@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "declaration": true,
     "lib": [
       "dom",
       "es5",
       "es2015"
     ],
-    "module": "es2015",
-    "outDir": "../dist",
-    "target": "es2015",
+    "module": "commonjs",
+    "outDir": "../dist/",
+    "rootDir": "./",
+    "target": "es5",
+    "noImplicitAny": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "baseUrl": ".",

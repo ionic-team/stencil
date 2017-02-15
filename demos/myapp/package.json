@@ -3,15 +3,18 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "build": "npm run build.ts && npm run bundle",
+    "build": "npm run build.clean && npm run build.ts && npm run bundle",
     "build.clean": "rimraf dist",
     "build.ts": "tsc --project src",
-    "bundle": "rollup -c scripts/build/rollup.es2015.js",
+    "bundle": "webpack",
+    "minify": "java -jar node_modules/google-closure-compiler/compiler.jar --language_in=ES6_STRICT --language_out=ES5 --rewrite_polyfills=false --js=www/build/app.client.js --js_output_file=www/build/app.client.min.js && npm run gzip",
+    "gzip": "gzip --keep --force www/build/app.client.min.js",
     "serve": "httpster -p 8888 -d www"
   },
   "devDependencies": {
+    "google-closure-compiler": "^20170124.0.0",
     "httpster": "1.0.3",
     "rimraf": "2.5.4",
-    "rollup": "^0.41.4"
+    "webpack": "^2.2.1"
   }
 }
