@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "dom",
+      "es5",
+      "es2015"
+    ],
+    "module": "es2015",
+    "outDir": "../dist",
+    "target": "es2015",
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "ionic-core": ["../../../ionic-core/dist/es2015/index"],
+      "ionic-ui": ["../../../ionic-ui/dist/es2015/index"]
+    }
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}

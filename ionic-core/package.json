@@ -1,0 +1,20 @@
+{
+  "name": "ionic-core",
+  "version": "0.0.1",
+  "description": "yolo",
+  "author": "yes",
+  "license": "MIT Romney",
+  "scripts": {
+    "build": "npm run build.clean && npm run build.ts && npm run rollup.es2015 && npm run copy.package.json",
+    "build.clean": "rimraf dist",
+    "build.ts": "tsc --project src",
+    "rollup.es2015": "rollup -c scripts/build/rollup.es2015.js",
+    "copy.package.json": "cp scripts/build/package.json dist"
+  },
+  "devDependencies": {
+    "rimraf": "2.5.4",
+    "rollup": "^0.41.4",
+    "tslint": "^4.3.1",
+    "typescript": "^2.1.0"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "ionic-next",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run build.core && npm run build.ui && npm run build.demo",
+    "build.core": "cd ionic-core && npm run build",
+    "build.ui": "cd ionic-ui && npm run build",
+    "build.demo": "cd demos/myapp && npm run build"
+  }
+}

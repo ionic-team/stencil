@@ -1,0 +1,17 @@
+{
+  "name": "myapp",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run build.ts && npm run bundle",
+    "build.clean": "rimraf dist",
+    "build.ts": "tsc --project src",
+    "bundle": "rollup -c scripts/build/rollup.es2015.js",
+    "serve": "httpster -p 8888 -d www"
+  },
+  "devDependencies": {
+    "httpster": "1.0.3",
+    "rimraf": "2.5.4",
+    "rollup": "^0.41.4"
+  }
+}
