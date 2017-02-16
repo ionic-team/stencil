@@ -9,6 +9,13 @@ module.exports = {
   output: {
     filename: './www/build/app.client.js'
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"production"'
+      }
+    })
+  ],
   resolve: {
     alias: {
         'ionic-core': path.resolve(__dirname, '../../ionic-core/dist/es2015/index.js'),
