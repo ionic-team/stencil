@@ -3,11 +3,24 @@ import { CompileOptions, CompilerContext, ComponentMeta, FileMeta } from './inte
 import { parseComponentSourceText } from './parser';
 import { transformTemplateContent } from './transformer';
 import { generateComponentDecorator, generateComponentFile } from './generator';
-import { readFile } from './util';
+import { readFile, readDir } from './util';
 
 
 export function compileDirectory(inputDirPath: string, opts?: CompileOptions, ctx?: CompilerContext) {
+  return readDir(inputDirPath, opts, ctx).then(filePaths => {
 
+    const promises: Promise<FileMeta>[] = [];
+
+    filePaths.forEach(filePath => {
+
+      if (filePath.split('.').pop().toLowerCase() === 'js') {
+        promises.push(compileFile(filePath, null, opts, ctx));
+      }
+
+    });
+
+    return Promise.all(promises);
+  });
 }
 
 
