@@ -6,7 +6,7 @@ import { generateComponentDecorator, generateComponentFile } from './generator';
 import { readFile } from './util';
 
 
-export function compileDirectory(inputDirPath: string, outputDirPath: string, opts?: CompileOptions, ctx?: CompilerContext) {
+export function compileDirectory(inputDirPath: string, opts?: CompileOptions, ctx?: CompilerContext) {
 
 }
 

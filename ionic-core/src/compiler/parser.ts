@@ -75,7 +75,7 @@ export interface ComponentParse {
   selector: string;
 }
 
-const COMPONENT_REGEX = /\@Component\s*?\(\s*?(\{([\s\S]*?)(\s*(.*?)\s*?)([\s\S]*?)}\s*?)\)/m;
+const COMPONENT_REGEX = /\Component\s*?\(\s*?(\{([\s\S]*?)(\s*(.*?)\s*?)([\s\S]*?)}\s*?)\)/m;
 
 const TEMPLATE_REGEX = /\s*template\s*:\s*(['"`])(.*?)(['"`])/m;
 

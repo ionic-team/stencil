@@ -32,6 +32,7 @@ export interface ComponentMeta {
 
 
 export interface CompileOptions {
+  compiledFileSuffix?: string;
   writeToDisk?: boolean;
 }
 

@@ -2,8 +2,8 @@ import { Component, Input, Output } from 'ionic-core';
 
 
 @Component({
-  'selector': 'ion-button',
-  'templateUrl': 'button.html'
+  selector: 'ion-button',
+  templateUrl: 'button.html'
 })
 export class Button {
   constructor() {

@@ -1,25 +1,24 @@
+const fs = require('fs');
 const path = require('path');
 const compiler = require('../../../ionic-core/dist/es2015/compiler/index');
 
 
-// compiler.compileFile(path.join(__dirname, '../../'))
+function compileComponents() {
+  let inputFilePath = path.join(__dirname, '../../dist/es2015/components/button/button.js');
 
-let filePath = 'asdf'
-let sourceText = `
-@Component({
-  selector: 'ion-button',
-  template: '<div>hi</div>'
-})
-export class MyButton{}
-`
+  console.log(inputFilePath)
 
+  let promises = [
+    compiler.compileFile(inputFilePath)
+  ];
 
-// var asdf = compiler.parseComponentDecorator(content)
-// console.log(asdf)
+  Promise.all(promises).then(files => {
 
+    files.forEach(f => {
+      console.log(f);
+    });
 
-var out = compiler.compileSourceText(sourceText).then(components => {
-  console.log(components)
-});
+  });
+}
 
-
+compileComponents();
