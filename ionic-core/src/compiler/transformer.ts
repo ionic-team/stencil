@@ -1,9 +1,4 @@
 
-const directiveReplacer: {[find: string]: string} = {
-  '*ngIf=': 'v-if',
-  '*ngFor=': 'v-for'
-};
-
 
 export function transformTemplateContent(content: string) {
 
