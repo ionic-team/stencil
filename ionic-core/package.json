@@ -5,17 +5,19 @@
   "author": "yes",
   "license": "MIT Romney",
   "scripts": {
-    "build": "npm run build.clean && npm run build.ts && npm run rollup.index && npm run copy.package.json",
+    "build": "npm run build.clean && npm run build.index.ts && npm run rollup.index && npm run copy.package.json && npm run build.compiler.ts",
     "build.clean": "rimraf dist",
-    "build.ts": "tsc --project src",
+    "build.index.ts": "tsc --project src",
+    "build.compiler.ts": "tsc --project src/compiler",
     "rollup.index": "rollup -c scripts/build/rollup.index.js",
     "copy.package.json": "cp scripts/build/package.json dist"
   },
   "devDependencies": {
     "rimraf": "2.5.4",
-    "rollup": "^0.41.4",
-    "tslint": "^4.3.1",
-    "typescript": "^2.1.0",
-    "vue": "^2.1.10"
+    "rollup": "0.41.4",
+    "tslint": "4.3.1",
+    "typescript": "2.1.0",
+    "vue": "2.1.10",
+    "vue-template-compiler": "2.1.10"
   }
 }

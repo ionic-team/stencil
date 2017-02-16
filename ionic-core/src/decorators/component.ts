@@ -1,6 +1,4 @@
 
-declare var Vue: any;
-
 
 export let Component: {
   (meta: {
@@ -9,4 +7,14 @@ export let Component: {
     templateUrl?: string;
     stylesheets?: string[];
   }): any;
+};
+
+
+export let Input: {
+  (): any;
+};
+
+
+export let Output: {
+  (): any;
 };

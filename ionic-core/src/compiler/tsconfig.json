@@ -1,23 +1,21 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "declaration": true,
+    "declaration": false,
     "lib": [
       "dom",
       "es5",
       "es2015"
     ],
     "module": "es2015",
-    "outDir": "../dist/es2015",
+    "outDir": "../../dist/es2015/compiler",
     "target": "es2015",
     "noImplicitAny": true,
-    "sourceMap": true,
-    "experimentalDecorators": true
+    "sourceMap": false,
+    "baseUrl": "."
   },
   "include": [
     "**/*.ts"
-  ],
-  "exclude": [
-    "compiler/**/*.ts"
   ]
 }
