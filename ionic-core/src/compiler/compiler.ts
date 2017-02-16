@@ -1,8 +1,9 @@
 import * as compiler from './build';
-import * as fs from 'fs';
-import { CompileOptions, CompilerContext, ComponentItem} from './interfaces';
-import { parseComponentDecorator } from './parser';
+import { CompileOptions, CompilerContext, ComponentMeta, FileMeta } from './interfaces';
+import { parseComponentSourceText } from './parser';
 import { transformTemplateContent } from './transformer';
+import { generateComponentDecorator, generateComponentFile } from './generator';
+import { readFile } from './util';
 
 
 export function compileDirectory(inputDirPath: string, outputDirPath: string, opts?: CompileOptions, ctx?: CompilerContext) {
@@ -10,82 +11,85 @@ export function compileDirectory(inputDirPath: string, outputDirPath: string, op
 }
 
 
-export function compileFile(inputFilePath: string, outputFilePath: string, opts?: CompileOptions, ctx?: CompilerContext) {
-  return readFile(inputFilePath, opts, ctx).then(content => {
-    return compileFileContent(inputFilePath, content, opts, ctx);
+export function compileFile(inputFilePath: string, outputFilePath?: string, opts?: CompileOptions, ctx?: CompilerContext) {
+  return readFile(inputFilePath, opts, ctx).then(sourceText => {
+
+    const file: FileMeta = {
+      inputFilePath: inputFilePath,
+      outputFilePath: outputFilePath,
+      inputSourceText: sourceText,
+      outputSourceText: sourceText
+    };
+
+    return compileSourceText(sourceText, opts, ctx).then(components => {
+      file.components = components;
+
+      return generateComponentFile(file, opts, ctx).then(() => {
+        return file;
+      });
+    });
   });
 }
 
 
-export function compileFileContent(filePath: string, content: string, opts?: CompileOptions, ctx?: CompilerContext) {
-  const items = parseComponentDecorator(content, opts, ctx);
+export function compileSourceText(sourceText: string, opts?: CompileOptions, ctx?: CompilerContext) {
+  const components = parseComponentSourceText(sourceText, opts, ctx);
 
-  const promises: Promise<ComponentItem>[] = [];
+  const promises: Promise<ComponentMeta>[] = [];
 
-  items.forEach(item => {
-    item.filePath = filePath;
+  components.forEach(c => {
+    if (c.template) {
+      promises.push(Promise.resolve(c));
 
-    if (item.template) {
-      promises.push(Promise.resolve(item));
-
-    } else if (item.templateUrl) {
-      promises.push(loadTemplateFile(item, opts, ctx));
+    } else if (c.templateUrl) {
+      promises.push(loadTemplateFile(c, opts, ctx));
     }
   });
 
-  return Promise.all(promises).then(items => {
-    items.forEach(item => {
-      compileTemplate(item, opts, ctx);
+  return Promise.all(promises).then(components => {
+    components.forEach(c => {
+      compileTemplate(c, opts, ctx);
+      generateComponentDecorator(c, opts, ctx);
     });
 
-    return items;
+    return components;
   });
 }
 
 
-export function loadTemplateFile(item: ComponentItem, opts?: CompileOptions, ctx?: CompilerContext) {
-  let templateFilePath = item.templateUrl;
+export function loadTemplateFile(c: ComponentMeta, opts?: CompileOptions, ctx?: CompilerContext) {
+  let templateFilePath = c.templateUrl;
 
   return readFile(templateFilePath, opts, ctx)
     .then(template => {
-      item.template = template;
-      return item;
+      c.template = template;
+      return c;
     })
     .catch(reason => {
-      item.errors = [reason];
-      return item;
+      c.templateErrors = [reason];
+      return c;
     });
 }
 
 
-export function compileTemplate(item: ComponentItem, opts?: any, ctx?: CompilerContext): ComponentItem {
+export function compileTemplate(c: ComponentMeta, opts?: any, ctx?: CompilerContext): ComponentMeta {
   try {
-    item.transformedTemplate = transformTemplateContent(item.template);
+    c.transformedTemplate = transformTemplateContent(c.template);
 
-    const compilerResult = compiler.compile(item.transformedTemplate, opts);
+    const compileResult = compiler.compile(c.transformedTemplate, opts);
 
-    item.ast = compilerResult.ast;
-    item.templateRender = compilerResult.render;
-    item.staticRenderFns = compilerResult.staticRenderFns;
-    item.errors = (<any>compilerResult).errors;
+    c.templateAst = compileResult.ast;
+    c.templateRenderSource = compileResult.render;
+    c.templateStaticRenderFns = compileResult.staticRenderFns;
+    c.templateErrors = (<any>compileResult).errors;
+
+    if (!c.templateErrors.length && c.templateRenderSource) {
+      c.templateRenderFn = `function (_c, context){${c.templateRenderSource}}`;
+    }
 
   } catch (e) {
-    item.errors = [e ? e.toString() : 'compile template error'];
+    c.templateErrors = [e ? e.toString() : 'compile template error'];
   }
 
-  return item;
-}
-
-
-function readFile(filePath: string, opts: CompileOptions, ctx: CompilerContext): Promise<string> {
-  return new Promise((resolve, reject) => {
-    fs.readFile(filePath, (err, content) => {
-      if (err) {
-        reject(err);
-
-      } else {
-        resolve(content.toString());
-      }
-    });
-  });
+  return c;
 }

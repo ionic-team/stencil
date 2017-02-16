@@ -1,73 +1,74 @@
-import { CompileOptions, CompilerContext, ComponentItem} from './interfaces';
+import { CompileOptions, CompilerContext, ComponentMeta} from './interfaces';
 
 
-export function parseComponentDecorator(content: string, opts?: CompileOptions, ctx?: CompilerContext) {
-  const items: ComponentItem[] = [];
+export function parseComponentSourceText(sourceText: string, opts?: CompileOptions, ctx?: CompilerContext) {
+  const components: ComponentMeta[] = [];
 
-  if (!content || typeof content !== 'string' || !content.length) {
-    return items;
+  if (!sourceText || typeof sourceText !== 'string' || !sourceText.length) {
+    return components;
   }
 
-  var match: ComponentMeta;
+  let match: ComponentParse;
 
-  while ((match = getComponentMeta(content))) {
-    items.push({
-      hasValidComponent: true,
-      template: content,
+  while ((match = getComponentMatch(sourceText))) {
+    components.push({
+      selector: match.selector,
+      template: match.template,
       templateUrl: match.templateUrl,
-      inputComponentDecorator: match.component
+      inputComponentDecorator: match.inputText,
+      outputComponentDecorator: match.inputText,
     });
 
-    content = content.replace(match.component, '');
+    sourceText = sourceText.replace(match.inputText, '');
   }
 
-
-  return items;
+  return components;
 }
 
 
-export function getComponentMeta(str: string): ComponentMeta {
+export function getComponentMatch(str: string): ComponentParse {
   let match = COMPONENT_REGEX.exec(str);
   if (match) {
-    var meta = {
+    var parsed = {
       start: match.index,
       end: match.index + match[0].length,
-      component: match[0],
+      inputText: match[0],
       data: match[5].trim(),
       templateUrl: '',
       template: '',
       selector: ''
     };
 
-    if (!meta.data) {
+    if (!parsed.data) {
       return null;
     }
 
-    match = TEMPLATE_REGEX.exec(meta.data);
+    match = TEMPLATE_REGEX.exec(parsed.data);
     if (match) {
-      meta.template = match[2].trim();
+      parsed.template = match[2].trim();
     }
 
-    match = TEMPLATE_URL_REGEX.exec(meta.data);
+    match = TEMPLATE_URL_REGEX.exec(parsed.data);
     if (match) {
-      meta.templateUrl = match[2].trim();
+      parsed.templateUrl = match[2].trim();
     }
 
-    match = SELECTOR_REGEX.exec(meta.data);
+    match = SELECTOR_REGEX.exec(parsed.data);
     if (match) {
-      meta.selector = match[2].trim();
+      parsed.selector = match[2].trim();
     }
 
-    return meta;
+    return parsed;
   }
+
   return null;
 }
 
 
-export interface ComponentMeta {
+export interface ComponentParse {
   start: number;
   end: number;
-  component: string;
+  inputText: string;
   data: string;
   templateUrl: string;
   template: string;

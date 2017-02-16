@@ -1,22 +1,38 @@
 
-export interface ComponentItem {
-  hasValidComponent?: boolean;
-  filePath?: string;
+
+export interface FileMeta {
+  inputFilePath?: string;
+  outputFilePath?: string;
+
+  inputSourceText?: string;
+  outputSourceText?: string;
+
+  components?: ComponentMeta[];
+}
+
+
+export interface ComponentMeta {
+  selector?: string;
+
   template?: string;
-  transformedTemplate?: string;
   templateUrl?: string;
-  templateRender?: string;
+
+  transformedTemplate?: string;
+  templateRenderSource?: string;
+  templateRenderFn?: string;
+  templateStaticRenderFns?: any;
+
+  templateErrors?: string[];
+  templateAst?: any;
+
   inputComponentDecorator?: string;
   outputComponentDecorator?: string;
-  ast?: any;
-  staticRenderFns?: any;
-  errors?: string[];
 }
 
 
 
 export interface CompileOptions {
-
+  writeToDisk?: boolean;
 }
 
 

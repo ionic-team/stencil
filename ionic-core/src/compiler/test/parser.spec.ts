@@ -1,9 +1,9 @@
-import { parseComponentDecorator, getComponentMeta } from '../parser';
+import { parseComponentSourceText, getComponentMatch } from '../parser';
 
 
 describe('parser', () => {
 
-  describe('parseComponentDecorator', () => {
+  describe('parseComponentSourceText', () => {
 
     it('should get multiple component meta data', () => {
       let content = `
@@ -13,7 +13,7 @@ describe('parser', () => {
         @Component({ templateUrl: './buttonB.html' })
         export class MyButtonB {}
         `;
-      let p = parseComponentDecorator(content);
+      let p = parseComponentSourceText(content);
       expect(p.length).toEqual(2);
       expect(p[0].templateUrl).toEqual('./buttonA.html');
       expect(p[1].templateUrl).toEqual('./buttonB.html');
@@ -21,26 +21,26 @@ describe('parser', () => {
 
     it('should get one component template url', () => {
       let content = `@Component({ templateUrl: './button.html' })`;
-      let p = parseComponentDecorator(content);
+      let p = parseComponentSourceText(content);
       expect(p.length).toEqual(1);
       expect(p[0].templateUrl).toEqual('./button.html');
     });
 
     it('should not parse invalid component meta', () => {
       let content = `Component Data!!`;
-      let p = parseComponentDecorator(content);
+      let p = parseComponentSourceText(content);
       expect(p.length).toEqual(0);
     });
 
     it('should return empty array for null', () => {
-      expect(parseComponentDecorator(undefined).length).toEqual(0);
-      expect(parseComponentDecorator('').length).toEqual(0);
-      expect(parseComponentDecorator(null).length).toEqual(0);
+      expect(parseComponentSourceText(undefined).length).toEqual(0);
+      expect(parseComponentSourceText('').length).toEqual(0);
+      expect(parseComponentSourceText(null).length).toEqual(0);
     });
 
   });
 
-  describe('getComponentMeta', () => {
+  describe('getComponentMatch', () => {
 
     it('should get Component with template url and selector above', () => {
       const str = `
@@ -50,7 +50,7 @@ describe('parser', () => {
         })
       `;
 
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.templateUrl).toEqual('home.html');
     });
 
@@ -62,7 +62,7 @@ describe('parser', () => {
         })
       `;
 
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.templateUrl).toEqual('home.html');
     });
 
@@ -78,41 +78,41 @@ describe('parser', () => {
         )
       `;
 
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.templateUrl).toEqual('c:\\some\windows\path.ts');
     });
 
     it('should get Component with template url and spaces', () => {
       const str = '  @Component  (  {  templateUrl  :  `  hi  `  }  )  ';
-      const match = getComponentMeta(str);
-      expect(match.component).toEqual('@Component  (  {  templateUrl  :  `  hi  `  }  )');
+      const match = getComponentMatch(str);
+      expect(match.inputText).toEqual('@Component  (  {  templateUrl  :  `  hi  `  }  )');
       expect(match.templateUrl).toEqual('hi');
     });
 
     it('should get Component with template url and back-ticks', () => {
       const str = '@Component({templateUrl:`hi`})';
-      const match = getComponentMeta(str);
-      expect(match.component).toEqual('@Component({templateUrl:`hi`})');
+      const match = getComponentMatch(str);
+      expect(match.inputText).toEqual('@Component({templateUrl:`hi`})');
       expect(match.templateUrl).toEqual('hi');
     });
 
     it('should get Component with template url and double quotes', () => {
       const str = '@Component({templateUrl:"hi"})';
-      const match = getComponentMeta(str);
-      expect(match.component).toEqual('@Component({templateUrl:"hi"})');
+      const match = getComponentMatch(str);
+      expect(match.inputText).toEqual('@Component({templateUrl:"hi"})');
       expect(match.templateUrl).toEqual('hi');
     });
 
     it('should get Component with template url and single quotes', () => {
       const str = '@Component({templateUrl:\'hi\'})';
-      const match = getComponentMeta(str);
-      expect(match.component).toEqual('@Component({templateUrl:\'hi\'})');
+      const match = getComponentMatch(str);
+      expect(match.inputText).toEqual('@Component({templateUrl:\'hi\'})');
       expect(match.templateUrl).toEqual('hi');
     });
 
     it('should get empty string for Component without string for templateUrl', () => {
       const str = '@Component({templateUrl:someVar})';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.templateUrl).toEqual('');
     });
 
@@ -124,7 +124,7 @@ describe('parser', () => {
           template: "<div>hi</div>"
         })';
       `
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.templateUrl).toEqual('hi.html');
       expect(match.selector).toEqual('ion-button');
       expect(match.template).toEqual('<div>hi</div>');
@@ -132,52 +132,52 @@ describe('parser', () => {
 
     it('should get Component templateUrl', () => {
       const str = '@Component({templateUrl:"hi"})';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.data).toEqual('templateUrl:"hi"');
       expect(match.templateUrl).toEqual('hi');
     });
 
     it('should get Component template', () => {
       const str = '@Component({template:"hi"})';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.data).toEqual('template:"hi"');
       expect(match.template).toEqual('hi');
     });
 
     it('should get Component selector', () => {
       const str = '@Component({selector:"hi"})';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match.data).toEqual('selector:"hi"');
       expect(match.selector).toEqual('hi');
     });
 
     it('should get null for Component without brackets', () => {
       const str = '@Component()';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match).toEqual(null);
     });
 
     it('should get null for Component without parentheses', () => {
       const str = '@Component';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match).toEqual(null);
     });
 
     it('should get null for Component without @', () => {
       const str = 'Component({})';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match).toEqual(null);
     });
 
     it('should get null for @Component({})', () => {
       const str = '@Component({})';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match).toEqual(null);
     });
 
     it('should get null for no Component', () => {
       const str = 'whatever';
-      const match = getComponentMeta(str);
+      const match = getComponentMatch(str);
       expect(match).toEqual(null);
     });
 

@@ -1,5 +1,5 @@
 import { compileTemplate } from '../compiler';
-import { ComponentItem } from '../interfaces';
+import { ComponentMeta } from '../interfaces';
 
 
 describe('compiler', () => {
@@ -7,24 +7,24 @@ describe('compiler', () => {
   describe('compileTemplate', () => {
 
     it('should compile template', () => {
-      let item: ComponentItem = {
+      let m: ComponentMeta = {
         template: '<div>hello</div>'
       };
 
-      compileTemplate(item);
+      compileTemplate(m);
 
-      expect(item.templateRender.length > 0).toEqual(true);
-      expect(item.errors.length).toEqual(0);
+      expect(m.templateRenderSource.length > 0).toEqual(true);
+      expect(m.templateErrors.length).toEqual(0);
     });
 
     it('should get error for bad template', () => {
-      let item: ComponentItem = {
+      let m: ComponentMeta = {
         template: 'no root node should throw error'
       };
 
-      compileTemplate(item);
+      compileTemplate(m);
 
-      expect(item.errors.length > 0).toEqual(true);
+      expect(m.templateErrors.length > 0).toEqual(true);
     });
 
   });
