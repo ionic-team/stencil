@@ -13,7 +13,7 @@ Protoype and mono-repo for `ionic-core`, `ionic-ui` and a demo app. Each project
 
 ### Serve `demo/myapp/www`
 
-    npm serve
+    npm run serve
 
 [http://localhost:8888/](http://localhost:8888/)
 
