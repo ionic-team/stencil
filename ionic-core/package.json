@@ -13,6 +13,7 @@
     "copy.package.json": "cp scripts/build/package.json dist"
   },
   "devDependencies": {
+    "@types/node": "^7.0.5",
     "rimraf": "2.5.4",
     "rollup": "0.41.4",
     "tslint": "4.3.1",

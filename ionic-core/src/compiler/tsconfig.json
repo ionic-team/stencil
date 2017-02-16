@@ -8,12 +8,15 @@
       "es5",
       "es2015"
     ],
-    "module": "es2015",
+    "module": "commonjs",
     "outDir": "../../dist/es2015/compiler",
-    "target": "es2015",
+    "target": "es5",
     "noImplicitAny": true,
     "sourceMap": false,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "**/*.ts"

@@ -8,7 +8,8 @@
     "build": "npm run build.clean && npm run build.ts && npm run copy.package.json",
     "build.clean": "rimraf dist",
     "build.ts": "tsc --project src",
-    "copy.package.json": "cp scripts/build/package.json dist"
+    "copy.package.json": "cp scripts/build/package.json dist",
+    "generate": "node scripts/build/generate.js"
   },
   "devDependencies": {
     "rimraf": "2.5.4",
