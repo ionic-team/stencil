@@ -1,7 +1,7 @@
 import * as compiler from './build';
 import * as fs from 'fs';
 import { CompileOptions, CompilerContext, ComponentItem} from './interfaces';
-import { parseFileContent } from './parser';
+import { parseComponentDecorator } from './parser';
 
 
 export function compileDirectory(inputDirPath: string, outputDirPath: string, opts?: CompileOptions, ctx?: CompilerContext) {
@@ -19,7 +19,7 @@ export function compileFile(inputFilePath: string, outputFilePath: string, opts?
 export function compileFileContent(componentFilePath: string, content: string, opts?: CompileOptions, ctx?: CompilerContext) {
   const promises: Promise<ComponentItem>[] = [];
 
-  const parseResults = parseFileContent(content, opts, ctx);
+  const parseResults = parseComponentDecorator(content, opts, ctx);
 
 
   return Promise.all(promises);
