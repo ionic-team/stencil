@@ -2,7 +2,8 @@
 export interface ComponentItem {
   hasValidComponent?: boolean;
   filePath?: string;
-  templateContent?: string;
+  template?: string;
+  transformedTemplate?: string;
   templateUrl?: string;
   templateRender?: string;
   inputComponentDecorator?: string;
