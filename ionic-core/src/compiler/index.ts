@@ -16,59 +16,59 @@ export function compileFile(inputFilePath: string, outputFilePath: string, opts?
 }
 
 
-export function compileFileContent(componentFilePath: string, content: string, opts?: CompileOptions, ctx?: CompilerContext) {
+export function compileFileContent(filePath: string, content: string, opts?: CompileOptions, ctx?: CompilerContext) {
+  const items = parseComponentDecorator(content, opts, ctx);
+
   const promises: Promise<ComponentItem>[] = [];
 
-  const parseResults = parseComponentDecorator(content, opts, ctx);
+  items.forEach(item => {
+    item.filePath = filePath;
 
+    if (item.templateContent) {
+      promises.push(Promise.resolve(item));
 
-  return Promise.all(promises);
-}
+    } else if (item.templateUrl) {
+      promises.push(loadTemplateFile(item, opts, ctx));
+    }
+  });
 
-
-export function parseComponentContent(componentFilePath: string, componentContent: string, opts?: CompileOptions, ctx?: CompilerContext): Promise<ComponentItem> {
-  const item: ComponentItem = {
-    hasValidComponent: false
-  };
-
-  var isValid = true;
-
-  if (!isValid) {
-    return Promise.resolve(item);
-  }
-
-  item.inputTemplateContent = null;
-  item.inputTemplateUrl = './button.html';
-
-  if (!item.inputTemplateContent && item.inputTemplateUrl) {
-    return loadTemplateFile(componentFilePath, item.inputTemplateUrl, opts, ctx).then(inputTemplateContent => {
-      item.inputTemplateContent = inputTemplateContent;
-
+  return Promise.all(promises).then(items => {
+    items.forEach(item => {
       compileTemplate(item, opts, ctx);
-
-      return Promise.resolve(item);
     });
-  }
 
-  compileTemplate(item, opts, ctx);
-
-  return Promise.resolve(item);
+    return items;
+  });
 }
 
 
-export function loadTemplateFile(componentFilePath: string, templateFilePath: string, opts?: CompileOptions, ctx?: CompilerContext) {
+export function loadTemplateFile(item: ComponentItem, opts?: CompileOptions, ctx?: CompilerContext) {
+  let templateFilePath = item.templateUrl;
 
-  return readFile(templateFilePath, opts, ctx);
+  return readFile(templateFilePath, opts, ctx)
+    .then(inputTemplateContent => {
+      item.templateContent = inputTemplateContent;
+      return item;
+    })
+    .catch(reason => {
+      item.errors = [reason];
+      return item;
+    });
 }
 
 
 export function compileTemplate(item: ComponentItem, opts?: any, ctx?: CompilerContext): ComponentItem {
-  const compilerResult = compiler.compile(item.inputTemplateContent, opts);
+  try {
+    const compilerResult = compiler.compile(item.templateContent, opts);
 
-  item.ast = compilerResult.ast;
-  item.outputRenderContent = compilerResult.render;
-  item.staticRenderFns = compilerResult.staticRenderFns;
-  item.errors = (<any>compilerResult).errors;
+    item.ast = compilerResult.ast;
+    item.templateRender = compilerResult.render;
+    item.staticRenderFns = compilerResult.staticRenderFns;
+    item.errors = (<any>compilerResult).errors;
+
+  } catch (e) {
+    item.errors = [e ? e.toString() : 'invalid template'];
+  }
 
   return item;
 }

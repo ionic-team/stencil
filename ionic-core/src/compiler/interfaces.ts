@@ -1,10 +1,12 @@
 
 export interface ComponentItem {
   hasValidComponent?: boolean;
-  inputTemplateContent?: string;
-  inputTemplateUrl?: string;
-  outputRenderContent?: string;
-  outputComponentContent?: string;
+  filePath?: string;
+  templateContent?: string;
+  templateUrl?: string;
+  templateRender?: string;
+  inputComponentDecorator?: string;
+  outputComponentDecorator?: string;
   ast?: any;
   staticRenderFns?: any;
   errors?: string[];

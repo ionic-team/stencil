@@ -15,15 +15,15 @@ describe('parser', () => {
         `;
       let p = parseComponentDecorator(content);
       expect(p.length).toEqual(2);
-      expect(p[0].inputTemplateUrl).toEqual('./buttonA.html');
-      expect(p[1].inputTemplateUrl).toEqual('./buttonB.html');
+      expect(p[0].templateUrl).toEqual('./buttonA.html');
+      expect(p[1].templateUrl).toEqual('./buttonB.html');
     });
 
     it('should get one component template url', () => {
       let content = `@Component({ templateUrl: './button.html' })`;
       let p = parseComponentDecorator(content);
       expect(p.length).toEqual(1);
-      expect(p[0].inputTemplateUrl).toEqual('./button.html');
+      expect(p[0].templateUrl).toEqual('./button.html');
     });
 
     it('should not parse invalid component meta', () => {

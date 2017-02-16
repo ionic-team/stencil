@@ -13,8 +13,9 @@ export function parseComponentDecorator(content: string, opts?: CompileOptions, 
   while ((match = getTemplateMatch(content))) {
     items.push({
       hasValidComponent: true,
-      inputTemplateContent: content,
-      inputTemplateUrl: match.templateUrl
+      templateContent: content,
+      templateUrl: match.templateUrl,
+      inputComponentDecorator: match.component
     });
 
     content = content.replace(match.component, '');
