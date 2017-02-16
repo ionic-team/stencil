@@ -10,15 +10,29 @@
     "build.index.ts": "tsc --project src",
     "build.compiler.ts": "tsc --project src/compiler",
     "rollup.index": "rollup -c scripts/build/rollup.index.js",
-    "copy.package.json": "cp scripts/build/package.json dist"
+    "copy.package.json": "cp scripts/build/package.json dist",
+    "test": "jest || true"
   },
   "devDependencies": {
+    "@types/jest": "^18.1.1",
     "@types/node": "^7.0.5",
+    "jest": "^18.1.0",
     "rimraf": "2.5.4",
     "rollup": "0.41.4",
     "tslint": "4.3.1",
     "typescript": "^2.1.0",
     "vue": "2.1.10",
     "vue-template-compiler": "2.1.10"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts)$": "<rootDir>/scripts/preprocessor.js"
+    },
+    "testRegex": "/src/.*\\.spec\\.(ts|js)$"
   }
 }

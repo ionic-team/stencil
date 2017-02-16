@@ -15,7 +15,8 @@
     "sourceMap": false,
     "baseUrl": ".",
     "types": [
-      "node"
+      "node",
+      "jest"
     ]
   },
   "include": [
