@@ -1,14 +1,17 @@
 
 export {
   bootstrapClient,
-  registerComponent
 } from './client/platform-client';
 
 export {
-  BootstrapData
+  AppInitializeData
 } from './shared/interfaces';
 
 export {
-  DirectiveDecorator,
-  Directive
-} from './decorators/component';
+  ComponentDecorator,
+  Component,
+  Input,
+  InputDecorator,
+  Output,
+  OutputDecorator
+} from './decorators/decorators';

@@ -1,7 +1,7 @@
-import { Directive } from 'ionic-core';
+import { Component } from 'ionic-core';
 
 
-@Directive({
+@Component({
   selector: 'ion-button'
 })
 export class Button {

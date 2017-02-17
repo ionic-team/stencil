@@ -1,6 +1,6 @@
 
 
-export interface BootstrapData {
+export interface AppInitializeData {
   config?: any;
   pages?: any[];
   components?: any[];
