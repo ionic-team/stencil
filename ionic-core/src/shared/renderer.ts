@@ -1,4 +1,6 @@
 import Vue from 'vue'
+import { ComponentClass } from '../shared/interfaces';
+import { ComponentMeta } from '../decorators/decorators';
 
 
 export function createRenderer(window: any, document: any): Renderer {
@@ -7,17 +9,17 @@ export function createRenderer(window: any, document: any): Renderer {
 }
 
 
-export function createComponent(r: Renderer) {
+export function registerComponent(r: Renderer, cls: ComponentClass, meta: ComponentMeta) {
+  r.component(meta.selector, meta.render);
+}
 
+
+export interface Renderer {
+  component: Vue.CreateElement;
 }
 
 
 function rendererFactory(window: any, document: any) {
 'placeholder:vue.runtime.js'
-}
-
-
-export interface Renderer {
-
 }
 

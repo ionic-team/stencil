@@ -1,8 +1,8 @@
 
-export const annotations = new WeakMap();
+const annotations = new WeakMap();
 
 
-export function addAnnotation(cls: any, dataKey: string, dataValue: any) {
+export function setAnnotation(cls: any, dataKey: string, dataValue: any) {
   let clsAnnotations = annotations.get(cls);
 
   if (clsAnnotations) {
@@ -12,5 +12,14 @@ export function addAnnotation(cls: any, dataKey: string, dataValue: any) {
     clsAnnotations = {};
     clsAnnotations[dataKey] = dataValue;
     annotations.set(cls, clsAnnotations);
+  }
+}
+
+
+export function getAnnotation(cls: any, dataKey: string) {
+  let clsAnnotations = annotations.get(cls);
+
+  if (clsAnnotations) {
+    return clsAnnotations[dataKey];
   }
 }

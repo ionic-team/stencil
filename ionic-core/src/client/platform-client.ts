@@ -1,11 +1,14 @@
-import { AppInitializeData } from '../shared/interfaces';
-import { createRenderer, createComponent } from '../shared/renderer';
+import { AppInitializeData, ComponentClass } from '../shared/interfaces';
+import { createRenderer, registerComponent, Renderer } from '../shared/renderer';
+import { registerComponents } from './component-client';
 
 
-export function bootstrapClient(bootstrapData: AppInitializeData) {
-  console.debug(`bootstrapClient: ${bootstrapData}`);
+export function bootstrapClient(appInit: AppInitializeData) {
+  console.time(`bootstrapClient`);
 
   const r = createRenderer(window, document);
 
-  createComponent(r);
+  registerComponents(r, appInit.components);
+
+  console.timeEnd(`bootstrapClient`);
 }

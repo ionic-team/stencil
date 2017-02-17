@@ -1,55 +1,77 @@
-import { addAnnotation } from './annotations';
+import { setAnnotation, getAnnotation } from './annotations';
 
 
-function makeDecorator(key: string): (...args: any[]) => (cls: any) => any {
+const COMPONENT_KEY = 'Component';
+const INPUT_KEY = 'Input';
+const OUTPUT_KEY = 'Output';
 
-  function DecoratorFactory(data: any): (cls: any) => any {
-    const TypeDecorator: any = function(cls: any) {
-      addAnnotation(cls, key, data);
-      return cls;
-    };
-    return TypeDecorator;
-  }
 
-  return DecoratorFactory;
+export function getComponentMeta(cls: any): ComponentMeta {
+  return getAnnotation(cls, COMPONENT_KEY);
+}
+
+export function getInputMeta(cls: any, prop: string): InputMeta {
+  return getAnnotation(cls, INPUT_KEY);
+}
+
+export function getOutputMeta(cls: any, prop: string): OutputMeta {
+  return getAnnotation(cls, OUTPUT_KEY);
 }
 
 
 export interface ComponentDecorator {
-  (obj: Component): any;
+  (obj: ComponentMeta): any;
 }
 
 
-export interface Component {
-  selector?: string;
+export interface ComponentMeta {
+  selector: string;
+  template?: string;
+  templateUrl?: string;
+  render?: Function;
   inputs?: string[];
   outputs?: string[];
   host?: {[key: string]: string};
 }
 
 
-export const Component: ComponentDecorator = makeDecorator('Component');
+export const Component: ComponentDecorator = function(metadata: ComponentMeta): (cls: any) => any {
+  return function(cls: any) {
+    setAnnotation(cls, COMPONENT_KEY, metadata);
+    return cls;
+  }
+}
 
 
 export interface InputDecorator {
-  (obj: Input): any;
+  (obj?: InputMeta): any;
 }
 
 
-export interface Input {
+export interface InputMeta {
 }
 
 
-export const Input: InputDecorator = makeDecorator('Input');
+export const Input: InputDecorator = function(metadata: InputMeta): (cls: any) => any {
+  return function(cls: any) {
+    setAnnotation(cls, INPUT_KEY, metadata);
+    return cls;
+  }
+}
 
 
 export interface OutputDecorator {
-  (obj: Output): any;
+  (obj?: OutputMeta): any;
 }
 
 
-export interface Output {
+export interface OutputMeta {
 }
 
 
-export const Output: OutputDecorator = makeDecorator('Output');
+export const Output: OutputDecorator = function(metadata: OutputMeta): (cls: any) => any {
+  return function(cls: any) {
+    setAnnotation(cls, OUTPUT_KEY, metadata);
+    return cls;
+  }
+}
