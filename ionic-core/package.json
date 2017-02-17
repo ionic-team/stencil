@@ -16,11 +16,11 @@
   "devDependencies": {
     "@types/jest": "^18.1.1",
     "@types/node": "^7.0.5",
-    "jest": "^18.1.0",
+    "jest": "18.1.0",
     "rimraf": "2.5.4",
     "rollup": "0.41.4",
     "tslint": "4.3.1",
-    "typescript": "^2.1.0",
+    "typescript": "2.2.0",
     "vue": "2.1.10",
     "vue-template-compiler": "2.1.10"
   },

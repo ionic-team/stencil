@@ -15,7 +15,7 @@
     "google-closure-compiler": "^20170124.0.0",
     "httpster": "1.0.3",
     "rimraf": "2.5.4",
-    "typescript": "^2.1.0",
-    "webpack": "^2.2.1"
+    "typescript": "2.2.0",
+    "webpack": "2.2.1"
   }
 }
