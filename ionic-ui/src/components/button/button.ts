@@ -1,16 +1,14 @@
-import { Component, Input, Output } from 'ionic-core';
+import { Directive } from 'ionic-core';
 
 
-@Component({
-  selector: 'ion-button',
-  templateUrl: 'button.html'
+@Directive({
+  selector: 'ion-button'
 })
 export class Button {
   constructor() {
     console.log('button');
   }
 
-  @Input()
   set tabIndex(value: string) {
     console.log('type');
   }

@@ -9,7 +9,6 @@ export {
 } from './shared/interfaces';
 
 export {
-  Component,
-  Input,
-  Output
+  DirectiveDecorator,
+  Directive
 } from './decorators/component';

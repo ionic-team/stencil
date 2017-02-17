@@ -12,7 +12,11 @@
     "target": "es2015",
     "noImplicitAny": true,
     "sourceMap": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "vue": ["../node_modules/vue/types/index.d.ts"]
+    }
   },
   "include": [
     "**/*.ts"
