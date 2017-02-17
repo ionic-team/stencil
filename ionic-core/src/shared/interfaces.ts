@@ -1,6 +1,7 @@
 
 
 export interface AppInitializeData {
+  el?: string;
   config?: any;
   pages?: any[];
   components?: ComponentClass[];

@@ -11,6 +11,7 @@
     "outDir": "../dist/",
     "rootDir": "./",
     "target": "es5",
+    "noImplicitUseStrict": true,
     "noImplicitAny": true,
     "sourceMap": true,
     "experimentalDecorators": true,

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { ComponentClass } from '../shared/interfaces';
+import { AppInitializeData, ComponentClass } from '../shared/interfaces';
 import { ComponentMeta } from '../decorators/decorators';
 
 
@@ -9,12 +9,21 @@ export function createRenderer(window: any, document: any): Renderer {
 }
 
 
-export function registerComponent(r: Renderer, cls: ComponentClass, meta: ComponentMeta) {
-  r.component(meta.selector, meta.render);
+export function createApp(r: Renderer, appInit: AppInitializeData) {
+  debugger
+  const app = new (<any>r)({
+    el: appInit.el
+  });
 }
 
 
-export interface Renderer {
+export function registerComponent(r: Renderer, cls: ComponentClass, meta: ComponentMeta) {
+  r.component(meta.selector, meta.render);
+
+
+}
+
+export interface Renderer extends Vue {
   component: Vue.CreateElement;
 }
 
