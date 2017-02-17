@@ -25,3 +25,18 @@ if (destText.indexOf(placeHolder) === -1) {
 destText = destText.replace(placeHolder, sourceText);
 
 fs.writeFileSync(rendererRuntimeCommonDesc, destText);
+
+
+var bundleEntry = path.join(__dirname, '../../dist/es2015/index.js');
+
+rollup.rollup({
+  entry: bundleEntry
+
+}).then(function (bundle) {
+  // Generate bundle + sourcemap
+  var result = bundle.generate({
+    format: 'es'
+  });
+
+  fs.writeFileSync(bundleEntry, result.code);
+});
