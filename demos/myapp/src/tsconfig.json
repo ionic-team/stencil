@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "ionic-core": ["../../../ionic-core/dist/es2015/index"],
-      "ionic-ui": ["../../../ionic-ui/dist/es2015/index"]
+      "ionic-ui": ["../../../ionic-ui/dist/commonjs/index"]
     }
   },
   "include": [

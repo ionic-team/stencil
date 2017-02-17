@@ -9,7 +9,7 @@
     ],
     "module": "es2015",
     "outDir": "../dist/es2015",
-    "target": "es2015",
+    "target": "es5",
     "noImplicitAny": true,
     "sourceMap": true,
     "experimentalDecorators": true,

@@ -19,6 +19,6 @@ function compileComponents(inputDir) {
 
 }
 
-const inputDir = path.join(__dirname, '../../dist/es2015/components/');
+const inputDir = path.join(__dirname, '../../dist/commonjs/components/');
 
 compileComponents(inputDir);

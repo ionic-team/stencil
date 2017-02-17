@@ -5,11 +5,12 @@
   "author": "yes",
   "license": "MIT Romney",
   "scripts": {
-    "build": "npm run build.clean && npm run build.ts && npm run copy.package.json",
+    "build": "npm run build.clean && npm run build.commonjs && npm run compile.components && npm run copy.package.json",
     "build.clean": "rimraf dist",
-    "build.ts": "tsc --project src",
+    "build.commonjs": "tsc --project src --module commonjs --noImplicitUseStrict --outDir dist/commonjs",
+    "build.2015": "tsc --project src",
     "copy.package.json": "cp scripts/build/package.json dist",
-    "generate": "node scripts/build/generate.js"
+    "compile.components": "node scripts/build/compile-components.js"
   },
   "devDependencies": {
     "rimraf": "2.5.4",
