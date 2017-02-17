@@ -7,10 +7,6 @@ import { Component } from 'ionic-core';
 })
 export class Button {
   constructor() {
-    console.log('button');
-  }
-
-  set tabIndex(value: string) {
-    console.log('type');
+    console.log('ion-button');
   }
 }

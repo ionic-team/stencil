@@ -1,9 +1,7 @@
 
 
-export interface AppInitializeData {
-  el?: string;
+export interface AppInitOptions {
   config?: any;
-  pages?: any[];
   components?: ComponentClass[];
   routes?: any;
 }

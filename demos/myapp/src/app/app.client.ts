@@ -1,15 +1,13 @@
 import { bootstrapClient } from 'ionic-core';
-
+import { App } from 'ionic-ui';
 
 import config from './config';
-import pages from './pages';
 import components from './components';
 import routes from './routes';
 
 
-bootstrapClient({
+bootstrapClient(App, {
   config,
-  pages,
   components,
   routes
 });

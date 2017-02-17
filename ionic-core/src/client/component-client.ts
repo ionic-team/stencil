@@ -1,4 +1,4 @@
-import { AppInitializeData, ComponentClass } from '../shared/interfaces';
+import { AppInitOptions, ComponentClass } from '../shared/interfaces';
 import { registerComponent, Renderer } from '../shared/renderer';
 import { ionDevWarn } from '../shared/util';
 import { getComponentMeta, ComponentMeta } from '../decorators/decorators';

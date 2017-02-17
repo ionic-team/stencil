@@ -1,18 +1,16 @@
-import { AppInitializeData, ComponentClass } from '../shared/interfaces';
+import { AppInitOptions, ComponentClass } from '../shared/interfaces';
 import { createRenderer, createApp } from '../shared/renderer';
 import { registerComponents } from './component-client';
 
 
-export function bootstrapClient(appInit?: AppInitializeData) {
+export function bootstrapClient(rootComponent: any, opts?: AppInitOptions) {
   console.time(`bootstrapClient`);
 
-  appInit = appInit || {};
-  appInit.el = appInit.el || 'ion-app';
+  opts = opts || {};
 
-  const r = createRenderer(window, document);
-  createApp(r, appInit);
+  createApp(window, document, rootComponent, opts);
 
-  registerComponents(r, appInit.components);
+  // registerComponents(r, opts.components);
 
   console.timeEnd(`bootstrapClient`);
 }

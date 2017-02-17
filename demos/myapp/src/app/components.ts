@@ -1,5 +1,12 @@
-import { Button } from 'ionic-ui';
-import { MyComponent } from '../components/my-component';
+import {
+  App,
+  Button
+} from 'ionic-ui';
+
+
+import {
+  MyComponent
+} from '../components/my-component';
 
 
 export default [

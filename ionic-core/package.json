@@ -5,9 +5,9 @@
   "author": "yes",
   "license": "MIT Romney",
   "scripts": {
-    "build": "npm run build.clean && npm run build.index && npm run bundle.index && npm run copy.package.json && npm run build.compiler",
+    "build": "npm run build.clean && npm run build.index && npm run copy.package.json && npm run build.compiler",
     "build.clean": "rimraf dist",
-    "build.index": "tsc --project src",
+    "build.index": "tsc --project src && npm run bundle.index",
     "build.compiler": "tsc --project src/compiler",
     "bundle.index": "node scripts/build/bundle.index.js",
     "copy.package.json": "cp scripts/build/package.json dist",

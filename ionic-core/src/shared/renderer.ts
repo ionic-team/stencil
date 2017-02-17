@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import { AppInitializeData, ComponentClass } from '../shared/interfaces';
-import { ComponentMeta } from '../decorators/decorators';
+import { AppInitOptions, ComponentClass } from '../shared/interfaces';
+import { ComponentMeta, getComponentMeta } from '../decorators/decorators';
 
 
 export function createRenderer(window: any, document: any): Renderer {
@@ -9,11 +9,18 @@ export function createRenderer(window: any, document: any): Renderer {
 }
 
 
-export function createApp(r: Renderer, appInit: AppInitializeData) {
-  debugger
-  const app = new (<any>r)({
-    el: appInit.el
-  });
+export function createApp(window: any, document: any, rootComponentCls: any, opts: AppInitOptions): any {
+  const r: any = rendererFactory(window, document);
+
+  const rootComponentMeta = getComponentMeta(rootComponentCls);
+
+  (<any>rootComponentMeta).el = rootComponentMeta.selector;
+
+  const app: Vue = new (<any>r)(rootComponentMeta);
+
+  app.$el.classList.add('ion-app');
+
+  return app;
 }
 
 
@@ -22,6 +29,7 @@ export function registerComponent(r: Renderer, cls: ComponentClass, meta: Compon
 
 
 }
+
 
 export interface Renderer extends Vue {
   component: Vue.CreateElement;

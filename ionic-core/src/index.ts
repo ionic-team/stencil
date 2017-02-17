@@ -4,7 +4,7 @@ export {
 } from './client/platform-client';
 
 export {
-  AppInitializeData
+  AppInitOptions
 } from './shared/interfaces';
 
 export {
