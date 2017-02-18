@@ -10,6 +10,7 @@
     "build.index": "tsc --project src && npm run bundle.index",
     "build.compiler": "tsc --project src/compiler",
     "bundle.index": "node scripts/build/bundle.index.js",
+    "build.quick": "npm run build.index",
     "copy.package.json": "cp scripts/build/package.json dist",
     "test": "jest || true"
   },
