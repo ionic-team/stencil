@@ -1,7 +1,7 @@
 
 
 export interface AppInitOptions {
-  el?: string;
+  rootSelector?: string;
   config?: any;
   components?: ComponentClass[];
   routes?: any;

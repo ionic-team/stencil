@@ -10,8 +10,8 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
 
   // add the user's root component
   let meta = getComponentMeta(userRootCls);
-  let userRootSelector = meta.selector
-  appComponents[meta.selector] = <any>meta;
+  let userRootSelector = meta.selector || 'ion-user-root';
+  appComponents[userRootSelector] = <any>meta;
 
   if (opts.components) {
     // add all of the app's components
@@ -23,18 +23,12 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
 
   // create the app options
   const appRoot: Vue.ComponentOptions<any> = {
-    el: opts.el || 'ion-app',
+    el: opts.rootSelector || 'ion-app',
 
     render: function (h) {
-      return h(
-        'button',
-        {
-          class: 'ion-app'
-        },
-        [
-          h(userRootSelector)
-        ]
-      );
+      return h('div', { class: 'ion-app' }, [
+        h(userRootSelector)
+      ]);
     },
 
     beforeCreate: function () {
