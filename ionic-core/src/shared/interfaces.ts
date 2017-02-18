@@ -1,10 +1,10 @@
 
 
 export interface AppInitOptions {
+  el?: string;
   config?: any;
   components?: ComponentClass[];
   routes?: any;
 }
 
-
-export interface ComponentClass {}
+export type ComponentClass = Function;

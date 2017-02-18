@@ -1,5 +1,4 @@
 import {
-  App,
   Button
 } from 'ionic-ui';
 

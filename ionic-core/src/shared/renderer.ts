@@ -3,40 +3,79 @@ import { AppInitOptions, ComponentClass } from '../shared/interfaces';
 import { ComponentMeta, getComponentMeta } from '../decorators/decorators';
 
 
-export function createRenderer(window: any, document: any): Renderer {
-  const r: any = rendererFactory(window, document);
-  return r;
+export function createApp(window: any, document: any, userRootCls: ComponentClass, opts: AppInitOptions): any {
+
+  // generate a collection of the app components
+  const appComponents: {[tag: string]: any} = {};
+
+  // add the user's root component
+  let meta = getComponentMeta(userRootCls);
+  let userRootSelector = meta.selector
+  appComponents[meta.selector] = <any>meta;
+
+  if (opts.components) {
+    // add all of the app's components
+    for (var i = 0, l = opts.components.length; i < l; i++) {
+      meta = getComponentMeta(opts.components[i]);
+      appComponents[meta.selector] = <any>meta;
+    }
+  }
+
+  // create the app options
+  const appRoot: Vue.ComponentOptions<any> = {
+    el: opts.el || 'ion-app',
+
+    render: function (h) {
+      return h(
+        'button',
+        {
+          class: 'ion-app'
+        },
+        [
+          h(userRootSelector)
+        ]
+      );
+    },
+
+    beforeCreate: function () {
+      console.debug('root component: beforeCreate');
+    },
+
+    created: function () {
+      console.debug('root component: created');
+    },
+
+    mounted: function () {
+      console.debug('root component: mounted');
+    },
+
+    components: appComponents
+
+  };
+
+  // fire up the renderer
+  const Renderer: any = rendererFactory(window, document);
+
+  // create the app
+  const app: Vue = new Renderer(appRoot);
 }
 
 
-export function createApp(window: any, document: any, rootComponentCls: any, opts: AppInitOptions): any {
-  const r: any = rendererFactory(window, document);
+const APP_MIXINS = {
 
-  const rootComponentMeta = getComponentMeta(rootComponentCls);
+  created: function () {
+    console.log('mixin: created!');
+  },
 
-  (<any>rootComponentMeta).el = rootComponentMeta.selector;
+  methods: {
+    heyYou: function () {
+      console.log('mixin: heyYou!')
+    }
+  }
 
-  const app: Vue = new (<any>r)(rootComponentMeta);
-
-  app.$el.classList.add('ion-app');
-
-  return app;
-}
-
-
-export function registerComponent(r: Renderer, cls: ComponentClass, meta: ComponentMeta) {
-  r.component(meta.selector, meta.render);
-
-
-}
-
-
-export interface Renderer extends Vue {
-  component: Vue.CreateElement;
-}
+};
 
 
 function rendererFactory(window: any, document: any) {
 'placeholder:vue.runtime.js'
 }
-

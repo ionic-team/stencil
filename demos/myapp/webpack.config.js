@@ -4,10 +4,10 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    app: './dist/app/app.client.js'
+    app: './dist/app/main.client.js'
   },
   output: {
-    filename: './www/build/app.client.js'
+    filename: './www/build/main.client.js'
   },
   plugins: [
     new webpack.DefinePlugin({

@@ -9,8 +9,8 @@
     "bundle": "webpack",
     "build.quick": "npm run build.ts && npm run compile.components && npm run bundle",
     "compile.components": "node scripts/build/compile-components.js",
-    "minify": "java -jar node_modules/google-closure-compiler/compiler.jar --language_in=ES6_STRICT --language_out=ES5 --rewrite_polyfills=false --js=www/build/app.client.js --js_output_file=www/build/app.client.min.js && npm run gzip",
-    "gzip": "gzip --keep --force www/build/app.client.min.js",
+    "minify": "java -jar node_modules/google-closure-compiler/compiler.jar --language_in=ES6_STRICT --language_out=ES5 --rewrite_polyfills=false --js=www/build/main.client.js --js_output_file=www/build/main.client.min.js && npm run gzip",
+    "gzip": "gzip --keep --force www/build/main.client.min.js",
     "serve": "httpster -p 8888 -d www"
   },
   "devDependencies": {

@@ -25,7 +25,7 @@ export interface ComponentDecorator {
 
 
 export interface ComponentMeta {
-  selector: string;
+  selector?: string;
   template?: string;
   templateUrl?: string;
   render?: Function;

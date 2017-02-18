@@ -11,7 +11,7 @@
     "build.core": "cd ionic-core && npm run build",
     "build.ui": "cd ionic-ui && npm run build",
     "build.demo": "cd demos/myapp && npm run build",
-    "build.quick": "(cd ionic-core && npm run build.quick) & (cd ionic-ui && npm run build.quick) & (cd demos/myapp && npm run build.quick)",
+    "build.quick": "(cd ionic-core && npm run build.quick) && (cd ionic-ui && npm run build.quick) && (cd demos/myapp && npm run build.quick)",
     "serve": "cd demos/myapp && npm run serve"
   }
 }

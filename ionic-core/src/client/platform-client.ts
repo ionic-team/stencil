@@ -1,6 +1,5 @@
 import { AppInitOptions, ComponentClass } from '../shared/interfaces';
-import { createRenderer, createApp } from '../shared/renderer';
-import { registerComponents } from './component-client';
+import { createApp } from '../shared/renderer';
 
 
 export function bootstrapClient(rootComponent: any, opts?: AppInitOptions) {
@@ -9,8 +8,6 @@ export function bootstrapClient(rootComponent: any, opts?: AppInitOptions) {
   opts = opts || {};
 
   createApp(window, document, rootComponent, opts);
-
-  // registerComponents(r, opts.components);
 
   console.timeEnd(`bootstrapClient`);
 }
