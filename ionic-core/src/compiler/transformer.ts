@@ -1,17 +1,21 @@
 
 
-export function transformTemplateContent(content: string) {
+export function transformTemplate(content: string) {
+  content = transformIf(content);
+  content = transformFor(content);
+  return content;
+}
 
-  content = transformIfConditionals(content);
+
+export function transformIf(content: string) {
+  content = content.replace(/\ \[if\]/g, ' v-if');
 
   return content;
 }
 
 
-export function transformIfConditionals(content: string) {
-
-  content = content.replace(/\*ngIf/g, 'v-if');
-  content = content.replace(/\ng-if/g, 'v-if');
+export function transformFor(content: string) {
+  content = content.replace(/\ \[for\]/g, ' v-for');
 
   return content;
 }

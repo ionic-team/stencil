@@ -1,22 +1,14 @@
-import { transformIfConditionals } from '../transformer';
+import { transformIf } from '../transformer';
 
 
 describe('transformer', () => {
 
   describe('transformIfConditionals', () => {
 
-    it('should rename *ngIf', () => {
-      let content = '<div *ngIf="shouldShow"></div>';
+    it('should rename [if]', () => {
+      let content = '<div [if]="shouldShow"></div>';
 
-      let transformedContent = transformIfConditionals(content);
-
-      expect(transformedContent).toEqual('<div v-if="shouldShow"></div>');
-    });
-
-    it('should rename ng-if', () => {
-      let content = '<div *ngIf="shouldShow"></div>';
-
-      let transformedContent = transformIfConditionals(content);
+      let transformedContent = transformIf(content);
 
       expect(transformedContent).toEqual('<div v-if="shouldShow"></div>');
     });

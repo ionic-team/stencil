@@ -18,13 +18,15 @@ export interface ComponentMeta {
 
   template?: string;
   templateUrl?: string;
-
   transformedTemplate?: string;
+
   templateRenderSource?: string;
   templateRenderFn?: string;
+
+  templateStaticRenderFnsSource?: any;
   templateStaticRenderFns?: any;
 
-  templateErrors?: string[];
+  errors?: string[];
   templateAst?: any;
 
   inputComponentDecorator?: string;
@@ -33,9 +35,11 @@ export interface ComponentMeta {
 
 
 export interface CompileOptions {
-  inputDir: string;
+  inputDir?: string;
   sourceFileDir?: string;
   writeToDisk?: boolean;
+  preserveWhitespace?: boolean;
+  warn?: Function;
 }
 
 

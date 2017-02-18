@@ -50,8 +50,15 @@ export function generateComponentDecorator(c: ComponentMeta, opts?: CompileOptio
   if (c.templateRenderFn && (c.templateUrl || c.template)) {
     const d: string[] = [];
 
-    d.push(`  selector: '${c.selector}'`);
+    if (c.selector) {
+      d.push(`  selector: '${c.selector}'`);
+    }
+
     d.push(`  render: ${c.templateRenderFn}`);
+
+    if (c.templateStaticRenderFns) {
+      d.push(`  staticRenderFns: ${c.templateStaticRenderFns}`);
+    }
 
     c.outputComponentDecorator = `Component({\n${d.join(',\n')}\n})`;
   }

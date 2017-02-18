@@ -1,7 +1,7 @@
 import * as compiler from './build';
 import { CompileOptions, CompilerContext, ComponentMeta, FileMeta } from './interfaces';
 import { parseComponentSourceText } from './parser';
-import { transformTemplateContent } from './transformer';
+import { transformTemplate } from './transformer';
 import { generateComponentDecorator, generateComponentFile } from './generator';
 import { readFile, readDir } from './util';
 import * as path from 'path';
@@ -35,6 +35,9 @@ export function compileFile(file: FileMeta, opts?: CompileOptions, ctx?: Compile
         return file;
       });
     });
+
+  }).catch(reason => {
+    console.error(reason);
   });
 }
 
@@ -61,6 +64,14 @@ export function compileSourceText(sourceText: string, file?: FileMeta, opts?: Co
       generateComponentDecorator(c, opts, ctx);
     });
 
+    components.forEach(c => {
+      if (c.errors && c.errors.length) {
+        c.errors.forEach(err => {
+          console.error(err);
+        });
+      }
+    });
+
     return components;
   });
 }
@@ -68,7 +79,7 @@ export function compileSourceText(sourceText: string, file?: FileMeta, opts?: Co
 
 export function loadTemplateFile(c: ComponentMeta, file: FileMeta, opts?: CompileOptions, ctx?: CompilerContext) {
   if (!file) {
-    return Promise.reject(`missing file info for ${c.templateUrl}`);
+    return Promise.reject(addError(c, `missing file info for ${c.templateUrl}`));
   }
 
   let sourceFileDir = path.dirname(file.sourceFileDirPath);
@@ -80,40 +91,82 @@ export function loadTemplateFile(c: ComponentMeta, file: FileMeta, opts?: Compil
       return c;
     })
     .catch(reason => {
-      console.log(reason);
-      c.templateErrors = [reason];
+      addError(c, reason);
       return c;
     });
 }
 
 
-export function compileTemplate(c: ComponentMeta, opts?: any, ctx?: CompilerContext): ComponentMeta {
+export function compileTemplate(c: ComponentMeta, opts?: CompileOptions, ctx?: CompilerContext, attempt = 0): ComponentMeta {
+  attempt++;
+  if (attempt > 20) {
+    addError(c, `compileTemplate infinite loop detected`);
+    return c;
+  }
+
   if (c.templateRenderFn) {
     return c;
   }
 
   if (!c.template) {
-    c.templateErrors = [`missing template`];
+    addError(c, `missing template`);
     return c;
   }
 
   try {
-    c.transformedTemplate = transformTemplateContent(c.template);
+    c.transformedTemplate = transformTemplate(c.template);
 
-    const compileResult = compiler.compile(c.transformedTemplate, opts);
+    opts = opts || {};
+    const compilerOptions = {
+      preserveWhitespace: opts.preserveWhitespace,
+      warn: opts.warn
+    };
+
+    const compileResult = compiler.compile(c.transformedTemplate, compilerOptions);
 
     c.templateAst = compileResult.ast;
     c.templateRenderSource = compileResult.render;
-    c.templateStaticRenderFns = compileResult.staticRenderFns;
-    c.templateErrors = (<any>compileResult).errors;
 
-    if (!c.templateErrors.length && c.templateRenderSource) {
-      c.templateRenderFn = `function (_c, context){${c.templateRenderSource}}`;
+    const errors = (<any>compileResult).errors || [];
+    for (var i = 0; i < errors.length; i++) {
+
+      if (requiresRootElement(errors[i])) {
+        c.template = `<div>${c.template}</div>`;
+        return compileTemplate(c, opts, ctx, attempt);
+      }
+
+      addError(c, errors[i]);
+    }
+
+    if (c.templateRenderSource) {
+      c.templateRenderFn = fnWrap(c.templateRenderSource);
+    }
+
+    c.templateStaticRenderFnsSource = compileResult.staticRenderFns;
+    if (c.templateStaticRenderFnsSource && c.templateStaticRenderFnsSource.length) {
+      c.templateStaticRenderFns = '[' + c.templateStaticRenderFnsSource.map(fnWrap).join(',') + ']'
     }
 
   } catch (e) {
-    c.templateErrors = [e ? e.toString() : 'compile template error'];
+    addError(c, e ? e.toString() : `compile template error`);
   }
 
   return c;
+}
+
+
+function requiresRootElement(err: string) {
+  return err.indexOf('one root element') > -1 || err.indexOf('requires a root element') > -1
+}
+
+
+function fnWrap(code: string) {
+  return `function(){${code}}`;
+}
+
+
+function addError(c: ComponentMeta, msg: string) {
+  c.errors = c.errors || [];
+  c.errors.push(msg);
+  return msg;
 }
