@@ -3,6 +3,8 @@
 export interface FileMeta {
   inputFilePath?: string;
   outputFilePath?: string;
+  sourceFileDirPath?: string;
+  ext?: string;
 
   inputSourceText?: string;
   outputSourceText?: string;
@@ -30,9 +32,9 @@ export interface ComponentMeta {
 }
 
 
-
 export interface CompileOptions {
-  compiledFileSuffix?: string;
+  inputDir: string;
+  sourceFileDir?: string;
   writeToDisk?: boolean;
 }
 
@@ -40,3 +42,4 @@ export interface CompileOptions {
 export interface CompilerContext {
 
 }
+

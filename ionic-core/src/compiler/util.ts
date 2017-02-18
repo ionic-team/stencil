@@ -1,4 +1,4 @@
-import { CompileOptions, CompilerContext } from './interfaces';
+import { CompileOptions, CompilerContext, FileMeta } from './interfaces';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -22,7 +22,7 @@ export function readFile(filePath: string, opts: CompileOptions, ctx: CompilerCo
 }
 
 
-export function readDir(inputDirPath: string, opts: CompileOptions, ctx: CompilerContext): Promise<string[]> {
+export function readDir(inputDirPath: string, sourceFileDirPath: string, opts: CompileOptions, ctx: CompilerContext): Promise<FileMeta[]> {
   return new Promise((resolve1, reject1) => {
 
     fs.readdir(inputDirPath, (err, dirFiles) => {
@@ -31,21 +31,22 @@ export function readDir(inputDirPath: string, opts: CompileOptions, ctx: Compile
         return;
       }
 
-      const collectedFiles: string[] = [];
+      const collectedFiles: FileMeta[] = [];
 
       const promises: Promise<any>[] = dirFiles.map(dirFile => {
 
         return new Promise((resolve2, reject2) => {
-          const readPath = path.join(inputDirPath, dirFile);
+          const inputReadPath = path.join(inputDirPath, dirFile);
+          const sourceReadPath = path.join(sourceFileDirPath, dirFile);
 
-          fs.stat(readPath, (err, stats) => {
+          fs.stat(inputReadPath, (err, stats) => {
             if (err) {
               reject2(err);
               return;
             }
 
             if (stats.isDirectory()) {
-              readDir(readPath, opts, ctx).then(subFiles => {
+              readDir(inputReadPath, sourceReadPath, opts, ctx).then(subFiles => {
                 subFiles.forEach(subFile => {
                   collectedFiles.push(subFile);
                 });
@@ -53,7 +54,12 @@ export function readDir(inputDirPath: string, opts: CompileOptions, ctx: Compile
               });
 
             } else {
-              collectedFiles.push(readPath);
+              const file: FileMeta = {
+                inputFilePath: inputReadPath,
+                sourceFileDirPath: sourceReadPath,
+                ext: inputReadPath.split('.').pop().toLowerCase()
+              };
+              collectedFiles.push(file);
               resolve2();
             }
           });

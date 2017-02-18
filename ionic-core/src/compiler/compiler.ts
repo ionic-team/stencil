@@ -4,19 +4,17 @@ import { parseComponentSourceText } from './parser';
 import { transformTemplateContent } from './transformer';
 import { generateComponentDecorator, generateComponentFile } from './generator';
 import { readFile, readDir } from './util';
+import * as path from 'path';
 
 
-export function compileDirectory(inputDirPath: string, opts?: CompileOptions, ctx?: CompilerContext) {
-  return readDir(inputDirPath, opts, ctx).then(filePaths => {
+export function compileDirectory(opts: CompileOptions, ctx?: CompilerContext) {
+  const inputDirPath = opts.inputDir;
+  const sourceDirPath = opts.sourceFileDir || inputDirPath;
 
-    const promises: Promise<FileMeta>[] = [];
+  return readDir(inputDirPath, sourceDirPath, opts, ctx).then(filePaths => {
 
-    filePaths.forEach(filePath => {
-
-      if (filePath.split('.').pop().toLowerCase() === 'js') {
-        promises.push(compileFile(filePath, null, opts, ctx));
-      }
-
+    const promises = filePaths.filter(f => f.ext === 'js').map(file => {
+      return compileFile(file, opts, ctx);
     });
 
     return Promise.all(promises);
@@ -24,17 +22,13 @@ export function compileDirectory(inputDirPath: string, opts?: CompileOptions, ct
 }
 
 
-export function compileFile(inputFilePath: string, outputFilePath?: string, opts?: CompileOptions, ctx?: CompilerContext) {
-  return readFile(inputFilePath, opts, ctx).then(sourceText => {
+export function compileFile(file: FileMeta, opts?: CompileOptions, ctx?: CompilerContext) {
+  return readFile(file.inputFilePath, opts, ctx).then(sourceText => {
 
-    const file: FileMeta = {
-      inputFilePath: inputFilePath,
-      outputFilePath: outputFilePath,
-      inputSourceText: sourceText,
-      outputSourceText: sourceText
-    };
+    file.inputSourceText = sourceText;
+    file.outputSourceText = sourceText;
 
-    return compileSourceText(sourceText, opts, ctx).then(components => {
+    return compileSourceText(sourceText, file, opts, ctx).then(components => {
       file.components = components;
 
       return generateComponentFile(file, opts, ctx).then(() => {
@@ -45,17 +39,19 @@ export function compileFile(inputFilePath: string, outputFilePath?: string, opts
 }
 
 
-export function compileSourceText(sourceText: string, opts?: CompileOptions, ctx?: CompilerContext) {
+export function compileSourceText(sourceText: string, file?: FileMeta, opts?: CompileOptions, ctx?: CompilerContext) {
   const components = parseComponentSourceText(sourceText, opts, ctx);
 
   const promises: Promise<ComponentMeta>[] = [];
 
   components.forEach(c => {
-    if (c.template) {
-      promises.push(Promise.resolve(c));
+    if (!c.templateRenderFn) {
+      if (c.template) {
+        promises.push(Promise.resolve(c));
 
-    } else if (c.templateUrl) {
-      promises.push(loadTemplateFile(c, opts, ctx));
+      } else if (c.templateUrl) {
+        promises.push(loadTemplateFile(c, file, opts, ctx));
+      }
     }
   });
 
@@ -70,8 +66,13 @@ export function compileSourceText(sourceText: string, opts?: CompileOptions, ctx
 }
 
 
-export function loadTemplateFile(c: ComponentMeta, opts?: CompileOptions, ctx?: CompilerContext) {
-  let templateFilePath = c.templateUrl;
+export function loadTemplateFile(c: ComponentMeta, file: FileMeta, opts?: CompileOptions, ctx?: CompilerContext) {
+  if (!file) {
+    return Promise.reject(`missing file info for ${c.templateUrl}`);
+  }
+
+  let sourceFileDir = path.dirname(file.sourceFileDirPath);
+  let templateFilePath = path.join(sourceFileDir, c.templateUrl);
 
   return readFile(templateFilePath, opts, ctx)
     .then(template => {
@@ -79,6 +80,7 @@ export function loadTemplateFile(c: ComponentMeta, opts?: CompileOptions, ctx?: 
       return c;
     })
     .catch(reason => {
+      console.log(reason);
       c.templateErrors = [reason];
       return c;
     });
@@ -86,6 +88,15 @@ export function loadTemplateFile(c: ComponentMeta, opts?: CompileOptions, ctx?: 
 
 
 export function compileTemplate(c: ComponentMeta, opts?: any, ctx?: CompilerContext): ComponentMeta {
+  if (c.templateRenderFn) {
+    return c;
+  }
+
+  if (!c.template) {
+    c.templateErrors = [`missing template`];
+    return c;
+  }
+
   try {
     c.transformedTemplate = transformTemplateContent(c.template);
 

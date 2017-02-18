@@ -43,19 +43,6 @@ export function generateOutputFilePath(file: FileMeta, opts: CompileOptions) {
   }
 
   file.outputFilePath = file.inputFilePath;
-
-  let suffix = (opts && opts.compiledFileSuffix);
-  if (suffix) {
-    let parts = file.outputFilePath.split('.');
-    if (parts.length > 1) {
-      let lastPart = parts.pop();
-      parts.push(suffix, lastPart);
-      file.outputFilePath = parts.join('.');
-    } else {
-      file.outputFilePath += `.${suffix}`;
-    }
-  }
-
 }
 
 

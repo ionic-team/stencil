@@ -3,14 +3,14 @@ const path = require('path');
 const compiler = require('../../../../ionic-core/dist/es2015/compiler/index');
 
 
-function compileComponents(inputDir) {
+function compileComponents(opts) {
 
-  compiler.compileDirectory(inputDir).then((files) => {
+  compiler.compileDirectory(opts).then(files => {
 
     files.forEach(f => {
 
       f.components.forEach(c => {
-        console.log(`${f.inputFilePath} : ${c.selector}`);
+        console.log(`demo/myapp: ${c.selector} ${f.inputFilePath}`);
       });
 
     });
@@ -19,6 +19,9 @@ function compileComponents(inputDir) {
 
 }
 
-const inputDir = path.join(__dirname, '../../dist/');
 
-compileComponents(inputDir);
+compileComponents({
+  inputDir: path.join(__dirname, '../../dist/'),
+  sourceFileDir: path.join(__dirname, '../../src/')
+});
+
