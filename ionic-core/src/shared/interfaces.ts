@@ -7,4 +7,6 @@ export interface AppInitOptions {
   routes?: any;
 }
 
-export type ComponentClass = Function;
+export interface ComponentClass {
+  new (arg0?: any): any;
+}

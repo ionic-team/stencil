@@ -1,4 +1,4 @@
-import { AppInitOptions, ComponentClass } from '../shared/interfaces';
+import { AppInitOptions } from '../shared/interfaces';
 import { createApp } from '../shared/renderer';
 
 

@@ -28,7 +28,8 @@ export interface ComponentMeta {
   selector?: string;
   template?: string;
   templateUrl?: string;
-  render?: Function;
+  render?: any;
+  staticRenderFns?: any;
   inputs?: string[];
   outputs?: string[];
   host?: {[key: string]: string};

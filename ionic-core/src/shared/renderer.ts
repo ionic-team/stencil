@@ -14,7 +14,7 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
   appComponents[userRootSelector] = <any>meta;
 
   // create the app options
-  const appRoot: Vue.ComponentOptions<any> = {
+  const appRoot: ComponentOptions = {
     el: opts.rootSelector || 'ion-app',
 
     render: function (h) {
@@ -50,8 +50,7 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
   if (opts.components) {
     // add all of the app's components
     for (var i = 0, l = opts.components.length; i < l; i++) {
-      meta = getComponentMeta(opts.components[i]);
-      Renderer.component(meta.selector, <any>meta);
+      registerComponent(Renderer, opts.components[i]);
     }
   }
 
@@ -60,19 +59,47 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
 }
 
 
-const APP_MIXINS = {
+function registerComponent(r: Renderer, cls: ComponentClass) {
+  const meta = getComponentMeta(cls);
 
-  created: function () {
-    console.log('mixin: created!');
-  },
-
-  methods: {
-    heyYou: function () {
-      console.log('mixin: heyYou!')
+  const opts: ComponentOptions = {
+    render: meta.render,
+    staticRenderFns: meta.staticRenderFns,
+    beforeCreate: function() {
+      console.debug(`${meta.selector} : beforeCreate`);
+      initComponent(this, cls);
+    },
+    created() {
+      console.debug(`${meta.selector} : created`);
+    },
+    data: function() {
+      return {
+        title: Math.random()
+      }
     }
-  }
+  };
 
-};
+  r.component(meta.selector, opts);
+}
+
+
+function initComponent(context: ComponentOptions, cls: ComponentClass) {
+  let instance = context.instance = new cls();
+
+  setTimeout(() => {
+    console.log(context)
+  }, 1000)
+}
+
+
+export interface Renderer {
+  component: {(tag: string, opts: ComponentOptions): Vue};
+}
+
+
+export interface ComponentOptions extends Vue.ComponentOptions<any> {
+  instance?: any;
+}
 
 
 function rendererFactory(window: any, document: any): any {
