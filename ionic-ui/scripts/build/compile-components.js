@@ -21,5 +21,6 @@ function compileComponents(opts) {
 
 compileComponents({
   inputDir: path.join(__dirname, '../../dist/commonjs/components/'),
-  sourceFileDir: path.join(__dirname, '../../src/components/')
+  sourceFileDir: path.join(__dirname, '../../src/components/'),
+  preserveWhitespace: false
 });

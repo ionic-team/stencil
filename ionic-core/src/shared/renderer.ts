@@ -13,14 +13,6 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
   let userRootSelector = meta.selector || 'ion-user-root';
   appComponents[userRootSelector] = <any>meta;
 
-  if (opts.components) {
-    // add all of the app's components
-    for (var i = 0, l = opts.components.length; i < l; i++) {
-      meta = getComponentMeta(opts.components[i]);
-      appComponents[meta.selector] = <any>meta;
-    }
-  }
-
   // create the app options
   const appRoot: Vue.ComponentOptions<any> = {
     el: opts.rootSelector || 'ion-app',
@@ -48,10 +40,18 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
   };
 
   // fire up the renderer
-  const Renderer: any = rendererFactory(window, document);
+  const Renderer = rendererFactory(window, document);
+
+  if (opts.components) {
+    // add all of the app's components
+    for (var i = 0, l = opts.components.length; i < l; i++) {
+      meta = getComponentMeta(opts.components[i]);
+      Renderer.component(meta.selector, <any>meta);
+    }
+  }
 
   // create the app
-  const app: Vue = new Renderer(appRoot);
+  new Renderer(appRoot);
 }
 
 
@@ -70,6 +70,6 @@ const APP_MIXINS = {
 };
 
 
-function rendererFactory(window: any, document: any) {
+function rendererFactory(window: any, document: any): any {
 'placeholder:vue.runtime.js'
 }
