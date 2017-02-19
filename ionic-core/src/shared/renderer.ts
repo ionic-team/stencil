@@ -1,7 +1,7 @@
 import Vue from 'vue';
-import { AppInitOptions, ComponentClass, ComponentCompiledMeta, PropOptions } from '../shared/interfaces';
+import { AppInitOptions, ComponentClass, ComponentCompiledMeta, ComponentInstance, PropOptions } from '../shared/interfaces';
 import { getComponentMeta } from '../decorators/decorators';
-import { initComponent } from './component';
+import { initComponent, componentDidLoad, componentWillUnload } from './component';
 
 
 export function createApp(window: any, document: any, userRootCls: ComponentClass, opts: AppInitOptions): any {
@@ -62,15 +62,20 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
 function registerComponent(r: Renderer, cls: ComponentClass) {
   const meta = getComponentMeta(cls);
 
-  const opts: Vue.ComponentOptions<any> = {
+  const opts: Vue.ComponentOptions<VueInstance> = {
     render: meta.render,
     staticRenderFns: meta.staticRenderFns,
-    beforeCreate: function() {
-      console.debug(`${meta.selector} : beforeCreate`);
+
+    beforeCreate() {
       createRenderComponent(this, cls, meta);
     },
+
     created() {
-      console.debug(`${meta.selector} : created`);
+      componentDidLoad(this._ion);
+    },
+
+    beforeDestroy() {
+      componentWillUnload(this._ion);
     }
   };
 
@@ -78,8 +83,8 @@ function registerComponent(r: Renderer, cls: ComponentClass) {
 }
 
 
-function createRenderComponent(vm: Vue, cls: ComponentClass, meta: ComponentCompiledMeta) {
-  const instance = initComponent(cls);
+function createRenderComponent(vm: VueInstance, cls: ComponentClass, meta: ComponentCompiledMeta) {
+  const instance = vm._ion = initComponent(cls);
 
   const opts = vm.$options;
 
@@ -123,8 +128,13 @@ function createRenderComponent(vm: Vue, cls: ComponentClass, meta: ComponentComp
 }
 
 
+interface VueInstance extends Vue {
+  _ion: ComponentInstance;
+}
+
+
 interface Renderer {
-  component: {(tag: string, opts: Vue.ComponentOptions<any>): Vue};
+  component: {(tag: string, opts: Vue.ComponentOptions<VueInstance>): Vue};
 }
 
 

@@ -1,5 +1,4 @@
 
-
 export interface AppInitOptions {
   rootSelector?: string;
   config?: any;
@@ -7,11 +6,23 @@ export interface AppInitOptions {
   routes?: any;
 }
 
+
 export interface ComponentClass {
-  new (arg0?: any): any;
+  new (arg0?: any): ComponentInstance;
 }
 
-export interface ComponentInstance {}
+
+export abstract class ComponentInstance {
+  abstract ionViewDidLoad?(): void;
+  abstract ionViewWillEnter?(): void;
+  abstract ionViewDidEnter?(): void;
+  abstract ionViewWillLeave?(): void;
+  abstract ionViewDidLeave?(): void;
+  abstract ionViewCanEnter?(): void;
+  abstract ionViewCanLeave?(): void;
+  abstract ionViewWillUnload?(): void;
+}
+
 
 export interface ComponentMeta {
   selector?: string;
@@ -22,14 +33,17 @@ export interface ComponentMeta {
   props?: { [key: string]: PropOptions };
   computed?: { [key: string]: ComputedOptions };
   methods?: { [key: string]: Function };
-  // watch?: { [key: string]: ({ handler: WatchHandler<V> } & WatchOptions) | WatchHandler<V> | string };
-
   render?: any;
   staticRenderFns?: any;
   inputs?: string[];
   outputs?: string[];
   host?: {[key: string]: string};
 }
+
+
+export interface ComponentCompiledMeta extends ComponentMeta {
+}
+
 
 export interface PropOptions {
   type?: any;
@@ -38,17 +52,17 @@ export interface PropOptions {
   validator?(value: any): boolean;
 }
 
+
 export interface ComputedOptions {
   get?(): any;
   set?(value: any): void;
   cache?: boolean;
 }
 
-export interface ComponentCompiledMeta extends ComponentMeta {
-}
 
 export interface InputMeta {
 }
+
 
 export interface OutputMeta {
 }

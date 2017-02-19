@@ -1,4 +1,4 @@
-Protoype and mono-repo for `ionic-core`, `ionic-ui` and a demo app. Each project is already hooked up so theres no npm link BS do deal with for now.
+Protoype and mono-repo for `ionic-core`, `ionic-ui` and a demo app. Each project is already hooked up so theres no npm link BS to deal with for now.
 
 
 ### Initial Setup
