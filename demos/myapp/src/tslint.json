@@ -13,15 +13,8 @@
     "no-debugger": true,
     "no-duplicate-variable": true,
     "no-eval": true,
-    "no-inner-declarations": [
-      true,
-      "functions"
-    ],
     "no-internal-module": true,
     "no-trailing-whitespace": true,
-    "no-unused-variable": [
-      true
-    ],
     "no-var-keyword": false,
     "one-line": [
       true,

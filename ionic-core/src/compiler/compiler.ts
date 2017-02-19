@@ -144,7 +144,7 @@ export function compileTemplate(c: ComponentMeta, opts?: CompileOptions, ctx?: C
 
     c.templateStaticRenderFnsSource = compileResult.staticRenderFns;
     if (c.templateStaticRenderFnsSource && c.templateStaticRenderFnsSource.length) {
-      c.templateStaticRenderFns = '[' + c.templateStaticRenderFnsSource.map(fnWrap).join(',') + ']'
+      c.templateStaticRenderFns = '[' + c.templateStaticRenderFnsSource.map(fnWrap).join(',') + ']';
     }
 
   } catch (e) {
@@ -156,7 +156,7 @@ export function compileTemplate(c: ComponentMeta, opts?: CompileOptions, ctx?: C
 
 
 function requiresRootElement(err: string) {
-  return err.indexOf('one root element') > -1 || err.indexOf('requires a root element') > -1
+  return err.indexOf('one root element') > -1 || err.indexOf('requires a root element') > -1;
 }
 
 

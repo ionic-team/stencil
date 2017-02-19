@@ -160,7 +160,7 @@ describe('parser', () => {
           selector: 'ion-button',
           template: "<div>hi</div>"
         })';
-      `
+      `;
       const match = getComponentMatch(str);
       expect(match.templateUrl).toEqual('hi.html');
       expect(match.selector).toEqual('ion-button');

@@ -11,7 +11,9 @@
     "build.2015": "tsc --project src",
     "build.quick": " npm run build.commonjs && npm run compile.components",
     "copy.package.json": "cp scripts/build/package.json dist",
-    "compile.components": "node scripts/build/compile-components.js"
+    "compile.components": "node scripts/build/compile-components.js",
+    "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
+    "validate": "npm run lint"
   },
   "devDependencies": {
     "rimraf": "2.5.4",

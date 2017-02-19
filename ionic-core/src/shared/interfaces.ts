@@ -11,6 +11,8 @@ export interface ComponentClass {
   new (arg0?: any): any;
 }
 
+export interface ComponentInstance {}
+
 export interface ComponentMeta {
   selector?: string;
   template?: string;

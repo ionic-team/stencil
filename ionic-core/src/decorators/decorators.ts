@@ -31,8 +31,8 @@ export const Component: ComponentDecorator = function(metadata: ComponentMeta): 
   return function(cls: any) {
     setAnnotation(cls, COMPONENT_KEY, metadata);
     return cls;
-  }
-}
+  };
+};
 
 
 export interface InputDecorator {
@@ -44,8 +44,8 @@ export const Input: InputDecorator = function(metadata: InputMeta): (cls: any) =
   return function(cls: any) {
     setAnnotation(cls, INPUT_KEY, metadata);
     return cls;
-  }
-}
+  };
+};
 
 
 export interface OutputDecorator {
@@ -57,5 +57,5 @@ export const Output: OutputDecorator = function(metadata: OutputMeta): (cls: any
   return function(cls: any) {
     setAnnotation(cls, OUTPUT_KEY, metadata);
     return cls;
-  }
-}
+  };
+};

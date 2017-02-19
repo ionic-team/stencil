@@ -1,6 +1,6 @@
 
 
-export function noop(){};
+export function noop() {};
 
 
 export var ionDevWarn: Function = noop;

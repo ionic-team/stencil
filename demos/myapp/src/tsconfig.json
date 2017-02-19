@@ -13,6 +13,8 @@
     "target": "es5",
     "noImplicitUseStrict": true,
     "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "sourceMap": true,
     "experimentalDecorators": true,
     "baseUrl": ".",

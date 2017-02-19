@@ -12,7 +12,9 @@
     "bundle.index": "node scripts/build/bundle.index.js",
     "build.quick": "npm run build.index",
     "copy.package.json": "cp scripts/build/package.json dist",
-    "test": "jest || true"
+    "test": "jest || true",
+    "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
+    "validate": "npm run test & npm run lint"
   },
   "devDependencies": {
     "@types/jest": "^18.1.1",

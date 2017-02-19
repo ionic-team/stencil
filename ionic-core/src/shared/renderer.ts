@@ -1,6 +1,7 @@
-import Vue from 'vue'
+import Vue from 'vue';
 import { AppInitOptions, ComponentClass, ComponentCompiledMeta, PropOptions } from '../shared/interfaces';
 import { getComponentMeta } from '../decorators/decorators';
+import { initComponent } from './component';
 
 
 export function createApp(window: any, document: any, userRootCls: ComponentClass, opts: AppInitOptions): any {
@@ -41,7 +42,6 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
     },
 
     components: appComponents
-
   };
 
   // fire up the renderer
@@ -67,7 +67,7 @@ function registerComponent(r: Renderer, cls: ComponentClass) {
     staticRenderFns: meta.staticRenderFns,
     beforeCreate: function() {
       console.debug(`${meta.selector} : beforeCreate`);
-      initComponent(this, cls, meta);
+      createRenderComponent(this, cls, meta);
     },
     created() {
       console.debug(`${meta.selector} : created`);
@@ -78,8 +78,8 @@ function registerComponent(r: Renderer, cls: ComponentClass) {
 }
 
 
-function initComponent(vm: VueComponent, cls: ComponentClass, meta: ComponentCompiledMeta) {
-  const instance = vm._ionInstance = new cls();
+function createRenderComponent(vm: Vue, cls: ComponentClass, meta: ComponentCompiledMeta) {
+  const instance = initComponent(cls);
 
   const opts = vm.$options;
 
@@ -128,11 +128,6 @@ interface Renderer {
 }
 
 
-interface VueComponent extends Vue {
-  _ionInstance?: any;
-}
-
-
 function rendererFactory(window: any, document: any): any {
-'placeholder:vue.runtime.js'
+'placeholder:vue.runtime.js';
 }

@@ -10,6 +10,8 @@
     ],
     "module": "commonjs",
     "outDir": "../../dist/es2015/compiler",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "target": "es5",
     "noImplicitAny": true,
     "sourceMap": false,
