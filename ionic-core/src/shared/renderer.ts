@@ -11,7 +11,7 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
 
   // add the user's root component
   let meta = getComponentMeta(userRootCls);
-  let userRootSelector = meta.selector || 'ion-user-root';
+  let userRootSelector = meta.tag || 'ion-user-root';
   appComponents[userRootSelector] = <any>meta;
 
   // create the app options
@@ -79,7 +79,7 @@ function registerComponent(r: Renderer, cls: ComponentClass) {
     }
   };
 
-  r.component(meta.selector, opts);
+  r.component(meta.tag, opts);
 }
 
 

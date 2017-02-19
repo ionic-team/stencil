@@ -25,7 +25,7 @@ export abstract class ComponentInstance {
 
 
 export interface ComponentMeta {
-  selector?: string;
+  tag?: string;
   template?: string;
   templateUrl?: string;
 
