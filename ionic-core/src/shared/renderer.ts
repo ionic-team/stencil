@@ -18,9 +18,14 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
     el: opts.rootSelector || 'ion-app',
 
     render: function (h) {
-      return h('div', { class: 'ion-app' }, [
-        h(userRootSelector)
-      ]);
+      return h('div',
+        {
+          class: 'ion-app md',
+        },
+        [
+          h(userRootSelector)
+        ]
+      );
     },
 
     beforeCreate: function () {
