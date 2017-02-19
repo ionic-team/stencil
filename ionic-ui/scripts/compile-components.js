@@ -10,7 +10,7 @@ function compileComponents(opts) {
     files.forEach(f => {
 
       f.components.forEach(c => {
-        console.log(`ionic-ui: ${c.selector} ${f.inputFilePath}`);
+        console.log(`ionic-ui: ${c.tag} ${f.inputFilePath}`);
       });
 
     });

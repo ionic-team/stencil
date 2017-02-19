@@ -21,7 +21,7 @@ describe('parser', () => {
         ], Button.prototype, "tabIndex", null);
         Button = __decorate([
             Component({
-                selector: 'ion-button',
+                tag: 'ion-button',
                 templateUrl: 'button.html'
             })
         ], Button);
@@ -71,10 +71,10 @@ describe('parser', () => {
 
   describe('getComponentMatch', () => {
 
-    it('should get Component with template url and selector above', () => {
+    it('should get Component with template url and tag above', () => {
       const str = `
         @Component({
-          selector: 'page-home',
+          tag: 'page-home',
           templateUrl: 'home.html'
         })
       `;
@@ -157,13 +157,13 @@ describe('parser', () => {
       const str = `
         @Component({
           templateUrl: "hi.html",
-          selector: 'ion-button',
+          tag: 'ion-button',
           template: "<div>hi</div>"
         })';
       `;
       const match = getComponentMatch(str);
       expect(match.templateUrl).toEqual('hi.html');
-      expect(match.selector).toEqual('ion-button');
+      expect(match.tag).toEqual('ion-button');
       expect(match.template).toEqual('<div>hi</div>');
     });
 
@@ -181,11 +181,18 @@ describe('parser', () => {
       expect(match.template).toEqual('hi');
     });
 
-    it('should get Component selector', () => {
+    it('should get Component tag', () => {
+      const str = '@Component({tag:"hi"})';
+      const match = getComponentMatch(str);
+      expect(match.data).toEqual('tag:"hi"');
+      expect(match.tag).toEqual('hi');
+    });
+
+    it('should get Component deprecated selector and set as tag', () => {
       const str = '@Component({selector:"hi"})';
       const match = getComponentMatch(str);
       expect(match.data).toEqual('selector:"hi"');
-      expect(match.selector).toEqual('hi');
+      expect(match.tag).toEqual('hi');
     });
 
     it('should get null for Component without brackets', () => {

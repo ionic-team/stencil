@@ -12,7 +12,7 @@ export function parseComponentSourceText(sourceText: string) {
 
   while ((match = getComponentMatch(sourceText))) {
     components.push({
-      selector: match.selector,
+      tag: match.tag,
       template: match.template,
       templateUrl: match.templateUrl,
       inputComponentDecorator: match.inputText,
@@ -29,14 +29,14 @@ export function parseComponentSourceText(sourceText: string) {
 export function getComponentMatch(str: string): ComponentParse {
   let match = COMPONENT_REGEX.exec(str);
   if (match) {
-    var parsed = {
+    var parsed: ComponentParse = {
       start: match.index,
       end: match.index + match[0].length,
       inputText: match[0],
       data: match[5].trim(),
       templateUrl: '',
       template: '',
-      selector: ''
+      tag: ''
     };
 
     if (!parsed.data) {
@@ -53,9 +53,14 @@ export function getComponentMatch(str: string): ComponentParse {
       parsed.templateUrl = match[2].trim();
     }
 
-    match = SELECTOR_REGEX.exec(parsed.data);
+    match = TAG_REGEX.exec(parsed.data);
     if (match) {
-      parsed.selector = match[2].trim();
+      parsed.tag = match[2].trim();
+    } else {
+      match = SELECTOR_REGEX.exec(parsed.data);
+      if (match) {
+        parsed.tag = match[2].trim();
+      }
     }
 
     return parsed;
@@ -72,7 +77,7 @@ export interface ComponentParse {
   data: string;
   templateUrl: string;
   template: string;
-  selector: string;
+  tag: string;
 }
 
 const COMPONENT_REGEX = /\Component\s*?\(\s*?(\{([\s\S]*?)(\s*(.*?)\s*?)([\s\S]*?)}\s*?)\)/m;
@@ -80,5 +85,7 @@ const COMPONENT_REGEX = /\Component\s*?\(\s*?(\{([\s\S]*?)(\s*(.*?)\s*?)([\s\S]*
 const TEMPLATE_REGEX = /\s*template\s*:\s*(['"`])(.*?)(['"`])/m;
 
 const TEMPLATE_URL_REGEX = /\s*templateUrl\s*:\s*(['"`])(.*?)(['"`])/m;
+
+const TAG_REGEX = /\s*tag\s*:\s*(['"`])(.*?)(['"`])/m;
 
 const SELECTOR_REGEX = /\s*selector\s*:\s*(['"`])(.*?)(['"`])/m;

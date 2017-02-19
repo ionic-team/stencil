@@ -14,7 +14,7 @@ export interface FileMeta {
 
 
 export interface ComponentMeta {
-  selector?: string;
+  tag?: string;
 
   template?: string;
   templateUrl?: string;

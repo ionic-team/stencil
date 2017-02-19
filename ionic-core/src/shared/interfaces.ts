@@ -26,6 +26,10 @@ export abstract class ComponentInstance {
 
 export interface ComponentMeta {
   tag?: string;
+
+  /** @deprecated */
+  selector?: string;
+
   template?: string;
   templateUrl?: string;
 

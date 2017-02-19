@@ -2,7 +2,7 @@ import { Component } from 'ionic-core';
 
 
 @Component({
-  selector: 'ion-button',
+  tag: 'ion-button',
   templateUrl: 'button.html'
 })
 export class Button {

@@ -48,8 +48,8 @@ export function generateComponentDecorator(c: ComponentMeta) {
   if (c.templateRenderFn && (c.templateUrl || c.template)) {
     const d: string[] = [];
 
-    if (c.selector) {
-      d.push(`  selector: '${c.selector}'`);
+    if (c.tag) {
+      d.push(`  tag: '${c.tag}'`);
     }
 
     d.push(`  render: ${c.templateRenderFn}`);
