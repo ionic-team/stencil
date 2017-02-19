@@ -1,4 +1,5 @@
 import { setAnnotation, getAnnotation } from './annotations';
+import { ComponentMeta, ComponentCompiledMeta, InputMeta, OutputMeta } from '../shared/interfaces';
 
 
 const COMPONENT_KEY = 'Component';
@@ -6,13 +7,15 @@ const INPUT_KEY = 'Input';
 const OUTPUT_KEY = 'Output';
 
 
-export function getComponentMeta(cls: any): ComponentMeta {
+export function getComponentMeta(cls: any): ComponentCompiledMeta {
   return getAnnotation(cls, COMPONENT_KEY);
 }
+
 
 export function getInputMeta(cls: any, prop: string): InputMeta {
   return getAnnotation(cls, INPUT_KEY);
 }
+
 
 export function getOutputMeta(cls: any, prop: string): OutputMeta {
   return getAnnotation(cls, OUTPUT_KEY);
@@ -21,18 +24,6 @@ export function getOutputMeta(cls: any, prop: string): OutputMeta {
 
 export interface ComponentDecorator {
   (obj: ComponentMeta): any;
-}
-
-
-export interface ComponentMeta {
-  selector?: string;
-  template?: string;
-  templateUrl?: string;
-  render?: any;
-  staticRenderFns?: any;
-  inputs?: string[];
-  outputs?: string[];
-  host?: {[key: string]: string};
 }
 
 
@@ -49,10 +40,6 @@ export interface InputDecorator {
 }
 
 
-export interface InputMeta {
-}
-
-
 export const Input: InputDecorator = function(metadata: InputMeta): (cls: any) => any {
   return function(cls: any) {
     setAnnotation(cls, INPUT_KEY, metadata);
@@ -63,10 +50,6 @@ export const Input: InputDecorator = function(metadata: InputMeta): (cls: any) =
 
 export interface OutputDecorator {
   (obj?: OutputMeta): any;
-}
-
-
-export interface OutputMeta {
 }
 
 

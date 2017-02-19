@@ -1,6 +1,6 @@
 import Vue from 'vue'
-import { AppInitOptions, ComponentClass } from '../shared/interfaces';
-import { ComponentMeta, getComponentMeta } from '../decorators/decorators';
+import { AppInitOptions, ComponentClass, ComponentCompiledMeta, PropOptions } from '../shared/interfaces';
+import { getComponentMeta } from '../decorators/decorators';
 
 
 export function createApp(window: any, document: any, userRootCls: ComponentClass, opts: AppInitOptions): any {
@@ -14,16 +14,16 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
   appComponents[userRootSelector] = <any>meta;
 
   // create the app options
-  const appRoot: ComponentOptions = {
+  const appRoot: Vue.ComponentOptions<any> = {
     el: opts.rootSelector || 'ion-app',
 
-    render: function (h) {
-      return h('div',
+    render: function(createElement) {
+      return createElement('div',
         {
           class: 'ion-app md',
         },
         [
-          h(userRootSelector)
+          createElement(userRootSelector)
         ]
       );
     },
@@ -62,20 +62,15 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
 function registerComponent(r: Renderer, cls: ComponentClass) {
   const meta = getComponentMeta(cls);
 
-  const opts: ComponentOptions = {
+  const opts: Vue.ComponentOptions<any> = {
     render: meta.render,
     staticRenderFns: meta.staticRenderFns,
     beforeCreate: function() {
       console.debug(`${meta.selector} : beforeCreate`);
-      initComponent(this, cls);
+      initComponent(this, cls, meta);
     },
     created() {
       console.debug(`${meta.selector} : created`);
-    },
-    data: function() {
-      return {
-        title: Math.random()
-      }
     }
   };
 
@@ -83,22 +78,58 @@ function registerComponent(r: Renderer, cls: ComponentClass) {
 }
 
 
-function initComponent(context: ComponentOptions, cls: ComponentClass) {
-  let instance = context.instance = new cls();
+function initComponent(vm: VueComponent, cls: ComponentClass, meta: ComponentCompiledMeta) {
+  const instance = vm._ionInstance = new cls();
 
-  setTimeout(() => {
-    console.log(context)
-  }, 1000)
+  const opts = vm.$options;
+
+  let keys: string[];
+  let i: number;
+  let prop: any;
+
+  // assign input properties
+  let inputProps = meta.props;
+  if (inputProps) {
+    opts.props = {};
+    keys = Object.keys(inputProps);
+    i = keys.length;
+
+    while (i--) {
+      prop = inputProps[keys[i]];
+      opts.props[keys[i]] = {
+        type: (<PropOptions>prop).type,
+        required: (<PropOptions>prop).required,
+        default: (<PropOptions>prop).default,
+        validator: (<PropOptions>prop).validator
+      };
+    }
+  }
+
+  // assign component methods
+  let methods = meta.methods;
+  if (methods) {
+    opts.methods = {};
+  }
+
+  // assign component computed getters/setters
+  let computed = meta.computed;
+  if (computed) {
+    opts.computed = {};
+  }
+
+  // proxy instance state data
+  opts.data = instance;
+
 }
 
 
-export interface Renderer {
-  component: {(tag: string, opts: ComponentOptions): Vue};
+interface Renderer {
+  component: {(tag: string, opts: Vue.ComponentOptions<any>): Vue};
 }
 
 
-export interface ComponentOptions extends Vue.ComponentOptions<any> {
-  instance?: any;
+interface VueComponent extends Vue {
+  _ionInstance?: any;
 }
 
 
