@@ -4,7 +4,7 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    app: './dist/app/main.client.js'
+    app: './dist/main/main.client.js'
   },
   output: {
     filename: './www/build/main.client.js'

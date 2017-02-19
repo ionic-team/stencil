@@ -2,7 +2,7 @@ import { Component } from 'ionic-core';
 
 
 @Component({
-  templateUrl: 'app.template.html'
+  templateUrl: 'app.html'
 })
 export class MyApp {
   constructor() {

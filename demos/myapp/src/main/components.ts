@@ -5,7 +5,7 @@ import {
 
 import {
   MyComponent
-} from '../components/my-component';
+} from '../components/my-component/my-component';
 
 
 export default [
