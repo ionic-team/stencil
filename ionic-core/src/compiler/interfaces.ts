@@ -40,10 +40,11 @@ export interface CompileOptions {
   writeToDisk?: boolean;
   preserveWhitespace?: boolean;
   warn?: Function;
+  cacheFiles?: boolean;
 }
 
 
 export interface CompilerContext {
-
+  files?: Map<string, string>;
 }
 

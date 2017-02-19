@@ -13,12 +13,18 @@ export function getComponentMeta(cls: any): ComponentCompiledMeta {
 
 
 export function getInputMeta(cls: any, prop: string): InputMeta {
-  return getAnnotation(cls, INPUT_KEY);
+  const clsAnnotation = getAnnotation(cls, INPUT_KEY);
+  if (clsAnnotation) {
+    return clsAnnotation[prop];
+  }
 }
 
 
 export function getOutputMeta(cls: any, prop: string): OutputMeta {
-  return getAnnotation(cls, OUTPUT_KEY);
+  const clsAnnotation = getAnnotation(cls, OUTPUT_KEY);
+  if (clsAnnotation) {
+    return clsAnnotation[prop];
+  }
 }
 
 

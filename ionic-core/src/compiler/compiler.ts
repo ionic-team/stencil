@@ -43,7 +43,7 @@ export function compileFile(file: FileMeta, opts?: CompileOptions, ctx?: Compile
 
 
 export function compileSourceText(sourceText: string, file?: FileMeta, opts?: CompileOptions, ctx?: CompilerContext) {
-  const components = parseComponentSourceText(sourceText, opts, ctx);
+  const components = parseComponentSourceText(sourceText);
 
   const promises: Promise<ComponentMeta>[] = [];
 
@@ -61,7 +61,7 @@ export function compileSourceText(sourceText: string, file?: FileMeta, opts?: Co
   return Promise.all(promises).then(components => {
     components.forEach(c => {
       compileTemplate(c, opts, ctx);
-      generateComponentDecorator(c, opts, ctx);
+      generateComponentDecorator(c);
     });
 
     components.forEach(c => {

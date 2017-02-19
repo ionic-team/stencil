@@ -3,13 +3,13 @@ import { writeFile } from './util';
 
 
 export function generateComponentFile(file: FileMeta, opts?: CompileOptions, ctx?: CompilerContext): Promise<boolean> {
-  generateSourceTextOutput(file, opts, ctx);
+  generateSourceTextOutput(file);
 
   if (opts && opts.writeToDisk === false) {
     return Promise.resolve(false);
   }
 
-  generateOutputFilePath(file, opts);
+  generateOutputFilePath(file);
 
   if (file.inputFilePath === file.outputFilePath && file.inputSourceText === file.outputFilePath) {
     return Promise.resolve(false);
@@ -19,13 +19,13 @@ export function generateComponentFile(file: FileMeta, opts?: CompileOptions, ctx
 }
 
 
-export function generateSourceTextOutput(file: FileMeta, opts?: CompileOptions, ctx?: CompilerContext) {
+export function generateSourceTextOutput(file: FileMeta) {
   if (!file.components || !file.components.length) {
     return;
   }
 
   file.components.forEach(c => {
-    generateComponentDecorator(c, opts, ctx);
+    generateComponentDecorator(c);
 
     if (c.inputComponentDecorator !== c.outputComponentDecorator) {
       file.outputSourceText = file.outputSourceText.replace(
@@ -37,16 +37,14 @@ export function generateSourceTextOutput(file: FileMeta, opts?: CompileOptions, 
 }
 
 
-export function generateOutputFilePath(file: FileMeta, opts: CompileOptions) {
-  if (file.outputFilePath) {
-    return;
+export function generateOutputFilePath(file: FileMeta) {
+  if (!file.outputFilePath) {
+    file.outputFilePath = file.inputFilePath;
   }
-
-  file.outputFilePath = file.inputFilePath;
 }
 
 
-export function generateComponentDecorator(c: ComponentMeta, opts?: CompileOptions, ctx?: CompilerContext) {
+export function generateComponentDecorator(c: ComponentMeta) {
   if (c.templateRenderFn && (c.templateUrl || c.template)) {
     const d: string[] = [];
 

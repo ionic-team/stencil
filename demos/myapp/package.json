@@ -8,7 +8,7 @@
     "build.ts": "tsc --project src",
     "bundle": "webpack",
     "build.quick": "npm run build.ts && npm run compile.components && npm run bundle",
-    "compile.components": "node scripts/build/compile-components.js",
+    "compile.components": "node scripts/compile-components.js",
     "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
     "validate": "npm run lint",
     "minify": "java -jar node_modules/google-closure-compiler/compiler.jar --language_in=ES6_STRICT --language_out=ES5 --rewrite_polyfills=false --js=www/build/main.client.js --js_output_file=www/build/main.client.min.js && npm run gzip",

@@ -10,8 +10,8 @@
     "build.commonjs": "tsc --project src --module commonjs --noImplicitUseStrict --outDir dist/commonjs",
     "build.2015": "tsc --project src",
     "build.quick": " npm run build.commonjs && npm run compile.components",
-    "copy.package.json": "cp scripts/build/package.json dist",
-    "compile.components": "node scripts/build/compile-components.js",
+    "copy.package.json": "cp scripts/npm.package.json dist/package.json",
+    "compile.components": "node scripts/compile-components.js",
     "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
     "validate": "npm run lint"
   },

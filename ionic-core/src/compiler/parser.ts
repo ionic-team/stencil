@@ -1,7 +1,7 @@
-import { CompileOptions, CompilerContext, ComponentMeta} from './interfaces';
+import { ComponentMeta} from './interfaces';
 
 
-export function parseComponentSourceText(sourceText: string, opts?: CompileOptions, ctx?: CompilerContext) {
+export function parseComponentSourceText(sourceText: string) {
   const components: ComponentMeta[] = [];
 
   if (!sourceText || typeof sourceText !== 'string' || !sourceText.length) {

@@ -129,5 +129,7 @@ interface Renderer {
 
 
 function rendererFactory(window: any, document: any): any {
+window;
+document;
 'placeholder:vue.runtime.js';
 }

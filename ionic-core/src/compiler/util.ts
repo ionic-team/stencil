@@ -10,11 +10,22 @@ export function readFile(filePath: string, opts: CompileOptions, ctx: CompilerCo
       return;
     }
 
+    if (opts && opts.cacheFiles && ctx) {
+      const fileContent = ctx.files.get(filePath);
+      if (fileContent) {
+        resolve(fileContent);
+        return;
+      }
+    }
+
     fs.readFile(filePath, (err, content) => {
       if (err) {
         reject(err);
 
       } else {
+        if (opts.cacheFiles && ctx) {
+          ctx.files.set(filePath, content.toString());
+        }
         resolve(content.toString());
       }
     });
@@ -84,6 +95,10 @@ export function writeFile(filePath: string, data: string, opts: CompileOptions, 
     if (!path.isAbsolute(filePath)) {
       reject(`absolute file path required: ${filePath}`);
       return;
+    }
+
+    if (opts && opts.cacheFiles && ctx) {
+      ctx.files.set(filePath, data);
     }
 
     if (opts && opts.writeToDisk === false) {
