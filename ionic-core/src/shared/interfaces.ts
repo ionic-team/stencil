@@ -1,6 +1,5 @@
 
 export interface AppInitOptions {
-  rootSelector?: string;
   config?: any;
   components?: ComponentClass[];
   routes?: any;
@@ -26,30 +25,22 @@ export abstract class ComponentInstance {
 
 export interface ComponentMeta {
   tag?: string;
-
-  /** @deprecated */
-  selector?: string;
-
   template?: string;
   templateUrl?: string;
 
-  // will only be in ComponentCompiledMeta
-  props?: { [key: string]: PropOptions };
-  computed?: { [key: string]: ComputedOptions };
-  methods?: { [key: string]: Function };
-  render?: any;
-  staticRenderFns?: any;
-  inputs?: string[];
-  outputs?: string[];
-  host?: {[key: string]: string};
+  /** @deprecated */
+  selector?: string;
 }
 
 
 export interface ComponentCompiledMeta extends ComponentMeta {
+  render?: any;
+  staticRenderFns?: any;
+  host?: {[key: string]: string};
 }
 
 
-export interface PropOptions {
+export interface PropOptionsMeta {
   type?: any;
   required?: boolean;
   default?: any;

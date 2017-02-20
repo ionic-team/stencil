@@ -1,47 +1,18 @@
 import Vue from 'vue';
-import { AppInitOptions, ComponentClass, ComponentCompiledMeta, ComponentInstance, PropOptions } from '../shared/interfaces';
-import { getComponentMeta } from '../decorators/decorators';
+import { AppInitOptions, ComponentClass, ComponentCompiledMeta, ComponentInstance, PropOptionsMeta } from '../shared/interfaces';
+import { getComponentMeta } from '../decorators/component';
+import { getAllPropMeta } from '../decorators/prop';
 import { initComponent, componentDidLoad, componentWillUnload } from './component';
 
 
-export function createApp(window: any, document: any, userRootCls: ComponentClass, opts: AppInitOptions): any {
-
-  // generate a collection of the app components
-  const appComponents: {[tag: string]: any} = {};
-
-  // add the user's root component
-  let meta = getComponentMeta(userRootCls);
-  let userRootSelector = meta.tag || 'ion-user-root';
-  appComponents[userRootSelector] = <any>meta;
+export function createApp(window: any, document: any, appRootCls: ComponentClass, opts: AppInitOptions): any {
+  let meta = getComponentMeta(appRootCls);
 
   // create the app options
-  const appRoot: Vue.ComponentOptions<any> = {
-    el: opts.rootSelector || 'ion-app',
-
-    render: function(createElement) {
-      return createElement('div',
-        {
-          class: 'ion-app md',
-        },
-        [
-          createElement(userRootSelector)
-        ]
-      );
-    },
-
-    beforeCreate: function () {
-      console.debug('root component: beforeCreate');
-    },
-
-    created: function () {
-      console.debug('root component: created');
-    },
-
-    mounted: function () {
-      console.debug('root component: mounted');
-    },
-
-    components: appComponents
+  const appRoot = generateOptions(meta, appRootCls);
+  appRoot.el = meta.tag || 'ion-app';
+  appRoot.mounted = function() {
+    this.$el.classList.add('ion-app');
   };
 
   // fire up the renderer
@@ -61,13 +32,18 @@ export function createApp(window: any, document: any, userRootCls: ComponentClas
 
 function registerComponent(r: Renderer, cls: ComponentClass) {
   const meta = getComponentMeta(cls);
+  const opts = generateOptions(meta, cls);
+  r.component(meta.tag, opts);
+}
 
+
+function generateOptions(meta: ComponentCompiledMeta, cls: ComponentClass) {
   const opts: Vue.ComponentOptions<VueInstance> = {
     render: meta.render,
     staticRenderFns: meta.staticRenderFns,
 
     beforeCreate() {
-      createRenderComponent(this, cls, meta);
+      createRenderComponent(this, cls);
     },
 
     created() {
@@ -79,22 +55,22 @@ function registerComponent(r: Renderer, cls: ComponentClass) {
     }
   };
 
-  r.component(meta.tag, opts);
+  return opts;
 }
 
 
-function createRenderComponent(vm: VueInstance, cls: ComponentClass, meta: ComponentCompiledMeta) {
+function createRenderComponent(vm: VueInstance, cls: ComponentClass) {
   const instance = vm._ion = initComponent(cls);
 
   const opts = vm.$options;
 
   let keys: string[];
   let i: number;
-  let prop: any;
 
   // assign input properties
-  let inputProps = meta.props;
+  let inputProps = getAllPropMeta(cls);
   if (inputProps) {
+    let prop: PropOptionsMeta;
     opts.props = {};
     keys = Object.keys(inputProps);
     i = keys.length;
@@ -102,29 +78,16 @@ function createRenderComponent(vm: VueInstance, cls: ComponentClass, meta: Compo
     while (i--) {
       prop = inputProps[keys[i]];
       opts.props[keys[i]] = {
-        type: (<PropOptions>prop).type,
-        required: (<PropOptions>prop).required,
-        default: (<PropOptions>prop).default,
-        validator: (<PropOptions>prop).validator
+        type: prop.type,
+        required: prop.required,
+        default: prop.default,
+        validator: prop.validator
       };
     }
   }
 
-  // assign component methods
-  let methods = meta.methods;
-  if (methods) {
-    opts.methods = {};
-  }
-
-  // assign component computed getters/setters
-  let computed = meta.computed;
-  if (computed) {
-    opts.computed = {};
-  }
-
   // proxy instance state data
   opts.data = instance;
-
 }
 
 

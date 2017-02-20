@@ -15,10 +15,12 @@ export {
 
 
 export {
-  ComponentDecorator,
   Component,
-  Input,
-  InputDecorator,
-  Output,
-  OutputDecorator
-} from './decorators/decorators';
+  ComponentDecorator
+} from './decorators/component';
+
+
+export {
+  Prop,
+  PropDecorator
+} from './decorators/prop';
