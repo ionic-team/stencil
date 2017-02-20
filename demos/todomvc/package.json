@@ -1,0 +1,29 @@
+{
+  "name": "todomvc-ionic-core",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run build.clean && npm run build.ts && npm run compile.components && npm run bundle",
+    "build.clean": "rimraf dist && rimraf www/build",
+    "build.ts": "tsc --project src",
+    "bundle": "webpack",
+    "build.quick": "npm run build.ts && npm run compile.components && npm run bundle",
+    "compile.components": "node scripts/compile-components.js",
+    "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
+    "validate": "npm run lint",
+    "minify": "java -jar node_modules/google-closure-compiler/compiler.jar --js=www/build/main.client.js --js_output_file=www/build/main.client.min.js && npm run gzip",
+    "gzip": "gzip --keep --force www/build/main.client.min.js",
+    "serve": "httpster -p 8888 -d www"
+  },
+  "dependencies": {
+    "todomvc-common": "^1.0.1",
+    "todomvc-app-css": "^2.0.0"
+  },
+  "devDependencies": {
+    "google-closure-compiler": "^20170124.0.0",
+    "httpster": "1.0.3",
+    "rimraf": "2.5.4",
+    "typescript": "2.2.0",
+    "webpack": "2.2.1"
+  }
+}

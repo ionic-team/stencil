@@ -6,6 +6,6 @@ import { Component } from 'ionic-core';
 })
 export class App {
   constructor() {
-    console.log('App');
+    console.log('TodoApp');
   }
 }

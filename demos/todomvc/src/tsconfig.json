@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "lib": [
+      "dom",
+      "es5",
+      "es2015"
+    ],
+    "module": "commonjs",
+    "outDir": "../dist/",
+    "rootDir": "./",
+    "target": "es5",
+    "noImplicitUseStrict": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "ionic-core": ["../../../ionic-core/dist/es2015/index"]
+    }
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}

@@ -10,7 +10,7 @@ function compileComponents(opts) {
     files.forEach(f => {
 
       f.components.forEach(c => {
-        console.log(`demo/myapp: ${c.tag} ${f.inputFilePath}`);
+        console.log(`demo/todomvc: ${c.tag} ${f.inputFilePath}`);
       });
 
     });
