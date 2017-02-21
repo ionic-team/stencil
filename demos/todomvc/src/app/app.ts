@@ -9,6 +9,7 @@ import { TodoItem, TodoStore } from '../services/todo-store';
 export class App {
   todos: TodoItem[];
   store: TodoStore;
+  editedTodo: TodoItem = null;
 
   constructor() {
     this.store = new TodoStore();

@@ -1,8 +1,8 @@
 
-<section class="main" :show="todos.length">
+<section class="main" [show]="todos.length">
   <input class="toggle-all" type="checkbox">
   <ul class="todo-list">
-    <li class="todo" :for="todo in todos">
+    <li class="todo" *for="todo in todos" [class]="{completed: todo.completed, editing: todo == editedTodo}">
       <div class="view">
         <input class="toggle" type="checkbox">
         <label>{{todo.title}}</label>

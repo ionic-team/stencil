@@ -11,4 +11,7 @@ export class TodoList {
   @Prop()
   todos: TodoItem[];
 
+  @Prop()
+  editedTodo: TodoItem;
+
 }
