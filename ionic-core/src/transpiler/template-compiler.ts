@@ -1,4 +1,5 @@
 import { ComponentMeta, FileMeta, TranspileOptions, TranspileContext } from './interfaces';
+import { generateTemplate } from './template-generator';
 import { readFile } from './util';
 import * as path from 'path';
 import * as compiler from './template-compiler-build';
@@ -71,13 +72,15 @@ export function compileTemplate(c: ComponentMeta, opts: TranspileOptions, ctx: T
   }
 
   try {
-    c.transformedTemplate = c.template;
+    if (!c.generatedTemplate) {
+      c.generatedTemplate = generateTemplate(c.template, opts, ctx);
+    }
 
     const compilerOptions = {
       preserveWhitespace: opts.preserveWhitespace
     };
 
-    const compileResult = compiler.compile(c.transformedTemplate, compilerOptions);
+    const compileResult = compiler.compile(c.generatedTemplate, compilerOptions);
 
     c.templateAst = compileResult.ast;
     c.templateRenderSource = compileResult.render;

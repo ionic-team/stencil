@@ -38,7 +38,7 @@ export interface ComponentMeta {
 
   template?: string;
   templateUrl?: string;
-  transformedTemplate?: string;
+  generatedTemplate?: string;
 
   templateRenderSource?: string;
   templateRenderFn?: string;
