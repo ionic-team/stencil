@@ -1,4 +1,5 @@
-import { Component } from 'ionic-core';
+import { Component, Prop } from 'ionic-core';
+import { TodoItem } from '../../services/todo-store';
 
 
 @Component({
@@ -6,5 +7,8 @@ import { Component } from 'ionic-core';
   templateUrl: 'todo-footer.html'
 })
 export class TodoFooter {
+
+  @Prop()
+  todos: TodoItem[];
 
 }

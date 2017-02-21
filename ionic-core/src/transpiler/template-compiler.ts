@@ -73,7 +73,7 @@ export function compileTemplate(c: ComponentMeta, opts: TranspileOptions, ctx: T
 
   try {
     if (!c.generatedTemplate) {
-      c.generatedTemplate = generateTemplate(c.template, opts, ctx);
+      c.generatedTemplate = generateTemplate(c.tag, c.template, opts, ctx);
     }
 
     const compilerOptions = {
