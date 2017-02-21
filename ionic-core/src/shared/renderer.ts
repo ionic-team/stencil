@@ -1,22 +1,31 @@
 import Vue from 'vue';
-import { AppInitOptions, ComponentClass, ComponentCompiledMeta, ComponentInstance, PropOptionsMeta } from '../shared/interfaces';
+import { App } from './app';
+import { AppInitOptions, ComponentClass, PropOptionsMeta } from '../shared/interfaces';
 import { getComponentMeta } from '../decorators/component';
-import { getAllPropMeta } from '../decorators/prop';
+import { getComponentPropMeta } from '../decorators/prop';
 import { initComponent, componentDidLoad, componentWillUnload } from './component';
 
 
 export function createApp(window: any, document: any, appRootCls: ComponentClass, opts: AppInitOptions): any {
-  let meta = getComponentMeta(appRootCls);
+  const appRootMeta = getComponentMeta(appRootCls);
 
-  // create the app options
-  const appRoot = generateOptions(meta, appRootCls);
-  appRoot.el = meta.tag || 'ion-app';
-  appRoot.mounted = function() {
-    this.$el.classList.add('ion-app');
-  };
+  // create the Ionic App instance
+  const app = new App();
 
   // fire up the renderer
   const Renderer = rendererFactory(window, document);
+
+  // create the app root component
+  const appRoot: Vue.ComponentOptions<Vue> = {
+    el: appRootMeta.tag || 'ion-app',
+    render: appRootMeta.render,
+    staticRenderFns: appRootMeta.staticRenderFns,
+    data: new appRootCls(),
+    mounted() {
+      this.$el.classList.add('ion-app');
+      app.isReady();
+    }
+  };
 
   if (opts.components) {
     // add all of the app's components
@@ -31,73 +40,54 @@ export function createApp(window: any, document: any, appRootCls: ComponentClass
 
 
 function registerComponent(r: Renderer, cls: ComponentClass) {
-  const meta = getComponentMeta(cls);
-  const opts = generateOptions(meta, cls);
-  r.component(meta.tag, opts);
-}
+  const cmpMeta = getComponentMeta(cls);
 
+  const opts: Vue.ComponentOptions<Vue> = {
+    render: cmpMeta.render,
 
-function generateOptions(meta: ComponentCompiledMeta, cls: ComponentClass) {
-  const opts: Vue.ComponentOptions<VueInstance> = {
-    render: meta.render,
-    staticRenderFns: meta.staticRenderFns,
-
-    beforeCreate() {
-      createRenderComponent(this, cls);
-    },
+    staticRenderFns: cmpMeta.staticRenderFns,
 
     created() {
-      componentDidLoad(this._ion);
+      componentDidLoad(this.$data);
     },
 
     beforeDestroy() {
-      componentWillUnload(this._ion);
+      componentWillUnload(this.$data);
+    },
+
+    data: function() {
+      return initComponent(cls);
     }
   };
 
-  return opts;
-}
-
-
-function createRenderComponent(vm: VueInstance, cls: ComponentClass) {
-  const instance = vm._ion = initComponent(cls);
-
-  const opts = vm.$options;
-
-  let keys: string[];
-  let i: number;
-
   // assign input properties
-  let inputProps = getAllPropMeta(cls);
-  if (inputProps) {
-    let prop: PropOptionsMeta;
+  const cmpPropsMeta = getComponentPropMeta(cls);
+  if (cmpPropsMeta) {
+    let keys: string[];
+    let i: number;
+    let propOptsMeta: PropOptionsMeta;
+
     opts.props = {};
-    keys = Object.keys(inputProps);
+    keys = Object.keys(cmpPropsMeta);
     i = keys.length;
 
     while (i--) {
-      prop = inputProps[keys[i]];
+      propOptsMeta = cmpPropsMeta[keys[i]];
       opts.props[keys[i]] = {
-        type: prop.type,
-        required: prop.required,
-        default: prop.default,
-        validator: prop.validator
+        type: propOptsMeta.type,
+        required: propOptsMeta.required,
+        default: propOptsMeta.default,
+        validator: propOptsMeta.validator
       };
     }
   }
 
-  // proxy instance state data
-  opts.data = instance;
-}
-
-
-interface VueInstance extends Vue {
-  _ion: ComponentInstance;
+  r.component(cmpMeta.tag, opts);
 }
 
 
 interface Renderer {
-  component: {(tag: string, opts: Vue.ComponentOptions<VueInstance>): Vue};
+  component: {(tag: string, opts: Vue.ComponentOptions<Vue>): Vue};
 }
 
 

@@ -2,7 +2,7 @@ import { getAnnotation, setAnnotation } from './annotations';
 import { PropOptionsMeta } from '../shared/interfaces';
 
 
-export function getAllPropMeta(cls: any) {
+export function getComponentPropMeta(cls: any) {
   const propAnnotation: {[key: string]: PropOptionsMeta} = getAnnotation(cls, PROP_ANNOTATION);
   if (propAnnotation) {
     return propAnnotation;
