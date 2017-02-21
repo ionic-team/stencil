@@ -10,13 +10,13 @@ export function getAllPropMeta(cls: any) {
 }
 
 
-export const Prop: PropDecorator = function(opts: PropOptionsMeta): (target: any, propKey: string) => any {
+export const Prop: PropDecorator = function(opts?: PropOptionsMeta): (target: any, propKey: string) => any {
   return function(target: any, propKey: string) {
     let propAnnotation: {[key: string]: PropOptionsMeta} = getAnnotation(target.constructor, PROP_ANNOTATION);
     if (!propAnnotation) {
       propAnnotation = {};
     }
-    propAnnotation[propKey] = opts;
+    propAnnotation[propKey] = opts || {};
 
     setAnnotation(target.constructor, PROP_ANNOTATION, propAnnotation);
     return target.constructor;
@@ -25,7 +25,7 @@ export const Prop: PropDecorator = function(opts: PropOptionsMeta): (target: any
 
 
 export interface PropDecorator {
-  (opts: PropOptionsMeta): any;
+  (opts?: PropOptionsMeta): any;
 }
 
 

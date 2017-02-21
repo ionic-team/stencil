@@ -24,6 +24,6 @@
     "**/*.ts"
   ],
   "exclude": [
-    "compiler/**/*.ts"
+    "transpiler/**/*.ts"
   ]
 }

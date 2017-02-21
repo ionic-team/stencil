@@ -9,9 +9,8 @@
       "es2015"
     ],
     "module": "commonjs",
-    "outDir": "../../dist/es2015/compiler",
+    "outDir": "../../dist/es2015/transpiler",
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "target": "es5",
     "noImplicitAny": true,
     "sourceMap": false,

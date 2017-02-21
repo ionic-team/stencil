@@ -5,13 +5,11 @@
   "author": "yes",
   "license": "MIT Romney",
   "scripts": {
-    "build": "npm run build.clean && npm run build.commonjs && npm run compile.components && npm run copy.package.json",
+    "build": "npm run build.clean && npm run transpile && npm run copy.package.json",
     "build.clean": "rimraf dist",
-    "build.commonjs": "tsc --project src --module commonjs --noImplicitUseStrict --outDir dist/commonjs",
-    "build.2015": "tsc --project src",
-    "build.quick": " npm run build.commonjs && npm run compile.components",
+    "build.quick": " npm run transpile",
     "copy.package.json": "cp scripts/npm.package.json dist/package.json",
-    "compile.components": "node scripts/compile-components.js",
+    "transpile": "node scripts/transpile.js",
     "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
     "validate": "npm run lint"
   },
