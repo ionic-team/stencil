@@ -7,11 +7,16 @@ import { TodoItem } from '../../services/todo-store';
   templateUrl: 'todo-list.html'
 })
 export class TodoList {
+  allDone = false;
 
   @Prop()
   todos: TodoItem[];
 
   @Prop()
   editedTodo: TodoItem;
+
+  get filteredTodos(): any[] {
+    return this.todos;
+  }
 
 }
