@@ -15,6 +15,7 @@
     "build.demo.todomvc": "cd demos/todomvc && npm run build",
     "build.quick": "(cd ionic-core && npm run build.quick) && (cd demos/todomvc && npm run build.quick)",
     "validate": "(cd ionic-core && npm run validate) && (cd ionic-ui && npm run validate) && (cd demos/myapp && npm run validate)",
-    "todomvc": "npm run start.core && npm run start.demo.todomvc && cd demos/todomvc && npm run stats && npm run serve"
+    "todomvc": "npm run start.core && npm run start.demo.todomvc && cd demos/todomvc && npm run stats && npm run serve",
+    "myapp": "npm run start.core && npm run start.ui && npm run start.demo.myapp && cd demos/myapp && npm run stats && npm run serve"
   }
 }

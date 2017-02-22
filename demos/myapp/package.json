@@ -10,15 +10,15 @@
     "transpile": "node scripts/transpile.js",
     "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
     "validate": "npm run lint",
-    "minify": "java -jar node_modules/google-closure-compiler/compiler.jar --language_in=ES6_STRICT --language_out=ES5 --rewrite_polyfills=false --js=www/build/main.client.js --js_output_file=www/build/main.client.min.js && npm run gzip",
-    "gzip": "gzip --keep --force www/build/main.client.min.js",
+    "minify": "uglifyjs --compress --mangle --output=www/build/main.client.js -- www/build/main.client.js && npm run stats",
+    "stats": "gzip --keep --force www/build/main.client.js && gzip -l www/build/main.client.js.gz",
     "serve": "httpster -p 8889 -d www"
   },
   "devDependencies": {
-    "google-closure-compiler": "^20170124.0.0",
     "httpster": "1.0.3",
     "rimraf": "2.5.4",
     "typescript": "2.2.0",
-    "webpack": "2.2.1"
+    "webpack": "2.2.1",
+    "uglify-js": "^2.7.5"
   }
 }
