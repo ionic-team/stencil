@@ -2,7 +2,7 @@
 export interface AppInitOptions {
   config?: any;
   components?: ComponentClass[];
-  routes?: any;
+  pages?: PageAsyncMeta[];
 }
 
 
@@ -48,16 +48,8 @@ export interface PropOptionsMeta {
 }
 
 
-export interface ComputedOptions {
-  get?(): any;
-  set?(value: any): void;
-  cache?: boolean;
+export interface PageAsyncMeta {
+  tag: string;
+  modulePath: string;
 }
 
-
-export interface InputMeta {
-}
-
-
-export interface OutputMeta {
-}

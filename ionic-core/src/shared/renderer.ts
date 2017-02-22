@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import { App } from './app';
-import { AppInitOptions, ComponentClass, ComponentInstance, PropOptionsMeta } from '../shared/interfaces';
+import { AppInitOptions, ComponentClass, ComponentInstance, ComponentCompiledMeta, PropOptionsMeta } from '../shared/interfaces';
 import { getComponentMeta } from '../decorators/component';
 import { getComponentPropMeta } from '../decorators/prop';
 import { initComponent, componentDidLoad, componentWillUnload } from './component';
@@ -13,10 +13,10 @@ export function createApp(window: any, document: any, appRootCls: ComponentClass
   const app = new App();
 
   // fire up the renderer
-  const Renderer = rendererFactory(window, document);
+  const Renderer: Renderer = rendererFactory(window, document);
 
   // register the app root component
-  const appRoot = registerComponent(Renderer, appRootCls, false);
+  const appRoot = generateComponentOptions(appRootMeta, appRootCls);
   appRoot.el = appRootMeta.tag || 'ion-app';
   appRoot.mounted = function() {
     this.$el.classList.add('ion-app');
@@ -25,9 +25,23 @@ export function createApp(window: any, document: any, appRootCls: ComponentClass
 
   if (opts.components) {
     // add all of the app's components
-    for (var i = 0, l = opts.components.length; i < l; i++) {
-      registerComponent(Renderer, opts.components[i], true);
-    }
+    opts.components.forEach(cls => {
+      const meta = getComponentMeta(cls);
+      Renderer.component(meta.tag, generateComponentOptions(meta, cls));
+    });
+  }
+
+  if (opts.pages) {
+    opts.pages.forEach(page => {
+      Renderer.component(page.tag, function(resolve: Function) {
+        setTimeout(function(){
+          const asyncReceivedCls: any = {};
+          const meta = getComponentMeta(asyncReceivedCls);
+          const opts = generateComponentOptions(meta, asyncReceivedCls)
+          resolve(opts);
+        }, 1000);
+      });
+    });
   }
 
   // create the app
@@ -35,8 +49,7 @@ export function createApp(window: any, document: any, appRootCls: ComponentClass
 }
 
 
-function registerComponent(r: Renderer, cls: ComponentClass, reusableComponent: boolean) {
-  const cmpMeta = getComponentMeta(cls);
+function generateComponentOptions(cmpMeta: ComponentCompiledMeta, cls: ComponentClass) {
 
   const opts: Vue.ComponentOptions<Vue> = {
     render: cmpMeta.render,
@@ -114,10 +127,6 @@ function registerComponent(r: Renderer, cls: ComponentClass, reusableComponent: 
     }
   });
 
-  if (reusableComponent) {
-    r.component(cmpMeta.tag, opts);
-  }
-
   return opts;
 }
 
@@ -137,6 +146,7 @@ function proxyProps(vm: Vue, cmpInstance: ComponentInstance) {
 
 
 interface Renderer {
+  new (appRootOpts: any): any;
   component: {(tag: string, opts: Vue.ComponentOptions<Vue>): Vue};
 }
 
