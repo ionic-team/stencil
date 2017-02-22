@@ -1,5 +1,5 @@
 import { Component, Prop } from 'ionic-core';
-import { TodoItem } from '../../services/todo-store';
+import { TodoStore, TodoItem } from '../../services/todo-store';
 
 
 @Component({
@@ -7,16 +7,21 @@ import { TodoItem } from '../../services/todo-store';
   templateUrl: 'todo-list.html'
 })
 export class TodoList {
-  allDone = false;
 
   @Prop()
-  todos: TodoItem[];
+  store: TodoStore;
 
-  @Prop()
-  editedTodo: TodoItem;
+  get filteredTodos() {
+    return this.store.items;
+  }
 
-  get filteredTodos(): any[] {
-    return this.todos;
+  get allDone() {
+    return this.store.remainingTodos === 0;
+  }
+
+  set allDone(value: boolean) {
+    debugger
+    this.store.setAllChecked(value);
   }
 
 }

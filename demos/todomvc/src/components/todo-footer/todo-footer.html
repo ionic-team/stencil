@@ -1,7 +1,7 @@
 
-<footer class="footer" [show]="todos.length">
+<footer class="footer" [show]="store.hasTodoItems">
   <span class="todo-count">
-    <!--<strong :text="remaining"></strong> {{pluralize('item', remaining)}} left-->
+    <strong [text]="store.renamingTodos"></strong> <!--{{pluralize('item', remaining)}} left-->
   </span>
   <!--<ul class="filters">
     <li><a href="#/all" :class="{selected: visibility == 'all'}">All</a></li>

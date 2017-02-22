@@ -1,13 +1,14 @@
 
-<section class="main" [show]="todos.length">
+<section class="main" [show]="store.hasTodoItems">
   <input class="toggle-all" type="checkbox" [model]="allDone">
   <ul class="todo-list">
-    <li class="todo" *for="todo in filteredTodos" [class]="{completed: todo.completed, editing: todo == editedTodo}">
+    <li class="todo" *for="todo in filteredTodos" [class]="{completed: todo.completed, editing: todo == store.editedTodo}">
       <div class="view">
-        <input class="toggle" type="checkbox">
-        <label>{{todo.title}}</label>
-        <button class="destroy"></button>
+        <input class="toggle" type="checkbox" [model]="todo.completed">
+        <label @dblclick="store.editTodo(todo)">{{todo.title}}</label>
+        <button class="destroy" @click="store.remove(todo)"></button>
       </div>
+      <todo-edit :store="store" :todo="todo"></todo-edit>
     </li>
   </ul>
 </section>

@@ -58,13 +58,14 @@ function registerComponent(r: Renderer, cls: ComponentClass, reusableComponent: 
       return initComponent(cls);
     },
 
-    computed: {}
+    computed: {},
+
+    methods: {}
   };
 
   let keys: string[];
   let i: number;
 
-  // assign input properties
   const cmpPropsMeta = getComponentPropMeta(cls);
   if (cmpPropsMeta) {
     let propOptsMeta: PropOptionsMeta;
@@ -84,17 +85,25 @@ function registerComponent(r: Renderer, cls: ComponentClass, reusableComponent: 
     }
   }
 
-  keys = Object.getOwnPropertyNames(cls.prototype).filter(k => k !== 'constructor');
-
+  keys = Object.getOwnPropertyNames(cls.prototype);
   keys.forEach(key => {
-    let descriptor = Object.getOwnPropertyDescriptor(cls.prototype, key);
-    if (typeof descriptor.get === 'function') {
+    if (key === 'constructor') return;
+
+    const descriptor = Object.getOwnPropertyDescriptor(cls.prototype, key);
+
+    if (typeof descriptor.value === 'function') {
+      // method
+      opts.methods[key] = cls.prototype[key];
+
+    } else if (typeof descriptor.get === 'function') {
+      // getter
       opts.computed[key] = opts.computed[key] || {};
       (<any>opts.computed[key]).get = function() {
         return this.$data[key];
       };
 
     } else if (typeof descriptor.set === 'function') {
+      // setter
       opts.computed[key] = opts.computed[key] || {};
       (<any>opts.computed[key]).set = function(val: any) {
         this.$data[key] = val;

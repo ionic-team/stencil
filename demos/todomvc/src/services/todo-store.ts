@@ -1,28 +1,72 @@
 
 export class TodoStore {
-  private todos: TodoItem[];
+  items: TodoItem[];
+  editedTodo: TodoItem = null;
+  beforeEditCache: string;
 
   constructor() {
-    this.todos = this.load();
-  }
-
-  getTodos() {
-    return this.todos;
-  }
-
-  remove(todo: TodoItem) {
-    this.todos.splice(this.todos.indexOf(todo), 1);
-    this.save();
+    this.items = this.load();
   }
 
   add(title: string) {
+    let value = title && title.trim();
+    if (!value) {
+      return;
+    }
+
     let todo: TodoItem = {
       title: title,
-      id: this.nextId()
+      id: this.nextId(),
+      completed: false,
+      editing: false
     };
 
-    this.todos.push(todo);
+    this.items.push(todo);
     this.save();
+  }
+
+  remove(todo: TodoItem) {
+    let index = this.items.indexOf(todo);
+    if (index > -1) {
+      this.items.splice(index, 1);
+      this.save();
+    }
+  }
+
+  editTodo(todo: TodoItem) {
+    this.beforeEditCache = todo.title;
+    this.editedTodo = todo;
+  }
+
+  doneEdit(todo: TodoItem) {
+    if (!this.editedTodo) {
+      return;
+    }
+    this.editedTodo = null;
+    todo.title = todo.title.trim();
+    if (!todo.title) {
+      this.remove(todo);
+    }
+  }
+
+  cancelEdit(todo: TodoItem) {
+    this.editedTodo = null;
+    todo.title = this.beforeEditCache;
+  }
+
+  setAllChecked(checked: boolean) {
+    debugger
+    this.items.forEach(todo => {
+      todo.completed = checked;
+    });
+  }
+
+  get hasTodoItems() {
+    return this.items.length > 0;
+  }
+
+  get remainingTodos() {
+    return this.items.filter(t => !t.completed).length;
   }
 
   private load(): TodoItem[] {
@@ -30,12 +74,12 @@ export class TodoStore {
   }
 
   private save() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todos));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.items));
   }
 
   private nextId() {
-    if (this.todos.length > 0) {
-      return Math.max.apply(Math, this.todos.map(t => t.id)) + 1;
+    if (this.items.length > 0) {
+      return Math.max.apply(Math, this.items.map(t => t.id)) + 1;
     }
     return 0;
   }

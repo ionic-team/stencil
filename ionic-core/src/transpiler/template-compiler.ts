@@ -89,6 +89,7 @@ export function compileTemplate(c: ComponentMeta, opts: TranspileOptions, ctx: T
     for (var i = 0; i < errors.length; i++) {
 
       if (requiresRootElement(errors[i])) {
+        c.generatedTemplate = null;
         c.template = `<div>${c.template}</div>`;
         return compileTemplate(c, opts, ctx, attempt);
       }

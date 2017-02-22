@@ -1,10 +1,17 @@
 
 <section class="todoapp">
 
-  <todo-header></todo-header>
+  <todo-header :store="store"></todo-header>
 
-  <todo-list :todos="todos" :editedTodo="editedTodo"></todo-list>
+  <todo-list :store="store"></todo-list>
 
-  <todo-footer :todos="todos"></todo-footer>
+  <todo-footer :store="store"></todo-footer>
 
 </section>
+
+
+<footer class="info">
+  <p>Double-click to edit a todo</p>
+  <p>Written by <a href="http://ionicframework.com">Ionic</a></p>
+  <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+</footer>
