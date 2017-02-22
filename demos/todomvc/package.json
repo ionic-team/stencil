@@ -12,7 +12,7 @@
     "validate": "npm run lint",
     "minify": "uglifyjs --compress --mangle --output=www/build/main.client.js -- www/build/main.client.js && npm run stats",
     "stats": "gzip --keep --force www/build/main.client.js && gzip -l www/build/main.client.js.gz",
-    "serve": "httpster -p 8888 -d www"
+    "serve": "httpster -p 8889 -d www"
   },
   "dependencies": {
     "todomvc-common": "^1.0.1",

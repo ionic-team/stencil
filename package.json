@@ -6,16 +6,16 @@
     "start": "npm run start.core && npm run start.ui && npm run start.demo && npm run build",
     "start.core": "cd ionic-core && npm install",
     "start.ui": "cd ionic-ui && npm install",
-    "start.demo.myapp": "cd demos/myapp && npm install",
+    "start.demo.confapp": "cd demos/confapp && npm install",
     "start.demo.todomvc": "cd demos/todomvc && npm install",
-    "build": "npm run build.core && npm run build.ui && (npm run build.demo.myapp & npm run build.demo.todomvc)",
+    "build": "npm run build.core && npm run build.ui && (npm run build.demo.confapp & npm run build.demo.todomvc)",
     "build.core": "cd ionic-core && npm run build",
     "build.ui": "cd ionic-ui && npm run build",
-    "build.demo.myapp": "cd demos/myapp && npm run build",
+    "build.demo.confapp": "cd demos/confapp && npm run build",
     "build.demo.todomvc": "cd demos/todomvc && npm run build",
     "build.quick": "(cd ionic-core && npm run build.quick) && (cd demos/todomvc && npm run build.quick)",
-    "validate": "(cd ionic-core && npm run validate) && (cd ionic-ui && npm run validate) && (cd demos/myapp && npm run validate)",
-    "todomvc": "npm run start.core && npm run start.demo.todomvc && cd demos/todomvc && npm run stats && npm run serve",
-    "myapp": "npm run start.core && npm run start.ui && npm run start.demo.myapp && cd demos/myapp && npm run stats && npm run serve"
+    "validate": "(cd ionic-core && npm run validate) && (cd ionic-ui && npm run validate) && (cd demos/confapp && npm run validate)",
+    "todomvc": "npm run start.core && npm run start.demo.todomvc && cd demos/todomvc && npm run minify && npm run serve",
+    "confapp": "npm run start.core && npm run start.ui && npm run start.demo.confapp && cd demos/confapp && npm run stats && npm run serve"
   }
 }
