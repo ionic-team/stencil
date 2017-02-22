@@ -3,9 +3,24 @@ export class TodoStore {
   items: TodoItem[];
   editedTodo: TodoItem = null;
   beforeEditCache: string;
+  itemShow = 'all';
 
   constructor() {
     this.items = this.load();
+  }
+
+  showItems(itemShow: string) {
+    this.itemShow = itemShow;
+  }
+
+  get filteredTodos(): TodoItem[] {
+    if (this.itemShow === 'active') {
+			return this.items.filter(t => !t.completed);
+    }
+    if (this.itemShow === 'completed') {
+			return this.items.filter(t => t.completed);
+    }
+    return this.items;
   }
 
   add(title: string) {
@@ -33,6 +48,10 @@ export class TodoStore {
     }
   }
 
+  removeCompleted() {
+    this.items = this.items.filter(t => !t.completed);
+  }
+
   editTodo(todo: TodoItem) {
     this.beforeEditCache = todo.title;
     this.editedTodo = todo;
@@ -55,7 +74,6 @@ export class TodoStore {
   }
 
   setAllChecked(checked: boolean) {
-    debugger
     this.items.forEach(todo => {
       todo.completed = checked;
     });

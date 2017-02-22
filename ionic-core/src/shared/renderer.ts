@@ -95,19 +95,22 @@ function registerComponent(r: Renderer, cls: ComponentClass, reusableComponent: 
       // method
       opts.methods[key] = cls.prototype[key];
 
-    } else if (typeof descriptor.get === 'function') {
-      // getter
-      opts.computed[key] = opts.computed[key] || {};
-      (<any>opts.computed[key]).get = function() {
-        return this.$data[key];
-      };
+    } else {
+      if (typeof descriptor.get === 'function') {
+        // getter
+        opts.computed[key] = opts.computed[key] || {};
+        (<any>opts.computed[key]).get = function() {
+          return this.$data[key];
+        };
+      }
 
-    } else if (typeof descriptor.set === 'function') {
-      // setter
-      opts.computed[key] = opts.computed[key] || {};
-      (<any>opts.computed[key]).set = function(val: any) {
-        this.$data[key] = val;
-      };
+      if (typeof descriptor.set === 'function') {
+        // setter
+        opts.computed[key] = opts.computed[key] || {};
+        (<any>opts.computed[key]).set = function(val: any) {
+          this.$data[key] = val;
+        };
+      }
     }
   });
 

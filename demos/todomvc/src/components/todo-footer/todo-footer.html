@@ -1,29 +1,14 @@
 
 <footer class="footer" [show]="store.hasTodoItems">
   <span class="todo-count">
-    <strong [text]="store.renamingTodos"></strong> <!--{{pluralize('item', remaining)}} left-->
-  </span>
-  <!--<ul class="filters">
-    <li><a href="#/all" :class="{selected: visibility == 'all'}">All</a></li>
-    <li><a href="#/active" :class="{selected: visibility == 'active'}">Active</a></li>
-    <li><a href="#/completed" :class="{selected: visibility == 'completed'}">Completed</a></li>
-  </ul>
-  <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">
-    Clear completed
-  </button>-->
-</footer>
-
-
-<!--<footer class="footer" v-show="todos.length">
-  <span class="todo-count">
-    <strong v-text="remaining"></strong> {{pluralize('item', remaining)}} left
+    <strong [text]="store.renamingTodos"></strong> {{pluralize('item', store.renamingTodos)}} left
   </span>
   <ul class="filters">
-    <li><a href="#/all" :class="{selected: visibility == 'all'}">All</a></li>
-    <li><a href="#/active" :class="{selected: visibility == 'active'}">Active</a></li>
-    <li><a href="#/completed" :class="{selected: visibility == 'completed'}">Completed</a></li>
+    <li><a href="#" @click="store.showItems('all')" [class]="{selected: store.itemShow == 'all'}">All</a></li>
+    <li><a href="#" @click="store.showItems('active')" [class]="{selected: store.itemShow == 'active'}">Active</a></li>
+    <li><a href="#" @click="store.showItems('completed')" [class]="{selected: store.itemShow == 'completed'}">Completed</a></li>
   </ul>
-  <button class="clear-completed" @click="removeCompleted" v-show="todos.length > remaining">
+  <button class="clear-completed" @click="store.removeCompleted()" *if="showClearCompleted">
     Clear completed
   </button>
-</footer>-->
+</footer>
