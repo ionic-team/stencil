@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button
 } from 'ionic-ui';
 
@@ -9,6 +10,7 @@ import {
 
 
 export default [
+  Badge,
   Button,
   MyComponent
 ];

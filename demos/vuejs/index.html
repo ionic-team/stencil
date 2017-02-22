@@ -91,6 +91,11 @@ Vue.component('item', {
   props: {
     model: Object
   },
+  watch: {
+    model: function (newValue) {
+      debugger;
+    }
+  },
   data: function () {
     return {
       open: false
