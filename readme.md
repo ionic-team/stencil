@@ -1,14 +1,8 @@
-Protoype and mono-repo for `ionic-core`, `ionic-ui` and a demo app. Each project is already hooked up so theres no npm link BS to deal with for now.
+Protoype and mono-repo for `ionic-core`, `ionic-ui` and a demo app. Each project is already hooked up so there's no npm link BS to deal with for now.
 
+    npm run todomvc
 
-### Initial Setup
-
-    npm start
-
-
-### Build All Projects
-
-    npm run build
+[http://localhost:8889/](http://localhost:8889/)
 
 
 ### Install/Build/Serve Ionic Conference App `demo/confapp/www`
@@ -19,10 +13,6 @@ Protoype and mono-repo for `ionic-core`, `ionic-ui` and a demo app. Each project
 
 
 ### Install/Build/Serve TodoMVC `demo/todomvc/www`
-
-    npm run todomvc
-
-[http://localhost:8889/](http://localhost:8889/)
 
 
 Each project has its own `package.json` and can do it's own builds. Take a gander.

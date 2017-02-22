@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "start": "npm run start.core && npm run start.ui && npm run start.demo && npm run build",
     "start.core": "cd ionic-core && npm install",
     "start.ui": "cd ionic-ui && npm install",
     "start.demo.confapp": "cd demos/confapp && npm install",
