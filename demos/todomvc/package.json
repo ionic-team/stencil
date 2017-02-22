@@ -10,8 +10,8 @@
     "transpile": "node scripts/transpile.js",
     "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
     "validate": "npm run lint",
-    "minify": "java -jar node_modules/google-closure-compiler/compiler.jar --js=www/build/main.client.js --js_output_file=www/build/main.client.min.js && npm run gzip",
-    "gzip": "gzip --keep --force www/build/main.client.min.js",
+    "minify": "uglifyjs --compress --mangle --output=www/build/main.client.js -- www/build/main.client.js && npm run stats",
+    "stats": "gzip --keep --force www/build/main.client.js && gzip -l www/build/main.client.js.gz",
     "serve": "httpster -p 8888 -d www"
   },
   "dependencies": {
@@ -19,10 +19,10 @@
     "todomvc-app-css": "^2.0.0"
   },
   "devDependencies": {
-    "google-closure-compiler": "^20170124.0.0",
     "httpster": "1.0.3",
     "rimraf": "2.5.4",
     "typescript": "2.2.0",
+    "uglify-js": "^2.7.5",
     "webpack": "2.2.1"
   }
 }

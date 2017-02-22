@@ -11,9 +11,9 @@ Protoype and mono-repo for `ionic-core`, `ionic-ui` and a demo app. Each project
     npm run build
 
 
-### Serve `demo/myapp/www`
+### Start/Serve TodoMVC `demo/todomvc/www`
 
-    npm run serve
+    npm run todomvc
 
 [http://localhost:8888/](http://localhost:8888/)
 
