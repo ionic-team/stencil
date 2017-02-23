@@ -1,7 +1,7 @@
 import { TranspileOptions, TranspileContext } from './interfaces';
 import { parseTsSrcFile } from './parser';
 import { getFile } from './util';
-import { compileTemplateSourceText } from './template-compiler';
+import { compileFileTemplates } from './template-compiler';
 import { generateComponentFile } from './generator';
 
 
@@ -36,7 +36,7 @@ export function transformTsFile(filePath: string, opts: TranspileOptions, ctx: T
       return file;
     }
 
-    return compileTemplateSourceText(file, opts, ctx).then(() => {
+    return compileFileTemplates(file, opts, ctx).then(() => {
       generateComponentFile(file, opts, ctx);
 
       if (file.components) {

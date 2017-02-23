@@ -1,11 +1,11 @@
 import { ComponentMeta, FileMeta, TranspileOptions, TranspileContext } from './interfaces';
-import { generateTemplate } from './template-generator';
+import { updateTemplate } from './template-updater';
 import { readFile } from './util';
 import * as path from 'path';
 import * as compiler from './template-compiler-build';
 
 
-export function compileTemplateSourceText(file: FileMeta, opts: TranspileOptions, ctx: TranspileContext) {
+export function compileFileTemplates(file: FileMeta, opts: TranspileOptions, ctx: TranspileContext) {
   const promises: Promise<ComponentMeta>[] = [];
 
   file.components.forEach(c => {
@@ -21,7 +21,7 @@ export function compileTemplateSourceText(file: FileMeta, opts: TranspileOptions
 
   return Promise.all(promises).then(components => {
     components.forEach(c => {
-      compileTemplate(c, opts, ctx);
+      compileComponentTemplate(c, opts, ctx);
     });
     return components;
   });
@@ -55,7 +55,15 @@ export function loadTemplateFile(c: ComponentMeta, file: FileMeta, opts: Transpi
 }
 
 
-export function compileTemplate(c: ComponentMeta, opts: TranspileOptions, ctx: TranspileContext, attempt = 0): ComponentMeta {
+export function compileTemplate(template: string, opts: TranspileOptions = {}, ctx: TranspileContext = {}) {
+  const c: ComponentMeta = {
+    template: template
+  };
+  return compileComponentTemplate(c, opts, ctx, 0);
+}
+
+
+export function compileComponentTemplate(c: ComponentMeta, opts: TranspileOptions, ctx: TranspileContext, attempt = 0): ComponentMeta {
   attempt++;
   if (attempt > 10) {
     addError(c, `compileTemplate infinite loop detected`);
@@ -72,15 +80,15 @@ export function compileTemplate(c: ComponentMeta, opts: TranspileOptions, ctx: T
   }
 
   try {
-    if (!c.generatedTemplate) {
-      c.generatedTemplate = generateTemplate(c.tag, c.template, opts, ctx);
+    if (!c.updatedTemplate) {
+      c.updatedTemplate = updateTemplate(c.tag, c.template, opts, ctx);
     }
 
     const compilerOptions = {
       preserveWhitespace: opts.preserveWhitespace
     };
 
-    const compileResult = compiler.compile(c.generatedTemplate, compilerOptions);
+    const compileResult = compiler.compile(c.updatedTemplate, compilerOptions);
 
     c.templateAst = compileResult.ast;
     c.templateRenderSource = compileResult.render;
@@ -89,9 +97,9 @@ export function compileTemplate(c: ComponentMeta, opts: TranspileOptions, ctx: T
     for (var i = 0; i < errors.length; i++) {
 
       if (requiresRootElement(errors[i])) {
-        c.generatedTemplate = null;
+        c.updatedTemplate = null;
         c.template = `<div>${c.template}</div>`;
-        return compileTemplate(c, opts, ctx, attempt);
+        return compileComponentTemplate(c, opts, ctx, attempt);
       }
 
       addError(c, errors[i]);

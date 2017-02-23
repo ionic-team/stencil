@@ -40,7 +40,7 @@ const WARNING_REPLACER_EXPS: {[key: string]: {regex: RegExp, msg: string} } = {
 const warnReplaceWithKeys = Object.keys(WARNING_REPLACER_EXPS);
 
 
-export function generateTemplate(tag: string, template: string, opts: TranspileOptions, ctx: TranspileContext) {
+export function updateTemplate(tag: string, template: string, opts: TranspileOptions = {}, ctx: TranspileContext = {}) {
 
   replaceWithKeys.forEach(replaceWithKey => {
     template = template.replace(REPLACER_EXPS[replaceWithKey], replaceWithKey);

@@ -1,5 +1,5 @@
 import { TranspileOptions, TranspileContext } from './interfaces';
-import { Logger, BuildError } from './logger';
+import { Logger, BuildError, runTypeScriptDiagnostics } from './logger';
 import { transformTsFiles } from './transformer';
 import { getTsConfig, writeTranspiledFiles } from './util';
 import * as ts from 'typescript';
@@ -55,6 +55,17 @@ export function transpile(opts: TranspileOptions, ctx: TranspileContext) {
     });
 
     ts.sys.readFile = tsSysReadFile;
+
+    const tsDiagnostics = program.getSyntacticDiagnostics()
+                          .concat(program.getSemanticDiagnostics())
+                          .concat(program.getOptionsDiagnostics());
+
+    const diagnostics = runTypeScriptDiagnostics(opts, tsDiagnostics);
+
+    if (diagnostics.length) {
+      // darn, we've got some things wrong, transpile failed :(
+      // printDiagnostics(diagnostics);
+    }
 
     return writeTranspiledFiles(transpiledFiles, opts, ctx);
   });
