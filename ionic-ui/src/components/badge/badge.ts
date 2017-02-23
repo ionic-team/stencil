@@ -1,7 +1,7 @@
 import { Component, Prop } from 'ionic-core';
 
 import { Config } from '../../config/config';
-import { initTheme, setColor, setMode, ComponentTheme } from '../../util/theme-utils';
+import { initTheme, setMode, ComponentTheme } from '../../util/theme-utils';
 
 
 /**
@@ -12,11 +12,7 @@ import { initTheme, setColor, setMode, ComponentTheme } from '../../util/theme-u
  */
 @Component({
   tag: 'ion-badge',
-  template: `
-    <div class="badge" :class="theme.host">
-      <slot></slot>
-    </div>
-  `
+  templateUrl: 'badge.html'
 })
 export class Badge {
   private theme: ComponentTheme = {};
@@ -24,7 +20,6 @@ export class Badge {
   constructor(config: Config) {
     config = new Config();
     initTheme(this.theme, 'badge', config);
-
   }
 
   /**
@@ -33,8 +28,13 @@ export class Badge {
    * For more information, see [Theming your App](/docs/v2/theming/theming-your-app).
    */
   @Prop()
+  get color() {
+    debugger
+    return 'huh';
+  }
   set color(val: string) {
-    setColor(this.theme, val);
+    val;
+    debugger
   }
 
   /**
@@ -48,8 +48,3 @@ export class Badge {
   }
 
 }
-/**
-if its a proerty and a setter, then keep it as a prop
-but instead of a computed property setter, it needs to be
-a watcher
- */

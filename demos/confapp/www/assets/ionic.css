@@ -1199,7 +1199,7 @@ ion-backdrop {
 ion-backdrop.backdrop-no-tappable {
   cursor: auto; }
 
-ion-badge {
+.badge {
   display: inline-block;
   padding: 3px 8px;
   min-width: 10px;
@@ -1210,7 +1210,7 @@ ion-badge {
   white-space: nowrap;
   vertical-align: baseline; }
 
-ion-badge:empty {
+.badge:empty {
   display: none; }
 
 .badge-ios {
@@ -9608,7 +9608,7 @@ ion-spinner.spinner-paused svg {
 .tab-disabled {
   pointer-events: none; }
 
-.tab-disabled ion-badge,
+.tab-disabled .badge,
 .tab-disabled ion-icon,
 .tab-disabled span {
   opacity: .4; }

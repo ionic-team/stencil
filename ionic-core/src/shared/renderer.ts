@@ -73,18 +73,17 @@ function generateComponentOptions(cmpMeta: ComponentCompiledMeta, cls: Component
 
     computed: {},
 
-    methods: {}
-  };
+    methods: {},
 
-  let keys: string[];
-  let i: number;
+    watch: {}
+  };
 
   const cmpPropsMeta = getComponentPropMeta(cls);
   if (cmpPropsMeta) {
     let propOptsMeta: PropOptionsMeta;
 
-    keys = Object.keys(cmpPropsMeta);
-    i = keys.length;
+    let keys = Object.keys(cmpPropsMeta);
+    let i = keys.length;
     opts.props = {};
 
     while (i--) {
@@ -98,8 +97,7 @@ function generateComponentOptions(cmpMeta: ComponentCompiledMeta, cls: Component
     }
   }
 
-  keys = Object.getOwnPropertyNames(cls.prototype);
-  keys.forEach(key => {
+  Object.getOwnPropertyNames(cls.prototype).forEach(key => {
     if (key === 'constructor') return;
 
     const descriptor = Object.getOwnPropertyDescriptor(cls.prototype, key);
@@ -111,6 +109,8 @@ function generateComponentOptions(cmpMeta: ComponentCompiledMeta, cls: Component
     } else {
       if (typeof descriptor.get === 'function') {
         // getter
+
+        // computed getter property
         opts.computed[key] = opts.computed[key] || {};
         (<any>opts.computed[key]).get = function() {
           return this.$data[key];
@@ -119,10 +119,28 @@ function generateComponentOptions(cmpMeta: ComponentCompiledMeta, cls: Component
 
       if (typeof descriptor.set === 'function') {
         // setter
-        opts.computed[key] = opts.computed[key] || {};
-        (<any>opts.computed[key]).set = function(val: any) {
-          this.$data[key] = val;
-        };
+
+        if ((<any>opts).props[key]) {
+          // if a property is already a "prop" property, as in an object
+          // reference is being passed down from the parent to the child,
+          // and this property on this component is also a "setter", then
+          // we don't want  to make this a "computed" property, but rather
+          // we need to "watch" the property and fire off this setter when
+          // the parent's data changes.
+
+          // watch setter property
+          opts.watch[key] = function(val: any) {
+            debugger;
+            cls.prototype[key].call(this.$data, val);
+          };
+
+        } else {
+          // computed setter property
+          opts.computed[key] = opts.computed[key] || {};
+          (<any>opts.computed[key]).set = function(val: any) {
+            this.$data[key] = val;
+          };
+        }
       }
     }
   });

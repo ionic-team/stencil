@@ -11,8 +11,8 @@
     "module": "commonjs",
     "outDir": "../../dist/es2015/transpiler",
     "noUnusedLocals": true,
-    "target": "es5",
     "noImplicitAny": true,
+    "target": "es2015",
     "sourceMap": false,
     "baseUrl": ".",
     "types": [

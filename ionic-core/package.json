@@ -10,6 +10,7 @@
     "build.index": "tsc --project src && npm run bundle.index",
     "build.transpiler": "tsc --project src/transpiler",
     "bundle.index": "node scripts/bundle.index.js",
+    "bundle.transpiler": "webpack --config src/transpiler/webpack.config.js",
     "build.quick": "npm run build.index",
     "copy.package.json": "cp scripts/npm.package.json dist/package.json",
     "test": "jest || true",
@@ -25,7 +26,8 @@
     "tslint": "4.3.1",
     "typescript": "2.2.0",
     "vue": "2.1.10",
-    "vue-template-compiler": "2.1.10"
+    "vue-template-compiler": "2.1.10",
+    "webpack": "^2.2.1"
   },
   "jest": {
     "testEnvironment": "node",
