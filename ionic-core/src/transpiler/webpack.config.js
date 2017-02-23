@@ -7,7 +7,8 @@ module.exports = {
     app: path.resolve(__dirname, '../../dist/es2015/transpiler/index.js')
   },
   output: {
-    filename: path.resolve(__dirname, '../../dist/es2015/transpiler.js'),
+    path: path.join(__dirname, '..', '..', 'dist', 'es2015'),
+    filename: 'transpiler.js',
     libraryTarget: 'umd'
   },
   plugins: [
