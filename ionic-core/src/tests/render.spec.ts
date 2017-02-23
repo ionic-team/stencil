@@ -1,6 +1,5 @@
 // import { Component } from '../../decorators/component';
-// import { compileComponent } from './mocks';
-import transpiler from '../../../../ionic-transpiler/dist/commonjs/index';
+import { compileComponent } from './mocks';
 
 
 describe('renderer', () => {
@@ -16,14 +15,10 @@ describe('renderer', () => {
   // });
 
   it('should compileComponent for testing', () => {
-    // let c = compileComponent({ tag: 'my-cmp', template: '<div>hi</div>'});
-    // expect(c.tag).toEqual('my-cmp');
-    // expect(typeof c.render).toEqual('function');
-    // expect(c.template).toBeUndefined();
-
-    transpiler.generateComponentMeta()
-
-    expect(true).toBe(true);
+    let c = compileComponent({ tag: 'my-cmp', template: '<div>hi</div>'});
+    expect(c.tag).toEqual('my-cmp');
+    expect(typeof c.render).toEqual('function');
+    expect(c.template).toBeUndefined();
   });
 
 });
