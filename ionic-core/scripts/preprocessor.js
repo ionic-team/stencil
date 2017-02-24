@@ -1,5 +1,5 @@
 const tsc = require('typescript');
-const tsConfig = require('../src/tests/tsconfig.json');
+const tsConfig = require('../src/shared/tests/renderer/tsconfig.json');
 
 module.exports = {
   process(src, path) {

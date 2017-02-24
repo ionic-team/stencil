@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const transpiler = require('../../ionic-core/dist/es2015/transpiler/index');
+const transpiler = require('../../ionic-core/dist/commonjs/transpiler');
 
 
 transpiler.transpileProject({

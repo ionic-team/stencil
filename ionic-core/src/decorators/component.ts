@@ -8,6 +8,7 @@ export function getComponentMeta(cls: any): ComponentCompiledMeta {
 
 
 export const Component: ComponentDecorator = function(metadata: ComponentMeta): (cls: ComponentClass) => ClassDecorator {
+  console.log('Component', metadata)
   return function(cls: any) {
     setAnnotation(cls, COMPONENT_ANNOTATION, metadata);
     return cls;

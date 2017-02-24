@@ -4,10 +4,10 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    app: path.resolve(__dirname, '../../dist/es2015/transpiler/index.js')
+    app: path.resolve(__dirname, '../../dist/commonjs/transpiler/index.js')
   },
   output: {
-    path: path.join(__dirname, '..', '..', 'dist', 'es2015'),
+    path: path.join(__dirname, '..', '..', 'dist', 'commonjs'),
     filename: 'transpiler.js',
     libraryTarget: 'umd'
   },
@@ -20,10 +20,10 @@ module.exports = {
   ],
   resolve: {
     alias: {
-        'ionic-core': path.resolve(__dirname, '../../ionic-core/dist/es2015/index.js'),
+        'ionic-core': path.resolve(__dirname, '../../ionic-core/dist/commonjs/index.js'),
         'ionic-ui': path.resolve(__dirname, '../../ionic-ui/dist/commonjs/index.js'),
-        'fs': path.resolve(__dirname, '../../dist/es2015/transpiler/sys/fs.js'),
-        'module': path.resolve(__dirname, '../../dist/es2015/transpiler/sys/module.js')
+        'fs': path.resolve(__dirname, '../../dist/commonjs/transpiler/sys/fs.js'),
+        'module': path.resolve(__dirname, '../../dist/commonjs/transpiler/sys/module.js')
     }
   }
 };

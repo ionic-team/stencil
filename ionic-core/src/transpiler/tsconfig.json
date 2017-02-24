@@ -9,10 +9,10 @@
       "es2015"
     ],
     "module": "commonjs",
-    "outDir": "../../dist/es2015/transpiler",
+    "outDir": "../../dist/commonjs/transpiler",
     "noUnusedLocals": true,
     "noImplicitAny": true,
-    "target": "es2015",
+    "target": "es5",
     "sourceMap": false,
     "baseUrl": ".",
     "types": [
