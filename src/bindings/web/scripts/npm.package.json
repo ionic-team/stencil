@@ -1,10 +1,10 @@
 {
-  "name": "ionic-angular",
-  "version": "88.88.88",
-  "description": "A powerful framework for building mobile and progressive web apps with JavaScript and Angular",
+  "name": "ionic-web",
+  "version": "0.0.1",
+  "description": "A powerful framework for building mobile and progressive web apps with JavaScript and web components",
   "keywords": [
     "ionic",
-    "angular",
+    "web components",
     "framework",
     "mobile",
     "app",
