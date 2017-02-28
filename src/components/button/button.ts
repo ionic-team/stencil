@@ -2,10 +2,10 @@ import { IonElement } from '../../utils/ion-element';
 import { CreateElement, VNode } from '../../utils/interfaces';
 
 
-export class IonBadge extends IonElement {
+export class IonButton extends IonElement {
 
   connectedCallback() {
-    this.connect(IonBadge.observedAttributes);
+    this.connect(IonButton.observedAttributes);
   }
 
   ionNode(h: CreateElement) {

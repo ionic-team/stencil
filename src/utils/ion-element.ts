@@ -6,7 +6,7 @@ import { attributesModule } from '../renderer/modules/attributes';
 import { classModule } from '../renderer/modules/class';
 import { eventListenersModule } from '../renderer/modules/eventlisteners';
 import { styleModule } from '../renderer/modules/style';
-export { h, VNode, VNodeData };
+export { VNode, VNodeData };
 declare const global: any;
 
 

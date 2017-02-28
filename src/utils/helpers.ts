@@ -12,3 +12,10 @@ export function isPrimitive(s: any): s is (string | number) {
 export function toCamelCase(str: string) {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
+
+export function defineElements(win: any, elements: {[tag: string]: Object}) {
+  const tags = Object.keys(elements);
+  for (var i = 0, l = tags.length; i < l; i++) {
+    win.customElements.define(tags[i], elements[tags[i]]);
+  }
+}

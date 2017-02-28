@@ -20,7 +20,7 @@ rollup.rollup({
 
 }).then(function(bundle) {
   var result = bundle.generate({
-    format: 'es'
+    format: 'umd'
   });
 
   fs.writeFileSync(outputFile, result.code);
