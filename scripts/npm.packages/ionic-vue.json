@@ -1,6 +1,23 @@
 {
   "name": "ionic-vue",
-  "version": "88.0.0",
+  "version": "88.88.88",
+  "description": "A powerful framework for building mobile and progressive web apps with JavaScript and Vue.js",
+  "keywords": [
+    "ionic",
+    "vue",
+    "vuejs",
+    "framework",
+    "mobile",
+    "app",
+    "webapp",
+    "cordova",
+    "progressive web app",
+    "pwa"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/driftyco/ionic.git"
+  },
   "main": "es2015/index.js"
 }
