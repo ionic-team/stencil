@@ -8,8 +8,8 @@
     "clean": "rimraf ../../../dist/transpiled-web/",
     "build": "npm run transpile && node scripts/build.web.js",
     "start": "npm install && npm run build",
-    "transpile": "npm run clean && tsc -p src/tsconfig.json",
-    "transpile.watch": "npm run clean && tsc -p src/tsconfig.json --watch"
+    "transpile": "npm run clean && tsc -p tsconfig.json",
+    "transpile.watch": "npm run clean && tsc -p tsconfig.json --watch"
   },
   "devDependencies": {
     "rimraf": "2.6.1",

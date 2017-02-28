@@ -14,16 +14,11 @@
     "sourceMap": true,
     "target": "es5",
     "types": ["jasmine"],
-    "outDir": "../../../../dist/transpiled-angular"
+    "outDir": "../../../dist/transpiled-angular"
   },
   "include": [
-    "**/*.ts"
+    "src/**/*.ts"
   ],
-  "compileOnSave": false,
-  "buildOnSave": false,
-  "atom": {
-    "rewriteTsconfig": false
-  },
   "angularCompilerOptions": {
     "annotationsAs": "static fields",
     "annotateForClosureCompiler": true
