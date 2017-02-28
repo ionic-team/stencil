@@ -6,21 +6,23 @@
   "scripts": {
     "start.components": "npm install && npm run build.components",
     "start.angular": "npm run start.components && cd src/bindings/angular && npm install && npm run build.angular",
-
-    "transpile": "tsc -p src/tsconfig.json",
-
+    "clean": "rimraf dist/",
+    "transpile": "npm run clean && tsc -p src/tsconfig.json",
+    "transpile.watch": "npm run clean && tsc -p src/tsconfig.json --watch",
     "build.components": "npm run transpile && node scripts/build.components.js",
     "build.angular": "node scripts/build.angular.js",
+    "build.web": "npm run transpile && node scripts/build.web.js",
     "build.demo.angular": "cd demos/angular && npm run build",
-
     "angular": "npm run start.angular && npm run build.demo.angular",
     "react": "echo react",
     "vue": "echo vue",
     "web": "echo web"
   },
   "devDependencies": {
+    "fs-extra": "^2.0.0",
     "httpster": "1.0.3",
     "rimraf": "2.6.1",
+    "rollup": "0.41.4",
     "typescript": "2.2.1"
   }
 }
