@@ -1,12 +1,12 @@
 {
-  "name": "ionic-web",
+  "name": "ionic-react",
   "private": true,
   "version": "0.0.1",
   "license": "MIT",
   "main": "es2015/index.js",
   "scripts": {
-    "clean": "rimraf ../../../dist/transpiled-web/",
-    "build": "npm run transpile && node scripts/build.web.js",
+    "clean": "rimraf ../../../dist/transpiled-react/",
+    "build": "npm run transpile && node scripts/build.react.js",
     "start": "npm install && npm run build",
     "transpile": "npm run clean && tsc -p tsconfig.json",
     "transpile.watch": "npm run clean && tsc -p tsconfig.json --watch"
