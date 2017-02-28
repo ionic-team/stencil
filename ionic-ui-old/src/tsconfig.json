@@ -7,14 +7,19 @@
       "es5",
       "es2015"
     ],
-    "module": "es2015",
-    "outDir": "../node_modules/ionic-ui/es2015",
-    "target": "es2015",
+    "module": "commonjs",
+    "outDir": "../dist/commonjs",
+    "target": "es5",
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitUseStrict": true,
     "sourceMap": true,
-    "baseUrl": "."
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "ionic-core": ["../../ionic-core/dist/es2015/index"]
+    }
   },
   "include": [
     "**/*.ts"

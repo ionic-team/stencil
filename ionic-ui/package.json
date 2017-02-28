@@ -1,20 +1,22 @@
 {
-  "name": "ionic-next",
+  "name": "ionic-ui",
   "version": "0.0.1",
   "description": "yolo",
   "author": "yes",
   "license": "MIT Romney",
   "scripts": {
-    "build": "npm run build.clean && npm run transpile && npm run copy.package.json",
-    "build.clean": "rimraf dist",
-    "build.quick": " npm run transpile",
-    "copy.package.json": "cp scripts/npm.package.json dist/package.json",
-    "transpile": "node scripts/transpile.js",
-    "lint": "tslint --config src/tslint.json 'src/**/*.ts'",
-    "validate": "npm run lint"
+    "build": "npm run build.clean && npm run build.es2015 && npm run build.demos",
+    "build.clean": "rimraf node_modules/ionic-ui",
+    "build.es2015": "tsc --project src && npm run bundle",
+    "bundle": "node scripts/bundle.js",
+    "build.demos": "npm run build.demo.angular",
+    "build.demo.angular": "cd demos/angular && npm run ionic:build",
+    "build.quick": "npm run build.es2015 && npm run build.demo.angular"
   },
   "devDependencies": {
+    "ncp": "^2.0.0",
     "rimraf": "2.5.4",
+    "rollup": "^0.41.4",
     "tslint": "4.3.1",
     "typescript": "2.2.0"
   }

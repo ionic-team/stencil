@@ -32,5 +32,8 @@
     "typescript": "2.0.9",
     "@ionic/cli-plugin-core": "0.0.6",
     "@ionic/cli-plugin-cordova": "0.0.7"
+  },
+  "config": {
+    "ionic_generate_source_map": "false"
   }
 }
