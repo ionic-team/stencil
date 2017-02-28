@@ -9,13 +9,13 @@ export interface DomApi {
   appendChild: (node: Node, child: Node) => void;
   parentNode: (node: Node) => Node;
   nextSibling: (node: Node) => Node;
-  tagName: (elm: Element) => string;
+  tagName: (ele: Element) => string;
   setTextContent: (node: Node, text: string | null) => void;
   getTextContent: (node: Node) => string | null;
-  getAttribute: (node: Node, attrName: string) => string;
+  getAttribute: (ele: Element, attrName: string) => string;
   getProperty: (node: Node, propName: string) => string;
-  getPropOrAttr: (node: Node, propName: string) => any;
-  setStyle: (node: Node, styleName: string, styleValue: any) => void;
+  getPropOrAttr: (ele: Element, propName: string) => any;
+  setStyle: (ele: Element, styleName: string, styleValue: any) => void;
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
   isComment: (node: Node) => node is Comment;

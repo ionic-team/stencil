@@ -10,60 +10,74 @@ export { h, VNode, VNodeData };
 declare const global: any;
 
 
-export class IonElement extends HTMLElement {
-  ionic: Ionic;
-
+export class IonElement extends getBaseElement() {
+  /** @internal */
+  $dom: DomApi;
+  /** @internal */
+  $config: Config;
+  /** @internal */
+  $render: Patch;
   /** @internal */
   _vnode: VNode;
   /** @internal */
-  _render: Patch;
-  /** @internal */
   _ob: MutationObserver;
-  /** @internal */
-  _init = false;
+
 
   constructor() {
     super();
-    this.ionic = getIonic();
+
+    const ionic = getIonic();
+    this.$dom = ionic.dom;
+    this.$config = ionic.config;
   }
 
 
   connect(observedAttributes: string[]) {
-    const self = this;
+    const ele = this;
 
-    self.ionic.domApi.setStyle(self, 'visibility', 'hidden');
+    ele.$dom.setStyle(ele, 'visibility', 'hidden');
 
-    initProperties(self, observedAttributes);
-    self.update();
+    const propValues: any = {};
+
+    observedAttributes.forEach(attrName => {
+      const propName = toCamelCase(attrName);
+
+      propValues[propName] = (<any>ele)[propName];
+
+      Object.defineProperty(ele, propName, {
+        get: () => {
+          return propValues[propName];
+        },
+        set: (value: any) => {
+          if (propValues[propName] !== value) {
+            propValues[propName] = value;
+            ele.update();
+          }
+        }
+      });
+    });
+
+    ele.update();
   }
+
 
   update() {
     console.log('called update');
-    const self = this;
-    const ionic = self.ionic;
-    const domApi = ionic.domApi;
+    const ele = this;
 
-    if (self._ob) {
-      self._ob.disconnect();
+    if (ele._ob) {
+      return;
     }
 
-    self._ob = new MutationObserver(() => {
-      const newVnode = self.ionNode(h);
-      themeRoot(ionic.config, domApi, self, newVnode.data);
-      patch(domApi, self, newVnode);
+    ele._ob = new MutationObserver(() => {
+      patch(ele);
 
-      self._ob.disconnect();
-      self._ob = null;
-
-      if (!self._init) {
-        domApi.setStyle(self, 'visibility', '');
-        self._init = true;
-      }
-
-      console.log('updated');
+      ele._ob.disconnect();
+      ele._ob = null;
     });
-    const textNode = domApi.createTextNode('');
-    self._ob.observe(textNode, { characterData: true });
+
+    const textNode = ele.$dom.createTextNode('');
+    ele._ob.observe(textNode, { characterData: true });
     textNode.data = '1';
   }
 
@@ -71,67 +85,57 @@ export class IonElement extends HTMLElement {
   attributeChangedCallback(attrName: string, oldVal: string, newVal: string) {
     console.debug(`attributeChangedCallback: ${attrName}, was "${oldVal}", now "${newVal}"`);
 
-    if (oldVal !== newVal) {
-      this.update();
-    }
+    (<any>this)[toCamelCase(attrName)] = newVal;
   }
 
 
   disconnectedCallback() {
-    this.ionic = this._render = this._vnode = null;
+    this.$dom = this.$config = this.$render = this._vnode = this._ob = null;
   }
 
-  ionNode(h: any): VNode { return h; };
+  ionNode(h: any): VNode { h; return null; };
 
 }
 
 
-function patch(domApi: DomApi, ele: IonElement, newVnode: VNode) {
-  if (!ele._render) {
-    ele._render = init([
+function patch(ele: IonElement) {
+  const newVnode = ele.ionNode(h);
+  if (!newVnode) {
+    return;
+  }
+
+  const config = ele.$config;
+  const dom = ele.$dom;
+
+  const mode = getValue('mode', config, dom, ele);
+  const color = getValue('color', config, dom, ele);
+
+  const componentName = getComponentName(dom, ele);
+
+  const dataClass = newVnode.data.class = newVnode.data.class || {};
+  dataClass[componentName] = true;
+
+  dataClass[`${componentName}-${mode}`] = true;
+  if (color) {
+    dataClass[`${componentName}-${mode}-${color}`] = true;
+  }
+
+  if (!ele.$render) {
+    ele.$render = init([
       attributesModule,
       classModule,
       eventListenersModule,
       propsModule,
       styleModule
-    ], domApi);
+    ], dom);
 
-    ele._vnode = ele._render(ele, newVnode);
+    ele._vnode = ele.$render(ele, newVnode);
+
+    dom.setStyle(ele, 'visibility', '');
 
   } else {
-    ele._vnode = ele._render(ele._vnode, newVnode);
+    ele._vnode = ele.$render(ele._vnode, newVnode);
   }
-}
-
-
-function initProperties(ele: HTMLElement, observedAttributes: string[]) {
-  observedAttributes.forEach(attrName => {
-    const propName = toCamelCase(attrName);
-
-    if (ele.hasOwnProperty(propName)) {
-      return;
-    }
-
-
-  });
-}
-
-
-function themeRoot(config: Config, domApi: DomApi, ele: HTMLElement, data: VNodeData): VNodeData {
-  const mode = getValue('mode', config, domApi, ele);
-  const color = getValue('color', config, domApi, ele);
-
-  const componentName = getComponentName(domApi, ele);
-
-  data.class = data.class || {};
-  data.class[componentName] = true;
-
-  data.class[`${componentName}-${mode}`] = true;
-  if (color) {
-    data.class[`${componentName}-${mode}-${color}`] = true;
-  }
-
-  return data;
 }
 
 
@@ -145,11 +149,13 @@ function getIonic(): Ionic {
   const GLOBAL = typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : Function('return this;')();
   const ionic: Ionic  = (GLOBAL.ionic = GLOBAL.ionic || {});
 
-  ionic.domApi = new BrowserDomApi(document);
+  if (!ionic.dom) {
+    ionic.dom = new BrowserDomApi(document);
+  }
 
-  ionic.config = new Config({
-    mode: 'md'
-  });
+  if (!ionic.config) {
+    ionic.config = new Config();
+  }
 
   return ionic;
 }
@@ -162,11 +168,22 @@ function getComponentName(domApi: DomApi, ele: HTMLElement) {
 
 
 export interface Ionic {
-  domApi: DomApi;
+  dom: DomApi;
   config: Config;
 }
 
 
 export interface Patch {
   (oldVnode: VNode | Element, vnode: VNode): VNode;
+}
+
+
+function getBaseElement(): { new(): HTMLElement } {
+  if (typeof HTMLElement !== 'function') {
+    const BaseElement = function(){};
+    BaseElement.prototype = getIonic().dom.createElement('div');
+    return <any>BaseElement;
+  }
+
+  return HTMLElement;
 }
