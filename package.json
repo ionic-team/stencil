@@ -1,20 +1,26 @@
 {
-  "name": "ionic-next",
+  "name": "ionic-core",
+  "private": true,
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "start.core": "cd ionic-core && npm install && npm run build",
-    "start.ui": "cd ionic-ui && npm install && npm run build",
-    "start.demo.confapp": "cd demos/confapp && npm install && npm run build",
-    "start.demo.todomvc": "cd demos/todomvc && npm install && npm run build",
-    "build": "npm run build.core && npm run build.ui && (npm run build.demo.confapp & npm run build.demo.todomvc)",
-    "build.core": "cd ionic-core && npm run build",
-    "build.ui": "cd ionic-ui && npm run build",
-    "build.demo.confapp": "cd demos/confapp && npm run build",
-    "build.demo.todomvc": "cd demos/todomvc && npm run build",
-    "build.quick": "(cd ionic-core && npm run build.quick) && (cd demos/todomvc && npm run build.quick)",
-    "validate": "(cd ionic-core && npm run validate) && (cd ionic-ui && npm run validate) && (cd demos/confapp && npm run validate)",
-    "todomvc": "npm run start.core && npm run start.demo.todomvc && cd demos/todomvc && npm run minify && npm run serve",
-    "confapp": "npm run start.core && npm run start.ui && npm run start.demo.confapp && cd demos/confapp && npm run stats && npm run serve"
+    "start.components": "npm install && npm run build.components",
+    "start.angular": "npm run start.components && cd src/bindings/angular && npm install && npm run build.angular",
+
+    "transpile": "tsc -p src/tsconfig.json",
+
+    "build.components": "npm run transpile && node scripts/build.components.js",
+    "build.angular": "node scripts/build.angular.js",
+    "build.demo.angular": "cd demos/angular && npm run build",
+
+    "angular": "npm run start.angular && npm run build.demo.angular",
+    "react": "echo react",
+    "vue": "echo vue",
+    "web": "echo web"
+  },
+  "devDependencies": {
+    "httpster": "1.0.3",
+    "rimraf": "2.6.1",
+    "typescript": "2.2.1"
   }
 }
