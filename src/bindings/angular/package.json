@@ -4,6 +4,13 @@
   "version": "88.0.0",
   "license": "MIT",
   "main": "es2015/index.js",
+  "scripts": {
+    "clean": "rimraf ../../../dist/transpiled-angular/",
+    "build": "npm run transpile && node scripts/build.angular.js",
+    "start": "npm install && npm run build",
+    "transpile": "npm run clean && tsc -p src/tsconfig.json",
+    "transpile.watch": "npm run clean && tsc -p src/tsconfig.json --watch"
+  },
   "dependencies": {
     "@angular/common": "2.2.1",
     "@angular/compiler": "2.2.1",
@@ -19,6 +26,8 @@
     "zone.js": "~0.6.26"
   },
   "devDependencies": {
+    "@types/jasmine": "^2.5.43",
+    "rimraf": "^2.6.1",
     "typescript": "2.2.1"
   }
 }

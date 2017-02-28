@@ -10,13 +10,12 @@
     "target": "es2015",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "../dist/transpiled-core"
+    "outDir": "../../../../dist/transpiled-web"
   },
   "include": [
     "**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "bindings"
+    "node_modules"
   ]
 }

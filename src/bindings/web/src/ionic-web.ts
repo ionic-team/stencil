@@ -1,10 +1,10 @@
 
-import { defineElements } from '../../utils/helpers';
+import { defineElements } from '../../../utils/helpers';
 
 import {
   IonBadge,
   IonButton
-} from '../../components/index';
+} from '../../../components/index';
 
 
 defineElements(window, {

@@ -13,7 +13,8 @@
     "removeComments": false,
     "sourceMap": true,
     "target": "es5",
-    "types": ["jasmine"]
+    "types": ["jasmine"],
+    "outDir": "../../../../dist/transpiled-angular"
   },
   "include": [
     "**/*.ts"
