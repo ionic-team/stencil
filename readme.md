@@ -1,9 +1,6 @@
 
-### Install/Build/Serve ionic-angular `demo/angular`
+Start a local server at the root of the repo.
 
-    npm run angular
+Take a gander at the `demos`
 
-[http://localhost:8888/](http://localhost:8888/)
-
-
-Take a gander at the `package.json` for more details.
+[http://localhost:3333/demos/](http://localhost:3333/demos/)
