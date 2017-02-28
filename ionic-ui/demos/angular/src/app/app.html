@@ -4,10 +4,15 @@ my app
 
 <ion-badge>88</ion-badge>
 
-<ion-badge mode="ios">ios</ion-badge>
+<ion-badge mode="ios">ios {{ num }}</ion-badge>
 
-<ion-badge mode="md">ios</ion-badge>
+<ion-badge mode="md">ios {{ num }}</ion-badge>
 
-<ion-badge color="secondary">secondary</ion-badge>
+<ion-badge color="secondary">secondary {{ num }}</ion-badge>
 
-<ion-badge color="danger" mode="ios">ios danger</ion-badge>
+<ion-badge color="danger" mode="ios">ios danger {{ num }}</ion-badge>
+
+<ion-badge [color]="color" mode="ios">ios [color] {{ num }}</ion-badge>
+
+
+<button (click)="toggleVars()">Toggle Vars: {{ num }}</button>

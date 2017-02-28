@@ -11,7 +11,6 @@ function updateStyle(oldVnode: VNode, vnode: VNode): void {
   if (oldStyle === style) return;
   oldStyle = oldStyle || {};
   style = style || {};
-  // var oldHasDel = 'delayed' in oldStyle;
 
   for (name in oldStyle) {
     if (!style[name]) {
@@ -24,14 +23,7 @@ function updateStyle(oldVnode: VNode, vnode: VNode): void {
   }
   for (name in style) {
     cur = style[name];
-    if (name === 'delayed') {
-      for (name in style.delayed) {
-        cur = style.delayed[name];
-        // if (!oldHasDel || cur !== oldStyle.delayed[name]) {
-        //   setNextFrame((elm as any).style, name, cur);
-        // }
-      }
-    } else if (name !== 'remove' && cur !== oldStyle[name]) {
+    if (name !== 'remove' && cur !== oldStyle[name]) {
       if (name[0] === '-' && name[1] === '-') {
         (elm as any).style.setProperty(name, cur);
       } else {

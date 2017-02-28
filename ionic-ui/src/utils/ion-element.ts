@@ -1,10 +1,10 @@
 import { Config } from './config';
+import { GlobalIonic, Patch } from './interfaces';
 import { isDef, toCamelCase } from './helpers';
 import { init, DomApi, BrowserDomApi, VNode, VNodeData, h } from '../renderer/index';
 import { attributesModule } from '../renderer/modules/attributes';
 import { classModule } from '../renderer/modules/class';
 import { eventListenersModule } from '../renderer/modules/eventlisteners';
-import { propsModule } from '../renderer/modules/props';
 import { styleModule } from '../renderer/modules/style';
 export { h, VNode, VNodeData };
 declare const global: any;
@@ -110,7 +110,10 @@ function patch(ele: IonElement) {
   const mode = getValue('mode', config, dom, ele);
   const color = getValue('color', config, dom, ele);
 
-  const componentName = getComponentName(dom, ele);
+  let componentName = dom.tagName(ele).toLowerCase();
+  if (componentName.indexOf('ion-') === 0) {
+    componentName = componentName.substring(4);
+  }
 
   const dataClass = newVnode.data.class = newVnode.data.class || {};
   dataClass[componentName] = true;
@@ -125,7 +128,6 @@ function patch(ele: IonElement) {
       attributesModule,
       classModule,
       eventListenersModule,
-      propsModule,
       styleModule
     ], dom);
 
@@ -145,9 +147,9 @@ function getValue(name: string, config: Config, domApi: DomApi, ele: HTMLElement
 }
 
 
-function getIonic(): Ionic {
+function getIonic(): GlobalIonic {
   const GLOBAL = typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : Function('return this;')();
-  const ionic: Ionic  = (GLOBAL.ionic = GLOBAL.ionic || {});
+  const ionic: GlobalIonic  = (GLOBAL.ionic = GLOBAL.ionic || {});
 
   if (!ionic.dom) {
     ionic.dom = new BrowserDomApi(document);
@@ -158,23 +160,6 @@ function getIonic(): Ionic {
   }
 
   return ionic;
-}
-
-
-function getComponentName(domApi: DomApi, ele: HTMLElement) {
-  const tagName = domApi.tagName(ele).toLowerCase();
-  return (tagName.indexOf('ion-') === 0) ? tagName.substring(4) : tagName;
-}
-
-
-export interface Ionic {
-  dom: DomApi;
-  config: Config;
-}
-
-
-export interface Patch {
-  (oldVnode: VNode | Element, vnode: VNode): VNode;
 }
 
 
