@@ -21,6 +21,8 @@ export class IonElement extends getBaseElement() {
   _vnode: VNode;
   /** @internal */
   _ob: MutationObserver;
+  /** @internal */
+  _obAttrs: string[];
 
 
   constructor() {
@@ -37,30 +39,9 @@ export class IonElement extends getBaseElement() {
   }
 
 
-  connect(observedAttributes: string[]) {
-    const elm = this;
-
-    const propValues: any = {};
-
-    observedAttributes.forEach(attrName => {
-      const propName = toCamelCase(attrName);
-
-      propValues[propName] = (<any>elm)[propName];
-
-      Object.defineProperty(elm, propName, {
-        get: () => {
-          return propValues[propName];
-        },
-        set: (value: any) => {
-          if (propValues[propName] !== value) {
-            propValues[propName] = value;
-            elm.update();
-          }
-        }
-      });
-    });
-
-    elm.update();
+  connect(observedAttributes?: string[]) {
+    this._obAttrs = observedAttributes;
+    this.update();
   }
 
 
@@ -86,8 +67,6 @@ export class IonElement extends getBaseElement() {
 
 
   attributeChangedCallback(attrName: string, oldVal: string, newVal: string) {
-    console.debug(`attributeChangedCallback: ${attrName}, was "${oldVal}", now "${newVal}"`);
-
     (<any>this)[toCamelCase(attrName)] = newVal;
   }
 
@@ -103,14 +82,49 @@ export class IonElement extends getBaseElement() {
 }
 
 
+function initProperties(elm: IonElement) {
+  if (!elm._obAttrs) return;
+
+  const propValues: any = {};
+
+  elm._obAttrs.forEach(attrName => {
+    const propName = toCamelCase(attrName);
+
+    propValues[propName] = (<any>elm)[propName];
+
+    Object.defineProperty(elm, propName, {
+      get: () => {
+        return propValues[propName];
+      },
+      set: (value: any) => {
+        if (propValues[propName] !== value) {
+          propValues[propName] = value;
+          elm.update();
+        }
+      }
+    });
+  });
+}
+
+
 function patchElement(elm: IonElement) {
+  const config = elm.$config;
+  const dom = elm.$dom;
   const newVnode = elm.ionNode(h);
   if (!newVnode) {
     return;
   }
 
-  const config = elm.$config;
-  const dom = elm.$dom;
+  if (!elm.$renderer) {
+    initProperties(elm);
+
+    elm.$renderer = init([
+      attributesModule,
+      classModule,
+      eventListenersModule,
+      styleModule
+    ], dom);
+  }
 
   newVnode.elm = elm;
   newVnode.isHost = true;
@@ -135,19 +149,9 @@ function patchElement(elm: IonElement) {
     dataClass[`${componentPrefix}${mode}-${color}`] = true;
   }
 
-  if (!elm.$renderer) {
-    elm.$renderer = init([
-      attributesModule,
-      classModule,
-      eventListenersModule,
-      styleModule
-    ], dom);
-
-    elm._vnode = elm.$renderer(elm, newVnode);
-
-  } else {
-    elm._vnode = elm.$renderer(elm._vnode, newVnode);
-  }
+  // if we already have a vnode then use it
+  // otherwise, elm it's the initial patch and we need it to pass it the actual host element
+  elm._vnode =  elm.$renderer(elm._vnode ? elm._vnode : elm, newVnode);
 }
 
 
