@@ -9,7 +9,7 @@
     "build.angular": "cd src/bindings/angular/ && npm run build",
     "build.web": "cd src/bindings/web/ && npm run build",
     "start": "npm install && npm run build",
-    "test": "(jest --no-cache || true)",
+    "test": "(jest || true)",
     "transpile": "npm run clean && tsc -p src/tsconfig.json",
     "transpile.watch": "npm run clean && tsc -p src/tsconfig.json --watch"
   },

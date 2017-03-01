@@ -32,75 +32,75 @@ describe('style', function() {
     expect(elm.style.fontSize).toEqual('14px');
     expect(elm.style.display).toEqual('inline');
   });
-  // it('updates styles', function() {
-  //   var vnode1 = h('i', {style: {fontSize: '14px', display: 'inline'}});
-  //   var vnode2 = h('i', {style: {fontSize: '12px', display: 'block'}});
-  //   var vnode3 = h('i', {style: {fontSize: '10px', display: 'block'}});
-  //   elm = patch(vnode0, vnode1).elm;
-  //   assert.equal(elm.style.fontSize, '14px');
-  //   assert.equal(elm.style.display, 'inline');
-  //   elm = patch(vnode1, vnode2).elm;
-  //   assert.equal(elm.style.fontSize, '12px');
-  //   assert.equal(elm.style.display, 'block');
-  //   elm = patch(vnode2, vnode3).elm;
-  //   assert.equal(elm.style.fontSize, '10px');
-  //   assert.equal(elm.style.display, 'block');
-  // });
-  // it('explicialy removes styles', function() {
-  //   var vnode1 = h('i', {style: {fontSize: '14px'}});
-  //   var vnode2 = h('i', {style: {fontSize: ''}});
-  //   var vnode3 = h('i', {style: {fontSize: '10px'}});
-  //   elm = patch(vnode0, vnode1).elm;
-  //   assert.equal(elm.style.fontSize, '14px');
-  //   patch(vnode1, vnode2);
-  //   assert.equal(elm.style.fontSize, '');
-  //   patch(vnode2, vnode3);
-  //   assert.equal(elm.style.fontSize, '10px');
-  // });
-  // it('implicially removes styles from element', function() {
-  //   var vnode1 = h('div', [h('i', {style: {fontSize: '14px'}})]);
-  //   var vnode2 = h('div', [h('i')]);
-  //   var vnode3 = h('div', [h('i', {style: {fontSize: '10px'}})]);
-  //   patch(vnode0, vnode1);
-  //   assert.equal(elm.firstChild.style.fontSize, '14px');
-  //   patch(vnode1, vnode2);
-  //   assert.equal(elm.firstChild.style.fontSize, '');
-  //   patch(vnode2, vnode3);
-  //   assert.equal(elm.firstChild.style.fontSize, '10px');
-  // });
-  // it('updates css variables', function() {
-  //   var vnode1 = h('div', {style: {'--myVar': 1}});
-  //   var vnode2 = h('div', {style: {'--myVar': 2}});
-  //   var vnode3 = h('div', {style: {'--myVar': 3}});
-  //   elm = patch(vnode0, vnode1).elm;
-  //   assert.equal(elm.style.getPropertyValue('--myVar'), 1);
-  //   elm = patch(vnode1, vnode2).elm;
-  //   assert.equal(elm.style.getPropertyValue('--myVar'), 2);
-  //   elm = patch(vnode2, vnode3).elm;
-  //   assert.equal(elm.style.getPropertyValue('--myVar'), 3);
-  // });
-  // it('explicialy removes css variables', function() {
-  //   var vnode1 = h('i', {style: {'--myVar': 1}});
-  //   var vnode2 = h('i', {style: {'--myVar': ''}});
-  //   var vnode3 = h('i', {style: {'--myVar': 2}});
-  //   elm = patch(vnode0, vnode1).elm;
-  //   assert.equal(elm.style.getPropertyValue('--myVar'), 1);
-  //   patch(vnode1, vnode2);
-  //   assert.equal(elm.style.getPropertyValue('--myVar'), '');
-  //   patch(vnode2, vnode3);
-  //   assert.equal(elm.style.getPropertyValue('--myVar'), 2);
-  // });
-  // it('implicially removes css variables from element', function() {
-  //   var vnode1 = h('div', [h('i', {style: {'--myVar': 1}})]);
-  //   var vnode2 = h('div', [h('i')]);
-  //   var vnode3 = h('div', [h('i', {style: {'--myVar': 2}})]);
-  //   patch(vnode0, vnode1);
-  //   assert.equal(elm.firstChild.style.getPropertyValue('--myVar'), 1);
-  //   patch(vnode1, vnode2);
-  //   assert.equal(elm.firstChild.style.getPropertyValue('--myVar'), '');
-  //   patch(vnode2, vnode3);
-  //   assert.equal(elm.firstChild.style.getPropertyValue('--myVar'), 2);
-  // });
+  it('updates styles', function() {
+    var vnode1 = h('i', {style: {fontSize: '14px', display: 'inline'}});
+    var vnode2 = h('i', {style: {fontSize: '12px', display: 'block'}});
+    var vnode3 = h('i', {style: {fontSize: '10px', display: 'block'}});
+    elm = patch(vnode0, vnode1).elm;
+    expect(elm.style.fontSize).toEqual('14px');
+    expect(elm.style.display).toEqual('inline');
+    elm = patch(vnode1, vnode2).elm;
+    expect(elm.style.fontSize).toEqual('12px');
+    expect(elm.style.display).toEqual('block');
+    elm = patch(vnode2, vnode3).elm;
+    expect(elm.style.fontSize).toEqual('10px');
+    expect(elm.style.display).toEqual('block');
+  });
+  it('explicialy removes styles', function() {
+    var vnode1 = h('i', {style: {fontSize: '14px'}});
+    var vnode2 = h('i', {style: {fontSize: ''}});
+    var vnode3 = h('i', {style: {fontSize: '10px'}});
+    elm = patch(vnode0, vnode1).elm;
+    expect(elm.style.fontSize).toEqual('14px');
+    patch(vnode1, vnode2);
+    expect(elm.style.fontSize).toEqual('');
+    patch(vnode2, vnode3);
+    expect(elm.style.fontSize).toEqual('10px');
+  });
+  it('implicially removes styles from element', function() {
+    var vnode1 = h('div', [h('i', {style: {fontSize: '14px'}})]);
+    var vnode2 = h('div', [h('i')]);
+    var vnode3 = h('div', [h('i', {style: {fontSize: '10px'}})]);
+    patch(vnode0, vnode1);
+    expect(elm.firstChild.style.fontSize).toEqual('14px');
+    patch(vnode1, vnode2);
+    expect(elm.firstChild.style.fontSize).toEqual('');
+    patch(vnode2, vnode3);
+    expect(elm.firstChild.style.fontSize).toEqual('10px');
+  });
+  it('updates css variables', function() {
+    var vnode1 = h('div', {style: {'display': 'val1'}});
+    var vnode2 = h('div', {style: {'display': 'val2'}});
+    var vnode3 = h('div', {style: {'display': 'val3'}});
+    elm = patch(vnode0, vnode1).elm;
+    expect(elm.style.getPropertyValue('display')).toEqual('val1');
+    elm = patch(vnode1, vnode2).elm;
+    expect(elm.style.getPropertyValue('display')).toEqual('val2');
+    elm = patch(vnode2, vnode3).elm;
+    expect(elm.style.getPropertyValue('display')).toEqual('val3');
+  });
+  it('explicialy removes css variables', function() {
+    var vnode1 = h('i', {style: {'display': 'val1'}});
+    var vnode2 = h('i', {style: {'display': ''}});
+    var vnode3 = h('i', {style: {'display': 'val2'}});
+    elm = patch(vnode0, vnode1).elm;
+    expect(elm.style.getPropertyValue('display')).toEqual('val1');
+    patch(vnode1, vnode2);
+    expect(elm.style.getPropertyValue('display')).toEqual('');
+    patch(vnode2, vnode3);
+    expect(elm.style.getPropertyValue('display')).toEqual('val2');
+  });
+  it('implicially removes css variables from element', function() {
+    var vnode1 = h('div', [h('i', {style: {'display': 'val1'}})]);
+    var vnode2 = h('div', [h('i')]);
+    var vnode3 = h('div', [h('i', {style: {'display': 'val2'}})]);
+    patch(vnode0, vnode1);
+    expect(elm.firstChild.style.getPropertyValue('display')).toEqual('val1');
+    patch(vnode1, vnode2);
+    expect(elm.firstChild.style.getPropertyValue('display')).toEqual('');
+    patch(vnode2, vnode3);
+    expect(elm.firstChild.style.getPropertyValue('display')).toEqual('val2');
+  });
   // it('updates delayed styles in next frame', function() {
   //   var patch = snabbdom.init([
   //     require('../modules/style').default,
@@ -108,15 +108,15 @@ describe('style', function() {
   //   var vnode1 = h('i', {style: {fontSize: '14px', delayed: {fontSize: '16px'}}});
   //   var vnode2 = h('i', {style: {fontSize: '18px', delayed: {fontSize: '20px'}}});
   //   elm = patch(vnode0, vnode1).elm;
-  //   assert.equal(elm.style.fontSize, '14px');
+  //   expect(elm.style.fontSize, '14px');
   //   fakeRaf.step();
   //   fakeRaf.step();
-  //   assert.equal(elm.style.fontSize, '16px');
+  //   expect(elm.style.fontSize, '16px');
   //   elm = patch(vnode1, vnode2).elm;
-  //   assert.equal(elm.style.fontSize, '18px');
+  //   expect(elm.style.fontSize, '18px');
   //   fakeRaf.step();
   //   fakeRaf.step();
-  //   assert.equal(elm.style.fontSize, '20px');
+  //   expect(elm.style.fontSize, '20px');
   // });
 });
 
