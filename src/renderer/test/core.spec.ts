@@ -6,8 +6,7 @@ import { DomApi } from '../api/dom-api';
 import { BrowserDomApi } from '../api/browser-api';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
 
-import { mockDocument } from '../../utils/test/mocks';
-const document = mockDocument();
+const document: HTMLDocument = (<any>global).document;
 const domApi = new BrowserDomApi(document);
 
 

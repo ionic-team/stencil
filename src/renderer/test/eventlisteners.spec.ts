@@ -3,8 +3,7 @@ import { init, h } from '../index';
 import { eventListenersModule } from '../modules/eventlisteners';
 import { BrowserDomApi } from '../api/browser-api';
 
-import { mockDocument } from '../../utils/test/mocks';
-const document = mockDocument();
+const document: HTMLDocument = (<any>global).document;
 
 var patch = init([
   eventListenersModule,

@@ -3,8 +3,8 @@ import { Config } from './config';
 
 
 export interface GlobalIonic {
-  dom: DomApi;
-  config: Config;
+  dom?: DomApi;
+  config?: Config;
 }
 
 

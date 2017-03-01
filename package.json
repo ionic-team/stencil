@@ -9,7 +9,7 @@
     "build.angular": "cd src/bindings/angular/ && npm run build",
     "build.web": "cd src/bindings/web/ && npm run build",
     "start": "npm install && npm run build",
-    "test": "(jest || true)",
+    "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch",
     "transpile": "npm run clean && (tsc -p src/tsconfig.json || true)",
     "transpile.watch": "npm run clean && (tsc -p src/tsconfig.json --watch || true)"
@@ -31,6 +31,9 @@
     "moduleFileExtensions": [
       "ts",
       "js"
+    ],
+    "setupFiles": [
+      "<rootDir>/scripts/jest.setupfiles.js"
     ],
     "transform": {
       "^.+\\.(ts)$": "<rootDir>/scripts/jest.preprocessor.js"
