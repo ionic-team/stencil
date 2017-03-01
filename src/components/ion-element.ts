@@ -33,6 +33,13 @@ export class IonElement extends getBaseElement() {
     this.$config = ionic.config;
 
     this.$root = this.attachShadow({mode: 'open'});
+
+    const styles = this.ionStyles();
+    if (styles) {
+      const styleEle = this.$dom.createElement('style');
+      styleEle.innerHTML = styles;
+      this.$root.appendChild(styleEle);
+    }
   }
 
 
@@ -100,6 +107,8 @@ export class IonElement extends getBaseElement() {
   }
 
   ionNode(h: any): VNode { h; return null; };
+
+  ionStyles(): string { return null; };
 
 }
 
