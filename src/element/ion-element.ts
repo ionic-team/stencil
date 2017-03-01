@@ -1,9 +1,9 @@
 import { Config } from '../utils/config';
+import { DomApi } from '../renderer/index';
 import { Ionic } from '../utils/global';
 import { Patch, VNode } from '../utils/interfaces';
 import { patchElement } from './patch-element';
 import { toCamelCase } from '../utils/helpers';
-import { DomApi } from '../renderer/index';
 
 
 export class IonElement extends getBaseElement() {

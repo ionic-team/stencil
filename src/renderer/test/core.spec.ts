@@ -1,5 +1,5 @@
 
-import { init, h, vnode, VNode, VNodeData } from '../index';
+import { initRenderer, h, vnode, VNode, VNodeData } from '../index';
 import { classModule } from '../modules/class';
 import { eventListenersModule } from '../modules/eventlisteners';
 import { DomApi } from '../api/dom-api';
@@ -10,7 +10,7 @@ const document: HTMLDocument = (<any>global).document;
 const domApi = new BrowserDomApi(document);
 
 
-var patch = init([
+var patch = initRenderer([
   classModule,
   eventListenersModule,
 ], domApi);
@@ -840,7 +840,7 @@ describe('renderer', function() {
       });
       it('removes element when all remove listeners are done', function() {
         var rm1, rm2, rm3;
-        var patch = init([
+        var patch = initRenderer([
           {remove: function(_, rm) { rm1 = rm; }},
           {remove: function(_, rm) { rm2 = rm; }},
         ], domApi);
@@ -882,7 +882,7 @@ describe('renderer', function() {
     describe('module hooks', function() {
       it('invokes `pre` and `post` hook', function() {
         var result = [];
-        var patch = init([
+        var patch = initRenderer([
           {pre: function() { result.push('pre'); }},
           {post: function() { result.push('post'); }},
         ], domApi);
@@ -916,7 +916,7 @@ describe('renderer', function() {
       it('invokes `destroy` module hook for all removed children', function() {
         var created = 0;
         var destroyed = 0;
-        var patch = init([
+        var patch = initRenderer([
           {create: function() { created++; }},
           {destroy: function() { destroyed++; }},
         ], domApi);
@@ -936,7 +936,7 @@ describe('renderer', function() {
       it('does not invoke `create` and `remove` module hook for text nodes', function() {
         var created = 0;
         var removed = 0;
-        var patch = init([
+        var patch = initRenderer([
           {create: function() { created++; }},
           {remove: function() { removed++; }},
         ], domApi);
@@ -954,7 +954,7 @@ describe('renderer', function() {
       it('does not invoke `destroy` module hook for text nodes', function() {
         var created = 0;
         var destroyed = 0;
-        var patch = init([
+        var patch = initRenderer([
           {create: function() { created++; }},
           {destroy: function() { destroyed++; }},
         ], domApi);

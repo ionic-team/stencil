@@ -1,4 +1,4 @@
-import { IonElement } from './base-element';
+import { IonElement } from './ion-element';
 import { toCamelCase } from '../utils/helpers';
 
 

@@ -1,11 +1,11 @@
 
-import { init, h } from '../index';
+import { initRenderer, h } from '../index';
 import { attributesModule } from '../modules/attributes';
 import { BrowserDomApi } from '../api/browser-api';
 
 const document: HTMLDocument = (<any>global).document;
 
-var patch = init([
+var patch = initRenderer([
   attributesModule,
 ], new BrowserDomApi(document));
 

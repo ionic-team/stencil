@@ -4,6 +4,11 @@ import { vnode } from './vnode';
 import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
 import { DomApi } from './api/dom-api';
 import { BrowserDomApi } from './api/browser-api';
+
+export { attributesModule } from './modules/attributes';
+export { classModule } from './modules/class';
+export { eventListenersModule } from './modules/eventlisteners';
+export { styleModule } from './modules/style';
 export { DomApi, BrowserDomApi, VNode, VNodeData, vnode };
 
 type VNodeQueue = Array<VNode>;
@@ -42,7 +47,7 @@ const hooks: (keyof Module)[] = ['create', 'update', 'remove', 'destroy', 'pre',
 
 export {h} from './h';
 
-export function init(modules: Array<any>, api: DomApi) {
+export function initRenderer(modules: Array<any>, api: DomApi) {
   let i: number, j: number, cbs = ({} as ModuleHooks);
 
   for (i = 0; i < hooks.length; ++i) {

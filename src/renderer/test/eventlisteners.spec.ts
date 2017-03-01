@@ -1,11 +1,11 @@
 
-import { init, h } from '../index';
+import { initRenderer, h } from '../index';
 import { eventListenersModule } from '../modules/eventlisteners';
 import { BrowserDomApi } from '../api/browser-api';
 
 const document: HTMLDocument = (<any>global).document;
 
-var patch = init([
+var patch = initRenderer([
   eventListenersModule,
 ], new BrowserDomApi(document));
 
@@ -29,10 +29,10 @@ describe('event listeners', function() {
   it('does not attach new listener', function() {
     var result = [];
     //function clicked(ev) { result.push(ev); }
-    var vnode1 = h('div', {on: {click: function(ev) { result.push(1); }}}, [
+    var vnode1 = h('div', {on: {click: function() { result.push(1); }}}, [
       h('a', 'Click my parent'),
     ]);
-    var vnode2 = h('div', {on: {click: function(ev) { result.push(2); }}}, [
+    var vnode2 = h('div', {on: {click: function() { result.push(2); }}}, [
       h('a', 'Click my parent'),
     ]);
     elm = patch(vnode0, vnode1).elm;

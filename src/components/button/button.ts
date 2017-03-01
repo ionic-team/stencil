@@ -1,4 +1,4 @@
-import { IonElement } from '../../element/base-element';
+import { IonElement } from '../../element/ion-element';
 import { CreateElement, VNode } from '../../utils/interfaces';
 
 

@@ -1,10 +1,6 @@
+import { IonElement } from './ion-element';
 import { Config } from '../utils/config';
-import { DomApi, init, h } from '../renderer/index';
-import { attributesModule } from '../renderer/modules/attributes';
-import { classModule } from '../renderer/modules/class';
-import { eventListenersModule } from '../renderer/modules/eventlisteners';
-import { styleModule } from '../renderer/modules/style';
-import { IonElement } from './base-element';
+import { initRenderer, h, DomApi, attributesModule, classModule, eventListenersModule, styleModule } from '../renderer/index';
 import { initProperties } from './init-element';
 import { isDef } from '../utils/helpers';
 
@@ -20,7 +16,7 @@ export function patchElement(elm: IonElement) {
   if (!elm.$renderer) {
     initProperties(elm);
 
-    elm.$renderer = init([
+    elm.$renderer = initRenderer([
       attributesModule,
       classModule,
       eventListenersModule,
