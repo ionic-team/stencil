@@ -10,8 +10,9 @@
     "build.web": "cd src/bindings/web/ && npm run build",
     "start": "npm install && npm run build",
     "test": "(jest || true)",
-    "transpile": "npm run clean && tsc -p src/tsconfig.json",
-    "transpile.watch": "npm run clean && tsc -p src/tsconfig.json --watch"
+    "test.watch": "jest --watch",
+    "transpile": "npm run clean && (tsc -p src/tsconfig.json || true)",
+    "transpile.watch": "npm run clean && (tsc -p src/tsconfig.json --watch || true)"
   },
   "devDependencies": {
     "@types/jest": "18.1.1",

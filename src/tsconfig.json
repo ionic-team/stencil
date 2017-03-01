@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "declaration": true,
     "lib": [
       "dom",

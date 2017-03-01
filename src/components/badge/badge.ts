@@ -1,13 +1,11 @@
-import { IonElement } from '../ion-element';
+import { IonElement } from '../../element/base-element';
 import { CreateElement, VNode } from '../../utils/interfaces';
 
 
 export class IonBadge extends IonElement {
 
-  ionNode(h: CreateElement) {
-    return h('.badge', [
-      h('slot')
-    ]);
+  ionNode(h: CreateElement): VNode {
+    return h('.badge');
   }
 
   ionStyles() {

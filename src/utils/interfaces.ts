@@ -1,4 +1,4 @@
-import { DomApi, VNode, VNodeData } from '../renderer/index';
+import { DomApi } from '../renderer/index';
 import { Config } from './config';
 
 

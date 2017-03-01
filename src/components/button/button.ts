@@ -1,10 +1,10 @@
-import { IonElement } from '../ion-element';
+import { IonElement } from '../../element/base-element';
 import { CreateElement, VNode } from '../../utils/interfaces';
 
 
 export class IonButton extends IonElement {
 
-  ionNode(h: CreateElement) {
+  ionNode(h: CreateElement): VNode {
     return h('.button', [
       h('span.button-inner', [
         h('slot')
