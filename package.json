@@ -9,14 +9,31 @@
     "build.angular": "cd src/bindings/angular/ && npm run build",
     "build.web": "cd src/bindings/web/ && npm run build",
     "start": "npm install && npm run build",
+    "test": "(jest --no-cache || true)",
     "transpile": "npm run clean && tsc -p src/tsconfig.json",
     "transpile.watch": "npm run clean && tsc -p src/tsconfig.json --watch"
   },
   "devDependencies": {
+    "@types/jest": "18.1.1",
+    "@types/node": "7.0.5",
     "fs-extra": "2.0.0",
     "httpster": "1.0.3",
+    "jest": "19.0.2",
+    "jsdom": "9.11.0",
+    "knuth-shuffle": "1.0.1",
     "rimraf": "2.6.1",
     "rollup": "0.41.4",
     "typescript": "2.2.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts)$": "<rootDir>/scripts/jest.preprocessor.js"
+    },
+    "testRegex": "/src/.*\\.spec\\.(ts|js)$"
   }
 }

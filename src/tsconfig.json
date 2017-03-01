@@ -10,7 +10,11 @@
     "target": "es2015",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "../dist/transpiled-core"
+    "outDir": "../dist/transpiled-core",
+    "types": [
+      "jest",
+      "node"
+    ]
   },
   "include": [
     "**/*.ts"

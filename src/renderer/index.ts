@@ -4,7 +4,7 @@ import { vnode } from './vnode';
 import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
 import { DomApi } from './api/dom-api';
 import { BrowserDomApi } from './api/browser-api';
-export { DomApi, BrowserDomApi, VNode, VNodeData };
+export { DomApi, BrowserDomApi, VNode, VNodeData, vnode };
 
 type VNodeQueue = Array<VNode>;
 
