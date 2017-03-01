@@ -3,6 +3,7 @@ import { isDef, toCamelCase } from '../../utils/helpers';
 
 
 export class BrowserDomApi implements DomApi {
+  private css = new Set<string>();
 
   constructor(private d: HTMLDocument) {}
 
@@ -42,8 +43,8 @@ export class BrowserDomApi implements DomApi {
     return node.nextSibling;
   }
 
-  tagName(elm: Element): string {
-    return elm.tagName;
+  tag(elm: Element): string {
+    return (elm.tagName || '').toLowerCase();
   }
 
   setTextContent(node: Node, text: string | null): void {
@@ -81,6 +82,22 @@ export class BrowserDomApi implements DomApi {
 
   isComment(node: Node): node is Comment {
     return node.nodeType === 8;
+  }
+
+  hasElementCss(tag: string) {
+    return this.css.has(tag);
+  }
+
+  appendElementCss(tag: string, css: string) {
+    if (css) {
+      const head = this.d.getElementsByTagName('head')[0];
+      const elementCss = this.createElement('style');
+      elementCss.id = `css-${tag}`;
+      elementCss.innerHTML = css;
+      head.appendChild(elementCss);
+      head.insertBefore(elementCss, head.firstChild);
+      this.css.add(tag);
+    }
   }
 
 }

@@ -9,7 +9,7 @@ export interface DomApi {
   appendChild: (node: Node, child: Node) => void;
   parentNode: (node: Node) => Node;
   nextSibling: (node: Node) => Node;
-  tagName: (elm: Element) => string;
+  tag: (elm: Element) => string;
   setTextContent: (node: Node, text: string | null) => void;
   getTextContent: (node: Node) => string | null;
   getAttribute: (elm: Element, attrName: string) => string;
@@ -19,4 +19,6 @@ export interface DomApi {
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
   isComment: (node: Node) => node is Comment;
+  hasElementCss: (tag: string) => boolean;
+  appendElementCss: (tag: string, css: string) => void;
 }

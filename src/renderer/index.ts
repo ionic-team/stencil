@@ -1,5 +1,4 @@
 /* global module, document, Node */
-import { IonElement } from '../components/ion-element';
 import { VNode, VNodeData, Key, Hooks, Module } from '../utils/interfaces';
 import { vnode } from './vnode';
 import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
@@ -59,7 +58,7 @@ export function init(modules: Array<any>, api: DomApi) {
   function emptyNodeAt(elm: Element) {
     const id = elm.id ? '#' + elm.id : '';
     const c = elm.className ? '.' + elm.className.split(' ').join('.') : '';
-    return vnode(api.tagName(elm).toLowerCase() + id + c, {}, [], undefined, elm);
+    return vnode(api.tag(elm) + id + c, {}, [], undefined, elm);
   }
 
   function createRmCb(childElm: Node, listeners: number) {
@@ -261,7 +260,7 @@ export function init(modules: Array<any>, api: DomApi) {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) {
-          updateChildren((<IonElement>elm).$root || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
+          updateChildren(elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
         }
 
       } else if (isDef(ch)) {
@@ -289,7 +288,7 @@ export function init(modules: Array<any>, api: DomApi) {
       oldVnode = emptyNodeAt(oldVnode);
     }
 
-    if ((<IonElement>vnode.elm).$root || sameVnode(oldVnode, vnode)) {
+    if (vnode.isHost || sameVnode(oldVnode, vnode)) {
       patchVnode(oldVnode, vnode, insertedVnodeQueue);
     } else {
       elm = oldVnode.elm as Node;

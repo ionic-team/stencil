@@ -35,7 +35,7 @@ export interface VNode {
   elm: Node | undefined;
   text: string | undefined;
   key: Key;
-  isShadowHost?: boolean;
+  isHost?: boolean;
 }
 
 

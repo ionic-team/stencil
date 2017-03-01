@@ -1,18 +1,16 @@
 import { Config } from '../utils/config';
-import { GlobalIonic, Patch } from '../utils/interfaces';
+import { Ionic } from '../utils/global';
+import { Patch } from '../utils/interfaces';
 import { isDef, toCamelCase } from '../utils/helpers';
-import { init, DomApi, BrowserDomApi, VNode, VNodeData, h } from '../renderer/index';
+import { init, DomApi, VNode, VNodeData, h } from '../renderer/index';
 import { attributesModule } from '../renderer/modules/attributes';
 import { classModule } from '../renderer/modules/class';
 import { eventListenersModule } from '../renderer/modules/eventlisteners';
 import { styleModule } from '../renderer/modules/style';
 export { VNode, VNodeData };
-declare const global: any;
 
 
 export class IonElement extends getBaseElement() {
-  /** @internal */
-  $root: ShadowRoot;
   /** @internal */
   $dom: DomApi;
   /** @internal */
@@ -28,17 +26,13 @@ export class IonElement extends getBaseElement() {
   constructor() {
     super();
 
-    const ionic = getIonic();
-    this.$dom = ionic.dom;
+    const ionic = Ionic();
+    const dom = this.$dom = ionic.dom;
     this.$config = ionic.config;
 
-    this.$root = this.attachShadow({mode: 'open'});
-
-    const styles = this.ionStyles();
-    if (styles) {
-      const styleEle = this.$dom.createElement('style');
-      styleEle.innerHTML = styles;
-      this.$root.appendChild(styleEle);
+    const tag = dom.tag(this);
+    if (!dom.hasElementCss(tag)) {
+      dom.appendElementCss(tag, this.ionStyles());
     }
   }
 
@@ -71,27 +65,23 @@ export class IonElement extends getBaseElement() {
 
 
   update() {
-    console.log('called update');
     const elm = this;
-
-    patchElement(elm);
 
     if (elm._ob) {
       return;
     }
 
-    // elm._ob = new MutationObserver(() => {
-    //   if (elm._ob) {
-    //     debugger
-    //     patch(elm);
-    //     elm._ob.disconnect();
-    //     elm._ob = null;
-    //   }
-    // });
+    elm._ob = new MutationObserver(() => {
+      if (elm._ob) {
+        elm._ob.disconnect();
+        elm._ob = null;
+        patchElement(elm);
+      }
+    });
 
-    // const textNode = elm.$dom.createTextNode('');
-    // elm._ob.observe(textNode, { characterData: true });
-    // textNode.data = '1';
+    const textNode = elm.$dom.createTextNode('');
+    elm._ob.observe(textNode, { characterData: true });
+    textNode.data = '1';
   }
 
 
@@ -103,7 +93,7 @@ export class IonElement extends getBaseElement() {
 
 
   disconnectedCallback() {
-    this.$dom = this.$config = this.$root = this.$renderer = this._vnode = this._ob = null;
+    this.$dom = this.$config = this.$renderer = this._vnode = this._ob = null;
   }
 
   ionNode(h: any): VNode { h; return null; };
@@ -123,7 +113,7 @@ function patchElement(elm: IonElement) {
   const dom = elm.$dom;
 
   newVnode.elm = elm;
-  newVnode.isShadowHost = true;
+  newVnode.isHost = true;
 
   const mode = getValue('mode', config, dom, elm);
   const color = getValue('color', config, dom, elm);
@@ -167,26 +157,12 @@ function getValue(name: string, config: Config, domApi: DomApi, elm: HTMLElement
 }
 
 
-function getIonic(): GlobalIonic {
-  const GLOBAL = typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : Function('return this;')();
-  const ionic: GlobalIonic  = (GLOBAL.ionic = GLOBAL.ionic || {});
-
-  if (!ionic.dom) {
-    ionic.dom = new BrowserDomApi(document);
-  }
-
-  if (!ionic.config) {
-    ionic.config = new Config();
-  }
-
-  return ionic;
-}
 
 
 function getBaseElement(): { new(): HTMLElement } {
   if (typeof HTMLElement !== 'function') {
     const BaseElement = function(){};
-    BaseElement.prototype = getIonic().dom.createElement('div');
+    BaseElement.prototype = Ionic().dom.createElement('div');
     return <any>BaseElement;
   }
 
