@@ -1,5 +1,5 @@
-import {VNode, VNodeData} from '../vnode';
-import {Module} from './module';
+import { Module, VNode, VNodeData } from '../../utils/interfaces';
+
 
 function updateClass(oldVnode: VNode, vnode: VNode): void {
   var cur: any, name: string, elm: Element = vnode.elm as Element,

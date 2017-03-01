@@ -1,5 +1,5 @@
-import {VNode, VNodeData} from '../vnode';
-import {Module} from './module';
+import { Module, VNode, VNodeData } from '../../utils/interfaces';
+
 
 const NamespaceURIs = {
   "xlink": "http://www.w3.org/1999/xlink"

@@ -1,7 +1,7 @@
 /* global module, document, Node */
-import {Module} from './modules/module';
-import {Hooks} from './hooks';
-import vnode, {VNode, VNodeData, Key} from './vnode';
+import { IonElement } from '../components/ion-element';
+import { VNode, VNodeData, Key, Hooks, Module } from '../utils/interfaces';
+import { vnode } from './vnode';
 import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
 import { DomApi } from './api/dom-api';
 import { BrowserDomApi } from './api/browser-api';
@@ -16,7 +16,7 @@ function sameVnode(vnode1: VNode, vnode2: VNode): boolean {
 }
 
 function isVnode(vnode: any): vnode is VNode {
-  return vnode.sel !== undefined;
+  return vnode.sel !== undefined || vnode.elm !== undefined;
 }
 
 type KeyToIndexMap = {[key: string]: number};
@@ -260,7 +260,10 @@ export function init(modules: Array<any>, api: DomApi) {
     }
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
-        if (oldCh !== ch) updateChildren(elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
+        if (oldCh !== ch) {
+          updateChildren((<IonElement>elm).$root || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
+        }
+
       } else if (isDef(ch)) {
         if (isDef(oldVnode.text)) api.setTextContent(elm, '');
         addVnodes(elm, null, ch as Array<VNode>, 0, (ch as Array<VNode>).length - 1, insertedVnodeQueue);
@@ -286,7 +289,7 @@ export function init(modules: Array<any>, api: DomApi) {
       oldVnode = emptyNodeAt(oldVnode);
     }
 
-    if (sameVnode(oldVnode, vnode)) {
+    if ((<IonElement>vnode.elm).$root || sameVnode(oldVnode, vnode)) {
       patchVnode(oldVnode, vnode, insertedVnodeQueue);
     } else {
       elm = oldVnode.elm as Node;

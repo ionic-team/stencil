@@ -1,4 +1,5 @@
-import {vnode, VNode, VNodeData} from './vnode';
+import { vnode } from './vnode';
+import { VNode, VNodeData } from '../utils/interfaces';
 import { isArray, isPrimitive } from '../utils/helpers';
 
 
@@ -14,8 +15,6 @@ function addNS(data: any, children: Array<VNode> | undefined, sel: string | unde
   }
 }
 
-export function h(sel: HTMLElement): VNode;
-export function h(sel: HTMLElement, children: Array<VNode>): VNode;
 export function h(sel: string): VNode;
 export function h(sel: string, data: VNodeData): VNode;
 export function h(sel: string, text: string): VNode;
@@ -28,7 +27,6 @@ export function h(sel: any, b?: any, c?: any): VNode {
 
   if (sel.nodeType) {
     elm = sel;
-    sel = elm.tagName.toLowerCase();
   }
 
   if (c !== undefined) {

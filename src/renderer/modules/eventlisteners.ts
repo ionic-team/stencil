@@ -1,5 +1,5 @@
-import {VNode, VNodeData} from '../vnode';
-import {Module} from './module';
+import { Module, VNode, VNodeData } from '../../utils/interfaces';
+
 
 function invokeHandler(handler: any, vnode?: VNode, event?: Event): void {
   if (typeof handler === "function") {

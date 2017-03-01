@@ -1,6 +1,6 @@
-import { Config } from './config';
-import { GlobalIonic, Patch } from './interfaces';
-import { isDef, toCamelCase } from './helpers';
+import { Config } from '../utils/config';
+import { GlobalIonic, Patch } from '../utils/interfaces';
+import { isDef, toCamelCase } from '../utils/helpers';
 import { init, DomApi, BrowserDomApi, VNode, VNodeData, h } from '../renderer/index';
 import { attributesModule } from '../renderer/modules/attributes';
 import { classModule } from '../renderer/modules/class';
@@ -12,11 +12,13 @@ declare const global: any;
 
 export class IonElement extends getBaseElement() {
   /** @internal */
+  $root: ShadowRoot;
+  /** @internal */
   $dom: DomApi;
   /** @internal */
   $config: Config;
   /** @internal */
-  $render: Patch;
+  $renderer: Patch;
   /** @internal */
   _vnode: VNode;
   /** @internal */
@@ -29,56 +31,60 @@ export class IonElement extends getBaseElement() {
     const ionic = getIonic();
     this.$dom = ionic.dom;
     this.$config = ionic.config;
+
+    this.$root = this.attachShadow({mode: 'open'});
   }
 
 
   connect(observedAttributes: string[]) {
-    const ele = this;
-
-    ele.$dom.setStyle(ele, 'visibility', 'hidden');
+    const elm = this;
 
     const propValues: any = {};
 
     observedAttributes.forEach(attrName => {
       const propName = toCamelCase(attrName);
 
-      propValues[propName] = (<any>ele)[propName];
+      propValues[propName] = (<any>elm)[propName];
 
-      Object.defineProperty(ele, propName, {
+      Object.defineProperty(elm, propName, {
         get: () => {
           return propValues[propName];
         },
         set: (value: any) => {
           if (propValues[propName] !== value) {
             propValues[propName] = value;
-            ele.update();
+            elm.update();
           }
         }
       });
     });
 
-    ele.update();
+    elm.update();
   }
 
 
   update() {
     console.log('called update');
-    const ele = this;
+    const elm = this;
 
-    if (ele._ob) {
+    patchElement(elm);
+
+    if (elm._ob) {
       return;
     }
 
-    ele._ob = new MutationObserver(() => {
-      patch(ele);
+    // elm._ob = new MutationObserver(() => {
+    //   if (elm._ob) {
+    //     debugger
+    //     patch(elm);
+    //     elm._ob.disconnect();
+    //     elm._ob = null;
+    //   }
+    // });
 
-      ele._ob.disconnect();
-      ele._ob = null;
-    });
-
-    const textNode = ele.$dom.createTextNode('');
-    ele._ob.observe(textNode, { characterData: true });
-    textNode.data = '1';
+    // const textNode = elm.$dom.createTextNode('');
+    // elm._ob.observe(textNode, { characterData: true });
+    // textNode.data = '1';
   }
 
 
@@ -90,7 +96,7 @@ export class IonElement extends getBaseElement() {
 
 
   disconnectedCallback() {
-    this.$dom = this.$config = this.$render = this._vnode = this._ob = null;
+    this.$dom = this.$config = this.$root = this.$renderer = this._vnode = this._ob = null;
   }
 
   ionNode(h: any): VNode { h; return null; };
@@ -98,51 +104,56 @@ export class IonElement extends getBaseElement() {
 }
 
 
-function patch(ele: IonElement) {
-  const newVnode = ele.ionNode(h);
+function patchElement(elm: IonElement) {
+  const newVnode = elm.ionNode(h);
   if (!newVnode) {
     return;
   }
 
-  const config = ele.$config;
-  const dom = ele.$dom;
+  const config = elm.$config;
+  const dom = elm.$dom;
 
-  const mode = getValue('mode', config, dom, ele);
-  const color = getValue('color', config, dom, ele);
+  newVnode.elm = elm;
+  newVnode.isShadowHost = true;
 
-  let componentName = dom.tagName(ele).toLowerCase();
-  if (componentName.indexOf('ion-') === 0) {
-    componentName = componentName.substring(4);
-  }
+  const mode = getValue('mode', config, dom, elm);
+  const color = getValue('color', config, dom, elm);
 
   const dataClass = newVnode.data.class = newVnode.data.class || {};
-  dataClass[componentName] = true;
 
-  dataClass[`${componentName}-${mode}`] = true;
+  let componentPrefix: string;
+  const cssClasses = newVnode.sel.split('.');
+  if (cssClasses.length > 1) {
+    componentPrefix = cssClasses[1] + '-';
+
+  } else {
+    componentPrefix = '';
+  }
+  newVnode.sel = undefined;
+
+  dataClass[`${componentPrefix}${mode}`] = true;
   if (color) {
-    dataClass[`${componentName}-${mode}-${color}`] = true;
+    dataClass[`${componentPrefix}${mode}-${color}`] = true;
   }
 
-  if (!ele.$render) {
-    ele.$render = init([
+  if (!elm.$renderer) {
+    elm.$renderer = init([
       attributesModule,
       classModule,
       eventListenersModule,
       styleModule
     ], dom);
 
-    ele._vnode = ele.$render(ele, newVnode);
-
-    dom.setStyle(ele, 'visibility', '');
+    elm._vnode = elm.$renderer(elm, newVnode);
 
   } else {
-    ele._vnode = ele.$render(ele._vnode, newVnode);
+    elm._vnode = elm.$renderer(elm._vnode, newVnode);
   }
 }
 
 
-function getValue(name: string, config: Config, domApi: DomApi, ele: HTMLElement, fallback: any = null): any {
-  const val = domApi.getPropOrAttr(ele, name);
+function getValue(name: string, config: Config, domApi: DomApi, elm: HTMLElement, fallback: any = null): any {
+  const val = domApi.getPropOrAttr(elm, name);
   return isDef(val) ? val : config.get(name, fallback);
 }
 

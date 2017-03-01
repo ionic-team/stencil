@@ -1,5 +1,4 @@
-import {VNode, VNodeData} from '../vnode';
-import {Module} from './module';
+import { Module, VNode, VNodeData } from '../../utils/interfaces';
 
 
 function updateStyle(oldVnode: VNode, vnode: VNode): void {

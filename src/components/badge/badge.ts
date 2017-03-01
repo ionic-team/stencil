@@ -1,15 +1,17 @@
-import { IonElement } from '../../utils/ion-element';
+import { IonElement } from '../ion-element';
 import { CreateElement, VNode } from '../../utils/interfaces';
 
 
 export class IonBadge extends IonElement {
 
-  connectedCallback() {
-    this.connect(IonBadge.observedAttributes);
+  ionNode(h: CreateElement) {
+    return h('.badge', [
+      h('slot')
+    ]);
   }
 
-  ionNode(h: CreateElement) {
-    return h(this);
+  connectedCallback() {
+    this.connect(IonBadge.observedAttributes);
   }
 
   static get observedAttributes() {

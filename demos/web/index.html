@@ -11,7 +11,43 @@
 </head>
 <body>
 
-  <ion-badge></ion-badge>
+  <ion-badge>Badge</ion-badge>
+
+  <ion-badge color="secondary">secondary</ion-badge>
+
+  <ion-badge color="dark" mode="ios">dark ios</ion-badge>
+
+  <ion-badge id="dynamicBadge">dynamicBadge</ion-badge>
+
+  <script>
+    var dynamicBadge = document.getElementById('dynamicBadge');
+
+    function toggleBadge() {
+      if (dynamicBadge.color === 'danger') {
+        dynamicBadge.color = 'primary';
+      } else if (dynamicBadge.color === 'primary') {
+        dynamicBadge.color = 'secondary';
+      } else {
+        dynamicBadge.color = 'danger';
+      }
+    }
+
+    function randoBadge() {
+      dynamicBadge.textContent = Math.round(Math.random() * 1000);
+    }
+
+    toggleBadge();
+    randoBadge();
+
+    setInterval(function() {
+      toggleBadge();
+    }, 3333);
+
+    setInterval(function() {
+      randoBadge();
+    }, 2000);
+
+  </script>
 
 </body>
 </html>

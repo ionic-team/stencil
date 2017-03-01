@@ -1,15 +1,20 @@
-import { IonElement } from '../../utils/ion-element';
+import { IonElement } from '../ion-element';
 import { CreateElement, VNode } from '../../utils/interfaces';
 
 
 export class IonButton extends IonElement {
 
-  connectedCallback() {
-    this.connect(IonButton.observedAttributes);
+  ionNode(h: CreateElement) {
+    return h('.button', [
+      h('span.button-inner', [
+        h('slot')
+      ]),
+      h('div.button-effect')
+    ]);
   }
 
-  ionNode(h: CreateElement) {
-    return h(this);
+  connectedCallback() {
+    this.connect(IonButton.observedAttributes);
   }
 
   static get observedAttributes() {
