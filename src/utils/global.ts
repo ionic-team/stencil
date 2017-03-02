@@ -1,6 +1,7 @@
 import { Config } from './config';
 import { GlobalIonic } from '../utils/interfaces';
 import { BrowserDomApi } from '../renderer/api/browser-api';
+import { initRenderer, attributesModule, classModule, eventListenersModule, styleModule } from '../renderer/index';
 
 declare const global: any;
 
@@ -20,6 +21,15 @@ export function Ionic(opts?: GlobalIonic): GlobalIonic {
 
   if (!ionic.dom) {
     ionic.dom = new BrowserDomApi(document);
+  }
+
+  if (!ionic.renderer) {
+    ionic.renderer = initRenderer([
+      attributesModule,
+      classModule,
+      eventListenersModule,
+      styleModule
+    ], ionic.dom);
   }
 
   if (!ionic.config) {

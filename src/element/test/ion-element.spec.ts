@@ -8,12 +8,8 @@ describe('IonElement', function() {
     ionElement = new IonElement();
   });
 
-  it('should add $config to instance', function() {
-    expect(ionElement.$config).toBeDefined();
-  });
-
-  it('should add $dom to instance', function() {
-    expect(ionElement.$dom).toBeDefined();
+  it('should add $ionic to instance', function() {
+    expect(ionElement.$ionic).toBeDefined();
   });
 
 });

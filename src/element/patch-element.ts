@@ -1,27 +1,21 @@
-import { IonElement } from './ion-element';
 import { Config } from '../utils/config';
-import { initRenderer, h, DomApi, attributesModule, classModule, eventListenersModule, styleModule } from '../renderer/index';
+import { DomApi, h } from '../renderer/index';
+import { IonElement } from './ion-element';
 import { initProperties } from './init-element';
 import { isDef } from '../utils/helpers';
 
 
-export function patchElement(elm: IonElement) {
-  const config = elm.$config;
-  const dom = elm.$dom;
+export function patchHostElement(elm: IonElement) {
+  const config = elm.$ionic.config;
+  const dom = elm.$ionic.dom;
   const newVnode = elm.ionNode(h);
   if (!newVnode) {
     return;
   }
 
-  if (!elm.$renderer) {
+  if (!elm._init) {
     initProperties(elm);
-
-    elm.$renderer = initRenderer([
-      attributesModule,
-      classModule,
-      eventListenersModule,
-      styleModule
-    ], dom);
+    elm._init = true;
   }
 
   newVnode.elm = elm;
@@ -52,7 +46,7 @@ export function patchElement(elm: IonElement) {
 
   // if we already have a vnode then use it
   // otherwise, elm it's the initial patch and we need it to pass it the actual host element
-  elm._vnode =  elm.$renderer(elm._vnode ? elm._vnode : elm, newVnode);
+  elm._vnode =  elm.$ionic.renderer(elm._vnode ? elm._vnode : elm, newVnode);
 }
 
 

@@ -3,12 +3,13 @@ import { Config } from './config';
 
 
 export interface GlobalIonic {
-  dom?: DomApi;
   config?: Config;
+  dom?: DomApi;
+  renderer?: Renderer;
 }
 
 
-export interface Patch {
+export interface Renderer {
   (oldVnode: VNode | Element, vnode: VNode): VNode;
 }
 

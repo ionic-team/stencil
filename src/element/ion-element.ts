@@ -1,18 +1,14 @@
-import { Config } from '../utils/config';
-import { DomApi } from '../renderer/index';
 import { Ionic } from '../utils/global';
-import { Patch, VNode } from '../utils/interfaces';
-import { patchElement } from './patch-element';
+import { GlobalIonic, VNode } from '../utils/interfaces';
+import { patchHostElement } from './patch-element';
 import { toCamelCase } from '../utils/helpers';
 
 
 export class IonElement extends getBaseElement() {
   /** @internal */
-  $dom: DomApi;
+  $ionic: GlobalIonic;
   /** @internal */
-  $config: Config;
-  /** @internal */
-  $renderer: Patch;
+  _init: boolean;
   /** @internal */
   _vnode: VNode;
   /** @internal */
@@ -24,9 +20,8 @@ export class IonElement extends getBaseElement() {
   constructor() {
     super();
 
-    const ionic = Ionic();
-    const dom = this.$dom = ionic.dom;
-    this.$config = ionic.config;
+    this.$ionic = Ionic();
+    const dom = this.$ionic.dom;
 
     const tag = dom.tag(this);
     if (!dom.hasElementCss(tag)) {
@@ -52,11 +47,11 @@ export class IonElement extends getBaseElement() {
       if (elm._ob) {
         elm._ob.disconnect();
         elm._ob = null;
-        patchElement(elm);
+        patchHostElement(elm);
       }
     });
 
-    const textNode = elm.$dom.createTextNode('');
+    const textNode = elm.$ionic.dom.createTextNode('');
     elm._ob.observe(textNode, { characterData: true });
     textNode.data = '1';
   }
@@ -70,7 +65,7 @@ export class IonElement extends getBaseElement() {
 
 
   disconnectedCallback() {
-    this.$dom = this.$config = this.$renderer = this._vnode = this._ob = null;
+    this.$ionic = this._vnode = this._ob = null;
   }
 
   ionNode(h: any): VNode { h; return null; };

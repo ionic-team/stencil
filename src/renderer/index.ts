@@ -1,5 +1,15 @@
+/**
+ * Virtual DOM patching algorithm based on Snabbdom by
+ * Simon Friis Vindum (@paldepind)
+ * Licensed under the MIT License
+ * https://github.com/snabbdom/snabbdom/blob/master/LICENSE
+ *
+ * Modified for Ionic's Web Component Renderer
+ * /
+
+
 /* global module, document, Node */
-import { VNode, VNodeData, Key, Hooks, Module } from '../utils/interfaces';
+import { Renderer, VNode, VNodeData, Key, Hooks, Module } from '../utils/interfaces';
 import { vnode } from './vnode';
 import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
 import { DomApi } from './api/dom-api';
@@ -47,7 +57,8 @@ const hooks: (keyof Module)[] = ['create', 'update', 'remove', 'destroy', 'pre',
 
 export {h} from './h';
 
-export function initRenderer(modules: Array<any>, api: DomApi) {
+
+export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
   let i: number, j: number, cbs = ({} as ModuleHooks);
 
   for (i = 0; i < hooks.length; ++i) {
@@ -295,6 +306,7 @@ export function initRenderer(modules: Array<any>, api: DomApi) {
 
     if (vnode.isHost || sameVnode(oldVnode, vnode)) {
       patchVnode(oldVnode, vnode, insertedVnodeQueue);
+
     } else {
       elm = oldVnode.elm as Node;
       parent = api.parentNode(elm);
