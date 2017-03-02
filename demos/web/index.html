@@ -13,43 +13,42 @@
 
   <ion-button>Button</ion-button>
 
-  <ion-badge>Badge</ion-badge>
+  <ion-button color="secondary">secondary</ion-button>
 
-  <!--<ion-badge color="secondary">secondary</ion-badge>
+  <ion-button color="dark" mode="ios">dark ios</ion-button>
 
-  <ion-badge color="dark" mode="ios">dark ios</ion-badge>
-
-  <ion-badge id="dynamicBadge">dynamicBadge</ion-badge>
+  <ion-button id="dynamic">dynamic</ion-button>
 
   <script>
-    var dynamicBadge = document.getElementById('dynamicBadge');
+    var dynamic = document.getElementById('dynamic');
+    var dynamicText = dynamic.childNodes[0];
 
-    function toggleBadge() {
-      if (dynamicBadge.color === 'danger') {
-        dynamicBadge.color = 'primary';
-      } else if (dynamicBadge.color === 'primary') {
-        dynamicBadge.color = 'secondary';
+    function toggleColor() {
+      if (dynamic.color === 'danger') {
+        dynamic.color = 'primary';
+      } else if (dynamic.color === 'primary') {
+        dynamic.color = 'secondary';
       } else {
-        dynamicBadge.color = 'danger';
+        dynamic.color = 'danger';
       }
     }
 
-    function randoBadge() {
-      dynamicBadge.textContent = Math.round(Math.random() * 1000);
+    function randoText() {
+      dynamicText.textContent = Math.round(Math.random() * 1000);
     }
 
-    toggleBadge();
-    randoBadge();
+    toggleColor();
+    randoText();
 
     setInterval(function() {
-      toggleBadge();
+      toggleColor();
     }, 3333);
 
     setInterval(function() {
-      randoBadge();
+      randoText();
     }, 2000);
 
-  </script>-->
+  </script>
 
 </body>
 </html>

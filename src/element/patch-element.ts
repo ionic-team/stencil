@@ -13,9 +13,9 @@ export function patchHostElement(elm: IonElement) {
     return;
   }
 
-  if (!elm._init) {
+  if (!elm._vnode) {
+    // if no _vnode then this is the initial patch
     initProperties(elm);
-    elm._init = true;
   }
 
   newVnode.elm = elm;
@@ -45,8 +45,13 @@ export function patchHostElement(elm: IonElement) {
   }
 
   // if we already have a vnode then use it
-  // otherwise, elm it's the initial patch and we need it to pass it the actual host element
-  elm._vnode =  elm.$ionic.renderer(elm._vnode ? elm._vnode : elm, newVnode);
+  // otherwise, elm is the initial patch and
+  // we need it to pass it the actual host element
+  if (!elm._vnode) {
+    elm._vnode = elm.$ionic.renderer(elm, newVnode, true);
+  } else {
+    elm._vnode =  elm.$ionic.renderer(elm._vnode, newVnode, false);
+  }
 }
 
 

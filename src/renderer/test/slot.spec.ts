@@ -26,7 +26,7 @@ describe('slot', function() {
       ])
     ]);
 
-    let hostVNode = patch(hostEle, hostRender);
+    let hostVNode = patch(hostEle, hostRender, true);
     hostVNode.isHost = true;
 
     let divA = hostEle.children[0];
@@ -42,7 +42,7 @@ describe('slot', function() {
     expect(divANodes[6].textContent.trim()).toEqual('Text 3');
   });
 
-  it('should move the host content to the only slot', function() {
+  it('should not move host content on second patch', function() {
     hostEle.textContent = 'hello';
 
     let hostRender = h('ion-host', [
@@ -51,7 +51,28 @@ describe('slot', function() {
       ])
     ]);
 
-    let hostVNode = patch(hostEle, hostRender);
+    let vnode1 = patch(hostEle, hostRender, true);
+    vnode1.isHost = true;
+
+    let divA = hostEle.children[0];
+    expect(divA.childNodes[0].textContent).toEqual('hello');
+
+    let vnode2 = patch(vnode1, hostRender, false);
+    vnode2.isHost = true;
+
+    expect(divA.childNodes[0].textContent).toEqual('hello');
+  });
+
+  it('should relocate the host content to the only slot', function() {
+    hostEle.textContent = 'hello';
+
+    let hostRender = h('ion-host', [
+      h('div.a', [
+        h('slot')
+      ])
+    ]);
+
+    let hostVNode = patch(hostEle, hostRender, true);
     hostVNode.isHost = true;
 
     expect(hostEle.childNodes.length).toEqual(1);
@@ -62,18 +83,6 @@ describe('slot', function() {
     expect(divA.childNodes.length).toEqual(1);
     expect(divA.childNodes[0].textContent).toEqual('hello');
 
-    expect(hostEle.textContent).toEqual('hello');
-  });
-
-  it('should not get host content if not children', function() {
-    let hostVNode = patch(hostEle, h('ion-host', 'hello'));
-    hostVNode.isHost = true;
-    expect(hostEle.textContent).toEqual('hello');
-  });
-
-  it('should do nothing for vnode without child slot', function() {
-    let hostVNode = patch(hostEle, h('ion-host', 'hello'));
-    hostVNode.isHost = true;
     expect(hostEle.textContent).toEqual('hello');
   });
 

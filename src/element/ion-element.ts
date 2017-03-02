@@ -8,8 +8,6 @@ export class IonElement extends getBaseElement() {
   /** @internal */
   $ionic: GlobalIonic;
   /** @internal */
-  _init: boolean;
-  /** @internal */
   _vnode: VNode;
   /** @internal */
   _ob: MutationObserver;

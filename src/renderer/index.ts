@@ -103,19 +103,21 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
       vnode.elm = api.createComment(vnode.text as string);
 
     } else if (sel === 'slot') {
-      let hostContentNode: Node;
-      while (hostContentNode = hostContentNodes.shift()) {
-        // remove the host content node from it's original parent node
-        api.removeChild(hostContentNode.parentNode, hostContentNode);
+      if (hostContentNodes) {
+        let hostContentNode: Node;
+        while (hostContentNode = hostContentNodes.shift()) {
+          // remove the host content node from it's original parent node
+          api.removeChild(hostContentNode.parentNode, hostContentNode);
 
-        if (hostContentNodes.length === 0) {
-          // return the last node that gets appended
-          // like any other Node that was created
-          return hostContentNode;
+          if (hostContentNodes.length === 0) {
+            // return the last node that gets appended
+            // like any other Node that was created
+            return hostContentNode;
+          }
+
+          // relocate the node to it's new home
+          api.appendChild(parentElm, hostContentNode);
         }
-
-        // relocate the node to it's new home
-        api.appendChild(parentElm, hostContentNode);
       }
 
     } else if (sel !== undefined) {
@@ -210,7 +212,8 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
                           oldCh: Array<VNode>,
                           newCh: Array<VNode>,
                           insertedVnodeQueue: VNodeQueue,
-                          hostContentNodes: HostContentNodes) {
+                          hostContentNodes: HostContentNodes,
+                          slotProjection: boolean) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -233,20 +236,20 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
       } else if (newEndVnode == null) {
         newEndVnode = newCh[--newEndIdx];
       } else if (sameVnode(oldStartVnode, newStartVnode)) {
-        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue);
+        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue, slotProjection);
         oldStartVnode = oldCh[++oldStartIdx];
         newStartVnode = newCh[++newStartIdx];
       } else if (sameVnode(oldEndVnode, newEndVnode)) {
-        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue);
+        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue, slotProjection);
         oldEndVnode = oldCh[--oldEndIdx];
         newEndVnode = newCh[--newEndIdx];
       } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
-        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
+        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue, slotProjection);
         api.insertBefore(parentElm, oldStartVnode.elm as Node, api.nextSibling(oldEndVnode.elm as Node));
         oldStartVnode = oldCh[++oldStartIdx];
         newEndVnode = newCh[--newEndIdx];
       } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
-        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
+        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue, slotProjection);
         api.insertBefore(parentElm, oldEndVnode.elm as Node, oldStartVnode.elm as Node);
         oldEndVnode = oldCh[--oldEndIdx];
         newStartVnode = newCh[++newStartIdx];
@@ -263,7 +266,7 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
           if (elmToMove.sel !== newStartVnode.sel) {
             api.insertBefore(parentElm, createElm(parentElm, newStartVnode, insertedVnodeQueue, hostContentNodes), oldStartVnode.elm as Node);
           } else {
-            patchVnode(elmToMove, newStartVnode, insertedVnodeQueue);
+            patchVnode(elmToMove, newStartVnode, insertedVnodeQueue, slotProjection);
             oldCh[idxInOld] = undefined as any;
             api.insertBefore(parentElm, (elmToMove.elm as Node), oldStartVnode.elm as Node);
           }
@@ -279,7 +282,12 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
     }
   }
 
-  function patchVnode(oldVnode: VNode, vnode: VNode, insertedVnodeQueue: VNodeQueue) {
+  function patchVnode(oldVnode: VNode, vnode: VNode, insertedVnodeQueue: VNodeQueue, slotProjection?: boolean) {
+
+    if (!slotProjection && oldVnode.sel === 'slot') {
+      return;
+    }
+
     let i: any, hook: any;
     if (isDef(i = vnode.data) && isDef(hook = i.hook) && isDef(i = hook.prepatch)) {
       i(oldVnode, vnode);
@@ -296,14 +304,16 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) {
-          const hostContentNodes: HostContentNodes = [];
+          const hostContentNodes: HostContentNodes = slotProjection ? [] : null;
 
-          const childNodes = vnode.elm.childNodes;
-          for (let j = 0; j < childNodes.length; j++) {
-            hostContentNodes.push(childNodes[j]);
+          if (slotProjection) {
+            const childNodes = vnode.elm.childNodes;
+            for (let j = 0; j < childNodes.length; j++) {
+              hostContentNodes.push(childNodes[j]);
+            }
           }
 
-          updateChildren(elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue, hostContentNodes);
+          updateChildren(elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue, hostContentNodes, slotProjection);
         }
 
       } else if (isDef(ch)) {
@@ -322,7 +332,7 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
     }
   }
 
-  return function patch(oldVnode: VNode | Element, vnode: VNode): VNode {
+  return function patch(oldVnode: VNode | Element, vnode: VNode, slotProjection: boolean): VNode {
     let i: number, elm: Node, parent: Node;
     const insertedVnodeQueue: VNodeQueue = [];
     for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
@@ -332,7 +342,7 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
     }
 
     if (vnode.isHost || sameVnode(oldVnode, vnode)) {
-      patchVnode(oldVnode, vnode, insertedVnodeQueue);
+      patchVnode(oldVnode, vnode, insertedVnodeQueue, slotProjection);
 
     } else {
       elm = oldVnode.elm as Node;

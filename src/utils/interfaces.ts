@@ -10,7 +10,7 @@ export interface GlobalIonic {
 
 
 export interface Renderer {
-  (oldVnode: VNode | Element, vnode: VNode): VNode;
+  (oldVnode: VNode | Element, vnode: VNode, slotProjection?: boolean): VNode;
 }
 
 
