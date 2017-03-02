@@ -102,7 +102,7 @@ export class PlatformClient implements PlatformApi {
 
   nextTick(cb: Function) {
     const obs = new MutationObserver(() => {
-      cb();
+      cb && cb();
     });
 
     const textNode = this.createTextNode('');

@@ -1,14 +1,18 @@
-import { IonElement } from '../../element/ion-element';
-import { CreateElement, VNode } from '../../utils/interfaces';
+import { IonElement, h, VNode, Props } from '../../element/ion-element';
 
 
 export class IonBadge extends IonElement {
 
-  ionNode(h: CreateElement): VNode {
+  static props: Props = {
+    color: { string: true },
+    mode: { string: true }
+  };
+
+  render(): VNode {
     return h('.badge');
   }
 
-  ionStyles() {
+  styles() {
     return `
 ion-badge {
   display: inline-block;
@@ -99,14 +103,6 @@ ion-badge:empty {
   color: #fff;
   background-color: #222; }
 `;
-  }
-
-  connectedCallback() {
-    this.connect(IonBadge.observedAttributes);
-  }
-
-  static get observedAttributes() {
-    return ['color', 'mode'];
   }
 
 }

@@ -1,10 +1,14 @@
-import { IonElement } from '../../element/ion-element';
-import { CreateElement, VNode } from '../../utils/interfaces';
+import { IonElement, h, VNode, Props } from '../../element/ion-element';
 
 
 export class IonButton extends IonElement {
 
-  ionNode(h: CreateElement): VNode {
+  static props: Props = {
+    color: { string: true },
+    mode: { string: true }
+  };
+
+  render(): VNode {
     return h('.button', [
       h('span.button-inner', [
         h('slot')
@@ -13,15 +17,7 @@ export class IonButton extends IonElement {
     ]);
   }
 
-  connectedCallback() {
-    this.connect(IonButton.observedAttributes);
-  }
-
-  static get observedAttributes() {
-    return ['color', 'mode'];
-  }
-
-  ionStyles() {
+  styles() {
     return `
 .button {
   -moz-appearance: none;

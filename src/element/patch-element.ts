@@ -1,29 +1,21 @@
 import { Config } from '../utils/config';
-import { h } from '../renderer/core';
+import { Renderer } from '../utils/interfaces';
 import { IonElement } from './ion-element';
-import { initProperties } from './init-element';
 import { isDef } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 
 
-export function patchHostElement(elm: IonElement) {
-  const config = elm.$ionic.config;
-  const dom = elm.$ionic.api;
-  const newVnode = elm.ionNode(h);
+export function patchHostElement(config: Config, api: PlatformApi, renderer: Renderer, elm: IonElement) {
+  const newVnode = elm.render();
   if (!newVnode) {
     return;
-  }
-
-  if (!elm._vnode) {
-    // if no _vnode then this is the initial patch
-    initProperties(elm);
   }
 
   newVnode.elm = elm;
   newVnode.isHost = true;
 
-  const mode = getValue('mode', config, dom, elm);
-  const color = getValue('color', config, dom, elm);
+  const mode = getValue('mode', config, api, elm);
+  const color = getValue('color', config, api, elm);
 
   const dataClass = newVnode.data.class = newVnode.data.class || {};
 
@@ -49,9 +41,9 @@ export function patchHostElement(elm: IonElement) {
   // otherwise, elm is the initial patch and
   // we need it to pass it the actual host element
   if (!elm._vnode) {
-    elm._vnode = elm.$ionic.renderer(elm, newVnode, true);
+    elm._vnode = renderer(elm, newVnode, true);
   } else {
-    elm._vnode =  elm.$ionic.renderer(elm._vnode, newVnode, false);
+    elm._vnode =  renderer(elm._vnode, newVnode, false);
   }
 }
 

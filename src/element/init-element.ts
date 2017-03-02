@@ -1,13 +1,16 @@
-import { IonElement } from './ion-element';
+import { IonElement, Props } from './ion-element';
 import { toCamelCase } from '../utils/helpers';
 
 
-export function initProperties(elm: IonElement) {
-  if (!elm._obAttrs) return;
+export function initProperties(elm: IonElement, props: Props) {
+  if (!props) {
+    return;
+  }
 
   const propValues: any = {};
+  const propNames = Object.keys(props);
 
-  elm._obAttrs.forEach(attrName => {
+  propNames.forEach(attrName => {
     const propName = toCamelCase(attrName);
 
     propValues[propName] = (<any>elm)[propName];

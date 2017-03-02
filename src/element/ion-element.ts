@@ -1,48 +1,81 @@
 import { Ionic } from '../utils/global';
-import { GlobalIonic, VNode } from '../utils/interfaces';
+import { initProperties } from './init-element';
+import { VNode, VNodeData, Props, Prop } from '../utils/interfaces';
 import { patchHostElement } from './patch-element';
 import { toCamelCase } from '../utils/helpers';
+export { h } from '../renderer/core';
+export { VNode, VNodeData, Props, Prop };
 
 
 export class IonElement extends getBaseElement() {
   /** @internal */
-  $ionic: GlobalIonic;
-  /** @internal */
   _vnode: VNode;
   /** @internal */
   _q: boolean;
-  /** @internal */
-  _obAttrs: string[];
 
 
   constructor() {
     super();
 
-    this.$ionic = Ionic();
-    const dom = this.$ionic.api;
+    const api = Ionic().api;
 
-    const tag = dom.tag(this);
-    if (!dom.hasElementCss(tag)) {
-      dom.appendElementCss(tag, this.ionStyles());
+    const tag = api.tag(this);
+    if (!api.hasElementCss(tag)) {
+      api.appendElementCss(tag, this.styles());
     }
   }
 
-
-  connect(observedAttributes?: string[]) {
-    this._obAttrs = observedAttributes;
+  connectedCallback() {
     this.update();
   }
 
 
+  static get observedAttributes() {
+    return Ionic().obsAttrs.get(this) || [];
+  }
+
+
+  static set observedAttributes(attrs: string[]) {
+    const ionic = Ionic();
+    let existingObsAttrs = ionic.obsAttrs.get(this);
+    if (existingObsAttrs) {
+      attrs = existingObsAttrs.concat(attrs);
+    }
+    ionic.obsAttrs.set(this, attrs);
+  }
+
+
+  static set props(props: Props) {
+    const obsAttrs: string[] = [];
+    const propNames = Object.keys(props);
+    let prop: Prop;
+
+    for (var i = 0; i < propNames.length; i++) {
+      prop = props[propNames[i]];
+
+      obsAttrs.push(propNames[i]);
+    }
+
+    this.observedAttributes = obsAttrs;
+    Ionic().props.set(this, props);
+  }
+
+
   update() {
-    const self = this;
+    const elm = this;
 
-    if (!self._q) {
-      self._q = true;
+    if (!elm._q) {
+      elm._q = true;
 
-      self.$ionic.api.nextTick(() => {
-        self._q = false;
-        patchHostElement(self);
+      const ionic = Ionic();
+      ionic.api.nextTick(() => {
+        if (!elm._vnode) {
+          // if no _vnode then this is the initial patch
+          initProperties(elm, ionic.props.get(elm.constructor));
+        }
+
+        patchHostElement(ionic.config, ionic.api, ionic.renderer, elm);
+        elm._q = false;
       });
     }
   }
@@ -54,14 +87,9 @@ export class IonElement extends getBaseElement() {
     }
   }
 
+  render(): VNode { return null; };
 
-  disconnectedCallback() {
-    this.$ionic = this._vnode = null;
-  }
-
-  ionNode(h: any): VNode { h; return null; };
-
-  ionStyles(): string { return null; };
+  styles(): string { return null; };
 
 }
 

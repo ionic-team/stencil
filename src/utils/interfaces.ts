@@ -6,6 +6,8 @@ export interface GlobalIonic {
   config?: Config;
   api?: PlatformApi;
   renderer?: Renderer;
+  obsAttrs?: WeakMap<Object, string[]>;
+  props?: WeakMap<Object, Props>;
 }
 
 
@@ -23,6 +25,19 @@ export interface CreateElement {
   (sel: string, children: Array<VNode>): VNode;
   (sel: string, data: VNodeData, text: string): VNode;
   (sel: string, data: VNodeData, children: Array<VNode>): VNode;
+}
+
+
+export interface Prop {
+  string?: boolean;
+  number?: number;
+  boolean?: boolean;
+  default?: any;
+}
+
+
+export interface Props {
+  [propName: string]: Prop;
 }
 
 
