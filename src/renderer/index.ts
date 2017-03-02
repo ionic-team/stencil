@@ -22,6 +22,7 @@ export { styleModule } from './modules/style';
 export { DomApi, BrowserDomApi, VNode, VNodeData, vnode };
 
 type VNodeQueue = Array<VNode>;
+type HostContentNodes = Array<Node>;
 
 const emptyNode = vnode('', {}, [], undefined, undefined);
 
@@ -86,7 +87,7 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
     };
   }
 
-  function createElm(vnode: VNode, insertedVnodeQueue: VNodeQueue): Node {
+  function createElm(parentElm: Node, vnode: VNode, insertedVnodeQueue: VNodeQueue, hostContentNodes: HostContentNodes): Node {
     let i: any, data = vnode.data;
     if (data !== undefined) {
       if (isDef(i = data.hook) && isDef(i = i.init)) {
@@ -100,6 +101,23 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
         vnode.text = '';
       }
       vnode.elm = api.createComment(vnode.text as string);
+
+    } else if (sel === 'slot') {
+      let hostContentNode: Node;
+      while (hostContentNode = hostContentNodes.shift()) {
+        // remove the host content node from it's original parent node
+        api.removeChild(hostContentNode.parentNode, hostContentNode);
+
+        if (hostContentNodes.length === 0) {
+          // return the last node that gets appended
+          // like any other Node that was created
+          return hostContentNode;
+        }
+
+        // relocate the node to it's new home
+        api.appendChild(parentElm, hostContentNode);
+      }
+
     } else if (sel !== undefined) {
       // Parse selector
       const hashIdx = sel.indexOf('#');
@@ -116,7 +134,7 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
         for (i = 0; i < children.length; ++i) {
           const ch = children[i];
           if (ch != null) {
-            api.appendChild(elm, createElm(ch as VNode, insertedVnodeQueue));
+            api.appendChild(elm, createElm(elm, ch as VNode, insertedVnodeQueue, hostContentNodes));
           }
         }
       } else if (isPrimitive(vnode.text)) {
@@ -138,11 +156,12 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
                      vnodes: Array<VNode>,
                      startIdx: number,
                      endIdx: number,
-                     insertedVnodeQueue: VNodeQueue) {
+                     insertedVnodeQueue: VNodeQueue,
+                     hostContentNodes: HostContentNodes) {
     for (; startIdx <= endIdx; ++startIdx) {
       const ch = vnodes[startIdx];
       if (ch != null) {
-        api.insertBefore(parentElm, createElm(ch, insertedVnodeQueue), before);
+        api.insertBefore(parentElm, createElm(parentElm, ch, insertedVnodeQueue, hostContentNodes), before);
       }
     }
   }
@@ -190,7 +209,8 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
   function updateChildren(parentElm: Node,
                           oldCh: Array<VNode>,
                           newCh: Array<VNode>,
-                          insertedVnodeQueue: VNodeQueue) {
+                          insertedVnodeQueue: VNodeQueue,
+                          hostContentNodes: HostContentNodes) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -236,12 +256,12 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
         }
         idxInOld = oldKeyToIdx[newStartVnode.key as string];
         if (isUndef(idxInOld)) { // New element
-          api.insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue), oldStartVnode.elm as Node);
+          api.insertBefore(parentElm, createElm(parentElm, newStartVnode, insertedVnodeQueue, hostContentNodes), oldStartVnode.elm as Node);
           newStartVnode = newCh[++newStartIdx];
         } else {
           elmToMove = oldCh[idxInOld];
           if (elmToMove.sel !== newStartVnode.sel) {
-            api.insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue), oldStartVnode.elm as Node);
+            api.insertBefore(parentElm, createElm(parentElm, newStartVnode, insertedVnodeQueue, hostContentNodes), oldStartVnode.elm as Node);
           } else {
             patchVnode(elmToMove, newStartVnode, insertedVnodeQueue);
             oldCh[idxInOld] = undefined as any;
@@ -253,7 +273,7 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
     }
     if (oldStartIdx > oldEndIdx) {
       before = newCh[newEndIdx+1] == null ? null : newCh[newEndIdx+1].elm;
-      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue);
+      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue, hostContentNodes);
     } else if (newStartIdx > newEndIdx) {
       removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
     }
@@ -276,12 +296,19 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) {
-          updateChildren(elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
+          const hostContentNodes: HostContentNodes = [];
+
+          const childNodes = vnode.elm.childNodes;
+          for (let j = 0; j < childNodes.length; j++) {
+            hostContentNodes.push(childNodes[j]);
+          }
+
+          updateChildren(elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue, hostContentNodes);
         }
 
       } else if (isDef(ch)) {
         if (isDef(oldVnode.text)) api.setTextContent(elm, '');
-        addVnodes(elm, null, ch as Array<VNode>, 0, (ch as Array<VNode>).length - 1, insertedVnodeQueue);
+        addVnodes(elm, null, ch as Array<VNode>, 0, (ch as Array<VNode>).length - 1, insertedVnodeQueue, null);
       } else if (isDef(oldCh)) {
         removeVnodes(elm, oldCh as Array<VNode>, 0, (oldCh as Array<VNode>).length - 1);
       } else if (isDef(oldVnode.text)) {
@@ -311,7 +338,7 @@ export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
       elm = oldVnode.elm as Node;
       parent = api.parentNode(elm);
 
-      createElm(vnode, insertedVnodeQueue);
+      createElm(parent, vnode, insertedVnodeQueue, []);
 
       if (parent !== null) {
         api.insertBefore(parent, vnode.elm as Node, api.nextSibling(elm));
