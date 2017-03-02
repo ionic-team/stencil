@@ -8,6 +8,8 @@
     "build": "npm run transpile",
     "build.angular": "cd src/bindings/angular/ && npm run build",
     "build.web": "cd src/bindings/web/ && npm run build",
+    "gzip": "gzip --keep -f dist/ionic-web/dist/ionic.web.min.js",
+    "minify": "babili dist/ionic-web/dist/ionic.web.js -o dist/ionic-web/dist/ionic.web.min.js && npm run gzip && ls -alH dist/ionic-web/dist/",
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch",
@@ -17,6 +19,7 @@
   "devDependencies": {
     "@types/jest": "18.1.1",
     "@types/node": "7.0.5",
+    "babili": "0.0.11",
     "fs-extra": "2.0.0",
     "httpster": "1.0.3",
     "jest": "19.0.2",
