@@ -1,10 +1,9 @@
-
-import { initRenderer, h } from '../index';
+import { initRenderer, h } from '../core';
 import { attributesModule } from '../modules/attributes';
 import { classModule } from '../modules/class';
 import { eventListenersModule } from '../modules/eventlisteners';
 import { styleModule } from '../modules/style';
-import { BrowserDomApi } from '../api/browser-api';
+import { PlatformClient } from '../../platform/platform-client';
 
 
 describe('slot', function() {
@@ -102,4 +101,4 @@ var patch = initRenderer([
   classModule,
   eventListenersModule,
   styleModule,
-], new BrowserDomApi(document));
+], new PlatformClient(document));

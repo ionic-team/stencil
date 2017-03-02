@@ -1,10 +1,10 @@
-import { DomApi } from '../renderer/index';
+import { PlatformApi } from '../platform/platform-api';
 import { Config } from './config';
 
 
 export interface GlobalIonic {
   config?: Config;
-  dom?: DomApi;
+  api?: PlatformApi;
   renderer?: Renderer;
 }
 

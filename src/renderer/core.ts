@@ -12,14 +12,14 @@
 import { Renderer, VNode, VNodeData, Key, Hooks, Module } from '../utils/interfaces';
 import { vnode } from './vnode';
 import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
-import { DomApi } from './api/dom-api';
-import { BrowserDomApi } from './api/browser-api';
+import { PlatformApi } from '../platform/platform-api';
 
 export { attributesModule } from './modules/attributes';
 export { classModule } from './modules/class';
 export { eventListenersModule } from './modules/eventlisteners';
 export { styleModule } from './modules/style';
-export { DomApi, BrowserDomApi, VNode, VNodeData, vnode };
+export { VNode, VNodeData, vnode };
+export { h } from './h';
 
 type VNodeQueue = Array<VNode>;
 type HostContentNodes = Array<Node>;
@@ -56,10 +56,8 @@ function createKeyToOldIdx(children: Array<VNode>, beginIdx: number, endIdx: num
 
 const hooks: (keyof Module)[] = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
 
-export {h} from './h';
 
-
-export function initRenderer(modules: Array<any>, api: DomApi): Renderer {
+export function initRenderer(modules: Array<any>, api: PlatformApi): Renderer {
   let i: number, j: number, cbs = ({} as ModuleHooks);
 
   for (i = 0; i < hooks.length; ++i) {

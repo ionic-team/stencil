@@ -1,13 +1,14 @@
 import { Config } from '../utils/config';
-import { DomApi, h } from '../renderer/index';
+import { h } from '../renderer/core';
 import { IonElement } from './ion-element';
 import { initProperties } from './init-element';
 import { isDef } from '../utils/helpers';
+import { PlatformApi } from '../platform/platform-api';
 
 
 export function patchHostElement(elm: IonElement) {
   const config = elm.$ionic.config;
-  const dom = elm.$ionic.dom;
+  const dom = elm.$ionic.api;
   const newVnode = elm.ionNode(h);
   if (!newVnode) {
     return;
@@ -55,7 +56,7 @@ export function patchHostElement(elm: IonElement) {
 }
 
 
-function getValue(name: string, config: Config, domApi: DomApi, elm: HTMLElement, fallback: any = null): any {
-  const val = domApi.getPropOrAttr(elm, name);
+function getValue(name: string, config: Config, api: PlatformApi, elm: HTMLElement, fallback: any = null): any {
+  const val = api.getPropOrAttr(elm, name);
   return isDef(val) ? val : config.get(name, fallback);
 }

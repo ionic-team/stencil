@@ -1,13 +1,12 @@
-
-import { initRenderer, h } from '../index';
+import { initRenderer, h } from '../core';
 import { eventListenersModule } from '../modules/eventlisteners';
-import { BrowserDomApi } from '../api/browser-api';
+import { PlatformClient } from '../../platform/platform-client';
 
 const document: HTMLDocument = (<any>global).document;
 
 var patch = initRenderer([
   eventListenersModule,
-], new BrowserDomApi(document));
+], new PlatformClient(document));
 
 
 describe('event listeners', function() {

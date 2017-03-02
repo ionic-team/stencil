@@ -1,9 +1,9 @@
-import { DomApi } from './dom-api';
-import { isDef, toCamelCase } from '../../utils/helpers';
+import { PlatformApi } from './platform-api';
+import { isDef, toCamelCase } from '../utils/helpers';
 
 
-export class BrowserDomApi implements DomApi {
-  private css = new Set<string>();
+export class PlatformClient implements PlatformApi {
+  private css: {[tag: string]: boolean} = {};
 
   constructor(private d: HTMLDocument) {}
 
@@ -85,7 +85,7 @@ export class BrowserDomApi implements DomApi {
   }
 
   hasElementCss(tag: string) {
-    return this.css.has(tag);
+    return !!this.css[tag];
   }
 
   appendElementCss(tag: string, css: string) {
@@ -96,8 +96,18 @@ export class BrowserDomApi implements DomApi {
       elementCss.innerHTML = css;
       head.appendChild(elementCss);
       head.insertBefore(elementCss, head.firstChild);
-      this.css.add(tag);
+      this.css[tag] = true;
     }
+  }
+
+  nextTick(cb: Function) {
+    const obs = new MutationObserver(() => {
+      cb();
+    });
+
+    const textNode = this.createTextNode('');
+    obs.observe(textNode, { characterData: true });
+    textNode.data = '1';
   }
 
 }

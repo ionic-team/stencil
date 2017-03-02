@@ -1,5 +1,5 @@
 
-export interface DomApi {
+export interface PlatformApi {
   createElement: (tagName: any) => HTMLElement;
   createElementNS: (namespaceURI: string, qualifiedName: string) => Element;
   createTextNode: (text: string) => Text;
@@ -21,4 +21,5 @@ export interface DomApi {
   isComment: (node: Node) => node is Comment;
   hasElementCss: (tag: string) => boolean;
   appendElementCss: (tag: string, css: string) => void;
+  nextTick: (cb: Function) => void;
 }

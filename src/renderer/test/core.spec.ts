@@ -1,19 +1,17 @@
-
-import { initRenderer, h, vnode, VNode, VNodeData } from '../index';
+import { initRenderer, h, vnode, VNode, VNodeData } from '../core';
 import { classModule } from '../modules/class';
 import { eventListenersModule } from '../modules/eventlisteners';
-import { DomApi } from '../api/dom-api';
-import { BrowserDomApi } from '../api/browser-api';
+import { PlatformClient } from '../../platform/platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
 
 const document: HTMLDocument = (<any>global).document;
-const domApi = new BrowserDomApi(document);
+const api = new PlatformClient(document);
 
 
 var patch = initRenderer([
   classModule,
   eventListenersModule,
-], domApi);
+], api);
 
 
 function prop(name) {
@@ -740,10 +738,10 @@ describe('renderer', function() {
       });
       it('calls `postpatch` after `prepatch` listener', function() {
         var pre = [], post = [];
-        function preCb(oldVnode, vnode) {
+        function preCb() {
           pre.push(pre);
         }
-        function postCb(oldVnode, vnode) {
+        function postCb() {
           expect(pre.length).toEqual(post.length + 1);
           post.push(post);
         }
@@ -843,7 +841,7 @@ describe('renderer', function() {
         var patch = initRenderer([
           {remove: function(_, rm) { rm1 = rm; }},
           {remove: function(_, rm) { rm2 = rm; }},
-        ], domApi);
+        ], api);
         var vnode1 = h('div', [h('a', {hook: {remove: function(_, rm) { rm3 = rm; }}})]);
         var vnode2 = h('div', []);
         elm = patch(vnode0, vnode1).elm;
@@ -885,7 +883,7 @@ describe('renderer', function() {
         var patch = initRenderer([
           {pre: function() { result.push('pre'); }},
           {post: function() { result.push('post'); }},
-        ], domApi);
+        ], api);
         var vnode1 = h('div');
         patch(vnode0, vnode1);
         expect(result).toEqual(['pre', 'post']);
@@ -919,7 +917,7 @@ describe('renderer', function() {
         var patch = initRenderer([
           {create: function() { created++; }},
           {destroy: function() { destroyed++; }},
-        ], domApi);
+        ], api);
         var vnode1 = h('div', [
           h('span', 'First sibling'),
           h('div', [
@@ -939,7 +937,7 @@ describe('renderer', function() {
         var patch = initRenderer([
           {create: function() { created++; }},
           {remove: function() { removed++; }},
-        ], domApi);
+        ], api);
         var vnode1 = h('div', [
           h('span', 'First child'),
           '',
@@ -957,7 +955,7 @@ describe('renderer', function() {
         var patch = initRenderer([
           {create: function() { created++; }},
           {destroy: function() { destroyed++; }},
-        ], domApi);
+        ], api);
         var vnode1 = h('div', [
           h('span', 'First sibling'),
           h('div', [
@@ -1003,17 +1001,17 @@ describe('renderer', function() {
 
 
 
-function toVNode(node: Node, domApi?: DomApi): VNode {
-  if (!domApi) {
-    domApi = new BrowserDomApi(document);
+function toVNode(node: Node, api?: PlatformClient): VNode {
+  if (!api) {
+    api = new PlatformClient(document);
   }
 
   let text: string;
-  if (domApi.isElement(node)) {
+  if (api.isElement(node)) {
     const id = node.id ? '#' + node.id : '';
     const cn = node.getAttribute('class');
     const c = cn ? '.' + cn.split(' ').join('.') : '';
-    const sel = domApi.tag(node).toLowerCase() + id + c;
+    const sel = api.tag(node).toLowerCase() + id + c;
     const attrs: any = {};
     const children: Array<VNode> = [];
     let name: string;
@@ -1027,14 +1025,14 @@ function toVNode(node: Node, domApi?: DomApi): VNode {
       }
     }
     for (i = 0, n = elmChildren.length; i < n; i++) {
-      children.push(toVNode(elmChildren[i], domApi));
+      children.push(toVNode(elmChildren[i], api));
     }
     return vnode(sel, {attrs}, children, undefined, node);
-  } else if (domApi.isText(node)) {
-    text = domApi.getTextContent(node) as string;
+  } else if (api.isText(node)) {
+    text = api.getTextContent(node) as string;
     return vnode(undefined, undefined, undefined, text, node);
-  } else if (domApi.isComment(node)) {
-    text = domApi.getTextContent(node) as string;
+  } else if (api.isComment(node)) {
+    text = api.getTextContent(node) as string;
     return vnode('!', undefined, undefined, text, undefined);
   } else {
     return vnode('', {}, [], undefined, undefined);

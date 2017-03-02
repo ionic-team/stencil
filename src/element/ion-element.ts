@@ -10,7 +10,7 @@ export class IonElement extends getBaseElement() {
   /** @internal */
   _vnode: VNode;
   /** @internal */
-  _ob: MutationObserver;
+  _q: boolean;
   /** @internal */
   _obAttrs: string[];
 
@@ -19,7 +19,7 @@ export class IonElement extends getBaseElement() {
     super();
 
     this.$ionic = Ionic();
-    const dom = this.$ionic.dom;
+    const dom = this.$ionic.api;
 
     const tag = dom.tag(this);
     if (!dom.hasElementCss(tag)) {
@@ -35,23 +35,16 @@ export class IonElement extends getBaseElement() {
 
 
   update() {
-    const elm = this;
+    const self = this;
 
-    if (elm._ob) {
-      return;
+    if (!self._q) {
+      self._q = true;
+
+      self.$ionic.api.nextTick(() => {
+        self._q = false;
+        patchHostElement(self);
+      });
     }
-
-    elm._ob = new MutationObserver(() => {
-      if (elm._ob) {
-        elm._ob.disconnect();
-        elm._ob = null;
-        patchHostElement(elm);
-      }
-    });
-
-    const textNode = elm.$ionic.dom.createTextNode('');
-    elm._ob.observe(textNode, { characterData: true });
-    textNode.data = '1';
   }
 
 
@@ -63,7 +56,7 @@ export class IonElement extends getBaseElement() {
 
 
   disconnectedCallback() {
-    this.$ionic = this._vnode = this._ob = null;
+    this.$ionic = this._vnode = null;
   }
 
   ionNode(h: any): VNode { h; return null; };
@@ -76,7 +69,7 @@ export class IonElement extends getBaseElement() {
 function getBaseElement(): { new(): HTMLElement } {
   if (typeof HTMLElement !== 'function') {
     const BaseElement = function(){};
-    BaseElement.prototype = Ionic().dom.createElement('div');
+    BaseElement.prototype = Ionic().api.createElement('div');
     return <any>BaseElement;
   }
 

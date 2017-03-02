@@ -1,4 +1,4 @@
-import { Hooks, VNode } from '../utils/interfaces';
+import { VNode } from '../utils/interfaces';
 
 
 export function vnode(sel: string | undefined,
