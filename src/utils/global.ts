@@ -36,13 +36,5 @@ export function Ionic(opts?: GlobalIonic): GlobalIonic {
     ionic.config = new Config();
   }
 
-  if (!ionic.obsAttrs) {
-    ionic.obsAttrs = new WeakMap();
-  }
-
-  if (!ionic.props) {
-    ionic.props = new WeakMap();
-  }
-
   return ionic;
 }

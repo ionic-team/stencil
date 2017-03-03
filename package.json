@@ -21,7 +21,6 @@
     "@types/node": "7.0.5",
     "babili": "0.0.11",
     "fs-extra": "2.0.0",
-    "httpster": "1.0.3",
     "jest": "19.0.2",
     "jsdom": "9.11.0",
     "knuth-shuffle": "1.0.1",

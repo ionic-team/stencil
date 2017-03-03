@@ -1,19 +1,21 @@
-import { IonElement, h, VNode, Props } from '../../element/ion-element';
+import { IonElement, h, VNode, Prop } from '../../element/ion-element';
 
 
 export class IonBadge extends IonElement {
 
-  static props: Props = {
-    color: { string: true },
-    mode: { string: true }
-  };
+  @Prop()
+  color: string;
+
+  @Prop()
+  mode: string;
 
   render(): VNode {
     return h('.badge');
   }
 
-  styles() {
-    return `
+}
+
+IonBadge.prototype['$css'] = `
 ion-badge {
   display: inline-block;
   padding: 3px 8px;
@@ -103,6 +105,3 @@ ion-badge:empty {
   color: #fff;
   background-color: #222; }
 `;
-  }
-
-}

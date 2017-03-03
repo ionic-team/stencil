@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "declaration": true,

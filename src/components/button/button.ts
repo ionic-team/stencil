@@ -1,15 +1,79 @@
-import { IonElement, h, VNode, Props } from '../../element/ion-element';
+import { IonElement, h, Prop, VNode, VNodeData } from '../../element/ion-element';
 
 
 export class IonButton extends IonElement {
 
-  static props: Props = {
-    color: { string: true },
-    mode: { string: true }
-  };
+  @Prop()
+  role = 'button';
+
+  @Prop({ type: 'boolean'})
+  large: boolean;
+
+  @Prop({ type: 'boolean'})
+  small: boolean;
+
+  @Prop({ type: 'boolean'})
+  default: boolean;
+
+  @Prop({ type: 'boolean'})
+  outline: boolean;
+
+  @Prop({ type: 'boolean'})
+  clear: boolean;
+
+  @Prop({ type: 'boolean'})
+  solid: boolean;
+
+  @Prop({ type: 'boolean'})
+  round: boolean;
+
+  @Prop({ type: 'boolean'})
+  block: boolean;
+
+  @Prop({ type: 'boolean'})
+  full: boolean;
+
+  @Prop({ type: 'boolean'})
+  strong: boolean;
+
 
   render(): VNode {
-    return h('.button', [
+    const vnodeData: VNodeData = { class: {} };
+    const hostCss = vnodeData.class;
+    const host = this;
+    const role = host.role;
+    const mode = host.mode;
+
+    function setCssClass(type: string) {
+      if (type) {
+        type = type.toLocaleLowerCase();
+        hostCss[`${role}-${type}`] = true;
+        hostCss[`${role}-${type}-${mode}`] = true;
+      }
+    }
+
+    hostCss[role] = true;
+    hostCss[`${role}-${mode}`] = true;
+
+    let size = host.large ? 'large' : host.small ? 'small' : 'default';
+    setCssClass(size);
+
+    let style = host.outline ? 'outline' : host.clear ? 'clear' : host.solid ? 'solid' : null;
+    style = (role !== 'bar-button' && style === 'solid' ? 'default' : style);
+    setCssClass(style);
+
+    let display = host.block ? 'block' : host.full ? 'full' : null;
+    setCssClass(display);
+
+    if (host.round) {
+      setCssClass('round');
+    }
+
+    if (host.strong) {
+      setCssClass('strong');
+    }
+
+    return h('.button', vnodeData, [
       h('span.button-inner', [
         h('slot')
       ]),
@@ -17,8 +81,9 @@ export class IonButton extends IonElement {
     ]);
   }
 
-  styles() {
-    return `
+}
+
+IonButton.prototype['$css'] = `
 .button {
   -moz-appearance: none;
   -ms-appearance: none;
@@ -870,7 +935,4 @@ button[disabled],
 
 .button-strong-wp {
   font-weight: bold; }
-    `;
-  }
-
-}
+`;

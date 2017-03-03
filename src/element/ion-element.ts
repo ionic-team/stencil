@@ -1,80 +1,81 @@
 import { Ionic } from '../utils/global';
 import { initProperties } from './init-element';
-import { VNode, VNodeData, Props, Prop } from '../utils/interfaces';
-import { patchHostElement } from './patch-element';
 import { toCamelCase } from '../utils/helpers';
+import { Prop } from '../utils/decorators';
+import { VNode, VNodeData, Props } from '../utils/interfaces';
+import { patchHostElement } from './patch-element';
 export { h } from '../renderer/core';
-export { VNode, VNodeData, Props, Prop };
+export { VNode, VNodeData, Prop, Props };
+import { $css, $obsAttrs, $props } from '../utils/constants';
 
 
 export class IonElement extends getBaseElement() {
   /** @internal */
   _vnode: VNode;
   /** @internal */
-  _q: boolean;
+  _q: boolean = true;
+
+  color: string;
+  mode: string;
 
 
   constructor() {
     super();
 
-    const api = Ionic().api;
+    const ctorPrototype = this.constructor.prototype;
 
-    const tag = api.tag(this);
-    if (!api.hasElementCss(tag)) {
-      api.appendElementCss(tag, this.styles());
+    initProperties(this, ctorPrototype[$props]);
+
+    const cssStyles = ctorPrototype[$css];
+    if (cssStyles) {
+      const api = Ionic().api;
+      const tag = api.tag(this);
+      if (!api.hasElementCss(tag)) {
+        api.appendElementCss(tag, cssStyles);
+        delete ctorPrototype[$css];
+      }
     }
   }
 
   connectedCallback() {
+    this._q = false;
     this.update();
   }
 
 
   static get observedAttributes() {
-    return Ionic().obsAttrs.get(this) || [];
+    const obsAttrs = this.prototype[$obsAttrs] || [];
+    // all components have mode and color props
+    obsAttrs.push('mode', 'color');
+    return obsAttrs;
   }
 
 
   static set observedAttributes(attrs: string[]) {
-    const ionic = Ionic();
-    let existingObsAttrs = ionic.obsAttrs.get(this);
+    const existingObsAttrs = this.prototype[$obsAttrs];
     if (existingObsAttrs) {
-      attrs = existingObsAttrs.concat(attrs);
+      Array.prototype.push.apply(existingObsAttrs, attrs);
+    } else {
+      this.prototype[$obsAttrs] = attrs;
     }
-    ionic.obsAttrs.set(this, attrs);
-  }
-
-
-  static set props(props: Props) {
-    const obsAttrs: string[] = [];
-    const propNames = Object.keys(props);
-    let prop: Prop;
-
-    for (var i = 0; i < propNames.length; i++) {
-      prop = props[propNames[i]];
-
-      obsAttrs.push(propNames[i]);
-    }
-
-    this.observedAttributes = obsAttrs;
-    Ionic().props.set(this, props);
   }
 
 
   update() {
     const elm = this;
 
+    // only run patch if it isn't queued already
     if (!elm._q) {
       elm._q = true;
 
+      // run the patch in the next tick
       const ionic = Ionic();
       ionic.api.nextTick(() => {
-        if (!elm._vnode) {
-          // if no _vnode then this is the initial patch
-          initProperties(elm, ionic.props.get(elm.constructor));
-        }
 
+        // vdom diff and patch the host element for differences
         patchHostElement(ionic.config, ionic.api, ionic.renderer, elm);
+
+        // no longer queued
         elm._q = false;
       });
     }
@@ -88,8 +89,6 @@ export class IonElement extends getBaseElement() {
   }
 
   render(): VNode { return null; };
-
-  styles(): string { return null; };
 
 }
 

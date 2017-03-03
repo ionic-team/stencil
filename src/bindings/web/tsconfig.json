@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "declaration": true,
     "lib": [
       "dom",

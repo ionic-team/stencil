@@ -6,6 +6,9 @@ import { PlatformApi } from '../platform/platform-api';
 
 
 export function patchHostElement(config: Config, api: PlatformApi, renderer: Renderer, elm: IonElement) {
+  elm.mode = getValue('mode', config, api, elm);
+  elm.color = getValue('color', config, api, elm);
+
   const newVnode = elm.render();
   if (!newVnode) {
     return;
@@ -14,17 +17,14 @@ export function patchHostElement(config: Config, api: PlatformApi, renderer: Ren
   newVnode.elm = elm;
   newVnode.isHost = true;
 
-  const mode = getValue('mode', config, api, elm);
-  const color = getValue('color', config, api, elm);
-
-  const dataClass = newVnode.data.class = newVnode.data.class || {};
+  const hostCss = newVnode.data.class = newVnode.data.class || {};
 
   let componentPrefix: string;
   const cssClasses = newVnode.sel.split('.');
   if (cssClasses.length > 1) {
     componentPrefix = cssClasses[1] + '-';
     for (var i = 1; i < cssClasses.length; i++) {
-      dataClass[cssClasses[i]] = true;
+      hostCss[cssClasses[i]] = true;
     }
 
   } else {
@@ -32,9 +32,9 @@ export function patchHostElement(config: Config, api: PlatformApi, renderer: Ren
   }
   newVnode.sel = undefined;
 
-  dataClass[`${componentPrefix}${mode}`] = true;
-  if (color) {
-    dataClass[`${componentPrefix}${mode}-${color}`] = true;
+  hostCss[`${componentPrefix}${elm.mode}`] = true;
+  if (elm.color) {
+    hostCss[`${componentPrefix}${elm.mode}-${elm.color}`] = true;
   }
 
   // if we already have a vnode then use it
