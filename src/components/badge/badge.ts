@@ -1,13 +1,7 @@
-import { IonElement, h, VNode, Prop } from '../../element/ion-element';
+import { IonElement, h, VNode } from '../../element/ion-element';
 
 
 export class IonBadge extends IonElement {
-
-  @Prop()
-  color: string;
-
-  @Prop()
-  mode: string;
 
   render(): VNode {
     return h('.badge');

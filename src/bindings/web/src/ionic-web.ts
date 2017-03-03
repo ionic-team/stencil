@@ -7,11 +7,13 @@ import { defineElements } from '../../../utils/helpers';
 
 import {
   IonBadge,
-  IonButton
+  IonButton,
+  IonItem
 } from '../../../components/index';
 
 
 defineElements(window, {
   'ion-badge': IonBadge,
-  'ion-button': IonButton
+  'ion-button': IonButton,
+  'ion-item': IonItem
 });
