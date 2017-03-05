@@ -1,19 +1,26 @@
 
 if (!customElements) {
-  throw new Error('Ionic requires native custom element support or a polyfill');
+  throw new Error('Ionic requires custom element support');
 }
 
 import { defineElements } from '../../../utils/helpers';
 
+
 import {
+  IonApp,
   IonBadge,
   IonButton,
-  IonItem
+  IonContent,
+  IonItem,
+  IonList
 } from '../../../components/index';
 
 
 defineElements(window, {
+  'ion-app': IonApp,
   'ion-badge': IonBadge,
   'ion-button': IonButton,
-  'ion-item': IonItem
+  'ion-content': IonContent,
+  'ion-item': IonItem,
+  'ion-list': IonList
 });

@@ -84,6 +84,7 @@ export class IonButton extends IonElement {
 }
 
 IonButton.prototype['$css'] = `
+
 .button {
   -moz-appearance: none;
   -ms-appearance: none;

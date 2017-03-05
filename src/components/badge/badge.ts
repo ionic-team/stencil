@@ -10,92 +10,142 @@ export class IonBadge extends IonElement {
 }
 
 IonBadge.prototype['$css'] = `
+
+
+
+/* Badge */
+/* -------------------------------------------------- */
+
+/* @prop - Font size of the badge */
+$badge-font-size:                 1.3rem !default;
+
+/* @prop - Font weight of the badge */
+$badge-font-weight:               bold !default;
+
+
 ion-badge {
   display: inline-block;
+
   padding: 3px 8px;
+
   min-width: 10px;
-  font-size: 1.3rem;
-  font-weight: bold;
+
+  font-size: $badge-font-size;
+  font-weight: $badge-font-weight;
   line-height: 1;
+
   text-align: center;
   white-space: nowrap;
-  vertical-align: baseline; }
+  vertical-align: baseline;
+}
 
 ion-badge:empty {
-  display: none; }
+  display: none;
+}
+
+
+
+
+/* iOS Badge */
+/* -------------------------------------------------- */
+
+/* @prop - Border radius of the badge */
+$badge-ios-border-radius:      10px !default;
+
+/* @prop - Background color of the badge */
+$badge-ios-background-color:   color($colors-ios, primary) !default;
+
+/* @prop - Text color of the badge */
+$badge-ios-text-color:         color-contrast($colors-ios, $badge-ios-background-color) !default;
+
 
 .badge-ios {
-  border-radius: 10px;
-  color: #fff;
-  background-color: #327eff; }
+  border-radius: $badge-ios-border-radius;
+  color: $badge-ios-text-color;
+  background-color: $badge-ios-background-color;
+}
 
-.badge-ios-primary {
-  color: #fff;
-  background-color: #327eff; }
 
-.badge-ios-secondary {
-  color: #fff;
-  background-color: #32db64; }
+/* Generate iOS Badge Colors */
+/* -------------------------------------------------- */
 
-.badge-ios-danger {
-  color: #fff;
-  background-color: #f53d3d; }
+@each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
 
-.badge-ios-light {
-  color: #000;
-  background-color: #f4f4f4; }
+  .badge-ios-#{$color-name} {
+    color: $color-contrast;
+    background-color: $color-base;
+  }
 
-.badge-ios-dark {
-  color: #fff;
-  background-color: #222; }
+}
+
+
+
+
+/* Material Design Badge */
+/* -------------------------------------------------- */
+
+/* @prop - Border radius of the badge */
+$badge-md-border-radius:            4px !default;
+
+/* @prop - Background color of the badge */
+$badge-md-background-color:         color($colors-md, primary) !default;
+
+/* @prop - Text color of the badge */
+$badge-md-text-color:               color-contrast($colors-md, $badge-md-background-color) !default;
+
 
 .badge-md {
-  border-radius: 4px;
-  color: #fff;
-  background-color: #327eff; }
+  border-radius: $badge-md-border-radius;
+  color: $badge-md-text-color;
+  background-color: $badge-md-background-color;
+}
 
-.badge-md-primary {
-  color: #fff;
-  background-color: #327eff; }
 
-.badge-md-secondary {
-  color: #fff;
-  background-color: #32db64; }
+/* Generate Material Design Badge Colors */
+/* -------------------------------------------------- */
 
-.badge-md-danger {
-  color: #fff;
-  background-color: #f53d3d; }
+@each $color-name, $color-base, $color-contrast in get-colors($colors-md) {
 
-.badge-md-light {
-  color: #000;
-  background-color: #f4f4f4; }
+  .badge-md-#{$color-name} {
+    color: $color-contrast;
+    background-color: $color-base;
+  }
 
-.badge-md-dark {
-  color: #fff;
-  background-color: #222; }
+}
+
+
+
+
+/* Windows Badge */
+/* -------------------------------------------------- */
+
+/* @prop - Border radius of the badge */
+$badge-wp-border-radius:            0 !default;
+
+/* @prop - Background color of the badge */
+$badge-wp-background-color:         color($colors-wp, primary) !default;
+
+/* @prop - Text color of the badge */
+$badge-wp-text-color:               color-contrast($colors-wp, $badge-wp-background-color) !default;
+
 
 .badge-wp {
-  border-radius: 0;
-  color: #fff;
-  background-color: #327eff; }
+  border-radius: $badge-wp-border-radius;
+  color: $badge-wp-text-color;
+  background-color: $badge-wp-background-color;
+}
 
-.badge-wp-primary {
-  color: #fff;
-  background-color: #327eff; }
 
-.badge-wp-secondary {
-  color: #fff;
-  background-color: #32db64; }
+/* Generate Windows Badge Colors */
+/* -------------------------------------------------- */
 
-.badge-wp-danger {
-  color: #fff;
-  background-color: #f53d3d; }
+@each $color-name, $color-base, $color-contrast in get-colors($colors-wp) {
 
-.badge-wp-light {
-  color: #000;
-  background-color: #f4f4f4; }
+  .badge-wp-#{$color-name} {
+    color: $color-contrast;
+    background-color: $color-base;
+  }
 
-.badge-wp-dark {
-  color: #fff;
-  background-color: #222; }
+}
+
 `;
