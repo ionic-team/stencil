@@ -9,7 +9,9 @@ describe('IonElement', function() {
   });
 
   it('should add $ionic to instance', function() {
-    expect(ionElement.$ionic).toBeDefined();
+    spyOn(ionElement, 'update');
+    ionElement.connectedCallback();
+    expect(ionElement.update).toHaveBeenCalled();
   });
 
 });

@@ -17,7 +17,7 @@ export class IonItem extends IonElement {
   // '<div class="button-effect"></div>',
   render(): VNode {
     return h('.item', [
-      h('slot', { select: '[item-left]' }),
+      h('slot', { select: '[item-left],ion-checkbox:not([item-right])' }),
       h('div.item-inner', [
         h('div.input-wrapper', [
           h('ion-label', [

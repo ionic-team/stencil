@@ -34,6 +34,7 @@ export interface VNode {
   text: string | undefined;
   key: Key;
   isHost?: boolean;
+  select?: string;
 }
 
 
