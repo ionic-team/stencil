@@ -12,7 +12,7 @@
     "module": "es2015",
     "target": "es2015",
     "moduleResolution": "node",
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "../dist/transpiled-core",
     "types": [
       "jest",

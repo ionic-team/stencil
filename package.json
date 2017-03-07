@@ -7,13 +7,14 @@
     "clean": "rimraf dist/transpiled-core/",
     "build": "npm run transpile",
     "build.angular": "cd src/bindings/angular/ && npm run build",
+    "build.css": "node scripts/build.css.js",
     "build.web": "cd src/bindings/web/ && npm run build",
     "gzip": "gzip --keep -f dist/ionic-web/dist/ionic.web.min.js",
     "minify": "babili dist/ionic-web/dist/ionic.web.js -o dist/ionic-web/dist/ionic.web.min.js && npm run gzip && ls -alH dist/ionic-web/dist/",
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch",
-    "transpile": "npm run clean && (tsc -p src/tsconfig.json || true)",
+    "transpile": "npm run clean && (tsc -p src/tsconfig.json || true) && npm run build.css",
     "transpile.watch": "npm run clean && (tsc -p src/tsconfig.json --watch || true)"
   },
   "devDependencies": {
@@ -21,9 +22,11 @@
     "@types/node": "7.0.5",
     "babili": "0.0.11",
     "fs-extra": "2.0.0",
+    "glob": "^7.1.1",
     "jest": "19.0.2",
     "jsdom": "9.11.0",
     "knuth-shuffle": "1.0.1",
+    "node-sass": "^4.5.0",
     "rimraf": "2.6.1",
     "rollup": "0.41.4",
     "typescript": "2.2.1"

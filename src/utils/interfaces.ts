@@ -14,12 +14,26 @@ export interface Renderer {
 }
 
 
+export interface ComponentOptions {
+  tag?: string;
+  styleUrl?: string;
+  preprocessStyles?: string[];
+}
+
+
 export interface PropOptions {
   type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
 }
 
+
 export interface Props {
   [propName: string]: PropOptions;
+}
+
+
+export interface Annotations extends ComponentOptions {
+  props?: Props;
+  obsAttrs?: string[];
 }
 
 

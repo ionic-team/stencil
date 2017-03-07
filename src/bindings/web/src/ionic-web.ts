@@ -11,8 +11,11 @@ import {
   IonBadge,
   IonButton,
   IonContent,
+  IonHeader,
   IonItem,
-  IonList
+  IonList,
+  IonTitle,
+  IonToolbar
 } from '../../../components/index';
 
 
@@ -21,6 +24,9 @@ defineElements(window, {
   'ion-badge': IonBadge,
   'ion-button': IonButton,
   'ion-content': IonContent,
+  'ion-header': IonHeader,
   'ion-item': IonItem,
-  'ion-list': IonList
+  'ion-list': IonList,
+  'ion-title': IonTitle,
+  'ion-toolbar': IonToolbar
 });

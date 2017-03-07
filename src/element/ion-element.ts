@@ -1,12 +1,12 @@
+import { Component, Prop } from '../utils/decorators';
 import { Ionic } from '../utils/global';
 import { initProperties } from './init-element';
 import { toCamelCase } from '../utils/helpers';
-import { Prop } from '../utils/decorators';
-import { VNode, VNodeData, Props } from '../utils/interfaces';
+import { Annotations, VNode, VNodeData, Props } from '../utils/interfaces';
 import { patchHostElement } from './patch-element';
 export { h } from '../renderer/core';
-export { VNode, VNodeData, Prop, Props };
-import { $css, $obsAttrs, $props } from '../utils/constants';
+import { $annotations } from '../utils/constants';
+export { Component, VNode, VNodeData, Prop, Props };
 
 
 export class IonElement extends getBaseElement() {
@@ -24,15 +24,14 @@ export class IonElement extends getBaseElement() {
 
     const ctorPrototype = this.constructor.prototype;
 
-    initProperties(this, ctorPrototype[$props]);
+    initProperties(this, ctorPrototype[$annotations]);
 
-    const cssStyles = ctorPrototype[$css];
-    if (cssStyles) {
+    const styleUrl = (<Annotations>ctorPrototype).styleUrl;
+    if (styleUrl) {
       const api = Ionic().api;
-      const tag = api.tag(this);
+      const tag = (<Annotations>ctorPrototype).tag || api.tag(this);
       if (!api.hasElementCss(tag)) {
-        api.appendElementCss(tag, cssStyles);
-        delete ctorPrototype[$css];
+        api.appendElementCss(tag, styleUrl);
       }
     }
   }
@@ -44,19 +43,21 @@ export class IonElement extends getBaseElement() {
 
 
   static get observedAttributes() {
-    const obsAttrs = this.prototype[$obsAttrs] || [];
+    const annotations: Annotations = this.prototype[$annotations] = this.prototype[$annotations] || {};
+    annotations.obsAttrs = annotations.obsAttrs || [];
     // all components have mode and color props
-    obsAttrs.push('mode', 'color');
-    return obsAttrs;
+    annotations.obsAttrs.push('mode', 'color');
+    return annotations.obsAttrs;
   }
 
 
   static set observedAttributes(attrs: string[]) {
-    const existingObsAttrs = this.prototype[$obsAttrs];
-    if (existingObsAttrs) {
-      Array.prototype.push.apply(existingObsAttrs, attrs);
+    const annotations: Annotations = this.prototype[$annotations] = this.prototype[$annotations] || {};
+
+    if (annotations.obsAttrs) {
+      Array.prototype.push.apply(annotations.obsAttrs, attrs);
     } else {
-      this.prototype[$obsAttrs] = attrs;
+      annotations.obsAttrs = attrs;
     }
   }
 

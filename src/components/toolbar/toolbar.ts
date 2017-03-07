@@ -1,9 +1,9 @@
 import { IonElement, h, VNode } from '../../element/ion-element';
 
 
-export class IonList extends IonElement {
+export class IonToolbar extends IonElement {
   render(): VNode {
-    return h('.list');
+    return h('.toolbar');
   }
 
 }

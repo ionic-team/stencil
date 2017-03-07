@@ -2,6 +2,7 @@ import { IonElement, h, VNode } from '../../element/ion-element';
 
 
 export class IonItem extends IonElement {
+
   render(): VNode {
     return h('.item', [
       h('slot', { select: '[item-left],ion-checkbox:not([item-right])' }),
@@ -20,7 +21,3 @@ export class IonItem extends IonElement {
   }
 
 }
-
-IonItem.prototype['$css'] = `
-
-`;

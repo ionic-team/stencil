@@ -88,15 +88,20 @@ export class PlatformClient implements PlatformApi {
     return !!this.css[tag];
   }
 
-  appendElementCss(tag: string, css: string) {
-    if (css) {
+  appendElementCss(tag: string, styleUrl: string) {
+    this.css[tag] = true;
+
+    if (styleUrl) {
+      const cssId = `css-${tag}`;
       const head = this.d.getElementsByTagName('head')[0];
-      const elementCss = this.createElement('style');
-      elementCss.id = `css-${tag}`;
-      elementCss.innerHTML = css;
-      head.appendChild(elementCss);
-      head.insertBefore(elementCss, head.firstChild);
-      this.css[tag] = true;
+
+      if (!head.querySelector(`#${cssId}`)) {
+        const linkEle = <HTMLLinkElement>this.createElement('link');
+        linkEle.id = cssId;
+        linkEle.href = styleUrl;
+        linkEle.rel = 'stylesheet';
+        head.insertBefore(linkEle, head.firstChild);
+      }
     }
   }
 
