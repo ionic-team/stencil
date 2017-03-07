@@ -43,7 +43,7 @@ export function patchHostElement(config: Config, api: PlatformApi, renderer: Ren
   if (!elm._vnode) {
     elm._vnode = renderer(elm, newVnode, true);
   } else {
-    elm._vnode =  renderer(elm._vnode, newVnode, false);
+    elm._vnode = renderer(elm._vnode, newVnode, false);
   }
 }
 

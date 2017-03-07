@@ -2,11 +2,11 @@ import { Component, Prop } from '../utils/decorators';
 import { Ionic } from '../utils/global';
 import { initProperties } from './init-element';
 import { toCamelCase } from '../utils/helpers';
-import { Annotations, VNode, VNodeData, Props } from '../utils/interfaces';
+import { Annotations, IonicComponent, VNode, VNodeData, Props } from '../utils/interfaces';
 import { patchHostElement } from './patch-element';
 export { h } from '../renderer/core';
 import { $annotations } from '../utils/constants';
-export { Component, VNode, VNodeData, Prop, Props };
+export { Annotations, Component, IonicComponent, VNode, VNodeData, Prop, Props };
 
 
 export class IonElement extends getBaseElement() {

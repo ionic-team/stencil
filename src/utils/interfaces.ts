@@ -9,6 +9,11 @@ export interface GlobalIonic {
 }
 
 
+export interface IonicComponent {
+  annotations?: Annotations;
+}
+
+
 export interface Renderer {
   (oldVnode: VNode | Element, vnode: VNode, slotProjection?: boolean): VNode;
 }
