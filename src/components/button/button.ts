@@ -1,46 +1,18 @@
-import { IonElement, Component, Prop, h, VNode, VNodeData } from '../../element/ion-element';
+import { IonElement, IonicComponent, h, VNode, VNodeData } from '../../element/ion-element';
 
 
-@Component({
-  tag: 'ion-button',
-  styleUrl: 'button.css',
-  preprocessStyles: [
-    'button.scss'
-  ]
-})
 export class IonButton extends IonElement {
 
-  @Prop()
   role = 'button';
-
-  @Prop({ type: 'boolean'})
   large: boolean;
-
-  @Prop({ type: 'boolean'})
   small: boolean;
-
-  @Prop({ type: 'boolean'})
   default: boolean;
-
-  @Prop({ type: 'boolean'})
   outline: boolean;
-
-  @Prop({ type: 'boolean'})
   clear: boolean;
-
-  @Prop({ type: 'boolean'})
   solid: boolean;
-
-  @Prop({ type: 'boolean'})
   round: boolean;
-
-  @Prop({ type: 'boolean'})
   block: boolean;
-
-  @Prop({ type: 'boolean'})
   full: boolean;
-
-  @Prop({ type: 'boolean'})
   strong: boolean;
 
 
@@ -89,3 +61,21 @@ export class IonButton extends IonElement {
   }
 
 }
+
+(<IonicComponent>IonButton).$annotations = {
+  tag: 'ion-button',
+  props: {
+    role: {},
+    large: {type: 'boolean'},
+    small: {type: 'boolean'},
+    default: {type: 'boolean'},
+    outline: {type: 'boolean'},
+    clear: {type: 'boolean'},
+    solid: {type: 'boolean'},
+    round: {type: 'boolean'},
+    block: {type: 'boolean'},
+    full: {type: 'boolean'},
+    strong: {type: 'boolean'}
+  },
+  styles: 'ion-button { background: blue; }'
+};

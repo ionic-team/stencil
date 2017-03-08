@@ -10,6 +10,6 @@ export class IonApp extends IonElement {
 }
 
 
-(<IonicComponent>IonApp).annotations = {
+(<IonicComponent>IonApp).$annotations = {
   tag: 'ion-app'
 };

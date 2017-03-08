@@ -5,7 +5,6 @@ import { toCamelCase } from '../utils/helpers';
 import { Annotations, IonicComponent, VNode, VNodeData, Props } from '../utils/interfaces';
 import { patchHostElement } from './patch-element';
 export { h } from '../renderer/core';
-import { $annotations } from '../utils/constants';
 export { Annotations, Component, IonicComponent, VNode, VNodeData, Prop, Props };
 
 
@@ -22,16 +21,20 @@ export class IonElement extends getBaseElement() {
   constructor() {
     super();
 
-    const ctorPrototype = this.constructor.prototype;
+    const annotations = (<IonicComponent>this.constructor).$annotations;
 
-    initProperties(this, ctorPrototype[$annotations]);
+    initProperties(this, annotations.props);
 
-    const styleUrl = (<Annotations>ctorPrototype).styleUrl;
-    if (styleUrl) {
-      const api = Ionic().api;
-      const tag = (<Annotations>ctorPrototype).tag || api.tag(this);
-      if (!api.hasElementCss(tag)) {
-        api.appendElementCss(tag, styleUrl);
+    const api = Ionic().api;
+
+    if (annotations.styles) {
+      if (!api.hasElementCss(annotations.tag)) {
+        api.appendStyles(annotations.tag, annotations.styles);
+      }
+
+    } else if (annotations.styleUrl) {
+      if (!api.hasElementCss(annotations.tag)) {
+        api.appendStyleUrl(annotations.tag, annotations.styleUrl);
       }
     }
   }
@@ -43,7 +46,7 @@ export class IonElement extends getBaseElement() {
 
 
   static get observedAttributes() {
-    const annotations: Annotations = this.prototype[$annotations] = this.prototype[$annotations] || {};
+    const annotations = (<IonicComponent>this).$annotations = (<IonicComponent>this).$annotations || {};
     annotations.obsAttrs = annotations.obsAttrs || [];
     // all components have mode and color props
     annotations.obsAttrs.push('mode', 'color');
@@ -52,7 +55,7 @@ export class IonElement extends getBaseElement() {
 
 
   static set observedAttributes(attrs: string[]) {
-    const annotations: Annotations = this.prototype[$annotations] = this.prototype[$annotations] || {};
+    const annotations = (<IonicComponent>this).$annotations = (<IonicComponent>this).$annotations || {};
 
     if (annotations.obsAttrs) {
       Array.prototype.push.apply(annotations.obsAttrs, attrs);

@@ -9,11 +9,6 @@ export interface GlobalIonic {
 }
 
 
-export interface IonicComponent {
-  annotations?: Annotations;
-}
-
-
 export interface Renderer {
   (oldVnode: VNode | Element, vnode: VNode, slotProjection?: boolean): VNode;
 }
@@ -21,6 +16,7 @@ export interface Renderer {
 
 export interface ComponentOptions {
   tag?: string;
+  styles?: string;
   styleUrl?: string;
   preprocessStyles?: string[];
 }
@@ -39,6 +35,11 @@ export interface Props {
 export interface Annotations extends ComponentOptions {
   props?: Props;
   obsAttrs?: string[];
+}
+
+
+export interface IonicComponent {
+  $annotations?: Annotations;
 }
 
 

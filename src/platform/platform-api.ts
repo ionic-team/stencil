@@ -20,6 +20,7 @@ export interface PlatformApi {
   isText: (node: Node) => node is Text;
   isComment: (node: Node) => node is Comment;
   hasElementCss: (tag: string) => boolean;
-  appendElementCss: (tag: string, css: string) => void;
+  appendStyles: (tag: string, styles: string) => void;
+  appendStyleUrl: (tag: string, styleUrl: string) => void;
   nextTick: (cb: Function) => void;
 }

@@ -1,11 +1,10 @@
-import { $annotations } from './constants';
-import { Annotations, ComponentOptions, PropOptions } from './interfaces';
+import { ComponentOptions, IonicComponent, PropOptions } from './interfaces';
 
 
 export const Component: ComponentDecorator = function(opts?: ComponentOptions): (target: any) => any {
-  return function(target: any) {
+  return function(target: IonicComponent) {
     if (opts) {
-      const annotations: Annotations = target[$annotations] = target[$annotations] || {};
+      const annotations = target.$annotations = target.$annotations || {};
       annotations.tag = opts.tag;
       annotations.styleUrl = opts.styleUrl;
     }
@@ -19,8 +18,8 @@ export interface ComponentDecorator {
 
 
 export const Prop: PropDecorator = function(opts?: PropOptions): (target: any, propKey: string) => any {
-  return function(target: any, propKey: string) {
-    const annotations: Annotations = target[$annotations] = target[$annotations] || {};
+  return function(target: IonicComponent, propKey: string) {
+    const annotations = target.$annotations = target.$annotations || {};
     annotations.props = annotations.props || {};
     annotations.props[propKey] = opts || {};
 
