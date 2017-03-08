@@ -9,11 +9,11 @@
       "dom",
       "es2015"
     ],
-    "module": "es2015",
-    "target": "es2015",
+    "module": "commonjs",
+    "target": "es5",
     "moduleResolution": "node",
     "sourceMap": false,
-    "outDir": "../dist/transpiled-core",
+    "outDir": "../../dist/compiler",
     "types": [
       "jest",
       "node"
@@ -23,8 +23,6 @@
     "**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "bindings",
-    "compiler"
+    "node_modules"
   ]
 }

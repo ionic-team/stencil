@@ -1,4 +1,4 @@
-import { IonElement, h, VNode } from '../../element/ion-element';
+import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element';
 
 
 export class IonBadge extends IonElement {
@@ -8,3 +8,13 @@ export class IonBadge extends IonElement {
   }
 
 }
+
+(<IonicComponent>IonBadge).$annotations = {
+  tag: 'ion-badge',
+  preprocessStyles: [
+    'badge.scss',
+    'badge.ios.scss',
+    'badge.md.scss',
+    'badge.wp.scss'
+  ]
+};

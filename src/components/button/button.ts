@@ -77,5 +77,11 @@ export class IonButton extends IonElement {
     full: {type: 'boolean'},
     strong: {type: 'boolean'}
   },
-  styles: 'ion-button { background: blue; }'
+  preprocessStyles: [
+    'button.scss',
+    'button.ios.scss',
+    'button.md.scss',
+    'button.wp.scss',
+    'button-icon.scss',
+  ]
 };
