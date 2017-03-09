@@ -1,4 +1,4 @@
-import { IonElement, h, VNode } from '../../element/ion-element';
+import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element';
 
 
 export class IonToolbar extends IonElement {
@@ -7,3 +7,15 @@ export class IonToolbar extends IonElement {
   }
 
 }
+
+(<IonicComponent>IonToolbar).$annotations = {
+  tag: 'ion-toolbar',
+  preprocessStyles: [
+    'toolbar.scss',
+    'toolbar.ios.scss',
+    'toolbar.md.scss',
+    'toolbar.wp.scss',
+    'toolbar-button.scss',
+  ]
+};
+
