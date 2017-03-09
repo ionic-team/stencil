@@ -10,5 +10,5 @@ export class IonCardTitle extends IonElement {
 }
 
 (<IonicComponent>IonCardTitle).$annotations = {
-  tag: 'ion-title'
+  tag: 'ion-card-title'
 };
