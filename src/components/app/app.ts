@@ -11,5 +11,11 @@ export class IonApp extends IonElement {
 
 
 (<IonicComponent>IonApp).$annotations = {
-  tag: 'ion-app'
+  tag: 'ion-app',
+  preprocessStyles: [
+    'app.scss',
+    'app.ios.scss',
+    'app.md.scss',
+    'app.wp.scss'
+  ]
 };

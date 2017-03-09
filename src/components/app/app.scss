@@ -193,10 +193,10 @@ sub {
 // Nav Container Structure
 // --------------------------------------------------
 
-ion-app,
-ion-nav,
-ion-tab,
-ion-tabs,
+.app,
+.nav,
+.tab,
+.tabs,
 .app-root {
   position: absolute;
   top: 0;
@@ -208,24 +208,24 @@ ion-tabs,
   height: 100%;
 }
 
-ion-nav,
-ion-tab,
-ion-tabs {
+.nav,
+.tab,
+.tabs {
   overflow: hidden;
 }
 
-ion-tab {
+.tab {
   display: none;
 }
 
-ion-tab.show-tab {
+.tab.show-tab {
   display: block;
 }
 
-ion-app,
-ion-nav,
-ion-tab,
-ion-tabs,
+.app,
+.nav,
+.tab,
+.tabs,
 .app-root,
 .ion-page {
   contain: strict;
@@ -257,7 +257,7 @@ ion-tabs,
 // Toolbar Container Structure
 // --------------------------------------------------
 
-ion-header {
+.header {
   position: absolute;
   top: 0;
   left: 0;
@@ -267,7 +267,7 @@ ion-header {
   width: 100%;
 }
 
-ion-footer {
+.footer {
   position: absolute;
   bottom: 0;
   left: 0;
