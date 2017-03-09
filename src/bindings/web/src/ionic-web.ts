@@ -19,6 +19,7 @@ import {
   IonHeader,
   IonItem,
   IonList,
+  IonNav,
   IonTitle,
   IonToolbar
 } from '../../../components/index';
@@ -36,6 +37,7 @@ defineElements(window, {
   'ion-header': IonHeader,
   'ion-item': IonItem,
   'ion-list': IonList,
+  'ion-nav': IonNav,
   'ion-title': IonTitle,
   'ion-toolbar': IonToolbar
 });
