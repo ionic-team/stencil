@@ -37,10 +37,18 @@ export function Ionic(opts?: GlobalIonic): GlobalIonic {
   }
 
   if (!ionic.staticDir) {
-    const scriptElms = document.getElementsByTagName('script');
-    const paths = scriptElms[scriptElms.length - 1].src.split('/');
-    paths.pop();
-    ionic.staticDir = paths.join('/') + '/';
+    const script = <HTMLScriptElement>document.querySelector('[static-dir]');
+    if (script) {
+      const paths = script.getAttribute('static-dir').split('/');
+      paths.pop();
+      ionic.staticDir = paths.join('/') + '/';
+
+    } else {
+      const scriptElms = document.getElementsByTagName('script');
+      const paths = scriptElms[scriptElms.length - 1].src.split('/');
+      paths.pop();
+      ionic.staticDir = paths.join('/') + '/';
+    }
   }
 
   return ionic;

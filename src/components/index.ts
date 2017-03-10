@@ -12,6 +12,7 @@ export { IonCardTitle } from './card-title/card-title';
 export { IonContent } from './content/content';
 export { IonHeader } from './header/header';
 export { IonItem } from './item/item';
+export { IonLabel } from './label/label';
 export { IonList } from './list/list';
 export { IonListHeader } from './list-header/list-header';
 export { IonNav } from './nav/nav';
