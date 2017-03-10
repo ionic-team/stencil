@@ -3,12 +3,9 @@
 // Toolbar
 // --------------------------------------------------
 
-ion-toolbar {
+:host {
   position: relative;
   z-index: $z-index-toolbar;
-}
-
-.toolbar {
   display: flex;
   overflow: hidden;
 
@@ -38,24 +35,24 @@ ion-toolbar {
   contain: strict;
 }
 
-ion-title {
-  display: flex;
+// ion-title {
+//   display: flex;
 
-  flex: 1;
-  align-items: center;
+//   flex: 1;
+//   align-items: center;
 
-  transform: translateZ(0);
-}
+//   transform: translateZ(0);
+// }
 
-.toolbar-title {
-  display: block;
-  overflow: hidden;
+// .toolbar-title {
+//   display: block;
+//   overflow: hidden;
 
-  width: 100%;
+//   width: 100%;
 
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+//   text-overflow: ellipsis;
+//   white-space: nowrap;
+// }
 
 ion-buttons {
   display: block;

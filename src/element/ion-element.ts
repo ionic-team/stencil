@@ -13,6 +13,8 @@ export class IonElement extends getBaseElement() {
   _vnode: VNode;
   /** @internal */
   _q: boolean = true;
+  /** @internal */
+  _root: ShadowRoot;
 
   color: string;
   mode: string;
@@ -21,23 +23,29 @@ export class IonElement extends getBaseElement() {
   constructor() {
     super();
 
+    const api = Ionic().api;
     const annotations = (<IonicComponent>this.constructor).$annotations;
 
-    initProperties(this, annotations.props);
+    this._root = this.attachShadow({mode: 'open'});
 
-    const api = Ionic().api;
+    if (annotations.externalStyleUrls) {
+      annotations.externalStyleUrls.forEach(externalStyleUrl => {
+        const link = <HTMLLinkElement>api.createElement('link');
+        link.href = externalStyleUrl;
+        link.rel = 'stylesheet';
+        this._root.appendChild(link);
+      });
+    }
 
     if (annotations.styles) {
-      if (!api.hasElementCss(annotations.tag)) {
-        api.appendStyles(annotations.tag, annotations.styles);
-      }
-
-    } else if (annotations.styleUrl) {
-      if (!api.hasElementCss(annotations.tag)) {
-        api.appendStyleUrl(annotations.tag, annotations.styleUrl);
-      }
+      const style = <HTMLStyleElement>api.createElement('style');
+      style.innerHTML = annotations.styles;
+      this._root.appendChild(style);
     }
+
+    initProperties(this, annotations.props);
   }
+
 
   connectedCallback() {
     this._q = false;
@@ -90,6 +98,10 @@ export class IonElement extends getBaseElement() {
     if (oldVal !== newVal) {
       (<any>this)[toCamelCase(attrName)] = newVal;
     }
+  }
+
+  disconnectedCallback() {
+    this._root = this._vnode = null;
   }
 
   render(): VNode { return null; };

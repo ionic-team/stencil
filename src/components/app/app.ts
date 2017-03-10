@@ -4,7 +4,9 @@ import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element'
 export class IonApp extends IonElement {
 
   render(): VNode {
-    return h('.app');
+    return h('.app', [
+      h('slot')
+    ]);
   }
 
 }
@@ -12,10 +14,10 @@ export class IonApp extends IonElement {
 
 (<IonicComponent>IonApp).$annotations = {
   tag: 'ion-app',
+  externalStyleUrls: [
+    // '/dist/themes/ionic.css'
+  ],
   preprocessStyles: [
-    'app.scss',
-    'app.ios.scss',
-    'app.md.scss',
-    'app.wp.scss'
+    'app.scss'
   ]
 };

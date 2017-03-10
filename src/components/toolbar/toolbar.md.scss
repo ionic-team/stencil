@@ -37,7 +37,7 @@ $toolbar-md-button-strong-font-weight:   bold !default;
 $navbar-md-height:                       $toolbar-md-height !default;
 
 
-.toolbar-md {
+:host-context(.toolbar-md) {
   padding: $toolbar-md-padding;
 
   min-height: $toolbar-md-height;

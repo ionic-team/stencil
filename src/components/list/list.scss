@@ -1,0 +1,20 @@
+@import "../../themes/ionic.globals";
+
+
+// List
+// --------------------------------------------------
+
+:host {
+  display: block;
+
+  margin: 0;
+  padding: 0;
+
+  list-style-type: none;
+}
+
+:host[inset] {
+  overflow: hidden;
+
+  transform: translateZ(0);
+}

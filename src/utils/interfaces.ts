@@ -10,7 +10,7 @@ export interface GlobalIonic {
 
 
 export interface Renderer {
-  (oldVnode: VNode | Element, vnode: VNode, slotProjection?: boolean): VNode;
+  (oldVnode: VNode | Element, vnode: VNode): VNode;
 }
 
 
@@ -18,6 +18,7 @@ export interface ComponentOptions {
   tag?: string;
   styles?: string;
   styleUrl?: string;
+  externalStyleUrls?: string[];
   preprocessStyles?: string[];
 }
 
@@ -54,7 +55,6 @@ export interface VNode {
   text: string | undefined;
   key: Key;
   isHost?: boolean;
-  select?: string;
 }
 
 

@@ -41,9 +41,10 @@ export function patchHostElement(config: Config, api: PlatformApi, renderer: Ren
   // otherwise, elm is the initial patch and
   // we need it to pass it the actual host element
   if (!elm._vnode) {
-    elm._vnode = renderer(elm, newVnode, true);
+    elm._vnode = renderer(elm, newVnode);
+
   } else {
-    elm._vnode = renderer(elm._vnode, newVnode, false);
+    elm._vnode = renderer(elm._vnode, newVnode);
   }
 }
 

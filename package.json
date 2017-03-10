@@ -5,10 +5,12 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf dist/transpiled-core/",
-    "build": "npm run transpile",
+    "copy.fonts": "cp -R src/fonts/ dist/fonts/",
+    "build": "npm run transpile && npm run build.themes",
     "build.angular": "cd src/bindings/angular/ && npm run build",
     "build.components": "cd src/compiler && npm run build && node ../../scripts/build.components.js",
     "build.web": "cd src/bindings/web/ && npm run build",
+    "build.themes": "node-sass src/themes/ionic.scss --output dist/themes/",
     "gzip": "gzip --keep -f dist/ionic-web/dist/ionic.web.min.js",
     "minify": "babili dist/ionic-web/dist/ionic.web.js -o dist/ionic-web/dist/ionic.web.min.js && npm run gzip && ls -alH dist/ionic-web/dist/",
     "start": "npm install && npm run build",

@@ -13,6 +13,7 @@ export { IonContent } from './content/content';
 export { IonHeader } from './header/header';
 export { IonItem } from './item/item';
 export { IonList } from './list/list';
+export { IonListHeader } from './list-header/list-header';
 export { IonNav } from './nav/nav';
 export { IonTitle } from './title/title';
 export { IonToolbar } from './toolbar/toolbar';

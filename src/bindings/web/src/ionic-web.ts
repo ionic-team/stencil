@@ -19,6 +19,7 @@ import {
   IonHeader,
   IonItem,
   IonList,
+  IonListHeader,
   IonNav,
   IonTitle,
   IonToolbar
@@ -37,6 +38,7 @@ defineElements(window, {
   'ion-header': IonHeader,
   'ion-item': IonItem,
   'ion-list': IonList,
+  'ion-list-header': IonListHeader,
   'ion-nav': IonNav,
   'ion-title': IonTitle,
   'ion-toolbar': IonToolbar
