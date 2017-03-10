@@ -4,7 +4,7 @@ import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element'
 export class IonBadge extends IonElement {
 
   render(): VNode {
-    return h('.badge');
+    return h('.badge', h('slot'));
   }
 
 }

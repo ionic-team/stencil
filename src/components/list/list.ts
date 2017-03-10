@@ -1,4 +1,4 @@
-import { IonElement, h, VNode } from '../../element/ion-element';
+import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element';
 
 
 export class IonList extends IonElement {
@@ -8,3 +8,12 @@ export class IonList extends IonElement {
   }
 
 }
+
+(<IonicComponent>IonList).$annotations = {
+  tag: 'ion-list',
+  preprocessStyles: [
+    'list.scss',
+    'list.md.scss',
+  ]
+};
+
