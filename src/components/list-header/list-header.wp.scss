@@ -32,7 +32,7 @@ $list-wp-header-color:           $list-wp-text-color !default;
 // --------------------------------------------------
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-wp) {
-  :host-context([color=#{$color-name}]) {
+  :host([color=#{$color-name}]) {
     color: $color-contrast;
     background-color: $color-base;
   }

@@ -27,7 +27,7 @@ $badge-ios-text-color:         color-contrast($colors-ios, $badge-ios-background
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
 
-  :host-context([color=#{$color-name}]) {
+  :host([color=#{$color-name}]) {
     color: $color-contrast;
     background-color: $color-base;
   }

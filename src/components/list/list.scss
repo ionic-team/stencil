@@ -15,7 +15,7 @@
   list-style-type: none;
 }
 
-:host-context([inset]) {
+:host([inset]) {
   overflow: hidden;
 
   transform: translateZ(0);

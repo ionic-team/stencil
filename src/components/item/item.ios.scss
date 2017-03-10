@@ -48,7 +48,7 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
 // iOS Item
 // --------------------------------------------------
 
-.item-ios {
+:host {
   position: relative;
 
   padding-left: $item-ios-padding-left;
@@ -60,29 +60,29 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
   transition: background-color 200ms linear;
 }
 
-.item-ios.activated {
+:host(.activated) {
   background-color: $list-ios-activated-background-color;
   transition-duration: 0ms;
 }
 
-.item-ios h1 {
+h1 {
   margin: 0 0 2px;
 
   font-size: 2.4rem;
   font-weight: normal;
 }
 
-.item-ios h2 {
+h2 {
   margin: 0 0 2px;
 
   font-size: 1.7rem;
   font-weight: normal;
 }
 
-.item-ios h3,
-.item-ios h4,
-.item-ios h5,
-.item-ios h6 {
+h3,
+h4,
+h5,
+h6 {
   margin: 0 0 3px;
 
   font-size: 1.4rem;
@@ -90,7 +90,7 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
   line-height: normal;
 }
 
-.item-ios p {
+p {
   overflow: inherit;
 
   margin: $item-ios-paragraph-margin;
@@ -101,16 +101,16 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
   color: $item-ios-paragraph-text-color;
 }
 
-.item-ios h2:last-child,
-.item-ios h3:last-child,
-.item-ios h4:last-child,
-.item-ios h5:last-child,
-.item-ios h6:last-child,
-.item-ios p:last-child {
+h2:last-child,
+h3:last-child,
+h4:last-child,
+h5:last-child,
+h6:last-child,
+p:last-child {
   margin-bottom: 0;
 }
 
-.item-ios.item-block .item-inner {
+:host(.item-block) .item-inner {
   padding-right: ($item-ios-padding-right / 2);
 
   border-bottom: $hairlines-width solid $list-ios-border-color;
@@ -120,22 +120,22 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
 // iOS Item Media
 // --------------------------------------------------
 
-.item-ios [item-left] {
+[item-left] {
   margin: $item-ios-padding-media-top $item-ios-padding-left $item-ios-padding-media-bottom 0;
 }
 
-.item-ios [item-right] {
+[item-right] {
   margin: $item-ios-padding-media-top ($item-ios-padding-left / 2) $item-ios-padding-media-bottom ($item-ios-padding-right / 2);
 }
 
-.item-ios ion-icon[item-left],
-.item-ios ion-icon[item-right] {
+ion-icon[item-left],
+ion-icon[item-right] {
   margin-top: $item-ios-padding-icon-top;
   margin-bottom: $item-ios-padding-icon-bottom;
   margin-left: 0;
 }
 
-.item-ios .item-button {
+.item-button {
   padding: 0 .5em;
 
   height: 24px;
@@ -143,18 +143,18 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
   font-size: 1.3rem;
 }
 
-.item-ios .item-button[icon-only] ion-icon,
-.item-ios .item-button[icon-only] {
+.item-button[icon-only] ion-icon,
+.item-button[icon-only] {
   padding: 0 1px;
 }
 
-.item-ios ion-avatar[item-left],
-.item-ios ion-thumbnail[item-left] {
+ion-avatar[item-left],
+ion-thumbnail[item-left] {
   margin: ($item-ios-padding-right / 2) $item-ios-padding-right ($item-ios-padding-right / 2) 0;
 }
 
-.item-ios ion-avatar[item-right],
-.item-ios ion-thumbnail[item-right] {
+ion-avatar[item-right],
+ion-thumbnail[item-right] {
   margin: ($item-ios-padding-right / 2);
 }
 
@@ -162,13 +162,13 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
 // iOS Item Avatar
 // --------------------------------------------------
 
-.item-ios ion-avatar {
+ion-avatar {
   min-width: $item-ios-avatar-size;
   min-height: $item-ios-avatar-size;
 }
 
-.item-ios ion-avatar ion-img,
-.item-ios ion-avatar img {
+ion-avatar ion-img,
+ion-avatar img {
   width: $item-ios-avatar-size;
   height: $item-ios-avatar-size;
 
@@ -181,13 +181,13 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
 // iOS Item Thumbnail
 // --------------------------------------------------
 
-.item-ios ion-thumbnail {
+ion-thumbnail {
   min-width: $item-ios-thumbnail-size;
   min-height: $item-ios-thumbnail-size;
 }
 
-.item-ios ion-thumbnail ion-img,
-.item-ios ion-thumbnail img {
+ion-thumbnail ion-img,
+ion-thumbnail img {
   width: $item-ios-thumbnail-size;
   height: $item-ios-thumbnail-size;
 }
@@ -220,7 +220,7 @@ ion-item-group .item-ios:first-child .item-inner {
 }
 
 ion-item-group .item-ios:last-child .item-inner,
-ion-item-group .item-wrapper:last-child .item-ios .item-inner {
+ion-item-group .item-wrapper:last-child .item-inner {
   border: 0;
 }
 
@@ -242,7 +242,7 @@ ion-item-group .item-wrapper:last-child .item-ios .item-inner {
 @each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
   // If there is text with a color it should use this color
   // and override whatever item sets it to
-  .item-ios .text-ios-#{$color-name} {
+  .text-ios-#{$color-name} {
     color: $color-base;
   }
 

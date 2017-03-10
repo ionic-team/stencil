@@ -15,9 +15,11 @@
 //   [ion-item]
 
 :host {
-  contain: content;
+  display: block;
 
   visibility: inherit !important;
+
+  contain: content;
 }
 
 .item-block {
@@ -71,8 +73,8 @@
   text-overflow: ellipsis;
 }
 
-:host-context([no-lines]),
-:host-context([no-lines]) .item-inner {
+.item[no-lines],
+.item.item[no-lines] .item-inner {
   border: 0;
 }
 

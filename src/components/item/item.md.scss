@@ -51,7 +51,7 @@ $item-md-divider-padding:            5px 15px !default;
 $item-md-sliding-content-background: $list-md-background-color !default;
 
 
-.item-md {
+:host {
   position: relative;
 
   padding-right: 0;
@@ -67,32 +67,32 @@ $item-md-sliding-content-background: $list-md-background-color !default;
   transition: background-color 300ms cubic-bezier(.4, 0, .2, 1);
 }
 
-.item-md.activated {
+:host(.activated) {
   background-color: $list-md-activated-background-color;
 }
 
-.item-md[no-lines] {
+:host([no-lines]) {
   border-width: 0;
 }
 
-.item-md h1 {
+h1 {
   margin: 0 0 2px;
 
   font-size: 2.4rem;
   font-weight: normal;
 }
 
-.item-md h2 {
+h2 {
   margin: 2px 0;
 
   font-size: 1.6rem;
   font-weight: normal;
 }
 
-.item-md h3,
-.item-md h4,
-.item-md h5,
-.item-md h6 {
+h3,
+h4,
+h5,
+h6 {
   margin: 2px 0;
 
   font-size: 1.4rem;
@@ -100,7 +100,7 @@ $item-md-sliding-content-background: $list-md-background-color !default;
   line-height: normal;
 }
 
-.item-md p {
+p {
   overflow: inherit;
 
   margin: 0 0 2px;
@@ -111,7 +111,7 @@ $item-md-sliding-content-background: $list-md-background-color !default;
   color: $item-md-paragraph-text-color;
 }
 
-.item-md.item-block .item-inner {
+:host(.item-block) .item-inner {
   padding-right: ($item-md-padding-right / 2);
 
   border-bottom: 1px solid $list-md-border-color;
@@ -140,19 +140,19 @@ $item-md-sliding-content-background: $list-md-background-color !default;
 // Material Design Item Media
 // --------------------------------------------------
 
-.item-md [item-left],
-.item-md [item-right] {
+[item-left],
+[item-right] {
   margin: $item-md-padding-media-top ($item-md-padding-right / 2) $item-md-padding-media-bottom 0;
 }
 
-.item-md ion-icon[item-left],
-.item-md ion-icon[item-right] {
+ion-icon[item-left],
+ion-icon[item-right] {
   margin-top: $item-md-padding-icon-top;
   margin-bottom: $item-md-padding-icon-bottom;
   margin-left: 0;
 }
 
-.item-md .item-button {
+.item-button {
   padding: 0 .6em;
 
   height: 25px;
@@ -160,23 +160,23 @@ $item-md-sliding-content-background: $list-md-background-color !default;
   font-size: 1.2rem;
 }
 
-.item-md .item-button[icon-only] ion-icon,
-.item-md .item-button[icon-only] {
+.item-button[icon-only] ion-icon,
+.item-button[icon-only] {
   padding: 0 1px;
 }
 
-.item-md ion-icon[item-left] + .item-inner,
-.item-md ion-icon[item-left] + .item-input {
+ion-icon[item-left] + .item-inner,
+ion-icon[item-left] + .item-input {
   margin-left: $item-md-padding-left + ($item-md-padding-left / 2);
 }
 
-.item-md ion-avatar[item-left],
-.item-md ion-thumbnail[item-left] {
+ion-avatar[item-left],
+ion-thumbnail[item-left] {
   margin: ($item-md-padding-right / 2) $item-md-padding-right ($item-md-padding-right / 2) 0;
 }
 
-.item-md ion-avatar[item-right],
-.item-md ion-thumbnail[item-right] {
+ion-avatar[item-right],
+ion-thumbnail[item-right] {
   margin: ($item-md-padding-right / 2);
 }
 
@@ -184,13 +184,13 @@ $item-md-sliding-content-background: $list-md-background-color !default;
 // Material Design Item Avatar
 // --------------------------------------------------
 
-.item-md ion-avatar {
+ion-avatar {
   min-width: $item-md-avatar-size;
   min-height: $item-md-avatar-size;
 }
 
-.item-md ion-avatar ion-img,
-.item-md ion-avatar img {
+ion-avatar ion-img,
+ion-avatar img {
   width: $item-md-avatar-size;
   height: $item-md-avatar-size;
 
@@ -203,13 +203,13 @@ $item-md-sliding-content-background: $list-md-background-color !default;
 // Material Design Item Thumbnail
 // --------------------------------------------------
 
-.item-md ion-thumbnail {
+ion-thumbnail {
   min-width: $item-md-thumbnail-size;
   min-height: $item-md-thumbnail-size;
 }
 
-.item-md ion-thumbnail ion-img,
-.item-md ion-thumbnail img {
+ion-thumbnail ion-img,
+ion-thumbnail img {
   width: $item-md-thumbnail-size;
   height: $item-md-thumbnail-size;
 }
@@ -223,7 +223,7 @@ ion-item-group .item-md:first-child .item-inner {
 }
 
 ion-item-group .item-md:last-child .item-inner,
-ion-item-group .item-md .item-wrapper:last-child .item-inner {
+ion-item-group .item-wrapper:last-child .item-inner {
   border: 0;
 }
 
@@ -248,7 +248,7 @@ ion-item-group .item-md .item-wrapper:last-child .item-inner {
 @each $color-name, $color-base, $color-contrast in get-colors($colors-md) {
   // If there is text with a color it should use this color
   // and override whatever item sets it to
-  .item-md .text-md-#{$color-name} {
+  .text-md-#{$color-name} {
     color: $color-base;
   }
 
@@ -278,7 +278,7 @@ ion-item-group .item-md .item-wrapper:last-child .item-inner {
 // Item reorder
 // --------------------------------------------------
 
-.item-md ion-reorder {
+ion-reorder {
   font-size: 1.5em;
   opacity: .3;
 }

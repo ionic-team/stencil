@@ -99,35 +99,35 @@ ion-item-options .button::before {
 // iOS Inset List
 // --------------------------------------------------
 
-:host-context([inset]) {
+:host([inset]) {
   margin: $list-inset-ios-margin-top $list-inset-ios-margin-right $list-inset-ios-margin-bottom $list-inset-ios-margin-left;
 
   border-radius: $list-inset-ios-border-radius;
 }
 
-:host-context([inset]) ion-list-header {
+:host([inset]) ion-list-header {
   background-color: $list-ios-background-color;
 }
 
-:host-context([inset]) .item {
+:host([inset]) .item {
   border-bottom: 1px solid $list-ios-border-color;
 }
 
-:host-context([inset]) .item-inner {
+:host([inset]) .item-inner {
   border-bottom: 0;
 }
 
-:host-context([inset]) > .item:first-child,
-:host-context([inset]) > .item-wrapper:first-child .item {
+:host([inset]) > .item:first-child,
+:host([inset]) > .item-wrapper:first-child .item {
   border-top: 0;
 }
 
-:host-context([inset]) > .item:last-child,
-:host-context([inset]) > .item-wrapper:last-child .item {
+:host([inset]) > .item:last-child,
+:host([inset]) > .item-wrapper:last-child .item {
   border-bottom: 0;
 }
 
-:host-context([inset]) + ion-list[inset] {
+:host([inset]) + ion-list[inset] {
   margin-top: 0;
 }
 
@@ -135,9 +135,9 @@ ion-item-options .button::before {
 // iOS No Lines List
 // --------------------------------------------------
 
-:host-context([no-lines]) ion-list-header,
-:host-context([no-lines]) ion-item-options,
-:host-context([no-lines]) .item,
-:host-context([no-lines]) .item .item-inner {
+:host([no-lines]) ion-list-header,
+:host([no-lines]) ion-item-options,
+:host([no-lines]) .item,
+:host([no-lines]) .item .item-inner {
   border-width: 0;
 }
