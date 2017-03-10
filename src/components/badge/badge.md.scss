@@ -1,6 +1,7 @@
 @import "../../themes/ionic.globals.md";
 @import "./badge";
 
+
 // Material Design Badge
 // --------------------------------------------------
 
@@ -14,7 +15,7 @@ $badge-md-background-color:         color($colors-md, primary) !default;
 $badge-md-text-color:               color-contrast($colors-md, $badge-md-background-color) !default;
 
 
-:host-context(.badge-md) {
+:host {
   border-radius: $badge-md-border-radius;
   color: $badge-md-text-color;
   background-color: $badge-md-background-color;
@@ -26,7 +27,7 @@ $badge-md-text-color:               color-contrast($colors-md, $badge-md-backgro
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-md) {
 
-  :host-context(.badge-md-#{$color-name}) {
+  :host-context([color=#{$color-name}]) {
     color: $color-contrast;
     background-color: $color-base;
   }

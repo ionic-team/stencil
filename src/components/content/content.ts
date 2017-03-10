@@ -1,4 +1,4 @@
-import { IonElement, h, VNode } from '../../element/ion-element';
+import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element';
 
 
 export class IonContent extends IonElement {
@@ -726,11 +726,6 @@ export class IonContent extends IonElement {
   //   return Math.abs(this._scroll.ev.velocityY) < this._imgVelMax;
   // }
 
-  connectedCallback() {
-    super.connectedCallback();
-
-
-  }
 
   render(): VNode {
     return h('.content', [
@@ -745,6 +740,11 @@ export class IonContent extends IonElement {
   }
 
 }
+
+(<IonicComponent>IonContent).$annotations = {
+  tag: 'ion-content',
+  cloak: false
+};
 
 // '<div class="fixed-content">' +
 //   '<ng-content select="[ion-fixed],ion-fab"></ng-content>' +
