@@ -12,8 +12,20 @@ export class IonList extends IonElement {
 (<IonicComponent>IonList).$annotations = {
   tag: 'ion-list',
   preprocessStyles: [
-    'list.scss',
+    'list.ios.scss',
     'list.md.scss',
-  ]
+    'list.wp.scss'
+  ],
+  modeStyles: {
+    'ios': [
+      'list.ios.css'
+    ],
+    'md': [
+      'list.md.css'
+    ],
+    'wp': [
+      'list.wp.css'
+    ]
+  }
 };
 

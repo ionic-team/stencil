@@ -4,12 +4,14 @@
 // --------------------------------------------------
 
 
-ion-card {
+:host {
   display: block;
   overflow: hidden;
+
+  visibility: inherit !important;
 }
 
-ion-card img {
+img {
   display: block;
 
   width: 100%;

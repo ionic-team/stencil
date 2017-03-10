@@ -21,8 +21,18 @@ export class IonTitle extends IonElement {
 (<IonicComponent>IonTitle).$annotations = {
   tag: 'ion-title',
   preprocessStyles: [
-    'title.scss',
     'title.md.scss'
-  ]
+  ],
+  modeStyles: {
+    'ios': [
+      'title.ios.css'
+    ],
+    'md': [
+      'title.md.css'
+    ],
+    'wp': [
+      'title.wp.css'
+    ]
+  }
 };
 

@@ -12,9 +12,19 @@ export class IonCard extends IonElement {
 (<IonicComponent>IonCard).$annotations = {
   tag: 'ion-card',
   preprocessStyles: [
-    'card.scss',
     'card.ios.scss',
     'card.md.scss',
     'card.wp.scss'
-  ]
+  ],
+  modeStyles: {
+    'ios': [
+      'card.ios.css'
+    ],
+    'md': [
+      'card.md.css'
+    ],
+    'wp': [
+      'card.wp.css'
+    ]
+  }
 };

@@ -2,6 +2,8 @@
 :host {
   display: flex;
 
+  visibility: inherit !important;
+
   flex: 1;
   align-items: center;
 

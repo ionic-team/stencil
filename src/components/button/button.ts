@@ -78,10 +78,20 @@ export class IonButton extends IonElement {
     strong: {type: 'boolean'}
   },
   preprocessStyles: [
-    'button.scss',
     'button.ios.scss',
     'button.md.scss',
     'button.wp.scss',
-    'button-icon.scss',
-  ]
+    // 'button-icon.scss',
+  ],
+  modeStyles: {
+    'ios': [
+      'button.ios.css'
+    ],
+    'md': [
+      'button.md.css'
+    ],
+    'wp': [
+      'button.wp.css'
+    ]
+  }
 };

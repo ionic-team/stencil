@@ -3,22 +3,19 @@ import * as path from 'path';
 import * as sass from 'node-sass';
 
 
-export function compileComponents(srcDir: string, jsDir: string, ctx?: BuildContext) {
-  if (!jsDir) {
-    jsDir = srcDir;
-  }
 
+export function compileComponents(srcDir: string, jsDir: string, cssDir: string, ctx?: BuildContext) {
   if (!ctx) {
     ctx = {};
   }
 
-  return compileComponentDirectory(srcDir, jsDir, ctx).then(() => {
+  return compileComponentDirectory(srcDir, jsDir, cssDir, ctx).then(() => {
     console.log('compileComponents done');
   });
 }
 
 
-function compileComponentDirectory(srcDir: string, jsDir: string, ctx: BuildContext) {
+function compileComponentDirectory(srcDir: string, jsDir: string, cssDir: string, ctx: BuildContext) {
   return new Promise((resolve, reject) => {
 
     fs.readdir(srcDir, (err, files) => {
@@ -35,10 +32,10 @@ function compileComponentDirectory(srcDir: string, jsDir: string, ctx: BuildCont
         const readJsPath = path.join(jsDir, fileName);
 
         if (fs.statSync(readSrcPath).isDirectory()) {
-          promises.push(compileComponentDirectory(readSrcPath, readJsPath, ctx));
+          promises.push(compileComponentDirectory(readSrcPath, readJsPath, cssDir, ctx));
 
         } else {
-          promises.push(compileComponentFile(fileName, srcDir, jsDir, ctx));
+          promises.push(compileComponentFile(fileName, srcDir, jsDir, cssDir, ctx));
         }
       });
 
@@ -51,7 +48,7 @@ function compileComponentDirectory(srcDir: string, jsDir: string, ctx: BuildCont
 }
 
 
-export function compileComponentFile(srcFileName: string, srcDir: string, jsDir: string, ctx?: BuildContext) {
+export function compileComponentFile(srcFileName: string, srcDir: string, jsDir: string, cssDir: string, ctx?: BuildContext) {
   if (!isTsFile(srcFileName)) {
     return Promise.resolve();
   }
@@ -114,8 +111,13 @@ export function compileComponentFile(srcFileName: string, srcDir: string, jsDir:
         };
 
         if (meta.annotations.preprocessStyles) {
-          preprocessStyles(meta.annotations.preprocessStyles, srcDir, (styles) => {
-            meta.annotations.styles = styles;
+          preprocessStyles(meta.annotations.preprocessStyles, srcDir, cssDir, () => {
+            // meta.annotations.styles = styles;
+
+            meta.annotations.externalStyleUrls = meta.annotations.preprocessStyles.map(styleUrl => {
+              return styleUrl.replace('.scss', '.css');
+            });
+
             delete meta.annotations.preprocessStyles;
 
             meta.jsContent = replaceAnnotations(meta.jsContent, annotationsMatch, meta.annotations);
@@ -129,6 +131,7 @@ export function compileComponentFile(srcFileName: string, srcDir: string, jsDir:
 
               resolve();
             });
+
           });
 
         } else {
@@ -142,25 +145,42 @@ export function compileComponentFile(srcFileName: string, srcDir: string, jsDir:
 }
 
 
-function preprocessStyles(fileNames: string[], srcDir: string, callback: {(styles: string)}) {
-  const sassImports = fileNames.map(f => {
-    return path.join(srcDir, f);
-  })
+function preprocessStyles(fileNames: string[], srcDir: string, cssDir: string, callback: {(styles: string)}) {
 
-  var sassConfig = {
-    data: '@charset "UTF-8"; @import "' + sassImports.join('","') + '";',
-    outputStyle: 'compressed'
-  };
+  const promises = fileNames.map(f => {
+    return new Promise(resolve => {
+      const scssFile = path.join(srcDir, f);
+      const cssFile = path.join(cssDir, f.replace('.scss', '.css'));
 
-  sass.render(sassConfig, (err, result) => {
-    if (err) {
-      console.log(err);
-      callback(null);
+      var sassConfig = {
+        file: scssFile,
+        outputStyle: 'compressed'
+      };
 
-    } else {
-      const cssOutput = result.css.toString().trim();
-      callback(cssOutput);
-    }
+      sass.render(sassConfig, (err, result) => {
+        if (err) {
+          console.log(err);
+          callback(null);
+
+        } else {
+          const cssOutput = result.css.toString().trim();
+          console.log('write', cssFile)
+
+          fs.writeFile(cssFile, cssOutput, (err) => {
+            if (err) {
+              console.log(err);
+            } else {
+              resolve();
+            }
+          });
+
+        }
+      });
+    });
+  });
+
+  Promise.all(promises).then(() => {
+    callback('');
   });
 }
 
@@ -212,6 +232,7 @@ export interface BuildContext {
 export interface Annotations {
   preprocessStyles: string[];
   styles: string;
+  externalStyleUrls: string[]
 }
 
 

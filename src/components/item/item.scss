@@ -16,6 +16,8 @@
 
 :host {
   contain: content;
+
+  visibility: inherit !important;
 }
 
 .item-block {

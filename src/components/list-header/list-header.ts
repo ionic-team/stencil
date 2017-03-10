@@ -12,7 +12,17 @@ export class IonListHeader extends IonElement {
 (<IonicComponent>IonListHeader).$annotations = {
   tag: 'ion-list-header',
   preprocessStyles: [
-    'list-header.scss',
     'list-header.md.scss',
-  ]
+  ],
+  modeStyles: {
+    'ios': [
+      'list-header.ios.css'
+    ],
+    'md': [
+      'list-header.md.css'
+    ],
+    'wp': [
+      'list-header.wp.css'
+    ]
+  }
 };

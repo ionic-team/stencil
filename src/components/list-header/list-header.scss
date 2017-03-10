@@ -1,12 +1,15 @@
 @import "../../themes/ionic.globals";
 
 
+
 // List Header
 // --------------------------------------------------
 
 :host {
   display: flex;
   overflow: hidden;
+
+  visibility: inherit !important;
 
   align-items: center;
   justify-content: space-between;

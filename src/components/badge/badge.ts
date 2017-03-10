@@ -12,9 +12,19 @@ export class IonBadge extends IonElement {
 (<IonicComponent>IonBadge).$annotations = {
   tag: 'ion-badge',
   preprocessStyles: [
-    'badge.scss',
     'badge.ios.scss',
     'badge.md.scss',
     'badge.wp.scss'
-  ]
+  ],
+  modeStyles: {
+    'ios': [
+      'badge.ios.css'
+    ],
+    'md': [
+      'badge.md.css'
+    ],
+    'wp': [
+      'badge.wp.css'
+    ]
+  }
 };

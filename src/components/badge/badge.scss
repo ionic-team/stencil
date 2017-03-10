@@ -13,6 +13,8 @@ $badge-font-weight:               bold !default;
 :host {
   display: inline-block;
 
+  visibility: inherit !important;
+
   padding: 3px 8px;
 
   min-width: 10px;

@@ -1,4 +1,6 @@
 @import "../../themes/ionic.globals.wp";
+@import "./toolbar";
+
 
 // Windows Toolbar
 // --------------------------------------------------
@@ -44,13 +46,6 @@ $toolbar-wp-button-strong-font-weight:   bold !default;
 
 /// @prop - Height of the navigation bar
 $navbar-wp-height:                       $toolbar-wp-height !default;
-
-
-.toolbar-wp {
-  padding: $toolbar-wp-padding;
-
-  min-height: $toolbar-wp-height;
-}
 
 
 // Windows Toolbar Background

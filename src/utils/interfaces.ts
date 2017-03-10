@@ -6,6 +6,7 @@ export interface GlobalIonic {
   config?: Config;
   api?: PlatformApi;
   renderer?: Renderer;
+  staticDir?: string;
 }
 
 
@@ -18,8 +19,9 @@ export interface ComponentOptions {
   tag?: string;
   styles?: string;
   styleUrl?: string;
-  externalStyleUrls?: string[];
   preprocessStyles?: string[];
+  modeStyles?: {[mode: string]: string[]}
+  cloak?: boolean;
 }
 
 

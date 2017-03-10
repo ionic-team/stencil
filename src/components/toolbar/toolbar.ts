@@ -22,25 +22,25 @@ export class IonToolbar extends IonElement {
 
 }
 
-// '<div class="toolbar-background" [ngClass]="\'toolbar-background-\' + _mode"></div>' +
-// '<ng-content select="[menuToggle],ion-buttons[left]"></ng-content>' +
-// '<ng-content select="ion-buttons[start]"></ng-content>' +
-// '<ng-content select="ion-buttons[end],ion-buttons[right]"></ng-content>' +
-// '<div class="toolbar-content" [ngClass]="\'toolbar-content-\' + _mode">' +
-//   '<ng-content></ng-content>' +
-// '</div>'
 
 (<IonicComponent>IonToolbar).$annotations = {
   tag: 'ion-toolbar',
-  externalStyleUrls: [
-    // '/dist/themes/ionic.css'
-  ],
   preprocessStyles: [
-    'toolbar.scss',
     'toolbar.ios.scss',
     'toolbar.md.scss',
     'toolbar.wp.scss',
     'toolbar-button.scss',
-  ]
+  ],
+  modeStyles: {
+    'ios': [
+      'toolbar.ios.css'
+    ],
+    'md': [
+      'toolbar.md.css'
+    ],
+    'wp': [
+      'toolbar.wp.css'
+    ]
+  }
 };
 

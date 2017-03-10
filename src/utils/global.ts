@@ -36,5 +36,12 @@ export function Ionic(opts?: GlobalIonic): GlobalIonic {
     ionic.config = new Config();
   }
 
+  if (!ionic.staticDir) {
+    const scriptElms = document.getElementsByTagName('script');
+    const paths = scriptElms[scriptElms.length - 1].src.split('/');
+    paths.pop();
+    ionic.staticDir = paths.join('/') + '/';
+  }
+
   return ionic;
 }

@@ -1,4 +1,6 @@
 @import "../../themes/ionic.globals.md";
+@import "./toolbar";
+
 
 // Material Design Toolbar
 // --------------------------------------------------
@@ -36,12 +38,6 @@ $toolbar-md-button-strong-font-weight:   bold !default;
 /// @prop - Height of the navigation bar
 $navbar-md-height:                       $toolbar-md-height !default;
 
-
-:host-context(.toolbar-md) {
-  padding: $toolbar-md-padding;
-
-  min-height: $toolbar-md-height;
-}
 
 
 // Material Design Toolbar Background

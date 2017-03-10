@@ -14,10 +14,5 @@ export class IonApp extends IonElement {
 
 (<IonicComponent>IonApp).$annotations = {
   tag: 'ion-app',
-  externalStyleUrls: [
-    // '/dist/themes/ionic.css'
-  ],
-  preprocessStyles: [
-    'app.scss'
-  ]
+  cloak: false
 };

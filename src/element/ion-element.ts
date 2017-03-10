@@ -23,32 +23,34 @@ export class IonElement extends getBaseElement() {
   constructor() {
     super();
 
-    const api = Ionic().api;
-    const annotations = (<IonicComponent>this.constructor).$annotations;
-
     this._root = this.attachShadow({mode: 'open'});
 
-    if (annotations.externalStyleUrls) {
-      annotations.externalStyleUrls.forEach(externalStyleUrl => {
-        const link = <HTMLLinkElement>api.createElement('link');
-        link.href = externalStyleUrl;
-        link.rel = 'stylesheet';
-        this._root.appendChild(link);
-      });
-    }
-
-    if (annotations.styles) {
-      const style = <HTMLStyleElement>api.createElement('style');
-      style.innerHTML = annotations.styles;
-      this._root.appendChild(style);
-    }
-
+    const annotations = (<IonicComponent>this.constructor).$annotations;
     initProperties(this, annotations.props);
   }
 
 
   connectedCallback() {
     this._q = false;
+
+    const ionic = Ionic();
+
+    const annotations = (<IonicComponent>this.constructor).$annotations;
+
+    if (annotations.modeStyles) {
+      const modeStyleFilename = annotations.modeStyles[ionic.config.get('mode')];
+      if (modeStyleFilename) {
+        const link = <HTMLLinkElement>ionic.api.createElement('link');
+        link.href = ionic.staticDir + modeStyleFilename;
+        link.rel = 'stylesheet';
+        this._root.appendChild(link);
+      }
+    }
+
+    if (annotations.cloak !== false) {
+      this.setAttribute('cloak', '');
+    }
+
     this.update();
   }
 

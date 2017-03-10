@@ -17,6 +17,8 @@ $button-round-border-radius:      64px !default;
   z-index: 0;
   display: inline-block;
 
+  visibility: inherit !important;
+
   text-align: center;
   text-overflow: ellipsis;
   text-transform: none;

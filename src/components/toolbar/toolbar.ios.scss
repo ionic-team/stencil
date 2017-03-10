@@ -1,4 +1,6 @@
 @import "../../themes/ionic.globals.ios";
+@import "./toolbar";
+
 
 // iOS Toolbar
 // --------------------------------------------------
@@ -41,13 +43,6 @@ $toolbar-ios-button-strong-font-weight:     600 !default;
 
 /// @prop - Height of the navigation bar
 $navbar-ios-height:                         $toolbar-ios-height !default;
-
-
-.toolbar-ios {
-  padding: $toolbar-ios-padding;
-
-  min-height: $toolbar-ios-height;
-}
 
 
 // iOS Toolbar Background
