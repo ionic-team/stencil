@@ -225,6 +225,14 @@ export class IonContent extends IonElement {
     //   _dom.read(this._readDimensions.bind(this));
     //   _dom.write(this._writeDimensions.bind(this));
     // }
+
+    this.onUpdate(elm => {
+      this._fixedEle = <HTMLElement>elm._root.children[0];
+      this._scrollEle = <HTMLElement>elm._root.children[1];
+
+      this._readDimensions();
+      this._writeDimensions();
+    });
   }
 
   /**
@@ -474,7 +482,8 @@ export class IonContent extends IonElement {
     let cacheHeaderHeight = this._hdrHeight;
     let cacheFooterHeight = this._ftrHeight;
     let cacheTabsPlacement = this._tabsPlacement;
-    let scrollEvent: ScrollEvent;
+    // let scrollEvent: ScrollEvent;
+    // let scrollEvent: any;
     let tabsTop = 0;
     this._pTop = 0;
     this._pRight = 0;
@@ -489,15 +498,15 @@ export class IonContent extends IonElement {
 
     // In certain cases this._scroll is undefined
     // if that is the case then we should just return
-    if (!this._scroll) return;
+    // if (!this._scroll) return;
 
-    scrollEvent = this._scroll.ev;
+    // scrollEvent = this._scroll.ev;
 
     let ele: HTMLElement = this;
-    if (!ele) {
-      // assert(false, 'ele should be valid');
-      return;
-    }
+    // if (!ele) {
+    //   assert(false, 'ele should be valid');
+    //   return;
+    // }
 
     let computedStyle: any;
     let tagName: string;
@@ -507,7 +516,7 @@ export class IonContent extends IonElement {
       ele = <HTMLElement>children[i];
       tagName = ele.tagName;
       if (tagName === 'ION-CONTENT') {
-        scrollEvent.contentElement = ele;
+        // scrollEvent.contentElement = ele;
 
         if (this._fullscreen) {
           // ******** DOM READ ****************
@@ -519,13 +528,13 @@ export class IonContent extends IonElement {
         }
 
       } else if (tagName === 'ION-HEADER') {
-        scrollEvent.headerElement = ele;
+        // scrollEvent.headerElement = ele;
 
         // ******** DOM READ ****************
         this._hdrHeight = ele.clientHeight;
 
       } else if (tagName === 'ION-FOOTER') {
-        scrollEvent.footerElement = ele;
+        // scrollEvent.footerElement = ele;
 
         // ******** DOM READ ****************
         this._ftrHeight = ele.clientHeight;
@@ -581,13 +590,13 @@ export class IonContent extends IonElement {
     }
 
     // ******** DOM READ ****************
-    const contentDimensions = this.getContentDimensions();
-    scrollEvent.scrollHeight = contentDimensions.scrollHeight;
-    scrollEvent.scrollWidth = contentDimensions.scrollWidth;
-    scrollEvent.contentHeight = contentDimensions.contentHeight;
-    scrollEvent.contentWidth = contentDimensions.contentWidth;
-    scrollEvent.contentTop = contentDimensions.contentTop;
-    scrollEvent.contentBottom = contentDimensions.contentBottom;
+    // const contentDimensions = this.getContentDimensions();
+    // scrollEvent.scrollHeight = contentDimensions.scrollHeight;
+    // scrollEvent.scrollWidth = contentDimensions.scrollWidth;
+    // scrollEvent.contentHeight = contentDimensions.contentHeight;
+    // scrollEvent.contentWidth = contentDimensions.contentWidth;
+    // scrollEvent.contentTop = contentDimensions.contentTop;
+    // scrollEvent.contentBottom = contentDimensions.contentBottom;
 
     this._dirty = (
       cachePaddingTop !== this._pTop ||
@@ -602,7 +611,7 @@ export class IonContent extends IonElement {
       this._cBottom !== this.contentBottom
     );
 
-    this._scroll.init(this._scrollEle, this._cTop, this._cBottom);
+    // this._scroll.init(this._scrollEle, this._cTop, this._cBottom);
 
     // initial imgs refresh
     // this.imgsUpdate();

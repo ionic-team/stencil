@@ -87,6 +87,10 @@ export class IonElement extends getBaseElement() {
         // vdom diff and patch the host element for differences
         patchHostElement(ionic.config, ionic.api, ionic.renderer, elm);
 
+        this._onUpdates.forEach(cb => {
+          cb(elm);
+        });
+
         // no longer queued
         elm._q = false;
       });
@@ -99,6 +103,12 @@ export class IonElement extends getBaseElement() {
       (<any>this)[toCamelCase(attrName)] = newVal;
     }
   }
+
+  onUpdate(cb: {(elm: IonElement)}) {
+    this._onUpdates.push(cb);
+  }
+
+  _onUpdates: Function[] = [];
 
   disconnectedCallback() {
     this._root = this._vnode = null;
