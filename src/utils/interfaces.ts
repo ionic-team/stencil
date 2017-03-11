@@ -22,6 +22,7 @@ export interface ComponentOptions {
   preprocessStyles?: string[];
   modeStyles?: {[mode: string]: string[]}
   cloak?: boolean;
+  shadow?: boolean;
 }
 
 

@@ -734,8 +734,7 @@ export class IonContent extends IonElement {
       ]),
       h('div.scroll-content', [
         h('slot')
-      ]),
-      // h('slot')
+      ])
     ]);
   }
 

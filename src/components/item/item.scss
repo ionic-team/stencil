@@ -15,16 +15,10 @@
 //   [ion-item]
 
 :host {
-  display: block;
-
-  visibility: inherit !important;
-
-  contain: content;
-}
-
-.item-block {
   display: flex;
   overflow: hidden;
+
+  visibility: inherit !important;
 
   align-items: center;
   justify-content: space-between;
@@ -42,6 +36,8 @@
   text-align: initial;
   text-decoration: none;
   color: inherit;
+
+  contain: content;
 }
 
 .item-inner {
@@ -73,8 +69,8 @@
   text-overflow: ellipsis;
 }
 
-.item[no-lines],
-.item.item[no-lines] .item-inner {
+:host([no-lines]),
+:host([no-lines]) .item-inner {
   border: 0;
 }
 

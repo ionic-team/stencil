@@ -23,8 +23,6 @@ export class IonElement extends getBaseElement() {
   constructor() {
     super();
 
-    this._root = this.attachShadow({mode: 'open'});
-
     const annotations = (<IonicComponent>this.constructor).$annotations;
     initProperties(this, annotations.props);
   }
@@ -36,6 +34,10 @@ export class IonElement extends getBaseElement() {
     const ionic = Ionic();
 
     const annotations = (<IonicComponent>this.constructor).$annotations;
+
+    if (annotations.shadow !== false) {
+      this._root = this.attachShadow({mode: 'open'});
+    }
 
     if (annotations.modeStyles) {
       const modeStyleFilename = annotations.modeStyles[ionic.config.get('mode')];

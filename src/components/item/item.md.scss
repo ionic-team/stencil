@@ -111,10 +111,18 @@ p {
   color: $item-md-paragraph-text-color;
 }
 
-:host(.item-block) .item-inner {
+.item-inner {
   padding-right: ($item-md-padding-right / 2);
 
   border-bottom: 1px solid $list-md-border-color;
+}
+
+// If the item has the no-lines attribute remove the bottom border from:
+// the item itself (for last-child items)
+// the item-inner class (if it is not last)
+:host([no-lines]),
+:host([no-lines]) .item-inner {
+  border-width: 0;
 }
 
 
@@ -123,7 +131,7 @@ p {
 
 // Only show the forward arrow icon if true
 @if $item-md-detail-push-show == true {
-  .item-md[detail-push] .item-inner,
+  :host([detail-push]) .item-inner,
   button.item-md:not([detail-none]) .item-inner,
   a.item-md:not([detail-none]) .item-inner {
     @include svg-background-image($item-md-detail-push-svg);
@@ -140,13 +148,13 @@ p {
 // Material Design Item Media
 // --------------------------------------------------
 
-[item-left],
-[item-right] {
+[slot="item-left"],
+[slot="item-right"] {
   margin: $item-md-padding-media-top ($item-md-padding-right / 2) $item-md-padding-media-bottom 0;
 }
 
-ion-icon[item-left],
-ion-icon[item-right] {
+ion-icon[slot="item-left"],
+ion-icon[slot="item-right"] {
   margin-top: $item-md-padding-icon-top;
   margin-bottom: $item-md-padding-icon-bottom;
   margin-left: 0;
@@ -165,18 +173,18 @@ ion-icon[item-right] {
   padding: 0 1px;
 }
 
-ion-icon[item-left] + .item-inner,
-ion-icon[item-left] + .item-input {
+ion-icon[slot="item-left"] + .item-inner,
+ion-icon[slot="item-left"] + .item-input {
   margin-left: $item-md-padding-left + ($item-md-padding-left / 2);
 }
 
-ion-avatar[item-left],
-ion-thumbnail[item-left] {
+ion-avatar[slot="item-left"],
+ion-thumbnail[slot="item-left"] {
   margin: ($item-md-padding-right / 2) $item-md-padding-right ($item-md-padding-right / 2) 0;
 }
 
-ion-avatar[item-right],
-ion-thumbnail[item-right] {
+ion-avatar[slot="item-right"],
+ion-thumbnail[slot="item-right"] {
   margin: ($item-md-padding-right / 2);
 }
 
@@ -271,7 +279,7 @@ ion-item-group .item-wrapper:last-child .item-inner {
 // Material Design Item Sliding
 // --------------------------------------------------
 
-.list-md ion-item-sliding {
+ion-item-sliding {
   background-color: $item-md-sliding-content-background;
 }
 

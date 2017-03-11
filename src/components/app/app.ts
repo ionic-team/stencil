@@ -4,9 +4,7 @@ import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element'
 export class IonApp extends IonElement {
 
   render(): VNode {
-    return h('.app', [
-      h('slot')
-    ]);
+    return h('.app');
   }
 
 }
@@ -14,5 +12,6 @@ export class IonApp extends IonElement {
 
 (<IonicComponent>IonApp).$annotations = {
   tag: 'ion-app',
-  cloak: false
+  cloak: false,
+  shadow: false
 };

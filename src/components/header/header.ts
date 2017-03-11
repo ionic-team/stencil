@@ -4,26 +4,13 @@ import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element'
 export class IonHeader extends IonElement {
 
   render(): VNode {
-    return h('.header', h('slot'));
+    return h('.header');
   }
 
 }
 
 (<IonicComponent>IonHeader).$annotations = {
   tag: 'ion-header',
-  preprocessStyles: [
-    'header.md.scss',
-  ],
-  modeStyles: {
-    'ios': [
-      'header.ios.css'
-    ],
-    'md': [
-      'header.md.css'
-    ],
-    'wp': [
-      'header.wp.css'
-    ]
-  },
-  cloak: false
+  cloak: false,
+  shadow: false
 };

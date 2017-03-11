@@ -267,6 +267,24 @@ ion-header {
   width: 100%;
 }
 
+.header-md:after {
+  // using datauri png background image for improved scroll performance
+  // rather than using `box-shadow: 0 2px 5px rgba(0,0,0,0.26);`
+  // noticable performance difference on older Android devices
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+
+  width: 100%;
+  height: 5px;
+
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAHBAMAAADzDtBxAAAAD1BMVEUAAAAAAAAAAAAAAAAAAABPDueNAAAABXRSTlMUCS0gBIh/TXEAAAAaSURBVAjXYxCEAgY4UIICBmMogMsgFLtAAQCNSwXZKOdPxgAAAABJRU5ErkJggg==);
+  background-repeat: repeat-x;
+  background-position: 0 -2px;
+
+  content: "";
+}
+
 ion-footer {
   position: absolute;
   bottom: 0;
