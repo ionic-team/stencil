@@ -1,0 +1,11 @@
+@import "../../themes/ionic.globals.ios";
+
+
+// iOS Toolbar - Light DOM
+// --------------------------------------------------
+
+.toolbar-ios {
+  padding: $toolbar-ios-padding;
+
+  min-height: $toolbar-ios-height;
+}

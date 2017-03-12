@@ -1,0 +1,15 @@
+@import "../../themes/ionic.globals";
+
+
+// Footer - Light DOM
+// --------------------------------------------------
+
+ion-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: $z-index-toolbar;
+  display: block;
+
+  width: 100%;
+}

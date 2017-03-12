@@ -1,0 +1,11 @@
+@import "../../themes/ionic.globals.wp";
+
+
+// Windows Toolbar - Light DOM
+// --------------------------------------------------
+
+.toolbar-wp {
+  padding: $toolbar-wp-padding;
+
+  min-height: $toolbar-wp-height;
+}

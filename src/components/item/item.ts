@@ -13,7 +13,7 @@ export class IonItem extends IonElement {
           ]),
           h('slot', { attrs: { name: 'input' } }),
         ]),
-        h('slot', { attrs: { name: 'item-right' } }),
+        h('div.item-right', h('slot', { attrs: { name: 'item-right' } })),
         h('ion-reorder')
       ]),
       h('button-effect')
