@@ -1,4 +1,5 @@
 @import "../../themes/ionic.globals.ios";
+@import "../../themes/ionic.theme.default";
 @import "./label";
 
 
@@ -63,6 +64,7 @@ $label-ios-margin:             $item-ios-padding-top ($item-ios-padding-right / 
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
 
+  :host([color=#{$color-name}]),
   .label-ios-#{$color-name},
   .item-input .label-ios-#{$color-name},
   .item-select .label-ios-#{$color-name},

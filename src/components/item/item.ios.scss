@@ -32,15 +32,6 @@ $item-ios-detail-push-color:              $list-ios-border-color !default;
 /// @prop - Icon for the detail arrow
 $item-ios-detail-push-svg:                "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20'><path d='M2,20l-2-2l8-8L0,2l2-2l10,10L2,20z' fill='#{$item-ios-detail-push-color}'/></svg>" !default;
 
-/// @prop - Background for the divider
-$item-ios-divider-background:             #f7f7f7 !default;
-
-/// @prop - Color for the divider
-$item-ios-divider-color:                  #222 !default;
-
-/// @prop - Padding for the divider
-$item-ios-divider-padding:                5px 15px !default;
-
 /// @prop - Background for the sliding content
 $item-ios-sliding-content-background:     $list-ios-background-color !default;
 
@@ -222,17 +213,6 @@ ion-item-group .item-ios:first-child .item-inner {
 ion-item-group .item-ios:last-child .item-inner,
 ion-item-group .item-wrapper:last-child .item-inner {
   border: 0;
-}
-
-
-// iOS Item Divider
-// --------------------------------------------------
-
-.item-divider-ios {
-  padding-left: $item-ios-padding-left;
-
-  color: $item-ios-divider-color;
-  background-color: $item-ios-divider-background;
 }
 
 

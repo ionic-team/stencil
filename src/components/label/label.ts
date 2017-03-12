@@ -11,21 +11,20 @@ export class IonLabel extends IonElement {
 
 (<IonicComponent>IonLabel).$annotations = {
   tag: 'ion-label',
-  // preprocessStyles: [
-  //   'label.ios.scss',
-  //   'label.md.scss',
-  //   'label.wp.scss'
-  // ],
-  // modeStyles: {
-  //   'ios': [
-  //     'label.ios.css'
-  //   ],
-  //   'md': [
-  //     'label.md.css'
-  //   ],
-  //   'wp': [
-  //     'label.wp.css'
-  //   ]
-  // }
+  preprocessStyles: [
+    'label.ios.scss',
+    'label.md.scss',
+    'label.wp.scss'
+  ],
+  modeStyles: {
+    'ios': [
+      'label.ios.css'
+    ],
+    'md': [
+      'label.md.css'
+    ],
+    'wp': [
+      'label.wp.css'
+    ]
+  }
 };
-

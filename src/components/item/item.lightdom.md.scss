@@ -1,0 +1,17 @@
+@import "../../themes/ionic.globals.md";
+
+
+// Material Design Item - Light DOM
+// --------------------------------------------------
+
+.item-md [slot="item-left"],
+.item-md [slot="item-right"] {
+  margin: $item-md-padding-media-top ($item-md-padding-right / 2) $item-md-padding-media-bottom 0;
+}
+
+.item-md ion-icon[slot="item-left"],
+.item-md ion-icon[slot="item-right"] {
+  margin-top: $item-md-padding-icon-top;
+  margin-bottom: $item-md-padding-icon-bottom;
+  margin-left: 0;
+}

@@ -5,12 +5,6 @@
 // Material Design Item
 // --------------------------------------------------
 
-/// @prop - Font size of the item text
-$item-md-body-text-font-size:        1.4rem !default;
-
-/// @prop - line height of the item text
-$item-md-body-text-line-height:      1.5 !default;
-
 /// @prop - Color of the item paragraph
 $item-md-paragraph-text-color:       #666 !default;
 
@@ -31,21 +25,6 @@ $item-md-detail-push-color:          $list-md-border-color !default;
 
 /// @prop - Icon for the detail arrow
 $item-md-detail-push-svg:            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20'><path d='M2,20l-2-2l8-8L0,2l2-2l10,10L2,20z' fill='#{$item-md-detail-push-color}'/></svg>" !default;
-
-/// @prop - Color for the divider
-$item-md-divider-color:              #858585 !default;
-
-/// @prop - Background for the divider
-$item-md-divider-background:         #fff !default;
-
-/// @prop - Font size for the divider
-$item-md-divider-font-size:          $item-md-body-text-font-size !default;
-
-/// @prop - Border bottom for the divider
-$item-md-divider-border-bottom:      1px solid $list-md-border-color !default;
-
-/// @prop - Padding for the divider
-$item-md-divider-padding:            5px 15px !default;
 
 /// @prop - Background for the sliding content
 $item-md-sliding-content-background: $list-md-background-color !default;
@@ -148,18 +127,6 @@ p {
 // Material Design Item Media
 // --------------------------------------------------
 
-[slot="item-left"],
-[slot="item-right"] {
-  margin: $item-md-padding-media-top ($item-md-padding-right / 2) $item-md-padding-media-bottom 0;
-}
-
-ion-icon[slot="item-left"],
-ion-icon[slot="item-right"] {
-  margin-top: $item-md-padding-icon-top;
-  margin-bottom: $item-md-padding-icon-bottom;
-  margin-left: 0;
-}
-
 .item-button {
   padding: 0 .6em;
 
@@ -233,20 +200,6 @@ ion-item-group .item-md:first-child .item-inner {
 ion-item-group .item-md:last-child .item-inner,
 ion-item-group .item-wrapper:last-child .item-inner {
   border: 0;
-}
-
-
-// Material Design Item Divider
-// --------------------------------------------------
-
-.item-divider-md {
-  padding-left: $item-md-padding-left;
-
-  color: $item-md-divider-color;
-  background-color: $item-md-divider-background;
-
-  border-bottom: $item-md-divider-border-bottom;
-  font-size: $item-md-divider-font-size;
 }
 
 

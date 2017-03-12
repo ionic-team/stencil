@@ -1,4 +1,5 @@
 @import "../../themes/ionic.globals.wp";
+@import "../../themes/ionic.theme.default";
 @import "./label";
 
 
@@ -15,7 +16,7 @@ $label-wp-text-color-focused:         color($colors-wp, primary) !default;
 // Windows Default Label
 // --------------------------------------------------
 
-.label-wp {
+:host {
   margin: $item-wp-padding-top ($item-wp-padding-right / 2) $item-wp-padding-bottom 0;
 }
 
@@ -33,17 +34,17 @@ $label-wp-text-color-focused:         color($colors-wp, primary) !default;
 // Windows Stacked & Floating Labels
 // --------------------------------------------------
 
-.label-wp[stacked] {
+:host([stacked]) {
   font-size: 1.2rem;
 }
 
-.label-wp[floating] {
+:host([floating]) {
   transform: translate3d(8px, 34px, 0);
   transform-origin: left top;
 }
 
-.label-wp[stacked],
-.label-wp[floating] {
+:host([stacked]),
+:host([floating]) {
   margin-bottom: 0;
   margin-left: 0;
 }
@@ -70,6 +71,7 @@ $label-wp-text-color-focused:         color($colors-wp, primary) !default;
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-wp) {
 
+  :host([color=#{$color-name}]),
   .label-wp-#{$color-name},
   .item-input .label-wp-#{$color-name},
   .item-select .label-wp-#{$color-name},

@@ -1,9 +1,16 @@
 @import "../../themes/ionic.globals.md";
+@import "../../themes/ionic.theme.default";
 @import "./label";
 
 
 // Material Design Label
 // --------------------------------------------------
+
+/// @prop - Font size of the item text
+$label-md-body-text-font-size:        1.4rem !default;
+
+/// @prop - line height of the item text
+$label-md-body-text-line-height:      1.5 !default;
 
 /// @prop - Text color of the label
 $label-md-text-color:                 #999 !default;
@@ -23,8 +30,8 @@ $label-md-margin:                     $item-md-padding-top ($item-md-padding-rig
 }
 
 [text-wrap] .label-md {
-  font-size: $item-md-body-text-font-size;
-  line-height: $item-md-body-text-line-height;
+  font-size: $label-md-body-text-font-size;
+  line-height: $label-md-body-text-line-height;
 }
 
 // Material Design Default Label Inside An Input/Select Item
@@ -40,18 +47,18 @@ $label-md-margin:                     $item-md-padding-top ($item-md-padding-rig
 // Material Design Stacked & Floating Labels
 // --------------------------------------------------
 
-.label-md[stacked] {
+:host([stacked]) {
   font-size: 1.2rem;
 }
 
-.label-md[floating] {
+:host([floating]) {
   transform: translate3d(0, 27px, 0);
   transform-origin: left top;
   transition: transform 150ms ease-in-out;
 }
 
-.label-md[stacked],
-.label-md[floating] {
+:host([stacked]),
+:host([floating]) {
   margin-bottom: 0;
   margin-left: 0;
 }
@@ -78,6 +85,7 @@ $label-md-margin:                     $item-md-padding-top ($item-md-padding-rig
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-md) {
 
+  :host([color=#{$color-name}]),
   .label-md-#{$color-name},
   .item-input .label-md-#{$color-name},
   .item-select .label-md-#{$color-name},
