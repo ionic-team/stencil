@@ -74,33 +74,11 @@
   border: 0;
 }
 
-ion-item-group {
-  display: block;
-}
-
-ion-item-divider {
-  z-index: $z-index-item-divider;
-  display: flex;
-  overflow: hidden;
-
-  align-items: center;
-  justify-content: space-between;
-
-  margin: 0;
-  padding: 0;
-
-  width: 100%;
-
-  min-height: 30px;
-}
-
-ion-item-divider[sticky] {
-  position: sticky;
-  top: 0;
-}
-
 [vertical-align-top],
 ion-input.item {
   align-items: flex-start;
 }
 
+ion-item-group {
+  display: block;
+}

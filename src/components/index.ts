@@ -3,6 +3,7 @@ export { VNode, VNodeData} from '../utils/interfaces';
 
 
 export { IonApp } from './app/app';
+export { IonAvatar } from './avatar/avatar';
 export { IonBadge } from './badge/badge';
 export { IonButton } from './button/button';
 export { IonCard } from './card/card';
@@ -16,5 +17,6 @@ export { IonLabel } from './label/label';
 export { IonList } from './list/list';
 export { IonListHeader } from './list-header/list-header';
 export { IonNav } from './nav/nav';
+export { IonThumbnail } from './thumbnail/thumbnail';
 export { IonTitle } from './title/title';
 export { IonToolbar } from './toolbar/toolbar';

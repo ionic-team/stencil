@@ -22,6 +22,7 @@ import {
   IonList,
   IonListHeader,
   IonNav,
+  IonThumbnail,
   IonTitle,
   IonToolbar
 } from '../../../components/index';
@@ -42,6 +43,7 @@ defineElements(window, {
   'ion-list': IonList,
   'ion-list-header': IonListHeader,
   'ion-nav': IonNav,
+  'ion-thumbnail': IonThumbnail,
   'ion-title': IonTitle,
   'ion-toolbar': IonToolbar
 });

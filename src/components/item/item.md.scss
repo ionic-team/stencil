@@ -11,12 +11,6 @@ $item-md-paragraph-text-color:       #666 !default;
 /// @prop - Font size of the item
 $item-md-font-size:                  1.6rem !default;
 
-/// @prop - Size of the avatar in the item
-$item-md-avatar-size:                40px !default;
-
-/// @prop - Size of the thumbnail in the item
-$item-md-thumbnail-size:             80px !default;
-
 /// @prop - Shows the detail arrow icon on an item
 $item-md-detail-push-show:           false !default;
 
@@ -138,55 +132,6 @@ p {
 .item-button[icon-only] ion-icon,
 .item-button[icon-only] {
   padding: 0 1px;
-}
-
-ion-icon[slot="item-left"] + .item-inner,
-ion-icon[slot="item-left"] + .item-input {
-  margin-left: $item-md-padding-left + ($item-md-padding-left / 2);
-}
-
-ion-avatar[slot="item-left"],
-ion-thumbnail[slot="item-left"] {
-  margin: ($item-md-padding-right / 2) $item-md-padding-right ($item-md-padding-right / 2) 0;
-}
-
-ion-avatar[slot="item-right"],
-ion-thumbnail[slot="item-right"] {
-  margin: ($item-md-padding-right / 2);
-}
-
-
-// Material Design Item Avatar
-// --------------------------------------------------
-
-ion-avatar {
-  min-width: $item-md-avatar-size;
-  min-height: $item-md-avatar-size;
-}
-
-ion-avatar ion-img,
-ion-avatar img {
-  width: $item-md-avatar-size;
-  height: $item-md-avatar-size;
-
-  border-radius: 50%;
-
-  overflow: hidden;
-}
-
-
-// Material Design Item Thumbnail
-// --------------------------------------------------
-
-ion-thumbnail {
-  min-width: $item-md-thumbnail-size;
-  min-height: $item-md-thumbnail-size;
-}
-
-ion-thumbnail ion-img,
-ion-thumbnail img {
-  width: $item-md-thumbnail-size;
-  height: $item-md-thumbnail-size;
 }
 
 

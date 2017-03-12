@@ -32,6 +32,9 @@ $list-inset-ios-margin-left:          16px !default;
 /// @prop - Border radius of the inset list
 $list-inset-ios-border-radius:        4px !default;
 
+/// @prop - Background for the sliding content
+$item-ios-sliding-content-background:     $list-ios-background-color !default;
+
 
 // iOS Default List
 // --------------------------------------------------
@@ -140,4 +143,26 @@ ion-item-options .button::before {
 :host([no-lines]) .item,
 :host([no-lines]) .item .item-inner {
   border-width: 0;
+}
+
+
+
+// iOS Item Sliding
+// --------------------------------------------------
+
+ion-item-sliding {
+  background-color: $item-ios-sliding-content-background;
+}
+
+
+// iOS Item Group
+// --------------------------------------------------
+
+ion-item-group .item-ios:first-child .item-inner {
+  border-top-width: 0;
+}
+
+ion-item-group .item-ios:last-child .item-inner,
+ion-item-group .item-wrapper:last-child .item-inner {
+  border: 0;
 }

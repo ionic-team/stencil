@@ -1,0 +1,28 @@
+@import "../../themes/ionic.globals.ios";
+
+
+// iOS Item Thumbnail
+// --------------------------------------------------
+
+/// @prop - Size of the thumbnail in the item
+$item-ios-thumbnail-size:                 56px !default;
+
+
+:host {
+  min-width: $item-ios-thumbnail-size;
+  min-height: $item-ios-thumbnail-size;
+}
+
+ion-img,
+img {
+  width: $item-ios-thumbnail-size;
+  height: $item-ios-thumbnail-size;
+}
+
+:host([slot="item-left"]) {
+  margin: ($item-ios-padding-right / 2) $item-ios-padding-right ($item-ios-padding-right / 2) 0;
+}
+
+:host([slot="item-right"]) {
+  margin: ($item-ios-padding-right / 2);
+}

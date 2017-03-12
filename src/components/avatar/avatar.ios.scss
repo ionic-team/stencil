@@ -1,0 +1,32 @@
+@import "../../themes/ionic.globals.ios";
+
+
+// iOS Item Avatar
+// --------------------------------------------------
+
+/// @prop - Size of the avatar in the item
+$item-ios-avatar-size:                    36px !default;
+
+
+:host {
+  min-width: $item-ios-avatar-size;
+  min-height: $item-ios-avatar-size;
+}
+
+ion-img,
+img {
+  width: $item-ios-avatar-size;
+  height: $item-ios-avatar-size;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+}
+
+:host([slot="item-left"]) {
+  margin: ($item-ios-padding-right / 2) $item-ios-padding-right ($item-ios-padding-right / 2) 0;
+}
+
+:host([slot="item-right"]) {
+  margin: ($item-ios-padding-right / 2);
+}
