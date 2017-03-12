@@ -88,6 +88,7 @@ body {
 // --------------------------------------------------
 
 a {
+  color: $link-color;
   background-color: transparent;
 }
 
@@ -108,17 +109,13 @@ h6 {
   line-height: $headings-line-height;
 }
 
-[padding] {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    &:first-child {
-      margin-top: -.3rem;
-    }
-  }
+[padding] h1:first-child,
+[padding] h2:first-child,
+[padding] h3:first-child,
+[padding] h4:first-child,
+[padding] h5:first-child,
+[padding] h6:first-child {
+  margin-top: -.3rem;
 }
 
 h1 + h2,

@@ -32,41 +32,44 @@ $list-inset-wp-margin-left:      16px !default;
 /// @prop - Border radius of the inset list
 $list-inset-wp-border-radius:    2px !default;
 
+/// @prop - Background for the sliding content
+$item-wp-sliding-content-background: $list-wp-background-color !default;
+
 
 // Windows Default List
 // --------------------------------------------------
 
-.list-wp {
+:host {
   margin: 0 $list-wp-margin-right $list-wp-margin-bottom $list-wp-margin-left;
 }
 
-.list-wp .item-block .item-inner {
+.item-block .item-inner {
   border-bottom: 1px solid $list-wp-border-color;
 }
 
-.list-wp > .item-block:first-child,
-.list-wp > .item-wrapper:first-child .item-block {
+.item-block:first-child,
+.item-wrapper:first-child .item-block {
   border-top: 1px solid $list-wp-border-color;
 }
 
-.list-wp > .item-block:last-child,
-.list-wp > .item-wrapper:last-child .item-block {
+.item-block:last-child,
+.item-wrapper:last-child .item-block {
   border-bottom: 1px solid $list-wp-border-color;
 }
 
-.list-wp > .item-block:last-child,
-.list-wp > .item-wrapper:last-child {
+.item-block:last-child,
+.item-wrapper:last-child {
   ion-label,
   .item-inner {
     border-bottom: 0;
   }
 }
 
-.list-wp > ion-input:last-child::after {
+ion-input:last-child::after {
   left: 0;
 }
 
-.list-wp ion-item-options .button {
+ion-item-options .button {
   display: inline-flex;
 
   align-items: center;
@@ -82,15 +85,15 @@ $list-inset-wp-border-radius:    2px !default;
   box-sizing: border-box;
 }
 
-.list-wp ion-item-options .button::before {
+ion-item-options .button::before {
   margin: 0 auto;
 }
 
 // If the item has the no-lines attribute remove the bottom border from:
 // the item itself (for last-child items)
 // the item-inner class (if it is not last)
-.list-wp .item[no-lines],
-.list-wp .item[no-lines] .item-inner {
+.item[no-lines],
+.item[no-lines] .item-inner {
   border-width: 0;
 }
 
@@ -103,34 +106,34 @@ $list-inset-wp-border-radius:    2px !default;
 // Windows Insert List
 // --------------------------------------------------
 
-.list-wp[inset] {
+:host([inset]) {
   margin: $list-inset-wp-margin-top $list-inset-wp-margin-right $list-inset-wp-margin-bottom $list-inset-wp-margin-left;
 
   border-radius: $list-inset-wp-border-radius;
 }
 
-.list-wp[inset] .item:first-child {
+:host([inset]) .item:first-child {
   border-top-width: 0;
   border-top-left-radius: $list-inset-wp-border-radius;
   border-top-right-radius: $list-inset-wp-border-radius;
 }
 
-.list-wp[inset] .item:last-child {
+:host([inset]) .item:last-child {
   border-bottom-width: 0;
   border-bottom-left-radius: $list-inset-wp-border-radius;
   border-bottom-right-radius: $list-inset-wp-border-radius;
 }
 
-.list-wp[inset] .item-input {
+:host([inset]) .item-input {
   padding-right: 0;
   padding-left: 0;
 }
 
-.list-wp[inset] + ion-list[inset] {
+:host([inset]) + ion-list[inset] {
   margin-top: 0;
 }
 
-.list-wp[inset] ion-list-header {
+:host([inset]) ion-list-header {
   background-color: $list-wp-background-color;
 }
 
@@ -138,7 +141,15 @@ $list-inset-wp-border-radius:    2px !default;
 // Windows No Lines List
 // --------------------------------------------------
 
-.list-wp[no-lines] .item,
-.list-wp[no-lines] .item .item-inner {
+:host([inset]) .item,
+:host([inset]) .item .item-inner {
   border-width: 0;
+}
+
+
+// Windows Item Sliding
+// --------------------------------------------------
+
+ion-item-sliding {
+  background-color: $item-wp-sliding-content-background;
 }

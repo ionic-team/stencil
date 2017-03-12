@@ -32,9 +32,6 @@ $item-wp-detail-push-color:          $input-wp-border-color !default;
 /// @prop - Icon for the detail arrow
 $item-wp-detail-push-svg:            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 20'><path d='M2,20l-2-2l8-8L0,2l2-2l10,10L2,20z' fill='#{$item-wp-detail-push-color}'/></svg>" !default;
 
-/// @prop - Background for the sliding content
-$item-wp-sliding-content-background: $list-wp-background-color !default;
-
 
 :host {
   position: relative;
@@ -171,12 +168,4 @@ ion-icon[item-left] + .item-input {
       background-color: color-shade($color-base);
     }
   }
-}
-
-
-// Windows Item Sliding
-// --------------------------------------------------
-
-.list-wp ion-item-sliding {
-  background-color: $item-wp-sliding-content-background;
 }
