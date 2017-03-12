@@ -8,6 +8,7 @@ import { defineElements } from '../../../utils/helpers';
 
 import {
   IonApp,
+  IonAvatar,
   IonBadge,
   IonButton,
   IonCard,
@@ -18,6 +19,8 @@ import {
   IonElement,
   IonHeader,
   IonItem,
+  IonItemDivider,
+  IonItemGroup,
   IonLabel,
   IonList,
   IonListHeader,
@@ -30,6 +33,7 @@ import {
 
 defineElements(window, {
   'ion-app': IonApp,
+  'ion-avatar': IonAvatar,
   'ion-badge': IonBadge,
   'ion-button': IonButton,
   'ion-card': IonCard,
@@ -39,6 +43,8 @@ defineElements(window, {
   'ion-content': IonContent,
   'ion-header': IonHeader,
   'ion-item': IonItem,
+  'ion-item-divider': IonItemDivider,
+  'ion-item-group': IonItemGroup,
   'ion-label': IonLabel,
   'ion-list': IonList,
   'ion-list-header': IonListHeader,

@@ -146,23 +146,9 @@ ion-item-options .button::before {
 }
 
 
-
 // iOS Item Sliding
 // --------------------------------------------------
 
 ion-item-sliding {
   background-color: $item-ios-sliding-content-background;
-}
-
-
-// iOS Item Group
-// --------------------------------------------------
-
-ion-item-group .item-ios:first-child .item-inner {
-  border-top-width: 0;
-}
-
-ion-item-group .item-ios:last-child .item-inner,
-ion-item-group .item-wrapper:last-child .item-inner {
-  border: 0;
 }

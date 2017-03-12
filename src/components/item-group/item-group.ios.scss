@@ -1,0 +1,14 @@
+@import "../../themes/ionic.globals.ios";
+
+
+// iOS Item Group
+// --------------------------------------------------
+
+.item-ios:first-child .item-inner {
+  border-top-width: 0;
+}
+
+.item-ios:last-child .item-inner,
+.item-wrapper:last-child .item-inner {
+  border: 0;
+}
