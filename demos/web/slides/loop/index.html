@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ionic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <link href="/dist/themes/ionic.css" rel="stylesheet">
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+</head>
+<body>
+
+  <ion-app>
+
+    
+<div class="slides-div">
+  <ion-slides #loopSlider (ionSlideDidChange)="onSlideChanged($event)" pager loop>
+    <ion-slide *ngFor="let slide of slides" [ngClass]="slide.class">
+      Loop {{ slide.name }}
+    </ion-slide>
+  </ion-slides>
+</div>
+
+
+<div class="slides-div">
+  <ion-slides (ionSlideDidChange)="onSlideChanged($event)" pager>
+    <ion-slide *ngFor="let slide of slides" [ngClass]="slide.class">
+      Don't Loop {{ slide.name }}
+    </ion-slide>
+  </ion-slides>
+</div>
+
+<style>
+  .slides-div {
+    height: 50%;
+    border-bottom: 1px solid #ccc;
+  }
+
+  .yellow {
+    background-color: #fbeb14;
+  }
+
+  .red {
+    background-color: #ED4337;
+  }
+
+  .blue {
+    background-color: #89cff0;
+  }
+</style>
+
+
+  </ion-app>
+
+</body>
+</html>

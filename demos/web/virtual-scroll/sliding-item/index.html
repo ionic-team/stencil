@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ionic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <link href="/dist/themes/ionic.css" rel="stylesheet">
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+</head>
+<body>
+
+  <ion-app>
+
+    <ion-header>
+  <ion-navbar>
+    <ion-title>Virtual Scroll{{webview}}</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="reload()">
+        Reload
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+
+  <ion-list [virtualScroll]="items"
+            [headerFn]="headerFn">
+
+    <ion-item-divider *virtualHeader="let header">
+      Header: {{header}}
+    </ion-item-divider>
+
+    <ion-item-sliding *virtualItem="let item">
+      <ion-item>Item: {{item.value}} {{item.someMethod()}}</ion-item>
+      <ion-item-options>
+        <button ion-button>Archive</button>
+      </ion-item-options>
+      <ion-item-options side="left">
+        <button ion-button danger>Remove</button>
+      </ion-item-options>
+    </ion-item-sliding>
+
+  </ion-list>
+
+</ion-content>
+
+
+  </ion-app>
+
+</body>
+</html>

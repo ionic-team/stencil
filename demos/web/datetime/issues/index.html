@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ionic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <link href="/dist/themes/ionic.css" rel="stylesheet">
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+</head>
+<body>
+
+  <ion-app>
+
+    <ion-header>
+
+  <ion-toolbar>
+    <ion-title>Datetime</ion-title>
+  </ion-toolbar>
+
+</ion-header>
+
+
+<ion-content class="outer-content">
+
+  <ion-item>
+    <ion-label>
+      min="2017-07-01"
+      max="2017-12-01"
+    </ion-label>
+    <ion-datetime
+      min="2017-07-01"
+      max="2017-12-01"
+    ></ion-datetime>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>
+      min="2017-01-01"
+      max="2017-12-01"
+    </ion-label>
+    <ion-datetime
+      min="2017-01-01"
+      max="2017-12-01"
+    ></ion-datetime>
+  </ion-item>
+
+  <ion-item>
+    <ion-label>
+      min="2017-01-15"
+      max="2017-01-30"
+    </ion-label>
+    <ion-datetime
+      min="2017-01-15"
+      max="2017-01-30"
+    ></ion-datetime>
+  </ion-item>
+
+</ion-content>
+
+
+  </ion-app>
+
+</body>
+</html>

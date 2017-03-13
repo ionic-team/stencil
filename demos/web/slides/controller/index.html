@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ionic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <link href="/dist/themes/ionic.css" rel="stylesheet">
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+</head>
+<body>
+
+  <ion-app>
+
+    
+<ion-content no-bounce>
+
+  <ion-slides class="my-slides"
+              #mySlider
+              initialSlide="1"
+              (ionSlideDidChange)="onSlideChanged()"
+              (ionSlideDrag)="onSlideMove($event)">
+
+    <ion-slide padding>
+      <h1>Slide 1</h1>
+      <button ion-button block (click)="goToPrevSlide()">Navigate Back</button>
+      <button ion-button block (click)="goToNextSlide()">Navigate Forward</button>
+      <button ion-button block (click)="goToSlide(2)">Navigate to 3rd Slide</button>
+      <button ion-button block (click)="getLength()">Get Slide Length</button>
+      <button ion-button block (click)="getIndex()">Get Index</button>
+    </ion-slide>
+
+    <ion-slide padding>
+      <h1>Slide 2</h1>
+      <button ion-button block (click)="goToPrevSlide()">Navigate Back</button>
+      <button ion-button block (click)="goToNextSlide()">Navigate Forward</button>
+      <button ion-button block (click)="goToSlide(2)">Navigate to 3rd Slide</button>
+      <button ion-button block (click)="getIndex()">Get Index</button>
+    </ion-slide>
+
+    <ion-slide padding>
+      <h1>Slide 3</h1>
+      <button ion-button block (click)="goToPrevSlide()">Navigate Back</button>
+      <button ion-button block (click)="goToNextSlide()">Navigate Forward</button>
+      <button ion-button block (click)="getIndex()">Get Index</button>
+    </ion-slide>
+
+  </ion-slides>
+
+</ion-content>
+
+  </ion-app>
+
+</body>
+</html>

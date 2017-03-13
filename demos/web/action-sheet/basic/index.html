@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ionic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <link href="/dist/themes/ionic.css" rel="stylesheet">
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+</head>
+<body>
+
+  <ion-app>
+
+    <ion-header>
+
+  <ion-navbar>
+    <ion-title>Action Sheet</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+  <button ion-button block class="e2eOpenActionSheet" (click)="presentActionSheet1()">Present Action Sheet 1</button>
+  <button ion-button block (click)="presentActionSheet2()">Present Action Sheet 2</button>
+  <button ion-button block (click)="presentActionSheet3()">Present Action Sheet 3</button>
+
+  <pre>
+    Result: {{result}}
+  </pre>
+
+</ion-content>
+
+
+  </ion-app>
+
+</body>
+</html>
