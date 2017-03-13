@@ -1,0 +1,10 @@
+@import "../../themes/ionic.globals.md";
+@import "./list";
+
+
+// Material Design Lists - Light DOM
+// --------------------------------------------------
+
+.list-md + ion-list ion-list-header {
+  margin-top: -$list-md-margin-top;
+}

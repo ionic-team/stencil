@@ -9,14 +9,6 @@
   margin: -1px $list-md-margin-right $list-md-margin-bottom $list-md-margin-left;
 }
 
-.item-block:last-child,
-.item-wrapper:last-child {
-  ion-label,
-  .item-inner {
-    border-bottom: 0;
-  }
-}
-
 ion-input:last-child::after {
   left: 0;
 }

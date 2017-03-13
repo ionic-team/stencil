@@ -48,6 +48,11 @@ $item-md-sliding-content-background: $list-md-background-color !default;
   border-width: 0;
 }
 
+:host(:last-child) ion-label,
+:host(:last-child) .item-inner {
+  border-bottom: 0;
+}
+
 h1 {
   margin: 0 0 2px;
 
@@ -175,3 +180,4 @@ ion-reorder {
   font-size: 1.5em;
   opacity: .3;
 }
+

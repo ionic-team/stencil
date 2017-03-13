@@ -25,7 +25,7 @@ $list-md-header-color:           #757575 !default;
 // Material Design List Header
 // --------------------------------------------------
 
-:host(.list-header-md) {
+:host {
   margin-bottom: $list-md-header-margin-bottom;
   padding-left: $list-md-header-padding-left;
 

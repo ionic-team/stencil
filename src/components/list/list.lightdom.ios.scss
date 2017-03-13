@@ -1,0 +1,10 @@
+@import "../../themes/ionic.globals.ios";
+@import "./list";
+
+
+// iOS Lists - Light DOM
+// --------------------------------------------------
+
+.list-ios + ion-list ion-list-header {
+  margin-top: -$list-ios-margin-top;
+}
