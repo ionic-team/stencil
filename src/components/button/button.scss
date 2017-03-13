@@ -54,9 +54,7 @@ a {
   text-decoration: none;
 }
 
-a[disabled],
-button[disabled],
-[ion-button][disabled] {
+:host([disabled]) {
   cursor: default;
   opacity: .4;
 
@@ -67,7 +65,7 @@ button[disabled],
 // Block Button
 // --------------------------------------------------
 
-:host(.button-block) {
+:host([block]) {
   display: block;
   clear: both;
 
@@ -76,7 +74,7 @@ button[disabled],
   contain: strict;
 }
 
-:host(.button-block::after) {
+:host([block]::after) {
   clear: both;
 }
 
@@ -84,7 +82,7 @@ button[disabled],
 // Full Button
 // --------------------------------------------------
 
-:host(.button-full) {
+:host([full]) {
   display: block;
 
   width: 100%;
@@ -95,7 +93,7 @@ button[disabled],
 // Full Outline Button
 // --------------------------------------------------
 
-:host(.button-full.button-outline) {
+:host([full][outline]) {
   border-right-width: 0;
   border-left-width: 0;
   border-radius: 0;

@@ -224,16 +224,16 @@ $button-md-strong-font-weight:                  bold !default;
     background-color: $bg-color;
   }
 
-  .button-md-#{$color-name}:hover:not(.disable-hover) {
+  :host([color="#{$color-name}"]:hover:not(.disable-hover)) {
     background-color: $bg-color;
   }
 
-  .button-md-#{$color-name}.activated {
+  :host([color="#{$color-name}"].activated) {
     background-color: $bg-color-activated;
     opacity: $button-md-opacity-activated;
   }
 
-  .button-md-#{$color-name} .button-effect {
+  :host([color="#{$color-name}"]) .button-effect {
     background-color: $fg-color;
   }
 }
@@ -242,7 +242,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Button Sizes
 // --------------------------------------------------
 
-:host(.button-large-md) {
+:host([large]) {
   padding: $button-md-large-padding;
 
   height: $button-md-large-height;
@@ -250,7 +250,7 @@ $button-md-strong-font-weight:                  bold !default;
   font-size: $button-md-large-font-size;
 }
 
-:host(.button-small-md) {
+:host([small]) {
   padding: $button-md-small-padding;
 
   height: $button-md-small-height;
@@ -258,14 +258,14 @@ $button-md-strong-font-weight:                  bold !default;
   font-size: $button-md-small-font-size;
 }
 
-:host(.button-small-md[icon-only]) ion-icon {
+:host([small][icon-only]) ion-icon {
   font-size: $button-md-small-icon-font-size;
 }
 
 // Material Design Block Button
 // --------------------------------------------------
 
-:host(.button-block-md) {
+:host([block]) {
   margin-right: 0;
   margin-left: 0;
 }
@@ -273,7 +273,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Full Button
 // --------------------------------------------------
 
-:host(.button-full-md) {
+:host([full]) {
   margin-right: 0;
   margin-left: 0;
 
@@ -285,7 +285,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Outline Button
 // --------------------------------------------------
 
-:host(.button-outline-md) {
+:host([outline]) {
   border-width: $button-md-outline-border-width;
   border-style: $button-md-outline-border-style;
   border-color: $button-md-outline-border-color;
@@ -294,17 +294,17 @@ $button-md-strong-font-weight:                  bold !default;
   box-shadow: $button-md-outline-box-shadow;
 }
 
-.button-outline-md:hover:not(.disable-hover) {
+:host([outline]:hover:not(.disable-hover)) {
   background-color: $button-md-outline-background-color-hover;
 }
 
-.button-outline-md.activated {
+:host([outline].activated) {
   background-color: $button-md-outline-background-color-activated;
   box-shadow: $button-md-outline-box-shadow-activated;
   opacity: $button-md-outline-opacity-activated;
 }
 
-.button-outline-md .button-effect {
+:host([outline]) .button-effect {
   background-color: $button-md-outline-ripple-background-color;
 }
 
@@ -315,21 +315,21 @@ $button-md-strong-font-weight:                  bold !default;
 @mixin md-button-outline($color-name, $color-base, $color-contrast) {
   $fg-color: color-shade($color-base, 5%);
 
-  .button-outline-md-#{$color-name} {
+  :host([outline][color=#{$color-name}]) {
     border-color: $fg-color;
     color: $fg-color;
     background-color: $button-md-outline-background-color;
   }
 
-  .button-outline-md-#{$color-name}:hover:not(.disable-hover) {
+  :host([outline][color=#{$color-name}]:hover:not(.disable-hover)) {
     background-color: $button-md-outline-background-color-hover;
   }
 
-  .button-outline-md-#{$color-name}.activated {
+  :host([outline][color=#{$color-name}].activated) {
     background-color: $button-md-outline-background-color-activated;
   }
 
-  .button-outline-md-#{$color-name} .button-effect {
+  :host([outline][color=#{$color-name}]) .button-effect {
     background-color: $fg-color;
   }
 }
@@ -338,7 +338,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Clear Button
 // --------------------------------------------------
 
-:host(.button-clear-md) {
+:host([clear]) {
   border-color: $button-md-clear-border-color;
   color: $button-md-background-color;
   background-color: $button-md-clear-background-color;
@@ -346,16 +346,16 @@ $button-md-strong-font-weight:                  bold !default;
   opacity: $button-md-clear-opacity;
 }
 
-:host(.button-clear-md.activated) {
+:host([clear].activated) {
   background-color: $button-md-clear-background-color-activated;
   box-shadow: $button-md-clear-box-shadow-activated;
 }
 
-:host(.button-clear-md:hover:not(.disable-hover)) {
+:host([clear]:hover:not(.disable-hover)) {
   background-color: $button-md-clear-background-color-hover;
 }
 
-:host(.button-clear-md) .button-effect {
+:host([clear]) .button-effect {
   background-color: $button-md-clear-ripple-background-color;
 }
 
@@ -366,18 +366,18 @@ $button-md-strong-font-weight:                  bold !default;
 @mixin md-button-clear($color-name, $color-base, $color-contrast) {
   $fg-color: $color-base;
 
-  .button-clear-md-#{$color-name} {
+  :host([clear][color=#{$color-name}]) {
     border-color: $button-md-clear-border-color;
     color: $fg-color;
     background-color: $button-md-clear-background-color;
   }
 
-  .button-clear-md-#{$color-name}.activated {
+  :host([clear][color=#{$color-name}].activated) {
     background-color: $button-md-clear-background-color-activated;
     box-shadow: $button-md-clear-box-shadow-activated;
   }
 
-  .button-clear-md-#{$color-name}:hover:not(.disable-hover) {
+  :host([clear][color=#{$color-name}]:hover:not(.disable-hover)) {
     color: $fg-color;
   }
 }
@@ -386,7 +386,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Round Button
 // --------------------------------------------------
 
-:host(.button-round-md) {
+:host([round]) {
   padding: $button-md-round-padding;
 
   border-radius: $button-md-round-border-radius;
@@ -434,6 +434,6 @@ $button-md-strong-font-weight:                  bold !default;
 // MD strong Button
 // --------------------------------------------------
 
-:host(.button-strong-md) {
+:host([strong]) {
   font-weight: $button-md-strong-font-weight;
 }
