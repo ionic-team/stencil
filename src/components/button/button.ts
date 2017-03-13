@@ -52,11 +52,12 @@ export class IonButton extends IonElement {
       setCssClass('strong');
     }
 
+    const buttonInnerTag = 'a.button-inner';
+    const hasButtonEffect = true;
+
     return h('.button', vnodeData, [
-      h('span.button-inner', [
-        h('slot')
-      ]),
-      h('div.button-effect')
+      h(buttonInnerTag, h('slot')),
+      (hasButtonEffect) ? h('div.button-effect') : null
     ]);
   }
 

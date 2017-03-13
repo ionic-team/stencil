@@ -7,6 +7,23 @@ body {
   padding: 0;
 }
 
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 8px;
+  width: 100%;
+  background: #eee;
+}
+
+select {
+  margin: 4px;
+}
+
+.compare {
+  margin-top: 30px;
+}
+
 .iframe-wrapper {
   display: inline-block;
   width: 50%;
@@ -19,7 +36,7 @@ iframe {
   border: 1px solid black;
 }
 
-header {
+.row-header {
   padding-top: 18px;
   font-size: 12px;
   font-family: Courier New, Courier, monospace;
