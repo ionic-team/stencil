@@ -1,0 +1,135 @@
+@import "../../themes/ionic.globals.ios";
+@import "./content";
+
+
+// iOS Content
+// --------------------------------------------------
+
+/// @prop - Background color of the outer content
+$content-ios-outer-background:          #efeff4 !default;
+
+/// @prop - Background color of the content when making transition
+$content-ios-transition-background:     #000 !default;
+
+
+:host {
+  color: $text-ios-color;
+  background-color: $background-ios-color;
+}
+
+:host(.outer-content) {
+  background: $content-ios-outer-background;
+}
+
+hr {
+  height: $hairlines-width;
+
+  background-color: rgba(0, 0, 0, .12);
+}
+
+.ios .ion-page.show-page ~ .nav-decor {
+  // when ios pages transition, the leaving page grays out
+  // this is the black square behind all pages so they gray out
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  background: $content-ios-transition-background;
+
+  pointer-events: none;
+}
+
+
+// iOS Content Padding
+// --------------------------------------------------
+
+:host([padding]) .scroll-content {
+  padding: $content-ios-padding;
+}
+
+:host([padding-top]) .scroll-content {
+  padding-top: $content-ios-padding;
+}
+
+:host([padding-left]) .scroll-content {
+  padding-left: $content-ios-padding;
+}
+
+:host([padding-right]) .scroll-content {
+  padding-right: $content-ios-padding;
+}
+
+:host([padding-bottom]) .scroll-content {
+  padding-bottom: $content-ios-padding;
+}
+
+:host([padding-vertical]) .scroll-content {
+  padding-top: $content-ios-padding;
+  padding-bottom: $content-ios-padding;
+}
+
+:host([padding-horizontal]) .scroll-content {
+  padding-right: $content-ios-padding;
+  padding-left: $content-ios-padding;
+}
+
+
+// iOS Content Margin
+// --------------------------------------------------
+
+:host([margin]) .scroll-content {
+  margin: $content-ios-margin;
+}
+
+:host([margin-top]) .scroll-content {
+  margin-top: $content-ios-margin;
+}
+
+:host([margin-left]) .scroll-content {
+  margin-left: $content-ios-margin;
+}
+
+:host([margin-right]) .scroll-content {
+  margin-right: $content-ios-margin;
+}
+
+:host([margin-bottom]) .scroll-content {
+  margin-bottom: $content-ios-margin;
+}
+
+:host([margin-vertical]) .scroll-content {
+  margin-top: $content-ios-margin;
+  margin-bottom: $content-ios-margin;
+}
+
+:host([margin-horizontal]) .scroll-content {
+  margin-right: $content-ios-margin;
+  margin-left: $content-ios-margin;
+}
+
+
+// iOS Content Scroll
+// --------------------------------------------------
+
+.content-ios:not([no-bounce]) > .scroll-content::before,
+.content-ios:not([no-bounce]) > .scroll-content::after {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  content: "";
+}
+
+.content-ios:not([no-bounce]) > .scroll-content::before {
+  bottom: -1px;
+}
+
+.content-ios:not([no-bounce]) > .scroll-content::after {
+  top: -1px;
+}

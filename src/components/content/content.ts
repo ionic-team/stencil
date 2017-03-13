@@ -227,8 +227,8 @@ export class IonContent extends IonElement {
     // }
 
     this.onUpdate(elm => {
-      this._fixedEle = <HTMLElement>elm._root.children[0];
-      this._scrollEle = <HTMLElement>elm._root.children[1];
+      this._fixedEle = <HTMLElement>elm._root.querySelector('.fixed-content');
+      this._scrollEle = <HTMLElement>elm._root.querySelector('.scroll-content');
 
       this._readDimensions();
       this._writeDimensions();
@@ -742,7 +742,23 @@ export class IonContent extends IonElement {
 
 (<IonicComponent>IonContent).$annotations = {
   tag: 'ion-content',
-  cloak: false
+  cloak: false,
+  preprocessStyles: [
+    'content.ios.scss',
+    'content.md.scss',
+    'content.wp.scss'
+  ],
+  modeStyles: {
+    'ios': [
+      'content.ios.css'
+    ],
+    'md': [
+      'content.md.css'
+    ],
+    'wp': [
+      'content.wp.css'
+    ]
+  }
 };
 
 // '<div class="fixed-content">' +

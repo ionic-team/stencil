@@ -1,0 +1,83 @@
+@import "../../themes/ionic.globals.md";
+@import "./content";
+
+
+// Material Design Content
+// --------------------------------------------------
+
+:host {
+  color: $text-md-color;
+  background-color: $background-md-color;
+}
+
+hr {
+  background-color: rgba(0, 0, 0, .08);
+}
+
+
+// Material Design Content Padding
+// --------------------------------------------------
+
+:host([padding]) .scroll-content {
+  padding: $content-md-padding;
+}
+
+:host([padding-top]) .scroll-content {
+  padding-top: $content-md-padding;
+}
+
+:host([padding-left]) .scroll-content {
+  padding-left: $content-md-padding;
+}
+
+:host([padding-right]) .scroll-content {
+  padding-right: $content-md-padding;
+}
+
+:host([padding-bottom]) .scroll-content {
+  padding-bottom: $content-md-padding;
+}
+
+:host([padding-vertical]) .scroll-content {
+  padding-top: $content-md-padding;
+  padding-bottom: $content-md-padding;
+}
+
+:host([padding-horizontal]) .scroll-content {
+  padding-right: $content-md-padding;
+  padding-left: $content-md-padding;
+}
+
+
+// Material Design Content Margin
+// --------------------------------------------------
+
+:host([margin]) .scroll-content {
+  margin: $content-md-margin;
+}
+
+:host([margin-top]) .scroll-content {
+  margin-top: $content-md-margin;
+}
+
+:host([margin-left]) .scroll-content {
+  margin-left: $content-md-margin;
+}
+
+:host([margin-right]) .scroll-content {
+  margin-right: $content-md-margin;
+}
+
+:host([margin-bottom]) .scroll-content {
+  margin-bottom: $content-md-margin;
+}
+
+:host([margin-vertical]) .scroll-content {
+  margin-top: $content-md-margin;
+  margin-bottom: $content-md-margin;
+}
+
+:host([margin-horizontal]) .scroll-content {
+  margin-right: $content-md-margin;
+  margin-left: $content-md-margin;
+}

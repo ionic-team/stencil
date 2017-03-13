@@ -67,3 +67,75 @@
     @warn "First value in `#{$map-name}` must start at 0, but starts at #{$first-value}.";
   }
 }
+
+
+// Content Padding
+// --------------------------------------------------
+
+@mixin content-padding($mode, $content-padding) {
+  #{$mode} [padding] {
+    padding: $content-padding;
+  }
+
+  #{$mode} [padding-top] {
+    padding-top: $content-padding;
+  }
+
+  #{$mode} [padding-left] {
+    padding-left: $content-padding;
+  }
+
+  #{$mode} [padding-right] {
+    padding-right: $content-padding;
+  }
+
+  #{$mode} [padding-bottom] {
+    padding-bottom: $content-padding;
+  }
+
+  #{$mode} [padding-vertical] {
+    padding-top: $content-padding;
+    padding-bottom: $content-padding;
+  }
+
+  #{$mode} [padding-horizontal] {
+    padding-right: $content-padding;
+    padding-left: $content-padding;
+  }
+}
+
+
+// Content Margin
+// --------------------------------------------------
+
+@mixin content-margin($mode, $content-margin) {
+  #{$mode} [margin] {
+    margin: $content-margin;
+  }
+
+  #{$mode} [margin-top] {
+    margin-top: $content-margin;
+  }
+
+  #{$mode} [margin-left] {
+    margin-left: $content-margin;
+  }
+
+  #{$mode} [margin-right] {
+    margin-right: $content-margin;
+  }
+
+  #{$mode} [margin-bottom] {
+    margin-bottom: $content-margin;
+  }
+
+  #{$mode} [margin-vertical] {
+    margin-top: $content-margin;
+    margin-bottom: $content-margin;
+  }
+
+  #{$mode} [margin-horizontal] {
+    margin-right: $content-margin;
+    margin-left: $content-margin;
+  }
+}
