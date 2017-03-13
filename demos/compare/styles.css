@@ -3,7 +3,7 @@
 }
 
 body {
-  margin: 8px 0 0 0;
+  margin: 0;
   padding: 0;
 }
 
@@ -17,4 +17,10 @@ iframe {
   width: 96%;
   height: 650px;
   border: 1px solid black;
+}
+
+header {
+  padding-top: 18px;
+  font-size: 12px;
+  font-family: Courier New, Courier, monospace;
 }

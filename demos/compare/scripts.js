@@ -36,13 +36,18 @@ function buildCompareRow(compareIndex) {
 
 
 function buildIframe(src) {
+  var wrapper = document.createElement('div');
+  wrapper.className = 'iframe-wrapper';
+
+  var header = document.createElement('header');
+  header.textContent = src.replace('/index.html', '');
+  wrapper.appendChild(header);
+
   var iframeEle = document.createElement('iframe');
 
   iframeEle.src = src;
   iframeEle.frameBorder = 0;
 
-  var wrapper = document.createElement('div');
-  wrapper.className = 'iframe-wrapper';
   wrapper.appendChild(iframeEle);
   return wrapper;
 }
