@@ -40,7 +40,10 @@ function buildIframe(src) {
   wrapper.className = 'iframe-wrapper';
 
   var header = document.createElement('header');
-  header.textContent = src.replace('/index.html', '');
+  var headerAnchor = document.createElement('a');
+  headerAnchor.href = src;
+  headerAnchor.textContent = src.replace('/index.html', '');
+  header.appendChild(headerAnchor);
   wrapper.appendChild(header);
 
   var iframeEle = document.createElement('iframe');
