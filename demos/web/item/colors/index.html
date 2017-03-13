@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Item Colors</ion-title>
@@ -52,14 +54,14 @@
   </button>
 
   <ion-item color="primary">
-    <button ion-button item-left color="dark">Dark</button>
+    <button ion-button slot="item-left" color="dark">Dark</button>
     <h1>Heading</h1>
     <p>Normal paragraph</p>
-    <button ion-button outline item-right>Outline</button>
+    <button ion-button outline slot="item-right">Outline</button>
   </ion-item>
 
   <button ion-item color="dark">
-    <button ion-button item-left icon-left>
+    <button ion-button slot="item-left" icon-left>
       <ion-icon name="home"></ion-icon>
       Left Icon
     </button>
@@ -68,7 +70,7 @@
   </button>
 
   <button ion-item disabled color="dark">
-    <button ion-button item-left icon-left>
+    <button ion-button slot="item-left" icon-left>
       <ion-icon name="home"></ion-icon>
       Left Icon
     </button>
@@ -77,12 +79,12 @@
   </button>
 
   <ion-item color="light">
-    <button ion-button item-left icon-right>
+    <button ion-button slot="item-left" icon-right>
       Right Icon
       <ion-icon name="home"></ion-icon>
     </button>
     right icon buttons
-    <button ion-button outline item-right icon-right>
+    <button ion-button outline slot="item-right" icon-right>
       Right Icon
       <ion-icon name="star"></ion-icon>
     </button>
@@ -95,6 +97,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

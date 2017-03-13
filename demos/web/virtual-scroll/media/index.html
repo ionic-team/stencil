@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
   <ion-navbar>
     <ion-title>Virtual Scroll{{webview}}</ion-title>
     <ion-buttons end>
@@ -29,14 +31,16 @@
   <ion-list radio-group [virtualScroll]="items">
     <ion-item *virtualItem="let item" [ngClass]="item.class">
       <ion-label>{{item.type}}-{{item.value}}</ion-label>
-      <ion-checkbox *ngIf="item.type === 'checkbox'" item-left></ion-checkbox>
-      <ion-toggle *ngIf="item.type === 'toggle'" item-left></ion-toggle>
-      <ion-radio *ngIf="item.type === 'radio'" item-left></ion-radio>
+      <ion-checkbox *ngIf="item.type === 'checkbox'" slot="item-left"></ion-checkbox>
+      <ion-toggle *ngIf="item.type === 'toggle'" slot="item-left"></ion-toggle>
+      <ion-radio *ngIf="item.type === 'radio'" slot="item-left"></ion-radio>
       <ion-range *ngIf="item.type === 'range'"></ion-range>
     </ion-item>
   </ion-list>
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

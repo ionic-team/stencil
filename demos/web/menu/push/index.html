@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-menu [content]="content" type="push" side="left">
+<!-- main start -->
+
+<ion-menu [content]="content" type="push" side="left">
 
   <ion-header>
     <ion-toolbar color="secondary">
@@ -73,6 +75,8 @@
 
 <ion-nav id="nav" [root]="rootView" #content swipeBackEnabled="false"></ion-nav>
 
+
+<!-- main end -->
 
   </ion-app>
 

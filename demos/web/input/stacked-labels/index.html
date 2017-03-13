@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    
+<!-- main start -->
+
+
 <ion-header>
 
   <ion-toolbar>
@@ -35,8 +37,8 @@
     <ion-item>
       <ion-label stacked>Label 2</ion-label>
       <ion-input value="Text 2"></ion-input>
-      <button ion-button icon-only item-right clear><ion-icon name="heart-outline"></ion-icon></button>
-      <button ion-button icon-only item-right clear><ion-icon ios="ios-call-outline" md="md-call"></ion-icon></button>
+      <button ion-button icon-only slot="item-right" clear><ion-icon name="heart-outline"></ion-icon></button>
+      <button ion-button icon-only slot="item-right" clear><ion-icon ios="ios-call-outline" md="md-call"></ion-icon></button>
     </ion-item>
 
     <ion-item>
@@ -91,6 +93,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

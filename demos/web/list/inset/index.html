@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Inset List</ion-title>
@@ -40,7 +42,7 @@
     </ion-list-header>
 
     <a ion-item href="#">
-      <ion-icon name="alarm" item-left></ion-icon>
+      <ion-icon name="alarm" slot="item-left"></ion-icon>
       List Link Item 1
     </a>
 
@@ -55,7 +57,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-icon name="boat" item-left></ion-icon>
+      <ion-icon name="boat" slot="item-left"></ion-icon>
       List Button Item 1
     </ion-item>
 
@@ -66,7 +68,7 @@
           List header 2
       </ion-list-header>
       <ion-item>
-          <ion-icon name="list" item-left></ion-icon>
+          <ion-icon name="list" slot="item-left"></ion-icon>
           item 1
       </ion-item>
   </ion-list>
@@ -76,7 +78,7 @@
         List header 3
     </ion-list-header>
     <ion-item>
-        <ion-icon name="list" item-left></ion-icon>
+        <ion-icon name="list" slot="item-left"></ion-icon>
         item 1
     </ion-item>
   </ion-list>
@@ -86,7 +88,7 @@
         List header 4
     </ion-list-header>
     <ion-item>
-        <ion-icon name="list" item-left></ion-icon>
+        <ion-icon name="list" slot="item-left"></ion-icon>
         item 1
     </ion-item>
   </ion-list>
@@ -95,7 +97,7 @@
 
     <ion-item>
       Inset List, No Header
-      <button ion-button outline item-right>View</button>
+      <button ion-button outline slot="item-right">View</button>
     </ion-item>
 
     <ion-item>
@@ -124,6 +126,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

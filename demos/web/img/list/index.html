@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
   <ion-navbar>
     <ion-title>Img: Long List</ion-title>
   </ion-navbar>
@@ -26,13 +28,13 @@
 
     <ion-item *ngFor="let item of items">
 
-      <ion-avatar item-left>
+      <ion-avatar slot="item-left">
         <ion-img [src]="item.avatar"></ion-img>
       </ion-avatar>
 
       Item: {{ item.id }}
 
-      <ion-thumbnail item-right>
+      <ion-thumbnail slot="item-right">
         <ion-img [src]="item.thumbnail"></ion-img>
       </ion-thumbnail>
 
@@ -42,6 +44,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

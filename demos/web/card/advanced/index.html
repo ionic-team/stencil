@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Advanced Cards</ion-title>
@@ -63,7 +65,7 @@
   <ion-card>
 
     <ion-item>
-      <ion-avatar item-left>
+      <ion-avatar slot="item-left">
         <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
       </ion-avatar>
       <h2>Card With An Inset Picture</h2>
@@ -146,6 +148,8 @@
   }
 </style>
 
+
+<!-- main end -->
 
   </ion-app>
 

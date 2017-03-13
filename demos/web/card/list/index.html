@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>List Cards</ion-title>
@@ -33,24 +35,24 @@
       </ion-list-header>
 
       <button ion-item>
-        <ion-icon name="cart" item-left></ion-icon>
+        <ion-icon name="cart" slot="item-left"></ion-icon>
         Shopping
       </button>
 
       <button ion-item>
-        <ion-icon name="medical" item-left></ion-icon>
+        <ion-icon name="medical" slot="item-left"></ion-icon>
         Hospital
       </button>
 
       <button ion-item>
-        <ion-icon name="paw" item-left></ion-icon>
+        <ion-icon name="paw" slot="item-left"></ion-icon>
         Dog Park
       </button>
 
     </ion-list>
 
     <button ion-item>
-      <ion-icon name="heart" item-left></ion-icon>
+      <ion-icon name="heart" slot="item-left"></ion-icon>
       Single Item
     </button>
 
@@ -65,23 +67,23 @@
       </ion-list-header>
 
       <ion-item>
-        <ion-icon name="wifi" item-left></ion-icon>
+        <ion-icon name="wifi" slot="item-left"></ion-icon>
         <ion-label>Wifi</ion-label>
         <ion-toggle></ion-toggle>
       </ion-item>
 
       <ion-item>
-        <ion-icon name="heart" item-left></ion-icon>
+        <ion-icon name="heart" slot="item-left"></ion-icon>
         Affection
-        <ion-note item-right>
+        <ion-note slot="item-right">
           Very Little
         </ion-note>
       </ion-item>
 
       <ion-item>
-        <ion-icon name="home" item-left></ion-icon>
+        <ion-icon name="home" slot="item-left"></ion-icon>
         Home
-        <ion-note item-right>
+        <ion-note slot="item-right">
           Where the heart is
         </ion-note>
       </ion-item>
@@ -97,23 +99,23 @@
     </ion-card-header>
 
     <ion-item>
-      <ion-icon name="wifi" item-left></ion-icon>
+      <ion-icon name="wifi" slot="item-left"></ion-icon>
       <ion-label>Wifi</ion-label>
       <ion-toggle></ion-toggle>
     </ion-item>
 
     <ion-item>
-      <ion-icon name="heart" item-left></ion-icon>
+      <ion-icon name="heart" slot="item-left"></ion-icon>
       Affection
-      <ion-note item-right>
+      <ion-note slot="item-right">
         Very Little
       </ion-note>
     </ion-item>
 
     <ion-item>
-      <ion-icon name="home" item-left></ion-icon>
+      <ion-icon name="home" slot="item-left"></ion-icon>
       Home
-      <ion-note item-right>
+      <ion-note slot="item-right">
         Where the heart is
       </ion-note>
     </ion-item>
@@ -123,6 +125,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

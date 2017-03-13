@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
   <ion-navbar>
     <ion-title>Img: Basic</ion-title>
   </ion-navbar>
@@ -26,13 +28,13 @@
 
     <ion-item>
 
-      <ion-avatar item-left>
+      <ion-avatar slot="item-left">
         <ion-img></ion-img>
       </ion-avatar>
 
       Unloaded Avatar
 
-      <ion-avatar item-right>
+      <ion-avatar slot="item-right">
         <ion-img></ion-img>
       </ion-avatar>
 
@@ -40,13 +42,13 @@
 
     <ion-item>
 
-      <ion-avatar item-left>
+      <ion-avatar slot="item-left">
         <ion-img src="../img/blues-brothers.jpg"></ion-img>
       </ion-avatar>
 
       Loaded Avatar
 
-      <ion-avatar item-right>
+      <ion-avatar slot="item-right">
         <ion-img src="../img/bueller.jpg"></ion-img>
       </ion-avatar>
 
@@ -54,13 +56,13 @@
 
     <ion-item>
 
-      <ion-thumbnail item-left>
+      <ion-thumbnail slot="item-left">
         <ion-img></ion-img>
       </ion-thumbnail>
 
       Unloaded Thumbnail
 
-      <ion-thumbnail item-right>
+      <ion-thumbnail slot="item-right">
         <ion-img></ion-img>
       </ion-thumbnail>
 
@@ -68,13 +70,13 @@
 
     <ion-item>
 
-      <ion-avatar item-left>
+      <ion-avatar slot="item-left">
         <ion-img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw=="></ion-img>
       </ion-avatar>
 
       Datauri
 
-      <ion-thumbnail item-right>
+      <ion-thumbnail slot="item-right">
         <ion-img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw=="></ion-img>
       </ion-thumbnail>
 
@@ -82,13 +84,13 @@
 
     <ion-item>
 
-      <ion-thumbnail item-left>
+      <ion-thumbnail slot="item-left">
         <ion-img src="../img/delorean.jpg"></ion-img>
       </ion-thumbnail>
 
       Loaded Thumbnail
 
-      <ion-thumbnail item-right>
+      <ion-thumbnail slot="item-right">
         <ion-img src="../img/batmobile.jpg"></ion-img>
       </ion-thumbnail>
 
@@ -116,6 +118,8 @@
   </ion-grid>
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

@@ -48,6 +48,9 @@ fs.readdir(webDir, (err, files) => {
 function createIndex(index, mainContent) {
   console.log(index);
 
+  mainContent = mainContent.replace(/ item-left/g, ' slot="item-left"');
+  mainContent = mainContent.replace(/ item-right/g, ' slot="item-right"');
+
   var content = `<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
@@ -63,7 +66,11 @@ function createIndex(index, mainContent) {
 
   <ion-app>
 
-    ${mainContent}
+<!-- main start -->
+
+${mainContent}
+
+<!-- main end -->
 
   </ion-app>
 

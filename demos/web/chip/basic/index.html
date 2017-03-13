@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Chips</ion-title>
@@ -110,7 +112,7 @@
 
   <ion-item>
     <ion-label>Chip Item</ion-label>
-    <ion-chip item-right #chip1>
+    <ion-chip slot="item-right" #chip1>
       <ion-icon name="pin" color="primary"></ion-icon>
       <ion-label>Default</ion-label>
       <button ion-button clear color="light" (click)="delete(chip1)">
@@ -120,6 +122,8 @@
   </ion-item>
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Item Media</ion-title>
@@ -25,7 +27,7 @@
 <ion-content>
 
   <button ion-item>
-    <ion-avatar item-left>
+    <ion-avatar slot="item-left">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
     </ion-avatar>
     Media/Avatar left, button.item
@@ -33,21 +35,21 @@
 
   <a ion-item href="#">
     Media/Avatar right, a.item
-    <ion-avatar item-right>
+    <ion-avatar slot="item-right">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
     </ion-avatar>
   </a>
 
   <ion-item>
-    <ion-avatar item-left>
+    <ion-avatar slot="item-left">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
     </ion-avatar>
     Media/Avatar, right button
-    <button ion-button outline item-right>View</button>
+    <button ion-button outline slot="item-right">View</button>
   </ion-item>
 
   <a ion-item href="#">
-    <ion-avatar item-left>
+    <ion-avatar slot="item-left">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
     </ion-avatar>
     <h2>H2 Title Text</h2>
@@ -56,29 +58,29 @@
 
   <a ion-item href="#">
     Media/Thumbnail right side, a.item
-    <ion-thumbnail item-right>
+    <ion-thumbnail slot="item-right">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
     </ion-thumbnail>
   </a>
 
   <ion-item>
-    <ion-thumbnail item-left>
+    <ion-thumbnail slot="item-left">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
     </ion-thumbnail>
     <h2>H2 Title Text</h2>
     <p>Button on right</p>
-    <button ion-button outline item-right>View</button>
+    <button ion-button outline slot="item-right">View</button>
   </ion-item>
 
   <button ion-item>
-    <ion-thumbnail item-left>
+    <ion-thumbnail slot="item-left">
       <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
     </ion-thumbnail>
     <h3>H3 Title Text</h3>
     <p>Icon on right</p>
     <p>Vertically align top</p>
     <p>button.item</p>
-    <ion-icon name="close-circle" item-right></ion-icon>
+    <ion-icon name="close-circle" slot="item-right"></ion-icon>
   </button>
 
 </ion-content>
@@ -90,6 +92,8 @@
   }
 </style>
 
+
+<!-- main end -->
 
   </ion-app>
 

@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-content>
+<!-- main start -->
+
+<ion-content>
   <h5 padding-left> Search - Default </h5>
   <ion-searchbar [(ngModel)]="defaultSearch" type="tel" showCancelButton debounce="500" (ionInput)="triggerInput($event)" (ionBlur)="inputBlurred($event)" (ionFocus)="inputFocused($event)" (ionCancel)="onCancelSearchbar($event)" (ionClear)="onClearSearchbar($event)"></ion-searchbar>
 
@@ -61,6 +63,8 @@
   </p>
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

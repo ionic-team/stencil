@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Placeholder Label Text Input</ion-title>
@@ -42,12 +44,12 @@
     </ion-item>
 
     <ion-item>
-      <ion-icon name="call" item-left></ion-icon>
+      <ion-icon name="call" slot="item-left"></ion-icon>
       <ion-input placeholder="Text Input Placeholder"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-icon name="call" item-left></ion-icon>
+      <ion-icon name="call" slot="item-left"></ion-icon>
       <ion-input placeholder="Text Input Placeholder" value="Text Input Value"></ion-input>
     </ion-item>
 
@@ -76,12 +78,12 @@
     </ion-item>
 
     <ion-item>
-      <ion-icon name="call" item-left></ion-icon>
+      <ion-icon name="call" slot="item-left"></ion-icon>
       <ion-input placeholder="Inset List: Text Input Placeholder"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-icon name="call" item-left></ion-icon>
+      <ion-icon name="call" slot="item-left"></ion-icon>
       <ion-input placeholder="Inset List: Text Input Placeholder" value="Inset List: Text Input Value"></ion-input>
     </ion-item>
 
@@ -89,6 +91,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
   <ion-toolbar>
     <ion-title>Virtual Scroll: Cards</ion-title>
   </ion-toolbar>
@@ -30,7 +32,7 @@
       </div>
 
       <ion-item>
-        <ion-avatar item-left>
+        <ion-avatar slot="item-left">
           <ion-img [src]="item.avatarSrc" height="40" width="40" [bounds]="itemBounds"></ion-img>
         </ion-avatar>
         <h2>{{ item.name }}</h2>
@@ -46,6 +48,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

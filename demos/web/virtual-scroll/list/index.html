@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
   <ion-navbar>
     <ion-title>Virtual Scroll: List</ion-title>
     <ion-buttons end>
@@ -40,13 +42,13 @@
   <ion-list [virtualScroll]="items">
 
     <ion-item class="item-text-wrap" *virtualItem="let item; let itemBounds = bounds;">
-      <ion-thumbnail item-left>
+      <ion-thumbnail slot="item-left">
         <ion-img [src]="item.url" [bounds]="itemBounds"></ion-img>
       </ion-thumbnail>
 
       <h2 class="text-wrap">{{item.id}}, top: {{itemBounds.top}}, bottom: {{itemBounds.bottom}}, height: {{itemBounds.height}}</h2>
 
-      <!--<ion-thumbnail item-right>
+      <!--<ion-thumbnail slot="item-right">
         <ion-img [src]="item.gif" [bounds]="itemBounds"></ion-img>
       </ion-thumbnail>-->
     </ion-item>
@@ -55,6 +57,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 

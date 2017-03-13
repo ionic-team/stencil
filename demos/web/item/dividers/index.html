@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Item Divider</ion-title>
@@ -55,7 +57,7 @@
   <ion-item-group>
     <ion-item-divider>
       Item Divider <span color="danger">Danger Span</span>
-      <button ion-button item-right>button</button>
+      <button ion-button slot="item-right">button</button>
     </ion-item-divider>
 
     <ion-item text-wrap class="custom-item">
@@ -66,10 +68,10 @@
 
   <ion-item-group>
     <ion-item-divider color="dark">
-      <button ion-button item-left clear>
+      <button ion-button slot="item-left" clear>
         <ion-icon name="cloudy"></ion-icon>
       </button>
-      <button ion-button item-left clear color="light">
+      <button ion-button slot="item-left" clear color="light">
         <ion-icon name="rainy"></ion-icon>
       </button>
       Dark <h5 color="primary">Primary h5</h5>
@@ -82,18 +84,18 @@
 
   <ion-item-group>
     <ion-item-divider color="light">
-      <ion-avatar item-left>
+      <ion-avatar slot="item-left">
         <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
       </ion-avatar>
       Light
-      <button ion-button item-right clear color="danger">
+      <button ion-button slot="item-right" clear color="danger">
         <ion-icon name="sunny"></ion-icon>
       </button>
     </ion-item-divider>
 
     <ion-item-divider color="primary">
       Primary
-      <ion-thumbnail item-right>
+      <ion-thumbnail slot="item-right">
         <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAAAAACH5BAAAAAAALAAAAAABAAEAAAICTAEAOw==">
       </ion-thumbnail>
     </ion-item-divider>
@@ -122,6 +124,8 @@
   }
 </style>
 
+
+<!-- main end -->
 
   </ion-app>
 

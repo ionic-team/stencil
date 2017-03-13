@@ -7,13 +7,15 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/ionic.web.js"></script>
+  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
 </head>
 <body>
 
   <ion-app>
 
-    <ion-header>
+<!-- main start -->
+
+<ion-header>
 
   <ion-toolbar>
     <ion-title>Clear Input</ion-title>
@@ -44,12 +46,12 @@
     <ion-item>
       <ion-label>Button:</ion-label>
       <ion-input class="e2eClearInput" [(ngModel)]="myValue"></ion-input>
-      <button ion-button item-right (click)="clicked()">Button</button>
+      <button ion-button slot="item-right" (click)="clicked()">Button</button>
     </ion-item>
 
     <ion-item>
       <input type="text" placeholder="Native Input"/>
-      <button ion-button item-right (click)="clicked()">Button</button>
+      <button ion-button slot="item-right" (click)="clicked()">Button</button>
     </ion-item>
   </ion-list>
 
@@ -71,6 +73,8 @@
 
 </ion-content>
 
+
+<!-- main end -->
 
   </ion-app>
 
