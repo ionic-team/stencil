@@ -19,6 +19,7 @@ export { IonLabel } from './label/label';
 export { IonList } from './list/list';
 export { IonListHeader } from './list-header/list-header';
 export { IonNav } from './nav/nav';
+export { IonNavbar } from './navbar/navbar';
 export { IonThumbnail } from './thumbnail/thumbnail';
 export { IonTitle } from './title/title';
 export { IonToolbar } from './toolbar/toolbar';

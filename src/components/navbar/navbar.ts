@@ -2,7 +2,7 @@ import { Ionic } from '../../utils/global';
 import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element';
 
 
-export class IonToolbar extends IonElement {
+export class IonNavbar extends IonElement {
 
   render(): VNode {
     const mode = Ionic().config.get('mode');
@@ -23,15 +23,8 @@ export class IonToolbar extends IonElement {
 
 }
 
-
-(<IonicComponent>IonToolbar).$annotations = {
-  tag: 'ion-toolbar',
-  preprocessStyles: [
-    'toolbar.ios.scss',
-    'toolbar.md.scss',
-    'toolbar.wp.scss',
-    'toolbar-button.scss',
-  ],
+(<IonicComponent>IonNavbar).$annotations = {
+  tag: 'ion-navbar',
   modeStyles: {
     'ios': [
       'toolbar.ios.css'
@@ -44,4 +37,3 @@ export class IonToolbar extends IonElement {
     ]
   }
 };
-
