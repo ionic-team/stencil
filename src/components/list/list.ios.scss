@@ -2,40 +2,6 @@
 @import "./list";
 
 
-// iOS List
-// --------------------------------------------------
-
-/// @prop - Margin top of the list
-$list-ios-margin-top:                 10px !default;
-
-/// @prop - Margin right of the list
-$list-ios-margin-right:               0 !default;
-
-/// @prop - Margin bottom of the list
-$list-ios-margin-bottom:              32px !default;
-
-/// @prop - Margin left of the list
-$list-ios-margin-left:                0 !default;
-
-/// @prop - Margin top of the inset list
-$list-inset-ios-margin-top:           16px !default;
-
-/// @prop - Margin right of the inset list
-$list-inset-ios-margin-right:         16px !default;
-
-/// @prop - Margin bottom of the inset list
-$list-inset-ios-margin-bottom:        16px !default;
-
-/// @prop - Margin left of the inset list
-$list-inset-ios-margin-left:          16px !default;
-
-/// @prop - Border radius of the inset list
-$list-inset-ios-border-radius:        4px !default;
-
-/// @prop - Background for the sliding content
-$item-ios-sliding-content-background:     $list-ios-background-color !default;
-
-
 // iOS Default List
 // --------------------------------------------------
 
