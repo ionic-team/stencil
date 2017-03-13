@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf dist/transpiled-core/",
+    "compare": "node scripts/build.compare.js",
     "copy.fonts": "cp -R src/fonts/ dist/fonts/",
     "build": "npm run transpile && npm run build.themes",
     "build.angular": "cd src/bindings/angular/ && npm run build",

@@ -1,0 +1,20 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 8px 0 0 0;
+  padding: 0;
+}
+
+.iframe-wrapper {
+  display: inline-block;
+  width: 50%;
+  text-align: center;
+}
+
+iframe {
+  width: 96%;
+  height: 650px;
+  border: 1px solid black;
+}
