@@ -51,9 +51,9 @@
   </button>
 
   <ion-item (click)="testClickOutsize($event)">
-    <button ion-button slot="item-left" (click)="testClick($event)">Default</button>
+    <ion-button slot="item-left" (click)="testClick($event)">Default</ion-button>
     Inner Buttons
-    <button ion-button outline slot="item-right" (click)="testClick($event)">Outline</button>
+    <ion-button outline slot="item-right" (click)="testClick($event)">Outline</ion-button>
   </ion-item>
 
   <button ion-item disabled>
@@ -117,7 +117,7 @@
     This is multiline text that has a
     long description of about how the text is really long
     and a <a href="#" (click)="testClick($event)">link</a>.
-    <button ion-button outline slot="item-right" (click)="testClick($event)">View</button>
+    <ion-button outline slot="item-right" (click)="testClick($event)">View</ion-button>
   </ion-item>
 
   <button ion-item *ngFor="let data of [0,1,2,3,4]; let i = index" [class.activated]="i == 1" (click)="testClick($event)">

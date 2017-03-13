@@ -48,6 +48,18 @@ function createWebIndex(index, mainContent) {
   mainContent = mainContent.replace(/ item-left/g, ' slot="item-left"');
   mainContent = mainContent.replace(/ item-right/g, ' slot="item-right"');
 
+  var match;
+  var oldButton;
+  var newButton;
+  while ((match = mainContent.match('<button(.*)ion-button(.*)</button>'))) {
+    oldButton = match[0];
+    newButton = oldButton.replace('<button', '<ion-button');
+    newButton = newButton.replace('</button>', '</ion-button>');
+    newButton = newButton.replace(' ion-button>', '>');
+    newButton = newButton.replace(' ion-button ', ' ');
+    mainContent = mainContent.replace(oldButton, newButton);
+  }
+
   var content = `<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>

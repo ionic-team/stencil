@@ -11,7 +11,7 @@ $button-round-padding:            0 2.6rem !default;
 $button-round-border-radius:      64px !default;
 
 
-.button {
+:host {
   @include appearance(none);
 
   position: relative;
@@ -50,7 +50,7 @@ $button-round-border-radius:      64px !default;
 }
 
 
-[ion-button] {
+a {
   text-decoration: none;
 }
 
@@ -67,7 +67,7 @@ button[disabled],
 // Block Button
 // --------------------------------------------------
 
-.button-block {
+:host(.button-block) {
   display: block;
   clear: both;
 
@@ -76,7 +76,7 @@ button[disabled],
   contain: strict;
 }
 
-.button-block::after {
+:host(.button-block::after) {
   clear: both;
 }
 
@@ -84,7 +84,7 @@ button[disabled],
 // Full Button
 // --------------------------------------------------
 
-.button-full {
+:host(.button-full) {
   display: block;
 
   width: 100%;
@@ -95,7 +95,7 @@ button[disabled],
 // Full Outline Button
 // --------------------------------------------------
 
-.button-full.button-outline {
+:host(.button-full.button-outline) {
   border-right-width: 0;
   border-left-width: 0;
   border-radius: 0;

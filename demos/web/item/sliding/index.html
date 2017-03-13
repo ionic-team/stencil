@@ -20,7 +20,7 @@
   <ion-toolbar>
     <ion-title>Sliding Items</ion-title>
     <ion-buttons end>
-      <button ion-button (click)="reload()">Reload</button>
+      <ion-button (click)="reload()">Reload</ion-button>
     </ion-buttons>
   </ion-toolbar>
 
@@ -30,9 +30,9 @@
 <ion-content>
 
   <div padding>
-    <button ion-button block (click)="toggleSliding()">Toggle sliding</button>
-    <button ion-button block (click)="changeDynamic()">Change Dynamic Options</button>
-    <button ion-button block (click)="closeOpened()">Close Opened Items</button>
+    <ion-button block (click)="toggleSliding()">Toggle sliding</ion-button>
+    <ion-button block (click)="changeDynamic()">Change Dynamic Options</ion-button>
+    <ion-button block (click)="closeOpened()">Close Opened Items</ion-button>
   </div>
 
   <ion-list #myList>
@@ -113,8 +113,8 @@
         <p>Hey do you want to go to the game tonight?</p>
       </button>
       <ion-item-options *ngIf="slidingEnabled">
-        <button ion-button color="primary" (click)="archive(item0)">Archive</button>
-        <button ion-button color="danger" (click)="del(item0)">Delete</button>
+        <ion-button color="primary" (click)="archive(item0)">Archive</ion-button>
+        <ion-button color="danger" (click)="del(item0)">Delete</ion-button>
       </ion-item-options>
     </ion-item-sliding>
 
@@ -124,8 +124,8 @@
         <p>I think I figured out how to get more Mountain Dew</p>
       </a>
       <ion-item-options side="left" *ngIf="slidingEnabled">
-        <button ion-button color="primary" (click)="archive(item1)">Archive</button>
-        <button ion-button color="danger" (click)="del(item1)">Delete</button>
+        <ion-button color="primary" (click)="archive(item1)">Archive</ion-button>
+        <ion-button color="danger" (click)="del(item1)">Delete</ion-button>
       </ion-item-options>
     </ion-item-sliding>
 
@@ -272,7 +272,7 @@
         <h3>ng-for {{data}}</h3>
       </ion-item>
       <ion-item-options>
-        <button ion-button color="primary" (click)="archive(item9)">Archive</button>
+        <ion-button color="primary" (click)="archive(item9)">Archive</ion-button>
       </ion-item-options>
     </ion-item-sliding>
 

@@ -49,7 +49,7 @@
     <ion-item>
       <ion-label floating>value: {{ numberInput.value }} min: {{ minValue }} max: {{ maxValue }} step: {{ stepValue }} </ion-label>
       <ion-input #numberInput [min]="minValue" [max]="maxValue" [step]="stepValue" type="number"></ion-input>
-      <button slot="item-right" outline ion-button (click)="toggleValues()">Toggle</button>
+      <ion-button slot="item-right" outline (click)="toggleValues()">Toggle</ion-button>
     </ion-item>
 
     <ion-item>

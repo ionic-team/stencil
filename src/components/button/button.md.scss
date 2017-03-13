@@ -174,7 +174,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Default Button
 // --------------------------------------------------
 
-.button-md {
+:host {
   overflow: hidden;
 
   margin: $button-md-margin;
@@ -197,16 +197,16 @@ $button-md-strong-font-weight:                  bold !default;
               color $button-md-transition-duration $button-md-transition-timing-function;
 }
 
-.button-md:hover:not(.disable-hover) {
+:host(:hover:not(.disable-hover)) {
   background-color: $button-md-background-color-hover;
 }
 
-.button-md.activated {
+:host(.activated) {
   background-color: $button-md-background-color-activated;
   box-shadow: $button-md-box-shadow-activated;
 }
 
-.button-md .button-effect {
+.button-effect {
   background-color: $button-md-text-color;
 }
 
@@ -219,7 +219,7 @@ $button-md-strong-font-weight:                  bold !default;
   $bg-color-activated: color-shade($bg-color);
   $fg-color: $color-contrast;
 
-  .button-md-#{$color-name} {
+  :host([color="#{$color-name}"]) {
     color: $fg-color;
     background-color: $bg-color;
   }
@@ -242,7 +242,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Button Sizes
 // --------------------------------------------------
 
-.button-large-md {
+:host(.button-large-md) {
   padding: $button-md-large-padding;
 
   height: $button-md-large-height;
@@ -250,7 +250,7 @@ $button-md-strong-font-weight:                  bold !default;
   font-size: $button-md-large-font-size;
 }
 
-.button-small-md {
+:host(.button-small-md) {
   padding: $button-md-small-padding;
 
   height: $button-md-small-height;
@@ -258,14 +258,14 @@ $button-md-strong-font-weight:                  bold !default;
   font-size: $button-md-small-font-size;
 }
 
-.button-small-md[icon-only] ion-icon {
+:host(.button-small-md[icon-only]) ion-icon {
   font-size: $button-md-small-icon-font-size;
 }
 
 // Material Design Block Button
 // --------------------------------------------------
 
-.button-block-md {
+:host(.button-block-md) {
   margin-right: 0;
   margin-left: 0;
 }
@@ -273,7 +273,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Full Button
 // --------------------------------------------------
 
-.button-full-md {
+:host(.button-full-md) {
   margin-right: 0;
   margin-left: 0;
 
@@ -285,7 +285,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Outline Button
 // --------------------------------------------------
 
-.button-outline-md {
+:host(.button-outline-md) {
   border-width: $button-md-outline-border-width;
   border-style: $button-md-outline-border-style;
   border-color: $button-md-outline-border-color;
@@ -338,7 +338,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Clear Button
 // --------------------------------------------------
 
-.button-clear-md {
+:host(.button-clear-md) {
   border-color: $button-md-clear-border-color;
   color: $button-md-background-color;
   background-color: $button-md-clear-background-color;
@@ -346,16 +346,16 @@ $button-md-strong-font-weight:                  bold !default;
   opacity: $button-md-clear-opacity;
 }
 
-.button-clear-md.activated {
+:host(.button-clear-md.activated) {
   background-color: $button-md-clear-background-color-activated;
   box-shadow: $button-md-clear-box-shadow-activated;
 }
 
-.button-clear-md:hover:not(.disable-hover) {
+:host(.button-clear-md:hover:not(.disable-hover)) {
   background-color: $button-md-clear-background-color-hover;
 }
 
-.button-clear-md .button-effect {
+:host(.button-clear-md) .button-effect {
   background-color: $button-md-clear-ripple-background-color;
 }
 
@@ -386,13 +386,13 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Round Button
 // --------------------------------------------------
 
-.button-round-md {
+:host(.button-round-md) {
   padding: $button-md-round-padding;
 
   border-radius: $button-md-round-border-radius;
 }
 
-.button-md [icon-only] {
+:host([icon-only]) {
   padding: 0;
 }
 
@@ -407,7 +407,7 @@ $button-md-strong-font-weight:                  bold !default;
   top: 0;
   left: 0;
   z-index: 0;
-  display: none;
+  display: block;
 
   border-radius: 50%;
 
@@ -418,10 +418,6 @@ $button-md-strong-font-weight:                  bold !default;
   transition-timing-function: ease-in-out;
 
   pointer-events: none;
-}
-
-.md .button-effect {
-  display: block;
 }
 
 
@@ -438,6 +434,6 @@ $button-md-strong-font-weight:                  bold !default;
 // MD strong Button
 // --------------------------------------------------
 
-.button-strong-md {
+:host(.button-strong-md) {
   font-weight: $button-md-strong-font-weight;
 }
