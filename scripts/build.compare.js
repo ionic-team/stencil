@@ -43,36 +43,47 @@ function buildWebDemos() {
 
 
 function createWebIndex(index, mainContent) {
-  mainContent = mainContent.replace(/ item-left/g, ' slot="item-left"');
-  mainContent = mainContent.replace(/ item-right/g, ' slot="item-right"');
+  mainContent = mainContent.replace(/ item-left/gi, ' slot="item-left"');
+  mainContent = mainContent.replace(/ item-right/gi, ' slot="item-right"');
 
-  var match;
   var oldText;
   var newText;
-  while ((match = mainContent.match(/<button(.*)ion-button(.*)([\s\S]*?)<\/button>/m))) {
-    oldText = match[0];
-    newText = oldText.replace('<button', '<ion-button');
-    newText = newText.replace('</button>', '</ion-button>');
-    newText = newText.replace(' ion-button>', '>');
-    newText = newText.replace(' ion-button ', ' ');
+
+  while ((oldText = tagFinder(mainContent, 'button', ['ion-button', 'ion-item']))) {
+    newText = oldText;
+
+    if (oldText.indexOf(' ion-item') > -1) {
+      newText = newText.replace(/<button/gi, '<ion-item');
+      newText = newText.replace(/<\/button>/gi, '</ion-item>');
+      newText = newText.replace(/ ion-item>/gi, '>');
+      newText = newText.replace(/ ion-item /gi, ' ');
+
+    } else {
+      newText = newText.replace(/<button/gi, '<ion-button');
+      newText = newText.replace(/<\/button>/gi, '</ion-button>');
+      newText = newText.replace(/ ion-button>/gi, '>');
+      newText = newText.replace(/ ion-button /gi, ' ');
+    }
+
     mainContent = mainContent.replace(oldText, newText);
   }
 
-  while ((match = mainContent.match(/<a(.*)ion-button(.*)([\s\S]*?)<\/a>/m))) {
-    oldText = match[0];
-    newText = oldText.replace('<a', '<ion-button');
-    newText = newText.replace('</a>', '</ion-button>');
-    newText = newText.replace(' ion-button>', '>');
-    newText = newText.replace(' ion-button ', ' ');
-    mainContent = mainContent.replace(oldText, newText);
-  }
+  while ((oldText = tagFinder(mainContent, 'a', ['ion-button', 'ion-item']))) {
+    newText = oldText;
 
-  while ((match = mainContent.match(/<button(.*)ion-item(.*)([\s\S]*?)<\/button>/m))) {
-    oldText = match[0];
-    newText = oldText.replace('<button', '<ion-item');
-    newText = newText.replace('</button>', '</ion-item>');
-    newText = newText.replace(' ion-item>', '>');
-    newText = newText.replace(' ion-item ', ' ');
+    if (oldText.indexOf(' ion-item') > -1) {
+      newText = newText.replace(/<a/gi, '<ion-item');
+      newText = newText.replace(/<\/a>/gi, '</ion-item>');
+      newText = newText.replace(/ ion-item>/gi, '>');
+      newText = newText.replace(/ ion-item /gi, ' ');
+
+    } else {
+      newText = newText.replace(/<a/gi, '<ion-button');
+      newText = newText.replace(/<\/a>/gi, '</ion-button>');
+      newText = newText.replace(/ ion-button>/gi, '>');
+      newText = newText.replace(/ ion-button /gi, ' ');
+    }
+
     mainContent = mainContent.replace(oldText, newText);
   }
 
@@ -105,6 +116,32 @@ ${mainContent}
 
   fs.writeFileSync(index, content);
 
+}
+
+
+function tagFinder(content, tag, attrs) {
+  var searchContent;
+
+  while (content) {
+    var startIndex = content.indexOf('<' + tag);
+    if (startIndex === -1) return null;
+
+    content = content.substr(startIndex);
+
+    var endIndex = content.indexOf('</' + tag + '>');
+    if (endIndex === -1) return null;
+
+    searchContent = content.substr(0, endIndex + ('</' + tag + '>').length);
+    content = content.substr(endIndex + ('</' + tag + '>').length);
+
+    for (var i = 0; i < attrs.length; i++) {
+      if (searchContent.indexOf(attrs[i]) > -1) {
+        return searchContent;
+      }
+    }
+  }
+
+  return null;
 }
 
 

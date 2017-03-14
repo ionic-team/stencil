@@ -26,17 +26,17 @@
 
 <ion-content>
 
-  <a ion-item href="#" (click)="testClick($event)">
+  <ion-item href="#" (click)="testClick($event)">
     a[ion-item]
-  </a>
+  </ion-item>
 
-  <a ion-item class="activated" href="#" (click)="testClick($event)">
+  <ion-item class="activated" href="#" (click)="testClick($event)">
     a[ion-item].activated
-  </a>
+  </ion-item>
 
-   <a ion-item color="secondary" href="#" (click)="testClick($event)">
+   <ion-item color="secondary" href="#" (click)="testClick($event)">
     a[ion-item] secondary
-  </a>
+  </ion-item>
 
   <ion-item (click)="testClick($event)">
     button[ion-item]
@@ -57,16 +57,16 @@
   </ion-item>
 
   <ion-item disabled>
-    <ion-button slot="item-left" icon-left (click)="testClick($event)">
+    <ion-item ion-button slot="item-left" icon-left (click)="testClick($event)">
       <ion-icon name="home"></ion-icon>
       Left Icon
-    </ion-button>
+    </ion-item>
     disabled left icon buttons
     <ion-button outline slot="item-right" icon-left (click)="testClick($event)">
       <ion-icon name="star"></ion-icon>
       Left Icon
     </ion-button>
-  </ion-item>
+  </button>
 
   <ion-item>
     <ion-button slot="item-left" icon-right (click)="testClick($event)">
@@ -90,13 +90,13 @@
     </ion-button>
   </ion-item>
 
-  <a ion-item disabled>
-    a ion-item disabled right icon/text button large
+  <ion-item disabled>
+    a disabled right icon/text button large
     <ion-button slot="item-right" large icon-left (click)="testClick($event)">
       <ion-icon name="refresh"></ion-icon>
       Refresh
     </ion-button>
-  </a>
+  </ion-item>
 
   <ion-item>
     <ion-button clear slot="item-left" small icon-left (click)="testClick($event)">

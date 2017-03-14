@@ -82,14 +82,14 @@
     </ion-item-sliding>
 
     <ion-item-sliding #item100>
-      <a ion-item>
+      <ion-item>
         <h2>HubStruck Notifications</h2>
         <p>A new message from a repo in your network</p>
         <p>Oceanic Next has joined your network</p>
         <ion-note slot="item-right">
           10:45 AM
         </ion-note>
-      </a>
+      </ion-item>
 
       <ion-item-options side="left">
         <ion-button (click)="noclose(item100)">
@@ -119,10 +119,10 @@
     </ion-item-sliding>
 
     <ion-item-sliding #item1>
-      <a ion-item text-wrap detail-push class="activated">
+      <ion-item text-wrap detail-push class="activated">
         <h2>LEFT side - no icons</h2>
         <p>I think I figured out how to get more Mountain Dew</p>
-      </a>
+      </ion-item>
       <ion-item-options side="left" *ngIf="slidingEnabled">
         <ion-button color="primary" (click)="archive(item1)">Archive</ion-button>
         <ion-button color="danger" (click)="del(item1)">Delete</ion-button>
