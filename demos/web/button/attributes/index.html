@@ -22,7 +22,15 @@
       <ion-button>Default</ion-button>
       <ion-button solid>Solid</ion-button>
       <ion-button outline>Outline</ion-button>
-      <ion-button [clear]="isBarClear" (click)="toggleBarClear()">Clear</ion-button>
+      <ion-button id="dynamicClear" onclick="toggleBarClear()">Clear</ion-button>
+      <script>
+        var dynamicClear = document.getElementById('dynamicClear');
+        dynamicClear.clear = true;
+
+        function toggleBarClear() {
+          dynamicClear.clear = !dynamicClear.clear;
+        }
+      </script>
     </ion-buttons>
   </ion-toolbar>
 
@@ -31,8 +39,22 @@
 
 <ion-content padding style="text-align:center" no-bounce>
   <h5>Button Displays</h5>
-  <ion-button [block]="isBlock" (click)="toggleBlock()">Block (toggle)</ion-button>
-  <ion-button [full]="isFull">Full</ion-button>
+  <ion-button id="dynamicBlock" onclick="toggleBlock()">Block (toggle)</ion-button>
+
+  <ion-button id="dynamicFull">Full</ion-button>
+  <script>
+    var dynamicBlock = document.getElementById('dynamicBlock');
+    dynamicBlock.block = true;
+
+    var dynamicFull = document.getElementById('dynamicFull');
+    dynamicFull.full = true;
+
+    function toggleBlock() {
+      dynamicBlock.block = !dynamicBlock.block;
+      dynamicFull.full = !dynamicFull.full;
+    }
+  </script>
+
   <ion-button full block>Both</ion-button>
 
   <h5>Button Styles (Click to Toggle)</h5>
