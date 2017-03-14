@@ -43,30 +43,37 @@ function buildWebDemos() {
 
 
 function createWebIndex(index, mainContent) {
-  console.log(index);
-
   mainContent = mainContent.replace(/ item-left/g, ' slot="item-left"');
   mainContent = mainContent.replace(/ item-right/g, ' slot="item-right"');
 
   var match;
-  var oldButton;
-  var newButton;
-  while ((match = mainContent.match('<button(.*)ion-button(.*)</button>'))) {
-    oldButton = match[0];
-    newButton = oldButton.replace('<button', '<ion-button');
-    newButton = newButton.replace('</button>', '</ion-button>');
-    newButton = newButton.replace(' ion-button>', '>');
-    newButton = newButton.replace(' ion-button ', ' ');
-    mainContent = mainContent.replace(oldButton, newButton);
+  var oldText;
+  var newText;
+  while ((match = mainContent.match(/<button(.*)ion-button(.*)([\s\S]*?)<\/button>/m))) {
+    oldText = match[0];
+    newText = oldText.replace('<button', '<ion-button');
+    newText = newText.replace('</button>', '</ion-button>');
+    newText = newText.replace(' ion-button>', '>');
+    newText = newText.replace(' ion-button ', ' ');
+    mainContent = mainContent.replace(oldText, newText);
   }
 
-  while ((match = mainContent.match('<a(.*)ion-button(.*)</a>'))) {
-    oldButton = match[0];
-    newButton = oldButton.replace('<a', '<ion-button');
-    newButton = newButton.replace('</a>', '</ion-button>');
-    newButton = newButton.replace(' ion-button>', '>');
-    newButton = newButton.replace(' ion-button ', ' ');
-    mainContent = mainContent.replace(oldButton, newButton);
+  while ((match = mainContent.match(/<a(.*)ion-button(.*)([\s\S]*?)<\/a>/m))) {
+    oldText = match[0];
+    newText = oldText.replace('<a', '<ion-button');
+    newText = newText.replace('</a>', '</ion-button>');
+    newText = newText.replace(' ion-button>', '>');
+    newText = newText.replace(' ion-button ', ' ');
+    mainContent = mainContent.replace(oldText, newText);
+  }
+
+  while ((match = mainContent.match(/<button(.*)ion-item(.*)([\s\S]*?)<\/button>/m))) {
+    oldText = match[0];
+    newText = oldText.replace('<button', '<ion-item');
+    newText = newText.replace('</button>', '</ion-item>');
+    newText = newText.replace(' ion-item>', '>');
+    newText = newText.replace(' ion-item ', ' ');
+    mainContent = mainContent.replace(oldText, newText);
   }
 
   var content = `<!DOCTYPE html>
