@@ -35,3 +35,17 @@
 
   contain: strict;
 }
+
+
+// Toolbar Buttons - Light DOM
+// --------------------------------------------------
+
+ion-buttons {
+  display: flex;
+
+  margin: 0 .2rem;
+
+  transform: translateZ(0);
+
+  pointer-events: none;
+}
