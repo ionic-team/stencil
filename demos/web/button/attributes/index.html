@@ -58,9 +58,19 @@
   <ion-button full block>Both</ion-button>
 
   <h5>Button Styles (Click to Toggle)</h5>
-  <ion-button [solid]="isSolid" (click)="toggleStyles()">Solid</ion-button>
-  <ion-button [outline]="isOutline" (click)="toggleStyles()">Outline</ion-button>
-  <ion-button [clear]="isClear" (click)="toggleStyles()">Clear</ion-button>
+  <ion-button id="btnA" [solid]="isSolid" (click)="toggleStyles()">Solid</ion-button>
+  <ion-button id="btnB" [outline]="isOutline" (click)="toggleStyles()">Outline</ion-button>
+  <ion-button id="btnC" [clear]="isClear" (click)="toggleStyles()">Clear</ion-button>
+
+  <script>
+    var btnA = document.getElementById('btnA');
+    var btnB = document.getElementById('btnB');
+    var btnC = document.getElementById('btnC');
+
+    btnA.solid = true;
+    btnB.outline = true;
+    btnC.clear = true;
+  </script>
 
   <h5>Button Sizes</h5>
   <ion-button small="true">Small</ion-button>
@@ -68,11 +78,23 @@
   <ion-button large>Large</ion-button>
 
   <h5>Button Colors (Click to Toggle)</h5>
-  <ion-button block [color]="isSecondary" (click)="toggleColors()">Block</ion-button>
-  <ion-button solid [color]="isDanger" (click)="toggleColors()">Solid</ion-button>
-  <ion-button outline [color]="isDark" (click)="toggleColors()">Outline</ion-button>
-  <ion-button clear [color]="isSecondary" (click)="toggleColors()">Clear</ion-button>
+  <ion-button id="btn1" block id= [color]="isSecondary" (click)="toggleColors()">Block</ion-button>
+  <ion-button id="btn2" solid [color]="isDanger" (click)="toggleColors()">Solid</ion-button>
+  <ion-button id="btn3" outline [color]="isDark" (click)="toggleColors()">Outline</ion-button>
+  <ion-button id="btn4" clear [color]="isSecondary" (click)="toggleColors()">Clear</ion-button>
   <ion-button (click)="removeColors()">Remove Colors</ion-button>
+
+  <script>
+    var btn1 = document.getElementById('btn1');
+    var btn2 = document.getElementById('btn2');
+    var btn3 = document.getElementById('btn3');
+    var btn4 = document.getElementById('btn4');
+
+    btn1.color = "secondary";
+    btn2.color = "danger";
+    btn3.color = "dark";
+    btn4.color = "secondary";
+  </script>
 
 </ion-content>
 

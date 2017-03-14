@@ -154,7 +154,7 @@ function preprocessStyles(fileNames: string[], srcDir: string, cssDir: string, c
 
       var sassConfig = {
         file: scssFile,
-        outputStyle: 'compressed'
+        outputStyle: 'expanded' // 'compressed'
       };
 
       sass.render(sassConfig, (err, result) => {

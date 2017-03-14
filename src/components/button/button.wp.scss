@@ -311,6 +311,18 @@ $button-wp-strong-font-weight:                            bold !default;
   border-radius: $button-wp-round-border-radius;
 }
 
+
+// Windows Strong Button
+// --------------------------------------------------
+
+.button-strong-wp {
+  font-weight: $button-wp-strong-font-weight;
+}
+
+
+// Windows Icon Only Button
+// --------------------------------------------------
+
 .button-wp [icon-only] {
   padding: 0;
 }
@@ -323,12 +335,4 @@ $button-wp-strong-font-weight:                            bold !default;
   @include wp-button-default($color-name, $color-base, $color-contrast);
   @include wp-button-outline($color-name, $color-base, $color-contrast);
   @include wp-button-clear($color-name, $color-base, $color-contrast);
-}
-
-
-// WP strong Button
-// --------------------------------------------------
-
-.button-strong-wp {
-  font-weight: $button-wp-strong-font-weight;
 }

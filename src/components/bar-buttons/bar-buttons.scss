@@ -1,0 +1,20 @@
+@import "../../themes/ionic.globals";
+
+
+// Bar Buttons
+// --------------------------------------------------
+// Bar buttons refers to the element which contains
+// buttons within a toolbar.
+
+:host {
+  visibility: inherit !important;
+}
+
+
+button,
+a,
+input,
+textarea,
+div {
+  pointer-events: auto;
+}

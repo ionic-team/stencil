@@ -174,6 +174,7 @@ $button-md-strong-font-weight:                  bold !default;
 // Material Design Default Button
 // --------------------------------------------------
 
+
 :host {
   overflow: hidden;
 
@@ -192,9 +193,9 @@ $button-md-strong-font-weight:                  bold !default;
   background-color: $button-md-background-color;
   box-shadow: $button-md-box-shadow;
 
-  transition: box-shadow $button-md-transition-duration $button-md-transition-timing-function,
-              background-color $button-md-transition-duration $button-md-transition-timing-function,
-              color $button-md-transition-duration $button-md-transition-timing-function;
+  // transition: box-shadow $button-md-transition-duration $button-md-transition-timing-function,
+  //             background-color $button-md-transition-duration $button-md-transition-timing-function,
+  //             color $button-md-transition-duration $button-md-transition-timing-function;
 }
 
 :host(:hover:not(.disable-hover)) {
@@ -392,6 +393,18 @@ $button-md-strong-font-weight:                  bold !default;
   border-radius: $button-md-round-border-radius;
 }
 
+
+// Material Design Strong Button
+// --------------------------------------------------
+
+:host([strong]) {
+  font-weight: $button-md-strong-font-weight;
+}
+
+
+// Material Design Icon Only
+// --------------------------------------------------
+
 :host([icon-only]) {
   padding: 0;
 }
@@ -431,9 +444,7 @@ $button-md-strong-font-weight:                  bold !default;
 }
 
 
-// MD strong Button
+// Material Design Toolbar Buttons
 // --------------------------------------------------
 
-:host([strong]) {
-  font-weight: $button-md-strong-font-weight;
-}
+@import "./toolbar-button.md";

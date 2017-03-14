@@ -312,6 +312,14 @@ $button-ios-strong-font-weight:                     600 !default;
 }
 
 
+// iOS Strong Button
+// --------------------------------------------------
+
+.button-strong-ios {
+  font-weight: $button-ios-strong-font-weight;
+}
+
+
 // Generate iOS Button Colors
 // --------------------------------------------------
 
@@ -319,12 +327,4 @@ $button-ios-strong-font-weight:                     600 !default;
   @include ios-button-default($color-name, $color-base, $color-contrast);
   @include ios-button-outline($color-name, $color-base, $color-contrast);
   @include ios-button-clear($color-name, $color-base, $color-contrast);
-}
-
-
-// iOS strong Button
-// --------------------------------------------------
-
-.button-strong-ios {
-  font-weight: $button-ios-strong-font-weight;
 }

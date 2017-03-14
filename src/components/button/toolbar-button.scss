@@ -1,9 +1,10 @@
 @import "../../themes/ionic.globals";
 
+
 // Toolbar Buttons
 // --------------------------------------------------
 
-.bar-button {
+:host-context(.bar-buttons) {
   @include appearance(none);
 
   position: relative;
@@ -26,7 +27,7 @@
   user-select: none;
 }
 
-.bar-button::after {
+:host-context(.bar-buttons)::after {
   // used to make the button's hit area larger
   position: absolute;
   top: -7px;

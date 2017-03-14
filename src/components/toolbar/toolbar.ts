@@ -30,7 +30,6 @@ export class IonToolbar extends IonElement {
     'toolbar.ios.scss',
     'toolbar.md.scss',
     'toolbar.wp.scss',
-    'toolbar-button.scss',
   ],
   modeStyles: {
     'ios': [

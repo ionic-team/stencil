@@ -1,0 +1,32 @@
+@import "../../themes/ionic.globals.md";
+@import "./bar-buttons";
+
+
+// Material Design Toolbar Button Placement
+// --------------------------------------------------
+
+:host {
+  order: map-get($toolbar-order-md, buttons-start);
+
+  transform: translateZ(0);
+}
+
+:host([left]) {
+  order: map-get($toolbar-order-md, buttons-left);
+}
+
+:host:first-child {
+  margin-left: 0;
+}
+
+:host([end]) {
+  order: map-get($toolbar-order-md, buttons-end);
+
+  text-align: right;
+}
+
+:host([right]) {
+  order: map-get($toolbar-order-md, buttons-right);
+
+  text-align: right;
+}

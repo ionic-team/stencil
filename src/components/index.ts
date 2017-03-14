@@ -5,6 +5,7 @@ export { VNode, VNodeData} from '../utils/interfaces';
 export { IonApp } from './app/app';
 export { IonAvatar } from './avatar/avatar';
 export { IonBadge } from './badge/badge';
+export { IonBarButtons } from './bar-buttons/bar-buttons';
 export { IonButton } from './button/button';
 export { IonCard } from './card/card';
 export { IonCardContent } from './card-content/card-content';

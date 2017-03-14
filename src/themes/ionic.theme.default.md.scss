@@ -66,3 +66,18 @@ $item-md-padding-media-top:           9px !default;
 $item-md-padding-media-bottom:        9px !default;
 $item-md-padding-icon-top:            11px !default;
 $item-md-padding-icon-bottom:         10px !default;
+
+
+// Material Design Toolbar Order
+// --------------------------------------------------
+
+$toolbar-order-md: (
+  back-button: 0,
+  menu-toggle-start: 1,
+  buttons-left: 2,
+  content: 3,
+  buttons-start: 4,
+  buttons-end: 5,
+  buttons-right: 6,
+  menu-toggle-end: 7,
+);

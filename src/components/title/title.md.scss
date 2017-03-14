@@ -11,20 +11,9 @@ $toolbar-md-title-font-size:             2rem !default;
 /// @prop - Text color of the toolbar title
 $toolbar-md-title-text-color:            color-contrast($colors-md, $toolbar-md-background, md) !default;
 
-/// @prop - Font size of the toolbar button
-$toolbar-md-button-font-size:            1.4rem !default;
-
-/// @prop - Text color of the toolbar button
-$toolbar-md-button-color:                $toolbar-md-title-text-color !default;
-
-/// @prop - Border radius of the toolbar button
-$toolbar-md-button-border-radius:        2px !default;
-
-/// @prop - Font weight of a strong toolbar button
-$toolbar-md-button-strong-font-weight:   bold !default;
-
 /// @prop - Height of the navigation bar
 $navbar-md-height:                       $toolbar-md-height !default;
+
 
 .toolbar-title-md {
   padding: 0 12px;

@@ -49,6 +49,10 @@ export class IonButton extends IonElement {
       attrs['strong'] = '';
     }
 
+    if (host.color) {
+      attrs['color'] = host.color;
+    }
+
     const buttonInnerTag = 'a.button-inner';
     const hasButtonEffect = true;
 
