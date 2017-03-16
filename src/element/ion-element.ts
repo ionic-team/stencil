@@ -40,7 +40,7 @@ export class IonElement extends getBaseElement() {
     }
 
     if (annotations.modeStyles) {
-      const modeStyleFilename = annotations.modeStyles[ionic.config.get('mode')];
+      const modeStyleFilename = annotations.modeStyles[ionic.config.getValue('mode')];
       if (modeStyleFilename) {
         const link = <HTMLLinkElement>ionic.api.createElement('link');
         link.href = ionic.staticDir + modeStyleFilename;
@@ -91,7 +91,7 @@ export class IonElement extends getBaseElement() {
         // vdom diff and patch the host element for differences
         patchHostElement(ionic.config, ionic.api, ionic.renderer, elm);
 
-        this._onUpdates.forEach(cb => {
+        elm._onUpdates.forEach(cb => {
           cb(elm);
         });
 

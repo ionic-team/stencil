@@ -5,7 +5,7 @@ import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element'
 export class IonToolbar extends IonElement {
 
   render(): VNode {
-    const mode = Ionic().config.get('mode');
+    const mode = Ionic().config.getValue('mode');
 
     const bgData = { class: {} };
     bgData.class[`toolbar-background-${mode}`] = true;

@@ -46,5 +46,5 @@ export function patchHostElement(config: Config, api: PlatformApi, renderer: Ren
 
 function getValue(name: string, config: Config, api: PlatformApi, elm: HTMLElement, fallback: any = null): any {
   const val = api.getPropOrAttr(elm, name);
-  return isDef(val) ? val : config.get(name, fallback);
+  return isDef(val) ? val : config.getValue(name, fallback);
 }

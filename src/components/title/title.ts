@@ -4,7 +4,7 @@ import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element'
 
 export class IonTitle extends IonElement {
   render(): VNode {
-    const mode = Ionic().config.get('mode');
+    const mode = Ionic().config.getValue('mode');
 
     const titleData = { class: {} };
     titleData.class[`toolbar-title-${mode}`] = true;
