@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<title>Adamer</title>
+
+
+<!--<script src="scripts/apply-shim.min.js"></script>
+<script src="scripts/webcomponents-hi-sd-ce.js"></script>-->
+
+<!--<script src="scripts/webcomponents-es5-loader.js"></script>-->
+<script src="scripts/webcomponents-hi-sd-ce.js"></script>
+
+
+<script src="scripts/boot.js"></script>
+<script src="scripts/mixin.js"></script>
+<!--<script src="scripts/resolve-url.js"></script>-->
+<!--<script src="scripts/async.js"></script>-->
+<!--<script src="scripts/property-accessors.js"></script>-->
+<!--<script src="scripts/template-stamp.js"></script>-->
+<!--<script src="scripts/property-effects.js"></script>-->
+<script src="scripts/case-map.js"></script>
+<script src="scripts/element-mixin.js"></script>
+<!--<script src="scripts/gesture-event-listeners.js"></script>-->
+<!--<script src="scripts/legacy-element-mixin.js"></script>-->
+<script src="scripts/polymer-element.js"></script>
+<!--<script src="scripts/polymer.js"></script>-->
+<!--<script src="scripts/array-selector.js"></script>-->
+<!--<script src="scripts/array-splice.js"></script>-->
+<!--<script src="scripts/class.js"></script>-->
+<!--<script src="scripts/custom-style-interface.min.js"></script>-->
+<!--<script src="scripts/custom-style.js"></script>-->
+<!--<script src="scripts/debounce.js"></script>-->
+<!--<script src="scripts/mutable-data.js"></script>-->
+<!--<script src="scripts/mutable-data-behavior.js"></script>-->
+<!--<script src="scripts/dom-bind.js"></script>-->
+<!--<script src="scripts/dom-if.js"></script>-->
+<!--<script src="scripts/dom-module.js"></script>-->
+<!--<script src="scripts/dom-repeat.js"></script>-->
+<!--<script src="scripts/flattened-nodes-observer.js"></script>-->
+<!--<script src="scripts/flush.js"></script>-->
+<!--<script src="scripts/gestures.js"></script>-->
+<!--<script src="scripts/import-href.js"></script>-->
+<!--<script src="scripts/path.js"></script>-->
+<!--<script src="scripts/polymer-fn.js"></script>-->
+<!--<script src="scripts/polymer.dom.js"></script>-->
+<!--<script src="scripts/render-status.js"></script>-->
+<!--<script src="scripts/style-gather.js"></script>-->
+<!--<script src="scripts/templatize.js"></script>-->
+<!--<script src="scripts/templatizer-behavior.js"></script>-->
+<!--<script src="scripts/unresolved.js"></script>-->
+
+<script>
+
+setTimeout(function() {
+
+  var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+  function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+  function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+  var MyApplication = function (_Polymer$Element) {
+    _inherits(MyApplication, _Polymer$Element);
+
+    function MyApplication() {
+      _classCallCheck(this, MyApplication);
+
+document.body.style.background = 'yellow';
+console.log('5555 MyApplication constructor!!!')
+
+
+      var thinger = MyApplication.__proto__ || Object.getPrototypeOf(MyApplication);
+
+      return _possibleConstructorReturn(this, (thinger).apply(this, arguments));;
+    }
+
+    _createClass(MyApplication, null, [{
+      key: 'is',
+      get: function get() {
+        return 'adamer-app';
+      }
+    }, {
+      key: 'properties',
+      get: function get() {
+        return {
+          prop1: {
+            type: String,
+            value: 'adamer-app'
+          }
+        };
+      }
+    }]);
+
+    return MyApplication;
+  }(Polymer.Element);
+
+  window.customElements.define(MyApplication.is, MyApplication);
+
+}, 500);
+
+</script>
+
+</head>
+<body>
+
+<adamer-app></adamer-app>
+
+</body>
+</html>

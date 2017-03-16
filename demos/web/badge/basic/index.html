@@ -7,7 +7,18 @@
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
   <link href="/dist/themes/ionic.css" rel="stylesheet">
-  <script src="/dist/ionic-web/dist/ionic.web.js" static-dir="/dist/ionic-web/dist/"></script>
+
+  <script src="/node_modules/webcomponents.js/webcomponents.js"></script>
+  <!--<script src="/dist/ionic-angular/dist/ionic.components.js" static-dir="/dist/ionic-web/dist/"></script>-->
+
+  <script>
+  customElements.define('ion-badge', class IonBadge extends HTMLElement {
+    constructor() {
+      super();
+      console.log('badge!')
+    }
+  })
+  </script>
 </head>
 <body>
 
