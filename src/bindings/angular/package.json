@@ -7,6 +7,8 @@
   "scripts": {
     "clean": "rimraf ../../../dist/transpiled-angular/",
     "build": "npm run transpile && node scripts/build.angular.js",
+    "gzip": "gzip --keep -f ../../../dist/ionic-angular/dist/ionic.components.min.js",
+    "minify": "babili ../../../dist/ionic-angular/dist/ionic.components.js -o ../../../dist/ionic-angular/dist/ionic.components.min.js && npm run gzip && ls -alH ../../../dist/ionic-angular/dist/",
     "start": "npm install && npm run build",
     "transpile": "npm run clean && tsc -p tsconfig.json",
     "transpile.watch": "npm run clean && tsc -p tsconfig.json --watch"
@@ -27,6 +29,14 @@
   },
   "devDependencies": {
     "@types/jasmine": "^2.5.43",
+    "babel-cli": "^6.24.0",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
+    "babel-plugin-transform-es2015-block-scoped-functions": "^6.22.0",
+    "babel-plugin-transform-es2015-block-scoping": "^6.23.0",
+    "babel-plugin-transform-es2015-parameters": "^6.23.0",
+    "babel-plugin-transform-es2015-template-literals": "^6.22.0",
+    "babel-preset-babili": "0.0.12",
+    "babili": "0.0.12",
     "rimraf": "^2.6.1",
     "typescript": "2.2.1"
   }

@@ -29,7 +29,8 @@
     "knuth-shuffle": "1.0.1",
     "rimraf": "2.6.1",
     "rollup": "0.41.4",
-    "typescript": "2.2.1"
+    "typescript": "2.2.1",
+    "webcomponents.js": "^0.7.24"
   },
   "jest": {
     "testEnvironment": "node",
