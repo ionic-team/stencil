@@ -1,5 +1,5 @@
 {
-  "name": "@ionic/compiler",
+  "name": "ionic-compiler",
   "private": true,
   "version": "0.0.1",
   "license": "MIT",
@@ -9,16 +9,14 @@
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch",
-    "transpile": "npm run clean && (tsc -p tsconfig.json || true)",
-    "transpile.watch": "npm run clean && (tsc -p tsconfig.json --watch || true)"
+    "transpile": "npm run clean && (tsc || true)",
+    "transpile.watch": "npm run clean && (tsc --watch || true)"
   },
   "devDependencies": {
-    "@types/fs-extra": "^2.0.0",
-    "@types/jest": "^19.2.2",
-    "@types/node": "^7.0.8",
-    "@types/node-sass": "^3.10.32",
+    "@types/jest": "18.1.1",
+    "@types/node": "7.0.5",
     "babili": "0.0.11",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "2.0.0",
     "glob": "^7.1.1",
     "jest": "19.0.2",
     "node-sass": "^4.5.0",

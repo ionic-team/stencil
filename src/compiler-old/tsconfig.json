@@ -1,23 +1,22 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "declaration": false,
+    "experimentalDecorators": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "declaration": true,
     "lib": [
       "dom",
-      "es5",
       "es2015"
     ],
     "module": "commonjs",
     "target": "es5",
-    "outDir": "../../dist/compiler/",
-    "noUnusedLocals": true,
-    "noImplicitAny": true,
+    "moduleResolution": "node",
     "sourceMap": false,
+    "outDir": "../../dist/compiler",
     "types": [
-      "node",
       "jest",
-      "node-sass"
+      "node"
     ]
   },
   "include": [

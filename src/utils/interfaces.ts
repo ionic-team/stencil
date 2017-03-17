@@ -16,6 +16,7 @@ export interface Renderer {
 
 
 export interface ComponentMeta {
+  tag?: string;
   props?: Props;
   obsAttrs?: string[];
   hostCss?: string;

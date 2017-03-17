@@ -1,9 +1,7 @@
-import { IonElement, IonicComponent } from '../../element/ion-element';
+import { Component } from '../../utils/decorators';
 
 
-export class IonBadge extends IonElement {}
-
-(<IonicComponent>IonBadge).$annotations = {
+@Component({
   tag: 'ion-badge',
   preprocessStyles: [
     'badge.ios.scss',
@@ -21,4 +19,6 @@ export class IonBadge extends IonElement {}
       'badge.wp.css'
     ]
   }
-};
+})
+export class IonBadge {}
+

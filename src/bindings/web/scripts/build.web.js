@@ -8,29 +8,37 @@ var compiler = require(common.distPath('compiler'));
 var task = 'build ionic-web';
 console.log(task);
 
-
-var srcDir = common.srcPath('components');
-var jsDir = common.distPath('transpiled-web/components');
-var cssDir = common.distPath('ionic-web/dist');
-var entryFile = common.distPath('transpiled-web/bindings/web/src/ionic.js');
-var outputFile = common.distPath('ionic-web/dist/ionic.js');
+var opts = {
+  srcDir: common.srcPath('components'),
+  destDir: common.distPath('ionic-web'),
+};
 
 
-compiler.compileComponents(srcDir, jsDir, cssDir).then(() => {
+compiler.compileComponents(opts);
 
-  fs.ensureDirSync(path.dirname(outputFile));
 
-  rollup.rollup({
-    entry: entryFile
+// var srcDir = common.srcPath('components');
+// var jsDir = common.distPath('transpiled-web/components');
+// var cssDir = common.distPath('ionic-web/dist');
+// var entryFile = common.distPath('transpiled-web/bindings/web/src/ionic.js');
+// var outputFile = common.distPath('ionic-web/dist/ionic.js');
 
-  }).then(function(bundle) {
-    var result = bundle.generate({
-      format: 'umd'
-    });
 
-    fs.writeFileSync(outputFile, result.code);
+// compiler.compileComponents(srcDir, jsDir, cssDir).then(() => {
 
-    console.log(task, 'bundle:', outputFile);
-  });
+//   fs.ensureDirSync(path.dirname(outputFile));
 
-});
+//   rollup.rollup({
+//     entry: entryFile
+
+//   }).then(function(bundle) {
+//     var result = bundle.generate({
+//       format: 'umd'
+//     });
+
+//     fs.writeFileSync(outputFile, result.code);
+
+//     console.log(task, 'bundle:', outputFile);
+//   });
+
+// });
