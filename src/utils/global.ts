@@ -20,7 +20,7 @@ export function Ionic(opts?: GlobalIonic): GlobalIonic {
   }
 
   if (!ionic.api) {
-    ionic.api = new PlatformClient(document);
+    ionic.api = new PlatformClient(GLOBAL, document);
   }
 
   if (!ionic.renderer) {

@@ -39,8 +39,8 @@ export class IonElement extends getBaseElement() {
       this._root = this.attachShadow({mode: 'open'});
     }
 
-    if (annotations.modeStyles) {
-      const modeStyleFilename = annotations.modeStyles[ionic.config.getValue('mode')];
+    if (annotations.modeStyleUrls) {
+      const modeStyleFilename = annotations.modeStyleUrls[ionic.config.getValue('mode')];
       if (modeStyleFilename) {
         const link = <HTMLLinkElement>ionic.api.createElement('link');
         link.href = ionic.staticDir + modeStyleFilename;

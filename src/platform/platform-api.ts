@@ -1,5 +1,10 @@
+import { ComponentMeta, ComponentModule, ComponentRegistry } from '../utils/interfaces';
+
 
 export interface PlatformApi {
+  registerComponents: (componentsToRegister: ComponentRegistry) => void;
+  getComponentMeta: (tag: string) => ComponentMeta;
+  loadComponentModule: (tag: string, cb: {(cmpMeta: ComponentMeta, cmpModule: ComponentModule): void}) => void;
   createElement: (tagName: any) => HTMLElement;
   createElementNS: (namespaceURI: string, qualifiedName: string) => Element;
   createTextNode: (text: string) => Text;
@@ -19,8 +24,9 @@ export interface PlatformApi {
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
   isComment: (node: Node) => node is Comment;
-  hasElementCss: (tag: string) => boolean;
-  appendStyles: (tag: string, styles: string) => void;
-  appendStyleUrl: (tag: string, styleUrl: string) => void;
   nextTick: (cb: Function) => void;
+  injectScopedCss: boolean;
+  staticDir: string;
+  hasLinkCss(linkUrl: string): boolean;
+  getDocumentHead(): HTMLHeadElement;
 }

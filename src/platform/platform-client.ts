@@ -1,11 +1,117 @@
 import { PlatformApi } from './platform-api';
 import { isDef, toCamelCase } from '../utils/helpers';
+import { ComponentRegistry, ComponentMeta, ComponentModule } from '../utils/interfaces';
+import { getStaticComponentDir } from '../utils/helpers';
 
 
 export class PlatformClient implements PlatformApi {
-  private css: {[tag: string]: boolean} = {};
+  private registry: ComponentRegistry = {};
+  private modules: {[tag: string]: ComponentModule} = {};
+  private loadCallbacks: LoadedCallbacks = {};
+  private activeRequests: string[] = [];
+  private hasLink: {[tag: string]: boolean} = {};
 
-  constructor(private d: HTMLDocument) {}
+  injectScopedCss: boolean;
+  staticDir: string;
+
+
+  constructor(private win: Window, private d: HTMLDocument) {
+    const self = this;
+    self.win;
+
+    self.staticDir = getStaticComponentDir(d);
+
+    (<any>win).ionicComponent = function(tag: string, moduleFn: {(): ComponentModule}) {
+      console.debug('ionicComponent', tag);
+
+      const cmpMeta = self.getComponentMeta(tag);
+      const cmpModule = moduleFn();
+
+      self.modules[tag] = cmpModule;
+
+      const callbacks = self.loadCallbacks[tag];
+      if (callbacks) {
+        callbacks.forEach(cb => {
+          cb(cmpMeta, cmpModule);
+        })
+        delete self.loadCallbacks[tag];
+      }
+    };
+
+  }
+
+  registerComponents(componentsToRegister: ComponentRegistry) {
+    Object.assign(this.registry, componentsToRegister);
+  }
+
+  getComponentMeta(tag: string): ComponentMeta {
+    return this.registry[tag];
+  }
+
+  loadComponentModule(tag: string, cb: {(cmpMeta: ComponentMeta, cmpModule: any): void}): void {
+    const self = this;
+    const cmpMeta = self.getComponentMeta(tag);
+    const loadedCallbacks = self.loadCallbacks;
+
+    if (self.injectScopedCss) {
+
+    }
+
+    const cmpModule = self.modules[tag];
+    if (cmpModule) {
+      cb(cmpMeta, cmpModule);
+
+    } else if (cmpMeta.moduleUrl) {
+      if (!loadedCallbacks[tag]) {
+        loadedCallbacks[tag] = [cb];
+      } else {
+        loadedCallbacks[tag].push(cb);
+      }
+
+      self.jsonp(cmpMeta.moduleUrl);
+
+    } else {
+      cb(cmpMeta, CommonComponent);
+    }
+  }
+
+  private jsonp(jsonpUrl: string) {
+    var scriptTag: HTMLScriptElement;
+    var tmrId: any;
+    const self = this;
+
+    // jsonpUrl = scriptsDir + jsonpUrl;
+
+    if (self.activeRequests.indexOf(jsonpUrl) > -1) {
+      return;
+    }
+    self.activeRequests.push(jsonpUrl);
+
+    scriptTag = <HTMLScriptElement>self.createElement('script');
+
+    scriptTag.charset = 'utf-8';
+    scriptTag.async = true;
+    (<any>scriptTag).timeout = 120000;
+
+    scriptTag.src = jsonpUrl;
+
+    tmrId = setTimeout(onScriptComplete, 120000);
+
+    function onScriptComplete() {
+      clearTimeout(tmrId);
+      scriptTag.onerror = scriptTag.onload = null;
+      scriptTag.parentNode.removeChild(scriptTag);
+
+      var index = self.activeRequests.indexOf(jsonpUrl);
+      if (index > -1) {
+        self.activeRequests.splice(index, 1);
+      }
+    }
+
+    scriptTag.onerror = scriptTag.onload = onScriptComplete;
+
+    self.d.head.appendChild(scriptTag);
+  }
 
   createElement(tagName: any): HTMLElement {
     return this.d.createElement(tagName);
@@ -84,43 +190,6 @@ export class PlatformClient implements PlatformApi {
     return node.nodeType === 8;
   }
 
-  hasElementCss(tag: string) {
-    return !!this.css[tag];
-  }
-
-  appendStyles(tag: string, styles: string) {
-    this.css[tag] = true;
-
-    if (styles) {
-      const cssId = `css-${tag}`;
-      const head = this.d.getElementsByTagName('head')[0];
-
-      if (!head.querySelector(`#${cssId}`)) {
-        const styleEle = <HTMLStyleElement>this.createElement('style');
-        styleEle.id = cssId;
-        styleEle.innerHTML = styles;
-        head.insertBefore(styleEle, head.firstChild);
-      }
-    }
-  }
-
-  appendStyleUrl(tag: string, styleUrl: string) {
-    this.css[tag] = true;
-
-    if (styleUrl) {
-      const cssId = `css-${tag}`;
-      const head = this.d.getElementsByTagName('head')[0];
-
-      if (!head.querySelector(`#${cssId}`)) {
-        const linkEle = <HTMLLinkElement>this.createElement('link');
-        linkEle.id = cssId;
-        linkEle.href = styleUrl;
-        linkEle.rel = 'stylesheet';
-        head.insertBefore(linkEle, head.firstChild);
-      }
-    }
-  }
-
   nextTick(cb: Function) {
     const obs = new MutationObserver(() => {
       cb && cb();
@@ -131,4 +200,34 @@ export class PlatformClient implements PlatformApi {
     textNode.data = '1';
   }
 
+  hasLinkCss(linkUrl: string): boolean {
+    if (this.hasLink[linkUrl]) {
+      return true;
+    }
+
+    if (this.d.head.querySelector(`link[href="${linkUrl}"]`)) {
+      this.hasLink[linkUrl] = true;
+      return true;
+    }
+
+    return false;
+  }
+
+  getDocumentHead(): HTMLHeadElement {
+    return this.d.head;
+  }
+
 }
+
+
+export interface FetchComponentCallback {
+  (cmpMeta: ComponentMeta, cmpModule: ComponentModule): void;
+}
+
+
+export interface LoadedCallbacks {
+  [key: string]: FetchComponentCallback[];
+}
+
+
+export class CommonComponent {}

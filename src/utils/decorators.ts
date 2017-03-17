@@ -1,19 +1,18 @@
-import { ComponentOptions, IonicComponent, PropOptions } from './interfaces';
+import { ComponentMeta, IonicComponent, PropOptions } from './interfaces';
 
 
-export const Component: ComponentDecorator = function(opts?: ComponentOptions): (target: any) => any {
+export const Component: ComponentDecorator = function(opts?: ComponentMeta): (target: any) => any {
   return function(target: IonicComponent) {
     if (opts) {
       const annotations = target.$annotations = target.$annotations || {};
       annotations.tag = opts.tag;
-      annotations.styleUrl = opts.styleUrl;
     }
   };
 };
 
 
 export interface ComponentDecorator {
-  (opts?: ComponentOptions): any;
+  (opts?: ComponentMeta): any;
 }
 
 

@@ -19,9 +19,17 @@ export function toCamelCase(str: string) {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
-export function defineElements(win: any, elements: {[tag: string]: Object}) {
-  const tags = Object.keys(elements);
-  for (var i = 0, l = tags.length; i < l; i++) {
-    win.customElements.define(tags[i], elements[tags[i]]);
+export function getStaticComponentDir(doc: HTMLDocument) {
+  let staticDirEle = <HTMLScriptElement>doc.querySelector('script[data-static-dir]');
+  if (staticDirEle) {
+    return staticDirEle.dataset['staticDir'];
   }
+
+  const scriptElms = document.getElementsByTagName('script');
+  staticDirEle = scriptElms[scriptElms.length - 1];
+
+  const paths = staticDirEle.src.split('/');
+  paths.pop();
+
+  return staticDirEle.dataset['staticDir'] = paths.join('/') + '/';
 }

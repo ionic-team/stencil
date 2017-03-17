@@ -15,14 +15,46 @@ export interface Renderer {
 }
 
 
-export interface ComponentOptions {
-  tag?: string;
+export interface ComponentMeta {
+  props?: Props;
+  obsAttrs?: string[];
+  hostCss?: string;
+  moduleUrl?: string;
   styles?: string;
-  styleUrl?: string;
+  styleUrls?: string[];
+  modeStyleUrls?: {[mode: string]: string[]};
   preprocessStyles?: string[];
-  modeStyles?: {[mode: string]: string[]}
   cloak?: boolean;
   shadow?: boolean;
+}
+
+
+export interface ComponentInstance {
+  connectedCallback?: {(): void};
+  attributeChangedCallback?: {(attrName?: string, oldVal?: string, newVal?: string, namespace?: string): void};
+  disconnectedCallback?: {(): void};
+  render?: {(): VNode};
+}
+
+
+export abstract class ProxyComponent extends HTMLElement {
+  $config: Config;
+  $instance: ComponentInstance;
+  $queued: boolean;
+  connectedCallback: {(): void};
+  attributeChangedCallback: {(attrName: string, oldVal: string, newVal: string, namespace: string): void};
+  disconnectedCallback: {(): void};
+  static observedAttributes?: string[];
+}
+
+
+export interface ComponentModule {
+  new (): ComponentInstance;
+}
+
+
+export interface ComponentRegistry {
+  [tag: string]: ComponentMeta;
 }
 
 
@@ -36,7 +68,8 @@ export interface Props {
 }
 
 
-export interface Annotations extends ComponentOptions {
+export interface Annotations extends ComponentMeta {
+  tag?: string;
   props?: Props;
   obsAttrs?: string[];
 }
