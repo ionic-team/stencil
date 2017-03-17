@@ -7,7 +7,7 @@ const document: HTMLDocument = (<any>global).document;
 
 var patch = initRenderer([
   attributesModule,
-], new PlatformClient(document));
+], new PlatformClient(window, document));
 
 describe('attributes', function() {
   var elm, vnode0;

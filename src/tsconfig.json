@@ -23,8 +23,9 @@
     "**/*.ts"
   ],
   "exclude": [
-    "node_modules",
     "bindings",
-    "compiler"
+    "compiler",
+    "fonts",
+    "node_modules"
   ]
 }

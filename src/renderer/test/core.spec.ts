@@ -5,7 +5,7 @@ import { PlatformClient } from '../../platform/platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
 
 const document: HTMLDocument = (<any>global).document;
-const api = new PlatformClient(document);
+const api = new PlatformClient(window, document);
 
 
 var patch = initRenderer([
@@ -676,6 +676,7 @@ describe('renderer', function() {
       it('calls `create` listener before inserted into parent but after children', function() {
         var result = [];
         function cb(empty, vnode) {
+          empty;
           expect(vnode.elm.nodeType).toEqual(1);
           expect(vnode.elm.children.length).toEqual(2);
           expect(vnode.elm.parentNode).toEqual(null);
@@ -826,6 +827,7 @@ describe('renderer', function() {
             count += 1;
           }
           function prepatch(oldVnode, vnode) {
+            oldVnode;
             expect(vnode).toEqual(vnode1);
             count += 1;
           }
@@ -1003,7 +1005,7 @@ describe('renderer', function() {
 
 function toVNode(node: Node, api?: PlatformClient): VNode {
   if (!api) {
-    api = new PlatformClient(document);
+    api = new PlatformClient(window, document);
   }
 
   let text: string;

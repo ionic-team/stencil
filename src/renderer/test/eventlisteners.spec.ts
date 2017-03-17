@@ -6,7 +6,7 @@ const document: HTMLDocument = (<any>global).document;
 
 var patch = initRenderer([
   eventListenersModule,
-], new PlatformClient(document));
+], new PlatformClient(window, document));
 
 
 describe('event listeners', function() {
@@ -124,7 +124,10 @@ describe('event listeners', function() {
   });
   it('access to virtual node in event handler', function() {
     var result = [];
-    function clicked(ev, vnode) { result.push(this); result.push(vnode); }
+    function clicked(ev, vnode) {
+      ev;
+      result.push(this); result.push(vnode);
+    }
     var vnode1 = h('div', {on: {click: clicked }}, [
       h('a', 'Click my parent'),
     ]);
@@ -136,7 +139,10 @@ describe('event listeners', function() {
   }),
   it('access to virtual node in event handler with argument', function() {
     var result = [];
-    function clicked(arg, ev, vnode) { result.push(this); result.push(vnode); }
+    function clicked(arg, ev, vnode) {
+      arg; ev;
+      result.push(this); result.push(vnode);
+    }
     var vnode1 = h('div', {on: {click: [clicked, 1] }}, [
       h('a', 'Click my parent'),
     ]);
@@ -148,7 +154,10 @@ describe('event listeners', function() {
   }),
   it('access to virtual node in event handler with arguments', function() {
     var result = [];
-    function clicked(arg1, arg2, ev, vnode) { result.push(this); result.push(vnode); }
+    function clicked(arg1, arg2, ev, vnode) {
+      arg1; arg2; ev;
+      result.push(this); result.push(vnode);
+    }
     var vnode1 = h('div', {on: {click: [clicked, 1, "2"] }}, [
       h('a', 'Click my parent'),
     ]);

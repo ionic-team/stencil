@@ -6,7 +6,7 @@ const document: HTMLDocument = (<any>global).document;
 
 var patch = initRenderer([
   styleModule,
-], new PlatformClient(document));
+], new PlatformClient(window, document));
 
 
 describe('style', function() {
