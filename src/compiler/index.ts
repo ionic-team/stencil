@@ -16,12 +16,12 @@ export function compileComponents(srcDir: string, jsDir: string, cssDir: string,
 
 
 function compileComponentDirectory(srcDir: string, jsDir: string, cssDir: string, ctx: BuildContext) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
 
     fs.readdir(srcDir, (err, files) => {
       if (err) {
         console.log(err);
-        reject(err);
+        resolve();
         return;
       }
 
@@ -53,11 +53,11 @@ export function compileComponentFile(srcFileName: string, srcDir: string, jsDir:
     return Promise.resolve();
   }
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     fs.readFile(path.join(srcDir, srcFileName), 'utf8', (err, srcContent) => {
       if (err) {
         console.log(err);
-        reject(err);
+        resolve();
         return;
       }
 
@@ -76,7 +76,7 @@ export function compileComponentFile(srcFileName: string, srcDir: string, jsDir:
       fs.readFile(jsFilePath, 'utf8', (err, jsContent) => {
         if (err) {
           console.log(err);
-          reject(err);
+          resolve();
           return;
         }
 
@@ -125,7 +125,7 @@ export function compileComponentFile(srcFileName: string, srcDir: string, jsDir:
             fs.writeFile(jsFilePath, meta.jsContent, (err) => {
               if (err) {
                 console.log(err);
-                reject(err);
+                resolve();
                 return;
               }
 

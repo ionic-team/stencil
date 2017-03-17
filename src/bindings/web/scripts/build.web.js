@@ -12,8 +12,8 @@ console.log(task);
 var srcDir = common.srcPath('components');
 var jsDir = common.distPath('transpiled-web/components');
 var cssDir = common.distPath('ionic-web/dist');
-var entryFile = common.distPath('transpiled-web/bindings/web/src/ionic-web.js');
-var outputFile = common.distPath('ionic-web/dist/ionic.web.js');
+var entryFile = common.distPath('transpiled-web/bindings/web/src/ionic.js');
+var outputFile = common.distPath('ionic-web/dist/ionic.js');
 
 
 compiler.compileComponents(srcDir, jsDir, cssDir).then(() => {

@@ -1,13 +1,7 @@
-import { IonElement, IonicComponent, h, VNode } from '../../element/ion-element';
+import { IonElement, IonicComponent } from '../../element/ion-element';
 
 
-export class IonBadge extends IonElement {
-
-  render(): VNode {
-    return h('.badge', h('slot'));
-  }
-
-}
+export class IonBadge extends IonElement {}
 
 (<IonicComponent>IonBadge).$annotations = {
   tag: 'ion-badge',
@@ -16,7 +10,7 @@ export class IonBadge extends IonElement {
     'badge.md.scss',
     'badge.wp.scss'
   ],
-  modeStyles: {
+  modeStyleUrls: {
     'ios': [
       'badge.ios.css'
     ],
