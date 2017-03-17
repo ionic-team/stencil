@@ -6,7 +6,7 @@
   "main": "es2015/index.js",
   "scripts": {
     "clean": "rimraf ../../../dist/transpiled-web/",
-    "build": "node scripts/build.web.js",
+    "build": "tsc -p tsconfig.json && node scripts/build.web.js",
     "start": "npm install && npm run build"
   },
   "devDependencies": {

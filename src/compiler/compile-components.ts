@@ -1,5 +1,5 @@
 import { CompilerOptions, CompilerContext } from './interfaces';
-import { Logger, BuildError } from './logger';
+import { Logger } from './logger';
 import { transformTsFiles } from './transformer';
 import { emptyDir, writeFile } from './util';
 import * as path from 'path';
@@ -21,18 +21,6 @@ export function compileComponents(opts: CompilerOptions, ctx: CompilerContext = 
 
 
 export function transpile(opts: CompilerOptions, ctx: CompilerContext) {
-  if (!opts.srcDir) {
-    throw new BuildError(`srcDir required`);
-  } else if (!path.isAbsolute(opts.srcDir)) {
-    throw new BuildError(`srcDir must be an absolute path`);
-  }
-
-  if (!opts.destDir) {
-    throw new BuildError(`destDir required`);
-  } else if (!path.isAbsolute(opts.destDir)) {
-    throw new BuildError(`destDir must be an absolute path`);
-  }
-
   return emptyDir(opts.destDir)
     .then(() => {
       return transformTsFiles(opts, ctx)

@@ -6,9 +6,9 @@ import * as sass from 'node-sass';
 
 export function preprocessStyles(file: FileMeta, opts: CompilerOptions, ctx: CompilerContext) {
   const preprocessStyles: string[] = [];
+
   file.components.forEach(c => {
     c.preprocessStyles.forEach(scssFileName => {
-      console.log(scssFileName);
       preprocessStyles.push(scssFileName);
     });
   });
@@ -19,7 +19,7 @@ export function preprocessStyles(file: FileMeta, opts: CompilerOptions, ctx: Com
       const cssFileName = scssFileName.replace('.scss', '.css');
       const cssFilePath = path.join(opts.destDir, cssFileName);
 
-      var sassConfig = {
+      const sassConfig = {
         file: scssFilePath,
         outputStyle: (opts.sassOutputStyle || 'expanded')
       };
@@ -31,7 +31,6 @@ export function preprocessStyles(file: FileMeta, opts: CompilerOptions, ctx: Com
 
         } else {
           const cssOutput = result.css.toString().trim();
-          console.log('write', cssFilePath);
 
           fs.writeFile(cssFilePath, cssOutput, err => {
             if (err) {

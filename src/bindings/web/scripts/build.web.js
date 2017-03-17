@@ -5,40 +5,65 @@ var rollup = require('rollup');
 var compiler = require(common.distPath('compiler'));
 
 
-var task = 'build ionic-web';
-console.log(task);
-
-var opts = {
-  srcDir: common.srcPath('components'),
-  destDir: common.distPath('ionic-web'),
-};
+console.log('build ionic-web');
 
 
-compiler.compile(opts);
+function bundleIonicJs() {
+  return new Promise(resolve => {
+    var entryFile = common.distPath('transpiled-web/bindings/web/src/ionic.js');
+    var outputFile = common.distPath('ionic-bundles/web/ionic.js');
+
+    fs.copy(entryFile, outputFile, err => {
+      if (err) {
+        console.log(err);
+      }
+      resolve();
+    })
+  });
+}
 
 
-// var srcDir = common.srcPath('components');
-// var jsDir = common.distPath('transpiled-web/components');
-// var cssDir = common.distPath('ionic-web/dist');
-// var entryFile = common.distPath('transpiled-web/bindings/web/src/ionic.js');
-// var outputFile = common.distPath('ionic-web/dist/ionic.js');
+function bundleComponentJs() {
+  return new Promise(resolve => {
+    var entryFile = common.distPath('transpiled-web/bindings/web/src/ionic.components.js');
+    var outputFile = common.distPath('ionic-bundles/web/ionic.components.js');
+
+    fs.ensureDirSync(path.dirname(outputFile));
+
+    rollup.rollup({
+      entry: entryFile
+
+    }).then(function(bundle) {
+      var result = bundle.generate({
+        format: 'iife'
+      });
+
+      fs.writeFile(outputFile, result.code, err => {
+        if (err) {
+          console.log(err);
+        }
+        resolve();
+      });
+    });
+  });
+}
 
 
-// compiler.compileComponents(srcDir, jsDir, cssDir).then(() => {
+function createBundles() {
+  return Promise.all([
+    bundleIonicJs(),
+    bundleComponentJs()
+  ]);
+}
 
-//   fs.ensureDirSync(path.dirname(outputFile));
 
-//   rollup.rollup({
-//     entry: entryFile
+createBundles().then(() => {
 
-//   }).then(function(bundle) {
-//     var result = bundle.generate({
-//       format: 'umd'
-//     });
+  compiler.compile({
+    srcDir: common.srcPath('components'),
+    destDir: common.distPath('ionic-web'),
+    ionicBundlesDir: common.distPath('ionic-bundles/web'),
+    ionicThemesDir: common.distPath('ionic-core/themes'),
+  });
 
-//     fs.writeFileSync(outputFile, result.code);
-
-//     console.log(task, 'bundle:', outputFile);
-//   });
-
-// });
+});

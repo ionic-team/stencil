@@ -4,6 +4,8 @@ import * as ts from 'typescript';
 export interface CompilerOptions {
   srcDir?: string;
   destDir?: string;
+  ionicBundlesDir?: string;
+  ionicThemesDir?: string;
   scriptTarget?: 'es5' | 'es2015';
   module?: 'common' | 'es2015' | 'umd';
   sassOutputStyle?: 'expanded' | 'compressed';
