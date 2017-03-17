@@ -18,8 +18,18 @@
     "test.watch": "jest --watch"
   },
   "devDependencies": {
+    "@types/babel-core": "^6.7.14",
     "@types/jest": "18.1.1",
     "@types/node": "7.0.5",
+    "babel-core": "^6.24.0",
+    "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
+    "babel-plugin-transform-es2015-block-scoped-functions": "^6.22.0",
+    "babel-plugin-transform-es2015-block-scoping": "^6.23.0",
+    "babel-plugin-transform-es2015-destructuring": "^6.23.0",
+    "babel-plugin-transform-es2015-parameters": "^6.23.0",
+    "babel-plugin-transform-es2015-shorthand-properties": "^6.22.0",
+    "babel-plugin-transform-es2015-template-literals": "^6.22.0",
+    "babel-preset-babili": "0.0.12",
     "babili": "0.0.11",
     "fs-extra": "^2.1.2",
     "jest": "19.0.2",
