@@ -14,7 +14,7 @@ var opts = {
 };
 
 
-compiler.compileComponents(opts);
+compiler.compile(opts);
 
 
 // var srcDir = common.srcPath('components');

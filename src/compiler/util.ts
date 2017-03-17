@@ -1,4 +1,3 @@
-import { CompilerOptions, CompilerContext } from './interfaces';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as ts from 'typescript';
@@ -42,42 +41,6 @@ export function readFile(filePath: string): Promise<string> {
 }
 
 
-export function writeTranspiledFiles(transpiledFiles: Map<string, string>, opts: CompilerOptions, ctx: CompilerContext): Promise<null> {
-  const writeTranspiledFilesToDisk = false;
-
-  if (writeTranspiledFilesToDisk) {
-    ensureDirectories(transpiledFiles);
-  }
-
-  const writePromises: Promise<any>[] = [];
-
-  transpiledFiles.forEach((transpileText, filePath) => {
-    if (opts.cacheFiles !== false) {
-      let file = ctx.files.get(filePath);
-
-      if (!file) {
-        file = {
-          filePath: filePath,
-          srcText: transpileText,
-          isTsSourceFile: isTsSourceFile(filePath),
-          isTransformable: false,
-          components: []
-        };
-        ctx.files.set(filePath, file);
-      }
-
-      file.transpileText = transpileText;
-    }
-
-    if (writeTranspiledFilesToDisk) {
-      writePromises.push(writeFile(filePath, transpileText));
-    }
-  })
-
-  return Promise.all(writePromises);
-}
-
-
 export function emptyDir(dirPath: string) {
   return new Promise((resolve, reject) => {
 
@@ -109,45 +72,6 @@ export function writeFile(filePath: string, data: string): Promise<null> {
       }
     });
   });
-}
-
-
-export function ensureDirectories(files: Map<string, string>) {
-  let dirPaths: string[] = [];
-
-  files.forEach((content, filePath) => {
-    content;
-    const dirPath = path.dirname(filePath);
-    if (dirPaths.indexOf(dirPath) === -1) {
-      dirPaths.push(dirPath);
-    }
-  });
-
-  dirPaths.forEach(dirPath => {
-    recursiveCreateDirectory(dirPath);
-  });
-}
-
-
-function recursiveCreateDirectory(dirPath: string) {
-  var basePath = path.dirname(dirPath);
-  var shouldCreateParent = dirPath !== basePath && !dirExists(basePath);
-  if (shouldCreateParent) {
-    recursiveCreateDirectory(basePath);
-  }
-  if (shouldCreateParent || !dirExists(dirPath)) {
-    fs.mkdirSync(dirPath);
-  }
-}
-
-
-function dirExists(dirPath: string) {
-  try {
-    fs.accessSync(dirPath);
-  } catch (e) {
-    return false;
-  }
-  return true;
 }
 
 
