@@ -1,4 +1,4 @@
-import { FileMeta, CompilerOptions, CompilerContext } from './interfaces';
+import { FileMeta, CompilerOptions, CompilerContext, ComponentMeta } from './interfaces';
 import { getTsScriptTarget } from './util';
 import * as ts from 'typescript';
 
@@ -37,6 +37,15 @@ function inspectClassDecorator(n: ts.Node, file: FileMeta, opts: CompilerOptions
   const meta = parseComponentMeta(text);
 
   file.components.push(meta);
+
+  if (!ctx.components) {
+    ctx.components = [];
+  }
+
+  const metaCopy: ComponentMeta = Object.assign({}, meta);
+  delete metaCopy.preprocessStyles;
+
+  ctx.components.push(metaCopy);
 }
 
 

@@ -33,9 +33,11 @@ function bundleComponentJs() {
     rollup.rollup({
       entry: entryFile
 
-    }).then(function(bundle) {
+    }).then(bundle => {
       var result = bundle.generate({
-        format: 'iife'
+        format: 'es',
+        intro: '(function(window, document) {',
+        outro: '})(window, document);'
       });
 
       fs.writeFile(outputFile, result.code, err => {

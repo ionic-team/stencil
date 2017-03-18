@@ -25,7 +25,7 @@ export function getStaticComponentDir(doc: HTMLDocument) {
     return staticDirEle.dataset['staticDir'];
   }
 
-  const scriptElms = document.getElementsByTagName('script');
+  const scriptElms = doc.getElementsByTagName('script');
   staticDirEle = scriptElms[scriptElms.length - 1];
 
   const paths = staticDirEle.src.split('/');

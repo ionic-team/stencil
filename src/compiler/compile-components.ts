@@ -34,16 +34,9 @@ export function transpile(opts: CompilerOptions, ctx: CompilerContext) {
 function generateManifest(opts: CompilerOptions, ctx: CompilerContext) {
   const manifestPath = path.join(opts.destDir, 'manifest.json');
 
-  ctx.manifest = {
-    components: []
+  const manifest: any = {
+    components: ctx.components || []
   };
 
-  ctx.files.forEach(f => {
-    f.components.forEach(c => {
-      delete c.preprocessStyles;
-      ctx.manifest.components.push(c);
-    });
-  });
-
-  return writeFile(manifestPath, JSON.stringify(ctx.manifest, null, 2));
+  return writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 }

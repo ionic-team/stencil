@@ -18,7 +18,7 @@ export interface CompilerContext {
   files?: Map<string, FileMeta>;
   cachedTsProgram?: ts.Program;
   tsCompilerHost?: ts.CompilerHost;
-  manifest?: { components: ComponentMeta[] };
+  components?: ComponentMeta[];
 }
 
 

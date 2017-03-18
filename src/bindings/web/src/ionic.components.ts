@@ -8,7 +8,9 @@ const config = new Config();
 
 const plt = new PlatformClient(window, document);
 
-const components: ComponentRegistry = process.env.COMPONENTS;
+declare const IONIC_COMPONENTS: ComponentRegistry;
+
+const components = IONIC_COMPONENTS;
 
 plt.registerComponents(components);
 
