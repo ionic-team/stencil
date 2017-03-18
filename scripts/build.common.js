@@ -5,28 +5,36 @@ exports.distPath = function(filePath) {
   return path.join(__dirname, '../dist/', filePath);
 };
 
+
 exports.srcPath = function(filePath) {
   return path.join(__dirname, '../src/', filePath);
 };
 
 
-exports.lessEs6Please = function(inputCode) {
-  // we DO NOT want to transpile ES6 classes
-  // Safari 9 has classes, but doesn't have all
-  // of es6, so we're only transpiling some things
+exports.compileSass = function(inputFile, outputFile, sassOpts) {
+  return new Promise(resolve => {
+    var sass = require('node-sass');
 
-  // https://babeljs.io/docs/plugins/
-  var babel = require("babel-core");
+    sassOpts = sassOpts || {};
 
-  var transpiled = babel.transform(inputCode, {
-    plugins: [
-      'transform-es2015-arrow-functions',
-      'transform-es2015-block-scoped-functions',
-      'transform-es2015-block-scoping',
-      'transform-es2015-parameters',
-      'transform-es2015-template-literals'
-    ]
+    sassOpts.file = inputFile;
+
+    sass.render(sassOpts, (err, result) => {
+      if (err) {
+        console.log(err);
+        resolve();
+
+      } else {
+        var fs = require('fs');
+
+        fs.writeFile(outputFile, result.css.toString(), err => {
+          if (err) {
+            console.log(err);
+          }
+          resolve();
+        });
+      }
+    });
+
   });
-
-  return transpiled.code;
 };

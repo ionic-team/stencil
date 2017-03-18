@@ -36,6 +36,7 @@
     "jest": "19.0.2",
     "jsdom": "9.11.0",
     "knuth-shuffle": "1.0.1",
+    "node-sass": "^4.5.0",
     "rimraf": "2.6.1",
     "rollup": "0.41.4",
     "typescript": "2.2.1",

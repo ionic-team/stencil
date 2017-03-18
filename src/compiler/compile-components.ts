@@ -1,7 +1,7 @@
 import { CompilerOptions, CompilerContext } from './interfaces';
 import { Logger } from './logger';
 import { transformTsFiles } from './transformer';
-import { emptyDir, writeFile } from './util';
+import { writeFile } from './util';
 import * as path from 'path';
 
 
@@ -21,12 +21,8 @@ export function compileComponents(opts: CompilerOptions, ctx: CompilerContext = 
 
 
 export function transpile(opts: CompilerOptions, ctx: CompilerContext) {
-  return emptyDir(opts.destDir)
-    .then(() => {
-      return transformTsFiles(opts, ctx)
-    .then(files => {
-      return generateManifest(opts, ctx);
-    });
+  return transformTsFiles(opts, ctx).then(files => {
+    return generateManifest(opts, ctx);
   });
 }
 

@@ -18,8 +18,22 @@ function bundleIonicJs() {
         console.log(err);
       }
       resolve();
-    })
+    });
   });
+}
+
+
+function bundleIonicCss() {
+  const scssFilePath = common.srcPath('themes/ionic.scss');
+  const cssFilePath = common.distPath('ionic-web/ionic.css');
+  const cssMinFilePath = common.distPath('ionic-web/ionic.min.css');
+
+  return Promise.all([
+    common.compileSass(scssFilePath, cssFilePath),
+    common.compileSass(scssFilePath, cssMinFilePath, {
+      outputStyle: 'compressed'
+    })
+  ]);
 }
 
 
@@ -52,9 +66,12 @@ function bundleComponentJs() {
 
 
 function createBundles() {
+  fs.emptyDirSync(common.distPath('ionic-web'));
+
   return Promise.all([
     bundleIonicJs(),
-    bundleComponentJs()
+    bundleComponentJs(),
+    bundleIonicCss()
   ]);
 }
 
