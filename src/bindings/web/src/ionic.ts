@@ -1,27 +1,13 @@
-
-(function(window: any, document: HTMLDocument) {
+(function(d: HTMLDocument) {
   'use strict';
 
-  var staticDir = getStaticComponentDir();
-
-  if (!window.customElements || window.customElements.forcePolyfill) {
-    var polyfillScript = document.createElement('script');
-    polyfillScript.src = staticDir + 'webcomponents-ce.js';
-    document.head.appendChild(polyfillScript);
-
-  } else {
-    requestAnimationFrame(() => {
-      window.dispatchEvent(new CustomEvent('WebComponentsReady'));
-    });
-  }
-
-  function getStaticComponentDir(): string {
-    var val: any = document.querySelector('script[data-static-dir]');
+  function staticDir(): string {
+    var val: any = d.querySelector('script[data-static-dir]');
     if (val) {
       return val.dataset['staticDir'];
     }
 
-    val = document.getElementsByTagName('script');
+    val = d.getElementsByTagName('script');
     val = val[val.length - 1];
 
     var paths = val.src.split('/');
@@ -30,4 +16,28 @@
     return val.dataset['staticDir'] = paths.join('/') + '/';
   }
 
-})(window, document);
+  function es5() {
+    try {
+      eval('(class C{})');
+    } catch (e) {
+      return true;
+    }
+  }
+
+  const i: string[] = [
+    'components'
+  ];
+
+  if (!window.customElements) {
+    i.push('ce');
+  }
+
+  if (es5()) {
+    i.push('es5');
+  }
+
+  const s = d.createElement('script');
+  s.src = `${staticDir()}ionic.${i.join('.')}.js`;
+  d.head.appendChild(s);
+
+})(document);

@@ -2,7 +2,7 @@ import { ComponentMeta, ComponentModule, ComponentRegistry } from '../utils/inte
 
 
 export interface PlatformApi {
-  registerComponents: (componentsToRegister: ComponentRegistry) => void;
+  registerComponent: (cmpMeta: ComponentMeta) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
   loadComponentModule: (tag: string, cb: {(cmpMeta: ComponentMeta, cmpModule: ComponentModule): void}) => void;
   createElement: (tagName: any) => HTMLElement;

@@ -40,8 +40,8 @@ export class PlatformClient implements PlatformApi {
 
   }
 
-  registerComponents(componentsToRegister: ComponentRegistry) {
-    Object.assign(this.registry, componentsToRegister);
+  registerComponent(cmpMeta: ComponentMeta) {
+    this.registry[cmpMeta.tag] = cmpMeta;
   }
 
   getComponentMeta(tag: string): ComponentMeta {

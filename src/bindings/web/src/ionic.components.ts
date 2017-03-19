@@ -1,4 +1,4 @@
-import { ComponentRegistry, ProxyComponent } from '../../../utils/interfaces';
+import { ComponentMeta, ProxyComponent } from '../../../utils/interfaces';
 import { Config } from '../../../utils/config';
 import { PlatformClient } from '../../../platform/platform-client';
 import { ProxyElement } from '../../../element/proxy-element';
@@ -8,18 +8,16 @@ const config = new Config();
 
 const plt = new PlatformClient(window, document);
 
-declare const IONIC_COMPONENTS: ComponentRegistry;
+declare const IONIC_COMPONENTS: ComponentMeta[];
 
 const components = IONIC_COMPONENTS;
 
-plt.registerComponents(components);
+components.forEach(cmpMeta => {
+  plt.registerComponent(cmpMeta);
 
-Object.keys(components).forEach(tag => {
-  const cmpMeta = components[tag];
-
-  window.customElements.define(tag, class extends ProxyElement implements ProxyComponent {
+  window.customElements.define(cmpMeta.tag, class extends ProxyElement implements ProxyComponent {
     constructor() {
-      super(plt, config, tag);
+      super(plt, config, cmpMeta.tag);
     }
 
     static get observedAttributes() {

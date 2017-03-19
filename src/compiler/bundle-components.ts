@@ -19,7 +19,7 @@ export function createIonicJs(opts: CompilerOptions, ctx: CompilerContext) {
     const src = path.join(opts.ionicBundlesDir, fileName);
     const dest = path.join(opts.destDir, fileName);
 
-    return transpile(src, dest, ctx.components);
+    return transpile(src, dest, [], ctx.components);
   });
 }
 
@@ -31,15 +31,15 @@ function createComponentJs(opts: CompilerOptions, ctx: CompilerContext) {
     const src = path.join(opts.ionicBundlesDir, fileName);
     const dest = path.join(opts.destDir, fileName);
 
-    return transpile(src, dest, ctx.components);
+    return transpile(src, dest, [], ctx.components);
   });
 }
 
 
-function transpile(src: string, dest: string, components: ComponentMeta[]) {
+function transpile(src: string, dest: string, plugins: any[], components: ComponentMeta[]) {
   return readFile(src).then(code => {
 
-    const plugins = [
+    plugins = plugins.concat([
       'transform-es2015-arrow-functions',
       'transform-es2015-block-scoped-functions',
       'transform-es2015-block-scoping',
@@ -50,7 +50,7 @@ function transpile(src: string, dest: string, components: ComponentMeta[]) {
       ['transform-define', {
         'IONIC_COMPONENTS': components
       }]
-    ];
+    ]);
 
     const transpileResult = babel.transform(code, { plugins: plugins });
 
@@ -59,7 +59,7 @@ function transpile(src: string, dest: string, components: ComponentMeta[]) {
         ['babili', {
           removeConsole: true,
           removeDebugger: true
-        }]
+        }],
       ]
     });
 
