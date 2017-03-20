@@ -1,50 +1,49 @@
-import { ComponentMeta, ComponentModule, ProxyComponent } from '../utils/interfaces';
+import { ComponentMeta, ComponentModule, ProxyComponent, ProxyController } from '../utils/interfaces';
 import { PlatformApi } from '../platform/platform-api';
 import { Config } from '../utils/config';
 
 
-export function connectedCallback(plt: PlatformApi, config: Config, prxElement: ProxyComponent, tag: string, cmpMeta: ComponentMeta, cmpModule: ComponentModule) {
-  console.debug(`connectedCallback: ${tag}, ${cmpMeta}, ${prxElement}`);
+export function connectedCallback(plt: PlatformApi, config: Config, prxCtrl: ProxyController, tag: string, cmpMeta: ComponentMeta, cmpModule: ComponentModule) {
+  console.debug(`connectedCallback: ${tag}, ${cmpMeta}`);
 
-  prxElement.$queued = false;
+  prxCtrl.queued = false;
 
-  let cmpInstance = prxElement.$instance;
+  let cmpInstance = prxCtrl.instance;
   if (!cmpInstance) {
-    cmpInstance = createComponentInstance(prxElement, cmpModule);
+    cmpInstance = createComponentInstance(prxCtrl, cmpModule);
   }
+debugger
+  // if (!prxCtrl.root && cmpMeta.shadow !== false) {
+  //   createShadowRoot(plt, config, prxCtrl, cmpMeta);
+  // }
 
-  if (!prxElement.shadowRoot && cmpMeta.shadow !== false) {
-    createShadowRoot(plt, config, prxElement, cmpMeta);
-  }
+  // if (cmpInstance.render) {
 
-  if (cmpInstance.render) {
+  // }
 
-  }
+  // var style = document.createElement('style');
+  // style.innerHTML = ':host { background: yellow; }';
+  // prxCtrl.root.appendChild(style);
 
-  var style = document.createElement('style');
-  style.innerHTML = ':host { background: yellow; }';
-  prxElement.shadowRoot.appendChild(style);
+  // var div = document.createElement('div');
+  // div.innerHTML = 'SHADOWY';
 
-  var div = document.createElement('div');
-  div.innerHTML = 'SHADOWY';
-
-  prxElement.shadowRoot.appendChild(div);
+  // prxCtrl.root.appendChild(div);
 
 
-
-  cmpInstance.connectedCallback && cmpInstance.connectedCallback();
+  // cmpInstance.connectedCallback && cmpInstance.connectedCallback();
 }
 
 
-function createComponentInstance(prxElement: ProxyComponent, cmpModule: ComponentModule) {
-  return prxElement.$instance = new cmpModule();
+function createComponentInstance(prxCtrl: ProxyController, cmpModule: ComponentModule) {
+  return prxCtrl.instance = new cmpModule();
 }
 
 
-function createShadowRoot(plt: PlatformApi, config: Config, prxElement: ProxyComponent, cmpMeta: ComponentMeta) {
-  prxElement.attachShadow({ mode: 'open' });
+function createShadowRoot(plt: PlatformApi, config: Config, prxCtrl: ProxyController, cmpMeta: ComponentMeta) {
+  // prxElement.attachShadow({ mode: 'open' });
 
-  injectCssLink(plt, config, cmpMeta, prxElement.shadowRoot);
+  // injectCssLink(plt, config, cmpMeta, prxElement.shadowRoot);
 }
 
 
