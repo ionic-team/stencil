@@ -1,4 +1,4 @@
-var common = require('../../../../scripts/build.common');
+var common = require('../../../../scripts/util');
 var path = require('path');
 var fs = require('fs-extra');
 var rollup = require('rollup');

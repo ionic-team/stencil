@@ -28,11 +28,7 @@
     'components'
   ];
 
-  if (!window.customElements) {
-    i.push('ce');
-  }
-
-  if (es5()) {
+  if (!window.customElements || es5()) {
     i.push('es5');
   }
 

@@ -25,3 +25,6 @@ function validateDir(dir: string, name: string) {
     throw new BuildError(`${name} must be an absolute path`);
   }
 }
+
+
+export { transpile, transpileFile } from './transpiler';

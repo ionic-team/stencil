@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const common = require('./build.common');
+const common = require('./util');
 
 
 console.log('build.bundles');
