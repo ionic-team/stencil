@@ -38,18 +38,14 @@ export interface ComponentInstance {
 }
 
 
-export interface ProxyController {
-  instance?: ComponentInstance;
-  queued?: boolean;
-  root?: Node;
-}
-
-
-export abstract class ProxyComponent extends HTMLElement {
+export interface ProxyElement extends HTMLElement {
+  $shadowDom?: boolean;
+  $root?: HTMLElement | ShadowRoot;
+  $queued?: boolean;
+  $instance?: ComponentInstance;
   connectedCallback: {(): void};
   attributeChangedCallback: {(attrName: string, oldVal: string, newVal: string, namespace: string): void};
   disconnectedCallback: {(): void};
-  static observedAttributes?: string[];
 }
 
 

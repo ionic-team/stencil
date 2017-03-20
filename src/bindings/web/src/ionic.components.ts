@@ -1,4 +1,4 @@
-import { ComponentInstance, ComponentMeta, ProxyComponent } from '../../../utils/interfaces';
+import { ComponentInstance, ComponentMeta, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
 import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
@@ -15,42 +15,34 @@ const config = new Config();
 const plt = new PlatformClient(window, document);
 
 
-class ProxyElement extends HTMLElement implements ProxyComponent {
-  $instance: ComponentInstance;
-  $queued: boolean;
+components.forEach(meta => {
+  plt.registerComponent(meta);
 
-  constructor(public $tag: string) {
-    super();
-  }
-
-  connectedCallback() {
-    const self = this;
-    plt.loadComponentModule(self.$tag, (cmpMeta, cmpModule) => {
-      connectedCallback(plt, config, self, self.$tag, cmpMeta, cmpModule);
-    });
-  }
-
-  attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
-    attributeChangedCallback(this.$instance, attrName, oldVal, newVal, namespace);
-  }
-
-  disconnectedCallback() {
-    disconnectedCallback(this.$instance);
-    this.$instance = null;
-  }
-
-}
+  const tag = meta.tag;
+  const obsAttrs = meta.obsAttrs && meta.obsAttrs.slice();
 
 
-components.forEach(cmpMeta => {
-  plt.registerComponent(cmpMeta);
+  window.customElements.define(tag, class extends HTMLElement {
 
-  const tag = cmpMeta.tag;
-  const obsAttrs = cmpMeta.obsAttrs && cmpMeta.obsAttrs.slice();
-
-  window.customElements.define(tag, class extends ProxyElement {
     constructor() {
-      super(tag);
+      super();
+    }
+
+    connectedCallback() {
+      const prxElm: ProxyElement = this;
+      plt.loadComponentModule(tag, (cmpMeta, cmpModule) => {
+        connectedCallback(plt, config, prxElm, cmpMeta, cmpModule);
+      });
+    }
+
+    attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
+      const prxElm: ProxyElement = this;
+      attributeChangedCallback(prxElm.$instance, attrName, oldVal, newVal, namespace);
+    }
+
+    disconnectedCallback() {
+      const prxElm: ProxyElement = this;
+      disconnectedCallback(prxElm);
     }
 
     static get observedAttributes() {

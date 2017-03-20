@@ -1,4 +1,4 @@
-import { ComponentMeta, ProxyComponent, ProxyController } from '../../../utils/interfaces';
+import { ComponentMeta, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
 import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
@@ -15,11 +15,12 @@ const config = new Config();
 const plt = new PlatformClient(window, document);
 
 
-components.forEach(meta => {
+components.forEach(function(meta) {
   plt.registerComponent(meta);
 
   var tag = meta.tag;
-  var pxyCtrl: ProxyController = {};
+  var obsAttrs = meta.obsAttrs && meta.obsAttrs.slice();
+
 
   function ProxyElementES5() {
     return HTMLElement.apply(this);
@@ -28,21 +29,23 @@ components.forEach(meta => {
   ProxyElementES5.prototype.constructor = ProxyElementES5;
 
   ProxyElementES5.prototype.connectedCallback = function() {
-    plt.loadComponentModule(tag, (cmpMeta, cmpModule) => {
-      connectedCallback(plt, config, pxyCtrl, tag, cmpMeta, cmpModule);
+    var prxElm: ProxyElement = this;
+    plt.loadComponentModule(tag, function(cmpMeta, cmpModule) {
+      connectedCallback(plt, config, prxElm, cmpMeta, cmpModule);
     });
   };
 
   ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {
-    attributeChangedCallback(pxyCtrl.instance, attrName, oldVal, newVal, namespace);
+    var prxElm: ProxyElement = this;
+    attributeChangedCallback(prxElm.$instance, attrName, oldVal, newVal, namespace);
   };
 
   ProxyElementES5.prototype.disconnectedCallback = function() {
-    disconnectedCallback(pxyCtrl.instance);
-    pxyCtrl = pxyCtrl.instance = pxyCtrl.root = null;
+    var prxElm: ProxyElement = this;
+    disconnectedCallback(prxElm);
   };
 
-  (<any>ProxyElementES5).observedAttributes = meta.obsAttrs && meta.obsAttrs.slice();
+  (<any>ProxyElementES5).observedAttributes = obsAttrs;
 
   window.customElements.define(tag, ProxyElementES5);
 });

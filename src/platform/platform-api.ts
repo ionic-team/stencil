@@ -25,7 +25,6 @@ export interface PlatformApi {
   isText: (node: Node) => node is Text;
   isComment: (node: Node) => node is Comment;
   nextTick: (cb: Function) => void;
-  injectScopedCss: boolean;
   staticDir: string;
   hasLinkCss(linkUrl: string): boolean;
   getDocumentHead(): HTMLHeadElement;

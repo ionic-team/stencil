@@ -11,7 +11,6 @@ export class PlatformClient implements PlatformApi {
   private activeRequests: string[] = [];
   private hasLink: {[tag: string]: boolean} = {};
 
-  injectScopedCss: boolean;
   staticDir: string;
 
 
@@ -52,10 +51,6 @@ export class PlatformClient implements PlatformApi {
     const self = this;
     const cmpMeta = self.getComponentMeta(tag);
     const loadedCallbacks = self.loadCallbacks;
-
-    if (self.injectScopedCss) {
-
-    }
 
     const cmpModule = self.modules[tag];
     if (cmpModule) {
