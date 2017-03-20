@@ -1,6 +1,6 @@
 import { Component, Prop } from '../utils/decorators';
 import { Ionic } from '../utils/global';
-import { initProperties } from './init-element';
+import { initProperties } from './properties';
 import { toCamelCase } from '../utils/helpers';
 import { Annotations, IonicComponent, VNode, VNodeData, Props } from '../utils/interfaces';
 import { patchHostElement } from './patch-element';
