@@ -26,6 +26,7 @@ export interface PlatformApi {
   isComment: (node: Node) => node is Comment;
   nextTick: (cb: Function) => void;
   staticDir: string;
-  hasLinkCss(linkUrl: string): boolean;
+  hasCssLink(linkUrl: string): boolean;
+  setCssLink(linkUrl: string): void;
   getDocumentHead(): HTMLHeadElement;
 }

@@ -19,10 +19,6 @@ export function connectedCallback(plt: PlatformApi, config: Config, prxCmp: Prox
 
   }
 
-  var style = document.createElement('style');
-  style.innerHTML = ':host { background: yellow; }';
-  prxCmp.$root.appendChild(style);
-
   var div = document.createElement('div');
   div.innerHTML = 'SHADOWY';
 
@@ -46,7 +42,6 @@ function createRoot(plt: PlatformApi, config: Config, prxCmp: ProxyElement, cmpM
 
     injectCssLink(plt, config, cmpMeta, prxCmp.$root, true);
 
-
   } else {
     // yeah, no native shadow DOM, but we can still do this, don't panic
     prxCmp.$root =  prxCmp;
@@ -67,9 +62,10 @@ function injectCssLink(plt: PlatformApi, config: Config, cmpMeta: ComponentMeta,
   if (!supportsShadowDom) {
     linkUrl = linkUrl.replace('.css', '.scoped.css');
 
-    if (plt.hasLinkCss(linkUrl)) {
+    if (plt.hasCssLink(linkUrl)) {
       return;
     }
+    plt.setCssLink(linkUrl);
   }
 
   const linkEle = <HTMLLinkElement>plt.createElement('link');

@@ -9,7 +9,7 @@ export class PlatformClient implements PlatformApi {
   private modules: {[tag: string]: ComponentModule} = {};
   private loadCallbacks: LoadedCallbacks = {};
   private activeRequests: string[] = [];
-  private hasLink: {[tag: string]: boolean} = {};
+  private cssLink: {[tag: string]: boolean} = {};
 
   staticDir: string;
 
@@ -195,17 +195,21 @@ export class PlatformClient implements PlatformApi {
     textNode.data = '1';
   }
 
-  hasLinkCss(linkUrl: string): boolean {
-    if (this.hasLink[linkUrl]) {
+  hasCssLink(linkUrl: string): boolean {
+    if (this.cssLink[linkUrl]) {
       return true;
     }
 
     if (this.d.head.querySelector(`link[href="${linkUrl}"]`)) {
-      this.hasLink[linkUrl] = true;
+      this.setCssLink(linkUrl);
       return true;
     }
 
     return false;
+  }
+
+  setCssLink(linkUrl: string) {
+    this.cssLink[linkUrl] = true;
   }
 
   getDocumentHead(): HTMLHeadElement {
