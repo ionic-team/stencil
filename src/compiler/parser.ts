@@ -26,29 +26,55 @@ function inspectNode(n: ts.Node, file: FileMeta, opts: CompilerOptions, ctx: Com
 
 
 function inspectClassDecorator(n: ts.Node, file: FileMeta, opts: CompilerOptions, ctx: CompilerContext) {
-  let text = n.getText();
+  let orgText = n.getText();
 
-  if (text.replace(/\s/g,'').indexOf('@Component({') !== 0) {
+  if (orgText.replace(/\s/g,'').indexOf('@Component({') !== 0) {
     return;
   }
 
-  text = text.replace('@Component', '');
+  const text = orgText.replace('@Component', '');
 
-  const meta = parseComponentMeta(text);
+  const cmpMeta = parseComponentMeta(text);
 
-  file.components.push(meta);
+  updateComponentMeta(cmpMeta, orgText);
+
+  file.components.push(cmpMeta);
 
   if (!ctx.components) {
     ctx.components = [];
   }
 
-  const metaCopy: ComponentMeta = Object.assign({}, meta);
+  const metaCopy: ComponentMeta = Object.assign({}, cmpMeta);
   delete metaCopy.preprocessStyles;
 
   ctx.components.push(metaCopy);
 }
 
 
-function parseComponentMeta(text: string): any {
+function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
+  if (!cmpMeta.tag) {
+    throw `tag missing in component decorator: ${orgText}`;
+  }
+
+  if (cmpMeta.tag.indexOf('-') === -1) {
+    throw `tag must have a dash (-): ${cmpMeta.tag}`;
+  }
+
+  if (cmpMeta.tag.indexOf('-') === 0) {
+    throw `tag cannot start with a dash (-): ${cmpMeta.tag}`;
+  }
+
+  if (cmpMeta.tag.indexOf('-') === cmpMeta.tag.length - 1) {
+    throw `tag cannot end with a dash (-): ${cmpMeta.tag}`;
+  }
+
+  if (!cmpMeta.hostCss) {
+    const tagSplit = cmpMeta.tag.split('-');
+    cmpMeta.hostCss = tagSplit[tagSplit.length - 1];
+  }
+}
+
+
+function parseComponentMeta(text: string): ComponentMeta {
   return eval(`(function(){ return ${text}; })()`);
 }
