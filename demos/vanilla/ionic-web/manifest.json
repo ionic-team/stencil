@@ -1,0 +1,27 @@
+{
+  "components": [
+    {
+      "tag": "ion-badge",
+      "modeStyleUrls": {
+        "ios": [
+          "badge.ios.css"
+        ],
+        "md": [
+          "badge.md.css"
+        ],
+        "wp": [
+          "badge.wp.css"
+        ]
+      },
+      "hostCss": "badge",
+      "props": {
+        "color": {},
+        "mode": {}
+      },
+      "observedAttributes": [
+        "color",
+        "mode"
+      ]
+    }
+  ]
+}
