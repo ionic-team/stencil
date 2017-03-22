@@ -79,18 +79,6 @@ export interface Props {
 }
 
 
-export interface Annotations extends ComponentMeta {
-  tag?: string;
-  props?: Props;
-  obsAttrs?: string[];
-}
-
-
-export interface IonicComponent {
-  $annotations?: Annotations;
-}
-
-
 export type Key = string | number;
 
 

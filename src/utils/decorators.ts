@@ -1,11 +1,10 @@
-import { ComponentMeta, IonicComponent, PropOptions } from './interfaces';
+import { ComponentMeta, PropOptions } from './interfaces';
 
 
 export const Component: ComponentDecorator = function(opts?: ComponentMeta): (target: any) => any {
-  return function(target: IonicComponent) {
+  return function(target: any) {
     if (opts) {
-      const annotations = target.$annotations = target.$annotations || {};
-      annotations.tag = opts.tag;
+      Object.assign(target.$annotations || {}, opts)
     }
   };
 };
@@ -17,7 +16,7 @@ export interface ComponentDecorator {
 
 
 export const Prop: PropDecorator = function(opts?: PropOptions): (target: any, propKey: string) => any {
-  return function(target: IonicComponent, propKey: string) {
+  return function(target: any, propKey: string) {
     const annotations = target.$annotations = target.$annotations || {};
     annotations.props = annotations.props || {};
     annotations.props[propKey] = opts || {};

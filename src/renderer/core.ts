@@ -13,7 +13,6 @@ import { Renderer, VNode, VNodeData, Key, Hooks, Module } from '../utils/interfa
 import { vnode } from './vnode';
 import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
-import { IonElement } from '../element/ion-element';
 
 export { attributesModule } from './modules/attributes';
 export { classModule } from './modules/class';
@@ -276,7 +275,8 @@ export function initRenderer(modules: Array<any>, api: PlatformApi): Renderer {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) {
-          updateChildren((<IonElement>elm)._root || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
+          debugger;
+          // updateChildren((<IonElement>elm)._root || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
         }
 
       } else if (isDef(ch)) {
