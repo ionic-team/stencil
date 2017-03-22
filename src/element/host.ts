@@ -1,35 +1,32 @@
-import { ComponentInstance, ComponentMeta, ProxyElement, VNode } from '../utils/interfaces';
+import { ComponentInstance, ComponentMeta, VNode } from '../utils/interfaces';
 import { h } from '../renderer/core';
 
 
-export function generateVNode(elm: ProxyElement, instance: ComponentInstance, cmpMeta: ComponentMeta): VNode {
+export function generateVNode(elm: Node, instance: ComponentInstance, cmpMeta: ComponentMeta): VNode {
   let vnode = instance.render && instance.render();
   if (!vnode) {
-    const tagSplit = cmpMeta.tag.split('-');
-    vnode = h(`.${tagSplit[tagSplit.length - 1]}`);
+    vnode = h(`.${cmpMeta.hostCss}`, h('slot'));
   }
 
   vnode.elm = elm;
 
-  const hostCss = vnode.data.class = vnode.data.class || {};
+  const hostCssClasses = vnode.data.class = vnode.data.class || {};
+  const hostAttributes = vnode.data.attrs = vnode.data.attrs || {};
 
-  let componentPrefix: string;
   const cssClasses = vnode.sel.split('.');
-  if (cssClasses.length > 1) {
-    componentPrefix = cssClasses[1] + '-';
-    for (var i = 1; i < cssClasses.length; i++) {
-      hostCss[cssClasses[i]] = true;
-    }
-
-  } else {
-    componentPrefix = '';
+  for (var i = 1; i < cssClasses.length; i++) {
+    hostCssClasses[cssClasses[i]] = true;
   }
-  vnode.sel = undefined;
 
-  hostCss[`${componentPrefix}${instance.mode}`] = true;
+  delete vnode.sel;
+
+  hostCssClasses[`${cmpMeta.hostCss}-${instance.mode}`] = true;
+  hostAttributes.mode = instance.mode;
 
   if (instance.color) {
-    hostCss[`${componentPrefix}${instance.mode}-${instance.color}`] = true;
+    hostCssClasses[`${cmpMeta.hostCss}-${instance.color}`] = true;
+    hostCssClasses[`${cmpMeta.hostCss}-${instance.mode}-${instance.color}`] = true;
+    hostAttributes.color = instance.color;
   }
 
   return vnode;

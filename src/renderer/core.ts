@@ -275,8 +275,7 @@ export function initRenderer(modules: Array<any>, api: PlatformApi): Renderer {
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) {
-          debugger;
-          // updateChildren((<IonElement>elm)._root || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
+          updateChildren((<HTMLElement>elm).shadowRoot || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue);
         }
 
       } else if (isDef(ch)) {

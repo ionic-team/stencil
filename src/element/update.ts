@@ -28,7 +28,7 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
 export function patch(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta, cmpModule: ComponentModule) {
   let instance = ctrl.instance;
   if (!instance) {
-    instance = createComponentInstance(ctrl, cmpModule);
+    instance = ctrl.instance = new cmpModule();
     initState(plt, config, renderer, elm, ctrl, cmpMeta);
   }
 
@@ -39,7 +39,7 @@ export function patch(plt: PlatformApi, config: Config, renderer: Renderer, elm:
     createRoot(plt, config, elm, ctrl, cmpMeta);
   }
 
-  const vnode = generateVNode(elm, instance, cmpMeta);
+  const vnode = generateVNode(ctrl.root, instance, cmpMeta);
 
   // if we already have a vnode then use it
   // otherwise, elm is the initial patch and
@@ -50,11 +50,6 @@ export function patch(plt: PlatformApi, config: Config, renderer: Renderer, elm:
     instance.connectedCallback && instance.connectedCallback();
     ctrl.connected = true;
   }
-}
-
-
-function createComponentInstance(ctrl: ComponentController, cmpModule: ComponentModule) {
-  return ctrl.instance = new cmpModule();
 }
 
 
