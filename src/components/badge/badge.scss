@@ -11,7 +11,8 @@ $badge-font-size:                 1.3rem !default;
 $badge-font-weight:               bold !default;
 
 
-:host {
+:host,
+ion-badge {
   display: inline-block;
 
   visibility: inherit !important;
@@ -29,6 +30,7 @@ $badge-font-weight:               bold !default;
   vertical-align: baseline;
 }
 
-:host:empty {
+:host(:empty),
+ion-badge:empty {
   display: none;
 }
