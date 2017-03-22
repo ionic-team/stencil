@@ -52,25 +52,33 @@ function inspectClassDecorator(n: ts.Node, file: FileMeta, opts: CompilerOptions
 
 
 function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
-  if (!cmpMeta.tag) {
+  if (!cmpMeta.tag || cmpMeta.tag.trim() == '') {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
+  cmpMeta.tag = cmpMeta.tag.trim().toLowerCase();
+
+  let invalidChars = cmpMeta.tag.replace(/\w|-/g, '');
+  if (invalidChars !== '') {
+    throw `"${cmpMeta.tag}" tag contains invalid characters: ${invalidChars}`
+  }
+
   if (cmpMeta.tag.indexOf('-') === -1) {
-    throw `tag must have a dash (-): ${cmpMeta.tag}`;
+    throw `"${cmpMeta.tag}" tag must contain a dash (-)`;
   }
 
   if (cmpMeta.tag.indexOf('-') === 0) {
-    throw `tag cannot start with a dash (-): ${cmpMeta.tag}`;
+    throw `"${cmpMeta.tag}" tag cannot start with a dash (-)`;
   }
 
-  if (cmpMeta.tag.indexOf('-') === cmpMeta.tag.length - 1) {
-    throw `tag cannot end with a dash (-): ${cmpMeta.tag}`;
+  if (cmpMeta.tag.lastIndexOf('-') === cmpMeta.tag.length - 1) {
+    throw `"${cmpMeta.tag}" tag cannot end with a dash (-)`;
   }
 
   if (!cmpMeta.hostCss) {
     const tagSplit = cmpMeta.tag.split('-');
-    cmpMeta.hostCss = tagSplit[tagSplit.length - 1];
+    tagSplit.shift();
+    cmpMeta.hostCss = tagSplit.join('-');
   }
 }
 
