@@ -1,18 +1,25 @@
-import { ComponentInstance, ComponentMeta, ProxyElement } from '../../../utils/interfaces';
+import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
-import { connectedCallback } from '../../../element/connected';
+import { update } from '../../../element/update';
 import { disconnectedCallback } from '../../../element/disconnected';
 import { Config } from '../../../utils/config';
 import { PlatformApi } from '../../../platform/platform-api';
 import { PlatformClient } from '../../../platform/platform-client';
+import { initRenderer, attributesModule, classModule, styleModule } from '../../../renderer/core';
 
 // declared in the base iife arguments
 declare const components: ComponentMeta[];
 
 
-const config = new Config();
-
 const plt = new PlatformClient(window, document);
+const config = new Config();
+const renderer = initRenderer([
+  attributesModule,
+  classModule,
+  styleModule
+], plt);
+
+const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
 
 components.forEach(meta => {
@@ -26,23 +33,23 @@ components.forEach(meta => {
 
     constructor() {
       super();
+      ctrls.set(this, {});
     }
 
     connectedCallback() {
-      const prxElm: ProxyElement = this;
+      const elm: ProxyElement = this;
       plt.loadComponentModule(tag, (cmpMeta, cmpModule) => {
-        connectedCallback(plt, config, prxElm, cmpMeta, cmpModule);
+        update(plt, config, renderer, elm, ctrls.get(elm), cmpMeta, cmpModule);
       });
     }
 
     attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
-      const prxElm: ProxyElement = this;
-      attributeChangedCallback(prxElm.$instance, attrName, oldVal, newVal, namespace);
+      attributeChangedCallback(ctrls.get(this).instance, attrName, oldVal, newVal, namespace);
     }
 
     disconnectedCallback() {
-      const prxElm: ProxyElement = this;
-      disconnectedCallback(prxElm);
+      disconnectedCallback(ctrls.get(this));
+      ctrls.delete(this);
     }
 
     static get observedAttributes() {

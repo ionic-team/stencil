@@ -1,8 +1,6 @@
 import { ComponentInstance } from '../utils/interfaces';
 
 
-export function attributeChangedCallback(cmpInstance: ComponentInstance, attrName: string, oldVal: string, newVal: string, namespace: string) {
-  console.debug(`attributeChangedCallback: ${attrName}, ${oldVal}, ${newVal}, ${namespace}`);
-
-  cmpInstance.attributeChangedCallback && cmpInstance.attributeChangedCallback(attrName, oldVal, newVal, namespace);
+export function attributeChangedCallback(instance: ComponentInstance, attrName: string, oldVal: string, newVal: string, namespace: string) {
+  instance && instance.attributeChangedCallback && instance.attributeChangedCallback(attrName, oldVal, newVal, namespace);
 }

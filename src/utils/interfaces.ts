@@ -35,17 +35,27 @@ export interface ComponentInstance {
   attributeChangedCallback?: {(attrName?: string, oldVal?: string, newVal?: string, namespace?: string): void};
   disconnectedCallback?: {(): void};
   render?: {(): VNode};
+
+  mode?: string;
+  color?: string;
 }
 
 
 export interface ProxyElement extends HTMLElement {
-  $shadowDom?: boolean;
-  $root?: HTMLElement | ShadowRoot;
-  $queued?: boolean;
-  $instance?: ComponentInstance;
   connectedCallback: {(): void};
   attributeChangedCallback: {(attrName: string, oldVal: string, newVal: string, namespace: string): void};
   disconnectedCallback: {(): void};
+}
+
+
+export interface ComponentController {
+  shadowDom?: boolean;
+  root?: HTMLElement | ShadowRoot;
+  queued?: boolean;
+  instance?: ComponentInstance;
+  vnode?: VNode;
+  connected?: boolean;
+  state?: {[propName: string]: any};
 }
 
 
@@ -91,7 +101,6 @@ export interface VNode {
   elm: Node | undefined;
   text: string | undefined;
   key: Key;
-  isHost?: boolean;
 }
 
 

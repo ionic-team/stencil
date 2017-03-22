@@ -304,7 +304,7 @@ export function initRenderer(modules: Array<any>, api: PlatformApi): Renderer {
       oldVnode = emptyNodeAt(oldVnode);
     }
 
-    if (vnode.isHost || sameVnode(oldVnode, vnode)) {
+    if (vnode.elm || sameVnode(oldVnode, vnode)) {
       patchVnode(oldVnode, vnode, insertedVnodeQueue);
 
     } else {

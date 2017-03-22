@@ -1,12 +1,10 @@
-import { ProxyElement } from '../utils/interfaces';
+import { ComponentController } from '../utils/interfaces';
 
 
-export function disconnectedCallback(prxElm: ProxyElement) {
-  const cmpInstance = prxElm.$instance;
+export function disconnectedCallback(ctrl: ComponentController) {
+  if (ctrl) {
+    ctrl.instance && ctrl.instance.disconnectedCallback && ctrl.instance.disconnectedCallback();
 
-  if (cmpInstance) {
-    cmpInstance.disconnectedCallback && cmpInstance.disconnectedCallback();
+    ctrl.instance = ctrl.state = ctrl.vnode = ctrl.root = null;
   }
-
-  prxElm.$instance = prxElm.$root = null;
 }

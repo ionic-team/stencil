@@ -1,9 +1,8 @@
 import { Component, Prop } from '../utils/decorators';
 import { Ionic } from '../utils/global';
-import { initProperties } from './properties';
+// import { initProperties } from './properties';
 import { toCamelCase } from '../utils/helpers';
 import { Annotations, IonicComponent, VNode, VNodeData, Props } from '../utils/interfaces';
-import { patchHostElement } from './patch-element';
 export { h } from '../renderer/core';
 export { Annotations, Component, IonicComponent, VNode, VNodeData, Prop, Props };
 
@@ -23,8 +22,8 @@ export class IonElement extends getBaseElement() {
   constructor() {
     super();
 
-    const annotations = (<IonicComponent>this.constructor).$annotations;
-    initProperties(this, annotations.props);
+    // const annotations = (<IonicComponent>this.constructor).$annotations;
+    // initProperties(this, annotations.props);
   }
 
 
@@ -89,7 +88,7 @@ export class IonElement extends getBaseElement() {
       ionic.api.nextTick(() => {
 
         // vdom diff and patch the host element for differences
-        patchHostElement(ionic.config, ionic.api, ionic.renderer, elm);
+        // patchHostElement(ionic.config, ionic.api, ionic.renderer, elm);
 
         elm._onUpdates.forEach(cb => {
           cb(elm);

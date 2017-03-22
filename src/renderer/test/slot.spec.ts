@@ -31,8 +31,7 @@ describe('slot', function() {
       ])
     ]);
 
-    let hostVNode = patch(hostEle, hostRender);
-    hostVNode.isHost = true;
+    patch(hostEle, hostRender);
 
     let divA = hostEle.children[0];
     let divB = hostEle.children[1];
@@ -68,8 +67,7 @@ describe('slot', function() {
       ])
     ]);
 
-    let hostVNode = patch(hostEle, hostRender);
-    hostVNode.isHost = true;
+    patch(hostEle, hostRender);
 
     let divA = hostEle.children[0];
     let divANodes = divA.childNodes;
@@ -94,13 +92,11 @@ describe('slot', function() {
     ]);
 
     let vnode1 = patch(hostEle, hostRender);
-    vnode1.isHost = true;
 
     let divA = hostEle.children[0];
     expect(divA.childNodes[0].textContent).toEqual('hello');
 
-    let vnode2 = patch(vnode1, hostRender);
-    vnode2.isHost = true;
+    patch(vnode1, hostRender);
 
     expect(divA.childNodes[0].textContent).toEqual('hello');
   });
@@ -114,8 +110,7 @@ describe('slot', function() {
       ])
     ]);
 
-    let hostVNode = patch(hostEle, hostRender);
-    hostVNode.isHost = true;
+    patch(hostEle, hostRender);
 
     expect(hostEle.childNodes.length).toEqual(1);
 

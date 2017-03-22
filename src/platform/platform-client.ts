@@ -186,7 +186,7 @@ export class PlatformClient implements PlatformApi {
   }
 
   nextTick(cb: Function) {
-    const obs = new MutationObserver(() => {
+    const obs = new MutationObserver(function nextTick() {
       cb && cb();
     });
 
