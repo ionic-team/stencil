@@ -36,10 +36,20 @@ export interface FileMeta {
 }
 
 
+export interface PropOptions {
+  type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
+}
+
+
+export interface Props {
+  [propName: string]: PropOptions;
+}
+
+
 export interface ComponentMeta {
   tag?: string;
-  props?: any;
-  obsAttrs?: string[];
+  props?: Props;
+  observedAttributes?: string[];
   hostCss?: string;
   moduleUrl?: string;
   styles?: string;

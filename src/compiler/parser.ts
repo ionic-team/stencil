@@ -52,10 +52,22 @@ function inspectClassDecorator(n: ts.Node, file: FileMeta, opts: CompilerOptions
 
 
 function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
+  if (!cmpMeta) {
+    throw `invalid component decorator`;
+  }
+
   if (!cmpMeta.tag || cmpMeta.tag.trim() == '') {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
+  updateTag(cmpMeta);
+  updateHostCss(cmpMeta);
+  updateProperties(cmpMeta);
+  updateObservedAttributes(cmpMeta);
+}
+
+
+function updateTag(cmpMeta: ComponentMeta) {
   cmpMeta.tag = cmpMeta.tag.trim().toLowerCase();
 
   let invalidChars = cmpMeta.tag.replace(/\w|-/g, '');
@@ -75,11 +87,66 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
     throw `"${cmpMeta.tag}" tag cannot end with a dash (-)`;
   }
 
+}
+
+
+function updateHostCss(cmpMeta: ComponentMeta) {
   if (!cmpMeta.hostCss) {
     const tagSplit = cmpMeta.tag.split('-');
     tagSplit.shift();
     cmpMeta.hostCss = tagSplit.join('-');
   }
+}
+
+
+function updateProperties(cmpMeta: ComponentMeta) {
+  const validPropTypes = ['string', 'boolean', 'number', 'Array', 'Object'];
+
+  cmpMeta.props = cmpMeta.props || {};
+
+  cmpMeta.props.color = cmpMeta.props.color || {};
+
+  cmpMeta.props.mode = cmpMeta.props.mode || {};
+
+  Object.keys(cmpMeta.props).forEach(propName => {
+
+    if (propName.indexOf('-') > -1) {
+      throw `"${propName}" property name cannot have a dash (-) in it`;
+    }
+
+    if (!isNaN(<any>propName.charAt(0))) {
+      throw `"${propName}" property name cannot start with a number`;
+    }
+
+    const prop = cmpMeta.props[propName];
+    if (prop.type) {
+      if (typeof prop.type === 'string') {
+        prop.type = (<any>prop.type).trim();
+      }
+
+      if (validPropTypes.indexOf(prop.type) === -1) {
+        throw `"${propName}" invalid for property type: ${prop.type}`;
+      }
+    }
+
+  });
+}
+
+
+function updateObservedAttributes(cmpMeta: ComponentMeta) {
+  cmpMeta.observedAttributes = cmpMeta.observedAttributes || [];
+
+  Object.keys(cmpMeta.props).forEach(propName => {
+    const attrName = camelCaseToDash(propName);
+    if (cmpMeta.observedAttributes.indexOf(attrName) === -1) {
+      cmpMeta.observedAttributes.push(attrName);
+    }
+  });
+}
+
+
+function camelCaseToDash(str: string) {
+  return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
 }
 
 
