@@ -10,6 +10,7 @@ export class PlatformClient implements PlatformApi {
   private loadCallbacks: LoadedCallbacks = {};
   private activeRequests: string[] = [];
   private cssLink: {[tag: string]: boolean} = {};
+  private hasPromises: boolean;
 
   staticDir: string;
 
@@ -19,6 +20,8 @@ export class PlatformClient implements PlatformApi {
     self.win;
 
     self.staticDir = getStaticComponentDir(d);
+
+    self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 
     (<any>win).ionicComponent = function(tag: string, moduleFn: {(): ComponentModule}) {
       console.debug('ionicComponent', tag);
@@ -47,14 +50,14 @@ export class PlatformClient implements PlatformApi {
     return this.registry[tag];
   }
 
-  loadComponentModule(tag: string, cb: {(cmpMeta: ComponentMeta, cmpModule: any): void}): void {
+  loadComponentModule(cmpMeta: ComponentMeta, cb: {(cmpModule: any): void}): void {
     const self = this;
-    const cmpMeta = self.getComponentMeta(tag);
     const loadedCallbacks = self.loadCallbacks;
+    const tag = cmpMeta.tag;
 
     const cmpModule = self.modules[tag];
     if (cmpModule) {
-      cb(cmpMeta, cmpModule);
+      cb(cmpModule);
 
     } else if (cmpMeta.moduleUrl) {
       if (!loadedCallbacks[tag]) {
@@ -66,7 +69,7 @@ export class PlatformClient implements PlatformApi {
       self.jsonp(cmpMeta.moduleUrl);
 
     } else {
-      cb(cmpMeta, CommonComponent);
+      cb(CommonComponent);
     }
   }
 
@@ -186,13 +189,14 @@ export class PlatformClient implements PlatformApi {
   }
 
   nextTick(cb: Function) {
-    const obs = new MutationObserver(function nextTick() {
-      cb && cb();
-    });
+    const timerId = setTimeout(cb);
 
-    const textNode = this.createTextNode('');
-    obs.observe(textNode, { characterData: true });
-    textNode.data = '1';
+    if (this.hasPromises) {
+      Promise.resolve().then(() => {
+        clearTimeout(timerId);
+        cb && cb();
+      });
+    }
   }
 
   hasCssLink(linkUrl: string): boolean {

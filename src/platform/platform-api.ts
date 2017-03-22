@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentModule, ComponentRegistry } from '../utils/interfaces';
+import { ComponentMeta, ComponentModule } from '../utils/interfaces';
 
 
 export interface PlatformApi {

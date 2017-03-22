@@ -1,4 +1,4 @@
-import { isNumber, isUndef, isString, toCamelCase } from '../utils/helpers';
+import { isNumber, isUndef, isString } from '../utils/helpers';
 import { Config } from '../utils/config';
 import { PlatformApi } from '../platform/platform-api';
 import { ComponentController, ComponentMeta, PropOptions, ProxyElement, Renderer } from '../utils/interfaces';
@@ -10,13 +10,8 @@ export function initState(plt: PlatformApi, config: Config, renderer: Renderer, 
   const state = ctrl.state = {};
   const props = cmpMeta.props || {};
 
-  // all components have mode and color props
-  props.mode = true;
-  props.color = true;
-
 
   Object.keys(props).forEach(propName => {
-    propName = toCamelCase(propName);
 
     if (isUndef(instance[propName])) {
       // no instance value, so get it from the element

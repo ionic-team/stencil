@@ -21,11 +21,8 @@ const renderer = initRenderer([
 const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
 
-components.forEach(function registerComponentMeta(meta) {
-  plt.registerComponent(meta);
-
-  var tag = meta.tag;
-  var obsAttrs = meta.obsAttrs && meta.obsAttrs.slice();
+components.forEach(function registerComponentMeta(cmpMeta) {
+  plt.registerComponent(cmpMeta);
 
 
   function ProxyElementES5() {
@@ -40,13 +37,13 @@ components.forEach(function registerComponentMeta(meta) {
 
   ProxyElementES5.prototype.connectedCallback = function() {
     var elm: ProxyElement = this;
-    plt.loadComponentModule(tag, function loadedModule(cmpMeta, cmpModule) {
+    plt.loadComponentModule(cmpMeta, function loadedModule(cmpModule) {
       update(plt, config, renderer, elm, ctrls.get(elm), cmpMeta, cmpModule);
     });
   };
 
   ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {
-    attributeChangedCallback(ctrls.get(this).instance, attrName, oldVal, newVal, namespace);
+    attributeChangedCallback(ctrls.get(this).instance, cmpMeta, attrName, oldVal, newVal, namespace);
   };
 
   ProxyElementES5.prototype.disconnectedCallback = function() {
@@ -54,7 +51,7 @@ components.forEach(function registerComponentMeta(meta) {
     ctrls.delete(this);
   };
 
-  (<any>ProxyElementES5).observedAttributes = obsAttrs;
+  (<any>ProxyElementES5).observedAttributes = cmpMeta.observedAttributes;
 
-  window.customElements.define(tag, ProxyElementES5);
+  window.customElements.define(cmpMeta.tag, ProxyElementES5);
 });

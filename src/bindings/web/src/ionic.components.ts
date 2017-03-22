@@ -21,14 +21,10 @@ const renderer = initRenderer([
 const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
 
-components.forEach(function registerComponentMeta(meta) {
-  plt.registerComponent(meta);
+components.forEach(function registerComponentMeta(cmpMeta) {
+  plt.registerComponent(cmpMeta);
 
-  const tag = meta.tag;
-  const obsAttrs = meta.obsAttrs && meta.obsAttrs.slice();
-
-
-  window.customElements.define(tag, class extends HTMLElement {
+  window.customElements.define(cmpMeta.tag, class extends HTMLElement {
 
     constructor() {
       super();
@@ -37,13 +33,13 @@ components.forEach(function registerComponentMeta(meta) {
 
     connectedCallback() {
       const elm: ProxyElement = this;
-      plt.loadComponentModule(tag, function loadedModule(cmpMeta, cmpModule) {
+      plt.loadComponentModule(cmpMeta.tag, function loadedModule(cmpModule) {
         update(plt, config, renderer, elm, ctrls.get(elm), cmpMeta, cmpModule);
       });
     }
 
     attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
-      attributeChangedCallback(ctrls.get(this).instance, attrName, oldVal, newVal, namespace);
+      attributeChangedCallback(ctrls.get(this).instance, cmpMeta, attrName, oldVal, newVal, namespace);
     }
 
     disconnectedCallback() {
@@ -52,7 +48,7 @@ components.forEach(function registerComponentMeta(meta) {
     }
 
     static get observedAttributes() {
-      return obsAttrs;
+      return cmpMeta.observedAttributes;
     }
   });
 });
