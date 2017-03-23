@@ -24,34 +24,24 @@ export function transformTsFile(filePath: string, opts: CompilerOptions, ctx: Co
 }
 
 
-export function transformTsFileSync(filePath: string, opts: CompilerOptions, ctx: CompilerContext = {}) {
-  if (!ctx.files) {
-    ctx.files = new Map();
-  }
-
-  const file = getFileSync(filePath, opts, ctx);
-  return transformFile(file, opts, ctx);
-}
-
-
 function transformFile(file: FileMeta, opts: CompilerOptions, ctx: CompilerContext) {
   if (!file.isTsSourceFile || !file.isTransformable) {
-    return file;
+    return Promise.resolve(file);
   }
 
   if (file.srcTransformedText) {
-    return file;
+    return Promise.resolve(file);
   }
 
   parseTsSrcFile(file, opts, ctx);
 
   if (!file.components.length) {
-    return file;
+    return Promise.resolve(file);
   }
 
-  preprocessStyles(file, opts, ctx);
-
-  return file;
+  return preprocessStyles(file, opts, ctx).then(() => {
+    return file;
+  });
 }
 
 
