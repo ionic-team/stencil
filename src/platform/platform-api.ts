@@ -18,8 +18,9 @@ export interface PlatformApi {
   setTextContent: (node: Node, text: string | null) => void;
   getTextContent: (node: Node) => string | null;
   getAttribute: (elm: Element, attrName: string) => string;
+  setAttribute: (elm: Element, attrName: string, attrValue: any) => void;
   getProperty: (node: Node, propName: string) => string;
-  getPropOrAttr: (elm: Element, propName: string) => any;
+  setProperty: (node: Node, propName: string, propValue: any) => void;
   setStyle: (elm: Element, styleName: string, styleValue: any) => void;
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;

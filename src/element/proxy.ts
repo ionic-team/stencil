@@ -1,7 +1,7 @@
-import { isNumber, isUndef, isString } from '../utils/helpers';
+import { isDef, toCamelCase, isNumber, isString } from '../utils/helpers';
 import { Config } from '../utils/config';
 import { PlatformApi } from '../platform/platform-api';
-import { ComponentController, ComponentMeta, PropOptions, ProxyElement, Renderer } from '../utils/interfaces';
+import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
 import { update } from './update';
 
 
@@ -12,24 +12,16 @@ export function initState(plt: PlatformApi, config: Config, renderer: Renderer, 
 
 
   Object.keys(props).forEach(propName => {
+    const propType = props[propName].type;
 
-    if (isUndef(instance[propName])) {
-      // no instance value, so get it from the element
-      state[propName] = elm[propName];
-
-    } else if (isUndef(elm[propName])) {
-      // no element value, so get it from from instance
-      // but also be sure to set the element to have the same value
-      // before we assign the getters/setters
-      state[propName] = elm[propName] = instance[propName];
-    }
+    state[propName] = getInitialValue(plt, config, elm, instance, propName);
 
     function getState() {
       return state[propName];
     }
 
     function setState(value: any) {
-      value = getValue(props[propName], value);
+      value = getPropValue(propType, value);
 
       if (state[propName] !== value) {
         state[propName] = value;
@@ -52,20 +44,46 @@ export function initState(plt: PlatformApi, config: Config, renderer: Renderer, 
 }
 
 
-function getValue(propOpts: PropOptions, value: any): any {
-  if (propOpts.type === 'boolean') {
+function getPropValue(propType: string, value: any): any {
+  if (propType === 'boolean') {
     if (isString(value)) {
       return (value !== 'false')
     }
     return !!value;
   }
 
-  if (propOpts.type === 'number') {
+  if (propType === 'number') {
     if (isNumber(value)) {
       return value;
     }
-    return parseFloat(value);
+    try {
+      return parseFloat(value);
+    } catch (e) {}
+    return NaN;
   }
 
   return value;
+}
+
+
+function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, instance: ComponentInstance, propName: string) {
+  let value = plt.getProperty(elm, propName);
+  if (isDef(value)) {
+    return value;
+  }
+
+  value = plt.getAttribute(elm, toCamelCase(propName));
+  if (isDef(value)) {
+    return value;
+  }
+
+  if (isDef(instance[propName])) {
+    plt.setProperty(elm, propName, instance[propName]);
+    return instance[propName];
+  }
+
+  value = config.get(propName);
+  if (isDef(value)) {
+    return value;
+  }
 }

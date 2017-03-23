@@ -1,10 +1,9 @@
 import { ComponentController, ComponentMeta, ComponentModule, ProxyElement } from '../utils/interfaces';
 import { PlatformApi } from '../platform/platform-api';
 import { Config } from '../utils/config';
-import { Renderer } from '../utils/interfaces';
-import { isDef } from '../utils/helpers';
-import { initState } from './proxy';
 import { generateVNode } from './host';
+import { initState } from './proxy';
+import { Renderer } from '../utils/interfaces';
 
 
 export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta, cmpModule?: ComponentModule) {
@@ -31,9 +30,6 @@ export function patch(plt: PlatformApi, config: Config, renderer: Renderer, elm:
     instance = ctrl.instance = new cmpModule();
     initState(plt, config, renderer, elm, ctrl, cmpMeta);
   }
-
-  instance.mode = getValue('mode', config, plt, elm);
-  instance.color = getValue('color', config, plt, elm);
 
   if (!ctrl.root) {
     createRoot(plt, config, elm, ctrl, cmpMeta);
@@ -72,7 +68,7 @@ function createRoot(plt: PlatformApi, config: Config, elm: ProxyElement, ctrl: C
 
 
 function injectCssLink(plt: PlatformApi, config: Config, cmpMeta: ComponentMeta, parentNode: Node, supportsShadowDom: boolean) {
-  const modeStyleFilename = cmpMeta.modeStyleUrls[config.getValue('mode')];
+  const modeStyleFilename = cmpMeta.modeStyleUrls[config.get('mode')];
   if (!modeStyleFilename) {
     return;
   }
@@ -95,9 +91,3 @@ function injectCssLink(plt: PlatformApi, config: Config, cmpMeta: ComponentMeta,
   plt.appendChild(parentNode, linkEle);
 }
 
-
-
-function getValue(name: string, config: Config, api: PlatformApi, elm: HTMLElement, fallback: any = null): any {
-  const val = api.getPropOrAttr(elm, name);
-  return isDef(val) ? val : config.getValue(name, fallback);
-}

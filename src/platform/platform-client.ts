@@ -1,5 +1,5 @@
 import { PlatformApi } from './platform-api';
-import { isDef, toCamelCase } from '../utils/helpers';
+import { toCamelCase } from '../utils/helpers';
 import { ComponentRegistry, ComponentMeta, ComponentModule } from '../utils/interfaces';
 import { getStaticComponentDir } from '../utils/helpers';
 
@@ -163,13 +163,16 @@ export class PlatformClient implements PlatformApi {
     return elm.getAttribute(attrName);
   }
 
+  setAttribute(elm: HTMLElement, attrName: string, attrValue: any): void {
+    elm.setAttribute(attrName, attrValue);
+  }
+
   getProperty(node: Node, propName: string): any {
     return (<any>node)[propName];
   }
 
-  getPropOrAttr(elm: HTMLElement, name: string): any {
-    const val = (<any>elm)[toCamelCase(name)];
-    return isDef(val) ? val : elm.getAttribute(name);
+  setProperty(node: Node, propName: string, propValue: any): any {
+    (<any>node)[propName] = propValue;
   }
 
   setStyle(elm: HTMLElement, styleName: string, styleValue: any) {

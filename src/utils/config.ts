@@ -6,7 +6,7 @@ export class Config {
     this.c = config;
   }
 
-  getValue(key: string, fallback: any = null): any {
+  get(key: string, fallback: any = null): any {
     if (key === 'mode') {
       return 'md';
     }
