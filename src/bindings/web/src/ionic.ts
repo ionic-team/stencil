@@ -1,19 +1,20 @@
 (function(d: HTMLDocument) {
   'use strict';
 
-  function staticDir(): string {
-    var val: any = d.querySelector('script[data-static-dir]');
-    if (val) {
-      return val.dataset['staticDir'];
-    }
+  var dir: string;
 
-    val = d.getElementsByTagName('script');
-    val = val[val.length - 1];
+  var scp: any = d.getElementsByTagName('script');
+  scp = scp[scp.length - 1];
+  var isMin = scp.src.indexOf('.min.js') > -1;
 
-    var paths = val.src.split('/');
+  var stcDir = <HTMLElement>d.querySelector('script[data-static-dir]');
+  if (stcDir) {
+    dir = stcDir.dataset['staticDir'];
+
+  } else {
+    var paths = scp.src.split('/');
     paths.pop();
-
-    return val.dataset['staticDir'] = paths.join('/') + '/';
+    return scp.dataset['staticDir'] = paths.join('/') + '/';
   }
 
   function es5() {
@@ -32,8 +33,12 @@
     i.push('es5');
   }
 
+  if (isMin) {
+    i.push('min');
+  }
+
   const s = d.createElement('script');
-  s.src = `${staticDir()}ionic.${i.join('.')}.js`;
+  s.src = `${dir}ionic.${i.join('.')}.js`;
   d.head.appendChild(s);
 
 })(document);
