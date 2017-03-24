@@ -15,20 +15,6 @@ function bundleIonicJs() {
 }
 
 
-function bundleIonicCss() {
-  const scssFilePath = util.srcPath('themes/ionic.scss');
-  const cssFilePath = util.distPath('ionic-web/ionic.css');
-  const cssMinFilePath = util.distPath('ionic-web/ionic.min.css');
-
-  return Promise.all([
-    util.compileSass(scssFilePath, cssFilePath),
-    util.compileSass(scssFilePath, cssMinFilePath, {
-      outputStyle: 'compressed'
-    })
-  ]);
-}
-
-
 function bundleComponentJs(cePolyfill) {
   var entryFile = util.distPath('transpiled-web/bindings/web/src/ionic.components.js');
   var outputFile = util.distPath('ionic-bundles/web/ionic.components.js');
@@ -89,8 +75,7 @@ Promise.all([
   return Promise.all([
     bundleIonicJs(),
     bundleComponentJs(cePolyfill),
-    bundleComponentEs5Js(cePolyfill),
-    bundleIonicCss()
+    bundleComponentEs5Js(cePolyfill)
   ]);
 })
 
