@@ -32,7 +32,6 @@ function bundleIonicCss() {
 function bundleComponentJs(cePolyfill) {
   var entryFile = util.distPath('transpiled-web/bindings/web/src/ionic.components.js');
   var outputFile = util.distPath('ionic-bundles/web/ionic.components.js');
-  var ceOutputFile = util.distPath('ionic-bundles/web/ionic.components.ce.js');
 
   return rollup.rollup({
     entry: entryFile
@@ -49,10 +48,7 @@ function bundleComponentJs(cePolyfill) {
       result.code
     ];
 
-    return Promise.all([
-      util.writeFile(outputFile, result.code),
-      util.writeFile(ceOutputFile, ceOutput.join('\n'))
-    ]);
+    return util.writeFile(outputFile, result.code);
   });
 }
 
@@ -83,7 +79,7 @@ function bundleComponentEs5Js(cePolyfill) {
 
 Promise.all([
   util.readFile(util.nodeModulesPath('@webcomponents/custom-elements/src/custom-elements.js')),
-  util.emptyDir(util.distPath('ionic-web/web')),
+  util.emptyDir(util.distPath('ionic-web')),
   util.emptyDir(util.distPath('ionic-bundles/web'))
 ])
 
