@@ -1,7 +1,7 @@
 import { FileMeta, CompilerOptions, CompilerContext } from './interfaces';
 import { parseTsSrcFile } from './parser';
 import { isTsSourceFile, isTransformable, readFile } from './util';
-import { preprocessStyles } from './styles';
+import { processStyles } from './styles';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -29,17 +29,13 @@ function transformFile(file: FileMeta, opts: CompilerOptions, ctx: CompilerConte
     return Promise.resolve(file);
   }
 
-  if (file.srcTransformedText) {
-    return Promise.resolve(file);
-  }
-
   parseTsSrcFile(file, opts, ctx);
 
-  if (!file.components.length) {
+  if (!file.cmpMeta) {
     return Promise.resolve(file);
   }
 
-  return preprocessStyles(file, opts, ctx).then(() => {
+  return processStyles(file, opts, ctx).then(() => {
     return file;
   });
 }
@@ -109,11 +105,13 @@ export function getFileSync(filePath: string, opts: CompilerOptions, ctx: Compil
 
 function createFileMeta(filePath: string, srcText: string, opts: CompilerOptions, ctx: CompilerContext) {
   const file: FileMeta = {
+    fileName: path.basename(filePath),
     filePath: filePath,
     srcText: srcText,
+    srcTextWithoutDecorators: srcText,
     isTsSourceFile: isTsSourceFile(filePath),
     isTransformable: false,
-    components: []
+    cmpMeta: null
   };
 
   if (file.isTsSourceFile) {
@@ -131,4 +129,3 @@ function createFileMeta(filePath: string, srcText: string, opts: CompilerOptions
 function isValidDirectory(filePath: string) {
   return filePath.indexOf('node_modules') === -1;
 }
-

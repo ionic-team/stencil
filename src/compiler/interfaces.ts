@@ -23,16 +23,17 @@ export interface CompilerContext {
 
 
 export interface FileMeta {
+  fileName: string;
   filePath: string;
 
   srcText: string;
-  srcTransformedText?: string;
-  transpileText?: string;
+  srcTextWithoutDecorators: string;
+  transpiledText?: string;
 
-  isTsSourceFile?: boolean;
-  isTransformable?: boolean;
+  isTsSourceFile: boolean;
+  isTransformable: boolean;
 
-  components?: ComponentMeta[];
+  cmpMeta?: ComponentMeta;
 }
 
 
@@ -51,13 +52,13 @@ export interface ComponentMeta {
   props?: Props;
   observedAttributes?: string[];
   hostCss?: string;
-  moduleUrl?: string;
+  modes: {[mode: string]: ComponentMode};
+}
+
+
+export interface ComponentMode {
   styles?: string;
   styleUrls?: string[];
-  modeStyleUrls?: {[mode: string]: string[]};
-  preprocessStyles?: string[];
-  cloak?: boolean;
-  shadow?: boolean;
 }
 
 

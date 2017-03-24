@@ -4,14 +4,15 @@ import * as ts from 'typescript';
 
 
 export function isTsSourceFile(filePath: string) {
+
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
     if (parts[parts.length - 1] === 'ts') {
       if (parts.length > 2 && parts[parts.length - 2] === 'd') {
         return false;
       }
+      return true;
     }
-    return true;
   }
   return false;
 }
@@ -23,6 +24,8 @@ export function isTransformable(sourceText: string) {
 
 
 export function readFile(filePath: string): Promise<string> {
+  console.time(`readFile: ${filePath}`);
+
   return new Promise((resolve, reject) => {
     if (!path.isAbsolute(filePath)) {
       reject(`absolute file path required: ${filePath}`);
@@ -34,6 +37,7 @@ export function readFile(filePath: string): Promise<string> {
         reject(err);
 
       } else {
+        console.timeEnd(`readFile: ${filePath}`);
         resolve(content.toString());
       }
     });
@@ -42,12 +46,15 @@ export function readFile(filePath: string): Promise<string> {
 
 
 export function emptyDir(dirPath: string) {
+  console.time(`emptyDir: ${dirPath}`);
+
   return new Promise((resolve, reject) => {
 
     fs.emptyDir(dirPath, err => {
       if (err) {
         reject(err);
       } else {
+        console.timeEnd(`emptyDir: ${dirPath}`);
         resolve();
       }
     });
@@ -57,6 +64,8 @@ export function emptyDir(dirPath: string) {
 
 
 export function writeFile(filePath: string, data: string): Promise<null> {
+  console.time(`writeFile: ${filePath}`);
+
   return new Promise((resolve, reject) => {
     if (!path.isAbsolute(filePath)) {
       reject(`absolute file path required: ${filePath}`);
@@ -68,6 +77,7 @@ export function writeFile(filePath: string, data: string): Promise<null> {
         reject(err);
 
       } else {
+        console.timeEnd(`writeFile: ${filePath}`);
         resolve();
       }
     });

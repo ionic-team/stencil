@@ -18,6 +18,7 @@
     "@types/jest": "^19.2.2",
     "@types/node": "^7.0.8",
     "@types/node-sass": "^3.10.32",
+    "babel-cli": "^6.24.0",
     "babel-core": "^6.24.0",
     "babel-plugin-transform-define": "^1.2.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",
@@ -34,6 +35,8 @@
     "jest": "19.0.2",
     "node-sass": "^4.5.0",
     "rimraf": "2.6.1",
+    "rollup": "^0.41.6",
+    "rollup-pluginutils": "^2.0.1",
     "typescript": "2.2.1"
   },
   "jest": {

@@ -11,6 +11,7 @@ export function parseTsSrcFile(file: FileMeta, opts: CompilerOptions, ctx: Compi
 
 
 function inspectNode(n: ts.Node, file: FileMeta, opts: CompilerOptions, ctx: CompilerContext) {
+
   if (n.kind === ts.SyntaxKind.ClassDeclaration) {
     ts.forEachChild(n, childNode => {
       if (childNode.kind === ts.SyntaxKind.Decorator) {
@@ -34,20 +35,20 @@ function inspectClassDecorator(n: ts.Node, file: FileMeta, opts: CompilerOptions
 
   const text = orgText.replace('@Component', '');
 
-  const cmpMeta = parseComponentMeta(text);
+  file.cmpMeta = parseComponentMeta(text);
 
-  updateComponentMeta(cmpMeta, orgText);
-
-  file.components.push(cmpMeta);
+  updateComponentMeta(file.cmpMeta, orgText);
 
   if (!ctx.components) {
     ctx.components = [];
   }
 
-  const metaCopy: ComponentMeta = Object.assign({}, cmpMeta);
-  delete metaCopy.preprocessStyles;
+  const metaCopy: ComponentMeta = Object.assign({}, file.cmpMeta);
+  delete metaCopy.modes;
 
   ctx.components.push(metaCopy);
+
+  file.srcTextWithoutDecorators = file.srcTextWithoutDecorators.replace(orgText, '');
 }
 
 

@@ -8,7 +8,7 @@ import * as path from 'path';
 export function compileComponents(opts: CompilerOptions, ctx: CompilerContext = {}) {
   const logger = new Logger(ctx, `compile`);
 
-  return transpile(opts, ctx)
+  return compile(opts, ctx)
     .then(() => {
       // congrats, we did it!  (•_•) / ( •_•)>⌐■-■ / (⌐■_■)
       logger.finish();
@@ -20,7 +20,7 @@ export function compileComponents(opts: CompilerOptions, ctx: CompilerContext = 
 }
 
 
-export function transpile(opts: CompilerOptions, ctx: CompilerContext) {
+export function compile(opts: CompilerOptions, ctx: CompilerContext) {
   return transformTsFiles(opts, ctx).then(files => {
     return generateManifest(opts, ctx);
   });
