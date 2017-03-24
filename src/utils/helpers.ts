@@ -19,6 +19,10 @@ export function toCamelCase(str: string) {
   return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
+export function toDashCase(str: string) {
+  return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
+}
+
 export function getStaticComponentDir(doc: HTMLDocument) {
   let staticDirEle = <HTMLScriptElement>doc.querySelector('script[data-static-dir]');
   if (staticDirEle) {

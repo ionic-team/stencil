@@ -7,6 +7,8 @@ import { Config } from '../../../utils/config';
 import { PlatformApi } from '../../../platform/platform-api';
 import { PlatformClient } from '../../../platform/platform-client';
 import { initRenderer, attributesModule, classModule } from '../../../renderer/core';
+import { initPropertyDefaults } from '../../../element/proxy';
+
 
 // declared in the base iife arguments
 declare const components: ComponentMeta[];
@@ -23,6 +25,8 @@ const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
 
 components.forEach(function registerComponentMeta(cmpMeta) {
+  initPropertyDefaults(cmpMeta);
+
   const tag = cmpMeta.tag;
 
   plt.registerComponent(cmpMeta);

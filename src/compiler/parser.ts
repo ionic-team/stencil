@@ -64,7 +64,6 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
   updateTag(cmpMeta);
   updateHostCss(cmpMeta);
   updateProperties(cmpMeta);
-  updateObservedAttributes(cmpMeta);
 }
 
 
@@ -101,13 +100,9 @@ function updateHostCss(cmpMeta: ComponentMeta) {
 
 
 function updateProperties(cmpMeta: ComponentMeta) {
+  if (!cmpMeta.props) return;
+
   const validPropTypes = ['string', 'boolean', 'number', 'Array', 'Object'];
-
-  cmpMeta.props = cmpMeta.props || {};
-
-  cmpMeta.props.color = cmpMeta.props.color || {};
-
-  cmpMeta.props.mode = cmpMeta.props.mode || {};
 
   Object.keys(cmpMeta.props).forEach(propName => {
 
@@ -122,7 +117,15 @@ function updateProperties(cmpMeta: ComponentMeta) {
     const prop = cmpMeta.props[propName];
     if (prop.type) {
       if (typeof prop.type === 'string') {
-        prop.type = (<any>prop.type).trim();
+        prop.type = (<any>prop.type).trim().toLowerCase();
+      }
+
+      if (<any>prop.type === 'array') {
+        prop.type = 'Array';
+      }
+
+      if (<any>prop.type === 'object') {
+        prop.type = 'Object';
       }
 
       if (validPropTypes.indexOf(prop.type) === -1) {
@@ -131,23 +134,6 @@ function updateProperties(cmpMeta: ComponentMeta) {
     }
 
   });
-}
-
-
-function updateObservedAttributes(cmpMeta: ComponentMeta) {
-  cmpMeta.observedAttributes = cmpMeta.observedAttributes || [];
-
-  Object.keys(cmpMeta.props).forEach(propName => {
-    const attrName = camelCaseToDash(propName);
-    if (cmpMeta.observedAttributes.indexOf(attrName) === -1) {
-      cmpMeta.observedAttributes.push(attrName);
-    }
-  });
-}
-
-
-function camelCaseToDash(str: string) {
-  return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
 }
 
 

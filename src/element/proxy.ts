@@ -1,14 +1,14 @@
-import { isDef, toCamelCase, isNumber, isString } from '../utils/helpers';
 import { Config } from '../utils/config';
-import { PlatformApi } from '../platform/platform-api';
 import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
+import { isDef, isNumber, isString, toCamelCase, toDashCase } from '../utils/helpers';
+import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 
 export function initState(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   const instance = ctrl.instance;
   const state = ctrl.state = {};
-  const props = cmpMeta.props || {};
+  const props = cmpMeta.props;
 
 
   Object.keys(props).forEach(propName => {
@@ -86,4 +86,18 @@ function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, ins
   if (isDef(value)) {
     return value;
   }
+}
+
+
+export function initPropertyDefaults(cmpMeta: ComponentMeta) {
+  const props = cmpMeta.props = cmpMeta.props || {};
+  props.color = {};
+  props.mode = {};
+
+  const observedAttributes = cmpMeta.observedAttributes = cmpMeta.observedAttributes || [];
+  observedAttributes.push('color', 'mode');
+
+  Object.keys(props).forEach(propName => {
+    observedAttributes.push(toDashCase(propName));
+  });
 }
