@@ -1,5 +1,6 @@
 import { ComponentController, ComponentMeta, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
+import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
 import { Config } from '../../../utils/config';
 import { PlatformApi } from '../../../platform/platform-api';
@@ -22,28 +23,27 @@ const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
 
 components.forEach(function registerComponentMeta(cmpMeta) {
+  var tag = cmpMeta.tag;
+
   plt.registerComponent(cmpMeta);
 
-
   function ProxyElementES5() {
-    var elm = HTMLElement.apply(this);
-
-    ctrls.set(elm, {});
-
-    return elm;
+    return HTMLElement.apply(this);
   }
   ProxyElementES5.prototype = Object.create(HTMLElement.prototype);
   ProxyElementES5.prototype.constructor = ProxyElementES5;
 
   ProxyElementES5.prototype.connectedCallback = function() {
-    var elm: ProxyElement = this;
-    plt.loadComponentModule(cmpMeta, function loadedModule(cmpModule) {
-      update(plt, config, renderer, elm, ctrls.get(elm), cmpMeta, cmpModule);
-    });
+    var ctrl: ComponentController = {};
+    ctrls.set(this, ctrl);
+    connectedCallback(plt, config, renderer, this, ctrl, tag);
   };
 
   ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {
-    attributeChangedCallback(ctrls.get(this).instance, cmpMeta, attrName, oldVal, newVal, namespace);
+    var ctrl = ctrls.get(this);
+    if (ctrl && ctrl.instance) {
+      attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
+    }
   };
 
   ProxyElementES5.prototype.disconnectedCallback = function() {
@@ -53,5 +53,5 @@ components.forEach(function registerComponentMeta(cmpMeta) {
 
   (<any>ProxyElementES5).observedAttributes = cmpMeta.observedAttributes;
 
-  window.customElements.define(cmpMeta.tag, ProxyElementES5);
+  window.customElements.define(tag, ProxyElementES5);
 });

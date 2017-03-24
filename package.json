@@ -22,6 +22,7 @@
     "@types/jest": "18.1.1",
     "@types/node": "7.0.5",
     "@webcomponents/custom-elements": "^1.0.0-alpha.3",
+    "babel-cli": "^6.24.0",
     "babel-core": "^6.24.0",
     "babel-plugin-transform-define": "^1.2.0",
     "babel-plugin-transform-es2015-arrow-functions": "^6.22.0",

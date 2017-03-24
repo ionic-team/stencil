@@ -1,17 +1,17 @@
-import { ComponentMeta, ComponentModule } from '../utils/interfaces';
+import { ComponentMeta, LoadComponentCallback } from '../utils/interfaces';
 
 
 export interface PlatformApi {
   registerComponent: (cmpMeta: ComponentMeta) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
-  loadComponentModule: (tag: string, cb: {(cmpMeta: ComponentMeta, cmpModule: ComponentModule): void}) => void;
+  loadComponentModule: (tag: string, mode: string, cb: LoadComponentCallback) => void ;
   createElement: (tagName: any) => HTMLElement;
   createElementNS: (namespaceURI: string, qualifiedName: string) => Element;
   createTextNode: (text: string) => Text;
   createComment: (text: string) => Comment;
   insertBefore: (parentNode: Node, newNode: Node, referenceNode: Node | null) => void;
-  removeChild: (node: Node, child: Node) => void;
-  appendChild: (node: Node, child: Node) => void;
+  removeChild: (parentNode: Node, childNode: Node) => void;
+  appendChild: (parentNode: Node, childNode: Node) => void;
   parentNode: (node: Node) => Node;
   nextSibling: (node: Node) => Node;
   tag: (elm: Element) => string;
@@ -27,7 +27,7 @@ export interface PlatformApi {
   isComment: (node: Node) => node is Comment;
   nextTick: (cb: Function) => void;
   staticDir: string;
-  hasCssLink(linkUrl: string): boolean;
-  setCssLink(linkUrl: string): void;
+  hasCss(moduleId: string): boolean;
+  setCss(moduleId: string): void;
   getDocumentHead(): HTMLHeadElement;
 }

@@ -3,25 +3,16 @@ import { Component } from '../../utils/decorators';
 
 @Component({
   tag: 'ion-badge',
-  preprocessStyles: [
-    'badge.ios.scss',
-    'badge.ios.scoped.scss',
-    'badge.md.scss',
-    'badge.md.scoped.scss',
-    'badge.wp.scss',
-    'badge.wp.scoped.scss'
-  ],
-  modeStyleUrls: {
-    'ios': [
-      'badge.ios.css'
-    ],
-    'md': [
-      'badge.md.css'
-    ],
-    'wp': [
-      'badge.wp.css'
-    ]
+  modes: {
+    ios: {
+      styleUrls: ['badge.ios.scss']
+    },
+    md: {
+      styleUrls: ['badge.md.scss']
+    },
+    wp: {
+      styleUrls: ['badge.wp.scss']
+    }
   }
 })
 export class IonBadge {}
-

@@ -1,32 +1,25 @@
-import { PlatformApi } from '../platform/platform-api';
-import { Config } from './config';
-
-
-export interface GlobalIonic {
-  config?: Config;
-  api?: PlatformApi;
-  renderer?: Renderer;
-  staticDir?: string;
-}
-
-
-export interface Renderer {
-  (oldVnode: VNode | Element, vnode: VNode): VNode;
-}
-
 
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
   observedAttributes?: string[];
   hostCss?: string;
-  moduleUrl?: string;
+  module?: any;
+  modes: {[mode: string]: ComponentMode};
+}
+
+
+export interface ComponentMode {
   styles?: string;
   styleUrls?: string[];
-  modeStyleUrls?: {[mode: string]: string[]};
-  preprocessStyles?: string[];
-  cloak?: boolean;
-  shadow?: boolean;
+}
+
+
+export interface LoadComponentData {
+  tag?: string;
+  mode?: string;
+  styles?: string;
+  moduleFn?: Function;
 }
 
 
@@ -41,15 +34,7 @@ export interface ComponentInstance {
 }
 
 
-export interface ProxyElement extends HTMLElement {
-  connectedCallback: {(): void};
-  attributeChangedCallback: {(attrName: string, oldVal: string, newVal: string, namespace: string): void};
-  disconnectedCallback: {(): void};
-}
-
-
 export interface ComponentController {
-  shadowDom?: boolean;
   root?: HTMLElement | ShadowRoot;
   queued?: boolean;
   instance?: ComponentInstance;
@@ -69,6 +54,11 @@ export interface ComponentRegistry {
 }
 
 
+export interface LoadComponentCallback {
+  (cmpMeta: ComponentMeta, cmpMode: ComponentMode): void;
+}
+
+
 export interface PropOptions {
   type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
 }
@@ -76,6 +66,18 @@ export interface PropOptions {
 
 export interface Props {
   [propName: string]: PropOptions;
+}
+
+
+export interface ProxyElement extends HTMLElement {
+  connectedCallback: {(): void};
+  attributeChangedCallback: {(attrName: string, oldVal: string, newVal: string, namespace: string): void};
+  disconnectedCallback: {(): void};
+}
+
+
+export interface Renderer {
+  (oldVnode: VNode | Element, vnode: VNode): VNode;
 }
 
 

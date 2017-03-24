@@ -1,6 +1,7 @@
 import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
 import { update } from '../../../element/update';
+import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
 import { Config } from '../../../utils/config';
 import { PlatformApi } from '../../../platform/platform-api';
@@ -22,24 +23,27 @@ const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
 
 components.forEach(function registerComponentMeta(cmpMeta) {
+  const tag = cmpMeta.tag;
+
   plt.registerComponent(cmpMeta);
 
-  window.customElements.define(cmpMeta.tag, class extends HTMLElement {
+  window.customElements.define(tag, class extends HTMLElement {
 
     constructor() {
       super();
-      ctrls.set(this, {});
     }
 
     connectedCallback() {
-      const elm: ProxyElement = this;
-      plt.loadComponentModule(cmpMeta.tag, function loadedModule(cmpModule) {
-        update(plt, config, renderer, elm, ctrls.get(elm), cmpMeta, cmpModule);
-      });
+      const ctrl: ComponentController = {};
+      ctrls.set(this, ctrl);
+      connectedCallback(plt, config, renderer, this, ctrl, tag);
     }
 
     attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
-      attributeChangedCallback(ctrls.get(this).instance, cmpMeta, attrName, oldVal, newVal, namespace);
+      const ctrl = ctrls.get(this);
+      if (ctrl && ctrl.instance) {
+        attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
+      }
     }
 
     disconnectedCallback() {

@@ -1,75 +1,70 @@
 import { PlatformApi } from './platform-api';
-import { toCamelCase } from '../utils/helpers';
-import { ComponentRegistry, ComponentMeta, ComponentModule } from '../utils/interfaces';
+import { getModuleId, toCamelCase } from '../utils/helpers';
+import { ComponentRegistry, ComponentMeta, LoadComponentData, LoadComponentCallback } from '../utils/interfaces';
 import { getStaticComponentDir } from '../utils/helpers';
 
 
 export class PlatformClient implements PlatformApi {
   private registry: ComponentRegistry = {};
-  private modules: {[tag: string]: ComponentModule} = {};
-  private loadCallbacks: LoadedCallbacks = {};
-  private activeRequests: string[] = [];
-  private cssLink: {[tag: string]: boolean} = {};
+  private loadCallbacks: LoadCallbacks = {};
+  private jsonReqs: string[] = [];
+  private css: {[tag: string]: boolean} = {};
   private hasPromises: boolean;
 
   staticDir: string;
 
 
-  constructor(private win: Window, private d: HTMLDocument) {
+  constructor(window: any, private d: HTMLDocument) {
     const self = this;
-    self.win;
 
     self.staticDir = getStaticComponentDir(d);
 
     self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 
-    (<any>win).ionicComponent = function(tag: string, moduleFn: {(): ComponentModule}) {
-      console.debug('ionicComponent', tag);
+    window.ionicComponent = function(data: LoadComponentData) {
+      const tag = data.tag;
+      const mode = data.mode;
 
       const cmpMeta = self.getComponentMeta(tag);
-      const cmpModule = moduleFn();
+      cmpMeta.modes = cmpMeta.modes || {};
+      const cmpMode = cmpMeta.modes[mode] = {
+        styles: data.styles
+      };
+      cmpMeta.module = data.moduleFn();
 
-      self.modules[tag] = cmpModule;
+      const moduleId = getModuleId(tag, mode);
 
-      const callbacks = self.loadCallbacks[tag];
+      const callbacks = self.loadCallbacks[moduleId];
       if (callbacks) {
-        callbacks.forEach(cb => {
-          cb(cmpMeta, cmpModule);
-        })
-        delete self.loadCallbacks[tag];
+        for (var i = 0, l = callbacks.length; i < l; i++) {
+          callbacks[i](cmpMeta, cmpMode);
+        }
+        delete self.loadCallbacks[moduleId];
       }
     };
 
   }
 
-  registerComponent(cmpMeta: ComponentMeta) {
-    this.registry[cmpMeta.tag] = cmpMeta;
-  }
+  loadComponentModule(tag: string, mode: string, cb: LoadComponentCallback): void {
+    const cmpMeta = this.getComponentMeta(tag);
 
-  getComponentMeta(tag: string): ComponentMeta {
-    return this.registry[tag];
-  }
-
-  loadComponentModule(cmpMeta: ComponentMeta, cb: {(cmpModule: any): void}): void {
-    const self = this;
-    const loadedCallbacks = self.loadCallbacks;
-    const tag = cmpMeta.tag;
-
-    const cmpModule = self.modules[tag];
-    if (cmpModule) {
-      cb(cmpModule);
-
-    } else if (cmpMeta.moduleUrl) {
-      if (!loadedCallbacks[tag]) {
-        loadedCallbacks[tag] = [cb];
-      } else {
-        loadedCallbacks[tag].push(cb);
-      }
-
-      self.jsonp(cmpMeta.moduleUrl);
+    if (cmpMeta.module && cmpMeta.modes[mode]) {
+      cb(cmpMeta, cmpMeta.modes[mode]);
 
     } else {
-      cb(CommonComponent);
+      const moduleId = getModuleId(tag, mode);
+
+      const loadedCallbacks = this.loadCallbacks;
+
+      if (!loadedCallbacks[moduleId]) {
+        loadedCallbacks[moduleId] = [cb];
+      } else {
+        loadedCallbacks[moduleId].push(cb);
+      }
+
+      const moduleUrl = `${moduleId}.js`;
+
+      this.jsonp(moduleUrl);
     }
   }
 
@@ -78,12 +73,12 @@ export class PlatformClient implements PlatformApi {
     var tmrId: any;
     const self = this;
 
-    // jsonpUrl = scriptsDir + jsonpUrl;
+    jsonpUrl = self.staticDir + jsonpUrl;
 
-    if (self.activeRequests.indexOf(jsonpUrl) > -1) {
+    if (self.jsonReqs.indexOf(jsonpUrl) > -1) {
       return;
     }
-    self.activeRequests.push(jsonpUrl);
+    self.jsonReqs.push(jsonpUrl);
 
     scriptTag = <HTMLScriptElement>self.createElement('script');
 
@@ -100,15 +95,23 @@ export class PlatformClient implements PlatformApi {
       scriptTag.onerror = scriptTag.onload = null;
       scriptTag.parentNode.removeChild(scriptTag);
 
-      var index = self.activeRequests.indexOf(jsonpUrl);
+      var index = self.jsonReqs.indexOf(jsonpUrl);
       if (index > -1) {
-        self.activeRequests.splice(index, 1);
+        self.jsonReqs.splice(index, 1);
       }
     }
 
     scriptTag.onerror = scriptTag.onload = onScriptComplete;
 
     self.d.head.appendChild(scriptTag);
+  }
+
+  registerComponent(cmpMeta: ComponentMeta) {
+    this.registry[cmpMeta.tag] = cmpMeta;
+  }
+
+  getComponentMeta(tag: string): ComponentMeta {
+    return this.registry[tag];
   }
 
   createElement(tagName: any): HTMLElement {
@@ -131,12 +134,12 @@ export class PlatformClient implements PlatformApi {
     parentNode.insertBefore(newNode, referenceNode);
   }
 
-  removeChild(node: Node, child: Node): void {
-    node.removeChild(child);
+  removeChild(parentNode: Node, childNode: Node): void {
+    parentNode.removeChild(childNode);
   }
 
-  appendChild(node: Node, child: Node): void {
-    node.appendChild(child);
+  appendChild(parentNode: Node, childNode: Node): void {
+    parentNode.appendChild(childNode);
   }
 
   parentNode(node: Node): Node | null {
@@ -202,21 +205,21 @@ export class PlatformClient implements PlatformApi {
     }
   }
 
-  hasCssLink(linkUrl: string): boolean {
-    if (this.cssLink[linkUrl]) {
+  hasCss(moduleId: string): boolean {
+    if (this.css[moduleId]) {
       return true;
     }
 
-    if (this.d.head.querySelector(`link[href="${linkUrl}"]`)) {
-      this.setCssLink(linkUrl);
+    if (this.d.head.querySelector(`style[data-module-id="${moduleId}"]`)) {
+      this.setCss(moduleId);
       return true;
     }
 
     return false;
   }
 
-  setCssLink(linkUrl: string) {
-    this.cssLink[linkUrl] = true;
+  setCss(linkUrl: string) {
+    this.css[linkUrl] = true;
   }
 
   getDocumentHead(): HTMLHeadElement {
@@ -226,14 +229,6 @@ export class PlatformClient implements PlatformApi {
 }
 
 
-export interface FetchComponentCallback {
-  (cmpMeta: ComponentMeta, cmpModule: ComponentModule): void;
+export interface LoadCallbacks {
+  [moduleId: string]: LoadComponentCallback[];
 }
-
-
-export interface LoadedCallbacks {
-  [key: string]: FetchComponentCallback[];
-}
-
-
-export class CommonComponent {}

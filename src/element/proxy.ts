@@ -2,7 +2,7 @@ import { isDef, toCamelCase, isNumber, isString } from '../utils/helpers';
 import { Config } from '../utils/config';
 import { PlatformApi } from '../platform/platform-api';
 import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
-import { update } from './update';
+import { queueUpdate } from './update';
 
 
 export function initState(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
@@ -26,7 +26,7 @@ export function initState(plt: PlatformApi, config: Config, renderer: Renderer, 
       if (state[propName] !== value) {
         state[propName] = value;
 
-        update(plt, config, renderer, elm, ctrl, cmpMeta);
+        queueUpdate(plt, config, renderer, elm, ctrl, cmpMeta);
       }
     }
 
