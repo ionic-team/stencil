@@ -57,12 +57,16 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
     throw `invalid component decorator`;
   }
 
+  if ((<any>cmpMeta).selector) {
+    console.log(`Please use "tag" instead of "selector" in component decorator: ${(<any>cmpMeta).selector}`);
+    cmpMeta.tag = (<any>cmpMeta).selector;
+  }
+
   if (!cmpMeta.tag || cmpMeta.tag.trim() == '') {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
   updateTag(cmpMeta);
-  updateHostCss(cmpMeta);
   updateProperties(cmpMeta);
 }
 
@@ -87,15 +91,6 @@ function updateTag(cmpMeta: ComponentMeta) {
     throw `"${cmpMeta.tag}" tag cannot end with a dash (-)`;
   }
 
-}
-
-
-function updateHostCss(cmpMeta: ComponentMeta) {
-  if (!cmpMeta.hostCss) {
-    const tagSplit = cmpMeta.tag.split('-');
-    tagSplit.shift();
-    cmpMeta.hostCss = tagSplit.join('-');
-  }
 }
 
 

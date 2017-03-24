@@ -1,6 +1,6 @@
 import { Config } from '../utils/config';
 import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
-import { isDef, isNumber, isString, toCamelCase, toDashCase } from '../utils/helpers';
+import { isDef, isNumber, isString, isUndef, toCamelCase, toDashCase } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
@@ -89,7 +89,13 @@ function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, ins
 }
 
 
-export function initPropertyDefaults(cmpMeta: ComponentMeta) {
+export function initComponentMeta(cmpMeta: ComponentMeta) {
+  if (isUndef(cmpMeta.hostCss)) {
+    const tagSplit = cmpMeta.tag.split('-');
+    tagSplit.shift();
+    cmpMeta.hostCss = tagSplit.join('-');
+  }
+
   const props = cmpMeta.props = cmpMeta.props || {};
   props.color = {};
   props.mode = {};

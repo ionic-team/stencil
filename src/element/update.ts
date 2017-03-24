@@ -4,7 +4,7 @@ import { Config } from '../utils/config';
 import { generateVNode } from './host';
 import { initState } from './proxy';
 import { Renderer } from '../utils/interfaces';
-import { getModuleId } from '../utils/helpers';
+import { getModuleId, isUndef } from '../utils/helpers';
 
 
 export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
@@ -27,12 +27,12 @@ export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer
 
 export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   let instance = ctrl.instance;
-  if (instance === undefined) {
+  if (isUndef(instance)) {
     instance = ctrl.instance = new cmpMeta.module();
     initState(plt, config, renderer, elm, ctrl, cmpMeta);
   }
 
-  if (ctrl.root === undefined) {
+  if (isUndef(ctrl.root)) {
     const cmpMode = cmpMeta.modes[instance.mode];
 
     if (elm.attachShadow) {
@@ -65,7 +65,7 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
   // we need it to pass it the actual host element
   ctrl.vnode = renderer(ctrl.vnode ? ctrl.vnode : elm, vnode);
 
-  if (ctrl.connected === undefined) {
+  if (isUndef(ctrl.connected)) {
     instance.connectedCallback && instance.connectedCallback();
     ctrl.connected = true;
   }
