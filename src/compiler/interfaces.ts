@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 export interface CompilerOptions {
   srcDir?: string;
   destDir?: string;
-  ionicBundlesDir?: string;
+  ionicCoreDir?: string;
   ionicThemesDir?: string;
   scriptTarget?: 'es5' | 'es2015';
   module?: 'common' | 'es2015' | 'umd';
@@ -59,6 +59,9 @@ export interface ComponentMeta {
 export interface ComponentMode {
   styles?: string;
   styleUrls?: string[];
+  hash?: string;
+  id?: string;
+  fileName?: string;
 }
 
 

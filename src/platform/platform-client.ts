@@ -1,6 +1,6 @@
 import { PlatformApi } from './platform-api';
-import { getModuleId, toCamelCase } from '../utils/helpers';
-import { ComponentRegistry, ComponentMeta, LoadComponentData, LoadComponentCallback } from '../utils/interfaces';
+import { getComponentId, toCamelCase } from '../utils/helpers';
+import { ComponentRegistry, ComponentMeta, Ionic, LoadComponentCallback } from '../utils/interfaces';
 import { getStaticComponentDir } from '../utils/helpers';
 
 
@@ -14,25 +14,22 @@ export class PlatformClient implements PlatformApi {
   staticDir: string;
 
 
-  constructor(window: any, private d: HTMLDocument) {
+  constructor(private d: HTMLDocument, ionic: Ionic) {
     const self = this;
 
     self.staticDir = getStaticComponentDir(d);
 
     self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 
-    window.ionicComponent = function(data: LoadComponentData) {
-      const tag = data.tag;
-      const mode = data.mode;
+    ionic.loadComponent = function loadComponent(tag, mode, id, styles, moduleFn) {
+      const cmpMeta = self.registry[tag];
+      cmpMeta.module = moduleFn();
 
-      const cmpMeta = self.getComponentMeta(tag);
-      cmpMeta.modes = cmpMeta.modes || {};
-      const cmpMode = cmpMeta.modes[mode] = {
-        styles: data.styles
-      };
-      cmpMeta.module = data.moduleFn();
+      const cmpMode = cmpMeta.modes[mode];
+      cmpMode.styles = styles;
+      cmpMode.loaded = true;
 
-      const moduleId = getModuleId(tag, mode);
+      const moduleId = getComponentId(tag, mode, id);
 
       const callbacks = self.loadCallbacks[moduleId];
       if (callbacks) {
@@ -42,29 +39,29 @@ export class PlatformClient implements PlatformApi {
         delete self.loadCallbacks[moduleId];
       }
     };
-
   }
 
   loadComponentModule(tag: string, mode: string, cb: LoadComponentCallback): void {
-    const cmpMeta = this.getComponentMeta(tag);
+    const cmpMeta = this.registry[tag];
+    const cmpMode = cmpMeta.modes[mode];
 
-    if (cmpMeta.module && cmpMeta.modes[mode]) {
-      cb(cmpMeta, cmpMeta.modes[mode]);
+    if (cmpMode && cmpMode.loaded) {
+      cb(cmpMeta, cmpMode);
 
     } else {
-      const moduleId = getModuleId(tag, mode);
+      const cmpId = getComponentId(tag, mode, cmpMode.id);
 
       const loadedCallbacks = this.loadCallbacks;
 
-      if (!loadedCallbacks[moduleId]) {
-        loadedCallbacks[moduleId] = [cb];
+      if (!loadedCallbacks[cmpId]) {
+        loadedCallbacks[cmpId] = [cb];
       } else {
-        loadedCallbacks[moduleId].push(cb);
+        loadedCallbacks[cmpId].push(cb);
       }
 
-      const moduleUrl = `${moduleId}.js`;
+      const componentFileName = `${cmpId}.js`;
 
-      this.jsonp(moduleUrl);
+      this.jsonp(componentFileName);
     }
   }
 
@@ -108,10 +105,6 @@ export class PlatformClient implements PlatformApi {
 
   registerComponent(cmpMeta: ComponentMeta) {
     this.registry[cmpMeta.tag] = cmpMeta;
-  }
-
-  getComponentMeta(tag: string): ComponentMeta {
-    return this.registry[tag];
   }
 
   createElement(tagName: any): HTMLElement {

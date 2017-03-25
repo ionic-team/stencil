@@ -14,7 +14,7 @@
   } else {
     var paths = scp.src.split('/');
     paths.pop();
-    return scp.dataset['staticDir'] = paths.join('/') + '/';
+    dir = scp.dataset['staticDir'] = paths.join('/') + '/';
   }
 
   function es5() {
@@ -26,7 +26,7 @@
   }
 
   const i: string[] = [
-    'components'
+    'core'
   ];
 
   if (!window.customElements || es5()) {

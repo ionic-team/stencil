@@ -4,7 +4,7 @@ import { Config } from '../utils/config';
 import { generateVNode } from './host';
 import { initState } from './proxy';
 import { Renderer } from '../utils/interfaces';
-import { getModuleId, isUndef } from '../utils/helpers';
+import { getComponentId, isUndef } from '../utils/helpers';
 
 
 export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
@@ -37,23 +37,20 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
 
     if (elm.attachShadow) {
       ctrl.root = elm.attachShadow({ mode: 'open' });
-
-      if (cmpMode) {
-        const shadowStyleEle = <HTMLStyleElement>plt.createElement('style');
-        shadowStyleEle.innerHTML = cmpMode.styles;
-        ctrl.root.appendChild(shadowStyleEle);
-      }
+      const shadowStyleEle = <HTMLStyleElement>plt.createElement('style');
+      shadowStyleEle.innerHTML = cmpMode.styles;
+      ctrl.root.appendChild(shadowStyleEle);
 
     } else {
       ctrl.root = elm;
 
-      const moduleId = getModuleId(cmpMeta.tag, instance.mode);
-      if (!plt.hasCss(moduleId)) {
+      const cmpId = getComponentId(cmpMeta.tag, instance.mode, cmpMode.id);
+      if (!plt.hasCss(cmpId)) {
         const headStyleEle = <HTMLStyleElement>plt.createElement('style');
-        headStyleEle.dataset['moduleId'] = moduleId;
+        headStyleEle.dataset['componentId'] = cmpId;
         headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
         plt.appendChild(plt.getDocumentHead(), headStyleEle);
-        plt.setCss(moduleId);
+        plt.setCss(cmpId);
       }
     }
   }

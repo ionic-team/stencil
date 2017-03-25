@@ -8,7 +8,7 @@ import * as path from 'path';
 export function compile(opts: CompilerOptions, ctx: CompilerContext = {}) {
   validateDir(opts.srcDir, 'srcDir');
   validateDir(opts.destDir, 'destDir');
-  validateDir(opts.ionicBundlesDir, 'ionicBundlesDir');
+  validateDir(opts.ionicCoreDir, 'ionicCoreDir');
   validateDir(opts.ionicThemesDir, 'ionicThemesDir');
 
   return compileComponents(opts, ctx).then(() => {
@@ -27,4 +27,6 @@ function validateDir(dir: string, name: string) {
 }
 
 
+export { minify } from './minifier';
 export { transpile, transpileFile } from './transpiler';
+export { readFile, writeFile, copy, emptyDir } from './util';

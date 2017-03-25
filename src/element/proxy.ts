@@ -1,6 +1,6 @@
 import { Config } from '../utils/config';
 import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
-import { isDef, isNumber, isString, isUndef, toCamelCase, toDashCase } from '../utils/helpers';
+import { isDef, isNumber, isString, toCamelCase, toDashCase } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
@@ -89,21 +89,36 @@ function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, ins
 }
 
 
-export function initComponentMeta(cmpMeta: ComponentMeta) {
-  if (isUndef(cmpMeta.hostCss)) {
-    const tagSplit = cmpMeta.tag.split('-');
-    tagSplit.shift();
-    cmpMeta.hostCss = tagSplit.join('-');
+export function initComponentMeta(tag: string, data: any[]) {
+  const modeIds = data[0];
+  const props = data[1] || {};
+
+  const cmpMeta: ComponentMeta = {
+    tag: tag,
+    modes: {},
+    props: props
+  };
+
+  let keys = Object.keys(modeIds);
+  for (var i = 0; i < keys.length; i++) {
+    cmpMeta.modes[keys[i]] = {
+      id: modeIds[keys[i]]
+    };
   }
 
-  const props = cmpMeta.props = cmpMeta.props || {};
+  keys = cmpMeta.tag.split('-');
+  keys.shift();
+  cmpMeta.hostCss = keys.join('-');
+
   props.color = {};
   props.mode = {};
 
   const observedAttributes = cmpMeta.observedAttributes = cmpMeta.observedAttributes || [];
-  observedAttributes.push('color', 'mode');
 
-  Object.keys(props).forEach(propName => {
-    observedAttributes.push(toDashCase(propName));
-  });
+  keys = Object.keys(props);
+  for (i = 0; i < keys.length; i++) {
+    observedAttributes.push(toDashCase(keys[i]));
+  }
+
+  return cmpMeta;
 }

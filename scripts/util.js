@@ -48,7 +48,7 @@ function compileSass(inputFile, outputFile, sassOpts) {
 
 function readFile(filePath) {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf8', (err, data) => {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         console.log(err);
         reject(err);

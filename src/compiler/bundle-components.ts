@@ -1,69 +1,88 @@
-import { CompilerOptions, CompilerContext, FileMeta } from './interfaces';
-import { transpileFile } from './transpiler';
-import { getTsModule, getTsScriptTarget, writeFile } from './util';
+import { CompilerOptions, CompilerContext, ComponentMode, FileMeta } from './interfaces';
+import { getTsModule, getTsScriptTarget, readFile, writeFile, copy } from './util';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as ts from 'typescript';
 import * as babel from 'babel-core';
+import * as crypto from 'crypto';
+import * as nodeUtil from 'util';
 const rollup = require('rollup');
 
 
 export function bundleComponents(opts: CompilerOptions, ctx: CompilerContext) {
-  return Promise.all([
-    createIonicJs(opts, ctx),
-    createComponentJs(opts, ctx),
-    createComponentES5Js(opts, ctx),
-    createComponentFiles(opts, ctx)
-  ]);
+  return createComponentFiles(opts, ctx).then(() => {
+
+    return Promise.all([
+      createIonicJs(opts, ctx),
+      createIonicCoreJs(opts, ctx)
+    ]);
+
+  });
 }
 
 
 export function createIonicJs(opts: CompilerOptions, ctx: CompilerContext) {
-  return new Promise(resolve => {
-    const fileName = 'ionic.js';
+  const fileName = 'ionic.js';
+  const src = path.join(opts.ionicCoreDir, fileName);
+  const dest = path.join(opts.destDir, fileName);
 
-    const src = path.join(opts.ionicBundlesDir, fileName);
-    const dest = path.join(opts.destDir, fileName);
+  return readFile(src).then(ionicJsContent => {
+    const components: {[tag: string]: any[]} = {};
 
-    return transpileFile(src, dest);
+    ctx.files.forEach(file => {
+      if (file.cmpMeta && file.cmpMeta.modes) {
+        const component: any[] = components[file.cmpMeta.tag] = [];
+
+        const cmpModes: {[mode: string]: string} = {};
+
+        Object.keys(file.cmpMeta.modes).forEach(mode => {
+          cmpModes[mode] = file.cmpMeta.modes[mode].id;
+        });
+
+        component.push(cmpModes);
+
+        if (file.cmpMeta.props) {
+          component.push(file.cmpMeta.props);
+        }
+      }
+    });
+
+    const cmpStr = nodeUtil.inspect(components, false, null).replace(/\s/g, '');
+
+    const content = [
+      `window.ionic=window.ionic||{};`,
+      `window.ionic.components=${cmpStr};`,
+      ionicJsContent
+    ];
+
+    return writeFile(dest, content.join('\n'));
   });
 }
 
 
-function createComponentJs(opts: CompilerOptions, ctx: CompilerContext) {
-  return new Promise(resolve => {
-    const fileName = 'ionic.components.js';
+function createIonicCoreJs(opts: CompilerOptions, ctx: CompilerContext) {
+  const fileName = `ionic.core.js`;
+  const src = path.join(opts.ionicCoreDir, fileName);
+  const dest = path.join(opts.destDir, fileName);
 
-    const src = path.join(opts.ionicBundlesDir, fileName);
-    const dest = path.join(opts.destDir, fileName);
+  const fileNameMin = `ionic.core.min.js`;
+  const srcMin = path.join(opts.ionicCoreDir, fileNameMin);
+  const destMin = path.join(opts.destDir, fileNameMin);
 
-    const plugins = [
-      ['transform-define', {
-        'IONIC_COMPONENTS': ctx.components
-      }]
-    ];
+  const fileNameEs5 = `ionic.core.es5.js`;
+  const srcEs5 = path.join(opts.ionicCoreDir, fileNameEs5);
+  const destEs5 = path.join(opts.destDir, fileNameEs5);
 
-    return transpileFile(src, dest, plugins);
-  });
-}
+  const fileNameEs5Min = `ionic.core.es5.min.js`;
+  const srcEs5Min = path.join(opts.ionicCoreDir, fileNameEs5Min);
+  const destEs5Min = path.join(opts.destDir, fileNameEs5Min);
 
-
-function createComponentES5Js(opts: CompilerOptions, ctx: CompilerContext) {
-  return new Promise(resolve => {
-    const fileName = 'ionic.components.es5.js';
-
-    const src = path.join(opts.ionicBundlesDir, fileName);
-    const dest = path.join(opts.destDir, fileName);
-
-    const plugins = [
-      'transform-es2015-classes',
-      ['transform-define', {
-        'IONIC_COMPONENTS': ctx.components
-      }]
-    ];
-
-    return transpileFile(src, dest, plugins);
-  });
+  return Promise.all([
+    copy(src, dest),
+    copy(srcMin, destMin),
+    copy(srcEs5, destEs5),
+    copy(srcEs5Min, destEs5Min)
+  ]);
 }
 
 
@@ -77,6 +96,7 @@ function createComponentFiles(opts: CompilerOptions, ctx: CompilerContext) {
 function transpileComponentFiles(opts: CompilerOptions, ctx: CompilerContext) {
   return new Promise(resolve => {
     const files: string[] = [];
+
     ctx.files.forEach(file => {
       if (file.isTransformable && file.isTsSourceFile) {
         files.push(file.filePath);
@@ -96,7 +116,7 @@ function transpileComponentFiles(opts: CompilerOptions, ctx: CompilerContext) {
         }
       }
 
-      return fs.readFileSync(filePath, 'utf8');
+      return fs.readFileSync(filePath, 'utf-8');
     };
 
     const program = ts.createProgram(files, {
@@ -166,7 +186,7 @@ function bundleComponentJs(file: FileMeta, opts: CompilerOptions, ctx: CompilerC
       code = code.replace(match[0], `return ${match[1].trim()};`)
     }
 
-    code = `function moduleFn() {
+    code = `function __moduleFn() {
       ${code};
     }`
 
@@ -194,13 +214,14 @@ function bundleComponentJs(file: FileMeta, opts: CompilerOptions, ctx: CompilerC
       babelrc: false
     });
 
-    const moduleFn = transpileResult.code;
+    let moduleFn = transpileResult.code;
+    moduleFn = moduleFn.replace('function __moduleFn()', 'function()');
 
     const promises: Promise<any>[] = [];
 
     Object.keys(file.cmpMeta.modes).forEach(mode => {
-      const styles = file.cmpMeta.modes[mode].styles;
-      promises.push(bundleComponentMode(file, mode, styles, moduleFn, opts, ctx));
+      const cmpMode = file.cmpMeta.modes[mode];
+      promises.push(bundleComponentMode(file, mode, cmpMode, moduleFn, opts, ctx));
     });
 
     return Promise.all(promises);
@@ -208,21 +229,21 @@ function bundleComponentJs(file: FileMeta, opts: CompilerOptions, ctx: CompilerC
 }
 
 
-function bundleComponentMode(file: FileMeta, mode: string, styles: string, moduleFn: string, opts: CompilerOptions, ctx: CompilerContext) {
-  const outfileName = `${file.cmpMeta.tag}.${mode}.js`;
-  const outfile = path.join(opts.destDir, outfileName);
-
-  styles = styles || '';
+function bundleComponentMode(file: FileMeta, mode: string, cmpMode: ComponentMode, moduleFn: string, opts: CompilerOptions, ctx: CompilerContext) {
+  let styles = cmpMode.styles || '';
   styles = styles.replace(/\'/g, '"');
   styles = styles.replace(/\n/g, '');
 
-  let output = `ionicComponent({
-  tag: '${file.cmpMeta.tag}',
-  mode: '${mode}',
-  styles: '${styles}',
-  moduleFn: ${moduleFn}\n});`;
+  const hash = crypto.createHash('sha1')
+  hash.update(`${file.cmpMeta.tag}${mode}${styles}${moduleFn}`);
+  cmpMode.hash = hash.digest('hex');
+  cmpMode.id = cmpMode.hash.substr(0, 8);
+  cmpMode.fileName = `${file.cmpMeta.tag}.${mode}.${cmpMode.id}.js`;
 
-  output = output.replace('function moduleFn()', 'function()');
+
+  const output = `ionic.loadComponent('${file.cmpMeta.tag}','${mode}','${cmpMode.id}','${styles}',${moduleFn});`;
+
+  const outfile = path.join(opts.destDir, cmpMode.fileName);
 
   return writeFile(outfile, output);
 }

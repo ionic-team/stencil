@@ -42,7 +42,7 @@ function transformFile(file: FileMeta, opts: CompilerOptions, ctx: CompilerConte
 
 
 function transformDirectory(dir: string, opts: CompilerOptions, ctx: CompilerContext) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
 
     fs.readdir(dir, (err, files) => {
       if (err) {
@@ -99,7 +99,7 @@ export function getFileSync(filePath: string, opts: CompilerOptions, ctx: Compil
     }
   }
 
-  return createFileMeta(filePath, fs.readFileSync(filePath, 'utf8'), opts, ctx);
+  return createFileMeta(filePath, fs.readFileSync(filePath, 'utf-8'), opts, ctx);
 }
 
 

@@ -1,4 +1,4 @@
-import { ComponentController, ComponentMeta, ProxyElement } from '../../../utils/interfaces';
+import { ComponentController, ComponentMeta, Ionic, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
 import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
@@ -11,10 +11,10 @@ import { initComponentMeta } from '../../../element/proxy';
 
 
 // declared in the base iife arguments
-declare const components: ComponentMeta[];
+declare const ionic: Ionic;
 
 
-const plt = new PlatformClient(window, document);
+const plt = new PlatformClient(document, ionic);
 const config = new Config();
 const renderer = initRenderer([
   attributesModule,
@@ -24,10 +24,8 @@ const renderer = initRenderer([
 const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
 
-components.forEach(function registerComponentMeta(cmpMeta) {
-  initComponentMeta(cmpMeta);
-
-  var tag = cmpMeta.tag;
+Object.keys(ionic.components || {}).forEach(tag => {
+  const cmpMeta = initComponentMeta(tag, ionic.components[tag]);
 
   plt.registerComponent(cmpMeta);
 

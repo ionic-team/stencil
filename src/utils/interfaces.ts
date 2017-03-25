@@ -1,4 +1,10 @@
 
+export interface Ionic {
+  components?: {[tag: string]: any[]};
+  loadComponent?: {(tag: string, mode: string, id: string, styles: string, moduleFn: Function): void};
+}
+
+
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
@@ -10,16 +16,10 @@ export interface ComponentMeta {
 
 
 export interface ComponentMode {
+  loaded?: boolean;
+  id?: string;
   styles?: string;
   styleUrls?: string[];
-}
-
-
-export interface LoadComponentData {
-  tag?: string;
-  mode?: string;
-  styles?: string;
-  moduleFn?: Function;
 }
 
 

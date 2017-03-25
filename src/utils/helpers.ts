@@ -38,6 +38,6 @@ export function getStaticComponentDir(doc: HTMLDocument) {
   return staticDirEle.dataset['staticDir'] = paths.join('/') + '/';
 }
 
-export function getModuleId(tag: string, mode: string) {
-  return `${tag}.${mode}`;
+export function getComponentId(tag: string, mode: string, id: string) {
+  return `${tag}.${mode}.${id}`;
 }

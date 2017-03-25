@@ -3,7 +3,6 @@ import { ComponentMeta, LoadComponentCallback } from '../utils/interfaces';
 
 export interface PlatformApi {
   registerComponent: (cmpMeta: ComponentMeta) => void;
-  getComponentMeta: (tag: string) => ComponentMeta;
   loadComponentModule: (tag: string, mode: string, cb: LoadComponentCallback) => void ;
   createElement: (tagName: any) => HTMLElement;
   createElementNS: (namespaceURI: string, qualifiedName: string) => Element;
