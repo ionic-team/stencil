@@ -95,7 +95,6 @@ function createWebIndex(index, mainContent) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
-  <link href="/dist/ionic-web/ionic.css" rel="stylesheet">
 </head>
 <body>
 
@@ -109,7 +108,7 @@ ${mainContent}
 
   </ion-app>
 
-  <script src="/dist/ionic-web/ionic.js" data-static-dir="/dist/ionic-web/"></script>
+  <script src="/dist/ionic-web/ionic.js"></script>
 
 </body>
 </html>`;
