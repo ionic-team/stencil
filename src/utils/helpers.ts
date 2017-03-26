@@ -32,10 +32,14 @@ export function getStaticComponentDir(doc: HTMLDocument) {
   const scriptElms = doc.getElementsByTagName('script');
   staticDirEle = scriptElms[scriptElms.length - 1];
 
-  const paths = staticDirEle.src.split('/');
-  paths.pop();
+  if (staticDirEle) {
+    const paths = staticDirEle.src.split('/');
+    paths.pop();
 
-  return staticDirEle.dataset['staticDir'] = paths.join('/') + '/';
+    return staticDirEle.dataset['staticDir'] = paths.join('/') + '/';
+  }
+
+  return '/';
 }
 
 export function getComponentId(tag: string, mode: string, id: string) {
