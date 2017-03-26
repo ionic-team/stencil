@@ -7,7 +7,7 @@ const document: HTMLDocument = (<any>global).document;
 
 var patch = initRenderer([
   attributesModule,
-], new PlatformClient(window, document));
+], new PlatformClient(window, document, {}));
 
 describe('attributes', function() {
   var elm, vnode0;
@@ -62,12 +62,15 @@ describe('attributes', function() {
     expect(elm.textContent).toEqual('Hello');
   });
   describe('boolean attribute', function() {
-    it('is present if the value is truthy', function() {
+    it('is present and empty string if the value is truthy', function() {
       var vnode1 = h('div', {attrs: {required: true, readonly: 1, noresize: 'truthy'}});
       elm = patch(vnode0, vnode1).elm;
-      expect(elm.getAttribute('required')).toEqual('true');
-      expect(elm.getAttribute('readonly')).toEqual('1');
-      expect(elm.getAttribute('noresize')).toEqual('truthy');
+      expect(elm.hasAttribute('required')).toEqual(true);
+      expect(elm.getAttribute('required')).toEqual('');
+      expect(elm.hasAttribute('readonly')).toEqual(true);
+      expect(elm.getAttribute('readonly')).toEqual('');
+      expect(elm.hasAttribute('noresize')).toEqual(true);
+      expect(elm.getAttribute('noresize')).toEqual('');
     });
     it('is omitted if the value is falsy', function() {
       var vnode1 = h('div', {attrs: {required: false, readonly: 0, noresize: null}});
