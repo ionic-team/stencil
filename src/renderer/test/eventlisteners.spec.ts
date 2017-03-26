@@ -6,7 +6,7 @@ const document: HTMLDocument = (<any>global).document;
 
 var patch = initRenderer([
   eventListenersModule,
-], new PlatformClient(window, document));
+], new PlatformClient(window, document, {}));
 
 
 describe('event listeners', function() {

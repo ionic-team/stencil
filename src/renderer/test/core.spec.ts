@@ -5,7 +5,7 @@ import { PlatformClient } from '../../platform/platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
 
 const document: HTMLDocument = (<any>global).document;
-const api = new PlatformClient(window, document);
+const api = new PlatformClient(window, document, {});
 
 
 var patch = initRenderer([
@@ -1005,7 +1005,7 @@ describe('renderer', function() {
 
 function toVNode(node: Node, api?: PlatformClient): VNode {
   if (!api) {
-    api = new PlatformClient(window, document);
+    api = new PlatformClient(window, document, {});
   }
 
   let text: string;

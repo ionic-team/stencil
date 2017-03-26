@@ -139,4 +139,4 @@ var patch = initRenderer([
   classModule,
   eventListenersModule,
   styleModule,
-], new PlatformClient(window, document));
+], new PlatformClient(window, document, {}));
