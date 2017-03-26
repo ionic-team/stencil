@@ -1,13 +1,10 @@
 
 import { initRenderer, h } from '../core';
-import { attributesModule } from '../modules/attributes';
 import { PlatformClient } from '../../platform/platform-client';
 
 const document: HTMLDocument = (<any>global).document;
 
-var patch = initRenderer([
-  attributesModule,
-], new PlatformClient(window, document, {}));
+var patch = initRenderer(new PlatformClient(window, document, {}));
 
 describe('attributes', function() {
   var elm, vnode0;

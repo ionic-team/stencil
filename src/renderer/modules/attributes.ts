@@ -1,4 +1,4 @@
-import { Module, VNode, VNodeData } from '../../utils/interfaces';
+import { VNode, VNodeData } from '../../utils/interfaces';
 
 
 const booleanAttrs = ["allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact", "controls", "declare",
@@ -18,7 +18,7 @@ for (let i = 0, len = booleanAttrs.length; i < len; i++) {
   booleanAttrsDict[booleanAttrs[i]] = true;
 }
 
-function updateAttrs(oldVnode: VNode, vnode: VNode): void {
+export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
   var key: string, cur: any, old: any, elm: Element = vnode.elm as Element,
       oldAttrs = (oldVnode.data as VNodeData).attrs,
       attrs = (vnode.data as VNodeData).attrs;
@@ -63,6 +63,3 @@ function updateAttrs(oldVnode: VNode, vnode: VNode): void {
     }
   }
 }
-
-export const attributesModule = {create: updateAttrs, update: updateAttrs} as Module;
-export default attributesModule;

@@ -6,7 +6,7 @@ import { disconnectedCallback } from '../../../element/disconnected';
 import { Config } from '../../../utils/config';
 import { PlatformApi } from '../../../platform/platform-api';
 import { PlatformClient } from '../../../platform/platform-client';
-import { initRenderer, attributesModule, classModule } from '../../../renderer/core';
+import { initRenderer } from '../../../renderer/core';
 import { initComponentMeta } from '../../../element/proxy';
 
 
@@ -16,10 +16,7 @@ declare const ionic: Ionic;
 
 const plt = new PlatformClient(window, document, ionic);
 const config = new Config();
-const renderer = initRenderer([
-  attributesModule,
-  classModule
-], plt);
+const renderer = initRenderer(plt);
 
 const ctrls = new WeakMap<HTMLElement, ComponentController>();
 

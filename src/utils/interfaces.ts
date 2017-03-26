@@ -104,7 +104,7 @@ export interface VNodeData {
   on?: any;
   hero?: any;
   attachData?: any;
-  hook?: Hooks;
+  // hook?: Hooks;
   key?: Key;
   ns?: string; // for SVGs
   fn?: () => VNode; // for thunks
@@ -114,38 +114,38 @@ export interface VNodeData {
 }
 
 
-export interface Module {
-  pre: PreHook;
-  create: CreateHook;
-  update: UpdateHook;
-  destroy: DestroyHook;
-  remove: RemoveHook;
-  post: PostHook;
-}
+// export interface Module {
+//   pre: PreHook;
+//   create: CreateHook;
+//   update: UpdateHook;
+//   destroy: DestroyHook;
+//   remove: RemoveHook;
+//   post: PostHook;
+// }
 
 
-export type PreHook = () => any;
-export type InitHook = (vNode: VNode) => any;
-export type CreateHook = (emptyVNode: VNode, vNode: VNode) => any;
-export type InsertHook = (vNode: VNode) => any;
-export type PrePatchHook = (oldVNode: VNode, vNode: VNode) => any;
-export type UpdateHook = (oldVNode: VNode, vNode: VNode) => any;
-export type PostPatchHook = (oldVNode: VNode, vNode: VNode) => any;
-export type DestroyHook = (vNode: VNode) => any;
-export type RemoveHook = (vNode: VNode, removeCallback: () => void) => any;
-export type PostHook = () => any;
+// export type PreHook = () => any;
+// export type InitHook = (vNode: VNode) => any;
+// export type CreateHook = (emptyVNode: VNode, vNode: VNode) => any;
+// export type InsertHook = (vNode: VNode) => any;
+// export type PrePatchHook = (oldVNode: VNode, vNode: VNode) => any;
+// export type UpdateHook = (oldVNode: VNode, vNode: VNode) => any;
+// export type PostPatchHook = (oldVNode: VNode, vNode: VNode) => any;
+// export type DestroyHook = (vNode: VNode) => any;
+// export type RemoveHook = (vNode: VNode, removeCallback: () => void) => any;
+// export type PostHook = () => any;
 
 
-export interface Hooks {
-  pre?: PreHook;
-  init?: InitHook;
-  create?: CreateHook;
-  insert?: InsertHook;
-  prepatch?: PrePatchHook;
-  update?: UpdateHook;
-  postpatch?: PostPatchHook;
-  destroy?: DestroyHook;
-  remove?: RemoveHook;
-  post?: PostHook;
-}
+// export interface Hooks {
+//   pre?: PreHook;
+//   init?: InitHook;
+//   create?: CreateHook;
+//   insert?: InsertHook;
+//   prepatch?: PrePatchHook;
+//   update?: UpdateHook;
+//   postpatch?: PostPatchHook;
+//   destroy?: DestroyHook;
+//   remove?: RemoveHook;
+//   post?: PostHook;
+// }
 
