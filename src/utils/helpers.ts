@@ -41,3 +41,5 @@ export function getStaticComponentDir(doc: HTMLDocument) {
 export function getComponentId(tag: string, mode: string, id: string) {
   return `${tag}.${mode}.${id}`;
 }
+
+export function noop(){};

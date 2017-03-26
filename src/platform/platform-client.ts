@@ -1,25 +1,31 @@
 import { PlatformApi } from './platform-api';
-import { getComponentId, toCamelCase } from '../utils/helpers';
+import { getComponentId, noop, toCamelCase } from '../utils/helpers';
 import { ComponentRegistry, ComponentMeta, Ionic, LoadComponentCallback } from '../utils/interfaces';
 import { getStaticComponentDir } from '../utils/helpers';
 
 
 export class PlatformClient implements PlatformApi {
   private registry: ComponentRegistry = {};
-  private loadCallbacks: LoadCallbacks = {};
+  private loadCBs: LoadCallbacks = {};
   private jsonReqs: string[] = [];
   private css: {[tag: string]: boolean} = {};
+  private nextCBs: Function[] = [];
+  private nextPending: boolean;
   private hasPromises: boolean;
+  private isIOS: boolean;
 
   staticDir: string;
 
 
-  constructor(private d: HTMLDocument, ionic: Ionic) {
+  constructor(window: Window, private d: HTMLDocument, ionic: Ionic) {
     const self = this;
+
+    self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 
     self.staticDir = getStaticComponentDir(d);
 
-    self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
+    const ua = window.navigator.userAgent.toLowerCase();
+    self.isIOS = /iphone|ipad|ipod|ios/.test(ua);
 
     ionic.loadComponent = function loadComponent(tag, mode, id, styles, moduleFn) {
       const cmpMeta = self.registry[tag];
@@ -31,14 +37,62 @@ export class PlatformClient implements PlatformApi {
 
       const moduleId = getComponentId(tag, mode, id);
 
-      const callbacks = self.loadCallbacks[moduleId];
+      const callbacks = self.loadCBs[moduleId];
       if (callbacks) {
         for (var i = 0, l = callbacks.length; i < l; i++) {
           callbacks[i](cmpMeta, cmpMode);
         }
-        delete self.loadCallbacks[moduleId];
+        delete self.loadCBs[moduleId];
       }
     };
+  }
+
+  nextTick(cb: Function) {
+    const self = this;
+    const nextCBs = self.nextCBs;
+
+    nextCBs.push(cb);
+
+    if (!self.nextPending) {
+      self.nextPending = true;
+
+      if (self.hasPromises) {
+        Promise.resolve().then(function nextTickHandler() {
+          self.nextPending = false;
+
+          const callbacks = nextCBs.slice(0);
+          nextCBs.length = 0;
+
+          for (let i = 0; i < callbacks.length; i++) {
+            callbacks[i]();
+          }
+        }).catch(err => {
+          console.error(err);
+        });
+
+        if (self.isIOS) {
+          // Adopt from vue.js: https://github.com/vuejs/vue, MIT Licensed
+          // In problematic UIWebViews, Promise.then doesn't completely break, but
+          // it can get stuck in a weird state where callbacks are pushed into the
+          // microtask queue but the queue isn't being flushed, until the browser
+          // needs to do some other work, e.g. handle a timer. Therefore we can
+          // "force" the microtask queue to be flushed by adding an empty timer.
+          setTimeout(noop);
+        }
+
+      } else {
+        setTimeout(function nextTickHandler() {
+          self.nextPending = false;
+
+          const callbacks = nextCBs.slice(0);
+          nextCBs.length = 0;
+
+          for (let i = 0; i < callbacks.length; i++) {
+            callbacks[i]();
+          }
+        });
+      }
+    }
   }
 
   loadComponentModule(tag: string, mode: string, cb: LoadComponentCallback): void {
@@ -51,7 +105,7 @@ export class PlatformClient implements PlatformApi {
     } else {
       const cmpId = getComponentId(tag, mode, cmpMode.id);
 
-      const loadedCallbacks = this.loadCallbacks;
+      const loadedCallbacks = this.loadCBs;
 
       if (!loadedCallbacks[cmpId]) {
         loadedCallbacks[cmpId] = [cb];
@@ -185,17 +239,6 @@ export class PlatformClient implements PlatformApi {
 
   isComment(node: Node): node is Comment {
     return node.nodeType === 8;
-  }
-
-  nextTick(cb: Function) {
-    const timerId = setTimeout(cb);
-
-    if (this.hasPromises) {
-      Promise.resolve().then(() => {
-        clearTimeout(timerId);
-        cb && cb();
-      });
-    }
   }
 
   hasCss(moduleId: string): boolean {
