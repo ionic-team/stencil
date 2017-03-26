@@ -1,14 +1,25 @@
 @import "../../themes/ionic.globals.ios";
-@import "./badge.ios.scoped";
+@import "./badge";
 
 
 // iOS Badge
 // --------------------------------------------------
 
+/// @prop - Border radius of the badge
+$badge-ios-border-radius:      10px !default;
 
+/// @prop - Background color of the badge
+$badge-ios-background-color:   color($colors-ios, primary) !default;
+
+/// @prop - Text color of the badge
+$badge-ios-text-color:         color-contrast($colors-ios, $badge-ios-background-color) !default;
+
+
+.badge-ios,
 :host {
-  @extend ion-badge;
-  @extend .badge-ios;
+  border-radius: $badge-ios-border-radius;
+  color: $badge-ios-text-color;
+  background-color: $badge-ios-background-color;
 }
 
 
@@ -17,8 +28,10 @@
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
 
+  .badge-ios-#{$color-name},
   :host([color=#{$color-name}]) {
-    @extend .badge-ios-#{$color-name};
+    color: $color-contrast;
+    background-color: $color-base;
   }
 
 }
