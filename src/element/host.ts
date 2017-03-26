@@ -13,6 +13,8 @@ export function generateVNode(elm: Node, instance: ComponentInstance, cmpMeta: C
   const hostCssClasses = vnode.data.class = vnode.data.class || {};
   const hostAttributes = vnode.data.attrs = vnode.data.attrs || {};
 
+  hostAttributes.upgraded = '';
+
   const cssClasses = vnode.sel.split('.');
   for (var i = 1; i < cssClasses.length; i++) {
     hostCssClasses[cssClasses[i]] = true;
