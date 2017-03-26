@@ -14,7 +14,7 @@ import { initComponentMeta } from '../../../element/proxy';
 declare const ionic: Ionic;
 
 
-const plt = new PlatformClient(document, ionic);
+const plt = new PlatformClient(window, document, ionic);
 const config = new Config();
 const renderer = initRenderer([
   attributesModule,
