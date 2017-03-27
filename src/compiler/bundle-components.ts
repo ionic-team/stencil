@@ -20,68 +20,79 @@ export function createIonicJs(opts: CompilerOptions, ctx: CompilerContext) {
   const src = path.join(opts.ionicCoreDir, fileName);
   const dest = path.join(opts.destDir, fileName);
 
-  return readFile(src).then(ionicJsContent => {
-    const components: {[tag: string]: any[]} = {};
+  const fileNameMin = 'ionic.min.js';
+  const srcMin = path.join(opts.ionicCoreDir, fileNameMin);
+  const destMin = path.join(opts.destDir, fileNameMin);
 
-    ctx.files.forEach(file => {
-      if (file.cmpMeta && file.cmpMeta.modes) {
-        const component: any[] = components[file.cmpMeta.tag] = [];
+  const components: {[tag: string]: any[]} = {};
 
-        const cmpModes: {[mode: string]: string} = {};
+  ctx.files.forEach(file => {
+    if (file.cmpMeta && file.cmpMeta.modes) {
+      const component: any[] = components[file.cmpMeta.tag] = [];
 
-        Object.keys(file.cmpMeta.modes).forEach(mode => {
-          cmpModes[mode] = file.cmpMeta.modes[mode].id;
-        });
+      const cmpModes: {[mode: string]: string} = {};
 
-        component.push(cmpModes);
+      Object.keys(file.cmpMeta.modes).forEach(mode => {
+        cmpModes[mode] = file.cmpMeta.modes[mode].id;
+      });
 
-        if (file.cmpMeta.props) {
-          component.push(file.cmpMeta.props);
-        }
+      component.push(cmpModes);
+
+      if (file.cmpMeta.props) {
+        component.push(file.cmpMeta.props);
       }
-    });
+    }
+  });
 
-    const cmpStr = nodeUtil.inspect(components, false, null).replace(/\s/g, '');
+  const cmpStr = nodeUtil.inspect(components, false, null).replace(/\s/g, '');
 
-    const content = [
-      `window.ionic=window.ionic||{};`,
-      `window.ionic.components=${cmpStr};`,
-      ionicJsContent
-    ];
+  const componentJs = `window.ionic=window.ionic||{};window.ionic.components=${cmpStr};`;
 
-    let ionicJsOutput = content.join('\n');
 
-    let ionicJsHash = hashContent(ionicJsOutput).substr(0, 8);
+  return createIonicCoreJs(opts, ctx).then((results: any[]) => {
+    const ionicCoreJsHash = results[0];
 
-    ionicJsOutput = ionicJsOutput.replace('core', ionicJsHash);
+    return Promise.all([
+      readFile(src).then(ionicJsContent => {
+        ionicJsContent = ionicJsContent.replace('core', ionicCoreJsHash);
+        ionicJsContent = `${componentJs}\n${ionicJsContent}`;
+        return writeFile(dest, ionicJsContent);
+      }),
 
-    return createIonicCoreJs(opts, ctx, ionicJsHash).then(() => {
-      return writeFile(dest, ionicJsOutput);
-    });
+      readFile(srcMin).then(ionicJsContent => {
+        ionicJsContent = ionicJsContent.replace('core', ionicCoreJsHash);
+        ionicJsContent = `${componentJs}${ionicJsContent}`;
+        return writeFile(destMin, ionicJsContent);
+      })
+    ]);
 
   });
 }
 
 
-function createIonicCoreJs(opts: CompilerOptions, ctx: CompilerContext, ionicJsHash: string) {
+function createIonicCoreJs(opts: CompilerOptions, ctx: CompilerContext) {
   const src = path.join(opts.ionicCoreDir, `ionic.core.js`);
-  const dest = path.join(opts.destDir, `ionic.${ionicJsHash}.js`);
-
   const srcMin = path.join(opts.ionicCoreDir, `ionic.core.min.js`);
-  const destMin = path.join(opts.destDir, `ionic.${ionicJsHash}.min.js`);
-
   const srcEs5 = path.join(opts.ionicCoreDir, `ionic.core.es5.js`);
-  const destEs5 = path.join(opts.destDir, `ionic.${ionicJsHash}.es5.js`);
-
   const srcEs5Min = path.join(opts.ionicCoreDir, `ionic.core.es5.min.js`);
-  const destEs5Min = path.join(opts.destDir, `ionic.${ionicJsHash}.es5.min.js`);
 
-  return Promise.all([
-    copy(src, dest),
-    copy(srcMin, destMin),
-    copy(srcEs5, destEs5),
-    copy(srcEs5Min, destEs5Min)
-  ]);
+
+  return readFile(src).then(content => {
+    const componentJsHash = hashContent(content).substr(0, 8);
+
+    const dest = path.join(opts.destDir, `ionic.${componentJsHash}.js`);
+    const destMin = path.join(opts.destDir, `ionic.${componentJsHash}.min.js`);
+    const destEs5 = path.join(opts.destDir, `ionic.${componentJsHash}.es5.js`);
+    const destEs5Min = path.join(opts.destDir, `ionic.${componentJsHash}.es5.min.js`);
+
+    return Promise.all([
+      Promise.resolve(componentJsHash),
+      copy(src, dest),
+      copy(srcMin, destMin),
+      copy(srcEs5, destEs5),
+      copy(srcEs5Min, destEs5Min)
+    ]);
+  });
 }
 
 
