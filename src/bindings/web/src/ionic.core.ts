@@ -28,10 +28,6 @@ Object.keys(ionic.components || {}).forEach(tag => {
 
   window.customElements.define(tag, class extends HTMLElement {
 
-    constructor() {
-      super();
-    }
-
     connectedCallback() {
       const ctrl: ComponentController = {};
       ctrls.set(this, ctrl);
