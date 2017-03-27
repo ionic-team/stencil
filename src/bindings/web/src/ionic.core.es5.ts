@@ -40,7 +40,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
 
   ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {
     var ctrl = ctrls.get(this);
-    if (ctrl && ctrl.instance) {
+    if (ctrl) {
       attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
     }
   };

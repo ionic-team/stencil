@@ -36,7 +36,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
 
     attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
       const ctrl = ctrls.get(this);
-      if (ctrl && ctrl.instance) {
+      if (ctrl) {
         attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
       }
     }
