@@ -8,7 +8,47 @@
 </head>
 <body>
 
-  <ion-badge>88</ion-badge>
+  <p>
+    <ion-badge>default</ion-badge>
+  </p>
+
+  <p>
+    <ion-badge color="secondary">secondary</ion-badge>
+  </p>
+
+  <p>
+    <ion-badge color="danger">danger</ion-badge>
+  </p>
+
+  <p>
+    <ion-badge color="light">light</ion-badge>
+  </p>
+
+  <p>
+    <ion-badge color="dark">dark</ion-badge>
+  </p>
+
+  <p>
+    <ion-badge id="dynamicColor">dynamic</ion-badge>
+  </p>
+
+  <script>
+    var dynamicColor = document.getElementById('dynamicColor');
+
+    setInterval(function() {
+      if (dynamicColor.color === 'secondary') {
+        dynamicColor.color = 'danger';
+      } else if (dynamicColor.color === 'danger') {
+        dynamicColor.color = 'light';
+      } else if (dynamicColor.color === 'light') {
+        dynamicColor.color = 'dark';
+      } else if (dynamicColor.color === 'dark') {
+        dynamicColor.color = 'primary';
+      } else {
+        dynamicColor.color = 'secondary';
+      }
+    }, 1000);
+  </script>
 
 </body>
 </html>
