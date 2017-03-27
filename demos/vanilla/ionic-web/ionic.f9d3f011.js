@@ -1,4 +1,4 @@
-(function (window, document, components) {
+(function (window, document, ionic) {
 
     function isDef(s) {
         return s !== undefined && s !== null;
@@ -22,6 +22,11 @@
             return g[1].toUpperCase();
         });
     }
+    function toDashCase(str) {
+        return str.replace(/([A-Z])/g, function (g) {
+            return '-' + g[0].toLowerCase();
+        });
+    }
     function getStaticComponentDir(doc) {
         var staticDirEle = doc.querySelector('script[data-static-dir]');
         if (staticDirEle) {
@@ -29,10 +34,17 @@
         }
         var scriptElms = doc.getElementsByTagName('script');
         staticDirEle = scriptElms[scriptElms.length - 1];
-        var paths = staticDirEle.src.split('/');
-        paths.pop();
-        return staticDirEle.dataset['staticDir'] = paths.join('/') + '/';
+        if (staticDirEle) {
+            var paths = staticDirEle.src.split('/');
+            paths.pop();
+            return staticDirEle.dataset['staticDir'] = paths.join('/') + '/';
+        }
+        return '/';
     }
+    function getComponentId(tag, mode, id) {
+        return tag + '.' + mode + '.' + id;
+    }
+    function noop() {}
 
     function attributeChangedCallback(instance, cmpMeta, attrName, oldVal, newVal, namespace) {
         if (!instance) return;
@@ -43,66 +55,15 @@
         instance.attributeChangedCallback && instance.attributeChangedCallback(attrName, oldVal, newVal, namespace);
     }
 
-    function initState(plt, config, renderer, elm, ctrl, cmpMeta) {
-        var instance = ctrl.instance;
-        var state = ctrl.state = {};
-        var props = cmpMeta.props || {};
-        Object.keys(props).forEach(function (propName) {
-            if (isUndef(instance[propName])) {
-                // no instance value, so get it from the element
-                state[propName] = elm[propName];
-            } else if (isUndef(elm[propName])) {
-                // no element value, so get it from from instance
-                // but also be sure to set the element to have the same value
-                // before we assign the getters/setters
-                state[propName] = elm[propName] = instance[propName];
-            }
-            function getState() {
-                return state[propName];
-            }
-            function setState(value) {
-                value = getValue$1(props[propName], value);
-                if (state[propName] !== value) {
-                    state[propName] = value;
-                    update(plt, config, renderer, elm, ctrl, cmpMeta);
-                }
-            }
-            Object.defineProperty(elm, propName, {
-                get: getState,
-                set: setState
-            });
-            Object.defineProperty(instance, propName, {
-                get: getState,
-                set: setState
-            });
-        });
-    }
-    function getValue$1(propOpts, value) {
-        if (propOpts.type === 'boolean') {
-            if (isString(value)) {
-                return value !== 'false';
-            }
-            return !!value;
-        }
-        if (propOpts.type === 'number') {
-            if (isNumber(value)) {
-                return value;
-            }
-            return parseFloat(value);
-        }
-        return value;
-    }
-
     function vnode(sel, data, children, text, elm) {
         var key = data === undefined ? undefined : data.key;
         return { sel: sel, data: data, children: children,
             text: text, elm: elm, key: key };
     }
 
-    var NamespaceURIs = {
-        "xlink": "http://www.w3.org/1999/xlink"
-    };
     var booleanAttrs = ["allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact", "controls", "declare", "default", "defaultchecked", "defaultmuted", "defaultselected", "defer", "disabled", "draggable", "enabled", "formnovalidate", "hidden", "indeterminate", "inert", "ismap", "itemscope", "loop", "multiple", "muted", "nohref", "noresize", "noshade", "novalidate", "nowrap", "open", "pauseonexit", "readonly", "required", "reversed", "scoped", "seamless", "selected", "sortable", "spellcheck", "translate", "truespeed", "typemustmatch", "visible"];
+    var xlinkNS = 'http://www.w3.org/1999/xlink';
+    var xmlNS = 'http://www.w3.org/XML/1998/namespace';
     var booleanAttrsDict = Object.create(null);
     for (var i = 0, len = booleanAttrs.length; i < len; i++) {
         booleanAttrsDict[booleanAttrs[i]] = true;
@@ -113,8 +74,7 @@
             old,
             elm = vnode.elm,
             oldAttrs = oldVnode.data.attrs,
-            attrs = vnode.data.attrs,
-            namespaceSplit;
+            attrs = vnode.data.attrs;
         if (!oldAttrs && !attrs) return;
         if (oldAttrs === attrs) return;
         oldAttrs = oldAttrs || {};
@@ -124,13 +84,28 @@
             cur = attrs[key];
             old = oldAttrs[key];
             if (old !== cur) {
-                if (!cur && booleanAttrsDict[key]) elm.removeAttribute(key);else {
-                    namespaceSplit = key.split(":");
-                    if (namespaceSplit.length > 1 && NamespaceURIs.hasOwnProperty(namespaceSplit[0])) elm.setAttributeNS(NamespaceURIs[namespaceSplit[0]], key, cur);else elm.setAttribute(key, cur);
+                if (booleanAttrsDict[key]) {
+                    if (cur) {
+                        elm.setAttribute(key, "");
+                    } else {
+                        elm.removeAttribute(key);
+                    }
+                } else {
+                    if (key.charCodeAt(0) !== 120) {
+                        elm.setAttribute(key, cur);
+                    } else if (key.charCodeAt(3) === 58) {
+                        // Assume xml namespace
+                        elm.setAttributeNS(xmlNS, key, cur);
+                    } else if (key.charCodeAt(5) === 58) {
+                        // Assume xlink namespace
+                        elm.setAttributeNS(xlinkNS, key, cur);
+                    } else {
+                        elm.setAttribute(key, cur);
+                    }
                 }
             }
         }
-        //remove removed attributes
+        // remove removed attributes
         // use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)
         // the other option is to remove all attributes with value == undefined
         for (key in oldAttrs) {
@@ -139,7 +114,6 @@
             }
         }
     }
-    var attributesModule = { create: updateAttrs, update: updateAttrs };
 
     function updateClass(oldVnode, vnode) {
         var cur,
@@ -163,7 +137,6 @@
             }
         }
     }
-    var classModule = { create: updateClass, update: updateClass };
 
     function addNS(data, children, sel) {
         data.ns = 'http://www.w3.org/2000/svg';
@@ -223,6 +196,10 @@
     function isVnode(vnode$$1) {
         return vnode$$1.sel !== undefined || vnode$$1.elm !== undefined;
     }
+    // type ArraysOf<T> = {
+    //   [K in keyof T]: (T[K])[];
+    // }
+    // type ModuleHooks = ArraysOf<Module>;
     function createKeyToOldIdx(children, beginIdx, endIdx) {
         var i = void 0,
             map = {},
@@ -237,31 +214,27 @@
         }
         return map;
     }
-    var hooks = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
-    function initRenderer(modules, api) {
-        var i = void 0,
-            j = void 0,
-            cbs = {};
-        for (i = 0; i < hooks.length; ++i) {
-            cbs[hooks[i]] = [];
-            for (j = 0; j < modules.length; ++j) {
-                var hook = modules[j][hooks[i]];
-                if (hook !== undefined) {
-                    cbs[hooks[i]].push(hook);
-                }
-            }
-        }
+    // const hooks: (keyof Module)[] = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
+    function initRenderer(api) {
+        // let i: number, j: number;
+        // for (i = 0; i < hooks.length; ++i) {
+        //   cbs[hooks[i]] = [];
+        //   for (j = 0; j < modules.length; ++j) {
+        //     const hook = modules[j][hooks[i]];
+        //     if (hook !== undefined) {
+        //       (cbs[hooks[i]] as Array<any>).push(hook);
+        //     }
+        //   }
+        // }
         function emptyNodeAt(elm) {
             var id = elm.id ? '#' + elm.id : '';
             var c = elm.className ? '.' + elm.className.split(' ').join('.') : '';
             return vnode(api.tag(elm) + id + c, {}, [], undefined, elm);
         }
-        function createRmCb(childElm, listeners) {
+        function createRmCb(childElm) {
             return function rmCb() {
-                if (--listeners === 0) {
-                    var parent = api.parentNode(childElm);
-                    api.removeChild(parent, childElm);
-                }
+                var parent = api.parentNode(childElm);
+                api.removeChild(parent, childElm);
             };
         }
         function createElm(vnode$$1, insertedVnodeQueue) {
@@ -290,9 +263,10 @@
                 var elm = vnode$$1.elm = isDef(data) && isDef(i = data.ns) ? api.createElementNS(i, tag) : api.createElement(tag);
                 if (hash < dot) elm.id = sel.slice(hash + 1, dot);
                 if (dotIdx > 0) elm.className = sel.slice(dot + 1).replace(/\./g, ' ');
-                for (i = 0; i < cbs.create.length; ++i) {
-                    cbs.create[i](emptyNode, vnode$$1);
-                }if (isArray(children)) {
+                // for (i = 0; i < cbs.create.length; ++i) cbs.create[i](emptyNode, vnode);
+                updateAttrs(emptyNode, vnode$$1);
+                updateClass(emptyNode, vnode$$1);
+                if (isArray(children)) {
                     for (i = 0; i < children.length; ++i) {
                         var ch = children[i];
                         if (ch != null) {
@@ -320,38 +294,33 @@
                 }
             }
         }
-        function invokeDestroyHook(vnode$$1) {
-            var i = void 0,
-                j = void 0,
-                data = vnode$$1.data;
-            if (data !== undefined) {
-                if (isDef(i = data.hook) && isDef(i = i.destroy)) i(vnode$$1);
-                for (i = 0; i < cbs.destroy.length; ++i) {
-                    cbs.destroy[i](vnode$$1);
-                }if (vnode$$1.children !== undefined) {
-                    for (j = 0; j < vnode$$1.children.length; ++j) {
-                        i = vnode$$1.children[j];
-                        if (i != null && typeof i !== "string") {
-                            invokeDestroyHook(i);
-                        }
-                    }
-                }
-            }
-        }
+        // function invokeDestroyHook(vnode: VNode) {
+        //   let i: any, j: number, data = vnode.data;
+        //   if (data !== undefined) {
+        //     if (isDef(i = data.hook) && isDef(i = i.destroy)) i(vnode);
+        //     for (i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode);
+        //     if (vnode.children !== undefined) {
+        //       for (j = 0; j < vnode.children.length; ++j) {
+        //         i = vnode.children[j];
+        //         if (i != null && typeof i !== "string") {
+        //           invokeDestroyHook(i);
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
         function removeVnodes(parentElm, vnodes, startIdx, endIdx) {
             for (; startIdx <= endIdx; ++startIdx) {
                 var _i2 = void 0,
-                    listeners = void 0,
                     rm = void 0,
                     ch = vnodes[startIdx];
                 if (ch != null) {
                     if (isDef(ch.sel)) {
-                        invokeDestroyHook(ch);
-                        listeners = cbs.remove.length + 1;
-                        rm = createRmCb(ch.elm, listeners);
-                        for (_i2 = 0; _i2 < cbs.remove.length; ++_i2) {
-                            cbs.remove[_i2](ch, rm);
-                        }if (isDef(_i2 = ch.data) && isDef(_i2 = _i2.hook) && isDef(_i2 = _i2.remove)) {
+                        // invokeDestroyHook(ch);
+                        // listeners = cbs.remove.length + 1;
+                        rm = createRmCb(ch.elm);
+                        // for (i = 0; i < cbs.remove.length; ++i) cbs.remove[i](ch, rm);
+                        if (isDef(_i2 = ch.data) && isDef(_i2 = _i2.hook) && isDef(_i2 = _i2.remove)) {
                             _i2(ch, rm);
                         } else {
                             rm();
@@ -441,9 +410,10 @@
             var ch = vnode$$1.children;
             if (oldVnode === vnode$$1) return;
             if (vnode$$1.data !== undefined) {
-                for (i = 0; i < cbs.update.length; ++i) {
-                    cbs.update[i](oldVnode, vnode$$1);
-                }i = vnode$$1.data.hook;
+                // for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode);
+                updateAttrs(oldVnode, vnode$$1);
+                updateClass(oldVnode, vnode$$1);
+                i = vnode$$1.data.hook;
                 if (isDef(i) && isDef(i = i.update)) i(oldVnode, vnode$$1);
             }
             if (isUndef(vnode$$1.text)) {
@@ -467,13 +437,11 @@
             }
         }
         return function patch(oldVnode, vnode$$1) {
-            var i = void 0,
-                elm = void 0,
+            var elm = void 0,
                 parent = void 0;
             var insertedVnodeQueue = [];
-            for (i = 0; i < cbs.pre.length; ++i) {
-                cbs.pre[i]();
-            }if (!isVnode(oldVnode)) {
+            // for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
+            if (!isVnode(oldVnode)) {
                 oldVnode = emptyNodeAt(oldVnode);
             }
             if (vnode$$1.elm || sameVnode(oldVnode, vnode$$1)) {
@@ -487,12 +455,11 @@
                     removeVnodes(parent, [oldVnode], 0, 0);
                 }
             }
-            for (i = 0; i < insertedVnodeQueue.length; ++i) {
-                insertedVnodeQueue[i].data.hook.insert(insertedVnodeQueue[i]);
-            }
-            for (i = 0; i < cbs.post.length; ++i) {
-                cbs.post[i]();
-            }return vnode$$1;
+            // for (i = 0; i < insertedVnodeQueue.length; ++i) {
+            //   (((insertedVnodeQueue[i].data as VNodeData).hook as Hooks).insert as any)(insertedVnodeQueue[i]);
+            // }
+            // for (i = 0; i < cbs.post.length; ++i) cbs.post[i]();
+            return vnode$$1;
         };
     }
 
@@ -504,6 +471,7 @@
         vnode$$1.elm = elm;
         var hostCssClasses = vnode$$1.data.class = vnode$$1.data.class || {};
         var hostAttributes = vnode$$1.data.attrs = vnode$$1.data.attrs || {};
+        hostAttributes.upgraded = '';
         var cssClasses = vnode$$1.sel.split('.');
         for (var i = 1; i < cssClasses.length; i++) {
             hostCssClasses[cssClasses[i]] = true;
@@ -519,75 +487,163 @@
         return vnode$$1;
     }
 
-    function update(plt, config, renderer, elm, ctrl, cmpMeta, cmpModule) {
+    function initState(plt, config, renderer, elm, ctrl, cmpMeta) {
+        var instance = ctrl.instance;
+        var state = ctrl.state = {};
+        var props = cmpMeta.props;
+        Object.keys(props).forEach(function (propName) {
+            var propType = props[propName].type;
+            state[propName] = getInitialValue(plt, config, elm, instance, propName);
+            function getState() {
+                return state[propName];
+            }
+            function setState(value) {
+                value = getPropValue(propType, value);
+                if (state[propName] !== value) {
+                    state[propName] = value;
+                    queueUpdate(plt, config, renderer, elm, ctrl, cmpMeta);
+                }
+            }
+            Object.defineProperty(elm, propName, {
+                get: getState,
+                set: setState
+            });
+            Object.defineProperty(instance, propName, {
+                get: getState,
+                set: setState
+            });
+        });
+    }
+    function getPropValue(propType, value) {
+        if (propType === 'boolean') {
+            if (isString(value)) {
+                return value !== 'false';
+            }
+            return !!value;
+        }
+        if (propType === 'number') {
+            if (isNumber(value)) {
+                return value;
+            }
+            try {
+                return parseFloat(value);
+            } catch (e) {}
+            return NaN;
+        }
+        return value;
+    }
+    function getInitialValue(plt, config, elm, instance, propName) {
+        var value = plt.getProperty(elm, propName);
+        if (isDef(value)) {
+            return value;
+        }
+        value = plt.getAttribute(elm, toCamelCase(propName));
+        if (isDef(value)) {
+            return value;
+        }
+        if (isDef(instance[propName])) {
+            plt.setProperty(elm, propName, instance[propName]);
+            return instance[propName];
+        }
+        value = config.get(propName);
+        if (isDef(value)) {
+            return value;
+        }
+    }
+    function initComponentMeta(tag, data) {
+        var modeIds = data[0];
+        var props = data[1] || {};
+        var cmpMeta = {
+            tag: tag,
+            modes: {},
+            props: props
+        };
+        var keys = Object.keys(modeIds);
+        for (var i = 0; i < keys.length; i++) {
+            cmpMeta.modes[keys[i]] = {
+                id: modeIds[keys[i]]
+            };
+        }
+        keys = cmpMeta.tag.split('-');
+        keys.shift();
+        cmpMeta.hostCss = keys.join('-');
+        props.color = {};
+        props.mode = {};
+        var observedAttributes = cmpMeta.observedAttributes = cmpMeta.observedAttributes || [];
+        keys = Object.keys(props);
+        for (i = 0; i < keys.length; i++) {
+            observedAttributes.push(toDashCase(keys[i]));
+        }
+        return cmpMeta;
+    }
+
+    function queueUpdate(plt, config, renderer, elm, ctrl, cmpMeta) {
         // only run patch if it isn't queued already
         if (!ctrl.queued) {
             ctrl.queued = true;
             // run the patch in the next tick
-            plt.nextTick(function patchUpdate() {
+            plt.nextTick(function nextUpdate() {
                 // vdom diff and patch the host element for differences
-                patch(plt, config, renderer, elm, ctrl, cmpMeta, cmpModule);
+                update(plt, config, renderer, elm, ctrl, cmpMeta);
                 // no longer queued
                 ctrl.queued = false;
             });
         }
     }
-    function patch(plt, config, renderer, elm, ctrl, cmpMeta, cmpModule) {
+    function update(plt, config, renderer, elm, ctrl, cmpMeta) {
         var instance = ctrl.instance;
-        if (!instance) {
-            instance = ctrl.instance = new cmpModule();
+        if (isUndef(instance)) {
+            instance = ctrl.instance = new cmpMeta.module();
             initState(plt, config, renderer, elm, ctrl, cmpMeta);
         }
-        instance.mode = getValue('mode', config, plt, elm);
-        instance.color = getValue('color', config, plt, elm);
-        if (!ctrl.root) {
-            createRoot(plt, config, elm, ctrl, cmpMeta);
+        if (isUndef(ctrl.root)) {
+            var cmpMode = cmpMeta.modes[instance.mode];
+            if (elm.attachShadow) {
+                ctrl.root = elm.attachShadow({ mode: 'open' });
+                var shadowStyleEle = plt.createElement('style');
+                shadowStyleEle.innerHTML = cmpMode.styles;
+                ctrl.root.appendChild(shadowStyleEle);
+            } else {
+                ctrl.root = elm;
+                var cmpId = getComponentId(cmpMeta.tag, instance.mode, cmpMode.id);
+                if (!plt.hasCss(cmpId)) {
+                    var headStyleEle = plt.createElement('style');
+                    headStyleEle.dataset['componentId'] = cmpId;
+                    headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+                    plt.appendChild(plt.getDocumentHead(), headStyleEle);
+                    plt.setCss(cmpId);
+                }
+            }
         }
         var vnode = generateVNode(ctrl.root, instance, cmpMeta);
         // if we already have a vnode then use it
         // otherwise, elm is the initial patch and
         // we need it to pass it the actual host element
         ctrl.vnode = renderer(ctrl.vnode ? ctrl.vnode : elm, vnode);
-        if (!ctrl.connected) {
+        if (isUndef(ctrl.connected)) {
             instance.connectedCallback && instance.connectedCallback();
             ctrl.connected = true;
         }
     }
-    function createRoot(plt, config, elm, ctrl, cmpMeta) {
-        ctrl.shadowDom = !!elm.attachShadow;
-        if (ctrl.shadowDom && cmpMeta.shadow !== false) {
-            // huzzah!! support for native shadow DOM!
-            ctrl.root = elm.attachShadow({ mode: 'open' });
-            injectCssLink(plt, config, cmpMeta, ctrl.root, true);
-        } else {
-            // yeah, no native shadow DOM, but we can still do this, don't panic
-            ctrl.root = elm;
-            injectCssLink(plt, config, cmpMeta, plt.getDocumentHead(), false);
-        }
-    }
-    function injectCssLink(plt, config, cmpMeta, parentNode, supportsShadowDom) {
-        var modeStyleFilename = cmpMeta.modeStyleUrls[config.getValue('mode')];
-        if (!modeStyleFilename) {
-            return;
-        }
-        var linkUrl = plt.staticDir + modeStyleFilename;
-        if (!supportsShadowDom) {
-            linkUrl = linkUrl.replace('.css', '.scoped.css');
-            if (plt.hasCssLink(linkUrl)) {
-                return;
-            }
-            plt.setCssLink(linkUrl);
-        }
-        var linkEle = plt.createElement('link');
-        linkEle.href = linkUrl;
-        linkEle.rel = 'stylesheet';
-        plt.appendChild(parentNode, linkEle);
-    }
-    function getValue(name, config, api, elm) {
-        var fallback = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
 
-        var val = api.getPropOrAttr(elm, name);
-        return isDef(val) ? val : config.getValue(name, fallback);
+    function connectedCallback(plt, config, renderer, elm, ctrl, tag) {
+        plt.nextTick(function () {
+            var mode = getMode(plt, config, elm, 'mode');
+            plt.loadComponentModule(tag, mode, function loadedModule(cmpMeta) {
+                update(plt, config, renderer, elm, ctrl, cmpMeta);
+            });
+        });
+    }
+    function getMode(plt, config, elm, propName) {
+        var value = plt.getProperty(elm, propName);
+        if (isDef(value)) {
+            return value;
+        }
+        value = plt.getAttribute(elm, propName);
+        if (isDef(value)) {
+            return value;
+        }
+        return config.get(propName);
     }
 
     function disconnectedCallback(ctrl) {
@@ -601,7 +657,7 @@
         constructor(config) {
             this.c = config;
         }
-        getValue(key) {
+        get(key) {
             var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
             if (key === 'mode') {
@@ -612,65 +668,101 @@
     }
 
     class PlatformClient {
-        constructor(win, d) {
-            this.win = win;
+        constructor(window, d, ionic) {
             this.d = d;
             this.registry = {};
-            this.modules = {};
-            this.loadCallbacks = {};
-            this.activeRequests = [];
-            this.cssLink = {};
+            this.loadCBs = {};
+            this.jsonReqs = [];
+            this.css = {};
+            this.nextCBs = [];
             var self = this;
-            self.win;
-            self.staticDir = getStaticComponentDir(d);
             self.hasPromises = typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1;
-            win.ionicComponent = function (tag, moduleFn) {
-                console.debug('ionicComponent', tag);
-                var cmpMeta = self.getComponentMeta(tag);
-                var cmpModule = moduleFn();
-                self.modules[tag] = cmpModule;
-                var callbacks = self.loadCallbacks[tag];
+            self.staticDir = getStaticComponentDir(d);
+            var ua = window.navigator.userAgent.toLowerCase();
+            self.isIOS = /iphone|ipad|ipod|ios/.test(ua);
+            ionic.loadComponent = function loadComponent(tag, mode, id, styles, importModuleFn) {
+                var cmpMeta = self.registry[tag];
+                var moduleImports = {};
+                importModuleFn(moduleImports);
+                var importNames = Object.keys(moduleImports);
+                cmpMeta.module = moduleImports[importNames[0]];
+                var cmpMode = cmpMeta.modes[mode];
+                cmpMode.styles = styles;
+                cmpMode.loaded = true;
+                var moduleId = getComponentId(tag, mode, id);
+                var callbacks = self.loadCBs[moduleId];
                 if (callbacks) {
-                    callbacks.forEach(function (cb) {
-                        cb(cmpMeta, cmpModule);
-                    });
-                    delete self.loadCallbacks[tag];
+                    for (var i = 0, l = callbacks.length; i < l; i++) {
+                        callbacks[i](cmpMeta, cmpMode);
+                    }
+                    delete self.loadCBs[moduleId];
                 }
             };
         }
-        registerComponent(cmpMeta) {
-            this.registry[cmpMeta.tag] = cmpMeta;
-        }
-        getComponentMeta(tag) {
-            return this.registry[tag];
-        }
-        loadComponentModule(cmpMeta, cb) {
+        nextTick(cb) {
             var self = this;
-            var loadedCallbacks = self.loadCallbacks;
-            var tag = cmpMeta.tag;
-            var cmpModule = self.modules[tag];
-            if (cmpModule) {
-                cb(cmpModule);
-            } else if (cmpMeta.moduleUrl) {
-                if (!loadedCallbacks[tag]) {
-                    loadedCallbacks[tag] = [cb];
+            var nextCBs = self.nextCBs;
+            nextCBs.push(cb);
+            if (!self.nextPending) {
+                self.nextPending = true;
+                if (self.hasPromises) {
+                    Promise.resolve().then(function nextTickHandler() {
+                        self.nextPending = false;
+                        var callbacks = nextCBs.slice(0);
+                        nextCBs.length = 0;
+                        for (var _i3 = 0; _i3 < callbacks.length; _i3++) {
+                            callbacks[_i3]();
+                        }
+                    }).catch(function (err) {
+                        console.error(err);
+                    });
+                    if (self.isIOS) {
+                        // Adopt from vue.js: https://github.com/vuejs/vue, MIT Licensed
+                        // In problematic UIWebViews, Promise.then doesn't completely break, but
+                        // it can get stuck in a weird state where callbacks are pushed into the
+                        // microtask queue but the queue isn't being flushed, until the browser
+                        // needs to do some other work, e.g. handle a timer. Therefore we can
+                        // "force" the microtask queue to be flushed by adding an empty timer.
+                        setTimeout(noop);
+                    }
                 } else {
-                    loadedCallbacks[tag].push(cb);
+                    setTimeout(function nextTickHandler() {
+                        self.nextPending = false;
+                        var callbacks = nextCBs.slice(0);
+                        nextCBs.length = 0;
+                        for (var _i4 = 0; _i4 < callbacks.length; _i4++) {
+                            callbacks[_i4]();
+                        }
+                    });
                 }
-                self.jsonp(cmpMeta.moduleUrl);
+            }
+        }
+        loadComponentModule(tag, mode, cb) {
+            var cmpMeta = this.registry[tag];
+            var cmpMode = cmpMeta.modes[mode];
+            if (cmpMode && cmpMode.loaded) {
+                cb(cmpMeta, cmpMode);
             } else {
-                cb(CommonComponent);
+                var cmpId = getComponentId(tag, mode, cmpMode.id);
+                var loadedCallbacks = this.loadCBs;
+                if (!loadedCallbacks[cmpId]) {
+                    loadedCallbacks[cmpId] = [cb];
+                } else {
+                    loadedCallbacks[cmpId].push(cb);
+                }
+                var componentFileName = cmpId + '.js';
+                this.jsonp(componentFileName);
             }
         }
         jsonp(jsonpUrl) {
             var scriptTag;
             var tmrId;
             var self = this;
-            // jsonpUrl = scriptsDir + jsonpUrl;
-            if (self.activeRequests.indexOf(jsonpUrl) > -1) {
+            jsonpUrl = self.staticDir + jsonpUrl;
+            if (self.jsonReqs.indexOf(jsonpUrl) > -1) {
                 return;
             }
-            self.activeRequests.push(jsonpUrl);
+            self.jsonReqs.push(jsonpUrl);
             scriptTag = self.createElement('script');
             scriptTag.charset = 'utf-8';
             scriptTag.async = true;
@@ -681,13 +773,16 @@
                 clearTimeout(tmrId);
                 scriptTag.onerror = scriptTag.onload = null;
                 scriptTag.parentNode.removeChild(scriptTag);
-                var index = self.activeRequests.indexOf(jsonpUrl);
+                var index = self.jsonReqs.indexOf(jsonpUrl);
                 if (index > -1) {
-                    self.activeRequests.splice(index, 1);
+                    self.jsonReqs.splice(index, 1);
                 }
             }
             scriptTag.onerror = scriptTag.onload = onScriptComplete;
             self.d.head.appendChild(scriptTag);
+        }
+        registerComponent(cmpMeta) {
+            this.registry[cmpMeta.tag] = cmpMeta;
         }
         createElement(tagName) {
             return this.d.createElement(tagName);
@@ -704,11 +799,11 @@
         insertBefore(parentNode, newNode, referenceNode) {
             parentNode.insertBefore(newNode, referenceNode);
         }
-        removeChild(node, child) {
-            node.removeChild(child);
+        removeChild(parentNode, childNode) {
+            parentNode.removeChild(childNode);
         }
-        appendChild(node, child) {
-            node.appendChild(child);
+        appendChild(parentNode, childNode) {
+            parentNode.appendChild(childNode);
         }
         parentNode(node) {
             return node.parentNode;
@@ -728,12 +823,14 @@
         getAttribute(elm, attrName) {
             return elm.getAttribute(attrName);
         }
+        setAttribute(elm, attrName, attrValue) {
+            elm.setAttribute(attrName, attrValue);
+        }
         getProperty(node, propName) {
             return node[propName];
         }
-        getPropOrAttr(elm, name) {
-            var val = elm[toCamelCase(name)];
-            return isDef(val) ? val : elm.getAttribute(name);
+        setProperty(node, propName, propValue) {
+            node[propName] = propValue;
         }
         setStyle(elm, styleName, styleValue) {
             elm.style[toCamelCase(styleName)] = styleValue;
@@ -747,53 +844,45 @@
         isComment(node) {
             return node.nodeType === 8;
         }
-        nextTick(cb) {
-            var timerId = setTimeout(cb);
-            if (this.hasPromises) {
-                Promise.resolve().then(function () {
-                    clearTimeout(timerId);
-                    cb && cb();
-                });
-            }
-        }
-        hasCssLink(linkUrl) {
-            if (this.cssLink[linkUrl]) {
+        hasCss(moduleId) {
+            if (this.css[moduleId]) {
                 return true;
             }
-            if (this.d.head.querySelector('link[href="' + linkUrl + '"]')) {
-                this.setCssLink(linkUrl);
+            if (this.d.head.querySelector('style[data-module-id="' + moduleId + '"]')) {
+                this.setCss(moduleId);
                 return true;
             }
             return false;
         }
-        setCssLink(linkUrl) {
-            this.cssLink[linkUrl] = true;
+        setCss(linkUrl) {
+            this.css[linkUrl] = true;
         }
         getDocumentHead() {
             return this.d.head;
         }
     }
-    class CommonComponent {}
 
-    var plt = new PlatformClient(window, document);
+    var plt = new PlatformClient(window, document, ionic);
     var config = new Config();
-    var renderer = initRenderer([attributesModule, classModule], plt);
+    var renderer = initRenderer(plt);
     var ctrls = new WeakMap();
-    components.forEach(function registerComponentMeta(cmpMeta) {
+    Object.keys(ionic.components || {}).forEach(function (tag) {
+        var cmpMeta = initComponentMeta(tag, ionic.components[tag]);
         plt.registerComponent(cmpMeta);
-        window.customElements.define(cmpMeta.tag, class extends HTMLElement {
+        window.customElements.define(tag, class extends HTMLElement {
             constructor() {
                 super();
-                ctrls.set(this, {});
             }
             connectedCallback() {
-                var elm = this;
-                plt.loadComponentModule(cmpMeta.tag, function loadedModule(cmpModule) {
-                    update(plt, config, renderer, elm, ctrls.get(elm), cmpMeta, cmpModule);
-                });
+                var ctrl = {};
+                ctrls.set(this, ctrl);
+                connectedCallback(plt, config, renderer, this, ctrl, tag);
             }
             attributeChangedCallback(attrName, oldVal, newVal, namespace) {
-                attributeChangedCallback(ctrls.get(this).instance, cmpMeta, attrName, oldVal, newVal, namespace);
+                var ctrl = ctrls.get(this);
+                if (ctrl && ctrl.instance) {
+                    attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
+                }
             }
             disconnectedCallback() {
                 disconnectedCallback(ctrls.get(this));
@@ -804,17 +893,4 @@
             }
         });
     });
-})(window, document, [{
-    tag: 'ion-badge',
-    modeStyleUrls: {
-        ios: ['badge.ios.css'],
-        md: ['badge.md.css'],
-        wp: ['badge.wp.css']
-    },
-    hostCss: 'badge',
-    props: {
-        color: {},
-        mode: {}
-    },
-    observedAttributes: ['color', 'mode']
-}]);
+})(window, document, window.ionic = window.ionic || {});
