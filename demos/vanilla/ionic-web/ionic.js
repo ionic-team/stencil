@@ -23,7 +23,7 @@ window.ionic=window.ionic||{};window.ionic.components={'ion-badge':[{ios:'8bc3e3
         paths.pop();
         staticDir = scriptElm.dataset['staticDir'] = paths.join('/') + '/';
     }
-    var pathItems = ['f9d3f011'];
+    var pathItems = ['17968e3f'];
     if (!window.customElements || requiresEs5()) {
         pathItems.push('es5');
     }

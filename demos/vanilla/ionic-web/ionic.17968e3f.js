@@ -44,15 +44,36 @@
     function getComponentId(tag, mode, id) {
         return tag + '.' + mode + '.' + id;
     }
+    function getPropValue(propType, value) {
+        if (propType === 'boolean') {
+            if (isString(value)) {
+                return value !== 'false';
+            }
+            return !!value;
+        }
+        if (propType === 'number') {
+            if (isNumber(value)) {
+                return value;
+            }
+            try {
+                return parseFloat(value);
+            } catch (e) {}
+            return NaN;
+        }
+        return value;
+    }
     function noop() {}
 
     function attributeChangedCallback(instance, cmpMeta, attrName, oldVal, newVal, namespace) {
-        if (!instance) return;
-        var propName = toCamelCase(attrName);
-        if (cmpMeta.props[propName]) {
-            instance[propName] = newVal;
+        if (instance) {
+            if (oldVal !== newVal) {
+                var propName = toCamelCase(attrName);
+                if (cmpMeta.props[propName]) {
+                    instance[propName] = getPropValue(cmpMeta.props[propName].type, newVal);
+                }
+            }
+            instance.attributeChangedCallback && instance.attributeChangedCallback(attrName, oldVal, newVal, namespace);
         }
-        instance.attributeChangedCallback && instance.attributeChangedCallback(attrName, oldVal, newVal, namespace);
     }
 
     function vnode(sel, data, children, text, elm) {
@@ -490,15 +511,12 @@
     function initState(plt, config, renderer, elm, ctrl, cmpMeta) {
         var instance = ctrl.instance;
         var state = ctrl.state = {};
-        var props = cmpMeta.props;
-        Object.keys(props).forEach(function (propName) {
-            var propType = props[propName].type;
-            state[propName] = getInitialValue(plt, config, elm, instance, propName);
+        Object.keys(cmpMeta.props).forEach(function (propName) {
+            state[propName] = getInitialValue(plt, config, elm, instance, cmpMeta.props, propName);
             function getState() {
                 return state[propName];
             }
             function setState(value) {
-                value = getPropValue(propType, value);
                 if (state[propName] !== value) {
                     state[propName] = value;
                     queueUpdate(plt, config, renderer, elm, ctrl, cmpMeta);
@@ -514,32 +532,14 @@
             });
         });
     }
-    function getPropValue(propType, value) {
-        if (propType === 'boolean') {
-            if (isString(value)) {
-                return value !== 'false';
-            }
-            return !!value;
-        }
-        if (propType === 'number') {
-            if (isNumber(value)) {
-                return value;
-            }
-            try {
-                return parseFloat(value);
-            } catch (e) {}
-            return NaN;
-        }
-        return value;
-    }
-    function getInitialValue(plt, config, elm, instance, propName) {
+    function getInitialValue(plt, config, elm, instance, props, propName) {
         var value = plt.getProperty(elm, propName);
         if (isDef(value)) {
             return value;
         }
         value = plt.getAttribute(elm, toCamelCase(propName));
         if (isDef(value)) {
-            return value;
+            return getPropValue(props[propName].type, value);
         }
         if (isDef(instance[propName])) {
             plt.setProperty(elm, propName, instance[propName]);
@@ -582,7 +582,7 @@
         if (!ctrl.queued) {
             ctrl.queued = true;
             // run the patch in the next tick
-            plt.nextTick(function nextUpdate() {
+            plt.domWrite(function domWrite() {
                 // vdom diff and patch the host element for differences
                 update(plt, config, renderer, elm, ctrl, cmpMeta);
                 // no longer queued
@@ -620,7 +620,7 @@
         // otherwise, elm is the initial patch and
         // we need it to pass it the actual host element
         ctrl.vnode = renderer(ctrl.vnode ? ctrl.vnode : elm, vnode);
-        if (isUndef(ctrl.connected)) {
+        if (!ctrl.connected) {
             instance.connectedCallback && instance.connectedCallback();
             ctrl.connected = true;
         }
@@ -668,17 +668,20 @@
     }
 
     class PlatformClient {
-        constructor(window, d, ionic) {
+        constructor(w, d, ionic) {
+            this.w = w;
             this.d = d;
             this.registry = {};
             this.loadCBs = {};
             this.jsonReqs = [];
             this.css = {};
             this.nextCBs = [];
+            this.readCBs = [];
+            this.writeCBs = [];
             var self = this;
             self.hasPromises = typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1;
             self.staticDir = getStaticComponentDir(d);
-            var ua = window.navigator.userAgent.toLowerCase();
+            var ua = w.navigator.userAgent.toLowerCase();
             self.isIOS = /iphone|ipad|ipod|ios/.test(ua);
             ionic.loadComponent = function loadComponent(tag, mode, id, styles, importModuleFn) {
                 var cmpMeta = self.registry[tag];
@@ -737,6 +740,47 @@
                 }
             }
         }
+        domRead(cb) {
+            this.readCBs.push(cb);
+            if (!this.rafPending) {
+                this.rafQueue();
+            }
+        }
+        domWrite(cb) {
+            this.writeCBs.push(cb);
+            if (!this.rafPending) {
+                this.rafQueue();
+            }
+        }
+        rafQueue(self) {
+            self = this;
+            self.rafPending = true;
+            self.w.requestAnimationFrame(function rafCallback(timeStamp) {
+                self.rafFlush(timeStamp);
+            });
+        }
+        rafFlush(timeStamp, self, cb, err) {
+            self = this;
+            try {
+                // ******** DOM READS ****************
+                while (cb = self.readCBs.shift()) {
+                    cb(timeStamp);
+                }
+                // ******** DOM WRITES ****************
+                while (cb = self.writeCBs.shift()) {
+                    cb(timeStamp);
+                }
+            } catch (e) {
+                err = e;
+            }
+            self.rafPending = false;
+            if (self.readCBs.length || self.writeCBs.length) {
+                self.rafQueue();
+            }
+            if (err) {
+                throw err;
+            }
+        }
         loadComponentModule(tag, mode, cb) {
             var cmpMeta = this.registry[tag];
             var cmpMode = cmpMeta.modes[mode];
@@ -750,36 +794,9 @@
                 } else {
                     loadedCallbacks[cmpId].push(cb);
                 }
-                var componentFileName = cmpId + '.js';
-                this.jsonp(componentFileName);
+                var url = '' + this.staticDir + cmpId + '.js';
+                jsonp(url, this.jsonReqs, this.d);
             }
-        }
-        jsonp(jsonpUrl) {
-            var scriptTag;
-            var tmrId;
-            var self = this;
-            jsonpUrl = self.staticDir + jsonpUrl;
-            if (self.jsonReqs.indexOf(jsonpUrl) > -1) {
-                return;
-            }
-            self.jsonReqs.push(jsonpUrl);
-            scriptTag = self.createElement('script');
-            scriptTag.charset = 'utf-8';
-            scriptTag.async = true;
-            scriptTag.timeout = 120000;
-            scriptTag.src = jsonpUrl;
-            tmrId = setTimeout(onScriptComplete, 120000);
-            function onScriptComplete() {
-                clearTimeout(tmrId);
-                scriptTag.onerror = scriptTag.onload = null;
-                scriptTag.parentNode.removeChild(scriptTag);
-                var index = self.jsonReqs.indexOf(jsonpUrl);
-                if (index > -1) {
-                    self.jsonReqs.splice(index, 1);
-                }
-            }
-            scriptTag.onerror = scriptTag.onload = onScriptComplete;
-            self.d.head.appendChild(scriptTag);
         }
         registerComponent(cmpMeta) {
             this.registry[cmpMeta.tag] = cmpMeta;
@@ -823,9 +840,6 @@
         getAttribute(elm, attrName) {
             return elm.getAttribute(attrName);
         }
-        setAttribute(elm, attrName, attrValue) {
-            elm.setAttribute(attrName, attrValue);
-        }
         getProperty(node, propName) {
             return node[propName];
         }
@@ -861,18 +875,38 @@
             return this.d.head;
         }
     }
+    function jsonp(jsonpUrl, jsonReqs, doc, scriptTag, tmrId) {
+        if (jsonReqs.indexOf(jsonpUrl) > -1) {
+            return;
+        }
+        jsonReqs.push(jsonpUrl);
+        scriptTag = doc.createElement('script');
+        scriptTag.charset = 'utf-8';
+        scriptTag.async = true;
+        scriptTag.timeout = 120000;
+        scriptTag.src = jsonpUrl;
+        tmrId = setTimeout(onScriptComplete, 120000);
+        function onScriptComplete() {
+            clearTimeout(tmrId);
+            scriptTag.onerror = scriptTag.onload = null;
+            scriptTag.parentNode.removeChild(scriptTag);
+            var index = jsonReqs.indexOf(jsonpUrl);
+            if (index > -1) {
+                jsonReqs.splice(index, 1);
+            }
+        }
+        scriptTag.onerror = scriptTag.onload = onScriptComplete;
+        doc.head.appendChild(scriptTag);
+    }
 
     var plt = new PlatformClient(window, document, ionic);
-    var config = new Config();
+    var config = ionic.config || new Config();
     var renderer = initRenderer(plt);
     var ctrls = new WeakMap();
     Object.keys(ionic.components || {}).forEach(function (tag) {
         var cmpMeta = initComponentMeta(tag, ionic.components[tag]);
         plt.registerComponent(cmpMeta);
         window.customElements.define(tag, class extends HTMLElement {
-            constructor() {
-                super();
-            }
             connectedCallback() {
                 var ctrl = {};
                 ctrls.set(this, ctrl);
