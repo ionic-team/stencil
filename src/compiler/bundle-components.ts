@@ -176,17 +176,14 @@ function bundleComponentJs(file: FileMeta, opts: CompilerOptions, ctx: CompilerC
   }).then((bundle: any) => {
 
     const result = bundle.generate({
-      format: 'es'
+      format: 'cjs'
     });
 
     let code: string = result.code;
 
-    const match = /export {(.*?)};/g.exec(code);
-    if (match) {
-      code = code.replace(match[0], `return ${match[1].trim()};`)
-    }
+    code = code.replace(`Object.defineProperty(exports, '__esModule', { value: true });`, '');
 
-    code = `function __moduleFn() {
+    code = `function __importModuleFn(exports) {
       ${code};
     }`
 
@@ -215,7 +212,7 @@ function bundleComponentJs(file: FileMeta, opts: CompilerOptions, ctx: CompilerC
     });
 
     let moduleFn = transpileResult.code;
-    moduleFn = moduleFn.replace('function __moduleFn()', 'function()');
+    moduleFn = moduleFn.replace('function __importModuleFn(', 'function(');
 
     const promises: Promise<any>[] = [];
 

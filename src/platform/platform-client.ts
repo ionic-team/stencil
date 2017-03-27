@@ -27,9 +27,13 @@ export class PlatformClient implements PlatformApi {
     const ua = window.navigator.userAgent.toLowerCase();
     self.isIOS = /iphone|ipad|ipod|ios/.test(ua);
 
-    ionic.loadComponent = function loadComponent(tag, mode, id, styles, moduleFn) {
+    ionic.loadComponent = function loadComponent(tag, mode, id, styles, importModuleFn) {
       const cmpMeta = self.registry[tag];
-      cmpMeta.module = moduleFn();
+
+      const moduleImports = {};
+      importModuleFn(moduleImports);
+      const importNames = Object.keys(moduleImports);
+      cmpMeta.module = moduleImports[importNames[0]];
 
       const cmpMode = cmpMeta.modes[mode];
       cmpMode.styles = styles;
