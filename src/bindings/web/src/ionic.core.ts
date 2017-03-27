@@ -15,7 +15,7 @@ declare const ionic: Ionic;
 
 
 const plt = new PlatformClient(window, document, ionic);
-const config = new Config();
+const config = ionic.config || new Config();
 const renderer = initRenderer(plt);
 
 const ctrls = new WeakMap<HTMLElement, ComponentController>();

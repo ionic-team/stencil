@@ -1,6 +1,9 @@
+import { Config } from './config';
+
 
 export interface Ionic {
   components?: {[tag: string]: any[]};
+  config?: Config;
   loadComponent?: {(tag: string, mode: string, id: string, styles: string, moduleFn: Function): void};
 }
 
