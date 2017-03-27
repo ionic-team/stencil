@@ -46,4 +46,25 @@ export function getComponentId(tag: string, mode: string, id: string) {
   return `${tag}.${mode}.${id}`;
 }
 
+export function getPropValue(propType: string, value: any): any {
+  if (propType === 'boolean') {
+    if (isString(value)) {
+      return (value !== 'false')
+    }
+    return !!value;
+  }
+
+  if (propType === 'number') {
+    if (isNumber(value)) {
+      return value;
+    }
+    try {
+      return parseFloat(value);
+    } catch (e) {}
+    return NaN;
+  }
+
+  return value;
+}
+
 export function noop(){};

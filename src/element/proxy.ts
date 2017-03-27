@@ -1,6 +1,6 @@
 import { Config } from '../utils/config';
-import { ComponentController, ComponentInstance, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
-import { isDef, isNumber, isString, toCamelCase, toDashCase } from '../utils/helpers';
+import { ComponentController, ComponentInstance, ComponentMeta, Props, ProxyElement, Renderer } from '../utils/interfaces';
+import { getPropValue, isDef, toCamelCase, toDashCase } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
@@ -8,21 +8,16 @@ import { queueUpdate } from './update';
 export function initState(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   const instance = ctrl.instance;
   const state = ctrl.state = {};
-  const props = cmpMeta.props;
 
 
-  Object.keys(props).forEach(propName => {
-    const propType = props[propName].type;
-
-    state[propName] = getInitialValue(plt, config, elm, instance, propName);
+  Object.keys(cmpMeta.props).forEach(propName => {
+    state[propName] = getInitialValue(plt, config, elm, instance, cmpMeta.props, propName);
 
     function getState() {
       return state[propName];
     }
 
     function setState(value: any) {
-      value = getPropValue(propType, value);
-
       if (state[propName] !== value) {
         state[propName] = value;
 
@@ -44,29 +39,7 @@ export function initState(plt: PlatformApi, config: Config, renderer: Renderer, 
 }
 
 
-function getPropValue(propType: string, value: any): any {
-  if (propType === 'boolean') {
-    if (isString(value)) {
-      return (value !== 'false')
-    }
-    return !!value;
-  }
-
-  if (propType === 'number') {
-    if (isNumber(value)) {
-      return value;
-    }
-    try {
-      return parseFloat(value);
-    } catch (e) {}
-    return NaN;
-  }
-
-  return value;
-}
-
-
-function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, instance: ComponentInstance, propName: string) {
+function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, instance: ComponentInstance, props: Props, propName: string) {
   let value = plt.getProperty(elm, propName);
   if (isDef(value)) {
     return value;
@@ -74,7 +47,7 @@ function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, ins
 
   value = plt.getAttribute(elm, toCamelCase(propName));
   if (isDef(value)) {
-    return value;
+    return getPropValue(props[propName].type, value);
   }
 
   if (isDef(instance[propName])) {
