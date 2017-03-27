@@ -29,23 +29,37 @@
   </p>
 
   <p>
-    <ion-badge id="dynamicColor">dynamic</ion-badge>
+    <ion-badge id="dynamicProp">dynamic property</ion-badge>
+  </p>
+
+  <p>
+    <ion-badge id="dynamicAttr">dynamic attribute</ion-badge>
   </p>
 
   <script>
-    var dynamicColor = document.getElementById('dynamicColor');
+    var dynamicProp = document.getElementById('dynamicProp');
+    var dynamicAttr = document.getElementById('dynamicAttr');
 
     setInterval(function() {
-      if (dynamicColor.color === 'secondary') {
-        dynamicColor.color = 'danger';
-      } else if (dynamicColor.color === 'danger') {
-        dynamicColor.color = 'light';
-      } else if (dynamicColor.color === 'light') {
-        dynamicColor.color = 'dark';
-      } else if (dynamicColor.color === 'dark') {
-        dynamicColor.color = 'primary';
+      if (dynamicProp.color === 'secondary') {
+        dynamicProp.color = 'danger';
+        dynamicAttr.setAttribute('color', 'danger');
+
+      } else if (dynamicProp.color === 'danger') {
+        dynamicProp.color = 'light';
+        dynamicAttr.setAttribute('color', 'light');
+
+      } else if (dynamicProp.color === 'light') {
+        dynamicProp.color = 'dark';
+        dynamicAttr.setAttribute('color', 'dark');
+
+      } else if (dynamicProp.color === 'dark') {
+        dynamicProp.color = 'primary';
+        dynamicAttr.setAttribute('color', 'primary');
+
       } else {
-        dynamicColor.color = 'secondary';
+        dynamicProp.color = 'secondary';
+        dynamicAttr.setAttribute('color', 'secondary');
       }
     }, 1000);
   </script>
