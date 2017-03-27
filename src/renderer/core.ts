@@ -33,12 +33,6 @@ function isVnode(vnode: any): vnode is VNode {
 
 type KeyToIndexMap = {[key: string]: number};
 
-// type ArraysOf<T> = {
-//   [K in keyof T]: (T[K])[];
-// }
-
-// type ModuleHooks = ArraysOf<Module>;
-
 function createKeyToOldIdx(children: Array<VNode>, beginIdx: number, endIdx: number): KeyToIndexMap {
   let i: number, map: KeyToIndexMap = {}, key: Key, ch;
   for (i = beginIdx; i <= endIdx; ++i) {
@@ -51,21 +45,8 @@ function createKeyToOldIdx(children: Array<VNode>, beginIdx: number, endIdx: num
   return map;
 }
 
-// const hooks: (keyof Module)[] = ['create', 'update', 'remove', 'destroy', 'pre', 'post'];
-
 
 export function initRenderer(api: PlatformApi): Renderer {
-  // let i: number, j: number;
-
-  // for (i = 0; i < hooks.length; ++i) {
-  //   cbs[hooks[i]] = [];
-  //   for (j = 0; j < modules.length; ++j) {
-  //     const hook = modules[j][hooks[i]];
-  //     if (hook !== undefined) {
-  //       (cbs[hooks[i]] as Array<any>).push(hook);
-  //     }
-  //   }
-  // }
 
   function emptyNodeAt(elm: Element) {
     const id = elm.id ? '#' + elm.id : '';
@@ -106,7 +87,6 @@ export function initRenderer(api: PlatformApi): Renderer {
       if (hash < dot) elm.id = sel.slice(hash + 1, dot);
       if (dotIdx > 0) elm.className = sel.slice(dot + 1).replace(/\./g, ' ');
 
-      // for (i = 0; i < cbs.create.length; ++i) cbs.create[i](emptyNode, vnode);
       updateAttrs(emptyNode, vnode);
       updateClass(emptyNode, vnode);
 
@@ -145,22 +125,6 @@ export function initRenderer(api: PlatformApi): Renderer {
     }
   }
 
-  // function invokeDestroyHook(vnode: VNode) {
-  //   let i: any, j: number, data = vnode.data;
-  //   if (data !== undefined) {
-  //     if (isDef(i = data.hook) && isDef(i = i.destroy)) i(vnode);
-  //     for (i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode);
-  //     if (vnode.children !== undefined) {
-  //       for (j = 0; j < vnode.children.length; ++j) {
-  //         i = vnode.children[j];
-  //         if (i != null && typeof i !== "string") {
-  //           invokeDestroyHook(i);
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
   function removeVnodes(parentElm: Node,
                         vnodes: Array<VNode>,
                         startIdx: number,
@@ -169,10 +133,7 @@ export function initRenderer(api: PlatformApi): Renderer {
       let i: any, rm: () => void, ch = vnodes[startIdx];
       if (ch != null) {
         if (isDef(ch.sel)) {
-          // invokeDestroyHook(ch);
-          // listeners = cbs.remove.length + 1;
           rm = createRmCb(ch.elm as Node);
-          // for (i = 0; i < cbs.remove.length; ++i) cbs.remove[i](ch, rm);
           if (isDef(i = ch.data) && isDef(i = i.hook) && isDef(i = i.remove)) {
             i(ch, rm);
           } else {
@@ -268,8 +229,6 @@ export function initRenderer(api: PlatformApi): Renderer {
     let ch = vnode.children;
     if (oldVnode === vnode) return;
     if (vnode.data !== undefined) {
-
-      // for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode);
       updateAttrs(oldVnode, vnode);
       updateClass(oldVnode, vnode);
 
@@ -301,7 +260,6 @@ export function initRenderer(api: PlatformApi): Renderer {
   return function patch(oldVnode: VNode | Element, vnode: VNode): VNode {
     let elm: Node, parent: Node;
     const insertedVnodeQueue: VNodeQueue = [];
-    // for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
 
     if (!isVnode(oldVnode)) {
       oldVnode = emptyNodeAt(oldVnode);
@@ -321,11 +279,6 @@ export function initRenderer(api: PlatformApi): Renderer {
         removeVnodes(parent, [oldVnode], 0, 0);
       }
     }
-
-    // for (i = 0; i < insertedVnodeQueue.length; ++i) {
-    //   (((insertedVnodeQueue[i].data as VNodeData).hook as Hooks).insert as any)(insertedVnodeQueue[i]);
-    // }
-    // for (i = 0; i < cbs.post.length; ++i) cbs.post[i]();
     return vnode;
   };
 }
