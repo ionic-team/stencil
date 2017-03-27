@@ -11,20 +11,23 @@ export class PlatformClient implements PlatformApi {
   private css: {[tag: string]: boolean} = {};
   private nextCBs: Function[] = [];
   private nextPending: boolean;
+  private readCBs: RafCallback[] = [];
+  private writeCBs: RafCallback[] = [];
+  private rafPending: boolean;
   private hasPromises: boolean;
   private isIOS: boolean;
 
   staticDir: string;
 
 
-  constructor(window: Window, private d: HTMLDocument, ionic: Ionic) {
+  constructor(private w: Window, private d: HTMLDocument, ionic: Ionic) {
     const self = this;
 
     self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 
     self.staticDir = getStaticComponentDir(d);
 
-    const ua = window.navigator.userAgent.toLowerCase();
+    const ua = w.navigator.userAgent.toLowerCase();
     self.isIOS = /iphone|ipad|ipod|ios/.test(ua);
 
     ionic.loadComponent = function loadComponent(tag, mode, id, styles, importModuleFn) {
@@ -99,6 +102,60 @@ export class PlatformClient implements PlatformApi {
     }
   }
 
+  domRead(cb: RafCallback) {
+    this.readCBs.push(cb);
+    if (!this.rafPending) {
+      this.rafQueue();
+    }
+  }
+
+  domWrite(cb: RafCallback) {
+    this.writeCBs.push(cb);
+    if (!this.rafPending) {
+      this.rafQueue();
+    }
+  }
+
+  private rafQueue(self?: PlatformClient) {
+    self = this;
+
+    self.rafPending = true;
+
+    self.w.requestAnimationFrame(function rafCallback(timeStamp) {
+      self.rafFlush(timeStamp);
+    });
+  }
+
+  private rafFlush(timeStamp: number, self?: PlatformClient, cb?: RafCallback, err?: any) {
+    self = this;
+
+    try {
+
+      // ******** DOM READS ****************
+      while (cb = self.readCBs.shift()) {
+        cb(timeStamp);
+      }
+
+      // ******** DOM WRITES ****************
+      while (cb = self.writeCBs.shift()) {
+        cb(timeStamp);
+      }
+
+    } catch(e) {
+      err = e;
+    }
+
+    self.rafPending = false;
+
+    if (self.readCBs.length || self.writeCBs.length) {
+      self.rafQueue();
+    }
+
+    if (err) {
+      throw err;
+    }
+  }
+
   loadComponentModule(tag: string, mode: string, cb: LoadComponentCallback): void {
     const cmpMeta = this.registry[tag];
     const cmpMode = cmpMeta.modes[mode];
@@ -117,48 +174,10 @@ export class PlatformClient implements PlatformApi {
         loadedCallbacks[cmpId].push(cb);
       }
 
-      const componentFileName = `${cmpId}.js`;
+      const url = `${this.staticDir}${cmpId}.js`;
 
-      this.jsonp(componentFileName);
+      jsonp(url, this.jsonReqs, this.d);
     }
-  }
-
-  private jsonp(jsonpUrl: string) {
-    var scriptTag: HTMLScriptElement;
-    var tmrId: any;
-    const self = this;
-
-    jsonpUrl = self.staticDir + jsonpUrl;
-
-    if (self.jsonReqs.indexOf(jsonpUrl) > -1) {
-      return;
-    }
-    self.jsonReqs.push(jsonpUrl);
-
-    scriptTag = <HTMLScriptElement>self.createElement('script');
-
-    scriptTag.charset = 'utf-8';
-    scriptTag.async = true;
-    (<any>scriptTag).timeout = 120000;
-
-    scriptTag.src = jsonpUrl;
-
-    tmrId = setTimeout(onScriptComplete, 120000);
-
-    function onScriptComplete() {
-      clearTimeout(tmrId);
-      scriptTag.onerror = scriptTag.onload = null;
-      scriptTag.parentNode.removeChild(scriptTag);
-
-      var index = self.jsonReqs.indexOf(jsonpUrl);
-      if (index > -1) {
-        self.jsonReqs.splice(index, 1);
-      }
-    }
-
-    scriptTag.onerror = scriptTag.onload = onScriptComplete;
-
-    self.d.head.appendChild(scriptTag);
   }
 
   registerComponent(cmpMeta: ComponentMeta) {
@@ -217,10 +236,6 @@ export class PlatformClient implements PlatformApi {
     return elm.getAttribute(attrName);
   }
 
-  setAttribute(elm: HTMLElement, attrName: string, attrValue: any): void {
-    elm.setAttribute(attrName, attrValue);
-  }
-
   getProperty(node: Node, propName: string): any {
     return (<any>node)[propName];
   }
@@ -271,4 +286,42 @@ export class PlatformClient implements PlatformApi {
 
 export interface LoadCallbacks {
   [moduleId: string]: LoadComponentCallback[];
+}
+
+
+export interface RafCallback {
+  (timeStamp?: number): void;
+}
+
+
+function jsonp(jsonpUrl: string, jsonReqs: string[], doc?: HTMLDocument, scriptTag?: HTMLScriptElement, tmrId?: any) {
+  if (jsonReqs.indexOf(jsonpUrl) > -1) {
+    return;
+  }
+  jsonReqs.push(jsonpUrl);
+
+  scriptTag = <HTMLScriptElement>doc.createElement('script');
+
+  scriptTag.charset = 'utf-8';
+  scriptTag.async = true;
+  (<any>scriptTag).timeout = 120000;
+
+  scriptTag.src = jsonpUrl;
+
+  tmrId = setTimeout(onScriptComplete, 120000);
+
+  function onScriptComplete() {
+    clearTimeout(tmrId);
+    scriptTag.onerror = scriptTag.onload = null;
+    scriptTag.parentNode.removeChild(scriptTag);
+
+    var index = jsonReqs.indexOf(jsonpUrl);
+    if (index > -1) {
+      jsonReqs.splice(index, 1);
+    }
+  }
+
+  scriptTag.onerror = scriptTag.onload = onScriptComplete;
+
+  doc.head.appendChild(scriptTag);
 }

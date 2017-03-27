@@ -13,7 +13,7 @@ export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer
     ctrl.queued = true;
 
     // run the patch in the next tick
-    plt.nextTick(function nextUpdate() {
+    plt.domWrite(function domWrite() {
 
       // vdom diff and patch the host element for differences
       update(plt, config, renderer, elm, ctrl, cmpMeta);
@@ -62,7 +62,7 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
   // we need it to pass it the actual host element
   ctrl.vnode = renderer(ctrl.vnode ? ctrl.vnode : elm, vnode);
 
-  if (isUndef(ctrl.connected)) {
+  if (!ctrl.connected) {
     instance.connectedCallback && instance.connectedCallback();
     ctrl.connected = true;
   }
