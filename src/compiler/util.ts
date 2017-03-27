@@ -1,5 +1,6 @@
 import * as fs from 'fs-extra';
 import * as ts from 'typescript';
+import * as crypto from 'crypto';
 
 
 export function isTsSourceFile(filePath: string) {
@@ -19,6 +20,13 @@ export function isTsSourceFile(filePath: string) {
 
 export function isTransformable(sourceText: string) {
   return (sourceText.indexOf('@Component') > -1);
+}
+
+
+export function hashContent(content: string) {
+  const hash = crypto.createHash('sha1');
+  hash.update(content);
+  return hash.digest('hex');
 }
 
 

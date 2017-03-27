@@ -1,22 +1,16 @@
 import { CompilerOptions, CompilerContext, ComponentMode, FileMeta } from './interfaces';
-import { getTsModule, getTsScriptTarget, readFile, writeFile, copy } from './util';
+import { getTsModule, getTsScriptTarget, readFile, writeFile, copy, hashContent } from './util';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as ts from 'typescript';
 import * as babel from 'babel-core';
-import * as crypto from 'crypto';
 import * as nodeUtil from 'util';
 const rollup = require('rollup');
 
 
 export function bundleComponents(opts: CompilerOptions, ctx: CompilerContext) {
   return createComponentFiles(opts, ctx).then(() => {
-
-    return Promise.all([
-      createIonicJs(opts, ctx),
-      createIonicCoreJs(opts, ctx)
-    ]);
-
+    return createIonicJs(opts, ctx);
   });
 }
 
@@ -55,27 +49,32 @@ export function createIonicJs(opts: CompilerOptions, ctx: CompilerContext) {
       ionicJsContent
     ];
 
-    return writeFile(dest, content.join('\n'));
+    let ionicJsOutput = content.join('\n');
+
+    let ionicJsHash = hashContent(ionicJsOutput).substr(0, 8);
+
+    ionicJsOutput = ionicJsOutput.replace('core', ionicJsHash);
+
+    return createIonicCoreJs(opts, ctx, ionicJsHash).then(() => {
+      return writeFile(dest, ionicJsOutput);
+    });
+
   });
 }
 
 
-function createIonicCoreJs(opts: CompilerOptions, ctx: CompilerContext) {
-  const fileName = `ionic.core.js`;
-  const src = path.join(opts.ionicCoreDir, fileName);
-  const dest = path.join(opts.destDir, fileName);
+function createIonicCoreJs(opts: CompilerOptions, ctx: CompilerContext, ionicJsHash: string) {
+  const src = path.join(opts.ionicCoreDir, `ionic.core.js`);
+  const dest = path.join(opts.destDir, `ionic.${ionicJsHash}.js`);
 
-  const fileNameMin = `ionic.core.min.js`;
-  const srcMin = path.join(opts.ionicCoreDir, fileNameMin);
-  const destMin = path.join(opts.destDir, fileNameMin);
+  const srcMin = path.join(opts.ionicCoreDir, `ionic.core.min.js`);
+  const destMin = path.join(opts.destDir, `ionic.${ionicJsHash}.min.js`);
 
-  const fileNameEs5 = `ionic.core.es5.js`;
-  const srcEs5 = path.join(opts.ionicCoreDir, fileNameEs5);
-  const destEs5 = path.join(opts.destDir, fileNameEs5);
+  const srcEs5 = path.join(opts.ionicCoreDir, `ionic.core.es5.js`);
+  const destEs5 = path.join(opts.destDir, `ionic.${ionicJsHash}.es5.js`);
 
-  const fileNameEs5Min = `ionic.core.es5.min.js`;
-  const srcEs5Min = path.join(opts.ionicCoreDir, fileNameEs5Min);
-  const destEs5Min = path.join(opts.destDir, fileNameEs5Min);
+  const srcEs5Min = path.join(opts.ionicCoreDir, `ionic.core.es5.min.js`);
+  const destEs5Min = path.join(opts.destDir, `ionic.${ionicJsHash}.es5.min.js`);
 
   return Promise.all([
     copy(src, dest),
@@ -231,12 +230,9 @@ function bundleComponentMode(file: FileMeta, mode: string, cmpMode: ComponentMod
   styles = styles.replace(/\'/g, '"');
   styles = styles.replace(/\n/g, '');
 
-  const hash = crypto.createHash('sha1')
-  hash.update(`${file.cmpMeta.tag}${mode}${styles}${moduleFn}`);
-  cmpMode.hash = hash.digest('hex');
+  cmpMode.hash = hashContent(`${file.cmpMeta.tag}${mode}${styles}${moduleFn}`);
   cmpMode.id = cmpMode.hash.substr(0, 8);
   cmpMode.fileName = `${file.cmpMeta.tag}.${mode}.${cmpMode.id}.js`;
-
 
   const output = `ionic.loadComponent('${file.cmpMeta.tag}','${mode}','${cmpMode.id}','${styles}',${moduleFn});`;
 
