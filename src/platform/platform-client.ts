@@ -130,6 +130,7 @@ export class PlatformClient implements PlatformApi {
     self = this;
 
     try {
+      const startTime = performance.now();
 
       // ******** DOM READS ****************
       while (cb = self.readCBs.shift()) {
@@ -139,6 +140,10 @@ export class PlatformClient implements PlatformApi {
       // ******** DOM WRITES ****************
       while (cb = self.writeCBs.shift()) {
         cb(timeStamp);
+
+        if ((performance.now() - startTime) > 8) {
+          break;
+        }
       }
 
     } catch(e) {
