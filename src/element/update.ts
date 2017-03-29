@@ -38,12 +38,12 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
     if (elm.attachShadow) {
       ctrl.root = elm.attachShadow({ mode: 'open' });
 
-      if (!cmpMode.styleNode) {
-        cmpMode.styleNode = <HTMLStyleElement>plt.createElement('style');
-        cmpMode.styleNode.innerHTML = cmpMode.styles;
+      if (!cmpMode.styleElm) {
+        cmpMode.styleElm = <HTMLStyleElement>plt.createElement('style');
+        cmpMode.styleElm.innerHTML = cmpMode.styles;
       }
 
-      ctrl.root.appendChild(cmpMode.styleNode.cloneNode(true));
+      ctrl.root.appendChild(cmpMode.styleElm.cloneNode(true));
 
     } else {
       ctrl.root = elm;
