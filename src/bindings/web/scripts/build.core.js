@@ -15,7 +15,7 @@ function bundleIonicJs() {
 }
 
 
-function bundleCoreJs(cePolyfill) {
+function bundleCoreJs() {
   var entryFile = util.distPath('transpiled-web/bindings/web/src/ionic.core.js');
   var outputFile = util.distPath('ionic-core/web/ionic.core.js');
   var outputFileMin = outputFile.replace('.js', '.min.js');
@@ -52,7 +52,7 @@ function bundleCoreEs5Js(cePolyfill) {
     var ceOutput = [
       cePolyfill,
       result.code
-    ].join('\n');
+    ].join(';\n');
 
     return compiler.transpile(ceOutput, outputFile, ['transform-es2015-classes'], true);
   });
@@ -61,15 +61,16 @@ function bundleCoreEs5Js(cePolyfill) {
 
 Promise.all([
   util.readFile(util.nodeModulesPath('@webcomponents/custom-elements/src/custom-elements.js')),
+  util.readFile(util.srcPath('polyfills/webcomponents-sd-ce.js')),
   util.emptyDir(util.distPath('ionic-core/web'))
 ])
 
 .then(results => {
-  var cePolyfill = results[0];
+  var cePolyfill = results[0] + '\n' + results[1];
 
   return Promise.all([
     bundleIonicJs(),
-    bundleCoreJs(cePolyfill),
+    bundleCoreJs(),
     bundleCoreEs5Js(cePolyfill)
   ]);
 });
