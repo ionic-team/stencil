@@ -30,4 +30,5 @@ export interface PlatformApi {
   hasCss: (moduleId: string) => boolean;
   setCss: (moduleId: string) => void;
   getDocumentHead: () => HTMLHeadElement;
+  supports: { shadowDom?: boolean };
 }

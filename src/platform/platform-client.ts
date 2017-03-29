@@ -18,10 +18,13 @@ export class PlatformClient implements PlatformApi {
   private isIOS: boolean;
 
   staticDir: string;
+  supports: { shadowDom?: boolean } = {};
 
 
-  constructor(private w: Window, private d: HTMLDocument, ionic: Ionic) {
+  constructor(private w: any, private d: HTMLDocument, ionic: Ionic) {
     const self = this;
+
+    self.supports.shadowDom = !(w.ShadyDOM && w.ShadyDOM.inUse);
 
     self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 

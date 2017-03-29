@@ -35,9 +35,9 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
   if (isUndef(ctrl.root)) {
     const cmpMode = cmpMeta.modes[instance.mode];
 
-    if (elm.attachShadow) {
-      ctrl.root = elm.attachShadow({ mode: 'open' });
+    ctrl.root = elm.attachShadow({ mode: 'open' });
 
+    if (plt.supports.shadowDom) {
       if (!cmpMode.styleElm) {
         cmpMode.styleElm = <HTMLStyleElement>plt.createElement('style');
         cmpMode.styleElm.innerHTML = cmpMode.styles;
@@ -46,8 +46,6 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
       ctrl.root.appendChild(cmpMode.styleElm.cloneNode(true));
 
     } else {
-      ctrl.root = elm;
-
       const cmpId = getComponentId(cmpMeta.tag, instance.mode, cmpMode.id);
       if (!plt.hasCss(cmpId)) {
         const headStyleEle = <HTMLStyleElement>plt.createElement('style');
