@@ -23,6 +23,7 @@ export interface ComponentMode {
   id?: string;
   styles?: string;
   styleUrls?: string[];
+  styleNode?: HTMLStyleElement;
 }
 
 

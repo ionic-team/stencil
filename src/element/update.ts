@@ -37,9 +37,13 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
 
     if (elm.attachShadow) {
       ctrl.root = elm.attachShadow({ mode: 'open' });
-      const shadowStyleEle = <HTMLStyleElement>plt.createElement('style');
-      shadowStyleEle.innerHTML = cmpMode.styles;
-      ctrl.root.appendChild(shadowStyleEle);
+
+      if (!cmpMode.styleNode) {
+        cmpMode.styleNode = <HTMLStyleElement>plt.createElement('style');
+        cmpMode.styleNode.innerHTML = cmpMode.styles;
+      }
+
+      ctrl.root.appendChild(cmpMode.styleNode.cloneNode(true));
 
     } else {
       ctrl.root = elm;
