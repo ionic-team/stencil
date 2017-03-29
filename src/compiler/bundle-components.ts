@@ -245,7 +245,7 @@ function bundleComponentMode(file: FileMeta, mode: string, cmpMode: ComponentMod
   cmpMode.id = cmpMode.hash.substr(0, 8);
   cmpMode.fileName = `${file.cmpMeta.tag}.${mode}.${cmpMode.id}.js`;
 
-  const output = `ionic.loadComponent('${file.cmpMeta.tag}','${mode}','${cmpMode.id}','${styles}',${moduleFn});`;
+  const output = `Ionic.loadComponent('${file.cmpMeta.tag}','${mode}','${cmpMode.id}','${styles}',${moduleFn});`;
 
   const outfile = path.join(opts.destDir, cmpMode.fileName);
 
