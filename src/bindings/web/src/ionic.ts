@@ -2,16 +2,6 @@
 (function(window: any, document: HTMLDocument, requiresEs5: {(): boolean}) {
   'use strict';
 
-  var tags = window.Ionic && window.Ionic.components && Object.keys(window.Ionic.components);
-  if (tags) {
-    var styleElm = document.createElement('style');
-    tags = tags.map(function(tag) {
-      return tag + ':not([upgraded])';
-    });
-    styleElm.innerHTML = tags.join(',') + '{visibility:hidden;overflow:hidden}';
-    document.head.appendChild(styleElm);
-  }
-
   var staticDir: string;
 
   var scriptElm: any = document.getElementsByTagName('script');
