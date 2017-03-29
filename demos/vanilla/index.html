@@ -4,36 +4,25 @@
   <meta charset="UTF-8">
   <title>Ionic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <script src="ionic-web/ionic.js"></script>
+  <script src="/dist/ionic-web/ionic.js"></script>
 </head>
 <body>
 
   <p>
     <ion-badge>default</ion-badge>
-  </p>
-
-  <p>
     <ion-badge color="secondary">secondary</ion-badge>
-  </p>
-
-  <p>
     <ion-badge color="danger">danger</ion-badge>
-  </p>
-
-  <p>
     <ion-badge color="light">light</ion-badge>
-  </p>
-
-  <p>
     <ion-badge color="dark">dark</ion-badge>
   </p>
 
   <p>
     <ion-badge id="dynamicProp">dynamic property</ion-badge>
+    <ion-badge id="dynamicAttr">dynamic attribute</ion-badge>
   </p>
 
-  <p>
-    <ion-badge id="dynamicAttr">dynamic attribute</ion-badge>
+  <p id="dynamicBadges">
+
   </p>
 
   <script>
@@ -62,6 +51,15 @@
         dynamicAttr.setAttribute('color', 'secondary');
       }
     }, 1000);
+
+
+    var dynamicBadges = document.getElementById('dynamicBadges');
+    for (var i = 0; i < 200; i++) {
+      var badge = document.createElement('ion-badge');
+      badge.innerHTML = i;
+      dynamicBadges.appendChild(badge);
+    }
+
   </script>
 
 </body>
