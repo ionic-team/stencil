@@ -27,7 +27,7 @@ function bundleCoreJs(cePolyfill) {
     var result = bundle.generate({
       format: 'es',
       intro: '(function(window, document, ionic) {',
-      outro: '})(window, document, window.ionic = window.ionic || {});'
+      outro: '})(window, document, window.Ionic = window.Ionic || {});'
     });
 
     return compiler.transpile(result.code, outputFile, [], true);
@@ -46,7 +46,7 @@ function bundleCoreEs5Js(cePolyfill) {
     var result = bundle.generate({
       format: 'es',
       intro: '(function(window, document, ionic) {',
-      outro: '})(window, document, window.ionic = window.ionic || {});'
+      outro: '})(window, document, window.Ionic = window.Ionic || {});'
     });
 
     var ceOutput = [

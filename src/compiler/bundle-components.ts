@@ -46,7 +46,7 @@ export function createIonicJs(opts: CompilerOptions, ctx: CompilerContext) {
 
   const cmpStr = nodeUtil.inspect(components, false, null).replace(/\s/g, '');
 
-  const componentJs = `window.ionic=window.ionic||{};window.ionic.components=${cmpStr};`;
+  const componentJs = `window.Ionic=window.Ionic||{};window.Ionic.components=${cmpStr};`;
 
 
   return createIonicCoreJs(opts, ctx).then((results: any[]) => {
