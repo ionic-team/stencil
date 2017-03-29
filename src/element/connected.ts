@@ -2,7 +2,7 @@ import { ComponentController, ProxyElement, Renderer } from '../utils/interfaces
 import { Config } from '../utils/config';
 import { isDef } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
-import { update } from './update';
+import { queueUpdate } from './update';
 
 
 export function connectedCallback(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
@@ -10,7 +10,7 @@ export function connectedCallback(plt: PlatformApi, config: Config, renderer: Re
     const mode = getMode(plt, config, elm, 'mode');
 
     plt.loadComponentModule(tag, mode, function loadedModule(cmpMeta) {
-      update(plt, config, renderer, elm, ctrl, cmpMeta);
+      queueUpdate(plt, config, renderer, elm, ctrl, cmpMeta);
     });
   });
 }
