@@ -14,8 +14,8 @@ $badge-font-weight:               bold !default;
 ion-badge,
 :host {
   display: inline-block;
+  contain: layout content;
 }
-
 
 .badge {
   padding: 3px 8px;
