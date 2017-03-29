@@ -16,6 +16,7 @@ function addNS(data: any, children: Array<VNode> | undefined, sel: string | unde
 }
 
 export function h(sel: string): VNode;
+export function h(sel: Node, data: VNodeData): VNode;
 export function h(sel: string, data: VNodeData): VNode;
 export function h(sel: string, text: string): VNode;
 export function h(sel: string, children: Array<VNode>): VNode;

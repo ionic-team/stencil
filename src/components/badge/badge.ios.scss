@@ -15,8 +15,7 @@ $badge-ios-background-color:   color($colors-ios, primary) !default;
 $badge-ios-text-color:         color-contrast($colors-ios, $badge-ios-background-color) !default;
 
 
-.badge-ios,
-:host {
+.badge-ios {
   border-radius: $badge-ios-border-radius;
   color: $badge-ios-text-color;
   background-color: $badge-ios-background-color;
@@ -28,8 +27,7 @@ $badge-ios-text-color:         color-contrast($colors-ios, $badge-ios-background
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
 
-  .badge-ios-#{$color-name},
-  :host([color=#{$color-name}]) {
+  .badge-ios-#{$color-name} {
     color: $color-contrast;
     background-color: $color-base;
   }
