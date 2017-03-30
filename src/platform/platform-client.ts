@@ -1,12 +1,12 @@
 import { PlatformApi } from './platform-api';
-import { getComponentId, noop, toCamelCase } from '../utils/helpers';
-import { ComponentRegistry, ComponentMeta, Ionic, LoadComponentCallback } from '../utils/interfaces';
+import { ComponentRegistry, ComponentMeta, ComponentMode, Ionic } from '../utils/interfaces';
 import { getStaticComponentDir } from '../utils/helpers';
+import { noop, toCamelCase } from '../utils/helpers';
 
 
 export class PlatformClient implements PlatformApi {
   private registry: ComponentRegistry = {};
-  private loadCBs: LoadCallbacks = {};
+  private bundleCBs: BundleCallbacks = {};
   private jsonReqs: string[] = [];
   private css: {[tag: string]: boolean} = {};
   private nextCBs: Function[] = [];
@@ -16,45 +16,75 @@ export class PlatformClient implements PlatformApi {
   private rafPending: boolean;
   private hasPromises: boolean;
   private isIOS: boolean;
+  private raf: {(cb: {(timeStamp?: number): void}): void};
 
   staticDir: string;
   supports: { shadowDom?: boolean } = {};
 
 
-  constructor(private w: any, private d: HTMLDocument, ionic: Ionic) {
+  constructor(win: any, private d: HTMLDocument, ionic: Ionic) {
     const self = this;
 
-    self.supports.shadowDom = !(w.ShadyDOM && w.ShadyDOM.inUse);
+    self.supports.shadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
 
     self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 
     self.staticDir = getStaticComponentDir(d);
 
-    const ua = w.navigator.userAgent.toLowerCase();
+    const ua = win.navigator.userAgent.toLowerCase();
     self.isIOS = /iphone|ipad|ipod|ios/.test(ua);
 
-    ionic.loadComponent = function loadComponent(tag, mode, id, styles, importModuleFn) {
-      const cmpMeta = self.registry[tag];
+    self.raf = ionic.raf ? ionic.raf : win.requestAnimationFrame.bind(win);
 
-      const moduleImports = {};
-      importModuleFn(moduleImports);
-      const importNames = Object.keys(moduleImports);
-      cmpMeta.module = moduleImports[importNames[0]];
+    ionic.loadComponents = function loadComponent(bundleId) {
+      const args = arguments;
+      for (var i = 1; i < args.length; i++) {
+        var cmpModeData = args[i];
+        var tag = cmpModeData[0];
+        var mode = cmpModeData[1];
 
-      const cmpMode = cmpMeta.modes[mode];
-      cmpMode.styles = styles;
-      cmpMode.loaded = true;
+        var cmpMeta = self.registry[tag];
+        var cmpMode = cmpMeta.modes[mode];
 
-      const moduleId = getComponentId(tag, mode, id);
+        cmpMode.styles = cmpModeData[2];
 
-      const callbacks = self.loadCBs[moduleId];
+        var importModuleFn = cmpModeData[3];
+        var moduleImports = {};
+        importModuleFn(moduleImports);
+        cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
+
+        cmpMode.loaded = true;
+      }
+
+      const callbacks = self.bundleCBs[bundleId];
       if (callbacks) {
         for (var i = 0, l = callbacks.length; i < l; i++) {
-          callbacks[i](cmpMeta, cmpMode);
+          callbacks[i]();
         }
-        delete self.loadCBs[moduleId];
+        delete self.bundleCBs[bundleId];
       }
     };
+  }
+
+  loadComponent(cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function): void {
+    if (cmpMode && cmpMode.loaded) {
+      cb(cmpMeta, cmpMode);
+
+    } else {
+      const bundleId = cmpMode.bundleId;
+
+      const bundleCallbacks = this.bundleCBs;
+
+      if (bundleCallbacks[bundleId]) {
+        bundleCallbacks[bundleId].push(cb);
+      } else {
+        bundleCallbacks[bundleId] = [cb];
+      }
+
+      const url = `${this.staticDir}ionic.${bundleId}.js`;
+
+      jsonp(url, this.jsonReqs, this.d);
+    }
   }
 
   nextTick(cb: Function) {
@@ -124,7 +154,7 @@ export class PlatformClient implements PlatformApi {
 
     self.rafPending = true;
 
-    self.w.requestAnimationFrame(function rafCallback(timeStamp) {
+    self.raf(function rafCallback(timeStamp) {
       self.rafFlush(timeStamp);
     });
   }
@@ -164,32 +194,12 @@ export class PlatformClient implements PlatformApi {
     }
   }
 
-  loadComponentModule(tag: string, mode: string, cb: LoadComponentCallback): void {
-    const cmpMeta = this.registry[tag];
-    const cmpMode = cmpMeta.modes[mode];
-
-    if (cmpMode && cmpMode.loaded) {
-      cb(cmpMeta, cmpMode);
-
-    } else {
-      const cmpId = getComponentId(tag, mode, cmpMode.id);
-
-      const loadedCallbacks = this.loadCBs;
-
-      if (!loadedCallbacks[cmpId]) {
-        loadedCallbacks[cmpId] = [cb];
-      } else {
-        loadedCallbacks[cmpId].push(cb);
-      }
-
-      const url = `${this.staticDir}${cmpId}.js`;
-
-      jsonp(url, this.jsonReqs, this.d);
-    }
-  }
-
   registerComponent(cmpMeta: ComponentMeta) {
     this.registry[cmpMeta.tag] = cmpMeta;
+  }
+
+  getComponentMeta(tag: string) {
+    return this.registry[tag];
   }
 
   createElement(tagName: any): HTMLElement {
@@ -292,8 +302,8 @@ export class PlatformClient implements PlatformApi {
 }
 
 
-export interface LoadCallbacks {
-  [moduleId: string]: LoadComponentCallback[];
+export interface BundleCallbacks {
+  [bundleId: string]: Function[];
 }
 
 

@@ -7,7 +7,8 @@ import { queueUpdate } from './update';
 
 export function initState(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   const instance = ctrl.instance;
-  const state = ctrl.state = {};
+  const state = {};
+  const tag = cmpMeta.tag;
 
 
   Object.keys(cmpMeta.props).forEach(propName => {
@@ -21,7 +22,7 @@ export function initState(plt: PlatformApi, config: Config, renderer: Renderer, 
       if (state[propName] !== value) {
         state[propName] = value;
 
-        queueUpdate(plt, config, renderer, elm, ctrl, cmpMeta);
+        queueUpdate(plt, config, renderer, elm, ctrl, tag);
       }
     }
 
@@ -63,7 +64,7 @@ function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, ins
 
 
 export function initComponentMeta(tag: string, data: any[]) {
-  const modeIds = data[0];
+  const modeBundleIds = data[0];
   const props = data[1] || {};
 
   const cmpMeta: ComponentMeta = {
@@ -72,10 +73,10 @@ export function initComponentMeta(tag: string, data: any[]) {
     props: props
   };
 
-  let keys = Object.keys(modeIds);
+  let keys = Object.keys(modeBundleIds);
   for (var i = 0; i < keys.length; i++) {
     cmpMeta.modes[keys[i]] = {
-      id: modeIds[keys[i]]
+      bundleId: modeBundleIds[keys[i]]
     };
   }
 

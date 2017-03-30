@@ -1,13 +1,12 @@
-import { ComponentController, ComponentMeta, ProxyElement } from '../utils/interfaces';
-import { PlatformApi } from '../platform/platform-api';
+import { ComponentController, ProxyElement } from '../utils/interfaces';
 import { Config } from '../utils/config';
 import { generateVNode } from './host';
 import { initState } from './proxy';
+import { PlatformApi } from '../platform/platform-api';
 import { Renderer } from '../utils/interfaces';
-import { getComponentId, isUndef } from '../utils/helpers';
 
 
-export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
+export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   // only run patch if it isn't queued already
   if (!ctrl.queued) {
     ctrl.queued = true;
@@ -16,7 +15,7 @@ export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer
     plt.domWrite(function domWrite() {
 
       // vdom diff and patch the host element for differences
-      update(plt, config, renderer, elm, ctrl, cmpMeta);
+      update(plt, config, renderer, elm, ctrl, tag);
 
       // no longer queued
       ctrl.queued = false;
@@ -25,14 +24,16 @@ export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer
 }
 
 
-export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
+export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+  const cmpMeta = plt.getComponentMeta(tag);
+
   let instance = ctrl.instance;
-  if (isUndef(instance)) {
-    instance = ctrl.instance = new cmpMeta.module();
+  if (!instance) {
+    instance = ctrl.instance = new cmpMeta.componentModule();
     initState(plt, config, renderer, elm, ctrl, cmpMeta);
   }
 
-  if (isUndef(ctrl.root)) {
+  if (!ctrl.root) {
     const cmpMode = cmpMeta.modes[instance.mode];
 
     ctrl.root = elm.attachShadow({ mode: 'open' });
@@ -46,13 +47,13 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
       ctrl.root.appendChild(cmpMode.styleElm.cloneNode(true));
 
     } else {
-      const cmpId = getComponentId(cmpMeta.tag, instance.mode, cmpMode.id);
-      if (!plt.hasCss(cmpId)) {
+      const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
+      if (!plt.hasCss(cmpModeId)) {
         const headStyleEle = <HTMLStyleElement>plt.createElement('style');
-        headStyleEle.dataset['componentId'] = cmpId;
+        headStyleEle.dataset['cmpModeId'] = cmpModeId;
         headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
         plt.appendChild(plt.getDocumentHead(), headStyleEle);
-        plt.setCss(cmpId);
+        plt.setCss(cmpModeId);
       }
     }
   }

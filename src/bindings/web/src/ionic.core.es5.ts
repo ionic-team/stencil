@@ -35,7 +35,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
   ProxyElementES5.prototype.connectedCallback = function() {
     var ctrl: ComponentController = {};
     ctrls.set(this, ctrl);
-    connectedCallback(plt, config, renderer, this, ctrl, tag);
+    connectedCallback(plt, config, renderer, this, ctrl, cmpMeta);
   };
 
   ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {

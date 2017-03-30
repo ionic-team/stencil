@@ -1,9 +1,10 @@
-import { ComponentMeta, LoadComponentCallback } from '../utils/interfaces';
+import { ComponentMeta, ComponentMode } from '../utils/interfaces';
 
 
 export interface PlatformApi {
   registerComponent: (cmpMeta: ComponentMeta) => void;
-  loadComponentModule: (tag: string, mode: string, cb: LoadComponentCallback) => void ;
+  getComponentMeta: (tag: string) => ComponentMeta;
+  loadComponent: (cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function) => void ;
   createElement: (tagName: any) => HTMLElement;
   createElementNS: (namespaceURI: string, qualifiedName: string) => Element;
   createTextNode: (text: string) => Text;

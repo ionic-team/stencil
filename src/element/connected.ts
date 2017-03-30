@@ -1,16 +1,18 @@
-import { ComponentController, ProxyElement, Renderer } from '../utils/interfaces';
+import { ComponentController, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
 import { Config } from '../utils/config';
 import { isDef } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 
-export function connectedCallback(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+export function connectedCallback(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   plt.nextTick(() => {
+    const tag = cmpMeta.tag;
     const mode = getMode(plt, config, elm, 'mode');
+    const cmpMode = cmpMeta.modes[mode];
 
-    plt.loadComponentModule(tag, mode, function loadedModule(cmpMeta) {
-      queueUpdate(plt, config, renderer, elm, ctrl, cmpMeta);
+    plt.loadComponent(cmpMeta, cmpMode, function loadComponentCallback() {
+      queueUpdate(plt, config, renderer, elm, ctrl, tag);
     });
   });
 }

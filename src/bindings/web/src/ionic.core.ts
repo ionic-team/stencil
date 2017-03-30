@@ -31,7 +31,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
     connectedCallback() {
       const ctrl: ComponentController = {};
       ctrls.set(this, ctrl);
-      connectedCallback(plt, config, renderer, this, ctrl, tag);
+      connectedCallback(plt, config, renderer, this, ctrl, cmpMeta);
     }
 
     attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {

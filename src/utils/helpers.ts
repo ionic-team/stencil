@@ -42,10 +42,6 @@ export function getStaticComponentDir(doc: HTMLDocument) {
   return '/';
 }
 
-export function getComponentId(tag: string, mode: string, id: string) {
-  return `${tag}.${mode}.${id}`;
-}
-
 export function getPropValue(propType: string, value: any): any {
   if (propType === 'boolean') {
     if (isString(value)) {

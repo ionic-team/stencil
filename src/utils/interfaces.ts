@@ -4,7 +4,10 @@ import { Config } from './config';
 export interface Ionic {
   components?: {[tag: string]: any[]};
   config?: Config;
-  loadComponent?: {(tag: string, mode: string, id: string, styles: string, moduleFn: Function): void};
+  loadComponents?: {
+    (bundleId: string, componentModeData: any[]);
+  };
+  raf?: {(cb: {(timeStamp?: number): void}): void};
 }
 
 
@@ -13,14 +16,14 @@ export interface ComponentMeta {
   props?: Props;
   observedAttributes?: string[];
   hostCss?: string;
-  module?: any;
-  modes: {[mode: string]: ComponentMode};
+  componentModule?: any;
+  modes: {[modeName: string]: ComponentMode};
 }
 
 
 export interface ComponentMode {
   loaded?: boolean;
-  id?: string;
+  bundleId?: string;
   styles?: string;
   styleUrls?: string[];
   styleElm?: HTMLStyleElement;
@@ -44,7 +47,6 @@ export interface ComponentController {
   instance?: ComponentInstance;
   vnode?: VNode;
   connected?: boolean;
-  state?: {[propName: string]: any};
 }
 
 
@@ -55,11 +57,6 @@ export interface ComponentModule {
 
 export interface ComponentRegistry {
   [tag: string]: ComponentMeta;
-}
-
-
-export interface LoadComponentCallback {
-  (cmpMeta: ComponentMeta, cmpMode: ComponentMode): void;
 }
 
 
