@@ -253,14 +253,6 @@ export class PlatformClient implements PlatformApi {
     return elm.getAttribute(attrName);
   }
 
-  getProperty(node: Node, propName: string): any {
-    return (<any>node)[propName];
-  }
-
-  setProperty(node: Node, propName: string, propValue: any): any {
-    (<any>node)[propName] = propValue;
-  }
-
   setStyle(elm: HTMLElement, styleName: string, styleValue: any) {
     (<any>elm.style)[toCamelCase(styleName)] = styleValue;
   }
