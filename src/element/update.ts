@@ -1,7 +1,7 @@
 import { ComponentController, ProxyElement } from '../utils/interfaces';
 import { Config } from '../utils/config';
 import { generateVNode } from './host';
-import { initState } from './proxy';
+import { initProps } from './proxy';
 import { PlatformApi } from '../platform/platform-api';
 import { Renderer } from '../utils/interfaces';
 
@@ -30,7 +30,7 @@ export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm
   let instance = ctrl.instance;
   if (!instance) {
     instance = ctrl.instance = new cmpMeta.componentModule();
-    initState(plt, config, renderer, elm, ctrl, cmpMeta);
+    initProps(plt, config, renderer, elm, ctrl, tag, cmpMeta.props);
   }
 
   if (!ctrl.root) {

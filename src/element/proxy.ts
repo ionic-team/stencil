@@ -1,63 +1,59 @@
 import { Config } from '../utils/config';
-import { ComponentController, ComponentInstance, ComponentMeta, Props, ProxyElement, Renderer } from '../utils/interfaces';
-import { getPropValue, isDef, toCamelCase, toDashCase } from '../utils/helpers';
+import { ComponentController, ComponentMeta, Props, ProxyElement, Renderer } from '../utils/interfaces';
+import { getPropValue, toCamelCase, toDashCase } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 
-export function initState(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
+export function initProps(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
   const instance = ctrl.instance;
-  const state = {};
-  const tag = cmpMeta.tag;
+  const lastPropValues: {[propName: string]: any} = {};
 
 
-  Object.keys(cmpMeta.props).forEach(propName => {
-    state[propName] = getInitialValue(plt, config, elm, instance, cmpMeta.props, propName);
+  Object.keys(props).forEach(propName => {
+    lastPropValues[propName] = getInitialValue(plt, config, elm, props, propName);
 
-    function getState() {
-      return state[propName];
+    function getPropValue() {
+      return lastPropValues[propName];
     }
 
-    function setState(value: any) {
-      if (state[propName] !== value) {
-        state[propName] = value;
-
-        queueUpdate(plt, config, renderer, elm, ctrl, tag);
-      }
-    }
-
+    // dom's element instance
     Object.defineProperty(elm, propName, {
-      get: getState,
-      set: setState
+      get: getPropValue,
+      set: function setPropValue(value: any) {
+        if (lastPropValues[propName] !== value) {
+          lastPropValues[propName] = value;
+
+          queueUpdate(plt, config, renderer, elm, ctrl, tag);
+        }
+      }
     });
 
+    // user's component instance
     Object.defineProperty(instance, propName, {
-      get: getState,
-      set: setState
+      get: getPropValue,
+      set: function invalidSetProperty() {
+        console.error(`${propName}: passed in property values cannot be changed`);
+      }
     });
 
   });
 }
 
 
-function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, instance: ComponentInstance, props: Props, propName: string) {
-  let value = plt.getProperty(elm, propName);
-  if (isDef(value)) {
+function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, props: Props, propName: string): any {
+  let value = elm[propName];
+  if (value !== undefined) {
     return value;
   }
 
   value = plt.getAttribute(elm, toCamelCase(propName));
-  if (isDef(value)) {
+  if (value !== undefined) {
     return getPropValue(props[propName].type, value);
   }
 
-  if (isDef(instance[propName])) {
-    plt.setProperty(elm, propName, instance[propName]);
-    return instance[propName];
-  }
-
   value = config.get(propName);
-  if (isDef(value)) {
+  if (value !== undefined) {
     return value;
   }
 }
