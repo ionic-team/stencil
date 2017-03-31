@@ -2,7 +2,6 @@ import { ComponentController, ComponentMeta, Ionic, ProxyElement } from '../../.
 import { attributeChangedCallback } from '../../../element/attribute-changed';
 import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
-import { Config } from '../../../utils/config';
 import { PlatformApi } from '../../../platform/platform-api';
 import { PlatformClient } from '../../../platform/platform-client';
 import { update } from '../../../element/update';
@@ -15,7 +14,6 @@ declare const ionic: Ionic;
 
 
 const plt = new PlatformClient(window, document, ionic);
-const config = ionic.config || new Config();
 const renderer = initRenderer(plt);
 
 const ctrls = new WeakMap<HTMLElement, ComponentController>();
@@ -35,7 +33,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
   ProxyElementES5.prototype.connectedCallback = function() {
     var ctrl: ComponentController = {};
     ctrls.set(this, ctrl);
-    connectedCallback(plt, config, renderer, this, ctrl, cmpMeta);
+    connectedCallback(plt, ionic.config, renderer, this, ctrl, cmpMeta);
   };
 
   ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {

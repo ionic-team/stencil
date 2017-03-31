@@ -1,5 +1,4 @@
-import { Config } from '../utils/config';
-import { ComponentController, ComponentMeta, Props, ProxyElement, Renderer } from '../utils/interfaces';
+import { ComponentController, ComponentMeta, Config, Props, ProxyElement, Renderer } from '../utils/interfaces';
 import { getPropValue, toCamelCase, toDashCase } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';

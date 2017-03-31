@@ -1,5 +1,4 @@
-import { ComponentController, ComponentMeta, ProxyElement, Renderer } from '../utils/interfaces';
-import { Config } from '../utils/config';
+import { ComponentController, ComponentMeta, Config, ProxyElement, Renderer } from '../utils/interfaces';
 import { isDef } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';

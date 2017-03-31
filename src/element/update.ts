@@ -1,5 +1,4 @@
-import { ComponentController, ProxyElement } from '../utils/interfaces';
-import { Config } from '../utils/config';
+import { ComponentController, Config, ProxyElement } from '../utils/interfaces';
 import { generateVNode } from './host';
 import { initProps } from './proxy';
 import { PlatformApi } from '../platform/platform-api';

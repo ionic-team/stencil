@@ -1,5 +1,3 @@
-import { Config } from './config';
-
 
 export interface Ionic {
   staticDir?: string;
@@ -9,6 +7,11 @@ export interface Ionic {
     (bundleId: string, componentModeData: any[]);
   };
   raf?: {(cb: {(timeStamp?: number): void}): void};
+}
+
+
+export interface Config {
+  get: (key: string, fallback?: any) => any;
 }
 
 

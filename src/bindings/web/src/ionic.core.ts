@@ -3,7 +3,6 @@ import { attributeChangedCallback } from '../../../element/attribute-changed';
 import { update } from '../../../element/update';
 import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
-import { Config } from '../../../utils/config';
 import { PlatformApi } from '../../../platform/platform-api';
 import { PlatformClient } from '../../../platform/platform-client';
 import { initRenderer } from '../../../renderer/core';
@@ -15,7 +14,6 @@ declare const ionic: Ionic;
 
 
 const plt = new PlatformClient(window, document, ionic);
-const config = ionic.config || new Config();
 const renderer = initRenderer(plt);
 
 const ctrls = new WeakMap<HTMLElement, ComponentController>();
@@ -31,7 +29,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
     connectedCallback() {
       const ctrl: ComponentController = {};
       ctrls.set(this, ctrl);
-      connectedCallback(plt, config, renderer, this, ctrl, cmpMeta);
+      connectedCallback(plt, ionic.config, renderer, this, ctrl, cmpMeta);
     }
 
     attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
