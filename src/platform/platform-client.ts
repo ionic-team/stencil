@@ -1,7 +1,6 @@
-import { PlatformApi } from './platform-api';
-import { ComponentRegistry, ComponentMeta, ComponentMode, Ionic } from '../utils/interfaces';
-import { getStaticComponentDir } from '../utils/helpers';
+import { ComponentMeta, ComponentMode, ComponentRegistry, Ionic } from '../utils/interfaces';
 import { noop, toCamelCase } from '../utils/helpers';
+import { PlatformApi } from './platform-api';
 
 
 export class PlatformClient implements PlatformApi {
@@ -29,7 +28,7 @@ export class PlatformClient implements PlatformApi {
 
     self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
 
-    self.staticDir = getStaticComponentDir(d);
+    self.staticDir = ionic.staticDir;
 
     const ua = win.navigator.userAgent.toLowerCase();
     self.isIOS = /iphone|ipad|ipod|ios/.test(ua);

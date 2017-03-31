@@ -2,6 +2,7 @@ import { Config } from './config';
 
 
 export interface Ionic {
+  staticDir?: string;
   components?: {[tag: string]: any[]};
   config?: Config;
   loadComponents?: {

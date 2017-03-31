@@ -23,25 +23,6 @@ export function toDashCase(str: string) {
   return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
 }
 
-export function getStaticComponentDir(doc: HTMLDocument) {
-  let staticDirEle = <HTMLScriptElement>doc.querySelector('script[data-static-dir]');
-  if (staticDirEle) {
-    return staticDirEle.dataset['staticDir'];
-  }
-
-  const scriptElms = doc.getElementsByTagName('script');
-  staticDirEle = scriptElms[scriptElms.length - 1];
-
-  if (staticDirEle) {
-    const paths = staticDirEle.src.split('/');
-    paths.pop();
-
-    return staticDirEle.dataset['staticDir'] = paths.join('/') + '/';
-  }
-
-  return '/';
-}
-
 export function getPropValue(propType: string, value: any): any {
   if (propType === 'boolean') {
     if (isString(value)) {
