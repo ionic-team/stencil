@@ -13,7 +13,7 @@ import { initComponentMeta } from '../../../element/proxy';
 declare const ionic: Ionic;
 
 
-const plt = new PlatformClient(window, document, ionic);
+const plt = PlatformClient(window, document, ionic);
 const renderer = initRenderer(plt);
 
 const ctrls = new WeakMap<HTMLElement, ComponentController>();

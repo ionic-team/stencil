@@ -3,101 +3,83 @@ import { noop, toCamelCase } from '../utils/helpers';
 import { PlatformApi } from './platform-api';
 
 
-export class PlatformClient implements PlatformApi {
-  private registry: ComponentRegistry = {};
-  private bundleCBs: BundleCallbacks = {};
-  private jsonReqs: string[] = [];
-  private css: {[tag: string]: boolean} = {};
-  private nextCBs: Function[] = [];
-  private nextPending: boolean;
-  private readCBs: RafCallback[] = [];
-  private writeCBs: RafCallback[] = [];
-  private rafPending: boolean;
-  private hasPromises: boolean;
-  private isIOS: boolean;
-  private raf: {(cb: {(timeStamp?: number): void}): void};
+export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): PlatformApi {
+  const registry: ComponentRegistry = {};
+  const bundleCBs: BundleCallbacks = {};
+  const jsonReqs: string[] = [];
+  const css: {[tag: string]: boolean} = {};
+  const nextCBs: Function[] = [];
+  let nextPending: boolean;
+  const readCBs: RafCallback[] = [];
+  const writeCBs: RafCallback[] = [];
+  let rafPending: boolean;
+  const staticDir: string = ionic.staticDir;
 
-  staticDir: string;
-  supports: { shadowDom?: boolean } = {};
+  const hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
+
+  const ua = win.navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad|ipod|ios/.test(ua);
+
+  const raf: RequestAnimationFrame = ionic.raf ? ionic.raf : win.requestAnimationFrame.bind(win);
 
 
-  constructor(win: any, private d: HTMLDocument, ionic: Ionic) {
-    const self = this;
+  ionic.loadComponents = function loadComponent(bundleId) {
+    const args = arguments;
+    for (var i = 1; i < args.length; i++) {
+      var cmpModeData = args[i];
+      var tag = cmpModeData[0];
+      var mode = cmpModeData[1];
 
-    self.supports.shadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+      var cmpMeta = registry[tag];
+      var cmpMode = cmpMeta.modes[mode];
 
-    self.hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
+      cmpMode.styles = cmpModeData[2];
 
-    self.staticDir = ionic.staticDir;
+      var importModuleFn = cmpModeData[3];
+      var moduleImports = {};
+      importModuleFn(moduleImports);
+      cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
 
-    const ua = win.navigator.userAgent.toLowerCase();
-    self.isIOS = /iphone|ipad|ipod|ios/.test(ua);
+      cmpMode.loaded = true;
+    }
 
-    self.raf = ionic.raf ? ionic.raf : win.requestAnimationFrame.bind(win);
-
-    ionic.loadComponents = function loadComponent(bundleId) {
-      const args = arguments;
-      for (var i = 1; i < args.length; i++) {
-        var cmpModeData = args[i];
-        var tag = cmpModeData[0];
-        var mode = cmpModeData[1];
-
-        var cmpMeta = self.registry[tag];
-        var cmpMode = cmpMeta.modes[mode];
-
-        cmpMode.styles = cmpModeData[2];
-
-        var importModuleFn = cmpModeData[3];
-        var moduleImports = {};
-        importModuleFn(moduleImports);
-        cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
-
-        cmpMode.loaded = true;
+    const callbacks = bundleCBs[bundleId];
+    if (callbacks) {
+      for (var i = 0, l = callbacks.length; i < l; i++) {
+        callbacks[i]();
       }
+      delete bundleCBs[bundleId];
+    }
+  };
 
-      const callbacks = self.bundleCBs[bundleId];
-      if (callbacks) {
-        for (var i = 0, l = callbacks.length; i < l; i++) {
-          callbacks[i]();
-        }
-        delete self.bundleCBs[bundleId];
-      }
-    };
-  }
-
-  loadComponent(cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function): void {
+  function loadComponent(cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function): void {
     if (cmpMode && cmpMode.loaded) {
       cb(cmpMeta, cmpMode);
 
     } else {
       const bundleId = cmpMode.bundleId;
 
-      const bundleCallbacks = this.bundleCBs;
-
-      if (bundleCallbacks[bundleId]) {
-        bundleCallbacks[bundleId].push(cb);
+      if (bundleCBs[bundleId]) {
+        bundleCBs[bundleId].push(cb);
       } else {
-        bundleCallbacks[bundleId] = [cb];
+        bundleCBs[bundleId] = [cb];
       }
 
-      const url = `${this.staticDir}ionic.${bundleId}.js`;
+      const url = `${staticDir}ionic.${bundleId}.js`;
 
-      jsonp(url, this.jsonReqs, this.d);
+      jsonp(url, jsonReqs, doc);
     }
   }
 
-  nextTick(cb: Function) {
-    const self = this;
-    const nextCBs = self.nextCBs;
-
+  function nextTick(cb: Function) {
     nextCBs.push(cb);
 
-    if (!self.nextPending) {
-      self.nextPending = true;
+    if (!nextPending) {
+      nextPending = true;
 
-      if (self.hasPromises) {
+      if (hasPromises) {
         Promise.resolve().then(function nextTickHandler() {
-          self.nextPending = false;
+          nextPending = false;
 
           const callbacks = nextCBs.slice(0);
           nextCBs.length = 0;
@@ -109,7 +91,7 @@ export class PlatformClient implements PlatformApi {
           console.error(err);
         });
 
-        if (self.isIOS) {
+        if (isIOS) {
           // Adopt from vue.js: https://github.com/vuejs/vue, MIT Licensed
           // In problematic UIWebViews, Promise.then doesn't completely break, but
           // it can get stuck in a weird state where callbacks are pushed into the
@@ -121,7 +103,7 @@ export class PlatformClient implements PlatformApi {
 
       } else {
         setTimeout(function nextTickHandler() {
-          self.nextPending = false;
+          nextPending = false;
 
           const callbacks = nextCBs.slice(0);
           nextCBs.length = 0;
@@ -134,43 +116,39 @@ export class PlatformClient implements PlatformApi {
     }
   }
 
-  domRead(cb: RafCallback) {
-    this.readCBs.push(cb);
-    if (!this.rafPending) {
-      this.rafQueue();
+  function domRead(cb: RafCallback) {
+    readCBs.push(cb);
+    if (!rafPending) {
+      rafQueue();
     }
   }
 
-  domWrite(cb: RafCallback) {
-    this.writeCBs.push(cb);
-    if (!this.rafPending) {
-      this.rafQueue();
+  function domWrite(cb: RafCallback) {
+    writeCBs.push(cb);
+    if (!rafPending) {
+      rafQueue();
     }
   }
 
-  private rafQueue(self?: PlatformClient) {
-    self = this;
+  function rafQueue() {
+    rafPending = true;
 
-    self.rafPending = true;
-
-    self.raf(function rafCallback(timeStamp) {
-      self.rafFlush(timeStamp);
+    raf(function rafCallback(timeStamp) {
+      rafFlush(timeStamp);
     });
   }
 
-  private rafFlush(timeStamp: number, self?: PlatformClient, cb?: RafCallback, err?: any) {
-    self = this;
-
+  function rafFlush(timeStamp: number, startTime?: number, cb?: RafCallback, err?: any) {
     try {
-      const startTime = performance.now();
+      startTime = performance.now();
 
       // ******** DOM READS ****************
-      while (cb = self.readCBs.shift()) {
+      while (cb = readCBs.shift()) {
         cb(timeStamp);
       }
 
       // ******** DOM WRITES ****************
-      while (cb = self.writeCBs.shift()) {
+      while (cb = writeCBs.shift()) {
         cb(timeStamp);
 
         if ((performance.now() - startTime) > 8) {
@@ -182,10 +160,10 @@ export class PlatformClient implements PlatformApi {
       err = e;
     }
 
-    self.rafPending = false;
+    rafPending = false;
 
-    if (self.readCBs.length || self.writeCBs.length) {
-      self.rafQueue();
+    if (readCBs.length || writeCBs.length) {
+      rafQueue();
     }
 
     if (err) {
@@ -193,103 +171,127 @@ export class PlatformClient implements PlatformApi {
     }
   }
 
-  registerComponent(cmpMeta: ComponentMeta) {
-    this.registry[cmpMeta.tag] = cmpMeta;
+  function registerComponent(cmpMeta: ComponentMeta) {
+    registry[cmpMeta.tag] = cmpMeta;
   }
 
-  getComponentMeta(tag: string) {
-    return this.registry[tag];
+  function getComponentMeta(tag: string) {
+    return registry[tag];
   }
 
-  createElement(tagName: any): HTMLElement {
-    return this.d.createElement(tagName);
+  function createElement(tagName: any): HTMLElement {
+    return doc.createElement(tagName);
   }
 
-  createElementNS(namespaceURI: string, qualifiedName: string): Element {
-    return this.d.createElementNS(namespaceURI, qualifiedName);
+  function createElementNS(namespaceURI: string, qualifiedName: string): Element {
+    return doc.createElementNS(namespaceURI, qualifiedName);
   }
 
-  createTextNode(text: string): Text {
-    return this.d.createTextNode(text);
+  function createTextNode(text: string): Text {
+    return doc.createTextNode(text);
   }
 
-  createComment(text: string): Comment {
-    return this.d.createComment(text);
+  function createComment(text: string): Comment {
+    return doc.createComment(text);
   }
 
-  insertBefore(parentNode: Node, newNode: Node, referenceNode: Node | null): void {
+  function insertBefore(parentNode: Node, newNode: Node, referenceNode: Node | null): void {
     parentNode.insertBefore(newNode, referenceNode);
   }
 
-  removeChild(parentNode: Node, childNode: Node): void {
+  function removeChild(parentNode: Node, childNode: Node): void {
     parentNode.removeChild(childNode);
   }
 
-  appendChild(parentNode: Node, childNode: Node): void {
+  function appendChild(parentNode: Node, childNode: Node): void {
     parentNode.appendChild(childNode);
   }
 
-  parentNode(node: Node): Node | null {
+  function parentNode(node: Node): Node | null {
     return node.parentNode;
   }
 
-  nextSibling(node: Node): Node | null {
+  function nextSibling(node: Node): Node | null {
     return node.nextSibling;
   }
 
-  tag(elm: Element): string {
+  function tag(elm: Element): string {
     return (elm.tagName || '').toLowerCase();
   }
 
-  setTextContent(node: Node, text: string | null): void {
+  function setTextContent(node: Node, text: string | null): void {
     node.textContent = text;
   }
 
-  getTextContent(node: Node): string | null {
+  function getTextContent(node: Node): string | null {
     return node.textContent;
   }
 
-  getAttribute(elm: HTMLElement, attrName: string): string {
+  function getAttribute(elm: HTMLElement, attrName: string): string {
     return elm.getAttribute(attrName);
   }
 
-  setStyle(elm: HTMLElement, styleName: string, styleValue: any) {
+  function setStyle(elm: HTMLElement, styleName: string, styleValue: any) {
     (<any>elm.style)[toCamelCase(styleName)] = styleValue;
   }
 
-  isElement(node: Node): node is Element {
+  function isElement(node: Node): node is Element {
     return node.nodeType === 1;
   }
 
-  isText(node: Node): node is Text {
+  function isText(node: Node): node is Text {
     return node.nodeType === 3;
   }
 
-  isComment(node: Node): node is Comment {
+  function isComment(node: Node): node is Comment {
     return node.nodeType === 8;
   }
 
-  hasCss(moduleId: string): boolean {
-    if (this.css[moduleId]) {
-      return true;
-    }
-
-    if (this.d.head.querySelector(`style[data-module-id="${moduleId}"]`)) {
-      this.setCss(moduleId);
-      return true;
-    }
-
-    return false;
+  function hasCss(moduleId: string): boolean {
+    return !!css[moduleId];
   }
 
-  setCss(linkUrl: string) {
-    this.css[linkUrl] = true;
+  function setCss(linkUrl: string) {
+    css[linkUrl] = true;
   }
 
-  getDocumentHead(): HTMLHeadElement {
-    return this.d.head;
+  function getDocumentHead(): HTMLHeadElement {
+    return doc.head;
   }
 
+
+  return {
+    registerComponent: registerComponent,
+    getComponentMeta: getComponentMeta,
+    loadComponent: loadComponent,
+    createElement: createElement,
+    createElementNS: createElementNS,
+    createTextNode: createTextNode,
+    createComment: createComment,
+    insertBefore: insertBefore,
+    removeChild: removeChild,
+    appendChild: appendChild,
+    parentNode: parentNode,
+    nextSibling: nextSibling,
+    tag: tag,
+    setTextContent: setTextContent,
+    getTextContent: getTextContent,
+    getAttribute: getAttribute,
+    setStyle: setStyle,
+    isElement: isElement,
+    isText: isText,
+    isComment: isComment,
+    nextTick: nextTick,
+    domRead: domRead,
+    domWrite: domWrite,
+    hasCss: hasCss,
+    setCss: setCss,
+    getDocumentHead: getDocumentHead,
+    supports: {
+      shadowDom: !(win.ShadyDOM && win.ShadyDOM.inUse)
+    },
+    staticDir: ionic.staticDir
+  }
 }
 
 
@@ -333,4 +335,9 @@ function jsonp(jsonpUrl: string, jsonReqs: string[], doc?: HTMLDocument, scriptT
   scriptTag.onerror = scriptTag.onload = onScriptComplete;
 
   doc.head.appendChild(scriptTag);
+}
+
+
+export interface RequestAnimationFrame {
+  (cb: {(timeStamp?: number): void}): void;
 }

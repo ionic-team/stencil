@@ -13,7 +13,7 @@ import { initComponentMeta } from '../../../element/proxy';
 declare const ionic: Ionic;
 
 
-const plt = new PlatformClient(window, document, ionic);
+const plt = PlatformClient(window, document, ionic);
 const renderer = initRenderer(plt);
 
 const ctrls = new WeakMap<HTMLElement, ComponentController>();
@@ -24,28 +24,31 @@ Object.keys(ionic.components || {}).forEach(tag => {
 
   plt.registerComponent(cmpMeta);
 
-  window.customElements.define(tag, class extends HTMLElement {
+  function ProxyElementES5() {
+    return HTMLElement.apply(this);
+  }
+  ProxyElementES5.prototype = Object.create(HTMLElement.prototype);
+  ProxyElementES5.prototype.constructor = ProxyElementES5;
 
-    connectedCallback() {
-      const ctrl: ComponentController = {};
-      ctrls.set(this, ctrl);
-      connectedCallback(plt, ionic.config, renderer, this, ctrl, cmpMeta);
-    }
+  ProxyElementES5.prototype.connectedCallback = function() {
+    var ctrl: ComponentController = {};
+    ctrls.set(this, ctrl);
+    connectedCallback(plt, ionic.config, renderer, this, ctrl, cmpMeta);
+  };
 
-    attributeChangedCallback(attrName: string, oldVal: string, newVal: string, namespace: string) {
-      const ctrl = ctrls.get(this);
-      if (ctrl) {
-        attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
-      }
+  ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {
+    var ctrl = ctrls.get(this);
+    if (ctrl) {
+      attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
     }
+  };
 
-    disconnectedCallback() {
-      disconnectedCallback(ctrls.get(this));
-      ctrls.delete(this);
-    }
+  ProxyElementES5.prototype.disconnectedCallback = function() {
+    disconnectedCallback(ctrls.get(this));
+    ctrls.delete(this);
+  };
 
-    static get observedAttributes() {
-      return cmpMeta.observedAttributes;
-    }
-  });
+  (<any>ProxyElementES5).observedAttributes = cmpMeta.observedAttributes;
+
+  window.customElements.define(tag, ProxyElementES5);
 });
