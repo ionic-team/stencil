@@ -12,7 +12,7 @@ export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer
     ctrl.queued = true;
 
     // run the patch in the next tick
-    plt.domWrite(function domWrite() {
+    plt.domWrite(function queueUpdateWrite() {
 
       // vdom diff and patch the host element for differences
       update(plt, config, renderer, elm, ctrl, tag);
