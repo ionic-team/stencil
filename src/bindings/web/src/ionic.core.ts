@@ -1,17 +1,14 @@
-import { ComponentController, ComponentInstance, Ionic, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
-import { update } from '../../../element/update';
+import { ComponentController, Ionic } from '../../../utils/interfaces';
 import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
-import { PlatformApi } from '../../../platform/platform-api';
-import { PlatformClient } from '../../../platform/platform-client';
-import { initRenderer } from '../../../renderer/core';
 import { initComponentMeta } from '../../../element/proxy';
+import { initRenderer } from '../../../renderer/core';
+import { PlatformClient } from '../../../platform/platform-client';
+import { update } from '../../../element/update';
 
 
-// declared in the base iife arguments
-declare const ionic: Ionic;
-
+const ionic: Ionic = window['Ionic'] = window['Ionic'] || {};
 
 const plt = PlatformClient(window, document, ionic);
 const renderer = initRenderer(plt);
@@ -24,31 +21,27 @@ Object.keys(ionic.components || {}).forEach(tag => {
 
   plt.registerComponent(cmpMeta);
 
-  function ProxyElementES5() {
-    return HTMLElement.apply(this);
-  }
-  ProxyElementES5.prototype = Object.create(HTMLElement.prototype);
-  ProxyElementES5.prototype.constructor = ProxyElementES5;
+  class ProxyElement extends HTMLElement {}
 
-  ProxyElementES5.prototype.connectedCallback = function() {
+  (<any>ProxyElement).prototype.connectedCallback = function() {
     var ctrl: ComponentController = {};
     ctrls.set(this, ctrl);
     connectedCallback(plt, ionic.config, renderer, this, ctrl, cmpMeta);
   };
 
-  ProxyElementES5.prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {
+  (<any>ProxyElement).prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string, namespace: string) {
     var ctrl = ctrls.get(this);
     if (ctrl) {
       attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal, namespace);
     }
   };
 
-  ProxyElementES5.prototype.disconnectedCallback = function() {
+  (<any>ProxyElement).prototype.disconnectedCallback = function() {
     disconnectedCallback(ctrls.get(this));
     ctrls.delete(this);
   };
 
-  (<any>ProxyElementES5).observedAttributes = cmpMeta.observedAttributes;
+  (<any>ProxyElement).observedAttributes = cmpMeta.observedAttributes;
 
-  window.customElements.define(tag, ProxyElementES5);
+  window.customElements.define(tag, ProxyElement);
 });

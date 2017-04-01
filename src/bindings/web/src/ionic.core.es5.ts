@@ -1,17 +1,14 @@
-import { ComponentController, ComponentMeta, Ionic, ProxyElement } from '../../../utils/interfaces';
 import { attributeChangedCallback } from '../../../element/attribute-changed';
+import { ComponentController, Ionic } from '../../../utils/interfaces';
 import { connectedCallback } from '../../../element/connected';
 import { disconnectedCallback } from '../../../element/disconnected';
-import { PlatformApi } from '../../../platform/platform-api';
+import { initComponentMeta } from '../../../element/proxy';
+import { initRenderer } from '../../../renderer/core';
 import { PlatformClient } from '../../../platform/platform-client';
 import { update } from '../../../element/update';
-import { initRenderer } from '../../../renderer/core';
-import { initComponentMeta } from '../../../element/proxy';
 
 
-// declared in the base iife arguments
-declare const ionic: Ionic;
-
+const ionic: Ionic = window['Ionic'] = window['Ionic'] || {};
 
 const plt = PlatformClient(window, document, ionic);
 const renderer = initRenderer(plt);

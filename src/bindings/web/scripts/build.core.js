@@ -26,8 +26,8 @@ function bundleCoreJs() {
   }).then(bundle => {
     var result = bundle.generate({
       format: 'es',
-      intro: '(function(window, document, ionic) {',
-      outro: '})(window, document, window.Ionic = window.Ionic || {});'
+      intro: '(function(window, document) {',
+      outro: '})(window, document);'
     });
 
     return compiler.transpile(result.code, outputFile, [], true);
@@ -45,8 +45,8 @@ function bundleCoreEs5Js(cePolyfill) {
   }).then(bundle => {
     var result = bundle.generate({
       format: 'es',
-      intro: '(function(window, document, ionic) {',
-      outro: '})(window, document, window.Ionic = window.Ionic || {});'
+      intro: '(function(window, document) {',
+      outro: '})(window, document);'
     });
 
     var ceOutput = [
