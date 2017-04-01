@@ -47,12 +47,12 @@ function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, pro
   }
 
   value = plt.getAttribute(elm, toCamelCase(propName));
-  if (value !== undefined) {
+  if (value !== null && value !== '') {
     return getPropValue(props[propName].type, value);
   }
 
   value = config.get(propName);
-  if (value !== undefined) {
+  if (value !== null) {
     return value;
   }
 }
