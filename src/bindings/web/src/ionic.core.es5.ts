@@ -8,7 +8,7 @@ import { PlatformClient } from '../../../platform/platform-client';
 import { update } from '../../../element/update';
 
 
-const ionic: Ionic = window['Ionic'] = window['Ionic'] || {};
+const ionic: Ionic = (<any>window).Ionic = (<any>window).Ionic || {};
 
 const plt = PlatformClient(window, document, ionic);
 const renderer = initRenderer(plt);
@@ -45,7 +45,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
     ctrls.delete(this);
   };
 
-  (<any>ProxyElementES5).observedAttributes = cmpMeta.observedAttributes;
+  (<any>ProxyElementES5).observedAttributes = cmpMeta.observedAttrs;
 
   window.customElements.define(tag, ProxyElementES5);
 });

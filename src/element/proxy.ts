@@ -46,7 +46,7 @@ function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, pro
     return value;
   }
 
-  value = plt.getAttribute(elm, toCamelCase(propName));
+  value = plt.$getAttribute(elm, toCamelCase(propName));
   if (value !== null && value !== '') {
     return getPropValue(props[propName].type, value);
   }
@@ -82,7 +82,7 @@ export function initComponentMeta(tag: string, data: any[]) {
   props.color = {};
   props.mode = {};
 
-  const observedAttributes = cmpMeta.observedAttributes = cmpMeta.observedAttributes || [];
+  const observedAttributes = cmpMeta.observedAttrs = cmpMeta.observedAttrs || [];
 
   keys = Object.keys(props);
   for (i = 0; i < keys.length; i++) {

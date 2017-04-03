@@ -7,6 +7,7 @@ export interface Ionic {
     (bundleId: string, componentModeData: any[]);
   };
   raf?: {(cb: {(timeStamp?: number): void}): void};
+  defaultMode?: string;
 }
 
 
@@ -18,7 +19,7 @@ export interface Config {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
-  observedAttributes?: string[];
+  observedAttrs?: string[];
   hostCss?: string;
   componentModule?: any;
   modes: {[modeName: string]: ComponentMode};
@@ -26,18 +27,15 @@ export interface ComponentMeta {
 
 
 export interface ComponentMode {
-  loaded?: boolean;
+  isLoaded?: boolean;
   bundleId?: string;
   styles?: string;
   styleUrls?: string[];
-  styleElm?: HTMLStyleElement;
+  styleElm?: HTMLElement;
 }
 
 
 export interface ComponentInstance {
-  connectedCallback?: {(): void};
-  attributeChangedCallback?: {(attrName?: string, oldVal?: string, newVal?: string, namespace?: string): void};
-  disconnectedCallback?: {(): void};
   render?: {(): VNode};
 
   mode?: string;
@@ -46,11 +44,10 @@ export interface ComponentInstance {
 
 
 export interface ComponentController {
-  root?: HTMLElement | ShadowRoot;
+  rootElm?: HTMLElement | ShadowRoot;
   queued?: boolean;
   instance?: ComponentInstance;
   vnode?: VNode;
-  connected?: boolean;
 }
 
 
@@ -91,11 +88,11 @@ export type Key = string | number;
 
 export interface VNode {
   sel: string | undefined;
-  data: VNodeData | undefined;
-  children: Array<VNode | string> | undefined;
+  vdata: VNodeData | undefined;
+  vchildren: Array<VNode | string> | undefined;
   elm: Node | undefined;
-  text: string | undefined;
-  key: Key;
+  vtext: string | undefined;
+  vkey: Key;
 }
 
 
@@ -107,10 +104,9 @@ export interface VNodeData {
   style?: any;
   dataset?: any;
   on?: any;
-  hero?: any;
   attachData?: any;
-  key?: Key;
-  ns?: string; // for SVGs
+  vkey?: Key;
+  vns?: string; // for SVGs
   [key: string]: any; // for any other 3rd party module
   // end of modules
 }

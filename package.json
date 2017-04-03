@@ -36,6 +36,7 @@
     "babel-preset-babili": "0.0.12",
     "babili": "0.0.11",
     "fs-extra": "^2.1.2",
+    "google-closure-compiler": "^20170218.0.0",
     "jest": "19.0.2",
     "jsdom": "9.11.0",
     "knuth-shuffle": "1.0.1",

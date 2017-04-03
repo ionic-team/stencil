@@ -8,7 +8,7 @@ import { PlatformClient } from '../../../platform/platform-client';
 import { update } from '../../../element/update';
 
 
-const ionic: Ionic = window['Ionic'] = window['Ionic'] || {};
+const ionic: Ionic = (<any>window).Ionic = (<any>window).Ionic || {};
 
 const plt = PlatformClient(window, document, ionic);
 const renderer = initRenderer(plt);
@@ -21,6 +21,9 @@ Object.keys(ionic.components || {}).forEach(tag => {
 
   plt.registerComponent(cmpMeta);
 
+  // closure doesn't support outputting es6 classes (yet)
+  // build step does some closure tricks by changing this class
+  // to just a function for compiling, then changing it back to a class
   class ProxyElement extends HTMLElement {}
 
   (<any>ProxyElement).prototype.connectedCallback = function() {
@@ -41,7 +44,7 @@ Object.keys(ionic.components || {}).forEach(tag => {
     ctrls.delete(this);
   };
 
-  (<any>ProxyElement).observedAttributes = cmpMeta.observedAttributes;
+  (<any>ProxyElement).observedAttributes = cmpMeta.observedAttrs;
 
   window.customElements.define(tag, ProxyElement);
 });

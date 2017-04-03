@@ -3,8 +3,8 @@ import { VNode, VNodeData } from '../../utils/interfaces';
 
 export function updateClass(oldVnode: VNode, vnode: VNode): void {
   var cur: any, name: string, elm: Element = vnode.elm as Element,
-      oldClass = (oldVnode.data as VNodeData).class,
-      klass = (vnode.data as VNodeData).class;
+      oldClass = (oldVnode.vdata as VNodeData).class,
+      klass = (vnode.vdata as VNodeData).class;
 
   if (!oldClass && !klass) return;
   if (oldClass === klass) return;

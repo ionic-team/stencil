@@ -41,5 +41,5 @@ export function transpile(code: string, dest: string, plugins: any[] = [], minif
     promises.push(writeFile(destMin, minifyResult.code));
   }
 
-  return promises;
+  return Promise.all(promises);
 }

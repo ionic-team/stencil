@@ -1,25 +1,14 @@
 import { VNode, VNodeData } from '../../utils/interfaces';
 
 
-const booleanAttrs = ["allowfullscreen", "async", "autofocus", "autoplay", "checked", "compact", "controls", "declare",
-                "default", "defaultchecked", "defaultmuted", "defaultselected", "defer", "disabled", "draggable",
-                "enabled", "formnovalidate", "hidden", "indeterminate", "inert", "ismap", "itemscope", "loop", "multiple",
-                "muted", "nohref", "noresize", "noshade", "novalidate", "nowrap", "open", "pauseonexit", "readonly",
-                "required", "reversed", "scoped", "seamless", "selected", "sortable", "spellcheck", "translate",
-                "truespeed", "typemustmatch", "visible"];
-
 const xlinkNS = 'http://www.w3.org/1999/xlink';
 const xmlNS = 'http://www.w3.org/XML/1998/namespace';
 
-const booleanAttrsDict: {[attribute: string]: boolean} = Object.create(null);
-for (let i = 0, len = booleanAttrs.length; i < len; i++) {
-  booleanAttrsDict[booleanAttrs[i]] = true;
-}
 
 export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
   var key: string, cur: any, old: any, elm: Element = vnode.elm as Element,
-      oldAttrs = (oldVnode.data as VNodeData).attrs,
-      attrs = (vnode.data as VNodeData).attrs;
+      oldAttrs = (oldVnode.vdata as VNodeData).attrs,
+      attrs = (vnode.vdata as VNodeData).attrs;
 
   if (!oldAttrs && !attrs) return;
   if (oldAttrs === attrs) return;
@@ -31,7 +20,7 @@ export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
     cur = attrs[key];
     old = oldAttrs[key];
     if (old !== cur) {
-      if (booleanAttrsDict[key]) {
+      if (typeof cur === 'boolean') {
         if (cur) {
           elm.setAttribute(key, "");
         } else {

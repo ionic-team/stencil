@@ -1,4 +1,4 @@
-import { ComponentController, ComponentMeta, Config, ProxyElement, Renderer } from '../utils/interfaces';
+import { ComponentController, ComponentMeta, Config, Ionic, ProxyElement, Renderer } from '../utils/interfaces';
 import { isDef } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
@@ -23,10 +23,14 @@ function getMode(plt: PlatformApi, config: Config, elm: HTMLElement, propName: s
     return value;
   }
 
-  value = plt.getAttribute(elm, propName);
+  value = plt.$getAttribute(elm, propName);
   if (isDef(value)) {
     return value;
   }
 
-  return config.get(propName);
+  if (config) {
+    return config.get(propName);
+  }
+
+  return 'md';
 }

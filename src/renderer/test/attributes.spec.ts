@@ -4,7 +4,7 @@ import { PlatformClient } from '../../platform/platform-client';
 
 const document: HTMLDocument = (<any>global).document;
 
-var patch = initRenderer(new PlatformClient(window, document, {}));
+var patch = initRenderer(PlatformClient(window, document, {}));
 
 describe('attributes', function() {
   var elm, vnode0;

@@ -1,26 +1,22 @@
 import { ComponentMeta, ComponentMode, ComponentRegistry, Ionic } from '../utils/interfaces';
-import { noop, toCamelCase } from '../utils/helpers';
+import { noop } from '../utils/helpers';
 import { PlatformApi } from './platform-api';
 
 
 export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): PlatformApi {
+  const staticDir: string = ionic.staticDir;
   const registry: ComponentRegistry = {};
   const bundleCBs: BundleCallbacks = {};
   const jsonReqs: string[] = [];
   const css: {[tag: string]: boolean} = {};
-  const nextCBs: Function[] = [];
-  let nextPending: boolean;
+
+  const isIOS = /iphone|ipad|ipod|ios/.test(win.navigator.userAgent.toLowerCase());
+  const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+
+  const raf: RequestAnimationFrame = ionic.raf ? ionic.raf : win.requestAnimationFrame.bind(win);
   const readCBs: RafCallback[] = [];
   const writeCBs: RafCallback[] = [];
   let rafPending: boolean;
-  const staticDir: string = ionic.staticDir;
-
-  const hasPromises = (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1);
-
-  const ua = win.navigator.userAgent.toLowerCase();
-  const isIOS = /iphone|ipad|ipod|ios/.test(ua);
-
-  const raf: RequestAnimationFrame = ionic.raf ? ionic.raf : win.requestAnimationFrame.bind(win);
 
 
   ionic.loadComponents = function loadComponent(bundleId) {
@@ -40,7 +36,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
       importModuleFn(moduleImports);
       cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
 
-      cmpMode.loaded = true;
+      cmpMode.isLoaded = true;
     }
 
     const callbacks = bundleCBs[bundleId];
@@ -52,8 +48,9 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     }
   };
 
+
   function loadComponent(cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function): void {
-    if (cmpMode && cmpMode.loaded) {
+    if (cmpMode && cmpMode.isLoaded) {
       cb(cmpMeta, cmpMode);
 
     } else {
@@ -67,54 +64,112 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
 
       const url = `${staticDir}ionic.${bundleId}.js`;
 
-      jsonp(url, jsonReqs, doc);
-    }
-  }
-
-  function nextTick(cb: Function) {
-    nextCBs.push(cb);
-
-    if (!nextPending) {
-      nextPending = true;
-
-      if (hasPromises) {
-        Promise.resolve().then(function nextTickHandler() {
-          nextPending = false;
-
-          const callbacks = nextCBs.slice(0);
-          nextCBs.length = 0;
-
-          for (let i = 0; i < callbacks.length; i++) {
-            callbacks[i]();
-          }
-        }).catch(err => {
-          console.error(err);
-        });
-
-        if (isIOS) {
-          // Adopt from vue.js: https://github.com/vuejs/vue, MIT Licensed
-          // In problematic UIWebViews, Promise.then doesn't completely break, but
-          // it can get stuck in a weird state where callbacks are pushed into the
-          // microtask queue but the queue isn't being flushed, until the browser
-          // needs to do some other work, e.g. handle a timer. Therefore we can
-          // "force" the microtask queue to be flushed by adding an empty timer.
-          setTimeout(noop);
-        }
-
-      } else {
-        setTimeout(function nextTickHandler() {
-          nextPending = false;
-
-          const callbacks = nextCBs.slice(0);
-          nextCBs.length = 0;
-
-          for (let i = 0; i < callbacks.length; i++) {
-            callbacks[i]();
-          }
-        });
+      if (jsonReqs.indexOf(url) === -1) {
+        jsonp(url);
       }
     }
   }
+
+
+  function jsonp(jsonpUrl: string) {
+    jsonReqs.push(jsonpUrl);
+
+    var scriptElm = createElement('script');
+    scriptElm.charset = 'utf-8';
+    scriptElm.async = true;
+    scriptElm.src = jsonpUrl;
+
+    var tmrId = setTimeout(onScriptComplete, 120000);
+
+    function onScriptComplete() {
+      clearTimeout(tmrId);
+      scriptElm.onerror = scriptElm.onload = null;
+      scriptElm.parentNode.removeChild(scriptElm);
+
+      var index = jsonReqs.indexOf(jsonpUrl);
+      if (index > -1) {
+        jsonReqs.splice(index, 1);
+      }
+    }
+
+    scriptElm.onerror = scriptElm.onload = onScriptComplete;
+
+    doc.head.appendChild(scriptElm);
+  }
+
+
+  function attachShadow(elm: Element, cmpMode: ComponentMode, cmpModeId: string) {
+    const shadowElm = elm.attachShadow({ mode: 'open' });
+
+    if (hasNativeShadowDom) {
+      if (!cmpMode.styleElm) {
+        cmpMode.styleElm = createElement('style');
+        cmpMode.styleElm.innerHTML = cmpMode.styles;
+      }
+
+      shadowElm.appendChild(cmpMode.styleElm.cloneNode(true));
+
+    } else {
+      if (!hasCss(cmpModeId)) {
+        const headStyleEle = createElement('style');
+        headStyleEle.dataset['cmpModeId'] = cmpModeId;
+        headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+        appendChild(doc.head, headStyleEle);
+        setCss(cmpModeId);
+      }
+    }
+
+    return shadowElm;
+  }
+
+
+  const nextTick = (function () {
+    /* Adopted from Vue.js, MIT, https://github.com/vuejs/vue */
+    const callbacks: Function[] = [];
+    let pending = false;
+    let timerFunc;
+
+    function nextTickHandler() {
+      pending = false;
+      const copies = callbacks.slice(0);
+
+      callbacks.length = 0;
+      for (let i = 0; i < copies.length; i++) {
+        copies[i]();
+      }
+    }
+
+    if (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1) {
+      const p = Promise.resolve();
+      const logError = err => { console.error(err); };
+
+      timerFunc = function promiseTick() {
+        p.then(nextTickHandler).catch(logError);
+        // in problematic UIWebViews, Promise.then doesn't completely break, but
+        // it can get stuck in a weird state where callbacks are pushed into the
+        // microtask queue but the queue isn't being flushed, until the browser
+        // needs to do some other work, e.g. handle a timer. Therefore we can
+        // "force" the microtask queue to be flushed by adding an empty timer.
+        if (isIOS) setTimeout(noop);
+      }
+
+    } else {
+      // fallback to setTimeout
+      timerFunc = function timeoutTick() {
+        setTimeout(nextTickHandler, 0);
+      };
+    }
+
+    return function queueNextTick(cb: Function) {
+      callbacks.push(cb);
+
+      if (!pending) {
+        pending = true;
+        timerFunc();
+      }
+    }
+  })();
+
 
   function domRead(cb: RafCallback) {
     readCBs.push(cb);
@@ -123,12 +178,14 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     }
   }
 
+
   function domWrite(cb: RafCallback) {
     writeCBs.push(cb);
     if (!rafPending) {
       rafQueue();
     }
   }
+
 
   function rafQueue() {
     rafPending = true;
@@ -137,6 +194,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
       rafFlush(timeStamp);
     });
   }
+
 
   function rafFlush(timeStamp: number, startTime?: number, cb?: RafCallback, err?: any) {
     try {
@@ -171,6 +229,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     }
   }
 
+
   function registerComponent(cmpMeta: ComponentMeta) {
     registry[cmpMeta.tag] = cmpMeta;
   }
@@ -179,7 +238,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     return registry[tag];
   }
 
-  function createElement(tagName: any): HTMLElement {
+  function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K] {
     return doc.createElement(tagName);
   }
 
@@ -215,7 +274,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     return node.nextSibling;
   }
 
-  function tag(elm: Element): string {
+  function tagName(elm: Element): string {
     return (elm.tagName || '').toLowerCase();
   }
 
@@ -229,10 +288,6 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
 
   function getAttribute(elm: HTMLElement, attrName: string): string {
     return elm.getAttribute(attrName);
-  }
-
-  function setStyle(elm: HTMLElement, styleName: string, styleValue: any) {
-    (<any>elm.style)[toCamelCase(styleName)] = styleValue;
   }
 
   function isElement(node: Node): node is Element {
@@ -255,42 +310,33 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     css[linkUrl] = true;
   }
 
-  function getDocumentHead(): HTMLHeadElement {
-    return doc.head;
-  }
-
 
   return {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
     loadComponent: loadComponent,
-    createElement: createElement,
-    createElementNS: createElementNS,
-    createTextNode: createTextNode,
-    createComment: createComment,
-    insertBefore: insertBefore,
-    removeChild: removeChild,
-    appendChild: appendChild,
-    parentNode: parentNode,
-    nextSibling: nextSibling,
-    tag: tag,
-    setTextContent: setTextContent,
-    getTextContent: getTextContent,
-    getAttribute: getAttribute,
-    setStyle: setStyle,
+
     isElement: isElement,
     isText: isText,
     isComment: isComment,
     nextTick: nextTick,
     domRead: domRead,
     domWrite: domWrite,
-    hasCss: hasCss,
-    setCss: setCss,
-    getDocumentHead: getDocumentHead,
-    supports: {
-      shadowDom: !(win.ShadyDOM && win.ShadyDOM.inUse)
-    },
-    staticDir: ionic.staticDir
+
+    $createElement: createElement,
+    $createElementNS: createElementNS,
+    $createTextNode: createTextNode,
+    $createComment: createComment,
+    $insertBefore: insertBefore,
+    $removeChild: removeChild,
+    $appendChild: appendChild,
+    $parentNode: parentNode,
+    $nextSibling: nextSibling,
+    $tagName: tagName,
+    $setTextContent: setTextContent,
+    $getTextContent: getTextContent,
+    $getAttribute: getAttribute,
+    $attachShadow: attachShadow
   }
 }
 
@@ -302,39 +348,6 @@ export interface BundleCallbacks {
 
 export interface RafCallback {
   (timeStamp?: number): void;
-}
-
-
-function jsonp(jsonpUrl: string, jsonReqs: string[], doc?: HTMLDocument, scriptTag?: HTMLScriptElement, tmrId?: any) {
-  if (jsonReqs.indexOf(jsonpUrl) > -1) {
-    return;
-  }
-  jsonReqs.push(jsonpUrl);
-
-  scriptTag = <HTMLScriptElement>doc.createElement('script');
-
-  scriptTag.charset = 'utf-8';
-  scriptTag.async = true;
-  (<any>scriptTag).timeout = 120000;
-
-  scriptTag.src = jsonpUrl;
-
-  tmrId = setTimeout(onScriptComplete, 120000);
-
-  function onScriptComplete() {
-    clearTimeout(tmrId);
-    scriptTag.onerror = scriptTag.onload = null;
-    scriptTag.parentNode.removeChild(scriptTag);
-
-    var index = jsonReqs.indexOf(jsonpUrl);
-    if (index > -1) {
-      jsonReqs.splice(index, 1);
-    }
-  }
-
-  scriptTag.onerror = scriptTag.onload = onScriptComplete;
-
-  doc.head.appendChild(scriptTag);
 }
 
 

@@ -11,7 +11,5 @@ export function attributeChangedCallback(instance: ComponentInstance, cmpMeta: C
         instance[propName] = getPropValue(cmpMeta.props[propName].type, newVal);
       }
     }
-
-    instance.attributeChangedCallback && instance.attributeChangedCallback(attrName, oldVal, newVal, namespace);
   }
 }

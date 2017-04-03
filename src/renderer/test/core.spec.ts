@@ -3,7 +3,7 @@ import { PlatformClient } from '../../platform/platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
 
 const document: HTMLDocument = (<any>global).document;
-const api = new PlatformClient(window, document, {});
+const api = PlatformClient(window, document, {});
 
 
 var patch = initRenderer(api);
@@ -39,35 +39,35 @@ describe('renderer', function() {
     it('can create vnode with children', function() {
       var vnode = h('div', [h('span#hello'), h('b.world')]);
       expect(vnode.sel).toEqual('div');
-      expect((<VNode>vnode.children[0]).sel).toEqual('span#hello');
-      expect((<VNode>vnode.children[1]).sel).toEqual('b.world');
+      expect((<VNode>vnode.vchildren[0]).sel).toEqual('span#hello');
+      expect((<VNode>vnode.vchildren[1]).sel).toEqual('b.world');
     });
     it('can create vnode with one child vnode', function() {
       var vnode = h('div', h('span#hello'));
       expect(vnode.sel).toEqual('div');
-      expect((<VNode>vnode.children[0]).sel).toEqual('span#hello');
+      expect((<VNode>vnode.vchildren[0]).sel).toEqual('span#hello');
     });
     it('can create vnode with props and one child vnode', function() {
       var vnode = h('div', {}, h('span#hello'));
       expect(vnode.sel).toEqual('div');
-      expect((<VNode>vnode.children[0]).sel).toEqual('span#hello');
+      expect((<VNode>vnode.vchildren[0]).sel).toEqual('span#hello');
     });
     it('can create vnode with text content', function() {
       var vnode = h('a', ['I am a string']);
-      expect((<VNode>vnode.children[0]).text).toEqual('I am a string');
+      expect((<VNode>vnode.vchildren[0]).vtext).toEqual('I am a string');
     });
     it('can create vnode with text content in string', function() {
       var vnode = h('a', 'I am a string');
-      expect(vnode.text).toEqual('I am a string');
+      expect(vnode.vtext).toEqual('I am a string');
     });
     it('can create vnode with props and text content in string', function() {
       var vnode = h('a', {}, 'I am a string');
-      expect(vnode.text).toEqual('I am a string');
+      expect(vnode.vtext).toEqual('I am a string');
     });
     it('can create vnode for comment', function() {
       var vnode = h('!', 'test');
       expect(vnode.sel).toEqual('!');
-      expect(vnode.text).toEqual('test');
+      expect(vnode.vtext).toEqual('test');
     });
   });
   describe('created element', function() {
@@ -263,7 +263,7 @@ describe('renderer', function() {
         } else if (typeof n === 'string') {
           return h('span', {}, n);
         } else {
-          return h('span', {key: n}, n.toString());
+          return h('span', {vkey: n}, n.toString());
         }
       }
       describe('addition of elements', function() {
@@ -303,24 +303,24 @@ describe('renderer', function() {
           expect(map(inner, elm.children)).toEqual(['1', '2', '3', '4', '5']);
         });
         it('adds children to parent with no children', function() {
-          var vnode1 = h('span', {key: 'span'});
-          var vnode2 = h('span', {key: 'span'}, [1, 2, 3].map(spanNum));
+          var vnode1 = h('span', {vkey: 'span'});
+          var vnode2 = h('span', {vkey: 'span'}, [1, 2, 3].map(spanNum));
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(0);
           elm = patch(vnode1, vnode2).elm;
           expect(map(inner, elm.children)).toEqual(['1', '2', '3']);
         });
         it('removes all children from parent', function() {
-          var vnode1 = h('span', {key: 'span'}, [1, 2, 3].map(spanNum));
-          var vnode2 = h('span', {key: 'span'});
+          var vnode1 = h('span', {vkey: 'span'}, [1, 2, 3].map(spanNum));
+          var vnode2 = h('span', {vkey: 'span'});
           elm = patch(vnode0, vnode1).elm;
           expect(map(inner, elm.children)).toEqual(['1', '2', '3']);
           elm = patch(vnode1, vnode2).elm;
           expect(elm.children.length).toEqual(0);
         });
         it('update one child with same key but different sel', function() {
-          var vnode1 = h('span', {key: 'span'}, [1, 2, 3].map(spanNum));
-          var vnode2 = h('span', {key: 'span'}, [spanNum(1), h('i', {key: 2}, '2'), spanNum(3)]);
+          var vnode1 = h('span', {vkey: 'span'}, [1, 2, 3].map(spanNum));
+          var vnode2 = h('span', {vkey: 'span'}, [spanNum(1), h('i', {vkey: 2}, '2'), spanNum(3)]);
           elm = patch(vnode0, vnode1).elm;
           expect(map(inner, elm.children)).toEqual(['1', '2', '3']);
           elm = patch(vnode1, vnode2).elm;
@@ -475,7 +475,7 @@ describe('renderer', function() {
       it('handles random shuffles', function() {
         var n, i, arr = [], opacities = [], elms = 14, samples = 5;
         function spanNumWithOpacity(n, o) {
-          return h('span', {key: n, style: {opacity: o}}, n.toString());
+          return h('span', {vkey: n, style: {opacity: o}}, n.toString());
         }
         for (n = 0; n < elms; ++n) { arr[n] = n; }
         for (n = 0; n < samples; ++n) {
@@ -710,8 +710,8 @@ describe('renderer', function() {
       it('calls `prepatch` listener', function() {
         var result = [];
         function cb(oldVnode, vnode) {
-          expect(oldVnode).toEqual(vnode1.children[1]);
-          expect(vnode).toEqual(vnode2.children[1]);
+          expect(oldVnode).toEqual(vnode1.vchildren[1]);
+          expect(vnode).toEqual(vnode2.vchildren[1]);
           result.push(vnode);
         }
         var vnode1 = h('div', [
@@ -985,7 +985,7 @@ describe('renderer', function() {
         h('span', 'there'),
       ]);
       var vnode2 = h('div');
-      vnode2.children = vnode1.children;
+      vnode2.vchildren = vnode1.vchildren;
       patch(vnode0, vnode1);
       patch(vnode1, vnode2);
       expect(result.length).toEqual(0);
@@ -995,9 +995,9 @@ describe('renderer', function() {
 
 
 
-function toVNode(node: Node, api?: PlatformClient): VNode {
+function toVNode(node: Node, api?: any): VNode {
   if (!api) {
-    api = new PlatformClient(window, document, {});
+    api = PlatformClient(window, document, {});
   }
 
   let text: string;
