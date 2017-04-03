@@ -41,6 +41,7 @@ function bundleCoreJs() {
 function bundleCoreEs5Js(cePolyfill) {
   var entryFile = util.distPath('transpiled-web/bindings/web/src/ionic.core.es5.js');
   var outputFile = util.distPath('ionic-core/web/ionic.core.es5.js');
+  var outputFileMin = outputFile.replace('.js', '.min.js');
 
   return rollup.rollup({
     entry: entryFile
@@ -57,7 +58,45 @@ function bundleCoreEs5Js(cePolyfill) {
       result.code
     ].join(';\n');
 
-    return compiler.transpile(ceOutput, outputFile, ['transform-es2015-classes'], true);
+    return compiler.transpile(ceOutput, outputFile, ['transform-es2015-classes'], false).then(() => {
+      return minifyES5(outputFile, outputFileMin);
+    });
+  });
+}
+
+
+function minifyES5(inputFilePath, outputFilePath) {
+  var ClosureCompiler = require('google-closure-compiler').compiler;
+
+  var opts = {
+    js: inputFilePath,
+    externs: path.join(__dirname, 'externs.js'),
+    language_out: 'ECMASCRIPT5',
+    compilation_level: 'ADVANCED_OPTIMIZATIONS',
+    assume_function_wrapper: 'true',
+    warning_level: 'VERBOSE',
+    rewrite_polyfills: 'false',
+    warning_level: 'QUIET',
+    // formatting: 'PRETTY_PRINT',
+    // debug: 'true'
+  };
+
+  var closureCompiler = new ClosureCompiler(opts);
+
+  return new Promise(function(resolve, reject) {
+    console.log(closureCompiler.commandArguments.join(' '));
+
+    closureCompiler.run(function(exitCode, stdOut, stdErr) {
+      if (stdErr) {
+        console.log('closureCompiler exitCode', exitCode, 'stdErr', stdErr);
+        reject(stdErr);
+
+      } else {
+        util.writeFile(outputFilePath, stdOut).then(() => {
+          resolve();
+        });
+      }
+    });
   });
 }
 
@@ -78,8 +117,8 @@ function minify(inputFilePath, outputFilePath) {
       warning_level: 'VERBOSE',
       rewrite_polyfills: 'false',
       warning_level: 'QUIET',
-      formatting: 'PRETTY_PRINT',
-      debug: 'true'
+      // formatting: 'PRETTY_PRINT',
+      // debug: 'true'
     };
 
     var closureCompiler = new ClosureCompiler(opts);
@@ -95,7 +134,6 @@ function minify(inputFilePath, outputFilePath) {
         } else {
           postClosure(outputFilePath, stdOut).then(function() {
             fs.unlink(closurePrepareFile);
-
             resolve();
           });
         }
@@ -114,7 +152,7 @@ function preClosure(inputFilePath, closurePrepareFile) {
       throw 'preClosure: something done changed!'
     }
 
-    content = content.replace(match[0], 'function ' + match[1] + '() { "tricks-are-for-closure"; }');
+    content = content.replace(match[0], 'function ' + match[1] + ' () { "tricks-are-for-closure"; }');
 
     return util.writeFile(closurePrepareFile, content);
   });
@@ -122,7 +160,6 @@ function preClosure(inputFilePath, closurePrepareFile) {
 
 
 function postClosure(outputFilePath, content) {
-
   var match = /function (.*?)\(\){"tricks-are-for-closure"}/gm.exec(content);
   if (!match) {
     match = /function (.*?)\s*?\(\)\s*?{\s*?"tricks-are-for-closure";\s*?}/gm.exec(content);
@@ -132,6 +169,12 @@ function postClosure(outputFilePath, content) {
   }
 
   var className = match[0].split('(')[0].replace('function ', '').trim();
+
+  if (className.indexOf('$$') > -1) {
+    className += '$$'; // thanks JS regex :)
+  }
+
+  var classReplacer = 'class ' + className + ' extends HTMLElement {}';
 
   content = content.replace(match[0], 'class ' + className + ' extends HTMLElement {}');
 
