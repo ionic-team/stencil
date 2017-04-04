@@ -1,13 +1,18 @@
 
 export interface Ionic {
   staticDir?: string;
-  components?: {[tag: string]: any[]};
+  components?: LoadComponents;
   config?: Config;
   loadComponents?: {
     (bundleId: string, componentModeData: any[]);
   };
   raf?: {(cb: {(timeStamp?: number): void}): void};
   defaultMode?: string;
+}
+
+
+export interface LoadComponents {
+  [tag: string]: any[]
 }
 
 

@@ -1,12 +1,12 @@
 import { attributeChangedCallback } from '../element/attribute-changed';
-import { ComponentController, Config, Renderer } from '../utils/interfaces';
+import { ComponentController, Config, LoadComponents, Renderer } from '../utils/interfaces';
 import { connectedCallback } from '../element/connected';
 import { disconnectedCallback } from '../element/disconnected';
 import { initComponentMeta } from '../element/proxy';
 import { PlatformApi } from '../platform/platform-api';
 
 
-export function registerComponentsES5(plt: PlatformApi, config: Config, renderer: Renderer, components: any[]) {
+export function registerComponentsES5(renderer: Renderer, plt: PlatformApi, config: Config, components: LoadComponents) {
   const ctrls = new WeakMap<HTMLElement, ComponentController>();
 
   Object.keys(components || {}).forEach(tag => {

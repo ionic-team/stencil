@@ -10,7 +10,7 @@
     "copy.themes": "mkdir -p dist/ionic-core && cp -R src/themes/ dist/ionic-core/themes/",
     "build": "npm run clean && npm run build.core && npm run build.compiler && npm run compare",
 
-    "build.core": "tsc -p src/tsconfig.json && cd scripts && tsc",
+    "build.core": "tsc -p scripts/tsconfig.json",
 
     "build.angular": "tsc -p src/bindings/angular/tsconfig.json && npm run build.core && node dist/scripts/build-angular.js",
 
