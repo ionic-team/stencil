@@ -1,4 +1,5 @@
 import { initRenderer, h, vnode, VNode, VNodeData } from '../core';
+import { PlatformApi } from '../../platform/platform-api';
 import { PlatformClient } from '../../platform/platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
 
@@ -995,7 +996,7 @@ describe('renderer', function() {
 
 
 
-function toVNode(node: Node, api?: any): VNode {
+function toVNode(node: Node, api?: PlatformApi): VNode {
   if (!api) {
     api = PlatformClient(window, document, {});
   }
@@ -1005,7 +1006,7 @@ function toVNode(node: Node, api?: any): VNode {
     const id = node.id ? '#' + node.id : '';
     const cn = node.getAttribute('class');
     const c = cn ? '.' + cn.split(' ').join('.') : '';
-    const sel = api.tag(node).toLowerCase() + id + c;
+    const sel = api.$tagName(node).toLowerCase() + id + c;
     const attrs: any = {};
     const children: Array<VNode> = [];
     let name: string;
@@ -1023,10 +1024,10 @@ function toVNode(node: Node, api?: any): VNode {
     }
     return vnode(sel, {attrs}, children, undefined, node);
   } else if (api.isText(node)) {
-    text = api.getTextContent(node) as string;
+    text = api.$getTextContent(node) as string;
     return vnode(undefined, undefined, undefined, text, node);
   } else if (api.isComment(node)) {
-    text = api.getTextContent(node) as string;
+    text = api.$getTextContent(node) as string;
     return vnode('!', undefined, undefined, text, undefined);
   } else {
     return vnode('', {}, [], undefined, undefined);
