@@ -27,21 +27,25 @@ function bundleCoreJs() {
   }).then(bundle => {
     var result = bundle.generate({
       format: 'es',
-      intro: '(function(window, document) {',
+      intro: '(function(window, document) {\n"use strict";\n',
       outro: '})(window, document);'
     });
 
-    return compiler.transpile(result.code, outputFile, [], false).then(() => {
+    return compiler.transpile(result.code, outputFile, [], false).then(function(){
       return minify(outputFile, outputFileMin);
     });
   });
 }
 
 
-function bundleCoreEs5Js(cePolyfill) {
+function bundleCoreEs5Js() {
+  // create just the es5 and es5 minified files
+  // then prefix each one with the web-component polyfill
   var entryFile = util.distPath('transpiled-web/bindings/web/src/ionic.core.es5.js');
   var outputFile = util.distPath('ionic-core/web/ionic.core.es5.js');
   var outputFileMin = outputFile.replace('.js', '.min.js');
+
+  var ceReadPromise = util.readFile(util.srcPath('polyfills/webcomponents-sd-ce.js'));
 
   return rollup.rollup({
     entry: entryFile
@@ -49,17 +53,36 @@ function bundleCoreEs5Js(cePolyfill) {
   }).then(bundle => {
     var result = bundle.generate({
       format: 'es',
-      intro: '(function(window, document) {',
+      intro: '(function(window, document) {\n"use strict";\n',
       outro: '})(window, document);'
     });
 
-    var ceOutput = [
-      cePolyfill,
-      result.code
-    ].join(';\n');
+    return compiler.transpile(result.code, outputFile, ['transform-es2015-classes'], false).then(function(){
+      return minifyES5(outputFile, outputFileMin).then(function() {
 
-    return compiler.transpile(ceOutput, outputFile, ['transform-es2015-classes'], false).then(() => {
-      return minifyES5(outputFile, outputFileMin);
+        return ceReadPromise.then(function(cePolyfill) {
+          cePolyfill = cePolyfill.trim() + ';';
+
+          var jsPromise = util.readFile(outputFile).then(function(content) {
+            content = cePolyfill + content;
+            return util.writeFile(outputFile, content)
+          });
+
+          var jsMinPromise = util.readFile(outputFileMin).then(function(content) {
+            content = addUseStrict(content);
+
+            content = cePolyfill + content;
+            return util.writeFile(outputFileMin, content)
+          });
+
+          return Promise.all([
+            jsPromise,
+            jsMinPromise
+          ]);
+
+        });
+
+      });
     });
   });
 }
@@ -178,7 +201,21 @@ function postClosure(outputFilePath, content) {
 
   content = content.replace(match[0], 'class ' + className + ' extends HTMLElement {}');
 
+  content = addUseStrict(content);
+
   return util.writeFile(outputFilePath, content);
+}
+
+function addUseStrict(content) {
+  // (function(B,U){
+  var match = /\(function\((.*?),(.*?)\)\{/.exec(content);
+  if (!match) {
+    throw 'addUseStrict: something done changed!';
+  }
+
+  content = content.replace(match[0], '(function(' + match[1] + ',' + match[2] + '){"use-strict";')
+
+  return content
 }
 
 
@@ -465,17 +502,14 @@ function postClosure(outputFilePath, content) {
 
 
 Promise.all([
-  util.readFile(util.nodeModulesPath('@webcomponents/custom-elements/src/custom-elements.js')),
   util.readFile(util.srcPath('polyfills/webcomponents-sd-ce.js')),
   util.emptyDir(util.distPath('ionic-core/web'))
 ])
 
 .then(results => {
-  var cePolyfill = results[0] + '\n' + results[1];
-
   return Promise.all([
     bundleIonicJs(),
     bundleCoreJs(),
-    bundleCoreEs5Js(cePolyfill)
+    bundleCoreEs5Js()
   ]);
 });
