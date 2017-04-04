@@ -1,7 +1,7 @@
 import { ConfigApi } from '../utils/interfaces';
 
 
-export function ConfigController(config: any): ConfigApi {
+export function ConfigController(config: Object = {}): ConfigApi {
 
   // TODO
   function get(key: string, fallback = null) {

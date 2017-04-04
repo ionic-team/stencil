@@ -1,47 +1,50 @@
+import { ConfigController } from '../../../platform/config-controller';
+import { DomController } from '../../../platform/dom-controller';
+import { Ionic } from '../../../utils/interfaces';
+import { NextTickController } from '../../../platform/next-tick-controller';
 
-(function(window: any, document: HTMLDocument, requiresEs5: {(): boolean}) {
+
+(function(window: any, document: HTMLDocument) {
   'use strict';
 
-  var ionic = window.Ionic = window.Ionic || {};
+  // create window.Ionic if it doesn't already exist
+  const ionic: Ionic = window.Ionic = window.Ionic || {};
 
-  var scriptElm: any = document.getElementsByTagName('script');
+  // find the static directory, which should be the same as this JS file
+  let scriptElm: any = document.getElementsByTagName('script');
   scriptElm = scriptElm[scriptElm.length - 1];
-  var isMin = scriptElm.src.indexOf('.min.js') > -1;
 
-  var stcDir = <HTMLElement>document.querySelector('script[data-static-dir]');
+  let stcDir = <HTMLElement>document.querySelector('script[data-static-dir]');
   if (stcDir) {
     ionic.staticDir = stcDir.dataset['staticDir'];
 
   } else {
-    var paths = scriptElm.src.split('/');
+    let paths = scriptElm.src.split('/');
     paths.pop();
     ionic.staticDir = scriptElm.dataset['staticDir'] = paths.join('/') + '/';
   }
 
-  var pathItems: string[] = [
-    'core'
-  ];
+  // create the controllers used by ionic-web
+  ionic.configCtrl = ConfigController(ionic.config);
+  ionic.domCtrl = DomController(window);
+  ionic.nextTickCtrl = NextTickController(window);
 
-  if (!window.customElements || requiresEs5()) {
-    pathItems.push('es5');
+  // build up a path for the exact ionic core javascript file this browser needs
+  var pathItems: string[] = ['core'];
+
+  if (!('attachShadow' in Element.prototype)) {
+    // browser requires the shadow dom polyfill
+    pathItems.push('sd');
   }
 
-  if (isMin) {
-    pathItems.push('min');
+  if (!window.customElements) {
+    // browser requires the custom elements polyfill
+    pathItems.push('ce');
   }
 
+  // request the ionic core file this browser needs
   var s = document.createElement('script');
   s.src = `${ionic.staticDir}ionic.${pathItems.join('.')}.js`;
   document.head.appendChild(s);
 
-})(
-  window,
-  document,
-  function es5() {
-    try {
-      eval('(class C{})');
-    } catch (e) {
-      return true;
-    }
-  }
-);
+})(window, document);
