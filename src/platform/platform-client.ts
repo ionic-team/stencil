@@ -1,22 +1,13 @@
-import { ComponentMeta, ComponentMode, ComponentRegistry, Ionic } from '../utils/interfaces';
-import { noop } from '../utils/helpers';
+import { ComponentMeta, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi } from '../utils/interfaces';
 import { PlatformApi } from './platform-api';
 
 
-export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): PlatformApi {
-  const staticDir: string = ionic.staticDir;
+export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const bundleCBs: BundleCallbacks = {};
   const jsonReqs: string[] = [];
   const css: {[tag: string]: boolean} = {};
-
-  const isIOS = /iphone|ipad|ipod|ios/.test(win.navigator.userAgent.toLowerCase());
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
-
-  const raf: RequestAnimationFrame = ionic.raf ? ionic.raf : win.requestAnimationFrame.bind(win);
-  const readCBs: RafCallback[] = [];
-  const writeCBs: RafCallback[] = [];
-  let rafPending: boolean;
 
 
   ionic.loadComponents = function loadComponent(bundleId) {
@@ -122,114 +113,6 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     return shadowElm;
   }
 
-
-  const nextTick = (function () {
-    /* Adopted from Vue.js, MIT, https://github.com/vuejs/vue */
-    const callbacks: Function[] = [];
-    let pending = false;
-    let timerFunc;
-
-    function nextTickHandler() {
-      pending = false;
-      const copies = callbacks.slice(0);
-
-      callbacks.length = 0;
-      for (let i = 0; i < copies.length; i++) {
-        copies[i]();
-      }
-    }
-
-    if (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1) {
-      const p = Promise.resolve();
-      const logError = err => { console.error(err); };
-
-      timerFunc = function promiseTick() {
-        p.then(nextTickHandler).catch(logError);
-        // in problematic UIWebViews, Promise.then doesn't completely break, but
-        // it can get stuck in a weird state where callbacks are pushed into the
-        // microtask queue but the queue isn't being flushed, until the browser
-        // needs to do some other work, e.g. handle a timer. Therefore we can
-        // "force" the microtask queue to be flushed by adding an empty timer.
-        if (isIOS) setTimeout(noop);
-      }
-
-    } else {
-      // fallback to setTimeout
-      timerFunc = function timeoutTick() {
-        setTimeout(nextTickHandler, 0);
-      };
-    }
-
-    return function queueNextTick(cb: Function) {
-      callbacks.push(cb);
-
-      if (!pending) {
-        pending = true;
-        timerFunc();
-      }
-    }
-  })();
-
-
-  function domRead(cb: RafCallback) {
-    readCBs.push(cb);
-    if (!rafPending) {
-      rafQueue();
-    }
-  }
-
-
-  function domWrite(cb: RafCallback) {
-    writeCBs.push(cb);
-    if (!rafPending) {
-      rafQueue();
-    }
-  }
-
-
-  function rafQueue() {
-    rafPending = true;
-
-    raf(function rafCallback(timeStamp) {
-      rafFlush(timeStamp);
-    });
-  }
-
-
-  function rafFlush(timeStamp: number, startTime?: number, cb?: RafCallback, err?: any) {
-    try {
-      startTime = performance.now();
-
-      // ******** DOM READS ****************
-      while (cb = readCBs.shift()) {
-        cb(timeStamp);
-      }
-
-      // ******** DOM WRITES ****************
-      while (cb = writeCBs.shift()) {
-        cb(timeStamp);
-
-        if ((performance.now() - startTime) > 8) {
-          break;
-        }
-      }
-
-    } catch(e) {
-      err = e;
-    }
-
-    rafPending = false;
-
-    if (readCBs.length || writeCBs.length) {
-      rafQueue();
-    }
-
-    if (err) {
-      throw err;
-    }
-  }
-
-
   function registerComponent(cmpMeta: ComponentMeta) {
     registry[cmpMeta.tag] = cmpMeta;
   }
@@ -319,9 +202,9 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
     isElement: isElement,
     isText: isText,
     isComment: isComment,
-    nextTick: nextTick,
-    domRead: domRead,
-    domWrite: domWrite,
+    nextTick: nextTickCtrl.nextTick.bind(nextTickCtrl),
+    domRead: domCtrl.read.bind(domCtrl),
+    domWrite: domCtrl.write.bind(domCtrl),
 
     $createElement: createElement,
     $createElementNS: createElementNS,
@@ -343,14 +226,4 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic): Platf
 
 export interface BundleCallbacks {
   [bundleId: string]: Function[];
-}
-
-
-export interface RafCallback {
-  (timeStamp?: number): void;
-}
-
-
-export interface RequestAnimationFrame {
-  (cb: {(timeStamp?: number): void}): void;
 }

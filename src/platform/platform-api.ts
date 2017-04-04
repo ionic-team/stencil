@@ -1,17 +1,17 @@
-import { ComponentMeta, ComponentMode } from '../utils/interfaces';
+import { ComponentMeta, ComponentMode, DomRead, DomWrite, NextTick } from '../utils/interfaces';
 
 
 export interface PlatformApi {
   registerComponent: (cmpMeta: ComponentMeta) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
-  loadComponent: (cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function) => void ;
+  loadComponent: (cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function) => void;
+  nextTick: NextTick;
+  domRead: DomRead;
+  domWrite: DomWrite;
 
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
   isComment: (node: Node) => node is Comment;
-  nextTick: (cb: Function) => void;
-  domRead: (cb: Function) => void;
-  domWrite: (cb: Function) => void;
 
   $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
   $createElementNS: (namespaceURI: string, qualifiedName: string) => Element;

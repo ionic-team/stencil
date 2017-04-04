@@ -2,10 +2,13 @@
 function Ionic(){};
 function loadComponents(){};
 function components(){};
-function config(){};
-function raf(){};
-function defaultMode(){};
+function configCtrl(){};
 function staticDir(){};
+function domCtrl(){};
+function read(){}
+function write(){}
+function nextTickCtrl(){};
+function nextTick(){}
 
 function tag(){};
 function modes(){};

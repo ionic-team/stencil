@@ -2,12 +2,46 @@
 export interface Ionic {
   staticDir?: string;
   components?: LoadComponents;
-  config?: Config;
-  loadComponents?: {
-    (bundleId: string, componentModeData: any[]);
-  };
-  raf?: {(cb: {(timeStamp?: number): void}): void};
-  defaultMode?: string;
+  loadComponents?: {(bundleId: string, componentModeData: any[]): void};
+  configCtrl?: ConfigApi;
+  domCtrl?: DomControllerApi;
+  nextTickCtrl?: NextTickApi;
+}
+
+
+export interface NextTickApi {
+  nextTick: NextTick;
+}
+
+
+export interface NextTick {
+  (cb: Function): void;
+}
+
+
+export interface DomRead {
+  (cb: Function): void;
+}
+
+
+export interface DomWrite {
+  (cb: Function): void;
+}
+
+
+export interface DomControllerApi {
+  read: DomRead;
+  write: DomWrite;
+}
+
+
+export interface RafCallback {
+  (timeStamp?: number): void;
+}
+
+
+export interface RequestAnimationFrame {
+  (cb: RafCallback): void;
 }
 
 
@@ -16,7 +50,7 @@ export interface LoadComponents {
 }
 
 
-export interface Config {
+export interface ConfigApi {
   get: (key: string, fallback?: any) => any;
 }
 
@@ -102,7 +136,6 @@ export interface VNode {
 
 
 export interface VNodeData {
-  // modules - use any because Object type is useless
   props?: any;
   attrs?: any;
   class?: any;
@@ -113,5 +146,4 @@ export interface VNodeData {
   vkey?: Key;
   vns?: string; // for SVGs
   [key: string]: any; // for any other 3rd party module
-  // end of modules
 }

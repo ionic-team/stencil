@@ -6,8 +6,8 @@ import { registerComponents } from '../../../registry/registry';
 
 const ionic: Ionic = (<any>window).Ionic = (<any>window).Ionic || {};
 
-const plt = PlatformClient(window, document, ionic);
+const plt = PlatformClient(window, document, ionic, ionic.staticDir, ionic.domCtrl, ionic.nextTickCtrl);
 const renderer = initRenderer(plt);
 
 
-registerComponents(renderer, plt, ionic.config, ionic.components);
+registerComponents(renderer, plt, ionic.configCtrl, ionic.components);

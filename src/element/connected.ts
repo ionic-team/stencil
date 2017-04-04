@@ -1,10 +1,10 @@
-import { ComponentController, ComponentMeta, Config, ProxyElement, Renderer } from '../utils/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, ProxyElement, Renderer } from '../utils/interfaces';
 import { isDef } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 
-export function connectedCallback(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
+export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   plt.nextTick(() => {
     const tag = cmpMeta.tag;
     const mode = getMode(plt, config, elm, 'mode');
@@ -17,7 +17,7 @@ export function connectedCallback(plt: PlatformApi, config: Config, renderer: Re
 }
 
 
-function getMode(plt: PlatformApi, config: Config, elm: HTMLElement, propName: string): string {
+function getMode(plt: PlatformApi, config: ConfigApi, elm: HTMLElement, propName: string): string {
   let value = elm[propName];
   if (isDef(value)) {
     return value;

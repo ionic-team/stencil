@@ -1,11 +1,11 @@
-import { ComponentController, Config, ProxyElement } from '../utils/interfaces';
+import { ComponentController, ConfigApi, ProxyElement } from '../utils/interfaces';
 import { generateVNode } from './host';
 import { initProps } from './proxy';
 import { PlatformApi } from '../platform/platform-api';
 import { Renderer } from '../utils/interfaces';
 
 
-export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   // only run patch if it isn't queued already
   if (!ctrl.queued) {
     ctrl.queued = true;
@@ -23,7 +23,7 @@ export function queueUpdate(plt: PlatformApi, config: Config, renderer: Renderer
 }
 
 
-export function update(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+export function update(plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   const cmpMeta = plt.getComponentMeta(tag);
 
   let instance = ctrl.instance;

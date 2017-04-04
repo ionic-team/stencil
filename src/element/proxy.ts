@@ -1,10 +1,10 @@
-import { ComponentController, ComponentMeta, Config, Props, ProxyElement, Renderer } from '../utils/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, Props, ProxyElement, Renderer } from '../utils/interfaces';
 import { getPropValue, toCamelCase, toDashCase } from '../utils/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 
-export function initProps(plt: PlatformApi, config: Config, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
+export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
   const instance = ctrl.instance;
   const lastPropValues: {[propName: string]: any} = {};
 
@@ -40,7 +40,7 @@ export function initProps(plt: PlatformApi, config: Config, renderer: Renderer, 
 }
 
 
-function getInitialValue(plt: PlatformApi, config: Config, elm: HTMLElement, props: Props, propName: string): any {
+function getInitialValue(plt: PlatformApi, config: ConfigApi, elm: HTMLElement, props: Props, propName: string): any {
   let value = elm[propName];
   if (value !== undefined) {
     return value;
