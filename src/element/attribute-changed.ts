@@ -2,7 +2,7 @@ import { ComponentInstance, ComponentMeta } from '../utils/interfaces';
 import { getPropValue, toCamelCase } from '../utils/helpers';
 
 
-export function attributeChangedCallback(instance: ComponentInstance, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string, namespace: string) {
+export function attributeChangedCallback(instance: ComponentInstance, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {
   if (instance) {
 
     if (oldVal !== newVal) {
