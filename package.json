@@ -9,7 +9,11 @@
     "copy.fonts": "mkdir -p dist/ionic-core && cp -R src/fonts/ dist/ionic-core/fonts/",
     "copy.themes": "mkdir -p dist/ionic-core && cp -R src/themes/ dist/ionic-core/themes/",
     "build": "npm run clean && npm run build.core && npm run build.compiler && npm run compare",
-    "build.core": "npm run copy.fonts && npm run copy.themes && npm run build.themes",
+
+    "build.core": "tsc -p src/tsconfig.json && cd scripts && tsc",
+
+    "build.angular": "tsc -p src/bindings/angular/tsconfig.json && npm run build.core && node dist/scripts/build-angular.js",
+
     "build.compiler": "cd src/compiler && npm run build",
     "build.themes": "node-sass src/themes/ionic.scss --output dist/ionic-core/themes/",
     "build.web": "cd src/bindings/web/ && npm run build",
@@ -19,6 +23,7 @@
   },
   "devDependencies": {
     "@types/babel-core": "^6.7.14",
+    "@types/fs-extra": "^2.0.0",
     "@types/jest": "18.1.1",
     "@types/node": "7.0.5",
     "@webcomponents/custom-elements": "^1.0.0-alpha.3",
@@ -42,7 +47,7 @@
     "knuth-shuffle": "1.0.1",
     "node-sass": "^4.5.0",
     "rimraf": "2.6.1",
-    "rollup": "0.41.4",
+    "rollup": "^0.41.4",
     "typescript": "2.2.1"
   },
   "jest": {
