@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowUnreachableCode": false,
-    "declaration": true,
+    "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": ["dom", "es2015"],
@@ -11,15 +11,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "removeComments": false,
-    "sourceMap": true,
-    "types": ["jasmine"],
+    "sourceMap": false,
     "outDir": "../../../dist/transpiled-angular"
   },
   "include": [
     "src/**/*.ts"
-  ],
-  "angularCompilerOptions": {
-    "annotationsAs": "static fields",
-    "annotateForClosureCompiler": true
-  }
+  ]
 }
