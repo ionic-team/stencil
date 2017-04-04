@@ -3,6 +3,7 @@ export interface Ionic {
   staticDir?: string;
   components?: LoadComponents;
   loadComponents?: {(bundleId: string, componentModeData: any[]): void};
+  config?: Object;
   configCtrl?: ConfigApi;
   domCtrl?: DomControllerApi;
   nextTickCtrl?: NextTickApi;
