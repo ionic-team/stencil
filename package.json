@@ -11,12 +11,11 @@
     "build": "npm run clean && npm run build.core && npm run build.compiler && npm run compare",
 
     "build.core": "tsc -p scripts/tsconfig.json",
-
     "build.angular": "tsc -p src/bindings/angular/tsconfig.json && npm run build.core && node dist/scripts/build-angular.js",
+    "build.web": "tsc -p src/bindings/web/tsconfig.json && npm run build.core && node dist/scripts/build-web.js",
 
     "build.compiler": "cd src/compiler && npm run build",
     "build.themes": "node-sass src/themes/ionic.scss --output dist/ionic-core/themes/",
-    "build.web": "cd src/bindings/web/ && npm run build",
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch"

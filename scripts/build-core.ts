@@ -1,12 +1,12 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as babel from 'babel-core';
-
 const rollup = require('rollup');
-const ROOT_DIR = path.join(__dirname, '../..');
-const EXTERNS = path.join(ROOT_DIR, 'scripts', 'core.externs.js');
-const POLYFILLS_DIR = path.join(ROOT_DIR, 'src/polyfills');
-const LICENSE = `/*! (C) Ionic, https://ionicframework.com/ - Mit License */\n`;
+
+export const ROOT_DIR = path.join(__dirname, '../..');
+export const EXTERNS = path.join(ROOT_DIR, 'scripts', 'core.externs.js');
+export const POLYFILLS_DIR = path.join(ROOT_DIR, 'src/polyfills');
+export const LICENSE = `/*! (C) Ionic, https://ionicframework.com/ - Mit License */\n`;
 
 
 // ionic.core.dev.js - Extends HTMLElement Class, w/out polyfills, not minified
@@ -235,7 +235,7 @@ function transpile(code: string) {
 }
 
 
-function writeFile(filePath: string, content: string) {
+export function writeFile(filePath: string, content: string) {
   return new Promise((resolve, reject) => {
     fs.writeFile(filePath, content, (err) => {
       if (err) {
@@ -273,42 +273,35 @@ export function buildCore(transpiledSrcDir: string, destDir: string) {
     cePolyfillContent: ''
   };
 
-  fs.emptyDir(destDir, (err) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
+  fs.emptyDirSync(destDir);
+
+  Promise.all([
+    buildCoreDev(ctx),
+    buildCoreES5Dev(ctx)
+  ])
+
+  .then(() => {
 
     return Promise.all([
-        buildCoreDev(ctx),
-        buildCoreES5Dev(ctx)
-      ])
+      buildCoreMinified(ctx),
+      buildCoreES5Minified(ctx)
+    ]);
 
-      .then(() => {
+  })
 
-        return Promise.all([
-          buildCoreMinified(ctx),
-          buildCoreES5Minified(ctx)
-        ]);
+  .then(() => {
 
-      })
+    ctx.shadyDomContent = fs.readFileSync(ctx.shadyDomFilePath, 'utf-8').trim();
+    ctx.cePolyfillContent = fs.readFileSync(ctx.cePolyFillPath, 'utf-8').trim();
 
-      .then(() => {
-
-        ctx.shadyDomContent = fs.readFileSync(ctx.shadyDomFilePath, 'utf-8').trim();
-        ctx.cePolyfillContent = fs.readFileSync(ctx.cePolyFillPath, 'utf-8').trim();
-
-        return Promise.all([
-          customElementPolyfillDev(ctx),
-          customElementPolyfillMin(ctx),
-          shadyDomCustomElementPolyfillDev(ctx),
-          shadyDomCustomElementPolyfillMin(ctx)
-        ]);
-
-      });
+    return Promise.all([
+      customElementPolyfillDev(ctx),
+      customElementPolyfillMin(ctx),
+      shadyDomCustomElementPolyfillDev(ctx),
+      shadyDomCustomElementPolyfillMin(ctx)
+    ]);
 
   });
-
 }
 
 
