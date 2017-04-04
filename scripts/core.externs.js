@@ -1,5 +1,4 @@
 
-// do not property rename these
 function Ionic(){};
 function loadComponents(){};
 function components(){};
@@ -8,8 +7,12 @@ function raf(){};
 function defaultMode(){};
 function staticDir(){};
 
+function tag(){};
+function modes(){};
+function props(){};
 function mode(){};
 function color(){};
+function observedAttrs(){};
 
 function connectedCallback(){};
 function attributeChangedCallback(){};
@@ -18,5 +21,3 @@ function observedAttributes(){};
 function customElements(){};
 function define(){};
 function attachShadow(){};
-function HTMLElement(){};
-
