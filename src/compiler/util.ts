@@ -1,10 +1,72 @@
-import * as fs from 'fs-extra';
+import { GenerateContext, FileMeta } from './interfaces';
+import * as fs from 'fs';
+import * as path from 'path';
 import * as ts from 'typescript';
-import * as crypto from 'crypto';
+
+
+export function getFileMeta(ctx: GenerateContext, filePath: string): Promise<FileMeta> {
+  const fileMeta = ctx.files.get(filePath);
+  if (fileMeta) {
+    return Promise.resolve(fileMeta);
+  }
+
+  return readFile(filePath).then(srcText => {
+    return createFileMeta(ctx, filePath, srcText);
+  });
+}
+
+
+export function createFileMeta(ctx: GenerateContext, filePath: string, srcText: string) {
+  const fileMeta: FileMeta = {
+    fileName: path.basename(filePath),
+    filePath: filePath,
+    fileExt: path.extname(filePath),
+    srcText: srcText,
+    srcTextWithoutDecorators: null,
+    isTsSourceFile: isTsSourceFile(filePath),
+    isTransformable: false,
+    cmpMeta: null
+  };
+
+  if (fileMeta.isTsSourceFile) {
+    fileMeta.isTransformable = isTransformable(fileMeta.srcText);
+  }
+
+  ctx.files.set(filePath, fileMeta);
+
+  return fileMeta;
+}
+
+
+export function readFile(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      if (err) {
+        console.log(err);
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+
+export function writeFile(filePath: string, content: string) {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath, content, (err) => {
+      if (err) {
+        console.log(err);
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
 
 
 export function isTsSourceFile(filePath: string) {
-
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
     if (parts[parts.length - 1] === 'ts') {
@@ -23,74 +85,7 @@ export function isTransformable(sourceText: string) {
 }
 
 
-export function hashContent(content: string) {
-  const hash = crypto.createHash('sha1');
-  hash.update(content);
-  return hash.digest('hex');
-}
-
-
-export function readFile(filePath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-
-    fs.readFile(filePath, 'utf-8', (err, content) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(content.toString());
-      }
-    });
-
-  });
-}
-
-
-export function writeFile(filePath: string, data: string): Promise<null> {
-  return new Promise((resolve, reject) => {
-
-    fs.writeFile(filePath, data, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-
-  });
-}
-
-
-export function emptyDir(dirPath: string) {
-  return new Promise((resolve, reject) => {
-
-    fs.emptyDir(dirPath, err => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-
-  });
-}
-
-
-export function copy(src: string, dest: string) {
-  return new Promise((resolve, reject) => {
-
-    fs.copy(src, dest, err => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-
-  });
-}
-
-
-export function getTsScriptTarget(str: string) {
+export function getTsScriptTarget(str: 'es5' | 'es2015') {
   if (str === 'es5') {
     return ts.ScriptTarget.ES5
   }
@@ -99,10 +94,10 @@ export function getTsScriptTarget(str: string) {
 }
 
 
-export function getTsModule(str: string) {
-  if (str === 'common') {
-    return ts.ModuleKind.CommonJS;
+export function getTsModule(str: 'commonjs' | 'es2015') {
+  if (str === 'es2015') {
+    return ts.ModuleKind.ES2015;
   }
 
-  return ts.ModuleKind.ES2015;
+  return ts.ModuleKind.CommonJS;
 }

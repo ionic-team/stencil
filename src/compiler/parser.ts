@@ -1,32 +1,32 @@
-import { FileMeta, CompilerOptions, CompilerContext, ComponentMeta } from './interfaces';
+import { FileMeta, GenerateConfig, GenerateContext, ComponentMeta } from './interfaces';
 import { getTsScriptTarget } from './util';
 import * as ts from 'typescript';
 
 
-export function parseTsSrcFile(file: FileMeta, opts: CompilerOptions, ctx: CompilerContext) {
-  let tsSrcFile = ts.createSourceFile(file.filePath, file.srcText, getTsScriptTarget(opts.scriptTarget), true);
+export function parseTsSrcFile(file: FileMeta, config: GenerateConfig, ctx: GenerateContext) {
+  let tsSrcFile = ts.createSourceFile(file.filePath, file.srcText, getTsScriptTarget(config.scriptTarget), true);
 
-  inspectNode(tsSrcFile, file, opts, ctx);
+  inspectNode(tsSrcFile, file, config, ctx);
 }
 
 
-function inspectNode(n: ts.Node, file: FileMeta, opts: CompilerOptions, ctx: CompilerContext) {
+function inspectNode(n: ts.Node, file: FileMeta, config: GenerateConfig, ctx: GenerateContext) {
 
   if (n.kind === ts.SyntaxKind.ClassDeclaration) {
     ts.forEachChild(n, childNode => {
       if (childNode.kind === ts.SyntaxKind.Decorator) {
-        inspectClassDecorator(childNode, file, opts, ctx);
+        inspectClassDecorator(childNode, file, ctx);
       }
     });
   }
 
   ts.forEachChild(n, childNode => {
-    inspectNode(childNode, file, opts, ctx);
+    inspectNode(childNode, file, config, ctx);
   });
 }
 
 
-function inspectClassDecorator(n: ts.Node, file: FileMeta, opts: CompilerOptions, ctx: CompilerContext) {
+function inspectClassDecorator(n: ts.Node, file: FileMeta, ctx: GenerateContext) {
   let orgText = n.getText();
 
   if (orgText.replace(/\s/g,'').indexOf('@Component({') !== 0) {
@@ -133,5 +133,5 @@ function updateProperties(cmpMeta: ComponentMeta) {
 
 
 function parseComponentMeta(text: string): ComponentMeta {
-  return eval(`(function(){ return ${text}; })()`);
+  return new Function(`return ${text};`)();
 }
