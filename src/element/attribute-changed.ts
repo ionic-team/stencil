@@ -1,5 +1,5 @@
-import { ComponentInstance, ComponentMeta } from '../utils/interfaces';
-import { getPropValue, toCamelCase } from '../utils/helpers';
+import { ComponentInstance, ComponentMeta } from '../util/interfaces';
+import { getPropValue, toCamelCase } from '../util/helpers';
 
 
 export function attributeChangedCallback(instance: ComponentInstance, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {

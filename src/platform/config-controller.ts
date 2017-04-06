@@ -1,4 +1,4 @@
-import { ConfigApi } from '../utils/interfaces';
+import { ConfigApi } from '../util/interfaces';
 
 
 export function ConfigController(config: Object = {}): ConfigApi {

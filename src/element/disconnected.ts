@@ -1,4 +1,4 @@
-import { ComponentController } from '../utils/interfaces';
+import { ComponentController } from '../util/interfaces';
 
 
 export function disconnectedCallback(ctrl: ComponentController) {

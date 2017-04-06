@@ -1,4 +1,4 @@
-import { VNode } from '../utils/interfaces';
+import { VNode } from '../util/interfaces';
 
 
 export function vnode(sel: string | undefined,

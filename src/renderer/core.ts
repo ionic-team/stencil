@@ -9,9 +9,9 @@
 
 
 /* global module, document, Node */
-import { Renderer, VNode, VNodeData, Key } from '../utils/interfaces';
+import { Renderer, VNode, VNodeData, Key } from '../util/interfaces';
 import { vnode } from './vnode';
-import { isArray, isDef, isUndef, isPrimitive } from '../utils/helpers';
+import { isArray, isDef, isUndef, isPrimitive } from '../util/helpers';
 import { PlatformApi } from '../platform/platform-api';
 
 import { updateAttrs } from './modules/attributes';

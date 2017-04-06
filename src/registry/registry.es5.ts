@@ -1,5 +1,5 @@
 import { attributeChangedCallback } from '../element/attribute-changed';
-import { ComponentController, ConfigApi, LoadComponents, Renderer } from '../utils/interfaces';
+import { ComponentController, ConfigApi, LoadComponents, Renderer } from '../util/interfaces';
 import { connectedCallback } from '../element/connected';
 import { disconnectedCallback } from '../element/disconnected';
 import { initComponentMeta } from '../element/proxy';

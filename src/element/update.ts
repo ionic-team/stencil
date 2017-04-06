@@ -1,8 +1,8 @@
-import { ComponentController, ConfigApi, ProxyElement } from '../utils/interfaces';
+import { ComponentController, ConfigApi, ProxyElement } from '../util/interfaces';
 import { generateVNode } from './host';
 import { initProps } from './proxy';
 import { PlatformApi } from '../platform/platform-api';
-import { Renderer } from '../utils/interfaces';
+import { Renderer } from '../util/interfaces';
 
 
 export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {

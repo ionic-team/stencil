@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi } from '../utils/interfaces';
+import { ComponentMeta, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi } from '../util/interfaces';
 import { PlatformApi } from './platform-api';
 
 

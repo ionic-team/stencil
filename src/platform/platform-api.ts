@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentMode, DomRead, DomWrite, NextTick } from '../utils/interfaces';
+import { ComponentMeta, ComponentMode, DomRead, DomWrite, NextTick } from '../util/interfaces';
 
 
 export interface PlatformApi {

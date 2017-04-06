@@ -1,4 +1,4 @@
-import { DomControllerApi, RafCallback } from '../utils/interfaces';
+import { DomControllerApi, RafCallback } from '../util/interfaces';
 
 
 export function DomController(window: Window): DomControllerApi {

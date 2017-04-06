@@ -1,6 +1,6 @@
 import { vnode } from './vnode';
-import { VNode, VNodeData } from '../utils/interfaces';
-import { isArray, isPrimitive } from '../utils/helpers';
+import { VNode, VNodeData } from '../util/interfaces';
+import { isArray, isPrimitive } from '../util/helpers';
 
 
 function addNS(data: any, children: Array<VNode> | undefined, sel: string | undefined): void {

@@ -1,4 +1,4 @@
-import { ComponentInstance, ComponentMeta, VNode, VNodeData } from '../utils/interfaces';
+import { ComponentInstance, ComponentMeta, VNode, VNodeData } from '../util/interfaces';
 import { h } from '../renderer/core';
 
 

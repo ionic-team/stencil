@@ -1,5 +1,5 @@
-import { NextTickApi } from '../utils/interfaces';
-import { noop } from '../utils/helpers';
+import { NextTickApi } from '../util/interfaces';
+import { noop } from '../util/helpers';
 
 
 export function NextTickController(window: Window): NextTickApi {
