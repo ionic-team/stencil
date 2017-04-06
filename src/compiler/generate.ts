@@ -1,5 +1,5 @@
-import { GenerateConfig, GenerateContext } from './interfaces';
-import { getFileMeta, isTsSourceFile } from './util';
+import { copyFile, getFileMeta, isTsSourceFile, writeFile } from './util';
+import { GenerateConfig, GenerateContext, Manifest } from './interfaces';
 import { parseTsSrcFile } from './parser';
 import { transpile } from './transpile';
 import * as fs from 'fs';
@@ -11,20 +11,31 @@ export function generate(config: GenerateConfig, ctx: GenerateContext = {}) {
     ctx.files = new Map();
   }
 
-  const srcDirs = config.srcDirs || [];
+  config.include = config.include || [];
 
-  const promises = srcDirs.map(srcDir => {
-    return scanDirectory(srcDir, config, ctx);
+  if (!config.exclude) {
+    config.exclude = ['node_modules', 'bower_components'];
+  }
+
+  const promises = config.include.map(includePath => {
+    return scanDirectory(includePath, config, ctx);
   });
 
-  return Promise.all(promises).then(() => {
-    return transpile(config, ctx);
-  });
+  return Promise.all(promises)
+    .then(() => {
+      return transpile(config, ctx);
+    }).then(() => {
+      return generateManifest(config, ctx);
+    });
 }
 
 
 function scanDirectory(dir: string, config: GenerateConfig, ctx: GenerateContext) {
   return new Promise(resolve => {
+
+    if (config.debug) {
+      console.log(`scanDirectory: ${dir}`);
+    }
 
     fs.readdir(dir, (err, files) => {
       if (err) {
@@ -38,7 +49,7 @@ function scanDirectory(dir: string, config: GenerateConfig, ctx: GenerateContext
       files.forEach(dirItem => {
         const readPath = path.join(dir, dirItem);
 
-        if (!isValidDirectory(readPath)) {
+        if (!isValidDirectory(config, readPath)) {
           return;
         }
 
@@ -60,6 +71,9 @@ function scanDirectory(dir: string, config: GenerateConfig, ctx: GenerateContext
               inspectTsFile(readPath, config, ctx).then(() => {
                 resolve();
               });
+
+            } else {
+              resolve();
             }
           })
 
@@ -81,6 +95,10 @@ function inspectTsFile(filePath: string, config: GenerateConfig, ctx: GenerateCo
     ctx.files = new Map();
   }
 
+  if (config.debug) {
+    console.log(`inspectTsFile: ${filePath}`);
+  }
+
   return getFileMeta(ctx, filePath).then(fileMeta => {
 
     if (!fileMeta.isTsSourceFile || !fileMeta.isTransformable) {
@@ -92,6 +110,66 @@ function inspectTsFile(filePath: string, config: GenerateConfig, ctx: GenerateCo
 }
 
 
-function isValidDirectory(filePath: string) {
-  return filePath.indexOf('node_modules') === -1 || filePath.indexOf('bower_components') === -1;
+function isValidDirectory(config: GenerateConfig, filePath: string) {
+  for (var i = 0; i < config.exclude.length; i++) {
+    if (filePath.indexOf(config.exclude[i]) > -1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+function generateManifest(config: GenerateConfig, ctx: GenerateContext) {
+  const manifest: Manifest = {
+    components: {},
+    bundles: []
+  };
+
+  const destDir = config.compilerOptions.outDir;
+  const promises: Promise<any>[] = [];
+
+  ctx.files.forEach(f => {
+    if (!f.isTsSourceFile || !f.cmpMeta) return;
+
+    const cmpMeta = Object.assign({}, f.cmpMeta);
+    const componentUrl = f.jsFilePath.replace(destDir + path.sep, '');
+    const modes = cmpMeta.modes;
+    const componentDir = path.dirname(componentUrl);
+
+    Object.keys(modes).forEach(modeName => {
+      modes[modeName].styleUrls = modes[modeName].styleUrls.map(styleUrl => {
+        const relativePath = path.join(componentDir, styleUrl);
+        const srcAbsolutePath = path.join(f.srcDir, styleUrl);
+        const destAbsolutePath = path.join(destDir, relativePath);
+
+        promises.push(copyFile(srcAbsolutePath, destAbsolutePath));
+
+        return relativePath;
+      });
+    });
+
+    manifest.components[cmpMeta.tag] = {
+      componentUrl: componentUrl,
+      modes: modes
+    };
+  });
+
+  if (config.bundles) {
+    manifest.bundles = config.bundles;
+
+  } else {
+    ctx.files.forEach(f => {
+      if (f.isTsSourceFile && f.cmpMeta) {
+        manifest.bundles.push([f.cmpMeta.tag]);
+      }
+    });
+  }
+
+  const manifestFile = path.join(config.compilerOptions.outDir, 'manifest.json')
+  const json = JSON.stringify(manifest, null, 2);
+
+  promises.push(writeFile(manifestFile, json));
+
+  return Promise.all(promises);
 }

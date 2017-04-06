@@ -1,11 +1,18 @@
 
 
 export interface GenerateConfig {
-  srcDirs: string[];
-  outDir: string;
-  manifestFilePath: string;
-  scriptTarget: 'es5' | 'es2015';
-  module: 'es2015' | 'commonjs';
+  compilerOptions: {
+    declaration?: boolean;
+    lib?: string[];
+    module?: 'es2015' | 'commonjs';
+    outDir?: string;
+    sourceMap?: boolean;
+    target?: 'es5' | 'es2015';
+  },
+  include: string[];
+  exclude?: string[];
+  debug?: boolean;
+  bundles?: string[][];
 }
 
 
@@ -13,8 +20,11 @@ export interface FileMeta {
   fileName: string;
   fileExt: string;
   filePath: string;
+  srcDir: string;
   srcText: string;
   srcTextWithoutDecorators: string;
+  jsFilePath: string;
+  jsText: string;
   isTsSourceFile: boolean;
   isTransformable: boolean;
   cmpMeta: ComponentMeta;
@@ -23,7 +33,6 @@ export interface FileMeta {
 
 export interface GenerateContext {
   files?: Map<string, FileMeta>;
-  components?: ComponentMeta[];
 }
 
 
@@ -72,17 +81,17 @@ export interface CoreComponents {
 
 
 export interface Component {
-  tag: string;
+  tag?: string;
   modes: {[modeName: string]: ComponentMode};
   componentUrl: string;
-  componentImporter: string;
+  componentImporter?: string;
 }
 
 
 export interface ComponentMode {
-  name: string;
-  styleUrls: string[];
-  styles: string;
+  name?: string;
+  styleUrls?: string[];
+  styles?: string;
 }
 
 

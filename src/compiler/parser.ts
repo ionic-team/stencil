@@ -1,10 +1,11 @@
 import { FileMeta, GenerateConfig, GenerateContext, ComponentMeta } from './interfaces';
-import { getTsScriptTarget } from './util';
+import { getTsScriptTarget } from './transpile';
 import * as ts from 'typescript';
 
 
 export function parseTsSrcFile(file: FileMeta, config: GenerateConfig, ctx: GenerateContext) {
-  let tsSrcFile = ts.createSourceFile(file.filePath, file.srcText, getTsScriptTarget(config.scriptTarget), true);
+  const scriptTarget = getTsScriptTarget(config.compilerOptions.target);
+  const tsSrcFile = ts.createSourceFile(file.filePath, file.srcText, scriptTarget, true);
 
   inspectNode(tsSrcFile, file, config, ctx);
 }
@@ -15,7 +16,7 @@ function inspectNode(n: ts.Node, file: FileMeta, config: GenerateConfig, ctx: Ge
   if (n.kind === ts.SyntaxKind.ClassDeclaration) {
     ts.forEachChild(n, childNode => {
       if (childNode.kind === ts.SyntaxKind.Decorator) {
-        inspectClassDecorator(childNode, file, ctx);
+        inspectClassDecorator(childNode, file);
       }
     });
   }
@@ -26,7 +27,7 @@ function inspectNode(n: ts.Node, file: FileMeta, config: GenerateConfig, ctx: Ge
 }
 
 
-function inspectClassDecorator(n: ts.Node, file: FileMeta, ctx: GenerateContext) {
+function inspectClassDecorator(n: ts.Node, file: FileMeta) {
   let orgText = n.getText();
 
   if (orgText.replace(/\s/g,'').indexOf('@Component({') !== 0) {
@@ -39,16 +40,7 @@ function inspectClassDecorator(n: ts.Node, file: FileMeta, ctx: GenerateContext)
 
   updateComponentMeta(file.cmpMeta, orgText);
 
-  if (!ctx.components) {
-    ctx.components = [];
-  }
-
-  const metaCopy: ComponentMeta = Object.assign({}, file.cmpMeta);
-  delete metaCopy.modes;
-
-  ctx.components.push(metaCopy);
-
-  file.srcTextWithoutDecorators = file.srcTextWithoutDecorators.replace(orgText, '');
+  file.srcTextWithoutDecorators = file.srcText.replace(orgText, '');
 }
 
 
@@ -67,6 +59,8 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
   }
 
   updateTag(cmpMeta);
+  updateModes(cmpMeta);
+  updateStyles(cmpMeta);
   updateProperties(cmpMeta);
 }
 
@@ -90,7 +84,24 @@ function updateTag(cmpMeta: ComponentMeta) {
   if (cmpMeta.tag.lastIndexOf('-') === cmpMeta.tag.length - 1) {
     throw `"${cmpMeta.tag}" tag cannot end with a dash (-)`;
   }
+}
 
+
+function updateModes(cmpMeta: ComponentMeta) {
+  cmpMeta.modes = cmpMeta.modes = {};
+}
+
+
+function updateStyles(cmpMeta: ComponentMeta) {
+  const styleModes: {[modeName: string]: string} = (<any>cmpMeta).styleUrls;
+
+  if (styleModes) {
+    Object.keys(styleModes).forEach(styleModeName => {
+      cmpMeta.modes[styleModeName] = {
+        styleUrls: [styleModes[styleModeName]]
+      }
+    });
+  }
 }
 
 

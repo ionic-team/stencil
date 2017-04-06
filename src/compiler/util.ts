@@ -1,7 +1,6 @@
 import { GenerateContext, FileMeta } from './interfaces';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ts from 'typescript';
 
 
 export function getFileMeta(ctx: GenerateContext, filePath: string): Promise<FileMeta> {
@@ -21,8 +20,11 @@ export function createFileMeta(ctx: GenerateContext, filePath: string, srcText: 
     fileName: path.basename(filePath),
     filePath: filePath,
     fileExt: path.extname(filePath),
+    srcDir: path.dirname(filePath),
     srcText: srcText,
     srcTextWithoutDecorators: null,
+    jsFilePath: null,
+    jsText: null,
     isTsSourceFile: isTsSourceFile(filePath),
     isTransformable: false,
     cmpMeta: null
@@ -66,6 +68,13 @@ export function writeFile(filePath: string, content: string) {
 }
 
 
+export function copyFile(src: string, dest: string) {
+  return readFile(src).then(content => {
+    return writeFile(dest, content);
+  });
+}
+
+
 export function isTsSourceFile(filePath: string) {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
@@ -82,22 +91,4 @@ export function isTsSourceFile(filePath: string) {
 
 export function isTransformable(sourceText: string) {
   return (sourceText.indexOf('@Component') > -1);
-}
-
-
-export function getTsScriptTarget(str: 'es5' | 'es2015') {
-  if (str === 'es5') {
-    return ts.ScriptTarget.ES5
-  }
-
-  return ts.ScriptTarget.ES2015
-}
-
-
-export function getTsModule(str: 'commonjs' | 'es2015') {
-  if (str === 'es2015') {
-    return ts.ModuleKind.ES2015;
-  }
-
-  return ts.ModuleKind.CommonJS;
 }
