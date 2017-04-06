@@ -1,244 +1,264 @@
-import { buildComponentModeStyles } from './styles';
-import { Bundle, CompilerConfig, CompilerResults, CompilerContext, Component, ComponentMode, Manifest } from './interfaces';
-import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
-import { readFile, writeFile } from './util';
+import { getFileMeta, isTsSourceFile, logError, readFile, writeFile } from './util';
+import { CompilerConfig, CompilerContext, Manifest, Results } from './interfaces';
+import { parseTsSrcFile } from './parser';
+import { transpile } from './transpile';
+import * as fs from 'fs';
 import * as path from 'path';
+import * as ts from 'typescript';
 
 
-export function compile(config: CompilerConfig) {
-  const ctx: CompilerContext = (<any>global).ionCompilerContext = (<any>global).ionCompilerContext || {};
+/**
+ * Inputs a source directory of components (.ts/.scss files)
+ * and compiles them into reusable ionic components. Output directory
+ * contains that transpiled files that are now separate .js files, and
+ * copies over all .scss files each component requires. Think
+ * typescript's "tsc" command, but for ionic components.
+ *
+ * This command also creates a manifest.json file, which includes
+ * everything 3rd party tooling need to know about each component at
+ * "build" time. The manifest.json also includes paths to all the files
+ * each component uses, and meta data like modes, properties, etc.
+ *
+ * @param config  Compiler config
+ * @param ctx  Option context object so rebuilds are faster
+ */
+export function compile(config: CompilerConfig, ctx: CompilerContext = {}): Promise<Results> {
+  if (!ctx.files) {
+    ctx.files = new Map();
+  }
 
-  return getManifest(config, ctx).then(manifest => {
+  ctx.results = {};
 
-    const components = getComponents(ctx, manifest);
+  config.include = config.include || [];
 
-    const results: CompilerResults = {
-      error: null
-    };
+  if (!config.exclude) {
+    config.exclude = ['node_modules', 'bower_components'];
+  }
 
-    return Promise.all(Object.keys(components).map(tag => {
-      return buildComponent(config, components[tag]);
+  const promises = config.include.map(includePath => {
+    return scanDirectory(includePath, config, ctx);
+  });
 
-    }))
+  return Promise.all(promises)
     .then(() => {
-      return buildCoreJs(config, ctx, manifest);
+      return transpile(config, ctx);
 
     }).then(() => {
-      return results;
+      return processStyles(config, ctx);
+
+    }).then(() => {
+      return generateManifest(config, ctx);
+
+    }).then(() => {
+      return ctx.results;
 
     }).catch(err => {
-      results.error = err;
-      return results;
+      return logError(ctx.results, err);
     });
-
-  });
 }
 
 
-function buildComponent(config: CompilerConfig, component: Component) {
-  return buildComponentModule(config, component).then(() => {
-    const modeNames = Object.keys(component.modes);
+function scanDirectory(dir: string, config: CompilerConfig, ctx: CompilerContext) {
+  return new Promise(resolve => {
 
-    return Promise.all(modeNames.map(modeName => {
-      component.modes[modeName].name = modeName;
-      return buildComponentMode(config, component, component.modes[modeName]);
-    }));
-  });
-}
-
-
-function buildComponentModule(config: CompilerConfig, component: Component) {
-  if (component.componentImporter) {
-    return Promise.resolve(component.componentImporter);
-  }
-
-  const manifestDir = path.dirname(config.manifestFilePath);
-
-  const rollupConfig = {
-    entry: path.join(manifestDir, component.componentUrl),
-    format: 'cjs'
-  };
-
-  return config.rollup.rollup(rollupConfig).then((bundle: any) => {
-    const bundleOutput = bundle.generate(rollupConfig);
-
-    let code = `function importComponent(exports) { ${bundleOutput.code} }`;
-
-    if (config.minifyJs) {
-      const minifyResults = config.uglify.minify(code, {
-        fromString: true
-      });
-
-      code = minifyResults.code;
+    if (config.debug) {
+      console.log(`scanDirectory: ${dir}`);
     }
 
-    code = code.replace(/function importComponent\(/g, 'function(');
+    fs.readdir(dir, (err, files) => {
+      if (err) {
+        logError(ctx.results, err);
+        resolve();
+        return;
+      }
 
-    return component.componentImporter = code;
-  });
-}
+      const promises: Promise<any>[] = [];
 
+      files.forEach(dirItem => {
+        const readPath = path.join(dir, dirItem);
 
-function buildComponentMode(config: CompilerConfig, component: Component, mode: ComponentMode) {
-  return buildComponentModeStyles(config, mode).then(() => {
-    return getComponentModeLoader(component, mode);
-  });
-}
+        if (!isValidDirectory(config, readPath)) {
+          return;
+        }
 
+        promises.push(new Promise(resolve => {
 
-function getComponents(ctx: CompilerContext, manifest: Manifest) {
-  if (!ctx.components) {
-    ctx.components = {};
+          fs.stat(readPath, (err, stats) => {
+            if (err) {
+              logError(ctx.results, err);
+              resolve();
+              return;
+            }
 
-    Object.keys(manifest.components).forEach(tag => {
-      ctx.components[tag] = <Component>Object.assign({}, manifest.components[tag]);
-      ctx.components[tag].tag = tag;
+            if (stats.isDirectory()) {
+              scanDirectory(readPath, config, ctx).then(() => {
+                resolve();
+              });
+
+            } else if (isTsSourceFile(readPath)) {
+              inspectTsFile(readPath, config, ctx).then(() => {
+                resolve();
+              });
+
+            } else {
+              resolve();
+            }
+          })
+
+        }));
+
+      });
+
+      Promise.all(promises).then(() => {
+        resolve();
+      });
     });
-  }
-  return ctx.components;
+
+  });
 }
 
 
-function buildCoreJs(config: CompilerConfig, ctx: CompilerContext, manifest: Manifest) {
-  ctx.bundles = [];
+function inspectTsFile(filePath: string, config: CompilerConfig, ctx: CompilerContext = {}) {
+  if (!ctx.files) {
+    ctx.files = new Map();
+  }
 
-  manifest.bundles.forEach(bundleComponentTags => {
-    buildComponentBundles(ctx, bundleComponentTags);
+  if (config.debug) {
+    console.log(`inspectTsFile: ${filePath}`);
+  }
+
+  return getFileMeta(ctx, filePath).then(fileMeta => {
+
+    if (!fileMeta.isTsSourceFile || !fileMeta.isTransformable) {
+      return;
+    }
+
+    parseTsSrcFile(fileMeta, config, ctx);
+  });
+}
+
+
+function isValidDirectory(config: CompilerConfig, filePath: string) {
+  for (var i = 0; i < config.exclude.length; i++) {
+    if (filePath.indexOf(config.exclude[i]) > -1) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+function processStyles(config: CompilerConfig, ctx: CompilerContext) {
+  const destDir = config.compilerOptions.outDir;
+  const promises: Promise<any>[] = [];
+
+  const includedSassFiles: string[] = [];
+
+  ctx.files.forEach(f => {
+    if (!f.isTsSourceFile || !f.cmpMeta) return;
+
+    Object.keys(f.cmpMeta.modes).forEach(modeName => {
+
+      f.cmpMeta.modes[modeName].styleUrls.forEach(styleUrl => {
+        const srcAbsolutePath = path.join(f.srcDir, styleUrl);
+
+        promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, srcAbsolutePath));
+      });
+
+    });
   });
 
-  return generateBundleFiles(config, ctx).then(() => {
-    const registryContent = getRegistryContent(ctx.registry);
-
+  return Promise.all(promises).then(() => {
     const promises: Promise<any>[] = [];
 
-    if (config.minifyJs) {
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.js', 'ionic.core.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.js', 'ionic.core.ce.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.js', 'ionic.core.sd.ce.js'));
+    includedSassFiles.forEach(includedSassFile => {
 
-    } else {
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.dev.js', 'ionic.core.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.dev.js', 'ionic.core.ce.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.dev.js', 'ionic.core.sd.ce.js'));
-    }
+      config.include.forEach(includeDir => {
+        if (includedSassFile.indexOf(includeDir) === 0) {
+          const src = includedSassFile;
+          const relative = includedSassFile.replace(includeDir, '');
+          const dest = path.join(destDir, relative);
 
-    return promises;
+          promises.push(readFile(src).then(content => {
+            ts.sys.writeFile(dest, content);
+          }));
+        }
+      });
+
+    });
+
+    return Promise.all(promises);
   });
 }
 
 
-function buildComponentBundles(ctx: CompilerContext, bundleComponentTags: string[]) {
-  const allModeNames = getAllModeNames(ctx);
+function getIncludedSassFiles(config: CompilerConfig, ctx: CompilerContext, includedSassFiles: string[], scssFilePath: string) {
+  return new Promise((resolve, reject) => {
 
-  allModeNames.forEach(modeName => {
-
-    const bundle: Bundle = {
-      components: []
+    const sassConfig = {
+      file: scssFilePath
     };
 
-    bundleComponentTags.forEach(bundleComponentTag => {
+    config.packages.nodeSass.render(sassConfig, (err: any, result: any) => {
+      if (err) {
+        logError(ctx.results, err);
+        reject(err);
 
-      const component = ctx.components[bundleComponentTag];
-      if (!component) return;
+      } else {
+        result.stats.includedFiles.forEach((includedFile: string) => {
+          if (includedSassFiles.indexOf(includedFile) === -1) {
+            includedSassFiles.push(includedFile);
+          }
+        });
 
-      const mode = component.modes[modeName];
-      if (!mode) return;
+        resolve();
+      }
+    });
 
-      bundle.components.push({
-        component: component,
-        mode: mode
+  });
+}
+
+
+function generateManifest(config: CompilerConfig, ctx: CompilerContext) {
+  const manifest: Manifest = {
+    components: {},
+    bundles: []
+  };
+
+  const destDir = config.compilerOptions.outDir;
+
+  ctx.files.forEach(f => {
+    if (!f.isTsSourceFile || !f.cmpMeta) return;
+
+    const componentUrl = f.jsFilePath.replace(destDir + path.sep, '');
+    const modes = f.cmpMeta.modes;
+    const componentDir = path.dirname(componentUrl);
+
+    Object.keys(modes).forEach(modeName => {
+      modes[modeName].styleUrls = modes[modeName].styleUrls.map(styleUrl => {
+        return path.join(componentDir, styleUrl);
       });
     });
 
-    if (bundle.components.length) {
-      ctx.bundles.push(bundle);
-    }
+    manifest.components[f.cmpMeta.tag] = {
+      componentUrl: componentUrl,
+      modes: modes
+    };
   });
-}
 
+  if (config.bundles) {
+    manifest.bundles = config.bundles;
 
-function generateBundleFiles(config: CompilerConfig, ctx: CompilerContext) {
-  // {'ion-badge':[{ios:'8bc3e3bb',md:'80ccf7f0',wp:'581787f8'}]}
-  ctx.registry = {};
-
-  return Promise.all(ctx.bundles.map((bundle, bundleIndex) => {
-
-    const componentModeLoaders = bundle.components.map(bundleComponent => {
-      return getComponentModeLoader(bundleComponent.component, bundleComponent.mode);
-    }).join(',');
-
-    bundle.id = getBundleId(bundleIndex);
-    bundle.fileName = getBundleFileName(bundle.id);
-    bundle.filePath = path.join(config.buildDir, bundle.fileName);
-
-    bundle.content = getBundleContent(bundle.id, componentModeLoaders);
-
-    bundle.components.forEach(bundleComponent => {
-      const tag = bundleComponent.component.tag;
-      const modeName = bundleComponent.mode.name;
-
-      ctx.registry[tag] = ctx.registry[tag] || [];
-
-      const modes: {[modeName: string]: string} = ctx.registry[tag][0] || {};
-
-      modes[modeName] = bundle.id;
-
-      ctx.registry[tag][0] = modes;
-    });
-
-    return writeFile(bundle.filePath, bundle.content).then(() => {
-      return bundle.filePath;
-    });
-
-  }));
-}
-
-
-function getAllModeNames(ctx: CompilerContext) {
-  const allModeNames: string[] = [];
-
-  Object.keys(ctx.components).forEach(tag => {
-    const component = ctx.components[tag];
-
-    Object.keys(component.modes).forEach(modeName => {
-      if (allModeNames.indexOf(modeName) === -1) {
-        allModeNames.push(modeName);
+  } else {
+    ctx.files.forEach(f => {
+      if (f.isTsSourceFile && f.cmpMeta) {
+        manifest.bundles.push([f.cmpMeta.tag]);
       }
     });
-  });
-
-  return allModeNames;
-}
-
-
-function getManifest(config: CompilerConfig, ctx: CompilerContext) {
-  if (ctx.manifest) {
-    return Promise.resolve(ctx.manifest);
   }
 
-  config.manifestFilePath = config.manifestFilePath || path.join(__dirname, '../manifest.json');
+  const manifestFile = path.join(config.compilerOptions.outDir, 'manifest.json')
+  const json = JSON.stringify(manifest, null, 2);
 
-  return readFile(config.manifestFilePath).then(manifestStr => {
-    return ctx.manifest = JSON.parse(manifestStr);
-  });
-}
-
-
-function createCoreJs(config: CompilerConfig, registryContent: string, srcFileName: string, destFileName: string) {
-  const srcFilePath = path.join(__dirname, srcFileName);
-  const destFilePath = path.join(config.buildDir, destFileName);
-
-  return readFile(srcFilePath).then(coreJsContent => {
-    let content: string;
-
-    if (config.minifyJs) {
-      registryContent = registryContent.replace(/\s/g, '');
-      content = registryContent + coreJsContent;
-
-    } else {
-      content = `${registryContent}\n\n${coreJsContent}`;
-    }
-
-    return writeFile(destFilePath, content);
-  });
+  return writeFile(manifestFile, json)
 }

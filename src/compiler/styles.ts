@@ -1,8 +1,8 @@
-import { CompilerConfig, ComponentMode } from './interfaces';
+import { BundlerConfig, ComponentMode } from './interfaces';
 import * as path from 'path';
 
 
-export function buildComponentModeStyles(config: CompilerConfig, mode: ComponentMode) {
+export function buildComponentModeStyles(config: BundlerConfig, mode: ComponentMode) {
   return Promise.all(mode.styleUrls.map(styleUrl => {
     return buildComponentModeStyle(config, styleUrl);
 
@@ -12,7 +12,7 @@ export function buildComponentModeStyles(config: CompilerConfig, mode: Component
 }
 
 
-export function buildComponentModeStyle(config: CompilerConfig, scssFileName: string) {
+export function buildComponentModeStyle(config: BundlerConfig, scssFileName: string) {
   return new Promise((resolve, reject) => {
     const manifestDir = path.dirname(config.manifestFilePath);
     const scssFilePath = path.join(manifestDir, scssFileName);

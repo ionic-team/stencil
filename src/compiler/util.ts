@@ -1,9 +1,9 @@
-import { GenerateContext, FileMeta } from './interfaces';
+import { CompilerContext, FileMeta, Results } from './interfaces';
 import * as fs from 'fs';
 import * as path from 'path';
 
 
-export function getFileMeta(ctx: GenerateContext, filePath: string): Promise<FileMeta> {
+export function getFileMeta(ctx: CompilerContext, filePath: string): Promise<FileMeta> {
   const fileMeta = ctx.files.get(filePath);
   if (fileMeta) {
     return Promise.resolve(fileMeta);
@@ -15,7 +15,7 @@ export function getFileMeta(ctx: GenerateContext, filePath: string): Promise<Fil
 }
 
 
-export function createFileMeta(ctx: GenerateContext, filePath: string, srcText: string) {
+export function createFileMeta(ctx: CompilerContext, filePath: string, srcText: string) {
   const fileMeta: FileMeta = {
     fileName: path.basename(filePath),
     filePath: filePath,
@@ -44,7 +44,6 @@ export function readFile(filePath: string): Promise<string> {
   return new Promise((resolve, reject) => {
     fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
-        console.log(err);
         reject(err);
       } else {
         resolve(data);
@@ -58,7 +57,6 @@ export function writeFile(filePath: string, content: string) {
   return new Promise((resolve, reject) => {
     fs.writeFile(filePath, content, (err) => {
       if (err) {
-        console.log(err);
         reject(err);
       } else {
         resolve();
@@ -91,4 +89,12 @@ export function isTsSourceFile(filePath: string) {
 
 export function isTransformable(sourceText: string) {
   return (sourceText.indexOf('@Component') > -1);
+}
+
+
+export function logError(results: Results, msg: any) {
+  results.errors = results.errors || [];
+  results.errors.push(msg);
+
+  return results;
 }

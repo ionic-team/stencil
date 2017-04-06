@@ -10,6 +10,10 @@
     "noUnusedParameters": true,
     "removeComments": false,
     "sourceMap": false,
-    "outDir": "../dist/scripts"
+    "outDir": "../dist/scripts",
+    "baseUrl": ".",
+    "paths": {
+      "compiler": ["../dist/compiler"]
+    }
   }
 }

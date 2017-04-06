@@ -6,16 +6,14 @@
   "scripts": {
     "clean": "rimraf dist/",
     "compare": "node scripts/build.compare.js",
-    "copy.fonts": "mkdir -p dist/ionic-core && cp -R src/fonts/ dist/ionic-core/fonts/",
-    "copy.themes": "mkdir -p dist/ionic-core && cp -R src/themes/ dist/ionic-core/themes/",
-    "build": "npm run clean && npm run build.core && npm run build.compiler && npm run compare",
 
-    "build.compiler": "tsc -p src/compiler/tsconfig.json && rollup -c src/compiler/rollup.config.js",
-    "build.core": "tsc -p scripts/tsconfig.json",
-    "build.angular": "tsc -p src/bindings/angular/tsconfig.json && npm run build.core && node dist/scripts/build-angular.js",
-    "build.web": "tsc -p src/bindings/web/tsconfig.json && npm run build.core && node dist/scripts/build-web.js",
+    "build": "npm run clean && npm run build.compiler && npm run build.components && npm run build.web && npm run build.angular",
+      "build.scripts": "tsc -p scripts/tsconfig.json",
+      "build.compiler": "tsc -p src/compiler/tsconfig.json && node dist/scripts/build-compiler.js",
+      "build.components": "node dist/scripts/build-components.js",
+      "build.web": "tsc -p src/bindings/web/tsconfig.json && node dist/scripts/build-web.js",
+      "build.angular": "tsc -p src/bindings/angular/tsconfig.json && node dist/scripts/build-angular.js",
 
-    "build.themes": "node-sass src/themes/ionic.scss --output dist/ionic-core/themes/",
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch"

@@ -1,4 +1,4 @@
 
+export { bundle } from './bundle';
 export { compile } from './compile';
-
-export { generate } from './generate';
+export * from './interfaces';

@@ -1,3 +1,22 @@
+/**
+ * Build Core:
+ * Creates the core JS files, which are static files ready to
+ * go, and already come minified and prepackaged with the required polyfills.
+ * These are the core files to allow ionic components to work, but they have
+ * already been packaged up into static files ready to be reused.
+ *
+ * In the "bundle" command, a component registry is concatenated to
+ * the top of each core js file. The component registry simply includes all
+ * of the possible component tags which exist, and nothing more. If that
+ * component tag hits the DOM, the core js files figure out how to request
+ * the actual component module and styles.
+ *
+ * There is really only one "core" js, however the various versions
+ * available come with ready to go polyfills. When the app first starts, it'll
+ * figure out the polyfills required, if any. Static polyfill files are simply
+ * concatenated to the top their respective core file.
+ */
+
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as babel from 'babel-core';
@@ -7,19 +26,6 @@ export const ROOT_DIR = path.join(__dirname, '../..');
 export const EXTERNS = path.join(ROOT_DIR, 'scripts', 'core.externs.js');
 export const POLYFILLS_DIR = path.join(ROOT_DIR, 'src/polyfills');
 export const LICENSE = `/*! (C) Ionic, https://ionicframework.com/ - Mit License */\n`;
-
-
-// ionic.core.dev.js - Extends HTMLElement Class, w/out polyfills, not minified
-// ionic.core.js - Extends HTMLElement Class, w/out polyfills, is minified
-
-// ionic.core.es5.dev.js - HTMLElement Function, w/out polyfills, not minified
-// ionic.core.es5.js - HTMLElement Function, w/out polyfills, is minified
-
-// ionic.core.ce.dev.js - HTMLElement Function, document-register-element polyfilled, not minified
-// ionic.core.ce.js - HTMLElement Function, document-register-element polyfilled, is minified
-
-// ionic.core.ce.sd.dev.js - HTMLElement Function, document-register-element/shadydom polyfill, not minified
-// ionic.core.ce.sd.js - HTMLElement Function, document-register-element/shadydom  polyfill, is minified
 
 
 function buildCoreDev(ctx: BuildContext) {

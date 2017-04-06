@@ -1,6 +1,6 @@
 
 
-export interface GenerateConfig {
+export interface CompilerConfig {
   compilerOptions: {
     declaration?: boolean;
     lib?: string[];
@@ -13,6 +13,11 @@ export interface GenerateConfig {
   exclude?: string[];
   debug?: boolean;
   bundles?: string[][];
+  packages: {
+    nodeSass: {
+      render: Function;
+    };
+  }
 }
 
 
@@ -31,24 +36,26 @@ export interface FileMeta {
 }
 
 
-export interface GenerateContext {
+export interface CompilerContext {
   files?: Map<string, FileMeta>;
+  results?: Results;
 }
 
 
-export interface CompilerConfig {
+export interface BundlerConfig {
+  coreDir: string;
   buildDir: string;
   rollup: { rollup: Function };
   uglify: { minify: Function };
   sass: { render: Function };
   minifyJs: boolean;
-  useHashId: boolean;
   manifestFilePath: string;
+  debug?: boolean;
 }
 
 
-export interface CompilerResults {
-  error: any;
+export interface Results {
+  errors?: string[];
 }
 
 
@@ -95,11 +102,12 @@ export interface ComponentMode {
 }
 
 
-export interface CompilerContext {
-  bundles: Bundle[];
-  components: CoreComponents;
-  registry: Registry;
-  manifest: Manifest;
+export interface BundlerContext {
+  bundles?: Bundle[];
+  components?: CoreComponents;
+  registry?: Registry;
+  manifest?: Manifest;
+  results?: Results;
 }
 
 

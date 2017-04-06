@@ -1,10 +1,10 @@
 import { createFileMeta } from './util';
-import { GenerateConfig, GenerateContext } from './interfaces';
+import { CompilerConfig, CompilerContext } from './interfaces';
 import * as fs from 'fs';
 import * as ts from 'typescript';
 
 
-export function transpile(config: GenerateConfig, ctx: GenerateContext): Promise<any> {
+export function transpile(config: CompilerConfig, ctx: CompilerContext): Promise<any> {
   const tsFileNames = getTsFileNames(ctx);
 
   if (config.debug) {
@@ -54,10 +54,10 @@ export function transpile(config: GenerateConfig, ctx: GenerateContext): Promise
 }
 
 
-function writeJsFiles(ctx: GenerateContext) {
+function writeJsFiles(ctx: CompilerContext) {
   ctx.files.forEach(f => {
     if (f.jsFilePath && f.jsText) {
-      if (f.jsFilePath.indexOf('ionic-component') > -1) {
+      if (!f.cmpMeta) {
         return;
       }
 
@@ -72,7 +72,7 @@ function writeJsFiles(ctx: GenerateContext) {
 }
 
 
-function createTsCompilerConfigs(config: GenerateConfig) {
+function createTsCompilerConfigs(config: CompilerConfig) {
   const tsCompilerOptions: ts.CompilerOptions = Object.assign({}, config.compilerOptions);
 
   tsCompilerOptions.noImplicitUseStrict = true;
@@ -92,11 +92,11 @@ function createTsCompilerConfigs(config: GenerateConfig) {
 }
 
 
-function getTsFileNames(ctx: GenerateContext) {
+function getTsFileNames(ctx: CompilerContext) {
   const fileNames: string[] = [];
 
   ctx.files.forEach(fileMeta => {
-    if (!fileMeta.isTsSourceFile) {
+    if (!fileMeta.isTsSourceFile || !fileMeta.cmpMeta) {
       return;
     }
 
