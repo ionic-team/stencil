@@ -1,4 +1,11 @@
 
+/**
+ * Externs are used so these properties are not
+ * mistakenly renamed.
+ *
+ * https://developers.google.com/closure/compiler/docs/api-tutorial3
+ */
+
 function Ionic(){};
 function loadComponents(){};
 function components(){};
