@@ -1,29 +1,28 @@
-import { ComponentMeta, PropOptions } from './interfaces';
+import { PropOptions } from './interfaces';
 
 
-export const Component: ComponentDecorator = function(opts?: ComponentMeta): (target: any) => any {
-  return function(target: any) {
-    if (opts) {
-      Object.assign(target.$annotations || {}, opts)
-    }
-  };
+export const Component: ComponentDecorator = function(opts?: ComponentOptions): (target: any) => any {
+  return function() {opts;};
 };
 
 
 export interface ComponentDecorator {
-  (opts?: ComponentMeta): any;
+  (opts?: ComponentOptions): any;
+}
+
+
+export interface ComponentOptions {
+  tag: string;
+  styleUrls: string[] | ModeStyles;
+}
+
+export interface ModeStyles {
+  [modeName: string]: string | string[];
 }
 
 
 export const Prop: PropDecorator = function(opts?: PropOptions): (target: any, propKey: string) => any {
-  return function(target: any, propKey: string) {
-    const annotations = target.$annotations = target.$annotations || {};
-    annotations.props = annotations.props || {};
-    annotations.props[propKey] = opts || {};
-
-    annotations.obsAttrs = annotations.obsAttrs || [];
-    annotations.obsAttrs.push(propKey);
-  };
+  return function() {opts;};
 };
 
 
