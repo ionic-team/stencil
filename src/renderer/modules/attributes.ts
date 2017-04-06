@@ -1,4 +1,4 @@
-import { VNode, VNodeData } from '../../utils/interfaces';
+import { VNode, VNodeData } from '../../util/interfaces';
 
 
 const xlinkNS = 'http://www.w3.org/1999/xlink';

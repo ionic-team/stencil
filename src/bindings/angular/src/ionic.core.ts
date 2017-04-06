@@ -1,4 +1,4 @@
-import { Ionic } from '../../../utils/interfaces';
+import { Ionic } from '../../../util/interfaces';
 import { PlatformClient } from '../../../platform/platform-client';
 import { initRenderer } from '../../../renderer/core';
 import { registerComponents } from '../../../registry/registry';

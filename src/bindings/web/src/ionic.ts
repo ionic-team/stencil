@@ -1,4 +1,4 @@
-import { Ionic } from '../../../utils/interfaces';
+import { Ionic } from '../../../util/interfaces';
 
 
 (function(window: any, document: HTMLDocument) {

@@ -1,4 +1,4 @@
-import { VNode, VNodeData } from '../../utils/interfaces';
+import { VNode, VNodeData } from '../../util/interfaces';
 
 
 export function updateClass(oldVnode: VNode, vnode: VNode): void {

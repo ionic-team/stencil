@@ -1,4 +1,4 @@
-import { Component } from '../../utils/decorators';
+import { Component } from '../../util/decorators';
 
 
 @Component({
