@@ -52,19 +52,17 @@ function buildComponentModule(config: CompilerConfig, component: Component) {
     return Promise.resolve(component.componentImporter);
   }
 
+  const manifestDir = path.dirname(config.manifestFilePath);
+
   const rollupConfig = {
-    entry: path.join(__dirname, component.componentUrl),
+    entry: path.join(manifestDir, component.componentUrl),
     format: 'cjs'
   };
 
   return config.rollup.rollup(rollupConfig).then((bundle: any) => {
     const bundleOutput = bundle.generate(rollupConfig);
 
-    let code = bundleOutput.code;
-
-    code = code.replace(`Object.defineProperty(exports, '__esModule', { value: true });`, '');
-
-    code = `function importComponent(exports) { ${code} }`;
+    let code = `function importComponent(exports) { ${bundleOutput.code} }`;
 
     if (config.minifyJs) {
       const minifyResults = config.uglify.minify(code, {
@@ -218,9 +216,9 @@ function getManifest(config: CompilerConfig, ctx: CompilerContext) {
     return Promise.resolve(ctx.manifest);
   }
 
-  const filePath = config.manifestFilePath || path.join(__dirname, '../components/manifest.json');
+  config.manifestFilePath = config.manifestFilePath || path.join(__dirname, '../manifest.json');
 
-  return readFile(filePath).then(manifestStr => {
+  return readFile(config.manifestFilePath).then(manifestStr => {
     return ctx.manifest = JSON.parse(manifestStr);
   });
 }
