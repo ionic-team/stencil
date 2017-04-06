@@ -8,7 +8,7 @@ export function generateVNode(utils: IonicUtils, elm: Node, instance: ComponentI
     // use the default render function instead
     vnode = h(elm,
       h('div',
-        theme(instance, hostCss),
+        theme(hostCss, instance.mode, instance.color),
         h('slot')
       )
     );
@@ -20,13 +20,17 @@ export function generateVNode(utils: IonicUtils, elm: Node, instance: ComponentI
 }
 
 
-export function theme(instance: ComponentInstance, hostCss: string): VNodeData {
+export function theme(cssClassName: string, mode?: string, color?: string): VNodeData {
   const cssClasses: any = {};
 
-  cssClasses[`${hostCss}`] = cssClasses[`${hostCss}-${instance.mode}`] = true;
+  cssClasses[`${cssClassName}`] = true;
 
-  if (instance.color) {
-    cssClasses[`${hostCss}-${instance.color}`] = cssClasses[`${hostCss}-${instance.mode}-${instance.color}`] = true;
+  if (mode) {
+    cssClasses[`${cssClassName}-${mode}`] = true;
+
+    if (color) {
+      cssClasses[`${cssClassName}-${color}`] = cssClasses[`${cssClassName}-${mode}-${color}`] = true;
+    }
   }
 
   return {
