@@ -1,13 +1,18 @@
 import { attributeChangedCallback } from '../element/attribute-changed';
-import { ComponentController, ConfigApi, LoadComponents, Renderer } from '../util/interfaces';
+import { ComponentController, ConfigApi, IonicUtils, LoadComponents, Renderer } from '../util/interfaces';
 import { connectedCallback } from '../element/connected';
 import { disconnectedCallback } from '../element/disconnected';
 import { initComponentMeta } from '../element/proxy';
 import { PlatformApi } from '../platform/platform-api';
+import { theme } from '../element/host';
 
 
 export function registerComponents(renderer: Renderer, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
   const cmpControllers = new WeakMap<HTMLElement, ComponentController>();
+
+  const utils: IonicUtils = {
+    theme: theme
+  };
 
   Object.keys(components || {}).forEach(tag => {
     const cmpMeta = initComponentMeta(tag, components[tag]);
@@ -22,7 +27,7 @@ export function registerComponents(renderer: Renderer, plt: PlatformApi, config:
     (<any>ProxyElement).prototype.connectedCallback = function() {
       var ctrl: ComponentController = {};
       cmpControllers.set(this, ctrl);
-      connectedCallback(plt, config, renderer, this, ctrl, cmpMeta);
+      connectedCallback(utils, plt, config, renderer, this, ctrl, cmpMeta);
     };
 
     (<any>ProxyElement).prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string) {

@@ -1,11 +1,17 @@
-import { ComponentInstance, ComponentMeta, VNode, VNodeData } from '../util/interfaces';
+import { ComponentInstance, IonicUtils, VNode, VNodeData } from '../util/interfaces';
 import { h } from '../renderer/core';
 
 
-export function generateVNode(elm: Node, instance: ComponentInstance, cmpMeta: ComponentMeta): VNode {
-  let vnode = instance.render && instance.render();
+export function generateVNode(utils: IonicUtils, elm: Node, instance: ComponentInstance, hostCss: string): VNode {
+  let vnode = instance.render && instance.render(h, utils);
   if (!vnode) {
-    vnode = h(elm, h('div', getThemeData(instance, cmpMeta), h('slot')));
+    // use the default render function instead
+    vnode = h(elm,
+      h('div',
+        theme(instance, hostCss),
+        h('slot')
+      )
+    );
   }
 
   delete vnode.sel;
@@ -14,13 +20,13 @@ export function generateVNode(elm: Node, instance: ComponentInstance, cmpMeta: C
 }
 
 
-function getThemeData(instance: ComponentInstance, cmpMeta: ComponentMeta): VNodeData {
+export function theme(instance: ComponentInstance, hostCss: string): VNodeData {
   const cssClasses: any = {};
 
-  cssClasses[`${cmpMeta.hostCss}`] = cssClasses[`${cmpMeta.hostCss}-${instance.mode}`] = true;
+  cssClasses[`${hostCss}`] = cssClasses[`${hostCss}-${instance.mode}`] = true;
 
   if (instance.color) {
-    cssClasses[`${cmpMeta.hostCss}-${instance.color}`] = cssClasses[`${cmpMeta.hostCss}-${instance.mode}-${instance.color}`] = true;
+    cssClasses[`${hostCss}-${instance.color}`] = cssClasses[`${hostCss}-${instance.mode}-${instance.color}`] = true;
   }
 
   return {

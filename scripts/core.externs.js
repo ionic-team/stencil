@@ -16,6 +16,7 @@ function props(){};
 function mode(){};
 function color(){};
 function observedAttrs(){};
+function theme(){};
 
 function connectedCallback(){};
 function attributeChangedCallback(){};

@@ -1,10 +1,10 @@
-import { ComponentController, ComponentMeta, ConfigApi, Props, ProxyElement, Renderer } from '../util/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, Props, ProxyElement, Renderer } from '../util/interfaces';
 import { getPropValue, toCamelCase, toDashCase } from '../util/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 
-export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
+export function initProps(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
   const instance = ctrl.instance;
   const lastPropValues: {[propName: string]: any} = {};
 
@@ -23,7 +23,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
         if (lastPropValues[propName] !== value) {
           lastPropValues[propName] = value;
 
-          queueUpdate(plt, config, renderer, elm, ctrl, tag);
+          queueUpdate(utils, plt, config, renderer, elm, ctrl, tag);
         }
       }
     });

@@ -75,11 +75,29 @@ export interface ComponentMode {
 }
 
 
+export interface HyperScript {
+  (sel: string): VNode;
+  (sel: Node, data: VNodeData): VNode;
+  (sel: string, data: VNodeData): VNode;
+  (sel: string, text: string): VNode;
+  (sel: string, children: Array<VNode>): VNode;
+  (sel: string, data: VNodeData, text: string): VNode;
+  (sel: string, data: VNodeData, children: Array<VNode|string>): VNode;
+  (sel: string, data: VNodeData, children: VNode): VNode;
+  (sel: any, b?: any, c?: any): VNode
+}
+
+
 export interface ComponentInstance {
-  render?: {(): VNode};
+  render?: {(h: HyperScript, ionic?: IonicUtils): VNode};
 
   mode?: string;
   color?: string;
+}
+
+
+export interface IonicUtils {
+  theme(instance: ComponentInstance, hostCss: string): VNodeData;
 }
 
 

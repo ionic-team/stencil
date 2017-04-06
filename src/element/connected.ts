@@ -1,17 +1,17 @@
-import { ComponentController, ComponentMeta, ConfigApi, ProxyElement, Renderer } from '../util/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, ProxyElement, Renderer } from '../util/interfaces';
 import { isDef } from '../util/helpers';
 import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 
-export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
+export function connectedCallback(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   plt.nextTick(() => {
     const tag = cmpMeta.tag;
     const mode = getMode(plt, config, elm, 'mode');
     const cmpMode = cmpMeta.modes[mode];
 
     plt.loadComponent(cmpMeta, cmpMode, function loadComponentCallback() {
-      queueUpdate(plt, config, renderer, elm, ctrl, tag);
+      queueUpdate(utils, plt, config, renderer, elm, ctrl, tag);
     });
   });
 }
@@ -28,9 +28,5 @@ function getMode(plt: PlatformApi, config: ConfigApi, elm: HTMLElement, propName
     return value;
   }
 
-  if (config) {
-    return config.get(propName);
-  }
-
-  return 'md';
+  return config.get(propName, 'md');
 }
