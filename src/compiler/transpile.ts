@@ -62,7 +62,7 @@ function writeJsFiles(config: CompilerConfig, ctx: BuildContext) {
       }
 
       if (config.debug) {
-        console.log(`transpile, writeJsFile: ${f.jsFilePath}`);
+        console.log(`compile, transpile, writeJsFile: ${f.jsFilePath}`);
       }
 
       f.jsText = f.jsText.replace(`Object.defineProperty(exports, "__esModule", { value: true });`, '');

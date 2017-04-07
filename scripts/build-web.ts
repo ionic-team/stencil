@@ -30,14 +30,14 @@ const compiledDir = path.join(__dirname, '../compiled-ionic-web');
 const destDir = path.join(__dirname, '../ionic-web');
 
 
-// first clean out the ionic-web directory
+// first clean out the ionic-web directories
 fs.emptyDirSync(destDir);
 fs.emptyDirSync(compiledDir);
 
 
 const ctx = {};
 
-// first find all the source components and compile
+// find all the source components and compile
 // them into reusable components, and create a manifest.json
 // where all the components can be found, and their styles.
 compileComponents()

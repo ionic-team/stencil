@@ -18,28 +18,32 @@ const compiler = require(path.join(__dirname, '../compiler'));
 
 const srcDir = path.join(__dirname, '../../src');
 const transpiledSrcDir = path.join(__dirname, '../transpiled-angular/bindings/angular/src');
-const destDir = path.join(__dirname, '../ionic-angular');
+const compiledDir = path.join(__dirname, '../compiled-ionic-angular');
 
 
-// first clean out the ionic-web directory
-fs.emptyDirSync(destDir);
+// first clean out the ionic-web directories
+fs.emptyDirSync(compiledDir);
 
 
 const ctx = {};
 
-// first find all the source components and compile
-// them into reusable components
+// find all the source components and compile
+// them into reusable components, and create a manifest.json
+// where all the components can be found, and their styles.
 compileComponents()
   .then(() => {
-    // next build all of the core files for ionic-web
-    return buildBindingCore(transpiledSrcDir, destDir);
+    // next build all of the core files for ionic-angular
+    return buildBindingCore(transpiledSrcDir, compiledDir, 'core');
+
+  }).catch(err => {
+    console.log(err);
   });
 
 
 function compileComponents() {
   const config = {
     compilerOptions: {
-      outDir: destDir,
+      outDir: compiledDir,
       module: 'commonjs',
       target: 'es5'
     },
