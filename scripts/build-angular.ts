@@ -7,7 +7,7 @@
  * user's build from within app-scripts.
  */
 
-import { buildBindingCore, readFile, writeFile } from './build-core';
+import { buildBindingCore } from './build-core';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
