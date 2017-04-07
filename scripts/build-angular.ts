@@ -7,7 +7,7 @@
  * user's build from within app-scripts.
  */
 
-import { buildBindingCore } from './build-core';
+import { buildBindingCore, readFile, writeFile } from './build-core';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
@@ -23,6 +23,11 @@ const compiledDir = path.join(__dirname, '../compiled-ionic-angular');
 
 // first clean out the ionic-web directories
 fs.emptyDirSync(compiledDir);
+
+// copy compiler/index.js to the compiled ionic-angular location
+const compilerJsScript = path.join(__dirname, '../compiler/index.js');
+const compilerDest = path.join(compiledDir, 'compiler/index.js');
+fs.copySync(compilerJsScript, compilerDest);
 
 
 const ctx = {};
