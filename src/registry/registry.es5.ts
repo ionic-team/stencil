@@ -39,10 +39,7 @@ export function registerComponentsES5(renderer: Renderer, plt: PlatformApi, conf
 
         attributeChangedCallback: { configurable: true, value:
           function(attrName: string, oldVal: string, newVal: string) {
-            var ctrl = cmpControllers.get(this);
-            if (ctrl) {
-              attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal);
-            }
+            attributeChangedCallback(this, cmpMeta, attrName, oldVal, newVal);
           }
         },
 

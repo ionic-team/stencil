@@ -31,10 +31,7 @@ export function registerComponents(renderer: Renderer, plt: PlatformApi, config:
     };
 
     (<any>ProxyElement).prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string) {
-      var ctrl = cmpControllers.get(this);
-      if (ctrl) {
-        attributeChangedCallback(ctrl.instance, cmpMeta, attrName, oldVal, newVal);
-      }
+      attributeChangedCallback(this, cmpMeta, attrName, oldVal, newVal);
     };
 
     (<any>ProxyElement).prototype.disconnectedCallback = function() {

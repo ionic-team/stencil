@@ -2,12 +2,13 @@ import { initRenderer, h, vnode, VNode, VNodeData } from '../core';
 import { PlatformApi } from '../../platform/platform-api';
 import { PlatformClient } from '../../platform/platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
+import { DomController } from '../../platform/dom-controller';
+import { NextTickController } from '../../platform/next-tick-controller';
 
 const document: HTMLDocument = (<any>global).document;
-const api = PlatformClient(window, document, {});
-
-
-var patch = initRenderer(api);
+var domCtrl = DomController(window);
+var nextTick = NextTickController(window);
+var patch = initRenderer(PlatformClient(window, document, {}, '/build', domCtrl, nextTick));
 
 
 function prop(name) {
@@ -998,7 +999,7 @@ describe('renderer', function() {
 
 function toVNode(node: Node, api?: PlatformApi): VNode {
   if (!api) {
-    api = PlatformClient(window, document, {});
+    api = PlatformClient(window, document, {}, '/build', domCtrl, nextTick);
   }
 
   let text: string;

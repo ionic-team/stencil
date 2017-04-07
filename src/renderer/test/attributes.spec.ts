@@ -1,10 +1,13 @@
-
 import { initRenderer, h } from '../core';
 import { PlatformClient } from '../../platform/platform-client';
+import { DomController } from '../../platform/dom-controller';
+import { NextTickController } from '../../platform/next-tick-controller';
 
 const document: HTMLDocument = (<any>global).document;
 
-var patch = initRenderer(PlatformClient(window, document, {}));
+var domCtrl = DomController(window);
+var nextTick = NextTickController(window);
+var patch = initRenderer(PlatformClient(window, document, {}, '/build', domCtrl, nextTick));
 
 describe('attributes', function() {
   var elm, vnode0;

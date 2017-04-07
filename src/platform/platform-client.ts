@@ -53,7 +53,12 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
         bundleCBs[bundleId] = [cb];
       }
 
-      const url = `${staticDir}ionic.${bundleId}.js`;
+      let url = `${staticDir}ionic.${bundleId}`;
+
+      if (ionic.devMode) {
+        url += '.dev';
+      }
+      url += '.js';
 
       if (jsonReqs.indexOf(url) === -1) {
         jsonp(url);

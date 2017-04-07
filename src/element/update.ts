@@ -11,7 +11,7 @@ export function queueUpdate(utils: IonicUtils, plt: PlatformApi, config: ConfigA
     ctrl.queued = true;
 
     // run the patch in the next tick
-    plt.domWrite(function queueUpdateWrite() {
+    plt.nextTick(function queueUpdateNextTick() {
 
       // vdom diff and patch the host element for differences
       update(utils, plt, config, renderer, elm, ctrl, tag);
