@@ -15,6 +15,7 @@
     "outDir": "../../../dist/transpiled-web"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "../../components/**/*.ts"
   ]
 }

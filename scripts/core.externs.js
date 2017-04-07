@@ -16,6 +16,7 @@ function read(){}
 function write(){}
 function nextTickCtrl(){};
 function nextTick(){}
+function devMode(){}
 
 function tag(){};
 function modes(){};

@@ -7,6 +7,7 @@ export interface Ionic {
   configCtrl?: ConfigApi;
   domCtrl?: DomControllerApi;
   nextTickCtrl?: NextTickApi;
+  devMode?: boolean;
 }
 
 

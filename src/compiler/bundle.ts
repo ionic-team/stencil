@@ -1,11 +1,11 @@
 import { buildComponentModeStyles } from './styles';
-import { Bundle, BundlerConfig, BundlerContext, Component, ComponentMode, Manifest, Results } from './interfaces';
+import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
 import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
 import { logError, readFile, writeFile } from './util';
 import * as path from 'path';
 
 
-export function bundle(config: BundlerConfig, ctx: BundlerContext = {}): Promise<Results> {
+export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
   ctx.results = {};
 
   return getManifest(config, ctx).then(manifest => {
@@ -47,27 +47,15 @@ function buildComponentModule(config: BundlerConfig, component: Component) {
     return Promise.resolve(component.componentImporter);
   }
 
-  const manifestDir = path.dirname(config.manifestFilePath);
-
   const rollupConfig = {
-    entry: path.join(manifestDir, component.componentUrl),
+    entry: path.join(config.coreDir, component.componentUrl),
     format: 'cjs'
   };
 
-  return config.rollup.rollup(rollupConfig).then((bundle: any) => {
+  return config.packages.rollup.rollup(rollupConfig).then((bundle: any) => {
     const bundleOutput = bundle.generate(rollupConfig);
 
     let code = `function importComponent(exports) { ${bundleOutput.code} }`;
-
-    if (config.minifyJs) {
-      const minifyResults = config.uglify.minify(code, {
-        fromString: true
-      });
-
-      code = minifyResults.code;
-    }
-
-    code = code.replace(/function importComponent\(/g, 'function(');
 
     return component.componentImporter = code;
   });
@@ -81,7 +69,7 @@ function buildComponentMode(config: BundlerConfig, component: Component, mode: C
 }
 
 
-function getComponents(ctx: BundlerContext, manifest: Manifest) {
+function getComponents(ctx: BuildContext, manifest: Manifest) {
   if (!ctx.components) {
     ctx.components = {};
 
@@ -94,7 +82,7 @@ function getComponents(ctx: BundlerContext, manifest: Manifest) {
 }
 
 
-function buildCoreJs(config: BundlerConfig, ctx: BundlerContext, manifest: Manifest) {
+function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifest) {
   ctx.bundles = [];
 
   manifest.bundles.forEach(bundleComponentTags => {
@@ -106,23 +94,20 @@ function buildCoreJs(config: BundlerConfig, ctx: BundlerContext, manifest: Manif
 
     const promises: Promise<any>[] = [];
 
-    if (config.minifyJs) {
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.js', 'ionic.core.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.js', 'ionic.core.ce.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.js', 'ionic.core.sd.ce.js'));
+    promises.push(createCoreJs(config, registryContent, 'ionic.core.js', true));
+    promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.js', true));
+    promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.js', true));
 
-    } else {
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.dev.js', 'ionic.core.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.dev.js', 'ionic.core.ce.js'));
-      promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.dev.js', 'ionic.core.sd.ce.js'));
-    }
+    promises.push(createCoreJs(config, registryContent, 'ionic.core.dev.js', false));
+    promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.dev.js', false));
+    promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.dev.js', false));
 
     return promises;
   });
 }
 
 
-function buildComponentBundles(ctx: BundlerContext, bundleComponentTags: string[]) {
+function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[]) {
   const allModeNames = getAllModeNames(ctx);
 
   allModeNames.forEach(modeName => {
@@ -152,7 +137,7 @@ function buildComponentBundles(ctx: BundlerContext, bundleComponentTags: string[
 }
 
 
-function generateBundleFiles(config: BundlerConfig, ctx: BundlerContext) {
+function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
   // {'ion-badge':[{ios:'8bc3e3bb',md:'80ccf7f0',wp:'581787f8'}]}
   ctx.registry = {};
 
@@ -181,15 +166,41 @@ function generateBundleFiles(config: BundlerConfig, ctx: BundlerContext) {
       ctx.registry[tag][0] = modes;
     });
 
-    return writeFile(bundle.filePath, bundle.content).then(() => {
-      return bundle.filePath;
+    const minifyResults = config.packages.uglify.minify(bundle.content, {
+      fromString: true
     });
 
+    const prodFilePath = bundle.filePath;
+    const devFilePath = bundle.filePath.replace('.js', '.dev.js');
+
+    return Promise.all([
+      writeFile(prodFilePath, minifyResults.code),
+      writeFile(devFilePath, bundle.content)
+    ]);
   }));
 }
 
 
-function getAllModeNames(ctx: BundlerContext) {
+function createCoreJs(config: BundlerConfig, registryContent: string, fileName: string, minify: boolean) {
+  const filePath = path.join(config.coreDir, fileName);
+
+  return readFile(filePath).then(coreJsContent => {
+    let content: string;
+
+    if (minify) {
+      registryContent = registryContent.replace(/\s/g, '');
+      content = registryContent + '\n' + coreJsContent;
+
+    } else {
+      content = registryContent + '\n\n' + coreJsContent;
+    }
+
+    return writeFile(filePath, content);
+  });
+}
+
+
+function getAllModeNames(ctx: BuildContext) {
   const allModeNames: string[] = [];
 
   Object.keys(ctx.components).forEach(tag => {
@@ -206,41 +217,18 @@ function getAllModeNames(ctx: BundlerContext) {
 }
 
 
-function getManifest(config: BundlerConfig, ctx: BundlerContext) {
+function getManifest(config: BundlerConfig, ctx: BuildContext) {
   if (ctx.manifest) {
     return Promise.resolve(ctx.manifest);
   }
 
-  config.manifestFilePath = config.manifestFilePath || path.join(config.coreDir, 'manifest.json');
+  const manifestFilePath = path.join(config.coreDir, 'manifest.json');
 
   if (config.debug) {
-    console.log(`manifestFilePath: ${config.manifestFilePath}`) ;
+    console.log(`manifestFilePath: ${manifestFilePath}`) ;
   }
 
-  return readFile(config.manifestFilePath).then(manifestStr => {
+  return readFile(manifestFilePath).then(manifestStr => {
     return ctx.manifest = JSON.parse(manifestStr);
-  });
-}
-
-
-function createCoreJs(config: BundlerConfig, registryContent: string, srcFileName: string, destFileName: string) {
-  const srcFilePath = path.join(__dirname, srcFileName);
-  if (__dirname) {
-    throw 'TODO: no __dirname!!'
-  }
-  const destFilePath = path.join(config.buildDir, destFileName);
-
-  return readFile(srcFilePath).then(coreJsContent => {
-    let content: string;
-
-    if (config.minifyJs) {
-      registryContent = registryContent.replace(/\s/g, '');
-      content = registryContent + coreJsContent;
-
-    } else {
-      content = `${registryContent}\n\n${coreJsContent}`;
-    }
-
-    return writeFile(destFilePath, content);
   });
 }

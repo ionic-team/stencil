@@ -34,9 +34,19 @@ import { Ionic } from '../../../util/interfaces';
     pathItems.push('ce');
   }
 
+  if ($IONIC_DEV_MODE) {
+    // hardcoded at build time
+    pathItems.push('dev');
+    ionic.devMode = true;
+  }
+
   // request the ionic core file this browser needs
   var s = document.createElement('script');
   s.src = ionic.staticDir + 'ionic.' + pathItems.join('.') + '.js';
   document.head.appendChild(s);
 
 })(window, document);
+
+
+// hardcoded at build time
+declare const $IONIC_DEV_MODE: boolean;

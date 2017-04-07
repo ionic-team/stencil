@@ -1,10 +1,10 @@
+import { BuildContext, CompilerConfig } from './interfaces';
 import { createFileMeta } from './util';
-import { CompilerConfig, CompilerContext } from './interfaces';
 import * as fs from 'fs';
 import * as ts from 'typescript';
 
 
-export function transpile(config: CompilerConfig, ctx: CompilerContext): Promise<any> {
+export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<any> {
   const tsFileNames = getTsFileNames(ctx);
 
   if (config.debug) {
@@ -54,7 +54,7 @@ export function transpile(config: CompilerConfig, ctx: CompilerContext): Promise
 }
 
 
-function writeJsFiles(ctx: CompilerContext) {
+function writeJsFiles(ctx: BuildContext) {
   ctx.files.forEach(f => {
     if (f.jsFilePath && f.jsText) {
       if (!f.cmpMeta) {
@@ -92,7 +92,7 @@ function createTsCompilerConfigs(config: CompilerConfig) {
 }
 
 
-function getTsFileNames(ctx: CompilerContext) {
+function getTsFileNames(ctx: BuildContext) {
   const fileNames: string[] = [];
 
   ctx.files.forEach(fileMeta => {

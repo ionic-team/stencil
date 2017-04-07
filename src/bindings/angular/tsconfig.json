@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowUnreachableCode": false,
     "declaration": false,
-    "emitDecoratorMetadata": true,
+    "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
     "lib": ["dom", "es2015"],
     "module": "es2015",
@@ -15,6 +15,7 @@
     "outDir": "../../../dist/transpiled-angular"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "../../components/**/*.ts"
   ]
 }

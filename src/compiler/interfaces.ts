@@ -36,20 +36,30 @@ export interface FileMeta {
 }
 
 
-export interface CompilerContext {
+export interface BuildContext {
   files?: Map<string, FileMeta>;
   results?: Results;
+  bundles?: Bundle[];
+  components?: CoreComponents;
+  registry?: Registry;
+  manifest?: Manifest;
 }
 
 
 export interface BundlerConfig {
   coreDir: string;
   buildDir: string;
-  rollup: { rollup: Function };
-  uglify: { minify: Function };
-  sass: { render: Function };
-  minifyJs: boolean;
-  manifestFilePath: string;
+  packages: {
+    nodeSass: {
+      render: Function;
+    };
+    uglify: {
+      minify: Function;
+    };
+    rollup: {
+      rollup: Function;
+    };
+  }
   debug?: boolean;
 }
 
@@ -99,15 +109,6 @@ export interface ComponentMode {
   name?: string;
   styleUrls?: string[];
   styles?: string;
-}
-
-
-export interface BundlerContext {
-  bundles?: Bundle[];
-  components?: CoreComponents;
-  registry?: Registry;
-  manifest?: Manifest;
-  results?: Results;
 }
 
 

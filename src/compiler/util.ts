@@ -1,9 +1,9 @@
-import { CompilerContext, FileMeta, Results } from './interfaces';
+import { BuildContext, FileMeta, Results } from './interfaces';
 import * as fs from 'fs';
 import * as path from 'path';
 
 
-export function getFileMeta(ctx: CompilerContext, filePath: string): Promise<FileMeta> {
+export function getFileMeta(ctx: BuildContext, filePath: string): Promise<FileMeta> {
   const fileMeta = ctx.files.get(filePath);
   if (fileMeta) {
     return Promise.resolve(fileMeta);
@@ -15,7 +15,7 @@ export function getFileMeta(ctx: CompilerContext, filePath: string): Promise<Fil
 }
 
 
-export function createFileMeta(ctx: CompilerContext, filePath: string, srcText: string) {
+export function createFileMeta(ctx: BuildContext, filePath: string, srcText: string) {
   const fileMeta: FileMeta = {
     fileName: path.basename(filePath),
     filePath: filePath,
@@ -55,12 +55,14 @@ export function readFile(filePath: string): Promise<string> {
 
 export function writeFile(filePath: string, content: string) {
   return new Promise((resolve, reject) => {
-    fs.writeFile(filePath, content, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
+    mkdir(path.dirname(filePath), () => {
+      fs.writeFile(filePath, content, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
   });
 }
@@ -69,6 +71,48 @@ export function writeFile(filePath: string, content: string) {
 export function copyFile(src: string, dest: string) {
   return readFile(src).then(content => {
     return writeFile(dest, content);
+  });
+}
+
+
+export function mkdir(root: string, callback: Function) {
+  var chunks = root.split(path.sep); // split in chunks
+  var chunk;
+
+  if (path.isAbsolute(root) === true) { // build from absolute path
+    chunk = chunks.shift(); // remove "/" or C:/
+    if (!chunk) { // add "/"
+      chunk = path.sep;
+    }
+
+  } else {
+    chunk = path.resolve(); // build with relative path
+  }
+
+  return mkdirRecursive(chunk, chunks, callback);
+}
+
+
+function mkdirRecursive(root: string, chunks: string[], callback: Function): void {
+  var chunk = chunks.shift();
+  if (!chunk) {
+    return callback(null);
+  }
+
+  var root = path.join(root, chunk);
+
+  return fs.exists(root, (exists) => {
+
+    if (exists === true) { // already done
+      return mkdirRecursive(root, chunks, callback);
+    }
+    return fs.mkdir(root, (err) => {
+
+      if (err) {
+        return callback(err);
+      }
+      return mkdirRecursive(root, chunks, callback); // let's magic
+    });
   });
 }
 

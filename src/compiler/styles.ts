@@ -14,15 +14,14 @@ export function buildComponentModeStyles(config: BundlerConfig, mode: ComponentM
 
 export function buildComponentModeStyle(config: BundlerConfig, scssFileName: string) {
   return new Promise((resolve, reject) => {
-    const manifestDir = path.dirname(config.manifestFilePath);
-    const scssFilePath = path.join(manifestDir, scssFileName);
+    const scssFilePath = path.join(config.coreDir, scssFileName);
 
     const sassConfig = {
       file: scssFilePath,
       outputStyle: 'compressed'
     };
 
-    config.sass.render(sassConfig, (err: any, result: any) => {
+    config.packages.nodeSass.render(sassConfig, (err: any, result: any) => {
       if (err) {
         reject(err);
 

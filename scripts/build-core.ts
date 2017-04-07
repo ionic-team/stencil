@@ -255,7 +255,20 @@ export function writeFile(filePath: string, content: string) {
 }
 
 
-export function buildCore(transpiledSrcDir: string, destDir: string) {
+export function readFile(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf-8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+
+export function buildBindingCore(transpiledSrcDir: string, destDir: string) {
   const ctx: BuildContext = {
     coreEntryFilePath: path.join(transpiledSrcDir, 'ionic.core.js'),
     coreDevContent: '',
@@ -279,9 +292,7 @@ export function buildCore(transpiledSrcDir: string, destDir: string) {
     cePolyfillContent: ''
   };
 
-  fs.emptyDirSync(destDir);
-
-  Promise.all([
+  return Promise.all([
     buildCoreDev(ctx),
     buildCoreES5Dev(ctx)
   ])

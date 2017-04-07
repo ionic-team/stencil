@@ -1,10 +1,9 @@
 import { getFileMeta, isTsSourceFile, logError, readFile, writeFile } from './util';
-import { CompilerConfig, CompilerContext, Manifest, Results } from './interfaces';
+import { CompilerConfig, BuildContext, Manifest, Results } from './interfaces';
 import { parseTsSrcFile } from './parser';
 import { transpile } from './transpile';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as ts from 'typescript';
 
 
 /**
@@ -22,7 +21,7 @@ import * as ts from 'typescript';
  * @param config  Compiler config
  * @param ctx  Option context object so rebuilds are faster
  */
-export function compile(config: CompilerConfig, ctx: CompilerContext = {}): Promise<Results> {
+export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise<Results> {
   if (!ctx.files) {
     ctx.files = new Map();
   }
@@ -58,7 +57,7 @@ export function compile(config: CompilerConfig, ctx: CompilerContext = {}): Prom
 }
 
 
-function scanDirectory(dir: string, config: CompilerConfig, ctx: CompilerContext) {
+function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
   return new Promise(resolve => {
 
     if (config.debug) {
@@ -118,7 +117,7 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: CompilerContext
 }
 
 
-function inspectTsFile(filePath: string, config: CompilerConfig, ctx: CompilerContext = {}) {
+function inspectTsFile(filePath: string, config: CompilerConfig, ctx: BuildContext = {}) {
   if (!ctx.files) {
     ctx.files = new Map();
   }
@@ -148,7 +147,7 @@ function isValidDirectory(config: CompilerConfig, filePath: string) {
 }
 
 
-function processStyles(config: CompilerConfig, ctx: CompilerContext) {
+function processStyles(config: CompilerConfig, ctx: BuildContext) {
   const destDir = config.compilerOptions.outDir;
   const promises: Promise<any>[] = [];
 
@@ -180,7 +179,7 @@ function processStyles(config: CompilerConfig, ctx: CompilerContext) {
           const dest = path.join(destDir, relative);
 
           promises.push(readFile(src).then(content => {
-            ts.sys.writeFile(dest, content);
+            return writeFile(dest, content);
           }));
         }
       });
@@ -192,7 +191,7 @@ function processStyles(config: CompilerConfig, ctx: CompilerContext) {
 }
 
 
-function getIncludedSassFiles(config: CompilerConfig, ctx: CompilerContext, includedSassFiles: string[], scssFilePath: string) {
+function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, includedSassFiles: string[], scssFilePath: string) {
   return new Promise((resolve, reject) => {
 
     const sassConfig = {
@@ -219,7 +218,7 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: CompilerContext, incl
 }
 
 
-function generateManifest(config: CompilerConfig, ctx: CompilerContext) {
+function generateManifest(config: CompilerConfig, ctx: BuildContext) {
   const manifest: Manifest = {
     components: {},
     bundles: []

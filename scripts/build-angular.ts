@@ -1,4 +1,4 @@
-import { buildCore } from './build-core';
+import { buildBindingCore } from './build-core';
 import * as path from 'path';
 
 
@@ -6,4 +6,4 @@ const transpiledSrcDir = path.join(__dirname, '../transpiled-angular/bindings/an
 const destDir = path.join(__dirname, '../ionic-angular');
 
 
-buildCore(transpiledSrcDir, destDir);
+buildBindingCore(transpiledSrcDir, destDir);

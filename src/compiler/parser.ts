@@ -1,9 +1,9 @@
-import { FileMeta, CompilerConfig, CompilerContext, ComponentMeta } from './interfaces';
+import { BuildContext, FileMeta, CompilerConfig, ComponentMeta } from './interfaces';
 import { getTsScriptTarget } from './transpile';
 import * as ts from 'typescript';
 
 
-export function parseTsSrcFile(file: FileMeta, config: CompilerConfig, ctx: CompilerContext) {
+export function parseTsSrcFile(file: FileMeta, config: CompilerConfig, ctx: BuildContext) {
   const scriptTarget = getTsScriptTarget(config.compilerOptions.target);
   const tsSrcFile = ts.createSourceFile(file.filePath, file.srcText, scriptTarget, true);
 
@@ -11,7 +11,7 @@ export function parseTsSrcFile(file: FileMeta, config: CompilerConfig, ctx: Comp
 }
 
 
-function inspectNode(n: ts.Node, file: FileMeta, config: CompilerConfig, ctx: CompilerContext) {
+function inspectNode(n: ts.Node, file: FileMeta, config: CompilerConfig, ctx: BuildContext) {
 
   if (n.kind === ts.SyntaxKind.ClassDeclaration) {
     ts.forEachChild(n, childNode => {
