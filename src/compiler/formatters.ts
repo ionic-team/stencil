@@ -1,5 +1,4 @@
 import { Component, ComponentMode, Registry } from './interfaces';
-import * as nodeUtil from 'util';
 
 
 export function getBundleFileName(bundleId: string) {
@@ -26,7 +25,7 @@ export function getComponentModeLoader(component: Component, mode: ComponentMode
 
 export function getRegistryContent(registry: Registry) {
   let content = '(window.Ionic = window.Ionic || {}).components = ';
-  content += nodeUtil.inspect(registry, false, null) + ';';
+  content += JSON.stringify(registry, null, 2) + ';';
   return content;
 }
 
