@@ -1,21 +1,16 @@
 /**
  * Build Angular:
- * First build the core files for specifically ionic-angular.
- *
- * Bundle up all of the compiled ionic components, using the
- * newly created manifest.json as a guide, and create a bunch of
- * bundled js files which include each component.
- *
- * We do not need to create an ionic.js file because that is
- * apart of Ionic's providers during bootstrap.
+ * Build the core files for ionic-angular. We do not need
+ * to create an ionic.js file because that is apart of
+ * Ionic's providers during bootstrap. We also do not need
+ * to bundle files because that will be done during a
+ * user's build from within app-scripts.
  */
 
 import { buildBindingCore } from './build-core';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
-import * as rollup from 'rollup';
-import * as uglify from 'uglify-js';
 
 // dynamic require cuz this file gets transpiled to dist/
 const compiler = require(path.join(__dirname, '../compiler'));
@@ -38,10 +33,6 @@ compileComponents()
   .then(() => {
     // next build all of the core files for ionic-web
     return buildBindingCore(transpiledSrcDir, destDir);
-  })
-  .then(() => {
-    // next add the component registry to the top of each core file
-    return bundleComponents(destDir);
   });
 
 
@@ -64,27 +55,4 @@ function compileComponents() {
   };
 
   return compiler.compile(config, ctx);
-}
-
-
-function bundleComponents(destDir: string) {
-  const config = {
-    coreDir: destDir,
-    buildDir: destDir,
-    packages: {
-      rollup: rollup,
-      uglify: uglify,
-      nodeSass: nodeSass
-    },
-    minifyJs: true,
-    debug: true
-  };
-
-  return compiler.bundle(config, ctx).then(results => {
-    if (results.errors) {
-      results.errors.forEach(err => {
-        console.error(`compiler.bundle: ${err}`);
-      });
-    }
-  });
 }

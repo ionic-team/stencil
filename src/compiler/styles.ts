@@ -2,9 +2,9 @@ import { BundlerConfig, ComponentMode } from './interfaces';
 import * as path from 'path';
 
 
-export function buildComponentModeStyles(config: BundlerConfig, mode: ComponentMode) {
+export function bundleComponentModeStyles(config: BundlerConfig, mode: ComponentMode) {
   return Promise.all(mode.styleUrls.map(styleUrl => {
-    return buildComponentModeStyle(config, styleUrl);
+    return bundleComponentModeStyle(config, styleUrl);
 
   })).then(results => {
     return mode.styles = results.join('');
@@ -12,14 +12,18 @@ export function buildComponentModeStyles(config: BundlerConfig, mode: ComponentM
 }
 
 
-export function buildComponentModeStyle(config: BundlerConfig, scssFileName: string) {
+export function bundleComponentModeStyle(config: BundlerConfig, styleUrl: string) {
   return new Promise((resolve, reject) => {
-    const scssFilePath = path.join(config.coreDir, scssFileName);
+    const scssFilePath = path.join(config.srcDir, styleUrl);
 
     const sassConfig = {
       file: scssFilePath,
       outputStyle: 'compressed'
     };
+
+    if (config.debug) {
+      console.log(`bundle, render sass: ${scssFilePath}`);
+    }
 
     config.packages.nodeSass.render(sassConfig, (err: any, result: any) => {
       if (err) {

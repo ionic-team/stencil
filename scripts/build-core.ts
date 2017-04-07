@@ -20,6 +20,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as babel from 'babel-core';
+import * as ts from 'typescript';
 const rollup = require('rollup');
 
 export const ROOT_DIR = path.join(__dirname, '../..');
@@ -28,7 +29,7 @@ export const POLYFILLS_DIR = path.join(ROOT_DIR, 'src/polyfills');
 export const LICENSE = `/*! (C) Ionic, https://ionicframework.com/ - Mit License */\n`;
 
 
-function buildCoreDev(ctx: BuildContext) {
+function buildCore(ctx: BuildContext) {
   // ionic.core.dev.js - Extends HTMLElement Class, w/out polyfills, not minified
 
   return rollup.rollup({
@@ -42,12 +43,15 @@ function buildCoreDev(ctx: BuildContext) {
     });
 
     ctx.coreDevContent = transpile(result.code);
-    return writeFile(ctx.coreDevFilePath, ctx.coreDevContent);
+
+    ts.sys.writeFile(ctx.coreDevFilePath, ctx.coreDevContent);
+
+    return Promise.resolve();
   });
 }
 
 
-function buildCoreES5Dev(ctx: BuildContext) {
+function buildCoreES5(ctx: BuildContext) {
   // ionic.core.es5.dev.js - HTMLElement Function, w/out polyfills, not minified
 
   return rollup.rollup({
@@ -61,7 +65,11 @@ function buildCoreES5Dev(ctx: BuildContext) {
     });
 
     ctx.coreES5DevContent = transpile(result.code);
-    return writeFile(ctx.coreES5DevFilePath, ctx.coreES5DevContent);
+
+    ts.sys.writeFile(ctx.coreES5DevFilePath, ctx.coreES5DevContent);
+
+
+    return Promise.resolve();
   });
 }
 
@@ -268,22 +276,22 @@ export function readFile(filePath: string): Promise<string> {
 }
 
 
-export function buildBindingCore(transpiledSrcDir: string, destDir: string) {
+export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string) {
   const ctx: BuildContext = {
-    coreEntryFilePath: path.join(transpiledSrcDir, 'ionic.core.js'),
+    coreEntryFilePath: path.join(srcDir, 'ionic.core.js'),
     coreDevContent: '',
-    coreDevFilePath: path.join(destDir, 'ionic.core.dev.js'),
+    coreDevFilePath: path.join(destDir, coreFilesDir, 'ionic.core.dev.js'),
     coreMinifiedContent: '',
-    coreMinifiedFilePath: path.join(destDir, 'ionic.core.js'),
-    coreES5EntryFilePath: path.join(transpiledSrcDir, 'ionic.core.es5.js'),
+    coreMinifiedFilePath: path.join(destDir, coreFilesDir, 'ionic.core.js'),
+    coreES5EntryFilePath: path.join(srcDir, 'ionic.core.es5.js'),
     coreES5DevContent: '',
-    coreES5DevFilePath: path.join(destDir, 'ionic.core.es5.dev.js'),
+    coreES5DevFilePath: path.join(destDir, coreFilesDir, 'ionic.core.es5.dev.js'),
     coreES5MinifiedContent: '',
-    coreES5MinifiedFilePath: path.join(destDir, 'ionic.core.es5.js'),
-    ceDevFilePath: path.join(destDir, 'ionic.core.ce.dev.js'),
-    ceMinFilePath: path.join(destDir, 'ionic.core.ce.js'),
-    sdCeDevFilePath: path.join(destDir, 'ionic.core.sd.ce.dev.js'),
-    sdCeMinFilePath: path.join(destDir, 'ionic.core.sd.ce.js'),
+    coreES5MinifiedFilePath: path.join(destDir, coreFilesDir, 'ionic.core.es5.js'),
+    ceDevFilePath: path.join(destDir, coreFilesDir, 'ionic.core.ce.dev.js'),
+    ceMinFilePath: path.join(destDir, coreFilesDir, 'ionic.core.ce.js'),
+    sdCeDevFilePath: path.join(destDir, coreFilesDir, 'ionic.core.sd.ce.dev.js'),
+    sdCeMinFilePath: path.join(destDir, coreFilesDir, 'ionic.core.sd.ce.js'),
 
     shadyDomFilePath: path.join(POLYFILLS_DIR, 'shady-dom.js'),
     shadyDomContent: '',
@@ -292,13 +300,14 @@ export function buildBindingCore(transpiledSrcDir: string, destDir: string) {
     cePolyfillContent: ''
   };
 
+  // create the dev mode versions
   return Promise.all([
-    buildCoreDev(ctx),
-    buildCoreES5Dev(ctx)
+    buildCore(ctx),
+    buildCoreES5(ctx)
   ])
 
   .then(() => {
-
+    // create the minified versions
     return Promise.all([
       buildCoreMinified(ctx),
       buildCoreES5Minified(ctx)
@@ -307,7 +316,7 @@ export function buildBindingCore(transpiledSrcDir: string, destDir: string) {
   })
 
   .then(() => {
-
+    // create the polyfill versions
     ctx.shadyDomContent = fs.readFileSync(ctx.shadyDomFilePath, 'utf-8').trim();
     ctx.cePolyfillContent = fs.readFileSync(ctx.cePolyFillPath, 'utf-8').trim();
 
@@ -318,6 +327,25 @@ export function buildBindingCore(transpiledSrcDir: string, destDir: string) {
       shadyDomCustomElementPolyfillMin(ctx)
     ]);
 
+  })
+
+  .then(() => {
+    // add the location of each file to the manifest
+    const manifestFilePath = path.join(destDir, 'manifest.json');
+
+    return readFile(manifestFilePath).then(manifestStr => {
+      const manifest = JSON.parse(manifestStr);
+
+      manifest.coreFiles = {
+        'core': path.join(coreFilesDir, 'ionic.core.js'),
+        'core_ce': path.join(coreFilesDir, 'ionic.core.ce.js'),
+        'core_sd_cd': path.join(coreFilesDir, 'ionic.core.sd.ce.js')
+      }
+
+      manifestStr = JSON.stringify(manifest, null, 2);
+
+      return writeFile(manifestFilePath, manifestStr);
+    });
   });
 }
 

@@ -22,6 +22,11 @@ import * as path from 'path';
  * @param ctx  Option context object so rebuilds are faster
  */
 export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise<Results> {
+  if (config.debug) {
+    console.log(`compile, include: ${config.include}`);
+    console.log(`compile, outDir: ${config.compilerOptions.outDir}`);
+  }
+
   if (!ctx.files) {
     ctx.files = new Map();
   }
@@ -61,7 +66,7 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
   return new Promise(resolve => {
 
     if (config.debug) {
-      console.log(`scanDirectory: ${dir}`);
+      console.log(`compile, scanDirectory: ${dir}`);
     }
 
     fs.readdir(dir, (err, files) => {
@@ -123,7 +128,7 @@ function inspectTsFile(filePath: string, config: CompilerConfig, ctx: BuildConte
   }
 
   if (config.debug) {
-    console.log(`inspectTsFile: ${filePath}`);
+    console.log(`compile, inspectTsFile: ${filePath}`);
   }
 
   return getFileMeta(ctx, filePath).then(fileMeta => {
@@ -197,6 +202,10 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
     const sassConfig = {
       file: scssFilePath
     };
+
+    if (config.debug) {
+      console.log(`compile, getIncludedSassFiles: ${scssFilePath}`);
+    }
 
     config.packages.nodeSass.render(sassConfig, (err: any, result: any) => {
       if (err) {

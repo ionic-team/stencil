@@ -1,4 +1,4 @@
-import { buildComponentModeStyles } from './styles';
+import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
 import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
 import { logError, readFile, writeFile } from './util';
@@ -6,6 +6,11 @@ import * as path from 'path';
 
 
 export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
+  if (config.debug) {
+    console.log(`bundle, srcDir: ${config.srcDir}`);
+    console.log(`bundle, destDir: ${config.destDir}`);
+  }
+
   ctx.results = {};
 
   return getManifest(config, ctx).then(manifest => {
@@ -13,7 +18,7 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
     const components = getComponents(ctx, manifest);
 
     return Promise.all(Object.keys(components).map(tag => {
-      return buildComponent(config, components[tag]);
+      return bundleComponent(config, components[tag]);
 
     }))
     .then(() => {
@@ -30,27 +35,31 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
 }
 
 
-function buildComponent(config: BundlerConfig, component: Component) {
-  return buildComponentModule(config, component).then(() => {
+function bundleComponent(config: BundlerConfig, component: Component) {
+  return bundleComponentModule(config, component).then(() => {
     const modeNames = Object.keys(component.modes);
 
     return Promise.all(modeNames.map(modeName => {
       component.modes[modeName].name = modeName;
-      return buildComponentMode(config, component, component.modes[modeName]);
+      return bundleComponentMode(config, component, component.modes[modeName]);
     }));
   });
 }
 
 
-function buildComponentModule(config: BundlerConfig, component: Component) {
+function bundleComponentModule(config: BundlerConfig, component: Component) {
   if (component.componentImporter) {
     return Promise.resolve(component.componentImporter);
   }
 
   const rollupConfig = {
-    entry: path.join(config.coreDir, component.componentUrl),
+    entry: path.join(config.srcDir, component.componentUrl),
     format: 'cjs'
   };
+
+  if (config.debug) {
+    console.log(`bundle, bundleComponentModule, entry: ${rollupConfig.entry}`);
+  }
 
   return config.packages.rollup.rollup(rollupConfig).then((bundle: any) => {
     const bundleOutput = bundle.generate(rollupConfig);
@@ -62,8 +71,11 @@ function buildComponentModule(config: BundlerConfig, component: Component) {
 }
 
 
-function buildComponentMode(config: BundlerConfig, component: Component, mode: ComponentMode) {
-  return buildComponentModeStyles(config, mode).then(() => {
+function bundleComponentMode(config: BundlerConfig, component: Component, mode: ComponentMode) {
+  if (config.debug) {
+    console.log(`bundle, bundleComponentMode: ${component.tag}, ${mode.name}`);
+  }
+  return bundleComponentModeStyles(config, mode).then(() => {
     return getComponentModeLoader(component, mode);
   });
 }
@@ -90,17 +102,16 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
   });
 
   return generateBundleFiles(config, ctx).then(() => {
-    const registryContent = getRegistryContent(ctx.registry);
+    const content = getRegistryContent(ctx.registry);
 
     const promises: Promise<any>[] = [];
 
-    promises.push(createCoreJs(config, registryContent, 'ionic.core.js', true));
-    promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.js', true));
-    promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.js', true));
+    Object.keys(ctx.manifest.coreFiles).forEach(coreDirName => {
+      const corePath = ctx.manifest.coreFiles[coreDirName];
 
-    promises.push(createCoreJs(config, registryContent, 'ionic.core.dev.js', false));
-    promises.push(createCoreJs(config, registryContent, 'ionic.core.ce.dev.js', false));
-    promises.push(createCoreJs(config, registryContent, 'ionic.core.sd.ce.dev.js', false));
+      promises.push(createCoreJs(config, content, corePath, true));
+      promises.push(createCoreJs(config, content, corePath, false));
+    });
 
     return promises;
   });
@@ -138,7 +149,6 @@ function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[])
 
 
 function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
-  // {'ion-badge':[{ios:'8bc3e3bb',md:'80ccf7f0',wp:'581787f8'}]}
   ctx.registry = {};
 
   return Promise.all(ctx.bundles.map((bundle, bundleIndex) => {
@@ -149,7 +159,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     bundle.id = getBundleId(bundleIndex);
     bundle.fileName = getBundleFileName(bundle.id);
-    bundle.filePath = path.join(config.buildDir, bundle.fileName);
+    bundle.filePath = path.join(config.destDir, bundle.fileName);
 
     bundle.content = getBundleContent(bundle.id, componentModeLoaders);
 
@@ -181,10 +191,18 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 }
 
 
-function createCoreJs(config: BundlerConfig, registryContent: string, fileName: string, minify: boolean) {
-  const filePath = path.join(config.coreDir, fileName);
+function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePath: string, minify: boolean) {
+  if (!minify) {
+    srcFilePath = srcFilePath.replace('.js', '.dev.js');
+  }
 
-  return readFile(filePath).then(coreJsContent => {
+  let fileName = path.basename(srcFilePath);
+
+  srcFilePath = path.join(config.srcDir, srcFilePath);
+
+  let destFilePath = path.join(config.destDir, fileName);
+
+  return readFile(srcFilePath).then(coreJsContent => {
     let content: string;
 
     if (minify) {
@@ -193,9 +211,14 @@ function createCoreJs(config: BundlerConfig, registryContent: string, fileName: 
 
     } else {
       content = registryContent + '\n\n' + coreJsContent;
+
     }
 
-    return writeFile(filePath, content);
+    if (config.debug) {
+      console.log(`bundle, createCoreJs: ${destFilePath}`)
+    }
+
+    return writeFile(destFilePath, content);
   });
 }
 
@@ -222,10 +245,10 @@ function getManifest(config: BundlerConfig, ctx: BuildContext) {
     return Promise.resolve(ctx.manifest);
   }
 
-  const manifestFilePath = path.join(config.coreDir, 'manifest.json');
+  const manifestFilePath = path.join(config.srcDir, 'manifest.json');
 
   if (config.debug) {
-    console.log(`manifestFilePath: ${manifestFilePath}`) ;
+    console.log(`bundle, manifestFilePath: ${manifestFilePath}`) ;
   }
 
   return readFile(manifestFilePath).then(manifestStr => {

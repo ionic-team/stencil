@@ -8,7 +8,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
   const tsFileNames = getTsFileNames(ctx);
 
   if (config.debug) {
-    console.log(`transpile: ${tsFileNames}`);
+    console.log(`compile, transpile: ${tsFileNames}`);
   }
 
   if (!tsFileNames.length) {
@@ -50,15 +50,19 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
 
   ts.sys.readFile = tsSysReadFile;
 
-  return writeJsFiles(ctx);
+  return writeJsFiles(config, ctx);
 }
 
 
-function writeJsFiles(ctx: BuildContext) {
+function writeJsFiles(config: CompilerConfig, ctx: BuildContext) {
   ctx.files.forEach(f => {
     if (f.jsFilePath && f.jsText) {
       if (!f.cmpMeta) {
         return;
+      }
+
+      if (config.debug) {
+        console.log(`transpile, writeJsFile: ${f.jsFilePath}`);
       }
 
       f.jsText = f.jsText.replace(`Object.defineProperty(exports, "__esModule", { value: true });`, '');

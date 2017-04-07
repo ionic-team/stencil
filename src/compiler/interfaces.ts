@@ -47,8 +47,8 @@ export interface BuildContext {
 
 
 export interface BundlerConfig {
-  coreDir: string;
-  buildDir: string;
+  srcDir: string;
+  destDir: string;
   packages: {
     nodeSass: {
       render: Function;
@@ -87,8 +87,14 @@ export interface Bundle {
 
 
 export interface Manifest {
-  components: CoreComponents;
-  bundles: string[][];
+  components?: CoreComponents;
+  bundles?: string[][];
+  coreFiles?: {
+    core: string;
+    core_ce: string;
+    core_sd_ce: string;
+    [key: string]: string;
+  }
 }
 
 
