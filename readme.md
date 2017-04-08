@@ -1,5 +1,5 @@
 
-# ionic-next
+# ionic-core
 
     npm start
 
