@@ -18,11 +18,12 @@ const compiler = require(path.join(__dirname, '../compiler'));
 
 const srcDir = path.join(__dirname, '../../src');
 const transpiledSrcDir = path.join(__dirname, '../transpiled-angular/bindings/angular/src');
-const compiledDir = path.join(__dirname, '../compiled-ionic-angular');
+let compiledDir = path.join(__dirname, '../compiled-ionic-angular');
 
+if (process.argv[2]) {
+  compiledDir = process.argv[2];
+}
 
-// first clean out the ionic-web directories
-fs.emptyDirSync(compiledDir);
 
 // copy compiler/index.js to the compiled ionic-angular location
 const compilerJsScript = path.join(__dirname, '../compiler/index.js');
