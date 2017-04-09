@@ -90,7 +90,6 @@ function bundleComponents() {
       uglify: uglify,
       nodeSass: nodeSass
     },
-    minifyJs: true,
     debug: true
   };
 
