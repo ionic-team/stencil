@@ -137,7 +137,7 @@ export interface ProxyElement extends HTMLElement {
 }
 
 
-export interface Renderer {
+export interface RendererApi {
   (oldVnode: VNode | Element, vnode: VNode): VNode;
 }
 

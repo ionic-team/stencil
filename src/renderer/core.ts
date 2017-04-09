@@ -10,7 +10,7 @@
 
 /* global module, document, Node */
 import { isArray, isDef, isUndef, isPrimitive } from '../util/helpers';
-import { PlatformApi, Renderer, VNode, VNodeData, Key } from '../util/interfaces';
+import { PlatformApi, RendererApi, VNode, VNodeData, Key } from '../util/interfaces';
 import { vnode } from './vnode';
 
 import { updateAttrs } from './modules/attributes';
@@ -45,7 +45,7 @@ function createKeyToOldIdx(children: Array<VNode>, beginIdx: number, endIdx: num
 }
 
 
-export function initRenderer(api: PlatformApi): Renderer {
+export function initRenderer(api: PlatformApi): RendererApi {
 
   function emptyNodeAt(elm: Element) {
     const id = elm.id ? '#' + elm.id : '';

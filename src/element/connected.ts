@@ -1,9 +1,9 @@
-import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, PlatformApi, ProxyElement, Renderer } from '../util/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
 import { isDef } from '../util/helpers';
 import { queueUpdate } from './update';
 
 
-export function connectedCallback(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
+export function connectedCallback(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, cmpMeta: ComponentMeta) {
   plt.nextTick(() => {
     const tag = cmpMeta.tag;
     const mode = getMode(plt, config, elm, 'mode');

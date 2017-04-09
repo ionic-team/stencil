@@ -1,12 +1,12 @@
 import { attributeChangedCallback } from '../element/attribute-changed';
-import { ComponentController, ConfigApi, IonicUtils, LoadComponents, PlatformApi, Renderer } from '../util/interfaces';
+import { ComponentController, ConfigApi, IonicUtils, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
 import { connectedCallback } from '../element/connected';
 import { disconnectedCallback } from '../element/disconnected';
 import { initComponentMeta } from '../element/proxy';
 import { theme } from '../element/host';
 
 
-export function registerComponentsES5(renderer: Renderer, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
+export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
   const cmpControllers = new WeakMap<HTMLElement, ComponentController>();
 
   const utils: IonicUtils = {

@@ -1,10 +1,10 @@
 import { ComponentController, ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
 import { generateVNode } from './host';
 import { initProps } from './proxy';
-import { IonicUtils, Renderer } from '../util/interfaces';
+import { IonicUtils, RendererApi } from '../util/interfaces';
 
 
-export function queueUpdate(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+export function queueUpdate(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   // only run patch if it isn't queued already
   if (!ctrl.queued) {
     ctrl.queued = true;
@@ -22,7 +22,7 @@ export function queueUpdate(utils: IonicUtils, plt: PlatformApi, config: ConfigA
 }
 
 
-export function update(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+export function update(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   const cmpMeta = plt.getComponentMeta(tag);
 
   let instance = ctrl.instance;

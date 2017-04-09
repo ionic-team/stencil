@@ -1,9 +1,9 @@
-import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, PlatformApi, Props, ProxyElement, Renderer } from '../util/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, PlatformApi, Props, ProxyElement, RendererApi } from '../util/interfaces';
 import { getPropValue, toCamelCase, toDashCase } from '../util/helpers';
 import { queueUpdate } from './update';
 
 
-export function initProps(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: Renderer, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
+export function initProps(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
   const instance = ctrl.instance;
   const lastPropValues: {[propName: string]: any} = {};
 

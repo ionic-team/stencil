@@ -1,7 +1,7 @@
-import { Renderer } from '../util/interfaces';
+import { RendererApi } from '../util/interfaces';
 
 
-export function renderComponentToString(renderer: Renderer, content: string, callback: Function) {
+export function renderComponentToString(renderer: RendererApi, content: string, callback: Function) {
   renderer;
 
   callback(content);
