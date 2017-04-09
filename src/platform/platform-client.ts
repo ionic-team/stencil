@@ -1,5 +1,4 @@
-import { ComponentMeta, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi } from '../util/interfaces';
-import { PlatformApi } from './platform-api';
+import { ComponentMeta, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi, PlatformApi } from '../util/interfaces';
 
 
 export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {

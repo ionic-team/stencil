@@ -1,6 +1,5 @@
-import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, ProxyElement, Renderer } from '../util/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, PlatformApi, ProxyElement, Renderer } from '../util/interfaces';
 import { isDef } from '../util/helpers';
-import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 

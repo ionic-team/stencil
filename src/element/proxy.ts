@@ -1,6 +1,5 @@
-import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, Props, ProxyElement, Renderer } from '../util/interfaces';
+import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, PlatformApi, Props, ProxyElement, Renderer } from '../util/interfaces';
 import { getPropValue, toCamelCase, toDashCase } from '../util/helpers';
-import { PlatformApi } from '../platform/platform-api';
 import { queueUpdate } from './update';
 
 

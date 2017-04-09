@@ -1,9 +1,8 @@
 import { attributeChangedCallback } from '../element/attribute-changed';
-import { ComponentController, ConfigApi, IonicUtils, LoadComponents, Renderer } from '../util/interfaces';
+import { ComponentController, ConfigApi, IonicUtils, LoadComponents, PlatformApi, Renderer } from '../util/interfaces';
 import { connectedCallback } from '../element/connected';
 import { disconnectedCallback } from '../element/disconnected';
 import { initComponentMeta } from '../element/proxy';
-import { PlatformApi } from '../platform/platform-api';
 import { theme } from '../element/host';
 
 

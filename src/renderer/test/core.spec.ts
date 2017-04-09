@@ -1,5 +1,5 @@
 import { initRenderer, h, vnode, VNode, VNodeData } from '../core';
-import { PlatformApi } from '../../platform/platform-api';
+import { PlatformApi } from '../../util/interfaces';
 import { PlatformClient } from '../../platform/platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
 import { DomController } from '../../platform/dom-controller';
