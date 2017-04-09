@@ -1,0 +1,152 @@
+@import "../../themes/ionic.globals";
+
+// Picker
+// --------------------------------------------------
+
+/// @prop - Width of the picker
+$picker-width:                             100% !default;
+
+/// @prop - Max width of the picker
+$picker-max-width:                         500px !default;
+
+
+ion-picker-cmp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: $z-index-overlay;
+  display: block;
+
+  width: $picker-width;
+  height: $picker-width;
+
+  contain: strict;
+}
+
+.picker-toolbar {
+  z-index: 1;
+
+  width: 100%;
+
+  contain: strict;
+}
+
+.picker-wrapper {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: $z-index-overlay-wrapper;
+  display: flex;
+
+  overflow: hidden;
+
+  flex-direction: column;
+
+  margin: auto;
+
+  width: $picker-width;
+  max-width: $picker-max-width;
+
+  transform: translate3d(0, 100%, 0);
+
+  contain: strict;
+}
+
+.picker-columns {
+  position: relative;
+  display: flex;
+
+  overflow: hidden;
+
+  justify-content: center;
+
+  contain: strict;
+}
+
+.picker-col {
+  position: relative;
+  display: flex;
+
+  flex: 1;
+  justify-content: center;
+
+  height: 100%;
+
+  box-sizing: content-box;
+
+  contain: content;
+}
+
+.picker-opts {
+  position: relative;
+
+  flex: 1;
+
+  max-width: 100%;
+}
+
+.picker-prefix {
+  position: relative;
+
+  flex: 2;
+
+  min-width: 45%;
+  max-width: 50%;
+
+  text-align: right;
+  white-space: nowrap;
+}
+
+.picker-suffix {
+  position: relative;
+
+  flex: 2;
+
+  min-width: 45%;
+  max-width: 50%;
+
+  text-align: left;
+  white-space: nowrap;
+}
+
+// contain property is supported by Chrome
+.picker-opt {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  overflow: hidden;
+
+  width: 100%;
+
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  will-change: transform;
+  contain: strict;
+}
+
+.picker-opt.picker-opt-disabled {
+  pointer-events: none;
+}
+
+.picker-opt-disabled {
+  opacity: 0;
+}
+
+.picker-opts-left {
+  justify-content: flex-start;
+}
+
+.picker-opts-right {
+  justify-content: flex-end;
+}
+
+.picker-above-highlight,
+.picker-below-highlight {
+  display: none;
+
+  pointer-events: none;
+}

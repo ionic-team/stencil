@@ -1,0 +1,71 @@
+@import "../../themes/ionic.globals.ios";
+
+// iOS Label
+// --------------------------------------------------
+
+/// @prop - Margin of the label
+$label-ios-margin:             $item-ios-padding-top ($item-ios-padding-right / 2) $item-ios-padding-bottom 0 !default;
+
+
+// iOS Default Label
+// --------------------------------------------------
+
+.label-ios {
+  margin: $label-ios-margin;
+}
+
+
+// iOS Default Label Inside An Input/Select Item
+// --------------------------------------------------
+
+.label-ios + ion-input .text-input,
+.label-ios + ion-textarea .text-input,
+.label-ios + .input + .cloned-input {
+  margin-left: $item-ios-padding-left;
+
+  width: calc(100% - (#{$item-ios-padding-right} / 2) - #{$item-ios-padding-left});
+}
+
+
+// iOS Stacked & Floating Labels
+// --------------------------------------------------
+
+.label-ios[stacked] {
+  margin-bottom: 4px;
+
+  font-size: 1.2rem;
+}
+
+.label-ios[floating] {
+  margin-bottom: 0;
+
+  transform: translate3d(0, 27px, 0);
+  transform-origin: left top;
+  transition: transform 150ms ease-in-out;
+}
+
+.input-has-focus .label-ios[floating],
+.input-has-value .label-ios[floating] {
+  transform: translate3d(0, 0, 0) scale(.8);
+}
+
+.item-ios.item-label-stacked [item-right],
+.item-ios.item-label-floating [item-right] {
+  margin-top: $item-ios-padding-media-top - 2;
+  margin-bottom: $item-ios-padding-media-bottom - 2;
+}
+
+
+// Generate iOS Label colors
+// --------------------------------------------------
+
+@each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
+
+  .label-ios-#{$color-name},
+  .item-input .label-ios-#{$color-name},
+  .item-select .label-ios-#{$color-name},
+  .item-datetime .label-ios-#{$color-name} {
+    color: $color-base;
+  }
+
+}

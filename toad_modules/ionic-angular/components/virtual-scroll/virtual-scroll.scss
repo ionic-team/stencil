@@ -1,0 +1,29 @@
+
+// Virtual Scroll
+// --------------------------------------------------
+
+.virtual-loading {
+  opacity: 0;
+}
+
+.virtual-scroll {
+  position: relative;
+
+  contain: content;
+}
+
+.virtual-scroll .virtual-position,
+.virtual-scroll .virtual-position.item {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  transition-duration: 0ms;
+
+  contain: content;
+}
+
+.virtual-scroll .virtual-last {
+  display: none;
+}
