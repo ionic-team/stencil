@@ -45,7 +45,7 @@ function createKeyToOldIdx(children: Array<VNode>, beginIdx: number, endIdx: num
 }
 
 
-export function initRenderer(api: PlatformApi): RendererApi {
+export function Renderer(api: PlatformApi): RendererApi {
 
   function emptyNodeAt(elm: Element) {
     const id = elm.id ? '#' + elm.id : '';

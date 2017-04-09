@@ -1,13 +1,13 @@
-import { initRenderer } from '../../../renderer/core';
 import { initServer } from '../../../server/init-server';
 import { LoadComponents } from '../../../util/interfaces';
 import { PlatformServer } from '../../../server/platform-server';
 import { renderComponentToString } from '../../../server/render';
+import { Renderer } from '../../../renderer/core';
 
 
 export function init(components: LoadComponents) {
   const plt = PlatformServer();
-  const renderer = initRenderer(plt);
+  const renderer = Renderer(plt);
 
   initServer(plt, components);
 
