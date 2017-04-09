@@ -9,12 +9,13 @@ var ionic = ionicUniversal.init({});
 app.get('/', function (req, res) {
   console.log('req.url:', req.url);
 
-  var input = Math.random().toString();
+  var input = '<div>hi</div><ion-badge>88</ion-badge><span>yo</span><!--comment-->';
 
-  ionic.renderToString(input, (content) => {
+  ionic.upgradeHtml(input).then(function(html) {
 
-    res.send(content);
+    res.send(html);
   });
+
 });
 
 

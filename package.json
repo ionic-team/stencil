@@ -6,13 +6,11 @@
   "scripts": {
     "clean": "rimraf dist/",
     "compare": "node scripts/build.compare.js",
-
     "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.universal",
-      "build.compiler": "node dist/scripts/build-compiler.js",
-      "build.web": "node dist/scripts/build-web.js",
-      "build.angular": "node dist/scripts/build-angular.js",
-      "build.universal": "node dist/scripts/build-universal.js",
-
+    "build.compiler": "node dist/scripts/build-compiler.js",
+    "build.web": "node dist/scripts/build-web.js",
+    "build.angular": "node dist/scripts/build-angular.js",
+    "build.universal": "node dist/scripts/build-universal.js",
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch",
@@ -41,6 +39,7 @@
     "jsdom": "9.11.0",
     "knuth-shuffle": "1.0.1",
     "node-sass": "^4.5.0",
+    "parse5": "^3.0.2",
     "rimraf": "2.6.1",
     "rollup": "0.41.4",
     "typescript": "2.2.1"

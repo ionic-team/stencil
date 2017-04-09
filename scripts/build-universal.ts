@@ -18,6 +18,7 @@ rollup.rollup({
   entry: ENTRY_FILE,
   external: [
     'fs',
+    'parse5',
     'path'
   ]
 

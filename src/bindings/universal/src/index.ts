@@ -1,7 +1,7 @@
 import { initServer } from '../../../server/init-server';
 import { LoadComponents } from '../../../util/interfaces';
 import { PlatformServer } from '../../../server/platform-server';
-import { renderComponentToString } from '../../../server/render';
+import { upgradeInputHtml } from '../../../server/render';
 import { Renderer } from '../../../renderer/core';
 
 
@@ -12,12 +12,12 @@ export function init(components: LoadComponents) {
   initServer(plt, components);
 
 
-  function renderToString(content: string, callback: Function) {
-    renderComponentToString(renderer, content, callback);
+  function upgradeHtml(content: string) {
+    return upgradeInputHtml(renderer, plt, content);
   }
 
 
   return {
-    renderToString: renderToString
+    upgradeHtml: upgradeHtml
   }
 }
