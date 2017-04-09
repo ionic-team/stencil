@@ -6,6 +6,12 @@ const plt = PlatformServer();
 
 initRenderer(plt);
 
-export function initServer() {
 
+export function renderToString(inputHtml: string) {
+  return inputHtml;
+}
+
+
+export function renderFromHtmlToString(inputHtml: string) {
+  return inputHtml;
 }
