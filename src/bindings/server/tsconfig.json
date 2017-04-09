@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowUnreachableCode": false,
+    "declaration": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": ["dom", "es2015"],
+    "module": "es2015",
+    "target": "es5",
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": false,
+    "sourceMap": false,
+    "outDir": "../../../dist/transpiled-server"
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../components/**/*.ts"
+  ]
+}
