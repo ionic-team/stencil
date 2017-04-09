@@ -1,6 +1,6 @@
 /**
- * Build Server:
- * Bundles up the server into a single JS file.
+ * Build Universal:
+ * Bundles up the universal into a single JS file.
  */
 
 import * as path from 'path';
@@ -8,9 +8,9 @@ import * as fs from 'fs-extra';
 const rollup = require('rollup');
 
 
-const SRC_DIR = path.join(__dirname, '../transpiled-server');
-const ENTRY_FILE = path.join(__dirname, '../transpiled-server/bindings/server/src/index.js');
-const DEST_DIR = path.join(__dirname, '../ionic-server');
+const SRC_DIR = path.join(__dirname, '../transpiled-universal');
+const ENTRY_FILE = path.join(__dirname, '../transpiled-universal/bindings/universal/src/index.js');
+const DEST_DIR = path.join(__dirname, '../ionic-universal');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 

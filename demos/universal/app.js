@@ -1,14 +1,20 @@
 var express = require('express');
 var app = express();
-var ionicServer = require('../../dist/ionic-server');
+var ionicUniversal = require('../../dist/ionic-universal');
+
+
+var ionic = ionicUniversal.init({});
 
 
 app.get('/', function (req, res) {
   console.log('req.url:', req.url);
 
-  var content = ionicServer.renderToString(Math.random().toString());
+  var input = Math.random().toString();
 
-  res.send(content);
+  ionic.renderToString(input, (content) => {
+
+    res.send(content);
+  });
 });
 
 

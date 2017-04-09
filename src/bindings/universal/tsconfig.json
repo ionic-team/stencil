@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowUnreachableCode": false,
-    "declaration": false,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": ["dom", "es2015"],
@@ -12,10 +12,9 @@
     "noUnusedParameters": true,
     "removeComments": false,
     "sourceMap": false,
-    "outDir": "../../../dist/transpiled-server"
+    "outDir": "../../../dist/transpiled-universal"
   },
   "include": [
-    "src/**/*.ts",
-    "../../components/**/*.ts"
+    "src/**/*.ts"
   ]
 }

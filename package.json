@@ -7,17 +7,17 @@
     "clean": "rimraf dist/",
     "compare": "node scripts/build.compare.js",
 
-    "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.server",
+    "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.universal",
       "build.compiler": "node dist/scripts/build-compiler.js",
       "build.web": "node dist/scripts/build-web.js",
       "build.angular": "node dist/scripts/build-angular.js",
-      "build.server": "node dist/scripts/build-server.js",
+      "build.universal": "node dist/scripts/build-universal.js",
 
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
     "test.watch": "jest --watch",
-    "transpile": "tsc -p scripts/tsconfig.json & tsc -p src/compiler/tsconfig.json & tsc -p src/bindings/web/tsconfig.json & tsc -p src/bindings/angular/tsconfig.json & tsc -p src/bindings/server/tsconfig.json",
-    "transpile.watch": "tsc -p scripts/tsconfig.json -w & tsc -p src/compiler/tsconfig.json -w & tsc -p src/bindings/web/tsconfig.json -w & tsc -p src/bindings/angular/tsconfig.json -w & tsc -p src/bindings/server/tsconfig.json -w"
+    "transpile": "tsc -p scripts/tsconfig.json & tsc -p src/compiler/tsconfig.json & tsc -p src/bindings/web/tsconfig.json & tsc -p src/bindings/angular/tsconfig.json & tsc -p src/bindings/universal/tsconfig.json",
+    "transpile.watch": "tsc -p scripts/tsconfig.json -w & tsc -p src/compiler/tsconfig.json -w & tsc -p src/bindings/web/tsconfig.json -w & tsc -p src/bindings/angular/tsconfig.json -w & tsc -p src/bindings/universal/tsconfig.json -w"
   },
   "devDependencies": {
     "@types/babel-core": "^6.7.14",
