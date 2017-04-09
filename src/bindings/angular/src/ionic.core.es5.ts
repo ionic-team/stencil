@@ -1,7 +1,7 @@
-import { Ionic } from '../../../util/interfaces';
-import { PlatformClient } from '../../../platform/platform-client';
 import { initRenderer } from '../../../renderer/core';
-import { registerComponentsES5 } from '../../../registry/registry.es5';
+import { Ionic } from '../../../util/interfaces';
+import { PlatformClient } from '../../../client/platform-client';
+import { registerComponentsES5 } from '../../../client/registry.es5';
 
 
 const ionic: Ionic = (<any>window).Ionic = (<any>window).Ionic || {};

@@ -1,10 +1,10 @@
-import { ConfigController } from '../../../platform/config-controller';
-import { DomController } from '../../../platform/dom-controller';
+import { ConfigController } from '../../../client/config-controller';
+import { DomController } from '../../../client/dom-controller';
 import { initRenderer } from '../../../renderer/core';
 import { Ionic } from '../../../util/interfaces';
-import { NextTickController } from '../../../platform/next-tick-controller';
-import { PlatformClient } from '../../../platform/platform-client';
-import { registerComponentsES5 } from '../../../registry/registry.es5';
+import { NextTickController } from '../../../client/next-tick-controller';
+import { PlatformClient } from '../../../client/platform-client';
+import { registerComponentsES5 } from '../../../client/registry.es5';
 
 
 const ionic: Ionic = (<any>window).Ionic = (<any>window).Ionic || {};
