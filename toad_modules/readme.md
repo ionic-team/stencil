@@ -19,7 +19,7 @@ Sadly, to use a web component in Angular you need to add another config to the `
 
 ```
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ErrorHandler, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { IonicApp, IonicModule } from 'ionic-angular';
 
