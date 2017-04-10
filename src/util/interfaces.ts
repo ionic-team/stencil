@@ -2,7 +2,7 @@
 export interface Ionic {
   staticDir?: string;
   components?: LoadComponents;
-  loadComponents?: {(bundleId: string, componentModeData: any[]): void};
+  loadComponents?: {(bundleId: string): void};
   config?: Object;
   configCtrl?: ConfigApi;
   domCtrl?: DomControllerApi;
@@ -48,7 +48,30 @@ export interface RequestAnimationFrame {
 
 
 export interface LoadComponents {
-  [tag: string]: any[]
+  [tag: string]: any[];
+}
+
+
+export interface ComponentModeData {
+  /**
+   * tag (ion-badge)
+   */
+  [0]: string;
+
+  /**
+   * modeName (ios,md,wp)
+   */
+  [1]: string;
+
+  /**
+   * styles
+   */
+  [2]: string;
+
+  /**
+   * moduleFn
+   */
+  [3]: {(importer: Object): void};
 }
 
 
@@ -170,7 +193,7 @@ export interface VNodeData {
 
 
 export interface PlatformApi {
-  registerComponent: (cmpMeta: ComponentMeta) => void;
+  registerComponent: (tag: string, data: any[]) => ComponentMeta;
   getComponentMeta: (tag: string) => ComponentMeta;
   loadComponent: (cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function) => void;
   nextTick: NextTick;
@@ -195,4 +218,10 @@ export interface PlatformApi {
   $getTextContent: (node: Node) => string | null;
   $getAttribute: (elm: Element, attrName: string) => string;
   $attachShadow: (elm: Element, cmpMode: ComponentMode, cmpModeId: string) => ShadowRoot;
+}
+
+
+export interface ServerInitConfig {
+  staticDir: string;
+  config?: Object;
 }

@@ -1,9 +1,17 @@
 var express = require('express');
 var app = express();
 var ionicUniversal = require('../../dist/ionic-universal');
+var path = require('path');
 
 
-var ionic = ionicUniversal.init({});
+var ionicServerConfig = {
+  staticDir: path.join('../../dist/ionic-web')
+}
+
+console.log('load components from:', ionicServerConfig.staticDir);
+
+
+var ionic = ionicUniversal.init(ionicServerConfig);
 
 
 app.get('/', function (req, res) {

@@ -1,12 +1,41 @@
-import { ComponentMeta, ComponentMode, ComponentRegistry, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ComponentMode, ComponentModeData, ComponentRegistry, Ionic, PlatformApi } from '../util/interfaces';
 
 
-export function PlatformServer(): PlatformApi {
+export function PlatformServer(ionic: Ionic): PlatformApi {
   const registry: ComponentRegistry = {};
 
 
+  ionic.loadComponents = function loadComponents(bundleId) {
+    var args = arguments;
+    for (var i = 1; i < args.length; i++) {
+      var cmpModeData: ComponentModeData = args[i];
+      var tag = cmpModeData[0];
+      var mode = cmpModeData[1];
+      var styles = cmpModeData[2];
+      var importModuleFn = cmpModeData[3];
+
+      console.log(`Ionic.loadComponents, bundle: ${bundleId}, tag: ${tag}, mode: ${mode}`);
+
+      var cmpMeta = registerComponent(tag, []);
+
+      cmpMeta.modes[mode] = {
+        styles: styles,
+        isLoaded: true
+      };
+
+      var moduleImports = {};
+      importModuleFn(moduleImports);
+      cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
+    }
+  };
+
   function loadComponent(cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function): void {
-    cb(cmpMeta, cmpMode);
+    if (cmpMode && cmpMode.isLoaded) {
+      cb(cmpMeta, cmpMode);
+
+    } else {
+      console.log(`invalid component: ${cmpMeta}`);
+    }
   }
 
   function domRead(cb: Function) {
@@ -26,8 +55,26 @@ export function PlatformServer(): PlatformApi {
     return shadowElm;
   }
 
-  function registerComponent(cmpMeta: ComponentMeta) {
-    registry[cmpMeta.tag] = cmpMeta;
+  function registerComponent(tag: string, data: any[]) {
+    let cmpMeta: ComponentMeta = registry[tag];
+    if (cmpMeta) {
+      return cmpMeta;
+    }
+
+    const props = data[1] || {};
+
+    cmpMeta = registry[tag] = { modes: {} };
+    cmpMeta.tag = tag;
+    cmpMeta.props = props;
+
+    const hostCssParts = cmpMeta.tag.split('-');
+    hostCssParts.shift();
+    cmpMeta.hostCss = hostCssParts.join('-');
+
+    props.color = {};
+    props.mode = {};
+
+    return cmpMeta;
   }
 
   function getComponentMeta(tag: string) {

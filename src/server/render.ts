@@ -2,17 +2,6 @@ import { ComponentMeta, PlatformApi, RendererApi } from '../util/interfaces';
 import * as parse5 from 'parse5';
 
 
-export function renderComponentToString(renderer: RendererApi, content: string) {
-  renderer;
-
-  return new Promise(resolve => {
-
-    resolve(content);
-
-  });
-}
-
-
 export function upgradeInputHtml(renderer: RendererApi, plt: PlatformApi, html: string) {
   const node: Node = <any>parse5.parseFragment(html);
 

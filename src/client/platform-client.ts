@@ -1,4 +1,5 @@
-import { ComponentMeta, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi, PlatformApi } from '../util/interfaces';
+import { toDashCase } from '../util/helpers';
 
 
 export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
@@ -9,10 +10,10 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
 
 
-  ionic.loadComponents = function loadComponent(bundleId) {
-    const args = arguments;
+  ionic.loadComponents = function loadComponents(bundleId) {
+    var args = arguments;
     for (var i = 1; i < args.length; i++) {
-      var cmpModeData = args[i];
+      var cmpModeData: ComponentModeData = args[i];
       var tag = cmpModeData[0];
       var mode = cmpModeData[1];
 
@@ -27,14 +28,14 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
       cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
 
       cmpMode.isLoaded = true;
-    }
 
-    const callbacks = bundleCBs[bundleId];
-    if (callbacks) {
-      for (var i = 0, l = callbacks.length; i < l; i++) {
-        callbacks[i]();
+      const callbacks = bundleCBs[bundleId];
+      if (callbacks) {
+        for (var i = 0, l = callbacks.length; i < l; i++) {
+          callbacks[i]();
+        }
+        delete bundleCBs[bundleId];
       }
-      delete bundleCBs[bundleId];
     }
   };
 
@@ -117,8 +118,38 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
     return shadowElm;
   }
 
-  function registerComponent(cmpMeta: ComponentMeta) {
-    registry[cmpMeta.tag] = cmpMeta;
+  function registerComponent(tag: string, data: any[]) {
+    const modeBundleIds = data[0];
+    const props = data[1] || {};
+
+    const cmpMeta: ComponentMeta = registry[tag] = {
+      tag: tag,
+      modes: {},
+      props: props
+    };
+
+    let keys = Object.keys(modeBundleIds);
+    for (var i = 0; i < keys.length; i++) {
+      cmpMeta.modes[keys[i]] = {
+        bundleId: modeBundleIds[keys[i]]
+      };
+    }
+
+    keys = cmpMeta.tag.split('-');
+    keys.shift();
+    cmpMeta.hostCss = keys.join('-');
+
+    props.color = {};
+    props.mode = {};
+
+    const observedAttributes = cmpMeta.observedAttrs = cmpMeta.observedAttrs || [];
+
+    keys = Object.keys(props);
+    for (i = 0; i < keys.length; i++) {
+      observedAttributes.push(toDashCase(keys[i]));
+    }
+
+    return cmpMeta;
   }
 
   function getComponentMeta(tag: string) {

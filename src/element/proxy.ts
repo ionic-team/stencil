@@ -1,5 +1,5 @@
-import { ComponentController, ComponentMeta, ConfigApi, IonicUtils, PlatformApi, Props, ProxyElement, RendererApi } from '../util/interfaces';
-import { getPropValue, toCamelCase, toDashCase } from '../util/helpers';
+import { ComponentController, ConfigApi, IonicUtils, PlatformApi, Props, ProxyElement, RendererApi } from '../util/interfaces';
+import { getPropValue, toCamelCase } from '../util/helpers';
 import { queueUpdate } from './update';
 
 
@@ -54,39 +54,4 @@ function getInitialValue(plt: PlatformApi, config: ConfigApi, elm: HTMLElement, 
   if (value !== null) {
     return value;
   }
-}
-
-
-export function initComponentMeta(tag: string, data: any[]) {
-  const modeBundleIds = data[0];
-  const props = data[1] || {};
-
-  const cmpMeta: ComponentMeta = {
-    tag: tag,
-    modes: {},
-    props: props
-  };
-
-  let keys = Object.keys(modeBundleIds);
-  for (var i = 0; i < keys.length; i++) {
-    cmpMeta.modes[keys[i]] = {
-      bundleId: modeBundleIds[keys[i]]
-    };
-  }
-
-  keys = cmpMeta.tag.split('-');
-  keys.shift();
-  cmpMeta.hostCss = keys.join('-');
-
-  props.color = {};
-  props.mode = {};
-
-  const observedAttributes = cmpMeta.observedAttrs = cmpMeta.observedAttrs || [];
-
-  keys = Object.keys(props);
-  for (i = 0; i < keys.length; i++) {
-    observedAttributes.push(toDashCase(keys[i]));
-  }
-
-  return cmpMeta;
 }

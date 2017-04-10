@@ -2,7 +2,6 @@ import { attributeChangedCallback } from '../element/attribute-changed';
 import { ComponentController, ConfigApi, IonicUtils, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
 import { connectedCallback } from '../element/connected';
 import { disconnectedCallback } from '../element/disconnected';
-import { initComponentMeta } from '../element/proxy';
 import { theme } from '../element/host';
 
 
@@ -14,9 +13,7 @@ export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, c
   };
 
   Object.keys(components || {}).forEach(tag => {
-    const cmpMeta = initComponentMeta(tag, components[tag]);
-
-    plt.registerComponent(cmpMeta);
+    const cmpMeta = plt.registerComponent(tag, components[tag]);
 
 
     function ProxyElement(self) {
