@@ -37,11 +37,11 @@ export function upgradeNode(utils: IonicUtils, plt: PlatformApi, renderer: Rende
   console.log(`upgradeNode ${elm.tagName}`)
   const instance = new cmpMeta.componentModule();
 
-  const cmpMode = cmpMeta.modes[instance.mode];
-  const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
-  const rootElm = plt.$attachShadow(elm, cmpMode, cmpModeId);
+  // const cmpMode = cmpMeta.modes[instance.mode];
+  // const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
+  plt;
 
-  let vnode = generateVNode(utils, rootElm, instance, cmpMeta.hostCss);
+  let vnode = generateVNode(utils, elm, instance, cmpMeta.hostCss);
 
   vnode = renderer(elm, vnode);
 

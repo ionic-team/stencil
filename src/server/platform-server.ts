@@ -106,16 +106,36 @@ export function PlatformServer(ionic: Ionic): PlatformApi {
     };
   }
 
-  function insertBefore(parentNode: Node, newNode: Node, referenceNode: Node | null): void {
-    parentNode.insertBefore(newNode, referenceNode);
+  function insertBefore(parentNode: any, newNode: Node, referenceNode: Node | null): void {
+    if (!parentNode.childNodes) {
+      parentNode.childNodes = [newNode];
+
+    } else {
+      const refNodeIndex = parentNode.childNodes.indexOf(referenceNode);
+      if (refNodeIndex > 0) {
+        parentNode.childNodes.splice(refNodeIndex - 1, 0, newNode);
+      } else {
+        parentNode.childNodes.unshift(referenceNode);
+      }
+    }
   }
 
-  function removeChild(parentNode: Node, childNode: Node): void {
-    parentNode.removeChild(childNode);
+  function removeChild(parentNode: any, childNode: Node): void {
+    if (parentNode.childNodes) {
+      const refNodeIndex = parentNode.childNodes.indexOf(childNode);
+      if (refNodeIndex > -1) {
+        parentNode.childNodes.splice(refNodeIndex, 1);
+      }
+    }
   }
 
-  function appendChild(parentNode: Node, childNode: Node): void {
-    parentNode.appendChild(childNode);
+  function appendChild(parentNode: any, childNode: Node): void {
+    if (!parentNode.childNodes) {
+      parentNode.childNodes = [childNode];
+
+    } else {
+      parentNode.childNodes.push(childNode);
+    }
   }
 
   function parentNode(node: Node): Node | null {
