@@ -1,8 +1,9 @@
 import { registerComponents } from '../../../server/registry';
-import { Ionic, ServerInitConfig } from '../../../util/interfaces';
+import { Ionic, IonicUtils, ServerInitConfig } from '../../../util/interfaces';
 import { PlatformServer } from '../../../server/platform-server';
 import { upgradeInputHtml } from '../../../server/render';
 import { Renderer } from '../../../renderer/core';
+import { theme } from '../../../element/host';
 
 
 export function init(serverInitConfig: ServerInitConfig) {
@@ -10,12 +11,15 @@ export function init(serverInitConfig: ServerInitConfig) {
   const plt = PlatformServer(ionic);
   const renderer = Renderer(plt);
 
+  const utils: IonicUtils = {
+    theme: theme
+  };
 
   registerComponents(serverInitConfig.staticDir);
 
 
   function upgradeHtml(content: string) {
-    return upgradeInputHtml(renderer, plt, content);
+    return upgradeInputHtml(utils, plt, renderer, content);
   }
 
 
