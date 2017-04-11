@@ -12,11 +12,11 @@ function components(){};
 function configCtrl(){};
 function staticDir(){};
 function domCtrl(){};
-function read(){}
-function write(){}
+function read(){};
+function write(){};
 function nextTickCtrl(){};
-function nextTick(){}
-function devMode(){}
+function nextTick(){};
+function devMode(){};
 
 function tag(){};
 function modes(){};
@@ -33,3 +33,6 @@ function observedAttributes(){};
 function customElements(){};
 function define(){};
 function attachShadow(){};
+
+function ShadyDOM(){};
+function inUse(){};

@@ -170,7 +170,11 @@ function buildCoreMinified(ctx: BuildContext) {
           // (function(B,U){
           var match = /\(function\((.*?),(.*?)\)\{/.exec(content);
           if (!match) {
-            throw 'addUseStrict: something done changed!';
+            match = /\(function\((.*?), (.*?)\)\ {/.exec(content);
+            if (!match) {
+              console.log(content);
+              throw 'addUseStrict: something done changed!';
+            }
           }
 
           content = content.replace(match[0], '(function(' + match[1] + ',' + match[2] + '){"use-strict";')

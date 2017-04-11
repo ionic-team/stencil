@@ -1,2 +1,0 @@
-/*! (C) Ionic, https://ionicframework.com/ - Mit License */
-(function(b,d){var e=b.Ionic=b.Ionic||{},a=d.getElementsByTagName("script"),a=a[a.length-1],c=d.querySelector("script[data-static-dir]");c?e.staticDir=c.dataset.staticDir:(c=a.src.split("/"),c.pop(),e.staticDir=a.dataset.staticDir=c.join("/")+"/");a=["core"];"attachShadow"in Element.prototype||a.push("sd");b.customElements||a.push("ce");b=d.createElement("script");b.src=e.staticDir+"ionic."+a.join(".")+".js";d.head.appendChild(b)})(window,document);
