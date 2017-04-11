@@ -1,1 +1,0 @@
-{"summaries":[{"symbol":{"__symbol":0,"members":[]},"metadata":{"__symbolic":"function","parameters":["config","plt","domCtrl","zone"],"value":{"__symbolic":"error","message":"Function call not supported","line":10,"character":9}}}],"symbols":[{"__symbol":0,"name":"setupCore","filePath":"/Users/adam/git/ionic2/dist/ionic-angular/es2015/util/ionic-core.d.ts"}]}
