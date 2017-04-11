@@ -109,8 +109,7 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
     Object.keys(ctx.manifest.coreFiles).forEach(coreDirName => {
       const corePath = ctx.manifest.coreFiles[coreDirName];
 
-      promises.push(createCoreJs(config, content, corePath, true));
-      promises.push(createCoreJs(config, content, corePath, false));
+      promises.push(createCoreJs(config, content, corePath));
     });
 
     return promises;
@@ -176,23 +175,26 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       ctx.registry[tag][0] = modes;
     });
 
-    const minifyResults = config.packages.uglify.minify(bundle.content, {
-      fromString: true
-    });
+    let content = bundle.content;
 
-    const prodFilePath = bundle.filePath;
-    const devFilePath = bundle.filePath.replace('.js', '.dev.js');
+    if (!config.devMode) {
+      try {
+        const minifyResults = config.packages.uglify.minify(content, {
+          fromString: true
+        });
+        content = minifyResults.code;
+      } catch(e) {
+        console.log(`uglify.minify error: ${e}`);
+      }
+    }
 
-    return Promise.all([
-      writeFile(prodFilePath, minifyResults.code),
-      writeFile(devFilePath, bundle.content)
-    ]);
+    return writeFile(bundle.filePath, content);
   }));
 }
 
 
-function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePath: string, minify: boolean) {
-  if (!minify) {
+function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePath: string) {
+  if (config.devMode) {
     srcFilePath = srcFilePath.replace('.js', '.dev.js');
   }
 
@@ -205,13 +207,12 @@ function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePat
   return readFile(srcFilePath).then(coreJsContent => {
     let content: string;
 
-    if (minify) {
-      registryContent = registryContent.replace(/\s/g, '');
-      content = registryContent + '\n' + coreJsContent;
-
-    } else {
+    if (config.devMode) {
       content = registryContent + '\n\n' + coreJsContent;
 
+    } else {
+      registryContent = registryContent.replace(/\s/g, '');
+      content = registryContent + '\n' + coreJsContent;
     }
 
     if (config.debug) {

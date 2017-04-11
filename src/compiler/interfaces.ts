@@ -49,6 +49,7 @@ export interface BuildContext {
 export interface BundlerConfig {
   srcDir: string;
   destDir: string;
+  devMode?: boolean;
   packages: {
     nodeSass: {
       render: Function;
