@@ -109,12 +109,9 @@ function buildLoader() {
   const prodLoaderPath = path.join(destDir, 'ionic.js');
 
   return readFile(loaderSrcFile).then(srcLoaderJs => {
-    const prodLoaderJs = srcLoaderJs.replace('$IONIC_DEV_MODE', 'false');
-    const devLoaderJs = srcLoaderJs.replace('$IONIC_DEV_MODE', 'true');
+    writeFile(devLoaderPath, srcLoaderJs);
 
-    writeFile(devLoaderPath, devLoaderJs);
-
-    return writeFile(prodLoaderPath, prodLoaderJs).then(() => {
+    return writeFile(prodLoaderPath, srcLoaderJs).then(() => {
       const ClosureCompiler = require('google-closure-compiler').compiler;
 
       return new Promise((resolve, reject) => {

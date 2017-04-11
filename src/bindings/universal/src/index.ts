@@ -1,9 +1,9 @@
-import { registerComponents } from '../../../server/registry';
 import { Ionic, IonicUtils, ServerInitConfig } from '../../../util/interfaces';
 import { PlatformServer } from '../../../server/platform-server';
-import { upgradeInputHtml } from '../../../server/render';
+import { registerComponents } from '../../../server/registry';
 import { Renderer } from '../../../renderer/core';
 import { theme } from '../../../element/host';
+import { upgradeInputHtml } from '../../../server/render';
 
 
 export function init(serverInitConfig: ServerInitConfig) {
