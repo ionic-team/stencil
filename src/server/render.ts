@@ -8,6 +8,9 @@ export function upgradeInputHtml(utils: IonicUtils, plt: PlatformApi, renderer: 
 
   return inspectNode(utils, plt, renderer, node).then(() => {
     return parse5.serialize(node);
+
+  }).catch(err => {
+    console.log(err);
   });
 }
 
