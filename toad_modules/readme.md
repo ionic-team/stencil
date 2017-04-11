@@ -2,7 +2,7 @@
 
 Contains the same node_module directories that would ship from upcoming versions of npm.
 
-- Copy `ionic-angular` and `@ionic/app-scripts` into an Ionic app's node_modules.
+- Unzip then copy `ionic-angular` and `@ionic/app-scripts` into an Ionic app's node_modules.
 - Ensure there is at least one `ion-badge` in the app that is viewable.
 - Build the app no differently than it would have been built before. Again, we're assuming these packages were the same as the ones downloaded from npm.
 - You'll get an error like `'ion-badge' is not a known element`, to fix this add the `CUSTOM_ELEMENTS_SCHEMA` to the `@NgModule`, see below.
