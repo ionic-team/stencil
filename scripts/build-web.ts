@@ -18,6 +18,7 @@ import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
 import * as rollup from 'rollup';
+import * as typescript from 'typescript';
 import * as uglify from 'uglify-js';
 
 // dynamic require cuz this file gets transpiled to dist/
@@ -75,7 +76,8 @@ function compileComponents() {
     packages: {
       fs: fs,
       path: path,
-      nodeSass: nodeSass
+      nodeSass: nodeSass,
+      typescript
     }
   };
 

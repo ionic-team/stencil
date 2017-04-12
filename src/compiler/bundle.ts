@@ -20,6 +20,9 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
   if (!config.packages.rollup) {
     throw 'config.packages.rollup required';
   }
+  if (!config.packages.typescript) {
+    throw 'config.packages.typescript required';
+  }
 
   if (config.debug) {
     console.log(`bundle, srcDir: ${config.srcDir}`);

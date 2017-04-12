@@ -26,37 +26,6 @@ export interface BundlerConfig {
 }
 
 
-export interface Packages {
-  path?: {
-    basename(p: string, ext?: string): string;
-    dirname(p: string): string;
-    extname(p: string): string;
-    isAbsolute(path: string): boolean;
-    join(...paths: string[]): string;
-    resolve(...pathSegments: any[]): string;
-    sep: string;
-  },
-  fs?: {
-    exists(path: string | Buffer, callback?: (exists: boolean) => void): void;
-    mkdir(path: string | Buffer, callback?: (err?: any) => void): void;
-    readdir(path: string | Buffer, callback?: (err: any, files: string[]) => void): void;
-    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
-    readFileSync(filename: string, encoding: string): string;
-    stat(path: string | Buffer, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
-    writeFile(filename: string, data: any, callback?: (err: any) => void): void;
-  };
-  nodeSass?: {
-    render: Function;
-  };
-  rollup?: {
-    rollup: Function;
-  };
-  uglify?: {
-    minify: Function;
-  };
-}
-
-
 export interface FileMeta {
   fileName: string;
   fileExt: string;
@@ -153,4 +122,38 @@ export interface PropOptions {
 
 export interface Props {
   [propName: string]: PropOptions;
+}
+
+
+export interface Packages {
+  path?: {
+    basename(p: string, ext?: string): string;
+    dirname(p: string): string;
+    extname(p: string): string;
+    isAbsolute(path: string): boolean;
+    join(...paths: string[]): string;
+    resolve(...pathSegments: any[]): string;
+    sep: string;
+  },
+  fs?: {
+    exists(path: string | Buffer, callback?: (exists: boolean) => void): void;
+    mkdir(path: string | Buffer, callback?: (err?: any) => void): void;
+    readdir(path: string | Buffer, callback?: (err: any, files: string[]) => void): void;
+    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
+    readFileSync(filename: string, encoding: string): string;
+    stat(path: string | Buffer, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
+    writeFile(filename: string, data: any, callback?: (err: any) => void): void;
+  };
+  typescript?: {
+
+  },
+  nodeSass?: {
+    render: Function;
+  };
+  rollup?: {
+    rollup: Function;
+  };
+  uglify?: {
+    minify: Function;
+  };
 }

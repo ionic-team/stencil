@@ -32,6 +32,9 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
   if (!config.packages.nodeSass) {
     throw 'config.packages.nodeSass required';
   }
+  if (!config.packages.typescript) {
+    throw 'config.packages.typescript required';
+  }
 
   if (config.debug) {
     console.log(`compile, include: ${config.include}`);
