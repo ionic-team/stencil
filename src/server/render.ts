@@ -17,7 +17,7 @@ export function upgradeInputHtml(utils: IonicUtils, plt: PlatformApi, renderer: 
 
 export function inspectNode(utils: IonicUtils, plt: PlatformApi, renderer: RendererApi, node: Node): Promise<any> {
   const promises: Promise<any>[] = [];
-
+console.log('inspectNode', node)
   if (plt.isElement(node)) {
     const cmpMeta = plt.getComponentMeta(node.tagName.toLowerCase());
 
@@ -37,7 +37,6 @@ export function inspectNode(utils: IonicUtils, plt: PlatformApi, renderer: Rende
 
 
 export function upgradeNode(utils: IonicUtils, plt: PlatformApi, renderer: RendererApi, elm: Element, cmpMeta: ComponentMeta) {
-  console.log(`upgradeNode ${elm.tagName}`)
   const instance = new cmpMeta.componentModule();
 
   // const cmpMode = cmpMeta.modes[instance.mode];
@@ -71,19 +70,18 @@ function renderToString(vnode: VNode) {
 
   // open element
   // open start tag
-  const html = ['<' + tagName];
+  const html = ['<', tagName];
 
   const attributes = {};
 
   Object.keys(attributes).forEach(attrName => {
     const attrVal = attributes[attrName];
-    html.push(` ${attrName}="${attrVal}"`);
+    html.push(' ', attrName, '="', attrVal, '"');
   });
 
   // close start tag
   html.push('>');
 
-  // Ccose tag
   if (vnode.vtext) {
     html.push(vnode.vtext);
 
@@ -94,7 +92,7 @@ function renderToString(vnode: VNode) {
   }
 
   // close element
-  html.push(`</${tagName}>`);
+  html.push('</', tagName, '>');
 
   return html.join('');
 }
