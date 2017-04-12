@@ -1,12 +1,13 @@
-import { ComponentMeta, IonicUtils, PlatformApi, RendererApi, VNode } from '../util/interfaces';
+import { ComponentMeta, IonicUtils, PlatformApi, VNode } from '../util/interfaces';
 import { generateVNode } from '../client/host';
+import { renderVNodeToString } from './renderer/core';
 import * as parse5 from 'parse5';
 
 
-export function upgradeInputHtml(utils: IonicUtils, plt: PlatformApi, renderer: RendererApi, html: string) {
+export function upgradeInputHtml(utils: IonicUtils, plt: PlatformApi, html: string) {
   const node: Node = <any>parse5.parseFragment(html);
 
-  return inspectNode(utils, plt, renderer, node).then(() => {
+  return inspectNode(utils, plt, node).then(() => {
     return parse5.serialize(node);
 
   }).catch(err => {
@@ -15,20 +16,20 @@ export function upgradeInputHtml(utils: IonicUtils, plt: PlatformApi, renderer: 
 }
 
 
-export function inspectNode(utils: IonicUtils, plt: PlatformApi, renderer: RendererApi, node: Node): Promise<any> {
+export function inspectNode(utils: IonicUtils, plt: PlatformApi, node: Node): Promise<any> {
   const promises: Promise<any>[] = [];
-console.log('inspectNode', node)
+
   if (plt.isElement(node)) {
     const cmpMeta = plt.getComponentMeta(node.tagName.toLowerCase());
 
     if (cmpMeta) {
-      promises.push(upgradeNode(utils, plt, renderer, node, cmpMeta));
+      promises.push(upgradeNode(utils, plt, node, cmpMeta));
     }
   }
 
   if (node.childNodes) {
     for (var i = 0; i < node.childNodes.length; i++) {
-      promises.push(inspectNode(utils, plt, renderer, node.childNodes[i]));
+      promises.push(inspectNode(utils, plt, node.childNodes[i]));
     }
   }
 
@@ -36,8 +37,10 @@ console.log('inspectNode', node)
 }
 
 
-export function upgradeNode(utils: IonicUtils, plt: PlatformApi, renderer: RendererApi, elm: Element, cmpMeta: ComponentMeta) {
+export function upgradeNode(utils: IonicUtils, plt: PlatformApi, elm: Element, cmpMeta: ComponentMeta) {
   const instance = new cmpMeta.componentModule();
+
+  console.log('upgradeNode', elm.tagName);
 
   // const cmpMode = cmpMeta.modes[instance.mode];
   // const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
@@ -45,9 +48,7 @@ export function upgradeNode(utils: IonicUtils, plt: PlatformApi, renderer: Rende
 
   let vnode = generateVNode(utils, elm, instance, cmpMeta.hostCss);
 
-  vnode = renderer(elm, vnode);
-
-  const html = renderToString(vnode);
+  const html = renderVNodeToString(plt, vnode);
 
   console.log(html)
 

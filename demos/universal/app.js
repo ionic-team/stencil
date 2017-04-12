@@ -20,7 +20,7 @@ app.get('/', function (req, res) {
   var input = '<div>hi</div><ion-badge>88</ion-badge><span>yo</span><!--comment-->';
 
   ionic.upgradeHtml(input).then(function(html) {
-
+    console.log(html);
     res.send(html);
   });
 

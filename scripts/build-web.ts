@@ -77,7 +77,7 @@ function compileComponents() {
       fs: fs,
       path: path,
       nodeSass: nodeSass,
-      typescript
+      typescript: typescript
     }
   };
 
@@ -90,9 +90,12 @@ function bundleComponents() {
     srcDir: compiledDir,
     destDir: destDir,
     packages: {
+      fs: fs,
+      path: path,
       rollup: rollup,
       uglify: uglify,
-      nodeSass: nodeSass
+      nodeSass: nodeSass,
+      typescript: typescript
     },
     debug: true
   };
