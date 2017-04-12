@@ -1,5 +1,5 @@
 import { ComponentInstance, IonicUtils, VNode, VNodeData } from '../util/interfaces';
-import { h } from '../renderer/core';
+import { h } from './renderer/core';
 
 
 export function generateVNode(utils: IonicUtils, elm: Node, instance: ComponentInstance, hostCss: string): VNode {

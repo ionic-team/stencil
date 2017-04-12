@@ -1,8 +1,8 @@
-import { attributeChangedCallback } from '../element/attribute-changed';
+import { attributeChangedCallback } from './attribute-changed';
 import { ComponentController, ConfigApi, IonicUtils, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
-import { connectedCallback } from '../element/connected';
-import { disconnectedCallback } from '../element/disconnected';
-import { theme } from '../element/host';
+import { connectedCallback } from './connected';
+import { disconnectedCallback } from './disconnected';
+import { theme } from './host';
 
 
 export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {

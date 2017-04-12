@@ -1,5 +1,5 @@
 import { ComponentMeta, IonicUtils, PlatformApi, RendererApi, VNode } from '../util/interfaces';
-import { generateVNode } from '../element/host';
+import { generateVNode } from '../client/host';
 import * as parse5 from 'parse5';
 
 

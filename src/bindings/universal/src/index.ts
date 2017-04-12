@@ -1,8 +1,8 @@
 import { Ionic, IonicUtils, ServerInitConfig } from '../../../util/interfaces';
 import { PlatformServer } from '../../../server/platform-server';
 import { registerComponents } from '../../../server/registry';
-import { Renderer } from '../../../renderer/core';
-import { theme } from '../../../element/host';
+import { Renderer } from '../../../client/renderer/core';
+import { theme } from '../../../client/host';
 import { upgradeInputHtml } from '../../../server/render';
 
 

@@ -1,14 +1,14 @@
-import { initRenderer, h, vnode, VNode, VNodeData } from '../core';
-import { PlatformApi } from '../../util/interfaces';
-import { PlatformClient } from '../../platform/platform-client';
+import { Renderer, h, vnode, VNode, VNodeData } from '../core';
+import { PlatformApi } from '../../../util/interfaces';
+import { PlatformClient } from '../../platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
-import { DomController } from '../../platform/dom-controller';
-import { NextTickController } from '../../platform/next-tick-controller';
+import { DomController } from '../../dom-controller';
+import { NextTickController } from '../../next-tick-controller';
 
 const document: HTMLDocument = (<any>global).document;
 var domCtrl = DomController(window);
 var nextTick = NextTickController(window);
-var patch = initRenderer(PlatformClient(window, document, {}, '/build', domCtrl, nextTick));
+var patch = Renderer(PlatformClient(window, document, {}, '/build', domCtrl, nextTick));
 
 
 function prop(name) {

@@ -4,7 +4,7 @@ import { Ionic } from '../../../util/interfaces';
 import { NextTickController } from '../../../client/next-tick-controller';
 import { PlatformClient } from '../../../client/platform-client';
 import { registerComponentsES5 } from '../../../client/registry.es5';
-import { Renderer } from '../../../renderer/core';
+import { Renderer } from '../../../client/renderer/core';
 
 
 const ionic: Ionic = (<any>window).Ionic = (<any>window).Ionic || {};
