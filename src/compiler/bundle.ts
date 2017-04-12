@@ -194,11 +194,11 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
 
 function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePath: string) {
+  let fileName = path.basename(srcFilePath);
+
   if (config.devMode) {
     srcFilePath = srcFilePath.replace('.js', '.dev.js');
   }
-
-  let fileName = path.basename(srcFilePath);
 
   srcFilePath = path.join(config.srcDir, srcFilePath);
 
