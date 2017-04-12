@@ -1,9 +1,7 @@
+import { BuildContext, CompilerConfig, Manifest, Results } from './interfaces';
 import { getFileMeta, isTsSourceFile, logError, readFile, writeFile } from './util';
-import { CompilerConfig, BuildContext, Manifest, Results } from './interfaces';
 import { parseTsSrcFile } from './parser';
 import { transpile } from './transpile';
-import * as fs from 'fs';
-import * as path from 'path';
 
 
 /**
@@ -22,6 +20,19 @@ import * as path from 'path';
  * @param ctx  Option context object so rebuilds are faster
  */
 export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise<Results> {
+  if (!config.packages) {
+    throw 'config.packages required';
+  }
+  if (!config.packages.fs) {
+    throw 'config.packages.fs required';
+  }
+  if (!config.packages.path) {
+    throw 'config.packages.path required';
+  }
+  if (!config.packages.nodeSass) {
+    throw 'config.packages.nodeSass required';
+  }
+
   if (config.debug) {
     console.log(`compile, include: ${config.include}`);
     console.log(`compile, outDir: ${config.compilerOptions.outDir}`);
@@ -69,7 +80,7 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
       console.log(`compile, scanDirectory: ${dir}`);
     }
 
-    fs.readdir(dir, (err, files) => {
+    config.packages.fs.readdir(dir, (err, files) => {
       if (err) {
         logError(ctx.results, err);
         resolve();
@@ -79,7 +90,7 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
       const promises: Promise<any>[] = [];
 
       files.forEach(dirItem => {
-        const readPath = path.join(dir, dirItem);
+        const readPath = config.packages.path.join(dir, dirItem);
 
         if (!isValidDirectory(config, readPath)) {
           return;
@@ -87,7 +98,7 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
 
         promises.push(new Promise(resolve => {
 
-          fs.stat(readPath, (err, stats) => {
+          config.packages.fs.stat(readPath, (err, stats) => {
             if (err) {
               logError(ctx.results, err);
               resolve();
@@ -131,7 +142,7 @@ function inspectTsFile(filePath: string, config: CompilerConfig, ctx: BuildConte
     console.log(`compile, inspectTsFile: ${filePath}`);
   }
 
-  return getFileMeta(ctx, filePath).then(fileMeta => {
+  return getFileMeta(config, ctx, filePath).then(fileMeta => {
 
     if (!fileMeta.isTsSourceFile || !fileMeta.isTransformable) {
       return;
@@ -164,7 +175,7 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
     Object.keys(f.cmpMeta.modes).forEach(modeName => {
 
       f.cmpMeta.modes[modeName].styleUrls.forEach(styleUrl => {
-        const srcAbsolutePath = path.join(f.srcDir, styleUrl);
+        const srcAbsolutePath = config.packages.path.join(f.srcDir, styleUrl);
 
         promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, srcAbsolutePath));
       });
@@ -181,10 +192,10 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
         if (includedSassFile.indexOf(includeDir) === 0) {
           const src = includedSassFile;
           const relative = includedSassFile.replace(includeDir, '');
-          const dest = path.join(destDir, relative);
+          const dest = config.packages.path.join(destDir, relative);
 
-          promises.push(readFile(src).then(content => {
-            return writeFile(dest, content);
+          promises.push(readFile(config.packages, src).then(content => {
+            return writeFile(config.packages, dest, content);
           }));
         }
       });
@@ -238,13 +249,13 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
   ctx.files.forEach(f => {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
-    const componentUrl = f.jsFilePath.replace(destDir + path.sep, '');
+    const componentUrl = f.jsFilePath.replace(destDir + config.packages.path.sep, '');
     const modes = f.cmpMeta.modes;
-    const componentDir = path.dirname(componentUrl);
+    const componentDir = config.packages.path.dirname(componentUrl);
 
     Object.keys(modes).forEach(modeName => {
       modes[modeName].styleUrls = modes[modeName].styleUrls.map(styleUrl => {
-        return path.join(componentDir, styleUrl);
+        return config.packages.path.join(componentDir, styleUrl);
       });
     });
 
@@ -265,8 +276,8 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     });
   }
 
-  const manifestFile = path.join(config.compilerOptions.outDir, 'manifest.json')
+  const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json')
   const json = JSON.stringify(manifest, null, 2);
 
-  return writeFile(manifestFile, json)
+  return writeFile(config.packages, manifestFile, json)
 }

@@ -1,5 +1,4 @@
 import { BundlerConfig, ComponentMode } from './interfaces';
-import * as path from 'path';
 
 
 export function bundleComponentModeStyles(config: BundlerConfig, mode: ComponentMode) {
@@ -14,7 +13,7 @@ export function bundleComponentModeStyles(config: BundlerConfig, mode: Component
 
 export function bundleComponentModeStyle(config: BundlerConfig, styleUrl: string) {
   return new Promise((resolve, reject) => {
-    const scssFilePath = path.join(config.srcDir, styleUrl);
+    const scssFilePath = config.packages.path.join(config.srcDir, styleUrl);
 
     const sassConfig = {
       file: scssFilePath,

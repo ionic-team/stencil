@@ -1,6 +1,5 @@
 import { BuildContext, CompilerConfig } from './interfaces';
 import { createFileMeta } from './util';
-import * as fs from 'fs';
 import * as ts from 'typescript';
 
 
@@ -26,7 +25,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
       return fileMeta.srcTextWithoutDecorators || fileMeta.srcText;
     }
 
-    fileMeta = createFileMeta(ctx, tsFilePath, fs.readFileSync(tsFilePath, 'utf-8'));
+    fileMeta = createFileMeta(config, ctx, tsFilePath, config.packages.fs.readFileSync(tsFilePath, 'utf-8'));
     return fileMeta.srcText;
   };
 

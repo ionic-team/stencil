@@ -60,6 +60,8 @@ function compileComponents() {
       ['ion-badge']
     ],
     packages: {
+      fs: fs,
+      path: path,
       nodeSass: nodeSass
     }
   };

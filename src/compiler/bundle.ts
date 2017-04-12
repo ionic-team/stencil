@@ -2,10 +2,25 @@ import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
 import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
 import { logError, readFile, writeFile } from './util';
-import * as path from 'path';
 
 
 export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
+  if (!config.packages) {
+    throw 'config.packages required';
+  }
+  if (!config.packages.fs) {
+    throw 'config.packages.fs required';
+  }
+  if (!config.packages.path) {
+    throw 'config.packages.path required';
+  }
+  if (!config.packages.nodeSass) {
+    throw 'config.packages.nodeSass required';
+  }
+  if (!config.packages.rollup) {
+    throw 'config.packages.rollup required';
+  }
+
   if (config.debug) {
     console.log(`bundle, srcDir: ${config.srcDir}`);
     console.log(`bundle, destDir: ${config.destDir}`);
@@ -53,7 +68,7 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
   }
 
   const rollupConfig = {
-    entry: path.join(config.srcDir, component.componentUrl),
+    entry: config.packages.path.join(config.srcDir, component.componentUrl),
     format: 'cjs'
   };
 
@@ -158,7 +173,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     bundle.id = getBundleId(bundleIndex);
     bundle.fileName = getBundleFileName(bundle.id);
-    bundle.filePath = path.join(config.destDir, bundle.fileName);
+    bundle.filePath = config.packages.path.join(config.destDir, bundle.fileName);
 
     bundle.content = getBundleContent(bundle.id, componentModeLoaders);
 
@@ -188,23 +203,23 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       }
     }
 
-    return writeFile(bundle.filePath, content);
+    return writeFile(config.packages, bundle.filePath, content);
   }));
 }
 
 
 function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePath: string) {
-  let fileName = path.basename(srcFilePath);
+  let fileName = config.packages.path.basename(srcFilePath);
 
   if (config.devMode) {
     srcFilePath = srcFilePath.replace('.js', '.dev.js');
   }
 
-  srcFilePath = path.join(config.srcDir, srcFilePath);
+  srcFilePath = config.packages.path.join(config.srcDir, srcFilePath);
 
-  let destFilePath = path.join(config.destDir, fileName);
+  let destFilePath = config.packages.path.join(config.destDir, fileName);
 
-  return readFile(srcFilePath).then(coreJsContent => {
+  return readFile(config.packages, srcFilePath).then(coreJsContent => {
     let content: string;
 
     if (config.devMode) {
@@ -219,7 +234,7 @@ function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePat
       console.log(`bundle, createCoreJs: ${destFilePath}`)
     }
 
-    return writeFile(destFilePath, content);
+    return writeFile(config.packages, destFilePath, content);
   });
 }
 
@@ -246,13 +261,13 @@ function getManifest(config: BundlerConfig, ctx: BuildContext) {
     return Promise.resolve(ctx.manifest);
   }
 
-  const manifestFilePath = path.join(config.srcDir, 'manifest.json');
+  const manifestFilePath = config.packages.path.join(config.srcDir, 'manifest.json');
 
   if (config.debug) {
     console.log(`bundle, manifestFilePath: ${manifestFilePath}`) ;
   }
 
-  return readFile(manifestFilePath).then(manifestStr => {
+  return readFile(config.packages, manifestFilePath).then(manifestStr => {
     return ctx.manifest = JSON.parse(manifestStr);
   });
 }

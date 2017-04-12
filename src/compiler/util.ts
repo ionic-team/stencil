@@ -1,26 +1,24 @@
-import { BuildContext, FileMeta, Results } from './interfaces';
-import * as fs from 'fs';
-import * as path from 'path';
+import { BuildContext, CompilerConfig, FileMeta, Packages, Results } from './interfaces';
 
 
-export function getFileMeta(ctx: BuildContext, filePath: string): Promise<FileMeta> {
+export function getFileMeta(config: CompilerConfig, ctx: BuildContext, filePath: string): Promise<FileMeta> {
   const fileMeta = ctx.files.get(filePath);
   if (fileMeta) {
     return Promise.resolve(fileMeta);
   }
 
-  return readFile(filePath).then(srcText => {
-    return createFileMeta(ctx, filePath, srcText);
+  return readFile(config.packages, filePath).then(srcText => {
+    return createFileMeta(config.packages, ctx, filePath, srcText);
   });
 }
 
 
-export function createFileMeta(ctx: BuildContext, filePath: string, srcText: string) {
+export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: string, srcText: string) {
   const fileMeta: FileMeta = {
-    fileName: path.basename(filePath),
+    fileName: packages.path.basename(filePath),
     filePath: filePath,
-    fileExt: path.extname(filePath),
-    srcDir: path.dirname(filePath),
+    fileExt: packages.path.extname(filePath),
+    srcDir: packages.path.dirname(filePath),
     srcText: srcText,
     srcTextWithoutDecorators: null,
     jsFilePath: null,
@@ -40,9 +38,9 @@ export function createFileMeta(ctx: BuildContext, filePath: string, srcText: str
 }
 
 
-export function readFile(filePath: string): Promise<string> {
+export function readFile(packages: Packages, filePath: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    fs.readFile(filePath, 'utf-8', (err, data) => {
+    packages.fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -53,10 +51,10 @@ export function readFile(filePath: string): Promise<string> {
 }
 
 
-export function writeFile(filePath: string, content: string) {
+export function writeFile(packages: Packages, filePath: string, content: string) {
   return new Promise((resolve, reject) => {
-    mkdir(path.dirname(filePath), () => {
-      fs.writeFile(filePath, content, (err) => {
+    mkdir(packages, packages.path.dirname(filePath), () => {
+      packages.fs.writeFile(filePath, content, (err) => {
         if (err) {
           reject(err);
         } else {
@@ -68,50 +66,50 @@ export function writeFile(filePath: string, content: string) {
 }
 
 
-export function copyFile(src: string, dest: string) {
-  return readFile(src).then(content => {
-    return writeFile(dest, content);
+export function copyFile(packages: Packages, src: string, dest: string) {
+  return readFile(packages, src).then(content => {
+    return writeFile(packages, dest, content);
   });
 }
 
 
-export function mkdir(root: string, callback: Function) {
-  var chunks = root.split(path.sep); // split in chunks
+export function mkdir(packages: Packages, root: string, callback: Function) {
+  var chunks = root.split(packages.path.sep); // split in chunks
   var chunk;
 
-  if (path.isAbsolute(root) === true) { // build from absolute path
+  if (packages.path.isAbsolute(root) === true) { // build from absolute path
     chunk = chunks.shift(); // remove "/" or C:/
     if (!chunk) { // add "/"
-      chunk = path.sep;
+      chunk = packages.path.sep;
     }
 
   } else {
-    chunk = path.resolve(); // build with relative path
+    chunk = packages.path.resolve(); // build with relative path
   }
 
-  return mkdirRecursive(chunk, chunks, callback);
+  return mkdirRecursive(packages, chunk, chunks, callback);
 }
 
 
-function mkdirRecursive(root: string, chunks: string[], callback: Function): void {
+function mkdirRecursive(packages: Packages, root: string, chunks: string[], callback: Function): void {
   var chunk = chunks.shift();
   if (!chunk) {
     return callback(null);
   }
 
-  var root = path.join(root, chunk);
+  var root = packages.path.join(root, chunk);
 
-  return fs.exists(root, (exists) => {
+  return packages.fs.exists(root, (exists) => {
 
     if (exists === true) { // already done
-      return mkdirRecursive(root, chunks, callback);
+      return mkdirRecursive(packages, root, chunks, callback);
     }
-    return fs.mkdir(root, (err) => {
+    return packages.fs.mkdir(root, (err) => {
 
       if (err) {
         return callback(err);
       }
-      return mkdirRecursive(root, chunks, callback); // let's magic
+      return mkdirRecursive(packages, root, chunks, callback); // let's magic
     });
   });
 }
