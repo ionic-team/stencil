@@ -100,14 +100,12 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
 
       shadowElm.appendChild(cmpMode.styleElm.cloneNode(true));
 
-    } else {
-      if (!hasCss(cmpModeId)) {
-        const headStyleEle = createElement('style');
-        headStyleEle.dataset['cmpModeId'] = cmpModeId;
-        headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
-        appendChild(doc.head, headStyleEle);
-        setCss(cmpModeId);
-      }
+    } else if (!hasCss(cmpModeId)) {
+      const headStyleEle = createElement('style');
+      headStyleEle.dataset['cmpModeId'] = cmpModeId;
+      headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+      appendChild(doc.head, headStyleEle);
+      setCss(cmpModeId);
     }
 
     return shadowElm;
