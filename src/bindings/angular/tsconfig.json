@@ -15,7 +15,9 @@
     "outDir": "../../../dist/transpiled-angular"
   },
   "include": [
-    "src/**/*.ts",
-    "../../components/**/*.ts"
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/components/**/*.ts"
   ]
 }
