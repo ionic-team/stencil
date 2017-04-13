@@ -70,7 +70,43 @@ export interface ComponentModeData {
   /**
    * moduleFn
    */
-  [3]: {(importer: Object): void};
+  [3]: ComponentModeImporterFn;
+}
+
+
+export interface ComponentModeImporterFn {
+  (ionicOpts: IonicImporterOpts, importer: Object): void;
+}
+
+
+export interface ComponentDecorator {
+  (opts?: ComponentOptions): any;
+}
+
+
+export interface ComponentOptions {
+  tag: string;
+  styleUrls?: string[] | ModeStyles;
+}
+
+export interface ModeStyles {
+  [modeName: string]: string | string[];
+}
+
+
+export interface PropDecorator {
+  (opts?: PropOptions): any;
+}
+
+
+export interface IonicImporterOpts {
+  h: Hyperscript;
+  ionicTheme: IonicTheme;
+}
+
+
+export interface IonicTheme {
+  (instance: ComponentInstance, hostCss: string): VNodeData;
 }
 
 
@@ -98,29 +134,11 @@ export interface ComponentMode {
 }
 
 
-export interface HyperScript {
-  (sel: string): VNode;
-  (sel: Node, data: VNodeData): VNode;
-  (sel: string, data: VNodeData): VNode;
-  (sel: string, text: string): VNode;
-  (sel: string, children: Array<VNode>): VNode;
-  (sel: string, data: VNodeData, text: string): VNode;
-  (sel: string, data: VNodeData, children: Array<VNode|string>): VNode;
-  (sel: string, data: VNodeData, children: VNode): VNode;
-  (sel: any, b?: any, c?: any): VNode
-}
-
-
 export interface ComponentInstance {
-  render?: {(h: HyperScript, ionic?: IonicUtils): VNode};
+  render?: {(): VNode};
 
   mode?: string;
   color?: string;
-}
-
-
-export interface IonicUtils {
-  theme(instance: ComponentInstance, hostCss: string): VNodeData;
 }
 
 
@@ -165,6 +183,18 @@ export interface RendererApi {
 
 
 export type Key = string | number;
+
+
+export interface Hyperscript {
+  (sel: string): any;
+  (sel: Node, data: VNodeData): any;
+  (sel: string, data: VNodeData): any;
+  (sel: string, text: string): any;
+  (sel: string, children: Array<any>): any;
+  (sel: string, data: VNodeData, text: string): any;
+  (sel: string, data: VNodeData, children: Array<any|string>): any;
+  (sel: string, data: VNodeData, children: any): any;
+}
 
 
 export interface VNode {

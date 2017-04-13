@@ -1,13 +1,13 @@
-import { ComponentMeta, IonicUtils, PlatformApi, VNode } from '../util/interfaces';
+import { ComponentMeta, PlatformApi, VNode } from '../util/interfaces';
 import { generateVNode } from '../client/host';
 import { renderVNodeToString } from './renderer/core';
 import * as parse5 from 'parse5';
 
 
-export function upgradeInputHtml(utils: IonicUtils, plt: PlatformApi, html: string) {
+export function upgradeInputHtml(plt: PlatformApi, html: string) {
   const node: Node = <any>parse5.parseFragment(html);
 
-  return inspectNode(utils, plt, node).then(() => {
+  return inspectNode(plt, node).then(() => {
     return parse5.serialize(node);
 
   }).catch(err => {
@@ -16,20 +16,20 @@ export function upgradeInputHtml(utils: IonicUtils, plt: PlatformApi, html: stri
 }
 
 
-export function inspectNode(utils: IonicUtils, plt: PlatformApi, node: Node): Promise<any> {
+export function inspectNode(plt: PlatformApi, node: Node): Promise<any> {
   const promises: Promise<any>[] = [];
 
   if (plt.isElement(node)) {
     const cmpMeta = plt.getComponentMeta(node.tagName.toLowerCase());
 
     if (cmpMeta) {
-      promises.push(upgradeNode(utils, plt, node, cmpMeta));
+      promises.push(upgradeNode(plt, node, cmpMeta));
     }
   }
 
   if (node.childNodes) {
     for (var i = 0; i < node.childNodes.length; i++) {
-      promises.push(inspectNode(utils, plt, node.childNodes[i]));
+      promises.push(inspectNode(plt, node.childNodes[i]));
     }
   }
 
@@ -37,7 +37,7 @@ export function inspectNode(utils: IonicUtils, plt: PlatformApi, node: Node): Pr
 }
 
 
-export function upgradeNode(utils: IonicUtils, plt: PlatformApi, elm: Element, cmpMeta: ComponentMeta) {
+export function upgradeNode(plt: PlatformApi, elm: Element, cmpMeta: ComponentMeta) {
   const instance = new cmpMeta.componentModule();
 
   console.log('upgradeNode', elm.tagName);
@@ -46,7 +46,7 @@ export function upgradeNode(utils: IonicUtils, plt: PlatformApi, elm: Element, c
   // const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
   plt;
 
-  let vnode = generateVNode(utils, elm, instance, cmpMeta.hostCss);
+  let vnode = generateVNode(elm, instance, cmpMeta.hostCss);
 
   const html = renderVNodeToString(plt, vnode);
 

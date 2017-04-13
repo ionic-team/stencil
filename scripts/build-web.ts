@@ -70,6 +70,7 @@ function compileComponents() {
     include: [srcDir],
     exclude: ['node_modules', 'test'],
     debug: true,
+    devMode: true,
     bundles: [
       ['ion-badge'],
       ['ion-toggle']
@@ -98,6 +99,7 @@ function bundleComponents() {
       nodeSass: nodeSass,
       typescript: typescript
     },
+    devMode: true,
     debug: true
   };
 

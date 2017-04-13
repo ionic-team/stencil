@@ -25,6 +25,10 @@
 
   </p>
 
+  <p>
+    <ion-toggle>Toggle</ion-toggle>
+  </p>
+
   <script>
     var dynamicProp = document.getElementById('dynamicProp');
     var dynamicAttr = document.getElementById('dynamicAttr');
@@ -54,7 +58,7 @@
 
 
     var dynamicBadges = document.getElementById('dynamicBadges');
-    for (var i = 0; i < 50; i++) {
+    for (var i = 0; i < 10; i++) {
       var badge = document.createElement('ion-badge');
       badge.innerHTML = i;
       dynamicBadges.appendChild(badge);

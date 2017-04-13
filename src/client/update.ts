@@ -1,10 +1,10 @@
 import { ComponentController, ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
 import { generateVNode } from './host';
 import { initProps } from './proxy';
-import { IonicUtils, RendererApi } from '../util/interfaces';
+import { RendererApi } from '../util/interfaces';
 
 
-export function queueUpdate(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   // only run patch if it isn't queued already
   if (!ctrl.queued) {
     ctrl.queued = true;
@@ -13,7 +13,7 @@ export function queueUpdate(utils: IonicUtils, plt: PlatformApi, config: ConfigA
     plt.nextTick(function queueUpdateNextTick() {
 
       // vdom diff and patch the host element for differences
-      update(utils, plt, config, renderer, elm, ctrl, tag);
+      update(plt, config, renderer, elm, ctrl, tag);
 
       // no longer queued
       ctrl.queued = false;
@@ -22,13 +22,13 @@ export function queueUpdate(utils: IonicUtils, plt: PlatformApi, config: ConfigA
 }
 
 
-export function update(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string) {
+export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   const cmpMeta = plt.getComponentMeta(tag);
 
   let instance = ctrl.instance;
   if (!instance) {
     instance = ctrl.instance = new cmpMeta.componentModule();
-    initProps(utils, plt, config, renderer, elm, ctrl, tag, cmpMeta.props);
+    initProps(plt, config, renderer, elm, ctrl, tag, cmpMeta.props);
   }
 
   if (!ctrl.rootElm) {
@@ -37,7 +37,7 @@ export function update(utils: IonicUtils, plt: PlatformApi, config: ConfigApi, r
     ctrl.rootElm = plt.$attachShadow(elm, cmpMode, cmpModeId);
   }
 
-  const vnode = generateVNode(utils, ctrl.rootElm, instance, cmpMeta.hostCss);
+  const vnode = generateVNode(ctrl.rootElm, instance, cmpMeta.hostCss);
 
   // if we already have a vnode then use it
   // otherwise, elm is the initial patch and

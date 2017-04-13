@@ -1,14 +1,14 @@
-import { ComponentInstance, IonicUtils, VNode, VNodeData } from '../util/interfaces';
+import { ComponentInstance, VNode, VNodeData } from '../util/interfaces';
 import { h } from './renderer/core';
 
 
-export function generateVNode(utils: IonicUtils, elm: Node, instance: ComponentInstance, hostCss: string): VNode {
-  let vnode = instance.render && instance.render(h, utils);
+export function generateVNode(elm: Node, instance: ComponentInstance, hostCss: string): VNode {
+  let vnode = instance.render && instance.render();
   if (!vnode) {
     // use the default render function instead
     vnode = h(elm,
       h('div',
-        theme(hostCss, instance.mode, instance.color),
+        ionicTheme(hostCss, instance.mode, instance.color),
         h('slot')
       )
     );
@@ -20,7 +20,7 @@ export function generateVNode(utils: IonicUtils, elm: Node, instance: ComponentI
 }
 
 
-export function theme(cssClassName: string, mode?: string, color?: string): VNodeData {
+export function ionicTheme(cssClassName: string, mode?: string, color?: string): VNodeData {
   const cssClasses: any = {};
 
   cssClasses[`${cssClassName}`] = true;

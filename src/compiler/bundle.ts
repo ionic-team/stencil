@@ -82,9 +82,10 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
   return config.packages.rollup.rollup(rollupConfig).then((bundle: any) => {
     const bundleOutput = bundle.generate(rollupConfig);
 
-    let code = `function importComponent(exports) { ${bundleOutput.code} }`;
-
-    return component.componentImporter = code;
+    component.componentImporter = `function importComponent(ionicOpts, exports) {
+      var h = ionicOpts.h;
+      ${bundleOutput.code}
+    }`;
   });
 }
 
