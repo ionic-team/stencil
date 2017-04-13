@@ -13,7 +13,7 @@ export interface ComponentDecorator {
 
 export interface ComponentOptions {
   tag: string;
-  styleUrls: string[] | ModeStyles;
+  styleUrls?: string[] | ModeStyles;
 }
 
 export interface ModeStyles {

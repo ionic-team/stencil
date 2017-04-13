@@ -71,7 +71,8 @@ function compileComponents() {
     exclude: ['node_modules', 'test'],
     debug: true,
     bundles: [
-      ['ion-badge']
+      ['ion-badge'],
+      ['ion-toggle']
     ],
     packages: {
       fs: fs,
