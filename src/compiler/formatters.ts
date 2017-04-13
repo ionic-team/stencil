@@ -11,12 +11,20 @@ export function getBundleContent(bundleId: string, componentModeLoader: string) 
 }
 
 
+export function getImportComponentWrapper(innerCode: string) {
+  return `function importComponent(ionicOpts, exports) {
+    var h = ionicOpts.h;
+    ${innerCode}
+  }`;
+}
+
+
 export function getComponentModeLoader(component: Component, mode: ComponentMode) {
   const t = [
     `'` + component.tag + `'`,
     `'` + mode.name + `'`,
     `'` + mode.styles.replace(/'/g, '"') + `'`,
-    component.componentImporter
+    `\n` + component.componentImporter
   ];
 
   return `[` + t.join(',') + `]`;

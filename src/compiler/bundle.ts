@@ -1,6 +1,6 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
+import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getImportComponentWrapper, getRegistryContent } from './formatters';
 import { logError, readFile, writeFile } from './util';
 
 
@@ -82,10 +82,7 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
   return config.packages.rollup.rollup(rollupConfig).then((bundle: any) => {
     const bundleOutput = bundle.generate(rollupConfig);
 
-    component.componentImporter = `function importComponent(ionicOpts, exports) {
-      var h = ionicOpts.h;
-      ${bundleOutput.code}
-    }`;
+    component.componentImporter = getImportComponentWrapper(bundleOutput.code);
   });
 }
 
