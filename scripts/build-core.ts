@@ -46,6 +46,8 @@ function buildCore(ctx: BuildContext) {
 
     ts.sys.writeFile(ctx.coreDevFilePath, ctx.coreDevContent);
 
+    console.log('core, buildCore:', ctx.coreDevFilePath);
+
     return Promise.resolve();
   });
 }
@@ -68,6 +70,7 @@ function buildCoreES5(ctx: BuildContext) {
 
     ts.sys.writeFile(ctx.coreES5DevFilePath, ctx.coreES5DevContent);
 
+    console.log('core, buildCoreES5:', ctx.coreES5DevFilePath);
 
     return Promise.resolve();
   });
@@ -96,13 +99,15 @@ function buildCoreES5Minified(ctx: BuildContext) {
 
     closureCompiler.run((exitCode: number, stdOut: string, stdErr: string) => {
       if (stdErr) {
-        console.log('closureCompiler exitCode', exitCode, 'stdErr', stdErr);
+        console.log('core, closureCompiler exitCode', exitCode, 'stdErr', stdErr);
         reject(stdErr);
 
       } else {
         ctx.coreES5MinifiedContent = stdOut
 
         fs.unlink(ctx.coreES5DevFilePath, () => {
+          console.log('core, buildCoreES5Minified:', ctx.coreES5DevFilePath);
+
           resolve();
         });
       }
@@ -145,7 +150,7 @@ function buildCoreMinified(ctx: BuildContext) {
     return new Promise((resolve, reject) => {
       closureCompiler.run((exitCode: number, stdOut: string, stdErr: string) => {
         if (stdErr) {
-          console.log('closureCompiler exitCode', exitCode, 'stdErr', stdErr);
+          console.log('core, closureCompiler exitCode', exitCode, 'stdErr', stdErr);
           reject(stdErr);
 
         } else {
@@ -184,6 +189,8 @@ function buildCoreMinified(ctx: BuildContext) {
           fs.unlink(closurePrepareFilePath);
 
           writeFile(ctx.coreMinifiedFilePath, LICENSE + ctx.coreMinifiedContent).then(() => {
+            console.log('core, buildCoreMinified:', ctx.coreMinifiedFilePath);
+
             resolve();
           });
         }
@@ -200,6 +207,8 @@ function customElementPolyfillDev(ctx: BuildContext) {
     LICENSE + ctx.coreES5DevContent
   ];
 
+  console.log('core, customElementPolyfillDev:', ctx.ceDevFilePath);
+
   return writeFile(ctx.ceDevFilePath, content.join('\n'));
 }
 
@@ -209,6 +218,8 @@ function customElementPolyfillMin(ctx: BuildContext) {
     ctx.cePolyfillContent,
     LICENSE + ctx.coreES5MinifiedContent
   ];
+
+  console.log('core, customElementPolyfillMin:', ctx.ceMinFilePath);
 
   return writeFile(ctx.ceMinFilePath, content.join('\n'));
 }
@@ -221,6 +232,8 @@ function shadyDomCustomElementPolyfillDev(ctx: BuildContext) {
     LICENSE + ctx.coreES5DevContent
   ];
 
+  console.log('core, shadyDomCustomElementPolyfillDev:', ctx.sdCeDevFilePath);
+
   return writeFile(ctx.sdCeDevFilePath, content.join('\n'));
 }
 
@@ -231,6 +244,8 @@ function shadyDomCustomElementPolyfillMin(ctx: BuildContext) {
     ctx.cePolyfillContent,
     LICENSE + ctx.coreES5MinifiedContent
   ];
+
+  console.log('core, shadyDomCustomElementPolyfillMin:', ctx.sdCeMinFilePath);
 
   return writeFile(ctx.sdCeMinFilePath, content.join('\n'));
 }
@@ -281,6 +296,8 @@ export function readFile(filePath: string): Promise<string> {
 
 
 export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string) {
+  console.log('core, buildBindingCore:', srcDir);
+
   const ctx: BuildContext = {
     coreEntryFilePath: path.join(srcDir, 'ionic.core.js'),
     coreDevContent: '',
