@@ -42,7 +42,7 @@
     "parse5": "^3.0.2",
     "rimraf": "2.6.1",
     "rollup": "0.41.4",
-    "typescript": "2.2.1"
+    "typescript": "rc"
   },
   "jest": {
     "testEnvironment": "node",

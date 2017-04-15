@@ -1,7 +1,7 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getImportComponentWrapper, getRegistryContent } from './formatters';
-import { logError, readFile, writeFile } from './util';
+import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
+import { readFile, writeFile } from './util';
 
 
 export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
@@ -45,8 +45,6 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
     }).then(() => {
       return ctx.results;
 
-    }).catch(err => {
-      return logError(ctx.results, err);
     });
 
   });
@@ -67,22 +65,30 @@ function bundleComponent(config: BundlerConfig, component: Component) {
 
 function bundleComponentModule(config: BundlerConfig, component: Component) {
   if (component.componentImporter) {
-    return Promise.resolve(component.componentImporter);
+    return Promise.resolve();
   }
 
-  const rollupConfig = {
-    entry: config.packages.path.join(config.srcDir, component.componentUrl),
-    format: 'cjs'
-  };
+  const entry = config.packages.path.join(config.srcDir, component.componentUrl);
 
   if (config.debug) {
-    console.log(`bundle, bundleComponentModule, entry: ${rollupConfig.entry}`);
+    console.log(`bundle, bundleComponentModule, entry: ${entry}`);
   }
 
-  return config.packages.rollup.rollup(rollupConfig).then((bundle: any) => {
-    const bundleOutput = bundle.generate(rollupConfig);
+  return config.packages.rollup.rollup({
+    entry: entry
 
-    component.componentImporter = getImportComponentWrapper(bundleOutput.code);
+  }).then(bundle => {
+    const results = bundle.generate({
+      format: 'iife',
+      moduleName: 'ionicModule'
+    });
+
+    let code = results.code.trim();
+
+    code = code.replace('(function (exports) {', 'function importComponent(exports, h, Ionic) {');
+    code = code.replace('}((this.ionicModule = this.ionicModule || {})));', '}');
+
+    component.componentImporter = code;
   });
 }
 
@@ -128,7 +134,7 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
       promises.push(createCoreJs(config, content, corePath));
     });
 
-    return promises;
+    return Promise.all(promises);
   });
 }
 

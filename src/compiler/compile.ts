@@ -1,6 +1,5 @@
 import { BuildContext, CompilerConfig, Manifest, Results } from './interfaces';
-import { getFileMeta, isTsSourceFile, logError, readFile, writeFile } from './util';
-import { parseTsSrcFile } from './parser';
+import { getFileMeta, isTsSourceFile, logError, readFile, writeFile, writeFiles } from './util';
 import { transpile } from './transpile';
 
 
@@ -31,6 +30,9 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
   }
   if (!config.packages.nodeSass) {
     throw 'config.packages.nodeSass required';
+  }
+  if (!config.packages.rollup) {
+    throw 'config.packages.rollup required';
   }
   if (!config.packages.typescript) {
     throw 'config.packages.typescript required';
@@ -70,8 +72,6 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
     }).then(() => {
       return ctx.results;
 
-    }).catch(err => {
-      return logError(ctx.results, err);
     });
 }
 
@@ -105,23 +105,21 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
             if (err) {
               logError(ctx.results, err);
               resolve();
-              return;
-            }
 
-            if (stats.isDirectory()) {
+            } else if (stats.isDirectory()) {
               scanDirectory(readPath, config, ctx).then(() => {
                 resolve();
               });
 
             } else if (isTsSourceFile(readPath)) {
-              inspectTsFile(readPath, config, ctx).then(() => {
+              getFileMeta(config, ctx, readPath).then(() => {
                 resolve();
               });
 
             } else {
               resolve();
             }
-          })
+          });
 
         }));
 
@@ -132,26 +130,6 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
       });
     });
 
-  });
-}
-
-
-function inspectTsFile(filePath: string, config: CompilerConfig, ctx: BuildContext = {}) {
-  if (!ctx.files) {
-    ctx.files = new Map();
-  }
-
-  if (config.debug) {
-    console.log(`compile, inspectTsFile: ${filePath}`);
-  }
-
-  return getFileMeta(config, ctx, filePath).then(fileMeta => {
-
-    if (!fileMeta.isTsSourceFile || !fileMeta.isTransformable) {
-      return;
-    }
-
-    parseTsSrcFile(fileMeta, config, ctx);
   });
 }
 
@@ -187,6 +165,7 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
   });
 
   return Promise.all(promises).then(() => {
+    const files = new Map<string, string>();
     const promises: Promise<any>[] = [];
 
     includedSassFiles.forEach(includedSassFile => {
@@ -198,14 +177,16 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
           const dest = config.packages.path.join(destDir, relative);
 
           promises.push(readFile(config.packages, src).then(content => {
-            return writeFile(config.packages, dest, content);
+            files.set(dest, content);
           }));
         }
       });
 
     });
 
-    return Promise.all(promises);
+    return Promise.all(promises).then(() => {
+      return writeFiles(config.packages, files);
+    });
   });
 }
 

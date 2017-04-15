@@ -12,7 +12,11 @@ import { Component, h } from '../../index';
 export class Toggle {
 
   render() {
-    return h('div');
+    return h(this,
+      h('div',
+        h('slot')
+      )
+    );
   }
 
 }

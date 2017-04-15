@@ -11,6 +11,7 @@ export interface CompilerConfig {
   },
   include: string[];
   exclude?: string[];
+  devMode?: boolean;
   debug?: boolean;
   bundles?: string[][];
   packages: Packages;
@@ -32,12 +33,12 @@ export interface FileMeta {
   filePath: string;
   srcDir: string;
   srcText: string;
-  srcTextWithoutDecorators: string;
   jsFilePath: string;
   jsText: string;
   isTsSourceFile: boolean;
-  isTransformable: boolean;
+  hasCmpClass: boolean;
   cmpMeta: ComponentMeta;
+  cmpClassName: string;
 }
 
 
@@ -130,13 +131,11 @@ export interface Packages {
     basename(p: string, ext?: string): string;
     dirname(p: string): string;
     extname(p: string): string;
-    isAbsolute(path: string): boolean;
     join(...paths: string[]): string;
-    resolve(...pathSegments: any[]): string;
     sep: string;
   },
   fs?: {
-    exists(path: string | Buffer, callback?: (exists: boolean) => void): void;
+    access(path: string | Buffer, callback: (err: any) => void): void;
     mkdir(path: string | Buffer, callback?: (err?: any) => void): void;
     readdir(path: string | Buffer, callback?: (err: any, files: string[]) => void): void;
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
@@ -151,9 +150,29 @@ export interface Packages {
     render: Function;
   };
   rollup?: {
-    rollup: Function;
+    rollup: Rollup;
   };
   uglify?: {
-    minify: Function;
+    minify: {(content: string, opts: any): {code: string;}};
   };
+}
+
+
+export interface Rollup {
+  (config: {
+    entry: string;
+    plugins?: any[];
+    treeshake?: boolean;
+  } ): Promise<{
+    generate: {(config: {
+      format?: string;
+      banner?: string;
+      footer?: string;
+      exports?: string;
+      moduleName?: string;
+    }): {
+      code: string;
+      map: any;
+    }}
+  }>;
 }

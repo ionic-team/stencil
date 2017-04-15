@@ -20,16 +20,16 @@ export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: 
     fileExt: packages.path.extname(filePath),
     srcDir: packages.path.dirname(filePath),
     srcText: srcText,
-    srcTextWithoutDecorators: null,
     jsFilePath: null,
     jsText: null,
     isTsSourceFile: isTsSourceFile(filePath),
-    isTransformable: false,
-    cmpMeta: null
+    hasCmpClass: false,
+    cmpMeta: null,
+    cmpClassName: null
   };
 
   if (fileMeta.isTsSourceFile) {
-    fileMeta.isTransformable = isTransformable(fileMeta.srcText);
+    fileMeta.hasCmpClass = hasCmpClass(fileMeta.srcText);
   }
 
   ctx.files.set(filePath, fileMeta);
@@ -53,14 +53,12 @@ export function readFile(packages: Packages, filePath: string): Promise<string> 
 
 export function writeFile(packages: Packages, filePath: string, content: string) {
   return new Promise((resolve, reject) => {
-    mkdir(packages, packages.path.dirname(filePath), () => {
-      packages.fs.writeFile(filePath, content, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
+    packages.fs.writeFile(filePath, content, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
     });
   });
 }
@@ -73,44 +71,111 @@ export function copyFile(packages: Packages, src: string, dest: string) {
 }
 
 
-export function mkdir(packages: Packages, root: string, callback: Function) {
-  var chunks = root.split(packages.path.sep); // split in chunks
-  var chunk;
+export function writeFiles(packages: Packages, files: Map<string, string>) {
+  const paths: string[] = [];
 
-  if (packages.path.isAbsolute(root) === true) { // build from absolute path
-    chunk = chunks.shift(); // remove "/" or C:/
-    if (!chunk) { // add "/"
-      chunk = packages.path.sep;
-    }
+  files.forEach((content, filePath) => {
+    content;
+    paths.push(filePath);
+  });
 
-  } else {
-    chunk = packages.path.resolve(); // build with relative path
-  }
+  return ensureDirs(packages, paths).then(() => {
+    const promises: Promise<any>[] = [];
 
-  return mkdirRecursive(packages, chunk, chunks, callback);
+    files.forEach((content, filePath) => {
+      promises.push(writeFile(packages, filePath, content));
+    });
+
+    return Promise.all(promises);
+  });
 }
 
 
-function mkdirRecursive(packages: Packages, root: string, chunks: string[], callback: Function): void {
-  var chunk = chunks.shift();
-  if (!chunk) {
-    return callback(null);
-  }
+export function ensureDirs(packages: Packages, paths: string[]) {
+  const path = packages.path;
+  const fs = packages.fs;
 
-  var root = packages.path.join(root, chunk);
+  let checkDirs: string[] = [];
 
-  return packages.fs.exists(root, (exists) => {
-
-    if (exists === true) { // already done
-      return mkdirRecursive(packages, root, chunks, callback);
+  paths.forEach(p => {
+    const dir = path.dirname(p);
+    if (checkDirs.indexOf(dir) === -1) {
+      checkDirs.push(dir);
     }
-    return packages.fs.mkdir(root, (err) => {
+  });
 
-      if (err) {
-        return callback(err);
+  checkDirs = checkDirs.sort((a, b) => {
+    if (a.split(path.sep).length < b.split(path.sep).length) {
+      return -1;
+    }
+    if (a.split(path.sep).length > b.split(path.sep).length) {
+      return 1;
+    }
+    if (a.length < b.length) {
+      return -1;
+    }
+    if (a.length > b.length) {
+      return 1;
+    }
+    if (a < b) {
+      return -1;
+    }
+    if (a > b) {
+      return 1;
+    }
+    return 0;
+  });
+
+  const dirExists = new Set();
+
+  return new Promise((resolve, reject) => {
+
+    function checkDir(resolve: Function) {
+      const dir = checkDirs.shift();
+      if (!dir) {
+        resolve();
+        return;
       }
-      return mkdirRecursive(packages, root, chunks, callback); // let's magic
-    });
+
+      var chunks = dir.split(path.sep);
+
+      checkChunk(chunks, 0, resolve);
+    }
+
+    function checkChunk(chunks: string[], appendIndex: number, resolve: Function) {
+      if (appendIndex >= chunks.length - 1) {
+        checkDir(resolve);
+        return;
+      }
+
+      const dir = chunks.slice(0, appendIndex + 2).join(path.sep);
+
+      if (dirExists.has(dir)) {
+        checkChunk(chunks, ++appendIndex, resolve);
+        return;
+      }
+
+      fs.access(dir, err => {
+        if (err) {
+          // no access
+          fs.mkdir(dir, err => {
+            if (err) {
+              reject(err);
+
+            } else {
+              checkChunk(chunks, ++appendIndex, resolve);
+            }
+          });
+
+        } else {
+          // has access
+          dirExists.add(dir);
+          checkChunk(chunks, ++appendIndex, resolve);
+        }
+      })
+    }
+
+    checkDir(resolve);
   });
 }
 
@@ -129,7 +194,7 @@ export function isTsSourceFile(filePath: string) {
 }
 
 
-export function isTransformable(sourceText: string) {
+export function hasCmpClass(sourceText: string) {
   return (sourceText.indexOf('@Component') > -1);
 }
 

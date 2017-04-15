@@ -1,54 +1,102 @@
-import { BuildContext, FileMeta, CompilerConfig, ComponentMeta } from './interfaces';
-import { getTsScriptTarget } from './transpile';
+import { BuildContext, ComponentMeta, FileMeta } from '../interfaces';
 import * as ts from 'typescript';
 
 
-export function parseTsSrcFile(file: FileMeta, config: CompilerConfig, ctx: BuildContext) {
-  const scriptTarget = getTsScriptTarget(config.compilerOptions.target);
-  const tsSrcFile = ts.createSourceFile(file.filePath, file.srcText, scriptTarget, true);
+export function getComponentMeta(ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {
 
-  inspectNode(tsSrcFile, file, config, ctx);
-}
+  return (transformContext) => {
 
+    function visitClass(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
+      fileMeta.cmpMeta = getComponentDecoratorData(classNode);
 
-function inspectNode(n: ts.Node, file: FileMeta, config: CompilerConfig, ctx: BuildContext) {
+      if (fileMeta.cmpMeta) {
+        fileMeta.hasCmpClass = true;
+        fileMeta.cmpClassName = classNode.name.getText().trim();
 
-  if (n.kind === ts.SyntaxKind.ClassDeclaration) {
-    ts.forEachChild(n, childNode => {
-      if (childNode.kind === ts.SyntaxKind.Decorator) {
-        inspectClassDecorator(childNode, file);
+        const classWithoutDecorators = ts.createClassDeclaration(
+            undefined!, classNode.modifiers!, classNode.name!, classNode.typeParameters!,
+            classNode.heritageClauses!, classNode.members);
+
+        return classWithoutDecorators;
       }
-    });
+
+      fileMeta.hasCmpClass = false;
+      return classNode;
+    }
+
+    function visit(fileMeta: FileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
+      switch (node.kind) {
+
+        case ts.SyntaxKind.ClassDeclaration:
+          return visitClass(fileMeta, node as ts.ClassDeclaration);
+
+        default:
+          return ts.visitEachChild(node, (node) => {
+            return visit(fileMeta, node);
+          }, transformContext);
+      }
+    }
+
+    return (tsSourceFile) => {
+      const fileMeta = ctx.files.get(tsSourceFile.fileName);
+      if (fileMeta && fileMeta.hasCmpClass) {
+        return visit(fileMeta, tsSourceFile) as ts.SourceFile;
+      }
+
+      return tsSourceFile;
+    }
   }
 
-  ts.forEachChild(n, childNode => {
-    inspectNode(childNode, file, config, ctx);
-  });
 }
 
 
-function inspectClassDecorator(n: ts.Node, file: FileMeta) {
-  let orgText = n.getText();
+function getComponentDecoratorData(classNode: ts.ClassDeclaration) {
+  let metaData: ComponentMeta = null;
 
-  if (orgText.replace(/\s/g,'').indexOf('@Component({') !== 0) {
-    return;
+  if (!classNode.decorators) {
+    return metaData;
   }
 
-  const text = orgText.replace('@Component', '');
+  let isComponent = false;
 
-  file.cmpMeta = parseComponentMeta(text);
+  classNode.decorators.forEach(decorator => {
 
-  updateComponentMeta(file.cmpMeta, orgText);
+    decorator.forEachChild(decoratorChild => {
 
-  file.srcTextWithoutDecorators = file.srcText.replace(orgText, '');
+      decoratorChild.forEachChild(componentChild => {
+
+        if (componentChild.getText().trim() === 'Component') {
+          isComponent = true;
+
+        } else if (isComponent) {
+          metaData = parseComponentMetaData(componentChild.getText());
+        }
+
+      });
+
+    });
+  });
+
+  return metaData;
+}
+
+
+function parseComponentMetaData(text: string): ComponentMeta {
+  try {
+    const fnStr = `return ${text};`;
+    let cmpMeta: ComponentMeta = new Function(fnStr)();
+
+    return updateComponentMeta(cmpMeta, text);
+
+  } catch (e) {
+    console.log(`parseComponentMetaData: ${e}`);
+    console.log(text);
+  }
+  return null;
 }
 
 
 function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
-  if (!cmpMeta) {
-    throw `invalid component decorator`;
-  }
-
   if ((<any>cmpMeta).selector) {
     console.log(`Please use "tag" instead of "selector" in component decorator: ${(<any>cmpMeta).selector}`);
     cmpMeta.tag = (<any>cmpMeta).selector;
@@ -62,6 +110,8 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
   updateModes(cmpMeta);
   updateStyles(cmpMeta);
   updateProperties(cmpMeta);
+
+  return cmpMeta;
 }
 
 
@@ -140,9 +190,4 @@ function updateProperties(cmpMeta: ComponentMeta) {
     }
 
   });
-}
-
-
-function parseComponentMeta(text: string): ComponentMeta {
-  return new Function(`return ${text};`)();
 }
