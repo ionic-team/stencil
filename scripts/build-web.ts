@@ -21,6 +21,7 @@ import * as rollup from 'rollup';
 import * as typescript from 'typescript';
 import * as uglify from 'uglify-js';
 
+
 // dynamic require cuz this file gets transpiled to dist/
 const compiler = require(path.join(__dirname, '../compiler'));
 
@@ -79,6 +80,7 @@ function compileComponents() {
       fs: fs,
       path: path,
       nodeSass: nodeSass,
+      rollup: rollup,
       typescript: typescript
     }
   };

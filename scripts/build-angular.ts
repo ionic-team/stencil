@@ -11,7 +11,9 @@ import { buildBindingCore } from './build-core';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
+import * as rollup from 'rollup';
 import * as typescript from 'typescript';
+
 
 // dynamic require cuz this file gets transpiled to dist/
 const compiler = require(path.join(__dirname, '../compiler'));
@@ -65,6 +67,7 @@ function compileComponents() {
       fs: fs,
       path: path,
       nodeSass: nodeSass,
+      rollup: rollup,
       typescript: typescript
     }
   };

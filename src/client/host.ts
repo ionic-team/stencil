@@ -4,7 +4,10 @@ import { h } from './renderer/core';
 
 export function generateVNode(elm: Node, instance: ComponentInstance, hostCss: string): VNode {
   let vnode = instance.render && instance.render();
-  if (!vnode) {
+  if (vnode) {
+    vnode.elm = elm;
+
+  } else {
     // use the default render function instead
     vnode = h(elm,
       h('div',

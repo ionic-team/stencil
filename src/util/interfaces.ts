@@ -75,7 +75,7 @@ export interface ComponentModeData {
 
 
 export interface ComponentModeImporterFn {
-  (ionicOpts: IonicImporterOpts, importer: Object): void;
+  (importer: any, h: Hyperscript, ionicTheme: IonicTheme): void;
 }
 
 
@@ -96,12 +96,6 @@ export interface ModeStyles {
 
 export interface PropDecorator {
   (opts?: PropOptions): any;
-}
-
-
-export interface IonicImporterOpts {
-  h: Hyperscript;
-  ionicTheme: IonicTheme;
 }
 
 
@@ -186,14 +180,14 @@ export type Key = string | number;
 
 
 export interface Hyperscript {
-  (sel: string): any;
+  (sel: any): any;
   (sel: Node, data: VNodeData): any;
-  (sel: string, data: VNodeData): any;
-  (sel: string, text: string): any;
-  (sel: string, children: Array<any>): any;
-  (sel: string, data: VNodeData, text: string): any;
-  (sel: string, data: VNodeData, children: Array<any|string>): any;
-  (sel: string, data: VNodeData, children: any): any;
+  (sel: any, data: VNodeData): any;
+  (sel: any, text: string): any;
+  (sel: any, children: Array<any>): any;
+  (sel: any, data: VNodeData, text: string): any;
+  (sel: any, data: VNodeData, children: Array<any|string>): any;
+  (sel: any, data: VNodeData, children: any): any;
 }
 
 

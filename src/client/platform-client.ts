@@ -1,7 +1,7 @@
-import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, IonicImporterOpts, NextTickApi, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
-import { toDashCase } from '../util/helpers';
 import { ionicTheme } from './host';
+import { toDashCase } from '../util/helpers';
 
 
 export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
@@ -10,10 +10,6 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
   const jsonReqs: string[] = [];
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
-  const ionicImporterOpts: IonicImporterOpts = {
-    h: h,
-    ionicTheme: ionicTheme
-  };
 
 
   ionic.loadComponents = function loadComponents(bundleId) {
@@ -29,9 +25,11 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
       cmpMode.styles = cmpModeData[2];
 
       var importModuleFn = cmpModeData[3];
-      var moduleImports = {};
-      importModuleFn(ionicImporterOpts, moduleImports);
-      cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
+
+      const importer = {};
+      importModuleFn(importer, h, ionicTheme);
+
+      cmpMeta.componentModule = importer[Object.keys(importer)[0]];
 
       cmpMode.isLoaded = true;
 
