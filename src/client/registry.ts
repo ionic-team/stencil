@@ -30,7 +30,7 @@ export function registerComponents(renderer: RendererApi, plt: PlatformApi, conf
       cmpControllers.delete(this);
     };
 
-    (<any>ProxyElement).observedAttributes = cmpMeta.observedAttrs;
+    (<any>ProxyElement).observedAttributes = cmpMeta.obsAttrs;
 
     window.customElements.define(tag, ProxyElement);
   });

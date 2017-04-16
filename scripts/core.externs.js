@@ -23,7 +23,7 @@ function modes(){};
 function props(){};
 function mode(){};
 function color(){};
-function observedAttrs(){};
+function obsAttrs(){};
 function theme(){};
 
 function connectedCallback(){};

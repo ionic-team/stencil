@@ -124,7 +124,8 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     const cmpMeta: ComponentMeta = registry[tag] = {
       tag: tag,
       modes: {},
-      props: props
+      props: props,
+      obsAttrs: []
     };
 
     let keys = Object.keys(modeBundleIds);
@@ -141,11 +142,9 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     props.color = {};
     props.mode = {};
 
-    const observedAttributes = cmpMeta.observedAttrs = cmpMeta.observedAttrs || [];
-
     keys = Object.keys(props);
     for (i = 0; i < keys.length; i++) {
-      observedAttributes.push(toDashCase(keys[i]));
+      cmpMeta.obsAttrs.push(toDashCase(keys[i]));
     }
 
     return cmpMeta;

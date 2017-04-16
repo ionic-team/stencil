@@ -43,7 +43,7 @@ export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, c
       }
     );
 
-    (<any>ProxyElement).observedAttributes = cmpMeta.observedAttrs;
+    (<any>ProxyElement).observedAttributes = cmpMeta.obsAttrs;
 
     window.customElements.define(tag, ProxyElement);
   });

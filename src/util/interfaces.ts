@@ -119,7 +119,7 @@ export interface ConfigApi {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
-  observedAttrs?: string[];
+  obsAttrs?: string[];
   hostCss?: string;
   componentModule?: any;
   modes: {[modeName: string]: ComponentMode};
