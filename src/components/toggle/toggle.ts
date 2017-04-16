@@ -17,6 +17,9 @@ export class Toggle {
   @Prop() checked: boolean;
   @Prop() disabled: boolean;
 
+  click() {
+    this.checked = !this.checked;
+  }
 
   render() {
     return h(this,
@@ -39,6 +42,9 @@ export class Toggle {
               'aria-labelledby': this.labelId,
               'role': 'checkbox',
               'type': 'button'
+            },
+            on: {
+              click: this.click.bind(this)
             }
           })
         ]

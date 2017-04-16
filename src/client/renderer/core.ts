@@ -15,6 +15,7 @@ import { vnode } from './vnode';
 
 import { updateAttrs } from './modules/attributes';
 import { updateClass } from './modules/class';
+import { updateEventListeners } from './modules/eventlisteners';
 export { VNode, VNodeData, vnode };
 export { h } from './h';
 
@@ -88,6 +89,7 @@ export function Renderer(api: PlatformApi): RendererApi {
 
       updateAttrs(emptyNode, vnode);
       updateClass(emptyNode, vnode);
+      updateEventListeners(emptyNode, vnode);
 
       if (isArray(children)) {
         for (i = 0; i < children.length; ++i) {
@@ -132,6 +134,7 @@ export function Renderer(api: PlatformApi): RendererApi {
       let i: any, rm: () => void, ch = vnodes[startIdx];
       if (ch != null) {
         if (isDef(ch.sel)) {
+          invokeDestroyHook(ch);
           rm = createRmCb(ch.elm as Node);
           if (isDef(i = ch.vdata) && isDef(i = i.hook) && isDef(i = i.remove)) {
             i(ch, rm);
@@ -230,6 +233,7 @@ export function Renderer(api: PlatformApi): RendererApi {
     if (vnode.vdata !== undefined) {
       updateAttrs(oldVnode, vnode);
       updateClass(oldVnode, vnode);
+      updateEventListeners(emptyNode, vnode);
 
       i = vnode.vdata.hook;
       if (isDef(i) && isDef(i = i.update)) i(oldVnode, vnode);
@@ -280,4 +284,20 @@ export function Renderer(api: PlatformApi): RendererApi {
     }
     return vnode;
   };
+}
+
+
+export function invokeDestroyHook(vnode: VNode) {
+  let i: any, j: number, data = vnode.vdata;
+  if (data !== undefined) {
+    updateEventListeners(vnode);
+    if (vnode.vchildren !== undefined) {
+      for (j = 0; j < vnode.vchildren.length; ++j) {
+        i = vnode.vchildren[j];
+        if (i != null && typeof i !== "string") {
+          invokeDestroyHook(i);
+        }
+      }
+    }
+  }
 }
