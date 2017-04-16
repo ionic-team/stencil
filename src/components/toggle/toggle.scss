@@ -1,0 +1,18 @@
+@import "../../themes/ionic.globals";
+
+
+// Toggle
+// --------------------------------------------------
+
+:host {
+  display: inline-block;
+  visibility: inherit !important;
+  contain: layout content;
+}
+
+
+.toggle-item-cover {
+  @include item-cover;
+  @include button-cover;
+}
+

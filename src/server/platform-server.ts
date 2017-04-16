@@ -1,13 +1,12 @@
-import { ComponentMeta, ComponentMode, ComponentModeData, ComponentRegistry, Ionic, IonicImporterOpts, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ComponentMode, ComponentModeData, ComponentRegistry, Ionic, IonicGlobal, PlatformApi } from '../util/interfaces';
 import { h } from '../client/renderer/h';
-import { ionicTheme } from '../client/host';
+import { themeVNodeData } from '../client/host';
 
 
-export function PlatformServer(ionic: Ionic): PlatformApi {
+export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   const registry: ComponentRegistry = {};
-  const ionicImporterOpts: IonicImporterOpts = {
-    h: h,
-    ionicTheme: ionicTheme
+  const injectIonic: Ionic = {
+    theme: themeVNodeData
   };
 
 
@@ -30,7 +29,7 @@ export function PlatformServer(ionic: Ionic): PlatformApi {
       };
 
       var moduleImports = {};
-      importModuleFn(ionicImporterOpts, moduleImports);
+      importModuleFn(moduleImports, h, injectIonic);
       cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
     }
   };

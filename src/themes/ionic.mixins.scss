@@ -10,6 +10,40 @@
 }
 
 
+// Button Cover
+// --------------------------------------------------
+
+@mixin button-cover() {
+  border: 0;
+
+  font-family: inherit;
+  font-style: inherit;
+  font-variant: inherit;
+
+  line-height: 1;
+  text-transform: none;
+
+  cursor: pointer;
+  -webkit-appearance: button;
+}
+
+
+// Item Cover
+// --------------------------------------------------
+
+@mixin item-cover() {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: transparent;
+  cursor: pointer;
+}
+
+
 // Input Placeholder
 // --------------------------------------------------
 

@@ -1,5 +1,10 @@
 
 export interface Ionic {
+  theme?: IonicTheme;
+}
+
+
+export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
   loadComponents?: {(bundleId: string): void};
@@ -75,7 +80,7 @@ export interface ComponentModeData {
 
 
 export interface ComponentModeImporterFn {
-  (importer: any, h: Hyperscript, ionicTheme: IonicTheme): void;
+  (importer: any, h: Hyperscript, Ionic: Ionic): void;
 }
 
 
@@ -100,7 +105,7 @@ export interface PropDecorator {
 
 
 export interface IonicTheme {
-  (instance: ComponentInstance, hostCss: string): VNodeData;
+  (instance: ComponentInstance, cssClassName: string, vnodeData: VNodeData): VNodeData;
 }
 
 

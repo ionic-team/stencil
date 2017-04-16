@@ -1,15 +1,18 @@
-import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, NextTickApi, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
-import { ionicTheme } from './host';
+import { themeVNodeData } from './host';
 import { toDashCase } from '../util/helpers';
 
 
-export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
+export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const bundleCBs: BundleCallbacks = {};
   const jsonReqs: string[] = [];
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+  const injectIonic: Ionic = {
+    theme: themeVNodeData
+  };
 
 
   ionic.loadComponents = function loadComponents(bundleId) {
@@ -26,14 +29,13 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: Ionic, static
 
       var importModuleFn = cmpModeData[3];
 
-      const importer = {};
-      importModuleFn(importer, h, ionicTheme);
-
-      cmpMeta.componentModule = importer[Object.keys(importer)[0]];
+      var moduleImports = {};
+      importModuleFn(moduleImports, h, injectIonic);
+      cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
 
       cmpMode.isLoaded = true;
 
-      const callbacks = bundleCBs[bundleId];
+      var callbacks = bundleCBs[bundleId];
       if (callbacks) {
         for (var i = 0, l = callbacks.length; i < l; i++) {
           callbacks[i]();

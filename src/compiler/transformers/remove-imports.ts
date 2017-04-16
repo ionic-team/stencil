@@ -1,8 +1,8 @@
 import { BuildContext } from '../interfaces';
 import * as ts from 'typescript';
 
-
-const IONIC_GLOBALS = ['Component', 'h'];
+// same as the "declare" variables in the root index.ts file
+const IONIC_GLOBALS = ['Component', 'h', 'Ionic', 'Prop'];
 
 
 export function removeImports(ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {

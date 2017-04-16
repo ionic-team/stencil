@@ -1,11 +1,11 @@
 
-import { ComponentDecorator, Hyperscript, IonicTheme, PropDecorator } from './util/interfaces';
+import * as interfaces from './util/interfaces';
 
 
-export declare const h: Hyperscript;
+export declare const Component: interfaces.ComponentDecorator;
 
-export declare const ionicTheme: IonicTheme;
+export declare const h: interfaces.Hyperscript;
 
-export declare const Component: ComponentDecorator;
+export declare const Ionic: interfaces.Ionic;
 
-export declare const Prop: PropDecorator;
+export declare const Prop: interfaces.PropDecorator;
