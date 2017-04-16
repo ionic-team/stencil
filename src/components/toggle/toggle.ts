@@ -35,12 +35,11 @@ export class Toggle {
           h('button.toggle-item-cover', {
             attrs: {
               'id': this.id,
-              'aria-checked': this.checked,
+              'aria-checked': this.checked ? 'true': false,
+              'aria-disabled': this.disabled ? 'true': false,
               'aria-labelledby': this.labelId,
-              'aria-disabled': this.disabled,
-              'roll': 'checkbox',
-              'type': 'button',
-              'disable-activated': '',
+              'role': 'checkbox',
+              'type': 'button'
             }
           })
         ]
