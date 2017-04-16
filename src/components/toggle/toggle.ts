@@ -15,7 +15,6 @@ export class Toggle {
   labelId: string;
 
   @Prop() checked: boolean;
-
   @Prop() disabled: boolean;
 
 
@@ -32,7 +31,7 @@ export class Toggle {
           h('div.toggle-icon',
             h('div.toggle-inner')
           ),
-          h('button.toggle-item-cover', {
+          h('button.toggle-cover', {
             attrs: {
               'id': this.id,
               'aria-checked': this.checked ? 'true': false,
