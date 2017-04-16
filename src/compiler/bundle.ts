@@ -85,8 +85,12 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
 
     let code = results.code.trim();
 
-    code = code.replace('(function (exports) {', 'function importComponent(exports, h, Ionic) {');
-    code = code.replace('}((this.ionicModule = this.ionicModule || {})));', '}');
+    code = code.replace('(function (exports) {', '');
+    code = code.replace('}((this.ionicModule = this.ionicModule || {})));', '');
+
+    code = code.trim();
+
+    code = `function importComponent(exports, h, Ionic) {\n${code}\n}`;
 
     component.componentImporter = code;
   });
@@ -195,6 +199,10 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       modes[modeName] = bundle.id;
 
       ctx.registry[tag][0] = modes;
+
+      if (ctx.registry[tag].length === 1 && Object.keys(bundleComponent.component.props).length) {
+        ctx.registry[tag].push(bundleComponent.component.props);
+      }
     });
 
     let content = bundle.content;

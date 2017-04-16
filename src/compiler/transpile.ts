@@ -1,6 +1,6 @@
 import { BuildContext, CompilerConfig } from './interfaces';
 import { createFileMeta, writeFiles } from './util';
-import { getComponentMeta } from './transformers/component-meta';
+import { componentClass } from './transformers/component-class';
 import { removeImports } from './transformers/remove-imports';
 import * as ts from 'typescript';
 
@@ -74,7 +74,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
 
   const result = program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
-      getComponentMeta(ctx),
+      componentClass(ctx),
       removeImports(ctx)
     ]
   });

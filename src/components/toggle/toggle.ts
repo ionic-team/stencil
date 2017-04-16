@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../../index';
+import { Component, h, Ionic, Prop } from '../../index';
 
 
 @Component({
@@ -11,10 +11,12 @@ import { Component, h, Ionic } from '../../index';
 })
 export class Toggle {
   activated: boolean;
-  checked: boolean;
-  disabled: boolean;
   id: string;
   labelId: string;
+
+  @Prop() checked: boolean;
+
+  @Prop() disabled: boolean;
 
 
   render() {

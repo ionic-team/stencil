@@ -245,7 +245,8 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
 
     manifest.components[f.cmpMeta.tag] = {
       componentUrl: componentUrl,
-      modes: modes
+      modes: modes,
+      props: f.cmpMeta.props || {}
     };
   });
 

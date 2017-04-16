@@ -2,7 +2,7 @@ import { BuildContext, ComponentMeta, FileMeta } from '../interfaces';
 import * as ts from 'typescript';
 
 
-export function getComponentMeta(ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {
+export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
@@ -12,6 +12,8 @@ export function getComponentMeta(ctx: BuildContext): ts.TransformerFactory<ts.So
       if (fileMeta.cmpMeta) {
         fileMeta.hasCmpClass = true;
         fileMeta.cmpClassName = classNode.name.getText().trim();
+
+        getPropertyMeta(fileMeta.cmpMeta, classNode);
 
         const classWithoutDecorators = ts.createClassDeclaration(
             undefined!, classNode.modifiers!, classNode.name!, classNode.typeParameters!,
@@ -23,6 +25,52 @@ export function getComponentMeta(ctx: BuildContext): ts.TransformerFactory<ts.So
       fileMeta.hasCmpClass = false;
       return classNode;
     }
+
+
+    function getPropertyMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
+      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
+
+      cmpMeta.props = cmpMeta.props || {};
+
+      propMembers.forEach(memberNode => {
+        let isProp = false;
+        let identifier: string = null;
+        let type = null;
+
+        memberNode.forEachChild(n => {
+
+          if (n.kind === ts.SyntaxKind.Decorator && n.getChildAt(1).getFirstToken().getText() === 'Prop') {
+            isProp = true;
+
+          } else if (isProp) {
+            if (n.kind === ts.SyntaxKind.Identifier) {
+              identifier = n.getText();
+
+            } else if (n.kind === ts.SyntaxKind.StringKeyword) {
+              type = 'string';
+
+            } else if (n.kind === ts.SyntaxKind.BooleanKeyword) {
+              type = 'boolean';
+
+            } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
+              type = 'number';
+            }
+          }
+
+        });
+
+        if (isProp && identifier) {
+          cmpMeta.props[identifier] = {};
+
+          if (type !== 'string') {
+            cmpMeta.props[identifier].type = type;
+          }
+
+          memberNode.decorators = undefined;
+        }
+      });
+    }
+
 
     function visit(fileMeta: FileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
@@ -36,6 +84,7 @@ export function getComponentMeta(ctx: BuildContext): ts.TransformerFactory<ts.So
           }, transformContext);
       }
     }
+
 
     return (tsSourceFile) => {
       const fileMeta = ctx.files.get(tsSourceFile.fileName);

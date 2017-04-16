@@ -1,12 +1,22 @@
 import { ComponentMeta, ProxyElement } from '../util/interfaces';
-import { getPropValue, toCamelCase } from '../util/helpers';
+import { toCamelCase } from '../util/helpers';
 
 
 export function attributeChangedCallback(elm: ProxyElement, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {
   if (oldVal !== newVal) {
     const propName = toCamelCase(attrName);
-    if (cmpMeta.props[propName]) {
-      elm[propName] = getPropValue(cmpMeta.props[propName].type, newVal);
+    const prop = cmpMeta.props[propName];
+
+    if (prop) {
+      if (prop.type === 'boolean') {
+        elm[propName] = (newVal === null || newVal === 'false') ? false : true;
+
+      } else if (prop.type === 'number') {
+        elm[propName] = parseFloat(newVal);
+
+      } else {
+        elm[propName] = newVal;
+      }
     }
   }
 }

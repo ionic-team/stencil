@@ -1,5 +1,4 @@
 import { ComponentController, ConfigApi, PlatformApi, Props, ProxyElement, RendererApi } from '../util/interfaces';
-import { getPropValue, toCamelCase } from '../util/helpers';
 import { queueUpdate } from './update';
 
 
@@ -9,7 +8,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 
 
   Object.keys(props).forEach(propName => {
-    lastPropValues[propName] = getInitialValue(plt, config, elm, props, propName);
+    lastPropValues[propName] = getInitialValue(config, elm, props[propName].type, propName);
 
     function getPropValue() {
       return lastPropValues[propName];
@@ -31,7 +30,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
     Object.defineProperty(instance, propName, {
       get: getPropValue,
       set: function invalidSetProperty() {
-        console.error(`${propName}: passed in property values cannot be changed`);
+        console.error(`${propName}: passed in props cannot be changed`);
       }
     });
 
@@ -39,19 +38,18 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 }
 
 
-function getInitialValue(plt: PlatformApi, config: ConfigApi, elm: HTMLElement, props: Props, propName: string): any {
-  let value = elm[propName];
-  if (value !== undefined) {
-    return value;
+function getInitialValue(config: ConfigApi, elm: HTMLElement, propType: string, propName: string): any {
+  if (elm[propName] !== undefined) {
+    return elm[propName];
   }
 
-  value = plt.$getAttribute(elm, toCamelCase(propName));
-  if (value !== null && value !== '') {
-    return getPropValue(props[propName].type, value);
+  if (propType === 'boolean') {
+    return config.getBoolean(propName);
   }
 
-  value = config.get(propName);
-  if (value !== null) {
-    return value;
+  if (propType === 'number') {
+    return config.getNumber(propName);
   }
+
+  return config.get(propName);
 }

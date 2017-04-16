@@ -4,7 +4,7 @@ import { ConfigApi } from '../util/interfaces';
 export function ConfigController(config: Object = {}): ConfigApi {
 
   // TODO
-  function get(key: string, fallback = null) {
+  function get(key: string, fallback = null): any {
     if (key === 'mode') {
       return 'md';
     }
@@ -16,7 +16,25 @@ export function ConfigController(config: Object = {}): ConfigApi {
     return fallback;
   }
 
+  function getBoolean(key: string, fallback: boolean = false): boolean {
+    if (config[key] !== undefined) {
+      return !!config[key];
+    }
+
+    return fallback;
+  }
+
+  function getNumber(key: string, fallback: number = NaN): number {
+    if (config[key] !== undefined) {
+      return config[key];
+    }
+
+    return fallback;
+  }
+
   return {
-    get: get
+    get: get,
+    getBoolean: getBoolean,
+    getNumber: getNumber
   };
 }

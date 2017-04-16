@@ -111,6 +111,8 @@ export interface IonicTheme {
 
 export interface ConfigApi {
   get: (key: string, fallback?: any) => any;
+  getBoolean: (key: string, fallback?: boolean) => boolean;
+  getNumber: (key: string, fallback?: number) => number;
 }
 
 

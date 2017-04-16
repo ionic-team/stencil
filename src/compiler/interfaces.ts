@@ -94,6 +94,7 @@ export interface CoreComponents {
 export interface Component {
   tag?: string;
   modes: {[modeName: string]: ComponentMode};
+  props: Props;
   componentUrl: string;
   componentImporter?: string;
 }
