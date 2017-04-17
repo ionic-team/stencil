@@ -17,7 +17,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     emit: function emitEvent(instance: any, eventName: string, data?: any) {
       const ev = doc.createEvent('CustomEvent');
       ev.initCustomEvent(eventName, true, true, data);
-      (<Component>instance).$elm.dispatchEvent(ev);
+      (<Component>instance).$el.dispatchEvent(ev);
     }
   };
 

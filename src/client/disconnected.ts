@@ -8,7 +8,7 @@ export function disconnectedCallback(elm: ProxyElement) {
     if (instance) {
       instance.ionViewWillUnload && instance.ionViewWillUnload();
       instance.$vnode && invokeDestroyHook(instance.$vnode);
-      elm.$instance = instance.$elm = instance.$root = instance.$vnode = null;
+      elm.$instance = instance.$el = instance.$root = instance.$vnode = null;
     }
   }
 }

@@ -176,7 +176,7 @@ export interface Component {
   mode?: string;
   color?: string;
 
-  $elm?: ProxyElement;
+  $el?: ProxyElement;
   $root?: HTMLElement | ShadowRoot;
   $vnode?: VNode;
 }

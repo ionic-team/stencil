@@ -27,6 +27,7 @@ function mode(){};
 function color(){};
 function obsAttrs(){};
 function theme(){};
+function $el(){};
 
 function ionViewDidLoad(){};
 function ionViewWillUnload(){};

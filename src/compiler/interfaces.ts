@@ -146,7 +146,7 @@ export interface Packages {
     extname(p: string): string;
     join(...paths: string[]): string;
     sep: string;
-  },
+  };
   fs?: {
     access(path: string | Buffer, callback: (err: any) => void): void;
     mkdir(path: string | Buffer, callback?: (err?: any) => void): void;
@@ -158,7 +158,7 @@ export interface Packages {
   };
   typescript?: {
 
-  },
+  };
   nodeSass?: {
     render: Function;
   };

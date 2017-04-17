@@ -29,7 +29,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   let instance = elm.$instance;
   if (!instance) {
     instance = elm.$instance = new cmpMeta.componentModule();
-    instance.$elm = elm;
+    instance.$el = elm;
     initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.watches);
     initalLoad = true;
   }
