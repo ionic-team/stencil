@@ -52,9 +52,6 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
             if (n.kind === ts.SyntaxKind.Identifier) {
               propName = n.getText();
 
-            } else if (n.kind === ts.SyntaxKind.StringKeyword) {
-              type = 'string';
-
             } else if (n.kind === ts.SyntaxKind.BooleanKeyword) {
               type = 'boolean';
 
@@ -68,7 +65,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         if (isProp && propName) {
           cmpMeta.props[propName] = {};
 
-          if (type !== 'string') {
+          if (type) {
             cmpMeta.props[propName].type = type;
           }
 
