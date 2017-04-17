@@ -9,3 +9,5 @@ export declare const h: interfaces.Hyperscript;
 export declare const Ionic: interfaces.Ionic;
 
 export declare const Prop: interfaces.PropDecorator;
+
+export declare const Watch: interfaces.WatchDecorator;

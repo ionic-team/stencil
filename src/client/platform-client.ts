@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
+import { Component, ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { themeVNodeData } from './host';
 import { toDashCase } from '../util/helpers';
@@ -10,8 +10,15 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const jsonReqs: string[] = [];
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+
+
   const injectedIonic: Ionic = {
-    theme: themeVNodeData
+    theme: themeVNodeData,
+    emit: function emitEvent(instance: any, eventName: string, data?: any) {
+      const ev = doc.createEvent('CustomEvent');
+      ev.initCustomEvent(eventName, true, true, data);
+      (<Component>instance).$elm.dispatchEvent(ev);
+    }
   };
 
 
@@ -32,6 +39,8 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       var moduleImports = {};
       importModuleFn(moduleImports, h, injectedIonic);
       cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
+
+      cmpMeta.watches = cmpModeData[4];
 
       cmpMode.isLoaded = true;
 

@@ -1,24 +1,27 @@
-import { ComponentController, ConfigApi, PlatformApi, Props, ProxyElement, RendererApi } from '../util/interfaces';
+import { Component, ConfigApi, PlatformApi, Props, ProxyElement, RendererApi, Watches } from '../util/interfaces';
 import { queueUpdate } from './update';
 
 
-export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string, props: Props) {
-  const instance = ctrl.instance;
-  const lastPropValues: {[propName: string]: any} = {};
+export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, watches: Watches) {
+  const propValues: {[propName: string]: any} = {};
 
 
   Object.keys(props).forEach(propName => {
-    lastPropValues[propName] = getInitialValue(config, elm, props[propName].type, propName);
+    const watcher: Function = (watches[propName]) ? instance[watches[propName].fn].bind(instance) : null;
+
+    propValues[propName] = getInitialValue(config, elm, props[propName].type, propName);
 
     function getPropValue() {
-      return lastPropValues[propName];
+      return propValues[propName];
     }
 
     function setPropValue(value: any) {
-      if (lastPropValues[propName] !== value) {
-        lastPropValues[propName] = value;
+      if (propValues[propName] !== value) {
+        propValues[propName] = value;
 
-        queueUpdate(plt, config, renderer, elm, ctrl, tag);
+        watcher && watcher(value);
+
+        queueUpdate(plt, config, renderer, elm, tag);
       }
     }
 

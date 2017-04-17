@@ -1,5 +1,6 @@
 
 export interface Ionic {
+  emit?: EventEmit;
   theme?: IonicTheme;
 }
 
@@ -76,6 +77,11 @@ export interface ComponentModeData {
    * moduleFn
    */
   [3]: ComponentModeImporterFn;
+
+  /**
+   * watches
+   */
+  [4]: Watches;
 }
 
 
@@ -104,6 +110,31 @@ export interface PropDecorator {
 }
 
 
+export interface PropOptions {
+  type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
+}
+
+
+export interface Props {
+  [propName: string]: PropOptions;
+}
+
+
+export interface WatchDecorator {
+  (propName: string): any;
+}
+
+
+export interface WatchOpts {
+  fn: string;
+}
+
+
+export interface Watches {
+  [propName: string]: WatchOpts;
+}
+
+
 export interface IonicTheme {
   (instance: Component, cssClassName: string, vnodeData: VNodeData): VNodeData;
 }
@@ -119,6 +150,7 @@ export interface ConfigApi {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
+  watches?: Watches;
   obsAttrs?: string[];
   hostCss?: string;
   componentModule?: any;
@@ -143,6 +175,10 @@ export interface Component {
 
   mode?: string;
   color?: string;
+
+  $elm?: ProxyElement;
+  $root?: HTMLElement | ShadowRoot;
+  $vnode?: VNode;
 }
 
 
@@ -157,15 +193,6 @@ export interface BooleanInputComponent extends BaseInputComponent {
 }
 
 
-
-export interface ComponentController {
-  rootElm?: HTMLElement | ShadowRoot;
-  queued?: boolean;
-  instance?: Component;
-  vnode?: VNode;
-}
-
-
 export interface ComponentModule {
   new (): Component;
 }
@@ -176,20 +203,13 @@ export interface ComponentRegistry {
 }
 
 
-export interface PropOptions {
-  type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
-}
-
-
-export interface Props {
-  [propName: string]: PropOptions;
-}
-
-
 export interface ProxyElement extends HTMLElement {
   connectedCallback: {(): void};
   attributeChangedCallback: {(attrName: string, oldVal: string, newVal: string, namespace: string): void};
   disconnectedCallback: {(): void};
+
+  $queued?: boolean;
+  $instance?: Component;
 }
 
 
@@ -234,6 +254,11 @@ export interface VNodeData {
   vkey?: Key;
   vns?: string; // for SVGs
   [key: string]: any; // for any other 3rd party module
+}
+
+
+export interface EventEmit {
+  (instance: any, eventName: string, data?: any): void;
 }
 
 

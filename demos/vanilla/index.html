@@ -11,6 +11,11 @@
   <p>
     <ion-toggle checked></ion-toggle>Toggle
   </p>
+  <script>
+    document.querySelector('ion-toggle').addEventListener('ionChange', function(ev) {
+      console.log('ion-toggle, ionChange, checked:', ev.detail.checked);
+    });
+  </script>
 <!--
   <p>
     <ion-badge>default</ion-badge>

@@ -18,6 +18,7 @@ function nextTickCtrl(){};
 function nextTick(){};
 function devMode(){};
 function on(){};
+function fn(){};
 
 function tag(){};
 function modes(){};

@@ -1,11 +1,10 @@
 import { attributeChangedCallback } from './attribute-changed';
-import { ComponentController, ConfigApi, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
+import { ConfigApi, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 
 
 export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
-  const cmpControllers = new WeakMap<HTMLElement, ComponentController>();
 
   Object.keys(components || {}).forEach(tag => {
     const cmpMeta = plt.registerComponent(tag, components[tag]);
@@ -22,9 +21,7 @@ export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, c
 
         connectedCallback: { configurable: true, value:
           function() {
-            var ctrl: ComponentController = {};
-            cmpControllers.set(this, ctrl);
-            connectedCallback(plt, config, renderer, this, ctrl, cmpMeta);
+            connectedCallback(plt, config, renderer, this, cmpMeta);
           }
         },
 
@@ -36,8 +33,7 @@ export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, c
 
         disconnectedCallback: { configurable: true, value:
           function() {
-            disconnectedCallback(cmpControllers.get(this));
-            cmpControllers.delete(this);
+            disconnectedCallback(this);
           }
         }
       }
