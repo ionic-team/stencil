@@ -1,8 +1,8 @@
-import { ComponentInstance, VNode, VNodeData } from '../util/interfaces';
+import { Component, VNode, VNodeData } from '../util/interfaces';
 import { h } from './renderer/core';
 
 
-export function generateVNode(elm: Node, instance: ComponentInstance, hostCss: string): VNode {
+export function generateVNode(elm: Node, instance: Component, hostCss: string): VNode {
   let vnode = instance.render && instance.render();
   if (vnode) {
     vnode.elm = elm;
@@ -23,7 +23,7 @@ export function generateVNode(elm: Node, instance: ComponentInstance, hostCss: s
 }
 
 
-export function themeVNodeData(instance: ComponentInstance, cssClassName: string, vnodeData: VNodeData = {}): VNodeData {
+export function themeVNodeData(instance: Component, cssClassName: string, vnodeData: VNodeData = {}): VNodeData {
   const cssClasses = vnodeData.class = vnodeData.class || {};
   const mode = instance.mode;
   const color = instance.color;

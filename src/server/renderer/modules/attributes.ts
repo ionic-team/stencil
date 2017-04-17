@@ -1,4 +1,5 @@
 import { VNode, VNodeData } from '../../../util/interfaces';
+import { isBoolean } from '../../../util/helpers';
 
 
 const xlinkNS = 'http://www.w3.org/1999/xlink';
@@ -20,9 +21,9 @@ export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
     cur = attrs[key];
     old = oldAttrs[key];
     if (old !== cur) {
-      if (typeof cur === 'boolean') {
+      if (isBoolean(cur)) {
         if (cur) {
-          elm.setAttribute(key, "");
+          elm.setAttribute(key, '');
         } else {
           elm.removeAttribute(key);
         }

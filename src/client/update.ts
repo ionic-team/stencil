@@ -24,11 +24,13 @@ export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Rende
 
 export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, ctrl: ComponentController, tag: string) {
   const cmpMeta = plt.getComponentMeta(tag);
+  let initalLoad = false;
 
   let instance = ctrl.instance;
   if (!instance) {
     instance = ctrl.instance = new cmpMeta.componentModule();
     initProps(plt, config, renderer, elm, ctrl, tag, cmpMeta.props);
+    initalLoad = true;
   }
 
   if (!ctrl.rootElm) {
@@ -43,4 +45,8 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   // otherwise, elm is the initial patch and
   // we need it to pass it the actual host element
   ctrl.vnode = renderer(ctrl.vnode ? ctrl.vnode : elm, vnode);
+
+  if (initalLoad && instance) {
+    instance.ionViewDidLoad && instance.ionViewDidLoad();
+  }
 }

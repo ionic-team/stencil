@@ -9,7 +9,7 @@
 
 
 /* global module, document, Node */
-import { isArray, isDef, isUndef, isPrimitive } from '../../util/helpers';
+import { isArray, isDef, isUndef, isString, isStringOrNumber } from '../../util/helpers';
 import { PlatformApi, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
 import { vnode } from './vnode';
 
@@ -98,7 +98,7 @@ export function Renderer(api: PlatformApi): RendererApi {
             api.$appendChild(elm, createElm(ch as VNode, insertedVnodeQueue));
           }
         }
-      } else if (isPrimitive(vnode.vtext)) {
+      } else if (isStringOrNumber(vnode.vtext)) {
         api.$appendChild(elm, api.$createTextNode(vnode.vtext));
       }
       i = (vnode.vdata as VNodeData).hook; // Reuse variable
@@ -294,7 +294,7 @@ export function invokeDestroyHook(vnode: VNode) {
     if (vnode.vchildren !== undefined) {
       for (j = 0; j < vnode.vchildren.length; ++j) {
         i = vnode.vchildren[j];
-        if (i != null && typeof i !== "string") {
+        if (i != null && !isString(i)) {
           invokeDestroyHook(i);
         }
       }

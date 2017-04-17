@@ -14,24 +14,26 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
       return lastPropValues[propName];
     }
 
+    function setPropValue(value: any) {
+      if (lastPropValues[propName] !== value) {
+        lastPropValues[propName] = value;
+
+        queueUpdate(plt, config, renderer, elm, ctrl, tag);
+      }
+    }
+
     // dom's element instance
     Object.defineProperty(elm, propName, {
+      configurable: true,
       get: getPropValue,
-      set: function setPropValue(value: any) {
-        if (lastPropValues[propName] !== value) {
-          lastPropValues[propName] = value;
-
-          queueUpdate(plt, config, renderer, elm, ctrl, tag);
-        }
-      }
+      set: setPropValue
     });
 
-    // user's component instance
+    // user's component class instance
     Object.defineProperty(instance, propName, {
+      configurable: true,
       get: getPropValue,
-      set: function invalidSetProperty() {
-        console.error(`${propName}: passed in props cannot be changed`);
-      }
+      set: setPropValue
     });
 
   });

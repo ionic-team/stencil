@@ -1,4 +1,5 @@
 import { Component, h, Ionic, Prop } from '../../index';
+import { BooleanInputComponent } from '../../util/interfaces';
 
 
 @Component({
@@ -9,7 +10,7 @@ import { Component, h, Ionic, Prop } from '../../index';
     wp: 'toggle.wp.scss'
   }
 })
-export class Toggle {
+export class Toggle implements BooleanInputComponent {
   activated: boolean;
   id: string;
   labelId: string;
@@ -17,8 +18,10 @@ export class Toggle {
   @Prop() checked: boolean;
   @Prop() disabled: boolean;
 
-  click() {
+  toggle(ev: UIEvent) {
     this.checked = !this.checked;
+    ev.preventDefault();
+    ev.stopImmediatePropagation();
   }
 
   render() {
@@ -44,7 +47,7 @@ export class Toggle {
               'type': 'button'
             },
             on: {
-              click: this.click.bind(this)
+              click: this.toggle.bind(this)
             }
           })
         ]

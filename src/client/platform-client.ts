@@ -10,7 +10,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const jsonReqs: string[] = [];
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
-  const injectIonic: Ionic = {
+  const injectedIonic: Ionic = {
     theme: themeVNodeData
   };
 
@@ -30,7 +30,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       var importModuleFn = cmpModeData[3];
 
       var moduleImports = {};
-      importModuleFn(moduleImports, h, injectIonic);
+      importModuleFn(moduleImports, h, injectedIonic);
       cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
 
       cmpMode.isLoaded = true;

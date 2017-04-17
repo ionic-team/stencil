@@ -27,6 +27,9 @@ function color(){};
 function obsAttrs(){};
 function theme(){};
 
+function ionViewDidLoad(){};
+function ionViewWillUnload(){};
+
 function connectedCallback(){};
 function attributeChangedCallback(){};
 function disconnectedCallback(){};

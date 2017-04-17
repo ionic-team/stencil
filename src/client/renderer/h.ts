@@ -1,6 +1,6 @@
 import { vnode } from './vnode';
 import { VNode, VNodeData } from '../../util/interfaces';
-import { isArray, isPrimitive } from '../../util/helpers';
+import { isArray, isStringOrNumber } from '../../util/helpers';
 
 
 function addNS(data: any, children: Array<VNode> | undefined, sel: string | undefined): void {
@@ -34,17 +34,17 @@ export function h(sel: any, b?: any, c?: any): VNode {
   if (c !== undefined) {
     data = b;
     if (isArray(c)) { children = c; }
-    else if (isPrimitive(c)) { text = c; }
+    else if (isStringOrNumber(c)) { text = c; }
     else if (c && c.sel) { children = [c]; }
   } else if (b !== undefined) {
     if (isArray(b)) { children = b; }
-    else if (isPrimitive(b)) { text = b; }
+    else if (isStringOrNumber(b)) { text = b; }
     else if (b && b.sel) { children = [b]; }
     else { data = b; }
   }
   if (isArray(children)) {
     for (i = 0; i < children.length; ++i) {
-      if (isPrimitive(children[i])) children[i] = (vnode as any)(undefined, undefined, undefined, children[i]);
+      if (isStringOrNumber(children[i])) children[i] = (vnode as any)(undefined, undefined, undefined, children[i]);
     }
   }
   if (

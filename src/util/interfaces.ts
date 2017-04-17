@@ -105,7 +105,7 @@ export interface PropDecorator {
 
 
 export interface IonicTheme {
-  (instance: ComponentInstance, cssClassName: string, vnodeData: VNodeData): VNodeData;
+  (instance: Component, cssClassName: string, vnodeData: VNodeData): VNodeData;
 }
 
 
@@ -135,7 +135,10 @@ export interface ComponentMode {
 }
 
 
-export interface ComponentInstance {
+export interface Component {
+  ionViewDidLoad?: {(): void};
+  ionViewWillUnload?: {(): void};
+
   render?: {(): VNode};
 
   mode?: string;
@@ -143,16 +146,28 @@ export interface ComponentInstance {
 }
 
 
+export interface BaseInputComponent extends Component {
+  disabled: boolean;
+}
+
+
+export interface BooleanInputComponent extends BaseInputComponent {
+  checked: boolean;
+  toggle: {(ev: UIEvent): void};
+}
+
+
+
 export interface ComponentController {
   rootElm?: HTMLElement | ShadowRoot;
   queued?: boolean;
-  instance?: ComponentInstance;
+  instance?: Component;
   vnode?: VNode;
 }
 
 
 export interface ComponentModule {
-  new (): ComponentInstance;
+  new (): Component;
 }
 
 
