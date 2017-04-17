@@ -95,6 +95,7 @@ export interface Component {
   tag?: string;
   modes: {[modeName: string]: ComponentMode};
   props: Props;
+  watches: Watches;
   componentUrl: string;
   componentImporter?: string;
 }
@@ -110,6 +111,7 @@ export interface ComponentMode {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
+  watches?: Watches;
   observedAttrs?: string[];
   hostCss?: string;
   componentModule?: any;
@@ -124,6 +126,16 @@ export interface PropOptions {
 
 export interface Props {
   [propName: string]: PropOptions;
+}
+
+
+export interface WatchOpts {
+  fn: string;
+}
+
+
+export interface Watches {
+  [propName: string]: WatchOpts;
 }
 
 

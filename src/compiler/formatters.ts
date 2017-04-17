@@ -16,7 +16,8 @@ export function getComponentModeLoader(component: Component, mode: ComponentMode
     `'` + component.tag + `'`,
     `'` + mode.name + `'`,
     `'` + mode.styles.replace(/'/g, '"') + `'`,
-    `\n` + component.componentImporter
+    `\n` + component.componentImporter,
+    `\n` + JSON.stringify(component.watches)
   ];
 
   return `[` + t.join(',') + `]`;

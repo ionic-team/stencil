@@ -13,13 +13,10 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         fileMeta.hasCmpClass = true;
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
-        getPropertyMeta(fileMeta.cmpMeta, classNode);
+        getPropertyDecoratorMeta(fileMeta.cmpMeta, classNode);
+        getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
 
-        const classWithoutDecorators = ts.createClassDeclaration(
-            undefined!, classNode.modifiers!, classNode.name!, classNode.typeParameters!,
-            classNode.heritageClauses!, classNode.members);
-
-        return classWithoutDecorators;
+        return removeClassDecorator(classNode);
       }
 
       fileMeta.hasCmpClass = false;
@@ -27,24 +24,33 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     }
 
 
-    function getPropertyMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
+    function removeClassDecorator(classNode: ts.ClassDeclaration) {
+      const classWithoutDecorators = ts.createClassDeclaration(
+          undefined!, classNode.modifiers!, classNode.name!, classNode.typeParameters!,
+          classNode.heritageClauses!, classNode.members);
+
+      return classWithoutDecorators;
+    }
+
+
+    function getPropertyDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
       cmpMeta.props = cmpMeta.props || {};
 
       propMembers.forEach(memberNode => {
         let isProp = false;
-        let identifier: string = null;
+        let propName: string = null;
         let type = null;
 
         memberNode.forEachChild(n => {
 
-          if (n.kind === ts.SyntaxKind.Decorator && n.getChildAt(1).getFirstToken().getText() === 'Prop') {
+          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Prop') {
             isProp = true;
 
           } else if (isProp) {
             if (n.kind === ts.SyntaxKind.Identifier) {
-              identifier = n.getText();
+              propName = n.getText();
 
             } else if (n.kind === ts.SyntaxKind.StringKeyword) {
               type = 'string';
@@ -59,12 +65,57 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
         });
 
-        if (isProp && identifier) {
-          cmpMeta.props[identifier] = {};
+        if (isProp && propName) {
+          cmpMeta.props[propName] = {};
 
           if (type !== 'string') {
-            cmpMeta.props[identifier].type = type;
+            cmpMeta.props[propName].type = type;
           }
+
+          memberNode.decorators = undefined;
+        }
+      });
+    }
+
+
+    function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
+      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
+
+      cmpMeta.watches = cmpMeta.watches || {};
+
+      propMembers.forEach(memberNode => {
+        let isWatch = false;
+        let propName: string = null;
+        let methodName: string = null;
+
+        memberNode.forEachChild(n => {
+
+          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Watch') {
+            isWatch = true;
+
+            n.getChildAt(1).forEachChild(n => {
+
+              if (n.kind === ts.SyntaxKind.StringLiteral) {
+                propName = n.getText();
+                propName = propName.replace(/\'/g, '');
+                propName = propName.replace(/\"/g, '');
+                propName = propName.replace(/\`/g, '');
+              }
+
+            });
+
+          } else if (isWatch) {
+            if (n.kind === ts.SyntaxKind.Identifier) {
+              methodName = n.getText();
+            }
+          }
+
+        });
+
+        if (isWatch && propName && methodName) {
+          cmpMeta.watches[propName] = {
+            fn: methodName
+          };
 
           memberNode.decorators = undefined;
         }
