@@ -1,7 +1,8 @@
 
 export interface Ionic {
-  emit?: EventEmit;
-  theme?: IonicTheme;
+  emit: EventEmit;
+  theme: IonicTheme;
+  platform?: PlatformApi;
 }
 
 
@@ -159,7 +160,6 @@ export interface ComponentMeta {
 
 
 export interface ComponentMode {
-  isLoaded?: boolean;
   bundleId?: string;
   styles?: string;
   styleUrls?: string[];
@@ -179,11 +179,18 @@ export interface Component {
   $el?: ProxyElement;
   $root?: HTMLElement | ShadowRoot;
   $vnode?: VNode;
+  $onDestroy?: {(cb: Function): void};
+  $destroys?: Function[];
 }
 
 
 export interface BaseInputComponent extends Component {
   disabled: boolean;
+  hasFocus: boolean;
+  value: string;
+
+  fireFocus: {(): void;}
+  fireBlur: {(): void;}
 }
 
 
@@ -265,7 +272,7 @@ export interface EventEmit {
 export interface PlatformApi {
   registerComponent: (tag: string, data: any[]) => ComponentMeta;
   getComponentMeta: (tag: string) => ComponentMeta;
-  loadComponent: (cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function) => void;
+  loadComponent: (bundleId: string, cb: Function) => void;
   nextTick: NextTick;
   domRead: DomRead;
   domWrite: DomWrite;

@@ -1,11 +1,11 @@
-import { Ionic } from '../../../util/interfaces';
+import { IonicGlobal } from '../../../util/interfaces';
 
 
 (function(window: any, document: HTMLDocument) {
   'use strict';
 
   // create window.Ionic if it doesn't already exist
-  var ionic: Ionic = window.Ionic = window.Ionic || {};
+  var ionic: IonicGlobal = window.Ionic = window.Ionic || {};
 
   // find the static directory, which should be the same as this JS file
   var scriptElm: any = document.getElementsByTagName('script');

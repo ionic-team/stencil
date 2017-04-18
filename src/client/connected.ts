@@ -6,10 +6,9 @@ import { queueUpdate } from './update';
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
   plt.nextTick(() => {
     const tag = cmpMeta.tag;
-    const mode = getMode(plt, config, elm, 'mode');
-    const cmpMode = cmpMeta.modes[mode];
+    const cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')];
 
-    plt.loadComponent(cmpMeta, cmpMode, function loadComponentCallback() {
+    plt.loadComponent(cmpMode.bundleId, function loadComponentCallback() {
       queueUpdate(plt, config, renderer, elm, tag);
     });
   });

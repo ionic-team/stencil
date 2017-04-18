@@ -5,8 +5,10 @@ import { themeVNodeData } from '../client/host';
 
 export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   const registry: ComponentRegistry = {};
+  const loadedBundles: {[bundleId: string]: boolean} = {};
   const injectIonic: Ionic = {
-    theme: themeVNodeData
+    theme: themeVNodeData,
+    emit: function(){}
   };
 
 
@@ -24,22 +26,23 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
       var cmpMeta = registerComponent(tag, []);
 
       cmpMeta.modes[mode] = {
-        styles: styles,
-        isLoaded: true
+        styles: styles
       };
 
       var moduleImports = {};
       importModuleFn(moduleImports, h, injectIonic);
       cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
+
+      loadedBundles[bundleId] = true;
     }
   };
 
-  function loadComponent(cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function): void {
-    if (cmpMode && cmpMode.isLoaded) {
-      cb(cmpMeta, cmpMode);
+  function loadComponent(bundleId: string, cb: Function): void {
+    if (loadedBundles[bundleId]) {
+      cb();
 
     } else {
-      console.log(`invalid component: ${cmpMeta}`);
+      console.log(`invalid bundleId: ${bundleId}`);
     }
   }
 
@@ -180,7 +183,7 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   }
 
 
-  return {
+  return injectIonic.platform = {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
     loadComponent: loadComponent,

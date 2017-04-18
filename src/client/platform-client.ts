@@ -6,7 +6,8 @@ import { toDashCase } from '../util/helpers';
 
 export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
   const registry: ComponentRegistry = {};
-  const bundleCBs: BundleCallbacks = {};
+  const loadedBundles: {[bundleId: string]: boolean} = {};
+  const bundleCallbacks: BundleCallbacks = {};
   const jsonReqs: string[] = [];
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
@@ -42,30 +43,28 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
 
       cmpMeta.watches = cmpModeData[4];
 
-      cmpMode.isLoaded = true;
-
-      var callbacks = bundleCBs[bundleId];
+      var callbacks = bundleCallbacks[bundleId];
       if (callbacks) {
         for (var j = 0, l = callbacks.length; j < l; j++) {
           callbacks[j]();
         }
-        delete bundleCBs[bundleId];
+        delete bundleCallbacks[bundleId];
       }
+
+      loadedBundles[bundleId] = true;
     }
   };
 
 
-  function loadComponent(cmpMeta: ComponentMeta, cmpMode: ComponentMode, cb: Function): void {
-    if (cmpMode && cmpMode.isLoaded) {
-      cb(cmpMeta, cmpMode);
+  function loadComponent(bundleId: string, cb: Function): void {
+    if (loadedBundles[bundleId]) {
+      cb();
 
     } else {
-      const bundleId = cmpMode.bundleId;
-
-      if (bundleCBs[bundleId]) {
-        bundleCBs[bundleId].push(cb);
+      if (bundleCallbacks[bundleId]) {
+        bundleCallbacks[bundleId].push(cb);
       } else {
-        bundleCBs[bundleId] = [cb];
+        bundleCallbacks[bundleId] = [cb];
       }
 
       const url = `${staticDir}ionic.${bundleId}.js`;

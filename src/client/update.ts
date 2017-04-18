@@ -30,6 +30,12 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   if (!instance) {
     instance = elm.$instance = new cmpMeta.componentModule();
     instance.$el = elm;
+
+    instance.$destroys = [];
+    instance.$onDestroy = function(cb: Function) {
+      instance.$destroys.push(cb);
+    };
+
     initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.watches);
     initalLoad = true;
   }
