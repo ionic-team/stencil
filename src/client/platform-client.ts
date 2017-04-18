@@ -46,8 +46,8 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
 
       var callbacks = bundleCBs[bundleId];
       if (callbacks) {
-        for (var i = 0, l = callbacks.length; i < l; i++) {
-          callbacks[i]();
+        for (var j = 0, l = callbacks.length; j < l; j++) {
+          callbacks[j]();
         }
         delete bundleCBs[bundleId];
       }
