@@ -61,7 +61,8 @@ function compileComponents() {
     debug: true,
     bundles: [
       ['ion-badge'],
-      ['ion-toggle']
+      ['ion-toggle'],
+      ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title']
     ],
     packages: {
       fs: fs,

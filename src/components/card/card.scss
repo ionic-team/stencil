@@ -1,0 +1,18 @@
+@import "../../themes/ionic.globals";
+
+// Card
+// --------------------------------------------------
+
+
+ion-card,
+:host {
+  display: block;
+  overflow: hidden;
+}
+
+ion-card img,
+:host img {
+  display: block;
+
+  width: 100%;
+}
