@@ -7,20 +7,35 @@ export function getBundleFileName(bundleId: string) {
 
 
 export function getBundleContent(bundleId: string, componentModeLoader: string) {
-  return `Ionic.loadComponents('${bundleId}',${componentModeLoader});`;
+  return `Ionic.loadComponents(\n/** bundleId **/\n'${bundleId}',${componentModeLoader});`;
 }
 
 
 export function getComponentModeLoader(component: Component, mode: ComponentMode) {
+  const tag = component.tag.trim().toLowerCase();
+
+  const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
+
+  const styles = (mode.styles ? mode.styles.replace(/'/g, '"') : '');
+
+  const componentFn = component.componentImporter.trim();
+
+  const watches = JSON.stringify(component.watches);
+
+  let label = tag;
+  if (mode.name) {
+    label += '.' + mode.name;
+  }
+
   const t = [
-    `'` + component.tag + `'`,
-    `'` + mode.name + `'`,
-    `'` + mode.styles.replace(/'/g, '"') + `'`,
-    `\n` + component.componentImporter,
-    `\n` + JSON.stringify(component.watches)
+    `/** ${label}: tag [0] **/\n'${tag}'`,
+    `/** ${label}: modeName [1] **/\n'${modeName}'`,
+    `/** ${label}: styles [2] **/\n'${styles}'`,
+    `/** ${label}: importComponent function [3] **/\n${componentFn}`,
+    `/** ${label}: watches [4] **/\n${watches}`
   ];
 
-  return `[` + t.join(',') + `]`;
+  return `\n\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
 }
 
 
