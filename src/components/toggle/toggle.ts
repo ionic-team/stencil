@@ -1,5 +1,5 @@
-import { Component, h, Ionic, Prop, Watch } from '../../index';
 import { BooleanInputComponent } from '../../util/interfaces';
+import { Component, h, Ionic, Prop, Watch } from '../../index';
 
 
 @Component({
@@ -12,24 +12,45 @@ import { BooleanInputComponent } from '../../util/interfaces';
 })
 export class Toggle implements BooleanInputComponent {
   activated: boolean;
+  hasFocus: boolean;
   id: string;
   labelId: string;
 
+
   @Prop() checked: boolean;
   @Prop() disabled: boolean;
+  @Prop() value: string;
+
 
   @Watch('checked')
   changed(val: boolean) {
-    Ionic.emit(this, 'ionChange', {
-      checked: val
-    });
+    Ionic.emit(this, 'ionChange', { checked: val });
   }
+
 
   toggle(ev: UIEvent) {
     this.checked = !this.checked;
     ev.preventDefault();
     ev.stopImmediatePropagation();
+    this.fireFocus();
   }
+
+
+  fireFocus() {
+    if (!this.hasFocus) {
+      this.hasFocus = true;
+      Ionic.emit(this, 'ionFocus');
+    }
+  }
+
+
+  fireBlur() {
+    if (this.hasFocus) {
+      this.hasFocus = false;
+      Ionic.emit(this, 'ionBlur');
+    }
+  }
+
 
   render() {
     return h(this,
