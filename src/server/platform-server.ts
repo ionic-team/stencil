@@ -6,7 +6,8 @@ import { themeVNodeData } from '../client/host';
 export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
-  const injectIonic: Ionic = {
+  const moduleImports = {};
+  const injectedIonic: Ionic = {
     theme: themeVNodeData,
     emit: function(){}
   };
@@ -15,23 +16,44 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   ionic.loadComponents = function loadComponents(bundleId) {
     var args = arguments;
     for (var i = 1; i < args.length; i++) {
+      // first arg is the bundleId
+      // each arg after that is a component/mode
       var cmpModeData: ComponentModeData = args[i];
+
+      // tag name (ion-badge)
       var tag = cmpModeData[0];
-      var mode = cmpModeData[1];
-      var styles = cmpModeData[2];
-      var importModuleFn = cmpModeData[3];
 
-      console.log(`Ionic.loadComponents, bundle: ${bundleId}, tag: ${tag}, mode: ${mode}`);
+      // component class name (Badge)
+      var cmpClassName = cmpModeData[1];
 
-      var cmpMeta = registerComponent(tag, []);
+      // get component meta data by tag name
+      var cmpMeta = registry[tag];
 
-      cmpMeta.modes[mode] = {
-        styles: styles
-      };
+      // component instance property watches
+      cmpMeta.watches = cmpModeData[2];
 
-      var moduleImports = {};
-      importModuleFn(moduleImports, h, injectIonic);
-      cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
+      // mode name (ios, md, wp)
+      var modeName = cmpModeData[3];
+
+      // get component mode
+      var cmpMode = cmpMeta.modes[modeName];
+      if (cmpMode) {
+        // component mode styles
+        cmpMode.styles = cmpModeData[4];
+      }
+
+      // import component function
+      var importModuleFn = cmpModeData[5];
+
+      // inject ionic globals
+      importModuleFn(moduleImports, h, injectedIonic);
+
+      // get the component class which was added to moduleImports
+      cmpMeta.componentModule = moduleImports[cmpClassName];
+
+      console.log(`Ionic.loadComponents, bundle: ${bundleId}, tag: ${tag}, mode: ${modeName}`);
+
+      registerComponent(tag, []);
 
       loadedBundles[bundleId] = true;
     }
@@ -183,7 +205,7 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   }
 
 
-  return injectIonic.platform = {
+  return injectedIonic.platform = {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
     loadComponent: loadComponent,

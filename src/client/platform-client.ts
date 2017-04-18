@@ -8,10 +8,10 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
-  const activeJsonRequests: string[] = [];
+  const activeJsonRequests: {[url: string]: boolean} = {};
+  const moduleImports = {};
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
-  const moduleImports = {};
 
 
   const injectedIonic: Ionic = {
@@ -32,40 +32,32 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       var cmpModeData: ComponentModeData = args[i];
 
       // tag name (ion-badge)
-      var tag = cmpModeData[0];
-
-      // component class name (Badge)
-      var cmpClassName = cmpModeData[1];
-
       // get component meta data by tag name
-      var cmpMeta = registry[tag];
+      var cmpMeta = registry[cmpModeData[0]];
 
       // component instance property watches
       cmpMeta.watches = cmpModeData[2];
 
       // mode name (ios, md, wp)
-      var modeName = cmpModeData[3];
-
       // get component mode
-      var cmpMode = cmpMeta.modes[modeName];
+      var cmpMode = cmpMeta.modes[cmpModeData[3]];
       if (cmpMode) {
         // component mode styles
         cmpMode.styles = cmpModeData[4];
       }
 
       // import component function
-      var importModuleFn = cmpModeData[5];
-
       // inject ionic globals
-      importModuleFn(moduleImports, h, injectedIonic);
+      cmpModeData[5](moduleImports, h, injectedIonic);
 
       // get the component class which was added to moduleImports
-      cmpMeta.componentModule = moduleImports[cmpClassName];
+      // component class name (Badge)
+      cmpMeta.componentModule = moduleImports[cmpModeData[1]];
 
       // fire off all the callbacks waiting on this bundle to load
       var callbacks = bundleCallbacks[bundleId];
       if (callbacks) {
-        for (var j = 0, l = callbacks.length; j < l; j++) {
+        for (var j = 0, jlen = callbacks.length; j < jlen; j++) {
           callbacks[j]();
         }
         delete bundleCallbacks[bundleId];
@@ -94,7 +86,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       // create the url we'll be requesting
       const url = `${staticDir}ionic.${bundleId}.js`;
 
-      if (activeJsonRequests.indexOf(url) === -1) {
+      if (!activeJsonRequests[url]) {
         // not already actively requesting this url
         // let's kick off the request
         jsonp(url);
@@ -105,7 +97,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
 
   function jsonp(url: string) {
     // remember that we're actively requesting this url
-    activeJsonRequests.push(url);
+    activeJsonRequests[url] = true;
 
     // create a sript element to add to the document.head
     var scriptElm = createElement('script');
@@ -122,10 +114,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       scriptElm.parentNode.removeChild(scriptElm);
 
       // remove from our list of active requests
-      var index = activeJsonRequests.indexOf(url);
-      if (index > -1) {
-        activeJsonRequests.splice(index, 1);
-      }
+      delete activeJsonRequests[url];
     }
 
     // add script completed listener to this script element
