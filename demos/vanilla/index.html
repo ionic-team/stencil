@@ -8,9 +8,15 @@
 </head>
 <body>
 
-  <p>
-    <ion-toggle checked></ion-toggle>Toggle
-  </p>
+
+  <ion-card>
+    <ion-card-header>
+      Card Header
+    </ion-card-header>
+    <ion-card-content>
+      <ion-toggle checked></ion-toggle>Toggle
+    </ion-card-content>
+  </ion-card>
   <script>
     document.querySelector('ion-toggle').addEventListener('ionChange', function(ev) {
       console.log('ion-toggle, ionChange, checked:', ev.detail.checked);
