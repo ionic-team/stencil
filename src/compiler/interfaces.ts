@@ -96,6 +96,7 @@ export interface Component {
   modes: {[modeName: string]: ComponentMode};
   props: Props;
   watches: Watches;
+  componentClass: string;
   componentUrl: string;
   componentImporter?: string;
 }

@@ -18,6 +18,8 @@ export function getComponentModeLoader(component: Component, mode: ComponentMode
 
   const styles = (mode.styles ? mode.styles.replace(/'/g, '"') : '');
 
+  const componentClass = component.componentClass;
+
   const componentFn = component.componentImporter.trim();
 
   const watches = JSON.stringify(component.watches);
@@ -28,11 +30,12 @@ export function getComponentModeLoader(component: Component, mode: ComponentMode
   }
 
   const t = [
-    `/** ${label}: tag [0] **/\n'${tag}'`,
-    `/** ${label}: modeName [1] **/\n'${modeName}'`,
-    `/** ${label}: styles [2] **/\n'${styles}'`,
-    `/** ${label}: importComponent function [3] **/\n${componentFn}`,
-    `/** ${label}: watches [4] **/\n${watches}`
+    `/** ${label}: tagName [0] **/\n'${tag}'`,
+    `/** ${label}: component class name [1] **/\n'${componentClass}'`,
+    `/** ${label}: watches [2] **/\n${watches}`,
+    `/** ${label}: modeName [3] **/\n'${modeName}'`,
+    `/** ${label}: styles [4] **/\n'${styles}'`,
+    `/** ${label}: importComponent function [5] **/\n${componentFn}`
   ];
 
   return `\n\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;

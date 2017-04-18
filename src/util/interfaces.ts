@@ -60,29 +60,34 @@ export interface LoadComponents {
 
 export interface ComponentModeData {
   /**
-   * tag (ion-badge)
+   * tag name (ion-badge)
    */
   [0]: string;
 
   /**
-   * modeName (ios,md,wp)
+   * component class name (Badge)
    */
   [1]: string;
 
   /**
-   * styles
-   */
-  [2]: string;
-
-  /**
-   * moduleFn
-   */
-  [3]: ComponentModeImporterFn;
-
-  /**
    * watches
    */
-  [4]: Watches;
+  [2]: Watches;
+
+  /**
+   * mode name (ios, md, wp)
+   */
+  [3]: string;
+
+  /**
+   * component mode styles
+   */
+  [4]: string;
+
+  /**
+   * import component function
+   */
+  [5]: ComponentModeImporterFn;
 }
 
 

@@ -1,4 +1,4 @@
-import { BuildContext, CompilerConfig, Manifest, Results } from './interfaces';
+import { BuildContext, Component, CompilerConfig, Manifest, Results } from './interfaces';
 import { getFileMeta, isTsSourceFile, logError, readFile, writeFile, writeFiles } from './util';
 import { transpile } from './transpile';
 
@@ -228,6 +228,8 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     bundles: []
   };
 
+  let components: Component[] = [];
+
   const destDir = config.compilerOptions.outDir;
 
   ctx.files.forEach(f => {
@@ -243,12 +245,14 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       });
     });
 
-    manifest.components[f.cmpMeta.tag] = {
+    components.push({
+      tag: f.cmpMeta.tag,
       componentUrl: componentUrl,
+      componentClass: f.cmpClassName,
       modes: modes,
       props: f.cmpMeta.props || {},
       watches: f.cmpMeta.watches || {}
-    };
+    });
   });
 
   if (config.bundles) {
@@ -261,6 +265,26 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       }
     });
   }
+
+  components = components.sort((a, b) => {
+    if (a.tag < b.tag) {
+      return -1;
+    }
+    if (a.tag > b.tag) {
+      return 1;
+    }
+    return 0;
+  });
+
+  components.forEach(cmp => {
+    manifest.components[cmp.tag] = {
+      componentUrl: cmp.componentUrl,
+      componentClass: cmp.componentClass,
+      modes: cmp.modes,
+      props: cmp.props,
+      watches: cmp.watches
+    };
+  });
 
   const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json')
   const json = JSON.stringify(manifest, null, 2);

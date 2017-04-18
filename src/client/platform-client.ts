@@ -8,9 +8,10 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
-  const jsonReqs: string[] = [];
+  const activeJsonRequests: string[] = [];
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+  const moduleImports = {};
 
 
   const injectedIonic: Ionic = {
@@ -26,23 +27,42 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   ionic.loadComponents = function loadComponents(bundleId) {
     var args = arguments;
     for (var i = 1; i < args.length; i++) {
+      // first arg is the bundleId
+      // each arg after that is a component/mode
       var cmpModeData: ComponentModeData = args[i];
+
+      // tag name (ion-badge)
       var tag = cmpModeData[0];
-      var mode = cmpModeData[1];
 
+      // component class name (Badge)
+      var cmpClassName = cmpModeData[1];
+
+      // get component meta data by tag name
       var cmpMeta = registry[tag];
-      var cmpMode = cmpMeta.modes[mode];
 
-      cmpMode.styles = cmpModeData[2];
+      // component instance property watches
+      cmpMeta.watches = cmpModeData[2];
 
-      var importModuleFn = cmpModeData[3];
+      // mode name (ios, md, wp)
+      var modeName = cmpModeData[3];
 
-      var moduleImports = {};
+      // get component mode
+      var cmpMode = cmpMeta.modes[modeName];
+      if (cmpMode) {
+        // component mode styles
+        cmpMode.styles = cmpModeData[4];
+      }
+
+      // import component function
+      var importModuleFn = cmpModeData[5];
+
+      // inject ionic globals
       importModuleFn(moduleImports, h, injectedIonic);
-      cmpMeta.componentModule = moduleImports[Object.keys(moduleImports)[0]];
 
-      cmpMeta.watches = cmpModeData[4];
+      // get the component class which was added to moduleImports
+      cmpMeta.componentModule = moduleImports[cmpClassName];
 
+      // fire off all the callbacks waiting on this bundle to load
       var callbacks = bundleCallbacks[bundleId];
       if (callbacks) {
         for (var j = 0, l = callbacks.length; j < l; j++) {
@@ -51,6 +71,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
         delete bundleCallbacks[bundleId];
       }
 
+      // remember that we've already loaded this bundle
       loadedBundles[bundleId] = true;
     }
   };
@@ -58,32 +79,41 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
 
   function loadComponent(bundleId: string, cb: Function): void {
     if (loadedBundles[bundleId]) {
+      // we've already loaded this bundle
       cb();
 
     } else {
+      // never seen this bundle before, let's start the request
+      // and add it to the bundle callbacks to fire when it's loaded
       if (bundleCallbacks[bundleId]) {
         bundleCallbacks[bundleId].push(cb);
       } else {
         bundleCallbacks[bundleId] = [cb];
       }
 
+      // create the url we'll be requesting
       const url = `${staticDir}ionic.${bundleId}.js`;
 
-      if (jsonReqs.indexOf(url) === -1) {
+      if (activeJsonRequests.indexOf(url) === -1) {
+        // not already actively requesting this url
+        // let's kick off the request
         jsonp(url);
       }
     }
   }
 
 
-  function jsonp(jsonpUrl: string) {
-    jsonReqs.push(jsonpUrl);
+  function jsonp(url: string) {
+    // remember that we're actively requesting this url
+    activeJsonRequests.push(url);
 
+    // create a sript element to add to the document.head
     var scriptElm = createElement('script');
     scriptElm.charset = 'utf-8';
     scriptElm.async = true;
-    scriptElm.src = jsonpUrl;
+    scriptElm.src = url;
 
+    // create a fallback timeout if something goes wrong
     var tmrId = setTimeout(onScriptComplete, 120000);
 
     function onScriptComplete() {
@@ -91,14 +121,18 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       scriptElm.onerror = scriptElm.onload = null;
       scriptElm.parentNode.removeChild(scriptElm);
 
-      var index = jsonReqs.indexOf(jsonpUrl);
+      // remove from our list of active requests
+      var index = activeJsonRequests.indexOf(url);
       if (index > -1) {
-        jsonReqs.splice(index, 1);
+        activeJsonRequests.splice(index, 1);
       }
     }
 
+    // add script completed listener to this script element
     scriptElm.onerror = scriptElm.onload = onScriptComplete;
 
+    // inject a script tag in the head
+    // kick off the actual request
     doc.head.appendChild(scriptElm);
   }
 
