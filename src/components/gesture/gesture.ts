@@ -1,6 +1,5 @@
-import { Component, Ionic, Prop } from '../../index';
-import { BaseGesture } from './base-gesture';
-import { PanGesture } from './pan-gesture';
+import { Component, Prop } from '../../index';
+import { noop } from '../../util/helpers';
 
 
 @Component({
@@ -8,32 +7,27 @@ import { PanGesture } from './pan-gesture';
   shadow: false
 })
 export class Gesture {
-  gesture: BaseGesture = null;
   $el: HTMLElement;
 
-  @Prop() type: string = 'pan';
   @Prop() direction: string = 'x';
   @Prop() threshold: number = 20;
+
+  @Prop() onStart: Function = noop;
+  @Prop() onMove: Function = noop;
+  @Prop() onEnd: Function = noop;
 
 
   ionViewDidLoad() {
     console.log('ion-gesture');
 
-    switch (this.type) {
-      case 'pan':
-        this.gesture = new PanGesture();
-        break;
+    this.onStart(true);
 
-      default:
-        console.log(`invalid gesture type: ${this.type}`);
-        break;
-    }
-
-    this.gesture && this.gesture.init(Ionic, this.$el);
+    this.onMove()
   }
 
+
   ionViewWillUnload() {
-    this.gesture && this.gesture.destroy();
+
   }
 
 }

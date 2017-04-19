@@ -1,5 +1,5 @@
 import { BooleanInputComponent } from '../../util/interfaces';
-import { Component, h, Ionic, Listen, Prop, Watch } from '../../index';
+import { Component, h, Ionic, Prop, Watch } from '../../index';
 
 
 @Component({
@@ -28,19 +28,16 @@ export class Toggle implements BooleanInputComponent {
   }
 
 
-  @Listen('ionGestureStart', { passive: true })
   onStart(ev: UIEvent) {
     console.log('onStart', ev);
   }
 
 
-  @Listen('ionGestureStart', { passive: true })
   onMove(ev: UIEvent) {
     console.log('onMove', ev);
   }
 
 
-  @Listen('ionGestureStart', { passive: true })
   onEnd(ev: UIEvent) {
     console.log('onEnd', ev);
   }
@@ -77,6 +74,9 @@ export class Toggle implements BooleanInputComponent {
           'toggle-activated': this.activated,
           'toggle-checked': this.checked,
           'toggle-disabled': this.disabled,
+        },
+        props: {
+          'onStart': this.onStart.bind(this)
         }
       }),
         [
@@ -93,7 +93,7 @@ export class Toggle implements BooleanInputComponent {
               'type': 'button'
             },
             on: {
-              click: this.toggle.bind(this)
+              'click': this.toggle.bind(this)
             }
           })
         ]
