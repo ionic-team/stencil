@@ -1,6 +1,27 @@
+import { GestureController } from './gesture-controller';
 
-export abstract class BaseGesture {
 
-  abstract init(): void;
+export class BaseGesture {
+  el: HTMLElement;
+  gestureCtrl: GestureController;
+
+
+  init(Ionic: any, el: any) {
+    console.debug('BaseGesture init');
+
+    if (!Ionic.gestureCtrl) {
+      Ionic.gestureCtrl = new GestureController();
+    }
+
+    this.gestureCtrl = Ionic.gestureCtrl;
+
+    this.el = el;
+  }
+
+  destroy() {
+    console.debug('BaseGesture destroy');
+
+    this.gestureCtrl = this.el = null;
+  }
 
 }

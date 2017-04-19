@@ -1,10 +1,12 @@
 import { BaseGesture } from './base-gesture';
 
 
-export class PanGesture implements BaseGesture {
+export class PanGesture extends BaseGesture {
 
-  init() {
-
+  init(Ionic: any, el: any) {
+    super.init(Ionic, el);
   }
+
+
 
 }

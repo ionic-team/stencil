@@ -1,4 +1,4 @@
-import { Component, Prop } from '../../index';
+import { Component, Ionic, Prop } from '../../index';
 import { BaseGesture } from './base-gesture';
 import { PanGesture } from './pan-gesture';
 
@@ -9,7 +9,7 @@ import { PanGesture } from './pan-gesture';
 })
 export class Gesture {
   gesture: BaseGesture = null;
-
+  $el: HTMLElement;
 
   @Prop() type: string = 'pan';
   @Prop() direction: string = 'x';
@@ -30,8 +30,12 @@ export class Gesture {
     }
 
     if (this.gesture) {
-      this.gesture.init();
+      this.gesture.init(Ionic, this.$el);
     }
+  }
+
+  ionViewWillUnload() {
+    this.gesture && this.gesture.destroy();
   }
 
 }
