@@ -44,12 +44,12 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 
 
 function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Component, propType: string, propName: string): any {
-  if (instance[propName] !== undefined) {
-    return instance[propName];
-  }
-
   if (elm[propName] !== undefined) {
     return elm[propName];
+  }
+
+  if (instance[propName] !== undefined) {
+    return instance[propName];
   }
 
   if (propType === 'boolean') {
