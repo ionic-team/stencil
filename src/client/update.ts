@@ -1,4 +1,4 @@
-import { ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
+import { ComponentMeta, Component, ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
 import { generateVNode } from './host';
 import { initProps } from './proxy';
 import { RendererApi } from '../util/interfaces';
@@ -57,5 +57,16 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
 
   if (initalLoad && instance) {
     instance.ionViewDidLoad && instance.ionViewDidLoad();
+
+    attachListeners(plt, cmpMeta, instance);
   }
+}
+
+
+function attachListeners(plt: PlatformApi, cmpMeta: ComponentMeta, instance: Component) {
+  Object.keys(cmpMeta.listeners).forEach(methodName => {
+    const listenerOpts = cmpMeta.listeners[methodName];
+    const cb = instance[methodName].bind(instance);
+    plt.$addEventListener(instance, listenerOpts.type, cb, listenerOpts);
+  });
 }

@@ -258,6 +258,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       componentClass: f.cmpClassName,
       modes: modes,
       props: f.cmpMeta.props,
+      listeners: f.cmpMeta.listeners,
       watches: f.cmpMeta.watches,
       shadow: f.cmpMeta.shadow
     });
@@ -290,6 +291,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       componentClass: cmp.componentClass,
       modes: cmp.modes,
       props: cmp.props,
+      listeners: cmp.listeners,
       watches: cmp.watches,
       shadow: cmp.shadow
     };

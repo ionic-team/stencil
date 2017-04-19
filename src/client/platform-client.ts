@@ -1,4 +1,7 @@
-import { Component, ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry, DomControllerApi, Ionic, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
+import { Component, ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry,
+  DomControllerApi, EventListenerCallback, EventListenerOptions, Ionic, IonicGlobal,
+  NextTickApi, PlatformApi } from '../util/interfaces';
+import { emitEvent, listenEvent } from '../util/dom';
 import { h } from './renderer/h';
 import { themeVNodeData } from './host';
 import { toDashCase } from '../util/helpers';
@@ -12,14 +15,15 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const moduleImports = {};
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+  let hasEventOptionsSupport = false;
+
+  checkEventOptionsSupport();
 
 
   const injectedIonic: Ionic = {
     theme: themeVNodeData,
-    emit: function emitEvent(instance: any, eventName: string, data?: any) {
-      const ev = doc.createEvent('CustomEvent');
-      ev.initCustomEvent(eventName, true, true, data);
-      (<Component>instance).$el.dispatchEvent(ev);
+    emit: function(instance: any, eventName: string, data?: any) {
+      emitEvent(doc, (<Component>instance).$el, eventName, data);
     }
   };
 
@@ -35,23 +39,26 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       // get component meta data by tag name
       var cmpMeta = registry[cmpModeData[0]];
 
+      // component listeners
+      cmpMeta.listeners = cmpModeData[2];
+
       // component instance property watches
-      cmpMeta.watches = cmpModeData[2];
+      cmpMeta.watches = cmpModeData[3];
 
       // shadow
-      cmpMeta.shadow = cmpModeData[3];
+      cmpMeta.shadow = cmpModeData[4];
 
       // mode name (ios, md, wp)
       // get component mode
-      var cmpMode = cmpMeta.modes[cmpModeData[4]];
+      var cmpMode = cmpMeta.modes[cmpModeData[5]];
       if (cmpMode) {
         // component mode styles
-        cmpMode.styles = cmpModeData[5];
+        cmpMode.styles = cmpModeData[6];
       }
 
       // import component function
       // inject ionic globals
-      cmpModeData[6](moduleImports, h, injectedIonic);
+      cmpModeData[7](moduleImports, h, injectedIonic);
 
       // get the component class which was added to moduleImports
       // component class name (Badge)
@@ -262,6 +269,23 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     css[linkUrl] = true;
   }
 
+  function checkEventOptionsSupport() {
+    try {
+      var opts = Object.defineProperty({}, 'passive', {
+        get: function() {
+          hasEventOptionsSupport = true;
+        }
+      });
+      win.addEventListener('test', null, opts);
+    } catch (e) {}
+  }
+
+  function addEventListener(instance: Component, eventName: string, cb: EventListenerCallback, opts?: EventListenerOptions) {
+    const unlistenFn = listenEvent(instance.$el, eventName, cb, opts, hasEventOptionsSupport);
+    instance.$destroys.push(unlistenFn);
+    return unlistenFn;
+  }
+
 
   return {
     registerComponent: registerComponent,
@@ -288,7 +312,8 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachShadow: attachShadow
+    $attachShadow: attachShadow,
+    $addEventListener: addEventListener
   }
 }
 

@@ -29,9 +29,7 @@ export class Gesture {
         break;
     }
 
-    if (this.gesture) {
-      this.gesture.init(Ionic, this.$el);
-    }
+    this.gesture && this.gesture.init(Ionic, this.$el);
   }
 
   ionViewWillUnload() {

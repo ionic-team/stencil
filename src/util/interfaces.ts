@@ -2,7 +2,27 @@
 export interface Ionic {
   emit: EventEmit;
   theme: IonicTheme;
-  platform?: PlatformApi;
+}
+
+
+export interface EventEmit {
+  (instance: any, eventName: string, data?: any): void;
+}
+
+
+export interface EventListen {
+  (instance: any, eventName: string, cb: EventListenerCallback, opts?: EventListenerOptions): Function;
+}
+
+
+export interface EventListenerCallback {
+  (ev?: any): void;
+}
+
+
+export interface EventListenerOptions {
+  capture?: boolean;
+  passive?: boolean;
 }
 
 
@@ -70,29 +90,34 @@ export interface ComponentModeData {
   [1]: string;
 
   /**
+   * listeners
+   */
+  [2]: Listeners;
+
+  /**
    * watches
    */
-  [2]: Watches;
+  [3]: Watches;
 
   /**
    * shadow
    */
-  [3]: boolean;
+  [4]: boolean;
 
   /**
    * mode name (ios, md, wp)
    */
-  [4]: string;
+  [5]: string;
 
   /**
    * component mode styles
    */
-  [5]: string;
+  [6]: string;
 
   /**
    * import component function
    */
-  [6]: ComponentModeImporterFn;
+  [7]: ComponentModeImporterFn;
 }
 
 
@@ -132,6 +157,23 @@ export interface Props {
 }
 
 
+export interface ListenDecorator {
+  (eventName: string, opts?: EventListenerOptions): any;
+}
+
+
+export interface Listeners {
+  [methodName: string]: ListenOpts;
+}
+
+
+export interface ListenOpts {
+  type: string;
+  capture?: boolean;
+  passive?: boolean;
+}
+
+
 export interface WatchDecorator {
   (propName: string): any;
 }
@@ -162,6 +204,7 @@ export interface ConfigApi {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
+  listeners?: Listeners;
   watches?: Watches;
   shadow?: boolean;
   obsAttrs?: string[];
@@ -276,11 +319,6 @@ export interface VNodeData {
 }
 
 
-export interface EventEmit {
-  (instance: any, eventName: string, data?: any): void;
-}
-
-
 export interface PlatformApi {
   registerComponent: (tag: string, data: any[]) => ComponentMeta;
   getComponentMeta: (tag: string) => ComponentMeta;
@@ -307,6 +345,7 @@ export interface PlatformApi {
   $getTextContent: (node: Node) => string | null;
   $getAttribute: (elm: Element, attrName: string) => string;
   $attachShadow: (elm: Element, cmpMode: ComponentMode, cmpModeId: string) => ShadowRoot;
+  $addEventListener: (instance: Component, eventName: string, cb: EventListenerCallback, opts?: EventListenerOptions) => Function;
 }
 
 

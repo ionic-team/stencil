@@ -63,7 +63,7 @@ export interface Registry {
 
 
 export interface Bundle {
-  id?: string;
+  id?: number;
   components?: {
     component: Component;
     mode: ComponentMode
@@ -95,6 +95,7 @@ export interface Component {
   tag?: string;
   modes: {[modeName: string]: ComponentMode};
   props: Props;
+  listeners: Listeners;
   watches: Watches;
   shadow: boolean;
   componentClass: string;
@@ -113,6 +114,7 @@ export interface ComponentMode {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
+  listeners?: Listeners;
   watches?: Watches;
   shadow?: boolean;
   observedAttrs?: string[];
@@ -129,6 +131,18 @@ export interface PropOptions {
 
 export interface Props {
   [propName: string]: PropOptions;
+}
+
+
+export interface Listeners {
+  [methodName: string]: ListenOpts;
+}
+
+
+export interface ListenOpts {
+  type: string;
+  capture?: boolean;
+  passive?: boolean;
 }
 
 

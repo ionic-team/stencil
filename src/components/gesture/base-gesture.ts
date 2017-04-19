@@ -1,3 +1,4 @@
+import { emitEvent } from '../../util/dom';
 import { GestureController } from './gesture-controller';
 
 
@@ -18,10 +19,16 @@ export class BaseGesture {
     this.el = el;
   }
 
+
   destroy() {
     console.debug('BaseGesture destroy');
 
     this.gestureCtrl = this.el = null;
+  }
+
+
+  emit(eventName: string, data?: any) {
+    emitEvent(document, this.el, eventName, data);
   }
 
 }

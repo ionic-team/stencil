@@ -1,6 +1,6 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { getBundleId, getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
+import { getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
 import { readFile, writeFile } from './util';
 
 
@@ -182,7 +182,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       return getComponentModeLoader(bundleComponent.component, bundleComponent.mode);
     }).join(',\n');
 
-    bundle.id = getBundleId(bundleIndex);
+    bundle.id = bundleIndex;
     bundle.fileName = getBundleFileName(bundle.id);
     bundle.filePath = config.packages.path.join(config.destDir, bundle.fileName);
 
@@ -194,7 +194,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
       ctx.registry[tag] = ctx.registry[tag] || [];
 
-      const modes: {[modeName: string]: string} = ctx.registry[tag][0] || {};
+      const modes: {[modeName: string]: number} = ctx.registry[tag][0] || {};
 
       modes[modeName] = bundle.id;
 

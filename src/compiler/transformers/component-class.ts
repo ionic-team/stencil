@@ -14,6 +14,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
         getPropertyDecoratorMeta(fileMeta.cmpMeta, classNode);
+        getListenDecoratorMeta(fileMeta.cmpMeta, classNode);
         getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
 
         return removeClassDecorator(classNode);
@@ -68,6 +69,51 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
           if (type) {
             cmpMeta.props[propName].type = type;
           }
+
+          memberNode.decorators = undefined;
+        }
+      });
+    }
+
+
+    function getListenDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
+      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
+
+      cmpMeta.listeners = {};
+
+      propMembers.forEach(memberNode => {
+        let isListen = false;
+        let eventName: string = null;
+        let methodName: string = null;
+
+        memberNode.forEachChild(n => {
+
+          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Listen') {
+            isListen = true;
+
+            n.getChildAt(1).forEachChild(n => {
+
+              if (n.kind === ts.SyntaxKind.StringLiteral) {
+                eventName = n.getText();
+                eventName = eventName.replace(/\'/g, '');
+                eventName = eventName.replace(/\"/g, '');
+                eventName = eventName.replace(/\`/g, '');
+              }
+
+            });
+
+          } else if (isListen) {
+            if (n.kind === ts.SyntaxKind.Identifier) {
+              methodName = n.getText();
+            }
+          }
+
+        });
+
+        if (isListen && eventName && methodName) {
+          cmpMeta.listeners[methodName] = {
+            type: eventName
+          };
 
           memberNode.decorators = undefined;
         }

@@ -29,25 +29,28 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
       // get component meta data by tag name
       var cmpMeta = registry[tag];
 
+      // component listeners
+      cmpMeta.listeners = cmpModeData[2];
+
       // component instance property watches
-      cmpMeta.watches = cmpModeData[2];
+      cmpMeta.watches = cmpModeData[3];
 
       // shadow
-      cmpMeta.shadow = cmpModeData[3];
+      cmpMeta.shadow = cmpModeData[4];
 
       // mode name (ios, md, wp)
-      var modeName = cmpModeData[4];
+      var modeName = cmpModeData[5];
 
       // get component mode
       var cmpMode = cmpMeta.modes[modeName];
       if (cmpMode) {
         // component mode styles
-        cmpMode.styles = cmpModeData[5];
+        cmpMode.styles = cmpModeData[6];
       }
 
       // import component function
       // inject ionic globals
-      cmpModeData[6](moduleImports, h, injectedIonic);
+      cmpModeData[7](moduleImports, h, injectedIonic);
 
       // get the component class which was added to moduleImports
       cmpMeta.componentModule = moduleImports[cmpClassName];
@@ -206,7 +209,7 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   }
 
 
-  return injectedIonic.platform = {
+  return {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
     loadComponent: loadComponent,
@@ -231,7 +234,8 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachShadow: attachShadow
+    $attachShadow: attachShadow,
+    $addEventListener: function(){ return function(){} }
   }
 }
 
