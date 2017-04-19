@@ -36,7 +36,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     function getPropertyDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-      cmpMeta.props = cmpMeta.props || {};
+      cmpMeta.props = {};
 
       propMembers.forEach(memberNode => {
         let isProp = false;
@@ -78,7 +78,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-      cmpMeta.watches = cmpMeta.watches || {};
+      cmpMeta.watches = {};
 
       propMembers.forEach(memberNode => {
         let isWatch = false;
@@ -203,10 +203,12 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
+  cmpMeta.modes = {};
+
   updateTag(cmpMeta);
-  updateModes(cmpMeta);
   updateStyles(cmpMeta);
-  updateProperties(cmpMeta);
+  updateModes(cmpMeta);
+  updateShadow(cmpMeta);
 
   return cmpMeta;
 }
@@ -234,11 +236,6 @@ function updateTag(cmpMeta: ComponentMeta) {
 }
 
 
-function updateModes(cmpMeta: ComponentMeta) {
-  cmpMeta.modes = cmpMeta.modes = {};
-}
-
-
 function updateStyles(cmpMeta: ComponentMeta) {
   const styleModes: {[modeName: string]: string} = (<any>cmpMeta).styleUrls;
 
@@ -252,39 +249,33 @@ function updateStyles(cmpMeta: ComponentMeta) {
 }
 
 
-function updateProperties(cmpMeta: ComponentMeta) {
-  if (!cmpMeta.props) return;
-
-  const validPropTypes = ['string', 'boolean', 'number', 'Array', 'Object'];
-
-  Object.keys(cmpMeta.props).forEach(propName => {
-
-    if (propName.indexOf('-') > -1) {
-      throw `"${propName}" property name cannot have a dash (-) in it`;
-    }
-
-    if (!isNaN(<any>propName.charAt(0))) {
-      throw `"${propName}" property name cannot start with a number`;
-    }
-
-    const prop = cmpMeta.props[propName];
-    if (prop.type) {
-      if (typeof prop.type === 'string') {
-        prop.type = (<any>prop.type).trim().toLowerCase();
-      }
-
-      if (<any>prop.type === 'array') {
-        prop.type = 'Array';
-      }
-
-      if (<any>prop.type === 'object') {
-        prop.type = 'Object';
-      }
-
-      if (validPropTypes.indexOf(prop.type) === -1) {
-        throw `"${propName}" invalid for property type: ${prop.type}`;
-      }
-    }
-
-  });
+function updateModes(cmpMeta: ComponentMeta) {
+  if (Object.keys(cmpMeta.modes).length === 0) {
+    cmpMeta.modes['default'] = {};
+  }
 }
+
+
+function updateShadow(cmpMeta: ComponentMeta) {
+  // default to use shadow dom
+  // or figure out a best guess depending on the value they put in
+  if (typeof cmpMeta.shadow === 'string') {
+    const shadowStr = (<string>cmpMeta.shadow).toLowerCase().trim();
+
+    if (shadowStr === 'false' || shadowStr === 'null' || shadowStr === '') {
+      cmpMeta.shadow = false;
+    } else {
+      cmpMeta.shadow = true;
+    }
+
+  } else if (cmpMeta.shadow === undefined) {
+    cmpMeta.shadow = true;
+
+  } else if (cmpMeta.shadow === null) {
+    cmpMeta.shadow = false;
+
+  } else {
+    cmpMeta.shadow = !!cmpMeta.shadow;
+  }
+}
+

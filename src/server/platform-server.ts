@@ -42,11 +42,12 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
         cmpMode.styles = cmpModeData[4];
       }
 
-      // import component function
-      var importModuleFn = cmpModeData[5];
+      // shadow
+      cmpMeta.shadow = cmpModeData[5];
 
+      // import component function
       // inject ionic globals
-      importModuleFn(moduleImports, h, injectedIonic);
+      cmpModeData[6](moduleImports, h, injectedIonic);
 
       // get the component class which was added to moduleImports
       cmpMeta.componentModule = moduleImports[cmpClassName];

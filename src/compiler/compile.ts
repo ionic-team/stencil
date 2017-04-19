@@ -154,12 +154,15 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
     Object.keys(f.cmpMeta.modes).forEach(modeName => {
+      const mode = f.cmpMeta.modes[modeName];
 
-      f.cmpMeta.modes[modeName].styleUrls.forEach(styleUrl => {
-        const srcAbsolutePath = config.packages.path.join(f.srcDir, styleUrl);
+      if (mode && mode.styleUrls) {
+        mode.styleUrls.forEach(styleUrl => {
+          const srcAbsolutePath = config.packages.path.join(f.srcDir, styleUrl);
 
-        promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, srcAbsolutePath));
-      });
+          promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, srcAbsolutePath));
+        });
+      }
 
     });
   });
@@ -240,9 +243,13 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     const componentDir = config.packages.path.dirname(componentUrl);
 
     Object.keys(modes).forEach(modeName => {
-      modes[modeName].styleUrls = modes[modeName].styleUrls.map(styleUrl => {
-        return config.packages.path.join(componentDir, styleUrl);
-      });
+      const mode = modes[modeName];
+
+      if (mode && mode.styleUrls) {
+        mode.styleUrls = mode.styleUrls.map(styleUrl => {
+          return config.packages.path.join(componentDir, styleUrl);
+        });
+      }
     });
 
     components.push({
@@ -250,8 +257,9 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       componentUrl: componentUrl,
       componentClass: f.cmpClassName,
       modes: modes,
-      props: f.cmpMeta.props || {},
-      watches: f.cmpMeta.watches || {}
+      props: f.cmpMeta.props,
+      watches: f.cmpMeta.watches,
+      shadow: f.cmpMeta.shadow
     });
   });
 
@@ -282,7 +290,8 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       componentClass: cmp.componentClass,
       modes: cmp.modes,
       props: cmp.props,
-      watches: cmp.watches
+      watches: cmp.watches,
+      shadow: cmp.shadow
     };
   });
 

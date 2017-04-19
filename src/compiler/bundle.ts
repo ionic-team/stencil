@@ -101,9 +101,8 @@ function bundleComponentMode(config: BundlerConfig, component: Component, mode: 
   if (config.debug) {
     console.log(`bundle, bundleComponentMode: ${component.tag}, ${mode.name}`);
   }
-  return bundleComponentModeStyles(config, mode).then(() => {
-    return getComponentModeLoader(component, mode);
-  });
+
+  return bundleComponentModeStyles(config, mode);
 }
 
 
@@ -146,7 +145,6 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
 function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[]) {
   const allModeNames = getAllModeNames(ctx);
 
-  // build bundles for components that have modes (normal ui component)
   allModeNames.forEach(modeName => {
 
     const bundle: Bundle = {
@@ -172,28 +170,6 @@ function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[])
     }
   });
 
-  // build bundles for components that do not have modes (gestures)
-  bundleComponentTags.forEach(bundleComponentTag => {
-    const bundle: Bundle = {
-      components: []
-    };
-
-    const component = ctx.components[bundleComponentTag];
-    if (!component) return;
-
-    if (Object.keys(component.modes).length > 1) return;
-
-    bundle.components.push({
-      component: component,
-      mode: {
-        name: ''
-      }
-    });
-
-    if (bundle.components.length) {
-      ctx.bundles.push(bundle);
-    }
-  });
 }
 
 

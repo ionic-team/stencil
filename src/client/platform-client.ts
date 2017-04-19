@@ -46,9 +46,12 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
         cmpMode.styles = cmpModeData[4];
       }
 
+      // shadow
+      cmpMeta.shadow = cmpModeData[5];
+
       // import component function
       // inject ionic globals
-      cmpModeData[5](moduleImports, h, injectedIonic);
+      cmpModeData[6](moduleImports, h, injectedIonic);
 
       // get the component class which was added to moduleImports
       // component class name (Badge)
@@ -127,25 +130,27 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
 
 
   function attachShadow(elm: Element, cmpMode: ComponentMode, cmpModeId: string) {
-    const shadowElm = elm.attachShadow({ mode: 'open' });
+    const shadowRoot = elm.attachShadow({ mode: 'open' });
 
-    if (hasNativeShadowDom) {
-      if (!cmpMode.styleElm) {
-        cmpMode.styleElm = createElement('style');
-        cmpMode.styleElm.innerHTML = cmpMode.styles;
+    if (cmpMode.styles) {
+      if (hasNativeShadowDom) {
+        if (!cmpMode.styleElm) {
+          cmpMode.styleElm = createElement('style');
+          cmpMode.styleElm.innerHTML = cmpMode.styles;
+        }
+
+        shadowRoot.appendChild(cmpMode.styleElm.cloneNode(true));
+
+      } else if (!hasCss(cmpModeId)) {
+        const headStyleEle = createElement('style');
+        headStyleEle.dataset['cmpModeId'] = cmpModeId;
+        headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+        appendChild(doc.head, headStyleEle);
+        setCss(cmpModeId);
       }
-
-      shadowElm.appendChild(cmpMode.styleElm.cloneNode(true));
-
-    } else if (!hasCss(cmpModeId)) {
-      const headStyleEle = createElement('style');
-      headStyleEle.dataset['cmpModeId'] = cmpModeId;
-      headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
-      appendChild(doc.head, headStyleEle);
-      setCss(cmpModeId);
     }
 
-    return shadowElm;
+    return shadowRoot;
   }
 
   function registerComponent(tag: string, data: any[]) {

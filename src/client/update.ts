@@ -40,18 +40,20 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     initalLoad = true;
   }
 
-  if (!instance.$root) {
-    const cmpMode = cmpMeta.modes[instance.mode];
-    const cmpModeId = `${tag}.${instance.mode}`;
-    instance.$root = plt.$attachShadow(elm, cmpMode, cmpModeId);
+  if (cmpMeta.shadow) {
+    if (!instance.$root) {
+      const cmpMode = cmpMeta.modes[instance.mode];
+      const cmpModeId = `${tag}.${instance.mode}`;
+      instance.$root = plt.$attachShadow(elm, cmpMode, cmpModeId);
+    }
+
+    const vnode = generateVNode(instance.$root, instance, cmpMeta.hostCss);
+
+    // if we already have a vnode then use it
+    // otherwise, elm is the initial patch and
+    // we need it to pass it the actual host element
+    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode);
   }
-
-  const vnode = generateVNode(instance.$root, instance, cmpMeta.hostCss);
-
-  // if we already have a vnode then use it
-  // otherwise, elm is the initial patch and
-  // we need it to pass it the actual host element
-  instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode);
 
   if (initalLoad && instance) {
     instance.ionViewDidLoad && instance.ionViewDidLoad();

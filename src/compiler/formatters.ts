@@ -14,15 +14,17 @@ export function getBundleContent(bundleId: string, componentModeLoader: string) 
 export function getComponentModeLoader(component: Component, mode: ComponentMode) {
   const tag = component.tag.trim().toLowerCase();
 
-  const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
-
-  const styles = (mode.styles ? mode.styles.replace(/'/g, '"') : '');
-
   const componentClass = component.componentClass;
 
-  const componentFn = component.componentImporter.trim();
-
   const watches = JSON.stringify(component.watches);
+
+  const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
+
+  const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : 'null');
+
+  const shadow = component.shadow;
+
+  const componentFn = component.componentImporter.trim();
 
   let label = tag;
   if (mode.name) {
@@ -30,12 +32,13 @@ export function getComponentModeLoader(component: Component, mode: ComponentMode
   }
 
   const t = [
-    `/** ${label}: tagName [0] **/\n'${tag}'`,
-    `/** ${label}: component class name [1] **/\n'${componentClass}'`,
-    `/** ${label}: watches [2] **/\n${watches}`,
-    `/** ${label}: modeName [3] **/\n'${modeName}'`,
-    `/** ${label}: styles [4] **/\n'${styles}'`,
-    `/** ${label}: importComponent function [5] **/\n${componentFn}`
+    `/** ${label}: [0] tagName **/\n'${tag}'`,
+    `/** ${label}: [1] component class name **/\n'${componentClass}'`,
+    `/** ${label}: [2] watches **/\n${watches}`,
+    `/** ${label}: [3] modeName **/\n'${modeName}'`,
+    `/** ${label}: [4] styles **/\n${styles}`,
+    `/** ${label}: [5] shadow **/\n${shadow}`,
+    `/** ${label}: [6] importComponent function **/\n${componentFn}`
   ];
 
   return `\n\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;

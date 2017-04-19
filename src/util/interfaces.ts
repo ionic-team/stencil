@@ -85,9 +85,14 @@ export interface ComponentModeData {
   [4]: string;
 
   /**
+   * shadow
+   */
+  [5]: boolean;
+
+  /**
    * import component function
    */
-  [5]: ComponentModeImporterFn;
+  [6]: ComponentModeImporterFn;
 }
 
 
@@ -104,6 +109,7 @@ export interface ComponentDecorator {
 export interface ComponentOptions {
   tag: string;
   styleUrls?: string[] | ModeStyles;
+  shadow?: boolean;
 }
 
 export interface ModeStyles {
@@ -157,6 +163,7 @@ export interface ComponentMeta {
   tag?: string;
   props?: Props;
   watches?: Watches;
+  shadow?: boolean;
   obsAttrs?: string[];
   hostCss?: string;
   componentModule?: any;
