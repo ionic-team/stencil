@@ -14,6 +14,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
         getPropertyDecoratorMeta(fileMeta.cmpMeta, classNode);
+        getListenDecoratorMeta(fileMeta.cmpMeta, classNode);
         getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
 
         return removeClassDecorator(classNode);
@@ -36,12 +37,12 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     function getPropertyDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-      cmpMeta.props = cmpMeta.props || {};
+      cmpMeta.props = {};
 
       propMembers.forEach(memberNode => {
         let isProp = false;
         let propName: string = null;
-        let type = null;
+        let type: string = null;
 
         memberNode.forEachChild(n => {
 
@@ -49,14 +50,22 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
             isProp = true;
 
           } else if (isProp) {
-            if (n.kind === ts.SyntaxKind.Identifier) {
+            if (n.kind === ts.SyntaxKind.Identifier && !propName) {
               propName = n.getText();
 
-            } else if (n.kind === ts.SyntaxKind.BooleanKeyword) {
-              type = 'boolean';
+            } else if (!type) {
+              if (n.kind === ts.SyntaxKind.BooleanKeyword) {
+                type = 'boolean';
 
-            } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
-              type = 'number';
+              } else if (n.kind === ts.SyntaxKind.StringKeyword) {
+                type = 'string';
+
+              } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
+                type = 'number';
+
+              } else if (n.kind === ts.SyntaxKind.TypeReference) {
+                type = 'Type';
+              }
             }
           }
 
@@ -75,10 +84,55 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     }
 
 
+    function getListenDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
+      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
+
+      cmpMeta.listeners = {};
+
+      propMembers.forEach(memberNode => {
+        let isListen = false;
+        let eventName: string = null;
+        let methodName: string = null;
+
+        memberNode.forEachChild(n => {
+
+          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Listen') {
+            isListen = true;
+
+            n.getChildAt(1).forEachChild(n => {
+
+              if (n.kind === ts.SyntaxKind.StringLiteral && !eventName) {
+                eventName = n.getText();
+                eventName = eventName.replace(/\'/g, '');
+                eventName = eventName.replace(/\"/g, '');
+                eventName = eventName.replace(/\`/g, '');
+              }
+
+            });
+
+          } else if (isListen) {
+            if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
+              methodName = n.getText();
+            }
+          }
+
+        });
+
+        if (isListen && eventName && methodName) {
+          cmpMeta.listeners[methodName] = {
+            type: eventName
+          };
+
+          memberNode.decorators = undefined;
+        }
+      });
+    }
+
+
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-      cmpMeta.watches = cmpMeta.watches || {};
+      cmpMeta.watches = {};
 
       propMembers.forEach(memberNode => {
         let isWatch = false;
@@ -92,7 +146,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
             n.getChildAt(1).forEachChild(n => {
 
-              if (n.kind === ts.SyntaxKind.StringLiteral) {
+              if (n.kind === ts.SyntaxKind.StringLiteral && !propName) {
                 propName = n.getText();
                 propName = propName.replace(/\'/g, '');
                 propName = propName.replace(/\"/g, '');
@@ -102,7 +156,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
             });
 
           } else if (isWatch) {
-            if (n.kind === ts.SyntaxKind.Identifier) {
+            if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
               methodName = n.getText();
             }
           }
@@ -203,10 +257,12 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
+  cmpMeta.modes = {};
+
   updateTag(cmpMeta);
-  updateModes(cmpMeta);
   updateStyles(cmpMeta);
-  updateProperties(cmpMeta);
+  updateModes(cmpMeta);
+  updateShadow(cmpMeta);
 
   return cmpMeta;
 }
@@ -234,11 +290,6 @@ function updateTag(cmpMeta: ComponentMeta) {
 }
 
 
-function updateModes(cmpMeta: ComponentMeta) {
-  cmpMeta.modes = cmpMeta.modes = {};
-}
-
-
 function updateStyles(cmpMeta: ComponentMeta) {
   const styleModes: {[modeName: string]: string} = (<any>cmpMeta).styleUrls;
 
@@ -252,39 +303,33 @@ function updateStyles(cmpMeta: ComponentMeta) {
 }
 
 
-function updateProperties(cmpMeta: ComponentMeta) {
-  if (!cmpMeta.props) return;
-
-  const validPropTypes = ['string', 'boolean', 'number', 'Array', 'Object'];
-
-  Object.keys(cmpMeta.props).forEach(propName => {
-
-    if (propName.indexOf('-') > -1) {
-      throw `"${propName}" property name cannot have a dash (-) in it`;
-    }
-
-    if (!isNaN(<any>propName.charAt(0))) {
-      throw `"${propName}" property name cannot start with a number`;
-    }
-
-    const prop = cmpMeta.props[propName];
-    if (prop.type) {
-      if (typeof prop.type === 'string') {
-        prop.type = (<any>prop.type).trim().toLowerCase();
-      }
-
-      if (<any>prop.type === 'array') {
-        prop.type = 'Array';
-      }
-
-      if (<any>prop.type === 'object') {
-        prop.type = 'Object';
-      }
-
-      if (validPropTypes.indexOf(prop.type) === -1) {
-        throw `"${propName}" invalid for property type: ${prop.type}`;
-      }
-    }
-
-  });
+function updateModes(cmpMeta: ComponentMeta) {
+  if (Object.keys(cmpMeta.modes).length === 0) {
+    cmpMeta.modes['default'] = {};
+  }
 }
+
+
+function updateShadow(cmpMeta: ComponentMeta) {
+  // default to use shadow dom
+  // or figure out a best guess depending on the value they put in
+  if (typeof cmpMeta.shadow === 'string') {
+    const shadowStr = (<string>cmpMeta.shadow).toLowerCase().trim();
+
+    if (shadowStr === 'false' || shadowStr === 'null' || shadowStr === '') {
+      cmpMeta.shadow = false;
+    } else {
+      cmpMeta.shadow = true;
+    }
+
+  } else if (cmpMeta.shadow === undefined) {
+    cmpMeta.shadow = true;
+
+  } else if (cmpMeta.shadow === null) {
+    cmpMeta.shadow = false;
+
+  } else {
+    cmpMeta.shadow = !!cmpMeta.shadow;
+  }
+}
+

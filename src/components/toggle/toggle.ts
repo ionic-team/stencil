@@ -28,6 +28,21 @@ export class Toggle implements BooleanInputComponent {
   }
 
 
+  onStart(ev: UIEvent) {
+    console.log('onStart', ev);
+  }
+
+
+  onMove(ev: UIEvent) {
+    console.log('onMove', ev);
+  }
+
+
+  onEnd(ev: UIEvent) {
+    console.log('onEnd', ev);
+  }
+
+
   toggle(ev: UIEvent) {
     this.checked = !this.checked;
     ev.preventDefault();
@@ -54,11 +69,14 @@ export class Toggle implements BooleanInputComponent {
 
   render() {
     return h(this,
-      h('div', Ionic.theme(this, 'toggle', {
+      h('ion-gesture', Ionic.theme(this, 'toggle', {
         class: {
           'toggle-activated': this.activated,
           'toggle-checked': this.checked,
           'toggle-disabled': this.disabled,
+        },
+        props: {
+          'onStart': this.onStart.bind(this)
         }
       }),
         [
@@ -75,7 +93,7 @@ export class Toggle implements BooleanInputComponent {
               'type': 'button'
             },
             on: {
-              click: this.toggle.bind(this)
+              'click': this.toggle.bind(this)
             }
           })
         ]

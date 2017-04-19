@@ -9,7 +9,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
   Object.keys(props).forEach(propName => {
     const watcher: Function = (watches[propName]) ? instance[watches[propName].fn].bind(instance) : null;
 
-    propValues[propName] = getInitialValue(config, elm, props[propName].type, propName);
+    propValues[propName] = getInitialValue(config, elm, instance, props[propName].type, propName);
 
     function getPropValue() {
       return propValues[propName];
@@ -43,9 +43,13 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 }
 
 
-function getInitialValue(config: ConfigApi, elm: HTMLElement, propType: string, propName: string): any {
+function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Component, propType: string, propName: string): any {
   if (elm[propName] !== undefined) {
     return elm[propName];
+  }
+
+  if (instance[propName] !== undefined) {
+    return instance[propName];
   }
 
   if (propType === 'boolean') {

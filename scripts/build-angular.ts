@@ -60,9 +60,7 @@ function compileComponents() {
     exclude: ['node_modules', 'test'],
     debug: true,
     bundles: [
-      ['ion-badge'],
-      ['ion-toggle'],
-      ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title']
+      ['ion-badge']
     ],
     packages: {
       fs: fs,

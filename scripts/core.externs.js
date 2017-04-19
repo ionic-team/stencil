@@ -6,7 +6,13 @@
  * https://developers.google.com/closure/compiler/docs/api-tutorial3
  */
 
+// Injected Ionic
 function Ionic(){};
+function emit(){};
+function listen(){};
+function theme(){};
+
+// Global Ionic
 function loadComponents(){};
 function components(){};
 function configCtrl(){};
@@ -26,12 +32,15 @@ function props(){};
 function mode(){};
 function color(){};
 function obsAttrs(){};
-function theme(){};
 function $el(){};
 
+
+// Ionic Lifecycle methods
 function ionViewDidLoad(){};
 function ionViewWillUnload(){};
 
+
+// Web Standards
 function connectedCallback(){};
 function attributeChangedCallback(){};
 function disconnectedCallback(){};
@@ -39,6 +48,10 @@ function observedAttributes(){};
 function customElements(){};
 function define(){};
 function attachShadow(){};
+function capture(){};
+function passive(){};
 
+
+// Polyfills
 function ShadyDOM(){};
 function inUse(){};

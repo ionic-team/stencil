@@ -2,11 +2,15 @@ import { BundlerConfig, ComponentMode } from './interfaces';
 
 
 export function bundleComponentModeStyles(config: BundlerConfig, mode: ComponentMode) {
+  if (!mode || !mode.styleUrls) {
+    return Promise.resolve();
+  }
+
   return Promise.all(mode.styleUrls.map(styleUrl => {
     return bundleComponentModeStyle(config, styleUrl);
 
   })).then(results => {
-    return mode.styles = results.join('');
+    mode.styles = results.join('');
   });
 }
 
