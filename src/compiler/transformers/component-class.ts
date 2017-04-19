@@ -42,7 +42,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
       propMembers.forEach(memberNode => {
         let isProp = false;
         let propName: string = null;
-        let type = null;
+        let type: string = null;
 
         memberNode.forEachChild(n => {
 
@@ -50,14 +50,22 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
             isProp = true;
 
           } else if (isProp) {
-            if (n.kind === ts.SyntaxKind.Identifier) {
+            if (n.kind === ts.SyntaxKind.Identifier && !propName) {
               propName = n.getText();
 
-            } else if (n.kind === ts.SyntaxKind.BooleanKeyword) {
-              type = 'boolean';
+            } else if (!type) {
+              if (n.kind === ts.SyntaxKind.BooleanKeyword) {
+                type = 'boolean';
 
-            } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
-              type = 'number';
+              } else if (n.kind === ts.SyntaxKind.StringKeyword) {
+                type = 'string';
+
+              } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
+                type = 'number';
+
+              } else if (n.kind === ts.SyntaxKind.TypeReference) {
+                type = 'Type';
+              }
             }
           }
 
@@ -93,7 +101,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
             n.getChildAt(1).forEachChild(n => {
 
-              if (n.kind === ts.SyntaxKind.StringLiteral) {
+              if (n.kind === ts.SyntaxKind.StringLiteral && !eventName) {
                 eventName = n.getText();
                 eventName = eventName.replace(/\'/g, '');
                 eventName = eventName.replace(/\"/g, '');
@@ -103,7 +111,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
             });
 
           } else if (isListen) {
-            if (n.kind === ts.SyntaxKind.Identifier) {
+            if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
               methodName = n.getText();
             }
           }
@@ -138,7 +146,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
             n.getChildAt(1).forEachChild(n => {
 
-              if (n.kind === ts.SyntaxKind.StringLiteral) {
+              if (n.kind === ts.SyntaxKind.StringLiteral && !propName) {
                 propName = n.getText();
                 propName = propName.replace(/\'/g, '');
                 propName = propName.replace(/\"/g, '');
@@ -148,7 +156,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
             });
 
           } else if (isWatch) {
-            if (n.kind === ts.SyntaxKind.Identifier) {
+            if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
               methodName = n.getText();
             }
           }

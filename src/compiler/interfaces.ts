@@ -125,7 +125,7 @@ export interface ComponentMeta {
 
 
 export interface PropOptions {
-  type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
+  type?: string;
 }
 
 
