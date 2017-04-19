@@ -32,18 +32,18 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
       // component instance property watches
       cmpMeta.watches = cmpModeData[2];
 
+      // shadow
+      cmpMeta.shadow = cmpModeData[3];
+
       // mode name (ios, md, wp)
-      var modeName = cmpModeData[3];
+      var modeName = cmpModeData[4];
 
       // get component mode
       var cmpMode = cmpMeta.modes[modeName];
       if (cmpMode) {
         // component mode styles
-        cmpMode.styles = cmpModeData[4];
+        cmpMode.styles = cmpModeData[5];
       }
-
-      // shadow
-      cmpMeta.shadow = cmpModeData[5];
 
       // import component function
       // inject ionic globals

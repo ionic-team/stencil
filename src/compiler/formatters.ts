@@ -18,11 +18,11 @@ export function getComponentModeLoader(component: Component, mode: ComponentMode
 
   const watches = JSON.stringify(component.watches);
 
+  const shadow = component.shadow;
+
   const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
 
   const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : 'null');
-
-  const shadow = component.shadow;
 
   const componentFn = component.componentImporter.trim();
 
@@ -35,9 +35,9 @@ export function getComponentModeLoader(component: Component, mode: ComponentMode
     `/** ${label}: [0] tagName **/\n'${tag}'`,
     `/** ${label}: [1] component class name **/\n'${componentClass}'`,
     `/** ${label}: [2] watches **/\n${watches}`,
-    `/** ${label}: [3] modeName **/\n'${modeName}'`,
-    `/** ${label}: [4] styles **/\n${styles}`,
-    `/** ${label}: [5] shadow **/\n${shadow}`,
+    `/** ${label}: [3] shadow **/\n${shadow}`,
+    `/** ${label}: [4] modeName **/\n'${modeName}'`,
+    `/** ${label}: [5] styles **/\n${styles}`,
     `/** ${label}: [6] importComponent function **/\n${componentFn}`
   ];
 

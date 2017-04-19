@@ -38,16 +38,16 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       // component instance property watches
       cmpMeta.watches = cmpModeData[2];
 
+      // shadow
+      cmpMeta.shadow = cmpModeData[3];
+
       // mode name (ios, md, wp)
       // get component mode
-      var cmpMode = cmpMeta.modes[cmpModeData[3]];
+      var cmpMode = cmpMeta.modes[cmpModeData[4]];
       if (cmpMode) {
         // component mode styles
-        cmpMode.styles = cmpModeData[4];
+        cmpMode.styles = cmpModeData[5];
       }
-
-      // shadow
-      cmpMeta.shadow = cmpModeData[5];
 
       // import component function
       // inject ionic globals

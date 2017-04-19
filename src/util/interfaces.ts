@@ -75,19 +75,19 @@ export interface ComponentModeData {
   [2]: Watches;
 
   /**
-   * mode name (ios, md, wp)
+   * shadow
    */
-  [3]: string;
+  [3]: boolean;
 
   /**
-   * component mode styles
+   * mode name (ios, md, wp)
    */
   [4]: string;
 
   /**
-   * shadow
+   * component mode styles
    */
-  [5]: boolean;
+  [5]: string;
 
   /**
    * import component function
