@@ -89,7 +89,8 @@ export class Toggle implements BooleanInputComponent {
           'gesturePriority': 30,
           'type': 'pan',
           'direction': 'x',
-          'threshold': 15
+          'threshold': 15,
+          'listenOn': 'parent'
         }
       }),
         [

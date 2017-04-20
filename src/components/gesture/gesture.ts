@@ -1,7 +1,6 @@
 import { Component, Listen, Ionic, Prop } from '../../index';
 import { GestureController, GestureDelegate } from './gesture-controller';
 import { GestureCallback, GestureDetail } from '../../util/interfaces';
-import { noop } from '../../util/helpers';
 import { pointerCoordX, pointerCoordY } from '../../util/dom'
 import { Recognizer, PanRecognizer } from './recognizers';
 
@@ -16,21 +15,22 @@ export class Gesture {
   private lastTouch = 0;
   private recognizer: Recognizer;
 
-  @Prop() type: string = 'pan';
+  @Prop() direction: string = 'x';
   @Prop() gestureName: string = '';
   @Prop() gesturePriority: number = 0;
-  @Prop() direction: string = 'x';
+  @Prop() listenOn: string = 'child';
   @Prop() maxAngle: number = 40;
   @Prop() threshold: number = 20;
+  @Prop() type: string = 'pan';
 
-  @Prop() canStart: GestureCallback = noop;
-  @Prop() onStart: GestureCallback = noop;
-  @Prop() onMove: GestureCallback = noop;
-  @Prop() onEnd: GestureCallback = noop;
-  @Prop() notCaptured: GestureCallback = noop;
+  @Prop() canStart: GestureCallback;
+  @Prop() onStart: GestureCallback;
+  @Prop() onMove: GestureCallback;
+  @Prop() onEnd: GestureCallback;
+  @Prop() notCaptured: GestureCallback;
 
 
-  constructor() {
+  ionViewDidLoad() {
     Ionic.controllers.gesture = (Ionic.controllers.gesture || new GestureController());
 
     this.gesture = (<GestureController>Ionic.controllers.gesture).createGesture(this.gestureName, this.gesturePriority, false);
@@ -38,12 +38,17 @@ export class Gesture {
     if (this.type === 'pan') {
       this.recognizer = new PanRecognizer(this.direction, this.threshold, this.maxAngle);
     }
+
+    this.detail.type = this.type;
+
+    Ionic.listener.enable(this, 'touchstart', true, this.listenOn);
+    Ionic.listener.enable(this, 'mousedown', true, this.listenOn);
   }
 
 
   // DOWN *************************
 
-  @Listen('touchstart', { passive: true })
+  @Listen('touchstart', { passive: true, enabled: false })
   onTouchStart(ev: TouchEvent) {
     this.lastTouch = this.detail.timeStamp = now(ev);
 
@@ -54,7 +59,7 @@ export class Gesture {
   }
 
 
-  @Listen('mousedown', { passive: true })
+  @Listen('mousedown', { passive: true, enabled: false })
   onMouseDown(ev: MouseEvent) {
     const timeStamp = now(ev);
 
@@ -69,7 +74,7 @@ export class Gesture {
 
 
   private pointerDown(ev: UIEvent): boolean {
-    if (!this.recognizer || !this.gesture || this.detail.started) {
+    if (!this.recognizer || !this.gesture || this.detail.hasStarted) {
       return false;
     }
 
@@ -89,8 +94,8 @@ export class Gesture {
       return false;
     }
 
-    this.detail.started = true;
-    this.detail.captured = false;
+    this.detail.hasStarted = true;
+    this.detail.hasCaptured = false;
 
     this.recognizer.start(this.detail.startX, this.detail.startY);
 
@@ -112,7 +117,7 @@ export class Gesture {
   onMoveMove(ev: TouchEvent) {
     const timeStamp = now(ev);
 
-    if (this.lastTouch + MOUSE_WAIT < timeStamp) {
+    if (this.lastTouch === 0 || (this.lastTouch + MOUSE_WAIT < timeStamp)) {
       this.detail.timeStamp = timeStamp;
       this.pointerMove(ev);
     }
@@ -124,9 +129,13 @@ export class Gesture {
     detail.currentY = pointerCoordY(ev);
     detail.event = ev;
 
-    if (detail.captured) {
+    if (detail.hasCaptured) {
       // this.debouncer.write(() => {
-        this.onMove(detail);
+        if (this.onMove) {
+          this.onMove(detail);
+        } else {
+          Ionic.emit(this, 'ionGestureMove', this.detail);
+        }
       // });
 
     } else if (this.recognizer.detect(detail.currentX, detail.currentY)) {
@@ -145,16 +154,23 @@ export class Gesture {
 
     this.detail.event = ev;
 
-    this.onStart(this.detail);
-    this.detail.captured = true;
+    if (this.onStart) {
+      this.onStart(this.detail);
+    } else {
+      Ionic.emit(this, 'ionGestureStart', this.detail);
+    }
+
+    this.detail.hasCaptured = true;
 
     return true;
   }
 
   private abortGesture() {
-    this.detail.started = false;
-    this.detail.captured = false;
+    this.detail.hasStarted = false;
+    this.detail.hasCaptured = false;
+
     this.gesture.release();
+
     this.enable(false)
     this.notCaptured(this.detail);
   }
@@ -175,29 +191,39 @@ export class Gesture {
   onMouseUp(ev: TouchEvent) {
     const timeStamp = now(ev);
 
-    if (this.lastTouch + MOUSE_WAIT < timeStamp) {
+    if (this.lastTouch === 0 || (this.lastTouch + MOUSE_WAIT < timeStamp)) {
       this.detail.timeStamp = timeStamp;
       this.pointerUp(ev);
       this.enableMouse(false);
     }
   }
 
+
   private pointerUp(ev: UIEvent) {
+    const detail = this.detail;
     // this.debouncer.cancel();
 
     this.gesture && this.gesture.release();
 
-    this.detail.event = ev;
+    detail.event = ev;
 
-    if (this.detail.captured) {
-      this.onEnd(this.detail);
+    if (detail.hasCaptured) {
+      if (this.onEnd) {
+        this.onEnd(detail);
+      } else {
+        Ionic.emit(this, 'ionGestureEnd', detail);
+      }
 
     } else {
-      this.notCaptured(this.detail);
+      if (this.notCaptured) {
+        this.notCaptured(detail);
+      } else {
+        Ionic.emit(this, 'ionGestureNotCaptured', detail);
+      }
     }
 
-    this.detail.captured = false;
-    this.detail.started = false;
+    detail.hasCaptured = false;
+    detail.hasStarted = false;
   }
 
 
@@ -223,7 +249,7 @@ export class Gesture {
 
   ionViewWillUnload() {
     this.gesture && this.gesture.destroy();
-    this.gesture = this.recognizer = this.detail = null;
+    this.gesture = this.recognizer = this.detail = this.detail.event = null;
   }
 
 }

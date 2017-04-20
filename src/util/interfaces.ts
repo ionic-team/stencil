@@ -17,7 +17,7 @@ export interface EventEmit {
 
 
 export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean): void;
+  (instance: any, eventName: string, enabled: boolean, listenOn?: string): void;
 }
 
 
@@ -27,9 +27,10 @@ export interface EventListenerCallback {
 
 
 export interface GestureDetail {
+  type?: string;
   event?: UIEvent;
-  captured?: boolean;
-  started?: boolean;
+  hasCaptured?: boolean;
+  hasStarted?: boolean;
   startX?: number;
   startY?: number;
   currentX?: number;

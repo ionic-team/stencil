@@ -19,7 +19,7 @@ export function attachListeners(listenerMetaOpts: ComponentMetaListeners, instan
 }
 
 
-export function enableListener(instance: Component, eventName: string, shouldEnable: boolean) {
+export function enableListener(instance: Component, eventName: string, shouldEnable: boolean, listenOn?: string) {
   if (instance && instance.$meta) {
     const listenerMetaOpts = instance.$meta.listeners;
 
@@ -34,7 +34,8 @@ export function enableListener(instance: Component, eventName: string, shouldEna
         if (listenerOpts.eventName === eventName) {
 
           if (shouldEnable && !deregisterFns[eventName]) {
-            deregisterFns[eventName] = addEventListener(instance.$el, eventName, instance[methodName].bind(instance), listenerOpts);
+            var listenOnEventName = listenOn ? `${listenOn}:${eventName}` : eventName;
+            deregisterFns[eventName] = addEventListener(instance.$el, listenOnEventName, instance[methodName].bind(instance), listenerOpts);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();
@@ -49,7 +50,7 @@ export function enableListener(instance: Component, eventName: string, shouldEna
 }
 
 
-export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts: ListenOpts) {
+export function addEventListener(elm: any, eventName: string, cb: {(ev?: any): void}, opts: ListenOpts) {
   if (elm) {
     if (supportsOpts === null) {
       supportsOpts = checkEventOptsSupport(elm);
@@ -63,16 +64,34 @@ export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName
     var splt = eventName.split(':');
     if (splt.length > 1) {
       // document:mousemove
+      // parent:touchend
       // body:keyup.enter
       eventName = splt[1];
 
       switch (splt[0]) {
+        case 'parent':
+          if (elm.parentElement ) {
+            // normal element with a parent element
+            elm = elm.parentElement;
+
+          } else if (elm.parentNode && elm.parentNode.host) {
+            // shadow dom's document fragment
+            elm = elm.parentNode.host;
+          }
+          break;
+
+        case 'child':
+          elm = (<any>elm).firstElementChild;
+          break;
+
         case 'document':
           elm = (<HTMLElement>elm).ownerDocument;
           break;
+
         case 'body':
           elm = (<HTMLElement>elm).ownerDocument.body;
           break;
+
         case 'window':
           elm = (<HTMLElement>elm).ownerDocument.defaultView
           break;
