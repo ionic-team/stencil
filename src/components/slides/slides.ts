@@ -1,13 +1,4 @@
-import { Config } from '../../config/config';
-import { enableKeyboardControl } from './swiper/swiper-keyboard';
-import { isTrueProperty } from '../../util/util';
-import { initEvents } from './swiper/swiper-events';
-import { initZoom } from './swiper/swiper-zoom';
-import { SlideContainer, SlideElement, SlideTouchEvents, SlideTouches, SlideZoom } from './swiper/swiper-interfaces';
-import { slideTo, slideNext, slidePrev, update, initSwiper, destroySwiper, startAutoplay, stopAutoplay } from './swiper/swiper';
-import { SwiperEffect, SWIPER_EFFECTS } from './swiper/swiper-effects';
-
-
+import Swiper from 'swiper';
 import { Component, h, Ionic, Prop, Watch } from '../../index';
 
 /**
@@ -134,7 +125,6 @@ import { Component, h, Ionic, Prop, Watch } from '../../index';
  * Licensed under MIT
  */
 
-export type PaginationType =  'bullets' | 'fraction' | 'progress';
 
 @Component({
   tag: 'ion-slides',
@@ -145,6 +135,9 @@ export type PaginationType =  'bullets' | 'fraction' | 'progress';
   }
 })
 export class Slides {
+  swiper: Swiper;
+  $el: HTMLElement;
+
   paginationBulletRender: (index?: number, cssClass?: string) => void = null;
 
   /**
@@ -152,7 +145,7 @@ export class Slides {
    * Possible values are: `slide`, `fade`, `cube`, `coverflow` or `flip`.
    * Default: `slide`.
    */
-  @Prop() effect: SwiperEffect = 'slide';
+  @Prop() effect: string = 'slide';
 
   /**
    * @input {number} Delay between transitions (in milliseconds). If this
@@ -168,11 +161,6 @@ export class Slides {
    * Default: `null`.
    */
   @Prop() control: Slides | Slides[] = null;
-
-  /**
-   * @input {string} If dir attribute is equal to rtl, set interal _rtl to true;
-   */
-  @Prop() dir: string = 'rtl';
 
   /**
    * @input {string}  Swipe direction: 'horizontal' or 'vertical'.
@@ -205,7 +193,7 @@ export class Slides {
    * (Note that the pager will not show unless `pager` input
    * is set to true).
    */
-  @Prop() paginationType: PaginationType = 'bullets'; 
+  @Prop() paginationType: string = 'bullets'; 
   
   
   /**
@@ -236,14 +224,18 @@ export class Slides {
    */
   @Prop() zoom: boolean;
 
+  /**
+   * @input {boolean} If true, enables keyboard control
+   */
+  @Prop() keyboardControl: boolean;
+
 
   render() {
     return h(this, 
       h('div', {
           class: {
             'swiper-container': true
-          },
-          [this.dir]: this._rtl ? 'rtl' : null
+          }
         },
         [
           h('div', {
@@ -292,293 +284,6 @@ export class Slides {
   roundLengths = false;
 
   // Slides grid
-
-  /**
-   * @input {number} Distance between slides in px. Default: `0`.
-   */
-
-
-  /**
-   * @hidden
-   */
-  slidesPerColumn = 1;
-  /**
-   * @hidden
-   */
-  slidesPerColumnFill = 'column';
-  /**
-   * @hidden
-   */
-  slidesPerGroup = 1;
-  /**
-   * @hidden
-   */
-  centeredSlides = false;
-  /**
-   * @hidden
-   */
-  slidesOffsetBefore = 0;
-  /**
-   * @hidden
-   */
-  slidesOffsetAfter = 0;
-
-  /**
-   * @hidden
-   */
-  touchEventsTarget: 'container';
-
-  // autoplay
-  /**
-   * @hidden
-   */
-  autoplayDisableOnInteraction = true;
-  /**
-   * @hidden
-   */
-  autoplayStopOnLast = false;
-
-  // Free mode
-  /**
-   * @hidden
-   */
-  freeMode = false;
-  /**
-   * @hidden
-   */
-  freeModeMomentum = true;
-  /**
-   * @hidden
-   */
-  freeModeMomentumRatio = 1;
-  /**
-   * @hidden
-   */
-  freeModeMomentumBounce = true;
-  /**
-   * @hidden
-   */
-  freeModeMomentumBounceRatio = 1;
-  /**
-   * @hidden
-   */
-  freeModeMomentumVelocityRatio = 1;
-  /**
-   * @hidden
-   */
-  freeModeSticky = false;
-  /**
-   * @hidden
-   */
-  freeModeMinimumVelocity = 0.02;
-
-  // Autoheight
-  /**
-   * @hidden
-   */
-  autoHeight = false;
-
-  // Set wrapper width
-  /**
-   * @hidden
-   */
-  setWrapperSize = false;
-
-  // Zoom
-  /**
-   * @hidden
-   */
-  zoomMax = 3;
-  /**
-   * @hidden
-   */
-  zoomMin = 1;
-  /**
-   * @hidden
-   */
-  zoomToggle = true;
-
-  // Touches
-  /**
-   * @hidden
-   */
-  touchRatio = 1;
-  /**
-   * @hidden
-   */
-  touchAngle = 45;
-  /**
-   * @hidden
-   */
-  simulateTouch = true;
-  /**
-   * @hidden
-   */
-  shortSwipes = true;
-  /**
-   * @hidden
-   */
-  longSwipes = true;
-  /**
-   * @hidden
-   */
-  longSwipesRatio = 0.5;
-  /**
-   * @hidden
-   */
-  longSwipesMs = 300;
-  /**
-   * @hidden
-   */
-  followFinger = true;
-  /**
-   * @hidden
-   */
-  onlyExternal = false;
-  /**
-   * @hidden
-   */
-  threshold = 0;
-  /**
-   * @hidden
-   */
-  touchMoveStopPropagation = true;
-  /**
-   * @hidden
-   */
-  touchReleaseOnEdges = false;
-
-  // To support iOS's swipe-to-go-back gesture (when being used in-app, with UIWebView).
-  /**
-   * @hidden
-   */
-  iOSEdgeSwipeDetection = false;
-  /**
-   * @hidden
-   */
-  iOSEdgeSwipeThreshold = 20;
-
-  // Pagination
-  /**
-   * @hidden
-   */
-  paginationClickable = false;
-  /**
-   * @hidden
-   */
-  paginationHide = false;
-
-  // Resistance
-  /** @hidden */
-  resistance = true;
-  /** @hidden */
-  resistanceRatio = 0.85;
-
-  // Progress
-  /** @hidden */
-  watchSlidesProgress = false;
-  /** @hidden */
-  watchSlidesVisibility = false;
-
-  // Clicks
-  /**
-   * @hidden
-   */
-  preventClicks = true;
-  /**
-   * @hidden
-   */
-  preventClicksPropagation = true;
-  /**
-   * @hidden
-   */
-  slideToClickedSlide = false;
-
-  // loop
-  /**
-   * @hidden
-   */
-  loopAdditionalSlides = 0;
-  /**
-   * @hidden
-   */
-  loopedSlides: number = null;
-
-  // Swiping/no swiping
-  /**
-   * @hidden
-   */
-  swipeHandler: any = null;
-  /**
-   * @hidden
-   */
-  noSwiping = true;
-
-  // Callbacks
-  /** @hidden */
-  runCallbacksOnInit = true;
-
-  // Controller
-  controlBy = 'slide';
-  controlInverse = false;
-
-  // Keyboard
-  /**
-   * @hidden
-   */
-  keyboardControl = true;
-
-  // Effects
-  /**
-   * @hidden
-   */
-  coverflow = {
-    rotate: 50,
-    stretch: 0,
-    depth: 100,
-    modifier: 1,
-    slideShadows: true
-  };
-  /**
-   * @hidden
-   */
-  flip = {
-    slideShadows: true,
-    limitRotation: true
-  };
-  /**
-   * @hidden
-   */
-  cube = {
-    slideShadows: true,
-    shadow: true,
-    shadowOffset: 20,
-    shadowScale: 0.94
-  };
-  /**
-   * @hidden
-   */
-  fade = {
-    crossFade: false
-  };
-
-  // Accessibility
-  /**
-   * @hidden
-   */
-  prevSlideMessage = 'Previous slide';
-  /**
-   * @hidden
-   */
-  nextSlideMessage = 'Next slide';
-  /**
-   * @hidden
-   */
-  firstSlideMessage = 'This is the first slide';
-  /**
-   * @hidden
-   */
-  lastSlideMessage = 'This is the last slide';
 
   /**
    * @hidden
@@ -674,24 +379,15 @@ export class Slides {
    */
   private _init: boolean;
   private _tmr: number;
-  private _unregs: Function[] = [];
 
   /**
    * Properties that are exposed publically but no docs.
    * ------------------------------------
    */
   /** @hidden */
-  clickedIndex: number;
-  /** @hidden */
-  clickedSlide: SlideElement;
-  /** @hidden */
-  container: SlideContainer;
+  container: HTMLElement;
   /** @hidden */
   id: number;
-  /** @hidden */
-  progress: number;
-  /** @hidden */
-  realIndex: number;
   /** @hidden */
   renderedHeight: number;
   /** @hidden */
@@ -709,74 +405,6 @@ export class Slides {
    * and not exposed to the public
    * ------------------------------------
    */
-  /** @internal */
-  _activeIndex: number;
-  /** @internal */
-  _allowClick: boolean;
-  /** @internal */
-  _allowSwipeToNext = true;
-  /** @internal */
-  _allowSwipeToPrev = true;
-  /** @internal */
-  _animating: boolean;
-  /** @internal */
-  _autoplaying: boolean;
-  /** @internal */
-  _autoplayPaused: boolean;
-  /** @internal */
-  _autoplayTimeoutId: number;
-  /** @internal */
-  _bullets: HTMLElement[];
-  /** @internal */
-  _classNames: string[];
-  /** @internal */
-  _isBeginning: boolean;
-  /** @internal */
-  _isEnd: boolean;
-  /** @internal */
-  _keyboardUnReg: Function;
-  /** @internal */
-  _liveRegion: HTMLElement;
-  /** @internal */
-  _paginationContainer: HTMLElement;
-  /** @internal */
-  _previousIndex: number;
-  /** @internal */
-  _renderedSize: number;
-  /** @internal */
-  _rtl: boolean;
-  /** @internal */
-  _slides: SlideElement[];
-  /** @internal */
-  _snapGrid: any;
-  /** @internal */
-  _slidesGrid: any;
-  /** @internal */
-  _snapIndex: number;
-  /** @internal */
-  _slidesSizesGrid: any;
-  /** @internal */
-  _spline: any;
-  /** @internal */
-  _supportTouch: boolean;
-  /** @internal */
-  _supportGestures: boolean;
-  /** @internal */
-  _touches: SlideTouches;
-  /** @internal */
-  _touchEvents: SlideTouchEvents;
-  /** @internal */
-  _touchEventsDesktop: SlideTouchEvents;
-  /** @internal */
-  _translate: number;
-  /** @internal */
-  _virtualSize: any;
-  /** @internal */
-  _wrapper: HTMLElement;
-  /** @internal */
-  _zone: NgZone;
-  /** @internal */
-  _zoom: SlideZoom;
 
   /** @hidden */
   nextButton: HTMLElement;
@@ -786,10 +414,6 @@ export class Slides {
 
 
   constructor(
-    config: Config,
-    private _plt: Platform,
-    elementRef: ElementRef,
-    renderer: Renderer,
   ) {
     this.id = ++slidesId;
     this.slideId = 'slides-' + this.id;
@@ -798,25 +422,111 @@ export class Slides {
   private _initSlides() {
     if (!this._init) {
       console.debug(`ion-slides, init`);
-      var s = this;
-      var plt = s._plt;
 
-      s.container = this.getNativeElement().children[0];
-
-      // init swiper core
-      initSwiper(s, plt);
-
-      // init core event listeners
-      this._unregs.push(initEvents(s, plt));
-
-      if (this.zoom) {
-        // init zoom event listeners
-        this._unregs.push(initZoom(s, plt));
+      this.container = <HTMLElement>this.$el.firstChild;
+      var swiperOptions = {
+        height: this.height,
+        width: this.width,
+        virtualTranslate: this.virtualTranslate,
+        roundLengths: this.roundLengths,
+        originalEvent: this.originalEvent,
+        autoplay: this.autoplay,
+        direction: this.direction,
+        initialSlide: this.initialSlide,
+        loop: this.loop,
+        pager: this.pager,
+        paginationType: this.paginationType,
+        parallax: this.parallax,
+        slidesPerView: this.slidesPerView,
+        spaceBetween: this.spaceBetween,
+        speed: this.speed,
+        zoom: this.zoom,
+        slidesPerColumn: 1,
+        slidesPerColumnFill: 'column',
+        slidesPerGroup: 1,
+        centeredSlides: false,
+        slidesOffsetBefore: 0,
+        slidesOffsetAfter: 0,
+        touchEventsTarget: 'container',
+        autoplayDisableOnInteraction: true,
+        autoplayStopOnLast: false,
+        freeMode: false,
+        freeModeMomentum: true,
+        freeModeMomentumRatio: 1,
+        freeModeMomentumBounce: true,
+        freeModeMomentumBounceRatio: 1,
+        freeModeMomentumVelocityRatio: 1,
+        freeModeSticky: false,
+        freeModeMinimumVelocity: 0.02,
+        autoHeight: false,
+        setWrapperSize: false,
+        zoomMax: 3,
+        zoomMin: 1,
+        zoomToggle: true,
+        touchRatio: 1,
+        touchAngle: 45,
+        simulateTouch: true,
+        shortSwipes: true,
+        longSwipes: true,
+        longSwipesRatio: 0.5,
+        longSwipesMs: 300,
+        followFinger: true,
+        onlyExternal: false,
+        threshold: 0,
+        touchMoveStopPropagation: true,
+        touchReleaseOnEdges: false,
+        iOSEdgeSwipeDetection: false,
+        iOSEdgeSwipeThreshold: 20,
+        paginationClickable: false,
+        paginationHide: false,
+        resistance: true,
+        resistanceRatio: 0.85,
+        watchSlidesProgress: false,
+        watchSlidesVisibility: false,
+        preventClicks: true,
+        preventClicksPropagation: true,
+        slideToClickedSlide: false,
+        loopAdditionalSlides: 0,
+        loopedSlides: null,
+        swipeHandler: null,
+        noSwiping: true,
+        runCallbacksOnInit: true,
+        controlBy: 'slide',
+        controlInverse: false,
+        keyboardControl: true,
+        coverflow: {
+          rotate: 50,
+          stretch: 0,
+          depth: 100,
+          modifier: 1,
+          slideShadows: true
+        },
+        flip: {
+          slideShadows: true,
+          limitRotation: true
+        },
+        cube: {
+          slideShadows: true,
+          shadow: true,
+          shadowOffset: 20,
+          shadowScale: 0.94
+        },
+        fade: {
+          crossFade: false
+        },
+        prevSlideMessage: 'Previous slide',
+        nextSlideMessage: 'Next slide',
+        firstSlideMessage: 'This is the first slide',
+        lastSlideMessage: 'This is the last slide'
       }
+      
+      this.swiper = new Swiper(this.container, swiperOptions);
+      // init swiper core
+
 
       if (this.keyboardControl) {
         // init keyboard event listeners
-        s.enableKeyboardControl(true);
+        this.enableKeyboardControl(true);
       }
 
       this._init = true;
@@ -827,9 +537,7 @@ export class Slides {
    * @hidden
    */
   ionViewDidLoad() {
-    this._plt.timeout(() => {
-      this._initSlides();
-    }, 300);
+    this._initSlides();
   }
 
   /**
@@ -838,9 +546,9 @@ export class Slides {
    */
   update(debounce = 300) {
     if (this._init) {
-      this._plt.cancelTimeout(this._tmr);
-      this._tmr = this._plt.timeout(() => {
-        update(this, this._plt);
+      window.clearTimeout(this._tmr);
+      this._tmr = window.setTimeout(() => {
+        this.swiper.update();
 
         // Don't allow pager to show with > 10 slides
         if (this.length() > 10) {
@@ -864,7 +572,7 @@ export class Slides {
    * @param {boolean} [runCallbacks] Whether or not to emit the `ionSlideWillChange`/`ionSlideDidChange` events. Default true.
    */
   slideTo(index: number, speed?: number, runCallbacks?: boolean) {
-    slideTo(this, this._plt, index, speed, runCallbacks);
+    this.swiper.slideTo(index, speed, runCallbacks);
   }
 
   /**
@@ -874,7 +582,7 @@ export class Slides {
    * @param {boolean} [runCallbacks]  Whether or not to emit the `ionSlideWillChange`/`ionSlideDidChange` events. Default true.
    */
   slideNext(speed?: number, runCallbacks?: boolean) {
-    slideNext(this, this._plt, runCallbacks, speed, true);
+    this.swiper.slideNext(runCallbacks, speed);
   }
 
   /**
@@ -884,7 +592,7 @@ export class Slides {
    * @param {boolean} [runCallbacks]  Whether or not to emit the `ionSlideWillChange`/`ionSlideDidChange` events. Default true.
    */
   slidePrev(speed?: number, runCallbacks?: boolean) {
-    slidePrev(this, this._plt, runCallbacks, speed, true);
+    this.swiper.slidePrev(runCallbacks, speed);
   }
 
   /**
@@ -893,7 +601,7 @@ export class Slides {
    * @returns {number} The index number of the current slide.
    */
   getActiveIndex(): number {
-    return this._activeIndex;
+    return this.swiper.activeIndex;
   }
 
   /**
@@ -902,7 +610,7 @@ export class Slides {
    * @returns {number} The index number of the previous slide.
    */
   getPreviousIndex(): number {
-    return this._previousIndex;
+    return this.swiper.previousIndex;
   }
 
   /**
@@ -911,7 +619,7 @@ export class Slides {
    * @returns {number} The total number of slides.
    */
   length(): number {
-    return this._slides.length;
+    return this.swiper.slides.length;
   }
 
   /**
@@ -920,7 +628,7 @@ export class Slides {
    * @returns {boolean} If the slide is the last slide or not.
    */
   isEnd(): boolean {
-    return this._isEnd;
+    return this.isEnd();
   }
 
   /**
@@ -929,49 +637,61 @@ export class Slides {
    * @returns {boolean} If the slide is the first slide or not.
    */
   isBeginning(): boolean {
-    return this._isBeginning;
+    return this.isBeginning();
   }
 
   /**
    * Start auto play.
    */
   startAutoplay() {
-    startAutoplay(this, this._plt);
+    this.swiper.startAutoplay();
   }
 
   /**
    * Stop auto play.
    */
   stopAutoplay() {
-    stopAutoplay(this);
+    this.swiper.stopAutoplay();
   }
 
   /**
    * Lock or unlock the ability to slide to the next slides.
    */
   lockSwipeToNext(shouldLockSwipeToNext: boolean) {
-    this._allowSwipeToNext = !shouldLockSwipeToNext;
+    if (shouldLockSwipeToNext) {
+      return this.swiper.lockSwipeToNext();
+    }
+    this.swiper.unlockSwipeToNext();
   }
 
   /**
    * Lock or unlock the ability to slide to the previous slides.
    */
   lockSwipeToPrev(shouldLockSwipeToPrev: boolean) {
-    this._allowSwipeToPrev = !shouldLockSwipeToPrev;
+    if (shouldLockSwipeToPrev) {
+      return this.swiper.lockSwipeToPrev();
+    }
+    this.swiper.unlockSwipeToPrev();
   }
 
   /**
    * Lock or unlock the ability to slide to change slides.
    */
   lockSwipes(shouldLockSwipes: boolean) {
-    this._allowSwipeToNext = this._allowSwipeToPrev = !shouldLockSwipes;
+    if (shouldLockSwipes) {
+      return this.swiper.lockSwipes();
+    }
+    this.swiper.unlockSwipes();
   }
 
   /**
    * Enable or disable keyboard control.
    */
   enableKeyboardControl(shouldEnableKeyboard: boolean) {
-    enableKeyboardControl(this, this._plt, shouldEnableKeyboard);
+    if (shouldEnableKeyboard) {
+      return this.swiper.enableKeyboardControl();
+    }
+    this.swiper.disableKeyboardControl();
   }
 
   /**
@@ -980,13 +700,7 @@ export class Slides {
   ngOnDestroy() {
     this._init = false;
 
-    this._unregs.forEach(unReg => {
-      unReg();
-    });
-    this._unregs.length = 0;
-
-    destroySwiper(this);
-
+    this.swiper.destroy(true, true);
     this.enableKeyboardControl(false);
   }
 }
