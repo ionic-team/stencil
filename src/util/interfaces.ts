@@ -1,7 +1,13 @@
 
 export interface Ionic {
   emit: EventEmit;
+  listener: {
+    enable: EventListenerEnable;
+  }
   theme: IonicTheme;
+  controllers: {
+    gesture?: any;
+  }
 }
 
 
@@ -10,8 +16,8 @@ export interface EventEmit {
 }
 
 
-export interface EventListen {
-  (instance: any, eventName: string, cb: EventListenerCallback, opts?: EventListenerOptions): Function;
+export interface EventListenerEnable {
+  (instance: any, eventName: string, enabled: boolean): void;
 }
 
 
@@ -20,9 +26,20 @@ export interface EventListenerCallback {
 }
 
 
-export interface EventListenerOptions {
-  capture?: boolean;
-  passive?: boolean;
+export interface GestureDetail {
+  event?: UIEvent;
+  captured?: boolean;
+  started?: boolean;
+  startX?: number;
+  startY?: number;
+  currentX?: number;
+  currentY?: number;
+  timeStamp?: number;
+}
+
+
+export interface GestureCallback {
+  (detail?: GestureDetail): boolean|void;
 }
 
 
@@ -92,7 +109,7 @@ export interface ComponentModeData {
   /**
    * listeners
    */
-  [2]: Listeners;
+  [2]: ComponentMetaListeners;
 
   /**
    * watches
@@ -158,19 +175,20 @@ export interface Props {
 
 
 export interface ListenDecorator {
-  (eventName: string, opts?: EventListenerOptions): any;
+  (eventName: string, opts?: ListenOpts): any;
 }
 
 
-export interface Listeners {
+export interface ComponentMetaListeners {
   [methodName: string]: ListenOpts;
 }
 
 
 export interface ListenOpts {
-  type: string;
+  eventName?: string;
   capture?: boolean;
   passive?: boolean;
+  enabled?: boolean;
 }
 
 
@@ -204,7 +222,7 @@ export interface ConfigApi {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
-  listeners?: Listeners;
+  listeners?: ComponentMetaListeners;
   watches?: Watches;
   shadow?: boolean;
   obsAttrs?: string[];
@@ -232,10 +250,15 @@ export interface Component {
   color?: string;
 
   $el?: ProxyElement;
+  $meta?: ComponentMeta;
+  $listeners?: ComponentActiveListeners;
   $root?: HTMLElement | ShadowRoot;
   $vnode?: VNode;
-  $onDestroy?: {(cb: Function): void};
-  $destroys?: Function[];
+}
+
+
+export interface ComponentActiveListeners {
+  [eventName: string]: Function;
 }
 
 
@@ -345,7 +368,6 @@ export interface PlatformApi {
   $getTextContent: (node: Node) => string | null;
   $getAttribute: (elm: Element, attrName: string) => string;
   $attachShadow: (elm: Element, cmpMode: ComponentMode, cmpModeId: string) => ShadowRoot;
-  $addEventListener: (instance: Component, eventName: string, cb: EventListenerCallback, opts?: EventListenerOptions) => Function;
 }
 
 

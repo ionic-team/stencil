@@ -28,6 +28,11 @@ export class Toggle implements BooleanInputComponent {
   }
 
 
+  canStart(ev: UIEvent) {
+    console.log('canStart', ev);
+  }
+
+
   onStart(ev: UIEvent) {
     console.log('onStart', ev);
   }
@@ -76,7 +81,10 @@ export class Toggle implements BooleanInputComponent {
           'toggle-disabled': this.disabled,
         },
         props: {
-          'onStart': this.onStart.bind(this)
+          'canStart': this.canStart.bind(this),
+          'onStart': this.onStart.bind(this),
+          'onMove': this.onMove.bind(this),
+          'onEnd': this.onEnd.bind(this),
         }
       }),
         [

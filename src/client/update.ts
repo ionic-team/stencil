@@ -1,4 +1,5 @@
-import { ComponentMeta, Component, ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
+import { attachListeners } from './events';
+import { ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
 import { generateVNode } from './host';
 import { initProps } from './proxy';
 import { RendererApi } from '../util/interfaces';
@@ -30,11 +31,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   if (!instance) {
     instance = elm.$instance = new cmpMeta.componentModule();
     instance.$el = elm;
-
-    instance.$destroys = [];
-    instance.$onDestroy = function(cb: Function) {
-      instance.$destroys.push(cb);
-    };
+    instance.$meta = cmpMeta;
 
     initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.watches);
     initalLoad = true;
@@ -58,15 +55,6 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   if (initalLoad && instance) {
     instance.ionViewDidLoad && instance.ionViewDidLoad();
 
-    attachListeners(plt, cmpMeta, instance);
+    attachListeners(cmpMeta.listeners, instance);
   }
-}
-
-
-function attachListeners(plt: PlatformApi, cmpMeta: ComponentMeta, instance: Component) {
-  Object.keys(cmpMeta.listeners).forEach(methodName => {
-    const listenerOpts = cmpMeta.listeners[methodName];
-    const cb = instance[methodName].bind(instance);
-    plt.$addEventListener(instance, listenerOpts.type, cb, listenerOpts);
-  });
 }
