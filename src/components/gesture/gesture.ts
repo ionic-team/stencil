@@ -58,7 +58,7 @@ export class Gesture {
   onMouseDown(ev: MouseEvent) {
     const timeStamp = now(ev);
 
-    if (this.lastTouch + MOUSE_WAIT < timeStamp) {
+    if (this.lastTouch === 0 || (this.lastTouch + MOUSE_WAIT < timeStamp)) {
       this.detail.timeStamp = timeStamp;
       this.enableMouse(true);
       this.enableTouch(false);
@@ -222,8 +222,8 @@ export class Gesture {
 
 
   ionViewWillUnload() {
-     this.gesture && this.gesture.destroy();
-     this.gesture = this.recognizer = this.detail = null;
+    this.gesture && this.gesture.destroy();
+    this.gesture = this.recognizer = this.detail = null;
   }
 
 }
