@@ -29,8 +29,6 @@ export interface EventListenerCallback {
 export interface GestureDetail {
   type?: string;
   event?: UIEvent;
-  hasCaptured?: boolean;
-  hasStarted?: boolean;
   startX?: number;
   startY?: number;
   currentX?: number;

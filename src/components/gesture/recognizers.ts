@@ -1,12 +1,6 @@
 
-export abstract class Recognizer {
-  abstract start(x: number, y: number): void;
-  abstract detect(x: number, y: number): void;
-  abstract isGesture(): number;
-}
 
-
-export class PanRecognizer implements Recognizer {
+export class PanRecognizer {
   private startX: number;
   private startY: number;
 

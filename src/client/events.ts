@@ -177,7 +177,7 @@ function checkEventOptsSupport(elm: any) {
         hasEventOptionsSupport = true;
       }
     });
-    elm.addEventListener('opttest', null, opts);
+    elm.addEventListener('test', null, opts);
   } catch (e) {}
 
   return hasEventOptionsSupport;
