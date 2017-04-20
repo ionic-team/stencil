@@ -85,6 +85,11 @@ export class Toggle implements BooleanInputComponent {
           'onStart': this.onStart.bind(this),
           'onMove': this.onMove.bind(this),
           'onEnd': this.onEnd.bind(this),
+          'gestureName': 'toggle',
+          'gesturePriority': 30,
+          'type': 'pan',
+          'direction': 'x',
+          'threshold': 15
         }
       }),
         [

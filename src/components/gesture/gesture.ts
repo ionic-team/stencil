@@ -11,17 +11,17 @@ import { Recognizer, PanRecognizer } from './recognizers';
   shadow: false
 })
 export class Gesture {
-  private recognizer: Recognizer;
+  private detail: GestureDetail = {};
   private gesture: GestureDelegate;
   private lastTouch = 0;
-  private detail: GestureDetail = {};
+  private recognizer: Recognizer;
 
   @Prop() type: string = 'pan';
   @Prop() gestureName: string = '';
   @Prop() gesturePriority: number = 0;
   @Prop() direction: string = 'x';
   @Prop() maxAngle: number = 40;
-  @Prop() threshold: number = 15;
+  @Prop() threshold: number = 20;
 
   @Prop() canStart: GestureCallback = noop;
   @Prop() onStart: GestureCallback = noop;
