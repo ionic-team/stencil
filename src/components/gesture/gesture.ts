@@ -1,7 +1,7 @@
 import { Component, Listen, Ionic, Prop } from '../../index';
 import { GestureController, GestureDelegate } from './gesture-controller';
 import { GestureCallback, GestureDetail } from '../../util/interfaces';
-import { pointerCoordX, pointerCoordY } from '../../util/dom'
+import { pointerCoordX, pointerCoordY } from '../../util/dom';
 import { PanRecognizer } from './recognizers';
 
 
@@ -187,7 +187,7 @@ export class Gesture {
 
     this.gesture.release();
 
-    this.enable(false)
+    this.enable(false);
     this.notCaptured(this.detail);
   }
 
