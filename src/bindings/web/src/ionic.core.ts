@@ -7,16 +7,16 @@ import { registerComponents } from '../../../client/registry';
 import { Renderer } from '../../../client/renderer/core';
 
 
-const ionic: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
+const Ionic: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
 const domCtrl = DomController(window);
 
 const nextTickCtrl = NextTickController(window);
 
-const plt = PlatformClient(window, document, ionic, ionic.staticDir, domCtrl, nextTickCtrl);
+const plt = PlatformClient(window, document, Ionic, Ionic.staticDir, domCtrl, nextTickCtrl);
 
 const renderer = Renderer(plt);
 
-const configCtrl = ConfigController(ionic.config || {});
+const configCtrl = ConfigController(Ionic.config || {});
 
-registerComponents(renderer, plt, configCtrl, ionic.components);
+registerComponents(window, renderer, plt, configCtrl, Ionic.components);

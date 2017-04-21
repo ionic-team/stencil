@@ -38,8 +38,8 @@ function buildCore(ctx: BuildContext) {
   }).then((bundle: any) => {
     var result = bundle.generate({
       format: 'es',
-      intro: '(function(window, document) {\n"use strict";\n',
-      outro: '})(window, document);'
+      intro: '(function(window) {\n"use strict";\n',
+      outro: '})(window);'
     });
 
     ctx.coreDevContent = transpile(result.code);
@@ -62,8 +62,8 @@ function buildCoreES5(ctx: BuildContext) {
   }).then((bundle: any) => {
     var result = bundle.generate({
       format: 'es',
-      intro: '(function(window, document) {\n"use strict";\n',
-      outro: '})(window, document);'
+      intro: '(function(window) {\n"use strict";\n',
+      outro: '})(window);'
     });
 
     ctx.coreES5DevContent = transpile(result.code);

@@ -6,16 +6,11 @@
  * https://developers.google.com/closure/compiler/docs/api-tutorial3
  */
 
-// Injected Ionic
-function Ionic(){};
-function emit(){};
-function listen(){};
-function theme(){};
 
-// Global Ionic
+// Global Ionic (window.Ionic)
+function configCtrl(){};
 function loadComponents(){};
 function components(){};
-function configCtrl(){};
 function staticDir(){};
 function domCtrl(){};
 function read(){};
@@ -25,15 +20,34 @@ function nextTick(){};
 function devMode(){};
 function on(){};
 function fn(){};
+
+
+// Injected Ionic (passed into user's closure)
+function Ionic(){};
+function emit(){};
+function listen(){};
+function theme(){};
 function controllers(){};
 
+
+// Config API (each binding provides a Config)
+function get(){};
+function getBoolean(){};
+function getNumber(){};
+
+
+// Proxy Element
+function $el(){};
+
+
+// Component
 function tag(){};
 function modes(){};
 function props(){};
 function mode(){};
 function color(){};
 function obsAttrs(){};
-function $el(){};
+function eventName(){};
 
 
 // Ionic Lifecycle methods
@@ -41,7 +55,7 @@ function ionViewDidLoad(){};
 function ionViewWillUnload(){};
 
 
-// Web Standards
+// Web Standards (stuff closure doesn't know to not rename yet)
 function connectedCallback(){};
 function attributeChangedCallback(){};
 function disconnectedCallback(){};
