@@ -1,6 +1,6 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { formatComponentModeLoader, formatModeName, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
+import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName, formatBundleContent, formatRegistryContent } from './formatters';
 import { readFile, writeFile } from './util';
 
 
@@ -136,7 +136,7 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
   });
 
   return generateBundleFiles(config, ctx).then(() => {
-    const content = getRegistryContent(ctx.registry);
+    const content = formatRegistryContent(ctx.registry);
 
     const promises: Promise<any>[] = [];
 
@@ -192,10 +192,10 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
     }).join(',\n');
 
     bundle.id = bundleIndex;
-    bundle.fileName = getBundleFileName(bundle.id);
+    bundle.fileName = formatBundleFileName(bundle.id);
     bundle.filePath = config.packages.path.join(config.destDir, bundle.fileName);
 
-    bundle.content = getBundleContent(bundle.id, componentModeLoaders);
+    bundle.content = formatBundleContent(bundle.id, componentModeLoaders);
 
     bundle.components.forEach(bundleComponent => {
       const tag = bundleComponent.component.tag;
@@ -210,7 +210,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       ctx.registry[tag][0] = modes;
 
       if (ctx.registry[tag].length === 1 && Object.keys(bundleComponent.component.props).length) {
-        ctx.registry[tag].push(bundleComponent.component.props);
+        ctx.registry[tag].push(formatComponentRegistryProps(bundleComponent.component.props));
       }
     });
 

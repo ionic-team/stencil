@@ -197,7 +197,7 @@ export interface PropDecorator {
 
 
 export interface PropOptions {
-  type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
+  type?: number;
 }
 
 

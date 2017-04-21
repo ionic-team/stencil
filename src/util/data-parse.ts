@@ -1,4 +1,4 @@
-import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchesData } from '../util/interfaces';
+import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchesData, Props } from '../util/interfaces';
 import { isString } from './helpers';
 
 
@@ -55,8 +55,8 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 }
 
 
-export function parseModeName(mode: any) {
-  switch (mode) {
+export function parseModeName(modeCode: string) {
+  switch (modeCode) {
     case '0':
       return 'default';
     case '1':
@@ -67,5 +67,27 @@ export function parseModeName(mode: any) {
       return 'wp';
   }
 
-  return mode;
+  return modeCode;
 }
+
+
+export function parseProp(propData: any[][]) {
+  const prop: Props = {
+    color: {},
+    mode: {}
+  };
+
+  if (propData) {
+    for (var i = 0; i < propData.length; i++) {
+      prop[propData[i][0]] = {
+        type: propData[i][1]
+      };
+    }
+  }
+
+  return prop;
+}
+
+
+export const BOOLEAN_TYPE_CODE = 0;
+export const NUMBER_TYPE_CODE = 1;

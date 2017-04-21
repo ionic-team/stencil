@@ -1,5 +1,6 @@
 import { Component, ConfigApi, PlatformApi, Props, ProxyElement, RendererApi, Watches } from '../util/interfaces';
 import { queueUpdate } from './update';
+import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 
 
 export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, watches: Watches) {
@@ -43,7 +44,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 }
 
 
-function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Component, propType: string, propName: string): any {
+function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Component, propTypeCode: number, propName: string): any {
   if (elm[propName] !== undefined) {
     return elm[propName];
   }
@@ -52,11 +53,11 @@ function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Componen
     return instance[propName];
   }
 
-  if (propType === 'boolean') {
+  if (propTypeCode === BOOLEAN_TYPE_CODE) {
     return config.getBoolean(propName);
   }
 
-  if (propType === 'number') {
+  if (propTypeCode === NUMBER_TYPE_CODE) {
     return config.getNumber(propName);
   }
 

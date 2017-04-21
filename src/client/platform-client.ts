@@ -2,7 +2,7 @@ import { ComponentMeta, ComponentMode, ComponentRegistry,
   DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './injected-ionic';
-import { parseComponentModeData, parseModeName } from '../util/data-parse';
+import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 
 
@@ -124,12 +124,11 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
 
   function registerComponent(tag: string, data: any[]) {
     const modeBundleIds = data[0];
-    const props = data[1] || {};
 
     const cmpMeta: ComponentMeta = registry[tag] = {
       tag: tag,
       modes: {},
-      props: props,
+      props: parseProp(data[1]),
       obsAttrs: []
     };
 
@@ -144,10 +143,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     keys.shift();
     cmpMeta.hostCss = keys.join('-');
 
-    props.color = {};
-    props.mode = {};
-
-    keys = Object.keys(props);
+    keys = Object.keys(cmpMeta.props);
     for (i = 0; i < keys.length; i++) {
       cmpMeta.obsAttrs.push(toDashCase(keys[i]));
     }

@@ -1,13 +1,34 @@
-import { Component, ComponentMode, Listeners, ListenOpts, Registry, Watches, WatchOpts } from './interfaces';
+import { Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watches, WatchOpts } from './interfaces';
 
 
-export function getBundleFileName(bundleId: number) {
+export function formatBundleFileName(bundleId: number) {
   return `ionic.${bundleId}.js`;
 }
 
 
-export function getBundleContent(bundleId: number, componentModeLoader: string) {
+export function formatBundleContent(bundleId: number, componentModeLoader: string) {
   return `Ionic.loadComponents(\n/** bundleId **/\n${bundleId},${componentModeLoader});`;
+}
+
+
+export function formatComponentRegistryProps(props: Props): any {
+  const p: any[] = [];
+
+  Object.keys(props).forEach(propName => {
+    const prop = props[propName];
+    const formattedProp: any[] = [propName];
+
+    if (prop.type === 'boolean') {
+      formattedProp.push(0);
+
+    } else if (prop.type === 'number') {
+      formattedProp.push(1);
+    }
+
+    p.push(formattedProp);
+  });
+
+  return p;
 }
 
 
@@ -130,7 +151,7 @@ function formatBoolean(val: boolean) {
 }
 
 
-export function getRegistryContent(registry: Registry) {
+export function formatRegistryContent(registry: Registry) {
   let content = '(window.Ionic = window.Ionic || {}).components = ';
 
   let strData = JSON.stringify(registry, null, 2) + ';';
