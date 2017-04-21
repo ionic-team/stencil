@@ -13,7 +13,7 @@ const domCtrl = DomController(window);
 
 const nextTickCtrl = NextTickController(window);
 
-const plt = PlatformClient(window, document, Ionic, Ionic.staticDir, domCtrl, nextTickCtrl);
+const plt = PlatformClient(window, window.document, Ionic, Ionic.staticDir, domCtrl, nextTickCtrl);
 
 const renderer = Renderer(plt);
 

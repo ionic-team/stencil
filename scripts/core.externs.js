@@ -23,7 +23,6 @@ function write(){};
 function nextTickCtrl(){};
 function nextTick(){};
 function devMode(){};
-function on(){};
 
 
 /**
@@ -50,6 +49,8 @@ function getNumber(){};
  * Proxy Element
  */
 function $el(){};
+function $meta(){};
+function listeners(){};
 
 
 /**
@@ -58,6 +59,14 @@ function $el(){};
 function ionViewDidLoad(){};
 function ionViewWillUnload(){};
 function render(){};
+
+
+/**
+ * Renderer data properties
+ */
+function attrs(){};
+function on(){};
+function props(){};
 
 
 /**
