@@ -4,7 +4,7 @@ import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 
 
-export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
+export function registerComponentsES5(window: Window, renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
 
   Object.keys(components || {}).forEach(tag => {
     const cmpMeta = plt.registerComponent(tag, components[tag]);
