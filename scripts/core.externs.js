@@ -1,13 +1,18 @@
 
 /**
  * Externs are used so these properties are not
- * mistakenly renamed.
+ * mistakenly renamed. When two JS files are compiled at different
+ * times, there are cerain properties that need to NOT be renamed so
+ * each JS file can communicate against the known property names.
  *
  * https://developers.google.com/closure/compiler/docs/api-tutorial3
  */
 
 
-// Global Ionic (window.Ionic)
+/**
+ * Global Ionic
+ * Each binding can provide it's own values to window.Ionic
+ */
 function configCtrl(){};
 function loadComponents(){};
 function components(){};
@@ -19,43 +24,46 @@ function nextTickCtrl(){};
 function nextTick(){};
 function devMode(){};
 function on(){};
-function fn(){};
 
 
-// Injected Ionic (passed into user's closure)
+/**
+ * Injected Ionic
+ * Passed into user's closure
+ */
 function Ionic(){};
+function controllers(){};
 function emit(){};
 function listen(){};
 function theme(){};
-function controllers(){};
 
 
-// Config API (each binding provides a Config)
+/**
+ * Config API
+ * Each binding provides its own Config
+ */
 function get(){};
 function getBoolean(){};
 function getNumber(){};
 
 
-// Proxy Element
+/**
+ * Proxy Element
+ */
 function $el(){};
 
 
-// Component
-function tag(){};
-function modes(){};
-function props(){};
-function mode(){};
-function color(){};
-function obsAttrs(){};
-function eventName(){};
-
-
-// Ionic Lifecycle methods
+/**
+ * Component Instance
+ */
 function ionViewDidLoad(){};
 function ionViewWillUnload(){};
+function render(){};
 
 
-// Web Standards (stuff closure doesn't know to not rename yet)
+/**
+ * Web Standards
+ * Stuff closure doesn't know to not rename yet
+ */
 function connectedCallback(){};
 function attributeChangedCallback(){};
 function disconnectedCallback(){};
@@ -65,6 +73,8 @@ function define(){};
 function attachShadow(){};
 
 
-// Polyfills
+/**
+ * Polyfills
+ */
 function ShadyDOM(){};
 function inUse(){};

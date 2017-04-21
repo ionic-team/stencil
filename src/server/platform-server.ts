@@ -1,11 +1,11 @@
 import { ComponentMeta, ComponentMode, ComponentModeData, ComponentRegistry, Ionic, IonicGlobal, PlatformApi } from '../util/interfaces';
 import { h } from '../client/renderer/h';
+import { parseComponentModeData } from '../util/data-parse';
 import { themeVNodeData } from '../client/host';
 
 
 export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   const registry: ComponentRegistry = {};
-  const loadedBundles: {[bundleId: string]: boolean} = {};
   const moduleImports = {};
 
   const injectedIonic: Ionic = {
@@ -18,63 +18,26 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   };
 
 
-  ionic.loadComponents = function loadComponents(bundleId) {
+  ionic.loadComponents = function loadComponents() {
     var args = arguments;
     for (var i = 1; i < args.length; i++) {
       // first arg is the bundleId
       // each arg after that is a component/mode
       var cmpModeData: ComponentModeData = args[i];
 
+      parseComponentModeData(registry, moduleImports, h, injectedIonic, args[i]);
+
       // tag name (ion-badge)
       var tag = cmpModeData[0];
 
-      // component class name (Badge)
-      var cmpClassName = cmpModeData[1];
-
-      // get component meta data by tag name
-      var cmpMeta = registry[tag];
-
-      // component listeners
-      cmpMeta.listeners = cmpModeData[2];
-
-      // component instance property watches
-      cmpMeta.watches = cmpModeData[3];
-
-      // shadow
-      cmpMeta.shadow = cmpModeData[4];
-
-      // mode name (ios, md, wp)
-      var modeName = cmpModeData[5];
-
-      // get component mode
-      var cmpMode = cmpMeta.modes[modeName];
-      if (cmpMode) {
-        // component mode styles
-        cmpMode.styles = cmpModeData[6];
-      }
-
-      // import component function
-      // inject ionic globals
-      cmpModeData[7](moduleImports, h, injectedIonic);
-
-      // get the component class which was added to moduleImports
-      cmpMeta.componentModule = moduleImports[cmpClassName];
-
-      console.log(`Ionic.loadComponents, bundle: ${bundleId}, tag: ${tag}, mode: ${modeName}`);
-
       registerComponent(tag, []);
-
-      loadedBundles[bundleId] = true;
     }
   };
 
   function loadComponent(bundleId: string, cb: Function): void {
-    if (loadedBundles[bundleId]) {
-      cb();
+    console.log(`loadComponent, bundleId: ${bundleId}`);
 
-    } else {
-      console.log(`invalid bundleId: ${bundleId}`);
-    }
+    cb();
   }
 
   function domRead(cb: Function) {

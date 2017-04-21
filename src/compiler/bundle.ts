@@ -1,6 +1,6 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { getComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
+import { formatComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
 import { readFile, writeFile } from './util';
 
 
@@ -179,7 +179,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
   return Promise.all(ctx.bundles.map((bundle, bundleIndex) => {
 
     const componentModeLoaders = bundle.components.map(bundleComponent => {
-      return getComponentModeLoader(bundleComponent.component, bundleComponent.mode);
+      return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
     }).join(',\n');
 
     bundle.id = bundleIndex;
