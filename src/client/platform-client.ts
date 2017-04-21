@@ -2,7 +2,7 @@ import { ComponentMeta, ComponentMode, ComponentRegistry,
   DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './injected-ionic';
-import { parseComponentModeData } from '../util/data-parse';
+import { parseComponentModeData, parseModeName } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 
 
@@ -135,7 +135,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
 
     let keys = Object.keys(modeBundleIds);
     for (var i = 0; i < keys.length; i++) {
-      cmpMeta.modes[keys[i]] = {
+      cmpMeta.modes[parseModeName(keys[i].toString())] = {
         bundleId: modeBundleIds[keys[i]]
       };
     }

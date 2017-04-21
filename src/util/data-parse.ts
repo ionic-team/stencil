@@ -38,7 +38,7 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // mode name (ios, md, wp)
   // get component mode
   if (isString(cmpModeData[6])) {
-    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[5])];
+    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[5].toString())];
     if (cmpMode) {
       // component mode styles
       cmpMode.styles = cmpModeData[6];
@@ -55,15 +55,15 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 }
 
 
-function parseModeName(mode: any) {
+export function parseModeName(mode: any) {
   switch (mode) {
-    case 0:
+    case '0':
       return 'default';
-    case 1:
+    case '1':
       return 'ios';
-    case 2:
+    case '2':
       return 'md';
-    case 3:
+    case '3':
       return 'wp';
   }
 

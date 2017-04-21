@@ -1,6 +1,6 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { formatComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
+import { formatComponentModeLoader, formatModeName, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
 import { readFile, writeFile } from './util';
 
 
@@ -85,8 +85,17 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
 
     let code = results.code.trim();
 
-    code = code.replace('(function (exports) {', '');
-    code = code.replace('}((this.ionicModule = this.ionicModule || {})));', '');
+    let closureStart = '(function (exports) {';
+    if (code.indexOf(closureStart) === -1) {
+      throw `bundleComponentModule: importComponent() closureStart format changed!`;
+    }
+    code = code.replace(closureStart, '');
+
+    let closureEnd = '}((this.ionicModule = this.ionicModule || {})));';
+    if (code.indexOf(closureEnd) === -1) {
+      throw `bundleComponentModule: importComponent() closureEnd format changed!`;
+    }
+    code = code.replace(closureEnd, '');
 
     code = code.trim();
 
@@ -190,13 +199,13 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     bundle.components.forEach(bundleComponent => {
       const tag = bundleComponent.component.tag;
-      const modeName = bundleComponent.mode.name;
+      const modeCode = formatModeName(bundleComponent.mode.name);
 
       ctx.registry[tag] = ctx.registry[tag] || [];
 
-      const modes: {[modeName: string]: number} = ctx.registry[tag][0] || {};
+      const modes: {[modeCode: string]: number} = ctx.registry[tag][0] || {};
 
-      modes[modeName] = bundle.id;
+      modes[modeCode] = bundle.id;
 
       ctx.registry[tag][0] = modes;
 

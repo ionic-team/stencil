@@ -20,7 +20,7 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 
   const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
 
-  const modeCode = formatModeName(modeName);
+  const modeCode = `/* ${modeName} **/ ${formatModeName(modeName)}`;
 
   const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : '/* no styles */ 0');
 
@@ -50,21 +50,19 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 }
 
 
-function formatModeName(modeName: string) {
-  let modeCode = `/* ${modeName} **/ `;
-
+export function formatModeName(modeName: string) {
   switch (modeName) {
     case 'default':
-      return modeCode + 0;
+      return 0;
     case 'ios':
-      return modeCode + 1;
+      return 1;
     case 'md':
-      return modeCode + 2;
+      return 2;
     case 'wp':
-      return modeCode + 3;
+      return 3;
   }
 
-  return modeCode + `'${modeName}'`;
+  return `'${modeName}'`;
 }
 
 
@@ -134,6 +132,15 @@ function formatBoolean(val: boolean) {
 
 export function getRegistryContent(registry: Registry) {
   let content = '(window.Ionic = window.Ionic || {}).components = ';
-  content += JSON.stringify(registry, null, 2) + ';';
+
+  let strData = JSON.stringify(registry, null, 2) + ';';
+
+  strData = strData.replace(/"0"/g, '0');
+  strData = strData.replace(/"1"/g, '1');
+  strData = strData.replace(/"2"/g, '2');
+  strData = strData.replace(/"3"/g, '3');
+
+  content += strData;
+
   return content;
 }
