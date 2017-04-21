@@ -1,9 +1,7 @@
-import { Component, ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry,
-  DomControllerApi, EventListenerCallback, EventListenerOptions, Ionic, IonicGlobal,
-  NextTickApi, PlatformApi } from '../util/interfaces';
-import { emitEvent, listenEvent } from '../util/dom';
+import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry,
+  DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
-import { themeVNodeData } from './host';
+import { initInjectedIonic } from './injected-ionic';
 import { toDashCase } from '../util/helpers';
 
 
@@ -15,17 +13,9 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const moduleImports = {};
   const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
-  let hasEventOptionsSupport = false;
-
-  checkEventOptionsSupport();
 
 
-  const injectedIonic: Ionic = {
-    theme: themeVNodeData,
-    emit: function(instance: any, eventName: string, data?: any) {
-      emitEvent(doc, (<Component>instance).$el, eventName, data);
-    }
-  };
+  const injectedIonic = initInjectedIonic(doc);
 
 
   ionic.loadComponents = function loadComponents(bundleId) {
@@ -269,23 +259,6 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     css[linkUrl] = true;
   }
 
-  function checkEventOptionsSupport() {
-    try {
-      var opts = Object.defineProperty({}, 'passive', {
-        get: function() {
-          hasEventOptionsSupport = true;
-        }
-      });
-      win.addEventListener('test', null, opts);
-    } catch (e) {}
-  }
-
-  function addEventListener(instance: Component, eventName: string, cb: EventListenerCallback, opts?: EventListenerOptions) {
-    const unlistenFn = listenEvent(instance.$el, eventName, cb, opts, hasEventOptionsSupport);
-    instance.$destroys.push(unlistenFn);
-    return unlistenFn;
-  }
-
 
   return {
     registerComponent: registerComponent,
@@ -312,8 +285,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachShadow: attachShadow,
-    $addEventListener: addEventListener
+    $attachShadow: attachShadow
   }
 }
 

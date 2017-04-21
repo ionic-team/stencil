@@ -25,6 +25,7 @@ function nextTick(){};
 function devMode(){};
 function on(){};
 function fn(){};
+function controllers(){};
 
 function tag(){};
 function modes(){};
@@ -48,8 +49,6 @@ function observedAttributes(){};
 function customElements(){};
 function define(){};
 function attachShadow(){};
-function capture(){};
-function passive(){};
 
 
 // Polyfills

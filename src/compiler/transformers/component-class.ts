@@ -1,4 +1,4 @@
-import { BuildContext, ComponentMeta, FileMeta } from '../interfaces';
+import { BuildContext, ComponentMeta, FileMeta, ListenOpts } from '../interfaces';
 import * as ts from 'typescript';
 
 
@@ -91,8 +91,8 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
       propMembers.forEach(memberNode => {
         let isListen = false;
-        let eventName: string = null;
         let methodName: string = null;
+        let opts: ListenOpts = {};
 
         memberNode.forEachChild(n => {
 
@@ -101,13 +101,23 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
             n.getChildAt(1).forEachChild(n => {
 
-              if (n.kind === ts.SyntaxKind.StringLiteral && !eventName) {
-                eventName = n.getText();
-                eventName = eventName.replace(/\'/g, '');
-                eventName = eventName.replace(/\"/g, '');
-                eventName = eventName.replace(/\`/g, '');
-              }
+              if (n.kind === ts.SyntaxKind.StringLiteral && !opts.eventName) {
+                opts.eventName = n.getText();
+                opts.eventName = opts.eventName.replace(/\'/g, '');
+                opts.eventName = opts.eventName.replace(/\"/g, '');
+                opts.eventName = opts.eventName.replace(/\`/g, '');
 
+              } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && opts.eventName) {
+                try {
+                  const fnStr = `return ${n.getText()};`;
+                  let parsedOpts: ListenOpts = new Function(fnStr)();
+
+                  Object.assign(opts, parsedOpts);
+
+                } catch (e) {
+                  console.log(`parse listener options: ${e}`);
+                }
+              }
             });
 
           } else if (isListen) {
@@ -118,10 +128,8 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
         });
 
-        if (isListen && eventName && methodName) {
-          cmpMeta.listeners[methodName] = {
-            type: eventName
-          };
+        if (isListen && opts.eventName && methodName) {
+          cmpMeta.listeners[methodName] = opts;
 
           memberNode.decorators = undefined;
         }

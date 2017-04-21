@@ -140,9 +140,10 @@ export interface Listeners {
 
 
 export interface ListenOpts {
-  type: string;
+  eventName?: string;
   capture?: boolean;
   passive?: boolean;
+  enabled?: boolean;
 }
 
 

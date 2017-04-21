@@ -7,9 +7,14 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const moduleImports = {};
+
   const injectedIonic: Ionic = {
     theme: themeVNodeData,
-    emit: function(){}
+    emit: function(){},
+    listener: {
+      enable: function() {}
+    },
+    controllers: {}
   };
 
 
@@ -234,8 +239,7 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachShadow: attachShadow,
-    $addEventListener: function(){ return function(){} }
+    $attachShadow: attachShadow
   }
 }
 

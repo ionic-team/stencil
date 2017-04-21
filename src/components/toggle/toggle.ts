@@ -1,5 +1,5 @@
-import { BooleanInputComponent } from '../../util/interfaces';
-import { Component, h, Ionic, Prop, Watch } from '../../index';
+import { BooleanInputComponent, GestureDetail } from '../../util/interfaces';
+import { Component, h, Ionic, Listen, Prop, Watch } from '../../index';
 
 
 @Component({
@@ -15,7 +15,7 @@ export class Toggle implements BooleanInputComponent {
   hasFocus: boolean;
   id: string;
   labelId: string;
-
+  startX: number;
 
   @Prop() checked: boolean;
   @Prop() disabled: boolean;
@@ -28,25 +28,46 @@ export class Toggle implements BooleanInputComponent {
   }
 
 
-  onStart(ev: UIEvent) {
-    console.log('onStart', ev);
+  onDragStart(detail: GestureDetail) {
+    this.startX = detail.startX;
+    this.fireFocus();
   }
 
 
-  onMove(ev: UIEvent) {
-    console.log('onMove', ev);
+  onDragMove(detail: GestureDetail) {
+    if (this.checked) {
+      if (detail.currentX + 15 < this.startX) {
+        this.checked = false;
+        this.activated = true;
+        this.startX = detail.currentX;
+      }
+
+    } else if (detail.currentX - 15 > this.startX) {
+      this.checked = true;
+      this.activated = (detail.currentX < this.startX + 5);
+      this.startX = detail.currentX;
+    }
   }
 
 
-  onEnd(ev: UIEvent) {
-    console.log('onEnd', ev);
+  onDragEnd(detail: GestureDetail) {
+    if (this.checked) {
+      if (detail.startX + 4 > detail.currentX) {
+        this.checked = false;
+      }
+
+    } else if (detail.startX - 4 < detail.currentX) {
+      this.checked = true;
+    }
+
+    this.activated = false;
+    this.fireBlur();
+    this.startX = null;
   }
 
-
-  toggle(ev: UIEvent) {
+  @Listen('keydown.space')
+  toggle() {
     this.checked = !this.checked;
-    ev.preventDefault();
-    ev.stopImmediatePropagation();
     this.fireFocus();
   }
 
@@ -76,24 +97,30 @@ export class Toggle implements BooleanInputComponent {
           'toggle-disabled': this.disabled,
         },
         props: {
-          'onStart': this.onStart.bind(this)
+          'onStart': this.onDragStart.bind(this),
+          'onMove': this.onDragMove.bind(this),
+          'onEnd': this.onDragEnd.bind(this),
+          'onPress': this.toggle.bind(this),
+          'gestureName': 'toggle',
+          'gesturePriority': 30,
+          'type': 'pan,press',
+          'direction': 'x',
+          'threshold': 20,
+          'listenOn': 'parent'
         }
       }),
         [
           h('div.toggle-icon',
             h('div.toggle-inner')
           ),
-          h('button.toggle-cover', {
+          h('div.toggle-cover', {
             attrs: {
               'id': this.id,
               'aria-checked': this.checked ? 'true': false,
               'aria-disabled': this.disabled ? 'true': false,
               'aria-labelledby': this.labelId,
               'role': 'checkbox',
-              'type': 'button'
-            },
-            on: {
-              'click': this.toggle.bind(this)
+              'tabindex': 0
             }
           })
         ]
