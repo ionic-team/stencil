@@ -1,5 +1,5 @@
 import Swiper from 'swiper';
-import { Component, h, Ionic, Prop, Watch } from '../../index';
+import { Component, h, Ionic, Prop } from '../../index';
 
 /**
  * @name Slides
@@ -290,87 +290,11 @@ export class Slides {
    */
   originalEvent: any;
 
-  /**
-   * @output {Slides} Emitted when a slide change starts.
-   */
-  @Output() ionSlideWillChange: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a slide change ends.
-   */
-  @Output() ionSlideDidChange: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a slide moves.
-   */
-  @Output() ionSlideDrag: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when slides reaches its beginning (initial position).
-   */
-  @Output() ionSlideReachStart: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when slides reaches its last slide.
-   */
-  @Output() ionSlideReachEnd: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a slide moves.
-   */
-  @Output() ionSlideAutoplay: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a autoplay starts.
-   */
-  @Output() ionSlideAutoplayStart: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a autoplay stops.
-   */
-  @Output() ionSlideAutoplayStop: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a slide change starts with the "forward" direction.
-   */
-  @Output() ionSlideNextStart: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a slide change starts with the "backward" direction.
-   */
-  @Output() ionSlidePrevStart: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a slide change ends with the "forward" direction.
-   */
-  @Output() ionSlideNextEnd: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when a slide change ends with the "backward" direction.
-   */
-  @Output() ionSlidePrevEnd: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when the user taps/clicks on the slide's container.
-   */
-  @Output() ionSlideTap: EventEmitter<Slides> = new EventEmitter();
-
-  /**
-   * @output {Slides} Emitted when the user double taps on the slide's container.
-   */
-  @Output() ionSlideDoubleTap: EventEmitter<Slides> = new EventEmitter();
-
-
-  /** @hidden */
-  ionSlideProgress: EventEmitter<number> = new EventEmitter();
-  /** @hidden */
-  ionSlideTransitionStart: EventEmitter<Slides> = new EventEmitter();
-  /** @hidden */
-  ionSlideTransitionEnd: EventEmitter<Slides> = new EventEmitter();
-  /** @hidden */
-  ionSlideTouchStart: EventEmitter<TouchEvent> = new EventEmitter();
-  /** @hidden */
-  ionSlideTouchEnd: EventEmitter<TouchEvent> = new EventEmitter();
+  emitEvent(eventName: string) {
+    return (data: any) => {
+      Ionic.emit(this, eventName, data);
+    };
+  }
 
 
   /**
@@ -517,11 +441,30 @@ export class Slides {
         prevSlideMessage: 'Previous slide',
         nextSlideMessage: 'Next slide',
         firstSlideMessage: 'This is the first slide',
-        lastSlideMessage: 'This is the last slide'
-      }
-      
-      this.swiper = new Swiper(this.container, swiperOptions);
+        lastSlideMessage: 'This is the last slide',
+        onSlideChangeStart: this.emitEvent('ionSlideWillChange'),
+        onSlideChangeEnd: this.emitEvent('ionSlideDidChange'),
+        onAutoplay: this.emitEvent('ionSlideAutoplay'),
+        onAutoplayStart: this.emitEvent('ionSlideAutoplayStart'),
+        onAutoplayStop: this.emitEvent('ionSlideAutoplayStop'),
+        onSlideNextStart: this.emitEvent('ionSlideNextStarto'),
+        onSlidePrevStart: this.emitEvent('ionSlidePrevStart'),
+        onSlideNextEnd: this.emitEvent('ionSlideNextEnd'),
+        onSlidePrevEnd: this.emitEvent('ionSlidePrevEnd'),
+        onTransitionStart: this.emitEvent('ionSlideTransitionStart'),
+        onTransitionEnd: this.emitEvent('ionSlideTransitionEnd'),
+        onTap: this.emitEvent('ionSlideTap'),
+        onDoubleTap: this.emitEvent('ionSlideDoubleTap'),
+        onProgress: this.emitEvent('ionSlideProgress'),
+        onSliderMove: this.emitEvent('ionSlideDrag'),
+        onReachBeginning: this.emitEvent('ionSlideReachStart'),
+        onReachEnd: this.emitEvent('ionSlideReachEnd'),
+        onTouchStart: this.emitEvent('ionSlideTouchStart'),
+        onTouchEnd: this.emitEvent('ionSlideTouchEnd')
+      };
+
       // init swiper core
+      this.swiper = new Swiper(this.container, swiperOptions);
 
 
       if (this.keyboardControl) {
@@ -555,12 +498,6 @@ export class Slides {
           this.paginationType = undefined;
         }
       }, debounce);
-    }
-  }
-
-  resize() {
-    if (this._init) {
-
     }
   }
 
