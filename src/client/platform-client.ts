@@ -1,7 +1,8 @@
-import { ComponentMeta, ComponentModeData, ComponentMode, ComponentRegistry,
+import { ComponentMeta, ComponentMode, ComponentRegistry,
   DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './injected-ionic';
+import { parseComponentModeData } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 
 
@@ -23,36 +24,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     for (var i = 1; i < args.length; i++) {
       // first arg is the bundleId
       // each arg after that is a component/mode
-      var cmpModeData: ComponentModeData = args[i];
-
-      // tag name (ion-badge)
-      // get component meta data by tag name
-      var cmpMeta = registry[cmpModeData[0]];
-
-      // component listeners
-      cmpMeta.listeners = cmpModeData[2];
-
-      // component instance property watches
-      cmpMeta.watches = cmpModeData[3];
-
-      // shadow
-      cmpMeta.shadow = cmpModeData[4];
-
-      // mode name (ios, md, wp)
-      // get component mode
-      var cmpMode = cmpMeta.modes[cmpModeData[5]];
-      if (cmpMode) {
-        // component mode styles
-        cmpMode.styles = cmpModeData[6];
-      }
-
-      // import component function
-      // inject ionic globals
-      cmpModeData[7](moduleImports, h, injectedIonic);
-
-      // get the component class which was added to moduleImports
-      // component class name (Badge)
-      cmpMeta.componentModule = moduleImports[cmpModeData[1]];
+      parseComponentModeData(registry, moduleImports, h, injectedIonic, args[i]);
 
       // fire off all the callbacks waiting on this bundle to load
       var callbacks = bundleCallbacks[bundleId];

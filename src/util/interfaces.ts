@@ -108,12 +108,12 @@ export interface ComponentModeData {
   /**
    * listeners
    */
-  [2]: ComponentMetaListeners;
+  [2]: ComponentListenersData[];
 
   /**
    * watches
    */
-  [3]: Watches;
+  [3]: ComponentWatchesData[];
 
   /**
    * shadow
@@ -134,6 +134,39 @@ export interface ComponentModeData {
    * import component function
    */
   [7]: ComponentModeImporterFn;
+}
+
+
+export interface ComponentListenersData {
+  /**
+   * methodName
+   */
+  [0]: string;
+
+  /**
+   * eventName
+   */
+  [1]: string;
+
+  /**
+   * capture
+   */
+  [2]: number;
+
+  /**
+   * passive
+   */
+  [3]: number;
+
+  /**
+   * enabled
+   */
+  [4]: number;
+}
+
+
+export interface ComponentWatchesData {
+
 }
 
 
