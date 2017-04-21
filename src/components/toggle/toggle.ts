@@ -116,8 +116,8 @@ export class Toggle implements BooleanInputComponent {
           h('div.toggle-cover', {
             attrs: {
               'id': this.id,
-              'aria-checked': this.checked ? 'true': false,
-              'aria-disabled': this.disabled ? 'true': false,
+              'aria-checked': this.checked ? 'true' : false,
+              'aria-disabled': this.disabled ? 'true' : false,
               'aria-labelledby': this.labelId,
               'role': 'checkbox',
               'tabindex': 0

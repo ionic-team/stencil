@@ -8,8 +8,8 @@ export class PanRecognizer {
   private threshold: number;
   private maxCosine: number;
 
-  private angle: any = 0;
-  private isPan: number = 0;
+  private angle = 0;
+  private isPan = 0;
 
 
   constructor(private direction: string, threshold: number, maxAngle: number) {
