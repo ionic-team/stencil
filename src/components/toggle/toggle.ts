@@ -1,5 +1,5 @@
 import { BooleanInputComponent, GestureDetail } from '../../util/interfaces';
-import { Component, h, Ionic, Prop, Watch } from '../../index';
+import { Component, h, Ionic, Listen, Prop, Watch } from '../../index';
 
 
 @Component({
@@ -65,7 +65,7 @@ export class Toggle implements BooleanInputComponent {
     this.startX = null;
   }
 
-
+  @Listen('keydown.space')
   toggle() {
     this.checked = !this.checked;
     this.fireFocus();
@@ -119,7 +119,8 @@ export class Toggle implements BooleanInputComponent {
               'aria-checked': this.checked ? 'true': false,
               'aria-disabled': this.disabled ? 'true': false,
               'aria-labelledby': this.labelId,
-              'role': 'checkbox'
+              'role': 'checkbox',
+              'tabindex': 0
             }
           })
         ]
