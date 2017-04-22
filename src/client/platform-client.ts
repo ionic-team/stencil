@@ -16,7 +16,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
 
 
-  const injectedIonic = initInjectedIonic(doc);
+  const injectedIonic = initInjectedIonic(doc, ionic);
 
 
   ionic.loadComponents = function loadComponents(bundleId) {

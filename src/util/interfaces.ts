@@ -50,6 +50,7 @@ export interface IonicGlobal {
   configCtrl?: ConfigApi;
   domCtrl?: DomControllerApi;
   nextTickCtrl?: NextTickApi;
+  eventNamePrefix?: string;
 }
 
 

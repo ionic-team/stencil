@@ -22,6 +22,7 @@ function read(){};
 function write(){};
 function nextTickCtrl(){};
 function nextTick(){};
+function eventNamePrefix(){};
 
 
 /**
