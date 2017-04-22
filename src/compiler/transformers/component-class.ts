@@ -129,9 +129,21 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         });
 
         if (isListen && opts.eventName && methodName) {
+          if (opts.capture === undefined) {
+            opts.capture = false;
+          }
           opts.capture = !!opts.capture;
+
+          if (opts.passive === undefined) {
+            opts.passive = false;
+          }
           opts.passive = !!opts.passive;
+
+          if (opts.enabled === undefined) {
+            opts.enabled = true;
+          }
           opts.enabled = !!opts.enabled;
+
           cmpMeta.listeners[methodName] = opts;
 
           memberNode.decorators = undefined;
