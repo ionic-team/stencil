@@ -24,7 +24,7 @@ export function generateVNode(elm: Node, instance: Component, hostCss: string): 
 
 
 export function themeVNodeData(instance: Component, cssClassName: string, vnodeData: VNodeData = {}): VNodeData {
-  const cssClasses = vnodeData.class = vnodeData.class || {};
+  const cssClasses = vnodeData['class'] = vnodeData['class'] || {};
   const mode = instance.mode;
   const color = instance.color;
 

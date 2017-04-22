@@ -2,9 +2,10 @@ import { VNode, VNodeData } from '../../../util/interfaces';
 
 
 export function updateClass(oldVnode: VNode, vnode: VNode): void {
+  // ['class'] bracket notation for closure advanced
   var cur: any, name: string, elm: Element = vnode.elm as Element,
-      oldClass = (oldVnode.vdata as VNodeData).class,
-      klass = (vnode.vdata as VNodeData).class;
+      oldClass = (oldVnode.vdata as VNodeData)['class'],
+      klass = (vnode.vdata as VNodeData)['class'];
 
   if (!oldClass && !klass) return;
   if (oldClass === klass) return;
