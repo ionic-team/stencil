@@ -71,7 +71,7 @@ function compileComponents() {
     include: [srcDir],
     exclude: ['node_modules', 'test'],
     debug: true,
-    devMode: true,
+    devMode: false,
     bundles: [
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
@@ -103,7 +103,7 @@ function bundleComponents() {
       nodeSass: nodeSass,
       typescript: typescript
     },
-    devMode: true,
+    devMode: false,
     debug: true
   };
 
@@ -134,7 +134,7 @@ function buildLoader() {
           language_out: 'ECMASCRIPT5',
           warning_level: 'QUIET',
           rewrite_polyfills: 'false',
-          // formatting: 'PRETTY_PRINT',
+          formatting: 'PRETTY_PRINT',
           // debug: 'true'
         };
 

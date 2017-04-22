@@ -173,16 +173,16 @@ function buildCoreMinified(ctx: BuildContext) {
           content = content.replace(match[0], 'class ' + className + ' extends HTMLElement {}');
 
           // (function(B,U){
-          var match = /\(function\((.*?),(.*?)\)\{/.exec(content);
+          var match = /\(function\((.*?)\)\{/.exec(content);
           if (!match) {
-            match = /\(function\((.*?), (.*?)\)\ {/.exec(content);
+            match = /\(function\((.*?)\)\ {/.exec(content);
             if (!match) {
               console.log(content);
               throw 'addUseStrict: something done changed!';
             }
           }
 
-          content = content.replace(match[0], '(function(' + match[1] + ',' + match[2] + '){"use-strict";')
+          content = content.replace(match[0], '(function(' + match[1] + '){"use-strict";')
 
           ctx.coreMinifiedContent = content;
 
