@@ -66,9 +66,12 @@ export class Toggle implements BooleanInputComponent {
   }
 
   @Listen('keydown.space')
-  toggle() {
+  toggle(ev: KeyboardEvent) {
     this.checked = !this.checked;
     this.fireFocus();
+
+    ev.stopPropagation();
+    ev.preventDefault();
   }
 
 
