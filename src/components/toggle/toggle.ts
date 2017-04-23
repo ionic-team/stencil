@@ -28,6 +28,11 @@ export class Toggle implements BooleanInputComponent {
   }
 
 
+  canStart() {
+    return !this.disabled;
+  }
+
+
   onDragStart(detail: GestureDetail) {
     this.startX = detail.startX;
     this.fireFocus();
@@ -75,8 +80,10 @@ export class Toggle implements BooleanInputComponent {
 
 
   toggle() {
-    this.checked = !this.checked;
-    this.fireFocus();
+    if (!this.disabled) {
+      this.checked = !this.checked;
+      this.fireFocus();
+    }
   }
 
 
@@ -105,6 +112,7 @@ export class Toggle implements BooleanInputComponent {
           'toggle-disabled': this.disabled,
         },
         props: {
+          'canStart': this.canStart.bind(this),
           'onStart': this.onDragStart.bind(this),
           'onMove': this.onDragMove.bind(this),
           'onEnd': this.onDragEnd.bind(this),
