@@ -241,7 +241,7 @@ export interface Watchers {
 
 
 export interface IonicTheme {
-  (instance: Component, cssClassName: string, vnodeData: VNodeData): VNodeData;
+  (instance: any, cssClassName: string, vnodeData: VNodeData): VNodeData;
 }
 
 
@@ -344,14 +344,14 @@ export type Key = string | number;
 
 
 export interface Hyperscript {
-  (sel: any): any;
-  (sel: Node, data: VNodeData): any;
-  (sel: any, data: VNodeData): any;
-  (sel: any, text: string): any;
-  (sel: any, children: Array<any>): any;
-  (sel: any, data: VNodeData, text: string): any;
-  (sel: any, data: VNodeData, children: Array<any|string>): any;
-  (sel: any, data: VNodeData, children: any): any;
+  (sel: any): VNode;
+  (sel: Node, data: VNodeData): VNode;
+  (sel: any, data: VNodeData): VNode;
+  (sel: any, text: string): VNode;
+  (sel: any, children: Array<any>): VNode;
+  (sel: any, data: VNodeData, text: string): VNode;
+  (sel: any, data: VNodeData, children: Array<any|string>): VNode;
+  (sel: any, data: VNodeData, children: any): VNode;
 }
 
 
