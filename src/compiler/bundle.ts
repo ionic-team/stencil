@@ -29,7 +29,9 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
     console.log(`bundle, destDir: ${config.destDir}`);
   }
 
-  ctx.results = {};
+  ctx.results = {
+    files: []
+  };
 
   return getManifest(config, ctx).then(manifest => {
 
@@ -140,8 +142,8 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
 
     const promises: Promise<any>[] = [];
 
-    Object.keys(ctx.manifest.coreFiles).forEach(coreDirName => {
-      const corePath = ctx.manifest.coreFiles[coreDirName];
+    Object.keys(ctx.results.manifest.coreFiles).forEach(coreDirName => {
+      const corePath = ctx.results.manifest.coreFiles[coreDirName];
 
       promises.push(createCoreJs(config, content, corePath));
     });
@@ -227,6 +229,8 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       }
     }
 
+    ctx.results.files.push(bundle.filePath);
+
     return writeFile(config.packages, bundle.filePath, content);
   }));
 }
@@ -281,17 +285,17 @@ function getAllModeNames(ctx: BuildContext) {
 
 
 function getManifest(config: BundlerConfig, ctx: BuildContext) {
-  if (ctx.manifest) {
-    return Promise.resolve(ctx.manifest);
+  if (ctx.results.manifest) {
+    return Promise.resolve(ctx.results.manifest);
   }
 
-  const manifestFilePath = config.packages.path.join(config.srcDir, 'manifest.json');
+  ctx.results.manifestPath = config.packages.path.join(config.srcDir, 'manifest.json');
 
   if (config.debug) {
-    console.log(`bundle, manifestFilePath: ${manifestFilePath}`) ;
+    console.log(`bundle, manifestFilePath: ${ctx.results.manifestPath}`) ;
   }
 
-  return readFile(config.packages, manifestFilePath).then(manifestStr => {
-    return ctx.manifest = JSON.parse(manifestStr);
+  return readFile(config.packages, ctx.results.manifestPath).then(manifestStr => {
+    return ctx.results.manifest = JSON.parse(manifestStr);
   });
 }

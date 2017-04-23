@@ -48,12 +48,14 @@ export interface BuildContext {
   bundles?: Bundle[];
   components?: CoreComponents;
   registry?: Registry;
-  manifest?: Manifest;
 }
 
 
 export interface Results {
   errors?: string[];
+  files?: string[];
+  manifest?: Manifest;
+  manifestPath?: string;
 }
 
 

@@ -109,13 +109,7 @@ function bundleComponents() {
     debug: true
   };
 
-  return compiler.bundle(config, ctx).then(results => {
-    if (results.errors) {
-      results.errors.forEach(err => {
-        console.error(`compiler.bundle: ${err}`);
-      });
-    }
-  });
+  return compiler.bundle(config, ctx);
 }
 
 
