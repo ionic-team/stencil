@@ -11,6 +11,7 @@ import { PanRecognizer } from './recognizers';
 })
 export class Gesture {
   private detail: GestureDetail = {};
+  private positions: number[] = [];
   private gesture: GestureDelegate;
   private lastTouch = 0;
   private pan: PanRecognizer;
@@ -59,12 +60,12 @@ export class Gesture {
 
   @Listen('touchstart', { passive: true, enabled: false })
   onTouchStart(ev: TouchEvent) {
-    this.lastTouch = this.detail.timeStamp = now(ev);
+    this.lastTouch = now(ev);
 
     this.enableMouse(false);
     this.enableTouch(true);
 
-    this.pointerDown(ev);
+    this.pointerDown(ev, this.lastTouch);
   }
 
 
@@ -73,16 +74,15 @@ export class Gesture {
     const timeStamp = now(ev);
 
     if (this.lastTouch === 0 || (this.lastTouch + MOUSE_WAIT < timeStamp)) {
-      this.detail.timeStamp = timeStamp;
       this.enableMouse(true);
       this.enableTouch(false);
 
-      this.pointerDown(ev);
+      this.pointerDown(ev, timeStamp);
     }
   }
 
 
-  private pointerDown(ev: UIEvent): boolean {
+  private pointerDown(ev: UIEvent, timeStamp: number): boolean {
     if (!this.gesture || this.hasStartedPan) {
       return false;
     }
@@ -91,11 +91,17 @@ export class Gesture {
 
     detail.startX = detail.currentX = pointerCoordX(ev);
     detail.startY = detail.currentY = pointerCoordY(ev);
+    detail.startTimeStamp = detail.timeStamp = timeStamp;
+    detail.velocityX = detail.velocityY = detail.deltaX = detail.deltaY = 0;
+    detail.directionX = detail.directionY = detail.velocityDirectionX = detail.velocityDirectionY = null;
     detail.event = ev;
+    this.positions.length = 0;
 
     if (this.canStart && this.canStart(detail) === false) {
       return false;
     }
+
+    this.positions.push(detail.currentX, detail.currentY, timeStamp);
 
     // Release fallback
     this.gesture.release();
@@ -137,15 +143,14 @@ export class Gesture {
   }
 
   private pointerMove(ev: UIEvent) {
-    if (this.pan) {
-      const detail = this.detail;
-      detail.currentX = pointerCoordX(ev);
-      detail.currentY = pointerCoordY(ev);
-      detail.event = ev;
+    const detail = this.detail;
+    this.calcGestureData(ev);
 
+    if (this.pan) {
       if (this.hasCapturedPan) {
         // this.debouncer.write(() => {
           detail.type = 'pan';
+
           if (this.onMove) {
             this.onMove(detail);
           } else {
@@ -160,6 +165,45 @@ export class Gesture {
           }
         }
       }
+    }
+  }
+
+  private calcGestureData(ev: UIEvent) {
+    const detail = this.detail;
+    detail.currentX = pointerCoordX(ev);
+    detail.currentY = pointerCoordY(ev);
+    detail.deltaX = (detail.currentX - detail.startX);
+    detail.deltaY = (detail.currentY - detail.startY);
+    detail.event = ev;
+
+    // figure out which direction we're movin'
+    detail.directionX = detail.velocityDirectionX = (detail.deltaX > 0 ? 'left' : (detail.deltaX < 0 ? 'right' : null));
+    detail.directionY = detail.velocityDirectionY = (detail.deltaY > 0 ? 'up' : (detail.deltaY < 0 ? 'down' : null));
+
+    const positions = this.positions;
+    positions.push(detail.currentX, detail.currentY, detail.timeStamp);
+
+    var endPos = (positions.length - 1);
+    var startPos = endPos;
+    var timeRange = (detail.timeStamp - 100);
+
+    // move pointer to position measured 100ms ago
+    for (var i = endPos; i > 0 && positions[i] > timeRange; i -= 3) {
+      startPos = i;
+    }
+
+    if (startPos !== endPos) {
+      // compute relative movement between these two points
+      var movedX = (positions[startPos - 2] - positions[endPos - 2]);
+      var movedY = (positions[startPos - 1] - positions[endPos - 1]);
+      var factor = 16 / (positions[endPos] - positions[startPos]);
+
+      // based on XXms compute the movement to apply for each render step
+      detail.velocityX = movedX * factor;
+      detail.velocityY = movedY * factor;
+
+      detail.velocityDirectionX = (detail.velocityX > 0 ? 'left' : (detail.velocityX < 0 ? 'right' : null));
+      detail.velocityDirectionY = (detail.velocityY > 0 ? 'up' : (detail.velocityY < 0 ? 'down' : null));
     }
   }
 
@@ -222,6 +266,8 @@ export class Gesture {
     this.gesture && this.gesture.release();
 
     detail.event = ev;
+
+    this.calcGestureData(ev);
 
     if (this.pan) {
       if (this.hasCapturedPan) {

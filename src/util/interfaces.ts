@@ -31,8 +31,17 @@ export interface GestureDetail {
   event?: UIEvent;
   startX?: number;
   startY?: number;
+  startTimeStamp?: number;
   currentX?: number;
   currentY?: number;
+  velocityX?: number;
+  velocityY?: number;
+  deltaX?: number;
+  deltaY?: number;
+  directionX?: 'left'|'right';
+  directionY?: 'up'|'down';
+  velocityDirectionX?: 'left'|'right';
+  velocityDirectionY?: 'up'|'down';
   timeStamp?: number;
 }
 
