@@ -14,6 +14,7 @@
  */
 
 import { buildBindingCore, LICENSE, readFile, writeFile } from './build-core';
+import * as cleanCss from 'clean-css';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
@@ -96,6 +97,7 @@ function bundleComponents() {
     srcDir: compiledDir,
     destDir: destDir,
     packages: {
+      cleanCss: cleanCss,
       fs: fs,
       path: path,
       rollup: rollup,

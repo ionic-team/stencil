@@ -33,7 +33,14 @@ export function bundleComponentModeStyle(config: BundlerConfig, styleUrl: string
         reject(err);
 
       } else {
-        const css = result.css.toString().replace(/\n/g, '').trim();
+        let css = result.css.toString().replace(/\n/g, '').trim();
+
+        if (!config.devMode && config.packages.cleanCss) {
+          const output = new config.packages.cleanCss().minify(css);
+
+          css = output.styles;
+        }
+
         resolve(css);
       }
     });

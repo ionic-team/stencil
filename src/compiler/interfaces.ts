@@ -177,6 +177,11 @@ export interface Packages {
   typescript?: {
 
   };
+  cleanCss?: {
+    new(opts?: any): {
+      minify: {(input: string): any}
+    };
+  };
   nodeSass?: {
     render: Function;
   };
