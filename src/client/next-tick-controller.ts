@@ -6,7 +6,7 @@ export function NextTickController(window: Window): NextTickApi {
   /* Adopted from Vue.js, MIT, https://github.com/vuejs/vue */
   const callbacks: Function[] = [];
   let pending = false;
-  let timerFunc;
+  let timerFunc: Function;
   const isIOS = /iphone|ipad|ipod|ios/.test(window.navigator.userAgent.toLowerCase());
 
 
@@ -21,9 +21,9 @@ export function NextTickController(window: Window): NextTickApi {
   }
 
 
-  if (typeof Promise !== "undefined" && Promise.toString().indexOf("[native code]") !== -1) {
+  if (typeof Promise !== 'undefined' && Promise.toString().indexOf('[native code]') !== -1) {
     const p = Promise.resolve();
-    const logError = err => { console.error(err); };
+    const logError = (err: any) => { console.error(err); };
 
     timerFunc = function promiseTick() {
       p.then(nextTickHandler).catch(logError);
@@ -33,7 +33,7 @@ export function NextTickController(window: Window): NextTickApi {
       // needs to do some other work, e.g. handle a timer. Therefore we can
       // "force" the microtask queue to be flushed by adding an empty timer.
       if (isIOS) setTimeout(noop);
-    }
+    };
 
   } else {
     // fallback to setTimeout
@@ -53,5 +53,5 @@ export function NextTickController(window: Window): NextTickApi {
 
   return {
     nextTick: queueNextTick
-  }
+  };
 }

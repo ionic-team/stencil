@@ -203,7 +203,7 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
     $attachShadow: attachShadow
-  }
+  };
 }
 
 

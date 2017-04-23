@@ -44,7 +44,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 }
 
 
-function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Component, propTypeCode: number, propName: string): any {
+function getInitialValue(config: ConfigApi, elm: ProxyElement, instance: Component, propTypeCode: number, propName: string): any {
   if (elm[propName] !== undefined) {
     return elm[propName];
   }

@@ -3,11 +3,11 @@ export interface Ionic {
   emit: EventEmit;
   listener: {
     enable: EventListenerEnable;
-  }
+  };
   theme: IonicTheme;
   controllers: {
     gesture?: any;
-  }
+  };
 }
 
 
@@ -167,7 +167,7 @@ export interface ComponentListenersData {
 
 
 export interface ComponentWatchersData {
-
+  [methodName: string]: any;
 }
 
 
@@ -287,6 +287,8 @@ export interface Component {
   $listeners?: ComponentActiveListeners;
   $root?: HTMLElement | ShadowRoot;
   $vnode?: VNode;
+
+  [memberName: string]: any;
 }
 
 
@@ -300,8 +302,8 @@ export interface BaseInputComponent extends Component {
   hasFocus: boolean;
   value: string;
 
-  fireFocus: {(): void;}
-  fireBlur: {(): void;}
+  fireFocus: {(): void};
+  fireBlur: {(): void};
 }
 
 
@@ -328,6 +330,8 @@ export interface ProxyElement extends HTMLElement {
 
   $queued?: boolean;
   $instance?: Component;
+
+  [memberName: string]: any;
 }
 
 

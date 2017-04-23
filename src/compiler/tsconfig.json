@@ -1,23 +1,30 @@
 {
   "compilerOptions": {
+    "alwaysStrict": true,
+    "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "declaration": true,
+    "experimentalDecorators": false,
+    "forceConsistentCasingInFileNames": true,
     "lib": [
       "dom",
       "es2015"
     ],
+    "moduleResolution": "node",
     "module": "es2015",
     "target": "es5",
-    "moduleResolution": "node",
     "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "outDir": "../../dist/transpiled-compiler",
+    "pretty": true,
     "removeComments": true,
     "sourceMap": false,
     "types": [
       "node"
-    ],
-    "outDir": "../../dist/transpiled-compiler"
+    ]
   },
   "include": [
     "**/*.ts"

@@ -297,8 +297,8 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     };
   });
 
-  const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json')
+  const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json');
   const json = JSON.stringify(manifest, null, 2);
 
-  return writeFile(config.packages, manifestFile, json)
+  return writeFile(config.packages, manifestFile, json);
 }

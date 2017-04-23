@@ -222,7 +222,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
           fromString: true
         });
         content = minifyResults.code;
-      } catch(e) {
+      } catch (e) {
         console.log(`uglify.minify error: ${e}`);
       }
     }
@@ -255,7 +255,7 @@ function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePat
     }
 
     if (config.debug) {
-      console.log(`bundle, createCoreJs: ${destFilePath}`)
+      console.log(`bundle, createCoreJs: ${destFilePath}`);
     }
 
     return writeFile(config.packages, destFilePath, content);

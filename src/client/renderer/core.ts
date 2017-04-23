@@ -215,7 +215,7 @@ export function Renderer(api: PlatformApi): RendererApi {
       }
     }
     if (oldStartIdx > oldEndIdx) {
-      before = newCh[newEndIdx+1] == null ? null : newCh[newEndIdx+1].elm;
+      before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
       addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue);
     } else if (newStartIdx > newEndIdx) {
       removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);

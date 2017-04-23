@@ -90,7 +90,7 @@ export function formatModeName(modeName: string) {
 function formatListeners(label: string, listeners: Listeners) {
   const methodNames = Object.keys(listeners);
   if (!methodNames.length) {
-    return '[]'
+    return '[]';
   }
 
   const t: string[] = [];
@@ -120,7 +120,7 @@ function formatListenerOpts(label: string, methodName: string, listenerIndex: nu
 function formatWatchers(label: string, watchers: Watchers) {
   const methodNames = Object.keys(watchers);
   if (!methodNames.length) {
-    return '[]'
+    return '[]';
   }
 
   const t: string[] = [];

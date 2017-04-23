@@ -254,7 +254,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
     $attachShadow: attachShadow
-  }
+  };
 }
 
 

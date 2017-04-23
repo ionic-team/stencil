@@ -10,7 +10,7 @@ export function registerComponentsES5(window: Window, renderer: RendererApi, plt
     const cmpMeta = plt.registerComponent(tag, components[tag]);
 
 
-    function ProxyElement(self) {
+    function ProxyElement(self: any) {
       return HTMLElement.call(this, self);
     }
 

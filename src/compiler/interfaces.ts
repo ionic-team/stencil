@@ -8,7 +8,7 @@ export interface CompilerConfig {
     outDir?: string;
     sourceMap?: boolean;
     target?: 'es5' | 'es2015';
-  },
+  };
   include: string[];
   exclude?: string[];
   devMode?: boolean;
@@ -82,7 +82,7 @@ export interface Manifest {
     core_ce: string;
     core_sd_ce: string;
     [key: string]: string;
-  }
+  };
 }
 
 
@@ -184,7 +184,7 @@ export interface Packages {
     rollup: Rollup;
   };
   uglify?: {
-    minify: {(content: string, opts: any): {code: string;}};
+    minify: {(content: string, opts: any): {code: string}};
   };
 }
 

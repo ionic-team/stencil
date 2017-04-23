@@ -40,7 +40,7 @@ function handleEvent(event: Event, vnode: VNode) {
 function createListener() {
   return function handler(event: Event) {
     handleEvent(event, (handler as any).vnode);
-  }
+  };
 }
 
 export function updateEventListeners(oldVnode: VNode, vnode?: VNode): void {

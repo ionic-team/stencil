@@ -19,7 +19,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
 }
 
 
-function getMode(plt: PlatformApi, config: ConfigApi, elm: HTMLElement, propName: string): string {
+function getMode(plt: PlatformApi, config: ConfigApi, elm: ProxyElement, propName: string): string {
   let value = elm[propName];
   if (isDef(value)) {
     return value;

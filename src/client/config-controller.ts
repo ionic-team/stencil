@@ -1,10 +1,10 @@
 import { ConfigApi } from '../util/interfaces';
 
 
-export function ConfigController(config: Object = {}): ConfigApi {
+export function ConfigController(config: any = {}): ConfigApi {
 
   // TODO
-  function get(key: string, fallback = null): any {
+  function get(key: string, fallback: any = null): any {
     if (key === 'mode') {
       return 'md';
     }

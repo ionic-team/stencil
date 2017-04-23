@@ -172,7 +172,7 @@ export function ensureDirs(packages: Packages, paths: string[]) {
           dirExists.add(dir);
           checkChunk(chunks, ++appendIndex, resolve);
         }
-      })
+      });
     }
 
     checkDir(resolve);

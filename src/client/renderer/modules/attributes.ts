@@ -22,7 +22,7 @@ export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
     if (old !== cur) {
       if (typeof cur === 'boolean') {
         if (cur) {
-          elm.setAttribute(key, "");
+          elm.setAttribute(key, '');
         } else {
           elm.removeAttribute(key);
         }

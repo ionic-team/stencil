@@ -49,7 +49,7 @@ export function removeImports(ctx: BuildContext): ts.TransformerFactory<ts.Sourc
       }
 
       return tsSourceFile;
-    }
-  }
+    };
+  };
 
 }

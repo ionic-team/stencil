@@ -93,7 +93,7 @@ export function addEventListener(elm: any, eventName: string, cb: {(ev?: any): v
           break;
 
         case 'window':
-          elm = (<HTMLElement>elm).ownerDocument.defaultView
+          elm = (<HTMLElement>elm).ownerDocument.defaultView;
           break;
       }
     }
