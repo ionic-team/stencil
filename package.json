@@ -5,7 +5,6 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf dist/",
-    "compare": "node scripts/build.compare.js",
     "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.universal",
     "build.compiler": "node dist/scripts/build-compiler.js",
     "build.web": "node dist/scripts/build-web.js",
