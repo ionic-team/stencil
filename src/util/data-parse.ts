@@ -1,11 +1,11 @@
-import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchesData, Props } from '../util/interfaces';
+import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, Props } from '../util/interfaces';
 import { isString } from './helpers';
 
 
 export function parseComponentModeData(registry: ComponentRegistry, moduleImports: any, h: any, injectedIonic: any, cmpModeData: ComponentModeData) {
   var i = 0;
   var cmpListenerData: ComponentListenersData;
-  var cmpWatchData: ComponentWatchesData;
+  var cmpWatchData: ComponentWatchersData;
 
   // tag name (ion-badge)
   // get component meta data by tag name
@@ -23,11 +23,11 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
     };
   }
 
-  // component instance property watches
-  cmpMeta.watches = {};
+  // component instance property watchers
+  cmpMeta.watchers = {};
   for (i = 0; i < cmpModeData[3].length; i++) {
     cmpWatchData = cmpModeData[3][i];
-    cmpMeta.watches[cmpWatchData[0]] = {
+    cmpMeta.watchers[cmpWatchData[0]] = {
       fn: cmpWatchData[1],
     };
   }

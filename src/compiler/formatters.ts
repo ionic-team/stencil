@@ -1,4 +1,4 @@
-import { Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watches, WatchOpts } from './interfaces';
+import { Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watchers, WatchOpts } from './interfaces';
 
 
 export function formatBundleFileName(bundleId: number) {
@@ -54,13 +54,13 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 
   const listeners = formatListeners(label, component.listeners);
 
-  const watches = formatWatches(label, component.watches);
+  const watchers = formatWatchers(label, component.watchers);
 
   const t = [
     `/** ${label}: [0] tagName **/\n'${tag}'`,
     `/** ${label}: [1] component class name **/\n'${componentClass}'`,
     `/** ${label}: [2] listeners **/\n${listeners}`,
-    `/** ${label}: [3] watches **/\n${watches}`,
+    `/** ${label}: [3] watchers **/\n${watchers}`,
     `/** ${label}: [4] shadow **/\n${formatBoolean(shadow)}`,
     `/** ${label}: [5] modeName **/\n${modeCode}`,
     `/** ${label}: [6] styles **/\n${styles}`,
@@ -117,8 +117,8 @@ function formatListenerOpts(label: string, methodName: string, listenerIndex: nu
 }
 
 
-function formatWatches(label: string, watches: Watches) {
-  const methodNames = Object.keys(watches);
+function formatWatchers(label: string, watchers: Watchers) {
+  const methodNames = Object.keys(watchers);
   if (!methodNames.length) {
     return '[]'
   }
@@ -126,7 +126,7 @@ function formatWatches(label: string, watches: Watches) {
   const t: string[] = [];
 
   methodNames.forEach((methodName, watchIndex) => {
-    t.push(formatWatcherOpts(label, methodName, watchIndex, watches[methodName]));
+    t.push(formatWatcherOpts(label, methodName, watchIndex, watchers[methodName]));
   });
 
   return `[\n` + t.join(',\n') + `\n]`;

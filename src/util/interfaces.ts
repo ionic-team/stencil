@@ -112,9 +112,9 @@ export interface ComponentModeData {
   [2]: ComponentListenersData[];
 
   /**
-   * watches
+   * watchers
    */
-  [3]: ComponentWatchesData[];
+  [3]: ComponentWatchersData[];
 
   /**
    * shadow
@@ -166,7 +166,7 @@ export interface ComponentListenersData {
 }
 
 
-export interface ComponentWatchesData {
+export interface ComponentWatchersData {
 
 }
 
@@ -235,7 +235,7 @@ export interface WatchOpts {
 }
 
 
-export interface Watches {
+export interface Watchers {
   [propName: string]: WatchOpts;
 }
 
@@ -256,7 +256,7 @@ export interface ComponentMeta {
   tag?: string;
   props?: Props;
   listeners?: ComponentMetaListeners;
-  watches?: Watches;
+  watchers?: Watchers;
   shadow?: boolean;
   obsAttrs?: string[];
   hostCss?: string;

@@ -259,7 +259,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       modes: modes,
       props: f.cmpMeta.props,
       listeners: f.cmpMeta.listeners,
-      watches: f.cmpMeta.watches,
+      watchers: f.cmpMeta.watchers,
       shadow: f.cmpMeta.shadow
     });
   });
@@ -292,7 +292,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       modes: cmp.modes,
       props: cmp.props,
       listeners: cmp.listeners,
-      watches: cmp.watches,
+      watchers: cmp.watchers,
       shadow: cmp.shadow
     };
   });

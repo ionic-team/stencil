@@ -155,7 +155,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-      cmpMeta.watches = {};
+      cmpMeta.watchers = {};
 
       propMembers.forEach(memberNode => {
         let isWatch = false;
@@ -187,7 +187,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         });
 
         if (isWatch && propName && methodName) {
-          cmpMeta.watches[propName] = {
+          cmpMeta.watchers[propName] = {
             fn: methodName
           };
 

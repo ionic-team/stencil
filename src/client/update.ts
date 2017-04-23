@@ -33,7 +33,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     instance.$el = elm;
     instance.$meta = cmpMeta;
 
-    initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.watches);
+    initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.watchers);
     initalLoad = true;
   }
 

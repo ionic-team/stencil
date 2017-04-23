@@ -96,7 +96,7 @@ export interface Component {
   modes: {[modeName: string]: ComponentMode};
   props: Props;
   listeners: Listeners;
-  watches: Watches;
+  watchers: Watchers;
   shadow: boolean;
   componentClass: string;
   componentUrl: string;
@@ -115,7 +115,7 @@ export interface ComponentMeta {
   tag?: string;
   props?: Props;
   listeners?: Listeners;
-  watches?: Watches;
+  watchers?: Watchers;
   shadow?: boolean;
   observedAttrs?: string[];
   hostCss?: string;
@@ -152,7 +152,7 @@ export interface WatchOpts {
 }
 
 
-export interface Watches {
+export interface Watchers {
   [propName: string]: WatchOpts;
 }
 
