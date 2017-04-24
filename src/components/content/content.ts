@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../../index';
+import { Component, h, Ionic, Prop } from '../../index';
 
 
 /**
@@ -105,14 +105,42 @@ import { Component, h, Ionic } from '../../index';
 })
 export class Content {
 
+  /**
+   * @output {ScrollEvent} Emitted when the scrolling first starts.
+   */
+  @Prop() ionScrollStart: Function;
+
+  /**
+   * @output {ScrollEvent} Emitted on every scroll event.
+   */
+  @Prop() ionScroll: Function;
+
+  /**
+   * @output {ScrollEvent} Emitted when scrolling ends.
+   */
+  @Prop() ionScrollEnd: Function;
+
 
   render() {
+    const props: any = {};
+
+    if (this.ionScrollStart) {
+      props['ionScrollStart'] = this.ionScrollStart.bind(this);
+    }
+    if (this.ionScroll) {
+      props['ionScroll'] = this.ionScroll.bind(this);
+    }
+    if (this.ionScrollEnd) {
+      props['ionScrollEnd'] = this.ionScrollEnd.bind(this);
+    }
+
     return h(this,
-      h('ion-gesture', Ionic.theme(this, 'content', {
+      h('ion-scroll', Ionic.theme(this, 'content', {
           class: {
             'scroll-content': true,
             'statusbar-padding': this.statusbarPadding,
-          }
+          },
+          props: props
         }),
         h('slot')
       )

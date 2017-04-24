@@ -1,4 +1,4 @@
-import { Component, ComponentMeta, ComponentMode, ComponentRegistry,
+import { Component, ComponentMeta, ComponentRegistry, ConfigApi,
   DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './injected-ionic';
@@ -6,7 +6,7 @@ import { parseComponentModeData, parseModeName, parseProp } from '../util/data-p
 import { toDashCase } from '../util/helpers';
 
 
-export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
+export function PlatformClient(win: any, doc: HTMLDocument, IonicGbl: IonicGlobal, staticDir: string, configCtrl: ConfigApi, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
@@ -16,10 +16,10 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
 
 
-  const injectedIonic = initInjectedIonic(doc, ionic);
+  const injectedIonic = initInjectedIonic(win, IonicGbl.eventNamePrefix, configCtrl, domCtrl);
 
 
-  ionic.loadComponents = function loadComponents(bundleId) {
+  IonicGbl.loadComponents = function loadComponents(bundleId) {
     var args = arguments;
     for (var i = 1; i < args.length; i++) {
       // first arg is the bundleId

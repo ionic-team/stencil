@@ -82,7 +82,7 @@ function compileComponents() {
       ['ion-app', 'ion-content'],
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-      ['ion-gesture'],
+      ['ion-gesture', 'ion-scroll'],
       ['ion-toggle']
     ],
     packages: {

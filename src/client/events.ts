@@ -115,20 +115,6 @@ export function detachListeners(instance: Component) {
 }
 
 
-export function emitEvent(doc: HTMLDocument, eventNamePrefix: string, instance: Component, eventName: string, data?: any) {
-  if (instance && instance.$el) {
-    const ev = doc.createEvent('CustomEvent');
-
-    if (eventNamePrefix) {
-      eventName = eventNamePrefix + eventName;
-    }
-
-    ev.initCustomEvent(eventName, true, true, data);
-    instance.$el.dispatchEvent(ev);
-  }
-}
-
-
 function checkEventOptsSupport(elm: any) {
   let hasEventOptionsSupport = false;
 

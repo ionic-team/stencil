@@ -14,7 +14,15 @@ export interface Ionic {
 
 
 export interface EventEmit {
-  (instance: any, eventName: string, data?: any): void;
+  (instance: any, eventName: string, data?: CustomEventOptions): void;
+}
+
+
+export interface CustomEventOptions {
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
+  detail?: any;
 }
 
 
@@ -53,6 +61,29 @@ export interface GestureCallback {
 }
 
 
+export interface ScrollDetail extends GestureDetail {
+  scrollTop?: number;
+  scrollLeft?: number;
+  scrollHeight?: number;
+  scrollWidth?: number;
+  contentHeight?: number;
+  contentWidth?: number;
+  contentTop?: number;
+  contentBottom?: number;
+  domWrite?: {(fn: DomWrite, ctx?: any): void};
+  contentElement?: HTMLElement;
+  fixedElement?: HTMLElement;
+  scrollElement?: HTMLElement;
+  headerElement?: HTMLElement;
+  footerElement?: HTMLElement;
+}
+
+
+export interface ScrollCallback {
+  (detail?: ScrollDetail): boolean|void;
+}
+
+
 export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
@@ -76,12 +107,12 @@ export interface NextTick {
 
 
 export interface DomRead {
-  (cb: Function): void;
+  (cb: {(timeStamp: number): void}): void;
 }
 
 
 export interface DomWrite {
-  (cb: Function): void;
+  (cb: {(timeStamp: number): void}): void;
 }
 
 
