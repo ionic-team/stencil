@@ -138,14 +138,16 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
   });
 
   return generateBundleFiles(config, ctx).then(() => {
-    const content = formatRegistryContent(ctx.registry);
+    const registryContent = formatRegistryContent(ctx.registry);
+    ctx.results.registry = registryContent;
+    ctx.results.loaderPath = config.packages.path.join(config.destDir, 'ionic.js');
 
     const promises: Promise<any>[] = [];
 
     Object.keys(ctx.results.manifest.coreFiles).forEach(coreDirName => {
       const corePath = ctx.results.manifest.coreFiles[coreDirName];
 
-      promises.push(createCoreJs(config, content, corePath));
+      promises.push(createCoreJs(config, registryContent, corePath));
     });
 
     return Promise.all(promises);
@@ -248,14 +250,16 @@ function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePat
   let destFilePath = config.packages.path.join(config.destDir, fileName);
 
   return readFile(config.packages, srcFilePath).then(coreJsContent => {
-    let content: string;
+    let content = coreJsContent;
 
-    if (config.devMode) {
-      content = registryContent + '\n\n' + coreJsContent;
+    if (config.attachRegistryTo === 'core') {
+      if (config.devMode) {
+        content = registryContent + '\n\n' + content;
 
-    } else {
-      registryContent = registryContent.replace(/\s/g, '');
-      content = registryContent + '\n' + coreJsContent;
+      } else {
+        registryContent = registryContent.replace(/\s/g, '');
+        content = registryContent + '\n' + content;
+      }
     }
 
     if (config.debug) {

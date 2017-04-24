@@ -49,13 +49,18 @@ compileComponents()
     return buildBindingCore(transpiledSrcDir, compiledDir, 'core');
 
   }).then(() => {
-    // next add the component registry to the top of each core file
-    return bundleComponents();
-
-  }).then(() => {
     // next build the ionic.js loader file which
     // ionic-web uses to decide which core files to load
     return buildLoader();
+
+  }).then(() => {
+    // next add the component registry to the top of each core file
+    return bundleComponents().then(results => {
+      return readFile(results.loaderPath).then(content => {
+        content = results.registry + content;
+        return writeFile(results.loaderPath, content);
+      });
+    });
 
   }).catch(err => {
     console.log(err);
@@ -74,6 +79,7 @@ function compileComponents() {
     debug: true,
     devMode: true,
     bundles: [
+      ['ion-app', 'ion-content'],
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
       ['ion-gesture'],

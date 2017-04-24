@@ -24,6 +24,7 @@ export interface BundlerConfig {
   devMode?: boolean;
   packages: Packages;
   debug?: boolean;
+  attachRegistryTo?: 'core'|'loader';
 }
 
 
@@ -56,6 +57,8 @@ export interface Results {
   files?: string[];
   manifest?: Manifest;
   manifestPath?: string;
+  registry?: string;
+  loaderPath?: string;
 }
 
 
