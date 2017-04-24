@@ -10,6 +10,10 @@ export function removeImports(ctx: BuildContext): ts.TransformerFactory<ts.Sourc
   return (transformContext) => {
 
     function visitImport(importNode: ts.ImportDeclaration) {
+      if (typeof importNode.importClause.namedBindings === 'undefined') {
+        return ts.visitEachChild(importNode, visit, transformContext);
+      }
+
       const importSpecifiers: ts.ImportSpecifier[] = [];
 
       importNode.importClause.namedBindings.forEachChild(nb => {
@@ -23,27 +27,24 @@ export function removeImports(ctx: BuildContext): ts.TransformerFactory<ts.Sourc
       });
 
       const namedImports = ts.createNamedImports(importSpecifiers);
-
       const newImportClause = ts.updateImportClause(importNode.importClause, importNode.importClause.name, namedImports);
 
       return ts.updateImportDeclaration(importNode, importNode.decorators, importNode.modifiers, newImportClause, importNode.moduleSpecifier);
     }
 
+
     function visit(node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
-
-        case ts.SyntaxKind.ImportDeclaration:
-          return visitImport(node as ts.ImportDeclaration);
-
-        default:
-          return ts.visitEachChild(node, (node) => {
-            return visit(node);
-          }, transformContext);
+      case ts.SyntaxKind.ImportDeclaration:
+        return visitImport(node as ts.ImportDeclaration);
+      default:
+        return ts.visitEachChild(node, visit, transformContext);
       }
     }
 
     return (tsSourceFile) => {
       const fileMeta = ctx.files.get(tsSourceFile.fileName);
+
       if (fileMeta && fileMeta.hasCmpClass) {
         return visit(tsSourceFile) as ts.SourceFile;
       }

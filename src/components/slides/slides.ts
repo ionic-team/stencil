@@ -138,8 +138,6 @@ export class Slides {
   swiper: Swiper;
   $el: HTMLElement;
 
-  paginationBulletRender: (index?: number, cssClass?: string) => void = null;
-
   /**
    * @input {string} The animation effect of the slides.
    * Possible values are: `slide`, `fade`, `cube`, `coverflow` or `flip`.
