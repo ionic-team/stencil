@@ -72,7 +72,7 @@ function compileComponents() {
     include: [srcDir],
     exclude: ['node_modules', 'test'],
     debug: true,
-    devMode: false,
+    devMode: true,
     bundles: [
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
@@ -105,7 +105,7 @@ function bundleComponents() {
       nodeSass: nodeSass,
       typescript: typescript
     },
-    devMode: false,
+    devMode: true,
     debug: true
   };
 
