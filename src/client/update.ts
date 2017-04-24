@@ -34,16 +34,13 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     instance.$meta = cmpMeta;
 
     initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.watchers);
+
+    plt.$attachComponent(elm, cmpMeta, instance);
+
     initalLoad = true;
   }
 
   if (cmpMeta.shadow) {
-    if (!instance.$root) {
-      const cmpMode = cmpMeta.modes[instance.mode];
-      const cmpModeId = `${tag}.${instance.mode}`;
-      instance.$root = plt.$attachShadow(elm, cmpMode, cmpModeId);
-    }
-
     const vnode = generateVNode(instance.$root, instance, cmpMeta.hostCss);
 
     // if we already have a vnode then use it

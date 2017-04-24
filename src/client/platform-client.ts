@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentMode, ComponentRegistry,
+import { Component, ComponentMeta, ComponentMode, ComponentRegistry,
   DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './injected-ionic';
@@ -98,29 +98,36 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   }
 
 
-  function attachShadow(elm: Element, cmpMode: ComponentMode, cmpModeId: string) {
-    const shadowRoot = elm.attachShadow({ mode: 'open' });
+  function attachComponent(elm: Element, cmpMeta: ComponentMeta, instance: Component) {
+    if (cmpMeta.shadow) {
+      instance.$root = elm.attachShadow({ mode: 'open' });
+    }
 
-    if (cmpMode.styles) {
-      if (hasNativeShadowDom) {
+    const cmpMode = cmpMeta.modes[instance.mode];
+
+    if (cmpMode && cmpMode.styles) {
+      if (cmpMeta.shadow && hasNativeShadowDom) {
         if (!cmpMode.styleElm) {
           cmpMode.styleElm = createElement('style');
           cmpMode.styleElm.innerHTML = cmpMode.styles;
         }
 
-        shadowRoot.appendChild(cmpMode.styleElm.cloneNode(true));
+        instance.$root.appendChild(cmpMode.styleElm.cloneNode(true));
 
-      } else if (!hasCss(cmpModeId)) {
-        const headStyleEle = createElement('style');
-        headStyleEle.dataset['cmpModeId'] = cmpModeId;
-        headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
-        appendChild(doc.head, headStyleEle);
-        setCss(cmpModeId);
+      } else {
+        const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
+
+        if (!hasCss(cmpModeId)) {
+          const headStyleEle = createElement('style');
+          headStyleEle.dataset['cmpId'] = cmpModeId;
+          headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+          appendChild(doc.head, headStyleEle);
+          setCss(cmpModeId);
+        }
       }
     }
-
-    return shadowRoot;
   }
+
 
   function registerComponent(tag: string, data: any[]) {
     const modeBundleIds = data[0];
@@ -253,7 +260,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachShadow: attachShadow
+    $attachComponent: attachComponent
   };
 }
 

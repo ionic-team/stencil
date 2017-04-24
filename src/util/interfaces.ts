@@ -414,7 +414,7 @@ export interface PlatformApi {
   $setTextContent: (node: Node, text: string | null) => void;
   $getTextContent: (node: Node) => string | null;
   $getAttribute: (elm: Element, attrName: string) => string;
-  $attachShadow: (elm: Element, cmpMode: ComponentMode, cmpModeId: string) => ShadowRoot;
+  $attachComponent: (elm: Element, cmpMeta: ComponentMeta, instance: Component) => void;
 }
 
 
