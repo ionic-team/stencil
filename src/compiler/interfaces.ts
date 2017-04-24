@@ -200,6 +200,7 @@ export interface Rollup {
       footer?: string;
       exports?: string;
       moduleName?: string;
+      plugins?: any;
     }): {
       code: string;
       map: any;

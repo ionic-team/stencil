@@ -43,6 +43,8 @@
     "parse5": "^3.0.2",
     "rimraf": "2.6.1",
     "rollup": "0.41.4",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "swiper": "^3.4.2",
     "typescript": "rc"
   },

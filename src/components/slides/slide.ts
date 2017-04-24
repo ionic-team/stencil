@@ -15,9 +15,9 @@ import { Component, h } from '../../index';
 @Component({
   tag: 'ion-slide',
   styleUrls: {
-    ios: 'slides.scss',
-    md: 'slides.scss',
-    wp: 'slides.scss'
+    ios: 'slide.ios.scss',
+    md: 'slide.md.scss',
+    wp: 'slide.wp.scss'
   }
 })
 export class Slide {

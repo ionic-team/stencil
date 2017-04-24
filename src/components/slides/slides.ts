@@ -164,7 +164,7 @@ export class Slides {
    * @input {string}  Swipe direction: 'horizontal' or 'vertical'.
    * Default: `horizontal`.
    */
-  @Prop() direction: 'horizontal' | 'vertical';
+  @Prop() direction: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
    * @input {number}  Index number of initial slide. Default: `0`.
@@ -233,7 +233,8 @@ export class Slides {
       h('div', {
           class: {
             'swiper-container': true
-          }
+          },
+          'data-dir': 'rtl'
         },
         [
           h('div', {
@@ -345,7 +346,7 @@ export class Slides {
     if (!this._init) {
       console.debug(`ion-slides, init`);
 
-      this.container = <HTMLElement>this.$el.firstChild;
+      this.container = <HTMLElement>this.$el;
       var swiperOptions = {
         height: this.height,
         width: this.width,
