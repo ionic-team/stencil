@@ -1,4 +1,4 @@
-import { emitEvent, enableListener } from './events'
+import { emitEvent, enableListener } from './events';
 import { Ionic, IonicGlobal } from '../util/interfaces';
 import { themeVNodeData } from './host';
 
@@ -18,7 +18,9 @@ export function initInjectedIonic(doc: HTMLDocument, ionic: IonicGlobal): Ionic 
 
     controllers: {},
 
-    dom: ionic.domCtrl
+    dom: ionic.domCtrl,
+
+    config: ionic.configCtrl
   };
 
 }
