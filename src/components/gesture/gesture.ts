@@ -20,6 +20,7 @@ export class Gesture {
   private hasPress = false;
   private hasStartedPan = false;
   private requiresMove = false;
+  private isMoveQueued = false;
 
   @Prop() direction: string = 'x';
   @Prop() gestureName: string = '';
@@ -153,15 +154,21 @@ export class Gesture {
 
     if (this.pan) {
       if (this.hasCapturedPan) {
-        Ionic.dom.write(() => {
-          detail.type = 'pan';
 
-          if (this.onMove) {
-            this.onMove(detail);
-          } else {
-            Ionic.emit(this, 'ionGestureMove', this.detail);
-          }
-        });
+        if (!this.isMoveQueued) {
+          this.isMoveQueued = true;
+
+          Ionic.dom.write(() => {
+            this.isMoveQueued = false;
+            detail.type = 'pan';
+
+            if (this.onMove) {
+              this.onMove(detail);
+            } else {
+              Ionic.emit(this, 'ionGestureMove', this.detail);
+            }
+          });
+        }
 
       } else if (this.pan.detect(detail.currentX, detail.currentY)) {
         if (this.pan.isGesture() !== 0) {
