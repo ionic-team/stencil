@@ -54,7 +54,9 @@ export class Gesture {
       Ionic.listener.enable(this, 'touchstart', true, this.listenOn);
       Ionic.listener.enable(this, 'mousedown', true, this.listenOn);
 
-      applyStyles(getElementReference(this.$el, this.listenOn), GESTURE_INLINE_STYLES);
+      Ionic.dom.write(() => {
+        applyStyles(getElementReference(this.$el, this.listenOn), GESTURE_INLINE_STYLES);
+      });
     }
   }
 
@@ -151,7 +153,7 @@ export class Gesture {
 
     if (this.pan) {
       if (this.hasCapturedPan) {
-        // this.debouncer.write(() => {
+        Ionic.dom.write(() => {
           detail.type = 'pan';
 
           if (this.onMove) {
@@ -159,7 +161,7 @@ export class Gesture {
           } else {
             Ionic.emit(this, 'ionGestureMove', this.detail);
           }
-        // });
+        });
 
       } else if (this.pan.detect(detail.currentX, detail.currentY)) {
         if (this.pan.isGesture() !== 0) {
@@ -264,7 +266,6 @@ export class Gesture {
 
   private pointerUp(ev: UIEvent) {
     const detail = this.detail;
-    // this.debouncer.cancel();
 
     this.gesture && this.gesture.release();
 

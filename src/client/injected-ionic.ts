@@ -16,7 +16,9 @@ export function initInjectedIonic(doc: HTMLDocument, ionic: IonicGlobal): Ionic 
       enable: enableListener
     },
 
-    controllers: {}
+    controllers: {},
+
+    dom: ionic.domCtrl
   };
 
 }

@@ -9,11 +9,11 @@ import { Renderer } from '../../../client/renderer/core';
 
 const Ionic: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-const domCtrl = DomController(window);
+Ionic.domCtrl = DomController(window);
 
-const nextTickCtrl = NextTickController(window);
+Ionic.nextTickCtrl = NextTickController(window);
 
-const plt = PlatformClient(window, window.document, Ionic, Ionic.staticDir, domCtrl, nextTickCtrl);
+const plt = PlatformClient(window, window.document, Ionic, Ionic.staticDir, Ionic.domCtrl, Ionic.nextTickCtrl);
 
 const renderer = Renderer(plt);
 

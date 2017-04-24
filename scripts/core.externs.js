@@ -18,6 +18,7 @@ function loadComponents(){};
 function components(){};
 function staticDir(){};
 function domCtrl(){};
+function dom(){};
 function read(){};
 function write(){};
 function nextTickCtrl(){};

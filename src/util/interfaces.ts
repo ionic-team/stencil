@@ -8,6 +8,7 @@ export interface Ionic {
   controllers: {
     gesture?: any;
   };
+  dom: DomControllerApi;
 }
 
 
