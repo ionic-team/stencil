@@ -1,4 +1,5 @@
 import { Component, ComponentMetaListeners, ListenOpts } from '../util/interfaces';
+import { getElementReference, getKeyCodeByName } from '../util/dom';
 import { noop } from '../util/helpers';
 
 
@@ -51,96 +52,51 @@ export function enableListener(instance: Component, eventName: string, shouldEna
 
 
 export function addEventListener(elm: any, eventName: string, cb: {(ev?: any): void}, opts: ListenOpts) {
-  if (elm) {
-    if (supportsOpts === null) {
-      supportsOpts = checkEventOptsSupport(elm);
-    }
-
-    var optsArg: any = (supportsOpts) ? {
-          'capture': !!opts.capture,
-          'passive': !!opts.passive
-        } : !!opts.capture;
-
-    var splt = eventName.split(':');
-    if (splt.length > 1) {
-      // document:mousemove
-      // parent:touchend
-      // body:keyup.enter
-      eventName = splt[1];
-
-      switch (splt[0]) {
-        case 'parent':
-          if (elm.parentElement ) {
-            // normal element with a parent element
-            elm = elm.parentElement;
-
-          } else if (elm.parentNode && elm.parentNode.host) {
-            // shadow dom's document fragment
-            elm = elm.parentNode.host;
-          }
-          break;
-
-        case 'child':
-          elm = (<any>elm).firstElementChild;
-          break;
-
-        case 'document':
-          elm = (<HTMLElement>elm).ownerDocument;
-          break;
-
-        case 'body':
-          elm = (<HTMLElement>elm).ownerDocument.body;
-          break;
-
-        case 'window':
-          elm = (<HTMLElement>elm).ownerDocument.defaultView;
-          break;
-      }
-    }
-
-    splt = eventName.split('.');
-    if (splt.length > 1) {
-      // keyup.enter
-      eventName = splt[0];
-      var validKeycode: number = null;
-
-      switch (splt[1]) {
-        case 'enter':
-          validKeycode = KEY_ENTER;
-          break;
-        case 'escape':
-          // fall through
-        case 'esc':
-          validKeycode = KEY_ESCAPE;
-          break;
-        case 'space':
-          validKeycode = KEY_SPACE;
-          break;
-        case 'tab':
-          validKeycode = KEY_TAB;
-          break;
-      }
-
-      if (validKeycode !== null) {
-        var orgCb = cb;
-        cb = function(ev: KeyboardEvent) {
-          if (ev.keyCode === validKeycode) {
-            orgCb(ev);
-          }
-        };
-      }
-    }
-
-    elm.addEventListener(eventName, cb, optsArg);
-
-    return function removeListener() {
-      if (elm) {
-        elm.removeEventListener(eventName, cb, optsArg);
-      }
-    };
+  if (!elm) {
+    return noop;
   }
 
-  return noop;
+  if (supportsOpts === null) {
+    supportsOpts = checkEventOptsSupport(elm);
+  }
+
+  var eventListenerOpts: any = (supportsOpts) ? {
+        'capture': !!opts.capture,
+        'passive': !!opts.passive
+      } : !!opts.capture;
+
+  var splt = eventName.split(':');
+  if (splt.length > 1) {
+    // document:mousemove
+    // parent:touchend
+    // body:keyup.enter
+    elm = getElementReference(elm, splt[0]);
+    eventName = splt[1];
+  }
+
+  splt = eventName.split('.');
+  if (splt.length > 1) {
+    // keyup.enter
+    eventName = splt[0];
+    var validKeycode = getKeyCodeByName(splt[1]);
+
+    if (validKeycode !== null) {
+      var orgCb = cb;
+      cb = function(ev: KeyboardEvent) {
+        if (ev.keyCode === validKeycode) {
+          orgCb(ev);
+        }
+      };
+    }
+  }
+
+  elm.addEventListener(eventName, cb, eventListenerOpts);
+
+  return function removeListener() {
+    if (elm) {
+      elm.removeEventListener(eventName, cb, eventListenerOpts);
+    }
+  };
 }
 
 
@@ -187,12 +143,3 @@ function checkEventOptsSupport(elm: any) {
 
   return hasEventOptionsSupport;
 }
-
-// const KEY_LEFT = 37;
-// const KEY_UP = 38;
-// const KEY_RIGHT = 39;
-// const KEY_DOWN = 40;
-const KEY_ENTER = 13;
-const KEY_ESCAPE = 27;
-const KEY_SPACE = 32;
-const KEY_TAB = 9;

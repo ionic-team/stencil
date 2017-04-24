@@ -1,7 +1,7 @@
+import { applyStyles, getElementReference, pointerCoordX, pointerCoordY } from '../../util/dom';
 import { Component, Listen, Ionic, Prop } from '../../index';
-import { GestureController, GestureDelegate } from './gesture-controller';
 import { GestureCallback, GestureDetail } from '../../util/interfaces';
-import { pointerCoordX, pointerCoordY } from '../../util/dom';
+import { GestureController, GestureDelegate } from './gesture-controller';
 import { PanRecognizer } from './recognizers';
 
 
@@ -10,6 +10,7 @@ import { PanRecognizer } from './recognizers';
   shadow: false
 })
 export class Gesture {
+  private $el: HTMLElement;
   private detail: GestureDetail = {};
   private positions: number[] = [];
   private gesture: GestureDelegate;
@@ -52,6 +53,8 @@ export class Gesture {
     if (this.pan || this.hasPress) {
       Ionic.listener.enable(this, 'touchstart', true, this.listenOn);
       Ionic.listener.enable(this, 'mousedown', true, this.listenOn);
+
+      applyStyles(getElementReference(this.$el, this.listenOn), GESTURE_INLINE_STYLES);
     }
   }
 
@@ -345,8 +348,17 @@ export class Gesture {
 }
 
 
+const GESTURE_INLINE_STYLES = {
+  'touch-action': 'none',
+  'user-select': 'none',
+  '-webkit-user-drag': 'none',
+  '-webkit-tap-highlight-color': 'rgba(0,0,0,0)'
+};
+
 const MOUSE_WAIT = 2500;
+
 
 function now(ev: UIEvent) {
   return ev.timeStamp || Date.now();
 }
+
