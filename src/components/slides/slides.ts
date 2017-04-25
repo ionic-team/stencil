@@ -138,8 +138,6 @@ export class Slides {
   swiper: Swiper;
   $el: HTMLElement;
 
-  paginationBulletRender: (index?: number, cssClass?: string) => void = null;
-
   /**
    * @input {string} The animation effect of the slides.
    * Possible values are: `slide`, `fade`, `cube`, `coverflow` or `flip`.
@@ -166,7 +164,7 @@ export class Slides {
    * @input {string}  Swipe direction: 'horizontal' or 'vertical'.
    * Default: `horizontal`.
    */
-  @Prop() direction: 'horizontal' | 'vertical';
+  @Prop() direction: 'horizontal' | 'vertical' = 'horizontal';
 
   /**
    * @input {number}  Index number of initial slide. Default: `0`.
@@ -235,12 +233,13 @@ export class Slides {
       h('div', {
           class: {
             'swiper-container': true
-          }
+          },
+          'data-dir': 'rtl'
         },
         [
           h('div', {
               class: {
-                'swipper-wrapper': true
+                'swiper-wrapper': true
               }
             },
             h('slot')
@@ -347,7 +346,8 @@ export class Slides {
     if (!this._init) {
       console.debug(`ion-slides, init`);
 
-      this.container = <HTMLElement>this.$el.firstChild;
+      this.container = <HTMLElement>this.$el.shadowRoot.childNodes[1];
+      this.container.children = this.$el.children[0].children[0].assignedNodes();
       var swiperOptions = {
         height: this.height,
         width: this.width,
