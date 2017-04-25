@@ -21,6 +21,7 @@ function domCtrl(){};
 function dom(){};
 function read(){};
 function write(){};
+function raf(){};
 function nextTickCtrl(){};
 function nextTick(){};
 function eventNamePrefix(){};
