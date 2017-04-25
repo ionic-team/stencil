@@ -239,7 +239,7 @@ export class Slides {
         [
           h('div', {
               class: {
-                'swipper-wrapper': true
+                'swiper-wrapper': true
               }
             },
             h('slot')
@@ -346,7 +346,8 @@ export class Slides {
     if (!this._init) {
       console.debug(`ion-slides, init`);
 
-      this.container = <HTMLElement>this.$el;
+      this.container = <HTMLElement>this.$el.shadowRoot.childNodes[1];
+      this.container.children = this.$el.children[0].children[0].assignedNodes();
       var swiperOptions = {
         height: this.height,
         width: this.width,
