@@ -41,15 +41,25 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   }
 
   if (cmpMeta.shadow) {
-    const vnode = generateVNode(instance.$root, instance, cmpMeta.hostCss);
+    // should use shadom dom with default slot and/or named slots
 
     // if we already have a vnode then use it
     // otherwise, elm is the initial patch and
     // we need it to pass it the actual host element
-    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode);
+    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, generateVNode(instance.$root, instance, cmpMeta.hostCss));
+
+  } else if (initalLoad && instance.render) {
+    // should not use shadow dom, but it still has a render function
+    // in this case it'll manually relocate the content into the render's slot
+    // this does not work for named slots, only the default slot
+    // but it doesn't use native shadow dom for that, everything stays light dom
+    // additionally, this should only happen on the initial load
+    const vnode = instance.render();
+    vnode.elm = elm;
+    renderer(elm, vnode, true);
   }
 
-  if (initalLoad && instance) {
+  if (initalLoad) {
     attachListeners(cmpMeta.listeners, instance);
 
     instance.ionViewDidLoad && instance.ionViewDidLoad();

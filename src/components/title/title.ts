@@ -1,4 +1,4 @@
-import { Component } from '../../index';
+import { Component, h, Ionic } from '../../index';
 
 
 /**
@@ -43,15 +43,21 @@ import { Component } from '../../index';
     md: 'title.md.scss',
     wp: 'title.wp.scss'
   },
-  // template:
-  //   '<div class="toolbar-title" [ngClass]="\'toolbar-title-\' + _mode">' +
-  //     '<ng-content></ng-content>' +
-  //   '</div>'
+  shadow: false
 })
 export class ToolbarTitle {
   constructor() {
     // toolbar && toolbar._setTitle(this);
     // navbar && navbar._setTitle(this);
+  }
+
+  render() {
+    return h(this,
+      h('div',
+        Ionic.theme(this, 'toolbar-title'),
+        h('slot')
+      )
+    );
   }
 
   // /**

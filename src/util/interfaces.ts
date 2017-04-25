@@ -384,7 +384,7 @@ export interface ProxyElement extends HTMLElement {
 
 
 export interface RendererApi {
-  (oldVnode: VNode | Element, vnode: VNode): VNode;
+  (oldVnode: VNode | Element, vnode: VNode, manualSlotProjection?: boolean): VNode;
 }
 
 
