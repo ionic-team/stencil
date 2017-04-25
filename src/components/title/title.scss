@@ -1,0 +1,25 @@
+@import "../../themes/ionic.globals";
+
+
+// Title
+// --------------------------------------------------
+
+ion-title {
+  display: flex;
+  visibility: inherit !important;
+
+  flex: 1;
+  align-items: center;
+
+  transform: translateZ(0);
+}
+
+.toolbar-title {
+  display: block;
+  overflow: hidden;
+
+  width: 100%;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

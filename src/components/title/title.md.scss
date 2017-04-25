@@ -1,0 +1,14 @@
+@import "../../themes/ionic.globals.md";
+@import "./title";
+
+
+// Material Design Title
+// --------------------------------------------------
+
+.toolbar-title-md {
+  padding: 0 12px;
+
+  font-size: $toolbar-md-title-font-size;
+  font-weight: 500;
+  color: $toolbar-md-title-text-color;
+}

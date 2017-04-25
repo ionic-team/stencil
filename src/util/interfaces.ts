@@ -289,7 +289,7 @@ export interface Watchers {
 
 
 export interface IonicTheme {
-  (instance: any, cssClassName: string, vnodeData: VNodeData): VNodeData;
+  (instance: any, cssClassName: string, vnodeData?: VNodeData): VNodeData;
 }
 
 
