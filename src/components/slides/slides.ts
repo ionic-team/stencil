@@ -309,6 +309,7 @@ export class Slides {
    */
   /** @hidden */
   container: HTMLElement;
+  slideElements: HTMLCollection;
   /** @hidden */
   id: number;
   /** @hidden */
@@ -347,8 +348,15 @@ export class Slides {
       console.debug(`ion-slides, init`);
 
       this.container = <HTMLElement>this.$el.shadowRoot.childNodes[1];
-      this.container.children = this.$el.children[0].children[0].assignedNodes();
+      var slideElements = this.$el.children;
+      for (var i = 0; i < slideElements.length; i++) {
+        var item = slideElements[i];
+        item.classList.add('slide-zoom');
+        item.classList.add('swiper-slide');
+      }
+
       var swiperOptions = {
+        slideElements: slideElements,
         height: this.height,
         width: this.width,
         virtualTranslate: this.virtualTranslate,

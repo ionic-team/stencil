@@ -21,15 +21,14 @@ import { Component, h } from '../../index';
   }
 })
 export class Slide {
+  $el: HTMLElement;
+
   render() {
-    return h(this, 
-      h('div', {
-          class: {
-            'slide-zoom': true
-          }
-        },
-        h('slot')
-      )
-    );
+    return h(this, {
+      class: {
+        'slide-zoom': true,
+        'swiper-slide': true
+      }
+    })
   }
 }

@@ -77,7 +77,7 @@ function compileComponents() {
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
       ['ion-gesture'],
       ['ion-toggle'],
-      ['ion-slide', 'ion-slides']
+      ['ion-slides']
     ],
     packages: {
       fs: fs,
