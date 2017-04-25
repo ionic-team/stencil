@@ -70,7 +70,7 @@ export interface ScrollDetail extends GestureDetail {
   contentWidth?: number;
   contentTop?: number;
   contentBottom?: number;
-  domWrite?: {(fn: DomWrite, ctx?: any): void};
+  domWrite?: RequestAnimationFrame;
   contentElement?: HTMLElement;
   fixedElement?: HTMLElement;
   scrollElement?: HTMLElement;
@@ -81,6 +81,22 @@ export interface ScrollDetail extends GestureDetail {
 
 export interface ScrollCallback {
   (detail?: ScrollDetail): boolean|void;
+}
+
+
+export interface ContentDimensions {
+  contentHeight: number;
+  contentTop: number;
+  contentBottom: number;
+
+  contentWidth: number;
+  contentLeft: number;
+
+  scrollHeight: number;
+  scrollTop: number;
+
+  scrollWidth: number;
+  scrollLeft: number;
 }
 
 
@@ -106,21 +122,11 @@ export interface NextTick {
 }
 
 
-export interface DomRead {
-  (cb: {(timeStamp: number): void}): void;
-}
-
-
-export interface DomWrite {
-  (cb: {(timeStamp: number): void}): void;
-}
-
-
 export interface DomControllerApi {
-  read: DomRead;
-  write: DomWrite;
+  read: RequestAnimationFrame;
+  write: RequestAnimationFrame;
+  raf: RequestAnimationFrame;
 }
-
 
 export interface RafCallback {
   (timeStamp?: number): void;
@@ -426,8 +432,6 @@ export interface PlatformApi {
   getComponentMeta: (tag: string) => ComponentMeta;
   loadComponent: (bundleId: string, cb: Function) => void;
   nextTick: NextTick;
-  domRead: DomRead;
-  domWrite: DomWrite;
 
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;

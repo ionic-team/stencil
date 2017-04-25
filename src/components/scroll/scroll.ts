@@ -1,26 +1,27 @@
 import { Component, Listen, Ionic, Prop } from '../../index';
 import { ScrollCallback, ScrollDetail } from '../../util/interfaces';
 import { GestureController, GestureDelegate } from '../../controllers/gesture-controller';
+import { Scroll as IScroll } from './scroll-interface';
 
 
 @Component({
   tag: 'ion-scroll',
   shadow: false
 })
-export class Scroll {
+export class Scroll implements IScroll {
   private $el: HTMLElement;
-  private detail: ScrollDetail = {};
   private gesture: GestureDelegate;
   private positions: number[] = [];
-  private left: number;
-  private top: number;
+  private _l: number;
+  private _t: number;
   private tmr: any;
   private queued = false;
-  private isScrolling: boolean = false;
 
-  @Prop() jsScroll: boolean = false;
+  isScrolling: boolean = false;
+  detail: ScrollDetail = {};
+
   @Prop() enabled: boolean = true;
-
+  @Prop() jsScroll: boolean = false;
   @Prop() ionScrollStart: ScrollCallback;
   @Prop() ionScroll: ScrollCallback;
   @Prop() ionScrollEnd: ScrollCallback;
@@ -30,19 +31,12 @@ export class Scroll {
     Ionic.controllers.gesture = (Ionic.controllers.gesture || new GestureController());
 
     this.gesture = (<GestureController>Ionic.controllers.gesture).createGesture('scroll', 100, false);
-
-    if (this.jsScroll) {
-      Ionic.listener.enable(this, 'touchstart', true);
-
-    } else {
-      Ionic.listener.enable(this, 'scroll', true);
-    }
   }
 
 
   // Native Scroll *************************
 
-  @Listen('scroll', { passive: true, enabled: false })
+  @Listen('scroll', { passive: true })
   onNativeScroll() {
     const self = this;
 
@@ -164,6 +158,17 @@ export class Scroll {
   }
 
 
+  enableJsScroll(contentTop: number, contentBottom: number) {
+    this.jsScroll = true;
+
+    Ionic.listener.enable(this, 'scroll', false);
+
+    Ionic.listener.enable(this, 'touchstart', true);
+
+    contentTop; contentBottom;
+  }
+
+
   // Touch Scroll *************************
 
   @Listen('touchstart', { passive: true, enabled: false })
@@ -171,6 +176,10 @@ export class Scroll {
     if (!this.enabled) {
       return;
     }
+
+    Ionic.listener.enable(this, 'touchmove', true);
+    Ionic.listener.enable(this, 'touchend', true);
+
     throw 'jsScroll: TODO!';
   }
 
@@ -191,14 +200,15 @@ export class Scroll {
     }
   }
 
+
   /**
    * DOM READ
    */
   getTop() {
     if (this.jsScroll) {
-      return this.top;
+      return this._t;
     }
-    return this.top = this.$el.scrollTop;
+    return this._t = this.$el.scrollTop;
   }
 
   /**
@@ -208,7 +218,136 @@ export class Scroll {
     if (this.jsScroll) {
       return 0;
     }
-    return this.left = this.$el.scrollLeft;
+    return this._l = this.$el.scrollLeft;
+  }
+
+  /**
+   * DOM WRITE
+   */
+  setTop(top: number) {
+    this._t = top;
+
+    if (this.jsScroll) {
+      this.$el.style.transform = this.$el.style.webkitTransform = `translate3d(${this._l * -1}px,${top * -1}px,0px)`;
+
+    } else {
+      this.$el.scrollTop = top;
+    }
+  }
+
+  /**
+   * DOM WRITE
+   */
+  setLeft(left: number) {
+    this._l = left;
+
+    if (this.jsScroll) {
+      this.$el.style.transform = this.$el.style.webkitTransform = `translate3d(${left * -1}px,${this._t * -1}px,0px)`;
+
+    } else {
+      this.$el.scrollLeft = left;
+    }
+  }
+
+  scrollTo(x: number, y: number, duration: number, done?: Function): Promise<any> {
+    // scroll animation loop w/ easing
+    // credit https://gist.github.com/dezinezync/5487119
+
+    let promise: Promise<any>;
+    if (done === undefined) {
+      // only create a promise if a done callback wasn't provided
+      // done can be a null, which avoids any functions
+      promise = new Promise(resolve => {
+        done = resolve;
+      });
+    }
+
+    const self = this;
+    const el = self.$el;
+    if (!el) {
+      // invalid element
+      done();
+      return promise;
+    }
+
+    if (duration < 32) {
+      self.setTop(y);
+      self.setLeft(x);
+      done();
+      return promise;
+    }
+
+    const fromY = el.scrollTop;
+    const fromX = el.scrollLeft;
+
+    const maxAttempts = (duration / 16) + 100;
+
+    let startTime: number;
+    let attempts = 0;
+    let stopScroll = false;
+
+    // scroll loop
+    function step(timeStamp: number) {
+      attempts++;
+
+      if (!self.$el || stopScroll || attempts > maxAttempts) {
+        self.isScrolling = false;
+        el.style.transform = el.style.webkitTransform = '';
+        done();
+        return;
+      }
+
+      let time = Math.min(1, ((timeStamp - startTime) / duration));
+
+      // where .5 would be 50% of time on a linear scale easedT gives a
+      // fraction based on the easing method
+      let easedT = (--time) * time * time + 1;
+
+      if (fromY !== y) {
+        self.setTop((easedT * (y - fromY)) + fromY);
+      }
+
+      if (fromX !== x) {
+        self.setLeft(Math.floor((easedT * (x - fromX)) + fromX));
+      }
+
+      if (easedT < 1) {
+        // do not use DomController here
+        // must use nativeRaf in order to fire in the next frame
+        Ionic.dom.raf(step);
+
+      } else {
+        stopScroll = true;
+        self.isScrolling = false;
+        el.style.transform = el.style.webkitTransform = '';
+        done();
+      }
+    }
+
+    // start scroll loop
+    self.isScrolling = true;
+
+    // chill out for a frame first
+    Ionic.dom.write(() => {
+      Ionic.dom.write(timeStamp => {
+        startTime = timeStamp;
+        step(timeStamp);
+      });
+    });
+
+    return promise;
+  }
+
+  scrollToTop(duration: number): Promise<void> {
+    return this.scrollTo(0, 0, duration);
+  }
+
+  scrollToBottom(duration: number): Promise<void> {
+    let y = 0;
+    if (this.$el) {
+      y = this.$el.scrollHeight - this.$el.clientHeight;
+    }
+    return this.scrollTo(0, y, duration);
   }
 
 

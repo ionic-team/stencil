@@ -10,91 +10,99 @@
 
   <ion-app>
 
-    <ion-content id="content">
+    <ion-page>
 
-      <ion-card>
-        <ion-card-header>
-          Card Header
-        </ion-card-header>
-        <ion-card-content>
-          Card Content
-        </ion-card-content>
-      </ion-card>
+      <ion-header style="background:gray; height: 50px;">
+        Header
+      </ion-header>
 
-      <p>
-        <ion-toggle checked></ion-toggle>Toggle
-      </p>
-      <p>
-        <ion-toggle disabled></ion-toggle>Toggle Disabled
-      </p>
+      <ion-content id="content">
 
-      <p>
-        <ion-badge>default</ion-badge>
-        <ion-badge color="secondary">secondary</ion-badge>
-        <ion-badge color="danger">danger</ion-badge>
-        <ion-badge color="light">light</ion-badge>
-        <ion-badge color="dark">dark</ion-badge>
-      </p>
+        <ion-card>
+          <ion-card-header>
+            Card Header
+          </ion-card-header>
+          <ion-card-content>
+            Card Content
+          </ion-card-content>
+        </ion-card>
 
-      <p>
-        <ion-badge id="dynamicProp">dynamic property</ion-badge>
-        <ion-badge id="dynamicAttr">dynamic attribute</ion-badge>
-      </p>
+        <p>
+          <ion-toggle checked></ion-toggle>Toggle
+        </p>
+        <p>
+          <ion-toggle disabled></ion-toggle>Toggle Disabled
+        </p>
 
-      <p id="dynamicBadges">
+        <p>
+          <ion-badge>default</ion-badge>
+          <ion-badge color="secondary">secondary</ion-badge>
+          <ion-badge color="danger">danger</ion-badge>
+          <ion-badge color="light">light</ion-badge>
+          <ion-badge color="dark">dark</ion-badge>
+        </p>
 
-      </p>
+        <p>
+          <ion-badge id="dynamicProp">dynamic property</ion-badge>
+          <ion-badge id="dynamicAttr">dynamic attribute</ion-badge>
+        </p>
 
-      <script>
-        // var content = document.getElementById('content');
-        // content.addEventListener('ionScrollStart', function(ev) {
-        //   console.log('ionScrollStart', ev);
-        // });
-        // content.addEventListener('ionScroll', function(ev) {
-        //   console.log('ionScroll', ev);
-        // });
-        // content.addEventListener('ionScrollEnd', function(ev) {
-        //   console.log('ionScrollEnd', ev);
-        // });
+        <p id="dynamicBadges">
+
+        </p>
+
+        <script>
+          // var content = document.getElementById('content');
+          // content.addEventListener('ionScrollStart', function(ev) {
+          //   console.log('ionScrollStart', ev);
+          // });
+          // content.addEventListener('ionScroll', function(ev) {
+          //   console.log('ionScroll', ev);
+          // });
+          // content.addEventListener('ionScrollEnd', function(ev) {
+          //   console.log('ionScrollEnd', ev);
+          // });
 
 
-        var dynamicProp = document.getElementById('dynamicProp');
-        var dynamicAttr = document.getElementById('dynamicAttr');
+          var dynamicProp = document.getElementById('dynamicProp');
+          var dynamicAttr = document.getElementById('dynamicAttr');
 
-        setInterval(function() {
-          if (dynamicProp.color === 'secondary') {
-            dynamicProp.color = 'danger';
-            dynamicAttr.setAttribute('color', 'danger');
+          setInterval(function() {
+            if (dynamicProp.color === 'secondary') {
+              dynamicProp.color = 'danger';
+              dynamicAttr.setAttribute('color', 'danger');
 
-          } else if (dynamicProp.color === 'danger') {
-            dynamicProp.color = 'light';
-            dynamicAttr.setAttribute('color', 'light');
+            } else if (dynamicProp.color === 'danger') {
+              dynamicProp.color = 'light';
+              dynamicAttr.setAttribute('color', 'light');
 
-          } else if (dynamicProp.color === 'light') {
-            dynamicProp.color = 'dark';
-            dynamicAttr.setAttribute('color', 'dark');
+            } else if (dynamicProp.color === 'light') {
+              dynamicProp.color = 'dark';
+              dynamicAttr.setAttribute('color', 'dark');
 
-          } else if (dynamicProp.color === 'dark') {
-            dynamicProp.color = 'primary';
-            dynamicAttr.setAttribute('color', 'primary');
+            } else if (dynamicProp.color === 'dark') {
+              dynamicProp.color = 'primary';
+              dynamicAttr.setAttribute('color', 'primary');
 
-          } else {
-            dynamicProp.color = 'secondary';
-            dynamicAttr.setAttribute('color', 'secondary');
+            } else {
+              dynamicProp.color = 'secondary';
+              dynamicAttr.setAttribute('color', 'secondary');
+            }
+          }, 1000);
+
+
+          var dynamicBadges = document.getElementById('dynamicBadges');
+          for (var i = 0; i < 100; i++) {
+            var div = document.createElement('div');
+            div.innerHTML = '<ion-badge>' + i + '</ion-badge>';
+            dynamicBadges.appendChild(div);
           }
-        }, 1000);
 
+        </script>
 
-        var dynamicBadges = document.getElementById('dynamicBadges');
-        for (var i = 0; i < 100; i++) {
-          var div = document.createElement('div');
-          div.innerHTML = '<ion-badge>' + i + '</ion-badge>';
-          dynamicBadges.appendChild(div);
-        }
+      </ion-content>
 
-      </script>
-
-    </ion-content>
+    </ion-page>
 
   </ion-app>
 

@@ -79,10 +79,10 @@ function compileComponents() {
     debug: true,
     devMode: true,
     bundles: [
-      ['ion-app', 'ion-content'],
+      ['ion-app', 'ion-content', 'ion-scroll'],
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-      ['ion-gesture', 'ion-scroll'],
+      ['ion-gesture'],
       ['ion-toggle']
     ],
     packages: {

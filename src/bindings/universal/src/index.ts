@@ -9,8 +9,9 @@ export function init(serverInitConfig: ServerInitConfig) {
   const IonicGbl: IonicGlobal = (<any>global).Ionic = (<any>global).Ionic || {};
 
   IonicGbl.domCtrl = {
-    read: function(cb: Function) { cb(); },
-    write: function(cb: Function) { cb(); },
+    read: function(cb: Function) { cb(performance.now()); },
+    write: function(cb: Function) { cb(performance.now()); },
+    raf: function(cb: Function) { cb(performance.now()); },
   };
 
   IonicGbl.nextTickCtrl = null;

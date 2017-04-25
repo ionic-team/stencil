@@ -244,8 +244,6 @@ export function PlatformClient(win: any, doc: HTMLDocument, IonicGbl: IonicGloba
     isText: isText,
     isComment: isComment,
     nextTick: nextTickCtrl.nextTick.bind(nextTickCtrl),
-    domRead: domCtrl.read.bind(domCtrl),
-    domWrite: domCtrl.write.bind(domCtrl),
 
     $createElement: createElement,
     $createElementNS: createElementNS,

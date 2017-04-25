@@ -66,6 +66,7 @@ export function DomController(window: Window): DomControllerApi {
 
   return {
     read: domRead,
-    write: domWrite
+    write: domWrite,
+    raf: window.requestAnimationFrame.bind(window)
   };
 }

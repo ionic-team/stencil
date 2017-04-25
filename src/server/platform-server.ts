@@ -43,14 +43,6 @@ export function PlatformServer(IonicGbl: IonicGlobal, configCtrl: ConfigApi, dom
     cb();
   }
 
-  function domRead(cb: Function) {
-    cb();
-  }
-
-  function domWrite(cb: Function) {
-    cb();
-  }
-
   function attachComponent(elm: Element, cmpMeta: ComponentMeta, instance: Component) {
     const shadowElm = elm.attachShadow({ mode: 'open' });
 
@@ -189,8 +181,6 @@ export function PlatformServer(IonicGbl: IonicGlobal, configCtrl: ConfigApi, dom
     isText: isText,
     isComment: isComment,
     nextTick: process.nextTick,
-    domRead: domRead,
-    domWrite: domWrite,
 
     $createElement: createElement,
     $createElementNS: createElementNS,
