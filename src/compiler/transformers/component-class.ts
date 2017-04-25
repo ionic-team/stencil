@@ -295,7 +295,11 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
 
 
 function updateTag(cmpMeta: ComponentMeta) {
-  cmpMeta.tag = cmpMeta.tag.trim().toLowerCase();
+  cmpMeta.tag = cmpMeta.tag.replace(/\s/g, '').toLowerCase();
+
+  if (cmpMeta.tag.indexOf(',') > -1) {
+    throw `"${cmpMeta.tag}" tag cannot be use for multiple tags`;
+  }
 
   let invalidChars = cmpMeta.tag.replace(/\w|-/g, '');
   if (invalidChars !== '') {
