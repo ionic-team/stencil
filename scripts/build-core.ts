@@ -282,8 +282,8 @@ export function writeFile(filePath: string, content: string) {
 }
 
 
-export function readFile(filePath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
+export function readFile(filePath: string) {
+  return new Promise<string>((resolve, reject) => {
     fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         reject(err);
@@ -295,7 +295,7 @@ export function readFile(filePath: string): Promise<string> {
 }
 
 
-export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string) {
+export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string, skipIfExists = false) {
   console.log('core, buildBindingCore:', srcDir);
 
   const ctx: BuildContext = {
@@ -320,6 +320,11 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
     cePolyFillPath: path.join(POLYFILLS_DIR, 'document-register-element.js'),
     cePolyfillContent: ''
   };
+
+  if (skipIfExists && ts.sys.fileExists(ctx.coreEntryFilePath)) {
+    console.log('core files already built');
+    return Promise.resolve();
+  }
 
   // create the dev mode versions
   return Promise.all([

@@ -1,5 +1,5 @@
 
-import * as interfaces from './util/interfaces';
+import * as interfaces from '../util/interfaces';
 
 
 export declare const Component: interfaces.ComponentDecorator;

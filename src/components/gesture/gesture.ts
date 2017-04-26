@@ -1,7 +1,7 @@
-import { applyStyles, getElementReference, pointerCoordX, pointerCoordY } from '../../util/dom';
-import { Component, Listen, Ionic, Prop } from '../../index';
+import { applyStyles, getElementReference, pointerCoordX, pointerCoordY } from '../../util/helpers';
+import { Component, Listen, Ionic, Prop } from '../index';
 import { GestureCallback, GestureDetail } from '../../util/interfaces';
-import { GestureController, GestureDelegate } from '../../controllers/gesture-controller';
+import { GestureController, GestureDelegate } from './gesture-controller';
 import { PanRecognizer } from './recognizers';
 
 

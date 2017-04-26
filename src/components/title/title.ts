@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../../index';
+import { Component, h, Ionic } from '../index';
 
 
 /**

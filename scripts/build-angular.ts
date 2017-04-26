@@ -19,12 +19,21 @@ import * as typescript from 'typescript';
 const compiler = require(path.join(__dirname, '../compiler'));
 
 
-const srcDir = path.join(__dirname, '../../src');
-const transpiledSrcDir = path.join(__dirname, '../transpiled-angular/bindings/angular/src');
+let srcDir = path.join(__dirname, '../../src');
+let transpiledSrcDir = path.join(__dirname, '../transpiled-angular/bindings/angular/src');
 let compiledDir = path.join(__dirname, '../compiled-ionic-angular');
+let skipBuildingCore = false;
 
 if (process.argv[2]) {
-  compiledDir = process.argv[2];
+  srcDir = process.argv[2];
+}
+
+if (process.argv[3]) {
+  compiledDir = process.argv[3];
+}
+
+if (process.argv[4] === 'skip-core') {
+  skipBuildingCore = true;
 }
 
 
@@ -42,7 +51,7 @@ const ctx = {};
 compileComponents()
   .then(() => {
     // next build all of the core files for ionic-angular
-    return buildBindingCore(transpiledSrcDir, compiledDir, 'core');
+    return buildBindingCore(transpiledSrcDir, compiledDir, 'core', skipBuildingCore);
 
   }).catch(err => {
     console.log(err);
@@ -57,7 +66,7 @@ function compileComponents() {
       target: 'es5'
     },
     include: [srcDir],
-    exclude: ['node_modules', 'test'],
+    exclude: ['node_modules', 'navigation', 'test'],
     debug: true,
     bundles: [
       ['ion-badge'],

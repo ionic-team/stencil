@@ -38,8 +38,8 @@ export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: 
 }
 
 
-export function readFile(packages: Packages, filePath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
+export function readFile(packages: Packages, filePath: string) {
+  return new Promise<string>((resolve, reject) => {
     packages.fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         reject(err);

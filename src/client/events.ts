@@ -1,5 +1,5 @@
 import { Component, ComponentMetaListeners, ListenOpts } from '../util/interfaces';
-import { getElementReference, getKeyCodeByName } from '../util/dom';
+import { getElementReference, getKeyCodeByName } from '../util/helpers';
 import { noop } from '../util/helpers';
 
 

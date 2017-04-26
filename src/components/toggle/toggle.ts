@@ -1,5 +1,5 @@
 import { BooleanInputComponent, GestureDetail } from '../../util/interfaces';
-import { Component, h, Ionic, Listen, Prop, Watch } from '../../index';
+import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
 
 
 @Component({

@@ -1,6 +1,6 @@
-import { Component, Listen, Ionic, Prop } from '../../index';
+import { Component, Listen, Ionic, Prop } from '../index';
 import { ScrollCallback, ScrollDetail } from '../../util/interfaces';
-import { GestureController, GestureDelegate } from '../../controllers/gesture-controller';
+import { GestureController, GestureDelegate } from '../gesture/gesture-controller';
 import { Scroll as IScroll } from './scroll-interface';
 
 

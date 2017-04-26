@@ -1,4 +1,4 @@
-import { Component, Ionic } from '../../index';
+import { Component, Ionic } from '../index';
 
 
 @Component({

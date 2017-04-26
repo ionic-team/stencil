@@ -1,4 +1,4 @@
-import { Component, h, Ionic, Prop } from '../../index';
+import { Component, h, Ionic, Prop } from '../index';
 import { ContentDimensions, ScrollDetail } from '../../util/interfaces';
 import { Scroll } from '../scroll/scroll-interface';
 
