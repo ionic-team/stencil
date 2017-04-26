@@ -13,16 +13,16 @@
  * Global Ionic
  * Each binding can provide it's own values to window.Ionic
  */
-function configCtrl(){};
 function loadComponents(){};
 function components(){};
 function staticDir(){};
-function domCtrl(){};
+function ConfigCtrl(){};
+function DomCtrl(){};
 function dom(){};
 function read(){};
 function write(){};
 function raf(){};
-function nextTickCtrl(){};
+function NextTickCtrl(){};
 function nextTick(){};
 function eventNamePrefix(){};
 

@@ -5,18 +5,18 @@ import { NextTickController } from '../../../client/next-tick-controller';
 import { PlatformClient } from '../../../client/platform-client';
 import { registerComponentsES5 } from '../../../client/registry.es5';
 import { Renderer } from '../../../client/renderer/core';
+import { detectPlatforms } from '../../../platform/platform-util';
+import { PLATFORM_CONFIGS } from '../../../platform/platform-registry';
 
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-IonicGbl.domCtrl = DomController(window);
+IonicGbl.DomCtrl = DomController(window);
 
-IonicGbl.nextTickCtrl = NextTickController(window);
+IonicGbl.NextTickCtrl = NextTickController(window);
 
-IonicGbl.configCtrl = ConfigController(IonicGbl.config || {});
+IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core'));
 
-const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.staticDir, IonicGbl.configCtrl, IonicGbl.domCtrl, IonicGbl.nextTickCtrl);
+const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.staticDir, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl, IonicGbl.NextTickCtrl);
 
-const renderer = Renderer(plt);
-
-registerComponentsES5(window, renderer, plt, IonicGbl.configCtrl, IonicGbl.components);
+registerComponentsES5(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

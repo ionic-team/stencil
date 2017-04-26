@@ -76,13 +76,13 @@ function compileComponents() {
     },
     include: [srcDir],
     exclude: ['node_modules', 'test'],
+    devMode: false,
     debug: true,
-    devMode: true,
     bundles: [
-      ['ion-app', 'ion-content', 'ion-scroll', 'ion-navbar', 'ion-toolbar', 'ion-title'],
+      ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-      ['ion-gesture'],
+      ['ion-gesture', 'ion-scroll'],
       ['ion-toggle']
     ],
     packages: {
@@ -111,7 +111,7 @@ function bundleComponents() {
       nodeSass: nodeSass,
       typescript: typescript
     },
-    devMode: true,
+    devMode: false,
     debug: true
   };
 
@@ -136,7 +136,7 @@ function buildLoader() {
           language_out: 'ECMASCRIPT5',
           warning_level: 'QUIET',
           rewrite_polyfills: 'false',
-          formatting: 'PRETTY_PRINT',
+          // formatting: 'PRETTY_PRINT',
           // debug: 'true'
         };
 

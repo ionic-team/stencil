@@ -104,11 +104,11 @@ export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
   loadComponents?: {(bundleId: string): void};
-  config?: Object;
-  configCtrl?: ConfigApi;
-  domCtrl?: DomControllerApi;
-  nextTickCtrl?: NextTickApi;
   eventNamePrefix?: string;
+  config?: Object;
+  ConfigCtrl?: ConfigApi;
+  DomCtrl?: DomControllerApi;
+  NextTickCtrl?: NextTickApi;
 }
 
 
@@ -451,6 +451,13 @@ export interface PlatformApi {
   $getTextContent: (node: Node) => string | null;
   $getAttribute: (elm: Element, attrName: string) => string;
   $attachComponent: (elm: Element, cmpMeta: ComponentMeta, instance: Component) => void;
+}
+
+
+export interface PlatformConfig {
+  name: string;
+  isMatch?: {(url: string, userAgent: string): boolean};
+  settings?: any;
 }
 
 

@@ -6,17 +6,17 @@ import { parseComponentModeData, parseModeName, parseProp } from '../util/data-p
 import { toDashCase } from '../util/helpers';
 
 
-export function PlatformClient(win: any, doc: HTMLDocument, IonicGbl: IonicGlobal, staticDir: string, configCtrl: ConfigApi, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
+export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, staticDir: string, ConfigCtrl: ConfigApi, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
   const activeJsonRequests: {[url: string]: boolean} = {};
   const moduleImports = {};
   const css: {[tag: string]: boolean} = {};
-  const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+  const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
 
 
-  const injectedIonic = initInjectedIonic(win, IonicGbl.eventNamePrefix, configCtrl, domCtrl);
+  const injectedIonic = initInjectedIonic(win, IonicGbl.eventNamePrefix, ConfigCtrl, domCtrl);
 
 
   IonicGbl.loadComponents = function loadComponents(bundleId) {
@@ -233,7 +233,6 @@ export function PlatformClient(win: any, doc: HTMLDocument, IonicGbl: IonicGloba
   function setCss(linkUrl: string) {
     css[linkUrl] = true;
   }
-
 
   return {
     registerComponent: registerComponent,

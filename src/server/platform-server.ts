@@ -5,7 +5,7 @@ import { parseComponentModeData } from '../util/data-parse';
 import { themeVNodeData } from '../client/host';
 
 
-export function PlatformServer(IonicGbl: IonicGlobal, configCtrl: ConfigApi, domCtrl: DomControllerApi): PlatformApi {
+export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const moduleImports = {};
 
@@ -16,8 +16,8 @@ export function PlatformServer(IonicGbl: IonicGlobal, configCtrl: ConfigApi, dom
       enable: function() {}
     },
     controllers: {},
-    config: configCtrl,
-    dom: domCtrl
+    config: ConfigCtrl,
+    dom: DomCtrl
   };
 
 

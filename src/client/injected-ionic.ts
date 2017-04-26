@@ -3,7 +3,7 @@ import { enableListener } from './events';
 import { themeVNodeData } from './host';
 
 
-export function initInjectedIonic(win: any, eventNamePrefix: string, configCtrl: ConfigApi, domCtrl: DomControllerApi): Ionic {
+export function initInjectedIonic(win: any, eventNamePrefix: string, ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -37,9 +37,9 @@ export function initInjectedIonic(win: any, eventNamePrefix: string, configCtrl:
 
     controllers: {},
 
-    dom: domCtrl,
+    dom: DomCtrl,
 
-    config: configCtrl
+    config: ConfigCtrl
   };
 
 }

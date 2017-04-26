@@ -6,9 +6,6 @@ import { Renderer } from '../../../client/renderer/core';
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
+const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.staticDir, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl, IonicGbl.NextTickCtrl);
 
-const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.staticDir, IonicGbl.configCtrl, IonicGbl.domCtrl, IonicGbl.nextTickCtrl);
-const renderer = Renderer(plt);
-
-
-registerComponentsES5(window, renderer, plt, IonicGbl.configCtrl, IonicGbl.components);
+registerComponentsES5(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

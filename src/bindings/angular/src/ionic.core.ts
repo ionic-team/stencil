@@ -6,9 +6,6 @@ import { Renderer } from '../../../client/renderer/core';
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-// most of the controllers are added to window.Ionic within ionic-angular
-const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.staticDir, IonicGbl.configCtrl, IonicGbl.domCtrl, IonicGbl.nextTickCtrl);
-const renderer = Renderer(plt);
+const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.staticDir, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl, IonicGbl.NextTickCtrl);
 
-
-registerComponents(window, renderer, plt, IonicGbl.configCtrl, IonicGbl.components);
+registerComponents(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

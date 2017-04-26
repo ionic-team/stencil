@@ -8,17 +8,19 @@ import { upgradeInputHtml } from '../../../server/upgrade';
 export function init(serverInitConfig: ServerInitConfig) {
   const IonicGbl: IonicGlobal = (<any>global).Ionic = (<any>global).Ionic || {};
 
-  IonicGbl.domCtrl = {
+  IonicGbl.DomCtrl = {
     read: function(cb: Function) { cb(performance.now()); },
     write: function(cb: Function) { cb(performance.now()); },
     raf: function(cb: Function) { cb(performance.now()); },
   };
 
-  IonicGbl.nextTickCtrl = null;
+  IonicGbl.NextTickCtrl = {
+    nextTick: process.nextTick.bind(process)
+  };
 
-  IonicGbl.configCtrl = ConfigController(IonicGbl.config || {});
+  IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, []);
 
-  const plt = PlatformServer(IonicGbl, IonicGbl.configCtrl, IonicGbl.domCtrl);
+  const plt = PlatformServer(IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
   registerComponents(serverInitConfig.staticDir);
 
