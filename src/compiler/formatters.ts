@@ -146,15 +146,15 @@ function formatWatcherOpts(label: string, methodName: string, watchIndex: number
 
 function formatBoolean(val: boolean) {
   return val ?
-    '/* true **/ 1' :
-    '/* false */ 0';
+    '1 /* true **/' :
+    '0 /* false */';
 }
 
 
 export function formatRegistryContent(registry: Registry) {
-  let content = '(window.Ionic = window.Ionic || {}).components = ';
+  let content = '(window.Ionic=window.Ionic||{}).components=';
 
-  let strData = JSON.stringify(registry, null, 2) + ';';
+  let strData = JSON.stringify(registry) + ';\n';
 
   strData = strData.replace(/"0"/g, '0');
   strData = strData.replace(/"1"/g, '1');
