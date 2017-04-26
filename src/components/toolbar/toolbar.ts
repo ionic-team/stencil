@@ -105,12 +105,14 @@ export class Toolbar {
   }
 
   render() {
-    return h(this, { class: { 'statusbar-padding': this.sbPadding } }, [
-      h('div', Ionic.theme(this, 'toolbar-background')),
-      h('div', Ionic.theme(this, 'toolbar-content'),
-        h('slot')
-      ),
-    ]);
+    return h(this, { class: { 'statusbar-padding': this.sbPadding } },
+      h('div', Ionic.theme(this, 'toolbar'), [
+        h('div', Ionic.theme(this, 'toolbar-background')),
+        h('div', Ionic.theme(this, 'toolbar-content'),
+          h('slot')
+        ),
+      ])
+    );
   }
 
 }

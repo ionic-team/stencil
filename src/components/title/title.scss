@@ -4,7 +4,8 @@
 // Title
 // --------------------------------------------------
 
-ion-title {
+ion-title,
+:host {
   display: flex;
   visibility: inherit !important;
 

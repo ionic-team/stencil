@@ -4,7 +4,8 @@
 // Toolbar
 // --------------------------------------------------
 
-ion-toolbar {
+ion-toolbar,
+:host {
   position: relative;
   z-index: $z-index-toolbar;
   visibility: inherit !important;
