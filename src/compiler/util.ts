@@ -195,7 +195,7 @@ export function isTsSourceFile(filePath: string) {
 
 
 export function hasCmpClass(sourceText: string) {
-  return (sourceText.indexOf('@Component') > -1);
+  return (sourceText.indexOf('@Component') > -1) && (sourceText.indexOf('@angular/core') === -1);
 }
 
 
