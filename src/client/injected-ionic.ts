@@ -3,7 +3,7 @@ import { enableListener } from './events';
 import { themeVNodeData } from './host';
 
 
-export function initInjectedIonic(win: any, eventNamePrefix: string, ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi): Ionic {
+export function initInjectedIonic(win: any, eventNameFn: {(eventName: string): string}, ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -26,8 +26,11 @@ export function initInjectedIonic(win: any, eventNamePrefix: string, ConfigCtrl:
         // https://developers.google.com/web/fundamentals/getting-started/primers/shadowdom#events
         data.composed = true;
       }
+      if (eventNameFn) {
+        eventName = eventNameFn(eventName);
+      }
       instance && instance.$el && instance.$el.dispatchEvent(
-        new win.CustomEvent((eventNamePrefix || '') + eventName, data)
+        new win.CustomEvent(eventName, data)
       );
     },
 

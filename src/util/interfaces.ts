@@ -104,7 +104,7 @@ export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
   loadComponents?: {(bundleId: string): void};
-  eventNamePrefix?: string;
+  eventNameFn?: {(eventName: string): string};
   config?: Object;
   ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;

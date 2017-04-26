@@ -24,7 +24,7 @@ function write(){};
 function raf(){};
 function NextTickCtrl(){};
 function nextTick(){};
-function eventNamePrefix(){};
+function eventNameFn(){};
 
 
 /**

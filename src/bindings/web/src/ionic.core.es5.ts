@@ -17,6 +17,6 @@ IonicGbl.NextTickCtrl = NextTickController(window);
 
 IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core'));
 
-const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.staticDir, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl, IonicGbl.NextTickCtrl);
+const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.NextTickCtrl);
 
 registerComponentsES5(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

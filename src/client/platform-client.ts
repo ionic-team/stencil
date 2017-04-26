@@ -1,12 +1,12 @@
-import { Component, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
+import { Component, ComponentMeta, ComponentRegistry,
+  IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './injected-ionic';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 
 
-export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, staticDir: string, ConfigCtrl: ConfigApi, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
+export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, NextTickCtrl: NextTickApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
@@ -16,7 +16,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
 
 
-  const injectedIonic = initInjectedIonic(win, IonicGbl.eventNamePrefix, ConfigCtrl, domCtrl);
+  const injectedIonic = initInjectedIonic(win, IonicGbl.eventNameFn, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
 
   IonicGbl.loadComponents = function loadComponents(bundleId) {
@@ -56,7 +56,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       }
 
       // create the url we'll be requesting
-      const url = `${staticDir}ionic.${bundleId}.js`;
+      const url = `${IonicGbl.staticDir}ionic.${bundleId}.js`;
 
       if (!activeJsonRequests[url]) {
         // not already actively requesting this url
@@ -242,7 +242,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     isElement: isElement,
     isText: isText,
     isComment: isComment,
-    nextTick: nextTickCtrl.nextTick.bind(nextTickCtrl),
+    nextTick: NextTickCtrl.nextTick.bind(NextTickCtrl),
 
     $createElement: createElement,
     $createElementNS: createElementNS,
