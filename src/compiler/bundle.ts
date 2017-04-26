@@ -131,6 +131,10 @@ function getComponents(ctx: BuildContext, manifest: Manifest) {
 
 
 function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifest) {
+  if (config.debug) {
+    console.log(`bundle, buildCoreJs`);
+  }
+
   ctx.bundles = [];
 
   manifest.bundles.forEach(bundleComponentTags => {
@@ -143,6 +147,10 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
     ctx.results.loaderPath = config.packages.path.join(config.destDir, 'ionic.js');
 
     const promises: Promise<any>[] = [];
+
+    if (!ctx.results.manifest.coreFiles) {
+      throw `missing manifest core files`;
+    }
 
     Object.keys(ctx.results.manifest.coreFiles).forEach(coreDirName => {
       const corePath = ctx.results.manifest.coreFiles[coreDirName];
@@ -187,6 +195,10 @@ function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[])
 
 
 function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
+  if (config.debug) {
+    console.log(`bundle, generateBundleFiles`);
+  }
+
   ctx.registry = {};
 
   return Promise.all(ctx.bundles.map((bundle, bundleIndex) => {

@@ -30,7 +30,7 @@ export function bundleComponentModeStyle(config: BundlerConfig, styleUrl: string
 
     config.packages.nodeSass.render(sassConfig, (err: any, result: any) => {
       if (err) {
-        reject(err);
+        reject(`bundleComponentModeStyle, nodeSass.render: ${err}`);
 
       } else {
         let css = result.css.toString().replace(/\n/g, '').trim();
