@@ -80,7 +80,7 @@ export class Scroll implements IScroll {
       if (self.ionScrollStart) {
         self.ionScrollStart(detail);
       } else {
-        Ionic.emit(this, 'ionScrollStart', detail);
+        Ionic.emit(this, 'ionScrollStart', { detail: detail });
       }
     }
 
@@ -137,7 +137,7 @@ export class Scroll implements IScroll {
     if (self.ionScrollStart) {
       self.ionScroll(detail);
     } else {
-      Ionic.emit(this, 'ionScroll', detail);
+      Ionic.emit(this, 'ionScroll', { detail: detail });
     }
   }
 
@@ -153,7 +153,7 @@ export class Scroll implements IScroll {
       self.ionScrollEnd(detail);
 
     } else {
-      Ionic.emit(this, 'ionScrollEnd', detail);
+      Ionic.emit(this, 'ionScrollEnd', { detail: detail });
     }
   }
 

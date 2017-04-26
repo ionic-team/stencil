@@ -24,7 +24,7 @@ export class Toggle implements BooleanInputComponent {
 
   @Watch('checked')
   changed(val: boolean) {
-    Ionic.emit(this, 'ionChange', { checked: val });
+    Ionic.emit(this, 'ionChange', { detail: { checked: val } });
   }
 
 

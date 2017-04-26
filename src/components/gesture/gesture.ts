@@ -165,7 +165,7 @@ export class Gesture {
             if (this.onMove) {
               this.onMove(detail);
             } else {
-              Ionic.emit(this, 'ionGestureMove', this.detail);
+              Ionic.emit(this, 'ionGestureMove', { detail: this.detail });
             }
           });
         }
@@ -229,7 +229,7 @@ export class Gesture {
     if (this.onStart) {
       this.onStart(this.detail);
     } else {
-      Ionic.emit(this, 'ionGestureStart', this.detail);
+      Ionic.emit(this, 'ionGestureStart', { detail: this.detail });
     }
 
     this.hasCapturedPan = true;
@@ -286,7 +286,7 @@ export class Gesture {
         if (this.onEnd) {
           this.onEnd(detail);
         } else {
-          Ionic.emit(this, 'ionGestureEnd', detail);
+          Ionic.emit(this, 'ionGestureEnd', { detail: detail });
         }
 
       } else if (this.hasPress) {
@@ -296,7 +296,7 @@ export class Gesture {
         if (this.notCaptured) {
           this.notCaptured(detail);
         } else {
-          Ionic.emit(this, 'ionGestureNotCaptured', detail);
+          Ionic.emit(this, 'ionGestureNotCaptured', { detail: detail });
         }
       }
 
@@ -318,7 +318,7 @@ export class Gesture {
       if (this.onPress) {
         this.onPress(detail);
       } else {
-        Ionic.emit(this, 'ionPress', detail);
+        Ionic.emit(this, 'ionPress', { detail: detail });
       }
     }
   }
