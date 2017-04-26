@@ -32,6 +32,7 @@ function eventNamePrefix(){};
  * Passed into user's closure
  */
 function Ionic(){};
+function config(){};
 function controllers(){};
 function emit(){};
 function listen(){};

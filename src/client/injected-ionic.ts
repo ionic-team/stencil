@@ -10,7 +10,7 @@ export function initInjectedIonic(win: any, eventNamePrefix: string, configCtrl:
     function CustomEvent(event: any, params: any) {
       params = params || { bubbles: false, cancelable: false, detail: undefined };
       var evt = document.createEvent('CustomEvent');
-      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail );
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
       return evt;
     }
     CustomEvent.prototype = win.Event.prototype;
