@@ -5,10 +5,26 @@
 // Material Design Title
 // --------------------------------------------------
 
-// .toolbar-title-md {
-//   padding: 0 12px;
+/// @prop - Font size of the toolbar title
+$toolbar-md-title-font-size:             2rem !default;
 
-//   font-size: $toolbar-md-title-font-size;
-//   font-weight: 500;
-//   color: $toolbar-md-title-text-color;
-// }
+/// @prop - Text color of the toolbar title
+$toolbar-md-title-text-color:            color-contrast($colors-md, $toolbar-md-background, md) !default;
+
+
+.toolbar-title-md {
+  padding: 0 12px;
+
+  font-size: $toolbar-md-title-font-size;
+  font-weight: 500;
+  color: $toolbar-md-title-text-color;
+}
+
+
+@mixin md-toolbar-title-theme($color-name, $color-base, $color-contrast) {
+
+  .toolbar-md-#{$color-name} .toolbar-title-md {
+    color: $fg-color;
+  }
+
+}

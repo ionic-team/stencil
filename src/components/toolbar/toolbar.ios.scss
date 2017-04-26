@@ -20,18 +20,6 @@ $toolbar-order-ios: (
 /// @prop - Font size of the toolbar button
 $toolbar-ios-button-font-size:              1.7rem !default;
 
-/// @prop - Font size of the toolbar title
-$toolbar-ios-title-font-size:               1.7rem !default;
-
-/// @prop - Font weight of the toolbar title
-$toolbar-ios-title-font-weight:             600 !default;
-
-/// @prop - Text alignment of the toolbar title
-$toolbar-ios-title-text-align:              center !default;
-
-/// @prop - Text color of the toolbar title
-$toolbar-ios-title-text-color:              color-contrast($colors-ios, $toolbar-ios-background) !default;
-
 /// @prop - Text color of the toolbar button
 $toolbar-ios-button-color:                  color-contrast($colors-ios, $toolbar-ios-background, ios) !default;
 
@@ -98,30 +86,6 @@ $toolbar-button-ios-strong-font-weight:     600 !default;
   min-width: 0;
 }
 
-.toolbar-title-ios {
-  font-size: $toolbar-ios-title-font-size;
-  font-weight: $toolbar-ios-title-font-weight;
-  text-align: $toolbar-ios-title-text-align;
-  color: $toolbar-ios-title-text-color;
-
-  pointer-events: auto;
-}
-
-.toolbar-ios ion-title {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  padding: 0 90px 1px;
-
-  width: 100%;
-  height: 100%;
-
-  transform: translateZ(0);
-
-  pointer-events: none;
-}
-
 @mixin ios-toolbar-theme($color-name, $color-base, $color-contrast) {
   .toolbar-ios-#{$color-name} {
 
@@ -129,7 +93,6 @@ $toolbar-button-ios-strong-font-weight:     600 !default;
       background: $color-base;
     }
 
-    .toolbar-title-ios,
     .bar-button-clear-ios,
     .bar-button-default-ios {
       color: $color-contrast;

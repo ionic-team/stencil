@@ -17,21 +17,6 @@ $toolbar-order-wp: (
   menu-toggle-end: 7,
 );
 
-/// @prop - Padding of the toolbar title
-$toolbar-wp-title-padding:               0 6px !default;
-
-/// @prop - Font size of the toolbar title
-$toolbar-wp-title-font-size:             1.5rem !default;
-
-/// @prop - Font weight of the toolbar title
-$toolbar-wp-title-font-weight:           bold !default;
-
-/// @prop - Text transform of the toolbar title
-$toolbar-wp-title-text-transform:        uppercase !default;
-
-/// @prop - Text color of the toolbar title
-$toolbar-wp-title-text-color:            color-contrast($colors-wp, $toolbar-wp-background, wp) !default;
-
 /// @prop - Font size of the toolbar button
 $toolbar-wp-button-font-size:            1.4rem !default;
 
@@ -77,15 +62,6 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
   max-width: 100%;
 }
 
-.toolbar-title-wp {
-  padding: $toolbar-wp-title-padding;
-
-  font-size: $toolbar-wp-title-font-size;
-  font-weight: $toolbar-wp-title-font-weight;
-  text-transform: $toolbar-wp-title-text-transform;
-  color: $toolbar-wp-title-text-color;
-}
-
 @mixin wp-toolbar-theme($color-name, $color-base, $color-contrast) {
 
   .toolbar-wp-#{$color-name} .toolbar-background-wp {
@@ -94,8 +70,7 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 
   .toolbar-wp-#{$color-name} .bar-button-clear-wp,
   .toolbar-wp-#{$color-name} .bar-button-default-wp,
-  .toolbar-wp-#{$color-name} .bar-button-outline-wp,
-  .toolbar-wp-#{$color-name} .toolbar-title-wp {
+  .toolbar-wp-#{$color-name} .bar-button-outline-wp {
     color: $color-contrast;
   }
 

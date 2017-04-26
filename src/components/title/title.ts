@@ -42,14 +42,9 @@ import { Component, h, Ionic } from '../../index';
     ios: 'title.ios.scss',
     md: 'title.md.scss',
     wp: 'title.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class ToolbarTitle {
-  constructor() {
-    // toolbar && toolbar._setTitle(this);
-    // navbar && navbar._setTitle(this);
-  }
 
   render() {
     return h(this,
@@ -60,10 +55,4 @@ export class ToolbarTitle {
     );
   }
 
-  // /**
-  //  * @hidden
-  //  */
-  // getTitleText() {
-  //   return this._elementRef.nativeElement.textContent;
-  // }
 }
