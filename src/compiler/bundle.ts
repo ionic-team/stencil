@@ -2,7 +2,8 @@ import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
 import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName, formatBundleContent, formatRegistryContent } from './formatters';
 import { readFile, writeFile } from './util';
-
+import commonjs from 'rollup-plugin-commonjs';
+import nodeResolve from 'rollup-plugin-node-resolve';
 
 export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
   if (!config.packages) {
@@ -77,12 +78,21 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
   }
 
   return config.packages.rollup.rollup({
-    entry: entry
-
+    entry: entry,
+    plugins: [
+      nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+      commonjs({
+        include: 'node_modules/**',
+        sourceMap: false
+      })
+    ]
   }).then(bundle => {
     const results = bundle.generate({
       format: 'iife',
-      moduleName: 'ionicModule'
+      moduleName: 'ionicModule',
     });
 
     let code = results.code.trim();
