@@ -44,7 +44,7 @@ Promise.all([
   compileComponents(),
 
   // build all of the core files for ionic-web
-  // the core files is what makes up how ionic-core "works"
+  // the core files are what makes up how ionic-core "works"
   buildBindingCore(transpiledSrcDir, compiledDir, 'core')
 
 ]).then(() => {

@@ -16,7 +16,9 @@ import * as typescript from 'typescript';
 
 
 // dynamic require cuz this file gets transpiled to dist/
-const compiler = require(path.join(__dirname, '../compiler'));
+const compilerPath = path.join(__dirname, '../compiler');
+console.log('build-angular core, compilerPath:', compilerPath);
+const compiler = require(compilerPath);
 
 
 let srcDir = path.join(__dirname, '../../src');
@@ -27,35 +29,41 @@ let skipBuildingCore = false;
 if (process.argv[2]) {
   srcDir = process.argv[2];
 }
+console.log('build-angular core, srcDir:', srcDir);
 
 if (process.argv[3]) {
   compiledDir = process.argv[3];
 }
+console.log('build-angular core, compiledDir:', srcDir);
 
 if (process.argv[4] === 'skip-core') {
   skipBuildingCore = true;
 }
+console.log('build-angular core, skipBuildingCore:', skipBuildingCore);
 
 
 // copy compiler/index.js to the compiled ionic-angular location
 const compilerJsScript = path.join(__dirname, '../compiler/index.js');
 const compilerDest = path.join(compiledDir, 'compiler/index.js');
 fs.copySync(compilerJsScript, compilerDest);
+console.log('build-angular core, copy compiler from:', compilerJsScript);
+console.log('build-angular core, copy compiler to:', compilerDest);
+
+
+Promise.all([
+  // find all the source components and compile
+  // them into reusable components, and create a manifest.json
+  // where all the components can be found, and their styles.
+  compileComponents(),
+
+  // build all of the core files for ionic-angular
+  // the core files are what makes up how ionic-core "works"
+  buildBindingCore(transpiledSrcDir, compiledDir, 'core', skipBuildingCore)
+
+]);
 
 
 const ctx = {};
-
-// find all the source components and compile
-// them into reusable components, and create a manifest.json
-// where all the components can be found, and their styles.
-compileComponents()
-  .then(() => {
-    // next build all of the core files for ionic-angular
-    return buildBindingCore(transpiledSrcDir, compiledDir, 'core', skipBuildingCore);
-
-  }).catch(err => {
-    console.log(err);
-  });
 
 
 function compileComponents() {
@@ -66,7 +74,7 @@ function compileComponents() {
       target: 'es5'
     },
     include: [srcDir],
-    exclude: ['node_modules', 'navigation', 'test'],
+    exclude: ['node_modules', 'test'],
     debug: true,
     bundles: [
       ['ion-badge'],
