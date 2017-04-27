@@ -38,8 +38,8 @@ export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: 
 }
 
 
-export function readFile(packages: Packages, filePath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
+export function readFile(packages: Packages, filePath: string) {
+  return new Promise<string>((resolve, reject) => {
     packages.fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         reject(err);
@@ -172,7 +172,7 @@ export function ensureDirs(packages: Packages, paths: string[]) {
           dirExists.add(dir);
           checkChunk(chunks, ++appendIndex, resolve);
         }
-      })
+      });
     }
 
     checkDir(resolve);
@@ -195,7 +195,7 @@ export function isTsSourceFile(filePath: string) {
 
 
 export function hasCmpClass(sourceText: string) {
-  return (sourceText.indexOf('@Component') > -1);
+  return (sourceText.indexOf('@Component') > -1) && (sourceText.indexOf('@angular/core') === -1);
 }
 
 

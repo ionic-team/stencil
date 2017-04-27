@@ -1,10 +1,11 @@
-import { ComponentMeta, ComponentMode, ComponentModeData, ComponentRegistry, Ionic, IonicGlobal, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, Component, ComponentModeData, ComponentRegistry, ConfigApi,
+  DomControllerApi, Ionic, IonicGlobal, PlatformApi } from '../util/interfaces';
 import { h } from '../client/renderer/h';
 import { parseComponentModeData } from '../util/data-parse';
 import { themeVNodeData } from '../client/host';
 
 
-export function PlatformServer(ionic: IonicGlobal): PlatformApi {
+export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const moduleImports = {};
 
@@ -14,11 +15,13 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
     listener: {
       enable: function() {}
     },
-    controllers: {}
+    controllers: {},
+    config: ConfigCtrl,
+    dom: DomCtrl
   };
 
 
-  ionic.loadComponents = function loadComponents() {
+  IonicGbl.loadComponents = function loadComponents() {
     var args = arguments;
     for (var i = 1; i < args.length; i++) {
       // first arg is the bundleId
@@ -40,19 +43,11 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
     cb();
   }
 
-  function domRead(cb: Function) {
-    cb();
-  }
-
-  function domWrite(cb: Function) {
-    cb();
-  }
-
-  function attachShadow(elm: Element, cmpMode: ComponentMode, cmpModeId: string) {
+  function attachComponent(elm: Element, cmpMeta: ComponentMeta, instance: Component) {
     const shadowElm = elm.attachShadow({ mode: 'open' });
 
-    cmpMode;
-    cmpModeId;
+    cmpMeta;
+    instance;
 
     return shadowElm;
   }
@@ -186,8 +181,6 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
     isText: isText,
     isComment: isComment,
     nextTick: process.nextTick,
-    domRead: domRead,
-    domWrite: domWrite,
 
     $createElement: createElement,
     $createElementNS: createElementNS,
@@ -202,8 +195,8 @@ export function PlatformServer(ionic: IonicGlobal): PlatformApi {
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachShadow: attachShadow
-  }
+    $attachComponent: attachComponent
+  };
 }
 
 

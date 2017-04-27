@@ -14,6 +14,7 @@
  */
 
 import { buildBindingCore, LICENSE, readFile, writeFile } from './build-core';
+import * as cleanCss from 'clean-css';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
@@ -48,13 +49,18 @@ compileComponents()
     return buildBindingCore(transpiledSrcDir, compiledDir, 'core');
 
   }).then(() => {
-    // next add the component registry to the top of each core file
-    return bundleComponents();
-
-  }).then(() => {
     // next build the ionic.js loader file which
     // ionic-web uses to decide which core files to load
     return buildLoader();
+
+  }).then(() => {
+    // next add the component registry to the top of each core file
+    return bundleComponents().then(results => {
+      return readFile(results.loaderPath).then(content => {
+        content = results.registry + content;
+        return writeFile(results.loaderPath, content);
+      });
+    });
 
   }).catch(err => {
     console.log(err);
@@ -70,13 +76,14 @@ function compileComponents() {
     },
     include: [srcDir],
     exclude: ['node_modules', 'test'],
+    devMode: false,
     debug: true,
-    devMode: true,
     bundles: [
+      ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-      ['ion-gesture'],
-      ['ion-toggle'],
+      ['ion-gesture', 'ion-scroll'],
+      ['ion-toggle']
       ['ion-slides']
     ],
     packages: {
@@ -97,6 +104,7 @@ function bundleComponents() {
     srcDir: compiledDir,
     destDir: destDir,
     packages: {
+      cleanCss: cleanCss,
       fs: fs,
       path: path,
       rollup: rollup,
@@ -104,17 +112,11 @@ function bundleComponents() {
       nodeSass: nodeSass,
       typescript: typescript
     },
-    devMode: true,
+    devMode: false,
     debug: true
   };
 
-  return compiler.bundle(config, ctx).then(results => {
-    if (results.errors) {
-      results.errors.forEach(err => {
-        console.error(`compiler.bundle: ${err}`);
-      });
-    }
-  });
+  return compiler.bundle(config, ctx);
 }
 
 

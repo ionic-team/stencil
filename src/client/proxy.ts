@@ -1,13 +1,14 @@
-import { Component, ConfigApi, PlatformApi, Props, ProxyElement, RendererApi, Watches } from '../util/interfaces';
+import { Component, ConfigApi, PlatformApi, Props, ProxyElement, RendererApi, Watchers } from '../util/interfaces';
 import { queueUpdate } from './update';
+import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 
 
-export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, watches: Watches) {
+export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, watchers: Watchers) {
   const propValues: {[propName: string]: any} = {};
 
 
   Object.keys(props).forEach(propName => {
-    const watcher: Function = (watches[propName]) ? instance[watches[propName].fn].bind(instance) : null;
+    const watcher: Function = (watchers[propName]) ? instance[watchers[propName].fn].bind(instance) : null;
 
     propValues[propName] = getInitialValue(config, elm, instance, props[propName].type, propName);
 
@@ -43,7 +44,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 }
 
 
-function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Component, propType: string, propName: string): any {
+function getInitialValue(config: ConfigApi, elm: ProxyElement, instance: Component, propTypeCode: number, propName: string): any {
   if (elm[propName] !== undefined) {
     return elm[propName];
   }
@@ -52,11 +53,11 @@ function getInitialValue(config: ConfigApi, elm: HTMLElement, instance: Componen
     return instance[propName];
   }
 
-  if (propType === 'boolean') {
+  if (propTypeCode === BOOLEAN_TYPE_CODE) {
     return config.getBoolean(propName);
   }
 
-  if (propType === 'number') {
+  if (propTypeCode === NUMBER_TYPE_CODE) {
     return config.getNumber(propName);
   }
 

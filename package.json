@@ -5,7 +5,6 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf dist/",
-    "compare": "node scripts/build.compare.js",
     "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.universal",
     "build.compiler": "node dist/scripts/build-compiler.js",
     "build.web": "node dist/scripts/build-web.js",
@@ -34,6 +33,7 @@
     "babel-plugin-transform-es2015-parameters": "^6.23.0",
     "babel-plugin-transform-es2015-shorthand-properties": "^6.22.0",
     "babel-plugin-transform-es2015-template-literals": "^6.22.0",
+    "clean-css": "^4.0.12",
     "fs-extra": "^2.1.2",
     "google-closure-compiler": "20170218.0.0",
     "jest": "19.0.2",
@@ -46,7 +46,9 @@
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "swiper": "^3.4.2",
-    "typescript": "rc"
+    "tslint": "^5.1.0",
+    "tslint-ionic-rules": "0.0.8",
+    "typescript": "next"
   },
   "jest": {
     "testEnvironment": "node",

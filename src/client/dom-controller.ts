@@ -4,7 +4,7 @@ import { DomControllerApi, RafCallback } from '../util/interfaces';
 export function DomController(window: Window): DomControllerApi {
   const readCBs: RafCallback[] = [];
   const writeCBs: RafCallback[] = [];
-  let rafPending: boolean;
+  let rafPending = false;
 
   function domRead(cb: RafCallback) {
     readCBs.push(cb);
@@ -66,6 +66,7 @@ export function DomController(window: Window): DomControllerApi {
 
   return {
     read: domRead,
-    write: domWrite
+    write: domWrite,
+    raf: window.requestAnimationFrame.bind(window)
   };
 }

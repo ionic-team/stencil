@@ -24,7 +24,7 @@ export function renderVNodeToString(plt: PlatformApi, vnode: VNode) {
   // open start tag
   const html = ['<', tagName];
 
-  const attributes = {};
+  const attributes: any = {};
 
   Object.keys(attributes).forEach(attrName => {
     const attrVal = attributes[attrName];

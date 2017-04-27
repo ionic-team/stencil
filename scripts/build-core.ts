@@ -173,16 +173,16 @@ function buildCoreMinified(ctx: BuildContext) {
           content = content.replace(match[0], 'class ' + className + ' extends HTMLElement {}');
 
           // (function(B,U){
-          var match = /\(function\((.*?),(.*?)\)\{/.exec(content);
+          var match = /\(function\((.*?)\)\{/.exec(content);
           if (!match) {
-            match = /\(function\((.*?), (.*?)\)\ {/.exec(content);
+            match = /\(function\((.*?)\)\ {/.exec(content);
             if (!match) {
               console.log(content);
               throw 'addUseStrict: something done changed!';
             }
           }
 
-          content = content.replace(match[0], '(function(' + match[1] + ',' + match[2] + '){"use-strict";')
+          content = content.replace(match[0], '(function(' + match[1] + '){"use-strict";')
 
           ctx.coreMinifiedContent = content;
 
@@ -282,8 +282,8 @@ export function writeFile(filePath: string, content: string) {
 }
 
 
-export function readFile(filePath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
+export function readFile(filePath: string) {
+  return new Promise<string>((resolve, reject) => {
     fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         reject(err);
@@ -295,7 +295,7 @@ export function readFile(filePath: string): Promise<string> {
 }
 
 
-export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string) {
+export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string, skipIfExists = false) {
   console.log('core, buildBindingCore:', srcDir);
 
   const ctx: BuildContext = {
@@ -320,6 +320,11 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
     cePolyFillPath: path.join(POLYFILLS_DIR, 'document-register-element.js'),
     cePolyfillContent: ''
   };
+
+  if (skipIfExists && ts.sys.fileExists(ctx.coreEntryFilePath)) {
+    console.log('core files already built');
+    return appendCoreFilesToManifest(destDir, coreFilesDir);
+  }
 
   // create the dev mode versions
   return Promise.all([
@@ -352,21 +357,27 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
 
   .then(() => {
     // add the location of each file to the manifest
-    const manifestFilePath = path.join(destDir, 'manifest.json');
+    return appendCoreFilesToManifest(destDir, coreFilesDir);
+  });
+}
 
-    return readFile(manifestFilePath).then(manifestStr => {
-      const manifest = JSON.parse(manifestStr);
 
-      manifest.coreFiles = {
-        'core': path.join(coreFilesDir, 'ionic.core.js'),
-        'core_ce': path.join(coreFilesDir, 'ionic.core.ce.js'),
-        'core_sd_cd': path.join(coreFilesDir, 'ionic.core.sd.ce.js')
-      }
+function appendCoreFilesToManifest(destDir: string, coreFilesDir: string) {
+  // add the location of each file to the manifest
+  const manifestFilePath = path.join(destDir, 'manifest.json');
 
-      manifestStr = JSON.stringify(manifest, null, 2);
+  return readFile(manifestFilePath).then(manifestStr => {
+    const manifest = JSON.parse(manifestStr);
 
-      return writeFile(manifestFilePath, manifestStr);
-    });
+    manifest.coreFiles = {
+      'core': path.join(coreFilesDir, 'ionic.core.js'),
+      'core_ce': path.join(coreFilesDir, 'ionic.core.ce.js'),
+      'core_sd_cd': path.join(coreFilesDir, 'ionic.core.sd.ce.js')
+    }
+
+    manifestStr = JSON.stringify(manifest, null, 2);
+
+    return writeFile(manifestFilePath, manifestStr);
   });
 }
 

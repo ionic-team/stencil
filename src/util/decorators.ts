@@ -2,7 +2,7 @@ import { PropOptions } from './interfaces';
 
 
 export const Component: ComponentDecorator = function(opts?: ComponentOptions): (target: any) => any {
-  return function() {opts;};
+  return function() { opts; };
 };
 
 
@@ -22,7 +22,7 @@ export interface ModeStyles {
 
 
 export const Prop: PropDecorator = function(opts?: PropOptions): (target: any, propKey: string) => any {
-  return function() {opts;};
+  return function() { opts; };
 };
 
 

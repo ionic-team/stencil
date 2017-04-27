@@ -1,5 +1,5 @@
 import { BooleanInputComponent, GestureDetail } from '../../util/interfaces';
-import { Component, h, Ionic, Listen, Prop, Watch } from '../../index';
+import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
 
 
 @Component({
@@ -24,7 +24,12 @@ export class Toggle implements BooleanInputComponent {
 
   @Watch('checked')
   changed(val: boolean) {
-    Ionic.emit(this, 'ionChange', { checked: val });
+    Ionic.emit(this, 'ionChange', { detail: { checked: val } });
+  }
+
+
+  canStart() {
+    return !this.disabled;
   }
 
 
@@ -65,10 +70,20 @@ export class Toggle implements BooleanInputComponent {
     this.startX = null;
   }
 
+
   @Listen('keydown.space')
+  onSpace(ev: KeyboardEvent) {
+    this.toggle();
+    ev.stopPropagation();
+    ev.preventDefault();
+  }
+
+
   toggle() {
-    this.checked = !this.checked;
-    this.fireFocus();
+    if (!this.disabled) {
+      this.checked = !this.checked;
+      this.fireFocus();
+    }
   }
 
 
@@ -97,6 +112,7 @@ export class Toggle implements BooleanInputComponent {
           'toggle-disabled': this.disabled,
         },
         props: {
+          'canStart': this.canStart.bind(this),
           'onStart': this.onDragStart.bind(this),
           'onMove': this.onDragMove.bind(this),
           'onEnd': this.onDragEnd.bind(this),

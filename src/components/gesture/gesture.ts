@@ -1,7 +1,7 @@
-import { Component, Listen, Ionic, Prop } from '../../index';
-import { GestureController, GestureDelegate } from './gesture-controller';
+import { applyStyles, getElementReference, pointerCoordX, pointerCoordY } from '../../util/helpers';
+import { Component, Listen, Ionic, Prop } from '../index';
 import { GestureCallback, GestureDetail } from '../../util/interfaces';
-import { pointerCoordX, pointerCoordY } from '../../util/dom';
+import { GestureController, GestureDelegate } from './gesture-controller';
 import { PanRecognizer } from './recognizers';
 
 
@@ -10,7 +10,9 @@ import { PanRecognizer } from './recognizers';
   shadow: false
 })
 export class Gesture {
+  private $el: HTMLElement;
   private detail: GestureDetail = {};
+  private positions: number[] = [];
   private gesture: GestureDelegate;
   private lastTouch = 0;
   private pan: PanRecognizer;
@@ -18,6 +20,7 @@ export class Gesture {
   private hasPress = false;
   private hasStartedPan = false;
   private requiresMove = false;
+  private isMoveQueued = false;
 
   @Prop() direction: string = 'x';
   @Prop() gestureName: string = '';
@@ -51,6 +54,10 @@ export class Gesture {
     if (this.pan || this.hasPress) {
       Ionic.listener.enable(this, 'touchstart', true, this.listenOn);
       Ionic.listener.enable(this, 'mousedown', true, this.listenOn);
+
+      Ionic.dom.write(() => {
+        applyStyles(getElementReference(this.$el, this.listenOn), GESTURE_INLINE_STYLES);
+      });
     }
   }
 
@@ -59,12 +66,12 @@ export class Gesture {
 
   @Listen('touchstart', { passive: true, enabled: false })
   onTouchStart(ev: TouchEvent) {
-    this.lastTouch = this.detail.timeStamp = now(ev);
+    this.lastTouch = now(ev);
 
     this.enableMouse(false);
     this.enableTouch(true);
 
-    this.pointerDown(ev);
+    this.pointerDown(ev, this.lastTouch);
   }
 
 
@@ -73,16 +80,15 @@ export class Gesture {
     const timeStamp = now(ev);
 
     if (this.lastTouch === 0 || (this.lastTouch + MOUSE_WAIT < timeStamp)) {
-      this.detail.timeStamp = timeStamp;
       this.enableMouse(true);
       this.enableTouch(false);
 
-      this.pointerDown(ev);
+      this.pointerDown(ev, timeStamp);
     }
   }
 
 
-  private pointerDown(ev: UIEvent): boolean {
+  private pointerDown(ev: UIEvent, timeStamp: number): boolean {
     if (!this.gesture || this.hasStartedPan) {
       return false;
     }
@@ -91,11 +97,17 @@ export class Gesture {
 
     detail.startX = detail.currentX = pointerCoordX(ev);
     detail.startY = detail.currentY = pointerCoordY(ev);
+    detail.startTimeStamp = detail.timeStamp = timeStamp;
+    detail.velocityX = detail.velocityY = detail.deltaX = detail.deltaY = 0;
+    detail.directionX = detail.directionY = detail.velocityDirectionX = detail.velocityDirectionY = null;
     detail.event = ev;
+    this.positions.length = 0;
 
     if (this.canStart && this.canStart(detail) === false) {
       return false;
     }
+
+    this.positions.push(detail.currentX, detail.currentY, timeStamp);
 
     // Release fallback
     this.gesture.release();
@@ -137,21 +149,26 @@ export class Gesture {
   }
 
   private pointerMove(ev: UIEvent) {
-    if (this.pan) {
-      const detail = this.detail;
-      detail.currentX = pointerCoordX(ev);
-      detail.currentY = pointerCoordY(ev);
-      detail.event = ev;
+    const detail = this.detail;
+    this.calcGestureData(ev);
 
+    if (this.pan) {
       if (this.hasCapturedPan) {
-        // this.debouncer.write(() => {
-          detail.type = 'pan';
-          if (this.onMove) {
-            this.onMove(detail);
-          } else {
-            Ionic.emit(this, 'ionGestureMove', this.detail);
-          }
-        // });
+
+        if (!this.isMoveQueued) {
+          this.isMoveQueued = true;
+
+          Ionic.dom.write(() => {
+            this.isMoveQueued = false;
+            detail.type = 'pan';
+
+            if (this.onMove) {
+              this.onMove(detail);
+            } else {
+              Ionic.emit(this, 'ionGestureMove', { detail: this.detail });
+            }
+          });
+        }
 
       } else if (this.pan.detect(detail.currentX, detail.currentY)) {
         if (this.pan.isGesture() !== 0) {
@@ -160,6 +177,45 @@ export class Gesture {
           }
         }
       }
+    }
+  }
+
+  private calcGestureData(ev: UIEvent) {
+    const detail = this.detail;
+    detail.currentX = pointerCoordX(ev);
+    detail.currentY = pointerCoordY(ev);
+    detail.deltaX = (detail.currentX - detail.startX);
+    detail.deltaY = (detail.currentY - detail.startY);
+    detail.event = ev;
+
+    // figure out which direction we're movin'
+    detail.directionX = detail.velocityDirectionX = (detail.deltaX > 0 ? 'left' : (detail.deltaX < 0 ? 'right' : null));
+    detail.directionY = detail.velocityDirectionY = (detail.deltaY > 0 ? 'up' : (detail.deltaY < 0 ? 'down' : null));
+
+    const positions = this.positions;
+    positions.push(detail.currentX, detail.currentY, detail.timeStamp);
+
+    var endPos = (positions.length - 1);
+    var startPos = endPos;
+    var timeRange = (detail.timeStamp - 100);
+
+    // move pointer to position measured 100ms ago
+    for (var i = endPos; i > 0 && positions[i] > timeRange; i -= 3) {
+      startPos = i;
+    }
+
+    if (startPos !== endPos) {
+      // compute relative movement between these two points
+      var movedX = (positions[startPos - 2] - positions[endPos - 2]);
+      var movedY = (positions[startPos - 1] - positions[endPos - 1]);
+      var factor = 16.67 / (positions[endPos] - positions[startPos]);
+
+      // based on XXms compute the movement to apply for each render step
+      detail.velocityX = movedX * factor;
+      detail.velocityY = movedY * factor;
+
+      detail.velocityDirectionX = (movedX > 0 ? 'left' : (movedX < 0 ? 'right' : null));
+      detail.velocityDirectionY = (movedY > 0 ? 'up' : (movedY < 0 ? 'down' : null));
     }
   }
 
@@ -173,7 +229,7 @@ export class Gesture {
     if (this.onStart) {
       this.onStart(this.detail);
     } else {
-      Ionic.emit(this, 'ionGestureStart', this.detail);
+      Ionic.emit(this, 'ionGestureStart', { detail: this.detail });
     }
 
     this.hasCapturedPan = true;
@@ -217,11 +273,12 @@ export class Gesture {
 
   private pointerUp(ev: UIEvent) {
     const detail = this.detail;
-    // this.debouncer.cancel();
 
     this.gesture && this.gesture.release();
 
     detail.event = ev;
+
+    this.calcGestureData(ev);
 
     if (this.pan) {
       if (this.hasCapturedPan) {
@@ -229,7 +286,7 @@ export class Gesture {
         if (this.onEnd) {
           this.onEnd(detail);
         } else {
-          Ionic.emit(this, 'ionGestureEnd', detail);
+          Ionic.emit(this, 'ionGestureEnd', { detail: detail });
         }
 
       } else if (this.hasPress) {
@@ -239,7 +296,7 @@ export class Gesture {
         if (this.notCaptured) {
           this.notCaptured(detail);
         } else {
-          Ionic.emit(this, 'ionGestureNotCaptured', detail);
+          Ionic.emit(this, 'ionGestureNotCaptured', { detail: detail });
         }
       }
 
@@ -261,7 +318,7 @@ export class Gesture {
       if (this.onPress) {
         this.onPress(detail);
       } else {
-        Ionic.emit(this, 'ionPress', detail);
+        Ionic.emit(this, 'ionPress', { detail: detail });
       }
     }
   }
@@ -299,8 +356,17 @@ export class Gesture {
 }
 
 
+const GESTURE_INLINE_STYLES = {
+  'touch-action': 'none',
+  'user-select': 'none',
+  '-webkit-user-drag': 'none',
+  '-webkit-tap-highlight-color': 'rgba(0,0,0,0)'
+};
+
 const MOUSE_WAIT = 2500;
+
 
 function now(ev: UIEvent) {
   return ev.timeStamp || Date.now();
 }
+

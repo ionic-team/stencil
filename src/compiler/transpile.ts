@@ -62,7 +62,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
         outputs.set(jsFilePath, jsText);
       }
 
-      writeByteOrderMark;onError;
+      writeByteOrderMark; onError;
     }
   };
 

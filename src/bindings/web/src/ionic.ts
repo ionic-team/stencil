@@ -21,8 +21,12 @@ import { IonicGlobal } from '../../../util/interfaces';
     ionic.staticDir = scriptElm.dataset['staticDir'] = paths.join('/') + '/';
   }
 
+  var style = document.createElement('style');
+  style.innerHTML = Object.keys(ionic.components).join(',') + '{visibility:hidden}';
+  document.head.appendChild(style);
+
   // build up a path for the exact ionic core javascript file this browser needs
-  var pathItems: string[] = ['core'];
+  var pathItems: string[] = [];
 
   if (!('attachShadow' in Element.prototype)) {
     // browser requires the shadow dom polyfill
@@ -36,7 +40,7 @@ import { IonicGlobal } from '../../../util/interfaces';
 
   // request the ionic core file this browser needs
   var s = document.createElement('script');
-  s.src = ionic.staticDir + 'ionic.' + pathItems.join('.') + '.js';
+  s.src = ionic.staticDir + 'ionic.core' + pathItems.join('.') + '.js';
   document.head.appendChild(s);
 
 })(window, document);

@@ -235,6 +235,10 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
 
   const destDir = config.compilerOptions.outDir;
 
+  if (config.debug) {
+    console.log(`compile, generateManifest: ${destDir}`);
+  }
+
   ctx.files.forEach(f => {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
@@ -259,7 +263,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       modes: modes,
       props: f.cmpMeta.props,
       listeners: f.cmpMeta.listeners,
-      watches: f.cmpMeta.watches,
+      watchers: f.cmpMeta.watchers,
       shadow: f.cmpMeta.shadow
     });
   });
@@ -292,13 +296,17 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       modes: cmp.modes,
       props: cmp.props,
       listeners: cmp.listeners,
-      watches: cmp.watches,
+      watchers: cmp.watchers,
       shadow: cmp.shadow
     };
   });
 
-  const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json')
+  const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json');
   const json = JSON.stringify(manifest, null, 2);
 
-  return writeFile(config.packages, manifestFile, json)
+  if (config.debug) {
+    console.log(`compile, manifestFile: ${manifestFile}`);
+  }
+
+  return writeFile(config.packages, manifestFile, json);
 }

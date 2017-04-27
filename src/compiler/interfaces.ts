@@ -8,7 +8,7 @@ export interface CompilerConfig {
     outDir?: string;
     sourceMap?: boolean;
     target?: 'es5' | 'es2015';
-  },
+  };
   include: string[];
   exclude?: string[];
   devMode?: boolean;
@@ -24,6 +24,7 @@ export interface BundlerConfig {
   devMode?: boolean;
   packages: Packages;
   debug?: boolean;
+  attachRegistryTo?: 'core'|'loader';
 }
 
 
@@ -48,12 +49,16 @@ export interface BuildContext {
   bundles?: Bundle[];
   components?: CoreComponents;
   registry?: Registry;
-  manifest?: Manifest;
 }
 
 
 export interface Results {
   errors?: string[];
+  files?: string[];
+  manifest?: Manifest;
+  manifestPath?: string;
+  registry?: string;
+  loaderPath?: string;
 }
 
 
@@ -82,7 +87,7 @@ export interface Manifest {
     core_ce: string;
     core_sd_ce: string;
     [key: string]: string;
-  }
+  };
 }
 
 
@@ -96,7 +101,7 @@ export interface Component {
   modes: {[modeName: string]: ComponentMode};
   props: Props;
   listeners: Listeners;
-  watches: Watches;
+  watchers: Watchers;
   shadow: boolean;
   componentClass: string;
   componentUrl: string;
@@ -115,7 +120,7 @@ export interface ComponentMeta {
   tag?: string;
   props?: Props;
   listeners?: Listeners;
-  watches?: Watches;
+  watchers?: Watchers;
   shadow?: boolean;
   observedAttrs?: string[];
   hostCss?: string;
@@ -152,7 +157,7 @@ export interface WatchOpts {
 }
 
 
-export interface Watches {
+export interface Watchers {
   [propName: string]: WatchOpts;
 }
 
@@ -177,6 +182,11 @@ export interface Packages {
   typescript?: {
 
   };
+  cleanCss?: {
+    new(opts?: any): {
+      minify: {(input: string): any}
+    };
+  };
   nodeSass?: {
     render: Function;
   };
@@ -184,7 +194,7 @@ export interface Packages {
     rollup: Rollup;
   };
   uglify?: {
-    minify: {(content: string, opts: any): {code: string;}};
+    minify: {(content: string, opts: any): {code: string}};
   };
 }
 

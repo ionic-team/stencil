@@ -1,25 +1,25 @@
-import { ComponentMeta, ComponentMode, ComponentRegistry,
-  DomControllerApi, IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
+import { Component, ComponentMeta, ComponentRegistry,
+  IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './injected-ionic';
-import { parseComponentModeData } from '../util/data-parse';
+import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 
 
-export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, staticDir: string, domCtrl: DomControllerApi, nextTickCtrl: NextTickApi): PlatformApi {
+export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, NextTickCtrl: NextTickApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
   const activeJsonRequests: {[url: string]: boolean} = {};
   const moduleImports = {};
   const css: {[tag: string]: boolean} = {};
-  const hasNativeShadowDom = !(win.ShadyDOM && win.ShadyDOM.inUse);
+  const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
 
 
-  const injectedIonic = initInjectedIonic(doc);
+  const injectedIonic = initInjectedIonic(win, IonicGbl.eventNameFn, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
 
-  ionic.loadComponents = function loadComponents(bundleId) {
+  IonicGbl.loadComponents = function loadComponents(bundleId) {
     var args = arguments;
     for (var i = 1; i < args.length; i++) {
       // first arg is the bundleId
@@ -56,7 +56,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
       }
 
       // create the url we'll be requesting
-      const url = `${staticDir}ionic.${bundleId}.js`;
+      const url = `${IonicGbl.staticDir}ionic.${bundleId}.js`;
 
       if (!activeJsonRequests[url]) {
         // not already actively requesting this url
@@ -98,44 +98,50 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
   }
 
 
-  function attachShadow(elm: Element, cmpMode: ComponentMode, cmpModeId: string) {
-    const shadowRoot = elm.attachShadow({ mode: 'open' });
+  function attachComponent(elm: Element, cmpMeta: ComponentMeta, instance: Component) {
+    if (cmpMeta.shadow) {
+      instance.$root = elm.attachShadow({ mode: 'open' });
+    }
 
-    if (cmpMode.styles) {
-      if (hasNativeShadowDom) {
+    const cmpMode = cmpMeta.modes[instance.mode];
+
+    if (cmpMode && cmpMode.styles) {
+      if (cmpMeta.shadow && hasNativeShadowDom) {
         if (!cmpMode.styleElm) {
           cmpMode.styleElm = createElement('style');
           cmpMode.styleElm.innerHTML = cmpMode.styles;
         }
 
-        shadowRoot.appendChild(cmpMode.styleElm.cloneNode(true));
+        instance.$root.appendChild(cmpMode.styleElm.cloneNode(true));
 
-      } else if (!hasCss(cmpModeId)) {
-        const headStyleEle = createElement('style');
-        headStyleEle.dataset['cmpModeId'] = cmpModeId;
-        headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
-        appendChild(doc.head, headStyleEle);
-        setCss(cmpModeId);
+      } else {
+        const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
+
+        if (!hasCss(cmpModeId)) {
+          const headStyleEle = createElement('style');
+          headStyleEle.dataset['cmpId'] = cmpModeId;
+          headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+          appendChild(doc.head, headStyleEle);
+          setCss(cmpModeId);
+        }
       }
     }
-
-    return shadowRoot;
   }
+
 
   function registerComponent(tag: string, data: any[]) {
     const modeBundleIds = data[0];
-    const props = data[1] || {};
 
     const cmpMeta: ComponentMeta = registry[tag] = {
       tag: tag,
       modes: {},
-      props: props,
+      props: parseProp(data[1]),
       obsAttrs: []
     };
 
     let keys = Object.keys(modeBundleIds);
     for (var i = 0; i < keys.length; i++) {
-      cmpMeta.modes[keys[i]] = {
+      cmpMeta.modes[parseModeName(keys[i].toString())] = {
         bundleId: modeBundleIds[keys[i]]
       };
     }
@@ -144,10 +150,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     keys.shift();
     cmpMeta.hostCss = keys.join('-');
 
-    props.color = {};
-    props.mode = {};
-
-    keys = Object.keys(props);
+    keys = Object.keys(cmpMeta.props);
     for (i = 0; i < keys.length; i++) {
       cmpMeta.obsAttrs.push(toDashCase(keys[i]));
     }
@@ -231,7 +234,6 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     css[linkUrl] = true;
   }
 
-
   return {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
@@ -240,9 +242,7 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     isElement: isElement,
     isText: isText,
     isComment: isComment,
-    nextTick: nextTickCtrl.nextTick.bind(nextTickCtrl),
-    domRead: domCtrl.read.bind(domCtrl),
-    domWrite: domCtrl.write.bind(domCtrl),
+    nextTick: NextTickCtrl.nextTick.bind(NextTickCtrl),
 
     $createElement: createElement,
     $createElementNS: createElementNS,
@@ -257,8 +257,8 @@ export function PlatformClient(win: any, doc: HTMLDocument, ionic: IonicGlobal, 
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachShadow: attachShadow
-  }
+    $attachComponent: attachComponent
+  };
 }
 
 

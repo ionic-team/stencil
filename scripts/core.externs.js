@@ -13,17 +13,18 @@
  * Global Ionic
  * Each binding can provide it's own values to window.Ionic
  */
-function configCtrl(){};
 function loadComponents(){};
 function components(){};
 function staticDir(){};
-function domCtrl(){};
+function ConfigCtrl(){};
+function DomCtrl(){};
+function dom(){};
 function read(){};
 function write(){};
-function nextTickCtrl(){};
+function raf(){};
+function NextTickCtrl(){};
 function nextTick(){};
-function devMode(){};
-function on(){};
+function eventNameFn(){};
 
 
 /**
@@ -31,6 +32,7 @@ function on(){};
  * Passed into user's closure
  */
 function Ionic(){};
+function config(){};
 function controllers(){};
 function emit(){};
 function listen(){};
@@ -50,6 +52,8 @@ function getNumber(){};
  * Proxy Element
  */
 function $el(){};
+function $meta(){};
+function listeners(){};
 
 
 /**
@@ -58,6 +62,14 @@ function $el(){};
 function ionViewDidLoad(){};
 function ionViewWillUnload(){};
 function render(){};
+
+
+/**
+ * Renderer data properties
+ */
+function attrs(){};
+function on(){};
+function props(){};
 
 
 /**

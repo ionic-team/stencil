@@ -92,6 +92,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
       propMembers.forEach(memberNode => {
         let isListen = false;
         let methodName: string = null;
+        let eventName: string = null;
         let opts: ListenOpts = {};
 
         memberNode.forEachChild(n => {
@@ -101,13 +102,13 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
             n.getChildAt(1).forEachChild(n => {
 
-              if (n.kind === ts.SyntaxKind.StringLiteral && !opts.eventName) {
-                opts.eventName = n.getText();
-                opts.eventName = opts.eventName.replace(/\'/g, '');
-                opts.eventName = opts.eventName.replace(/\"/g, '');
-                opts.eventName = opts.eventName.replace(/\`/g, '');
+              if (n.kind === ts.SyntaxKind.StringLiteral && !eventName) {
+                eventName = n.getText().trim();
+                eventName = eventName.replace(/\'/g, '');
+                eventName = eventName.replace(/\"/g, '');
+                eventName = eventName.replace(/\`/g, '');
 
-              } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && opts.eventName) {
+              } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && eventName) {
                 try {
                   const fnStr = `return ${n.getText()};`;
                   let parsedOpts: ListenOpts = new Function(fnStr)();
@@ -122,19 +123,33 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
           } else if (isListen) {
             if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
-              methodName = n.getText();
+              methodName = n.getText().trim();
             }
           }
 
         });
 
-        if (isListen && opts.eventName && methodName) {
-          opts.capture = !!opts.capture;
-          opts.passive = !!opts.passive;
-          opts.enabled = !!opts.enabled;
-          cmpMeta.listeners[methodName] = opts;
-
+        if (isListen && eventName && methodName) {
           memberNode.decorators = undefined;
+
+          if (opts.capture === undefined) {
+            opts.capture = false;
+          }
+          opts.capture = !!opts.capture;
+
+          if (opts.passive === undefined) {
+            opts.passive = false;
+          }
+          opts.passive = !!opts.passive;
+
+          if (opts.enabled === undefined) {
+            opts.enabled = true;
+          }
+          opts.enabled = !!opts.enabled;
+
+          opts.eventName = eventName;
+
+          cmpMeta.listeners[methodName] = opts;
         }
       });
     }
@@ -143,7 +158,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-      cmpMeta.watches = {};
+      cmpMeta.watchers = {};
 
       propMembers.forEach(memberNode => {
         let isWatch = false;
@@ -175,7 +190,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         });
 
         if (isWatch && propName && methodName) {
-          cmpMeta.watches[propName] = {
+          cmpMeta.watchers[propName] = {
             fn: methodName
           };
 
@@ -206,8 +221,8 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
       }
 
       return tsSourceFile;
-    }
-  }
+    };
+  };
 
 }
 
@@ -264,7 +279,7 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
     cmpMeta.tag = (<any>cmpMeta).selector;
   }
 
-  if (!cmpMeta.tag || cmpMeta.tag.trim() == '') {
+  if (!cmpMeta.tag || cmpMeta.tag.trim() === '') {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
@@ -280,11 +295,15 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
 
 
 function updateTag(cmpMeta: ComponentMeta) {
-  cmpMeta.tag = cmpMeta.tag.trim().toLowerCase();
+  cmpMeta.tag = cmpMeta.tag.replace(/\s/g, '').toLowerCase();
+
+  if (cmpMeta.tag.indexOf(',') > -1) {
+    throw `"${cmpMeta.tag}" tag cannot be use for multiple tags`;
+  }
 
   let invalidChars = cmpMeta.tag.replace(/\w|-/g, '');
   if (invalidChars !== '') {
-    throw `"${cmpMeta.tag}" tag contains invalid characters: ${invalidChars}`
+    throw `"${cmpMeta.tag}" tag contains invalid characters: ${invalidChars}`;
   }
 
   if (cmpMeta.tag.indexOf('-') === -1) {
@@ -308,7 +327,7 @@ function updateStyles(cmpMeta: ComponentMeta) {
     Object.keys(styleModes).forEach(styleModeName => {
       cmpMeta.modes[styleModeName] = {
         styleUrls: [styleModes[styleModeName]]
-      }
+      };
     });
   }
 }

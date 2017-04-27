@@ -45,15 +45,6 @@ $list-wp-text-color:                  $list-text-color !default;
 $list-wp-border-color:                transparent !default;
 $list-wp-background-color:            $list-background-color !default;
 $list-wp-activated-background-color:  #aaa !default;
-$list-wp-margin-top:                  16px !default;
-$list-wp-margin-right:                0 !default;
-$list-wp-margin-bottom:               16px !default;
-$list-wp-margin-left:                 0 !default;
-$list-inset-wp-margin-top:            16px !default;
-$list-inset-wp-margin-right:          16px !default;
-$list-inset-wp-margin-bottom:         16px !default;
-$list-inset-wp-margin-left:           16px !default;
-$list-inset-wp-border-radius:         2px !default;
 
 
 // Windows Item
@@ -67,7 +58,6 @@ $item-wp-padding-media-top:           9px !default;
 $item-wp-padding-media-bottom:        9px !default;
 $item-wp-padding-icon-top:            11px !default;
 $item-wp-padding-icon-bottom:         10px !default;
-$item-wp-sliding-content-background:  $list-wp-background-color !default;
 
 
 // Windows Input

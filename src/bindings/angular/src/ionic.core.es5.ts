@@ -4,11 +4,8 @@ import { registerComponentsES5 } from '../../../client/registry.es5';
 import { Renderer } from '../../../client/renderer/core';
 
 
-const Ionic: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
+const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
+const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.NextTickCtrl);
 
-const plt = PlatformClient(window, window.document, Ionic, Ionic.staticDir, Ionic.domCtrl, Ionic.nextTickCtrl);
-const renderer = Renderer(plt);
-
-
-registerComponentsES5(window, renderer, plt, Ionic.configCtrl, Ionic.components);
+registerComponentsES5(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

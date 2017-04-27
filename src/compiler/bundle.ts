@@ -1,6 +1,6 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { formatComponentModeLoader, getBundleFileName, getBundleContent, getRegistryContent } from './formatters';
+import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName, formatBundleContent, formatRegistryContent } from './formatters';
 import { readFile, writeFile } from './util';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
@@ -30,7 +30,9 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
     console.log(`bundle, destDir: ${config.destDir}`);
   }
 
-  ctx.results = {};
+  ctx.results = {
+    files: []
+  };
 
   return getManifest(config, ctx).then(manifest => {
 
@@ -95,8 +97,17 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
 
     let code = results.code.trim();
 
-    code = code.replace('(function (exports) {', '');
-    code = code.replace('}((this.ionicModule = this.ionicModule || {})));', '');
+    let closureStart = '(function (exports) {';
+    if (code.indexOf(closureStart) === -1) {
+      throw `bundleComponentModule: importComponent() closureStart format changed!`;
+    }
+    code = code.replace(closureStart, '');
+
+    let closureEnd = '}((this.ionicModule = this.ionicModule || {})));';
+    if (code.indexOf(closureEnd) === -1) {
+      throw `bundleComponentModule: importComponent() closureEnd format changed!`;
+    }
+    code = code.replace(closureEnd, '');
 
     code = code.trim();
 
@@ -130,6 +141,10 @@ function getComponents(ctx: BuildContext, manifest: Manifest) {
 
 
 function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifest) {
+  if (config.debug) {
+    console.log(`bundle, buildCoreJs`);
+  }
+
   ctx.bundles = [];
 
   manifest.bundles.forEach(bundleComponentTags => {
@@ -137,14 +152,20 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
   });
 
   return generateBundleFiles(config, ctx).then(() => {
-    const content = getRegistryContent(ctx.registry);
+    const registryContent = formatRegistryContent(ctx.registry);
+    ctx.results.registry = registryContent;
+    ctx.results.loaderPath = config.packages.path.join(config.destDir, 'ionic.js');
 
     const promises: Promise<any>[] = [];
 
-    Object.keys(ctx.manifest.coreFiles).forEach(coreDirName => {
-      const corePath = ctx.manifest.coreFiles[coreDirName];
+    if (!ctx.results.manifest.coreFiles) {
+      throw `missing manifest core files`;
+    }
 
-      promises.push(createCoreJs(config, content, corePath));
+    Object.keys(ctx.results.manifest.coreFiles).forEach(coreDirName => {
+      const corePath = ctx.results.manifest.coreFiles[coreDirName];
+
+      promises.push(createCoreJs(config, registryContent, corePath));
     });
 
     return Promise.all(promises);
@@ -184,6 +205,10 @@ function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[])
 
 
 function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
+  if (config.debug) {
+    console.log(`bundle, generateBundleFiles`);
+  }
+
   ctx.registry = {};
 
   return Promise.all(ctx.bundles.map((bundle, bundleIndex) => {
@@ -193,25 +218,25 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
     }).join(',\n');
 
     bundle.id = bundleIndex;
-    bundle.fileName = getBundleFileName(bundle.id);
+    bundle.fileName = formatBundleFileName(bundle.id);
     bundle.filePath = config.packages.path.join(config.destDir, bundle.fileName);
 
-    bundle.content = getBundleContent(bundle.id, componentModeLoaders);
+    bundle.content = formatBundleContent(bundle.id, componentModeLoaders);
 
     bundle.components.forEach(bundleComponent => {
       const tag = bundleComponent.component.tag;
-      const modeName = bundleComponent.mode.name;
+      const modeCode = formatModeName(bundleComponent.mode.name);
 
       ctx.registry[tag] = ctx.registry[tag] || [];
 
-      const modes: {[modeName: string]: number} = ctx.registry[tag][0] || {};
+      const modes: {[modeCode: string]: number} = ctx.registry[tag][0] || {};
 
-      modes[modeName] = bundle.id;
+      modes[modeCode] = bundle.id;
 
       ctx.registry[tag][0] = modes;
 
       if (ctx.registry[tag].length === 1 && Object.keys(bundleComponent.component.props).length) {
-        ctx.registry[tag].push(bundleComponent.component.props);
+        ctx.registry[tag].push(formatComponentRegistryProps(bundleComponent.component.props));
       }
     });
 
@@ -223,10 +248,12 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
           fromString: true
         });
         content = minifyResults.code;
-      } catch(e) {
+      } catch (e) {
         console.log(`uglify.minify error: ${e}`);
       }
     }
+
+    ctx.results.files.push(bundle.filePath);
 
     return writeFile(config.packages, bundle.filePath, content);
   }));
@@ -245,18 +272,20 @@ function createCoreJs(config: BundlerConfig, registryContent: string, srcFilePat
   let destFilePath = config.packages.path.join(config.destDir, fileName);
 
   return readFile(config.packages, srcFilePath).then(coreJsContent => {
-    let content: string;
+    let content = coreJsContent;
 
-    if (config.devMode) {
-      content = registryContent + '\n\n' + coreJsContent;
+    if (config.attachRegistryTo === 'core') {
+      if (config.devMode) {
+        content = registryContent + '\n\n' + content;
 
-    } else {
-      registryContent = registryContent.replace(/\s/g, '');
-      content = registryContent + '\n' + coreJsContent;
+      } else {
+        registryContent = registryContent.replace(/\s/g, '');
+        content = registryContent + '\n' + content;
+      }
     }
 
     if (config.debug) {
-      console.log(`bundle, createCoreJs: ${destFilePath}`)
+      console.log(`bundle, createCoreJs: ${destFilePath}`);
     }
 
     return writeFile(config.packages, destFilePath, content);
@@ -282,17 +311,17 @@ function getAllModeNames(ctx: BuildContext) {
 
 
 function getManifest(config: BundlerConfig, ctx: BuildContext) {
-  if (ctx.manifest) {
-    return Promise.resolve(ctx.manifest);
+  if (ctx.results.manifest) {
+    return Promise.resolve(ctx.results.manifest);
   }
 
-  const manifestFilePath = config.packages.path.join(config.srcDir, 'manifest.json');
+  ctx.results.manifestPath = config.packages.path.join(config.srcDir, 'manifest.json');
 
   if (config.debug) {
-    console.log(`bundle, manifestFilePath: ${manifestFilePath}`) ;
+    console.log(`bundle, manifestFilePath: ${ctx.results.manifestPath}`) ;
   }
 
-  return readFile(config.packages, manifestFilePath).then(manifestStr => {
-    return ctx.manifest = JSON.parse(manifestStr);
+  return readFile(config.packages, ctx.results.manifestPath).then(manifestStr => {
+    return ctx.results.manifest = JSON.parse(manifestStr);
   });
 }

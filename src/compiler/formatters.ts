@@ -1,13 +1,34 @@
-import { Component, ComponentMode, Listeners, ListenOpts, Registry, Watches, WatchOpts } from './interfaces';
+import { Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watchers, WatchOpts } from './interfaces';
 
 
-export function getBundleFileName(bundleId: number) {
+export function formatBundleFileName(bundleId: number) {
   return `ionic.${bundleId}.js`;
 }
 
 
-export function getBundleContent(bundleId: number, componentModeLoader: string) {
+export function formatBundleContent(bundleId: number, componentModeLoader: string) {
   return `Ionic.loadComponents(\n/** bundleId **/\n${bundleId},${componentModeLoader});`;
+}
+
+
+export function formatComponentRegistryProps(props: Props): any {
+  const p: any[] = [];
+
+  Object.keys(props).forEach(propName => {
+    const prop = props[propName];
+    const formattedProp: any[] = [propName];
+
+    if (prop.type === 'boolean') {
+      formattedProp.push(0);
+
+    } else if (prop.type === 'number') {
+      formattedProp.push(1);
+    }
+
+    p.push(formattedProp);
+  });
+
+  return p;
 }
 
 
@@ -20,7 +41,7 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 
   const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
 
-  const modeCode = formatModeName(modeName);
+  const modeCode = `/* ${modeName} **/ ${formatModeName(modeName)}`;
 
   const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : '/* no styles */ 0');
 
@@ -33,13 +54,13 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 
   const listeners = formatListeners(label, component.listeners);
 
-  const watches = formatWatches(label, component.watches);
+  const watchers = formatWatchers(label, component.watchers);
 
   const t = [
     `/** ${label}: [0] tagName **/\n'${tag}'`,
     `/** ${label}: [1] component class name **/\n'${componentClass}'`,
     `/** ${label}: [2] listeners **/\n${listeners}`,
-    `/** ${label}: [3] watches **/\n${watches}`,
+    `/** ${label}: [3] watchers **/\n${watchers}`,
     `/** ${label}: [4] shadow **/\n${formatBoolean(shadow)}`,
     `/** ${label}: [5] modeName **/\n${modeCode}`,
     `/** ${label}: [6] styles **/\n${styles}`,
@@ -50,28 +71,26 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 }
 
 
-function formatModeName(modeName: string) {
-  let modeCode = `/* ${modeName} **/ `;
-
+export function formatModeName(modeName: string) {
   switch (modeName) {
     case 'default':
-      return modeCode + 0;
+      return 0;
     case 'ios':
-      return modeCode + 1;
+      return 1;
     case 'md':
-      return modeCode + 2;
+      return 2;
     case 'wp':
-      return modeCode + 3;
+      return 3;
   }
 
-  return modeCode + `'${modeName}'`;
+  return `'${modeName}'`;
 }
 
 
 function formatListeners(label: string, listeners: Listeners) {
   const methodNames = Object.keys(listeners);
   if (!methodNames.length) {
-    return '[]'
+    return '[]';
   }
 
   const t: string[] = [];
@@ -98,16 +117,16 @@ function formatListenerOpts(label: string, methodName: string, listenerIndex: nu
 }
 
 
-function formatWatches(label: string, watches: Watches) {
-  const methodNames = Object.keys(watches);
+function formatWatchers(label: string, watchers: Watchers) {
+  const methodNames = Object.keys(watchers);
   if (!methodNames.length) {
-    return '[]'
+    return '[]';
   }
 
   const t: string[] = [];
 
   methodNames.forEach((methodName, watchIndex) => {
-    t.push(formatWatcherOpts(label, methodName, watchIndex, watches[methodName]));
+    t.push(formatWatcherOpts(label, methodName, watchIndex, watchers[methodName]));
   });
 
   return `[\n` + t.join(',\n') + `\n]`;
@@ -127,13 +146,22 @@ function formatWatcherOpts(label: string, methodName: string, watchIndex: number
 
 function formatBoolean(val: boolean) {
   return val ?
-    '/* true **/ 1' :
-    '/* false */ 0';
+    '1 /* true **/' :
+    '0 /* false */';
 }
 
 
-export function getRegistryContent(registry: Registry) {
-  let content = '(window.Ionic = window.Ionic || {}).components = ';
-  content += JSON.stringify(registry, null, 2) + ';';
+export function formatRegistryContent(registry: Registry) {
+  let content = '(window.Ionic=window.Ionic||{}).components=';
+
+  let strData = JSON.stringify(registry) + ';\n';
+
+  strData = strData.replace(/"0"/g, '0');
+  strData = strData.replace(/"1"/g, '1');
+  strData = strData.replace(/"2"/g, '2');
+  strData = strData.replace(/"3"/g, '3');
+
+  content += strData;
+
   return content;
 }

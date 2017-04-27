@@ -3,16 +3,26 @@ export interface Ionic {
   emit: EventEmit;
   listener: {
     enable: EventListenerEnable;
-  }
+  };
   theme: IonicTheme;
   controllers: {
     gesture?: any;
-  }
+  };
+  dom: DomControllerApi;
+  config: ConfigApi;
 }
 
 
 export interface EventEmit {
-  (instance: any, eventName: string, data?: any): void;
+  (instance: any, eventName: string, data?: CustomEventOptions): void;
+}
+
+
+export interface CustomEventOptions {
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
+  detail?: any;
 }
 
 
@@ -31,8 +41,17 @@ export interface GestureDetail {
   event?: UIEvent;
   startX?: number;
   startY?: number;
+  startTimeStamp?: number;
   currentX?: number;
   currentY?: number;
+  velocityX?: number;
+  velocityY?: number;
+  deltaX?: number;
+  deltaY?: number;
+  directionX?: 'left'|'right';
+  directionY?: 'up'|'down';
+  velocityDirectionX?: 'left'|'right';
+  velocityDirectionY?: 'up'|'down';
   timeStamp?: number;
 }
 
@@ -42,14 +61,54 @@ export interface GestureCallback {
 }
 
 
+export interface ScrollDetail extends GestureDetail {
+  scrollTop?: number;
+  scrollLeft?: number;
+  scrollHeight?: number;
+  scrollWidth?: number;
+  contentHeight?: number;
+  contentWidth?: number;
+  contentTop?: number;
+  contentBottom?: number;
+  domWrite?: RequestAnimationFrame;
+  contentElement?: HTMLElement;
+  fixedElement?: HTMLElement;
+  scrollElement?: HTMLElement;
+  headerElement?: HTMLElement;
+  footerElement?: HTMLElement;
+}
+
+
+export interface ScrollCallback {
+  (detail?: ScrollDetail): boolean|void;
+}
+
+
+export interface ContentDimensions {
+  contentHeight: number;
+  contentTop: number;
+  contentBottom: number;
+
+  contentWidth: number;
+  contentLeft: number;
+
+  scrollHeight: number;
+  scrollTop: number;
+
+  scrollWidth: number;
+  scrollLeft: number;
+}
+
+
 export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
   loadComponents?: {(bundleId: string): void};
+  eventNameFn?: {(eventName: string): string};
   config?: Object;
-  configCtrl?: ConfigApi;
-  domCtrl?: DomControllerApi;
-  nextTickCtrl?: NextTickApi;
+  ConfigCtrl?: ConfigApi;
+  DomCtrl?: DomControllerApi;
+  NextTickCtrl?: NextTickApi;
 }
 
 
@@ -63,21 +122,11 @@ export interface NextTick {
 }
 
 
-export interface DomRead {
-  (cb: Function): void;
-}
-
-
-export interface DomWrite {
-  (cb: Function): void;
-}
-
-
 export interface DomControllerApi {
-  read: DomRead;
-  write: DomWrite;
+  read: RequestAnimationFrame;
+  write: RequestAnimationFrame;
+  raf: RequestAnimationFrame;
 }
-
 
 export interface RafCallback {
   (timeStamp?: number): void;
@@ -111,9 +160,9 @@ export interface ComponentModeData {
   [2]: ComponentListenersData[];
 
   /**
-   * watches
+   * watchers
    */
-  [3]: ComponentWatchesData[];
+  [3]: ComponentWatchersData[];
 
   /**
    * shadow
@@ -165,8 +214,8 @@ export interface ComponentListenersData {
 }
 
 
-export interface ComponentWatchesData {
-
+export interface ComponentWatchersData {
+  [methodName: string]: any;
 }
 
 
@@ -197,7 +246,7 @@ export interface PropDecorator {
 
 
 export interface PropOptions {
-  type?: 'string' | 'boolean' | 'number' | 'Array' | 'Object';
+  type?: number;
 }
 
 
@@ -234,13 +283,13 @@ export interface WatchOpts {
 }
 
 
-export interface Watches {
+export interface Watchers {
   [propName: string]: WatchOpts;
 }
 
 
 export interface IonicTheme {
-  (instance: Component, cssClassName: string, vnodeData: VNodeData): VNodeData;
+  (instance: any, cssClassName: string, vnodeData?: VNodeData): VNodeData;
 }
 
 
@@ -255,7 +304,7 @@ export interface ComponentMeta {
   tag?: string;
   props?: Props;
   listeners?: ComponentMetaListeners;
-  watches?: Watches;
+  watchers?: Watchers;
   shadow?: boolean;
   obsAttrs?: string[];
   hostCss?: string;
@@ -286,6 +335,8 @@ export interface Component {
   $listeners?: ComponentActiveListeners;
   $root?: HTMLElement | ShadowRoot;
   $vnode?: VNode;
+
+  [memberName: string]: any;
 }
 
 
@@ -299,8 +350,8 @@ export interface BaseInputComponent extends Component {
   hasFocus: boolean;
   value: string;
 
-  fireFocus: {(): void;}
-  fireBlur: {(): void;}
+  fireFocus: {(): void};
+  fireBlur: {(): void};
 }
 
 
@@ -327,11 +378,13 @@ export interface ProxyElement extends HTMLElement {
 
   $queued?: boolean;
   $instance?: Component;
+
+  [memberName: string]: any;
 }
 
 
 export interface RendererApi {
-  (oldVnode: VNode | Element, vnode: VNode): VNode;
+  (oldVnode: VNode | Element, vnode: VNode, manualSlotProjection?: boolean): VNode;
 }
 
 
@@ -339,14 +392,14 @@ export type Key = string | number;
 
 
 export interface Hyperscript {
-  (sel: any): any;
-  (sel: Node, data: VNodeData): any;
-  (sel: any, data: VNodeData): any;
-  (sel: any, text: string): any;
-  (sel: any, children: Array<any>): any;
-  (sel: any, data: VNodeData, text: string): any;
-  (sel: any, data: VNodeData, children: Array<any|string>): any;
-  (sel: any, data: VNodeData, children: any): any;
+  (sel: any): VNode;
+  (sel: Node, data: VNodeData): VNode;
+  (sel: any, data: VNodeData): VNode;
+  (sel: any, text: string): VNode;
+  (sel: any, children: Array<any>): VNode;
+  (sel: any, data: VNodeData, text: string): VNode;
+  (sel: any, data: VNodeData, children: Array<any|string>): VNode;
+  (sel: any, data: VNodeData, children: any): VNode;
 }
 
 
@@ -379,8 +432,6 @@ export interface PlatformApi {
   getComponentMeta: (tag: string) => ComponentMeta;
   loadComponent: (bundleId: string, cb: Function) => void;
   nextTick: NextTick;
-  domRead: DomRead;
-  domWrite: DomWrite;
 
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
@@ -399,7 +450,14 @@ export interface PlatformApi {
   $setTextContent: (node: Node, text: string | null) => void;
   $getTextContent: (node: Node) => string | null;
   $getAttribute: (elm: Element, attrName: string) => string;
-  $attachShadow: (elm: Element, cmpMode: ComponentMode, cmpModeId: string) => ShadowRoot;
+  $attachComponent: (elm: Element, cmpMeta: ComponentMeta, instance: Component) => void;
+}
+
+
+export interface PlatformConfig {
+  name: string;
+  isMatch?: {(url: string, userAgent: string): boolean};
+  settings?: any;
 }
 
 

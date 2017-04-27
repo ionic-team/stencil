@@ -1,11 +1,11 @@
-import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchesData } from '../util/interfaces';
+import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, Props } from '../util/interfaces';
 import { isString } from './helpers';
 
 
 export function parseComponentModeData(registry: ComponentRegistry, moduleImports: any, h: any, injectedIonic: any, cmpModeData: ComponentModeData) {
   var i = 0;
   var cmpListenerData: ComponentListenersData;
-  var cmpWatchData: ComponentWatchesData;
+  var cmpWatchData: ComponentWatchersData;
 
   // tag name (ion-badge)
   // get component meta data by tag name
@@ -23,11 +23,11 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
     };
   }
 
-  // component instance property watches
-  cmpMeta.watches = {};
+  // component instance property watchers
+  cmpMeta.watchers = {};
   for (i = 0; i < cmpModeData[3].length; i++) {
     cmpWatchData = cmpModeData[3][i];
-    cmpMeta.watches[cmpWatchData[0]] = {
+    cmpMeta.watchers[cmpWatchData[0]] = {
       fn: cmpWatchData[1],
     };
   }
@@ -38,7 +38,7 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // mode name (ios, md, wp)
   // get component mode
   if (isString(cmpModeData[6])) {
-    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[5])];
+    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[5].toString())];
     if (cmpMode) {
       // component mode styles
       cmpMode.styles = cmpModeData[6];
@@ -55,17 +55,39 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 }
 
 
-function parseModeName(mode: any) {
-  switch (mode) {
-    case 0:
+export function parseModeName(modeCode: string) {
+  switch (modeCode) {
+    case '0':
       return 'default';
-    case 1:
+    case '1':
       return 'ios';
-    case 2:
+    case '2':
       return 'md';
-    case 3:
+    case '3':
       return 'wp';
   }
 
-  return mode;
+  return modeCode;
 }
+
+
+export function parseProp(propData: any[][]) {
+  const prop: Props = {
+    color: {},
+    mode: {}
+  };
+
+  if (propData) {
+    for (var i = 0; i < propData.length; i++) {
+      prop[propData[i][0]] = {
+        type: propData[i][1]
+      };
+    }
+  }
+
+  return prop;
+}
+
+
+export const BOOLEAN_TYPE_CODE = 0;
+export const NUMBER_TYPE_CODE = 1;

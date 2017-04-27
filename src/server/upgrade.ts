@@ -50,7 +50,7 @@ export function upgradeNode(plt: PlatformApi, elm: Element, cmpMeta: ComponentMe
 
   const html = renderVNodeToString(plt, vnode);
 
-  console.log(html)
+  console.log(html);
 
   return Promise.resolve();
 }
@@ -73,7 +73,7 @@ function renderToString(vnode: VNode) {
   // open start tag
   const html = ['<', tagName];
 
-  const attributes = {};
+  const attributes: any = {};
 
   Object.keys(attributes).forEach(attrName => {
     const attrVal = attributes[attrName];

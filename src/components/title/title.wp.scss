@@ -1,0 +1,40 @@
+@import "../../themes/ionic.globals.wp";
+@import "./title";
+
+
+// Windows Title
+// --------------------------------------------------
+
+/// @prop - Padding of the toolbar title
+$toolbar-wp-title-padding:               0 6px !default;
+
+/// @prop - Font size of the toolbar title
+$toolbar-wp-title-font-size:             1.5rem !default;
+
+/// @prop - Font weight of the toolbar title
+$toolbar-wp-title-font-weight:           bold !default;
+
+/// @prop - Text transform of the toolbar title
+$toolbar-wp-title-text-transform:        uppercase !default;
+
+/// @prop - Text color of the toolbar title
+$toolbar-wp-title-text-color:            color-contrast($colors-wp, $toolbar-wp-background, wp) !default;
+
+
+
+.toolbar-title-wp {
+  padding: $toolbar-wp-title-padding;
+
+  font-size: $toolbar-wp-title-font-size;
+  font-weight: $toolbar-wp-title-font-weight;
+  text-transform: $toolbar-wp-title-text-transform;
+  color: $toolbar-wp-title-text-color;
+}
+
+@mixin wp-toolbar-title-theme($color-name, $color-base, $color-contrast) {
+
+  .toolbar-wp-#{$color-name} .toolbar-title-wp {
+    color: $color-contrast;
+  }
+
+}
