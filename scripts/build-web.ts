@@ -37,28 +37,27 @@ fs.emptyDirSync(destDir);
 fs.emptyDirSync(compiledDir);
 
 
-Promise.all([
+Promise.resolve().then(() => {
   // find all the source components and compile
   // them into reusable components, and create a manifest.json
   // where all the components can be found, and their styles.
-  compileComponents(),
+  return compileComponents();
 
+}).then(() => {
   // build all of the core files for ionic-web
   // the core files are what makes up how ionic-core "works"
-  buildBindingCore(transpiledSrcDir, compiledDir, 'core')
+  return buildBindingCore(transpiledSrcDir, compiledDir, 'core')
 
-])
-.then(() => {
+}).then(() => {
   // bundle all of the components into their separate files
   return bundleComponents().then(results => {
 
     // build the ionic.js loader file which
     // ionic-web uses to decide which core files to load
     // then prepend the component registry to the top of the loader file
-    return buildWebLoader(results.registry);
+    return buildWebLoader(results.componentRegistry);
   });
 });
-
 
 
 const ctx = {};
@@ -115,7 +114,7 @@ function bundleComponents() {
 }
 
 
-function buildWebLoader(registry: string) {
+function buildWebLoader(componentRegistry: string) {
   console.log('buildWebLoader');
 
   const loaderSrcFile = path.join(transpiledSrcDir, 'ionic.js');
@@ -123,10 +122,11 @@ function buildWebLoader(registry: string) {
   const prodLoaderPath = path.join(destDir, 'ionic.js');
 
   return readFile(loaderSrcFile).then(srcLoaderJs => {
+    componentRegistry = `(window.Ionic=window.Ionic||{}).components=${componentRegistry};`;
 
     const content = [
       LICENSE,
-      registry,
+      componentRegistry,
       srcLoaderJs
     ].join('\n');
 
@@ -155,7 +155,7 @@ function buildWebLoader(registry: string) {
           } else {
             const content = [
               LICENSE,
-              registry,
+              componentRegistry,
               stdOut
             ].join('\n');
 

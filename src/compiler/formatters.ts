@@ -152,16 +152,13 @@ function formatBoolean(val: boolean) {
 
 
 export function formatRegistryContent(registry: Registry) {
-  let content = '(window.Ionic=window.Ionic||{}).components=';
+  let strData = JSON.stringify(registry);
 
-  let strData = JSON.stringify(registry) + ';';
-
+  // remove unnecessary double quotes
   strData = strData.replace(/"0"/g, '0');
   strData = strData.replace(/"1"/g, '1');
   strData = strData.replace(/"2"/g, '2');
   strData = strData.replace(/"3"/g, '3');
 
-  content += strData;
-
-  return content;
+  return strData;
 }

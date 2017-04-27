@@ -57,7 +57,7 @@ export interface Results {
   files?: string[];
   manifest?: Manifest;
   manifestPath?: string;
-  registry?: string;
+  componentRegistry?: string;
 }
 
 

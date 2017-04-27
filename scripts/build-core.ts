@@ -368,6 +368,8 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
 
 function appendCoreFilesToManifest(destDir: string, coreFilesDir: string) {
   // add the location of each file to the manifest
+  console.log('core, appendCoreFilesToManifest');
+
   const manifestFilePath = path.join(destDir, 'manifest.json');
 
   return readFile(manifestFilePath).then(manifestStr => {

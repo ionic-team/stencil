@@ -50,17 +50,17 @@ console.log('build-angular core, copy compiler from:', compilerJsScript);
 console.log('build-angular core, copy compiler to:', compilerDest);
 
 
-Promise.all([
+Promise.resolve().then(() => {
   // find all the source components and compile
   // them into reusable components, and create a manifest.json
   // where all the components can be found, and their styles.
-  compileComponents(),
+  return compileComponents();
 
+}).then(() => {
   // build all of the core files for ionic-angular
   // the core files are what makes up how ionic-core "works"
-  buildBindingCore(transpiledSrcDir, compiledDir, 'core', skipBuildingCore)
-
-]);
+  return buildBindingCore(transpiledSrcDir, compiledDir, 'core', skipBuildingCore);
+})
 
 
 const ctx = {};

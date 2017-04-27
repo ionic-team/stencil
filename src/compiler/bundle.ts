@@ -143,7 +143,7 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
 
   return generateBundleFiles(config, ctx).then(() => {
     const registryContent = formatRegistryContent(ctx.registry);
-    ctx.results.registry = registryContent;
+    ctx.results.componentRegistry = registryContent;
 
     const promises: Promise<any>[] = [];
 
