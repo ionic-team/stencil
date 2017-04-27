@@ -70,7 +70,7 @@ function compileComponents() {
       target: 'es5'
     },
     include: [srcDir],
-    exclude: ['node_modules', 'test'],
+    exclude: ['node_modules', 'compiler', 'test'],
     devMode: false,
     debug: true,
     bundles: [

@@ -8,17 +8,17 @@ export function getFileMeta(config: CompilerConfig, ctx: BuildContext, filePath:
   }
 
   return readFile(config.packages, filePath).then(srcText => {
-    return createFileMeta(config.packages, ctx, filePath, srcText);
+    return createFileMeta(config, ctx, filePath, srcText);
   });
 }
 
 
-export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: string, srcText: string) {
+export function createFileMeta(config: CompilerConfig, ctx: BuildContext, filePath: string, srcText: string) {
   const fileMeta: FileMeta = {
-    fileName: packages.path.basename(filePath),
+    fileName: config.packages.path.basename(filePath),
     filePath: filePath,
-    fileExt: packages.path.extname(filePath),
-    srcDir: packages.path.dirname(filePath),
+    fileExt: config.packages.path.extname(filePath),
+    srcDir: config.packages.path.dirname(filePath),
     srcText: srcText,
     jsFilePath: null,
     jsText: null,
@@ -29,7 +29,7 @@ export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: 
   };
 
   if (fileMeta.isTsSourceFile) {
-    fileMeta.hasCmpClass = hasCmpClass(fileMeta.srcText);
+    fileMeta.hasCmpClass = hasCmpClass(config, fileMeta.srcText, fileMeta.filePath);
   }
 
   ctx.files.set(filePath, fileMeta);
@@ -194,8 +194,19 @@ export function isTsSourceFile(filePath: string) {
 }
 
 
-export function hasCmpClass(sourceText: string) {
-  return (sourceText.indexOf('@Component') > -1) && (sourceText.indexOf('@angular/core') === -1);
+export function hasCmpClass(config: CompilerConfig, sourceText: string, filePath: string) {
+  if (sourceText.indexOf('@Component') === -1) {
+    return false;
+  }
+
+  if (sourceText.indexOf('@angular/core') > -1) {
+    if (config.debug) {
+      console.log(`compile, skipping @angular/core component: ${filePath}`);
+    }
+    return false;
+  }
+
+  return true;
 }
 
 

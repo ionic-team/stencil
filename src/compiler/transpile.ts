@@ -9,7 +9,9 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
   const tsFileNames = getTsFileNames(ctx);
 
   if (config.debug) {
-    console.log(`compile, transpile: ${tsFileNames}`);
+    tsFileNames.forEach(tsFileName => {
+      console.log(`compile, transpile: ${tsFileName}`);
+    });
   }
 
   if (!tsFileNames.length) {
@@ -45,7 +47,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
       if (fileMeta) {
         return fileMeta.srcText;
       }
-      fileMeta = createFileMeta(config.packages, ctx, filePath, config.packages.fs.readFileSync(filePath, 'utf-8'));
+      fileMeta = createFileMeta(config, ctx, filePath, config.packages.fs.readFileSync(filePath, 'utf-8'));
       return fileMeta.srcText;
     },
 
