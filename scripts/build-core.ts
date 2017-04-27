@@ -26,7 +26,7 @@ const rollup = require('rollup');
 export const ROOT_DIR = path.join(__dirname, '../..');
 export const EXTERNS = path.join(ROOT_DIR, 'scripts', 'core.externs.js');
 export const POLYFILLS_DIR = path.join(ROOT_DIR, 'src/polyfills');
-export const LICENSE = `/*! (C) Ionic, https://ionicframework.com/ - Mit License */\n`;
+export const LICENSE = `/*! (C) Ionic https://ionicframework.com - Mit License */`;
 
 
 function buildCore(ctx: BuildContext) {
@@ -188,7 +188,7 @@ function buildCoreMinified(ctx: BuildContext) {
 
           fs.unlink(closurePrepareFilePath);
 
-          writeFile(ctx.coreMinifiedFilePath, LICENSE + ctx.coreMinifiedContent).then(() => {
+          writeFile(ctx.coreMinifiedFilePath, `${LICENSE}\n${ctx.coreMinifiedContent}`).then(() => {
             console.log('core, buildCoreMinified:', ctx.coreMinifiedFilePath);
 
             resolve();
@@ -204,7 +204,8 @@ function buildCoreMinified(ctx: BuildContext) {
 function customElementPolyfillDev(ctx: BuildContext) {
   const content = [
     ctx.cePolyfillContent,
-    LICENSE + ctx.coreES5DevContent
+    LICENSE,
+    ctx.coreES5DevContent
   ];
 
   console.log('core, customElementPolyfillDev:', ctx.ceDevFilePath);
@@ -216,7 +217,8 @@ function customElementPolyfillDev(ctx: BuildContext) {
 function customElementPolyfillMin(ctx: BuildContext) {
   const content = [
     ctx.cePolyfillContent,
-    LICENSE + ctx.coreES5MinifiedContent
+    LICENSE,
+    ctx.coreES5MinifiedContent
   ];
 
   console.log('core, customElementPolyfillMin:', ctx.ceMinFilePath);
@@ -229,7 +231,8 @@ function shadyDomCustomElementPolyfillDev(ctx: BuildContext) {
   const content = [
     ctx.shadyDomContent,
     ctx.cePolyfillContent,
-    LICENSE + ctx.coreES5DevContent
+    LICENSE,
+    ctx.coreES5DevContent
   ];
 
   console.log('core, shadyDomCustomElementPolyfillDev:', ctx.sdCeDevFilePath);
@@ -242,7 +245,8 @@ function shadyDomCustomElementPolyfillMin(ctx: BuildContext) {
   const content = [
     ctx.shadyDomContent,
     ctx.cePolyfillContent,
-    LICENSE + ctx.coreES5MinifiedContent
+    LICENSE,
+    ctx.coreES5MinifiedContent
   ];
 
   console.log('core, shadyDomCustomElementPolyfillMin:', ctx.sdCeMinFilePath);

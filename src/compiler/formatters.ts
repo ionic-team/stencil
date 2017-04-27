@@ -43,7 +43,7 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 
   const modeCode = `/* ${modeName} **/ ${formatModeName(modeName)}`;
 
-  const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : '/* no styles */ 0');
+  const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : '0 /* no styles */');
 
   const componentFn = component.componentImporter.trim();
 
@@ -154,7 +154,7 @@ function formatBoolean(val: boolean) {
 export function formatRegistryContent(registry: Registry) {
   let content = '(window.Ionic=window.Ionic||{}).components=';
 
-  let strData = JSON.stringify(registry) + ';\n';
+  let strData = JSON.stringify(registry) + ';';
 
   strData = strData.replace(/"0"/g, '0');
   strData = strData.replace(/"1"/g, '1');

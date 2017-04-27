@@ -58,7 +58,6 @@ export interface Results {
   manifest?: Manifest;
   manifestPath?: string;
   registry?: string;
-  loaderPath?: string;
 }
 
 

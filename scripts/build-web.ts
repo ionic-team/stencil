@@ -26,7 +26,6 @@ import * as uglify from 'uglify-js';
 // dynamic require cuz this file gets transpiled to dist/
 const compiler = require(path.join(__dirname, '../compiler'));
 
-
 const srcDir = path.join(__dirname, '../../src');
 const transpiledSrcDir = path.join(__dirname, '../transpiled-web/bindings/web/src');
 const compiledDir = path.join(__dirname, '../compiled-ionic-web');
@@ -38,34 +37,31 @@ fs.emptyDirSync(destDir);
 fs.emptyDirSync(compiledDir);
 
 
-const ctx = {};
+Promise.all([
+  // find all the source components and compile
+  // them into reusable components, and create a manifest.json
+  // where all the components can be found, and their styles.
+  compileComponents(),
 
-// find all the source components and compile
-// them into reusable components, and create a manifest.json
-// where all the components can be found, and their styles.
-compileComponents()
-  .then(() => {
-    // next build all of the core files for ionic-web
-    return buildBindingCore(transpiledSrcDir, compiledDir, 'core');
+  // build all of the core files for ionic-web
+  // the core files is what makes up how ionic-core "works"
+  buildBindingCore(transpiledSrcDir, compiledDir, 'core')
 
-  }).then(() => {
-    // next build the ionic.js loader file which
+]).then(() => {
+  // bundle all of the components into their separate files
+  return bundleComponents().then(results => {
+
+    // build the ionic.js loader file which
     // ionic-web uses to decide which core files to load
-    return buildLoader();
+    // then prepend the component registry to the top of the loader file
+    return buildWebLoader(results.registry);
 
-  }).then(() => {
-    // next add the component registry to the top of each core file
-    return bundleComponents().then(results => {
-      return readFile(results.loaderPath).then(content => {
-        content = results.registry + content;
-        return writeFile(results.loaderPath, content);
-      });
-    });
-
-  }).catch(err => {
-    console.log(err);
   });
+});
 
+
+
+const ctx = {};
 
 function compileComponents() {
   const config = {
@@ -119,13 +115,15 @@ function bundleComponents() {
 }
 
 
-function buildLoader() {
+function buildWebLoader(registry: string) {
+  console.log('buildWebLoader');
+
   const loaderSrcFile = path.join(transpiledSrcDir, 'ionic.js');
   const devLoaderPath = path.join(destDir, 'ionic.dev.js');
   const prodLoaderPath = path.join(destDir, 'ionic.js');
 
   return readFile(loaderSrcFile).then(srcLoaderJs => {
-    writeFile(devLoaderPath, srcLoaderJs);
+    writeFile(devLoaderPath, `${LICENSE}\n${registry}\n${srcLoaderJs}`);
 
     return writeFile(prodLoaderPath, srcLoaderJs).then(() => {
       const ClosureCompiler = require('google-closure-compiler').compiler;
@@ -148,7 +146,13 @@ function buildLoader() {
             reject();
 
           } else {
-            writeFile(prodLoaderPath, LICENSE + stdOut).then(() => {
+            const content = [
+              LICENSE,
+              registry,
+              stdOut
+            ].join('\n');
+
+            writeFile(prodLoaderPath, content).then(() => {
               resolve();
             });
           }
