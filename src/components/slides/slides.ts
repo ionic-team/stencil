@@ -1,5 +1,5 @@
 import Swiper from 'swiper';
-import { Component, h, Ionic, Prop } from '../../index';
+import { Component, h, Ionic, Prop } from '../index';
 
 /**
  * @name Slides
@@ -7,110 +7,6 @@ import { Component, h, Ionic, Prop } from '../../index';
  * The Slides component is a multi-section container. Each section can be swiped
  * or dragged between. It contains any number of [Slide](../Slide) components.
  *
- *
- * ### Creating
- * You should use a template to create slides and listen to slide events. The template
- * should contain the slide container, an `<ion-slides>` element, and any number of
- * [Slide](../Slide) components, written as `<ion-slide>`. Basic configuration
- * values can be set as input properties, which are listed below. Slides events
- * can also be listened to such as the slide changing by placing the event on the
- * `<ion-slides>` element. See [Usage](#usage) below for more information.
- *
- *
- * ### Navigating
- * After creating and configuring the slides, you can navigate between them
- * by swiping or calling methods on the `Slides` instance. You can call `slideTo()` to
- * navigate to a specific slide, or `slideNext()` to change to the slide that follows
- * the active slide. All of the [methods](#instance-members) provided by the `Slides`
- * instance are listed below. See [Usage](#usage) below for more information on
- * navigating between slides.
- *
- *
- * @usage
- *
- * You can add slides to a `@Component` using the following template:
- *
- * ```html
- * <ion-slides>
- *   <ion-slide>
- *     <h1>Slide 1</h1>
- *   </ion-slide>
- *   <ion-slide>
- *     <h1>Slide 2</h1>
- *   </ion-slide>
- *   <ion-slide>
- *     <h1>Slide 3</h1>
- *   </ion-slide>
- * </ion-slides>
- * ```
- *
- * Next, we can use `ViewChild` to assign the Slides instance to
- * your `slides` property. Now we can call any of the `Slides`
- * [methods](#instance-members), for example we can use the Slide's
- * `slideTo()` method in order to navigate to a specific slide on
- * a button click. Below we call the `goToSlide()` method and it
- * navigates to the 3rd slide:
- *
- * ```ts
- * import { ViewChild } from '@angular/core';
- * import { Slides } from 'ionic-angular';
- *
- * class MyPage {
- *   @ViewChild(Slides) slides: Slides;
- *
- *   goToSlide() {
- *     this.slides.slideTo(2, 500);
- *   }
- * }
- * ```
- *
- * We can also add events to listen to on the `<ion-slides>` element.
- * Let's add the `ionSlideDidChange` event and call a method when the slide changes:
- *
- * ```html
- * <ion-slides (ionSlideDidChange)="slideChanged()">
- * ```
- *
- * In our class, we add the `slideChanged()` method which gets the active
- * index and prints it:
- *
- * ```ts
- * class MyPage {
- *   ...
- *
- *   slideChanged() {
- *     let currentIndex = this.slides.getActiveIndex();
- *     console.log("Current index is", currentIndex);
- *   }
- * }
- * ```
- *
- * @advanced
- *
- * There are several options available to create customized slides. Ionic exposes
- * the most commonly used options as [inputs](http://learnangular2.com/inputs/).
- * In order to use an option that isn't exposed as an input the following code
- * should be used, where `freeMode` is the option to change:
- *
- * ```ts
- * import { ViewChild } from '@angular/core';
- * import { Slides } from 'ionic-angular';
-
- * class MyPage {
- *   @ViewChild(Slides) slides: Slides;
- *
- *   ngAfterViewInit() {
- *     this.slides.freeMode = true;
- *   }
- * }
- *
- * ```
- *
- * To see all of the available options, take a look at the
- * [source for slides](https://github.com/driftyco/ionic/blob/master/src/components/slides/slides.ts).
- *
- * @demo /docs/demos/src/slides/
- * @see {@link /docs/components#slides Slides Component Docs}
  *
  * Adopted from Swiper.js:
  * The most modern mobile touch slider and framework with
@@ -230,7 +126,8 @@ export class Slides {
 
 
   render() {
-    return h(this, 
+    console.debug(`ion-slides, render`);
+    return h(this,
       h('div', {
           class: {
             'swiper-container': true
@@ -310,7 +207,6 @@ export class Slides {
    */
   /** @hidden */
   container: HTMLElement;
-  slideElements: HTMLCollection;
   /** @hidden */
   id: number;
   /** @hidden */
@@ -348,16 +244,9 @@ export class Slides {
     if (!this._init) {
       console.debug(`ion-slides, init`);
 
-      this.container = <HTMLElement>this.$el.shadowRoot.childNodes[1];
-      var slideElements = this.$el.children;
-      for (var i = 0; i < slideElements.length; i++) {
-        var item = slideElements[i];
-        item.classList.add('slide-zoom');
-        item.classList.add('swiper-slide');
-      }
+      this.container = <HTMLElement>this.$el.children[0];
 
       var swiperOptions = {
-        slideElements: slideElements,
         height: this.height,
         width: this.width,
         virtualTranslate: this.virtualTranslate,
@@ -420,8 +309,6 @@ export class Slides {
         preventClicksPropagation: true,
         slideToClickedSlide: false,
         loopAdditionalSlides: 0,
-        loopedSlides: null,
-        swipeHandler: null,
         noSwiping: true,
         runCallbacksOnInit: true,
         controlBy: 'slide',
@@ -489,7 +376,13 @@ export class Slides {
    * @hidden
    */
   ionViewDidLoad() {
-    this._initSlides();
+    /**
+     * TODO: This should change because currently ionViewDidLoad fires independent of whether the
+     * child components are ready.
+     */
+    setTimeout(() => {
+      this._initSlides();
+    }, 10);
   }
 
   /**

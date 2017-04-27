@@ -83,8 +83,8 @@ function compileComponents() {
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
       ['ion-gesture', 'ion-scroll'],
-      ['ion-toggle']
-      ['ion-slides']
+      ['ion-toggle'],
+      ['ion-slides', 'ion-slide']
     ],
     packages: {
       fs: fs,

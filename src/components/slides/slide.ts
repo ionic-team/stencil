@@ -1,4 +1,4 @@
-import { Component, h } from '../../index';
+import { Component, h } from '../index';
 
  /**
   * @name Slide
@@ -25,6 +25,7 @@ export class Slide {
   $el: HTMLElement;
 
   render() {
+    console.debug(`ion-slide, render`);
     return h(this, {
       class: {
         'slide-zoom': true,
