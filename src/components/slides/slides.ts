@@ -132,7 +132,8 @@ import { Component, h, Ionic, Prop } from '../../index';
     ios: 'slides.ios.scss',
     md: 'slides.md.scss',
     wp: 'slides.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Slides {
   swiper: Swiper;

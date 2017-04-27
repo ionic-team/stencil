@@ -18,7 +18,8 @@ import { Component, h } from '../../index';
     ios: 'slide.ios.scss',
     md: 'slide.md.scss',
     wp: 'slide.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Slide {
   $el: HTMLElement;
