@@ -47,7 +47,8 @@ Promise.all([
   // the core files are what makes up how ionic-core "works"
   buildBindingCore(transpiledSrcDir, compiledDir, 'core')
 
-]).then(() => {
+])
+.then(() => {
   // bundle all of the components into their separate files
   return bundleComponents().then(results => {
 
@@ -55,7 +56,6 @@ Promise.all([
     // ionic-web uses to decide which core files to load
     // then prepend the component registry to the top of the loader file
     return buildWebLoader(results.registry);
-
   });
 });
 
@@ -123,7 +123,14 @@ function buildWebLoader(registry: string) {
   const prodLoaderPath = path.join(destDir, 'ionic.js');
 
   return readFile(loaderSrcFile).then(srcLoaderJs => {
-    writeFile(devLoaderPath, `${LICENSE}\n${registry}\n${srcLoaderJs}`);
+
+    const content = [
+      LICENSE,
+      registry,
+      srcLoaderJs
+    ].join('\n');
+
+    writeFile(devLoaderPath, content);
 
     return writeFile(prodLoaderPath, srcLoaderJs).then(() => {
       const ClosureCompiler = require('google-closure-compiler').compiler;
