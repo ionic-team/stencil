@@ -56,7 +56,7 @@ Promise.resolve().then(() => {
     // build the ionic.js loader file which
     // ionic-web uses to decide which core files to load
     // then prepend the component registry to the top of the loader file
-    return buildWebLoader(results.componentRegistry);
+    return buildWebLoader(results.componentRegistry, DEV_MODE);
   });
 });
 
@@ -118,30 +118,31 @@ function bundleComponents() {
 }
 
 
-function buildWebLoader(componentRegistry: string) {
+function buildWebLoader(componentRegistry: string, devMode: boolean) {
   console.log('buildWebLoader');
 
-  const loaderSrcFile = path.join(transpiledSrcDir, 'ionic.js');
-  const devLoaderPath = path.join(destDir, 'ionic.dev.js');
-  const prodLoaderPath = path.join(destDir, 'ionic.js');
+  const loaderSrcPath = path.join(transpiledSrcDir, 'ionic.js');
+  const loaderDestPath = path.join(destDir, 'ionic.js');
 
-  return readFile(loaderSrcFile).then(srcLoaderJs => {
+  return readFile(loaderSrcPath).then(srcLoaderJs => {
     componentRegistry = `(window.Ionic=window.Ionic||{}).components=${componentRegistry};`;
 
-    const content = [
-      LICENSE,
-      componentRegistry,
-      srcLoaderJs
-    ].join('\n');
+    if (devMode) {
+      const content = [
+        LICENSE,
+        componentRegistry,
+        srcLoaderJs
+      ].join('\n');
 
-    writeFile(devLoaderPath, content);
+      return writeFile(loaderDestPath, content);
+    }
 
-    return writeFile(prodLoaderPath, srcLoaderJs).then(() => {
+    return writeFile(loaderDestPath, srcLoaderJs).then(() => {
       const ClosureCompiler = require('google-closure-compiler').compiler;
 
       return new Promise((resolve, reject) => {
         const opts = {
-          js: prodLoaderPath,
+          js: loaderDestPath,
           language_out: 'ECMASCRIPT5',
           warning_level: 'QUIET',
           rewrite_polyfills: 'false',
@@ -163,7 +164,7 @@ function buildWebLoader(componentRegistry: string) {
               stdOut
             ].join('\n');
 
-            writeFile(prodLoaderPath, content).then(() => {
+            writeFile(loaderDestPath, content).then(() => {
               resolve();
             });
           }
