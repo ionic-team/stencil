@@ -1,8 +1,8 @@
-ion-slides,
-:host {
+ion-slide {
   width: 100%;
   height: 100%;
   display: block;
+  visibility: inherit !important;
 }
 
 .slide-zoom {
