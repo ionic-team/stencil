@@ -67,7 +67,7 @@ export interface Registry {
 
 
 export interface Bundle {
-  id?: number;
+  id?: string;
   components?: {
     component: Component;
     mode: ComponentMode

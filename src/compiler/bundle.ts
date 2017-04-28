@@ -1,6 +1,6 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName, formatBundleContent, formatRegistryContent } from './formatters';
+import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName, formatBundleContent, formatRegistryContent, generateBundleId } from './formatters';
 import { readFile, writeFile } from './util';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
@@ -212,17 +212,33 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
   ctx.registry = {};
 
-  return Promise.all(ctx.bundles.map((bundle, bundleIndex) => {
+  const bundleIdKeyword = '__IONIC_BUNDLE_ID__';
+
+  return Promise.all(ctx.bundles.map(bundle => {
 
     const componentModeLoaders = bundle.components.map(bundleComponent => {
       return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
     }).join(',\n');
 
-    bundle.id = bundleIndex;
+
+    bundle.content = formatBundleContent(bundleIdKeyword, componentModeLoaders);
+
+    if (!config.devMode) {
+      try {
+        const minifyResults = config.packages.uglify.minify(bundle.content, {
+          fromString: true
+        });
+        bundle.content = minifyResults.code;
+      } catch (e) {
+        console.log(`uglify.minify error: ${e}`);
+      }
+    }
+
+    bundle.id = generateBundleId(bundle.content);
     bundle.fileName = formatBundleFileName(bundle.id);
     bundle.filePath = config.packages.path.join(config.destDir, bundle.fileName);
 
-    bundle.content = formatBundleContent(bundle.id, componentModeLoaders);
+    bundle.content = bundle.content.replace(bundleIdKeyword, `"${bundle.id}"`);
 
     bundle.components.forEach(bundleComponent => {
       const tag = bundleComponent.component.tag;
@@ -230,7 +246,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
       ctx.registry[tag] = ctx.registry[tag] || [];
 
-      const modes: {[modeCode: string]: number} = ctx.registry[tag][0] || {};
+      const modes: {[modeCode: string]: string} = ctx.registry[tag][0] || {};
 
       modes[modeCode] = bundle.id;
 
@@ -241,22 +257,9 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       }
     });
 
-    let content = bundle.content;
-
-    if (!config.devMode) {
-      try {
-        const minifyResults = config.packages.uglify.minify(content, {
-          fromString: true
-        });
-        content = minifyResults.code;
-      } catch (e) {
-        console.log(`uglify.minify error: ${e}`);
-      }
-    }
-
     ctx.results.files.push(bundle.filePath);
 
-    return writeFile(config.packages, bundle.filePath, content);
+    return writeFile(config.packages, bundle.filePath, bundle.content);
   }));
 }
 

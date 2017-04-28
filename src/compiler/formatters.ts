@@ -1,12 +1,21 @@
 import { Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watchers, WatchOpts } from './interfaces';
+import * as crypto from 'crypto';
 
 
-export function formatBundleFileName(bundleId: number) {
+export function generateBundleId(content: string) {
+  return crypto.createHash('sha256')
+                  .update(content)
+                  .digest('hex')
+                  .substr(0, 8);
+}
+
+
+export function formatBundleFileName(bundleId: string) {
   return `ionic.${bundleId}.js`;
 }
 
 
-export function formatBundleContent(bundleId: number, componentModeLoader: string) {
+export function formatBundleContent(bundleId: string, componentModeLoader: string) {
   return `Ionic.loadComponents(\n/** bundleId **/\n${bundleId},${componentModeLoader});`;
 }
 

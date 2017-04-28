@@ -31,7 +31,7 @@ const transpiledSrcDir = path.join(__dirname, '../transpiled-web/bindings/web/sr
 const compiledDir = path.join(__dirname, '../compiled-ionic-web');
 const destDir = path.join(__dirname, '../ionic-web');
 
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 // first clean out the ionic-web directories
 fs.emptyDirSync(destDir);
@@ -77,12 +77,12 @@ function compileComponents() {
     bundles: [
       ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
       ['ion-badge'],
+      ['ion-button'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
       ['ion-list', 'ion-item', 'ion-label'],
       ['ion-gesture', 'ion-scroll'],
       ['ion-toggle'],
       ['ion-slides', 'ion-slide'],
-      ['ion-button']
     ],
     packages: {
       fs: fs,
