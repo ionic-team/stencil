@@ -19,9 +19,9 @@ export function h(sel: string): VNode;
 export function h(sel: Node, data: VNodeData): VNode;
 export function h(sel: string, data: VNodeData): VNode;
 export function h(sel: string, text: string): VNode;
-export function h(sel: string, children: Array<VNode>): VNode;
+export function h(sel: string, children: Array<VNode | undefined | null>): VNode;
 export function h(sel: string, data: VNodeData, text: string): VNode;
-export function h(sel: string, data: VNodeData, children: Array<VNode|string>): VNode;
+export function h(sel: string, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
 export function h(sel: string, data: VNodeData, children: VNode): VNode;
 export function h(sel: any, b?: any, c?: any): VNode {
   var data: VNodeData = {}, children: any, text: any, i: number;

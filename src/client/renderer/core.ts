@@ -103,8 +103,8 @@ export function Renderer(api: PlatformApi): RendererApi {
       const tag = hashIdx !== -1 || dotIdx !== -1 ? sel.slice(0, Math.min(hash, dot)) : sel;
       const elm = vnode.elm = isDef(data) && isDef(i = (data as VNodeData).ns) ? api.$createElementNS(i, tag)
                                                                                : api.$createElement(<any>tag);
-      if (hash < dot) elm.id = sel.slice(hash + 1, dot);
-      if (dotIdx > 0) elm.className = sel.slice(dot + 1).replace(/\./g, ' ');
+      if (hash < dot) elm.setAttribute('id', sel.slice(hash + 1, dot));
+      if (dotIdx > 0) elm.setAttribute('class', sel.slice(dot + 1).replace(/\./g, ' '));
 
       updateAttrs(emptyNode, vnode);
       updateClass(emptyNode, vnode);

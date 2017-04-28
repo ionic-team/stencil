@@ -1,9 +1,18 @@
 import { VNode, VNodeData } from '../../../util/interfaces';
 
 
+const booleanAttrs = ['allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'disabled', 'draggable',
+                      'enabled', 'formnovalidate', 'hidden', 'multiple', 'noresize', 'readonly', 'required', 'selected', 'spellcheck'];
+
 const xlinkNS = 'http://www.w3.org/1999/xlink';
 const xmlNS = 'http://www.w3.org/XML/1998/namespace';
 
+
+const booleanAttrsDict: {[attribute: string]: boolean} = Object.create(null);
+
+for (let i = 0, len = booleanAttrs.length; i < len; i++) {
+  booleanAttrsDict[booleanAttrs[i]] = true;
+}
 
 export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
   var key: string, cur: any, old: any, elm: Element = vnode.elm as Element,
@@ -20,7 +29,7 @@ export function updateAttrs(oldVnode: VNode, vnode: VNode): void {
     cur = attrs[key];
     old = oldAttrs[key];
     if (old !== cur) {
-      if (typeof cur === 'boolean') {
+      if (booleanAttrsDict[key]) {
         if (cur) {
           elm.setAttribute(key, '');
         } else {
