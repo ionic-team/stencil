@@ -103,7 +103,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       instance.$root = elm.attachShadow({ mode: 'open' });
     }
 
-    const cmpMode = cmpMeta.modes[instance.mode];
+    const cmpMode = cmpMeta.modes[instance.mode] || cmpMeta.modes.default;
 
     if (cmpMode && cmpMode.styles) {
       if (cmpMeta.shadow && hasNativeShadowDom) {
