@@ -16,13 +16,15 @@ export class Item {
       h('div', Ionic.theme(this, 'item'),
         [
           h('slot', { attrs: { name: 'item-start' } }),
-          h('div.item-inner',
-            h('div.input-wrapper', [
-              h('slot')
-            ]),
-            h('slot', { attrs: { name: 'item-end' } }),
+          h('div.item-inner', [
+              h('div.input-wrapper',
+                h('slot')
+              ),
+              h('slot', { attrs: { name: 'item-end' } }),
+              // h('ion-reorder')
+            ]
           ),
-          h('div.button-effect')
+          // h('div.button-effect')
         ]
       )
     );
