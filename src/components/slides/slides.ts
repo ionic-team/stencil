@@ -1,5 +1,5 @@
 import Swiper from 'swiper';
-import { Component, h, Ionic, Prop } from '../../index';
+import { Component, h, Ionic, Prop } from '../index';
 
 /**
  * @name Slides
