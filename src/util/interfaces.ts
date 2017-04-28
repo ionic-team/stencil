@@ -103,7 +103,7 @@ export interface ContentDimensions {
 export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
-  loadComponents?: {(bundleId: string): void};
+  loadComponents?: {(bundleId: string, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData): void};
   eventNameFn?: {(eventName: string): string};
   config?: Object;
   ConfigCtrl?: ConfigApi;

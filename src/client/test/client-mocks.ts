@@ -1,12 +1,37 @@
-import { ConfigApi, CustomEventOptions, DomControllerApi, Ionic,
-  IonicGlobal, NextTickApi, PlatformConfig, RafCallback } from '../../util/interfaces';
+import { ComponentModeData, ConfigApi, CustomEventOptions, DomControllerApi, Ionic,
+  IonicGlobal, NextTickApi, PlatformConfig, ProxyElement, PlatformApi,
+  RafCallback } from '../../util/interfaces';
 import { ConfigController } from '../../util/config-controller';
 import { PlatformClient } from '../../client/platform-client';
 import { themeVNodeData } from '../../client/host';
 
+let mockBundleIds = 0;
 
-export function mockPlatformClient() {
-  return PlatformClient(mockWindow(), mockDocument(), mockIonicGlobal(), mockNextTickController());
+export function mockComponent(IonicGbl: IonicGlobal, plt: PlatformApi, tag: string, componentName: string, componentModule: any) {
+  const bundleId = (++mockBundleIds).toString();
+  const cmpData = [{0: bundleId}];
+  plt.registerComponent(tag, cmpData);
+
+  const cmpModeData: ComponentModeData = [
+    tag,
+    componentName,
+    [],
+    [],
+    false,
+    'default',
+    null,
+    function importerFn(exports: any) {
+      exports[componentName] = componentModule;
+    }
+  ];
+
+  IonicGbl.loadComponents(bundleId, cmpModeData);
+}
+
+
+export function mockPlatformClient(IonicGbl?: IonicGlobal) {
+  IonicGbl = IonicGbl || mockIonicGlobal();
+  return PlatformClient(mockWindow(), mockDocument(), IonicGbl, mockNextTickController());
 }
 
 
@@ -124,6 +149,12 @@ export function mockNextTickController(): NextTickApi {
   return {
     nextTick: process.nextTick
   };
+}
+
+
+export function mockProxyElement(tag: string) {
+  const elm: ProxyElement = (<any>global).document.createElement(tag);
+  return elm;
 }
 
 
