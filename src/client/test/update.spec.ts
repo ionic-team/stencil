@@ -10,8 +10,8 @@ describe('client/update', function() {
   const renderer = Renderer(plt);
   const config = mockConfigController();
 
-  function createComponent(tag: string, cmpName: string, cmpModule: any) {
-    return mockComponent(IonicGbl, plt, tag, cmpName, cmpModule);
+  function createComponent(tag: string, cmpModule: any) {
+    return mockComponent(IonicGbl, plt, tag, cmpModule);
   }
 
   describe('update', function() {
@@ -19,7 +19,7 @@ describe('client/update', function() {
     it('should create an instance', function() {
       const tag  = 'ion-elm';
       const elm = mockProxyElement(tag);
-      createComponent(tag, 'MyClass', class MyClass {});
+      createComponent(tag, class MyClass {});
 
       update(plt, config, renderer, elm, tag);
 
@@ -30,6 +30,24 @@ describe('client/update', function() {
 
       expect(instance.$meta).toBeDefined();
       expect(instance.$meta.tag).toEqual(tag);
+    });
+
+    it('should run ionViewDidLoad only once', function() {
+      const tag  = 'ion-elm';
+      const elm = mockProxyElement(tag);
+
+      let runCount = 0;
+
+      createComponent(tag, class MyClass {
+        ionViewDidLoad() {
+          runCount++;
+        }
+      });
+
+      update(plt, config, renderer, elm, tag);
+      update(plt, config, renderer, elm, tag);
+
+      expect(runCount).toEqual(1);
     });
 
   });

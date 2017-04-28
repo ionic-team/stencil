@@ -7,27 +7,26 @@ import { themeVNodeData } from '../../client/host';
 
 let mockBundleIds = 0;
 
-export function mockComponent(IonicGbl: IonicGlobal, plt: PlatformApi, tag: string, componentName: string, componentModule: any) {
+export function mockComponent(IonicGbl: IonicGlobal, plt: PlatformApi, tag: string, componentModule: any) {
   const bundleId = (++mockBundleIds).toString();
   const cmpData = [{0: bundleId}];
   plt.registerComponent(tag, cmpData);
 
   const cmpModeData: ComponentModeData = [
     tag,
-    componentName,
+    componentModule.constructor.name,
     [],
     [],
     false,
     'default',
     null,
     function importerFn(exports: any) {
-      exports[componentName] = componentModule;
+      exports[componentModule.constructor.name] = componentModule;
     }
   ];
 
   IonicGbl.loadComponents(bundleId, cmpModeData);
 }
-
 
 export function mockPlatformClient(IonicGbl?: IonicGlobal) {
   IonicGbl = IonicGbl || mockIonicGlobal();
