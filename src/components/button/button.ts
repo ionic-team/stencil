@@ -184,9 +184,11 @@ export class Button {
     style = (role !== 'bar-button' && style === 'solid') ? 'default' : style;
     let className =
       role +
-      (style !== null && style !== '' && style !== 'default') ?
+      ((style && style !== 'default') ?
         '-' + style.toLowerCase() :
-        '';
+        '');
+
+    console.log(role, style, className, mode, color);
 
     return `${className}-${mode}-${color}`;
   }
@@ -226,25 +228,26 @@ export class Button {
         return prevValue;
       }, {});
 
-    return h(this, {
+    return h(this,
+      h('div', {
         class: buttonClasses
       },
-      [
-        h('span', {
-            class: {
-              'button-inner': true
+        [
+          h('span', {
+              class: {
+                'button-inner': true
+              }
+            },
+            h('slot')
+          ),
+          h('div', {
+              class: {
+                'button-effect': true
+              }
             }
-          },
-          h('slot')
-        ),
-        h('div', {
-            class: {
-              'button-effect': true
-            }
-          }
-        )
-      ]
+          )
+        ]
+      )
     );
   }
-
 }

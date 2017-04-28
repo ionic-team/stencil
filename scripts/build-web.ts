@@ -80,7 +80,8 @@ function compileComponents() {
       ['ion-list'],
       ['ion-gesture', 'ion-scroll'],
       ['ion-toggle'],
-      ['ion-slides', 'ion-slide']
+      ['ion-slides', 'ion-slide'],
+      ['ion-button']
     ],
     packages: {
       fs: fs,

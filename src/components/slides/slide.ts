@@ -15,9 +15,7 @@ import { Component, h } from '../index';
 @Component({
   tag: 'ion-slide',
   styleUrls: {
-    ios: 'slide.ios.scss',
-    md: 'slide.md.scss',
-    wp: 'slide.wp.scss'
+    default: 'slide.scss',
   },
   shadow: false
 })
