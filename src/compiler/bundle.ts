@@ -99,12 +99,14 @@ function bundleComponentModule(config: BundlerConfig, component: Component) {
 
     let closureStart = '(function (exports) {';
     if (code.indexOf(closureStart) === -1) {
+      console.log(code);
       throw `bundleComponentModule: importComponent() closureStart format changed!`;
     }
     code = code.replace(closureStart, '');
 
     let closureEnd = '}((this.ionicModule = this.ionicModule || {})));';
     if (code.indexOf(closureEnd) === -1) {
+      console.log(code);
       throw `bundleComponentModule: importComponent() closureEnd format changed!`;
     }
     code = code.replace(closureEnd, '');

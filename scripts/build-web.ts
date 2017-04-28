@@ -77,6 +77,7 @@ function compileComponents() {
       ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
       ['ion-badge'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
+      ['ion-list'],
       ['ion-gesture', 'ion-scroll'],
       ['ion-toggle'],
       ['ion-slides', 'ion-slide']

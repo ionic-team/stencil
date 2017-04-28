@@ -1,0 +1,13 @@
+@import "../../themes/ionic.globals";
+
+
+// List
+// --------------------------------------------------
+
+
+ion-list,
+:host {
+  display: block;
+  visibility: inherit !important;
+  contain: content;
+}
