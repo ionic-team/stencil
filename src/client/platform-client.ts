@@ -56,7 +56,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       }
 
       // create the url we'll be requesting
-      const url = `${IonicGbl.staticDir}ionic.${bundleId}.js`;
+      const url = `${IonicGbl.staticDir}bundles/ionic.${bundleId}.js`;
 
       if (!activeJsonRequests[url]) {
         // not already actively requesting this url

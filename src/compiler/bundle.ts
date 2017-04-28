@@ -1,9 +1,10 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
 import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName, formatBundleContent, formatRegistryContent, generateBundleId } from './formatters';
-import { readFile, writeFile } from './util';
+import { readFile, writeFile, writeFiles } from './util';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
+
 
 export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
   if (!config.packages) {
@@ -212,9 +213,11 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
   ctx.registry = {};
 
+  const filesToWrite = new Map<string, string>();
+
   const bundleIdKeyword = '__IONIC_BUNDLE_ID__';
 
-  return Promise.all(ctx.bundles.map(bundle => {
+  ctx.bundles.forEach(bundle => {
 
     const componentModeLoaders = bundle.components.map(bundleComponent => {
       return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
@@ -236,7 +239,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     bundle.id = generateBundleId(bundle.content);
     bundle.fileName = formatBundleFileName(bundle.id);
-    bundle.filePath = config.packages.path.join(config.destDir, bundle.fileName);
+    bundle.filePath = config.packages.path.join(config.destDir, 'bundles', bundle.fileName);
 
     bundle.content = bundle.content.replace(bundleIdKeyword, `"${bundle.id}"`);
 
@@ -259,8 +262,10 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     ctx.results.files.push(bundle.filePath);
 
-    return writeFile(config.packages, bundle.filePath, bundle.content);
-  }));
+    filesToWrite.set(bundle.filePath, bundle.content);
+  });
+
+  return writeFiles(config.packages, filesToWrite);
 }
 
 
