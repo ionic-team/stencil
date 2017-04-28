@@ -1,16 +1,15 @@
 import { Renderer, h } from '../core';
-import { PlatformClient } from '../../platform-client';
-import { DomController } from '../../dom-controller';
-import { NextTickController } from '../../next-tick-controller';
+import { mockDocument, mockPlatformClient } from '../../test/client-mocks';
 
-const document: HTMLDocument = (<any>global).document;
 
-var domCtrl = DomController(window);
-var nextTick = NextTickController(window);
-var patch = Renderer(PlatformClient(window, document, {}, '/build', domCtrl, nextTick));
+const document = mockDocument();
+const plt = mockPlatformClient();
+const patch = Renderer(plt);
+
 
 describe('attributes', function() {
-  var elm, vnode0;
+  var elm: any;
+  var vnode0: any;
 
   beforeEach(function() {
     elm = document.createElement('div');

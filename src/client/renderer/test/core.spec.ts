@@ -1,23 +1,20 @@
 import { Renderer, h, vnode, VNode, VNodeData } from '../core';
 import { PlatformApi } from '../../../util/interfaces';
-import { PlatformClient } from '../../platform-client';
 import { knuthShuffle as shuffle} from 'knuth-shuffle';
-import { DomController } from '../../dom-controller';
-import { NextTickController } from '../../next-tick-controller';
+import { mockDocument, mockPlatformClient } from '../../test/client-mocks';
 
-const document: HTMLDocument = (<any>global).document;
-var domCtrl = DomController(window);
-var nextTick = NextTickController(window);
-var patch = Renderer(PlatformClient(window, document, {}, '/build', domCtrl, nextTick));
+const document = mockDocument();
+const plt = mockPlatformClient();
+const patch = Renderer(plt);
 
 
-function prop(name) {
-  return function(obj) {
+function prop(name: any) {
+  return function(obj: any) {
     return obj[name];
   };
 }
 
-function map(fn, list) {
+function map(fn: any, list: any) {
   var ret = [];
   for (var i = 0; i < list.length; ++i) {
     ret[i] = fn(list[i]);
@@ -28,7 +25,9 @@ function map(fn, list) {
 var inner = prop('innerHTML');
 
 describe('renderer', function() {
-  var elm, vnode0;
+  var elm: any;
+  var vnode0: any;
+
   beforeEach(function() {
     elm = document.createElement('div');
     vnode0 = elm;
@@ -114,18 +113,39 @@ describe('renderer', function() {
       elm = patch(vnode0, h('svg-custom-el')).elm;
       expect(elm.namespaceURI).not.toEqual(SVGNamespace);
     });
-    it('is receives classes in selector', function() {
+    it('receives classes in selector', function() {
       elm = patch(vnode0, h('div', [h('i.am.a.class')])).elm;
       expect(elm.firstChild.classList.contains('am')).toBeTruthy();
       expect(elm.firstChild.classList.contains('a')).toBeTruthy();
       expect(elm.firstChild.classList.contains('class')).toBeTruthy();
     });
-    it('is receives classes in class property', function() {
+    it('receives classes in class property', function() {
       elm = patch(vnode0, h('i', {class: {am: true, a: true, class: true, not: false}})).elm;
       expect(elm.classList.contains('am')).toBeTruthy();
       expect(elm.classList.contains('a')).toBeTruthy();
       expect(elm.classList.contains('class')).toBeTruthy();
       expect(!elm.classList.contains('not')).toBeTruthy();
+    });
+    it('receives classes in selector when namespaced', function() {
+      elm = patch(vnode0,
+        h('svg', [
+          h('g.am.a.class.too')
+        ])
+      ).elm;
+      expect(elm.firstChild.classList.contains('am')).toBeTruthy();
+      expect(elm.firstChild.classList.contains('a')).toBeTruthy();
+      expect(elm.firstChild.classList.contains('class')).toBeTruthy();
+    });
+    it('receives classes in class property when namespaced', function() {
+      elm = patch(vnode0,
+        h('svg', [
+          h('g', {class: {am: true, a: true, class: true, not: false, too: true}})
+        ])
+      ).elm;
+      expect(elm.firstChild.classList.contains('am')).toBeTruthy();
+      expect(elm.firstChild.classList.contains('a')).toBeTruthy();
+      expect(elm.firstChild.classList.contains('class')).toBeTruthy();
+      expect(!elm.firstChild.classList.contains('not')).toBeTruthy();
     });
     it('handles classes from both selector and property', function() {
       elm = patch(vnode0, h('div', [h('i.has', {class: {classes: true}})])).elm;
@@ -202,7 +222,7 @@ describe('renderer', function() {
     describe('using toVNode()', function () {
       it('can remove previous children of the root element', function () {
         var h2 = document.createElement('h2');
-        h2.textContent = 'Hello'
+        h2.textContent = 'Hello';
         var prevElm = document.createElement('div');
         prevElm.id = 'id';
         prevElm.className = 'class';
@@ -219,7 +239,7 @@ describe('renderer', function() {
       });
       it('can remove some children of the root element', function () {
         var h2 = document.createElement('h2');
-        h2.textContent = 'Hello'
+        h2.textContent = 'Hello';
         var prevElm = document.createElement('div');
         prevElm.id = 'id';
         prevElm.className = 'class';
@@ -240,7 +260,7 @@ describe('renderer', function() {
       });
       it('can remove text elements', function () {
         var h2 = document.createElement('h2');
-        h2.textContent = 'Hello'
+        h2.textContent = 'Hello';
         var prevElm = document.createElement('div');
         prevElm.id = 'id';
         prevElm.className = 'class';
@@ -256,10 +276,10 @@ describe('renderer', function() {
         expect(elm.childNodes.length).toEqual(1);
         expect(elm.childNodes[0].nodeType).toEqual(1);
         expect(elm.childNodes[0].textContent).toEqual('Hello');
-      })
+      });
     });
     describe('updating children with keys', function() {
-      function spanNum(n) {
+      function spanNum(n: any) {
         if (n == null) {
           return n;
         } else if (typeof n === 'string') {
@@ -475,8 +495,8 @@ describe('renderer', function() {
         expect(map(inner, elm.children)).toEqual(['4', '3', '2', '1', '5', '0']);
       });
       it('handles random shuffles', function() {
-        var n, i, arr = [], opacities = [], elms = 14, samples = 5;
-        function spanNumWithOpacity(n, o) {
+        var n, i, arr = [], opacities: any[] = [], elms = 14, samples = 5;
+        function spanNumWithOpacity(n: any, o: any) {
           return h('span', {vkey: n, style: {opacity: o}}, n.toString());
         }
         for (n = 0; n < elms; ++n) { arr[n] = n; }
@@ -532,7 +552,7 @@ describe('renderer', function() {
           shuffle(arr);
           vnode2 = h('div', arr.map(spanNum));
           elm = patch(vnode1, vnode2).elm;
-          expect(map(inner, elm.children)).toEqual(arr.filter(function(x) {return x != null;}));
+          expect(map(inner, elm.children)).toEqual(arr.filter(function(x) {return x != null; }));
         }
       });
     });
@@ -671,8 +691,8 @@ describe('renderer', function() {
   describe('hooks', function() {
     describe('element hooks', function() {
       it('calls `create` listener before inserted into parent but after children', function() {
-        var result = [];
-        function cb(empty, vnode) {
+        var result: any[] = [];
+        function cb(empty: any, vnode: any) {
           empty;
           expect(vnode.elm.nodeType).toEqual(1);
           expect(vnode.elm.children.length).toEqual(2);
@@ -710,8 +730,8 @@ describe('renderer', function() {
       //   expect(1).toEqual(result.length);
       // });
       it('calls `prepatch` listener', function() {
-        var result = [];
-        function cb(oldVnode, vnode) {
+        var result: any[] = [];
+        function cb(oldVnode: any, vnode: any) {
           expect(oldVnode).toEqual(vnode1.vchildren[1]);
           expect(vnode).toEqual(vnode2.vchildren[1]);
           result.push(vnode);
@@ -735,7 +755,7 @@ describe('renderer', function() {
         expect(result.length).toEqual(1);
       });
       it('calls `postpatch` after `prepatch` listener', function() {
-        var pre = [], post = [];
+        var pre: any = [], post: any = [];
         function preCb() {
           pre.push(pre);
         }
@@ -763,13 +783,13 @@ describe('renderer', function() {
         expect(post.length).toEqual(1);
       });
       it('calls `update` listener', function() {
-        var result1 = [];
-        var result2 = [];
-        function cb(result, oldVnode, vnode) {
+        var result1: any = [];
+        var result2: any = [];
+        function cb(result: any, oldVnode: any, vnode: any) {
           if (result.length > 0) {
-            console.log(result[result.length-1]);
+            console.log(result[result.length - 1]);
             console.log(oldVnode);
-            expect(result[result.length-1]).toEqual(oldVnode);
+            expect(result[result.length - 1]).toEqual(oldVnode);
           }
           result.push(vnode);
         }
@@ -793,8 +813,8 @@ describe('renderer', function() {
         expect(result2.length).toEqual(1);
       });
       it('calls `remove` listener', function() {
-        var result = [];
-        function cb(vnode, rm) {
+        var result: any = [];
+        function cb(vnode: any, rm: any) {
           var parent = vnode.elm.parentNode;
           expect(vnode.elm.nodeType).toEqual(1);
           expect(vnode.elm.children.length).toEqual(2);
@@ -819,11 +839,11 @@ describe('renderer', function() {
       });
       it('calls `init` and `prepatch` listeners on root', function() {
           var count = 0;
-          function init(vnode) {
+          function init(vnode: any) {
             expect(vnode).toEqual(vnode2);
             count += 1;
           }
-          function prepatch(oldVnode, vnode) {
+          function prepatch(oldVnode: any, vnode: any) {
             oldVnode;
             expect(vnode).toEqual(vnode1);
             count += 1;
@@ -852,11 +872,11 @@ describe('renderer', function() {
       //   expect(elm.children.length).toEqual(0);
       // });
       it('invokes remove hook on replaced root', function() {
-        var result = [];
+        var result: any = [];
         var parent = document.createElement('div');
         var vnode0 = document.createElement('div');
         parent.appendChild(vnode0);
-        function cb(vnode, rm) {
+        function cb(vnode: any, rm: any) {
           result.push(vnode);
           rm();
         }
@@ -969,8 +989,8 @@ describe('renderer', function() {
   });
   describe('short circuiting', function() {
     it('does not update strictly equal vnodes', function() {
-      var result = [];
-      function cb(vnode) { result.push(vnode); }
+      var result: any = [];
+      function cb(vnode: any) { result.push(vnode); }
       var vnode1 = h('div', [
         h('span', {hook: {update: cb}}, 'Hello'),
         h('span', 'there'),
@@ -980,8 +1000,8 @@ describe('renderer', function() {
       expect(result.length).toEqual(0);
     });
     it('does not update strictly equal children', function() {
-      var result = [];
-      function cb(vnode) { result.push(vnode); }
+      var result: any = [];
+      function cb(vnode: any) { result.push(vnode); }
       var vnode1 = h('div', [
         h('span', (<VNodeData>{hook: {patch: cb}}), 'Hello'),
         h('span', 'there'),
@@ -999,7 +1019,7 @@ describe('renderer', function() {
 
 function toVNode(node: Node, api?: PlatformApi): VNode {
   if (!api) {
-    api = PlatformClient(window, document, {}, '/build', domCtrl, nextTick);
+    api = mockPlatformClient();
   }
 
   let text: string;

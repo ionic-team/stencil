@@ -2,7 +2,7 @@ import { NextTickApi } from '../util/interfaces';
 import { noop } from '../util/helpers';
 
 
-export function NextTickController(window: Window): NextTickApi {
+export function NextTickClient(window: Window): NextTickApi {
   /* Adopted from Vue.js, MIT, https://github.com/vuejs/vue */
   const callbacks: Function[] = [];
   let pending = false;

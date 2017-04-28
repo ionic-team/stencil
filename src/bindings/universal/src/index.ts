@@ -1,4 +1,4 @@
-import { ConfigController } from '../../../client/config-controller';
+import { ConfigController } from '../../../util/config-controller';
 import { IonicGlobal, ServerInitConfig } from '../../../util/interfaces';
 import { PlatformServer } from '../../../server/platform-server';
 import { registerComponents } from '../../../server/registry';

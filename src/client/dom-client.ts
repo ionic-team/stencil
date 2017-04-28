@@ -1,7 +1,7 @@
 import { DomControllerApi, RafCallback } from '../util/interfaces';
 
 
-export function DomController(window: Window): DomControllerApi {
+export function DomClient(window: Window): DomControllerApi {
   const readCBs: RafCallback[] = [];
   const writeCBs: RafCallback[] = [];
   let rafPending = false;
@@ -49,7 +49,7 @@ export function DomController(window: Window): DomControllerApi {
         }
       }
 
-    } catch(e) {
+    } catch (e) {
       err = e;
     }
 

@@ -70,7 +70,7 @@ export interface ScrollDetail extends GestureDetail {
   contentWidth?: number;
   contentTop?: number;
   contentBottom?: number;
-  domWrite?: RequestAnimationFrame;
+  domWrite?: DomControllerCallback;
   contentElement?: HTMLElement;
   fixedElement?: HTMLElement;
   scrollElement?: HTMLElement;
@@ -123,9 +123,9 @@ export interface NextTick {
 
 
 export interface DomControllerApi {
-  read: RequestAnimationFrame;
-  write: RequestAnimationFrame;
-  raf: RequestAnimationFrame;
+  read: DomControllerCallback;
+  write: DomControllerCallback;
+  raf: DomControllerCallback;
 }
 
 export interface RafCallback {
@@ -133,7 +133,7 @@ export interface RafCallback {
 }
 
 
-export interface RequestAnimationFrame {
+export interface DomControllerCallback {
   (cb: RafCallback): void;
 }
 
@@ -396,10 +396,10 @@ export interface Hyperscript {
   (sel: Node, data: VNodeData): VNode;
   (sel: any, data: VNodeData): VNode;
   (sel: any, text: string): VNode;
-  (sel: any, children: Array<any>): VNode;
+  (sel: any, children: Array<VNode | undefined | null>): VNode;
   (sel: any, data: VNodeData, text: string): VNode;
-  (sel: any, data: VNodeData, children: Array<any|string>): VNode;
-  (sel: any, data: VNodeData, children: any): VNode;
+  (sel: any, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
+  (sel: any, data: VNodeData, children: VNode): VNode;
 }
 
 

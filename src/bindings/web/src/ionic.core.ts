@@ -1,7 +1,7 @@
-import { ConfigController } from '../../../client/config-controller';
-import { DomController } from '../../../client/dom-controller';
+import { ConfigController } from '../../../util/config-controller';
+import { DomClient } from '../../../client/dom-client';
 import { IonicGlobal } from '../../../util/interfaces';
-import { NextTickController } from '../../../client/next-tick-controller';
+import { NextTickClient } from '../../../client/next-tick-client';
 import { PlatformClient } from '../../../client/platform-client';
 import { registerComponents } from '../../../client/registry';
 import { Renderer } from '../../../client/renderer/core';
@@ -11,9 +11,9 @@ import { PLATFORM_CONFIGS } from '../../../platform/platform-registry';
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-IonicGbl.DomCtrl = DomController(window);
+IonicGbl.DomCtrl = DomClient(window);
 
-IonicGbl.NextTickCtrl = NextTickController(window);
+IonicGbl.NextTickCtrl = NextTickClient(window);
 
 IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core'));
 
