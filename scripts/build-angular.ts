@@ -36,11 +36,6 @@ if (process.argv[3]) {
 }
 console.log('build-angular core, compiledDir:', srcDir);
 
-if (process.argv[4] === 'skip-core') {
-  skipBuildingCore = true;
-}
-console.log('build-angular core, skipBuildingCore:', skipBuildingCore);
-
 
 // copy compiler/index.js to the compiled ionic-angular location
 const compilerJsScript = path.join(__dirname, '../compiler/index.js');
