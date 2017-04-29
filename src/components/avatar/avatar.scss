@@ -1,0 +1,11 @@
+@import "../../themes/ionic.globals";
+
+
+// Avatar
+// --------------------------------------------------
+
+ion-avatar,
+:host {
+  display: block;
+  visibility: inherit !important;
+}

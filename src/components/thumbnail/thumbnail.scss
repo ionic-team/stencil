@@ -1,0 +1,11 @@
+@import "../../themes/ionic.globals";
+
+
+// Thumbnail
+// --------------------------------------------------
+
+ion-thumbnail,
+:host {
+  display: block;
+  visibility: inherit !important;
+}
