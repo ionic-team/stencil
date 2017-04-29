@@ -378,6 +378,9 @@ export interface ProxyElement extends HTMLElement {
 }
 
 
+export type Side = 'left' | 'right' | 'start' | 'end';
+
+
 export interface RendererApi {
   (oldVnode: VNode | Element, vnode: VNode, manualSlotProjection?: boolean): VNode;
 }
