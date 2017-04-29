@@ -7,6 +7,19 @@
  * user's build from within app-scripts.
  */
 
+
+const DEV_MODE = false;
+
+const BUNDLES = [
+  ['ion-badge'],
+  ['ion-button'],
+  ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
+  ['ion-gesture'],
+  ['ion-toggle'],
+  ['ion-slides', 'ion-slide'],
+];
+
+
 import { buildBindingCore } from './build-core';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
@@ -71,12 +84,8 @@ function compileComponents() {
     include: [srcDir],
     exclude: ['node_modules', 'test'],
     debug: true,
-    bundles: [
-      ['ion-badge'],
-      ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-      ['ion-gesture'],
-      ['ion-toggle']
-    ],
+    devMode: DEV_MODE,
+    bundles: BUNDLES,
     packages: {
       fs: fs,
       path: path,
