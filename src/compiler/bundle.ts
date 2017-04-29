@@ -227,7 +227,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     if (config.devMode) {
       // in dev mode, create the bundle id from combining all of the tags
-      bundle.id = bundle.components.map(c => c.component.tag).join('.');
+      bundle.id = bundle.components.map(c => c.component.tag + '.' + c.mode.name).join('.');
 
     } else {
       // in prod mode, create bundle id from hashing the content
