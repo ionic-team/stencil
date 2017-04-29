@@ -4,16 +4,16 @@ import { Component, h, Ionic } from '../index';
 @Component({
   tag: 'ion-item',
   styleUrls: {
-    default: 'item.scss',
-    // md: 'item.md.scss',
-    // wp: 'item.wp.scss'
+    ios: 'item.ios.scss',
+    md: 'item.md.scss',
+    wp: 'item.wp.scss'
   }
 })
 export class Item {
 
   render() {
     return h(this,
-      h('div', Ionic.theme(this, 'item'),
+      h('div.item-block', Ionic.theme(this, 'item'),
         [
           h('slot', { attrs: { name: 'item-start' } }),
           h('div.item-inner', [
