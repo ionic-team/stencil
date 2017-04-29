@@ -1,0 +1,11 @@
+@import "../../themes/ionic.globals";
+
+
+// Item Divider
+// --------------------------------------------------
+
+ion-item-divider,
+:host {
+  display: block;
+  visibility: inherit !important;
+}

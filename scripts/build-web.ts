@@ -13,6 +13,23 @@
  * the initial ionic providers during bootstrap.
  */
 
+
+const DEV_MODE = false;
+
+const BUNDLES = [
+  ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
+  ['ion-avatar', 'ion-thumbnail'],
+  ['ion-badge'],
+  ['ion-button'],
+  ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
+  ['ion-list', 'ion-item', 'ion-label'],
+  ['ion-list-header', 'item-divider'],
+  ['ion-gesture', 'ion-scroll'],
+  ['ion-toggle'],
+  ['ion-slides', 'ion-slide'],
+];
+
+
 import { buildBindingCore, LICENSE, readFile, writeFile } from './build-core';
 import * as cleanCss from 'clean-css';
 import * as fs from 'fs-extra';
@@ -30,8 +47,6 @@ const srcDir = path.join(__dirname, '../../src');
 const transpiledSrcDir = path.join(__dirname, '../transpiled-web/bindings/web/src');
 const compiledDir = path.join(__dirname, '../compiled-ionic-web');
 const destDir = path.join(__dirname, '../ionic-web');
-
-const DEV_MODE = false;
 
 // first clean out the ionic-web directories
 fs.emptyDirSync(destDir);
@@ -74,18 +89,7 @@ function compileComponents() {
     exclude: ['node_modules', 'compiler', 'test'],
     devMode: DEV_MODE,
     debug: true,
-    bundles: [
-      ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
-      ['ion-avatar', 'ion-thumbnail'],
-      ['ion-badge'],
-      ['ion-button'],
-      ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-      ['ion-list', 'ion-item', 'ion-label'],
-      ['ion-list-header'],
-      ['ion-gesture', 'ion-scroll'],
-      ['ion-toggle'],
-      ['ion-slides', 'ion-slide'],
-    ],
+    bundles: BUNDLES,
     packages: {
       fs: fs,
       path: path,
