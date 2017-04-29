@@ -25,9 +25,7 @@ import { Component, h, Ionic, Prop } from '../index';
 @Component({
   tag: 'ion-slides',
   styleUrls: {
-    ios: 'slides.ios.scss',
-    md: 'slides.md.scss',
-    wp: 'slides.wp.scss'
+    default: 'slides.scss'
   },
   shadow: false
 })
