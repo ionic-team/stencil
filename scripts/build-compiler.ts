@@ -19,8 +19,11 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 rollup.rollup({
   entry: ENTRY_FILE,
   external: [
+    'crypto',
     'fs',
     'path',
+    'rollup-plugin-commonjs',
+    'rollup-plugin-node-resolve',
     'typescript'
   ]
 
