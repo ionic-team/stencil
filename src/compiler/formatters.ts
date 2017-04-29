@@ -1,4 +1,4 @@
-import { Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watchers, WatchOpts } from './interfaces';
+import { Bundle, Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watchers, WatchOpts } from './interfaces';
 import * as crypto from 'crypto';
 
 
@@ -15,8 +15,8 @@ export function formatBundleFileName(bundleId: string) {
 }
 
 
-export function formatBundleContent(bundleId: string, componentModeLoader: string) {
-  return `Ionic.loadComponents(\n/** bundleId **/\n${bundleId},${componentModeLoader});`;
+export function formatBundleContent(bundleId: string, bundledJsModules: string, componentModeLoader: string) {
+  return `Ionic.loadComponents(\n/** bundleId **/\n${bundleId},\n\n/** modules **/\n${bundledJsModules},${componentModeLoader});`;
 }
 
 
@@ -54,8 +54,6 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 
   const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : '0 /* no styles */');
 
-  const componentFn = component.componentImporter.trim();
-
   let label = tag;
   if (mode.name) {
     label += '.' + mode.name;
@@ -72,8 +70,7 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
     `/** ${label}: [3] watchers **/\n${watchers}`,
     `/** ${label}: [4] shadow **/\n${formatBoolean(shadow)}`,
     `/** ${label}: [5] modeName **/\n${modeCode}`,
-    `/** ${label}: [6] styles **/\n${styles}`,
-    `/** ${label}: [7] importComponent function **/\n${componentFn}`
+    `/** ${label}: [6] styles **/\n${styles}`
   ];
 
   return `\n\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
@@ -170,4 +167,9 @@ export function formatRegistryContent(registry: Registry) {
   strData = strData.replace(/"3"/g, '3');
 
   return strData;
+}
+
+
+export function getBundledModulesId(bundle: Bundle) {
+  return bundle.components.map(c => c.component.componentClass).sort().join('.');
 }

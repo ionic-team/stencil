@@ -19,12 +19,18 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const injectedIonic = initInjectedIonic(win, IonicGbl.eventNameFn, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
 
-  IonicGbl.loadComponents = function loadComponents(bundleId) {
+  IonicGbl.loadComponents = function loadComponents(bundleId, importFn) {
     var args = arguments;
-    for (var i = 1; i < args.length; i++) {
+
+    // import component function
+    // inject ionic globals
+    importFn(moduleImports, h, injectedIonic);
+
+    for (var i = 2; i < args.length; i++) {
       // first arg is the bundleId
+      // second arg is the importFn
       // each arg after that is a component/mode
-      parseComponentModeData(registry, moduleImports, h, injectedIonic, args[i]);
+      parseComponentModeData(registry, moduleImports, args[i]);
 
       // fire off all the callbacks waiting on this bundle to load
       var callbacks = bundleCallbacks[bundleId];

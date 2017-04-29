@@ -47,6 +47,7 @@ export interface BuildContext {
   files?: Map<string, FileMeta>;
   results?: Results;
   bundles?: Bundle[];
+  bundledJsModules?: {[id: string]: string};
   components?: CoreComponents;
   registry?: Registry;
 }
@@ -72,6 +73,7 @@ export interface Bundle {
     component: Component;
     mode: ComponentMode
   }[];
+  bundledJsModules?: string;
   content?: string;
   fileName?: string;
   filePath?: string;
@@ -104,7 +106,6 @@ export interface Component {
   shadow: boolean;
   componentClass: string;
   componentUrl: string;
-  componentImporter?: string;
 }
 
 
@@ -209,6 +210,8 @@ export interface Rollup {
       banner?: string;
       footer?: string;
       exports?: string;
+      external?: string[];
+      globals?: {[key: string]: any};
       moduleName?: string;
       plugins?: any;
     }): {

@@ -1,9 +1,11 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
-import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName, formatBundleContent, formatRegistryContent, generateBundleId } from './formatters';
+import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName,
+  formatBundleContent, formatRegistryContent, generateBundleId, getBundledModulesId } from './formatters';
 import { readFile, writeFile, writeFiles } from './util';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
+import * as os from 'os';
 
 
 export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
@@ -56,68 +58,12 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
 
 
 function bundleComponent(config: BundlerConfig, component: Component) {
-  return bundleComponentModule(config, component).then(() => {
-    const modeNames = Object.keys(component.modes);
+  const modeNames = Object.keys(component.modes);
 
-    return Promise.all(modeNames.map(modeName => {
-      component.modes[modeName].name = modeName;
-      return bundleComponentMode(config, component, component.modes[modeName]);
-    }));
-  });
-}
-
-
-function bundleComponentModule(config: BundlerConfig, component: Component) {
-  if (component.componentImporter) {
-    return Promise.resolve();
-  }
-
-  const entry = config.packages.path.join(config.srcDir, component.componentUrl);
-
-  if (config.debug) {
-    console.log(`bundle, bundleComponentModule, entry: ${entry}`);
-  }
-
-  return config.packages.rollup.rollup({
-    entry: entry,
-    plugins: [
-      nodeResolve({
-        jsnext: true,
-        main: true
-      }),
-      commonjs({
-        include: 'node_modules/**',
-        sourceMap: false
-      })
-    ]
-  }).then(bundle => {
-    const results = bundle.generate({
-      format: 'iife',
-      moduleName: 'ionicModule',
-    });
-
-    let code = results.code.trim();
-
-    let closureStart = '(function (exports) {';
-    if (code.indexOf(closureStart) === -1) {
-      console.log(code);
-      throw `bundleComponentModule: importComponent() closureStart format changed!`;
-    }
-    code = code.replace(closureStart, '');
-
-    let closureEnd = '}((this.ionicModule = this.ionicModule || {})));';
-    if (code.indexOf(closureEnd) === -1) {
-      console.log(code);
-      throw `bundleComponentModule: importComponent() closureEnd format changed!`;
-    }
-    code = code.replace(closureEnd, '');
-
-    code = code.trim();
-
-    code = `function importComponent(exports, h, Ionic) {\n${code}\n}`;
-
-    component.componentImporter = code;
-  });
+  return Promise.all(modeNames.map(modeName => {
+    component.modes[modeName].name = modeName;
+    return bundleComponentMode(config, component, component.modes[modeName]);
+  }));
 }
 
 
@@ -190,19 +136,74 @@ function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[])
       if (!component) return;
 
       const mode = component.modes[modeName];
-      if (!mode) return;
-
-      bundle.components.push({
-        component: component,
-        mode: mode
-      });
+      if (mode) {
+        bundle.components.push({
+          component: component,
+          mode: mode
+        });
+      }
     });
 
     if (bundle.components.length) {
       ctx.bundles.push(bundle);
     }
   });
+}
 
+
+function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
+  ctx.bundledJsModules = {};
+
+  ctx.bundles.map(bundle => {
+    const id = getBundledModulesId(bundle);
+    if (ctx.bundledJsModules[id]) return;
+
+    const entryContent: string[] = [];
+    bundle.components.forEach(c => {
+      let importPath = config.packages.path.join(config.srcDir, c.component.componentUrl);
+      let exportName = c.component.componentClass;
+      entryContent.push(`import { ${c.component.componentClass} } from "${importPath}";`);
+      entryContent.push(`exports.${exportName} = ${exportName};`);
+    });
+
+    ctx.bundledJsModules[id] = entryContent.join('\n');
+  });
+
+  const ids = Object.keys(ctx.bundledJsModules);
+
+  return Promise.all<any>(ids.map(id => {
+    const tmpEntry = config.packages.path.join(os.tmpdir(), id + '.js');
+
+    return Promise.resolve()
+      .then(() => {
+        return writeFile(config.packages, tmpEntry, ctx.bundledJsModules[id]);
+      })
+
+      .then(() => {
+        return config.packages.rollup.rollup({
+          entry: tmpEntry,
+          plugins: [
+            nodeResolve({
+              jsnext: true,
+              main: true
+            }),
+            commonjs({
+              include: 'node_modules/**',
+              sourceMap: false
+            })
+          ]
+        })
+
+      .then(rollupBundle => {
+        const results = rollupBundle.generate({
+          format: 'es'
+        });
+
+        ctx.bundledJsModules[id] = `function importComponent(exports, h, Ionic) {\n${results.code.trim()}\n}`;
+      });
+
+    });
+  }));
 }
 
 
@@ -217,13 +218,16 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
   const bundleIdKeyword = '__IONIC_BUNDLE_ID__';
 
-  ctx.bundles.forEach(bundle => {
+  return bundleComponentModules(config, ctx).then(() => {
+    ctx.bundles.forEach(bundle => {
 
     const componentModeLoaders = bundle.components.map(bundleComponent => {
       return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
     }).join(',\n');
 
-    bundle.content = formatBundleContent(bundleIdKeyword, componentModeLoaders);
+    bundle.bundledJsModules = ctx.bundledJsModules[getBundledModulesId(bundle)];
+
+    bundle.content = formatBundleContent(bundleIdKeyword, bundle.bundledJsModules, componentModeLoaders);
 
     if (config.devMode) {
       // in dev mode, create the bundle id from combining all of the tags
@@ -272,6 +276,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
   });
 
   return writeFiles(config.packages, filesToWrite);
+  });
 }
 
 

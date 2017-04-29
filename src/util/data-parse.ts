@@ -2,7 +2,7 @@ import { ComponentListenersData, ComponentModeData, ComponentRegistry, Component
 import { isString } from './helpers';
 
 
-export function parseComponentModeData(registry: ComponentRegistry, moduleImports: any, h: any, injectedIonic: any, cmpModeData: ComponentModeData) {
+export function parseComponentModeData(registry: ComponentRegistry, moduleImports: any, cmpModeData: ComponentModeData) {
   var i = 0;
   var cmpListenerData: ComponentListenersData;
   var cmpWatchData: ComponentWatchersData;
@@ -44,10 +44,6 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
       cmpMode.styles = cmpModeData[6];
     }
   }
-
-  // import component function
-  // inject ionic globals
-  cmpModeData[7](moduleImports, h, injectedIonic);
 
   // get the component class which was added to moduleImports
   // component class name (Badge)

@@ -21,17 +21,24 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
   };
 
 
-  IonicGbl.loadComponents = function loadComponents() {
+  IonicGbl.loadComponents = function loadComponents(bundleId, importFn) {
     var args = arguments;
-    for (var i = 1; i < args.length; i++) {
+
+    // import component function
+    // inject ionic globals
+    importFn(moduleImports, h, injectedIonic);
+
+    for (var i = 2; i < args.length; i++) {
       // first arg is the bundleId
+      // second arg is the importFn
       // each arg after that is a component/mode
       var cmpModeData: ComponentModeData = args[i];
 
-      parseComponentModeData(registry, moduleImports, h, injectedIonic, args[i]);
+      parseComponentModeData(registry, moduleImports, args[i]);
 
       // tag name (ion-badge)
       var tag = cmpModeData[0];
+      console.log(`load tag: ${tag}, bundleId: ${bundleId}`);
 
       registerComponent(tag, []);
     }

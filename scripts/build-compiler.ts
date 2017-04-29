@@ -24,6 +24,7 @@ rollup.rollup({
     'path',
     'rollup-plugin-commonjs',
     'rollup-plugin-node-resolve',
+    'os',
     'typescript'
   ]
 

@@ -103,7 +103,7 @@ export interface ContentDimensions {
 export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
-  loadComponents?: {(bundleId: string, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData): void};
+  loadComponents?: {(bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData): void};
   eventNameFn?: {(eventName: string): string};
   config?: Object;
   ConfigCtrl?: ConfigApi;
@@ -178,11 +178,6 @@ export interface ComponentModeData {
    * component mode styles
    */
   [6]: string;
-
-  /**
-   * import component function
-   */
-  [7]: ComponentModeImporterFn;
 }
 
 
@@ -219,7 +214,7 @@ export interface ComponentWatchersData {
 }
 
 
-export interface ComponentModeImporterFn {
+export interface ModulesImporterFn {
   (importer: any, h: Hyperscript, Ionic: Ionic): void;
 }
 
