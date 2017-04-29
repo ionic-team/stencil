@@ -223,10 +223,17 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
     }).join(',\n');
 
-
     bundle.content = formatBundleContent(bundleIdKeyword, componentModeLoaders);
 
-    if (!config.devMode) {
+    if (config.devMode) {
+      // in dev mode, create the bundle id from combining all of the tags
+      bundle.id = bundle.components.map(c => c.component.tag).join('.');
+
+    } else {
+      // in prod mode, create bundle id from hashing the content
+      bundle.id = generateBundleId(bundle.content);
+
+      // minify when in prod mode
       try {
         const minifyResults = config.packages.uglify.minify(bundle.content, {
           fromString: true
@@ -237,7 +244,6 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       }
     }
 
-    bundle.id = generateBundleId(bundle.content);
     bundle.fileName = formatBundleFileName(bundle.id);
     bundle.filePath = config.packages.path.join(config.destDir, 'bundles', bundle.fileName);
 
