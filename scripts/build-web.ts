@@ -80,6 +80,7 @@ function compileComponents() {
       ['ion-button'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
       ['ion-list', 'ion-item', 'ion-label'],
+      ['ion-list-header'],
       ['ion-gesture', 'ion-scroll'],
       ['ion-toggle'],
       ['ion-slides', 'ion-slide'],
