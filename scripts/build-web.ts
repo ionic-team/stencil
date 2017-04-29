@@ -76,6 +76,7 @@ function compileComponents() {
     debug: true,
     bundles: [
       ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
+      ['ion-avatar', 'ion-thumbnail'],
       ['ion-badge'],
       ['ion-button'],
       ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
