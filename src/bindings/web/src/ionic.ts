@@ -26,7 +26,7 @@ import { IonicGlobal } from '../../../util/interfaces';
   document.head.appendChild(style);
 
   // build up a path for the exact ionic core javascript file this browser needs
-  var pathItems: string[] = [];
+  var pathItems: string[] = ['core'];
 
   if (!('attachShadow' in Element.prototype)) {
     // browser requires the shadow dom polyfill
@@ -40,7 +40,7 @@ import { IonicGlobal } from '../../../util/interfaces';
 
   // request the ionic core file this browser needs
   var s = document.createElement('script');
-  s.src = ionic.staticDir + 'ionic.core' + pathItems.join('.') + '.js';
+  s.src = ionic.staticDir + 'ionic.' + pathItems.join('.') + '.js';
   document.head.appendChild(s);
 
 })(window, document);

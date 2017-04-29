@@ -622,7 +622,6 @@ export class Content {
     return h(this,
       h('ion-scroll', Ionic.theme(this, 'content', {
           class: {
-            'scroll-content': true,
             'statusbar-padding': this.statusbarPadding,
           },
           props: props
