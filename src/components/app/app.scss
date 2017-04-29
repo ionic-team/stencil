@@ -261,8 +261,7 @@ ion-app,
 ion-nav,
 ion-tab,
 ion-tabs,
-.app-root,
-.ion-page {
+ion-page {
   contain: strict;
 }
 
@@ -270,7 +269,7 @@ ion-tabs,
 // Page Container Structure
 // --------------------------------------------------
 
-.ion-page {
+ion-page {
   position: absolute;
   top: 0;
   left: 0;
@@ -280,12 +279,12 @@ ion-tabs,
   height: 100%;
 
   // do not show, but still render so we can get dimensions
-  opacity: 0;
+  // opacity: 0;
 }
 
-.ion-page.show-page {
+ion-page.show-page {
   // show the page now that it's ready
-  opacity: 1;
+  // opacity: 1;
 }
 
 
