@@ -17,16 +17,17 @@
 const DEV_MODE = false;
 
 const BUNDLES = [
-  ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'],
-  ['ion-avatar', 'ion-thumbnail'],
-  ['ion-badge'],
-  ['ion-button'],
-  ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-  ['ion-list', 'ion-item', 'ion-label'],
-  ['ion-list-header', 'item-divider'],
-  ['ion-gesture', 'ion-scroll'],
-  ['ion-toggle'],
-  ['ion-slides', 'ion-slide'],
+  { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'] },
+  { components: ['ion-avatar', 'ion-thumbnail'] },
+  { components: ['ion-badge'] },
+  { components: ['ion-button'] },
+  { components: ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'] },
+  { components: ['ion-list', 'ion-item', 'ion-label'] },
+  { components: ['ion-list-header', 'item-divider'] },
+  { components: ['ion-menu'], priority: 'low' },
+  { components: ['ion-gesture', 'ion-scroll'], priority: 'low' },
+  { components: ['ion-toggle'] },
+  { components: ['ion-slides', 'ion-slide'] },
 ];
 
 

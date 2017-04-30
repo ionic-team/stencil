@@ -83,6 +83,7 @@ function observedAttributes(){};
 function customElements(){};
 function define(){};
 function attachShadow(){};
+function requestIdleCallback(){};
 
 
 /**

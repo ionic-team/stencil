@@ -268,16 +268,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     });
   });
 
-  if (config.bundles) {
-    manifest.bundles = config.bundles;
-
-  } else {
-    ctx.files.forEach(f => {
-      if (f.isTsSourceFile && f.cmpMeta) {
-        manifest.bundles.push([f.cmpMeta.tag]);
-      }
-    });
-  }
+  manifest.bundles = config.bundles;
 
   components = components.sort((a, b) => {
     if (a.tag < b.tag) {

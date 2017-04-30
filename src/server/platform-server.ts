@@ -44,8 +44,8 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
     }
   };
 
-  function loadComponent(bundleId: string, cb: Function): void {
-    console.log(`loadComponent, bundleId: ${bundleId}`);
+  function loadComponent(bundleId: string, priority: string, cb: Function): void {
+    console.log(`loadComponent, bundleId: ${bundleId}, priority: ${priority}`);
 
     cb();
   }

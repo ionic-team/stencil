@@ -13,8 +13,14 @@ export interface CompilerConfig {
   exclude?: string[];
   devMode?: boolean;
   debug?: boolean;
-  bundles?: string[][];
+  bundles?: ManifestBundle[];
   packages: Packages;
+}
+
+
+export interface ManifestBundle {
+  components: string[];
+  priority: 'high'|'low';
 }
 
 
@@ -77,12 +83,13 @@ export interface Bundle {
   content?: string;
   fileName?: string;
   filePath?: string;
+  priority?: 'high'|'low';
 }
 
 
 export interface Manifest {
   components?: CoreComponents;
-  bundles?: string[][];
+  bundles?: ManifestBundle[];
   coreFiles?: {
     core: string;
     core_ce: string;

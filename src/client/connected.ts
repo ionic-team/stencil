@@ -12,7 +12,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
       cmpMode = cmpMeta.modes.default;
     }
 
-    plt.loadComponent(cmpMode.bundleId, function loadComponentCallback() {
+    plt.loadComponent(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
       queueUpdate(plt, config, renderer, elm, tag);
     });
   });

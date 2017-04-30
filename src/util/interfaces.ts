@@ -305,6 +305,7 @@ export interface ComponentMeta {
   hostCss?: string;
   componentModule?: any;
   modes: {[modeName: string]: ComponentMode};
+  priority?: 'high'|'low';
 }
 
 
@@ -428,7 +429,7 @@ export interface VNodeData {
 export interface PlatformApi {
   registerComponent: (tag: string, data: any[]) => ComponentMeta;
   getComponentMeta: (tag: string) => ComponentMeta;
-  loadComponent: (bundleId: string, cb: Function) => void;
+  loadComponent: (bundleId: string, priority: string, cb: Function) => void;
   nextTick: NextTick;
 
   isElement: (node: Node) => node is Element;

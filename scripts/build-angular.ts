@@ -11,12 +11,12 @@
 const DEV_MODE = false;
 
 const BUNDLES = [
-  ['ion-badge'],
-  ['ion-button'],
-  ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'],
-  ['ion-gesture'],
-  ['ion-toggle'],
-  ['ion-slides', 'ion-slide'],
+  { components: ['ion-badge'] },
+  { components: ['ion-button'] },
+  { components: ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'] },
+  { components: ['ion-gesture'], priority: 'low' },
+  { components: ['ion-toggle'] },
+  { components: ['ion-slides', 'ion-slide'] },
 ];
 
 

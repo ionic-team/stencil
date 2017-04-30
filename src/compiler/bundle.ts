@@ -1,7 +1,7 @@
 import { bundleComponentModeStyles } from './styles';
-import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, Results } from './interfaces';
+import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, ManifestBundle, Results } from './interfaces';
 import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName,
-  formatBundleContent, formatRegistryContent, generateBundleId, getBundledModulesId } from './formatters';
+  formatBundleContent, formatRegistryContent, formatPriority, generateBundleId, getBundledModulesId } from './formatters';
 import { readFile, writeFile, writeFiles } from './util';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
@@ -96,8 +96,8 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
 
   ctx.bundles = [];
 
-  manifest.bundles.forEach(bundleComponentTags => {
-    buildComponentBundles(ctx, bundleComponentTags);
+  manifest.bundles.forEach(manifestBundle => {
+    buildComponentBundles(ctx, manifestBundle);
   });
 
   return generateBundleFiles(config, ctx).then(() => {
@@ -121,18 +121,19 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
 }
 
 
-function buildComponentBundles(ctx: BuildContext, bundleComponentTags: string[]) {
+function buildComponentBundles(ctx: BuildContext, manifestBundle: ManifestBundle) {
   const allModeNames = getAllModeNames(ctx);
 
   allModeNames.forEach(modeName => {
 
     const bundle: Bundle = {
-      components: []
+      components: [],
+      priority: manifestBundle.priority
     };
 
-    bundleComponentTags.forEach(bundleComponentTag => {
+    manifestBundle.components.forEach(manifestComponentTag => {
 
-      const component = ctx.components[bundleComponentTag];
+      const component = ctx.components[manifestComponentTag];
       if (!component) return;
 
       const mode = component.modes[modeName];
@@ -266,7 +267,14 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       ctx.registry[tag][0] = modes;
 
       if (ctx.registry[tag].length === 1 && Object.keys(bundleComponent.component.props).length) {
-        ctx.registry[tag].push(formatComponentRegistryProps(bundleComponent.component.props));
+        ctx.registry[tag][1] = formatComponentRegistryProps(bundleComponent.component.props);
+
+      } else if (bundle.priority === 'low') {
+        ctx.registry[tag][1] = null;
+      }
+
+      if (bundle.priority === 'low') {
+        ctx.registry[tag][2] = formatPriority(bundle.priority);
       }
     });
 

@@ -47,7 +47,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   };
 
 
-  function loadComponent(bundleId: string, cb: Function): void {
+  function loadComponent(bundleId: string, priority: string, cb: Function): void {
     if (loadedBundles[bundleId]) {
       // we've already loaded this bundle
       cb();
@@ -67,16 +67,37 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       if (!activeJsonRequests[url]) {
         // not already actively requesting this url
         // let's kick off the request
-        jsonp(url);
+
+        // remember that we're now actively requesting this url
+        activeJsonRequests[url] = true;
+
+        if (priority === 'low') {
+          // low priority which means its ok to load this behind
+          // UI components, for example: gestures, menu, animations
+          if ('requestIdleCallback' in win) {
+            // kick off the request in a requestIdleCallback
+            (<any>win).requestIdleCallback(() => {
+              jsonp(url);
+            }, { timeout: 2000 });
+
+          } else {
+            // no support for requestIdleCallback, so instead throw it
+            // in a setTimeout just so all the UI components kick in first
+            setTimeout(() => {
+              jsonp(url);
+            }, 600);
+          }
+
+        } else {
+          // high priority component (normal UI components)
+          jsonp(url);
+        }
       }
     }
   }
 
 
   function jsonp(url: string) {
-    // remember that we're actively requesting this url
-    activeJsonRequests[url] = true;
-
     // create a sript element to add to the document.head
     var scriptElm = createElement('script');
     scriptElm.charset = 'utf-8';
@@ -136,6 +157,9 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
 
   function registerComponent(tag: string, data: any[]) {
+    // data[0] = all of the mode and bundle maps
+    // data[1] = properties
+    // data[2] = bundle priority
     const modeBundleIds = data[0];
 
     const cmpMeta: ComponentMeta = registry[tag] = {
@@ -144,6 +168,11 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       props: parseProp(data[1]),
       obsAttrs: []
     };
+
+    if (data[2] === 0) {
+      // priority
+      cmpMeta.priority = 'low';
+    }
 
     let keys = Object.keys(modeBundleIds);
     for (var i = 0; i < keys.length; i++) {

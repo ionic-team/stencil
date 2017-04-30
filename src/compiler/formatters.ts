@@ -16,7 +16,19 @@ export function formatBundleFileName(bundleId: string) {
 
 
 export function formatBundleContent(bundleId: string, bundledJsModules: string, componentModeLoader: string) {
-  return `Ionic.loadComponents(\n/** bundleId **/\n${bundleId},\n\n/** modules **/\n${bundledJsModules},${componentModeLoader});`;
+  return [
+    `Ionic.loadComponents(\n`,
+
+      `/**** bundleId ****/`,
+      `${bundleId},\n`,
+
+      `/**** bundled modules ****/`,
+      `${bundledJsModules},\n`,
+
+      `${componentModeLoader}`,
+
+    `)`
+  ].join('\n');
 }
 
 
@@ -73,7 +85,7 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
     `/** ${label}: [6] styles **/\n${styles}`
   ];
 
-  return `\n\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
+  return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
 }
 
 
@@ -154,6 +166,11 @@ function formatBoolean(val: boolean) {
   return val ?
     '1 /* true **/' :
     '0 /* false */';
+}
+
+
+export function formatPriority(priority: 'high'|'low') {
+  return priority === 'low' ? '0' : '1';
 }
 
 
