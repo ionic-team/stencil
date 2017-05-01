@@ -229,7 +229,7 @@ export class Button {
       }, {});
 
     return h(this,
-      h('div', {
+      h('button', {
         class: buttonClasses
       },
         [
