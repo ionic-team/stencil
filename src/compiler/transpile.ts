@@ -99,6 +99,7 @@ function createTsCompilerConfigs(config: CompilerConfig) {
   tsCompilerOptions.module = ts.ModuleKind.ES2015;
   tsCompilerOptions.target = getTsScriptTarget(config.compilerOptions.target);
   tsCompilerOptions.isolatedModules = true;
+  tsCompilerOptions.allowSyntheticDefaultImports = true;
 
   tsCompilerOptions.lib = tsCompilerOptions.lib || [];
   if (!tsCompilerOptions.lib.indexOf('lib.dom.d.ts')) {
