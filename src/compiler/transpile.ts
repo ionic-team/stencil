@@ -48,6 +48,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
         return fileMeta.srcText;
       }
       fileMeta = createFileMeta(config, ctx, filePath, config.packages.fs.readFileSync(filePath, 'utf-8'));
+      fileMeta.recompileOnChange = true;
       return fileMeta.srcText;
     },
 
@@ -55,6 +56,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
       sourceFiles.forEach(s => {
         const fileMeta = ctx.files.get(s.fileName);
         if (fileMeta) {
+          fileMeta.recompileOnChange = true;
           fileMeta.jsFilePath = jsFilePath;
           fileMeta.jsText = jsText;
         }

@@ -15,6 +15,7 @@ export interface CompilerConfig {
   debug?: boolean;
   bundles?: ManifestBundle[];
   packages: Packages;
+  watch?: boolean;
 }
 
 
@@ -31,6 +32,7 @@ export interface BundlerConfig {
   packages: Packages;
   debug?: boolean;
   attachRegistryTo?: 'core'|'loader';
+  watch?: boolean;
 }
 
 
@@ -43,9 +45,13 @@ export interface FileMeta {
   jsFilePath: string;
   jsText: string;
   isTsSourceFile: boolean;
+  isScssSourceFile: boolean;
   hasCmpClass: boolean;
   cmpMeta: ComponentMeta;
   cmpClassName: string;
+  isWatching: boolean;
+  recompileOnChange: boolean;
+  rebundleOnChange: boolean;
 }
 
 
@@ -56,6 +62,8 @@ export interface BuildContext {
   bundledJsModules?: {[id: string]: string};
   components?: CoreComponents;
   registry?: Registry;
+  isCompilerWatchInitialized?: boolean;
+  isBundlerWatchInitialized?: boolean;
 }
 
 
@@ -90,12 +98,6 @@ export interface Bundle {
 export interface Manifest {
   components?: CoreComponents;
   bundles?: ManifestBundle[];
-  coreFiles?: {
-    core: string;
-    core_ce: string;
-    core_sd_ce: string;
-    [key: string]: string;
-  };
 }
 
 
@@ -186,9 +188,7 @@ export interface Packages {
     stat(path: string | Buffer, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
   };
-  typescript?: {
-
-  };
+  typescript?: any;
   cleanCss?: {
     new(opts?: any): {
       minify: {(input: string): any}

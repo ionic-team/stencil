@@ -299,7 +299,7 @@ export function readFile(filePath: string) {
 }
 
 
-export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string, skipIfExists = false) {
+export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string) {
   console.log('core, buildBindingCore:', srcDir);
 
   const ctx: BuildContext = {
@@ -324,11 +324,6 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
     cePolyFillPath: path.join(POLYFILLS_DIR, 'document-register-element.js'),
     cePolyfillContent: ''
   };
-
-  if (skipIfExists && ts.sys.fileExists(ctx.coreEntryFilePath)) {
-    console.log('core files already built');
-    return appendCoreFilesToManifest(destDir, coreFilesDir);
-  }
 
   // create the dev mode versions
   return Promise.all([
@@ -357,33 +352,6 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
       shadyDomCustomElementPolyfillMin(ctx)
     ]);
 
-  })
-
-  .then(() => {
-    // add the location of each file to the manifest
-    return appendCoreFilesToManifest(destDir, coreFilesDir);
-  });
-}
-
-
-function appendCoreFilesToManifest(destDir: string, coreFilesDir: string) {
-  // add the location of each file to the manifest
-  console.log('core, appendCoreFilesToManifest');
-
-  const manifestFilePath = path.join(destDir, 'manifest.json');
-
-  return readFile(manifestFilePath).then(manifestStr => {
-    const manifest = JSON.parse(manifestStr);
-
-    manifest.coreFiles = {
-      'core': path.join(coreFilesDir, 'ionic.core.js'),
-      'core_ce': path.join(coreFilesDir, 'ionic.core.ce.js'),
-      'core_sd_cd': path.join(coreFilesDir, 'ionic.core.sd.ce.js')
-    }
-
-    manifestStr = JSON.stringify(manifest, null, 2);
-
-    return writeFile(manifestFilePath, manifestStr);
   });
 }
 

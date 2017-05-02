@@ -2,7 +2,8 @@ import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, ManifestBundle, Results } from './interfaces';
 import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName,
   formatBundleContent, formatRegistryContent, formatPriority, generateBundleId, getBundledModulesId } from './formatters';
-import { readFile, writeFile, writeFiles } from './util';
+import { createFileMeta, readFile, writeFile, writeFiles } from './util';
+import { setupBundlerWatch } from './watch';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import * as os from 'os';
@@ -42,13 +43,17 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
     const components = getComponents(ctx, manifest);
 
     return Promise.all(Object.keys(components).map(tag => {
-      return bundleComponent(config, components[tag]);
+      return bundleComponent(config, ctx, components[tag]);
 
     }))
     .then(() => {
       return buildCoreJs(config, ctx, manifest);
 
     }).then(() => {
+      return setupBundlerWatch(config, ctx, config.packages.typescript.sys);
+
+    }).then(() => {
+      console.log('bundle, done');
       return ctx.results;
 
     });
@@ -57,22 +62,28 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
 }
 
 
-function bundleComponent(config: BundlerConfig, component: Component) {
+export function bundleWatch(config: BundlerConfig, ctx: BuildContext, changedFiles: string[]) {
+  changedFiles;
+  bundle(config, ctx);
+}
+
+
+function bundleComponent(config: BundlerConfig, ctx: BuildContext, component: Component) {
   const modeNames = Object.keys(component.modes);
 
   return Promise.all(modeNames.map(modeName => {
     component.modes[modeName].name = modeName;
-    return bundleComponentMode(config, component, component.modes[modeName]);
+    return bundleComponentMode(config, ctx, component, component.modes[modeName]);
   }));
 }
 
 
-function bundleComponentMode(config: BundlerConfig, component: Component, mode: ComponentMode) {
+function bundleComponentMode(config: BundlerConfig, ctx: BuildContext, component: Component, mode: ComponentMode) {
   if (config.debug) {
     console.log(`bundle, bundleComponentMode: ${component.tag}, ${mode.name}`);
   }
 
-  return bundleComponentModeStyles(config, mode);
+  return bundleComponentModeStyles(config, ctx, mode);
 }
 
 
@@ -104,19 +115,16 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
     const registryContent = formatRegistryContent(ctx.registry);
     ctx.results.componentRegistry = registryContent;
 
-    const promises: Promise<any>[] = [];
+    const coreFiles = [
+      'ionic.core.js',
+      'ionic.core.ce.js',
+      'ionic.core.sd.ce.js'
+    ];
 
-    if (!ctx.results.manifest.coreFiles) {
-      throw `missing manifest core files`;
-    }
-
-    Object.keys(ctx.results.manifest.coreFiles).forEach(coreDirName => {
-      const corePath = ctx.results.manifest.coreFiles[coreDirName];
-
-      promises.push(createCoreJs(config, corePath));
-    });
-
-    return Promise.all(promises);
+    return Promise.all(coreFiles.map(coreFile => {
+      const corePath = config.packages.path.join('core', coreFile);
+      return createCoreJs(config, corePath);
+    }));
   });
 }
 
@@ -162,6 +170,9 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
     const entryContent: string[] = [];
     bundle.components.forEach(c => {
       let importPath = config.packages.path.join(config.srcDir, c.component.componentUrl);
+      let fileMeta = createFileMeta(config.packages, ctx, importPath, '');
+      fileMeta.rebundleOnChange = true;
+
       let exportName = c.component.componentClass;
       entryContent.push(`import { ${c.component.componentClass} } from "${importPath}";`);
       entryContent.push(`exports.${exportName} = ${exportName};`);

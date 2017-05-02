@@ -9,4 +9,4 @@ import { Component } from '../index';
     wp: 'badge.wp.scss'
   }
 })
-export class Badge {}
+export class Badge {};

@@ -15,7 +15,17 @@ Start a local server at the root of the repo and check out.
 [http://localhost:3333/demos/vanilla](http://localhost:3333/demos/vanilla)
 
 
-### Development
+### ionic-web Development
+
+    npm run build.web -- dev watch
+
+
+### ionic-angular Development
+
+    npm run build.angular -- dev watch
+
+
+### Core Development
 
 Basically run `npm run transpile.watch` in one terminal.
 

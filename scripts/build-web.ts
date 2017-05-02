@@ -13,8 +13,8 @@
  * the initial ionic providers during bootstrap.
  */
 
-
-const DEV_MODE = true;
+const DEV_MODE = process.argv.indexOf('dev') > -1;
+const WATCH = process.argv.indexOf('watch') > -1;
 
 const BUNDLES = [
   { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'] },
@@ -91,6 +91,7 @@ function compileComponents() {
     devMode: DEV_MODE,
     debug: true,
     bundles: BUNDLES,
+    watch: WATCH,
     packages: {
       fs: fs,
       path: path,
@@ -118,6 +119,7 @@ function bundleComponents() {
       typescript: typescript
     },
     devMode: DEV_MODE,
+    watch: WATCH,
     debug: true
   };
 

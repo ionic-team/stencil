@@ -1,5 +1,6 @@
 import { BuildContext, Component, CompilerConfig, Manifest, Results } from './interfaces';
-import { getFileMeta, isTsSourceFile, logError, readFile, writeFile, writeFiles } from './util';
+import { createFileMeta, getFileMeta, isTsSourceFile, logError, readFile, writeFile, writeFiles } from './util';
+import { setupCompilerWatch } from './watch';
 import { transpile } from './transpile';
 
 
@@ -70,6 +71,37 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
       return generateManifest(config, ctx);
 
     }).then(() => {
+      return setupCompilerWatch(config, ctx, config.packages.typescript.sys);
+
+    }).then(() => {
+      console.log('compile, done');
+      return ctx.results;
+
+    });
+}
+
+
+export function compileWatch(config: CompilerConfig, ctx: BuildContext, changedFiles: string[]) {
+  let shouldTranspile = changedFiles.some(f => f.indexOf('.ts') > -1);
+
+  return Promise.resolve()
+    .then(() => {
+      if (shouldTranspile) {
+        return transpile(config, ctx);
+      }
+      return Promise.resolve();
+
+    }).then(() => {
+      return processStyles(config, ctx);
+
+    }).then(() => {
+      return generateManifest(config, ctx);
+
+    }).then(() => {
+      return setupCompilerWatch(config, ctx, config.packages.typescript.sys);
+
+    }).then(() => {
+      console.log('compile, done');
       return ctx.results;
 
     });
@@ -112,7 +144,8 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
               });
 
             } else if (isTsSourceFile(readPath)) {
-              getFileMeta(config, ctx, readPath).then(() => {
+              getFileMeta(config.packages, ctx, readPath).then(fileMeta => {
+                fileMeta.recompileOnChange = true;
                 resolve();
               });
 
@@ -154,13 +187,13 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
     Object.keys(f.cmpMeta.modes).forEach(modeName => {
-      const mode = f.cmpMeta.modes[modeName];
+      const mode = Object.assign({}, f.cmpMeta.modes[modeName]);
 
       if (mode && mode.styleUrls) {
         mode.styleUrls.forEach(styleUrl => {
-          const srcAbsolutePath = config.packages.path.join(f.srcDir, styleUrl);
-
-          promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, srcAbsolutePath));
+          const scssFileName = config.packages.path.basename(styleUrl);
+          const scssFilePath = config.packages.path.join(f.srcDir, scssFileName);
+          promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, scssFilePath));
         });
       }
 
@@ -214,6 +247,9 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
         result.stats.includedFiles.forEach((includedFile: string) => {
           if (includedSassFiles.indexOf(includedFile) === -1) {
             includedSassFiles.push(includedFile);
+
+            const fileMeta = createFileMeta(config.packages, ctx, includedFile, '');
+            fileMeta.recompileOnChange = true;
           }
         });
 
@@ -243,7 +279,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
     const componentUrl = f.jsFilePath.replace(destDir + config.packages.path.sep, '');
-    const modes = f.cmpMeta.modes;
+    const modes = Object.assign({}, f.cmpMeta.modes);
     const componentDir = config.packages.path.dirname(componentUrl);
 
     Object.keys(modes).forEach(modeName => {

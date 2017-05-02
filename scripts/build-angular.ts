@@ -8,7 +8,8 @@
  */
 
 
-const DEV_MODE = false;
+const DEV_MODE = process.argv.indexOf('dev') > -1;
+const WATCH = process.argv.indexOf('watch') > -1;
 
 const BUNDLES = [
   { components: ['ion-badge'] },
@@ -37,17 +38,6 @@ const compiler = require(compilerPath);
 let srcDir = path.join(__dirname, '../../src');
 let transpiledSrcDir = path.join(__dirname, '../transpiled-angular/bindings/angular/src');
 let compiledDir = path.join(__dirname, '../compiled-ionic-angular');
-let skipBuildingCore = false;
-
-if (process.argv[2]) {
-  srcDir = process.argv[2];
-}
-console.log('build-angular core, srcDir:', srcDir);
-
-if (process.argv[3]) {
-  compiledDir = process.argv[3];
-}
-console.log('build-angular core, compiledDir:', srcDir);
 
 
 // copy compiler/index.js to the compiled ionic-angular location
@@ -67,7 +57,7 @@ Promise.resolve().then(() => {
 }).then(() => {
   // build all of the core files for ionic-angular
   // the core files are what makes up how ionic-core "works"
-  return buildBindingCore(transpiledSrcDir, compiledDir, 'core', skipBuildingCore);
+  return buildBindingCore(transpiledSrcDir, compiledDir, 'core');
 })
 
 
@@ -85,6 +75,7 @@ function compileComponents() {
     exclude: ['node_modules', 'test'],
     debug: true,
     devMode: DEV_MODE,
+    watch: WATCH,
     bundles: BUNDLES,
     packages: {
       fs: fs,

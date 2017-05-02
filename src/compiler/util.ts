@@ -1,38 +1,45 @@
-import { BuildContext, CompilerConfig, FileMeta, Packages, Results } from './interfaces';
+import { BuildContext, FileMeta, Packages, Results } from './interfaces';
 
 
-export function getFileMeta(config: CompilerConfig, ctx: BuildContext, filePath: string): Promise<FileMeta> {
+export function getFileMeta(packages: Packages, ctx: BuildContext, filePath: string): Promise<FileMeta> {
   const fileMeta = ctx.files.get(filePath);
   if (fileMeta) {
     return Promise.resolve(fileMeta);
   }
 
-  return readFile(config.packages, filePath).then(srcText => {
-    return createFileMeta(config, ctx, filePath, srcText);
+  return readFile(packages, filePath).then(srcText => {
+    return createFileMeta(packages, ctx, filePath, srcText);
   });
 }
 
 
-export function createFileMeta(config: CompilerConfig, ctx: BuildContext, filePath: string, srcText: string) {
-  const fileMeta: FileMeta = {
-    fileName: config.packages.path.basename(filePath),
-    filePath: filePath,
-    fileExt: config.packages.path.extname(filePath),
-    srcDir: config.packages.path.dirname(filePath),
-    srcText: srcText,
-    jsFilePath: null,
-    jsText: null,
-    isTsSourceFile: isTsSourceFile(filePath),
-    hasCmpClass: false,
-    cmpMeta: null,
-    cmpClassName: null
-  };
+export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: string, srcText: string) {
+  let fileMeta = ctx.files.get(filePath);
+  if (!fileMeta) {
+    fileMeta = {
+      fileName: packages.path.basename(filePath),
+      filePath: filePath,
+      fileExt: packages.path.extname(filePath),
+      srcDir: packages.path.dirname(filePath),
+      srcText: srcText,
+      jsFilePath: null,
+      jsText: null,
+      isTsSourceFile: isTsSourceFile(filePath),
+      isScssSourceFile: isScssSourceFile(filePath),
+      hasCmpClass: false,
+      cmpMeta: null,
+      cmpClassName: null,
+      isWatching: false,
+      recompileOnChange: false,
+      rebundleOnChange: false
+    };
 
-  if (fileMeta.isTsSourceFile) {
-    fileMeta.hasCmpClass = hasCmpClass(config, fileMeta.srcText, fileMeta.filePath);
+    ctx.files.set(filePath, fileMeta);
   }
 
-  ctx.files.set(filePath, fileMeta);
+  if (fileMeta.isTsSourceFile) {
+    fileMeta.hasCmpClass = hasCmpClass(fileMeta.srcText, fileMeta.filePath);
+  }
 
   return fileMeta;
 }
@@ -194,15 +201,22 @@ export function isTsSourceFile(filePath: string) {
 }
 
 
-export function hasCmpClass(config: CompilerConfig, sourceText: string, filePath: string) {
+export function isScssSourceFile(filePath: string) {
+  const parts = filePath.toLowerCase().split('.');
+  if (parts.length > 1) {
+    return (parts[parts.length - 1] === 'scss');
+  }
+  return false;
+}
+
+
+export function hasCmpClass(sourceText: string, filePath: string) {
   if (sourceText.indexOf('@Component') === -1) {
     return false;
   }
 
   if (sourceText.indexOf('@angular/core') > -1) {
-    if (config.debug) {
-      console.log(`compile, skipping @angular/core component: ${filePath}`);
-    }
+    console.log(`compile, skipping @angular/core component: ${filePath}`);
     return false;
   }
 

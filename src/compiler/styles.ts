@@ -1,13 +1,14 @@
-import { BundlerConfig, ComponentMode } from './interfaces';
+import { BundlerConfig, BuildContext, ComponentMode } from './interfaces';
+import { createFileMeta } from './util';
 
 
-export function bundleComponentModeStyles(config: BundlerConfig, mode: ComponentMode) {
+export function bundleComponentModeStyles(config: BundlerConfig, ctx: BuildContext, mode: ComponentMode) {
   if (!mode || !mode.styleUrls) {
     return Promise.resolve();
   }
 
   return Promise.all(mode.styleUrls.map(styleUrl => {
-    return bundleComponentModeStyle(config, styleUrl);
+    return bundleComponentModeStyle(config, ctx, styleUrl);
 
   })).then(results => {
     mode.styles = results.join('');
@@ -15,9 +16,11 @@ export function bundleComponentModeStyles(config: BundlerConfig, mode: Component
 }
 
 
-export function bundleComponentModeStyle(config: BundlerConfig, styleUrl: string) {
+export function bundleComponentModeStyle(config: BundlerConfig, ctx: BuildContext, styleUrl: string) {
   return new Promise((resolve, reject) => {
     const scssFilePath = config.packages.path.join(config.srcDir, styleUrl);
+    const fileMeta = createFileMeta(config.packages, ctx, scssFilePath, '');
+    fileMeta.rebundleOnChange = true;
 
     const sassConfig = {
       file: scssFilePath,
