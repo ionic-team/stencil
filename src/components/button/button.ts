@@ -89,6 +89,7 @@ export class Button {
    */
   @Prop() default: boolean = false;
 
+  @Prop() disabled: boolean = false;
   /**
    * @input {boolean} If true, activates a transparent button style with a border.
    * Type: style
@@ -229,8 +230,11 @@ export class Button {
       }, {});
 
     return h(this,
-      h('div', {
-        class: buttonClasses
+      h('button', {
+        class: buttonClasses,
+        props: {
+          disabled: this.disabled
+        }
       },
         [
           h('span', {
