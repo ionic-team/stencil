@@ -11,7 +11,8 @@ $menu-width:                 304px !default;
 $menu-small-width:           $menu-width - 40px !default;
 
 
-ion-menu {
+ion-menu,
+:host {
   position: absolute;
   top: 0;
   right: 0;
@@ -19,6 +20,7 @@ ion-menu {
   left: 0;
 
   display: none;
+  visibility: inherit !important;
 
   contain: strict;
 }

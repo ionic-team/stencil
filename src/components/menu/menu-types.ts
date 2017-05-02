@@ -1,11 +1,5 @@
-// import { Animation } from '../../animations/animation';
-// import { Menu, MenuType as IMenuType } from '../app/menu-interface';
-// import { MenuController } from '../app/menu-controller';
-// import { Platform } from '../../platform/platform';
-
 
 // /**
-//  * @hidden
 //  * Menu Type
 //  * Base class which is extended by the various types. Each
 //  * type will provide their own animations for open and close

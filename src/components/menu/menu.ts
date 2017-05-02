@@ -1,58 +1,93 @@
-import { Component, h, Ionic } from '../index';
+import { Component, h, Ionic, Prop } from '../index';
 // import { Menu as MenuInterface, MenuType } from './menu-interface';
 
 
 @Component({
   tag: 'ion-menu',
-  loadOnIdle: true
+  styleUrls: {
+    'default': 'menu.scss'
+  }
 })
 export class Menu {
+  isOpen: boolean = false;
+
+  @Prop() content: any;
+  @Prop() enabled: boolean = true;
+  @Prop() id: string;
+  @Prop() maxEdgeStart: number = 50;
+  @Prop() persistent: boolean = false;
+  @Prop() side: string = 'start';
+  @Prop() swipeEnabled: boolean = true;
+  @Prop() type: string;
+
+  // @Prop() ionDrag: EventEmitter<number> = new EventEmitter<number>();
+  // @Prop() ionOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
+  // @Prop() ionClose: EventEmitter<boolean> = new EventEmitter<boolean>();
+
 
   render() {
-    // '<div class="menu-inner"><ng-content></ng-content></div>' +
-    // '<ion-backdrop></ion-backdrop>',
+    let menuTag: any;
+    if (this.type === 'push') {
+      menuTag = 'ion-menu-push';
 
-    return h(this,
-      h('ion-gesture.menu-inner', Ionic.theme(this, 'menu', {
-        props: {
-          // 'canStart': this.canStart.bind(this),
-          // 'onStart': this.onDragStart.bind(this),
-          // 'onMove': this.onDragMove.bind(this),
-          // 'onEnd': this.onDragEnd.bind(this),
-          // 'onPress': this.toggle.bind(this),
-          'gestureName': 'menu',
-          'gesturePriority': 30,
-          'type': 'pan,press',
-          'direction': 'x',
-          'threshold': 20,
-          'listenOn': 'parent'
-        },
-        attrs: {
-          'role': 'navigation'
-        }
-      }),
-        h('slot')
-      )
+    } else if (this.type === 'overlay') {
+      // iOS
+      menuTag = 'ion-menu-overlay';
+
+    } else {
+      // Material Design and Windows
+      menuTag = 'ion-menu-reveal';
+    }
+
+    return h(this, { attrs: { 'role': 'navigation'} }, [
+      h(`${menuTag}.menu-inner`, Ionic.theme(this, 'menu-' + menuTag, {
+          props: {
+            // 'canStart': this.canStart.bind(this),
+            // 'onStart': this.onDragStart.bind(this),
+            // 'onMove': this.onDragMove.bind(this),
+            // 'onEnd': this.onDragEnd.bind(this),
+            // 'onPress': this.toggle.bind(this),
+            // 'gestureName': 'menu',
+            // 'gesturePriority': 30,
+            // 'type': 'pan,press',
+            // 'direction': 'x',
+            // 'threshold': 20,
+            // 'listenOn': 'parent'
+          }
+        }),
+          h('slot')
+        )
+      ]
     );
+    // return h(this, [
+    //   h('ion-gesture.menu-inner', Ionic.theme(this, 'menu', {
+    //       props: {
+    //         // 'canStart': this.canStart.bind(this),
+    //         // 'onStart': this.onDragStart.bind(this),
+    //         // 'onMove': this.onDragMove.bind(this),
+    //         // 'onEnd': this.onDragEnd.bind(this),
+    //         // 'onPress': this.toggle.bind(this),
+    //         'gestureName': 'menu',
+    //         'gesturePriority': 30,
+    //         'type': 'pan,press',
+    //         'direction': 'x',
+    //         'threshold': 20,
+    //         'listenOn': 'parent'
+    //       },
+    //       attrs: {
+    //         'role': 'navigation'
+    //       }
+    //     }),
+    //       h('slot')
+    //     ),
+    //     h('ion-backdrop', {
+    //       'on': {
+    //         'click': this.onBackdropClick.bind(this)
+    //       }
+    //     })
+    //   ]
+    // );
   }
-
-  // private _cntEle: HTMLElement;
-  // private _gesture: MenuContentGesture;
-  // private _type: MenuType;
-  // private _isEnabled: boolean;
-  // private _isSwipeEnabled: boolean = true;
-  // private _isAnimating: boolean = false;
-  // private _isPersistent: boolean = false;
-  // private _init: boolean = false;
-  // private _events: UIEventManager;
-  // private _gestureBlocker: BlockerDelegate;
-  // private _isPane: boolean = false;
-  // private _side: Side;
-
-  // /**
-  //  * @hidden
-  //  */
-  // isOpen: boolean = false;
 
   // /**
   //  * @hidden
@@ -74,123 +109,8 @@ export class Menu {
   //  */
   // @ContentChild(Nav) menuNav: Nav;
 
-  // /**
-  //  * @input {any} A reference to the content element the menu should use.
-  //  */
-  // @Input() content: any;
 
-  // /**
-  //  * @input {string} An id for the menu.
-  //  */
-  // @Input() id: string;
-
-  // /**
-  //  * @input {string} The display type of the menu. Default varies based on the mode,
-  //  * see the `menuType` in the [config](../../config/Config). Available options:
-  //  * `"overlay"`, `"reveal"`, `"push"`.
-  //  */
-  // @Input() type: string;
-
-  // /**
-  //  * @input {boolean} If true, the menu is enabled. Default `true`.
-  //  */
-  // @Input()
-  // get enabled(): boolean {
-  //   return this._isEnabled;
-  // }
-
-  // set enabled(val: boolean) {
-  //   const isEnabled = isTrueProperty(val);
-  //   this.enable(isEnabled);
-  // }
-
-  // /**
-  //  * @input {string} Which side of the view the menu should be placed. Default `"left"`.
-  //  */
-  // @Input()
-  // get side(): Side {
-  //   return this._side;
-  // }
-
-  // set side(val: Side) {
-  //   this.isRightSide = isRightSide(val, this._plt.isRTL);
-  //   if (this.isRightSide) {
-  //     this._side = 'right';
-  //   } else {
-  //     this._side = 'left';
-  //   }
-  // }
-
-  // /**
-  //  * @input {boolean} If true, swiping the menu is enabled. Default `true`.
-  //  */
-  // @Input()
-  // get swipeEnabled(): boolean {
-  //   return this._isSwipeEnabled;
-  // }
-
-  // set swipeEnabled(val: boolean) {
-  //   const isEnabled = isTrueProperty(val);
-  //   this.swipeEnable(isEnabled);
-  // }
-
-  // /**
-  //  * @input {boolean} If true, the menu will persist on child pages.
-  //  */
-  // @Input()
-  // get persistent(): boolean {
-  //   return this._isPersistent;
-  // }
-
-  // set persistent(val: boolean) {
-  //   this._isPersistent = isTrueProperty(val);
-  // }
-
-  // /**
-  //  * @hidden
-  //  */
-  // @Input() maxEdgeStart: number;
-
-  // /**
-  //  * @output {event} Emitted when the menu is being dragged open.
-  //  */
-  // @Output() ionDrag: EventEmitter<number> = new EventEmitter<number>();
-
-  // /**
-  //  * @output {event} Emitted when the menu has been opened.
-  //  */
-  // @Output() ionOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  // /**
-  //  * @output {event} Emitted when the menu has been closed.
-  //  */
-  // @Output() ionClose: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  // constructor(
-  //   public _menuCtrl: MenuController,
-  //   private _elementRef: ElementRef,
-  //   private _config: Config,
-  //   private _plt: Platform,
-  //   private _renderer: Renderer,
-  //   private _keyboard: Keyboard,
-  //   private _zone: NgZone,
-  //   private _gestureCtrl: GestureController,
-  //   private _domCtrl: DomController,
-  //   private _app: App,
-  // ) {
-  //   this._events = new UIEventManager(_plt);
-  //   this._gestureBlocker = _gestureCtrl.createBlocker({
-  //     disable: [GESTURE_GO_BACK_SWIPE]
-  //   });
-  //   this.side = 'start';
-  // }
-
-  // /**
-  //  * @hidden
-  //  */
-  // ngOnInit() {
-  //   this._init = true;
-
+  // ionViewDidLoad() {
   //   let content = this.content;
   //   this._cntEle = (content instanceof Node) ? content : content && content.getNativeElement && content.getNativeElement();
 
@@ -226,16 +146,17 @@ export class Menu {
 
   //   // mask it as enabled / disabled
   //   this.enable(isEnabled);
+
+  //   // this._gestureBlocker = _gestureCtrl.createBlocker({
+  //   //   disable: [GESTURE_GO_BACK_SWIPE]
+  //   // });
   // }
 
-  // /**
-  //  * @hidden
-  //  */
-  // onBackdropClick(ev: UIEvent) {
-  //   ev.preventDefault();
-  //   ev.stopPropagation();
-  //   this._menuCtrl.close();
-  // }
+  onBackdropClick(ev: UIEvent) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    // this._menuCtrl.close();
+  }
 
   // /**
   //  * @hidden

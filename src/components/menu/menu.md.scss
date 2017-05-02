@@ -15,18 +15,18 @@ $menu-md-box-shadow-color:      rgba(0, 0, 0, .25) !default;
 $menu-md-box-shadow:            0 0 10px $menu-md-box-shadow-color !default;
 
 
-.md .menu-inner {
+.menu-md {
   background: $menu-md-background;
 }
 
-.md .menu-content-reveal {
+.menu-md .menu-content-reveal {
   box-shadow: $menu-md-box-shadow;
 }
 
-.md .menu-content-push {
+.menu-md .menu-content-push {
   box-shadow: $menu-md-box-shadow;
 }
 
-.md ion-menu[type=overlay] .menu-inner {
+ion-menu[type=overlay] .menu-md {
   box-shadow: $menu-md-box-shadow;
 }
