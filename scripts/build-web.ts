@@ -74,6 +74,15 @@ Promise.resolve().then(() => {
     // then prepend the component registry to the top of the loader file
     return buildWebLoader(results.componentRegistry, DEV_MODE);
   });
+
+}).catch(err => {
+  if (err) {
+    if (err.stack) {
+      console.log(err.stack);
+    } else {
+      console.log(err);
+    }
+  }
 });
 
 

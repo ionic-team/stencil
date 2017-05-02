@@ -14,6 +14,8 @@ export function getFileMeta(packages: Packages, ctx: BuildContext, filePath: str
 
 
 export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: string, srcText: string) {
+  ctx.files = ctx.files || new Map();
+
   let fileMeta = ctx.files.get(filePath);
   if (!fileMeta) {
     fileMeta = {
