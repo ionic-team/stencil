@@ -14,7 +14,7 @@
  */
 
 
-const DEV_MODE = false;
+const DEV_MODE = true;
 
 const BUNDLES = [
   { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'] },
