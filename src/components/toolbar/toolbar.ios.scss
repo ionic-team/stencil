@@ -45,7 +45,7 @@ $toolbar-button-ios-strong-font-weight:     600 !default;
 // iOS Toolbar Background
 // --------------------------------------------------
 
-:host(.toolbar-background-ios) {
+.toolbar-background-ios {
   background: $toolbar-ios-background;
 }
 
