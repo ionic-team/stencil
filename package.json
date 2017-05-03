@@ -5,10 +5,11 @@
   "license": "MIT",
   "scripts": {
     "clean": "rimraf dist/",
+    "copy.angular": "node dist/scripts/copy-angular.js",
     "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.universal",
     "build.compiler": "node dist/scripts/build-compiler.js",
     "build.web": "node dist/scripts/build-web.js",
-    "build.angular": "node dist/scripts/build-angular.js",
+    "build.angular": "npm run copy.angular && node dist/scripts/build-angular.js",
     "build.universal": "node dist/scripts/build-universal.js",
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",

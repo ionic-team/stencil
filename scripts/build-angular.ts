@@ -10,18 +10,9 @@
 
 const DEV_MODE = process.argv.indexOf('dev') > -1;
 const WATCH = process.argv.indexOf('watch') > -1;
-const ionicDir = process.argv[2];
-
-const BUNDLES = [
-  { components: ['ion-badge'] },
-  { components: ['ion-button'] },
-  { components: ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'] },
-  { components: ['ion-gesture'], priority: 'low' },
-  { components: ['ion-toggle'] },
-  { components: ['ion-slides', 'ion-slide'] },
-];
 
 
+import { BUNDLES } from './angular-bundles';
 import { buildBindingCore } from './build-core';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
@@ -53,11 +44,7 @@ Promise.resolve().then(() => {
   // find all the source components and compile
   // them into reusable components, and create a manifest.json
   // where all the components can be found, and their styles.
-  return compileComponents().then(results => {
-    if (ionicDir) {
-      copyCoreToIonicAngular(results.files, ionicDir);
-    }
-  });
+  return compileComponents();
 
 }).then(() => {
   // build all of the core files for ionic-angular
@@ -94,42 +81,3 @@ function compileComponents() {
 
   return compiler.compile(config, ctx);
 }
-
-
-function copyCoreToIonicAngular(srcCorePaths: string[], ionicDir: string) {
-  console.log(`ionicDir`, ionicDir);
-
-  const destComponents = path.join(ionicDir, 'src/components');
-  const destThemes = path.join(ionicDir, 'src/themes');
-
-  srcCorePaths.forEach(srcCorePath => {
-    console.log(`srcCorePath`, srcCorePath);
-    let parts = srcCorePath.split(path.sep);
-    let copyTo: string;
-
-    if (parts[parts.length - 3] === 'components') {
-      const componentName = parts[parts.length - 2];
-      const isInBundle = BUNDLES.some(b => b.components.some(c => c === `ion-${componentName}`));
-
-      if (isInBundle) {
-        copyTo = path.join(destComponents, parts[parts.length - 2], parts[parts.length - 1]);
-      }
-
-    } else if (parts[parts.length - 2] === 'themes') {
-      copyTo = path.join(destThemes, parts[parts.length - 1]);
-    }
-
-    if (copyTo) {
-      fs.ensureDirSync(path.dirname(copyTo));
-
-      console.log(`copy from`, srcCorePath, 'to', copyTo);
-      fs.copy(srcCorePath, copyTo, err => {
-        if (err) {
-          console.log(err)
-        }
-      });
-    }
-
-  });
-}
-
