@@ -111,6 +111,7 @@ function createTsCompilerConfigs(config: CompilerConfig) {
   tsCompilerOptions.target = getTsScriptTarget(config.compilerOptions.target);
   tsCompilerOptions.isolatedModules = true;
   tsCompilerOptions.allowSyntheticDefaultImports = true;
+  tsCompilerOptions.allowJs = true;
 
   tsCompilerOptions.lib = tsCompilerOptions.lib || [];
   if (!tsCompilerOptions.lib.indexOf('lib.dom.d.ts')) {
