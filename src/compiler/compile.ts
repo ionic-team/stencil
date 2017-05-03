@@ -48,7 +48,9 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
     ctx.files = new Map();
   }
 
-  ctx.results = {};
+  ctx.results = {
+    files: []
+  };
 
   config.include = config.include || [];
 
@@ -146,6 +148,13 @@ function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
             } else if (isTsSourceFile(readPath)) {
               getFileMeta(config.packages, ctx, readPath).then(fileMeta => {
                 fileMeta.recompileOnChange = true;
+
+                if (fileMeta.filePath && fileMeta.hasCmpClass) {
+                  if (ctx.results.files.indexOf(fileMeta.filePath) === -1) {
+                    ctx.results.files.push(fileMeta.filePath);
+                  }
+                }
+
                 resolve();
               });
 
@@ -234,6 +243,10 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
       file: scssFilePath
     };
 
+    if (ctx.results.files.indexOf(scssFilePath) === -1) {
+      ctx.results.files.push(scssFilePath);
+    }
+
     if (config.debug) {
       console.log(`compile, getIncludedSassFiles: ${scssFilePath}`);
     }
@@ -247,9 +260,12 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
         result.stats.includedFiles.forEach((includedFile: string) => {
           if (includedSassFiles.indexOf(includedFile) === -1) {
             includedSassFiles.push(includedFile);
-
             const fileMeta = createFileMeta(config.packages, ctx, includedFile, '');
             fileMeta.recompileOnChange = true;
+          }
+
+          if (ctx.results.files.indexOf(includedFile) === -1) {
+            ctx.results.files.push(includedFile);
           }
         });
 

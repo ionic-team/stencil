@@ -51,20 +51,18 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
 
     }).then(() => {
       return setupBundlerWatch(config, ctx, config.packages.typescript.sys);
-
-    }).then(() => {
-      console.log('bundle, done');
-      return ctx.results;
-
     });
 
+  }).then(() => {
+    console.log('bundle, done');
+    return ctx.results;
   });
 }
 
 
 export function bundleWatch(config: BundlerConfig, ctx: BuildContext, changedFiles: string[]) {
   changedFiles;
-  bundle(config, ctx);
+  return bundle(config, ctx);
 }
 
 
@@ -289,7 +287,9 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
       }
     });
 
-    ctx.results.files.push(bundle.filePath);
+    if (ctx.results.files.indexOf(bundle.filePath) === -1) {
+      ctx.results.files.push(bundle.filePath);
+    }
 
     filesToWrite.set(bundle.filePath, bundle.content);
   });
