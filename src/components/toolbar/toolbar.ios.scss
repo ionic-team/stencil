@@ -35,7 +35,7 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
 $toolbar-button-ios-strong-font-weight:     600 !default;
 
 
-.toolbar-ios {
+:host(.toolbar-ios) {
   padding: $toolbar-ios-padding;
 
   min-height: $toolbar-ios-height;
@@ -45,7 +45,7 @@ $toolbar-button-ios-strong-font-weight:     600 !default;
 // iOS Toolbar Background
 // --------------------------------------------------
 
-.toolbar-background-ios {
+:host(.toolbar-background-ios) {
   background: $toolbar-ios-background;
 }
 
@@ -53,25 +53,25 @@ $toolbar-button-ios-strong-font-weight:     600 !default;
 // iOS Header / Footer Borders
 // --------------------------------------------------
 
-.header-ios .toolbar-background-ios,
-.footer-ios .toolbar-background-ios {
+:host-context(.header-ios) .toolbar-background-ios,
+:host-context(.footer-ios) .toolbar-background-ios {
   border-style: solid;
   border-color: $toolbar-ios-border-color;
 }
 
-.header-ios .toolbar-ios:last-child .toolbar-background-ios {
+:host-context(.header-ios) :host(.toolbar-ios):last-child .toolbar-background-ios {
   border-width: 0 0 $hairlines-width;
 }
 
-.footer-ios .toolbar-ios:first-child .toolbar-background-ios {
+:host-context(.footer-ios) :host(.toolbar-ios):first-child .toolbar-background-ios {
   border-width: $hairlines-width 0 0;
 }
 
-.header-ios[no-border] .toolbar-ios:last-child .toolbar-background-ios {
+:host-context(.header-ios[no-border]) :host(.toolbar-ios):last-child .toolbar-background-ios {
   border-bottom-width: 0;
 }
 
-.footer-ios[no-border] .toolbar-ios:first-child .toolbar-background-ios {
+:host-context(.footer-ios[no-border]) :host(.toolbar-ios):first-child .toolbar-background-ios {
   border-top-width: 0;
 }
 
@@ -87,7 +87,7 @@ $toolbar-button-ios-strong-font-weight:     600 !default;
 }
 
 @mixin ios-toolbar-theme($color-name, $color-base, $color-contrast) {
-  .toolbar-ios-#{$color-name} {
+  :host(.toolbar-ios-#{$color-name}) {
 
     .toolbar-background-ios {
       background: $color-base;

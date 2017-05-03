@@ -35,7 +35,7 @@ $navbar-wp-height:                       $toolbar-wp-height !default;
 $toolbar-button-wp-strong-font-weight:   bold !default;
 
 
-.toolbar-wp {
+:host(.toolbar-wp) {
   padding: $toolbar-wp-padding;
 
   min-height: $toolbar-wp-height;
@@ -64,21 +64,21 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 
 @mixin wp-toolbar-theme($color-name, $color-base, $color-contrast) {
 
-  .toolbar-wp-#{$color-name} .toolbar-background-wp {
+  :host(.toolbar-wp-#{$color-name}) .toolbar-background-wp {
     background: $color-base;
   }
 
-  .toolbar-wp-#{$color-name} .bar-button-clear-wp,
-  .toolbar-wp-#{$color-name} .bar-button-default-wp,
-  .toolbar-wp-#{$color-name} .bar-button-outline-wp {
+  :host(.toolbar-wp-#{$color-name}) .bar-button-clear-wp,
+  :host(.toolbar-wp-#{$color-name}) .bar-button-default-wp,
+  :host(.toolbar-wp-#{$color-name}) .bar-button-outline-wp {
     color: $color-contrast;
   }
 
-  .toolbar-wp-#{$color-name} .bar-button-outline-wp {
+  :host(.toolbar-wp-#{$color-name}) .bar-button-outline-wp {
     border-color: $color-contrast;
   }
 
-  .toolbar-wp-#{$color-name} {
+  :host(.toolbar-wp-#{$color-name}) {
     @each $color-name, $color-base, $color-contrast in get-colors($colors-wp) {
       @include wp-bar-button-default($color-name, $color-base, $color-contrast);
       @include wp-bar-button-outline($color-name, $color-base, $color-contrast);

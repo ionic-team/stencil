@@ -98,10 +98,16 @@ import { Component, h, Ionic } from '../index';
   }
 })
 export class Toolbar {
+  $el: HTMLElement;
   private sbPadding: boolean;
 
   constructor() {
     this.sbPadding = Ionic.config.getBoolean('statusbarPadding');
+  }
+
+  ionViewDidLoad() {
+    const ionButtons = this.$el.shadowRoot.querySelectorAll('ion-button');
+    console.log(ionButtons.length);
   }
 
   render() {
