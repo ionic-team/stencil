@@ -4,7 +4,6 @@
 // Title
 // --------------------------------------------------
 
-ion-title,
 :host {
   display: flex;
   visibility: inherit !important;
@@ -15,7 +14,7 @@ ion-title,
   transform: translateZ(0);
 }
 
-.toolbar-title {
+:host(.toolbar-title) {
   display: block;
   overflow: hidden;
 

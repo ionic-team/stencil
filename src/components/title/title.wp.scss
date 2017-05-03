@@ -22,7 +22,7 @@ $toolbar-wp-title-text-color:            color-contrast($colors-wp, $toolbar-wp-
 
 
 
-.toolbar-title-wp {
+:host(.toolbar-title-wp) {
   padding: $toolbar-wp-title-padding;
 
   font-size: $toolbar-wp-title-font-size;
@@ -33,7 +33,7 @@ $toolbar-wp-title-text-color:            color-contrast($colors-wp, $toolbar-wp-
 
 @mixin wp-toolbar-title-theme($color-name, $color-base, $color-contrast) {
 
-  .toolbar-wp-#{$color-name} .toolbar-title-wp {
+  :host-context(.toolbar-wp-#{$color-name}) :host(.toolbar-title-wp) {
     color: $color-contrast;
   }
 
