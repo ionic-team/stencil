@@ -6,16 +6,27 @@ import * as ts from 'typescript';
 
 
 export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<any> {
-  const tsFileNames = getTsFileNames(ctx);
+  const tsFilePaths = getTsFilePaths(ctx);
 
-  if (config.debug) {
-    tsFileNames.forEach(tsFileName => {
-      console.log(`compile, transpile: ${tsFileName}`);
-    });
+  ctx.files.forEach(f => {
+    if (f.isTsSourceFile) {
+      f.transpiledCount++;
+    }
+  });
+
+  return transpileFiles(tsFilePaths, config, ctx);
+}
+
+
+export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ctx: BuildContext): Promise<any> {
+  if (!tsFilePaths.length) {
+    return Promise.resolve();
   }
 
-  if (!tsFileNames.length) {
-    return Promise.resolve();
+  if (config.debug) {
+    tsFilePaths.forEach(tsFileName => {
+      console.log(`compile, transpile: ${tsFileName}`);
+    });
   }
 
   const sourcesMap = new Map<string, ts.SourceFile>();
@@ -70,7 +81,7 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
     }
   };
 
-  const program = ts.createProgram(tsFileNames, tsCompilerOptions, tsHost);
+  const program = ts.createProgram(tsFilePaths, tsCompilerOptions, tsHost);
 
   if (program.getSyntacticDiagnostics().length > 0) {
     return Promise.reject(program.getSyntacticDiagnostics());
@@ -116,16 +127,16 @@ function createTsCompilerConfigs(config: CompilerConfig) {
 }
 
 
-function getTsFileNames(ctx: BuildContext) {
-  const fileNames: string[] = [];
+function getTsFilePaths(ctx: BuildContext) {
+  const filePaths: string[] = [];
 
   ctx.files.forEach(fileMeta => {
     if (fileMeta.isTsSourceFile && fileMeta.hasCmpClass) {
-      fileNames.push(fileMeta.filePath);
+      filePaths.push(fileMeta.filePath);
     }
   });
 
-  return fileNames;
+  return filePaths;
 }
 
 

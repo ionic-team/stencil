@@ -1,7 +1,7 @@
 import { BuildContext, Component, CompilerConfig, Manifest, Results } from './interfaces';
 import { createFileMeta, getFileMeta, isTsSourceFile, logError, readFile, writeFile, writeFiles } from './util';
 import { setupCompilerWatch } from './watch';
-import { transpile } from './transpile';
+import { transpile, transpileFiles } from './transpile';
 
 
 /**
@@ -58,11 +58,11 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
     config.exclude = ['node_modules', 'bower_components'];
   }
 
-  const promises = config.include.map(includePath => {
+  const scanDirPromises = config.include.map(includePath => {
     return scanDirectory(includePath, config, ctx);
   });
 
-  return Promise.all(promises)
+  return Promise.all(scanDirPromises)
     .then(() => {
       return transpile(config, ctx);
 
@@ -84,14 +84,32 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
 
 
 export function compileWatch(config: CompilerConfig, ctx: BuildContext, changedFiles: string[]) {
-  let shouldTranspile = changedFiles.some(f => f.indexOf('.ts') > -1);
-
-  return Promise.resolve()
-    .then(() => {
-      if (shouldTranspile) {
-        return transpile(config, ctx);
+  const scanDirs: string[] = [];
+  changedFiles.forEach(filePath => {
+    if (isTsSourceFile(filePath)) {
+      const dirPath = config.packages.path.dirname(filePath);
+      if (scanDirs.indexOf(dirPath) === -1) {
+        scanDirs.push(dirPath);
       }
-      return Promise.resolve();
+    }
+  });
+
+  const scanDirPromises = scanDirs.map(dirPath => {
+    return scanDirectory(dirPath, config, ctx);
+  });
+
+  return Promise.all(scanDirPromises)
+    .then(() => {
+      const tsFilesToRetranspile: string[] = [];
+
+      ctx.files.forEach(f => {
+        if (f.isTsSourceFile && f.transpiledCount === 0) {
+          tsFilesToRetranspile.push(f.filePath);
+          f.transpiledCount++;
+        }
+      });
+
+      return transpileFiles(tsFilesToRetranspile, config, ctx);
 
     }).then(() => {
       return processStyles(config, ctx);

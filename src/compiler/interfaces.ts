@@ -52,6 +52,7 @@ export interface FileMeta {
   isWatching: boolean;
   recompileOnChange: boolean;
   rebundleOnChange: boolean;
+  transpiledCount: number;
 }
 
 

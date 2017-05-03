@@ -33,7 +33,8 @@ export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: 
       cmpClassName: null,
       isWatching: false,
       recompileOnChange: false,
-      rebundleOnChange: false
+      rebundleOnChange: false,
+      transpiledCount: 0
     };
 
     ctx.files.set(filePath, fileMeta);

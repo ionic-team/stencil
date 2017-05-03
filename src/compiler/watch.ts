@@ -12,6 +12,10 @@ export function setupCompilerWatch(config: CompilerConfig, ctx: BuildContext, ts
   let timerId: NodeJS.Timer;
 
   function compilerFileChanged(config: CompilerConfig, ctx: BuildContext, changedFile: string) {
+    if (changedFiles.indexOf(changedFile) === -1) {
+      changedFiles.push(changedFile);
+    }
+
     const wasDeleted = ctx.files.delete(changedFile);
 
     if (config.debug) {
@@ -25,10 +29,10 @@ export function setupCompilerWatch(config: CompilerConfig, ctx: BuildContext, ts
         console.log(`recompile`);
       }
 
-      compileWatch(config, ctx, changedFiles);
+      compileWatch(config, ctx, changedFiles.slice());
 
       changedFiles.length = 0;
-    }, 250);
+    }, 200);
   }
 
   config.include.forEach(includePath => {
@@ -62,7 +66,9 @@ export function setupBundlerWatch(config: BundlerConfig, ctx: BuildContext, tsSy
   let timerId: NodeJS.Timer;
 
   function bundlerFileChanged(config: BundlerConfig, ctx: BuildContext, changedFile: string) {
-    changedFiles.push(changedFile);
+    if (changedFiles.indexOf(changedFile) === -1) {
+      changedFiles.push(changedFile);
+    }
 
     clearTimeout(timerId);
 
@@ -70,10 +76,10 @@ export function setupBundlerWatch(config: BundlerConfig, ctx: BuildContext, tsSy
       if (config.debug) {
         console.log(`rebundle`);
       }
-      bundleWatch(config, ctx, changedFiles);
+      bundleWatch(config, ctx, changedFiles.slice());
 
       changedFiles.length = 0;
-    }, 250);
+    }, 200);
   }
 
   tsSys.watchDirectory(config.srcDir === '' ? '.' : config.srcDir, (changedFile) => {

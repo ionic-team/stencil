@@ -78,10 +78,12 @@ Promise.resolve().then(() => {
 }).catch(err => {
   if (err) {
     if (err.stack) {
-      console.log(err.stack);
+      console.log('build.web', err.stack);
     } else {
-      console.log(err);
+      console.log('build.web', err);
     }
+  } else {
+    console.log('build.web error');
   }
 });
 
