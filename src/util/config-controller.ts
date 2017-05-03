@@ -9,9 +9,12 @@ export function ConfigController(configObj: any, platforms: PlatformConfig[]): C
       return configObj[key];
     }
 
-    for (var i = 0; i < platforms.length; i++) {
-      if (platforms[i]['settings'][key] !== undefined) {
-        return platforms[i]['settings'][key];
+    let settings: any = null;
+
+    for (let i = 0; i < platforms.length; i++) {
+      settings = platforms[i]['settings'];
+      if (settings && settings[key] !== undefined) {
+        return settings[key];
       }
     }
 
