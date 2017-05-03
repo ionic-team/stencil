@@ -1,23 +1,12 @@
 import { Component, VNode, VNodeData } from '../util/interfaces';
-import { h } from './renderer/core';
 
 
-export function generateVNode(elm: Node, instance: Component, hostCss: string): VNode {
-  let vnode = instance.render && instance.render();
+export function generateVNode(elm: Node, instance: Component): VNode {
+  const vnode = instance.render && instance.render();
   if (vnode) {
     vnode.elm = elm;
-
-  } else {
-    // use the default render function instead
-    vnode = h(elm,
-      h('div',
-        themeVNodeData(instance, hostCss),
-        h('slot')
-      )
-    );
+    delete vnode.sel;
   }
-
-  delete vnode.sel;
 
   return vnode;
 }

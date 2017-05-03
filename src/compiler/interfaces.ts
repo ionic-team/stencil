@@ -132,7 +132,6 @@ export interface ComponentMeta {
   watchers?: Watchers;
   shadow?: boolean;
   observedAttrs?: string[];
-  hostCss?: string;
   componentModule?: any;
   modes: {[modeName: string]: ComponentMode};
 }

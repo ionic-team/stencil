@@ -1,4 +1,4 @@
-import { Component } from '../index';
+import { Component, h, Ionic } from '../index';
 
 
 @Component({
@@ -9,4 +9,10 @@ import { Component } from '../index';
     wp: 'avatar.wp.scss'
   }
 })
-export class Avatar {}
+export class Avatar {
+  render() {
+    return h(this, Ionic.theme(this, 'avatar'),
+      h('slot')
+    );
+  }
+}

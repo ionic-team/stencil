@@ -1,4 +1,4 @@
-import { Component } from '../index';
+import { Component, h, Ionic } from '../index';
 
 
 @Component({
@@ -9,4 +9,10 @@ import { Component } from '../index';
     wp: 'item-divider.wp.scss'
   }
 })
-export class ItemDivider {}
+export class ItemDivider {
+  render() {
+    return h(this, Ionic.theme(this, 'item-divider'),
+      h('slot')
+    );
+  }
+}

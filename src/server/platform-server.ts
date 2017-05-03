@@ -71,10 +71,6 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
     cmpMeta.tag = tag;
     cmpMeta.props = props;
 
-    const hostCssParts = cmpMeta.tag.split('-');
-    hostCssParts.shift();
-    cmpMeta.hostCss = hostCssParts.join('-');
-
     props.color = {};
     props.mode = {};
 

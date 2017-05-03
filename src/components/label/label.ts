@@ -1,4 +1,4 @@
-import { Component } from '../index';
+import { Component, h, Ionic } from '../index';
 
 
 @Component({
@@ -9,4 +9,10 @@ import { Component } from '../index';
     wp: 'label.wp.scss'
   }
 })
-export class Label {}
+export class Label {
+  render() {
+    return h(this, Ionic.theme(this, 'label'),
+      h('slot')
+    );
+  }
+}

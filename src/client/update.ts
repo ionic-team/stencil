@@ -46,7 +46,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     // if we already have a vnode then use it
     // otherwise, elm is the initial patch and
     // we need it to pass it the actual host element
-    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, generateVNode(instance.$root, instance, cmpMeta.hostCss));
+    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, generateVNode(instance.$root, instance));
 
   } else if (initalLoad && instance.render) {
     // should not use shadow dom, but it still has a render function

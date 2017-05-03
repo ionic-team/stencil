@@ -302,7 +302,6 @@ export interface ComponentMeta {
   watchers?: Watchers;
   shadow?: boolean;
   obsAttrs?: string[];
-  hostCss?: string;
   componentModule?: any;
   modes: {[modeName: string]: ComponentMode};
   priority?: 'high'|'low';

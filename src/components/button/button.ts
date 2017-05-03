@@ -1,4 +1,4 @@
-import { Component, h, Ionic, Prop } from '../index';
+import { Component, h, Prop } from '../index';
 type CssClassObject = { [className: string]: boolean };
 
 /**

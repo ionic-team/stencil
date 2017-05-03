@@ -1,4 +1,4 @@
-import { Component } from '../index';
+import { Component, h, Ionic } from '../index';
 
 
 @Component({
@@ -9,4 +9,10 @@ import { Component } from '../index';
     wp: 'thumbnail.wp.scss'
   }
 })
-export class Thumbnail {}
+export class Thumbnail {
+  render() {
+    return h(this, Ionic.theme(this, 'thumbnail'),
+      h('slot')
+    );
+  }
+}

@@ -1,4 +1,4 @@
-import { Component } from '../index';
+import { Component, h, Ionic } from '../index';
 
 
 @Component({
@@ -9,4 +9,10 @@ import { Component } from '../index';
     wp: 'list.wp.scss'
   }
 })
-export class List {}
+export class List {
+  render() {
+    return h(this, Ionic.theme(this, 'list'),
+      h('slot')
+    );
+  }
+}

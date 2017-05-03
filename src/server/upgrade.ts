@@ -46,7 +46,7 @@ export function upgradeNode(plt: PlatformApi, elm: Element, cmpMeta: ComponentMe
   // const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
   plt;
 
-  let vnode = generateVNode(elm, instance, cmpMeta.hostCss);
+  let vnode = generateVNode(elm, instance);
 
   const html = renderVNodeToString(plt, vnode);
 

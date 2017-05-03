@@ -181,10 +181,6 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       };
     }
 
-    keys = cmpMeta.tag.split('-');
-    keys.shift();
-    cmpMeta.hostCss = keys.join('-');
-
     keys = Object.keys(cmpMeta.props);
     for (i = 0; i < keys.length; i++) {
       cmpMeta.obsAttrs.push(toDashCase(keys[i]));
