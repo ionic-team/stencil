@@ -15,6 +15,7 @@ $button-round-border-radius:      64px !default;
 
 
 .button {
+  @include text-align(center);
   @include appearance(none);
   border: 0;
 
@@ -22,7 +23,6 @@ $button-round-border-radius:      64px !default;
   z-index: 0;
   display: inline-block;
 
-  text-align: center;
   text-overflow: ellipsis;
   text-transform: none;
 
