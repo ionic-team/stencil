@@ -18,7 +18,7 @@ function watchCompiler() {
 
 
 function watchWeb() {
-  ['bindings/web/src', 'client', 'platform', 'polyfills', 'util'].forEach(dir => {
+  ['bindings/web/src', 'client', 'components', 'platform', 'polyfills', 'util'].forEach(dir => {
 
     watchDirectory(path.join(SRC_ROOT, dir), changedFile => {
       console.log(`watch: ${changedFile}`);
