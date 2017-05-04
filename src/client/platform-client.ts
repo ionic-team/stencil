@@ -12,7 +12,6 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const bundleCallbacks: BundleCallbacks = {};
   const activeJsonRequests: {[url: string]: boolean} = {};
   const moduleImports = {};
-  const css: {[tag: string]: boolean} = {};
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
 
 
@@ -127,29 +126,59 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
   function attachComponent(elm: Element, cmpMeta: ComponentMeta, instance: Component) {
     if (cmpMeta.shadow) {
+      // cool, this component should use shadow dom
       instance.$root = elm.attachShadow({ mode: 'open' });
     }
 
+    // look up which component mode this instance should use
+    // if a mode isn't found then check if there's a default
     const cmpMode = cmpMeta.modes[instance.mode] || cmpMeta.modes.default;
 
     if (cmpMode && cmpMode.styles) {
+      // this component mode has styles
+
       if (cmpMeta.shadow && hasNativeShadowDom) {
+        // this component uses the shadow dom
+        // and this browser supports the shadow dom natively
         if (!cmpMode.styleElm) {
+          // we're doing this so the browser only needs to parse
+          // the HTML once, and can clone it every time after that
           cmpMode.styleElm = createElement('style');
           cmpMode.styleElm.innerHTML = cmpMode.styles;
         }
 
+        // attach our styles to the root
         instance.$root.appendChild(cmpMode.styleElm.cloneNode(true));
 
       } else {
+        // this component does not use the shadow dom
+        // or this browser does not support shadow dom
         const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
 
-        if (!hasCss(cmpModeId)) {
-          const headStyleEle = createElement('style');
-          headStyleEle.dataset['cmpId'] = cmpModeId;
-          headStyleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
-          appendChild(doc.head, headStyleEle);
-          setCss(cmpModeId);
+        // climb up the ancestors looking to see if this element
+        // is within another component with a shadow root
+        let node: any = elm;
+        let hostRoot: any = doc.head;
+        while (node = node.parentNode) {
+          if (node.host && node.host.shadowRoot) {
+            // this element is within another shadow root
+            // so instead of attaching the styles to the head
+            // we need to attach the styles to this shadow root
+            hostRoot = node.host.shadowRoot;
+            break;
+          }
+        }
+
+        const hostCss = hostRoot.$css = hostRoot.$css || {};
+        if (!hostCss[cmpModeId]) {
+          // only attach the styles if we haven't already
+          // added this css to the host root
+          const styleEle = createElement('style');
+          // we're replacing the :host and :host-context stuff because
+          // it's invalid css for browsers that don't support shadow dom
+          styleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+          appendChild(hostRoot, styleEle);
+          hostCss[cmpModeId] = true;
         }
       }
     }
@@ -255,14 +284,6 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
   function isComment(node: Node): node is Comment {
     return node.nodeType === 8;
-  }
-
-  function hasCss(moduleId: string): boolean {
-    return !!css[moduleId];
-  }
-
-  function setCss(linkUrl: string) {
-    css[linkUrl] = true;
   }
 
   return {
