@@ -26,7 +26,7 @@ const rollup = require('rollup');
 export const ROOT_DIR = path.join(__dirname, '../..');
 export const EXTERNS = path.join(ROOT_DIR, 'scripts', 'core.externs.js');
 export const POLYFILLS_DIR = path.join(ROOT_DIR, 'src/polyfills');
-export const LICENSE = `/*! (C) Ionic https://ionicframework.com - Mit License */`;
+export const LICENSE = `/*! (C) Ionic https://ionicframework.com - MIT License */`;
 
 
 function buildCore(ctx: BuildContext) {

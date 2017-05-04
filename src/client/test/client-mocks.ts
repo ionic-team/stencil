@@ -19,13 +19,14 @@ export function mockComponent(IonicGbl: IonicGlobal, plt: PlatformApi, tag: stri
     [],
     false,
     'default',
-    null,
-    function importerFn(exports: any) {
-      exports[componentModule.constructor.name] = componentModule;
-    }
+    null
   ];
 
-  IonicGbl.loadComponents(bundleId, cmpModeData);
+  function importerFn(exports: any) {
+    exports[componentModule.constructor.name] = componentModule;
+  }
+
+  IonicGbl.loadComponents(bundleId, importerFn, cmpModeData);
 }
 
 export function mockPlatformClient(IonicGbl?: IonicGlobal) {
