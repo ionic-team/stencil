@@ -19,6 +19,7 @@ import * as nodeSass from 'node-sass';
 import * as path from 'path';
 import * as rollup from 'rollup';
 import * as typescript from 'typescript';
+import * as ncp from 'ncp';
 
 
 // dynamic require cuz this file gets transpiled to dist/
@@ -39,8 +40,16 @@ fs.copySync(compilerJsScript, compilerDest);
 console.log('build-angular core, copy compiler from:', compilerJsScript);
 console.log('build-angular core, copy compiler to:', compilerDest);
 
+// copy vendor JS directory to the compiled ionic-angular location
+const vendorJsScript = path.join(srcDir, 'vendor');
+const vendorCompilerDest = path.join(compiledDir, 'vendor');
 
-Promise.resolve().then(() => {
+copyDirectory(vendorJsScript, vendorCompilerDest)
+.then(() => {
+  console.log('build-angular core, copy vendor directory from:', vendorJsScript);
+  console.log('build-angular core, copy vendor directory to:', vendorCompilerDest);
+})
+.then(() => {
   // find all the source components and compile
   // them into reusable components, and create a manifest.json
   // where all the components can be found, and their styles.
@@ -80,4 +89,16 @@ function compileComponents() {
   };
 
   return compiler.compile(config, ctx);
+}
+
+
+export function copyDirectory(source: string, destionation: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    ncp.ncp(source, destionation, { clobber: true }, (err: Error) => {
+      if (err) {
+        reject(err);
+      }
+      resolve();
+    });
+  });
 }

@@ -38,6 +38,7 @@ import * as path from 'path';
 import * as rollup from 'rollup';
 import * as typescript from 'typescript';
 import * as uglify from 'uglify-js';
+import * as ncp from 'ncp';
 
 
 // dynamic require cuz this file gets transpiled to dist/
@@ -52,8 +53,15 @@ const destDir = path.join(__dirname, '../ionic-web');
 fs.emptyDirSync(destDir);
 fs.emptyDirSync(compiledDir);
 
+// copy vendor JS directory to the compiled ionic-angular location
+const vendorJsScript = path.join(srcDir, 'vendor');
+const vendorCompilerDest = path.join(compiledDir, 'vendor');
 
-Promise.resolve().then(() => {
+copyDirectory(vendorJsScript, vendorCompilerDest)
+.then(() => {
+  console.log('build-web core, copy vendor directory from:', vendorJsScript);
+  console.log('build-web core, copy vendor directory to:', vendorCompilerDest);
+}).then(() => {
   // find all the source components and compile
   // them into reusable components, and create a manifest.json
   // where all the components can be found, and their styles.
@@ -186,6 +194,17 @@ function buildWebLoader(componentRegistry: string, devMode: boolean) {
           }
         });
       });
+    });
+  });
+}
+
+export function copyDirectory(source: string, destionation: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    ncp.ncp(source, destionation, { clobber: true }, (err: Error) => {
+      if (err) {
+        reject(err);
+      }
+      resolve();
     });
   });
 }

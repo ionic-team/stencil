@@ -12,6 +12,8 @@
  * 
  * Released on: March 10, 2017
  */
+var Swiper;
+
 (function () {
     'use strict';
     var $;
@@ -19,7 +21,7 @@
     /*===========================
     Swiper
     ===========================*/
-    var Swiper = function (container, params) {
+    Swiper = function (container, params) {
         if (!(this instanceof Swiper)) return new Swiper(container, params);
     
 
@@ -5333,23 +5335,6 @@
         }
     }
 
-    window.Swiper = Swiper;
 })();
 
-/*===========================
-Swiper AMD Export
-===========================*/
-if (typeof(module) !== 'undefined')
-{
-    module.exports = {
-        default: window.Swiper
-    };
-}
-else if (typeof define === 'function' && define.amd) {
-    define([], function () {
-        'use strict';
-        return window.Swiper;
-    });
-}
-
-//# sourceMappingURL=maps/swiper.js.map
+export { Swiper };
