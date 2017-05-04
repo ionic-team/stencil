@@ -137,8 +137,6 @@ function bundleComponents() {
 
 
 function buildWebLoader(componentRegistry: string, devMode: boolean) {
-  console.log('buildWebLoader');
-
   const loaderSrcPath = path.join(transpiledSrcDir, 'ionic.js');
   const loaderDestPath = path.join(destDir, 'ionic.js');
 

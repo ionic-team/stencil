@@ -17,7 +17,7 @@ Start a local server at the root of the repo and check out.
 
 ### ionic-web Development
 
-    npm run build.web -- dev watch
+    npm run dev
 
 
 ### ionic-angular Development

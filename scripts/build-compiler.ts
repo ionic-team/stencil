@@ -41,6 +41,8 @@ rollup.rollup({
   bundle.write({
     format: 'cjs',
     dest: DEST_FILE
+  }).then(() => {
+    console.log(`bundled compiler: ${DEST_FILE}`);
   });
 
 });
