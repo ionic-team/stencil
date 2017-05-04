@@ -7,7 +7,8 @@ import { Component, h, Ionic } from '../index';
     ios: 'label.ios.scss',
     md: 'label.md.scss',
     wp: 'label.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Label {
   render() {
