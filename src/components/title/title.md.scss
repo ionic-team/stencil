@@ -12,7 +12,7 @@ $toolbar-md-title-font-size:             2rem !default;
 $toolbar-md-title-text-color:            color-contrast($colors-md, $toolbar-md-background, md) !default;
 
 
-:host(.toolbar-title-md) {
+.toolbar-title-md {
   padding: 0 12px;
 
   font-size: $toolbar-md-title-font-size;
@@ -23,7 +23,7 @@ $toolbar-md-title-text-color:            color-contrast($colors-md, $toolbar-md-
 
 @mixin md-toolbar-title-theme($color-name, $color-base, $color-contrast) {
 
-  :host-context(.toolbar-md-#{$color-name}) :host(.toolbar-title-md) {
+  .toolbar-md-#{$color-name} .toolbar-title-md {
     color: $fg-color;
   }
 

@@ -18,7 +18,7 @@ $toolbar-ios-title-text-align:              center !default;
 $toolbar-ios-title-text-color:              color-contrast($colors-ios, $toolbar-ios-background) !default;
 
 
-:host-context(.toolbar-ios) :host() {
+.toolbar-ios ion-title {
   position: absolute;
   top: 0;
   left: 0;
@@ -34,7 +34,7 @@ $toolbar-ios-title-text-color:              color-contrast($colors-ios, $toolbar
 }
 
 
-:host(.toolbar-title-ios) {
+.toolbar-title-ios {
   font-size: $toolbar-ios-title-font-size;
   font-weight: $toolbar-ios-title-font-weight;
   text-align: $toolbar-ios-title-text-align;
@@ -46,7 +46,7 @@ $toolbar-ios-title-text-color:              color-contrast($colors-ios, $toolbar
 
 @mixin ios-toolbar-title-theme($color-name, $color-base, $color-contrast) {
 
-  :host(.toolbar-ios-#{$color-name}) .toolbar-title-ios {
+  .toolbar-ios-#{$color-name} .toolbar-title-ios {
     color: $color-contrast;
   }
 
