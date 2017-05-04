@@ -299,7 +299,7 @@ export function readFile(filePath: string) {
 }
 
 
-export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string) {
+export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: string, devMode: boolean) {
   console.log('core, buildBindingCore:', srcDir);
 
   const ctx: BuildContext = {
@@ -322,7 +322,9 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
     shadyDomContent: '',
 
     cePolyFillPath: path.join(POLYFILLS_DIR, 'document-register-element.js'),
-    cePolyfillContent: ''
+    cePolyfillContent: '',
+
+    devMode: devMode
   };
 
   // create the dev mode versions
@@ -333,10 +335,12 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
 
   .then(() => {
     // create the minified versions
-    return Promise.all([
-      buildCoreMinified(ctx),
-      buildCoreES5Minified(ctx)
-    ]);
+    if (!ctx.devMode) {
+      return Promise.all([
+        buildCoreMinified(ctx),
+        buildCoreES5Minified(ctx)
+      ]);
+    }
 
   })
 
@@ -345,13 +349,17 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
     ctx.shadyDomContent = fs.readFileSync(ctx.shadyDomFilePath, 'utf-8').trim();
     ctx.cePolyfillContent = fs.readFileSync(ctx.cePolyFillPath, 'utf-8').trim();
 
-    return Promise.all([
+    const promises: Promise<any>[] = [
       customElementPolyfillDev(ctx),
-      customElementPolyfillMin(ctx),
-      shadyDomCustomElementPolyfillDev(ctx),
-      shadyDomCustomElementPolyfillMin(ctx)
-    ]);
+      shadyDomCustomElementPolyfillDev(ctx)
+    ];
 
+    if (!ctx.devMode) {
+      promises.push(customElementPolyfillMin(ctx));
+      promises.push(shadyDomCustomElementPolyfillMin(ctx));
+    }
+
+    return Promise.all(promises);
   });
 }
 
@@ -432,5 +440,7 @@ interface BuildContext {
 
   cePolyFillPath: string;
   cePolyfillContent: string;
+
+  devMode: boolean;
 };
 

@@ -49,7 +49,7 @@ Promise.resolve().then(() => {
 }).then(() => {
   // build all of the core files for ionic-angular
   // the core files are what makes up how ionic-core "works"
-  return buildBindingCore(transpiledSrcDir, compiledDir, 'core');
+  return buildBindingCore(transpiledSrcDir, compiledDir, 'core', DEV_MODE);
 
 });
 
