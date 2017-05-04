@@ -136,6 +136,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
     if (cmpMode && cmpMode.styles) {
       // this component mode has styles
+      let cmpStyles = cmpMode.styles;
 
       if (cmpMeta.shadow && hasNativeShadowDom) {
         // this component uses the shadow dom
@@ -144,7 +145,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
           // we're doing this so the browser only needs to parse
           // the HTML once, and can clone it every time after that
           cmpMode.styleElm = createElement('style');
-          cmpMode.styleElm.innerHTML = cmpMode.styles;
+          cmpMode.styleElm.innerHTML = cmpStyles;
         }
 
         // attach our styles to the root
@@ -155,31 +156,60 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
         // or this browser does not support shadow dom
         const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
 
+        // remove any :host and :host-context stuff which is
+        // invalid css for browsers that don't support shadow dom
+        cmpStyles = cmpStyles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+
         // climb up the ancestors looking to see if this element
         // is within another component with a shadow root
         let node: any = elm;
         let hostRoot: any = doc.head;
+        let styleElm: HTMLStyleElement;
+
         while (node = node.parentNode) {
           if (node.host && node.host.shadowRoot) {
             // this element is within another shadow root
             // so instead of attaching the styles to the head
             // we need to attach the styles to this shadow root
             hostRoot = node.host.shadowRoot;
-            break;
+            hostRoot.$css = hostRoot.$css || {};
+
+            if (!hostRoot.$css[cmpModeId]) {
+              // only attach the styles if we haven't already done so for this host element
+              hostRoot.$css[cmpModeId] = true;
+
+              styleElm = hostRoot.querySelector('style');
+              if (styleElm) {
+                styleElm.innerHTML = cmpStyles + styleElm.innerHTML;
+
+              } else {
+                styleElm = createElement('style');
+                styleElm.innerHTML = cmpStyles;
+                insertBefore(hostRoot, styleElm, hostRoot.firstChild);
+              }
+            }
+
+            // the styles are added to this shadow root, no need to continue
+            return;
           }
         }
 
-        const hostCss = hostRoot.$css = hostRoot.$css || {};
-        if (!hostCss[cmpModeId]) {
-          // only attach the styles if we haven't already
-          // added this css to the host root
-          const styleEle = createElement('style');
+        // this component is not within a parent shadow root
+        // so attach the styles to document.head
+        hostRoot.$css = hostRoot.$css || {};
+        if (!hostRoot.$css[cmpModeId]) {
+          // only attach the styles if we haven't already done so for this host element
+          hostRoot.$css[cmpModeId] = true;
+
+          // add these styles to document.head
+          let styleEle = createElement('style');
           styleEle.dataset['cmp'] = cmpModeId;
+
           // we're replacing the :host and :host-context stuff because
           // it's invalid css for browsers that don't support shadow dom
-          styleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
+          styleEle.innerHTML = cmpStyles;
+
           appendChild(hostRoot, styleEle);
-          hostCss[cmpModeId] = true;
         }
       }
     }

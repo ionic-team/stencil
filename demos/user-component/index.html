@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Ionic</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="/dist/ionic-web/ionic.js"></script>
+</head>
+<body>
+
+  <my-app></my-app>
+
+  <my-other-app></my-other-app>
+
+  <script>
+
+    class MyApp extends HTMLElement {
+
+      constructor() {
+        super();
+
+        const shadowRoot = this.attachShadow({mode: 'open'});
+
+        shadowRoot.innerHTML = `
+          <ion-card>
+            <ion-card-header>Header</ion-card-header>
+            <ion-card-content>Content</ion-card-content>
+          </ion-card>
+        `;
+      }
+
+    }
+    customElements.define('my-app', MyApp);
+
+
+    class MyOtherApp extends HTMLElement {
+
+      constructor() {
+        super();
+
+        const shadowRoot = this.attachShadow({mode: 'open'});
+
+        shadowRoot.innerHTML = `
+          <style>
+            .card-header {
+              color: blue;
+            }
+            .card-content {
+              color: green;
+            }
+          </style>
+          <ion-card>
+            <ion-card-header>Header</ion-card-header>
+            <ion-card-content>Content</ion-card-content>
+          </ion-card>
+        `;
+      }
+
+    }
+    customElements.define('my-other-app', MyOtherApp);
+
+  </script>
+
+</body>
+</html>
