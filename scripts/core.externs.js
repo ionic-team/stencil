@@ -10,26 +10,27 @@
 
 
 /**
- * Global Ionic
+ * Global window.Ionic
  * Each binding can provide it's own values to window.Ionic
  */
-function loadComponents(){};
 function components(){};
-function staticDir(){};
 function ConfigCtrl(){};
-function DomCtrl(){};
 function dom(){};
-function read(){};
-function write(){};
-function raf(){};
-function NextTickCtrl(){};
-function nextTick(){};
+function DomCtrl(){};
 function eventNameFn(){};
+function loadComponents(){};
+function nextTick(){};
+function NextTickCtrl(){};
+function raf(){};
+function read(){};
+function staticDir(){};
+function write(){};
 
 
 /**
  * Injected Ionic
- * Passed into user's closure
+ * Passed into user's closure so it's globally available
+ * to all of the user's code.
  */
 function Ionic(){};
 function config(){};
@@ -50,6 +51,7 @@ function getNumber(){};
 
 /**
  * Proxy Element
+ * Properties set on the proxy element
  */
 function $el(){};
 function $meta(){};
@@ -58,6 +60,7 @@ function listeners(){};
 
 /**
  * Component Instance
+ * Methods set on the user's component
  */
 function ionViewDidLoad(){};
 function ionViewWillUnload(){};
@@ -66,6 +69,7 @@ function render(){};
 
 /**
  * Renderer data properties
+ * Properties used by the renderer and user's hyperscript
  */
 function attrs(){};
 function on(){};
@@ -74,16 +78,18 @@ function props(){};
 
 /**
  * Web Standards
- * Stuff closure doesn't know to not rename yet
+ * Window and document stuff closure doesn't know not to rename yet
  */
-function connectedCallback(){};
+function attachShadow(){};
 function attributeChangedCallback(){};
+function connectedCallback(){};
+function customElements(){};
+function host(){};
+function define(){};
 function disconnectedCallback(){};
 function observedAttributes(){};
-function customElements(){};
-function define(){};
-function attachShadow(){};
 function requestIdleCallback(){};
+function shadowRoot(){};
 
 
 /**
