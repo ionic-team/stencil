@@ -189,11 +189,6 @@ export interface Packages {
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
   };
   typescript?: any;
-  cleanCss?: {
-    new(opts?: any): {
-      minify: {(input: string): any}
-    };
-  };
   nodeSass?: {
     render: Function;
   };

@@ -19,12 +19,13 @@ export function bundleComponentModeStyles(config: BundlerConfig, ctx: BuildConte
 export function bundleComponentModeStyle(config: BundlerConfig, ctx: BuildContext, styleUrl: string) {
   return new Promise((resolve, reject) => {
     const scssFilePath = config.packages.path.join(config.srcDir, styleUrl);
+    const scssFileName = config.packages.path.basename(styleUrl);
     const fileMeta = createFileMeta(config.packages, ctx, scssFilePath, '');
     fileMeta.rebundleOnChange = true;
 
     const sassConfig = {
       file: scssFilePath,
-      outputStyle: 'compressed'
+      outputStyle: config.devMode ? 'expanded' : 'compressed'
     };
 
     if (config.debug) {
@@ -36,12 +37,12 @@ export function bundleComponentModeStyle(config: BundlerConfig, ctx: BuildContex
         reject(`bundleComponentModeStyle, nodeSass.render: ${err}`);
 
       } else {
-        let css = result.css.toString().replace(/\n/g, '').trim();
+        let css = result.css.toString().trim();
 
-        if (!config.devMode && config.packages.cleanCss) {
-          const output = new config.packages.cleanCss().minify(css);
-
-          css = output.styles;
+        if (config.devMode) {
+          css = `/********** ${scssFileName} **********/\n\n${css}\n\n`;
+        } else {
+          css = css.replace(/\n/g, '');
         }
 
         resolve(css);

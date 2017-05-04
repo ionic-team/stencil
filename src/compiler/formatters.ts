@@ -64,7 +64,7 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
 
   const modeCode = `/* ${modeName} **/ ${formatModeName(modeName)}`;
 
-  const styles = (mode.styles ? ('\'' + mode.styles.replace(/'/g, '"') + '\'') : '0 /* no styles */');
+  const styles = formatStyles(mode.styles);
 
   let label = tag;
   if (mode.name) {
@@ -86,6 +86,19 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
+}
+
+
+export function formatStyles(styles: string) {
+  if (!styles) {
+    return '0 /* no styles */';
+  }
+
+  const lines = styles.split(/\r?\n/g).map(line => {
+    return `'${line.replace(/'/g, '"')}\\n'`;
+  });
+
+  return lines.join(' + \n');
 }
 
 

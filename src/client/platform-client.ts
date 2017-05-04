@@ -174,6 +174,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
           // only attach the styles if we haven't already
           // added this css to the host root
           const styleEle = createElement('style');
+          styleEle.dataset['cmp'] = cmpModeId;
           // we're replacing the :host and :host-context stuff because
           // it's invalid css for browsers that don't support shadow dom
           styleEle.innerHTML = cmpMode.styles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
