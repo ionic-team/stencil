@@ -35,7 +35,7 @@ $navbar-md-height:                       $toolbar-md-height !default;
 $toolbar-button-md-strong-font-weight:   bold !default;
 
 
-:host(.toolbar-md) {
+.toolbar-md {
   padding: $toolbar-md-padding;
 
   min-height: $toolbar-md-height;
@@ -54,9 +54,9 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 // Material Design Header / Footer / Tabs Box Shadow
 // --------------------------------------------------
 
-:host-context(.header-md::after),
+.header-md::after,
 .tabs-md[tabsPlacement="top"] > .tabbar::after,
-:host-context(.footer-md::before),
+.footer-md::before,
 .tabs-md[tabsPlacement="bottom"] > .tabbar::before {
   // using datauri png background image for improved scroll performance
   // rather than using `box-shadow: 0 2px 5px rgba(0,0,0,0.26);`
@@ -75,7 +75,7 @@ $toolbar-button-md-strong-font-weight:   bold !default;
   content: "";
 }
 
-:host-context(.footer-md::before),
+.footer-md::before,
 .tabs-md[tabsPlacement="bottom"] > .tabbar::before {
   top: -2px;
   bottom: auto;
@@ -85,8 +85,8 @@ $toolbar-button-md-strong-font-weight:   bold !default;
   background-position: 0 0;
 }
 
-:host-context(.header-md[no-border]::after),
-:host-context(.footer-md[no-border]::before),
+.header-md[no-border]::after,
+.footer-md[no-border]::before,
 .tabs-md[tabsPlacement="top"][no-border] > .tabbar::after,
 .tabs-md[tabsPlacement="bottom"][no-border] > .tabbar::before {
   display: none;
@@ -105,7 +105,7 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 
 
 @mixin md-toolbar-theme($color-name, $color-base, $color-contrast) {
-  :host(.toolbar-md-#{$color-name}) {
+  .toolbar-md-#{$color-name} {
     $fg-color: color-contrast($colors-md, $color-base, md);
 
     .toolbar-background-md {

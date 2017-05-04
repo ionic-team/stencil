@@ -95,7 +95,8 @@ import { Component, h, Ionic } from '../index';
     ios: 'toolbar.ios.scss',
     md: 'toolbar.md.scss',
     wp: 'toolbar.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Toolbar {
   $el: HTMLElement;
@@ -110,16 +111,16 @@ export class Toolbar {
      * This is a platform specific hack that we would like to remove.  Currently this adds the
      * attribute button-type bar-button to all ion-buttons that exist within a toolbar.
      */
-    const slot = <HTMLSlotElement>this.$el.shadowRoot.querySelector('slot');
-    const ionButtons = slot.assignedNodes()
-      .filter((elmt: HTMLElement) => elmt.nodeType !== Node.TEXT_NODE)
-      .reduce((nodeList: HTMLElement[], elmt: HTMLElement) => {
-        return nodeList.concat(Array.prototype.slice.call(elmt.querySelectorAll('ion-button')));
-      }, []);
+    // const slot = <HTMLSlotElement>this.$el.shadowRoot.querySelector('slot');
+    // const ionButtons = slot.assignedNodes()
+    //   .filter((elmt: HTMLElement) => elmt.nodeType !== Node.TEXT_NODE)
+    //   .reduce((nodeList: HTMLElement[], elmt: HTMLElement) => {
+    //     return nodeList.concat(Array.prototype.slice.call(elmt.querySelectorAll('ion-button')));
+    //   }, []);
 
-    ionButtons.forEach(btn => {
-      btn.setAttribute('button-type', 'bar-button');
-    });
+    // ionButtons.forEach(btn => {
+    //   btn.setAttribute('button-type', 'bar-button');
+    // });
   }
 
   render() {

@@ -44,9 +44,9 @@ $toolbar-ios-title-text-color:              color-contrast($colors-ios, $toolbar
 }
 
 
-@mixin ios-toolbar-title-theme($color-name, $color-base, $color-contrast) {
+@each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
 
-  .toolbar-ios-#{$color-name} .toolbar-title-ios {
+  .toolbar-#{$color-name} .toolbar-title-ios {
     color: $color-contrast;
   }
 

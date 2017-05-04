@@ -4,13 +4,13 @@
 // Toolbar
 // --------------------------------------------------
 
-:host {
+ion-toolbar {
   position: relative;
   z-index: $z-index-toolbar;
   visibility: inherit !important;
 }
 
-:host(.toolbar) {
+.toolbar {
   display: flex;
   overflow: hidden;
   visibility: inherit !important;
@@ -63,7 +63,7 @@ ion-buttons div {
 // Transparent Toolbar
 // --------------------------------------------------
 
-:host(.toolbar[transparent]) .toolbar-background {
+.toolbar[transparent] .toolbar-background {
   border-color: transparent;
   background: transparent;
 }

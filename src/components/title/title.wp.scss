@@ -31,9 +31,9 @@ $toolbar-wp-title-text-color:            color-contrast($colors-wp, $toolbar-wp-
   color: $toolbar-wp-title-text-color;
 }
 
-@mixin wp-toolbar-title-theme($color-name, $color-base, $color-contrast) {
+@each $color-name, $color-base, $color-contrast in get-colors($colors-wp) {
 
-  .toolbar-wp-#{$color-name} .toolbar-title-wp {
+  .toolbar-#{$color-name} .toolbar-title-wp {
     color: $color-contrast;
   }
 

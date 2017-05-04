@@ -21,10 +21,10 @@ $toolbar-md-title-text-color:            color-contrast($colors-md, $toolbar-md-
 }
 
 
-@mixin md-toolbar-title-theme($color-name, $color-base, $color-contrast) {
+@each $color-name, $color-base, $color-contrast in get-colors($colors-md) {
 
-  .toolbar-md-#{$color-name} .toolbar-title-md {
-    color: $fg-color;
+  .toolbar-#{$color-name} .toolbar-title-md {
+    color: $color-contrast;
   }
 
 }
