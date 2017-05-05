@@ -25,7 +25,7 @@ export function collectedHostContentNodes(elm: ProxyElement, namedSlots: string[
 
   if (!namedSlots) {
     return <HostContentNodes>{
-      $defaultSlot: <any>childNodes
+      $defaultSlot: Array.apply(null, childNodes)
     };
   }
 
