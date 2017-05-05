@@ -14,8 +14,7 @@
 //   ion-item
 //   [ion-item]
 
-ion-item,
-:host {
+ion-item {
   display: block;
   visibility: inherit !important;
   contain: content;

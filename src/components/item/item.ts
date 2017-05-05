@@ -7,7 +7,8 @@ import { Component, h, Ionic } from '../index';
     ios: 'item.ios.scss',
     md: 'item.md.scss',
     wp: 'item.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Item {
 
@@ -15,12 +16,12 @@ export class Item {
     return h(this,
       h('div.item-block', Ionic.theme(this, 'item'),
         [
-          h('slot', { attrs: { name: 'item-start' } }),
+          h('slot', { attrs: { name: 'start' } }),
           h('div.item-inner', [
               h('div.input-wrapper',
                 h('slot')
               ),
-              h('slot', { attrs: { name: 'item-end' } }),
+              h('slot', { attrs: { name: 'end' } }),
               // h('ion-reorder')
             ]
           ),
@@ -29,7 +30,7 @@ export class Item {
       )
     );
     // template:
-    //   '<ng-content select="[item-left],ion-checkbox:not([item-right])"></ng-content>' +
+    //   '<ng-content select="[slot="start"],ion-checkbox:not([slot="end"])"></ng-content>' +
     //   '<div class="item-inner">' +
     //     '<div class="input-wrapper">' +
     //       '<ng-content select="ion-label"></ng-content>' +
@@ -38,7 +39,7 @@ export class Item {
     //       '</ion-label>' +
     //       '<ng-content select="ion-select,ion-input,ion-textarea,ion-datetime,ion-range,[item-content]"></ng-content>' +
     //     '</div>' +
-    //     '<ng-content select="[item-right],ion-radio,ion-toggle"></ng-content>' +
+    //     '<ng-content select="[slot="end"],ion-radio,ion-toggle"></ng-content>' +
     //     '<ion-reorder *ngIf="_hasReorder"></ion-reorder>' +
     //   '</div>' +
     //   '<div class="button-effect"></div>',
