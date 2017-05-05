@@ -1,5 +1,5 @@
+import { addEventListener, enableListener } from './events';
 import { ConfigApi, CustomEventOptions, DomControllerApi, Ionic } from '../util/interfaces';
-import { enableListener } from './events';
 import { themeVNodeData } from './host';
 
 
@@ -35,7 +35,8 @@ export function initInjectedIonic(win: any, eventNameFn: {(eventName: string): s
     },
 
     listener: {
-      enable: enableListener
+      enable: enableListener,
+      add: addEventListener
     },
 
     controllers: {},

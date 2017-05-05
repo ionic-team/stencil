@@ -3,6 +3,7 @@ export interface Ionic {
   emit: EventEmit;
   listener: {
     enable: EventListenerEnable;
+    add: AddEventListenerApi;
   };
   theme: IonicTheme;
   controllers: {
@@ -10,6 +11,11 @@ export interface Ionic {
   };
   dom: DomControllerApi;
   config: ConfigApi;
+}
+
+
+export interface AddEventListenerApi {
+  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts?: ListenOpts): Function;
 }
 
 

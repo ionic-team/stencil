@@ -1,7 +1,7 @@
 import { Component, ComponentMeta, ComponentRegistry,
   IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
-import { initInjectedIonic } from './injected-ionic';
+import { initInjectedIonic } from './injected-ionic-client';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 

@@ -1,24 +1,15 @@
 import { ComponentMeta, Component, ComponentModeData, ComponentRegistry, ConfigApi,
-  DomControllerApi, Ionic, IonicGlobal, PlatformApi } from '../util/interfaces';
+  DomControllerApi, IonicGlobal, PlatformApi } from '../util/interfaces';
 import { h } from '../client/renderer/h';
+import { initInjectedIonic } from './injected-ionic-server';
 import { parseComponentModeData } from '../util/data-parse';
-import { themeVNodeData } from '../client/host';
 
 
 export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const moduleImports = {};
 
-  const injectedIonic: Ionic = {
-    theme: themeVNodeData,
-    emit: function(){},
-    listener: {
-      enable: function() {}
-    },
-    controllers: {},
-    config: ConfigCtrl,
-    dom: DomCtrl
-  };
+  const injectedIonic = initInjectedIonic(ConfigCtrl, DomCtrl);
 
 
   IonicGbl.loadComponents = function loadComponents(bundleId, importFn) {

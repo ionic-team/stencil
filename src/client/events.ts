@@ -51,7 +51,7 @@ export function enableListener(instance: Component, eventName: string, shouldEna
 }
 
 
-export function addEventListener(elm: any, eventName: string, cb: {(ev?: any): void}, opts: ListenOpts) {
+export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts: ListenOpts = {}) {
   if (!elm) {
     return noop;
   }
