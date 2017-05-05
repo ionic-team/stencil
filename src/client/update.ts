@@ -47,7 +47,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
 
       if (cmpMeta.tag === 'ion-item') {
         // TODO!!
-        cmpMeta.namedSlots = ['item-start', 'item-end'];
+        cmpMeta.namedSlots = ['start', 'end'];
       }
 
       elm.$hostContent = collectedHostContentNodes(elm, cmpMeta.namedSlots);
