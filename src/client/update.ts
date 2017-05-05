@@ -1,6 +1,6 @@
 import { attachListeners } from './events';
+import { collectedHostContentNodes } from './host';
 import { ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
-import { generateVNode } from './host';
 import { initProps } from './proxy';
 import { RendererApi } from '../util/interfaces';
 
@@ -38,25 +38,27 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     plt.$attachComponent(elm, cmpMeta, instance);
 
     initalLoad = true;
+
+    if (!cmpMeta.shadow && instance.render) {
+      // this component is not using shadow dom
+      // and it does have a render function
+      // collect up the host content nodes so we can
+      // manually move them around to the correct slot
+
+      if (cmpMeta.tag === 'ion-item') {
+        // TODO!!
+        cmpMeta.namedSlots = ['item-start', 'item-end'];
+      }
+
+      elm.$hostContent = collectedHostContentNodes(elm, cmpMeta.namedSlots);
+    }
   }
 
-  if (cmpMeta.shadow) {
-    // should use shadom dom with default slot and/or named slots
-
-    // if we already have a vnode then use it
-    // otherwise, elm is the initial patch and
-    // we need it to pass it the actual host element
-    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, generateVNode(instance.$root, instance));
-
-  } else if (initalLoad && instance.render) {
-    // should not use shadow dom, but it still has a render function
-    // in this case it'll manually relocate the content into the render's slot
-    // this does not work for named slots, only the default slot
-    // but it doesn't use native shadow dom for that, everything stays light dom
-    // additionally, this should only happen on the initial load
-    const vnode = instance.render();
+  const vnode = instance.render && instance.render();
+  if (vnode) {
     vnode.elm = elm;
-    renderer(elm, vnode, true);
+    delete vnode.sel;
+    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode, elm.$hostContent);
   }
 
   if (initalLoad) {

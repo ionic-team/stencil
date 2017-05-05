@@ -10,7 +10,7 @@
 
 /* global module, document, Node */
 import { isArray, isDef, isUndef, isString, isStringOrNumber } from '../../util/helpers';
-import { PlatformApi, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
+import { HostContentNodes, PlatformApi, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
 import { vnode } from './vnode';
 
 import { updateAttrs } from './modules/attributes';
@@ -21,7 +21,6 @@ export { VNode, VNodeData, vnode };
 export { h } from './h';
 
 type VNodeQueue = Array<VNode>;
-type HostContentNodes = Array<Node>;
 
 const emptyNode = vnode('', {}, [], undefined, undefined);
 
@@ -79,19 +78,32 @@ export function Renderer(api: PlatformApi): RendererApi {
       vnode.elm = api.$createComment(vnode.vtext as string);
 
     } else if (hostContentNodes && sel === 'slot') {
-      let hostContentNode: Node;
-      while (hostContentNode = hostContentNodes.shift()) {
-        // remove the host content node from it's original parent node
-        api.$removeChild(hostContentNode.parentNode, hostContentNode);
+      // special case for manually relocating host content nodes
+      // there their new home in either a named slot or the default slot
+      let namedSlot = (data.attrs && data.attrs.name);
+      let slotNodes: Node[];
 
-        if (hostContentNodes.length === 0) {
-          // return the last node that gets appended
-          // like any other Node that was created
-          return hostContentNode;
+      if (namedSlot) {
+        slotNodes = hostContentNodes.$namedSlots && hostContentNodes.$namedSlots[namedSlot];
+
+      } else {
+        slotNodes = hostContentNodes.$defaultSlot;
+      }
+
+      if (slotNodes) {
+        for (let nodeIndex = 0; nodeIndex < slotNodes.length; nodeIndex++) {
+          // remove the host content node from it's original parent node
+          api.$removeChild(slotNodes[nodeIndex].parentNode, slotNodes[nodeIndex]);
+
+          if (nodeIndex === slotNodes.length - 1) {
+            // return the last node that gets appended
+            // like any other Node that was created
+            return slotNodes[nodeIndex];
+          }
+
+          // relocate the node to it's new home
+          api.$appendChild(parentElm, slotNodes[nodeIndex]);
         }
-
-        // relocate the node to it's new home
-        api.$appendChild(parentElm, hostContentNode);
       }
 
     } else if (sel !== undefined) {
@@ -113,9 +125,12 @@ export function Renderer(api: PlatformApi): RendererApi {
 
       if (isArray(children)) {
         for (i = 0; i < children.length; ++i) {
-          const ch = children[i];
+          let ch = children[i];
           if (ch != null) {
-            api.$appendChild(elm, createElm(ch as VNode, insertedVnodeQueue, elm, hostContentNodes));
+            ch = <any>createElm(ch as VNode, insertedVnodeQueue, elm, hostContentNodes);
+            if (ch) {
+              api.$appendChild(elm, <any>ch);
+            }
           }
         }
       } else if (isStringOrNumber(vnode.vtext)) {
@@ -173,8 +188,7 @@ export function Renderer(api: PlatformApi): RendererApi {
                           oldCh: Array<VNode>,
                           newCh: Array<VNode>,
                           insertedVnodeQueue: VNodeQueue,
-                          hostContentNodes: HostContentNodes,
-                          manualSlotProjection: boolean) {
+                          hostContentNodes: HostContentNodes) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -197,20 +211,20 @@ export function Renderer(api: PlatformApi): RendererApi {
       } else if (newEndVnode == null) {
         newEndVnode = newCh[--newEndIdx];
       } else if (sameVnode(oldStartVnode, newStartVnode)) {
-        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue, manualSlotProjection);
+        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue, hostContentNodes);
         oldStartVnode = oldCh[++oldStartIdx];
         newStartVnode = newCh[++newStartIdx];
       } else if (sameVnode(oldEndVnode, newEndVnode)) {
-        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue, manualSlotProjection);
+        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue, hostContentNodes);
         oldEndVnode = oldCh[--oldEndIdx];
         newEndVnode = newCh[--newEndIdx];
       } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
-        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue, manualSlotProjection);
+        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue, hostContentNodes);
         api.$insertBefore(parentElm, oldStartVnode.elm as Node, api.$nextSibling(oldEndVnode.elm as Node));
         oldStartVnode = oldCh[++oldStartIdx];
         newEndVnode = newCh[--newEndIdx];
       } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
-        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue, manualSlotProjection);
+        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue, hostContentNodes);
         api.$insertBefore(parentElm, oldEndVnode.elm as Node, oldStartVnode.elm as Node);
         oldEndVnode = oldCh[--oldEndIdx];
         newStartVnode = newCh[++newStartIdx];
@@ -227,7 +241,7 @@ export function Renderer(api: PlatformApi): RendererApi {
           if (elmToMove.sel !== newStartVnode.sel) {
             api.$insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue, parentElm, hostContentNodes), oldStartVnode.elm as Node);
           } else {
-            patchVnode(elmToMove, newStartVnode, insertedVnodeQueue, manualSlotProjection);
+            patchVnode(elmToMove, newStartVnode, insertedVnodeQueue, hostContentNodes);
             oldCh[idxInOld] = undefined as any;
             api.$insertBefore(parentElm, (elmToMove.elm as Node), oldStartVnode.elm as Node);
           }
@@ -243,8 +257,8 @@ export function Renderer(api: PlatformApi): RendererApi {
     }
   }
 
-  function patchVnode(oldVnode: VNode, vnode: VNode, insertedVnodeQueue: VNodeQueue, manualSlotProjection: boolean) {
-    if (!manualSlotProjection && oldVnode.sel === 'slot') {
+  function patchVnode(oldVnode: VNode, vnode: VNode, insertedVnodeQueue: VNodeQueue, hostContentNodes: HostContentNodes) {
+    if (!hostContentNodes && oldVnode.sel === 'slot') {
       return;
     }
 
@@ -269,16 +283,7 @@ export function Renderer(api: PlatformApi): RendererApi {
     if (isUndef(vnode.vtext)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) {
-          const hostContentNodes: HostContentNodes = manualSlotProjection ? [] : null;
-
-          if (manualSlotProjection) {
-            const childNodes = vnode.elm.childNodes;
-            for (let j = 0; j < childNodes.length; j++) {
-              hostContentNodes.push(childNodes[j]);
-            }
-          }
-
-          updateChildren((<HTMLElement>elm).shadowRoot || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue, hostContentNodes, manualSlotProjection);
+          updateChildren((<HTMLElement>elm).shadowRoot || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue, hostContentNodes);
         }
 
       } else if (isDef(ch)) {
@@ -297,7 +302,7 @@ export function Renderer(api: PlatformApi): RendererApi {
     }
   }
 
-  return function patch(oldVnode: VNode | Element, vnode: VNode, manualSlotProjection?: boolean): VNode {
+  return function patch(oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes): VNode {
     let elm: Node, parent: Node;
     const insertedVnodeQueue: VNodeQueue = [];
 
@@ -306,13 +311,13 @@ export function Renderer(api: PlatformApi): RendererApi {
     }
 
     if (vnode.elm || sameVnode(oldVnode, vnode)) {
-      patchVnode(oldVnode, vnode, insertedVnodeQueue, manualSlotProjection);
+      patchVnode(oldVnode, vnode, insertedVnodeQueue, hostContentNodes);
 
     } else {
       elm = oldVnode.elm as Node;
       parent = api.$parentNode(elm);
 
-      createElm(vnode, insertedVnodeQueue, parent, []);
+      createElm(vnode, insertedVnodeQueue, parent, hostContentNodes);
 
       if (parent !== null) {
         api.$insertBefore(parent, vnode.elm as Node, api.$nextSibling(elm));

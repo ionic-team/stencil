@@ -1,5 +1,4 @@
 import { ComponentMeta, PlatformApi, VNode } from '../util/interfaces';
-import { generateVNode } from '../client/host';
 import { renderVNodeToString } from './renderer/core';
 import * as parse5 from 'parse5';
 
@@ -46,7 +45,11 @@ export function upgradeNode(plt: PlatformApi, elm: Element, cmpMeta: ComponentMe
   // const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
   plt;
 
-  let vnode = generateVNode(elm, instance);
+  const vnode = instance.render && instance.render();
+  if (vnode) {
+    vnode.elm = elm;
+    delete vnode.sel;
+  }
 
   const html = renderVNodeToString(plt, vnode);
 

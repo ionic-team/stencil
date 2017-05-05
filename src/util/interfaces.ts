@@ -301,6 +301,7 @@ export interface ComponentMeta {
   listeners?: ComponentMetaListeners;
   watchers?: Watchers;
   shadow?: boolean;
+  namedSlots?: string[];
   obsAttrs?: string[];
   componentModule?: any;
   modes: {[modeName: string]: ComponentMode};
@@ -373,6 +374,7 @@ export interface ProxyElement extends HTMLElement {
 
   $queued?: boolean;
   $instance?: Component;
+  $hostContent?: HostContentNodes;
 
   [memberName: string]: any;
 }
@@ -382,7 +384,7 @@ export type Side = 'left' | 'right' | 'start' | 'end';
 
 
 export interface RendererApi {
-  (oldVnode: VNode | Element, vnode: VNode, manualSlotProjection?: boolean): VNode;
+  (oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes): VNode;
 }
 
 
@@ -408,6 +410,12 @@ export interface VNode {
   elm: Node | undefined;
   vtext: string | undefined;
   vkey: Key;
+}
+
+
+export interface HostContentNodes {
+  $defaultSlot: Node[];
+  $namedSlots?: {[slotName: string]: Node[]};
 }
 
 

@@ -12,7 +12,7 @@ export function disconnectedCallback(elm: ProxyElement) {
       detachListeners(instance);
 
       instance.$vnode && invokeDestroyHook(instance.$vnode);
-      elm.$instance = instance.$el = instance.$meta = instance.$root = instance.$vnode = null;
+      elm.$instance = elm.$hostContent = instance.$el = instance.$meta = instance.$root = instance.$vnode = null;
     }
   }
 }
