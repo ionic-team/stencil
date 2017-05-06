@@ -1,11 +1,11 @@
-import { BuildContext } from '../interfaces';
 import * as ts from 'typescript';
+
 
 // same as the "declare" variables in the root index.ts file
 const IONIC_GLOBALS = ['Component', 'h', 'Ionic', 'Listen', 'Prop', 'Watch'];
 
 
-export function removeImports(ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {
+export function removeImports(): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
@@ -35,21 +35,15 @@ export function removeImports(ctx: BuildContext): ts.TransformerFactory<ts.Sourc
 
     function visit(node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
-      case ts.SyntaxKind.ImportDeclaration:
-        return visitImport(node as ts.ImportDeclaration);
-      default:
-        return ts.visitEachChild(node, visit, transformContext);
+        case ts.SyntaxKind.ImportDeclaration:
+          return visitImport(node as ts.ImportDeclaration);
+        default:
+          return ts.visitEachChild(node, visit, transformContext);
       }
     }
 
     return (tsSourceFile) => {
-      const fileMeta = ctx.files.get(tsSourceFile.fileName);
-
-      if (fileMeta && fileMeta.hasCmpClass) {
-        return visit(tsSourceFile) as ts.SourceFile;
-      }
-
-      return tsSourceFile;
+      return visit(tsSourceFile) as ts.SourceFile;
     };
   };
 
