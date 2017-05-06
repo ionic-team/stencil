@@ -62,7 +62,7 @@ export function formatComponentModeLoader(cmp: Component, mode: ComponentMode) {
 
   const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
 
-  const modeCode = `/* ${modeName} **/ ${formatModeName(modeName)}`;
+  const modeCode = formatModeName(modeName);
 
   const styles = formatStyles(mode.styles);
 
@@ -106,6 +106,11 @@ export function formatStyles(styles: string) {
 
 
 export function formatModeName(modeName: string) {
+  return `${getModeCode(modeName)} /* ${modeName} **/`;
+}
+
+
+export function getModeCode(modeName: string) {
   switch (modeName) {
     case 'default':
       return 0;

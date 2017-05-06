@@ -1,7 +1,8 @@
 import { bundleComponentModeStyles } from './styles';
 import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, ManifestBundle, Results } from './interfaces';
-import { formatComponentRegistryProps, formatComponentModeLoader, formatModeName, formatBundleFileName,
-  formatBundleContent, formatRegistryContent, formatPriority, generateBundleId, getBundledModulesId } from './formatters';
+import { formatComponentRegistryProps, formatComponentModeLoader, formatBundleFileName,
+  formatBundleContent, formatRegistryContent, formatPriority, generateBundleId,
+  getBundledModulesId, getModeCode } from './formatters';
 import { createFileMeta, readFile, writeFile, writeFiles } from './util';
 import { setupBundlerWatch } from './watch';
 import commonjs from 'rollup-plugin-commonjs';
@@ -265,7 +266,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     bundle.components.forEach(bundleComponent => {
       const tag = bundleComponent.component.tag;
-      const modeCode = formatModeName(bundleComponent.mode.name);
+      const modeCode = getModeCode(bundleComponent.mode.name);
 
       ctx.registry[tag] = ctx.registry[tag] || [];
 
