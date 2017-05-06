@@ -110,6 +110,7 @@ export interface CoreComponents {
 export interface Component {
   tag?: string;
   modes: {[modeName: string]: ComponentMode};
+  methods: Methods;
   props: Props;
   listeners: Listeners;
   watchers: Watchers;
@@ -128,6 +129,7 @@ export interface ComponentMode {
 
 export interface ComponentMeta {
   tag?: string;
+  methods?: Methods;
   props?: Props;
   listeners?: Listeners;
   watchers?: Watchers;
@@ -136,6 +138,9 @@ export interface ComponentMeta {
   componentModule?: any;
   modes: {[modeName: string]: ComponentMode};
 }
+
+
+export type Methods = string[];
 
 
 export interface PropOptions {

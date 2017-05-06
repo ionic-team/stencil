@@ -90,7 +90,7 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
   const result = program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
       componentClass(ctx),
-      removeImports(ctx)
+      removeImports()
     ]
   });
 

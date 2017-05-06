@@ -1,11 +1,22 @@
-import { Component, ConfigApi, PlatformApi, Props, ProxyElement, RendererApi, Watchers } from '../util/interfaces';
+import { Component, ConfigApi, Methods, PlatformApi, Props, ProxyElement, RendererApi, Watchers } from '../util/interfaces';
 import { queueUpdate } from './update';
 import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 
 
-export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, watchers: Watchers) {
+export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, methods: Methods, watchers: Watchers) {
   const propValues: {[propName: string]: any} = {};
 
+  if (methods) {
+    methods.forEach(methodName => {
+
+      // dom's element instance
+      Object.defineProperty(elm, methodName, {
+        configurable: true,
+        value: instance[methodName].bind(instance)
+      });
+
+    });
+  }
 
   Object.keys(props).forEach(propName => {
     const watcher: Function = (watchers[propName]) ? instance[watchers[propName].fn].bind(instance) : null;

@@ -13,6 +13,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         fileMeta.hasCmpClass = true;
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
+        getMethodsMeta(fileMeta.cmpMeta, classNode);
         getPropertyDecoratorMeta(fileMeta.cmpMeta, classNode);
         getListenDecoratorMeta(fileMeta.cmpMeta, classNode);
         getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
@@ -34,10 +35,50 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     }
 
 
-    function getPropertyDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
+    function getMethodsMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
+      cmpMeta.methods = [];
 
+      const EXCLUDE = ['render', 'ionViewDidLoad', 'ionViewWillUnload'];
+
+      classNode.members.filter(n => n.kind === ts.SyntaxKind.MethodDeclaration).forEach(methodNode => {
+        let methodName: string = null;
+        let isValidMethod = false;
+
+        methodNode.forEachChild(n => {
+          if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
+            methodName = n.getText();
+
+            if (methodName.indexOf('_') === 0) {
+              return;
+            }
+
+            if (EXCLUDE.indexOf(methodName) > -1) {
+              return;
+            }
+
+            if (methodNode.modifiers) {
+              if (methodNode.modifiers.some(n => n.kind === ts.SyntaxKind.PrivateKeyword)) {
+                return;
+              }
+            }
+
+            isValidMethod = true;
+          }
+        });
+
+        if (isValidMethod && methodName) {
+          cmpMeta.methods.push(methodName);
+        }
+      });
+
+      cmpMeta.methods = cmpMeta.methods.sort();
+    }
+
+
+    function getPropertyDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       cmpMeta.props = {};
+
+      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
       propMembers.forEach(memberNode => {
         let isProp = false;
@@ -85,9 +126,9 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
 
     function getListenDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-
       cmpMeta.listeners = {};
+
+      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
       propMembers.forEach(memberNode => {
         let isListen = false;
@@ -156,9 +197,9 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
 
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-
       cmpMeta.watchers = {};
+
+      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
       propMembers.forEach(memberNode => {
         let isWatch = false;

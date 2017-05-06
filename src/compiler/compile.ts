@@ -314,6 +314,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
 
     const componentUrl = f.jsFilePath.replace(destDir + config.packages.path.sep, '');
     const modes = Object.assign({}, f.cmpMeta.modes);
+    const methods = f.cmpMeta.methods.slice();
     const componentDir = config.packages.path.dirname(componentUrl);
 
     Object.keys(modes).forEach(modeName => {
@@ -331,6 +332,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       componentUrl: componentUrl,
       componentClass: f.cmpClassName,
       modes: modes,
+      methods: methods,
       props: f.cmpMeta.props,
       listeners: f.cmpMeta.listeners,
       watchers: f.cmpMeta.watchers,
@@ -355,6 +357,7 @@ function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       componentUrl: cmp.componentUrl,
       componentClass: cmp.componentClass,
       modes: cmp.modes,
+      methods: cmp.methods,
       props: cmp.props,
       listeners: cmp.listeners,
       watchers: cmp.watchers,

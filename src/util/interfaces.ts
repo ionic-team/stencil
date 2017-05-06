@@ -161,29 +161,34 @@ export interface ComponentModeData {
   [1]: string;
 
   /**
+   * methods
+   */
+  [2]: Methods;
+
+  /**
    * listeners
    */
-  [2]: ComponentListenersData[];
+  [3]: ComponentListenersData[];
 
   /**
    * watchers
    */
-  [3]: ComponentWatchersData[];
+  [4]: ComponentWatchersData[];
 
   /**
    * shadow
    */
-  [4]: boolean;
+  [5]: boolean;
 
   /**
    * mode name (ios, md, wp)
    */
-  [5]: string;
+  [6]: string;
 
   /**
    * component mode styles
    */
-  [6]: string;
+  [7]: string;
 }
 
 
@@ -256,6 +261,9 @@ export interface Props {
 }
 
 
+export type Methods = string[];
+
+
 export interface ListenDecorator {
   (eventName: string, opts?: ListenOpts): any;
 }
@@ -304,6 +312,7 @@ export interface ConfigApi {
 export interface ComponentMeta {
   tag?: string;
   props?: Props;
+  methods?: Methods;
   listeners?: ComponentMetaListeners;
   watchers?: Watchers;
   shadow?: boolean;

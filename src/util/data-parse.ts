@@ -11,10 +11,13 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // get component meta data by tag name
   var cmpMeta = registry[cmpModeData[0]];
 
+  // component methods
+  cmpMeta.methods = cmpModeData[2];
+
   // component listeners
   cmpMeta.listeners = {};
-  for (i = 0; i < cmpModeData[2].length; i++) {
-    cmpListenerData = cmpModeData[2][i];
+  for (i = 0; i < cmpModeData[3].length; i++) {
+    cmpListenerData = cmpModeData[3][i];
     cmpMeta.listeners[cmpListenerData[0]] = {
       eventName: cmpListenerData[1],
       capture: !!cmpListenerData[2],
@@ -25,23 +28,23 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 
   // component instance property watchers
   cmpMeta.watchers = {};
-  for (i = 0; i < cmpModeData[3].length; i++) {
-    cmpWatchData = cmpModeData[3][i];
+  for (i = 0; i < cmpModeData[4].length; i++) {
+    cmpWatchData = cmpModeData[4][i];
     cmpMeta.watchers[cmpWatchData[0]] = {
       fn: cmpWatchData[1],
     };
   }
 
   // shadow
-  cmpMeta.shadow = !!cmpModeData[4];
+  cmpMeta.shadow = !!cmpModeData[5];
 
   // mode name (ios, md, wp)
   // get component mode
-  if (isString(cmpModeData[6])) {
-    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[5].toString())];
+  if (isString(cmpModeData[7])) {
+    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[6].toString())];
     if (cmpMode) {
       // component mode styles
-      cmpMode.styles = cmpModeData[6];
+      cmpMode.styles = cmpModeData[7];
     }
   }
 

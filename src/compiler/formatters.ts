@@ -53,12 +53,12 @@ export function formatComponentRegistryProps(props: Props): any {
 }
 
 
-export function formatComponentModeLoader(component: Component, mode: ComponentMode) {
-  const tag = component.tag.trim().toLowerCase();
+export function formatComponentModeLoader(cmp: Component, mode: ComponentMode) {
+  const tag = cmp.tag.trim().toLowerCase();
 
-  const componentClass = component.componentClass;
+  const componentClass = cmp.componentClass;
 
-  const shadow = component.shadow;
+  const shadow = cmp.shadow;
 
   const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
 
@@ -71,18 +71,21 @@ export function formatComponentModeLoader(component: Component, mode: ComponentM
     label += '.' + mode.name;
   }
 
-  const listeners = formatListeners(label, component.listeners);
+  const methods = formatMethods(cmp.methods);
 
-  const watchers = formatWatchers(label, component.watchers);
+  const listeners = formatListeners(label, cmp.listeners);
+
+  const watchers = formatWatchers(label, cmp.watchers);
 
   const t = [
     `/** ${label}: [0] tagName **/\n'${tag}'`,
     `/** ${label}: [1] component class name **/\n'${componentClass}'`,
-    `/** ${label}: [2] listeners **/\n${listeners}`,
-    `/** ${label}: [3] watchers **/\n${watchers}`,
-    `/** ${label}: [4] shadow **/\n${formatBoolean(shadow)}`,
-    `/** ${label}: [5] modeName **/\n${modeCode}`,
-    `/** ${label}: [6] styles **/\n${styles}`
+    `/** ${label}: [2] methods **/\n${methods}`,
+    `/** ${label}: [3] listeners **/\n${listeners}`,
+    `/** ${label}: [4] watchers **/\n${watchers}`,
+    `/** ${label}: [5] shadow **/\n${formatBoolean(shadow)}`,
+    `/** ${label}: [6] modeName **/\n${modeCode}`,
+    `/** ${label}: [7] styles **/\n${styles}`
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
@@ -118,15 +121,24 @@ export function formatModeName(modeName: string) {
 }
 
 
+function formatMethods(methods: string[]) {
+  if (!methods || !methods.length) {
+    return '0 /* no methods */';
+  }
+
+  return `['` + methods.join(`', '`) + `']`;
+}
+
+
 function formatListeners(label: string, listeners: Listeners) {
-  const methodNames = Object.keys(listeners);
-  if (!methodNames.length) {
+  const listenerMethodNames = Object.keys(listeners);
+  if (!listenerMethodNames.length) {
     return '[]';
   }
 
   const t: string[] = [];
 
-  methodNames.forEach((methodName, listenerIndex) => {
+  listenerMethodNames.forEach((methodName, listenerIndex) => {
     t.push(formatListenerOpts(label, methodName, listenerIndex, listeners[methodName]));
   });
 
@@ -149,14 +161,14 @@ function formatListenerOpts(label: string, methodName: string, listenerIndex: nu
 
 
 function formatWatchers(label: string, watchers: Watchers) {
-  const methodNames = Object.keys(watchers);
-  if (!methodNames.length) {
+  const watcherMethodNames = Object.keys(watchers);
+  if (!watcherMethodNames.length) {
     return '[]';
   }
 
   const t: string[] = [];
 
-  methodNames.forEach((methodName, watchIndex) => {
+  watcherMethodNames.forEach((methodName, watchIndex) => {
     t.push(formatWatcherOpts(label, methodName, watchIndex, watchers[methodName]));
   });
 
