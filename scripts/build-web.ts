@@ -17,7 +17,8 @@ const DEV_MODE = process.argv.indexOf('dev') > -1;
 const WATCH = process.argv.indexOf('watch') > -1;
 
 const BUNDLES = [
-  { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-toolbar', 'ion-title'] },
+  { components: ['ion-animation'], priority: 'low' },
+  { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-title', 'ion-toolbar'] },
   { components: ['ion-avatar', 'ion-thumbnail'] },
   { components: ['ion-badge'] },
   { components: ['ion-button'] },
@@ -25,6 +26,7 @@ const BUNDLES = [
   { components: ['ion-list', 'ion-item', 'ion-label'] },
   { components: ['ion-list-header', 'item-divider'] },
   { components: ['ion-menu'], priority: 'low' },
+  { components: ['ion-modal'], priority: 'low' },
   { components: ['ion-gesture', 'ion-scroll'], priority: 'low' },
   { components: ['ion-toggle'] },
   { components: ['ion-slides', 'ion-slide'] },

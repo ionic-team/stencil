@@ -20,11 +20,13 @@
 
       <ion-content id="content">
 
+        <ion-button id="presentModal">Present Modal</ion-button>
+
         <ion-list>
 
           <ion-item>
-            <div slot="item-start">item start</div>
-            <div slot="item-end">item end</div>
+            <div slot="start">item start</div>
+            <div slot="end">item end</div>
             <ion-label>Hello!</ion-label>
           </ion-item>
 
@@ -82,6 +84,12 @@
         </p>
 
         <script>
+          var presentModal = document.getElementById('presentModal');
+          presentModal.addEventListener('click', function() {
+            var modal = document.getElementById('modal');
+            modal.toggle();
+          });
+
           // var content = document.getElementById('content');
           // content.addEventListener('ionScrollStart', function(ev) {
           //   console.log('ionScrollStart', ev);
@@ -133,6 +141,10 @@
       </ion-content>
 
     </ion-page>
+
+    <ion-modal id="modal">
+      Modal
+    </ion-modal>
 
   </ion-app>
 

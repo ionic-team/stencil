@@ -1,5 +1,5 @@
-import { Component, Prop } from '../index';
 import { AnimationController } from './animation-controller';
+import { Component, Prop } from '../index';
 
 
 @Component({
@@ -24,4 +24,3 @@ export class Animation {
   }
 
 }
-
