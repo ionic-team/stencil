@@ -7,7 +7,8 @@ import { Component, h, Ionic } from '../index';
     ios: 'modal.ios.scss',
     md: 'modal.md.scss',
     wp: 'modal.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Modal {
 

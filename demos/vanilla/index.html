@@ -79,15 +79,15 @@
           <ion-badge id="dynamicAttr">dynamic attribute</ion-badge>
         </p>
 
-        <p id="dynamicBadges">
-
-        </p>
+        <p id="dynamicBadges"></p>
 
         <script>
-          var presentModal = document.getElementById('presentModal');
-          presentModal.addEventListener('click', function() {
-            var modal = document.getElementById('modal');
-            modal.toggle();
+          document.getElementById('presentModal').addEventListener('click', function() {
+            var profileModal = Ionic.modal.create('my-profile', { userId: 88 });
+
+            profileModal.present().then(function() {
+              console.log('modal presented');
+            });
           });
 
           // var content = document.getElementById('content');

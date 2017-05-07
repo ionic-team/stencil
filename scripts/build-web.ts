@@ -27,6 +27,7 @@ const BUNDLES = [
   { components: ['ion-list-header', 'item-divider'] },
   { components: ['ion-menu'], priority: 'low' },
   { components: ['ion-modal'], priority: 'low' },
+  { components: ['ion-modal-viewport'], priority: 'low' },
   { components: ['ion-gesture', 'ion-scroll'], priority: 'low' },
   { components: ['ion-toggle'] },
   { components: ['ion-slides', 'ion-slide'] },

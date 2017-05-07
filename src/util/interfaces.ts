@@ -11,6 +11,22 @@ export interface Ionic {
   };
   dom: DomControllerApi;
   config: ConfigApi;
+  modal: ModalControllerApi;
+}
+
+
+export interface ModalControllerApi {
+  create: {(tag: string, data?: any, opts?: any): ModalViewControllerApi};
+}
+
+export interface ModalControllerInternalApi extends ModalControllerApi {
+  _create?: any[];
+}
+
+
+export interface ModalViewControllerApi {
+  dismiss: {(): Promise<void>};
+  present: {(): Promise<void>};
 }
 
 

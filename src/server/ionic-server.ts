@@ -10,11 +10,19 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     emit: noop,
     listener: {
       enable: noop,
-      add: function() { return noop; }
+      add: () => noop
     },
     controllers: {},
     config: ConfigCtrl,
-    dom: DomCtrl
+    dom: DomCtrl,
+    modal: {
+      create: () => {
+        return {
+          present: () => Promise.resolve(),
+          dismiss: () => Promise.resolve()
+        };
+      }
+    }
   };
 
   return injectedIonic;

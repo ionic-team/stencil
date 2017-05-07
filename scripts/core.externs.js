@@ -35,8 +35,12 @@ function write(){};
 function Ionic(){};
 function config(){};
 function controllers(){};
+function create(){};
+function dismiss(){};
 function emit(){};
 function listen(){};
+function modal(){};
+function present(){};
 function theme(){};
 
 

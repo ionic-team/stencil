@@ -1,7 +1,7 @@
 import { ComponentMeta, Component, ComponentModeData, ComponentRegistry, ConfigApi,
   DomControllerApi, IonicGlobal, PlatformApi } from '../util/interfaces';
 import { h } from '../client/renderer/h';
-import { initInjectedIonic } from './injected-ionic-server';
+import { initInjectedIonic } from './ionic-server';
 import { parseComponentModeData } from '../util/data-parse';
 
 

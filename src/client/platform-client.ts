@@ -1,7 +1,7 @@
 import { Component, ComponentMeta, ComponentRegistry,
   IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
-import { initInjectedIonic } from './injected-ionic-client';
+import { initInjectedIonic } from './ionic-client';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 
@@ -15,7 +15,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
 
 
-  const injectedIonic = initInjectedIonic(win, IonicGbl.eventNameFn, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+  const injectedIonic = initInjectedIonic(IonicGbl, win, doc);
 
 
   IonicGbl.loadComponents = function loadComponents(bundleId, importFn) {
