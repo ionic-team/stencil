@@ -18,16 +18,18 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const injectedIonic = initInjectedIonic(IonicGbl, win, doc);
 
 
-  IonicGbl.loadComponents = function loadComponents(bundleId, importFn) {
+  IonicGbl.loadComponents = function loadComponents(coreVersion, bundleId, importFn) {
+    coreVersion;
     var args = arguments;
 
     // import component function
     // inject ionic globals
     importFn(moduleImports, h, injectedIonic);
 
-    for (var i = 2; i < args.length; i++) {
-      // first arg is the bundleId
-      // second arg is the importFn
+    for (var i = 3; i < args.length; i++) {
+      // first arg is core version
+      // second arg is the bundleId
+      // third arg is the importFn
       // each arg after that is a component/mode
       parseComponentModeData(registry, moduleImports, args[i]);
 

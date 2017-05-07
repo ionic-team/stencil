@@ -19,7 +19,7 @@ export function initProps(plt: PlatformApi, config: ConfigApi, renderer: Rendere
   }
 
   Object.keys(props).forEach(propName => {
-    const watcher: Function = (watchers[propName]) ? instance[watchers[propName].fn].bind(instance) : null;
+    const watcher: Function = (watchers && watchers[propName]) ? instance[watchers[propName].fn].bind(instance) : null;
 
     propValues[propName] = getInitialValue(config, elm, instance, props[propName].type, propName);
 

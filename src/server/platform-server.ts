@@ -12,16 +12,17 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
   const injectedIonic = initInjectedIonic(ConfigCtrl, DomCtrl);
 
 
-  IonicGbl.loadComponents = function loadComponents(bundleId, importFn) {
+  IonicGbl.loadComponents = function loadComponents(coreVersion, bundleId, importFn) {
     var args = arguments;
 
     // import component function
     // inject ionic globals
     importFn(moduleImports, h, injectedIonic);
 
-    for (var i = 2; i < args.length; i++) {
-      // first arg is the bundleId
-      // second arg is the importFn
+    for (var i = 3; i < args.length; i++) {
+      // first arg is core version
+      // second arg is the bundleId
+      // third arg is the importFn
       // each arg after that is a component/mode
       var cmpModeData: ComponentModeData = args[i];
 
@@ -29,7 +30,7 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
 
       // tag name (ion-badge)
       var tag = cmpModeData[0];
-      console.log(`load tag: ${tag}, bundleId: ${bundleId}`);
+      console.log(`load tag: ${tag}, bundleId: ${bundleId}, coreVersion: ${coreVersion}`);
 
       registerComponent(tag, []);
     }

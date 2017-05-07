@@ -19,8 +19,16 @@ export interface ModalControllerApi {
   create: {(tag: string, data?: any, opts?: any): ModalViewControllerApi};
 }
 
+
 export interface ModalControllerInternalApi extends ModalControllerApi {
   _create?: any[];
+}
+
+
+export interface ModalDidEnterEvent {
+  detail: {
+    modalId: string;
+  };
 }
 
 
@@ -125,7 +133,7 @@ export interface ContentDimensions {
 export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
-  loadComponents?: {(bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData): void};
+  loadComponents?: {(coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData): void};
   eventNameFn?: {(eventName: string): string};
   config?: Object;
   ConfigCtrl?: ConfigApi;
@@ -172,39 +180,34 @@ export interface ComponentModeData {
   [0]: string;
 
   /**
-   * component class name (Badge)
-   */
-  [1]: string;
-
-  /**
    * methods
    */
-  [2]: Methods;
+  [1]: Methods;
 
   /**
    * listeners
    */
-  [3]: ComponentListenersData[];
+  [2]: ComponentListenersData[];
 
   /**
    * watchers
    */
-  [4]: ComponentWatchersData[];
+  [3]: ComponentWatchersData[];
 
   /**
    * shadow
    */
-  [5]: boolean;
+  [4]: boolean;
 
   /**
    * mode name (ios, md, wp)
    */
-  [6]: string;
+  [5]: string;
 
   /**
    * component mode styles
    */
-  [7]: string;
+  [6]: string;
 }
 
 
@@ -406,6 +409,7 @@ export interface ProxyElement extends HTMLElement {
   $queued?: boolean;
   $instance?: Component;
   $hostContent?: HostContentNodes;
+  $hasLoadEvent?: boolean;
 
   [memberName: string]: any;
 }

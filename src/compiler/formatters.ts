@@ -19,6 +19,9 @@ export function formatBundleContent(bundleId: string, bundledJsModules: string, 
   return [
     `Ionic.loadComponents(\n`,
 
+      `/**** core version ****/`,
+      `0,\n`,
+
       `/**** bundleId ****/`,
       `${bundleId},\n`,
 
@@ -54,13 +57,9 @@ export function formatComponentRegistryProps(props: Props): any {
 
 
 export function formatComponentModeLoader(cmp: Component, mode: ComponentMode) {
-  const tag = cmp.tag.trim().toLowerCase();
+  const tag = cmp.tag;
 
-  const componentClass = cmp.componentClass;
-
-  const shadow = cmp.shadow;
-
-  const modeName = (mode.name ? mode.name.trim().toLowerCase() : '');
+  const modeName = (mode.name ? mode.name : '');
 
   const modeCode = formatModeName(modeName);
 
@@ -77,15 +76,16 @@ export function formatComponentModeLoader(cmp: Component, mode: ComponentMode) {
 
   const watchers = formatWatchers(label, cmp.watchers);
 
+  const shadow = formatShadow(cmp.shadow);
+
   const t = [
     `/** ${label}: [0] tagName **/\n'${tag}'`,
-    `/** ${label}: [1] component class name **/\n'${componentClass}'`,
-    `/** ${label}: [2] methods **/\n${methods}`,
-    `/** ${label}: [3] listeners **/\n${listeners}`,
-    `/** ${label}: [4] watchers **/\n${watchers}`,
-    `/** ${label}: [5] shadow **/\n${formatBoolean(shadow)}`,
-    `/** ${label}: [6] modeName **/\n${modeCode}`,
-    `/** ${label}: [7] styles **/\n${styles}`
+    `/** ${label}: [1] methods **/\n${methods}`,
+    `/** ${label}: [2] listeners **/\n${listeners}`,
+    `/** ${label}: [3] watchers **/\n${watchers}`,
+    `/** ${label}: [4] shadow **/\n${shadow}`,
+    `/** ${label}: [5] modeName **/\n${modeCode}`,
+    `/** ${label}: [6] styles **/\n${styles}`
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
@@ -138,7 +138,7 @@ function formatMethods(methods: string[]) {
 function formatListeners(label: string, listeners: Listeners) {
   const listenerMethodNames = Object.keys(listeners);
   if (!listenerMethodNames.length) {
-    return '[]';
+    return '0 /* no listeners */';
   }
 
   const t: string[] = [];
@@ -168,7 +168,7 @@ function formatListenerOpts(label: string, methodName: string, listenerIndex: nu
 function formatWatchers(label: string, watchers: Watchers) {
   const watcherMethodNames = Object.keys(watchers);
   if (!watcherMethodNames.length) {
-    return '[]';
+    return '0 /* no watchers */';
   }
 
   const t: string[] = [];
@@ -189,6 +189,13 @@ function formatWatcherOpts(label: string, methodName: string, watchIndex: number
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
+}
+
+
+function formatShadow(val: boolean) {
+  return val ?
+    '1 /* use shadow dom */' :
+    '0 /* do not use shadow dom */';
 }
 
 
@@ -218,5 +225,5 @@ export function formatRegistryContent(registry: Registry) {
 
 
 export function getBundledModulesId(bundle: Bundle) {
-  return bundle.components.map(c => c.component.componentClass).sort().join('.');
+  return bundle.components.map(c => c.component.tag).sort().join('.');
 }

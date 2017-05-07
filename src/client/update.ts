@@ -62,7 +62,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   }
 
   if (initalLoad) {
-    attachListeners(cmpMeta.listeners, instance);
+    cmpMeta.listeners && attachListeners(cmpMeta.listeners, instance);
 
     instance.ionViewDidLoad && instance.ionViewDidLoad();
   }

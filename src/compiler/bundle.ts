@@ -172,9 +172,8 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
       let fileMeta = createFileMeta(config.packages, ctx, importPath, '');
       fileMeta.rebundleOnChange = true;
 
-      let exportName = c.component.componentClass;
       entryContent.push(`import { ${c.component.componentClass} } from "${importPath}";`);
-      entryContent.push(`exports.${exportName} = ${exportName};`);
+      entryContent.push(`exports['${c.component.tag}'] = ${c.component.componentClass};`);
     });
 
     ctx.bundledJsModules[id] = entryContent.join('\n');

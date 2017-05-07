@@ -349,7 +349,11 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
 
 
 function updateTag(cmpMeta: ComponentMeta) {
-  cmpMeta.tag = cmpMeta.tag.replace(/\s/g, '').toLowerCase();
+  cmpMeta.tag = cmpMeta.tag.trim().toLowerCase();
+
+  if (cmpMeta.tag.indexOf(' ') > -1) {
+    throw `"${cmpMeta.tag}" tag cannot contain a space`;
+  }
 
   if (cmpMeta.tag.indexOf(',') > -1) {
     throw `"${cmpMeta.tag}" tag cannot be use for multiple tags`;
@@ -362,6 +366,10 @@ function updateTag(cmpMeta: ComponentMeta) {
 
   if (cmpMeta.tag.indexOf('-') === -1) {
     throw `"${cmpMeta.tag}" tag must contain a dash (-)`;
+  }
+
+  if (cmpMeta.tag.indexOf('--') === -1) {
+    throw `"${cmpMeta.tag}" tag cannot contain multiple dashes (-) next to each other`;
   }
 
   if (cmpMeta.tag.indexOf('-') === 0) {
@@ -379,7 +387,8 @@ function updateStyles(cmpMeta: ComponentMeta) {
 
   if (styleModes) {
     Object.keys(styleModes).forEach(styleModeName => {
-      cmpMeta.modes[styleModeName] = {
+      const modeName = styleModeName.trim().toLowerCase();
+      cmpMeta.modes[modeName] = {
         styleUrls: [styleModes[styleModeName]]
       };
     });
