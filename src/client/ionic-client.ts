@@ -26,6 +26,9 @@ export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocu
   (<Ionic>IonicGlb).theme = themeVNodeData;
 
   (<Ionic>IonicGlb).emit = (instance: any, eventName: string, data: CustomEventOptions = {}) => {
+    if (data.bubbles === undefined) {
+      data.bubbles = true;
+    }
     if (data.composed === undefined) {
       // https://developers.google.com/web/fundamentals/getting-started/primers/shadowdom#events
       data.composed = true;

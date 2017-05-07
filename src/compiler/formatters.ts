@@ -106,7 +106,7 @@ export function formatStyles(styles: string) {
 
 
 export function formatModeName(modeName: string) {
-  return `${getModeCode(modeName)} /* ${modeName} **/`;
+  return `${getModeCode(modeName)} /* ${modeName} mode **/`;
 }
 
 
