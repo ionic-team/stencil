@@ -365,11 +365,11 @@ function updateTag(cmpMeta: ComponentMeta) {
   }
 
   if (cmpMeta.tag.indexOf('-') === -1) {
-    throw `"${cmpMeta.tag}" tag must contain a dash (-)`;
+    throw `"${cmpMeta.tag}" tag must contain a dash (-) to work as a valid web component`;
   }
 
-  if (cmpMeta.tag.indexOf('--') === -1) {
-    throw `"${cmpMeta.tag}" tag cannot contain multiple dashes (-) next to each other`;
+  if (cmpMeta.tag.indexOf('--') > -1) {
+    throw `"${cmpMeta.tag}" tag cannot contain multiple dashes (--) next to each other`;
   }
 
   if (cmpMeta.tag.indexOf('-') === 0) {
