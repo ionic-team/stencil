@@ -1,4 +1,5 @@
 import { Component, h, Ionic } from '../index';
+import { ModalDidEnterEvent } from '../../util/interfaces';
 
 
 @Component({
@@ -11,9 +12,16 @@ import { Component, h, Ionic } from '../index';
   shadow: false
 })
 export class Modal {
+  id: string;
 
-  toggle() {
-    console.log('modal toggle');
+  ionViewDidLoad() {
+    const ev: ModalDidEnterEvent = {
+      detail: {
+        modalId: this.id
+      }
+    };
+
+    Ionic.emit(this, 'ionModalDidLoad', ev);
   }
 
   render() {

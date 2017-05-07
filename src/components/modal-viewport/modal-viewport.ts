@@ -1,6 +1,5 @@
-import { Component, Ionic } from '../index';
+import { Component, Ionic, Listen } from '../index';
 import { ModalControllerApi, ModalControllerInternalApi, ModalViewControllerApi } from '../../util/interfaces';
-import { removeArrayItem } from '../../util/helpers';
 
 
 @Component({
@@ -8,7 +7,9 @@ import { removeArrayItem } from '../../util/helpers';
   shadow: false
 })
 export class ModalViewport implements ModalControllerApi {
-  views: ModalViewController[] = [];
+  private $el: HTMLElement;
+  _views: {[id: string]: ModalViewController} = {};
+  _ids = 0;
 
 
   ionViewDidLoad() {
@@ -22,7 +23,7 @@ export class ModalViewport implements ModalControllerApi {
         if (q[4]) {
           if (!q[5]) {
             viewCtrl = new ModalViewController(this, q[0], q[1], q[2]);
-            presentModal(this, q[6], q[7]);
+            viewCtrl.append(q[6], q[7]);
           }
 
         } else {
@@ -45,36 +46,74 @@ export class ModalViewport implements ModalControllerApi {
     return modalOverlay;
   }
 
+
+  append(modalElm: HTMLElement) {
+    this.$el.appendChild(modalElm);
+  }
+
+
+  @Listen('ionModalDidLoad')
+  viewDidLoad(ev: any) {
+    ev.stopPropagation();
+
+    const viewCtrl = this._views[ev.detail.modalId];
+    if (viewCtrl) {
+      viewCtrl.state = 'entering';
+
+      Ionic.dom.write(() => {
+        viewCtrl.startTrans();
+      });
+    }
+  }
+
 }
 
 
 export class ModalViewController implements ModalViewControllerApi {
+  private $el: HTMLElement;
+  private presentResolve: Function;
+  private presentReject: Function;
 
-  constructor(private viewport: ModalViewport, tag: string, data: any, opts: any) {
+  id: string;
+  state: string;
+
+
+  constructor(private viewport: ModalViewport, public tag: string, public data: any, public opts: any) {
     console.log(`modal: ${tag}, ${data}, ${opts}`);
 
+    this.id = `modal-${this.viewport._ids++}`;
+    viewport._views[this.id] = this;
+
+    this.state = 'loading';
   }
 
 
   present() {
     return new Promise<void>((resolve, reject) => {
-      presentModal(this.viewport, resolve, reject);
+      this.append(resolve, reject);
     });
   }
 
 
+  append(presentResolve: Function, presentReject: Function) {
+    this.presentResolve = presentResolve;
+    this.presentReject = presentReject;
+
+    const elm = this.$el = document.createElement('ion-modal');
+    elm.id = this.id;
+
+    elm.appendChild(document.createElement(this.tag));
+    this.viewport.append(elm);
+  }
+
+
   dismiss() {
-    removeArrayItem(this.viewport.views, this);
     return Promise.resolve();
   }
 
-}
 
+  startTrans() {
+    this.presentResolve();
+  }
 
-function presentModal(viewport: ModalViewport, resolve: Function, reject: (reason?: any) => void) {
-  reject;
-
-  viewport.views.push(this);
-
-  resolve();
 }

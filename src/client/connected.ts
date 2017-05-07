@@ -4,6 +4,8 @@ import { queueUpdate } from './update';
 
 
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
+  elm.$hasLoadEvent = true;
+
   plt.nextTick(() => {
     const tag = cmpMeta.tag;
 
