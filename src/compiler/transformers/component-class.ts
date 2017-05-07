@@ -6,10 +6,17 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
   return (transformContext) => {
 
-    function visitClass(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-      fileMeta.cmpMeta = getComponentDecoratorData(classNode);
+    function visitClass(srcContext: SourceContext, fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
+      const cmpMeta = getComponentDecoratorData(classNode);
 
-      if (fileMeta.cmpMeta) {
+      if (cmpMeta) {
+        if (fileMeta.cmpMeta) {
+          throw `file cannot have multiple @Components: ${fileMeta.filePath}`;
+        }
+
+        fileMeta.cmpMeta = cmpMeta;
+
+        srcContext.cmpClassCount++;
         fileMeta.hasCmpClass = true;
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
@@ -19,9 +26,11 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
 
         return removeClassDecorator(classNode);
+
+      } else if (!fileMeta.cmpMeta) {
+        fileMeta.hasCmpClass = false;
       }
 
-      fileMeta.hasCmpClass = false;
       return classNode;
     }
 
@@ -241,24 +250,28 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     }
 
 
-    function visit(fileMeta: FileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
+    function visit(srcContext: SourceContext, fileMeta: FileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(fileMeta, node as ts.ClassDeclaration);
+          return visitClass(srcContext, fileMeta, node as ts.ClassDeclaration);
 
         default:
           return ts.visitEachChild(node, (node) => {
-            return visit(fileMeta, node);
+            return visit(srcContext, fileMeta, node);
           }, transformContext);
       }
     }
 
 
     return (tsSourceFile) => {
+      const srcContext: SourceContext = {
+        cmpClassCount: 0
+      };
+
       const fileMeta = ctx.files.get(tsSourceFile.fileName);
       if (fileMeta && fileMeta.hasCmpClass) {
-        return visit(fileMeta, tsSourceFile) as ts.SourceFile;
+        return visit(srcContext, fileMeta, tsSourceFile) as ts.SourceFile;
       }
 
       return tsSourceFile;
@@ -402,5 +415,10 @@ function updateShadow(cmpMeta: ComponentMeta) {
   } else {
     cmpMeta.shadow = !!cmpMeta.shadow;
   }
+}
+
+
+interface SourceContext {
+  cmpClassCount: number;
 }
 
