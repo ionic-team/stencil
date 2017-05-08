@@ -1,5 +1,6 @@
 import { Component, Ionic, Listen } from '../index';
 import { ModalControllerApi, ModalControllerInternalApi, ModalViewControllerApi } from '../../util/interfaces';
+import { IModal as Modal } from '../modal/modal-interface';
 
 
 @Component({
@@ -59,10 +60,7 @@ export class ModalViewport implements ModalControllerApi {
     const viewCtrl = this._views[ev.detail.modalId];
     if (viewCtrl) {
       viewCtrl.state = 'entering';
-
-      Ionic.dom.write(() => {
-        viewCtrl.startTrans();
-      });
+      viewCtrl.startTrans();
     }
   }
 
@@ -70,7 +68,7 @@ export class ModalViewport implements ModalControllerApi {
 
 
 export class ModalViewController implements ModalViewControllerApi {
-  private $el: HTMLElement;
+  private $el: Modal;
   private presentResolve: Function;
   private presentReject: Function;
 
@@ -81,7 +79,7 @@ export class ModalViewController implements ModalViewControllerApi {
   constructor(private viewport: ModalViewport, public tag: string, public data: any, public opts: any) {
     console.log(`modal: ${tag}, ${data}, ${opts}`);
 
-    this.id = `modal-${this.viewport._ids++}`;
+    this.id = `modal-${viewport._ids++}`;
     viewport._views[this.id] = this;
 
     this.state = 'loading';
@@ -99,7 +97,7 @@ export class ModalViewController implements ModalViewControllerApi {
     this.presentResolve = presentResolve;
     this.presentReject = presentReject;
 
-    const elm = this.$el = document.createElement('ion-modal');
+    const elm = (<any>this).$el = document.createElement('ion-modal');
     elm.id = this.id;
 
     elm.appendChild(document.createElement(this.tag));
@@ -113,7 +111,9 @@ export class ModalViewController implements ModalViewControllerApi {
 
 
   startTrans() {
-    this.presentResolve();
+    this.$el.transitionIn(() => {
+      this.presentResolve();
+    });
   }
 
 }
