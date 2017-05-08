@@ -23,7 +23,7 @@ const BUNDLES = [
   { components: ['ion-button'] },
   { components: ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'] },
   { components: ['ion-list', 'ion-item', 'ion-label'] },
-  { components: ['ion-list-header', 'item-divider'] },
+  { components: ['ion-list-header', 'ion-item-divider'] },
   { components: ['ion-menu'], priority: 'low' },
   { components: ['ion-modal'], priority: 'low' },
   { components: ['ion-modal-viewport'], priority: 'low' },

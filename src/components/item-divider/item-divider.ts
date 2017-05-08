@@ -7,12 +7,24 @@ import { Component, h, Ionic } from '../index';
     ios: 'item-divider.ios.scss',
     md: 'item-divider.md.scss',
     wp: 'item-divider.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class ItemDivider {
   render() {
-    return h(this, Ionic.theme(this, 'item-divider'),
-      h('slot')
+    return h(this, Ionic.theme(this, 'item item-divider'),
+      [
+        h('slot', { attrs: { name: 'start' } }),
+        h('div.item-inner', [
+            h('div.input-wrapper',
+              h('slot')
+            ),
+            h('slot', { attrs: { name: 'end' } }),
+            // h('ion-reorder')
+          ]
+        ),
+        // h('div.button-effect')
+      ]
     );
   }
 }

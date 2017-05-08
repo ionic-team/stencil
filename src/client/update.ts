@@ -45,7 +45,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
       // collect up the host content nodes so we can
       // manually move them around to the correct slot
 
-      if (cmpMeta.tag === 'ion-item') {
+      if (cmpMeta.tag === 'ion-item' || cmpMeta.tag === 'ion-item-divider') {
         // TODO!!
         cmpMeta.namedSlots = ['start', 'end'];
       }
