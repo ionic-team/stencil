@@ -20,7 +20,7 @@ export function attachListeners(listenerMetaOpts: ComponentMetaListeners, instan
 }
 
 
-export function enableListener(instance: Component, eventName: string, shouldEnable: boolean, listenOn?: string) {
+export function enableListener(instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
   if (instance && instance.$meta) {
     const listenerMetaOpts = instance.$meta.listeners;
 
@@ -35,8 +35,8 @@ export function enableListener(instance: Component, eventName: string, shouldEna
         if (listenerOpts.eventName === eventName) {
 
           if (shouldEnable && !deregisterFns[eventName]) {
-            var listenOnEventName = listenOn ? `${listenOn}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(instance.$el, listenOnEventName, instance[methodName].bind(instance), listenerOpts);
+            var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
+            deregisterFns[eventName] = addEventListener(instance.$el, attachToEventName, instance[methodName].bind(instance), listenerOpts);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();

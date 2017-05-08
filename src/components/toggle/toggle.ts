@@ -122,7 +122,7 @@ export class Toggle implements BooleanInputComponent {
           'type': 'pan,press',
           'direction': 'x',
           'threshold': 20,
-          'listenOn': 'parent'
+          'attachTo': 'parent'
         }
       }),
         [

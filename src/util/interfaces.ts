@@ -57,7 +57,7 @@ export interface CustomEventOptions {
 
 
 export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, listenOn?: string): void;
+  (instance: any, eventName: string, enabled: boolean, attachTo?: string): void;
 }
 
 
