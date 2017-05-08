@@ -12,6 +12,20 @@ export interface Ionic {
   dom: DomControllerApi;
   config: ConfigApi;
   modal: ModalControllerApi;
+  Animation: any;
+}
+
+
+export interface IonicGlobal {
+  staticDir?: string;
+  components?: LoadComponents;
+  loadComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData) => void;
+  eventNameFn?: (eventName: string) => string;
+  config?: Object;
+  ConfigCtrl?: ConfigApi;
+  DomCtrl?: DomControllerApi;
+  NextTickCtrl?: NextTickApi;
+  Animation: any;
 }
 
 
@@ -127,18 +141,6 @@ export interface ContentDimensions {
 
   scrollWidth: number;
   scrollLeft: number;
-}
-
-
-export interface IonicGlobal {
-  staticDir?: string;
-  components?: LoadComponents;
-  loadComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData) => void;
-  eventNameFn?: (eventName: string) => string;
-  config?: Object;
-  ConfigCtrl?: ConfigApi;
-  DomCtrl?: DomControllerApi;
-  NextTickCtrl?: NextTickApi;
 }
 
 

@@ -25,6 +25,7 @@ function raf(){};
 function read(){};
 function staticDir(){};
 function write(){};
+function Animation(){};
 
 
 /**

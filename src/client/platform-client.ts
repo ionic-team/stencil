@@ -74,7 +74,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
         if (priority === 'low') {
           // low priority which means its ok to load this behind
-          // UI components, for example: gestures, menu, animations
+          // UI components, for example: gestures, menu
           if ('requestIdleCallback' in win) {
             // kick off the request in a requestIdleCallback
             (<any>win).requestIdleCallback(() => {

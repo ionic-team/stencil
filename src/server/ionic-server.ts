@@ -22,7 +22,8 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
           dismiss: () => Promise.resolve()
         };
       }
-    }
+    },
+    Animation: {}
   };
 
   return injectedIonic;

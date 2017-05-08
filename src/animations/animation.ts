@@ -1,10 +1,12 @@
+import { AnimationOptions, EffectProperty, EffectState, PlayOptions } from './animation-interface';
 import { Css } from './css-props';
-import { Ionic } from '../index';
-import { isDef } from '../../util/helpers';
+import * as interfaces from '../util/interfaces';
+
+declare const Ionic: interfaces.Ionic;
 
 
-export class AnimationController {
-  private _c: AnimationController[];
+export class Animation {
+  private _c: Animation[];
   private _cL: number;
   private _e: HTMLElement[] = null;
   private _eL: number;
@@ -29,13 +31,13 @@ export class AnimationController {
   private _isAsync: boolean;
   private _twn: boolean;
 
-  parent: AnimationController;
+  parent: Animation;
   opts: AnimationOptions;
   hasChildren: boolean = false;
   isPlaying: boolean = false;
   hasCompleted: boolean = false;
 
-  element(ele: any): AnimationController {
+  element(ele: any): Animation {
     if (ele) {
       if (ele.length) {
         for (var i = 0; i < ele.length; i++) {
@@ -62,7 +64,7 @@ export class AnimationController {
   /**
    * Add a child animation to this animation.
    */
-  add(childAnimation: AnimationController): AnimationController {
+  add(childAnimation: Animation): Animation {
     childAnimation.parent = this;
     this.hasChildren = true;
     this._cL = (this._c = this._c || []).push(childAnimation);
@@ -74,7 +76,7 @@ export class AnimationController {
    * not have a duration, then it'll get the duration from its parent.
    */
   getDuration(opts?: PlayOptions): number {
-    if (opts && isDef(opts.duration)) {
+    if (opts && opts.duration !== null && opts.duration !== undefined) {
       return opts.duration;
     } else if (this._dur !== null) {
       return this._dur;
@@ -94,7 +96,7 @@ export class AnimationController {
   /**
    * Set the duration for this animation.
    */
-  duration(milliseconds: number): AnimationController {
+  duration(milliseconds: number): Animation {
     this._dur = milliseconds;
     return this;
   }
@@ -113,7 +115,7 @@ export class AnimationController {
   /**
    * Set the easing for this animation.
    */
-  easing(name: string): AnimationController {
+  easing(name: string): Animation {
     this._es = name;
     return this;
   }
@@ -121,7 +123,7 @@ export class AnimationController {
   /**
    * Set the easing for this reversed animation.
    */
-  easingReverse(name: string): AnimationController {
+  easingReverse(name: string): Animation {
     this._rvEs = name;
     return this;
   }
@@ -129,7 +131,7 @@ export class AnimationController {
   /**
    * Add the "from" value for a specific property.
    */
-  from(prop: string, val: any): AnimationController {
+  from(prop: string, val: any): Animation {
     this._addProp('from', prop, val);
     return this;
   }
@@ -137,13 +139,13 @@ export class AnimationController {
   /**
    * Add the "to" value for a specific property.
    */
-  to(prop: string, val: any, clearProperyAfterTransition?: boolean): AnimationController {
+  to(prop: string, val: any, clearProperyAfterTransition?: boolean): Animation {
     const fx = this._addProp('to', prop, val);
 
     if (clearProperyAfterTransition) {
       // if this effect is a transform then clear the transform effect
       // otherwise just clear the actual property
-      this.afterClearStyles([ fx.trans ? Css.transform : prop]);
+      this.afterClearStyles([ fx.trans ? Css.transformProp : prop]);
     }
 
     return this;
@@ -152,7 +154,7 @@ export class AnimationController {
   /**
    * Shortcut to add both the "from" and "to" for the same property.
    */
-  fromTo(prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean): AnimationController {
+  fromTo(prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean): Animation {
     return this.from(prop, fromVal).to(prop, toVal, clearProperyAfterTransition);
   }
 
@@ -163,7 +165,7 @@ export class AnimationController {
 
   private _getProp(name: string): EffectProperty {
     if (this._fx) {
-      return this._fx.find((prop) => prop.name === name);
+      return this._fx.find((prop) => prop.effectName === name);
     } else {
       this._fx = [];
     }
@@ -176,12 +178,12 @@ export class AnimationController {
     if (!fxProp) {
       // first time we've see this EffectProperty
       var shouldTrans = (ANIMATION_TRANSFORMS[prop] === 1);
-      fxProp = {
-        name: prop,
+      fxProp = <EffectProperty>{
+        effectName: prop,
         trans: shouldTrans,
 
         // add the will-change property for transforms or opacity
-        wc: (shouldTrans ? Css.transform : prop)
+        wc: (shouldTrans ? Css.transformProp : prop)
       };
       this._fx.push(fxProp);
     }
@@ -190,7 +192,7 @@ export class AnimationController {
     let fxState: EffectState = {
       val: val,
       num: null,
-      unit: '',
+      effectUnit: '',
     };
     fxProp[state] = fxState;
 
@@ -201,7 +203,7 @@ export class AnimationController {
       if (!isNaN(num)) {
         fxState.num = num;
       }
-      fxState.unit = (r[0] !== r[2] ? r[2] : '');
+      fxState.effectUnit = (r[0] !== r[2] ? r[2] : '');
 
     } else if (typeof val === 'number') {
       fxState.num = val;
@@ -214,7 +216,7 @@ export class AnimationController {
    * Add CSS class to this animation's elements
    * before the animation begins.
    */
-  beforeAddClass(className: string): AnimationController {
+  beforeAddClass(className: string): Animation {
     (this._bfAdd = this._bfAdd || []).push(className);
     return this;
   }
@@ -223,7 +225,7 @@ export class AnimationController {
    * Remove CSS class from this animation's elements
    * before the animation begins.
    */
-  beforeRemoveClass(className: string): AnimationController {
+  beforeRemoveClass(className: string): Animation {
     (this._bfRm = this._bfRm || []).push(className);
     return this;
   }
@@ -232,7 +234,7 @@ export class AnimationController {
    * Set CSS inline styles to this animation's elements
    * before the animation begins.
    */
-  beforeStyles(styles: { [property: string]: any; }): AnimationController {
+  beforeStyles(styles: { [property: string]: any; }): Animation {
     this._bfSty = styles;
     return this;
   }
@@ -241,7 +243,7 @@ export class AnimationController {
    * Clear CSS inline styles from this animation's elements
    * before the animation begins.
    */
-  beforeClearStyles(propertyNames: string[]): AnimationController {
+  beforeClearStyles(propertyNames: string[]): Animation {
     this._bfSty = this._bfSty || {};
     for (var i = 0; i < propertyNames.length; i++) {
       this._bfSty[propertyNames[i]] = '';
@@ -253,7 +255,7 @@ export class AnimationController {
    * Add a function which contains DOM reads, which will run
    * before the animation begins.
    */
-  beforeAddRead(domReadFn: Function): AnimationController {
+  beforeAddRead(domReadFn: Function): Animation {
     (this._rdFn = this._rdFn || []).push(domReadFn);
     return this;
   }
@@ -262,7 +264,7 @@ export class AnimationController {
    * Add a function which contains DOM writes, which will run
    * before the animation begins.
    */
-  beforeAddWrite(domWriteFn: Function): AnimationController {
+  beforeAddWrite(domWriteFn: Function): Animation {
     (this._wrFn = this._wrFn || []).push(domWriteFn);
     return this;
   }
@@ -271,7 +273,7 @@ export class AnimationController {
    * Add CSS class to this animation's elements
    * after the animation finishes.
    */
-  afterAddClass(className: string): AnimationController {
+  afterAddClass(className: string): Animation {
     (this._afAdd = this._afAdd || []).push(className);
     return this;
   }
@@ -280,7 +282,7 @@ export class AnimationController {
    * Remove CSS class from this animation's elements
    * after the animation finishes.
    */
-  afterRemoveClass(className: string): AnimationController {
+  afterRemoveClass(className: string): Animation {
     (this._afRm = this._afRm || []).push(className);
     return this;
   }
@@ -289,7 +291,7 @@ export class AnimationController {
    * Set CSS inline styles to this animation's elements
    * after the animation finishes.
    */
-  afterStyles(styles: { [property: string]: any; }): AnimationController {
+  afterStyles(styles: { [property: string]: any; }): Animation {
     this._afSty = styles;
     return this;
   }
@@ -298,7 +300,7 @@ export class AnimationController {
    * Clear CSS inline styles from this animation's elements
    * after the animation finishes.
    */
-  afterClearStyles(propertyNames: string[]): AnimationController {
+  afterClearStyles(propertyNames: string[]): Animation {
     this._afSty = this._afSty || {};
     for (var i = 0; i < propertyNames.length; i++) {
       this._afSty[propertyNames[i]] = '';
@@ -529,7 +531,7 @@ export class AnimationController {
     }
 
     if (this._hasDur) {
-      if (isDef(stepValue)) {
+      if (stepValue !== null && stepValue !== undefined) {
         // too late to have a smooth animation, just finish it
         // ******** DOM WRITE ****************
         this._setTrans(0, true);
@@ -633,9 +635,9 @@ export class AnimationController {
     for (i = 0; i < effects.length; i++) {
       var fx = effects[i];
 
-      if (fx.from && fx.to) {
-        var fromNum = fx.from.num;
-        var toNum = fx.to.num;
+      if (fx.fromEffect && fx.toEffect) {
+        var fromNum = fx.fromEffect.num;
+        var toNum = fx.toEffect.num;
         var tweenEffect = (fromNum !== toNum);
 
         if (tweenEffect) {
@@ -644,16 +646,16 @@ export class AnimationController {
 
         if (stepValue === 0) {
           // FROM
-          val = fx.from.val;
+          val = fx.fromEffect.val;
 
         } else if (stepValue === 1) {
           // TO
-          val = fx.to.val;
+          val = fx.toEffect.val;
 
         } else if (tweenEffect) {
           // EVERYTHING IN BETWEEN
           var valNum = (((toNum - fromNum) * stepValue) + fromNum);
-          var unit = fx.to.unit;
+          var unit = fx.toEffect.effectUnit;
           if (unit === 'px') {
             valNum = Math.round(valNum);
           }
@@ -661,7 +663,7 @@ export class AnimationController {
         }
 
         if (val !== null) {
-          var prop = fx.name;
+          var prop = fx.effectName;
           if (fx.trans) {
             finalTransform += prop + '(' + val + ') ';
 
@@ -681,7 +683,7 @@ export class AnimationController {
         finalTransform += 'translateZ(0px)';
       }
 
-      var cssTransform = Css.transform;
+      var cssTransform = Css.transformProp;
       for (i = 0; i < elements.length; i++) {
         // ******** DOM WRITE ****************
         (<any>elements[i].style)[cssTransform] = finalTransform;
@@ -704,9 +706,9 @@ export class AnimationController {
     const elements = this._e;
     const easing = (forcedLinearEasing ? 'linear' : this.getEasing());
     const durString = dur + 'ms';
-    const cssTransform = Css.transition;
-    const cssTransitionDuration = Css.transitionDuration;
-    const cssTransitionTimingFn = Css.transitionTimingFn;
+    const cssTransform = Css.transitionProp;
+    const cssTransitionDuration = Css.transitionDurationProp;
+    const cssTransitionTimingFn = Css.transitionTimingFnProp;
 
     let eleStyle: any;
     for (var i = 0; i < this._eL; i++) {
@@ -867,7 +869,7 @@ export class AnimationController {
 
       // remove the transition duration/easing
       // ******** DOM WRITE ****************
-      (<any>ele).style[Css.transitionDuration] = (<any>ele).style[Css.transitionTimingFn] = '';
+      (<any>ele).style[Css.transitionDurationProp] = (<any>ele).style[Css.transitionTimingFnProp] = '';
 
       if (this._rv) {
         // finished in reverse direction
@@ -1021,8 +1023,6 @@ export class AnimationController {
    * End the progress animation.
    */
   progressEnd(shouldComplete: boolean, currentStepValue: number, dur: number = -1) {
-    console.debug('Animation, progressEnd, shouldComplete', shouldComplete, 'currentStepValue', currentStepValue);
-
     if (this._rv) {
       // if the animation is going in reverse then
       // flip the step value: 0 becomes 1, 1 becomes 0
@@ -1092,7 +1092,7 @@ export class AnimationController {
   /**
    * Add a callback to fire when the animation has finished.
    */
-  onFinish(callback: Function, onceTimeCallback: boolean = false, clearOnFinishCallacks: boolean = false): AnimationController {
+  onFinish(callback: Function, onceTimeCallback: boolean = false, clearOnFinishCallacks: boolean = false): Animation {
     if (clearOnFinishCallacks) {
       this._fFn = this._fOneFn = undefined;
     }
@@ -1151,7 +1151,7 @@ export class AnimationController {
   /**
    * Reverse the animation.
    */
-  reverse(shouldReverse: boolean = true): AnimationController {
+  reverse(shouldReverse: boolean = true): Animation {
     const children = this._c;
     for (var i = 0; i < this._cL; i++) {
       children[i].reverse(shouldReverse);
@@ -1204,32 +1204,6 @@ export class AnimationController {
 
 }
 
-export interface AnimationOptions {
-  animation?: string;
-  duration?: number;
-  easing?: string;
-  direction?: string;
-  isRTL?: boolean;
-  ev?: any;
-}
-
-export interface PlayOptions {
-  duration?: number;
-}
-
-export interface EffectProperty {
-  name: string;
-  trans: boolean;
-  wc?: string;
-  to?: EffectState;
-  from?: EffectState;
-}
-
-export interface EffectState {
-  val: any;
-  num: number;
-  unit: string;
-}
 
 const ANIMATION_TRANSFORMS: {[key: string]: number} = {
   'translateX': 1,
@@ -1262,8 +1236,8 @@ function transitionEnd(elm: HTMLElement, callback: {(ev?: TransitionEvent): void
   let opts = { passive: true };
 
   function unregister() {
-    unRegWKTrans();
-    unRegTrans();
+    unRegWKTrans && unRegWKTrans();
+    unRegWKTrans && unRegTrans();
   }
 
   function onTransitionEnd(ev: TransitionEvent) {
@@ -1280,3 +1254,4 @@ function transitionEnd(elm: HTMLElement, callback: {(ev?: TransitionEvent): void
 
   return unregister;
 }
+
