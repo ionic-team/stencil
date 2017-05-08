@@ -1,7 +1,6 @@
 import { Component, h, Ionic } from '../index';
-import { IAnimation as Animation } from '../animation/animation-interface';
-import { IModal } from './modal-interface';
 import { ModalDidEnterEvent } from '../../util/interfaces';
+import { IModal } from './modal-interface';
 
 
 @Component({
@@ -15,7 +14,6 @@ import { ModalDidEnterEvent } from '../../util/interfaces';
 })
 export class Modal implements IModal {
   private id: string;
-  private animation: Animation;
   private backdrop: any;
 
   ionViewDidLoad() {
@@ -49,10 +47,6 @@ export class Modal implements IModal {
     return h(this, [
         h('ion-backdrop', {
           ref: backdrop => this.backdrop = backdrop
-        }),
-
-        h('ion-animation', {
-          ref: animation => this.animation = animation
         }),
 
         h('div', Ionic.theme(this, 'modal-wrapper'),
