@@ -1,4 +1,4 @@
-import { AnimationOptions, EffectProperty, EffectState, PlayOptions } from './animation-interface';
+import { AnimationOptions, EffectProperty, EffectState, PlayOptions } from '../util/interfaces';
 import { Css } from './css-props';
 import * as interfaces from '../util/interfaces';
 

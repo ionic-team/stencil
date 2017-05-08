@@ -12,7 +12,7 @@ export interface Ionic {
   dom: DomControllerApi;
   config: ConfigApi;
   modal: ModalControllerApi;
-  Animation: any;
+  Animation: Animation;
 }
 
 
@@ -508,4 +508,65 @@ export interface PlatformConfig {
 export interface ServerInitConfig {
   staticDir: string;
   config?: Object;
+}
+
+
+export interface Animation {
+  new(): Animation;
+  add: (childAnimation: Animation) => Animation;
+  afterAddClass: (className: string) => Animation;
+  afterClearStyles: (propertyNames: string[]) => Animation;
+  afterRemoveClass: (className: string) => Animation;
+  afterStyles: (styles: { [property: string]: any; }) => Animation;
+  beforeAddClass: (className: string) => Animation;
+  beforeClearStyles: (propertyNames: string[]) => Animation;
+  beforeRemoveClass: (className: string) => Animation;
+  beforeStyles: (styles: { [property: string]: any; }) => Animation;
+  destroy: () => void;
+  duration: (milliseconds: number) => Animation;
+  easing: (name: string) => Animation;
+  element: (ele: any) => Animation;
+  from: (prop: string, val: any) => Animation;
+  fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
+  hasCompleted: boolean;
+  isPlaying: boolean;
+  onFinish: (callback: Function, onceTimeCallback?: boolean, clearOnFinishCallacks?: boolean) => void;
+  play: (opts: PlayOptions) => void;
+  progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;
+  progressStep: (stepValue: number) => void;
+  progressStart: () => void;
+  reverse: (shouldReverse?: boolean) => Animation;
+  stop: (stepValue?: number) => void;
+  to: (prop: string, val: any, clearProperyAfterTransition?: boolean) => Animation;
+}
+
+
+export interface AnimationOptions {
+  animation?: string;
+  duration?: number;
+  easing?: string;
+  direction?: string;
+  isRTL?: boolean;
+  ev?: any;
+}
+
+
+export interface PlayOptions {
+  duration?: number;
+}
+
+
+export interface EffectProperty {
+  effectName: string;
+  trans: boolean;
+  wc?: string;
+  toEffect?: EffectState;
+  fromEffect?: EffectState;
+}
+
+
+export interface EffectState {
+  val: any;
+  num: number;
+  effectUnit: string;
 }

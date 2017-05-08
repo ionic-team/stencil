@@ -23,7 +23,7 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
         };
       }
     },
-    Animation: {}
+    Animation: <any>{}
   };
 
   return injectedIonic;
