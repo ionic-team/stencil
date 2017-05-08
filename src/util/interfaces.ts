@@ -461,7 +461,7 @@ export interface VNodeData {
   style?: any;
   dataset?: any;
   on?: any;
-  attachData?: any;
+  ref?: (elm: any) => void;
   vkey?: Key;
   vns?: string; // for SVGs
   [key: string]: any; // for any other 3rd party module

@@ -123,6 +123,8 @@ export function Renderer(api: PlatformApi): RendererApi {
       updateEventListeners(emptyNode, vnode);
       updateProps(emptyNode, vnode);
 
+      data.ref && data.ref(elm);
+
       if (isArray(children)) {
         for (i = 0; i < children.length; ++i) {
           let ch = children[i];
