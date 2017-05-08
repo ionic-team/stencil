@@ -16,7 +16,7 @@ export interface Ionic {
 
 
 export interface ModalControllerApi {
-  create: {(tag: string, data?: any, opts?: any): ModalViewControllerApi};
+  create: (tag: string, data?: any, opts?: any) => ModalViewControllerApi;
 }
 
 
@@ -33,13 +33,13 @@ export interface ModalDidEnterEvent {
 
 
 export interface ModalViewControllerApi {
-  dismiss: {(): Promise<void>};
-  present: {(): Promise<void>};
+  dismiss: () => Promise<void>;
+  present: () => Promise<void>;
 }
 
 
 export interface AddEventListenerApi {
-  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts?: ListenOpts): Function;
+  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => void, opts?: ListenOpts): Function;
 }
 
 
@@ -133,8 +133,8 @@ export interface ContentDimensions {
 export interface IonicGlobal {
   staticDir?: string;
   components?: LoadComponents;
-  loadComponents?: {(coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData): void};
-  eventNameFn?: {(eventName: string): string};
+  loadComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData) => void;
+  eventNameFn?: (eventName: string) => string;
   config?: Object;
   ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;
@@ -352,10 +352,10 @@ export interface ComponentMode {
 
 
 export interface Component {
-  ionViewDidLoad?: {(): void};
-  ionViewWillUnload?: {(): void};
+  ionViewDidLoad?: () => void;
+  ionViewWillUnload?: () => void;
 
-  render?: {(): VNode};
+  render?: () => VNode;
 
   mode?: string;
   color?: string;
@@ -380,14 +380,14 @@ export interface BaseInputComponent extends Component {
   hasFocus: boolean;
   value: string;
 
-  fireFocus: {(): void};
-  fireBlur: {(): void};
+  fireFocus: () => void;
+  fireBlur: () => void;
 }
 
 
 export interface BooleanInputComponent extends BaseInputComponent {
   checked: boolean;
-  toggle: {(ev: UIEvent): void};
+  toggle: (ev: UIEvent) => void;
 }
 
 
@@ -402,14 +402,15 @@ export interface ComponentRegistry {
 
 
 export interface ProxyElement extends HTMLElement {
-  connectedCallback: {(): void};
-  attributeChangedCallback: {(attrName: string, oldVal: string, newVal: string, namespace: string): void};
-  disconnectedCallback: {(): void};
+  connectedCallback: () => void;
+  attributeChangedCallback: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
+  disconnectedCallback: () => void;
+  whenReady: (cb: Function) => void;
 
   $queued?: boolean;
   $instance?: Component;
   $hostContent?: HostContentNodes;
-  $hasLoadEvent?: boolean;
+  $readyFns?: Function[];
 
   [memberName: string]: any;
 }

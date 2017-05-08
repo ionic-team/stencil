@@ -65,5 +65,12 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     cmpMeta.listeners && attachListeners(cmpMeta.listeners, instance);
 
     instance.ionViewDidLoad && instance.ionViewDidLoad();
+
+    if (elm.$readyFns) {
+      for (var i = 0; i < elm.$readyFns.length; i++) {
+        elm.$readyFns[i]();
+      }
+      delete elm.$readyFns;
+    }
   }
 }

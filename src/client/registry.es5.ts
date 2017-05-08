@@ -35,7 +35,20 @@ export function registerComponentsES5(window: Window, renderer: RendererApi, plt
           function() {
             disconnectedCallback(this);
           }
+        },
+
+        whenReady: { configurable: true, value:
+          function(cb: Function) {
+            if (this.$instance) {
+              cb();
+            } else if (this.$readyFns) {
+              this.$readyFns.push(cb);
+            } else {
+              this.$readyFns = [cb];
+            }
+          }
         }
+
       }
     );
 
