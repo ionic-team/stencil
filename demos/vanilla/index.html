@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
   <title>Ionic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script src="/dist/ionic-web/ionic.js"></script>
 </head>
+
 <body>
 
   <ion-app>
@@ -24,6 +26,12 @@
 
         <ion-list>
 
+          <ion-item-divider>
+            <div slot="start">item start</div>
+            <div slot="end">item end</div>
+            <ion-label>Item Divider</ion-label>
+          </ion-item-divider>
+
           <ion-item>
             <div slot="start">item start</div>
             <div slot="end">item end</div>
@@ -31,21 +39,35 @@
           </ion-item>
 
           <ion-item>
-            <ion-label>Hello!</ion-label>
+            <ion-label><b>Item Label</b></ion-label>
+            <ion-item slot="start">
+              <div slot="start">start</div>
+              <div slot="end">end</div>
+              <ion-label>Item Start</ion-label>
+            </ion-item>
           </ion-item>
 
           <ion-item>
-            <ion-label>Hello!</ion-label>
+            <ion-label>Hello</ion-label>
           </ion-item>
 
           <ion-item>
-            <ion-label>Hello!</ion-label>
+            <ion-avatar slot="start"><img src="http://placehold.it/150x150" /></ion-avatar>
+            <ion-label>Avatar</ion-label>
           </ion-item>
 
           <ion-item>
-            <ion-label>Hello!</ion-label>
+            <ion-thumbnail slot="end"><img src="http://placehold.it/150x150" /></ion-thumbnail>
+            <ion-label>Thumbnail</ion-label>
           </ion-item>
 
+          <ion-item>
+            <ion-label>Gender</ion-label>
+            <ion-select [(ngModel)]="login.gender" formControlName="gender">
+              <ion-option value="f">Female</ion-option>
+              <ion-option value="m">Male</ion-option>
+            </ion-select>
+          </ion-item>
         </ion-list>
 
         <ion-card>
@@ -54,6 +76,8 @@
           </ion-card-header>
           <ion-card-content>
             Card Content
+            <h1>Heading 1</h1>
+            <h2>Heading 2</h2>
           </ion-card-content>
         </ion-card>
 
@@ -105,7 +129,7 @@
           var dynamicProp = document.getElementById('dynamicProp');
           var dynamicAttr = document.getElementById('dynamicAttr');
 
-          setInterval(function() {
+          setInterval(function () {
             if (dynamicProp.color === 'secondary') {
               dynamicProp.color = 'danger';
               dynamicAttr.setAttribute('color', 'danger');
@@ -135,7 +159,6 @@
             div.innerHTML = '<ion-badge>' + i + '</ion-badge>';
             dynamicBadges.appendChild(div);
           }
-
         </script>
 
       </ion-content>
@@ -145,4 +168,5 @@
   </ion-app>
 
 </body>
+
 </html>
