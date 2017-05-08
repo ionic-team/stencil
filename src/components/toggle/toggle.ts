@@ -28,18 +28,18 @@ export class Toggle implements BooleanInputComponent {
   }
 
 
-  canStart() {
+  private canStart() {
     return !this.disabled;
   }
 
 
-  onDragStart(detail: GestureDetail) {
+  private onDragStart(detail: GestureDetail) {
     this.startX = detail.startX;
     this.fireFocus();
   }
 
 
-  onDragMove(detail: GestureDetail) {
+  private onDragMove(detail: GestureDetail) {
     if (this.checked) {
       if (detail.currentX + 15 < this.startX) {
         this.checked = false;
@@ -55,7 +55,7 @@ export class Toggle implements BooleanInputComponent {
   }
 
 
-  onDragEnd(detail: GestureDetail) {
+  private onDragEnd(detail: GestureDetail) {
     if (this.checked) {
       if (detail.startX + 4 > detail.currentX) {
         this.checked = false;
@@ -84,6 +84,7 @@ export class Toggle implements BooleanInputComponent {
       this.checked = !this.checked;
       this.fireFocus();
     }
+    return this.checked;
   }
 
 
