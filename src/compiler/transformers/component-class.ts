@@ -157,6 +157,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
                 eventName = eventName.replace(/\'/g, '');
                 eventName = eventName.replace(/\"/g, '');
                 eventName = eventName.replace(/\`/g, '');
+                eventName = eventName.trim();
 
               } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && eventName) {
                 try {
@@ -188,7 +189,27 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
           opts.capture = !!opts.capture;
 
           if (opts.passive === undefined) {
-            opts.passive = false;
+            // they didn't set if it should be passive or not
+            // so let's figure out some good defaults depending
+            // on what type of event this is
+            const eventNameTest = eventName.toLowerCase();
+            if (eventNameTest.indexOf('touch') > -1) {
+              // touch events always passive
+              opts.passive = true;
+
+            } else if (eventNameTest.indexOf('mouse') > -1) {
+              // mouse events always passive
+              opts.passive = true;
+
+            } else if (eventNameTest.indexOf('scroll') > -1) {
+              // scroll events always passive
+              opts.passive = true;
+
+            } else {
+              // play it safe and have all others default
+              // to NOT be passive
+              opts.passive = false;
+            }
           }
           opts.passive = !!opts.passive;
 
