@@ -1,30 +1,38 @@
-import { Ionic } from '../index';
+import { Ionic } from '../../index';
 
+
+/**
+ * iOS Modal Enter Animation
+ */
+export default function(rootElm: HTMLElement) {
+  const baseAnimation = new Ionic.Animation();
+
+  const backdropAnimatin = new Ionic.Animation();
+  backdropAnimatin.addElement(rootElm.querySelector('ion-backdrop'));
+
+  const wrapperAnimatin = new Ionic.Animation();
+  wrapperAnimatin.addElement(rootElm.querySelector('.modal-wrapper'));
+
+  wrapperAnimatin.beforeStyles({ 'opacity': 1 })
+                 .fromTo('translateY', '100%', '0%');
+
+  backdropAnimatin.fromTo('opacity', 0.01, 0.4);
+
+  return baseAnimation
+    .addElement(rootElm)
+    .easing('cubic-bezier(0.36,0.66,0.04,1)')
+    .duration(400)
+    .beforeAddClass('show-modal')
+    .addChildAnimation(backdropAnimatin)
+    .addChildAnimation(wrapperAnimatin);
+}
 
 /**
  * Animations for modals
  */
-export function modalSlideIn(rootElm: HTMLElement) {
-  const rootAni = new Ionic.Animation();
+// export function modalSlideIn(rootElm: HTMLElement) {
 
-  const backdropAni = new Ionic.Animation();
-  backdropAni.element(rootElm.querySelector('ion-backdrop'));
-
-  const wrapperAni = new Ionic.Animation();
-  wrapperAni.element(rootElm.querySelector('.modal-wrapper'));
-
-  wrapperAni.beforeStyles({ 'opacity': 1 })
-            .fromTo('translateY', '100%', '0%');
-
-  backdropAni.fromTo('opacity', 0.01, 0.4);
-
-  return rootAni
-    .element(rootElm)
-    .easing('cubic-bezier(0.36,0.66,0.04,1)')
-    .duration(400)
-    .add(backdropAni)
-    .add(wrapperAni);
-}
+// }
 
 
 // export class ModalSlideOut {

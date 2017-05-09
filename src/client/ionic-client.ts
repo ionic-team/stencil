@@ -1,5 +1,5 @@
 import { addEventListener, enableListener } from './events';
-import { CustomEventOptions, Ionic, IonicGlobal, ModalControllerInternalApi, ModalViewControllerApi } from '../util/interfaces';
+import { CustomEventOptions, Ionic, IonicGlobal, ModalControllerInternalApi } from '../util/interfaces';
 import { themeVNodeData } from './host';
 
 
@@ -47,33 +47,23 @@ export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocu
   };
 
   const modalCtrl: ModalControllerInternalApi = (<Ionic>IonicGlb).modal = {
+    // stub function to startup the modal viewport if it hasn't been
+    // loaded already. This will queue up all the create calls, and when
+    // the modal viewport loads it'll then create the modal(s). This stub
+    // function  will get replaced by the real "create" fn once loaded.
     create: function(tag: string, data?: any, opts?: any) {
-      if (!doc.querySelector('ion-modal-viewport')) {
-        const elm = doc.createElement('ion-modal-viewport');
-        doc.body.appendChild(elm);
-      }
+      return new Promise<any>(resolve => {
+        // generate a _create array if one wasn't already created
+        // once the viewport loads, it'll loop through this array
+        (modalCtrl._create = modalCtrl._create || []).push(
+          tag/*0*/, data/*1*/, opts/*2*/, resolve/*3:create.resolve*/
+        );
 
-      const queue = [tag/*0*/, data/*1*/, opts/*2*/, 0/*3:modalView*/, 0/*4:shouldPresent*/, 0/*5:shouldDismiss*/, 0/*6:resolve*/, 0/*7:reject*/];
-
-      queue[3] = <ModalViewControllerApi>{
-        dismiss: () => {
-          queue[5] = 1;
-          return Promise.resolve();
-        },
-        present: () => {
-          queue[4] = 1;
-          return promise;
+        // add the viewport if one wasn't already added (one could be loading still)
+        if (!doc.querySelector('ion-modal-portal')) {
+          doc.body.appendChild(doc.createElement('ion-modal-portal'));
         }
-      };
-
-      var promise = new Promise<void>((res, rej) => {
-        queue[6] = res;
-        queue[7] = rej;
       });
-
-      (modalCtrl._create = modalCtrl._create || []).push(queue);
-
-      return queue[3];
     }
   };
 

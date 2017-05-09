@@ -1,6 +1,6 @@
 
 
-function getCss(docEle: HTMLElement) {
+export const CSS_PROP = function(docEle: HTMLElement) {
   const css: {
     transformProp?: string;
     transitionProp?: string;
@@ -29,16 +29,39 @@ function getCss(docEle: HTMLElement) {
   }
 
   // The only prefix we care about is webkit for transitions.
-  var isWebkit = css.transitionProp.indexOf('webkit') > -1;
+  var prefix = css.transitionProp.indexOf('webkit') > -1 ? '-webkit-' : '';
 
   // transition duration
-  css.transitionDurationProp = (isWebkit ? '-webkit-' : '') + 'transition-duration';
+  css.transitionDurationProp = prefix + 'transition-duration';
 
   // transition timing function
-  css.transitionTimingFnProp = (isWebkit ? '-webkit-' : '') + 'transition-timing-function';
+  css.transitionTimingFnProp = prefix + 'transition-timing-function';
 
   return css;
-}
+
+}(document.documentElement);
 
 
-export const Css = getCss(document.documentElement);
+export const TRANSFORM_PROPS: {[key: string]: number} = {
+  'translateX': 1,
+  'translateY': 1,
+  'translateZ': 1,
+
+  'scale': 1,
+  'scaleX': 1,
+  'scaleY': 1,
+  'scaleZ': 1,
+
+  'rotate': 1,
+  'rotateX': 1,
+  'rotateY': 1,
+  'rotateZ': 1,
+
+  'skewX': 1,
+  'skewY': 1,
+  'perspective': 1
+};
+
+export const CSS_VALUE_REGEX = /(^-?\d*\.?\d*)(.*)/;
+export const DURATION_MIN = 32;
+export const TRANSITION_END_FALLBACK_PADDING_MS = 400;

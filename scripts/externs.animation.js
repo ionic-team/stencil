@@ -20,6 +20,8 @@ function listener(){};
 /**
  * Animation Class
  */
+function addChildAnimation(){};
+function addElement(){};
 function afterAddClass(){};
 function afterClearStyles(){};
 function afterRemoveClass(){};
@@ -32,11 +34,12 @@ function beforeStyles(){};
 function beforeClearStyles(){};
 function beforeAddRead(){};
 function beforeAddWrite(){};
+function clearExistingCallacks(){};
 function destroy(){};
+function destroyOnFinish(){};
 function duration(){};
 function easing(){};
 function easingReverse(){};
-function element(){};
 function ev(){};
 function from(){};
 function fromTo(){};
@@ -46,6 +49,7 @@ function hasCompleted(){};
 function isPlaying(){};
 function isRoot(){};
 function isRTL(){};
+function oneTimeCallback(){};
 function onFinish(){};
 function opts(){};
 function parent(){};

@@ -6,6 +6,11 @@
   <title>Ionic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script src="/dist/ionic-web/ionic.js"></script>
+  <style>
+    profile-modal {
+      background: red;
+    }
+  </style>
 </head>
 
 <body>
@@ -89,7 +94,6 @@
         </p>
 
         <p>
-          <!-- empty -->
           <ion-badge></ion-badge>
           <ion-badge>default</ion-badge>
           <ion-badge color="secondary">secondary</ion-badge>
@@ -107,23 +111,28 @@
 
         <script>
           document.getElementById('presentModal').addEventListener('click', function() {
-            var profileModal = Ionic.modal.create('my-profile', { userId: 88 });
 
-            profileModal.present().then(function() {
-              console.log('modal presented');
+            Ionic.modal.create('profile-modal', { userId: 88 }).then(modal => {
+              console.log('modal created');
+
+              modal.present().then(function() {
+                console.log('modal finished transitioning in');
+              });
+
             });
+
           });
 
-          // var content = document.getElementById('content');
-          // content.addEventListener('ionScrollStart', function(ev) {
-          //   console.log('ionScrollStart', ev);
-          // });
-          // content.addEventListener('ionScroll', function(ev) {
-          //   console.log('ionScroll', ev);
-          // });
-          // content.addEventListener('ionScrollEnd', function(ev) {
-          //   console.log('ionScrollEnd', ev);
-          // });
+          var content = document.getElementById('content');
+          content.addEventListener('ionScrollStart', function(ev) {
+            console.log('ionScrollStart', ev.detail.directionY);
+          });
+          content.addEventListener('ionScroll', function(ev) {
+            console.log('ionScroll', ev.detail.directionY);
+          });
+          content.addEventListener('ionScrollEnd', function(ev) {
+            console.log('ionScrollEnd', ev.detail.directionY);
+          });
 
 
           var dynamicProp = document.getElementById('dynamicProp');

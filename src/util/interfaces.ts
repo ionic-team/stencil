@@ -30,7 +30,7 @@ export interface IonicGlobal {
 
 
 export interface ModalControllerApi {
-  create: (tag: string, data?: any, opts?: any) => ModalViewControllerApi;
+  create: (component: string, params?: any, opts?: ModalOptions) => Promise<Modal>;
 }
 
 
@@ -39,16 +39,29 @@ export interface ModalControllerInternalApi extends ModalControllerApi {
 }
 
 
-export interface ModalDidEnterEvent {
-  detail: {
-    modalId: string;
+export interface Modal {
+  component: string;
+  id: string;
+  style: {
+    zIndex: number;
   };
+  showBackdrop: boolean;
+  enableBackdropDismiss: boolean;
+  enterAnimation: AnimationFactory;
+  exitAnimation: AnimationFactory;
+  cssClass: string;
+  params: any;
+  present: (done?: Function) => void;
+  dismiss: (done?: Function) => void;
 }
 
 
-export interface ModalViewControllerApi {
-  dismiss: () => Promise<void>;
-  present: () => Promise<void>;
+export interface ModalOptions {
+  showBackdrop?: boolean;
+  enableBackdropDismiss?: boolean;
+  enterAnimation?: AnimationFactory;
+  exitAnimation?: AnimationFactory;
+  cssClass?: string;
 }
 
 
@@ -512,8 +525,9 @@ export interface ServerInitConfig {
 
 
 export interface Animation {
-  new(): Animation;
-  add: (childAnimation: Animation) => Animation;
+  new(elm?: Node|Node[]|NodeList): Animation;
+  addChildAnimation: (childAnimation: Animation) => Animation;
+  addElement: (elm: Node|Node[]|NodeList) => Animation;
   afterAddClass: (className: string) => Animation;
   afterClearStyles: (propertyNames: string[]) => Animation;
   afterRemoveClass: (className: string) => Animation;
@@ -523,21 +537,26 @@ export interface Animation {
   beforeRemoveClass: (className: string) => Animation;
   beforeStyles: (styles: { [property: string]: any; }) => Animation;
   destroy: () => void;
+  destroyOnFinish: (shouldDestroyOnFinish: boolean) => void;
   duration: (milliseconds: number) => Animation;
   easing: (name: string) => Animation;
-  element: (ele: any) => Animation;
   from: (prop: string, val: any) => Animation;
   fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
   hasCompleted: boolean;
   isPlaying: boolean;
-  onFinish: (callback: Function, onceTimeCallback?: boolean, clearOnFinishCallacks?: boolean) => void;
-  play: (opts: PlayOptions) => void;
+  onFinish: (callback: Function, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}) => Animation;
+  play: (opts?: PlayOptions) => void;
   progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;
   progressStep: (stepValue: number) => void;
   progressStart: () => void;
   reverse: (shouldReverse?: boolean) => Animation;
   stop: (stepValue?: number) => void;
   to: (prop: string, val: any, clearProperyAfterTransition?: boolean) => Animation;
+}
+
+
+export interface AnimationFactory {
+  (elm?: HTMLElement): Animation;
 }
 
 
@@ -560,8 +579,9 @@ export interface EffectProperty {
   effectName: string;
   trans: boolean;
   wc?: string;
-  toEffect?: EffectState;
-  fromEffect?: EffectState;
+  to?: EffectState;
+  from?: EffectState;
+  [state: string]: any;
 }
 
 

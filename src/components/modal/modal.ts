@@ -1,6 +1,6 @@
-import { Component, h, Ionic } from '../index';
-import { ModalDidEnterEvent } from '../../util/interfaces';
-import { IModal } from './modal-interface';
+import { Component, h, Ionic, Prop } from '../index';
+import { AnimationFactory, Modal as IModal } from '../../util/interfaces';
+import iOSEnter from './animations/ios.enter';
 
 
 @Component({
@@ -13,44 +13,61 @@ import { IModal } from './modal-interface';
   shadow: false
 })
 export class Modal implements IModal {
-  private id: string;
-  private backdrop: any;
+  $el: HTMLElement;
+  id: string;
+
+  @Prop() component: string;
+  @Prop() cssClass: string;
+  @Prop() enableBackdropDismiss: boolean = true;
+  @Prop() enterAnimation: AnimationFactory;
+  @Prop() exitAnimation: AnimationFactory;
+  @Prop() params: any;
+  @Prop() showBackdrop: boolean = true;
+
 
   ionViewDidLoad() {
-    const ev: ModalDidEnterEvent = {
-      detail: {
-        modalId: this.id
-      }
-    };
-
+    const ev = { detail: { modal: this } };
     Ionic.emit(this, 'ionModalDidLoad', ev);
   }
 
-  transitionIn(done?: Function) {
-    done;
-    // this.ani.whenReady(() => {
-    //   this.ani.onFinish(done, true);
-
-    //   const opts: PlayOptions = {
-    //     duration: 100
-    //   };
-
-    //   this.ani.play(opts);
-    // });
+  present() {
+    return new Promise<void>(resolve => {
+      this._present(resolve);
+    });
   }
 
-  transitionOut() {
+  private _present(resolve: Function) {
+    // get the user's animation fn if one was provided
+    let animationFactory = this.enterAnimation;
+
+    if (!animationFactory) {
+      // user did not provide a custom animation fn
+      // decide from the config which animation to use
+      // TODO!!
+      animationFactory = iOSEnter;
+    }
+
+    // build the animation and kick it off
+    let animation = animationFactory(this.$el);
+    animation.onFinish(resolve);
+    animation.destroyOnFinish(true);
+    animation.play();
+  }
+
+  dismiss() {
 
   }
 
   render() {
-    return h(this, [
-        h('ion-backdrop', {
-          ref: backdrop => this.backdrop = backdrop
-        }),
+    let userCssClass = 'modal-content';
+    if (this.cssClass) {
+      userCssClass += ' ' + this.cssClass;
+    }
 
+    return h(this, [
+        h('div.modal-backdrop'),
         h('div', Ionic.theme(this, 'modal-wrapper'),
-          h('slot')
+          h(this.component, Ionic.theme(this, userCssClass))
         ),
       ]
     );
