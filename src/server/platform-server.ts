@@ -170,7 +170,7 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
   return {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
-    loadComponent: loadComponent,
+    loadBundle: loadComponent,
 
     isElement: isElement,
     isText: isText,

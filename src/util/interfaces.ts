@@ -472,7 +472,7 @@ export interface VNodeData {
 export interface PlatformApi {
   registerComponent: (tag: string, data: any[]) => ComponentMeta;
   getComponentMeta: (tag: string) => ComponentMeta;
-  loadComponent: (bundleId: string, priority: string, cb: Function) => void;
+  loadBundle: (bundleId: string, priority: string, cb: Function) => void;
   nextTick: NextTick;
 
   isElement: (node: Node) => node is Element;

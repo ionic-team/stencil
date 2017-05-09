@@ -13,6 +13,7 @@ export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Rende
     // run the patch in the next tick
     plt.nextTick(function queueUpdateNextTick() {
 
+      console.log(elm.nodeName, 'queueUpdate nextTick');
       // vdom diff and patch the host element for differences
       update(plt, config, renderer, elm, tag);
 
@@ -72,5 +73,6 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
       }
       delete elm.$readyFns;
     }
+
   }
 }

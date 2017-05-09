@@ -51,6 +51,15 @@ export function NextTickClient(window: Window): NextTickApi {
     }
   }
 
+  function forceNextTick(cb: Function) {
+    callbacks.unshift(cb);
+
+    if (!pending) {
+      pending = true;
+      timerFunc();
+    }
+  }
+
   return {
     nextTick: queueNextTick
   };

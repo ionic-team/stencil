@@ -4,15 +4,46 @@ import { queueUpdate } from './update';
 
 
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
+
+  // Begin stack ide
+  window.componentStack = window.componentStack || [];
+  window.componentStack = window.componentStack.reduce((stack, item, index) => {
+    if (item.contains(elm)) {
+      return stack.concat(item);
+    }
+
+    return stack;
+  }, []);
+
+  var parent = window.componentStack[0];
+
+  if (parent) {
+    if (parent.$children.hasOwnProperty(elm.nodeName)) {
+      parent.$children[elm.nodeName] += 1;
+    } else {
+      parent.$children[elm.nodeName] = 1;
+    }
+  }
+
+  elm.$children = {};
+  elm.$parent = parent;
+  window.componentStack.unshift(elm);
+
+  // End stack idea
+
   plt.nextTick(() => {
     const tag = cmpMeta.tag;
+
+    console.log(elm.nodeName, 'connectedCallback nextTick');
 
     let cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')];
     if (!cmpMode) {
       cmpMode = cmpMeta.modes.default;
     }
 
-    plt.loadComponent(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
+    // Asynchronously load the ionic component type
+    plt.loadBundle(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
+      console.log(elm.nodeName, 'loadComponentCallback');
       queueUpdate(plt, config, renderer, elm, tag);
     });
   });
