@@ -12,12 +12,13 @@ export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: Rendere
     }
   }
 
-  instance.$values = {};
+  if (props) {
+    instance.$values = {};
 
-  for (i = 0; i < props.length; i++) {
-    initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, tag, instance, watchers);
+    for (i = 0; i < props.length; i++) {
+      initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, tag, instance, watchers);
+    }
   }
-
 }
 
 
