@@ -6,13 +6,13 @@ import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 export function attributeChangedCallback(elm: ProxyElement, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {
   if (oldVal !== newVal) {
     const propName = toCamelCase(attrName);
-    const prop = cmpMeta.props[propName];
+    const prop = cmpMeta.props.find(p => p.propName === propName);
 
     if (prop) {
-      if (prop.type === BOOLEAN_TYPE_CODE) {
+      if (prop.propType === BOOLEAN_TYPE_CODE) {
         elm[propName] = (newVal === null || newVal === 'false') ? false : true;
 
-      } else if (prop.type === NUMBER_TYPE_CODE) {
+      } else if (prop.propType === NUMBER_TYPE_CODE) {
         elm[propName] = parseFloat(newVal);
 
       } else {

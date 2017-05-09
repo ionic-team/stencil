@@ -73,7 +73,7 @@ export interface ModalEvent extends Event {
 
 
 export interface AddEventListenerApi {
-  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => void, opts?: ListenOpts): Function;
+  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => void, opts?: ListenOptions): Function;
 }
 
 
@@ -297,8 +297,9 @@ export interface PropOptions {
 }
 
 
-export interface Props {
-  [propName: string]: PropOptions;
+export interface ComponentMetaProp {
+  propName?: string;
+  propType?: any;
 }
 
 
@@ -314,11 +315,11 @@ export interface MethodOptions {}
 
 
 export interface ListenDecorator {
-  (eventName: string, opts?: ListenOpts): any;
+  (eventName: string, opts?: ListenOptions): any;
 }
 
 
-export interface ListenOpts {
+export interface ListenOptions {
   eventName?: string;
   capture?: boolean;
   passive?: boolean;
@@ -326,7 +327,7 @@ export interface ListenOpts {
 }
 
 
-export interface ComponentMetaListener extends ListenOpts {
+export interface ComponentMetaListener extends ListenOptions {
   methodName?: string;
 }
 
@@ -360,8 +361,8 @@ export interface ConfigApi {
 
 export interface ComponentMeta {
   tag?: string;
-  props?: Props;
   methods?: Methods;
+  props?: ComponentMetaProp[];
   listeners?: ComponentMetaListener[];
   watchers?: ComponentMetaWatcher[];
   shadow?: boolean;

@@ -1,9 +1,9 @@
-import { Component, ConfigApi, Methods, PlatformApi, Props, ProxyElement, RendererApi, ComponentMetaWatcher } from '../util/interfaces';
+import { Component, ComponentMetaProp, ConfigApi, Methods, PlatformApi, ProxyElement, RendererApi, ComponentMetaWatcher } from '../util/interfaces';
 import { queueUpdate } from './update';
 import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 
 
-export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, methods: Methods, watchers: ComponentMetaWatcher[]) {
+export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: ComponentMetaProp[], methods: Methods, watchers: ComponentMetaWatcher[]) {
   if (methods) {
     methods.forEach(methodName => {
       initMethod(methodName, elm, instance);
@@ -12,9 +12,10 @@ export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 
   instance.$values = {};
 
-  Object.keys(props).forEach(propName => {
-    initProp(propName, plt, config, renderer, elm, tag, instance, props, watchers);
-  });
+  for (var i = 0; i < props.length; i++) {
+    initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, tag, instance, watchers);
+  }
+
 }
 
 
@@ -27,8 +28,8 @@ function initMethod(methodName: string, elm: ProxyElement, instance: Component) 
 }
 
 
-function initProp(propName: string, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, watchers: ComponentMetaWatcher[]) {
-  instance.$values[propName] = getInitialValue(config, elm, instance, props[propName].type, propName);
+function initProp(propName: string, propType: any, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, watchers: ComponentMetaWatcher[]) {
+  instance.$values[propName] = getInitialValue(config, elm, instance, propType, propName);
 
   if (watchers) {
     for (var i = 0; i < watchers.length; i++) {

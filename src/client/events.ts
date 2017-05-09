@@ -1,4 +1,4 @@
-import { Component, ComponentMetaListener, ListenOpts } from '../util/interfaces';
+import { Component, ComponentMetaListener, ListenOptions } from '../util/interfaces';
 import { getElementReference, getKeyCodeByName } from '../util/helpers';
 import { noop } from '../util/helpers';
 
@@ -46,7 +46,7 @@ export function enableListener(instance: Component, eventName: string, shouldEna
 }
 
 
-export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts: ListenOpts = {}) {
+export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts: ListenOptions = {}) {
   if (!elm) {
     return noop;
   }
