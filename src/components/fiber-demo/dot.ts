@@ -41,9 +41,9 @@ export class FiberDot {
 
     return h(this, {
         style: style,
-        attrs: {
-          onMouseEnter: this.enter,
-          onMouseLeave: this.leave
+        on: {
+          mouseenter: this.enter.bind(this),
+          mouseleave: this.leave.bind(this)
         },
       },
       this.hover ? '*' + this.text + '*' : this.text
