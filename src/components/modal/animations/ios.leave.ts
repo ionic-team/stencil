@@ -2,7 +2,7 @@ import { Ionic } from '../../index';
 
 
 /**
- * iOS Modal Exit Animation
+ * iOS Modal Leave Animation
  */
 export default function(rootElm: HTMLElement) {
   const baseAnimation = new Ionic.Animation();

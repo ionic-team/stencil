@@ -1,4 +1,4 @@
-import { Bundle, Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watchers, WatchOpts } from './interfaces';
+import { Bundle, Component, ComponentMode, Listener, Props, Registry, Watchers, WatchOpts } from './interfaces';
 import * as crypto from 'crypto';
 
 
@@ -15,12 +15,12 @@ export function formatBundleFileName(bundleId: string) {
 }
 
 
-export function formatBundleContent(bundleId: string, bundledJsModules: string, componentModeLoader: string) {
+export function formatBundleContent(coreVersion: number, bundleId: string, bundledJsModules: string, componentModeLoader: string) {
   return [
     `Ionic.loadComponents(\n`,
 
       `/**** core version ****/`,
-      `0,\n`,
+      `${coreVersion},\n`,
 
       `/**** bundleId ****/`,
       `${bundleId},\n`,
@@ -135,30 +135,29 @@ function formatMethods(methods: string[]) {
 }
 
 
-function formatListeners(label: string, listeners: Listeners) {
-  const listenerMethodNames = Object.keys(listeners);
-  if (!listenerMethodNames.length) {
+function formatListeners(label: string, listeners: Listener[]) {
+  if (!listeners.length) {
     return '0 /* no listeners */';
   }
 
   const t: string[] = [];
 
-  listenerMethodNames.forEach((methodName, listenerIndex) => {
-    t.push(formatListenerOpts(label, methodName, listenerIndex, listeners[methodName]));
+  listeners.forEach((listener, listenerIndex) => {
+    t.push(formatListenerOpts(label, listener, listenerIndex));
   });
 
   return `[\n` + t.join(',\n') + `\n]`;
 }
 
 
-function formatListenerOpts(label: string, methodName: string, listenerIndex: number, listenerOpts: ListenOpts) {
+function formatListenerOpts(label: string, listener: Listener, listenerIndex: number) {
   const t = [
-    `    /********* ${label} listener[${listenerIndex}] ${methodName} *********/\n` +
-    `    /* [0] methodName **/ '${methodName}'`,
-    `    /* [1] eventName ***/ '${listenerOpts.eventName}'`,
-    `    /* [2] capture *****/ ${formatBoolean(listenerOpts.capture)}`,
-    `    /* [3] passive *****/ ${formatBoolean(listenerOpts.passive)}`,
-    `    /* [4] enabled *****/ ${formatBoolean(listenerOpts.enabled)}`,
+    `    /***** ${label} listener[${listenerIndex}]  ${listener.eventName} -> ${listener.methodName}() *****/\n` +
+    `    /* [0] methodName **/ '${listener.methodName}'`,
+    `    /* [1] eventName ***/ '${listener.eventName}'`,
+    `    /* [2] capture *****/ ${formatBoolean(listener.capture)}`,
+    `    /* [3] passive *****/ ${formatBoolean(listener.passive)}`,
+    `    /* [4] enabled *****/ ${formatBoolean(listener.enabled)}`,
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
@@ -183,7 +182,7 @@ function formatWatchers(label: string, watchers: Watchers) {
 
 function formatWatcherOpts(label: string, methodName: string, watchIndex: number, watchOpts: WatchOpts) {
   const t = [
-    `    /********* ${label} watch[${watchIndex}] ${methodName} *********/\n` +
+    `    /*****  ${label} watch[${watchIndex}] ${methodName} ***** /\n` +
     `    /* [0] methodName **/ '${methodName}'`,
     `    /* [1] fn **********/ '${watchOpts.fn}'`
   ];

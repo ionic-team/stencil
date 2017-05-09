@@ -1,4 +1,5 @@
-import { BuildContext, ComponentMeta, FileMeta, ListenOpts } from '../interfaces';
+import { BuildContext, ComponentMeta, FileMeta } from '../interfaces';
+import { getListenDecoratorMeta } from './listen-decorator';
 import * as ts from 'typescript';
 
 
@@ -22,7 +23,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
         getMethodsMeta(fileMeta.cmpMeta, classNode);
         getPropertyDecoratorMeta(fileMeta.cmpMeta, classNode);
-        getListenDecoratorMeta(fileMeta.cmpMeta, classNode);
+        getListenDecoratorMeta(fileMeta, classNode);
         getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
 
         return removeClassDecorator(classNode);
@@ -125,87 +126,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     }
 
 
-    function getListenDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-      cmpMeta.listeners = {};
 
-      const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-
-      decoratedMembers.forEach(memberNode => {
-        let isListen = false;
-        let methodName: string = null;
-        let eventName: string = null;
-        let opts: ListenOpts = {};
-
-        memberNode.forEachChild(n => {
-
-          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Listen') {
-            isListen = true;
-
-            n.getChildAt(1).forEachChild(n => {
-
-              if (n.kind === ts.SyntaxKind.StringLiteral && !eventName) {
-                eventName = n.getText().trim();
-                eventName = eventName.replace(/\'/g, '');
-                eventName = eventName.replace(/\"/g, '');
-                eventName = eventName.replace(/\`/g, '');
-                eventName = eventName.trim();
-
-              } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && eventName) {
-                try {
-                  const fnStr = `return ${n.getText()};`;
-                  let parsedOpts: ListenOpts = new Function(fnStr)();
-
-                  Object.assign(opts, parsedOpts);
-
-                } catch (e) {
-                  console.log(`parse listener options: ${e}`);
-                }
-              }
-            });
-
-          } else if (isListen) {
-            if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
-              methodName = n.getText().trim();
-            }
-          }
-
-        });
-
-        if (isListen && eventName && methodName) {
-          memberNode.decorators = undefined;
-
-          if (opts.capture === undefined) {
-            opts.capture = false;
-          }
-          opts.capture = !!opts.capture;
-
-          if (opts.passive === undefined) {
-            // they didn't set if it should be passive or not
-            // so let's figure out some good defaults depending
-            // on what type of event this is
-
-            if (PASSIVE_TRUE_DEFAULTS.indexOf(eventName.toLowerCase()) > -1) {
-              // good list of known events that we should default to passive
-              opts.passive = true;
-
-            } else {
-              // play it safe and have all others default to NOT be passive
-              opts.passive = false;
-            }
-          }
-          opts.passive = !!opts.passive;
-
-          if (opts.enabled === undefined) {
-            opts.enabled = true;
-          }
-          opts.enabled = !!opts.enabled;
-
-          opts.eventName = eventName;
-
-          cmpMeta.listeners[methodName] = opts;
-        }
-      });
-    }
 
 
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
@@ -433,13 +354,3 @@ function updateShadow(cmpMeta: ComponentMeta) {
 interface SourceContext {
   cmpClassCount: number;
 }
-
-const PASSIVE_TRUE_DEFAULTS = [
-  'dragstart', 'drag', 'dragend', 'dragenter', 'dragover', 'dragleave', 'drop',
-  'mouseenter', 'mouseover', 'mousemove', 'mousedown', 'mouseup', 'mouseleave', 'mouseout', 'mousewheel',
-  'pointerover', 'pointerenter', 'pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'pointerout', 'pointerleave',
-  'resize',
-  'scroll',
-  'touchstart', 'touchmove', 'touchend', 'touchenter', 'touchleave', 'touchcancel',
-  'wheel',
-];

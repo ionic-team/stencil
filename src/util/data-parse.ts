@@ -16,15 +16,16 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 
   // component listeners
   if (cmpModeData[2]) {
-    cmpMeta.listeners = {};
+    cmpMeta.listeners = [];
     for (i = 0; i < cmpModeData[2].length; i++) {
       cmpListenerData = cmpModeData[2][i];
-      cmpMeta.listeners[cmpListenerData[0]] = {
+      cmpMeta.listeners.push({
+        methodName: cmpListenerData[0],
         eventName: cmpListenerData[1],
         capture: !!cmpListenerData[2],
         passive: !!cmpListenerData[3],
         enabled: !!cmpListenerData[4],
-      };
+      });
     }
   }
 

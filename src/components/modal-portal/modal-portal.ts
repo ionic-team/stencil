@@ -1,5 +1,5 @@
 import { Component, Ionic, Listen } from '../index';
-import { ModalControllerApi, ModalControllerInternalApi, ModalOptions, Modal } from '../../util/interfaces';
+import { ModalControllerApi, ModalControllerInternalApi, ModalEvent, ModalOptions, Modal } from '../../util/interfaces';
 
 
 @Component({
@@ -17,7 +17,7 @@ import { ModalControllerApi, ModalControllerInternalApi, ModalOptions, Modal } f
 export class ModalPortal implements ModalControllerApi {
   private ids = 0;
   private modalResolves: {[modalId: string]: Function} = {};
-
+  private modals: Modal[] = [];
 
   ionViewDidLoad() {
     const modalCtrl = <ModalControllerInternalApi>Ionic.modal;
@@ -77,14 +77,36 @@ export class ModalPortal implements ModalControllerApi {
 
 
   @Listen('body:ionModalDidLoad')
-  viewDidLoad(ev: any) {
+  viewDidLoad(ev: ModalEvent) {
     const modal = ev.detail.modal;
-    if (modal) {
-      const modalResolve = this.modalResolves[modal.id];
-      if (modalResolve) {
-        modalResolve(modal);
-        delete this.modalResolves[modal.id];
-      }
+    const modalResolve = this.modalResolves[modal.id];
+    if (modalResolve) {
+      modalResolve(modal);
+      delete this.modalResolves[modal.id];
+    }
+  }
+
+
+  @Listen('body:ionModalWillPresent')
+  willPresent(ev: ModalEvent) {
+    this.modals.push(ev.detail.modal);
+  }
+
+
+  @Listen('body:ionModalWillDismiss, body:ionModalWillUnload')
+  willDismiss(ev: ModalEvent) {
+    const index = this.modals.indexOf(ev.detail.modal);
+    if (index > -1) {
+      this.modals.splice(index, 1);
+    }
+  }
+
+
+  @Listen('body:keyup.escape')
+  escapeKeyUp() {
+    const lastModal = this.modals[this.modals.length - 1];
+    if (lastModal) {
+      lastModal.dismiss();
     }
   }
 

@@ -226,8 +226,6 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
   const filesToWrite = new Map<string, string>();
 
-  const bundleIdKeyword = '__IONIC_BUNDLE_ID__';
-
   return bundleComponentModules(config, ctx).then(() => {
     ctx.bundles.forEach(bundle => {
 
@@ -237,7 +235,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
     bundle.bundledJsModules = ctx.bundledJsModules[getBundledModulesId(bundle)];
 
-    bundle.content = formatBundleContent(bundleIdKeyword, bundle.bundledJsModules, componentModeLoaders);
+    bundle.content = formatBundleContent(CORE_VERSION, BUNDLE_ID_KEYWORD, bundle.bundledJsModules, componentModeLoaders);
 
     if (config.devMode) {
       // in dev mode, create the bundle id from combining all of the tags
@@ -261,7 +259,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
     bundle.fileName = formatBundleFileName(bundle.id);
     bundle.filePath = config.packages.path.join(config.destDir, 'bundles', bundle.fileName);
 
-    bundle.content = bundle.content.replace(bundleIdKeyword, `"${bundle.id}"`);
+    bundle.content = bundle.content.replace(BUNDLE_ID_KEYWORD, `"${bundle.id}"`);
 
     bundle.components.forEach(bundleComponent => {
       const tag = bundleComponent.component.tag;
@@ -352,3 +350,7 @@ function getManifest(config: BundlerConfig, ctx: BuildContext) {
     return ctx.results.manifest = JSON.parse(manifestStr);
   });
 }
+
+
+const CORE_VERSION = 0;
+const BUNDLE_ID_KEYWORD = '__IONIC_BUNDLE_ID__';

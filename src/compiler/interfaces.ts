@@ -112,7 +112,7 @@ export interface Component {
   modes: {[modeName: string]: ComponentMode};
   methods: Methods;
   props: Props;
-  listeners: Listeners;
+  listeners: Listener[];
   watchers: Watchers;
   shadow: boolean;
   componentClass: string;
@@ -131,7 +131,7 @@ export interface ComponentMeta {
   tag?: string;
   methods?: Methods;
   props?: Props;
-  listeners?: Listeners;
+  listeners?: Listener[];
   watchers?: Watchers;
   shadow?: boolean;
   observedAttrs?: string[];
@@ -153,12 +153,8 @@ export interface Props {
 }
 
 
-export interface Listeners {
-  [methodName: string]: ListenOpts;
-}
-
-
-export interface ListenOpts {
+export interface Listener {
+  methodName?: string;
   eventName?: string;
   capture?: boolean;
   passive?: boolean;

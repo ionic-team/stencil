@@ -42,13 +42,13 @@ export interface ModalControllerInternalApi extends ModalControllerApi {
 export interface Modal {
   component: string;
   id: string;
-  style: {
+  style?: {
     zIndex: number;
   };
   showBackdrop: boolean;
   enableBackdropDismiss: boolean;
-  enterAnimation: AnimationFactory;
-  exitAnimation: AnimationFactory;
+  enterAnimation: AnimationBuilder;
+  exitAnimation: AnimationBuilder;
   cssClass: string;
   params: any;
   present: (done?: Function) => void;
@@ -59,9 +59,16 @@ export interface Modal {
 export interface ModalOptions {
   showBackdrop?: boolean;
   enableBackdropDismiss?: boolean;
-  enterAnimation?: AnimationFactory;
-  exitAnimation?: AnimationFactory;
+  enterAnimation?: AnimationBuilder;
+  exitAnimation?: AnimationBuilder;
   cssClass?: string;
+}
+
+
+export interface ModalEvent extends Event {
+  detail: {
+    modal: Modal;
+  };
 }
 
 
@@ -311,16 +318,16 @@ export interface ListenDecorator {
 }
 
 
-export interface ComponentMetaListeners {
-  [methodName: string]: ListenOpts;
-}
-
-
 export interface ListenOpts {
   eventName?: string;
   capture?: boolean;
   passive?: boolean;
   enabled?: boolean;
+}
+
+
+export interface ComponentMetaListener extends ListenOpts {
+  methodName?: string;
 }
 
 
@@ -355,7 +362,7 @@ export interface ComponentMeta {
   tag?: string;
   props?: Props;
   methods?: Methods;
-  listeners?: ComponentMetaListeners;
+  listeners?: ComponentMetaListener[];
   watchers?: Watchers;
   shadow?: boolean;
   namedSlots?: string[];
@@ -563,7 +570,7 @@ export interface Animation {
 }
 
 
-export interface AnimationFactory {
+export interface AnimationBuilder {
   (elm?: HTMLElement): Animation;
 }
 
@@ -580,6 +587,7 @@ export interface AnimationOptions {
 
 export interface PlayOptions {
   duration?: number;
+  promise?: boolean;
 }
 
 

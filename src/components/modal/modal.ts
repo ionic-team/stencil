@@ -1,6 +1,8 @@
 import { Component, h, Ionic, Prop } from '../index';
-import { AnimationFactory, Modal as IModal } from '../../util/interfaces';
-import iOSEnter from './animations/ios.enter';
+import { AnimationBuilder, Modal as IModal } from '../../util/interfaces';
+
+import iOSEnterAnimation from './animations/ios.enter';
+import iOSLeaveAnimation from './animations/ios.leave';
 
 
 @Component({
@@ -19,15 +21,14 @@ export class Modal implements IModal {
   @Prop() component: string;
   @Prop() cssClass: string;
   @Prop() enableBackdropDismiss: boolean = true;
-  @Prop() enterAnimation: AnimationFactory;
-  @Prop() exitAnimation: AnimationFactory;
+  @Prop() enterAnimation: AnimationBuilder;
+  @Prop() exitAnimation: AnimationBuilder;
   @Prop() params: any;
   @Prop() showBackdrop: boolean = true;
 
 
   ionViewDidLoad() {
-    const ev = { detail: { modal: this } };
-    Ionic.emit(this, 'ionModalDidLoad', ev);
+    Ionic.emit(this, 'ionModalDidLoad', { detail: { modal: this } });
   }
 
   present() {
@@ -37,25 +38,66 @@ export class Modal implements IModal {
   }
 
   private _present(resolve: Function) {
-    // get the user's animation fn if one was provided
-    let animationFactory = this.enterAnimation;
+    Ionic.emit(this, 'ionModalWillPresent', { detail: { modal: this } });
 
-    if (!animationFactory) {
+    // get the user's animation fn if one was provided
+    let animationBuilder = this.enterAnimation;
+
+    if (!animationBuilder) {
       // user did not provide a custom animation fn
       // decide from the config which animation to use
       // TODO!!
-      animationFactory = iOSEnter;
+      animationBuilder = iOSEnterAnimation;
     }
 
     // build the animation and kick it off
-    let animation = animationFactory(this.$el);
-    animation.onFinish(resolve);
+    const animation = animationBuilder(this.$el);
+    animation.onFinish(() => {
+      Ionic.emit(this, 'ionModalDidPresent', { detail: { modal: this } });
+      resolve();
+    });
+
     animation.destroyOnFinish(true);
     animation.play();
   }
 
   dismiss() {
+    return new Promise<void>(resolve => {
+      Ionic.emit(this, 'ionModalWillDismiss', { detail: { modal: this } });
 
+      // get the user's animation fn if one was provided
+      let animationBuilder = this.exitAnimation;
+
+      if (!animationBuilder) {
+        // user did not provide a custom animation fn
+        // decide from the config which animation to use
+        // TODO!!
+        animationBuilder = iOSLeaveAnimation;
+      }
+
+      // build the animation and kick it off
+      const animation = animationBuilder(this.$el);
+      animation.onFinish(() => {
+        Ionic.emit(this, 'ionModalDidDismiss', { detail: { modal: this } });
+        resolve();
+      });
+
+      animation.destroyOnFinish(true);
+      animation.play();
+    });
+  }
+
+  ionViewWillUnload() {
+    Ionic.emit(this, 'ionModalWillUnload', { detail: { modal: this } });
+  }
+
+  backdropClick() {
+    // if (this._enabled && this._bdDismiss) {
+    //   const opts: NavOptions = {
+    //     minClickBlockDuration: 400
+    //   };
+    //   return this._viewCtrl.dismiss(null, 'backdrop', opts);
+    // }
   }
 
   render() {
@@ -65,7 +107,11 @@ export class Modal implements IModal {
     }
 
     return h(this, [
-        h('div.modal-backdrop'),
+        h('div.modal-backdrop', {
+          on: {
+            'click': this.backdropClick.bind(this)
+          }
+        }),
         h('div', Ionic.theme(this, 'modal-wrapper'),
           h(this.component, Ionic.theme(this, userCssClass))
         ),
