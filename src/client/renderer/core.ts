@@ -15,6 +15,7 @@ import { vnode } from './vnode';
 
 import { updateAttrs } from './modules/attributes';
 import { updateClass } from './modules/class';
+import { updateStyle } from './modules/style';
 import { updateEventListeners } from './modules/eventlisteners';
 import { updateProps } from './modules/props';
 export { VNode, VNodeData, vnode };
@@ -120,6 +121,7 @@ export function Renderer(api: PlatformApi): RendererApi {
 
       updateAttrs(emptyNode, vnode);
       updateClass(emptyNode, vnode);
+      updateStyle(emptyNode, vnode);
       updateEventListeners(emptyNode, vnode);
       updateProps(emptyNode, vnode);
 
@@ -276,6 +278,7 @@ export function Renderer(api: PlatformApi): RendererApi {
     if (vnode.vdata !== undefined) {
       updateAttrs(oldVnode, vnode);
       updateClass(oldVnode, vnode);
+      updateStyle(emptyNode, vnode);
       updateEventListeners(oldVnode, vnode);
       updateProps(oldVnode, vnode);
 

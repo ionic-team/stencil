@@ -31,6 +31,7 @@ const BUNDLES = [
   { components: ['ion-gesture', 'ion-scroll'], priority: 'low' },
   { components: ['ion-toggle'] },
   { components: ['ion-slides', 'ion-slide'] },
+  { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
 ];
 
 
