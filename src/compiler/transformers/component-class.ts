@@ -183,22 +183,13 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
             // they didn't set if it should be passive or not
             // so let's figure out some good defaults depending
             // on what type of event this is
-            const eventNameTest = eventName.toLowerCase();
-            if (eventNameTest.indexOf('touch') > -1) {
-              // touch events always passive
-              opts.passive = true;
 
-            } else if (eventNameTest.indexOf('mouse') > -1) {
-              // mouse events always passive
-              opts.passive = true;
-
-            } else if (eventNameTest.indexOf('scroll') > -1) {
-              // scroll events always passive
+            if (PASSIVE_TRUE_DEFAULTS.indexOf(eventName.toLowerCase()) > -1) {
+              // good list of known events that we should default to passive
               opts.passive = true;
 
             } else {
-              // play it safe and have all others default
-              // to NOT be passive
+              // play it safe and have all others default to NOT be passive
               opts.passive = false;
             }
           }
@@ -443,3 +434,12 @@ interface SourceContext {
   cmpClassCount: number;
 }
 
+const PASSIVE_TRUE_DEFAULTS = [
+  'dragstart', 'drag', 'dragend', 'dragenter', 'dragover', 'dragleave', 'drop',
+  'mouseenter', 'mouseover', 'mousemove', 'mousedown', 'mouseup', 'mouseleave', 'mouseout', 'mousewheel',
+  'pointerover', 'pointerenter', 'pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'pointerout', 'pointerleave',
+  'resize',
+  'scroll',
+  'touchstart', 'touchmove', 'touchend', 'touchenter', 'touchleave', 'touchcancel',
+  'wheel',
+];
