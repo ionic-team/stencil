@@ -4,15 +4,17 @@ import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 
 
 export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: PropMeta[], methods: Methods, watchers: WatchMeta[]) {
+  let i = 0;
+
   if (methods) {
-    methods.forEach(methodName => {
-      initMethod(methodName, elm, instance);
-    });
+    for (i = 0; i < methods.length; i++) {
+      initMethod(methods[i], elm, instance);
+    }
   }
 
   instance.$values = {};
 
-  for (var i = 0; i < props.length; i++) {
+  for (i = 0; i < props.length; i++) {
     initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, tag, instance, watchers);
   }
 
