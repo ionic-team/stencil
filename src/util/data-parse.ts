@@ -1,4 +1,4 @@
-import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, ComponentMetaProp } from '../util/interfaces';
+import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, PropMeta } from '../util/interfaces';
 import { isString } from './helpers';
 
 
@@ -77,7 +77,7 @@ export function parseModeName(modeCode: string) {
 
 
 export function parseProp(propData: any[][]) {
-  const props: ComponentMetaProp[] = [
+  const props: PropMeta[] = [
     { propName: 'color' },
     { propName: 'mode' },
     { propName: 'id' }

@@ -297,7 +297,7 @@ export interface PropOptions {
 }
 
 
-export interface ComponentMetaProp {
+export interface PropMeta {
   propName?: string;
   propType?: any;
 }
@@ -327,7 +327,7 @@ export interface ListenOptions {
 }
 
 
-export interface ComponentMetaListener extends ListenOptions {
+export interface ListenMeta extends ListenOptions {
   methodName?: string;
 }
 
@@ -342,7 +342,7 @@ export interface WatchOpts {
 }
 
 
-export interface ComponentMetaWatcher extends WatchOpts {
+export interface WatchMeta extends WatchOpts {
   propName?: string;
 }
 
@@ -362,9 +362,9 @@ export interface ConfigApi {
 export interface ComponentMeta {
   tag?: string;
   methods?: Methods;
-  props?: ComponentMetaProp[];
-  listeners?: ComponentMetaListener[];
-  watchers?: ComponentMetaWatcher[];
+  props?: PropMeta[];
+  listeners?: ListenMeta[];
+  watchers?: WatchMeta[];
   shadow?: boolean;
   namedSlots?: string[];
   obsAttrs?: string[];

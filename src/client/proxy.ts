@@ -1,9 +1,9 @@
-import { Component, ComponentMetaProp, ConfigApi, Methods, PlatformApi, ProxyElement, RendererApi, ComponentMetaWatcher } from '../util/interfaces';
+import { Component, PropMeta, ConfigApi, Methods, PlatformApi, ProxyElement, RendererApi, WatchMeta } from '../util/interfaces';
 import { queueUpdate } from './update';
 import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 
 
-export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: ComponentMetaProp[], methods: Methods, watchers: ComponentMetaWatcher[]) {
+export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: PropMeta[], methods: Methods, watchers: WatchMeta[]) {
   if (methods) {
     methods.forEach(methodName => {
       initMethod(methodName, elm, instance);
@@ -28,7 +28,7 @@ function initMethod(methodName: string, elm: ProxyElement, instance: Component) 
 }
 
 
-function initProp(propName: string, propType: any, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, watchers: ComponentMetaWatcher[]) {
+function initProp(propName: string, propType: any, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, watchers: WatchMeta[]) {
   instance.$values[propName] = getInitialValue(config, elm, instance, propType, propName);
 
   if (watchers) {

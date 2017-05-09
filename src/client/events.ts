@@ -1,4 +1,4 @@
-import { Component, ComponentMetaListener, ListenOptions } from '../util/interfaces';
+import { Component, ListenMeta, ListenOptions } from '../util/interfaces';
 import { getElementReference, getKeyCodeByName } from '../util/helpers';
 import { noop } from '../util/helpers';
 
@@ -6,7 +6,7 @@ import { noop } from '../util/helpers';
 let supportsOpts: boolean = null;
 
 
-export function attachListeners(listeners: ComponentMetaListener[], instance: Component) {
+export function attachListeners(listeners: ListenMeta[], instance: Component) {
   for (var i = 0; i < listeners.length; i++) {
     var listener = listeners[i];
     if (listener.enabled !== false) {
