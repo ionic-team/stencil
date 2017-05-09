@@ -2,6 +2,7 @@ import { BuildContext, ComponentMeta, FileMeta } from '../interfaces';
 import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropertyDecoratorMeta } from './prop-decorator';
+import { getWatchDecoratorMeta } from './watch-decorator';
 import * as ts from 'typescript';
 
 
@@ -26,7 +27,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         getMethodDecoratorMeta(fileMeta, classNode);
         getPropertyDecoratorMeta(fileMeta, classNode);
         getListenDecoratorMeta(fileMeta, classNode);
-        getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
+        getWatchDecoratorMeta(fileMeta, classNode);
 
         return removeClassDecorator(classNode);
 
@@ -44,50 +45,6 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
           classNode.heritageClauses!, classNode.members);
 
       return classWithoutDecorators;
-    }
-
-    function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-      cmpMeta.watchers = {};
-
-      const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-
-      propMembers.forEach(memberNode => {
-        let isWatch = false;
-        let propName: string = null;
-        let methodName: string = null;
-
-        memberNode.forEachChild(n => {
-
-          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Watch') {
-            isWatch = true;
-
-            n.getChildAt(1).forEachChild(n => {
-
-              if (n.kind === ts.SyntaxKind.StringLiteral && !propName) {
-                propName = n.getText();
-                propName = propName.replace(/\'/g, '');
-                propName = propName.replace(/\"/g, '');
-                propName = propName.replace(/\`/g, '');
-              }
-
-            });
-
-          } else if (isWatch) {
-            if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
-              methodName = n.getText();
-            }
-          }
-
-        });
-
-        if (isWatch && propName && methodName) {
-          cmpMeta.watchers[propName] = {
-            fn: methodName
-          };
-
-          memberNode.decorators = undefined;
-        }
-      });
     }
 
 
