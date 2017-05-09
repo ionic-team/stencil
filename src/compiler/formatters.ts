@@ -211,8 +211,24 @@ export function formatPriority(priority: 'high'|'low') {
 }
 
 
-export function formatRegistryContent(registry: Registry) {
-  let strData = JSON.stringify(registry);
+export function formatRegistryContent(inputRegistry: Registry, devMode: boolean) {
+  const registry: Registry = {};
+
+  // alphabetize the registry
+  Object.keys(inputRegistry).sort().forEach(tag => {
+    registry[tag] = inputRegistry[tag];
+  });
+
+  let strData: string;
+
+  if (devMode) {
+    // pretty print
+    strData = JSON.stringify(registry, null, 2);
+
+  } else {
+    // remove all whitespace
+    strData = JSON.stringify(registry);
+  }
 
   // remove unnecessary double quotes
   strData = strData.replace(/"0"/g, '0');

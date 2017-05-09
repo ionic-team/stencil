@@ -111,7 +111,7 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
   });
 
   return generateBundleFiles(config, ctx).then(() => {
-    const registryContent = formatRegistryContent(ctx.registry);
+    const registryContent = formatRegistryContent(ctx.registry, config.devMode);
     ctx.results.componentRegistry = registryContent;
 
     const coreFiles = [
