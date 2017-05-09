@@ -341,8 +341,8 @@ export interface WatchOpts {
 }
 
 
-export interface Watchers {
-  [propName: string]: WatchOpts;
+export interface ComponentMetaWatcher extends WatchOpts {
+  propName?: string;
 }
 
 
@@ -363,7 +363,7 @@ export interface ComponentMeta {
   props?: Props;
   methods?: Methods;
   listeners?: ComponentMetaListener[];
-  watchers?: Watchers;
+  watchers?: ComponentMetaWatcher[];
   shadow?: boolean;
   namedSlots?: string[];
   obsAttrs?: string[];
@@ -393,8 +393,10 @@ export interface Component {
   $el?: ProxyElement;
   $meta?: ComponentMeta;
   $listeners?: ComponentActiveListeners;
+  $watchers?: ComponentActiveWatchers;
   $root?: HTMLElement | ShadowRoot;
   $vnode?: VNode;
+  $values?: ComponentActiveValues;
 
   [memberName: string]: any;
 }
@@ -402,6 +404,14 @@ export interface Component {
 
 export interface ComponentActiveListeners {
   [eventName: string]: Function;
+}
+
+
+export type ComponentActiveWatchers = Function[];
+
+
+export interface ComponentActiveValues {
+  [propName: string]: any;
 }
 
 
@@ -440,6 +450,7 @@ export interface ProxyElement extends HTMLElement {
   $queued?: boolean;
   $instance?: Component;
   $hostContent?: HostContentNodes;
+  $tmpDisconnected?: boolean;
   $readyFns?: Function[];
 
   [memberName: string]: any;

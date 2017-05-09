@@ -10,7 +10,7 @@
 
 /* global module, document, Node */
 import { isArray, isDef, isUndef, isString, isStringOrNumber } from '../../util/helpers';
-import { HostContentNodes, PlatformApi, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
+import { HostContentNodes, PlatformApi, ProxyElement, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
 import { vnode } from './vnode';
 
 import { updateAttrs } from './modules/attributes';
@@ -93,6 +93,7 @@ export function Renderer(api: PlatformApi): RendererApi {
       if (slotNodes) {
         for (let nodeIndex = 0; nodeIndex < slotNodes.length; nodeIndex++) {
           // remove the host content node from it's original parent node
+          (<ProxyElement>slotNodes[nodeIndex]).$tmpDisconnected = true;
           api.$removeChild(slotNodes[nodeIndex].parentNode, slotNodes[nodeIndex]);
 
           if (nodeIndex === slotNodes.length - 1) {
@@ -103,6 +104,7 @@ export function Renderer(api: PlatformApi): RendererApi {
 
           // relocate the node to it's new home
           api.$appendChild(parentElm, slotNodes[nodeIndex]);
+          delete (<ProxyElement>slotNodes[nodeIndex]).$tmpDisconnect;
         }
       }
 

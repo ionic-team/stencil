@@ -113,7 +113,7 @@ export interface Component {
   methods: Methods;
   props: Props;
   listeners: Listener[];
-  watchers: Watchers;
+  watchers: Watcher[];
   shadow: boolean;
   componentClass: string;
   componentUrl: string;
@@ -132,7 +132,7 @@ export interface ComponentMeta {
   methods?: Methods;
   props?: Props;
   listeners?: Listener[];
-  watchers?: Watchers;
+  watchers?: Watcher[];
   shadow?: boolean;
   observedAttrs?: string[];
   componentModule?: any;
@@ -162,13 +162,9 @@ export interface Listener {
 }
 
 
-export interface WatchOpts {
+export interface Watcher {
+  propName: string;
   fn: string;
-}
-
-
-export interface Watchers {
-  [propName: string]: WatchOpts;
 }
 
 

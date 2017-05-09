@@ -1,7 +1,7 @@
 import { attachListeners } from './events';
 import { collectedHostContentNodes } from './host';
 import { ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
-import { initProps } from './proxy';
+import { initProxy } from './proxy';
 import { RendererApi } from '../util/interfaces';
 
 
@@ -33,7 +33,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     instance.$el = elm;
     instance.$meta = cmpMeta;
 
-    initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.methods, cmpMeta.watchers);
+    initProxy(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.methods, cmpMeta.watchers);
 
     plt.$attachComponent(elm, cmpMeta, instance);
 

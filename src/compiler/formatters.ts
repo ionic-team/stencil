@@ -1,4 +1,4 @@
-import { Bundle, Component, ComponentMode, Listener, Props, Registry, Watchers, WatchOpts } from './interfaces';
+import { Bundle, Component, ComponentMode, Listener, Props, Registry, Watcher } from './interfaces';
 import * as crypto from 'crypto';
 
 
@@ -164,27 +164,26 @@ function formatListenerOpts(label: string, listener: Listener, listenerIndex: nu
 }
 
 
-function formatWatchers(label: string, watchers: Watchers) {
-  const watcherMethodNames = Object.keys(watchers);
-  if (!watcherMethodNames.length) {
+function formatWatchers(label: string, watchers: Watcher[]) {
+  if (!watchers.length) {
     return '0 /* no watchers */';
   }
 
   const t: string[] = [];
 
-  watcherMethodNames.forEach((methodName, watchIndex) => {
-    t.push(formatWatcherOpts(label, methodName, watchIndex, watchers[methodName]));
+  watchers.forEach((watcher, watchIndex) => {
+    t.push(formatWatcherOpts(label, watcher, watchIndex));
   });
 
   return `[\n` + t.join(',\n') + `\n]`;
 }
 
 
-function formatWatcherOpts(label: string, methodName: string, watchIndex: number, watchOpts: WatchOpts) {
+function formatWatcherOpts(label: string, watcher: Watcher, watchIndex: number) {
   const t = [
-    `    /*****  ${label} watch[${watchIndex}] ${methodName} ***** /\n` +
-    `    /* [0] methodName **/ '${methodName}'`,
-    `    /* [1] fn **********/ '${watchOpts.fn}'`
+    `    /*****  ${label} watch[${watchIndex}] ${watcher.propName} ***** /\n` +
+    `    /* [0] watch prop **/ '${watcher.propName}'`,
+    `    /* [1] call fn *****/ '${watcher.fn}'`
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;

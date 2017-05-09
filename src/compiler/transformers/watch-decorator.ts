@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 
 
 export function getWatchDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.watchers = {};
+  fileMeta.cmpMeta.watchers = [];
 
   const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
@@ -37,9 +37,10 @@ export function getWatchDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDec
     });
 
     if (isWatch && propName && methodName) {
-      fileMeta.cmpMeta.watchers[propName] = {
+      fileMeta.cmpMeta.watchers.push({
+        propName: propName,
         fn: methodName
-      };
+      });
 
       memberNode.decorators = undefined;
     }

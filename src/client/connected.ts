@@ -4,18 +4,20 @@ import { queueUpdate } from './update';
 
 
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
-  plt.nextTick(() => {
-    const tag = cmpMeta.tag;
+  if (!elm.$tmpDisconnected) {
+    plt.nextTick(() => {
+      const tag = cmpMeta.tag;
 
-    let cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')];
-    if (!cmpMode) {
-      cmpMode = cmpMeta.modes.default;
-    }
+      let cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')];
+      if (!cmpMode) {
+        cmpMode = cmpMeta.modes.default;
+      }
 
-    plt.loadComponent(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
-      queueUpdate(plt, config, renderer, elm, tag);
+      plt.loadComponent(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
+        queueUpdate(plt, config, renderer, elm, tag);
+      });
     });
-  });
+  }
 }
 
 

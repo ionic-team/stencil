@@ -31,12 +31,13 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 
   // component instance property watchers
   if (cmpModeData[3]) {
-    cmpMeta.watchers = {};
-     for (i = 0; i < cmpModeData[3].length; i++) {
+    cmpMeta.watchers = [];
+    for (i = 0; i < cmpModeData[3].length; i++) {
       cmpWatchData = cmpModeData[3][i];
-      cmpMeta.watchers[cmpWatchData[0]] = {
-        fn: cmpWatchData[1],
-      };
+      cmpMeta.watchers.push({
+        propName: cmpWatchData[0],
+        fn: cmpWatchData[1]
+      });
     }
   }
 
