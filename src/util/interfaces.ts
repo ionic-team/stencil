@@ -298,6 +298,14 @@ export interface Props {
 export type Methods = string[];
 
 
+export interface MethodDecorator {
+  (opts?: MethodOptions): any;
+}
+
+
+export interface MethodOptions {}
+
+
 export interface ListenDecorator {
   (eventName: string, opts?: ListenOpts): any;
 }
