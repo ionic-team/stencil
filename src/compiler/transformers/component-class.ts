@@ -1,5 +1,6 @@
 import { BuildContext, ComponentMeta, FileMeta } from '../interfaces';
 import { getListenDecoratorMeta } from './listen-decorator';
+import { getPropertyDecoratorMeta } from './prop-decorator';
 import * as ts from 'typescript';
 
 
@@ -22,7 +23,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
         getMethodsMeta(fileMeta.cmpMeta, classNode);
-        getPropertyDecoratorMeta(fileMeta.cmpMeta, classNode);
+        getPropertyDecoratorMeta(fileMeta, classNode);
         getListenDecoratorMeta(fileMeta, classNode);
         getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
 
@@ -74,59 +75,6 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
       cmpMeta.methods = cmpMeta.methods.sort();
     }
-
-
-    function getPropertyDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-      cmpMeta.props = {};
-
-      const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-
-      decoratedMembers.forEach(memberNode => {
-        let isProp = false;
-        let propName: string = null;
-        let type: string = null;
-
-        memberNode.forEachChild(n => {
-
-          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Prop') {
-            isProp = true;
-
-          } else if (isProp) {
-            if (n.kind === ts.SyntaxKind.Identifier && !propName) {
-              propName = n.getText();
-
-            } else if (!type) {
-              if (n.kind === ts.SyntaxKind.BooleanKeyword) {
-                type = 'boolean';
-
-              } else if (n.kind === ts.SyntaxKind.StringKeyword) {
-                type = 'string';
-
-              } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
-                type = 'number';
-
-              } else if (n.kind === ts.SyntaxKind.TypeReference) {
-                type = 'Type';
-              }
-            }
-          }
-
-        });
-
-        if (isProp && propName) {
-          cmpMeta.props[propName] = {};
-
-          if (type) {
-            cmpMeta.props[propName].type = type;
-          }
-
-          memberNode.decorators = undefined;
-        }
-      });
-    }
-
-
-
 
 
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
