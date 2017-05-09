@@ -11,7 +11,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
   return (transformContext) => {
 
-    function visitClass(srcContext: SourceContext, fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
+    function visitClass(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
       const cmpMeta = getComponentDecoratorData(classNode);
 
       if (cmpMeta) {
@@ -20,8 +20,6 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         }
 
         fileMeta.cmpMeta = cmpMeta;
-
-        srcContext.cmpClassCount++;
         fileMeta.hasCmpClass = true;
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
@@ -40,28 +38,24 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
     }
 
 
-    function visit(srcContext: SourceContext, fileMeta: FileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
+    function visit(fileMeta: FileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(srcContext, fileMeta, node as ts.ClassDeclaration);
+          return visitClass(fileMeta, node as ts.ClassDeclaration);
 
         default:
           return ts.visitEachChild(node, (node) => {
-            return visit(srcContext, fileMeta, node);
+            return visit(fileMeta, node);
           }, transformContext);
       }
     }
 
 
     return (tsSourceFile) => {
-      const srcContext: SourceContext = {
-        cmpClassCount: 0
-      };
-
       const fileMeta = ctx.files.get(tsSourceFile.fileName);
       if (fileMeta && fileMeta.hasCmpClass) {
-        return visit(srcContext, fileMeta, tsSourceFile) as ts.SourceFile;
+        return visit(fileMeta, tsSourceFile) as ts.SourceFile;
       }
 
       return tsSourceFile;
@@ -72,14 +66,13 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
 
 function removeClassDecorator(classNode: ts.ClassDeclaration) {
-  const classWithoutDecorators = ts.createClassDeclaration(
-      undefined!, classNode.modifiers!, classNode.name!, classNode.typeParameters!,
-      classNode.heritageClauses!, classNode.members);
+  return ts.createClassDeclaration(
+      undefined!, // <-- that's what's removing the decorator
 
-  return classWithoutDecorators;
-}
-
-
-interface SourceContext {
-  cmpClassCount: number;
+      // everything else should be the same
+      classNode.modifiers!,
+      classNode.name!,
+      classNode.typeParameters!,
+      classNode.heritageClauses!,
+      classNode.members);
 }
