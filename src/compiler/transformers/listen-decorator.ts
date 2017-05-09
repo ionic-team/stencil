@@ -56,6 +56,22 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
 
     }
   });
+
+  fileMeta.cmpMeta.listeners = fileMeta.cmpMeta.listeners.sort((a, b) => {
+    if (a.eventName < b.eventName) {
+      return -1;
+    }
+    if (a.eventName > b.eventName) {
+      return 1;
+    }
+    if (a.methodName < b.methodName) {
+      return -1;
+    }
+    if (a.methodName > b.methodName) {
+      return 1;
+    }
+    return 0;
+  });
 }
 
 
@@ -120,22 +136,6 @@ function validateListener(fileMeta: FileMeta, eventName: string, listener: Liste
   listener.enabled = !!listener.enabled;
 
   fileMeta.cmpMeta.listeners.push(listener);
-
-  fileMeta.cmpMeta.listeners = fileMeta.cmpMeta.listeners.sort((a, b) => {
-    if (a.eventName < b.eventName) {
-      return -1;
-    }
-    if (a.eventName > b.eventName) {
-      return 1;
-    }
-    if (a.methodName < b.methodName) {
-      return -1;
-    }
-    if (a.methodName > b.methodName) {
-      return 1;
-    }
-    return 0;
-  });
 
   // gathered valid meta data
   // remove decorator entirely

@@ -1,5 +1,6 @@
 import { BuildContext, ComponentMeta, FileMeta } from '../interfaces';
 import { getListenDecoratorMeta } from './listen-decorator';
+import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropertyDecoratorMeta } from './prop-decorator';
 import * as ts from 'typescript';
 
@@ -22,7 +23,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         fileMeta.hasCmpClass = true;
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
-        getMethodsMeta(fileMeta.cmpMeta, classNode);
+        getMethodDecoratorMeta(fileMeta, classNode);
         getPropertyDecoratorMeta(fileMeta, classNode);
         getListenDecoratorMeta(fileMeta, classNode);
         getWatchDecoratorMeta(fileMeta.cmpMeta, classNode);
@@ -44,38 +45,6 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
       return classWithoutDecorators;
     }
-
-
-    function getMethodsMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-      cmpMeta.methods = [];
-
-      const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-      const methodMemebers = decoratedMembers.filter(n => n.kind === ts.SyntaxKind.MethodDeclaration);
-
-      methodMemebers.forEach(methodNode => {
-        let isMethod = false;
-        let methodName: string = null;
-
-        methodNode.forEachChild(n => {
-          if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Method') {
-            isMethod = true;
-
-          } else if (isMethod) {
-            if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
-              methodName = n.getText();
-            }
-          }
-        });
-
-        if (isMethod && methodName) {
-          cmpMeta.methods.push(methodName);
-          methodNode.decorators = undefined;
-        }
-      });
-
-      cmpMeta.methods = cmpMeta.methods.sort();
-    }
-
 
     function getWatchDecoratorMeta(cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
       cmpMeta.watchers = {};
