@@ -1,14 +1,23 @@
 @import "../../themes/ionic.globals";
 
 
-// Backdrop
+// Modal Portal
+// --------------------------------------------------
+
+ion-modal-portal {
+  display: none;
+  visibility: inherit !important;
+}
+
+
+// Modal Portal Backdrop
 // --------------------------------------------------
 
 /// @prop - Color of the backdrop
 $backdrop-color: #000 !default;
 
 
-ion-backdrop {
+.modal-backdrop {
   position: absolute;
   top: 0;
   left: 0;
@@ -23,6 +32,6 @@ ion-backdrop {
   transform: translateZ(0);
 }
 
-ion-backdrop.backdrop-no-tappable {
+.modal-backdrop.backdrop-no-tappable {
   cursor: auto;
 }
