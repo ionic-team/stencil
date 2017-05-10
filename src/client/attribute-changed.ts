@@ -1,6 +1,5 @@
 import { ComponentMeta, ProxyElement } from '../util/interfaces';
-import { toCamelCase } from '../util/helpers';
-import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
+import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE, toCamelCase } from '../util/helpers';
 
 
 export function attributeChangedCallback(elm: ProxyElement, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {
