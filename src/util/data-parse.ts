@@ -47,7 +47,7 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // mode name (ios, md, wp)
   // get component mode
   if (isString(cmpModeData[6])) {
-    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[5].toString())];
+    var cmpMode = cmpMeta.modes.find(m => m.modeName === parseModeName(cmpModeData[5].toString()));
     if (cmpMode) {
       // component mode styles
       cmpMode.styles = cmpModeData[6];

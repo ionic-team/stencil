@@ -1,4 +1,4 @@
-import { Bundle, Component, ComponentMode, Listener, Props, Registry, Watcher } from './interfaces';
+import { Bundle, ComponentMeta, ModeMeta, ListenMeta, PropMeta, Registry, WatchMeta } from './interfaces';
 import * as crypto from 'crypto';
 
 
@@ -35,39 +35,18 @@ export function formatBundleContent(coreVersion: number, bundleId: string, bundl
 }
 
 
-export function formatComponentRegistryProps(props: Props): any {
-  const p: any[] = [];
-
-  Object.keys(props).forEach(propName => {
-    const prop = props[propName];
-    const formattedProp: any[] = [propName];
-
-    if (prop.type === 'boolean') {
-      formattedProp.push(0);
-
-    } else if (prop.type === 'number') {
-      formattedProp.push(1);
-    }
-
-    p.push(formattedProp);
-  });
-
-  return p;
-}
-
-
-export function formatComponentModeLoader(cmp: Component, mode: ComponentMode) {
+export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
   const tag = cmp.tag;
 
-  const modeName = (mode.name ? mode.name : '');
+  const modeName = (mode.modeName ? mode.modeName : '');
 
   const modeCode = formatModeName(modeName);
 
   const styles = formatStyles(mode.styles);
 
   let label = tag;
-  if (mode.name) {
-    label += '.' + mode.name;
+  if (mode.modeName) {
+    label += '.' + mode.modeName;
   }
 
   const methods = formatMethods(cmp.methods);
@@ -135,8 +114,8 @@ function formatMethods(methods: string[]) {
 }
 
 
-function formatListeners(label: string, listeners: Listener[]) {
-  if (!listeners.length) {
+function formatListeners(label: string, listeners: ListenMeta[]) {
+  if (!listeners || !listeners.length) {
     return '0 /* no listeners */';
   }
 
@@ -150,7 +129,7 @@ function formatListeners(label: string, listeners: Listener[]) {
 }
 
 
-function formatListenerOpts(label: string, listener: Listener, listenerIndex: number) {
+function formatListenerOpts(label: string, listener: ListenMeta, listenerIndex: number) {
   const t = [
     `    /***** ${label} listener[${listenerIndex}]  ${listener.eventName} -> ${listener.methodName}() *****/\n` +
     `    /* [0] methodName **/ '${listener.methodName}'`,
@@ -164,8 +143,8 @@ function formatListenerOpts(label: string, listener: Listener, listenerIndex: nu
 }
 
 
-function formatWatchers(label: string, watchers: Watcher[]) {
-  if (!watchers.length) {
+function formatWatchers(label: string, watchers: WatchMeta[]) {
+  if (!watchers || !watchers.length) {
     return '0 /* no watchers */';
   }
 
@@ -179,7 +158,7 @@ function formatWatchers(label: string, watchers: Watcher[]) {
 }
 
 
-function formatWatcherOpts(label: string, watcher: Watcher, watchIndex: number) {
+function formatWatcherOpts(label: string, watcher: WatchMeta, watchIndex: number) {
   const t = [
     `    /*****  ${label} watch[${watchIndex}] ${watcher.propName} ***** /\n` +
     `    /* [0] watch prop **/ '${watcher.propName}'`,
@@ -235,6 +214,30 @@ export function formatRegistryContent(inputRegistry: Registry, devMode: boolean)
   strData = strData.replace(/"3"/g, '3');
 
   return strData;
+}
+
+
+export function formatComponentRegistryProps(props: PropMeta[]): any {
+  if (!props || !props.length) {
+    return null;
+  }
+
+  const p: any[] = [];
+
+  props.forEach(prop => {
+    const formattedProp: any[] = [prop.propName];
+
+    if (prop.propType === 'boolean') {
+      formattedProp.push(0);
+
+    } else if (prop.propType === 'number') {
+      formattedProp.push(1);
+    }
+
+    p.push(formattedProp);
+  });
+
+  return p;
 }
 
 

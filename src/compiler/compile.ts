@@ -1,5 +1,6 @@
-import { BuildContext, Component, CompilerConfig, Manifest, Results } from './interfaces';
-import { createFileMeta, getFileMeta, isTsSourceFile, logError, readFile, writeFile, writeFiles } from './util';
+import { BuildContext, CompilerConfig, Results } from './interfaces';
+import { createFileMeta, getFileMeta, isTsSourceFile, logError, readFile, writeFiles } from './util';
+import { generateManifest } from './manifest';
 import { setupCompilerWatch } from './watch';
 import { transpile, transpileFiles } from './transpile';
 
@@ -213,11 +214,11 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
   ctx.files.forEach(f => {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
-    Object.keys(f.cmpMeta.modes).forEach(modeName => {
-      const mode = Object.assign({}, f.cmpMeta.modes[modeName]);
+    f.cmpMeta.modes.forEach(cm => {
+      const modeMeta = Object.assign({}, cm);
 
-      if (mode && mode.styleUrls) {
-        mode.styleUrls.forEach(styleUrl => {
+      if (modeMeta.styleUrls) {
+        modeMeta.styleUrls.forEach(styleUrl => {
           const scssFileName = config.packages.path.basename(styleUrl);
           const scssFilePath = config.packages.path.join(f.srcDir, scssFileName);
           promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, scssFilePath));
@@ -292,85 +293,4 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
     });
 
   });
-}
-
-
-function generateManifest(config: CompilerConfig, ctx: BuildContext) {
-  const manifest: Manifest = {
-    components: {},
-    bundles: []
-  };
-
-  let components: Component[] = [];
-
-  const destDir = config.compilerOptions.outDir;
-
-  if (config.debug) {
-    console.log(`compile, generateManifest: ${destDir}`);
-  }
-
-  ctx.files.forEach(f => {
-    if (!f.isTsSourceFile || !f.cmpMeta) return;
-
-    const componentUrl = f.jsFilePath.replace(destDir + config.packages.path.sep, '');
-    const modes = Object.assign({}, f.cmpMeta.modes);
-    const methods = f.cmpMeta.methods.slice();
-    const componentDir = config.packages.path.dirname(componentUrl);
-
-    Object.keys(modes).forEach(modeName => {
-      const mode = modes[modeName];
-
-      if (mode && mode.styleUrls) {
-        mode.styleUrls = mode.styleUrls.map(styleUrl => {
-          return config.packages.path.join(componentDir, styleUrl);
-        });
-      }
-    });
-
-    components.push({
-      tag: f.cmpMeta.tag,
-      componentUrl: componentUrl,
-      componentClass: f.cmpClassName,
-      modes: modes,
-      methods: methods,
-      props: f.cmpMeta.props,
-      listeners: f.cmpMeta.listeners,
-      watchers: f.cmpMeta.watchers,
-      shadow: f.cmpMeta.shadow
-    });
-  });
-
-  manifest.bundles = config.bundles;
-
-  components = components.sort((a, b) => {
-    if (a.tag < b.tag) {
-      return -1;
-    }
-    if (a.tag > b.tag) {
-      return 1;
-    }
-    return 0;
-  });
-
-  components.forEach(cmp => {
-    manifest.components[cmp.tag] = {
-      componentUrl: cmp.componentUrl,
-      componentClass: cmp.componentClass,
-      modes: cmp.modes,
-      methods: cmp.methods,
-      props: cmp.props,
-      listeners: cmp.listeners,
-      watchers: cmp.watchers,
-      shadow: cmp.shadow
-    };
-  });
-
-  const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json');
-  const json = JSON.stringify(manifest, null, 2);
-
-  if (config.debug) {
-    console.log(`compile, manifestFile: ${manifestFile}`);
-  }
-
-  return writeFile(config.packages, manifestFile, json);
 }

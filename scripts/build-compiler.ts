@@ -10,7 +10,7 @@ import * as fs from 'fs-extra';
 const rollup = require('rollup');
 
 
-const SRC_DIR = path.join(__dirname, '../transpiled-compiler');
+const SRC_DIR = path.join(__dirname, '../transpiled-compiler/compiler');
 const ENTRY_FILE = path.join(SRC_DIR, 'index.js');
 const DEST_DIR = path.join(__dirname, '../compiler');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');

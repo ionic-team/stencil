@@ -1,17 +1,17 @@
-import { BundlerConfig, BuildContext, ComponentMode } from './interfaces';
+import { BundlerConfig, BuildContext, ModeMeta } from './interfaces';
 import { createFileMeta } from './util';
 
 
-export function bundleComponentModeStyles(config: BundlerConfig, ctx: BuildContext, mode: ComponentMode) {
-  if (!mode || !mode.styleUrls) {
+export function bundleComponentModeStyles(config: BundlerConfig, ctx: BuildContext, cmpMode: ModeMeta) {
+  if (!cmpMode || !cmpMode.styleUrls) {
     return Promise.resolve();
   }
 
-  return Promise.all(mode.styleUrls.map(styleUrl => {
+  return Promise.all(cmpMode.styleUrls.map(styleUrl => {
     return bundleComponentModeStyle(config, ctx, styleUrl);
 
   })).then(results => {
-    mode.styles = results.join('');
+    cmpMode.styles = results.join('');
   });
 }
 

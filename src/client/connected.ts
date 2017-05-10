@@ -8,10 +8,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
     plt.nextTick(() => {
       const tag = cmpMeta.tag;
 
-      let cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')];
-      if (!cmpMode) {
-        cmpMode = cmpMeta.modes.default;
-      }
+      const cmpMode = cmpMeta.modes.find(m => m.modeName === getMode(plt, config, elm, 'mode') || m.modeName === 'default');
 
       plt.loadComponent(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
         queueUpdate(plt, config, renderer, elm, tag);

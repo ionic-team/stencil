@@ -59,7 +59,7 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
 
     const props = data[1] || {};
 
-    cmpMeta = registry[tag] = { modes: {} };
+    cmpMeta = registry[tag] = { modes: [] };
     cmpMeta.tag = tag;
     cmpMeta.props = props;
 

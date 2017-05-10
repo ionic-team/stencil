@@ -1,4 +1,4 @@
-import { FileMeta, Listener } from '../interfaces';
+import { FileMeta, ListenMeta } from '../interfaces';
 import * as ts from 'typescript';
 
 
@@ -11,7 +11,7 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
     let isListen = false;
     let methodName: string = null;
     let eventName: string = null;
-    let listener: Listener = {};
+    let listener: ListenMeta = {};
 
     memberNode.forEachChild(n => {
 
@@ -29,7 +29,7 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
           } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && eventName) {
             try {
               const fnStr = `return ${n.getText()};`;
-              let parsedOpts: Listener = new Function(fnStr)();
+              let parsedOpts: ListenMeta = new Function(fnStr)();
 
               Object.assign(listener, parsedOpts);
 
@@ -75,7 +75,7 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
 }
 
 
-function validateListener(fileMeta: FileMeta, eventName: string, listener: Listener, methodName: string, memberNode: ts.ClassElement) {
+function validateListener(fileMeta: FileMeta, eventName: string, listener: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
   eventName = eventName.trim();
   if (!eventName) return;
 

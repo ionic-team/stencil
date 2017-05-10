@@ -1,16 +1,16 @@
-import { FileMeta } from '../interfaces';
+import { FileMeta, PropMeta } from '../interfaces';
 import * as ts from 'typescript';
 
 
 export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.props = {};
+  fileMeta.cmpMeta.props = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
     let isProp = false;
     let propName: string = null;
-    let type: string = null;
+    let propType: string = null;
 
     memberNode.forEachChild(n => {
 
@@ -21,18 +21,18 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
         if (n.kind === ts.SyntaxKind.Identifier && !propName) {
           propName = n.getText();
 
-        } else if (!type) {
+        } else if (!propType) {
           if (n.kind === ts.SyntaxKind.BooleanKeyword) {
-            type = 'boolean';
+            propType = 'boolean';
 
           } else if (n.kind === ts.SyntaxKind.StringKeyword) {
-            type = 'string';
+            propType = 'string';
 
           } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
-            type = 'number';
+            propType = 'number';
 
           } else if (n.kind === ts.SyntaxKind.TypeReference) {
-            type = 'Type';
+            propType = 'Type';
           }
         }
       }
@@ -40,11 +40,15 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
     });
 
     if (isProp && propName) {
-      fileMeta.cmpMeta.props[propName] = {};
+      const prop: PropMeta = {
+        propName: propName
+      };
 
-      if (type) {
-        fileMeta.cmpMeta.props[propName].type = type;
+      if (propType) {
+        prop.propType = propType;
       }
+
+      fileMeta.cmpMeta.props.push(prop);
 
       memberNode.decorators = undefined;
     }

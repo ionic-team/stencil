@@ -1,3 +1,5 @@
+export * from '../util/interfaces';
+import { ComponentMeta, ModeMeta } from '../util/interfaces';
 
 
 export interface CompilerConfig {
@@ -16,12 +18,6 @@ export interface CompilerConfig {
   bundles?: ManifestBundle[];
   packages: Packages;
   watch?: boolean;
-}
-
-
-export interface ManifestBundle {
-  components: string[];
-  priority: 'high'|'low';
 }
 
 
@@ -61,7 +57,7 @@ export interface BuildContext {
   results?: Results;
   bundles?: Bundle[];
   bundledJsModules?: {[id: string]: string};
-  components?: CoreComponents;
+
   registry?: Registry;
   isCompilerWatchInitialized?: boolean;
   isBundlerWatchInitialized?: boolean;
@@ -85,8 +81,8 @@ export interface Registry {
 export interface Bundle {
   id?: string;
   components?: {
-    component: Component;
-    mode: ComponentMode
+    component: ManifestComponentMeta;
+    mode: ModeMeta;
   }[];
   bundledJsModules?: string;
   content?: string;
@@ -97,74 +93,20 @@ export interface Bundle {
 
 
 export interface Manifest {
-  components?: CoreComponents;
+  components?: ManifestComponentMeta[];
   bundles?: ManifestBundle[];
 }
 
 
-export interface CoreComponents {
-  [tag: string]: Component;
-}
-
-
-export interface Component {
-  tag?: string;
-  modes: {[modeName: string]: ComponentMode};
-  methods: Methods;
-  props: Props;
-  listeners: Listener[];
-  watchers: Watcher[];
-  shadow: boolean;
+export interface ManifestComponentMeta extends ComponentMeta {
   componentClass: string;
   componentUrl: string;
 }
 
 
-export interface ComponentMode {
-  name?: string;
-  styleUrls?: string[];
-  styles?: string;
-}
-
-
-export interface ComponentMeta {
-  tag?: string;
-  methods?: Methods;
-  props?: Props;
-  listeners?: Listener[];
-  watchers?: Watcher[];
-  shadow?: boolean;
-  observedAttrs?: string[];
-  componentModule?: any;
-  modes: {[modeName: string]: ComponentMode};
-}
-
-
-export type Methods = string[];
-
-
-export interface PropOptions {
-  type?: string;
-}
-
-
-export interface Props {
-  [propName: string]: PropOptions;
-}
-
-
-export interface Listener {
-  methodName?: string;
-  eventName?: string;
-  capture?: boolean;
-  passive?: boolean;
-  enabled?: boolean;
-}
-
-
-export interface Watcher {
-  propName: string;
-  fn: string;
+export interface ManifestBundle {
+  components: string[];
+  priority: 'high'|'low';
 }
 
 

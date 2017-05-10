@@ -58,7 +58,7 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
-  cmpMeta.modes = {};
+  cmpMeta.modes = [];
 
   updateTag(cmpMeta);
   updateStyles(cmpMeta);
@@ -109,17 +109,23 @@ function updateStyles(cmpMeta: ComponentMeta) {
   if (styleModes) {
     Object.keys(styleModes).forEach(styleModeName => {
       const modeName = styleModeName.trim().toLowerCase();
-      cmpMeta.modes[modeName] = {
+
+      cmpMeta.modes.push({
+        modeName: modeName,
         styleUrls: [styleModes[styleModeName]]
-      };
+      });
     });
+
+    delete (<any>cmpMeta).styleUrls;
   }
 }
 
 
 function updateModes(cmpMeta: ComponentMeta) {
   if (Object.keys(cmpMeta.modes).length === 0) {
-    cmpMeta.modes['default'] = {};
+    cmpMeta.modes.push({
+      modeName: 'default'
+    });
   }
 }
 

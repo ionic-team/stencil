@@ -134,7 +134,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
     // look up which component mode this instance should use
     // if a mode isn't found then check if there's a default
-    const cmpMode = cmpMeta.modes[instance.mode] || cmpMeta.modes.default;
+    const cmpMode = cmpMeta.modes.find(m => m.modeName === instance.mode || m.modeName === 'default');
 
     if (cmpMode && cmpMode.styles) {
       // this component mode has styles
@@ -226,7 +226,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
     const cmpMeta: ComponentMeta = registry[tag] = {
       tag: tag,
-      modes: {},
+      modes: [],
       props: parseProp(data[1]),
       obsAttrs: []
     };
@@ -238,9 +238,10 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
     let keys = Object.keys(modeBundleIds);
     for (var i = 0; i < keys.length; i++) {
-      cmpMeta.modes[parseModeName(keys[i].toString())] = {
+      cmpMeta.modes.push({
+        modeName: parseModeName(keys[i].toString()),
         bundleId: modeBundleIds[keys[i]]
-      };
+      });
     }
 
     keys = Object.keys(cmpMeta.props);

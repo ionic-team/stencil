@@ -365,16 +365,17 @@ export interface ComponentMeta {
   props?: PropMeta[];
   listeners?: ListenMeta[];
   watchers?: WatchMeta[];
+  modes: ModeMeta[];
   shadow?: boolean;
   namedSlots?: string[];
   obsAttrs?: string[];
   componentModule?: any;
-  modes: {[modeName: string]: ComponentMode};
   priority?: 'high'|'low';
 }
 
 
-export interface ComponentMode {
+export interface ModeMeta {
+  modeName?: string;
   bundleId?: string;
   styles?: string;
   styleUrls?: string[];
