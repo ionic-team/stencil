@@ -236,7 +236,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       cmpMeta.priority = 'low';
     }
 
-    let keys = Object.keys(modeBundleIds);
+    const keys = Object.keys(modeBundleIds);
     for (var i = 0; i < keys.length; i++) {
       cmpMeta.modes.push({
         modeName: parseModeName(keys[i].toString()),
@@ -244,9 +244,8 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       });
     }
 
-    keys = Object.keys(cmpMeta.props);
-    for (i = 0; i < keys.length; i++) {
-      cmpMeta.obsAttrs.push(toDashCase(keys[i]));
+    for (i = 0; i < cmpMeta.props.length; i++) {
+      cmpMeta.obsAttrs.push(toDashCase(cmpMeta.props[i].propName));
     }
 
     return cmpMeta;

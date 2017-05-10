@@ -1,4 +1,8 @@
 
+export const BOOLEAN_TYPE_CODE = 0;
+
+export const NUMBER_TYPE_CODE = 1;
+
 export function isDef(s: any): boolean { return s !== undefined && s !== null; }
 
 export function isUndef(s: any): boolean { return s === undefined; }
