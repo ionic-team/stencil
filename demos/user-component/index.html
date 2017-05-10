@@ -8,11 +8,25 @@
 </head>
 <body>
 
+  <ion-button id="presentModal">Present Modal</ion-button>
+
   <my-app></my-app>
 
   <my-other-app></my-other-app>
 
   <script>
+    document.getElementById('presentModal').addEventListener('click', function() {
+
+      Ionic.modal.create('profile-modal', { userId: 88 }).then(modal => {
+        console.log('modal created');
+
+        modal.present().then(function() {
+          console.log('modal finished transitioning in');
+        });
+
+      });
+
+    });
 
     class MyApp extends HTMLElement {
 
@@ -58,6 +72,38 @@
 
     }
     customElements.define('my-other-app', MyOtherApp);
+
+
+    class ProfileModal extends HTMLElement {
+
+      constructor() {
+        super();
+
+        const shadowRoot = this.attachShadow({mode: 'open'});
+
+        shadowRoot.innerHTML = `
+          <style>
+            :host {
+              background: gray;
+            }
+          </style>
+          <p>My Profile Modal</p>
+          <p>
+            <ion-button>Dismiss Modal</ion-button>
+          </p>
+        `;
+      }
+
+      connectedCallback() {
+        var btn = this.shadowRoot.querySelector('ion-button');
+        btn.addEventListener('click', function(uiEvent) {
+          var ev = new CustomEvent('ionModalDismiss', { composed: true, bubbles: true });
+          uiEvent.target.dispatchEvent(ev);
+        });
+      }
+
+    }
+    customElements.define('profile-modal', ProfileModal);
 
   </script>
 

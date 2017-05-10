@@ -27,8 +27,6 @@
 
       <ion-content id="content">
 
-        <ion-button id="presentModal">Present Modal</ion-button>
-
         <ion-list>
 
           <ion-item-divider>
@@ -110,18 +108,6 @@
         <p id="dynamicBadges"></p>
 
         <script>
-          document.getElementById('presentModal').addEventListener('click', function() {
-
-            Ionic.modal.create('profile-modal', { userId: 88 }).then(modal => {
-              console.log('modal created');
-
-              modal.present().then(function() {
-                console.log('modal finished transitioning in');
-              });
-
-            });
-
-          });
 
           var content = document.getElementById('content');
           content.addEventListener('ionScrollStart', function(ev) {

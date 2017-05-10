@@ -565,14 +565,13 @@ export interface Animation {
   beforeRemoveClass: (className: string) => Animation;
   beforeStyles: (styles: { [property: string]: any; }) => Animation;
   destroy: () => void;
-  destroyOnFinish: (shouldDestroyOnFinish: boolean) => void;
   duration: (milliseconds: number) => Animation;
   easing: (name: string) => Animation;
   from: (prop: string, val: any) => Animation;
   fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
   hasCompleted: boolean;
   isPlaying: boolean;
-  onFinish: (callback: Function, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}) => Animation;
+  onFinish: (callback: (animation?: Animation) => void, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}) => Animation;
   play: (opts?: PlayOptions) => void;
   progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;
   progressStep: (stepValue: number) => void;

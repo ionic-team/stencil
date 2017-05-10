@@ -7,31 +7,30 @@ declare const Ionic: interfaces.Ionic;
 
 
 export class Animation {
+  private _afterAddClasses: string[];
+  private _afterRemoveClasses: string[];
+  private _afterStyles: { [property: string]: any; };
+  private _beforeAddClasses: string[];
+  private _beforeRemoveClasses: string[];
+  private _beforeStyles: { [property: string]: any; };
   private _childAnimations: Animation[];
   private _childAnimationTotal: number;
+  private _duration: number = null;
+  private _easingName: string = null;
   private _elements: HTMLElement[] = null;
   private _elementTotal: number;
   private _fxProperties: EffectProperty[];
-  private _duration: number = null;
-  private _easingName: string = null;
-  private _reversedEasingName: string = null;
-  private _beforeStyles: { [property: string]: any; };
-  private _beforeAddClasses: string[];
-  private _beforeRemoveClasses: string[];
-  private _afterStyles: { [property: string]: any; };
-  private _afterAddClasses: string[];
-  private _afterRemoveClasses: string[];
-  private _readCallbacks: Function[];
-  private _writeCallbacks: Function[];
+  private _hasDur: boolean;
+  private _hasTweenEffect: boolean;
+  private _isAsync: boolean;
+  private _isReverse: boolean;
   private _onFinishCallbacks: Function[];
   private _onFinishOneTimeCallbacks: Function[];
-  private _isReverse: boolean;
-  private _unregisterTrnsEnd: Function;
+  private _readCallbacks: Function[];
+  private _reversedEasingName: string = null;
   private _timerId: any;
-  private _hasDur: boolean;
-  private _isAsync: boolean;
-  private _hasTweenEffect: boolean;
-  private _destroyOnFinish: boolean;
+  private _unregisterTrnsEnd: Function;
+  private _writeCallbacks: Function[];
 
   parent: Animation;
   opts: AnimationOptions;
@@ -1101,7 +1100,7 @@ export class Animation {
   /**
    * Add a callback to fire when the animation has finished.
    */
-  onFinish(callback: Function, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}): Animation {
+  onFinish(callback: (animation?: Animation) => void, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}): Animation {
     if (opts && opts.clearExistingCallacks) {
       this._onFinishCallbacks = this._onFinishOneTimeCallbacks = undefined;
     }
@@ -1114,10 +1113,6 @@ export class Animation {
       this._onFinishCallbacks.push(callback);
     }
     return this;
-  }
-
-  destroyOnFinish(shouldDestroyOnFinish: boolean) {
-    this._destroyOnFinish = shouldDestroyOnFinish;
   }
 
   /**
@@ -1158,10 +1153,6 @@ export class Animation {
         this._onFinishOneTimeCallbacks[i](this);
       }
       this._onFinishOneTimeCallbacks.length = 0;
-    }
-
-    if (hasCompleted && this._destroyOnFinish) {
-      this.destroy();
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, h, Ionic, Prop } from '../index';
+import { Component, h, Ionic, Listen, Prop } from '../index';
 import { AnimationBuilder, Modal as IModal } from '../../util/interfaces';
 
 import iOSEnterAnimation from './animations/ios.enter';
@@ -26,6 +26,13 @@ export class Modal implements IModal {
   @Prop() params: any;
   @Prop() showBackdrop: boolean = true;
 
+  @Listen('ionModalDismiss')
+  onDismiss(ev: UIEvent) {
+    ev.stopPropagation();
+    ev.preventDefault();
+
+    this.dismiss();
+  }
 
   ionViewDidLoad() {
     Ionic.emit(this, 'ionModalDidLoad', { detail: { modal: this } });
@@ -52,13 +59,12 @@ export class Modal implements IModal {
 
     // build the animation and kick it off
     const animation = animationBuilder(this.$el);
-    animation.onFinish(() => {
+
+    animation.onFinish(a => {
+      a.destroy();
       Ionic.emit(this, 'ionModalDidPresent', { detail: { modal: this } });
       resolve();
-    });
-
-    animation.destroyOnFinish(true);
-    animation.play();
+    }).play();
   }
 
   dismiss() {
@@ -77,13 +83,14 @@ export class Modal implements IModal {
 
       // build the animation and kick it off
       const animation = animationBuilder(this.$el);
-      animation.onFinish(() => {
+      animation.onFinish(a => {
+        a.destroy();
         Ionic.emit(this, 'ionModalDidDismiss', { detail: { modal: this } });
+        Ionic.dom.write(() => {
+          this.$el.parentNode.removeChild(this.$el);
+        });
         resolve();
-      });
-
-      animation.destroyOnFinish(true);
-      animation.play();
+      }).play();
     });
   }
 
