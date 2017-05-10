@@ -34,7 +34,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
     plt.nextTick(() => {
       const tag = cmpMeta.tag;
 
-      console.log(elm.nodeName, 'connectedCallback nextTick');
+      // console.log(elm.nodeName, 'connectedCallback nextTick');
       const cmpMode = cmpMeta.modes.find(m => m.modeName === getMode(plt, config, elm, 'mode') || m.modeName === 'default');
 
       plt.loadBundle(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
