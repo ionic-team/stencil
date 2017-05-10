@@ -1,56 +1,77 @@
-import { Component, ConfigApi, Methods, PlatformApi, Props, ProxyElement, RendererApi, Watchers } from '../util/interfaces';
+import { Component, PropMeta, ConfigApi, Methods, PlatformApi, ProxyElement, RendererApi, WatchMeta } from '../util/interfaces';
 import { queueUpdate } from './update';
 import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/data-parse';
 
 
-export function initProps(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: Props, methods: Methods, watchers: Watchers) {
-  const propValues: {[propName: string]: any} = {};
+export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: PropMeta[], methods: Methods, watchers: WatchMeta[]) {
+  let i = 0;
 
   if (methods) {
-    methods.forEach(methodName => {
-
-      // dom's element instance
-      Object.defineProperty(elm, methodName, {
-        configurable: true,
-        value: instance[methodName].bind(instance)
-      });
-
-    });
+    for (i = 0; i < methods.length; i++) {
+      initMethod(methods[i], elm, instance);
+    }
   }
 
-  Object.keys(props).forEach(propName => {
-    const watcher: Function = (watchers && watchers[propName]) ? instance[watchers[propName].fn].bind(instance) : null;
+  if (props) {
+    instance.$values = {};
 
-    propValues[propName] = getInitialValue(config, elm, instance, props[propName].type, propName);
-
-    function getPropValue() {
-      return propValues[propName];
+    for (i = 0; i < props.length; i++) {
+      initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, tag, instance, watchers);
     }
+  }
+}
 
-    function setPropValue(value: any) {
-      if (propValues[propName] !== value) {
-        propValues[propName] = value;
 
-        watcher && watcher(value);
+function initMethod(methodName: string, elm: ProxyElement, instance: Component) {
+  // dom's element instance
+  Object.defineProperty(elm, methodName, {
+    configurable: true,
+    value: instance[methodName].bind(instance)
+  });
+}
 
-        queueUpdate(plt, config, renderer, elm, tag);
+
+function initProp(propName: string, propType: any, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, watchers: WatchMeta[]) {
+  instance.$values[propName] = getInitialValue(config, elm, instance, propType, propName);
+
+  if (watchers) {
+    for (var i = 0; i < watchers.length; i++) {
+      if (watchers[i].propName === propName) {
+        (instance.$watchers = instance.$watchers || []).push(instance[watchers[i].fn].bind(instance));
       }
     }
+  }
 
-    // dom's element instance
-    Object.defineProperty(elm, propName, {
-      configurable: true,
-      get: getPropValue,
-      set: setPropValue
-    });
+  function getPropValue() {
+    return instance.$values[propName];
+  }
 
-    // user's component class instance
-    Object.defineProperty(instance, propName, {
-      configurable: true,
-      get: getPropValue,
-      set: setPropValue
-    });
+  function setPropValue(value: any) {
+    if (instance.$values[propName] !== value) {
+      instance.$values[propName] = value;
 
+      if (instance.$watchers) {
+        for (var i = 0; i < instance.$watchers.length; i++) {
+          instance.$watchers[i](value);
+        }
+      }
+
+      queueUpdate(plt, config, renderer, elm, tag);
+    }
+  }
+
+  // dom's element instance
+  Object.defineProperty(elm, propName, {
+    configurable: true,
+    get: getPropValue,
+    set: setPropValue
+  });
+
+  // user's component class instance
+  Object.defineProperty(instance, propName, {
+    configurable: true,
+    get: getPropValue,
+    set: setPropValue
   });
 }
 

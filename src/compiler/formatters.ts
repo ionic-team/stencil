@@ -1,4 +1,4 @@
-import { Bundle, Component, ComponentMode, Listeners, ListenOpts, Props, Registry, Watchers, WatchOpts } from './interfaces';
+import { Bundle, ComponentMeta, ModeMeta, ListenMeta, PropMeta, Registry, WatchMeta } from './interfaces';
 import * as crypto from 'crypto';
 
 
@@ -15,12 +15,12 @@ export function formatBundleFileName(bundleId: string) {
 }
 
 
-export function formatBundleContent(bundleId: string, bundledJsModules: string, componentModeLoader: string) {
+export function formatBundleContent(coreVersion: number, bundleId: string, bundledJsModules: string, componentModeLoader: string) {
   return [
     `Ionic.loadComponents(\n`,
 
       `/**** core version ****/`,
-      `0,\n`,
+      `${coreVersion},\n`,
 
       `/**** bundleId ****/`,
       `${bundleId},\n`,
@@ -35,39 +35,18 @@ export function formatBundleContent(bundleId: string, bundledJsModules: string, 
 }
 
 
-export function formatComponentRegistryProps(props: Props): any {
-  const p: any[] = [];
-
-  Object.keys(props).forEach(propName => {
-    const prop = props[propName];
-    const formattedProp: any[] = [propName];
-
-    if (prop.type === 'boolean') {
-      formattedProp.push(0);
-
-    } else if (prop.type === 'number') {
-      formattedProp.push(1);
-    }
-
-    p.push(formattedProp);
-  });
-
-  return p;
-}
-
-
-export function formatComponentModeLoader(cmp: Component, mode: ComponentMode) {
+export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
   const tag = cmp.tag;
 
-  const modeName = (mode.name ? mode.name : '');
+  const modeName = (mode.modeName ? mode.modeName : '');
 
   const modeCode = formatModeName(modeName);
 
   const styles = formatStyles(mode.styles);
 
   let label = tag;
-  if (mode.name) {
-    label += '.' + mode.name;
+  if (mode.modeName) {
+    label += '.' + mode.modeName;
   }
 
   const methods = formatMethods(cmp.methods);
@@ -135,57 +114,55 @@ function formatMethods(methods: string[]) {
 }
 
 
-function formatListeners(label: string, listeners: Listeners) {
-  const listenerMethodNames = Object.keys(listeners);
-  if (!listenerMethodNames.length) {
+function formatListeners(label: string, listeners: ListenMeta[]) {
+  if (!listeners || !listeners.length) {
     return '0 /* no listeners */';
   }
 
   const t: string[] = [];
 
-  listenerMethodNames.forEach((methodName, listenerIndex) => {
-    t.push(formatListenerOpts(label, methodName, listenerIndex, listeners[methodName]));
+  listeners.forEach((listener, listenerIndex) => {
+    t.push(formatListenerOpts(label, listener, listenerIndex));
   });
 
   return `[\n` + t.join(',\n') + `\n]`;
 }
 
 
-function formatListenerOpts(label: string, methodName: string, listenerIndex: number, listenerOpts: ListenOpts) {
+function formatListenerOpts(label: string, listener: ListenMeta, listenerIndex: number) {
   const t = [
-    `    /********* ${label} listener[${listenerIndex}] ${methodName} *********/\n` +
-    `    /* [0] methodName **/ '${methodName}'`,
-    `    /* [1] eventName ***/ '${listenerOpts.eventName}'`,
-    `    /* [2] capture *****/ ${formatBoolean(listenerOpts.capture)}`,
-    `    /* [3] passive *****/ ${formatBoolean(listenerOpts.passive)}`,
-    `    /* [4] enabled *****/ ${formatBoolean(listenerOpts.enabled)}`,
+    `    /***** ${label} listener[${listenerIndex}]  ${listener.eventName} -> ${listener.methodName}() *****/\n` +
+    `    /* [0] methodName **/ '${listener.methodName}'`,
+    `    /* [1] eventName ***/ '${listener.eventName}'`,
+    `    /* [2] capture *****/ ${formatBoolean(listener.capture)}`,
+    `    /* [3] passive *****/ ${formatBoolean(listener.passive)}`,
+    `    /* [4] enabled *****/ ${formatBoolean(listener.enabled)}`,
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
 }
 
 
-function formatWatchers(label: string, watchers: Watchers) {
-  const watcherMethodNames = Object.keys(watchers);
-  if (!watcherMethodNames.length) {
+function formatWatchers(label: string, watchers: WatchMeta[]) {
+  if (!watchers || !watchers.length) {
     return '0 /* no watchers */';
   }
 
   const t: string[] = [];
 
-  watcherMethodNames.forEach((methodName, watchIndex) => {
-    t.push(formatWatcherOpts(label, methodName, watchIndex, watchers[methodName]));
+  watchers.forEach((watcher, watchIndex) => {
+    t.push(formatWatcherOpts(label, watcher, watchIndex));
   });
 
   return `[\n` + t.join(',\n') + `\n]`;
 }
 
 
-function formatWatcherOpts(label: string, methodName: string, watchIndex: number, watchOpts: WatchOpts) {
+function formatWatcherOpts(label: string, watcher: WatchMeta, watchIndex: number) {
   const t = [
-    `    /********* ${label} watch[${watchIndex}] ${methodName} *********/\n` +
-    `    /* [0] methodName **/ '${methodName}'`,
-    `    /* [1] fn **********/ '${watchOpts.fn}'`
+    `    /*****  ${label} watch[${watchIndex}] ${watcher.propName} ***** /\n` +
+    `    /* [0] watch prop **/ '${watcher.propName}'`,
+    `    /* [1] call fn *****/ '${watcher.fn}'`
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
@@ -211,8 +188,24 @@ export function formatPriority(priority: 'high'|'low') {
 }
 
 
-export function formatRegistryContent(registry: Registry) {
-  let strData = JSON.stringify(registry);
+export function formatRegistryContent(inputRegistry: Registry, devMode: boolean) {
+  const registry: Registry = {};
+
+  // alphabetize the registry
+  Object.keys(inputRegistry).sort().forEach(tag => {
+    registry[tag] = inputRegistry[tag];
+  });
+
+  let strData: string;
+
+  if (devMode) {
+    // pretty print
+    strData = JSON.stringify(registry, null, 2);
+
+  } else {
+    // remove all whitespace
+    strData = JSON.stringify(registry);
+  }
 
   // remove unnecessary double quotes
   strData = strData.replace(/"0"/g, '0');
@@ -221,6 +214,30 @@ export function formatRegistryContent(registry: Registry) {
   strData = strData.replace(/"3"/g, '3');
 
   return strData;
+}
+
+
+export function formatComponentRegistryProps(props: PropMeta[]): any {
+  if (!props || !props.length) {
+    return null;
+  }
+
+  const p: any[] = [];
+
+  props.forEach(prop => {
+    const formattedProp: any[] = [prop.propName];
+
+    if (prop.propType === 'boolean') {
+      formattedProp.push(0);
+
+    } else if (prop.propType === 'number') {
+      formattedProp.push(1);
+    }
+
+    p.push(formattedProp);
+  });
+
+  return p;
 }
 
 

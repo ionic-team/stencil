@@ -1,4 +1,4 @@
-import { Component, ComponentMetaListeners, ListenOpts } from '../util/interfaces';
+import { Component, ListenMeta, ListenOptions } from '../util/interfaces';
 import { getElementReference, getKeyCodeByName } from '../util/helpers';
 import { noop } from '../util/helpers';
 
@@ -6,15 +6,12 @@ import { noop } from '../util/helpers';
 let supportsOpts: boolean = null;
 
 
-export function attachListeners(listenerMetaOpts: ComponentMetaListeners, instance: Component) {
-  const methodNames = Object.keys(listenerMetaOpts);
-
-  for (var i = 0; i < methodNames.length; i++) {
-    var methodName = methodNames[i];
-    var listenerOpts = listenerMetaOpts[methodName];
-    if (listenerOpts.enabled !== false) {
+export function attachListeners(listeners: ListenMeta[], instance: Component) {
+  for (var i = 0; i < listeners.length; i++) {
+    var listener = listeners[i];
+    if (listener.enabled !== false) {
       instance.$listeners = instance.$listeners || {};
-      instance.$listeners[listenerOpts.eventName] = addEventListener(instance.$el, listenerOpts.eventName, instance[methodName].bind(instance), listenerOpts);
+      instance.$listeners[listener.eventName] = addEventListener(instance.$el, listener.eventName, instance[listener.methodName].bind(instance), listener);
     }
   }
 }
@@ -22,21 +19,19 @@ export function attachListeners(listenerMetaOpts: ComponentMetaListeners, instan
 
 export function enableListener(instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
   if (instance && instance.$meta) {
-    const listenerMetaOpts = instance.$meta.listeners;
+    const listeners = instance.$meta.listeners;
 
-    if (listenerMetaOpts) {
+    if (listeners) {
       const deregisterFns = instance.$listeners = instance.$listeners || {};
-      const methodNames = Object.keys(listenerMetaOpts);
 
-      for (var i = 0; i < methodNames.length; i++) {
-        var methodName = methodNames[i];
-        var listenerOpts = listenerMetaOpts[methodName];
+      for (var i = 0; i < listeners.length; i++) {
+        var listener = listeners[i];
 
-        if (listenerOpts.eventName === eventName) {
+        if (listener.eventName === eventName) {
 
           if (shouldEnable && !deregisterFns[eventName]) {
             var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(instance.$el, attachToEventName, instance[methodName].bind(instance), listenerOpts);
+            deregisterFns[eventName] = addEventListener(instance.$el, attachToEventName, instance[listener.methodName].bind(instance), listener);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();
@@ -51,7 +46,7 @@ export function enableListener(instance: Component, eventName: string, shouldEna
 }
 
 
-export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts: ListenOpts = {}) {
+export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts: ListenOptions = {}) {
   if (!elm) {
     return noop;
   }

@@ -1,7 +1,7 @@
 import { attachListeners } from './events';
 import { collectedHostContentNodes } from './host';
 import { ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
-import { initProps } from './proxy';
+import { initProxy } from './proxy';
 import { RendererApi } from '../util/interfaces';
 
 
@@ -34,7 +34,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     instance.$el = elm;
     instance.$meta = cmpMeta;
 
-    initProps(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.methods, cmpMeta.watchers);
+    initProxy(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.methods, cmpMeta.watchers);
 
     plt.$attachComponent(elm, cmpMeta, instance);
 
@@ -46,7 +46,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
       // collect up the host content nodes so we can
       // manually move them around to the correct slot
 
-      if (cmpMeta.tag === 'ion-item') {
+      if (cmpMeta.tag === 'ion-item' || cmpMeta.tag === 'ion-item-divider') {
         // TODO!!
         cmpMeta.namedSlots = ['start', 'end'];
       }

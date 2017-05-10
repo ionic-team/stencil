@@ -1,4 +1,4 @@
-import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, Props } from '../util/interfaces';
+import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, PropMeta } from '../util/interfaces';
 import { isString } from './helpers';
 
 
@@ -16,26 +16,28 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 
   // component listeners
   if (cmpModeData[2]) {
-    cmpMeta.listeners = {};
+    cmpMeta.listeners = [];
     for (i = 0; i < cmpModeData[2].length; i++) {
       cmpListenerData = cmpModeData[2][i];
-      cmpMeta.listeners[cmpListenerData[0]] = {
+      cmpMeta.listeners.push({
+        methodName: cmpListenerData[0],
         eventName: cmpListenerData[1],
         capture: !!cmpListenerData[2],
         passive: !!cmpListenerData[3],
         enabled: !!cmpListenerData[4],
-      };
+      });
     }
   }
 
   // component instance property watchers
   if (cmpModeData[3]) {
-    cmpMeta.watchers = {};
-     for (i = 0; i < cmpModeData[3].length; i++) {
+    cmpMeta.watchers = [];
+    for (i = 0; i < cmpModeData[3].length; i++) {
       cmpWatchData = cmpModeData[3][i];
-      cmpMeta.watchers[cmpWatchData[0]] = {
-        fn: cmpWatchData[1],
-      };
+      cmpMeta.watchers.push({
+        propName: cmpWatchData[0],
+        fn: cmpWatchData[1]
+      });
     }
   }
 
@@ -45,7 +47,7 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // mode name (ios, md, wp)
   // get component mode
   if (isString(cmpModeData[6])) {
-    var cmpMode = cmpMeta.modes[parseModeName(cmpModeData[5].toString())];
+    var cmpMode = cmpMeta.modes.find(m => m.modeName === parseModeName(cmpModeData[5].toString()));
     if (cmpMode) {
       // component mode styles
       cmpMode.styles = cmpModeData[6];
@@ -75,21 +77,22 @@ export function parseModeName(modeCode: string) {
 
 
 export function parseProp(propData: any[][]) {
-  const prop: Props = {
-    color: {},
-    mode: {},
-    id: {}
-  };
+  const props: PropMeta[] = [
+    { propName: 'color' },
+    { propName: 'mode' },
+    { propName: 'id' }
+  ];
 
   if (propData) {
     for (var i = 0; i < propData.length; i++) {
-      prop[propData[i][0]] = {
-        type: propData[i][1]
-      };
+      props.push({
+        propName: propData[i][0],
+        propType: propData[i][1]
+      });
     }
   }
 
-  return prop;
+  return props;
 }
 
 

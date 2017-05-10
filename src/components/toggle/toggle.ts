@@ -1,5 +1,5 @@
 import { BooleanInputComponent, GestureDetail } from '../../util/interfaces';
-import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
+import { Component, h, Ionic, Listen, Method, Prop, Watch } from '../index';
 
 
 @Component({
@@ -78,7 +78,7 @@ export class Toggle implements BooleanInputComponent {
     ev.preventDefault();
   }
 
-
+  @Method()
   toggle() {
     if (!this.disabled) {
       this.checked = !this.checked;

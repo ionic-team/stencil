@@ -30,23 +30,18 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
   window.componentStack.unshift(elm);
 
   // End stack idea
+  if (!elm.$tmpDisconnected) {
+    plt.nextTick(() => {
+      const tag = cmpMeta.tag;
 
-  plt.nextTick(() => {
-    const tag = cmpMeta.tag;
+      console.log(elm.nodeName, 'connectedCallback nextTick');
+      const cmpMode = cmpMeta.modes.find(m => m.modeName === getMode(plt, config, elm, 'mode') || m.modeName === 'default');
 
-    console.log(elm.nodeName, 'connectedCallback nextTick');
-
-    let cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')];
-    if (!cmpMode) {
-      cmpMode = cmpMeta.modes.default;
-    }
-
-    // Asynchronously load the ionic component type
-    plt.loadBundle(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
-      console.log(elm.nodeName, 'loadComponentCallback');
-      queueUpdate(plt, config, renderer, elm, tag);
+      plt.loadBundle(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
+        queueUpdate(plt, config, renderer, elm, tag);
+      });
     });
-  });
+  }
 }
 
 

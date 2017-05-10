@@ -4,8 +4,25 @@
 // Item Divider
 // --------------------------------------------------
 
-ion-item-divider,
-:host {
-  display: block;
+ion-item-divider {
   visibility: inherit !important;
+
+  z-index: $z-index-item-divider;
+  display: flex;
+  overflow: hidden;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin: 0;
+  padding: 0;
+
+  width: 100%;
+
+  min-height: 30px;
+}
+
+ion-item-divider[sticky] {
+  position: sticky;
+  top: 0;
 }

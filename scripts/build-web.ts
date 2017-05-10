@@ -17,17 +17,15 @@ const DEV_MODE = process.argv.indexOf('dev') > -1;
 const WATCH = process.argv.indexOf('watch') > -1;
 
 const BUNDLES = [
-  { components: ['ion-animation'], priority: 'low' },
   { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-title', 'ion-toolbar'] },
   { components: ['ion-avatar', 'ion-thumbnail'] },
   { components: ['ion-badge'] },
   { components: ['ion-button'] },
   { components: ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'] },
   { components: ['ion-list', 'ion-item', 'ion-label'] },
-  { components: ['ion-list-header', 'item-divider'] },
+  { components: ['ion-list-header', 'ion-item-divider'] },
   { components: ['ion-menu'], priority: 'low' },
-  { components: ['ion-modal'], priority: 'low' },
-  { components: ['ion-modal-viewport'], priority: 'low' },
+  { components: ['ion-modal', 'ion-modal-portal'] },
   { components: ['ion-gesture', 'ion-scroll'], priority: 'low' },
   { components: ['ion-toggle'] },
   { components: ['ion-slides', 'ion-slide'] },
@@ -85,6 +83,10 @@ copyDirectory(vendorJsScript, vendorCompilerDest)
     // then prepend the component registry to the top of the loader file
     return buildWebLoader(results.componentRegistry, DEV_MODE);
   });
+
+}).then(() => {
+  // copy ionic.animation.js
+  return copyAnimation();
 
 }).catch(err => {
   if (err) {
@@ -201,6 +203,24 @@ function buildWebLoader(componentRegistry: string, devMode: boolean) {
     });
   });
 }
+
+
+function copyAnimation() {
+  return new Promise((resolve, reject) => {
+    const srcName = DEV_MODE ? 'ionic.animation.dev.js' : 'ionic.animation.js';
+    const src = path.join(compiledDir, 'core', srcName);
+    const dest = path.join(destDir, 'ionic.animation.js');
+
+    fs.copy(src, dest, err => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 
 export function copyDirectory(source: string, destionation: string): Promise<any> {
   return new Promise((resolve, reject) => {

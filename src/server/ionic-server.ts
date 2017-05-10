@@ -15,14 +15,8 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     controllers: {},
     config: ConfigCtrl,
     dom: DomCtrl,
-    modal: {
-      create: () => {
-        return {
-          present: () => Promise.resolve(),
-          dismiss: () => Promise.resolve()
-        };
-      }
-    }
+    modal: null,
+    Animation: null
   };
 
   return injectedIonic;

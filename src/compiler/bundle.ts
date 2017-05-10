@@ -1,9 +1,10 @@
 import { bundleComponentModeStyles } from './styles';
-import { Bundle, BundlerConfig, BuildContext, Component, ComponentMode, Manifest, ManifestBundle, Results } from './interfaces';
+import { Bundle, BundlerConfig, BuildContext, ComponentMeta, ModeMeta, Manifest, ManifestBundle, Results } from './interfaces';
 import { formatComponentRegistryProps, formatComponentModeLoader, formatBundleFileName,
   formatBundleContent, formatRegistryContent, formatPriority, generateBundleId,
   getBundledModulesId, getModeCode } from './formatters';
 import { createFileMeta, readFile, writeFile, writeFiles } from './util';
+import { getManifest } from './manifest';
 import { setupBundlerWatch } from './watch';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
@@ -40,17 +41,15 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
   };
 
   return getManifest(config, ctx).then(manifest => {
-
-    const components = getComponents(ctx, manifest);
-
-    return Promise.all(Object.keys(components).map(tag => {
-      return bundleComponent(config, ctx, components[tag]);
+    return Promise.all(manifest.components.map(cmpMeta => {
+      return bundleComponent(config, ctx, cmpMeta);
 
     }))
     .then(() => {
       return buildCoreJs(config, ctx, manifest);
 
-    }).then(() => {
+    })
+    .then(() => {
       return setupBundlerWatch(config, ctx, config.packages.typescript.sys);
     });
 
@@ -62,40 +61,26 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
 
 
 export function bundleWatch(config: BundlerConfig, ctx: BuildContext, changedFiles: string[]) {
-  changedFiles;
+  if (config.debug) {
+    console.log(`bundle, bundleWatch: ${changedFiles}`);
+  }
   return bundle(config, ctx);
 }
 
 
-function bundleComponent(config: BundlerConfig, ctx: BuildContext, component: Component) {
-  const modeNames = Object.keys(component.modes);
-
-  return Promise.all(modeNames.map(modeName => {
-    component.modes[modeName].name = modeName;
-    return bundleComponentMode(config, ctx, component, component.modes[modeName]);
+function bundleComponent(config: BundlerConfig, ctx: BuildContext, cmpMeta: ComponentMeta) {
+  return Promise.all(cmpMeta.modes.map(modeMeta => {
+    return bundleComponentMode(config, ctx, cmpMeta, modeMeta);
   }));
 }
 
 
-function bundleComponentMode(config: BundlerConfig, ctx: BuildContext, component: Component, mode: ComponentMode) {
+function bundleComponentMode(config: BundlerConfig, ctx: BuildContext, cmpMeta: ComponentMeta, modeMeta: ModeMeta) {
   if (config.debug) {
-    console.log(`bundle, bundleComponentMode: ${component.tag}, ${mode.name}`);
+    console.log(`bundle, bundleComponentMode: ${cmpMeta.tag}, ${modeMeta.modeName}`);
   }
 
-  return bundleComponentModeStyles(config, ctx, mode);
-}
-
-
-function getComponents(ctx: BuildContext, manifest: Manifest) {
-  if (!ctx.components) {
-    ctx.components = {};
-
-    Object.keys(manifest.components).forEach(tag => {
-      ctx.components[tag] = <Component>Object.assign({}, manifest.components[tag]);
-      ctx.components[tag].tag = tag;
-    });
-  }
-  return ctx.components;
+  return bundleComponentModeStyles(config, ctx, modeMeta);
 }
 
 
@@ -107,11 +92,11 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
   ctx.bundles = [];
 
   manifest.bundles.forEach(manifestBundle => {
-    buildComponentBundles(ctx, manifestBundle);
+    buildComponentBundles(ctx, manifest, manifestBundle);
   });
 
   return generateBundleFiles(config, ctx).then(() => {
-    const registryContent = formatRegistryContent(ctx.registry);
+    const registryContent = formatRegistryContent(ctx.registry, config.devMode);
     ctx.results.componentRegistry = registryContent;
 
     const coreFiles = [
@@ -128,8 +113,8 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
 }
 
 
-function buildComponentBundles(ctx: BuildContext, manifestBundle: ManifestBundle) {
-  const allModeNames = getAllModeNames(ctx);
+function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBundle: ManifestBundle) {
+  const allModeNames = getAllModeNames(manifest);
 
   allModeNames.forEach(modeName => {
 
@@ -140,14 +125,14 @@ function buildComponentBundles(ctx: BuildContext, manifestBundle: ManifestBundle
 
     manifestBundle.components.forEach(manifestComponentTag => {
 
-      const component = ctx.components[manifestComponentTag];
+      const component = manifest.components.find(c => c.tag === manifestComponentTag);
       if (!component) return;
 
-      const mode = component.modes[modeName];
-      if (mode) {
+      const modeMeta = component.modes.find(m => m.modeName === modeName);
+      if (modeMeta) {
         bundle.components.push({
           component: component,
-          mode: mode
+          mode: modeMeta
         });
       }
     });
@@ -226,75 +211,77 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
   const filesToWrite = new Map<string, string>();
 
-  const bundleIdKeyword = '__IONIC_BUNDLE_ID__';
-
   return bundleComponentModules(config, ctx).then(() => {
     ctx.bundles.forEach(bundle => {
 
-    const componentModeLoaders = bundle.components.map(bundleComponent => {
-      return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
-    }).join(',\n');
+      const componentModeLoaders = bundle.components.map(bundleComponent => {
+        return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
+      }).join(',\n');
 
-    bundle.bundledJsModules = ctx.bundledJsModules[getBundledModulesId(bundle)];
+      bundle.bundledJsModules = ctx.bundledJsModules[getBundledModulesId(bundle)];
 
-    bundle.content = formatBundleContent(bundleIdKeyword, bundle.bundledJsModules, componentModeLoaders);
+      bundle.content = formatBundleContent(CORE_VERSION, BUNDLE_ID_KEYWORD, bundle.bundledJsModules, componentModeLoaders);
 
-    if (config.devMode) {
-      // in dev mode, create the bundle id from combining all of the tags
-      bundle.id = bundle.components.map(c => c.component.tag + '.' + c.mode.name).join('.');
+      if (config.devMode) {
+        // in dev mode, create the bundle id from combining all of the tags
+        bundle.id = bundle.components.map(c => c.component.tag + '.' + c.mode.modeName).join('.');
 
-    } else {
-      // in prod mode, create bundle id from hashing the content
-      bundle.id = generateBundleId(bundle.content);
+      } else {
+        // in prod mode, create bundle id from hashing the content
+        bundle.id = generateBundleId(bundle.content);
 
-      // minify when in prod mode
-      try {
-        const minifyResults = config.packages.uglify.minify(bundle.content, {
-          fromString: true
-        });
-        bundle.content = minifyResults.code;
-      } catch (e) {
-        console.log(`uglify.minify error: ${e}`);
-      }
-    }
-
-    bundle.fileName = formatBundleFileName(bundle.id);
-    bundle.filePath = config.packages.path.join(config.destDir, 'bundles', bundle.fileName);
-
-    bundle.content = bundle.content.replace(bundleIdKeyword, `"${bundle.id}"`);
-
-    bundle.components.forEach(bundleComponent => {
-      const tag = bundleComponent.component.tag;
-      const modeCode = getModeCode(bundleComponent.mode.name);
-
-      ctx.registry[tag] = ctx.registry[tag] || [];
-
-      const modes: {[modeCode: string]: string} = ctx.registry[tag][0] || {};
-
-      modes[modeCode] = bundle.id;
-
-      ctx.registry[tag][0] = modes;
-
-      if (ctx.registry[tag].length === 1 && Object.keys(bundleComponent.component.props).length) {
-        ctx.registry[tag][1] = formatComponentRegistryProps(bundleComponent.component.props);
-
-      } else if (bundle.priority === 'low') {
-        ctx.registry[tag][1] = null;
+        // minify when in prod mode
+        try {
+          const minifyResults = config.packages.uglify.minify(bundle.content, {
+            fromString: true
+          });
+          bundle.content = minifyResults.code;
+        } catch (e) {
+          console.log(`uglify.minify error: ${e}`);
+        }
       }
 
-      if (bundle.priority === 'low') {
-        ctx.registry[tag][2] = formatPriority(bundle.priority);
+      bundle.fileName = formatBundleFileName(bundle.id);
+      bundle.filePath = config.packages.path.join(config.destDir, 'bundles', bundle.fileName);
+
+      bundle.content = bundle.content.replace(BUNDLE_ID_KEYWORD, `"${bundle.id}"`);
+
+      bundle.components.forEach(bundleComponent => {
+        const cmp = bundleComponent.component;
+        const tag = cmp.tag;
+        const modeCode = getModeCode(bundleComponent.mode.modeName);
+
+        ctx.registry[tag] = ctx.registry[tag] || [];
+
+        const modes: {[modeCode: string]: string} = ctx.registry[tag][0] || {};
+
+        modes[modeCode] = bundle.id;
+
+        ctx.registry[tag][0] = modes;
+
+        if (ctx.registry[tag].length === 1) {
+          const formattedProps = formatComponentRegistryProps(cmp.props);
+          if (formattedProps) {
+            ctx.registry[tag][1] = formattedProps;
+          }
+
+        } else if (bundle.priority === 'low') {
+          ctx.registry[tag][1] = null;
+        }
+
+        if (bundle.priority === 'low') {
+          ctx.registry[tag][2] = formatPriority(bundle.priority);
+        }
+      });
+
+      if (ctx.results.files.indexOf(bundle.filePath) === -1) {
+        ctx.results.files.push(bundle.filePath);
       }
+
+      filesToWrite.set(bundle.filePath, bundle.content);
     });
 
-    if (ctx.results.files.indexOf(bundle.filePath) === -1) {
-      ctx.results.files.push(bundle.filePath);
-    }
-
-    filesToWrite.set(bundle.filePath, bundle.content);
-  });
-
-  return writeFiles(config.packages, filesToWrite);
+    return writeFiles(config.packages, filesToWrite);
   });
 }
 
@@ -320,35 +307,22 @@ function createCoreJs(config: BundlerConfig, srcFilePath: string) {
 }
 
 
-function getAllModeNames(ctx: BuildContext) {
+function getAllModeNames(manifest: Manifest) {
   const allModeNames: string[] = [];
 
-  Object.keys(ctx.components).forEach(tag => {
-    const component = ctx.components[tag];
+  manifest.components.forEach(cmpMeta => {
 
-    Object.keys(component.modes).forEach(modeName => {
-      if (allModeNames.indexOf(modeName) === -1) {
-        allModeNames.push(modeName);
+    cmpMeta.modes.forEach(mode => {
+      if (allModeNames.indexOf(mode.modeName) === -1) {
+        allModeNames.push(mode.modeName);
       }
     });
+
   });
 
-  return allModeNames;
+  return allModeNames.sort();
 }
 
 
-function getManifest(config: BundlerConfig, ctx: BuildContext) {
-  if (ctx.results.manifest) {
-    return Promise.resolve(ctx.results.manifest);
-  }
-
-  ctx.results.manifestPath = config.packages.path.join(config.srcDir, 'manifest.json');
-
-  if (config.debug) {
-    console.log(`bundle, manifestFilePath: ${ctx.results.manifestPath}`) ;
-  }
-
-  return readFile(config.packages, ctx.results.manifestPath).then(manifestStr => {
-    return ctx.results.manifest = JSON.parse(manifestStr);
-  });
-}
+const CORE_VERSION = 0;
+const BUNDLE_ID_KEYWORD = '__IONIC_BUNDLE_ID__';

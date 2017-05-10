@@ -24,7 +24,8 @@ import * as ts from 'typescript';
 const rollup = require('rollup');
 
 export const ROOT_DIR = path.join(__dirname, '../..');
-export const EXTERNS = path.join(ROOT_DIR, 'scripts', 'core.externs.js');
+export const EXTERNS_CORE = path.join(ROOT_DIR, 'scripts', 'externs.core.js');
+export const EXTERNS_ANIMATION = path.join(ROOT_DIR, 'scripts', 'externs.animation.js');
 export const POLYFILLS_DIR = path.join(ROOT_DIR, 'src/polyfills');
 export const LICENSE = `/*! (C) Ionic https://ionicframework.com - MIT License */`;
 
@@ -84,7 +85,7 @@ function buildCoreES5Minified(ctx: BuildContext) {
 
   const opts = {
     js: ctx.coreES5DevFilePath,
-    externs: EXTERNS,
+    externs: EXTERNS_CORE,
     language_out: 'ECMASCRIPT5',
     compilation_level: 'ADVANCED_OPTIMIZATIONS',
     assume_function_wrapper: 'true',
@@ -103,7 +104,7 @@ function buildCoreES5Minified(ctx: BuildContext) {
         reject(stdErr);
 
       } else {
-        ctx.coreES5MinifiedContent = stdOut
+        ctx.coreES5MinifiedContent = stdOut;
 
         fs.unlink(ctx.coreES5DevFilePath, () => {
           console.log('core, buildCoreES5Minified:', ctx.coreES5DevFilePath);
@@ -135,7 +136,7 @@ function buildCoreMinified(ctx: BuildContext) {
 
     var opts = {
       js: closurePrepareFilePath,
-      externs: EXTERNS,
+      externs: EXTERNS_CORE,
       language_out: 'ECMASCRIPT5',
       compilation_level: 'ADVANCED_OPTIMIZATIONS',
       assume_function_wrapper: 'true',
@@ -197,6 +198,65 @@ function buildCoreMinified(ctx: BuildContext) {
       });
     });
 
+  });
+}
+
+
+function buildAnimation(ctx: BuildContext) {
+  // ionic.animation.dev.js
+
+  return rollup.rollup({
+    entry: ctx.animationEntryFilePath
+
+  }).then((bundle: any) => {
+    var result = bundle.generate({
+      format: 'es',
+      intro: '(function(window) {\n"use strict";\n',
+      outro: '})(window);'
+    });
+
+    ts.sys.writeFile(ctx.animationDevFilePath, result.code);
+
+    return Promise.resolve();
+  });
+}
+
+
+function buildAnimationMinified(ctx: BuildContext) {
+  // ionic.animation.js
+
+  const ClosureCompiler = require('google-closure-compiler').compiler;
+
+  const opts = {
+    js: ctx.animationDevFilePath,
+    externs: EXTERNS_ANIMATION,
+    language_out: 'ECMASCRIPT5',
+    compilation_level: 'ADVANCED_OPTIMIZATIONS',
+    assume_function_wrapper: 'true',
+    warning_level: 'QUIET',
+    rewrite_polyfills: 'false',
+    // formatting: 'PRETTY_PRINT',
+    // debug: 'true'
+  };
+
+  return new Promise((resolve, reject) => {
+    var closureCompiler = new ClosureCompiler(opts);
+
+    closureCompiler.run((exitCode: number, stdOut: string, stdErr: string) => {
+      if (stdErr) {
+        console.log('core, buildAnimationsMinified exitCode', exitCode, 'stdErr', stdErr);
+        reject(stdErr);
+
+      } else {
+        ts.sys.writeFile(ctx.animationMinifiedFilePath, stdOut);
+
+        fs.unlink(ctx.animationDevFilePath, () => {
+          console.log('core, buildAnimationsMinified:', ctx.coreES5DevFilePath);
+
+          resolve();
+        });
+      }
+    });
   });
 }
 
@@ -324,13 +384,18 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
     cePolyFillPath: path.join(POLYFILLS_DIR, 'document-register-element.js'),
     cePolyfillContent: '',
 
+    animationEntryFilePath: path.join(srcDir, 'ionic.animation.js'),
+    animationDevFilePath: path.join(destDir, coreFilesDir, 'ionic.animation.dev.js'),
+    animationMinifiedFilePath: path.join(destDir, coreFilesDir, 'ionic.animation.js'),
+
     devMode: devMode
   };
 
   // create the dev mode versions
   return Promise.all([
     buildCore(ctx),
-    buildCoreES5(ctx)
+    buildCoreES5(ctx),
+    buildAnimation(ctx)
   ])
 
   .then(() => {
@@ -338,7 +403,8 @@ export function buildBindingCore(srcDir: string, destDir: string, coreFilesDir: 
     if (!ctx.devMode) {
       return Promise.all([
         buildCoreMinified(ctx),
-        buildCoreES5Minified(ctx)
+        buildCoreES5Minified(ctx),
+        buildAnimationMinified(ctx)
       ]);
     }
 
@@ -440,6 +506,10 @@ interface BuildContext {
 
   cePolyFillPath: string;
   cePolyfillContent: string;
+
+  animationEntryFilePath: string;
+  animationDevFilePath: string;
+  animationMinifiedFilePath: string;
 
   devMode: boolean;
 };

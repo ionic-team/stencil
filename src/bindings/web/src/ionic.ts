@@ -43,4 +43,11 @@ import { IonicGlobal } from '../../../util/interfaces';
   s.src = ionic.staticDir + 'ionic.' + pathItems.join('.') + '.js';
   document.head.appendChild(s);
 
+  // request the ionic core file this browser needs
+  (window.requestIdleCallback || setTimeout)(() => {
+    var s = document.createElement('script');
+    s.src = ionic.staticDir + 'ionic.animation.js';
+    document.head.appendChild(s);
+  });
+
 })(window, document);

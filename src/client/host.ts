@@ -6,13 +6,17 @@ export function themeVNodeData(instance: Component, cssClassName: string, vnodeD
   const mode = instance.mode;
   const color = instance.color;
 
-  cssClasses[cssClassName] = true;
+  const cssClassNames = cssClassName.split(' ');
 
-  if (mode) {
-    cssClasses[`${cssClassName}-${mode}`] = true;
+  for (var i = 0; i < cssClassNames.length; i++) {
+    cssClasses[cssClassNames[i]] = true;
 
-    if (color) {
-      cssClasses[`${cssClassName}-${color}`] = cssClasses[`${cssClassName}-${mode}-${color}`] = true;
+    if (mode) {
+      cssClasses[`${cssClassNames[i]}-${mode}`] = true;
+
+      if (color) {
+        cssClasses[`${cssClassNames[i]}-${color}`] = cssClasses[`${cssClassNames[i]}-${mode}-${color}`] = true;
+      }
     }
   }
 
