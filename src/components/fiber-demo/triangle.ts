@@ -29,13 +29,6 @@ export class FiberTriangle {
         )
       );
     }
-    var slowDown = true;
-    if (slowDown) {
-        var e = performance.now() + 0.8;
-        while (performance.now() < e) {
-        // Artificially long execution time.
-        }
-    }
     s = s / 2;
     return h(this, {
         style: {

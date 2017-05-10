@@ -1,6 +1,8 @@
 import { NextTickApi } from '../util/interfaces';
 import { noop } from '../util/helpers';
 
+var hostScheduleDeferredCallback = window.requestIdleCallback;
+
 
 export function NextTickClient(window: Window): NextTickApi {
   /* Adopted from Vue.js, MIT, https://github.com/vuejs/vue */
@@ -9,16 +11,48 @@ export function NextTickClient(window: Window): NextTickApi {
   let timerFunc: Function;
   const isIOS = /iphone|ipad|ipod|ios/.test(window.navigator.userAgent.toLowerCase());
 
+  let deadlineObj: any;
+
 
   function nextTickHandler() {
+    hostScheduleDeferredCallback((dl: any) => {
+      deadlineObj = dl;
+      doWork();
+    });
+  }
+
+  function doWork() {
     pending = false;
     const copies = callbacks.slice(0);
 
     callbacks.length = 0;
     for (let i = 0; i < copies.length; i++) {
-      copies[i]();
+      if (!deadlineObj.didTimeout) {
+        copies[i]();
+      } else {
+        break;
+      }
+    }
+    nextTickHandler();
+  }
+/*
+  function scheduleDeferredCallback(callback) {
+    if (!isDeferredCallbackScheduled) {
+      isDeferredCallbackScheduled = true;
+      hostScheduleDeferredCallback(callback);
     }
   }
+
+  function performDeferredWork(deadline) {
+    // We pass the lowest deferred priority here because it acts as a minimum.
+    // Higher priorities will also be performed.
+    isDeferredCallbackScheduled = false;
+    performWork(OffscreenPriority, deadline);
+  }
+
+  function performWork(priorityLevel: number, deadline: any) {
+  }
+*/
 
 
   if (typeof Promise !== 'undefined' && Promise.toString().indexOf('[native code]') !== -1) {
@@ -44,6 +78,7 @@ export function NextTickClient(window: Window): NextTickApi {
 
   function queueNextTick(cb: Function) {
     callbacks.push(cb);
+    console.log(callbacks.length);
 
     if (!pending) {
       pending = true;
@@ -55,3 +90,4 @@ export function NextTickClient(window: Window): NextTickApi {
     nextTick: queueNextTick
   };
 }
+
