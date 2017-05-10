@@ -11,7 +11,7 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
     let isListen = false;
     let methodName: string = null;
     let eventName: string = null;
-    let listener: ListenMeta = {};
+    let rawListenMeta: ListenMeta = {};
 
     memberNode.forEachChild(n => {
 
@@ -29,9 +29,8 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
           } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && eventName) {
             try {
               const fnStr = `return ${n.getText()};`;
-              let parsedOpts: ListenMeta = new Function(fnStr)();
 
-              Object.assign(listener, parsedOpts);
+              Object.assign(rawListenMeta, new Function(fnStr)());
 
             } catch (e) {
               console.log(`parse listener options: ${e}`);
@@ -49,11 +48,9 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
 
 
     if (isListen && eventName && methodName) {
-
       eventName.split(',').forEach(evName => {
-        validateListener(fileMeta, evName, listener, methodName, memberNode);
+        validateListener(fileMeta, evName, rawListenMeta, methodName, memberNode);
       });
-
     }
   });
 
@@ -75,11 +72,9 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
 }
 
 
-function validateListener(fileMeta: FileMeta, eventName: string, listener: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
+function validateListener(fileMeta: FileMeta, eventName: string, rawListenMeta: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
   eventName = eventName.trim();
   if (!eventName) return;
-
-  listener.methodName = methodName;
 
   let rawEventName = eventName;
 
@@ -105,7 +100,10 @@ function validateListener(fileMeta: FileMeta, eventName: string, listener: Liste
     rawEventName = splt[0];
   }
 
+  const listener: ListenMeta = Object.assign({}, rawListenMeta);
+
   listener.eventName = eventName;
+  listener.methodName = methodName;
 
   if (listener.capture === undefined) {
     // default to not use capture if it wasn't provided

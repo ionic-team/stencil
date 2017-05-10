@@ -4,27 +4,27 @@ import { Ionic } from '../../index';
 /**
  * iOS Modal Enter Animation
  */
-export default function(rootElm: HTMLElement) {
+export default function(baseElm: HTMLElement) {
   const baseAnimation = new Ionic.Animation();
 
-  const backdropAnimatin = new Ionic.Animation();
-  backdropAnimatin.addElement(rootElm.querySelector('ion-backdrop'));
+  const backdropAnimation = new Ionic.Animation();
+  backdropAnimation.addElement(baseElm.querySelector('.modal-backdrop'));
 
-  const wrapperAnimatin = new Ionic.Animation();
-  wrapperAnimatin.addElement(rootElm.querySelector('.modal-wrapper'));
+  const wrapperAnimation = new Ionic.Animation();
+  wrapperAnimation.addElement(baseElm.querySelector('.modal-wrapper'));
 
-  wrapperAnimatin.beforeStyles({ 'opacity': 1 })
-                 .fromTo('translateY', '100%', '0%');
+  wrapperAnimation.beforeStyles({ 'opacity': 1 })
+                  .fromTo('translateY', '100%', '0%');
 
-  backdropAnimatin.fromTo('opacity', 0.01, 0.4);
+  backdropAnimation.fromTo('opacity', 0.01, 0.4);
 
   return baseAnimation
-    .addElement(rootElm)
+    .addElement(baseElm)
     .easing('cubic-bezier(0.36,0.66,0.04,1)')
     .duration(400)
     .beforeAddClass('show-modal')
-    .addChildAnimation(backdropAnimatin)
-    .addChildAnimation(wrapperAnimatin);
+    .addChildAnimation(backdropAnimation)
+    .addChildAnimation(wrapperAnimation);
 }
 
 /**

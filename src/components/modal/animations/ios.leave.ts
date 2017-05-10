@@ -4,24 +4,26 @@ import { Ionic } from '../../index';
 /**
  * iOS Modal Leave Animation
  */
-export default function(rootElm: HTMLElement) {
+export default function(baseElm: HTMLElement) {
   const baseAnimation = new Ionic.Animation();
 
-  const backdropAnimatin = new Ionic.Animation();
-  backdropAnimatin.addElement(rootElm.querySelector('ion-backdrop'));
+  const backdropAnimation = new Ionic.Animation();
+  backdropAnimation.addElement(baseElm.querySelector('.modal-backdrop'));
 
-  const wrapperAnimatin = new Ionic.Animation();
-  wrapperAnimatin.addElement(rootElm.querySelector('.modal-wrapper'));
+  const wrapperAnimation = new Ionic.Animation();
+  const wrapperElm = baseElm.querySelector('.modal-wrapper');
+  wrapperAnimation.addElement(wrapperElm);
+  const wrapperElmRect = wrapperElm.getBoundingClientRect();
 
-  wrapperAnimatin.beforeStyles({ 'opacity': 1 })
-                 .fromTo('translateY', '0%', '100%');
+  wrapperAnimation.beforeStyles({ 'opacity': 1 })
+                  .fromTo('translateY', '0%', `${window.innerHeight - wrapperElmRect.top}px`);
 
-  backdropAnimatin.fromTo('opacity', 0.4, 0.0);
+  backdropAnimation.fromTo('opacity', 0.4, 0.0);
 
   return baseAnimation
-    .addElement(rootElm)
+    .addElement(baseElm)
     .easing('ease-out')
     .duration(250)
-    .addChildAnimation(backdropAnimatin)
-    .addChildAnimation(wrapperAnimatin);
+    .addChildAnimation(backdropAnimation)
+    .addChildAnimation(wrapperAnimation);
 }

@@ -1,5 +1,5 @@
 import { Component, h, Ionic, Listen, Prop } from '../index';
-import { AnimationBuilder, Modal as IModal } from '../../util/interfaces';
+import { AnimationBuilder, Animation, Modal as IModal } from '../../util/interfaces';
 
 import iOSEnterAnimation from './animations/ios.enter';
 import iOSLeaveAnimation from './animations/ios.leave';
@@ -17,6 +17,7 @@ import iOSLeaveAnimation from './animations/ios.leave';
 export class Modal implements IModal {
   $el: HTMLElement;
   id: string;
+  animation: Animation;
 
   @Prop() component: string;
   @Prop() cssClass: string;
@@ -45,6 +46,11 @@ export class Modal implements IModal {
   }
 
   private _present(resolve: Function) {
+    if (this.animation) {
+      this.animation.destroy();
+      this.animation = null;
+    }
+
     Ionic.emit(this, 'ionModalWillPresent', { detail: { modal: this } });
 
     // get the user's animation fn if one was provided
@@ -58,9 +64,9 @@ export class Modal implements IModal {
     }
 
     // build the animation and kick it off
-    const animation = animationBuilder(this.$el);
+    this.animation = animationBuilder(this.$el);
 
-    animation.onFinish(a => {
+    this.animation.onFinish(a => {
       a.destroy();
       Ionic.emit(this, 'ionModalDidPresent', { detail: { modal: this } });
       resolve();
@@ -68,6 +74,11 @@ export class Modal implements IModal {
   }
 
   dismiss() {
+    if (this.animation) {
+      this.animation.destroy();
+      this.animation = null;
+    }
+
     return new Promise<void>(resolve => {
       Ionic.emit(this, 'ionModalWillDismiss', { detail: { modal: this } });
 
@@ -82,8 +93,8 @@ export class Modal implements IModal {
       }
 
       // build the animation and kick it off
-      const animation = animationBuilder(this.$el);
-      animation.onFinish(a => {
+      this.animation = animationBuilder(this.$el);
+      this.animation.onFinish(a => {
         a.destroy();
         Ionic.emit(this, 'ionModalDidDismiss', { detail: { modal: this } });
         Ionic.dom.write(() => {
@@ -99,12 +110,12 @@ export class Modal implements IModal {
   }
 
   backdropClick() {
-    // if (this._enabled && this._bdDismiss) {
-    //   const opts: NavOptions = {
-    //     minClickBlockDuration: 400
-    //   };
-    //   return this._viewCtrl.dismiss(null, 'backdrop', opts);
-    // }
+    if (this.enableBackdropDismiss) {
+      // const opts: NavOptions = {
+      //   minClickBlockDuration: 400
+      // };
+      this.dismiss();
+    }
   }
 
   render() {
