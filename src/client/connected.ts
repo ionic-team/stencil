@@ -6,6 +6,7 @@ import { queueUpdate } from './update';
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
 
   // Begin stack ide
+  /*
   window.componentStack = window.componentStack || [];
   window.componentStack = window.componentStack.reduce((stack, item, index) => {
     if (item.contains(elm)) {
@@ -28,6 +29,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
   elm.$children = {};
   elm.$parent = parent;
   window.componentStack.unshift(elm);
+  */
 
   // End stack idea
   if (!elm.$tmpDisconnected) {
