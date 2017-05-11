@@ -27,8 +27,8 @@ export function registerComponents(window: any, renderer: RendererApi, plt: Plat
       disconnectedCallback(this);
     };
 
-    (<any>ProxyElement).prototype.$queueUpdate = function(priority?: number) {
-      queueUpdate(plt, config, renderer, this, tag, priority);
+    (<any>ProxyElement).prototype.$queueUpdate = function() {
+      queueUpdate(plt, config, renderer, this, tag);
     };
 
     (<any>ProxyElement).observedAttributes = cmpMeta.obsAttrs;

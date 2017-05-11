@@ -5,12 +5,10 @@ import { initProxy } from './proxy';
 import { RendererApi } from '../util/interfaces';
 
 
-export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, priority: number) {
+export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string) {
   // only run patch if it isn't queued already
   if (!elm.$queued) {
     elm.$queued = true;
-
-    priority;
 
     // run the patch in the next tick
     plt.nextTick(function queueUpdateNextTick() {

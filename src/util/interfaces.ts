@@ -447,7 +447,7 @@ export interface ProxyElement extends HTMLElement {
   connectedCallback: () => void;
   attributeChangedCallback: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback: () => void;
-  $queueUpdate: (priority?: number) => QueueHandlerId;
+  $queueUpdate: () => void;
 
   $queued?: boolean;
   $instance?: Component;

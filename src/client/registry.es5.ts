@@ -39,8 +39,8 @@ export function registerComponentsES5(window: Window, renderer: RendererApi, plt
         },
 
         $queueUpdate: { configurable: true, value:
-          function(priority?: number) {
-            queueUpdate(plt, config, renderer, this, tag, priority);
+          function() {
+            queueUpdate(plt, config, renderer, this, tag);
           }
         }
 
