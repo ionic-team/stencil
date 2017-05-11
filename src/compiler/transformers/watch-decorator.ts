@@ -5,9 +5,9 @@ import * as ts from 'typescript';
 export function getWatchDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
   fileMeta.cmpMeta.watchers = [];
 
-  const propMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
+  const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-  propMembers.forEach(memberNode => {
+  decoratedMembers.forEach(memberNode => {
     let isWatch = false;
     let propName: string = null;
     let methodName: string = null;

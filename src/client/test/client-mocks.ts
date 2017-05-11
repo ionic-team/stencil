@@ -14,19 +14,20 @@ export function mockComponent(IonicGbl: IonicGlobal, plt: PlatformApi, tag: stri
 
   const cmpModeData: ComponentModeData = [
     tag,
-    componentModule.constructor.name,
-    [],
-    [],
-    false,
-    'default',
-    null
+    null, // methods
+    null, // states
+    null, // listeners
+    null, // watchers
+    null, // shadow
+    null, // default mode name
+    null, // mode styles
   ];
 
   function importerFn(exports: any) {
     exports[componentModule.constructor.name] = componentModule;
   }
 
-  IonicGbl.loadComponents(bundleId, importerFn, cmpModeData);
+  IonicGbl.loadComponents(0, bundleId, importerFn, cmpModeData);
 }
 
 export function mockPlatformClient(IonicGbl?: IonicGlobal) {
@@ -44,7 +45,7 @@ export function mockIonicGlobal(): IonicGlobal {
 
 
 export function mockInjectedIonic(): Ionic {
-  const ionic: Ionic = {
+  const ionic: any = {
 
     theme: themeVNodeData,
 

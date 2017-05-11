@@ -25,7 +25,7 @@ export interface IonicGlobal {
   ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;
   NextTickCtrl?: NextTickApi;
-  Animation: any;
+  Animation?: any;
 }
 
 
@@ -204,32 +204,37 @@ export interface ComponentModeData {
   /**
    * methods
    */
-  [1]: Methods;
+  [1]: MethodMeta[];
+
+  /**
+   * states
+   */
+  [2]: StateMeta[];
 
   /**
    * listeners
    */
-  [2]: ComponentListenersData[];
+  [3]: ComponentListenersData[];
 
   /**
    * watchers
    */
-  [3]: ComponentWatchersData[];
+  [4]: ComponentWatchersData[];
 
   /**
    * shadow
    */
-  [4]: boolean;
+  [5]: boolean;
 
   /**
    * mode name (ios, md, wp)
    */
-  [5]: string;
+  [6]: number;
 
   /**
    * component mode styles
    */
-  [6]: string;
+  [7]: string;
 }
 
 
@@ -303,7 +308,7 @@ export interface PropMeta {
 }
 
 
-export type Methods = string[];
+export type MethodMeta = string;
 
 
 export interface MethodDecorator {
@@ -330,6 +335,14 @@ export interface ListenOptions {
 export interface ListenMeta extends ListenOptions {
   methodName?: string;
 }
+
+
+export interface StateDecorator {
+  (): any;
+}
+
+
+export type StateMeta = string;
 
 
 export interface WatchDecorator {
@@ -361,10 +374,11 @@ export interface ConfigApi {
 
 export interface ComponentMeta {
   tag?: string;
-  methods?: Methods;
+  methods?: MethodMeta[];
   props?: PropMeta[];
   listeners?: ListenMeta[];
   watchers?: WatchMeta[];
+  states?: StateMeta[];
   modes: ModeMeta[];
   shadow?: boolean;
   namedSlots?: string[];

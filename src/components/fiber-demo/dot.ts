@@ -1,4 +1,4 @@
-import { Component, Prop, h } from '../index';
+import { Component, Prop, h, State } from '../index';
 
 @Component({
   tag: 'fiber-dot',
@@ -12,7 +12,7 @@ export class FiberDot {
   @Prop() y: number;
   @Prop() text: string;
 
-  hover: boolean = false;
+  @State() hover: boolean = false;
 
   enter() {
     this.hover = true;

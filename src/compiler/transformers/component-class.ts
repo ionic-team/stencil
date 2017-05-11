@@ -3,6 +3,7 @@ import { getComponentDecoratorData } from './component-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropertyDecoratorMeta } from './prop-decorator';
+import { getStateDecoratorMeta } from './state-decorator';
 import { getWatchDecoratorMeta } from './watch-decorator';
 import * as ts from 'typescript';
 
@@ -24,6 +25,7 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
         fileMeta.cmpClassName = classNode.name.getText().trim();
 
         getMethodDecoratorMeta(fileMeta, classNode);
+        getStateDecoratorMeta(fileMeta, classNode);
         getPropertyDecoratorMeta(fileMeta, classNode);
         getListenDecoratorMeta(fileMeta, classNode);
         getWatchDecoratorMeta(fileMeta, classNode);

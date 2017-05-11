@@ -1,4 +1,4 @@
-import { Bundle, ComponentMeta, ModeMeta, ListenMeta, PropMeta, Registry, WatchMeta } from './interfaces';
+import { Bundle, ComponentMeta, MethodMeta, ModeMeta, ListenMeta, PropMeta, Registry, StateMeta, WatchMeta } from './interfaces';
 import * as crypto from 'crypto';
 
 
@@ -40,10 +40,6 @@ export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
 
   const modeName = (mode.modeName ? mode.modeName : '');
 
-  const modeCode = formatModeName(modeName);
-
-  const styles = formatStyles(mode.styles);
-
   let label = tag;
   if (mode.modeName) {
     label += '.' + mode.modeName;
@@ -51,36 +47,30 @@ export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
 
   const methods = formatMethods(cmp.methods);
 
+  const states = formatStates(cmp.states);
+
   const listeners = formatListeners(label, cmp.listeners);
 
   const watchers = formatWatchers(label, cmp.watchers);
 
   const shadow = formatShadow(cmp.shadow);
 
+  const modeCode = formatModeName(modeName);
+
+  const styles = formatStyles(mode.styles);
+
   const t = [
     `/** ${label}: [0] tagName **/\n'${tag}'`,
     `/** ${label}: [1] methods **/\n${methods}`,
-    `/** ${label}: [2] listeners **/\n${listeners}`,
-    `/** ${label}: [3] watchers **/\n${watchers}`,
-    `/** ${label}: [4] shadow **/\n${shadow}`,
-    `/** ${label}: [5] modeName **/\n${modeCode}`,
-    `/** ${label}: [6] styles **/\n${styles}`
+    `/** ${label}: [2] states **/\n${states}`,
+    `/** ${label}: [3] listeners **/\n${listeners}`,
+    `/** ${label}: [4] watchers **/\n${watchers}`,
+    `/** ${label}: [5] shadow **/\n${shadow}`,
+    `/** ${label}: [6] modeName **/\n${modeCode}`,
+    `/** ${label}: [7] styles **/\n${styles}`
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
-}
-
-
-export function formatStyles(styles: string) {
-  if (!styles) {
-    return '0 /* no styles */';
-  }
-
-  const lines = styles.split(/\r?\n/g).map(line => {
-    return `'${line.replace(/'/g, '"')}\\n'`;
-  });
-
-  return lines.join(' + \n');
 }
 
 
@@ -89,28 +79,21 @@ export function formatModeName(modeName: string) {
 }
 
 
-export function getModeCode(modeName: string) {
-  switch (modeName) {
-    case 'default':
-      return 0;
-    case 'ios':
-      return 1;
-    case 'md':
-      return 2;
-    case 'wp':
-      return 3;
-  }
-
-  return `'${modeName}'`;
-}
-
-
-function formatMethods(methods: string[]) {
+function formatMethods(methods: MethodMeta[]) {
   if (!methods || !methods.length) {
     return '0 /* no methods */';
   }
 
   return `['` + methods.join(`', '`) + `']`;
+}
+
+
+function formatStates(states: StateMeta[]) {
+  if (!states || !states.length) {
+    return '0 /* no states */';
+  }
+
+  return `['` + states.join(`', '`) + `']`;
 }
 
 
@@ -140,6 +123,13 @@ function formatListenerOpts(label: string, listener: ListenMeta, listenerIndex: 
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
+}
+
+
+function formatBoolean(val: boolean) {
+  return val ?
+    '1 /* true **/' :
+    '0 /* false */';
 }
 
 
@@ -176,10 +166,32 @@ function formatShadow(val: boolean) {
 }
 
 
-function formatBoolean(val: boolean) {
-  return val ?
-    '1 /* true **/' :
-    '0 /* false */';
+export function getModeCode(modeName: string) {
+  switch (modeName) {
+    case 'default':
+      return 0;
+    case 'ios':
+      return 1;
+    case 'md':
+      return 2;
+    case 'wp':
+      return 3;
+  }
+
+  return `'${modeName}'`;
+}
+
+
+export function formatStyles(styles: string) {
+  if (!styles) {
+    return '0 /* no styles */';
+  }
+
+  const lines = styles.split(/\r?\n/g).map(line => {
+    return `'${line.replace(/'/g, '"')}\\n'`;
+  });
+
+  return lines.join(' + \n');
 }
 
 

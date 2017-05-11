@@ -2,7 +2,16 @@ import * as ts from 'typescript';
 
 
 // same as the "declare" variables in the root index.ts file
-const IONIC_GLOBALS = ['Component', 'h', 'Ionic', 'Listen', 'Method', 'Prop', 'Watch'];
+const IONIC_GLOBALS = [
+  'Component',
+  'h',
+  'Ionic',
+  'Listen',
+  'Method',
+  'Prop',
+  'State',
+  'Watch'
+];
 
 
 export function removeImports(): ts.TransformerFactory<ts.SourceFile> {
