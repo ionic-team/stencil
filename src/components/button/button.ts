@@ -245,7 +245,7 @@ export class Button {
         return prevValue;
       }, {});
 
-    return h(this,
+    return h(this, [
       h('button', {
         class: buttonClasses,
         props: {
@@ -254,20 +254,19 @@ export class Button {
       },
         [
           h('span', {
-              class: {
-                'button-inner': true
-              }
-            },
+            class: {
+              'button-inner': true
+            }
+          },
             h('slot')
           ),
           h('div', {
-              class: {
-                'button-effect': true
-              }
+            class: {
+              'button-effect': true
             }
-          )
-        ]
-      )
-    );
+          })
+        ])
+       ]
+     );
   }
 }
