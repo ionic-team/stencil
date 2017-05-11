@@ -72,6 +72,7 @@ type CssClassObject = { [className: string]: boolean };
 })
 export class Button {
 
+  @Prop() href: string;
 
   /**
    * @Prop {boolean} If true, activates the large button size.
@@ -204,7 +205,7 @@ export class Button {
   }
 
   getStyleClassList(buttonType: string): string[] {
-    var classList = [].concat(
+    let classList = [].concat(
       this.outline ? this.getColorClassList(this.color, buttonType, 'outline', this.mode) : [],
       this.clear ? this.getColorClassList(this.color, buttonType, 'clear', this.mode) : [],
       this.solid ? this.getColorClassList(this.color, buttonType, 'solid', this.mode) : []
@@ -218,20 +219,20 @@ export class Button {
   }
 
   render() {
-    var size =
+    const size =
       (this.large ? 'large' : null) ||
       (this.small ? 'small' : null) ||
       (this.default ? 'default' : null);
 
-    var shape = (this.round ? 'round' : null);
+    const shape = (this.round ? 'round' : null);
 
-    var display =
+    const display =
       (this.block ? 'block' : null) ||
       (this.full ? 'full' : null);
 
-    var decorator = (this.strong ? 'strong' : null);
+    const decorator = (this.strong ? 'strong' : null);
 
-    var buttonClasses: CssClassObject = []
+    const buttonClasses: CssClassObject = []
       .concat(
         this.getElementClassList(this.buttonType, this.mode),
         this.getClassList(this.buttonType, shape, this.mode),
@@ -245,8 +246,10 @@ export class Button {
         return prevValue;
       }, {});
 
+    const tagType = this.href ? 'a' : 'button';
+
     return h(this,
-      h('button', {
+      h(tagType, {
         class: buttonClasses,
         props: {
           disabled: this.disabled
