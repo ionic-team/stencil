@@ -1,6 +1,6 @@
+import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/constants';
 import { Component, PropMeta, ConfigApi, Methods, PlatformApi, ProxyElement, RendererApi, WatchMeta } from '../util/interfaces';
 import { queueUpdate } from './update';
-import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/helpers';
 
 
 export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: PropMeta[], methods: Methods, watchers: WatchMeta[]) {

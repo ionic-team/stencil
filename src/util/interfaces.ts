@@ -447,6 +447,7 @@ export interface ProxyElement extends HTMLElement {
   connectedCallback: () => void;
   attributeChangedCallback: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback: () => void;
+  $queueUpdate: (priority?: number) => QueueHandlerId;
 
   $queued?: boolean;
   $instance?: Component;
@@ -455,6 +456,9 @@ export interface ProxyElement extends HTMLElement {
 
   [memberName: string]: any;
 }
+
+
+export type QueueHandlerId = number;
 
 
 export type Side = 'left' | 'right' | 'start' | 'end';
