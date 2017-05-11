@@ -62,5 +62,4 @@ function stop(){};
 function style(){}
 function syncPlay(){};;
 function to(){};
-function whenReady(){};
 function willChange(){};

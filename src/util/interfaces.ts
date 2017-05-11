@@ -447,13 +447,11 @@ export interface ProxyElement extends HTMLElement {
   connectedCallback: () => void;
   attributeChangedCallback: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback: () => void;
-  whenReady: (cb: Function) => void;
 
   $queued?: boolean;
   $instance?: Component;
   $hostContent?: HostContentNodes;
   $tmpDisconnected?: boolean;
-  $readyFns?: Function[];
 
   [memberName: string]: any;
 }

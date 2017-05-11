@@ -26,16 +26,6 @@ export function registerComponents(window: any, renderer: RendererApi, plt: Plat
       disconnectedCallback(this);
     };
 
-    (<any>ProxyElement).prototype.whenReady = function(cb: Function) {
-      if (this.$instance) {
-        cb();
-      } else if (this.$readyFns) {
-        this.$readyFns.push(cb);
-      } else {
-        this.$readyFns = [cb];
-      }
-    };
-
     (<any>ProxyElement).observedAttributes = cmpMeta.obsAttrs;
 
     window.customElements.define(tag, ProxyElement);
