@@ -28,7 +28,6 @@ export class FiberDemo {
     const t = (elapsed / 1000) % 10;
     const scale = 1 + (t > 5 ? 10 - t : t) / 10;
     var containerStyle = {
-      visibility: 'visible',
       position: 'absolute',
       transformOrigin: '0 0',
       left: '50%',
@@ -44,7 +43,7 @@ export class FiberDemo {
       },
         h('div', {},
           h('fiber-triangle', {
-              props: {
+              attrs: {
                 x: 0,
                 y: 0,
                 s: 1000,

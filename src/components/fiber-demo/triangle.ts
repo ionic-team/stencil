@@ -7,7 +7,6 @@ var targetSize = 25;
   shadow: false
 })
 export class FiberTriangle {
-  $el: HTMLElement;
 
   @Prop() x: number;
   @Prop() y: number;
@@ -30,11 +29,7 @@ export class FiberTriangle {
       );
     }
     s = s / 2;
-    return h(this, {
-        style: {
-          visibility: 'visible'
-        }
-      },
+    return h(this,
       [
         h('fiber-triangle', {
             props: {

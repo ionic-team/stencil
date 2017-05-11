@@ -7,6 +7,12 @@ body {
   padding: 30px;
 }
 
+fiber-demo,
+fiber-triangle,
+fiber-dot {
+  visibility: inherit;
+}
+
 a {
   color: #4183c4;
   text-decoration: none;

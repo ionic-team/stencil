@@ -25,7 +25,6 @@ export class FiberDot {
   render() {
     var s = this.size * 1.3;
     var style = {
-      visibility: 'visible',
       position: 'absolute',
       font: 'normal 15px sans-serif',
       textAlign: 'center',
