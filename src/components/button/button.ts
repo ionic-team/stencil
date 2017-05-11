@@ -67,7 +67,8 @@ type CssClassObject = { [className: string]: boolean };
     ios: 'button.ios.scss',
     md: 'button.md.scss',
     wp: 'button.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Button {
 
@@ -197,8 +198,7 @@ export class Button {
         '-' + style.toLowerCase() :
         '');
 
-    return [].concat(
-        `${className}-${mode}`,
+    return [`${className}-${mode}`].concat(
         color ? `${className}-${mode}-${color}` : []
       );
   }
@@ -211,7 +211,7 @@ export class Button {
     );
 
     if (classList.length === 0) {
-      classList = [this.getColorClassList(this.color, buttonType, 'default', this.mode)];
+      classList = this.getColorClassList(this.color, buttonType, 'default', this.mode);
     }
 
     return classList;
