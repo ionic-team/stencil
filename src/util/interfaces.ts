@@ -618,3 +618,24 @@ export interface EffectState {
   num: number;
   effectUnit: string;
 }
+
+
+export interface RequestIdleCallback {
+  (callback: IdleCallback): number;
+}
+
+
+export interface IdleCallback {
+  (deadline: IdleDeadline, options?: IdleOptions): void;
+}
+
+
+export interface IdleDeadline {
+  didTimeout: boolean;
+  timeRemaining: () => number;
+}
+
+
+export interface IdleOptions {
+  timeout?: number;
+}
