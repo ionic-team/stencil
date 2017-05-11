@@ -48,7 +48,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   };
 
 
-  function loadComponent(bundleId: string, priority: string, cb: Function): void {
+  function loadBundle(bundleId: string, priority: string, cb: Function): void {
     if (loadedBundles[bundleId]) {
       // we've already loaded this bundle
       cb();
@@ -322,7 +322,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   return {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
-    loadComponent: loadComponent,
+    loadBundle: loadBundle,
 
     isElement: isElement,
     isText: isText,

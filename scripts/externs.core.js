@@ -94,6 +94,7 @@ function define(){};
 function disconnectedCallback(){};
 function observedAttributes(){};
 function requestIdleCallback(){};
+function timeRemaining(){};
 function shadowRoot(){};
 
 

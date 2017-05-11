@@ -4,13 +4,15 @@ import { queueUpdate } from './update';
 
 
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
+
   if (!elm.$tmpDisconnected) {
     plt.nextTick(() => {
       const tag = cmpMeta.tag;
 
+      // console.log(elm.nodeName, 'connectedCallback nextTick');
       const cmpMode = cmpMeta.modes.find(m => m.modeName === getMode(plt, config, elm, 'mode') || m.modeName === 'default');
 
-      plt.loadComponent(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
+      plt.loadBundle(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
         queueUpdate(plt, config, renderer, elm, tag);
       });
     });

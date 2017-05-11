@@ -513,7 +513,7 @@ export interface VNodeData {
 export interface PlatformApi {
   registerComponent: (tag: string, data: any[]) => ComponentMeta;
   getComponentMeta: (tag: string) => ComponentMeta;
-  loadComponent: (bundleId: string, priority: string, cb: Function) => void;
+  loadBundle: (bundleId: string, priority: string, cb: Function) => void;
   nextTick: NextTick;
 
   isElement: (node: Node) => node is Element;
@@ -615,4 +615,25 @@ export interface EffectState {
   val: any;
   num: number;
   effectUnit: string;
+}
+
+
+export interface RequestIdleCallback {
+  (callback: IdleCallback): number;
+}
+
+
+export interface IdleCallback {
+  (deadline: IdleDeadline, options?: IdleOptions): void;
+}
+
+
+export interface IdleDeadline {
+  didTimeout: boolean;
+  timeRemaining: () => number;
+}
+
+
+export interface IdleOptions {
+  timeout?: number;
 }

@@ -1,7 +1,7 @@
 import { ConfigController } from '../../../util/config-controller';
 import { DomClient } from '../../../client/dom-client';
 import { IonicGlobal } from '../../../util/interfaces';
-import { NextTickClient } from '../../../client/next-tick-client';
+import { NextTickClient } from '../../../client/next-tick-client-optimized';
 import { PlatformClient } from '../../../client/platform-client';
 import { registerComponentsES5 } from '../../../client/registry.es5';
 import { Renderer } from '../../../client/renderer/core';
