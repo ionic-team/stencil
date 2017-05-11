@@ -4,7 +4,20 @@ import { invokeDestroyHook } from './renderer/core';
 
 
 export function disconnectedCallback(elm: ProxyElement) {
-  if (elm && !elm.$tmpDisconnected) {
+  if (elm) {
+
+    let parentElm: ProxyElement = <any>elm.parentElement;
+    while (parentElm) {
+      if (parentElm.$tmpDisconnected) {
+        // a node may be in the process of moving from the host content
+        // to a slot. If it is being moved, we don't actually want to run
+        // the disconnect and connect code again, so we temporarily disable
+        // disconnect cuz we're about to reconnect it again
+        return;
+      }
+      parentElm = <any>elm.parentElement;
+    }
+
     const instance = elm.$instance;
     if (instance) {
       instance.ionViewWillUnload && instance.ionViewWillUnload();
