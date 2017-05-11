@@ -2,6 +2,7 @@ import { attributeChangedCallback } from './attribute-changed';
 import { ConfigApi, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
+import { queueUpdate } from './update';
 
 
 export function registerComponentsES5(window: Window, renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
@@ -34,6 +35,12 @@ export function registerComponentsES5(window: Window, renderer: RendererApi, plt
         disconnectedCallback: { configurable: true, value:
           function() {
             disconnectedCallback(this);
+          }
+        },
+
+        $queueUpdate: { configurable: true, value:
+          function(priority?: number) {
+            queueUpdate(plt, config, renderer, this, tag, priority);
           }
         }
 

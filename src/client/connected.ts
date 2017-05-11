@@ -1,10 +1,10 @@
 import { ComponentMeta, ConfigApi, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
 import { isDef } from '../util/helpers';
 import { queueUpdate } from './update';
+import { LOW_PRIORITY } from '../util/constants';
 
 
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
-
   if (!elm.$tmpDisconnected) {
     plt.nextTick(() => {
       const tag = cmpMeta.tag;
@@ -13,7 +13,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
       const cmpMode = cmpMeta.modes.find(m => m.modeName === getMode(plt, config, elm, 'mode') || m.modeName === 'default');
 
       plt.loadBundle(cmpMode.bundleId, cmpMeta.priority, function loadComponentCallback() {
-        queueUpdate(plt, config, renderer, elm, tag);
+        queueUpdate(plt, config, renderer, elm, tag, LOW_PRIORITY);
       });
     });
   }

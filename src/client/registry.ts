@@ -2,6 +2,7 @@ import { attributeChangedCallback } from './attribute-changed';
 import { ConfigApi, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
+import { queueUpdate } from './update';
 
 
 export function registerComponents(window: any, renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
@@ -24,6 +25,10 @@ export function registerComponents(window: any, renderer: RendererApi, plt: Plat
 
     (<any>ProxyElement).prototype.disconnectedCallback = function() {
       disconnectedCallback(this);
+    };
+
+    (<any>ProxyElement).prototype.$queueUpdate = function(priority?: number) {
+      queueUpdate(plt, config, renderer, this, tag, priority);
     };
 
     (<any>ProxyElement).observedAttributes = cmpMeta.obsAttrs;
