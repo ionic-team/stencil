@@ -1,23 +1,20 @@
 import { NextTickApi } from '../util/interfaces';
 
 
-export function NextTickClient(window: Window): NextTickApi {
-  var hostScheduleDeferredCallback = window.requestIdleCallback;
-  let callbacks: Function[] = [];
+export function NextTickClient(window: any): NextTickApi {
+  const hostScheduleDeferredCallback: RequestIdleCallback = window.requestIdleCallback;
+  const callbacks: Function[] = [];
   let pending = false;
-  let callBackHandle: any;
+  let callBackHandle: number;
 
-  function nextTickHandler() {
-    pending = true;
-    callBackHandle = hostScheduleDeferredCallback(doWork);
-  }
-
-  function doWork(deadlineObj: any) {
+  function doWork(deadlineObj: IdleDeadline) {
     while (deadlineObj.timeRemaining() > 0 && callbacks.length > 0) {
       callbacks.shift()();
     }
     if (callbacks.length > 0) {
-      return nextTickHandler();
+      pending = true;
+      callBackHandle = hostScheduleDeferredCallback(doWork);
+      return;
     }
     pending = false;
   }
@@ -26,7 +23,8 @@ export function NextTickClient(window: Window): NextTickApi {
     callbacks.push(cb);
 
     if (!pending) {
-      nextTickHandler();
+      pending = true;
+      callBackHandle = hostScheduleDeferredCallback(doWork);
     }
   }
 
@@ -35,3 +33,19 @@ export function NextTickClient(window: Window): NextTickApi {
   };
 }
 
+interface RequestIdleCallback {
+  (callback: IdleCallback): number;
+}
+
+interface IdleCallback {
+  (deadline: IdleDeadline, options?: IdleOptions): void;
+}
+
+interface IdleDeadline {
+  didTimeout: boolean;
+  timeRemaining: () => number;
+}
+
+interface IdleOptions {
+  timeout?: number;
+}
