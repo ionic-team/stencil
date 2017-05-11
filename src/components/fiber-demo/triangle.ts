@@ -19,7 +19,7 @@ export class FiberTriangle {
     if (s <= targetSize) {
       return h(this,
         h('fiber-dot', {
-            attrs: {
+            props: {
               x: this.x - (targetSize / 2),
               y: this.y - (targetSize / 2),
               size: targetSize,
@@ -37,7 +37,7 @@ export class FiberTriangle {
       },
       [
         h('fiber-triangle', {
-            attrs: {
+            props: {
               x: this.x,
               y: this.y - (s / 2),
               s: s,
@@ -46,7 +46,7 @@ export class FiberTriangle {
           }
         ),
         h('fiber-triangle', {
-            attrs: {
+            props: {
               x: this.x - s,
               y: this.y + (s / 2),
               s: s,
@@ -55,7 +55,7 @@ export class FiberTriangle {
           }
         ),
         h('fiber-triangle', {
-            attrs: {
+            props: {
               x: this.x + s,
               y: this.y + (s / 2),
               s: s,

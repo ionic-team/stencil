@@ -44,7 +44,7 @@ export class FiberDemo {
       },
         h('div', {},
           h('fiber-triangle', {
-              attrs: {
+              props: {
                 x: 0,
                 y: 0,
                 s: 1000,
