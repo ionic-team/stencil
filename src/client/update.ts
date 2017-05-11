@@ -72,6 +72,5 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
       }
       delete elm.$readyFns;
     }
-
   }
 }
