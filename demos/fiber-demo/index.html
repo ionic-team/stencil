@@ -11,11 +11,11 @@
     <fiber-demo></fiber-demo>
 
     <script type="text/javascript">
-      var start = new Date().getTime();
+      var start = Date.now();
       var baseEl = document.querySelector('fiber-demo');
 
       function update() {
-        baseEl.setAttribute('elapsed', new Date().getTime() - start);
+        baseEl.elapsed = Date.now() - start;
         requestAnimationFrame(update);
       }
 

@@ -8,8 +8,6 @@ import { Component, Prop, h } from '../index';
   shadow: false
 })
 export class FiberDemo {
-  $el: HTMLElement;
-
   @Prop() elapsed: number = 0;
 
   seconds: number = 0;
@@ -41,9 +39,9 @@ export class FiberDemo {
     return h(this, {
         style: containerStyle
       },
-        h('div', {},
+        h('div',
           h('fiber-triangle', {
-              attrs: {
+              props: {
                 x: 0,
                 y: 0,
                 s: 1000,

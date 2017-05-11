@@ -6,13 +6,16 @@ export function updateProps(oldVnode: VNode, vnode: VNode): void {
       oldProps = (oldVnode.vdata as VNodeData).props,
       props = (vnode.vdata as VNodeData).props;
 
-  if (!oldProps && !props) return;
-  if (oldProps === props) return;
+  if (!oldProps && !props || oldProps === props) return;
+
   oldProps = oldProps || {};
   props = props || {};
 
   for (key in oldProps) {
-    if (!props[key]) {
+    if (props[key] === undefined) {
+      // only delete the old property when the
+      // new property is undefined, otherwise we'll
+      // end up deleting getters/setters
       delete (elm as any)[key];
     }
   }
