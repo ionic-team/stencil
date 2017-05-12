@@ -1,16 +1,16 @@
 @import "../../themes/ionic.globals";
 
 
-// Modal Portal
+// Modal Controller
 // --------------------------------------------------
 
-ion-modal-portal {
+ion-modal-controller {
   display: none;
   visibility: inherit !important;
 }
 
 
-// Modal Portal Backdrop
+// Modal Controller Backdrop
 // --------------------------------------------------
 
 /// @prop - Color of the backdrop

@@ -64,8 +64,8 @@ export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocu
         );
 
         // add the viewport if one wasn't already added (one could be loading still)
-        if (!doc.querySelector('ion-modal-portal')) {
-          doc.body.appendChild(doc.createElement('ion-modal-portal'));
+        if (!doc.querySelector('ion-modal-controller')) {
+          doc.body.appendChild(doc.createElement('ion-modal-controller'));
         }
       });
     }

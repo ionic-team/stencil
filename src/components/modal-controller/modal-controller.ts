@@ -3,18 +3,18 @@ import { ModalControllerApi, ModalControllerInternalApi, ModalEvent, ModalOption
 
 
 @Component({
-  tag: 'ion-modal-portal',
+  tag: 'ion-modal-controller',
   styleUrls: {
     // modes all sharing the same scss on purpose
     // this allows ion-modal-viewport and ion-modal
     // components to be bundled in the same file/request
-    ios: 'modal-portal.scss',
-    md: 'modal-portal.scss',
-    wp: 'modal-portal.scss'
+    ios: 'modal-controller.scss',
+    md: 'modal-controller.scss',
+    wp: 'modal-controller.scss'
   },
   shadow: false
 })
-export class ModalPortal implements ModalControllerApi {
+export class ModalController implements ModalControllerApi {
   private ids = 0;
   private modalResolves: {[modalId: string]: Function} = {};
   private modals: Modal[] = [];
@@ -78,6 +78,7 @@ export class ModalPortal implements ModalControllerApi {
 
   @Listen('body:ionModalDidLoad')
   viewDidLoad(ev: ModalEvent) {
+    console.log(ev.type)
     const modal = ev.detail.modal;
     const modalResolve = this.modalResolves[modal.id];
     if (modalResolve) {
@@ -89,12 +90,14 @@ export class ModalPortal implements ModalControllerApi {
 
   @Listen('body:ionModalWillPresent')
   willPresent(ev: ModalEvent) {
+    console.log(ev.type)
     this.modals.push(ev.detail.modal);
   }
 
 
   @Listen('body:ionModalWillDismiss, body:ionModalWillUnload')
   willDismiss(ev: ModalEvent) {
+    console.log(ev.type)
     const index = this.modals.indexOf(ev.detail.modal);
     if (index > -1) {
       this.modals.splice(index, 1);
@@ -103,7 +106,8 @@ export class ModalPortal implements ModalControllerApi {
 
 
   @Listen('body:keyup.escape')
-  escapeKeyUp() {
+  escapeKeyUp(ev) {
+    console.log(ev.type)
     const lastModal = this.modals[this.modals.length - 1];
     if (lastModal) {
       lastModal.dismiss();
