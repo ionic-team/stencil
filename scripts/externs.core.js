@@ -43,6 +43,7 @@ function dismiss(){};
 function emit(){};
 function listen(){};
 function modal(){};
+function overlay(){};
 function present(){};
 function theme(){};
 
