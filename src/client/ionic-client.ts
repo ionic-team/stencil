@@ -1,5 +1,5 @@
 import { addEventListener, enableListener } from './events';
-import { CustomEventOptions, Ionic, IonicGlobal, ListenOptions, ModalControllerInternalApi, QueueApi } from '../util/interfaces';
+import { CustomEventOptions, Ionic, IonicGlobal, OverlayApi, ListenOptions, QueueApi } from '../util/interfaces';
 import { themeVNodeData } from './host';
 
 
@@ -50,24 +50,49 @@ export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocu
     }
   };
 
-  const modalCtrl: ModalControllerInternalApi = (<Ionic>IonicGlb).modal = {
-    // stub function to startup the modal viewport if it hasn't been
-    // loaded already. This will queue up all the create calls, and when
-    // the modal viewport loads it'll then create the modal(s). This stub
-    // function  will get replaced by the real "create" fn once loaded.
-    create: function(tag: string, data?: any, opts?: any) {
-      return new Promise<any>(resolve => {
-        // generate a _create array if one wasn't already created
-        // once the viewport loads, it'll loop through this array
-        (modalCtrl._create = modalCtrl._create || []).push(
-          tag/*0*/, data/*1*/, opts/*2*/, resolve/*3:create.resolve*/
-        );
+  const overlayQueue: {[ctrlName: string]: any[]} = {};
 
-        // add the viewport if one wasn't already added (one could be loading still)
-        if (!doc.querySelector('ion-modal-controller')) {
-          doc.body.appendChild(doc.createElement('ion-modal-controller'));
+  (<Ionic>IonicGlb).overlay = (ctrlName: string, opts: any) => {
+    return new Promise<any>((resolve: Function) => {
+      const overlayCtrl: OverlayApi = (<Ionic>IonicGlb).controllers[ctrlName];
+      if (overlayCtrl) {
+        // we've already loaded this overlay controller
+        // let's pass the options to the controller's load method
+        // and let the controller's load resolve, which then
+        // will resolve the user's promise
+        overlayCtrl.load(opts).then(<any>resolve);
+
+      } else {
+        // oh noz! we haven't already loaded this overlay yet!
+        const overlayCtrlQueue = overlayQueue[ctrlName];
+        if (overlayCtrlQueue) {
+          // cool we've already "started" to load it, but
+          // it hasn't finished loading yet, so lets add
+          // this one also to the queue
+          overlayCtrlQueue.push(opts, resolve);
+
+        } else {
+          // looks like we haven't even started the request yet
+          // let add the component to the DOM and create a queue
+          const ctrlTag = `ion-${ctrlName}-controller`;
+          if (!doc.querySelector(ctrlTag)) {
+            doc.body.appendChild(doc.createElement(ctrlTag));
+          }
+          overlayQueue[ctrlName] = [opts, resolve];
         }
-      });
+      }
+    });
+  };
+
+  IonicGlb.loadController = (ctrlName: string, ctrl: OverlayApi) => {
+    (<Ionic>IonicGlb).controllers[ctrlName] = ctrl;
+
+    const pendingOverlayLoads = overlayQueue[ctrlName];
+    if (pendingOverlayLoads) {
+      for (var i = 0; i < pendingOverlayLoads.length; i += 2) {
+        ctrl.load(pendingOverlayLoads[i]).then(pendingOverlayLoads[i + 1]);
+      }
+      delete overlayQueue[ctrlName];
     }
   };
 

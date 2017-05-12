@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <ion-button id="presentModal">Present Modal</ion-button>
+  <button id="presentModal">Present Modal</button>
 
   <my-app></my-app>
 
@@ -16,14 +16,16 @@
 
   <script>
     document.getElementById('presentModal').addEventListener('click', function() {
+      var userId = Math.round(Math.random() * 10000);
 
-      Ionic.modal.create('profile-modal', { userId: 88 }).then(modal => {
-        console.log('modal created');
+      console.log('open profile modal for userId:', userId);
 
-        modal.present().then(function() {
-          console.log('modal finished transitioning in, userId: ', modal.params.userId);
+      Ionic.overlay('modal', { component: 'profile-page', componentProps: { userId: userId } }).then(modal => {
+        console.log('start presenting modal, userId:', modal.componentProps.userId);
+
+        modal.present().then(() => {
+          console.log('finished presenting modal, userId:', modal.componentProps.userId);
         });
-
       });
 
     });
@@ -74,7 +76,7 @@
     customElements.define('my-other-app', MyOtherApp);
 
 
-    class ProfileModal extends HTMLElement {
+    class ProfilePage extends HTMLElement {
 
       constructor() {
         super();
@@ -87,26 +89,28 @@
               background: yellow;
             }
           </style>
-          <p>My Profile Modal</p>
+          <p>My Profile Page</p>
           <p>User Id: <span id="userId"></span></p>
           <p>
-            <ion-button>Dismiss Modal</ion-button>
+            <ion-button>Dismiss</ion-button>
           </p>
         `;
       }
 
       connectedCallback() {
         var btn = this.shadowRoot.querySelector('ion-button');
-        btn.addEventListener('click', function(uiEvent) {
+
+        btn.addEventListener('click', (uiEvent) => {
+          console.log('dismiss profile page for userId:', this.userId);
           var ev = new CustomEvent('ionDismiss', { composed: true, bubbles: true });
           uiEvent.target.dispatchEvent(ev);
         });
 
-        this.shadowRoot.getElementById('userId').textContent = this.params.userId;
+        this.shadowRoot.getElementById('userId').textContent = this.userId;
       }
 
     }
-    customElements.define('profile-modal', ProfileModal);
+    customElements.define('profile-page', ProfilePage);
 
   </script>
 

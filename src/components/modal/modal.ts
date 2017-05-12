@@ -20,11 +20,11 @@ export class Modal implements IModal {
   animation: Animation;
 
   @Prop() component: string;
+  @Prop() componentProps: any = {};
   @Prop() cssClass: string;
   @Prop() enableBackdropDismiss: boolean = true;
   @Prop() enterAnimation: AnimationBuilder;
   @Prop() exitAnimation: AnimationBuilder;
-  @Prop() params: any;
   @Prop() showBackdrop: boolean = true;
 
   @Listen('ionDismiss')
@@ -132,9 +132,7 @@ export class Modal implements IModal {
         }),
         h('div', Ionic.theme(this, 'modal-wrapper'),
           h(this.component, Ionic.theme(this, userCssClass, {
-            props: {
-              params: this.params
-            }
+            props: this.componentProps
           }))
         ),
       ]

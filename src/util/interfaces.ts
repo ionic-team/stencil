@@ -6,13 +6,27 @@ export interface Ionic {
     add: AddEventListenerApi;
   };
   theme: IonicTheme;
-  controllers: {
-    gesture?: any;
-  };
+  controllers: {[ctrlName: string]: any};
+  overlay: IonicOverlay;
   dom: DomControllerApi;
   config: ConfigApi;
-  modal: ModalControllerApi;
   Animation: Animation;
+}
+
+
+export interface OverlayApi {
+  load: (opts?: any) => Promise<any>;
+}
+
+
+export interface IonicOverlay {
+  <ModalController>(ctrlName: 'modal', opts: ModalOptions): Promise<Modal>;
+  (ctrlName: string, opts?: any): Promise<any>;
+}
+
+
+export interface IonicControllerLoaded {
+  (ctrlName: string): void;
 }
 
 
@@ -22,6 +36,7 @@ export interface IonicGlobal {
   loadComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData) => void;
   eventNameFn?: (eventName: string) => string;
   config?: Object;
+  loadController?: (ctrlName: string, ctrl: any) => any;
   ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;
   QueueCtrl?: QueueApi;
@@ -29,18 +44,14 @@ export interface IonicGlobal {
 }
 
 
-export interface ModalControllerApi {
-  create: (component: string, params?: any, opts?: ModalOptions) => Promise<Modal>;
-}
+export interface ModalController {
 
-
-export interface ModalControllerInternalApi extends ModalControllerApi {
-  _create?: any[];
 }
 
 
 export interface Modal {
   component: string;
+  componentProps?: any;
   id: string;
   style?: {
     zIndex: number;
@@ -50,13 +61,14 @@ export interface Modal {
   enterAnimation: AnimationBuilder;
   exitAnimation: AnimationBuilder;
   cssClass: string;
-  params: any;
   present: (done?: Function) => void;
   dismiss: (done?: Function) => void;
 }
 
 
 export interface ModalOptions {
+  component: string;
+  componentProps?: any;
   showBackdrop?: boolean;
   enableBackdropDismiss?: boolean;
   enterAnimation?: AnimationBuilder;

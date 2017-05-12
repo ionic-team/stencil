@@ -15,7 +15,7 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     controllers: {},
     config: ConfigCtrl,
     dom: DomCtrl,
-    modal: null,
+    overlay: null,
     Animation: null
   };
 

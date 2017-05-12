@@ -1,5 +1,5 @@
 import { Component, Ionic, Listen } from '../index';
-import { ModalControllerApi, ModalControllerInternalApi, ModalEvent, ModalOptions, Modal } from '../../util/interfaces';
+import { IonicGlobal, ModalEvent, ModalOptions, Modal, OverlayApi } from '../../util/interfaces';
 
 
 @Component({
@@ -14,47 +14,18 @@ import { ModalControllerApi, ModalControllerInternalApi, ModalEvent, ModalOption
   },
   shadow: false
 })
-export class ModalController implements ModalControllerApi {
+export class ModalController implements OverlayApi {
   private ids = 0;
   private modalResolves: {[modalId: string]: Function} = {};
   private modals: Modal[] = [];
 
+
   ionViewDidLoad() {
-    const modalCtrl = <ModalControllerInternalApi>Ionic.modal;
-
-    const createQueue = modalCtrl._create;
-    if (createQueue) {
-      var modalElm;
-
-      // tag/*0*/, data/*1*/, opts/*2*/, resolve/*3:create.resolve*/
-      for (var i = 0; i < createQueue.length; i += 4) {
-        modalElm = this.generate(createQueue[i], createQueue[i + 1], createQueue[i + 2]);
-        this.modalResolves[modalElm.id] = createQueue[i + 3];
-        document.body.appendChild(<any>modalElm);
-      }
-
-      delete modalCtrl._create;
-    }
-
-    // replace the stubbed modal#create with the actual one
-    Ionic.modal.create = this.create.bind(this);
+    (<IonicGlobal>Ionic).loadController('modal', this);
   }
 
 
-  create(component: string, params?: any, opts?: ModalOptions) {
-    const modalElm = this.generate(component, params, opts);
-
-    // append the modal element to the document body
-    document.body.appendChild(<any>modalElm);
-
-    // store the resolve function to be called later up when the modal loads
-    return new Promise<Modal>(resolve => {
-      this.modalResolves[modalElm.id] = resolve;
-    });
-  }
-
-
-  private generate(userComponent: string, params: any, opts: ModalOptions) {
+  load(opts?: ModalOptions) {
     // create ionic's wrapping ion-modal component
     const modal: Modal = document.createElement<any>('ion-modal');
 
@@ -63,16 +34,18 @@ export class ModalController implements ModalControllerApi {
     // give this modal a unique id
     modal.id = `modal-${id}`;
     modal.style.zIndex = (10000 + id);
-    modal.component = userComponent;
-    modal.params = params;
 
     // convert the passed in modal options into props
     // that get passed down into the new modal
-    if (opts) {
-      Object.assign(modal, opts);
-    }
+    Object.assign(modal, opts);
 
-    return modal;
+    // append the modal element to the document body
+    document.body.appendChild(<any>modal);
+
+    // store the resolve function to be called later up when the modal loads
+    return new Promise<Modal>(resolve => {
+      this.modalResolves[modal.id] = resolve;
+    });
   }
 
 
