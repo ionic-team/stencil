@@ -15,7 +15,7 @@ export function disconnectedCallback(elm: ProxyElement) {
         // disconnect cuz we're about to reconnect it again
         return;
       }
-      parentElm = <any>elm.parentElement;
+      parentElm = <any>parentElm.parentElement;
     }
 
     const instance = elm.$instance;
