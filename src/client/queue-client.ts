@@ -6,7 +6,6 @@ export function QueueClient(window: any): QueueApi {
   const callbacks: Function[] = [];
   let pending = false;
 
-
   function doWork(deadlineObj: IdleDeadline) {
     console.log(`queue, doWork, timeRemaining: ${deadlineObj.timeRemaining()}, callbacks: ${callbacks.length}`);
 
@@ -24,40 +23,33 @@ export function QueueClient(window: any): QueueApi {
       // we already don't have time to do anything in this callback
       // let's throw the next one in a requestAnimationFrame
       // so we can just simmer down for a bit
-      requestAnimationFrame(rafChillout);
+      requestAnimationFrame(flush);
     }
-  }
-
-  function rafChillout() {
-    console.log(`queue, rafChillout, callbacks: ${callbacks.length}`);
-
-    const start = Date.now();
-    while (callbacks.length > 0 && (Date.now() - start < 4)) {
-      callbacks.shift()();
-    }
-    hostScheduleDefer(doWork);
   }
 
   function flush() {
     console.log(`queue, flush, callbacks: ${callbacks.length}`);
 
-    const start = Date.now();
-    while (callbacks.length > 0 && (Date.now() - start < 9)) {
+    // always force a bunch of callbacks to run, but still have
+    // a throttle on how many can run in a certain time
+    const start = performance.now();
+    while (callbacks.length > 0 && (performance.now() - start < 4)) {
       callbacks.shift()();
     }
 
-    if (callbacks.length > 0) {
-      pending = true;
-      requestAnimationFrame(rafChillout);
-
-    } else {
-      pending = false;
+    if (pending = (callbacks.length > 0)) {
+      // still more to do yet, but we've run out of time
+      // let's let thing cool off and try again after a raf
+      hostScheduleDefer(doWork);
     }
   }
 
   function add(cb: Function) {
+    // add the work to the end of the callbacks
     callbacks.push(cb);
+
     if (!pending) {
+      // not already pending work to do, so let's tee it up
       pending = true;
       hostScheduleDefer(doWork);
     }
