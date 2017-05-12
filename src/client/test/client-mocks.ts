@@ -1,5 +1,5 @@
 import { ComponentModeData, ConfigApi, CustomEventOptions, DomControllerApi, Ionic,
-  IonicGlobal, NextTickApi, PlatformConfig, ProxyElement, PlatformApi,
+  IonicGlobal, QueueApi, PlatformConfig, ProxyElement, PlatformApi,
   RafCallback } from '../../util/interfaces';
 import { ConfigController } from '../../util/config-controller';
 import { PlatformClient } from '../../client/platform-client';
@@ -146,9 +146,29 @@ export function mockDomController(): DomControllerApi {
 }
 
 
-export function mockNextTickController(): NextTickApi {
+export function mockNextTickController(): QueueApi {
+  const callbacks: Function[] = [];
+  let queued = false;
+
+  function flush() {
+    while (callbacks.length > 0) {
+      callbacks.shift()();
+    }
+  }
+
+  function add(cb: Function) {
+    callbacks.push(cb);
+    if (!queued) {
+      queued = true;
+      process.nextTick(() => {
+        flush();
+      });
+    }
+  }
+
   return {
-    nextTick: process.nextTick
+    add: add,
+    flush: flush
   };
 }
 

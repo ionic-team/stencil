@@ -1,12 +1,12 @@
 import { Component, ComponentMeta, ComponentRegistry,
-  IonicGlobal, NextTickApi, PlatformApi } from '../util/interfaces';
+  IonicGlobal, QueueApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './ionic-client';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
 import { toDashCase } from '../util/helpers';
 
 
-export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, NextTickCtrl: NextTickApi): PlatformApi {
+export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, queue: QueueApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
@@ -15,7 +15,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
 
 
-  const injectedIonic = initInjectedIonic(IonicGbl, win, doc);
+  const injectedIonic = initInjectedIonic(IonicGbl, win, doc, queue);
 
 
   IonicGbl.loadComponents = function loadComponents(coreVersion, bundleId, importFn) {
@@ -319,6 +319,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     return node.nodeType === 8;
   }
 
+
   return {
     registerComponent: registerComponent,
     getComponentMeta: getComponentMeta,
@@ -327,7 +328,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     isElement: isElement,
     isText: isText,
     isComment: isComment,
-    nextTick: NextTickCtrl.nextTick.bind(NextTickCtrl),
+    queue: queue,
 
     $createElement: createElement,
     $createElementNS: createElementNS,

@@ -1,9 +1,9 @@
 import { addEventListener, enableListener } from './events';
-import { CustomEventOptions, Ionic, IonicGlobal, ModalControllerInternalApi } from '../util/interfaces';
+import { CustomEventOptions, Ionic, IonicGlobal, ListenOptions, ModalControllerInternalApi, QueueApi } from '../util/interfaces';
 import { themeVNodeData } from './host';
 
 
-export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocument): Ionic {
+export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocument, queue: QueueApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -42,8 +42,12 @@ export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocu
   };
 
   (<Ionic>IonicGlb).listener = {
-    enable: enableListener,
-    add: addEventListener
+    enable: function(instance: any, eventName: string, shouldEnable: boolean, attachTo?: string) {
+      enableListener(queue, instance, eventName, shouldEnable, attachTo);
+    },
+    add: function (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => void, opts?: ListenOptions) {
+      return addEventListener(queue, elm, eventName, cb, opts);
+    }
   };
 
   const modalCtrl: ModalControllerInternalApi = (<Ionic>IonicGlb).modal = {

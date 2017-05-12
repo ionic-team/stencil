@@ -11,7 +11,7 @@ export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Rende
     elm.$queued = true;
 
     // run the patch in the next tick
-    plt.nextTick(function queueUpdateNextTick() {
+    plt.queue.add(function queueUpdateNextTick() {
 
       // vdom diff and patch the host element for differences
       update(plt, config, renderer, elm, tag);
@@ -62,7 +62,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   }
 
   if (initalLoad) {
-    cmpMeta.listeners && attachListeners(cmpMeta.listeners, instance);
+    cmpMeta.listeners && attachListeners(plt.queue, cmpMeta.listeners, instance);
 
     instance.ionViewDidLoad && instance.ionViewDidLoad();
   }

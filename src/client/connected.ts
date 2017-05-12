@@ -5,7 +5,7 @@ import { queueUpdate } from './update';
 
 export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, cmpMeta: ComponentMeta) {
   if (!elm.$tmpDisconnected) {
-    plt.nextTick(() => {
+    plt.queue.add(() => {
       const tag = cmpMeta.tag;
 
       // console.log(elm.nodeName, 'connectedCallback nextTick');

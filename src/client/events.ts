@@ -1,4 +1,4 @@
-import { Component, ListenMeta, ListenOptions } from '../util/interfaces';
+import { Component, ListenMeta, ListenOptions, QueueApi } from '../util/interfaces';
 import { getElementReference, getKeyCodeByName } from '../util/helpers';
 import { noop } from '../util/helpers';
 
@@ -6,18 +6,18 @@ import { noop } from '../util/helpers';
 let supportsOpts: boolean = null;
 
 
-export function attachListeners(listeners: ListenMeta[], instance: Component) {
+export function attachListeners(queue: QueueApi, listeners: ListenMeta[], instance: Component) {
   for (var i = 0; i < listeners.length; i++) {
     var listener = listeners[i];
     if (listener.enabled !== false) {
       instance.$listeners = instance.$listeners || {};
-      instance.$listeners[listener.eventName] = addEventListener(instance.$el, listener.eventName, instance[listener.methodName].bind(instance), listener);
+      instance.$listeners[listener.eventName] = addEventListener(queue, instance.$el, listener.eventName, instance[listener.methodName].bind(instance), listener);
     }
   }
 }
 
 
-export function enableListener(instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
+export function enableListener(queue: QueueApi, instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
   if (instance && instance.$meta) {
     const listeners = instance.$meta.listeners;
 
@@ -31,7 +31,7 @@ export function enableListener(instance: Component, eventName: string, shouldEna
 
           if (shouldEnable && !deregisterFns[eventName]) {
             var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(instance.$el, attachToEventName, instance[listener.methodName].bind(instance), listener);
+            deregisterFns[eventName] = addEventListener(queue, instance.$el, attachToEventName, instance[listener.methodName].bind(instance), listener);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();
@@ -46,7 +46,7 @@ export function enableListener(instance: Component, eventName: string, shouldEna
 }
 
 
-export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: {(ev?: any): void}, opts: ListenOptions = {}) {
+export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): void}, opts: ListenOptions = {}) {
   if (!elm) {
     return noop;
   }
@@ -70,29 +70,53 @@ export function addEventListener(elm: HTMLElement|HTMLDocument|Window, eventName
   }
 
   splt = eventName.split('.');
+  let testKeyCode: number = null;
+
   if (splt.length > 1) {
     // keyup.enter
     eventName = splt[0];
-    var validKeycode = getKeyCodeByName(splt[1]);
-
-    if (validKeycode !== null) {
-      var orgCb = cb;
-      cb = function(ev: KeyboardEvent) {
-        if (ev.keyCode === validKeycode) {
-          orgCb(ev);
-        }
-      };
-    }
+    testKeyCode = getKeyCodeByName(splt[1]);
   }
 
-  elm.addEventListener(eventName, cb, eventListenerOpts);
+  const eventListener = (ev: any) => {
+    if (testKeyCode !== null && ev.keyCode !== testKeyCode) {
+      // we're looking for a specific keycode but this wasn't it
+      return;
+    }
+
+    // fire the component's event listener callback
+    userEventListener(ev);
+
+    // test if this is the user's interaction
+    if (isUserInteraction(eventName)) {
+      // so it's very important to flush the queue now
+      // so that the app reflects whatever they just did
+      // basically don't let requestIdleCallback delay the important
+      queue.flush();
+    }
+  };
+
+  elm.addEventListener(eventName, eventListener, eventListenerOpts);
 
   return function removeListener() {
     if (elm) {
-      elm.removeEventListener(eventName, cb, eventListenerOpts);
+      elm.removeEventListener(eventName, eventListener, eventListenerOpts);
     }
   };
 }
+
+
+function isUserInteraction(eventName: string) {
+  for (var i = 0; i < USER_INTERACTIONS.length; i++) {
+    if (eventName.indexOf(USER_INTERACTIONS[i]) > -1) {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+const USER_INTERACTIONS = ['touch', 'mouse', 'pointer', 'key', 'focus', 'blur', 'drag'];
 
 
 export function detachListeners(instance: Component) {

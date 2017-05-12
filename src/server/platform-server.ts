@@ -3,11 +3,13 @@ import { ComponentMeta, Component, ComponentModeData, ComponentRegistry, ConfigA
 import { h } from '../client/renderer/h';
 import { initInjectedIonic } from './ionic-server';
 import { parseComponentModeData } from '../util/data-parse';
+import { QueueServer } from './queue-server';
 
 
 export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const moduleImports = {};
+  const queue = QueueServer();
 
   const injectedIonic = initInjectedIonic(ConfigCtrl, DomCtrl);
 
@@ -175,7 +177,7 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
     isElement: isElement,
     isText: isText,
     isComment: isComment,
-    nextTick: process.nextTick,
+    queue: queue,
 
     $createElement: createElement,
     $createElementNS: createElementNS,

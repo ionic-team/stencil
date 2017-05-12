@@ -2,6 +2,7 @@ import { ConfigController } from '../../../util/config-controller';
 import { IonicGlobal, ServerInitConfig } from '../../../util/interfaces';
 import { PlatformServer } from '../../../server/platform-server';
 import { registerComponents } from '../../../server/registry';
+import { QueueServer } from '../../../server/queue-server';
 import { upgradeInputHtml } from '../../../server/upgrade';
 
 
@@ -14,9 +15,7 @@ export function init(serverInitConfig: ServerInitConfig) {
     raf: function(cb: Function) { cb(performance.now()); },
   };
 
-  IonicGbl.NextTickCtrl = {
-    nextTick: process.nextTick.bind(process)
-  };
+  IonicGbl.QueueCtrl = QueueServer();
 
   IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, []);
 

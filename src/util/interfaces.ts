@@ -24,7 +24,7 @@ export interface IonicGlobal {
   config?: Object;
   ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;
-  NextTickCtrl?: NextTickApi;
+  QueueCtrl?: QueueApi;
   Animation?: any;
 }
 
@@ -164,13 +164,9 @@ export interface ContentDimensions {
 }
 
 
-export interface NextTickApi {
-  nextTick: NextTick;
-}
-
-
-export interface NextTick {
-  (cb: Function): void;
+export interface QueueApi {
+  add: (cb: Function) => void;
+  flush: Function;
 }
 
 
@@ -532,7 +528,7 @@ export interface PlatformApi {
   registerComponent: (tag: string, data: any[]) => ComponentMeta;
   getComponentMeta: (tag: string) => ComponentMeta;
   loadBundle: (bundleId: string, priority: string, cb: Function) => void;
-  nextTick: NextTick;
+  queue: QueueApi;
 
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
