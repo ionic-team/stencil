@@ -27,7 +27,7 @@ export class Modal implements IModal {
   @Prop() params: any;
   @Prop() showBackdrop: boolean = true;
 
-  @Listen('ionModalDismiss')
+  @Listen('ionDismiss')
   onDismiss(ev: UIEvent) {
     ev.stopPropagation();
     ev.preventDefault();
@@ -131,7 +131,11 @@ export class Modal implements IModal {
           }
         }),
         h('div', Ionic.theme(this, 'modal-wrapper'),
-          h(this.component, Ionic.theme(this, userCssClass))
+          h(this.component, Ionic.theme(this, userCssClass, {
+            props: {
+              params: this.params
+            }
+          }))
         ),
       ]
     );

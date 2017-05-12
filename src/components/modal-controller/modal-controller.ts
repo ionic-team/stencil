@@ -78,7 +78,6 @@ export class ModalController implements ModalControllerApi {
 
   @Listen('body:ionModalDidLoad')
   viewDidLoad(ev: ModalEvent) {
-    console.log(ev.type)
     const modal = ev.detail.modal;
     const modalResolve = this.modalResolves[modal.id];
     if (modalResolve) {
@@ -90,14 +89,12 @@ export class ModalController implements ModalControllerApi {
 
   @Listen('body:ionModalWillPresent')
   willPresent(ev: ModalEvent) {
-    console.log(ev.type)
     this.modals.push(ev.detail.modal);
   }
 
 
   @Listen('body:ionModalWillDismiss, body:ionModalWillUnload')
   willDismiss(ev: ModalEvent) {
-    console.log(ev.type)
     const index = this.modals.indexOf(ev.detail.modal);
     if (index > -1) {
       this.modals.splice(index, 1);
@@ -106,8 +103,7 @@ export class ModalController implements ModalControllerApi {
 
 
   @Listen('body:keyup.escape')
-  escapeKeyUp(ev) {
-    console.log(ev.type)
+  escapeKeyUp() {
     const lastModal = this.modals[this.modals.length - 1];
     if (lastModal) {
       lastModal.dismiss();
