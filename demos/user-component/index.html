@@ -84,16 +84,18 @@
         const shadowRoot = this.attachShadow({mode: 'open'});
 
         shadowRoot.innerHTML = `
-          <style>
-            :host {
-              background: yellow;
-            }
-          </style>
-          <p>My Profile Page</p>
-          <p>User Id: <span id="userId"></span></p>
-          <p>
-            <ion-button>Dismiss</ion-button>
-          </p>
+          <ion-header>
+            <ion-toolbar>
+              My Profile
+            </ion-toolbar>
+          </ion-header>
+
+          <ion-content padding>
+            <p>User Id: <span id="userId"></span></p>
+            <p>
+              <ion-button>Dismiss</ion-button>
+            </p>
+          </ion-content>
         `;
       }
 

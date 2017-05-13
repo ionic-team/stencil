@@ -1,5 +1,6 @@
 import { Component, h, Ionic, Prop } from '../index';
 import { ContentDimensions, ScrollDetail } from '../../util/interfaces';
+import { getParentElement } from '../../util/helpers';
 import { Scroll } from '../scroll/scroll-interface';
 
 
@@ -9,7 +10,8 @@ import { Scroll } from '../scroll/scroll-interface';
     ios: 'content.ios.scss',
     md: 'content.md.scss',
     wp: 'content.wp.scss'
-  }
+  },
+  shadow: false
 })
 export class Content {
   $el: HTMLElement;
@@ -203,9 +205,6 @@ export class Content {
   }
 
   ionViewDidLoad() {
-    this.$scroll = this.$el.shadowRoot.querySelector<any>('ion-scroll');
-    this.$fixed = this.$el.querySelector<any>('ion-fixed');
-
     this.resize();
   }
 
@@ -377,6 +376,7 @@ export class Content {
     const cacheHeaderHeight = this._hdrHeight;
     const cacheFooterHeight = this._ftrHeight;
     const cacheTabsPlacement = this._tabsPlacement;
+
     let tabsTop = 0;
     this._pTop = 0;
     this._pRight = 0;
@@ -390,21 +390,23 @@ export class Content {
     this._fBottom = 0;
     let scrollDetail = this.$scrollDetail;
 
-    let ele: HTMLElement = this.$el;
+    let elm: HTMLElement = this.$el;
 
     let computedStyle: any;
     let tagName: string;
-    let parentEle: HTMLElement = ele.parentElement;
+    let parentEle: HTMLElement = getParentElement(elm);
+    if (!parentEle) return;
+
     let children = parentEle.children;
     for (var i = children.length - 1; i >= 0; i--) {
-      ele = <HTMLElement>children[i];
-      tagName = ele.tagName;
+      elm = <HTMLElement>children[i];
+      tagName = elm.tagName;
       if (tagName === 'ION-CONTENT') {
-        scrollDetail.contentElement = ele;
+        scrollDetail.contentElement = elm;
 
         if (this.fullscreen) {
           // ******** DOM READ ****************
-          computedStyle = getComputedStyle(ele);
+          computedStyle = getComputedStyle(elm);
           this._pTop = parsePxUnit(computedStyle.paddingTop);
           this._pBottom = parsePxUnit(computedStyle.paddingBottom);
           this._pRight = parsePxUnit(computedStyle.paddingRight);
@@ -412,37 +414,37 @@ export class Content {
         }
 
       } else if (tagName === 'ION-HEADER') {
-        scrollDetail.headerElement = ele;
+        scrollDetail.headerElement = elm;
 
         // ******** DOM READ ****************
-        this._hdrHeight = ele.clientHeight;
+        this._hdrHeight = elm.clientHeight;
 
       } else if (tagName === 'ION-FOOTER') {
-        scrollDetail.footerElement = ele;
+        scrollDetail.footerElement = elm;
 
         // ******** DOM READ ****************
-        this._ftrHeight = ele.clientHeight;
-        this.$siblingFooter = ele;
+        this._ftrHeight = elm.clientHeight;
+        this.$siblingFooter = elm;
       }
     }
 
-    ele = parentEle;
+    elm = parentEle;
     let tabbarEle: HTMLElement;
 
-    while (ele && ele.tagName !== 'ION-MODAL' && !ele.classList.contains('tab-subpage')) {
+    while (elm && elm.tagName !== 'ION-MODAL' && !elm.classList.contains('tab-subpage')) {
 
-      if (ele.tagName === 'ION-TABS') {
-        tabbarEle = <HTMLElement>ele.firstElementChild;
+      if (elm.tagName === 'ION-TABS') {
+        tabbarEle = <HTMLElement>elm.firstElementChild;
         // ******** DOM READ ****************
         this._tabbarHeight = tabbarEle.clientHeight;
 
         if (this._tabsPlacement === null) {
           // this is the first tabbar found, remember it's position
-          this._tabsPlacement = ele.getAttribute('tabsplacement');
+          this._tabsPlacement = elm.getAttribute('tabsplacement');
         }
       }
 
-      ele = ele.parentElement;
+      elm = getParentElement(elm);
     }
 
     // Tabs top
@@ -624,7 +626,8 @@ export class Content {
           class: {
             'statusbar-padding': this.statusbarPadding,
           },
-          props: props
+          props: props,
+          ref: refElm => this.$scroll = refElm
         }),
         h('slot')
       )
