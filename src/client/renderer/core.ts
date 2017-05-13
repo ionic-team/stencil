@@ -136,6 +136,7 @@ export function Renderer(api: PlatformApi): RendererApi {
             ch = <any>createElm(ch as VNode, insertedVnodeQueue, elm, hostContentNodes);
             if (ch) {
               api.$appendChild(elm, <any>ch);
+              delete (<any>ch).$tmpDisconnect;
             }
           }
         }
@@ -160,10 +161,15 @@ export function Renderer(api: PlatformApi): RendererApi {
                      endIdx: number,
                      insertedVnodeQueue: VNodeQueue,
                      hostContentNodes: HostContentNodes) {
+    let vnodeChild: VNode;
+    let newElm: Node;
+
     for (; startIdx <= endIdx; ++startIdx) {
-      const ch = vnodes[startIdx];
-      if (ch != null) {
-        api.$insertBefore(parentElm, createElm(ch, insertedVnodeQueue, parentElm, hostContentNodes), before);
+      vnodeChild = vnodes[startIdx];
+      if (vnodeChild != null) {
+        newElm = createElm(vnodeChild, insertedVnodeQueue, parentElm, hostContentNodes);
+        api.$insertBefore(parentElm, newElm, before);
+        delete (<ProxyElement>newElm).$tmpDisconnect;
       }
     }
   }

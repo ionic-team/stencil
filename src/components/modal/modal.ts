@@ -105,8 +105,8 @@ export class Modal implements IModal {
     });
   }
 
-  ionViewWillUnload() {
-    Ionic.emit(this, 'ionModalWillUnload', { detail: { modal: this } });
+  ionViewDidUnload() {
+    Ionic.emit(this, 'ionModalDidUnload', { detail: { modal: this } });
   }
 
   backdropClick() {

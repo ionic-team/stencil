@@ -208,7 +208,7 @@ export class Content {
     this.resize();
   }
 
-  ionViewWillUnload() {
+  ionViewDidUnload() {
     this.$fixed = this.$scroll = this.$siblingFooter = this.$siblingHeader = this.$scrollDetail = null;
   }
 

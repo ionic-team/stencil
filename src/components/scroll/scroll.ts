@@ -351,7 +351,7 @@ export class Scroll implements IScroll {
   }
 
 
-  ionViewWillUnload() {
+  ionViewDidUnload() {
     this.gesture && this.gesture.destroy();
     this.gesture = this.detail = this.detail.event = null;
   }

@@ -66,7 +66,7 @@ export class ModalController implements OverlayApi {
   }
 
 
-  @Listen('body:ionModalWillDismiss, body:ionModalWillUnload')
+  @Listen('body:ionModalWillDismiss, body:ionModalDidUnload')
   willDismiss(ev: ModalEvent) {
     const index = this.modals.indexOf(ev.detail.modal);
     if (index > -1) {

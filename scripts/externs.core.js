@@ -71,7 +71,7 @@ function listeners(){};
  * Methods set on the user's component
  */
 function ionViewDidLoad(){};
-function ionViewWillUnload(){};
+function ionViewDidUnload(){};
 function render(){};
 
 
