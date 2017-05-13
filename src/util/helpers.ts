@@ -85,43 +85,10 @@ export function getElementReference(elm: any, ref: string) {
   return elm;
 }
 
-export function getKeyCodeByName(keyName: string) {
-  if (keyName === 'enter') {
-    return 13;
-  }
-  if (keyName === 'escape') {
-    return 27;
-  }
-  if (keyName === 'space') {
-    return 32;
-  }
-  if (keyName === 'tab') {
-    return 9;
-  }
-  return null;
-}
-
 export function applyStyles(elm: HTMLElement, styles: {[styleProp: string]: string|number}) {
   const styleProps = Object.keys(styles);
 
   for (var i = 0; i < styleProps.length; i++) {
     (<any>elm.style)[styleProps[i]] = styles[styleProps[i]];
   }
-}
-
-export function asyncFn(queue: Function[], cb: Function) {
-  if (queue === null) {
-    cb();
-  } else {
-    queue.push(cb);
-  }
-}
-
-export function drainAsyncFns(queue: Function[]): any {
-  if (queue) {
-    for (var i = 0; i < queue.length; i++) {
-      queue[i]();
-    }
-  }
-  return null;
 }

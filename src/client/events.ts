@@ -1,6 +1,6 @@
 import { Component, ListenMeta, ListenOptions, QueueApi } from '../util/interfaces';
-import { getElementReference, getKeyCodeByName } from '../util/helpers';
-import { noop } from '../util/helpers';
+import { getElementReference, noop } from '../util/helpers';
+import { KEY_CODE_MAP } from '../util/constants';
 
 
 let supportsOpts: boolean = null;
@@ -70,16 +70,16 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
   }
 
   splt = eventName.split('.');
-  let testKeyCode: number = null;
+  let testKeyCode = 0;
 
   if (splt.length > 1) {
     // keyup.enter
     eventName = splt[0];
-    testKeyCode = getKeyCodeByName(splt[1]);
+    testKeyCode = KEY_CODE_MAP[splt[1]];
   }
 
   const eventListener = (ev: any) => {
-    if (testKeyCode !== null && ev.keyCode !== testKeyCode) {
+    if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
       // we're looking for a specific keycode but this wasn't it
       return;
     }
