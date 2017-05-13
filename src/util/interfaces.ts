@@ -178,7 +178,6 @@ export interface ContentDimensions {
 
 export interface QueueApi {
   add: (cb: Function) => void;
-  remove: (handerId: number) => void;
   flush: Function;
 }
 
@@ -514,7 +513,6 @@ export interface VNode {
   elm: Node | undefined;
   vtext: string | undefined;
   vkey: Key;
-  tmpDisconnected: boolean;
 }
 
 
