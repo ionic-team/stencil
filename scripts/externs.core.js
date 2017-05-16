@@ -82,6 +82,7 @@ function render(){};
 function attrs(){};
 function on(){};
 function props(){};
+function ref(){};
 
 
 /**
