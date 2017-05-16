@@ -4,26 +4,35 @@
  * - requestAnimationFrame
  * - requestIdleCallback
  */
-export function applyWindowPolyfills(win: any) {
+(function(window: any){
 
 
   // performance.now
   // ---------------------
+  // https://gist.github.com/paulirish/5438650
   // @license http://opensource.org/licenses/MIT
   // copyright Paul Irish 2015
-  const performance = ('performance' in win === false) ? {} : win.performance;
+  if ('performance' in window === false) {
+    window.performance = {};
+  }
 
-  if ('now' in performance === false) {
+  Date.now = (Date.now || function () {  // thanks IE8
+    return new Date().getTime();
+  });
+
+  if ('now' in window.performance === false) {
+
     var nowOffset = Date.now();
 
     if (performance.timing && performance.timing.navigationStart) {
       nowOffset = performance.timing.navigationStart;
     }
 
-    performance.now = function now() {
+    window.performance.now = function now(){
       return Date.now() - nowOffset;
     };
   }
+
 
 
   // requestAnimationFrame
@@ -36,16 +45,16 @@ export function applyWindowPolyfills(win: any) {
   var lastTime = 0;
   var vendors = ['ms', 'moz', 'webkit'];
 
-  for (var i = 0; i < vendors.length && !win.requestAnimationFrame; ++i) {
-    win.requestAnimationFrame = win[vendors[i] + 'RequestAnimationFrame'];
-    win.cancelAnimationFrame = win[vendors[i] + 'CancelAnimationFrame'] || win[vendors[i] + 'CancelRequestAnimationFrame'];
+  for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+    window.requestAnimationFrame = window[vendors[i] + 'RequestAnimationFrame'];
+    window.cancelAnimationFrame = window[vendors[i] + 'CancelAnimationFrame'] || window[vendors[i] + 'CancelRequestAnimationFrame'];
   }
 
-  if (!win.requestAnimationFrame) {
-    win.requestAnimationFrame = (callback: Function) => {
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame = (callback: Function) => {
       var currTime = Date.now();
       var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-      var id = win.setTimeout(() => {
+      var id = setTimeout(() => {
         callback(currTime + timeToCall);
       }, timeToCall);
       lastTime = currTime + timeToCall;
@@ -53,8 +62,8 @@ export function applyWindowPolyfills(win: any) {
     };
   }
 
-  if (!win.cancelAnimationFrame) {
-    win.cancelAnimationFrame = (id: any) => {
+  if (!window.cancelAnimationFrame) {
+    window.cancelAnimationFrame = (id: any) => {
       clearTimeout(id);
     };
   }
@@ -64,7 +73,7 @@ export function applyWindowPolyfills(win: any) {
   // requestIdleCallback
   // ---------------------
 
-  if (typeof win.requestIdleCallback !== 'function') {
+  if (typeof window.requestIdleCallback !== 'function') {
     // darn, this browser does not support requestIdleCallback
     // use requestAnimationFrame to simulate rIC
 
@@ -90,8 +99,8 @@ export function applyWindowPolyfills(win: any) {
     // using post message as a way to queue up ric callbacks after paint
     // add a message listener and if it has the same id as
     // queueRicId then that means we've queued up a requestIdleCallback
-    win.addEventListener('message', (ev: MessageEvent) => {
-      if (ev.source === win && ev.data === queueRicId) {
+    window.addEventListener('message', (ev: MessageEvent) => {
+      if (ev.source === window && ev.data === queueRicId) {
         // cool, so this message was created because there's
         // a ric to do!
         isRicQueued = false;
@@ -129,7 +138,7 @@ export function applyWindowPolyfills(win: any) {
       deadline = (timestamp + currentFrameTime);
       if (!isRicQueued) {
         isRicQueued = true;
-        win.postMessage(queueRicId, '*');
+        window.postMessage(queueRicId, '*');
       }
 
       var cb = queuedRafCBs;
@@ -139,10 +148,10 @@ export function applyWindowPolyfills(win: any) {
     }
 
     // remember the original raf
-    const orgRaf = win.requestAnimationFrame;
+    const orgRaf = window.requestAnimationFrame;
 
     // create a new raf which helps to polyfill ric
-    win.requestAnimationFrame = (rafCb: (time: number) => void) => {
+    window.requestAnimationFrame = (rafCb: (time: number) => void) => {
       queuedRafCBs = rafCb;
 
       if (!isRafQueued) {
@@ -153,7 +162,7 @@ export function applyWindowPolyfills(win: any) {
     };
 
     // create the ric which this browser doesn't already have
-    win.requestIdleCallback = (ricCb: (deadline: Deadline) => void) => {
+    window.requestIdleCallback = (ricCb: (deadline: any) => void) => {
       // remember the callback to be fired
       queuedRicCBs = ricCb;
 
@@ -165,9 +174,4 @@ export function applyWindowPolyfills(win: any) {
     };
   }
 
-}
-
-
-export type Deadline = {
-  timeRemaining: () => number,
-};
+})(window);

@@ -38,16 +38,32 @@ import { IonicGlobal } from '../../../util/interfaces';
     pathItems.push('ce');
   }
 
+  // async load the ionic animation
+  function asyncLoadAnimations() {
+    var s = document.createElement('script');
+    s.src = ionic.staticDir + 'ionic.animation.js';
+    document.head.appendChild(s);
+  }
+
+  if ('requestIdleCallback' in window) {
+    // cool, this browser supports requestIdleCallback (and requestAnimationFrame)
+    // no need to also load the window polyfills/shims
+
+    // using requestIdleCallback, async load the animation core
+    window.requestIdleCallback(asyncLoadAnimations);
+
+  } else {
+    // this browser doesn't have the native requestIdleCallback and/or requestAnimationFrame
+    // load the window polyfills/shims
+    pathItems.push('wn');
+
+    // using setTimeout, async load the animation core
+    setTimeout(asyncLoadAnimations, 500);
+  }
+
   // request the ionic core file this browser needs
   var s = document.createElement('script');
   s.src = ionic.staticDir + 'ionic.' + pathItems.join('.') + '.js';
   document.head.appendChild(s);
-
-  // request the ionic core file this browser needs
-  (window.requestIdleCallback || setTimeout)(() => {
-    var s = document.createElement('script');
-    s.src = ionic.staticDir + 'ionic.animation.js';
-    document.head.appendChild(s);
-  });
 
 })(window, document);
