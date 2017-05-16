@@ -8,12 +8,13 @@ import { Component, h, Ionic } from '../index';
     md: 'avatar.md.scss',
     wp: 'avatar.wp.scss'
   },
-  shadow: false
+  shadow: false,
+  host: {
+    class: 'avatar'
+  }
 })
 export class Avatar {
   render() {
-    return h(this, Ionic.theme(this, 'avatar'),
-      h('slot')
-    );
+    return h('slot');
   }
 }

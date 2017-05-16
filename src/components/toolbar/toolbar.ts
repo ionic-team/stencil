@@ -96,7 +96,10 @@ import { Component, h, Ionic } from '../index';
     md: 'toolbar.md.scss',
     wp: 'toolbar.wp.scss'
   },
-  shadow: false
+  shadow: false,
+  host: {
+    class: 'toolbar'
+  }
 })
 export class Toolbar {
   $el: HTMLElement;
@@ -124,12 +127,17 @@ export class Toolbar {
   }
 
   render() {
-    return h(this, Ionic.theme(this, 'toolbar', { class: { 'statusbar-padding': this.sbPadding } }), [
+    if (this.sbPadding) {
+      this.$el.classList.add('statusbar-padding');
+    } else {
+      this.$el.classList.remove('statusbar-padding');
+    }
+    return [
       h('div', Ionic.theme(this, 'toolbar-background')),
       h('div', Ionic.theme(this, 'toolbar-content'),
         h('slot')
       ),
-    ]);
+    ];
   }
 
 }

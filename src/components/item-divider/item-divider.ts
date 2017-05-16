@@ -8,23 +8,24 @@ import { Component, h, Ionic } from '../index';
     md: 'item-divider.md.scss',
     wp: 'item-divider.wp.scss'
   },
-  shadow: false
+  shadow: false,
+  host: {
+    class: 'item item-divider'
+  }
 })
 export class ItemDivider {
   render() {
-    return h(this, Ionic.theme(this, 'item item-divider'),
-      [
-        h('slot', { attrs: { name: 'start' } }),
-        h('div.item-inner', [
-            h('div.input-wrapper',
-              h('slot')
-            ),
-            h('slot', { attrs: { name: 'end' } }),
-            // h('ion-reorder')
-          ]
-        ),
-        // h('div.button-effect')
-      ]
-    );
+    return [
+      h('slot', { attrs: { name: 'start' } }),
+      h('div.item-inner', [
+          h('div.input-wrapper',
+            h('slot')
+          ),
+          h('slot', { attrs: { name: 'end' } }),
+          // h('ion-reorder')
+        ]
+      ),
+      // h('div.button-effect')
+    ];
   }
 }

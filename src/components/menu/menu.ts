@@ -6,6 +6,11 @@ import { Component, h, Ionic, Prop } from '../index';
   tag: 'ion-menu',
   styleUrls: {
     'default': 'menu.scss'
+  },
+  host: {
+    attrs: {
+      'role': 'navigation'
+    }
   }
 })
 export class Menu {
@@ -39,26 +44,25 @@ export class Menu {
       menuTag = 'ion-menu-reveal';
     }
 
-    return h(this, { attrs: { 'role': 'navigation'} }, [
+    return [
       h(`${menuTag}.menu-inner`, Ionic.theme(this, 'menu-' + menuTag, {
-          props: {
-            // 'canStart': this.canStart.bind(this),
-            // 'onStart': this.onDragStart.bind(this),
-            // 'onMove': this.onDragMove.bind(this),
-            // 'onEnd': this.onDragEnd.bind(this),
-            // 'onPress': this.toggle.bind(this),
-            // 'gestureName': 'menu',
-            // 'gesturePriority': 30,
-            // 'type': 'pan,press',
-            // 'direction': 'x',
-            // 'threshold': 20,
-            // 'listenOn': 'parent'
-          }
-        }),
-          h('slot')
-        )
-      ]
-    );
+        props: {
+          // 'canStart': this.canStart.bind(this),
+          // 'onStart': this.onDragStart.bind(this),
+          // 'onMove': this.onDragMove.bind(this),
+          // 'onEnd': this.onDragEnd.bind(this),
+          // 'onPress': this.toggle.bind(this),
+          // 'gestureName': 'menu',
+          // 'gesturePriority': 30,
+          // 'type': 'pan,press',
+          // 'direction': 'x',
+          // 'threshold': 20,
+          // 'listenOn': 'parent'
+        }
+      }),
+        h('slot')
+      )
+    ];
     // return h(this, [
     //   h('ion-gesture.menu-inner', Ionic.theme(this, 'menu', {
     //       props: {

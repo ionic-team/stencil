@@ -121,29 +121,27 @@ export class Slides {
 
 
   render() {
-    return h(this,
-      h('div', {
-          class: {
-            'swiper-container': true
-          },
-          'data-dir': 'rtl'
+    return h('div', {
+        class: {
+          'swiper-container': true
         },
-        [
-          h('div', {
-              class: {
-                'swiper-wrapper': true
-              }
-            },
-            h('slot')
-          ),
-          h('div', {
+        'data-dir': 'rtl'
+      },
+      [
+        h('div', {
             class: {
-              'swiper-pagination': true,
-              'hide': !this.pager
+              'swiper-wrapper': true
             }
-          })
-        ]
-      )
+          },
+          h('slot')
+        ),
+        h('div', {
+          class: {
+            'swiper-pagination': true,
+            'hide': !this.pager
+          }
+        })
+      ]
     );
   }
 

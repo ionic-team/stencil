@@ -8,10 +8,9 @@ import { Component, h, Ionic } from '../index';
     md: 'card-title.md.scss',
     wp: 'card-title.wp.scss'
   },
-  shadow: false
-})
-export class CardTitle {
-  render() {
-    return h(this, Ionic.theme(this, 'card-title'));
+  shadow: false,
+  host: {
+    class: 'card-title'
   }
-}
+})
+export class CardTitle {}

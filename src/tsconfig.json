@@ -24,10 +24,15 @@
     "sourceMap": false,
     "types": [
       "jest", "node"
-    ]
+    ],
+    "jsx": "react",
+    "jsxFactory": "h"
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "**/*.tsx",
+    "../types/jsx.d.ts",
+    "../types/snabbdom-jsx.d.ts"
   ],
   "exclude": [
     "bindings",

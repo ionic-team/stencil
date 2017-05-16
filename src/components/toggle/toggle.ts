@@ -105,43 +105,41 @@ export class Toggle implements BooleanInputComponent {
 
 
   render() {
-    return h(this,
-      h('ion-gesture', Ionic.theme(this, 'toggle', {
-        class: {
-          'toggle-activated': this.activated,
-          'toggle-checked': this.checked,
-          'toggle-disabled': this.disabled,
-        },
-        props: {
-          'canStart': this.canStart.bind(this),
-          'onStart': this.onDragStart.bind(this),
-          'onMove': this.onDragMove.bind(this),
-          'onEnd': this.onDragEnd.bind(this),
-          'onPress': this.toggle.bind(this),
-          'gestureName': 'toggle',
-          'gesturePriority': 30,
-          'type': 'pan,press',
-          'direction': 'x',
-          'threshold': 20,
-          'attachTo': 'parent'
-        }
-      }),
-        [
-          h('div.toggle-icon',
-            h('div.toggle-inner')
-          ),
-          h('div.toggle-cover', {
-            attrs: {
-              'id': this.id,
-              'aria-checked': this.checked ? 'true' : false,
-              'aria-disabled': this.disabled ? 'true' : false,
-              'aria-labelledby': this.labelId,
-              'role': 'checkbox',
-              'tabindex': 0
-            }
-          })
-        ]
-      )
+    return h('ion-gesture', Ionic.theme(this, 'toggle', {
+      class: {
+        'toggle-activated': this.activated,
+        'toggle-checked': this.checked,
+        'toggle-disabled': this.disabled,
+      },
+      props: {
+        'canStart': this.canStart.bind(this),
+        'onStart': this.onDragStart.bind(this),
+        'onMove': this.onDragMove.bind(this),
+        'onEnd': this.onDragEnd.bind(this),
+        'onPress': this.toggle.bind(this),
+        'gestureName': 'toggle',
+        'gesturePriority': 30,
+        'type': 'pan,press',
+        'direction': 'x',
+        'threshold': 20,
+        'attachTo': 'parent'
+      }
+    }),
+      [
+        h('div.toggle-icon',
+          h('div.toggle-inner')
+        ),
+        h('div.toggle-cover', {
+          attrs: {
+            'id': this.id,
+            'aria-checked': this.checked ? 'true' : false,
+            'aria-disabled': this.disabled ? 'true' : false,
+            'aria-labelledby': this.labelId,
+            'role': 'checkbox',
+            'tabindex': 0
+          }
+        })
+      ]
     );
   }
 

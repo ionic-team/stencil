@@ -218,7 +218,7 @@ export class Button {
     return classList;
   }
 
-  render() {
+  render(vnode) {
     const size =
       (this.large ? 'large' : null) ||
       (this.small ? 'small' : null) ||
@@ -246,8 +246,15 @@ export class Button {
         return prevValue;
       }, {});
 
-    const tagType = this.href ? 'a' : 'button';
+    const TagType = this.href ? 'a' : 'button';
 
+    return (
+      <TagType class={buttonClasses} disabled={this.disabled}>
+        <span class="button-inner"></span>
+        <div class="button-effect"></div>
+      </TagType>
+    );
+/*
     return h(this,
       h(tagType, {
         class: buttonClasses,
@@ -272,5 +279,6 @@ export class Button {
         ]
       )
     );
+*/
   }
 }

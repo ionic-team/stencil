@@ -8,12 +8,13 @@ import { Component, h, Ionic } from '../index';
     md: 'label.md.scss',
     wp: 'label.wp.scss'
   },
-  shadow: false
+  shadow: false,
+  host: {
+    class: 'label'
+  }
 })
 export class Label {
   render() {
-    return h(this, Ionic.theme(this, 'label'),
-      h('slot')
-    );
+    return h('slot');
   }
 }

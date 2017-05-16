@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../index';
+import { Component } from '../index';
 
 
 @Component({
@@ -8,10 +8,9 @@ import { Component, h, Ionic } from '../index';
     md: 'list.md.scss',
     wp: 'list.wp.scss'
   },
-  shadow: false
-})
-export class List {
-  render() {
-    return h(this, Ionic.theme(this, 'list'));
+  shadow: false,
+  host: {
+    class: 'list'
   }
-}
+})
+export class List {}

@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../index';
+import { Component } from '../index';
 
 
 @Component({
@@ -8,10 +8,9 @@ import { Component, h, Ionic } from '../index';
     md: 'badge.md.scss',
     wp: 'badge.wp.scss'
   },
-  shadow: false
-})
-export class Badge {
-  render() {
-    return h(this, Ionic.theme(this, 'badge'));
+  shadow: false,
+  host: {
+    class: 'badge'
   }
-}
+})
+export class Badge {}

@@ -621,16 +621,14 @@ export class Content {
       props['ionScrollEnd'] = this.ionScrollEnd.bind(this);
     }
 
-    return h(this,
-      h('ion-scroll', Ionic.theme(this, 'content', {
-          class: {
-            'statusbar-padding': this.statusbarPadding,
-          },
-          props: props,
-          ref: refElm => this.$scroll = refElm
-        }),
-        h('slot')
-      )
+    return h('ion-scroll', Ionic.theme(this, 'content', {
+        class: {
+          'statusbar-padding': this.statusbarPadding,
+        },
+        props: props,
+        ref: refElm => this.$scroll = refElm
+      }),
+      h('slot')
     );
   }
 

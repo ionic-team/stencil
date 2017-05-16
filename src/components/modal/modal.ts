@@ -124,19 +124,17 @@ export class Modal implements IModal {
       userCssClass += ' ' + this.cssClass;
     }
 
-    return h(this, [
-        h('div.modal-backdrop', {
-          on: {
-            'click': this.backdropClick.bind(this)
-          }
-        }),
-        h('div', Ionic.theme(this, 'modal-wrapper'),
-          h(this.component, Ionic.theme(this, userCssClass, {
-            props: this.componentProps
-          }))
-        ),
-      ]
-    );
+    return [
+      h('div.modal-backdrop', {
+        on: {
+          'click': this.backdropClick.bind(this)
+        }
+      }),
+      h('div', Ionic.theme(this, 'modal-wrapper'),
+        h(this.component, Ionic.theme(this, userCssClass, {
+          props: this.componentProps
+        }))
+      ),
+    ];
   }
-
 }

@@ -13,21 +13,19 @@ import { Component, h, Ionic } from '../index';
 export class Item {
 
   render() {
-    return h(this,
-      h('div.item-block', Ionic.theme(this, 'item'),
-        [
-          h('slot', { attrs: { name: 'start' } }),
-          h('div.item-inner', [
-              h('div.input-wrapper',
-                h('slot')
-              ),
-              h('slot', { attrs: { name: 'end' } }),
-              // h('ion-reorder')
-            ]
-          ),
-          // h('div.button-effect')
-        ]
-      )
+    return h('div.item-block', Ionic.theme(this, 'item'),
+      [
+        h('slot', { attrs: { name: 'start' } }),
+        h('div.item-inner', [
+            h('div.input-wrapper',
+              h('slot')
+            ),
+            h('slot', { attrs: { name: 'end' } }),
+            // h('ion-reorder')
+          ]
+        ),
+        // h('div.button-effect')
+      ]
     );
     // template:
     //   '<ng-content select="[slot="start"],ion-checkbox:not([slot="end"])"></ng-content>' +

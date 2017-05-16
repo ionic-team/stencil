@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../index';
+import { Component, h } from '../index';
 
 
 @Component({
@@ -8,12 +8,13 @@ import { Component, h, Ionic } from '../index';
     md: 'thumbnail.md.scss',
     wp: 'thumbnail.wp.scss'
   },
-  shadow: false
+  shadow: false,
+  host: {
+    class: 'thumbnail'
+  }
 })
 export class Thumbnail {
   render() {
-    return h(this, Ionic.theme(this, 'thumbnail'),
-      h('slot')
-    );
+    return h('slot');
   }
 }

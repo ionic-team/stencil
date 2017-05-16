@@ -235,14 +235,19 @@ export interface ComponentModeData {
   [5]: boolean;
 
   /**
+   * host
+   */
+  [6]: any;
+
+  /**
    * mode name (ios, md, wp)
    */
-  [6]: number;
+  [7]: number;
 
   /**
    * component mode styles
    */
-  [7]: string;
+  [8]: string;
 }
 
 
@@ -293,6 +298,7 @@ export interface ComponentOptions {
   tag: string;
   styleUrls?: string[] | ModeStyles;
   shadow?: boolean;
+  host?: HostMeta;
 }
 
 export interface ModeStyles {
@@ -389,6 +395,7 @@ export interface ComponentMeta {
   states?: StateMeta[];
   modes: ModeMeta[];
   shadow?: boolean;
+  host?: HostMeta;
   namedSlots?: string[];
   obsAttrs?: string[];
   componentModule?: any;
@@ -404,6 +411,9 @@ export interface ModeMeta {
   styleElm?: HTMLElement;
 }
 
+export interface HostMeta {
+    [key: string]: any;
+}
 
 export interface Component {
   ionViewDidLoad?: () => void;

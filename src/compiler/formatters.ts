@@ -55,6 +55,8 @@ export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
 
   const shadow = formatShadow(cmp.shadow);
 
+  const host = formatHost(cmp.host);
+
   const modeCode = formatModeName(modeName);
 
   const styles = formatStyles(mode.styles);
@@ -66,8 +68,9 @@ export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
     `/** ${label}: [3] listeners **/\n${listeners}`,
     `/** ${label}: [4] watchers **/\n${watchers}`,
     `/** ${label}: [5] shadow **/\n${shadow}`,
-    `/** ${label}: [6] modeName **/\n${modeCode}`,
-    `/** ${label}: [7] styles **/\n${styles}`
+    `/** ${label}: [6] host **/\n${host}`,
+    `/** ${label}: [7] modeName **/\n${modeCode}`,
+    `/** ${label}: [8] styles **/\n${styles}`
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
@@ -165,6 +168,9 @@ function formatShadow(val: boolean) {
     '0 /* do not use shadow dom */';
 }
 
+function formatHost(val: any, devMode: boolean) {
+  return JSON.stringify(val, null, devMode ? 2 : null);
+}
 
 export function getModeCode(modeName: string) {
   switch (modeName) {

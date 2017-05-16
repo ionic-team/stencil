@@ -112,6 +112,8 @@ function createTsCompilerConfigs(config: CompilerConfig) {
   tsCompilerOptions.isolatedModules = true;
   tsCompilerOptions.allowSyntheticDefaultImports = true;
   tsCompilerOptions.allowJs = true;
+  tsCompilerOptions.jsx = ts.JsxEmit.React;
+  tsCompilerOptions.jsxFactory = 'h';
 
   tsCompilerOptions.lib = tsCompilerOptions.lib || [];
   if (!tsCompilerOptions.lib.indexOf('lib.dom.d.ts')) {

@@ -47,10 +47,8 @@ import { Component, h, Ionic } from '../index';
 })
 export class ToolbarTitle {
   render() {
-    return h(this, [
-      h('div', Ionic.theme(this, 'toolbar-title'),
-        h('slot')
-      )]
+    return h('div', Ionic.theme(this, 'toolbar-title'),
+      h('slot')
     );
   }
 }
