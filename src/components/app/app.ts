@@ -1,4 +1,4 @@
-import { Component, Ionic } from '../index';
+import { Component, h, Ionic } from '../index';
 
 
 @Component({
@@ -11,10 +11,9 @@ import { Component, Ionic } from '../index';
   shadow: false
 })
 export class App {
-  $el: HTMLElement;
 
-  ionViewDidLoad() {
-    this.$el.classList.add(Ionic.config.get('mode'));
+  render() {
+    return h(this, Ionic.theme(this, 'app'));
   }
 
 }
