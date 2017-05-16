@@ -17,7 +17,7 @@ const DEV_MODE = process.argv.indexOf('dev') > -1;
 const WATCH = process.argv.indexOf('watch') > -1;
 
 const BUNDLES = [
-  { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-title', 'ion-toolbar'] },
+  { components: ['ion-app', 'ion-content', 'ion-navbar', 'ion-page', 'ion-title', 'ion-toolbar'] },
   { components: ['ion-avatar', 'ion-thumbnail'] },
   { components: ['ion-badge'] },
   { components: ['ion-button'] },
