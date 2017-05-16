@@ -569,6 +569,8 @@ export class Content {
       this.scrollToBottom(0);
       this._scrollDownOnLoad = false;
     }
+
+    this.$el.classList.add('content-ready');
   }
 
   /**

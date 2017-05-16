@@ -7,6 +7,10 @@
 
 ion-list {
   display: block;
-  visibility: inherit !important;
+
   contain: content;
+}
+
+ion-list.upgraded {
+  visibility: inherit;
 }

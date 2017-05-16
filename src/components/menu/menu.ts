@@ -6,7 +6,8 @@ import { Component, h, Ionic, Prop } from '../index';
   tag: 'ion-menu',
   styleUrls: {
     'default': 'menu.scss'
-  }
+  },
+  shadow: false
 })
 export class Menu {
   isOpen: boolean = false;

@@ -6,5 +6,8 @@
 
 ion-avatar {
   display: block;
-  visibility: inherit !important;
+}
+
+ion-avatar.upgraded {
+  visibility: inherit;
 }

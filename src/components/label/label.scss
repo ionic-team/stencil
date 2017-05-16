@@ -7,7 +7,6 @@
 ion-label {
   display: block;
   overflow: hidden;
-  visibility: inherit !important;
 
   flex: 1;
 
@@ -16,6 +15,10 @@ ion-label {
   font-size: inherit;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+ion-label.upgraded {
+  visibility: inherit;
 }
 
 .item-input ion-label {

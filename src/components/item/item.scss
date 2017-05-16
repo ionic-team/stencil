@@ -16,8 +16,12 @@
 
 ion-item {
   display: block;
-  visibility: inherit !important;
+
   contain: content;
+}
+
+ion-item.upgraded {
+  visibility: inherit;
 }
 
 

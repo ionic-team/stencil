@@ -6,5 +6,8 @@
 
 ion-thumbnail {
   display: block;
-  visibility: inherit !important;
+}
+
+ion-thumbnail.upgraded {
+  visibility: inherit;
 }

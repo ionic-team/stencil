@@ -6,12 +6,15 @@
 
 ion-title {
   display: flex;
-  visibility: inherit !important;
 
   flex: 1;
   align-items: center;
 
   transform: translateZ(0);
+}
+
+ion-title.upgraded {
+  visibility: inherit;
 }
 
 .toolbar-title {
