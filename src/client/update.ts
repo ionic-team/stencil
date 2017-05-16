@@ -109,6 +109,10 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
 
       // we're good here, let's just remove this guy now
       delete topLoadingElm.$awaitLoads;
+
+    } else {
+      // never found a top loading component, so let's just load this one
+      elm.$initLoadComponent();
     }
   }
 }
@@ -147,14 +151,13 @@ export function initLoadComponent(plt: PlatformApi, listeners: ListenMeta[], elm
 
 
 export function getLoadingParentComponent(elm: ProxyElement) {
-  let parentElm: ProxyElement = getParentElement(elm);
-  while (parentElm) {
-    if (parentElm.$awaitLoads) {
-      return parentElm;
+  while (elm) {
+    if (elm.$awaitLoads) {
+      return elm;
     }
 
     // just keep swimming
-    parentElm = getParentElement(parentElm);
+    elm = getParentElement(elm);
   }
 
   return null;
