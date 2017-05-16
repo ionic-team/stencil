@@ -1,24 +1,21 @@
 import { attributeChangedCallback } from './attribute-changed';
-import { ConfigApi, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
+import { ConfigApi, LoadComponents, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { queueUpdate } from './update';
+import { initLoadComponent, queueUpdate } from './update';
 
 
-export function registerComponentsES5(window: Window, renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
+export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
 
-  Object.keys(components || {}).forEach(tag => {
-    const cmpMeta = plt.registerComponent(tag, components[tag]);
-
-
-    function ProxyElement(self: any) {
+  plt.registerComponents(components).forEach(cmpMeta => {
+    function ProxyHTMLElement(self: any) {
       return HTMLElement.call(this, self);
     }
 
-    ProxyElement.prototype = Object.create(
+    ProxyHTMLElement.prototype = Object.create(
       HTMLElement.prototype,
       {
-        constructor: { value: ProxyElement, configurable: true },
+        constructor: { value: ProxyHTMLElement, configurable: true },
 
         connectedCallback: { configurable: true, value:
           function() {
@@ -34,21 +31,28 @@ export function registerComponentsES5(window: Window, renderer: RendererApi, plt
 
         disconnectedCallback: { configurable: true, value:
           function() {
-            disconnectedCallback(this);
+            disconnectedCallback(plt, this);
           }
         },
 
         $queueUpdate: { configurable: true, value:
           function() {
-            queueUpdate(plt, config, renderer, this, tag);
+            queueUpdate(plt, config, renderer, this, cmpMeta.tag);
+          }
+        },
+
+        $initLoadComponent: { configurable: true, value:
+          function() {
+            initLoadComponent(plt, cmpMeta.listeners, this, (<ProxyElement>this).$instance);
           }
         }
 
       }
     );
 
-    (<any>ProxyElement).observedAttributes = cmpMeta.obsAttrs;
+    (<any>ProxyHTMLElement).observedAttributes = cmpMeta.obsAttrs;
 
-    window.customElements.define(tag, ProxyElement);
+    plt.defineComponent(cmpMeta.tag, ProxyHTMLElement);
   });
+
 }

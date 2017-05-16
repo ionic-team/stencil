@@ -1,5 +1,5 @@
 import { Component, ComponentMeta, ComponentRegistry,
-  IonicGlobal, QueueApi, PlatformApi } from '../util/interfaces';
+  IonicGlobal, LoadComponents, QueueApi, PlatformApi } from '../util/interfaces';
 import { h } from './renderer/h';
 import { initInjectedIonic } from './ionic-client';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
@@ -218,38 +218,49 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   }
 
 
-  function registerComponent(tag: string, data: any[]) {
-    // data[0] = all of the mode and bundle maps
-    // data[1] = properties
-    // data[2] = bundle priority
-    const modeBundleIds = data[0];
+  function registerComponents(components: LoadComponents) {
 
-    const cmpMeta: ComponentMeta = registry[tag] = {
-      tag: tag,
-      modes: [],
-      props: parseProp(data[1]),
-      obsAttrs: []
-    };
+    return Object.keys(components || {}).map(tag => {
+      const data = components[tag];
 
-    if (data[2] === 0) {
-      // priority
-      cmpMeta.priority = 'low';
-    }
+      // data[0] = all of the mode and bundle maps
+      // data[1] = properties
+      // data[2] = bundle priority
+      const modeBundleIds = data[0];
 
-    const keys = Object.keys(modeBundleIds);
-    for (var i = 0; i < keys.length; i++) {
-      cmpMeta.modes.push({
-        modeName: parseModeName(keys[i].toString()),
-        bundleId: modeBundleIds[keys[i]]
-      });
-    }
+      const cmpMeta: ComponentMeta = registry[tag] = {
+        tag: tag,
+        modes: [],
+        props: parseProp(data[1]),
+        obsAttrs: []
+      };
 
-    for (i = 0; i < cmpMeta.props.length; i++) {
-      cmpMeta.obsAttrs.push(toDashCase(cmpMeta.props[i].propName));
-    }
+      if (data[2] === 0) {
+        // priority
+        cmpMeta.priority = 'low';
+      }
 
-    return cmpMeta;
+      const keys = Object.keys(modeBundleIds);
+      for (var i = 0; i < keys.length; i++) {
+        cmpMeta.modes.push({
+          modeName: parseModeName(keys[i].toString()),
+          bundleId: modeBundleIds[keys[i]]
+        });
+      }
+
+      for (i = 0; i < cmpMeta.props.length; i++) {
+        cmpMeta.obsAttrs.push(toDashCase(cmpMeta.props[i].propName));
+      }
+
+      return cmpMeta;
+    });
   }
+
+
+  function defineComponent(tag: string, constructor: Function) {
+    win.customElements.define(tag, constructor);
+  }
+
 
   function getComponentMeta(tag: string) {
     return registry[tag];
@@ -321,7 +332,8 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
 
   return {
-    registerComponent: registerComponent,
+    registerComponents: registerComponents,
+    defineComponent: defineComponent,
     getComponentMeta: getComponentMeta,
     loadBundle: loadBundle,
 
@@ -343,7 +355,9 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachComponent: attachComponent
+    $attachComponent: attachComponent,
+
+    $tmpDisconnected: false
   };
 }
 

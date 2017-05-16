@@ -19,4 +19,4 @@ IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, detectPlatforms(window.l
 
 const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
 
-registerComponentsES5(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);
+registerComponentsES5(Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

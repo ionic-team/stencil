@@ -10,7 +10,7 @@
 
 /* global module, document, Node */
 import { isArray, isDef, isUndef, isString, isStringOrNumber } from '../../util/helpers';
-import { HostContentNodes, PlatformApi, ProxyElement, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
+import { HostContentNodes, PlatformApi, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
 import { vnode } from './vnode';
 
 import { updateAttrs } from './modules/attributes';
@@ -94,7 +94,7 @@ export function Renderer(api: PlatformApi): RendererApi {
       if (slotNodes) {
         for (let nodeIndex = 0; nodeIndex < slotNodes.length; nodeIndex++) {
           // remove the host content node from it's original parent node
-          (<ProxyElement>slotNodes[nodeIndex]).$tmpDisconnected = true;
+          api.$tmpDisconnected = true;
           api.$removeChild(slotNodes[nodeIndex].parentNode, slotNodes[nodeIndex]);
 
           if (nodeIndex === slotNodes.length - 1) {
@@ -105,7 +105,7 @@ export function Renderer(api: PlatformApi): RendererApi {
 
           // relocate the node to it's new home
           api.$appendChild(parentElm, slotNodes[nodeIndex]);
-          delete (<ProxyElement>slotNodes[nodeIndex]).$tmpDisconnect;
+          api.$tmpDisconnected = false;
         }
       }
 
@@ -136,7 +136,7 @@ export function Renderer(api: PlatformApi): RendererApi {
             ch = <any>createElm(ch as VNode, insertedVnodeQueue, elm, hostContentNodes);
             if (ch) {
               api.$appendChild(elm, <any>ch);
-              delete (<any>ch).$tmpDisconnect;
+              api.$tmpDisconnected = false;
             }
           }
         }
@@ -169,7 +169,7 @@ export function Renderer(api: PlatformApi): RendererApi {
       if (vnodeChild != null) {
         newElm = createElm(vnodeChild, insertedVnodeQueue, parentElm, hostContentNodes);
         api.$insertBefore(parentElm, newElm, before);
-        delete (<ProxyElement>newElm).$tmpDisconnect;
+        api.$tmpDisconnected = false;
       }
     }
   }

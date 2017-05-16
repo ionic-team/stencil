@@ -469,14 +469,17 @@ export interface ProxyElement extends HTMLElement {
   connectedCallback: () => void;
   attributeChangedCallback: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback: () => void;
-  $queueUpdate: () => void;
 
+  $queueUpdate: () => void;
+  $initLoadComponent: () => void;
   $queued?: boolean;
   $instance?: Component;
   $hostContent?: HostContentNodes;
-  $tmpDisconnected?: boolean;
-
-  [memberName: string]: any;
+  $isLoaded?: boolean;
+  $hasConnected?: boolean;
+  $hasRendered?: boolean;
+  $awaitLoads?: ProxyElement[];
+  $depth?: number;
 }
 
 
@@ -537,7 +540,8 @@ export interface VNodeData {
 
 
 export interface PlatformApi {
-  registerComponent: (tag: string, data: any[]) => ComponentMeta;
+  registerComponents: (components: LoadComponents) => ComponentMeta[];
+  defineComponent: (tag: string, constructor: Function) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
   loadBundle: (bundleId: string, priority: string, cb: Function) => void;
   queue: QueueApi;
@@ -560,6 +564,7 @@ export interface PlatformApi {
   $getTextContent: (node: Node) => string | null;
   $getAttribute: (elm: Element, attrName: string) => string;
   $attachComponent: (elm: Element, cmpMeta: ComponentMeta, instance: Component) => void;
+  $tmpDisconnected: boolean;
 }
 
 

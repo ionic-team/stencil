@@ -1,5 +1,5 @@
 import { ComponentMeta, Component, ComponentModeData, ComponentRegistry, ConfigApi,
-  DomControllerApi, IonicGlobal, PlatformApi } from '../util/interfaces';
+  DomControllerApi, IonicGlobal, LoadComponents, PlatformApi } from '../util/interfaces';
 import { h } from '../client/renderer/h';
 import { initInjectedIonic } from './ionic-server';
 import { parseComponentModeData } from '../util/data-parse';
@@ -34,7 +34,7 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
       var tag = cmpModeData[0];
       console.log(`load tag: ${tag}, bundleId: ${bundleId}, coreVersion: ${coreVersion}`);
 
-      registerComponent(tag, []);
+      // registerComponents(tag, []);
     }
   };
 
@@ -53,22 +53,14 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
     return shadowElm;
   }
 
-  function registerComponent(tag: string, data: any[]) {
-    let cmpMeta: ComponentMeta = registry[tag];
-    if (cmpMeta) {
-      return cmpMeta;
-    }
+  function registerComponents(components: LoadComponents): ComponentMeta[] {
+    components;
 
-    const props = data[1] || {};
+    return [];
+  }
 
-    cmpMeta = registry[tag] = { modes: [] };
-    cmpMeta.tag = tag;
-    cmpMeta.props = props;
-
-    props.color = {};
-    props.mode = {};
-
-    return cmpMeta;
+  function defineComponent(tag: string, constructor: Function) {
+    console.log('defineComponent', tag, constructor);
   }
 
   function getComponentMeta(tag: string) {
@@ -170,7 +162,8 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
 
 
   return {
-    registerComponent: registerComponent,
+    registerComponents: registerComponents,
+    defineComponent: defineComponent,
     getComponentMeta: getComponentMeta,
     loadBundle: loadComponent,
 
@@ -192,7 +185,9 @@ export function PlatformServer(IonicGbl: IonicGlobal, ConfigCtrl: ConfigApi, Dom
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachComponent: attachComponent
+    $attachComponent: attachComponent,
+
+    $tmpDisconnected: false
   };
 }
 

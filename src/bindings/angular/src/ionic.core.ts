@@ -8,4 +8,4 @@ const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
 const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
 
-registerComponents(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);
+registerComponents(Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

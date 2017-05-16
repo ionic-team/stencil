@@ -1,39 +1,41 @@
 import { attributeChangedCallback } from './attribute-changed';
-import { ConfigApi, LoadComponents, PlatformApi, RendererApi } from '../util/interfaces';
+import { ConfigApi, LoadComponents, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { queueUpdate } from './update';
+import { initLoadComponent, queueUpdate } from './update';
 
 
-export function registerComponents(window: any, renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
+export function registerComponents(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
 
-  Object.keys(components || {}).forEach(tag => {
-    const cmpMeta = plt.registerComponent(tag, components[tag]);
-
+  plt.registerComponents(components).forEach(cmpMeta => {
     // closure doesn't support outputting es6 classes (yet)
     // build step does some closure tricks by changing this class
     // to just a function for compiling, then changing it back to a class
-    class ProxyElement extends HTMLElement {}
+    class ProxyHTMLElement extends HTMLElement {}
 
-    (<any>ProxyElement).prototype.connectedCallback = function() {
+    (<any>ProxyHTMLElement).prototype.connectedCallback = function() {
       connectedCallback(plt, config, renderer, this, cmpMeta);
     };
 
-    (<any>ProxyElement).prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string) {
+    (<any>ProxyHTMLElement).prototype.attributeChangedCallback = function(attrName: string, oldVal: string, newVal: string) {
       attributeChangedCallback(this, cmpMeta, attrName, oldVal, newVal);
     };
 
-    (<any>ProxyElement).prototype.disconnectedCallback = function() {
-      disconnectedCallback(this);
+    (<any>ProxyHTMLElement).prototype.disconnectedCallback = function() {
+      disconnectedCallback(plt, this);
     };
 
-    (<any>ProxyElement).prototype.$queueUpdate = function() {
-      queueUpdate(plt, config, renderer, this, tag);
+    (<any>ProxyHTMLElement).prototype.$queueUpdate = function() {
+      queueUpdate(plt, config, renderer, this, cmpMeta.tag);
     };
 
-    (<any>ProxyElement).observedAttributes = cmpMeta.obsAttrs;
+    (<any>ProxyHTMLElement).prototype.$initLoadComponent = function() {
+      initLoadComponent(plt, cmpMeta.listeners, this, (<ProxyElement>this).$instance);
+    };
 
-    window.customElements.define(tag, ProxyElement);
+    (<any>ProxyHTMLElement).observedAttributes = cmpMeta.obsAttrs;
+
+    plt.defineComponent(cmpMeta.tag, ProxyHTMLElement);
   });
 
 }
