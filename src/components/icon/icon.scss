@@ -1,5 +1,7 @@
 @import "../../themes/ionic.globals";
 
+@import "../../fonts/ionicons";
+
 // Icon
 // --------------------------------------------------
 
@@ -10,11 +12,6 @@ ion-icon {
   display: inline-block;
 
   font-size: 1.2em;
-
-  // TODO remove
-  background-color: red;
-  height: 4px;
-  width: 4px;
 }
 
 ion-icon[small] {

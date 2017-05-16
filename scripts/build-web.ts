@@ -47,6 +47,7 @@ import * as ncp from 'ncp';
 const compiler = require(path.join(__dirname, '../compiler'));
 
 const srcDir = path.join(__dirname, '../../src');
+const distDir = path.join(__dirname, '../../dist');
 const transpiledSrcDir = path.join(__dirname, '../transpiled-web/bindings/web/src');
 const compiledDir = path.join(__dirname, '../compiled-ionic-web');
 const destDir = path.join(__dirname, '../ionic-web');
@@ -54,6 +55,16 @@ const destDir = path.join(__dirname, '../ionic-web');
 // first clean out the ionic-web directories
 fs.emptyDirSync(destDir);
 fs.emptyDirSync(compiledDir);
+
+// copy fonts directory from ionicons to dist
+const ioniconsFontsDir = path.join(__dirname, '../../node_modules/ionicons/dist/fonts');
+const fontsDistDir = path.join(distDir, 'fonts');
+
+copyDirectory(ioniconsFontsDir, fontsDistDir)
+.then(() => {
+  console.log('build-web core, copy fonts directory from:', ioniconsFontsDir);
+  console.log('build-web core, copy fonts directory to:', fontsDistDir);
+})
 
 // copy vendor JS directory to the compiled ionic-angular location
 const vendorJsScript = path.join(srcDir, 'vendor');
@@ -222,9 +233,9 @@ function copyAnimation() {
 }
 
 
-export function copyDirectory(source: string, destionation: string): Promise<any> {
+export function copyDirectory(source: string, destination: string): Promise<any> {
   return new Promise((resolve, reject) => {
-    ncp.ncp(source, destionation, { clobber: true }, (err: Error) => {
+    ncp.ncp(source, destination, { clobber: true }, (err: Error) => {
       if (err) {
         reject(err);
       }

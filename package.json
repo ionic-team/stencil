@@ -67,5 +67,8 @@
       "^.+\\.(ts)$": "<rootDir>/scripts/jest.preprocessor.js"
     },
     "testRegex": "/src/.*\\.spec\\.(ts|js)$"
+  },
+  "dependencies": {
+    "ionicons": "3.0.0"
   }
 }
