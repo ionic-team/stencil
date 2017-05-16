@@ -148,19 +148,62 @@ export function initLoadComponent(plt: PlatformApi, listeners: ListenMeta[], elm
 
 export function getLoadingParentComponent(elm: ProxyElement) {
   let parentElm: ProxyElement = getParentElement(elm);
+  while (parentElm) {
+    if (parentElm.$awaitLoads) {
+      return parentElm;
+    }
+
+    // just keep swimming
+    parentElm = getParentElement(parentElm);
+  }
+
+  return null;
+}
+
+
+export function addToLoadingParentComponent(plt: PlatformApi, elm: ProxyElement) {
+  let parentElm: ProxyElement = getParentElement(elm);
+  let topProxyElm: ProxyElement = elm;
   let depth = 1;
 
   while (parentElm) {
     if (parentElm.$isLoaded) {
+      // we hit an ancestor who's already loaded
+      // so this component and anything above it couldn't be loading
       break;
     }
+
     if (parentElm.$awaitLoads) {
-      elm.$depth = depth;
-      return parentElm;
+      // we found a ancestor element that is already collecting elements
+      // as the top level loading component
+      topProxyElm = parentElm;
+      break;
     }
+
+    if (plt.getComponentMeta(parentElm.tagName.toLowerCase())) {
+      // this ancestor element is a known component
+      // let's remember this for later incase this
+      // ends up being the component to use
+      topProxyElm = parentElm;
+    }
+
+    // keep climbing up the tree
     parentElm = getParentElement(parentElm);
     depth++;
   }
 
-  return null;
+  if (topProxyElm.$awaitLoads) {
+    // we already have an array collecting child elements
+    // add this element to it's collection of elements we're waiting on
+    elm.$depth = depth;
+    topProxyElm.$awaitLoads.push(elm);
+
+  } else {
+    // this is the top level component that is not a child
+    // of another component which is loading
+    // create a collection of child components which we
+    // should be tracking while they're all loading
+    topProxyElm.$awaitLoads = [elm];
+    topProxyElm.$depth = 0;
+  }
 }

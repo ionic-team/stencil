@@ -1,5 +1,5 @@
 import { ComponentMeta, ConfigApi, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
-import { getLoadingParentComponent, queueUpdate } from './update';
+import { addToLoadingParentComponent, queueUpdate } from './update';
 import { isDef } from '../util/helpers';
 
 
@@ -10,20 +10,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
     elm.$hasConnected = true;
 
     // see if one of the parent components is still actively loading
-    const topLoadingElm = getLoadingParentComponent(elm);
-    if (topLoadingElm) {
-      // we found a ancestor element that is the top level loading component
-      // add this element to it's collection of elements we're waiting on
-      topLoadingElm.$awaitLoads.push(elm);
-
-    } else {
-      // this is the top level component that is not a child
-      // of another component which is loading
-      // create a collection of child components which we
-      // should be tracking while they're all loading
-      elm.$awaitLoads = [elm];
-      elm.$depth = 0;
-    }
+    addToLoadingParentComponent(plt, elm);
 
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can
