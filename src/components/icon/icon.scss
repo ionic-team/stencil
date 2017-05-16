@@ -1,0 +1,24 @@
+@import "../../themes/ionic.globals";
+
+// Icon
+// --------------------------------------------------
+
+
+ion-icon {
+  visibility: inherit !important;
+
+  display: inline-block;
+
+  font-size: 1.2em;
+
+  // TODO remove
+  background-color: red;
+  height: 4px;
+  width: 4px;
+}
+
+ion-icon[small] {
+  min-height: 1.1em;
+
+  font-size: 1.1em;
+}
