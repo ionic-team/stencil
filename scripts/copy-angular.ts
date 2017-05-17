@@ -11,15 +11,6 @@ const destDir = path.join(__dirname, '../../../ionic');
 const destComponents = path.join(destDir, 'src/components');
 const destThemes = path.join(destDir, 'src/themes');
 const destUtil = path.join(destDir, 'src/util');
-const componentsToCopy = [
-  'badge',
-  'card',
-  'card-content',
-  'card-header',
-  'card-title',
-  'slides',
-  'toggle'
-];
 
 console.log(`copy to ionic-angular, from`, srcDir, `to`, destDir);
 
@@ -36,9 +27,6 @@ fs.copySync('src/vendor', path.join(destDir, 'src/vendor'));
 BUNDLES.forEach(b => {
   b.components.forEach(tag => {
     const folderName = tag.replace('ion-', '');
-    if (componentsToCopy.indexOf(folderName) === -1) {
-      return;
-    }
     const srcDir = path.join(srcComponents, folderName);
     const destDir = path.join(destComponents, folderName);
     try {
