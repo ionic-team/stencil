@@ -94,7 +94,6 @@ export class Icon {
       iconName += '-outline';
     }
 
-    // TODO add label attribute
     let label = iconName
       .replace('ios-', '')
       .replace('md-', '')
