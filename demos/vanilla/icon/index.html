@@ -34,44 +34,44 @@
         <ion-list>
 
           <ion-item>
-            <ion-icon name="home" [color]="dynamicColor" slot="start"></ion-icon>
+            <ion-icon id="dynamicColor" name="home" slot="start"></ion-icon>
             <code>
-              name="home"
+              dynamicColor name="home"
             </code>
           </ion-item>
 
           <ion-item>
-            <ion-icon name="home" isActive="true" slot="start"></ion-icon>
+            <ion-icon name="home" is-active="true" slot="start"></ion-icon>
             <code>
-              name="home" isActive="true"
+              name="home" is-active="true"
             </code>
           </ion-item>
 
           <ion-item>
-            <ion-icon id="dynamicProp" isActive="false" slot="start"></ion-icon>
+            <ion-icon id="dynamicProp" is-active="false" slot="start"></ion-icon>
             <code>
-              dynamicProp isActive="false"
+              dynamicProp is-active="false"
             </code>
           </ion-item>
 
           <ion-item>
-            <ion-icon id="dynamicAttr" isActive="false" slot="start"></ion-icon>
+            <ion-icon id="dynamicAttr" is-active="false" slot="start"></ion-icon>
             <code>
-              dynamicAttr isActive="false"
+              dynamicAttr is-active="false"
             </code>
           </ion-item>
 
           <ion-item>
-            <ion-icon name="md-home" isActive="true" slot="start"></ion-icon>
+            <ion-icon name="md-home" is-active="true" slot="start"></ion-icon>
             <code>
-              name="md-home" isActive="true"
+              name="md-home" is-active="true"
             </code>
           </ion-item>
 
           <ion-item>
-            <ion-icon name="ios-home" isActive="true" slot="start"></ion-icon>
+            <ion-icon name="ios-home" is-active="true" slot="start"></ion-icon>
             <code>
-              name="ios-home" isActive="true"
+              name="ios-home" is-active="true"
             </code>
           </ion-item>
 
@@ -90,9 +90,9 @@
           </ion-item>
 
           <ion-item>
-            <ion-icon name="ios-home-outline" isActive="false" slot="start"></ion-icon>
+            <ion-icon name="ios-home-outline" is-active="false" slot="start"></ion-icon>
             <code>
-              name="ios-home-outline" isActive="false"
+              name="ios-home-outline" is-active="false"
             </code>
           </ion-item>
 
@@ -125,9 +125,9 @@
           </ion-item>
 
           <ion-item>
-            <ion-icon ios="md-color-filter" md="ios-color-filter" isActive="false" slot="start"></ion-icon>
+            <ion-icon ios="md-color-filter" md="ios-color-filter" is-active="false" slot="start"></ion-icon>
             <code>
-              ios="md-color-filter" md="ios-color-filter" isActive="false"
+              ios="md-color-filter" md="ios-color-filter" is-active="false"
             </code>
           </ion-item>
 
@@ -148,8 +148,11 @@
         </ion-list>
 
         <script>
+          var dynamicColor = document.getElementById('dynamicColor');
           var dynamicProp = document.getElementById('dynamicProp');
           var dynamicAttr = document.getElementById('dynamicAttr');
+
+          dynamicColor.setAttribute('color', 'danger');
 
           let interval = setInterval(function () {
             if (dynamicProp.name === 'home') {

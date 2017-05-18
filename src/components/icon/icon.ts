@@ -45,18 +45,13 @@ export class Icon {
    * An active icon is filled in, and an inactive icon is the outline of the icon.
    * The `isActive` property is largely used by the tabbar. Only affects `ios` icons.
    */
-  @Prop() isActive: boolean = false;
+  @Prop() isActive: boolean = null;
 
   /**
    * @input {boolean} If true, the icon is hidden.
    */
   @Prop() hidden: boolean = false;
 
-
-  constructor() {
-    // TODO set the right iconMode based on the platform
-    this.iconMode = this.mode || Ionic.config.get('iconMode', 'ios');
-  }
 
   getElementClassList() {
     let iconName: string;
@@ -88,7 +83,7 @@ export class Icon {
     let iconMode = iconName.split('-', 2)[0];
     if (
       iconMode === 'ios' &&
-      !this.isActive &&
+      this.isActive === false &&
       iconName.indexOf('logo-') < 0 &&
       iconName.indexOf('-outline') < 0) {
       iconName += '-outline';
@@ -104,6 +99,10 @@ export class Icon {
   }
 
   render() {
+    // TODO set the right iconMode based on the config
+    let iconMode = this.mode === 'md' ? 'md' : 'ios';
+    this.iconMode = iconMode || Ionic.config.get('iconMode');
+
     const iconClasses: CssClassObject = []
        .concat(
         this.getElementClassList(),
