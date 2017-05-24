@@ -17,17 +17,12 @@ import { Component, h } from '../index';
   styleUrls: {
     default: 'slide.scss',
   },
-  shadow: false
-})
-export class Slide {
-  $el: HTMLElement;
-
-  render() {
-    return h(this, {
-      class: {
-        'slide-zoom': true,
-        'swiper-slide': true
-      }
-    });
+  shadow: false,
+  host: {
+    class: {
+      'slide-zoom': true,
+      'swiper-slide': true
+    }
   }
-}
+})
+export class Slide {}

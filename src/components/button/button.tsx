@@ -1,5 +1,5 @@
 import { Component, h, Prop } from '../index';
-type CssClassObject = { [className: string]: boolean };
+import { CssClassObject } from '../../util/interfaces';
 
 /**
   * @name Button
@@ -218,7 +218,7 @@ export class Button {
     return classList;
   }
 
-  render(vnode) {
+  render() {
     const size =
       (this.large ? 'large' : null) ||
       (this.small ? 'small' : null) ||
@@ -250,10 +250,11 @@ export class Button {
 
     return (
       <TagType class={buttonClasses} disabled={this.disabled}>
-        <span class="button-inner"></span>
-        <div class="button-effect"></div>
+        <span class='button-inner'></span>
+        <div class='button-effect'></div>
       </TagType>
     );
+
 /*
     return h(this,
       h(tagType, {

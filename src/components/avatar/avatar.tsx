@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../index';
+import { Component, h } from '../index';
 
 
 @Component({
@@ -15,6 +15,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class Avatar {
   render() {
-    return h('slot');
+    return <slot></slot>;
   }
 }

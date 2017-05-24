@@ -35,7 +35,7 @@ export function formatBundleContent(coreVersion: number, bundleId: string, bundl
 }
 
 
-export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
+export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta, devMode: boolean) {
   const tag = cmp.tag;
 
   const modeName = (mode.modeName ? mode.modeName : '');
@@ -55,7 +55,7 @@ export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
 
   const shadow = formatShadow(cmp.shadow);
 
-  const host = formatHost(cmp.host);
+  const host = formatHost(cmp.host, devMode);
 
   const modeCode = formatModeName(modeName);
 

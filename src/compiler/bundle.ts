@@ -215,7 +215,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
     ctx.bundles.forEach(bundle => {
 
       const componentModeLoaders = bundle.components.map(bundleComponent => {
-        return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode);
+        return formatComponentModeLoader(bundleComponent.component, bundleComponent.mode, config.devMode);
       }).join(',\n');
 
       bundle.bundledJsModules = ctx.bundledJsModules[getBundledModulesId(bundle)];

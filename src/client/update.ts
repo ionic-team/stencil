@@ -3,8 +3,9 @@ import { collectedHostContentNodes } from './host';
 import { ConfigApi, PlatformApi, ProxyElement } from '../util/interfaces';
 import { initProxy } from './proxy';
 import { RendererApi } from '../util/interfaces';
-import { h, Ionic } from '../index';
+import { h } from './renderer/h';
 import { themeVNodeData } from './host';
+import { VNodeData } from '../util/interfaces';
 
 
 export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string) {
@@ -57,9 +58,16 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
   }
 
   // On render then take the top level elm and replace with the instance $vnode
-  const vnodeAttributes = Object.keys(cmpMeta.host).map(hostItem => {
+  const vnodeAttributes = Object.keys(cmpMeta.host).reduce((hostData: VNodeData, key: string) => {
+    switch (key) {
+    case 'class':
+      return themeVNodeData(instance, cmpMeta.host[key], hostData);
+    default:
+      hostData[key] = cmpMeta.host[key];
+      return hostData;
+    }
+  }, <VNodeData>{});
 
-  });
   const vnode = h(elm, vnodeAttributes, instance.render && instance.render());
   instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode, elm.$hostContent);
 

@@ -531,11 +531,12 @@ export interface HostContentNodes {
   $namedSlots?: {[slotName: string]: Node[]};
 }
 
+export type CssClassObject = { [className: string]: boolean };
 
 export interface VNodeData {
   props?: any;
   attrs?: any;
-  class?: any;
+  class?: CssClassObject;
   style?: any;
   dataset?: any;
   on?: any;
