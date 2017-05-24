@@ -46,6 +46,10 @@ ion-modal.hydrated {
   }
 }
 
+.modal-backdrop.hide-backdrop {
+  visibility: hidden;
+}
+
 .modal-wrapper {
   z-index: 10;
 

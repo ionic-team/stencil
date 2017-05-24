@@ -6,7 +6,7 @@ import { IonicGlobal, ModalEvent, ModalOptions, Modal, OverlayApi } from '../../
   tag: 'ion-modal-controller',
   styleUrls: {
     // modes all sharing the same scss on purpose
-    // this allows ion-modal-viewport and ion-modal
+    // this allows ion-modal-controller and ion-modal
     // components to be bundled in the same file/request
     ios: 'modal-controller.scss',
     md: 'modal-controller.scss',

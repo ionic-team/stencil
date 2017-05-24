@@ -1,5 +1,5 @@
 import { Component, h, Ionic, Listen, Prop } from '../index';
-import { AnimationBuilder, Animation, Modal as IModal } from '../../util/interfaces';
+import { AnimationBuilder, Animation, Modal as IModal, ModalEvent } from '../../util/interfaces';
 
 import iOSEnterAnimation from './animations/ios.enter';
 import iOSLeaveAnimation from './animations/ios.leave';
@@ -36,7 +36,7 @@ export class Modal implements IModal {
   }
 
   ionViewDidLoad() {
-    Ionic.emit(this, 'ionModalDidLoad', { detail: { modal: this } });
+    Ionic.emit(this, 'ionModalDidLoad', <ModalEvent>{ detail: { modal: this } });
   }
 
   present() {
@@ -51,7 +51,7 @@ export class Modal implements IModal {
       this.animation = null;
     }
 
-    Ionic.emit(this, 'ionModalWillPresent', { detail: { modal: this } });
+    Ionic.emit(this, 'ionModalWillPresent', <ModalEvent>{ detail: { modal: this } });
 
     // get the user's animation fn if one was provided
     let animationBuilder = this.enterAnimation;
@@ -68,7 +68,7 @@ export class Modal implements IModal {
 
     this.animation.onFinish(a => {
       a.destroy();
-      Ionic.emit(this, 'ionModalDidPresent', { detail: { modal: this } });
+      Ionic.emit(this, 'ionModalDidPresent', <ModalEvent>{ detail: { modal: this } });
       resolve();
     }).play();
   }
@@ -80,7 +80,7 @@ export class Modal implements IModal {
     }
 
     return new Promise<void>(resolve => {
-      Ionic.emit(this, 'ionModalWillDismiss', { detail: { modal: this } });
+      Ionic.emit(this, 'ionModalWillDismiss', <ModalEvent>{ detail: { modal: this } });
 
       // get the user's animation fn if one was provided
       let animationBuilder = this.exitAnimation;
@@ -96,7 +96,7 @@ export class Modal implements IModal {
       this.animation = animationBuilder(this.$el);
       this.animation.onFinish(a => {
         a.destroy();
-        Ionic.emit(this, 'ionModalDidDismiss', { detail: { modal: this } });
+        Ionic.emit(this, 'ionModalDidDismiss', <ModalEvent>{ detail: { modal: this } });
         Ionic.dom.write(() => {
           this.$el.parentNode.removeChild(this.$el);
         });
@@ -106,7 +106,7 @@ export class Modal implements IModal {
   }
 
   ionViewDidUnload() {
-    Ionic.emit(this, 'ionModalDidUnload', { detail: { modal: this } });
+    Ionic.emit(this, 'ionModalDidUnload', <ModalEvent>{ detail: { modal: this } });
   }
 
   backdropClick() {
@@ -124,15 +124,19 @@ export class Modal implements IModal {
       userCssClass += ' ' + this.cssClass;
     }
 
-    return h(this, [
+    return h(this,
+      [
         h('div.modal-backdrop', {
+          class: {
+            'hide-backdrop': !this.showBackdrop
+          },
           on: {
             'click': this.backdropClick.bind(this)
           }
         }),
-        h('div', Ionic.theme(this, 'modal-wrapper'),
+        h('div', Ionic.theme(this, 'modal-wrapper', { attrs: { role: 'dialog' } }),
           h(this.component, Ionic.theme(this, userCssClass, {
-            props: this.componentProps
+            props: this.componentProps,
           }))
         ),
       ]
