@@ -430,7 +430,6 @@ export interface ModeMeta {
   bundleId?: string;
   styles?: string;
   styleUrls?: string[];
-  styleElm?: HTMLElement;
 }
 
 

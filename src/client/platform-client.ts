@@ -128,30 +128,21 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     const cmpMode = cmpMeta.modes[instance.mode] || cmpMeta.modes['default'];
 
     if (cmpMode && cmpMode.styles) {
-      // this component mode has styles
-      let cmpStyles = cmpMode.styles;
+      // cool, we found the mode for this component
+      // and this mode has styles :)
 
       if (cmpMeta.shadow && hasNativeShadowDom) {
         // this component uses the shadow dom
         // and this browser supports the shadow dom natively
-        if (!cmpMode.styleElm) {
-          // we're doing this so the browser only needs to parse
-          // the HTML once, and can clone it every time after that
-          cmpMode.styleElm = createElement('style');
-          cmpMode.styleElm.innerHTML = cmpStyles;
-        }
-
         // attach our styles to the root
-        instance.$root.appendChild(cmpMode.styleElm.cloneNode(true));
+        const styleElm = createElement('style');
+        styleElm.innerHTML = cmpMode.styles;
+        instance.$root.appendChild(styleElm);
 
       } else {
         // this component does not use the shadow dom
         // or this browser does not support shadow dom
         const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
-
-        // remove any :host and :host-context stuff which is
-        // invalid css for browsers that don't support shadow dom
-        cmpStyles = cmpStyles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
 
         // climb up the ancestors looking to see if this element
         // is within another component with a shadow root
@@ -173,11 +164,11 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
               styleElm = hostRoot.querySelector('style');
               if (styleElm) {
-                styleElm.innerHTML = cmpStyles + styleElm.innerHTML;
+                styleElm.innerHTML = cmpMode.styles + styleElm.innerHTML;
 
               } else {
                 styleElm = createElement('style');
-                styleElm.innerHTML = cmpStyles;
+                styleElm.innerHTML = cmpMode.styles;
                 insertBefore(hostRoot, styleElm, hostRoot.firstChild);
               }
             }
@@ -200,9 +191,10 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
           // we're replacing the :host and :host-context stuff because
           // it's invalid css for browsers that don't support shadow dom
-          styleEle.innerHTML = cmpStyles;
+          styleEle.innerHTML = cmpMode.styles;
 
-          appendChild(hostRoot, styleEle);
+          // prepend the styles to the head, above of existing styles
+          insertBefore(hostRoot, styleEle, hostRoot.firstChild);
         }
       }
     }
