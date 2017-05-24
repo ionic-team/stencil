@@ -11,7 +11,7 @@ export function bundleComponentModeStyles(config: BundlerConfig, ctx: BuildConte
     return bundleComponentModeStyle(config, ctx, styleUrl);
 
   })).then(results => {
-    cmpMode.styles = results.join('');
+    cmpMode.styles = results.join('').trim();
   });
 }
 

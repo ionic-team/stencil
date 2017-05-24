@@ -15,12 +15,12 @@
  */
 function components(){};
 function ConfigCtrl(){};
+function defineComponents(){};
 function dom(){};
 function DomCtrl(){};
 function eventNameFn(){};
 function flush(){};
 function load(){};
-function loadComponents(){};
 function loadController(){};
 function QueueCtrl(){};
 function raf(){};

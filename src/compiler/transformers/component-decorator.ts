@@ -58,7 +58,7 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
-  cmpMeta.modes = [];
+  cmpMeta.modes = {};
 
   updateTag(cmpMeta);
   updateStyles(cmpMeta);
@@ -110,10 +110,9 @@ function updateStyles(cmpMeta: ComponentMeta) {
     Object.keys(styleModes).forEach(styleModeName => {
       const modeName = styleModeName.trim().toLowerCase();
 
-      cmpMeta.modes.push({
-        modeName: modeName,
+      cmpMeta.modes[modeName] = {
         styleUrls: [styleModes[styleModeName]]
-      });
+      };
     });
 
     delete (<any>cmpMeta).styleUrls;
@@ -123,9 +122,7 @@ function updateStyles(cmpMeta: ComponentMeta) {
 
 function updateModes(cmpMeta: ComponentMeta) {
   if (Object.keys(cmpMeta.modes).length === 0) {
-    cmpMeta.modes.push({
-      modeName: 'default'
-    });
+    cmpMeta.modes['default'] = {};
   }
 }
 
@@ -133,7 +130,11 @@ function updateModes(cmpMeta: ComponentMeta) {
 function updateShadow(cmpMeta: ComponentMeta) {
   // default to use shadow dom
   // or figure out a best guess depending on the value they put in
-  if (typeof cmpMeta.shadow === 'string') {
+  if (cmpMeta.shadow === undefined) {
+    // default to true if it was never defined in the decorator
+    cmpMeta.shadow = true;
+
+  } else if (typeof cmpMeta.shadow === 'string') {
     const shadowStr = (<string>cmpMeta.shadow).toLowerCase().trim();
 
     if (shadowStr === 'false' || shadowStr === 'null' || shadowStr === '') {
@@ -141,9 +142,6 @@ function updateShadow(cmpMeta: ComponentMeta) {
     } else {
       cmpMeta.shadow = true;
     }
-
-  } else if (cmpMeta.shadow === undefined) {
-    cmpMeta.shadow = true;
 
   } else if (cmpMeta.shadow === null) {
     cmpMeta.shadow = false;

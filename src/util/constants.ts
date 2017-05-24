@@ -2,8 +2,22 @@
 /**
  * Property Types
  */
-export const BOOLEAN_TYPE_CODE = 0;
-export const NUMBER_TYPE_CODE = 1;
+export const TYPE_BOOLEAN = 1;
+export const TYPE_NUMBER = 2;
+
+
+/**
+ * JS Property to Attribute Name Options
+ */
+export const ATTR_DASH_CASE = 1;
+export const ATTR_CAMEL_CASE = 2;
+
+
+/**
+ * Load Priority Levels
+ */
+export const PRIORITY_LOW = 0;
+export const PRIORITY_HIGH = 1;
 
 
 /**
@@ -15,3 +29,7 @@ export const KEY_CODE_MAP: {[key: string]: number} = {
   'space': 32,
   'tab': 9
 };
+
+
+export const XLINK_NS = 'http://www.w3.org/1999/xlink';
+export const XML_NS = 'http://www.w3.org/XML/1998/namespace';

@@ -1,4 +1,6 @@
-import { Bundle, ComponentMeta, MethodMeta, ModeMeta, ListenMeta, PropMeta, Registry, StateMeta, WatchMeta } from './interfaces';
+import { Bundle, ComponentMeta, ManifestComponentMeta, MethodMeta, ModeMeta,
+  ListenMeta, PropMeta, StateMeta, WatchMeta } from './interfaces';
+import { ATTR_CAMEL_CASE, ATTR_DASH_CASE, TYPE_BOOLEAN, PRIORITY_LOW, PRIORITY_HIGH, TYPE_NUMBER } from '../util/constants';
 import * as crypto from 'crypto';
 
 
@@ -17,7 +19,7 @@ export function formatBundleFileName(bundleId: string) {
 
 export function formatBundleContent(coreVersion: number, bundleId: string, bundledJsModules: string, componentModeLoader: string) {
   return [
-    `Ionic.loadComponents(\n`,
+    `Ionic.defineComponents(\n`,
 
       `/**** core version ****/`,
       `${coreVersion},\n`,
@@ -35,15 +37,12 @@ export function formatBundleContent(coreVersion: number, bundleId: string, bundl
 }
 
 
-export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
+export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, modeName: string, modeMeta: ModeMeta) {
   const tag = cmp.tag;
 
-  const modeName = (mode.modeName ? mode.modeName : '');
+  const label = `${tag}.${modeName}`;
 
-  let label = tag;
-  if (mode.modeName) {
-    label += '.' + mode.modeName;
-  }
+  const props = formatProps(cmp.props, attrCase);
 
   const methods = formatMethods(cmp.methods);
 
@@ -57,25 +56,59 @@ export function formatComponentModeLoader(cmp: ComponentMeta, mode: ModeMeta) {
 
   const modeCode = formatModeName(modeName);
 
-  const styles = formatStyles(mode.styles);
+  const styles = formatStyles(modeMeta.styles);
 
   const t = [
     `/** ${label}: [0] tagName **/\n'${tag}'`,
-    `/** ${label}: [1] methods **/\n${methods}`,
-    `/** ${label}: [2] states **/\n${states}`,
-    `/** ${label}: [3] listeners **/\n${listeners}`,
-    `/** ${label}: [4] watchers **/\n${watchers}`,
-    `/** ${label}: [5] shadow **/\n${shadow}`,
-    `/** ${label}: [6] modeName **/\n${modeCode}`,
-    `/** ${label}: [7] styles **/\n${styles}`
+    `/** ${label}: [1] props **/\n${props}`,
+    `/** ${label}: [2] methods **/\n${methods}`,
+    `/** ${label}: [3] states **/\n${states}`,
+    `/** ${label}: [4] listeners **/\n${listeners}`,
+    `/** ${label}: [5] watchers **/\n${watchers}`,
+    `/** ${label}: [6] shadow **/\n${shadow}`,
+    `/** ${label}: [7] modeName **/\n${modeCode}`,
+    `/** ${label}: [8] styles **/\n${styles}`
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
 }
 
 
-export function formatModeName(modeName: string) {
-  return `${getModeCode(modeName)} /* ${modeName} mode **/`;
+function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
+  if (!props || !props.length) {
+    return prefix + `0 /* no props */`;
+  }
+
+  const formattedProps: string[] = [];
+
+  props.forEach(prop => {
+    let formattedProp = `'${prop.propName}'`;
+
+    if (prop.attrCase === undefined) {
+      // if individual prop wasn't set with an option
+      // then use the config's default
+      prop.attrCase = attrCase;
+    }
+
+    //
+    if (prop.attrCase === ATTR_CAMEL_CASE) {
+      formattedProp += `, ${prop.attrCase} /* camelCase attribute */`;
+
+    } else {
+      formattedProp += `, ${ATTR_DASH_CASE} /* dash-case attribute */`;
+    }
+
+    if (prop.propType === 'boolean') {
+      formattedProp += `, ${TYPE_BOOLEAN} /* boolean props */`;
+
+    } else if (prop.propType === 'number') {
+      formattedProp += `, ${TYPE_NUMBER} /* number props */`;
+    }
+
+    formattedProps.push(prefix + `  [${formattedProp}]`);
+  });
+
+  return prefix + `[\n` + formattedProps.join(`,\n`) + '\n' + prefix + `]`;
 }
 
 
@@ -166,6 +199,11 @@ function formatShadow(val: boolean) {
 }
 
 
+export function formatModeName(modeName: string) {
+  return `${getModeCode(modeName)} /* ${modeName} **/`;
+}
+
+
 export function getModeCode(modeName: string) {
   switch (modeName) {
     case 'default':
@@ -196,60 +234,84 @@ export function formatStyles(styles: string) {
 
 
 export function formatPriority(priority: 'high'|'low') {
-  return priority === 'low' ? '0' : '1';
+  return priority === 'low' ? PRIORITY_LOW : PRIORITY_HIGH;
 }
 
 
-export function formatRegistryContent(inputRegistry: Registry, devMode: boolean) {
-  const registry: Registry = {};
+export function formatRegistry(bundles: Bundle[], attrOption: number) {
+  let registry: {
+    component: ManifestComponentMeta;
+    bundles: {[modeCode: string]: Bundle};
+  }[] = [];
 
-  // alphabetize the registry
-  Object.keys(inputRegistry).sort().forEach(tag => {
-    registry[tag] = inputRegistry[tag];
+  bundles.forEach(bundle => {
+    bundle.components.forEach(bundledComponent => {
+      let registryCmp = registry.find(c => c.component.tag === bundledComponent.component.tag);
+      if (!registryCmp) {
+        registryCmp = {
+          component: bundledComponent.component,
+          bundles: {}
+        };
+        registry.push(registryCmp);
+      }
+      registryCmp.bundles[bundledComponent.modeName] = bundle;
+    });
   });
 
-  let strData: string;
+  registry = registry.sort((a, b) => {
+    if (a.component.tag < b.component.tag) return -1;
+    if (a.component.tag > b.component.tag) return 1;
+    return 0;
+  });
 
-  if (devMode) {
-    // pretty print
-    strData = JSON.stringify(registry, null, 2);
+  const cmps: string[] = [];
 
-  } else {
-    // remove all whitespace
-    strData = JSON.stringify(registry);
-  }
+  registry.forEach(registryCmp => {
+    const tag = registryCmp.component.tag;
+    let cmp: string[] = [];
 
-  // remove unnecessary double quotes
-  strData = strData.replace(/"0"/g, '0');
-  strData = strData.replace(/"1"/g, '1');
-  strData = strData.replace(/"2"/g, '2');
-  strData = strData.replace(/"3"/g, '3');
+    cmp.push([
+      `    /** tag [0] **/`,
+      `    '${tag}'`
+    ].join('\n'));
 
-  return strData;
-}
+    let modes = [
+      `    /** ${tag}: modes [1] **/`,
+      `    {`
+    ];
+    modes.push(Object.keys(registryCmp.bundles).map(modeName => {
+      return `      ${formatModeName(modeName)}: '${registryCmp.bundles[modeName].id}'`;
+    }).join(',\n'));
+    modes.push(`    }`);
+    cmp.push(modes.join('\n'));
 
+    const props = registryCmp.component.props;
 
-export function formatComponentRegistryProps(props: PropMeta[]): any {
-  if (!props || !props.length) {
-    return null;
-  }
+    if ((props && props.length) || registryCmp.component.priority === PRIORITY_LOW) {
 
-  const p: any[] = [];
+      if (props && props.length) {
+        cmp.push([
+          `    /** ${tag}: props [2] **/`,
+          `${formatProps(registryCmp.component.props, attrOption, '    ')}`
+        ].join('\n'));
 
-  props.forEach(prop => {
-    const formattedProp: any[] = [prop.propName];
+      } else {
+        cmp.push(`    0 /** ${tag} has no props [2] **/`);
+      }
 
-    if (prop.propType === 'boolean') {
-      formattedProp.push(0);
-
-    } else if (prop.propType === 'number') {
-      formattedProp.push(1);
+      if (registryCmp.component.priority === PRIORITY_LOW) {
+        let priority = [
+          `    /** ${tag}: priority [3] **/`,
+          `    ${registryCmp.component.priority}`
+        ];
+        cmp.push(priority.join('\n'));
+      }
     }
 
-    p.push(formattedProp);
+    cmps.push(`  [\n${cmp.join(',\n\n')}\n  ]`);
   });
 
-  return p;
+  return `[\n${cmps.join(',\n')}\n]`;
 }
 
 

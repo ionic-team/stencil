@@ -1,27 +1,32 @@
+import { ATTR_DASH_CASE } from './constants';
 import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, PropMeta } from '../util/interfaces';
-import { isString } from './helpers';
+import { isString, toDashCase } from './helpers';
 
 
 export function parseComponentModeData(registry: ComponentRegistry, moduleImports: any, cmpModeData: ComponentModeData) {
-  var i = 0;
-  var cmpListenerData: ComponentListenersData;
-  var cmpWatchData: ComponentWatchersData;
+  let i = 0;
+  let cmpListenerData: ComponentListenersData;
+  let cmpWatchData: ComponentWatchersData;
 
   // tag name (ion-badge)
   // get component meta data by tag name
-  var cmpMeta = registry[cmpModeData[0]];
+  let cmpMeta = registry[cmpModeData[0]];
+
+  // component props would have already been parsed
+  // and added to the cmpMeta when it was registered
+  // no need to redo prop parsing on the client side again
 
   // component methods
-  cmpMeta.methods = cmpModeData[1];
+  cmpMeta.methods = cmpModeData[2];
 
   // component states
-  cmpMeta.states = cmpModeData[2];
+  cmpMeta.states = cmpModeData[3];
 
   // component listeners
-  if (cmpModeData[3]) {
+  if (cmpModeData[4]) {
     cmpMeta.listeners = [];
-    for (i = 0; i < cmpModeData[3].length; i++) {
-      cmpListenerData = cmpModeData[3][i];
+    for (i = 0; i < cmpModeData[4].length; i++) {
+      cmpListenerData = cmpModeData[4][i];
       cmpMeta.listeners.push({
         methodName: cmpListenerData[0],
         eventName: cmpListenerData[1],
@@ -33,10 +38,10 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   }
 
   // component instance property watchers
-  if (cmpModeData[4]) {
+  if (cmpModeData[5]) {
     cmpMeta.watchers = [];
-    for (i = 0; i < cmpModeData[4].length; i++) {
-      cmpWatchData = cmpModeData[4][i];
+    for (i = 0; i < cmpModeData[5].length; i++) {
+      cmpWatchData = cmpModeData[5][i];
       cmpMeta.watchers.push({
         propName: cmpWatchData[0],
         fn: cmpWatchData[1]
@@ -45,26 +50,39 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   }
 
   // shadow
-  cmpMeta.shadow = !!cmpModeData[5];
+  cmpMeta.shadow = !!cmpModeData[6];
 
   // mode name (ios, md, wp)
   // get component mode
-  if (isString(cmpModeData[7])) {
-    var cmpMode = cmpMeta.modes.find(m => m.modeName === parseModeName(cmpModeData[6].toString()));
+  if (isString(cmpModeData[8])) {
+    let cmpMode = cmpMeta.modes[parseModeName(cmpModeData[7])];
     if (cmpMode) {
       // component mode styles
-      cmpMode.styles = cmpModeData[7];
+      cmpMode.styles = cmpModeData[8];
     }
   }
 
   // get the component class which was added to moduleImports
-  // component class name (Badge)
+  // using the tag as the key on the export object
   cmpMeta.componentModule = moduleImports[cmpModeData[0]];
 }
 
 
-export function parseModeName(modeCode: string) {
-  switch (modeCode) {
+export function parseProp(data: any[]) {
+  // data[0] = propName
+  // data[1] = attrOption
+  // data[2] = propType
+
+  return <PropMeta>{
+    propName: data[0],
+    attrName: data[1] === ATTR_DASH_CASE ? toDashCase(data[0]) : data[0],
+    propType: data[2]
+  };
+}
+
+
+export function parseModeName(modeCode: any) {
+  switch (modeCode.toString()) {
     case '0':
       return 'default';
     case '1':
@@ -76,24 +94,4 @@ export function parseModeName(modeCode: string) {
   }
 
   return modeCode;
-}
-
-
-export function parseProp(propData: any[][]) {
-  const props: PropMeta[] = [
-    { propName: 'color' },
-    { propName: 'mode' },
-    { propName: 'id' }
-  ];
-
-  if (propData) {
-    for (var i = 0; i < propData.length; i++) {
-      props.push({
-        propName: propData[i][0],
-        propType: propData[i][1]
-      });
-    }
-  }
-
-  return props;
 }

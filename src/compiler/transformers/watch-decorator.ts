@@ -45,4 +45,12 @@ export function getWatchDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDec
       memberNode.decorators = undefined;
     }
   });
+
+  fileMeta.cmpMeta.watchers = fileMeta.cmpMeta.watchers.sort((a, b) => {
+    if (a.propName < b.propName) return -1;
+    if (a.propName > b.propName) return 1;
+    if (a.fn < b.fn) return -1;
+    if (a.fn > b.fn) return 1;
+    return 0;
+  });
 }

@@ -24,7 +24,10 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
 
     const componentDir = config.packages.path.dirname(manifestCmp.componentUrl);
 
-    manifestCmp.modes.forEach(cmpMode => {
+    const modeNames = Object.keys(manifestCmp.modes);
+
+    modeNames.forEach(modeName => {
+      const cmpMode = manifestCmp.modes[modeName];
       if (cmpMode.styleUrls) {
         cmpMode.styleUrls = cmpMode.styleUrls.map(styleUrl => {
           return config.packages.path.join(componentDir, styleUrl);

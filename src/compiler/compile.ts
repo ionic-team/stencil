@@ -214,8 +214,10 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
   ctx.files.forEach(f => {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
-    f.cmpMeta.modes.forEach(cm => {
-      const modeMeta = Object.assign({}, cm);
+    const modeNames = Object.keys(f.cmpMeta.modes);
+
+    modeNames.forEach(modeName => {
+      const modeMeta = Object.assign({}, f.cmpMeta.modes[modeName]);
 
       if (modeMeta.styleUrls) {
         modeMeta.styleUrls.forEach(styleUrl => {
