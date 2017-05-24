@@ -137,7 +137,7 @@ export function initLoadComponent(plt: PlatformApi, listeners: ListenMeta[], elm
   // this value is only useful during the initial load, but
   // not accurate after that remove it so there's no confusion
   elm.$isLoaded = true;
-  plt.$setClass(elm, 'upgraded', true);
+  plt.$setClass(elm, 'hydrated', true);
 
   // the element is within the DOM now, so let's attach the event listeners
   listeners && attachListeners(plt.queue, listeners, instance);

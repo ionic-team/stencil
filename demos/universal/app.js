@@ -31,8 +31,8 @@ app.get('/', function (req, res) {
       req: req
     };
 
-    ionic.hydrate(html, opts).then(upgradedHtml => {
-      res.send(upgradedHtml);
+    ionic.hydrate(html, opts).then(hydratedHtml => {
+      res.send(hydratedHtml);
 
     }).catch(err => {
       res.send(err.toString() + err.stack && err.stack.toString());
