@@ -13,11 +13,8 @@ import { isArray, isDef, isUndef, isString, isStringOrNumber } from '../util/hel
 import { HostContentNodes, PlatformApi, RendererApi, VNode, VNodeData, Key } from '../util/interfaces';
 import { vnode } from './vnode';
 
-import { updateAttrs } from './modules/attributes';
-import { updateClass } from './modules/class';
-import { updateStyle } from './modules/style';
+import { updateElement } from './modules/element-update';
 import { updateEventListeners } from './modules/eventlisteners';
-import { updateProps } from './modules/props';
 export { VNode, VNodeData, vnode };
 export { h } from './h';
 
@@ -126,11 +123,8 @@ export function Renderer(api: PlatformApi): RendererApi {
         api.$setAttribute(elm, 'class', sel.slice(dot + 1).replace(/\./g, ' '));
       }
 
-      updateAttrs(api, emptyNode, vnode);
-      updateClass(api, emptyNode, vnode);
-      updateStyle(emptyNode, vnode);
+      updateElement(api, emptyNode, vnode);
       updateEventListeners(emptyNode, vnode);
-      updateProps(emptyNode, vnode);
 
       data.ref && data.ref(elm);
 
@@ -292,11 +286,8 @@ export function Renderer(api: PlatformApi): RendererApi {
     if (oldVnode === vnode) return;
 
     if (vnode.vdata !== undefined) {
-      updateAttrs(api, oldVnode, vnode);
-      updateClass(api, oldVnode, vnode);
-      updateStyle(emptyNode, vnode);
+      updateElement(api, oldVnode, vnode);
       updateEventListeners(oldVnode, vnode);
-      updateProps(oldVnode, vnode);
     }
 
     if (isUndef(vnode.vtext)) {

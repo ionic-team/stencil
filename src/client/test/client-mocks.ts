@@ -3,7 +3,7 @@ import { ComponentModeData, ConfigApi, CustomEventOptions, DomControllerApi, Ion
   RafCallback } from '../../util/interfaces';
 import { ConfigController } from '../../util/config-controller';
 import { PlatformClient } from '../../client/platform-client';
-import { themeVNodeData } from '../../client/host';
+import { themeVNodeData } from '../../renderer/host';
 
 let mockBundleIds = 0;
 
