@@ -1,4 +1,4 @@
-import { VNode, VNodeData } from '../../../util/interfaces';
+import { VNode, VNodeData } from '../../util/interfaces';
 
 
 export function updateProps(oldVnode: VNode, vnode: VNode): void {

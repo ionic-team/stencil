@@ -22,7 +22,7 @@ import { IonicGlobal } from '../../../util/interfaces';
   }
 
   var style = document.createElement('style');
-  style.innerHTML = Object.keys(ionic.components).join(',') + '{visibility:hidden}';
+  style.innerHTML = ionic.components.map(c => c[0]).join(',') + '{visibility:hidden}';
   document.head.appendChild(style);
 
   // build up a path for the exact ionic core javascript file this browser needs

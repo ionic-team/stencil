@@ -1,9 +1,9 @@
-import { Component, ComponentMeta, ComponentRegistry,
-  IonicGlobal, LoadComponents, QueueApi, PlatformApi } from '../util/interfaces';
-import { h } from './renderer/h';
+import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
+  IonicGlobal, LoadComponentData, QueueApi, PlatformApi } from '../util/interfaces';
+import { h } from '../renderer/h';
 import { initInjectedIonic } from './ionic-client';
+import { PRIORITY_LOW, XLINK_NS, XML_NS } from '../util/constants';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
-import { toDashCase } from '../util/helpers';
 
 
 export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, queue: QueueApi): PlatformApi {
@@ -18,7 +18,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const injectedIonic = initInjectedIonic(IonicGbl, win, doc, queue);
 
 
-  IonicGbl.loadComponents = function loadComponents(coreVersion, bundleId, importFn) {
+  IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
     coreVersion;
     var args = arguments;
 
@@ -48,7 +48,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   };
 
 
-  function loadBundle(bundleId: string, priority: string, cb: Function): void {
+  function loadBundle(bundleId: string, priority: number, cb: Function): void {
     if (loadedBundles[bundleId]) {
       // we've already loaded this bundle
       cb();
@@ -72,22 +72,13 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
         // remember that we're now actively requesting this url
         activeJsonRequests[url] = true;
 
-        if (priority === 'low') {
+        if (priority === PRIORITY_LOW) {
           // low priority which means its ok to load this behind
           // UI components, for example: gestures, menu
-          if ('requestIdleCallback' in win) {
-            // kick off the request in a requestIdleCallback
-            (<any>win).requestIdleCallback(() => {
-              jsonp(url);
-            }, { timeout: 2000 });
-
-          } else {
-            // no support for requestIdleCallback, so instead throw it
-            // in a setTimeout just so all the UI components kick in first
-            setTimeout(() => {
-              jsonp(url);
-            }, 600);
-          }
+          // kick off the request in a requestIdleCallback
+          (<any>win).requestIdleCallback(() => {
+            jsonp(url);
+          }, { timeout: 2000 });
 
         } else {
           // high priority component (normal UI components)
@@ -134,7 +125,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
     // look up which component mode this instance should use
     // if a mode isn't found then check if there's a default
-    const cmpMode = cmpMeta.modes.find(m => m.modeName === instance.mode || m.modeName === 'default');
+    const cmpMode = cmpMeta.modes[instance.mode] || cmpMeta.modes['default'];
 
     if (cmpMode && cmpMode.styles) {
       // this component mode has styles
@@ -218,39 +209,38 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   }
 
 
-  function registerComponents(components: LoadComponents) {
+  function registerComponents(components: LoadComponentData[]) {
+    // this is the part that just registers the minimal amount about each
+    // component, basically its tag, modes and observed attributes
 
-    return Object.keys(components || {}).map(tag => {
-      const data = components[tag];
+    return components.map(data => {
 
-      // data[0] = all of the mode and bundle maps
-      // data[1] = properties
-      // data[2] = bundle priority
-      const modeBundleIds = data[0];
-
-      const cmpMeta: ComponentMeta = registry[tag] = {
-        tag: tag,
-        modes: [],
-        props: parseProp(data[1]),
-        obsAttrs: []
+      const cmpMeta: ComponentMeta = registry[data[0]] = {
+        tag: data[0],
+        modes: {},
+        props: [
+          // every component defaults to always have
+          // the mode and color properties
+          // but only watch the color attribute
+          { propName: 'color', attrName: 'color' },
+          { propName: 'mode' },
+        ]
       };
 
-      if (data[2] === 0) {
-        // priority
-        cmpMeta.priority = 'low';
+      // copy over the map of the modes and bundle ids
+      // parse the mode codes to names: "1" becomes "ios"
+      Object.keys(data[1]).forEach(modeCode => {
+        cmpMeta.modes[parseModeName(modeCode)] = {
+          bundleId: data[1][modeCode]
+        };
+      });
+
+      if (data[2]) {
+        cmpMeta.props = cmpMeta.props.concat(data[2].map(parseProp));
       }
 
-      const keys = Object.keys(modeBundleIds);
-      for (var i = 0; i < keys.length; i++) {
-        cmpMeta.modes.push({
-          modeName: parseModeName(keys[i].toString()),
-          bundleId: modeBundleIds[keys[i]]
-        });
-      }
-
-      for (i = 0; i < cmpMeta.props.length; i++) {
-        cmpMeta.obsAttrs.push(toDashCase(cmpMeta.props[i].propName));
-      }
+      // priority
+      cmpMeta.priority = data[3];
 
       return cmpMeta;
     });
@@ -318,6 +308,26 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     return elm.getAttribute(attrName);
   }
 
+  function setAttribute(elm: HTMLElement, attrName: string, attrValue: any) {
+    if (attrName.charCodeAt(0) === 120) {
+      const namespaceURI = attrName.charCodeAt(3) === 58 ? XML_NS : (attrName.charCodeAt(5) === 58 ? XLINK_NS : 0);
+      if (namespaceURI) {
+        elm.setAttributeNS(namespaceURI, attrName, attrValue);
+        return;
+      }
+    }
+
+    elm.setAttribute(attrName, attrValue);
+  }
+
+  function removeAttribute(elm: HTMLElement, attrName: string) {
+    elm.removeAttribute(attrName);
+  }
+
+  function setClass(elm: HTMLElement, cssClassName: string, shouldAddCssClassName: boolean) {
+    elm.classList[shouldAddCssClassName ? 'add' : 'remove'](cssClassName);
+  }
+
   function isElement(node: Node): node is Element {
     return node.nodeType === 1;
   }
@@ -355,13 +365,11 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
+    $setAttribute: setAttribute,
+    $removeAttribute: removeAttribute,
+    $setClass: setClass,
     $attachComponent: attachComponent,
 
     $tmpDisconnected: false
   };
-}
-
-
-export interface BundleCallbacks {
-  [bundleId: string]: Function[];
 }

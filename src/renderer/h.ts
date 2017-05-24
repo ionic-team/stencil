@@ -1,6 +1,6 @@
 import { vnode } from './vnode';
-import { VNode, VNodeData } from '../../util/interfaces';
-import { isArray, isStringOrNumber } from '../../util/helpers';
+import { VNode, VNodeData } from '../util/interfaces';
+import { isArray, isStringOrNumber } from '../util/helpers';
 
 
 function addNS(data: any, children: Array<VNode> | undefined, sel: string | undefined): void {
@@ -33,14 +33,23 @@ export function h(sel: any, b?: any, c?: any): VNode {
 
   if (c !== undefined) {
     data = b;
-    if (isArray(c)) { children = c; }
-    else if (isStringOrNumber(c)) { text = c; }
-    else if (c && c.sel) { children = [c]; }
+    if (isArray(c)) {
+      children = c;
+    } else if (isStringOrNumber(c)) {
+      text = c;
+    } else if (c && c.sel) {
+      children = [c];
+    }
   } else if (b !== undefined) {
-    if (isArray(b)) { children = b; }
-    else if (isStringOrNumber(b)) { text = b; }
-    else if (b && b.sel) { children = [b]; }
-    else { data = b; }
+    if (isArray(b)) {
+      children = b;
+    } else if (isStringOrNumber(b)) {
+      text = b;
+    } else if (b && b.sel) {
+      children = [b];
+    } else {
+      data = b;
+    }
   }
   if (isArray(children)) {
     for (i = 0; i < children.length; ++i) {
@@ -54,5 +63,5 @@ export function h(sel: any, b?: any, c?: any): VNode {
     addNS(data, children, sel);
   }
   return vnode(sel, data, children, text, elm);
-};
+}
 export default h;

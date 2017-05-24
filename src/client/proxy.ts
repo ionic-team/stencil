@@ -1,4 +1,4 @@
-import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/constants';
+import { TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
 import { Component, PropMeta, ConfigApi, MethodMeta, PlatformApi, ProxyElement, RendererApi, WatchMeta } from '../util/interfaces';
 import { queueUpdate } from './update';
 
@@ -74,7 +74,7 @@ function initProp(propName: string, propType: any, plt: PlatformApi, config: Con
 }
 
 
-function getInitialValue(config: ConfigApi, elm: ProxyElement, instance: Component, propTypeCode: number, propName: string): any {
+function getInitialValue(config: ConfigApi, elm: any, instance: Component, propTypeCode: number, propName: string): any {
   if (elm[propName] !== undefined) {
     return elm[propName];
   }
@@ -83,11 +83,11 @@ function getInitialValue(config: ConfigApi, elm: ProxyElement, instance: Compone
     return instance[propName];
   }
 
-  if (propTypeCode === BOOLEAN_TYPE_CODE) {
+  if (propTypeCode === TYPE_BOOLEAN) {
     return config.getBoolean(propName);
   }
 
-  if (propTypeCode === NUMBER_TYPE_CODE) {
+  if (propTypeCode === TYPE_NUMBER) {
     return config.getNumber(propName);
   }
 

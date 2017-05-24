@@ -27,7 +27,7 @@ export function mockComponent(IonicGbl: IonicGlobal, plt: PlatformApi, tag: stri
     exports[componentModule.constructor.name] = componentModule;
   }
 
-  IonicGbl.loadComponents(0, bundleId, importerFn, cmpModeData);
+  IonicGbl.defineComponents(0, bundleId, importerFn, cmpModeData);
 }
 
 export function mockPlatformClient(IonicGbl?: IonicGlobal) {

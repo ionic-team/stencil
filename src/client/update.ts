@@ -27,11 +27,13 @@ export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Rende
 export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string) {
   const cmpMeta = plt.getComponentMeta(tag);
 
-  let initialLoad = false;
+  let isInitialLoad = false;
+  let isSsrHydrated = false;
 
   let instance = elm.$instance;
   if (!instance) {
-    initialLoad = true;
+    isInitialLoad = true;
+    isSsrHydrated = !plt.isServer && elm.classList.contains('ssr');
 
     // using the component's class, let's create a new instance
     instance = elm.$instance = new cmpMeta.componentModule();
@@ -50,9 +52,10 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     // if it should use shadow dom or not
     plt.$attachComponent(elm, cmpMeta, instance);
 
-    if (!cmpMeta.shadow && instance.render) {
+    if (!cmpMeta.shadow && instance.render && !isSsrHydrated) {
       // this component is not using shadow dom
       // but it does have a render function
+      // and it hasn't already been SSR hydrated
       // collect up the host content nodes so we can
       // manually move them around to the correct slot
 
@@ -78,10 +81,10 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
 
     // if this is the intial load, then we give the renderer the actual element
     // if this is a re-render, then give the renderer the last vnode we created
-    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode, elm.$hostContent);
+    instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode, elm.$hostContent, isSsrHydrated);
   }
 
-  if (initialLoad) {
+  if (isInitialLoad) {
     // this item has completed rendering
     // if it rendered more child components, than more elements
     // would have been added to the $awaitLoads array
@@ -119,12 +122,8 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
 
 
 function sortElementsByDepth(a: ProxyElement, b: ProxyElement) {
-  if (a.$depth < b.$depth) {
-    return 1;
-  }
-  if (a.$depth > b.$depth) {
-    return -1;
-  }
+  if (a.$depth < b.$depth) return 1;
+  if (a.$depth > b.$depth) return -1;
   return 0;
 }
 
@@ -138,7 +137,7 @@ export function initLoadComponent(plt: PlatformApi, listeners: ListenMeta[], elm
   // this value is only useful during the initial load, but
   // not accurate after that remove it so there's no confusion
   elm.$isLoaded = true;
-  elm.classList.add('upgraded');
+  plt.$setClass(elm, 'upgraded', true);
 
   // the element is within the DOM now, so let's attach the event listeners
   listeners && attachListeners(plt.queue, listeners, instance);

@@ -1,11 +1,11 @@
 import { attributeChangedCallback } from './attribute-changed';
-import { ConfigApi, LoadComponents, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
+import { ComponentMeta, ConfigApi, LoadComponentData, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initLoadComponent, queueUpdate } from './update';
 
 
-export function registerComponents(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
+export function registerComponents(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponentData[]) {
 
   plt.registerComponents(components).forEach(cmpMeta => {
     // closure doesn't support outputting es6 classes (yet)
@@ -33,9 +33,14 @@ export function registerComponents(renderer: RendererApi, plt: PlatformApi, conf
       initLoadComponent(plt, cmpMeta.listeners, this, (<ProxyElement>this).$instance);
     };
 
-    (<any>ProxyHTMLElement).observedAttributes = cmpMeta.obsAttrs;
+    (<any>ProxyHTMLElement).observedAttributes = getObservedAttributes(cmpMeta);
 
     plt.defineComponent(cmpMeta.tag, ProxyHTMLElement);
   });
 
+}
+
+
+export function getObservedAttributes(cmpMeta: ComponentMeta) {
+  return cmpMeta.props.filter(p => p.attrName).map(p => p.attrName);
 }

@@ -20,7 +20,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
 
       // get the mode the element which is loading
       // if there is no mode, then use "default"
-      const cmpMode = cmpMeta.modes.find(m => m.modeName === getMode(plt, config, elm, 'mode') || m.modeName === 'default');
+      const cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')] || cmpMeta.modes['default'];
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous

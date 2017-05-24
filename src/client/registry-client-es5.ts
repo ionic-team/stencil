@@ -1,11 +1,12 @@
 import { attributeChangedCallback } from './attribute-changed';
-import { ConfigApi, LoadComponents, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
+import { ConfigApi, LoadComponentData, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
+import { getObservedAttributes } from './registry-client';
 import { initLoadComponent, queueUpdate } from './update';
 
 
-export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponents) {
+export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponentData[]) {
 
   plt.registerComponents(components).forEach(cmpMeta => {
     function ProxyHTMLElement(self: any) {
@@ -50,7 +51,7 @@ export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, c
       }
     );
 
-    (<any>ProxyHTMLElement).observedAttributes = cmpMeta.obsAttrs;
+    (<any>ProxyHTMLElement).observedAttributes = getObservedAttributes(cmpMeta);
 
     plt.defineComponent(cmpMeta.tag, ProxyHTMLElement);
   });

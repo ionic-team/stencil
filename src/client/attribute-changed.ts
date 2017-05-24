@@ -1,22 +1,24 @@
-import { BOOLEAN_TYPE_CODE, NUMBER_TYPE_CODE } from '../util/constants';
-import { ComponentMeta, ProxyElement } from '../util/interfaces';
-import { toCamelCase } from '../util/helpers';
+import { TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
+import { ComponentMeta } from '../util/interfaces';
 
 
-export function attributeChangedCallback(elm: ProxyElement, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {
+export function attributeChangedCallback(elm: any, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {
   if (oldVal !== newVal) {
-    const propName = toCamelCase(attrName);
-    const prop = cmpMeta.props.find(p => p.propName === propName);
+    // convert an attribute name that's in dash case
+    // to a property name that's in camel case
+    const prop = cmpMeta.props.find(p => p.attrName === attrName);
 
     if (prop) {
-      if (prop.propType === BOOLEAN_TYPE_CODE) {
-        elm[propName] = (newVal === null || newVal === 'false') ? false : true;
+      if (prop.propType === TYPE_BOOLEAN) {
+        // per the HTML spec, any string value means it is a boolean true value
+        // but we'll cheat here and say that the string "false" is the boolean false
+        elm[prop.propName] = (newVal === null || newVal === 'false') ? false : true;
 
-      } else if (prop.propType === NUMBER_TYPE_CODE) {
-        elm[propName] = parseFloat(newVal);
+      } else if (prop.propType === TYPE_NUMBER) {
+        elm[prop.propName] = parseFloat(newVal);
 
       } else {
-        elm[propName] = newVal;
+        elm[prop.propName] = newVal;
       }
     }
   }

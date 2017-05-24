@@ -1,5 +1,5 @@
-import { ProxyElement, VNode, VNodeData } from '../../../util/interfaces';
-import { isFunction, isObject } from '../../../util/helpers';
+import { ProxyElement, VNode, VNodeData } from '../../util/interfaces';
+import { isFunction, isObject } from '../../util/helpers';
 
 
 function invokeHandler(handler: any, vnode?: VNode, event?: Event): void {
