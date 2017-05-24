@@ -5,7 +5,7 @@ import { formatComponentModeLoader, formatBundleFileName,
   formatBundleContent, formatRegistry, formatPriority, generateBundleId,
   getBundledModulesId } from './formatters';
 import { createFileMeta, readFile, writeFile, writeFiles } from './util';
-import { ATTR_CAMEL_CASE, ATTR_DASH_CASE } from '../util/constants';
+import { ATTR_LOWER_CASE, ATTR_DASH_CASE } from '../util/constants';
 import { getManifest } from './manifest';
 import { setupBundlerWatch } from './watch';
 import commonjs from 'rollup-plugin-commonjs';
@@ -14,33 +14,12 @@ import * as os from 'os';
 
 
 export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
-  if (!config.packages) {
-    throw 'config.packages required';
-  }
-  if (!config.packages.fs) {
-    throw 'config.packages.fs required';
-  }
-  if (!config.packages.path) {
-    throw 'config.packages.path required';
-  }
-  if (!config.packages.nodeSass) {
-    throw 'config.packages.nodeSass required';
-  }
-  if (!config.packages.rollup) {
-    throw 'config.packages.rollup required';
-  }
-  if (!config.packages.typescript) {
-    throw 'config.packages.typescript required';
-  }
-
-  if (config.attrCase !== ATTR_CAMEL_CASE && config.attrCase !== ATTR_DASH_CASE) {
-    // default to use dash-case for attributes
-    config.attrCase = ATTR_DASH_CASE;
-  }
+  validateConfig(config);
 
   if (config.debug) {
     console.log(`bundle, srcDir: ${config.srcDir}`);
     console.log(`bundle, destDir: ${config.destDir}`);
+    console.log(`bundle, attrCase: ${config.attrCase}`);
   }
 
   ctx.results = {
@@ -295,6 +274,51 @@ function getAllModeNames(manifest: Manifest) {
   });
 
   return allModeNames.sort();
+}
+
+
+function validateConfig(config: BundlerConfig) {
+  if (!config.packages) {
+    throw 'config.packages required';
+  }
+  if (!config.packages.fs) {
+    throw 'config.packages.fs required';
+  }
+  if (!config.packages.path) {
+    throw 'config.packages.path required';
+  }
+  if (!config.packages.nodeSass) {
+    throw 'config.packages.nodeSass required';
+  }
+  if (!config.packages.rollup) {
+    throw 'config.packages.rollup required';
+  }
+  if (!config.packages.typescript) {
+    throw 'config.packages.typescript required';
+  }
+
+  config.attrCase = normalizeAttrCase(config.attrCase);
+}
+
+
+function normalizeAttrCase(attrCase: any) {
+  if (attrCase === ATTR_LOWER_CASE || attrCase === ATTR_DASH_CASE) {
+    // already using a valid attr case value
+    return attrCase;
+  }
+
+  if (typeof attrCase === 'string') {
+    if (attrCase.trim().toLowerCase() === 'dash') {
+      return ATTR_DASH_CASE;
+    }
+
+    if (attrCase.trim().toLowerCase() === 'lower') {
+      return ATTR_LOWER_CASE;
+    }
+  }
+
+  // default to use dash-case for attributes
+  return ATTR_DASH_CASE;
 }
 
 

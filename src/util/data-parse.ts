@@ -75,7 +75,7 @@ export function parseProp(data: any[]) {
 
   return <PropMeta>{
     propName: data[0],
-    attrName: data[1] === ATTR_DASH_CASE ? toDashCase(data[0]) : data[0],
+    attrName: (data[1] === ATTR_DASH_CASE ? toDashCase(data[0]) : data[0]).toLowerCase(),
     propType: data[2]
   };
 }

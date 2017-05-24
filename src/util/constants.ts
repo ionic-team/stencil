@@ -10,7 +10,7 @@ export const TYPE_NUMBER = 2;
  * JS Property to Attribute Name Options
  */
 export const ATTR_DASH_CASE = 1;
-export const ATTR_CAMEL_CASE = 2;
+export const ATTR_LOWER_CASE = 2;
 
 
 /**

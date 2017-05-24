@@ -1,6 +1,6 @@
 import { Bundle, ComponentMeta, ManifestComponentMeta, MethodMeta, ModeMeta,
   ListenMeta, PropMeta, StateMeta, WatchMeta } from './interfaces';
-import { ATTR_CAMEL_CASE, ATTR_DASH_CASE, TYPE_BOOLEAN, PRIORITY_LOW, PRIORITY_HIGH, TYPE_NUMBER } from '../util/constants';
+import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_BOOLEAN, PRIORITY_LOW, PRIORITY_HIGH, TYPE_NUMBER } from '../util/constants';
 import * as crypto from 'crypto';
 
 
@@ -91,8 +91,8 @@ function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
     }
 
     //
-    if (prop.attrCase === ATTR_CAMEL_CASE) {
-      formattedProp += `, ${prop.attrCase} /* camelCase attribute */`;
+    if (prop.attrCase === ATTR_LOWER_CASE) {
+      formattedProp += `, ${prop.attrCase} /* lowercase attribute */`;
 
     } else {
       formattedProp += `, ${ATTR_DASH_CASE} /* dash-case attribute */`;

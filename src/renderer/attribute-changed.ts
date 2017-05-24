@@ -4,8 +4,7 @@ import { TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
 
 export function attributeChangedCallback(elm: any, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {
   if (oldVal !== newVal) {
-    // convert an attribute name that's in dash case
-    // to a property name that's in camel case
+    attrName = attrName.toLowerCase();
     const prop = cmpMeta.props.find(p => p.attrName === attrName);
 
     if (prop) {
