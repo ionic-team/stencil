@@ -30,6 +30,7 @@ const BUNDLES = [
   { components: ['ion-toggle'] },
   { components: ['ion-slides', 'ion-slide'] },
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
+  { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] }
 ];
 
 
