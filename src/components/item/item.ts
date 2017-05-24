@@ -1,4 +1,5 @@
-import { Component, h, Ionic } from '../index';
+import { Component, h, Ionic, Listen } from '../index';
+import { VNodeData } from '../../util/interfaces';
 
 
 @Component({
@@ -11,10 +12,32 @@ import { Component, h, Ionic } from '../index';
   shadow: false
 })
 export class Item {
+  childStyles: {[className: string]: boolean} = Object.create(null);
+
+  @Listen('ionStyle')
+  itemStyle(ev: UIEvent) {
+    ev.stopPropagation();
+
+    let hasChildStyleChange = false;
+    let updatedStyles: any = ev.detail;
+
+    for (var key in updatedStyles) {
+      if (updatedStyles[key] !== this.childStyles['item-' + key]) {
+        this.childStyles['item-' + key] = updatedStyles[key];
+        hasChildStyleChange = true;
+      }
+    }
+
+    // returning true tells the renderer to queue an update
+    return hasChildStyleChange;
+  }
 
   render() {
+    const themeVNode: VNodeData = { class: {} };
+    Object.assign(themeVNode.class, this.childStyles);
+
     return h(this,
-      h('div.item-block', Ionic.theme(this, 'item'),
+      h('div.item-block', Ionic.theme(this, 'item', themeVNode),
         [
           h('slot', { attrs: { name: 'start' } }),
           h('div.item-inner', [

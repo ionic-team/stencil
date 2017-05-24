@@ -16,8 +16,6 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
     // it's important to have an async tick in here so we can
     // ensure the "mode" attribute has been added to the element
     plt.queue.add(() => {
-      const tag = cmpMeta.tag;
-
       // get the mode the element which is loading
       // if there is no mode, then use "default"
       const cmpMode = cmpMeta.modes[getMode(plt, config, elm, 'mode')] || cmpMeta.modes['default'];
@@ -28,7 +26,7 @@ export function connectedCallback(plt: PlatformApi, config: ConfigApi, renderer:
 
         // we've fully loaded the component mode data
         // let's queue it up to be rendered next
-        queueUpdate(plt, config, renderer, elm, tag);
+        queueUpdate(plt, config, renderer, elm);
       });
     });
   }

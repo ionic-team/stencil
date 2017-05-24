@@ -38,7 +38,7 @@ export function registerComponentsES5(renderer: RendererApi, plt: PlatformApi, c
 
         $queueUpdate: { configurable: true, value:
           function() {
-            queueUpdate(plt, config, renderer, this, cmpMeta.tag);
+            queueUpdate(plt, config, renderer, this);
           }
         },
 

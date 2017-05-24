@@ -3,7 +3,7 @@ import { Component, PropMeta, ConfigApi, MethodMeta, PlatformApi, ProxyElement, 
 import { queueUpdate } from './update';
 
 
-export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, props: PropMeta[], methods: MethodMeta[], watchers: WatchMeta[]) {
+export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, instance: Component, props: PropMeta[], methods: MethodMeta[], watchers: WatchMeta[]) {
   let i = 0;
 
   if (methods) {
@@ -15,7 +15,7 @@ export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: Rendere
   instance.$values = {};
 
   for (i = 0; i < props.length; i++) {
-    initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, tag, instance, watchers);
+    initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, instance, watchers);
   }
 }
 
@@ -29,7 +29,7 @@ function initMethod(methodName: string, elm: ProxyElement, instance: Component) 
 }
 
 
-function initProp(propName: string, propType: any, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string, instance: Component, watchers: WatchMeta[]) {
+function initProp(propName: string, propType: any, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, instance: Component, watchers: WatchMeta[]) {
   instance.$values[propName] = getInitialValue(config, elm, instance, propType, propName);
 
   if (watchers) {
@@ -54,7 +54,7 @@ function initProp(propName: string, propType: any, plt: PlatformApi, config: Con
         }
       }
 
-      queueUpdate(plt, config, renderer, elm, tag);
+      queueUpdate(plt, config, renderer, elm);
     }
   }
 

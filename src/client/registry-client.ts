@@ -26,7 +26,7 @@ export function registerComponents(renderer: RendererApi, plt: PlatformApi, conf
     };
 
     (<any>ProxyHTMLElement).prototype.$queueUpdate = function() {
-      queueUpdate(plt, config, renderer, this, cmpMeta.tag);
+      queueUpdate(plt, config, renderer, this);
     };
 
     (<any>ProxyHTMLElement).prototype.$initLoadComponent = function() {

@@ -245,7 +245,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
 
   function getComponentMeta(tag: string) {
-    return registry[tag];
+    return registry[tag.toLowerCase()];
   }
 
   function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K] {

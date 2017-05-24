@@ -6,7 +6,7 @@ import { initProxy } from './proxy';
 import { RendererApi } from '../util/interfaces';
 
 
-export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string) {
+export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement) {
   // only run patch if it isn't queued already
   if (!elm.$queued) {
     elm.$queued = true;
@@ -15,7 +15,7 @@ export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Rende
     plt.queue.add(function queueUpdateNextTick() {
 
       // vdom diff and patch the host element for differences
-      update(plt, config, renderer, elm, tag);
+      update(plt, config, renderer, elm);
 
       // no longer queued
       elm.$queued = false;
@@ -24,8 +24,8 @@ export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: Rende
 }
 
 
-export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, tag: string) {
-  const cmpMeta = plt.getComponentMeta(tag);
+export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement) {
+  const cmpMeta = plt.getComponentMeta(elm.tagName);
 
   let isInitialLoad = false;
   let isSsrHydrated = false;
@@ -45,7 +45,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     // so we've got an host element now, and a actual instance
     // let's wire them up together with getter/settings
     // the setters are use for change detection and knowing when to re-render
-    initProxy(plt, config, renderer, elm, tag, instance, cmpMeta.props, cmpMeta.methods, cmpMeta.watchers);
+    initProxy(plt, config, renderer, elm, instance, cmpMeta.props, cmpMeta.methods, cmpMeta.watchers);
 
     // cool, let's actually attach the component to the DOM
     // this largely adds this components styles and determines
@@ -182,7 +182,7 @@ export function addToLoadingParentComponent(plt: PlatformApi, elm: ProxyElement)
       break;
     }
 
-    if (plt.getComponentMeta(parentElm.tagName.toLowerCase())) {
+    if (plt.getComponentMeta(parentElm.tagName)) {
       // this ancestor element is a known component
       // let's remember this for later incase this
       // ends up being the component to use

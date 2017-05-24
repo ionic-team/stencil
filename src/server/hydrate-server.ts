@@ -80,7 +80,7 @@ export function parseNodes(plt: PlatformApi, config: ConfigApi, renderer: Render
 
 export function inspectNode(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, node: Node, promises: Promise<any>[]) {
   if (plt.isElement(node)) {
-    const cmpMeta = plt.getComponentMeta(node.tagName.toLowerCase());
+    const cmpMeta = plt.getComponentMeta(node.tagName);
     if (cmpMeta) {
       const promise = connectElement(plt, config, renderer, cmpMeta, node);
       promises.push(promise);
@@ -99,7 +99,7 @@ function connectElement(plt: PlatformApi, config: ConfigApi, renderer: RendererA
   return new Promise(resolve => {
 
     elm.$queueUpdate = function() {
-      queueUpdate(plt, config, renderer, elm, cmpMeta.tag);
+      queueUpdate(plt, config, renderer, elm);
     };
 
     elm.$initLoadComponent = function() {

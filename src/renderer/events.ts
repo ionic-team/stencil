@@ -1,4 +1,4 @@
-import { Component, ListenMeta, ListenOptions, QueueApi } from '../util/interfaces';
+import { Component, ListenMeta, ListenOptions, ProxyElement, QueueApi } from '../util/interfaces';
 import { getElementReference, noop } from '../util/helpers';
 import { KEY_CODE_MAP } from '../util/constants';
 
@@ -46,7 +46,7 @@ export function enableListener(queue: QueueApi, instance: Component, eventName: 
 }
 
 
-export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): void}, opts: ListenOptions = {}) {
+export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): any}, opts: ListenOptions = {}) {
   if (!elm) {
     return noop;
   }
@@ -85,7 +85,10 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
     }
 
     // fire the component's event listener callback
-    userEventListener(ev);
+    // returning true forces the the element to be queued for an update
+    if (userEventListener(ev) === true) {
+      queueAncestorUpdate(elm);
+    }
 
     // test if this is the user's interaction
     if (isUserInteraction(eventName)) {
@@ -103,6 +106,17 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
       elm.removeEventListener(eventName, eventListener, eventListenerOpts);
     }
   };
+}
+
+
+export function queueAncestorUpdate(elm: any) {
+  while (elm) {
+    if ((<ProxyElement>elm).$queueUpdate) {
+      (<ProxyElement>elm).$queueUpdate();
+      break;
+    }
+    elm = elm.parentElement;
+  }
 }
 
 

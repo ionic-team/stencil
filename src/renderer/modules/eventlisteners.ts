@@ -1,5 +1,6 @@
-import { ProxyElement, VNode, VNodeData } from '../../util/interfaces';
 import { isFunction, isObject } from '../../util/helpers';
+import { queueAncestorUpdate } from '../events';
+import { VNode, VNodeData } from '../../util/interfaces';
 
 
 function invokeHandler(handler: any, vnode?: VNode, event?: Event): void {
@@ -26,14 +27,7 @@ function invokeHandler(handler: any, vnode?: VNode, event?: Event): void {
     }
   }
 
-  let proxyElm: ProxyElement = <any>vnode.elm;
-  while (proxyElm) {
-    if (proxyElm.$queueUpdate) {
-      proxyElm.$queueUpdate();
-      break;
-    }
-    proxyElm = <any>proxyElm.parentElement;
-  }
+  queueAncestorUpdate(vnode.elm);
 }
 
 function handleEvent(event: Event, vnode: VNode) {

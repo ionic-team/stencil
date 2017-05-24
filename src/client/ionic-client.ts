@@ -45,7 +45,7 @@ export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocu
     enable: function(instance: any, eventName: string, shouldEnable: boolean, attachTo?: string) {
       enableListener(queue, instance, eventName, shouldEnable, attachTo);
     },
-    add: function (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => void, opts?: ListenOptions) {
+    add: function (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => any, opts?: ListenOptions) {
       return addEventListener(queue, elm, eventName, cb, opts);
     }
   };
