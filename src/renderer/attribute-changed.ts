@@ -1,5 +1,5 @@
-import { TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
 import { ComponentMeta } from '../util/interfaces';
+import { TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
 
 
 export function attributeChangedCallback(elm: any, cmpMeta: ComponentMeta, attrName: string, oldVal: string, newVal: string) {

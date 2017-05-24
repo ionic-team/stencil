@@ -1,16 +1,16 @@
 import { adapter } from './dom/adapter';
 import { attributeChangedCallback } from '../renderer/attribute-changed';
-import { BundleCallbacks, ComponentModeData, ComponentMeta, Component, ComponentRegistry,
+import { BundleCallbacks, Component, ComponentModeData, ComponentMeta, ComponentRegistry,
   IonicGlobal, LoadComponentData, PlatformApi } from '../util/interfaces';
-import { generateGlobalContext, Window } from './dom/window';
+import { generateGlobalContext } from './dom/global-context';
 import { h } from '../renderer/h';
 import { initInjectedIonic } from './ionic-server';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
+import { Window } from './dom/window';
 import { XLINK_NS, XML_NS } from '../util/constants';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vm from 'vm';
-
 
 
 export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGbl: IonicGlobal): PlatformApi {
@@ -88,13 +88,16 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
         // priority doesn't matter on the server
         priority;
 
-        fs.readFile(filePath, 'utf-8', (err, content) => {
+        fs.readFile(filePath, 'utf-8', (err, code) => {
           if (err) {
             console.error(`loadBundle: ${bundleId}, ${err}`);
             err.stack && console.error(err.stack);
+
           } else {
-            vm.runInContext(content, context);
+            // run the code in this sandboxed context
+            vm.runInContext(code, context);
           }
+
           delete activeFileReads[filePath];
         });
 
