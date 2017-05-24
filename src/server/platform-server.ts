@@ -21,9 +21,11 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
   const css: {[cmpModeId: string]: string} = {};
   const injectedIonic = initInjectedIonic(IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
-  const context = generateGlobalContext(win, IonicGbl);
 
+  // generate a sandboxed context
+  const context = generateGlobalContext(win, IonicGbl);
   vm.createContext(context);
+
 
   IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
     coreVersion;

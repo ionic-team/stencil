@@ -92,9 +92,3 @@ export class Window {
   focus() {}
   blur() {}
 }
-
-
-export interface WindowOptions {
-  url?: string;
-  userAgent?: string;
-}

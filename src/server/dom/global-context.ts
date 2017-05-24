@@ -1,7 +1,8 @@
+import { IonicGlobal } from '../../util/interfaces';
 import { Window } from './window';
 
 
-export function generateGlobalContext(win: Window, IonicGbl: any) {
+export function generateGlobalContext(win: Window, IonicGbl: IonicGlobal) {
   return {
     'Ionic': IonicGbl,
     'window': win,
