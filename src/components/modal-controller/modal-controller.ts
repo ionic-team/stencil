@@ -18,9 +18,11 @@ export class ModalController implements OverlayApi {
   private ids = 0;
   private modalResolves: {[modalId: string]: Function} = {};
   private modals: Modal[] = [];
+  private appRoot: Element;
 
 
   ionViewDidLoad() {
+    this.appRoot = document.querySelector('ion-app') || document.body;
     (<IonicGlobal>Ionic).loadController('modal', this);
   }
 
@@ -40,7 +42,7 @@ export class ModalController implements OverlayApi {
     Object.assign(modal, opts);
 
     // append the modal element to the document body
-    document.body.appendChild(<any>modal);
+    this.appRoot.appendChild(<any>modal);
 
     // store the resolve function to be called later up when the modal loads
     return new Promise<Modal>(resolve => {

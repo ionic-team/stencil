@@ -16,7 +16,6 @@ import iOSLeaveAnimation from './animations/ios.leave';
 })
 export class Modal implements IModal {
   $el: HTMLElement;
-  id: string;
   animation: Animation;
 
   @Prop() component: string;
@@ -25,6 +24,7 @@ export class Modal implements IModal {
   @Prop() enableBackdropDismiss: boolean = true;
   @Prop() enterAnimation: AnimationBuilder;
   @Prop() exitAnimation: AnimationBuilder;
+  @Prop() id: string;
   @Prop() showBackdrop: boolean = true;
 
   @Listen('ionDismiss')

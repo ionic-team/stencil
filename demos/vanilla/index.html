@@ -23,7 +23,7 @@
         <ion-toolbar>
           <ion-title>Header</ion-title>
           <ion-buttons end>
-            <ion-button>Default</ion-button>
+            <ion-button id="presentModal">Modal</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
@@ -180,6 +180,59 @@
             div.innerHTML = '<ion-badge>' + i + '</ion-badge>';
             dynamicBadges.appendChild(div);
           }
+
+
+          document.getElementById('presentModal').addEventListener('click', function() {
+            var userId = Math.round(Math.random() * 10000);
+
+            console.log('open profile modal for userId:', userId);
+
+            Ionic.overlay('modal', { component: 'profile-page', componentProps: { userId: userId } }).then(modal => {
+              console.log('start presenting modal, userId:', modal.componentProps.userId);
+
+              modal.present().then(() => {
+                console.log('finished presenting modal, userId:', modal.componentProps.userId);
+              });
+            });
+          });
+
+          class ProfilePage extends HTMLElement {
+
+            constructor() {
+              super();
+
+              const shadowRoot = this.attachShadow({mode: 'open'});
+
+              shadowRoot.innerHTML = `
+                <ion-header>
+                  <ion-toolbar>
+                    My Profile
+                  </ion-toolbar>
+                </ion-header>
+
+                <ion-content padding>
+                  <p>User Id: <span id="userId"></span></p>
+                  <p>
+                    <ion-button>Dismiss</ion-button>
+                  </p>
+                </ion-content>
+              `;
+            }
+
+            connectedCallback() {
+              var btn = this.shadowRoot.querySelector('ion-button');
+
+              btn.addEventListener('click', (uiEvent) => {
+                console.log('dismiss profile page for userId:', this.userId);
+                var ev = new CustomEvent('ionDismiss', { composed: true, bubbles: true });
+                uiEvent.target.dispatchEvent(ev);
+              });
+
+              this.shadowRoot.getElementById('userId').textContent = this.userId;
+            }
+
+          }
+          customElements.define('profile-page', ProfilePage);
         </script>
 
       </ion-content>

@@ -74,11 +74,8 @@ export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocu
         } else {
           // looks like we haven't even started the request yet
           // let add the component to the DOM and create a queue
-          const ctrlTag = `ion-${ctrlName}-controller`;
-          if (!doc.querySelector(ctrlTag)) {
-            doc.body.appendChild(doc.createElement(ctrlTag));
-          }
           overlayQueue[ctrlName] = [opts, resolve];
+          doc.body.appendChild(doc.createElement(`ion-${ctrlName}-controller`));
         }
       }
     });
