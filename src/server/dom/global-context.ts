@@ -3,7 +3,7 @@ import { Window } from './window';
 
 
 export function generateGlobalContext(win: Window, IonicGbl: IonicGlobal) {
-  return {
+  const context: any = {
     'Ionic': IonicGbl,
     'window': win,
     'document': win.document,
@@ -30,4 +30,6 @@ export function generateGlobalContext(win: Window, IonicGbl: IonicGlobal) {
     'removeEventListener': win.removeEventListener,
     'dispatchEvent': win.dispatchEvent,
   };
+
+  return context;
 }
