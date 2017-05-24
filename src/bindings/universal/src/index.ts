@@ -1,33 +1,21 @@
-import { ConfigController } from '../../../util/config-controller';
-import { IonicGlobal, ServerInitConfig } from '../../../util/interfaces';
-import { PlatformServer } from '../../../server/platform-server';
-import { registerComponents } from '../../../server/registry';
-import { QueueServer } from '../../../server/queue-server';
-import { upgradeInputHtml } from '../../../server/upgrade';
+import { hydrateHtml } from '../../../server/hydrate-server';
+import { registerComponents } from '../../../server/registry-server';
+import { ServerInitConfig, HydrateConfig } from '../../../util/interfaces';
 
 
 export function init(serverInitConfig: ServerInitConfig) {
-  const IonicGbl: IonicGlobal = (<any>global).Ionic = (<any>global).Ionic || {};
+  const staticDir = serverInitConfig.staticDir;
+  const registry = registerComponents(staticDir);
 
-  IonicGbl.DomCtrl = {
-    read: function(cb: Function) { cb(performance.now()); },
-    write: function(cb: Function) { cb(performance.now()); },
-    raf: function(cb: Function) { cb(performance.now()); },
-  };
+  function hydrate(html: string, opts: HydrateConfig = {}) {
+    const registryClone = Object.assign({}, registry);
 
-  IonicGbl.QueueCtrl = QueueServer();
+    opts.config = opts.config || serverInitConfig.config;
 
-  IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, []);
-
-  const plt = PlatformServer(IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
-
-  registerComponents(serverInitConfig.staticDir);
-
-  function upgradeHtml(html: string) {
-    return upgradeInputHtml(plt, html);
+    return hydrateHtml(registryClone, html, opts, staticDir);
   }
 
   return {
-    upgradeHtml: upgradeHtml
+    hydrate: hydrate
   };
 }
