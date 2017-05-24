@@ -1,9 +1,9 @@
 import { generateCss } from './css-server';
 import { ComponentMeta, ComponentRegistry, ConfigApi, IonicGlobal, PlatformApi, RendererApi, HydrateConfig } from '../util/interfaces';
 import { ConfigController } from '../util/config-controller';
-import { connectedCallback } from '../client/connected';
+import { connectedCallback } from '../renderer/connected';
 import { detectPlatforms } from '../platform/platform-util';
-import { initLoadComponent, queueUpdate } from '../client/update';
+import { initLoadComponent, queueUpdate } from '../renderer/update';
 import { PLATFORM_CONFIGS } from '../platform/platform-configs';
 import { PlatformServer } from './platform-server';
 import { QueueServer } from './queue-server';

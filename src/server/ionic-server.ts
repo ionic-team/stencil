@@ -1,6 +1,6 @@
 import { ConfigApi, DomControllerApi, Ionic } from '../util/interfaces';
 import { noop } from '../util/helpers';
-import { themeVNodeData } from '../client/host';
+import { themeVNodeData } from '../renderer/host';
 
 
 export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {

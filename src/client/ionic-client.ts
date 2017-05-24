@@ -1,6 +1,6 @@
-import { addEventListener, enableListener } from './events';
-import { CustomEventOptions, Ionic, IonicGlobal, OverlayApi, ListenOptions, QueueApi } from '../util/interfaces';
-import { themeVNodeData } from './host';
+import { addEventListener, enableListener } from '../renderer/events';
+import { CustomEventOptions, Ionic, IonicGlobal, ListenOptions, OverlayApi, QueueApi } from '../util/interfaces';
+import { themeVNodeData } from '../renderer/host';
 
 
 export function initInjectedIonic(IonicGlb: IonicGlobal, win: any, doc: HTMLDocument, queue: QueueApi): Ionic {

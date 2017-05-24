@@ -1,4 +1,4 @@
-import { detachListeners } from './events';
+import { detachListeners } from '../renderer/events';
 import { invokeDestroyHook } from '../renderer/core';
 import { PlatformApi, ProxyElement } from '../util/interfaces';
 

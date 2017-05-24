@@ -1,8 +1,8 @@
-import { attributeChangedCallback } from './attribute-changed';
+import { attributeChangedCallback } from '../renderer/attribute-changed';
 import { ComponentMeta, ConfigApi, LoadComponentData, PlatformApi, ProxyElement, RendererApi } from '../util/interfaces';
-import { connectedCallback } from './connected';
-import { disconnectedCallback } from './disconnected';
-import { initLoadComponent, queueUpdate } from './update';
+import { connectedCallback } from '../renderer/connected';
+import { disconnectedCallback } from './disconnected-client';
+import { initLoadComponent, queueUpdate } from '../renderer/update';
 
 
 export function registerComponents(renderer: RendererApi, plt: PlatformApi, config: ConfigApi, components: LoadComponentData[]) {

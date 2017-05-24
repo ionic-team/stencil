@@ -1,11 +1,11 @@
 import { adapter } from './dom/adapter';
+import { attributeChangedCallback } from '../renderer/attribute-changed';
 import { BundleCallbacks, ComponentModeData, ComponentMeta, Component, ComponentRegistry,
   IonicGlobal, LoadComponentData, PlatformApi } from '../util/interfaces';
-import { attributeChangedCallback } from '../client/attribute-changed';
+import { generateGlobalContext, Window } from './dom/window';
 import { h } from '../renderer/h';
 import { initInjectedIonic } from './ionic-server';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
-import { generateGlobalContext, Window } from './dom/window';
 import { XLINK_NS, XML_NS } from '../util/constants';
 import * as fs from 'fs';
 import * as path from 'path';
