@@ -93,6 +93,7 @@ function attachShadow(){};
 function attributeChangedCallback(){};
 function connectedCallback(){};
 function customElements(){};
+function didTimeout(){};
 function host(){};
 function define(){};
 function disconnectedCallback(){};
