@@ -12,8 +12,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class Label {
   render() {
-    return h(this, Ionic.theme(this, 'label'),
-      h('slot')
-    );
+    return h(this, Ionic.theme(this, 'label'), h('slot'));
   }
 }

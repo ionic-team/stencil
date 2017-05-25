@@ -12,8 +12,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class Avatar {
   render() {
-    return h(this, Ionic.theme(this, 'avatar'),
-      h('slot')
-    );
+    return h(this, Ionic.theme(this, 'avatar'), h('slot'));
   }
 }

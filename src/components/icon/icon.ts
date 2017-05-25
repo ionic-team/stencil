@@ -118,7 +118,7 @@ export class Icon {
         'aria-label': this.label
       },
       class: iconClasses
-    }));
+    }), h('slot'));
   }
 
 }

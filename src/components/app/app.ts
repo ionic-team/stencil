@@ -13,7 +13,7 @@ import { Component, h, Ionic } from '../index';
 export class App {
 
   render() {
-    return h(this, Ionic.theme(this, 'app'));
+    return h(this, Ionic.theme(this, 'app'), h('slot'));
   }
 
 }

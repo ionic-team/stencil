@@ -12,6 +12,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class Badge {
   render() {
-    return h(this, Ionic.theme(this, 'badge'));
+    return h(this, Ionic.theme(this, 'badge'), h('slot'));
   }
 }

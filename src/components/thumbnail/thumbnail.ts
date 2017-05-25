@@ -12,8 +12,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class Thumbnail {
   render() {
-    return h(this, Ionic.theme(this, 'thumbnail'),
-      h('slot')
-    );
+    return h(this, Ionic.theme(this, 'thumbnail'), h('slot'));
   }
 }

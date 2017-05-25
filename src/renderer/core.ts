@@ -154,16 +154,16 @@ export function Renderer(api: PlatformApi): RendererApi {
                      startIdx: number,
                      endIdx: number,
                      insertedVnodeQueue: VNodeQueue,
-                     hostContentNodes: HostContentNodes,
-                     isSsrHydrated: boolean) {
+                     hostContentNodes: HostContentNodes) {
     let vnodeChild: VNode;
 
     for (; startIdx <= endIdx; ++startIdx) {
       vnodeChild = vnodes[startIdx];
 
-      if (vnodeChild != null && !(vnodeChild.sel === 'slot' && isSsrHydrated)) {
+      if (vnodeChild != null && vnodeChild.sel !== 'slot') {
         api.$insertBefore(parentElm, createElm(vnodeChild, insertedVnodeQueue, parentElm, hostContentNodes), before);
       }
+
       api.$tmpDisconnected = false;
     }
   }
@@ -263,9 +263,9 @@ export function Renderer(api: PlatformApi): RendererApi {
     }
     if (oldStartIdx > oldEndIdx) {
       before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
-      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue, hostContentNodes, isSsrHydrated);
+      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue, hostContentNodes);
 
-    } else if (newStartIdx > newEndIdx) {
+    } else if (newStartIdx > newEndIdx && !(newEndVnode && newEndVnode.sel === 'slot')) {
       removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
     }
   }
@@ -298,7 +298,7 @@ export function Renderer(api: PlatformApi): RendererApi {
 
       } else if (isDef(ch)) {
         if (isDef(oldVnode.vtext)) api.$setTextContent(elm, '');
-        addVnodes(elm, null, ch as Array<VNode>, 0, (ch as Array<VNode>).length - 1, insertedVnodeQueue, null, isSsrHydrated);
+        addVnodes(elm, null, ch as Array<VNode>, 0, (ch as Array<VNode>).length - 1, insertedVnodeQueue, null);
 
       } else if (isDef(oldCh)) {
         removeVnodes(elm, oldCh as Array<VNode>, 0, (oldCh as Array<VNode>).length - 1);

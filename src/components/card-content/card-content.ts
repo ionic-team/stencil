@@ -12,6 +12,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class CardContent {
   render() {
-    return h(this, Ionic.theme(this, 'card-content'));
+    return h(this, Ionic.theme(this, 'card-content'), h('slot'));
   }
 }

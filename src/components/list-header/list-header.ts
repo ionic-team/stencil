@@ -6,8 +6,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class ListHeader {
   render() {
-    return h(this, Ionic.theme(this, 'list-header'),
-      h('slot')
-    );
+    return h(this, Ionic.theme(this, 'list-header'), h('slot'));
   }
 }

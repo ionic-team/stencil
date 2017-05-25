@@ -28,6 +28,6 @@ export class Slide {
         'slide-zoom': true,
         'swiper-slide': true
       }
-    });
+    }, h('slot'));
   }
 }

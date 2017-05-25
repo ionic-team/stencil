@@ -205,6 +205,7 @@ export class Content {
   }
 
   ionViewDidLoad() {
+    this.$scroll = <any>this.$el.querySelector('ion-scroll');
     this.resize();
   }
 
@@ -629,7 +630,6 @@ export class Content {
             'statusbar-padding': this.statusbarPadding,
           },
           props: props,
-          ref: refElm => this.$scroll = refElm
         }),
         h('slot')
       )
