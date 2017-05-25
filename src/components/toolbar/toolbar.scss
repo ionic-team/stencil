@@ -23,9 +23,9 @@ ion-toolbar {
 }
 
 .toolbar-background {
+  @include position(0, null, null, 0);
+
   position: absolute;
-  top: 0;
-  left: 0;
   z-index: $z-index-toolbar-background;
 
   width: 100%;
@@ -40,9 +40,9 @@ ion-toolbar {
 }
 
 ion-buttons {
-  display: block;
+  @include margin(0, .2rem);
 
-  margin: 0 .2rem;
+  display: block;
 
   transform: translateZ(0);
 

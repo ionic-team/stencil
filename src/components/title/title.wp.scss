@@ -5,8 +5,20 @@
 // Windows Title
 // --------------------------------------------------
 
-/// @prop - Padding of the toolbar title
-$toolbar-wp-title-padding:               0 6px !default;
+// deprecated
+$toolbar-wp-title-padding:               null !default;
+
+/// @prop - Padding top of the toolbar title
+$toolbar-wp-title-padding-top:           0 !default;
+
+/// @prop - Padding end of the toolbar title
+$toolbar-wp-title-padding-end:           6px !default;
+
+/// @prop - Padding bottom of the toolbar title
+$toolbar-wp-title-padding-bottom:        $toolbar-wp-title-padding-top !default;
+
+/// @prop - Padding start of the toolbar title
+$toolbar-wp-title-padding-start:         $toolbar-wp-title-padding-end !default;
 
 /// @prop - Font size of the toolbar title
 $toolbar-wp-title-font-size:             1.5rem !default;
@@ -21,14 +33,15 @@ $toolbar-wp-title-text-transform:        uppercase !default;
 $toolbar-wp-title-text-color:            color-contrast($colors-wp, $toolbar-wp-background, wp) !default;
 
 
-
 .toolbar-title-wp {
-  padding: $toolbar-wp-title-padding;
-
   font-size: $toolbar-wp-title-font-size;
   font-weight: $toolbar-wp-title-font-weight;
   text-transform: $toolbar-wp-title-text-transform;
   color: $toolbar-wp-title-text-color;
+
+  @include deprecated-variable(padding, $toolbar-wp-title-padding) {
+    @include padding($toolbar-wp-title-padding-top, $toolbar-wp-title-padding-end, $toolbar-wp-title-padding-bottom, $toolbar-wp-title-padding-start);
+  }
 }
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-wp) {
