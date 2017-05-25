@@ -31,8 +31,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "../types/jsx.d.ts",
-    "../types/snabbdom-jsx.d.ts"
+    "../types/jsx.d.ts"
   ],
   "exclude": [
     "bindings",

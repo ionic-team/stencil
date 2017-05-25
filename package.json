@@ -49,7 +49,6 @@
     "rollup": "0.41.4",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "snabbdom-jsx": "^0.3.1",
     "swiper": "^3.4.2",
     "tslint": "^5.1.0",
     "tslint-ionic-rules": "0.0.8",
