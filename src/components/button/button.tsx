@@ -247,17 +247,19 @@ export class Button {
       }, {});
 
     const TagType = this.href ? 'a' : 'button';
+    const buttonInner = {
+      'button-inner': true
+    };
+    const buttonEffect = {
+      'button-effect': true
+    };
 
     return (
       <TagType class={buttonClasses} disabled={this.disabled}>
-        <span class="button-inner">
+        <span class={buttonInner}>
           <slot></slot>
         </span>
-        <div class="button-effect">
-          <span class="red" style={{background: 'red'}}>
-            Hi
-          </span>
-        </div>
+        <div class={buttonEffect}></div>
       </TagType>
     );
 
