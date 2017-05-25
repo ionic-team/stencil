@@ -79,15 +79,19 @@ export function parseNodes(plt: PlatformApi, config: ConfigApi, renderer: Render
 
 
 export function inspectNode(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, node: Node, promises: Promise<any>[]) {
-  if (plt.isElement(node)) {
+  if (plt.isElement(node) && node.getAttribute('ssr') !== 'false') {
+    // only inspect elements
+    // and elements that DO NOT have [ssr=false] attributes
     const cmpMeta = plt.getComponentMeta(node.tagName);
     if (cmpMeta) {
+      // only connect elements which is a register component
       const promise = connectElement(plt, config, renderer, cmpMeta, node);
       promises.push(promise);
     }
   }
 
   if (node.childNodes) {
+    // continue drilling down through child elements
     for (var i = 0; i < node.childNodes.length; i++) {
       inspectNode(plt, config, renderer, node.childNodes[i], promises);
     }
