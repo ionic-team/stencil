@@ -22,3 +22,28 @@ ion-toolbar ion-button.headerButton button {
 .button-bar {
   float: right;
 }
+
+.nextButton {
+  float: right;
+}
+
+.previousButton {
+  float: left;
+}
+
+.page-number {
+  line-height: 3;
+}
+
+.pager {
+  text-align: center;
+}
+
+.comments-text {
+  color: grey;
+}
+
+.item-content {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}

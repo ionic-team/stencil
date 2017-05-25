@@ -22,7 +22,7 @@ export class CommentsPage {
 
     return h(this,
       [
-        h('ion-header',
+        h('ion-header.header.header-md',
           h('ion-toolbar', { props: { color: 'primary' } },
             [
               h('ion-button.closeButton', { props: { clear: true, iconOnly: true, slot: 'start' }, on: { click: () => this.close(event) } },

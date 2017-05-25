@@ -15,6 +15,7 @@ export class NewsContainer {
   apiRootUrl: string = 'http://localhost:8100';
   page: number = 1;
   pageType: string;
+  @Prop() prevColor: string;
 
   ionViewDidLoad() {
     Ionic.overlay('loading', { content: 'fetching articles...' }).then((loading: any) => {
@@ -39,9 +40,12 @@ export class NewsContainer {
   }
 
   getStories(type: string) {
+    // reset page number
+    this.page = 1;
+
     Ionic.overlay('loading', { content: `fetching ${type} articles...` }).then((loading: any) => {
       loading.present().then(() => {
-        fetch(`${this.apiRootUrl}/${type}?page=${this.page}`).then((response) => {
+        fetch(`${this.apiRootUrl}/${type}?page=1`).then((response) => {
           return response.json();
         }).then((data) => {
           this.stories = data;
@@ -57,6 +61,7 @@ export class NewsContainer {
 
   previous() {
     if (this.page > 1) {
+
       Ionic.overlay('loading', { content: `fetching articles...` }).then((loading: any) => {
         loading.present().then(() => {
 
@@ -87,9 +92,9 @@ export class NewsContainer {
         fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((response) => {
           return response.json();
         }).then((data) => {
-          console.log(data);
-          this.stories = data;
-
+          if (data.length !== 0) {
+            this.stories = data;
+          }
           loading.dismiss();
         });
 
@@ -98,9 +103,18 @@ export class NewsContainer {
   }
 
   render() {
+
+    // set previous button color
+    if (this.page === 1) {
+      console.log('im here', this.page);
+      this.prevColor = 'dark';
+    } else {
+      this.prevColor = 'primary';
+    }
+
     return h(this,
       [
-        h('ion-header', { props: { mdHeight: '56px', iosHeight: '61px' }},
+        h('ion-header.header.header-md', { props: { mdHeight: '56px', iosHeight: '61px' } },
           [
             h('ion-toolbar', { props: { color: 'primary' } },
               [
@@ -124,14 +138,11 @@ export class NewsContainer {
         ),
 
         h('ion-footer',
-          h('ion-toolbar',
+          h('ion-toolbar.pager',
             [
-              h('ion-buttons', { props: { slot: 'start' } },
-                h('ion-button.previousButton', { props: { clear: true }, on: { click: () => this.previous() } }, 'prev'),
-              ),
-              h('ion-buttons', { props: { slot: 'end' } },
-                h('ion-button', { props: { clear: true }, on: { click: () => this.next() } }, 'next')
-              )
+              h('ion-button.previousButton', { props: { clear: true, slot: 'start', color: this.prevColor }, on: { click: () => this.previous() } }, 'prev'),
+              h('span.page-number', `page ${this.page}`),
+              h('ion-button.nextButton', { props: { clear: true, slot: 'end' }, on: { click: () => this.next() } }, 'next')
             ]
           )
         )
