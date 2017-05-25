@@ -28,8 +28,10 @@ const BUNDLES = [
   { components: ['ion-menu'], priority: 'low' },
   { components: ['ion-modal', 'ion-modal-controller'] },
   { components: ['ion-gesture', 'ion-scroll'], priority: 'low' },
-  { components: ['ion-toggle'] },
   { components: ['ion-slides', 'ion-slide'] },
+  { components: ['ion-spinner'] },
+  { components: ['ion-toggle'] },
+
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
   { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] }
 ];

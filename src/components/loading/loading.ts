@@ -41,7 +41,7 @@ export class Loading implements ILoading {
 
   ionViewDidLoad() {
     if (!this.spinner) {
-      this.spinner = Ionic.config.get('loadingSpinner', Ionic.config.get('spinner', 'ios'));
+      this.spinner = Ionic.config.get('loadingSpinner', Ionic.config.get('spinner', 'lines'));
     }
 
     if (this.showSpinner === null || this.showSpinner === undefined) {
