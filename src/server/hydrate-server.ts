@@ -107,8 +107,15 @@ function connectElement(plt: PlatformApi, config: ConfigApi, renderer: RendererA
     };
 
     elm.$initLoadComponent = function() {
-      initLoadComponent(plt, null, elm, elm.$instance);
-      resolve();
+      const results = initLoadComponent(plt, null, elm, elm.$instance);
+
+      if (results instanceof Promise) {
+        results.then(() => {
+          resolve();
+        });
+      } else {
+        resolve();
+      }
     };
 
     connectedCallback(plt, config, renderer, elm, cmpMeta);

@@ -133,7 +133,7 @@ function hasUninitializeInstance(elm: ProxyElement) {
 }
 
 
-export function initLoadComponent(plt: PlatformApi, listeners: ListenMeta[], elm: ProxyElement, instance: Component) {
+export function initLoadComponent(plt: PlatformApi, listeners: ListenMeta[], elm: ProxyElement, instance: Component): any {
   // this value is only useful during the initial load, but
   // not accurate after that remove it so there's no confusion
   elm.$isLoaded = true;
@@ -145,7 +145,7 @@ export function initLoadComponent(plt: PlatformApi, listeners: ListenMeta[], elm
   // sweet, we're good to go
   // all of this component's children have loaded (if any)
   // so now this component is officially loaded. good work team
-  instance.ionViewDidLoad && instance.ionViewDidLoad();
+  return (instance.ionViewDidLoad && instance.ionViewDidLoad());
 }
 
 
