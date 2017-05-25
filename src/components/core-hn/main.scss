@@ -1,8 +1,13 @@
-
-.nextButton {
-  float: right;
+ion-label {
+  white-space: normal;
 }
 
-.list-md {
-  margin: 0;
+ion-toolbar ion-button.headerButton button {
+  color: white !important;
+}
+
+.pointsDiv {
+  color: #327eff;
+  font-weight: bold;
+  width: 45px;
 }

@@ -1,5 +1,6 @@
 import { Component, Prop, h } from '../index';
 
+
 @Component({
   tag: 'comments-page',
   styleUrls: {
@@ -13,12 +14,20 @@ export class CommentsPage {
   @Prop() comments: string;
 
   ionViewDidLoad() {
-    fetch(this.comments).then((response) => {
-      return response.json();
-    }).then((data: any) => {
-      console.log(data);
-      this.stories = data.comments;
-    });
+    /*Ionic.overlay('loading', { content: 'fetching comments...' }).then((loading: any) => {
+      loading.present();
+
+      fetch(this.comments).then((response) => {
+        return response.json();
+      }).then((data: any) => {
+        console.log(data);
+        this.stories = data.comments;
+
+        setTimeout(() => {
+          loading.dismiss();
+        }, 300);
+      });
+    });*/
   }
 
   close(uiEvent: any) {
@@ -41,7 +50,7 @@ export class CommentsPage {
         ),
 
         h('ion-content',
-          h('comments-list', { props: { type: this.stories } })
+          h('comments-list', { props: { type: this.comments } })
         )
       ]
     );
