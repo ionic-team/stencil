@@ -92,9 +92,9 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
     before: [
       componentClass(ctx),
       removeImports(),
-      reactToSnabbdomJsx()
     ],
     after: [
+      reactToSnabbdomJsx()
     ]
   });
 

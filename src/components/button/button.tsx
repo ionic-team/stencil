@@ -250,8 +250,8 @@ export class Button {
 
     return (
       <TagType class={buttonClasses} disabled={this.disabled}>
-        <span class='button-inner'></span>
-        <div class='button-effect'></div>
+        <span class="button-inner"></span>
+        <div class="button-effect"></div>
       </TagType>
     );
 

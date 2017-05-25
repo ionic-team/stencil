@@ -68,7 +68,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     }
   }, <VNodeData>{});
 
-  const vnode = h(elm, vnodeAttributes, instance.render && instance.render());
+  const vnode = h((<Node>elm), vnodeAttributes, instance.render && instance.render());
   instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode, elm.$hostContent);
 
   if (initalLoad) {

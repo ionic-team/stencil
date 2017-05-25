@@ -91,12 +91,12 @@ copyDirectory(vendorJsScript, vendorCompilerDest)
 }).catch(err => {
   if (err) {
     if (err.stack) {
-      console.log('build.web', err.stack);
+      console.error('build.web', err.stack);
     } else {
-      console.log('build.web', err);
+      console.error('build.web', err);
     }
   } else {
-    console.log('build.web error');
+    console.error('build.web error');
   }
 });
 
