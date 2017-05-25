@@ -13,23 +13,6 @@ export class CommentsPage {
   @Prop() stories: any[] = [];
   @Prop() comments: string;
 
-  ionViewDidLoad() {
-    /*Ionic.overlay('loading', { content: 'fetching comments...' }).then((loading: any) => {
-      loading.present();
-
-      fetch(this.comments).then((response) => {
-        return response.json();
-      }).then((data: any) => {
-        console.log(data);
-        this.stories = data.comments;
-
-        setTimeout(() => {
-          loading.dismiss();
-        }, 300);
-      });
-    });*/
-  }
-
   close(uiEvent: any) {
     const ev = new (CustomEvent as any)('ionDismiss', { composed: true, bubbles: true });
     uiEvent.target.dispatchEvent(ev);

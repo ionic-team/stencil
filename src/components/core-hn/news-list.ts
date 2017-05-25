@@ -43,21 +43,6 @@ export class NewsList {
     console.log(this.type);
 
     const items = this.type.map((story: any) => {
-      /*return h('ion-card',
-        [
-          h('ion-card-header', { style: { whiteSpace: 'normal' } },
-            h('ion-card-title', story.title)
-          ),
-          h('ion-card-content',
-            [
-              h('div', `${story.points} points`),
-              h('div', `Posted by ${story.user} ${story.time_ago}`),
-            ]
-          ),
-          h('ion-button', { props: { clear: true }, on: { click: () => window.open(story.url) } }, 'visit'),
-          h('ion-button', { props: { clear: true }, on: { click: () => this.comments(story) } }, 'comments')
-        ]
-      );*/
       return h('ion-item',
         [
           h('div.points', { props: { slot: 'start' } }, story.points || 0),
