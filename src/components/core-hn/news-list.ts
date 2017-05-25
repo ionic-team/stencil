@@ -60,7 +60,7 @@ export class NewsList {
       );*/
       return h('ion-item',
         [
-          h('div.pointsDiv', { props: { slot: 'start' } }, story.points || 0),
+          h('div.points', { props: { slot: 'start' } }, story.points || 0),
           h('ion-label',
             [
               h('h2', { on: { click: () => window.open(story.url) } }, story.title),
