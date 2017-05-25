@@ -31,6 +31,7 @@ export class Animation {
   private _timerId: any;
   private _unregisterTrnsEnd: Function;
   private _writeCallbacks: Function[];
+  private _destroyed: boolean = false;
 
   parent: Animation;
   opts: AnimationOptions;
@@ -319,7 +320,7 @@ export class Animation {
    */
   play(opts?: PlayOptions) {
     // If the animation was already invalidated (it did finish), do nothing
-    if (this._elements === null) {
+    if (this._destroyed) {
       return;
     }
 
@@ -349,7 +350,7 @@ export class Animation {
 
   syncPlay() {
     // If the animation was already invalidated (it did finish), do nothing
-    if (this._elements === null) {
+    if (this._destroyed) {
       return;
     }
     const opts = { duration: 0 };
@@ -416,7 +417,7 @@ export class Animation {
     // ******** DOM WRITE ****************
     this._playProgress(opts);
 
-    if (this._isAsync && this._elements !== null) {
+    if (this._isAsync && !this._destroyed) {
       // this animation has a duration so we need another RAF
       // for the CSS TRANSITION properties to kick in
       Ionic.dom.raf(this._playToStep.bind(this, 1));
@@ -462,18 +463,20 @@ export class Animation {
    * RECURSION
    */
   _playToStep(stepValue: number) {
-    const children = this._childAnimations;
-    for (var i = 0; i < this._childAnimationTotal; i++) {
-      // ******** DOM WRITE ****************
-      children[i]._playToStep(stepValue);
-    }
+    if (!this._destroyed) {
+      const children = this._childAnimations;
+      for (var i = 0; i < this._childAnimationTotal; i++) {
+        // ******** DOM WRITE ****************
+        children[i]._playToStep(stepValue);
+      }
 
-    if (this._hasDur) {
-      // browser had some time to render everything in place
-      // and the transition duration/easing is set
-      // now set the TO properties which will trigger the transition to begin
-      // ******** DOM WRITE ****************
-      this._progress(stepValue);
+      if (this._hasDur) {
+        // browser had some time to render everything in place
+        // and the transition duration/easing is set
+        // now set the TO properties which will trigger the transition to begin
+        // ******** DOM WRITE ****************
+        this._progress(stepValue);
+      }
     }
   }
 
@@ -627,7 +630,7 @@ export class Animation {
     let effects = this._fxProperties;
     let nuElements = this._elementTotal;
 
-    if (!effects || !nuElements) {
+    if (!effects || !nuElements || this._destroyed) {
       return;
     }
 
@@ -1058,7 +1061,7 @@ export class Animation {
 
       // this animation has a duration so we need another RAF
       // for the CSS TRANSITION properties to kick in
-      if (this._elements !== null) {
+      if (!this._destroyed) {
         Ionic.dom.raf(this._playToStep.bind(this, stepValue));
       }
     }
@@ -1172,6 +1175,8 @@ export class Animation {
    * Recursively destroy this animation and all child animations.
    */
   destroy() {
+    this._destroyed = true;
+
     const children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       children[i].destroy();
@@ -1179,7 +1184,19 @@ export class Animation {
 
     this._clearAsync();
 
-    this.parent = this._elements = this._readCallbacks = this._writeCallbacks = null;
+    if (this._elements) {
+      this._elements.length = this._elementTotal = 0;
+    }
+
+    if (this._readCallbacks) {
+      this._readCallbacks.length = 0;
+    }
+
+    if (this._writeCallbacks) {
+      this._writeCallbacks.length = 0;
+    }
+
+    this.parent = null;
 
     if (this._childAnimations) {
       this._childAnimations.length = this._childAnimationTotal = 0;
