@@ -56,6 +56,26 @@ export class Window {
     this.console = this.document = this.localStorage = this.location = this.navigator = this.performance = null;
   }
 
+  get screen() {
+    return {};
+  }
+
+  setTimeout(cb: Function, timeout: number) {
+    return setTimeout(cb, timeout);
+  }
+
+  clearTimeout(timerId: any) {
+    clearTimeout(timerId);
+  }
+
+  setInterval(cb: Function, timeout: number) {
+    return setInterval(cb, timeout);
+  }
+
+  clearInterval(timerId: any) {
+    clearInterval(timerId);
+  }
+
   requestAnimationFrame(cb: Function) {
     return process.nextTick(() => {
       cb(this.performance.now());
@@ -73,10 +93,6 @@ export class Window {
         }
       });
     });
-  }
-
-  get screen() {
-    return {};
   }
 
   cancelAnimationFrame() {}
