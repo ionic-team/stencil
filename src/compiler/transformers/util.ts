@@ -1,5 +1,16 @@
 import * as ts from 'typescript';
 
+export class ObjectMap {
+  [key: string]: ts.Expression | ObjectMap
+}
+
+export function isInstanceOfObjectMap(object: any): object is ObjectMap{
+  return !object.hasOwnProperty('kind') &&
+    !object.hasOwnProperty('flags') &&
+    !object.hasOwnProperty('pos') &&
+    !object.hasOwnProperty('end');
+}
+
 export function getTextOfPropertyName(name: ts.PropertyName): string {
   switch (name.kind) {
   case ts.SyntaxKind.Identifier:
@@ -12,7 +23,6 @@ export function getTextOfPropertyName(name: ts.PropertyName): string {
       return (<ts.LiteralExpression>(<ts.ComputedPropertyName>name).expression).text;
     }
   }
-
   return undefined;
 }
 
@@ -22,16 +32,41 @@ export function isStringOrNumericLiteral(node: ts.Node): node is ts.StringLitera
       || kind === ts.SyntaxKind.NumericLiteral;
 }
 
-export type ObjectMap = { [key: string]: any };
+
 
 export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpression): ObjectMap {
   const attrs: ts.ObjectLiteralElementLike[] = objectLiteral.properties;
 
   return attrs.reduce((final: ObjectMap, attr: ts.PropertyAssignment) => {
     const name = getTextOfPropertyName(attr.name);
+    let val: any;
 
-    final[name] = true;
+    switch (attr.initializer.kind) {
+    case ts.SyntaxKind.ObjectLiteralExpression:
+      val = objectLiteralToObjectMap(attr.initializer as ts.ObjectLiteralExpression);
+      break;
+    case ts.SyntaxKind.StringLiteral:
+    case ts.SyntaxKind.Identifier:
+    case ts.SyntaxKind.PropertyAccessExpression:
+    default:
+      val = attr.initializer;
+    }
+
+    final[name] = val;
     return final;
 
   }, <ObjectMap>{});
+}
+
+export function objectMapToObjectLiteral(objMap: ObjectMap): ts.ObjectLiteralExpression {
+  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(objMap).map((key: string): ts.ObjectLiteralElementLike => {
+    let value = objMap[key];
+
+    if (isInstanceOfObjectMap(value)) {
+      return ts.createPropertyAssignment(key, objectMapToObjectLiteral(value));
+    }
+    return ts.createPropertyAssignment(key, value as ts.Expression);
+  });
+
+  return ts.createObjectLiteral(newProperties);
 }
