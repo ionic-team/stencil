@@ -49,7 +49,7 @@ export class NewsList {
           h('ion-label',
             [
               h('h2', { on: { click: () => window.open(story.url) } }, story.title),
-              h('h3', { on: { click: () => this.comments(story) } }, `Posted by ${story.user} ${story.time_ago} | ${story.comments_count} comments`)
+              h('h3', { on: { click: () => this.comments(story) } }, `Posted by ${story.user} ${story.time_ago} | ${story.comments_count} comments`),
             ]
           )
         ]

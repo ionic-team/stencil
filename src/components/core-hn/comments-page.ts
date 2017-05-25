@@ -24,11 +24,12 @@ export class CommentsPage {
       [
         h('ion-header',
           h('ion-toolbar', { props: { color: 'primary' } },
-            h('ion-buttons', { props: { start: true } },
-              h('ion-button.closeButton', { props: { clear: true, iconOnly: true }, on: { click: () => this.close(event) } },
+            [
+              h('ion-button.closeButton', { props: { clear: true, iconOnly: true, slot: 'start' }, on: { click: () => this.close(event) } },
                 h('ion-icon', { props: { name: 'close' }, style: { color: 'white' } })
-              )
-            )
+              ),
+              h('ion-title', 'Comments')
+            ]
           )
         ),
 
