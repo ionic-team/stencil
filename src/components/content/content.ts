@@ -14,6 +14,7 @@ import { Scroll } from '../scroll/scroll-interface';
   shadow: false
 })
 export class Content {
+  private mode: string;
   $el: HTMLElement;
   $scroll: Scroll;
   $scrollDetail: ScrollDetail = {};
@@ -612,6 +613,25 @@ export class Content {
 
 
   render() {
+    const contentClass: any = {};
+    const scrollStyle: any = {};
+
+    const children = this.$el.parentElement.children;
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].tagName === 'ION-HEADER') {
+        var headerHeight = children[i].getAttribute(`${this.mode}-height`);
+        if (headerHeight) {
+          if (this.fullscreen) {
+            scrollStyle.paddingTop = headerHeight;
+          } else {
+            scrollStyle.marginTop = headerHeight;
+          }
+          contentClass['content-ready'] = true;
+        }
+        break;
+      }
+    }
+
     const props: any = {};
 
     if (this.ionScrollStart) {
@@ -624,12 +644,13 @@ export class Content {
       props['ionScrollEnd'] = this.ionScrollEnd.bind(this);
     }
 
-    return h(this,
+    return h(this, { class: contentClass },
       h('ion-scroll', Ionic.theme(this, 'content', {
           class: {
             'statusbar-padding': this.statusbarPadding,
           },
           props: props,
+          style: scrollStyle
         }),
         h('slot')
       )
