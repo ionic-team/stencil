@@ -320,8 +320,10 @@ export class Animation {
    * Play the animation.
    */
   play(opts?: PlayOptions) {
+    var self = this;
+
     // If the animation was already invalidated (it did finish), do nothing
-    if (this._destroyed) {
+    if (self._destroyed) {
       return;
     }
 
@@ -331,21 +333,21 @@ export class Animation {
     // if there is a duration, then it'll stage all animations at the
     // FROM property and transition duration, wait a few frames, then
     // kick off the animation by setting the TO property for each animation
-    this._isAsync = this._hasDuration(opts);
+    self._isAsync = self._hasDuration(opts);
 
     // ensure all past transition end events have been cleared
-    this._clearAsync();
+    self._clearAsync();
 
     // recursively kicks off the correct progress step for each child animation
     // ******** DOM WRITE ****************
-    this._playInit(opts);
+    self._playInit(opts);
 
     // doubling up RAFs since this animation was probably triggered
     // from an input event, and just having one RAF would have this code
     // run within the same frame as the triggering input event, and the
     // input event probably already did way too much work for one frame
     Ionic.dom.raf(function() {
-      Ionic.dom.raf(this._playDomInspect.bind(this, opts));
+      Ionic.dom.raf(self._playDomInspect.bind(self, opts));
     });
   }
 
@@ -400,28 +402,29 @@ export class Animation {
    * ROOT ANIMATION
    */
   _playDomInspect(opts: PlayOptions) {
+    var self = this;
     // fire off all the "before" function that have DOM READS in them
     // elements will be in the DOM, however visibily hidden
     // so we can read their dimensions if need be
     // ******** DOM READ ****************
     // ******** DOM WRITE ****************
-    this._beforeAnimation();
+    self._beforeAnimation();
 
     // for the root animation only
     // set the async TRANSITION END event
     // and run onFinishes when the transition ends
-    var dur = this.getDuration(opts);
-    if (this._isAsync) {
-      this._asyncEnd(dur, true);
+    var dur = self.getDuration(opts);
+    if (self._isAsync) {
+      self._asyncEnd(dur, true);
     }
 
     // ******** DOM WRITE ****************
-    this._playProgress(opts);
+    self._playProgress(opts);
 
-    if (this._isAsync && !this._destroyed) {
+    if (self._isAsync && !this._destroyed) {
       // this animation has a duration so we need another RAF
       // for the CSS TRANSITION properties to kick in
-      Ionic.dom.raf(this._playToStep.bind(this, 1));
+      Ionic.dom.raf(self._playToStep.bind(self, 1));
     }
   }
 
@@ -1038,11 +1041,12 @@ export class Animation {
    * End the progress animation.
    */
   progressEnd(shouldComplete: boolean, currentStepValue: number, dur: number) {
+    var self = this;
     if (dur === undefined) {
       dur = -1;
     }
 
-    if (this._isReverse) {
+    if (self._isReverse) {
       // if the animation is going in reverse then
       // flip the step value: 0 becomes 1, 1 becomes 0
       currentStepValue = ((currentStepValue * -1) + 1);
@@ -1053,24 +1057,24 @@ export class Animation {
     if (diff < 0.05) {
       dur = 0;
     } else if (dur < 0) {
-      dur = this._duration;
+      dur = self._duration;
     }
 
-    this._isAsync = (dur > 30);
+    self._isAsync = (dur > 30);
 
-    this._progressEnd(shouldComplete, stepValue, dur, this._isAsync);
+    self._progressEnd(shouldComplete, stepValue, dur, self._isAsync);
 
-    if (this._isAsync) {
+    if (self._isAsync) {
       // for the root animation only
       // set the async TRANSITION END event
       // and run onFinishes when the transition ends
       // ******** DOM WRITE ****************
-      this._asyncEnd(dur, shouldComplete);
+      self._asyncEnd(dur, shouldComplete);
 
       // this animation has a duration so we need another RAF
       // for the CSS TRANSITION properties to kick in
-      if (!this._destroyed) {
-        Ionic.dom.raf(this._playToStep.bind(this, stepValue));
+      if (!self._destroyed) {
+        Ionic.dom.raf(self._playToStep.bind(self, stepValue));
       }
     }
   }
