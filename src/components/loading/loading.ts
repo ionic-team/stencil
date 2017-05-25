@@ -57,7 +57,7 @@ export class Loading implements ILoading {
     activeElement && activeElement.blur && activeElement.blur();
 
     // If there is a duration, dismiss after that amount of time
-    if (typeof this.duration === 'number') {
+    if (typeof this.duration === 'number' && this.duration > 10) {
       this.durationTimeout = setTimeout(() => this.dismiss(), this.duration);
     }
 
