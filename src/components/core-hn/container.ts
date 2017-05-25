@@ -107,9 +107,9 @@ export class NewsContainer {
     // set previous button color
     if (this.page === 1) {
       console.log('im here', this.page);
-      this.prevColor = 'dark';
+      this.prevColor = '#9e9e9e';
     } else {
-      this.prevColor = 'primary';
+      this.prevColor = '#327eff';
     }
 
     return h(this,
@@ -140,7 +140,7 @@ export class NewsContainer {
         h('ion-footer',
           h('ion-toolbar.pager',
             [
-              h('ion-button.previousButton', { props: { clear: true, slot: 'start', color: this.prevColor }, on: { click: () => this.previous() } }, 'prev'),
+              h('ion-button.previousButton', { props: { clear: true, slot: 'start' }, on: { click: () => this.previous() }, style: { color: this.prevColor} }, 'prev'),
               h('span.page-number', `page ${this.page}`),
               h('ion-button.nextButton', { props: { clear: true, slot: 'end' }, on: { click: () => this.next() } }, 'next')
             ]
