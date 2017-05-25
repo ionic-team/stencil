@@ -35,22 +35,6 @@ export class Window {
     this.document.referrer = referrer || '';
   }
 
-  $parse(html: string): any {
-    return this.document.$parse(html);
-  }
-
-  $serialize() {
-    return this.document.$serialize();
-  }
-
-  $applyCss(css: string) {
-    this.document.$applyCss(css);
-  }
-
-  $getAllSelectors() {
-    return this.document.$getAllSelectors();
-  }
-
   $destroy() {
     this.document.$destroy();
     this.console = this.document = this.localStorage = this.location = this.navigator = this.performance = null;

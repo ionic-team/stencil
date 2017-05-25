@@ -36,9 +36,9 @@ export function hydrateHtml(registry: ComponentRegistry, html: string, opts: Hyd
   const renderer = Renderer(plt);
 
   return parseNodes(plt, config, renderer, win, html).then(() => {
-    win.$applyCss(generateCss(plt, win.$getAllSelectors()));
+    win.document.$applyCss(generateCss(plt, win.document.$getAllSelectors()));
 
-    const html = win.$serialize();
+    const html = win.document.$serialize();
     win.$destroy();
     return html;
   });
@@ -67,7 +67,7 @@ export function parseNodes(plt: PlatformApi, config: ConfigApi, renderer: Render
   const promises: Promise<any>[] = [];
 
   // convert an HTML string into nodes
-  const node: any = win.$parse(html);
+  const node: any = win.document.$parse(html);
 
   // loop through each node and start upgrading any that are components
   inspectNode(plt, config, renderer, node, promises);
