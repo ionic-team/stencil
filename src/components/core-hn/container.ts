@@ -17,8 +17,6 @@ export class NewsContainer {
   pageType: string;
 
   ionViewDidLoad() {
-    console.log('did enter');
-
     Ionic.overlay('loading', { content: 'fetching articles...' }).then((loading: any) => {
 
       loading.present().then(() => {
@@ -102,7 +100,7 @@ export class NewsContainer {
   render() {
     return h(this,
       [
-        h('ion-header',
+        h('ion-header', { props: { mdHeight: '56px', iosHeight: '61px' }},
           [
             h('ion-toolbar', { props: { color: 'primary' } },
               [
