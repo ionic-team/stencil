@@ -77,9 +77,40 @@ export interface ModalOptions {
 }
 
 
-export interface ModalEvent extends Event {
+export interface ModalEvent {
   detail: {
     modal: Modal;
+  };
+}
+
+
+export interface Loading {
+  id: string;
+  style?: {
+    zIndex: number;
+  };
+  showBackdrop: boolean;
+  enterAnimation: AnimationBuilder;
+  exitAnimation: AnimationBuilder;
+  cssClass: string;
+  present: (done?: Function) => void;
+  dismiss: (done?: Function) => void;
+}
+
+
+export interface LoadingOptions {
+  spinner?: string;
+  content?: string;
+  cssClass?: string;
+  showBackdrop?: boolean;
+  dismissOnPageChange?: boolean;
+  duration?: number;
+}
+
+
+export interface LoadingEvent {
+  detail: {
+    loading: Loading;
   };
 }
 

@@ -24,6 +24,7 @@
           <ion-title>Header</ion-title>
           <ion-buttons end>
             <ion-button id="presentModal">Modal</ion-button>
+            <ion-button id="presentLoading">Loading</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
@@ -233,6 +234,19 @@
 
           }
           customElements.define('profile-page', ProfilePage);
+
+
+          document.getElementById('presentLoading').addEventListener('click', function() {
+            console.log('open loading');
+
+            Ionic.overlay('loading', { duration: 1000 }).then(modal => {
+              console.log('start presenting loading');
+
+              modal.present().then(() => {
+                console.log('finished presenting loading');
+              });
+            });
+          });
         </script>
 
       </ion-content>
