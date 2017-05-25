@@ -3,7 +3,7 @@ import { CSS_PROP, CSS_VALUE_REGEX, DURATION_MIN, TRANSITION_END_FALLBACK_PADDIN
 import { transitionEnd } from './transition-end';
 import * as interfaces from '../util/interfaces';
 
-declare const Ionic: interfaces.Ionic;
+declare var Ionic: interfaces.Ionic;
 
 
 export class Animation {
@@ -147,7 +147,7 @@ export class Animation {
    * Add the "to" value for a specific property.
    */
   to(prop: string, val: any, clearProperyAfterTransition?: boolean): Animation {
-    const fx = this._addProp('to', prop, val);
+    var fx = this._addProp('to', prop, val);
 
     if (clearProperyAfterTransition) {
       // if this effect is a transform then clear the transform effect
@@ -172,7 +172,8 @@ export class Animation {
 
   private _getProp(name: string): EffectProperty {
     if (this._fxProperties) {
-      return this._fxProperties.find((prop) => prop.effectName === name);
+      return this._fxProperties.find(function(prop) { return prop.effectName === name; });
+
     } else {
       this._fxProperties = [];
     }
@@ -180,7 +181,7 @@ export class Animation {
   }
 
   private _addProp(state: string, prop: string, val: any): EffectProperty {
-    let fxProp = this._getProp(prop);
+    var fxProp = this._getProp(prop);
 
     if (!fxProp) {
       // first time we've see this EffectProperty
@@ -196,7 +197,7 @@ export class Animation {
     }
 
     // add from/to EffectState to the EffectProperty
-    let fxState: EffectState = {
+    var fxState: EffectState = {
       val: val,
       num: null,
       effectUnit: '',
@@ -204,8 +205,8 @@ export class Animation {
     fxProp[state] = fxState;
 
     if (typeof val === 'string' && val.indexOf(' ') < 0) {
-      let r = val.match(CSS_VALUE_REGEX);
-      let num = parseFloat(r[1]);
+      var r = val.match(CSS_VALUE_REGEX);
+      var num = parseFloat(r[1]);
 
       if (!isNaN(num)) {
         fxState.num = num;
@@ -343,7 +344,7 @@ export class Animation {
     // from an input event, and just having one RAF would have this code
     // run within the same frame as the triggering input event, and the
     // input event probably already did way too much work for one frame
-    Ionic.dom.raf(() => {
+    Ionic.dom.raf(function() {
       Ionic.dom.raf(this._playDomInspect.bind(this, opts));
     });
   }
@@ -353,7 +354,7 @@ export class Animation {
     if (this._destroyed) {
       return;
     }
-    const opts = { duration: 0 };
+    var opts = { duration: 0 };
     this._isAsync = false;
     this._clearAsync();
     this._playInit(opts);
@@ -375,7 +376,7 @@ export class Animation {
     this.hasCompleted = false;
     this._hasDur = (this.getDuration(opts) > DURATION_MIN);
 
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM WRITE ****************
       children[i]._playInit(opts);
@@ -409,7 +410,7 @@ export class Animation {
     // for the root animation only
     // set the async TRANSITION END event
     // and run onFinishes when the transition ends
-    const dur = this.getDuration(opts);
+    var dur = this.getDuration(opts);
     if (this._isAsync) {
       this._asyncEnd(dur, true);
     }
@@ -430,7 +431,7 @@ export class Animation {
    * RECURSION
    */
   _playProgress(opts: PlayOptions) {
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM WRITE ****************
       children[i]._playProgress(opts);
@@ -464,7 +465,7 @@ export class Animation {
    */
   _playToStep(stepValue: number) {
     if (!this._destroyed) {
-      const children = this._childAnimations;
+      var children = this._childAnimations;
       for (var i = 0; i < this._childAnimationTotal; i++) {
         // ******** DOM WRITE ****************
         children[i]._playToStep(stepValue);
@@ -487,7 +488,7 @@ export class Animation {
    * ROOT ANIMATION
    */
   _asyncEnd(dur: number, shouldComplete: boolean) {
-    const self = this;
+    var self = this;
 
     function onTransitionEnd() {
       // congrats! a successful transition completed!
@@ -533,7 +534,7 @@ export class Animation {
    * RECURSION
    */
   _playEnd(stepValue?: number) {
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM WRITE ****************
       children[i]._playEnd(stepValue);
@@ -570,7 +571,7 @@ export class Animation {
       return true;
     }
 
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       if (children[i]._hasDuration(opts)) {
         return true;
@@ -589,7 +590,7 @@ export class Animation {
       return true;
     }
 
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       if (children[i]._hasDomReads()) {
         return true;
@@ -601,7 +602,10 @@ export class Animation {
   /**
    * Immediately stop at the end of the animation.
    */
-  stop(stepValue: number = 1) {
+  stop(stepValue?: number) {
+    if (stepValue === undefined) {
+      stepValue = 1;
+    }
     // ensure all past transition end events have been cleared
     this._clearAsync();
     this._hasDur = true;
@@ -626,9 +630,9 @@ export class Animation {
    */
   _progress(stepValue: number) {
     // bread 'n butter
-    let val: any;
-    let effects = this._fxProperties;
-    let nuElements = this._elementTotal;
+    var val: any;
+    var effects = this._fxProperties;
+    var nuElements = this._elementTotal;
 
     if (!effects || !nuElements || this._destroyed) {
       return;
@@ -714,14 +718,14 @@ export class Animation {
     }
 
     // set the TRANSITION properties inline on the element
-    const elements = this._elements;
-    const easing = (forcedLinearEasing ? 'linear' : this.getEasing());
-    const durString = dur + 'ms';
-    const cssTransform = CSS_PROP.transitionProp;
-    const cssTransitionDuration = CSS_PROP.transitionDurationProp;
-    const cssTransitionTimingFn = CSS_PROP.transitionTimingFnProp;
+    var elements = this._elements;
+    var easing = (forcedLinearEasing ? 'linear' : this.getEasing());
+    var durString = dur + 'ms';
+    var cssTransform = CSS_PROP.transitionProp;
+    var cssTransitionDuration = CSS_PROP.transitionDurationProp;
+    var cssTransitionTimingFn = CSS_PROP.transitionTimingFnProp;
 
-    let eleStyle: any;
+    var eleStyle: any;
     for (var i = 0; i < this._elementTotal; i++) {
       eleStyle = elements[i].style;
       if (dur > 0) {
@@ -770,8 +774,8 @@ export class Animation {
    * RECURSION
    */
   _setBeforeStyles() {
-    let i: number, j: number;
-    const children = this._childAnimations;
+    var i: number, j: number;
+    var children = this._childAnimations;
     for (i = 0; i < this._childAnimationTotal; i++) {
       children[i]._setBeforeStyles();
     }
@@ -781,12 +785,12 @@ export class Animation {
     if (this._isReverse) {
       return;
     }
-    const addClasses = this._beforeAddClasses;
-    const removeClasses = this._beforeRemoveClasses;
+    var addClasses = this._beforeAddClasses;
+    var removeClasses = this._beforeRemoveClasses;
 
-    let elm: HTMLElement;
-    let elementClassList: DOMTokenList;
-    let prop: string;
+    var elm: HTMLElement;
+    var elementClassList: DOMTokenList;
+    var prop: string;
     for (i = 0; i < this._elementTotal; i++) {
       elm = this._elements[i];
       elementClassList = elm.classList;
@@ -823,15 +827,15 @@ export class Animation {
    * RECURSION
    */
   _fireBeforeReadFunc() {
-    const children = this._childAnimations;
-    let i = 0;
+    var children = this._childAnimations;
+    var i = 0;
 
     for (i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM READ ****************
       children[i]._fireBeforeReadFunc();
     }
 
-    const readFunctions = this._readCallbacks;
+    var readFunctions = this._readCallbacks;
     if (readFunctions) {
       for (i = 0; i < readFunctions.length; i++) {
         // ******** DOM READ ****************
@@ -846,15 +850,15 @@ export class Animation {
    * RECURSION
    */
   _fireBeforeWriteFunc() {
-    const children = this._childAnimations;
-    let i = 0;
+    var children = this._childAnimations;
+    var i = 0;
 
     for (i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM WRITE ****************
       children[i]._fireBeforeWriteFunc();
     }
 
-    const writeFunctions = this._writeCallbacks;
+    var writeFunctions = this._writeCallbacks;
     if (this._writeCallbacks) {
       for (i = 0; i < writeFunctions.length; i++) {
         // ******** DOM WRITE ****************
@@ -868,11 +872,11 @@ export class Animation {
    * DOM WRITE
    */
   _setAfterStyles() {
-    let i: number, j: number;
-    let elm: HTMLElement;
-    let elementClassList: DOMTokenList;
-    let elements = this._elements;
-    let prop: string;
+    var i: number, j: number;
+    var elm: HTMLElement;
+    var elementClassList: DOMTokenList;
+    var elements = this._elements;
+    var prop: string;
 
     for (i = 0; i < this._elementTotal; i++) {
       elm = elements[i];
@@ -945,10 +949,10 @@ export class Animation {
    * NO RECURSION
    */
   _willChange(addWillChange: boolean) {
-    let i = 0;
-    let wc: string[];
-    let effects = this._fxProperties;
-    let willChange: string;
+    var i = 0;
+    var wc: string[];
+    var effects = this._fxProperties;
+    var willChange: string;
 
     if (addWillChange && effects) {
       wc = [];
@@ -993,7 +997,7 @@ export class Animation {
    * RECURSION
    */
   _progressStart() {
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM WRITE ****************
       children[i]._progressStart();
@@ -1014,7 +1018,7 @@ export class Animation {
     // only update if the last update was more than 16ms ago
     stepValue = Math.min(1, Math.max(0, stepValue));
 
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM WRITE ****************
       children[i].progressStep(stepValue);
@@ -1033,15 +1037,19 @@ export class Animation {
   /**
    * End the progress animation.
    */
-  progressEnd(shouldComplete: boolean, currentStepValue: number, dur: number = -1) {
+  progressEnd(shouldComplete: boolean, currentStepValue: number, dur: number) {
+    if (dur === undefined) {
+      dur = -1;
+    }
+
     if (this._isReverse) {
       // if the animation is going in reverse then
       // flip the step value: 0 becomes 1, 1 becomes 0
       currentStepValue = ((currentStepValue * -1) + 1);
     }
-    const stepValue = shouldComplete ? 1 : 0;
+    var stepValue = shouldComplete ? 1 : 0;
 
-    const diff = Math.abs(currentStepValue - stepValue);
+    var diff = Math.abs(currentStepValue - stepValue);
     if (diff < 0.05) {
       dur = 0;
     } else if (dur < 0) {
@@ -1073,7 +1081,7 @@ export class Animation {
    * RECURSION
    */
   _progressEnd(shouldComplete: boolean, stepValue: number, dur: number, isAsync: boolean) {
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       // ******** DOM WRITE ****************
       children[i]._progressEnd(shouldComplete, stepValue, dur, isAsync);
@@ -1124,7 +1132,7 @@ export class Animation {
    * RECURSION
    */
   _didFinishAll(hasCompleted: boolean, finishAsyncAnimations: boolean, finishNoDurationAnimations: boolean) {
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       children[i]._didFinishAll(hasCompleted, finishAsyncAnimations, finishNoDurationAnimations);
     }
@@ -1141,7 +1149,7 @@ export class Animation {
   _didFinish(hasCompleted: boolean) {
     this.isPlaying = false;
     this.hasCompleted = hasCompleted;
-    let i = 0;
+    var i = 0;
 
     if (this._onFinishCallbacks) {
       // run all finish callbacks
@@ -1162,8 +1170,11 @@ export class Animation {
   /**
    * Reverse the animation.
    */
-  reverse(shouldReverse: boolean = true): Animation {
-    const children = this._childAnimations;
+  reverse(shouldReverse?: boolean): Animation {
+    if (shouldReverse === undefined) {
+      shouldReverse = true;
+    }
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       children[i].reverse(shouldReverse);
     }
@@ -1177,7 +1188,7 @@ export class Animation {
   destroy() {
     this._destroyed = true;
 
-    const children = this._childAnimations;
+    var children = this._childAnimations;
     for (var i = 0; i < this._childAnimationTotal; i++) {
       children[i].destroy();
     }

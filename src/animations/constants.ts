@@ -1,7 +1,7 @@
 
 
-export const CSS_PROP = function(docEle: HTMLElement) {
-  const css: {
+export var CSS_PROP = function(docEle: HTMLElement) {
+  var css: {
     transformProp?: string;
     transitionProp?: string;
     transitionDurationProp?: string;
@@ -42,7 +42,7 @@ export const CSS_PROP = function(docEle: HTMLElement) {
 }(document.documentElement);
 
 
-export const TRANSFORM_PROPS: {[key: string]: number} = {
+export var TRANSFORM_PROPS: {[key: string]: number} = {
   'translateX': 1,
   'translateY': 1,
   'translateZ': 1,
@@ -62,6 +62,6 @@ export const TRANSFORM_PROPS: {[key: string]: number} = {
   'perspective': 1
 };
 
-export const CSS_VALUE_REGEX = /(^-?\d*\.?\d*)(.*)/;
-export const DURATION_MIN = 32;
-export const TRANSITION_END_FALLBACK_PADDING_MS = 400;
+export var CSS_VALUE_REGEX = /(^-?\d*\.?\d*)(.*)/;
+export var DURATION_MIN = 32;
+export var TRANSITION_END_FALLBACK_PADDING_MS = 400;
