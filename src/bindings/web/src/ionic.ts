@@ -21,8 +21,9 @@ import { IonicGlobal } from '../../../util/interfaces';
     ionic.staticDir = scriptElm.dataset['staticDir'] = paths.join('/') + '/';
   }
 
+  // auto hide components until they been fully hydrated
   var style = document.createElement('style');
-  style.innerHTML = ionic.components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}';
+  style.innerHTML = ionic.components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.hydrated{visibility:inherit}';
   document.head.appendChild(style);
 
   // build up a path for the exact ionic core javascript file this browser needs
@@ -38,10 +39,11 @@ import { IonicGlobal } from '../../../util/interfaces';
     pathItems.push('ce');
   }
 
-  if (!('requestIdleCallback' in window)) {
+  var requestIdleCallback = 'requestIdleCallback';
+  if (!(requestIdleCallback in window)) {
     // darn, this browser doesn't support requestIdleCallback
     // let's shim it!
-    window.requestIdleCallback = function(cb) {
+    window[requestIdleCallback] = function(cb) {
       var start = Date.now();
       return setTimeout(function() {
         cb({
@@ -60,7 +62,7 @@ import { IonicGlobal } from '../../../util/interfaces';
   document.head.appendChild(s);
 
   // using requestIdleCallback, async load the animation core
-  window.requestIdleCallback(function() {
+  window[requestIdleCallback](function() {
     var s = document.createElement('script');
     s.src = ionic.staticDir + 'ionic.animation.js';
     document.head.appendChild(s);

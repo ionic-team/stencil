@@ -9,10 +9,6 @@ ion-toolbar {
   z-index: $z-index-toolbar;
 }
 
-ion-toolbar.hydrated {
-  visibility: inherit;
-}
-
 .toolbar {
   display: flex;
   overflow: hidden;

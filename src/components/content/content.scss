@@ -48,10 +48,6 @@ ion-scroll {
   contain: size style layout;
 }
 
-ion-scroll.hydrated {
-  visibility: inherit;
-}
-
 ion-content.js-scroll ion-scroll {
   position: relative;
 

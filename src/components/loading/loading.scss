@@ -18,10 +18,6 @@ ion-loading {
   contain: strict;
 }
 
-ion-loading.hydrated {
-  visibility: inherit;
-}
-
 ion-loading ion-gesture {
   display: block;
 

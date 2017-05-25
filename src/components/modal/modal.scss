@@ -36,10 +36,6 @@ ion-modal {
   contain: strict;
 }
 
-ion-modal.hydrated {
-  visibility: inherit;
-}
-
 .modal-backdrop {
   @media not all and (min-width: $modal-inset-min-width) and (min-height: $modal-inset-min-height-small) {
     visibility: hidden;

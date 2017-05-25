@@ -20,10 +20,6 @@ ion-item-divider {
   min-height: 30px;
 }
 
-ion-item-divider.hydrated {
-  visibility: inherit;
-}
-
 ion-item-divider[sticky] {
   position: sticky;
   top: 0;

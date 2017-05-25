@@ -12,10 +12,6 @@ ion-spinner {
   height: 28px;
 }
 
-ion-spinner.hydrated {
-  visibility: inherit;
-}
-
 ion-spinner svg {
   @include position(0, null, null, 0);
 
