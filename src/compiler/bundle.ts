@@ -111,7 +111,7 @@ function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBu
       const bundleComponent: BundleComponent = {
         component: component,
         modeName: modeName,
-        modeMeta: component.modes[modeName]
+        modeMeta: component.modes[modeName] || component.modes['default']
       };
 
       if (bundleComponent.modeMeta) {
