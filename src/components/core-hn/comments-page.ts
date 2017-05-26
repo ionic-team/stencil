@@ -21,13 +21,13 @@ export class CommentsPage {
 
     return h(this,
       [
-        h('ion-header.header.header-md',
+        h('ion-header',
           h('ion-toolbar', { props: { color: 'primary' } },
             [
-              h('ion-button.closeButton', { props: { clear: true, iconOnly: true, slot: 'start' }, on: { click: () => this.close(event) } },
+              h('ion-button.close-button', { props: { clear: true, iconOnly: true, slot: 'start' }, on: { click: () => this.close(event) } },
                 h('ion-icon', { props: { name: 'close' }, style: { color: 'white' } })
               ),
-              h('ion-title', 'Comments')
+              h('ion-title.comments-title', { props: { slot: 'end' } }, 'Comments')
             ]
           )
         ),

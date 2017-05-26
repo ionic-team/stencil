@@ -113,7 +113,7 @@ export class NewsContainer {
 
     return h(this,
       [
-        h('ion-header.header.header-md', { props: { mdHeight: '56px', iosHeight: '61px' } },
+        h('ion-header', { props: { mdHeight: '56px', iosHeight: '61px' } },
           [
             h('ion-toolbar', { props: { color: 'primary' } },
               [
