@@ -247,47 +247,14 @@ export class Button {
       }, {});
 
     const TagType = this.href ? 'a' : 'button';
-    const buttonInner = {
-      'button-inner': true
-    };
-    const buttonEffect = {
-      'button-effect': true
-    };
 
     return (
       <TagType class={buttonClasses} disabled={this.disabled}>
-        <span class={buttonInner}>
+        <span class='button-inner'>
           <slot></slot>
         </span>
-        <div class={buttonEffect}></div>
+        <div class='button-effect'></div>
       </TagType>
     );
-
-/*
-    return h(this,
-      h(tagType, {
-        class: buttonClasses,
-        props: {
-          disabled: this.disabled
-        }
-      },
-        [
-          h('span', {
-              class: {
-                'button-inner': true
-              }
-            },
-            h('slot')
-          ),
-          h('div', {
-              class: {
-                'button-effect': true
-              }
-            }
-          )
-        ]
-      )
-    );
-*/
   }
 }

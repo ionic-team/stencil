@@ -4,7 +4,7 @@ export class ObjectMap {
   [key: string]: ts.Expression | ObjectMap
 }
 
-export function isInstanceOfObjectMap(object: any): object is ObjectMap{
+export function isInstanceOfObjectMap(object: any): object is ObjectMap {
   return !object.hasOwnProperty('kind') &&
     !object.hasOwnProperty('flags') &&
     !object.hasOwnProperty('pos') &&
@@ -63,9 +63,9 @@ export function objectMapToObjectLiteral(objMap: ObjectMap): ts.ObjectLiteralExp
     let value = objMap[key];
 
     if (isInstanceOfObjectMap(value)) {
-      return ts.createPropertyAssignment(key, objectMapToObjectLiteral(value));
+      return ts.createPropertyAssignment(ts.createLiteral(key), objectMapToObjectLiteral(value));
     }
-    return ts.createPropertyAssignment(key, value as ts.Expression);
+    return ts.createPropertyAssignment(ts.createLiteral(key), value as ts.Expression);
   });
 
   return ts.createObjectLiteral(newProperties);

@@ -41,7 +41,8 @@ export function reactToSnabbdomJsx(): ts.TransformerFactory<ts.SourceFile> {
       if (props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
         const jsxObjectMap = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
         const snabbDomObjectMap = normalizeObjectMap(jsxObjectMap);
-        const objectLiteral = util.objectMapToObjectLiteral(snabbDomObjectMap);
+        const snabbDomFinal = snabbDomStyle(snabbDomObjectMap);
+        const objectLiteral = util.objectMapToObjectLiteral(snabbDomFinal);
         newArgs.push(objectLiteral);
 
       } else if (typeof props !== 'undefined' && props !== null) {
@@ -99,4 +100,31 @@ export function normalizeObjectMap(attrs: util.ObjectMap): util.ObjectMap {
     var ns = <util.ObjectMap>(map[namespace] || (map[namespace] = {}));
     ns[key] = val;
   }
+}
+
+export function snabbDomStyle(attrs: util.ObjectMap): util.ObjectMap {
+  if (!attrs.hasOwnProperty('class') ||
+      (<ts.Expression>attrs.class).kind !== ts.SyntaxKind.StringLiteral) {
+    return {
+      ...attrs
+    };
+  }
+
+  const classNameString = (<ts.StringLiteral>attrs.class).text;
+
+  return {
+    ...attrs,
+    class: classStringToClassObj(classNameString),
+  };
+}
+
+function classStringToClassObj(className: string): {[key: string]: ts.BooleanLiteral} {
+  return className
+    .split(' ')
+    .reduce((obj: {[key: string]: ts.BooleanLiteral}, className: string): {[key: string]: ts.BooleanLiteral} => {
+      return {
+        ...obj,
+        [className]: ts.createTrue()
+      };
+    }, <{[key: string]: ts.BooleanLiteral}>{});
 }
