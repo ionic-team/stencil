@@ -128,25 +128,21 @@ function updateModes(cmpMeta: ComponentMeta) {
 
 
 function updateShadow(cmpMeta: ComponentMeta) {
-  // default to use shadow dom
+  // default to NOT use shadow dom
+  let shadow = false;
+
   // or figure out a best guess depending on the value they put in
-  if (cmpMeta.shadow === undefined) {
-    // default to true if it was never defined in the decorator
-    cmpMeta.shadow = true;
+  if (cmpMeta.shadow !== undefined) {
+    if (typeof cmpMeta.shadow === 'string') {
+      if ((<string>cmpMeta.shadow).toLowerCase().trim() === 'true') {
+        shadow = true;
+      }
 
-  } else if (typeof cmpMeta.shadow === 'string') {
-    const shadowStr = (<string>cmpMeta.shadow).toLowerCase().trim();
-
-    if (shadowStr === 'false' || shadowStr === 'null' || shadowStr === '') {
-      cmpMeta.shadow = false;
     } else {
-      cmpMeta.shadow = true;
+      // ensure it's a boolean
+      shadow = !!cmpMeta.shadow;
     }
-
-  } else if (cmpMeta.shadow === null) {
-    cmpMeta.shadow = false;
-
-  } else {
-    cmpMeta.shadow = !!cmpMeta.shadow;
   }
+
+  cmpMeta.shadow = shadow;
 }
