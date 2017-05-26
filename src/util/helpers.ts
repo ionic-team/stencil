@@ -89,7 +89,9 @@ export function getParentElement(elm: any) {
 export function applyStyles(elm: HTMLElement, styles: {[styleProp: string]: string|number}) {
   const styleProps = Object.keys(styles);
 
-  for (var i = 0; i < styleProps.length; i++) {
-    (<any>elm.style)[styleProps[i]] = styles[styleProps[i]];
+  if (elm) {
+    for (var i = 0; i < styleProps.length; i++) {
+      (<any>elm.style)[styleProps[i]] = styles[styleProps[i]];
+    }
   }
 }

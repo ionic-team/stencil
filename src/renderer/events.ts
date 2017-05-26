@@ -51,15 +51,6 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
     return noop;
   }
 
-  if (supportsOpts === null) {
-    supportsOpts = checkEventOptsSupport(elm);
-  }
-
-  var eventListenerOpts: any = (supportsOpts) ? {
-        'capture': !!opts.capture,
-        'passive': !!opts.passive
-      } : !!opts.capture;
-
   var splt = eventName.split(':');
   if (splt.length > 1) {
     // document:mousemove
@@ -67,6 +58,10 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
     // body:keyup.enter
     elm = getElementReference(elm, splt[0]);
     eventName = splt[1];
+  }
+
+  if (!elm) {
+    return noop;
   }
 
   splt = eventName.split('.');
@@ -77,6 +72,15 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
     eventName = splt[0];
     testKeyCode = KEY_CODE_MAP[splt[1]];
   }
+
+  if (supportsOpts === null) {
+    supportsOpts = checkEventOptsSupport(elm);
+  }
+
+  var eventListenerOpts: any = (supportsOpts) ? {
+        'capture': !!opts.capture,
+        'passive': !!opts.passive
+      } : !!opts.capture;
 
   const eventListener = (ev: any) => {
     if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
