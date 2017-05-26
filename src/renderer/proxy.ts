@@ -19,6 +19,11 @@ export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: Rendere
   // getters/setters with the same name, and then do change detection
   instance.$values = {};
 
+  if (watchers) {
+    // this component has watchers, so init the object to store them
+    instance.$watchers = {};
+  }
+
   if (states) {
     // add getters/setters to instance properties that are not already set as @Prop()
     // these are instance properties that should trigger a render update when
@@ -26,13 +31,13 @@ export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: Rendere
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
     for (i = 0; i < states.length; i++) {
-      initProp(states[i], null, instance, plt, config, renderer, elm, watchers, false);
+      initProperty(false, states[i], null, instance, plt, config, renderer, elm, watchers);
     }
   }
 
   for (i = 0; i < props.length; i++) {
     // add getters/setters for @Prop()s
-    initProp(props[i].propName, props[i].propType, instance, plt, config, renderer, elm, watchers, false);
+    initProperty(true, props[i].propName, props[i].propType, instance, plt, config, renderer, elm, watchers);
   }
 }
 
@@ -47,16 +52,16 @@ function initMethod(methodName: string, elm: ProxyElement, instance: Component) 
 }
 
 
-function initProp(propName: string, propType: any, instance: Component, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, watchers: WatchMeta[], isState: boolean) {
-  if (isState) {
-    // @State() property, so copy the value directly from the instance
-    // before we create getters/setters on this same property name
-    instance.$values[propName] = instance[propName];
-
-  } else {
+function initProperty(isProp: boolean, propName: string, propType: any, instance: Component, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, watchers: WatchMeta[]) {
+  if (isProp) {
     // @Prop() property, so check initial value from the proxy element, instance
     // and config, before we create getters/setters on this same property name
     instance.$values[propName] = getInitialValue(config, elm, instance, propType, propName);
+
+  } else {
+    // @State() property, so copy the value directly from the instance
+    // before we create getters/setters on this same property name
+    instance.$values[propName] = instance[propName];
   }
 
   if (watchers) {
@@ -64,7 +69,9 @@ function initProp(propName: string, propType: any, instance: Component, plt: Pla
     // changes, we should also fire off this @Watch() method
     for (var i = 0; i < watchers.length; i++) {
       if (watchers[i].propName === propName) {
-        (instance.$watchers = instance.$watchers || []).push(instance[watchers[i].fn].bind(instance));
+        // cool, we should watch for changes to this property
+        // bind the function and add it to our list of watchers
+        instance.$watchers[propName] = instance[watchers[i].fn].bind(instance);
       }
     }
   }
@@ -83,12 +90,10 @@ function initProp(propName: string, propType: any, instance: Component, plt: Pla
       // looks like this value actually changed, we've got work to do!
       instance.$values[propName] = value;
 
-      if (instance.$watchers) {
-        // this instance has @Watch() methods
-        for (var i = 0; i < instance.$watchers.length; i++) {
-          // fire off all of the watch methods for this property
-          instance.$watchers[i] && instance.$watchers[i](value);
-        }
+      if (instance.$watchers && instance.$watchers[propName]) {
+        // this instance has @Watch() methods and a
+        // watch method for this property
+        instance.$watchers[propName](value);
       }
 
       // queue that we need to do an update, don't worry

@@ -531,7 +531,9 @@ export interface ComponentActiveListeners {
 }
 
 
-export type ComponentActiveWatchers = Function[];
+export interface ComponentActiveWatchers {
+  [propName: string]: Function;
+}
 
 
 export interface ComponentActiveValues {
