@@ -1,9 +1,9 @@
 import { TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
-import { Component, PropMeta, ConfigApi, MethodMeta, PlatformApi, ProxyElement, RendererApi, WatchMeta } from '../util/interfaces';
+import { Component, PropMeta, ConfigApi, MethodMeta, PlatformApi, ProxyElement, RendererApi, StateMeta, WatchMeta } from '../util/interfaces';
 import { queueUpdate } from './update';
 
 
-export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, instance: Component, props: PropMeta[], methods: MethodMeta[], watchers: WatchMeta[]) {
+export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, instance: Component, props: PropMeta[], states: StateMeta[], methods: MethodMeta[], watchers: WatchMeta[]) {
   let i = 0;
 
   if (methods) {
@@ -14,8 +14,14 @@ export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: Rendere
 
   instance.$values = {};
 
+  if (states) {
+    for (i = 0; i < states.length; i++) {
+      initState(states[i], instance, plt, config, renderer, elm);
+    }
+  }
+
   for (i = 0; i < props.length; i++) {
-    initProp(props[i].propName, props[i].propType, plt, config, renderer, elm, instance, watchers);
+    initProp(props[i].propName, props[i].propType, instance, plt, config, renderer, elm, watchers);
   }
 }
 
@@ -29,7 +35,30 @@ function initMethod(methodName: string, elm: ProxyElement, instance: Component) 
 }
 
 
-function initProp(propName: string, propType: any, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, instance: Component, watchers: WatchMeta[]) {
+function initState(statePropName: string, instance: Component, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement) {
+  instance.$values[statePropName] = instance[statePropName];
+
+  function getStateValue() {
+    return instance.$values[statePropName];
+  }
+
+  function setStateValue(value: any) {
+    if (instance.$values[statePropName] !== value) {
+      instance.$values[statePropName] = value;
+
+      queueUpdate(plt, config, renderer, elm);
+    }
+  }
+
+  Object.defineProperty(instance, statePropName, {
+    configurable: true,
+    get: getStateValue,
+    set: setStateValue
+  });
+}
+
+
+function initProp(propName: string, propType: any, instance: Component, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, watchers: WatchMeta[]) {
   instance.$values[propName] = getInitialValue(config, elm, instance, propType, propName);
 
   if (watchers) {
