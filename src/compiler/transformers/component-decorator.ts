@@ -186,8 +186,20 @@ function updateStyles(cmpMeta: ComponentMeta) {
 
 
 function updateModes(cmpMeta: ComponentMeta) {
-  if (Object.keys(cmpMeta.modes).length === 0) {
+  const modeNames = Object.keys(cmpMeta.modes).sort();
+
+  if (modeNames.length === 0) {
+    // always set a default, even if there's nothing
     cmpMeta.modes['default'] = {};
+
+  } else {
+    // normalize mode name sorting
+    const modes = Object.assign({}, cmpMeta.modes);
+    cmpMeta.modes = {};
+
+    modeNames.forEach(modeName => {
+      cmpMeta.modes[modeName] = modes[modeName];
+    });
   }
 }
 
