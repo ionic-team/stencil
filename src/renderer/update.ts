@@ -45,7 +45,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     // so we've got an host element now, and a actual instance
     // let's wire them up together with getter/settings
     // the setters are use for change detection and knowing when to re-render
-    initProxy(plt, config, renderer, elm, instance, cmpMeta.props, cmpMeta.methods, cmpMeta.watchers);
+    initProxy(plt, config, renderer, elm, instance, cmpMeta.props, cmpMeta.states, cmpMeta.methods, cmpMeta.watchers);
 
     // cool, let's actually attach the component to the DOM
     // this largely adds this components styles and determines
