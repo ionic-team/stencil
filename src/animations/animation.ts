@@ -71,7 +71,7 @@ export class Animation {
   /**
    * Add a child animation to this animation.
    */
-  addChildAnimation(childAnimation: Animation): Animation {
+  add(childAnimation: Animation): Animation {
     childAnimation.parent = this;
     this.hasChildren = true;
     this._childAnimationTotal = (this._childAnimations = this._childAnimations || []).push(childAnimation);
@@ -353,14 +353,13 @@ export class Animation {
 
   syncPlay() {
     // If the animation was already invalidated (it did finish), do nothing
-    if (this._destroyed) {
-      return;
+    if (!this._destroyed) {
+      var opts = { duration: 0 };
+      this._isAsync = false;
+      this._clearAsync();
+      this._playInit(opts);
+      this._playDomInspect(opts);
     }
-    var opts = { duration: 0 };
-    this._isAsync = false;
-    this._clearAsync();
-    this._playInit(opts);
-    this._playDomInspect(opts);
   }
 
   /**
@@ -1115,7 +1114,7 @@ export class Animation {
   /**
    * Add a callback to fire when the animation has finished.
    */
-  onFinish(callback: (animation?: Animation) => void, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}): Animation {
+  onFinish(callback: (animation?: Animation) => void, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}): Animation {
     if (opts && opts.clearExistingCallacks) {
       this._onFinishCallbacks = this._onFinishOneTimeCallbacks = undefined;
     }
