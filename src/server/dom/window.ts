@@ -79,16 +79,39 @@ export class Window {
     });
   }
 
+
+  // noops
+  addEventListener() {}
+  alert() {}
+  atob() {}
+  blur() {}
+  btoa() {}
   cancelAnimationFrame() {}
   cancelIdleCallback() {}
-  alert() {}
+  captureEvents() {}
+  close() {}
   confirm() {}
-  prompt() {}
-  print() {}
-  postMessage() {}
-  addEventListener() {}
-  removeEventListener() {}
+  createImageBitmap() {}
   dispatchEvent() {}
+  find() {}
   focus() {}
-  blur() {}
+  getComputedStyle() {}
+  getMatchedCSSRules() {}
+  getSelection() {}
+  matchMedia() {}
+  moveTo() {}
+  moveBy() {}
+  open() {}
+  postMessage() {}
+  print() {}
+  prompt() {}
+  releaseEvents() {}
+  removeEventListener() {}
+  resizeBy() {}
+  resizeTo() {}
+  scroll() {}
+  scrollBy() {}
+  scrollTo() {}
+  stop() {}
+
 }

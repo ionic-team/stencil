@@ -2,38 +2,67 @@ import { IonicGlobal } from '../../util/interfaces';
 import { Window } from './window';
 
 
-export function generateGlobalContext(win: Window, IonicGbl: IonicGlobal) {
-  const context: any = {
-    'Ionic': IonicGbl,
-    'window': win,
-    'document': win.document,
-    'localStorage': win.localStorage,
-    'sessionStorage': win.sessionStorage,
-    'location': win.location,
-    'navigator': win.navigator,
-    'performance': win.performance,
-    'setTimeout': win.setTimeout,
-    'clearTimeout': win.clearTimeout,
-    'setInterval': win.setInterval,
-    'clearInterval': win.clearInterval,
-    'requestAnimationFrame': win.requestAnimationFrame,
-    'cancelAnimationFrame': win.cancelAnimationFrame,
-    'requestIdleCallback': win.requestIdleCallback,
-    'cancelIdleCallback': win.cancelIdleCallback,
-    'fetch': win.fetch,
-    'XMLHttpRequest': win.XMLHttpRequest,
-    'screen': win.screen,
-    'alert': win.alert,
-    'confirm': win.confirm,
-    'prompt': win.prompt,
-    'print': win.print,
-    'focus': win.focus,
-    'blur': win.blur,
-    'postMessage': win.postMessage,
-    'addEventListener': win.addEventListener,
-    'removeEventListener': win.removeEventListener,
-    'dispatchEvent': win.dispatchEvent,
-  };
+export function generateGlobalContext(win: Window, IonicGbl: IonicGlobal): any {
+  return {
 
-  return context;
+    // injected Ionic Global
+    Ionic: IonicGbl,
+
+    // common
+    window: win,
+    document: win.document,
+    fetch: win.fetch,
+    location: win.location,
+    navigator: win.navigator,
+    performance: win.performance,
+    screen: win.screen,
+    XMLHttpRequest: win.XMLHttpRequest,
+
+    // async callbacks
+    cancelAnimationFrame: win.cancelAnimationFrame,
+    cancelIdleCallback: win.cancelIdleCallback,
+    clearInterval: win.clearInterval,
+    clearTimeout: win.clearTimeout,
+    requestAnimationFrame: win.requestAnimationFrame,
+    requestIdleCallback: win.requestIdleCallback,
+    setInterval: win.setInterval,
+    setTimeout: win.setTimeout,
+
+    // storage
+    localStorage: win.localStorage,
+    sessionStorage: win.sessionStorage,
+
+    // noops
+    addEventListener: win.addEventListener,
+    alert: win.alert,
+    atob: win.atob,
+    blur: win.blur,
+    btoa: win.btoa,
+    captureEvents: win.captureEvents,
+    close: win.close,
+    confirm: win.confirm,
+    createImageBitmap: win.createImageBitmap,
+    dispatchEvent: win.dispatchEvent,
+    find: win.find,
+    focus: win.focus,
+    getComputedStyle: win.getComputedStyle,
+    getMatchedCSSRules: win.getMatchedCSSRules,
+    getSelection: win.getSelection,
+    matchMedia: win.matchMedia,
+    moveTo: win.moveTo,
+    moveBy: win.moveBy,
+    open: win.open,
+    postMessage: win.postMessage,
+    print: win.print,
+    prompt: win.prompt,
+    releaseEvents: win.releaseEvents,
+    removeEventListener: win.removeEventListener,
+    resizeBy: win.resizeBy,
+    resizeTo: win.resizeTo,
+    scroll: win.scroll,
+    scrollBy: win.scrollBy,
+    scrollTo: win.scrollTo,
+    stop: win.stop,
+
+  };
 }
