@@ -8,10 +8,6 @@ export function reactToSnabbdomJsx(): ts.TransformerFactory<ts.SourceFile> {
     let sourceFile: ts.SourceFile;
 
     function visit(node: ts.Node): ts.VisitResult<ts.Node> {
-      if (sourceFile.fileName.indexOf('/components/button') === -1) {
-          return ts.visitEachChild(node, visit, transformContext);
-      }
-
 
       switch (node.kind) {
         case ts.SyntaxKind.CallExpression:
@@ -83,7 +79,9 @@ export function normalizeObjectMap(attrs: util.ObjectMap): util.ObjectMap {
   }
 
   for (var key in attrs) {
-    if (key !== 'key' && key !== 'classNames' && key !== 'selector') {
+    if (key !== 'key' && key !== 'classNames' && key !== 'selector' &&
+      !map.hasOwnProperty(key)) {
+
       var idx = key.indexOf('-');
       if (idx > 0) {
         addAttr(
@@ -91,6 +89,8 @@ export function normalizeObjectMap(attrs: util.ObjectMap): util.ObjectMap {
           key.slice(idx + 1),
           attrs[key]
         );
+      } else {
+        addAttr('props', key, attrs[key]);
       }
     }
   }
