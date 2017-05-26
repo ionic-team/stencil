@@ -19,7 +19,7 @@ export class Location {
     this.host = parsedUrl.host;
     this.hostname = parsedUrl.hostname;
     this.href = parsedUrl.href;
-    this.origin = parsedUrl.host;
+    this.origin = `${parsedUrl.protocol}//${parsedUrl.host}`;
     this.pathname = parsedUrl.pathname;
     this.port = parsedUrl.port;
     this.protocol = parsedUrl.protocol;
