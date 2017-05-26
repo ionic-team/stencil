@@ -59,15 +59,23 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     manifest.components.push(manifestCmp);
   });
 
-  manifest.bundles = config.bundles;
+  manifest.bundles = (config.bundles && config.bundles.slice()) || [];
+
+  manifest.bundles.forEach(manifestBundle => {
+    manifestBundle.components = manifestBundle.components.sort();
+  });
+
+  manifest.bundles = manifest.bundles.sort((a, b) => {
+    if (a.components && a.components.length) {
+      if (a.components[0] < b.components[0]) return -1;
+      if (a.components[0] > b.components[0]) return 1;
+    }
+    return 0;
+  });
 
   manifest.components = manifest.components.sort((a, b) => {
-    if (a.tag < b.tag) {
-      return -1;
-    }
-    if (a.tag > b.tag) {
-      return 1;
-    }
+    if (a.tag < b.tag) return -1;
+    if (a.tag > b.tag) return 1;
     return 0;
   });
 
