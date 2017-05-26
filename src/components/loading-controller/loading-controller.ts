@@ -1,5 +1,5 @@
 import { Component, Ionic, Listen } from '../index';
-import { IonicGlobal, LoadingEvent, LoadingOptions, Loading, OverlayApi } from '../../util/interfaces';
+import { IonicGlobal, LoadingEvent, LoadingOptions, Loading, IonicControllerApi } from '../../util/interfaces';
 
 
 @Component({
@@ -14,7 +14,7 @@ import { IonicGlobal, LoadingEvent, LoadingOptions, Loading, OverlayApi } from '
   },
   shadow: false
 })
-export class LoadingController implements OverlayApi {
+export class LoadingController implements IonicControllerApi {
   private ids = 0;
   private loadingResolves: {[loadingId: string]: Function} = {};
   private loadings: Loading[] = [];

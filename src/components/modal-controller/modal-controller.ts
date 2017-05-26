@@ -1,5 +1,5 @@
 import { Component, Ionic, Listen } from '../index';
-import { IonicGlobal, ModalEvent, ModalOptions, Modal, OverlayApi } from '../../util/interfaces';
+import { IonicGlobal, ModalEvent, ModalOptions, Modal, IonicControllerApi } from '../../util/interfaces';
 
 
 @Component({
@@ -14,7 +14,7 @@ import { IonicGlobal, ModalEvent, ModalOptions, Modal, OverlayApi } from '../../
   },
   shadow: false
 })
-export class ModalController implements OverlayApi {
+export class ModalController implements IonicControllerApi {
   private ids = 0;
   private modalResolves: {[modalId: string]: Function} = {};
   private modals: Modal[] = [];

@@ -20,7 +20,7 @@
 
       console.log('open profile modal for userId:', userId);
 
-      Ionic.overlay('modal', { component: 'profile-page', componentProps: { userId: userId } }).then(modal => {
+      Ionic.controller('modal', { component: 'profile-page', componentProps: { userId: userId } }).then(modal => {
         console.log('start presenting modal, userId:', modal.componentProps.userId);
 
         modal.present().then(() => {

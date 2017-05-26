@@ -6,27 +6,23 @@ export interface Ionic {
     add: AddEventListenerApi;
   };
   theme: IonicTheme;
-  controllers: {[ctrlName: string]: any};
-  overlay: IonicOverlay;
+  controller?: IonicController;
   dom: DomControllerApi;
   config: ConfigApi;
-  Animation: Animation;
+  Animation?: Animation;
 }
 
 
-export interface OverlayApi {
-  load: (opts?: any) => Promise<any>;
-}
-
-
-export interface IonicOverlay {
+export interface IonicController {
+  <LoadingController>(ctrlName: 'loading', opts: LoadingOptions): Promise<Loading>;
+  <MenuController>(ctrlName: 'menu'): Promise<MenuController>;
   <ModalController>(ctrlName: 'modal', opts: ModalOptions): Promise<Modal>;
-  (ctrlName: string, opts?: any): Promise<any>;
+  (ctrlName: string, opts?: any): Promise<IonicControllerApi>;
 }
 
 
-export interface IonicControllerLoaded {
-  (ctrlName: string): void;
+export interface IonicControllerApi {
+  load?: (opts?: any) => Promise<any>;
 }
 
 
@@ -37,6 +33,7 @@ export interface IonicGlobal {
   eventNameFn?: (eventName: string) => string;
   config?: Object;
   loadController?: (ctrlName: string, ctrl: any) => any;
+  controllers?: {[ctrlName: string]: any};
   ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;
   QueueCtrl?: QueueApi;
@@ -44,8 +41,52 @@ export interface IonicGlobal {
 }
 
 
-export interface ModalController {
+export interface Menu {
+  setOpen(shouldOpen: boolean, animated?: boolean): Promise<boolean>;
+  open(): Promise<boolean>;
+  close(): Promise<boolean>;
+  toggle(): Promise<boolean>;
+  enable(shouldEnable: boolean): Menu;
+  swipeEnable(shouldEnable: boolean): Menu;
+  isAnimating: boolean;
+  isOpen: boolean;
+  isRightSide: boolean;
+  enabled: boolean;
+  side: string;
+  id: string;
+  maxEdgeStart: number;
+  persistent: boolean;
+  swipeEnabled: boolean;
+  type: string;
+  width(): number;
+  getMenuElement(): HTMLElement;
+  getContentElement(): HTMLElement;
+  getBackdropElement(): HTMLElement;
+}
 
+
+export interface MenuType {
+  ani: any;
+  isOpening: boolean;
+  setOpen(shouldOpen: boolean, animated: boolean, done: Function): void;
+  setProgressStart(isOpen: boolean): void;
+  setProgessStep(stepValue: number): void;
+  setProgressEnd(shouldComplete: boolean, currentStepValue: number, velocity: number, done: Function): void;
+  destroy(): void;
+}
+
+
+export interface MenuController {
+  open(menuId?: string): Promise<boolean>;
+  close(menuId?: string): Promise<boolean>;
+  toggle(menuId?: string): Promise<boolean>;
+  enable(shouldEnable: boolean, menuId?: string): void;
+  swipeEnable(shouldEnable: boolean, menuId?: string): void;
+  isOpen(menuId?: string): boolean;
+  isEnabled(menuId?: string): boolean;
+  get(menuId?: string): Menu;
+  getOpen(): Menu;
+  getMenus(): Menu[];
 }
 
 
@@ -542,9 +583,6 @@ export interface ProxyElement extends HTMLElement {
 }
 
 
-export type Side = 'left' | 'right' | 'start' | 'end';
-
-
 export interface RendererApi {
   (oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes, isSsrHydrated?: boolean): VNode;
 }
@@ -668,7 +706,7 @@ export interface UniversalSys {
 
 export interface Animation {
   new(elm?: Node|Node[]|NodeList): Animation;
-  addChildAnimation: (childAnimation: Animation) => Animation;
+  add: (childAnimation: Animation) => Animation;
   addElement: (elm: Node|Node[]|NodeList) => Animation;
   afterAddClass: (className: string) => Animation;
   afterClearStyles: (propertyNames: string[]) => Animation;
@@ -680,13 +718,16 @@ export interface Animation {
   beforeStyles: (styles: { [property: string]: any; }) => Animation;
   destroy: () => void;
   duration: (milliseconds: number) => Animation;
+  getDuration(opts?: PlayOptions): number;
   easing: (name: string) => Animation;
+  easingReverse: (name: string) => Animation;
   from: (prop: string, val: any) => Animation;
   fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
   hasCompleted: boolean;
   isPlaying: boolean;
-  onFinish: (callback: (animation?: Animation) => void, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}) => Animation;
+  onFinish: (callback: Function, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}) => Animation;
   play: (opts?: PlayOptions) => void;
+  syncPlay: () => void;
   progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;
   progressStep: (stepValue: number) => void;
   progressStart: () => void;

@@ -616,7 +616,8 @@ export class Content {
     const contentClass: any = {};
     const scrollStyle: any = {};
 
-    const children = this.$el.parentElement.children;
+    const children = getParentElement(this.$el).children;
+
     for (var i = 0; i < children.length; i++) {
       if (children[i].tagName === 'ION-HEADER') {
         var headerHeight = children[i].getAttribute(`${this.mode}-height`);

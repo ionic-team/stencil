@@ -12,12 +12,18 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
       enable: noop,
       add: () => noop
     },
-    controllers: {},
     config: ConfigCtrl,
     dom: DomCtrl,
-    overlay: null,
-    Animation: null
+    controller: (ctrlName: string, opts?: any) => {
+      throw `TODO: initInjectedIonic ${ctrlName} ${opts}`;
+    }
   };
+
+  Object.defineProperty(injectedIonic, 'Animation', {
+    get: function() {
+      throw `Ionic.Animation is not available on the server`;
+    }
+  });
 
   return injectedIonic;
 }

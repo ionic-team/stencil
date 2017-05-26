@@ -24,7 +24,8 @@ export function hydrateHtml(registry: ComponentRegistry, html: string, opts: Hyd
       raf: function(cb: Function) { cb(Date.now()); },
     },
     QueueCtrl: QueueServer(),
-    staticDir: staticDir
+    staticDir: staticDir,
+    controllers: {}
   };
 
   const config = ConfigController(opts.config, platforms);

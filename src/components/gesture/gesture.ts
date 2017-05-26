@@ -1,7 +1,7 @@
 import { applyStyles, getElementReference, pointerCoordX, pointerCoordY } from '../../util/helpers';
 import { BlockerDelegate } from './gesture-controller';
-import { Component, Ionic, Listen, Prop } from '../index';
-import { GestureCallback, GestureDetail } from '../../util/interfaces';
+import { Component, Ionic, Listen, Prop, Watch } from '../index';
+import { GestureCallback, GestureDetail, IonicGlobal } from '../../util/interfaces';
 import { GestureController, GestureDelegate, BLOCK_ALL } from './gesture-controller';
 import { PanRecognizer } from './recognizers';
 
@@ -12,6 +12,7 @@ import { PanRecognizer } from './recognizers';
 })
 export class Gesture {
   private $el: HTMLElement;
+  private ctrl: GestureController;
   private detail: GestureDetail = {};
   private positions: number[] = [];
   private gesture: GestureDelegate;
@@ -24,14 +25,16 @@ export class Gesture {
   private isMoveQueued = false;
   private blocker: BlockerDelegate;
 
+  @Prop() attachTo: string = 'child';
+  @Prop() autoBlockAll: boolean = false;
+  @Prop() block: string = null;
+  @Prop() disableScroll: boolean = false;
   @Prop() direction: string = 'x';
   @Prop() gestureName: string = '';
   @Prop() gesturePriority: number = 0;
-  @Prop() attachTo: string = 'child';
   @Prop() maxAngle: number = 40;
   @Prop() threshold: number = 20;
   @Prop() type: string = 'pan';
-  @Prop() autoBlockAll: boolean = false;
 
   @Prop() canStart: GestureCallback;
   @Prop() onStart: GestureCallback;
@@ -42,9 +45,9 @@ export class Gesture {
 
 
   ionViewDidLoad() {
-    const ctrl: GestureController = Ionic.controllers.gesture = (Ionic.controllers.gesture || new GestureController());
+    this.ctrl = (<IonicGlobal>Ionic).controllers.gesture = ((<IonicGlobal>Ionic).controllers.gesture || new GestureController());
 
-    this.gesture = ctrl.createGesture(this.gestureName, this.gesturePriority, false);
+    this.gesture = this.ctrl.createGesture(this.gestureName, this.gesturePriority, this.disableScroll);
 
     const types = this.type.replace(/\s/g, '').toLowerCase().split(',');
 
@@ -64,11 +67,21 @@ export class Gesture {
     }
 
     if (this.autoBlockAll) {
-      this.blocker = ctrl.createBlocker(BLOCK_ALL);
+      this.blocker = this.ctrl.createBlocker(BLOCK_ALL);
       this.blocker.block();
     }
   }
 
+
+  @Watch('block')
+  blockChange(block: string) {
+    if (this.blocker) {
+      this.blocker.destroy();
+    }
+    if (block) {
+      this.blocker = this.ctrl.createBlocker(block.split(','));
+    }
+  }
 
   // DOWN *************************
 
@@ -362,7 +375,7 @@ export class Gesture {
       this.blocker = null;
     }
     this.gesture && this.gesture.destroy();
-    this.gesture = this.pan = this.detail = this.detail.event = null;
+    this.ctrl = this.gesture = this.pan = this.detail = this.detail.event = null;
   }
 
 }
