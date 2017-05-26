@@ -257,7 +257,7 @@ $button-md-strong-font-weight:                  bold !default;
   font-size: $button-md-small-font-size;
 }
 
-.button-small-md[icon-only] ion-icon {
+[icon-only] .button-small-md ion-icon {
   font-size: $button-md-small-icon-font-size;
 }
 
@@ -391,7 +391,7 @@ $button-md-strong-font-weight:                  bold !default;
   border-radius: $button-md-round-border-radius;
 }
 
-.button-md [icon-only] {
+[icon-only] .button-md {
   padding: 0;
 }
 

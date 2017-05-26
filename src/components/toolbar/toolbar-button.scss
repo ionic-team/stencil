@@ -61,3 +61,18 @@
 
   align-items: center;
 }
+
+// Button Icons
+// --------------------------------------------------
+
+[icon-start] ion-icon {
+  @include button-icon();
+
+  padding-right: .3em;
+}
+
+[icon-end] ion-icon {
+  @include button-icon();
+
+  padding-left: .4em;
+}

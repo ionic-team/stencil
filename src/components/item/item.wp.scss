@@ -168,8 +168,8 @@ $item-wp-sliding-content-background: $list-wp-background-color !default;
   font-size: 1.2rem;
 }
 
-.item-wp .item-button[icon-only] ion-icon,
-.item-wp .item-button[icon-only] {
+.item-wp [icon-only] .item-button ion-icon,
+.item-wp [icon-only] .item-button {
   padding: 0 1px;
 }
 

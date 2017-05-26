@@ -30,6 +30,17 @@
 }
 
 
+// Button Icons
+// --------------------------------------------------
+
+@mixin button-icon($font-size: 1.4rem, $line-height: .67, $pointer-events: none) {
+  font-size: $font-size;
+  line-height: $line-height;
+
+  pointer-events: $pointer-events;
+}
+
+
 // SVG Background Image Mixin
 // --------------------------------------------------
 

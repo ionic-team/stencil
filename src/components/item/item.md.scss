@@ -163,8 +163,8 @@ $item-md-sliding-content-background: $list-md-background-color !default;
   font-size: 1.2rem;
 }
 
-.item-md .item-button[icon-only] ion-icon,
-.item-md .item-button[icon-only] {
+.item-md [icon-only] .item-button ion-icon,
+.item-md [icon-only] .item-button {
   padding: 0 1px;
 }
 
