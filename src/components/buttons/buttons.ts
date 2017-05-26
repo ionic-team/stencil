@@ -6,6 +6,6 @@ import { Component, h, Ionic } from '../index';
 })
 export class Buttons {
   render() {
-    return h(this, Ionic.theme(this, 'buttons'), h('slot'));
+    return h(this, Ionic.theme(this, 'bar-buttons'), h('slot'));
   }
 }

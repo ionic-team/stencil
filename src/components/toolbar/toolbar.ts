@@ -106,20 +106,11 @@ export class Toolbar {
   }
 
   ionViewDidLoad() {
-    /**
-     * This is a platform specific hack that we would like to remove.  Currently this adds the
-     * attribute button-type bar-button to all ion-buttons that exist within a toolbar.
-     */
-    // const slot = <HTMLSlotElement>this.$el.shadowRoot.querySelector('slot');
-    // const ionButtons = slot.assignedNodes()
-    //   .filter((elmt: HTMLElement) => elmt.nodeType !== Node.TEXT_NODE)
-    //   .reduce((nodeList: HTMLElement[], elmt: HTMLElement) => {
-    //     return nodeList.concat(Array.prototype.slice.call(elmt.querySelectorAll('ion-button')));
-    //   }, []);
-
-    // ionButtons.forEach(btn => {
-    //   btn.setAttribute('button-type', 'bar-button');
-    // });
+    // Add bar-button classes to each ion-button in the toolbar
+    const buttons = <any>this.$el.querySelectorAll('ion-button');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute('button-type', 'bar-button');
+    }
   }
 
   render() {
