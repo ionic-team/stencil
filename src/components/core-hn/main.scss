@@ -2,7 +2,7 @@ ion-label {
   white-space: normal;
 }
 
-ion-toolbar ion-button.headerButton button {
+ion-toolbar ion-button.header-button button {
   color: white !important;
 }
 
@@ -17,18 +17,14 @@ ion-toolbar ion-button.headerButton button {
   font-size: 3.4rem;
   margin-left: 15px;
   margin-top: 5px;
+  float: left;
 }
 
-.button-bar {
-  float: right;
-   width: 35.5rem;
-}
-
-.nextButton {
+.next-button {
   float: right;
 }
 
-.previousButton {
+.previous-button {
   float: left;
 }
 
@@ -41,10 +37,14 @@ ion-toolbar ion-button.headerButton button {
 }
 
 .comments-text {
-  color: grey;
+  color: blue;
 }
 
 .item-content {
   padding-top: 5px;
   padding-bottom: 5px;
+}
+
+.first-button {
+  margin-left: 7px;
 }

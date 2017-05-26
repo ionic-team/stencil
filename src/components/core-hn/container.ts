@@ -119,14 +119,10 @@ export class NewsContainer {
             h('ion-toolbar', { props: { color: 'primary' } },
               [
                 h('ion-icon.header-icon', { props: { name: 'ionic', slot: 'start' } }),
-                h('div.button-bar',
-                  [
-                    h('ion-button.headerButton', { props: { clear: true }, on: { click: () => this.getStories('news') } }, 'News'),
-                    h('ion-button.headerButton', { props: { clear: true }, on: { click: () => this.getStories('show') } }, 'Show'),
-                    h('ion-button.headerButton', { props: { clear: true }, on: { click: () => this.getStories('jobs') } }, 'Jobs'),
-                    h('ion-button.headerButton', { props: { clear: true }, on: { click: () => this.getStories('ask') } }, 'Ask')
-                  ]
-                )
+                h('ion-button.header-button.first-button', { props: { clear: true }, on: { click: () => this.getStories('news') } }, 'News'),
+                h('ion-button.header-button', { props: { clear: true }, on: { click: () => this.getStories('show') } }, 'Show'),
+                h('ion-button.header-button', { props: { clear: true }, on: { click: () => this.getStories('jobs') } }, 'Jobs'),
+                h('ion-button.header-button', { props: { clear: true }, on: { click: () => this.getStories('ask') } }, 'Ask')
               ]
             )
           ]
@@ -140,9 +136,9 @@ export class NewsContainer {
         h('ion-footer',
           h('ion-toolbar.pager',
             [
-              h('ion-button.previousButton', { props: { clear: true, slot: 'start' }, on: { click: () => this.previous() }, style: { color: this.prevColor} }, 'prev'),
+              h('ion-button.previous-button', { props: { clear: true, slot: 'start' }, on: { click: () => this.previous() }, style: { color: this.prevColor } }, 'prev'),
               h('span.page-number', `page ${this.page}`),
-              h('ion-button.nextButton', { props: { clear: true, slot: 'end' }, on: { click: () => this.next() } }, 'next')
+              h('ion-button.next-button', { props: { clear: true, slot: 'end' }, on: { click: () => this.next() } }, 'next')
             ]
           )
         )
