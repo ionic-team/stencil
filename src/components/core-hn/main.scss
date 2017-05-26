@@ -16,8 +16,6 @@ ion-toolbar ion-button.header-button button {
   color: white;
   font-size: 3.4rem;
   margin-left: 15px;
-  margin-top: 5px;
-  float: left;
 }
 
 .next-button {
@@ -36,8 +34,24 @@ ion-toolbar ion-button.header-button button {
   text-align: center;
 }
 
+ion-footer ion-toolbar div.toolbar-background {
+  background: white;
+}
+
+ion-footer {
+  height: 48px;
+}
+
+ion-footer ion-toolbar {
+  min-height: 48px !important;
+}
+
 .comments-text {
-  color:grey;
+  color: #7f858f;
+}
+
+.list-header {
+  color: #354154;
 }
 
 .item-content {
@@ -55,4 +69,16 @@ ion-toolbar ion-button.header-button button {
 
 .comments-title {
   line-height: 2.1;
+}
+
+.disabled-nav button {
+  color: lightgrey;
+}
+
+.header-button {
+  opacity: 0.6;
+}
+
+.header-button-selected {
+  opacity: 1;
 }

@@ -1,6 +1,5 @@
-import { Component, Prop, h } from '../index';
+import { Component, h, Prop, Ionic } from '../index';
 
-declare var Ionic: any;
 
 @Component({
   tag: 'news-list',
@@ -45,7 +44,7 @@ export class NewsList {
           h('div.points', { props: { slot: 'start' } }, story.points || 0),
           h('ion-label.item-content',
             [
-              h('h2', { on: { click: () => window.open(story.url) } }, story.title),
+              h('h2.list-header', { on: { click: () => window.open(story.url) } }, story.title),
               h('h3.comments-text', { on: { click: () => this.comments(story) } }, `Posted by ${story.user} ${story.time_ago} | ${story.comments_count} comments`),
             ]
           )
