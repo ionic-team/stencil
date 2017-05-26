@@ -1,501 +1,500 @@
-import { Component, h, Ionic, Prop } from '../index';
-// import { Menu as MenuInterface, MenuType } from './menu-interface';
+import { Component, h, Ionic, Prop, Watch } from '../index';
+import { IonicGlobal, Menu as IMenu } from '../../util/interfaces';
+import { MenuController } from './menu-controller';
+import { MenuType } from './menu-types';
 
 
 @Component({
   tag: 'ion-menu',
   styleUrls: {
-    'default': 'menu.scss'
+    ios: 'menu.ios.scss',
+    md: 'menu.md.scss',
+    wp: 'menu.wp.scss'
   },
   shadow: false
 })
-export class Menu {
-  isOpen: boolean = false;
+export class Menu implements IMenu {
+  private $el: HTMLElement;
+  private _backdropElm: HTMLElement;
+  private _ctrl: MenuController;
+  private _unregCntClick: Function;
+  private _unregBdClick: Function;
+  private _activeBlock: string;
 
+  private _cntElm: HTMLElement;
+  private _type: MenuType;
+  private _init = false;
+  private _isPane = false;
+
+  /**
+   * @hidden
+   */
+  @Prop() isOpen: boolean = false;
+
+  /**
+   * @hidden
+   */
+  @Prop() isAnimating: boolean = false;
+
+  /**
+   * @hidden
+   */
+  isRightSide: boolean = false;
+
+  /**
+   * @input {any} A reference to the content element the menu should use.
+   */
   @Prop() content: any;
-  @Prop() enabled: boolean = true;
+
+  /**
+   * @input {string} An id for the menu.
+   */
   @Prop() id: string;
-  @Prop() maxEdgeStart: number = 50;
-  @Prop() persistent: boolean = false;
-  @Prop() side: string = 'start';
-  @Prop() swipeEnabled: boolean = true;
+
+  /**
+   * @input {string} The display type of the menu. Default varies based on the mode,
+   * see the `menuType` in the [config](../../config/Config). Available options:
+   * `"overlay"`, `"reveal"`, `"push"`.
+   */
   @Prop() type: string;
 
-  // @Prop() ionDrag: EventEmitter<number> = new EventEmitter<number>();
-  // @Prop() ionOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
-  // @Prop() ionClose: EventEmitter<boolean> = new EventEmitter<boolean>();
+  /**
+   * @input {boolean} If true, the menu is enabled. Default `true`.
+   */
+  @Prop() enabled: boolean;
 
+  /**
+   * @input {string} Which side of the view the menu should be placed. Default `"start"`.
+   */
+  @Prop() side: string = 'start';
 
-  render() {
-    let menuTag: any;
-    if (this.type === 'push') {
-      menuTag = 'ion-menu-push';
+  /**
+   * @input {boolean} If true, swiping the menu is enabled. Default `true`.
+   */
+  @Prop() swipeEnabled: boolean;
 
-    } else if (this.type === 'overlay') {
-      // iOS
-      menuTag = 'ion-menu-overlay';
-
-    } else {
-      // Material Design and Windows
-      menuTag = 'ion-menu-reveal';
-    }
-
-    return h(this, { attrs: { 'role': 'navigation'} }, [
-      h(`${menuTag}.menu-inner`, Ionic.theme(this, 'menu-' + menuTag, {
-          props: {
-            // 'canStart': this.canStart.bind(this),
-            // 'onStart': this.onDragStart.bind(this),
-            // 'onMove': this.onDragMove.bind(this),
-            // 'onEnd': this.onDragEnd.bind(this),
-            // 'onPress': this.toggle.bind(this),
-            // 'gestureName': 'menu',
-            // 'gesturePriority': 30,
-            // 'type': 'pan,press',
-            // 'direction': 'x',
-            // 'threshold': 20,
-            // 'listenOn': 'parent'
-          }
-        }),
-          h('slot')
-        )
-      ]
-    );
-    // return h(this, [
-    //   h('ion-gesture.menu-inner', Ionic.theme(this, 'menu', {
-    //       props: {
-    //         // 'canStart': this.canStart.bind(this),
-    //         // 'onStart': this.onDragStart.bind(this),
-    //         // 'onMove': this.onDragMove.bind(this),
-    //         // 'onEnd': this.onDragEnd.bind(this),
-    //         // 'onPress': this.toggle.bind(this),
-    //         'gestureName': 'menu',
-    //         'gesturePriority': 30,
-    //         'type': 'pan,press',
-    //         'direction': 'x',
-    //         'threshold': 20,
-    //         'listenOn': 'parent'
-    //       },
-    //       attrs: {
-    //         'role': 'navigation'
-    //       }
-    //     }),
-    //       h('slot')
-    //     ),
-    //     h('ion-backdrop', {
-    //       'on': {
-    //         'click': this.onBackdropClick.bind(this)
-    //       }
-    //     })
-    //   ]
-    // );
+  @Watch('swipeEnabled')
+  swipeEnabledChange(isEnabled: boolean) {
+    this.swipeEnable(isEnabled);
   }
 
-  // /**
-  //  * @hidden
-  //  */
-  // isRightSide: boolean = false;
+  /**
+   * @input {boolean} If true, the menu will persist on child pages.
+   */
+  @Prop() persistent: boolean = false;
 
-  // /**
-  //  * @hidden
-  //  */
-  // @ViewChild(Backdrop) backdrop: Backdrop;
-
-  // /**
-  //  * @hidden
-  //  */
-  // @ContentChild(Content) menuContent: Content;
-
-  // /**
-  //  * @hidden
-  //  */
-  // @ContentChild(Nav) menuNav: Nav;
+  /**
+   * @hidden
+   */
+  @Prop() maxEdgeStart: number;
 
 
-  // ionViewDidLoad() {
-  //   let content = this.content;
-  //   this._cntEle = (content instanceof Node) ? content : content && content.getNativeElement && content.getNativeElement();
+  constructor() {
+    // get or create the MenuController singleton
+    this._ctrl = (<IonicGlobal>Ionic).controllers.menu = ((<IonicGlobal>Ionic).controllers.menu || new MenuController());
+  }
 
-  //   // requires content element
-  //   if (!this._cntEle) {
-  //     return console.error('Menu: must have a [content] element to listen for drag events on. Example:\n\n<ion-menu [content]="content"></ion-menu>\n\n<ion-nav #content></ion-nav>');
-  //   }
 
-  //   this.setElementAttribute('side', this._side);
+  /**
+   * @hidden
+   */
+  ionViewDidLoad() {
+    this._backdropElm = <HTMLElement>this.$el.querySelector('.menu-backdrop');
 
-  //   // normalize the "type"
-  //   if (!this.type) {
-  //     this.type = this._config.get('menuType');
-  //   }
-  //   this.setElementAttribute('type', this.type);
+    this._init = true;
 
-  //   // add the gestures
-  //   this._gesture = new MenuContentGesture(this._plt, this, this._gestureCtrl, this._domCtrl);
+    if (this.content) {
+      if ((<HTMLElement>this.content).tagName) {
+        this._cntElm = this.content;
+      } else if (typeof this.content === 'string') {
+        this._cntElm = <any>document.querySelector(this.content);
+      }
+    }
 
-  //   // add menu's content classes
-  //   this._cntEle.classList.add('menu-content');
-  //   this._cntEle.classList.add('menu-content-' + this.type);
+    if (!this._cntElm || !this._cntElm.tagName) {
+      // requires content element
+      return console.error('Menu: must have a "content" element to listen for drag events on.');
+    }
 
-  //   let isEnabled = this._isEnabled;
-  //   if (isEnabled === true || typeof isEnabled === 'undefined') {
-  //     // check if more than one menu is on the same side
-  //     isEnabled = !this._menuCtrl.getMenus().some(m => {
-  //       return m.side === this.side && m.enabled;
-  //     });
-  //   }
-  //   // register this menu with the app's menu controller
-  //   this._menuCtrl._register(this);
+    // add menu's content classes
+    this._cntElm.classList.add('menu-content');
+    this._cntElm.classList.add('menu-content-' + this.type);
 
-  //   // mask it as enabled / disabled
-  //   this.enable(isEnabled);
+    let isEnabled = this.enabled;
+    if (isEnabled === true || typeof isEnabled === 'undefined') {
+      // check if more than one menu is on the same side
+      isEnabled = !this._ctrl.getMenus().some(m => {
+        return m.side === this.side && m.enabled;
+      });
+    }
+    // register this menu with the app's menu controller
+    this._ctrl._register(this);
 
-  //   // this._gestureBlocker = _gestureCtrl.createBlocker({
-  //   //   disable: [GESTURE_GO_BACK_SWIPE]
-  //   // });
-  // }
+    // mask it as enabled / disabled
+    this.enable(isEnabled);
+  }
 
+  render() {
+    // normalize the "type"
+    if (!this.type) {
+      this.type = Ionic.config.get('menuType', 'overlay');
+    }
+
+    const hostAttrs = {
+      'role': 'navigation',
+      'side': this.side,
+      'type': this.type
+    };
+
+    const hostClass = {
+      'menu-enabled': this.enabled
+    };
+
+    return h(this, Ionic.theme(this, 'menu', { attrs: hostAttrs, class: hostClass }), [
+      h('div.menu-inner', h('slot')),
+      h('ion-gesture.menu-backdrop', {
+        props: {
+          // 'canStart': this.canStart.bind(this),
+          // 'onStart': this.onDragStart.bind(this),
+          // 'onMove': this.onDragMove.bind(this),
+          // 'onEnd': this.onDragEnd.bind(this),
+          'gestureName': 'menu-swipe',
+          'gesturePriority': 10,
+          'type': 'pan',
+          'direction': 'x',
+          'threshold': 5,
+          'attachTo': 'body',
+          'disableScroll': true,
+          'block': this._activeBlock
+        }
+      })
+    ]);
+  }
+
+  /**
+   * @hidden
+   */
   onBackdropClick(ev: UIEvent) {
     ev.preventDefault();
     ev.stopPropagation();
-    // this._menuCtrl.close();
+    this._ctrl.close();
   }
 
-  // /**
-  //  * @hidden
-  //  */
-  // private _getType(): MenuType {
-  //   if (!this._type) {
-  //     this._type = MenuController.create(this.type, this, this._plt);
+  /**
+   * @hidden
+   */
+  private _getType(): MenuType {
+    if (!this._type) {
+      this._type = this._ctrl.create(this.type, this);
 
-  //     if (this._config.get('animate') === false) {
-  //       this._type.ani.duration(0);
-  //     }
-  //   }
-  //   return this._type;
-  // }
+      if (Ionic.config.getBoolean('animate') === false) {
+        this._type.ani.duration(0);
+      }
+    }
+    return this._type;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // setOpen(shouldOpen: boolean, animated: boolean = true): Promise<boolean> {
-  //   // If the menu is disabled or it is currenly being animated, let's do nothing
-  //   if ((shouldOpen === this.isOpen) || !this._canOpen() || this._isAnimating) {
-  //     return Promise.resolve(this.isOpen);
-  //   }
-  //   return new Promise(resolve => {
-  //     this._before();
-  //     this._getType().setOpen(shouldOpen, animated, () => {
-  //       this._after(shouldOpen);
-  //       resolve(this.isOpen);
-  //     });
-  //   });
-  // }
+  /**
+   * @hidden
+   */
+  setOpen(shouldOpen: boolean, animated: boolean = true): Promise<boolean> {
+    // If the menu is disabled or it is currenly being animated, let's do nothing
+    if ((shouldOpen === this.isOpen) || !this._canOpen() || this.isAnimating) {
+      return Promise.resolve(this.isOpen);
+    }
+    return new Promise(resolve => {
+      this._before();
+      this._getType().setOpen(shouldOpen, animated, () => {
+        this._after(shouldOpen);
+        resolve(this.isOpen);
+      });
+    });
+  }
 
-  // _forceClosing() {
-  //   assert(this.isOpen, 'menu cannot be closed');
-  //   this._isAnimating = true;
-  //   this._getType().setOpen(false, false, () => {
-  //     this._after(false);
-  //   });
-  // }
+  _forceClosing() {
+    this.isAnimating = true;
+    this._getType().setOpen(false, false, () => {
+      this._after(false);
+    });
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // canSwipe(): boolean {
-  //   return this._isSwipeEnabled &&
-  //     !this._isAnimating &&
-  //     this._canOpen() &&
-  //     this._app.isEnabled();
-  // }
-
-  // /**
-  //  * @hidden
-  //  */
-  // isAnimating(): boolean {
-  //   return this._isAnimating;
-  // }
+  /**
+   * @hidden
+   */
+  canSwipe(): boolean {
+    return this.swipeEnabled &&
+      !this.isAnimating &&
+      this._canOpen();
+      // TODO: && this._app.isEnabled();
+  }
 
 
-  // _swipeBeforeStart() {
-  //   if (!this.canSwipe()) {
-  //     assert(false, 'canSwipe() has to be true');
-  //     return;
-  //   }
-  //   this._before();
-  // }
+  _swipeBeforeStart() {
+    if (!this.canSwipe()) {
+      return;
+    }
+    this._before();
+  }
 
-  // _swipeStart() {
-  //   if (!this._isAnimating) {
-  //     assert(false, '_isAnimating has to be true');
-  //     return;
-  //   }
+  _swipeStart() {
+    if (!this.isAnimating) {
+      return;
+    }
 
-  //   this._getType().setProgressStart(this.isOpen);
-  // }
+    this._getType().setProgressStart(this.isOpen);
+  }
 
-  // _swipeProgress(stepValue: number) {
-  //   if (!this._isAnimating) {
-  //     assert(false, '_isAnimating has to be true');
-  //     return;
-  //   }
+  _swipeProgress(stepValue: number) {
+    if (!this.isAnimating) {
+      return;
+    }
 
-  //   this._getType().setProgessStep(stepValue);
-  //   const ionDrag = this.ionDrag;
-  //   if (ionDrag.observers.length > 0) {
-  //     ionDrag.emit(stepValue);
-  //   }
-  // }
+    this._getType().setProgessStep(stepValue);
 
-  // _swipeEnd(shouldCompleteLeft: boolean, shouldCompleteRight: boolean, stepValue: number, velocity: number) {
-  //   if (!this._isAnimating) {
-  //     assert(false, '_isAnimating has to be true');
-  //     return;
-  //   }
+    Ionic.emit(this, 'ionDrag', { detail: { menu: this } });
+  }
 
-  //   // user has finished dragging the menu
-  //   const isRightSide = this.isRightSide;
-  //   const opening = !this.isOpen;
-  //   const shouldComplete = (opening)
-  //   ? isRightSide ? shouldCompleteLeft : shouldCompleteRight
-  //   : isRightSide ? shouldCompleteRight : shouldCompleteLeft;
+  _swipeEnd(shouldCompleteLeft: boolean, shouldCompleteRight: boolean, stepValue: number, velocity: number) {
+    if (!this.isAnimating) {
+      return;
+    }
 
-  //   this._getType().setProgressEnd(shouldComplete, stepValue, velocity, (isOpen: boolean) => {
-  //     console.debug('menu, swipeEnd', this.side);
-  //     this._after(isOpen);
-  //   });
-  // }
+    // user has finished dragging the menu
+    const isRightSide = this.isRightSide;
+    const opening = !this.isOpen;
+    const shouldComplete = (opening)
+    ? isRightSide ? shouldCompleteLeft : shouldCompleteRight
+    : isRightSide ? shouldCompleteRight : shouldCompleteLeft;
 
-  // private _before() {
-  //   assert(!this._isAnimating, '_before() should not be called while animating');
+    this._getType().setProgressEnd(shouldComplete, stepValue, velocity, (isOpen: boolean) => {
+      console.debug('menu, swipeEnd', this.side);
+      this._after(isOpen);
+    });
+  }
 
-  //   // this places the menu into the correct location before it animates in
-  //   // this css class doesn't actually kick off any animations
-  //   this.setElementClass('show-menu', true);
-  //   this.backdrop.setElementClass('show-backdrop', true);
-  //   this.resize();
-  //   this._keyboard.close();
-  //   this._isAnimating = true;
-  // }
+  private _before() {
+    // this places the menu into the correct location before it animates in
+    // this css class doesn't actually kick off any animations
+    this.$el.classList.add('show-menu');
+    this._backdropElm.classList.add('show-backdrop');
 
-  // private _after(isOpen: boolean) {
-  //   assert(this._isAnimating, '_before() should be called while animating');
+    this.resize();
 
-  //   this._app.setEnabled(false, 100);
-  //   // keep opening/closing the menu disabled for a touch more yet
-  //   // only add listeners/css if it's enabled and isOpen
-  //   // and only remove listeners/css if it's not open
-  //   // emit opened/closed events
-  //   this.isOpen = isOpen;
-  //   this._isAnimating = false;
+    // TODO: this._keyboard.close();
 
-  //   this._events.unlistenAll();
-  //   if (isOpen) {
-  //     // Disable swipe to go back gesture
-  //     this._gestureBlocker.block();
+    this.isAnimating = true;
+  }
 
-  //     this._cntEle.classList.add('menu-content-open');
-  //     let callback = this.onBackdropClick.bind(this);
-  //     this._events.listen(this._cntEle, 'click', callback, { capture: true });
-  //     this._events.listen(this.backdrop.getNativeElement(), 'click', callback, { capture: true });
+  private _after(isOpen: boolean) {
+    // TODO: this._app.setEnabled(false, 100);
 
-  //     this.ionOpen.emit(true);
+    // keep opening/closing the menu disabled for a touch more yet
+    // only add listeners/css if it's enabled and isOpen
+    // and only remove listeners/css if it's not open
+    // emit opened/closed events
+    this.isOpen = isOpen;
+    this.isAnimating = false;
 
-  //   } else {
-  //     // Enable swipe to go back gesture
-  //     this._gestureBlocker.unblock();
+    // add/remove backdrop click listeners
+    this._backdropClick(isOpen);
 
-  //     this._cntEle.classList.remove('menu-content-open');
-  //     this.setElementClass('show-menu', false);
-  //     this.backdrop.setElementClass('show-menu', false);
+    if (isOpen) {
+      // disable swipe to go back gesture
+      this._activeBlock = GESTURE_BLOCKER;
 
-  //     this.ionClose.emit(true);
-  //   }
-  // }
+      // add css class
+      Ionic.dom.write(() => {
+        this._cntElm.classList.add('menu-content-open');
+      });
 
-  // /**
-  //  * @hidden
-  //  */
-  // open(): Promise<boolean> {
-  //   return this.setOpen(true);
-  // }
+      // emit open event
+      Ionic.emit(this, 'ionOpen', { detail: { menu: this } });
 
-  // /**
-  //  * @hidden
-  //  */
-  // close(): Promise<boolean> {
-  //   return this.setOpen(false);
-  // }
+    } else {
+      // enable swipe to go back gesture
+      this._activeBlock = null;
 
-  // /**
-  //  * @hidden
-  //  */
-  // resize() {
-  //   const content: Content | Nav = this.menuContent
-  //     ? this.menuContent
-  //     : this.menuNav;
-  //   content && content.resize();
-  // }
+      // remove css classes
+      Ionic.dom.write(() => {
+        this._cntElm.classList.remove('menu-content-open');
+        this._cntElm.classList.remove('show-menu');
+        this._backdropElm.classList.remove('show-menu');
+      });
 
-  // /**
-  //  * @hidden
-  //  */
-  // toggle(): Promise<boolean> {
-  //   return this.setOpen(!this.isOpen);
-  // }
+      // emit close event
+      Ionic.emit(this, 'ionClose', { detail: { menu: this } });
+    }
+  }
 
-  // _canOpen(): boolean {
-  //   return this._isEnabled && !this._isPane;
-  // }
+  /**
+   * @hidden
+   */
+  open(): Promise<boolean> {
+    return this.setOpen(true);
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // _updateState() {
-  //   const canOpen = this._canOpen();
+  /**
+   * @hidden
+   */
+  close(): Promise<boolean> {
+    return this.setOpen(false);
+  }
 
-  //   // Close menu inmediately
-  //   if (!canOpen && this.isOpen) {
-  //     assert(this._init, 'menu must be initialized');
-  //     // close if this menu is open, and should not be enabled
-  //     this._forceClosing();
-  //   }
+  /**
+   * @hidden
+   */
+  resize() {
+    // TODO
+    // const content: Content | Nav = this.menuContent
+    //   ? this.menuContent
+    //   : this.menuNav;
+    // content && content.resize();
+  }
 
-  //   if (this._isEnabled && this._menuCtrl) {
-  //     this._menuCtrl._setActiveMenu(this);
-  //   }
+  /**
+   * @hidden
+   */
+  toggle(): Promise<boolean> {
+    return this.setOpen(!this.isOpen);
+  }
 
-  //   if (!this._init) {
-  //     return;
-  //   }
+  _canOpen(): boolean {
+    return this.enabled && !this._isPane;
+  }
 
-  //   const gesture = this._gesture;
-  //   // only listen/unlisten if the menu has initialized
-  //   if (canOpen && this._isSwipeEnabled && !gesture.isListening) {
-  //     // should listen, but is not currently listening
-  //     console.debug('menu, gesture listen', this.side);
-  //     gesture.listen();
+  /**
+   * @hidden
+   */
+  _updateState() {
+    const canOpen = this._canOpen();
 
-  //   } else if (gesture.isListening && (!canOpen || !this._isSwipeEnabled)) {
-  //     // should not listen, but is currently listening
-  //     console.debug('menu, gesture unlisten', this.side);
-  //     gesture.unlisten();
-  //   }
+    // Close menu inmediately
+    if (!canOpen && this.isOpen) {
+      // close if this menu is open, and should not be enabled
+      this._forceClosing();
+    }
 
-  //   if (this.isOpen || (this._isPane && this._isEnabled)) {
-  //     this.resize();
-  //   }
-  //   assert(!this._isAnimating, 'can not be animating');
-  // }
+    if (this.enabled && this._ctrl) {
+      this._ctrl._setActiveMenu(this);
+    }
 
-  // /**
-  //  * @hidden
-  //  */
-  // enable(shouldEnable: boolean): Menu {
-  //   this._isEnabled = shouldEnable;
-  //   this.setElementClass('menu-enabled', shouldEnable);
-  //   this._updateState();
-  //   return this;
-  // }
+    if (!this._init) {
+      return;
+    }
 
-  // /**
-  //  * @internal
-  //  */
-  // initPane(): boolean {
-  //   return false;
-  // }
+    // TODO
+    // const gesture = this._gesture;
+    // // only listen/unlisten if the menu has initialized
+    // if (canOpen && this.swipeEnabled && !gesture.isListening) {
+    //   // should listen, but is not currently listening
+    //   console.debug('menu, gesture listen', this.side);
+    //   gesture.listen();
 
-  // /**
-  //  * @internal
-  //  */
-  // paneChanged(isPane: boolean) {
-  //   this._isPane = isPane;
-  //   this._updateState();
-  // }
+    // } else if (gesture.isListening && (!canOpen || !this.swipeEnabled)) {
+    //   // should not listen, but is currently listening
+    //   console.debug('menu, gesture unlisten', this.side);
+    //   gesture.unlisten();
+    // }
 
-  // /**
-  //  * @hidden
-  //  */
-  // swipeEnable(shouldEnable: boolean): Menu {
-  //   this._isSwipeEnabled = shouldEnable;
-  //   this._updateState();
-  //   return this;
-  // }
+    if (this.isOpen || (this._isPane && this.enabled)) {
+      this.resize();
+    }
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // getNativeElement(): HTMLElement {
-  //   return this._elementRef.nativeElement;
-  // }
+  /**
+   * @hidden
+   */
+  enable(shouldEnable: boolean): Menu {
+    this.enabled = shouldEnable;
+    this._updateState();
+    return this;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // getMenuElement(): HTMLElement {
-  //   return <HTMLElement>this.getNativeElement().querySelector('.menu-inner');
-  // }
+  /**
+   * @internal
+   */
+  initPane(): boolean {
+    return false;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // getContentElement(): HTMLElement {
-  //   return this._cntEle;
-  // }
+  /**
+   * @internal
+   */
+  paneChanged(isPane: boolean) {
+    this._isPane = isPane;
+    this._updateState();
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // getBackdropElement(): HTMLElement {
-  //   return this.backdrop.getNativeElement();
-  // }
+  /**
+   * @hidden
+   */
+  swipeEnable(shouldEnable: boolean): Menu {
+    this.swipeEnabled = shouldEnable;
+    this._updateState();
+    return this;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // width(): number {
-  //   return this.getMenuElement().offsetWidth;
-  // }
+  /**
+   * @hidden
+   */
+  getMenuElement(): HTMLElement {
+    return <HTMLElement>this.$el.querySelector('.menu-inner');
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // getMenuController(): MenuController {
-  //   return this._menuCtrl;
-  // }
+  /**
+   * @hidden
+   */
+  getContentElement(): HTMLElement {
+    return this._cntElm;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // setElementClass(className: string, add: boolean) {
-  //   this._renderer.setElementClass(this._elementRef.nativeElement, className, add);
-  // }
+  /**
+   * @hidden
+   */
+  getBackdropElement(): HTMLElement {
+    return this._backdropElm;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // setElementAttribute(attributeName: string, value: string) {
-  //   this._renderer.setElementAttribute(this._elementRef.nativeElement, attributeName, value);
-  // }
+  /**
+   * @hidden
+   */
+  width(): number {
+    return this.getMenuElement().offsetWidth;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // getElementRef(): ElementRef {
-  //   return this._elementRef;
-  // }
+  /**
+   * @hidden
+   */
+  getMenuController(): MenuController {
+    return this._ctrl;
+  }
 
-  // /**
-  //  * @hidden
-  //  */
-  // ngOnDestroy() {
-  //   this._menuCtrl._unregister(this);
-  //   this._events.destroy();
-  //   this._gesture && this._gesture.destroy();
-  //   this._type && this._type.destroy();
+  private _backdropClick(shouldAdd: boolean) {
+    const onBackdropClick = this.onBackdropClick.bind(this);
 
-  //   this._gesture = null;
-  //   this._type = null;
-  //   this._cntEle = null;
-  // }
+    if (shouldAdd && !this._unregBdClick) {
+      this._unregBdClick = Ionic.listener.add(this._cntElm, 'click', onBackdropClick, { capture: true });
+      this._unregCntClick = Ionic.listener.add(this._cntElm, 'click', onBackdropClick, { capture: true });
+
+    } else if (!shouldAdd && this._unregBdClick) {
+      this._unregBdClick();
+      this._unregCntClick();
+      this._unregBdClick = this._unregCntClick = null;
+    }
+  }
+
+  /**
+   * @hidden
+   */
+  ionViewDidUnload() {
+    this._backdropClick(false);
+
+    this._ctrl._unregister(this);
+    this._type && this._type.destroy();
+
+    this._ctrl = this._type = this._cntElm = this._backdropElm = null;
+  }
 
 }
+
+const GESTURE_BLOCKER = 'goback-swipe';
