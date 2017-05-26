@@ -26,8 +26,7 @@ import { Swiper } from '../../vendor/swiper';
   tag: 'ion-slides',
   styleUrls: {
     default: 'slides.scss'
-  },
-  shadow: false
+  }
 })
 export class Slides {
   swiper: any;

@@ -7,8 +7,7 @@ import { Component, h, Ionic } from '../index';
     ios: 'page.ios.scss',
     md: 'page.md.scss',
     wp: 'page.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Page {
 

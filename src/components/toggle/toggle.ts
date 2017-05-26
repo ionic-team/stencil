@@ -8,8 +8,7 @@ import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
     ios: 'toggle.ios.scss',
     md: 'toggle.md.scss',
     wp: 'toggle.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Toggle implements BooleanInputComponent {
   activated: boolean = false;

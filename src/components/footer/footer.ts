@@ -2,8 +2,7 @@ import { Component, h, Ionic } from '../index';
 
 
 @Component({
-  tag: 'ion-footer',
-  shadow: false
+  tag: 'ion-footer'
 })
 export class Footer {
   render() {

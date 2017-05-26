@@ -7,8 +7,7 @@ import { Component, h, Ionic } from '../index';
     ios: 'item-divider.ios.scss',
     md: 'item-divider.md.scss',
     wp: 'item-divider.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class ItemDivider {
   render() {

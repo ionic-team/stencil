@@ -11,8 +11,7 @@ import iOSLeaveAnimation from './animations/ios.leave';
     ios: 'loading.ios.scss',
     md: 'loading.md.scss',
     wp: 'loading.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Loading implements ILoading {
   $el: HTMLElement;

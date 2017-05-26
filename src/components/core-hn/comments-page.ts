@@ -5,8 +5,7 @@ import { Component, Prop, h } from '../index';
   tag: 'comments-page',
   styleUrls: {
     default: 'main.scss',
-  },
-  shadow: false
+  }
 })
 export class CommentsPage {
 

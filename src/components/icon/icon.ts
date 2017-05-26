@@ -8,8 +8,7 @@ type CssClassObject = { [className: string]: boolean };
     ios: 'icon.ios.scss',
     md: 'icon.md.scss',
     wp: 'icon.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Icon {
   mode: string;

@@ -6,8 +6,7 @@ declare var Ionic: any;
   tag: 'news-container',
   styleUrls: {
     default: 'main.scss',
-  },
-  shadow: false
+  }
 })
 export class NewsContainer {
 

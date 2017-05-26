@@ -7,8 +7,7 @@ import { PanRecognizer } from './recognizers';
 
 
 @Component({
-  tag: 'ion-gesture',
-  shadow: false
+  tag: 'ion-gesture'
 })
 export class Gesture {
   private $el: HTMLElement;

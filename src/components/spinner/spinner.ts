@@ -8,8 +8,7 @@ import { SPINNERS, SpinnerConfig } from './spinner-configs';
     ios: 'spinner.ios.scss',
     md: 'spinner.md.scss',
     wp: 'spinner.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Spinner {
 

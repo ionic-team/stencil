@@ -7,8 +7,7 @@ import { Component, h, Ionic } from '../index';
     ios: 'card-content.ios.scss',
     md: 'card-content.md.scss',
     wp: 'card-content.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class CardContent {
   render() {

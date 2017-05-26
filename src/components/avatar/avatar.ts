@@ -7,8 +7,7 @@ import { Component, h, Ionic } from '../index';
     ios: 'avatar.ios.scss',
     md: 'avatar.md.scss',
     wp: 'avatar.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Avatar {
   render() {

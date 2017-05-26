@@ -16,8 +16,7 @@ import { Component, h } from '../index';
   tag: 'ion-slide',
   styleUrls: {
     default: 'slide.scss',
-  },
-  shadow: false
+  }
 })
 export class Slide {
   $el: HTMLElement;

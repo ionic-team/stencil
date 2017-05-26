@@ -2,8 +2,7 @@ import { Component, h, Ionic } from '../index';
 
 
 @Component({
-  tag: 'ion-header',
-  shadow: false
+  tag: 'ion-header'
 })
 export class Header {
   render() {

@@ -727,7 +727,7 @@ export interface Animation {
   fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
   hasCompleted: boolean;
   isPlaying: boolean;
-  onFinish: (callback: Function, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}) => Animation;
+  onFinish: (callback: (animation: Animation) => void, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}) => Animation;
   play: (opts?: PlayOptions) => void;
   syncPlay: () => void;
   progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;

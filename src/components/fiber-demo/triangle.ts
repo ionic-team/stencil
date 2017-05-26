@@ -3,8 +3,7 @@ import { Component, Prop, h } from '../index';
 var targetSize = 25;
 
 @Component({
-  tag: 'fiber-triangle',
-  shadow: false
+  tag: 'fiber-triangle'
 })
 export class FiberTriangle {
 

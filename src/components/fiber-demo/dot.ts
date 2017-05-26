@@ -1,8 +1,7 @@
 import { Component, Prop, h, State } from '../index';
 
 @Component({
-  tag: 'fiber-dot',
-  shadow: false
+  tag: 'fiber-dot'
 })
 export class FiberDot {
   $el: HTMLElement;

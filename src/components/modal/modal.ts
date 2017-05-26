@@ -11,8 +11,7 @@ import iOSLeaveAnimation from './animations/ios.leave';
     ios: 'modal.ios.scss',
     md: 'modal.md.scss',
     wp: 'modal.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Modal implements IModal {
   $el: HTMLElement;

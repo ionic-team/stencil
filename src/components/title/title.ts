@@ -42,8 +42,7 @@ import { Component, h, Ionic } from '../index';
     ios: 'title.ios.scss',
     md: 'title.md.scss',
     wp: 'title.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class ToolbarTitle {
   render() {

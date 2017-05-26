@@ -1,11 +1,7 @@
 import { Component, Prop, h } from '../index';
 
 @Component({
-  tag: 'fiber-demo',
-  styleUrls: {
-    default: 'main.scss',
-  },
-  shadow: false
+  tag: 'fiber-demo'
 })
 export class FiberDemo {
   @Prop() elapsed: number = 0;

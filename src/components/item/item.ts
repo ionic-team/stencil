@@ -8,8 +8,7 @@ import { VNodeData } from '../../util/interfaces';
     ios: 'item.ios.scss',
     md: 'item.md.scss',
     wp: 'item.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Item {
   childStyles: {[className: string]: boolean} = Object.create(null);

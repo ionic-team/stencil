@@ -6,8 +6,7 @@ import { IonicGlobal, LoadingEvent, LoadingOptions, Loading, IonicControllerApi 
   tag: 'ion-loading-controller',
   styleUrls: {
     default: 'loading-controller.scss'
-  },
-  shadow: false
+  }
 })
 export class LoadingController implements IonicControllerApi {
   private ids = 0;

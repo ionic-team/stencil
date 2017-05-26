@@ -67,8 +67,7 @@ type CssClassObject = { [className: string]: boolean };
     ios: 'button.ios.scss',
     md: 'button.md.scss',
     wp: 'button.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Button {
 

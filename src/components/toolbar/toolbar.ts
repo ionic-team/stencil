@@ -95,8 +95,7 @@ import { Component, h, Ionic } from '../index';
     ios: 'toolbar.ios.scss',
     md: 'toolbar.md.scss',
     wp: 'toolbar.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Toolbar {
   $el: HTMLElement;

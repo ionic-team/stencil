@@ -10,8 +10,7 @@ import { MenuType } from './menu-types';
     ios: 'menu.ios.scss',
     md: 'menu.md.scss',
     wp: 'menu.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Menu implements IMenu {
   private $el: HTMLElement;
