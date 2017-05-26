@@ -104,19 +104,84 @@ function updateTag(cmpMeta: ComponentMeta) {
 
 
 function updateStyles(cmpMeta: ComponentMeta) {
-  const styleModes: {[modeName: string]: string} = (<any>cmpMeta).styleUrls;
+  if (!(<any>cmpMeta).styleUrls) {
+    return;
+  }
 
-  if (styleModes) {
-    Object.keys(styleModes).forEach(styleModeName => {
-      const modeName = styleModeName.trim().toLowerCase();
+  // normalize the possible styleUrl structures
 
-      cmpMeta.modes[modeName] = {
-        styleUrls: [styleModes[styleModeName]]
-      };
+  if (typeof (<any>cmpMeta).styleUrls === 'string') {
+    // as a string
+    // styleUrls: 'my-styles.scss'
+
+    if (!(<any>cmpMeta).styleUrls.trim().length) {
+      throw `invalid style url for ${cmpMeta.tag}: ${(<any>cmpMeta).styleUrls}`;
+    }
+
+    cmpMeta.modes['default'] = {
+      styleUrls: [(<any>cmpMeta).styleUrls.trim()]
+    };
+
+  } else if (Array.isArray((<any>cmpMeta).styleUrls)) {
+    // as an array of strings
+    // styleUrls: ['my-styles.scss', 'my-other-styles']
+
+    cmpMeta.modes['default'] = {
+      styleUrls: []
+    };
+
+    (<any>cmpMeta).styleUrls.forEach((styleUrl: string) => {
+      if (styleUrl && typeof styleUrl === 'string' && styleUrl.trim().length) {
+        cmpMeta.modes['default'].styleUrls.push(styleUrl.trim());
+      } else {
+        throw `invalid style url for ${cmpMeta.tag}: ${styleUrl}`;
+      }
     });
 
-    delete (<any>cmpMeta).styleUrls;
+  } else {
+    // as an object
+    // styleUrls: {
+    //   ios: 'badge.ios.scss',
+    //   md: 'badge.md.scss',
+    //   wp: 'badge.wp.scss'
+    // }
+
+    const styleModes: {[modeName: string]: string} = (<any>cmpMeta).styleUrls;
+
+    Object.keys(styleModes).forEach(styleModeName => {
+      const modeName = styleModeName.trim().toLowerCase();
+      cmpMeta.modes[modeName] = {
+        styleUrls: []
+      };
+
+      if (typeof styleModes[styleModeName] === 'string') {
+        const styleUrl = styleModes[styleModeName].trim();
+        if (!styleUrl.length) {
+          throw `invalid style url for ${cmpMeta.tag}: ${styleModes[styleModeName]}`;
+        }
+
+        cmpMeta.modes[modeName].styleUrls.push(styleUrl);
+
+      } else if (Array.isArray(styleModes[styleModeName])) {
+        const styleUrls: string[] = (<any>cmpMeta).styleUrls;
+
+        styleUrls.forEach(styleUrl => {
+          if (styleUrl && typeof styleUrl === 'string' && styleUrl.trim().length) {
+            cmpMeta.modes[modeName].styleUrls.push(styleUrl.trim());
+          } else {
+            throw `invalid style url for ${cmpMeta.tag}: ${styleUrl}`;
+          }
+        });
+
+      } else {
+        throw `invalid style url for ${cmpMeta.tag}: ${styleModes[styleModeName]}`;
+      }
+    });
+
   }
+
+  // remove the original user data now that we've parsed it out
+  delete (<any>cmpMeta).styleUrls;
 }
 
 

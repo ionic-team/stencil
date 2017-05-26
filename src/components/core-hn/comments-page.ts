@@ -3,9 +3,7 @@ import { Component, Prop, h } from '../index';
 
 @Component({
   tag: 'comments-page',
-  styleUrls: {
-    default: 'main.scss',
-  }
+  styleUrls: 'main.scss'
 })
 export class CommentsPage {
 

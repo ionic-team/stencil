@@ -4,9 +4,7 @@ declare var Ionic: any;
 
 @Component({
   tag: 'news-container',
-  styleUrls: {
-    default: 'main.scss',
-  }
+  styleUrls: 'main.scss'
 })
 export class NewsContainer {
 

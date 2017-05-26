@@ -392,7 +392,7 @@ export interface ComponentDecorator {
 
 export interface ComponentOptions {
   tag: string;
-  styleUrls?: string[] | ModeStyles;
+  styleUrls?: string | string[] | ModeStyles;
   shadow?: boolean;
 }
 
