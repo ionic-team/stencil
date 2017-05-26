@@ -146,8 +146,8 @@ $item-ios-sliding-content-background:     $list-ios-background-color !default;
   font-size: 1.3rem;
 }
 
-.item-ios .item-button[icon-only] ion-icon,
-.item-ios .item-button[icon-only] {
+.item-ios [icon-only] .item-button ion-icon,
+.item-ios [icon-only] .item-button {
   padding: 0 1px;
 }
 

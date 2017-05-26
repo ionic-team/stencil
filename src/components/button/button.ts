@@ -13,51 +13,51 @@ type CssClassObject = { [className: string]: boolean };
   * ```html
   *
   *  <!-- Colors -->
-  *  <button ion-button>Default</button>
+  *  <ion-button>Default</ion-button>
   *
-  *  <button ion-button color="secondary">Secondary</button>
+  *  <ion-button color="secondary">Secondary</ion-button>
   *
-  *  <button ion-button color="danger">Danger</button>
+  *  <ion-button color="danger">Danger</ion-button>
   *
-  *  <button ion-button color="light">Light</button>
+  *  <ion-button color="light">Light</ion-button>
   *
-  *  <button ion-button color="dark">Dark</button>
+  *  <ion-button color="dark">Dark</ion-button>
   *
   *  <!-- Shapes -->
-  *  <button ion-button full>Full Button</button>
+  *  <ion-button full>Full Button</ion-button>
   *
-  *  <button ion-button block>Block Button</button>
+  *  <ion-button block>Block Button</ion-button>
   *
-  *  <button ion-button round>Round Button</button>
+  *  <ion-button round>Round Button</ion-button>
   *
   *  <!-- Outline -->
-  *  <button ion-button full outline>Outline + Full</button>
+  *  <ion-button full outline>Outline + Full</ion-button>
   *
-  *  <button ion-button block outline>Outline + Block</button>
+  *  <ion-button block outline>Outline + Block</ion-button>
   *
-  *  <button ion-button round outline>Outline + Round</button>
+  *  <ion-button round outline>Outline + Round</ion-button>
   *
   *  <!-- Icons -->
-  *  <button ion-button icon-left>
+  *  <ion-button icon-start>
   *    <ion-icon name="star"></ion-icon>
   *    Left Icon
-  *  </button>
+  *  </ion-button>
   *
-  *  <button ion-button icon-right>
+  *  <ion-button icon-end>
   *    Right Icon
   *    <ion-icon name="star"></ion-icon>
-  *  </button>
+  *  </ion-button>
   *
-  *  <button ion-button icon-only>
+  *  <ion-button icon-only>
   *    <ion-icon name="star"></ion-icon>
-  *  </button>
+  *  </ion-button>
   *
   *  <!-- Sizes -->
-  *  <button ion-button large>Large</button>
+  *  <ion-button large>Large</ion-button>
   *
-  *  <button ion-button>Default</button>
+  *  <ion-button>Default</ion-button>
   *
-  *  <button ion-button small>Small</button>
+  *  <ion-button small>Small</ion-button>
   * ```
   *
   */
@@ -197,6 +197,11 @@ export class Button {
       ((style && style !== 'default') ?
         '-' + style.toLowerCase() :
         '');
+
+    // special case for a default bar button
+    if (buttonType === 'bar-button' && style === 'default') {
+      className = buttonType + '-' + style.toLowerCase();
+    }
 
     return [`${className}-${mode}`].concat(
         color ? `${className}-${mode}-${color}` : []
