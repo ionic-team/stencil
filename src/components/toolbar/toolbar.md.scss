@@ -9,11 +9,11 @@
 $toolbar-order-md: (
   back-button: 0,
   menu-toggle-start: 1,
-  buttons-left: 2,
+  buttons-start: 2,
   content: 3,
-  buttons-start: 4,
-  buttons-end: 5,
-  buttons-right: 6,
+  buttons-mode-start: 4,
+  buttons-mode-end: 5,
+  buttons-end: 6,
   menu-toggle-end: 7,
 );
 
@@ -21,7 +21,7 @@ $toolbar-order-md: (
 $toolbar-md-button-font-size:            1.4rem !default;
 
 /// @prop - Text color of the toolbar button
-$toolbar-md-button-color:                $toolbar-md-title-text-color !default;
+$toolbar-md-button-color:                color-contrast($colors-md, $toolbar-md-background, md) !default;
 
 /// @prop - Border radius of the toolbar button
 $toolbar-md-button-border-radius:        2px !default;
@@ -140,29 +140,29 @@ $navbar-md-height:                       $toolbar-md-height !default;
 // --------------------------------------------------
 
 .bar-buttons-md {
-  order: map-get($toolbar-order-md, buttons-start);
+  order: map-get($toolbar-order-md, buttons-mode-start);
 
   transform: translateZ(0);
 }
 
-.bar-buttons-md[left] {
-  order: map-get($toolbar-order-md, buttons-left);
+.bar-buttons-md[slot="start"] {
+  order: map-get($toolbar-order-md, buttons-start);
 }
 
 .bar-button-md:first-child {
   @include margin-horizontal(0, null);
 }
 
-.bar-buttons-md[end] {
+.bar-buttons-md[slot="mode-end"] {
   @include text-align(end);
 
-  order: map-get($toolbar-order-md, buttons-end);
+  order: map-get($toolbar-order-md, buttons-mode-end);
 }
 
-.bar-buttons-md[right] {
+.bar-buttons-md[slot="end"] {
   @include text-align(right);
 
-  order: map-get($toolbar-order-md, buttons-right);
+  order: map-get($toolbar-order-md, buttons-end);
 }
 
 
@@ -355,8 +355,8 @@ $navbar-md-height:                       $toolbar-md-height !default;
   font-size: 2.4rem;
 }
 
-.bar-button-menutoggle-md[end],
-.bar-button-menutoggle-md[right] {
+.bar-button-menutoggle-md[slot="mode-end"],
+.bar-button-menutoggle-md[slot="end"] {
   @include margin(0, 2px);
 
   order: map-get($toolbar-order-md, menu-toggle-end);

@@ -9,11 +9,11 @@
 $toolbar-order-wp: (
   back-button: 0,
   menu-toggle-start: 1,
-  buttons-left: 2,
+  buttons-start: 2,
   content: 3,
-  buttons-start: 4,
-  buttons-end: 5,
-  buttons-right: 6,
+  buttons-mode-start: 4,
+  buttons-mode-end: 5,
+  buttons-end: 6,
   menu-toggle-end: 7,
 );
 
@@ -90,29 +90,29 @@ $navbar-wp-height:                       $toolbar-wp-height !default;
 // --------------------------------------------------
 
 .bar-buttons-wp {
-  order: map-get($toolbar-order-wp, buttons-start);
+  order: map-get($toolbar-order-wp, buttons-mode-start);
 
   transform: translateZ(0);
 }
 
-.bar-buttons-wp[left] {
-  order: map-get($toolbar-order-wp, buttons-left);
+.bar-buttons-wp[slot="start"] {
+  order: map-get($toolbar-order-wp, buttons-start);
 }
 
-.bar-buttons-wp[left] .bar-button:first-child {
+.bar-buttons-wp[slot="start"] .bar-button:first-child {
   @include margin-horizontal(0, null);
 }
 
-.bar-buttons-wp[end] {
+.bar-buttons-wp[slot="mode-end"] {
   @include text-align(end);
 
-  order: map-get($toolbar-order-wp, buttons-end);
+  order: map-get($toolbar-order-wp, buttons-mode-end);
 }
 
-.bar-buttons-wp[right] {
+.bar-buttons-wp[slot="end"] {
   @include text-align(right);
 
-  order: map-get($toolbar-order-wp, buttons-right);
+  order: map-get($toolbar-order-wp, buttons-end);
 }
 
 
@@ -299,8 +299,8 @@ $navbar-wp-height:                       $toolbar-wp-height !default;
   }
 }
 
-.bar-button-menutoggle-wp[end],
-.bar-button-menutoggle-wp[right] {
+.bar-button-menutoggle-wp[slot="mode-end"],
+.bar-button-menutoggle-wp[slot="end"] {
   @include margin(0, 2px);
 
   order: map-get($toolbar-order-wp, menu-toggle-end);

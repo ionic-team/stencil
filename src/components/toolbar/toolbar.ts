@@ -125,10 +125,22 @@ export class Toolbar {
   render() {
     return h(this, Ionic.theme(this, 'toolbar', { class: { 'statusbar-padding': this.sbPadding } }), [
       h('div', Ionic.theme(this, 'toolbar-background')),
+      h('slot', { attrs: { name: 'start' } }),
+      h('slot', { attrs: { name: 'mode-start' } }),
+      h('slot', { attrs: { name: 'mode-end' } }),
+      h('slot', { attrs: { name: 'end' } }),
       h('div', Ionic.theme(this, 'toolbar-content'),
         h('slot')
       ),
     ]);
   }
+
+    // '<div class="toolbar-background" [ngClass]="\'toolbar-background-\' + _mode"></div>' +
+    // '<ng-content select="[menuToggle],ion-buttons[left]"></ng-content>' +
+    // '<ng-content select="ion-buttons[start]"></ng-content>' +
+    // '<ng-content select="ion-buttons[end],ion-buttons[right]"></ng-content>' +
+    // '<div class="toolbar-content" [ngClass]="\'toolbar-content-\' + _mode">' +
+    //   '<ng-content></ng-content>' +
+    // '</div>',
 
 }

@@ -9,11 +9,11 @@
 $toolbar-order-ios: (
   back-button: 0,
   menu-toggle-start: 1,
-  buttons-left: 2,
-  buttons-start: 3,
+  buttons-start: 2,
+  buttons-mode-start: 3,
   content: 4,
-  buttons-end: 5,
-  buttons-right: 6,
+  buttons-mode-end: 5,
+  buttons-end: 6,
   menu-toggle-end: 7,
 );
 
@@ -109,25 +109,25 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
 // --------------------------------------------------
 
 .bar-buttons-ios {
-  order: map-get($toolbar-order-ios, buttons-start);
+  order: map-get($toolbar-order-ios, buttons-mode-start);
 
   transform: translateZ(0);
 }
 
-.bar-buttons-ios[left] {
-  order: map-get($toolbar-order-ios, buttons-left);
+.bar-buttons-ios[slot="start"] {
+  order: map-get($toolbar-order-ios, buttons-start);
 }
 
-.bar-buttons-ios[end] {
+.bar-buttons-ios[slot="mode-end"] {
   @include text-align(end);
 
-  order: map-get($toolbar-order-ios, buttons-end);
+  order: map-get($toolbar-order-ios, buttons-mode-end);
 }
 
-.bar-buttons-ios[right] {
+.bar-buttons-ios[slot="end"] {
   @include text-align(right);
 
-  order: map-get($toolbar-order-ios, buttons-right);
+  order: map-get($toolbar-order-ios, buttons-end);
 }
 
 
@@ -324,8 +324,8 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
   }
 }
 
-.bar-button-menutoggle-ios[end],
-.bar-button-menutoggle-ios[right] {
+.bar-button-menutoggle-ios[slot="mode-end"],
+.bar-button-menutoggle-ios[slot="end"] {
   order: map-get($toolbar-order-ios, menu-toggle-end);
 }
 
