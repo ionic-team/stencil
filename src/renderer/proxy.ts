@@ -1,5 +1,4 @@
-import { TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
-import { Component, PropMeta, ConfigApi, MethodMeta, PlatformApi, ProxyElement, RendererApi, StateMeta, WatchMeta } from '../util/interfaces';
+import { Component, ComponentActiveValues, ComponentActiveWatchers, PropMeta, ConfigApi, MethodMeta, PlatformApi, ProxyElement, RendererApi, StateMeta, WatchMeta } from '../util/interfaces';
 import { queueUpdate } from './update';
 
 
@@ -31,13 +30,13 @@ export function initProxy(plt: PlatformApi, config: ConfigApi, renderer: Rendere
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
     for (i = 0; i < states.length; i++) {
-      initProperty(false, states[i], null, instance, plt, config, renderer, elm, watchers);
+      initProperty(false, states[i], instance, instance.$values, instance.$watchers, plt, config, renderer, elm, watchers);
     }
   }
 
   for (i = 0; i < props.length; i++) {
     // add getters/setters for @Prop()s
-    initProperty(true, props[i].propName, props[i].propType, instance, plt, config, renderer, elm, watchers);
+    initProperty(true, props[i].propName, instance, instance.$values, instance.$watchers, plt, config, renderer, elm, watchers);
   }
 }
 
@@ -52,48 +51,61 @@ function initMethod(methodName: string, elm: ProxyElement, instance: Component) 
 }
 
 
-function initProperty(isProp: boolean, propName: string, propType: any, instance: Component, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, watchers: WatchMeta[]) {
+function initProperty(isProp: boolean, propName: string, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement, watchersMeta: WatchMeta[]) {
   if (isProp) {
     // @Prop() property, so check initial value from the proxy element, instance
     // and config, before we create getters/setters on this same property name
-    instance.$values[propName] = getInitialValue(config, elm, instance, propType, propName);
+    if ((<any>elm)[propName] !== undefined) {
+      // looks like we've got an initial value on the proxy element
+      internalValues[propName] = (<any>elm)[propName];
+
+    } else if (instance[propName] !== undefined) {
+      // looks like we've got an initial value on the instance already
+      internalValues[propName] = instance[propName];
+
+    } else if (propName === 'mode') {
+      // special case for just "mode" property
+      // which all component automatically get
+      internalValues[propName] = config.get(propName);
+    }
 
   } else {
     // @State() property, so copy the value directly from the instance
     // before we create getters/setters on this same property name
-    instance.$values[propName] = instance[propName];
+    internalValues[propName] = instance[propName];
   }
 
-  if (watchers) {
-    // there are watchers for this property so any time this property
-    // changes, we should also fire off this @Watch() method
-    for (var i = 0; i < watchers.length; i++) {
-      if (watchers[i].propName === propName) {
+  if (watchersMeta) {
+    // there are watchers for this component
+    for (var i = 0; i < watchersMeta.length; i++) {
+      if (watchersMeta[i].propName === propName) {
         // cool, we should watch for changes to this property
-        // bind the function and add it to our list of watchers
-        instance.$watchers[propName] = instance[watchers[i].fn].bind(instance);
+        // let's bind their watcher function and add it to our list
+        // of watchers, so any time this property changes we should
+        // also fire off their @Watch() method
+        internalWatchers[propName] = instance[watchersMeta[i].fn].bind(instance);
       }
     }
   }
 
   function getPropValue() {
     // get the property value directly from our internal values
-    return instance.$values[propName];
+    return internalValues[propName];
   }
 
   function setPropValue(value: any) {
     // TODO: account for Arrays/Objects
 
     // check our new property value against our internal value
-    if (instance.$values[propName] !== value) {
+    if (internalValues[propName] !== value) {
 
       // looks like this value actually changed, we've got work to do!
-      instance.$values[propName] = value;
+      internalValues[propName] = value;
 
-      if (instance.$watchers && instance.$watchers[propName]) {
+      if (internalWatchers && internalWatchers[propName]) {
         // this instance has @Watch() methods and a
         // watch method for this property
-        instance.$watchers[propName](value);
+        internalWatchers[propName](value);
       }
 
       // queue that we need to do an update, don't worry
@@ -116,32 +128,4 @@ function initProperty(isProp: boolean, propName: string, propType: any, instance
     get: getPropValue,
     set: setPropValue
   });
-}
-
-
-function getInitialValue(config: ConfigApi, elm: any, instance: Component, propTypeCode: number, propName: string): any {
-  if (elm[propName] !== undefined) {
-    // looks like we've got an initial value on the proxy element
-    return elm[propName];
-  }
-
-  if (instance[propName] !== undefined) {
-    // looks like we've got an initial value on the instance already
-    return instance[propName];
-  }
-
-  if (propTypeCode === TYPE_BOOLEAN) {
-    // this is a boolean property, so let's see if we can get a
-    // boolean value from the config using this property name
-    return config.getBoolean(propName);
-  }
-
-  if (propTypeCode === TYPE_NUMBER) {
-    // this is a number property, so let's see if we can get a
-    // number value from the config using this property name
-    return config.getNumber(propName);
-  }
-
-  // let's see if we can get a default config value for this property name
-  return config.get(propName);
 }
