@@ -18,7 +18,7 @@ export class NewsContainer {
   @Prop() prevColor: string;
 
   ionViewDidLoad() {
-    Ionic.overlay('loading', { content: 'fetching articles...' }).then((loading: any) => {
+    Ionic.controller('loading', { content: 'fetching articles...' }).then((loading: any) => {
 
       loading.present().then(() => {
         console.log('start presenting loading');
@@ -43,7 +43,7 @@ export class NewsContainer {
     // reset page number
     this.page = 1;
 
-    Ionic.overlay('loading', { content: `fetching ${type} articles...` }).then((loading: any) => {
+    Ionic.controller('loading', { content: `fetching ${type} articles...` }).then((loading: any) => {
       loading.present().then(() => {
         fetch(`${this.apiRootUrl}/${type}?page=1`).then((response) => {
           return response.json();
@@ -62,7 +62,7 @@ export class NewsContainer {
   previous() {
     if (this.page > 1) {
 
-      Ionic.overlay('loading', { content: `fetching articles...` }).then((loading: any) => {
+      Ionic.controller('loading', { content: `fetching articles...` }).then((loading: any) => {
         loading.present().then(() => {
 
           this.page = this.page--;
@@ -83,7 +83,7 @@ export class NewsContainer {
   }
 
   next() {
-    Ionic.overlay('loading', { content: `fetching articles...` }).then((loading: any) => {
+    Ionic.controller('loading', { content: `fetching articles...` }).then((loading: any) => {
       loading.present().then(() => {
 
         this.page = this.page++;

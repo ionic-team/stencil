@@ -15,7 +15,7 @@ export class NewsList {
   apiRootUrl: string = 'http://localhost:8100';
 
   comments(story: any) {
-    Ionic.overlay('loading', { content: 'fetching comments...' }).then((loading: any) => {
+    Ionic.controller('loading', { content: 'fetching comments...' }).then((loading: any) => {
       loading.present();
 
       fetch(`${this.apiRootUrl}/item/${story.id}`).then((response: any) => {
@@ -26,7 +26,7 @@ export class NewsList {
 
         setTimeout(() => {
           loading.dismiss().then(() => {
-            Ionic.overlay('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then((modal: any) => {
+            Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then((modal: any) => {
               console.log('modal created');
 
               modal.present().then(() => {
