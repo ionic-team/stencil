@@ -24,6 +24,6 @@ export default function(baseElm: HTMLElement) {
     .addElement(baseElm)
     .easing('ease-out')
     .duration(250)
-    .addChildAnimation(backdropAnimation)
-    .addChildAnimation(wrapperAnimation);
+    .add(backdropAnimation)
+    .add(wrapperAnimation);
 }

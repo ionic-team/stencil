@@ -1,12 +1,12 @@
 import * as interfaces from '../util/interfaces';
 
-declare const Ionic: interfaces.Ionic;
+declare var Ionic: interfaces.Ionic;
 
 
 export function transitionEnd(elm: HTMLElement, callback: {(ev?: TransitionEvent): void}) {
-  let unRegTrans: Function;
-  let unRegWKTrans: Function;
-  let opts = { passive: true };
+  var unRegTrans: Function;
+  var unRegWKTrans: Function;
+  var opts = { passive: true };
 
   function unregister() {
     unRegWKTrans && unRegWKTrans();

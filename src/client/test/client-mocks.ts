@@ -3,7 +3,7 @@ import { ComponentModeData, ConfigApi, CustomEventOptions, DomControllerApi, Ion
   RafCallback } from '../../util/interfaces';
 import { ConfigController } from '../../util/config-controller';
 import { PlatformClient } from '../../client/platform-client';
-import { themeVNodeData } from '../../client/host';
+import { themeVNodeData } from '../../renderer/host';
 
 let mockBundleIds = 0;
 
@@ -27,7 +27,7 @@ export function mockComponent(IonicGbl: IonicGlobal, plt: PlatformApi, tag: stri
     exports[componentModule.constructor.name] = componentModule;
   }
 
-  IonicGbl.loadComponents(0, bundleId, importerFn, cmpModeData);
+  IonicGbl.defineComponents(0, bundleId, importerFn, cmpModeData);
 }
 
 export function mockPlatformClient(IonicGbl?: IonicGlobal) {

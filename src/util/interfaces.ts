@@ -6,37 +6,34 @@ export interface Ionic {
     add: AddEventListenerApi;
   };
   theme: IonicTheme;
-  controllers: {[ctrlName: string]: any};
-  overlay: IonicOverlay;
+  controller?: IonicController;
   dom: DomControllerApi;
   config: ConfigApi;
-  Animation: Animation;
+  Animation?: Animation;
 }
 
 
-export interface OverlayApi {
-  load: (opts?: any) => Promise<any>;
-}
-
-
-export interface IonicOverlay {
+export interface IonicController {
+  <LoadingController>(ctrlName: 'loading', opts: LoadingOptions): Promise<Loading>;
+  <MenuController>(ctrlName: 'menu'): Promise<MenuController>;
   <ModalController>(ctrlName: 'modal', opts: ModalOptions): Promise<Modal>;
-  (ctrlName: string, opts?: any): Promise<any>;
+  (ctrlName: string, opts?: any): Promise<IonicControllerApi>;
 }
 
 
-export interface IonicControllerLoaded {
-  (ctrlName: string): void;
+export interface IonicControllerApi {
+  load?: (opts?: any) => Promise<any>;
 }
 
 
 export interface IonicGlobal {
   staticDir?: string;
-  components?: LoadComponents;
-  loadComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData) => void;
+  components?: LoadComponentData[];
+  defineComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData) => void;
   eventNameFn?: (eventName: string) => string;
   config?: Object;
   loadController?: (ctrlName: string, ctrl: any) => any;
+  controllers?: {[ctrlName: string]: any};
   ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;
   QueueCtrl?: QueueApi;
@@ -44,8 +41,52 @@ export interface IonicGlobal {
 }
 
 
-export interface ModalController {
+export interface Menu {
+  setOpen(shouldOpen: boolean, animated?: boolean): Promise<boolean>;
+  open(): Promise<boolean>;
+  close(): Promise<boolean>;
+  toggle(): Promise<boolean>;
+  enable(shouldEnable: boolean): Menu;
+  swipeEnable(shouldEnable: boolean): Menu;
+  isAnimating: boolean;
+  isOpen: boolean;
+  isRightSide: boolean;
+  enabled: boolean;
+  side: string;
+  id: string;
+  maxEdgeStart: number;
+  persistent: boolean;
+  swipeEnabled: boolean;
+  type: string;
+  width(): number;
+  getMenuElement(): HTMLElement;
+  getContentElement(): HTMLElement;
+  getBackdropElement(): HTMLElement;
+}
 
+
+export interface MenuType {
+  ani: any;
+  isOpening: boolean;
+  setOpen(shouldOpen: boolean, animated: boolean, done: Function): void;
+  setProgressStart(isOpen: boolean): void;
+  setProgessStep(stepValue: number): void;
+  setProgressEnd(shouldComplete: boolean, currentStepValue: number, velocity: number, done: Function): void;
+  destroy(): void;
+}
+
+
+export interface MenuController {
+  open(menuId?: string): Promise<boolean>;
+  close(menuId?: string): Promise<boolean>;
+  toggle(menuId?: string): Promise<boolean>;
+  enable(shouldEnable: boolean, menuId?: string): void;
+  swipeEnable(shouldEnable: boolean, menuId?: string): void;
+  isOpen(menuId?: string): boolean;
+  isEnabled(menuId?: string): boolean;
+  get(menuId?: string): Menu;
+  getOpen(): Menu;
+  getMenus(): Menu[];
 }
 
 
@@ -77,9 +118,40 @@ export interface ModalOptions {
 }
 
 
-export interface ModalEvent extends Event {
+export interface ModalEvent {
   detail: {
     modal: Modal;
+  };
+}
+
+
+export interface Loading {
+  id: string;
+  style?: {
+    zIndex: number;
+  };
+  showBackdrop: boolean;
+  enterAnimation: AnimationBuilder;
+  exitAnimation: AnimationBuilder;
+  cssClass: string;
+  present: (done?: Function) => void;
+  dismiss: (done?: Function) => void;
+}
+
+
+export interface LoadingOptions {
+  spinner?: string;
+  content?: string;
+  cssClass?: string;
+  showBackdrop?: boolean;
+  dismissOnPageChange?: boolean;
+  duration?: number;
+}
+
+
+export interface LoadingEvent {
+  detail: {
+    loading: Loading;
   };
 }
 
@@ -198,9 +270,32 @@ export interface DomControllerCallback {
 }
 
 
-export interface LoadComponents {
-  [tag: string]: any[];
+export interface LoadComponentData {
+  /**
+   * tag name (ion-badge)
+   */
+  [0]: string;
+
+  /**
+   * map of the modes and bundle ids
+   */
+  [1]: {
+    [modeCode: string]: string;
+  };
+
+  /**
+   * props
+   */
+  [2]: any[];
+
+  /**
+   * bundle priority
+   */
+  [3]: LoadPriority;
 }
+
+
+export type LoadPriority = number;
 
 
 export interface ComponentModeData {
@@ -210,44 +305,49 @@ export interface ComponentModeData {
   [0]: string;
 
   /**
+   * props
+   */
+  [1]: any[][];
+
+  /**
    * methods
    */
-  [1]: MethodMeta[];
+  [2]: MethodMeta[];
 
   /**
    * states
    */
-  [2]: StateMeta[];
+  [3]: StateMeta[];
 
   /**
    * listeners
    */
-  [3]: ComponentListenersData[];
+  [4]: ComponentListenersData[];
 
   /**
    * watchers
    */
-  [4]: ComponentWatchersData[];
+  [5]: ComponentWatchersData[];
 
   /**
    * shadow
    */
-  [5]: boolean;
+  [6]: boolean;
 
   /**
    * host
    */
-  [6]: any;
+  [7]: any;
 
   /**
    * mode name (ios, md, wp)
    */
-  [7]: number;
+  [8]: number;
 
   /**
    * component mode styles
    */
-  [8]: string;
+  [9]: string;
 }
 
 
@@ -319,6 +419,8 @@ export interface PropOptions {
 export interface PropMeta {
   propName?: string;
   propType?: any;
+  attrName?: string;
+  attrCase?: number;
 }
 
 
@@ -393,22 +495,19 @@ export interface ComponentMeta {
   listeners?: ListenMeta[];
   watchers?: WatchMeta[];
   states?: StateMeta[];
-  modes: ModeMeta[];
+  modes?: {[modeCode: string]: ModeMeta};
   shadow?: boolean;
   host?: HostMeta;
   namedSlots?: string[];
-  obsAttrs?: string[];
   componentModule?: any;
-  priority?: 'high'|'low';
+  priority?: LoadPriority;
 }
 
 
 export interface ModeMeta {
-  modeName?: string;
   bundleId?: string;
   styles?: string;
   styleUrls?: string[];
-  styleElm?: HTMLElement;
 }
 
 export interface HostMeta {
@@ -441,7 +540,9 @@ export interface ComponentActiveListeners {
 }
 
 
-export type ComponentActiveWatchers = Function[];
+export interface ComponentActiveWatchers {
+  [propName: string]: Function;
+}
 
 
 export interface ComponentActiveValues {
@@ -477,27 +578,24 @@ export interface ComponentRegistry {
 
 export interface ProxyElement extends HTMLElement {
   connectedCallback: () => void;
-  attributeChangedCallback: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
-  disconnectedCallback: () => void;
-  $queueUpdate: () => void;
+  attributeChangedCallback?: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
+  disconnectedCallback?: () => void;
 
+  $queueUpdate: () => void;
+  $initLoadComponent: () => void;
   $queued?: boolean;
   $instance?: Component;
   $hostContent?: HostContentNodes;
-  $tmpDisconnected?: boolean;
-
-  [memberName: string]: any;
+  $isLoaded?: boolean;
+  $hasConnected?: boolean;
+  $hasRendered?: boolean;
+  $awaitLoads?: ProxyElement[];
+  $depth?: number;
 }
 
 
-export type QueueHandlerId = number;
-
-
-export type Side = 'left' | 'right' | 'start' | 'end';
-
-
 export interface RendererApi {
-  (oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes): VNode;
+  (oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes, isSsrHydrated?: boolean): VNode;
 }
 
 
@@ -548,10 +646,13 @@ export interface VNodeData {
 
 
 export interface PlatformApi {
-  registerComponent: (tag: string, data: any[]) => ComponentMeta;
+  registerComponents: (components?: LoadComponentData[]) => ComponentMeta[];
+  defineComponent: (tag: string, constructor: Function) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
-  loadBundle: (bundleId: string, priority: string, cb: Function) => void;
+  loadBundle: (bundleId: string, priority: LoadPriority, cb: Function) => void;
   queue: QueueApi;
+  css?: {[cmpModeId: string]: string};
+  isServer?: boolean;
 
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
@@ -569,10 +670,13 @@ export interface PlatformApi {
   $tagName: (elm: Element) => string;
   $setTextContent: (node: Node, text: string | null) => void;
   $getTextContent: (node: Node) => string | null;
-  $getAttribute: (elm: Element, attrName: string) => string;
+  $getAttribute: (elm: any, attrName: string) => string;
+  $setAttribute: (elm: any, attrName: string, attrValue: any) => void;
+  $removeAttribute: (elm: any, attrName: string) => void;
+  $setClass: (elm: any, cssClassName: string, shouldAddCssClassName: boolean) => void;
   $attachComponent: (elm: Element, cmpMeta: ComponentMeta, instance: Component) => void;
+  $tmpDisconnected: boolean;
 }
-
 
 export interface PlatformConfig {
   name: string;
@@ -583,13 +687,38 @@ export interface PlatformConfig {
 
 export interface ServerInitConfig {
   staticDir: string;
+  sys?: UniversalSys;
   config?: Object;
+}
+
+export interface HydrateConfig {
+  req?: any;
+  url?: string;
+  referrer?: string;
+  userAgent?: string;
+  cookie?: string;
+  config?: Object;
+}
+
+
+export interface UniversalSys {
+  fs?: {
+    readdirSync?(path: string | Buffer): string[];
+    readFileSync?(filename: string, encoding: string): string;
+    statSync?(path: string | Buffer): {
+      isDirectory?(): boolean;
+    }
+  };
+  path?: {
+    join?: (...paths: string[]) => string;
+  };
+  isValidComponent?: (fileName: string) => boolean;
 }
 
 
 export interface Animation {
   new(elm?: Node|Node[]|NodeList): Animation;
-  addChildAnimation: (childAnimation: Animation) => Animation;
+  add: (childAnimation: Animation) => Animation;
   addElement: (elm: Node|Node[]|NodeList) => Animation;
   afterAddClass: (className: string) => Animation;
   afterClearStyles: (propertyNames: string[]) => Animation;
@@ -601,13 +730,16 @@ export interface Animation {
   beforeStyles: (styles: { [property: string]: any; }) => Animation;
   destroy: () => void;
   duration: (milliseconds: number) => Animation;
+  getDuration(opts?: PlayOptions): number;
   easing: (name: string) => Animation;
+  easingReverse: (name: string) => Animation;
   from: (prop: string, val: any) => Animation;
   fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
   hasCompleted: boolean;
   isPlaying: boolean;
-  onFinish: (callback: (animation?: Animation) => void, opts?: {oneTimeCallback: boolean, clearExistingCallacks: boolean}) => Animation;
+  onFinish: (callback: Function, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}) => Animation;
   play: (opts?: PlayOptions) => void;
+  syncPlay: () => void;
   progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;
   progressStep: (stepValue: number) => void;
   progressStart: () => void;
@@ -673,4 +805,9 @@ export interface IdleDeadline {
 
 export interface IdleOptions {
   timeout?: number;
+}
+
+
+export interface BundleCallbacks {
+  [bundleId: string]: Function[];
 }

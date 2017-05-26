@@ -1,4 +1,4 @@
-import { Component, h, Ionic } from '../index';
+import { Component, h } from '../index';
 
 
 @Component({
@@ -13,4 +13,8 @@ import { Component, h, Ionic } from '../index';
     class: 'card-title'
   }
 })
-export class CardTitle {}
+export class CardTitle {
+  render() {
+    return <slot></slot>;
+  }
+}

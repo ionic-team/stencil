@@ -14,6 +14,15 @@ const destUtil = path.join(destDir, 'src/util');
 
 console.log(`copy to ionic-angular, from`, srcDir, `to`, destDir);
 
+fs.readdirSync(srcComponents).forEach(fileName => {
+  var srcFile = path.join(srcComponents, fileName);
+  if (fs.lstatSync(srcFile).isFile() && fileName.indexOf('.') !== 0) {
+    fs.copySync(srcFile, path.join(destComponents, fileName))
+  }
+});
+
+fs.copySync('src/vendor', path.join(destDir, 'src/vendor'));
+
 
 BUNDLES.forEach(b => {
   b.components.forEach(tag => {

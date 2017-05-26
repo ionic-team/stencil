@@ -53,4 +53,10 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
       memberNode.decorators = undefined;
     }
   });
+
+  fileMeta.cmpMeta.props = fileMeta.cmpMeta.props.sort((a, b) => {
+    if (a.propName < b.propName) return -1;
+    if (a.propName > b.propName) return 1;
+    return 0;
+  });
 }

@@ -1,4 +1,4 @@
-import { Component } from '../index';
+import { Component, h } from '../index';
 
 
 @Component({
@@ -13,4 +13,8 @@ import { Component } from '../index';
     class: 'card-header'
   }
 })
-export class CardHeader {}
+export class CardHeader {
+  render() {
+    return <slot></slot>;
+  }
+}

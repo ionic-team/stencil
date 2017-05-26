@@ -17,9 +17,12 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 rollup.rollup({
   entry: ENTRY_FILE,
   external: [
+    'css',
     'fs',
+    'node-fetch',
     'parse5',
-    'path'
+    'path',
+    'vm'
   ]
 
 }).then((bundle: any) => {

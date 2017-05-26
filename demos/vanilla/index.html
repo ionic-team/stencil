@@ -17,18 +17,29 @@
 
   <ion-app>
 
-    <ion-page>
-
+    <ion-menu ssr="false" content="#menu-content">
       <ion-header>
+        Menu Header
+      </ion-header>
+      <ion-content>
+        Menu Content
+      </ion-content>
+    </ion-menu>
+
+    <ion-page id="menu-content">
+
+      <ion-header md-height="77px" ios-height="61px">
         <ion-toolbar>
           <ion-title>Header</ion-title>
           <ion-buttons end>
-            <ion-button>Default</ion-button>
+            <ion-button id="toggleMenu">Menu</ion-button>
+            <ion-button id="presentModal">Modal</ion-button>
+            <ion-button id="presentLoading">Loading</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
 
-      <ion-content id="content">
+      <ion-content id="content" fullscreen>
 
         <ion-list>
 
@@ -60,6 +71,11 @@
           <ion-item>
             <ion-avatar slot="start"><img src="http://placehold.it/150x150" /></ion-avatar>
             <ion-label>Avatar</ion-label>
+          </ion-item>
+
+          <ion-item>
+            <ion-toggle slot="start"></ion-toggle>
+            <ion-label>Toggle Enabled</ion-label>
           </ion-item>
 
           <ion-item>
@@ -175,6 +191,85 @@
             div.innerHTML = '<ion-badge>' + i + '</ion-badge>';
             dynamicBadges.appendChild(div);
           }
+
+
+          document.getElementById('presentModal').addEventListener('click', function() {
+            var userId = Math.round(Math.random() * 10000);
+
+            console.log('open profile modal for userId:', userId);
+
+            Ionic.controller('modal', { component: 'profile-page', componentProps: { userId: userId } }).then(modal => {
+              console.log('start presenting modal, userId:', modal.componentProps.userId);
+
+              modal.present().then(() => {
+                console.log('finished presenting modal, userId:', modal.componentProps.userId);
+              });
+            });
+          });
+
+          class ProfilePage extends HTMLElement {
+
+            constructor() {
+              super();
+
+              const shadowRoot = this.attachShadow({mode: 'open'});
+
+              shadowRoot.innerHTML = `
+                <ion-header>
+                  <ion-toolbar>
+                    My Profile
+                  </ion-toolbar>
+                </ion-header>
+
+                <ion-content padding>
+                  <p>User Id: <span id="userId"></span></p>
+                  <p>
+                    <ion-button>Dismiss</ion-button>
+                  </p>
+                </ion-content>
+              `;
+            }
+
+            connectedCallback() {
+              var btn = this.shadowRoot.querySelector('ion-button');
+
+              btn.addEventListener('click', (uiEvent) => {
+                console.log('dismiss profile page for userId:', this.userId);
+                var ev = new CustomEvent('ionDismiss', { composed: true, bubbles: true });
+                uiEvent.target.dispatchEvent(ev);
+              });
+
+              this.shadowRoot.getElementById('userId').textContent = this.userId;
+            }
+
+          }
+          customElements.define('profile-page', ProfilePage);
+
+
+          document.getElementById('presentLoading').addEventListener('click', function() {
+            console.log('open loading');
+
+            Ionic.controller('loading', { duration: 1000 }).then(loading => {
+              console.log('start presenting loading');
+
+              loading.present().then(() => {
+                console.log('finished presenting loading');
+              });
+            });
+          });
+
+
+          document.getElementById('toggleMenu').addEventListener('click', function() {
+            console.log('toggle menu');
+
+            Ionic.controller('menu').then(menuCtrl => {
+              console.log('start menu toggle');
+
+              menuCtrl.toggle().then(() => {
+                console.log('finished menu toggle');
+              });
+            });
+          });
         </script>
 
       </ion-content>

@@ -1,12 +1,12 @@
 import { Component, Ionic, Listen } from '../index';
-import { IonicGlobal, ModalEvent, ModalOptions, Modal, OverlayApi } from '../../util/interfaces';
+import { IonicGlobal, ModalEvent, ModalOptions, Modal, IonicControllerApi } from '../../util/interfaces';
 
 
 @Component({
   tag: 'ion-modal-controller',
   styleUrls: {
     // modes all sharing the same scss on purpose
-    // this allows ion-modal-viewport and ion-modal
+    // this allows ion-modal-controller and ion-modal
     // components to be bundled in the same file/request
     ios: 'modal-controller.scss',
     md: 'modal-controller.scss',
@@ -14,13 +14,15 @@ import { IonicGlobal, ModalEvent, ModalOptions, Modal, OverlayApi } from '../../
   },
   shadow: false
 })
-export class ModalController implements OverlayApi {
+export class ModalController implements IonicControllerApi {
   private ids = 0;
   private modalResolves: {[modalId: string]: Function} = {};
   private modals: Modal[] = [];
+  private appRoot: Element;
 
 
   ionViewDidLoad() {
+    this.appRoot = document.querySelector('ion-app') || document.body;
     (<IonicGlobal>Ionic).loadController('modal', this);
   }
 
@@ -40,7 +42,7 @@ export class ModalController implements OverlayApi {
     Object.assign(modal, opts);
 
     // append the modal element to the document body
-    document.body.appendChild(<any>modal);
+    this.appRoot.appendChild(<any>modal);
 
     // store the resolve function to be called later up when the modal loads
     return new Promise<Modal>(resolve => {

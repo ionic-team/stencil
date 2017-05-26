@@ -3,19 +3,20 @@
 // Content
 // --------------------------------------------------
 
-ion-content,
-:host {
+ion-content {
   position: relative;
   top: 0;
   left: 0;
   display: block;
 
-  visibility: inherit !important;
-
   width: 100%;
   height: 100%;
 
   contain: layout size style;
+}
+
+ion-content.content-ready {
+  visibility: inherit;
 }
 
 .ion-page > ion-content {
@@ -38,7 +39,6 @@ ion-scroll {
   left: 0;
   z-index: $z-index-scroll-content;
   display: block;
-  visibility: inherit !important;
 
   overflow-x: hidden;
   overflow-y: scroll;

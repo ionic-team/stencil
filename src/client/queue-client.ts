@@ -7,8 +7,6 @@ export function QueueClient(window: any): QueueApi {
   let pending = false;
 
   function doWork(deadlineObj: IdleDeadline) {
-    console.log(`queue, doWork, timeRemaining: ${deadlineObj.timeRemaining()}, callbacks: ${callbacks.length}`);
-
     // let's see if we've got time to take care of things
     while (deadlineObj.timeRemaining() > 1 && callbacks.length > 0) {
       // do some work while within the allowed time
@@ -28,8 +26,6 @@ export function QueueClient(window: any): QueueApi {
   }
 
   function flush() {
-    console.log(`queue, flush, callbacks: ${callbacks.length}`);
-
     // always force a bunch of callbacks to run, but still have
     // a throttle on how many can run in a certain time
     const start = performance.now();

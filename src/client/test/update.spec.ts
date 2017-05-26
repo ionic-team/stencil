@@ -1,7 +1,7 @@
 import { mockComponent, mockConfigController, mockIonicGlobal,
   mockPlatformClient, mockProxyElement } from './client-mocks';
-import { Renderer } from '../renderer/core';
-import { update } from '../update';
+import { Renderer } from '../../renderer/core';
+import { update } from '../../renderer/update';
 
 
 describe('client/update', function() {

@@ -12,22 +12,46 @@ import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
   shadow: false
 })
 export class Toggle implements BooleanInputComponent {
-  activated: boolean;
-  hasFocus: boolean;
+  activated: boolean = false;
+  hasFocus: boolean = false;
   id: string;
   labelId: string;
   startX: number;
+  styleTmr: any;
 
-  @Prop() checked: boolean;
-  @Prop() disabled: boolean;
+  @Prop() checked: boolean = false;
+  @Prop() disabled: boolean = false;
   @Prop() value: string;
 
+  ionViewDidLoad() {
+    this.emitStyle();
+  }
 
   @Watch('checked')
   changed(val: boolean) {
     Ionic.emit(this, 'ionChange', { detail: { checked: val } });
+    this.emitStyle();
   }
 
+  @Watch('disabled')
+  disableChanged() {
+    this.emitStyle();
+  }
+
+  private emitStyle() {
+    clearTimeout(this.styleTmr);
+
+    this.styleTmr = setTimeout(() => {
+      Ionic.emit(this, 'ionStyle', {
+        detail: {
+          'toggle-disabled': this.disabled,
+          'toggle-checked': this.checked,
+          'toggle-activated': this.activated,
+          'toggle-focus': this.hasFocus
+        }
+      });
+    });
+  }
 
   private canStart() {
     return !this.disabled;
@@ -92,6 +116,7 @@ export class Toggle implements BooleanInputComponent {
     if (!this.hasFocus) {
       this.hasFocus = true;
       Ionic.emit(this, 'ionFocus');
+      this.emitStyle();
     }
   }
 
@@ -100,47 +125,48 @@ export class Toggle implements BooleanInputComponent {
     if (this.hasFocus) {
       this.hasFocus = false;
       Ionic.emit(this, 'ionBlur');
+      this.emitStyle();
     }
   }
 
-
   render() {
-    return h('ion-gesture', Ionic.theme(this, 'toggle', {
+    return h(this, Ionic.theme(this, 'toggle', {
       class: {
         'toggle-activated': this.activated,
         'toggle-checked': this.checked,
         'toggle-disabled': this.disabled,
       },
-      props: {
-        'canStart': this.canStart.bind(this),
-        'onStart': this.onDragStart.bind(this),
-        'onMove': this.onDragMove.bind(this),
-        'onEnd': this.onDragEnd.bind(this),
-        'onPress': this.toggle.bind(this),
-        'gestureName': 'toggle',
-        'gesturePriority': 30,
-        'type': 'pan,press',
-        'direction': 'x',
-        'threshold': 20,
-        'attachTo': 'parent'
-      }
-    }),
-      [
-        h('div.toggle-icon',
-          h('div.toggle-inner')
-        ),
-        h('div.toggle-cover', {
-          attrs: {
-            'id': this.id,
-            'aria-checked': this.checked ? 'true' : false,
-            'aria-disabled': this.disabled ? 'true' : false,
-            'aria-labelledby': this.labelId,
-            'role': 'checkbox',
-            'tabindex': 0
-          }
-        })
-      ]
+    }), h('ion-gesture', {
+        props: {
+          'canStart': this.canStart.bind(this),
+          'onStart': this.onDragStart.bind(this),
+          'onMove': this.onDragMove.bind(this),
+          'onEnd': this.onDragEnd.bind(this),
+          'onPress': this.toggle.bind(this),
+          'gestureName': 'toggle',
+          'gesturePriority': 30,
+          'type': 'pan,press',
+          'direction': 'x',
+          'threshold': 20,
+          'attachTo': 'parent'
+        }
+    },
+        [
+          h('div.toggle-icon',
+            h('div.toggle-inner')
+          ),
+          h('div.toggle-cover', {
+            attrs: {
+              'id': this.id,
+              'aria-checked': this.checked ? 'true' : false,
+              'aria-disabled': this.disabled ? 'true' : false,
+              'aria-labelledby': this.labelId,
+              'role': 'checkbox',
+              'tabindex': 0
+            }
+          })
+        ]
+      )
     );
   }
-
 }

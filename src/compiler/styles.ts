@@ -11,7 +11,7 @@ export function bundleComponentModeStyles(config: BundlerConfig, ctx: BuildConte
     return bundleComponentModeStyle(config, ctx, styleUrl);
 
   })).then(results => {
-    cmpMode.styles = results.join('');
+    cmpMode.styles = results.join('').trim();
   });
 }
 
@@ -37,7 +37,7 @@ export function bundleComponentModeStyle(config: BundlerConfig, ctx: BuildContex
         reject(`bundleComponentModeStyle, nodeSass.render: ${err}`);
 
       } else {
-        let css = result.css.toString().trim();
+        let css = result.css.toString().trim().replace(/\\/g, '\\\\');
 
         if (config.devMode) {
           css = `/********** ${scssFileName} **********/\n\n${css}\n\n`;

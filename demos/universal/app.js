@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var ionicUniversal = require('../../dist/ionic-universal');
+var fs = require('fs');
 var path = require('path');
 
 
@@ -15,18 +16,32 @@ var ionic = ionicUniversal.init(ionicServerConfig);
 
 
 app.get('/', function (req, res) {
-  console.log('req.url:', req.url);
+  console.log(`serve: ${req.url}`);
 
-  var input = '<div>hi</div><ion-badge>88</ion-badge><span>yo</span><!--comment-->';
+  var filePath = path.join(__dirname, '../vanilla/index.html');
 
-  ionic.upgradeHtml(input).then(function(html) {
-    console.log(html);
-    res.send(html);
+  fs.readFile(filePath, 'utf-8', (err, html) => {
+    if (err) {
+      console.error(err);
+      res.send(err);
+      return;
+    }
+
+    var opts = {
+      req: req
+    };
+
+    ionic.hydrate(html, opts).then(hydratedHtml => {
+      res.send(hydratedHtml);
+
+    }).catch(err => {
+      res.send(err.toString() + err.stack && err.stack.toString());
+    });
   });
 
 });
 
 
-app.listen(3000, function () {
+app.listen(3000, () => {
   console.log('app listening on port 3000!');
 });

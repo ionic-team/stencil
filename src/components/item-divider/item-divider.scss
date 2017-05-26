@@ -5,8 +5,6 @@
 // --------------------------------------------------
 
 ion-item-divider {
-  visibility: inherit !important;
-
   z-index: $z-index-item-divider;
   display: flex;
   overflow: hidden;

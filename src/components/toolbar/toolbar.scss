@@ -7,13 +7,11 @@
 ion-toolbar {
   position: relative;
   z-index: $z-index-toolbar;
-  visibility: inherit !important;
 }
 
 .toolbar {
   display: flex;
   overflow: hidden;
-  visibility: inherit !important;
 
   flex-direction: row;
   align-items: center;

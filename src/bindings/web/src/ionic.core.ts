@@ -1,12 +1,12 @@
 import { ConfigController } from '../../../util/config-controller';
+import { detectPlatforms } from '../../../platform/platform-util';
 import { DomClient } from '../../../client/dom-client';
 import { IonicGlobal } from '../../../util/interfaces';
+import { PLATFORM_CONFIGS } from '../../../platform/platform-configs';
 import { PlatformClient } from '../../../client/platform-client';
 import { QueueClient } from '../../../client/queue-client';
-import { registerComponents } from '../../../client/registry';
-import { Renderer } from '../../../client/renderer/core';
-import { detectPlatforms } from '../../../platform/platform-util';
-import { PLATFORM_CONFIGS } from '../../../platform/platform-registry';
+import { Renderer } from '../../../renderer/core';
+import { registerComponents } from '../../../client/registry-client';
 
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
@@ -19,4 +19,4 @@ IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, detectPlatforms(window.l
 
 const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
 
-registerComponents(window, Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);
+registerComponents(Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);

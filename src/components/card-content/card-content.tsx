@@ -1,5 +1,4 @@
-import { Component } from '../index';
-
+import { Component, h } from '../index';
 
 @Component({
   tag: 'ion-card-content',
@@ -13,4 +12,8 @@ import { Component } from '../index';
     class: 'card-content'
   }
 })
-export class CardContent {}
+export class CardContent {
+  render() {
+    return <slot></slot>;
+  }
+}

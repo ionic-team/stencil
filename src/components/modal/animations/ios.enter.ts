@@ -23,8 +23,8 @@ export default function(baseElm: HTMLElement) {
     .easing('cubic-bezier(0.36,0.66,0.04,1)')
     .duration(400)
     .beforeAddClass('show-modal')
-    .addChildAnimation(backdropAnimation)
-    .addChildAnimation(wrapperAnimation);
+    .add(backdropAnimation)
+    .add(wrapperAnimation);
 }
 
 /**

@@ -15,14 +15,14 @@
  */
 function components(){};
 function ConfigCtrl(){};
+function defineComponents(){};
 function dom(){};
 function DomCtrl(){};
 function eventNameFn(){};
+function flush(){};
 function load(){};
-function loadComponents(){};
 function loadController(){};
-function nextTick(){};
-function NextTickCtrl(){};
+function QueueCtrl(){};
 function raf(){};
 function read(){};
 function staticDir(){};
@@ -82,6 +82,7 @@ function render(){};
 function attrs(){};
 function on(){};
 function props(){};
+function ref(){};
 
 
 /**
@@ -92,6 +93,7 @@ function attachShadow(){};
 function attributeChangedCallback(){};
 function connectedCallback(){};
 function customElements(){};
+function didTimeout(){};
 function host(){};
 function define(){};
 function disconnectedCallback(){};

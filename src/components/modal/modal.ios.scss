@@ -12,7 +12,7 @@ $modal-ios-background-color:          $background-ios-color !default;
 $modal-ios-border-radius:             10px !default;
 
 
-.ios .modal-wrapper {
+.modal-wrapper-ios {
   // hidden by default to prevent flickers, the animation will show it
   transform: translate3d(0, 100%, 0);
 

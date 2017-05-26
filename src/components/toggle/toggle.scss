@@ -6,26 +6,30 @@
 
 ion-toggle {
   display: inline-block;
-  visibility: inherit !important;
+
   contain: content;
 }
 
-ion-gesture {
+ion-toggle ion-gesture {
   display: block;
-  visibility: inherit !important;
+
+  width: 100%;
+  height: 100%;
+
+  visibility: inherit;
 }
 
 .toggle-cover {
+  @include position-horizontal(0, null);
+
   position: absolute;
   top: 0;
-  left: 0;
 
   width: 100%;
   height: 100%;
 
   border: 0;
-
-  background: transparent;
+  outline: none;
 
   font-family: inherit;
   font-style: inherit;
@@ -34,6 +38,6 @@ ion-gesture {
   line-height: 1;
   text-transform: none;
 
+  background: transparent;
   cursor: pointer;
-  outline: none;
 }

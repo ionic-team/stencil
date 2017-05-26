@@ -3,7 +3,7 @@ export function isDef(s: any): boolean { return s !== undefined && s !== null; }
 
 export function isUndef(s: any): boolean { return s === undefined; }
 
-export function isArray(val: any): val is Array<any> { return (!!val) && (val.constructor === Array); }
+export function isArray(val: any): val is Array<any> { return Array.isArray(val); }
 
 export function isObject(val: any): val is Object { return typeof val === 'object'; }
 
@@ -17,10 +17,6 @@ export function isFunction(val: any): val is (Function) { return typeof val === 
 
 export function isStringOrNumber(s: any): s is (string | number) {
   return isString(s) || isNumber(s);
-}
-
-export function toCamelCase(str: string) {
-  return str.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
 }
 
 export function toDashCase(str: string) {
@@ -93,7 +89,9 @@ export function getParentElement(elm: any) {
 export function applyStyles(elm: HTMLElement, styles: {[styleProp: string]: string|number}) {
   const styleProps = Object.keys(styles);
 
-  for (var i = 0; i < styleProps.length; i++) {
-    (<any>elm.style)[styleProps[i]] = styles[styleProps[i]];
+  if (elm) {
+    for (var i = 0; i < styleProps.length; i++) {
+      (<any>elm.style)[styleProps[i]] = styles[styleProps[i]];
+    }
   }
 }

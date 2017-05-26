@@ -29,6 +29,7 @@ export interface BundlerConfig {
   debug?: boolean;
   attachRegistryTo?: 'core'|'loader';
   watch?: boolean;
+  attrCase?: number;
 }
 
 
@@ -58,7 +59,6 @@ export interface BuildContext {
   bundles?: Bundle[];
   bundledJsModules?: {[id: string]: string};
 
-  registry?: Registry;
   isCompilerWatchInitialized?: boolean;
   isBundlerWatchInitialized?: boolean;
 }
@@ -73,22 +73,21 @@ export interface Results {
 }
 
 
-export interface Registry {
-  [tag: string]: any[];
-}
-
-
 export interface Bundle {
   id?: string;
-  components?: {
-    component: ManifestComponentMeta;
-    mode: ModeMeta;
-  }[];
+  components?: BundleComponent[];
   bundledJsModules?: string;
   content?: string;
   fileName?: string;
   filePath?: string;
-  priority?: 'high'|'low';
+  priority?: number;
+}
+
+
+export interface BundleComponent {
+  component: ManifestComponentMeta;
+  modeName: string;
+  modeMeta: ModeMeta;
 }
 
 

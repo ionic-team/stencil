@@ -19,16 +19,18 @@ export function isPlatformMatch(url: string, userAgent: string, platformName: st
     return queryValue === platformName;
   }
 
-  userAgent = userAgent.toLowerCase();
+  if (userAgent) {
+    userAgent = userAgent.toLowerCase();
 
-  for (var i = 0; i < userAgentAtLeastHas.length; i++) {
-    if (userAgent.indexOf(userAgentAtLeastHas[i]) > -1) {
-      for (var j = 0; j < userAgentMustNotHave.length; j++) {
-        if (userAgent.indexOf(userAgentMustNotHave[j]) > -1) {
-          return false;
+    for (var i = 0; i < userAgentAtLeastHas.length; i++) {
+      if (userAgent.indexOf(userAgentAtLeastHas[i]) > -1) {
+        for (var j = 0; j < userAgentMustNotHave.length; j++) {
+          if (userAgent.indexOf(userAgentMustNotHave[j]) > -1) {
+            return false;
+          }
         }
+        return true;
       }
-      return true;
     }
   }
 

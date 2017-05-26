@@ -1,9 +1,9 @@
-import { Component, ComponentMeta, ComponentRegistry,
-  IonicGlobal, QueueApi, PlatformApi } from '../util/interfaces';
-import { h } from './renderer/h';
+import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
+  IonicGlobal, LoadComponentData, QueueApi, PlatformApi } from '../util/interfaces';
+import { h } from '../renderer/h';
 import { initInjectedIonic } from './ionic-client';
+import { PRIORITY_LOW, XLINK_NS, XML_NS } from '../util/constants';
 import { parseComponentModeData, parseModeName, parseProp } from '../util/data-parse';
-import { toDashCase } from '../util/helpers';
 
 
 export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, queue: QueueApi): PlatformApi {
@@ -18,7 +18,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   const injectedIonic = initInjectedIonic(IonicGbl, win, doc, queue);
 
 
-  IonicGbl.loadComponents = function loadComponents(coreVersion, bundleId, importFn) {
+  IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
     coreVersion;
     var args = arguments;
 
@@ -48,7 +48,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
   };
 
 
-  function loadBundle(bundleId: string, priority: string, cb: Function): void {
+  function loadBundle(bundleId: string, priority: number, cb: Function): void {
     if (loadedBundles[bundleId]) {
       // we've already loaded this bundle
       cb();
@@ -72,22 +72,13 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
         // remember that we're now actively requesting this url
         activeJsonRequests[url] = true;
 
-        if (priority === 'low') {
+        if (priority === PRIORITY_LOW) {
           // low priority which means its ok to load this behind
           // UI components, for example: gestures, menu
-          if ('requestIdleCallback' in win) {
-            // kick off the request in a requestIdleCallback
-            (<any>win).requestIdleCallback(() => {
-              jsonp(url);
-            }, { timeout: 2000 });
-
-          } else {
-            // no support for requestIdleCallback, so instead throw it
-            // in a setTimeout just so all the UI components kick in first
-            setTimeout(() => {
-              jsonp(url);
-            }, 600);
-          }
+          // kick off the request in a requestIdleCallback
+          (<any>win).requestIdleCallback(() => {
+            jsonp(url);
+          }, { timeout: 2000 });
 
         } else {
           // high priority component (normal UI components)
@@ -134,33 +125,24 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
     // look up which component mode this instance should use
     // if a mode isn't found then check if there's a default
-    const cmpMode = cmpMeta.modes.find(m => m.modeName === instance.mode || m.modeName === 'default');
+    const cmpMode = cmpMeta.modes[instance.mode] || cmpMeta.modes['default'];
 
     if (cmpMode && cmpMode.styles) {
-      // this component mode has styles
-      let cmpStyles = cmpMode.styles;
+      // cool, we found the mode for this component
+      // and this mode has styles :)
 
       if (cmpMeta.shadow && hasNativeShadowDom) {
         // this component uses the shadow dom
         // and this browser supports the shadow dom natively
-        if (!cmpMode.styleElm) {
-          // we're doing this so the browser only needs to parse
-          // the HTML once, and can clone it every time after that
-          cmpMode.styleElm = createElement('style');
-          cmpMode.styleElm.innerHTML = cmpStyles;
-        }
-
         // attach our styles to the root
-        instance.$root.appendChild(cmpMode.styleElm.cloneNode(true));
+        const styleElm = createElement('style');
+        styleElm.innerHTML = cmpMode.styles;
+        instance.$root.appendChild(styleElm);
 
       } else {
         // this component does not use the shadow dom
         // or this browser does not support shadow dom
         const cmpModeId = `${cmpMeta.tag}.${instance.mode}`;
-
-        // remove any :host and :host-context stuff which is
-        // invalid css for browsers that don't support shadow dom
-        cmpStyles = cmpStyles.replace(/\:host\-context\((.*?)\)|:host\((.*?)\)|\:host/g, '__h');
 
         // climb up the ancestors looking to see if this element
         // is within another component with a shadow root
@@ -182,11 +164,11 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
               styleElm = hostRoot.querySelector('style');
               if (styleElm) {
-                styleElm.innerHTML = cmpStyles + styleElm.innerHTML;
+                styleElm.innerHTML = cmpMode.styles + styleElm.innerHTML;
 
               } else {
                 styleElm = createElement('style');
-                styleElm.innerHTML = cmpStyles;
+                styleElm.innerHTML = cmpMode.styles;
                 insertBefore(hostRoot, styleElm, hostRoot.firstChild);
               }
             }
@@ -209,50 +191,61 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
           // we're replacing the :host and :host-context stuff because
           // it's invalid css for browsers that don't support shadow dom
-          styleEle.innerHTML = cmpStyles;
+          styleEle.innerHTML = cmpMode.styles;
 
-          appendChild(hostRoot, styleEle);
+          // prepend the styles to the head, above of existing styles
+          insertBefore(hostRoot, styleEle, hostRoot.firstChild);
         }
       }
     }
   }
 
 
-  function registerComponent(tag: string, data: any[]) {
-    // data[0] = all of the mode and bundle maps
-    // data[1] = properties
-    // data[2] = bundle priority
-    const modeBundleIds = data[0];
+  function registerComponents(components: LoadComponentData[]) {
+    // this is the part that just registers the minimal amount about each
+    // component, basically its tag, modes and observed attributes
 
-    const cmpMeta: ComponentMeta = registry[tag] = {
-      tag: tag,
-      modes: [],
-      props: parseProp(data[1]),
-      obsAttrs: []
-    };
+    return components.map(data => {
 
-    if (data[2] === 0) {
-      // priority
-      cmpMeta.priority = 'low';
-    }
+      const cmpMeta: ComponentMeta = registry[data[0]] = {
+        tag: data[0],
+        modes: {},
+        props: [
+          // every component defaults to always have
+          // the mode and color properties
+          // but only watch the color attribute
+          { propName: 'color', attrName: 'color' },
+          { propName: 'mode' },
+        ]
+      };
 
-    const keys = Object.keys(modeBundleIds);
-    for (var i = 0; i < keys.length; i++) {
-      cmpMeta.modes.push({
-        modeName: parseModeName(keys[i].toString()),
-        bundleId: modeBundleIds[keys[i]]
+      // copy over the map of the modes and bundle ids
+      // parse the mode codes to names: "1" becomes "ios"
+      Object.keys(data[1]).forEach(modeCode => {
+        cmpMeta.modes[parseModeName(modeCode)] = {
+          bundleId: data[1][modeCode]
+        };
       });
-    }
 
-    for (i = 0; i < cmpMeta.props.length; i++) {
-      cmpMeta.obsAttrs.push(toDashCase(cmpMeta.props[i].propName));
-    }
+      if (data[2]) {
+        cmpMeta.props = cmpMeta.props.concat(data[2].map(parseProp));
+      }
 
-    return cmpMeta;
+      // priority
+      cmpMeta.priority = data[3];
+
+      return cmpMeta;
+    });
   }
 
+
+  function defineComponent(tag: string, constructor: Function) {
+    win.customElements.define(tag, constructor);
+  }
+
+
   function getComponentMeta(tag: string) {
-    return registry[tag];
+    return registry[tag.toLowerCase()];
   }
 
   function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K] {
@@ -307,6 +300,26 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     return elm.getAttribute(attrName);
   }
 
+  function setAttribute(elm: HTMLElement, attrName: string, attrValue: any) {
+    if (attrName.charCodeAt(0) === 120) {
+      const namespaceURI = attrName.charCodeAt(3) === 58 ? XML_NS : (attrName.charCodeAt(5) === 58 ? XLINK_NS : 0);
+      if (namespaceURI) {
+        elm.setAttributeNS(namespaceURI, attrName, attrValue);
+        return;
+      }
+    }
+
+    elm.setAttribute(attrName, attrValue);
+  }
+
+  function removeAttribute(elm: HTMLElement, attrName: string) {
+    elm.removeAttribute(attrName);
+  }
+
+  function setClass(elm: HTMLElement, cssClassName: string, shouldAddCssClassName: boolean) {
+    elm.classList[shouldAddCssClassName ? 'add' : 'remove'](cssClassName);
+  }
+
   function isElement(node: Node): node is Element {
     return node.nodeType === 1;
   }
@@ -321,7 +334,8 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
 
   return {
-    registerComponent: registerComponent,
+    registerComponents: registerComponents,
+    defineComponent: defineComponent,
     getComponentMeta: getComponentMeta,
     loadBundle: loadBundle,
 
@@ -343,11 +357,11 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     $setTextContent: setTextContent,
     $getTextContent: getTextContent,
     $getAttribute: getAttribute,
-    $attachComponent: attachComponent
+    $setAttribute: setAttribute,
+    $removeAttribute: removeAttribute,
+    $setClass: setClass,
+    $attachComponent: attachComponent,
+
+    $tmpDisconnected: false
   };
-}
-
-
-export interface BundleCallbacks {
-  [bundleId: string]: Function[];
 }
