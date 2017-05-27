@@ -11,6 +11,7 @@ export function generateGlobalContext(win: Window, IonicGbl: IonicGlobal): any {
     // common
     window: win,
     document: win.document,
+    console: win.console,
     fetch: win.fetch,
     location: win.location,
     navigator: win.navigator,
