@@ -104,8 +104,8 @@ export interface Modal {
   enterAnimation: AnimationBuilder;
   exitAnimation: AnimationBuilder;
   cssClass: string;
-  present: (done?: Function) => void;
-  dismiss: (done?: Function) => void;
+  present: () => Promise<void>;
+  dismiss: () => Promise<void>;
 }
 
 
@@ -136,8 +136,8 @@ export interface Loading {
   enterAnimation: AnimationBuilder;
   exitAnimation: AnimationBuilder;
   cssClass: string;
-  present: (done?: Function) => void;
-  dismiss: (done?: Function) => void;
+  present: () => Promise<void>;
+  dismiss: () => Promise<void>;
 }
 
 

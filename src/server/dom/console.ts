@@ -40,6 +40,6 @@ export class Console {
   }
 
   warn() {
-    console.warn.apply(console, arguments);
+    if (this.printUserLogs) console.warn.apply(console, arguments);
   }
 }
