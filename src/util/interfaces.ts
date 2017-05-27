@@ -300,6 +300,30 @@ export interface LoadComponentData {
 export type LoadPriority = number;
 
 
+export interface Bundle {
+  id?: string;
+  components?: BundleComponent[];
+  bundledJsModules?: string;
+  content?: string;
+  fileName?: string;
+  filePath?: string;
+  priority?: number;
+}
+
+
+export interface BundleComponent {
+  component: ManifestComponentMeta;
+  modeName: string;
+  modeMeta: ModeMeta;
+}
+
+
+export interface ManifestComponentMeta extends ComponentMeta {
+  componentClass: string;
+  componentUrl: string;
+}
+
+
 export interface ComponentModeData {
   /**
    * tag name (ion-badge)
@@ -645,6 +669,7 @@ export interface PlatformApi {
   queue: QueueApi;
   css?: {[cmpModeId: string]: string};
   isServer?: boolean;
+  postInitialRender?: (elm: Element) => void;
 
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;

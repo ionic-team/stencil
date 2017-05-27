@@ -1,5 +1,5 @@
 export * from '../util/interfaces';
-import { ComponentMeta, ModeMeta } from '../util/interfaces';
+import { Bundle, ComponentMeta, ManifestComponentMeta } from '../util/interfaces';
 
 
 export interface CompilerConfig {
@@ -73,33 +73,9 @@ export interface Results {
 }
 
 
-export interface Bundle {
-  id?: string;
-  components?: BundleComponent[];
-  bundledJsModules?: string;
-  content?: string;
-  fileName?: string;
-  filePath?: string;
-  priority?: number;
-}
-
-
-export interface BundleComponent {
-  component: ManifestComponentMeta;
-  modeName: string;
-  modeMeta: ModeMeta;
-}
-
-
 export interface Manifest {
   components?: ManifestComponentMeta[];
   bundles?: ManifestBundle[];
-}
-
-
-export interface ManifestComponentMeta extends ComponentMeta {
-  componentClass: string;
-  componentUrl: string;
 }
 
 
