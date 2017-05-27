@@ -64,9 +64,6 @@
       "ts",
       "js"
     ],
-    "setupFiles": [
-      "<rootDir>/scripts/jest.setupfiles.js"
-    ],
     "transform": {
       "^.+\\.(ts)$": "<rootDir>/scripts/jest.preprocessor.js"
     },
