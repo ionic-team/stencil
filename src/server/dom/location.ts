@@ -13,7 +13,7 @@ export class Location {
   search: string;
 
   constructor(urlStr: string) {
-    const parsedUrl = nodeUrl.parse(urlStr);
+    const parsedUrl = nodeUrl.parse(urlStr || '');
 
     this.hash = parsedUrl.hash;
     this.host = parsedUrl.host;

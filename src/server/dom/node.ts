@@ -45,11 +45,19 @@ export class Node {
   }
 
   get tagName() {
-    return this.name;
+    return this.name.toUpperCase();
+  }
+
+  set tagName(tagName: string) {
+    this.name = tagName;
   }
 
   get childNodes() {
     return this.children;
+  }
+
+  set childNodes(childNodes: Node[]) {
+    this.children = childNodes;
   }
 
   get parentNode() {
@@ -68,11 +76,11 @@ export class Node {
     return this.next;
   }
 
-  firstChild() {
+  get firstChild() {
     return this.children && this.children[0] || null;
   }
 
-  lastChild() {
+  get lastChild() {
     return this.children && this.children[this.children.length - 1] || null;
   }
 
@@ -164,6 +172,10 @@ export class Node {
 
   appendChild(childNode: Node): void {
     adapter.appendChild(this, childNode);
+  }
+
+  get innerHTML() {
+    return this.textContent;
   }
 
   get textContent() {
