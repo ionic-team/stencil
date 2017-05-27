@@ -97,7 +97,7 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
 
           } else {
             // run the code in this sandboxed context
-            vm.runInContext(code, context);
+            vm.runInContext(code, context, { timeout: 5000 });
           }
 
           delete activeFileReads[filePath];
