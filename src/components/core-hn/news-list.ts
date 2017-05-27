@@ -11,10 +11,12 @@ export class NewsList {
   apiRootUrl: string = 'http://localhost:8100';
 
   comments(story: any) {
-    Ionic.controller('loading', { content: 'fetching comments...' }).then((loading: any) => {
+    if (Ionic.isServer) return;
+
+    Ionic.controller('loading', { content: 'fetching comments...' }).then(loading => {
       loading.present();
 
-      fetch(`${this.apiRootUrl}/item/${story.id}`).then((response: any) => {
+      fetch(`${this.apiRootUrl}/item/${story.id}`).then(response => {
         return response.json();
       }).then((data: any) => {
         console.log(data);
@@ -22,7 +24,7 @@ export class NewsList {
 
         setTimeout(() => {
           loading.dismiss().then(() => {
-            Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then((modal: any) => {
+            Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then(modal => {
               console.log('modal created');
 
               modal.present().then(() => {

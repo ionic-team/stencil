@@ -19,6 +19,7 @@ export class NewsContainer {
   @Prop() fourthSelectedClass: boolean = false;
 
   ionViewDidLoad() {
+    if (Ionic.isServer) return;
 
     this.firstSelectedClass = true;
 
@@ -44,6 +45,8 @@ export class NewsContainer {
   }
 
   getStories(type: string) {
+    if (Ionic.isServer) return;
+
     // reset page number
     this.page = 1;
 
@@ -98,13 +101,13 @@ export class NewsContainer {
   previous() {
     if (this.page > 1) {
 
-      Ionic.controller('loading', { content: `fetching articles...` }).then((loading: any) => {
+      Ionic.controller('loading', { content: `fetching articles...` }).then(loading => {
         loading.present().then(() => {
 
           this.page = this.page--;
           console.log(this.page--);
 
-          fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((response) => {
+          fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then(response => {
             return response.json();
           }).then((data) => {
             console.log(data);
@@ -119,15 +122,15 @@ export class NewsContainer {
   }
 
   next() {
-    Ionic.controller('loading', { content: `fetching articles...` }).then((loading: any) => {
+    Ionic.controller('loading', { content: `fetching articles...` }).then(loading => {
       loading.present().then(() => {
 
         this.page = this.page++;
         console.log(this.page++);
 
-        fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((response) => {
+        fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then(response => {
           return response.json();
-        }).then((data) => {
+        }).then(data => {
           if (data.length !== 0) {
             this.stories = data;
           }
