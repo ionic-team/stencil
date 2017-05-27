@@ -22,18 +22,26 @@ export class Node {
   'x-publicId': string;
   'x-systemId': string;
 
-  get classList() {
-    if (!this._classList) {
-      this._classList = new ClassList(this);
-    }
-    return this._classList;
+  get nodeValue() {
+    return this.data;
   }
 
-  get style() {
-    if (!this._style) {
-      this._style = {};
+  get nodeName() {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName
+    if (adapter.isElementNode(this)) {
+      return this.tagName;
     }
-    return this._style;
+    if (adapter.isTextNode(this)) {
+      return '#text';
+    }
+    if (adapter.isCommentNode(this)) {
+      return '#comment';
+    }
+    return this.name;
+  }
+
+  get nodeType() {
+    return nodeTypes[this.type] || nodeTypes.element;
   }
 
   get tagName() {
@@ -60,20 +68,19 @@ export class Node {
     return this.next;
   }
 
-  get nodeValue() {
-    return this.data;
-  }
-
-  get nodeType() {
-    return nodeTypes[this.type] || nodeTypes.element;
-  }
-
   firstChild() {
     return this.children && this.children[0] || null;
   }
 
   lastChild() {
     return this.children && this.children[this.children.length - 1] || null;
+  }
+
+  get classList() {
+    if (!this._classList) {
+      this._classList = new ClassList(this);
+    }
+    return this._classList;
   }
 
   get className() {
@@ -84,6 +91,13 @@ export class Node {
     if (typeof cssClassName === 'string') {
       this.setAttribute('class', cssClassName.trim());
     }
+  }
+
+  get style() {
+    if (!this._style) {
+      this._style = {};
+    }
+    return this._style;
   }
 
   get id() {
