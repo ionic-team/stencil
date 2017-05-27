@@ -21,7 +21,7 @@ export class Window {
 
 
   constructor(url: string, referrer: string, userAgent: string, cookie: string) {
-    this.console = new Console();
+    this.console = new Console(true);
     this.location = new Location(url);
     this.navigator = new Navigator(userAgent);
     this.performance = new Performance();
