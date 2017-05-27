@@ -6,6 +6,8 @@ import { themeVNodeData } from '../renderer/host';
 export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
 
   const injectedIonic: Ionic = {
+    isServer: true,
+    isClient: false,
     theme: themeVNodeData,
     emit: noop,
     listener: {
@@ -14,14 +16,25 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     },
     config: ConfigCtrl,
     dom: DomCtrl,
-    controller: (ctrlName: string, opts?: any) => {
-      throw `TODO: initInjectedIonic ${ctrlName} ${opts}`;
-    }
+    controller: serverController
   };
+
+  function serverController(ctrlName: string, opts?: any) {
+    const promise: any = new Promise((resolve, reject) => {
+      const msg = `"${ctrlName}" is not available on the server`;
+      console.trace(msg);
+
+      reject(msg);
+
+      resolve; opts; // for no TS errors
+    });
+    return promise;
+  }
 
   Object.defineProperty(injectedIonic, 'Animation', {
     get: function() {
-      throw `Ionic.Animation is not available on the server`;
+      console.error(`Ionic.Animation is not available on the server`);
+      return {};
     }
   });
 

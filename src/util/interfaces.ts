@@ -10,6 +10,8 @@ export interface Ionic {
   dom: DomControllerApi;
   config: ConfigApi;
   Animation?: Animation;
+  isServer: boolean;
+  isClient: boolean;
 }
 
 
