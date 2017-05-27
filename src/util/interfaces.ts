@@ -665,11 +665,11 @@ export interface PlatformApi {
   registerComponents: (components?: LoadComponentData[]) => ComponentMeta[];
   defineComponent: (tag: string, constructor: Function) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
+  setComponentMeta: (cmpMeta: ComponentMeta) => void;
   loadBundle: (bundleId: string, priority: LoadPriority, cb: Function) => void;
   queue: QueueApi;
   css?: {[cmpModeId: string]: string};
   isServer?: boolean;
-  postInitialRender?: (elm: Element) => void;
 
   isElement: (node: Node) => node is Element;
   isText: (node: Node) => node is Text;
