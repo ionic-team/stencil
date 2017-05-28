@@ -42,6 +42,16 @@ app.get('/', function (req, res) {
 });
 
 
+app.get('/dist/*', function (req, res) {
+  // manually serve other dist files
+  var filePath = path.join(__dirname, '../../', req.url);
+  console.log(filePath)
+  fs.readFile(filePath, 'utf-8', (err, data) => {
+    res.send(data);
+  });
+});
+
+
 app.listen(3000, () => {
   console.log('app listening on port 3000!');
 });
