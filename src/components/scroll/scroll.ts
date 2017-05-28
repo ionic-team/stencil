@@ -27,6 +27,8 @@ export class Scroll implements IScroll {
 
 
   ionViewDidLoad() {
+    if (Ionic.isServer) return;
+
     const ctrl = (<IonicGlobal>Ionic).controllers.gesture = ((<IonicGlobal>Ionic).controllers.gesture || new GestureController());
 
     this.gesture = ctrl.createGesture('scroll', 100, false);
