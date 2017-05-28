@@ -1,18 +1,14 @@
 import { Renderer, h } from '../core';
-import { mockDocument, mockPlatformClient } from '../../test/client-mocks';
-
-
-const document = mockDocument();
-const plt = mockPlatformClient();
-const patch = Renderer(plt);
+import { mockElement, mockPlatform } from '../../test';
 
 
 describe('attributes', function() {
+  const patch = Renderer(mockPlatform());
   var elm: any;
   var vnode0: any;
 
   beforeEach(function() {
-    elm = document.createElement('div');
+    elm = mockElement('div');
     vnode0 = elm;
   });
 
@@ -23,6 +19,7 @@ describe('attributes', function() {
     expect(elm.getAttribute('minlength')).toEqual('1');
     expect(elm.getAttribute('value')).toEqual('true');
   });
+
   it('can be memoized', function() {
     var cachedAttrs = {href: '/foo', minlength: 1, value: true};
     var vnode1 = h('div', {attrs: cachedAttrs});
@@ -36,6 +33,7 @@ describe('attributes', function() {
     expect(elm.getAttribute('minlength')).toEqual('1');
     expect(elm.getAttribute('value')).toEqual('true');
   });
+
   it('are not omitted when falsy values are provided', function() {
     var vnode1 = h('div', {attrs: {href: null, minlength: 0, value: false}});
     elm = patch(vnode0, vnode1).elm;
@@ -43,24 +41,28 @@ describe('attributes', function() {
     expect(elm.getAttribute('minlength')).toEqual('0');
     expect(elm.getAttribute('value')).toEqual('false');
   });
+
   it('are set correctly when namespaced', function() {
     var vnode1 = h('div', {attrs: {'xlink:href': '#foo'}});
     elm = patch(vnode0, vnode1).elm;
     expect(elm.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).toEqual('#foo');
   });
+
   it('should not touch class nor id fields', function() {
-    elm = document.createElement('div');
+    elm = mockElement('div');
     elm.id = 'myId';
     elm.className = 'myClass';
     vnode0 = elm;
-    var vnode1 = h('div#myId.myClass', {attrs: {}}, ['Hello']);
+    var vnode1 = h('div#myId.myClass', {attrs: {}}, 'Hello');
     elm = patch(vnode0, vnode1).elm;
     expect(elm.tagName).toEqual('DIV');
     expect(elm.id).toEqual('myId');
     expect(elm.className).toEqual('myClass');
     expect(elm.textContent).toEqual('Hello');
   });
+
   describe('boolean attribute', function() {
+
     it('is present and empty string if the value is truthy', function() {
       var vnode1 = h('div', {attrs: {required: true, readonly: 1, noresize: 'truthy'}});
       elm = patch(vnode0, vnode1).elm;
@@ -71,6 +73,7 @@ describe('attributes', function() {
       expect(elm.hasAttribute('noresize')).toEqual(true);
       expect(elm.getAttribute('noresize')).toEqual('');
     });
+
     it('is omitted if the value is falsy', function() {
       var vnode1 = h('div', {attrs: {required: false, readonly: 0, noresize: null}});
       elm = patch(vnode0, vnode1).elm;
@@ -78,7 +81,9 @@ describe('attributes', function() {
       expect(elm.getAttribute('readonly')).toEqual(null);
       expect(elm.getAttribute('noresize')).toEqual(null);
     });
+
   });
+
   describe('Object.prototype property', function() {
     it('is not considered as a boolean attribute and shouldn\'t be omitted', function() {
       var vnode1 = h('div', {attrs: {constructor: true}});
@@ -87,6 +92,7 @@ describe('attributes', function() {
       var vnode2 = h('div', {attrs: {constructor: false}});
       elm = patch(vnode0, vnode2).elm;
       expect(elm.getAttribute('constructor')).toEqual('false');
-    })
+    });
   });
+
 });
