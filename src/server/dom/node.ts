@@ -124,6 +124,15 @@ export class Node {
     this.setAttribute('tabindex', id.trim());
   }
 
+  get attributes() {
+    return Object.keys(this.attribs).map(nodeName => {
+      return {
+        nodeName: nodeName,
+        nodeValue: this.attribs[nodeName]
+      };
+    });
+  }
+
   getAttribute(attrName: string) {
     if (this.attribs) {
       let attrValue = this.attribs[attrName];
@@ -136,14 +145,41 @@ export class Node {
 
   setAttribute(attrName: string, attrValue: string) {
     if (this.attribs) {
-      if (attrValue === null || attrValue === undefined) {
-        this.removeAttribute(attrName);
+      if (attrValue === null) {
+        attrValue = 'null';
 
-      } else {
-        this.attribs[attrName] = attrValue.toString();
-        this['x-attribsNamespace'][attrName] = null;
-        this['x-attribsPrefix'][attrName] = null;
+      } else if (attrValue === undefined) {
+        attrValue = 'undefined';
       }
+      this.attribs[attrName] = attrValue.toString();
+      this['x-attribsNamespace'][attrName] = null;
+      this['x-attribsPrefix'][attrName] = null;
+    }
+  }
+
+  getAttributeNS(namespaceUri: string, localName: string) {
+    if (this.attribs) {
+      let attrValue = this.attribs[localName];
+      if (attrValue !== undefined && attrValue !== null && this['x-attribsNamespace'][localName] === namespaceUri) {
+        return attrValue.toString();
+      }
+    }
+    return null;
+  }
+
+  setAttributeNS(namespaceUri: string, qualifiedName: string, attrValue: string) {
+    if (this.attribs) {
+      if (attrValue === null) {
+        attrValue = 'null';
+
+      } else if (attrValue === undefined) {
+        attrValue = 'undefined';
+      }
+      var splt = qualifiedName.split(':');
+
+      this.attribs[splt[1]] = attrValue.toString();
+      this['x-attribsNamespace'][splt[1]] = namespaceUri;
+      this['x-attribsPrefix'][splt[1]] = splt[0];
     }
   }
 
@@ -187,7 +223,7 @@ export class Node {
   }
 
   set textContent(text: string) {
-    if (this.type === 'text') {
+    if (this.type === 'text' || this.type === 'comment') {
       this.data = text;
 
     } else if (this.children) {
@@ -200,6 +236,10 @@ export class Node {
         adapter.insertText(this, text);
       }
     }
+  }
+
+  get wholeText() {
+    return this.textContent;
   }
 
   querySelector(selector: string) {
@@ -246,7 +286,7 @@ export class Node {
 }
 
 function concatText(text: string[], node: Node) {
-  if (node.type === 'text') {
+  if (node.type === 'text' || node.type === 'comment') {
     if (node.data !== undefined && node.data !== null) {
       text.push(node.data);
     }
