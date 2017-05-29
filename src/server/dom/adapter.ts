@@ -88,6 +88,13 @@ export function appendChild(parentNode: Node, newNode: Node) {
 }
 
 function insertBefore(parentNode: Node, newNode: Node, referenceNode: Node) {
+  if (newNode.parent) {
+    var oldIndex = newNode.parent.children.indexOf(newNode);
+    if (oldIndex > -1) {
+      newNode.parent.children.splice(oldIndex, 1);
+    }
+  }
+
   var insertionIdx = parentNode.children.indexOf(referenceNode);
   var prev = referenceNode && referenceNode.prev || null;
 

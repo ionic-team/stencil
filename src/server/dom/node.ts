@@ -45,7 +45,7 @@ export class Node {
   }
 
   get tagName() {
-    return this.name.toUpperCase();
+    return (this.name && this.name.toUpperCase()) || undefined;
   }
 
   set tagName(tagName: string) {
@@ -114,6 +114,75 @@ export class Node {
 
   set id(id: string) {
     this.setAttribute('id', id);
+  }
+
+  get src() {
+    return this.getAttribute('src') || '';
+  }
+
+  set src(src: string) {
+    this.setAttribute('src', src);
+  }
+
+  get value() {
+    return this.getAttribute('value') || '';
+  }
+
+  set value(value: string) {
+    this.setAttribute('value', value);
+  }
+
+  get innerHTML() {
+    const text: string[] = [];
+
+    concatHtml(text, this);
+
+    return text.join('');
+  }
+
+  set innerHTML(html: string) {
+    this.textContent = html;
+  }
+
+  get outerHTML() {
+    if (adapter.isElementNode(this)) {
+      let attrs = '';
+
+      Object.keys(this.attribs).map(attrName => {
+        attrs += ` ${attrName}="${this.attribs[attrName]}"`;
+      });
+
+      return `<${this.tagName.toLowerCase()}${attrs}>${this.innerHTML}</${this.tagName.toLowerCase()}>`;
+    }
+    return this.textContent;
+  }
+
+  get textContent() {
+    const text: string[] = [];
+
+    concatText(text, this);
+
+    return text.join('');
+  }
+
+  set textContent(text: string) {
+    if (this.type === 'text' || this.type === 'comment') {
+      this.data = text;
+
+    } else if (this.children) {
+      if (this.children.length === 1 && this.type === 'text') {
+        this.children[0].data = text;
+
+      } else {
+        this.children.forEach(adapter.detachNode);
+
+        adapter.insertText(this, text);
+      }
+    }
+  }
+
+  get wholeText() {
+    return this.textContent;
   }
 
   get tabIndex() {
@@ -198,6 +267,10 @@ export class Node {
     }
   }
 
+  get namespaceURI() {
+    return this.namespace;
+  }
+
   insertBefore(newNode: Node, referenceNode: Node): void {
     adapter.insertBefore(this, newNode, referenceNode);
   }
@@ -208,38 +281,6 @@ export class Node {
 
   appendChild(childNode: Node): void {
     adapter.appendChild(this, childNode);
-  }
-
-  get innerHTML() {
-    return this.textContent;
-  }
-
-  get textContent() {
-    const text: string[] = [];
-
-    concatText(text, this);
-
-    return text.join('');
-  }
-
-  set textContent(text: string) {
-    if (this.type === 'text' || this.type === 'comment') {
-      this.data = text;
-
-    } else if (this.children) {
-      if (this.children.length === 1 && this.type === 'text') {
-        this.children[0].data = text;
-
-      } else {
-        this.children.forEach(adapter.detachNode);
-
-        adapter.insertText(this, text);
-      }
-    }
-  }
-
-  get wholeText() {
-    return this.textContent;
   }
 
   querySelector(selector: string) {
@@ -294,6 +335,24 @@ function concatText(text: string[], node: Node) {
   } else if (node.children) {
     for (var i = 0; i < node.children.length; i++) {
       concatText(text, node.children[i]);
+    }
+  }
+}
+
+function concatHtml(text: string[], node: Node) {
+  if (node.data !== undefined && node.data !== null) {
+    text.push(node.data);
+  }
+
+  if (node.children) {
+    for (var i = 0; i < node.children.length; i++) {
+      if (node.children[i] && node.children[i].tagName) {
+        text.push(`<${node.children[i].tagName.toLowerCase()}>`);
+      }
+      concatText(text, node.children[i]);
+      if (node.children[i] && node.children[i].tagName) {
+        text.push(`</${node.children[i].tagName.toLowerCase()}>`);
+      }
     }
   }
 }
