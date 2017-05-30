@@ -199,8 +199,13 @@ export class Button {
         '');
 
     // special case for a default bar button
+    // if the bar button is default it should get the style
+    // but if a color is passed the style shouldn't be added
     if (buttonType === 'bar-button' && style === 'default') {
-      className = buttonType + '-' + style.toLowerCase();
+      className = buttonType;
+      if (!color) {
+        className += '-' + style.toLowerCase();
+      }
     }
 
     return [`${className}-${mode}`].concat(
