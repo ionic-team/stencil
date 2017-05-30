@@ -340,9 +340,11 @@ export interface ComponentModeData {
   [7]: any;
 
   /**
-   * mode name (ios, md, wp)
+   * mode code, which is a number that'll
+   * map to a mode name later (ios, md, wp)
    */
   [8]: number;
+
 
   /**
    * component mode styles

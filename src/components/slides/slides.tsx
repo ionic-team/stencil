@@ -225,7 +225,7 @@ export class Slides {
     if (!this._init) {
       console.debug(`ion-slides, init`);
 
-      this.container = <HTMLElement>this.$el.children[0];
+      this.container = this.$el.children[0] as HTMLElement;
 
       var swiperOptions = {
         height: this.height,
