@@ -148,8 +148,8 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
 @mixin ios-bar-button-default($color-name, $color-base, $color-contrast) {
 
   .bar-button-#{$color-name}-ios,
-  .bar-button-default.bar-button-ios-#{$color-name},
-  .bar-button-clear-ios-#{$color-name} {
+  .bar-button-clear-ios-#{$color-name},
+  .bar-button-ios-#{$color-name} {
     color: $color-base;
     background-color: transparent;
 
