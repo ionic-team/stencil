@@ -1,5 +1,5 @@
 import { Component, h, Ionic, Prop, Watch } from '../index';
-import { IonicGlobal, Menu as IMenu } from '../../util/interfaces';
+import { VNodeData, IonicGlobal, Menu as IMenu } from '../../util/interfaces';
 import { MenuController } from './menu-controller';
 import { MenuType } from './menu-types';
 
@@ -139,7 +139,7 @@ export class Menu implements IMenu {
     this.enable(isEnabled);
   }
 
-  hostData() {
+  hostData(): VNodeData {
     return {
       attrs: {
         'role': 'navigation',

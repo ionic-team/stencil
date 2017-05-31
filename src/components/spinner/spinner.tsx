@@ -1,6 +1,7 @@
 import { Component, h, Ionic, Prop } from '../index';
 import { SPINNERS, SpinnerConfig } from './spinner-configs';
 import { createThemedClasses } from '../../util/theme';
+import { VNodeData } from '../../util/interfaces';
 
 
 @Component({
@@ -31,7 +32,7 @@ export class Spinner {
     }
   }
 
-  hostData() {
+  hostData(): VNodeData {
     const spinnerThemedClasses = createThemedClasses(this.mode, this.color, `spinner spinner-${this.name}`);
     spinnerThemedClasses['spinner-paused'] = true;
 

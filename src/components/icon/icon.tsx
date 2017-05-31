@@ -1,5 +1,5 @@
 import { Component, h, Ionic, Prop } from '../index';
-import { CssClassObject } from '../../util/interfaces';
+import { CssClassObject, VNodeData } from '../../util/interfaces';
 
 @Component({
   tag: 'ion-icon',
@@ -100,7 +100,7 @@ export class Icon {
     return `ion-${iconName}`;
   }
 
-  hostData() {
+  hostData(): VNodeData {
     // TODO set the right iconMode based on the config
     let iconMode = this.mode === 'md' ? 'md' : 'ios';
     this.iconMode = iconMode || Ionic.config.get('iconMode');

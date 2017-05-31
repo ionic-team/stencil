@@ -1,4 +1,5 @@
 import { Component, Prop, h } from '../index';
+import { VNodeData } from '../../util/interfaces';
 
 @Component({
   tag: 'fiber-demo'
@@ -17,7 +18,7 @@ export class FiberDemo {
     this.seconds = (this.seconds % 10) + 1;
   }
 
-  hostData() {
+  hostData(): VNodeData {
     const elapsed = this.elapsed;
     const t = (elapsed / 1000) % 10;
     const scale = 1 + (t > 5 ? 10 - t : t) / 10;

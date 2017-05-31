@@ -1,4 +1,5 @@
 import { Component, h, Ionic } from '../index';
+import { VNodeData } from '../../util/interfaces';
 import { createThemedClasses } from '../../util/theme';
 
 
@@ -120,7 +121,7 @@ export class Toolbar {
     }
   }
 
-  hostData() {
+  hostData(): VNodeData {
     return {
       class: {
         'statusbar-padding': this.sbPadding

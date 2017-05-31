@@ -1,4 +1,5 @@
 import { Component, Prop, h, State } from '../index';
+import { VNodeData } from '../../util/interfaces';
 
 @Component({
   tag: 'fiber-dot'
@@ -21,7 +22,7 @@ export class FiberDot {
     this.hover = false;
   }
 
-  hostData() {
+  hostData(): VNodeData {
     const s = this.size * 1.3;
     const style = {
       position: 'absolute',

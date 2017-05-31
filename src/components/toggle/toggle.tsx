@@ -1,4 +1,4 @@
-import { BooleanInputComponent, GestureDetail } from '../../util/interfaces';
+import { BooleanInputComponent, GestureDetail, VNodeData } from '../../util/interfaces';
 import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
 
 
@@ -133,7 +133,7 @@ export class Toggle implements BooleanInputComponent {
     }
   }
 
-  hostData() {
+  hostData(): VNodeData {
     return {
       class: {
         'toggle-activated': this.activated,

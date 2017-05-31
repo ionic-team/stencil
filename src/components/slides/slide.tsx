@@ -1,4 +1,5 @@
 import { Component, h } from '../index';
+import { VNodeData } from '../../util/interfaces';
 
  /**
   * @name Slide
@@ -17,7 +18,7 @@ import { Component, h } from '../index';
   styleUrls: 'slide.scss'
 })
 export class Slide {
-  hostData() {
+  hostData(): VNodeData {
     return {
       class: {
         'slide-zoom': true,
