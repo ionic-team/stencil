@@ -16,14 +16,13 @@ export class FiberTriangle {
   render() {
     var s = this.s;
     if (s <= targetSize) {
-      return h('fiber-dot', {
-          props: {
-            x: this.x - (targetSize / 2),
-            y: this.y - (targetSize / 2),
-            size: targetSize,
-            text: this.seconds.toString()
-          }
-        }
+      return (
+        <fiber-dot
+          x={this.x - (targetSize / 2)}
+          y={this.y - (targetSize / 2)}
+          size={targetSize}
+          text={this.seconds.toString()}
+        ></fiber-dot>
       );
     }
     s = s / 2;
