@@ -40,7 +40,7 @@ export class NewsList {
   render() {
     console.log(this.type);
 
-    const items = this.type.map((story: any) => {
+    /*const items = this.type.map((story: any) => {
       return h('ion-item',
         [
           h('div.points', { props: { slot: 'start' } }, story.points || 0),
@@ -57,6 +57,24 @@ export class NewsList {
     return h(this,
       [
         h('ion-list', items)
+      ]
+    );*/
+
+    const items = this.type.map((story: any) => {
+      return h('li',
+        h('div.points', { props: { slot: 'start' } }, story.points || 0),
+        h('div',
+          [
+            h('h2.list-header', { on: { click: () => window.open(story.url) } }, story.title),
+             h('h3.comments-text', { on: { click: () => this.comments(story) } }, `Posted by ${story.user} ${story.time_ago} | ${story.comments_count} comments`)
+          ]
+        )
+      );
+    });
+
+    return h(this,
+      [
+        h('ul', items)
       ]
     );
   }

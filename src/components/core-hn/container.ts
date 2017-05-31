@@ -8,7 +8,7 @@ import { Component, h, Prop, Ionic } from '../index';
 export class NewsContainer {
 
   @Prop() stories: any[] = [];
-  apiRootUrl: string = 'http://localhost:8100';
+  apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
   page: number = 1;
   pageType: string;
   @Prop() prevClass: string;
@@ -23,24 +23,31 @@ export class NewsContainer {
 
     this.firstSelectedClass = true;
 
-    Ionic.controller('loading', { content: 'fetching articles...' }).then((loading: any) => {
+    /* Ionic.controller('loading', { content: 'fetching articles...' }).then((loading: any) => {
+ 
+       loading.present().then(() => {
+         console.log('start presenting loading');
+ 
+         fetch(`${this.apiRootUrl}/news?page=${this.page}`).then((response) => {
+           return response.json();
+         }).then((data) => {
+           console.log(data);
+           this.stories = data;
+ 
+           setTimeout(() => {
+             loading.dismiss();
+           }, 500);
+         });
+ 
+         this.pageType = 'news';
+       });
+     });*/
 
-      loading.present().then(() => {
-        console.log('start presenting loading');
-
-        fetch(`${this.apiRootUrl}/news?page=${this.page}`).then((response) => {
-          return response.json();
-        }).then((data) => {
-          console.log(data);
-          this.stories = data;
-
-          setTimeout(() => {
-            loading.dismiss();
-          }, 500);
-        });
-
-        this.pageType = 'news';
-      });
+    fetch(`${this.apiRootUrl}/news?page=${this.page}`).then((response) => {
+      return response.json();
+    }).then((data) => {
+      console.log(data);
+      this.stories = data;
     });
   }
 
