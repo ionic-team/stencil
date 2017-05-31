@@ -9,8 +9,7 @@ import { createThemedClasses } from '../../util/theme';
     ios: 'item.ios.scss',
     md: 'item.md.scss',
     wp: 'item.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Item {
   childStyles: CssClassObject = Object.create(null);

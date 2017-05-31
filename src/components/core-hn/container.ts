@@ -1,13 +1,9 @@
-import { Component, Prop, h } from '../index';
+import { Component, h, Prop, Ionic } from '../index';
 
-declare var Ionic: any;
 
 @Component({
   tag: 'news-container',
-  styleUrls: {
-    default: 'main.scss',
-  },
-  shadow: false
+  styleUrls: 'main.scss'
 })
 export class NewsContainer {
 
@@ -15,9 +11,18 @@ export class NewsContainer {
   apiRootUrl: string = 'http://localhost:8100';
   page: number = 1;
   pageType: string;
-  @Prop() prevColor: string;
+  @Prop() prevClass: string;
+  @Prop() selectedClass: boolean = false;
+  @Prop() firstSelectedClass: boolean;
+  @Prop() secondSelectedClass: boolean = false;
+  @Prop() thirdSelectedClass: boolean = false;
+  @Prop() fourthSelectedClass: boolean = false;
 
   ionViewDidLoad() {
+    if (Ionic.isServer) return;
+
+    this.firstSelectedClass = true;
+
     Ionic.controller('loading', { content: 'fetching articles...' }).then((loading: any) => {
 
       loading.present().then(() => {
@@ -40,8 +45,42 @@ export class NewsContainer {
   }
 
   getStories(type: string) {
+    if (Ionic.isServer) return;
+
     // reset page number
     this.page = 1;
+
+    // this is definitely not the best solution
+    // working on something more elegant, but this
+    // gets the job done for the moment
+    switch (type) {
+      case 'news':
+        this.firstSelectedClass = true;
+        this.secondSelectedClass = false;
+        this.thirdSelectedClass = false;
+        this.fourthSelectedClass = false;
+        break;
+      case 'show':
+        this.secondSelectedClass = true;
+        this.firstSelectedClass = false;
+        this.thirdSelectedClass = false;
+        this.fourthSelectedClass = false;
+        break;
+      case 'jobs':
+        this.thirdSelectedClass = true;
+        this.firstSelectedClass = false;
+        this.fourthSelectedClass = false;
+        this.secondSelectedClass = false;
+        break;
+      case 'ask':
+        this.fourthSelectedClass = true;
+        this.thirdSelectedClass = false;
+        this.secondSelectedClass = false;
+        this.firstSelectedClass = false;
+        break;
+    }
+
+    this.selectedClass = true;
 
     Ionic.controller('loading', { content: `fetching ${type} articles...` }).then((loading: any) => {
       loading.present().then(() => {
@@ -62,13 +101,13 @@ export class NewsContainer {
   previous() {
     if (this.page > 1) {
 
-      Ionic.controller('loading', { content: `fetching articles...` }).then((loading: any) => {
+      Ionic.controller('loading', { content: `fetching articles...` }).then(loading => {
         loading.present().then(() => {
 
           this.page = this.page--;
           console.log(this.page--);
 
-          fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((response) => {
+          fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then(response => {
             return response.json();
           }).then((data) => {
             console.log(data);
@@ -83,15 +122,15 @@ export class NewsContainer {
   }
 
   next() {
-    Ionic.controller('loading', { content: `fetching articles...` }).then((loading: any) => {
+    Ionic.controller('loading', { content: `fetching articles...` }).then(loading => {
       loading.present().then(() => {
 
         this.page = this.page++;
         console.log(this.page++);
 
-        fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((response) => {
+        fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then(response => {
           return response.json();
-        }).then((data) => {
+        }).then(data => {
           if (data.length !== 0) {
             this.stories = data;
           }
@@ -107,21 +146,24 @@ export class NewsContainer {
     // set previous button color
     if (this.page === 1) {
       console.log('im here', this.page);
-      this.prevColor = '#9e9e9e';
+      this.prevClass = '.disabled-nav';
     } else {
-      this.prevColor = '#327eff';
+      this.prevClass = '';
     }
 
-    return h('div', [
-       h('ion-header.header.header-md', { props: { mdHeight: '56px', iosHeight: '61px' } },
+    console.log(this.firstSelectedClass);
+
+    return h('div',
+      [
+        h('ion-header', { props: { mdHeight: '56px', iosHeight: '61px' } },
           [
             h('ion-toolbar', { props: { color: 'primary' } },
               [
                 h('ion-icon.header-icon', { props: { name: 'ionic', slot: 'start' } }),
-                h('ion-button.header-button.first-button', { props: { clear: true }, on: { click: () => this.getStories('news') } }, 'News'),
-                h('ion-button.header-button', { props: { clear: true }, on: { click: () => this.getStories('show') } }, 'Show'),
-                h('ion-button.header-button', { props: { clear: true }, on: { click: () => this.getStories('jobs') } }, 'Jobs'),
-                h('ion-button.header-button', { props: { clear: true }, on: { click: () => this.getStories('ask') } }, 'Ask')
+                h('ion-button.header-button.first-button', { class: { 'header-button-selected': this.firstSelectedClass }, props: { clear: true }, on: { click: () => this.getStories('news') } }, 'News'),
+                h('ion-button.header-button', { class: { 'header-button-selected': this.secondSelectedClass }, props: { clear: true }, on: { click: () => this.getStories('show') } }, 'Show'),
+                h('ion-button.header-button', { class: { 'header-button-selected': this.thirdSelectedClass }, props: { clear: true }, on: { click: () => this.getStories('jobs') } }, 'Jobs'),
+                h('ion-button.header-button', { class: { 'header-button-selected': this.fourthSelectedClass }, props: { clear: true }, on: { click: () => this.getStories('ask') } }, 'Ask')
               ]
             )
           ]
@@ -135,9 +177,9 @@ export class NewsContainer {
         h('ion-footer',
           h('ion-toolbar.pager',
             [
-              h('ion-button.previous-button', { props: { clear: true, slot: 'start' }, on: { click: () => this.previous() }, style: { color: this.prevColor } }, 'prev'),
+              h(`ion-button${this.prevClass}`, { props: { clear: true, slot: 'start' }, on: { click: () => this.previous() } }, 'prev'),
               h('span.page-number', `page ${this.page}`),
-              h('ion-button.next-button', { props: { clear: true, slot: 'end' }, on: { click: () => this.next() } }, 'next')
+              h('ion-button.next-button', { props: { clear: true }, on: { click: () => this.next() } }, 'next')
             ]
           )
         )

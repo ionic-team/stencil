@@ -8,7 +8,6 @@ import { Component, h } from '../index';
     md: 'thumbnail.md.scss',
     wp: 'thumbnail.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'thumbnail'
   }

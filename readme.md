@@ -35,4 +35,4 @@ And one of the `npm run build.XX` commands in another terminal. Take a gander at
 
 ### Live App Testing
 
-[Test Node Modules](https://github.com/driftyco/ionic-core/tree/master/toad_modules)
+[Test Node Modules](https://github.com/ionic-team/ionic-core/tree/master/toad_modules)

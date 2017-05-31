@@ -12,7 +12,6 @@ import iOSLeaveAnimation from './animations/ios.leave';
     md: 'loading.md.scss',
     wp: 'loading.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'loading'
   }

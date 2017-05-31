@@ -136,6 +136,27 @@ export function getElementsByClassName(foundNodes: Node[], node: Node, className
   }
 }
 
+
+export function getElementsName(foundNodes: Node[], node: Node, attrName: string) {
+  if (node) {
+    if (node.hasAttribute(attrName)) {
+      foundNodes.push(node);
+    }
+
+    if (node.children) {
+      for (let i = 0; i < node.children.length; i++) {
+        getElementsName(foundNodes, node.children[i], attrName);
+      }
+    }
+  }
+}
+
+
+export function hasChildNodes(node: Node) {
+  return !!(node && node.childNodes && node.childNodes.length);
+}
+
+
 const COMMON_ATTRS: any = {
   'class': true,
   'id': true

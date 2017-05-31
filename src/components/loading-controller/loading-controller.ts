@@ -4,15 +4,7 @@ import { IonicGlobal, LoadingEvent, LoadingOptions, Loading, IonicControllerApi 
 
 @Component({
   tag: 'ion-loading-controller',
-  styleUrls: {
-    // modes all sharing the same scss on purpose
-    // this allows ion-loading-controller and ion-loading
-    // components to be bundled in the same file/request
-    ios: 'loading-controller.scss',
-    md: 'loading-controller.scss',
-    wp: 'loading-controller.scss'
-  },
-  shadow: false
+  styleUrls: 'loading-controller.scss'
 })
 export class LoadingController implements IonicControllerApi {
   private ids = 0;

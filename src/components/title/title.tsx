@@ -43,7 +43,6 @@ import { createThemedClasses } from '../../util/theme';
     md: 'title.md.scss',
     wp: 'title.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'toolbar-title'
   }

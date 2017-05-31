@@ -22,26 +22,42 @@ export class Node {
   'x-publicId': string;
   'x-systemId': string;
 
-  get classList() {
-    if (!this._classList) {
-      this._classList = new ClassList(this);
-    }
-    return this._classList;
+  get nodeValue() {
+    return this.data;
   }
 
-  get style() {
-    if (!this._style) {
-      this._style = {};
+  get nodeName() {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeName
+    if (adapter.isElementNode(this)) {
+      return this.tagName;
     }
-    return this._style;
+    if (adapter.isTextNode(this)) {
+      return '#text';
+    }
+    if (adapter.isCommentNode(this)) {
+      return '#comment';
+    }
+    return this.name;
+  }
+
+  get nodeType() {
+    return nodeTypes[this.type] || nodeTypes.element;
   }
 
   get tagName() {
-    return this.name;
+    return (this.name && this.name.toUpperCase()) || undefined;
+  }
+
+  set tagName(tagName: string) {
+    this.name = tagName;
   }
 
   get childNodes() {
     return this.children;
+  }
+
+  set childNodes(childNodes: Node[]) {
+    this.children = childNodes;
   }
 
   get parentNode() {
@@ -60,20 +76,19 @@ export class Node {
     return this.next;
   }
 
-  get nodeValue() {
-    return this.data;
-  }
-
-  get nodeType() {
-    return nodeTypes[this.type] || nodeTypes.element;
-  }
-
-  firstChild() {
+  get firstChild() {
     return this.children && this.children[0] || null;
   }
 
-  lastChild() {
+  get lastChild() {
     return this.children && this.children[this.children.length - 1] || null;
+  }
+
+  get classList() {
+    if (!this._classList) {
+      this._classList = new ClassList(this);
+    }
+    return this._classList;
   }
 
   get className() {
@@ -86,6 +101,13 @@ export class Node {
     }
   }
 
+  get style() {
+    if (!this._style) {
+      this._style = {};
+    }
+    return this._style;
+  }
+
   get id() {
     return this.getAttribute('id') || '';
   }
@@ -94,12 +116,90 @@ export class Node {
     this.setAttribute('id', id);
   }
 
+  get src() {
+    return this.getAttribute('src') || '';
+  }
+
+  set src(src: string) {
+    this.setAttribute('src', src);
+  }
+
+  get value() {
+    return this.getAttribute('value') || '';
+  }
+
+  set value(value: string) {
+    this.setAttribute('value', value);
+  }
+
+  get innerHTML() {
+    const text: string[] = [];
+
+    concatHtml(text, this);
+
+    return text.join('');
+  }
+
+  set innerHTML(html: string) {
+    this.textContent = html;
+  }
+
+  get outerHTML() {
+    if (adapter.isElementNode(this)) {
+      let attrs = '';
+
+      Object.keys(this.attribs).map(attrName => {
+        attrs += ` ${attrName}="${this.attribs[attrName]}"`;
+      });
+
+      return `<${this.tagName.toLowerCase()}${attrs}>${this.innerHTML}</${this.tagName.toLowerCase()}>`;
+    }
+    return this.textContent;
+  }
+
+  get textContent() {
+    const text: string[] = [];
+
+    concatText(text, this);
+
+    return text.join('');
+  }
+
+  set textContent(text: string) {
+    if (this.type === 'text' || this.type === 'comment') {
+      this.data = text;
+
+    } else if (this.children) {
+      if (this.children.length === 1 && this.type === 'text') {
+        this.children[0].data = text;
+
+      } else {
+        this.children.forEach(adapter.detachNode);
+
+        adapter.insertText(this, text);
+      }
+    }
+  }
+
+  get wholeText() {
+    return this.textContent;
+  }
+
   get tabIndex() {
     return this.getAttribute('tabindex') || '';
   }
 
   set tabIndex(id: string) {
     this.setAttribute('tabindex', id.trim());
+  }
+
+  get attributes() {
+    return Object.keys(this.attribs).map(nodeName => {
+      return {
+        nodeName: nodeName,
+        nodeValue: this.attribs[nodeName]
+      };
+    });
   }
 
   getAttribute(attrName: string) {
@@ -114,14 +214,41 @@ export class Node {
 
   setAttribute(attrName: string, attrValue: string) {
     if (this.attribs) {
-      if (attrValue === null || attrValue === undefined) {
-        this.removeAttribute(attrName);
+      if (attrValue === null) {
+        attrValue = 'null';
 
-      } else {
-        this.attribs[attrName] = attrValue.toString();
-        this['x-attribsNamespace'][attrName] = null;
-        this['x-attribsPrefix'][attrName] = null;
+      } else if (attrValue === undefined) {
+        attrValue = 'undefined';
       }
+      this.attribs[attrName] = attrValue.toString();
+      this['x-attribsNamespace'][attrName] = null;
+      this['x-attribsPrefix'][attrName] = null;
+    }
+  }
+
+  getAttributeNS(namespaceUri: string, localName: string) {
+    if (this.attribs) {
+      let attrValue = this.attribs[localName];
+      if (attrValue !== undefined && attrValue !== null && this['x-attribsNamespace'][localName] === namespaceUri) {
+        return attrValue.toString();
+      }
+    }
+    return null;
+  }
+
+  setAttributeNS(namespaceUri: string, qualifiedName: string, attrValue: string) {
+    if (this.attribs) {
+      if (attrValue === null) {
+        attrValue = 'null';
+
+      } else if (attrValue === undefined) {
+        attrValue = 'undefined';
+      }
+      var splt = qualifiedName.split(':');
+
+      this.attribs[splt[1]] = attrValue.toString();
+      this['x-attribsNamespace'][splt[1]] = namespaceUri;
+      this['x-attribsPrefix'][splt[1]] = splt[0];
     }
   }
 
@@ -140,6 +267,10 @@ export class Node {
     }
   }
 
+  get namespaceURI() {
+    return this.namespace;
+  }
+
   insertBefore(newNode: Node, referenceNode: Node): void {
     adapter.insertBefore(this, newNode, referenceNode);
   }
@@ -150,30 +281,6 @@ export class Node {
 
   appendChild(childNode: Node): void {
     adapter.appendChild(this, childNode);
-  }
-
-  get textContent() {
-    const text: string[] = [];
-
-    concatText(text, this);
-
-    return text.join('');
-  }
-
-  set textContent(text: string) {
-    if (this.type === 'text') {
-      this.data = text;
-
-    } else if (this.children) {
-      if (this.children.length === 1 && this.type === 'text') {
-        this.children[0].data = text;
-
-      } else {
-        this.children.forEach(adapter.detachNode);
-
-        adapter.insertText(this, text);
-      }
-    }
   }
 
   querySelector(selector: string) {
@@ -220,7 +327,7 @@ export class Node {
 }
 
 function concatText(text: string[], node: Node) {
-  if (node.type === 'text') {
+  if (node.type === 'text' || node.type === 'comment') {
     if (node.data !== undefined && node.data !== null) {
       text.push(node.data);
     }
@@ -228,6 +335,24 @@ function concatText(text: string[], node: Node) {
   } else if (node.children) {
     for (var i = 0; i < node.children.length; i++) {
       concatText(text, node.children[i]);
+    }
+  }
+}
+
+function concatHtml(text: string[], node: Node) {
+  if (node.data !== undefined && node.data !== null) {
+    text.push(node.data);
+  }
+
+  if (node.children) {
+    for (var i = 0; i < node.children.length; i++) {
+      if (node.children[i] && node.children[i].tagName) {
+        text.push(`<${node.children[i].tagName.toLowerCase()}>`);
+      }
+      concatText(text, node.children[i]);
+      if (node.children[i] && node.children[i].tagName) {
+        text.push(`</${node.children[i].tagName.toLowerCase()}>`);
+      }
     }
   }
 }

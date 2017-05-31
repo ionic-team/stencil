@@ -1,5 +1,6 @@
 @import "../../themes/ionic.globals.wp";
 @import "./toolbar";
+@import "./toolbar-button";
 
 
 // Windows Toolbar
@@ -9,11 +10,11 @@
 $toolbar-order-wp: (
   back-button: 0,
   menu-toggle-start: 1,
-  buttons-left: 2,
+  buttons-start: 2,
   content: 3,
-  buttons-start: 4,
-  buttons-end: 5,
-  buttons-right: 6,
+  buttons-mode-start: 4,
+  buttons-mode-end: 5,
+  buttons-end: 6,
   menu-toggle-end: 7,
 );
 
@@ -32,11 +33,9 @@ $toolbar-wp-button-strong-font-weight:   bold !default;
 /// @prop - Height of the navigation bar
 $navbar-wp-height:                       $toolbar-wp-height !default;
 
-$toolbar-button-wp-strong-font-weight:   bold !default;
-
 
 .toolbar-wp {
-  padding: $toolbar-wp-padding;
+  @include padding($toolbar-wp-padding);
 
   min-height: $toolbar-wp-height;
 }
@@ -92,29 +91,29 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .bar-buttons-wp {
-  order: map-get($toolbar-order-wp, buttons-start);
+  order: map-get($toolbar-order-wp, buttons-mode-start);
 
   transform: translateZ(0);
 }
 
-.bar-buttons-wp[left] {
-  order: map-get($toolbar-order-wp, buttons-left);
+.bar-buttons-wp[slot="start"] {
+  order: map-get($toolbar-order-wp, buttons-start);
 }
 
-.bar-buttons-wp[left] .bar-button:first-child {
-  margin-left: 0;
+.bar-buttons-wp[slot="start"] .bar-button:first-child {
+  @include margin-horizontal(0, null);
 }
 
-.bar-buttons-wp[end] {
+.bar-buttons-wp[slot="mode-end"] {
+  @include text-align(end);
+
+  order: map-get($toolbar-order-wp, buttons-mode-end);
+}
+
+.bar-buttons-wp[slot="end"] {
+  @include text-align(right);
+
   order: map-get($toolbar-order-wp, buttons-end);
-
-  text-align: right;
-}
-
-.bar-buttons-wp[right] {
-  order: map-get($toolbar-order-wp, buttons-right);
-
-  text-align: right;
 }
 
 
@@ -122,16 +121,13 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .bar-button-wp {
-  margin-top: 0;
-  margin-right: .2rem;
-  margin-bottom: 0;
-  margin-left: .2rem;
-  padding: 0 5px;
+  @include margin(0, .2rem);
+  @include padding(0, 5px);
+  @include border-radius($toolbar-wp-button-border-radius);
 
   height: 32px;
 
   border: 0;
-  border-radius: $toolbar-wp-button-border-radius;
   font-size: $toolbar-wp-button-font-size;
   font-weight: 500;
   text-transform: uppercase;
@@ -231,8 +227,8 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 // Windows Toolbar Button Icon
 // --------------------------------------------------
 
-.bar-button-wp.bar-button-icon-left ion-icon {
-  padding-right: .3em;
+[icon-start] .bar-button-wp ion-icon {
+  @include padding-horizontal(null, .3em);
 
   font-size: 1.4em;
   line-height: .67;
@@ -240,8 +236,8 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
   pointer-events: none;
 }
 
-.bar-button-wp.bar-button-icon-right ion-icon {
-  padding-left: .4em;
+[icon-end] .bar-button-wp ion-icon {
+  @include padding-horizontal(.4em, null);
 
   font-size: 1.4em;
   line-height: .67;
@@ -249,11 +245,11 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
   pointer-events: none;
 }
 
-.bar-button-wp[icon-only] {
-  padding: 0;
+[icon-only] .bar-button-wp {
+  @include padding(0);
 
   ion-icon {
-    padding: 0 .1em;
+    @include padding(0, .1em);
 
     min-width: 28px;
 
@@ -269,7 +265,7 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .back-button-wp {
-  margin: 0 6px;
+  @include margin(0, 6px);
 
   min-width: 44px;
 
@@ -277,12 +273,12 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 }
 
 .back-button-icon-wp {
-  margin: 0;
-  padding: 0 6px;
+  @include text-align(start);
+  @include margin(0);
+  @include padding(0, 6px);
 
   font-size: 2.4rem;
   font-weight: normal;
-  text-align: left;
 }
 
 
@@ -290,25 +286,25 @@ $toolbar-button-wp-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .bar-button-menutoggle-wp {
-  order: map-get($toolbar-order-wp, menu-toggle-start);
+  @include margin(0, 6px);
+  @include padding(0, 2px);
 
-  margin: 0 6px;
-  padding: 0 2px;
+  order: map-get($toolbar-order-wp, menu-toggle-start);
 
   min-width: 44px;
 
   ion-icon {
-    padding: 0 6px;
+    @include padding(0, 6px);
 
     font-size: 2.4rem;
   }
 }
 
-.bar-button-menutoggle-wp[end],
-.bar-button-menutoggle-wp[right] {
-  order: map-get($toolbar-order-wp, menu-toggle-end);
+.bar-button-menutoggle-wp[slot="mode-end"],
+.bar-button-menutoggle-wp[slot="end"] {
+  @include margin(0, 2px);
 
-  margin: 0 2px;
+  order: map-get($toolbar-order-wp, menu-toggle-end);
 
   min-width: 28px;
 }

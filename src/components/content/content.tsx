@@ -11,8 +11,7 @@ import { Scroll } from '../scroll/scroll-interface';
     ios: 'content.ios.scss',
     md: 'content.md.scss',
     wp: 'content.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Content {
   private mode: string;

@@ -31,10 +31,25 @@
       <ion-header md-height="77px" ios-height="61px">
         <ion-toolbar>
           <ion-title>Header</ion-title>
-          <ion-buttons end>
+          <ion-buttons slot="end">
             <ion-button id="toggleMenu">Menu</ion-button>
             <ion-button id="presentModal">Modal</ion-button>
             <ion-button id="presentLoading">Loading</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+        <ion-toolbar>
+          <ion-title>Buttons</ion-title>
+          <ion-buttons slot="mode-start">
+            <ion-button id="presentLoading">M.Start</ion-button>
+          </ion-buttons>
+          <ion-buttons slot="mode-end">
+            <ion-button id="presentLoading">M.End</ion-button>
+          </ion-buttons>
+          <ion-buttons slot="start">
+            <ion-button id="presentLoading">Start</ion-button>
+          </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button id="presentLoading">End</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>

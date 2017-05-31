@@ -1,5 +1,6 @@
 @import "../../themes/ionic.globals.md";
 @import "./toolbar";
+@import "./toolbar-button";
 
 
 // Material Design Toolbar
@@ -9,11 +10,11 @@
 $toolbar-order-md: (
   back-button: 0,
   menu-toggle-start: 1,
-  buttons-left: 2,
+  buttons-start: 2,
   content: 3,
-  buttons-start: 4,
-  buttons-end: 5,
-  buttons-right: 6,
+  buttons-mode-start: 4,
+  buttons-mode-end: 5,
+  buttons-end: 6,
   menu-toggle-end: 7,
 );
 
@@ -32,11 +33,9 @@ $toolbar-md-button-strong-font-weight:   bold !default;
 /// @prop - Height of the navigation bar
 $navbar-md-height:                       $toolbar-md-height !default;
 
-$toolbar-button-md-strong-font-weight:   bold !default;
-
 
 .toolbar-md {
-  padding: $toolbar-md-padding;
+  @include padding($toolbar-md-padding);
 
   min-height: $toolbar-md-height;
 }
@@ -61,9 +60,9 @@ $toolbar-button-md-strong-font-weight:   bold !default;
   // using datauri png background image for improved scroll performance
   // rather than using `box-shadow: 0 2px 5px rgba(0,0,0,0.26);`
   // noticable performance difference on older Android devices
+  @include position(null, null, -5px, 0);
+
   position: absolute;
-  bottom: -5px;
-  left: 0;
 
   width: 100%;
   height: 5px;
@@ -77,8 +76,7 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 
 .footer-md::before,
 .tabs-md[tabsPlacement="bottom"] > .tabbar::before {
-  top: -2px;
-  bottom: auto;
+  @include position(-2px, null, auto, null);
 
   height: 2px;
 
@@ -143,29 +141,29 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .bar-buttons-md {
-  order: map-get($toolbar-order-md, buttons-start);
+  order: map-get($toolbar-order-md, buttons-mode-start);
 
   transform: translateZ(0);
 }
 
-.bar-buttons-md[left] {
-  order: map-get($toolbar-order-md, buttons-left);
+.bar-buttons-md[slot="start"] {
+  order: map-get($toolbar-order-md, buttons-start);
 }
 
 .bar-button-md:first-child {
-  margin-left: 0;
+  @include margin-horizontal(0, null);
 }
 
-.bar-buttons-md[end] {
+.bar-buttons-md[slot="mode-end"] {
+  @include text-align(end);
+
+  order: map-get($toolbar-order-md, buttons-mode-end);
+}
+
+.bar-buttons-md[slot="end"] {
+  @include text-align(right);
+
   order: map-get($toolbar-order-md, buttons-end);
-
-  text-align: right;
-}
-
-.bar-buttons-md[right] {
-  order: map-get($toolbar-order-md, buttons-right);
-
-  text-align: right;
 }
 
 
@@ -173,16 +171,13 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .bar-button-md {
-  margin-top: 0;
-  margin-right: .2rem;
-  margin-bottom: 0;
-  margin-left: .2rem;
-  padding: 0 5px;
+  @include margin(0, .2rem, 0, .2rem);
+  @include padding(0, 5px);
+  @include border-radius($toolbar-md-button-border-radius);
 
   height: 32px;
 
   border: 0;
-  border-radius: $toolbar-md-button-border-radius;
   font-size: $toolbar-md-button-font-size;
   font-weight: 500;
   text-transform: uppercase;
@@ -288,8 +283,8 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 // Material Design Toolbar Button Icon
 // --------------------------------------------------
 
-.bar-button-md.bar-button-icon-left ion-icon {
-  padding-right: .3em;
+[icon-start] .bar-button-md ion-icon {
+  @include padding-horizontal(null, .3em);
 
   font-size: 1.4em;
   line-height: .67;
@@ -297,8 +292,8 @@ $toolbar-button-md-strong-font-weight:   bold !default;
   pointer-events: none;
 }
 
-.bar-button-md.bar-button-icon-right ion-icon {
-  padding-left: .4em;
+[icon-end] .bar-button-md ion-icon {
+  @include padding-horizontal(.4em, null);
 
   font-size: 1.4em;
   line-height: .67;
@@ -306,12 +301,12 @@ $toolbar-button-md-strong-font-weight:   bold !default;
   pointer-events: none;
 }
 
-.bar-button-md[icon-only] {
-  padding: 0;
+[icon-only] .bar-button-md {
+  @include padding(0);
 }
 
-.bar-button-md[icon-only] ion-icon {
-  padding: 0 .1em;
+[icon-only] .bar-button-md ion-icon {
+  @include padding(0, .1em);
 
   min-width: 28px;
 
@@ -326,7 +321,7 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .back-button-md {
-  margin: 0 6px;
+  @include margin(0, 6px);
 
   min-width: 44px;
 
@@ -334,12 +329,12 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 }
 
 .back-button-icon-md {
-  margin: 0;
-  padding: 0 6px;
+  @include margin(0);
+  @include padding(0, 6px);
+  @include text-align(start);
 
   font-size: 2.4rem;
   font-weight: normal;
-  text-align: left;
 }
 
 
@@ -347,25 +342,25 @@ $toolbar-button-md-strong-font-weight:   bold !default;
 // --------------------------------------------------
 
 .bar-button-menutoggle-md {
-  order: map-get($toolbar-order-md, menu-toggle-start);
+  @include margin(0, 6px);
+  @include padding(0, 2px);
 
-  margin: 0 6px;
-  padding: 0 2px;
+  order: map-get($toolbar-order-md, menu-toggle-start);
 
   min-width: 44px;
 }
 
 .bar-button-menutoggle-md ion-icon {
-  padding: 0 6px;
+  @include padding(0, 6px);
 
   font-size: 2.4rem;
 }
 
-.bar-button-menutoggle-md[end],
-.bar-button-menutoggle-md[right] {
-  order: map-get($toolbar-order-md, menu-toggle-end);
+.bar-button-menutoggle-md[slot="mode-end"],
+.bar-button-menutoggle-md[slot="end"] {
+  @include margin(0, 2px);
 
-  margin: 0 2px;
+  order: map-get($toolbar-order-md, menu-toggle-end);
 
   min-width: 28px;
 }

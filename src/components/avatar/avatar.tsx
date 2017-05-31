@@ -8,7 +8,6 @@ import { Component, h } from '../index';
     md: 'avatar.md.scss',
     wp: 'avatar.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'avatar'
   }

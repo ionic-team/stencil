@@ -7,7 +7,6 @@ import { Component, h } from '../index';
     md: 'list.md.scss',
     wp: 'list.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'list'
   }

@@ -207,7 +207,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
     return components.map(data => {
 
-      const cmpMeta: ComponentMeta = registry[data[0]] = {
+      const cmpMeta: ComponentMeta = {
         tag: data[0],
         modes: {},
         props: [
@@ -234,6 +234,8 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
       // priority
       cmpMeta.priority = data[3];
 
+      setComponentMeta(cmpMeta);
+
       return cmpMeta;
     });
   }
@@ -246,6 +248,10 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
 
   function getComponentMeta(tag: string) {
     return registry[tag.toLowerCase()];
+  }
+
+  function setComponentMeta(cmpMeta: ComponentMeta) {
+    registry[cmpMeta.tag.toLowerCase()] = cmpMeta;
   }
 
   function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K] {
@@ -337,6 +343,7 @@ export function PlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGl
     registerComponents: registerComponents,
     defineComponent: defineComponent,
     getComponentMeta: getComponentMeta,
+    setComponentMeta: setComponentMeta,
     loadBundle: loadBundle,
 
     isElement: isElement,

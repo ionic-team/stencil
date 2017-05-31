@@ -22,6 +22,7 @@ rollup.rollup({
     'node-fetch',
     'parse5',
     'path',
+    'url',
     'vm'
   ]
 

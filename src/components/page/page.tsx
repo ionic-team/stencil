@@ -8,7 +8,6 @@ import { Component, h } from '../index';
     md: 'page.md.scss',
     wp: 'page.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'page'
   }

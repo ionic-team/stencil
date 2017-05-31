@@ -9,8 +9,7 @@ import { createThemedClasses } from '../../util/theme';
     ios: 'spinner.ios.scss',
     md: 'spinner.md.scss',
     wp: 'spinner.wp.scss'
-  },
-  shadow: false
+  }
 })
 export class Spinner {
 

@@ -10,6 +10,8 @@ export interface Ionic {
   dom: DomControllerApi;
   config: ConfigApi;
   Animation?: Animation;
+  isServer: boolean;
+  isClient: boolean;
 }
 
 
@@ -102,8 +104,8 @@ export interface Modal {
   enterAnimation: AnimationBuilder;
   exitAnimation: AnimationBuilder;
   cssClass: string;
-  present: (done?: Function) => void;
-  dismiss: (done?: Function) => void;
+  present: () => Promise<void>;
+  dismiss: () => Promise<void>;
 }
 
 
@@ -134,8 +136,8 @@ export interface Loading {
   enterAnimation: AnimationBuilder;
   exitAnimation: AnimationBuilder;
   cssClass: string;
-  present: (done?: Function) => void;
-  dismiss: (done?: Function) => void;
+  present: () => Promise<void>;
+  dismiss: () => Promise<void>;
 }
 
 
@@ -298,6 +300,30 @@ export interface LoadComponentData {
 export type LoadPriority = number;
 
 
+export interface Bundle {
+  id?: string;
+  components?: BundleComponent[];
+  bundledJsModules?: string;
+  content?: string;
+  fileName?: string;
+  filePath?: string;
+  priority?: number;
+}
+
+
+export interface BundleComponent {
+  component: ManifestComponentMeta;
+  modeName: string;
+  modeMeta: ModeMeta;
+}
+
+
+export interface ManifestComponentMeta extends ComponentMeta {
+  componentClass: string;
+  componentUrl: string;
+}
+
+
 export interface ComponentModeData {
   /**
    * tag name (ion-badge)
@@ -398,7 +424,7 @@ export interface ComponentDecorator {
 
 export interface ComponentOptions {
   tag: string;
-  styleUrls?: string[] | ModeStyles;
+  styleUrls?: string | string[] | ModeStyles;
   shadow?: boolean;
   host?: HostMeta;
 }
@@ -651,6 +677,7 @@ export interface PlatformApi {
   registerComponents: (components?: LoadComponentData[]) => ComponentMeta[];
   defineComponent: (tag: string, constructor: Function) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
+  setComponentMeta: (cmpMeta: ComponentMeta) => void;
   loadBundle: (bundleId: string, priority: LoadPriority, cb: Function) => void;
   queue: QueueApi;
   css?: {[cmpModeId: string]: string};
@@ -739,7 +766,7 @@ export interface Animation {
   fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
   hasCompleted: boolean;
   isPlaying: boolean;
-  onFinish: (callback: Function, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}) => Animation;
+  onFinish: (callback: (animation: Animation) => void, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}) => Animation;
   play: (opts?: PlayOptions) => void;
   syncPlay: () => void;
   progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;

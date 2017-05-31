@@ -19,11 +19,10 @@ $toolbar-ios-title-text-color:              color-contrast($colors-ios, $toolbar
 
 
 .toolbar-ios ion-title {
-  position: absolute;
-  top: 0;
-  left: 0;
+  @include position(0, null, null, 0);
+  @include padding(0, 90px, 1px);
 
-  padding: 0 90px 1px;
+  position: absolute;
 
   width: 100%;
   height: 100%;
@@ -33,16 +32,15 @@ $toolbar-ios-title-text-color:              color-contrast($colors-ios, $toolbar
   pointer-events: none;
 }
 
-
 .toolbar-title-ios {
+  @include text-align($toolbar-ios-title-text-align);
+
   font-size: $toolbar-ios-title-font-size;
   font-weight: $toolbar-ios-title-font-weight;
-  text-align: $toolbar-ios-title-text-align;
   color: $toolbar-ios-title-text-color;
 
   pointer-events: auto;
 }
-
 
 @each $color-name, $color-base, $color-contrast in get-colors($colors-ios) {
 

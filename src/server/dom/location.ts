@@ -1,4 +1,4 @@
-import { noop } from '../../util/helpers';
+import * as nodeUrl from 'url';
 
 
 export class Location {
@@ -10,13 +10,52 @@ export class Location {
   pathname: string;
   port: string;
   protocol: string;
-  reload = noop;
-  replace = noop;
   search: string;
 
-  constructor(url: string) {
-    // TODO
-    this.href = url;
+  constructor(urlStr: string) {
+    const parsedUrl = nodeUrl.parse(urlStr || '');
+
+    this.hash = parsedUrl.hash;
+    this.host = parsedUrl.host;
+    this.hostname = parsedUrl.hostname;
+    this.href = parsedUrl.href;
+    this.origin = `${parsedUrl.protocol}//${parsedUrl.host}`;
+    this.pathname = parsedUrl.pathname;
+    this.port = parsedUrl.port;
+    this.protocol = parsedUrl.protocol;
+    this.search = parsedUrl.search;
   }
 
+  // noops
+  reload() {}
+  replace() {}
+
 }
+
+/**
+https://nodejs.org/api/url.html
+
+A comparison between this API and url.parse() is given below. Above the URL
+'http://user:pass@sub.host.com:8080/p/a/t/h?query=string#hash', properties
+of an object returned by url.parse() are shown. Below it are properties of a
+WHATWG URL object.
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                            href                                             │
+├──────────┬──┬─────────────────────┬─────────────────────┬───────────────────────────┬───────┤
+│ protocol │  │        auth         │        host         │           path            │ hash  │
+│          │  │                     ├──────────────┬──────┼──────────┬────────────────┤       │
+│          │  │                     │   hostname   │ port │ pathname │     search     │       │
+│          │  │                     │              │      │          ├─┬──────────────┤       │
+│          │  │                     │              │      │          │ │    query     │       │
+"  http:    //    user   :   pass   @ sub.host.com : 8080   /p/a/t/h  ?  query=string   #hash "
+│          │  │          │          │   hostname   │ port │          │                │       │
+│          │  │          │          ├──────────────┴──────┤          │                │       │
+│ protocol │  │ username │ password │        host         │          │                │       │
+├──────────┴──┼──────────┴──────────┼─────────────────────┤          │                │       │
+│   origin    │                     │       origin        │ pathname │     search     │ hash  │
+├─────────────┴─────────────────────┴─────────────────────┴──────────┴────────────────┴───────┤
+│                                            href                                             │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+
+**/

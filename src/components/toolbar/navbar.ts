@@ -16,18 +16,18 @@ import { Component, Ionic, Prop } from '../index';
  * <ion-header>
  *
  *   <ion-navbar>
- *     <button ion-button icon-only menuToggle>
+ *     <ion-button icon-only menuToggle>
  *       <ion-icon name="menu"></ion-icon>
- *     </button>
+ *     </ion-button>
  *
  *     <ion-title>
  *       Page Title
  *     </ion-title>
  *
  *     <ion-buttons end>
- *       <button ion-button icon-only (click)="openModal()">
+ *       <ion-button icon-only (click)="openModal()">
  *         <ion-icon name="options"></ion-icon>
- *       </button>
+ *       </ion-button>
  *     </ion-buttons>
  *   </ion-navbar>
  *

@@ -21,7 +21,7 @@ export class Window {
 
 
   constructor(url: string, referrer: string, userAgent: string, cookie: string) {
-    this.console = new Console();
+    this.console = new Console(true);
     this.location = new Location(url);
     this.navigator = new Navigator(userAgent);
     this.performance = new Performance();
@@ -79,16 +79,39 @@ export class Window {
     });
   }
 
+
+  // noops
+  addEventListener() {}
+  alert() {}
+  atob() {}
+  blur() {}
+  btoa() {}
   cancelAnimationFrame() {}
   cancelIdleCallback() {}
-  alert() {}
+  captureEvents() {}
+  close() {}
   confirm() {}
-  prompt() {}
-  print() {}
-  postMessage() {}
-  addEventListener() {}
-  removeEventListener() {}
+  createImageBitmap() {}
   dispatchEvent() {}
+  find() {}
   focus() {}
-  blur() {}
+  getComputedStyle() {}
+  getMatchedCSSRules() {}
+  getSelection() {}
+  matchMedia() {}
+  moveTo() {}
+  moveBy() {}
+  open() {}
+  postMessage() {}
+  print() {}
+  prompt() {}
+  releaseEvents() {}
+  removeEventListener() {}
+  resizeBy() {}
+  resizeTo() {}
+  scroll() {}
+  scrollBy() {}
+  scrollTo() {}
+  stop() {}
+
 }

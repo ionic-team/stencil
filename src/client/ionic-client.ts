@@ -20,6 +20,9 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocu
   // properties that can stay hidden from public use
   const controllers: any = IonicGbl.controllers = {};
 
+  (<Ionic>IonicGbl).isClient = true;
+  (<Ionic>IonicGbl).isServer = false;
+
   // properties to be exposed to public
   // in actuality it's the exact same object
   IonicGbl.config = IonicGbl.ConfigCtrl;

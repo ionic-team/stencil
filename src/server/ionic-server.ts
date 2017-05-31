@@ -1,4 +1,6 @@
-import { ConfigApi, DomControllerApi, Ionic } from '../util/interfaces';
+import { ConfigApi, DomControllerApi, Ionic, IonicGlobal, PlatformConfig } from '../util/interfaces';
+import { ConfigController } from '../util/config-controller';
+import { QueueServer } from './queue-server';
 import { noop } from '../util/helpers';
 import { themeVNodeData } from '../renderer/host';
 
@@ -6,6 +8,8 @@ import { themeVNodeData } from '../renderer/host';
 export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
 
   const injectedIonic: Ionic = {
+    isServer: true,
+    isClient: false,
     theme: themeVNodeData,
     emit: noop,
     listener: {
@@ -14,16 +18,45 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     },
     config: ConfigCtrl,
     dom: DomCtrl,
-    controller: (ctrlName: string, opts?: any) => {
-      throw `TODO: initInjectedIonic ${ctrlName} ${opts}`;
-    }
+    controller: serverController
   };
+
+  function serverController(ctrlName: string, opts?: any) {
+    const promise: any = new Promise((resolve, reject) => {
+      const msg = `"${ctrlName}" is not available on the server`;
+      console.trace(msg);
+
+      reject(msg);
+
+      resolve; opts; // for no TS errors
+    });
+    return promise;
+  }
 
   Object.defineProperty(injectedIonic, 'Animation', {
     get: function() {
-      throw `Ionic.Animation is not available on the server`;
+      console.error(`Ionic.Animation is not available on the server`);
+      return {};
     }
   });
 
   return injectedIonic;
 }
+
+
+export function initIonicGlobal(configObj: any, platforms: PlatformConfig[], staticDir: string) {
+  const IonicGbl: IonicGlobal = {
+    ConfigCtrl: ConfigController(configObj, platforms),
+    DomCtrl: {
+      read: function(cb: Function) { process.nextTick(() => { cb(Date.now()); }); },
+      write: function(cb: Function) { process.nextTick(() => { cb(Date.now()); }); },
+      raf: function(cb: Function) { process.nextTick(() => { cb(Date.now()); }); },
+    },
+    QueueCtrl: QueueServer(),
+    staticDir: staticDir,
+    controllers: {}
+  };
+
+  return IonicGbl;
+}
+

@@ -2,18 +2,13 @@ import { Component, Prop, h } from '../index';
 
 @Component({
   tag: 'comments-list',
-  styleUrls: {
-    default: 'main.scss',
-  },
-  shadow: false
+  styleUrls: 'main.scss'
 })
 export class CommentsList {
 
   @Prop() type: any;
 
   render() {
-    console.log('type', this.type);
-
     const items = this.type.map((comment: any) => {
       return h('ion-item',
         h('ion-label',

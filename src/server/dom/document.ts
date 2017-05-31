@@ -1,7 +1,8 @@
 import { adapter, createElement, appendChild, insertText } from './adapter';
 import { Location } from './location';
 import { Node } from './node';
-import { getAllSelectors, getElementById, getElementsByClassName, getElementsByTagName, querySelector, querySelectorAll, createSelectors } from './selectors';
+import { createSelectors, getAllSelectors, getElementById, getElementsByClassName,
+  getElementsName, getElementsByTagName, hasChildNodes, querySelector, querySelectorAll } from './selectors';
 import * as parse5 from 'parse5';
 
 
@@ -123,6 +124,20 @@ export class Document {
     return node;
   }
 
+  createDocumentFragment() {
+    const node: any = adapter.createDocumentFragment();
+    return node;
+  }
+
+  createCDATASection(data: string) {
+    const node: any = adapter.createCommentNode(data);
+    return node;
+  }
+
+  cloneNode() {
+    return Object.assign({}, this.$ast);
+  }
+
   getElementById(id: string) {
     return getElementById(this.$ast, id);
   }
@@ -137,11 +152,31 @@ export class Document {
     return foundNodes;
   }
 
+  getElementsByTagNameNS(tagName: string) {
+    const foundNodes: Node[] = [];
+
+    if (typeof tagName === 'string') {
+      getElementsByTagName(foundNodes, this.$ast, tagName.trim().toLowerCase());
+    }
+
+    return foundNodes;
+  }
+
   getElementsByClassName(className: string) {
     const foundNodes: Node[] = [];
 
     if (typeof className === 'string') {
       getElementsByClassName(foundNodes, this.$ast, className.trim());
+    }
+
+    return foundNodes;
+  }
+
+  getElementsName(attrName: string) {
+    const foundNodes: Node[] = [];
+
+    if (typeof attrName === 'string') {
+      getElementsName(foundNodes, this.$ast, attrName.trim());
     }
 
     return foundNodes;
@@ -166,10 +201,39 @@ export class Document {
     return foundNodes;
   }
 
+  hasChildNodes() {
+    return hasChildNodes(this.$ast);
+  }
+
+
+  // noops
   addEventListener() {}
-  removeEventListener() {}
-  dispatchEvent() {}
-  focus() {}
   blur() {}
+  captureEvents() {}
+  caretRangeFromPoint() {}
+  createExpression() {}
+  createNSResolver() {}
+  close() {}
+  compareDocumentPosition() {}
+  createProcessingInstruction() {}
+  dispatchEvent() {}
+  elementFromPoint() {}
+  elementsFromPoint() {}
+  evaluate() {}
+  execCommand() {}
+  exitPointerLock() {}
+  focus() {}
+  getSelection() {}
+  hasFocus() {}
+  open() {}
+  queryCommandEnabled() {}
+  queryCommandIndeterm() {}
+  queryCommandState() {}
+  queryCommandSupported() {}
+  queryCommandValue() {}
+  releaseEvents() {}
+  removeEventListener() {}
+  write() {}
+  writeln() {}
 
 }

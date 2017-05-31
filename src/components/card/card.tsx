@@ -7,7 +7,6 @@ import { Component, h } from '../index';
     md: 'card.md.scss',
     wp: 'card.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'card'
   }

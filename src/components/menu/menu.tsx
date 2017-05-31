@@ -13,8 +13,7 @@ import { MenuType } from './menu-types';
   },
   host: {
     theme: 'menu'
-  },
-  shadow: false
+  }
 })
 export class Menu implements IMenu {
   private $el: HTMLElement;

@@ -7,7 +7,6 @@ import { Component, h } from '../index';
     md: 'badge.md.scss',
     wp: 'badge.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'badge'
   }

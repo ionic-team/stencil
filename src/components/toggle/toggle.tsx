@@ -9,7 +9,6 @@ import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
     md: 'toggle.md.scss',
     wp: 'toggle.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'toggle'
   }

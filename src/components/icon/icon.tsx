@@ -8,7 +8,6 @@ import { CssClassObject } from '../../util/interfaces';
     md: 'icon.md.scss',
     wp: 'icon.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'icon'
   }

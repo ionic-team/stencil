@@ -1,13 +1,9 @@
-import { Component, Prop, h } from '../index';
+import { Component, h, Prop, Ionic } from '../index';
 
-declare var Ionic: any;
 
 @Component({
   tag: 'news-list',
-  styleUrls: {
-    default: 'main.scss',
-  },
-  shadow: false
+  styleUrls: 'main.scss'
 })
 export class NewsList {
 
@@ -15,10 +11,12 @@ export class NewsList {
   apiRootUrl: string = 'http://localhost:8100';
 
   comments(story: any) {
-    Ionic.controller('loading', { content: 'fetching comments...' }).then((loading: any) => {
+    if (Ionic.isServer) return;
+
+    Ionic.controller('loading', { content: 'fetching comments...' }).then(loading => {
       loading.present();
 
-      fetch(`${this.apiRootUrl}/item/${story.id}`).then((response: any) => {
+      fetch(`${this.apiRootUrl}/item/${story.id}`).then(response => {
         return response.json();
       }).then((data: any) => {
         console.log(data);
@@ -26,7 +24,7 @@ export class NewsList {
 
         setTimeout(() => {
           loading.dismiss().then(() => {
-            Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then((modal: any) => {
+            Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then(modal => {
               console.log('modal created');
 
               modal.present().then(() => {
@@ -48,7 +46,7 @@ export class NewsList {
           h('div.points', { props: { slot: 'start' } }, story.points || 0),
           h('ion-label.item-content',
             [
-              h('h2', { on: { click: () => window.open(story.url) } }, story.title),
+              h('h2.list-header', { on: { click: () => window.open(story.url) } }, story.title),
               h('h3.comments-text', { on: { click: () => this.comments(story) } }, `Posted by ${story.user} ${story.time_ago} | ${story.comments_count} comments`),
             ]
           )

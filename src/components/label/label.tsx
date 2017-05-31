@@ -7,7 +7,6 @@ import { Component, h } from '../index';
     md: 'label.md.scss',
     wp: 'label.wp.scss'
   },
-  shadow: false,
   host: {
     theme: 'label'
   }

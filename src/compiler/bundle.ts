@@ -3,7 +3,7 @@ import { Bundle, BundleComponent, BundlerConfig, BuildContext, ComponentMeta, Ma
   ManifestBundle, Results } from './interfaces';
 import { formatComponentModeLoader, formatBundleFileName,
   formatBundleContent, formatRegistry, formatPriority, generateBundleId,
-  getBundledModulesId } from './formatters';
+  getBundledModulesId } from '../util/data-serialize';
 import { createFileMeta, readFile, writeFile, writeFiles } from './util';
 import { ATTR_LOWER_CASE, ATTR_DASH_CASE } from '../util/constants';
 import { getManifest } from './manifest';
@@ -111,7 +111,7 @@ function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBu
       const bundleComponent: BundleComponent = {
         component: component,
         modeName: modeName,
-        modeMeta: component.modes[modeName]
+        modeMeta: component.modes[modeName] || component.modes['default']
       };
 
       if (bundleComponent.modeMeta) {

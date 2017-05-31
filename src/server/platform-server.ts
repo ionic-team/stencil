@@ -97,7 +97,7 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
 
           } else {
             // run the code in this sandboxed context
-            vm.runInContext(code, context);
+            vm.runInContext(code, context, { timeout: 5000 });
           }
 
           delete activeFileReads[filePath];
@@ -142,7 +142,7 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
 
     return components.map(data => {
 
-      const cmpMeta: ComponentMeta = registry[data[0]] = {
+      const cmpMeta: ComponentMeta = {
         tag: data[0],
         modes: {},
         props: [
@@ -169,6 +169,8 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
       // priority
       cmpMeta.priority = data[3];
 
+      setComponentMeta(cmpMeta);
+
       return cmpMeta;
     });
   }
@@ -179,6 +181,10 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
 
   function getComponentMeta(tag: string) {
     return registry[tag.toLowerCase()];
+  }
+
+  function setComponentMeta(cmpMeta: ComponentMeta) {
+    registry[cmpMeta.tag.toLowerCase()] = cmpMeta;
   }
 
   function createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K] {
@@ -270,6 +276,7 @@ export function PlatformServer(registry: ComponentRegistry, win: Window, IonicGb
     registerComponents: registerComponents,
     defineComponent: defineComponent,
     getComponentMeta: getComponentMeta,
+    setComponentMeta: setComponentMeta,
     loadBundle: loadBundle,
 
     isElement: isElement,

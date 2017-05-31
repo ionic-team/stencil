@@ -66,6 +66,11 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
         cmpMeta.namedSlots = ['start', 'end'];
       }
 
+      if (cmpMeta.tag === 'ion-toolbar') {
+        // TODO!!
+        cmpMeta.namedSlots = ['start', 'end', 'mode-start', 'mode-end'];
+      }
+
       // collect up references to each of the host elements direct children
       elm.$hostContent = collectedHostContentNodes(elm, cmpMeta.namedSlots);
     }

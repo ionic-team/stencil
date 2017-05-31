@@ -14,10 +14,7 @@ import { Component, h } from '../index';
   */
 @Component({
   tag: 'ion-slide',
-  styleUrls: {
-    default: 'slide.scss',
-  },
-  shadow: false
+  styleUrls: 'slide.scss'
 })
 export class Slide {
   hostAttributes() {
