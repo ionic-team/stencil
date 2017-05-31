@@ -17,7 +17,7 @@ import { Component, h } from '../index';
   styleUrls: 'slide.scss'
 })
 export class Slide {
-  hostAttributes() {
+  hostData() {
     return {
       class: {
         'slide-zoom': true,

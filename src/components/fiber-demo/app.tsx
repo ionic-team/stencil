@@ -17,7 +17,7 @@ export class FiberDemo {
     this.seconds = (this.seconds % 10) + 1;
   }
 
-  hostAttributes() {
+  hostData() {
     const elapsed = this.elapsed;
     const t = (elapsed / 1000) % 10;
     const scale = 1 + (t > 5 ? 10 - t : t) / 10;

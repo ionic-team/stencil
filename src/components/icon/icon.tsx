@@ -100,7 +100,7 @@ export class Icon {
     return `ion-${iconName}`;
   }
 
-  hostAttributes() {
+  hostData() {
     // TODO set the right iconMode based on the config
     let iconMode = this.mode === 'md' ? 'md' : 'ios';
     this.iconMode = iconMode || Ionic.config.get('iconMode');

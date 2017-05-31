@@ -31,7 +31,7 @@ export class Spinner {
     }
   }
 
-  hostAttributes() {
+  hostData() {
     const spinnerThemedClasses = createThemedClasses(this.mode, this.color, `spinner spinner-${this.name}`);
     spinnerThemedClasses['spinner-paused'] = true;
 

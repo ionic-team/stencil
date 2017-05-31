@@ -76,7 +76,7 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     }
   }
 
-  let vnodeAttributes: VNodeData = instance.hostAttributes && instance.hostAttributes();
+  let vnodeAttributes: VNodeData = instance.hostData && instance.hostData();
   vnodeAttributes = Object.keys(cmpMeta.host).reduce((hostData, key: string) => {
     switch (key) {
     case 'theme':

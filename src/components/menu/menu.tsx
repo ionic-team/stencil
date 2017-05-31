@@ -139,7 +139,7 @@ export class Menu implements IMenu {
     this.enable(isEnabled);
   }
 
-  hostAttributes() {
+  hostData() {
     return {
       attrs: {
         'role': 'navigation',

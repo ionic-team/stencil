@@ -133,7 +133,7 @@ export class Toggle implements BooleanInputComponent {
     }
   }
 
-  hostAttributes() {
+  hostData() {
     return {
       class: {
         'toggle-activated': this.activated,

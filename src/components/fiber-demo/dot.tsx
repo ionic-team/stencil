@@ -21,7 +21,7 @@ export class FiberDot {
     this.hover = false;
   }
 
-  hostAttributes() {
+  hostData() {
     const s = this.size * 1.3;
     const style = {
       position: 'absolute',

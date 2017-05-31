@@ -120,7 +120,7 @@ export class Toolbar {
     }
   }
 
-  hostAttributes() {
+  hostData() {
     return {
       class: {
         'statusbar-padding': this.sbPadding
