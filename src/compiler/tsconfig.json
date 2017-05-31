@@ -27,6 +27,8 @@
     ]
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "../../types/jsx.d.ts",
+    "../../types/snabbdom-jsx.d.ts"
   ]
 }

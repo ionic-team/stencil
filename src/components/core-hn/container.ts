@@ -160,7 +160,7 @@ export class NewsContainer {
 
     console.log(this.firstSelectedClass);
 
-    return h(this,
+    return h('div',
       [
         h('ion-header', { props: { mdHeight: '56px', iosHeight: '61px' } },
           [

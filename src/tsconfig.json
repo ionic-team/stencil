@@ -24,10 +24,14 @@
     "sourceMap": false,
     "types": [
       "jest", "node"
-    ]
+    ],
+    "jsx": "react",
+    "jsxFactory": "h"
   },
   "include": [
-    "**/*.ts"
+    "**/*.ts",
+    "**/*.tsx",
+    "../types/jsx.d.ts"
   ],
   "exclude": [
     "bindings",
