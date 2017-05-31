@@ -54,10 +54,11 @@ export class NewsList {
       );
     });
 
-    return h(this,
-      [
-        h('ion-list', items)
-      ]
+    return (
+      <ion-list>
+        {items}
+      </ion-list>
     );
+
   }
 }
