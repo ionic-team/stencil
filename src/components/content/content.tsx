@@ -1,5 +1,7 @@
 import { Component, h, Ionic, Prop } from '../index';
 import { ScrollDetail } from '../../util/interfaces';
+import { getParentElement } from '../../util/helpers';
+import { createThemedClasses } from '../../util/theme';
 import { Scroll } from '../scroll/scroll-interface';
 
 
@@ -14,6 +16,7 @@ import { Scroll } from '../scroll/scroll-interface';
 })
 export class Content {
   private mode: string;
+  private color: string;
   $el: HTMLElement;
   $scroll: Scroll;
   $scrollDetail: ScrollDetail = {};
@@ -610,7 +613,6 @@ export class Content {
     };
   }
 
-
   render() {
     const contentClass: any = {};
     const scrollStyle: any = {};
@@ -643,20 +645,17 @@ export class Content {
     if (this.ionScrollEnd) {
       props['ionScrollEnd'] = this.ionScrollEnd.bind(this);
     }
+    const themedClasses = createThemedClasses(this.mode, this.color, 'content');
+    themedClasses['statusbar-padding'] = this.statusbarPadding;
 
-    return h(this, { class: contentClass },
-      h('ion-scroll', Ionic.theme(this, 'content', {
-          class: {
-            'statusbar-padding': this.statusbarPadding,
-          },
-          props: props,
-          style: scrollStyle
-        }),
-        h('slot')
-      )
+    return (
+      <div class={contentClass}>
+        <ion-scroll style={scrollStyle} props={props} class={{themedClasses}}>
+          <slot></slot>
+        </ion-scroll>
+      </div>
     );
   }
-
 }
 
 function parsePxUnit(val: string): number {

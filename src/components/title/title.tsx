@@ -1,5 +1,5 @@
-import { Component, h, Ionic } from '../index';
-
+import { Component, Prop, h } from '../index';
+import { createThemedClasses } from '../../util/theme';
 
 /**
  * @name Title
@@ -43,14 +43,14 @@ import { Component, h, Ionic } from '../index';
     md: 'title.md.scss',
     wp: 'title.wp.scss'
   },
-  shadow: false
+  shadow: false,
+  host: {
+    theme: 'toolbar-title'
+  }
 })
 export class ToolbarTitle {
+
   render() {
-    return (
-      <div {...Ionic.theme(this, 'toolbar-title')}>
-        <slot></slot>
-      </div>
-    );
+    return <slot></slot>;
   }
 }

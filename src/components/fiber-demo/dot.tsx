@@ -22,9 +22,9 @@ export class FiberDot {
     this.hover = false;
   }
 
-  render() {
-    var s = this.size * 1.3;
-    var style = {
+  hostAttributes() {
+    const s = this.size * 1.3;
+    const style = {
       position: 'absolute',
       font: 'normal 15px sans-serif',
       textAlign: 'center',
@@ -38,13 +38,17 @@ export class FiberDot {
       background: this.hover ? '#ff0' : '#61dafb'
     };
 
-    return h(this, {
-        style: style,
-        on: {
-          mouseenter: this.enter.bind(this),
-          mouseleave: this.leave.bind(this)
-        },
+    return {
+      style: style,
+      on: {
+        mouseenter: this.enter.bind(this),
+        mouseleave: this.leave.bind(this)
       },
+    };
+  }
+
+  render() {
+    return (
       this.hover ? '*' + this.text + '*' : this.text
     );
   }

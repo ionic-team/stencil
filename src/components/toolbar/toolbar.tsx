@@ -1,4 +1,5 @@
 import { Component, h, Ionic } from '../index';
+import { createThemedClasses } from '../../util/theme';
 
 
 /**
@@ -98,12 +99,15 @@ import { Component, h, Ionic } from '../index';
   },
   shadow: false,
   host: {
-    class: 'toolbar'
+    theme: 'toolbar'
   }
 })
 export class Toolbar {
   $el: HTMLElement;
   private sbPadding: boolean;
+
+  mode: string;
+  color: string;
 
   constructor() {
     this.sbPadding = Ionic.config.getBoolean('statusbarPadding');
@@ -126,15 +130,21 @@ export class Toolbar {
     // });
   }
 
+  hostAttributes() {
+    return {
+      class: {
+        'statusbar-padding': this.sbPadding
+      }
+    };
+  }
+
   render() {
-    if (this.sbPadding) {
-      this.$el.classList.add('statusbar-padding');
-    } else {
-      this.$el.classList.remove('statusbar-padding');
-    }
+    const backgroundClasses = createThemedClasses(this.mode, this.color, 'toolbar-background');
+    const contentClasses = createThemedClasses(this.mode, this.color, 'toolbar-content');
+
     return [
-      <div {...Ionic.theme(this, 'toolbar-background')}></div>,
-      <div {...Ionic.theme(this, 'toolbar-content')}>
+      <div class={{backgroundClasses}}></div>,
+      <div class={{contentClasses}}>
         <slot></slot>
       </div>
     ];

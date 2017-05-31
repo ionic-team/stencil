@@ -1,6 +1,5 @@
 import { Component, h, Ionic, Prop } from '../index';
-type CssClassObject = { [className: string]: boolean };
-
+import { CssClassObject } from '../../util/interfaces';
 
 @Component({
   tag: 'ion-icon',
@@ -11,11 +10,13 @@ type CssClassObject = { [className: string]: boolean };
   },
   shadow: false,
   host: {
-    class: 'icon'
+    theme: 'icon'
   }
 })
 export class Icon {
   mode: string;
+
+  @Prop() color: string;
 
   /**
    * @input {string} Specifies the label to use for accessibility. Defaults to the icon name.
@@ -55,8 +56,7 @@ export class Icon {
    */
   @Prop() hidden: boolean = false;
 
-
-  getElementClassList() {
+  getElementClass(): string {
     let iconName: string;
 
     // If no name was passed set iconName to null
@@ -80,7 +80,7 @@ export class Icon {
 
     if ((iconName === null) || (this.hidden === true)) {
       console.warn('Icon is hidden.');
-      return ['hide'];
+      return 'hide';
     }
 
     let iconMode = iconName.split('-', 2)[0];
@@ -101,27 +101,29 @@ export class Icon {
     return `ion-${iconName}`;
   }
 
-  render() {
+  hostAttributes() {
     // TODO set the right iconMode based on the config
     let iconMode = this.mode === 'md' ? 'md' : 'ios';
     this.iconMode = iconMode || Ionic.config.get('iconMode');
 
     const iconClasses: CssClassObject = []
-       .concat(
-        this.getElementClassList(),
-       )
+      .concat(
+        this.getElementClass(),
+      )
       .reduce((prevValue, cssClass) => {
         prevValue[cssClass] = true;
         return prevValue;
        }, {});
 
-    return h(this, Ionic.theme(this, 'icon', {
+    return {
+      class: iconClasses,
       attrs: {
-        role: 'img',
-        'aria-label': this.label
-      },
-      class: iconClasses
-    }), h('slot'));
+        'role': 'img'
+      }
+    };
   }
 
+  render() {
+    return <slot></slot>;
+  }
 }

@@ -10,7 +10,7 @@ import { Component, h } from '../index';
   },
   shadow: false,
   host: {
-    class: 'thumbnail'
+    theme: 'thumbnail'
   }
 })
 export class Thumbnail {

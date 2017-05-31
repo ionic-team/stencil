@@ -12,9 +12,7 @@ import { MenuType } from './menu-types';
     wp: 'menu.wp.scss'
   },
   host: {
-    attrs: {
-      'role': 'navigation'
-    }
+    theme: 'menu'
   },
   shadow: false
 })
@@ -30,6 +28,9 @@ export class Menu implements IMenu {
   private _type: MenuType;
   private _init = false;
   private _isPane = false;
+
+  mode: string;
+  color: string;
 
   /**
    * @hidden
@@ -139,41 +140,44 @@ export class Menu implements IMenu {
     this.enable(isEnabled);
   }
 
+  hostAttributes() {
+    return {
+      attrs: {
+        'role': 'navigation',
+        'side': this.side,
+        'type': this.type
+      },
+      class: {
+        'menu-enabled': this.enabled
+      }
+    };
+  }
+
   render() {
     // normalize the "type"
     if (!this.type) {
       this.type = Ionic.config.get('menuType', 'overlay');
     }
 
-    const hostAttrs = {
-      'role': 'navigation',
-      'side': this.side,
-      'type': this.type
-    };
-
-    const hostClass = {
-      'menu-enabled': this.enabled
-    };
-
-    return h(this, Ionic.theme(this, 'menu', { attrs: hostAttrs, class: hostClass }), [
-      h('div.menu-inner', h('slot')),
-      h('ion-gesture.menu-backdrop', {
-        props: {
-          // 'canStart': this.canStart.bind(this),
-          // 'onStart': this.onDragStart.bind(this),
-          // 'onMove': this.onDragMove.bind(this),
-          // 'onEnd': this.onDragEnd.bind(this),
-          'gestureName': 'menu-swipe',
-          'gesturePriority': 10,
-          'type': 'pan',
-          'direction': 'x',
-          'threshold': 5,
-          'attachTo': 'body',
-          'disableScroll': true,
-          'block': this._activeBlock
-        }
-      })
-    ]);
+    return [
+      <div class='menu-inner'>
+        <slot></slot>
+      </div>,
+      <ion-gesture class='menu-backdrop' props={{
+        // 'canStart': this.canStart.bind(this),
+        // 'onStart': this.onDragStart.bind(this),
+        // 'onMove': this.onDragMove.bind(this),
+        // 'onEnd': this.onDragEnd.bind(this),
+        'gestureName': 'menu-swipe',
+        'gesturePriority': 10,
+        'type': 'pan',
+        'direction': 'x',
+        'threshold': 5,
+        'attachTo': 'body',
+        'disableScroll': true,
+        'block': this._activeBlock
+      }}></ion-gesture>
+    ];
   }
 
   /**

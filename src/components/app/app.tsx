@@ -10,7 +10,7 @@ import { Component, h } from '../index';
   },
   shadow: false,
   host: {
-    class: 'app'
+    theme: 'app'
   }
 })
 export class App {

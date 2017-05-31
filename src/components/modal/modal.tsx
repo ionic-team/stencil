@@ -1,5 +1,6 @@
 import { Component, h, Ionic, Listen, Prop } from '../index';
 import { AnimationBuilder, Animation, Modal as IModal, ModalEvent } from '../../util/interfaces';
+import { createThemedClasses } from '../../util/theme';
 
 import iOSEnterAnimation from './animations/ios.enter';
 import iOSLeaveAnimation from './animations/ios.leave';
@@ -18,6 +19,8 @@ export class Modal implements IModal {
   $el: HTMLElement;
   animation: Animation;
 
+  @Prop() mode: string;
+  @Prop() color: string;
   @Prop() component: string;
   @Prop() componentProps: any = {};
   @Prop() cssClass: string;
@@ -120,18 +123,31 @@ export class Modal implements IModal {
 
   render() {
     const ThisComponent = this.component;
-    let userCssClass = 'modal-content';
+
+    let userCssClasses = 'modal-content';
     if (this.cssClass) {
-      userCssClass += ' ' + this.cssClass;
+      userCssClasses += ` ${this.cssClass}`;
     }
 
+    const dialogClasses = createThemedClasses(this.mode, this.color, 'modal-wrapper');
+    const thisComponentClasses = createThemedClasses(this.mode, this.color, userCssClasses);
+
     return [
-      <div on-click={this.backdropClick.bind(this)} class={{
-        'modal-backdrop': true,
-        'hide-backdrop': !this.showBackdrop
-      }}></div>,
-      <div {...Ionic.theme(this, 'modal-wrapper', { attrs: { role: 'dialog' } })}>
-        <ThisComponent {...Ionic.theme(this, userCssClass, { props: this.componentProps})}>
+      <div
+        on-click={this.backdropClick.bind(this)}
+        class={{
+          'modal-backdrop': true,
+          'hide-backdrop': !this.showBackdrop
+        }}
+      ></div>,
+      <div
+        role='dialog'
+        class={{dialogClasses}}
+      >
+        <ThisComponent
+          props={this.componentProps}
+          class={{thisComponentClasses}}
+        >
         </ThisComponent>
       </div>
     ];

@@ -9,7 +9,7 @@ import { Component, h } from '../index';
   },
   shadow: false,
   host: {
-    class: 'badge'
+    theme: 'badge'
   }
 })
 export class Badge {

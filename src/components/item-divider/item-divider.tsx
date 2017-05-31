@@ -10,7 +10,7 @@ import { Component, h } from '../index';
   },
   shadow: false,
   host: {
-    class: 'item item-divider'
+    theme: 'item item-divider'
   }
 })
 export class ItemDivider {

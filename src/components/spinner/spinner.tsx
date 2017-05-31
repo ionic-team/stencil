@@ -1,5 +1,6 @@
 import { Component, h, Ionic, Prop } from '../index';
 import { SPINNERS, SpinnerConfig } from './spinner-configs';
+import { createThemedClasses } from '../../util/theme';
 
 
 @Component({
@@ -13,6 +14,8 @@ import { SPINNERS, SpinnerConfig } from './spinner-configs';
 })
 export class Spinner {
 
+  @Prop() mode: string;
+  @Prop() color: string;
   @Prop() duration: number = null;
   @Prop() name: string;
   @Prop() paused: boolean = false;
@@ -29,6 +32,14 @@ export class Spinner {
     }
   }
 
+  hostAttributes() {
+    const spinnerThemedClasses = createThemedClasses(this.mode, this.color, `spinner spinner-${this.name}`);
+    spinnerThemedClasses['spinner-paused'] = true;
+
+    return {
+      class: spinnerThemedClasses
+    };
+  }
 
   render() {
     let name = this.name || Ionic.config.get('spinner', 'lines');
@@ -59,13 +70,8 @@ export class Spinner {
       }
     }
 
-    return h(this, Ionic.theme(this, 'spinner spinner-' + this.name, {
-              class: {
-                'spinner-paused': this.paused
-              }
-            }), svgs);
+    return svgs;
   }
-
 }
 
 

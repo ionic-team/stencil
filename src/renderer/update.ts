@@ -3,7 +3,9 @@ import { collectedHostContentNodes } from './host';
 import { Component, ConfigApi, ListenMeta, PlatformApi, ProxyElement } from '../util/interfaces';
 import { getParentElement } from '../util/helpers';
 import { initProxy } from './proxy';
-import { RendererApi } from '../util/interfaces';
+import { RendererApi, VNodeData } from '../util/interfaces';
+import { createThemedClasses } from '../util/theme';
+import { h } from './h';
 
 
 export function queueUpdate(plt: PlatformApi, config: ConfigApi, renderer: RendererApi, elm: ProxyElement) {
@@ -69,18 +71,29 @@ export function update(plt: PlatformApi, config: ConfigApi, renderer: RendererAp
     }
   }
 
+  let vnodeAttributes: VNodeData = instance.hostAttributes && instance.hostAttributes();
+  vnodeAttributes = Object.keys(cmpMeta.host).reduce((hostData, key: string) => {
+    switch (key) {
+    case 'theme':
+      hostData['class'] = hostData['class'] || {};
+      hostData['class'] = Object.assign(
+        hostData['class'],
+        createThemedClasses(instance.mode, instance.color, cmpMeta.host['theme']),
+      );
+    }
+    return hostData;
+  }, vnodeAttributes || {});
+
   // if this component has a render function, let's fire
-  // it off and generate a vnode for this
-  const vnode = instance.render && instance.render();
-  if (vnode) {
-    // this component has a render fn and now a vnode
-    // make some quick adjustments since we're reusing the initial
-    // element already in the dom (vs. replacing it entirely)
-    vnode.elm = elm;
-    delete vnode.sel;
+  // it off and generate the children for this vnode
+  const vnodeChildren = instance.render && instance.render();
+
+  if (vnodeAttributes || vnodeChildren) {
 
     // if this is the intial load, then we give the renderer the actual element
     // if this is a re-render, then give the renderer the last vnode we created
+    const vnode = h((<Node>elm), vnodeAttributes, vnodeChildren);
+
     instance.$vnode = renderer(instance.$vnode ? instance.$vnode : elm, vnode, elm.$hostContent, isSsrHydrated);
   }
 

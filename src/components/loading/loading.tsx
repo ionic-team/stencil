@@ -14,7 +14,7 @@ import iOSLeaveAnimation from './animations/ios.leave';
   },
   shadow: false,
   host: {
-    class: 'loading'
+    theme: 'loading'
   }
 })
 export class Loading implements ILoading {
@@ -162,16 +162,18 @@ export class Loading implements ILoading {
       );
     }
 
-    return (
-      <ion-gesture attachTo='parent' autoBlockAll class={{
-        'loading-backdrop': true,
-        'hide-backdrop': !this.showBackdrop
-      }}>
-        <div class='loading-wrapper' role='dialog'>
-          {loadingInner}
-        </div>
-      </ion-gesture>
-    );
+    return [
+      <ion-gesture
+        attachTo='parent'
+        autoBlockAll
+        class={{
+          'loading-backdrop': true,
+          'hide-backdrop': !this.showBackdrop
+        }}
+      ></ion-gesture>,
+      <div class='loading-wrapper' role='dialog'>
+        {loadingInner}
+      </div>
+    ];
   }
-
 }

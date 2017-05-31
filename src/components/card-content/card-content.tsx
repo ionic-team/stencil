@@ -9,7 +9,7 @@ import { Component, h } from '../index';
   },
   shadow: false,
   host: {
-    class: 'card-content'
+    theme: 'card-content'
   }
 })
 export class CardContent {

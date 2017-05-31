@@ -21,7 +21,7 @@ export class FiberDemo {
     this.seconds = (this.seconds % 10) + 1;
   }
 
-  render() {
+  hostAttributes() {
     const elapsed = this.elapsed;
     const t = (elapsed / 1000) % 10;
     const scale = 1 + (t > 5 ? 10 - t : t) / 10;
@@ -36,20 +36,22 @@ export class FiberDemo {
       transform: 'scaleX(' + (scale / 2.1) + ') scaleY(0.7) translateZ(0.1px)'
     };
 
-    return h(this, {
-        style: containerStyle
-      },
-        h('div',
-          h('fiber-triangle', {
-              props: {
-                x: 0,
-                y: 0,
-                s: 1000,
-                seconds: this.seconds
-              }
-            }
-          )
-        )
+    return {
+      style: containerStyle
+    };
+  }
+
+  render() {
+    return (
+      <div>
+        <fiber-triangle
+          x={0}
+          y={0}
+          s={1000}
+          seconds={this.seconds}
+        >
+        </fiber-triangle>
+      </div>
     );
   }
 }

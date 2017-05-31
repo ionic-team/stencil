@@ -1,5 +1,6 @@
-import { Component, h, Ionic, Listen } from '../index';
-import { VNodeData } from '../../util/interfaces';
+import { Component, Prop, h, Listen } from '../index';
+import { CssClassObject } from '../../util/interfaces';
+import { createThemedClasses } from '../../util/theme';
 
 
 @Component({
@@ -12,7 +13,10 @@ import { VNodeData } from '../../util/interfaces';
   shadow: false
 })
 export class Item {
-  childStyles: {[className: string]: boolean} = Object.create(null);
+  childStyles: CssClassObject = Object.create(null);
+
+  @Prop() mode: string;
+  @Prop() color: string;
 
   @Listen('ionStyle')
   itemStyle(ev: UIEvent) {
@@ -33,11 +37,14 @@ export class Item {
   }
 
   render() {
-    const themeVNode: VNodeData = { class: { 'item-block': true} };
-    Object.assign(themeVNode.class, this.childStyles);
+    let themedClasses = {
+      ...this.childStyles,
+      ...createThemedClasses(this.mode, this.color, 'item'),
+      'item-block': true
+    };
 
     return (
-      <div {...Ionic.theme(this, 'item', themeVNode)}>
+      <div class={{themedClasses}}>
         <slot name='start'></slot>
         <div class='item-inner'>
           <div class='input-wrapper'>

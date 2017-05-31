@@ -10,7 +10,7 @@ import { Component, h } from '../index';
   },
   shadow: false,
   host: {
-    class: 'card-header'
+    theme: 'card-header'
   }
 })
 export class CardHeader {

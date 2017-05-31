@@ -9,7 +9,7 @@ import { Component, h } from '../index';
   },
   shadow: false,
   host: {
-    class: 'label'
+    theme: 'label'
   }
 })
 export class Label {

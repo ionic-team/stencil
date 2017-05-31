@@ -17,15 +17,18 @@ import { Component, h } from '../index';
   styleUrls: {
     default: 'slide.scss',
   },
-  shadow: false,
-  host: {
-    class: {
-      'slide-zoom': true,
-      'swiper-slide': true
-    }
-  }
+  shadow: false
 })
 export class Slide {
+  hostAttributes() {
+    return {
+      class: {
+        'slide-zoom': true,
+        'swiper-slide': true
+      }
+    };
+  }
+
   render() {
     return <slot></slot>;
   }

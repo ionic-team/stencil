@@ -9,7 +9,10 @@ import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
     md: 'toggle.md.scss',
     wp: 'toggle.wp.scss'
   },
-  shadow: false
+  shadow: false,
+  host: {
+    theme: 'toggle'
+  }
 })
 export class Toggle implements BooleanInputComponent {
   activated: boolean = false;
@@ -19,6 +22,8 @@ export class Toggle implements BooleanInputComponent {
   startX: number;
   styleTmr: any;
 
+  @Prop() color: string;
+  @Prop() mode: string;
   @Prop() checked: boolean = false;
   @Prop() disabled: boolean = false;
   @Prop() value: string;
@@ -129,44 +134,47 @@ export class Toggle implements BooleanInputComponent {
     }
   }
 
-  render() {
-    return h(this, Ionic.theme(this, 'toggle', {
+  hostAttributes() {
+    return {
       class: {
         'toggle-activated': this.activated,
         'toggle-checked': this.checked,
-        'toggle-disabled': this.disabled,
-      },
-    }), h('ion-gesture', {
-        props: {
-          'canStart': this.canStart.bind(this),
-          'onStart': this.onDragStart.bind(this),
-          'onMove': this.onDragMove.bind(this),
-          'onEnd': this.onDragEnd.bind(this),
-          'onPress': this.toggle.bind(this),
-          'gestureName': 'toggle',
-          'gesturePriority': 30,
-          'type': 'pan,press',
-          'direction': 'x',
-          'threshold': 20,
-          'attachTo': 'parent'
-        }
-    },
-        [
-          h('div.toggle-icon',
-            h('div.toggle-inner')
-          ),
-          h('div.toggle-cover', {
-            attrs: {
-              'id': this.id,
-              'aria-checked': this.checked ? 'true' : false,
-              'aria-disabled': this.disabled ? 'true' : false,
-              'aria-labelledby': this.labelId,
-              'role': 'checkbox',
-              'tabindex': 0
-            }
-          })
-        ]
-      )
+        'toggle-disabled': this.disabled
+      }
+    };
+  }
+
+  render() {
+    return (
+      <ion-gesture props={{
+        'canStart': this.canStart.bind(this),
+        'onStart': this.onDragStart.bind(this),
+        'onMove': this.onDragMove.bind(this),
+        'onEnd': this.onDragEnd.bind(this),
+        'onPress': this.toggle.bind(this),
+        'gestureName': 'toggle',
+        'gesturePriority': 30,
+        'type': 'pan,press',
+        'direction': 'x',
+        'threshold': 20,
+        'attachTo': 'parent'
+      }}>
+        <div class='toggle-icon'>
+          <div class='toggle-inner'></div>
+        </div>
+        <div
+          class='toggle-cover'
+          attrs={{
+            'id': this.id,
+            'aria-checked': this.checked ? 'true' : false,
+            'aria-disabled': this.disabled ? 'true' : false,
+            'aria-labelledby': this.labelId,
+            'role': 'checkbox',
+            'tabindex': 0
+          }}
+        >
+        </div>
+      </ion-gesture>
     );
   }
 }

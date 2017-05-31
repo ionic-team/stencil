@@ -27,34 +27,26 @@ export class FiberTriangle {
       );
     }
     s = s / 2;
+
     return [
-      h('fiber-triangle', {
-          props: {
-            x: this.x,
-            y: this.y - (s / 2),
-            s: s,
-            seconds: this.seconds
-          }
-        }
-      ),
-      h('fiber-triangle', {
-          props: {
-            x: this.x - s,
-            y: this.y + (s / 2),
-            s: s,
-            seconds: this.seconds
-          }
-        }
-      ),
-      h('fiber-triangle', {
-          props: {
-            x: this.x + s,
-            y: this.y + (s / 2),
-            s: s,
-            seconds: this.seconds
-          }
-        }
-      )
+      <fiber-triangle
+        x={this.x}
+        y={this.y - (s / 2)}
+        s={s}
+        seconds={this.seconds}
+      ></fiber-triangle>,
+      <fiber-triangle
+        x={this.x - s}
+        y={this.y + (s / 2)}
+        s={s}
+        seconds={this.seconds}
+      ></fiber-triangle>,
+      <fiber-triangle
+        x={ this.x + s}
+        y={this.y + (s / 2)}
+        s={s}
+        seconds={this.seconds}
+      ></fiber-triangle>
     ];
   }
 }
