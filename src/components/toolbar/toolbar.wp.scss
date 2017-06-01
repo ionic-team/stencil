@@ -227,7 +227,7 @@ $navbar-wp-height:                       $toolbar-wp-height !default;
 // Windows Toolbar Button Icon
 // --------------------------------------------------
 
-[icon-start] .bar-button-wp ion-icon {
+.bar-button-wp ion-icon[slot="start"] {
   @include padding-horizontal(null, .3em);
 
   font-size: 1.4em;
@@ -236,7 +236,7 @@ $navbar-wp-height:                       $toolbar-wp-height !default;
   pointer-events: none;
 }
 
-[icon-end] .bar-button-wp ion-icon {
+.bar-button-wp ion-icon[slot="end"] {
   @include padding-horizontal(.4em, null);
 
   font-size: 1.4em;

@@ -11,6 +11,7 @@ import { VNodeData } from '../../util/interfaces';
   }
 })
 export class Item {
+  $el: HTMLElement;
   childStyles: {[className: string]: boolean} = Object.create(null);
 
   @Listen('ionStyle')
@@ -29,6 +30,14 @@ export class Item {
 
     // returning true tells the renderer to queue an update
     return hasChildStyleChange;
+  }
+
+  ionViewDidLoad() {
+    // Add item-button classes to each ion-button in the item
+    const buttons = <any>this.$el.querySelectorAll('ion-button');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].itemButton = true;
+    }
   }
 
   render() {
