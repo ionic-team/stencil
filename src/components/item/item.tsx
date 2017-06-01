@@ -12,6 +12,7 @@ import { createThemedClasses } from '../../util/theme';
   }
 })
 export class Item {
+  $el: HTMLElement;
   childStyles: CssClassObject = Object.create(null);
 
   @Prop() mode: string;
@@ -35,6 +36,14 @@ export class Item {
     return hasChildStyleChange;
   }
 
+  ionViewDidLoad() {
+    // Add item-button classes to each ion-button in the item
+    let buttons = this.$el.querySelectorAll('ion-button') as any;
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].itemButton = true;
+    }
+  }
+
   render() {
     let themedClasses = {
       ...this.childStyles,
@@ -43,7 +52,7 @@ export class Item {
     };
 
     return (
-      <div class={{themedClasses}}>
+      <div class={themedClasses}>
         <slot name='start'></slot>
         <div class='item-inner'>
           <div class='input-wrapper'>

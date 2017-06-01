@@ -33,11 +33,12 @@
 // Button Icons
 // --------------------------------------------------
 
-@mixin button-icon($font-size: 1.4rem, $line-height: .67, $pointer-events: none) {
+@mixin button-icon($font-size: 1.4em, $line-height: .67, $pointer-events: none, $margin: 0) {
   font-size: $font-size;
   line-height: $line-height;
 
   pointer-events: $pointer-events;
+  margin: $margin;
 }
 
 

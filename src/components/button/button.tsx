@@ -70,6 +70,7 @@ import { CssClassObject } from '../../util/interfaces';
   }
 })
 export class Button {
+  @Prop() itemButton: boolean = false;
 
   @Prop() href: string;
 
@@ -213,6 +214,9 @@ export class Button {
       );
   }
 
+  /**
+   * @hidden
+   */
   getStyleClassList(buttonType: string): string[] {
     let classList = [].concat(
       this.outline ? this.getColorClassList(this.color, buttonType, 'outline', this.mode) : [],
@@ -223,6 +227,18 @@ export class Button {
     if (classList.length === 0) {
       classList = this.getColorClassList(this.color, buttonType, 'default', this.mode);
     }
+
+    return classList;
+  }
+
+  /**
+   * @hidden
+   * Whether or not to add the item-button class
+   */
+  getItemClassList(size: string) {
+    let classList = [].concat(
+      this.itemButton && !size ? 'item-button' : []
+    );
 
     return classList;
   }
@@ -248,7 +264,8 @@ export class Button {
         this.getClassList(this.buttonType, display, this.mode),
         this.getClassList(this.buttonType, size, this.mode),
         this.getClassList(this.buttonType, decorator, this.mode),
-        this.getStyleClassList(this.buttonType)
+        this.getStyleClassList(this.buttonType),
+        this.getItemClassList(size)
       )
       .reduce((prevValue, cssClass) => {
         prevValue[cssClass] = true;
@@ -260,7 +277,9 @@ export class Button {
     return (
       <TagType class={buttonClasses} disabled={this.disabled}>
         <span class='button-inner'>
+          <slot name='start'></slot>
           <slot></slot>
+          <slot name='end'></slot>
         </span>
         <div class='button-effect'></div>
       </TagType>

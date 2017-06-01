@@ -239,7 +239,7 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
 // iOS Toolbar Button Icon
 // --------------------------------------------------
 
-[icon-start] .bar-button-ios ion-icon {
+.bar-button-ios ion-icon[slot="start"] {
   @include padding-horizontal(null, .3em);
 
   font-size: 1.4em;
@@ -248,7 +248,7 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
   pointer-events: none;
 }
 
-[icon-end] .bar-button-ios ion-icon {
+.bar-button-ios ion-icon[slot="end"] {
   @include padding-horizontal(.4em, null);
 
   font-size: 1.4em;

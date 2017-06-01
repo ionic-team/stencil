@@ -283,7 +283,7 @@ $navbar-md-height:                       $toolbar-md-height !default;
 // Material Design Toolbar Button Icon
 // --------------------------------------------------
 
-[icon-start] .bar-button-md ion-icon {
+.bar-button-md ion-icon[slot="start"] {
   @include padding-horizontal(null, .3em);
 
   font-size: 1.4em;
@@ -292,7 +292,7 @@ $navbar-md-height:                       $toolbar-md-height !default;
   pointer-events: none;
 }
 
-[icon-end] .bar-button-md ion-icon {
+.bar-button-md ion-icon[slot="end"] {
   @include padding-horizontal(.4em, null);
 
   font-size: 1.4em;

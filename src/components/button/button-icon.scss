@@ -3,13 +3,13 @@
 // Button Icons
 // --------------------------------------------------
 
-[icon-start] ion-icon {
+.button ion-icon[slot="start"] {
   @include button-icon();
 
   padding-right: .3em;
 }
 
-[icon-end] ion-icon {
+.button ion-icon[slot="end"] {
   @include button-icon();
 
   padding-left: .4em;
