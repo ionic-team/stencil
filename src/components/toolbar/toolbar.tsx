@@ -134,12 +134,12 @@ export class Toolbar {
     const contentClasses = createThemedClasses(this.mode, this.color, 'toolbar-content');
 
     return [
-      <div class={{backgroundClasses}}></div>,
+      <div class={backgroundClasses}></div>,
       <slot name='start'></slot>,
       <slot name='mode-start'></slot>,
       <slot name='mode-end'></slot>,
       <slot name='end'></slot>,
-      <div class={{contentClasses}}>
+      <div class={contentClasses}>
         <slot></slot>
       </div>
     ];
