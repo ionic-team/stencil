@@ -64,6 +64,7 @@ function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
   updateStyles(cmpMeta);
   updateModes(cmpMeta);
   updateShadow(cmpMeta);
+  updateHostMeta(cmpMeta);
 
   return cmpMeta;
 }
@@ -222,4 +223,8 @@ function updateShadow(cmpMeta: ComponentMeta) {
   }
 
   cmpMeta.shadow = shadow;
+}
+
+function updateHostMeta(cmpMeta: ComponentMeta) {
+  cmpMeta.host = cmpMeta.host || {};
 }

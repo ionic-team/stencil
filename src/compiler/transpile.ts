@@ -2,6 +2,7 @@ import { BuildContext, CompilerConfig } from './interfaces';
 import { createFileMeta, writeFiles } from './util';
 import { componentClass } from './transformers/component-class';
 import { removeImports } from './transformers/remove-imports';
+import { reactToSnabbdomJsx } from './transformers/react-to-snabbdom-jsx';
 import * as ts from 'typescript';
 
 
@@ -90,7 +91,10 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
   const result = program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
       componentClass(ctx),
-      removeImports()
+      removeImports(),
+    ],
+    after: [
+      reactToSnabbdomJsx()
     ]
   });
 
@@ -112,6 +116,8 @@ function createTsCompilerConfigs(config: CompilerConfig) {
   tsCompilerOptions.isolatedModules = true;
   tsCompilerOptions.allowSyntheticDefaultImports = true;
   tsCompilerOptions.allowJs = true;
+  tsCompilerOptions.jsx = ts.JsxEmit.React;
+  tsCompilerOptions.jsxFactory = 'h';
 
   tsCompilerOptions.lib = tsCompilerOptions.lib || [];
   if (!tsCompilerOptions.lib.indexOf('lib.dom.d.ts')) {

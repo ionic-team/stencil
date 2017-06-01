@@ -193,7 +193,7 @@ export function ensureDirs(packages: Packages, paths: string[]) {
 export function isTsSourceFile(filePath: string) {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
-    if (parts[parts.length - 1] === 'ts') {
+    if (parts[parts.length - 1] === 'ts' || parts[parts.length - 1] === 'tsx') {
       if (parts.length > 2 && parts[parts.length - 2] === 'd') {
         return false;
       }
@@ -202,7 +202,6 @@ export function isTsSourceFile(filePath: string) {
   }
   return false;
 }
-
 
 export function isScssSourceFile(filePath: string) {
   const parts = filePath.toLowerCase().split('.');

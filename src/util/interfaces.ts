@@ -361,15 +361,21 @@ export interface ComponentModeData {
   [6]: boolean;
 
   /**
+   * host
+   */
+  [7]: any;
+
+  /**
    * mode code, which is a number that'll
    * map to a mode name later (ios, md, wp)
    */
-  [7]: number;
+  [8]: number;
+
 
   /**
    * component mode styles
    */
-  [8]: string;
+  [9]: string;
 }
 
 
@@ -420,6 +426,7 @@ export interface ComponentOptions {
   tag: string;
   styleUrls?: string | string[] | ModeStyles;
   shadow?: boolean;
+  host?: HostMeta;
 }
 
 export interface ModeStyles {
@@ -518,6 +525,7 @@ export interface ComponentMeta {
   states?: StateMeta[];
   modes?: {[modeCode: string]: ModeMeta};
   shadow?: boolean;
+  host?: HostMeta;
   namedSlots?: string[];
   componentModule?: any;
   priority?: LoadPriority;
@@ -530,6 +538,9 @@ export interface ModeMeta {
   styleUrls?: string[];
 }
 
+export interface HostMeta {
+    [key: string]: any;
+}
 
 export interface Component {
   ionViewDidLoad?: () => void;
@@ -646,11 +657,12 @@ export interface HostContentNodes {
   $namedSlots?: {[slotName: string]: Node[]};
 }
 
+export type CssClassObject = { [className: string]: boolean };
 
 export interface VNodeData {
   props?: any;
   attrs?: any;
-  class?: any;
+  class?: CssClassObject;
   style?: any;
   dataset?: any;
   on?: any;

@@ -37,7 +37,7 @@ export function formatBundleContent(coreVersion: number, bundleId: string, bundl
 }
 
 
-export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, modeName: string, modeMeta: ModeMeta) {
+export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, modeName: string, modeMeta: ModeMeta, devMode: boolean) {
   const tag = cmp.tag;
 
   const label = `${tag}.${modeName}`;
@@ -54,6 +54,8 @@ export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, 
 
   const shadow = formatShadow(cmp.shadow);
 
+  const host = formatHost(cmp.host, devMode);
+
   const modeCode = formatModeName(modeName);
 
   const styles = formatStyles(modeMeta.styles);
@@ -66,8 +68,9 @@ export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, 
     `/** ${label}: [4] listeners **/\n${listeners}`,
     `/** ${label}: [5] watchers **/\n${watchers}`,
     `/** ${label}: [6] shadow **/\n${shadow}`,
-    `/** ${label}: [7] modeName **/\n${modeCode}`,
-    `/** ${label}: [8] styles **/\n${styles}`
+    `/** ${label}: [7] host **/\n${host}`,
+    `/** ${label}: [8] modeName **/\n${modeCode}`,
+    `/** ${label}: [9] styles **/\n${styles}`
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
@@ -198,6 +201,9 @@ function formatShadow(val: boolean) {
     '0 /* do not use shadow dom */';
 }
 
+function formatHost(val: any, devMode: boolean) {
+  return JSON.stringify(val, null, devMode ? 2 : null);
+}
 
 export function formatModeName(modeName: string) {
   return `${getModeCode(modeName)} /* ${modeName} **/`;
