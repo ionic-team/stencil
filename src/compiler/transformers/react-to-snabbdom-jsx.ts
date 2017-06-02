@@ -68,6 +68,7 @@ export function reactToSnabbdomJsx(): ts.TransformerFactory<ts.SourceFile> {
 
 export function normalizeObjectMap(attrs: util.ObjectMap): util.ObjectMap {
   var modules = ['hook', 'on', 'style', 'class', 'props', 'attrs', 'dataset'];
+  var attributeList = ['slot'];
   var map: util.ObjectMap = {};
 
   for (var i = 0, len = modules.length; i < len; i++) {
@@ -89,6 +90,8 @@ export function normalizeObjectMap(attrs: util.ObjectMap): util.ObjectMap {
           key.slice(idx + 1),
           attrs[key]
         );
+      } else if (attributeList.indexOf(key) !== -1) {
+        addAttr('attrs', key, attrs[key]);
       } else {
         addAttr('props', key, attrs[key]);
       }

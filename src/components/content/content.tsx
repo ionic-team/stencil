@@ -1,5 +1,5 @@
 import { Component, h, Ionic, Prop } from '../index';
-import { ScrollDetail } from '../../util/interfaces';
+import { ScrollDetail, VNodeData } from '../../util/interfaces';
 import { getParentElement } from '../../util/helpers';
 import { createThemedClasses } from '../../util/theme';
 import { Scroll } from '../scroll/scroll-interface';
@@ -612,28 +612,40 @@ export class Content {
     };
   }
 
-  render() {
-    const contentClass: any = {};
-    const scrollStyle: any = {};
-
+  getHeaderHeight() {
     const children = getParentElement(this.$el).children;
 
     for (var i = 0; i < children.length; i++) {
       if (children[i].tagName === 'ION-HEADER') {
         var headerHeight = children[i].getAttribute(`${this.mode}-height`);
         if (headerHeight) {
-          if (this.fullscreen) {
-            scrollStyle.paddingTop = headerHeight;
-          } else {
-            scrollStyle.marginTop = headerHeight;
-          }
-          contentClass['content-ready'] = true;
+          return headerHeight;
         }
-        break;
+        return;
       }
     }
+  }
 
+  hostData(): VNodeData {
+    const headerHeight = this.getHeaderHeight();
+
+    return {
+      class: {
+        'content-ready': headerHeight !== undefined
+      }
+    };
+  }
+
+  render() {
     const props: any = {};
+    const scrollStyle: any = {};
+    const headerHeight = this.getHeaderHeight();
+
+    if (this.fullscreen) {
+      scrollStyle.paddingTop = headerHeight;
+    } else {
+      scrollStyle.marginTop = headerHeight;
+    }
 
     if (this.ionScrollStart) {
       props['ionScrollStart'] = this.ionScrollStart.bind(this);
@@ -648,11 +660,9 @@ export class Content {
     themedClasses['statusbar-padding'] = this.statusbarPadding;
 
     return (
-      <div class={contentClass}>
-        <ion-scroll style={scrollStyle} props={props} class={{themedClasses}}>
-          <slot></slot>
-        </ion-scroll>
-      </div>
+      <ion-scroll style={scrollStyle} props={props} class={{themedClasses}}>
+        <slot></slot>
+      </ion-scroll>
     );
   }
 }

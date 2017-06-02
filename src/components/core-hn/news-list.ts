@@ -71,9 +71,8 @@ export class NewsList {
         )
       );
     });
+    console.log(items);
 
-    return (
-      <ul>{items}</ul>
-    );
+    return h('ul', {}, items);
   }
 }
