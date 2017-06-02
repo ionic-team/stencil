@@ -11,28 +11,24 @@ export function reactToSnabbdomJsx(): ts.TransformerFactory<ts.SourceFile> {
 
       switch (node.kind) {
         case ts.SyntaxKind.CallExpression:
-          var expression = (<ts.CallExpression>node).expression;
-          if (expression.parent && (expression.parent.kind === ts.SyntaxKind.JsxOpeningElement)) {
-            return substituteCallExpression(<ts.CallExpression>node);
+          const callNode = node as ts.CallExpression;
+          if ((<ts.Identifier>callNode.expression).text === 'h') {
+            const convertedArgs = convertReactToSnabbDom(callNode.arguments);
+            node = ts.updateCall(callNode, callNode.expression, null, convertedArgs);
           }
         default:
           return ts.visitEachChild(node, visit, transformContext);
       }
     }
 
-    function substituteCallExpression(node: ts.CallExpression): ts.CallExpression {
-      const convertedArgs = convertReactToSnabbDom(node.arguments);
-      return ts.createCall(
-         node.expression,
-         undefined,
-         convertedArgs
-      );
-    }
-
     function convertReactToSnabbDom(args: ts.NodeArray<ts.Expression>): ts.Expression[] {
       const [tag, props, ...children] = args;
 
       let newArgs: ts.Expression[] = [tag];
+
+      if (args.length === 1) {
+        return newArgs;
+      }
 
       if (props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
         const jsxObjectMap = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
@@ -41,19 +37,17 @@ export function reactToSnabbdomJsx(): ts.TransformerFactory<ts.SourceFile> {
         const objectLiteral = util.objectMapToObjectLiteral(snabbDomFinal);
         newArgs.push(objectLiteral);
 
-      } else if (typeof props !== 'undefined' && props !== null) {
+      } else if (props.kind !== ts.SyntaxKind.NullKeyword) {
         children.unshift(props);
       }
 
-      const updatedChildren: ts.Expression[] = children
-        .filter((node: ts.Expression) => node.kind === ts.SyntaxKind.CallExpression)
-        .map((node: ts.Expression) => {
-          return substituteCallExpression(node as ts.CallExpression);
-        });
-
-      if (updatedChildren.length > 0) {
-        newArgs.push(ts.createArrayLiteral(updatedChildren));
+      if (children.length === 0) {
+        return newArgs;
       }
+
+      newArgs.push(
+        children.length > 1 ? ts.createArrayLiteral(children) : children[0]
+      );
       return newArgs;
     }
 
