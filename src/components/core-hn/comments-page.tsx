@@ -16,20 +16,19 @@ export class CommentsPage {
 
   render() {
     return [
-      h('ion-header',
-        h('ion-toolbar', { props: { color: 'primary' } },
-          [
-            h('ion-button.close-button', { props: { clear: true, iconOnly: true, slot: 'start' }, on: { click: this.close.bind(this) } },
-              h('ion-icon', { props: { name: 'close' }, style: { color: 'white' } })
-            ),
-            h('ion-title.comments-title', { props: { slot: 'end' } }, 'Comments')
-          ]
-        )
-      ),
-
-      h('ion-content',
-        h('comments-list', { props: { type: this.comments } })
-      )
+      <ion-header>
+        <ion-toolbar color='primary'>
+          <ion-button class='close-button' clear icon-only slot='start' on-click={this.close.bind(this)}>
+            <ion-icon name='close' style={{ color: 'white'}} />
+          </ion-button>
+          <ion-title class='comments-title' slot='end'>
+            Comments
+          </ion-title>
+        </ion-toolbar>
+      </ion-header>,
+      <ion-content>
+        <comments-list type={this.comments}></comments-list>
+      </ion-content>
     ];
   }
 }
