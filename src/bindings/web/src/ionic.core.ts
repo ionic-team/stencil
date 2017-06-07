@@ -15,7 +15,7 @@ IonicGbl.QueueCtrl = QueueClient(window);
 
 IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core'));
 
-const plt = createPlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
+const plt = createPlatformClient(window, window.document, IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.QueueCtrl);
 
 plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {
   plt.defineComponent(cmpMeta, class HostElement extends HTMLElement {});

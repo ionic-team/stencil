@@ -24,7 +24,7 @@ export function hydrateHtml(registry: ComponentRegistry, html: string, opts: Hyd
 
     window.document.cookie = opts.cookie;
 
-    const plt = createPlatformServer(window, IonicGbl);
+    const plt = createPlatformServer(window, IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
     Object.keys(registry).forEach(tag => {
       plt.defineComponent(registry[tag], ServerHostElement);

@@ -10,11 +10,6 @@ import { render } from './render';
 
 export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement) {
   Object.defineProperties(HostElementConstructor, {
-    '$meta': {
-      get: function() {
-        return plt.getComponentMeta((<HostElement>this).tagName);
-      }
-    },
     'connectedCallback': {
       value: function() {
         connectedCallback(plt, (<HostElement>this));
@@ -22,7 +17,7 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
     },
     'attributeChangedCallback': {
       value: function(attribName: string, oldVal: string, newVal: string) {
-        attributeChangedCallback((<HostElement>this), attribName, oldVal, newVal);
+        attributeChangedCallback(plt, (<HostElement>this), attribName, oldVal, newVal);
       }
     },
     'disconnectedCallback': {
@@ -49,9 +44,9 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
 }
 
 
-export function initInstance(plt: PlatformApi,  elm: HostElement) {
+export function initInstance(plt: PlatformApi, elm: HostElement) {
   // using the component's class, let's create a new instance
-  const cmpMeta = elm.$meta;
+  const cmpMeta = plt.getComponentMeta(elm);
   const instance: Component = elm.$instance = new cmpMeta.componentModuleMeta();
 
   // let's automatically add a reference to the host element on the instance
@@ -76,8 +71,8 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
   elm.classList.add('hydrated');
 
   // the element is within the DOM now, so let's attach the event listeners
-  const cmpMeta = elm.$meta;
-  cmpMeta.listenersMeta && attachListeners(plt.queue, cmpMeta.listenersMeta, elm, elm.$instance);
+  const listenersMeta = plt.getComponentMeta(elm).listenersMeta;
+  listenersMeta && attachListeners(plt.queue, listenersMeta, elm, elm.$instance);
 
   // sweet, we're good to go
   // all of this component's children have loaded (if any)

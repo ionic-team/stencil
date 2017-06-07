@@ -13,7 +13,7 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     delete elm._hasDestroyed;
 
     // get the component meta data about this component
-    const cmpMeta = elm.$meta;
+    const cmpMeta = plt.getComponentMeta(elm);
 
     // only do slot work if this component even has slots
     if (cmpMeta.hasSlotsMeta || true /* TODO!! */) {
@@ -47,7 +47,7 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
 
 export function getParentHostElement(plt: PlatformApi, elm: HostElement) {
   while (elm = getParentElement(elm)) {
-    if (plt.getComponentMeta(elm.tagName)) {
+    if (plt.getComponentMeta(elm)) {
       return elm;
     }
   }

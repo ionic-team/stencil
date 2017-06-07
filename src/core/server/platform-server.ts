@@ -1,7 +1,7 @@
 import { assignHostContentSlots } from '../renderer/slot';
 import { attributeChangedCallback } from '../instance/attribute-changed';
-import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
-  HostElement, IonicGlobal, LoadComponentData, PlatformApi } from '../../util/interfaces';
+import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi,
+  DomControllerApi, HostElement, IonicGlobal, LoadComponentData, PlatformApi } from '../../util/interfaces';
 import { createDomApi } from '../renderer/dom-api';
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './dom/global-context';
@@ -14,7 +14,7 @@ import * as vm from 'vm';
 
 
 
-export function createPlatformServer(win: Window, IonicGbl: IonicGlobal): PlatformApi {
+export function createPlatformServer(win: Window, IonicGbl: IonicGlobal, config: ConfigApi, dom: DomControllerApi): PlatformApi {
   const domApi = createDomApi(win.document);
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
@@ -22,8 +22,22 @@ export function createPlatformServer(win: Window, IonicGbl: IonicGlobal): Platfo
   const activeFileReads: {[url: string]: boolean} = {};
   // const moduleImports = {};
   const css: {[cmpModeId: string]: string} = {};
-  const injectedIonic = initInjectedIonic(IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
-  const config = injectedIonic.config;
+  initInjectedIonic(config, dom);
+
+  const plt: PlatformApi = {
+    registerComponents,
+    defineComponent,
+    getComponentMeta,
+    loadBundle,
+    collectHostContent,
+    config,
+    queue: IonicGbl.QueueCtrl,
+    getMode,
+    attachStyles,
+    tmpDisconnected: false,
+    css: css,
+    isServer: true
+  };
 
   // generate a sandboxed context
   const context = generateGlobalContext(win, IonicGbl);
@@ -130,7 +144,7 @@ export function createPlatformServer(win: Window, IonicGbl: IonicGlobal): Platfo
     elm.classList.add('ssr');
 
     cmpMeta.propsMeta.forEach(prop => {
-      attributeChangedCallback(elm, prop.attribName, null, domApi.$getAttribute(elm, prop.attribName));
+      attributeChangedCallback(plt, elm, prop.attribName, null, domApi.$getAttribute(elm, prop.attribName));
     });
 
     if (cmpMeta.isShadowMeta) {
@@ -162,7 +176,7 @@ export function createPlatformServer(win: Window, IonicGbl: IonicGlobal): Platfo
     return components.map(data => {
       data[0] = data[0].toLowerCase();
 
-      const cmpMeta: ComponentMeta = registry[data[0]] = {
+      const cmpMeta: ComponentMeta = registry[data[0].toUpperCase()] = {
         tagNameMeta: data[0],
         modesMeta: {},
         propsMeta: [
@@ -194,31 +208,16 @@ export function createPlatformServer(win: Window, IonicGbl: IonicGlobal): Platfo
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
-    registry[cmpMeta.tagNameMeta] = cmpMeta;
+    registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
   }
 
-  function getComponentMeta(tag: string) {
-    return registry[tag.toLowerCase()];
+  function getComponentMeta(elm: Element) {
+    return registry[elm.tagName];
   }
 
   function collectHostContent(elm: HostElement, validNamedSlots: string[]) {
     assignHostContentSlots(domApi, elm, validNamedSlots);
   }
-
-  const plt: PlatformApi = {
-    registerComponents,
-    defineComponent,
-    getComponentMeta,
-    loadBundle,
-    collectHostContent,
-    config,
-    queue: IonicGbl.QueueCtrl,
-    getMode,
-    attachStyles,
-    $tmpDisconnected: false,
-    css: css,
-    isServer: true
-  };
 
   plt.render = createRenderer(plt, domApi);
 

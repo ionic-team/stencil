@@ -5,7 +5,7 @@ import { h } from '../renderer/h';
 
 export function render(plt: PlatformApi, elm: HostElement) {
   const instance = elm.$instance;
-  const cmpMeta = elm.$meta;
+  const cmpMeta = plt.getComponentMeta(elm);
 
   // if this component has a render function, let's fire
   // it off and generate the children for this vnode

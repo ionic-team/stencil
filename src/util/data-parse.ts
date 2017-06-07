@@ -10,7 +10,7 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
 
   // tag name (ion-badge)
   // get component meta data by tag name
-  let cmpMeta = registry[cmpModeData[0]];
+  let cmpMeta = registry[cmpModeData[0].toUpperCase()];
 
   // component props would have already been parsed
   // and added to the cmpMeta when it was registered

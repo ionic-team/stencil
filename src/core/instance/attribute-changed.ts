@@ -1,8 +1,8 @@
-import { HostElement } from '../../util/interfaces';
+import { HostElement, PlatformApi } from '../../util/interfaces';
 import { TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
 
 
-export function attributeChangedCallback( elm: any, attribName: string, oldVal: string, newVal: string) {
+export function attributeChangedCallback(plt: PlatformApi, elm: HostElement, attribName: string, oldVal: string, newVal: string) {
   // only react if the attribute values actually changed
   if (oldVal !== newVal) {
 
@@ -11,26 +11,24 @@ export function attributeChangedCallback( elm: any, attribName: string, oldVal: 
 
     // using the known component meta data
     // look up to see if we have a property wired up to this attribute name
-    const prop = (<HostElement>elm).$meta.propsMeta.find(p => p.attribName === attribName);
+    const prop = plt.getComponentMeta(elm).propsMeta.find(p => p.attribName === attribName);
 
     if (prop) {
-      // cool we've got a prop using this attribute name
-      // the value will be a string, so let's convert it
-      // to the correct type the app wants
+      // cool we've got a prop using this attribute name the value will
+      // be a string, so let's convert it to the correct type the app wants
+      // below code is ugly yes, but great minification ;)
+      (<any>elm)[prop.propName] =
+          (prop.propType === TYPE_BOOLEAN) ?
+              // per the HTML spec, any string value means it is a boolean "true" value
+              // but we'll cheat here and say that the string "false" is the boolean false
+              (newVal === null || newVal === 'false' ? false : true) :
 
-      if (prop.propType === TYPE_BOOLEAN) {
-        // per the HTML spec, any string value means it is a boolean "true" value
-        // but we'll cheat here and say that the string "false" is the boolean false
-        elm[prop.propName] = (newVal === null || newVal === 'false') ? false : true;
+          (prop.propType === TYPE_NUMBER) ?
+              // force it to be a number
+              parseFloat(newVal) :
 
-      } else if (prop.propType === TYPE_NUMBER) {
-        // force it to be a number
-        elm[prop.propName] = parseFloat(newVal);
-
-      } else {
-        // idk, any will do
-        elm[prop.propName] = newVal;
-      }
+          // else, idk, "any"
+          newVal;
     }
   }
 }

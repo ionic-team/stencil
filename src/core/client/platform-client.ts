@@ -1,5 +1,5 @@
 import { assignHostContentSlots } from '../renderer/slot';
-import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, HostElement,
+import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi, HostElement,
   IonicGlobal, LoadComponentData, QueueApi, PlatformApi } from '../../util/interfaces';
 import { createDomApi } from '../renderer/dom-api';
 import { createRenderer } from '../renderer/patch';
@@ -11,7 +11,7 @@ import { initHostConstructor } from '../instance/init';
 import { parseComponentModeData, parseModeName, parseProp } from '../../util/data-parse';
 
 
-export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, queue: QueueApi): PlatformApi {
+export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, config: ConfigApi, queue: QueueApi): PlatformApi {
   const domApi = createDomApi(doc);
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
@@ -20,38 +20,19 @@ export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: I
   const moduleImports = {};
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
 
-  const injectedIonic = initInjectedIonic(IonicGbl, win, doc, queue);
-  const config = injectedIonic.config;
-
-
-  IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
-    coreVersion;
-    var args = arguments;
-
-    // import component function
-    // inject ionic globals
-    importFn(moduleImports, h, injectedIonic);
-
-    for (var i = 3; i < args.length; i++) {
-      // first arg is core version
-      // second arg is the bundleId
-      // third arg is the importFn
-      // each arg after that is a component/mode
-      parseComponentModeData(registry, moduleImports, args[i]);
-
-      // fire off all the callbacks waiting on this bundle to load
-      var callbacks = bundleCallbacks[bundleId];
-      if (callbacks) {
-        for (var j = 0, jlen = callbacks.length; j < jlen; j++) {
-          callbacks[j]();
-        }
-        delete bundleCallbacks[bundleId];
-      }
-
-      // remember that we've already loaded this bundle
-      loadedBundles[bundleId] = true;
-    }
+  const plt: PlatformApi = {
+    registerComponents,
+    defineComponent,
+    getComponentMeta,
+    loadBundle,
+    config,
+    queue,
+    collectHostContent,
+    getMode,
+    attachStyles
   };
+
+  plt.render = createRenderer(plt, domApi);
 
 
   function loadBundle(bundleId: string, priority: number, cb: Function): void {
@@ -223,7 +204,7 @@ export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: I
     // component, basically its tag, modes and observed attributes
 
     return components.map(data => {
-      const cmpMeta: ComponentMeta = registry[data[0]] = {
+      const cmpMeta: ComponentMeta = registry[data[0].toUpperCase()] = {
         tagNameMeta: data[0],
         modesMeta: {},
         propsMeta: [
@@ -256,7 +237,7 @@ export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: I
 
 
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
-    registry[cmpMeta.tagNameMeta] = cmpMeta;
+    registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
 
     initHostConstructor(plt, HostElementConstructor.prototype);
 
@@ -269,27 +250,46 @@ export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: I
     return cmpMeta.propsMeta.filter(p => p.attribName).map(p => p.attribName);
   }
 
-  function getComponentMeta(tag: string) {
-    return registry[tag.toLowerCase()];
+  function getComponentMeta(elm: Element) {
+    return registry[elm.tagName];
   }
 
   function collectHostContent(elm: HostElement, validNamedSlots: string[]) {
     assignHostContentSlots(domApi, elm, validNamedSlots);
   }
 
-  const plt: PlatformApi = {
-    registerComponents,
-    defineComponent,
-    getComponentMeta,
-    loadBundle,
-    config,
-    queue,
-    collectHostContent,
-    getMode,
-    attachStyles
-  };
 
-  plt.render = createRenderer(plt, domApi);
+  const injectedIonic = initInjectedIonic(IonicGbl, win, doc, plt, config, queue);
+
+
+  IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
+    coreVersion;
+    var args = arguments;
+
+    // import component function
+    // inject ionic globals
+    importFn(moduleImports, h, injectedIonic);
+
+    for (var i = 3; i < args.length; i++) {
+      // first arg is core version
+      // second arg is the bundleId
+      // third arg is the importFn
+      // each arg after that is a component/mode
+      parseComponentModeData(registry, moduleImports, args[i]);
+
+      // fire off all the callbacks waiting on this bundle to load
+      var callbacks = bundleCallbacks[bundleId];
+      if (callbacks) {
+        for (var j = 0, jlen = callbacks.length; j < jlen; j++) {
+          callbacks[j]();
+        }
+        delete bundleCallbacks[bundleId];
+      }
+
+      // remember that we've already loaded this bundle
+      loadedBundles[bundleId] = true;
+    }
+  };
 
   return plt;
 }

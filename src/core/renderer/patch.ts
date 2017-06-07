@@ -91,7 +91,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       if (slotNodes) {
         for (let nodeIndex = 0; nodeIndex < slotNodes.length; nodeIndex++) {
           // remove the host content node from it's original parent node
-          plt.$tmpDisconnected = true;
+          plt.tmpDisconnected = true;
           domApi.$removeChild(slotNodes[nodeIndex].parentNode, slotNodes[nodeIndex]);
 
           if (nodeIndex === slotNodes.length - 1) {
@@ -102,7 +102,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
           // relocate the node to it's new home
           domApi.$appendChild(parentElm, slotNodes[nodeIndex]);
-          plt.$tmpDisconnected = false;
+          plt.tmpDisconnected = false;
         }
       }
 
@@ -134,7 +134,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
             ch = <any>createElm(ch as VNode, insertedVnodeQueue, elm, hostContentNodes);
             if (ch) {
               domApi.$appendChild(elm, <any>ch);
-              plt.$tmpDisconnected = false;
+              plt.tmpDisconnected = false;
             }
           }
         }
@@ -165,7 +165,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
         childNode && domApi.$insertBefore(parentElm, childNode, before);
       }
 
-      plt.$tmpDisconnected = false;
+      plt.tmpDisconnected = false;
     }
   }
 

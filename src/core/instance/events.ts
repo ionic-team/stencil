@@ -1,4 +1,4 @@
-import { Component, HostElement, ListenMeta, ListenOptions, QueueApi } from '../../util/interfaces';
+import { Component, HostElement, ListenMeta, ListenOptions, PlatformApi, QueueApi } from '../../util/interfaces';
 import { getElementReference, noop } from '../../util/helpers';
 import { KEY_CODE_MAP } from '../../util/constants';
 
@@ -17,9 +17,9 @@ export function attachListeners(queue: QueueApi, listeners: ListenMeta[], elm: H
 }
 
 
-export function enableListener(queue: QueueApi, elm: HostElement, instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
+export function enableListener(plt: PlatformApi, queue: QueueApi, elm: HostElement, instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
   if (instance) {
-    const listenerMeta = elm.$meta.listenersMeta;
+    const listenerMeta = plt.getComponentMeta(elm).listenersMeta;
 
     if (listenerMeta) {
       const deregisterFns = elm._listeners = elm._listeners || {};

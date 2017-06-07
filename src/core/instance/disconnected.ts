@@ -6,7 +6,7 @@ import { invokeDestroyHook } from '../renderer/patch';
 export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
-  if (!plt.$tmpDisconnected) {
+  if (!plt.tmpDisconnected) {
 
     // ok, let's officially destroy this thing
     // set this to true so that any of our pending async stuff

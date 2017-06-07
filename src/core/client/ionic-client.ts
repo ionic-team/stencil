@@ -1,8 +1,9 @@
 import { addEventListener, enableListener } from '../instance/events';
-import { Component, CustomEventOptions, Ionic, IonicGlobal, ListenOptions, IonicControllerApi, QueueApi } from '../../util/interfaces';
+import { Component, ConfigApi, CustomEventOptions, Ionic, IonicGlobal,
+  ListenOptions, IonicControllerApi, PlatformApi, QueueApi } from '../../util/interfaces';
 
 
-export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocument, queue: QueueApi): Ionic {
+export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocument, plt: PlatformApi, config: ConfigApi, queue: QueueApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -24,7 +25,7 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocu
 
   // properties to be exposed to public
   // in actuality it's the exact same object
-  IonicGbl.config = IonicGbl.ConfigCtrl;
+  IonicGbl.config = config;
 
   (<Ionic>IonicGbl).dom = IonicGbl.DomCtrl;
 
@@ -46,7 +47,7 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocu
 
   (<Ionic>IonicGbl).listener = {
     enable: function(instance: any, eventName: string, shouldEnable: boolean, attachTo?: string) {
-      enableListener(queue, (<Component>instance).$el, instance, eventName, shouldEnable, attachTo);
+      enableListener(plt, queue, (<Component>instance).$el, instance, eventName, shouldEnable, attachTo);
     },
     add: function (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => any, opts?: ListenOptions) {
       return addEventListener(queue, elm, eventName, cb, opts);

@@ -613,7 +613,6 @@ export interface HostElement extends HTMLElement {
 
   // public properties
   $instance?: Component;
-  $meta?: ComponentMeta;
 
   // private methods
   _render: () => void;
@@ -709,7 +708,7 @@ export interface VNodeData {
 export interface PlatformApi {
   registerComponents: (components?: LoadComponentData[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
-  getComponentMeta: (tag: string) => ComponentMeta;
+  getComponentMeta: (elm: Element) => ComponentMeta;
   loadBundle: (bundleId: string, priority: LoadPriority, cb: Function) => void;
   render?: RendererApi;
   config: ConfigApi;
@@ -719,7 +718,7 @@ export interface PlatformApi {
   isServer?: boolean;
   attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
   getMode: (elm: Element) => string;
-  $tmpDisconnected?: boolean;
+  tmpDisconnected?: boolean;
 }
 
 export interface PlatformConfig {
