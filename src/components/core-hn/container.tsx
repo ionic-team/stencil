@@ -11,7 +11,7 @@ export class NewsContainer {
   apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
   page: number = 1;
   pageType: string;
-  @Prop() prevColor: string;
+  @Prop() prevClass: string;
   @Prop() selectedClass: boolean = false;
   @Prop() firstSelectedClass: boolean;
   @Prop() secondSelectedClass: boolean = false;
@@ -22,26 +22,6 @@ export class NewsContainer {
     if (Ionic.isServer) return;
 
     this.firstSelectedClass = true;
-
-    /* Ionic.controller('loading', { content: 'fetching articles...' }).then((loading: any) => {
-
-       loading.present().then(() => {
-         console.log('start presenting loading');
-
-         fetch(`${this.apiRootUrl}/news?page=${this.page}`).then((response) => {
-           return response.json();
-         }).then((data) => {
-           console.log(data);
-           this.stories = data;
-
-           setTimeout(() => {
-             loading.dismiss();
-           }, 500);
-         });
-
-         this.pageType = 'news';
-       });
-     });*/
 
     fetch(`${this.apiRootUrl}/news?page=${this.page}`).then((response) => {
       return response.json();
@@ -154,56 +134,59 @@ export class NewsContainer {
 
     // set previous button color
     if (this.page === 1) {
-      this.prevColor = 'dark';
+      this.prevClass = 'no-back';
     } else {
-      this.prevColor = 'primary';
+      this.prevClass = 'yes-back';
     }
 
     return [
       <ion-header mdHeight='56px' iosHeight='61px'>
         <ion-toolbar color='primary'>
           <ion-icon class='header-icon' name='ionic' slot='start'></ion-icon>
-          <ion-button
-            class={{
-              'header-button': true,
-              'first-button': true,
-              'header-button-selected': this.firstSelectedClass
-            }}
-            clear
-            on-click={() => this.getStories('news')}
-          >
-            News
+
+          <div class='tabs-bar'>
+            <ion-button
+              class={{
+                'header-button': true,
+                'first-button': true,
+                'header-button-selected': this.firstSelectedClass
+              }}
+              clear
+              on-click={() => this.getStories('news')}
+            >
+              News
           </ion-button>
-          <ion-button
-            class={{
-              'header-button': true,
-              'header-button-selected': this.secondSelectedClass
-            }}
-            clear
-            on-click={() => this.getStories('show')}
-          >
-            Show
+            <ion-button
+              class={{
+                'header-button': true,
+                'header-button-selected': this.secondSelectedClass
+              }}
+              clear
+              on-click={() => this.getStories('show')}
+            >
+              Show
           </ion-button>
-          <ion-button
-            class={{
-              'header-button': true,
-              'header-button-selected': this.thirdSelectedClass
-            }}
-            clear
-            on-click={() => this.getStories('jobs')}
-          >
-            Jobs
+            <ion-button
+              class={{
+                'header-button': true,
+                'header-button-selected': this.thirdSelectedClass
+              }}
+              clear
+              on-click={() => this.getStories('jobs')}
+            >
+              Jobs
           </ion-button>
-          <ion-button
-            class={{
-              'header-button': true,
-              'header-button-selected': this.fourthSelectedClass
-            }}
-            clear
-            on-click={() => this.getStories('ask')}
-          >
-            Ask
+            <ion-button
+              class={{
+                'header-button': true,
+                'header-button-selected': this.fourthSelectedClass
+              }}
+              clear
+              on-click={() => this.getStories('ask')}
+            >
+              Ask
           </ion-button>
+          </div>
         </ion-toolbar>
       </ion-header>,
       <ion-content>
@@ -213,7 +196,7 @@ export class NewsContainer {
       <ion-footer>
         <ion-toolbar class='pager'>
           <ion-buttons slot='start'>
-            <ion-button color={this.prevColor} clear={true} on-click={() => this.previous()}>
+            <ion-button class={this.prevClass} clear={true} on-click={() => this.previous()}>
               prev
           </ion-button>
           </ion-buttons>
@@ -221,7 +204,7 @@ export class NewsContainer {
             page {this.page}
           </span>
           <ion-buttons slot='end'>
-            <ion-button class='next-button' color='primary' clear={true} on-click={() => this.next()}>
+            <ion-button color='primary' clear={true} on-click={() => this.next()}>
               next
           </ion-button>
           </ion-buttons>

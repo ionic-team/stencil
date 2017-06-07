@@ -63,14 +63,24 @@ ion-footer ion-toolbar {
   line-height: 2.1;
 }
 
-.disabled-nav button {
-  color: lightgrey;
-}
-
 .header-button {
   opacity: 0.6;
+  flex-grow: 0.1;
 }
 
 .header-button-selected {
   opacity: 1;
+}
+
+.tabs-bar {
+  display: flex;
+}
+
+.no-back button {
+  opacity: 0.3;
+}
+
+.yes-back button {
+  opacity: 1;
+  color: #327eff;
 }
