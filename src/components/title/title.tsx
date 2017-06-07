@@ -44,12 +44,20 @@ import { createThemedClasses } from '../../util/theme';
     wp: 'title.wp.scss'
   },
   host: {
-    theme: 'toolbar-title'
+    theme: 'title'
   }
 })
 export class ToolbarTitle {
+  mode: string;
+  color: string;
 
   render() {
-    return <slot></slot>;
+    const titleClasses = createThemedClasses(this.mode, this.color, 'toolbar-title');
+
+    return [
+      <div class={titleClasses}>
+        <slot></slot>
+      </div>
+    ];
   }
 }
