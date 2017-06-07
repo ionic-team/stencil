@@ -14,16 +14,8 @@ ion-toolbar ion-button.header-button button {
 
 .header-icon {
   color: white;
-  font-size: 3.4rem;
-  margin-left: 15px;
-}
-
-.next-button {
-  float: right;
-}
-
-.previous-button {
-  float: left;
+  font-size: 3.4rem !important;
+  margin-left: 15px !important;
 }
 
 .page-number {

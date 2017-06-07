@@ -11,7 +11,7 @@ export class NewsContainer {
   apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
   page: number = 1;
   pageType: string;
-  @Prop() prevClass: string;
+  @Prop() prevColor: string;
   @Prop() selectedClass: boolean = false;
   @Prop() firstSelectedClass: boolean;
   @Prop() secondSelectedClass: boolean = false;
@@ -48,6 +48,8 @@ export class NewsContainer {
     }).then((data) => {
       console.log(data);
       this.stories = data;
+
+      this.pageType = 'news';
     });
   }
 
@@ -152,18 +154,15 @@ export class NewsContainer {
 
     // set previous button color
     if (this.page === 1) {
-      console.log('im here', this.page);
-      this.prevClass = '.disabled-nav';
+      this.prevColor = 'dark';
     } else {
-      this.prevClass = '';
+      this.prevColor = 'primary';
     }
-
-    console.log(this.firstSelectedClass);
 
     return [
       <ion-header mdHeight='56px' iosHeight='61px'>
         <ion-toolbar color='primary'>
-          <ion-icon class='header-icon' name= 'ionic' slot='start'></ion-icon>
+          <ion-icon class='header-icon' name='ionic' slot='start'></ion-icon>
           <ion-button
             class={{
               'header-button': true,
@@ -213,15 +212,19 @@ export class NewsContainer {
       </ion-content>,
       <ion-footer>
         <ion-toolbar class='pager'>
-          <ion-button class={this.prevClass} clear={true} slot='start' on-click={() => this.previous()}>
-            prev
+          <ion-buttons slot='start'>
+            <ion-button color={this.prevColor} clear={true} on-click={() => this.previous()}>
+              prev
           </ion-button>
+          </ion-buttons>
           <span class='page-number'>
             page {this.page}
           </span>
-          <ion-button class='next-button' clear={true} on-click={() => this.next()}>
-            next
+          <ion-buttons slot='end'>
+            <ion-button class='next-button' color='primary' clear={true} on-click={() => this.next()}>
+              next
           </ion-button>
+          </ion-buttons>
         </ion-toolbar>
       </ion-footer>
     ];

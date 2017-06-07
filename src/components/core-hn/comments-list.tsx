@@ -25,11 +25,9 @@ export class CommentsList {
     });
 
     return (
-      <div>
-        <ion-list>
-          {items}
-        </ion-list>
-      </div>
+      <ion-list>
+        {items}
+      </ion-list>
     );
   }
 }

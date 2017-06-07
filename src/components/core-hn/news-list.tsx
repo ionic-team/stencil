@@ -8,7 +8,7 @@ import { Component, h, Prop, Ionic } from '../index';
 export class NewsList {
 
   @Prop() type: any[];
-  apiRootUrl: string = 'http://localhost:8100';
+  apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
 
   comments(story: any) {
     if (Ionic.isServer) return;
@@ -39,21 +39,23 @@ export class NewsList {
 
   render() {
     return (
-      <ul>
-        { this.type.map((story: any) => (
-          <li>
+      <ion-list>
+        {this.type.map((story: any) => (
+          <ion-item>
             <div class='points' slot='start'>
               {story.points || 0}
             </div>
-            <div>
-              <h2 class='list-header' on-click={() => window.open(story.url)}>{story.title}</h2>
-              <h3 class='comments-text' on-click={() => this.comments(story)}>
-                Posted by {story.user} {story.time_ago} | {story.comments_count} comments
+            <ion-label>
+              <div>
+                <h2 class='list-header' on-click={() => window.open(story.url)}>{story.title}</h2>
+                <h3 class='comments-text' on-click={() => this.comments(story)}>
+                  Posted by {story.user} {story.time_ago} | {story.comments_count} comments
               </h3>
-            </div>
-          </li>
+              </div>
+            </ion-label>
+          </ion-item>
         ))}
-      </ul>
+      </ion-list>
     );
   }
 }
