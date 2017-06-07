@@ -34,8 +34,10 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
       elm._hostContentNodes = elm._hostContentNodes.defaultSlot = elm._hostContentNodes.namedSlots = null;
     }
 
+    // fuhgeddaboudit
     // set it all to null to ensure we forget references
     // and reset values incase this node gets reused somehow
-    elm._root = elm._vnode = elm._watchers = elm._hasConnected = elm._isQueuedForUpdate = elm._isLoaded = null;
+    // (possible that it got disconnected, but the node was reused)
+    elm._root = elm._vnode = elm._ancestorHostElement = elm._activelyLoadingChildren = elm._watchers = elm._hasConnected = elm._isQueuedForUpdate = elm._hasLoaded = null;
   }
 }

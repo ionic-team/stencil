@@ -7,11 +7,13 @@ let supportsOpts: boolean = null;
 
 
 export function attachListeners(queue: QueueApi, listeners: ListenMeta[], elm: HostElement, instance: Component) {
-  for (var i = 0; i < listeners.length; i++) {
-    var listener = listeners[i];
-    if (listener.enabled !== false) {
-      elm._listeners = elm._listeners || {};
-      elm._listeners[listener.eventName] = addEventListener(queue, elm, listener.eventName, (<any>instance)[listener.methodName].bind(instance), listener);
+  if (listeners) {
+    for (var i = 0; i < listeners.length; i++) {
+      var listener = listeners[i];
+      if (listener.enabled !== false) {
+        elm._listeners = elm._listeners || {};
+        elm._listeners[listener.eventName] = addEventListener(queue, elm, listener.eventName, (<any>instance)[listener.methodName].bind(instance), listener);
+      }
     }
   }
 }

@@ -15,7 +15,7 @@ export function mockPlatform(IonicGbl?: IonicGlobal) {
   if (!IonicGbl) {
     IonicGbl = mockIonicGlobal();
   }
-  const plt = createPlatformServer(win, IonicGbl);
+  const plt = createPlatformServer(win, IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();
@@ -163,7 +163,7 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
 
   if (node.tagName) {
     if (!node._hasConnected) {
-      const cmpMeta = (<PlatformApi>plt).getComponentMeta(node.tagName);
+      const cmpMeta = (<PlatformApi>plt).getComponentMeta(node);
       if (cmpMeta) {
         initHostConstructor((<PlatformApi>plt), node);
         (<HostElement>node).connectedCallback();

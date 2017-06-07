@@ -606,7 +606,7 @@ export interface ComponentRegistry {
 
 
 export interface HostElement extends HTMLElement {
-  // standardized web apis
+  // web component APIs
   connectedCallback: () => void;
   attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
@@ -620,16 +620,17 @@ export interface HostElement extends HTMLElement {
   _queueUpdate: () => void;
 
   // private properties
+  _activelyLoadingChildren?: HostElement[];
+  _ancestorHostElement?: HostElement;
   _hasConnected?: boolean;
   _hasDestroyed?: boolean;
-  _isLoaded?: boolean;
+  _hasLoaded?: boolean;
+  _hostContentNodes?: HostContentNodes;
   _isQueuedForUpdate?: boolean;
   _listeners?: ComponentActiveListeners;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
   _watchers?: ComponentActiveWatchers;
-
-  _hostContentNodes?: HostContentNodes;
 }
 
 

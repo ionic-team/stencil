@@ -12,6 +12,27 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     // if somehow this node was reused, ensure we've removed this property
     delete elm._hasDestroyed;
 
+    // find the first ancestor host element (if there is one) and register
+    // this element as one of the actively loading child elements for its ancestor
+    let ancestorHostElement = elm;
+    while (ancestorHostElement = getParentElement(ancestorHostElement)) {
+      // climb up the ancestors looking for the first registered component
+      if (plt.getComponentMeta(ancestorHostElement)) {
+        // we found this elements the first ancestor host element
+        // if the ancestor already loaded then do nothing, it's too late
+        if (!ancestorHostElement._hasLoaded) {
+
+          // keep a reference to this element's ancestor host element
+          elm._ancestorHostElement = ancestorHostElement;
+
+          // ensure there is an array to contain a reference to each of the child elements
+          // and set this element as one of the ancestor's child elements it should wait on
+          (ancestorHostElement._activelyLoadingChildren = ancestorHostElement._activelyLoadingChildren || []).push(elm);
+        }
+        break;
+      }
+    }
+
     // get the component meta data about this component
     const cmpMeta = plt.getComponentMeta(elm);
 
@@ -42,23 +63,4 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
       });
     });
   }
-}
-
-
-export function getParentHostElement(plt: PlatformApi, elm: HostElement) {
-  while (elm = getParentElement(elm)) {
-    if (plt.getComponentMeta(elm)) {
-      return elm;
-    }
-  }
-  return null;
-}
-
-
-export function getRenderChildren(elm: HostElement) {
-  const renderChildren: Node[] = [];
-  for (var i = 0; i < elm.childNodes.length; i++) {
-    renderChildren.push(elm.childNodes[i]);
-  }
-  return renderChildren;
 }

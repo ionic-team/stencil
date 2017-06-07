@@ -65,17 +65,56 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
 
 
 export function initLoad(plt: PlatformApi, elm: HostElement): any {
-  // this value is only useful during the initial load, but
-  // not accurate after that remove it so there's no confusion
-  elm._isLoaded = true;
-  elm.classList.add('hydrated');
+  const instance = elm.$instance;
 
-  // the element is within the DOM now, so let's attach the event listeners
-  const listenersMeta = plt.getComponentMeta(elm).listenersMeta;
-  listenersMeta && attachListeners(plt.queue, listenersMeta, elm, elm.$instance);
+  // it's possible that we've already decided to destroy this element
+  // check if this element has any actively loading child elements
+  if (instance && !elm._hasDestroyed && (!elm._activelyLoadingChildren || !elm._activelyLoadingChildren.length)) {
 
-  // sweet, we're good to go
-  // all of this component's children have loaded (if any)
-  // so now this component is officially loaded. good work team
-  (elm.$instance.ionViewDidLoad && elm.$instance.ionViewDidLoad());
+    // cool, so at this point this element isn't already being destroyed
+    // and it does not have any child elements that are still loading
+    // ensure we remove any child references cuz it doesn't matter at this point
+    elm._activelyLoadingChildren = null;
+
+    // add the css class that this element has officially hydrated
+    elm.classList.add('hydrated');
+
+    // the element is within the DOM now, so let's attach the event listeners
+    attachListeners(plt.queue, plt.getComponentMeta(elm).listenersMeta, elm, instance);
+
+    // sweet, this particular element is good to go
+    // all of this element's children have loaded (if any)
+    elm._hasLoaded = true;
+
+    // fire off the user's DidLoad method (if one was provided)
+    instance.ionViewDidLoad && instance.ionViewDidLoad();
+
+    // ( •_•)
+    // ( •_•)>⌐■-■
+    // (⌐■_■)
+
+    // load events fire from bottom to top, the deepest elements first then bubbles up
+    // if this element did have an ancestor host element
+    if (elm._ancestorHostElement) {
+      // ok so this element already has a known ancestor host element
+      // let's make sure we remove this element from its ancestor's
+      // known list of child elements which are actively loading
+      let ancestorsActivelyLoadingChildren = elm._ancestorHostElement._activelyLoadingChildren;
+      let index = ancestorsActivelyLoadingChildren && ancestorsActivelyLoadingChildren.indexOf(elm);
+      if (index > -1) {
+        // yup, this element is in the list of child elements to wait on
+        // remove it so we can work to get the length down to 0
+        ancestorsActivelyLoadingChildren.splice(index, 1);
+      }
+
+      // the ancestor's initLoad method will do the actual checks
+      // to see if the ancestor is actually loaded or not
+      // then let's call the ancestor's initLoad method if there's no length
+      // (which actually ends up as this method again but for the ancestor)
+      !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement._initLoad();
+
+      // fuhgeddaboudit, no need to keep a reference after this element loaded
+      elm._ancestorHostElement = null;
+    }
+  }
 }
