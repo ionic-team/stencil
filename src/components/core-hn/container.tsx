@@ -11,7 +11,7 @@ export class NewsContainer {
   apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
   page: number = 1;
   pageType: string;
-  @Prop() prevClass: string;
+  @Prop() prevClass: any;
   @Prop() selectedClass: boolean = false;
   @Prop() firstSelectedClass: boolean;
   @Prop() secondSelectedClass: boolean = false;
@@ -132,12 +132,7 @@ export class NewsContainer {
 
   render() {
 
-    // set previous button color
-    if (this.page === 1) {
-      this.prevClass = 'no-back';
-    } else {
-      this.prevClass = 'yes-back';
-    }
+    this.prevClass = this.page === 1 ? { 'no-back': true } : { 'yes-back': true };
 
     return [
       <ion-header mdHeight='56px' iosHeight='61px'>
