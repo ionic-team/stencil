@@ -42,7 +42,7 @@ describe('instance update', () => {
       tagNameMeta: 'ion-test',
       componentModuleMeta: class {
         render() {
-          return h('ion-test', 'hi');
+          return h('grasshopper', 'hi');
         }
       }
     });
@@ -50,7 +50,8 @@ describe('instance update', () => {
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
     waitForLoad(plt, node, 'ion-test', (elm) => {
-      expect(elm.childNodes[0].nodeValue).toEqual('hi');
+      expect(elm.childNodes[0].nodeName).toBe('GRASSHOPPER');
+      expect(elm.childNodes[0].textContent).toBe('hi');
       done();
     });
   });
