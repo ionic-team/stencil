@@ -123,12 +123,13 @@ function buildCoreMinified(ctx: BuildContext) {
 
   var content = ctx.coreDevContent;
 
-  var match = /class (.*?) extends HTMLElement {}/gm.exec(content);
+  var match = /class HostElement extends HTMLElement {}/.exec(content);
   if (!match) {
+    fs.writeFileSync(closurePrepareFilePath, content);
     throw 'preClosure: something done changed!'
   }
 
-  content = content.replace(match[0], 'function ' + match[1] + ' () { "tricks-are-for-closure"; }');
+  content = content.replace(match[0], 'function(){"tricks-are-for-closure"}');
 
   return writeFile(closurePrepareFilePath, content).then(() => {
 
@@ -157,21 +158,13 @@ function buildCoreMinified(ctx: BuildContext) {
         } else {
           var content = stdOut;
 
-          var match = /function (.*?)\(\){"tricks-are-for-closure"}/gm.exec(content);
+          var match = /function\(\){"tricks-are-for-closure"}/.exec(content);
           if (!match) {
-            match = /function (.*?)\s*?\(\)\s*?{\s*?"tricks-are-for-closure";\s*?}/gm.exec(content);
-            if (!match) {
-              throw 'postClosure: something done changed!'
-            }
+            fs.writeFileSync(closurePrepareFilePath, content);
+            throw 'postClosure: something done changed!'
           }
 
-          var className = match[0].split('(')[0].replace('function ', '').trim();
-
-          if (className.indexOf('$$') > -1) {
-            className += '$$'; // thanks JS regex :)
-          }
-
-          content = content.replace(match[0], 'class ' + className + ' extends HTMLElement {}');
+          content = content.replace(match[0], `class extends HTMLElement{}`);
 
           // (function(B,U){
           var match = /\(function\((.*?)\)\{/.exec(content);

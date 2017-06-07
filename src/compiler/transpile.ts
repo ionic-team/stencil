@@ -59,7 +59,7 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
       if (fileMeta) {
         return fileMeta.srcText;
       }
-      fileMeta = createFileMeta(config, ctx, filePath, config.packages.fs.readFileSync(filePath, 'utf-8'));
+      fileMeta = createFileMeta(config.packages, ctx, filePath, config.packages.fs.readFileSync(filePath, 'utf-8'));
       fileMeta.recompileOnChange = true;
       return fileMeta.srcText;
     },

@@ -33,7 +33,10 @@ const BUNDLES = [
   { components: ['ion-toggle'] },
 
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
-  { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] }
+  { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] },
+
+  { components: ['ion-parent'] },
+  { components: ['ion-child'] }
 ];
 
 

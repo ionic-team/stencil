@@ -1,11 +1,11 @@
+import { createPlatformClient } from '../../../core/client/platform-client';
 import { IonicGlobal } from '../../../util/interfaces';
-import { PlatformClient } from '../../../client/platform-client';
-import { registerComponents } from '../../../client/registry-client';
-import { Renderer } from '../../../renderer/core';
 
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
+const plt = createPlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
 
-registerComponents(Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);
+plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {
+  plt.defineComponent(cmpMeta, class HostElement extends HTMLElement {});
+});

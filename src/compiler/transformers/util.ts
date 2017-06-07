@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 
+
 export class ObjectMap {
   [key: string]: ts.Expression | ObjectMap
 }

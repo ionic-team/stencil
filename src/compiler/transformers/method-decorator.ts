@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 
 
 export function getMethodDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.methods = [];
+  fileMeta.cmpMeta.methodsMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
   const methodMemebers = decoratedMembers.filter(n => n.kind === ts.SyntaxKind.MethodDeclaration);
@@ -24,10 +24,10 @@ export function getMethodDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
     });
 
     if (isMethod && methodName) {
-      fileMeta.cmpMeta.methods.push(methodName);
+      fileMeta.cmpMeta.methodsMeta.push(methodName);
       methodNode.decorators = undefined;
     }
   });
 
-  fileMeta.cmpMeta.methods = fileMeta.cmpMeta.methods.sort();
+  fileMeta.cmpMeta.methodsMeta = fileMeta.cmpMeta.methodsMeta.sort();
 }

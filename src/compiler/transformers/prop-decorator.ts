@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 
 
 export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.props = [];
+  fileMeta.cmpMeta.propsMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
@@ -48,13 +48,13 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
         prop.propType = propType;
       }
 
-      fileMeta.cmpMeta.props.push(prop);
+      fileMeta.cmpMeta.propsMeta.push(prop);
 
       memberNode.decorators = undefined;
     }
   });
 
-  fileMeta.cmpMeta.props = fileMeta.cmpMeta.props.sort((a, b) => {
+  fileMeta.cmpMeta.propsMeta = fileMeta.cmpMeta.propsMeta.sort((a, b) => {
     if (a.propName < b.propName) return -1;
     if (a.propName > b.propName) return 1;
     return 0;

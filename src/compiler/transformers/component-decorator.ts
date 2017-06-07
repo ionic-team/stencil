@@ -1,4 +1,4 @@
-import { ComponentMeta } from '../interfaces';
+import { ComponentMeta, ComponentOptions } from '../interfaces';
 import * as ts from 'typescript';
 
 
@@ -36,9 +36,22 @@ export function getComponentDecoratorData(classNode: ts.ClassDeclaration) {
 function parseComponentMetaData(text: string): ComponentMeta {
   try {
     const fnStr = `return ${text};`;
-    let cmpMeta: ComponentMeta = new Function(fnStr)();
 
-    return updateComponentMeta(cmpMeta, text);
+    // parse user component options
+    const userOpts: ComponentOptions = new Function(fnStr)();
+
+    // convert user component options from user into component meta
+    const cmpMeta: ComponentMeta = {};
+
+    cmpMeta.modesMeta = {};
+
+    normalizeTag(userOpts, cmpMeta, text);
+    normalizeStyles(userOpts, cmpMeta);
+    normalizeModes(cmpMeta);
+    normalizeShadow(userOpts, cmpMeta);
+    normalizeHost(userOpts, cmpMeta);
+
+    return cmpMeta;
 
   } catch (e) {
     console.log(`parseComponentMetaData: ${e}`);
@@ -48,94 +61,84 @@ function parseComponentMetaData(text: string): ComponentMeta {
 }
 
 
-function updateComponentMeta(cmpMeta: ComponentMeta, orgText: string) {
-  if ((<any>cmpMeta).selector) {
-    console.log(`Please use "tag" instead of "selector" in component decorator: ${(<any>cmpMeta).selector}`);
-    cmpMeta.tag = (<any>cmpMeta).selector;
+function normalizeTag(userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
+
+  if ((<any>userOpts).selector) {
+    console.log(`Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`);
+    cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
 
-  if (!cmpMeta.tag || cmpMeta.tag.trim() === '') {
+  cmpMeta.tagNameMeta = userOpts.tag;
+
+  if (!cmpMeta.tagNameMeta || cmpMeta.tagNameMeta.trim() === '') {
     throw `tag missing in component decorator: ${orgText}`;
   }
 
-  cmpMeta.modes = {};
+  cmpMeta.tagNameMeta = cmpMeta.tagNameMeta.trim().toLowerCase();
 
-  updateTag(cmpMeta);
-  updateStyles(cmpMeta);
-  updateModes(cmpMeta);
-  updateShadow(cmpMeta);
-  updateHostMeta(cmpMeta);
-
-  return cmpMeta;
-}
-
-
-function updateTag(cmpMeta: ComponentMeta) {
-  cmpMeta.tag = cmpMeta.tag.trim().toLowerCase();
-
-  if (cmpMeta.tag.indexOf(' ') > -1) {
-    throw `"${cmpMeta.tag}" tag cannot contain a space`;
+  if (cmpMeta.tagNameMeta.indexOf(' ') > -1) {
+    throw `"${cmpMeta.tagNameMeta}" tag cannot contain a space`;
   }
 
-  if (cmpMeta.tag.indexOf(',') > -1) {
-    throw `"${cmpMeta.tag}" tag cannot be use for multiple tags`;
+  if (cmpMeta.tagNameMeta.indexOf(',') > -1) {
+    throw `"${cmpMeta.tagNameMeta}" tag cannot be use for multiple tags`;
   }
 
-  let invalidChars = cmpMeta.tag.replace(/\w|-/g, '');
+  let invalidChars = cmpMeta.tagNameMeta.replace(/\w|-/g, '');
   if (invalidChars !== '') {
-    throw `"${cmpMeta.tag}" tag contains invalid characters: ${invalidChars}`;
+    throw `"${cmpMeta.tagNameMeta}" tag contains invalid characters: ${invalidChars}`;
   }
 
-  if (cmpMeta.tag.indexOf('-') === -1) {
-    throw `"${cmpMeta.tag}" tag must contain a dash (-) to work as a valid web component`;
+  if (cmpMeta.tagNameMeta.indexOf('-') === -1) {
+    throw `"${cmpMeta.tagNameMeta}" tag must contain a dash (-) to work as a valid web component`;
   }
 
-  if (cmpMeta.tag.indexOf('--') > -1) {
-    throw `"${cmpMeta.tag}" tag cannot contain multiple dashes (--) next to each other`;
+  if (cmpMeta.tagNameMeta.indexOf('--') > -1) {
+    throw `"${cmpMeta.tagNameMeta}" tag cannot contain multiple dashes (--) next to each other`;
   }
 
-  if (cmpMeta.tag.indexOf('-') === 0) {
-    throw `"${cmpMeta.tag}" tag cannot start with a dash (-)`;
+  if (cmpMeta.tagNameMeta.indexOf('-') === 0) {
+    throw `"${cmpMeta.tagNameMeta}" tag cannot start with a dash (-)`;
   }
 
-  if (cmpMeta.tag.lastIndexOf('-') === cmpMeta.tag.length - 1) {
-    throw `"${cmpMeta.tag}" tag cannot end with a dash (-)`;
+  if (cmpMeta.tagNameMeta.lastIndexOf('-') === cmpMeta.tagNameMeta.length - 1) {
+    throw `"${cmpMeta.tagNameMeta}" tag cannot end with a dash (-)`;
   }
 }
 
 
-function updateStyles(cmpMeta: ComponentMeta) {
-  if (!(<any>cmpMeta).styleUrls) {
+function normalizeStyles(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
+  if (!userOpts.styleUrls) {
     return;
   }
 
   // normalize the possible styleUrl structures
 
-  if (typeof (<any>cmpMeta).styleUrls === 'string') {
+  if (typeof userOpts.styleUrls === 'string') {
     // as a string
     // styleUrls: 'my-styles.scss'
 
-    if (!(<any>cmpMeta).styleUrls.trim().length) {
-      throw `invalid style url for ${cmpMeta.tag}: ${(<any>cmpMeta).styleUrls}`;
+    if (!userOpts.styleUrls.trim().length) {
+      throw `invalid style url for ${cmpMeta.tagNameMeta}: ${userOpts.styleUrls}`;
     }
 
-    cmpMeta.modes['default'] = {
-      styleUrls: [(<any>cmpMeta).styleUrls.trim()]
+    cmpMeta.modesMeta['default'] = {
+      styleUrls: [userOpts.styleUrls.trim()]
     };
 
-  } else if (Array.isArray((<any>cmpMeta).styleUrls)) {
+  } else if (Array.isArray(userOpts.styleUrls)) {
     // as an array of strings
     // styleUrls: ['my-styles.scss', 'my-other-styles']
 
-    cmpMeta.modes['default'] = {
+    cmpMeta.modesMeta['default'] = {
       styleUrls: []
     };
 
-    (<any>cmpMeta).styleUrls.forEach((styleUrl: string) => {
+    userOpts.styleUrls.forEach(styleUrl => {
       if (styleUrl && typeof styleUrl === 'string' && styleUrl.trim().length) {
-        cmpMeta.modes['default'].styleUrls.push(styleUrl.trim());
+        cmpMeta.modesMeta['default'].styleUrls.push(styleUrl.trim());
       } else {
-        throw `invalid style url for ${cmpMeta.tag}: ${styleUrl}`;
+        throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleUrl}`;
       }
     });
 
@@ -147,84 +150,82 @@ function updateStyles(cmpMeta: ComponentMeta) {
     //   wp: 'badge.wp.scss'
     // }
 
-    const styleModes: {[modeName: string]: string} = (<any>cmpMeta).styleUrls;
+    const styleModes: {[modeName: string]: string} = (<any>userOpts).styleUrls;
 
     Object.keys(styleModes).forEach(styleModeName => {
       const modeName = styleModeName.trim().toLowerCase();
-      cmpMeta.modes[modeName] = {
+      cmpMeta.modesMeta[modeName] = {
         styleUrls: []
       };
 
       if (typeof styleModes[styleModeName] === 'string') {
         const styleUrl = styleModes[styleModeName].trim();
         if (!styleUrl.length) {
-          throw `invalid style url for ${cmpMeta.tag}: ${styleModes[styleModeName]}`;
+          throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleModes[styleModeName]}`;
         }
 
-        cmpMeta.modes[modeName].styleUrls.push(styleUrl);
+        cmpMeta.modesMeta[modeName].styleUrls.push(styleUrl);
 
       } else if (Array.isArray(styleModes[styleModeName])) {
-        const styleUrls: string[] = (<any>cmpMeta).styleUrls;
+        const styleUrls: string[] = (<any>userOpts).styleUrls;
 
         styleUrls.forEach(styleUrl => {
           if (styleUrl && typeof styleUrl === 'string' && styleUrl.trim().length) {
-            cmpMeta.modes[modeName].styleUrls.push(styleUrl.trim());
+            cmpMeta.modesMeta[modeName].styleUrls.push(styleUrl.trim());
           } else {
-            throw `invalid style url for ${cmpMeta.tag}: ${styleUrl}`;
+            throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleUrl}`;
           }
         });
 
       } else {
-        throw `invalid style url for ${cmpMeta.tag}: ${styleModes[styleModeName]}`;
+        throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleModes[styleModeName]}`;
       }
     });
 
   }
-
-  // remove the original user data now that we've parsed it out
-  delete (<any>cmpMeta).styleUrls;
 }
 
 
-function updateModes(cmpMeta: ComponentMeta) {
-  const modeNames = Object.keys(cmpMeta.modes).sort();
+function normalizeModes(cmpMeta: ComponentMeta) {
+  const modeNames = Object.keys(cmpMeta.modesMeta).sort();
 
   if (modeNames.length === 0) {
     // always set a default, even if there's nothing
-    cmpMeta.modes['default'] = {};
+    cmpMeta.modesMeta['default'] = {};
 
   } else {
     // normalize mode name sorting
-    const modes = Object.assign({}, cmpMeta.modes);
-    cmpMeta.modes = {};
+    const modes = Object.assign({}, cmpMeta.modesMeta);
+    cmpMeta.modesMeta = {};
 
     modeNames.forEach(modeName => {
-      cmpMeta.modes[modeName] = modes[modeName];
+      cmpMeta.modesMeta[modeName] = modes[modeName];
     });
   }
 }
 
 
-function updateShadow(cmpMeta: ComponentMeta) {
-  // default to NOT use shadow dom
-  let shadow = false;
+function normalizeShadow(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
+  const rawShadowValue: any = userOpts.shadow;
 
-  // or figure out a best guess depending on the value they put in
-  if (cmpMeta.shadow !== undefined) {
-    if (typeof cmpMeta.shadow === 'string') {
-      if ((<string>cmpMeta.shadow).toLowerCase().trim() === 'true') {
-        shadow = true;
+  // default to NOT use shadow dom
+  cmpMeta.isShadowMeta = false;
+
+  // try to figure out a best guess depending on the value they put in
+  if (rawShadowValue !== undefined) {
+    if (typeof rawShadowValue === 'string') {
+      if (rawShadowValue.toLowerCase().trim() === 'true') {
+        cmpMeta.isShadowMeta = true;
       }
 
     } else {
       // ensure it's a boolean
-      shadow = !!cmpMeta.shadow;
+      cmpMeta.isShadowMeta = !!rawShadowValue;
     }
   }
-
-  cmpMeta.shadow = shadow;
 }
 
-function updateHostMeta(cmpMeta: ComponentMeta) {
-  cmpMeta.host = cmpMeta.host || {};
+
+function normalizeHost(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
+  cmpMeta.hostMeta = userOpts.host || {};
 }

@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 
 
 export function getStateDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.states = [];
+  fileMeta.cmpMeta.statesMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
@@ -23,10 +23,10 @@ export function getStateDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDec
     });
 
     if (isState && propName) {
-      fileMeta.cmpMeta.states.push(propName);
+      fileMeta.cmpMeta.statesMeta.push(propName);
       memberNode.decorators = undefined;
     }
   });
 
-  fileMeta.cmpMeta.states = fileMeta.cmpMeta.states.sort();
+  fileMeta.cmpMeta.statesMeta = fileMeta.cmpMeta.statesMeta.sort();
 }

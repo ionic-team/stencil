@@ -38,23 +38,23 @@ export function formatBundleContent(coreVersion: number, bundleId: string, bundl
 
 
 export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, modeName: string, modeMeta: ModeMeta, devMode: boolean) {
-  const tag = cmp.tag;
+  const tag = cmp.tagNameMeta;
 
   const label = `${tag}.${modeName}`;
 
-  const props = formatProps(cmp.props, attrCase);
+  const props = formatProps(cmp.propsMeta, attrCase);
 
-  const methods = formatMethods(cmp.methods);
+  const methods = formatMethods(cmp.methodsMeta);
 
-  const states = formatStates(cmp.states);
+  const states = formatStates(cmp.statesMeta);
 
-  const listeners = formatListeners(label, cmp.listeners);
+  const listeners = formatListeners(label, cmp.listenersMeta);
 
-  const watchers = formatWatchers(label, cmp.watchers);
+  const watchers = formatWatchers(label, cmp.watchersMeta);
 
-  const shadow = formatShadow(cmp.shadow);
+  const shadow = formatShadow(cmp.isShadowMeta);
 
-  const host = formatHost(cmp.host, devMode);
+  const host = formatHost(cmp.hostMeta, devMode);
 
   const modeCode = formatModeName(modeName);
 
@@ -87,15 +87,15 @@ function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
   props.forEach(prop => {
     let formattedProp = `'${prop.propName}'`;
 
-    if (prop.attrCase === undefined) {
+    if (prop.attribCase === undefined) {
       // if individual prop wasn't set with an option
       // then use the config's default
-      prop.attrCase = attrCase;
+      prop.attribCase = attrCase;
     }
 
     //
-    if (prop.attrCase === ATTR_LOWER_CASE) {
-      formattedProp += `, ${prop.attrCase} /* lowercase attribute */`;
+    if (prop.attribCase === ATTR_LOWER_CASE) {
+      formattedProp += `, ${prop.attribCase} /* lowercase attribute */`;
 
     } else {
       formattedProp += `, ${ATTR_DASH_CASE} /* dash-case attribute */`;
@@ -252,7 +252,7 @@ export function formatRegistry(bundles: Bundle[], attrOption: number) {
 
   bundles.forEach(bundle => {
     bundle.components.forEach(bundledComponent => {
-      let registryCmp = registry.find(c => c.component.tag === bundledComponent.component.tag);
+      let registryCmp = registry.find(c => c.component.tagNameMeta === bundledComponent.component.tagNameMeta);
       if (!registryCmp) {
         registryCmp = {
           component: bundledComponent.component,
@@ -265,15 +265,15 @@ export function formatRegistry(bundles: Bundle[], attrOption: number) {
   });
 
   registry = registry.sort((a, b) => {
-    if (a.component.tag < b.component.tag) return -1;
-    if (a.component.tag > b.component.tag) return 1;
+    if (a.component.tagNameMeta < b.component.tagNameMeta) return -1;
+    if (a.component.tagNameMeta > b.component.tagNameMeta) return 1;
     return 0;
   });
 
   const cmps: string[] = [];
 
   registry.forEach(registryCmp => {
-    const tag = registryCmp.component.tag;
+    const tag = registryCmp.component.tagNameMeta;
     let cmp: string[] = [];
 
     cmp.push([
@@ -291,24 +291,24 @@ export function formatRegistry(bundles: Bundle[], attrOption: number) {
     modes.push(`    }`);
     cmp.push(modes.join('\n'));
 
-    const props = registryCmp.component.props;
+    const props = registryCmp.component.propsMeta;
 
-    if ((props && props.length) || registryCmp.component.priority === PRIORITY_LOW) {
+    if ((props && props.length) || registryCmp.component.priorityMeta === PRIORITY_LOW) {
 
       if (props && props.length) {
         cmp.push([
           `    /** ${tag}: props [2] **/`,
-          `${formatProps(registryCmp.component.props, attrOption, '    ')}`
+          `${formatProps(registryCmp.component.propsMeta, attrOption, '    ')}`
         ].join('\n'));
 
       } else {
         cmp.push(`    0 /** ${tag} has no props [2] **/`);
       }
 
-      if (registryCmp.component.priority === PRIORITY_LOW) {
+      if (registryCmp.component.priorityMeta === PRIORITY_LOW) {
         let priority = [
           `    /** ${tag}: priority [3] **/`,
-          `    ${registryCmp.component.priority}`
+          `    ${registryCmp.component.priorityMeta}`
         ];
         cmp.push(priority.join('\n'));
       }
@@ -322,5 +322,5 @@ export function formatRegistry(bundles: Bundle[], attrOption: number) {
 
 
 export function getBundledModulesId(bundle: Bundle) {
-  return bundle.components.map(c => c.component.tag).sort().join('.');
+  return bundle.components.map(c => c.component.tagNameMeta).sort().join('.');
 }

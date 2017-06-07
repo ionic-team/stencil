@@ -55,10 +55,10 @@ export function bundleWatch(config: BundlerConfig, ctx: BuildContext, changedFil
 
 
 function bundleComponent(config: BundlerConfig, ctx: BuildContext, cmpMeta: ComponentMeta) {
-  const modeNames = Object.keys(cmpMeta.modes);
+  const modeNames = Object.keys(cmpMeta.modesMeta);
 
   return Promise.all(modeNames.map(modeName => {
-    return bundleComponentModeStyles(config, ctx, cmpMeta.modes[modeName]);
+    return bundleComponentModeStyles(config, ctx, cmpMeta.modesMeta[modeName]);
   }));
 }
 
@@ -103,7 +103,7 @@ function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBu
 
     manifestBundle.components.forEach(manifestComponentTag => {
 
-      const component = manifest.components.find(c => c.tag === manifestComponentTag);
+      const component = manifest.components.find(c => c.tagNameMeta === manifestComponentTag);
       if (!component) {
         throw `buildComponentBundles: unable to find tag "${manifestComponentTag}"`;
       }
@@ -111,7 +111,7 @@ function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBu
       const bundleComponent: BundleComponent = {
         component: component,
         modeName: modeName,
-        modeMeta: component.modes[modeName] || component.modes['default']
+        modeMeta: component.modesMeta[modeName] || component.modesMeta['default']
       };
 
       if (bundleComponent.modeMeta) {
@@ -140,7 +140,7 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
       fileMeta.rebundleOnChange = true;
 
       entryContent.push(`import { ${c.component.componentClass} } from "${importPath}";`);
-      entryContent.push(`exports['${c.component.tag}'] = ${c.component.componentClass};`);
+      entryContent.push(`exports['${c.component.tagNameMeta}'] = ${c.component.componentClass};`);
     });
 
     ctx.bundledJsModules[id] = entryContent.join('\n');
@@ -204,7 +204,7 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
 
       if (config.devMode) {
         // in dev mode, create the bundle id from combining all of the tags
-        bundle.id = bundle.components.map(c => c.component.tag + '.' + c.modeName).join('.');
+        bundle.id = bundle.components.map(c => c.component.tagNameMeta + '.' + c.modeName).join('.');
 
       } else {
         // in prod mode, create bundle id from hashing the content
@@ -264,8 +264,8 @@ function getAllModeNames(manifest: Manifest) {
   // collect up all the possible mode names we could use
   const allModeNames: string[] = [];
 
-  manifest.components.filter(c => !!c.modes).forEach(cmpMeta => {
-    const modeNames = Object.keys(cmpMeta.modes);
+  manifest.components.filter(c => !!c.modesMeta).forEach(cmpMeta => {
+    const modeNames = Object.keys(cmpMeta.modesMeta);
     modeNames.forEach(modeName => {
       if (allModeNames.indexOf(modeName) === -1) {
         allModeNames.push(modeName);

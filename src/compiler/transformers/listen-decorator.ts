@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 
 
 export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.listeners = [];
+  fileMeta.cmpMeta.listenersMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
@@ -54,7 +54,7 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
     }
   });
 
-  fileMeta.cmpMeta.listeners = fileMeta.cmpMeta.listeners.sort((a, b) => {
+  fileMeta.cmpMeta.listenersMeta = fileMeta.cmpMeta.listenersMeta.sort((a, b) => {
     if (a.eventName < b.eventName) return -1;
     if (a.eventName > b.eventName) return 1;
     if (a.methodName < b.methodName) return -1;
@@ -125,7 +125,7 @@ function validateListener(fileMeta: FileMeta, eventName: string, rawListenMeta: 
   }
   listener.enabled = !!listener.enabled;
 
-  fileMeta.cmpMeta.listeners.push(listener);
+  fileMeta.cmpMeta.listenersMeta.push(listener);
 
   // gathered valid meta data
   // remove decorator entirely

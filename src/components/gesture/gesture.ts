@@ -261,10 +261,10 @@ export class Gesture {
     this.hasStartedPan = false;
     this.hasCapturedPan = false;
 
-    this.gesture.release();
+    this.gesture && this.gesture.release();
 
     this.enable(false);
-    this.notCaptured(this.detail);
+    this.notCaptured && this.notCaptured(this.detail);
   }
 
 

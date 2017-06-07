@@ -1,11 +1,22 @@
+import { createPlatformClient } from '../../../core/client/platform-client';
 import { IonicGlobal } from '../../../util/interfaces';
-import { PlatformClient } from '../../../client/platform-client';
-import { registerComponentsES5 } from '../../../client/registry-client-es5';
-import { Renderer } from '../../../renderer/core';
 
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-const plt = PlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
+const plt = createPlatformClient(window, window.document, IonicGbl, IonicGbl.QueueCtrl);
 
-registerComponentsES5(Renderer(plt), plt, IonicGbl.ConfigCtrl, IonicGbl.components);
+plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {
+  plt.defineComponent(cmpMeta, function(){
+    function HostElement(self: any) {
+      return HTMLElement.call(this, self);
+    }
+
+    HostElement.prototype = Object.create(
+      HTMLElement.prototype,
+      { constructor: { value: HostElement, configurable: true } }
+    );
+
+    return HostElement;
+  }());
+});

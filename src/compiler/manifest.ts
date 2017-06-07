@@ -24,10 +24,10 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
 
     const componentDir = config.packages.path.dirname(manifestCmp.componentUrl);
 
-    const modeNames = Object.keys(manifestCmp.modes);
+    const modeNames = Object.keys(manifestCmp.modesMeta);
 
     modeNames.forEach(modeName => {
-      const cmpMode = manifestCmp.modes[modeName];
+      const cmpMode = manifestCmp.modesMeta[modeName];
       if (cmpMode.styleUrls) {
         cmpMode.styleUrls = cmpMode.styleUrls.map(styleUrl => {
           return config.packages.path.join(componentDir, styleUrl);
@@ -35,26 +35,26 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       }
     });
 
-    if (!manifestCmp.listeners.length) {
-      delete manifestCmp.listeners;
+    if (!manifestCmp.listenersMeta.length) {
+      delete manifestCmp.listenersMeta;
     }
 
-    if (!manifestCmp.methods.length) {
-      delete manifestCmp.methods;
+    if (!manifestCmp.methodsMeta.length) {
+      delete manifestCmp.methodsMeta;
     }
 
-    if (!manifestCmp.props.length) {
-      delete manifestCmp.props;
+    if (!manifestCmp.propsMeta.length) {
+      delete manifestCmp.propsMeta;
     }
 
-    if (!manifestCmp.watchers.length) {
-      delete manifestCmp.watchers;
+    if (!manifestCmp.watchersMeta.length) {
+      delete manifestCmp.watchersMeta;
     }
 
     // place property at the bottom
-    const shadow = manifestCmp.shadow;
-    delete manifestCmp.shadow;
-    manifestCmp.shadow = shadow;
+    const shadow = manifestCmp.isShadowMeta;
+    delete manifestCmp.isShadowMeta;
+    manifestCmp.isShadowMeta = shadow;
 
     manifest.components.push(manifestCmp);
   });
@@ -74,8 +74,8 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
   });
 
   manifest.components = manifest.components.sort((a, b) => {
-    if (a.tag < b.tag) return -1;
-    if (a.tag > b.tag) return 1;
+    if (a.tagNameMeta < b.tagNameMeta) return -1;
+    if (a.tagNameMeta > b.tagNameMeta) return 1;
     return 0;
   });
 

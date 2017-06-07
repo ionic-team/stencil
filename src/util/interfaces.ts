@@ -252,7 +252,7 @@ export interface ContentDimensions {
 
 export interface QueueApi {
   add: (cb: Function) => void;
-  flush: Function;
+  flush: (cb?: Function) => void;
 }
 
 
@@ -413,7 +413,7 @@ export interface ComponentWatchersData {
 
 
 export interface ModulesImporterFn {
-  (importer: any, h: Hyperscript, Ionic: Ionic): void;
+  (importer: any, h: Function, Ionic: Ionic): void;
 }
 
 
@@ -447,8 +447,8 @@ export interface PropOptions {
 export interface PropMeta {
   propName?: string;
   propType?: any;
-  attrName?: string;
-  attrCase?: number;
+  attribName?: string;
+  attribCase?: number;
 }
 
 
@@ -517,18 +517,20 @@ export interface ConfigApi {
 
 
 export interface ComponentMeta {
-  tag?: string;
-  methods?: MethodMeta[];
-  props?: PropMeta[];
-  listeners?: ListenMeta[];
-  watchers?: WatchMeta[];
-  states?: StateMeta[];
-  modes?: {[modeCode: string]: ModeMeta};
-  shadow?: boolean;
-  host?: HostMeta;
-  namedSlots?: string[];
-  componentModule?: any;
-  priority?: LoadPriority;
+  // "Meta" suffix to ensure property renaming
+  tagNameMeta?: string;
+  methodsMeta?: MethodMeta[];
+  propsMeta?: PropMeta[];
+  listenersMeta?: ListenMeta[];
+  watchersMeta?: WatchMeta[];
+  statesMeta?: StateMeta[];
+  modesMeta?: {[modeCode: string]: ModeMeta};
+  isShadowMeta?: boolean;
+  hostMeta?: HostMeta;
+  hasSlotsMeta?: boolean;
+  namedSlotsMeta?: string[];
+  componentModuleMeta?: any;
+  priorityMeta?: LoadPriority;
 }
 
 
@@ -539,7 +541,7 @@ export interface ModeMeta {
 }
 
 export interface HostMeta {
-    [key: string]: any;
+  [key: string]: any;
 }
 
 export interface Component {
@@ -547,17 +549,16 @@ export interface Component {
   ionViewDidUnload?: () => void;
 
   render?: () => VNode;
+  hostData?: () => VNodeData;
 
   mode?: string;
   color?: string;
 
-  $el?: ProxyElement;
-  $meta?: ComponentMeta;
-  $listeners?: ComponentActiveListeners;
-  $watchers?: ComponentActiveWatchers;
-  $root?: HTMLElement | ShadowRoot;
-  $vnode?: VNode;
-  $values?: ComponentActiveValues;
+  // public properties
+  $el?: HostElement;
+
+  // private properties
+  __values?: ComponentActiveValues;
 
   [memberName: string]: any;
 }
@@ -604,28 +605,61 @@ export interface ComponentRegistry {
 }
 
 
-export interface ProxyElement extends HTMLElement {
+export interface HostElement extends HTMLElement {
+  // standardized web apis
   connectedCallback: () => void;
-  attributeChangedCallback?: (attrName: string, oldVal: string, newVal: string, namespace: string) => void;
+  attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
 
-  $queueUpdate: () => void;
-  $initLoadComponent: () => void;
-  $queued?: boolean;
+  // public properties
   $instance?: Component;
-  $hostContent?: HostContentNodes;
-  $isLoaded?: boolean;
-  $hasConnected?: boolean;
-  $hasRendered?: boolean;
-  $awaitLoads?: ProxyElement[];
-  $depth?: number;
+  $meta?: ComponentMeta;
+
+  // private methods
+  _render: () => void;
+  _initLoad: () => void;
+  _queueUpdate: () => void;
+
+  // private properties
+  _hasConnected?: boolean;
+  _hasDestroyed?: boolean;
+  _isLoaded?: boolean;
+  _isQueuedForUpdate?: boolean;
+  _listeners?: ComponentActiveListeners;
+  _root?: HTMLElement | ShadowRoot;
+  _vnode: VNode;
+  _watchers?: ComponentActiveWatchers;
+
+  _hostContentNodes?: HostContentNodes;
 }
 
 
 export interface RendererApi {
-  (oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes, isSsrHydrated?: boolean): VNode;
+  (oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes, hydrating?: boolean): VNode;
 }
 
+
+export interface DomApi {
+  $isElement: (node: any) => boolean;
+  $isText: (node: any) => boolean;
+  $isComment: (node: any) => boolean;
+  $createElement: <K extends keyof HTMLElementTagNameMap>(tagName: K, innerHTML?: string) => HTMLElementTagNameMap[K];
+  $createElementNS: (namespace: string, tagName: string) => any;
+  $createTextNode: (text: string) => Text;
+  $createComment: (text: string) => Comment;
+  $insertBefore: (parentNode: Node, newNode: Node, referenceNode: Node) => void;
+  $removeChild: (node: Node, child: Node) => void;
+  $appendChild: (node: Node, child: Node) => void;
+  $parentNode: (node: Node) => Node;
+  $nextSibling: (node: Node) => Node;
+  $tagName: (node: any) => string;
+  $getTextContent: (node: any) => string;
+  $setTextContent: (node: Node, text: string) => void;
+  $getAttribute: (node: any, key: string) => string;
+  $setAttribute: (node: any, key: string, val: string) => void;
+  $setAttributeNS: (node: Element, namespaceURI: string, qualifiedName: string, value: string) => void;
+  $removeAttribute: (node: any, key: string) => void;
+}
 
 export type Key = string | number;
 
@@ -643,18 +677,18 @@ export interface Hyperscript {
 
 
 export interface VNode {
-  sel: string | undefined;
-  vdata: VNodeData | undefined;
-  vchildren: Array<VNode | string> | undefined;
-  elm: Node | undefined;
-  vtext: string | undefined;
-  vkey: Key;
+  sel?: string | undefined;
+  vdata?: VNodeData | undefined;
+  vchildren?: Array<VNode | string> | undefined;
+  elm?: Node | undefined | HostElement;
+  vtext?: string | undefined;
+  vkey?: Key;
 }
 
 
 export interface HostContentNodes {
-  $defaultSlot: Node[];
-  $namedSlots?: {[slotName: string]: Node[]};
+  defaultSlot?: Node[];
+  namedSlots?: {[slotName: string]: Node[]};
 }
 
 export type CssClassObject = { [className: string]: boolean };
@@ -666,7 +700,6 @@ export interface VNodeData {
   style?: any;
   dataset?: any;
   on?: any;
-  ref?: (elm: any) => void;
   vkey?: Key;
   vns?: string; // for SVGs
   [key: string]: any; // for any other 3rd party module
@@ -675,36 +708,18 @@ export interface VNodeData {
 
 export interface PlatformApi {
   registerComponents: (components?: LoadComponentData[]) => ComponentMeta[];
-  defineComponent: (tag: string, constructor: Function) => void;
+  defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   getComponentMeta: (tag: string) => ComponentMeta;
-  setComponentMeta: (cmpMeta: ComponentMeta) => void;
   loadBundle: (bundleId: string, priority: LoadPriority, cb: Function) => void;
+  render?: RendererApi;
+  config: ConfigApi;
+  collectHostContent: (elm: HostElement, validNamedSlots: string[]) => void;
   queue: QueueApi;
   css?: {[cmpModeId: string]: string};
   isServer?: boolean;
-
-  isElement: (node: Node) => node is Element;
-  isText: (node: Node) => node is Text;
-  isComment: (node: Node) => node is Comment;
-
-  $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
-  $createElementNS: (namespaceURI: string, qualifiedName: string) => Element;
-  $createTextNode: (text: string) => Text;
-  $createComment: (text: string) => Comment;
-  $insertBefore: (parentNode: Node, newNode: Node, referenceNode: Node | null) => void;
-  $removeChild: (parentNode: Node, childNode: Node) => void;
-  $appendChild: (parentNode: Node, childNode: Node) => void;
-  $parentNode: (node: Node) => Node;
-  $nextSibling: (node: Node) => Node;
-  $tagName: (elm: Element) => string;
-  $setTextContent: (node: Node, text: string | null) => void;
-  $getTextContent: (node: Node) => string | null;
-  $getAttribute: (elm: any, attrName: string) => string;
-  $setAttribute: (elm: any, attrName: string, attrValue: any) => void;
-  $removeAttribute: (elm: any, attrName: string) => void;
-  $setClass: (elm: any, cssClassName: string, shouldAddCssClassName: boolean) => void;
-  $attachComponent: (elm: Element, cmpMeta: ComponentMeta, instance: Component) => void;
-  $tmpDisconnected: boolean;
+  attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
+  getMode: (elm: Element) => string;
+  $tmpDisconnected?: boolean;
 }
 
 export interface PlatformConfig {
