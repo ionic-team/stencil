@@ -3,10 +3,6 @@ export function isDef(v: any): boolean { return v !== undefined && v !== null; }
 
 export function isUndef(v: any): boolean { return v === undefined || v === null; }
 
-export function isTrue (v: any): boolean { return v === true; }
-
-export function isFalse (v: any): boolean { return v === false; }
-
 export function isArray(v: any): v is Array<any> { return Array.isArray(v); }
 
 export function isObject(v: any): v is Object { return v !== null && typeof v === 'object'; }
@@ -17,22 +13,9 @@ export function isString(v: any): v is (string) { return typeof v === 'string'; 
 
 export function isNumber(v: any): v is (number) { return typeof v === 'number'; }
 
-export function isPrimitive (v: any): boolean { return typeof v === 'string' || typeof v === 'number'; }
-
 export function isFunction(v: any): v is (Function) { return typeof v === 'function'; }
 
 export function isStringOrNumber(v: any): v is (string | number) { return isString(v) || isNumber(v); }
-
-export function makeMap(str: string, expectsLowerCase?: boolean): (key: string) => true | void {
-  const map = Object.create(null);
-  const list: Array<string> = str.split(',');
-  for (let i = 0; i < list.length; i++) {
-    map[list[i]] = true;
-  }
-  return expectsLowerCase
-    ? val => map[val.toLowerCase()]
-    : val => map[val];
-}
 
 export function toDashCase(str: string) {
   return str.replace(/([A-Z])/g, (g) => '-' + g[0].toLowerCase());
@@ -110,106 +93,3 @@ export function applyStyles(elm: HTMLElement, styles: {[styleProp: string]: stri
     }
   }
 }
-
-export function once (fn: Function) {
-  var called = false;
-  return function () {
-    if (!called) {
-      called = true;
-      fn.apply(this, arguments);
-    }
-  };
-}
-
-/**
- * Create a cached version of a pure function.
- */
-export function cached(fn: Function) {
-  var cache = Object.create(null);
-  return (function cachedFn(str: string) {
-    var hit = cache[str];
-    return hit || (cache[str] = fn(str));
-  });
-}
-
-
-/**
- * Hyphenate a camelCase string.
- */
-var hyphenateRE = /([^-])([A-Z])/g;
-export const hyphenate = cached(function (str: string) {
-  return str
-    .replace(hyphenateRE, '$1-$2')
-    .replace(hyphenateRE, '$1-$2')
-    .toLowerCase();
-});
-
-/**
- * Camelize a hyphen-delimited string.
- */
-var camelizeRE = /-(\w)/g;
-export const camelize = cached(function (str: string) {
-  return str.replace(camelizeRE, function (_, c) { return c ? c.toUpperCase() : ''; });
-});
-
-/**
- * Capitalize a string.
- */
-export const capitalize = cached(function (str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-});
-
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-export function hasOwn (obj: any, key: any) {
-  return hasOwnProperty.call(obj, key);
-}
-
-export function remove (arr: any[], item: any) {
-  if (arr.length) {
-    var index = arr.indexOf(item);
-    if (index > -1) {
-      return arr.splice(index, 1);
-    }
-  }
-  return false;
-}
-/**
- * Resolve an asset.
- * This function is used because child instances need access
- * to assets defined in its ancestor chain.
- */
-export function resolveAsset (
-  options: any,
-  type: string,
-  id: string,
-  warnMissing?: boolean
-): any {
-  /* istanbul ignore if */
-  if (typeof id !== 'string') {
-    return;
-  }
-  const assets = options[type];
-  // check local registration variations first
-  if (hasOwn(assets, id)) return assets[id];
-  const camelizedId = camelize(id);
-  if (hasOwn(assets, camelizedId)) return assets[camelizedId];
-  const PascalCaseId = capitalize(camelizedId);
-  if (hasOwn(assets, PascalCaseId)) return assets[PascalCaseId];
-  // fallback to prototype chain
-  const res = assets[id] || assets[camelizedId] || assets[PascalCaseId];
-  if (process.env.NODE_ENV !== 'production' && warnMissing && !res) {
-    console.warn(
-      'Failed to resolve ' + type.slice(0, -1) + ': ' + id,
-      options
-    );
-  }
-  return res;
-}
-
-export function isNative (Ctor: any) {
-  return typeof Ctor === 'function' && /native code/.test(Ctor.toString());
-}
-
-export const hasSymbol =
-  typeof Symbol !== 'undefined' && isNative(Symbol) &&
-  typeof Reflect !== 'undefined' && isNative(Reflect.ownKeys);
