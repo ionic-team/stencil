@@ -141,11 +141,11 @@ export class Modal implements IModal {
       ></div>,
       <div
         role='dialog'
-        class={{dialogClasses}}
+        class={dialogClasses}
       >
         <ThisComponent
           props={this.componentProps}
-          class={{thisComponentClasses}}
+          class={thisComponentClasses}
         >
         </ThisComponent>
       </div>

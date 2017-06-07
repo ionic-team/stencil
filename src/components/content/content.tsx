@@ -660,7 +660,7 @@ export class Content {
     themedClasses['statusbar-padding'] = this.statusbarPadding;
 
     return (
-      <ion-scroll style={scrollStyle} props={props} class={{themedClasses}}>
+      <ion-scroll style={scrollStyle} props={props} class={themedClasses}>
         <slot></slot>
       </ion-scroll>
     );
