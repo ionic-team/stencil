@@ -89,12 +89,12 @@ function initProperty(isProp: boolean, propName: string, instance: Component, in
     }
   }
 
-  function getPropValue() {
+  function getValue() {
     // get the property value directly from our internal values
     return internalValues[propName];
   }
 
-  function setPropValue(newVal: any) {
+  function setValue(newVal: any) {
     // TODO: account for Arrays/Objects
 
     // check our new property value against our internal value
@@ -118,17 +118,25 @@ function initProperty(isProp: boolean, propName: string, instance: Component, in
     queueUpdate(plt, elm);
   }
 
+  function setInstanceValue(newVal: any) {
+    if (isProp) {
+      console.warn(`@Prop() "${propName}" on "${elm.tagName.toLowerCase()}" cannot be modified.`);
+    } else {
+      setValue(newVal);
+    }
+  }
+
   // dom's element instance
   Object.defineProperty(elm, propName, {
     configurable: true,
-    get: getPropValue,
-    set: setPropValue
+    get: getValue,
+    set: setValue
   });
 
   // user's component class instance
   Object.defineProperty(instance, propName, {
     configurable: true,
-    get: getPropValue,
-    set: setPropValue
+    get: getValue,
+    set: setInstanceValue
   });
 }
