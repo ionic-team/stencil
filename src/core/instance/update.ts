@@ -9,6 +9,8 @@ export function queueUpdate(plt: PlatformApi, elm: HostElement) {
 
     // run the patch in the next tick
     plt.queue.add(function queueUpdateNextTick() {
+      // no longer queued
+      elm._isQueuedForUpdate = false;
 
       // vdom diff and patch the host element for differences
       update(plt, elm);
@@ -36,7 +38,4 @@ export function update(plt: PlatformApi, elm: HostElement) {
       elm._initLoad();
     }
   }
-
-  // no longer queued
-  elm._isQueuedForUpdate = false;
 }

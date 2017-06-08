@@ -3,14 +3,14 @@ import { Component, ComponentActiveValues, ComponentActiveWatchers, HostElement,
 import { queueUpdate } from './update';
 
 
-export function initProxy(plt: PlatformApi, elm: HostElement, instance: Component, props: PropMeta[], states: StateMeta[], methods: MethodMeta[], watchers: WatchMeta[]) {
+export function initProxy(plt: PlatformApi, elm: HostElement, instance: Component, props: PropMeta[], states: StateMeta[], methods: MethodMeta[], watchMeta: WatchMeta[]) {
   let i = 0;
 
   if (methods) {
     // instances will already have the methods on them
     // but you can also expose methods to the proxy element
     // using @Method(). Think of like .focus() for an element.
-    for (i = 0; i < methods.length; i++) {
+    for (; i < methods.length; i++) {
       initMethod(methods[i], elm, instance);
     }
   }
@@ -19,7 +19,7 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
   // getters/setters with the same name, and then do change detection
   instance.__values = {};
 
-  if (watchers) {
+  if (watchMeta) {
     // this component has watchers, so init the object to store them
     elm._watchers = {};
   }
@@ -31,13 +31,13 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
     for (i = 0; i < states.length; i++) {
-      initProperty(false, states[i], instance, instance.__values, elm._watchers, plt, elm, watchers);
+      initProperty(false, states[i], instance, instance.__values, elm._watchers, plt, elm, watchMeta);
     }
   }
 
   for (i = 0; i < props.length; i++) {
     // add getters/setters for @Prop()s
-    initProperty(true, props[i].propName, instance, instance.__values, elm._watchers, plt, elm, watchers);
+    initProperty(true, props[i].propName, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
   }
 }
 
@@ -52,7 +52,7 @@ function initMethod(methodName: string, elm: HostElement, instance: Component) {
 }
 
 
-function initProperty(isProp: boolean, propName: string, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, elm: HostElement, watchersMeta: WatchMeta[]) {
+function initProperty(isProp: boolean, propName: string, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, elm: HostElement, watchMeta: WatchMeta[]) {
   if (isProp) {
     // @Prop() property, so check initial value from the proxy element, instance
     // and config, before we create getters/setters on this same property name
@@ -76,15 +76,15 @@ function initProperty(isProp: boolean, propName: string, instance: Component, in
     internalValues[propName] = (<any>instance)[propName];
   }
 
-  if (watchersMeta) {
+  if (watchMeta) {
     // there are watchers for this component
-    for (var i = 0; i < watchersMeta.length; i++) {
-      if (watchersMeta[i].propName === propName) {
+    for (var i = 0; i < watchMeta.length; i++) {
+      if (watchMeta[i].propName === propName) {
         // cool, we should watch for changes to this property
         // let's bind their watcher function and add it to our list
         // of watchers, so any time this property changes we should
         // also fire off their @Watch() method
-        internalWatchers[propName] = (<any>instance)[watchersMeta[i].fn].bind(instance);
+        internalWatchers[propName] = (<any>instance)[watchMeta[i].fn].bind(instance);
       }
     }
   }

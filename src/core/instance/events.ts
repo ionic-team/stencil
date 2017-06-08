@@ -91,10 +91,7 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
     }
 
     // fire the component's event listener callback
-    // returning true forces the the element to be queued for an update
-    if (userEventListener(ev) === true) {
-      // queueAncestorUpdate(elm);
-    }
+    userEventListener(ev);
 
     // test if this is the user's interaction
     if (isUserInteraction(eventName)) {

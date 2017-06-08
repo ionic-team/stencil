@@ -251,7 +251,7 @@ export interface ContentDimensions {
 
 
 export interface QueueApi {
-  add: (cb: Function) => void;
+  add: (cb: Function, priority?: number) => void;
   flush: (cb?: Function) => void;
 }
 

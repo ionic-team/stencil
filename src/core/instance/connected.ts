@@ -1,5 +1,6 @@
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { getParentElement } from '../../util/helpers';
+import { PRIORITY_HIGH } from '../../util/constants';
 
 
 export function connectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -47,6 +48,8 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can
     // ensure the "mode" attribute has been added to the element
+    // place in high priority since it's not much work and we need
+    // to know as fast as possible, but still an async tick in between
     plt.queue.add(() => {
 
       // get the mode the element which is loading
@@ -61,6 +64,7 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
         // let's queue it up to be rendered next
         elm._queueUpdate();
       });
-    });
+
+    }, PRIORITY_HIGH);
   }
 }

@@ -14,10 +14,11 @@ export const ATTR_LOWER_CASE = 2;
 
 
 /**
- * Load Priority Levels
+ * Priority Levels
  */
-export const PRIORITY_LOW = 0;
-export const PRIORITY_HIGH = 1;
+export const PRIORITY_HIGH = 3;
+export const PRIORITY_MEDIUM = 2;
+export const PRIORITY_LOW = 1;
 
 
 /**
