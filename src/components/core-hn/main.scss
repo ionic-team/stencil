@@ -65,11 +65,15 @@ ion-footer ion-toolbar {
 
 .header-button {
   opacity: 0.6;
-  flex-grow: 0.1;
+  width: 7rem;
 }
 
 .header-button-selected {
   opacity: 1;
+}
+
+.header-button-selected button {
+  font-weight: bold;
 }
 
 .tabs-bar {
@@ -82,5 +86,21 @@ ion-footer ion-toolbar {
 
 .yes-back button {
   opacity: 1;
-  color: #327eff;
+  color: #327eff !important;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+.basic-loading {
+  text-align: center;
+}
+
+.basic-loading > * {
+  animation: pulse 1s infinite ease-in-out;
+  will-change: opacity, transform;
+  display: inline-block;
+  padding: 64px;
 }

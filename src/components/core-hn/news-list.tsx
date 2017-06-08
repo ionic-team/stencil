@@ -38,24 +38,32 @@ export class NewsList {
   }
 
   render() {
-    return (
-      <ion-list>
-        {this.type.map((story: any) => (
-          <ion-item>
-            <div class='points' slot='start'>
-              {story.points || 0}
-            </div>
-            <ion-label>
-              <div>
-                <h2 class='list-header' on-click={() => window.open(story.url)}>{story.title}</h2>
-                <h3 class='comments-text' on-click={() => this.comments(story)}>
-                  Posted by {story.user} {story.time_ago} | {story.comments_count} comments
-              </h3>
+    if (this.type.length === 0) {
+      return (
+        <div class='basic-loading'>
+          <div>• • •</div>
+        </div>
+      );
+    } else {
+      return (
+        <ion-list>
+          {this.type.map((story: any) => (
+            <ion-item>
+              <div class='points' slot='start'>
+                {story.points || 0}
               </div>
-            </ion-label>
-          </ion-item>
-        ))}
-      </ion-list>
-    );
+              <ion-label>
+                <div>
+                  <h2 class='list-header' on-click={() => window.open(story.url)}>{story.title}</h2>
+                  <h3 class='comments-text' on-click={() => this.comments(story)}>
+                    Posted by {story.user} {story.time_ago} | {story.comments_count} comments
+              </h3>
+                </div>
+              </ion-label>
+            </ion-item>
+          ))}
+        </ion-list>
+      );
+    }
   }
 }

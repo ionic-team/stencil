@@ -1,4 +1,4 @@
-import { Component, h, Prop, Ionic } from '../index';
+import { Component, h, Prop, State, Ionic } from '../index';
 
 
 @Component({
@@ -7,16 +7,15 @@ import { Component, h, Prop, Ionic } from '../index';
 })
 export class NewsContainer {
 
-  @Prop() stories: any[] = [];
+  @State() stories: any[] = [];
   apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
   page: number = 1;
   pageType: string;
-  @Prop() prevClass: any;
   @Prop() selectedClass: boolean = false;
-  @Prop() firstSelectedClass: boolean;
-  @Prop() secondSelectedClass: boolean = false;
-  @Prop() thirdSelectedClass: boolean = false;
-  @Prop() fourthSelectedClass: boolean = false;
+  @State() firstSelectedClass: boolean;
+  @State() secondSelectedClass: boolean = false;
+  @State() thirdSelectedClass: boolean = false;
+  @State() fourthSelectedClass: boolean = false;
 
   ionViewDidLoad() {
     if (Ionic.isServer) return;
@@ -132,7 +131,7 @@ export class NewsContainer {
 
   render() {
 
-    this.prevClass = this.page === 1 ? { 'no-back': true } : { 'yes-back': true };
+    const prevClass = this.page === 1 ? { 'no-back': true } : { 'yes-back': true };
 
     return [
       <ion-header mdHeight='56px' iosHeight='61px'>
@@ -191,7 +190,7 @@ export class NewsContainer {
       <ion-footer>
         <ion-toolbar class='pager'>
           <ion-buttons slot='start'>
-            <ion-button class={this.prevClass} clear={true} on-click={() => this.previous()}>
+            <ion-button class={prevClass} clear={true} on-click={() => this.previous()}>
               prev
           </ion-button>
           </ion-buttons>
