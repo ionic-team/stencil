@@ -1,8 +1,9 @@
-import { QueueApi, IdleDeadline } from '../../util/interfaces';
+import { QueueApi } from '../../util/interfaces';
 import { PRIORITY_HIGH, PRIORITY_LOW } from '../../util/constants';
 
 
 export function createQueueClient(win: any): QueueApi {
+  const requestAnimationFrame = win.requestAnimationFrame;
   const highPromise = Promise.resolve();
 
   const highCallbacks: Function[] = [];
@@ -16,24 +17,29 @@ export function createQueueClient(win: any): QueueApi {
   function doHighPriority() {
     // holy geez we need to get this stuff done and fast
     // all high priority callbacks should be fired off immediately
-    var l = highCallbacks.length;
-    if (l > 0) {
-      for (var i = 0; i < l; i++) {
-        highCallbacks[i]();
-      }
-      highCallbacks.length = 0;
+    while (highCallbacks.length > 0) {
+      highCallbacks.shift()();
     }
+    resolvePending = false;
   }
 
 
-  function doRequestIdleCallbackWork(deadline: IdleDeadline) {
+  function doWork() {
+    const start = performance.now();
+
     // always run all of the high priority work if there is any
     doHighPriority();
 
-    if (drainRicQueue(mediumCallbacks, deadline)) {
+    while (mediumCallbacks.length > 0 && (performance.now() - start < 40)) {
+      mediumCallbacks.shift()();
+    }
+
+    if (mediumCallbacks.length === 0) {
       // we successfully drained the medium queue or the medium queue is empty
       // so now let's drain the low queue with our remaining time
-      drainRicQueue(lowCallbacks, deadline);
+      while (lowCallbacks.length > 0 && (performance.now() - start < 40)) {
+        lowCallbacks.shift()();
+      }
     }
 
     // check to see if we still have work to do
@@ -42,35 +48,8 @@ export function createQueueClient(win: any): QueueApi {
       // we already don't have time to do anything in this callback
       // let's throw the next one in a requestAnimationFrame
       // so we can just simmer down for a bit
-      win.requestAnimationFrame(flush);
+      requestAnimationFrame(flush);
     }
-  }
-
-  function drainRicQueue(callbacks: Function[], deadline: IdleDeadline) {
-    // let's see if we've got time to take care of things
-    var l = callbacks.length;
-    if (l > 0) {
-      // ok, so we've got some functions to run in this queue
-      for (var i = 0; i < l; i++) {
-        // do some work while within the allowed time
-        if (deadline.timeRemaining() < 1) {
-          // not enough time to exec all the callbacks
-          // but do remove the callbacks that we did run though
-          callbacks.splice(0, i);
-          return false;
-        }
-
-        // we've got time, so let's kick off the callback
-        callbacks[i]();
-      }
-
-      // cool, we did end up running all the medium callbacks
-      // let's reset the array back to zero
-      callbacks.length = 0;
-    }
-
-    // all good yo
-    return true;
   }
 
   function flush() {
@@ -87,7 +66,7 @@ export function createQueueClient(win: any): QueueApi {
     if (ricPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
       // still more to do yet, but we've run out of time
       // let's let this thing cool off and try again in the next ric
-      win.requestIdleCallback(doRequestIdleCallbackWork);
+      requestAnimationFrame(doWork);
     }
   }
 
@@ -115,7 +94,7 @@ export function createQueueClient(win: any): QueueApi {
       if (!ricPending) {
         // not already pending work to do, so let's tee it up
         ricPending = true;
-        win.requestIdleCallback(doRequestIdleCallbackWork);
+        requestAnimationFrame(doWork);
       }
     }
   }
