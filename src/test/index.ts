@@ -1,6 +1,6 @@
 import { ComponentMeta, ConfigApi, HostElement, Ionic,
   IonicGlobal, DomApi, PlatformConfig, PlatformApi } from '../util/interfaces';
-import { ConfigController } from '../util/config-controller';
+import { createConfigController } from '../util/config-controller';
 import { createDomApi } from '../core/renderer/dom-api';
 import { initInjectedIonic, initIonicGlobal } from '../core/server/ionic-server';
 import { createPlatformServer } from '../core/server/platform-server';
@@ -59,7 +59,7 @@ export function mockInjectedIonic(IonicGbl: IonicGlobal): Ionic {
 
 
 export function mockConfig(configObj: any = {}, platforms: PlatformConfig[] = []): ConfigApi {
-  const ConfigCtrl = ConfigController(configObj, platforms);
+  const ConfigCtrl = createConfigController(configObj, platforms);
   return ConfigCtrl;
 }
 

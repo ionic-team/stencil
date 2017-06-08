@@ -1,7 +1,7 @@
 import { ConfigApi, PlatformConfig } from '../util/interfaces';
 
 
-export function ConfigController(configObj: any, platforms: PlatformConfig[]): ConfigApi {
+export function createConfigController(configObj: any, platforms: PlatformConfig[]): ConfigApi {
   configObj = configObj || {};
 
   function get(key: string, fallback?: any): any {

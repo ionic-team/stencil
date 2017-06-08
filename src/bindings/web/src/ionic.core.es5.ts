@@ -1,21 +1,22 @@
-import { ConfigController } from '../../../util/config-controller';
+import { createConfigController } from '../../../util/config-controller';
 import { createPlatformClient } from '../../../core/client/platform-client';
-import { DomClient } from '../../../core/client/dom-client';
+import { createDomClient } from '../../../core/client/dom-client';
 import { IonicGlobal } from '../../../util/interfaces';
 import { PLATFORM_CONFIGS } from '../../../core/platform/platform-configs';
-import { QueueClient } from '../../../core/client/queue-client';
+import { createQueueClient } from '../../../core/client/queue-client';
 import { detectPlatforms } from '../../../core/platform/platform-util';
 
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-IonicGbl.DomCtrl = DomClient(window);
-
-IonicGbl.QueueCtrl = QueueClient(window);
-
-IonicGbl.ConfigCtrl = ConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core'));
-
-const plt = createPlatformClient(window, window.document, IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.QueueCtrl);
+const plt = createPlatformClient(
+  window,
+  window.document,
+  IonicGbl,
+  createConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core')),
+  createQueueClient(window),
+  createDomClient(window)
+);
 
 plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {
   plt.defineComponent(cmpMeta, function(){

@@ -2,77 +2,42 @@ import { isPlatformMatch } from './platform-util';
 import { PlatformConfig } from '../../util/interfaces';
 
 
-const IPAD = 'ipad';
-const IPHONE = 'iphone';
-const WINDOWS_PHONE = 'windows phone';
-
 // order from most specifc to least specific
 export const PLATFORM_CONFIGS: PlatformConfig[] = [
 
   {
-    'name': IPAD,
-    'settings': {
-      'keyboardHeight': 500,
-    },
-    'isMatch': function(url, userAgent) {
-      return isPlatformMatch(url, userAgent, IPAD, [IPAD], [WINDOWS_PHONE]);
-    }
+    'name': 'ipad',
+    'isMatch': (url, userAgent) => isPlatformMatch(url, userAgent, 'ipad', ['ipad'], ['windows phone'])
   },
 
   {
-    'name': IPHONE,
-    'isMatch': function(url, userAgent) {
-      return isPlatformMatch(url, userAgent, IPHONE, [IPHONE], [WINDOWS_PHONE]);
-    }
+    'name': 'iphone',
+    'isMatch': (url, userAgent) => isPlatformMatch(url, userAgent, 'iphone', ['iphone'], ['windows phone'])
   },
 
   {
     'name': 'ios',
     'settings': {
-      'autoFocusAssist': 'delay',
-      'hoverCSS': false,
-      'inputBlurring': true,
-      'inputCloning': true,
-      'keyboardHeight': 300,
       'mode': 'ios',
-      'scrollAssist': true,
-      'statusbarPadding': false,
-      'swipeBackEnabled': true,
-      'tapPolyfill': false,
-      'virtualScrollEventAssist': false,
-      'disableScrollAssist': true,
     },
-    'isMatch': function(url, userAgent) {
-      return isPlatformMatch(url, userAgent, 'ios', [IPHONE, IPAD, 'ipod'], [WINDOWS_PHONE]);
-    }
+    'isMatch': (url, userAgent) => isPlatformMatch(url, userAgent, 'ios', ['iphone', 'ipad', 'ipod'], ['windows phone'])
   },
 
   {
     'name': 'android',
     'settings': {
       'activator': 'ripple',
-      'autoFocusAssist': 'immediate',
-      'inputCloning': true,
-      'scrollAssist': true,
-      'hoverCSS': false,
-      'keyboardHeight': 300,
       'mode': 'md',
     },
-    'isMatch': function(url, userAgent) {
-      return isPlatformMatch(url, userAgent, 'android', ['android', 'silk'], [WINDOWS_PHONE]);
-    }
+    'isMatch': (url, userAgent) => isPlatformMatch(url, userAgent, 'android', ['android', 'silk'], ['windows phone'])
   },
 
   {
     'name': 'windows',
     'settings': {
-      'mode': 'wp',
-      'autoFocusAssist': 'immediate',
-      'hoverCSS': false
+      'mode': 'wp'
     },
-    'isMatch': function(url, userAgent) {
-      return isPlatformMatch(url, userAgent, 'windows', [WINDOWS_PHONE], []);
-    }
+    'isMatch': (url, userAgent) => isPlatformMatch(url, userAgent, 'windows', ['windows phone'], [])
   },
 
   {

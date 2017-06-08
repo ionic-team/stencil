@@ -1,9 +1,9 @@
 import { addEventListener, enableListener } from '../instance/events';
-import { Component, ConfigApi, CustomEventOptions, Ionic, IonicGlobal,
+import { Component, ConfigApi, CustomEventOptions, DomControllerApi, Ionic, IonicGlobal,
   ListenOptions, IonicControllerApi, PlatformApi, QueueApi } from '../../util/interfaces';
 
 
-export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocument, plt: PlatformApi, config: ConfigApi, queue: QueueApi): Ionic {
+export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocument, plt: PlatformApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -27,7 +27,7 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocu
   // in actuality it's the exact same object
   IonicGbl.config = config;
 
-  (<Ionic>IonicGbl).dom = IonicGbl.DomCtrl;
+  (<Ionic>IonicGbl).dom = dom;
 
   (<Ionic>IonicGbl).emit = (instance: any, eventName: string, data: CustomEventOptions) => {
     data = data || {};

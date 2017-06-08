@@ -1,7 +1,7 @@
 import { QueueApi, RequestIdleCallback, IdleDeadline } from '../../util/interfaces';
 
 
-export function QueueClient(window: any): QueueApi {
+export function createQueueClient(window: any): QueueApi {
   const hostScheduleDefer: RequestIdleCallback = window.requestIdleCallback;
   const callbacks: Function[] = [];
   let pending = false;
