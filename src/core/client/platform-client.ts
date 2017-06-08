@@ -100,7 +100,7 @@ export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: I
 
     // inject a script tag in the head
     // kick off the actual request
-    domApi.$appendChild(doc.head, scriptElm);
+    domApi.$appendChild(domApi.$head, scriptElm);
   }
 
 
@@ -150,7 +150,7 @@ export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: I
         // climb up the ancestors looking to see if this element
         // is within another component with a shadow root
         let node: any = elm;
-        let hostRoot: any = doc.head;
+        let hostRoot: any = domApi.$head;
         let styleElm: HTMLStyleElement;
 
         while (node = node.parentNode) {
@@ -259,7 +259,7 @@ export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: I
   }
 
 
-  const injectedIonic = initInjectedIonic(IonicGbl, win, doc, plt, config, queue, dom);
+  const injectedIonic = initInjectedIonic(IonicGbl, win, domApi, plt, config, queue, dom);
 
 
   IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {

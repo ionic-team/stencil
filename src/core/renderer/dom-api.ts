@@ -2,22 +2,32 @@ import { DomApi } from '../../util/interfaces';
 
 
 export function createDomApi(document: Document): DomApi {
+  // using the $ prefix so that closure if
+  // cool with property renaming each of these
 
   return {
 
-    $isElement: function(node: any) {
+    $head: document.head,
+
+    $body: document.body,
+
+    $isElement: function isElement(node: any) {
       return node.nodeType === 1;
     },
 
-    $isText: function(node: any) {
+    $isText: function isText(node: any) {
       return node.nodeType === 3;
     },
 
-    $isComment: function(node: any) {
+    $isComment: function isComment(node: any) {
       return node.nodeType === 8;
     },
 
-    $createElement: function createElement(tagName: string, innerHTML?: string) {
+    $createEvent: function createEvent() {
+      return document.createEvent('CustomEvent');
+    },
+
+    $createElement: function createElement(tagName: any, innerHTML?: string) {
       const elm = document.createElement(tagName);
       if (innerHTML) {
         elm.innerHTML = innerHTML;

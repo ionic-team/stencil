@@ -640,10 +640,14 @@ export interface RendererApi {
 
 
 export interface DomApi {
+  $head: HTMLHeadElement;
+  $body: HTMLElement;
   $isElement: (node: any) => boolean;
   $isText: (node: any) => boolean;
   $isComment: (node: any) => boolean;
-  $createElement: <K extends keyof HTMLElementTagNameMap>(tagName: K, innerHTML?: string) => HTMLElementTagNameMap[K];
+  $createEvent: () => CustomEvent;
+  $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, innerHtml?: string): HTMLElementTagNameMap[K];
+  $createElement(tagName: string, innerHtml?: string): HTMLElement;
   $createElementNS: (namespace: string, tagName: string) => any;
   $createTextNode: (text: string) => Text;
   $createComment: (text: string) => Comment;

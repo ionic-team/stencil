@@ -1,15 +1,15 @@
 import { addEventListener, enableListener } from '../instance/events';
-import { Component, ConfigApi, CustomEventOptions, DomControllerApi, Ionic, IonicGlobal,
+import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, Ionic, IonicGlobal,
   ListenOptions, IonicControllerApi, PlatformApi, QueueApi } from '../../util/interfaces';
 
 
-export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocument, plt: PlatformApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi): Ionic {
+export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
     function CustomEvent(event: any, params: any) {
       params = params || { bubbles: false, cancelable: false, detail: undefined };
-      var evt = doc.createEvent('CustomEvent');
+      var evt = domApi.$createEvent();
       evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
       return evt;
     }
@@ -82,7 +82,7 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocu
           // yet lets add the component to the DOM and create
           // a queue for this controller
           queuedCtrlResolves[ctrlName] = [resolve, opts];
-          doc.body.appendChild(doc.createElement(`ion-${ctrlName}-controller`));
+          domApi.$appendChild(domApi.$body, domApi.$createElement(`ion-${ctrlName}-controller`));
         }
       }
     });
