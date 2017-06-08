@@ -642,27 +642,27 @@ export interface RendererApi {
 export interface DomApi {
   $head: HTMLHeadElement;
   $body: HTMLElement;
-  $isElement: (node: any) => boolean;
-  $isText: (node: any) => boolean;
-  $isComment: (node: any) => boolean;
-  $createEvent: () => CustomEvent;
+  $isElement(node: any): boolean;
+  $isText(node: any): boolean;
+  $isComment(node: any): boolean;
+  $createEvent(): CustomEvent;
   $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, innerHtml?: string): HTMLElementTagNameMap[K];
   $createElement(tagName: string, innerHtml?: string): HTMLElement;
-  $createElementNS: (namespace: string, tagName: string) => any;
-  $createTextNode: (text: string) => Text;
-  $createComment: (text: string) => Comment;
-  $insertBefore: (parentNode: Node, newNode: Node, referenceNode: Node) => void;
-  $removeChild: (node: Node, child: Node) => void;
-  $appendChild: (node: Node, child: Node) => void;
-  $parentNode: (node: Node) => Node;
-  $nextSibling: (node: Node) => Node;
-  $tagName: (node: any) => string;
-  $getTextContent: (node: any) => string;
-  $setTextContent: (node: Node, text: string) => void;
-  $getAttribute: (node: any, key: string) => string;
-  $setAttribute: (node: any, key: string, val: string) => void;
-  $setAttributeNS: (node: Element, namespaceURI: string, qualifiedName: string, value: string) => void;
-  $removeAttribute: (node: any, key: string) => void;
+  $createElementNS(namespace: string, tagName: string): any;
+  $createTextNode(text: string): Text;
+  $createComment(text: string): Comment;
+  $insertBefore(parentNode: Node, newNode: Node, referenceNode: Node): void;
+  $removeChild(node: Node, child: Node): void;
+  $appendChild(node: Node, child: Node): void;
+  $parentNode(node: Node): Node;
+  $nextSibling(node: Node): Node;
+  $tagName(elm: any): string;
+  $getTextContent(node: any): string;
+  $setTextContent(node: Node, text: string): void;
+  $getAttribute(elm: any, key: string): string;
+  $setAttribute(elm: any, key: string, val: string): void;
+  $setAttributeNS(elm: any, namespaceURI: string, qualifiedName: string, value: string): void;
+  $removeAttribute(elm: any, key: string): void;
 }
 
 export type Key = string | number;

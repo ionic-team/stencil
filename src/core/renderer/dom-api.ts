@@ -67,8 +67,8 @@ export function createDomApi(document: Document): DomApi {
       return node.nextSibling;
     },
 
-    $tagName: function tagName(node: Element) {
-      return node.tagName;
+    $tagName: function tagName(elm: Element) {
+      return elm.tagName;
     },
 
     $getTextContent: function(node: any) {
@@ -79,20 +79,20 @@ export function createDomApi(document: Document): DomApi {
       node.textContent = text;
     },
 
-    $getAttribute: function getAttribute(node: Element, key: any) {
-      return node.getAttribute(key);
+    $getAttribute: function getAttribute(elm: Element, key: any) {
+      return elm.getAttribute(key);
     },
 
-    $setAttribute: function setAttribute(node: Element, key: string, val: string) {
-      node.setAttribute(key, val);
+    $setAttribute: function setAttribute(elm: Element, key: string, val: string) {
+      elm.setAttribute(key, val);
     },
 
-    $setAttributeNS: function $setAttributeNS(node: Element, namespaceURI: string, qualifiedName: string, val: string) {
-      node.setAttributeNS(namespaceURI, qualifiedName, val);
+    $setAttributeNS: function $setAttributeNS(elm: Element, namespaceURI: string, qualifiedName: string, val: string) {
+      elm.setAttributeNS(namespaceURI, qualifiedName, val);
     },
 
-    $removeAttribute: function removeAttribute(node: Element, key: string) {
-      node.removeAttribute(key);
+    $removeAttribute: function removeAttribute(elm: Element, key: string) {
+      elm.removeAttribute(key);
     }
 
   };
