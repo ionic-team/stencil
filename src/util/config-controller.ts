@@ -4,7 +4,7 @@ import { ConfigApi, PlatformConfig } from '../util/interfaces';
 export function ConfigController(configObj: any, platforms: PlatformConfig[]): ConfigApi {
   configObj = configObj || {};
 
-  function get(key: string, fallback: any = null): any {
+  function get(key: string, fallback?: any): any {
     if (configObj[key] !== undefined) {
       return configObj[key];
     }
@@ -18,13 +18,13 @@ export function ConfigController(configObj: any, platforms: PlatformConfig[]): C
       }
     }
 
-    return fallback;
+    return fallback !== undefined ? fallback : null;
   }
 
-  function getBoolean(key: string, fallbackValue: boolean = false): boolean {
+  function getBoolean(key: string, fallback: boolean): boolean {
     const val = get(key);
     if (val === null) {
-      return fallbackValue;
+      return fallback !== undefined ? fallback : false;
     }
     if (typeof val === 'string') {
       return val === 'true';
@@ -32,9 +32,9 @@ export function ConfigController(configObj: any, platforms: PlatformConfig[]): C
     return !!val;
   }
 
-  function getNumber(key: string, fallbackValue: number = NaN): number {
+  function getNumber(key: string, fallback: number): number {
     const val = parseFloat(get(key));
-    return isNaN(val) ? fallbackValue : val;
+    return isNaN(val) ? (fallback !== undefined ? fallback : NaN) : val;
   }
 
   return {

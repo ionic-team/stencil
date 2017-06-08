@@ -29,7 +29,8 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, doc: HTMLDocu
 
   (<Ionic>IonicGbl).dom = IonicGbl.DomCtrl;
 
-  (<Ionic>IonicGbl).emit = (instance: any, eventName: string, data: CustomEventOptions = {}) => {
+  (<Ionic>IonicGbl).emit = (instance: any, eventName: string, data: CustomEventOptions) => {
+    data = data || {};
     if (data.bubbles === undefined) {
       data.bubbles = true;
     }

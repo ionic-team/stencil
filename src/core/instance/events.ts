@@ -48,7 +48,7 @@ export function enableListener(plt: PlatformApi, queue: QueueApi, elm: HostEleme
 }
 
 
-export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): any}, opts: ListenOptions = {}) {
+export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): any}, opts: ListenOptions) {
   if (!elm) {
     return noop;
   }
@@ -79,10 +79,10 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
     supportsOpts = checkEventOptsSupport(elm);
   }
 
-  var eventListenerOpts: any = (supportsOpts) ? {
-        'capture': !!opts.capture,
-        'passive': !!opts.passive
-      } : !!opts.capture;
+  const eventListenerOpts: any = (supportsOpts) ? {
+        'capture': !!(opts && opts.capture),
+        'passive': !!(opts && opts.passive)
+      } : !!(opts && opts.capture);
 
   const eventListener = (ev: any) => {
     if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
