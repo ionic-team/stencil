@@ -27,12 +27,8 @@ export function createDomApi(document: Document): DomApi {
       return document.createEvent('CustomEvent');
     },
 
-    $createElement: function createElement(tagName: any, innerHTML?: string) {
-      const elm = document.createElement(tagName);
-      if (innerHTML) {
-        elm.innerHTML = innerHTML;
-      }
-      return elm;
+    $createElement: function createElement(tagName: any) {
+      return document.createElement(tagName);
     },
 
     $createElementNS: function createElementNS(namespace: string, tagName: string) {

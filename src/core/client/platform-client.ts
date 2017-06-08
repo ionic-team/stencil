@@ -134,12 +134,15 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     if (cmpMode && cmpMode.styles) {
       // cool, we found the mode for this component
       // and this mode has styles :)
+      let styleElm: HTMLStyleElement;
 
       if (cmpMeta.isShadowMeta && hasNativeShadowDom) {
         // this component uses the shadow dom
         // and this browser supports the shadow dom natively
         // attach our styles to the root
-        domApi.$appendChild(elm._root, domApi.$createElement('style', cmpMode.styles));
+        styleElm = domApi.$createElement('style');
+        styleElm.innerHTML = cmpMode.styles;
+        domApi.$appendChild(elm._root, styleElm);
 
       } else {
         // this component does not use the shadow dom
@@ -150,7 +153,6 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
         // is within another component with a shadow root
         let node: any = elm;
         let hostRoot: any = domApi.$head;
-        let styleElm: HTMLStyleElement;
 
         while (node = node.parentNode) {
           if (node.host && node.host.shadowRoot) {
@@ -169,7 +171,8 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
                 styleElm.innerHTML = cmpMode.styles + styleElm.innerHTML;
 
               } else {
-                styleElm = domApi.$createElement('style', cmpMode.styles);
+                styleElm = domApi.$createElement('style');
+                styleElm.innerHTML = cmpMode.styles;
                 domApi.$insertBefore(hostRoot, styleElm, hostRoot.firstChild);
               }
             }
@@ -186,14 +189,17 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
           // only attach the styles if we haven't already done so for this host element
           hostRoot._css[cmpModeId] = true;
 
-          // add these styles to document.head
-          let styleEle = domApi.$createElement('style', cmpMode.styles);
-          styleEle.dataset['cmp'] = cmpModeId;
-
           // prepend the styles to the head, above of existing styles
-          domApi.$insertBefore(hostRoot, styleEle, hostRoot.firstChild);
+          styleElm = domApi.$createElement('style');
+          styleElm.innerHTML = cmpMode.styles;
+          styleElm.dataset['cmp'] = cmpModeId;
+          domApi.$insertBefore(hostRoot, styleElm, hostRoot.firstChild);
         }
       }
+
+      // now that the styles are the dom, there's no need
+      // to keep its JS string counterpart in memory
+      cmpMode.styles = null;
     }
   }
 

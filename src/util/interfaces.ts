@@ -646,8 +646,8 @@ export interface DomApi {
   $isText(node: any): boolean;
   $isComment(node: any): boolean;
   $createEvent(): CustomEvent;
-  $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K, innerHtml?: string): HTMLElementTagNameMap[K];
-  $createElement(tagName: string, innerHtml?: string): HTMLElement;
+  $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
+  $createElement(tagName: string): HTMLElement;
   $createElementNS(namespace: string, tagName: string): any;
   $createTextNode(text: string): Text;
   $createComment(text: string): Comment;
@@ -836,7 +836,7 @@ export interface EffectState {
 
 
 export interface RequestIdleCallback {
-  (callback: IdleCallback): number;
+  (callback: IdleCallback, options?: { timeout?: number }): number;
 }
 
 
