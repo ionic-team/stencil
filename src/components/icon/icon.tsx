@@ -1,4 +1,4 @@
-import { Component, h, Ionic, Prop } from '../index';
+import { Component, h, Ionic, Prop, State } from '../index';
 import { CssClassObject, VNodeData } from '../../util/interfaces';
 
 @Component({
@@ -20,12 +20,12 @@ export class Icon {
   /**
    * @input {string} Specifies the label to use for accessibility. Defaults to the icon name.
    */
-  @Prop() label: string = '';
+  @State() label: string = '';
 
   /**
    * @input {string} Specifies the mode to use for the icon.
    */
-  @Prop() iconMode: string = '';
+  @State() iconMode: string = '';
 
   /**
    * @input {string} Specifies which icon to use. The appropriate icon will be used based on the mode.
