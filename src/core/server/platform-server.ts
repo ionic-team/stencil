@@ -1,8 +1,7 @@
 import { assignHostContentSlots } from '../renderer/slot';
 import { attributeChangedCallback } from '../instance/attribute-changed';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomControllerApi, HostElement, IonicGlobal, LoadComponentData, PlatformApi } from '../../util/interfaces';
-import { createDomApi } from '../renderer/dom-api';
+  DomApi, DomControllerApi, HostElement, IonicGlobal, LoadComponentData, PlatformApi } from '../../util/interfaces';
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './dom/global-context';
 import { initInjectedIonic } from './ionic-server';
@@ -14,8 +13,7 @@ import * as vm from 'vm';
 
 
 
-export function createPlatformServer(win: Window, IonicGbl: IonicGlobal, config: ConfigApi, dom: DomControllerApi): PlatformApi {
-  const domApi = createDomApi(win.document);
+export function createPlatformServer(IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};

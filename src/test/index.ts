@@ -15,7 +15,9 @@ export function mockPlatform(IonicGbl?: IonicGlobal) {
   if (!IonicGbl) {
     IonicGbl = mockIonicGlobal();
   }
-  const plt = createPlatformServer(win, IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+  const domApi = createDomApi(win.document);
+
+  const plt = createPlatformServer(IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();

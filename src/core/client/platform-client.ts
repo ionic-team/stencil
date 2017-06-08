@@ -1,7 +1,7 @@
 import { assignHostContentSlots } from '../renderer/slot';
-import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi, DomControllerApi, HostElement,
+import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
+  ConfigApi, DomControllerApi, DomApi, HostElement,
   IonicGlobal, LoadComponentData, QueueApi, PlatformApi } from '../../util/interfaces';
-import { createDomApi } from '../renderer/dom-api';
 import { createRenderer } from '../renderer/patch';
 import { h } from '../renderer/h';
 import { isDef } from '../../util/helpers';
@@ -11,8 +11,7 @@ import { initHostConstructor } from '../instance/init';
 import { parseComponentModeData, parseModeName, parseProp } from '../../util/data-parse';
 
 
-export function createPlatformClient(win: Window, doc: HTMLDocument, IonicGbl: IonicGlobal, config: ConfigApi, queue: QueueApi, dom: DomControllerApi): PlatformApi {
-  const domApi = createDomApi(doc);
+export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};

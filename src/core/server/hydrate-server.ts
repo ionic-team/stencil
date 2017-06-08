@@ -1,9 +1,9 @@
-// import { generateCss } from './css-server';
 import { ComponentRegistry, HostElement, PlatformApi, HydrateConfig } from '../../util/interfaces';
+import { createDomApi } from '../renderer/dom-api';
+import { createPlatformServer } from './platform-server';
 import { detectPlatforms } from '../platform/platform-util';
 import { initIonicGlobal } from './ionic-server';
 import { PLATFORM_CONFIGS } from '../platform/platform-configs';
-import { createPlatformServer } from './platform-server';
 const jsdom = require('jsdom');
 const { JSDOM } = jsdom;
 
@@ -16,22 +16,24 @@ export function hydrateHtml(registry: ComponentRegistry, html: string, opts: Hyd
 
     const IonicGbl = initIonicGlobal(opts.config, platforms, staticDir);
 
-    const window = new JSDOM(html, {
+    const win = new JSDOM(html, {
       url: opts.url,
       referrer: opts.referrer,
       userAgent: opts.userAgent,
     }).window;
 
-    window.document.cookie = opts.cookie;
+    win.document.cookie = opts.cookie;
 
-    const plt = createPlatformServer(window, IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+    const domApi = createDomApi(win.document);
+
+    const plt = createPlatformServer(IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
     Object.keys(registry).forEach(tag => {
       plt.defineComponent(registry[tag], ServerHostElement);
     });
 
     // loop through each node and start upgrading any that are components
-    inspectNode(plt, window.document.body);
+    inspectNode(plt, win.document.body);
 
     resolve();
   });

@@ -1,22 +1,28 @@
+import { createDomApi } from '../../../core/renderer/dom-api';
 import { createPlatformClient } from '../../../core/client/platform-client';
 import { IonicGlobal } from '../../../util/interfaces';
 
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
-const plt = createPlatformClient(window, window.document, IonicGbl, IonicGbl.ConfigCtrl, IonicGbl.QueueCtrl, IonicGbl.DomCtrl);
+const plt = createPlatformClient(
+  IonicGbl,
+  window,
+  createDomApi(window.document),
+  IonicGbl.ConfigCtrl,
+  IonicGbl.QueueCtrl,
+  IonicGbl.DomCtrl
+);
 
 plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {
-  plt.defineComponent(cmpMeta, function(){
-    function HostElement(self: any) {
-      return HTMLElement.call(this, self);
-    }
+  function HostElement(self: any) {
+    return HTMLElement.call(this, self);
+  }
 
-    HostElement.prototype = Object.create(
-      HTMLElement.prototype,
-      { constructor: { value: HostElement, configurable: true } }
-    );
+  HostElement.prototype = Object.create(
+    HTMLElement.prototype,
+    { constructor: { value: HostElement, configurable: true } }
+  );
 
-    return HostElement;
-  }());
+  plt.defineComponent(cmpMeta, HostElement);
 });

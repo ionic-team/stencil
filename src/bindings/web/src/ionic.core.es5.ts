@@ -1,34 +1,33 @@
 import { createConfigController } from '../../../util/config-controller';
-import { createPlatformClient } from '../../../core/client/platform-client';
+import { createDomApi } from '../../../core/renderer/dom-api';
 import { createDomClient } from '../../../core/client/dom-client';
-import { IonicGlobal } from '../../../util/interfaces';
-import { PLATFORM_CONFIGS } from '../../../core/platform/platform-configs';
+import { createPlatformClient } from '../../../core/client/platform-client';
 import { createQueueClient } from '../../../core/client/queue-client';
 import { detectPlatforms } from '../../../core/platform/platform-util';
+import { IonicGlobal } from '../../../util/interfaces';
+import { PLATFORM_CONFIGS } from '../../../core/platform/platform-configs';
 
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
 const plt = createPlatformClient(
-  window,
-  window.document,
   IonicGbl,
+  window,
+  createDomApi(window.document),
   createConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core')),
   createQueueClient(window),
   createDomClient(window)
 );
 
 plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {
-  plt.defineComponent(cmpMeta, function(){
-    function HostElement(self: any) {
-      return HTMLElement.call(this, self);
-    }
+  function HostElement(self: any) {
+    return HTMLElement.call(this, self);
+  }
 
-    HostElement.prototype = Object.create(
-      HTMLElement.prototype,
-      { constructor: { value: HostElement, configurable: true } }
-    );
+  HostElement.prototype = Object.create(
+    HTMLElement.prototype,
+    { constructor: { value: HostElement, configurable: true } }
+  );
 
-    return HostElement;
-  }());
+  plt.defineComponent(cmpMeta, HostElement);
 });
