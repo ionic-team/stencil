@@ -7,7 +7,6 @@ import { Component, Prop, h, Ionic } from '../index';
 })
 export class CommentsPage {
 
-  @Prop() stories: any[] = [];
   @Prop() comments: string;
 
   close() {

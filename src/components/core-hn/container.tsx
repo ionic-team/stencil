@@ -11,7 +11,6 @@ export class NewsContainer {
   apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
   page: number = 1;
   pageType: string;
-  @Prop() selectedClass: boolean = false;
   @State() firstSelectedClass: boolean;
   @State() secondSelectedClass: boolean = false;
   @State() thirdSelectedClass: boolean = false;
