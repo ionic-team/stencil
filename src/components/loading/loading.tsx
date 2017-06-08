@@ -1,4 +1,4 @@
-import { Component, h, Ionic, Listen, Prop } from '../index';
+import { Component, h, Ionic, Listen, Prop, State } from '../index';
 import { AnimationBuilder, Animation, Loading as ILoading, LoadingEvent } from '../../util/interfaces';
 
 import iOSEnterAnimation from './animations/ios.enter';
@@ -28,8 +28,8 @@ export class Loading implements ILoading {
   @Prop() enterAnimation: AnimationBuilder;
   @Prop() exitAnimation: AnimationBuilder;
   @Prop() id: string;
-  @Prop() showSpinner: boolean = null;
-  @Prop() spinner: string;
+  @State() showSpinner: boolean = null;
+  @State() spinner: string;
   @Prop() showBackdrop: boolean = true;
 
 
