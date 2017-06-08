@@ -43,8 +43,7 @@ export const PLATFORM_CONFIGS: PlatformConfig[] = [
   {
     'name': 'core',
     'settings': {
-      'mode': 'md',
-      'keyboardHeight': 290
+      'mode': 'md'
     }
   },
 

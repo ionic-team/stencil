@@ -1,7 +1,7 @@
+import { createDomClient } from '../../../core/client/dom-client';
 import { createConfigController } from '../../../util/config-controller';
 import { createPlatformClient } from '../../../core/client/platform-client';
 import { detectPlatforms } from '../../../core/platform/platform-util';
-import { createDomClient } from '../../../core/client/dom-client';
 import { IonicGlobal } from '../../../util/interfaces';
 import { PLATFORM_CONFIGS } from '../../../core/platform/platform-configs';
 import { createQueueClient } from '../../../core/client/queue-client';

@@ -1,10 +1,11 @@
+import { isArray, isStringOrNumber } from '../../util/helpers';
 import { vnode } from './vnode';
 import { VNode, VNodeData } from '../../util/interfaces';
-import { isArray, isStringOrNumber } from '../../util/helpers';
+import { SVG_NS } from '../../util/constants';
 
 
 function addNS(data: any, children: Array<VNode> | undefined, sel: string | undefined): void {
-  data.ns = 'http://www.w3.org/2000/svg';
+  data.ns = SVG_NS;
   if (sel !== 'foreignObject' && children !== undefined) {
     for (let i = 0; i < children.length; ++i) {
       let childData = children[i].vdata;
