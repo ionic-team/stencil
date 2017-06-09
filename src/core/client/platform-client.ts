@@ -63,9 +63,9 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
           // low priority which means its ok to load this behind
           // UI components, for example: gestures, menu
           // kick off the request in a requestIdleCallback
-          (<any>win).requestIdleCallback(() => {
+          queue.add(() => {
             jsonp(url);
-          }, { timeout: 2000 });
+          }, PRIORITY_LOW);
 
         } else {
           // high priority component (normal UI components)
