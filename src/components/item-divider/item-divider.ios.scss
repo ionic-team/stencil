@@ -10,15 +10,15 @@ $item-ios-divider-background:             #f7f7f7 !default;
 /// @prop - Color for the divider
 $item-ios-divider-color:                  #222 !default;
 
-/// @prop - Padding for the divider
-$item-ios-divider-padding:                5px 15px !default;
+/// @prop - Padding start for the divider
+$item-ios-divider-padding-start:          $item-ios-padding-start !default;
 
 
 // iOS Item Divider
 // --------------------------------------------------
 
 .item-divider-ios {
-  padding-left: $item-ios-padding-left;
+  @include padding-horizontal($item-ios-divider-padding-start, null);
 
   color: $item-ios-divider-color;
   background-color: $item-ios-divider-background;
@@ -38,7 +38,7 @@ $item-ios-divider-padding:                5px 15px !default;
     }
 
     &.activated {
-     background-color: color-shade($color-base);
+      background-color: color-shade($color-base);
     }
   }
 }
