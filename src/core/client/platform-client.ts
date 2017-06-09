@@ -244,7 +244,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
     registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
 
-    initHostConstructor(plt, HostElementConstructor.prototype);
+    initHostConstructor(IonicGbl, plt, HostElementConstructor.prototype);
 
     HostElementConstructor.observedAttributes = getObservedAttributes(cmpMeta);
 

@@ -2,6 +2,9 @@
 <html>
 
 <head>
+  <script>
+    console.time('app-load');
+  </script>
   <meta charset="UTF-8">
   <title>Ionic</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -284,6 +287,10 @@
                 console.log('finished menu toggle');
               });
             });
+          });
+
+          document.addEventListener('ionLoad', function() {
+            console.timeEnd('app-load');
           });
         </script>
 

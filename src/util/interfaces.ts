@@ -723,6 +723,8 @@ export interface PlatformApi {
   isServer?: boolean;
   attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
   getMode: (elm: Element) => string;
+  appRoot?: HostElement;
+  hasAppLoaded?: boolean;
   tmpDisconnected?: boolean;
 }
 

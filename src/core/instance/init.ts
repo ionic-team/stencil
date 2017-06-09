@@ -1,6 +1,6 @@
 import { attachListeners } from './events';
 import { attributeChangedCallback } from './attribute-changed';
-import { Component, HostElement, PlatformApi } from '../../util/interfaces';
+import { Component, HostElement, Ionic, IonicGlobal, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initProxy } from './proxy';
@@ -8,7 +8,7 @@ import { queueUpdate } from './update';
 import { render } from './render';
 
 
-export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement) {
+export function initHostConstructor(IonicGbl: IonicGlobal, plt: PlatformApi, HostElementConstructor: HostElement) {
   Object.defineProperties(HostElementConstructor, {
     'connectedCallback': {
       value: function() {
@@ -32,7 +32,7 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
     },
     _initLoad: {
       value: function() {
-        initLoad(plt, (<HostElement>this));
+        initLoad(IonicGbl, plt, (<HostElement>this));
       }
     },
     _render: {
@@ -64,7 +64,7 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
 }
 
 
-export function initLoad(plt: PlatformApi, elm: HostElement): any {
+export function initLoad(IonicGbl: IonicGlobal, plt: PlatformApi, elm: HostElement): any {
   const instance = elm.$instance;
 
   // it's possible that we've already decided to destroy this element
@@ -76,9 +76,6 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     // ensure we remove any child references cuz it doesn't matter at this point
     elm._activelyLoadingChildren = null;
 
-    // add the css class that this element has officially hydrated
-    elm.classList.add('hydrated');
-
     // the element is within the DOM now, so let's attach the event listeners
     attachListeners(plt.queue, plt.getComponentMeta(elm).listenersMeta, elm, instance);
 
@@ -88,6 +85,20 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
 
     // fire off the user's DidLoad method (if one was provided)
     instance.ionViewDidLoad && instance.ionViewDidLoad();
+
+    // add the css class that this element has officially hydrated
+    elm.classList.add('hydrated');
+
+    if (!plt.hasAppLoaded && elm === plt.appRoot) {
+      // so far the entire app hasn't loaded yet
+      // but turns out this is the element that is the root of the app
+      // so it looks like the app has fully loaded, congrats
+      plt.hasAppLoaded = true;
+
+      elm.classList.add('app-loaded');
+
+      (<Ionic>IonicGbl).emit(instance, 'ionLoad');
+    }
 
     // ( •_•)
     // ( •_•)>⌐■-■
@@ -116,5 +127,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
       // fuhgeddaboudit, no need to keep a reference after this element loaded
       elm._ancestorHostElement = null;
     }
+
   }
+
 }
