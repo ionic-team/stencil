@@ -43,11 +43,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the bundle callbacks to fire when it's loaded
-      if (bundleCallbacks[bundleId]) {
-        bundleCallbacks[bundleId].push(cb);
-      } else {
-        bundleCallbacks[bundleId] = [cb];
-      }
+      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
 
       // create the url we'll be requesting
       const url = `${staticDir}bundles/ionic.${bundleId}.js`;
@@ -89,7 +85,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     function onScriptComplete() {
       clearTimeout(tmrId);
       scriptElm.onerror = scriptElm.onload = null;
-      scriptElm.parentNode.removeChild(scriptElm);
+      domApi.$removeChild(scriptElm.parentNode, scriptElm);
 
       // remove from our list of active requests
       delete activeJsonRequests[url];
@@ -266,9 +262,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
 
   function loadCoreAuxiliary() {
     queue.add(() => {
-      const auxScriptElm = domApi.$createElement('script');
-      auxScriptElm.src = staticDir + 'ionic.animation.js';
-      domApi.$appendChild(domApi.$head, auxScriptElm);
+      jsonp(staticDir + 'ionic.animation.js');
     });
   }
 
