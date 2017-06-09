@@ -11,7 +11,8 @@ const plt = createPlatformClient(
   createDomApi(window.document),
   IonicGbl.ConfigCtrl,
   IonicGbl.QueueCtrl,
-  IonicGbl.DomCtrl
+  IonicGbl.DomCtrl,
+  IonicGbl.staticDir
 );
 
 plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {

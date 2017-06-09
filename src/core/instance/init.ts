@@ -95,9 +95,12 @@ export function initLoad(IonicGbl: IonicGlobal, plt: PlatformApi, elm: HostEleme
       // so it looks like the app has fully loaded, congrats
       plt.hasAppLoaded = true;
 
-      elm.classList.add('app-loaded');
-
+      // let it be know, we have loaded
       (<Ionic>IonicGbl).emit(instance, 'ionLoad');
+
+      // kick off loading the auxiliary code, which has stuff that wasn't
+      // needed for the initial paint, such as animation code
+      plt.loadCoreAuxiliary();
     }
 
     // ( •_•)

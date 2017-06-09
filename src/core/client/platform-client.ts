@@ -11,7 +11,7 @@ import { initHostConstructor } from '../instance/init';
 import { parseComponentModeData, parseModeName, parseProp } from '../../util/data-parse';
 
 
-export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi): PlatformApi {
+export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi, staticDir: string): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
@@ -28,7 +28,8 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     queue,
     collectHostContent,
     getMode,
-    attachStyles
+    attachStyles,
+    loadCoreAuxiliary
   };
 
   plt.render = createRenderer(plt, domApi);
@@ -49,7 +50,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
       }
 
       // create the url we'll be requesting
-      const url = `${IonicGbl.staticDir}bundles/ionic.${bundleId}.js`;
+      const url = `${staticDir}bundles/ionic.${bundleId}.js`;
 
       if (!activeJsonRequests[url]) {
         // not already actively requesting this url
@@ -263,6 +264,13 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     assignHostContentSlots(domApi, elm, validNamedSlots);
   }
 
+  function loadCoreAuxiliary() {
+    queue.add(() => {
+      const auxScriptElm = domApi.$createElement('script');
+      auxScriptElm.src = staticDir + 'ionic.animation.js';
+      domApi.$appendChild(domApi.$head, auxScriptElm);
+    });
+  }
 
   const injectedIonic = initInjectedIonic(IonicGbl, win, domApi, plt, config, queue, dom);
 

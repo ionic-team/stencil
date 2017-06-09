@@ -5,7 +5,7 @@ import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './dom/global-context';
 import { initInjectedIonic } from './ionic-server';
-import { isDef } from '../../util/helpers';
+import { isDef, noop } from '../../util/helpers';
 import { parseModeName, parseProp } from '../../util/data-parse';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -34,7 +34,8 @@ export function createPlatformServer(IonicGbl: IonicGlobal, win: Window, domApi:
     attachStyles,
     tmpDisconnected: false,
     css: css,
-    isServer: true
+    isServer: true,
+    loadCoreAuxiliary: noop
   };
 
   // generate a sandboxed context
