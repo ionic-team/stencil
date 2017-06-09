@@ -725,8 +725,9 @@ export interface PlatformApi {
   getMode: (elm: Element) => string;
   appRoot?: HostElement;
   hasAppLoaded?: boolean;
-  loadCoreAuxiliary: Function;
+  appLoaded: () => void;
   tmpDisconnected?: boolean;
+  onReady?: Promise<any>;
 }
 
 export interface PlatformConfig {

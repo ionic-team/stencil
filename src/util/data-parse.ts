@@ -68,6 +68,8 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // get the component class which was added to moduleImports
   // using the tag as the key on the export object
   cmpMeta.componentModuleMeta = moduleImports[cmpModeData[0]];
+
+  return cmpMeta;
 }
 
 

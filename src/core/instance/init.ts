@@ -1,6 +1,6 @@
 import { attachListeners } from './events';
 import { attributeChangedCallback } from './attribute-changed';
-import { Component, HostElement, Ionic, IonicGlobal, PlatformApi } from '../../util/interfaces';
+import { Component, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initProxy } from './proxy';
@@ -8,7 +8,7 @@ import { queueUpdate } from './update';
 import { render } from './render';
 
 
-export function initHostConstructor(IonicGbl: IonicGlobal, plt: PlatformApi, HostElementConstructor: HostElement) {
+export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement) {
   Object.defineProperties(HostElementConstructor, {
     'connectedCallback': {
       value: function() {
@@ -32,7 +32,7 @@ export function initHostConstructor(IonicGbl: IonicGlobal, plt: PlatformApi, Hos
     },
     _initLoad: {
       value: function() {
-        initLoad(IonicGbl, plt, (<HostElement>this));
+        initLoad(plt, (<HostElement>this));
       }
     },
     _render: {
@@ -64,7 +64,7 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
 }
 
 
-export function initLoad(IonicGbl: IonicGlobal, plt: PlatformApi, elm: HostElement): any {
+export function initLoad(plt: PlatformApi, elm: HostElement): any {
   const instance = elm.$instance;
 
   // it's possible that we've already decided to destroy this element
@@ -90,17 +90,12 @@ export function initLoad(IonicGbl: IonicGlobal, plt: PlatformApi, elm: HostEleme
     elm.classList.add('hydrated');
 
     if (!plt.hasAppLoaded && elm === plt.appRoot) {
-      // so far the entire app hasn't loaded yet
-      // but turns out this is the element that is the root of the app
+      // turns out this is the element that is the root of the app
       // so it looks like the app has fully loaded, congrats
       plt.hasAppLoaded = true;
 
-      // let it be know, we have loaded
-      (<Ionic>IonicGbl).emit(instance, 'ionLoad');
-
-      // kick off loading the auxiliary code, which has stuff that wasn't
-      // needed for the initial paint, such as animation code
-      plt.loadCoreAuxiliary();
+      // let the platform know we're all loaded now
+      plt.appLoaded();
     }
 
     // ( •_•)

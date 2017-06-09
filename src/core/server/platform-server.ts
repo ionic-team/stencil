@@ -5,7 +5,7 @@ import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './dom/global-context';
 import { initInjectedIonic } from './ionic-server';
-import { isDef, noop } from '../../util/helpers';
+import { isDef } from '../../util/helpers';
 import { parseModeName, parseProp } from '../../util/data-parse';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -18,9 +18,9 @@ export function createPlatformServer(IonicGbl: IonicGlobal, win: Window, domApi:
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
   const activeFileReads: {[url: string]: boolean} = {};
-  // const moduleImports = {};
   const css: {[cmpModeId: string]: string} = {};
   initInjectedIonic(config, dom);
+  let loadResolve: Function;
 
   const plt: PlatformApi = {
     registerComponents,
@@ -35,7 +35,10 @@ export function createPlatformServer(IonicGbl: IonicGlobal, win: Window, domApi:
     tmpDisconnected: false,
     css: css,
     isServer: true,
-    loadCoreAuxiliary: noop
+    appLoaded,
+    onReady: new Promise(resolve => {
+      loadResolve = resolve;
+    })
   };
 
   // generate a sandboxed context
@@ -216,6 +219,11 @@ export function createPlatformServer(IonicGbl: IonicGlobal, win: Window, domApi:
 
   function collectHostContent(elm: HostElement, validNamedSlots: string[]) {
     assignHostContentSlots(domApi, elm, validNamedSlots);
+  }
+
+  function appLoaded() {
+    // let it be know, we have loaded
+    loadResolve();
   }
 
   plt.render = createRenderer(plt, domApi);

@@ -29,7 +29,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     collectHostContent,
     getMode,
     attachStyles,
-    loadCoreAuxiliary
+    appLoaded
   };
 
   plt.render = createRenderer(plt, domApi);
@@ -149,7 +149,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
         // climb up the ancestors looking to see if this element
         // is within another component with a shadow root
         let node: any = elm;
-        let hostRoot: any = domApi.$head;
+        let hostRoot: any;
 
         while (node = node.parentNode) {
           if (node.host && node.host.shadowRoot) {
@@ -175,28 +175,10 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
             }
 
             // the styles are added to this shadow root, no need to continue
-            return;
+            break;
           }
         }
-
-        // this component is not within a parent shadow root
-        // so attach the styles to document.head
-        hostRoot._css = hostRoot._css || {};
-        if (!hostRoot._css[cmpModeId]) {
-          // only attach the styles if we haven't already done so for this host element
-          hostRoot._css[cmpModeId] = true;
-
-          // prepend the styles to the head, above of existing styles
-          styleElm = domApi.$createElement('style');
-          styleElm.innerHTML = cmpMode.styles;
-          styleElm.dataset['cmp'] = cmpModeId;
-          domApi.$insertBefore(hostRoot, styleElm, hostRoot.firstChild);
-        }
       }
-
-      // now that the styles are the dom, there's no need
-      // to keep its JS string counterpart in memory
-      cmpMode.styles = null;
     }
   }
 
@@ -241,7 +223,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
     registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
 
-    initHostConstructor(IonicGbl, plt, HostElementConstructor.prototype);
+    initHostConstructor(plt, HostElementConstructor.prototype);
 
     HostElementConstructor.observedAttributes = getObservedAttributes(cmpMeta);
 
@@ -260,42 +242,88 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     assignHostContentSlots(domApi, elm, validNamedSlots);
   }
 
-  function loadCoreAuxiliary() {
-    queue.add(() => {
-      jsonp(staticDir + 'ionic.animation.js');
-    });
+  let initAppStyles: string[] = [];
+
+  function appendBundleStyles(bundleCmpMeta: ComponentMeta[]) {
+    const styles = bundleCmpMeta.map(getCmpMetaStyle);
+
+    if (plt.hasAppLoaded) {
+      queue.add(() => {
+        appendStylesToHead(styles);
+      });
+
+    } else {
+      initAppStyles = initAppStyles.concat(styles);
+    }
+  }
+
+
+  function appendStylesToHead(styles: string[]) {
+    const styleElm = domApi.$createElement('style');
+    styleElm.innerHTML = styles.join('');
+    domApi.$insertBefore(domApi.$head, styleElm, domApi.$head.firstChild);
+  }
+
+
+  function getCmpMetaStyle(cmpMeta: ComponentMeta) {
+    if (cmpMeta.modesMeta) {
+      return Object.keys(cmpMeta.modesMeta).map(m => cmpMeta.modesMeta[m].styles).join('');
+    }
+    return '';
   }
 
   const injectedIonic = initInjectedIonic(IonicGbl, win, domApi, plt, config, queue, dom);
 
 
+  function appLoaded() {
+    appendStylesToHead(initAppStyles);
+    initAppStyles = null;
+
+    // let it be know, we have loaded
+    injectedIonic.emit(plt.appRoot.$instance, 'ionLoad');
+
+    // kick off loading the auxiliary code, which has stuff that wasn't
+    // needed for the initial paint, such as animation code
+    queue.add(() => {
+      jsonp(staticDir + 'ionic.animation.js');
+    });
+  }
+
+
   IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
     coreVersion;
-    var args = arguments;
+    const args = arguments;
+    const bundleCmpMeta: ComponentMeta[] = [];
+    let i = 0;
 
     // import component function
     // inject ionic globals
     importFn(moduleImports, h, injectedIonic);
 
-    for (var i = 3; i < args.length; i++) {
+    for (i = 3; i < args.length; i++) {
       // first arg is core version
       // second arg is the bundleId
       // third arg is the importFn
       // each arg after that is a component/mode
-      parseComponentModeData(registry, moduleImports, args[i]);
-
-      // fire off all the callbacks waiting on this bundle to load
-      var callbacks = bundleCallbacks[bundleId];
-      if (callbacks) {
-        for (var j = 0, jlen = callbacks.length; j < jlen; j++) {
-          callbacks[j]();
-        }
-        delete bundleCallbacks[bundleId];
-      }
-
-      // remember that we've already loaded this bundle
-      loadedBundles[bundleId] = true;
+      bundleCmpMeta.push(
+        parseComponentModeData(registry, moduleImports, args[i])
+      );
     }
+
+    // append all of the bundle's styles to the document in one go
+    appendBundleStyles(bundleCmpMeta);
+
+    // fire off all the callbacks waiting on this bundle to load
+    var callbacks = bundleCallbacks[bundleId];
+    if (callbacks) {
+      for (i = 0; i < callbacks.length; i++) {
+        callbacks[i]();
+      }
+      delete bundleCallbacks[bundleId];
+    }
+
+    // remember that we've already loaded this bundle
+    loadedBundles[bundleId] = true;
   };
 
   return plt;
