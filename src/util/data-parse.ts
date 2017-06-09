@@ -1,9 +1,9 @@
 import { ATTR_DASH_CASE } from './constants';
-import { ComponentListenersData, ComponentModeData, ComponentRegistry, ComponentWatchersData, PropMeta } from '../util/interfaces';
+import { ComponentListenersData, ComponentMeta, ComponentModeData, ComponentRegistry, ComponentWatchersData, PropMeta } from '../util/interfaces';
 import { isString, toDashCase } from './helpers';
 
 
-export function parseComponentModeData(registry: ComponentRegistry, moduleImports: any, cmpModeData: ComponentModeData) {
+export function parseComponentModeData(registry: ComponentRegistry, moduleImports: any, cmpModeData: ComponentModeData): ComponentMeta {
   let i = 0;
   let cmpListenerData: ComponentListenersData;
   let cmpWatchData: ComponentWatchersData;
