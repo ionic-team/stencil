@@ -32,7 +32,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
 
     // if this component has a render function, let's fire
     // it off and generate a vnode for this
-    elm._render();
+    elm._render(isInitialLoad);
 
     if (isInitialLoad) {
       elm._initLoad();

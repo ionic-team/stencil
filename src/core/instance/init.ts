@@ -36,8 +36,8 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
       }
     },
     _render: {
-      value: function() {
-        render(plt, (<HostElement>this));
+      value: function(isInitialRender: boolean) {
+        render(plt, (<HostElement>this), isInitialRender);
       }
     }
   });
@@ -61,6 +61,11 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
   // this largely adds this components styles and determines
   // if it should use shadow dom or not
   plt.attachStyles(cmpMeta, elm, instance);
+
+  // fire off the user's ionViewWillLoad method (if one was provided)
+  // ionViewWillLoad only runs ONCE, after instance.$el has been assigned
+  // the host element, but BEFORE render() has been called
+  instance.ionViewWillLoad && instance.ionViewWillLoad();
 }
 
 
@@ -83,7 +88,9 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     // all of this element's children have loaded (if any)
     elm._hasLoaded = true;
 
-    // fire off the user's DidLoad method (if one was provided)
+    // fire off the user's ionViewDidLoad method (if one was provided)
+    // ionViewDidLoad only runs ONCE, after instance.$el has been assigned
+    // the host element, and AFTER render() has been called
     instance.ionViewDidLoad && instance.ionViewDidLoad();
 
     // add the css class that this element has officially hydrated

@@ -545,7 +545,10 @@ export interface HostMeta {
 }
 
 export interface Component {
+  ionViewWillLoad?: () => void;
   ionViewDidLoad?: () => void;
+  ionViewWillUpdate?: () => void;
+  ionViewDidUpdate?: () => void;
   ionViewDidUnload?: () => void;
 
   render?: () => VNode;
@@ -615,7 +618,7 @@ export interface HostElement extends HTMLElement {
   $instance?: Component;
 
   // private methods
-  _render: () => void;
+  _render: (isInitialRender: boolean) => void;
   _initLoad: () => void;
   _queueUpdate: () => void;
 

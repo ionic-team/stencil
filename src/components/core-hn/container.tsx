@@ -16,7 +16,7 @@ export class NewsContainer {
   @State() thirdSelectedClass: boolean = false;
   @State() fourthSelectedClass: boolean = false;
 
-  ionViewDidLoad() {
+  ionViewWillLoad() {
     if (Ionic.isServer) return;
 
     this.firstSelectedClass = true;
