@@ -113,7 +113,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       const hash = hashIdx > 0 ? hashIdx : sel.length;
       const dot = dotIdx > 0 ? dotIdx : sel.length;
       const tag = hashIdx !== -1 || dotIdx !== -1 ? sel.slice(0, Math.min(hash, dot)) : sel;
-      const elm = vnode.elm = isDef(data) && isDef(i = (data as VNodeData).ns) ? domApi.$createElementNS(i, tag)
+      const elm = vnode.elm = isDef(data) && isDef(i = (data as VNodeData).vns) ? domApi.$createElementNS(i, tag)
                                                                                : domApi.$createElement(<any>tag);
       if (hash < dot) {
         domApi.$setAttribute(elm, 'id', sel.slice(hash + 1, dot));
@@ -124,8 +124,6 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
       updateElement(domApi, emptyNode, vnode);
       updateEventListeners(emptyNode, vnode);
-
-      data.ref && data.ref(elm);
 
       if (isArray(children)) {
         for (i = 0; i < children.length; ++i) {
