@@ -108,7 +108,7 @@ export function parsePropertyValue(propType: number, propValue: any) {
     if (propType === TYPE_BOOLEAN) {
       // per the HTML spec, any string value means it is a boolean "true" value
       // but we'll cheat here and say that the string "false" is the boolean false
-      return (propValue === null || propValue === 'false' ? false : true);
+      return (propValue === null || propValue === false || propValue === 'false' ? false : true);
     }
 
     if (propType === TYPE_NUMBER) {
