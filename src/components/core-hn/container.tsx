@@ -67,8 +67,6 @@ export class NewsContainer {
         break;
     }
 
-    this.selectedClass = true;
-
     Ionic.controller('loading', { content: `fetching ${type} articles...` }).then((loading: any) => {
       loading.present().then(() => {
         fetch(`${this.apiRootUrl}/${type}?page=1`).then((response) => {
