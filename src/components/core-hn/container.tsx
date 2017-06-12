@@ -1,4 +1,4 @@
-import { Component, h, Prop, State, Ionic } from '../index';
+import { Component, h, State, Prop, Ionic } from '../index';
 
 
 @Component({
@@ -15,6 +15,7 @@ export class NewsContainer {
   @State() secondSelectedClass: boolean = false;
   @State() thirdSelectedClass: boolean = false;
   @State() fourthSelectedClass: boolean = false;
+  prevClass: any;
 
   ionViewWillLoad() {
     if (Ionic.isServer) return;
@@ -67,8 +68,6 @@ export class NewsContainer {
         break;
     }
 
-    this.selectedClass = true;
-
     Ionic.controller('loading', { content: `fetching ${type} articles...` }).then((loading: any) => {
       loading.present().then(() => {
         fetch(`${this.apiRootUrl}/${type}?page=1`).then((response) => {
@@ -105,6 +104,8 @@ export class NewsContainer {
 
         });
       });
+    } else {
+      window.navigator.vibrate(200);
     }
   }
 
@@ -128,9 +129,12 @@ export class NewsContainer {
     });
   }
 
-  render() {
+  ionViewWillUpdate() {
+    this.prevClass = this.page === 1 ? { 'no-back': true } : { 'yes-back': true };
+  }
 
-    const prevClass = this.page === 1 ? { 'no-back': true } : { 'yes-back': true };
+  render() {
+    console.log('rendering');
 
     return [
       <ion-header mdHeight='56px' iosHeight='61px'>
@@ -189,7 +193,7 @@ export class NewsContainer {
       <ion-footer>
         <ion-toolbar class='pager'>
           <ion-buttons slot='start'>
-            <ion-button class={prevClass} clear={true} on-click={() => this.previous()}>
+            <ion-button class={this.prevClass} clear={true} on-click={() => this.previous()}>
               prev
           </ion-button>
           </ion-buttons>

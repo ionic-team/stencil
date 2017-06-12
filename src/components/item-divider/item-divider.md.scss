@@ -16,21 +16,21 @@ $item-md-divider-font-size:          1.4rem !default;
 /// @prop - Border bottom for the divider
 $item-md-divider-border-bottom:      1px solid $list-md-border-color !default;
 
-/// @prop - Padding for the divider
-$item-md-divider-padding:            5px 15px !default;
+/// @prop - Padding start for the divider
+$item-md-divider-padding-start:      $item-md-padding-start !default;
 
 
 // Material Design Item Divider
 // --------------------------------------------------
 
 .item-divider-md {
-  padding-left: $item-md-padding-left;
-
-  color: $item-md-divider-color;
-  background-color: $item-md-divider-background;
+  @include padding-horizontal($item-md-divider-padding-start, null);
 
   border-bottom: $item-md-divider-border-bottom;
   font-size: $item-md-divider-font-size;
+
+  color: $item-md-divider-color;
+  background-color: $item-md-divider-background;
 }
 
 
@@ -47,7 +47,7 @@ $item-md-divider-padding:            5px 15px !default;
     }
 
     &.activated {
-     background-color: color-shade($color-base);
+      background-color: color-shade($color-base);
     }
   }
 }

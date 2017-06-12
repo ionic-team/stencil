@@ -1,4 +1,4 @@
-import { Component, h, Prop, Ionic } from '../index';
+import { Component, h, Prop, Ionic, State } from '../index';
 
 
 @Component({
@@ -9,6 +9,21 @@ export class NewsList {
 
   @Prop() type: any[];
   apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
+  @State() fakeData: any[] = [];
+
+  ionViewWillLoad() {
+    // this can be simplified or removed once skeleton screens
+    // have made it in
+    for (let i = 0; i < 11; i++) {
+      this.fakeData.push({
+        points: 50,
+        title: 'PWAs are the future',
+        user: 'ionitron',
+        time_ago: '1 day ago',
+        comments_count: 400
+      });
+    }
+  }
 
   comments(story: any) {
     if (Ionic.isServer) return;
@@ -38,6 +53,28 @@ export class NewsList {
   }
 
   render() {
+    if (this.type.length === 0) {
+      // Note to self:
+      // change this to skeleton screens
+      // once those are in
+      return (
+        <ion-list>
+          {this.fakeData.map((story: any) => (
+            <ion-item>
+              <div class='points' slot='start'>
+                {story.points}
+              </div>
+              <ion-label>
+                <h2 class='list-header'>{story.title}</h2>
+                <h3 class='comments-text'>
+                  Posted by {story.user} {story.time_ago} | {story.comments_count} comments
+                </h3>
+              </ion-label>
+            </ion-item>
+          ))}
+        </ion-list>
+      );
+    }
     return (
       <ion-list>
         {this.type.map((story: any) => (
@@ -46,12 +83,10 @@ export class NewsList {
               {story.points || 0}
             </div>
             <ion-label>
-              <div>
-                <h2 class='list-header' on-click={() => window.open(story.url)}>{story.title}</h2>
-                <h3 class='comments-text' on-click={() => this.comments(story)}>
-                  Posted by {story.user} {story.time_ago} | {story.comments_count} comments
+              <h2 class='list-header' on-click={() => window.open(story.url)}>{story.title}</h2>
+              <h3 class='comments-text' on-click={() => this.comments(story)}>
+                Posted by {story.user} {story.time_ago} | {story.comments_count} comments
                 </h3>
-              </div>
             </ion-label>
           </ion-item>
         ))}

@@ -291,11 +291,9 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
 }
 
 .back-button-icon-ios {
-  @include margin(0);
+  @include margin(-1px, 0, 0, 0);
 
   display: inherit;
-
-  margin-top: -1px;
 
   min-width: 18px;
 
