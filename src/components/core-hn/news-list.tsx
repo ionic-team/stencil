@@ -35,7 +35,6 @@ export class NewsList {
         return response.json();
       }).then((data: any) => {
         console.log(data);
-        data.comments;
 
         setTimeout(() => {
           loading.dismiss().then(() => {
@@ -65,9 +64,11 @@ export class NewsList {
                 {story.points}
               </div>
               <ion-label>
-                <h2 class='list-header'>{story.title}</h2>
+                <h2 class='list-header'>
+                  <ion-skeleton-text width='90%'></ion-skeleton-text>
+                </h2>
                 <h3 class='comments-text'>
-                  Posted by {story.user} {story.time_ago} | {story.comments_count} comments
+                  <ion-skeleton-text width='60%'></ion-skeleton-text>
                 </h3>
               </ion-label>
             </ion-item>
