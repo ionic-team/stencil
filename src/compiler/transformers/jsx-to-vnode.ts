@@ -191,7 +191,7 @@ function isKey(attrName: string) {
 
 
 function isHyphenedEventListener(attrNameSplit: string[], exp: ts.Expression) {
-  if (exp.kind !== ts.SyntaxKind.CallExpression) {
+  if (exp.kind !== ts.SyntaxKind.FunctionExpression && exp.kind !== ts.SyntaxKind.CallExpression) {
     return false;
   }
 
@@ -200,7 +200,7 @@ function isHyphenedEventListener(attrNameSplit: string[], exp: ts.Expression) {
 
 
 function isStandardizedEventListener(attrName: string, exp: ts.Expression) {
-  if (exp.kind !== ts.SyntaxKind.CallExpression) {
+  if (exp.kind !== ts.SyntaxKind.FunctionExpression && exp.kind !== ts.SyntaxKind.CallExpression) {
     return false;
   }
 

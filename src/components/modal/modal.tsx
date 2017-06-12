@@ -133,7 +133,7 @@ export class Modal implements IModal {
 
     return [
       <div
-        on-click={this.backdropClick.bind(this)}
+        onClick={this.backdropClick.bind(this)}
         class={{
           'modal-backdrop': true,
           'hide-backdrop': !this.showBackdrop

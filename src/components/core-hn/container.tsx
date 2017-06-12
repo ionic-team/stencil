@@ -149,7 +149,7 @@ export class NewsContainer {
                 'header-button-selected': this.firstSelectedClass
               }}
               clear
-              on-click={() => this.getStories('news')}
+              onClick={() => this.getStories('news')}
             >
               News
           </ion-button>
@@ -159,7 +159,7 @@ export class NewsContainer {
                 'header-button-selected': this.secondSelectedClass
               }}
               clear
-              on-click={() => this.getStories('show')}
+              onClick={() => this.getStories('show')}
             >
               Show
           </ion-button>
@@ -169,7 +169,7 @@ export class NewsContainer {
                 'header-button-selected': this.thirdSelectedClass
               }}
               clear
-              on-click={() => this.getStories('jobs')}
+              onClick={() => this.getStories('jobs')}
             >
               Jobs
           </ion-button>
@@ -179,7 +179,7 @@ export class NewsContainer {
                 'header-button-selected': this.fourthSelectedClass
               }}
               clear
-              on-click={() => this.getStories('ask')}
+              onClick={() => this.getStories('ask')}
             >
               Ask
           </ion-button>
@@ -193,7 +193,7 @@ export class NewsContainer {
       <ion-footer>
         <ion-toolbar class='pager'>
           <ion-buttons slot='start'>
-            <ion-button class={this.prevClass} clear={true} on-click={() => this.previous()}>
+            <ion-button class={this.prevClass} clear={true} onClick={() => this.previous()}>
               prev
           </ion-button>
           </ion-buttons>
@@ -201,7 +201,7 @@ export class NewsContainer {
             page {this.page}
           </span>
           <ion-buttons slot='end'>
-            <ion-button color='primary' clear={true} on-click={() => this.next()}>
+            <ion-button color='primary' clear={true} onClick={() => this.next()}>
               next
           </ion-button>
           </ion-buttons>
