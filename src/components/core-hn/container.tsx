@@ -104,6 +104,8 @@ export class NewsContainer {
 
         });
       });
+    } else {
+      window.navigator.vibrate(200);
     }
   }
 
