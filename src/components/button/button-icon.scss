@@ -6,23 +6,23 @@
 .button ion-icon[slot="start"] {
   @include button-icon();
 
-  padding-right: .3em;
+  @include padding-horizontal(null, .3em);
 }
 
 .button ion-icon[slot="end"] {
   @include button-icon();
 
-  padding-left: .4em;
+  @include padding-horizontal(.4em, null);
 }
 
 [icon-only] .button {
-  padding: 0;
+  @include padding(0);
 
   min-width: .9em;
 }
 
 [icon-only] ion-icon {
-  padding: 0 .5em;
+  @include padding(0, .5em);
 
   font-size: 1.8em;
   line-height: .67;

@@ -22,14 +22,15 @@ ion-item {
 
 
 .item-block {
+  @include margin(0);
+  @include padding(0);
+  @include text-align(initial);
+
   display: flex;
   overflow: hidden;
 
   align-items: center;
   justify-content: space-between;
-
-  margin: 0;
-  padding: 0;
 
   width: 100%;
   min-height: 4.4rem;
@@ -38,12 +39,14 @@ ion-item {
 
   font-weight: normal;
   line-height: normal;
-  text-align: initial;
   text-decoration: none;
   color: inherit;
 }
 
 .item-inner {
+  @include margin(0);
+  @include padding(0);
+
   display: flex;
   overflow: hidden;
 
@@ -51,9 +54,6 @@ ion-item {
   flex-direction: inherit;
   align-items: inherit;
   align-self: stretch;
-
-  margin: 0;
-  padding: 0;
 
   min-height: inherit;
 
@@ -79,27 +79,6 @@ ion-item {
 
 ion-item-group {
   display: block;
-}
-
-ion-item-divider {
-  z-index: $z-index-item-divider;
-  display: flex;
-  overflow: hidden;
-
-  align-items: center;
-  justify-content: space-between;
-
-  margin: 0;
-  padding: 0;
-
-  width: 100%;
-
-  min-height: 30px;
-}
-
-ion-item-divider[sticky] {
-  position: sticky;
-  top: 0;
 }
 
 [vertical-align-top],
