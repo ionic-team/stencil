@@ -83,7 +83,9 @@ export class NewsList {
               {story.points || 0}
             </div>
             <ion-label>
-              <h2 class='list-header' onClick={() => window.open(story.url)}>{story.title}</h2>
+              <h2 class='list-header'>
+                <a href={story.url}>{story.title}</a>
+              </h2>
               <h3 class='comments-text' onClick={() => this.comments(story)}>
                 Posted by {story.user} {story.time_ago} | {story.comments_count} comments
                 </h3>
