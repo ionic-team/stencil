@@ -9,7 +9,7 @@
 
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
-import { isArray, isDef, isString, isStringOrNumber, isUndef } from '../../util/helpers';
+import { isArray, isDef, isString, isUndef } from '../../util/helpers';
 import { updateElement } from './element-update';
 
 
@@ -18,8 +18,6 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   function createElm(vnode: VNode, insertedVnodeQueue: VNodeQueue, parentElm: Node, hostContentNodes: HostContentNodes): Node {
     let i = 0;
     let childNode: Node;
-
-    // vnode = normalizeVNode(vnode);
 
     if (hostContentNodes && vnode.e === 'slot') {
       // special case for manually relocating host content nodes
@@ -219,9 +217,6 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   }
 
   function patchVnode(oldVnode: VNode, newVnode: VNode, insertedVnodeQueue: VNodeQueue, hostContentNodes: HostContentNodes) {
-    // newVnode = normalizeVNode(newVnode);
-
-
     if (oldVnode !== newVnode) {
       const elm: HostElement = newVnode.n = <any>oldVnode.n;
 
@@ -280,72 +275,44 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   };
 }
 
-function normalizeVNode(vnode: VNode): VNode {
-  if (isDef(vnode)) {
 
-    if (isStringOrNumber(vnode)) {
-      return <VNode>{
-        t: vnode.toString()
-      };
-    }
-
-    if (isUndef(vnode.e) && isUndef(vnode.t) && isUndef(vnode.n)) {
-      return null;
-    }
-
-    let stack = vnode.h;
-
-    if (isArray(stack)) {
-
-      let children = EMPTY_CHILDREN, lastSimple, child: any, simple, i;
-
-      while (stack.length) {
-        if ((child = stack.pop()) && child.pop !== undefined) {
-
-          for (i = child.length; i--; ) {
-            stack.push(child[i]);
-          }
-
-        } else {
-
-          // if (typeof child === 'boolean') child = null;
-
-          // if (child == null) child = '';
-          // else if (typeof child === 'number') child = String(child);
-          // else if (typeof child !== 'string') simple = false;
-
-          if (simple && lastSimple) {
-            children[children.length - 1] += child;
-
-          } else if (children === EMPTY_CHILDREN) {
-            children = [child];
-
-          } else {
-            children.push(child);
-          }
-
-          // lastSimple = simple;
-        }
-      }
-
-      if (children.length > 0) {
-        vnode.h = children;
-
-        for (i = 0; i < vnode.h.length; i++) {
-          vnode.h[i] = normalizeVNode(vnode.h[i]);
-        }
-
-      } else {
-        delete vnode.h;
-      }
-
-    }
-
+export function normalizeVNode(vnode: VNode) {
+  if (vnode === null || vnode === undefined) {
+    return <VNode>{
+      t: ''
+    };
   }
+
+  if (typeof vnode === 'string') {
+    return <VNode>{
+      t: vnode
+    };
+  }
+
+  if (typeof vnode === 'number') {
+    return <VNode>{
+      t: (<any>vnode).toString()
+    };
+  }
+
+  if (isArray(vnode.h)) {
+    let children: any[] = [];
+
+    for (var i = 0; i < vnode.h.length; i++) {
+      if (isArray(vnode.h[i])) {
+        for (var j = 0; j < (<any>vnode).h[i].length; j++) {
+          children.push(normalizeVNode((<any>vnode).h[i][j]));
+        }
+      } else {
+        children.push(normalizeVNode(vnode.h[i]));
+      }
+    }
+
+    vnode.h = children;
+  }
+
   return vnode;
 }
-
-var EMPTY_CHILDREN: any[] = [];
 
 
 export function invokeDestroyHook(vnode: VNode) {

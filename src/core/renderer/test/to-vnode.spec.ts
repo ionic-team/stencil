@@ -2,10 +2,10 @@ import { mockElement, mockDomApi } from '../../../test';
 import { toVNode } from '../to-vnode';
 
 
-describe('toVNode()', function () {
+describe('toVNode()', () => {
   const domApi = mockDomApi();
 
-  it('should create element w/ child elements and text nodes', function () {
+  it('should create element w/ child elements and text nodes', () => {
     const elm = mockElement('h1');
     elm.innerHTML = '<div> 1 <span> 2 </span><!--comment-->   </div>';
 
@@ -30,7 +30,7 @@ describe('toVNode()', function () {
     expect(vnode.h[0].h[1].h[0].t).toBe(' 2 ');
   });
 
-  it('should create element w/ child text node', function () {
+  it('should create element w/ child text node', () => {
     const elm = mockElement('h1');
     elm.textContent = '88mph';
     const vnode = toVNode(domApi, elm);
@@ -41,7 +41,7 @@ describe('toVNode()', function () {
     expect(vnode.h[0].t).toBe('88mph');
   });
 
-  it('should create element', function () {
+  it('should create element', () => {
     const elm = mockElement('h1');
     const vnode = toVNode(domApi, elm);
     expect(vnode.n).toBe(elm);
