@@ -218,7 +218,7 @@ export function createPlatformServer(IonicGbl: IonicGlobal, win: Window, domApi:
   }
 
   function collectHostContent(elm: HostElement, validNamedSlots: string[]) {
-    assignHostContentSlots(domApi, elm, validNamedSlots);
+    elm._hostContentNodes = assignHostContentSlots(domApi, elm, validNamedSlots);
   }
 
   function appLoaded() {

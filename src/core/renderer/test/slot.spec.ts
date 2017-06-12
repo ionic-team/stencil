@@ -1,6 +1,6 @@
-import { waitForLoad, mockConnect, mockDefine, mockPlatform } from '../../../test';
-import { h, VNode } from '../patch';
-import { HostElement } from '../../../util/interfaces';
+import { h } from '../h';
+import { HostElement, VNode } from '../../../util/interfaces';
+import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../test';
 
 
 describe('Component slot', () => {

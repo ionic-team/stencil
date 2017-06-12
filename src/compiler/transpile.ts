@@ -1,8 +1,8 @@
 import { BuildContext, CompilerConfig } from './interfaces';
 import { createFileMeta, writeFiles } from './util';
 import { componentClass } from './transformers/component-class';
+import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { removeImports } from './transformers/remove-imports';
-import { reactToSnabbdomJsx } from './transformers/react-to-snabbdom-jsx';
 import * as ts from 'typescript';
 
 
@@ -94,7 +94,7 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
       removeImports(),
     ],
     after: [
-      reactToSnabbdomJsx()
+      jsxToVNode(ctx)
     ]
   });
 

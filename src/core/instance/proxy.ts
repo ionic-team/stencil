@@ -1,5 +1,6 @@
 import { Component, ComponentActiveValues, ComponentActiveWatchers, HostElement, PropMeta,
   MethodMeta, PlatformApi, StateMeta, WatchMeta } from '../../util/interfaces';
+import { parsePropertyValue } from '../../util/data-parse';
 import { queueUpdate } from './update';
 
 
@@ -31,13 +32,13 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
     for (i = 0; i < states.length; i++) {
-      initProperty(false, states[i], instance, instance.__values, elm._watchers, plt, elm, watchMeta);
+      initProperty(false, '', states[i], 0, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
     }
   }
 
   for (i = 0; i < props.length; i++) {
     // add getters/setters for @Prop()s
-    initProperty(true, props[i].propName, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
+    initProperty(true, props[i].attribName, props[i].propName, props[i].propType, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
   }
 }
 
@@ -52,13 +53,18 @@ function initMethod(methodName: string, elm: HostElement, instance: Component) {
 }
 
 
-function initProperty(isProp: boolean, propName: string, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, elm: HostElement, watchMeta: WatchMeta[]) {
+function initProperty(isProp: boolean, attrName: string, propName: string, propType: number, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, elm: HostElement, watchMeta: WatchMeta[]) {
   if (isProp) {
     // @Prop() property, so check initial value from the proxy element, instance
     // and config, before we create getters/setters on this same property name
-    if ((<any>elm)[propName] !== undefined) {
+    const hostAttrValue = elm.getAttribute(attrName);
+    if (hostAttrValue !== null) {
+      // looks like we've got an initial value from the attribute
+      internalValues[propName] = parsePropertyValue(propType, hostAttrValue);
+
+    } else if ((<any>elm)[propName] !== undefined) {
       // looks like we've got an initial value on the proxy element
-      internalValues[propName] = (<any>elm)[propName];
+      internalValues[propName] = parsePropertyValue(propType, (<any>elm)[propName]);
 
     } else if ((<any>instance)[propName] !== undefined) {
       // looks like we've got an initial value on the instance already

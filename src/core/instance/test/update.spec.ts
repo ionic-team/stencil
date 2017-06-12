@@ -12,7 +12,9 @@ describe('instance update', () => {
       componentModuleMeta: class {
         value = '88';
         render() {
-          return h('ion-test', this.value);
+          return [
+            h('ion-test', this.value)
+          ];
         }
       }
     });
@@ -20,8 +22,7 @@ describe('instance update', () => {
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
     waitForLoad(plt, node, 'ion-test', (elm) => {
-
-      expect(elm._vnode.elm.textContent).toBe('88');
+      expect(elm._vnode.n.textContent).toBe('88');
 
       const instance: any = elm.$instance;
       instance.value = '99';
@@ -29,7 +30,7 @@ describe('instance update', () => {
       elm._queueUpdate();
 
       plt.$flushQueue(() => {
-        expect(elm._vnode.elm.textContent).toBe('99');
+        expect(elm._vnode.n.textContent).toBe('99');
 
         done();
       });
@@ -42,7 +43,9 @@ describe('instance update', () => {
       tagNameMeta: 'ion-test',
       componentModuleMeta: class {
         render() {
-          return h('grasshopper', 'hi');
+          return [
+            h('grasshopper', 'hi')
+          ];
         }
       }
     });

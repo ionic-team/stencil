@@ -43,14 +43,14 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
     let val: any;
 
     switch (attr.initializer.kind) {
-    case ts.SyntaxKind.ObjectLiteralExpression:
-      val = objectLiteralToObjectMap(attr.initializer as ts.ObjectLiteralExpression);
-      break;
-    case ts.SyntaxKind.StringLiteral:
-    case ts.SyntaxKind.Identifier:
-    case ts.SyntaxKind.PropertyAccessExpression:
-    default:
-      val = attr.initializer;
+      case ts.SyntaxKind.ObjectLiteralExpression:
+        val = objectLiteralToObjectMap(attr.initializer as ts.ObjectLiteralExpression);
+        break;
+      case ts.SyntaxKind.StringLiteral:
+      case ts.SyntaxKind.Identifier:
+      case ts.SyntaxKind.PropertyAccessExpression:
+      default:
+        val = attr.initializer;
     }
 
     final[name] = val;
@@ -59,7 +59,7 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
   }, <ObjectMap>{});
 }
 
-export function objectMapToObjectLiteral(objMap: ObjectMap): ts.ObjectLiteralExpression {
+export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpression {
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(objMap).map((key: string): ts.ObjectLiteralElementLike => {
     let value = objMap[key];
 
@@ -70,4 +70,14 @@ export function objectMapToObjectLiteral(objMap: ObjectMap): ts.ObjectLiteralExp
   });
 
   return ts.createObjectLiteral(newProperties);
+}
+
+
+export function createEmptyArg() {
+  return ts.createNumericLiteral('0');
+}
+
+
+export function isEmptyArgs(arg: any) {
+  return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';
 }

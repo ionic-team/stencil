@@ -169,6 +169,9 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
               sourceMap: false
             })
           ]
+        }).catch(err => {
+          console.log('bundle tmp entry:', tmpEntry);
+          throw err;
         })
 
       .then(rollupBundle => {

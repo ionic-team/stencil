@@ -201,20 +201,3 @@ export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string, cb?
     console.error('waitForLoad', err);
   });
 }
-
-
-export function waitForUpdate(plt: MockedPlatform, rootNode: any, tag: string, cb?: (elm: HostElement) => void): Promise<HostElement> {
-  return new Promise(resolve => {
-    const elm = rootNode.tagName === tag.toUpperCase() ? rootNode : rootNode.querySelector(tag);
-
-    plt.$flushQueue(() => {
-      // flush to do the update
-      connectComponents(plt, elm);
-      cb && cb(elm);
-      resolve(elm);
-    });
-
-  }).catch(err => {
-    console.error('waitForUpdate', err);
-  });
-}

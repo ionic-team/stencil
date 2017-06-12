@@ -11,16 +11,8 @@ export function createDomApi(document: Document): DomApi {
 
     $body: document.body,
 
-    $isElement: function isElement(node: any) {
-      return node.nodeType === 1;
-    },
-
-    $isText: function isText(node: any) {
-      return node.nodeType === 3;
-    },
-
-    $isComment: function isComment(node: any) {
-      return node.nodeType === 8;
+    $nodeType: function nodeType(node: any) {
+      return node.nodeType;
     },
 
     $createEvent: function createEvent() {
@@ -39,10 +31,6 @@ export function createDomApi(document: Document): DomApi {
       return document.createTextNode(text);
     },
 
-    $createComment: function createComment(text: string) {
-      return document.createComment(text);
-    },
-
     $insertBefore: function insertBefore(parentNode: Node, newNode: Node, referenceNode: Node) {
       parentNode.insertBefore(newNode, referenceNode);
     },
@@ -53,6 +41,10 @@ export function createDomApi(document: Document): DomApi {
 
     $appendChild: function appendChild(node: Node, child: Node) {
       node.appendChild(child);
+    },
+
+    $childNodes: function childNodes(node: Node) {
+      return node.childNodes;
     },
 
     $parentNode: function parentNode(node: Node) {

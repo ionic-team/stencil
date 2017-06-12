@@ -1,6 +1,6 @@
 import { createThemedClasses } from '../../util/theme';
-import { HostElement, PlatformApi } from '../../util/interfaces';
-import { h } from '../renderer/h';
+import { HostElement, PlatformApi, VNode } from '../../util/interfaces';
+import { isArray, isDef } from '../../util/helpers';
 
 
 export function render(plt: PlatformApi, elm: HostElement, isInitialRender: boolean) {
@@ -18,9 +18,9 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
   // it off and generate the children for this vnode
   const vnodeChildren = instance.render && instance.render();
 
-  let vnodeAttributes = instance.hostData && instance.hostData();
+  let vnodeHostData = instance.hostData && instance.hostData();
   if (cmpMeta.hostMeta) {
-    vnodeAttributes = Object.keys(cmpMeta.hostMeta).reduce((hostData, key) => {
+    vnodeHostData = Object.keys(cmpMeta.hostMeta).reduce((hostData, key) => {
       switch (key) {
       case 'theme':
         hostData['class'] = hostData['class'] || {};
@@ -30,18 +30,30 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
         );
       }
       return hostData;
-    }, vnodeAttributes || {});
+    }, vnodeHostData || {});
   }
 
-  if (vnodeChildren || vnodeAttributes) {
+  if (vnodeChildren || vnodeHostData) {
     let hydrating = false;
 
     // if this is the intial load, then we give the renderer the actual element
     // if this is a re-render, then give the renderer the last vnode we created
-    const newVNode = h(elm, vnodeAttributes, vnodeChildren);
+    const newVNode: VNode = {
+      n: elm
+    };
 
-    // kick off the actual render and any DOM updates
-    elm._vnode = plt.render(elm._vnode ? elm._vnode : elm, newVNode, elm._hostContentNodes, hydrating);
+    if (vnodeHostData) {
+      newVNode.a = vnodeHostData['attrs'];
+      newVNode.c = vnodeHostData['class'];
+    }
+
+    if (vnodeChildren) {
+      // the host element's children should always be an array
+      newVNode.h = isArray(vnodeChildren) ? vnodeChildren : [vnodeChildren];
+    }
+
+    // // kick off the actual render and any DOM updates
+    elm._vnode = plt.render(isDef(elm._vnode) ? elm._vnode : elm, newVNode, elm._hostContentNodes, hydrating);
   }
 
   if (!isInitialRender) {

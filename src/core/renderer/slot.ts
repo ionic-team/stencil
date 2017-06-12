@@ -1,7 +1,6 @@
 import { DomApi, HostElement } from '../../util/interfaces';
 
 
-
 export function assignHostContentSlots(domApi: DomApi, elm: HostElement, validNamedSlots: string[]) {
   const childNodes = elm.childNodes;
 
@@ -14,7 +13,8 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, validNa
       var isDefaultSlot = true;
       var childNode = childNodes[i];
 
-      if (domApi.$isElement(childNode)) {
+      if (domApi.$nodeType(childNode) === 1) {
+        // is element node
         var slotName = domApi.$getAttribute(childNode, 'slot');
 
         for (var j = 0; j < validNamedSlotsLen; j++) {
@@ -40,16 +40,14 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, validNa
       }
     }
 
-    elm._hostContentNodes = {
+    return {
       defaultSlot: defaultSlot,
       namedSlots: namedSlots
     };
-
-  } else {
-    // fast path for elements without named slots
-    elm._hostContentNodes = {
-      defaultSlot: childNodes.length ? Array.apply(null, childNodes) : null
-    };
   }
 
+  // fast path for elements without named slots
+  return {
+    defaultSlot: childNodes.length ? Array.apply(null, childNodes) : null
+  };
 }

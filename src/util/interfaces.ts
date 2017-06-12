@@ -618,7 +618,7 @@ export interface HostElement extends HTMLElement {
   $instance?: Component;
 
   // private methods
-  _render: (isInitialRender: boolean) => void;
+  _render: (isInitialRender?: boolean) => void;
   _initLoad: () => void;
   _queueUpdate: () => void;
 
@@ -645,18 +645,16 @@ export interface RendererApi {
 export interface DomApi {
   $head: HTMLHeadElement;
   $body: HTMLElement;
-  $isElement(node: any): boolean;
-  $isText(node: any): boolean;
-  $isComment(node: any): boolean;
+  $nodeType(node: any): number;
   $createEvent(): CustomEvent;
   $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
   $createElement(tagName: string): HTMLElement;
   $createElementNS(namespace: string, tagName: string): any;
   $createTextNode(text: string): Text;
-  $createComment(text: string): Comment;
   $insertBefore(parentNode: Node, newNode: Node, referenceNode: Node): void;
   $removeChild(node: Node, child: Node): void;
   $appendChild(node: Node, child: Node): void;
+  $childNodes(node: Node): NodeList;
   $parentNode(node: Node): Node;
   $nextSibling(node: Node): Node;
   $tagName(elm: any): string;
@@ -683,32 +681,102 @@ export interface Hyperscript {
 }
 
 
-export interface VNode {
-  sel?: string | undefined;
-  vdata?: VNodeData | undefined;
-  vchildren?: Array<VNode | string> | undefined;
-  elm?: Node | undefined | HostElement;
-  vtext?: string | undefined;
-  vkey?: Key;
-}
-
-
 export interface HostContentNodes {
   defaultSlot?: Node[];
   namedSlots?: {[slotName: string]: Node[]};
 }
 
+
 export type CssClassObject = { [className: string]: boolean };
+
+
+/**
+ * 0 tag
+ * 1 children
+ * 2 class
+ * 3 props
+ * 4 attrs
+ * 5 on
+ * 6 style
+ * 7 key
+ * 8 namespace
+ * 9 element
+ */
+export interface VNode {
+  /**
+   * tag name for element
+   */
+  e?: string;
+
+  /**
+   * text content for text node
+   */
+  t?: string;
+
+  /**
+   * children for element
+   */
+  h?: VNode[];
+
+  /**
+   * class for element
+   */
+  c?: CssClassObject;
+
+  /**
+   * props for element
+   */
+  p?: { [propName: string]: any };
+
+  /**
+   * attrs for element
+   */
+  a?: { [attrName: string]: any };
+
+  /**
+   * on (event listeners) for element
+   */
+  o?: { [eventName: string]: any };
+
+  /**
+   * style for element
+   */
+  s?: { [styleProp: string]: any };
+
+  /**
+   * key for element
+   */
+  k?: Key;
+
+  /**
+   * namespace for element
+   */
+  m?: string;
+
+  /**
+   * dom element or text node reference
+   */
+  n?: Element|Node;
+
+  /**
+   * listener for element
+   */
+  l?: any;
+
+  /**
+   * for h()
+   */
+  isVnode?: boolean;
+}
 
 export interface VNodeData {
   props?: any;
   attrs?: any;
   class?: CssClassObject;
   style?: any;
-  dataset?: any;
   on?: any;
-  vkey?: Key;
-  vns?: string; // for SVGs
+  key?: Key;
+  ns?: string; // for SVGs
 }
 
 

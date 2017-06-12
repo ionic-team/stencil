@@ -1,4 +1,4 @@
-import { ATTR_DASH_CASE } from './constants';
+import { ATTR_DASH_CASE, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
 import { ComponentListenersData, ComponentMeta, ComponentModeData, ComponentRegistry, ComponentWatchersData, PropMeta } from '../util/interfaces';
 import { isString, toDashCase } from './helpers';
 
@@ -99,4 +99,24 @@ export function parseModeName(modeCode: any) {
   }
 
   return modeCode;
+}
+
+
+export function parsePropertyValue(propType: number, propValue: any) {
+    // ensure this value is of the correct prop type
+
+    if (propType === TYPE_BOOLEAN) {
+      // per the HTML spec, any string value means it is a boolean "true" value
+      // but we'll cheat here and say that the string "false" is the boolean false
+      return (propValue === null || propValue === 'false' ? false : true);
+    }
+
+    if (propType === TYPE_NUMBER) {
+      // force it to be a number
+      return parseFloat(propValue);
+    }
+
+    // not sure exactly what type we want
+    // so no need to change to a different type
+    return propValue;
 }

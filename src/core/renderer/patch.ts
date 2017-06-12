@@ -5,149 +5,82 @@
  * https://github.com/snabbdom/snabbdom/blob/master/LICENSE
  *
  * Modified for Ionic's Web Component Renderer
- * /
+ */
 
 
-/* global module, document, Node */
-import { isArray, isDef, isUndef, isString, isStringOrNumber } from '../../util/helpers';
-import { DomApi, HostContentNodes, HostElement, PlatformApi, RendererApi, VNode, VNodeData, Key } from '../../util/interfaces';
-import { vnode } from './vnode';
-
-import { updateElement } from './modules/element-update';
-import { updateEventListeners } from './modules/event-listeners';
-// import { prepatch } from './modules/pre-patch';
-export { VNode, VNodeData, vnode };
-export { h } from './h';
-
-type VNodeQueue = Array<VNode>;
-
-const emptyNode = vnode('', {}, [], undefined, undefined);
-
-function sameVnode(vnode1: VNode, vnode2: VNode): boolean {
-  return vnode1.vkey === vnode2.vkey && vnode1.sel === vnode2.sel;
-}
-
-function isVnode(vnode: any): vnode is VNode {
-  return vnode.sel !== undefined || vnode.elm !== undefined;
-}
-
-type KeyToIndexMap = {[key: string]: number};
-
-function createKeyToOldIdx(children: Array<VNode>, beginIdx: number, endIdx: number): KeyToIndexMap {
-  let i: number, map: KeyToIndexMap = {}, key: Key, ch;
-  for (i = beginIdx; i <= endIdx; ++i) {
-    ch = children[i];
-    if (ch != null) {
-      key = (<VNode>ch).vkey;
-      if (key !== undefined) map[key] = i;
-    }
-  }
-  return map;
-}
+import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
+import { isArray, isDef, isString, isStringOrNumber, isUndef } from '../../util/helpers';
+import { updateElement } from './element-update';
 
 
 export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
-  function enhanceElement(elm: Element, isSsrHydrated: boolean) {
-    let sel = domApi.$tagName(elm);
-    const children: VNode[] = [];
-
-    if (isSsrHydrated) {
-      for (var i = 0; i < elm.children.length; i++) {
-        children.push(enhanceElement(elm.children[i], isSsrHydrated));
-      }
-    } else {
-      sel += (elm.id ? '#' + elm.id : '') + (elm.className ? '.' + elm.className.split(' ').join('.') : '');
-    }
-
-    return vnode(sel, {}, children, undefined, elm);
-  }
-
-
   function createElm(vnode: VNode, insertedVnodeQueue: VNodeQueue, parentElm: Node, hostContentNodes: HostContentNodes): Node {
-    let i: any, data = vnode.vdata;
-    let children = vnode.vchildren;
-    let sel = vnode.sel;
+    let i = 0;
+    let childNode: Node;
 
-    if (sel === '!') {
-      if (isUndef(vnode.vtext)) {
-        vnode.vtext = '';
-      }
-      vnode.elm = domApi.$createComment(vnode.vtext as string);
+    vnode = normalizeVNode(vnode);
 
-    } else if (hostContentNodes && sel === 'slot') {
+    if (hostContentNodes && vnode.e === 'slot') {
       // special case for manually relocating host content nodes
-      // there their new home in either a named slot or the default slot
-      let namedSlot = (data.attrs && data.attrs.name) || (data.props && data.props.name);
+      // to their new home in either a named slot or the default slot
+      let namedSlot = (vnode.a && vnode.a.name);
       let slotNodes: Node[];
 
-      if (namedSlot) {
+      if (isDef(namedSlot)) {
         slotNodes = hostContentNodes.namedSlots && hostContentNodes.namedSlots[namedSlot];
 
       } else {
         slotNodes = hostContentNodes.defaultSlot;
       }
 
-      if (slotNodes) {
-        for (let nodeIndex = 0; nodeIndex < slotNodes.length; nodeIndex++) {
+      if (isDef(slotNodes)) {
+        for (i = 0; i < slotNodes.length; i++) {
           // remove the host content node from it's original parent node
           plt.tmpDisconnected = true;
-          domApi.$removeChild(slotNodes[nodeIndex].parentNode, slotNodes[nodeIndex]);
+          domApi.$removeChild(slotNodes[i].parentNode, slotNodes[i]);
 
-          if (nodeIndex === slotNodes.length - 1) {
+          if (i === slotNodes.length - 1) {
             // return the last node that gets appended
             // like any other Node that was created
-            return slotNodes[nodeIndex];
+            return slotNodes[i];
           }
 
           // relocate the node to it's new home
-          domApi.$appendChild(parentElm, slotNodes[nodeIndex]);
+          domApi.$appendChild(parentElm, slotNodes[i]);
           plt.tmpDisconnected = false;
         }
       }
 
-    } else if (sel !== undefined) {
-      // Parse selector
-      const hashIdx = sel.indexOf('#');
-      const dotIdx = sel.indexOf('.', hashIdx);
-      const hash = hashIdx > 0 ? hashIdx : sel.length;
-      const dot = dotIdx > 0 ? dotIdx : sel.length;
-      const tag = hashIdx !== -1 || dotIdx !== -1 ? sel.slice(0, Math.min(hash, dot)) : sel;
-      const elm = vnode.elm = isDef(data) && isDef(i = (data as VNodeData).vns) ? domApi.$createElementNS(i, tag)
-                                                                               : domApi.$createElement(<any>tag);
-      if (hash < dot) {
-        domApi.$setAttribute(elm, 'id', sel.slice(hash + 1, dot));
-      }
-      if (dotIdx > 0) {
-        domApi.$setAttribute(elm, 'class', sel.slice(dot + 1).replace(/\./g, ' '));
-      }
+    } else if (isDef(vnode.t)) {
+      // create text node
+      vnode.n = domApi.$createTextNode(vnode.t);
 
-      updateElement(domApi, emptyNode, vnode);
-      updateEventListeners(emptyNode, vnode);
+    } else {
+      // create element
+      const elm = vnode.n = (vnode.m ? domApi.$createElementNS(vnode.m, vnode.e) : domApi.$createElement(vnode.e));
 
-      if (isArray(children)) {
+      updateElement(domApi, null, vnode);
+
+      const children = vnode.h;
+      if (children) {
         for (i = 0; i < children.length; ++i) {
-          let ch = children[i];
-          if (ch != null) {
-            ch = <any>createElm(ch as VNode, insertedVnodeQueue, elm, hostContentNodes);
-            if (ch) {
-              domApi.$appendChild(elm, <any>ch);
-              plt.tmpDisconnected = false;
-            }
+          childNode = createElm(children[i], insertedVnodeQueue, elm, hostContentNodes);
+
+          if (isDef(childNode)) {
+            domApi.$appendChild(elm, childNode);
+            plt.tmpDisconnected = false;
           }
         }
-      } else if (isStringOrNumber(vnode.vtext)) {
-        domApi.$appendChild(elm, domApi.$createTextNode(vnode.vtext));
       }
-    } else {
-      vnode.elm = domApi.$createTextNode(vnode.vtext as string);
     }
-    return vnode.elm;
+
+    return vnode.n;
   }
 
   function addVnodes(parentElm: Node,
                      before: Node | null,
-                     vnodes: Array<VNode>,
+                     vnodes: VNode[],
                      startIdx: number,
                      endIdx: number,
                      insertedVnodeQueue: VNodeQueue,
@@ -155,36 +88,49 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     let vnodeChild: VNode;
     let childNode: Node;
 
+
     for (; startIdx <= endIdx; ++startIdx) {
       vnodeChild = vnodes[startIdx];
 
-      if (vnodeChild != null) {
-        childNode = createElm(vnodeChild, insertedVnodeQueue, parentElm, hostContentNodes);
-        childNode && domApi.$insertBefore(parentElm, childNode, before);
-      }
+      if (isDef(vnodeChild)) {
+        if (isDef(vnodeChild.t)) {
+          childNode = domApi.$createTextNode(vnodeChild.t);
 
-      plt.tmpDisconnected = false;
+        } else {
+          childNode = createElm(vnodeChild, insertedVnodeQueue, parentElm, hostContentNodes);
+        }
+
+        if (isDef(childNode)) {
+          vnodeChild.n = childNode;
+          domApi.$insertBefore(parentElm, childNode, before);
+        }
+
+        plt.tmpDisconnected = false;
+      }
     }
   }
 
   function removeVnodes(parentElm: Node,
-                        vnodes: Array<VNode>,
+                        vnodes: VNode[],
                         startIdx: number,
                         endIdx: number): void {
+
     for (; startIdx <= endIdx; ++startIdx) {
-      var ch = vnodes[startIdx];
-      if (ch != null) {
-        if (isDef(ch.sel)) {
-          invokeDestroyHook(ch);
+      var vnode = vnodes[startIdx];
+
+      if (isDef(vnode)) {
+        if (isDef(vnode.t)) {
+          invokeDestroyHook(vnode);
         }
-        domApi.$removeChild(parentElm, ch.elm as Node);
+
+        domApi.$removeChild(parentElm, vnode.n);
       }
     }
   }
 
   function updateChildren(parentElm: Node,
-                          oldCh: Array<VNode>,
-                          newCh: Array<VNode>,
+                          oldCh: VNode[],
+                          newCh: VNode[],
                           insertedVnodeQueue: VNodeQueue,
                           hostContentNodes: HostContentNodes) {
     let oldStartIdx = 0, newStartIdx = 0;
@@ -224,39 +170,47 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
       } else if (sameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
         patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue, hostContentNodes);
-        domApi.$insertBefore(parentElm, oldStartVnode.elm as Node, domApi.$nextSibling(oldEndVnode.elm as Node));
+        domApi.$insertBefore(parentElm, oldStartVnode.n, domApi.$nextSibling(oldEndVnode.n));
         oldStartVnode = oldCh[++oldStartIdx];
         newEndVnode = newCh[--newEndIdx];
 
       } else if (sameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
         patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue, hostContentNodes);
-        domApi.$insertBefore(parentElm, oldEndVnode.elm as Node, oldStartVnode.elm as Node);
+        domApi.$insertBefore(parentElm, oldEndVnode.n, oldStartVnode.n);
         oldEndVnode = oldCh[--oldEndIdx];
         newStartVnode = newCh[++newStartIdx];
 
       } else {
-        if (oldKeyToIdx === undefined) {
+        if (isUndef(oldKeyToIdx)) {
           oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
         }
-        idxInOld = oldKeyToIdx[newStartVnode.vkey as string];
-        if (isUndef(idxInOld)) { // New element
-          domApi.$insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue, parentElm, hostContentNodes), oldStartVnode.elm as Node);
+
+        idxInOld = oldKeyToIdx[newStartVnode.k];
+
+        if (isUndef(idxInOld)) {
+          // new element
+          domApi.$insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue, parentElm, hostContentNodes), oldStartVnode.n);
           newStartVnode = newCh[++newStartIdx];
+
         } else {
           elmToMove = oldCh[idxInOld];
-          if (elmToMove.sel !== newStartVnode.sel) {
-            domApi.$insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue, parentElm, hostContentNodes), oldStartVnode.elm as Node);
+
+          if (elmToMove.e !== newStartVnode.e) {
+            domApi.$insertBefore(parentElm, createElm(newStartVnode, insertedVnodeQueue, parentElm, hostContentNodes), oldStartVnode.n);
+
           } else {
             patchVnode(elmToMove, newStartVnode, insertedVnodeQueue, hostContentNodes);
-            oldCh[idxInOld] = undefined as any;
-            domApi.$insertBefore(parentElm, (elmToMove.elm as Node), oldStartVnode.elm as Node);
+            oldCh[idxInOld] = undefined;
+            domApi.$insertBefore(parentElm, elmToMove.n, oldStartVnode.n);
           }
+
           newStartVnode = newCh[++newStartIdx];
         }
       }
     }
+
     if (oldStartIdx > oldEndIdx) {
-      before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
+      before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].n;
       addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue, hostContentNodes);
 
     } else if (newStartIdx > newEndIdx) {
@@ -264,98 +218,130 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     }
   }
 
-  function patchVnode(oldVnode: VNode, vnode: VNode, insertedVnodeQueue: VNodeQueue, hostContentNodes: HostContentNodes) {
-    // if (!hostContentNodes && oldVnode.sel === 'slot') {
-    //   return;
-    // }
+  function patchVnode(oldVnode: VNode, newVnode: VNode, insertedVnodeQueue: VNodeQueue, hostContentNodes: HostContentNodes) {
 
-    const elm = vnode.elm = (oldVnode.elm as HostElement);
+    if (oldVnode !== newVnode) {
+      const elm: HostElement = newVnode.n = <any>oldVnode.n;
 
-    // if (isSsrHydrated && elm) {
-    //   (<Element>elm).classList.remove('ssr');
-    // }
+      let oldChildren = oldVnode.h;
+      let newChildren = newVnode.h;
 
-    let oldCh = oldVnode.vchildren;
-    let ch = vnode.vchildren;
-    if (oldVnode === vnode) return;
+      updateElement(domApi, oldVnode, newVnode);
 
-    // prepatch(oldVnode, vnode);
+      if (isUndef(newVnode.t)) {
 
-    if (vnode.vdata !== undefined) {
-      updateElement(domApi, oldVnode, vnode);
-      updateEventListeners(oldVnode, vnode);
-    }
+        if (isDef(oldChildren) && isDef(newChildren)) {
+          if (oldChildren !== newChildren) {
+            updateChildren(elm, oldChildren, newChildren, insertedVnodeQueue, hostContentNodes);
+          }
 
-    if (isUndef(vnode.vtext)) {
-      if (isDef(oldCh) && isDef(ch)) {
-        if (oldCh !== ch) {
-          updateChildren((<HTMLElement>elm).shadowRoot || elm, oldCh as Array<VNode>, ch as Array<VNode>, insertedVnodeQueue, hostContentNodes);
+        } else if (isDef(newChildren)) {
+          if (isDef(oldVnode.t)) {
+            domApi.$setTextContent(elm, '');
+          }
+          addVnodes(elm, null, newChildren, 0, newChildren.length - 1, insertedVnodeQueue, hostContentNodes);
+
+        } else if (isDef(oldChildren)) {
+          removeVnodes(elm, oldChildren, 0, oldChildren.length - 1);
         }
 
-      } else if (isDef(ch)) {
-        if (isDef(oldVnode.vtext)) domApi.$setTextContent(elm, '');
-        addVnodes(elm, null, ch as Array<VNode>, 0, (ch as Array<VNode>).length - 1, insertedVnodeQueue, hostContentNodes);
-
-      } else if (isDef(oldCh)) {
-        removeVnodes(elm, oldCh as Array<VNode>, 0, (oldCh as Array<VNode>).length - 1);
-
-      } else if (isDef(oldVnode.vtext)) {
-        domApi.$setTextContent(elm, '');
-      }
-
-    } else if (oldVnode.vtext !== vnode.vtext) {
-      if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
+      } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
         // this element has slotted content
         let parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
-        domApi.$setTextContent(parentElement, vnode.vtext);
+        domApi.$setTextContent(parentElement, newVnode.t);
         elm._hostContentNodes.defaultSlot = [parentElement.childNodes[0]];
 
       } else {
-        // normal node
-        domApi.$setTextContent(elm, vnode.vtext);
+        domApi.$setTextContent(elm, newVnode.t);
       }
     }
   }
 
-  return function patch(oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes, hydrating?: boolean): VNode {
-    let elm: Node, parent: Node;
-    const insertedVnodeQueue: VNodeQueue = [];
+  return function patch(oldVnode: VNode, newVnode: VNode, hostContentNodes?: HostContentNodes, isSsrHydrated?: boolean): VNode {
+    isSsrHydrated;
 
-
-    if (!isVnode(oldVnode)) {
-      oldVnode = enhanceElement(oldVnode, hydrating);
+    const tagName = domApi.$tagName(oldVnode);
+    if (isDef(tagName)) {
+      // we weren't passed an old vnode, but an actual Element
+      // this is from the initial render
+      oldVnode = {
+        e: tagName.toLowerCase(),
+        n: <Element>oldVnode
+      };
     }
 
-    if (vnode.elm || sameVnode(oldVnode, vnode)) {
-      patchVnode(oldVnode, vnode, insertedVnodeQueue, hostContentNodes);
+    patchVnode(normalizeVNode(oldVnode), normalizeVNode(newVnode), [], hostContentNodes);
 
-    } else {
-      elm = oldVnode.elm as Node;
-      parent = domApi.$parentNode(elm);
-
-      createElm(vnode, insertedVnodeQueue, parent, hostContentNodes);
-
-      if (parent !== null) {
-        domApi.$insertBefore(parent, vnode.elm as Node, domApi.$nextSibling(elm));
-        removeVnodes(parent, [oldVnode], 0, 0);
-      }
-    }
-    return vnode;
+    return newVnode;
   };
+}
+
+function normalizeVNode(vnode: VNode): VNode {
+  if (isDef(vnode)) {
+
+    if (isStringOrNumber(vnode)) {
+      return <VNode>{
+        t: vnode
+      };
+    }
+
+    if (isArray(vnode.h)) {
+      const h: any[] = [];
+
+      for (let i = 0, l = vnode.h.length; i < l; i++) {
+        if (isArray(vnode.h[i])) {
+          for (var j = 0; j < (<any>vnode).h[i][j].length; j++) {
+            h.push((<any>vnode).h[i][j]);
+          }
+        } else {
+          h.push(vnode.h[i]);
+        }
+      }
+
+      vnode.h = h;
+    }
+
+  }
+  return vnode;
 }
 
 
 export function invokeDestroyHook(vnode: VNode) {
-  let i: any, j: number, data = vnode.vdata;
-  if (data !== undefined) {
-    updateEventListeners(vnode);
-    if (vnode.vchildren !== undefined) {
-      for (j = 0; j < vnode.vchildren.length; ++j) {
-        i = vnode.vchildren[j];
-        if (i != null && !isString(i)) {
-          invokeDestroyHook(i);
-        }
+  let i: any;
+  let j: number;
+
+  // TODO
+  // updateEventListeners(vnode);
+
+  if (isDef(vnode.h)) {
+    for (j = 0; j < vnode.h.length; ++j) {
+      i = vnode.h[j];
+      if (isDef(i) && !isString(i)) {
+        invokeDestroyHook(i);
       }
     }
   }
 }
+
+function sameVnode(vnode1: VNode, vnode2: VNode): boolean {
+  return vnode1.k === vnode2.k && vnode1.e === vnode2.e;
+}
+
+function createKeyToOldIdx(children: VNode[], beginIdx: number, endIdx: number): KeyToIndexMap {
+
+  let i: number, map: KeyToIndexMap = {}, key: Key, ch;
+  for (i = beginIdx; i <= endIdx; ++i) {
+    ch = children[i];
+    if (ch != null) {
+      key = ch.k;
+      if (key !== undefined) {
+        map.k = i;
+      }
+    }
+  }
+  return map;
+}
+
+type VNodeQueue = Array<VNode>;
+
+type KeyToIndexMap = {[key: string]: number};

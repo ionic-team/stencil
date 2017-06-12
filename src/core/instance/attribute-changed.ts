@@ -1,5 +1,5 @@
 import { HostElement, PlatformApi } from '../../util/interfaces';
-import { TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
+import { parsePropertyValue } from '../../util/data-parse';
 
 
 export function attributeChangedCallback(plt: PlatformApi, elm: HostElement, attribName: string, oldVal: string, newVal: string) {
@@ -17,18 +17,7 @@ export function attributeChangedCallback(plt: PlatformApi, elm: HostElement, att
       // cool we've got a prop using this attribute name the value will
       // be a string, so let's convert it to the correct type the app wants
       // below code is ugly yes, but great minification ;)
-      (<any>elm)[prop.propName] =
-          (prop.propType === TYPE_BOOLEAN) ?
-              // per the HTML spec, any string value means it is a boolean "true" value
-              // but we'll cheat here and say that the string "false" is the boolean false
-              (newVal === null || newVal === 'false' ? false : true) :
-
-          (prop.propType === TYPE_NUMBER) ?
-              // force it to be a number
-              parseFloat(newVal) :
-
-          // else, idk, "any"
-          newVal;
+      (<any>elm)[prop.propName] = parsePropertyValue(prop.propType, newVal);
     }
   }
 }

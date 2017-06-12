@@ -83,6 +83,23 @@ function attrs(){};
 function on(){};
 function props(){};
 
+/**
+ * Compiled hyperscript props
+ * Already short, just don't rename them
+ */
+function e(){};
+function t(){};
+function h(){};
+function c(){};
+function p(){};
+function a(){};
+function o(){};
+function s(){};
+function k(){};
+function m(){};
+function n(){};
+function l(){};
+
 
 /**
  * Web Standards

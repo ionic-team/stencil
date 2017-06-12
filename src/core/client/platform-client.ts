@@ -3,7 +3,6 @@ import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
   ConfigApi, DomControllerApi, DomApi, HostElement,
   IonicGlobal, LoadComponentData, QueueApi, PlatformApi } from '../../util/interfaces';
 import { createRenderer } from '../renderer/patch';
-import { h } from '../renderer/h';
 import { isDef } from '../../util/helpers';
 import { initInjectedIonic } from './ionic-client';
 import { PRIORITY_LOW } from '../../util/constants';
@@ -209,6 +208,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
       });
 
       if (data[2]) {
+        // parse prop meta
         cmpMeta.propsMeta = cmpMeta.propsMeta.concat(data[2].map(parseProp));
       }
 
@@ -239,7 +239,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
   }
 
   function collectHostContent(elm: HostElement, validNamedSlots: string[]) {
-    assignHostContentSlots(domApi, elm, validNamedSlots);
+    elm._hostContentNodes = assignHostContentSlots(domApi, elm, validNamedSlots);
   }
 
   let initAppStyles: string[] = [];
@@ -298,7 +298,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
 
     // import component function
     // inject ionic globals
-    importFn(moduleImports, h, injectedIonic);
+    importFn(moduleImports, null, injectedIonic);
 
     for (i = 3; i < args.length; i++) {
       // first arg is core version
