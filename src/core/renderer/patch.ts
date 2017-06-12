@@ -20,6 +20,9 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     let childNode: Node;
 
     vnode = normalizeVNode(vnode);
+    if (isUndef(vnode)) {
+      return;
+    }
 
     if (hostContentNodes && vnode.e === 'slot') {
       // special case for manually relocating host content nodes
@@ -219,6 +222,8 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   }
 
   function patchVnode(oldVnode: VNode, newVnode: VNode, insertedVnodeQueue: VNodeQueue, hostContentNodes: HostContentNodes) {
+    newVnode = normalizeVNode(newVnode);
+
 
     if (oldVnode !== newVnode) {
       const elm: HostElement = newVnode.n = <any>oldVnode.n;
@@ -270,7 +275,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       };
     }
 
-    patchVnode(normalizeVNode(oldVnode), normalizeVNode(newVnode), [], hostContentNodes);
+    patchVnode(oldVnode, newVnode, [], hostContentNodes);
 
     return newVnode;
   };
@@ -278,6 +283,9 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
 function normalizeVNode(vnode: VNode): VNode {
   if (isDef(vnode)) {
+    // if (isUndef(vnode.e) && isUndef(vnode.t)) {
+    //   return null;
+    // }
 
     if (isStringOrNumber(vnode)) {
       return <VNode>{
@@ -285,25 +293,49 @@ function normalizeVNode(vnode: VNode): VNode {
       };
     }
 
-    if (isArray(vnode.h)) {
+    let stack = vnode.h;
 
-      var childrenLength = vnode.h;
+    if (isArray(stack)) {
 
-      if (childrenLength > 1) {
-        var childArray = Array(childrenLength);
+      let children = EMPTY_CHILDREN, lastSimple, child: any, simple, i;
 
-        for (var i = 0; i < childrenLength; i++) {
-          childArray[i] = vnode.h[i];
+
+      while (stack.length) {
+        if ((child = stack.pop()) && child.pop !== undefined) {
+          for (i = child.length; i--; ) stack.push(child[i]);
+
+        } else {
+
+          if (typeof child === 'boolean') child = null;
+
+          // if ((simple = typeof nodeName !== 'function')) {
+          //   if (child == null) child = '';
+          //   else if (typeof child === 'number') child = String(child);
+          //   else if (typeof child !== 'string') simple = false;
+          // }
+
+          if (simple && lastSimple) {
+            children[children.length - 1] += child;
+
+          } else if (children === EMPTY_CHILDREN) {
+            children = [child];
+
+          } else {
+            children.push(child);
+          }
+
+          lastSimple = simple;
         }
-
-        vnode.h = childArray;
       }
 
+      vnode.h = children;
     }
 
   }
   return vnode;
 }
+
+var EMPTY_CHILDREN: any[] = [];
 
 
 export function invokeDestroyHook(vnode: VNode) {
