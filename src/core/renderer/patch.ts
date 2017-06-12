@@ -288,17 +288,19 @@ function normalizeVNode(vnode: VNode): VNode {
     if (isArray(vnode.h)) {
       const h: any[] = [];
 
-      for (let i = 0, l = vnode.h.length; i < l; i++) {
+      for (let i = 0, ilen = vnode.h.length; i < ilen; i++) {
         if (isArray(vnode.h[i])) {
-          for (var j = 0; j < (<any>vnode).h[i][j].length; j++) {
+          for (var j = 0, jlen = (<any>vnode).h[i].length; j < jlen; j++) {
             h.push((<any>vnode).h[i][j]);
           }
-        } else {
+        } else if (isDef(vnode.h[i])) {
           h.push(vnode.h[i]);
         }
       }
 
-      vnode.h = h;
+      if (h.length > 0) {
+        vnode.h = h;
+      }
     }
 
   }
