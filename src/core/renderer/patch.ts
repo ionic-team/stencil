@@ -19,10 +19,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     let i = 0;
     let childNode: Node;
 
-    vnode = normalizeVNode(vnode);
-    if (isUndef(vnode)) {
-      return;
-    }
+    // vnode = normalizeVNode(vnode);
 
     if (hostContentNodes && vnode.e === 'slot') {
       // special case for manually relocating host content nodes
@@ -222,7 +219,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   }
 
   function patchVnode(oldVnode: VNode, newVnode: VNode, insertedVnodeQueue: VNodeQueue, hostContentNodes: HostContentNodes) {
-    newVnode = normalizeVNode(newVnode);
+    // newVnode = normalizeVNode(newVnode);
 
 
     if (oldVnode !== newVnode) {
@@ -275,7 +272,9 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       };
     }
 
-    patchVnode(oldVnode, newVnode, [], hostContentNodes);
+    const normalizedVNode = normalizeVNode(newVnode);
+
+    patchVnode(oldVnode, normalizedVNode, [], hostContentNodes);
 
     return newVnode;
   };
@@ -283,14 +282,15 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
 function normalizeVNode(vnode: VNode): VNode {
   if (isDef(vnode)) {
-    // if (isUndef(vnode.e) && isUndef(vnode.t)) {
-    //   return null;
-    // }
 
     if (isStringOrNumber(vnode)) {
       return <VNode>{
-        t: vnode
+        t: vnode.toString()
       };
+    }
+
+    if (isUndef(vnode.e) && isUndef(vnode.t) && isUndef(vnode.n)) {
+      return null;
     }
 
     let stack = vnode.h;
@@ -299,20 +299,20 @@ function normalizeVNode(vnode: VNode): VNode {
 
       let children = EMPTY_CHILDREN, lastSimple, child: any, simple, i;
 
-
       while (stack.length) {
         if ((child = stack.pop()) && child.pop !== undefined) {
-          for (i = child.length; i--; ) stack.push(child[i]);
+
+          for (i = child.length; i--; ) {
+            stack.push(child[i]);
+          }
 
         } else {
 
-          if (typeof child === 'boolean') child = null;
+          // if (typeof child === 'boolean') child = null;
 
-          // if ((simple = typeof nodeName !== 'function')) {
-          //   if (child == null) child = '';
-          //   else if (typeof child === 'number') child = String(child);
-          //   else if (typeof child !== 'string') simple = false;
-          // }
+          // if (child == null) child = '';
+          // else if (typeof child === 'number') child = String(child);
+          // else if (typeof child !== 'string') simple = false;
 
           if (simple && lastSimple) {
             children[children.length - 1] += child;
@@ -324,11 +324,21 @@ function normalizeVNode(vnode: VNode): VNode {
             children.push(child);
           }
 
-          lastSimple = simple;
+          // lastSimple = simple;
         }
       }
 
-      vnode.h = children;
+      if (children.length > 0) {
+        vnode.h = children;
+
+        for (i = 0; i < vnode.h.length; i++) {
+          vnode.h[i] = normalizeVNode(vnode.h[i]);
+        }
+
+      } else {
+        delete vnode.h;
+      }
+
     }
 
   }
