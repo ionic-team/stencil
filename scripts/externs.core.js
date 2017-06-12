@@ -75,6 +75,7 @@ function ionViewWillUnload(){};
 function ionViewDidLoad(){};
 function ionViewDidUnload(){};
 function render(){};
+function hostData(){};
 
 
 /**
