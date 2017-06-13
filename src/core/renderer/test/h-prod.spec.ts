@@ -5,7 +5,7 @@ import { SVG_NS } from '../../../util/constants';
 describe('production h()', () => {
 
   it('should get vnode with only tag string', () => {
-    var vnode = h('div', null);
+    var vnode = h('div', 0);
     expect(vnode.vtag).toEqual('div');
   });
 
@@ -17,25 +17,25 @@ describe('production h()', () => {
   });
 
   it('should get vnode with tag and child text', () => {
-    var vnode = h('div', null, 'child text');
+    var vnode = h('div', 0, 'child text');
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren[0].vtext).toBe('child text');
   });
 
   it('should get vnode with tag and multiple child text', () => {
-    var vnode = (<any>h)('div', null, 'child 1', 'child 2');
+    var vnode = (<any>h)('div', 0, 'child 1', 'child 2');
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren[0].vtext).toBe('child 1child 2');
   });
 
   it('should get vnode with tag and child number', () => {
-    var vnode = h('div', null, 0);
+    var vnode = h('div', 0, 0);
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren[0].vtext).toBe('0');
   });
 
   it('should get vnode with tag with multiple child h()', () => {
-    var vnode = h('div', null, h('child-a', null), h('child-b', null));
+    var vnode = h('div', 0, h('child-a', 0), h('child-b', 0));
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren).toBeDefined();
     expect(vnode.vchildren.length).toBe(2);
@@ -44,7 +44,7 @@ describe('production h()', () => {
   });
 
   it('should get vnode with tag with one child h()', () => {
-    var vnode = h('parent', null, h('child', null));
+    var vnode = h('parent', 0, h('child', 0));
     expect(vnode.vtag).toEqual('parent');
     expect(vnode.vchildren).toBeDefined();
     expect(vnode.vchildren.length).toBe(1);
@@ -52,7 +52,7 @@ describe('production h()', () => {
   });
 
   it('should get vnode with tag with two child h()', () => {
-    var vnode = h('parent', null, h('child-a', null), h('child-b', null));
+    var vnode = h('parent', 0, h('child-a', 0), h('child-b', 0));
     expect(vnode.vtag).toEqual('parent');
     expect(vnode.vchildren).toBeDefined();
     expect(vnode.vchildren.length).toBe(2);
@@ -75,7 +75,7 @@ describe('production h()', () => {
   });
 
   it('should get vnode with tag, data, one child h()', () => {
-    var vnode = h('div', { a: { id: 'my-id' } }, h('child-a', null));
+    var vnode = h('div', { a: { id: 'my-id' } }, h('child-a', 0));
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vattrs).toBeDefined();
     expect(vnode.vchildren).toBeDefined();
@@ -85,8 +85,8 @@ describe('production h()', () => {
 
   it('should get vnode with tag, data, array of children h()', () => {
     var vnode = h('div', { a: { id: 'my-id' } },
-      h('child-a', null),
-      h('child-b', null)
+      h('child-a', 0),
+      h('child-b', 0)
     );
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vattrs).toBeDefined();
@@ -153,38 +153,38 @@ describe('production h()', () => {
   });
 
   it('can create vnode with proper tag', () => {
-    expect(h('div', null).vtag).toEqual('div');
-    expect(h('a', null).vtag).toEqual('a');
+    expect(h('div', 0).vtag).toEqual('div');
+    expect(h('a', 0).vtag).toEqual('a');
   });
 
   it('can create vnode with children', () => {
-    var vnode = h('div', null, h('span', null), h('b', null));
+    var vnode = h('div', 0, h('span', 0), h('b', 0));
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren[0].vtag).toEqual('span');
     expect(vnode.vchildren[1].vtag).toEqual('b');
   });
 
   it('can create vnode with one child vnode', () => {
-    var vnode = h('div', null,  h('span', null));
+    var vnode = h('div', 0,  h('span', 0));
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren[0].vtag).toEqual('span');
   });
 
   it('can create vnode with no props and one child vnode', () => {
-    var vnode = h('div', null, h('span', null));
+    var vnode = h('div', 0, h('span', 0));
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren[0].vtag).toEqual('span');
   });
 
   it('can create vnode text with dynamic string', () => {
     var val = 'jazzhands';
-    var vnode = h('div', null, val);
+    var vnode = h('div', 0, val);
     expect(vnode.vtag).toEqual('div');
     expect(vnode.vchildren[0].vtext).toEqual('jazzhands');
   });
 
   it('can create vnode with text content in string', () => {
-    var vnode = h('a', null, 'I am a string');
+    var vnode = h('a', 0, 'I am a string');
     expect(vnode.vchildren[0].vtext).toEqual('I am a string');
   });
 
