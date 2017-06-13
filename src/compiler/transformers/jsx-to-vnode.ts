@@ -13,7 +13,9 @@ export function jsxToVNode(ctx: BuildContext): ts.TransformerFactory<ts.SourceFi
         case ts.SyntaxKind.CallExpression:
           const callNode = node as ts.CallExpression;
           if ((<ts.Identifier>callNode.expression).text === 'h') {
-            node = <any>convertJsxToVNode(fileMeta, callNode.arguments);
+
+            const convertedArgs = convertJsxToVNode(fileMeta, callNode.arguments);
+            node = ts.updateCall(callNode, callNode.expression, null, convertedArgs);
           }
 
         default:
@@ -35,39 +37,55 @@ export function jsxToVNode(ctx: BuildContext): ts.TransformerFactory<ts.SourceFi
 }
 
 
-function convertJsxToVNode(fileMeta: FileMeta, args: ts.NodeArray<ts.Expression>) {
+function convertJsxToVNode(fileMeta: FileMeta, args: ts.NodeArray<ts.Expression>): ts.Expression[] {
   const [tag, props, ...children] = args;
-  const vnodeInfo: VNodeInfo = {};
+  const tagName = (<ts.StringLiteral>tag).text;
+  const namespace = getNamespace(tagName);
+  let newProps: ts.ObjectLiteralExpression;
+  let newArgs: ts.Expression[] = [tag];
 
-  vnodeInfo.tagName = tag;
+  updateFileMetaWithSlots(fileMeta, tagName, props);
 
-  parseNamespace(vnodeInfo);
-
-  parseSlots(fileMeta, vnodeInfo, props);
-
+  // If call has props and it is an object -> h('div', {})
   if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
     const jsxAttrs = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
 
-    parseJsxAttrs(vnodeInfo, jsxAttrs);
+    newProps = parseJsxAttrs(jsxAttrs);
   }
 
-  parseChildren(vnodeInfo, children);
+  // If there is a namespace
+  if (namespace !== undefined) {
+    newProps = newProps || ts.createObjectLiteral();
+    ts.updateObjectLiteral(newProps, [
+      ts.createPropertyAssignment('n', ts.createLiteral(namespace))
+    ]);
+  }
 
-  return generateVNode(vnodeInfo);
+  // If there are no props then set the value as a zero
+  newArgs.push(newProps || ts.createLiteral(0));
+
+  // If there are children then add them to the end of the arg list.
+  if (children && children.length > 0) {
+    newArgs = newArgs.concat(children);
+  }
+
+  return newArgs;
 }
 
 
-function parseNamespace(vnodeInfo: VNodeInfo) {
-  const tag = (<any>vnodeInfo.tagName).text.toLowerCase();
+function getNamespace(tagName: string): ts.StringLiteral | undefined {
+  const tag = tagName.toLowerCase();
 
   if (tag === 'svg') {
-    vnodeInfo.namespace = ts.createLiteral('http://www.w3.org/2000/svg');
+    ts.createLiteral('http://www.w3.org/2000/svg');
   }
+
+  return undefined;
 }
 
 
-function parseSlots(fileMeta: FileMeta, vnodeInfo: VNodeInfo, props: ts.Expression) {
-  const tag = (<any>vnodeInfo.tagName).text.toLowerCase();
+function updateFileMetaWithSlots(fileMeta: FileMeta, tagName: string, props: ts.Expression) {
+  const tag = tagName.toLowerCase();
 
   if (tag !== 'slot') {
     return;
@@ -88,7 +106,8 @@ function parseSlots(fileMeta: FileMeta, vnodeInfo: VNodeInfo, props: ts.Expressi
 }
 
 
-function parseJsxAttrs(vnodeInfo: VNodeInfo, jsxAttrs: util.ObjectMap) {
+function parseJsxAttrs(jsxAttrs: util.ObjectMap): ts.ObjectLiteralExpression {
+  let vnodeInfo: util.ObjectMap = {};
   let classNameStr = '';
   let styleStr = '';
   let eventListeners: any = null;
@@ -106,9 +125,9 @@ function parseJsxAttrs(vnodeInfo: VNodeInfo, jsxAttrs: util.ObjectMap) {
         classNameStr += ' ' + exp.getText().trim();
       } else {
         if (util.isInstanceOfObjectMap(exp)) {
-          vnodeInfo.class = util.objectMapToObjectLiteral(exp);
+          vnodeInfo.c = util.objectMapToObjectLiteral(exp);
         } else {
-          vnodeInfo.class = exp;
+          vnodeInfo.c = exp;
         }
       }
 
@@ -126,7 +145,7 @@ function parseJsxAttrs(vnodeInfo: VNodeInfo, jsxAttrs: util.ObjectMap) {
 
     } else if (isKey(attrName)) {
       // key
-      vnodeInfo.key = exp;
+      vnodeInfo.k = exp;
 
     } else if (isHyphenedEventListener(attrNameSplit, exp)) {
       // on-click
@@ -152,25 +171,27 @@ function parseJsxAttrs(vnodeInfo: VNodeInfo, jsxAttrs: util.ObjectMap) {
 
   classNameStr = classNameStr.replace(/['"]+/g, '').trim();
   if (classNameStr.length) {
-    vnodeInfo.class = classStringToClassObj(classNameStr);
+    vnodeInfo.c = classStringToClassObj(classNameStr);
   }
 
   styleStr = styleStr.replace(/['"]+/g, '').trim();
   if (styleStr.length) {
-    vnodeInfo.style = styleStringToStyleObj(styleStr);
+    vnodeInfo.s = styleStringToStyleObj(styleStr);
   }
 
   if (eventListeners) {
-    vnodeInfo.on = util.objectMapToObjectLiteral(eventListeners);
+    vnodeInfo.o = util.objectMapToObjectLiteral(eventListeners);
   }
 
   if (attrs) {
-    vnodeInfo.attrs = util.objectMapToObjectLiteral(attrs);
+    vnodeInfo.a = util.objectMapToObjectLiteral(attrs);
   }
 
   if (props) {
-    vnodeInfo.props = util.objectMapToObjectLiteral(props);
+    vnodeInfo.p = util.objectMapToObjectLiteral(props);
   }
+
+  return util.objectMapToObjectLiteral(vnodeInfo);
 }
 
 
@@ -268,93 +289,6 @@ function styleStringToStyleObj(styles: string) {
 
   return util.objectMapToObjectLiteral({});
 }
-
-
-function parseChildren(vnodeInfo: VNodeInfo, children: ts.Expression[]) {
-  if (!children || !children.length) {
-    return;
-  }
-
-  // for (var i = 0; i < children.length; i++) {
-  //   var child = children[i];
-
-  //   if (child.kind === ts.SyntaxKind.CallExpression && (<ts.Identifier>child).text === 'h') {
-  //     continue;
-  //   }
-
-  //   var textArray: ts.Expression[] = [
-  //     ts.createNumericLiteral(IS_TEXT_NODE.toString()),
-  //     child
-  //   ];
-
-  //   children[i] = ts.createArrayLiteral(textArray);
-  // }
-
-  vnodeInfo.children = ts.createArrayLiteral(children);
-}
-
-
-function generateVNode(vnodeInfo: VNodeInfo) {
-
-  const vnodeKeys: ts.ObjectLiteralElementLike[] = [];
-
-  if (vnodeInfo.textValue) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('t'), vnodeInfo.textValue));
-  }
-
-  if (vnodeInfo.tagName) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('e'), vnodeInfo.tagName));
-  }
-
-  if (vnodeInfo.children) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('h'), vnodeInfo.children));
-  }
-
-  if (vnodeInfo.class) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('c'), vnodeInfo.class));
-  }
-
-  if (vnodeInfo.props) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('p'), vnodeInfo.props));
-  }
-
-  if (vnodeInfo.attrs) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('a'), vnodeInfo.attrs));
-  }
-
-  if (vnodeInfo.on) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('o'), vnodeInfo.on));
-  }
-
-  if (vnodeInfo.style) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('s'), vnodeInfo.style));
-  }
-
-  if (vnodeInfo.key) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('k'), vnodeInfo.key));
-  }
-
-  if (vnodeInfo.namespace) {
-    vnodeKeys.push(ts.createPropertyAssignment(ts.createLiteral('m'), vnodeInfo.namespace));
-  }
-
-  return ts.createObjectLiteral(vnodeKeys);
-}
-
-
-interface VNodeInfo {
-  tagName?: ts.Expression;
-  children?: ts.Expression;
-  textValue?: ts.Expression;
-  class?: any;
-  props?: any;
-  attrs?: any;
-  on?: any;
-  style?: any;
-  key?: any;
-  namespace?: any;
-}
-
 
 const KNOWN_EVENT_LISTENERS = ['onabort', 'onanimationend', 'onanimationiteration', 'onanimationstart', 'onauxclick', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'oncancel', 'oncanplay', 'oncanplaythrough', 'onchange', 'onclick', 'onclose', 'oncontextmenu', 'oncopy', 'oncuechange', 'oncut', 'ondblclick', 'ondevicemotion', 'ondeviceorientation', 'ondeviceorientationabsolute', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'ondurationchange', 'onemptied', 'onended', 'onerror', 'onfocus', 'ongotpointercapture', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onlanguagechange', 'onload', 'onloadeddata', 'onloadedmetadata', 'onloadstart', 'onlostpointercapture', 'onmessage', 'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpagehide', 'onpageshow', 'onpaste', 'onpause', 'onplay', 'onplaying', 'onpointercancel', 'onpointerdown', 'onpointerenter', 'onpointerleave', 'onpointermove', 'onpointerout', 'onpointerover', 'onpointerup', 'onpopstate', 'onprogress', 'onratechange', 'onrejectionhandled', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onseeked', 'onseeking', 'onselect', 'onselectstart', 'onshow', 'onstalled', 'onstorage', 'onsubmit', 'onsuspend', 'ontimeupdate', 'ontoggle', 'ontransitionend', 'onunhandledrejection', 'onunload', 'onvolumechange', 'onwaiting', 'onwebkitanimationend', 'onwebkitanimationiteration', 'onwebkitanimationstart', 'onwebkitfullscreenchange', 'onwebkitfullscreenerror', 'onwebkittransitionend', 'onwheel'];
 const KNOWN_ATTR_NAMES = ['slot', 'hidden', 'disabled'];
