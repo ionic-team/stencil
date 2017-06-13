@@ -52,16 +52,22 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // shadow
   cmpMeta.isShadowMeta = !!cmpModeData[6];
 
+  // hasSlots
+  cmpMeta.hasSlotsMeta = !!cmpModeData[7];
+
+  // namedSlots
+  cmpMeta.namedSlotsMeta = cmpModeData[8];
+
   // host
-  cmpMeta.hostMeta = cmpModeData[7];
+  cmpMeta.hostMeta = cmpModeData[9];
 
   // mode name (ios, md, wp)
   // get component mode
-  if (isString(cmpModeData[9])) {
-    let cmpMode = cmpMeta.modesMeta[parseModeName(cmpModeData[8])];
+  if (isString(cmpModeData[11])) {
+    let cmpMode = cmpMeta.modesMeta[parseModeName(cmpModeData[10])];
     if (cmpMode) {
       // component mode styles
-      cmpMode.styles = cmpModeData[9];
+      cmpMode.styles = cmpModeData[11];
     }
   }
 

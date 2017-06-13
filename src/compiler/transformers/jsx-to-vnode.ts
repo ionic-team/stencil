@@ -27,11 +27,7 @@ export function jsxToVNode(ctx: BuildContext): ts.TransformerFactory<ts.SourceFi
 
     return (tsSourceFile) => {
       const fileMeta = ctx.files.get(tsSourceFile.fileName);
-      if (fileMeta && fileMeta.hasCmpClass) {
-        return visit(fileMeta, tsSourceFile) as ts.SourceFile;
-      }
-
-      return tsSourceFile;
+      return visit(fileMeta, tsSourceFile) as ts.SourceFile;
     };
   };
 }
@@ -87,21 +83,27 @@ function getNamespace(tagName: string): ts.StringLiteral | undefined {
 
 
 function updateFileMetaWithSlots(fileMeta: FileMeta, tagName: string, props: ts.Expression) {
-  const tag = tagName.toLowerCase();
-
-  if (tag !== 'slot') {
+  if (!fileMeta || !fileMeta.hasCmpClass) {
     return;
   }
 
-  fileMeta.hasSlots = true;
+  if (tagName.toLowerCase() !== 'slot') {
+    return;
+  }
+
+  fileMeta.cmpMeta.hasSlotsMeta = true;
 
   if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
     const jsxAttrs = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
 
     for (var attrName in jsxAttrs) {
-      if (attrName.toLowerCase() === 'name') {
-        fileMeta.namedSlots = fileMeta.namedSlots || [];
-        fileMeta.namedSlots.push((<any>jsxAttrs[attrName]).text);
+      if (attrName.toLowerCase().trim() === 'name') {
+        var attrValue: string = (<any>jsxAttrs[attrName]).text.trim();
+
+        if (attrValue.length > 0) {
+          fileMeta.cmpMeta.namedSlotsMeta = fileMeta.cmpMeta.namedSlotsMeta || [];
+          fileMeta.cmpMeta.namedSlotsMeta.push(attrValue);
+        }
       }
     }
   }

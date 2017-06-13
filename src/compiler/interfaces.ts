@@ -50,8 +50,6 @@ export interface FileMeta {
   recompileOnChange: boolean;
   rebundleOnChange: boolean;
   transpiledCount: number;
-  hasSlots: boolean;
-  namedSlots: string[];
 }
 
 

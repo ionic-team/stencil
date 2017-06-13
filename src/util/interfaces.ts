@@ -361,21 +361,31 @@ export interface ComponentModeData {
   [6]: boolean;
 
   /**
+   * hasSlots
+   */
+  [7]: boolean;
+
+  /**
+   * namedSlots
+   */
+  [8]: string[];
+
+  /**
    * host
    */
-  [7]: any;
+  [9]: any;
 
   /**
    * mode code, which is a number that'll
    * map to a mode name later (ios, md, wp)
    */
-  [8]: number;
+  [10]: number;
 
 
   /**
    * component mode styles
    */
-  [9]: string;
+  [11]: string;
 }
 
 

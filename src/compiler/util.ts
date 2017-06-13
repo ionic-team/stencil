@@ -34,9 +34,7 @@ export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: 
       isWatching: false,
       recompileOnChange: false,
       rebundleOnChange: false,
-      transpiledCount: 0,
-      hasSlots: false,
-      namedSlots: null
+      transpiledCount: 0
     };
 
     ctx.files.set(filePath, fileMeta);
