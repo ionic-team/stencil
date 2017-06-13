@@ -66,7 +66,9 @@ function convertJsxToVNode(fileMeta: FileMeta, args: ts.NodeArray<ts.Expression>
 
   // If there are children then add them to the end of the arg list.
   if (children && children.length > 0) {
-    newArgs = newArgs.concat(children);
+    newArgs = newArgs.concat(
+      updateVNodeChildren(children)
+    );
   }
 
   return newArgs;
@@ -194,11 +196,11 @@ function parseJsxAttrs(jsxAttrs: util.ObjectMap): ts.ObjectLiteralExpression {
   return util.objectMapToObjectLiteral(vnodeInfo);
 }
 
-export function updateVNodeChildren(items: ts.Expression[]): ts.Expression[] {
+function updateVNodeChildren(items: ts.Expression[]): ts.Expression[] {
   return items.map(node => {
     switch (node.kind) {
     case ts.SyntaxKind.StringLiteral:
-      return ts.createCall(ts.createLiteral('t'), null, [node]);
+      return ts.createCall(ts.createIdentifier('t'), null, [node]);
     }
 
     return node;
