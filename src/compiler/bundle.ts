@@ -179,7 +179,7 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
           format: 'es'
         });
 
-        ctx.bundledJsModules[id] = `function importComponent(exports, h, Ionic) {\n${results.code.trim()}\n}`;
+        ctx.bundledJsModules[id] = `function importComponent(exports, h, t, Ionic) {\n${results.code.trim()}\n}`;
       });
 
     });
