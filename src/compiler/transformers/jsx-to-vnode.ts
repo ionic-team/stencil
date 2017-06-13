@@ -199,6 +199,12 @@ function parseJsxAttrs(jsxAttrs: util.ObjectMap): ts.ObjectLiteralExpression {
 function updateVNodeChildren(items: ts.Expression[]): ts.Expression[] {
   return items.map(node => {
     switch (node.kind) {
+    case ts.SyntaxKind.TrueKeyword:
+    case ts.SyntaxKind.FalseKeyword:
+    case ts.SyntaxKind.NullKeyword:
+      return ts.createCall(ts.createIdentifier('t'), null, [ts.createLiteral('')]);
+    case ts.SyntaxKind.NumericLiteral:
+      return ts.createCall(ts.createIdentifier('t'), null, [ts.createLiteral((<ts.NumericLiteral>node).text)]);
     case ts.SyntaxKind.StringLiteral:
       return ts.createCall(ts.createIdentifier('t'), null, [node]);
     }
