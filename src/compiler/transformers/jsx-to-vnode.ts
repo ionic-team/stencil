@@ -194,6 +194,17 @@ function parseJsxAttrs(jsxAttrs: util.ObjectMap): ts.ObjectLiteralExpression {
   return util.objectMapToObjectLiteral(vnodeInfo);
 }
 
+export function updateVNodeChildren(items: ts.Expression[]): ts.Expression[] {
+  return items.map(node => {
+    switch (node.kind) {
+    case ts.SyntaxKind.StringLiteral:
+      return ts.createCall(ts.createLiteral('t'), null, [node]);
+    }
+
+    return node;
+  });
+}
+
 
 function isClassName(attrName: string) {
   attrName = attrName.toLowerCase();

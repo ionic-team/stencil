@@ -413,7 +413,7 @@ export interface ComponentWatchersData {
 
 
 export interface ModulesImporterFn {
-  (importer: any, h: Function, Ionic: Ionic): void;
+  (importer: any, h: Function, t: Function, Ionic: Ionic): void;
 }
 
 

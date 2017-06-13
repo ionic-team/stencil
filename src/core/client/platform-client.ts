@@ -3,6 +3,7 @@ import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
   ConfigApi, DomControllerApi, DomApi, HostElement,
   IonicGlobal, LoadComponentData, QueueApi, PlatformApi } from '../../util/interfaces';
 import { createRenderer } from '../renderer/patch';
+import { h, t } from '../renderer/h';
 import { isDef } from '../../util/helpers';
 import { initInjectedIonic } from './ionic-client';
 import { PRIORITY_LOW } from '../../util/constants';
@@ -298,7 +299,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
 
     // import component function
     // inject ionic globals
-    importFn(moduleImports, null, injectedIonic);
+    importFn(moduleImports, h, t, injectedIonic);
 
     for (i = 3; i < args.length; i++) {
       // first arg is core version
