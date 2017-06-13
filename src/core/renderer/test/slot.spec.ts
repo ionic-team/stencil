@@ -12,9 +12,7 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-test',
       componentModuleMeta: class {
         render() {
-          return h('spider', [
-            h('slot')
-          ]);
+          return h('spider', 0, h('slot', 0));
         }
       }
     });
@@ -35,9 +33,7 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-test',
       componentModuleMeta: class {
         render() {
-          return h('monkey', [
-            h('slot', { attrs: { name: 'start' } })
-          ]);
+          return h('monkey', 0, h('slot', { a: { name: 'start' } }));
         }
       }
     });
@@ -55,10 +51,8 @@ describe('Component slot', () => {
 
   it('no content', (done) => {
     mount({
-      parentVNode: h('lion', [
-        h('ion-child')
-      ]),
-      childVNode: h('slot')
+      parentVNode: h('lion', 0, h('ion-child', 0)),
+      childVNode: h('slot', 0)
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes.length).toBe(1);
       expect(parentElm.childNodes[0].nodeName).toBe('LION');
@@ -80,12 +74,8 @@ describe('Component slot', () => {
 
   it('no content, nested child slot', (done) => {
     mount({
-      parentVNode: h('giraffe', [
-        h('ion-child')
-      ]),
-      childVNode: h('fish', [
-        h('slot')
-      ])
+      parentVNode: h('giraffe', 0, h('ion-child', 0)),
+      childVNode: h('fish', 0, h('slot', 0))
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes.length).toBe(1);
       expect(parentElm.childNodes[0].nodeName).toBe('GIRAFFE');
@@ -114,12 +104,12 @@ describe('Component slot', () => {
 
   it('should put parent content in child default slot', done => {
     mount({
-      parentVNode: h('hippo', [
-        h('ion-child', [
-          h('aardvark', parentInstance.msg)
+      parentVNode: h('hippo', 0, [
+        h('ion-child', 0, [
+          h('aardvark', 0, parentInstance.msg)
         ])
       ]),
-      childVNode: h('slot')
+      childVNode: h('slot', 0)
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes[0].nodeName).toBe('HIPPO');
       expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
@@ -142,14 +132,14 @@ describe('Component slot', () => {
 
   it('should put parent content in child nested default slot', done => {
     mount({
-      parentVNode: h('badger', [
-        h('ion-child', [
-          h('dingo', parentInstance.msg)
+      parentVNode: h('badger', 0, [
+        h('ion-child', 0, [
+          h('dingo', 0, parentInstance.msg)
         ])
       ]),
-      childVNode: h('camel', [
-        h('owl', [
-          h('slot')
+      childVNode: h('camel', 0, [
+        h('owl', 0, [
+          h('slot', 0)
         ])
       ])
     }, (parentElm, childElm) => {
@@ -184,9 +174,9 @@ describe('Component slot', () => {
         msg = 'parent message';
 
         render() {
-          return h('cheetah', [
-            h('ion-child', [
-              h('bear', this.msg)
+          return h('cheetah', 0, [
+            h('ion-child', 0, [
+              h('bear', 0, this.msg)
             ])
           ]);
         }
@@ -197,8 +187,8 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-child',
       componentModuleMeta: class {
         render() {
-          return h('chipmunk', [
-            h('slot')
+          return h('chipmunk', 0, [
+            h('slot', 0)
           ]);
         }
       }
@@ -246,8 +236,8 @@ describe('Component slot', () => {
         msg = 'parent message';
 
         render() {
-          return h('ion-child', [
-            h('whale', this.msg)
+          return h('ion-child', 0, [
+            h('whale', 0, this.msg)
           ]);
         }
       }
@@ -257,8 +247,8 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-child',
       componentModuleMeta: class {
         render() {
-          return h('bull', [
-            h('slot')
+          return h('bull', 0, [
+            h('slot', 0)
           ]);
         }
       }
@@ -301,9 +291,9 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-parent',
       componentModuleMeta: class {
         render() {
-          return h('ion-child', [
-            h('falcon', { attrs: { slot: 'start' } }, ++values),
-            h('eagle', { attrs: { slot: 'start' } }, ++values),
+          return h('ion-child', 0, [
+            h('falcon', { a: { slot: 'start' } }, ++values),
+            h('eagle', { a: { slot: 'start' } }, ++values),
           ]);
         }
       }
@@ -313,10 +303,10 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-child',
       componentModuleMeta: class {
         render() {
-          return h('mouse', [
-            h('slot'),
-            h('slot', { attrs: { name: 'start' } }),
-            h('slot', { attrs: { name: 'end' } })
+          return h('mouse', 0, [
+            h('slot', 0),
+            h('slot', { a: { name: 'start' } }),
+            h('slot', { a: { name: 'end' } })
           ]);
         }
       }
@@ -364,10 +354,10 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-parent',
       componentModuleMeta: class {
         render() {
-          return h('ion-child', [
-            h('butterfly', (++values).toString()),
-            h('fox', { attrs: { slot: 'end' } }, ++values),
-            h('ferret', { attrs: { slot: 'start' } }, ++values)
+          return h('ion-child', 0, [
+            h('butterfly', 0, (++values).toString()),
+            h('fox', { a: { slot: 'end' } }, ++values),
+            h('ferret', { a: { slot: 'start' } }, ++values)
           ]);
         }
       }
@@ -377,12 +367,12 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-child',
       componentModuleMeta: class {
         render() {
-          return h('flamingo', [
-            h('slot', { attrs: { name: 'start' } }),
-            h('horse', [
-              h('slot'),
-              h('bullfrog', [
-                h('slot', { attrs: { name: 'end' } })
+          return h('flamingo', 0, [
+            h('slot', { a: { name: 'start' } }),
+            h('horse', 0, [
+              h('slot', 0),
+              h('bullfrog', 0, [
+                h('slot', { a: { name: 'end' } })
               ])
             ])
           ]);
@@ -444,9 +434,9 @@ describe('Component slot', () => {
       tagNameMeta: 'ion-parent',
       componentModuleMeta: class {
         render() {
-          return h('test-1', [
-            h('test-2', [
-              h('goat', (++values).toString())
+          return h('test-1', 0, [
+            h('test-2', 0, [
+              h('goat', 0, (++values).toString())
             ])
           ]);
         }
@@ -457,8 +447,8 @@ describe('Component slot', () => {
       tagNameMeta: 'test-1',
       componentModuleMeta: class {
         render() {
-          return h('seal', [
-            h('slot')
+          return h('seal', 0, [
+            h('slot', 0)
           ]);
         }
       }
@@ -468,8 +458,8 @@ describe('Component slot', () => {
       tagNameMeta: 'test-2',
       componentModuleMeta: class {
         render() {
-          return h('goose', [
-            h('slot')
+          return h('goose', 0, [
+            h('slot', 0)
           ]);
         }
       }
