@@ -1,8 +1,8 @@
-import { h } from '../h';
+import { h, t } from '../h';
 import { SVG_NS } from '../../../util/constants';
 
 
-describe('production h()', () => {
+describe('h()', () => {
 
   it('should get vnode with only tag string', () => {
     var vnode = h('div', 0);
@@ -186,6 +186,32 @@ describe('production h()', () => {
   it('can create vnode with text content in string', () => {
     var vnode = h('a', 0, 'I am a string');
     expect(vnode.vchildren[0].vtext).toEqual('I am a string');
+  });
+
+
+  describe('t()', () => {
+
+    it('h() can use t() with text', () => {
+      var vnode = (<any>h)('div', 0, t('1.21'), 'gigawatts');
+      expect(vnode.vtag).toBe('div');
+      expect(vnode.vchildren[0].vtext).toEqual('1.21');
+      expect(vnode.vchildren[1].vtext).toEqual('gigawatts');
+    });
+
+    it('h() can use multiple t()', () => {
+      var vnode = (<any>h)('div', 0, t('88'), t('mph'));
+      expect(vnode.vtag).toBe('div');
+      expect(vnode.vchildren[0].vtext).toEqual('88');
+      expect(vnode.vchildren[1].vtext).toEqual('mph');
+    });
+
+    it('can create vnode text', () => {
+      var vnode = t('doc');
+      expect(vnode.vtag).toBeUndefined();
+      expect(vnode.vchildren).toBeUndefined();
+      expect(vnode.vtext).toEqual('doc');
+    });
+
   });
 
 });
