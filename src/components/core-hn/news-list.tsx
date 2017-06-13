@@ -58,21 +58,22 @@ export class NewsList {
       // once those are in
       return (
         <ion-list>
-          {this.fakeData.map((story: any) => (
+          {Array.from(Array(10)).map(() =>
             <ion-item>
               <div class='points' slot='start'>
-                {story.points}
+                <ion-skeleton-text width='20px'></ion-skeleton-text>
               </div>
               <ion-label>
                 <h2 class='list-header'>
                   <ion-skeleton-text width='90%'></ion-skeleton-text>
+                  <ion-skeleton-text width='85%'></ion-skeleton-text>
                 </h2>
                 <h3 class='comments-text'>
                   <ion-skeleton-text width='60%'></ion-skeleton-text>
                 </h3>
               </ion-label>
             </ion-item>
-          ))}
+          )}
         </ion-list>
       );
     }

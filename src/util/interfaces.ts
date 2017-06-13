@@ -690,83 +690,21 @@ export interface HostContentNodes {
 export type CssClassObject = { [className: string]: boolean };
 
 
-/**
- * 0 tag
- * 1 children
- * 2 class
- * 3 props
- * 4 attrs
- * 5 on
- * 6 style
- * 7 key
- * 8 namespace
- * 9 element
- */
+
 export interface VNode {
-  /**
-   * tag name for element
-   */
-  e?: string;
-
-  /**
-   * text content for text node
-   */
-  t?: string;
-
-  /**
-   * children for element
-   */
-  h?: VNode[];
-
-  /**
-   * class for element
-   */
-  c?: CssClassObject;
-
-  /**
-   * props for element
-   */
-  p?: { [propName: string]: any };
-
-  /**
-   * attrs for element
-   */
-  a?: { [attrName: string]: any };
-
-  /**
-   * on (event listeners) for element
-   */
-  o?: { [eventName: string]: any };
-
-  /**
-   * style for element
-   */
-  s?: { [styleProp: string]: any };
-
-  /**
-   * key for element
-   */
-  k?: Key;
-
-  /**
-   * namespace for element
-   */
-  m?: string;
-
-  /**
-   * dom element or text node reference
-   */
-  n?: Element|Node;
-
-  /**
-   * listener for element
-   */
-  l?: any;
-
-  /**
-   * for h()
-   */
-  isVnode?: boolean;
+  // using v prefixes largely so closure has no issue property renaming
+  vtag: string;
+  vtext: string;
+  vchildren: VNode[];
+  vprops: any;
+  vattrs: any;
+  vclass: CssClassObject;
+  vstyle: any;
+  vlisteners: any;
+  vkey: Key;
+  elm: Element|Node;
+  vnamespace: any;
+  assignedListeners: any;
 }
 
 export interface VNodeData {
@@ -776,7 +714,41 @@ export interface VNodeData {
   style?: any;
   on?: any;
   key?: Key;
-  ns?: string; // for SVGs
+  ns?: any; // for SVGs
+}
+
+/**
+ * used by production compiler
+ */
+export interface VNodeProdData {
+  /**
+   * props
+   */
+  p?: any;
+  /**
+   * attrs
+   */
+  a?: any;
+  /**
+   * css classes
+   */
+  c?: CssClassObject;
+  /**
+   * styles
+   */
+  s?: any;
+  /**
+   * on (event listeners)
+   */
+  o?: any;
+  /**
+   * key
+   */
+  k?: Key;
+  /**
+   * namespace
+   */
+  n?: any;
 }
 
 

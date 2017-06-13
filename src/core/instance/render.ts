@@ -1,6 +1,7 @@
 import { createThemedClasses } from '../../util/theme';
 import { HostElement, PlatformApi, VNode } from '../../util/interfaces';
-import { isArray, isDef } from '../../util/helpers';
+import { isArray } from '../../util/helpers';
+import { VNode as VNodeObj } from '../renderer/vnode';
 
 
 export function render(plt: PlatformApi, elm: HostElement, isInitialRender: boolean) {
@@ -34,26 +35,33 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
   }
 
   if (vnodeChildren || vnodeHostData) {
+    let oldVNode: VNode;
+    let newVNode: VNode;
     let hydrating = false;
 
     // if this is the intial load, then we give the renderer the actual element
     // if this is a re-render, then give the renderer the last vnode we created
-    const newVNode: VNode = {
-      n: elm
-    };
+    if (isInitialRender) {
+      oldVNode = new VNodeObj();
+      oldVNode.elm = elm;
+    } else {
+      oldVNode = elm._vnode;
+    }
+
+    newVNode = new VNodeObj();
 
     if (vnodeHostData) {
-      newVNode.a = vnodeHostData['attrs'];
-      newVNode.c = vnodeHostData['class'];
+      newVNode.vattrs = vnodeHostData['attrs'];
+      newVNode.vclass = vnodeHostData['class'];
     }
 
     if (vnodeChildren) {
       // the host element's children should always be an array
-      newVNode.h = isArray(vnodeChildren) ? vnodeChildren : [vnodeChildren];
+      newVNode.vchildren = isArray(vnodeChildren) ? vnodeChildren : [vnodeChildren];
     }
 
     // // kick off the actual render and any DOM updates
-    elm._vnode = plt.render(isDef(elm._vnode) ? elm._vnode : elm, newVNode, elm._hostContentNodes, hydrating);
+    elm._vnode = plt.render(oldVNode, newVNode, elm._hostContentNodes, hydrating);
   }
 
   if (!isInitialRender) {

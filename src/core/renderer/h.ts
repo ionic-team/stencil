@@ -1,135 +1,81 @@
-import { isArray, isStringOrNumber, isObject } from '../../util/helpers';
-import { VNode, VNodeData } from '../../util/interfaces';
-import { SVG_NS } from '../../util/constants';
+/**
+ * Production h() function based on Preact by
+ * Jason Miller (@developit)
+ * Licensed under the MIT License
+ * https://github.com/developit/preact/blob/master/LICENSE
+ *
+ * Modified for Ionic's vdom
+ */
+
+import { VNode as VNodeObj } from './vnode';
+import { VNode, VNodeProdData } from '../../util/interfaces';
+
+const stack: any[] = [];
 
 
-// convert the user passed in args into our runtime equivalent
-export function h(sel: string | Node): VNode;
-export function h(sel: Node, data: VNodeData): VNode;
-export function h(sel: string, data: VNodeData): VNode;
-export function h(sel: string, text: string): VNode;
-export function h(sel: string, children: Array<VNode | undefined | null>): VNode;
-export function h(sel: string, data: VNodeData, text: string): VNode;
-export function h(sel: string, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
-export function h(sel: string | Node, data: VNodeData, children: VNode): VNode;
-export function h(sel: any, b?: any, c?: any): VNode {
-  let data: VNodeData;
+export function h(nodeName: string, vnodeData: VNodeProdData): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, childa: string): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, childa: number): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, childa: any[]): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, childb: string): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode, childb: VNode): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, child?: any) {
+  let children: any[], lastSimple: boolean, simple: boolean, i: number;
 
-  const vnode: VNode = {
-    isVnode: true
-  };
-
-  let id: string = null;
-  let classNames: any = null;
-  let i: number;
-
-  if (sel.nodeType) {
-    // this is an actual element
-    vnode.n = <Node>sel;
-    sel = vnode.e = sel.tagName.toLowerCase();
-
-  } else if (typeof sel === 'string') {
-    // this is a selector
-    const hashIdx = sel.indexOf('#');
-    const dotIdx = sel.indexOf('.', hashIdx);
-    const hash = hashIdx > 0 ? hashIdx : sel.length;
-    const dot = dotIdx > 0 ? dotIdx : sel.length;
-
-    vnode.e = hashIdx !== -1 || dotIdx !== -1 ? sel.slice(0, Math.min(hash, dot)) : sel;
-
-    if (hash < dot) {
-      id = sel.slice(hash + 1, dot);
-    }
-    if (dotIdx > 0) {
-      classNames = {};
-      sel.slice(dot + 1).split('.').forEach(className => {
-        classNames[className] = true;
-      });
-    }
+  for (i = arguments.length; i-- > 2; ) {
+    stack.push(arguments[i]);
   }
 
-  if (c !== undefined) {
-    data = b;
-    if (isStringOrNumber(c)) {
-      vnode.h = [
-        { t: c.toString() }
-      ];
-
-    } else if (c.isVnode) {
-      vnode.h = [c];
-
-    } else if (isArray(c)) {
-      for (i = 0; i < c.length; i++) {
-        if (isStringOrNumber(c[i])) {
-          c[i] = [{t: c[i].toString()}];
-        }
+  while (stack.length) {
+    if ((child = stack.pop()) && child.pop !== undefined) {
+      for (i = child.length; i--; ) {
+        stack.push(child[i]);
       }
-      vnode.h = c;
-    }
 
-  } else if (b !== undefined) {
-    if (isStringOrNumber(b)) {
-      vnode.h = [
-        {t: b.toString()}
-      ];
+    } else {
+      if (typeof child === 'boolean') child = null;
 
-    } else if (b.isVnode) {
-      vnode.h = [b];
-
-    } else if (isArray(b)) {
-      for (i = 0; i < b.length; i++) {
-        if (isStringOrNumber(b[i])) {
-          b[i] = { t: b[i].toString()};
-        }
+      if ((simple = typeof nodeName !== 'function')) {
+        if (child == null) child = '';
+        else if (typeof child === 'number') child = String(child);
+        else if (typeof child !== 'string') simple = false;
       }
-      vnode.h = b;
 
-    } else if (isObject(b)) {
-      data = b;
+      if (simple && lastSimple) {
+        (<VNode>children[children.length - 1]).vtext += child;
+
+      } else if (children === undefined) {
+        children = [simple ? t(child) : child];
+
+      } else {
+        children.push(simple ? t(child) : child);
+      }
+
+      lastSimple = simple;
     }
   }
 
-  if (data) {
-    // bracket notation to ensure it's not property renamed
-    vnode.c = data['class'];
-    vnode.p = data['props'];
-    vnode.a = data['attrs'];
-    vnode.o = data['on'];
-    vnode.s = data['style'];
-    vnode.k = data['key'];
-    vnode.m = data['ns'];
-  }
+  let vnode = new VNodeObj();
+  vnode.vtag = nodeName;
+  vnode.vchildren = children;
 
-  if (id !== null) {
-    if (vnode.a) {
-      vnode.a['id'] = id;
-    } else {
-      vnode.a = { 'id': id };
-    }
-  }
-
-  if (classNames !== null) {
-    if (vnode.c) {
-      Object.assign(vnode.c, classNames);
-    } else {
-      vnode.c = classNames;
-    }
-  }
-
-  if (sel[0] === 's' && sel[1] === 'v' && sel[2] === 'g' && (sel.length === 3 || sel[3] === '.' || sel[3] === '#')) {
-    addSvgNS(vnode);
+  if (vnodeData !== 0) {
+    vnode.vattrs = vnodeData.a;
+    vnode.vprops = vnodeData.p;
+    vnode.vclass = vnodeData.c;
+    vnode.vstyle = vnodeData.s;
+    vnode.vlisteners = vnodeData.o;
+    vnode.vkey = vnodeData.k;
+    vnode.vnamespace = vnodeData.n;
   }
 
   return vnode;
 }
 
 
-function addSvgNS(vnode: VNode): void {
-  vnode.m = SVG_NS;
-
-  if (vnode.e !== 'foreignObject' && vnode.h) {
-    for (let i = 0; i < vnode.h.length; ++i) {
-      addSvgNS(vnode.h[i]);
-    }
-  }
+export function t(textValue: any) {
+  let v = new VNodeObj();
+  v.vtext = textValue;
+  return v;
 }

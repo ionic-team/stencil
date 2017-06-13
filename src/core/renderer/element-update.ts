@@ -10,19 +10,19 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
 
   var key: string,
       cur: any,
-      elm = <any>vnode.n,
-      oldAttrs = oldVnode.a,
-      attrs = vnode.a,
-      oldClass = oldVnode.c,
-      klass = vnode.c,
-      oldProps = oldVnode.p,
-      props = vnode.p,
-      oldStyle = oldVnode.s,
-      style = vnode.s,
-      oldOn: any = oldVnode.o,
-      oldListener: any = oldVnode.l,
-      oldElm = oldVnode.n,
-      on = vnode.o;
+      elm = <any>vnode.elm,
+      oldAttrs = oldVnode.vattrs,
+      attrs = vnode.vattrs,
+      oldClass = oldVnode.vclass,
+      klass = vnode.vclass,
+      oldProps = oldVnode.vprops,
+      props = vnode.vprops,
+      oldStyle = oldVnode.vstyle,
+      style = vnode.vstyle,
+      oldOn: any = oldVnode.vlisteners,
+      on = vnode.vlisteners,
+      oldListener: any = oldVnode.assignedListeners,
+      oldElm = oldVnode.elm;
 
 
   // update attrs
@@ -157,7 +157,7 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
     // add new listeners which has not already attached
     if (on) {
       // reuse existing listener or create new
-      var listener = vnode.l = oldVnode.l || createListener();
+      var listener = vnode.assignedListeners = oldVnode.assignedListeners || createListener();
 
       // update vnode for listener
       listener.vnode = vnode;
@@ -192,7 +192,7 @@ function createListener() {
 
 function handleEvent(event: Event, vnode: VNode) {
   var eventName = event.type,
-      on = vnode.o;
+      on = vnode.vlisteners;
 
   // call event handler(s) if they exists
   if (on && on[eventName]) {
