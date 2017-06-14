@@ -1138,8 +1138,10 @@ defineElements(window, {
     'ion-button': IonButton,
     'ion-content': IonContent,
     'ion-header': IonHeader,
+    'ion-icon': IonIcon,
     'ion-item': IonItem,
     'ion-list': IonList,
+    'ion-scroll': IonScroll,
     'ion-title': IonTitle,
     'ion-toolbar': IonToolbar
 });
