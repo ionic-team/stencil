@@ -7,6 +7,8 @@
 ion-skeleton-text {
   display: inline-block;
   width: 100%;
+  pointer-events: none;
+  user-select: none;
 }
 
 ion-skeleton-text span {
