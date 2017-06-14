@@ -4,35 +4,36 @@ import { DomControllerApi, RafCallback } from '../../util/interfaces';
 export function createDomControllerClient(win: Window): DomControllerApi {
   const readCBs: RafCallback[] = [];
   const writeCBs: RafCallback[] = [];
-
   let rafPending = false;
+
+
+  function now() {
+    return win.performance.now();
+  }
+
 
   function raf(cb: FrameRequestCallback): number {
     return win.requestAnimationFrame(cb);
   }
 
+
   function domRead(cb: RafCallback) {
     readCBs.push(cb);
+
     if (!rafPending) {
-      rafQueue();
+      rafPending = true;
+      raf(rafFlush);
     }
   }
 
 
   function domWrite(cb: RafCallback) {
     writeCBs.push(cb);
+
     if (!rafPending) {
-      rafQueue();
+      rafPending = true;
+      raf(rafFlush);
     }
-  }
-
-
-  function rafQueue() {
-    rafPending = true;
-
-    raf(function rafCallback(timeStamp) {
-      rafFlush(timeStamp);
-    });
   }
 
 
@@ -58,19 +59,13 @@ export function createDomControllerClient(win: Window): DomControllerApi {
       err = e;
     }
 
-    rafPending = false;
-
-    if (readCBs.length || writeCBs.length) {
-      rafQueue();
+    if (rafPending = (readCBs.length > 0 || writeCBs.length > 0)) {
+      raf(rafFlush);
     }
 
     if (err) {
-      throw err;
+      console.error(err);
     }
-  }
-
-  function now() {
-    return win.performance.now();
   }
 
   return {
