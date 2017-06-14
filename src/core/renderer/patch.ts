@@ -15,11 +15,7 @@ import { updateElement } from './update-element';
 
 export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
-  function isSameVnode(vnode1: VNode, vnode2: VNode) {
-    return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
-  }
-
-  function createElm(vnode: VNode, parentElm: Node, hostContentNodes: HostContentNodes): Node {
+  function createElm(vnode: VNode, parentElm: Node): Node {
     let i = 0;
     let childNode: Node;
 
@@ -62,12 +58,13 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       // create element
       const elm = vnode.elm = (vnode.vnamespace ? domApi.$createElementNS(vnode.vnamespace, vnode.vtag) : domApi.$createElement(vnode.vtag));
 
+      // add css classes, attrs, props, listeners, etc.
       updateElement(domApi, null, vnode);
 
       const children = vnode.vchildren;
       if (children) {
         for (i = 0; i < children.length; ++i) {
-          childNode = createElm(children[i], elm, hostContentNodes);
+          childNode = createElm(children[i], elm);
 
           if (isDef(childNode)) {
             domApi.$appendChild(elm, childNode);
@@ -80,12 +77,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     return vnode.elm;
   }
 
-  function addVnodes(parentElm: Node,
-                     before: Node | null,
-                     vnodes: VNode[],
-                     startIdx: number,
-                     endIdx: number,
-                     hostContentNodes: HostContentNodes) {
+  function addVnodes(parentElm: Node, before: Node | null, vnodes: VNode[], startIdx: number, endIdx: number) {
     let vnodeChild: VNode;
     let childNode: Node;
 
@@ -97,7 +89,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
           childNode = domApi.$createTextNode(vnodeChild.vtext);
 
         } else {
-          childNode = createElm(vnodeChild, parentElm, hostContentNodes);
+          childNode = createElm(vnodeChild, parentElm);
         }
 
         if (isDef(childNode)) {
@@ -110,11 +102,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     }
   }
 
-  function removeVnodes(parentElm: Node,
-                        vnodes: VNode[],
-                        startIdx: number,
-                        endIdx: number): void {
-
+  function removeVnodes(parentElm: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
     for (; startIdx <= endIdx; ++startIdx) {
       var vnode = vnodes[startIdx];
 
@@ -128,11 +116,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     }
   }
 
-  function updateChildren(parentElm: Node,
-                          oldCh: VNode[],
-                          newCh: VNode[],
-                          isUpdate: boolean,
-                          hostContentNodes: HostContentNodes) {
+  function updateChildren(parentElm: Node, oldCh: VNode[], newCh: VNode[]) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -143,7 +127,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     let oldKeyToIdx: any;
     let idxInOld: number;
     let elmToMove: VNode;
-    let before: any;
+    let before: Node;
 
     while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
       if (oldStartVnode == null) {
@@ -159,23 +143,23 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
         newEndVnode = newCh[--newEndIdx];
 
       } else if (isSameVnode(oldStartVnode, newStartVnode)) {
-        patchVnode(oldStartVnode, newStartVnode, isUpdate, hostContentNodes);
+        patchVNode(oldStartVnode, newStartVnode);
         oldStartVnode = oldCh[++oldStartIdx];
         newStartVnode = newCh[++newStartIdx];
 
       } else if (isSameVnode(oldEndVnode, newEndVnode)) {
-        patchVnode(oldEndVnode, newEndVnode, isUpdate, hostContentNodes);
+        patchVNode(oldEndVnode, newEndVnode);
         oldEndVnode = oldCh[--oldEndIdx];
         newEndVnode = newCh[--newEndIdx];
 
       } else if (isSameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
-        patchVnode(oldStartVnode, newEndVnode, isUpdate, hostContentNodes);
+        patchVNode(oldStartVnode, newEndVnode);
         domApi.$insertBefore(parentElm, oldStartVnode.elm, domApi.$nextSibling(oldEndVnode.elm));
         oldStartVnode = oldCh[++oldStartIdx];
         newEndVnode = newCh[--newEndIdx];
 
       } else if (isSameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
-        patchVnode(oldEndVnode, newStartVnode, isUpdate, hostContentNodes);
+        patchVNode(oldEndVnode, newStartVnode);
         domApi.$insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
         oldEndVnode = oldCh[--oldEndIdx];
         newStartVnode = newCh[++newStartIdx];
@@ -189,17 +173,17 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
         if (isUndef(idxInOld)) {
           // new element
-          domApi.$insertBefore(parentElm, createElm(newStartVnode, parentElm, hostContentNodes), oldStartVnode.elm);
+          domApi.$insertBefore(parentElm, createElm(newStartVnode, parentElm), oldStartVnode.elm);
           newStartVnode = newCh[++newStartIdx];
 
         } else {
           elmToMove = oldCh[idxInOld];
 
           if (elmToMove.vtag !== newStartVnode.vtag) {
-            domApi.$insertBefore(parentElm, createElm(newStartVnode, parentElm, hostContentNodes), oldStartVnode.elm);
+            domApi.$insertBefore(parentElm, createElm(newStartVnode, parentElm), oldStartVnode.elm);
 
           } else {
-            patchVnode(elmToMove, newStartVnode, isUpdate, hostContentNodes);
+            patchVNode(elmToMove, newStartVnode);
             oldCh[idxInOld] = undefined;
             domApi.$insertBefore(parentElm, elmToMove.elm, oldStartVnode.elm);
           }
@@ -211,11 +195,15 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
     if (oldStartIdx > oldEndIdx) {
       before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
-      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, hostContentNodes);
+      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx);
 
     } else if (newStartIdx > newEndIdx) {
       removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
     }
+  }
+
+  function isSameVnode(vnode1: VNode, vnode2: VNode) {
+    return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
   }
 
   function createKeyToOldIdx(children: VNode[], beginIdx: number, endIdx: number) {
@@ -234,57 +222,65 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     return map;
   }
 
-  function patchVnode(oldVnode: VNode, newVnode: VNode, isUpdate: boolean, hostContentNodes: HostContentNodes) {
-    if (oldVnode !== newVnode) {
-      const elm: HostElement = newVnode.elm = <any>oldVnode.elm;
+  function patchVNode(oldVnode: VNode, newVnode: VNode) {
+    const elm: HostElement = newVnode.elm = <any>oldVnode.elm;
 
-      let oldChildren = oldVnode.vchildren;
-      let newChildren = newVnode.vchildren;
+    let oldChildren = oldVnode.vchildren;
+    let newChildren = newVnode.vchildren;
 
-      if (!isUpdate || !newVnode.skipDataOnUpdate) {
-        // either this is the first render of an element OR it's an update
-        // AND we already know it's possible it could have changed
-        // this updates the element's css classes, attrs, props, listeners, etc.
-        updateElement(domApi, oldVnode, newVnode);
-      }
+    if (!isUpdate || !newVnode.skipDataOnUpdate) {
+      // either this is the first render of an element OR it's an update
+      // AND we already know it's possible it could have changed
+      // this updates the element's css classes, attrs, props, listeners, etc.
+      updateElement(domApi, oldVnode, newVnode);
+    }
 
-      if (isUndef(newVnode.vtext)) {
-        // element node
+    if (isUndef(newVnode.vtext)) {
+      // element node
 
-        if (isDef(oldChildren) && isDef(newChildren)) {
-          if (!isUpdate || !newVnode.skipChildrenOnUpdate || oldChildren !== newChildren) {
-            // either this is the first render of an element OR it's an update
-            // AND we already know it's possible that the children could have changed
-            updateChildren(elm, oldChildren, newChildren, isUpdate, hostContentNodes);
-          }
-
-        } else if (isDef(newChildren)) {
-          if (isDef(oldVnode.vtext)) {
-            domApi.$setTextContent(elm, '');
-          }
-          addVnodes(elm, null, newChildren, 0, newChildren.length - 1, hostContentNodes);
-
-        } else if (isDef(oldChildren)) {
-          removeVnodes(elm, oldChildren, 0, oldChildren.length - 1);
+      if (isDef(oldChildren) && isDef(newChildren)) {
+        if (!isUpdate || !newVnode.skipChildrenOnUpdate || oldChildren !== newChildren) {
+          // either this is the first render of an element OR it's an update
+          // AND we already know it's possible that the children could have changed
+          updateChildren(elm, oldChildren, newChildren);
         }
 
-      } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
-        // this element has slotted content
-        let parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
-        domApi.$setTextContent(parentElement, newVnode.vtext);
-        elm._hostContentNodes.defaultSlot = [parentElement.childNodes[0]];
+      } else if (isDef(newChildren)) {
+        if (isDef(oldVnode.vtext)) {
+          domApi.$setTextContent(elm, '');
+        }
+        addVnodes(elm, null, newChildren, 0, newChildren.length - 1);
 
-      } else {
-        domApi.$setTextContent(elm, newVnode.vtext);
+      } else if (isDef(oldChildren)) {
+        removeVnodes(elm, oldChildren, 0, oldChildren.length - 1);
       }
+
+    } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
+      // this element has slotted content
+      let parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
+      domApi.$setTextContent(parentElement, newVnode.vtext);
+      elm._hostContentNodes.defaultSlot = [parentElement.childNodes[0]];
+
+    } else {
+      domApi.$setTextContent(elm, newVnode.vtext);
     }
   }
 
-  return function patch(oldVnode: VNode, newVnode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, isSsrHydrated?: boolean): VNode {
-    isSsrHydrated;
+  // internal variables to be reused per patch() call
+  let isUpdate = false;
+  let hostContentNodes: HostContentNodes = null;
 
-    patchVnode(oldVnode, newVnode, isUpdate, hostContentNodes);
+  return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes): VNode {
+    // patchVnode() is synchronous
+    // so it should be safe to set these variables and
+    // internally they all reference the same data per patch()
+    isUpdate = isUpdatePatch;
+    hostContentNodes = hostElementContentNodes;
 
+    // synchronous patch
+    patchVNode(oldVnode, newVnode);
+
+    // return our new vnode
     return newVnode;
   };
 }
