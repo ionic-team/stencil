@@ -2,12 +2,14 @@ import { DomControllerApi, RafCallback } from '../../util/interfaces';
 
 
 export function createDomControllerClient(win: Window): DomControllerApi {
-  const raf = win.requestAnimationFrame;
-
   const readCBs: RafCallback[] = [];
   const writeCBs: RafCallback[] = [];
 
   let rafPending = false;
+
+  function raf(cb: FrameRequestCallback): number {
+    return win.requestAnimationFrame(cb);
+  }
 
   function domRead(cb: RafCallback) {
     readCBs.push(cb);
