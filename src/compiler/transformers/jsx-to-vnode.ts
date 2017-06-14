@@ -147,9 +147,9 @@ function parseJsxAttrs(jsxAttrs: util.ObjectMap): ts.ObjectLiteralExpression {
         styleStr += ';' + exp.getText().trim();
       } else {
         if (util.isInstanceOfObjectMap(exp)) {
-          vnodeInfo.style = util.objectMapToObjectLiteral(exp);
+          vnodeInfo.s = util.objectMapToObjectLiteral(exp);
         } else {
-          vnodeInfo.style = exp;
+          vnodeInfo.s = exp;
         }
       }
 
