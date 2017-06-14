@@ -1,9 +1,10 @@
-import { QueueApi } from '../../util/interfaces';
+import { DomControllerApi, QueueApi } from '../../util/interfaces';
 import { PRIORITY_HIGH, PRIORITY_LOW } from '../../util/constants';
 
 
-export function createQueueClient(win: any): QueueApi {
-  const requestAnimationFrame = win.requestAnimationFrame;
+export function createQueueClient(domCtrl: DomControllerApi): QueueApi {
+  const now = domCtrl.now;
+  const raf = domCtrl.raf;
   const highPromise = Promise.resolve();
 
   const highCallbacks: Function[] = [];
@@ -25,19 +26,19 @@ export function createQueueClient(win: any): QueueApi {
 
 
   function doWork() {
-    const start = performance.now();
+    const start = now();
 
     // always run all of the high priority work if there is any
     doHighPriority();
 
-    while (mediumCallbacks.length > 0 && (performance.now() - start < 40)) {
+    while (mediumCallbacks.length > 0 && (now() - start < 40)) {
       mediumCallbacks.shift()();
     }
 
     if (mediumCallbacks.length === 0) {
       // we successfully drained the medium queue or the medium queue is empty
       // so now let's drain the low queue with our remaining time
-      while (lowCallbacks.length > 0 && (performance.now() - start < 40)) {
+      while (lowCallbacks.length > 0 && (now() - start < 40)) {
         lowCallbacks.shift()();
       }
     }
@@ -48,7 +49,7 @@ export function createQueueClient(win: any): QueueApi {
       // we already don't have time to do anything in this callback
       // let's throw the next one in a requestAnimationFrame
       // so we can just simmer down for a bit
-      requestAnimationFrame(flush);
+      raf(flush);
     }
   }
 
@@ -58,15 +59,15 @@ export function createQueueClient(win: any): QueueApi {
 
     // always force a bunch of medium callbacks to run, but still have
     // a throttle on how many can run in a certain time
-    const start = performance.now();
-    while (mediumCallbacks.length > 0 && (performance.now() - start < 4)) {
+    const start = now();
+    while (mediumCallbacks.length > 0 && (now() - start < 4)) {
       mediumCallbacks.shift()();
     }
 
     if (ricPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
       // still more to do yet, but we've run out of time
       // let's let this thing cool off and try again in the next ric
-      requestAnimationFrame(doWork);
+      raf(doWork);
     }
   }
 
@@ -94,7 +95,7 @@ export function createQueueClient(win: any): QueueApi {
       if (!ricPending) {
         // not already pending work to do, so let's tee it up
         ricPending = true;
-        requestAnimationFrame(doWork);
+        raf(doWork);
       }
     }
   }

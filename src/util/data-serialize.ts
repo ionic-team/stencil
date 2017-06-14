@@ -296,7 +296,6 @@ export function formatRegistry(bundles: Bundle[], attrOption: number) {
     if (registryCmp.component.slotMeta === undefined) {
       registryCmp.component.slotMeta = 0;
     }
-console.log(tag, registryCmp.component.slotMeta)
 
     cmp.push(`    /** ${tag} slot meta [2] **/\n    ${registryCmp.component.slotMeta}`);
 

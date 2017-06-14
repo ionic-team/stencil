@@ -11,7 +11,7 @@ import { initHostConstructor } from '../instance/init';
 import { parseComponentModeData, parseModeName, parseProp } from '../../util/data-parse';
 
 
-export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi, staticDir: string): PlatformApi {
+export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
   const registry: ComponentRegistry = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
@@ -151,7 +151,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
         let node: any = elm;
         let hostRoot: any;
 
-        while (node = node.parentNode) {
+        while (node = domApi.$parentNode(node)) {
           if (node.host && node.host.shadowRoot) {
             // this element is within another shadow root
             // so instead of attaching the styles to the head
@@ -276,7 +276,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     return '';
   }
 
-  const injectedIonic = initInjectedIonic(IonicGbl, win, domApi, plt, config, queue, dom);
+  const injectedIonic = initInjectedIonic(IonicGbl, win, domApi, plt, config, queue, domCtrl);
 
 
   function appLoaded() {

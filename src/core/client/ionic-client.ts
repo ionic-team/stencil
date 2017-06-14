@@ -3,7 +3,7 @@ import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, Ion
   ListenOptions, IonicControllerApi, PlatformApi, QueueApi } from '../../util/interfaces';
 
 
-export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, queue: QueueApi, dom: DomControllerApi): Ionic {
+export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, queue: QueueApi, domCtrl: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -27,7 +27,7 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomAp
   // in actuality it's the exact same object
   IonicGbl.config = config;
 
-  (<Ionic>IonicGbl).dom = dom;
+  (<Ionic>IonicGbl).dom = domCtrl;
 
   (<Ionic>IonicGbl).emit = (instance: any, eventName: string, data: CustomEventOptions) => {
     data = data || {};

@@ -260,6 +260,7 @@ export interface DomControllerApi {
   read: DomControllerCallback;
   write: DomControllerCallback;
   raf: DomControllerCallback;
+  now(): number;
 }
 
 export interface RafCallback {

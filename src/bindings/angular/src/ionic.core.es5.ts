@@ -10,8 +10,8 @@ const plt = createPlatformClient(
   window,
   createDomApi(window.document),
   IonicGbl.ConfigCtrl,
-  IonicGbl.QueueCtrl,
   IonicGbl.DomCtrl,
+  IonicGbl.QueueCtrl,
   IonicGbl.staticDir
 );
 

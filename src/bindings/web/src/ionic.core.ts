@@ -1,5 +1,5 @@
 import { createDomApi } from '../../../core/renderer/dom-api';
-import { createDomClient } from '../../../core/client/dom-client';
+import { createDomControllerClient } from '../../../core/client/dom-client';
 import { createConfigController } from '../../../util/config-controller';
 import { createPlatformClient } from '../../../core/client/platform-client';
 import { createQueueClient } from '../../../core/client/queue-client';
@@ -10,13 +10,15 @@ import { PLATFORM_CONFIGS } from '../../../core/platform/platform-configs';
 
 const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
 
+const domCtrl = createDomControllerClient(window);
+
 const plt = createPlatformClient(
   IonicGbl,
   window,
   createDomApi(window.document),
   createConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core')),
-  createQueueClient(window),
-  createDomClient(window),
+  domCtrl,
+  createQueueClient(domCtrl),
   IonicGbl.staticDir
 );
 

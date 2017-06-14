@@ -10,7 +10,7 @@
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
-import { updateElement } from './element-update';
+import { updateElement } from './update-element';
 
 
 export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
@@ -40,7 +40,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
         for (i = 0; i < slotNodes.length; i++) {
           // remove the host content node from it's original parent node
           plt.tmpDisconnected = true;
-          domApi.$removeChild(slotNodes[i].parentNode, slotNodes[i]);
+          domApi.$removeChild(domApi.$parentNode(slotNodes[i]), slotNodes[i]);
 
           if (i === slotNodes.length - 1) {
             // return the last node that gets appended
