@@ -61,7 +61,7 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
     }
 
     // // kick off the actual render and any DOM updates
-    elm._vnode = plt.render(oldVNode, newVNode, elm._hostContentNodes, hydrating);
+    elm._vnode = plt.render(oldVNode, newVNode, !isInitialRender, elm._hostContentNodes, hydrating);
   }
 
   if (!isInitialRender) {

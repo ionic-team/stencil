@@ -16,4 +16,7 @@ export class VNode implements IVNode {
 
   elm: Element|Node;
   assignedListener: any;
+
+  skipDataOnUpdate: boolean;
+  skipChildrenOnUpdate: boolean;
 }

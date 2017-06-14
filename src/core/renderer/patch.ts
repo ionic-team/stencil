@@ -131,6 +131,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   function updateChildren(parentElm: Node,
                           oldCh: VNode[],
                           newCh: VNode[],
+                          isUpdate: boolean,
                           hostContentNodes: HostContentNodes) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
@@ -158,23 +159,23 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
         newEndVnode = newCh[--newEndIdx];
 
       } else if (isSameVnode(oldStartVnode, newStartVnode)) {
-        patchVnode(oldStartVnode, newStartVnode, hostContentNodes);
+        patchVnode(oldStartVnode, newStartVnode, isUpdate, hostContentNodes);
         oldStartVnode = oldCh[++oldStartIdx];
         newStartVnode = newCh[++newStartIdx];
 
       } else if (isSameVnode(oldEndVnode, newEndVnode)) {
-        patchVnode(oldEndVnode, newEndVnode, hostContentNodes);
+        patchVnode(oldEndVnode, newEndVnode, isUpdate, hostContentNodes);
         oldEndVnode = oldCh[--oldEndIdx];
         newEndVnode = newCh[--newEndIdx];
 
       } else if (isSameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
-        patchVnode(oldStartVnode, newEndVnode, hostContentNodes);
+        patchVnode(oldStartVnode, newEndVnode, isUpdate, hostContentNodes);
         domApi.$insertBefore(parentElm, oldStartVnode.elm, domApi.$nextSibling(oldEndVnode.elm));
         oldStartVnode = oldCh[++oldStartIdx];
         newEndVnode = newCh[--newEndIdx];
 
       } else if (isSameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
-        patchVnode(oldEndVnode, newStartVnode, hostContentNodes);
+        patchVnode(oldEndVnode, newStartVnode, isUpdate, hostContentNodes);
         domApi.$insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
         oldEndVnode = oldCh[--oldEndIdx];
         newStartVnode = newCh[++newStartIdx];
@@ -198,7 +199,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
             domApi.$insertBefore(parentElm, createElm(newStartVnode, parentElm, hostContentNodes), oldStartVnode.elm);
 
           } else {
-            patchVnode(elmToMove, newStartVnode, hostContentNodes);
+            patchVnode(elmToMove, newStartVnode, isUpdate, hostContentNodes);
             oldCh[idxInOld] = undefined;
             domApi.$insertBefore(parentElm, elmToMove.elm, oldStartVnode.elm);
           }
@@ -233,21 +234,28 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     return map;
   }
 
-  function patchVnode(oldVnode: VNode, newVnode: VNode, hostContentNodes: HostContentNodes) {
+  function patchVnode(oldVnode: VNode, newVnode: VNode, isUpdate: boolean, hostContentNodes: HostContentNodes) {
     if (oldVnode !== newVnode) {
       const elm: HostElement = newVnode.elm = <any>oldVnode.elm;
 
       let oldChildren = oldVnode.vchildren;
       let newChildren = newVnode.vchildren;
 
-      updateElement(domApi, oldVnode, newVnode);
+      if (!isUpdate || !newVnode.skipDataOnUpdate) {
+        // either this is the first render of an element OR it's an update
+        // AND we already know it's possible it could have changed
+        // this updates the element's css classes, attrs, props, listeners, etc.
+        updateElement(domApi, oldVnode, newVnode);
+      }
 
       if (isUndef(newVnode.vtext)) {
         // element node
 
         if (isDef(oldChildren) && isDef(newChildren)) {
-          if (oldChildren !== newChildren) {
-            updateChildren(elm, oldChildren, newChildren, hostContentNodes);
+          if (!isUpdate || !newVnode.skipChildrenOnUpdate || oldChildren !== newChildren) {
+            // either this is the first render of an element OR it's an update
+            // AND we already know it's possible that the children could have changed
+            updateChildren(elm, oldChildren, newChildren, isUpdate, hostContentNodes);
           }
 
         } else if (isDef(newChildren)) {
@@ -272,10 +280,10 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     }
   }
 
-  return function patch(oldVnode: VNode, newVnode: VNode, hostContentNodes?: HostContentNodes, isSsrHydrated?: boolean): VNode {
+  return function patch(oldVnode: VNode, newVnode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, isSsrHydrated?: boolean): VNode {
     isSsrHydrated;
 
-    patchVnode(oldVnode, newVnode, hostContentNodes);
+    patchVnode(oldVnode, newVnode, isUpdate, hostContentNodes);
 
     return newVnode;
   };

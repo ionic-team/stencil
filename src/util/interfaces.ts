@@ -643,7 +643,7 @@ export interface HostElement extends HTMLElement {
 
 
 export interface RendererApi {
-  (oldVnode: VNode | Element, vnode: VNode, hostContentNodes?: HostContentNodes, hydrating?: boolean): VNode;
+  (oldVnode: VNode | Element, vnode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, hydrating?: boolean): VNode;
 }
 
 
@@ -710,6 +710,8 @@ export interface VNode {
   elm: Element|Node;
   vnamespace: any;
   assignedListener: any;
+  skipDataOnUpdate: boolean;
+  skipChildrenOnUpdate: boolean;
 }
 
 export interface VNodeData {
@@ -754,6 +756,10 @@ export interface VNodeProdData {
    * namespace
    */
   n?: any;
+  /**
+   * check once
+   */
+  x?: number;
 }
 
 

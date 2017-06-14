@@ -61,6 +61,7 @@ export function h(nodeName: string, vnodeData: VNodeProdData, child?: any) {
   vnode.vchildren = children;
 
   if (vnodeData !== 0) {
+    // data object was provided
     vnode.vattrs = vnodeData.a;
     vnode.vprops = vnodeData.p;
     vnode.vclass = vnodeData.c;
@@ -68,6 +69,23 @@ export function h(nodeName: string, vnodeData: VNodeProdData, child?: any) {
     vnode.vlisteners = vnodeData.o;
     vnode.vkey = vnodeData.k;
     vnode.vnamespace = vnodeData.n;
+
+    // x = undefined: always check both data and children
+    // x = 0 skip checking only data on update
+    // x = 1 skip checking only children on update
+    // x = 2 skip checking both data and children on update
+    vnode.skipDataOnUpdate = vnodeData.x === 0 || vnodeData.x === 2;
+    vnode.skipChildrenOnUpdate = vnodeData.x > 0;
+
+  } else {
+    // no data object was provided
+    // so no data, so don't both checking data
+    vnode.skipDataOnUpdate = true;
+
+    // since no data was provided, than no x was provided
+    // if no x was provided then we need to always check children
+    // if if there are no children at all, then we know never to check children
+    vnode.skipChildrenOnUpdate = (!children || children.length === 0);
   }
 
   return vnode;
@@ -75,7 +93,7 @@ export function h(nodeName: string, vnodeData: VNodeProdData, child?: any) {
 
 
 export function t(textValue: any) {
-  let v = new VNodeObj();
-  v.vtext = textValue;
-  return v;
+  const vnode = new VNodeObj();
+  vnode.vtext = textValue;
+  return vnode;
 }
