@@ -708,7 +708,7 @@ export interface VNode {
   vkey: Key;
   elm: Element|Node;
   vnamespace: any;
-  assignedListeners: any;
+  assignedListener: any;
 }
 
 export interface VNodeData {

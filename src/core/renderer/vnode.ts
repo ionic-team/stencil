@@ -15,5 +15,5 @@ export class VNode implements IVNode {
   vnamespace: any;
 
   elm: Element|Node;
-  assignedListeners: any;
+  assignedListener: any;
 }

@@ -21,7 +21,7 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
       style = vnode.vstyle,
       oldOn: any = oldVnode.vlisteners,
       on = vnode.vlisteners,
-      oldListener: any = oldVnode.assignedListeners,
+      oldListener: any = oldVnode.assignedListener,
       oldElm = oldVnode.elm;
 
 
@@ -157,7 +157,7 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
     // add new listeners which has not already attached
     if (on) {
       // reuse existing listener or create new
-      var listener = vnode.assignedListeners = oldVnode.assignedListeners || createListener();
+      var listener = vnode.assignedListener = oldVnode.assignedListener || createListener();
 
       // update vnode for listener
       listener.vnode = vnode;

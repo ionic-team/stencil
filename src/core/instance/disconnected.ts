@@ -1,6 +1,6 @@
 import { detachListeners } from './events';
 import { HostElement, PlatformApi } from '../../util/interfaces';
-import { invokeDestroyHook } from '../renderer/patch';
+import { invokeDestroy } from '../renderer/patch';
 
 
 export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -27,7 +27,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     detachListeners(elm);
 
     // destroy the vnode and child vnodes if they exist
-    elm._vnode && invokeDestroyHook(elm._vnode);
+    elm._vnode && invokeDestroy(elm._vnode);
 
     if (elm._hostContentNodes) {
       // overreacting here just to reduce any memory leak issues
