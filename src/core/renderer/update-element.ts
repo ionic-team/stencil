@@ -5,6 +5,7 @@ const EMPTY: any = {};
 
 
 export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): void {
+  const isInitialRender = (oldVnode == null);
   oldVnode = oldVnode || EMPTY;
   vnode = vnode || EMPTY;
 
@@ -54,9 +55,11 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
     // remove removed attributes
     // use `in` operator since the previous `for` iteration uses it (.i.e. add even attributes with undefined value)
     // the other option is to remove all attributes with value == undefined
-    for (key in oldData) {
-      if (!(key in newData)) {
-        nodeOps.$removeAttribute(elm, key);
+    if (!isInitialRender) {
+      for (key in oldData) {
+        if (!(key in newData)) {
+          nodeOps.$removeAttribute(elm, key);
+        }
       }
     }
   }
@@ -69,11 +72,14 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
     oldData = oldData || EMPTY;
     newData = newData || EMPTY;
 
-    for (key in oldData) {
-      if (!newData[key]) {
-        elm.classList.remove(key);
+    if (!isInitialRender) {
+      for (key in oldData) {
+        if (!newData[key]) {
+          elm.classList.remove(key);
+        }
       }
     }
+
     for (key in newData) {
       cur = newData[key];
       if (cur !== oldData[key]) {
@@ -90,12 +96,14 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
     oldData = oldData || EMPTY;
     newData = newData || EMPTY;
 
-    for (key in oldData) {
-      if (newData[key] === undefined) {
-        // only delete the old property when the
-        // new property is undefined, otherwise we'll
-        // end up deleting getters/setters
-        delete (elm as any)[key];
+    if (!isInitialRender) {
+      for (key in oldData) {
+        if (newData[key] === undefined) {
+          // only delete the old property when the
+          // new property is undefined, otherwise we'll
+          // end up deleting getters/setters
+          delete (elm as any)[key];
+        }
       }
     }
 
@@ -115,9 +123,11 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
     oldData = oldData || EMPTY;
     newData = newData || EMPTY;
 
-    for (key in oldData) {
-      if (!newData[key]) {
-        (elm as any).style[key] = '';
+    if (!isInitialRender) {
+      for (key in oldData) {
+        if (!newData[key]) {
+          (elm as any).style[key] = '';
+        }
       }
     }
 
@@ -135,7 +145,7 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
   newData = vnode.vlisteners;
   if (oldData !== newData) {
     // remove existing listeners which no longer used
-    if (oldData && oldVnode.assignedListener) {
+    if (!isInitialRender && oldData && oldVnode.assignedListener) {
       // if element changed or deleted we remove all existing listeners unconditionally
       if (!newData) {
         for (key in oldData) {
