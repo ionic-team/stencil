@@ -1,5 +1,6 @@
 import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
+import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../../util/constants';
 import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../test';
 
 
@@ -10,6 +11,7 @@ describe('Component slot', () => {
   it('should relocate nested default slot nodes', (done) => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
+      slotMeta: HAS_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('spider', 0, h('slot', 0));
@@ -31,6 +33,7 @@ describe('Component slot', () => {
   it('should relocate nested named slot nodes', (done) => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('monkey', 0, h('slot', { a: { name: 'start' } }));
@@ -170,6 +173,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         msg = 'parent message';
 
@@ -185,6 +189,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('chipmunk', 0, [
@@ -232,6 +237,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         msg = 'parent message';
 
@@ -245,6 +251,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('bull', 0, [
@@ -289,6 +296,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('ion-child', 0, [
@@ -301,6 +309,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('mouse', 0, [
@@ -352,6 +361,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('ion-child', 0, [
@@ -365,6 +375,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('flamingo', 0, [
@@ -432,6 +443,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('test-1', 0, [
@@ -445,6 +457,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'test-1',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('seal', 0, [
@@ -456,6 +469,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'test-2',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return h('goose', 0, [
@@ -558,6 +572,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return options.parentVNode;
@@ -567,6 +582,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
+      slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
           return options.childVNode;
