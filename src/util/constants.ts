@@ -22,6 +22,13 @@ export const PRIORITY_LOW = 1;
 
 
 /**
+ * Slot Meta
+ */
+export const HAS_SLOTS = 1;
+export const HAS_NAMED_SLOTS = 2;
+
+
+/**
  * Key Name to Key Code Map
  */
 export const KEY_CODE_MAP: {[key: string]: number} = {

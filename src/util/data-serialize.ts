@@ -54,10 +54,6 @@ export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, 
 
   const shadow = formatShadow(cmp.isShadowMeta);
 
-  const hasSlots = formatHasSlots(cmp.hasSlotsMeta);
-
-  const namedSlots = formatNamedSlots(cmp.namedSlotsMeta);
-
   const host = formatHost(cmp.hostMeta, devMode);
 
   const modeCode = formatModeName(modeName);
@@ -72,11 +68,9 @@ export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, 
     `/** ${label}: [4] listeners **/\n${listeners}`,
     `/** ${label}: [5] watchers **/\n${watchers}`,
     `/** ${label}: [6] shadow **/\n${shadow}`,
-    `/** ${label}: [7] hasSlots **/\n${hasSlots}`,
-    `/** ${label}: [8] namedSlots **/\n${namedSlots}`,
-    `/** ${label}: [9] host **/\n${host}`,
-    `/** ${label}: [10] modeName **/\n${modeCode}`,
-    `/** ${label}: [11] styles **/\n${styles}`
+    `/** ${label}: [7] host **/\n${host}`,
+    `/** ${label}: [8] modeName **/\n${modeCode}`,
+    `/** ${label}: [9] styles **/\n${styles}`
   ];
 
   return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
@@ -207,22 +201,6 @@ function formatShadow(val: boolean) {
     '0 /* do not use shadow dom */';
 }
 
-
-function formatHasSlots(val: boolean) {
-  return val ?
-    '1 /* has 1 or many slots */' :
-    '0 /* does not have any slots */';
-}
-
-
-function formatNamedSlots(namedSlots: string[]) {
-  if (!namedSlots || !namedSlots.length) {
-    return '0 /* no named slots */';
-  }
-
-  return JSON.stringify(namedSlots);
-}
-
 function formatHost(val: any, devMode: boolean) {
   return JSON.stringify(val, null, devMode ? 2 : null);
 }
@@ -307,11 +285,20 @@ export function formatRegistry(bundles: Bundle[], attrOption: number) {
       `    /** ${tag}: modes [1] **/`,
       `    {`
     ];
+
     modes.push(Object.keys(registryCmp.bundles).map(modeName => {
       return `      ${formatModeName(modeName)}: '${registryCmp.bundles[modeName].id}'`;
     }).join(',\n'));
+
     modes.push(`    }`);
     cmp.push(modes.join('\n'));
+
+    if (registryCmp.component.slotMeta === undefined) {
+      registryCmp.component.slotMeta = 0;
+    }
+console.log(tag, registryCmp.component.slotMeta)
+
+    cmp.push(`    /** ${tag} slot meta [2] **/\n    ${registryCmp.component.slotMeta}`);
 
     const props = registryCmp.component.propsMeta;
 
@@ -319,17 +306,17 @@ export function formatRegistry(bundles: Bundle[], attrOption: number) {
 
       if (props && props.length) {
         cmp.push([
-          `    /** ${tag}: props [2] **/`,
+          `    /** ${tag}: props [3] **/`,
           `${formatProps(registryCmp.component.propsMeta, attrOption, '    ')}`
         ].join('\n'));
 
       } else {
-        cmp.push(`    0 /** ${tag} has no props [2] **/`);
+        cmp.push(`    0 /** ${tag} has no props [3] **/`);
       }
 
       if (registryCmp.component.priorityMeta === PRIORITY_LOW) {
         let priority = [
-          `    /** ${tag}: priority [3] **/`,
+          `    /** ${tag}: priority [4] **/`,
           `    ${registryCmp.component.priorityMeta}`
         ];
         cmp.push(priority.join('\n'));

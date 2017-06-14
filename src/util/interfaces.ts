@@ -286,14 +286,19 @@ export interface LoadComponentData {
   };
 
   /**
+   * slot meta
+   */
+  [2]: number;
+
+  /**
    * props
    */
-  [2]: any[];
+  [3]: any[];
 
   /**
    * bundle priority
    */
-  [3]: LoadPriority;
+  [4]: LoadPriority;
 }
 
 
@@ -361,31 +366,21 @@ export interface ComponentModeData {
   [6]: boolean;
 
   /**
-   * hasSlots
-   */
-  [7]: boolean;
-
-  /**
-   * namedSlots
-   */
-  [8]: string[];
-
-  /**
    * host
    */
-  [9]: any;
+  [7]: any;
 
   /**
    * mode code, which is a number that'll
    * map to a mode name later (ios, md, wp)
    */
-  [10]: number;
+  [8]: number;
 
 
   /**
    * component mode styles
    */
-  [11]: string;
+  [9]: string;
 }
 
 
@@ -537,8 +532,7 @@ export interface ComponentMeta {
   modesMeta?: {[modeCode: string]: ModeMeta};
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;
-  hasSlotsMeta?: boolean;
-  namedSlotsMeta?: string[];
+  slotMeta?: number;
   componentModuleMeta?: any;
   priorityMeta?: LoadPriority;
 }
@@ -769,7 +763,7 @@ export interface PlatformApi {
   loadBundle: (bundleId: string, priority: LoadPriority, cb: Function) => void;
   render?: RendererApi;
   config: ConfigApi;
-  collectHostContent: (elm: HostElement, validNamedSlots: string[]) => void;
+  collectHostContent: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
   css?: {[cmpModeId: string]: string};
   isServer?: boolean;

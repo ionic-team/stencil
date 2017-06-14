@@ -208,13 +208,16 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
         };
       });
 
-      if (data[2]) {
+      // slot meta
+      cmpMeta.slotMeta = data[2];
+
+      if (data[3]) {
         // parse prop meta
-        cmpMeta.propsMeta = cmpMeta.propsMeta.concat(data[2].map(parseProp));
+        cmpMeta.propsMeta = cmpMeta.propsMeta.concat(data[3].map(parseProp));
       }
 
       // priority
-      cmpMeta.priorityMeta = data[3];
+      cmpMeta.priorityMeta = data[4];
 
       return cmpMeta;
     });
@@ -239,8 +242,8 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     return registry[elm.tagName];
   }
 
-  function collectHostContent(elm: HostElement, validNamedSlots: string[]) {
-    elm._hostContentNodes = assignHostContentSlots(domApi, elm, validNamedSlots);
+  function collectHostContent(elm: HostElement, slotMeta: number) {
+    assignHostContentSlots(domApi, elm, slotMeta);
   }
 
   let initAppStyles: string[] = [];

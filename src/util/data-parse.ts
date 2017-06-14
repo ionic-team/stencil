@@ -52,22 +52,16 @@ export function parseComponentModeData(registry: ComponentRegistry, moduleImport
   // shadow
   cmpMeta.isShadowMeta = !!cmpModeData[6];
 
-  // hasSlots
-  cmpMeta.hasSlotsMeta = !!cmpModeData[7];
-
-  // namedSlots
-  cmpMeta.namedSlotsMeta = cmpModeData[8];
-
   // host
-  cmpMeta.hostMeta = cmpModeData[9];
+  cmpMeta.hostMeta = cmpModeData[7];
 
   // mode name (ios, md, wp)
   // get component mode
-  if (isString(cmpModeData[11])) {
-    let cmpMode = cmpMeta.modesMeta[parseModeName(cmpModeData[10])];
+  if (isString(cmpModeData[9])) {
+    let cmpMode = cmpMeta.modesMeta[parseModeName(cmpModeData[8])];
     if (cmpMode) {
       // component mode styles
-      cmpMode.styles = cmpModeData[11];
+      cmpMode.styles = cmpModeData[9];
     }
   }
 
@@ -109,20 +103,20 @@ export function parseModeName(modeCode: any) {
 
 
 export function parsePropertyValue(propType: number, propValue: any) {
-    // ensure this value is of the correct prop type
+  // ensure this value is of the correct prop type
 
-    if (propType === TYPE_BOOLEAN) {
-      // per the HTML spec, any string value means it is a boolean "true" value
-      // but we'll cheat here and say that the string "false" is the boolean false
-      return (propValue === null || propValue === false || propValue === 'false' ? false : true);
-    }
+  if (propType === TYPE_BOOLEAN) {
+    // per the HTML spec, any string value means it is a boolean "true" value
+    // but we'll cheat here and say that the string "false" is the boolean false
+    return (propValue === null || propValue === false || propValue === 'false' ? false : true);
+  }
 
-    if (propType === TYPE_NUMBER) {
-      // force it to be a number
-      return parseFloat(propValue);
-    }
+  if (propType === TYPE_NUMBER) {
+    // force it to be a number
+    return parseFloat(propValue);
+  }
 
-    // not sure exactly what type we want
-    // so no need to change to a different type
-    return propValue;
+  // not sure exactly what type we want
+  // so no need to change to a different type
+  return propValue;
 }

@@ -1,5 +1,5 @@
-import { HostElement, PlatformApi } from '../../util/interfaces';
 import { getParentElement } from '../../util/helpers';
+import { HostElement, PlatformApi } from '../../util/interfaces';
 import { PRIORITY_HIGH } from '../../util/constants';
 
 
@@ -43,13 +43,8 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     // get the component meta data about this component
     const cmpMeta = plt.getComponentMeta(elm);
 
-    // only do slot work if this component even has slots
-    if (cmpMeta.hasSlotsMeta || true /* TODO!! */) {
-      // TODO!!
-      cmpMeta.namedSlotsMeta = ['start', 'end', 'mode-start', 'mode-end'];
-
-      plt.collectHostContent(elm, cmpMeta.namedSlotsMeta);
-    }
+    // only collects slot references if this component even has slots
+    plt.collectHostContent(elm, cmpMeta.slotMeta);
 
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can

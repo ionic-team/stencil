@@ -1,4 +1,5 @@
 import { BuildContext, FileMeta } from '../interfaces';
+import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../util/constants';
 import * as ts from 'typescript';
 import * as util from './util';
 
@@ -83,6 +84,9 @@ function getNamespace(tagName: string): ts.StringLiteral | undefined {
 
 
 function updateFileMetaWithSlots(fileMeta: FileMeta, tagName: string, props: ts.Expression) {
+  // checking if there is a default slot and/or named slots in the compiler
+  // so that during runtime there is less work to do
+
   if (!fileMeta || !fileMeta.hasCmpClass) {
     return;
   }
@@ -91,7 +95,9 @@ function updateFileMetaWithSlots(fileMeta: FileMeta, tagName: string, props: ts.
     return;
   }
 
-  fileMeta.cmpMeta.hasSlotsMeta = true;
+  if (fileMeta.cmpMeta.slotMeta === undefined) {
+    fileMeta.cmpMeta.slotMeta = HAS_SLOTS;
+  }
 
   if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
     const jsxAttrs = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
@@ -101,8 +107,8 @@ function updateFileMetaWithSlots(fileMeta: FileMeta, tagName: string, props: ts.
         var attrValue: string = (<any>jsxAttrs[attrName]).text.trim();
 
         if (attrValue.length > 0) {
-          fileMeta.cmpMeta.namedSlotsMeta = fileMeta.cmpMeta.namedSlotsMeta || [];
-          fileMeta.cmpMeta.namedSlotsMeta.push(attrValue);
+          fileMeta.cmpMeta.slotMeta = HAS_NAMED_SLOTS;
+          break;
         }
       }
     }
