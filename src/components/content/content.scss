@@ -15,10 +15,6 @@ ion-content {
   contain: layout size style;
 }
 
-ion-content.content-ready {
-  visibility: inherit;
-}
-
 .ion-page > ion-content {
   position: absolute;
 }
