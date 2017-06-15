@@ -13,17 +13,30 @@ export class NewsList {
   @State() fakeData: any[] = [];
 
 
+  fakeFetch(url: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest();
+
+      request.addEventListener('load', function () {
+        resolve(JSON.parse(this.responseText));
+      });
+
+      request.addEventListener('error', function () {
+        reject(`error: ${this.statusText} / ${this.status}`);
+      });
+
+      request.open('GET', url, true);
+      request.send();
+    });
+  }
+
   comments(story: any) {
     if (Ionic.isServer) return;
 
     Ionic.controller('loading', { content: 'fetching comments...' }).then(loading => {
       loading.present();
 
-      fetch(`${this.apiRootUrl}/item/${story.id}`).then(response => {
-        return response.json();
-      }).then((data: any) => {
-        console.log(data);
-
+      this.fakeFetch(`${this.apiRootUrl}/item/${story.id}`).then((data) => {
         setTimeout(() => {
           loading.dismiss().then(() => {
             Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then(modal => {
@@ -36,6 +49,7 @@ export class NewsList {
           });
         }, 300);
       });
+
     });
   }
 

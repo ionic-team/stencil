@@ -22,13 +22,26 @@ export class NewsContainer {
 
     this.firstSelectedClass = true;
 
-    fetch(`${this.apiRootUrl}/news?page=${this.page}`).then((response) => {
-      return response.json();
-    }).then((data) => {
-      console.log(data);
+    this.fakeFetch(`${this.apiRootUrl}/news?page=${this.page}`).then((data) => {
       this.stories = data;
-
       this.pageType = 'news';
+    });
+  }
+
+  fakeFetch(url: string): Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      const request = new XMLHttpRequest();
+
+      request.addEventListener('load', function() {
+        resolve(JSON.parse(this.responseText));
+      });
+
+      request.addEventListener('error', function() {
+        reject(`error: ${this.statusText} / ${this.status}`);
+      });
+
+      request.open('GET', url, true);
+      request.send();
     });
   }
 
@@ -70,9 +83,8 @@ export class NewsContainer {
 
     Ionic.controller('loading', { content: `fetching ${type} articles...` }).then((loading: any) => {
       loading.present().then(() => {
-        fetch(`${this.apiRootUrl}/${type}?page=1`).then((response) => {
-          return response.json();
-        }).then((data) => {
+
+        this.fakeFetch(`${this.apiRootUrl}/${type}?page=1`).then((data) => {
           this.stories = data;
 
           loading.dismiss();
@@ -93,10 +105,7 @@ export class NewsContainer {
           this.page = this.page--;
           console.log(this.page--);
 
-          fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then(response => {
-            return response.json();
-          }).then((data) => {
-            console.log(data);
+          this.fakeFetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((data) => {
             this.stories = data;
 
             loading.dismiss();
@@ -116,9 +125,7 @@ export class NewsContainer {
         this.page = this.page++;
         console.log(this.page++);
 
-        fetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then(response => {
-          return response.json();
-        }).then(data => {
+        this.fakeFetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((data) => {
           if (data.length !== 0) {
             this.stories = data;
           }
