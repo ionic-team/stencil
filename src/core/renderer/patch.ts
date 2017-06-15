@@ -7,15 +7,17 @@
  * Modified for Ionic's Web Component Renderer
  */
 
-
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
 import { updateElement } from './update-element';
 
 
 export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
+  // createRenderer() is only created once per app
+  // the patch() function which createRenderer() returned is the function
+  // which gets called numerous times by each component
 
-  function createElm(vnode: VNode, parentElm: Node): Node {
+  function createElm(vnode: VNode, parentElm: Node) {
     let i = 0;
     let childNode: Node;
 
@@ -26,14 +28,18 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       let slotNodes: Node[];
 
       if (isDef(namedSlot)) {
+        // this vnode is a named slot
         slotNodes = hostContentNodes.namedSlots && hostContentNodes.namedSlots[namedSlot];
 
       } else {
+        // this vnode is the default slot
         slotNodes = hostContentNodes.defaultSlot;
       }
 
       if (isDef(slotNodes)) {
-        for (i = 0; i < slotNodes.length; i++) {
+        // we have a slot for the user's vnode to go into
+
+        for (; i < slotNodes.length; i++) {
           // remove the host content node from it's original parent node
           plt.tmpDisconnected = true;
           domApi.$removeChild(domApi.$parentNode(slotNodes[i]), slotNodes[i]);
@@ -44,7 +50,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
             return slotNodes[i];
           }
 
-          // relocate the node to it's new home
+          // relocate the node to its new home
           domApi.$appendChild(parentElm, slotNodes[i]);
           plt.tmpDisconnected = false;
         }
@@ -63,7 +69,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
       const children = vnode.vchildren;
       if (children) {
-        for (i = 0; i < children.length; ++i) {
+        for (; i < children.length; ++i) {
           childNode = createElm(children[i], elm);
 
           if (isDef(childNode)) {
@@ -78,11 +84,10 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   }
 
   function addVnodes(parentElm: Node, before: Node | null, vnodes: VNode[], startIdx: number, endIdx: number) {
-    let vnodeChild: VNode;
     let childNode: Node;
 
     for (; startIdx <= endIdx; ++startIdx) {
-      vnodeChild = vnodes[startIdx];
+      var vnodeChild = vnodes[startIdx];
 
       if (isDef(vnodeChild)) {
         if (isDef(vnodeChild.vtext)) {
@@ -203,6 +208,8 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   }
 
   function isSameVnode(vnode1: VNode, vnode2: VNode) {
+    // compare if two vnode to see if they're "technically" the same
+    // need to have the same element tag, and same key to be the same
     return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
   }
 
@@ -224,9 +231,8 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
   function patchVNode(oldVnode: VNode, newVnode: VNode) {
     const elm: HostElement = newVnode.elm = <any>oldVnode.elm;
-
-    let oldChildren = oldVnode.vchildren;
-    let newChildren = newVnode.vchildren;
+    const oldChildren = oldVnode.vchildren;
+    const newChildren = newVnode.vchildren;
 
     if (!isUpdate || !newVnode.skipDataOnUpdate) {
       // either this is the first render of an element OR it's an update
@@ -239,19 +245,25 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       // element node
 
       if (isDef(oldChildren) && isDef(newChildren)) {
-        if (!isUpdate || !newVnode.skipChildrenOnUpdate || oldChildren !== newChildren) {
+        // looks like there's child vnodes for both the old and new vnodes
+
+        if (!isUpdate || !newVnode.skipChildrenOnUpdate) {
           // either this is the first render of an element OR it's an update
           // AND we already know it's possible that the children could have changed
           updateChildren(elm, oldChildren, newChildren);
         }
 
       } else if (isDef(newChildren)) {
+        // no old child vnodes, but there are new child vnodes to add
         if (isDef(oldVnode.vtext)) {
+          // the old vnode was text, so be sure to clear it out
           domApi.$setTextContent(elm, '');
         }
+        // add the new vnode children
         addVnodes(elm, null, newChildren, 0, newChildren.length - 1);
 
       } else if (isDef(oldChildren)) {
+        // no new child vnodes, but there are old child vnodes to remove
         removeVnodes(elm, oldChildren, 0, oldChildren.length - 1);
       }
 
@@ -262,6 +274,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       elm._hostContentNodes.defaultSlot = [parentElement.childNodes[0]];
 
     } else {
+      // update the text content for the text only vnode
       domApi.$setTextContent(elm, newVnode.vtext);
     }
   }
@@ -271,9 +284,9 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   let hostContentNodes: HostContentNodes = null;
 
   return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes): VNode {
-    // patchVnode() is synchronous
-    // so it should be safe to set these variables and
-    // internally they all reference the same data per patch()
+    // patchVNode() is synchronous
+    // so it is safe to set these variables and internally
+    // the same patch() call will reference the same data
     isUpdate = isUpdatePatch;
     hostContentNodes = hostElementContentNodes;
 
