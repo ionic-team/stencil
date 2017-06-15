@@ -22,7 +22,8 @@ export class NewsContainer {
 
     this.firstSelectedClass = true;
 
-    this.fakeFetch(`${this.apiRootUrl}/news?page=${this.page}`).then((data) => {
+    // call to firebase function for first view
+    this.fakeFetch('https://us-central1-corehacker-10883.cloudfunctions.net/fetchNews').then((data) => {
       this.stories = data;
       this.pageType = 'news';
     });
