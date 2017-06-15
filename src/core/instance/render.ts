@@ -4,11 +4,11 @@ import { isArray } from '../../util/helpers';
 import { VNode as VNodeObj } from '../renderer/vnode';
 
 
-export function render(plt: PlatformApi, elm: HostElement, isInitialRender: boolean) {
+export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boolean) {
   const instance = elm.$instance;
   const cmpMeta = plt.getComponentMeta(elm);
 
-  if (!isInitialRender) {
+  if (isUpdateRender) {
     // fire off the user's ionViewWillUpdate method (if one was provided)
     // ionViewWillUpdate runs BEFORE render() has been called
     // but only BEFORE an UPDATE and not before the intial render
@@ -59,10 +59,10 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
     }
 
     // kick off the actual render and any DOM updates
-    elm._vnode = plt.render(oldVNode, newVNode, !isInitialRender, elm._hostContentNodes);
+    elm._vnode = plt.render(oldVNode, newVNode, isUpdateRender, elm._hostContentNodes);
   }
 
-  if (!isInitialRender) {
+  if (isUpdateRender) {
     // fire off the user's ionViewDidUpdate method (if one was provided)
     // ionViewDidUpdate runs AFTER render() has been called
     // but only AFTER an UPDATE and not after the intial render

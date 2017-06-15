@@ -623,7 +623,7 @@ export interface HostElement extends HTMLElement {
   $instance?: Component;
 
   // private methods
-  _render: (isInitialRender?: boolean) => void;
+  _render: (isUpdateRender?: boolean) => void;
   _initLoad: () => void;
   _queueUpdate: () => void;
 
