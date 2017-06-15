@@ -9,6 +9,20 @@
 <body>
   <ion-app>
     <ion-content>
+      <ion-button button-type="bar-button">Test button</ion-button>
+
+      <ion-button button-type="test-button">Test button</ion-button>
+
+      <ion-button button-type="test-button" class="my-test-button">Test button w/ class</ion-button>
+
+      <ion-button button-type="alert-radio-button">
+        Alert button
+      </ion-button>
+
+      <ion-button button-type="alert-radio-button" class="alert-tappable alert-radio" role="radio">
+        Alert button w/ class & role
+      </ion-button>
+
       <h4>Colors</h4>
       <ion-button>Default</ion-button>
       <ion-button color="secondary">Secondary</ion-button>
@@ -35,14 +49,14 @@
 
       <h4>Icons</h4>
 
-      <ion-button icon-start color="dark">
-        <ion-icon name="star"></ion-icon>
+      <ion-button color="dark">
+        <ion-icon slot="start" name="star"></ion-icon>
         Left Icon
       </ion-button>
 
-      <ion-button icon-end color="dark">
+      <ion-button color="dark">
         Right Icon
-        <ion-icon name="star"></ion-icon>
+        <ion-icon slot="end" name="star"></ion-icon>
       </ion-button>
 
       <ion-button icon-only color="dark">
