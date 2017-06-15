@@ -1,5 +1,5 @@
 import { createThemedClasses } from '../../util/theme';
-import { HostElement, PlatformApi, VNode } from '../../util/interfaces';
+import { HostElement, PlatformApi } from '../../util/interfaces';
 import { isArray } from '../../util/helpers';
 import { VNode as VNodeObj } from '../renderer/vnode';
 
@@ -16,7 +16,8 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
   }
 
   // if this component has a render function, let's fire
-  // it off and generate the children for this vnode
+  // it off and generate the child vnodes for this host element
+  // note that we do not create the host element cuz it already exists
   const vnodeChildren = instance.render && instance.render();
 
   let vnodeHostData = instance.hostData && instance.hostData();
@@ -35,22 +36,19 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
   }
 
   if (vnodeChildren || vnodeHostData) {
-    let oldVNode: VNode;
-    let newVNode: VNode;
-    let hydrating = false;
+    // looks like we've got child nodes to render into this host element
+    // or we need to update the css class/attrs on the host element
 
     // if this is the intial load, then we give the renderer the actual element
     // if this is a re-render, then give the renderer the last vnode we created
-    if (isInitialRender) {
-      oldVNode = new VNodeObj();
-      oldVNode.elm = elm;
-    } else {
-      oldVNode = elm._vnode;
-    }
+    let oldVNode = elm._vnode || new VNodeObj();
+    oldVNode.elm = elm;
 
-    newVNode = new VNodeObj();
+    // each patch always gets a new new
+    let newVNode = new VNodeObj();
 
     if (vnodeHostData) {
+      // we've got css classes and/or attributes to add to the host element
       newVNode.vattrs = vnodeHostData['attrs'];
       newVNode.vclass = vnodeHostData['class'];
     }
@@ -60,8 +58,8 @@ export function render(plt: PlatformApi, elm: HostElement, isInitialRender: bool
       newVNode.vchildren = isArray(vnodeChildren) ? vnodeChildren : [vnodeChildren];
     }
 
-    // // kick off the actual render and any DOM updates
-    elm._vnode = plt.render(oldVNode, newVNode, !isInitialRender, elm._hostContentNodes, hydrating);
+    // kick off the actual render and any DOM updates
+    elm._vnode = plt.render(oldVNode, newVNode, !isInitialRender, elm._hostContentNodes);
   }
 
   if (!isInitialRender) {

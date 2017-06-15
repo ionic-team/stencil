@@ -643,7 +643,7 @@ export interface HostElement extends HTMLElement {
 
 
 export interface RendererApi {
-  (oldVnode: VNode | Element, vnode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, hydrating?: boolean): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes): VNode;
 }
 
 
