@@ -7,23 +7,11 @@ import { Component, h, Prop, Ionic, State } from '../index';
 })
 export class NewsList {
 
-  @Prop() type: any[];
   apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
+
+  @Prop() type: any[];
   @State() fakeData: any[] = [];
 
-  ionViewWillLoad() {
-    // this can be simplified or removed once skeleton screens
-    // have made it in
-    for (let i = 0; i < 11; i++) {
-      this.fakeData.push({
-        points: 50,
-        title: 'PWAs are the future',
-        user: 'ionitron',
-        time_ago: '1 day ago',
-        comments_count: 400
-      });
-    }
-  }
 
   comments(story: any) {
     if (Ionic.isServer) return;
@@ -53,9 +41,6 @@ export class NewsList {
 
   render() {
     if (this.type.length === 0) {
-      // Note to self:
-      // change this to skeleton screens
-      // once those are in
       return (
         <ion-list>
           {Array.from(Array(10)).map(() =>
@@ -77,6 +62,7 @@ export class NewsList {
         </ion-list>
       );
     }
+
     return (
       <ion-list>
         {this.type.map((story: any) => (

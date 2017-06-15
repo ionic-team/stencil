@@ -172,6 +172,15 @@ function parseJsxAttrs(jsxAttrs: util.ObjectMap): ts.ObjectLiteralExpression {
       attrs = attrs || {};
       attrs[attrName] = exp;
 
+    } else if (isPropsName(attrName)) {
+      // passed an actual "props" attribute
+      // probably containing an object of props data
+      if (util.isInstanceOfObjectMap(exp)) {
+        vnodeInfo.p = util.objectMapToObjectLiteral(exp);
+      } else {
+        vnodeInfo.p = exp;
+      }
+
     } else {
       // props
       props = props || {};
@@ -288,6 +297,12 @@ function isAttr(attrName: string, exp: ts.Expression) {
     return true;
   }
   return false;
+}
+
+
+function isPropsName(attrName: string) {
+  attrName = attrName.toLowerCase();
+  return (attrName === 'props');
 }
 
 
