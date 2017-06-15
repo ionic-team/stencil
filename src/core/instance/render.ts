@@ -1,6 +1,7 @@
 import { createThemedClasses } from '../../util/theme';
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { isArray } from '../../util/helpers';
+import { h } from '../renderer/h';
 import { VNode as VNodeObj } from '../renderer/vnode';
 
 
@@ -20,7 +21,7 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
   // note that we do not create the host element cuz it already exists
   const vnodeChildren = instance.render && instance.render();
 
-  let vnodeHostData = instance.hostData && instance.hostData();
+  let vnodeHostData: any = instance.hostData && instance.hostData();
   if (cmpMeta.hostMeta) {
     vnodeHostData = Object.keys(cmpMeta.hostMeta).reduce((hostData, key) => {
       switch (key) {
@@ -44,22 +45,13 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
     let oldVNode = elm._vnode || new VNodeObj();
     oldVNode.elm = elm;
 
-    // each patch always gets a new new
-    let newVNode = new VNodeObj();
+    vnodeHostData.a = vnodeHostData['attrs'];
+    vnodeHostData.c = vnodeHostData['class'];
 
-    if (vnodeHostData) {
-      // we've got css classes and/or attributes to add to the host element
-      newVNode.vattrs = vnodeHostData['attrs'];
-      newVNode.vclass = vnodeHostData['class'];
-    }
-
-    if (vnodeChildren) {
-      // the host element's children should always be an array
-      newVNode.vchildren = isArray(vnodeChildren) ? vnodeChildren : [vnodeChildren];
-    }
-
+    // each patch always gets a new vnode
+    // the host element itself isn't patched because it already exists
     // kick off the actual render and any DOM updates
-    elm._vnode = plt.render(oldVNode, newVNode, isUpdateRender, elm._hostContentNodes);
+    elm._vnode = plt.render(oldVNode, h(null, vnodeHostData, vnodeChildren), isUpdateRender, elm._hostContentNodes);
   }
 
   if (isUpdateRender) {
