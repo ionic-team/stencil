@@ -17,13 +17,12 @@ const DEV_MODE = process.argv.indexOf('dev') > -1;
 const WATCH = process.argv.indexOf('watch') > -1;
 
 const BUNDLES = [
-  { components: ['ion-app', 'ion-buttons', 'ion-content', 'ion-footer', 'ion-header', 'ion-navbar', 'ion-page', 'ion-title', 'ion-toolbar'] },
+  { components: ['ion-app', 'ion-content', 'ion-footer', 'ion-header', 'ion-navbar', 'ion-page', 'ion-title', 'ion-toolbar'] },
   { components: ['ion-avatar', 'ion-thumbnail'] },
   { components: ['ion-badge'] },
-  { components: ['ion-button'] },
+  { components: ['ion-button', 'ion-buttons', 'ion-icon'] },
   { components: ['ion-card', 'ion-card-content', 'ion-card-header', 'ion-card-title'] },
   { components: ['ion-gesture', 'ion-scroll'], priority: 'low' },
-  { components: ['ion-icon'] },
   { components: ['ion-item', 'ion-item-divider', 'ion-label', 'ion-list', 'ion-list-header', 'ion-skeleton-text'] },
   { components: ['ion-loading', 'ion-loading-controller'] },
   { components: ['ion-menu'], priority: 'low' },
