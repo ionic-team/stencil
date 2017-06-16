@@ -2,6 +2,7 @@
 /**
  * Property Types
  */
+export const TYPE_ANY = 0;
 export const TYPE_BOOLEAN = 1;
 export const TYPE_NUMBER = 2;
 

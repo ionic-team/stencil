@@ -1,4 +1,4 @@
-import { FileMeta, PropMeta } from '../interfaces';
+import { FileMeta, PropMeta, PropOptions } from '../interfaces';
 import * as ts from 'typescript';
 
 
@@ -11,11 +11,25 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
     let isProp = false;
     let propName: string = null;
     let propType: string = null;
+    let userPropOptions: PropOptions = null;
 
     memberNode.forEachChild(n => {
 
       if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Prop') {
         isProp = true;
+
+        n.getChildAt(1).forEachChild(n => {
+          if (n.kind === ts.SyntaxKind.ObjectLiteralExpression) {
+            try {
+              const fnStr = `return ${n.getText()};`;
+
+              userPropOptions = Object.assign(userPropOptions || {}, new Function(fnStr)());
+
+            } catch (e) {
+              console.log(`parse prop options: ${e}`);
+            }
+          }
+        });
 
       } else if (isProp) {
         if (n.kind === ts.SyntaxKind.Identifier && !propName) {
@@ -34,7 +48,9 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
           } else if (n.kind === ts.SyntaxKind.TypeReference) {
             propType = 'Type';
           }
+
         }
+
       }
 
     });
@@ -46,6 +62,20 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
 
       if (propType) {
         prop.propType = propType;
+      }
+
+      if (userPropOptions) {
+        if (typeof userPropOptions.type === 'string') {
+          userPropOptions.type = userPropOptions.type.toLowerCase().trim();
+          if (['string', 'boolean', 'number'].indexOf(userPropOptions.type) > -1) {
+            // user defined prop type wins of typescript
+            prop.propType = userPropOptions.type;
+          }
+        }
+
+        if (typeof userPropOptions.twoWay === 'boolean') {
+          prop.isTwoWay = !!userPropOptions.twoWay;
+        }
       }
 
       fileMeta.cmpMeta.propsMeta.push(prop);

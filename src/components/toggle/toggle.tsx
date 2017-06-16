@@ -23,11 +23,13 @@ export class Toggle implements BooleanInputComponent {
 
   @Prop() color: string;
   @Prop() mode: string;
-  @Prop() checked: boolean = false;
-  @Prop() disabled: boolean = false;
-  @Prop() value: string;
 
-  ionViewDidLoad() {
+  @Prop({ twoWay: true }) checked: boolean = false;
+  @Prop({ twoWay: true }) disabled: boolean = false;
+  @Prop({ twoWay: true }) value: string;
+
+
+  ionViewWillLoad() {
     this.emitStyle();
   }
 

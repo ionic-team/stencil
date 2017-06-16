@@ -446,7 +446,8 @@ export interface PropDecorator {
 
 
 export interface PropOptions {
-  type?: number;
+  type?: string;
+  twoWay?: boolean;
 }
 
 
@@ -455,6 +456,7 @@ export interface PropMeta {
   propType?: any;
   attribName?: string;
   attribCase?: number;
+  isTwoWay?: boolean;
 }
 
 
@@ -556,7 +558,7 @@ export interface Component {
   ionViewDidUpdate?: () => void;
   ionViewDidUnload?: () => void;
 
-  render?: () => VNode;
+  render?: () => any;
   hostData?: () => VNodeData;
 
   mode?: string;

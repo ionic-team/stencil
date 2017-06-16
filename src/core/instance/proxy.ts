@@ -32,13 +32,13 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
     for (i = 0; i < states.length; i++) {
-      initProperty(false, '', states[i], 0, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
+      initProperty(false, true, '', states[i], 0, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
     }
   }
 
   for (i = 0; i < props.length; i++) {
     // add getters/setters for @Prop()s
-    initProperty(true, props[i].attribName, props[i].propName, props[i].propType, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
+    initProperty(true, props[i].isTwoWay, props[i].attribName, props[i].propName, props[i].propType, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
   }
 }
 
@@ -53,7 +53,7 @@ function initMethod(methodName: string, elm: HostElement, instance: Component) {
 }
 
 
-function initProperty(isProp: boolean, attrName: string, propName: string, propType: number, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, elm: HostElement, watchMeta: WatchMeta[]) {
+function initProperty(isProp: boolean, isTwoWay: boolean, attrName: string, propName: string, propType: number, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, elm: HostElement, watchMeta: WatchMeta[]) {
   if (isProp) {
     // @Prop() property, so check initial value from the proxy element, instance
     // and config, before we create getters/setters on this same property name
@@ -125,10 +125,16 @@ function initProperty(isProp: boolean, attrName: string, propName: string, propT
   }
 
   function setInstanceValue(newVal: any) {
-    if (isProp) {
-      console.warn(`@Prop() "${propName}" on "${elm.tagName.toLowerCase()}" cannot be modified.`);
+    if (isTwoWay) {
+      // this is a two-way binding, mainly used for inputs
+      // so update the host element's property directly
+      // which will end up updating the proxied instance
+      elm[propName] = newVal;
+
     } else {
-      setValue(newVal);
+      // this is not a two-way binding
+      // so do not update the instance or host element
+      console.warn(`@Prop() "${propName}" on "${elm.tagName.toLowerCase()}" cannot be modified.`);
     }
   }
 

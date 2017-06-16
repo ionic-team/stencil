@@ -1,6 +1,6 @@
 import { Bundle, ComponentMeta, ManifestComponentMeta, MethodMeta, ModeMeta,
   ListenMeta, PropMeta, StateMeta, WatchMeta } from './interfaces';
-import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_BOOLEAN, PRIORITY_LOW, PRIORITY_HIGH, TYPE_NUMBER } from '../util/constants';
+import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, PRIORITY_LOW, PRIORITY_HIGH, TYPE_NUMBER } from '../util/constants';
 import * as crypto from 'crypto';
 
 
@@ -93,7 +93,6 @@ function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
       prop.attribCase = attrCase;
     }
 
-    //
     if (prop.attribCase === ATTR_LOWER_CASE) {
       formattedProp += `, ${prop.attribCase} /* lowercase attribute */`;
 
@@ -102,10 +101,19 @@ function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
     }
 
     if (prop.propType === 'boolean') {
-      formattedProp += `, ${TYPE_BOOLEAN} /* boolean props */`;
+      formattedProp += `, ${TYPE_BOOLEAN} /* boolean type */`;
 
     } else if (prop.propType === 'number') {
-      formattedProp += `, ${TYPE_NUMBER} /* number props */`;
+      formattedProp += `, ${TYPE_NUMBER} /* number type */`;
+
+    } else if (prop.isTwoWay) {
+      // if no propType data, but there is two-way data
+      // then we still need a value in this index
+      formattedProp += `, ${TYPE_ANY} /* any type */`;
+    }
+
+    if (prop.isTwoWay) {
+      formattedProp += `, 1 /* two-way prop */`;
     }
 
     formattedProps.push(prefix + `  [${formattedProp}]`);
