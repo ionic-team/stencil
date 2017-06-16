@@ -245,19 +245,15 @@ $navbar-wp-height:                       $toolbar-wp-height !default;
   pointer-events: none;
 }
 
-[icon-only] .bar-button-wp {
+.bar-button-wp ion-icon[slot="icon-only"] {
   @include padding(0);
 
-  ion-icon {
-    @include padding(0, .1em);
+  min-width: 28px;
 
-    min-width: 28px;
+  font-size: 1.8em;
+  line-height: .67;
 
-    font-size: 1.8em;
-    line-height: .67;
-
-    pointer-events: none;
-  }
+  pointer-events: none;
 }
 
 

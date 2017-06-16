@@ -257,14 +257,8 @@ $navbar-ios-height:                         $toolbar-ios-height !default;
   pointer-events: none;
 }
 
-[icon-only] .bar-button-ios {
+.bar-button-ios ion-icon[slot="icon-only"] {
   @include padding(0);
-
-  min-width: .9em;
-}
-
-[icon-only] .bar-button-ios ion-icon {
-  @include padding(0, .1em);
 
   font-size: 1.8em;
   line-height: .67;

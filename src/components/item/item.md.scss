@@ -159,9 +159,8 @@ $item-md-sliding-content-background: $list-md-background-color !default;
   font-size: 1.2rem;
 }
 
-.item-md [icon-only] .item-button ion-icon,
-.item-md [icon-only] .item-button {
-  @include padding(0, 1px);
+.item-md .item-button ion-icon[slot="icon-only"] {
+  @include padding(0);
 }
 
 .item-md ion-icon[slot="start"] + .item-inner,

@@ -19,16 +19,16 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only>
-            <ion-icon name="contact"></ion-icon>
+          <ion-button>
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
-          <ion-button icon-only>
-            <ion-icon name="search"></ion-icon>
+          <ion-button>
+            <ion-icon slot="icon-only" name="search"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only color="secondary">
-            <ion-icon name="more"></ion-icon>
+          <ion-button color="secondary">
+            <ion-icon slot="icon-only" name="more"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>This is a long title with buttons. It just goes on and on my friend.</ion-title>
@@ -39,13 +39,13 @@
           <ion-button class="closeButton" clear>
             Close
           </ion-button>
-          <ion-button icon-only>
-            <ion-icon name="search"></ion-icon>
+          <ion-button>
+            <ion-icon slot="icon-only" name="search"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only color="secondary">
-            <ion-icon name="more"></ion-icon>
+          <ion-button color="secondary">
+            <ion-icon slot="icon-only" name="more"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>This is a long title with buttons. It just goes on and on my friend.</ion-title>
@@ -53,16 +53,16 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only>
-            <ion-icon name="contact"></ion-icon>
+          <ion-button>
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
-          <ion-button icon-only>
-            <ion-icon name="search"></ion-icon>
+          <ion-button>
+            <ion-icon slot="icon-only" name="search"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only color="secondary">
-            <ion-icon name="more"></ion-icon>
+          <ion-button color="secondary">
+            <ion-icon slot="icon-only" name="more"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Defaults</ion-title>
@@ -70,16 +70,16 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only class="activated">
-            <ion-icon name="contact"></ion-icon>
+          <ion-button class="activated">
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
-          <ion-button icon-only class="activated">
-            <ion-icon name="search"></ion-icon>
+          <ion-button class="activated">
+            <ion-icon slot="icon-only" name="search"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only color="secondary" class="activated">
-            <ion-icon name="more"></ion-icon>
+          <ion-button color="secondary" class="activated">
+            <ion-icon slot="icon-only" name="more"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Defaults.activated</ion-title>
@@ -87,8 +87,8 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only solid>
-            <ion-icon name="contact"></ion-icon>
+          <ion-button solid>
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
           <ion-button solid>
             <ion-icon name="contact" slot="start"></ion-icon>
@@ -106,8 +106,8 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only solid class="activated">
-            <ion-icon name="contact"></ion-icon>
+          <ion-button solid class="activated">
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
           <ion-button solid class="activated">
             <ion-icon name="contact" slot="start"></ion-icon>
@@ -125,8 +125,8 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only outline>
-            <ion-icon name="contact"></ion-icon>
+          <ion-button outline>
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
           <ion-button outline>
             <ion-icon name="star" slot="start"></ion-icon>
@@ -134,8 +134,8 @@
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only color="secondary" outline>
-            <ion-icon name="contact"></ion-icon>
+          <ion-button color="secondary" outline>
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Outline</ion-title>
@@ -143,8 +143,8 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only outline class="activated">
-            <ion-icon name="contact"></ion-icon>
+          <ion-button outline class="activated">
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
           <ion-button outline class="activated">
             <ion-icon name="star" slot="start"></ion-icon>
@@ -152,8 +152,8 @@
           </ion-button>
         </ion-buttons>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only color="secondary" outline class="activated">
-            <ion-icon name="contact"></ion-icon>
+          <ion-button color="secondary" outline class="activated">
+            <ion-icon slot="icon-only" name="contact"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Outline.activated</ion-title>
@@ -194,8 +194,8 @@
           <ion-icon name="menu"></ion-icon>
         </ion-button>
         <ion-buttons slot="mode-start">
-          <ion-button icon-only>
-            <ion-icon name="star"></ion-icon>
+          <ion-button>
+            <ion-icon slot="icon-only" name="star"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Left side menu toggle</ion-title>
@@ -203,8 +203,8 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only #button1 (click)="buttonClick(button1)">
-            <ion-icon name="star"></ion-icon>
+          <ion-button #button1 (click)="buttonClick(button1)">
+            <ion-icon slot="icon-only" name="star"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-title>Right side menu toggle</ion-title>
@@ -215,8 +215,8 @@
 
       <ion-toolbar>
         <ion-buttons slot="mode-end">
-          <ion-button icon-only #button2 (click)="buttonClick(button2)">
-            <ion-icon name="search"></ion-icon>
+          <ion-button #button2 (click)="buttonClick(button2)">
+            <ion-icon slot="icon-only" name="search"></ion-icon>
           </ion-button>
         </ion-buttons>
         <ion-segment color="secondary">

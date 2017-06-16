@@ -300,12 +300,8 @@ $navbar-md-height:                       $toolbar-md-height !default;
   pointer-events: none;
 }
 
-[icon-only] .bar-button-md {
+.bar-button-md ion-icon[slot="icon-only"] {
   @include padding(0);
-}
-
-[icon-only] .bar-button-md ion-icon {
-  @include padding(0, .1em);
 
   min-width: 28px;
 

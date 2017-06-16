@@ -17,8 +17,8 @@ export class CommentsPage {
     return [
       <ion-header>
         <ion-toolbar color='primary'>
-          <ion-button class='close-button' clear icon-only slot='start' on-click={this.close.bind(this)}>
-            <ion-icon name='close' style={{ color: 'white'}} />
+          <ion-button class='close-button' clear slot='start' on-click={this.close.bind(this)}>
+            <ion-icon slot='icon-only' name='close' style={{ color: 'white'}} />
           </ion-button>
           <ion-title class='comments-title' slot='end'>
             Comments
