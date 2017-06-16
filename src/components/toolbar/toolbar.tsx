@@ -1,6 +1,6 @@
 import { Component, h, Ionic } from '../index';
-import { VNodeData } from '../../util/interfaces';
 import { createThemedClasses } from '../../util/theme';
+import { VNodeData } from '../../util/interfaces';
 
 
 /**
@@ -99,19 +99,16 @@ import { createThemedClasses } from '../../util/theme';
     wp: 'toolbar.wp.scss'
   },
   host: {
-    theme: 'toolbar'
+    theme: 'toolbar',
+    class: {
+      'statusbar-padding': Ionic.config.getBoolean('statusbarPadding')
+    }
   }
 })
 export class Toolbar {
   $el: HTMLElement;
-  private sbPadding: boolean;
-
   mode: string;
   color: string;
-
-  constructor() {
-    this.sbPadding = Ionic.config.getBoolean('statusbarPadding');
-  }
 
   ionViewWillLoad() {
     // Add bar-button classes to each ion-button in the toolbar
@@ -121,25 +118,17 @@ export class Toolbar {
     }
   }
 
-  hostData(): VNodeData {
-    return {
-      class: {
-        'statusbar-padding': this.sbPadding
-      }
-    };
-  }
-
   render() {
-    const backgroundClasses = createThemedClasses(this.mode, this.color, 'toolbar-background');
-    const contentClasses = createThemedClasses(this.mode, this.color, 'toolbar-content');
+    const backgroundCss = createThemedClasses(this.mode, this.color, 'toolbar-background');
+    const contentCss = createThemedClasses(this.mode, this.color, 'toolbar-content');
 
     return [
-      <div class={backgroundClasses}></div>,
+      <div class={backgroundCss}></div>,
       <slot name='start'></slot>,
       <slot name='mode-start'></slot>,
       <slot name='mode-end'></slot>,
       <slot name='end'></slot>,
-      <div class={contentClasses}>
+      <div class={contentCss}>
         <slot></slot>
       </div>
     ];
