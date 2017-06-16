@@ -57,14 +57,6 @@ export class Navbar {
   @Prop() hidden: boolean = false;
 
 
-  ionViewWillLoad() {
-    // Add bar-button classes to each ion-button in the toolbar
-    const buttons = this.$el.querySelectorAll('ion-button') as any;
-    for (var i = 0; i < buttons.length; i++) {
-      buttons[i].setAttribute('button-type', 'bar-button');
-    }
-  }
-
   backButtonClick(ev: UIEvent) {
     ev.preventDefault();
     ev.stopPropagation();
