@@ -113,7 +113,7 @@ export class Toolbar {
     this.sbPadding = Ionic.config.getBoolean('statusbarPadding');
   }
 
-  ionViewDidLoad() {
+  ionViewWillLoad() {
     // Add bar-button classes to each ion-button in the toolbar
     const buttons = this.$el.querySelectorAll('ion-button') as any;
     for (var i = 0; i < buttons.length; i++) {
