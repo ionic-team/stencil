@@ -1,5 +1,6 @@
 import { Component, h, Ionic, Prop } from '../index';
 import { createThemedClasses } from '../../util/theme';
+import { VNodeData } from '../../util/interfaces';
 
 
 /**
@@ -41,10 +42,7 @@ import { createThemedClasses } from '../../util/theme';
 @Component({
   tag: 'ion-navbar',
   host: {
-    theme: 'toolbar',
-    class: {
-      'statusbar-padding': Ionic.config.getBoolean('statusbarPadding')
-    }
+    theme: 'toolbar'
   }
 })
 export class Navbar {
@@ -72,6 +70,14 @@ export class Navbar {
     ev.stopPropagation();
 
     console.log('back button click');
+  }
+
+  hostData(): VNodeData {
+    return {
+      class: {
+        'statusbar-padding': Ionic.config.getBoolean('statusbarPadding')
+      }
+    };
   }
 
   render() {

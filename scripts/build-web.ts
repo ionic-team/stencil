@@ -31,7 +31,6 @@ const BUNDLES = [
   { components: ['ion-slides', 'ion-slide'] },
   { components: ['ion-spinner'] },
   { components: ['ion-toggle'] },
-
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
   { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] }
 ];

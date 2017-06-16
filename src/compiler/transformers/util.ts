@@ -73,11 +73,6 @@ export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpressio
 }
 
 
-export function createEmptyArg() {
-  return ts.createNumericLiteral('0');
-}
-
-
 export function isEmptyArgs(arg: any) {
   return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';
 }

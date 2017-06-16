@@ -1,7 +1,6 @@
 import { createThemedClasses } from '../../util/theme';
-import { HostElement, PlatformApi } from '../../util/interfaces';
-import { isArray } from '../../util/helpers';
 import { h } from '../renderer/h';
+import { HostElement, PlatformApi } from '../../util/interfaces';
 import { VNode as VNodeObj } from '../renderer/vnode';
 
 

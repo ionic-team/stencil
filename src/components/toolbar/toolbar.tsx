@@ -99,10 +99,7 @@ import { VNodeData } from '../../util/interfaces';
     wp: 'toolbar.wp.scss'
   },
   host: {
-    theme: 'toolbar',
-    class: {
-      'statusbar-padding': Ionic.config.getBoolean('statusbarPadding')
-    }
+    theme: 'toolbar'
   }
 })
 export class Toolbar {
@@ -116,6 +113,14 @@ export class Toolbar {
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].setAttribute('button-type', 'bar-button');
     }
+  }
+
+  hostData(): VNodeData {
+    return {
+      class: {
+        'statusbar-padding': Ionic.config.getBoolean('statusbarPadding')
+      }
+    };
   }
 
   render() {
