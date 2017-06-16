@@ -20,23 +20,23 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
   // it off and generate the child vnodes for this host element
   // note that we do not create the host element cuz it already exists
   const vnodeChildren = instance.render && instance.render();
-
   let vnodeHostData: any = instance.hostData && instance.hostData();
-  if (cmpMeta.hostMeta) {
-    vnodeHostData = Object.keys(cmpMeta.hostMeta).reduce((hostData, key) => {
-      switch (key) {
-      case 'theme':
-        hostData['class'] = hostData['class'] || {};
-        hostData['class'] = Object.assign(
-          hostData['class'],
-          createThemedClasses(instance.mode, instance.color, cmpMeta.hostMeta['theme']),
-        );
-      }
-      return hostData;
-    }, vnodeHostData || {});
-  }
+  const hostMeta = cmpMeta.hostMeta;
 
-  if (vnodeChildren || vnodeHostData) {
+  if (vnodeChildren || vnodeHostData || hostMeta) {
+    if (hostMeta) {
+      vnodeHostData = Object.keys(hostMeta).reduce((hostData, key) => {
+        switch (key) {
+        case 'theme':
+          hostData['class'] = hostData['class'] || {};
+          hostData['class'] = Object.assign(
+            hostData['class'],
+            createThemedClasses(instance.mode, instance.color, hostMeta['theme']),
+          );
+        }
+        return hostData;
+      }, vnodeHostData || {});
+    }
     // looks like we've got child nodes to render into this host element
     // or we need to update the css class/attrs on the host element
 
@@ -45,8 +45,10 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
     let oldVNode = elm._vnode || new VNodeObj();
     oldVNode.elm = elm;
 
+    // normalize host data keys to abbr. key
     vnodeHostData.a = vnodeHostData['attrs'];
     vnodeHostData.c = vnodeHostData['class'];
+    vnodeHostData.s = vnodeHostData['style'];
 
     // each patch always gets a new vnode
     // the host element itself isn't patched because it already exists
