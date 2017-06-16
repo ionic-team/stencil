@@ -5,8 +5,6 @@ import { VNodeData } from '../../util/interfaces';
   tag: 'fiber-dot'
 })
 export class FiberDot {
-  $el: HTMLElement;
-
   @Prop() size: number;
   @Prop() x: number;
   @Prop() y: number;
@@ -49,7 +47,7 @@ export class FiberDot {
 
   render() {
     return (
-      this.hover ? '*' + this.text + '*' : this.text
+      this.hover ? '**' + this.text + '**' : this.text
     );
   }
 }

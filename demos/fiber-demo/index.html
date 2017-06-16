@@ -2,7 +2,7 @@
 <html style="width: 100%; height: 100%; overflow: hidden">
   <head>
     <meta charset="utf-8">
-    <title>Ionic Example</title>
+    <title>Ionic Perf Demo</title>
     <script src="/dist/ionic-web/ionic.js"></script>
     <style>
       body {
@@ -15,7 +15,7 @@
       }
 
       a {
-        color: #4183c4;
+        color: #4a8bfc;
         text-decoration: none;
       }
 
@@ -23,67 +23,37 @@
         text-decoration: underline;
       }
 
-      code {
-        background-color: #f8f8f8;
-        border: 1px solid #ddd;
-        border-radius: 3px;
-        font-family: "Bitstream Vera Sans Mono", Consolas, Courier, monospace;
-        font-size: 12px;
-        margin: 0 2px;
-        padding: 0px 5px;
-      }
-
-      h1, h2, h3, h4 {
-        font-weight: bold;
-        margin: 0 0 15px;
-        padding: 0;
-      }
-
       h1 {
         border-bottom: 1px solid #ddd;
-        font-size: 2.5em;
+        font-size: 2.0em;
         font-weight: bold;
         margin: 0 0 15px;
         padding: 0;
       }
 
-      h2 {
-        border-bottom: 1px solid #eee;
-        font-size: 2em;
+      .demo {
+        font-weight: 500;
+        text-decoration: underline;
       }
 
-      h3 {
-        font-size: 1.5em;
-      }
-
-      h4 {
-        font-size: 1.2em;
-      }
-
-      p, ul {
-        margin: 15px 0;
-      }
-
-      ul {
-        padding-left: 30px;
+      .demo:hover {
+        color: #317bfc;
+        text-decoration: none;
       }
     </style>
   </head>
   <body>
-    <h1>Ionic Example</h1>
+    <h1>Ionic Perf Demo</h1>
+    <p>
+      The goal of this demo is to show smooth animations while at
+      the same time updating 729 text nodes every second. Only one property
+      is updated at the root node, which is then passed down through over
+      1,700 nodes every second. Additionally, user interactions, such as
+      mouseenter and mouseleave, take precedence, yet should not interfer with
+      animations and node updates. This demo was adopted from the
+      <a href="https://claudiopro.github.io/react-fiber-vs-stack-demo/">React Fiber demo</a>.
+    </p>
 
-    <fiber-demo></fiber-demo>
-
-    <script type="text/javascript">
-      var start = Date.now();
-      var baseEl = document.querySelector('fiber-demo');
-
-      function update() {
-        baseEl.elapsed = Date.now() - start;
-        requestAnimationFrame(update);
-      }
-
-      requestAnimationFrame(update);
-    </script>
+    <a class="demo" href="perf.html">Show Demo</a>
   </body>
 </html>

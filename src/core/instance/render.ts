@@ -49,6 +49,7 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
     vnodeHostData.a = vnodeHostData['attrs'];
     vnodeHostData.c = vnodeHostData['class'];
     vnodeHostData.s = vnodeHostData['style'];
+    vnodeHostData.o = vnodeHostData['on'];
 
     // each patch always gets a new vnode
     // the host element itself isn't patched because it already exists
