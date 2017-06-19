@@ -12,9 +12,9 @@
     "noUnusedParameters": true,
     "removeComments": false,
     "sourceMap": false,
-    "outDir": "../../../dist/transpiled-universal"
+    "outDir": "../../../dist/transpiled-ssr"
   },
   "include": [
-    "src/**/*.ts"
+    "src/index.ts"
   ]
 }

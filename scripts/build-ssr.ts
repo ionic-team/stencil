@@ -1,6 +1,5 @@
 /**
- * Build Universal:
- * Bundles up the universal into a single JS file.
+ * Build Server Renderer
  */
 
 import * as path from 'path';
@@ -8,9 +7,9 @@ import * as fs from 'fs-extra';
 const rollup = require('rollup');
 
 
-const SRC_DIR = path.join(__dirname, '../transpiled-universal');
-const ENTRY_FILE = path.join(__dirname, '../transpiled-universal/bindings/universal/src/index.js');
-const DEST_DIR = path.join(__dirname, '../ionic-universal');
+const SRC_DIR = path.join(__dirname, '../transpiled-ssr');
+const ENTRY_FILE = path.join(__dirname, '../transpiled-ssr/bindings/server-renderer/src/index.js');
+const DEST_DIR = path.join(__dirname, '../stencil-server-renderer');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 

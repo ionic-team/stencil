@@ -160,7 +160,7 @@ export function createPlatformServer(sys: StencilSystem, IonicGbl: IonicGlobal, 
         sys.fs.readFile(filePath, 'utf-8', (err, code) => {
           if (err) {
             console.error(`loadBundle: ${bundleId}, ${err}`);
-            err.stack && console.error(err.stack);
+            throw err;
 
           } else {
             // run the code in this sandboxed context

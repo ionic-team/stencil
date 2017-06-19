@@ -1,21 +1,17 @@
 var express = require('express');
 var app = express();
-var ionicUniversal = require('../../dist/ionic-universal');
 var fs = require('fs');
 var path = require('path');
 
 
-var ionicServerConfig = {
-  staticDir: path.join('../../dist/ionic-web')
-}
-
-console.log('load components from:', ionicServerConfig.staticDir);
-
-
-var ionic = ionicUniversal.init(ionicServerConfig);
+var stencil = require('../../dist/stencil-server-renderer');
+var renderer = stencil.createRenderer({
+  staticDir: path.join('../../dist/ionic-web'),
+  debug: true
+});
 
 
-app.get('/', function (req, res) {
+app.get('/', function (req, res, next) {
   console.log(`serve: ${req.url}`);
 
   var filePath = path.join(__dirname, '../vanilla/index.html');
@@ -27,16 +23,16 @@ app.get('/', function (req, res) {
       return;
     }
 
-    var opts = {
-      req: req
-    };
-
-    ionic.hydrate(html, opts).then(hydratedHtml => {
-      res.send(hydratedHtml);
-
-    }).catch(err => {
-      res.send(err.toString() + err.stack && err.stack.toString());
-    });
+    renderer.hydrateToString(
+      {
+        html: html,
+        req: req,
+        config: {}
+      },
+      function(err, html) {
+        res.send(html);
+      }
+    );
   });
 
 });

@@ -17,8 +17,10 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     },
     config: ConfigCtrl,
     dom: DomCtrl,
-    controller: serverController
+    controller: serverController,
   };
+
+  (<IonicGlobal>injectedIonic).controllers = {};
 
   function serverController(ctrlName: string, opts?: any) {
     const promise: any = new Promise((resolve, reject) => {
