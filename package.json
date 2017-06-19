@@ -57,7 +57,7 @@
     "swiper": "^3.4.2",
     "tslint": "^5.1.0",
     "tslint-ionic-rules": "0.0.8",
-    "typescript": "next",
+    "typescript": "2.4.0",
     "xmlhttprequest": "^1.8.0"
   },
   "jest": {
