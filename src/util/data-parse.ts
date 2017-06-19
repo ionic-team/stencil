@@ -25,7 +25,6 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   cmpMeta.componentModuleMeta = moduleImports[cmpMeta.tagNameMeta];
 
   // map of the modes w/ bundle id and style data
-  cmpMeta.modesMeta = cmpData[1];
   Object.keys(cmpData[1]).forEach(modeName => {
     cmpMeta.modesMeta[modeName] = cmpData[1][modeName];
   });
