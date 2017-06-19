@@ -33,11 +33,11 @@ export class NewsContainer {
     return new Promise((resolve, reject) => {
       const request = new XMLHttpRequest();
 
-      request.addEventListener('load', function() {
+      request.addEventListener('load', function () {
         resolve(JSON.parse(this.responseText));
       });
 
-      request.addEventListener('error', function() {
+      request.addEventListener('error', function () {
         reject(`error: ${this.statusText} / ${this.status}`);
       });
 
@@ -147,7 +147,7 @@ export class NewsContainer {
     return [
       <ion-header mdHeight='56px' iosHeight='61px'>
         <ion-toolbar color='primary'>
-          <ion-icon class='header-icon' name='ionic' slot='start'></ion-icon>
+          <img class='ionic-icon' src='ionic.svg' alt='ionic'></img>
 
           <div class='tabs-bar'>
             <ion-button

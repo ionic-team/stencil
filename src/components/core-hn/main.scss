@@ -54,10 +54,6 @@ ion-footer ion-toolbar {
   padding-bottom: 5px;
 }
 
-.first-button {
-  margin-left: 12px;
-}
-
 .comments-title {
   line-height: 2.1;
 }
@@ -92,4 +88,10 @@ ion-footer ion-toolbar {
   color: white;
   font-size: 2.3rem;
   margin-left: 15px;
+}
+
+.ionic-icon {
+  height: 40px;
+  float: left;
+  margin-left: 10px;
 }
