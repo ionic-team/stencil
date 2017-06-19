@@ -57,8 +57,8 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
   fileMeta.cmpMeta.listenersMeta = fileMeta.cmpMeta.listenersMeta.sort((a, b) => {
     if (a.eventName < b.eventName) return -1;
     if (a.eventName > b.eventName) return 1;
-    if (a.methodName < b.methodName) return -1;
-    if (a.methodName > b.methodName) return 1;
+    if (a.eventMethod < b.eventMethod) return -1;
+    if (a.eventMethod > b.eventMethod) return 1;
     return 0;
   });
 }
@@ -95,35 +95,35 @@ function validateListener(fileMeta: FileMeta, eventName: string, rawListenMeta: 
   const listener: ListenMeta = Object.assign({}, rawListenMeta);
 
   listener.eventName = eventName;
-  listener.methodName = methodName;
+  listener.eventMethod = methodName;
 
-  if (listener.capture === undefined) {
+  if (listener.eventCapture === undefined) {
     // default to not use capture if it wasn't provided
-    listener.capture = false;
+    listener.eventCapture = false;
   }
-  listener.capture = !!listener.capture;
+  listener.eventCapture = !!listener.eventCapture;
 
-  if (listener.passive === undefined) {
+  if (listener.eventPassive === undefined) {
     // they didn't set if it should be passive or not
     // so let's figure out some good defaults depending
     // on what type of event this is
 
     if (PASSIVE_TRUE_DEFAULTS.indexOf(rawEventName.toLowerCase()) > -1) {
       // good list of known events that we should default to passive
-      listener.passive = true;
+      listener.eventPassive = true;
 
     } else {
       // play it safe and have all others default to NOT be passive
-      listener.passive = false;
+      listener.eventPassive = false;
     }
   }
-  listener.passive = !!listener.passive;
+  listener.eventPassive = !!listener.eventPassive;
 
-  if (listener.enabled === undefined) {
+  if (listener.eventEnabled === undefined) {
     // default to enabled if it wasn't provided
-    listener.enabled = true;
+    listener.eventEnabled = true;
   }
-  listener.enabled = !!listener.enabled;
+  listener.eventEnabled = !!listener.eventEnabled;
 
   fileMeta.cmpMeta.listenersMeta.push(listener);
 

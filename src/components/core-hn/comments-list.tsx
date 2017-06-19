@@ -1,8 +1,8 @@
-import { Component, Prop, h } from '../index';
+import { Component, h, Prop } from '../index';
+
 
 @Component({
-  tag: 'comments-list',
-  styleUrls: 'main.scss'
+  tag: 'comments-list'
 })
 export class CommentsList {
 

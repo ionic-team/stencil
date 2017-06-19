@@ -30,8 +30,8 @@ export interface IonicControllerApi {
 
 export interface IonicGlobal {
   staticDir?: string;
-  components?: LoadComponentData[];
-  defineComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: ComponentModeData, cmp1?: ComponentModeData, cmp2?: ComponentModeData) => void;
+  components?: LoadComponentMeta[];
+  defineComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
   eventNameFn?: (eventName: string) => string;
   config?: Object;
   loadController?: (ctrlName: string, ctrl: any) => any;
@@ -273,7 +273,7 @@ export interface DomControllerCallback {
 }
 
 
-export interface LoadComponentData {
+export interface LoadComponentMeta {
   /**
    * tag name (ion-badge)
    */
@@ -283,105 +283,77 @@ export interface LoadComponentData {
    * map of the modes and bundle ids
    */
   [1]: {
-    [modeCode: string]: string;
+    [modeName: string]: {
+      /**
+       * bundleId
+       */
+      [0]: string;
+
+      /**
+       * styles
+       */
+      [1]: string;
+    }
   };
 
   /**
-   * slot meta
-   */
-  [2]: number;
-
-  /**
    * props
    */
-  [3]: any[];
+  [2]: any[];
 
   /**
-   * bundle priority
+   * slot
    */
-  [4]: LoadPriority;
-}
-
-
-export type LoadPriority = number;
-
-
-export interface Bundle {
-  id?: string;
-  components?: BundleComponent[];
-  bundledJsModules?: string;
-  content?: string;
-  fileName?: string;
-  filePath?: string;
-  priority?: number;
-}
-
-
-export interface BundleComponent {
-  component: ManifestComponentMeta;
-  modeName: string;
-  modeMeta: ModeMeta;
-}
-
-
-export interface ManifestComponentMeta extends ComponentMeta {
-  componentClass: string;
-  componentUrl: string;
-}
-
-
-export interface ComponentModeData {
-  /**
-   * tag name (ion-badge)
-   */
-  [0]: string;
-
-  /**
-   * props
-   */
-  [1]: any[][];
-
-  /**
-   * methods
-   */
-  [2]: MethodMeta[];
-
-  /**
-   * states
-   */
-  [3]: StateMeta[];
-
-  /**
-   * listeners
-   */
-  [4]: ComponentListenersData[];
-
-  /**
-   * watchers
-   */
-  [5]: ComponentWatchersData[];
-
-  /**
-   * shadow
-   */
-  [6]: boolean;
+  [3]: number;
 
   /**
    * host
    */
-  [7]: any;
+  [4]: any;
 
   /**
-   * mode code, which is a number that'll
-   * map to a mode name later (ios, md, wp)
+   * listeners
    */
-  [8]: number;
-
+  [5]: ComponentListenersData[];
 
   /**
-   * component mode styles
+   * states
    */
-  [9]: string;
+  [6]: StateMeta[];
+
+  /**
+   * watchers
+   */
+  [7]: ComponentWatchersData[];
+
+  /**
+   * methods
+   */
+  [8]: MethodMeta[];
+
+  /**
+   * shadow
+   */
+  [9]: boolean;
+}
+
+
+export interface Bundle {
+  id?: string;
+  components?: ComponentMeta[];
+  modeName?: string;
+  bundledJsModules?: string;
+  content?: string;
+  fileName?: string;
+  filePath?: string;
+}
+
+
+export interface FormatComponentDataOptions {
+  defaultAttrCase?: number;
+  minimumData?: boolean;
+  onlyIncludeModeName?: string;
+  includeStyles?: boolean;
 }
 
 
@@ -431,6 +403,7 @@ export interface ComponentDecorator {
 export interface ComponentOptions {
   tag: string;
   styleUrls?: string | string[] | ModeStyles;
+  styles?: string | string[];
   shadow?: boolean;
   host?: HostMeta;
 }
@@ -453,7 +426,7 @@ export interface PropOptions {
 
 export interface PropMeta {
   propName?: string;
-  propType?: any;
+  propType?: number;
   attribName?: string;
   attribCase?: number;
   isTwoWay?: boolean;
@@ -484,8 +457,12 @@ export interface ListenOptions {
 }
 
 
-export interface ListenMeta extends ListenOptions {
-  methodName?: string;
+export interface ListenMeta {
+  eventMethod?: string;
+  eventName?: string;
+  eventCapture?: boolean;
+  eventPassive?: boolean;
+  eventEnabled?: boolean;
 }
 
 
@@ -532,24 +509,50 @@ export interface ComponentMeta {
   listenersMeta?: ListenMeta[];
   watchersMeta?: WatchMeta[];
   statesMeta?: StateMeta[];
-  modesMeta?: {[modeCode: string]: ModeMeta};
+  modesMeta?: ModesMeta;
+  modesStyleMeta?: ModesStyleMeta;
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;
   slotMeta?: number;
   componentModuleMeta?: any;
-  priorityMeta?: LoadPriority;
+  componentClass?: string;
+  componentUrl?: string;
+}
+
+
+export interface ModesMeta {
+  [modeName: string]: ModeMeta;
+}
+
+
+export interface ModesStyleMeta {
+  [modeName: string]: ModeStyleMeta;
+}
+
+
+export interface ModeStyleMeta {
+  styleUrls?: string[];
+  styles?: string[];
 }
 
 
 export interface ModeMeta {
-  bundleId?: string;
-  styles?: string;
-  styleUrls?: string[];
+  /**
+   * bundleId
+   */
+  [0]?: string;
+
+  /**
+   * styles
+   */
+  [1]?: string;
 }
+
 
 export interface HostMeta {
   [key: string]: any;
 }
+
 
 export interface Component {
   ionViewWillLoad?: () => void;
@@ -668,7 +671,7 @@ export interface DomApi {
   $getTextContent(node: any): string;
   $setTextContent(node: Node, text: string): void;
   $getAttribute(elm: any, key: string): string;
-  $setAttribute(elm: any, key: string, val: string): void;
+  $setAttribute(elm: any, key: string, val: any): void;
   $setAttributeNS(elm: any, namespaceURI: string, qualifiedName: string, value: string): void;
   $removeAttribute(elm: any, key: string): void;
 }
@@ -766,10 +769,10 @@ export interface VNodeProdData {
 
 
 export interface PlatformApi {
-  registerComponents: (components?: LoadComponentData[]) => ComponentMeta[];
+  registerComponents?: (components?: LoadComponentMeta[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
-  loadBundle: (bundleId: string, priority: LoadPriority, cb: Function) => void;
+  loadBundle: (bundleId: string, cb: Function) => void;
   render?: RendererApi;
   config: ConfigApi;
   collectHostContent: (elm: HostElement, slotMeta: number) => void;
@@ -782,44 +785,14 @@ export interface PlatformApi {
   hasAppLoaded?: boolean;
   appLoaded: () => void;
   tmpDisconnected?: boolean;
-  onReady?: Promise<any>;
+  onAppLoad?: (rootElm: HostElement) => void;
 }
+
 
 export interface PlatformConfig {
   name: string;
   isMatch?: {(url: string, userAgent: string): boolean};
   settings?: any;
-}
-
-
-export interface ServerInitConfig {
-  staticDir: string;
-  sys?: UniversalSys;
-  config?: Object;
-}
-
-export interface HydrateConfig {
-  req?: any;
-  url?: string;
-  referrer?: string;
-  userAgent?: string;
-  cookie?: string;
-  config?: Object;
-}
-
-
-export interface UniversalSys {
-  fs?: {
-    readdirSync?(path: string | Buffer): string[];
-    readFileSync?(filename: string, encoding: string): string;
-    statSync?(path: string | Buffer): {
-      isDirectory?(): boolean;
-    }
-  };
-  path?: {
-    join?: (...paths: string[]) => string;
-  };
-  isValidComponent?: (fileName: string) => boolean;
 }
 
 
@@ -917,4 +890,52 @@ export interface IdleOptions {
 
 export interface BundleCallbacks {
   [bundleId: string]: Function[];
+}
+
+
+export interface StencilSystem {
+  fs?: {
+    readFile(filename: string, encoding: string, callback: (err: NodeJS.ErrnoException, data: string) => void): void;
+    readFileSync(filename: string, encoding: string): string;
+    readdirSync(path: string | Buffer, options?: string | {}): string[];
+    statSync(path: string | Buffer): {
+      isFile(): boolean;
+      isDirectory(): boolean;
+    };
+  };
+  path?: {
+    join(...paths: string[]): string;
+  };
+  vm?: {
+    createContext(sandbox?: any): any;
+    runInContext(code: string, contextifiedSandbox: any, options?: any): any;
+  };
+  createDom?(): {
+    parse(hydrateOptions: HydrateOptions): Window;
+    serialize(): string;
+  };
+}
+
+
+export interface RendererOptions {
+  registry?: ComponentRegistry;
+  staticDir?: string;
+  debug?: boolean;
+  sys?: StencilSystem;
+}
+
+
+export interface HydrateOptions {
+  req?: {
+    protocol: string;
+    get: (key: string) => string;
+    originalUrl: string;
+    url: string;
+  };
+  html?: string;
+  url?: string;
+  referrer?: string;
+  userAgent?: string;
+  cookie?: string;
+  config?: Object;
 }

@@ -1,4 +1,5 @@
 import { FileMeta, PropMeta, PropOptions } from '../interfaces';
+import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -10,7 +11,7 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
   decoratedMembers.forEach(memberNode => {
     let isProp = false;
     let propName: string = null;
-    let propType: string = null;
+    let propType: number = null;
     let userPropOptions: PropOptions = null;
 
     memberNode.forEachChild(n => {
@@ -37,18 +38,11 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
 
         } else if (!propType) {
           if (n.kind === ts.SyntaxKind.BooleanKeyword) {
-            propType = 'boolean';
-
-          } else if (n.kind === ts.SyntaxKind.StringKeyword) {
-            propType = 'string';
+            propType = TYPE_BOOLEAN;
 
           } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
-            propType = 'number';
-
-          } else if (n.kind === ts.SyntaxKind.TypeReference) {
-            propType = 'Type';
+            propType = TYPE_NUMBER;
           }
-
         }
 
       }
@@ -67,9 +61,12 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
       if (userPropOptions) {
         if (typeof userPropOptions.type === 'string') {
           userPropOptions.type = userPropOptions.type.toLowerCase().trim();
-          if (['string', 'boolean', 'number'].indexOf(userPropOptions.type) > -1) {
-            // user defined prop type wins of typescript
-            prop.propType = userPropOptions.type;
+
+          if (userPropOptions.type === 'boolean') {
+            prop.propType = TYPE_BOOLEAN;
+
+          } else if (userPropOptions.type === 'number') {
+            prop.propType = TYPE_NUMBER;
           }
         }
 
@@ -90,3 +87,4 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
     return 0;
   });
 }
+

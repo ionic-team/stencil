@@ -1,4 +1,5 @@
 import { ComponentMeta, ComponentOptions } from '../interfaces';
+import { normalizeStyles, normalizeStyleUrls } from './mode-styles';
 import * as ts from 'typescript';
 
 
@@ -43,10 +44,9 @@ function parseComponentMetaData(text: string): ComponentMeta {
     // convert user component options from user into component meta
     const cmpMeta: ComponentMeta = {};
 
-    cmpMeta.modesMeta = {};
-
     normalizeTag(userOpts, cmpMeta, text);
     normalizeStyles(userOpts, cmpMeta);
+    normalizeStyleUrls(userOpts, cmpMeta);
     normalizeModes(cmpMeta);
     normalizeShadow(userOpts, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
@@ -55,6 +55,7 @@ function parseComponentMetaData(text: string): ComponentMeta {
 
   } catch (e) {
     console.log(`parseComponentMetaData: ${e}`);
+    e.stack && console.error(e.stack);
     console.log(text);
   }
   return null;
@@ -107,91 +108,20 @@ function normalizeTag(userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgTex
 }
 
 
-function normalizeStyles(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
-  if (!userOpts.styleUrls) {
-    return;
-  }
-
-  // normalize the possible styleUrl structures
-
-  if (typeof userOpts.styleUrls === 'string') {
-    // as a string
-    // styleUrls: 'my-styles.scss'
-
-    if (!userOpts.styleUrls.trim().length) {
-      throw `invalid style url for ${cmpMeta.tagNameMeta}: ${userOpts.styleUrls}`;
-    }
-
-    cmpMeta.modesMeta['default'] = {
-      styleUrls: [userOpts.styleUrls.trim()]
-    };
-
-  } else if (Array.isArray(userOpts.styleUrls)) {
-    // as an array of strings
-    // styleUrls: ['my-styles.scss', 'my-other-styles']
-
-    cmpMeta.modesMeta['default'] = {
-      styleUrls: []
-    };
-
-    userOpts.styleUrls.forEach(styleUrl => {
-      if (styleUrl && typeof styleUrl === 'string' && styleUrl.trim().length) {
-        cmpMeta.modesMeta['default'].styleUrls.push(styleUrl.trim());
-      } else {
-        throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleUrl}`;
-      }
-    });
-
-  } else {
-    // as an object
-    // styleUrls: {
-    //   ios: 'badge.ios.scss',
-    //   md: 'badge.md.scss',
-    //   wp: 'badge.wp.scss'
-    // }
-
-    const styleModes: {[modeName: string]: string} = (<any>userOpts).styleUrls;
-
-    Object.keys(styleModes).forEach(styleModeName => {
-      const modeName = styleModeName.trim().toLowerCase();
-      cmpMeta.modesMeta[modeName] = {
-        styleUrls: []
-      };
-
-      if (typeof styleModes[styleModeName] === 'string') {
-        const styleUrl = styleModes[styleModeName].trim();
-        if (!styleUrl.length) {
-          throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleModes[styleModeName]}`;
-        }
-
-        cmpMeta.modesMeta[modeName].styleUrls.push(styleUrl);
-
-      } else if (Array.isArray(styleModes[styleModeName])) {
-        const styleUrls: string[] = (<any>userOpts).styleUrls;
-
-        styleUrls.forEach(styleUrl => {
-          if (styleUrl && typeof styleUrl === 'string' && styleUrl.trim().length) {
-            cmpMeta.modesMeta[modeName].styleUrls.push(styleUrl.trim());
-          } else {
-            throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleUrl}`;
-          }
-        });
-
-      } else {
-        throw `invalid style url for ${cmpMeta.tagNameMeta}: ${styleModes[styleModeName]}`;
-      }
-    });
-
-  }
-}
-
-
 function normalizeModes(cmpMeta: ComponentMeta) {
+  cmpMeta.modesMeta = {};
+
+  if (cmpMeta.modesStyleMeta) {
+    Object.keys(cmpMeta.modesStyleMeta).forEach(modeName => {
+      cmpMeta.modesMeta[modeName] = new Array(2);
+    });
+  }
+
   const modeNames = Object.keys(cmpMeta.modesMeta).sort();
 
   if (modeNames.length === 0) {
     // always set a default, even if there's nothing
-    cmpMeta.modesMeta['default'] = {};
+    cmpMeta.modesMeta.$ = [];
 
   } else {
     // normalize mode name sorting

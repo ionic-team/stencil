@@ -1,11 +1,11 @@
 import { bundleComponentModeStyles } from './styles';
-import { Bundle, BundleComponent, BundlerConfig, BuildContext, ComponentMeta, Manifest,
-  ManifestBundle, Results } from './interfaces';
-import { formatComponentModeLoader, formatBundleFileName,
-  formatBundleContent, formatRegistry, formatPriority, generateBundleId,
+import { Bundle, BundlerConfig, BuildContext, ComponentMeta, FormatComponentDataOptions,
+  Manifest, ManifestBundle, Results } from './interfaces';
+import { formatBundleFileName, formatDefineComponents,
+  formatRegistry, generateBundleId,
   getBundledModulesId } from '../util/data-serialize';
 import { createFileMeta, readFile, writeFile, writeFiles } from './util';
-import { ATTR_LOWER_CASE, ATTR_DASH_CASE } from '../util/constants';
+import { ATTR_LOWER_CASE, ATTR_DASH_CASE, BUNDLE_ID } from '../util/constants';
 import { getManifest } from './manifest';
 import { setupBundlerWatch } from './watch';
 import commonjs from 'rollup-plugin-commonjs';
@@ -58,7 +58,7 @@ function bundleComponent(config: BundlerConfig, ctx: BuildContext, cmpMeta: Comp
   const modeNames = Object.keys(cmpMeta.modesMeta);
 
   return Promise.all(modeNames.map(modeName => {
-    return bundleComponentModeStyles(config, ctx, cmpMeta.modesMeta[modeName]);
+    return bundleComponentModeStyles(config, ctx, cmpMeta, modeName);
   }));
 }
 
@@ -75,7 +75,12 @@ function buildCoreJs(config: BundlerConfig, ctx: BuildContext, manifest: Manifes
   });
 
   return generateBundleFiles(config, ctx).then(() => {
-    ctx.results.componentRegistry = formatRegistry(ctx.bundles, config.attrCase);
+    const opts: FormatComponentDataOptions = {
+      defaultAttrCase: config.attrCase,
+      minimumData: true
+    };
+
+    ctx.results.componentRegistry = formatRegistry(manifest.components, opts);
 
     const coreFiles = [
       'ionic.core.js',
@@ -97,8 +102,8 @@ function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBu
   allModeNames.forEach(modeName => {
 
     const bundle: Bundle = {
-      components: [],
-      priority: formatPriority(manifestBundle.priority)
+      modeName: modeName,
+      components: []
     };
 
     manifestBundle.components.forEach(manifestComponentTag => {
@@ -108,14 +113,8 @@ function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBu
         throw `buildComponentBundles: unable to find tag "${manifestComponentTag}"`;
       }
 
-      const bundleComponent: BundleComponent = {
-        component: component,
-        modeName: modeName,
-        modeMeta: component.modesMeta[modeName] || component.modesMeta['default']
-      };
-
-      if (bundleComponent.modeMeta) {
-        bundle.components.push(bundleComponent);
+      if (component.modesMeta[modeName]) {
+        bundle.components.push(component);
       }
     });
 
@@ -135,12 +134,12 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
 
     const entryContent: string[] = [];
     bundle.components.forEach(c => {
-      let importPath = config.packages.path.join(config.srcDir, c.component.componentUrl);
+      let importPath = config.packages.path.join(config.srcDir, c.componentUrl);
       let fileMeta = createFileMeta(config.packages, ctx, importPath, '');
       fileMeta.rebundleOnChange = true;
 
-      entryContent.push(`import { ${c.component.componentClass} } from "${importPath}";`);
-      entryContent.push(`exports['${c.component.tagNameMeta}'] = ${c.component.componentClass};`);
+      entryContent.push(`import { ${c.componentClass} } from "${importPath}";`);
+      entryContent.push(`exports['${c.tagNameMeta}'] = ${c.componentClass};`);
     });
 
     ctx.bundledJsModules[id] = entryContent.join('\n');
@@ -197,17 +196,30 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
   return bundleComponentModules(config, ctx).then(() => {
     ctx.bundles.forEach(bundle => {
 
-      const componentModeLoaders = bundle.components.map(bundleComponent => {
-        return formatComponentModeLoader(config.attrCase, bundleComponent.component, bundleComponent.modeName, bundleComponent.modeMeta, config.devMode);
-      }).join(',\n');
-
       bundle.bundledJsModules = ctx.bundledJsModules[getBundledModulesId(bundle)];
 
-      bundle.content = formatBundleContent(CORE_VERSION, BUNDLE_ID_KEYWORD, bundle.bundledJsModules, componentModeLoaders);
+      const opts: FormatComponentDataOptions = {
+        onlyIncludeModeName: bundle.modeName,
+        includeStyles: true,
+        defaultAttrCase: config.attrCase,
+        minimumData: false
+      };
+
+      bundle.components.forEach(cmpMeta => {
+        cmpMeta.modesMeta[bundle.modeName][BUNDLE_ID] = BUNDLE_ID_KEYWORD;
+      });
+
+      bundle.content = formatDefineComponents(
+        config.namespace, CORE_VERSION, BUNDLE_ID_KEYWORD,
+        opts, bundle.bundledJsModules, bundle.components
+      );
 
       if (config.devMode) {
         // in dev mode, create the bundle id from combining all of the tags
-        bundle.id = bundle.components.map(c => c.component.tagNameMeta + '.' + c.modeName).join('.');
+        bundle.id = bundle.components.map(c => c.tagNameMeta).join('.');
+        if (bundle.modeName !== '$') {
+          bundle.id += '.' + bundle.modeName;
+        }
 
       } else {
         // in prod mode, create bundle id from hashing the content
@@ -224,11 +236,15 @@ function generateBundleFiles(config: BundlerConfig, ctx: BuildContext) {
         }
       }
 
+      bundle.components.forEach(cmpMeta => {
+        cmpMeta.modesMeta[bundle.modeName][BUNDLE_ID] = bundle.id;
+      });
+
       bundle.fileName = formatBundleFileName(bundle.id);
       bundle.filePath = config.packages.path.join(config.destDir, 'bundles', bundle.fileName);
 
       // replace the known bundleid template with the newly created bundle id
-      bundle.content = bundle.content.replace(BUNDLE_ID_KEYWORD, `"${bundle.id}"`);
+      bundle.content = bundle.content.replace(/__STENCIL__BUNDLE__ID__/g, `${bundle.id}`);
 
       if (ctx.results.files.indexOf(bundle.filePath) === -1) {
         ctx.results.files.push(bundle.filePath);
@@ -281,6 +297,9 @@ function getAllModeNames(manifest: Manifest) {
 
 
 function validateConfig(config: BundlerConfig) {
+  if (!config.namespace) {
+    config.namespace = 'Ionic';
+  }
   if (!config.packages) {
     throw 'config.packages required';
   }
@@ -326,4 +345,4 @@ function normalizeAttrCase(attrCase: any) {
 
 
 const CORE_VERSION = 0;
-const BUNDLE_ID_KEYWORD = '__IONIC$BUNDLE$ID__';
+const BUNDLE_ID_KEYWORD = '__STENCIL__BUNDLE__ID__';

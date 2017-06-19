@@ -1,5 +1,5 @@
 export * from '../util/interfaces';
-import { Bundle, ComponentMeta, ManifestComponentMeta } from '../util/interfaces';
+import { Bundle, ComponentMeta } from '../util/interfaces';
 
 
 export interface CompilerConfig {
@@ -22,6 +22,7 @@ export interface CompilerConfig {
 
 
 export interface BundlerConfig {
+  namespace: string;
   srcDir: string;
   destDir: string;
   devMode?: boolean;
@@ -74,14 +75,13 @@ export interface Results {
 
 
 export interface Manifest {
-  components?: ManifestComponentMeta[];
+  components?: ComponentMeta[];
   bundles?: ManifestBundle[];
 }
 
 
 export interface ManifestBundle {
   components: string[];
-  priority: 'high'|'low';
 }
 
 

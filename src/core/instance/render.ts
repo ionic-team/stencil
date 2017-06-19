@@ -39,16 +39,18 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
     // looks like we've got child nodes to render into this host element
     // or we need to update the css class/attrs on the host element
 
-    // if this is the intial load, then we give the renderer the actual element
-    // if this is a re-render, then give the renderer the last vnode we created
+    // if we haven't already created a vnode, then we give the renderer the actual element
+    // if this is a re-render, then give the renderer the last vnode we already created
     let oldVNode = elm._vnode || new VNodeObj();
     oldVNode.elm = elm;
 
     // normalize host data keys to abbr. key
-    vnodeHostData.a = vnodeHostData['attrs'];
-    vnodeHostData.c = vnodeHostData['class'];
-    vnodeHostData.s = vnodeHostData['style'];
-    vnodeHostData.o = vnodeHostData['on'];
+    if (vnodeHostData) {
+      vnodeHostData.a = vnodeHostData['attrs'];
+      vnodeHostData.c = vnodeHostData['class'];
+      vnodeHostData.s = vnodeHostData['style'];
+      vnodeHostData.o = vnodeHostData['on'];
+    }
 
     // each patch always gets a new vnode
     // the host element itself isn't patched because it already exists

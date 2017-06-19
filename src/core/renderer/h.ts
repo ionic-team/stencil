@@ -60,7 +60,7 @@ export function h(nodeName: string, vnodeData: VNodeProdData, child?: any) {
   vnode.vtag = nodeName;
   vnode.vchildren = children;
 
-  if (vnodeData !== 0) {
+  if (vnodeData) {
     // data object was provided
     vnode.vattrs = vnodeData.a;
     vnode.vprops = vnodeData.p;

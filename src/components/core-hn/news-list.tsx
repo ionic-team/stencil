@@ -1,9 +1,8 @@
-import { Component, h, Prop, Ionic, State } from '../index';
+import { Component, h, Ionic, Prop, State } from '../index';
 
 
 @Component({
-  tag: 'news-list',
-  styleUrls: 'main.scss'
+  tag: 'news-list'
 })
 export class NewsList {
 

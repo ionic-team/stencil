@@ -1,5 +1,12 @@
 
 /**
+ * Mode Meta Indexes
+ */
+export const BUNDLE_ID = 0;
+export const STYLES = 1;
+
+
+/**
  * Property Types
  */
 export const TYPE_ANY = 0;

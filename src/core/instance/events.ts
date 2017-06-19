@@ -10,9 +10,9 @@ export function attachListeners(queue: QueueApi, listeners: ListenMeta[], elm: H
   if (listeners) {
     for (var i = 0; i < listeners.length; i++) {
       var listener = listeners[i];
-      if (listener.enabled !== false) {
+      if (listener.eventEnabled !== false) {
         elm._listeners = elm._listeners || {};
-        elm._listeners[listener.eventName] = addEventListener(queue, elm, listener.eventName, (<any>instance)[listener.methodName].bind(instance), listener);
+        elm._listeners[listener.eventName] = addEventListener(queue, elm, listener.eventName, (<any>instance)[listener.eventMethod].bind(instance), listener);
       }
     }
   }
@@ -33,7 +33,7 @@ export function enableListener(plt: PlatformApi, queue: QueueApi, elm: HostEleme
 
           if (shouldEnable && !deregisterFns[eventName]) {
             var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(queue, instance.$el, attachToEventName, (<any>instance)[listener.methodName].bind(instance), listener);
+            deregisterFns[eventName] = addEventListener(queue, instance.$el, attachToEventName, (<any>instance)[listener.eventMethod].bind(instance), listener);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();

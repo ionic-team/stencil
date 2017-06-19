@@ -1,77 +1,61 @@
-import { ComponentRegistry, HostElement, PlatformApi, HydrateConfig } from '../../util/interfaces';
+import { ComponentRegistry, HostElement, PlatformApi, HydrateOptions, StencilSystem } from '../../util/interfaces';
 import { createDomApi } from '../renderer/dom-api';
 import { createPlatformServer } from './platform-server';
 import { detectPlatforms } from '../platform/platform-util';
 import { initIonicGlobal } from './ionic-server';
+import { initHostConstructor } from '../instance/init';
 import { PLATFORM_CONFIGS } from '../platform/platform-configs';
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
 
 
-export function hydrateHtml(registry: ComponentRegistry, html: string, opts: HydrateConfig, staticDir: string) {
-  return new Promise(resolve => {
-    opts = loadHydrateConfig(opts);
+export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: ComponentRegistry, opts: HydrateOptions, callback: (err: any, html: string) => void) {
+  const platforms = detectPlatforms(opts.url, opts.userAgent, PLATFORM_CONFIGS, 'core');
 
-    const platforms = detectPlatforms(opts.url, opts.userAgent, PLATFORM_CONFIGS, 'core');
+  const IonicGbl = initIonicGlobal(opts.config, platforms, staticDir);
 
-    const IonicGbl = initIonicGlobal(opts.config, platforms, staticDir);
+  // create a emulated window
+  // attach data the request to the window
+  const dom = sys.createDom();
+  const win = dom.parse(opts);
 
-    const win = new JSDOM(html, {
-      url: opts.url,
-      referrer: opts.referrer,
-      userAgent: opts.userAgent,
-    }).window;
+  // create the DOM api which we'll use during hydrate
+  const domApi = createDomApi(win.document);
 
-    win.document.cookie = opts.cookie;
+  // create the platform for this hydrate
+  const plt = createPlatformServer(sys, IonicGbl, <any>win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
-    const domApi = createDomApi(win.document);
-
-    const plt = createPlatformServer(IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
-
-    Object.keys(registry).forEach(tag => {
-      plt.defineComponent(registry[tag], ServerHostElement);
-    });
-
-    // loop through each node and start upgrading any that are components
-    inspectNode(plt, win.document.body);
-
-    resolve();
+  // fully define each of our components onto this new platform instance
+  Object.keys(registry).forEach(tag => {
+    plt.defineComponent(registry[tag]);
   });
+
+  // fire off this function when the app has finished loading
+  // and all components have finished hydrating
+  plt.onAppLoad = () => {
+    callback(null, dom.serialize());
+  };
+
+  // loop through each node and start connecting/hydrating
+  // any elements that are host elements to components
+  // this kicks off all the async loading and hydrating
+  connectElement(plt, <any>win.document.body);
 }
 
 
-class ServerHostElement {
-
-}
-
-
-export function inspectNode(plt: PlatformApi, node: any) {
-  const cmpMeta = plt.getComponentMeta(node.tagName);
+export function connectElement(plt: PlatformApi, elm: HostElement) {
+  // only connect elements which is a registered component
+  const cmpMeta = plt.getComponentMeta(elm);
   if (cmpMeta) {
-    // only connect elements which is a registered component
-    (<HostElement>node).connectedCallback();
+    // init our host element functions
+    // not using Element.prototype on purpose
+    initHostConstructor(plt, elm);
+
+    elm.connectedCallback();
   }
 
-  if (node.childNodes) {
+  if (elm.children) {
     // continue drilling down through child elements
-    for (var i = 0; i < node.childNodes.length; i++) {
-      inspectNode(plt, node.childNodes[i]);
+    for (var i = 0; i < elm.children.length; i++) {
+      connectElement(plt, <HostElement>elm.children[i]);
     }
   }
-}
-
-
-function loadHydrateConfig(opts: HydrateConfig) {
-  opts = opts || {};
-
-  const req = opts.req;
-  if (req && typeof req.get === 'function') {
-    // express request
-    if (!opts.url) opts.url = req.protocol + '://' + req.get('host') + req.originalUrl;
-    if (!opts.referrer) opts.referrer = req.get('Referrer');
-    if (!opts.userAgent) opts.userAgent = req.get('user-agent');
-    if (!opts.cookie) opts.cookie = req.get('cookie');
-  }
-
-  return opts;
 }

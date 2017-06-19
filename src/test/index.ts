@@ -1,29 +1,33 @@
-import { ComponentMeta, ConfigApi, HostElement, Ionic,
-  IonicGlobal, DomApi, PlatformConfig, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ConfigApi, HostElement, HydrateOptions, Ionic,
+  IonicGlobal, DomApi, PlatformConfig, PlatformApi, StencilSystem } from '../util/interfaces';
 import { createConfigController } from '../util/config-controller';
 import { createDomApi } from '../core/renderer/dom-api';
 import { initInjectedIonic, initIonicGlobal } from '../core/server/ionic-server';
 import { createPlatformServer } from '../core/server/platform-server';
 import { createRenderer } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
+
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
 const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
 
 
 export function mockPlatform(IonicGbl?: IonicGlobal) {
-  const win: any = mockWindow();
   if (!IonicGbl) {
     IonicGbl = mockIonicGlobal();
   }
+  const sys = mockStencilSystem();
+  const win = sys.createDom().parse({html: ''});
   const domApi = createDomApi(win.document);
 
-  const plt = createPlatformServer(IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+  const plt = createPlatformServer(sys, IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
 
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();
 
-  plt.loadBundle = function(a: any, b: any, cb: Function) {
-    a; b;
+  plt.loadBundle = function(a: any, cb: Function) {
+    a;
     $loadBundleQueue.add(cb);
   };
 
@@ -66,15 +70,36 @@ export function mockConfig(configObj: any = {}, platforms: PlatformConfig[] = []
 }
 
 
-export function mockWindow(opts: { html?: string, url?: string, referrer?: string, userAgent?: string, cookie?: string, contentType?: string} = {}) {
-  const dom = new JSDOM(opts.html || '', {
-    url: opts.url,
-    referrer: opts.referrer,
-    contentType: opts.contentType,
-    userAgent: opts.userAgent || 'test',
-  });
+export function mockStencilSystem() {
+  const sys: StencilSystem = {
+    fs: fs,
+    path: path,
+    vm: vm,
+    createDom: function() {
+      return {
+        parse: function(opts: HydrateOptions) {
+          this._dom = new jsdom.JSDOM(opts.html, {
+            url: opts.url,
+            referrer: opts.referrer,
+            userAgent: opts.userAgent,
+          });
+          return this._dom.window;
+        },
+        serialize: function() {
+          return this._dom.serialize();
+        }
+      };
+    }
+  };
 
-  return dom.window;
+  return sys;
+}
+
+
+export function mockWindow(opts: HydrateOptions = {}) {
+  opts.userAgent = opts.userAgent || 'test';
+
+  return mockStencilSystem().createDom().parse(opts);
 }
 
 
@@ -123,12 +148,12 @@ export function mockQueue() {
 
 
 export function mockElement(tag: string): Element {
-  return JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
+  return jsdom.JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
 }
 
 
 export function mockTextNode(text: string): Element {
-  return JSDOM.fragment(text).firstChild;
+  return jsdom.JSDOM.fragment(text).firstChild;
 }
 
 
@@ -141,7 +166,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
   }
   if (!cmpMeta.modesMeta) {
     cmpMeta.modesMeta = {
-      'default': {}
+      $: {}
     };
   }
 
@@ -152,7 +177,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
 
 
 export function mockConnect(plt: MockedPlatform, html: string) {
-  const rootNode = JSDOM.fragment(html);
+  const rootNode = jsdom.JSDOM.fragment(html);
 
   connectComponents(plt, rootNode);
 

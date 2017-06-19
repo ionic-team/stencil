@@ -1,6 +1,6 @@
+import { BUNDLE_ID, PRIORITY_HIGH } from '../../util/constants';
 import { getParentElement } from '../../util/helpers';
 import { HostElement, PlatformApi } from '../../util/interfaces';
-import { PRIORITY_HIGH } from '../../util/constants';
 
 
 export function connectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -55,12 +55,11 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
 
       // get the mode the element which is loading
       // if there is no mode, then use "default"
-      const cmpMode = cmpMeta.modesMeta[plt.getMode(elm)] || cmpMeta.modesMeta['default'];
+      const cmpMode = cmpMeta.modesMeta[plt.getMode(elm)] || cmpMeta.modesMeta.$;
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.loadBundle(cmpMode.bundleId, cmpMeta.priorityMeta, function loadComponentCallback() {
-
+      plt.loadBundle(cmpMode[BUNDLE_ID], function loadComponentCallback() {
         // we've fully loaded the component mode data
         // let's queue it up to be rendered next
         elm._queueUpdate();

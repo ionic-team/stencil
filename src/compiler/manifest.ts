@@ -1,4 +1,4 @@
-import { BundlerConfig, BuildContext, CompilerConfig, Manifest, ManifestComponentMeta } from './interfaces';
+import { BundlerConfig, BuildContext, ComponentMeta, CompilerConfig, Manifest } from './interfaces';
 import { readFile, writeFile } from './util';
 
 
@@ -17,46 +17,52 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
   ctx.files.forEach(f => {
     if (!f.isTsSourceFile || !f.cmpMeta) return;
 
-    const manifestCmp: ManifestComponentMeta = Object.assign({}, <any>f.cmpMeta);
+    const cmpMeta: ComponentMeta = Object.assign({}, <any>f.cmpMeta);
 
-    manifestCmp.componentClass = f.cmpClassName;
-    manifestCmp.componentUrl = f.jsFilePath.replace(destDir + config.packages.path.sep, '');
+    cmpMeta.componentClass = f.cmpClassName;
+    cmpMeta.componentUrl = f.jsFilePath.replace(destDir + config.packages.path.sep, '');
 
-    const componentDir = config.packages.path.dirname(manifestCmp.componentUrl);
+    const componentDir = config.packages.path.dirname(cmpMeta.componentUrl);
 
-    const modeNames = Object.keys(manifestCmp.modesMeta);
+    if (cmpMeta.modesStyleMeta) {
+      const modeNames = Object.keys(cmpMeta.modesStyleMeta);
 
-    modeNames.forEach(modeName => {
-      const cmpMode = manifestCmp.modesMeta[modeName];
-      if (cmpMode.styleUrls) {
-        cmpMode.styleUrls = cmpMode.styleUrls.map(styleUrl => {
-          return config.packages.path.join(componentDir, styleUrl);
-        });
-      }
-    });
-
-    if (!manifestCmp.listenersMeta.length) {
-      delete manifestCmp.listenersMeta;
+      modeNames.forEach(modeName => {
+        const cmpMode = cmpMeta.modesStyleMeta[modeName];
+        if (cmpMode.styleUrls) {
+          cmpMode.styleUrls = cmpMode.styleUrls.map(styleUrl => {
+            return config.packages.path.join(componentDir, styleUrl);
+          });
+        }
+      });
     }
 
-    if (!manifestCmp.methodsMeta.length) {
-      delete manifestCmp.methodsMeta;
+    if (!cmpMeta.listenersMeta.length) {
+      delete cmpMeta.listenersMeta;
     }
 
-    if (!manifestCmp.propsMeta.length) {
-      delete manifestCmp.propsMeta;
+    if (!cmpMeta.methodsMeta.length) {
+      delete cmpMeta.methodsMeta;
     }
 
-    if (!manifestCmp.watchersMeta.length) {
-      delete manifestCmp.watchersMeta;
+    if (!cmpMeta.propsMeta.length) {
+      delete cmpMeta.propsMeta;
+    }
+
+    if (!cmpMeta.watchersMeta.length) {
+      delete cmpMeta.watchersMeta;
     }
 
     // place property at the bottom
-    const shadow = manifestCmp.isShadowMeta;
-    delete manifestCmp.isShadowMeta;
-    manifestCmp.isShadowMeta = shadow;
+    const slotMeta = cmpMeta.slotMeta;
+    delete cmpMeta.slotMeta;
+    cmpMeta.slotMeta = slotMeta;
 
-    manifest.components.push(manifestCmp);
+    const shadow = cmpMeta.isShadowMeta;
+    delete cmpMeta.isShadowMeta;
+    cmpMeta.isShadowMeta = shadow;
+
+    manifest.components.push(cmpMeta);
   });
 
   manifest.bundles = (config.bundles && config.bundles.slice()) || [];

@@ -1,4 +1,4 @@
-import { IonicGlobal } from '../../../util/interfaces';
+import { IonicGlobal } from '../../util/interfaces';
 
 
 export function generateGlobalContext(win: any, IonicGbl: IonicGlobal): any {

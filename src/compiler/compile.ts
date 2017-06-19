@@ -212,12 +212,12 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
   const includedSassFiles: string[] = [];
 
   ctx.files.forEach(f => {
-    if (!f.isTsSourceFile || !f.cmpMeta) return;
+    if (!f.isTsSourceFile || !f.cmpMeta || !f.cmpMeta.modesStyleMeta) return;
 
-    const modeNames = Object.keys(f.cmpMeta.modesMeta);
+    const modeNames = Object.keys(f.cmpMeta.modesStyleMeta);
 
     modeNames.forEach(modeName => {
-      const modeMeta = Object.assign({}, f.cmpMeta.modesMeta[modeName]);
+      const modeMeta = Object.assign({}, f.cmpMeta.modesStyleMeta[modeName]);
 
       if (modeMeta.styleUrls) {
         modeMeta.styleUrls.forEach(styleUrl => {

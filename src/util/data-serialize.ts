@@ -1,14 +1,126 @@
-import { Bundle, ComponentMeta, ManifestComponentMeta, MethodMeta, ModeMeta,
-  ListenMeta, PropMeta, StateMeta, WatchMeta } from './interfaces';
-import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, PRIORITY_LOW, PRIORITY_HIGH, TYPE_NUMBER } from '../util/constants';
+import { Bundle, ComponentMeta, FormatComponentDataOptions, MethodMeta, ModeMeta,
+  ModesMeta, ListenMeta, PropMeta, StateMeta, WatchMeta } from './interfaces';
+import { ATTR_LOWER_CASE, ATTR_DASH_CASE, BUNDLE_ID, STYLES, TYPE_ANY, TYPE_BOOLEAN, HAS_SLOTS, HAS_NAMED_SLOTS, TYPE_NUMBER } from '../util/constants';
 import * as crypto from 'crypto';
 
 
-export function generateBundleId(content: string) {
-  return crypto.createHash('sha256')
-                  .update(content)
-                  .digest('hex')
-                  .substr(0, 8);
+export function formatRegistry(components: ComponentMeta[], opts: FormatComponentDataOptions) {
+  const componentMeta = components.map(cmpMeta => {
+    return formatComponentMeta(cmpMeta, opts);
+  }).join(',\n');
+
+  return '[\n' + componentMeta + '\n]';
+}
+
+
+export function formatDefineComponents(
+    namespace: string,
+    coreVersion: number,
+    bundleId: string,
+    opts: FormatComponentDataOptions,
+    bundledJsModules: string,
+    components: ComponentMeta[]
+  ) {
+
+  const componentMeta = components.map(cmpMeta => {
+    return formatComponentMeta(cmpMeta, opts);
+  }).join(',\n');
+
+  return [
+    `${namespace}.defineComponents(\n`,
+
+      `/**** core version ****/`,
+      `${coreVersion},\n`,
+
+      `/**** bundleId ****/`,
+      `'${bundleId}',\n`,
+
+      `/**** bundled modules ****/`,
+      `${bundledJsModules},\n`,
+
+      `${componentMeta}`,
+
+    `)`
+  ].join('\n');
+}
+
+
+export function formatComponentMeta(cmpMeta: ComponentMeta, opts: FormatComponentDataOptions) {
+  const tag = cmpMeta.tagNameMeta;
+  const modes = formatModes(cmpMeta.modesMeta, opts);
+  const props = formatProps(cmpMeta.propsMeta, opts.defaultAttrCase);
+  const methods = formatMethods(cmpMeta.methodsMeta);
+  const states = formatStates(cmpMeta.statesMeta);
+  const listeners = formatListeners(tag, cmpMeta.listenersMeta);
+  const watchers = formatWatchers(tag, cmpMeta.watchersMeta);
+  const host = formatHost(cmpMeta.hostMeta);
+  const slot = formatSlot(cmpMeta.slotMeta);
+  const shadow = formatShadow(cmpMeta.isShadowMeta);
+
+
+  const d: string[] = [];
+
+  d.push(`/** ${tag}: [0] tagName **/\n'${tag}'`);
+  d.push(`/** ${tag}: [1] modes **/\n${modes}`);
+  d.push(`/** ${tag}: [2] props **/\n${props}`);
+  d.push(`/** ${tag}: [3] slot **/\n${slot}`);
+
+  if (!opts.minimumData) {
+    d.push(`/** ${tag}: [4] host **/\n${host}`);
+    d.push(`/** ${tag}: [5] listeners **/\n${listeners}`);
+    d.push(`/** ${tag}: [6] states **/\n${states}`);
+    d.push(`/** ${tag}: [7] watchers **/\n${watchers}`);
+    d.push(`/** ${tag}: [8] methods **/\n${methods}`);
+    d.push(`/** ${tag}: [9] shadow **/\n${shadow}`);
+  }
+
+  const arrData: any[] = new Function(`return [${d.join(',').replace(/\n/gm, '')}]`)();
+  for (var i = arrData.length - 1; i >= 0; i--) {
+    if (arrData[i]) {
+      break;
+    }
+    // if falsy, safe to pop()
+    d.pop();
+  }
+
+  return `\n/***************** ${tag} *****************/\n[\n` + d.join(',\n\n') + `\n\n]`;
+}
+
+
+export function formatModes(modesMeta: ModesMeta, opts: FormatComponentDataOptions) {
+  if (!modesMeta) {
+    return '{} /* no modes */';
+  }
+
+  let modeNames = Object.keys(modesMeta).sort();
+
+  if (opts.onlyIncludeModeName) {
+    modeNames = modeNames.filter(modeName => modeName === opts.onlyIncludeModeName);
+  }
+
+  const o = modeNames.map(modeName => {
+    return `\n  ${modeName}: ${formatMode(modesMeta[modeName], opts.includeStyles)}`;
+  });
+
+  return `{${o.join(`,\n`)}\n}`;
+}
+
+
+export function formatMode(modeMeta: ModeMeta, includeStyles: boolean) {
+  if (!modeMeta) {
+    return '[] /* no mode data */';
+  }
+
+  let bundleId = modeMeta[BUNDLE_ID] ? `'${modeMeta[BUNDLE_ID]}'` : `0`;
+
+  if (includeStyles && modeMeta[STYLES]) {
+    const styles = modeMeta[STYLES].split(/\r?\n/g).map(line => {
+      return `     '${line.replace(/'/g, '"')}\\n'`;
+    }).join(' + \n');
+    return `[${bundleId}, \n${styles}]`;
+  }
+
+  return `[${bundleId}]`;
 }
 
 
@@ -17,69 +129,9 @@ export function formatBundleFileName(bundleId: string) {
 }
 
 
-export function formatBundleContent(coreVersion: number, bundleId: string, bundledJsModules: string, componentModeLoader: string) {
-  return [
-    `Ionic.defineComponents(\n`,
-
-      `/**** core version ****/`,
-      `${coreVersion},\n`,
-
-      `/**** bundleId ****/`,
-      `${bundleId},\n`,
-
-      `/**** bundled modules ****/`,
-      `${bundledJsModules},\n`,
-
-      `${componentModeLoader}`,
-
-    `)`
-  ].join('\n');
-}
-
-
-export function formatComponentModeLoader(attrCase: number, cmp: ComponentMeta, modeName: string, modeMeta: ModeMeta, devMode: boolean) {
-  const tag = cmp.tagNameMeta;
-
-  const label = `${tag}.${modeName}`;
-
-  const props = formatProps(cmp.propsMeta, attrCase);
-
-  const methods = formatMethods(cmp.methodsMeta);
-
-  const states = formatStates(cmp.statesMeta);
-
-  const listeners = formatListeners(label, cmp.listenersMeta);
-
-  const watchers = formatWatchers(label, cmp.watchersMeta);
-
-  const shadow = formatShadow(cmp.isShadowMeta);
-
-  const host = formatHost(cmp.hostMeta, devMode);
-
-  const modeCode = formatModeName(modeName);
-
-  const styles = formatStyles(modeMeta.styles);
-
-  const t = [
-    `/** ${label}: [0] tagName **/\n'${tag}'`,
-    `/** ${label}: [1] props **/\n${props}`,
-    `/** ${label}: [2] methods **/\n${methods}`,
-    `/** ${label}: [3] states **/\n${states}`,
-    `/** ${label}: [4] listeners **/\n${listeners}`,
-    `/** ${label}: [5] watchers **/\n${watchers}`,
-    `/** ${label}: [6] shadow **/\n${shadow}`,
-    `/** ${label}: [7] host **/\n${host}`,
-    `/** ${label}: [8] modeName **/\n${modeCode}`,
-    `/** ${label}: [9] styles **/\n${styles}`
-  ];
-
-  return `\n/***************** ${label} *****************/\n[\n` + t.join(',\n\n') + `\n\n]`;
-}
-
-
-function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
+function formatProps(props: PropMeta[], defaultAttrCase: number) {
   if (!props || !props.length) {
-    return prefix + `0 /* no props */`;
+    return `0 /* no props */`;
   }
 
   const formattedProps: string[] = [];
@@ -90,7 +142,7 @@ function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
     if (prop.attribCase === undefined) {
       // if individual prop wasn't set with an option
       // then use the config's default
-      prop.attribCase = attrCase;
+      prop.attribCase = defaultAttrCase;
     }
 
     if (prop.attribCase === ATTR_LOWER_CASE) {
@@ -100,10 +152,10 @@ function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
       formattedProp += `, ${ATTR_DASH_CASE} /* dash-case attribute */`;
     }
 
-    if (prop.propType === 'boolean') {
+    if (prop.propType === TYPE_BOOLEAN) {
       formattedProp += `, ${TYPE_BOOLEAN} /* boolean type */`;
 
-    } else if (prop.propType === 'number') {
+    } else if (prop.propType === TYPE_NUMBER) {
       formattedProp += `, ${TYPE_NUMBER} /* number type */`;
 
     } else if (prop.isTwoWay) {
@@ -116,10 +168,10 @@ function formatProps(props: PropMeta[], attrCase: number, prefix = '') {
       formattedProp += `, 1 /* two-way prop */`;
     }
 
-    formattedProps.push(prefix + `  [${formattedProp}]`);
+    formattedProps.push(`  [${formattedProp}]`);
   });
 
-  return prefix + `[\n` + formattedProps.join(`,\n`) + '\n' + prefix + `]`;
+  return `[\n` + formattedProps.join(`,\n`) + `\n]`;
 }
 
 
@@ -158,12 +210,12 @@ function formatListeners(label: string, listeners: ListenMeta[]) {
 
 function formatListenerOpts(label: string, listener: ListenMeta, listenerIndex: number) {
   const t = [
-    `    /***** ${label} listener[${listenerIndex}]  ${listener.eventName} -> ${listener.methodName}() *****/\n` +
-    `    /* [0] methodName **/ '${listener.methodName}'`,
-    `    /* [1] eventName ***/ '${listener.eventName}'`,
-    `    /* [2] capture *****/ ${formatBoolean(listener.capture)}`,
-    `    /* [3] passive *****/ ${formatBoolean(listener.passive)}`,
-    `    /* [4] enabled *****/ ${formatBoolean(listener.enabled)}`,
+    `    /***** ${label} listener[${listenerIndex}]  ${listener.eventName} -> ${listener.eventName}() *****/\n` +
+    `    /* [0] eventMethod ***/ '${listener.eventMethod}'`,
+    `    /* [1] eventName *****/ '${listener.eventName}'`,
+    `    /* [2] eventCapture **/ ${formatBoolean(listener.eventCapture)}`,
+    `    /* [3] eventPassive **/ ${formatBoolean(listener.eventPassive)}`,
+    `    /* [4] eventEnabled **/ ${formatBoolean(listener.eventEnabled)}`,
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
@@ -203,140 +255,40 @@ function formatWatcherOpts(label: string, watcher: WatchMeta, watchIndex: number
 }
 
 
+function formatHost(val: any) {
+  if (val === undefined) {
+    return '0 /* no host data */';
+  }
+  return JSON.stringify(val);
+}
+
+
+function formatSlot(val: number) {
+  if (val === HAS_SLOTS) {
+    return HAS_SLOTS + ' /* has slots */';
+  }
+  if (val === HAS_NAMED_SLOTS) {
+    return HAS_NAMED_SLOTS + ' /* has named slots */';
+  }
+  return '0 /* no slot */';
+}
+
+
 function formatShadow(val: boolean) {
   return val ?
     '1 /* use shadow dom */' :
     '0 /* do not use shadow dom */';
 }
 
-function formatHost(val: any, devMode: boolean) {
-  return JSON.stringify(val, null, devMode ? 2 : null);
-}
-
-export function formatModeName(modeName: string) {
-  return `${getModeCode(modeName)} /* ${modeName} **/`;
-}
-
-
-export function getModeCode(modeName: string) {
-  switch (modeName) {
-    case 'default':
-      return 0;
-    case 'ios':
-      return 1;
-    case 'md':
-      return 2;
-    case 'wp':
-      return 3;
-  }
-
-  return `'${modeName}'`;
-}
-
-
-export function formatStyles(styles: string) {
-  if (!styles) {
-    return '0 /* no styles */';
-  }
-
-  const lines = styles.split(/\r?\n/g).map(line => {
-    return `'${line.replace(/'/g, '"')}\\n'`;
-  });
-
-  return lines.join(' + \n');
-}
-
-
-export function formatPriority(priority: 'high'|'low') {
-  return priority === 'low' ? PRIORITY_LOW : PRIORITY_HIGH;
-}
-
-
-export function formatRegistry(bundles: Bundle[], attrOption: number) {
-  let registry: {
-    component: ManifestComponentMeta;
-    bundles: {[modeCode: string]: Bundle};
-  }[] = [];
-
-  bundles.forEach(bundle => {
-    bundle.components.forEach(bundledComponent => {
-      let registryCmp = registry.find(c => c.component.tagNameMeta === bundledComponent.component.tagNameMeta);
-      if (!registryCmp) {
-        registryCmp = {
-          component: bundledComponent.component,
-          bundles: {}
-        };
-        registry.push(registryCmp);
-      }
-      registryCmp.bundles[bundledComponent.modeName] = bundle;
-    });
-  });
-
-  registry = registry.sort((a, b) => {
-    if (a.component.tagNameMeta < b.component.tagNameMeta) return -1;
-    if (a.component.tagNameMeta > b.component.tagNameMeta) return 1;
-    return 0;
-  });
-
-  const cmps: string[] = [];
-
-  registry.forEach(registryCmp => {
-    const tag = registryCmp.component.tagNameMeta;
-    let cmp: string[] = [];
-
-    cmp.push([
-      `    /** tag [0] **/`,
-      `    '${tag}'`
-    ].join('\n'));
-
-    let modes = [
-      `    /** ${tag}: modes [1] **/`,
-      `    {`
-    ];
-
-    modes.push(Object.keys(registryCmp.bundles).map(modeName => {
-      return `      ${formatModeName(modeName)}: '${registryCmp.bundles[modeName].id}'`;
-    }).join(',\n'));
-
-    modes.push(`    }`);
-    cmp.push(modes.join('\n'));
-
-    if (registryCmp.component.slotMeta === undefined) {
-      registryCmp.component.slotMeta = 0;
-    }
-
-    cmp.push(`    /** ${tag} slot meta [2] **/\n    ${registryCmp.component.slotMeta}`);
-
-    const props = registryCmp.component.propsMeta;
-
-    if ((props && props.length) || registryCmp.component.priorityMeta === PRIORITY_LOW) {
-
-      if (props && props.length) {
-        cmp.push([
-          `    /** ${tag}: props [3] **/`,
-          `${formatProps(registryCmp.component.propsMeta, attrOption, '    ')}`
-        ].join('\n'));
-
-      } else {
-        cmp.push(`    0 /** ${tag} has no props [3] **/`);
-      }
-
-      if (registryCmp.component.priorityMeta === PRIORITY_LOW) {
-        let priority = [
-          `    /** ${tag}: priority [4] **/`,
-          `    ${registryCmp.component.priorityMeta}`
-        ];
-        cmp.push(priority.join('\n'));
-      }
-    }
-
-    cmps.push(`  [\n${cmp.join(',\n\n')}\n  ]`);
-  });
-
-  return `[\n${cmps.join(',\n')}\n]`;
-}
-
 
 export function getBundledModulesId(bundle: Bundle) {
-  return bundle.components.map(c => c.component.tagNameMeta).sort().join('.');
+  return bundle.components.map(c => c.tagNameMeta).sort().join('.');
+}
+
+
+export function generateBundleId(content: string) {
+  return crypto.createHash('sha256')
+                  .update(content)
+                  .digest('hex')
+                  .substr(0, 8);
 }

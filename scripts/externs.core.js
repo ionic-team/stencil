@@ -64,6 +64,7 @@ function getNumber(){};
 function $el(){};
 function $meta(){};
 function listeners(){};
+function $(){};
 
 
 /**

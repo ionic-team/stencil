@@ -1,4 +1,4 @@
-import { Component, h, State, Ionic } from '../index';
+import { Component, h, Ionic, State } from '../index';
 
 
 @Component({

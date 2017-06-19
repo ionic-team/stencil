@@ -1,9 +1,8 @@
-import { Component, Prop, h, Ionic } from '../index';
+import { Component, h, Ionic, Prop } from '../index';
 
 
 @Component({
-  tag: 'comments-page',
-  styleUrls: 'main.scss'
+  tag: 'comments-page'
 })
 export class CommentsPage {
 
