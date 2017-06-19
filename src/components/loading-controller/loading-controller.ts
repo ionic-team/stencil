@@ -1,5 +1,5 @@
 import { Component, Ionic, Listen } from '../index';
-import { IonicGlobal, LoadingEvent, LoadingOptions, Loading, IonicControllerApi } from '../../util/interfaces';
+import { GlobalNamespace, LoadingEvent, LoadingOptions, Loading, IonicControllerApi } from '../../util/interfaces';
 
 
 @Component({
@@ -15,7 +15,7 @@ export class LoadingController implements IonicControllerApi {
 
   ionViewDidLoad() {
     this.appRoot = document.querySelector('ion-app') || document.body;
-    (<IonicGlobal>Ionic).loadController('loading', this);
+    (<GlobalNamespace>Ionic).loadController('loading', this);
   }
 
 

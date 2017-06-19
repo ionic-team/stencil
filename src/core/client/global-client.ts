@@ -1,9 +1,9 @@
 import { addEventListener, enableListener } from '../instance/events';
-import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, Ionic, IonicGlobal,
+import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, Ionic, GlobalNamespace,
   ListenOptions, IonicControllerApi, PlatformApi, QueueApi } from '../../util/interfaces';
 
 
-export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, queue: QueueApi, domCtrl: DomControllerApi): Ionic {
+export function initGlobal(Gbl: GlobalNamespace, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, queue: QueueApi, domCtrl: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -18,18 +18,18 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomAp
   }
 
   // properties that can stay hidden from public use
-  const controllers: any = IonicGbl.controllers = {};
+  const controllers: any = Gbl.controllers = {};
 
-  (<Ionic>IonicGbl).isClient = true;
-  (<Ionic>IonicGbl).isServer = false;
+  (<Ionic>Gbl).isClient = true;
+  (<Ionic>Gbl).isServer = false;
 
   // properties to be exposed to public
   // in actuality it's the exact same object
-  IonicGbl.config = config;
+  Gbl.config = config;
 
-  (<Ionic>IonicGbl).dom = domCtrl;
+  (<Ionic>Gbl).dom = domCtrl;
 
-  (<Ionic>IonicGbl).emit = (instance: any, eventName: string, data: CustomEventOptions) => {
+  (<Ionic>Gbl).emit = (instance: any, eventName: string, data: CustomEventOptions) => {
     data = data || {};
     if (data.bubbles === undefined) {
       data.bubbles = true;
@@ -38,15 +38,15 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomAp
       // https://developers.google.com/web/fundamentals/getting-started/primers/shadowdom#events
       data.composed = true;
     }
-    if (IonicGbl.eventNameFn) {
-      eventName = IonicGbl.eventNameFn(eventName);
+    if (Gbl.eventNameFn) {
+      eventName = Gbl.eventNameFn(eventName);
     }
     instance && instance.$el && instance.$el.dispatchEvent(
       new win.CustomEvent(eventName, data)
     );
   };
 
-  (<Ionic>IonicGbl).listener = {
+  (<Ionic>Gbl).listener = {
     enable: function(instance: any, eventName: string, shouldEnable: boolean, attachTo?: string) {
       enableListener(plt, queue, (<Component>instance).$el, instance, eventName, shouldEnable, attachTo);
     },
@@ -59,7 +59,7 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomAp
   // be resolved when the controller finishes loading
   const queuedCtrlResolves: {[ctrlName: string]: any[]} = {};
 
-  (<Ionic>IonicGbl).controller = (ctrlName: string, opts?: any) => {
+  (<Ionic>Gbl).controller = (ctrlName: string, opts?: any) => {
     // loading a controller is always async so return a promise
     return new Promise<any>((resolve: Function) => {
       // see if we already have the controller loaded
@@ -88,7 +88,7 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomAp
     });
   };
 
-  IonicGbl.loadController = (ctrlName: string, ctrl: IonicControllerApi) => {
+  Gbl.loadController = (ctrlName: string, ctrl: IonicControllerApi) => {
     // this method is called when the singleton
     // instance of our controller initially loads
 
@@ -125,5 +125,5 @@ export function initInjectedIonic(IonicGbl: IonicGlobal, win: any, domApi: DomAp
     }
   }
 
-  return (<Ionic>IonicGbl);
+  return (<Ionic>Gbl);
 }

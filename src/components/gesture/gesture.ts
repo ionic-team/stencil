@@ -1,7 +1,7 @@
 import { applyStyles, getElementReference, pointerCoordX, pointerCoordY } from '../../util/helpers';
 import { BlockerDelegate } from './gesture-controller';
 import { Component, Ionic, Listen, Prop, Watch } from '../index';
-import { GestureCallback, GestureDetail, IonicGlobal } from '../../util/interfaces';
+import { GestureCallback, GestureDetail, GlobalNamespace } from '../../util/interfaces';
 import { GestureController, GestureDelegate, BLOCK_ALL } from './gesture-controller';
 import { PanRecognizer } from './recognizers';
 
@@ -44,7 +44,7 @@ export class Gesture {
 
 
   ionViewDidLoad() {
-    this.ctrl = (<IonicGlobal>Ionic).controllers.gesture = ((<IonicGlobal>Ionic).controllers.gesture || new GestureController());
+    this.ctrl = (<GlobalNamespace>Ionic).controllers.gesture = ((<GlobalNamespace>Ionic).controllers.gesture || new GestureController());
 
     this.gesture = this.ctrl.createGesture(this.gestureName, this.gesturePriority, this.disableScroll);
 

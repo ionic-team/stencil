@@ -1,12 +1,12 @@
-import { IonicGlobal } from '../../util/interfaces';
+import { GlobalNamespace } from '../../util/interfaces';
 
 
-export function generateGlobalContext(win: any, IonicGbl: IonicGlobal): any {
+export function generateGlobalContext(win: any, Gbl: GlobalNamespace): any {
 
   return {
 
     // injected Ionic Global
-    Ionic: IonicGbl,
+    Ionic: Gbl,
 
     // common
     window: win,

@@ -1,4 +1,4 @@
-import { IonicGlobal } from '../../../util/interfaces';
+import { GlobalNamespace } from '../../../util/interfaces';
 
 
 // keep this all ES5!
@@ -6,7 +6,7 @@ import { IonicGlobal } from '../../../util/interfaces';
   'use strict';
 
   // create window.Ionic if it doesn't already exist
-  var ionic: IonicGlobal = window.Ionic = window.Ionic || {};
+  var ionic: GlobalNamespace = window.Ionic = window.Ionic || {};
 
   // find the static directory, which should be the same as this JS file
   // reusing the "x" and "y" variables for funzies

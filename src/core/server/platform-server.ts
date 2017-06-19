@@ -1,17 +1,17 @@
 import { assignHostContentSlots } from '../renderer/slot';
 import { attributeChangedCallback } from '../instance/attribute-changed';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomApi, DomControllerApi, HostElement, IonicGlobal, PlatformApi, StencilSystem } from '../../util/interfaces';
+  DomApi, DomControllerApi, HostElement, GlobalNamespace, PlatformApi, StencilSystem } from '../../util/interfaces';
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './global-context';
 import { h, t } from '../renderer/h';
-import { initInjectedIonic } from './ionic-server';
+import { initGlobal } from './global-server';
 import { isDef, isString } from '../../util/helpers';
 import { parseComponentMeta } from '../../util/data-parse';
 import { STYLES } from '../../util/constants';
 
 
-export function createPlatformServer(sys: StencilSystem, IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
+export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = {};
   const moduleImports: any = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
@@ -26,7 +26,7 @@ export function createPlatformServer(sys: StencilSystem, IonicGbl: IonicGlobal, 
     loadBundle,
     collectHostContent,
     config,
-    queue: IonicGbl.QueueCtrl,
+    queue: Gbl.QueueCtrl,
     getMode,
     attachStyles,
     tmpDisconnected: false,
@@ -37,10 +37,10 @@ export function createPlatformServer(sys: StencilSystem, IonicGbl: IonicGlobal, 
 
   plt.render = createRenderer(plt, domApi);
 
-  const injectedIonic = initInjectedIonic(config, dom);
+  const injectedGlobal = initGlobal(config, dom);
 
   // generate a sandboxed context
-  const context = generateGlobalContext(win, IonicGbl);
+  const context = generateGlobalContext(win, Gbl);
   sys.vm.createContext(context);
 
 
@@ -108,13 +108,13 @@ export function createPlatformServer(sys: StencilSystem, IonicGbl: IonicGlobal, 
   }
 
 
-  IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
+  Gbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
     coreVersion;
     const args = arguments;
 
     // import component function
-    // inject ionic globals
-    importFn(moduleImports, h, t, injectedIonic);
+    // inject globals
+    importFn(moduleImports, h, t, injectedGlobal);
 
     for (var i = 3; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);
@@ -148,7 +148,7 @@ export function createPlatformServer(sys: StencilSystem, IonicGbl: IonicGlobal, 
       (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
 
       // create the filePath we'll be reading
-      const filePath = sys.path.join(IonicGbl.staticDir, `bundles`, `ionic.${bundleId}.js`);
+      const filePath = sys.path.join(Gbl.staticDir, `bundles`, `ionic.${bundleId}.js`);
 
       if (!activeFileReads[filePath]) {
         // not already actively reading this file

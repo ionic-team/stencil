@@ -1,5 +1,5 @@
 import { Component, h, Ionic, Prop, Watch } from '../index';
-import { VNodeData, IonicGlobal, Menu as IMenu } from '../../util/interfaces';
+import { VNodeData, GlobalNamespace, Menu as IMenu } from '../../util/interfaces';
 import { MenuController } from './menu-controller';
 import { MenuType } from './menu-types';
 
@@ -96,7 +96,7 @@ export class Menu implements IMenu {
 
   constructor() {
     // get or create the MenuController singleton
-    this._ctrl = (Ionic as IonicGlobal).controllers.menu = ((Ionic as IonicGlobal).controllers.menu || new MenuController());
+    this._ctrl = (Ionic as GlobalNamespace).controllers.menu = ((Ionic as GlobalNamespace).controllers.menu || new MenuController());
   }
 
 

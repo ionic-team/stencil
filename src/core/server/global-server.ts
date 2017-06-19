@@ -1,12 +1,12 @@
-import { ConfigApi, DomControllerApi, Ionic, IonicGlobal, PlatformConfig } from '../../util/interfaces';
+import { ConfigApi, DomControllerApi, Ionic, GlobalNamespace, PlatformConfig } from '../../util/interfaces';
 import { createConfigController } from '../../util/config-controller';
 import { QueueServer } from './queue-server';
 import { noop } from '../../util/helpers';
 
 
-export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
+export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
 
-  const injectedIonic: Ionic = {
+  const injectedGlobal: Ionic = {
     isServer: true,
     isClient: false,
     theme: null,
@@ -20,7 +20,7 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     controller: serverController,
   };
 
-  (<IonicGlobal>injectedIonic).controllers = {};
+  (<GlobalNamespace>injectedGlobal).controllers = {};
 
   function serverController(ctrlName: string, opts?: any) {
     const promise: any = new Promise((resolve, reject) => {
@@ -34,19 +34,19 @@ export function initInjectedIonic(ConfigCtrl: ConfigApi, DomCtrl: DomControllerA
     return promise;
   }
 
-  Object.defineProperty(injectedIonic, 'Animation', {
+  Object.defineProperty(injectedGlobal, 'Animation', {
     get: function() {
       console.error(`Ionic.Animation is not available on the server`);
       return {};
     }
   });
 
-  return injectedIonic;
+  return injectedGlobal;
 }
 
 
-export function initIonicGlobal(configObj: any, platforms: PlatformConfig[], staticDir: string) {
-  const IonicGbl: IonicGlobal = {
+export function initGlobalNamespace(configObj: any, platforms: PlatformConfig[], staticDir: string) {
+  const IonicGbl: GlobalNamespace = {
     ConfigCtrl: createConfigController(configObj, platforms),
     DomCtrl: {
       read: function(cb: Function) { process.nextTick(() => { cb(Date.now()); }); },

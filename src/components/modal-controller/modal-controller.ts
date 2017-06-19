@@ -1,5 +1,5 @@
 import { Component, Ionic, Listen } from '../index';
-import { IonicGlobal, ModalEvent, ModalOptions, Modal, IonicControllerApi } from '../../util/interfaces';
+import { GlobalNamespace, ModalEvent, ModalOptions, Modal, IonicControllerApi } from '../../util/interfaces';
 
 
 @Component({
@@ -15,7 +15,7 @@ export class ModalController implements IonicControllerApi {
 
   ionViewDidLoad() {
     this.appRoot = document.querySelector('ion-app') || document.body;
-    (<IonicGlobal>Ionic).loadController('modal', this);
+    (<GlobalNamespace>Ionic).loadController('modal', this);
   }
 
 

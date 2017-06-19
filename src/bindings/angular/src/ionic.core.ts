@@ -1,9 +1,9 @@
 import { createDomApi } from '../../../core/renderer/dom-api';
 import { createPlatformClient } from '../../../core/client/platform-client';
-import { IonicGlobal } from '../../../util/interfaces';
+import { GlobalNamespace } from '../../../util/interfaces';
 
 
-const IonicGbl: IonicGlobal = (<any>window).Ionic = (<any>window).Ionic || {};
+const IonicGbl: GlobalNamespace = (<any>window).Ionic = (<any>window).Ionic || {};
 
 const plt = createPlatformClient(
   IonicGbl,

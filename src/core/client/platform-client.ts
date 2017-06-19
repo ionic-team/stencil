@@ -1,17 +1,17 @@
 import { assignHostContentSlots } from '../renderer/slot';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
   ConfigApi, DomControllerApi, DomApi, HostElement,
-  IonicGlobal, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
+  GlobalNamespace, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
 import { createRenderer } from '../renderer/patch';
 import { h, t } from '../renderer/h';
 import { isDef, isString } from '../../util/helpers';
 import { initHostConstructor } from '../instance/init';
-import { initInjectedIonic } from './ionic-client';
+import { initGlobal } from './global-client';
 import { parseComponentMeta } from '../../util/data-parse';
 import { STYLES } from '../../util/constants';
 
 
-export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
+export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
   const registry: ComponentRegistry = {};
   const moduleImports: any = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
@@ -35,7 +35,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
 
   plt.render = createRenderer(plt, domApi);
 
-  const injectedIonic = initInjectedIonic(IonicGbl, win, domApi, plt, config, queue, domCtrl);
+  const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, queue, domCtrl);
 
 
   function getMode(elm: HostElement): string {
@@ -166,7 +166,7 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
     initAppStyles = null;
 
     // let it be know, we have loaded
-    injectedIonic.emit(plt.appRoot.$instance, 'ionLoad');
+    injectedGlobal.emit(plt.appRoot.$instance, 'ionLoad');
 
     // kick off loading the auxiliary code, which has stuff that wasn't
     // needed for the initial paint, such as animation code
@@ -191,14 +191,14 @@ export function createPlatformClient(IonicGbl: IonicGlobal, win: Window, domApi:
   }
 
 
-  IonicGbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
+  Gbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
     coreVersion;
     const args = arguments;
     const bundleCmpMeta: ComponentMeta[] = [];
 
     // import component function
-    // inject ionic globals
-    importFn(moduleImports, h, t, injectedIonic);
+    // inject globals
+    importFn(moduleImports, h, t, injectedGlobal);
 
     for (var i = 3; i < args.length; i++) {
       bundleCmpMeta.push(

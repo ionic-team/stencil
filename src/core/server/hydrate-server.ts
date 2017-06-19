@@ -2,7 +2,7 @@ import { ComponentRegistry, HostElement, PlatformApi, HydrateOptions, StencilSys
 import { createDomApi } from '../renderer/dom-api';
 import { createPlatformServer } from './platform-server';
 import { detectPlatforms } from '../platform/platform-util';
-import { initIonicGlobal } from './ionic-server';
+import { initGlobalNamespace } from './global-server';
 import { initHostConstructor } from '../instance/init';
 import { PLATFORM_CONFIGS } from '../platform/platform-configs';
 
@@ -10,7 +10,7 @@ import { PLATFORM_CONFIGS } from '../platform/platform-configs';
 export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: ComponentRegistry, opts: HydrateOptions, callback: (err: any, html: string) => void) {
   const platforms = detectPlatforms(opts.url, opts.userAgent, PLATFORM_CONFIGS, 'core');
 
-  const IonicGbl = initIonicGlobal(opts.config, platforms, staticDir);
+  const Glb = initGlobalNamespace(opts.config, platforms, staticDir);
 
   // create a emulated window
   // attach data the request to the window
@@ -21,7 +21,7 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
   const domApi = createDomApi(win.document);
 
   // create the platform for this hydrate
-  const plt = createPlatformServer(sys, IonicGbl, <any>win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+  const plt = createPlatformServer(sys, Glb, <any>win, domApi, Glb.ConfigCtrl, Glb.DomCtrl);
 
   // fully define each of our components onto this new platform instance
   Object.keys(registry).forEach(tag => {

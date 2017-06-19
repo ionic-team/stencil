@@ -1,6 +1,6 @@
 import { Component, Listen, Ionic, Prop } from '../index';
 import { GestureController, GestureDelegate } from '../gesture/gesture-controller';
-import { IonicGlobal, ScrollCallback, ScrollDetail } from '../../util/interfaces';
+import { GlobalNamespace, ScrollCallback, ScrollDetail } from '../../util/interfaces';
 import { Scroll as IScroll } from './scroll-interface';
 
 
@@ -29,7 +29,7 @@ export class Scroll implements IScroll {
   ionViewDidLoad() {
     if (Ionic.isServer) return;
 
-    const ctrl = (<IonicGlobal>Ionic).controllers.gesture = ((<IonicGlobal>Ionic).controllers.gesture || new GestureController());
+    const ctrl = (<GlobalNamespace>Ionic).controllers.gesture = ((<GlobalNamespace>Ionic).controllers.gesture || new GestureController());
 
     this.gesture = ctrl.createGesture('scroll', 100, false);
   }

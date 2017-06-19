@@ -28,7 +28,7 @@ export interface IonicControllerApi {
 }
 
 
-export interface IonicGlobal {
+export interface GlobalNamespace {
   staticDir?: string;
   components?: LoadComponentMeta[];
   defineComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
