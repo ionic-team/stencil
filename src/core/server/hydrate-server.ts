@@ -4,6 +4,7 @@ import { createPlatformServer } from './platform-server';
 import { detectPlatforms } from '../platform/platform-util';
 import { initGlobalNamespace } from './global-server';
 import { initHostConstructor } from '../instance/init';
+import { optimizeDocument } from './optimize-document';
 import { PLATFORM_CONFIGS } from '../platform/platform-configs';
 
 
@@ -16,6 +17,12 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
   // attach data the request to the window
   const dom = sys.createDom();
   const win = dom.parse(opts);
+  const doc = win.document;
+
+  // normalize dir and lang before connecting elements
+  // so that the info is their incase they read it at runtime
+  normalizeDirection(doc, opts);
+  normalizeLanguage(doc, opts);
 
   // create the DOM api which we'll use during hydrate
   const domApi = createDomApi(win.document);
@@ -30,7 +37,9 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
 
   // fire off this function when the app has finished loading
   // and all components have finished hydrating
-  plt.onAppLoad = () => {
+  plt.onAppLoad = (rootElm, css) => {
+    rootElm;
+    optimizeDocument(doc, css, opts);
     callback(null, dom.serialize());
   };
 
@@ -56,6 +65,60 @@ export function connectElement(plt: PlatformApi, elm: HostElement) {
     // continue drilling down through child elements
     for (var i = 0; i < elm.children.length; i++) {
       connectElement(plt, <HostElement>elm.children[i]);
+    }
+  }
+}
+
+
+function normalizeDirection(doc: Document, opts: HydrateOptions) {
+  let dir = doc.body.getAttribute('dir');
+  if (dir) {
+    dir = dir.trim().toLowerCase();
+    if (dir.trim().length > 0) {
+      console.warn(`dir="${dir}" should be placed on the <html> instead of <body>`);
+    }
+  }
+
+  if (opts.dir) {
+    dir = opts.dir;
+  } else {
+    dir = doc.documentElement.getAttribute('dir');
+  }
+
+  if (dir) {
+    dir = dir.trim().toLowerCase();
+    if (dir !== 'ltr' && dir !== 'rtl') {
+      console.warn(`only "ltr" and "rtl" are valid "dir" values on the <html> element`);
+    }
+  }
+
+  if (dir !== 'ltr' && dir !== 'rtl') {
+    dir = 'ltr';
+  }
+
+  doc.documentElement.dir = dir;
+}
+
+
+function normalizeLanguage(doc: Document, opts: HydrateOptions) {
+  let lang = doc.body.getAttribute('lang');
+  if (lang) {
+    lang = lang.trim().toLowerCase();
+    if (lang.trim().length > 0) {
+      console.warn(`lang="${lang}" should be placed on <html> instead of <body>`);
+    }
+  }
+
+  if (opts.lang) {
+    lang = opts.lang;
+  } else {
+    lang = doc.documentElement.getAttribute('lang');
+  }
+
+  if (lang) {
+    lang = lang.trim().toLowerCase();
+    if (lang.length > 0) {
+      doc.documentElement.lang = lang;
     }
   }
 }

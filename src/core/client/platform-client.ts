@@ -27,7 +27,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     loadBundle,
     config,
     queue,
-    collectHostContent,
+    connectHostElement,
     getMode,
     attachStyles,
     appLoaded
@@ -128,7 +128,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     return registry[elm.tagName];
   }
 
-  function collectHostContent(elm: HostElement, slotMeta: number) {
+  function connectHostElement(elm: HostElement, slotMeta: number) {
     assignHostContentSlots(domApi, elm, slotMeta);
   }
 

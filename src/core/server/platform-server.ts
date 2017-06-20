@@ -17,22 +17,21 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
   const activeFileReads: {[url: string]: boolean} = {};
-  const css: {[cmpModeId: string]: string} = {};
+  const css: {[componentTag: string]: string} = {};
   let ssrIds = 0;
 
   const plt: PlatformApi = {
     defineComponent,
     getComponentMeta,
     loadBundle,
-    collectHostContent,
+    connectHostElement,
     config,
     queue: Gbl.QueueCtrl,
     getMode,
     attachStyles,
     tmpDisconnected: false,
-    css: css,
-    isServer: true,
-    appLoaded
+    appLoaded,
+    isServer: true
   };
 
   plt.render = createRenderer(plt, domApi);
@@ -62,8 +61,6 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   }
 
   function attachStyles(cmpMeta: ComponentMeta, elm: any, instance: Component) {
-    domApi.$setAttribute(elm, 'ssr', ssrIds++);
-
     cmpMeta.propsMeta.forEach(prop => {
       attributeChangedCallback(plt, elm, prop.attribName, null, domApi.$getAttribute(elm, prop.attribName));
     });
@@ -94,13 +91,19 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     return registry[elm.tagName];
   }
 
-  function collectHostContent(elm: HostElement, slotMeta: number) {
-    assignHostContentSlots(domApi, elm, slotMeta);
-  }
+  function connectHostElement(elm: HostElement, slotMeta: number) {
+    const ssrId = ssrIds++;
+    domApi.$setAttribute(elm, 'data-ssr', ssrId);
 
-  function appLoaded() {
-    // let it be know, we have loaded
-    plt.onAppLoad && plt.onAppLoad(plt.appRoot);
+    for (let i = 0, childNodeLen = elm.childNodes.length; i < childNodeLen; i++) {
+      var childNode = elm.childNodes[i];
+
+      if (domApi.$nodeType(childNode) === 1) {
+        domApi.$setAttribute(childNode, 'data-ssrc', ssrId);
+      }
+    }
+
+    assignHostContentSlots(domApi, elm, slotMeta);
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
@@ -119,9 +122,6 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     for (var i = 3; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);
     }
-
-    // append all of the bundle's styles to the document in one go
-    // appendBundleStyles(bundleCmpMeta);
 
     // fire off all the callbacks waiting on this bundle to load
     var callbacks = bundleCallbacks[bundleId];
@@ -172,6 +172,11 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
 
       }
     }
+  }
+
+  function appLoaded() {
+    // let it be know, we have loaded
+    plt.onAppLoad && plt.onAppLoad(plt.appRoot, Object.keys(css).sort().map(tag => css[tag]).join(''));
   }
 
   return plt;

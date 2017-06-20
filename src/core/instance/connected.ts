@@ -44,7 +44,7 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     const cmpMeta = plt.getComponentMeta(elm);
 
     // only collects slot references if this component even has slots
-    plt.collectHostContent(elm, cmpMeta.slotMeta);
+    plt.connectHostElement(elm, cmpMeta.slotMeta);
 
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can

@@ -2,7 +2,7 @@ import { ComponentMeta, ConfigApi, HostElement, HydrateOptions, Ionic,
   GlobalNamespace, DomApi, PlatformConfig, PlatformApi, StencilSystem } from '../util/interfaces';
 import { createConfigController } from '../util/config-controller';
 import { createDomApi } from '../core/renderer/dom-api';
-import { initInjectedIonic, initIonicGlobal } from '../core/server/ionic-server';
+import { initGlobal, initGlobalNamespace } from '../core/server/global-server';
 import { createPlatformServer } from '../core/server/platform-server';
 import { createRenderer } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
@@ -53,13 +53,13 @@ export function mockIonicGlobal(config?: ConfigApi): GlobalNamespace {
   if (!config) {
     config = mockConfig({}, []);
   }
-  const IonicGbl: GlobalNamespace = initIonicGlobal(config, [], '');
+  const IonicGbl: GlobalNamespace = initGlobalNamespace(config, [], '');
   return IonicGbl;
 }
 
 
 export function mockInjectedIonic(IonicGbl: GlobalNamespace): Ionic {
-  const ionic = initInjectedIonic(IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+  const ionic = initGlobal(IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
   return ionic;
 }
 
@@ -144,6 +144,11 @@ export function mockQueue() {
     flush: flush,
     clear: clear
   };
+}
+
+
+export function mockHtml(html: string): Element {
+  return jsdom.JSDOM.fragment(html.trim()).firstChild;
 }
 
 

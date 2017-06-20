@@ -775,17 +775,16 @@ export interface PlatformApi {
   loadBundle: (bundleId: string, cb: Function) => void;
   render?: RendererApi;
   config: ConfigApi;
-  collectHostContent: (elm: HostElement, slotMeta: number) => void;
+  connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
-  css?: {[cmpModeId: string]: string};
   isServer?: boolean;
   attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
   getMode: (elm: Element) => string;
   appRoot?: HostElement;
+  appLoaded?: () => void;
+  onAppLoad?: (rootElm: HostElement, css: string) => void;
   hasAppLoaded?: boolean;
-  appLoaded: () => void;
   tmpDisconnected?: boolean;
-  onAppLoad?: (rootElm: HostElement) => void;
 }
 
 
@@ -937,5 +936,8 @@ export interface HydrateOptions {
   referrer?: string;
   userAgent?: string;
   cookie?: string;
+  dir?: string;
+  lang?: string;
   config?: Object;
+  removeUnusedCss?: boolean;
 }

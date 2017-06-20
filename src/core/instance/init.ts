@@ -102,7 +102,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
       plt.hasAppLoaded = true;
 
       // let the platform know we're all loaded now
-      plt.appLoaded();
+      plt.appLoaded && plt.appLoaded();
     }
 
     // ( •_•)
