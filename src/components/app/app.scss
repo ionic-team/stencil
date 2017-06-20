@@ -135,7 +135,7 @@ a {
   background-color: transparent;
 }
 
-.enable-hover a:hover {
+.enable-hover a:not(.button):hover {
   opacity: .7;
 }
 
