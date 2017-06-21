@@ -14,6 +14,17 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     console.log(`compile, generateManifest: ${destDir}`);
   }
 
+  // normalize bundle component tags
+  config.bundles.forEach(b => {
+    if (Array.isArray(b.components)) {
+      b.components = b.components.map(c => c.toLowerCase().trim());
+      return;
+    }
+
+    console.error(`compile, generateManifest: missing bundle components array, instead received: ${b.components}`);
+    b.components = [];
+  });
+
   ctx.files.forEach(f => {
     if (!f.isTsSourceFile || !f.cmpMeta || !f.cmpMeta.tagNameMeta) return;
 
