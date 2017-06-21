@@ -15,7 +15,17 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
   }
 
   ctx.files.forEach(f => {
-    if (!f.isTsSourceFile || !f.cmpMeta) return;
+    if (!f.isTsSourceFile || !f.cmpMeta || !f.cmpMeta.tagNameMeta) return;
+
+    let includeComponent = false;
+    for (var i = 0; i < config.bundles.length; i++) {
+      if (config.bundles[i].components.indexOf(f.cmpMeta.tagNameMeta) > -1) {
+        includeComponent = true;
+        break;
+      }
+    }
+
+    if (!includeComponent) return;
 
     const cmpMeta: ComponentMeta = Object.assign({}, <any>f.cmpMeta);
 
