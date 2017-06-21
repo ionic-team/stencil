@@ -49,6 +49,10 @@ export class StringifyCss {
       .join('');
   }
 
+  comment() {
+    return '';
+  }
+
   /**
    * Visit import node.
    */
