@@ -3,6 +3,14 @@
   "private": true,
   "version": "0.0.1",
   "license": "MIT",
+  "bin": {
+    "stencil": "./bin/stencil"
+  },
+  "engines": {
+    "node": ">=6.4.0"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.ssr",
     "build.compiler": "npm run transpile.compiler && node dist/scripts/build-compiler.js",
