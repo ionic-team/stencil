@@ -23,6 +23,7 @@ import * as path from 'path';
 import * as rollup from 'rollup';
 import * as typescript from 'typescript';
 import * as uglify from 'uglify-js';
+import * as ncp from 'ncp';
 
 export type Bundle = {
   components: string[];
@@ -34,7 +35,7 @@ export type StencilConfig = {
   bundles: Bundle[]
 }
 
-const compiler = require(path.join(__dirname, '../compiler'));
+const compiler = require(path.join(__dirname, '..' , 'compiler'));
 
 export function run(pargv: string[], env: { [k: string]: string }) {
   pargv; env;
@@ -47,16 +48,20 @@ export function run(pargv: string[], env: { [k: string]: string }) {
 
   // dynamic require cuz this file gets transpiled to dist/
   const ctx = {};
-  const transpiledSrcDir = path.join(destDir, 'transpiled-web/bindings/web/src');
-  const compiledDir = path.join(destDir, 'compiled-ionic-web');
+  const transpiledSrcDir = path.join(__dirname, '../transpiled-web/bindings/web/src');
+  const compiledDir = destDir;
 
   // first clean out the ionic-web directories
   fs.emptyDirSync(destDir);
 
-  // find all the source components and compile
-  // them into reusable components, and create a manifest.json
-  // where all the components can be found, and their styles.
-  compileComponents(ctx, compiledDir, srcDir, bundles).then(() => {
+  copyDirectory(path.join(projectBase, 'src', 'vendor'), path.join(destDir, 'vendor')).then(() => {
+
+    // find all the source components and compile
+    // them into reusable components, and create a manifest.json
+    // where all the components can be found, and their styles.
+    return compileComponents(ctx, compiledDir, srcDir, bundles);
+
+  }).then(() => {
 
     // build all of the core files for ionic-web
     // the core files are what makes up how ionic-core "works"
@@ -184,6 +189,17 @@ function buildWebLoader(componentRegistry: string, devMode: boolean, transpiledS
           }
         });
       });
+    });
+  });
+}
+
+export function copyDirectory(source: string, destination: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    ncp.ncp(source, destination, { clobber: true }, (err: Error) => {
+      if (err) {
+        reject(err);
+      }
+      resolve();
     });
   });
 }
