@@ -48,7 +48,7 @@ export function run(pargv: string[], env: { [k: string]: string }) {
   // dynamic require cuz this file gets transpiled to dist/
   const ctx = {};
   const transpiledSrcDir = path.join(__dirname, '../transpiled-web/bindings/web/src');
-  const compiledDir = destDir;
+  const compiledDir = path.join(projectBase, 'temp');
 
   // first clean out the ionic-web directories
   // fs.emptyDirSync(destDir);
@@ -73,6 +73,14 @@ export function run(pargv: string[], env: { [k: string]: string }) {
       return buildWebLoader(results.componentRegistry, DEV_MODE, transpiledSrcDir, destDir);
     });
 
+  }).then(() => {
+
+    // Copy built animation file
+    return copyAnimation(compiledDir, destDir);
+  }).then(() => {
+
+    // Remove temp compiled dir
+    fs.removeSync(compiledDir);
   }).catch(err => {
     if (err) {
       if (err.stack) {
@@ -185,6 +193,22 @@ function buildWebLoader(componentRegistry: string, devMode: boolean, transpiledS
           }
         });
       });
+    });
+  });
+}
+
+function copyAnimation(compiledDir: string, destDir: string) {
+  return new Promise((resolve, reject) => {
+    const srcName = DEV_MODE ? 'ionic.animation.dev.js' : 'ionic.animation.js';
+    const src = path.join(compiledDir, 'core', srcName);
+    const dest = path.join(destDir, 'ionic.animation.js');
+
+    fs.copy(src, dest, err => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
     });
   });
 }

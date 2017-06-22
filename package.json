@@ -14,7 +14,7 @@
   "scripts": {
     "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.ssr",
     "build.types": " tsc --declaration src/index.ts --outDir ./dist",
-    "build.stencil": "npm run clean && npm run transpile && npm run build.compiler",
+    "build.stencil": "npm run clean && npm run transpile && npm run build.compiler && npm run build.types",
     "build.compiler": "npm run transpile.compiler && node dist/scripts/build-compiler.js",
     "build.web": "node dist/scripts/build-web.js",
     "build.angular": "npm run copy.angular && node dist/scripts/build-angular.js",
