@@ -23,7 +23,6 @@ import * as path from 'path';
 import * as rollup from 'rollup';
 import * as typescript from 'typescript';
 import * as uglify from 'uglify-js';
-import * as ncp from 'ncp';
 
 export type Bundle = {
   components: string[];
@@ -52,16 +51,13 @@ export function run(pargv: string[], env: { [k: string]: string }) {
   const compiledDir = destDir;
 
   // first clean out the ionic-web directories
-  fs.emptyDirSync(destDir);
+  // fs.emptyDirSync(destDir);
 
-  copyDirectory(path.join(projectBase, 'src', 'vendor'), path.join(destDir, 'vendor')).then(() => {
 
-    // find all the source components and compile
-    // them into reusable components, and create a manifest.json
-    // where all the components can be found, and their styles.
-    return compileComponents(ctx, compiledDir, srcDir, bundles);
-
-  }).then(() => {
+  // find all the source components and compile
+  // them into reusable components, and create a manifest.json
+  // where all the components can be found, and their styles.
+  compileComponents(ctx, compiledDir, srcDir, bundles).then(() => {
 
     // build all of the core files for ionic-web
     // the core files are what makes up how ionic-core "works"
@@ -189,17 +185,6 @@ function buildWebLoader(componentRegistry: string, devMode: boolean, transpiledS
           }
         });
       });
-    });
-  });
-}
-
-export function copyDirectory(source: string, destination: string): Promise<any> {
-  return new Promise((resolve, reject) => {
-    ncp.ncp(source, destination, { clobber: true }, (err: Error) => {
-      if (err) {
-        reject(err);
-      }
-      resolve();
     });
   });
 }
