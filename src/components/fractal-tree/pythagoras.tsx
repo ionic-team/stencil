@@ -3,8 +3,7 @@ import { Component, h, Prop } from '../index';
 declare var d3: any;
 
 @Component({
-  tag: 'pythagoras-node',
-  styleUrls: 'main.scss'
+  tag: 'pythagoras-node'
 })
 export class Pythagoras {
 
