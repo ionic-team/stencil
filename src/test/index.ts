@@ -1,5 +1,5 @@
-import { ComponentMeta, ConfigApi, HostElement, HydrateOptions, Ionic,
-  GlobalNamespace, DomApi, PlatformConfig, PlatformApi, StencilSystem } from '../util/interfaces';
+import { ComponentMeta, ConfigApi, HostElement, HostContentNodes, HydrateOptions, Ionic,
+  GlobalNamespace, DomApi, PlatformConfig, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createConfigController } from '../util/config-controller';
 import { createDomApi } from '../core/renderer/dom-api';
 import { initGlobal, initGlobalNamespace } from '../core/server/global-server';
@@ -26,8 +26,8 @@ export function mockPlatform(IonicGbl?: GlobalNamespace) {
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();
 
-  plt.loadBundle = function(a: any, cb: Function) {
-    a;
+  plt.loadBundle = function(a: any, elm: HostElement, cb: Function) {
+    a; elm;
     $loadBundleQueue.add(cb);
   };
 
@@ -37,6 +37,12 @@ export function mockPlatform(IonicGbl?: GlobalNamespace) {
 
   (<MockedPlatform>plt).$flushLoadBundle = function(cb: Function) {
     $loadBundleQueue.flush(cb);
+  };
+
+  const renderer = createRenderer(plt, domApi);
+
+  plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, hostElementContentNode?: HostContentNodes) {
+    return renderer(oldVNode, newVNode, isUpdate, hostElementContentNode);
   };
 
   return (<MockedPlatform>plt);
@@ -230,4 +236,10 @@ export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string, cb?
   }).catch(err => {
     console.error('waitForLoad', err);
   });
+}
+
+export function compareHtml(input: string) {
+  return input.replace(/(\s*)/g, '')
+              .toLowerCase()
+              .trim();
 }

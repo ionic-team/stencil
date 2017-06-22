@@ -1,19 +1,20 @@
-import { assignHostContentSlots } from '../renderer/slot';
+import { assignHostContentSlots, createVNodeFromSsr } from '../renderer/slot';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
   ConfigApi, DomControllerApi, DomApi, HostElement,
   GlobalNamespace, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
+import { BUNDLE_ID, SSR_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
+import { getMode } from '../platform/mode';
 import { h, t } from '../renderer/h';
-import { isDef, isString } from '../../util/helpers';
+import { isString } from '../../util/helpers';
 import { initHostConstructor } from '../instance/init';
 import { initGlobal } from './global-client';
 import { parseComponentMeta } from '../../util/data-parse';
-import { STYLES } from '../../util/constants';
 
 
 export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
   const registry: ComponentRegistry = {};
-  const moduleImports: any = {};
+  const moduleImports: {[tag: string]: any} = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
   const activeJsonRequests: {[url: string]: boolean} = {};
@@ -28,7 +29,6 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     config,
     queue,
     connectHostElement,
-    getMode,
     attachStyles,
     appLoaded
   };
@@ -37,23 +37,6 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
 
   const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, queue, domCtrl);
 
-
-  function getMode(elm: HostElement): string {
-    // first let's see if they set the mode directly on the property
-    let value = (<any>elm).mode;
-    if (isDef(value)) {
-      return value;
-    }
-
-    // next let's see if they set the mode on the elements attribute
-    value = domApi.$getAttribute(elm, 'mode');
-    if (isDef(value)) {
-      return value;
-    }
-
-    // ok fine, let's just get the values from the config
-    return config.get('mode', 'md');
-  }
 
 
   function attachStyles(cmpMeta: ComponentMeta, elm: HostElement, instance: Component) {
@@ -129,7 +112,12 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   }
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
-    assignHostContentSlots(domApi, elm, slotMeta);
+    const ssrId = domApi.$getAttribute(elm, SSR_ID);
+    if (ssrId) {
+      elm._vnode = createVNodeFromSsr(domApi, elm, ssrId);
+    } else {
+      assignHostContentSlots(domApi, elm, slotMeta);
+    }
   }
 
   function appendBundleStyles(bundleCmpMeta: ComponentMeta[]) {
@@ -223,7 +211,12 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   };
 
 
-  function loadBundle(bundleId: string, cb: Function): void {
+  function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
+    // get the mode the element which is loading
+    // if there is no mode, then use "default"
+    const cmpMode = cmpMeta.modesMeta[getMode(domApi, config, elm)] || cmpMeta.modesMeta.$;
+    const bundleId = cmpMode[BUNDLE_ID];
+
     if (loadedBundles[bundleId]) {
       // we've already loaded this bundle
       cb();
@@ -231,7 +224,11 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the bundle callbacks to fire when it's loaded
-      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
+      if (bundleCallbacks[bundleId]) {
+        bundleCallbacks[bundleId].push(cb);
+      } else {
+        bundleCallbacks[bundleId] = [cb];
+      }
 
       // create the url we'll be requesting
       const url = `${staticDir}bundles/ionic.${bundleId}.js`;

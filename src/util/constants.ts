@@ -32,8 +32,25 @@ export const PRIORITY_LOW = 1;
 /**
  * Slot Meta
  */
+export const SLOT_TAG = 0;
 export const HAS_SLOTS = 1;
 export const HAS_NAMED_SLOTS = 2;
+
+
+/**
+ * SSR Attribute Names
+ */
+export const SSR_ID = 'ssrid';
+export const SSR_SLOT_START = 's:';
+export const SSR_SLOT_END = '/s';
+
+
+/**
+ * Node Types
+ */
+export const ELEMENT_NODE = 1;
+export const TEXT_NODE = 3;
+export const COMMENT_NODE = 8;
 
 
 /**

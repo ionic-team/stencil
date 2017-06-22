@@ -31,12 +31,16 @@ export function createDomApi(document: Document): DomApi {
       return document.createTextNode(text);
     },
 
+    $createComment: function createComment(data: string) {
+      return document.createComment(data);
+    },
+
     $insertBefore: function insertBefore(parentNode: Node, newNode: Node, referenceNode: Node) {
       parentNode.insertBefore(newNode, referenceNode);
     },
 
     $removeChild: function removeChild(node: Node, child: Node) {
-      node.removeChild(child);
+      return node.removeChild(child);
     },
 
     $appendChild: function appendChild(node: Node, child: Node) {

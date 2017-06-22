@@ -1,5 +1,5 @@
 import { BuildContext, FileMeta } from '../interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../util/constants';
 import * as ts from 'typescript';
 import * as util from './util';
 
@@ -39,9 +39,17 @@ function convertJsxToVNode(fileMeta: FileMeta, args: ts.NodeArray<ts.Expression>
   const tagName = (<ts.StringLiteral>tag).text;
   const namespace = getNamespace(tagName);
   let newProps: ts.ObjectLiteralExpression;
-  let newArgs: ts.Expression[] = [tag];
+  let newArgs: ts.Expression[] = [];
 
-  updateFileMetaWithSlots(fileMeta, tagName, props);
+  if (tagName === 'slot') {
+    // this is a slot element
+    newArgs.push(ts.createNumericLiteral(SLOT_TAG.toString()));
+    updateFileMetaWithSlots(fileMeta, props);
+
+  } else {
+    // normal html element
+    newArgs.push(tag);
+  }
 
   // If call has props and it is an object -> h('div', {})
   if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
@@ -83,15 +91,11 @@ function getNamespace(tagName: string): ts.StringLiteral | undefined {
 }
 
 
-function updateFileMetaWithSlots(fileMeta: FileMeta, tagName: string, props: ts.Expression) {
+function updateFileMetaWithSlots(fileMeta: FileMeta, props: ts.Expression) {
   // checking if there is a default slot and/or named slots in the compiler
   // so that during runtime there is less work to do
 
   if (!fileMeta || !fileMeta.hasCmpClass) {
-    return;
-  }
-
-  if (tagName.toLowerCase() !== 'slot') {
     return;
   }
 

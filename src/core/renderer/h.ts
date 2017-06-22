@@ -4,7 +4,7 @@
  * Licensed under the MIT License
  * https://github.com/developit/preact/blob/master/LICENSE
  *
- * Modified for Ionic's vdom
+ * Modified for Stencil's compiler and vdom
  */
 
 import { VNode as VNodeObj } from './vnode';
@@ -13,6 +13,7 @@ import { VNode, VNodeProdData } from '../../util/interfaces';
 const stack: any[] = [];
 
 
+export function h(nodeName: number, vnodeData: VNodeProdData): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: string): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: number): VNode;
@@ -20,7 +21,7 @@ export function h(nodeName: string, vnodeData: VNodeProdData, childa: any[]): VN
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, childb: string): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode, childb: VNode): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, child?: any) {
+export function h(nodeName: any, vnodeData: VNodeProdData, child?: any) {
   let children: any[], lastSimple: boolean, simple: boolean, i: number;
 
   for (i = arguments.length; i-- > 2; ) {

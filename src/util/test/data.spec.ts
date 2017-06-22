@@ -285,7 +285,7 @@ describe('data serialize/parse', () => {
     const format = formatComponentMeta(cmpMeta, opts);
     parseComponentMeta(registry, moduleImports, evalStr(format));
 
-    expect(registry['TAG'].componentModuleMeta).toEqual(moduleImports.tag);
+    expect(registry['TAG'].componentModuleMeta).toEqual(moduleImports.TAG);
   });
 
   it('should set tagName', () => {
@@ -299,7 +299,7 @@ describe('data serialize/parse', () => {
 
 
   var registry: ComponentRegistry = {};
-  var moduleImports: any = { 'tag': class MyTag {} };
+  var moduleImports: any = { 'TAG': class MyTag {} };
   var cmpMeta: ComponentMeta = {};
   var opts: FormatComponentDataOptions = {};
 

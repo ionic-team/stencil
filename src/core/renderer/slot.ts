@@ -1,5 +1,71 @@
-import { DomApi, HostElement } from '../../util/interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../util/constants';
+import { COMMENT_NODE, ELEMENT_NODE, HAS_SLOTS, HAS_NAMED_SLOTS,
+  SSR_SLOT_END, SSR_SLOT_START, SLOT_TAG, SSR_ID, TEXT_NODE } from '../../util/constants';
+import { DomApi, HostElement, VNode } from '../../util/interfaces';
+import { VNode as VNodeObj } from './vnode';
+
+
+export function createVNodeFromSsr(domApi: DomApi, node: Node, ssrId: string) {
+  let vnode: VNode = null;
+
+  if (domApi.$getAttribute(node, SSR_ID) === ssrId) {
+    vnode = new VNodeObj();
+    vnode.elm = node;
+    vnode.vtag = domApi.$tagName(node).toLowerCase();
+
+    const childNodes = domApi.$childNodes(node);
+    let childVnode: VNode;
+    let childNode: Node;
+    let isWithinSlot = false;
+    let nodeType: number;
+    let nodeValue: string;
+
+    for (let i = 0, l = childNodes.length; i < l; i++) {
+      childVnode = null;
+      childNode = childNodes[i];
+      nodeType = domApi.$nodeType(childNode);
+
+      if (nodeType === COMMENT_NODE) {
+        nodeValue = childNode.nodeValue;
+
+        if (nodeValue.indexOf(SSR_SLOT_START) === 0) {
+          isWithinSlot = true;
+          childVnode = new VNodeObj();
+          childVnode.vtag = SLOT_TAG;
+
+          nodeValue = nodeValue.substring(2);
+          if (nodeValue) {
+            childVnode.vattrs = {
+              'name': nodeValue
+            };
+          }
+
+        } else if (nodeValue === SSR_SLOT_END) {
+          isWithinSlot = false;
+        }
+
+      } else if (!isWithinSlot) {
+        if (nodeType === ELEMENT_NODE) {
+          childVnode = createVNodeFromSsr(domApi, childNode, ssrId);
+
+        } else if (nodeType === TEXT_NODE) {
+          childVnode = new VNodeObj();
+          childVnode.elm = childNode;
+          childVnode.vtext = domApi.$getTextContent(childNode);
+        }
+      }
+
+      if (childVnode) {
+        if (vnode.vchildren) {
+          vnode.vchildren.push(childVnode);
+        } else {
+          vnode.vchildren = [childVnode];
+        }
+      }
+    }
+  }
+
+  return vnode;
+}
 
 
 export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMeta: number) {

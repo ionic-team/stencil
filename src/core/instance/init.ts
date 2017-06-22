@@ -130,7 +130,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
       !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement._initLoad();
 
       // fuhgeddaboudit, no need to keep a reference after this element loaded
-      elm._ancestorHostElement = null;
+      delete elm._ancestorHostElement;
     }
 
   }

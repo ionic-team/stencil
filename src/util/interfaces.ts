@@ -658,11 +658,12 @@ export interface DomApi {
   $nodeType(node: any): number;
   $createEvent(): CustomEvent;
   $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
-  $createElement(tagName: string): HTMLElement;
-  $createElementNS(namespace: string, tagName: string): any;
+  $createElement(tagName: any): HTMLElement;
+  $createElementNS(namespace: string, tagName: any): any;
   $createTextNode(text: string): Text;
+  $createComment(data: string): Comment;
   $insertBefore(parentNode: Node, newNode: Node, referenceNode: Node): void;
-  $removeChild(node: Node, child: Node): void;
+  $removeChild(node: Node, child: Node): Node;
   $appendChild(node: Node, child: Node): void;
   $childNodes(node: Node): NodeList;
   $parentNode(node: Node): Node;
@@ -703,7 +704,7 @@ export type CssClassObject = { [className: string]: boolean };
 
 export interface VNode {
   // using v prefixes largely so closure has no issue property renaming
-  vtag: string;
+  vtag: string|number;
   vtext: string;
   vchildren: VNode[];
   vprops: any;
@@ -772,14 +773,13 @@ export interface PlatformApi {
   registerComponents?: (components?: LoadComponentMeta[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
-  loadBundle: (bundleId: string, cb: Function) => void;
+  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
   render?: RendererApi;
   config: ConfigApi;
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
   isServer?: boolean;
   attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
-  getMode: (elm: Element) => string;
   appRoot?: HostElement;
   appLoaded?: () => void;
   onAppLoad?: (rootElm: HostElement, css: string) => void;
@@ -940,4 +940,5 @@ export interface HydrateOptions {
   lang?: string;
   config?: Object;
   removeUnusedCss?: boolean;
+  reduceHtmlWhitepace?: boolean;
 }

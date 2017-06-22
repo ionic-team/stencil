@@ -7,8 +7,8 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   let i = 0;
   let data: any;
 
-  const tagname = cmpData[0].toUpperCase();
-  const cmpMeta = registry[tagname] = registry[tagname] || {
+  const tagName = cmpData[0].toUpperCase();
+  const cmpMeta = registry[tagName] = registry[tagName] || {
     tagNameMeta: cmpData[0],
     modesMeta: {},
     propsMeta: [
@@ -22,7 +22,7 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
 
   // get the component class which was added to moduleImports
   // using the tag as the key on the export object
-  cmpMeta.componentModuleMeta = moduleImports[cmpMeta.tagNameMeta];
+  cmpMeta.componentModuleMeta = moduleImports[tagName];
 
   // map of the modes w/ bundle id and style data
   Object.keys(cmpData[1]).forEach(modeName => {

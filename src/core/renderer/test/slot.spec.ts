@@ -1,6 +1,6 @@
 import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../../util/constants';
 import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../test';
 
 
@@ -14,7 +14,7 @@ describe('Component slot', () => {
       slotMeta: HAS_SLOTS,
       componentModuleMeta: class {
         render() {
-          return h('spider', 0, h('slot', 0));
+          return h('spider', 0, h(SLOT_TAG, 0));
         }
       }
     });
@@ -36,7 +36,7 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModuleMeta: class {
         render() {
-          return h('monkey', 0, h('slot', { a: { name: 'start' } }));
+          return h('monkey', 0, h(SLOT_TAG, { a: { name: 'start' } }));
         }
       }
     });
@@ -55,7 +55,7 @@ describe('Component slot', () => {
   it('no content', (done) => {
     mount({
       parentVNode: h('lion', 0, h('ion-child', 0)),
-      childVNode: h('slot', 0)
+      childVNode: h(SLOT_TAG, 0)
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes.length).toBe(1);
       expect(parentElm.childNodes[0].nodeName).toBe('LION');
@@ -78,7 +78,7 @@ describe('Component slot', () => {
   it('no content, nested child slot', (done) => {
     mount({
       parentVNode: h('giraffe', 0, h('ion-child', 0)),
-      childVNode: h('fish', 0, h('slot', 0))
+      childVNode: h('fish', 0, h(SLOT_TAG, 0))
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes.length).toBe(1);
       expect(parentElm.childNodes[0].nodeName).toBe('GIRAFFE');
@@ -112,7 +112,7 @@ describe('Component slot', () => {
           h('aardvark', 0, parentInstance.msg)
         ])
       ]),
-      childVNode: h('slot', 0)
+      childVNode: h(SLOT_TAG, 0)
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes[0].nodeName).toBe('HIPPO');
       expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
@@ -142,7 +142,7 @@ describe('Component slot', () => {
       ]),
       childVNode: h('camel', 0, [
         h('owl', 0, [
-          h('slot', 0)
+          h(SLOT_TAG, 0)
         ])
       ])
     }, (parentElm, childElm) => {
@@ -193,7 +193,7 @@ describe('Component slot', () => {
       componentModuleMeta: class {
         render() {
           return h('chipmunk', 0, [
-            h('slot', 0)
+            h(SLOT_TAG, 0)
           ]);
         }
       }
@@ -255,7 +255,7 @@ describe('Component slot', () => {
       componentModuleMeta: class {
         render() {
           return h('bull', 0, [
-            h('slot', 0)
+            h(SLOT_TAG, 0)
           ]);
         }
       }
@@ -313,9 +313,9 @@ describe('Component slot', () => {
       componentModuleMeta: class {
         render() {
           return h('mouse', 0, [
-            h('slot', 0),
-            h('slot', { a: { name: 'start' } }),
-            h('slot', { a: { name: 'end' } })
+            h(SLOT_TAG, 0),
+            h(SLOT_TAG, { a: { name: 'start' } }),
+            h(SLOT_TAG, { a: { name: 'end' } })
           ]);
         }
       }
@@ -379,11 +379,11 @@ describe('Component slot', () => {
       componentModuleMeta: class {
         render() {
           return h('flamingo', 0, [
-            h('slot', { a: { name: 'start' } }),
+            h(SLOT_TAG, { a: { name: 'start' } }),
             h('horse', 0, [
-              h('slot', 0),
+              h(SLOT_TAG, 0),
               h('bullfrog', 0, [
-                h('slot', { a: { name: 'end' } })
+                h(SLOT_TAG, { a: { name: 'end' } })
               ])
             ])
           ]);
@@ -461,7 +461,7 @@ describe('Component slot', () => {
       componentModuleMeta: class {
         render() {
           return h('seal', 0, [
-            h('slot', 0)
+            h(SLOT_TAG, 0)
           ]);
         }
       }
@@ -473,7 +473,7 @@ describe('Component slot', () => {
       componentModuleMeta: class {
         render() {
           return h('goose', 0, [
-            h('slot', 0)
+            h(SLOT_TAG, 0)
           ]);
         }
       }
