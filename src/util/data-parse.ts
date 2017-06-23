@@ -104,16 +104,17 @@ export function parseProp(data: any[]) {
 
 export function parsePropertyValue(propType: number, propValue: any) {
   // ensure this value is of the correct prop type
+  if (propValue !== null) {
+    if (propType === TYPE_BOOLEAN) {
+      // per the HTML spec, any string value means it is a boolean "true" value
+      // but we'll cheat here and say that the string "false" is the boolean false
+      return (propValue === false || propValue === 'false' ? false : true);
+    }
 
-  if (propType === TYPE_BOOLEAN) {
-    // per the HTML spec, any string value means it is a boolean "true" value
-    // but we'll cheat here and say that the string "false" is the boolean false
-    return (propValue === null || propValue === false || propValue === 'false' ? false : true);
-  }
-
-  if (propType === TYPE_NUMBER) {
-    // force it to be a number
-    return parseFloat(propValue);
+    if (propType === TYPE_NUMBER) {
+      // force it to be a number
+      return parseFloat(propValue);
+    }
   }
 
   // not sure exactly what type we want
