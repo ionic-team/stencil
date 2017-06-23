@@ -68,7 +68,7 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
   if (connectedHostElements.length === 0) {
     // what gives, never found any host elements to connect!
     // ok we're just done i guess, idk
-    plt.onAppLoad(null, null);
+    plt.onAppLoad(null, opts.html);
   }
 }
 

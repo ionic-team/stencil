@@ -14,7 +14,7 @@ import { parseComponentMeta } from '../../util/data-parse';
 
 
 export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
-  const registry: ComponentRegistry = {};
+  const registry: ComponentRegistry = { HTML: {} };
   const moduleImports: {[tag: string]: any} = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
@@ -31,7 +31,6 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     queue: Gbl.QueueCtrl,
     attachStyles,
     tmpDisconnected: false,
-    appLoaded,
     isServer: true
   };
 
@@ -46,6 +45,17 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   // generate a sandboxed context
   const context = generateGlobalContext(win, Gbl);
   sys.vm.createContext(context);
+
+
+  // setup the root node of all things
+  // which is the mighty <html> tag
+  const rootNode = <HostElement>domApi.$documentElement;
+  rootNode._activelyLoadingChildren = [];
+  rootNode._initLoad = function appLoadedCallback() {
+    // let it be know, we have loaded
+    // injectedGlobal.emit(plt.appRoot.$instance, 'ionLoad');
+    plt.onAppLoad && plt.onAppLoad(rootNode, Object.keys(css).sort().map(tag => css[tag]).join(''));
+  };
 
 
   function attachStyles(cmpMeta: ComponentMeta, elm: any, instance: Component) {
@@ -168,11 +178,6 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
 
       }
     }
-  }
-
-  function appLoaded() {
-    // let it be know, we have loaded
-    plt.onAppLoad && plt.onAppLoad(plt.appRoot, Object.keys(css).sort().map(tag => css[tag]).join(''));
   }
 
   return plt;

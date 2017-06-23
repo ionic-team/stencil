@@ -653,6 +653,7 @@ export interface RendererApi {
 
 
 export interface DomApi {
+  $documentElement: HTMLElement;
   $head: HTMLHeadElement;
   $body: HTMLElement;
   $nodeType(node: any): number;
@@ -780,10 +781,7 @@ export interface PlatformApi {
   queue: QueueApi;
   isServer?: boolean;
   attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
-  appRoot?: HostElement;
-  appLoaded?: () => void;
   onAppLoad?: (rootElm: HostElement, css: string) => void;
-  hasAppLoaded?: boolean;
   tmpDisconnected?: boolean;
 }
 

@@ -12,7 +12,8 @@ const plt = createPlatformClient(
   IonicGbl.ConfigCtrl,
   IonicGbl.DomCtrl,
   IonicGbl.QueueCtrl,
-  IonicGbl.staticDir
+  IonicGbl.staticDir,
+  false
 );
 
 plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {

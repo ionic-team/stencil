@@ -13,12 +13,6 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     // if somehow this node was reused, ensure we've removed this property
     delete elm._hasDestroyed;
 
-    if (!plt.hasAppLoaded && !plt.appRoot) {
-      // first host element to connect to the dom is our app root
-      // in most cases it'll be <ion-app>
-      plt.appRoot = elm;
-    }
-
     // find the first ancestor host element (if there is one) and register
     // this element as one of the actively loading child elements for its ancestor
     let ancestorHostElement = elm;
@@ -34,7 +28,11 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
 
           // ensure there is an array to contain a reference to each of the child elements
           // and set this element as one of the ancestor's child elements it should wait on
-          (ancestorHostElement._activelyLoadingChildren = ancestorHostElement._activelyLoadingChildren || []).push(elm);
+          if (ancestorHostElement._activelyLoadingChildren) {
+            ancestorHostElement._activelyLoadingChildren.push(elm);
+          } else {
+            ancestorHostElement._activelyLoadingChildren = [elm];
+          }
         }
         break;
       }

@@ -7,6 +7,8 @@ export function createDomApi(document: Document): DomApi {
 
   return {
 
+    $documentElement: document.documentElement,
+
     $head: document.head,
 
     $body: document.body,

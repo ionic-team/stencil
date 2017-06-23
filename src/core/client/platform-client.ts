@@ -12,8 +12,8 @@ import { initGlobal } from './global-client';
 import { parseComponentMeta } from '../../util/data-parse';
 
 
-export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
-  const registry: ComponentRegistry = {};
+export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string, loadAnimations: boolean): PlatformApi {
+  const registry: ComponentRegistry = { HTML: {} };
   const moduleImports: {[tag: string]: any} = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
@@ -29,14 +29,32 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     config,
     queue,
     connectHostElement,
-    attachStyles,
-    appLoaded
+    attachStyles
   };
 
   plt.render = createRenderer(plt, domApi);
 
   const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, queue, domCtrl);
 
+
+  // setup the root node of all things
+  // which is the mighty <html> tag
+  const rootNode = <HostElement>domApi.$documentElement;
+  rootNode._activelyLoadingChildren = [];
+  rootNode._initLoad = function appLoadedCallback() {
+    // this will fire when all components have finished loaded
+    appendStylesToHead(initAppStyles);
+    initAppStyles = null;
+
+    // let it be know, we have loaded
+    // injectedGlobal.emit(plt.appRoot.$instance, 'ionLoad');
+
+    // kick off loading the auxiliary code, which has stuff that wasn't
+    // needed for the initial paint, such as animation code
+    loadAnimations && queue.add(() => {
+      jsonp(staticDir + 'ionic.animation.js');
+    });
+  };
 
 
   function attachStyles(cmpMeta: ComponentMeta, elm: HostElement, instance: Component) {
@@ -123,7 +141,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   function appendBundleStyles(bundleCmpMeta: ComponentMeta[]) {
     const styles = bundleCmpMeta.map(getCmpMetaStyle);
 
-    if (plt.hasAppLoaded) {
+    if (rootNode._hasLoaded) {
       queue.add(() => {
         appendStylesToHead(styles);
       });
@@ -146,21 +164,6 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
       return Object.keys(cmpMeta.modesMeta).map(m => cmpMeta.modesMeta[m][STYLES]).join('');
     }
     return '';
-  }
-
-
-  function appLoaded() {
-    appendStylesToHead(initAppStyles);
-    initAppStyles = null;
-
-    // let it be know, we have loaded
-    injectedGlobal.emit(plt.appRoot.$instance, 'ionLoad');
-
-    // kick off loading the auxiliary code, which has stuff that wasn't
-    // needed for the initial paint, such as animation code
-    queue.add(() => {
-      jsonp(staticDir + 'ionic.animation.js');
-    });
   }
 
 

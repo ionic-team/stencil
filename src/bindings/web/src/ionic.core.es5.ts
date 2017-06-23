@@ -19,7 +19,8 @@ const plt = createPlatformClient(
   createConfigController(IonicGbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core')),
   domCtrl,
   createQueueClient(domCtrl),
-  IonicGbl.staticDir
+  IonicGbl.staticDir,
+  true
 );
 
 plt.registerComponents(IonicGbl.components).forEach(cmpMeta => {

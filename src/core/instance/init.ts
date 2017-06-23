@@ -96,15 +96,6 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     // add the css class that this element has officially hydrated
     elm.classList.add('hydrated');
 
-    if (!plt.hasAppLoaded && elm === plt.appRoot) {
-      // turns out this is the element that is the root of the app
-      // so it looks like the app has fully loaded, congrats
-      plt.hasAppLoaded = true;
-
-      // let the platform know we're all loaded now
-      plt.appLoaded && plt.appLoaded();
-    }
-
     // ( •_•)
     // ( •_•)>⌐■-■
     // (⌐■_■)
