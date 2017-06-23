@@ -14,9 +14,7 @@ export function jsxToVNode(ctx: BuildContext): ts.TransformerFactory<ts.SourceFi
         case ts.SyntaxKind.CallExpression:
           const callNode = node as ts.CallExpression;
           if ((<ts.Identifier>callNode.expression).text === 'h') {
-
-            const convertedArgs = convertJsxToVNode(fileMeta, callNode.arguments);
-            node = ts.updateCall(callNode, callNode.expression, null, convertedArgs);
+            node = convertJsxToVNode(fileMeta, callNode);
           }
 
         default:
@@ -34,12 +32,11 @@ export function jsxToVNode(ctx: BuildContext): ts.TransformerFactory<ts.SourceFi
 }
 
 
-function convertJsxToVNode(fileMeta: FileMeta, args: ts.NodeArray<ts.Expression>): ts.Expression[] {
-  const [tag, props, ...children] = args;
-  const tagName = (<ts.StringLiteral>tag).text;
-  const namespace = getNamespace(tagName);
-  let newProps: ts.ObjectLiteralExpression;
+function convertJsxToVNode(fileMeta: FileMeta, callNode: ts.CallExpression) {
+  const [tag, props, ...children] = callNode.arguments;
+  const tagName = (<ts.StringLiteral>tag).text.trim().toLowerCase();
   let newArgs: ts.Expression[] = [];
+  const vnodeData: VNodeData = {};
 
   if (tagName === 'slot') {
     // this is a slot element
@@ -51,23 +48,28 @@ function convertJsxToVNode(fileMeta: FileMeta, args: ts.NodeArray<ts.Expression>
     newArgs.push(tag);
   }
 
+  // check if there should be a namespace: <svg> or <math>
+  const namespace = NAMESPACE_MAP[tagName];
+  if (namespace) {
+    vnodeData.n = ts.createLiteral(namespace);
+  }
+
   // If call has props and it is an object -> h('div', {})
   if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
     const jsxAttrs = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
 
-    newProps = parseJsxAttrs(jsxAttrs);
+    parseJsxAttrs(vnodeData, jsxAttrs);
   }
 
-  // If there is a namespace
-  if (namespace !== undefined) {
-    newProps = newProps || ts.createObjectLiteral();
-    ts.updateObjectLiteral(newProps, [
-      ts.createPropertyAssignment('n', ts.createLiteral(namespace))
-    ]);
+  // create the vnode data arg, if there is any vnode data
+  if (Object.keys(vnodeData).length) {
+    newArgs.push(util.objectMapToObjectLiteral(vnodeData));
+
+  } else {
+    // If there are no props then set the value as a zero
+    newArgs.push(ts.createLiteral(0));
   }
 
-  // If there are no props then set the value as a zero
-  newArgs.push(newProps || ts.createLiteral(0));
 
   // If there are children then add them to the end of the arg list.
   if (children && children.length > 0) {
@@ -76,18 +78,105 @@ function convertJsxToVNode(fileMeta: FileMeta, args: ts.NodeArray<ts.Expression>
     );
   }
 
-  return newArgs;
+  return ts.updateCall(callNode, callNode.expression, null, newArgs);
 }
 
 
-function getNamespace(tagName: string): ts.StringLiteral | undefined {
-  const tag = tagName.toLowerCase();
+function parseJsxAttrs(vnodeData: VNodeData, jsxAttrs: util.ObjectMap) {
+  let classNameStr = '';
+  let styleStr = '';
+  let eventListeners: any = null;
+  let attrs: any = null;
+  let props: any = null;
 
-  if (tag === 'svg') {
-    ts.createLiteral('http://www.w3.org/2000/svg');
+  for (var jsxAttrName in jsxAttrs) {
+    var exp: ts.Expression = <any>jsxAttrs[jsxAttrName];
+
+    var jsxAttrNameSplit = jsxAttrName.split('-');
+
+    if (isClassName(jsxAttrName)) {
+      // class
+      if (exp.kind === ts.SyntaxKind.StringLiteral) {
+        classNameStr += ' ' + exp.getText().trim();
+      } else {
+        if (util.isInstanceOfObjectMap(exp)) {
+          vnodeData.c = util.objectMapToObjectLiteral(exp);
+        } else {
+          vnodeData.c = exp;
+        }
+      }
+
+    } else if (isStyle(jsxAttrName)) {
+      // style
+      if (exp.kind === ts.SyntaxKind.StringLiteral) {
+        styleStr += ';' + exp.getText().trim();
+      } else {
+        if (util.isInstanceOfObjectMap(exp)) {
+          vnodeData.s = util.objectMapToObjectLiteral(exp);
+        } else {
+          vnodeData.s = exp;
+        }
+      }
+
+    } else if (isKey(jsxAttrName)) {
+      // key
+      vnodeData.k = exp;
+
+    } else if (isHyphenedEventListener(jsxAttrNameSplit, exp)) {
+      // on-click
+      eventListeners = eventListeners || {};
+      eventListeners[jsxAttrNameSplit.slice(1).join('-')] = exp;
+
+    } else if (isStandardizedEventListener(jsxAttrName, exp)) {
+      // onClick
+      eventListeners = eventListeners || {};
+      eventListeners[jsxAttrName.toLowerCase().substring(2)] = exp;
+
+    } else if (isAttr(jsxAttrName, vnodeData, exp)) {
+      // attrs
+      attrs = attrs || {};
+
+      var attrName = jsxAttrName;
+
+      attrs[attrName] = exp;
+
+    } else if (isPropsName(jsxAttrName)) {
+      // passed an actual "props" attribute
+      // probably containing an object of props data
+      if (util.isInstanceOfObjectMap(exp)) {
+        vnodeData.p = util.objectMapToObjectLiteral(exp);
+      } else {
+        vnodeData.p = exp;
+      }
+
+    } else {
+      // props
+      props = props || {};
+      props[jsxAttrName] = exp;
+    }
   }
 
-  return undefined;
+  classNameStr = classNameStr.replace(/['"]+/g, '').trim();
+  if (classNameStr.length) {
+    vnodeData.c = classStringToClassObj(classNameStr);
+  }
+
+  styleStr = styleStr.replace(/['"]+/g, '').trim();
+  if (styleStr.length) {
+    vnodeData.s = styleStringToStyleObj(styleStr);
+  }
+
+  if (eventListeners) {
+    vnodeData.o = util.objectMapToObjectLiteral(eventListeners);
+  }
+
+  if (attrs) {
+    vnodeData.a = util.objectMapToObjectLiteral(attrs);
+  }
+
+  if (props) {
+    vnodeData.p = util.objectMapToObjectLiteral(props);
+  }
 }
 
 
@@ -119,103 +208,6 @@ function updateFileMetaWithSlots(fileMeta: FileMeta, props: ts.Expression) {
   }
 }
 
-
-function parseJsxAttrs(jsxAttrs: util.ObjectMap): ts.ObjectLiteralExpression {
-  let vnodeInfo: util.ObjectMap = {};
-  let classNameStr = '';
-  let styleStr = '';
-  let eventListeners: any = null;
-  let attrs: any = null;
-  let props: any = null;
-
-  for (var attrName in jsxAttrs) {
-    var exp: ts.Expression = <any>jsxAttrs[attrName];
-
-    var attrNameSplit = attrName.split('-');
-
-    if (isClassName(attrName)) {
-      // class
-      if (exp.kind === ts.SyntaxKind.StringLiteral) {
-        classNameStr += ' ' + exp.getText().trim();
-      } else {
-        if (util.isInstanceOfObjectMap(exp)) {
-          vnodeInfo.c = util.objectMapToObjectLiteral(exp);
-        } else {
-          vnodeInfo.c = exp;
-        }
-      }
-
-    } else if (isStyle(attrName)) {
-      // style
-      if (exp.kind === ts.SyntaxKind.StringLiteral) {
-        styleStr += ';' + exp.getText().trim();
-      } else {
-        if (util.isInstanceOfObjectMap(exp)) {
-          vnodeInfo.s = util.objectMapToObjectLiteral(exp);
-        } else {
-          vnodeInfo.s = exp;
-        }
-      }
-
-    } else if (isKey(attrName)) {
-      // key
-      vnodeInfo.k = exp;
-
-    } else if (isHyphenedEventListener(attrNameSplit, exp)) {
-      // on-click
-      eventListeners = eventListeners || {};
-      eventListeners[attrNameSplit.slice(1).join('-')] = exp;
-
-    } else if (isStandardizedEventListener(attrName, exp)) {
-      // onClick
-      eventListeners = eventListeners || {};
-      eventListeners[attrName.toLowerCase().substring(2)] = exp;
-
-    } else if (isAttr(attrName, exp)) {
-      // attrs
-      attrs = attrs || {};
-      attrs[attrName] = exp;
-
-    } else if (isPropsName(attrName)) {
-      // passed an actual "props" attribute
-      // probably containing an object of props data
-      if (util.isInstanceOfObjectMap(exp)) {
-        vnodeInfo.p = util.objectMapToObjectLiteral(exp);
-      } else {
-        vnodeInfo.p = exp;
-      }
-
-    } else {
-      // props
-      props = props || {};
-      props[attrName] = exp;
-    }
-  }
-
-  classNameStr = classNameStr.replace(/['"]+/g, '').trim();
-  if (classNameStr.length) {
-    vnodeInfo.c = classStringToClassObj(classNameStr);
-  }
-
-  styleStr = styleStr.replace(/['"]+/g, '').trim();
-  if (styleStr.length) {
-    vnodeInfo.s = styleStringToStyleObj(styleStr);
-  }
-
-  if (eventListeners) {
-    vnodeInfo.o = util.objectMapToObjectLiteral(eventListeners);
-  }
-
-  if (attrs) {
-    vnodeInfo.a = util.objectMapToObjectLiteral(attrs);
-  }
-
-  if (props) {
-    vnodeInfo.p = util.objectMapToObjectLiteral(props);
-  }
-
-  return util.objectMapToObjectLiteral(vnodeInfo);
-}
 
 function updateVNodeChildren(items: ts.Expression[]): ts.Expression[] {
   return items.map(node => {
@@ -275,7 +267,11 @@ function isStandardizedEventListener(attrName: string, exp: ts.Expression) {
 }
 
 
-function isAttr(attrName: string, exp: ts.Expression) {
+function isAttr(attrName: string, vnodeData: VNodeData, exp: ts.Expression) {
+  if (vnodeData.n) {
+    // always use attributes when the element is namespaced
+    return true;
+  }
   if (exp.kind === ts.SyntaxKind.ObjectLiteralExpression) {
     return false;
   }
@@ -337,4 +333,48 @@ function styleStringToStyleObj(styles: string) {
 }
 
 const KNOWN_EVENT_LISTENERS = ['onabort', 'onanimationend', 'onanimationiteration', 'onanimationstart', 'onauxclick', 'onbeforecopy', 'onbeforecut', 'onbeforepaste', 'onbeforeunload', 'onblur', 'oncancel', 'oncanplay', 'oncanplaythrough', 'onchange', 'onclick', 'onclose', 'oncontextmenu', 'oncopy', 'oncuechange', 'oncut', 'ondblclick', 'ondevicemotion', 'ondeviceorientation', 'ondeviceorientationabsolute', 'ondrag', 'ondragend', 'ondragenter', 'ondragleave', 'ondragover', 'ondragstart', 'ondrop', 'ondurationchange', 'onemptied', 'onended', 'onerror', 'onfocus', 'ongotpointercapture', 'onhashchange', 'oninput', 'oninvalid', 'onkeydown', 'onkeypress', 'onkeyup', 'onlanguagechange', 'onload', 'onloadeddata', 'onloadedmetadata', 'onloadstart', 'onlostpointercapture', 'onmessage', 'onmousedown', 'onmouseenter', 'onmouseleave', 'onmousemove', 'onmouseout', 'onmouseover', 'onmouseup', 'onmousewheel', 'onoffline', 'ononline', 'onpagehide', 'onpageshow', 'onpaste', 'onpause', 'onplay', 'onplaying', 'onpointercancel', 'onpointerdown', 'onpointerenter', 'onpointerleave', 'onpointermove', 'onpointerout', 'onpointerover', 'onpointerup', 'onpopstate', 'onprogress', 'onratechange', 'onrejectionhandled', 'onreset', 'onresize', 'onscroll', 'onsearch', 'onseeked', 'onseeking', 'onselect', 'onselectstart', 'onshow', 'onstalled', 'onstorage', 'onsubmit', 'onsuspend', 'ontimeupdate', 'ontoggle', 'ontransitionend', 'onunhandledrejection', 'onunload', 'onvolumechange', 'onwaiting', 'onwebkitanimationend', 'onwebkitanimationiteration', 'onwebkitanimationstart', 'onwebkitfullscreenchange', 'onwebkitfullscreenerror', 'onwebkittransitionend', 'onwheel'];
+
 const KNOWN_ATTR_NAMES = ['slot', 'hidden', 'disabled'];
+
+const NAMESPACE_MAP: {[tag: string]: string} = {
+  'svg': 'http://www.w3.org/2000/svg',
+  'math': 'http://www.w3.org/1998/Math/MathML'
+};
+
+
+interface VNodeData {
+  /**
+   * classes
+   */
+  c?: any;
+
+  /**
+   * props
+   */
+  p?: any;
+
+  /**
+   * attrs
+   */
+  a?: any;
+
+  /**
+   * on (event listeners)
+   */
+  o?: any;
+
+  /**
+   * styles
+   */
+  s?: any;
+
+  /**
+   * key
+   */
+  k?: any;
+
+  /**
+   * namespace
+   */
+  n?: any;
+}
