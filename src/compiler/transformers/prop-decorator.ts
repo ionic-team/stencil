@@ -16,8 +16,18 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
 
     memberNode.forEachChild(n => {
 
-      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Prop') {
-        isProp = true;
+      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1) {
+        const child = n.getChildAt(1);
+        const firstToken = child.getFirstToken()
+
+        // If the first token is @State()
+        if (firstToken && firstToken.getText() === 'Prop') {
+          isProp = true;
+        }
+        // If the first token is @State
+        else if(!firstToken && child.getText() == 'Prop') {
+          isProp = true;
+        }
 
         n.getChildAt(1).forEachChild(n => {
           if (n.kind === ts.SyntaxKind.ObjectLiteralExpression) {
@@ -87,4 +97,3 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
     return 0;
   });
 }
-
