@@ -516,50 +516,6 @@ describe('Component slot', () => {
     });
   });
 
-  // // #4209
-  // it('slot of multiple text nodes should not be infinitely merged', done => {
-  //   const wrap = {
-  //     template: `<inner ref="inner">foo<slot></slot></inner>`,
-  //     components: {
-  //       inner: {
-  //         data: () => ({ a: 1 }),
-  //         template: `<div>{{a}}<slot></slot></div>`
-  //       }
-  //     }
-  //   }
-  //   const vm = new Vue({
-  //     template: `<wrap ref="wrap">bar</wrap>`,
-  //     components: { wrap }
-  //   }).$mount()
-
-  //   expect(vm.$el.textContent).toBe('1foobar')
-  //   vm.$refs.wrap.$refs.inner.a++
-  //   waitForUpdate(() => {
-  //     expect(vm.$el.textContent).toBe('2foobar')
-  //   }).then(done)
-  // })
-
-  // it('the elements of slot should be updated correctly', done => {
-  //   const vm = new Vue({
-  //     data: { n: 1 },
-  //     template: '<div><test><span v-for="i in n" :key="i">{{ i }}</span><input value="a"/></test></div>',
-  //     components: {
-  //       test: {
-  //         template: '<div><slot></slot></div>'
-  //       }
-  //     }
-  //   }).$mount()
-  //   expect(vm.$el.innerHTML).toBe('<div><span>1</span><input value="a"></div>')
-  //   const input = vm.$el.querySelector('input')
-  //   input.value = 'b'
-  //   vm.n++
-  //   waitForUpdate(() => {
-  //     expect(vm.$el.innerHTML).toBe('<div><span>1</span><span>2</span><input value="a"></div>')
-  //     expect(vm.$el.querySelector('input')).toBe(input)
-  //     expect(vm.$el.querySelector('input').value).toBe('b')
-  //   }).then(done)
-  // });
-
   const parentInstance = {
     msg: ''
   };
