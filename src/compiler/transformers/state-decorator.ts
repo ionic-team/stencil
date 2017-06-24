@@ -12,9 +12,18 @@ export function getStateDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDec
     let propName: string = null;
 
     memberNode.forEachChild(n => {
-      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'State') {
-        isState = true;
+      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1) {
+        const child = n.getChildAt(1);
+        const firstToken = child.getFirstToken();
 
+        // If the first token is @State()
+        if (firstToken && firstToken.getText() === 'State') {
+          isState = true;
+        }
+        // If the first token is @State
+        else if(!firstToken && child.getText() == 'State') {
+          isState = true;
+        }
       } else if (isState) {
         if (n.kind === ts.SyntaxKind.Identifier && !propName) {
           propName = n.getText();
