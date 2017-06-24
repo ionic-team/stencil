@@ -30,12 +30,15 @@ const BUNDLES = [
   { components: ['ion-slides', 'ion-slide'] },
   { components: ['ion-spinner'] },
   { components: ['ion-toggle'] },
+  { components: ['ion-router', 'ion-route'] },
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
-  { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] }
+  { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] },
+  { components: ['stencil-site', 'landing-page', 'site-header'] }
 ];
 
 
 import { buildBindingCore, LICENSE, readFile, writeFile } from './build-core';
+import * as chalk from 'chalk';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
@@ -104,12 +107,12 @@ copyDirectory(vendorJsScript, vendorCompilerDest)
 }).catch(err => {
   if (err) {
     if (err.stack) {
-      console.error('build.web', err.stack);
+      console.error(chalk.red('ERROR:'), ' build.web', err.stack);
     } else {
-      console.error('build.web', err);
+      console.error(chalk.red('ERROR:'), ' build.web', err);
     }
   } else {
-    console.error('build.web error');
+    console.error(chalk.red('ERROR: '), 'build.web unknown error');
   }
 });
 
