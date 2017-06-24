@@ -66,6 +66,10 @@ export class StringifyCss {
    */
 
   media(node: any) {
+    const mediaCss = this.mapVisit(node.rules);
+    if (mediaCss === '') {
+      return '';
+    }
     return '@media ' + node.media + '{' + this.mapVisit(node.rules) + '}';
   }
 
@@ -74,8 +78,12 @@ export class StringifyCss {
    */
 
   document(node: any) {
+    const documentCss = this.mapVisit(node.rules);
+    if (documentCss === '') {
+      return '';
+    }
     var doc = '@' + (node.vendor || '') + 'document ' + node.document;
-    return doc + '{' + this.mapVisit(node.rules) + '}';
+    return doc + '{' + documentCss + '}';
   }
 
   /**
@@ -99,7 +107,11 @@ export class StringifyCss {
    */
 
   supports(node: any) {
-    return '@supports ' + node.supports + '{' + this.mapVisit(node.rules) + '}';
+    const supportsCss = this.mapVisit(node.rules);
+    if (supportsCss === '') {
+      return '';
+    }
+    return '@supports ' + node.supports + '{' + supportsCss + '}';
   }
 
   /**
@@ -107,13 +119,12 @@ export class StringifyCss {
    */
 
   keyframes(node: any) {
-    return '@'
-      + (node.vendor || '')
-      + 'keyframes '
-      + node.name
-      + '{'
-      + this.mapVisit(node.keyframes)
-      + '}';
+    const keyframesCss = this.mapVisit(node.keyframes);
+    if (keyframesCss === '') {
+      return '';
+    }
+
+    return '@' + (node.vendor || '') + 'keyframes ' + node.name + '{' + keyframesCss + '}';
   }
 
   /**
@@ -143,7 +154,12 @@ export class StringifyCss {
    */
 
   ['font-face'](node: any) {
-    return '@font-face{' + this.mapVisit(node.declarations) + '}';
+    const fontCss = this.mapVisit(node.declarations);
+    if (fontCss === '') {
+      return '';
+    }
+
+    return '@font-face{' + fontCss + '}';
   }
 
   /**
