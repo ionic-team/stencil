@@ -110,7 +110,7 @@ function buildComponentBundles(ctx: BuildContext, manifest: Manifest, manifestBu
 
       const component = manifest.components.find(c => c.tagNameMeta === manifestComponentTag);
       if (!component) {
-        throw `buildComponentBundles: unable to find tag "${manifestComponentTag}"`;
+        throw `buildComponentBundles: unable to find tag "${manifestComponentTag}" from stencil.config.js bundles. Make sure there is a corresponding stencil component with the tag name "${manifestComponentTag}"`;
       }
 
       if (component.modesMeta[modeName]) {
