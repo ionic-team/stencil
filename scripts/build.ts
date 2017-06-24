@@ -17,6 +17,7 @@ const DEV_MODE = process.argv.indexOf('dev') > -1;
 const WATCH = process.argv.indexOf('watch') > -1;
 
 import { buildBindingCore, LICENSE, readFile, writeFile } from './build-core';
+import * as chalk from 'chalk';
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
@@ -84,12 +85,12 @@ export function run(pargv: string[], env: { [k: string]: string }) {
   }).catch(err => {
     if (err) {
       if (err.stack) {
-        console.error('build.web', err.stack);
+        console.error(chalk.red('ERROR:'), ' build.web', err.stack);
       } else {
-        console.error('build.web', err);
+        console.error(chalk.red('ERROR:'), ' build.web', err);
       }
     } else {
-      console.error('build.web error');
+      console.error(chalk.red('ERROR: '), 'build.web unknown error');
     }
   });
 }
