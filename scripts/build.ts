@@ -92,6 +92,9 @@ export function run(pargv: string[], env: { [k: string]: string }) {
     } else {
       console.error(chalk.red('ERROR: '), 'build.web unknown error');
     }
+
+    // Exit on serious errors
+    process.exit(1);
   });
 }
 
