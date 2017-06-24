@@ -1,6 +1,6 @@
 import { ATTR_DASH_CASE, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
 import { ComponentMeta, ComponentRegistry,  LoadComponentMeta, PropMeta } from '../util/interfaces';
-import { toDashCase } from './helpers';
+import { isDef, toDashCase } from './helpers';
 
 
 export function parseComponentMeta(registry: ComponentRegistry, moduleImports: any, cmpData: LoadComponentMeta): ComponentMeta {
@@ -104,11 +104,11 @@ export function parseProp(data: any[]) {
 
 export function parsePropertyValue(propType: number, propValue: any) {
   // ensure this value is of the correct prop type
-  if (propValue !== null) {
+  if (isDef(propValue)) {
     if (propType === TYPE_BOOLEAN) {
       // per the HTML spec, any string value means it is a boolean "true" value
       // but we'll cheat here and say that the string "false" is the boolean false
-      return (propValue === false || propValue === 'false' ? false : true);
+      return (propValue === 'false' ? false :  propValue === '' || !!propValue);
     }
 
     if (propType === TYPE_NUMBER) {

@@ -1,5 +1,5 @@
 import { formatComponentMeta } from '../data-serialize';
-import { parseComponentMeta } from '../data-parse';
+import { parseComponentMeta, parsePropertyValue } from '../data-parse';
 import { ComponentMeta, ComponentRegistry, FormatComponentDataOptions } from '../interfaces';
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE, BUNDLE_ID, STYLES, HAS_SLOTS, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
 
@@ -295,6 +295,91 @@ describe('data serialize/parse', () => {
     parseComponentMeta(registry, moduleImports, evalStr(format));
 
     expect(registry['ION-TAG-NAME'].tagNameMeta).toEqual('ion-tag-name');
+  });
+
+
+  describe('parsePropertyValue', () => {
+
+    describe('number', () => {
+
+      it('should convert number 1 to number 1', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, 1)).toBe(1);
+      });
+
+      it('should convert number 0 to number 0', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, 0)).toBe(0);
+      });
+
+      it('should convert string "0" to number 0', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, '0')).toBe(0);
+      });
+
+      it('should convert string "88" to number 88', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, '88')).toBe(88);
+      });
+
+      it('should convert empty string "" to NaN', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, '')).toEqual(NaN);
+      });
+
+      it('should convert any string "anyword" to NaN', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, 'anyword')).toEqual(NaN);
+      });
+
+      it('should keep number undefined as undefined', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, undefined)).toEqual(undefined);
+      });
+
+      it('should keep number null as null', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, null)).toBe(null);
+      });
+
+    });
+
+    describe('boolean', () => {
+
+      it('should set boolean 1 as true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 1)).toBe(true);
+      });
+
+      it('should set boolean 0 as false', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 0)).toBe(false);
+      });
+
+      it('should keep boolean true as boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, true)).toBe(true);
+      });
+
+      it('should keep boolean false as boolean false', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, false)).toBe(false);
+      });
+
+      it('should convert string "false" to boolean false', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 'false')).toBe(false);
+      });
+
+      it('should convert string "true" to boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 'true')).toBe(true);
+      });
+
+      it('should convert empty string "" to boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, '')).toBe(true);
+      });
+
+      it('should convert any string "anyword" to boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 'anyword')).toBe(true);
+      });
+
+      it('should keep boolean undefined as undefined', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, undefined)).toBe(undefined);
+      });
+
+      it('should keep boolean null as null', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, null)).toBe(null);
+      });
+
+    });
+
   });
 
 
