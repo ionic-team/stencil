@@ -1,8 +1,8 @@
 import { assignHostContentSlots } from '../renderer/slot';
 import { attributeChangedCallback } from '../instance/attribute-changed';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomApi, DomControllerApi, GlobalNamespace, HostContentNodes, HostElement,
-  PlatformApi, StencilSystem, VNode } from '../../util/interfaces';
+  DomApi, DomControllerApi, GlobalNamespace, HostElement,
+  PlatformApi, StencilSystem } from '../../util/interfaces';
 import { BUNDLE_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './global-context';
@@ -20,7 +20,7 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   const bundleCallbacks: BundleCallbacks = {};
   const activeFileReads: {[url: string]: boolean} = {};
   const css: {[componentTag: string]: string} = {};
-  let ssrIds = 0;
+
 
   const plt: PlatformApi = {
     defineComponent,
@@ -34,11 +34,7 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     isServer: true
   };
 
-  const patch = createRenderer(plt, domApi);
-
-  plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes) {
-    return patch(oldVNode, newVNode, isUpdate, hostContentNodes, ssrIds++);
-  };
+  plt.render = createRenderer(plt, domApi);
 
   const injectedGlobal = initGlobal(config, dom);
 
@@ -52,8 +48,6 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   const rootNode = <HostElement>domApi.$documentElement;
   rootNode._activelyLoadingChildren = [];
   rootNode._initLoad = function appLoadedCallback() {
-    // let it be know, we have loaded
-    // injectedGlobal.emit(plt.appRoot.$instance, 'ionLoad');
     plt.onAppLoad && plt.onAppLoad(rootNode, Object.keys(css).sort().map(tag => css[tag]).join(''));
   };
 
@@ -94,11 +88,13 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
-    registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
+    const tagName = cmpMeta.tagNameMeta.toUpperCase();
+
+    registry[tagName] = cmpMeta;
 
     if (cmpMeta.componentModuleMeta) {
       // for unit testing
-      moduleImports[cmpMeta.tagNameMeta] = cmpMeta.componentModuleMeta;
+      moduleImports[tagName] = cmpMeta.componentModuleMeta;
     }
   }
 

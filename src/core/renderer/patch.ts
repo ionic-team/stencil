@@ -7,13 +7,13 @@
  * Modified for Stencil's renderer and slot projection
  */
 
-import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, VNode } from '../../util/interfaces';
+import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
 import { SLOT_TAG, SSR_ID, SSR_SLOT_START, SSR_SLOT_END } from '../../util/constants';
 import { updateElement } from './update-element';
 
 
-export function createRenderer(plt: PlatformApi, domApi: DomApi) {
+export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   // createRenderer() is only created once per app
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
@@ -317,7 +317,8 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi) {
   // internal variables to be reused per patch() call
   let isUpdate: boolean, hostContentNodes: HostContentNodes, ssrId: number;
 
-  return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, ssrPatchId?: number): VNode {
+
+  return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data

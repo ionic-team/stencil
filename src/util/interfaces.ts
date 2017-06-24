@@ -648,7 +648,7 @@ export interface HostElement extends HTMLElement {
 
 
 export interface RendererApi {
-  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, ssrId?: number): VNode;
 }
 
 
@@ -663,9 +663,9 @@ export interface DomApi {
   $createElementNS(namespace: string, tagName: any): any;
   $createTextNode(text: string): Text;
   $createComment(data: string): Comment;
-  $insertBefore(parentNode: Node, newNode: Node, referenceNode: Node): void;
-  $removeChild(node: Node, child: Node): Node;
-  $appendChild(node: Node, child: Node): void;
+  $insertBefore(parentNode: Node, childNode: Node, referenceNode: Node): void;
+  $removeChild(parentNode: Node, childNode: Node): Node;
+  $appendChild(parentNode: Node, childNode: Node): void;
   $childNodes(node: Node): NodeList;
   $parentNode(node: Node): Node;
   $nextSibling(node: Node): Node;
