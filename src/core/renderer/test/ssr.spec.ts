@@ -11,7 +11,30 @@ describe('ssr', () => {
 
   describe('ssr vnode', () => {
 
-    it('should create a vnode w/ one named slot', () => {
+    it('should create a vnode from nested default slots html', () => {
+      elm = domApi.$createElement('ion-test');
+      elm.setAttribute('ssrid', '1');
+      elm.innerHTML = `
+        <child-a ssrid="1">
+          <!--s:-->
+            <!--s:-->
+              <div>88</div>
+              <div>mph</div>
+            <!--/s-->
+          <!--/s-->
+        </child-a>
+      `;
+
+      ssrVNode = createVNodeFromSsr(domApi, elm, '1');
+
+      expect(ssrVNode.vchildren[1].vchildren.length).toBe(4);
+      expect(ssrVNode.vchildren[1].vchildren[1].vtag).toBe(SLOT_TAG);
+      expect(ssrVNode.vchildren[1].vchildren[2].vtext).toBeDefined();
+      expect(ssrVNode.vchildren[1].vchildren[2].vtext).toBeDefined();
+
+    });
+
+    it('should create a vnode from one named slot html', () => {
       elm = domApi.$createElement('ion-test');
       elm.setAttribute('ssrid', '1');
       elm.innerHTML = `
@@ -30,7 +53,7 @@ describe('ssr', () => {
       expect(ssrVNode.vchildren[1].vchildren[1].vattrs.name).toBe('named-slot');
     });
 
-    it('should create a vnode w/ default slot', () => {
+    it('should create a vnode from default slot html', () => {
       elm = domApi.$createElement('ion-test');
       elm.setAttribute('ssrid', '1');
       elm.innerHTML = `

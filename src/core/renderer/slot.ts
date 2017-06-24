@@ -27,7 +27,7 @@ export function createVNodeFromSsr(domApi: DomApi, node: Node, ssrId: string) {
       if (nodeType === COMMENT_NODE) {
         nodeValue = childNode.nodeValue;
 
-        if (nodeValue.indexOf(SSR_SLOT_START) === 0) {
+        if (!isWithinSlot && nodeValue.indexOf(SSR_SLOT_START) === 0) {
           isWithinSlot = true;
           childVnode = new VNodeObj();
           childVnode.vtag = SLOT_TAG;
