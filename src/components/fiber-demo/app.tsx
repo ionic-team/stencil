@@ -10,7 +10,7 @@ export class FiberDemo {
   seconds: number = 0;
   intervalID: number;
 
-  ionViewDidLoad() {
+  componentDidLoad() {
     var tick: Function = this.tick.bind(this);
     this.intervalID = setInterval(tick, 1000);
   }

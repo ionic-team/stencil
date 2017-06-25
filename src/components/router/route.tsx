@@ -19,10 +19,10 @@ export class Route {
   //@Prop() match: any;
   @State() match: any = {};
 
-  ionViewDidLoad() {
+  componentDidLoad() {
     this.routerInstance = document.querySelector(this.router)
 
-    console.log('Router instance in ionViewDidLoad', this.routerInstance)
+    console.log('Router instance in componentDidLoad', this.routerInstance)
 
     // HACK
     this.routerInstance.addEventListener('ionRouterNavigation', (e) => {

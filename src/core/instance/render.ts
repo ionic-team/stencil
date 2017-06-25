@@ -9,10 +9,10 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
   const cmpMeta = plt.getComponentMeta(elm);
 
   if (isUpdateRender) {
-    // fire off the user's ionViewWillUpdate method (if one was provided)
-    // ionViewWillUpdate runs BEFORE render() has been called
+    // fire off the user's componentWillUpdate method (if one was provided)
+    // componentWillUpdate runs BEFORE render() has been called
     // but only BEFORE an UPDATE and not before the intial render
-    instance.ionViewWillUpdate && instance.ionViewWillUpdate();
+    instance.componentWillUpdate && instance.componentWillUpdate();
   }
 
   // if this component has a render function, let's fire
@@ -59,9 +59,9 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
   }
 
   if (isUpdateRender) {
-    // fire off the user's ionViewDidUpdate method (if one was provided)
-    // ionViewDidUpdate runs AFTER render() has been called
+    // fire off the user's componentDidUpdate method (if one was provided)
+    // componentDidUpdate runs AFTER render() has been called
     // but only AFTER an UPDATE and not after the intial render
-    instance.ionViewDidUpdate && instance.ionViewDidUpdate();
+    instance.componentDidUpdate && instance.componentDidUpdate();
   }
 }

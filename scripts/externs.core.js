@@ -71,10 +71,10 @@ function $(){};
  * Component Instance
  * Methods set on the user's component
  */
-function ionViewWillLoad(){};
+function componentWillLoad(){};
 function ionViewWillUnload(){};
-function ionViewDidLoad(){};
-function ionViewDidUnload(){};
+function componentDidLoad(){};
+function componentDidUnload(){};
 function render(){};
 function hostData(){};
 

@@ -17,8 +17,8 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // if we've created an instance for this
     const instance = elm.$instance;
     if (instance) {
-      // call the user's ionViewDidUnload if there is one
-      instance.ionViewDidUnload && instance.ionViewDidUnload();
+      // call the user's componentDidUnload if there is one
+      instance.componentDidUnload && instance.componentDidUnload();
       elm.$instance = instance.$el = instance.__values = null;
     }
 

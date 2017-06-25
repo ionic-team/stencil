@@ -41,7 +41,7 @@ export class Loading implements ILoading {
     this.dismiss();
   }
 
-  ionViewDidLoad() {
+  componentDidLoad() {
     if (!this.spinner) {
       this.spinner = Ionic.config.get('loadingSpinner', Ionic.config.get('spinner', 'lines'));
     }
@@ -133,7 +133,7 @@ export class Loading implements ILoading {
     });
   }
 
-  ionViewDidUnload() {
+  componentDidUnload() {
     Ionic.emit(this, 'ionLoadingDidUnload', { detail: { loading: this } } as LoadingEvent);
   }
 

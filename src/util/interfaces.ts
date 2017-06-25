@@ -555,11 +555,11 @@ export interface HostMeta {
 
 
 export interface Component {
-  ionViewWillLoad?: () => void;
-  ionViewDidLoad?: () => void;
-  ionViewWillUpdate?: () => void;
-  ionViewDidUpdate?: () => void;
-  ionViewDidUnload?: () => void;
+  componentWillLoad?: () => void;
+  componentDidLoad?: () => void;
+  componentWillUpdate?: () => void;
+  componentDidUpdate?: () => void;
+  componentDidUnload?: () => void;
 
   render?: () => any;
   hostData?: () => VNodeData;

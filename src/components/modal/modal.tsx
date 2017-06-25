@@ -37,7 +37,7 @@ export class Modal implements IModal {
     this.dismiss();
   }
 
-  ionViewDidLoad() {
+  componentDidLoad() {
     Ionic.emit(this, 'ionModalDidLoad', { detail: { modal: this } } as ModalEvent);
   }
 
@@ -107,7 +107,7 @@ export class Modal implements IModal {
     });
   }
 
-  ionViewDidUnload() {
+  componentDidUnload() {
     Ionic.emit(this, 'ionModalDidUnload', { detail: { modal: this } } as ModalEvent);
   }
 
