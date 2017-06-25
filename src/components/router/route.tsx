@@ -9,19 +9,42 @@ import { Component, Prop, h } from '@stencil/core';
   tag: 'ion-route'
 })
 export class Route {
+  $el: HTMLElement;
+  
   @Prop() url: string;
 
   // The instance of the router
   @Prop() router: any;
 
-  @Prop() match: any;
+  //@Prop() match: any;
+  @State() match: any = {};
+
+  ionViewDidLoad() {
+    this.routerInstance = document.querySelector(this.router)
+
+    console.log('Router instance in ionViewDidLoad', this.routerInstance)
+
+    // HACK
+    this.routerInstance.addEventListener('ionRouterNavigation', (e) => {
+      console.log('NAVIGATION IN ROUTER', e);
+      this.match = e.detail;
+    })
+  }
 
   render() {
     const match = this.match
-    console.log(`  <ion-route> Rendering route ${this.url}`, router, match);
 
-    return (
-      <slot></slot>
-    );
+    console.log('Does match match?', match.url, this.url)
+
+    return null;
+
+    /*
+    if(match.url == this.url) {
+      console.log(`  <ion-route> Rendering route ${this.url}`, router, match);
+      return (<slot></slot>);
+    } else {
+      return null;
+    }
+    */
   }
 }

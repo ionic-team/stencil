@@ -16,7 +16,6 @@ export class RouteLink {
 
   handleClick(e) {
     console.log('Route link click', e);
-    window.history.pushState(null, null, this.url)
     router.navigateTo(this.url)
   }
 

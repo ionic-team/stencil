@@ -4,6 +4,10 @@ import { Component, h, Prop } from '@stencil/core';
   tag: 'stencil-site'
 })
 export class App {
+  constructor() {
+    const dynamicRouter = <ion-router></ion-router>
+    console.log('Built router', dynamicRouter)
+  }
   render() {
     return (
       <div class="app">
