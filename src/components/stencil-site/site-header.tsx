@@ -1,7 +1,8 @@
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
-  tag: 'site-header'
+  tag: 'site-header',
+  styleUrls: 'site-header.scss'
 })
 export class SiteHeader {
   render() {
@@ -14,9 +15,9 @@ export class SiteHeader {
                 <img src="logo.png" />
               </ion-col>
               <ion-col>
-                <ul>
-                  <li><a href="/docs">Docs</a></li>
-                </ul>
+                <ion-route-link router="#router" url="">Home</ion-route-link>
+                <ion-route-link router="#router" url="docs">Docs</ion-route-link>
+                <ion-route-link router="#router" url="demos">Demos</ion-route-link>
               </ion-col>
             </ion-row>
           </ion-grid>

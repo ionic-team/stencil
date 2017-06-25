@@ -10,7 +10,7 @@ import { Component, Prop, h } from '@stencil/core';
 })
 export class Route {
   $el: HTMLElement;
-  
+
   @Prop() url: string;
 
   // The instance of the router
@@ -36,15 +36,14 @@ export class Route {
 
     console.log('Does match match?', match.url, this.url)
 
-    return null;
+    //return <p></p>;
 
-    /*
+    let styles = {}
     if(match.url == this.url) {
       console.log(`  <ion-route> Rendering route ${this.url}`, router, match);
-      return (<slot></slot>);
     } else {
-      return null;
+      styles = { display: 'none' }
     }
-    */
+    return (<div style={styles}><slot></slot></div>);
   }
 }
