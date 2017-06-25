@@ -14,9 +14,10 @@ export class Route {
   // The instance of the router
   @Prop() router: any;
 
+  @Prop() match: any;
+
   render() {
-    const router = document.querySelector(this.router);
-    const match = router.match
+    const match = this.match
     console.log(`  <ion-route> Rendering route ${this.url}`, router, match);
 
     return (
