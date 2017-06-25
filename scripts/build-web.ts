@@ -30,10 +30,10 @@ const BUNDLES = [
   { components: ['ion-slides', 'ion-slide'] },
   { components: ['ion-spinner'] },
   { components: ['ion-toggle'] },
-  { components: ['ion-router', 'ion-route'] },
+  { components: ['ion-router', 'ion-route', 'ion-route-link'] },
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
   { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] },
-  { components: ['stencil-site', 'landing-page', 'site-header'] }
+  { components: ['stencil-site', 'landing-page', 'site-header', 'docs-page'] }
 ];
 
 

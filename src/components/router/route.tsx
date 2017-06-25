@@ -1,21 +1,26 @@
 import { Component, Prop, h } from '@stencil/core';
 
 /**
-  * @name Avatar
+  * @name Route
   * @module ionic
   * @description
-  * An Avatar is a component that creates a circular image for an item.
-  * Avatars can be placed on the left or right side of an item with the `item-start` or `item-end` directive.
-  * @see {@link /docs/components/#avatar-list Avatar Component Docs}
  */
 @Component({
   tag: 'ion-route'
 })
 export class Route {
-  @Prop url: string;
+  @Prop() url: string;
+
+  // The instance of the router
+  @Prop() router: any;
 
   render() {
-    console.log(`<ion-route> Rendering route ${this.url}`)
-    return (<h1>Hello</h1>);
+    const router = document.querySelector(this.router);
+    const match = router.match
+    console.log(`  <ion-route> Rendering route ${this.url}`, router, match);
+
+    return (
+      <slot></slot>
+    );
   }
 }
