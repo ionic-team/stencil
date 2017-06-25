@@ -72,7 +72,6 @@ function $(){};
  * Methods set on the user's component
  */
 function componentWillLoad(){};
-function ionViewWillUnload(){};
 function componentDidLoad(){};
 function componentDidUnload(){};
 function render(){};
