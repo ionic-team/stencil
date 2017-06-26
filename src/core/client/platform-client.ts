@@ -49,6 +49,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   rootElm._activelyLoadingChildren = [];
   rootElm._initLoad = function appLoadedCallback() {
     // this will fire when all components have finished loaded
+    rootElm._hasLoaded = true;
     appendStylesToHead(initRenderStyles);
     initRenderStyles = null;
 
