@@ -105,3 +105,13 @@ ion-footer ion-toolbar {
 ion-toolbar.toolbar-ios .ionic-icon {
   margin-right: 10px;
 }
+
+@media(max-width: 330px) {
+  .header-button {
+    width: 6.3rem;
+  }
+
+  ion-toolbar.toolbar-ios .ionic-icon {
+    margin-right: 13px;
+  }
+}
