@@ -10,7 +10,23 @@ export class CommentsList {
 
   render() {
     const items = this.type.map((comment: any) => {
-      return (
+      console.log(comment);
+      const nestedComments = comment.comments.map((comment: any) => {
+        return (
+          <ion-item>
+            <ion-label>
+              <h2>
+                {`Posted by ${comment.user} ${comment.time_ago}`}
+              </h2>
+              <div props={{
+                innerHTML: comment.content
+              }}></div>
+            </ion-label>
+          </ion-item>
+        );
+      });
+
+      return [
         <ion-item>
           <ion-label>
             <h2>
@@ -20,8 +36,12 @@ export class CommentsList {
               innerHTML: comment.content
             }}></div>
           </ion-label>
-        </ion-item>
-      );
+        </ion-item>,
+
+        <ion-list class='nested-comments'>
+          {nestedComments}
+        </ion-list>
+      ];
     });
 
     return (
