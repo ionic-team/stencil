@@ -29,7 +29,7 @@ export class Toggle implements BooleanInputComponent {
   @Prop({ twoWay: true }) value: string;
 
 
-  ionViewWillLoad() {
+  componentWillLoad() {
     this.emitStyle();
   }
 

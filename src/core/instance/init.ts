@@ -62,10 +62,10 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
   // if it should use shadow dom or not
   plt.attachStyles(cmpMeta, elm, instance);
 
-  // fire off the user's ionViewWillLoad method (if one was provided)
-  // ionViewWillLoad only runs ONCE, after instance.$el has been assigned
+  // fire off the user's componentWillLoad method (if one was provided)
+  // componentWillLoad only runs ONCE, after instance.$el has been assigned
   // the host element, but BEFORE render() has been called
-  instance.ionViewWillLoad && instance.ionViewWillLoad();
+  instance.componentWillLoad && instance.componentWillLoad();
 }
 
 
@@ -88,10 +88,10 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     // all of this element's children have loaded (if any)
     elm._hasLoaded = true;
 
-    // fire off the user's ionViewDidLoad method (if one was provided)
-    // ionViewDidLoad only runs ONCE, after instance.$el has been assigned
+    // fire off the user's componentDidLoad method (if one was provided)
+    // componentDidLoad only runs ONCE, after instance.$el has been assigned
     // the host element, and AFTER render() has been called
-    instance.ionViewDidLoad && instance.ionViewDidLoad();
+    instance.componentDidLoad && instance.componentDidLoad();
 
     // add the css class that this element has officially hydrated
     elm.classList.add('hydrated');

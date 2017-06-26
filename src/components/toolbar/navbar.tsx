@@ -63,7 +63,7 @@ export class Navbar {
     console.log('back button click');
   }
 
-  ionViewDidLoad() {
+  componentDidLoad() {
     const buttons = this.$el.querySelectorAll('ion-button') as any;
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].setAttribute('button-type', 'bar-button');

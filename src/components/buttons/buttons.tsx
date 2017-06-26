@@ -10,7 +10,7 @@ import { Component, h } from '../index';
 export class Buttons {
   $el: HTMLElement;
 
-  ionViewDidLoad() {
+  componentDidLoad() {
     const buttons = this.$el.querySelectorAll('ion-button') as any;
     for (var i = 0; i < buttons.length; i++) {
       buttons[i].setAttribute('button-type', 'bar-button');

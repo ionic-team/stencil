@@ -22,7 +22,7 @@ export class NewsContainer {
   @State() lean: number = 0;
 
 
-  ionViewDidLoad() {
+  componentDidLoad() {
     this.mainSvg = document.querySelector('#mainSvg');
     d3.select(this.mainSvg).on('mousemove', this.onMouseMove.bind(this));
 
