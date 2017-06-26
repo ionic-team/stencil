@@ -105,7 +105,7 @@ export class NewsContainer {
       Ionic.controller('loading', { content: `fetching articles...` }).then(loading => {
         loading.present().then(() => {
 
-          this.page = this.page--;
+          this.page = this.page - 1;
 
           this.fakeFetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((data) => {
             this.stories = data;
@@ -122,7 +122,7 @@ export class NewsContainer {
     Ionic.controller('loading', { content: `fetching articles...` }).then(loading => {
       loading.present().then(() => {
 
-        this.page = this.page++;
+        this.page = this.page + 1;
 
         this.fakeFetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((data) => {
           if (data.length !== 0) {

@@ -35,18 +35,16 @@ export class NewsList {
     Ionic.controller('loading', { content: 'fetching comments...' }).then(loading => {
       loading.present();
 
-      this.fakeFetch(`${this.apiRootUrl}/item/${story.id}`).then((data) => {
-        setTimeout(() => {
-          loading.dismiss().then(() => {
-            Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then(modal => {
-              console.log('modal created');
+      this.fakeFetch(`${this.apiRootUrl}/item/${story.id}`).then((data: any) => {
+        loading.dismiss().then(() => {
+          Ionic.controller('modal', { component: 'comments-page', componentProps: { comments: data.comments, storyId: story.id } }).then(modal => {
+            console.log('modal created');
 
-              modal.present().then(() => {
-                console.log('modal finished transitioning in, commments: ', modal.componentProps.comments);
-              });
+            modal.present().then(() => {
+              console.log('modal finished transitioning in, commments: ', modal.componentProps.comments);
             });
           });
-        }, 300);
+        });
       });
 
     });
