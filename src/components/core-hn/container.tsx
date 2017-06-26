@@ -8,13 +8,13 @@ import { Component, h, Ionic, State } from '../index';
 export class NewsContainer {
 
   @State() stories: any[] = [];
-  apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
-  page: number = 1;
-  pageType: string;
   @State() firstSelectedClass: boolean;
   @State() secondSelectedClass: boolean = false;
   @State() thirdSelectedClass: boolean = false;
   @State() fourthSelectedClass: boolean = false;
+  apiRootUrl: string = 'https://node-hnapi.herokuapp.com';
+  page: number = 1;
+  pageType: string;
   prevClass: any;
 
   componentWillLoad() {
@@ -23,6 +23,8 @@ export class NewsContainer {
     this.firstSelectedClass = true;
 
     // call to firebase function for first view
+    // switch this out to hn/ for prod so fancy service
+    // worker trick works like it should
     this.fakeFetch('https://us-central1-corehacker-10883.cloudfunctions.net/fetchNews').then((data) => {
       this.stories = data;
       this.pageType = 'news';
@@ -104,7 +106,6 @@ export class NewsContainer {
         loading.present().then(() => {
 
           this.page = this.page--;
-          console.log(this.page--);
 
           this.fakeFetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((data) => {
             this.stories = data;
@@ -114,8 +115,6 @@ export class NewsContainer {
 
         });
       });
-    } else {
-      window.navigator.vibrate(200);
     }
   }
 
@@ -124,7 +123,6 @@ export class NewsContainer {
       loading.present().then(() => {
 
         this.page = this.page++;
-        console.log(this.page++);
 
         this.fakeFetch(`${this.apiRootUrl}/${this.pageType}?page=${this.page}`).then((data) => {
           if (data.length !== 0) {
@@ -142,8 +140,6 @@ export class NewsContainer {
   }
 
   render() {
-    console.log('rendering');
-
     return [
       <ion-header mdHeight='56px' iosHeight='61px'>
         <ion-toolbar color='primary'>
