@@ -13,7 +13,7 @@ import { parseComponentMeta } from '../../util/data-parse';
 
 
 export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string, loadAnimations: boolean): PlatformApi {
-  const registry: ComponentRegistry = { HTML: {} };
+  const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};

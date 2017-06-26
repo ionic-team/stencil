@@ -14,7 +14,7 @@ import { parseComponentMeta } from '../../util/data-parse';
 
 
 export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
-  const registry: ComponentRegistry = { HTML: {} };
+  const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
