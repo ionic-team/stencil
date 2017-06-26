@@ -6,12 +6,23 @@ process.title = 'stencil';
 process.on('unhandledRejection', r => console.error(r));
 
 var semver = require('semver');
+var cmd;
 
 if (semver.lt(process.version, 'v6.4.0')) {
   console.log('ERR' + ': Your Node.js version is ' + chalk.bold(process.version) + '. Please update to the latest Node 6 LTS version (or latest Node).');
   process.exit(1);
 }
 
-var cli = require('../dist/scripts/build.js');
+switch(process.argv[2]) {
+case 'build':
+  var cmd = require('../dist/scripts/build.js').run;
+  break;
+case 'collection':
+  var cmd = require('../dist/scripts/collection.js').run;
+  break;
+default:
+  throw 'Command expected for stencil';
+}
+
 process.env.IONIC_CLI_BIN = __filename;
-cli.run(process.argv, process.env);
+cmd(process.argv, process.env);
