@@ -39,17 +39,11 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrid="0" class="hydrated">
-              <elm-a ssrid="0">
-                <!--s:slot-a-->
-                  <div slot="slot-a">inner slot-a text</div>
-                <!--/s-->
-                <!--s:-->
-                  <div>default slot text</div>
-                <!--/s-->
-                <!--s:slot-b-->
-                  <div slot="slot-b">inner slot-b text</div>
-                <!--/s-->
+            <ion-test ssrv="0" class="hydrated">
+              <elm-a ssrc="0.0.">
+                <div slot="slot-a">inner slot-a text</div>
+                <div>default slot text</div>
+                <div slot="slot-b">inner slot-b text</div>
               </elm-a>
             </ion-test>
           </body>
@@ -66,6 +60,7 @@ describe('hydrate', () => {
         componentModuleMeta: class {
           render() {
             return h('elm-a', 0, [
+              'inner text',
               h(SLOT_TAG, 0)
             ]);
           }
@@ -76,7 +71,7 @@ describe('hydrate', () => {
     const opts: HydrateOptions = {
       html: `
         <ion-test>
-          inner text
+          content text
         </ion-test>
       `
     };
@@ -88,51 +83,11 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrid="0" class="hydrated">
-              <elm-a ssrid="0">
-                <!--s:-->
-                inner text
-                <!--/s-->
+            <ion-test ssrv="0" class="hydrated">
+              <elm-a ssrc="0.0">
+                <!--s.0.0-->inner text<!--/-->
+                content text
               </elm-a>
-            </ion-test>
-          </body>
-        </html>
-      `));
-
-      done();
-    });
-  });
-
-  it('should load content in default slot', (done) => {
-    const registry: ComponentRegistry = {
-      'ion-test': {
-        componentModuleMeta: class {
-          render() {
-            return h(SLOT_TAG, 0);
-          }
-        },
-        slotMeta: HAS_SLOTS
-      }
-    };
-    const opts: HydrateOptions = {
-      html: `
-        <ion-test>
-          inner text
-        </ion-test>
-      `
-    };
-
-    hydrateHtml(sys, staticDir, registry, opts, (err, html) => {
-      expect(err).toBe(null);
-
-      expect(compareHtml(html)).toEqual(compareHtml(`
-        <html dir="ltr">
-          <head></head>
-          <body>
-            <ion-test ssrid="0" class="hydrated">
-              <!--s:-->
-                inner text
-              <!--/s-->
             </ion-test>
           </body>
         </html>
@@ -163,8 +118,8 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrid="0" class="hydrated">
-              <div ssrid="0"></div>
+            <ion-test ssrv="0" class="hydrated">
+              <div ssrc="0.0."></div>
             </ion-test>
           </body>
         </html>

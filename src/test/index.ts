@@ -245,7 +245,7 @@ export function compareHtml(input: string) {
 }
 
 
-export function removeWhitespaceFromNodes(node: Node) {
+export function removeWhitespaceFromNodes(node: Node): any {
   if (node.nodeType === 1) {
     for (var i = node.childNodes.length - 1; i >= 0; i--) {
       if (node.childNodes[i].nodeType === 3) {
@@ -259,4 +259,5 @@ export function removeWhitespaceFromNodes(node: Node) {
       }
     }
   }
+  return node;
 }

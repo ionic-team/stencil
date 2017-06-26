@@ -1,8 +1,8 @@
-import { assignHostContentSlots, createVNodeFromSsr } from '../renderer/slot';
+import { assignHostContentSlots, createVNodesFromSsr } from '../renderer/slot';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
   ConfigApi, DomControllerApi, DomApi, HostElement,
   GlobalNamespace, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
-import { BUNDLE_ID, SSR_ID, STYLES } from '../../util/constants';
+import { BUNDLE_ID, SSR_VNODE_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
 import { getMode } from '../platform/mode';
 import { h, t } from '../renderer/h';
@@ -21,6 +21,8 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
   let initAppStyles: string[] = [];
 
+
+  // create the platform api which will be passed around for external use
   const plt: PlatformApi = {
     registerComponents,
     defineComponent,
@@ -32,22 +34,23 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     attachStyles
   };
 
+
+  // create the renderer that will be used
   plt.render = createRenderer(plt, domApi);
 
+
+  // create the global which will be injected into the user's instances
   const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, queue, domCtrl);
 
 
-  // setup the root node of all things
-  // which is the mighty <html> tag
-  const rootNode = <HostElement>domApi.$documentElement;
-  rootNode._activelyLoadingChildren = [];
-  rootNode._initLoad = function appLoadedCallback() {
+  // setup the root element which is the mighty <html> tag
+  // the <html> has the final say of when the app has loaded
+  const rootElm = <HostElement>domApi.$documentElement;
+  rootElm._activelyLoadingChildren = [];
+  rootElm._initLoad = function appLoadedCallback() {
     // this will fire when all components have finished loaded
     appendStylesToHead(initAppStyles);
     initAppStyles = null;
-
-    // let it be know, we have loaded
-    // injectedGlobal.emit(plt.appRoot.$instance, 'ionLoad');
 
     // kick off loading the auxiliary code, which has stuff that wasn't
     // needed for the initial paint, such as animation code
@@ -55,6 +58,11 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
       jsonp(staticDir + 'ionic.animation.js');
     });
   };
+
+
+  // if the HTML was generated from SSR
+  // then let's walk the tree and generate vnodes out of the data
+  createVNodesFromSsr(domApi, rootElm);
 
 
   function attachStyles(cmpMeta: ComponentMeta, elm: HostElement, instance: Component) {
@@ -130,10 +138,10 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   }
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
-    const ssrId = domApi.$getAttribute(elm, SSR_ID);
-    if (ssrId) {
-      elm._vnode = createVNodeFromSsr(domApi, elm, ssrId);
-    } else {
+    // host element has been connected to the DOM
+    if (!domApi.$getAttribute(elm, SSR_VNODE_ID)) {
+      // this host element was NOT created with SSR
+      // let's pick out the inner content for slot projection
       assignHostContentSlots(domApi, elm, slotMeta);
     }
   }
@@ -141,7 +149,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   function appendBundleStyles(bundleCmpMeta: ComponentMeta[]) {
     const styles = bundleCmpMeta.map(getCmpMetaStyle);
 
-    if (rootNode._hasLoaded) {
+    if (rootElm._hasLoaded) {
       queue.add(() => {
         appendStylesToHead(styles);
       });

@@ -9,7 +9,7 @@
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
-import { SLOT_TAG, SSR_ID, SSR_SLOT_START, SSR_SLOT_END } from '../../util/constants';
+import { SLOT_TAG, SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
 import { updateElement } from './update-element';
 
 
@@ -18,9 +18,8 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
 
-  function createElm(vnode: VNode, parentElm: Node) {
+  function createElm(vnode: VNode, parentElm: Node, childIndex: number) {
     let i = 0;
-    let childNode: Node;
 
     if (vnode.vtag === SLOT_TAG) {
 
@@ -42,15 +41,6 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
         if (isDef(slotNodes)) {
           // the host element has some nodes that need to be moved around
 
-          if (isDef(ssrId)) {
-            // this is a server-side rendering
-            // add a comment to the beginning of this slot
-            domApi.$appendChild(
-              parentElm,
-              domApi.$createComment(SSR_SLOT_START + (namedSlot || ''))
-            );
-          }
-
           // we have a slot for the user's vnode to go into
           // while we're moving nodes around, temporarily disable
           // the disconnectCallback from working
@@ -68,23 +58,15 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
           // done moving nodes around
           // allow the disconnect callback to work again
           plt.tmpDisconnected = false;
-
-          if (isDef(ssrId)) {
-            // this is a server-side rendering
-            // add a comment to the end of this slot
-            domApi.$appendChild(
-              parentElm,
-              domApi.$createComment(SSR_SLOT_END)
-            );
-          }
         }
       }
 
-      // this was a slot node, our work here is done
-      // no need to return an element to be added to the dom
+      // this was a slot node, we do not create slot elements, our work here is done
+      // no need to return any element to be added to the dom
       return null;
+    }
 
-    } else if (isDef(vnode.vtext)) {
+    if (isDef(vnode.vtext)) {
       // create text node
       vnode.elm = domApi.$createTextNode(vnode.vtext);
 
@@ -92,20 +74,43 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       // create element
       const elm = vnode.elm = (vnode.vnamespace ? domApi.$createElementNS(vnode.vnamespace, vnode.vtag) : domApi.$createElement(vnode.vtag));
 
-      if (isDef(ssrId)) {
-        domApi.$setAttribute(vnode.elm, SSR_ID, ssrId);
-      }
-
       // add css classes, attrs, props, listeners, etc.
       updateElement(domApi, null, vnode);
 
       const children = vnode.vchildren;
-      if (children) {
-        for (; i < children.length; ++i) {
-          childNode = createElm(children[i], elm);
 
-          if (isDef(childNode)) {
+      if (isDef(ssrId)) {
+        // SSR ONLY: this is an SSR render and this
+        // logic does not run on the client
+
+        // give this element the SSR child id that can be read by the client
+        domApi.$setAttribute(
+          vnode.elm,
+          SSR_CHILD_ID,
+          ssrId + '.' + childIndex + (hasChildNodes(children) ? '' : '.')
+        );
+      }
+
+      if (children) {
+        let childNode: Node;
+        for (; i < children.length; ++i) {
+          // create the node
+          childNode = createElm(children[i], elm, i);
+
+          // return node could have been null
+          if (childNode) {
+            if (isDef(ssrId) && childNode.nodeType === 3) {
+              // SSR ONLY: add the text node's start comment
+              domApi.$appendChild(elm, domApi.$createComment('s.' + ssrId + '.' + i));
+            }
+
+            // append our new node
             domApi.$appendChild(elm, childNode);
+
+            if (isDef(ssrId) && childNode.nodeType === 3) {
+              // SSR ONLY: add the text node's end comment
+              domApi.$appendChild(elm, domApi.$createComment('/'));
+            }
           }
         }
       }
@@ -114,7 +119,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     return vnode.elm;
   }
 
-  function addVnodes(parentElm: Node, before: Node | null, vnodes: VNode[], startIdx: number, endIdx: number) {
+  function addVnodes(parentElm: Node, before: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
     let childNode: Node;
 
     for (; startIdx <= endIdx; ++startIdx) {
@@ -125,7 +130,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
           childNode = domApi.$createTextNode(vnodeChild.vtext);
 
         } else {
-          childNode = createElm(vnodeChild, parentElm);
+          childNode = createElm(vnodeChild, parentElm, startIdx);
         }
 
         if (isDef(childNode)) {
@@ -208,14 +213,14 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
         if (isUndef(idxInOld)) {
           // new element
-          node = createElm(newStartVnode, parentElm);
+          node = createElm(newStartVnode, parentElm, newStartIdx);
           newStartVnode = newCh[++newStartIdx];
 
         } else {
           elmToMove = oldCh[idxInOld];
 
           if (elmToMove.vtag !== newStartVnode.vtag) {
-            node = createElm(newStartVnode, parentElm);
+            node = createElm(newStartVnode, parentElm, idxInOld);
 
           } else {
             patchVNode(elmToMove, newStartVnode);
@@ -326,12 +331,14 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     hostContentNodes = hostElementContentNodes;
     ssrId = ssrPatchId;
 
-    if (isDef(ssrId)) {
-      domApi.$setAttribute(oldVnode.elm, SSR_ID, ssrId);
-    }
-
     // synchronous patch
     patchVNode(oldVnode, newVnode);
+
+    if (isDef(ssrId)) {
+      // SSR ONLY: we've been given an SSR id, so the host element
+      // should be given the ssr id attribute
+      domApi.$setAttribute(oldVnode.elm, SSR_VNODE_ID, ssrId);
+    }
 
     // return our new vnode
     return newVnode;
@@ -351,4 +358,19 @@ export function invokeDestroy(vnode: VNode) {
       vnode.vchildren[i] && invokeDestroy(vnode.vchildren[i]);
     }
   }
+}
+
+
+function hasChildNodes(children: VNode[]) {
+  // SSR ONLY: check if there are any more nested child elements
+  // if there aren't, this info is useful so the client runtime
+  // doesn't have to climb down and check so many elements
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].vtag !== SLOT_TAG || hasChildNodes(children[i].vchildren)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
