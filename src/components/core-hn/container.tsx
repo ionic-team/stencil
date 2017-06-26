@@ -57,6 +57,7 @@ export class NewsContainer {
     // this is definitely not the best solution
     // working on something more elegant, but this
     // gets the job done for the moment
+    console.log(type);
     switch (type) {
       case 'news':
         this.firstSelectedClass = true;
@@ -149,10 +150,9 @@ export class NewsContainer {
             <ion-button
               class={{
                 'header-button': true,
-                'first-button': true,
-                'header-button-selected': this.firstSelectedClass
+                'header-button-selected': this.firstSelectedClass,
+                'no-select': !this.firstSelectedClass
               }}
-              clear
               onClick={() => this.getStories('news')}
             >
               News
@@ -160,9 +160,9 @@ export class NewsContainer {
             <ion-button
               class={{
                 'header-button': true,
-                'header-button-selected': this.secondSelectedClass
+                'header-button-selected': this.secondSelectedClass,
+                'no-select': !this.secondSelectedClass
               }}
-              clear
               onClick={() => this.getStories('show')}
             >
               Show
@@ -170,9 +170,9 @@ export class NewsContainer {
             <ion-button
               class={{
                 'header-button': true,
-                'header-button-selected': this.thirdSelectedClass
+                'header-button-selected': this.thirdSelectedClass,
+                'no-select': !this.thirdSelectedClass
               }}
-              clear
               onClick={() => this.getStories('jobs')}
             >
               Jobs
@@ -180,9 +180,9 @@ export class NewsContainer {
             <ion-button
               class={{
                 'header-button': true,
-                'header-button-selected': this.fourthSelectedClass
+                'header-button-selected': this.fourthSelectedClass,
+                'no-select': !this.fourthSelectedClass
               }}
-              clear
               onClick={() => this.getStories('ask')}
             >
               Ask

@@ -58,17 +58,22 @@ ion-footer ion-toolbar {
   line-height: 2.1;
 }
 
-.header-button {
-  opacity: 0.6;
+.header-button {  
   width: 7rem;
+  opacity: 1;
 }
 
 .header-button-selected {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .header-button-selected button {
   font-weight: bold;
+  opacity: 1 !important;
+}
+
+.no-select {
+  opacity: 0.6 !important;
 }
 
 .tabs-bar {
