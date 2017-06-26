@@ -19,7 +19,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   const bundleCallbacks: BundleCallbacks = {};
   const activeJsonRequests: {[url: string]: boolean} = {};
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
-  let initAppStyles: string[] = [];
+  let initRenderStyles: string[] = [];
 
 
   // create the platform api which will be passed around for external use
@@ -49,8 +49,8 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   rootElm._activelyLoadingChildren = [];
   rootElm._initLoad = function appLoadedCallback() {
     // this will fire when all components have finished loaded
-    appendStylesToHead(initAppStyles);
-    initAppStyles = null;
+    appendStylesToHead(initRenderStyles);
+    initRenderStyles = null;
 
     // kick off loading the auxiliary code, which has stuff that wasn't
     // needed for the initial paint, such as animation code
@@ -147,31 +147,39 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   }
 
   function appendBundleStyles(bundleCmpMeta: ComponentMeta[]) {
-    const styles = bundleCmpMeta.map(getCmpMetaStyle);
-
-    if (rootElm._hasLoaded) {
-      queue.add(() => {
-        appendStylesToHead(styles);
-      });
+    if (initRenderStyles) {
+      collectStyles(bundleCmpMeta, initRenderStyles);
 
     } else {
-      initAppStyles = initAppStyles.concat(styles);
+      queue.add(() => {
+        appendStylesToHead(collectStyles(bundleCmpMeta, []));
+      });
     }
   }
 
 
   function appendStylesToHead(styles: string[]) {
-    const styleElm = domApi.$createElement('style');
-    styleElm.innerHTML = styles.join('');
-    domApi.$insertBefore(domApi.$head, styleElm, domApi.$head.firstChild);
+    if (styles.length) {
+      const styleElm = domApi.$createElement('style');
+      styleElm.innerHTML = styles.join('');
+      domApi.$insertBefore(domApi.$head, styleElm, domApi.$head.firstChild);
+    }
   }
 
 
-  function getCmpMetaStyle(cmpMeta: ComponentMeta) {
-    if (cmpMeta.modesMeta) {
-      return Object.keys(cmpMeta.modesMeta).map(m => cmpMeta.modesMeta[m][STYLES]).join('');
+  function collectStyles(bundleCmpMeta: ComponentMeta[], appendTo: string[]) {
+    for (var i = 0; i < bundleCmpMeta.length; i++) {
+      var cmpMeta = bundleCmpMeta[i];
+      if (cmpMeta.modesMeta) {
+        let modeNames = Object.keys(cmpMeta.modesMeta);
+        for (var j = 0; j < modeNames.length; j++) {
+          if (isString(cmpMeta.modesMeta[modeNames[j]][STYLES])) {
+            appendTo.push(cmpMeta.modesMeta[modeNames[j]][STYLES]);
+          }
+        }
+      }
     }
-    return '';
+    return appendTo;
   }
 
 
