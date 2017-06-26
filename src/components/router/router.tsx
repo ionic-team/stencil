@@ -9,7 +9,9 @@ import { Component, h } from '@stencil/core';
   tag: 'ion-router'
 })
 export class Router {
-  $el: HTMLElement;
+  base: string;
+
+  @Prop() root: string = '';
 
   @State() routeMatch: any = {};
 
@@ -22,7 +24,7 @@ export class Router {
   navigateTo(url, data={}) {
     window.history.pushState(null, null, url);
     this.routeMatch = {
-      url: '/' + url
+      url: '/' + url.replace(this.root, '')
     }
     console.log('Route match', this.routeMatch);
 
@@ -30,12 +32,18 @@ export class Router {
     Ionic.emit(this.$instance, 'ionRouterNavigation', { detail: this.routeMatch });
   }
 
-  componentDidLoad() {
+  componentWillLoad() {
     console.log('<ion-router> loaded');
     window.addEventListener('popstate', this.handlePopState.bind(this));
     window.addEventListener('hashchange', this.handleHashChange.bind(this));
 
-    Ionic.emit(this.$instance, 'ionRouterNavigation', { detail: "/" });
+    const initialPath = window.location.pathname
+    const withoutBase = initialPath.replace(this.root, '')
+
+    this.routeMatch = {
+      url: "/" + withoutBase
+    }
+    console.log('Route match', this.routeMatch);
   }
 
   handlePopState(e) {

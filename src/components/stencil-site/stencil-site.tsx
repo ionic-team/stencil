@@ -5,25 +5,21 @@ import { Component, h, Prop } from '@stencil/core';
 })
 export class App {
   constructor() {
-    const dynamicRouter = <ion-router></ion-router>
-    console.log('Built router', dynamicRouter)
   }
   render() {
     return (
       <div class="app">
-        <ion-router id="router">
+        <ion-router id="router" root="/demos/stencil-site/">
 
           <site-header />
 
-          <ion-route url="/" router="#router">
-            <landing-page></landing-page>
-          </ion-route>
-          <ion-route url="/docs" router="#router">
-            <docs-page></docs-page>
-          </ion-route>
-          <ion-route url="/demos" router="#router">
-            <demos-page></demos-page>
-          </ion-route>
+          <div style={{
+            margin: '100px 0 0 0'
+          }}>
+            <ion-route url="/" router="#router" component="landing-page" />
+            <ion-route url="/docs" router="#router" component="docs-page" />
+            <ion-route url="/demos" router="#router" component="demos-page" />
+          </div>
 
         </ion-router>
       </div>

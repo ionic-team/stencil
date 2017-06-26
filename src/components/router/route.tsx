@@ -13,37 +13,39 @@ export class Route {
 
   @Prop() url: string;
 
+  @Prop() component: string;
+
+  @Prop() componentProps: any = {};
+
   // The instance of the router
   @Prop() router: any;
 
   //@Prop() match: any;
   @State() match: any = {};
 
-  componentDidLoad() {
+  componentWillLoad() {
     this.routerInstance = document.querySelector(this.router)
-
-    console.log('Router instance in componentDidLoad', this.routerInstance)
 
     // HACK
     this.routerInstance.addEventListener('ionRouterNavigation', (e) => {
-      console.log('NAVIGATION IN ROUTER', e);
       this.match = e.detail;
     })
   }
 
   render() {
+    this.match.url = this.routerInstance.$instance.routeMatch.url;
     const match = this.match
+    const ChildComponent = this.component
 
     console.log('Does match match?', match.url, this.url)
 
     //return <p></p>;
 
-    let styles = {}
     if(match.url == this.url) {
       console.log(`  <ion-route> Rendering route ${this.url}`, router, match);
+      return (<ChildComponent props={this.componentProps} />);
     } else {
-      styles = { display: 'none' }
+      return null;
     }
-    return (<div style={styles}><slot></slot></div>);
   }
 }
