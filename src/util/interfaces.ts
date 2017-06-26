@@ -903,10 +903,10 @@ export interface BundleCallbacks {
 
 export interface StencilSystem {
   fs?: {
-    readFile(filename: string, encoding: string, callback: (err: NodeJS.ErrnoException, data: string) => void): void;
+    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
     readFileSync(filename: string, encoding: string): string;
-    readdirSync(path: string | Buffer, options?: string | {}): string[];
-    statSync(path: string | Buffer): {
+    readdirSync(path: string, options?: string | {}): string[];
+    statSync(path: string): {
       isFile(): boolean;
       isDirectory(): boolean;
     };
