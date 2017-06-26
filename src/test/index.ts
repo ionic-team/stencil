@@ -243,3 +243,20 @@ export function compareHtml(input: string) {
               .toLowerCase()
               .trim();
 }
+
+
+export function removeWhitespaceFromNodes(node: Node) {
+  if (node.nodeType === 1) {
+    for (var i = node.childNodes.length - 1; i >= 0; i--) {
+      if (node.childNodes[i].nodeType === 3) {
+        if (node.childNodes[i].nodeValue.trim() === '') {
+          node.removeChild(node.childNodes[i]);
+        } else {
+          node.childNodes[i].nodeValue = node.childNodes[i].nodeValue.trim();
+        }
+      } else {
+        removeWhitespaceFromNodes(node.childNodes[i]);
+      }
+    }
+  }
+}
