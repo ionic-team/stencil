@@ -322,19 +322,24 @@ export interface LoadComponentMeta {
   [6]: StateMeta[];
 
   /**
-   * watchers
+   * prop WILL change
    */
-  [7]: ComponentWatchersData[];
+  [7]: PropChangeMeta[];
+
+  /**
+   * prop DID change
+   */
+  [8]: PropChangeMeta[];
 
   /**
    * methods
    */
-  [8]: MethodMeta[];
+  [9]: MethodMeta[];
 
   /**
    * shadow
    */
-  [9]: boolean;
+  [10]: boolean;
 }
 
 
@@ -385,8 +390,16 @@ export interface ComponentListenersData {
 }
 
 
-export interface ComponentWatchersData {
-  [methodName: string]: any;
+export interface PropChangeMeta {
+  /**
+   * prop name
+   */
+  [0]?: string;
+
+  /**
+   * fn name
+   */
+  [1]?: string;
 }
 
 
@@ -420,7 +433,7 @@ export interface PropDecorator {
 
 export interface PropOptions {
   type?: string;
-  twoWay?: boolean;
+  state?: boolean;
 }
 
 
@@ -429,7 +442,7 @@ export interface PropMeta {
   propType?: number;
   attribName?: string;
   attribCase?: number;
-  isTwoWay?: boolean;
+  isStateful?: boolean;
 }
 
 
@@ -474,18 +487,13 @@ export interface StateDecorator {
 export type StateMeta = string;
 
 
-export interface WatchDecorator {
+export interface PropChangeDecorator {
   (propName: string): any;
 }
 
 
-export interface WatchOpts {
+export interface PropChangeOpts {
   fn: string;
-}
-
-
-export interface WatchMeta extends WatchOpts {
-  propName?: string;
 }
 
 
@@ -507,7 +515,8 @@ export interface ComponentMeta {
   methodsMeta?: MethodMeta[];
   propsMeta?: PropMeta[];
   listenersMeta?: ListenMeta[];
-  watchersMeta?: WatchMeta[];
+  propWillChangeMeta?: PropChangeMeta[];
+  propDidChangeMeta?: PropChangeMeta[];
   statesMeta?: StateMeta[];
   modesMeta?: ModesMeta;
   modesStyleMeta?: ModesStyleMeta;
@@ -582,7 +591,7 @@ export interface ComponentActiveListeners {
 }
 
 
-export interface ComponentActiveWatchers {
+export interface ComponentActivePropChanges {
   [propName: string]: Function;
 }
 
@@ -643,7 +652,8 @@ export interface HostElement extends HTMLElement {
   _listeners?: ComponentActiveListeners;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
-  _watchers?: ComponentActiveWatchers;
+  _propWillChange?: ComponentActivePropChanges;
+  _propDidChange?: ComponentActivePropChanges;
 }
 
 

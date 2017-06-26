@@ -1,6 +1,6 @@
 import { applyStyles, getElementReference, pointerCoordX, pointerCoordY } from '../../util/helpers';
 import { BlockerDelegate } from './gesture-controller';
-import { Component, Ionic, Listen, Prop, Watch } from '../index';
+import { Component, Ionic, Listen, Prop, PropDidChange } from '../index';
 import { GestureCallback, GestureDetail, GlobalNamespace } from '../../util/interfaces';
 import { GestureController, GestureDelegate, BLOCK_ALL } from './gesture-controller';
 import { PanRecognizer } from './recognizers';
@@ -72,7 +72,7 @@ export class Gesture {
   }
 
 
-  @Watch('block')
+  @PropDidChange('block')
   blockChange(block: string) {
     if (this.blocker) {
       this.blocker.destroy();

@@ -55,7 +55,7 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
   // so we've got an host element now, and a actual instance
   // let's wire them up together with getter/settings
   // the setters are use for change detection and knowing when to re-render
-  initProxy(plt, elm, instance, cmpMeta.propsMeta, cmpMeta.statesMeta, cmpMeta.methodsMeta, cmpMeta.watchersMeta);
+  initProxy(plt, elm, instance, cmpMeta.propsMeta, cmpMeta.statesMeta, cmpMeta.methodsMeta, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
 
   // cool, let's actually connect the component to the DOM
   // this largely adds this components styles and determines

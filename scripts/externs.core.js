@@ -73,9 +73,11 @@ function $(){};
  */
 function componentWillLoad(){};
 function componentDidLoad(){};
+function componentWillUpdate(){};
+function componentDidUpdate(){};
 function componentDidUnload(){};
-function render(){};
 function hostData(){};
+function render(){};
 
 
 /**

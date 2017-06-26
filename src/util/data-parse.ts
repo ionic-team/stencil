@@ -1,5 +1,5 @@
 import { ATTR_DASH_CASE, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
-import { ComponentMeta, ComponentRegistry,  LoadComponentMeta, PropMeta } from '../util/interfaces';
+import { ComponentMeta, ComponentRegistry, LoadComponentMeta } from '../util/interfaces';
 import { isDef, toDashCase } from './helpers';
 
 
@@ -37,7 +37,7 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
         propName: data[0],
         attribName: (data[1] === ATTR_DASH_CASE ? toDashCase(data[0]) : data[0]).toLowerCase(),
         propType: data[2],
-        isTwoWay: !!data[3]
+        isStateful: !!data[3]
       });
     }
   }
@@ -66,39 +66,19 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   // component states
   cmpMeta.statesMeta = cmpData[6];
 
-  // component instance property watchers
-  if (cmpData[7]) {
-    cmpMeta.watchersMeta = [];
-    for (i = 0; i < cmpData[7].length; i++) {
-      data = cmpData[7][i];
-      cmpMeta.watchersMeta.push({
-        propName: data[0],
-        fn: data[1]
-      });
-    }
-  }
+  // component instance prop WILL change methods
+  cmpMeta.propWillChangeMeta = cmpData[7];
+
+  // component instance prop DID change methods
+  cmpMeta.propDidChangeMeta = cmpData[8];
 
   // component methods
-  cmpMeta.methodsMeta = cmpData[8];
+  cmpMeta.methodsMeta = cmpData[9];
 
   // shadow
-  cmpMeta.isShadowMeta = !!cmpData[9];
+  cmpMeta.isShadowMeta = !!cmpData[10];
 
   return cmpMeta;
-}
-
-
-export function parseProp(data: any[]) {
-  // data[0] = propName
-  // data[1] = attrOption
-  // data[2] = propType
-
-  return <PropMeta>{
-    propName: data[0],
-    attribName: (data[1] === ATTR_DASH_CASE ? toDashCase(data[0]) : data[0]).toLowerCase(),
-    propType: data[2],
-    isTwoWay: !!data[3]
-  };
 }
 
 

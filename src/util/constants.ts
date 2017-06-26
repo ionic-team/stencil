@@ -1,9 +1,25 @@
+/**
+ * This constants file is largely for minification tricks, and to
+ * have easy to read variable names. Enums would make more sense
+ * in most cases, but doing values like this as constants allows
+ * minifiers to just place the raw value directly in source, and in
+ * production there is no variable at all. For example, the minifier
+ * turns data[BUNDLE_ID] turns into data[0] for production builds.
+ */
+
 
 /**
  * Mode Meta Indexes
  */
 export const BUNDLE_ID = 0;
 export const STYLES = 1;
+
+
+/**
+ * Prop Change Meta Indexes
+ */
+export const PROP_CHANGE_PROP_NAME = 0;
+export const PROP_CHANGE_METHOD_NAME = 1;
 
 
 /**

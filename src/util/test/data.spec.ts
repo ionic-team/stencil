@@ -1,7 +1,8 @@
 import { formatComponentMeta } from '../data-serialize';
 import { parseComponentMeta, parsePropertyValue } from '../data-parse';
 import { ComponentMeta, ComponentRegistry, FormatComponentDataOptions } from '../interfaces';
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE, BUNDLE_ID, STYLES, HAS_SLOTS, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE, BUNDLE_ID, STYLES, HAS_SLOTS,
+  PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
 
 
 describe('data serialize/parse', () => {
@@ -58,26 +59,42 @@ describe('data serialize/parse', () => {
     expect(registry['TAG'].hostMeta).toBeFalsy();
   });
 
-  it('should set watchersMeta', () => {
-    cmpMeta.watchersMeta = [
-      {
-        fn: 'method1',
-        propName: 'prop'
-      }
+  it('should set propWillChangeMeta', () => {
+    cmpMeta.propWillChangeMeta = [
+      ['propName', 'methodName']
     ];
 
     const format = formatComponentMeta(cmpMeta, opts);
     parseComponentMeta(registry, moduleImports, evalStr(format));
 
-    expect(registry['TAG'].watchersMeta[0].fn).toBe('method1');
-    expect(registry['TAG'].watchersMeta[0].propName).toBe('prop');
+    expect(registry['TAG'].propWillChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
+    expect(registry['TAG'].propWillChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
   });
 
-  it('should set no watchersMeta', () => {
+  it('should set propDidChangeMeta', () => {
+    cmpMeta.propDidChangeMeta = [
+      ['propName', 'methodName']
+    ];
+
     const format = formatComponentMeta(cmpMeta, opts);
     parseComponentMeta(registry, moduleImports, evalStr(format));
 
-    expect(registry['TAG'].watchersMeta).toBeFalsy();
+    expect(registry['TAG'].propDidChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
+    expect(registry['TAG'].propDidChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
+  });
+
+  it('should set no propWillChangeMeta', () => {
+    const format = formatComponentMeta(cmpMeta, opts);
+    parseComponentMeta(registry, moduleImports, evalStr(format));
+
+    expect(registry['TAG'].propWillChangeMeta).toBeFalsy();
+  });
+
+  it('should set no propDidChangeMeta', () => {
+    const format = formatComponentMeta(cmpMeta, opts);
+    parseComponentMeta(registry, moduleImports, evalStr(format));
+
+    expect(registry['TAG'].propDidChangeMeta).toBeFalsy();
   });
 
   it('should set listenersMeta', () => {

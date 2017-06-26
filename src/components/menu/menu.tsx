@@ -1,4 +1,4 @@
-import { Component, h, Ionic, Prop, Watch } from '../index';
+import { Component, h, Ionic, Prop, PropDidChange } from '../index';
 import { VNodeData, GlobalNamespace, Menu as IMenu } from '../../util/interfaces';
 import { MenuController } from './menu-controller';
 import { MenuType } from './menu-types';
@@ -78,7 +78,7 @@ export class Menu implements IMenu {
    */
   @Prop() swipeEnabled: boolean;
 
-  @Watch('swipeEnabled')
+  @PropDidChange('swipeEnabled')
   swipeEnabledChange(isEnabled: boolean) {
     this.swipeEnable(isEnabled);
   }

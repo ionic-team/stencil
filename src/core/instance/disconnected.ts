@@ -38,6 +38,6 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // set it all to null to ensure we forget references
     // and reset values incase this node gets reused somehow
     // (possible that it got disconnected, but the node was reused)
-    elm._root = elm._vnode = elm._ancestorHostElement = elm._activelyLoadingChildren = elm._watchers = elm._hasConnected = elm._isQueuedForUpdate = elm._hasLoaded = null;
+    elm._root = elm._vnode = elm._ancestorHostElement = elm._activelyLoadingChildren = elm._propWillChange = elm._propDidChange = elm._hasConnected = elm._isQueuedForUpdate = elm._hasLoaded = null;
   }
 }

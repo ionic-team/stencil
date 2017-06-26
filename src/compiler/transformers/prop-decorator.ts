@@ -18,14 +18,14 @@ export function getPropDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDecl
 
       if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1) {
         const child = n.getChildAt(1);
-        const firstToken = child.getFirstToken()
+        const firstToken = child.getFirstToken();
 
         // If the first token is @State()
         if (firstToken && firstToken.getText() === 'Prop') {
           isProp = true;
-        }
-        // If the first token is @State
-        else if(!firstToken && child.getText() == 'Prop') {
+
+        } else if (!firstToken && child.getText() === 'Prop') {
+          // If the first token is @State
           isProp = true;
         }
 
@@ -80,8 +80,8 @@ export function getPropDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDecl
           }
         }
 
-        if (typeof userPropOptions.twoWay === 'boolean') {
-          prop.isTwoWay = !!userPropOptions.twoWay;
+        if (typeof userPropOptions.state === 'boolean') {
+          prop.isStateful = !!userPropOptions.state;
         }
       }
 

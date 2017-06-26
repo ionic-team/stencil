@@ -70,8 +70,12 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       delete cmpMeta.propsMeta;
     }
 
-    if (!cmpMeta.watchersMeta.length) {
-      delete cmpMeta.watchersMeta;
+    if (!cmpMeta.propWillChangeMeta.length) {
+      delete cmpMeta.propWillChangeMeta;
+    }
+
+    if (!cmpMeta.propDidChangeMeta.length) {
+      delete cmpMeta.propDidChangeMeta;
     }
 
     // place property at the bottom

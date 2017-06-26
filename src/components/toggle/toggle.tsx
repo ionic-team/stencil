@@ -1,5 +1,5 @@
 import { BooleanInputComponent, GestureDetail, VNodeData } from '../../util/interfaces';
-import { Component, h, Ionic, Listen, Prop, Watch } from '../index';
+import { Component, h, Ionic, Listen, Prop, PropDidChange } from '../index';
 
 
 @Component({
@@ -24,22 +24,22 @@ export class Toggle implements BooleanInputComponent {
   @Prop() color: string;
   @Prop() mode: string;
 
-  @Prop({ twoWay: true }) checked: boolean = false;
-  @Prop({ twoWay: true }) disabled: boolean = false;
-  @Prop({ twoWay: true }) value: string;
+  @Prop({ state: true }) checked: boolean = false;
+  @Prop({ state: true }) disabled: boolean = false;
+  @Prop({ state: true }) value: string;
 
 
   componentWillLoad() {
     this.emitStyle();
   }
 
-  @Watch('checked')
+  @PropDidChange('checked')
   changed(val: boolean) {
     Ionic.emit(this, 'ionChange', { detail: { checked: val } });
     this.emitStyle();
   }
 
-  @Watch('disabled')
+  @PropDidChange('disabled')
   disableChanged() {
     this.emitStyle();
   }

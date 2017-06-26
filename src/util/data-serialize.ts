@@ -1,5 +1,5 @@
 import { Bundle, ComponentMeta, FormatComponentDataOptions, MethodMeta, ModeMeta,
-  ModesMeta, ListenMeta, PropMeta, StateMeta, WatchMeta } from './interfaces';
+  ModesMeta, ListenMeta, PropMeta, StateMeta, PropChangeMeta } from './interfaces';
 import { ATTR_LOWER_CASE, ATTR_DASH_CASE, BUNDLE_ID, STYLES, TYPE_ANY, TYPE_BOOLEAN, HAS_SLOTS, HAS_NAMED_SLOTS, TYPE_NUMBER } from '../util/constants';
 import * as crypto from 'crypto';
 
@@ -52,7 +52,8 @@ export function formatComponentMeta(cmpMeta: ComponentMeta, opts: FormatComponen
   const methods = formatMethods(cmpMeta.methodsMeta);
   const states = formatStates(cmpMeta.statesMeta);
   const listeners = formatListeners(tag, cmpMeta.listenersMeta);
-  const watchers = formatWatchers(tag, cmpMeta.watchersMeta);
+  const propWillChanges = formatPropChanges(tag, 'prop will change', cmpMeta.propWillChangeMeta);
+  const propDidChanges = formatPropChanges(tag, 'prop did change', cmpMeta.propDidChangeMeta);
   const host = formatHost(cmpMeta.hostMeta);
   const slot = formatSlot(cmpMeta.slotMeta);
   const shadow = formatShadow(cmpMeta.isShadowMeta);
@@ -69,9 +70,10 @@ export function formatComponentMeta(cmpMeta: ComponentMeta, opts: FormatComponen
     d.push(`/** ${tag}: [4] host **/\n${host}`);
     d.push(`/** ${tag}: [5] listeners **/\n${listeners}`);
     d.push(`/** ${tag}: [6] states **/\n${states}`);
-    d.push(`/** ${tag}: [7] watchers **/\n${watchers}`);
-    d.push(`/** ${tag}: [8] methods **/\n${methods}`);
-    d.push(`/** ${tag}: [9] shadow **/\n${shadow}`);
+    d.push(`/** ${tag}: [7] propWillChanges **/\n${propWillChanges}`);
+    d.push(`/** ${tag}: [8] propDidChanges **/\n${propDidChanges}`);
+    d.push(`/** ${tag}: [9] methods **/\n${methods}`);
+    d.push(`/** ${tag}: [10] shadow **/\n${shadow}`);
   }
 
   const arrData: any[] = new Function(`return [${d.join(',').replace(/\n/gm, '')}]`)();
@@ -158,14 +160,14 @@ function formatProps(props: PropMeta[], defaultAttrCase: number) {
     } else if (prop.propType === TYPE_NUMBER) {
       formattedProp += `, ${TYPE_NUMBER} /* number type */`;
 
-    } else if (prop.isTwoWay) {
-      // if no propType data, but there is two-way data
+    } else if (prop.isStateful) {
+      // if no propType data, but there is isStateful data
       // then we still need a value in this index
       formattedProp += `, ${TYPE_ANY} /* any type */`;
     }
 
-    if (prop.isTwoWay) {
-      formattedProp += `, 1 /* two-way prop */`;
+    if (prop.isStateful) {
+      formattedProp += `, 1 /* is stateful prop */`;
     }
 
     formattedProps.push(`  [${formattedProp}]`);
@@ -229,26 +231,26 @@ function formatBoolean(val: boolean) {
 }
 
 
-function formatWatchers(label: string, watchers: WatchMeta[]) {
-  if (!watchers || !watchers.length) {
-    return '0 /* no watchers */';
+function formatPropChanges(label: string, propChangeType: string, propChange: PropChangeMeta[]) {
+  if (!propChange || !propChange.length) {
+    return `0 /* no ${propChangeType} methods */`;
   }
 
   const t: string[] = [];
 
-  watchers.forEach((watcher, watchIndex) => {
-    t.push(formatWatcherOpts(label, watcher, watchIndex));
+  propChange.forEach((propChange, index) => {
+    t.push(formatPropChangeOpts(label, propChangeType, propChange, index));
   });
 
   return `[\n` + t.join(',\n') + `\n]`;
 }
 
 
-function formatWatcherOpts(label: string, watcher: WatchMeta, watchIndex: number) {
+function formatPropChangeOpts(label: string, propChangeType: string, propChange: PropChangeMeta, index: number) {
   const t = [
-    `    /*****  ${label} watch[${watchIndex}] ${watcher.propName} ***** /\n` +
-    `    /* [0] watch prop **/ '${watcher.propName}'`,
-    `    /* [1] call fn *****/ '${watcher.fn}'`
+    `    /*****  ${label} ${propChangeType} [${index}] ***** /\n` +
+    `    /* [0] prop name **/ '${propChange[0]}'`,
+    `    /* [1] call fn *****/ '${propChange[1]}'`
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
