@@ -55,10 +55,10 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
   });
 
   fileMeta.cmpMeta.listenersMeta = fileMeta.cmpMeta.listenersMeta.sort((a, b) => {
-    if (a.eventName < b.eventName) return -1;
-    if (a.eventName > b.eventName) return 1;
-    if (a.eventMethod < b.eventMethod) return -1;
-    if (a.eventMethod > b.eventMethod) return 1;
+    if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
+    if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
+    if (a.eventMethod.toLowerCase() < b.eventMethod.toLowerCase()) return -1;
+    if (a.eventMethod.toLowerCase() > b.eventMethod.toLowerCase()) return 1;
     return 0;
   });
 }

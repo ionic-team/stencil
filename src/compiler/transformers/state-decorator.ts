@@ -19,9 +19,9 @@ export function getStateDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDec
         // If the first token is @State()
         if (firstToken && firstToken.getText() === 'State') {
           isState = true;
-        }
-        // If the first token is @State
-        else if(!firstToken && child.getText() == 'State') {
+
+        } else if (!firstToken && child.getText() === 'State') {
+          // If the first token is @State
           isState = true;
         }
       } else if (isState) {
@@ -37,5 +37,9 @@ export function getStateDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDec
     }
   });
 
-  fileMeta.cmpMeta.statesMeta = fileMeta.cmpMeta.statesMeta.sort();
+  fileMeta.cmpMeta.statesMeta = fileMeta.cmpMeta.statesMeta.sort((a, b) => {
+    if (a.toLowerCase() < b.toLowerCase()) return -1;
+    if (a.toLowerCase() > b.toLowerCase()) return 1;
+    return 0;
+  });
 }

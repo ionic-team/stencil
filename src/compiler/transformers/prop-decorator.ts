@@ -3,7 +3,7 @@ import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
+export function getPropDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
   fileMeta.cmpMeta.propsMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
@@ -92,8 +92,8 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
   });
 
   fileMeta.cmpMeta.propsMeta = fileMeta.cmpMeta.propsMeta.sort((a, b) => {
-    if (a.propName < b.propName) return -1;
-    if (a.propName > b.propName) return 1;
+    if (a.propName.toLowerCase() < b.propName.toLowerCase()) return -1;
+    if (a.propName.toLowerCase() > b.propName.toLowerCase()) return 1;
     return 0;
   });
 }
