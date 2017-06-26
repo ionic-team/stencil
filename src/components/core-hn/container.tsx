@@ -3,7 +3,7 @@ import { Component, h, Ionic, State } from '../index';
 
 @Component({
   tag: 'news-container',
-  styleUrls: 'main.scss'
+  styleUrl: 'main.scss'
 })
 export class NewsContainer {
 

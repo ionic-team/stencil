@@ -415,8 +415,9 @@ export interface ComponentDecorator {
 
 export interface ComponentOptions {
   tag: string;
-  styleUrls?: string | string[] | ModeStyles;
-  styles?: string | string[];
+  styleUrl?: string;
+  styleUrls?: string[] | ModeStyles;
+  styles?: string;
   shadow?: boolean;
   host?: HostMeta;
 }

@@ -536,7 +536,7 @@ import { Component, h } from '../index';
  */
 @Component({
   tag: 'ion-grid',
-  styleUrls: 'grid.scss'
+  styleUrl: 'grid.scss'
 })
 export class Grid {
 

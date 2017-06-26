@@ -3,8 +3,7 @@ import { Component, h, State } from '../index';
 declare var d3: any;
 
 @Component({
-  tag: 'fractal-tree',
-  styleUrls: 'main.scss'
+  tag: 'fractal-tree'
 })
 export class NewsContainer {
 
