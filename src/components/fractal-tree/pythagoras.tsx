@@ -79,7 +79,7 @@ export class Pythagoras {
     }
   }
 
-  componentWillUpdate() {
+  ionViewWillUpdate() {
     this.calculate();
   }
 

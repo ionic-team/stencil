@@ -17,7 +17,7 @@ export class NewsContainer {
   pageType: string;
   prevClass: any;
 
-  componentWillLoad() {
+  ionViewWillLoad() {
     if (Ionic.isServer) return;
 
     this.firstSelectedClass = true;
@@ -136,7 +136,7 @@ export class NewsContainer {
     });
   }
 
-  componentWillUpdate() {
+  ionViewWillUpdate() {
     this.prevClass = this.page === 1 ? { 'no-back': true } : { 'yes-back': true };
   }
 

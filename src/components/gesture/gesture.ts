@@ -43,7 +43,7 @@ export class Gesture {
   @Prop() notCaptured: GestureCallback;
 
 
-  componentDidLoad() {
+  ionViewDidLoad() {
     this.ctrl = (<GlobalNamespace>Ionic).controllers.gesture = ((<GlobalNamespace>Ionic).controllers.gesture || new GestureController());
 
     this.gesture = this.ctrl.createGesture(this.gestureName, this.gesturePriority, this.disableScroll);
@@ -368,7 +368,7 @@ export class Gesture {
   }
 
 
-  componentDidUnload() {
+  ionViewDidUnload() {
     if (this.blocker) {
       this.blocker.destroy();
       this.blocker = null;

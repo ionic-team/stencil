@@ -13,7 +13,7 @@ export class ModalController implements IonicControllerApi {
   private appRoot: Element;
 
 
-  componentDidLoad() {
+  ionViewDidLoad() {
     this.appRoot = document.querySelector('ion-app') || document.body;
     (<GlobalNamespace>Ionic).loadController('modal', this);
   }

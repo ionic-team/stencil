@@ -23,7 +23,7 @@ export class Route {
   //@Prop() match: any;
   @State() match: any = {};
 
-  componentWillLoad() {
+  ionViewWillLoad() {
     this.routerInstance = document.querySelector(this.router)
 
     // HACK

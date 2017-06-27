@@ -352,7 +352,7 @@ export class Slides {
   /**
    * @hidden
    */
-  componentDidLoad() {
+  ionViewDidLoad() {
     /**
      * TODO: This should change because currently componentDidLoad fires independent of whether the
      * child components are ready.
@@ -513,7 +513,7 @@ export class Slides {
   /**
    * @hidden
    */
-  componentDidUnload() {
+  ionViewDidUnload() {
     this._init = false;
 
     this.swiper.destroy(true, true);

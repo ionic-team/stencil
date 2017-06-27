@@ -36,7 +36,7 @@ export class Item {
     return hasChildStyleChange;
   }
 
-  componentDidLoad() {
+  ionViewDidLoad() {
     // Add item-button classes to each ion-button in the item
     const buttons = this.$el.querySelectorAll('ion-button') as any;
     for (var i = 0; i < buttons.length; i++) {

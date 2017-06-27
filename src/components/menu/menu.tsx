@@ -103,7 +103,7 @@ export class Menu implements IMenu {
   /**
    * @hidden
    */
-  componentDidLoad() {
+  ionViewDidLoad() {
     this._backdropElm = this.$el.querySelector('.menu-backdrop') as HTMLElement;
 
     this._init = true;
@@ -494,7 +494,7 @@ export class Menu implements IMenu {
   /**
    * @hidden
    */
-  componentDidUnload() {
+  ionViewDidUnload() {
     this._backdropClick(false);
 
     this._ctrl._unregister(this);

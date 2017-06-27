@@ -21,7 +21,7 @@ export class Spinner {
   @Prop() paused: boolean = false;
 
 
-  componentDidLoad() {
+  ionViewDidLoad() {
     if (this.name === 'ios') {
       // deprecation warning, renamed in v4
       console.warn(`spinner "ios" has been renamed to "lines"`);

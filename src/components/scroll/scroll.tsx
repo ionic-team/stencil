@@ -26,7 +26,7 @@ export class Scroll implements IScroll {
   @Prop() ionScrollEnd: ScrollCallback;
 
 
-  componentDidLoad() {
+  ionViewDidLoad() {
     if (Ionic.isServer) return;
 
     const ctrl = (Ionic as GlobalNamespace).controllers.gesture = ((Ionic as GlobalNamespace).controllers.gesture || new GestureController());
@@ -352,7 +352,7 @@ export class Scroll implements IScroll {
   }
 
 
-  componentDidUnload() {
+  ionViewDidUnload() {
     this.gesture && this.gesture.destroy();
     this.gesture = this.detail = this.detail.event = null;
   }
