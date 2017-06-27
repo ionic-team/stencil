@@ -1141,6 +1141,7 @@ defineElements(window, {
     'ion-icon': IonIcon,
     'ion-item': IonItem,
     'ion-list': IonList,
+    'ion-note': IonNote,
     'ion-scroll': IonScroll,
     'ion-title': IonTitle,
     'ion-toolbar': IonToolbar
