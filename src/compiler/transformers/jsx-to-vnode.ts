@@ -8,31 +8,38 @@ export function jsxToVNode(ctx: BuildContext): ts.TransformerFactory<ts.SourceFi
 
   return (transformContext: ts.TransformationContext) => {
 
-    function visit(fileMeta: FileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
+    function visit(fileMeta: FileMeta, node: ts.Node, parentNamespace: string): ts.VisitResult<ts.Node> {
 
       switch (node.kind) {
         case ts.SyntaxKind.CallExpression:
           const callNode = node as ts.CallExpression;
+
           if ((<ts.Identifier>callNode.expression).text === 'h') {
-            node = convertJsxToVNode(fileMeta, callNode);
+            const data: ParentData = { namespace: parentNamespace };
+
+            node = convertJsxToVNode(fileMeta, callNode, data);
+
+            if (data.namespace) {
+              parentNamespace = data.namespace;
+            }
           }
 
         default:
           return ts.visitEachChild(node, (node) => {
-            return visit(fileMeta, node);
+            return visit(fileMeta, node, parentNamespace);
           }, transformContext);
       }
     }
 
     return (tsSourceFile) => {
       const fileMeta = ctx.files.get(tsSourceFile.fileName);
-      return visit(fileMeta, tsSourceFile) as ts.SourceFile;
+      return visit(fileMeta, tsSourceFile, null) as ts.SourceFile;
     };
   };
 }
 
 
-function convertJsxToVNode(fileMeta: FileMeta, callNode: ts.CallExpression) {
+function convertJsxToVNode(fileMeta: FileMeta, callNode: ts.CallExpression, data: ParentData) {
   const [tag, props, ...children] = callNode.arguments;
   const tagName = (<ts.StringLiteral>tag).text.trim().toLowerCase();
   let newArgs: ts.Expression[] = [];
@@ -49,9 +56,15 @@ function convertJsxToVNode(fileMeta: FileMeta, callNode: ts.CallExpression) {
   }
 
   // check if there should be a namespace: <svg> or <math>
-  const namespace = NAMESPACE_MAP[tagName];
-  if (namespace) {
-    vnodeData.n = ts.createLiteral(namespace);
+  if (data.namespace) {
+    vnodeData.n = ts.createLiteral(data.namespace);
+
+  } else {
+    const namespace = NAMESPACE_MAP[tagName];
+    if (namespace) {
+      vnodeData.n = ts.createLiteral(namespace);
+      data.namespace = namespace;
+    }
   }
 
   // If call has props and it is an object -> h('div', {})
@@ -377,4 +390,8 @@ interface VNodeData {
    * namespace
    */
   n?: any;
+}
+
+interface ParentData {
+  namespace?: string;
 }
