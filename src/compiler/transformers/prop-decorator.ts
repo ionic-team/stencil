@@ -3,7 +3,7 @@ import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
+export function getPropDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
   fileMeta.cmpMeta.propsMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
@@ -18,14 +18,14 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
 
       if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1) {
         const child = n.getChildAt(1);
-        const firstToken = child.getFirstToken()
+        const firstToken = child.getFirstToken();
 
         // If the first token is @State()
         if (firstToken && firstToken.getText() === 'Prop') {
           isProp = true;
-        }
-        // If the first token is @State
-        else if(!firstToken && child.getText() == 'Prop') {
+
+        } else if (!firstToken && child.getText() === 'Prop') {
+          // If the first token is @State
           isProp = true;
         }
 
@@ -80,8 +80,8 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
           }
         }
 
-        if (typeof userPropOptions.twoWay === 'boolean') {
-          prop.isTwoWay = !!userPropOptions.twoWay;
+        if (typeof userPropOptions.state === 'boolean') {
+          prop.isStateful = !!userPropOptions.state;
         }
       }
 
@@ -92,8 +92,8 @@ export function getPropertyDecoratorMeta(fileMeta: FileMeta, classNode: ts.Class
   });
 
   fileMeta.cmpMeta.propsMeta = fileMeta.cmpMeta.propsMeta.sort((a, b) => {
-    if (a.propName < b.propName) return -1;
-    if (a.propName > b.propName) return 1;
+    if (a.propName.toLowerCase() < b.propName.toLowerCase()) return -1;
+    if (a.propName.toLowerCase() > b.propName.toLowerCase()) return 1;
     return 0;
   });
 }

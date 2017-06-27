@@ -55,17 +55,17 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
   // so we've got an host element now, and a actual instance
   // let's wire them up together with getter/settings
   // the setters are use for change detection and knowing when to re-render
-  initProxy(plt, elm, instance, cmpMeta.propsMeta, cmpMeta.statesMeta, cmpMeta.methodsMeta, cmpMeta.watchersMeta);
+  initProxy(plt, elm, instance, cmpMeta.propsMeta, cmpMeta.statesMeta, cmpMeta.methodsMeta, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
 
   // cool, let's actually connect the component to the DOM
   // this largely adds this components styles and determines
   // if it should use shadow dom or not
   plt.attachStyles(cmpMeta, elm, instance);
 
-  // fire off the user's ionViewWillLoad method (if one was provided)
-  // ionViewWillLoad only runs ONCE, after instance.$el has been assigned
+  // fire off the user's componentWillLoad method (if one was provided)
+  // componentWillLoad only runs ONCE, after instance.$el has been assigned
   // the host element, but BEFORE render() has been called
-  instance.ionViewWillLoad && instance.ionViewWillLoad();
+  instance.componentWillLoad && instance.componentWillLoad();
 }
 
 
@@ -82,28 +82,19 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     elm._activelyLoadingChildren = null;
 
     // the element is within the DOM now, so let's attach the event listeners
-    attachListeners(plt.queue, plt.getComponentMeta(elm).listenersMeta, elm, instance);
+    attachListeners(plt, plt.getComponentMeta(elm).listenersMeta, elm, instance);
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
     elm._hasLoaded = true;
 
-    // fire off the user's ionViewDidLoad method (if one was provided)
-    // ionViewDidLoad only runs ONCE, after instance.$el has been assigned
+    // fire off the user's componentDidLoad method (if one was provided)
+    // componentDidLoad only runs ONCE, after instance.$el has been assigned
     // the host element, and AFTER render() has been called
-    instance.ionViewDidLoad && instance.ionViewDidLoad();
+    instance.componentDidLoad && instance.componentDidLoad();
 
     // add the css class that this element has officially hydrated
     elm.classList.add('hydrated');
-
-    if (!plt.hasAppLoaded && elm === plt.appRoot) {
-      // turns out this is the element that is the root of the app
-      // so it looks like the app has fully loaded, congrats
-      plt.hasAppLoaded = true;
-
-      // let the platform know we're all loaded now
-      plt.appLoaded && plt.appLoaded();
-    }
 
     // ( •_•)
     // ( •_•)>⌐■-■
@@ -130,7 +121,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
       !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement._initLoad();
 
       // fuhgeddaboudit, no need to keep a reference after this element loaded
-      elm._ancestorHostElement = null;
+      delete elm._ancestorHostElement;
     }
 
   }

@@ -3,6 +3,7 @@ import { createFileMeta, writeFiles } from './util';
 import { componentClass } from './transformers/component-class';
 import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { removeImports } from './transformers/remove-imports';
+import { updateLifecycleMethods } from './transformers/update-lifecycle-methods';
 import * as ts from 'typescript';
 
 
@@ -92,6 +93,7 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
     before: [
       componentClass(ctx),
       removeImports(),
+      updateLifecycleMethods()
     ],
     after: [
       jsxToVNode(ctx)

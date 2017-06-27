@@ -15,8 +15,29 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     console.log(`compile, generateManifest: ${destDir}`);
   }
 
+  // normalize bundle component tags
+  config.bundles.forEach(b => {
+    if (Array.isArray(b.components)) {
+      b.components = b.components.map(c => c.toLowerCase().trim());
+      return;
+    }
+
+    console.error(`compile, generateManifest: missing bundle components array, instead received: ${b.components}`);
+    b.components = [];
+  });
+
   ctx.files.forEach(f => {
-    if (!f.isTsSourceFile || !f.cmpMeta) return;
+    if (!f.isTsSourceFile || !f.cmpMeta || !f.cmpMeta.tagNameMeta) return;
+
+    let includeComponent = false;
+    for (var i = 0; i < config.bundles.length; i++) {
+      if (config.bundles[i].components.indexOf(f.cmpMeta.tagNameMeta) > -1) {
+        includeComponent = true;
+        break;
+      }
+    }
+
+    if (!includeComponent) return;
 
     const cmpMeta: ComponentMeta = Object.assign({}, <any>f.cmpMeta);
 
@@ -50,8 +71,12 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
       delete cmpMeta.propsMeta;
     }
 
-    if (!cmpMeta.watchersMeta.length) {
-      delete cmpMeta.watchersMeta;
+    if (!cmpMeta.propWillChangeMeta.length) {
+      delete cmpMeta.propWillChangeMeta;
+    }
+
+    if (!cmpMeta.propDidChangeMeta.length) {
+      delete cmpMeta.propDidChangeMeta;
     }
 
     // place property at the bottom

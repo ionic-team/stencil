@@ -143,7 +143,7 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
       fileMeta.rebundleOnChange = true;
 
       entryContent.push(`import { ${c.componentClass} } from "${c.componentUrl}";`);
-      entryContent.push(`exports['${c.tagNameMeta}'] = ${c.componentClass};`);
+      entryContent.push(`exports['${c.tagNameMeta.toUpperCase()}'] = ${c.componentClass};`);
     });
 
     ctx.bundledJsModules[id] = entryContent.join('\n');

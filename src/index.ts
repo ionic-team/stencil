@@ -19,4 +19,6 @@ export declare const Prop: interfaces.PropDecorator;
 
 export declare const State: interfaces.StateDecorator;
 
-export declare const Watch: interfaces.WatchDecorator;
+export declare const PropWillChange: interfaces.PropChangeDecorator;
+
+export declare const PropDidChange: interfaces.PropChangeDecorator;

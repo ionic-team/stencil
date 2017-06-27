@@ -1,25 +1,28 @@
-import { assignHostContentSlots } from '../renderer/slot';
+import { assignHostContentSlots, createVNodesFromSsr } from '../renderer/slot';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
-  ConfigApi, DomControllerApi, DomApi, HostElement,
-  GlobalNamespace, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
+  ConfigApi, DomControllerApi, DomApi, HostElement, GlobalNamespace,
+  ListenOptions, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
+import { BUNDLE_ID, SSR_VNODE_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
+import { getMode } from '../platform/mode';
 import { h, t } from '../renderer/h';
-import { isDef, isString } from '../../util/helpers';
+import { isString } from '../../util/helpers';
 import { initHostConstructor } from '../instance/init';
 import { initGlobal } from './global-client';
 import { parseComponentMeta } from '../../util/data-parse';
-import { STYLES } from '../../util/constants';
 
 
-export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
-  const registry: ComponentRegistry = {};
-  const moduleImports: any = {};
+export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string, loadAnimations: boolean): PlatformApi {
+  const registry: ComponentRegistry = { 'HTML': {} };
+  const moduleImports: {[tag: string]: any} = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
   const activeJsonRequests: {[url: string]: boolean} = {};
   const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
-  let initAppStyles: string[] = [];
+  let initRenderStyles: string[] = [];
 
+
+  // create the platform api which will be passed around for external use
   const plt: PlatformApi = {
     registerComponents,
     defineComponent,
@@ -28,32 +31,40 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     config,
     queue,
     connectHostElement,
-    getMode,
     attachStyles,
-    appLoaded
+    getEventOptions
   };
 
+
+  // create the renderer that will be used
   plt.render = createRenderer(plt, domApi);
 
-  const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, queue, domCtrl);
+
+  // create the global which will be injected into the user's instances
+  const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, domCtrl);
 
 
-  function getMode(elm: HostElement): string {
-    // first let's see if they set the mode directly on the property
-    let value = (<any>elm).mode;
-    if (isDef(value)) {
-      return value;
-    }
+  // setup the root element which is the mighty <html> tag
+  // the <html> has the final say of when the app has loaded
+  const rootElm = <HostElement>domApi.$documentElement;
+  rootElm._activelyLoadingChildren = [];
+  rootElm._initLoad = function appLoadedCallback() {
+    // this will fire when all components have finished loaded
+    rootElm._hasLoaded = true;
+    appendStylesToHead(initRenderStyles);
+    initRenderStyles = null;
 
-    // next let's see if they set the mode on the elements attribute
-    value = domApi.$getAttribute(elm, 'mode');
-    if (isDef(value)) {
-      return value;
-    }
+    // kick off loading the auxiliary code, which has stuff that wasn't
+    // needed for the initial paint, such as animation code
+    loadAnimations && queue.add(() => {
+      jsonp(staticDir + 'ionic.animation.js');
+    });
+  };
 
-    // ok fine, let's just get the values from the config
-    return config.get('mode', 'md');
-  }
+
+  // if the HTML was generated from SSR
+  // then let's walk the tree and generate vnodes out of the data
+  createVNodesFromSsr(domApi, rootElm);
 
 
   function attachStyles(cmpMeta: ComponentMeta, elm: HostElement, instance: Component) {
@@ -129,50 +140,48 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   }
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
-    assignHostContentSlots(domApi, elm, slotMeta);
+    // host element has been connected to the DOM
+    if (!domApi.$getAttribute(elm, SSR_VNODE_ID)) {
+      // this host element was NOT created with SSR
+      // let's pick out the inner content for slot projection
+      assignHostContentSlots(domApi, elm, slotMeta);
+    }
   }
 
   function appendBundleStyles(bundleCmpMeta: ComponentMeta[]) {
-    const styles = bundleCmpMeta.map(getCmpMetaStyle);
-
-    if (plt.hasAppLoaded) {
-      queue.add(() => {
-        appendStylesToHead(styles);
-      });
+    if (initRenderStyles) {
+      collectStyles(bundleCmpMeta, initRenderStyles);
 
     } else {
-      initAppStyles = initAppStyles.concat(styles);
+      queue.add(() => {
+        appendStylesToHead(collectStyles(bundleCmpMeta, []));
+      });
     }
   }
 
 
   function appendStylesToHead(styles: string[]) {
-    const styleElm = domApi.$createElement('style');
-    styleElm.innerHTML = styles.join('');
-    domApi.$insertBefore(domApi.$head, styleElm, domApi.$head.firstChild);
-  }
-
-
-  function getCmpMetaStyle(cmpMeta: ComponentMeta) {
-    if (cmpMeta.modesMeta) {
-      return Object.keys(cmpMeta.modesMeta).map(m => cmpMeta.modesMeta[m][STYLES]).join('');
+    if (styles.length) {
+      const styleElm = domApi.$createElement('style');
+      styleElm.innerHTML = styles.join('');
+      domApi.$insertBefore(domApi.$head, styleElm, domApi.$head.firstChild);
     }
-    return '';
   }
 
 
-  function appLoaded() {
-    appendStylesToHead(initAppStyles);
-    initAppStyles = null;
-
-    // let it be know, we have loaded
-    injectedGlobal.emit(plt.appRoot.$instance, 'ionLoad');
-
-    // kick off loading the auxiliary code, which has stuff that wasn't
-    // needed for the initial paint, such as animation code
-    queue.add(() => {
-      jsonp(staticDir + 'ionic.animation.js');
-    });
+  function collectStyles(bundleCmpMeta: ComponentMeta[], appendTo: string[]) {
+    for (var i = 0; i < bundleCmpMeta.length; i++) {
+      var cmpMeta = bundleCmpMeta[i];
+      if (cmpMeta.modesMeta) {
+        let modeNames = Object.keys(cmpMeta.modesMeta);
+        for (var j = 0; j < modeNames.length; j++) {
+          if (isString(cmpMeta.modesMeta[modeNames[j]][STYLES])) {
+            appendTo.push(cmpMeta.modesMeta[modeNames[j]][STYLES]);
+          }
+        }
+      }
+    }
+    return appendTo;
   }
 
 
@@ -223,7 +232,12 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   };
 
 
-  function loadBundle(bundleId: string, cb: Function): void {
+  function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
+    // get the mode the element which is loading
+    // if there is no mode, then use "default"
+    const cmpMode = cmpMeta.modesMeta[getMode(domApi, config, elm)] || cmpMeta.modesMeta.$;
+    const bundleId = cmpMode[BUNDLE_ID];
+
     if (loadedBundles[bundleId]) {
       // we've already loaded this bundle
       cb();
@@ -231,7 +245,11 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the bundle callbacks to fire when it's loaded
-      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
+      if (bundleCallbacks[bundleId]) {
+        bundleCallbacks[bundleId].push(cb);
+      } else {
+        bundleCallbacks[bundleId] = [cb];
+      }
 
       // create the url we'll be requesting
       const url = `${staticDir}bundles/ionic.${bundleId}.js`;
@@ -274,6 +292,25 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     // inject a script tag in the head
     // kick off the actual request
     domApi.$appendChild(domApi.$head, scriptElm);
+  }
+
+  // test if this browser supports event options or not
+  let supportsEventOptions = false;
+  try {
+    win.addEventListener('evopt', null,
+      Object.defineProperty({}, 'passive', {
+        get: () => {
+          supportsEventOptions = true;
+        }
+      })
+    );
+  } catch (e) {}
+
+  function getEventOptions(opts?: ListenOptions) {
+    return supportsEventOptions ? {
+        'capture': !!(opts && opts.capture),
+        'passive': !(opts && opts.passive === false)
+      } : !!(opts && opts.capture);
   }
 
   return plt;

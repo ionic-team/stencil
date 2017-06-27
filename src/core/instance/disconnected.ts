@@ -17,8 +17,8 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // if we've created an instance for this
     const instance = elm.$instance;
     if (instance) {
-      // call the user's ionViewDidUnload if there is one
-      instance.ionViewDidUnload && instance.ionViewDidUnload();
+      // call the user's componentDidUnload if there is one
+      instance.componentDidUnload && instance.componentDidUnload();
       elm.$instance = instance.$el = instance.__values = null;
     }
 
@@ -38,6 +38,6 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // set it all to null to ensure we forget references
     // and reset values incase this node gets reused somehow
     // (possible that it got disconnected, but the node was reused)
-    elm._root = elm._vnode = elm._ancestorHostElement = elm._activelyLoadingChildren = elm._watchers = elm._hasConnected = elm._isQueuedForUpdate = elm._hasLoaded = null;
+    elm._root = elm._vnode = elm._ancestorHostElement = elm._activelyLoadingChildren = elm._propWillChange = elm._propDidChange = elm._hasConnected = elm._isQueuedForUpdate = elm._hasLoaded = null;
   }
 }

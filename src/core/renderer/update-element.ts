@@ -1,25 +1,27 @@
-import { DomApi, VNode } from '../../util/interfaces';
+import { DomApi, PlatformApi, VNode } from '../../util/interfaces';
 import { isFunction, isObject } from '../../util/helpers';
 
+
 const EMPTY: any = {};
+let DEFAULT_OPTS: any = null;
 
 
-export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): void {
+export function updateElement(plt: PlatformApi, nodeOps: DomApi, oldVnode: VNode, newVnode: VNode): void {
   const isUpdate = (oldVnode != null);
 
   oldVnode = oldVnode || EMPTY;
-  vnode = vnode || EMPTY;
+  newVnode = newVnode || EMPTY;
 
   var key: string,
       cur: any,
-      elm = <any>vnode.elm,
+      elm = <any>newVnode.elm,
       oldData: any,
       newData: any;
 
   // update attrs
-  if (oldVnode.vattrs || vnode.vattrs) {
+  if (oldVnode.vattrs || newVnode.vattrs) {
     oldData = oldVnode.vattrs || EMPTY;
-    newData = vnode.vattrs || EMPTY;
+    newData = newVnode.vattrs || EMPTY;
 
     // update modified attributes, add new attributes
     for (key in newData) {
@@ -65,9 +67,9 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
 
 
   // update class
-  if (oldVnode.vclass || vnode.vclass) {
+  if (oldVnode.vclass || newVnode.vclass) {
     oldData = oldVnode.vclass || EMPTY;
-    newData = vnode.vclass || EMPTY;
+    newData = newVnode.vclass || EMPTY;
 
     if (isUpdate) {
       for (key in oldData) {
@@ -87,9 +89,9 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
 
 
   // update props
-  if (oldVnode.vprops || vnode.vprops) {
+  if (oldVnode.vprops || newVnode.vprops) {
     oldData = oldVnode.vprops || EMPTY;
-    newData = vnode.vprops || EMPTY;
+    newData = newVnode.vprops || EMPTY;
 
     if (isUpdate) {
       for (key in oldData) {
@@ -112,9 +114,9 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
 
 
   // update style
-  if (oldVnode.vstyle || vnode.vstyle) {
+  if (oldVnode.vstyle || newVnode.vstyle) {
     oldData = oldVnode.vstyle || EMPTY;
-    newData = vnode.vstyle || EMPTY;
+    newData = newVnode.vstyle || EMPTY;
 
     if (isUpdate) {
       for (key in oldData) {
@@ -134,25 +136,21 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
 
 
   // update event listeners
-  if (oldVnode.vlisteners || vnode.vlisteners) {
-    oldData = oldVnode.vlisteners;
-    newData = vnode.vlisteners;
+  oldData = oldVnode.vlisteners;
+  newData = newVnode.vlisteners;
+  if (oldData || newData) {
+
+    if (!DEFAULT_OPTS) {
+      DEFAULT_OPTS = plt.getEventOptions();
+    }
 
     // remove existing listeners which no longer used
     if (isUpdate && oldData && oldVnode.assignedListener) {
       // if element changed or deleted we remove all existing listeners unconditionally
-      if (newData) {
-        for (key in oldData) {
-          // remove listener if existing listener removed
-          if (!newData[key]) {
-            oldVnode.elm.removeEventListener(key, oldVnode.assignedListener, false);
-          }
-        }
-
-      } else {
-        for (key in oldData) {
-          // remove listener if element was changed or existing listeners removed
-          oldVnode.elm.removeEventListener(key, oldVnode.assignedListener, false);
+      for (key in oldData) {
+        // remove listener if existing listener removed
+        if (!newData || !newData[key]) {
+          oldVnode.elm.removeEventListener(key, oldVnode.assignedListener, DEFAULT_OPTS);
         }
       }
     }
@@ -160,29 +158,20 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, vnode: VNode): v
     // add new listeners which has not already attached
     if (newData) {
       // reuse existing listener or create new
-      var listener = vnode.assignedListener = oldVnode.assignedListener || createListener();
+      cur = newVnode.assignedListener = oldVnode.assignedListener || createListener();
 
       // update vnode for listener
-      listener.vnode = vnode;
+      cur.vnode = newVnode;
 
       // if element changed or added we add all needed listeners unconditionally
-      if (isUpdate && oldData) {
-        for (key in newData) {
-          // add listener if new listener added
-          if (!oldData[key]) {
-            elm.addEventListener(key, listener, false);
-          }
-        }
-
-      } else {
-        for (key in newData) {
-          // add listener if element was changed or new listeners added
-          elm.addEventListener(key, listener, false);
+      for (key in newData) {
+        // add listener if new listener added
+        if (!oldData || !oldData[key]) {
+          elm.addEventListener(key, cur, DEFAULT_OPTS);
         }
       }
     }
   }
-
 }
 
 

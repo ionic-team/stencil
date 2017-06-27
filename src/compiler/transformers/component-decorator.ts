@@ -1,5 +1,5 @@
 import { ComponentMeta, ComponentOptions } from '../interfaces';
-import { normalizeStyles, normalizeStyleUrls } from './mode-styles';
+import { normalizeStyles, normalizeStyleUrl, normalizeStyleUrls } from './mode-styles';
 import * as ts from 'typescript';
 
 
@@ -46,6 +46,7 @@ function parseComponentMetaData(text: string): ComponentMeta {
 
     normalizeTag(userOpts, cmpMeta, text);
     normalizeStyles(userOpts, cmpMeta);
+    normalizeStyleUrl(userOpts, cmpMeta);
     normalizeStyleUrls(userOpts, cmpMeta);
     normalizeModes(cmpMeta);
     normalizeShadow(userOpts, cmpMeta);

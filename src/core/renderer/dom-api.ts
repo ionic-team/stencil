@@ -7,6 +7,8 @@ export function createDomApi(document: Document): DomApi {
 
   return {
 
+    $documentElement: document.documentElement,
+
     $head: document.head,
 
     $body: document.body,
@@ -31,16 +33,20 @@ export function createDomApi(document: Document): DomApi {
       return document.createTextNode(text);
     },
 
-    $insertBefore: function insertBefore(parentNode: Node, newNode: Node, referenceNode: Node) {
-      parentNode.insertBefore(newNode, referenceNode);
+    $createComment: function createComment(data: string) {
+      return document.createComment(data);
     },
 
-    $removeChild: function removeChild(node: Node, child: Node) {
-      node.removeChild(child);
+    $insertBefore: function insertBefore(parentNode: Node, childNode: Node, referenceNode: Node) {
+      parentNode.insertBefore(childNode, referenceNode);
     },
 
-    $appendChild: function appendChild(node: Node, child: Node) {
-      node.appendChild(child);
+    $removeChild: function removeChild(parentNode: Node, childNode: Node) {
+      return parentNode.removeChild(childNode);
+    },
+
+    $appendChild: function appendChild(parentNode: Node, childNode: Node) {
+      parentNode.appendChild(childNode);
     },
 
     $childNodes: function childNodes(node: Node) {

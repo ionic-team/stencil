@@ -2,25 +2,30 @@ import { ComponentMeta, ComponentOptions } from '../interfaces';
 
 
 export function normalizeStyles(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
-  if (!userOpts.styleUrls) {
-    return;
-  }
+  if (typeof userOpts.styles === 'string' && userOpts.styles.trim().length) {
+    cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
+    cmpMeta.modesStyleMeta.$ = cmpMeta.modesStyleMeta.$ || {};
+    cmpMeta.modesStyleMeta.$.styleUrls = cmpMeta.modesStyleMeta.$.styleUrls || [];
 
-  if (typeof userOpts.styles === 'string') {
-    if (userOpts.styles.trim().length) {
-      cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
-      (cmpMeta.modesStyleMeta.$ = cmpMeta.modesStyleMeta.$ || {}).styles = [userOpts.styles.trim()];
+    cmpMeta.modesStyleMeta.$.styles.push(userOpts.styles.trim());
+  }
+}
+
+
+export function normalizeStyleUrl(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
+  if (typeof userOpts.styleUrl === 'string') {
+    // as a string
+    // styleUrl: 'my-styles.scss'
+
+    if (!userOpts.styleUrl.trim().length) {
+      throw `invalid style url for ${cmpMeta.tagNameMeta}: ${userOpts.styleUrl}`;
     }
 
-  } else if (Array.isArray(userOpts.styles)) {
-    userOpts.styles.forEach(styles => {
-      if (typeof styles === 'string' && styles.trim().length) {
-        cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
-        cmpMeta.modesStyleMeta.$ = cmpMeta.modesStyleMeta.$ || {};
-        cmpMeta.modesStyleMeta.$.styles = cmpMeta.modesStyleMeta.$.styles || [];
-        cmpMeta.modesStyleMeta.$.styles.push(styles.trim());
-      }
-    });
+    cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
+    cmpMeta.modesStyleMeta.$ = cmpMeta.modesStyleMeta.$ || {};
+    cmpMeta.modesStyleMeta.$.styleUrls = cmpMeta.modesStyleMeta.$.styleUrls || [];
+
+    cmpMeta.modesStyleMeta.$.styleUrls.push(userOpts.styleUrl.trim());
   }
 }
 
@@ -32,18 +37,7 @@ export function normalizeStyleUrls(userOpts: ComponentOptions, cmpMeta: Componen
 
   // normalize the possible styleUrl structures
 
-  if (typeof userOpts.styleUrls === 'string') {
-    // as a string
-    // styleUrls: 'my-styles.scss'
-
-    if (!userOpts.styleUrls.trim().length) {
-      throw `invalid style url for ${cmpMeta.tagNameMeta}: ${userOpts.styleUrls}`;
-    }
-
-    cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
-    (cmpMeta.modesStyleMeta.$ = cmpMeta.modesStyleMeta.$ || {}).styleUrls = [userOpts.styleUrls.trim()];
-
-  } else if (Array.isArray(userOpts.styleUrls)) {
+  if (Array.isArray(userOpts.styleUrls)) {
     // as an array of strings
     // styleUrls: ['my-styles.scss', 'my-other-styles']
 
@@ -52,6 +46,7 @@ export function normalizeStyleUrls(userOpts: ComponentOptions, cmpMeta: Componen
         cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
         cmpMeta.modesStyleMeta.$ = cmpMeta.modesStyleMeta.$ || {};
         cmpMeta.modesStyleMeta.$.styleUrls = cmpMeta.modesStyleMeta.$.styleUrls || [];
+
         cmpMeta.modesStyleMeta.$.styleUrls.push(styleUrl.trim());
 
       } else {
@@ -81,6 +76,7 @@ export function normalizeStyleUrls(userOpts: ComponentOptions, cmpMeta: Componen
         cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
         cmpMeta.modesStyleMeta[modeName] = cmpMeta.modesStyleMeta[modeName] || {};
         cmpMeta.modesStyleMeta[modeName].styleUrls = cmpMeta.modesStyleMeta[modeName].styleUrls || [];
+
         cmpMeta.modesStyleMeta[modeName].styleUrls.push(styleUrl);
 
       } else if (Array.isArray(styleModes[styleModeName])) {
@@ -91,6 +87,7 @@ export function normalizeStyleUrls(userOpts: ComponentOptions, cmpMeta: Componen
             cmpMeta.modesStyleMeta = cmpMeta.modesStyleMeta || {};
             cmpMeta.modesStyleMeta[modeName] = cmpMeta.modesStyleMeta[modeName] || {};
             cmpMeta.modesStyleMeta[modeName].styleUrls = cmpMeta.modesStyleMeta[modeName].styleUrls || [];
+
             cmpMeta.modesStyleMeta[modeName].styleUrls.push(styleUrl.trim());
 
           } else {

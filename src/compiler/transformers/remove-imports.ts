@@ -9,8 +9,9 @@ const IONIC_GLOBALS = [
   'Listen',
   'Method',
   'Prop',
-  'State',
-  'Watch'
+  'PropDidChange',
+  'PropWillChange',
+  'State'
 ];
 
 

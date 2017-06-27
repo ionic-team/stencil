@@ -1,9 +1,9 @@
 import { addEventListener, enableListener } from '../instance/events';
-import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, Ionic, GlobalNamespace,
-  ListenOptions, IonicControllerApi, PlatformApi, QueueApi } from '../../util/interfaces';
+import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, GlobalNamespace,
+  Ionic, ListenOptions, IonicControllerApi, PlatformApi } from '../../util/interfaces';
 
 
-export function initGlobal(Gbl: GlobalNamespace, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, queue: QueueApi, domCtrl: DomControllerApi): Ionic {
+export function initGlobal(Gbl: GlobalNamespace, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, domCtrl: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill
@@ -48,10 +48,10 @@ export function initGlobal(Gbl: GlobalNamespace, win: any, domApi: DomApi, plt: 
 
   (<Ionic>Gbl).listener = {
     enable: function(instance: any, eventName: string, shouldEnable: boolean, attachTo?: string) {
-      enableListener(plt, queue, (<Component>instance).$el, instance, eventName, shouldEnable, attachTo);
+      enableListener(plt, (<Component>instance).$el, instance, eventName, shouldEnable, attachTo);
     },
     add: function (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => any, opts?: ListenOptions) {
-      return addEventListener(queue, elm, eventName, cb, opts);
+      return addEventListener(plt, elm, eventName, cb, opts);
     }
   };
 

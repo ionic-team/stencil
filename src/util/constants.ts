@@ -1,9 +1,25 @@
+/**
+ * This constants file is largely for minification tricks, and to
+ * have easy to read variable names. Enums would make more sense
+ * in most cases, but doing values like this as constants allows
+ * minifiers to just place the raw value directly in source, and in
+ * production there is no variable at all. For example, the minifier
+ * turns data[BUNDLE_ID] turns into data[0] for production builds.
+ */
+
 
 /**
  * Mode Meta Indexes
  */
 export const BUNDLE_ID = 0;
 export const STYLES = 1;
+
+
+/**
+ * Prop Change Meta Indexes
+ */
+export const PROP_CHANGE_PROP_NAME = 0;
+export const PROP_CHANGE_METHOD_NAME = 1;
 
 
 /**
@@ -32,8 +48,24 @@ export const PRIORITY_LOW = 1;
 /**
  * Slot Meta
  */
+export const SLOT_TAG = 0;
 export const HAS_SLOTS = 1;
 export const HAS_NAMED_SLOTS = 2;
+
+
+/**
+ * SSR Attribute Names
+ */
+export const SSR_VNODE_ID = 'ssrv';
+export const SSR_CHILD_ID = 'ssrc';
+
+
+/**
+ * Node Types
+ */
+export const ELEMENT_NODE = 1;
+export const TEXT_NODE = 3;
+export const COMMENT_NODE = 8;
 
 
 /**

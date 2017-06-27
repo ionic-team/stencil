@@ -1,10 +1,11 @@
-import { Component, ComponentActiveValues, ComponentActiveWatchers, HostElement, PropMeta,
-  MethodMeta, PlatformApi, StateMeta, WatchMeta } from '../../util/interfaces';
+import { Component, ComponentActiveValues, ComponentActivePropChanges, HostElement, PropMeta,
+  MethodMeta, PlatformApi, StateMeta, PropChangeMeta } from '../../util/interfaces';
 import { parsePropertyValue } from '../../util/data-parse';
+import { PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
 import { queueUpdate } from './update';
 
 
-export function initProxy(plt: PlatformApi, elm: HostElement, instance: Component, props: PropMeta[], states: StateMeta[], methods: MethodMeta[], watchMeta: WatchMeta[]) {
+export function initProxy(plt: PlatformApi, elm: HostElement, instance: Component, props: PropMeta[], states: StateMeta[], methods: MethodMeta[], propWillChangeMeta: PropChangeMeta[], propDidChangeMeta: PropChangeMeta[]) {
   let i = 0;
 
   if (methods) {
@@ -20,9 +21,14 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
   // getters/setters with the same name, and then do change detection
   instance.__values = {};
 
-  if (watchMeta) {
-    // this component has watchers, so init the object to store them
-    elm._watchers = {};
+  if (propWillChangeMeta) {
+    // this component has prop WILL change methods, so init the object to store them
+    elm._propWillChange = {};
+  }
+
+  if (propDidChangeMeta) {
+    // this component has prop DID change methods, so init the object to store them
+    elm._propDidChange = {};
   }
 
   if (states) {
@@ -32,13 +38,13 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
     for (i = 0; i < states.length; i++) {
-      initProperty(false, true, '', states[i], 0, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
+      initProperty(false, true, '', states[i], 0, instance, instance.__values, plt, elm, elm._propWillChange, propWillChangeMeta, elm._propDidChange, propDidChangeMeta);
     }
   }
 
   for (i = 0; i < props.length; i++) {
     // add getters/setters for @Prop()s
-    initProperty(true, props[i].isTwoWay, props[i].attribName, props[i].propName, props[i].propType, instance, instance.__values, elm._watchers, plt, elm, watchMeta);
+    initProperty(true, props[i].isStateful, props[i].attribName, props[i].propName, props[i].propType, instance, instance.__values, plt, elm, elm._propWillChange, propWillChangeMeta, elm._propDidChange, propDidChangeMeta);
   }
 }
 
@@ -53,7 +59,22 @@ function initMethod(methodName: string, elm: HostElement, instance: Component) {
 }
 
 
-function initProperty(isProp: boolean, isTwoWay: boolean, attrName: string, propName: string, propType: number, instance: Component, internalValues: ComponentActiveValues, internalWatchers: ComponentActiveWatchers, plt: PlatformApi, elm: HostElement, watchMeta: WatchMeta[]) {
+function initProperty(
+  isProp: boolean,
+  isStateful: boolean,
+  attrName: string,
+  propName: string,
+  propType: number,
+  instance: Component,
+  internalValues: ComponentActiveValues,
+  plt: PlatformApi,
+  elm: HostElement,
+  internalPropWillChanges: ComponentActivePropChanges,
+  propWillChangeMeta: PropChangeMeta[],
+  internalPropDidChanges: ComponentActivePropChanges,
+  propDidChangeMeta: PropChangeMeta[]
+) {
+
   if (isProp) {
     // @Prop() property, so check initial value from the proxy element, instance
     // and config, before we create getters/setters on this same property name
@@ -82,15 +103,29 @@ function initProperty(isProp: boolean, isTwoWay: boolean, attrName: string, prop
     internalValues[propName] = (<any>instance)[propName];
   }
 
-  if (watchMeta) {
-    // there are watchers for this component
-    for (var i = 0; i < watchMeta.length; i++) {
-      if (watchMeta[i].propName === propName) {
+  let i = 0;
+  if (propWillChangeMeta) {
+    // there are prop WILL change methods for this component
+    for (i = 0; i < propWillChangeMeta.length; i++) {
+      if (propWillChangeMeta[i][PROP_CHANGE_PROP_NAME] === propName) {
         // cool, we should watch for changes to this property
         // let's bind their watcher function and add it to our list
         // of watchers, so any time this property changes we should
-        // also fire off their @Watch() method
-        internalWatchers[propName] = (<any>instance)[watchMeta[i].fn].bind(instance);
+        // also fire off their @PropWillChange() method
+        internalPropWillChanges[propName] = (<any>instance)[propWillChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
+      }
+    }
+  }
+
+  if (propDidChangeMeta) {
+    // there are prop DID change methods for this component
+    for (i = 0; i < propDidChangeMeta.length; i++) {
+      if (propDidChangeMeta[i][PROP_CHANGE_PROP_NAME] === propName) {
+        // cool, we should watch for changes to this property
+        // let's bind their watcher function and add it to our list
+        // of watchers, so any time this property changes we should
+        // also fire off their @PropDidChange() method
+        internalPropDidChanges[propName] = (<any>instance)[propDidChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
       }
     }
   }
@@ -101,38 +136,43 @@ function initProperty(isProp: boolean, isTwoWay: boolean, attrName: string, prop
   }
 
   function setValue(newVal: any) {
-    // TODO: account for Arrays/Objects
-
     // check our new property value against our internal value
     const oldVal = internalValues[propName];
-    if (newVal === oldVal || (newVal !== newVal && oldVal !== oldVal)) {
-      return;
+
+    // TODO: account for Arrays/Objects
+    if (newVal !== oldVal) {
+      // gadzooks! the property's value has changed!!
+
+      if (internalPropWillChanges && internalPropWillChanges[propName]) {
+        // this instance is watching for when this property WILL change
+        internalPropWillChanges[propName](newVal, oldVal);
+      }
+
+      // set our new value!
+      internalValues[propName] = newVal;
+
+      if (internalPropDidChanges && internalPropDidChanges[propName]) {
+        // this instance is watching for when this property DID change
+        internalPropDidChanges[propName](newVal, oldVal);
+      }
+
+      // looks like this value actually changed, we've got work to do!
+      // queue that we need to do an update, don't worry
+      // about queuing up millions cuz this function
+      // ensures it only runs once
+      queueUpdate(plt, elm);
     }
-
-    // looks like this value actually changed, we've got work to do!
-    internalValues[propName] = newVal;
-
-    if (internalWatchers && internalWatchers[propName]) {
-      // this instance has @Watch() methods and a
-      // watch method for this property
-      internalWatchers[propName](newVal);
-    }
-
-    // queue that we need to do an update, don't worry
-    // about queuing up millions cuz this function
-    // ensures it only runs once
-    queueUpdate(plt, elm);
   }
 
   function setInstanceValue(newVal: any) {
-    if (isTwoWay) {
-      // this is a two-way binding, mainly used for inputs
+    if (isStateful) {
+      // this prop can keep state, mainly used for inputs
       // so update the host element's property directly
       // which will end up updating the proxied instance
-      elm[propName] = newVal;
+      setValue(newVal);
 
     } else {
-      // this is not a two-way binding
+      // this is not a stateful prop
       // so do not update the instance or host element
       console.warn(`@Prop() "${propName}" on "${elm.tagName.toLowerCase()}" cannot be modified.`);
     }

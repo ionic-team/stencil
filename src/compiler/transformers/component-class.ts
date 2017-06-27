@@ -2,9 +2,9 @@ import { BuildContext, FileMeta } from '../interfaces';
 import { getComponentDecoratorData } from './component-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';
-import { getPropertyDecoratorMeta } from './prop-decorator';
+import { getPropDecoratorMeta } from './prop-decorator';
+import { getPropChangeDecoratorMeta } from './prop-change-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
-import { getWatchDecoratorMeta } from './watch-decorator';
 import * as ts from 'typescript';
 
 
@@ -26,9 +26,9 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
         getMethodDecoratorMeta(fileMeta, classNode);
         getStateDecoratorMeta(fileMeta, classNode);
-        getPropertyDecoratorMeta(fileMeta, classNode);
+        getPropDecoratorMeta(fileMeta, classNode);
         getListenDecoratorMeta(fileMeta, classNode);
-        getWatchDecoratorMeta(fileMeta, classNode);
+        getPropChangeDecoratorMeta(fileMeta, classNode);
 
         return removeClassDecorator(classNode);
 

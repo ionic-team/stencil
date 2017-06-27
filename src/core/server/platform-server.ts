@@ -1,24 +1,26 @@
 import { assignHostContentSlots } from '../renderer/slot';
 import { attributeChangedCallback } from '../instance/attribute-changed';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomApi, DomControllerApi, HostElement, GlobalNamespace, PlatformApi, StencilSystem } from '../../util/interfaces';
+  DomApi, DomControllerApi, GlobalNamespace, HostElement, ListenOptions,
+  PlatformApi, StencilSystem } from '../../util/interfaces';
+import { BUNDLE_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './global-context';
+import { getMode } from '../platform/mode';
 import { h, t } from '../renderer/h';
 import { initGlobal } from './global-server';
-import { isDef, isString } from '../../util/helpers';
+import { isString } from '../../util/helpers';
 import { parseComponentMeta } from '../../util/data-parse';
-import { STYLES } from '../../util/constants';
 
 
 export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
-  const registry: ComponentRegistry = {};
-  const moduleImports: any = {};
+  const registry: ComponentRegistry = { 'HTML': {} };
+  const moduleImports: {[tag: string]: any} = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const bundleCallbacks: BundleCallbacks = {};
   const activeFileReads: {[url: string]: boolean} = {};
   const css: {[componentTag: string]: string} = {};
-  let ssrIds = 0;
+
 
   const plt: PlatformApi = {
     defineComponent,
@@ -27,11 +29,10 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     connectHostElement,
     config,
     queue: Gbl.QueueCtrl,
-    getMode,
     attachStyles,
     tmpDisconnected: false,
-    appLoaded,
-    isServer: true
+    isServer: true,
+    getEventOptions
   };
 
   plt.render = createRenderer(plt, domApi);
@@ -43,22 +44,14 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   sys.vm.createContext(context);
 
 
-  function getMode(elm: HostElement): string {
-    // first let's see if they set the mode directly on the property
-    let value = (<any>elm).mode;
-    if (isDef(value)) {
-      return value;
-    }
+  // setup the root node of all things
+  // which is the mighty <html> tag
+  const rootNode = <HostElement>domApi.$documentElement;
+  rootNode._activelyLoadingChildren = [];
+  rootNode._initLoad = function appLoadedCallback() {
+    plt.onAppLoad && plt.onAppLoad(rootNode, Object.keys(css).sort().map(tag => css[tag]).join(''));
+  };
 
-    // next let's see if they set the mode on the elements attribute
-    value = domApi.$getAttribute(elm, 'mode');
-    if (isDef(value)) {
-      return value;
-    }
-
-    // ok fine, let's just get the values from the config
-    return config.get('mode', 'md');
-  }
 
   function attachStyles(cmpMeta: ComponentMeta, elm: any, instance: Component) {
     cmpMeta.propsMeta.forEach(prop => {
@@ -92,22 +85,18 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   }
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
-    const ssrId = ssrIds++;
-    domApi.$setAttribute(elm, 'data-ssr', ssrId);
-
-    for (let i = 0, childNodeLen = elm.childNodes.length; i < childNodeLen; i++) {
-      var childNode = elm.childNodes[i];
-
-      if (domApi.$nodeType(childNode) === 1) {
-        domApi.$setAttribute(childNode, 'data-ssrc', ssrId);
-      }
-    }
-
     assignHostContentSlots(domApi, elm, slotMeta);
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
-    registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
+    const tagName = cmpMeta.tagNameMeta.toUpperCase();
+
+    registry[tagName] = cmpMeta;
+
+    if (cmpMeta.componentModuleMeta) {
+      // for unit testing
+      moduleImports[tagName] = cmpMeta.componentModuleMeta;
+    }
   }
 
 
@@ -137,15 +126,29 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   };
 
 
-  function loadBundle(bundleId: string, cb: Function): void {
+  function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
+    if (cmpMeta.componentModuleMeta) {
+      // we already have the module loaded
+      // (this is probably a unit test)
+      cb();
+      return;
+    }
+
+    const cmpMode = cmpMeta.modesMeta[getMode(domApi, config, elm)] || cmpMeta.modesMeta.$;
+    const bundleId = cmpMode[BUNDLE_ID];
+
     if (loadedBundles[bundleId]) {
-      // we've already loaded this bundle
+      // sweet, we've already loaded this bundle
       cb();
 
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the bundle callbacks to fire when it's loaded
-      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
+      if (bundleCallbacks[bundleId]) {
+        bundleCallbacks[bundleId].push(cb);
+      } else {
+        bundleCallbacks[bundleId] = [cb];
+      }
 
       // create the filePath we'll be reading
       const filePath = sys.path.join(Gbl.staticDir, `bundles`, `ionic.${bundleId}.js`);
@@ -174,9 +177,11 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     }
   }
 
-  function appLoaded() {
-    // let it be know, we have loaded
-    plt.onAppLoad && plt.onAppLoad(plt.appRoot, Object.keys(css).sort().map(tag => css[tag]).join(''));
+  function getEventOptions(opts: ListenOptions) {
+    return {
+      'capture': !!(opts && opts.capture),
+      'passive': !(opts && opts.passive === false)
+    };
   }
 
   return plt;

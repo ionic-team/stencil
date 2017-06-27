@@ -27,9 +27,12 @@ export function bundleComponentModeStyles(config: BundlerConfig, ctx: BuildConte
   }
 
   return Promise.all(promises).then(styles => {
-    cmpMeta.modesMeta = cmpMeta.modesMeta || {};
-    cmpMeta.modesMeta[modeName] = cmpMeta.modesMeta[modeName] || new Array(2);
-    cmpMeta.modesMeta[modeName][STYLES] = styles.join('').trim();
+    const styleStr = styles.join('').trim();
+    if (styleStr.length) {
+      cmpMeta.modesMeta = cmpMeta.modesMeta || {};
+      cmpMeta.modesMeta[modeName] = cmpMeta.modesMeta[modeName] || new Array(2);
+      cmpMeta.modesMeta[modeName][STYLES] = styleStr;
+    }
   });
 }
 

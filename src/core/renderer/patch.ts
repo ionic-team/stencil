@@ -4,11 +4,12 @@
  * Licensed under the MIT License
  * https://github.com/snabbdom/snabbdom/blob/master/LICENSE
  *
- * Modified for Ionic's Web Component Renderer
+ * Modified for Stencil's renderer and slot projection
  */
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
+import { SLOT_TAG, SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
 import { updateElement } from './update-element';
 
 
@@ -17,46 +18,55 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
 
-  function createElm(vnode: VNode, parentElm: Node) {
+  function createElm(vnode: VNode, parentElm: Node, childIndex: number) {
     let i = 0;
-    let childNode: Node;
 
-    if (hostContentNodes && vnode.vtag === 'slot') {
-      // special case for manually relocating host content nodes
-      // to their new home in either a named slot or the default slot
-      let namedSlot = (vnode.vattrs && vnode.vattrs.name);
-      let slotNodes: Node[];
+    if (vnode.vtag === SLOT_TAG) {
 
-      if (isDef(namedSlot)) {
-        // this vnode is a named slot
-        slotNodes = hostContentNodes.namedSlots && hostContentNodes.namedSlots[namedSlot];
+      if (hostContentNodes) {
+        // special case for manually relocating host content nodes
+        // to their new home in either a named slot or the default slot
+        let namedSlot = (vnode.vattrs && vnode.vattrs.name);
+        let slotNodes: Node[];
 
-      } else {
-        // this vnode is the default slot
-        slotNodes = hostContentNodes.defaultSlot;
-      }
+        if (isDef(namedSlot)) {
+          // this vnode is a named slot
+          slotNodes = hostContentNodes.namedSlots && hostContentNodes.namedSlots[namedSlot];
 
-      if (isDef(slotNodes)) {
-        // we have a slot for the user's vnode to go into
+        } else {
+          // this vnode is the default slot
+          slotNodes = hostContentNodes.defaultSlot;
+        }
 
-        for (; i < slotNodes.length; i++) {
-          // remove the host content node from it's original parent node
+        if (isDef(slotNodes)) {
+          // the host element has some nodes that need to be moved around
+
+          // we have a slot for the user's vnode to go into
+          // while we're moving nodes around, temporarily disable
+          // the disconnectCallback from working
           plt.tmpDisconnected = true;
-          domApi.$removeChild(domApi.$parentNode(slotNodes[i]), slotNodes[i]);
 
-          if (i === slotNodes.length - 1) {
-            // return the last node that gets appended
-            // like any other Node that was created
-            return slotNodes[i];
+          for (; i < slotNodes.length; i++) {
+            // remove the host content node from it's original parent node
+            // then relocate the host content node to its new slotted home
+            domApi.$appendChild(
+              parentElm,
+              domApi.$removeChild(domApi.$parentNode(slotNodes[i]), slotNodes[i])
+            );
           }
 
-          // relocate the node to its new home
-          domApi.$appendChild(parentElm, slotNodes[i]);
+          // done moving nodes around
+          // allow the disconnect callback to work again
           plt.tmpDisconnected = false;
         }
       }
 
-    } else if (isDef(vnode.vtext)) {
+      // this was a slot node, we do not create slot elements, our work here is done
+      // no need to return any element to be added to the dom
+      return null;
+    }
+
+    if (isDef(vnode.vtext)) {
       // create text node
       vnode.elm = domApi.$createTextNode(vnode.vtext);
 
@@ -65,16 +75,42 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       const elm = vnode.elm = (vnode.vnamespace ? domApi.$createElementNS(vnode.vnamespace, vnode.vtag) : domApi.$createElement(vnode.vtag));
 
       // add css classes, attrs, props, listeners, etc.
-      updateElement(domApi, null, vnode);
+      updateElement(plt, domApi, null, vnode);
 
       const children = vnode.vchildren;
-      if (children) {
-        for (; i < children.length; ++i) {
-          childNode = createElm(children[i], elm);
 
-          if (isDef(childNode)) {
+      if (isDef(ssrId)) {
+        // SSR ONLY: this is an SSR render and this
+        // logic does not run on the client
+
+        // give this element the SSR child id that can be read by the client
+        domApi.$setAttribute(
+          vnode.elm,
+          SSR_CHILD_ID,
+          ssrId + '.' + childIndex + (hasChildNodes(children) ? '' : '.')
+        );
+      }
+
+      if (children) {
+        let childNode: Node;
+        for (; i < children.length; ++i) {
+          // create the node
+          childNode = createElm(children[i], elm, i);
+
+          // return node could have been null
+          if (childNode) {
+            if (isDef(ssrId) && childNode.nodeType === 3) {
+              // SSR ONLY: add the text node's start comment
+              domApi.$appendChild(elm, domApi.$createComment('s.' + ssrId + '.' + i));
+            }
+
+            // append our new node
             domApi.$appendChild(elm, childNode);
-            plt.tmpDisconnected = false;
+
+            if (isDef(ssrId) && childNode.nodeType === 3) {
+              // SSR ONLY: add the text node's end comment
+              domApi.$appendChild(elm, domApi.$createComment('/'));
+            }
           }
         }
       }
@@ -83,7 +119,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     return vnode.elm;
   }
 
-  function addVnodes(parentElm: Node, before: Node | null, vnodes: VNode[], startIdx: number, endIdx: number) {
+  function addVnodes(parentElm: Node, before: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
     let childNode: Node;
 
     for (; startIdx <= endIdx; ++startIdx) {
@@ -94,15 +130,13 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
           childNode = domApi.$createTextNode(vnodeChild.vtext);
 
         } else {
-          childNode = createElm(vnodeChild, parentElm);
+          childNode = createElm(vnodeChild, parentElm, startIdx);
         }
 
         if (isDef(childNode)) {
           vnodeChild.elm = childNode;
           domApi.$insertBefore(parentElm, childNode, before);
         }
-
-        plt.tmpDisconnected = false;
       }
     }
   }
@@ -132,7 +166,8 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     let oldKeyToIdx: any;
     let idxInOld: number;
     let elmToMove: VNode;
-    let before: Node;
+    let node: Node;
+
 
     while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
       if (oldStartVnode == null) {
@@ -178,29 +213,34 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
 
         if (isUndef(idxInOld)) {
           // new element
-          domApi.$insertBefore(parentElm, createElm(newStartVnode, parentElm), oldStartVnode.elm);
+          node = createElm(newStartVnode, parentElm, newStartIdx);
           newStartVnode = newCh[++newStartIdx];
 
         } else {
           elmToMove = oldCh[idxInOld];
 
           if (elmToMove.vtag !== newStartVnode.vtag) {
-            domApi.$insertBefore(parentElm, createElm(newStartVnode, parentElm), oldStartVnode.elm);
+            node = createElm(newStartVnode, parentElm, idxInOld);
 
           } else {
             patchVNode(elmToMove, newStartVnode);
             oldCh[idxInOld] = undefined;
-            domApi.$insertBefore(parentElm, elmToMove.elm, oldStartVnode.elm);
+            node = elmToMove.elm;
           }
 
           newStartVnode = newCh[++newStartIdx];
+        }
+
+        if (node) {
+          domApi.$insertBefore(parentElm, node, oldStartVnode.elm);
         }
       }
     }
 
     if (oldStartIdx > oldEndIdx) {
-      before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
-      addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx);
+      addVnodes(parentElm,
+                (newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm),
+                newCh, newStartIdx, newEndIdx);
 
     } else if (newStartIdx > newEndIdx) {
       removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
@@ -234,15 +274,15 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
     const oldChildren = oldVnode.vchildren;
     const newChildren = newVnode.vchildren;
 
-    if (!isUpdate || !newVnode.skipDataOnUpdate) {
-      // either this is the first render of an element OR it's an update
-      // AND we already know it's possible it could have changed
-      // this updates the element's css classes, attrs, props, listeners, etc.
-      updateElement(domApi, oldVnode, newVnode);
-    }
-
     if (isUndef(newVnode.vtext)) {
       // element node
+
+      if ((!isUpdate || !newVnode.skipDataOnUpdate) && newVnode.vtag !== SLOT_TAG) {
+        // either this is the first render of an element OR it's an update
+        // AND we already know it's possible it could have changed
+        // this updates the element's css classes, attrs, props, listeners, etc.
+        updateElement(plt, domApi, oldVnode, newVnode);
+      }
 
       if (isDef(oldChildren) && isDef(newChildren)) {
         // looks like there's child vnodes for both the old and new vnodes
@@ -280,18 +320,25 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
   }
 
   // internal variables to be reused per patch() call
-  let isUpdate = false;
-  let hostContentNodes: HostContentNodes = null;
+  let isUpdate: boolean, hostContentNodes: HostContentNodes, ssrId: number;
 
-  return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes): VNode {
+
+  return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
     isUpdate = isUpdatePatch;
     hostContentNodes = hostElementContentNodes;
+    ssrId = ssrPatchId;
 
     // synchronous patch
     patchVNode(oldVnode, newVnode);
+
+    if (isDef(ssrId)) {
+      // SSR ONLY: we've been given an SSR id, so the host element
+      // should be given the ssr id attribute
+      domApi.$setAttribute(oldVnode.elm, SSR_VNODE_ID, ssrId);
+    }
 
     // return our new vnode
     return newVnode;
@@ -311,4 +358,19 @@ export function invokeDestroy(vnode: VNode) {
       vnode.vchildren[i] && invokeDestroy(vnode.vchildren[i]);
     }
   }
+}
+
+
+function hasChildNodes(children: VNode[]) {
+  // SSR ONLY: check if there are any more nested child elements
+  // if there aren't, this info is useful so the client runtime
+  // doesn't have to climb down and check so many elements
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      if (children[i].vtag !== SLOT_TAG || hasChildNodes(children[i].vchildren)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }

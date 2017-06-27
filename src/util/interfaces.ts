@@ -322,19 +322,24 @@ export interface LoadComponentMeta {
   [6]: StateMeta[];
 
   /**
-   * watchers
+   * prop WILL change
    */
-  [7]: ComponentWatchersData[];
+  [7]: PropChangeMeta[];
+
+  /**
+   * prop DID change
+   */
+  [8]: PropChangeMeta[];
 
   /**
    * methods
    */
-  [8]: MethodMeta[];
+  [9]: MethodMeta[];
 
   /**
    * shadow
    */
-  [9]: boolean;
+  [10]: boolean;
 }
 
 
@@ -385,8 +390,16 @@ export interface ComponentListenersData {
 }
 
 
-export interface ComponentWatchersData {
-  [methodName: string]: any;
+export interface PropChangeMeta {
+  /**
+   * prop name
+   */
+  [0]?: string;
+
+  /**
+   * fn name
+   */
+  [1]?: string;
 }
 
 
@@ -402,8 +415,9 @@ export interface ComponentDecorator {
 
 export interface ComponentOptions {
   tag: string;
-  styleUrls?: string | string[] | ModeStyles;
-  styles?: string | string[];
+  styleUrl?: string;
+  styleUrls?: string[] | ModeStyles;
+  styles?: string;
   shadow?: boolean;
   host?: HostMeta;
 }
@@ -420,7 +434,7 @@ export interface PropDecorator {
 
 export interface PropOptions {
   type?: string;
-  twoWay?: boolean;
+  state?: boolean;
 }
 
 
@@ -429,7 +443,7 @@ export interface PropMeta {
   propType?: number;
   attribName?: string;
   attribCase?: number;
-  isTwoWay?: boolean;
+  isStateful?: boolean;
 }
 
 
@@ -474,18 +488,13 @@ export interface StateDecorator {
 export type StateMeta = string;
 
 
-export interface WatchDecorator {
+export interface PropChangeDecorator {
   (propName: string): any;
 }
 
 
-export interface WatchOpts {
+export interface PropChangeOpts {
   fn: string;
-}
-
-
-export interface WatchMeta extends WatchOpts {
-  propName?: string;
 }
 
 
@@ -507,7 +516,8 @@ export interface ComponentMeta {
   methodsMeta?: MethodMeta[];
   propsMeta?: PropMeta[];
   listenersMeta?: ListenMeta[];
-  watchersMeta?: WatchMeta[];
+  propWillChangeMeta?: PropChangeMeta[];
+  propDidChangeMeta?: PropChangeMeta[];
   statesMeta?: StateMeta[];
   modesMeta?: ModesMeta;
   modesStyleMeta?: ModesStyleMeta;
@@ -555,11 +565,11 @@ export interface HostMeta {
 
 
 export interface Component {
-  ionViewWillLoad?: () => void;
-  ionViewDidLoad?: () => void;
-  ionViewWillUpdate?: () => void;
-  ionViewDidUpdate?: () => void;
-  ionViewDidUnload?: () => void;
+  componentWillLoad?: () => void;
+  componentDidLoad?: () => void;
+  componentWillUpdate?: () => void;
+  componentDidUpdate?: () => void;
+  componentDidUnload?: () => void;
 
   render?: () => any;
   hostData?: () => VNodeData;
@@ -582,7 +592,7 @@ export interface ComponentActiveListeners {
 }
 
 
-export interface ComponentActiveWatchers {
+export interface ComponentActivePropChanges {
   [propName: string]: Function;
 }
 
@@ -643,27 +653,30 @@ export interface HostElement extends HTMLElement {
   _listeners?: ComponentActiveListeners;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
-  _watchers?: ComponentActiveWatchers;
+  _propWillChange?: ComponentActivePropChanges;
+  _propDidChange?: ComponentActivePropChanges;
 }
 
 
 export interface RendererApi {
-  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, ssrId?: number): VNode;
 }
 
 
 export interface DomApi {
+  $documentElement: HTMLElement;
   $head: HTMLHeadElement;
   $body: HTMLElement;
   $nodeType(node: any): number;
   $createEvent(): CustomEvent;
   $createElement<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
-  $createElement(tagName: string): HTMLElement;
-  $createElementNS(namespace: string, tagName: string): any;
+  $createElement(tagName: any): HTMLElement;
+  $createElementNS(namespace: string, tagName: any): any;
   $createTextNode(text: string): Text;
-  $insertBefore(parentNode: Node, newNode: Node, referenceNode: Node): void;
-  $removeChild(node: Node, child: Node): void;
-  $appendChild(node: Node, child: Node): void;
+  $createComment(data: string): Comment;
+  $insertBefore(parentNode: Node, childNode: Node, referenceNode: Node): void;
+  $removeChild(parentNode: Node, childNode: Node): Node;
+  $appendChild(parentNode: Node, childNode: Node): void;
   $childNodes(node: Node): NodeList;
   $parentNode(node: Node): Node;
   $nextSibling(node: Node): Node;
@@ -703,7 +716,7 @@ export type CssClassObject = { [className: string]: boolean };
 
 export interface VNode {
   // using v prefixes largely so closure has no issue property renaming
-  vtag: string;
+  vtag: string|number;
   vtext: string;
   vchildren: VNode[];
   vprops: any;
@@ -772,18 +785,15 @@ export interface PlatformApi {
   registerComponents?: (components?: LoadComponentMeta[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
-  loadBundle: (bundleId: string, cb: Function) => void;
+  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
   render?: RendererApi;
   config: ConfigApi;
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
   isServer?: boolean;
   attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
-  getMode: (elm: Element) => string;
-  appRoot?: HostElement;
-  appLoaded?: () => void;
   onAppLoad?: (rootElm: HostElement, css: string) => void;
-  hasAppLoaded?: boolean;
+  getEventOptions: (opts?: ListenOptions) => any;
   tmpDisconnected?: boolean;
 }
 
@@ -894,10 +904,10 @@ export interface BundleCallbacks {
 
 export interface StencilSystem {
   fs?: {
-    readFile(filename: string, encoding: string, callback: (err: NodeJS.ErrnoException, data: string) => void): void;
+    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
     readFileSync(filename: string, encoding: string): string;
-    readdirSync(path: string | Buffer, options?: string | {}): string[];
-    statSync(path: string | Buffer): {
+    readdirSync(path: string, options?: string | {}): string[];
+    statSync(path: string): {
       isFile(): boolean;
       isDirectory(): boolean;
     };
@@ -940,4 +950,5 @@ export interface HydrateOptions {
   lang?: string;
   config?: Object;
   removeUnusedCss?: boolean;
+  reduceHtmlWhitepace?: boolean;
 }

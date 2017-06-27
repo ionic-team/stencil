@@ -1,7 +1,8 @@
 import { formatComponentMeta } from '../data-serialize';
-import { parseComponentMeta } from '../data-parse';
+import { parseComponentMeta, parsePropertyValue } from '../data-parse';
 import { ComponentMeta, ComponentRegistry, FormatComponentDataOptions } from '../interfaces';
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE, BUNDLE_ID, STYLES, HAS_SLOTS, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE, BUNDLE_ID, STYLES, HAS_SLOTS,
+  PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
 
 
 describe('data serialize/parse', () => {
@@ -58,26 +59,42 @@ describe('data serialize/parse', () => {
     expect(registry['TAG'].hostMeta).toBeFalsy();
   });
 
-  it('should set watchersMeta', () => {
-    cmpMeta.watchersMeta = [
-      {
-        fn: 'method1',
-        propName: 'prop'
-      }
+  it('should set propWillChangeMeta', () => {
+    cmpMeta.propWillChangeMeta = [
+      ['propName', 'methodName']
     ];
 
     const format = formatComponentMeta(cmpMeta, opts);
     parseComponentMeta(registry, moduleImports, evalStr(format));
 
-    expect(registry['TAG'].watchersMeta[0].fn).toBe('method1');
-    expect(registry['TAG'].watchersMeta[0].propName).toBe('prop');
+    expect(registry['TAG'].propWillChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
+    expect(registry['TAG'].propWillChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
   });
 
-  it('should set no watchersMeta', () => {
+  it('should set propDidChangeMeta', () => {
+    cmpMeta.propDidChangeMeta = [
+      ['propName', 'methodName']
+    ];
+
     const format = formatComponentMeta(cmpMeta, opts);
     parseComponentMeta(registry, moduleImports, evalStr(format));
 
-    expect(registry['TAG'].watchersMeta).toBeFalsy();
+    expect(registry['TAG'].propDidChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
+    expect(registry['TAG'].propDidChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
+  });
+
+  it('should set no propWillChangeMeta', () => {
+    const format = formatComponentMeta(cmpMeta, opts);
+    parseComponentMeta(registry, moduleImports, evalStr(format));
+
+    expect(registry['TAG'].propWillChangeMeta).toBeFalsy();
+  });
+
+  it('should set no propDidChangeMeta', () => {
+    const format = formatComponentMeta(cmpMeta, opts);
+    parseComponentMeta(registry, moduleImports, evalStr(format));
+
+    expect(registry['TAG'].propDidChangeMeta).toBeFalsy();
   });
 
   it('should set listenersMeta', () => {
@@ -285,7 +302,7 @@ describe('data serialize/parse', () => {
     const format = formatComponentMeta(cmpMeta, opts);
     parseComponentMeta(registry, moduleImports, evalStr(format));
 
-    expect(registry['TAG'].componentModuleMeta).toEqual(moduleImports.tag);
+    expect(registry['TAG'].componentModuleMeta).toEqual(moduleImports.TAG);
   });
 
   it('should set tagName', () => {
@@ -298,8 +315,93 @@ describe('data serialize/parse', () => {
   });
 
 
+  describe('parsePropertyValue', () => {
+
+    describe('number', () => {
+
+      it('should convert number 1 to number 1', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, 1)).toBe(1);
+      });
+
+      it('should convert number 0 to number 0', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, 0)).toBe(0);
+      });
+
+      it('should convert string "0" to number 0', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, '0')).toBe(0);
+      });
+
+      it('should convert string "88" to number 88', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, '88')).toBe(88);
+      });
+
+      it('should convert empty string "" to NaN', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, '')).toEqual(NaN);
+      });
+
+      it('should convert any string "anyword" to NaN', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, 'anyword')).toEqual(NaN);
+      });
+
+      it('should keep number undefined as undefined', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, undefined)).toEqual(undefined);
+      });
+
+      it('should keep number null as null', () => {
+        expect(parsePropertyValue(TYPE_NUMBER, null)).toBe(null);
+      });
+
+    });
+
+    describe('boolean', () => {
+
+      it('should set boolean 1 as true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 1)).toBe(true);
+      });
+
+      it('should set boolean 0 as false', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 0)).toBe(false);
+      });
+
+      it('should keep boolean true as boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, true)).toBe(true);
+      });
+
+      it('should keep boolean false as boolean false', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, false)).toBe(false);
+      });
+
+      it('should convert string "false" to boolean false', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 'false')).toBe(false);
+      });
+
+      it('should convert string "true" to boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 'true')).toBe(true);
+      });
+
+      it('should convert empty string "" to boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, '')).toBe(true);
+      });
+
+      it('should convert any string "anyword" to boolean true', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, 'anyword')).toBe(true);
+      });
+
+      it('should keep boolean undefined as undefined', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, undefined)).toBe(undefined);
+      });
+
+      it('should keep boolean null as null', () => {
+        expect(parsePropertyValue(TYPE_BOOLEAN, null)).toBe(null);
+      });
+
+    });
+
+  });
+
+
   var registry: ComponentRegistry = {};
-  var moduleImports: any = { 'tag': class MyTag {} };
+  var moduleImports: any = { 'TAG': class MyTag {} };
   var cmpMeta: ComponentMeta = {};
   var opts: FormatComponentDataOptions = {};
 

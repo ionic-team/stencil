@@ -1,4 +1,4 @@
-import { hydrateHtml } from '../../../core/server/hydrate-server';
+import { hydrateHtml } from '../../../core/server/hydrate-html';
 import { HydrateOptions, RendererOptions } from '../../../util/interfaces';
 import { registerDirectory } from './register-directory';
 
