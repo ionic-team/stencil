@@ -1,25 +1,27 @@
-import { Component, HostElement, ListenMeta, ListenOptions, PlatformApi, QueueApi } from '../../util/interfaces';
+import { Component, HostElement, ListenMeta, ListenOptions, PlatformApi } from '../../util/interfaces';
 import { getElementReference, noop } from '../../util/helpers';
 import { KEY_CODE_MAP } from '../../util/constants';
 
 
-let supportsOpts: boolean = null;
-
-
-export function attachListeners(queue: QueueApi, listeners: ListenMeta[], elm: HostElement, instance: Component) {
+export function attachListeners(plt: PlatformApi, listeners: ListenMeta[], elm: HostElement, instance: Component) {
   if (listeners) {
     for (var i = 0; i < listeners.length; i++) {
       var listener = listeners[i];
       if (listener.eventEnabled !== false) {
-        elm._listeners = elm._listeners || {};
-        elm._listeners[listener.eventName] = addEventListener(queue, elm, listener.eventName, (<any>instance)[listener.eventMethod].bind(instance), listener);
+        (elm._listeners = elm._listeners || {})[listener.eventName] = addEventListener(
+          plt,
+          elm,
+          listener.eventName,
+          (<any>instance)[listener.eventMethod].bind(instance),
+          listener
+        );
       }
     }
   }
 }
 
 
-export function enableListener(plt: PlatformApi, queue: QueueApi, elm: HostElement, instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
+export function enableListener(plt: PlatformApi, elm: HostElement, instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
   if (instance) {
     const listenerMeta = plt.getComponentMeta(elm).listenersMeta;
 
@@ -33,7 +35,7 @@ export function enableListener(plt: PlatformApi, queue: QueueApi, elm: HostEleme
 
           if (shouldEnable && !deregisterFns[eventName]) {
             var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(queue, instance.$el, attachToEventName, (<any>instance)[listener.eventMethod].bind(instance), listener);
+            deregisterFns[eventName] = addEventListener(plt, instance.$el, attachToEventName, (<any>instance)[listener.eventMethod].bind(instance), listener);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();
@@ -48,7 +50,7 @@ export function enableListener(plt: PlatformApi, queue: QueueApi, elm: HostEleme
 }
 
 
-export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): any}, opts: ListenOptions) {
+export function addEventListener(plt: PlatformApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): any}, opts: ListenOptions) {
   if (!elm) {
     return noop;
   }
@@ -75,15 +77,6 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
     testKeyCode = KEY_CODE_MAP[splt[1]];
   }
 
-  if (supportsOpts === null) {
-    supportsOpts = checkEventOptsSupport(elm);
-  }
-
-  const eventListenerOpts: any = (supportsOpts) ? {
-        'capture': !!(opts && opts.capture),
-        'passive': !!(opts && opts.passive)
-      } : !!(opts && opts.capture);
-
   const eventListener = (ev: any) => {
     if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
       // we're looking for a specific keycode but this wasn't it
@@ -98,9 +91,11 @@ export function addEventListener(queue: QueueApi, elm: HTMLElement|HTMLDocument|
       // so it's very important to flush the queue now
       // so that the app reflects whatever they just did
       // basically don't let requestIdleCallback delay the important
-      queue.flush();
+      plt.queue.flush();
     }
   };
+
+  const eventListenerOpts = plt.getEventOptions(opts);
 
   elm.addEventListener(eventName, eventListener, eventListenerOpts);
 
@@ -137,20 +132,4 @@ export function detachListeners(elm: HostElement) {
 
     elm._listeners = null;
   }
-}
-
-
-function checkEventOptsSupport(elm: any) {
-  let hasEventOptionsSupport = false;
-
-  try {
-    var opts = Object.defineProperty({}, 'passive', {
-      get: function() {
-        hasEventOptionsSupport = true;
-      }
-    });
-    elm.addEventListener('test', null, opts);
-  } catch (e) {}
-
-  return hasEventOptionsSupport;
 }

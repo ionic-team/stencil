@@ -75,7 +75,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
       const elm = vnode.elm = (vnode.vnamespace ? domApi.$createElementNS(vnode.vnamespace, vnode.vtag) : domApi.$createElement(vnode.vtag));
 
       // add css classes, attrs, props, listeners, etc.
-      updateElement(domApi, null, vnode);
+      updateElement(plt, domApi, null, vnode);
 
       const children = vnode.vchildren;
 
@@ -281,7 +281,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
-        updateElement(domApi, oldVnode, newVnode);
+        updateElement(plt, domApi, oldVnode, newVnode);
       }
 
       if (isDef(oldChildren) && isDef(newChildren)) {

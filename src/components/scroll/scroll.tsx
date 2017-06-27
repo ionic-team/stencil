@@ -15,9 +15,18 @@ export class Scroll implements IScroll {
   private _t: number;
   private tmr: any;
   private queued = false;
+  private eventOpts: any;
 
   isScrolling: boolean = false;
   detail: ScrollDetail = {};
+
+  constructor() {
+    this.eventOpts = {
+      detail: this.detail,
+      bubbles: true,
+      composed: true
+    };
+  }
 
   @Prop() enabled: boolean = true;
   @Prop() jsScroll: boolean = false;
@@ -81,7 +90,7 @@ export class Scroll implements IScroll {
       if (self.ionScrollStart) {
         self.ionScrollStart(detail);
       } else {
-        Ionic.emit(this, 'ionScrollStart', { detail: detail });
+        Ionic.emit(this, 'ionScrollStart', this.eventOpts);
       }
     }
 
@@ -138,7 +147,7 @@ export class Scroll implements IScroll {
     if (self.ionScrollStart) {
       self.ionScroll(detail);
     } else {
-      Ionic.emit(this, 'ionScroll', { detail: detail });
+      Ionic.emit(this, 'ionScroll', this.eventOpts);
     }
   }
 
@@ -154,7 +163,7 @@ export class Scroll implements IScroll {
       self.ionScrollEnd(detail);
 
     } else {
-      Ionic.emit(this, 'ionScrollEnd', { detail: detail });
+      Ionic.emit(this, 'ionScrollEnd', this.eventOpts);
     }
   }
 

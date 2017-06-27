@@ -1,7 +1,7 @@
 import { assignHostContentSlots } from '../renderer/slot';
 import { attributeChangedCallback } from '../instance/attribute-changed';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomApi, DomControllerApi, GlobalNamespace, HostElement,
+  DomApi, DomControllerApi, GlobalNamespace, HostElement, ListenOptions,
   PlatformApi, StencilSystem } from '../../util/interfaces';
 import { BUNDLE_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
@@ -31,7 +31,8 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     queue: Gbl.QueueCtrl,
     attachStyles,
     tmpDisconnected: false,
-    isServer: true
+    isServer: true,
+    getEventOptions
   };
 
   plt.render = createRenderer(plt, domApi);
@@ -174,6 +175,13 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
 
       }
     }
+  }
+
+  function getEventOptions(opts: ListenOptions) {
+    return {
+      'capture': !!(opts && opts.capture),
+      'passive': !(opts && opts.passive === false)
+    };
   }
 
   return plt;

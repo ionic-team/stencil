@@ -82,7 +82,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     elm._activelyLoadingChildren = null;
 
     // the element is within the DOM now, so let's attach the event listeners
-    attachListeners(plt.queue, plt.getComponentMeta(elm).listenersMeta, elm, instance);
+    attachListeners(plt, plt.getComponentMeta(elm).listenersMeta, elm, instance);
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)

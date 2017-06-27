@@ -1,10 +1,12 @@
-import { DomApi, VNode } from '../../util/interfaces';
+import { DomApi, PlatformApi, VNode } from '../../util/interfaces';
 import { isFunction, isObject } from '../../util/helpers';
 
+
 const EMPTY: any = {};
+let DEFAULT_OPTS: any = null;
 
 
-export function updateElement(nodeOps: DomApi, oldVnode: VNode, newVnode: VNode): void {
+export function updateElement(plt: PlatformApi, nodeOps: DomApi, oldVnode: VNode, newVnode: VNode): void {
   const isUpdate = (oldVnode != null);
 
   oldVnode = oldVnode || EMPTY;
@@ -134,25 +136,21 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, newVnode: VNode)
 
 
   // update event listeners
-  if (oldVnode.vlisteners || newVnode.vlisteners) {
-    oldData = oldVnode.vlisteners;
-    newData = newVnode.vlisteners;
+  oldData = oldVnode.vlisteners;
+  newData = newVnode.vlisteners;
+  if (oldData || newData) {
+
+    if (!DEFAULT_OPTS) {
+      DEFAULT_OPTS = plt.getEventOptions();
+    }
 
     // remove existing listeners which no longer used
     if (isUpdate && oldData && oldVnode.assignedListener) {
       // if element changed or deleted we remove all existing listeners unconditionally
-      if (newData) {
-        for (key in oldData) {
-          // remove listener if existing listener removed
-          if (!newData[key]) {
-            oldVnode.elm.removeEventListener(key, oldVnode.assignedListener, false);
-          }
-        }
-
-      } else {
-        for (key in oldData) {
-          // remove listener if element was changed or existing listeners removed
-          oldVnode.elm.removeEventListener(key, oldVnode.assignedListener, false);
+      for (key in oldData) {
+        // remove listener if existing listener removed
+        if (!newData || !newData[key]) {
+          oldVnode.elm.removeEventListener(key, oldVnode.assignedListener, DEFAULT_OPTS);
         }
       }
     }
@@ -160,29 +158,20 @@ export function updateElement(nodeOps: DomApi, oldVnode: VNode, newVnode: VNode)
     // add new listeners which has not already attached
     if (newData) {
       // reuse existing listener or create new
-      var listener = newVnode.assignedListener = oldVnode.assignedListener || createListener();
+      cur = newVnode.assignedListener = oldVnode.assignedListener || createListener();
 
       // update vnode for listener
-      listener.vnode = newVnode;
+      cur.vnode = newVnode;
 
       // if element changed or added we add all needed listeners unconditionally
-      if (isUpdate && oldData) {
-        for (key in newData) {
-          // add listener if new listener added
-          if (!oldData[key]) {
-            elm.addEventListener(key, listener, false);
-          }
-        }
-
-      } else {
-        for (key in newData) {
-          // add listener if element was changed or new listeners added
-          elm.addEventListener(key, listener, false);
+      for (key in newData) {
+        // add listener if new listener added
+        if (!oldData || !oldData[key]) {
+          elm.addEventListener(key, cur, DEFAULT_OPTS);
         }
       }
     }
   }
-
 }
 
 

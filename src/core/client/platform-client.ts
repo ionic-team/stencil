@@ -1,7 +1,7 @@
 import { assignHostContentSlots, createVNodesFromSsr } from '../renderer/slot';
 import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
-  ConfigApi, DomControllerApi, DomApi, HostElement,
-  GlobalNamespace, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
+  ConfigApi, DomControllerApi, DomApi, HostElement, GlobalNamespace,
+  ListenOptions, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
 import { BUNDLE_ID, SSR_VNODE_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
 import { getMode } from '../platform/mode';
@@ -31,7 +31,8 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     config,
     queue,
     connectHostElement,
-    attachStyles
+    attachStyles,
+    getEventOptions
   };
 
 
@@ -40,7 +41,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
 
 
   // create the global which will be injected into the user's instances
-  const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, queue, domCtrl);
+  const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, domCtrl);
 
 
   // setup the root element which is the mighty <html> tag
@@ -291,6 +292,25 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     // inject a script tag in the head
     // kick off the actual request
     domApi.$appendChild(domApi.$head, scriptElm);
+  }
+
+  // test if this browser supports event options or not
+  let supportsEventOptions = false;
+  try {
+    win.addEventListener('evopt', null,
+      Object.defineProperty({}, 'passive', {
+        get: () => {
+          supportsEventOptions = true;
+        }
+      })
+    );
+  } catch (e) {}
+
+  function getEventOptions(opts?: ListenOptions) {
+    return supportsEventOptions ? {
+        'capture': !!(opts && opts.capture),
+        'passive': !(opts && opts.passive === false)
+      } : !!(opts && opts.capture);
   }
 
   return plt;
