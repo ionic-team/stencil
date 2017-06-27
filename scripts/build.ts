@@ -88,8 +88,8 @@ export function run(pargv: string[], env: { [k: string]: string }) {
     if (results.errors && results.errors.length > 0) {
       throw results.errors;
     }
-    manifest = mergeManifests([].concat((results.manifest || []), dependentManifests));
-    console.log(JSON.stringify(manifest, null, 2));
+    const localManifest = updateManifestUrls(results.manifest, compiledDir, compiledDir);
+    manifest = mergeManifests([].concat((localManifest || []), dependentManifests));
 
     // build all of the core files for ionic-web
     // the core files are what makes up how ionic-core "works"
@@ -140,7 +140,8 @@ function compileComponents(ctx, compiledDir: string, srcDir: string, bundles): P
     compilerOptions: {
       outDir: compiledDir,
       module: 'commonjs',
-      target: 'es5'
+      target: 'es5',
+      rootDir: srcDir
     },
     include: [srcDir],
     exclude: ['node_modules', 'compiler', 'test'],

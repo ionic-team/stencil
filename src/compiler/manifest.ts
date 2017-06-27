@@ -86,13 +86,14 @@ export function generateManifest(config: CompilerConfig, ctx: BuildContext) {
     return 0;
   });
 
+  ctx.results.manifest = manifest;
+
   const manifestFile = config.packages.path.join(config.compilerOptions.outDir, 'manifest.json');
   const json = JSON.stringify(manifest, null, 2);
 
   if (config.debug) {
     console.log(`compile, manifestFile: ${manifestFile}`);
   }
-
   return writeFile(config.packages, manifestFile, json);
 }
 
@@ -114,7 +115,7 @@ export function getManifest(config: BundlerConfig, ctx: BuildContext): Promise<M
 }
 
 export function updateManifestUrls(manifestJson: Manifest, manifestDir: string, compiledDir: string): Manifest {
-  const components = manifestJson.components.map((comp: ComponentMeta) => {
+  const components = (manifestJson.components || []).map((comp: ComponentMeta) => {
     const modesStyleMeta = updateStyleUrls(comp.modesStyleMeta, manifestDir, compiledDir);
     return {
       ...comp,
