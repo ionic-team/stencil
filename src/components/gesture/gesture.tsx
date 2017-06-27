@@ -44,7 +44,7 @@ export class Gesture {
 
 
   ionViewDidLoad() {
-    this.ctrl = (<GlobalNamespace>Ionic).controllers.gesture = ((<GlobalNamespace>Ionic).controllers.gesture || new GestureController());
+    this.ctrl = (Ionic as GlobalNamespace).controllers.gesture = ((Ionic as GlobalNamespace).controllers.gesture || new GestureController());
 
     this.gesture = this.ctrl.createGesture(this.gestureName, this.gesturePriority, this.disableScroll);
 
