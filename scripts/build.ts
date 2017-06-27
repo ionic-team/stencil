@@ -88,7 +88,7 @@ export function run(pargv: string[], env: { [k: string]: string }) {
     if (results.errors && results.errors.length > 0) {
       throw results.errors;
     }
-    const localManifest = updateManifestUrls(results.manifest, compiledDir, compiledDir);
+    const localManifest = updateManifestUrls(results.manifest || {}, compiledDir, compiledDir);
     manifest = mergeManifests([].concat((localManifest || []), dependentManifests));
 
     // build all of the core files for ionic-web
