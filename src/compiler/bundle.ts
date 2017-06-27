@@ -13,7 +13,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import * as os from 'os';
 
 
-export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
+export function bundle(config: BundlerConfig, ctx: BuildContext = {}, manifest?: Manifest): Promise<Results> {
   validateConfig(config);
 
   if (config.debug) {
@@ -26,7 +26,11 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
     files: []
   };
 
-  return getManifest(config, ctx).then(manifest => {
+  let manifestPromise = (manifest) ?
+    Promise.resolve(manifest) :
+    getManifest(config, ctx);
+
+  return manifestPromise.then(manifest => {
     return Promise.all(manifest.components.map(cmpMeta => {
       return bundleComponent(config, ctx, cmpMeta);
 
@@ -134,11 +138,11 @@ function bundleComponentModules(config: BundlerConfig, ctx: BuildContext) {
 
     const entryContent: string[] = [];
     bundle.components.forEach(c => {
-      let importPath = config.packages.path.join(config.srcDir, c.componentUrl);
+      let importPath = c.componentUrl;
       let fileMeta = createFileMeta(config.packages, ctx, importPath, '');
       fileMeta.rebundleOnChange = true;
 
-      entryContent.push(`import { ${c.componentClass} } from "${importPath}";`);
+      entryContent.push(`import { ${c.componentClass} } from "${c.componentUrl}";`);
       entryContent.push(`exports['${c.tagNameMeta}'] = ${c.componentClass};`);
     });
 

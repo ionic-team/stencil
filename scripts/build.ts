@@ -18,6 +18,9 @@ const WATCH = process.argv.indexOf('watch') > -1;
 
 import { buildBindingCore, LICENSE, readFile, writeFile } from './build-core';
 import * as chalk from 'chalk';
+import { Manifest, mergeManifests, updateManifestUrls, Results } from '../src/compiler';
+import resolveFrom from './resolve-from';
+
 import * as fs from 'fs-extra';
 import * as nodeSass from 'node-sass';
 import * as path from 'path';
@@ -29,10 +32,26 @@ export type Bundle = {
   components: string[];
   priority?: 'low'
 }
+export type Collection = string;
+
 export type StencilConfig = {
   src: string;
   dest: string;
   bundles: Bundle[]
+  collections: Collection[]
+}
+interface loadCollectionCallback {
+  (collection: Collection): Manifest
+}
+
+function loadCollectionManifest(repoDir: string, compiledDir: string): loadCollectionCallback {
+  return (collection: Collection): Manifest => {
+    const manifestJsonFile = resolveFrom(repoDir, collection);
+    const manifestJson: Manifest = fs.readJsonSync(manifestJsonFile);
+    const manifestDir = path.dirname(manifestJsonFile);
+
+    return updateManifestUrls(manifestJson, manifestDir, compiledDir);
+  }
 }
 
 const compiler = require(path.join(__dirname, '..' , 'compiler'));
@@ -40,16 +59,23 @@ const compiler = require(path.join(__dirname, '..' , 'compiler'));
 export function run(pargv: string[], env: { [k: string]: string }) {
   pargv; env;
   const projectBase = process.cwd();
+  const compiledDir = path.join(projectBase, 'temp');
+  fs.emptyDirSync(compiledDir);
+
   const projectConfig = path.join(projectBase, 'stencil.config');
   const data: StencilConfig = require(projectConfig).config;
-  const srcDir = path.join(projectBase, data.src);
+  let manifest: Manifest;
+
+  const srcDir = data.src ? path.join(projectBase, data.src) : null;
   const destDir = path.join(projectBase, data.dest);
-  const bundles = data.bundles;
+
+  const bundles = data.bundles || [];
+  const dependentManifests = (data.collections || [])
+    .map(loadCollectionManifest(projectBase, compiledDir))
 
   // dynamic require cuz this file gets transpiled to dist/
   const ctx = {};
   const transpiledSrcDir = path.join(__dirname, '../transpiled-web/bindings/web/src');
-  const compiledDir = path.join(projectBase, 'temp');
 
   // first clean out the ionic-web directories
   // fs.emptyDirSync(destDir);
@@ -58,15 +84,21 @@ export function run(pargv: string[], env: { [k: string]: string }) {
   // find all the source components and compile
   // them into reusable components, and create a manifest.json
   // where all the components can be found, and their styles.
-  compileComponents(ctx, compiledDir, srcDir, bundles).then(() => {
+  compileComponents(ctx, compiledDir, srcDir, bundles).then((results: Results) => {
+    if (results.errors && results.errors.length > 0) {
+      throw results.errors;
+    }
+    manifest = mergeManifests([].concat((results.manifest || []), dependentManifests));
+    console.log(JSON.stringify(manifest, null, 2));
 
     // build all of the core files for ionic-web
     // the core files are what makes up how ionic-core "works"
     return buildBindingCore(transpiledSrcDir, compiledDir, 'core', DEV_MODE)
 
   }).then(() => {
+
     // bundle all of the components into their separate files
-    return bundleComponents(ctx, compiledDir, destDir).then(results => {
+    return bundleComponents(ctx, compiledDir, destDir, manifest).then(results => {
 
       // build the ionic.js loader file which
       // ionic-web uses to decide which core files to load
@@ -100,7 +132,10 @@ export function run(pargv: string[], env: { [k: string]: string }) {
 
 
 
-function compileComponents(ctx, compiledDir: string, srcDir: string, bundles) {
+function compileComponents(ctx, compiledDir: string, srcDir: string, bundles): Promise<Results> {
+  if (!srcDir) {
+    return Promise.resolve({});
+  }
   const config = {
     compilerOptions: {
       outDir: compiledDir,
@@ -126,7 +161,7 @@ function compileComponents(ctx, compiledDir: string, srcDir: string, bundles) {
 }
 
 
-function bundleComponents(ctx, compiledDir: string, destDir: string) {
+function bundleComponents(ctx, compiledDir: string, destDir: string, manifest: Manifest = null) {
   const config = {
     srcDir: compiledDir,
     destDir: destDir,
@@ -143,7 +178,7 @@ function bundleComponents(ctx, compiledDir: string, destDir: string) {
     debug: true
   };
 
-  return compiler.bundle(config, ctx);
+  return compiler.bundle(config, ctx, manifest);
 }
 
 

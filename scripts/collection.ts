@@ -21,7 +21,6 @@ import * as nodeSass from 'node-sass';
 import * as path from 'path';
 import * as rollup from 'rollup';
 import * as typescript from 'typescript';
-import * as uglify from 'uglify-js';
 
 export type Bundle = {
   components: string[];
@@ -43,14 +42,7 @@ export function run(pargv: string[], env: { [k: string]: string }) {
   const srcDir = path.join(projectBase, data.src);
   const destDir = path.join(projectBase, data.dest);
 
-  // Break up bundles because a collection contains them as seperate
-  const bundles = data.bundles.reduce((allComponents, bundle) => (
-    allComponents.concat(bundle.components.map((componentName: string): Bundle => (
-      {
-        components: [componentName]
-      }
-    )))
-  ), <Bundle[]>[]);
+  const bundles = data.bundles;
 
   // dynamic require cuz this file gets transpiled to dist/
   const ctx = {};
@@ -103,26 +95,4 @@ function compileComponents(ctx, compiledDir: string, srcDir: string, bundles) {
   };
 
   return compiler.compile(config, ctx);
-}
-
-
-function bundleComponents(ctx, compiledDir: string, destDir: string) {
-  const config = {
-    srcDir: compiledDir,
-    destDir: destDir,
-    packages: {
-      fs: fs,
-      path: path,
-      rollup: rollup,
-      uglify: uglify,
-      nodeSass: nodeSass,
-      typescript: typescript
-    },
-    devMode: DEV_MODE,
-    watch: WATCH,
-    debug: true,
-    noCore: true
-  };
-
-  return compiler.bundle(config, ctx);
 }
