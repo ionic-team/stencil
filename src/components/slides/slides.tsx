@@ -354,7 +354,7 @@ export class Slides {
    */
   ionViewDidLoad() {
     /**
-     * TODO: This should change because currently componentDidLoad fires independent of whether the
+     * TODO: This should change because currently ionViewDidLoad fires independent of whether the
      * child components are ready.
      */
     setTimeout(() => {
