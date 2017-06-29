@@ -40,10 +40,11 @@ export class Tab {
   render() {
     const RootComponent = this.root;
 
+    const style = {}
     if(!this.isSelected) {
-      return null;
+      style.display = 'none'
     }
 
-    return <RootComponent />
+    return <RootComponent style={style} />
   }
 }

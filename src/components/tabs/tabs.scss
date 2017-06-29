@@ -35,12 +35,16 @@
   @include text-align(center);
   @include border-radius(0);
 
-  flex: 1;
-
   position: relative;
   z-index: 0;
   display: flex;
   overflow: hidden;
+
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
 
   border: 0;
 
@@ -49,15 +53,6 @@
   cursor: pointer;
 
   user-select: none;
-}
-
-.tab-button-wrap {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  align-self: center;
-  justify-content: center;
 }
 
 .tab-disabled {

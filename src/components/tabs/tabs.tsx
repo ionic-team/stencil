@@ -17,15 +17,21 @@ export class Tabs {
 
   @State() tabs: [Tab] = []
 
-  @Listen('parent:ionTabDidLoad')
+  @Listen('ionTabDidLoad')
   tabDidLoad(ev) {
     console.log('Tabs load', ev)
     this.tabs = [ ...this.tabs, ev.detail.tab ]
   }
 
-  @Listen('parent:ionTabDidUnload')
+  @Listen('ionTabDidUnload')
   tabDidUnload(ev) {
     this.tabs = this.tabs.filter(t => t !== ev.detail.tab)
+  }
+
+
+  handleTabButtonClick(tab) {
+    console.log('Handling tab button click')
+    tab.onSelected()
   }
 
   render() {
@@ -37,7 +43,7 @@ export class Tabs {
       <div class="tabbar" role="tablist">
         {tabs.map(tab => {
         return (
-          <ion-tab-button role="tab" tab={tab}></ion-tab-button>
+          <ion-tab-button role="tab" tab={tab} onClick={this.handleTabButtonClick.bind(this, tab)}></ion-tab-button>
         )
         })}
       </div>,
