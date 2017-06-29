@@ -10,6 +10,35 @@ import { Component, h } from '../index';
 export class TabButton {
   @Prop() tab: Tab;
 
+  @Prop() layout: string;
+
+  hostData(): VNodeData {
+    const tab = this.tab;
+    if(!tab) return {};
+
+    // attr.id
+    // attr.aria-controls
+
+    const hasTitle = !!tab.tabTitle;
+    const hasIcon = !!tab.tabIcon && this.layout !== 'icon-hide';
+    const hasTitleOnly = (hasTitle && !hasIcon);
+    const hasIconOnly = (hasIcon && !hasTitle);
+    const hasBadge = !!tab.tabBadge;
+    // class.disable-hover
+    // class.tab-disabled
+    // class.tab-hidden
+
+    return {
+      class: {
+        'has-title': hasTitle,
+        'has-icon': hasIcon,
+        'has-title-only': hasTitleOnly,
+        'has-icon-only': hasIconOnly,
+        'has-badge': hasBadge
+      }
+    };
+  }
+
   render() {
     if(!this.tab) {
       return null;

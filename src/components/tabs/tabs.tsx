@@ -17,6 +17,9 @@ export class Tabs {
 
   @State() tabs: [Tab] = []
 
+  @Prop() tabsPlacement: string = 'bottom';
+  @Prop() tabsLayout: string = 'icon-top'
+
   @Listen('ionTabDidLoad')
   tabDidLoad(ev) {
     console.log('Tabs load', ev)
@@ -43,7 +46,11 @@ export class Tabs {
       <div class="tabbar" role="tablist">
         {tabs.map(tab => {
         return (
-          <ion-tab-button role="tab" tab={tab} onClick={this.handleTabButtonClick.bind(this, tab)} aria-selected={tab.isSelected}></ion-tab-button>
+          <ion-tab-button role="tab"
+                          tab={tab}
+                          onClick={this.handleTabButtonClick.bind(this, tab)}
+                          layout={this.tabsLayout}
+                          aria-selected={tab.isSelected}></ion-tab-button>
         )
         })}
       </div>,

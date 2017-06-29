@@ -1,4 +1,5 @@
 import { Component, h, Ionic } from '../index';
+import { VNodeData } from '../../util/interfaces';
 
 
 @Component({
@@ -11,12 +12,20 @@ export class Tab {
   @Prop() root: string;
 
   @Prop() tabTitle: string;
-
   @Prop() tabIcon: string;
+  @Prop() tabBadge: string;
+  @Prop() tabBadgeStyle: string;
 
   @Prop() onSelected: Function;
 
   @Prop() isSelected: Boolean = false;
+
+  hostData(): VNodeData {
+    return {
+      class: {
+      }
+    };
+  }
 
   ionViewDidLoad() {
     console.log('Tab did load')
