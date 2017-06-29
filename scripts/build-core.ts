@@ -319,7 +319,7 @@ function transpile(code: string) {
     'transform-es2015-parameters',
     'transform-es2015-shorthand-properties',
     'transform-es2015-template-literals',
-  ];
+  ].map((pluginName: string) => path.join(__dirname, `../../node_modules/babel-plugin-${pluginName}`));
 
   const transpileResult = babel.transform(code, { plugins: plugins });
 

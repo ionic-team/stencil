@@ -1,16 +1,23 @@
 {
-  "name": "ionic-core",
+  "name": "@stencil/core",
   "private": true,
   "version": "0.0.1",
   "license": "MIT",
+  "bin": {
+    "stencil": "./bin/stencil"
+  },
+  "engines": {
+    "node": ">=6.4.0"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.web && npm run build.angular && npm run build.ssr",
+    "build": "npm run clean && npm run transpile && npm run build.compiler && npm run build.ssr",
+    "build.types": " tsc --declaration src/index.ts --outDir ./dist",
+    "build.stencil": "npm run clean && npm run transpile && npm run build.compiler && npm run build.types",
     "build.compiler": "npm run transpile.compiler && node dist/scripts/build-compiler.js",
-    "build.web": "node dist/scripts/build-web.js",
-    "build.angular": "npm run copy.angular && node dist/scripts/build-angular.js",
     "build.ssr": "tsc -p src/bindings/server-renderer/tsconfig.json && node dist/scripts/build-ssr.js",
     "clean": "rimraf dist/",
-    "copy.angular": "node dist/scripts/copy-angular.js",
     "dev": "(npm run transpile && node dist/scripts/dev-watch.js) & npm run transpile.watch",
     "start": "npm install && npm run build",
     "test": "(jest --no-cache || true)",
