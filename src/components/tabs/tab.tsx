@@ -11,8 +11,12 @@ export class Tab {
   @Prop() root: string;
 
   @Prop() tabTitle: string;
-  
+
   @Prop() tabIcon: string;
+
+  @Prop() onSelected: Function;
+
+  @Prop() isSelected: Boolean = false;
 
   ionViewDidLoad() {
     console.log('Tab did load')
@@ -34,8 +38,11 @@ export class Tab {
   }
 
   render() {
-    console.log('Tab rendering')
     const RootComponent = this.root;
+
+    if(!this.isSelected) {
+      return null;
+    }
 
     return <RootComponent />
   }
