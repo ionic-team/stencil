@@ -31,11 +31,13 @@ const BUNDLES = [
   { components: ['ion-note'] },
   { components: ['ion-slides', 'ion-slide'] },
   { components: ['ion-spinner'] },
+  { components: ['ion-tabs', 'ion-tab', 'ion-tab-button', 'ion-tab-highlight'] },
   { components: ['ion-toggle'] },
   { components: ['ion-router', 'ion-route', 'ion-route-link'] },
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
   { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] },
-  { components: ['stencil-site', 'landing-page', 'site-header', 'docs-page', 'demos-page'] }
+  { components: ['stencil-site', 'landing-page', 'site-header', 'docs-page', 'demos-page'] },
+  { components: ['tabs-demo-app', 'feed-page', 'friends-page', 'settings-page'] }
 ];
 
 
