@@ -43,7 +43,7 @@ export class Tabs {
       <div class="tabbar" role="tablist">
         {tabs.map(tab => {
         return (
-          <ion-tab-button role="tab" tab={tab} onClick={this.handleTabButtonClick.bind(this, tab)}></ion-tab-button>
+          <ion-tab-button role="tab" tab={tab} onClick={this.handleTabButtonClick.bind(this, tab)} aria-selected={tab.isSelected}></ion-tab-button>
         )
         })}
       </div>,
