@@ -40,8 +40,6 @@ export class Tabs {
   render() {
     const tabs = this.tabs
 
-    console.log('Tabs rendering', tabs)
-
     return [
       <div class="tabbar" role="tablist">
         {tabs.map(tab => {

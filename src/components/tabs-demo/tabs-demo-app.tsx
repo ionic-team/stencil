@@ -7,8 +7,6 @@ export class TabsDemoApp {
   @State() selectedTab: Number = 0;
 
   render() {
-    console.log('Rendering', this.selectedTab);
-
     return (
       <ion-tabs selectedTab={this.selectedTab}>
         <ion-tab tab-badge="4" tab-badge-style="danger" tab-icon="flash" tab-title="Feed" root="feed-page" isSelected={this.selectedTab == 0} onSelected={() => this.selectedTab = 0}/>

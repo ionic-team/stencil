@@ -22,6 +22,9 @@ export class Tab {
 
   hostData(): VNodeData {
     return {
+      style: {
+        display: !this.isSelected && 'none' || ''
+      },
       class: {
       }
     };
@@ -48,12 +51,6 @@ export class Tab {
 
   render() {
     const RootComponent = this.root;
-
-    const style = {}
-    if(!this.isSelected) {
-      style.display = 'none'
-    }
-
-    return <RootComponent style={style} />
+    return <RootComponent />
   }
 }
