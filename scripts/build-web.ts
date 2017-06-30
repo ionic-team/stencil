@@ -33,7 +33,7 @@ const BUNDLES = [
   { components: ['ion-spinner'] },
   { components: ['ion-tabs', 'ion-tab-bar', 'ion-tab', 'ion-tab-button', 'ion-tab-highlight'] },
   { components: ['ion-toggle'] },
-  { components: ['ion-router', 'ion-route', 'ion-route-link'] },
+  { components: ['stencil-router', 'stencil-route', 'stencil-route-link'] },
   { components: ['fiber-demo', 'fiber-triangle', 'fiber-dot'] },
   { components: ['news-list', 'news-container', 'comments-page', 'comments-list'] },
   { components: ['stencil-site', 'landing-page', 'site-header', 'docs-page', 'demos-page'] },

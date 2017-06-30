@@ -6,7 +6,7 @@ import { Component, h } from '@stencil/core';
   * @description
  */
 @Component({
-  tag: 'ion-router'
+  tag: 'stencil-router'
 })
 export class Router {
   base: string;
@@ -32,7 +32,7 @@ export class Router {
     Ionic.emit(this.$instance, 'ionRouterNavigation', { detail: this.routeMatch });
   }
 
-  ionViewWillLoad() {
+  componentWillLoad() {
     console.log('<ion-router> loaded');
     window.addEventListener('popstate', this.handlePopState.bind(this));
     window.addEventListener('hashchange', this.handleHashChange.bind(this));

@@ -1,0 +1,74 @@
+$colors: (
+  clear: transparent
+);
+
+$fontCDN: 'https://code.ionicframework.com/';
+
+$avenir-font-path: '#{$fontCDN}/avenir-next';
+
+@font-face {
+  font-family: 'Avenir Next';
+  src: local('Avenir Next'),
+       url('#{$avenir-font-path}/bold.woff2') format('woff2'),
+       url('#{$avenir-font-path}/bold.woff') format('woff'),
+       url('#{$avenir-font-path}/bold.ttf') format('ttf'),
+       url('#{$avenir-font-path}/bold.eot?#iefix') format('eot');
+  font-weight: 700;
+  unicode-range: U+000-5FF;
+}
+@font-face {
+  font-family: 'Avenir Next';
+  src: local('Avenir Next'),
+       url('#{$avenir-font-path}/demi.woff2') format('woff2'),
+       url('#{$avenir-font-path}/demi.woff') format('woff'),
+       url('#{$avenir-font-path}/demi.ttf') format('ttf'),
+       url('#{$avenir-font-path}/demi.eot?#iefix') format('eot');
+  font-weight: 600;
+  unicode-range: U+000-5FF;
+}
+@font-face {
+  font-family: 'Avenir Next';
+  src: local('Avenir Next'),
+       url('#{$avenir-font-path}/medium.woff2') format('woff2'),
+       url('#{$avenir-font-path}/medium.woff') format('woff'),
+       url('#{$avenir-font-path}/medium.ttf') format('ttf'),
+       url('#{$avenir-font-path}/medium.eot?#iefix') format('eot');
+  font-weight: 500;
+  unicode-range: U+000-5FF;
+}
+@font-face {
+  font-family: 'Avenir Next';
+  src: local('Avenir Next'),
+       url('#{$avenir-font-path}/regular.woff2') format('woff2'),
+       url('#{$avenir-font-path}/regular.woff') format('woff'),
+       url('#{$avenir-font-path}/regular.ttf') format('ttf'),
+       url('#{$avenir-font-path}/regular.eot?#iefix') format('eot');
+  font-weight: 400;
+  unicode-range: U+000-5FF;
+}
+@font-face {
+  font-family: 'Avenir Next';
+  src: local('Avenir Next'),
+       url('#{$avenir-font-path}/thin.woff2') format('woff2'),
+       url('#{$avenir-font-path}/thin.woff') format('woff'),
+       url('#{$avenir-font-path}/thin.ttf') format('ttf'),
+       url('#{$avenir-font-path}/thin.eot?#iefix') format('eot');
+  font-weight: 300;
+  unicode-range: U+000-5FF;
+}
+@font-face {
+  font-family: 'Avenir Next';
+  src: local('Avenir Next'),
+       url('#{$avenir-font-path}/ultralight.woff2') format('woff2'),
+       url('#{$avenir-font-path}/ultralight.woff') format('woff'),
+       url('#{$avenir-font-path}/ultralight.ttf') format('ttf'),
+       url('#{$avenir-font-path}/ultralight.eot?#iefix') format('eot');
+  font-weight: 200;
+  unicode-range: U+000-5FF;
+}
+
+body {
+  font-family: 'Avenir Next','Helvetica Neue',Helvetica,sans-serif;
+  font-weight: normal;
+  font-size: 14px;
+}

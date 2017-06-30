@@ -1,7 +1,8 @@
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
-  tag: 'stencil-site'
+  tag: 'stencil-site',
+  styleUrl: 'stencil-site.scss'
 })
 export class App {
   constructor() {
@@ -9,19 +10,19 @@ export class App {
   render() {
     return (
       <div class="app">
-        <ion-router id="router" root="/demos/stencil-site/">
+        <stencil-router id="router" root="/demos/stencil-site/">
 
           <site-header />
 
           <div style={{
             margin: '100px 0 0 0'
           }}>
-            <ion-route url="/" router="#router" component="landing-page" />
-            <ion-route url="/docs" router="#router" component="docs-page" />
-            <ion-route url="/demos" router="#router" component="demos-page" />
+            <stencil-route url="/" router="#router" component="landing-page" />
+            <stencil-route url="/docs" router="#router" component="docs-page" />
+            <stencil-route url="/demos" router="#router" component="demos-page" />
           </div>
 
-        </ion-router>
+        </stencil-router>
       </div>
     );
   }

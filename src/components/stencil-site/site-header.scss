@@ -1,5 +1,15 @@
 site-header {
   a {
-    color: #fff;
+    color: #2b2b38;
+  }
+  .logo {
+    height: 32px;
+  }
+  .links {
+    text-align: right;
+    a {
+      vertical-align: middle;
+      margin: 0px 15px;
+    }
   }
 }

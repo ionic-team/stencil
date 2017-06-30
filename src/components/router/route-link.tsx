@@ -6,26 +6,40 @@ import { Component, Prop, h } from '@stencil/core';
   * @description
  */
 @Component({
-  tag: 'ion-route-link'
+  tag: 'stencil-route-link'
 })
 export class RouteLink {
   @Prop() url: string;
+
+  @Prop() custom: boolean = false;
 
   // The instance of the router
   @Prop() router: any;
 
   handleClick(e) {
     console.log('Route link click', e);
-    router.navigateTo(this.url)
+    const router = document.querySelector(this.router);
+    if(!router) {
+      console.warn('<stencil-route-link> wasn\'t passed an instance of the router as the "router" prop!');
+      return;
+    }
+
+    router.navigateTo(this.url);
   }
 
   render() {
-    const router = document.querySelector(this.router);
-    const match = router.match
-    console.log(`  <ion-route-link> Rendering route ${this.url}`, router, match);
-
-    return (
-      <a onClick={this.handleClick.bind(this)}><slot></slot></a>
-    );
+    if(this.custom) {
+      return (
+        <span onClick={this.handleClick.bind(this)}>
+          <slot></slot>
+        </span>
+      );
+    } else {
+      return (
+        <a href="#" onClick={this.handleClick.bind(this)}>
+          <slot></slot>
+        </a>
+      )
+    }
   }
 }

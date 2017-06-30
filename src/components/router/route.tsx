@@ -6,11 +6,9 @@ import { Component, Prop, h } from '@stencil/core';
   * @description
  */
 @Component({
-  tag: 'ion-route'
+  tag: 'stencil-route'
 })
 export class Route {
-  $el: HTMLElement;
-
   @Prop() url: string;
 
   @Prop() component: string;
