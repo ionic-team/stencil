@@ -63,8 +63,9 @@ function getNumber(){};
  * Properties set on the proxy element
  */
 function $el(){};
-function $meta(){};
+function $instance(){};
 function listeners(){};
+function $meta(){};
 function $(){};
 
 
