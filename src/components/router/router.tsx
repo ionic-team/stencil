@@ -22,6 +22,7 @@ export class Router {
 
   @Prop()
   navigateTo(url, data={}) {
+    console.log('navigateTo', url, data);
     window.history.pushState(null, null, url);
     this.routeMatch = {
       url: '/' + url.replace(this.root, '')
