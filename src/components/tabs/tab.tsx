@@ -22,8 +22,7 @@ export class Tab {
   /**
    * @prop {boolean} If true, the tab is selected
    */
-  @Prop() isSelected: Boolean = false;
-
+  @State() isSelected: Boolean = false;
 
   /**
    * @prop {string} The title of the tab button.
@@ -84,7 +83,6 @@ export class Tab {
   }
 
   ionViewDidLoad() {
-    console.log('Tab did load')
     setTimeout(() => {
       Ionic.emit(this, 'ionTabDidLoad', {
         detail: {

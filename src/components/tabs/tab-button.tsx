@@ -1,5 +1,5 @@
 import { Component, h } from '../index';
-
+import { VNodeData } from '../../util/interfaces';
 
 @Component({
   tag: 'ion-tab-button',
@@ -11,6 +11,10 @@ export class TabButton {
   @Prop() tab: Tab;
 
   @Prop() layout: string;
+
+  @Prop() selectedIndex: number;
+
+  @Prop() index: number;
 
   hostData(): VNodeData {
     const tab = this.tab;
@@ -29,6 +33,9 @@ export class TabButton {
     // class.tab-hidden
 
     return {
+      attrs: {
+        'aria-selected': this.selectedIndex == this.index
+      },
       class: {
         'has-title': hasTitle,
         'has-icon': hasIcon,
