@@ -4,6 +4,7 @@ import { Component, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initProxy } from './proxy';
+import { HYDRATED_CSS } from '../../util/constants';
 import { queueUpdate } from './update';
 import { render } from './render';
 
@@ -57,11 +58,6 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
   // the setters are use for change detection and knowing when to re-render
   initProxy(plt, elm, instance, cmpMeta.propsMeta, cmpMeta.statesMeta, cmpMeta.methodsMeta, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
 
-  // cool, let's actually connect the component to the DOM
-  // this largely adds this components styles and determines
-  // if it should use shadow dom or not
-  plt.attachStyles(cmpMeta, elm, instance);
-
   // fire off the user's componentWillLoad method (if one was provided)
   // componentWillLoad only runs ONCE, after instance.$el has been assigned
   // the host element, but BEFORE render() has been called
@@ -94,7 +90,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     instance.componentDidLoad && instance.componentDidLoad();
 
     // add the css class that this element has officially hydrated
-    elm.classList.add('hydrated');
+    elm.classList.add(HYDRATED_CSS);
 
     // ( •_•)
     // ( •_•)>⌐■-■

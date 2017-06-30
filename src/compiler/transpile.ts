@@ -8,6 +8,8 @@ import * as ts from 'typescript';
 
 
 export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<any> {
+  config.logger.debug(`transpile, include: ${config.include}`);
+
   const tsFilePaths = getTsFilePaths(ctx);
 
   ctx.files.forEach(f => {
@@ -22,14 +24,13 @@ export function transpile(config: CompilerConfig, ctx: BuildContext): Promise<an
 
 export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ctx: BuildContext): Promise<any> {
   if (!tsFilePaths.length) {
+    config.logger.debug(`transpile, no files`);
     return Promise.resolve();
   }
 
-  if (config.debug) {
-    tsFilePaths.forEach(tsFileName => {
-      console.log(`compile, transpile: ${tsFileName}`);
-    });
-  }
+  tsFilePaths.forEach(tsFileName => {
+    config.logger.debug(`transpile: ${tsFileName}`);
+  });
 
   const sourcesMap = new Map<string, ts.SourceFile>();
 
@@ -60,7 +61,7 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
       if (fileMeta) {
         return fileMeta.srcText;
       }
-      fileMeta = createFileMeta(config.packages, ctx, filePath, config.packages.fs.readFileSync(filePath, 'utf-8'));
+      fileMeta = createFileMeta(config.sys, ctx, filePath, config.sys.fs.readFileSync(filePath, 'utf-8'));
       fileMeta.recompileOnChange = true;
       return fileMeta.srcText;
     },
@@ -91,7 +92,7 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
 
   const result = program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
-      componentClass(ctx),
+      componentClass(config.logger, ctx),
       removeImports(),
       updateLifecycleMethods()
     ],
@@ -104,7 +105,9 @@ export function transpileFiles(tsFilePaths: string[], config: CompilerConfig, ct
     return Promise.reject(result.diagnostics);
   }
 
-  return writeFiles(config.packages, outputs);
+  config.logger.debug(`transpile, files to write: ${outputs.size}`);
+
+  return writeFiles(config.sys, outputs);
 }
 
 

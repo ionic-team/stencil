@@ -9,7 +9,7 @@ describe('hydrate', () => {
 
   it('should load content in nested named slots', (done) => {
     const registry: ComponentRegistry = {
-      'ion-test': {
+      'ION-TEST': {
         componentModuleMeta: class {
           render() {
             return h('elm-a', 0, [
@@ -56,7 +56,7 @@ describe('hydrate', () => {
 
   it('should load content in nested default slot', (done) => {
     const registry: ComponentRegistry = {
-      'ion-test': {
+      'ION-TEST': {
         componentModuleMeta: class {
           render() {
             return h('elm-a', 0, [
@@ -99,7 +99,7 @@ describe('hydrate', () => {
 
   it('should load one component and assign ssr ids', (done) => {
     const registry: ComponentRegistry = {
-      'ion-test': {
+      'ION-TEST': {
         componentModuleMeta: class {
           render() {
             return h('div', 0);

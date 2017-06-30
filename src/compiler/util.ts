@@ -1,28 +1,28 @@
-import { BuildContext, FileMeta, Packages, Results } from './interfaces';
+import { BuildContext, FileMeta, Results, StencilSystem } from './interfaces';
 
 
-export function getFileMeta(packages: Packages, ctx: BuildContext, filePath: string): Promise<FileMeta> {
+export function getFileMeta(sys: StencilSystem, ctx: BuildContext, filePath: string): Promise<FileMeta> {
   const fileMeta = ctx.files.get(filePath);
   if (fileMeta) {
     return Promise.resolve(fileMeta);
   }
 
-  return readFile(packages, filePath).then(srcText => {
-    return createFileMeta(packages, ctx, filePath, srcText);
+  return readFile(sys, filePath).then(srcText => {
+    return createFileMeta(sys, ctx, filePath, srcText);
   });
 }
 
 
-export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: string, srcText: string) {
+export function createFileMeta(sys: StencilSystem, ctx: BuildContext, filePath: string, srcText: string) {
   ctx.files = ctx.files || new Map();
 
   let fileMeta = ctx.files.get(filePath);
   if (!fileMeta) {
     fileMeta = {
-      fileName: packages.path.basename(filePath),
+      fileName: sys.path.basename(filePath),
       filePath: filePath,
-      fileExt: packages.path.extname(filePath),
-      srcDir: packages.path.dirname(filePath),
+      fileExt: sys.path.extname(filePath),
+      srcDir: sys.path.dirname(filePath),
       srcText: srcText,
       jsFilePath: null,
       jsText: null,
@@ -48,9 +48,9 @@ export function createFileMeta(packages: Packages, ctx: BuildContext, filePath: 
 }
 
 
-export function readFile(packages: Packages, filePath: string) {
+export function readFile(sys: StencilSystem, filePath: string) {
   return new Promise<string>((resolve, reject) => {
-    packages.fs.readFile(filePath, 'utf-8', (err, data) => {
+    sys.fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         reject(err);
       } else {
@@ -61,9 +61,9 @@ export function readFile(packages: Packages, filePath: string) {
 }
 
 
-export function writeFile(packages: Packages, filePath: string, content: string) {
+export function writeFile(sys: StencilSystem, filePath: string, content: string) {
   return new Promise((resolve, reject) => {
-    packages.fs.writeFile(filePath, content, (err) => {
+    sys.fs.writeFile(filePath, content, (err) => {
       if (err) {
         reject(err);
       } else {
@@ -74,14 +74,14 @@ export function writeFile(packages: Packages, filePath: string, content: string)
 }
 
 
-export function copyFile(packages: Packages, src: string, dest: string) {
-  return readFile(packages, src).then(content => {
-    return writeFile(packages, dest, content);
+export function copyFile(sys: StencilSystem, src: string, dest: string) {
+  return readFile(sys, src).then(content => {
+    return writeFile(sys, dest, content);
   });
 }
 
 
-export function writeFiles(packages: Packages, files: Map<string, string>) {
+export function writeFiles(sys: StencilSystem, files: Map<string, string>) {
   const paths: string[] = [];
 
   files.forEach((content, filePath) => {
@@ -89,11 +89,11 @@ export function writeFiles(packages: Packages, files: Map<string, string>) {
     paths.push(filePath);
   });
 
-  return ensureDirs(packages, paths).then(() => {
+  return ensureDirs(sys, paths).then(() => {
     const promises: Promise<any>[] = [];
 
     files.forEach((content, filePath) => {
-      promises.push(writeFile(packages, filePath, content));
+      promises.push(writeFile(sys, filePath, content));
     });
 
     return Promise.all(promises);
@@ -101,13 +101,31 @@ export function writeFiles(packages: Packages, files: Map<string, string>) {
 }
 
 
-export function ensureDirs(packages: Packages, paths: string[]) {
-  const path = packages.path;
-  const fs = packages.fs;
+export function access(sys: StencilSystem, filePath: string): Promise<boolean> {
+  return new Promise(resolve => {
+    sys.fs.access(filePath, err => {
+      if (err) {
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
+  });
+}
+
+
+export function ensureDir(sys: StencilSystem, filePath: string) {
+  return ensureDirs(sys, [filePath]);
+}
+
+
+export function ensureDirs(sys: StencilSystem, filePaths: string[]) {
+  const path = sys.path;
+  const fs = sys.fs;
 
   let checkDirs: string[] = [];
 
-  paths.forEach(p => {
+  filePaths.forEach(p => {
     const dir = path.dirname(p);
     if (checkDirs.indexOf(dir) === -1) {
       checkDirs.push(dir);
@@ -190,6 +208,11 @@ export function ensureDirs(packages: Packages, paths: string[]) {
 }
 
 
+export function removeFilePath(sys: StencilSystem, path: string) {
+  return sys.fs.remove(path);
+}
+
+
 export function isTsSourceFile(filePath: string) {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
@@ -213,12 +236,11 @@ export function isScssSourceFile(filePath: string) {
 
 
 export function hasCmpClass(sourceText: string, filePath: string) {
-  if (sourceText.indexOf('@Component') === -1) {
+  if (filePath.indexOf('.tsx') === -1) {
     return false;
   }
 
-  if (sourceText.indexOf('@angular/core') > -1) {
-    console.log(`compile, skipping @angular/core component: ${filePath}`);
+  if (sourceText.indexOf('@Component') === -1) {
     return false;
   }
 
@@ -231,4 +253,12 @@ export function logError(results: Results, msg: any) {
   results.errors.push(msg);
 
   return results;
+}
+
+
+export function generateContentHash(sys: StencilSystem, content: string) {
+  return sys.crypto.createHash('sha256')
+                   .update(content)
+                   .digest('hex')
+                   .substr(0, 8);
 }

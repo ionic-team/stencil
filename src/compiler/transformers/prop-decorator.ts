@@ -1,9 +1,9 @@
-import { FileMeta, PropMeta, PropOptions } from '../interfaces';
+import { FileMeta, Logger, PropMeta, PropOptions } from '../interfaces';
 import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
+export function getPropDecoratorMeta(logger: Logger, fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
   fileMeta.cmpMeta.propsMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
@@ -37,7 +37,7 @@ export function getPropDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDecl
               userPropOptions = Object.assign(userPropOptions || {}, new Function(fnStr)());
 
             } catch (e) {
-              console.log(`parse prop options: ${e}`);
+              logger.error(`parse prop options: ${e}`);
             }
           }
         });

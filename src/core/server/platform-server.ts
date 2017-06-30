@@ -1,25 +1,23 @@
 import { assignHostContentSlots } from '../renderer/slot';
-import { attributeChangedCallback } from '../instance/attribute-changed';
-import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomApi, DomControllerApi, GlobalNamespace, HostElement, ListenOptions,
+import { ModuleCallbacks, ComponentMeta, ComponentRegistry, ConfigApi,
+  DomApi, DomControllerApi, ProjectNamespace, HostElement, ListenOptions,
   PlatformApi, StencilSystem } from '../../util/interfaces';
-import { BUNDLE_ID, STYLES } from '../../util/constants';
 import { createRenderer } from '../renderer/patch';
 import { generateGlobalContext } from './global-context';
 import { getMode } from '../platform/mode';
 import { h, t } from '../renderer/h';
 import { initGlobal } from './global-server';
-import { isString } from '../../util/helpers';
 import { parseComponentMeta } from '../../util/data-parse';
 
 
-export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
+export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
-  const loadedBundles: {[bundleId: string]: boolean} = {};
-  const bundleCallbacks: BundleCallbacks = {};
-  const activeFileReads: {[url: string]: boolean} = {};
-  const css: {[componentTag: string]: string} = {};
+  const moduleCallbacks: ModuleCallbacks = {};
+  const loadedModules: {[moduleId: string]: boolean} = {};
+  const pendingModuleFileReads: {[url: string]: boolean} = {};
+  const pendingStyleFileReads: {[url: string]: boolean} = {};
+  const styles: {[styleId: string]: string} = {};
 
 
   const plt: PlatformApi = {
@@ -29,7 +27,6 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     connectHostElement,
     config,
     queue: Gbl.QueueCtrl,
-    attachStyles,
     tmpDisconnected: false,
     isServer: true,
     getEventOptions
@@ -49,53 +46,29 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
   const rootNode = <HostElement>domApi.$documentElement;
   rootNode._activelyLoadingChildren = [];
   rootNode._initLoad = function appLoadedCallback() {
-    plt.onAppLoad && plt.onAppLoad(rootNode, Object.keys(css).sort().map(tag => css[tag]).join(''));
+    // check we've only fully loaded when all of the styles have loaded also
+    if (plt.onAppLoad && Object.keys(pendingStyleFileReads).length === 0) {
+      rootNode._hasLoaded = true;
+
+      plt.onAppLoad(rootNode, Object.keys(styles).map(styleId => styles[styleId]).join(''));
+    }
   };
-
-
-  function attachStyles(cmpMeta: ComponentMeta, elm: any, instance: Component) {
-    cmpMeta.propsMeta.forEach(prop => {
-      attributeChangedCallback(plt, elm, prop.attribName, null, domApi.$getAttribute(elm, prop.attribName));
-    });
-
-    if (cmpMeta.isShadowMeta) {
-      // cannot use shadow dom server side :(
-      return;
-    }
-
-    // look up which component mode this instance should use
-    // if a mode isn't found then check if there's a default
-    const cmpMode = cmpMeta.modesMeta[instance.mode] || cmpMeta.modesMeta.$;
-
-    if (cmpMode && isString(cmpMode[STYLES])) {
-      // this component mode has styles
-      const cmpModeId = `${cmpMeta.tagNameMeta}.${instance.mode}`;
-
-      // this component is not within a parent shadow root
-      // so attach the styles to document.head
-      if (!css[cmpModeId]) {
-        // only attach the styles if we haven't already done so for this host element
-        css[cmpModeId] = cmpMode[STYLES];
-      }
-    }
-  }
-
-  function getComponentMeta(elm: Element) {
-    return registry[elm.tagName];
-  }
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
     assignHostContentSlots(domApi, elm, slotMeta);
   }
 
-  function defineComponent(cmpMeta: ComponentMeta) {
-    const tagName = cmpMeta.tagNameMeta.toUpperCase();
 
-    registry[tagName] = cmpMeta;
+  function getComponentMeta(elm: Element) {
+    return registry[elm.tagName];
+  }
+
+  function defineComponent(cmpMeta: ComponentMeta) {
+    registry[cmpMeta.tagNameMeta] = cmpMeta;
 
     if (cmpMeta.componentModuleMeta) {
       // for unit testing
-      moduleImports[tagName] = cmpMeta.componentModuleMeta;
+      moduleImports[cmpMeta.tagNameMeta] = cmpMeta.componentModuleMeta;
     }
   }
 
@@ -113,16 +86,16 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
     }
 
     // fire off all the callbacks waiting on this bundle to load
-    var callbacks = bundleCallbacks[bundleId];
+    var callbacks = moduleCallbacks[bundleId];
     if (callbacks) {
       for (i = 0; i < callbacks.length; i++) {
         callbacks[i]();
       }
-      delete bundleCallbacks[bundleId];
+      delete moduleCallbacks[bundleId];
     }
 
     // remember that we've already loaded this bundle
-    loadedBundles[bundleId] = true;
+    loadedModules[bundleId] = true;
   };
 
 
@@ -134,45 +107,73 @@ export function createPlatformServer(sys: StencilSystem, Gbl: GlobalNamespace, w
       return;
     }
 
-    const cmpMode = cmpMeta.modesMeta[getMode(domApi, config, elm)] || cmpMeta.modesMeta.$;
-    const bundleId = cmpMode[BUNDLE_ID];
+    const moduleId = cmpMeta.moduleId;
 
-    if (loadedBundles[bundleId]) {
-      // sweet, we've already loaded this bundle
+    if (loadedModules[moduleId]) {
+      // sweet, we've already loaded this module
       cb();
 
     } else {
-      // never seen this bundle before, let's start the request
+      // never seen this module before, let's start loading the file
       // and add it to the bundle callbacks to fire when it's loaded
-      if (bundleCallbacks[bundleId]) {
-        bundleCallbacks[bundleId].push(cb);
+      if (moduleCallbacks[moduleId]) {
+        moduleCallbacks[moduleId].push(cb);
       } else {
-        bundleCallbacks[bundleId] = [cb];
+        moduleCallbacks[moduleId] = [cb];
       }
 
-      // create the filePath we'll be reading
-      const filePath = sys.path.join(Gbl.staticDir, `bundles`, `ionic.${bundleId}.js`);
+      // create the module filePath we'll be reading
+      const moduleFilePath = sys.path.join(Gbl.staticDir, `bundles`, `${moduleId}.js`);
 
-      if (!activeFileReads[filePath]) {
+      if (!pendingModuleFileReads[moduleFilePath]) {
         // not already actively reading this file
-        // let's kick off the request
-
         // remember that we're now actively requesting this url
-        activeFileReads[filePath] = true;
+        pendingModuleFileReads[moduleFilePath] = true;
 
-        sys.fs.readFile(filePath, 'utf-8', (err, code) => {
+        // let's kick off reading the module
+        sys.fs.readFile(moduleFilePath, 'utf-8', (err, code) => {
+          delete pendingModuleFileReads[moduleFilePath];
+
           if (err) {
-            console.error(`loadBundle: ${bundleId}, ${err}`);
+            console.error(`loadBundle, module read: ${moduleFilePath}, ${err}`);
             throw err;
 
           } else {
             // run the code in this sandboxed context
             sys.vm.runInContext(code, context, { timeout: 5000 });
           }
-
-          delete activeFileReads[filePath];
         });
+      }
 
+      // we also need to load this component's css file
+      const styleId = cmpMeta.styleIds[getMode(domApi, config, elm)] || cmpMeta.styleIds.$;
+      if (styleId && !styles[styleId]) {
+        // this style hasn't been added to our collection yet
+
+        // create the style filePath we'll be reading
+        const styleFilePath = sys.path.join(Gbl.staticDir, `bundles`, `${styleId}.js`);
+
+        if (!pendingStyleFileReads[styleFilePath]) {
+          // we're not already actively opening this file
+          pendingStyleFileReads[styleFilePath] = true;
+
+          sys.fs.readFile(styleFilePath, 'utf-8', (err, styleContent) => {
+            delete pendingStyleFileReads[styleFilePath];
+
+            if (err) {
+              console.error(`loadBundle, style read: ${styleFilePath}, ${err}`);
+
+            } else {
+              // finished reading the css file
+              // let's add the content to our collection
+              styles[styleId] = styleContent;
+
+              // check if the entire app is done loading or not
+              // and if this was the last thing the app was waiting on
+              rootNode._initLoad();
+            }
+          });
+        }
       }
     }
   }

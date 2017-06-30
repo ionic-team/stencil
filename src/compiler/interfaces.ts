@@ -1,5 +1,5 @@
 export * from '../util/interfaces';
-import { Bundle, ComponentMeta } from '../util/interfaces';
+import { ComponentMeta, Manifest, Bundle, Logger, StencilSystem } from '../util/interfaces';
 
 
 export interface CompilerConfig {
@@ -7,17 +7,18 @@ export interface CompilerConfig {
     declaration?: boolean;
     lib?: string[];
     module?: 'es2015' | 'commonjs';
+    rootDir?: string;
     outDir?: string;
     sourceMap?: boolean;
     target?: 'es5' | 'es2015';
   };
   include: string[];
   exclude?: string[];
-  devMode?: boolean;
-  debug?: boolean;
-  bundles?: ManifestBundle[];
-  packages: Packages;
-  watch?: boolean;
+  isDevMode?: boolean;
+  bundles?: Bundle[];
+  sys: StencilSystem;
+  logger: Logger;
+  isWatch?: boolean;
 }
 
 
@@ -26,11 +27,12 @@ export interface BundlerConfig {
   srcDir: string;
   destDir: string;
   devMode?: boolean;
-  packages: Packages;
-  debug?: boolean;
+  logger: Logger;
+  sys: StencilSystem;
   attachRegistryTo?: 'core'|'loader';
-  watch?: boolean;
+  isWatch?: boolean;
   attrCase?: number;
+  manifest: Manifest;
 }
 
 
@@ -57,11 +59,21 @@ export interface FileMeta {
 export interface BuildContext {
   files?: Map<string, FileMeta>;
   results?: Results;
-  bundles?: Bundle[];
-  bundledJsModules?: {[id: string]: string};
 
   isCompilerWatchInitialized?: boolean;
   isBundlerWatchInitialized?: boolean;
+}
+
+
+export interface StylesResults {
+  [bundleId: string]: {
+    [modeName: string]: string;
+  };
+}
+
+
+export interface ModuleResults {
+  [bundleId: string]: string;
 }
 
 
@@ -71,68 +83,4 @@ export interface Results {
   manifest?: Manifest;
   manifestPath?: string;
   componentRegistry?: string;
-}
-
-
-export interface Manifest {
-  components?: ComponentMeta[];
-  bundles?: ManifestBundle[];
-}
-
-
-export interface ManifestBundle {
-  components: string[];
-}
-
-
-export interface Packages {
-  path?: {
-    basename(p: string, ext?: string): string;
-    dirname(p: string): string;
-    extname(p: string): string;
-    join(...paths: string[]): string;
-    sep: string;
-  };
-  fs?: {
-    access(path: string | Buffer, callback: (err: any) => void): void;
-    mkdir(path: string | Buffer, callback?: (err?: any) => void): void;
-    readdir(path: string | Buffer, callback?: (err: any, files: string[]) => void): void;
-    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
-    readFileSync(filename: string, encoding: string): string;
-    stat(path: string | Buffer, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
-    writeFile(filename: string, data: any, callback?: (err: any) => void): void;
-  };
-  typescript?: any;
-  nodeSass?: {
-    render: Function;
-  };
-  rollup?: {
-    rollup: Rollup;
-  };
-  uglify?: {
-    minify: {(content: string, opts: any): {code: string}};
-  };
-}
-
-
-export interface Rollup {
-  (config: {
-    entry: string;
-    plugins?: any[];
-    treeshake?: boolean;
-  } ): Promise<{
-    generate: {(config: {
-      format?: string;
-      banner?: string;
-      footer?: string;
-      exports?: string;
-      external?: string[];
-      globals?: {[key: string]: any};
-      moduleName?: string;
-      plugins?: any;
-    }): {
-      code: string;
-      map: any;
-    }}
-  }>;
 }

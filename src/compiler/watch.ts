@@ -5,7 +5,7 @@ import * as ts from 'typescript';
 
 
 export function setupCompilerWatch(config: CompilerConfig, ctx: BuildContext, tsSys: ts.System) {
-  if (!config.watch || ctx.isCompilerWatchInitialized) return;
+  if (!config.isWatch || ctx.isCompilerWatchInitialized) return;
   ctx.isCompilerWatchInitialized = true;
 
   const changedFiles: string[] = [];
@@ -18,16 +18,12 @@ export function setupCompilerWatch(config: CompilerConfig, ctx: BuildContext, ts
 
     const wasDeleted = ctx.files.delete(changedFile);
 
-    if (config.debug) {
-      console.log(`${changedFile} was ${wasDeleted ? 'removed from cache' : 'not found in the cache'}`);
-    }
+    config.logger.debug(`${changedFile} was ${wasDeleted ? 'removed from cache' : 'not found in the cache'}`);
 
     clearTimeout(timerId);
 
     timerId = setTimeout(() => {
-      if (config.debug) {
-        console.log(`recompile`);
-      }
+      config.logger.debug(`recompile`);
 
       compileWatch(config, ctx, changedFiles.slice());
 
@@ -36,9 +32,8 @@ export function setupCompilerWatch(config: CompilerConfig, ctx: BuildContext, ts
   }
 
   config.include.forEach(includePath => {
-    if (config.debug) {
-      console.log(`compile, watching directory: ${includePath}`);
-    }
+    config.logger.debug(`compile, watching directory: ${includePath}`);
+
     tsSys.watchDirectory(includePath === '' ? '.' : includePath, (changedFile: string) => {
       compilerFileChanged(config, ctx, changedFile);
     }, true);
@@ -55,15 +50,14 @@ export function setupCompilerWatch(config: CompilerConfig, ctx: BuildContext, ts
 
 
 export function setupBundlerWatch(config: BundlerConfig, ctx: BuildContext, tsSys: ts.System) {
-  if (!config.watch || ctx.isBundlerWatchInitialized) return;
+  if (!config.isWatch || ctx.isBundlerWatchInitialized) return;
+
   ctx.isBundlerWatchInitialized = true;
 
-  if (config.debug) {
-    console.log(`bundle, watching directory: ${config.srcDir}`);
-  }
+  config.logger.debug(`bundle, watching directory: ${config.srcDir}`);
 
   const changedFiles: string[] = [];
-  let timerId: NodeJS.Timer;
+  let timerId: any;
 
   function bundlerFileChanged(config: BundlerConfig, ctx: BuildContext, changedFile: string) {
     if (changedFiles.indexOf(changedFile) === -1) {
@@ -73,9 +67,8 @@ export function setupBundlerWatch(config: BundlerConfig, ctx: BuildContext, tsSy
     clearTimeout(timerId);
 
     timerId = setTimeout(() => {
-      if (config.debug) {
-        console.log(`rebundle`);
-      }
+      config.logger.debug(`rebundle`);
+
       bundleWatch(config, ctx, changedFiles.slice());
 
       changedFiles.length = 0;

@@ -1,4 +1,4 @@
-import { BuildContext, FileMeta } from '../interfaces';
+import { BuildContext, FileMeta, Logger } from '../interfaces';
 import { getComponentDecoratorData } from './component-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';
@@ -8,12 +8,12 @@ import { getStateDecoratorMeta } from './state-decorator';
 import * as ts from 'typescript';
 
 
-export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {
+export function componentClass(logger: Logger, ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
     function visitClass(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-      const cmpMeta = getComponentDecoratorData(classNode);
+      const cmpMeta = getComponentDecoratorData(logger, classNode);
 
       if (cmpMeta) {
         if (fileMeta.cmpMeta) {
@@ -26,8 +26,8 @@ export function componentClass(ctx: BuildContext): ts.TransformerFactory<ts.Sour
 
         getMethodDecoratorMeta(fileMeta, classNode);
         getStateDecoratorMeta(fileMeta, classNode);
-        getPropDecoratorMeta(fileMeta, classNode);
-        getListenDecoratorMeta(fileMeta, classNode);
+        getPropDecoratorMeta(logger, fileMeta, classNode);
+        getListenDecoratorMeta(logger, fileMeta, classNode);
         getPropChangeDecoratorMeta(fileMeta, classNode);
 
         return removeClassDecorator(classNode);

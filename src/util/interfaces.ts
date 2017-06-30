@@ -28,10 +28,10 @@ export interface IonicControllerApi {
 }
 
 
-export interface GlobalNamespace {
+export interface ProjectNamespace {
   staticDir?: string;
-  components?: LoadComponentMeta[];
-  defineComponents?: (coreVersion: number, bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
+  components?: LoadComponentRegistry[];
+  defineComponents?: (coreVersion: number, moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
   eventNameFn?: (eventName: string) => string;
   config?: Object;
   loadController?: (ctrlName: string, ctrl: any) => any;
@@ -40,6 +40,7 @@ export interface GlobalNamespace {
   DomCtrl?: DomControllerApi;
   QueueCtrl?: QueueApi;
   Animation?: any;
+  ns?: string;
 }
 
 
@@ -273,33 +274,23 @@ export interface DomControllerCallback {
 }
 
 
-export interface LoadComponentMeta {
+export interface LoadComponentRegistry {
   /**
    * tag name (ion-badge)
    */
   [0]: string;
 
   /**
-   * map of the modes and bundle ids
+   * module id
    */
-  [1]: {
-    [modeName: string]: {
-      /**
-       * bundleId
-       */
-      [0]: string;
-
-      /**
-       * styles
-       */
-      [1]: string;
-    }
-  };
+  [1]: string;
 
   /**
-   * props
+   * map of the mode styles and css bundle ids
    */
-  [2]: any[];
+  [2]: {
+    [modeName: string]: string
+  };
 
   /**
    * slot
@@ -307,58 +298,77 @@ export interface LoadComponentMeta {
   [3]: number;
 
   /**
+   * props
+   */
+  [4]: {
+    /**
+     * prop name
+     */
+    [0]: string;
+
+    /**
+     * attrib case
+     */
+    [1]: number;
+
+    /**
+     * prop type
+     */
+    [2]: number;
+
+    /**
+     * is stateful
+     */
+    [3]: number;
+  }[];
+
+  /**
+   * load priority
+   */
+  [5]: number;
+}
+
+
+export interface LoadComponentMeta {
+  /**
+   * tag name (ION-BADGE)
+   */
+  [0]: string;
+
+  /**
    * host
    */
-  [4]: any;
+  [1]: any;
 
   /**
    * listeners
    */
-  [5]: ComponentListenersData[];
+  [2]: ComponentListenersData[];
 
   /**
    * states
    */
-  [6]: StateMeta[];
+  [3]: StateMeta[];
 
   /**
    * prop WILL change
    */
-  [7]: PropChangeMeta[];
+  [4]: PropChangeMeta[];
 
   /**
    * prop DID change
    */
-  [8]: PropChangeMeta[];
+  [5]: PropChangeMeta[];
 
   /**
    * methods
    */
-  [9]: MethodMeta[];
+  [6]: MethodMeta[];
 
   /**
    * shadow
    */
-  [10]: boolean;
-}
-
-
-export interface Bundle {
-  id?: string;
-  components?: ComponentMeta[];
-  modeName?: string;
-  bundledJsModules?: string;
-  content?: string;
-  fileName?: string;
-  filePath?: string;
-}
-
-
-export interface FormatComponentDataOptions {
-  defaultAttrCase?: number;
-  minimumData?: boolean;
-  onlyIncludeModeName?: string;
-  includeStyles?: boolean;
+  [7]: boolean;
 }
 
 
@@ -403,6 +413,45 @@ export interface PropChangeMeta {
 }
 
 
+export interface Manifest {
+  components?: ComponentMeta[];
+  bundles?: Bundle[];
+}
+
+
+export interface Bundle {
+  components: string[];
+  priority?: string;
+}
+
+export type Collection = string;
+
+
+export interface BuildConfig {
+  sys: StencilSystem;
+  logger: Logger;
+  rootDir: string;
+  compiledDir: string;
+  namespace: string;
+  srcDir: string;
+  destDir: string;
+  bundles: Bundle[];
+  collections: Collection[];
+  isDevMode: boolean;
+  isWatch: boolean;
+  preamble: string;
+}
+
+
+export interface Logger {
+  debug(msg: string): void;
+  info(msg: string): void;
+  ok(msg: string): void;
+  warn(msg: string): void;
+  error(msg: string): void;
+}
+
+
 export interface ModulesImporterFn {
   (importer: any, h: Function, t: Function, Ionic: Ionic): void;
 }
@@ -421,6 +470,7 @@ export interface ComponentOptions {
   shadow?: boolean;
   host?: HostMeta;
 }
+
 
 export interface ModeStyles {
   [modeName: string]: string | string[];
@@ -472,7 +522,7 @@ export interface ListenOptions {
 
 
 export interface ListenMeta {
-  eventMethod?: string;
+  eventMethodName?: string;
   eventName?: string;
   eventCapture?: boolean;
   eventPassive?: boolean;
@@ -513,49 +563,34 @@ export interface ConfigApi {
 export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
+  moduleId?: string;
+  styleIds?: {[modeName: string]: string };
+  styleMeta?: StyleMeta;
   methodsMeta?: MethodMeta[];
   propsMeta?: PropMeta[];
   listenersMeta?: ListenMeta[];
   propWillChangeMeta?: PropChangeMeta[];
   propDidChangeMeta?: PropChangeMeta[];
   statesMeta?: StateMeta[];
-  modesMeta?: ModesMeta;
-  modesStyleMeta?: ModesStyleMeta;
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;
   slotMeta?: number;
+  loadPriority?: number;
   componentModuleMeta?: any;
   componentClass?: string;
   componentUrl?: string;
 }
 
 
-export interface ModesMeta {
-  [modeName: string]: ModeMeta;
-}
-
-
-export interface ModesStyleMeta {
+export interface StyleMeta {
   [modeName: string]: ModeStyleMeta;
 }
 
 
 export interface ModeStyleMeta {
   styleUrls?: string[];
-  styles?: string[];
-}
-
-
-export interface ModeMeta {
-  /**
-   * bundleId
-   */
-  [0]?: string;
-
-  /**
-   * styles
-   */
-  [1]?: string;
+  styleStr?: string;
+  styleId?: string;
 }
 
 
@@ -782,7 +817,7 @@ export interface VNodeProdData {
 
 
 export interface PlatformApi {
-  registerComponents?: (components?: LoadComponentMeta[]) => ComponentMeta[];
+  registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
   loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
@@ -791,8 +826,7 @@ export interface PlatformApi {
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
   isServer?: boolean;
-  attachStyles: (cmpMeta: ComponentMeta, elm: HostElement, instance: Component) => void;
-  onAppLoad?: (rootElm: HostElement, css: string) => void;
+  onAppLoad?: (rootElm: HostElement, styles: string) => void;
   getEventOptions: (opts?: ListenOptions) => any;
   tmpDisconnected?: boolean;
 }
@@ -897,32 +931,109 @@ export interface IdleOptions {
 }
 
 
-export interface BundleCallbacks {
-  [bundleId: string]: Function[];
+export interface ModuleCallbacks {
+  [moduleId: string]: Function[];
+}
+
+
+export interface StencilConfig {
+  namespace?: string;
+  src?: string;
+  dest?: string;
+  bundles?: Bundle[];
+  collections?: Collection[];
+  preamble?: string;
 }
 
 
 export interface StencilSystem {
-  fs?: {
-    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
-    readFileSync(filename: string, encoding: string): string;
-    readdirSync(path: string, options?: string | {}): string[];
-    statSync(path: string): {
-      isFile(): boolean;
-      isDirectory(): boolean;
+  createDom?(): {
+    parse(hydrateOptions: HydrateOptions): Window;
+    serialize(): string;
+  };
+  crypto?: {
+    createHash(algorithm: string): {
+      update(data: string): any;
+      digest(encoding: string): string;
     };
   };
+  fs?: {
+    access(path: string, callback: (err: any) => void): void;
+    mkdir(path: string, callback?: (err?: any) => void): void;
+    readdir(path: string, callback?: (err: any, files: string[]) => void): void;
+    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
+    readFileSync(filename: string, encoding: string): string;
+    stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
+    writeFile(filename: string, data: any, callback?: (err: any) => void): void;
+    remove(path: string): Promise<void>;
+  };
+  getClientCoreFile?(opts: {staticName: string, es5?: boolean, devMode: boolean}): Promise<string>;
+  module?: {
+    _nodeModulePaths(fromDir: string): any;
+    _resolveFilename(moduleId: string, opts: any): any;
+  };
   path?: {
+    basename(p: string, ext?: string): string;
+    dirname(p: string): string;
+    extname(p: string): string;
     join(...paths: string[]): string;
+    relative(from: string, to: string): string;
+    resolve(...pathSegments: any[]): string;
+    sep: string;
+  };
+  rollup?: {
+    rollup: {
+      (config: { entry: string; plugins?: any[]; treeshake?: boolean; onwarn?: Function; }): Promise<{
+        generate: {(config: {
+          format?: string;
+          banner?: string;
+          footer?: string;
+          exports?: string;
+          external?: string[];
+          globals?: {[key: string]: any};
+          moduleName?: string;
+          plugins?: any;
+        }): {
+          code: string;
+          map: any;
+        }}
+      }>;
+    };
+    plugins: { [pluginName: string]: any };
+  };
+  sass?: {
+    render(
+      config: {file: string, outputStyle?: string},
+      cb: (err: any, result: {css: string; stats: any}) => void
+    ): void;
+  };
+  typescript?: any;
+  uglify?: {
+    minify: {(content: string, opts?: {}): {
+      code: string;
+      error: {
+       message: string;
+       filename: string;
+       line: number;
+       col: number;
+       pos: number;
+      };
+    }};
   };
   vm?: {
     createContext(sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
-  createDom?(): {
-    parse(hydrateOptions: HydrateOptions): Window;
-    serialize(): string;
-  };
+}
+
+
+export interface TaskOptions {
+  rootDir: string;
+  sys: StencilSystem;
+  logger: Logger;
+  stencilConfig: StencilConfig;
+  isDevMode: boolean;
+  isWatch: boolean;
 }
 
 

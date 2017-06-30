@@ -12,7 +12,7 @@ export function attachListeners(plt: PlatformApi, listeners: ListenMeta[], elm: 
           plt,
           elm,
           listener.eventName,
-          (<any>instance)[listener.eventMethod].bind(instance),
+          (<any>instance)[listener.eventMethodName].bind(instance),
           listener
         );
       }
@@ -35,7 +35,7 @@ export function enableListener(plt: PlatformApi, elm: HostElement, instance: Com
 
           if (shouldEnable && !deregisterFns[eventName]) {
             var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(plt, instance.$el, attachToEventName, (<any>instance)[listener.eventMethod].bind(instance), listener);
+            deregisterFns[eventName] = addEventListener(plt, instance.$el, attachToEventName, (<any>instance)[listener.eventMethodName].bind(instance), listener);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();

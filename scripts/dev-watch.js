@@ -1,10 +1,10 @@
-import * as ts from 'typescript';
-import * as fs from 'fs-extra';
-import * as path from 'path';
-import * as childProcess from 'child_process';
+const ts = require('typescript');
+const fs = require('fs-extra');
+const path = require('path');
+const childProcess = require('child_process');
 
 
-const SRC_ROOT = path.join(__dirname, '../../src');
+const SRC_ROOT = path.join(__dirname, '../src');
 
 
 function watchCompiler() {
@@ -17,40 +17,34 @@ function watchCompiler() {
 }
 
 
-function watchWeb() {
+function watchCore() {
   [
-    'bindings/web/src',
-    'core/client',
-    'core/instance',
-    'core/platform',
-    'core/renderer',
-    'core/server',
-    'components',
-    'polyfills',
+    'bindings',
+    'core',
     'util'
   ].forEach(dir => {
 
     watchDirectory(path.join(SRC_ROOT, dir), changedFile => {
-      console.log(`watch: ${changedFile}`);
-      runScript(`build.web`, ['--', 'dev']);
+      console.log(`watch core: ${changedFile}`);
+      runScript(`build.core`, ['--', 'dev']);
     });
 
   });
 }
 
 
-function watchDirectory(dirPath: string, onFileChange: ts.FileWatcherCallback) {
-  let timer: NodeJS.Timer;
+function watchDirectory(dirPath, onFileChange) {
+  let timer;
 
-  function queueCallback(changedFile: string) {
+  function queueCallback(changedFile) {
     clearTimeout(timer);
 
     timer = setTimeout(() => {
       onFileChange(changedFile);
-    }, 300);
+    }, 250);
   }
 
-  function recursiveReadDir(dirPath: string) {
+  function recursiveReadDir(dirPath) {
     if (dirPath === 'test') return;
 
     fs.readdirSync(dirPath).forEach(name => {
@@ -71,10 +65,10 @@ function watchDirectory(dirPath: string, onFileChange: ts.FileWatcherCallback) {
 }
 
 
-function runScript(scriptName: string, args: string[]) {
+function runScript(scriptName, args) {
   console.log(`run ${scriptName}`);
 
-  const p = childProcess.spawn('npm', ['run', scriptName].concat(args), { cwd: path.join(__dirname, '../..') });
+  const p = childProcess.spawn('npm', ['run', scriptName].concat(args), { cwd: path.join(__dirname, '../') });
 
   p.stdout.on('data', (data) => {
     console.log(data.toString().trim());
@@ -94,9 +88,9 @@ function runScript(scriptName: string, args: string[]) {
 
 // kick off first builds
 runScript(`build.compiler`, []);
-runScript(`build.web`, ['--', 'dev']);
+runScript(`build.core`, ['--', 'dev']);
 
 
 // keep watching for changes
 watchCompiler();
-watchWeb();
+watchCore();

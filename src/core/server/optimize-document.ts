@@ -1,20 +1,18 @@
+import { COMMENT_NODE, TEXT_NODE } from '../../util/constants';
 import { HydrateOptions } from '../../util/interfaces';
 import { removeUnusedCss } from '../css/remove-unused-css';
-import { COMMENT_NODE, TEXT_NODE } from '../../util/constants';
 
 
-export function optimizeDocument(doc: Document, css: string, opts: HydrateOptions) {
-
-  if (css !== null && css.length > 0) {
+export function optimizeDocument(doc: Document, styles: string, opts: HydrateOptions) {
+  if (styles !== null && styles.length > 0) {
     const styleElm = doc.createElement('style');
-    styleElm.innerHTML = opts.removeUnusedCss !== false ? removeUnusedCss(doc.documentElement, css) : css;
+    styleElm.innerHTML = opts.removeUnusedCss !== false ? removeUnusedCss(doc.documentElement, styles) : styles;
     doc.head.insertBefore(styleElm, doc.head.firstChild);
   }
 
   if (opts.reduceHtmlWhitepace !== false) {
     reduceHtmlWhitepace(doc.body);
   }
-
 }
 
 

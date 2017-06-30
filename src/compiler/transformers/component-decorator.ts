@@ -1,9 +1,9 @@
-import { ComponentMeta, ComponentOptions } from '../interfaces';
-import { normalizeStyles, normalizeStyleUrl, normalizeStyleUrls } from './mode-styles';
+import { ComponentMeta, ComponentOptions, Logger } from '../interfaces';
+import { normalizeStyles } from './normalize-styles';
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorData(classNode: ts.ClassDeclaration) {
+export function getComponentDecoratorData(logger: Logger, classNode: ts.ClassDeclaration) {
   let metaData: ComponentMeta = null;
 
   if (!classNode.decorators) {
@@ -22,7 +22,7 @@ export function getComponentDecoratorData(classNode: ts.ClassDeclaration) {
           isComponent = true;
 
         } else if (isComponent) {
-          metaData = parseComponentMetaData(componentChild.getText());
+          metaData = parseComponentMetaData(logger, componentChild.getText());
         }
 
       });
@@ -34,7 +34,7 @@ export function getComponentDecoratorData(classNode: ts.ClassDeclaration) {
 }
 
 
-function parseComponentMetaData(text: string): ComponentMeta {
+function parseComponentMetaData(logger: Logger, text: string): ComponentMeta {
   try {
     const fnStr = `return ${text};`;
 
@@ -44,29 +44,25 @@ function parseComponentMetaData(text: string): ComponentMeta {
     // convert user component options from user into component meta
     const cmpMeta: ComponentMeta = {};
 
-    normalizeTag(userOpts, cmpMeta, text);
+    normalizeTag(logger, userOpts, cmpMeta, text);
     normalizeStyles(userOpts, cmpMeta);
-    normalizeStyleUrl(userOpts, cmpMeta);
-    normalizeStyleUrls(userOpts, cmpMeta);
-    normalizeModes(cmpMeta);
     normalizeShadow(userOpts, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
 
     return cmpMeta;
 
   } catch (e) {
-    console.log(`parseComponentMetaData: ${e}`);
-    e.stack && console.error(e.stack);
-    console.log(text);
+    logger.error(`parseComponentMetaData: ${e}`);
+    logger.error(text);
   }
   return null;
 }
 
 
-function normalizeTag(userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
+function normalizeTag(logger: Logger, userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
 
   if ((<any>userOpts).selector) {
-    console.log(`Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`);
+    logger.error(`Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`);
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
 
@@ -105,33 +101,6 @@ function normalizeTag(userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgTex
 
   if (cmpMeta.tagNameMeta.lastIndexOf('-') === cmpMeta.tagNameMeta.length - 1) {
     throw `"${cmpMeta.tagNameMeta}" tag cannot end with a dash (-)`;
-  }
-}
-
-
-function normalizeModes(cmpMeta: ComponentMeta) {
-  cmpMeta.modesMeta = {};
-
-  if (cmpMeta.modesStyleMeta) {
-    Object.keys(cmpMeta.modesStyleMeta).forEach(modeName => {
-      cmpMeta.modesMeta[modeName] = new Array(2);
-    });
-  }
-
-  const modeNames = Object.keys(cmpMeta.modesMeta).sort();
-
-  if (modeNames.length === 0) {
-    // always set a default, even if there's nothing
-    cmpMeta.modesMeta.$ = [];
-
-  } else {
-    // normalize mode name sorting
-    const modes = Object.assign({}, cmpMeta.modesMeta);
-    cmpMeta.modesMeta = {};
-
-    modeNames.forEach(modeName => {
-      cmpMeta.modesMeta[modeName] = modes[modeName];
-    });
   }
 }
 

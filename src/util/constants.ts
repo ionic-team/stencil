@@ -9,13 +9,6 @@
 
 
 /**
- * Mode Meta Indexes
- */
-export const BUNDLE_ID = 0;
-export const STYLES = 1;
-
-
-/**
  * Prop Change Meta Indexes
  */
 export const PROP_CHANGE_PROP_NAME = 0;
@@ -33,8 +26,8 @@ export const TYPE_NUMBER = 2;
 /**
  * JS Property to Attribute Name Options
  */
-export const ATTR_DASH_CASE = 1;
-export const ATTR_LOWER_CASE = 2;
+export const ATTR_DASH_CASE = 0;
+export const ATTR_LOWER_CASE = 1;
 
 
 /**
@@ -77,6 +70,19 @@ export const KEY_CODE_MAP: {[key: string]: number} = {
   'space': 32,
   'tab': 9
 };
+
+
+/**
+ * CSS class that gets added to the host element
+ * after the component has fully hydrated
+ */
+export const HYDRATED_CSS = 'hydrated';
+
+
+/**
+ * Bundle directory name
+ */
+export const BUNDLES_DIR = 'bundles';
 
 
 /**

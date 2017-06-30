@@ -1,8 +1,8 @@
-import { FileMeta, ListenMeta } from '../interfaces';
+import { FileMeta, ListenMeta, Logger } from '../interfaces';
 import * as ts from 'typescript';
 
 
-export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
+export function getListenDecoratorMeta(logger: Logger, fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
   fileMeta.cmpMeta.listenersMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
@@ -33,7 +33,7 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
               Object.assign(rawListenMeta, new Function(fnStr)());
 
             } catch (e) {
-              console.log(`parse listener options: ${e}`);
+              logger.error(`parse listener options: ${e}`);
             }
           }
         });
@@ -57,8 +57,8 @@ export function getListenDecoratorMeta(fileMeta: FileMeta, classNode: ts.ClassDe
   fileMeta.cmpMeta.listenersMeta = fileMeta.cmpMeta.listenersMeta.sort((a, b) => {
     if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
     if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
-    if (a.eventMethod.toLowerCase() < b.eventMethod.toLowerCase()) return -1;
-    if (a.eventMethod.toLowerCase() > b.eventMethod.toLowerCase()) return 1;
+    if (a.eventMethodName.toLowerCase() < b.eventMethodName.toLowerCase()) return -1;
+    if (a.eventMethodName.toLowerCase() > b.eventMethodName.toLowerCase()) return 1;
     return 0;
   });
 }
@@ -95,7 +95,7 @@ function validateListener(fileMeta: FileMeta, eventName: string, rawListenMeta: 
   const listener: ListenMeta = Object.assign({}, rawListenMeta);
 
   listener.eventName = eventName;
-  listener.eventMethod = methodName;
+  listener.eventMethodName = methodName;
 
   if (listener.eventCapture === undefined) {
     // default to not use capture if it wasn't provided

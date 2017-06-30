@@ -1,7 +1,7 @@
-import { GlobalNamespace } from '../../util/interfaces';
+import { ProjectNamespace } from '../../util/interfaces';
 
 
-export function generateGlobalContext(win: any, Gbl: GlobalNamespace): any {
+export function generateGlobalContext(win: any, Gbl: ProjectNamespace): any {
 
   return {
 

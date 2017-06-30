@@ -4,25 +4,119 @@
 
 process.title = 'stencil';
 process.on('unhandledRejection', r => console.error(r));
+process.env.IONIC_CLI_BIN = __filename;
 
+
+var chalk = require('chalk');
 var semver = require('semver');
-var cmd;
+
 
 if (semver.lt(process.version, 'v6.4.0')) {
   console.log('ERR' + ': Your Node.js version is ' + chalk.bold(process.version) + '. Please update to the latest Node 6 LTS version (or latest Node).');
   process.exit(1);
 }
 
-switch(process.argv[2]) {
-case 'build':
-  var cmd = require('../dist/scripts/build.js').run;
-  break;
-case 'collection':
-  var cmd = require('../dist/scripts/collection.js').run;
-  break;
-default:
-  throw 'Command expected for stencil';
+
+var cmdArgs = process.argv;
+var taskName = cmdArgs[2];
+
+try {
+  var npmRunArgs = process.env.npm_config_argv;
+  if (npmRunArgs) {
+    cmdArgs = cmdArgs.concat(JSON.parse(npmRunArgs).original);
+  }
+} catch (e) {}
+
+
+var isDevMode = (cmdArgs.indexOf('--prod') === -1) && (cmdArgs.indexOf('-p') === -1);
+var isWatch = (cmdArgs.indexOf('--watch') > -1) || (cmdArgs.indexOf('-w') > -1);
+var logLevel = cmdArgs.find(a => a.indexOf('--log-level') === 0);
+if (logLevel) {
+  logLevel = logLevel.split('=')[1];
+}
+if (!logLevel) {
+  logLevel = 'info';
 }
 
-process.env.IONIC_CLI_BIN = __filename;
-cmd(process.argv, process.env);
+var stencil = require('../dist/compiler');
+var logger = new stencil.CmdLogger({
+  level: logLevel,
+  stream: process.stdout,
+  columns: process.stdout.columns,
+  chalk: chalk
+});
+
+
+var sys = Object.defineProperties({}, {
+  'crypto': { get: () => require('crypto') },
+  'fs': { get: () => require('fs-extra') },
+  'module': { get: () => require('module') },
+  'path': { get: () => require('path') },
+  'rollup': { get: () => {
+    var rollup = require('rollup')
+    rollup.plugins = {
+      commonjs: require('rollup-plugin-commonjs'),
+      nodeResolve: require('rollup-plugin-node-resolve')
+    };
+    return rollup;
+  } },
+  'sass': { get: () => require('node-sass') },
+  'typescript': { get: () => require('typescript') },
+  'uglify': { get: () => require('uglify-js') },
+});
+
+
+sys.getClientCoreFile = function(opts) {
+  var fileName = opts.staticName;
+
+  if (opts.es5) {
+    fileName += '.es5';
+  }
+  if (opts.devMode) {
+    fileName += '.dev';
+  }
+  fileName += '.js';
+
+  const filePath = sys.path.join(__dirname, '..', 'dist', 'client', fileName);
+
+  logger.debug('getClientCoreFile: ' + filePath)
+
+  return new Promise(function(resolve, reject) {
+    sys.fs.readFile(filePath, 'utf-8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+
+var configFileName = 'stencil.config.js';
+var rootDir = process.cwd();
+var stencilConfig;
+try {
+  var stencilConfigObj = require(sys.path.join(rootDir, configFileName));
+
+  stencilConfig = stencilConfigObj.config;
+
+  if (!stencilConfig) {
+    console.log('Invalid Stencil ' + chalk.bold(configFileName) + ' configuration file');
+    process.exit(1);
+  }
+
+} catch(e) {
+  console.log('Error reading Stencil ' + chalk.bold(configFileName) + ' configuration file');
+  process.exit(1);
+}
+
+
+stencil.run(taskName, {
+  rootDir: rootDir,
+  sys: sys,
+  logger: logger,
+  stencilConfig: stencilConfig,
+  isDevMode: isDevMode,
+  isWatch: isWatch
+});

@@ -10,7 +10,7 @@
 
 
 /**
- * Global window.Ionic
+ * Global window.PROJECT
  * Each binding can provide it's own values to window.Ionic
  */
 function components(){};
@@ -28,6 +28,7 @@ function read(){};
 function staticDir(){};
 function write(){};
 function Animation(){};
+function ns(){};
 
 
 /**
@@ -122,10 +123,3 @@ function observedAttributes(){};
 function requestIdleCallback(){};
 function timeRemaining(){};
 function shadowRoot(){};
-
-
-/**
- * Polyfills
- */
-function ShadyDOM(){};
-function inUse(){};

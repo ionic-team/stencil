@@ -1,9 +1,9 @@
 import { addEventListener, enableListener } from '../instance/events';
-import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, GlobalNamespace,
+import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, ProjectNamespace,
   Ionic, ListenOptions, IonicControllerApi, PlatformApi } from '../../util/interfaces';
 
 
-export function initGlobal(Gbl: GlobalNamespace, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, domCtrl: DomControllerApi): Ionic {
+export function initGlobal(Gbl: ProjectNamespace, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, domCtrl: DomControllerApi): Ionic {
 
   if (typeof win.CustomEvent !== 'function') {
     // CustomEvent polyfill

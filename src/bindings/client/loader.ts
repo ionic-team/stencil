@@ -1,12 +1,13 @@
-import { GlobalNamespace } from '../../../util/interfaces';
+import { LoadComponentRegistry, ProjectNamespace } from '../../util/interfaces';
 
 
-// keep this all ES5!
-(function(window: any, document: HTMLDocument) {
+(function(window: any, document: HTMLDocument, projectNamespace: string, components?: LoadComponentRegistry[]) {
   'use strict';
 
-  // create window.Ionic if it doesn't already exist
-  var ionic: GlobalNamespace = window.Ionic = window.Ionic || {};
+  // create global namespace if it doesn't already exist
+  const Project: ProjectNamespace = window[projectNamespace] = window[projectNamespace] || {};
+  Project.components = Project.components || components;
+  Project.ns = projectNamespace;
 
   // find the static directory, which should be the same as this JS file
   // reusing the "x" and "y" variables for funzies
@@ -15,36 +16,31 @@ import { GlobalNamespace } from '../../../util/interfaces';
 
   var y: any = <HTMLElement>document.querySelector('script[data-static-dir]');
   if (y) {
-    ionic.staticDir = y.dataset['staticDir'];
+    Project.staticDir = y.dataset['staticDir'];
 
   } else {
     y = x.src.split('/');
     y.pop();
-    ionic.staticDir = x.dataset['staticDir'] = y.join('/') + '/';
+    Project.staticDir = x.dataset['staticDir'] = y.join('/') + '/';
   }
 
   // auto hide components until they been fully hydrated
   x = document.createElement('style');
-  x.innerHTML = ionic.components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.hydrated{visibility:inherit}';
+  x.innerHTML = Project.components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.hydrated{visibility:inherit}';
   x.innerHTML += 'ion-app:not(.hydrated){display:none}';
   document.head.appendChild(x);
 
-  // build up a path for the exact ionic core javascript file this browser needs
+  // build up a path for the exact core file this browser needs
   x = ['core'];
-
-  if (!('attachShadow' in Element.prototype)) {
-    // browser requires the shadow dom polyfill
-    x.push('sd');
-  }
 
   if (!window.customElements) {
     // browser requires the custom elements polyfill
     x.push('ce');
   }
 
-  // request the ionic core file this browser needs
+  // request the core file this browser needs
   y = document.createElement('script');
-  y.src = ionic.staticDir + 'ionic.' + x.join('.') + '.js';
+  y.src = Project.staticDir + projectNamespace.toLowerCase() + '.' + x.join('.') + '.js';
   document.head.appendChild(y);
 
   // performance.now() polyfill
@@ -57,4 +53,8 @@ import { GlobalNamespace } from '../../../util/interfaces';
       return Date.now() - navStart;
     };
   }
-})(window, document);
+})(
+  window,
+  document,
+  '__STENCIL__APP__'
+);

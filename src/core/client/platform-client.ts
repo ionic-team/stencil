@@ -1,25 +1,22 @@
 import { assignHostContentSlots, createVNodesFromSsr } from '../renderer/slot';
-import { BundleCallbacks, Component, ComponentMeta, ComponentRegistry,
-  ConfigApi, DomControllerApi, DomApi, HostElement, GlobalNamespace,
-  ListenOptions, LoadComponentMeta, QueueApi, PlatformApi } from '../../util/interfaces';
-import { BUNDLE_ID, SSR_VNODE_ID, STYLES } from '../../util/constants';
+import { BUNDLES_DIR, SSR_VNODE_ID } from '../../util/constants';
+import { ComponentMeta, ComponentRegistry, ConfigApi, DomControllerApi,
+  DomApi, HostElement, ProjectNamespace, ListenOptions, LoadComponentRegistry,
+  ModuleCallbacks, QueueApi, PlatformApi } from '../../util/interfaces';
 import { createRenderer } from '../renderer/patch';
 import { getMode } from '../platform/mode';
 import { h, t } from '../renderer/h';
-import { isString } from '../../util/helpers';
 import { initHostConstructor } from '../instance/init';
 import { initGlobal } from './global-client';
-import { parseComponentMeta } from '../../util/data-parse';
+import { parseComponentMeta, parseComponentRegistry } from '../../util/data-parse';
 
 
-export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string, loadAnimations: boolean): PlatformApi {
+export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string, loadAnimations: boolean): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
-  const loadedBundles: {[bundleId: string]: boolean} = {};
-  const bundleCallbacks: BundleCallbacks = {};
-  const activeJsonRequests: {[url: string]: boolean} = {};
-  const hasNativeShadowDom = !((<any>win).ShadyDOM && (<any>win).ShadyDOM.inUse);
-  let initRenderStyles: string[] = [];
+  const moduleCallbacks: ModuleCallbacks = {};
+  const loadedModules: {[moduleId: string]: boolean} = {};
+  const pendingModuleRequests: {[url: string]: boolean} = {};
 
 
   // create the platform api which will be passed around for external use
@@ -31,7 +28,6 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     config,
     queue,
     connectHostElement,
-    attachStyles,
     getEventOptions
   };
 
@@ -51,11 +47,9 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   rootElm._initLoad = function appLoadedCallback() {
     // this will fire when all components have finished loaded
     rootElm._hasLoaded = true;
-    appendStylesToHead(initRenderStyles);
-    initRenderStyles = null;
 
     // kick off loading the auxiliary code, which has stuff that wasn't
-    // needed for the initial paint, such as animation code
+    // needed for the initial paint, such as the animation library
     loadAnimations && queue.add(() => {
       jsonp(staticDir + 'ionic.animation.js');
     });
@@ -67,75 +61,9 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
   createVNodesFromSsr(domApi, rootElm);
 
 
-  function attachStyles(cmpMeta: ComponentMeta, elm: HostElement, instance: Component) {
-    if (cmpMeta.isShadowMeta) {
-      // cool, this component should use shadow dom
-      elm._root = elm.attachShadow({ mode: 'open' });
-    }
-
-    // look up which component mode this instance should use
-    // if a mode isn't found then check if there's a default
-    const cmpMode = cmpMeta.modesMeta[instance.mode] || cmpMeta.modesMeta.$;
-
-    if (cmpMode && isString(cmpMode[STYLES])) {
-      // cool, we found the mode for this component
-      // and this mode has styles :)
-      let styleElm: HTMLStyleElement;
-
-      if (cmpMeta.isShadowMeta && hasNativeShadowDom) {
-        // this component uses the shadow dom
-        // and this browser supports the shadow dom natively
-        // attach our styles to the root
-        styleElm = domApi.$createElement('style');
-        styleElm.innerHTML = cmpMode[STYLES];
-        domApi.$appendChild(elm._root, styleElm);
-
-      } else {
-        // this component does not use the shadow dom
-        // or this browser does not support shadow dom
-        const cmpModeId = `${cmpMeta.tagNameMeta}.${instance.mode}`;
-
-        // climb up the ancestors looking to see if this element
-        // is within another component with a shadow root
-        let node: any = elm;
-        let hostRoot: any;
-
-        while (node = domApi.$parentNode(node)) {
-          if (node.host && node.host.shadowRoot) {
-            // this element is within another shadow root
-            // so instead of attaching the styles to the head
-            // we need to attach the styles to this shadow root
-            hostRoot = node.host.shadowRoot;
-            hostRoot._css = hostRoot._css || {};
-
-            if (!hostRoot._css[cmpModeId]) {
-              // only attach the styles if we haven't already done so for this host element
-              hostRoot._css[cmpModeId] = true;
-
-              styleElm = hostRoot.querySelector('style');
-              if (styleElm) {
-                styleElm.innerHTML = cmpMode[STYLES] + styleElm.innerHTML;
-
-              } else {
-                styleElm = domApi.$createElement('style');
-                styleElm.innerHTML = cmpMode[STYLES];
-                domApi.$insertBefore(hostRoot, styleElm, hostRoot.firstChild);
-              }
-            }
-
-            // the styles are added to this shadow root, no need to continue
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  function getObservedAttributes(cmpMeta: ComponentMeta) {
-    return cmpMeta.propsMeta.filter(p => p.attribName).map(p => p.attribName);
-  }
-
   function getComponentMeta(elm: Element) {
+    // get component meta using the element
+    // important that the registry has upper case tag names
     return registry[elm.tagName];
   }
 
@@ -148,122 +76,98 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     }
   }
 
-  function appendBundleStyles(bundleCmpMeta: ComponentMeta[]) {
-    if (initRenderStyles) {
-      collectStyles(bundleCmpMeta, initRenderStyles);
 
-    } else {
-      queue.add(() => {
-        appendStylesToHead(collectStyles(bundleCmpMeta, []));
-      });
-    }
-  }
-
-
-  function appendStylesToHead(styles: string[]) {
-    if (styles.length) {
-      const styleElm = domApi.$createElement('style');
-      styleElm.innerHTML = styles.join('');
-      domApi.$insertBefore(domApi.$head, styleElm, domApi.$head.firstChild);
-    }
-  }
-
-
-  function collectStyles(bundleCmpMeta: ComponentMeta[], appendTo: string[]) {
-    for (var i = 0; i < bundleCmpMeta.length; i++) {
-      var cmpMeta = bundleCmpMeta[i];
-      if (cmpMeta.modesMeta) {
-        let modeNames = Object.keys(cmpMeta.modesMeta);
-        for (var j = 0; j < modeNames.length; j++) {
-          if (isString(cmpMeta.modesMeta[modeNames[j]][STYLES])) {
-            appendTo.push(cmpMeta.modesMeta[modeNames[j]][STYLES]);
-          }
-        }
-      }
-    }
-    return appendTo;
-  }
-
-
-  function registerComponents(components: LoadComponentMeta[]) {
+  function registerComponents(components: LoadComponentRegistry[]) {
     // this is the part that just registers the minimal amount of data
-    return components.map(data => parseComponentMeta(registry, moduleImports, data));
+    // it's basically a map of the component tag name to its associated external bundles
+    return (components || []).map(data => parseComponentRegistry(data, registry));
   }
 
 
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
+    // initialize the properties on the component module prototype
     initHostConstructor(plt, HostElementConstructor.prototype);
 
-    HostElementConstructor.observedAttributes = getObservedAttributes(cmpMeta);
+    // add which attributes should be observed
+    HostElementConstructor.observedAttributes = cmpMeta.propsMeta.filter(p => p.attribName).map(p => p.attribName);
 
-    win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
+    // define the custom element
+    win.customElements.define(cmpMeta.tagNameMeta.toLowerCase(), HostElementConstructor);
   }
 
 
-  Gbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
+  Gbl.defineComponents = function defineComponents(coreVersion, moduleId, importFn) {
     coreVersion;
     const args = arguments;
-    const bundleCmpMeta: ComponentMeta[] = [];
 
     // import component function
     // inject globals
     importFn(moduleImports, h, t, injectedGlobal);
 
     for (var i = 3; i < args.length; i++) {
-      bundleCmpMeta.push(
-        parseComponentMeta(registry, moduleImports, args[i])
-      );
+      parseComponentMeta(registry, moduleImports, args[i]);
     }
 
-    // append all of the bundle's styles to the document in one go
-    appendBundleStyles(bundleCmpMeta);
-
-    // fire off all the callbacks waiting on this bundle to load
-    var callbacks = bundleCallbacks[bundleId];
+    // fire off all the callbacks waiting on this module to load
+    var callbacks = moduleCallbacks[moduleId];
     if (callbacks) {
       for (i = 0; i < callbacks.length; i++) {
         callbacks[i]();
       }
-      delete bundleCallbacks[bundleId];
+      delete moduleCallbacks[moduleId];
     }
 
-    // remember that we've already loaded this bundle
-    loadedBundles[bundleId] = true;
+    // remember that we've already loaded this module
+    loadedModules[moduleId] = true;
   };
 
 
   function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
-    // get the mode the element which is loading
-    // if there is no mode, then use "default"
-    const cmpMode = cmpMeta.modesMeta[getMode(domApi, config, elm)] || cmpMeta.modesMeta.$;
-    const bundleId = cmpMode[BUNDLE_ID];
+    const moduleId = cmpMeta.moduleId;
 
-    if (loadedBundles[bundleId]) {
-      // we've already loaded this bundle
+    if (loadedModules[moduleId]) {
+      // sweet, we've already loaded this module
       cb();
 
     } else {
-      // never seen this bundle before, let's start the request
-      // and add it to the bundle callbacks to fire when it's loaded
-      if (bundleCallbacks[bundleId]) {
-        bundleCallbacks[bundleId].push(cb);
+      // never seen this module before, let's start the request
+      // and add it to the callbacks to fire when it has loaded
+      if (moduleCallbacks[moduleId]) {
+        moduleCallbacks[moduleId].push(cb);
       } else {
-        bundleCallbacks[bundleId] = [cb];
+        moduleCallbacks[moduleId] = [cb];
       }
 
       // create the url we'll be requesting
-      const url = `${staticDir}bundles/ionic.${bundleId}.js`;
+      const url = getBundlePath(`${moduleId}.js`);
 
-      if (!activeJsonRequests[url]) {
+      if (!pendingModuleRequests[url]) {
         // not already actively requesting this url
-        // let's kick off the request
-
         // remember that we're now actively requesting this url
-        activeJsonRequests[url] = true;
+        pendingModuleRequests[url] = true;
 
+        // let's kick off the module request
         jsonp(url);
       }
+
+      // we also need to load the css file in the head
+      const styleId = cmpMeta.styleIds[getMode(domApi, config, elm)] || cmpMeta.styleIds.$;
+      if (styleId && !loadedModules[styleId]) {
+        // this style hasn't been added to the head yet
+        loadedModules[styleId] = true;
+
+        // append this link element to the head, which starts the request for the file
+        const linkElm = domApi.$createElement('link');
+        linkElm.href = getBundlePath(`${styleId}.css`);
+        linkElm.rel = 'stylesheet';
+        domApi.$insertBefore(domApi.$head, linkElm, domApi.$head.firstChild);
+      }
     }
+  }
+
+
+  function getBundlePath(fileName: string) {
+    return `${staticDir}${BUNDLES_DIR}/${Gbl.ns.toLowerCase()}/${fileName}`;
   }
 
 
@@ -283,7 +187,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
       domApi.$removeChild(scriptElm.parentNode, scriptElm);
 
       // remove from our list of active requests
-      delete activeJsonRequests[url];
+      delete pendingModuleRequests[url];
     }
 
     // add script completed listener to this script element
@@ -293,6 +197,7 @@ export function createPlatformClient(Gbl: GlobalNamespace, win: Window, domApi: 
     // kick off the actual request
     domApi.$appendChild(domApi.$head, scriptElm);
   }
+
 
   // test if this browser supports event options or not
   let supportsEventOptions = false;

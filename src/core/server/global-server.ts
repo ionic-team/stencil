@@ -1,4 +1,4 @@
-import { ConfigApi, DomControllerApi, Ionic, GlobalNamespace, PlatformConfig } from '../../util/interfaces';
+import { ConfigApi, DomControllerApi, Ionic, ProjectNamespace, PlatformConfig } from '../../util/interfaces';
 import { createConfigController } from '../../util/config-controller';
 import { QueueServer } from './queue-server';
 import { noop } from '../../util/helpers';
@@ -20,7 +20,7 @@ export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
     controller: serverController,
   };
 
-  (<GlobalNamespace>injectedGlobal).controllers = {};
+  (<ProjectNamespace>injectedGlobal).controllers = {};
 
   function serverController(ctrlName: string, opts?: any) {
     const promise: any = new Promise((resolve, reject) => {
@@ -46,7 +46,7 @@ export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
 
 
 export function initGlobalNamespace(configObj: any, platforms: PlatformConfig[], staticDir: string) {
-  const IonicGbl: GlobalNamespace = {
+  const IonicGbl: ProjectNamespace = {
     ConfigCtrl: createConfigController(configObj, platforms),
     DomCtrl: {
       read: function(cb: Function) { process.nextTick(() => { cb(Date.now()); }); },

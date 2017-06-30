@@ -1,6 +1,6 @@
-import { hydrateHtml } from '../../../core/server/hydrate-html';
-import { HydrateOptions, RendererOptions } from '../../../util/interfaces';
-import { registerDirectory } from './register-directory';
+import { hydrateHtml } from '../../core/server/hydrate-html';
+import { HydrateOptions, RendererOptions } from '../../util/interfaces';
+import { registerComponents } from './register-components';
 
 
 export function createRenderer(rendererOpts: RendererOptions) {
@@ -64,7 +64,7 @@ export function validateRendererOptions(opts: RendererOptions) {
   }
 
   if (!opts.registry) {
-    opts.registry = registerDirectory(opts.sys, opts.staticDir);
+    opts.registry = registerComponents(opts.sys, opts.staticDir);
   }
 
   return opts;

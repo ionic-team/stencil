@@ -45,17 +45,20 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
   // fully define each of our components onto this new platform instance
   registeredTags.forEach(tag => {
     registry[tag].tagNameMeta = tag;
-    registry[tag].modesMeta = registry[tag].modesMeta || {};
     registry[tag].propsMeta = registry[tag].propsMeta || [];
     plt.defineComponent(registry[tag]);
   });
 
   // fire off this function when the app has finished loading
   // and all components have finished hydrating
-  plt.onAppLoad = (rootElm, css) => {
-    rootElm;
-    optimizeDocument(doc, css, opts);
-    callback(null, dom.serialize());
+  plt.onAppLoad = (rootElm, styles) => {
+    if (rootElm) {
+      optimizeDocument(doc, styles, opts);
+      callback(null, dom.serialize());
+
+    } else {
+      callback(null, opts.html);
+    }
   };
 
   // keep a collection of all the host elements we connected
@@ -82,7 +85,7 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
   if (connectedInfo.elementCount === 0) {
     // what gives, never found ANY host elements to connect!
     // ok we're just done i guess, idk
-    plt.onAppLoad(null, opts.html);
+    callback(null, opts.html);
   }
 }
 

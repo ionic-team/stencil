@@ -1,5 +1,5 @@
 import { BuildContext, CompilerConfig, Results } from './interfaces';
-import { createFileMeta, getFileMeta, isTsSourceFile, logError, readFile, writeFiles } from './util';
+import { createFileMeta, getFileMeta, isTsSourceFile, logError, readFile, writeFiles, access } from './util';
 import { generateManifest } from './manifest';
 import { setupCompilerWatch } from './watch';
 import { transpile, transpileFiles } from './transpile';
@@ -16,34 +16,12 @@ import { transpile, transpileFiles } from './transpile';
  * everything 3rd party tooling need to know about each component at
  * "build" time. The manifest.json also includes paths to all the files
  * each component uses, and meta data like modes, properties, etc.
- *
- * @param config  Compiler config
- * @param ctx  Option context object so rebuilds are faster
  */
 export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise<Results> {
-  if (!config.packages) {
-    throw 'config.packages required';
-  }
-  if (!config.packages.fs) {
-    throw 'config.packages.fs required';
-  }
-  if (!config.packages.path) {
-    throw 'config.packages.path required';
-  }
-  if (!config.packages.nodeSass) {
-    throw 'config.packages.nodeSass required';
-  }
-  if (!config.packages.rollup) {
-    throw 'config.packages.rollup required';
-  }
-  if (!config.packages.typescript) {
-    throw 'config.packages.typescript required';
-  }
+  validateCompile(config);
 
-  if (config.debug) {
-    console.log(`compile, include: ${config.include}`);
-    console.log(`compile, outDir: ${config.compilerOptions.outDir}`);
-  }
+  config.logger.debug(`compile, include: ${config.include}`);
+  config.logger.debug(`compile, outDir: ${config.compilerOptions.outDir}`);
 
   if (!ctx.files) {
     ctx.files = new Map();
@@ -74,10 +52,10 @@ export function compile(config: CompilerConfig, ctx: BuildContext = {}): Promise
       return generateManifest(config, ctx);
 
     }).then(() => {
-      return setupCompilerWatch(config, ctx, config.packages.typescript.sys);
+      return setupCompilerWatch(config, ctx, config.sys.typescript.sys);
 
     }).then(() => {
-      console.log('compile, done');
+      config.logger.info('compile, done');
       return ctx.results;
 
     });
@@ -88,7 +66,7 @@ export function compileWatch(config: CompilerConfig, ctx: BuildContext, changedF
   const scanDirs: string[] = [];
   changedFiles.forEach(filePath => {
     if (isTsSourceFile(filePath)) {
-      const dirPath = config.packages.path.dirname(filePath);
+      const dirPath = config.sys.path.dirname(filePath);
       if (scanDirs.indexOf(dirPath) === -1) {
         scanDirs.push(dirPath);
       }
@@ -101,6 +79,7 @@ export function compileWatch(config: CompilerConfig, ctx: BuildContext, changedF
 
   return Promise.all(scanDirPromises)
     .then(() => {
+
       const tsFilesToRetranspile: string[] = [];
 
       ctx.files.forEach(f => {
@@ -119,79 +98,85 @@ export function compileWatch(config: CompilerConfig, ctx: BuildContext, changedF
       return generateManifest(config, ctx);
 
     }).then(() => {
-      return setupCompilerWatch(config, ctx, config.packages.typescript.sys);
+      return setupCompilerWatch(config, ctx, config.sys.typescript.sys);
 
     }).then(() => {
-      console.log('compile, done');
+      config.logger.info('compile, done');
       return ctx.results;
 
     });
 }
 
 
-function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext) {
-  return new Promise(resolve => {
+function scanDirectory(dir: string, config: CompilerConfig, ctx: BuildContext): Promise<any> {
 
-    if (config.debug) {
-      console.log(`compile, scanDirectory: ${dir}`);
+  return access(config.sys, dir).then(pathExists => {
+    if (!pathExists) {
+      return Promise.resolve(null);
     }
 
-    config.packages.fs.readdir(dir, (err, files) => {
-      if (err) {
-        logError(ctx.results, err);
-        resolve();
-        return;
-      }
+    return new Promise(resolve => {
 
-      const promises: Promise<any>[] = [];
+      config.logger.debug(`compile, scanDirectory: ${dir}`);
 
-      files.forEach(dirItem => {
-        const readPath = config.packages.path.join(dir, dirItem);
-
-        if (!isValidDirectory(config, readPath)) {
+      config.sys.fs.readdir(dir, (err, files) => {
+        if (err) {
+          logError(ctx.results, err);
+          resolve();
           return;
         }
 
-        promises.push(new Promise(resolve => {
+        const promises: Promise<any>[] = [];
 
-          config.packages.fs.stat(readPath, (err, stats) => {
-            if (err) {
-              logError(ctx.results, err);
-              resolve();
+        files.forEach(dirItem => {
+          const readPath = config.sys.path.join(dir, dirItem);
 
-            } else if (stats.isDirectory()) {
-              scanDirectory(readPath, config, ctx).then(() => {
+          if (!isValidDirectory(config, readPath)) {
+            return;
+          }
+
+          promises.push(new Promise(resolve => {
+
+            config.sys.fs.stat(readPath, (err, stats) => {
+              if (err) {
+                logError(ctx.results, err);
                 resolve();
-              });
 
-            } else if (isTsSourceFile(readPath)) {
-              getFileMeta(config.packages, ctx, readPath).then(fileMeta => {
-                fileMeta.recompileOnChange = true;
+              } else if (stats.isDirectory()) {
+                scanDirectory(readPath, config, ctx).then(() => {
+                  resolve();
+                });
 
-                if (fileMeta.filePath && fileMeta.hasCmpClass) {
-                  if (ctx.results.files.indexOf(fileMeta.filePath) === -1) {
-                    ctx.results.files.push(fileMeta.filePath);
+              } else if (isTsSourceFile(readPath)) {
+                getFileMeta(config.sys, ctx, readPath).then(fileMeta => {
+                  fileMeta.recompileOnChange = true;
+
+                  if (fileMeta.filePath && fileMeta.hasCmpClass) {
+                    if (ctx.results.files.indexOf(fileMeta.filePath) === -1) {
+                      ctx.results.files.push(fileMeta.filePath);
+                    }
                   }
-                }
 
+                  resolve();
+                });
+
+              } else {
                 resolve();
-              });
+              }
+            });
 
-            } else {
-              resolve();
-            }
-          });
+          }));
 
-        }));
+        });
 
+        Promise.all(promises).then(() => {
+          resolve();
+        });
       });
 
-      Promise.all(promises).then(() => {
-        resolve();
-      });
     });
-
   });
+
 }
 
 
@@ -207,22 +192,25 @@ function isValidDirectory(config: CompilerConfig, filePath: string) {
 
 function processStyles(config: CompilerConfig, ctx: BuildContext) {
   const destDir = config.compilerOptions.outDir;
+
+  config.logger.debug(`compile, processStyles, destDir ${destDir}`);
+
   const promises: Promise<any>[] = [];
 
   const includedSassFiles: string[] = [];
 
   ctx.files.forEach(f => {
-    if (!f.isTsSourceFile || !f.cmpMeta || !f.cmpMeta.modesStyleMeta) return;
+    if (!f.isTsSourceFile || !f.cmpMeta || !f.cmpMeta.styleMeta) return;
 
-    const modeNames = Object.keys(f.cmpMeta.modesStyleMeta);
+    const modeNames = Object.keys(f.cmpMeta.styleMeta);
 
     modeNames.forEach(modeName => {
-      const modeMeta = Object.assign({}, f.cmpMeta.modesStyleMeta[modeName]);
+      const modeMeta = Object.assign({}, f.cmpMeta.styleMeta[modeName]);
 
       if (modeMeta.styleUrls) {
         modeMeta.styleUrls.forEach(styleUrl => {
-          const scssFileName = config.packages.path.basename(styleUrl);
-          const scssFilePath = config.packages.path.join(f.srcDir, scssFileName);
+          const scssFileName = config.sys.path.basename(styleUrl);
+          const scssFilePath = config.sys.path.join(f.srcDir, scssFileName);
           promises.push(getIncludedSassFiles(config, ctx, includedSassFiles, scssFilePath));
         });
       }
@@ -240,9 +228,9 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
         if (includedSassFile.indexOf(includeDir) === 0) {
           const src = includedSassFile;
           const relative = includedSassFile.replace(includeDir, '');
-          const dest = config.packages.path.join(destDir, relative);
+          const dest = config.sys.path.join(destDir, relative);
 
-          promises.push(readFile(config.packages, src).then(content => {
+          promises.push(readFile(config.sys, src).then(content => {
             files.set(dest, content);
           }));
         }
@@ -251,7 +239,7 @@ function processStyles(config: CompilerConfig, ctx: BuildContext) {
     });
 
     return Promise.all(promises).then(() => {
-      return writeFiles(config.packages, files);
+      return writeFiles(config.sys, files);
     });
   });
 }
@@ -268,11 +256,9 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
       ctx.results.files.push(scssFilePath);
     }
 
-    if (config.debug) {
-      console.log(`compile, getIncludedSassFiles: ${scssFilePath}`);
-    }
+    config.logger.debug(`compile, getIncludedSassFiles: ${scssFilePath}`);
 
-    config.packages.nodeSass.render(sassConfig, (err: any, result: any) => {
+    config.sys.sass.render(sassConfig, (err, result) => {
       if (err) {
         logError(ctx.results, err);
         reject(err);
@@ -281,7 +267,7 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
         result.stats.includedFiles.forEach((includedFile: string) => {
           if (includedSassFiles.indexOf(includedFile) === -1) {
             includedSassFiles.push(includedFile);
-            const fileMeta = createFileMeta(config.packages, ctx, includedFile, '');
+            const fileMeta = createFileMeta(config.sys, ctx, includedFile, '');
             fileMeta.recompileOnChange = true;
           }
 
@@ -295,4 +281,26 @@ function getIncludedSassFiles(config: CompilerConfig, ctx: BuildContext, include
     });
 
   });
+}
+
+
+function validateCompile(config: CompilerConfig) {
+  if (!config.sys) {
+    throw 'config.sys required';
+  }
+  if (!config.sys.fs) {
+    throw 'config.sys.fs required';
+  }
+  if (!config.sys.path) {
+    throw 'config.sys.path required';
+  }
+  if (!config.sys.sass) {
+    throw 'config.sys.sass required';
+  }
+  if (!config.sys.rollup) {
+    throw 'config.sys.rollup required';
+  }
+  if (!config.sys.typescript) {
+    throw 'config.sys.typescript required';
+  }
 }

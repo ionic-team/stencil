@@ -23,7 +23,8 @@
     "removeComments": false,
     "sourceMap": false,
     "types": [
-      "jest", "node"
+      "jest",
+      "node"
     ],
     "jsx": "react",
     "jsxFactory": "h"
@@ -34,9 +35,6 @@
     "../types/jsx.d.ts"
   ],
   "exclude": [
-    "bindings",
-    "compiler",
-    "fonts",
-    "node_modules"
+    "compiler"
   ]
 }

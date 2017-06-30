@@ -1,5 +1,5 @@
 import { ComponentMeta, ConfigApi, HostElement, HostContentNodes, HydrateOptions, Ionic,
-  GlobalNamespace, DomApi, PlatformConfig, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
+  ProjectNamespace, DomApi, PlatformConfig, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createConfigController } from '../util/config-controller';
 import { createDomApi } from '../core/renderer/dom-api';
 import { initGlobal, initGlobalNamespace } from '../core/server/global-server';
@@ -10,10 +10,11 @@ import { initHostConstructor } from '../core/instance/init';
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const module = require('module');
 const jsdom = require('jsdom');
 
 
-export function mockPlatform(IonicGbl?: GlobalNamespace) {
+export function mockPlatform(IonicGbl?: ProjectNamespace) {
   if (!IonicGbl) {
     IonicGbl = mockIonicGlobal();
   }
@@ -55,16 +56,16 @@ export interface MockedPlatform {
 }
 
 
-export function mockIonicGlobal(config?: ConfigApi): GlobalNamespace {
+export function mockIonicGlobal(config?: ConfigApi): ProjectNamespace {
   if (!config) {
     config = mockConfig({}, []);
   }
-  const IonicGbl: GlobalNamespace = initGlobalNamespace(config, [], '');
+  const IonicGbl: ProjectNamespace = initGlobalNamespace(config, [], '');
   return IonicGbl;
 }
 
 
-export function mockInjectedIonic(IonicGbl: GlobalNamespace): Ionic {
+export function mockInjectedIonic(IonicGbl: ProjectNamespace): Ionic {
   const ionic = initGlobal(IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
   return ionic;
 }
@@ -81,6 +82,7 @@ export function mockStencilSystem() {
     fs: fs,
     path: path,
     vm: vm,
+    module: module,
     createDom: function() {
       return {
         parse: function(opts: HydrateOptions) {
@@ -169,16 +171,17 @@ export function mockTextNode(text: string): Element {
 
 
 export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
+  if (cmpMeta.tagNameMeta) {
+    cmpMeta.tagNameMeta = cmpMeta.tagNameMeta.toUpperCase();
+  }
   if (!cmpMeta.componentModuleMeta) {
     cmpMeta.componentModuleMeta = class {};
   }
   if (!cmpMeta.propsMeta) {
     cmpMeta.propsMeta = [];
   }
-  if (!cmpMeta.modesMeta) {
-    cmpMeta.modesMeta = {
-      $: {}
-    };
+  if (!cmpMeta.styleIds) {
+    cmpMeta.styleIds = {};
   }
 
   (<PlatformApi>plt).defineComponent(cmpMeta);
@@ -217,8 +220,8 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
 
 
 export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string, cb?: (elm: HostElement) => void): Promise<HostElement> {
-  return new Promise(resolve => {
-    const elm = rootNode.tagName === tag.toUpperCase() ? rootNode : rootNode.querySelector(tag);
+  return new Promise((resolve: (elm: HostElement) => void) => {
+    const elm: HostElement = rootNode.tagName === tag.toUpperCase() ? rootNode : rootNode.querySelector(tag);
 
     plt.$flushQueue(() => {
       // flush to read attribute mode on host elment
@@ -235,6 +238,7 @@ export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string, cb?
 
   }).catch(err => {
     console.error('waitForLoad', err);
+    return null;
   });
 }
 
