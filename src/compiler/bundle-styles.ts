@@ -31,7 +31,14 @@ function generateBundleCss(config: BundlerConfig, ctx: BuildContext, userManifes
 
   // collect only the component meta data this bundle needs
   const bundleComponentMeta = userBundle.components.map(userBundleComponentTag => {
-    return userManifest.components.find(manifestComponent => manifestComponent.tagNameMeta === userBundleComponentTag);
+    const foundComponentMeta = userManifest.components.find(manifestComponent => (
+      manifestComponent.tagNameMeta === userBundleComponentTag
+    ));
+
+    if (!foundComponentMeta) {
+      throw new Error(`The component tag '${userBundleComponentTag}' is defined in a bundle but no component was found with this tag.`);
+    }
+    return foundComponentMeta;
   });
 
   // figure out all of the possible modes this bundle has
