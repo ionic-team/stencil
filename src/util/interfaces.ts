@@ -616,7 +616,7 @@ export interface Component {
   $el?: HostElement;
 
   // private properties
-  __values?: ComponentActiveValues;
+  __values?: ComponentInternalValues;
 
   [memberName: string]: any;
 }
@@ -632,7 +632,7 @@ export interface ComponentActivePropChanges {
 }
 
 
-export interface ComponentActiveValues {
+export interface ComponentInternalValues {
   __propWillChange?: ComponentActivePropChanges;
   __propDidChange?: ComponentActivePropChanges;
   [propName: string]: any;
