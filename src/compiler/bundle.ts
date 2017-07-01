@@ -1,7 +1,8 @@
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE, BUNDLES_DIR } from '../util/constants';
 import { BundlerConfig, BuildContext, Manifest, Results } from './interfaces';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
+import { emptyDir } from './util';
 import { generateComponentRegistry } from './bundle-registry';
 import { setupBundlerWatch } from './watch';
 
@@ -13,26 +14,41 @@ export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<R
 
   config.logger.debug(`bundle, srcDir: ${config.srcDir}`);
   config.logger.debug(`bundle, destDir: ${config.destDir}`);
-  config.logger.debug(`bundle, attrCase: ${config.attrCase}`);
 
   ctx.results = {
     files: []
   };
 
-  // kick off style and module bundling at the same time
-  return Promise.all([
-    bundleStyles(config, ctx, userManifest),
-    bundleModules(config, userManifest)
-  ])
-  .then(bundleResults => {
+  return Promise.resolve().then(() => {
+    if (!config.isDevMode) {
+      // in prod mode, be sure to first empty the
+      // bundles dest dir
+      const projectBundlesDir = config.sys.path.join(config.destDir, BUNDLES_DIR, config.namespace.toLowerCase());
+
+      config.logger.debug(`bundle, empty bundles dir: ${projectBundlesDir}`);
+
+      return emptyDir(config.sys, projectBundlesDir);
+    }
+    return Promise.resolve();
+
+  }).then(() => {
+    // kick off style and module bundling at the same time
+    return Promise.all([
+      bundleStyles(config, ctx, userManifest),
+      bundleModules(config, userManifest)
+    ]);
+
+  }).then(bundleResults => {
     // both styles and modules are done bundling
     const styleResults = bundleResults[0];
     const moduleResults = bundleResults[1];
 
     return generateComponentRegistry(config, ctx, styleResults, moduleResults);
+
   })
   .then(() => {
     return setupBundlerWatch(config, ctx, config.sys.typescript.sys);
+
   })
   .then(() => {
     config.logger.info('bundle, done');

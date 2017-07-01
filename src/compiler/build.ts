@@ -103,7 +103,7 @@ function bundleProject(buildConfig: BuildConfig, ctx: BuildContext, manifest: Ma
     destDir: buildConfig.destDir,
     manifest: manifest,
     sys: buildConfig.sys,
-    devMode: buildConfig.isDevMode,
+    isDevMode: buildConfig.isDevMode,
     isWatch: buildConfig.isWatch,
     logger: buildConfig.logger
   };

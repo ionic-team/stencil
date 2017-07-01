@@ -26,7 +26,7 @@ export interface BundlerConfig {
   namespace: string;
   srcDir: string;
   destDir: string;
-  devMode?: boolean;
+  isDevMode?: boolean;
   logger: Logger;
   sys: StencilSystem;
   attachRegistryTo?: 'core'|'loader';

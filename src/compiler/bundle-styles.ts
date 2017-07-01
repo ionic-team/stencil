@@ -85,7 +85,7 @@ function generateModeCss(config: BundlerConfig, ctx: BuildContext, bundleCompone
     // ensure we've got some good objects before we start assigning stuff
     const stylesResult = stylesResults[bundleId] = stylesResults[bundleId] || {};
 
-    if (config.devMode) {
+    if (config.isDevMode) {
       // dev mode has filename from the bundled tag names
       stylesResult[modeName] = modeName + '.' + (userBundle.components.sort().join('.') + '.' + modeName).toLowerCase();
 
@@ -176,7 +176,7 @@ function compileScssFile(config: BundlerConfig, ctx: BuildContext, styleUrl: str
 
     const sassConfig = {
       file: scssFilePath,
-      outputStyle: config.devMode ? 'expanded' : 'compressed',
+      outputStyle: config.isDevMode ? 'expanded' : 'compressed',
     };
 
     config.sys.sass.render(sassConfig, (err, result) => {
@@ -186,7 +186,7 @@ function compileScssFile(config: BundlerConfig, ctx: BuildContext, styleUrl: str
       } else {
         let cssContent = result.css.toString().trim().replace(/\\/g, '\\\\');
 
-        if (config.devMode) {
+        if (config.isDevMode) {
           styleCollection[styleUrl] = `/********** ${scssFileName} **********/\n\n${cssContent}\n\n`;
 
         } else {
@@ -217,7 +217,7 @@ function readCssFile(config: BundlerConfig, ctx: BuildContext, styleUrl: string,
       } else {
         cssContent = cssContent.toString().trim();
 
-        if (config.devMode) {
+        if (config.isDevMode) {
           styleCollection[styleUrl] = `/********** ${cssFileName} **********/\n\n${cssContent}\n\n`;
         } else {
           styleCollection[styleUrl] = cssContent;

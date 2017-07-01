@@ -208,8 +208,15 @@ export function ensureDirs(sys: StencilSystem, filePaths: string[]) {
 }
 
 
-export function removeFilePath(sys: StencilSystem, path: string) {
+export function removeFilePath(sys: StencilSystem, path: string): Promise<any> {
   return sys.fs.remove(path);
+}
+
+
+export function emptyDir(sys: StencilSystem, path: string): Promise<any> {
+  return sys.fs.remove(path).then(() => {
+    return ensureDir(sys, path);
+  });
 }
 
 

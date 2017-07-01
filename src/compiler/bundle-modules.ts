@@ -38,7 +38,7 @@ function generateDefineComponents(config: BundlerConfig, userManifest: Manifest,
       jsModuleContent, bundleComponentMeta
     );
 
-    if (config.devMode) {
+    if (config.isDevMode) {
       // dev mode has filename from the bundled tag names
       moduleResults[bundleId] = userBundle.components.sort().join('.').toLowerCase();
 
