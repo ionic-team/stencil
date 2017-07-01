@@ -56,7 +56,7 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
   // so we've got an host element now, and a actual instance
   // let's wire them up together with getter/settings
   // the setters are use for change detection and knowing when to re-render
-  initProxy(plt, elm, instance, cmpMeta.propsMeta, cmpMeta.statesMeta, cmpMeta.methodsMeta, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
+  initProxy(plt, elm, instance, cmpMeta);
 
   // fire off the user's componentWillLoad method (if one was provided)
   // componentWillLoad only runs ONCE, after instance.$el has been assigned

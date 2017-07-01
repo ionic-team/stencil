@@ -10,7 +10,7 @@ import { initHostConstructor } from '../core/instance/init';
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
-const module = require('module');
+const nodeModule = require('module');
 const jsdom = require('jsdom');
 
 
@@ -82,7 +82,7 @@ export function mockStencilSystem() {
     fs: fs,
     path: path,
     vm: vm,
-    module: module,
+    module: nodeModule,
     createDom: function() {
       return {
         parse: function(opts: HydrateOptions) {

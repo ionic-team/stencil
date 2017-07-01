@@ -1,50 +1,52 @@
-import { Component, ComponentActiveValues, ComponentActivePropChanges, HostElement, PropMeta,
-  MethodMeta, PlatformApi, StateMeta, PropChangeMeta } from '../../util/interfaces';
+import { Component, ComponentMeta, ComponentInternalValues,
+  HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { parsePropertyValue } from '../../util/data-parse';
 import { PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
 import { queueUpdate } from './update';
 
 
-export function initProxy(plt: PlatformApi, elm: HostElement, instance: Component, props: PropMeta[], states: StateMeta[], methods: MethodMeta[], propWillChangeMeta: PropChangeMeta[], propDidChangeMeta: PropChangeMeta[]) {
+export function initProxy(plt: PlatformApi, elm: HostElement, instance: Component, cmpMeta: ComponentMeta) {
   let i = 0;
 
-  if (methods) {
+  if (cmpMeta.methodsMeta) {
     // instances will already have the methods on them
     // but you can also expose methods to the proxy element
     // using @Method(). Think of like .focus() for an element.
-    for (; i < methods.length; i++) {
-      initMethod(methods[i], elm, instance);
+    for (; i < cmpMeta.methodsMeta.length; i++) {
+      initMethod(cmpMeta.methodsMeta[i], elm, instance);
     }
   }
 
   // used to store instance data internally so that we can add
   // getters/setters with the same name, and then do change detection
-  instance.__values = {};
+  const values: ComponentInternalValues = instance.__values = {};
 
-  if (propWillChangeMeta) {
+  if (cmpMeta.propWillChangeMeta) {
     // this component has prop WILL change methods, so init the object to store them
-    elm._propWillChange = {};
+    values.__propWillChange = {};
   }
 
-  if (propDidChangeMeta) {
+  if (cmpMeta.propDidChangeMeta) {
     // this component has prop DID change methods, so init the object to store them
-    elm._propDidChange = {};
+    values.__propDidChange = {};
   }
 
-  if (states) {
+  if (cmpMeta.statesMeta) {
     // add getters/setters to instance properties that are not already set as @Prop()
     // these are instance properties that should trigger a render update when
     // they change. Like @Prop(), except data isn't passed in and is only state data.
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
-    for (i = 0; i < states.length; i++) {
-      initProperty(false, true, '', states[i], 0, instance, instance.__values, plt, elm, elm._propWillChange, propWillChangeMeta, elm._propDidChange, propDidChangeMeta);
+    for (i = 0; i < cmpMeta.statesMeta.length; i++) {
+      initProperty(false, true, '', cmpMeta.statesMeta[i], 0, instance, values, plt, elm, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
     }
   }
 
-  for (i = 0; i < props.length; i++) {
-    // add getters/setters for @Prop()s
-    initProperty(true, props[i].isStateful, props[i].attribName, props[i].propName, props[i].propType, instance, instance.__values, plt, elm, elm._propWillChange, propWillChangeMeta, elm._propDidChange, propDidChangeMeta);
+  if (cmpMeta.propsMeta) {
+    for (i = 0; i < cmpMeta.propsMeta.length; i++) {
+      // add getters/setters for @Prop()s
+      initProperty(true, cmpMeta.propsMeta[i].isStateful, cmpMeta.propsMeta[i].attribName, cmpMeta.propsMeta[i].propName, cmpMeta.propsMeta[i].propType, instance, instance.__values, plt, elm, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
+    }
   }
 }
 
@@ -66,12 +68,10 @@ function initProperty(
   propName: string,
   propType: number,
   instance: Component,
-  internalValues: ComponentActiveValues,
+  internalValues: ComponentInternalValues,
   plt: PlatformApi,
   elm: HostElement,
-  internalPropWillChanges: ComponentActivePropChanges,
   propWillChangeMeta: PropChangeMeta[],
-  internalPropDidChanges: ComponentActivePropChanges,
   propDidChangeMeta: PropChangeMeta[]
 ) {
 
@@ -112,7 +112,7 @@ function initProperty(
         // let's bind their watcher function and add it to our list
         // of watchers, so any time this property changes we should
         // also fire off their @PropWillChange() method
-        internalPropWillChanges[propName] = (<any>instance)[propWillChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
+        internalValues.__propWillChange[propName] = (<any>instance)[propWillChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
       }
     }
   }
@@ -125,7 +125,7 @@ function initProperty(
         // let's bind their watcher function and add it to our list
         // of watchers, so any time this property changes we should
         // also fire off their @PropDidChange() method
-        internalPropDidChanges[propName] = (<any>instance)[propDidChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
+        internalValues.__propDidChange[propName] = (<any>instance)[propDidChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
       }
     }
   }
@@ -143,17 +143,17 @@ function initProperty(
     if (newVal !== oldVal) {
       // gadzooks! the property's value has changed!!
 
-      if (internalPropWillChanges && internalPropWillChanges[propName]) {
+      if (internalValues.__propWillChange && internalValues.__propWillChange[propName]) {
         // this instance is watching for when this property WILL change
-        internalPropWillChanges[propName](newVal, oldVal);
+        internalValues.__propWillChange[propName](newVal, oldVal);
       }
 
       // set our new value!
       internalValues[propName] = newVal;
 
-      if (internalPropDidChanges && internalPropDidChanges[propName]) {
+      if (internalValues.__propDidChange && internalValues.__propDidChange[propName]) {
         // this instance is watching for when this property DID change
-        internalPropDidChanges[propName](newVal, oldVal);
+        internalValues.__propDidChange[propName](newVal, oldVal);
       }
 
       // looks like this value actually changed, we've got work to do!
@@ -164,31 +164,37 @@ function initProperty(
     }
   }
 
-  function setInstanceValue(newVal: any) {
-    if (isStateful) {
-      // this prop can keep state, mainly used for inputs
-      // so update the host element's property directly
-      // which will end up updating the proxied instance
-      setValue(newVal);
+  if (isProp) {
+    // dom's element instance
+    // only place getters/setters on element for props
+    // state getters/setters should not be assigned to the element
+    Object.defineProperty(elm, propName, {
+      configurable: true,
+      get: getValue,
+      set: setValue
+    });
+  }
 
-    } else {
+  // user's component class instance
+  const instancePropDesc: PropertyDescriptor = {
+    configurable: true,
+    get: getValue
+  };
+
+  if (isStateful) {
+    // this is a state property, or it's a prop that can keep state
+    // for props it's mainly used for props on inputs like "checked"
+    instancePropDesc.set = setValue;
+
+  } else if (true /* TODO! */) {
+    // dev mode warning only
+    instancePropDesc.set = function invalidSetValue() {
       // this is not a stateful prop
       // so do not update the instance or host element
       console.warn(`@Prop() "${propName}" on "${elm.tagName.toLowerCase()}" cannot be modified.`);
-    }
+    };
   }
 
-  // dom's element instance
-  Object.defineProperty(elm, propName, {
-    configurable: true,
-    get: getValue,
-    set: setValue
-  });
-
-  // user's component class instance
-  Object.defineProperty(instance, propName, {
-    configurable: true,
-    get: getValue,
-    set: setInstanceValue
-  });
+  // define on component class instance
+  Object.defineProperty(instance, propName, instancePropDesc);
 }

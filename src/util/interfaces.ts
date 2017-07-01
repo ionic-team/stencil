@@ -633,6 +633,8 @@ export interface ComponentActivePropChanges {
 
 
 export interface ComponentActiveValues {
+  __propWillChange?: ComponentActivePropChanges;
+  __propDidChange?: ComponentActivePropChanges;
   [propName: string]: any;
 }
 
@@ -688,8 +690,6 @@ export interface HostElement extends HTMLElement {
   _listeners?: ComponentActiveListeners;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
-  _propWillChange?: ComponentActivePropChanges;
-  _propDidChange?: ComponentActivePropChanges;
 }
 
 
