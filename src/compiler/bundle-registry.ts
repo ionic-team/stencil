@@ -39,13 +39,21 @@ export function generateComponentRegistry(config: BundlerConfig, ctx: BuildConte
     });
   });
 
-  let registryData = formatComponentRegistry(registry, config.attrCase);
-  let registryContent = JSON.stringify(registryData);
+  const componentRegistry = formatComponentRegistry(registry, config.attrCase);
+  const projectRegistry = {
+    namespace: config.namespace,
+    components: componentRegistry
+  };
 
-  const registryFileName = `ionic.registry.json`;
+  const registryFileName = `${config.namespace.toLowerCase()}.registry.json`;
   const registryFilePath = config.sys.path.join(config.destDir, registryFileName);
 
-  ctx.results.componentRegistry = registryContent;
+  // add the component registry as a string to the results
+  ctx.results.componentRegistry = JSON.stringify(componentRegistry);
 
-  return writeFile(config.sys, registryFilePath, registryContent);
+  // write the registry as a json file
+  return writeFile(
+    config.sys,
+    registryFilePath, JSON.stringify(projectRegistry, null, 2)
+  );
 }
