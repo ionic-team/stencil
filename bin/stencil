@@ -9,6 +9,7 @@ process.env.IONIC_CLI_BIN = __filename;
 
 var chalk = require('chalk');
 var semver = require('semver');
+var crypto = require('crypto');
 
 
 if (semver.lt(process.version, 'v6.4.0')) {
@@ -48,12 +49,11 @@ var logger = new stencil.CmdLogger({
 
 
 var sys = Object.defineProperties({}, {
-  'crypto': { get: () => require('crypto') },
   'fs': { get: () => require('fs-extra') },
   'module': { get: () => require('module') },
   'path': { get: () => require('path') },
   'rollup': { get: () => {
-    var rollup = require('rollup')
+    var rollup = require('rollup');
     rollup.plugins = {
       commonjs: require('rollup-plugin-commonjs'),
       nodeResolve: require('rollup-plugin-node-resolve')
@@ -64,6 +64,16 @@ var sys = Object.defineProperties({}, {
   'typescript': { get: () => require('typescript') },
   'uglify': { get: () => require('uglify-js') },
 });
+
+
+sys.generateContentHash = function(content) {
+  return crypto.createHash('sha1')
+               .update(content)
+               .digest('base64')
+               .replace(/\W/g, '')
+               .substr(0, 12)
+               .toLowerCase();
+};
 
 
 sys.getClientCoreFile = function(opts) {
@@ -90,7 +100,7 @@ sys.getClientCoreFile = function(opts) {
       }
     });
   });
-}
+};
 
 
 var configFileName = 'stencil.config.js';

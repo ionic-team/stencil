@@ -254,11 +254,3 @@ export function logError(results: Results, msg: any) {
 
   return results;
 }
-
-
-export function generateContentHash(sys: StencilSystem, content: string) {
-  return sys.crypto.createHash('sha256')
-                   .update(content)
-                   .digest('hex')
-                   .substr(0, 8);
-}

@@ -951,12 +951,6 @@ export interface StencilSystem {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
   };
-  crypto?: {
-    createHash(algorithm: string): {
-      update(data: string): any;
-      digest(encoding: string): string;
-    };
-  };
   fs?: {
     access(path: string, callback: (err: any) => void): void;
     mkdir(path: string, callback?: (err?: any) => void): void;
@@ -967,6 +961,7 @@ export interface StencilSystem {
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
     remove(path: string): Promise<void>;
   };
+  generateContentHash?(content: string): string;
   getClientCoreFile?(opts: {staticName: string, es5?: boolean, devMode: boolean}): Promise<string>;
   module?: {
     _nodeModulePaths(fromDir: string): any;

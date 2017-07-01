@@ -119,9 +119,6 @@ function validateBuildConfig(buildConfig: BuildConfig) {
   if (!buildConfig.sys) {
     throw 'config.sys required';
   }
-  if (!buildConfig.sys.crypto) {
-    throw 'config.crypto required';
-  }
   if (!buildConfig.sys.fs) {
     throw 'config.sys.fs required';
   }

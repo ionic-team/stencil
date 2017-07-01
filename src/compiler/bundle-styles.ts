@@ -1,6 +1,6 @@
 import { BUNDLES_DIR, HYDRATED_CSS } from '../util/constants';
 import { BundlerConfig, StylesResults, BuildContext, ComponentMeta, Manifest, Bundle } from './interfaces';
-import { createFileMeta, generateContentHash, writeFiles } from './util';
+import { createFileMeta, writeFiles } from './util';
 import { formatCssBundleFileName, generateBundleId } from '../util/data-serialize';
 
 
@@ -96,7 +96,7 @@ function generateModeCss(config: BundlerConfig, ctx: BuildContext, bundleCompone
 
     } else {
       // in prod mode, create bundle id from hashing the content
-      stylesResult[modeName] = generateContentHash(config.sys, styleContent);
+      stylesResult[modeName] = config.sys.generateContentHash(styleContent);
     }
 
     // create the file name and path of where the bundle will be saved

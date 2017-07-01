@@ -1,7 +1,7 @@
 import { BundlerConfig, ModuleResults, Manifest, Bundle, Logger } from './interfaces';
 import { BUNDLES_DIR } from '../util/constants';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../util/data-serialize';
-import { generateContentHash, writeFiles } from './util';
+import { writeFiles } from './util';
 
 
 export function bundleModules(config: BundlerConfig, userManifest: Manifest) {
@@ -59,7 +59,7 @@ function generateDefineComponents(config: BundlerConfig, userManifest: Manifest,
       }
 
       // in prod mode, create bundle id from hashing the content
-      moduleResults[bundleId] = generateContentHash(config.sys, moduleContent);
+      moduleResults[bundleId] = config.sys.generateContentHash(moduleContent);
     }
 
     // replace the known bundle id template with the newly created bundle id

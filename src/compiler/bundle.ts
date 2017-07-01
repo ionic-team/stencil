@@ -59,9 +59,6 @@ function validateConfig(config: BundlerConfig) {
   if (!config.sys.path) {
     throw 'config.sys.path required';
   }
-  if (!config.sys.crypto) {
-    throw 'config.sys.crypto required';
-  }
   if (!config.sys.sass) {
     throw 'config.sys.sass required';
   }
