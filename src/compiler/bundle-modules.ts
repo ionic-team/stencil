@@ -34,7 +34,7 @@ function generateDefineComponents(config: BundlerConfig, userManifest: Manifest,
     // format all the JS bundle content
     // insert the already bundled JS module into the defineComponents function
     let moduleContent = formatDefineComponents(
-      config.namespace, COMPILER_VERSION, TMP_BUNDLE_ID,
+      config.namespace, TMP_BUNDLE_ID,
       jsModuleContent, bundleComponentMeta
     );
 
@@ -169,6 +169,5 @@ function entryInMemoryPlugin(entryKey: string, entryFileContent: string) {
 }
 
 
-const COMPILER_VERSION = 0;
 const TMP_BUNDLE_ID = '__STENCIL__BUNDLE__ID__';
 const MODULE_ID_REGEX = new RegExp(TMP_BUNDLE_ID, 'g');

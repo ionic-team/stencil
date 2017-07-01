@@ -96,15 +96,14 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
   }
 
 
-  Gbl.defineComponents = function defineComponents(coreVersion, moduleId, importFn) {
-    coreVersion;
+  Gbl.defineComponents = function defineComponents(moduleId, importFn) {
     const args = arguments;
 
     // import component function
     // inject globals
     importFn(moduleImports, h, t, injectedGlobal);
 
-    for (var i = 3; i < args.length; i++) {
+    for (var i = 2; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);
     }
 

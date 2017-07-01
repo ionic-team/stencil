@@ -73,29 +73,28 @@ export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, 
   }
 
 
-  Gbl.defineComponents = function defineComponents(coreVersion, bundleId, importFn) {
-    coreVersion;
+  Gbl.defineComponents = function defineComponents(module, importFn) {
     const args = arguments;
 
     // import component function
     // inject globals
     importFn(moduleImports, h, t, injectedGlobal);
 
-    for (var i = 3; i < args.length; i++) {
+    for (var i = 2; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);
     }
 
     // fire off all the callbacks waiting on this bundle to load
-    var callbacks = moduleCallbacks[bundleId];
+    var callbacks = moduleCallbacks[module];
     if (callbacks) {
       for (i = 0; i < callbacks.length; i++) {
         callbacks[i]();
       }
-      delete moduleCallbacks[bundleId];
+      delete moduleCallbacks[module];
     }
 
     // remember that we've already loaded this bundle
-    loadedModules[bundleId] = true;
+    loadedModules[module] = true;
   };
 
 

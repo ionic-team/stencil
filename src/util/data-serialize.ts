@@ -98,7 +98,6 @@ export function formatComponentRegistry(registry: ComponentRegistry, defaultAttr
 
 export function formatDefineComponents(
     namespace: string,
-    compilerVersion: number,
     moduleId: string,
     jsModuleContent: string,
     components: ComponentMeta[]
@@ -117,9 +116,6 @@ export function formatDefineComponents(
 
   return [
     `${namespace}.defineComponents(\n`,
-
-      `/**** compiler version ****/`,
-      `${compilerVersion},\n`,
 
       `/**** module id ****/`,
       `'${moduleId}',\n`,
