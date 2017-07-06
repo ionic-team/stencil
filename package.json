@@ -1,6 +1,5 @@
 {
   "name": "@stencil/core",
-  "private": true,
   "version": "0.0.1",
   "license": "MIT",
   "bin": {
