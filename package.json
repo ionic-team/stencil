@@ -10,7 +10,7 @@
     "node": ">=6.4.0"
   },
   "main": "./dist/compiler/index.js",
-  "types": "./dist/compiler/index.d.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "npm run clean && npm run build.compiler && npm run build.core",
     "build.compiler": "npm run transpile.compiler && node scripts/build-compiler.js",

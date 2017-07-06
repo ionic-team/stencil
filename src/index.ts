@@ -22,3 +22,5 @@ export declare const State: interfaces.StateDecorator;
 export declare const PropWillChange: interfaces.PropChangeDecorator;
 
 export declare const PropDidChange: interfaces.PropChangeDecorator;
+
+export * from './compiler';

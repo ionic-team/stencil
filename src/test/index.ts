@@ -121,7 +121,7 @@ export function mockDomApi(document?: any) {
 }
 
 
-export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi) {
+export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi): any {
   plt = plt || mockPlatform();
   return createRenderer(<PlatformApi>plt, domApi || mockDomApi());
 }

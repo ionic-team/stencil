@@ -66,6 +66,8 @@ function buildCore(isDevMode) {
     DIST_CLIENT_LOADER_PROD_FILE,
     isDevMode
   );
+
+  copyCoreDeclarationFiles();
 }
 
 
@@ -250,6 +252,53 @@ if (process.argv.indexOf('dev') > -1) {
   buildCore(false);
 }
 
+function copyCoreDeclarationFiles() {
+  copyMainDTs();
+  copyUtilDir();
+}
+
+function copyMainDTs() {
+  const readMainDTsPath = path.join(TRANSPILED_DIR, 'index.d.ts');
+  const writeMainDTsPath = path.join(DIST_DIR, 'index.d.ts');
+  fs.readFile(readMainDTsPath, function(err, data) {
+    if (err) {
+      console.log('Failed to read: ', readMainDTsPath);
+      return process.exit(1);
+    }
+    fs.writeFile(writeMainDTsPath, data.toString(), function(err) {
+      if (err) {
+        console.log('Failed to write: ', writeMainDTsPath);
+        return process.exit(1);
+      }
+    });
+  });
+}
+
+function copyUtilDir() {
+  const readUtilDirPath = path.join(TRANSPILED_DIR, 'util');
+  const writeUtilDirPath = path.join(DIST_DIR, 'util');
+  fs.ensureDirSync(writeUtilDirPath);
+  fs.readdir(readUtilDirPath, function(err, fileNames) {
+    if (err) {
+      console.log('failed to read dir: ', readUtilDirPath);
+      return process.exit(1);
+    }
+    fileNames = fileNames.filter(function(fileName) {
+      return fileName.endsWith('.d.ts');
+    }).map(function(fileName) {
+      return path.join(readUtilDirPath, fileName);
+    }).forEach(function(fullPath) {
+      const writePath = path.join(writeUtilDirPath, path.basename(fullPath));
+      fs.copy(fullPath, writePath, function(err) {
+        if (err) {
+          console.log(`failed to copy ${fullPath} to ${writePath}: `, err.message);
+          process.exit(1);
+        }
+      });
+    });
+
+  })
+}
 
 process.on('exit', (code) => {
   fs.removeSync(TRANSPILED_DIR);
