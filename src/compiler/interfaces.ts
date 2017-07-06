@@ -45,6 +45,11 @@ export interface TranspileResults {
 }
 
 
+export interface OptimizeHtmlResults {
+  diagnostics: Diagnostic[];
+}
+
+
 export interface ModuleResults {
   bundles: {
     [bundleId: string]: string;

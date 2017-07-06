@@ -1,5 +1,4 @@
 import { assignHostContentSlots, createVNodesFromSsr } from '../renderer/slot';
-import { BUNDLES_DIR, SSR_VNODE_ID } from '../../util/constants';
 import { ComponentMeta, ComponentRegistry, ConfigApi, DomControllerApi,
   DomApi, HostElement, ProjectNamespace, ListenOptions, LoadComponentRegistry,
   ModuleCallbacks, QueueApi, PlatformApi } from '../../util/interfaces';
@@ -9,6 +8,7 @@ import { h, t } from '../renderer/h';
 import { initHostConstructor } from '../instance/init';
 import { initGlobal } from './global-client';
 import { parseComponentMeta, parseComponentRegistry } from '../../util/data-parse';
+import { SSR_VNODE_ID } from '../../util/constants';
 
 
 export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string, loadAnimations: boolean): PlatformApi {
@@ -166,7 +166,7 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
 
 
   function getBundlePath(fileName: string) {
-    return `${staticDir}${BUNDLES_DIR}/${Gbl.ns.toLowerCase()}/${fileName}`;
+    return `${staticDir}${Gbl.ns.toLowerCase()}/${fileName}`;
   }
 
 

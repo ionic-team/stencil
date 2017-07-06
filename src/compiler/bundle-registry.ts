@@ -50,7 +50,7 @@ export function generateComponentRegistry(buildConfig: BuildConfig, ctx: BuildCo
   };
 
   const registryFileName = `${buildConfig.namespace.toLowerCase()}.registry.json`;
-  const registryFilePath = buildConfig.sys.path.join(buildConfig.dest, registryFileName);
+  const registryFilePath = buildConfig.sys.path.join(buildConfig.buildDest, registryFileName);
 
   ctx.filesToWrite[registryFilePath] = JSON.stringify(projectRegistry, null, 2);
 

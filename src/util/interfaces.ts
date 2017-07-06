@@ -435,8 +435,10 @@ export interface BuildConfig {
   rootDir: string;
   namespace: string;
   src: string;
-  dest: string;
+  buildDest: string;
   collectionDest: string;
+  indexSrc: string;
+  indexDest: string;
   generateCollection: boolean;
   bundles: Bundle[];
   collections: Collection[];

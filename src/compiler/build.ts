@@ -4,6 +4,7 @@ import { bundle } from './bundle';
 import { compile } from './compile';
 import { generateDependentManifests, mergeManifests, updateManifestUrls } from './manifest';
 import { generateProjectFiles } from './build-project';
+import { optimizeHtml } from './optimize-html';
 import { updateDirectories, writeFiles } from './util';
 
 
@@ -63,6 +64,14 @@ export function build(buildConfig: BuildConfig) {
     });
 
   }).then(() => {
+    // optimize index.html
+    return optimizeHtml(buildConfig, ctx).then(optimizeHtmlResults => {
+      if (optimizeHtmlResults.diagnostics) {
+        buildResults.diagnostics = buildResults.diagnostics.concat(optimizeHtmlResults.diagnostics);
+      }
+    });
+
+  }).then(() => {
     // write all the files in one go
     const filesToWrite = Object.assign({}, ctx.filesToWrite);
     ctx.filesToWrite = {};
@@ -70,13 +79,13 @@ export function build(buildConfig: BuildConfig) {
     if (buildConfig.devMode) {
       // dev mode
       // only ensure the directories it needs exists and writes the files
-      return writeFiles(sys, buildConfig.rootDir, filesToWrite, buildConfig.dest);
+      return writeFiles(sys, buildConfig.rootDir, filesToWrite);
     }
 
     // prod mode
     // first removes any directories and files that aren't in the files to write
     // then ensure the directories it needs exists and writes the files
-    return updateDirectories(sys, buildConfig.rootDir, filesToWrite, buildConfig.dest);
+    return updateDirectories(sys, buildConfig.rootDir, filesToWrite);
 
   }).catch(err => {
     buildResults.diagnostics.push({
@@ -125,24 +134,38 @@ export function normalizeBuildConfig(buildConfig: BuildConfig) {
   }
 
   if (typeof buildConfig.src !== 'string') {
-    buildConfig.src = DEFAULT_SRC_DIR;
+    buildConfig.src = DEFAULT_SRC;
   }
   if (!buildConfig.sys.path.isAbsolute(buildConfig.src)) {
     buildConfig.src = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.src);
   }
 
-  if (typeof buildConfig.dest !== 'string') {
-    buildConfig.dest = DEFAULT_DEST_DIR;
+  if (typeof buildConfig.buildDest !== 'string') {
+    buildConfig.buildDest = DEFAULT_BUILD_DEST;
   }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.dest)) {
-    buildConfig.dest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.dest);
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.buildDest)) {
+    buildConfig.buildDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.buildDest);
   }
 
   if (typeof buildConfig.collectionDest !== 'string') {
-    buildConfig.collectionDest = DEFAULT_COLLECTION_DIR;
+    buildConfig.collectionDest = DEFAULT_COLLECTION_DEST;
   }
   if (!buildConfig.sys.path.isAbsolute(buildConfig.collectionDest)) {
     buildConfig.collectionDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.collectionDest);
+  }
+
+  if (typeof buildConfig.indexSrc !== 'string') {
+    buildConfig.indexSrc = DEFAULT_INDEX_SRC;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexSrc)) {
+    buildConfig.indexSrc = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexSrc);
+  }
+
+  if (typeof buildConfig.indexDest !== 'string') {
+    buildConfig.indexDest = DEFAULT_INDEX_DEST;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexDest)) {
+    buildConfig.indexDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexDest);
   }
 
   buildConfig.devMode = !!buildConfig.devMode;
@@ -159,7 +182,9 @@ export function normalizeBuildConfig(buildConfig: BuildConfig) {
 }
 
 
+const DEFAULT_SRC = 'src';
+const DEFAULT_BUILD_DEST = 'www/build';
+const DEFAULT_INDEX_SRC = 'src/index.html';
+const DEFAULT_INDEX_DEST = 'www/index.html';
+const DEFAULT_COLLECTION_DEST = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
-const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_DEST_DIR = 'dist';
-const DEFAULT_COLLECTION_DIR = 'collection';

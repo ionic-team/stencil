@@ -14,16 +14,13 @@ export function readFile(sys: StencilSystem, filePath: string) {
 }
 
 
-export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite, ensureDir: string): Promise<any> {
+export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite): Promise<any> {
   const filePaths = Object.keys(filesToWrite);
   if (!filePaths.length) {
     return Promise.resolve();
   }
 
   const directories = getDirectoriesFromFiles(sys, filesToWrite);
-  if (directories.indexOf(ensureDir) === -1) {
-    directories.push(ensureDir);
-  }
 
   return ensureDirectoriesExist(sys, directories, [rootDir]).then(() => {
     return writeToDisk(sys, filesToWrite);
@@ -31,8 +28,8 @@ export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: Fi
 }
 
 
-export function updateDirectories(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite, ensureDir: string): Promise<any> {
-  return writeFiles(sys, rootDir, filesToWrite, ensureDir);
+export function updateDirectories(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite): Promise<any> {
+  return writeFiles(sys, rootDir, filesToWrite);
 }
 
 

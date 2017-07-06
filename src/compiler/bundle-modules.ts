@@ -1,6 +1,5 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
   Manifest, ModuleResults, StencilSystem } from './interfaces';
-import { BUNDLES_DIR } from '../util/constants';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../util/data-serialize';
 
 
@@ -86,7 +85,7 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
 
     // create the file name and path of where the bundle will be saved
     const moduleFileName = formatJsBundleFileName(moduleResults.bundles[bundleId]);
-    const moduleFilePath = sys.path.join(buildConfig.dest, BUNDLES_DIR, buildConfig.namespace.toLowerCase(), moduleFileName);
+    const moduleFilePath = sys.path.join(buildConfig.buildDest, buildConfig.namespace.toLowerCase(), moduleFileName);
 
     ctx.filesToWrite[moduleFilePath] = moduleContent;
 

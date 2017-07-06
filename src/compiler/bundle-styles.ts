@@ -1,6 +1,6 @@
-import { BUNDLES_DIR, HYDRATED_CSS } from '../util/constants';
 import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from './interfaces';
 import { formatCssBundleFileName, generateBundleId } from '../util/data-serialize';
+import { HYDRATED_CSS } from '../util/constants';
 import { readFile } from './util';
 
 
@@ -149,8 +149,7 @@ function generateModeCss(
     // create the file name and path of where the bundle will be saved
     const styleFileName = formatCssBundleFileName(stylesResult[modeName]);
     const styleFilePath = sys.path.join(
-      buildConfig.dest,
-      BUNDLES_DIR,
+      buildConfig.buildDest,
       buildConfig.namespace.toLowerCase(),
       styleFileName
     );

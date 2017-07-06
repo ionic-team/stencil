@@ -8,7 +8,6 @@ import { generateComponentRegistry } from './bundle-registry';
 export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfig: BundlerConfig) {
   // within MAIN thread
   const logger = buildConfig.logger;
-  const timeSpan = logger.createTimeSpan(`bundle started`);
 
   const bundleResults: BundleResults = {
     diagnostics: [],
@@ -16,7 +15,7 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
   };
 
   logger.debug(`bundle, src: ${buildConfig.src}`);
-  logger.debug(`bundle, dest: ${buildConfig.dest}`);
+  logger.debug(`bundle, buildDest: ${buildConfig.buildDest}`);
 
   return Promise.resolve().then(() => {
     validateBundlerConfig(bundlerConfig);
@@ -51,7 +50,6 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
 
   })
   .then(() => {
-    timeSpan.finish('bundle, done');
     return bundleResults;
   });
 }

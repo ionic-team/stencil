@@ -122,7 +122,7 @@ export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, 
       }
 
       // create the module filePath we'll be reading
-      const moduleFilePath = sys.path.join(Gbl.staticDir, `bundles`, `${moduleId}.js`);
+      const moduleFilePath = sys.path.join(Gbl.staticDir, `${moduleId}.js`);
 
       if (!pendingModuleFileReads[moduleFilePath]) {
         // not already actively reading this file
@@ -150,7 +150,7 @@ export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, 
         // this style hasn't been added to our collection yet
 
         // create the style filePath we'll be reading
-        const styleFilePath = sys.path.join(Gbl.staticDir, `bundles`, `${styleId}.js`);
+        const styleFilePath = sys.path.join(Gbl.staticDir, `${styleId}.js`);
 
         if (!pendingStyleFileReads[styleFilePath]) {
           // we're not already actively opening this file

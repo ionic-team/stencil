@@ -217,19 +217,7 @@ switch (cmdArgs[2]) {
     stencil.build(buildConfig);
     break;
 
-  case 'collection':
-    switch (cmdArgs[3]) {
-      case 'add':
-        stencil.collectionAdd(buildConfig);
-        break;
-
-      default:
-        console.log('Invalid stencil collection command: "' + cmdArgs[3] + '"');
-        process.exit(1);
-    }
-    break;
-
   default:
-    console.log('Invalid stencil command: "' + cmdArgs[2] + '"');
+    console.log('Invalid stencil command' + (cmdArgs[2] ? ': "' + cmdArgs[2] + '"' : ''));
     process.exit(1);
 }
