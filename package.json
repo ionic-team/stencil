@@ -1,7 +1,7 @@
 {
   "name": "@stencil/core",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.0",
   "license": "MIT",
   "bin": {
     "stencil": "./bin/stencil"
@@ -9,6 +9,13 @@
   "engines": {
     "node": ">=6.4.0"
   },
+  "files": [
+    "bin",
+    "dist/client",
+    "dist/compiler",
+    "dist/util",
+    "dist/index.d.ts"
+  ],
   "main": "./dist/compiler/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
