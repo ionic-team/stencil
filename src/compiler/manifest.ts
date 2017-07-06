@@ -111,7 +111,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
     return 0;
   });
 
-  if (buildConfig.collection) {
+  if (buildConfig.generateCollection) {
     const manifestFilePath = sys.path.join(buildConfig.collectionDest, MANIFEST_FILE_NAME);
     const manifestJson = JSON.stringify(manifest, null, 2);
 

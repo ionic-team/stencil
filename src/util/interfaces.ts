@@ -437,7 +437,7 @@ export interface BuildConfig {
   src: string;
   dest: string;
   collectionDest: string;
-  collection: boolean;
+  generateCollection: boolean;
   bundles: Bundle[];
   collections: Collection[];
   devMode: boolean;

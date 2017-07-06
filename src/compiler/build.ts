@@ -147,7 +147,7 @@ export function normalizeBuildConfig(buildConfig: BuildConfig) {
 
   buildConfig.devMode = !!buildConfig.devMode;
   buildConfig.watch = !!buildConfig.watch;
-  buildConfig.collection = !!buildConfig.collection;
+  buildConfig.generateCollection = !!buildConfig.generateCollection;
   buildConfig.collections = buildConfig.collections || [];
   buildConfig.bundles = buildConfig.bundles || [];
   buildConfig.exclude = buildConfig.exclude || [

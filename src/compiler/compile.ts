@@ -124,7 +124,7 @@ function compileFile(buildConfig: BuildConfig, ctx: BuildContext, filePath: stri
 
           compileResults.moduleFiles[tsFilePath] = moduleFile;
 
-          if (buildConfig.collection) {
+          if (buildConfig.generateCollection) {
             ctx.filesToWrite[moduleFile.jsFilePath] = moduleFile.jsText;
           }
 
@@ -146,7 +146,7 @@ function compileFile(buildConfig: BuildConfig, ctx: BuildContext, filePath: stri
 
 
 function copySourceSassFilesToDest(buildConfig: BuildConfig, ctx: BuildContext, compileResults: CompileResults): Promise<any> {
-  if (!buildConfig.collection) {
+  if (!buildConfig.generateCollection) {
     return Promise.resolve();
   }
 
