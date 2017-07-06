@@ -430,25 +430,33 @@ export type Collection = string;
 export interface BuildConfig {
   sys: StencilSystem;
   logger: Logger;
+  logLevel: 'error'|'warn'|'info'|'ok'|'debug';
+  exclude: string[];
   rootDir: string;
-  compiledDir: string;
   namespace: string;
-  srcDir: string;
-  destDir: string;
+  src: string;
+  dest: string;
+  collectionDest: string;
+  collection: boolean;
   bundles: Bundle[];
   collections: Collection[];
-  isDevMode: boolean;
-  isWatch: boolean;
+  devMode: boolean;
+  watch: boolean;
   preamble: string;
 }
 
 
 export interface Logger {
+  level: string;
   debug(msg: string): void;
   info(msg: string): void;
   ok(msg: string): void;
   warn(msg: string): void;
   error(msg: string): void;
+  dim(msg: string): string;
+  createTimeSpan(startMsg: string): {
+    finish(finishedMsg: string): void;
+  };
 }
 
 
@@ -936,13 +944,15 @@ export interface ModuleCallbacks {
 }
 
 
-export interface StencilConfig {
-  namespace?: string;
-  src?: string;
-  dest?: string;
-  bundles?: Bundle[];
-  collections?: Collection[];
-  preamble?: string;
+export interface Diagnostic {
+  msg: string;
+  type: 'error'|'warn';
+  filePath?: string;
+  start?: number;
+  length?: number;
+  category?: any;
+  code?: number;
+  stack?: string;
 }
 
 
@@ -957,12 +967,23 @@ export interface StencilSystem {
     readdir(path: string, callback?: (err: any, files: string[]) => void): void;
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
     readFileSync(filename: string, encoding: string): string;
+    rmdir(path: string, callback?: (err?: any) => void): void;
     stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
+    unlink(path: string, callback?: (err?: any) => void): void;
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
-    remove(path: string): Promise<void>;
   };
   generateContentHash?(content: string): string;
   getClientCoreFile?(opts: {staticName: string, es5?: boolean, devMode: boolean}): Promise<string>;
+  minifyCss?(input: string): {
+    output: string;
+    sourceMap?: any;
+    diagnostics?: Diagnostic[];
+  };
+  minifyJs?(input: string): {
+    output: string;
+    sourceMap?: any;
+    diagnostics?: Diagnostic[];
+  };
   module?: {
     _nodeModulePaths(fromDir: string): any;
     _resolveFilename(moduleId: string, opts: any): any;
@@ -971,6 +992,7 @@ export interface StencilSystem {
     basename(p: string, ext?: string): string;
     dirname(p: string): string;
     extname(p: string): string;
+    isAbsolute(p: string): boolean;
     join(...paths: string[]): string;
     relative(from: string, to: string): string;
     resolve(...pathSegments: any[]): string;
@@ -998,37 +1020,21 @@ export interface StencilSystem {
   };
   sass?: {
     render(
-      config: {file: string, outputStyle?: string},
+      config: {
+        data?: string;
+        file?: string;
+        includePaths?: string[];
+        outFile?: string;
+        outputStyle?: string;
+      },
       cb: (err: any, result: {css: string; stats: any}) => void
     ): void;
   };
   typescript?: any;
-  uglify?: {
-    minify: {(content: string, opts?: {}): {
-      code: string;
-      error: {
-       message: string;
-       filename: string;
-       line: number;
-       col: number;
-       pos: number;
-      };
-    }};
-  };
   vm?: {
     createContext(sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
-}
-
-
-export interface TaskOptions {
-  rootDir: string;
-  sys: StencilSystem;
-  logger: Logger;
-  stencilConfig: StencilConfig;
-  isDevMode: boolean;
-  isWatch: boolean;
 }
 
 

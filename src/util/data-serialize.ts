@@ -91,8 +91,11 @@ function formatProps(props: PropMeta[], defaultAttrCase: number) {
 export function formatComponentRegistry(registry: ComponentRegistry, defaultAttrCase: number) {
   // ensure we've got a standard order of the components
   return Object.keys(registry).sort().map(tag => {
-    return formatLoadComponentRegistry(registry[tag], defaultAttrCase);
-  });
+    if (registry[tag]) {
+      return formatLoadComponentRegistry(registry[tag], defaultAttrCase);
+    }
+    return null;
+  }).filter(c => c);
 }
 
 

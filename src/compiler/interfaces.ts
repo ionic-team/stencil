@@ -1,86 +1,81 @@
 export * from '../util/interfaces';
-import { ComponentMeta, Manifest, Bundle, Logger, StencilSystem } from '../util/interfaces';
-
-
-export interface CompilerConfig {
-  compilerOptions: {
-    declaration?: boolean;
-    lib?: string[];
-    module?: 'es2015' | 'commonjs';
-    rootDir?: string;
-    outDir?: string;
-    sourceMap?: boolean;
-    target?: 'es5' | 'es2015';
-  };
-  include: string[];
-  exclude?: string[];
-  isDevMode?: boolean;
-  bundles?: Bundle[];
-  sys: StencilSystem;
-  logger: Logger;
-  isWatch?: boolean;
-}
+import { ComponentMeta, Diagnostic, Manifest, LoadComponentRegistry } from '../util/interfaces';
 
 
 export interface BundlerConfig {
-  namespace: string;
-  srcDir: string;
-  destDir: string;
-  isDevMode?: boolean;
-  logger: Logger;
-  sys: StencilSystem;
-  attachRegistryTo?: 'core'|'loader';
-  isWatch?: boolean;
   attrCase?: number;
   manifest: Manifest;
 }
 
 
-export interface FileMeta {
-  fileName: string;
-  fileExt: string;
-  filePath: string;
-  srcDir: string;
-  srcText: string;
-  jsFilePath: string;
-  jsText: string;
-  isTsSourceFile: boolean;
-  isScssSourceFile: boolean;
-  hasCmpClass: boolean;
-  cmpMeta: ComponentMeta;
-  cmpClassName: string;
-  isWatching: boolean;
-  recompileOnChange: boolean;
-  rebundleOnChange: boolean;
-  transpiledCount: number;
+export interface ModuleFileMeta {
+  tsFilePath?: string;
+  tsText?: string;
+  jsFilePath?: string;
+  jsText?: string;
+  hasCmpClass?: boolean;
+  cmpMeta?: ComponentMeta;
+  cmpClassName?: string;
+  includedSassFiles?: string[];
 }
 
 
 export interface BuildContext {
-  files?: Map<string, FileMeta>;
-  results?: Results;
-
-  isCompilerWatchInitialized?: boolean;
-  isBundlerWatchInitialized?: boolean;
+  moduleFiles: ModuleFiles;
+  filesToWrite: FilesToWrite;
 }
 
 
-export interface StylesResults {
-  [bundleId: string]: {
-    [modeName: string]: string;
-  };
+export interface ModuleFiles {
+  [filePath: string]: ModuleFileMeta;
+}
+
+
+export interface CompileResults {
+  moduleFiles: ModuleFiles;
+  diagnostics: Diagnostic[];
+  manifest?: Manifest;
+  includedSassFiles?: string[];
+}
+
+
+export interface TranspileResults {
+  moduleFiles: ModuleFiles;
+  diagnostics: Diagnostic[];
 }
 
 
 export interface ModuleResults {
-  [bundleId: string]: string;
+  bundles: {
+    [bundleId: string]: string;
+  };
+  diagnostics: Diagnostic[];
 }
 
 
-export interface Results {
-  errors?: string[];
-  files?: string[];
-  manifest?: Manifest;
-  manifestPath?: string;
-  componentRegistry?: string;
+export interface FilesToWrite {
+  [filePath: string]: string;
+}
+
+
+export interface StylesResults {
+  bundles: {
+    [bundleId: string]: {
+      [modeName: string]: string;
+    };
+  };
+  diagnostics: Diagnostic[];
+}
+
+
+export interface BundleResults {
+  diagnostics: Diagnostic[];
+  componentRegistry: LoadComponentRegistry[];
+}
+
+
+export interface BuildResults {
+  diagnostics: Diagnostic[];
+  manifest: Manifest;
+  componentRegistry: LoadComponentRegistry[];
 }

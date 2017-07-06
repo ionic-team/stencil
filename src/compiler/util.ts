@@ -1,51 +1,4 @@
-import { BuildContext, FileMeta, Results, StencilSystem } from './interfaces';
-
-
-export function getFileMeta(sys: StencilSystem, ctx: BuildContext, filePath: string): Promise<FileMeta> {
-  const fileMeta = ctx.files.get(filePath);
-  if (fileMeta) {
-    return Promise.resolve(fileMeta);
-  }
-
-  return readFile(sys, filePath).then(srcText => {
-    return createFileMeta(sys, ctx, filePath, srcText);
-  });
-}
-
-
-export function createFileMeta(sys: StencilSystem, ctx: BuildContext, filePath: string, srcText: string) {
-  ctx.files = ctx.files || new Map();
-
-  let fileMeta = ctx.files.get(filePath);
-  if (!fileMeta) {
-    fileMeta = {
-      fileName: sys.path.basename(filePath),
-      filePath: filePath,
-      fileExt: sys.path.extname(filePath),
-      srcDir: sys.path.dirname(filePath),
-      srcText: srcText,
-      jsFilePath: null,
-      jsText: null,
-      isTsSourceFile: isTsSourceFile(filePath),
-      isScssSourceFile: isScssSourceFile(filePath),
-      hasCmpClass: false,
-      cmpMeta: null,
-      cmpClassName: null,
-      isWatching: false,
-      recompileOnChange: false,
-      rebundleOnChange: false,
-      transpiledCount: 0
-    };
-
-    ctx.files.set(filePath, fileMeta);
-  }
-
-  if (fileMeta.isTsSourceFile) {
-    fileMeta.hasCmpClass = hasCmpClass(fileMeta.srcText, fileMeta.filePath);
-  }
-
-  return fileMeta;
-}
+import { FilesToWrite, StencilSystem } from './interfaces';
 
 
 export function readFile(sys: StencilSystem, filePath: string) {
@@ -61,170 +14,151 @@ export function readFile(sys: StencilSystem, filePath: string) {
 }
 
 
-export function writeFile(sys: StencilSystem, filePath: string, content: string) {
+export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite, ensureDir: string): Promise<any> {
+  const filePaths = Object.keys(filesToWrite);
+  if (!filePaths.length) {
+    return Promise.resolve();
+  }
+
+  const directories = getDirectoriesFromFiles(sys, filesToWrite);
+  if (directories.indexOf(ensureDir) === -1) {
+    directories.push(ensureDir);
+  }
+
+  return ensureDirectoriesExist(sys, directories, [rootDir]).then(() => {
+    return writeToDisk(sys, filesToWrite);
+  });
+}
+
+
+export function updateDirectories(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite, ensureDir: string): Promise<any> {
+  return writeFiles(sys, rootDir, filesToWrite, ensureDir);
+}
+
+
+function writeToDisk(sys: StencilSystem, filesToWrite: FilesToWrite): Promise<any> {
+  // assumes directories to be saved in already exit
   return new Promise((resolve, reject) => {
-    sys.fs.writeFile(filePath, content, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
-}
+    const filePathsToWrite = Object.keys(filesToWrite);
+    let doneWriting = 0;
+    let rejected = false;
 
-
-export function copyFile(sys: StencilSystem, src: string, dest: string) {
-  return readFile(sys, src).then(content => {
-    return writeFile(sys, dest, content);
-  });
-}
-
-
-export function writeFiles(sys: StencilSystem, files: Map<string, string>) {
-  const paths: string[] = [];
-
-  files.forEach((content, filePath) => {
-    content;
-    paths.push(filePath);
-  });
-
-  return ensureDirs(sys, paths).then(() => {
-    const promises: Promise<any>[] = [];
-
-    files.forEach((content, filePath) => {
-      promises.push(writeFile(sys, filePath, content));
-    });
-
-    return Promise.all(promises);
-  });
-}
-
-
-export function access(sys: StencilSystem, filePath: string): Promise<boolean> {
-  return new Promise(resolve => {
-    sys.fs.access(filePath, err => {
-      if (err) {
-        resolve(false);
-      } else {
-        resolve(true);
-      }
-    });
-  });
-}
-
-
-export function ensureDir(sys: StencilSystem, filePath: string) {
-  return ensureDirs(sys, [filePath]);
-}
-
-
-export function ensureDirs(sys: StencilSystem, filePaths: string[]) {
-  const path = sys.path;
-  const fs = sys.fs;
-
-  let checkDirs: string[] = [];
-
-  filePaths.forEach(p => {
-    const dir = path.dirname(p);
-    if (checkDirs.indexOf(dir) === -1) {
-      checkDirs.push(dir);
-    }
-  });
-
-  checkDirs = checkDirs.sort((a, b) => {
-    if (a.split(path.sep).length < b.split(path.sep).length) {
-      return -1;
-    }
-    if (a.split(path.sep).length > b.split(path.sep).length) {
-      return 1;
-    }
-    if (a.length < b.length) {
-      return -1;
-    }
-    if (a.length > b.length) {
-      return 1;
-    }
-    if (a < b) {
-      return -1;
-    }
-    if (a > b) {
-      return 1;
-    }
-    return 0;
-  });
-
-  const dirExists = new Set();
-
-  return new Promise((resolve, reject) => {
-
-    function checkDir(resolve: Function) {
-      const dir = checkDirs.shift();
-      if (!dir) {
-        resolve();
-        return;
-      }
-
-      var chunks = dir.split(path.sep);
-
-      checkChunk(chunks, 0, resolve);
+    if (!filePathsToWrite.length) {
+      // shouldn't be possible, but ya never know
+      resolve();
+      return;
     }
 
-    function checkChunk(chunks: string[], appendIndex: number, resolve: Function) {
-      if (appendIndex >= chunks.length - 1) {
-        checkDir(resolve);
-        return;
-      }
-
-      const dir = chunks.slice(0, appendIndex + 2).join(path.sep);
-
-      if (dirExists.has(dir)) {
-        checkChunk(chunks, ++appendIndex, resolve);
-        return;
-      }
-
-      fs.access(dir, err => {
+    filePathsToWrite.forEach(filePathToWrite => {
+      sys.fs.writeFile(filePathToWrite, filesToWrite[filePathToWrite], (err) => {
         if (err) {
-          // no access
-          fs.mkdir(dir, err => {
-            if (err) {
-              reject(err);
-
-            } else {
-              checkChunk(chunks, ++appendIndex, resolve);
-            }
-          });
+          rejected = true;
+          reject(err);
 
         } else {
-          // has access
-          dirExists.add(dir);
-          checkChunk(chunks, ++appendIndex, resolve);
+          doneWriting++;
+          if (doneWriting >= filePathsToWrite.length && !rejected) {
+            resolve();
+          }
         }
       });
+    });
+  });
+}
+
+
+function ensureDirectoriesExist(sys: StencilSystem, directories: string[], existingDirectories: string[]) {
+  return new Promise(resolve => {
+
+    const knowExistingDirPaths = existingDirectories.map(existingDirectory => {
+      return existingDirectory.split(sys.path.sep);
+    });
+
+    const checkDirectories = sortDirectories(sys, directories).slice();
+
+    function ensureDir() {
+      if (checkDirectories.length === 0) {
+        resolve();
+        return;
+      }
+
+      const checkDirectory = checkDirectories.shift();
+
+      const dirPaths = checkDirectory.split(sys.path.sep);
+      let pathSections = 1;
+
+      function ensureSection() {
+        if (pathSections > dirPaths.length) {
+          ensureDir();
+          return;
+        }
+
+        const checkDirPaths = dirPaths.slice(0, pathSections);
+        const dirPath = checkDirPaths.join(sys.path.sep);
+
+        for (var i = 0; i < knowExistingDirPaths.length; i++) {
+          var existingDirPaths = knowExistingDirPaths[i];
+          var alreadyExists = true;
+
+          for (var j = 0; j < checkDirPaths.length; j++) {
+            if (checkDirPaths[j] !== existingDirPaths[j]) {
+              alreadyExists = false;
+              break;
+            }
+          }
+
+          if (alreadyExists) {
+            pathSections++;
+            ensureSection();
+            return;
+          }
+        }
+
+        sys.fs.mkdir(dirPath, () => {
+          // not worrying about the error here
+          // if there's an error, it's probably because this directory already exists
+          // which is what we want, no need to check access AND mkdir
+          knowExistingDirPaths.push(dirPath.split(sys.path.sep));
+          pathSections++;
+          ensureSection();
+        });
+      }
+
+      ensureSection();
     }
 
-    checkDir(resolve);
+    ensureDir();
   });
 }
 
 
-export function removeFilePath(sys: StencilSystem, path: string): Promise<any> {
-  sys;
-  path;
-  return Promise.resolve();
-  // return sys.fs.remove(path);
+function getDirectoriesFromFiles(sys: StencilSystem, filesToWrite: FilesToWrite) {
+  const directories: string[] = [];
+
+  Object.keys(filesToWrite).forEach(filePath => {
+    const dir = sys.path.dirname(filePath);
+    if (directories.indexOf(dir) === -1) {
+      directories.push(dir);
+    }
+  });
+
+  return directories;
 }
 
 
-export function emptyDir(sys: StencilSystem, path: string): Promise<any> {
-  sys;
-  path;
-  return Promise.resolve();
-  /*
-  return sys.fs.remove(path).then(() => {
-    return ensureDir(sys, path);
+function sortDirectories(sys: StencilSystem, directories: string[]) {
+  return directories.sort((a, b) => {
+    const aPaths = a.split(sys.path.sep).length;
+    const bPaths = b.split(sys.path.sep).length;
+
+    if (aPaths < bPaths) return -1;
+    if (aPaths > bPaths) return 1;
+
+    if (a < b) return -1;
+    if (a > b) return 1;
+
+    return 0;
   });
-  */
 }
 
 
@@ -260,12 +194,4 @@ export function hasCmpClass(sourceText: string, filePath: string) {
   }
 
   return true;
-}
-
-
-export function logError(results: Results, msg: any) {
-  results.errors = results.errors || [];
-  results.errors.push(msg);
-
-  return results;
 }

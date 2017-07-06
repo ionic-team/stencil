@@ -1,147 +1,165 @@
 import { BuildConfig, Manifest } from '../util/interfaces';
-import { BuildContext, BundlerConfig, CompilerConfig } from './interfaces';
+import { BuildContext, BuildResults, BundlerConfig } from './interfaces';
 import { bundle } from './bundle';
 import { compile } from './compile';
 import { generateDependentManifests, mergeManifests, updateManifestUrls } from './manifest';
-import { generateProjectCore } from './build-project-core';
-import { removeFilePath } from './util';
+import { generateProjectFiles } from './build-project';
+import { updateDirectories, writeFiles } from './util';
 
 
-export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
-  // use the same build context object throughout the build
-  ctx = ctx || {};
+export function build(buildConfig: BuildConfig) {
+  normalizeBuildConfig(buildConfig);
 
-  buildConfig.logger.info(`build, ${buildConfig.isDevMode ? 'dev' : 'prod'} mode`);
+  const sys = buildConfig.sys;
+  const logger = buildConfig.logger;
+
+  const timeSpan = logger.createTimeSpan(`build, ${buildConfig.devMode ? 'dev' : 'prod'} mode, started`);
+
+  const buildResults: BuildResults = {
+    diagnostics: [],
+    manifest: {},
+    componentRegistry: []
+  };
+
+  const ctx: BuildContext = {
+    moduleFiles: {},
+    filesToWrite: {}
+  };
 
   return Promise.resolve().then(() => {
-    // validate our data is good to go
-    validateBuildConfig(buildConfig);
-
-    return generateDependentManifests(
-      buildConfig.logger,
-      buildConfig.sys,
-      buildConfig.collections,
-      buildConfig.rootDir,
-      buildConfig.compiledDir);
+    // generate manifest phase
+    return generateDependentManifests(buildConfig);
 
   }).then(dependentManifests => {
-
-    return compileProject(buildConfig, ctx).then(results => {
-      if (results.errors && results.errors.length > 0) {
-        results.errors.forEach(err => {
-          buildConfig.logger.error(err);
-        });
-        throw 'build error';
+    // compile phase
+    return compile(buildConfig, ctx).then(compileResults => {
+      if (compileResults.diagnostics) {
+        buildResults.diagnostics = buildResults.diagnostics.concat(compileResults.diagnostics);
       }
 
-      const resultsManifest = results.manifest || {};
+      const resultsManifest: Manifest = compileResults.manifest || {};
 
       const localManifest = updateManifestUrls(
-        buildConfig.logger,
-        buildConfig.sys,
+        buildConfig,
         resultsManifest,
-        buildConfig.compiledDir,
-        buildConfig.compiledDir
+        buildConfig.collectionDest
       );
       return mergeManifests([].concat((localManifest || []), dependentManifests));
-
     });
 
   }).then(manifest => {
-    // bundle all of the components into their separate files
-    return bundleProject(buildConfig, ctx, manifest);
+    // bundle phase
+    const bundlerConfig: BundlerConfig = {
+      manifest: manifest
+    };
 
-  }).then(bundleProjectResults => {
-    // generate the core loader and aux files for this project
-    return generateProjectCore(buildConfig, bundleProjectResults.componentRegistry);
+    return bundle(buildConfig, ctx, bundlerConfig).then(bundleResults => {
+      if (bundleResults.diagnostics) {
+        buildResults.diagnostics = buildResults.diagnostics.concat(bundleResults.diagnostics);
+      }
+
+      // generate the loader and core files for this project
+      return generateProjectFiles(buildConfig, ctx, bundleResults.componentRegistry);
+    });
 
   }).then(() => {
-    // remove temp compiled dir
-    // remove is async but no need to wait on it
-    removeFilePath(buildConfig.sys, buildConfig.compiledDir);
+    // write all the files in one go
+    const filesToWrite = Object.assign({}, ctx.filesToWrite);
+    ctx.filesToWrite = {};
 
-    buildConfig.logger.info(`build, done`);
+    if (buildConfig.devMode) {
+      // dev mode
+      // only ensure the directories it needs exists and writes the files
+      return writeFiles(sys, buildConfig.rootDir, filesToWrite, buildConfig.dest);
+    }
+
+    // prod mode
+    // first removes any directories and files that aren't in the files to write
+    // then ensure the directories it needs exists and writes the files
+    return updateDirectories(sys, buildConfig.rootDir, filesToWrite, buildConfig.dest);
 
   }).catch(err => {
-    buildConfig.logger.error(err);
-    err.stack && buildConfig.logger.error(err.stack);
+    buildResults.diagnostics.push({
+      msg: err.toString(),
+      type: 'error',
+      stack: err.stack
+    });
+
+  }).then(() => {
+    buildResults.diagnostics.forEach(d => {
+      if (d.type === 'error' && logger.level === 'debug' && d.stack) {
+        logger.error(d.stack);
+      } else {
+        logger[d.type](d.msg);
+      }
+    });
+
+    if (buildConfig.watch) {
+      timeSpan.finish(`build ready, watching files...`);
+
+    } else {
+      timeSpan.finish(`build finished`);
+    }
+
+    return buildResults;
   });
 }
 
 
-function compileProject(buildConfig: BuildConfig, ctx: BuildContext) {
-  const config: CompilerConfig = {
-    compilerOptions: {
-      outDir: buildConfig.compiledDir,
-      module: 'commonjs',
-      target: 'es5',
-      rootDir: buildConfig.srcDir
-    },
-    include: [
-      buildConfig.srcDir
-    ],
-    exclude: [
-      'node_modules',
-      'compiler',
-      'test'
-    ],
-    isDevMode: buildConfig.isDevMode,
-    logger: buildConfig.logger,
-    bundles: buildConfig.bundles,
-    isWatch: buildConfig.isWatch,
-    sys: buildConfig.sys
-  };
-
-  return compile(config, ctx);
-}
-
-
-function bundleProject(buildConfig: BuildConfig, ctx: BuildContext, manifest: Manifest) {
-  const config: BundlerConfig = {
-    namespace: buildConfig.namespace,
-    srcDir: buildConfig.compiledDir,
-    destDir: buildConfig.destDir,
-    manifest: manifest,
-    sys: buildConfig.sys,
-    isDevMode: buildConfig.isDevMode,
-    isWatch: buildConfig.isWatch,
-    logger: buildConfig.logger
-  };
-
-  return bundle(config, ctx);
-}
-
-
-function validateBuildConfig(buildConfig: BuildConfig) {
-  if (!buildConfig.srcDir) {
-    throw `config.srcDir required`;
+export function normalizeBuildConfig(buildConfig: BuildConfig) {
+  if (!buildConfig) {
+    throw new Error(`invalid build config`);
+  }
+  if (!buildConfig.rootDir) {
+    throw new Error('config.rootDir required');
+  }
+  if (!buildConfig.logger) {
+    throw new Error(`config.logger required`);
   }
   if (!buildConfig.sys) {
-    throw 'config.sys required';
-  }
-  if (!buildConfig.sys.fs) {
-    throw 'config.sys.fs required';
-  }
-  if (!buildConfig.sys.path) {
-    throw 'config.sys.path required';
-  }
-  if (!buildConfig.sys.sass) {
-    throw 'config.sys.sass required';
-  }
-  if (!buildConfig.sys.rollup) {
-    throw 'config.sys.rollup required';
-  }
-  if (!buildConfig.sys.typescript) {
-    throw 'config.sys.typescript required';
+    throw new Error('config.sys required');
   }
 
-  // ensure we've at least got empty objects
-  buildConfig.bundles = buildConfig.bundles || [];
+  if (typeof buildConfig.namespace !== 'string') {
+    buildConfig.namespace = DEFAULT_NAMESPACE;
+  }
+
+  if (typeof buildConfig.src !== 'string') {
+    buildConfig.src = DEFAULT_SRC_DIR;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.src)) {
+    buildConfig.src = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.src);
+  }
+
+  if (typeof buildConfig.dest !== 'string') {
+    buildConfig.dest = DEFAULT_DEST_DIR;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.dest)) {
+    buildConfig.dest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.dest);
+  }
+
+  if (typeof buildConfig.collectionDest !== 'string') {
+    buildConfig.collectionDest = DEFAULT_COLLECTION_DIR;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.collectionDest)) {
+    buildConfig.collectionDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.collectionDest);
+  }
+
+  buildConfig.devMode = !!buildConfig.devMode;
+  buildConfig.watch = !!buildConfig.watch;
+  buildConfig.collection = !!buildConfig.collection;
   buildConfig.collections = buildConfig.collections || [];
+  buildConfig.bundles = buildConfig.bundles || [];
+  buildConfig.exclude = buildConfig.exclude || [
+    'node_modules',
+    'bower_components'
+  ];
 
-  // default to "App" namespace if one wasn't provided
-  buildConfig.namespace = (buildConfig.namespace || 'App').trim();
-
-  // default to "bundles" directory if one wasn't provided
-  buildConfig.namespace = (buildConfig.namespace || 'bundles').trim();
+  return buildConfig;
 }
+
+
+const DEFAULT_NAMESPACE = 'App';
+const DEFAULT_SRC_DIR = 'src';
+const DEFAULT_DEST_DIR = 'dist';
+const DEFAULT_COLLECTION_DIR = 'collection';

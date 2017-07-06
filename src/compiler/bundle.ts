@@ -1,114 +1,83 @@
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE, BUNDLES_DIR } from '../util/constants';
-import { BundlerConfig, BuildContext, Manifest, Results } from './interfaces';
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
 import { bundleModules } from './bundle-modules';
+import { BuildContext, BuildConfig, BundleResults, BundlerConfig } from './interfaces';
 import { bundleStyles } from './bundle-styles';
-import { emptyDir } from './util';
 import { generateComponentRegistry } from './bundle-registry';
-import { setupBundlerWatch } from './watch';
 
 
-export function bundle(config: BundlerConfig, ctx: BuildContext = {}): Promise<Results> {
-  validateConfig(config);
+export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfig: BundlerConfig) {
+  // within MAIN thread
+  const logger = buildConfig.logger;
+  const timeSpan = logger.createTimeSpan(`bundle started`);
 
-  const userManifest = validateUserManifest(config.manifest);
-
-  config.logger.debug(`bundle, srcDir: ${config.srcDir}`);
-  config.logger.debug(`bundle, destDir: ${config.destDir}`);
-
-  ctx.results = {
-    files: []
+  const bundleResults: BundleResults = {
+    diagnostics: [],
+    componentRegistry: []
   };
 
+  logger.debug(`bundle, src: ${buildConfig.src}`);
+  logger.debug(`bundle, dest: ${buildConfig.dest}`);
+
   return Promise.resolve().then(() => {
-    if (!config.isDevMode) {
-      // in prod mode, be sure to first empty the
-      // bundles dest dir
-      const projectBundlesDir = config.sys.path.join(config.destDir, BUNDLES_DIR, config.namespace.toLowerCase());
+    validateBundlerConfig(bundlerConfig);
 
-      config.logger.debug(`bundle, empty bundles dir: ${projectBundlesDir}`);
-
-      return emptyDir(config.sys, projectBundlesDir);
-    }
-    return Promise.resolve();
-
-  }).then(() => {
     // kick off style and module bundling at the same time
     return Promise.all([
-      bundleStyles(config, ctx, userManifest),
-      bundleModules(config, userManifest)
+      bundleStyles(buildConfig, ctx, bundlerConfig.manifest),
+      bundleModules(buildConfig, ctx, bundlerConfig.manifest)
     ]);
 
-  }).then(bundleResults => {
+  }).then(results => {
     // both styles and modules are done bundling
-    const styleResults = bundleResults[0];
-    const moduleResults = bundleResults[1];
+    const styleResults = results[0];
+    if (styleResults.diagnostics) {
+      bundleResults.diagnostics = bundleResults.diagnostics.concat(styleResults.diagnostics);
+    }
 
-    return generateComponentRegistry(config, ctx, styleResults, moduleResults);
+    const moduleResults = results[1];
+    if (moduleResults.diagnostics && moduleResults.diagnostics.length) {
+      bundleResults.diagnostics = bundleResults.diagnostics.concat(moduleResults.diagnostics);
+    }
+
+    bundleResults.componentRegistry = generateComponentRegistry(buildConfig, ctx, bundlerConfig, styleResults, moduleResults);
+
+  })
+  .catch(err => {
+    bundleResults.diagnostics.push({
+      msg: err.toString(),
+      type: 'error',
+      stack: err.stack
+    });
 
   })
   .then(() => {
-    return setupBundlerWatch(config, ctx, config.sys.typescript.sys);
-
-  })
-  .then(() => {
-    config.logger.info('bundle, done');
-
-    return ctx.results;
+    timeSpan.finish('bundle, done');
+    return bundleResults;
   });
 }
 
 
-export function bundleWatch(config: BundlerConfig, ctx: BuildContext, changedFiles: string[]) {
-  config.logger.debug(`bundle, bundleWatch: ${changedFiles}`);
+function validateBundlerConfig(bundlerConfig: BundlerConfig) {
+  bundlerConfig.attrCase = normalizeAttrCase(bundlerConfig.attrCase);
 
-  return bundle(config, ctx);
-}
-
-
-function validateConfig(config: BundlerConfig) {
-  if (!config.sys) {
-    throw 'config.sys required';
+  if (!bundlerConfig.manifest) {
+    throw new Error('config.manifest required');
   }
-  if (!config.sys.fs) {
-    throw 'config.sys.fs required';
+  if (!bundlerConfig.manifest.bundles) {
+    throw new Error('config.manifest.bundles required');
   }
-  if (!config.sys.path) {
-    throw 'config.sys.path required';
-  }
-  if (!config.sys.sass) {
-    throw 'config.sys.sass required';
-  }
-  if (!config.sys.rollup) {
-    throw 'config.sys.rollup required';
-  }
-  if (!config.sys.typescript) {
-    throw 'config.sys.typescript required';
-  }
-
-  config.attrCase = normalizeAttrCase(config.attrCase);
-}
-
-
-function validateUserManifest(manifest: Manifest) {
-  if (!manifest) {
-    throw 'config.manifest required';
-  }
-  if (!manifest.bundles) {
-    throw 'config.manifest.bundles required';
-  }
-  if (!manifest.components) {
-    throw 'config.manifest.components required';
+  if (!bundlerConfig.manifest.components) {
+    throw new Error('config.manifest.components required');
   }
 
   // sort by tag name and ensure they're lower case
-  manifest.bundles.forEach(b => {
+  bundlerConfig.manifest.bundles.forEach(b => {
     b.components = b.components.sort().map(c => c.toLowerCase().trim());
   });
-  manifest.components.forEach(c => {
+
+  bundlerConfig.manifest.components.forEach(c => {
     c.tagNameMeta = c.tagNameMeta.toLowerCase().trim();
   });
-
-  return manifest;
 }
 
 

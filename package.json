@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "chalk": "^1.1.3",
+    "clean-css": "^4.1.5",
     "node-sass": "^4.5.0",
     "rollup": "0.41.4",
     "rollup-plugin-commonjs": "^8.0.2",

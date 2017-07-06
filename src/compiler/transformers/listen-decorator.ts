@@ -1,9 +1,9 @@
-import { FileMeta, ListenMeta, Logger } from '../interfaces';
+import { Diagnostic, ListenMeta, ModuleFileMeta } from '../interfaces';
 import * as ts from 'typescript';
 
 
-export function getListenDecoratorMeta(logger: Logger, fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.listenersMeta = [];
+export function getListenDecoratorMeta(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+  moduleFile.cmpMeta.listenersMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
@@ -29,11 +29,14 @@ export function getListenDecoratorMeta(logger: Logger, fileMeta: FileMeta, class
           } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && eventName) {
             try {
               const fnStr = `return ${n.getText()};`;
-
               Object.assign(rawListenMeta, new Function(fnStr)());
 
             } catch (e) {
-              logger.error(`parse listener options: ${e}`);
+              diagnostics.push({
+                msg: `parse listener options: ${e}`,
+                type: 'error',
+                filePath: moduleFile.tsFilePath
+              });
             }
           }
         });
@@ -49,12 +52,12 @@ export function getListenDecoratorMeta(logger: Logger, fileMeta: FileMeta, class
 
     if (isListen && eventName && methodName) {
       eventName.split(',').forEach(evName => {
-        validateListener(fileMeta, evName, rawListenMeta, methodName, memberNode);
+        validateListener(moduleFile, evName, rawListenMeta, methodName, memberNode);
       });
     }
   });
 
-  fileMeta.cmpMeta.listenersMeta = fileMeta.cmpMeta.listenersMeta.sort((a, b) => {
+  moduleFile.cmpMeta.listenersMeta = moduleFile.cmpMeta.listenersMeta.sort((a, b) => {
     if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
     if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
     if (a.eventMethodName.toLowerCase() < b.eventMethodName.toLowerCase()) return -1;
@@ -64,7 +67,7 @@ export function getListenDecoratorMeta(logger: Logger, fileMeta: FileMeta, class
 }
 
 
-function validateListener(fileMeta: FileMeta, eventName: string, rawListenMeta: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
+function validateListener(fileMeta: ModuleFileMeta, eventName: string, rawListenMeta: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
   eventName = eventName.trim();
   if (!eventName) return;
 
@@ -72,22 +75,22 @@ function validateListener(fileMeta: FileMeta, eventName: string, rawListenMeta: 
 
   let splt = eventName.split(':');
   if (splt.length > 2) {
-    throw `@Listen can only contain one colon: ${eventName} in ${fileMeta.filePath}`;
+    throw `@Listen can only contain one colon: ${eventName} in ${fileMeta.tsFilePath}`;
   }
   if (splt.length > 1) {
     if (VALID_ELEMENT_REF_PREFIXES.indexOf(splt[0]) === -1) {
-      throw `invalid @Listen prefix "${splt[0]}" for "${eventName}" in ${fileMeta.filePath}`;
+      throw `invalid @Listen prefix "${splt[0]}" for "${eventName}" in ${fileMeta.tsFilePath}`;
     }
     rawEventName = splt[1];
   }
 
   splt = rawEventName.split('.');
   if (splt.length > 2) {
-    throw `@Listen can only contain one period: ${eventName} in ${fileMeta.filePath}`;
+    throw `@Listen can only contain one period: ${eventName} in ${fileMeta.tsFilePath}`;
   }
   if (splt.length > 1) {
     if (VALID_KEYCODE_SUFFIX.indexOf(splt[1]) === -1) {
-      throw `invalid @Listen suffix "${splt[1]}" for "${eventName}" in ${fileMeta.filePath}`;
+      throw `invalid @Listen suffix "${splt[1]}" for "${eventName}" in ${fileMeta.tsFilePath}`;
     }
     rawEventName = splt[0];
   }

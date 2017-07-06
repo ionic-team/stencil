@@ -1,10 +1,10 @@
-import { FileMeta, Logger, PropMeta, PropOptions } from '../interfaces';
+import { ModuleFileMeta, Diagnostic, PropMeta, PropOptions } from '../interfaces';
 import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(logger: Logger, fileMeta: FileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.propsMeta = [];
+export function getPropDecoratorMeta(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+  moduleFile.cmpMeta.propsMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
@@ -33,11 +33,14 @@ export function getPropDecoratorMeta(logger: Logger, fileMeta: FileMeta, classNo
           if (n.kind === ts.SyntaxKind.ObjectLiteralExpression) {
             try {
               const fnStr = `return ${n.getText()};`;
-
               userPropOptions = Object.assign(userPropOptions || {}, new Function(fnStr)());
 
             } catch (e) {
-              logger.error(`parse prop options: ${e}`);
+              diagnostics.push({
+                msg: `parse prop options: ${e}`,
+                type: 'error',
+                filePath: moduleFile.tsFilePath
+              });
             }
           }
         });
@@ -85,13 +88,13 @@ export function getPropDecoratorMeta(logger: Logger, fileMeta: FileMeta, classNo
         }
       }
 
-      fileMeta.cmpMeta.propsMeta.push(prop);
+      moduleFile.cmpMeta.propsMeta.push(prop);
 
       memberNode.decorators = undefined;
     }
   });
 
-  fileMeta.cmpMeta.propsMeta = fileMeta.cmpMeta.propsMeta.sort((a, b) => {
+  moduleFile.cmpMeta.propsMeta = moduleFile.cmpMeta.propsMeta.sort((a, b) => {
     if (a.propName.toLowerCase() < b.propName.toLowerCase()) return -1;
     if (a.propName.toLowerCase() > b.propName.toLowerCase()) return 1;
     return 0;

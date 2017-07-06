@@ -3,13 +3,13 @@
 'use strict';
 
 process.title = 'stencil';
-process.on('unhandledRejection', r => console.error(r));
+process.on('unhandledRejection', function(r) { console.error(r) });
 process.env.IONIC_CLI_BIN = __filename;
 
 
 var chalk = require('chalk');
+var path = require('path');
 var semver = require('semver');
-var crypto = require('crypto');
 
 
 if (semver.lt(process.version, 'v6.4.0')) {
@@ -17,10 +17,7 @@ if (semver.lt(process.version, 'v6.4.0')) {
   process.exit(1);
 }
 
-
 var cmdArgs = process.argv;
-var taskName = cmdArgs[2];
-
 try {
   var npmRunArgs = process.env.npm_config_argv;
   if (npmRunArgs) {
@@ -29,44 +26,100 @@ try {
 } catch (e) {}
 
 
-var isDevMode = (cmdArgs.indexOf('--prod') === -1) && (cmdArgs.indexOf('-p') === -1);
-var isWatch = (cmdArgs.indexOf('--watch') > -1) || (cmdArgs.indexOf('-w') > -1);
-var logLevel = cmdArgs.find(a => a.indexOf('--log-level') === 0);
-if (logLevel) {
-  logLevel = logLevel.split('=')[1];
-}
-if (!logLevel) {
-  logLevel = 'info';
+var buildConfig = {
+  process: process
+};
+
+
+var configFileName = 'stencil.config.js';
+
+var projectConfigFileNameCmdIndex = cmdArgs.indexOf('--config');
+if (projectConfigFileNameCmdIndex > -1) {
+  configFileName = cmdArgs[projectConfigFileNameCmdIndex + 1];
+
+} else {
+  projectConfigFileNameCmdIndex = cmdArgs.indexOf('-c');
+  if (projectConfigFileNameCmdIndex > -1) {
+    configFileName = cmdArgs[projectConfigFileNameCmdIndex + 1];
+  }
 }
 
-var stencil = require('../dist/compiler');
-var logger = new stencil.CmdLogger({
-  level: logLevel,
+var configFilePath = configFileName;
+if (!path.isAbsolute(configFilePath)) {
+  configFilePath = path.join(process.cwd(), configFilePath);
+}
+
+buildConfig.rootDir = path.dirname(configFilePath);
+
+
+try {
+  var buildConfigFile = require(configFilePath);
+
+  if (!buildConfigFile.config) {
+    console.log('Invalid Stencil "' + chalk.bold(configFilePath) + '" configuration file. Missing "config" property.');
+    process.exit(1);
+  }
+
+  Object.assign(buildConfig, buildConfigFile.config);
+
+} catch(e) {
+  console.log('Error reading Stencil "' + chalk.bold(configFilePath) + '" configuration file.');
+  process.exit(1);
+}
+
+
+if (cmdArgs.indexOf('--prod') === -1 && cmdArgs.indexOf('-p') === -1) {
+  buildConfig.devMode = true;
+}
+
+if (cmdArgs.indexOf('--watch') > -1 || cmdArgs.indexOf('-w') > -1) {
+  buildConfig.watch = true;
+}
+
+if (cmdArgs.indexOf('--debug') > -1) {
+  buildConfig.logLevel = 'debug';
+
+} else {
+  var logLevelCmdIndex = cmdArgs.indexOf('--log-level');
+  if (logLevelCmdIndex > -1) {
+    buildConfig.logLevel = cmdArgs[logLevelCmdIndex + 1];
+  }
+}
+
+
+var stencil = require(path.join(__dirname, '..', 'dist' , 'compiler'));
+buildConfig.logger = new stencil.CmdLogger({
+  level: buildConfig.logLevel,
   stream: process.stdout,
   columns: process.stdout.columns,
   chalk: chalk
 });
 
 
-var sys = Object.defineProperties({}, {
-  'fs': { get: () => require('fs-extra') },
-  'module': { get: () => require('module') },
-  'path': { get: () => require('path') },
-  'rollup': { get: () => {
-    var rollup = require('rollup');
-    rollup.plugins = {
-      commonjs: require('rollup-plugin-commonjs'),
-      nodeResolve: require('rollup-plugin-node-resolve')
-    };
-    return rollup;
-  } },
-  'sass': { get: () => require('node-sass') },
-  'typescript': { get: () => require('typescript') },
-  'uglify': { get: () => require('uglify-js') },
+buildConfig.sys = Object.defineProperties({
+  // direct reference
+  'path': path,
+
+}, {
+  // on-demand getters
+  'fs': { get: function() { return require('fs') } },
+  'module': { get: function() { return require('module') } },
+  'rollup': { get: function() {
+      var rollup = require('rollup');
+      rollup.plugins = {
+        commonjs: require('rollup-plugin-commonjs'),
+        nodeResolve: require('rollup-plugin-node-resolve')
+      };
+      return rollup;
+    }
+  },
+  'sass': { get: function() { return require('node-sass'); } },
+  'typescript': { get: function() { return require('typescript') } },
 });
 
 
-sys.generateContentHash = function(content) {
+buildConfig.sys.generateContentHash = function(content) {
+  var crypto = require('crypto');
   return crypto.createHash('sha1')
                .update(content)
                .digest('base64')
@@ -76,7 +129,59 @@ sys.generateContentHash = function(content) {
 };
 
 
-sys.getClientCoreFile = function(opts) {
+buildConfig.sys.minifyCss = function(input) {
+  var CleanCSS = require('clean-css');
+  var result = new CleanCSS().minify(input);
+  var diagnostics = [];
+
+  if (result.errors) {
+    result.errors.forEach(function(msg) {
+      diagnostics.push({
+        msg: msg,
+        level: 'error'
+      });
+    });
+  }
+
+  if (result.warnings) {
+    result.warnings.forEach(function(msg) {
+      diagnostics.push({
+        msg: msg,
+        level: 'warn'
+      });
+    });
+  }
+
+  return {
+    output: result.styles,
+    sourceMap: result.sourceMap,
+    diagnostics: diagnostics
+  };
+};
+
+
+buildConfig.sys.minifyJs = function(input) {
+  var UglifyJS = require("uglify-js");
+  var result = UglifyJS.minify(input);
+  var diagnostics = [];
+
+  if (result.error) {
+    diagnostics.push({
+      msg: result.error.message,
+      level: 'error'
+    });
+  }
+
+  return {
+    output: result.code,
+    sourceMap: result.sourceMap,
+    diagnostics: diagnostics
+  };
+};
+
+
+var coreFileCache = {};
+buildConfig.sys.getClientCoreFile = function(opts) {
   var fileName = opts.staticName;
 
   if (opts.es5) {
@@ -87,46 +192,44 @@ sys.getClientCoreFile = function(opts) {
   }
   fileName += '.js';
 
-  const filePath = sys.path.join(__dirname, '..', 'dist', 'client', fileName);
-
-  logger.debug('getClientCoreFile: ' + filePath)
+  var filePath = path.join(__dirname, '..', 'dist', 'client', fileName);
 
   return new Promise(function(resolve, reject) {
-    sys.fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
+    if (coreFileCache[filePath]) {
+      resolve(coreFileCache[filePath]);
+
+    } else {
+      buildConfig.sys.fs.readFile(filePath, 'utf-8', function(err, data) {
+        if (err) {
+          reject(err);
+        } else {
+          coreFileCache[filePath] = data;
+          resolve(data);
+        }
+      });
+    }
   });
 };
 
 
-var configFileName = 'stencil.config.js';
-var rootDir = process.cwd();
-var stencilConfig;
-try {
-  var stencilConfigObj = require(sys.path.join(rootDir, configFileName));
+switch (cmdArgs[2]) {
+  case 'build':
+    stencil.build(buildConfig);
+    break;
 
-  stencilConfig = stencilConfigObj.config;
+  case 'collection':
+    switch (cmdArgs[3]) {
+      case 'add':
+        stencil.collectionAdd(buildConfig);
+        break;
 
-  if (!stencilConfig) {
-    console.log('Invalid Stencil ' + chalk.bold(configFileName) + ' configuration file');
+      default:
+        console.log('Invalid stencil collection command: "' + cmdArgs[3] + '"');
+        process.exit(1);
+    }
+    break;
+
+  default:
+    console.log('Invalid stencil command: "' + cmdArgs[2] + '"');
     process.exit(1);
-  }
-
-} catch(e) {
-  console.log('Error reading Stencil ' + chalk.bold(configFileName) + ' configuration file');
-  process.exit(1);
 }
-
-
-stencil.run(taskName, {
-  rootDir: rootDir,
-  sys: sys,
-  logger: logger,
-  stencilConfig: stencilConfig,
-  isDevMode: isDevMode,
-  isWatch: isWatch
-});

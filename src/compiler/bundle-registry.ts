@@ -1,17 +1,17 @@
-import { BundlerConfig, BuildContext, ComponentRegistry, ModuleResults, StyleMeta, StylesResults } from './interfaces';
+import { BuildConfig, BuildContext, BundlerConfig, ComponentRegistry, ModuleResults,
+  LoadComponentRegistry, StyleMeta, StylesResults } from './interfaces';
 import { formatComponentRegistry } from '../util/data-serialize';
-import { writeFile } from './util';
 
 
-export function generateComponentRegistry(config: BundlerConfig, ctx: BuildContext, styleResults: StylesResults, moduleResults: ModuleResults) {
+export function generateComponentRegistry(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfig: BundlerConfig, styleResults: StylesResults, moduleResults: ModuleResults): LoadComponentRegistry[] {
   const registry: ComponentRegistry = {};
 
   // create the minimal registry component data for each bundle
-  Object.keys(styleResults).forEach(bundleId => {
+  Object.keys(styleResults.bundles).forEach(bundleId => {
     // a bundle id is made of of each component tag name
     // separated by a period
     const components = bundleId.split('.');
-    const styleResult = styleResults[bundleId];
+    const styleResult = styleResults.bundles[bundleId];
     let styleMeta: StyleMeta = null;
 
     if (styleResult) {
@@ -23,37 +23,36 @@ export function generateComponentRegistry(config: BundlerConfig, ctx: BuildConte
     }
 
     components.forEach(tag => {
-      registry[tag] = registry[tag] || config.manifest.components.find(c => c.tagNameMeta === tag);
-      registry[tag].styleMeta = styleMeta;
+      registry[tag] = registry[tag] || bundlerConfig.manifest.components.find(c => c.tagNameMeta === tag);
+      if (registry[tag]) {
+        registry[tag].styleMeta = styleMeta;
+      }
     });
   });
 
 
-  Object.keys(moduleResults).forEach(bundleId => {
+  Object.keys(moduleResults.bundles).forEach(bundleId => {
     const components = bundleId.split('.');
-    const moduleId = moduleResults[bundleId];
+    const moduleId = moduleResults.bundles[bundleId];
 
     components.forEach(tag => {
-      registry[tag] = registry[tag] || config.manifest.components.find(c => c.tagNameMeta === tag);
-      registry[tag].moduleId = moduleId;
+      registry[tag] = registry[tag] || bundlerConfig.manifest.components.find(c => c.tagNameMeta === tag);
+      if (registry[tag]) {
+        registry[tag].moduleId = moduleId;
+      }
     });
   });
 
-  const componentRegistry = formatComponentRegistry(registry, config.attrCase);
+  const componentRegistry = formatComponentRegistry(registry, bundlerConfig.attrCase);
   const projectRegistry = {
-    namespace: config.namespace,
+    namespace: buildConfig.namespace,
     components: componentRegistry
   };
 
-  const registryFileName = `${config.namespace.toLowerCase()}.registry.json`;
-  const registryFilePath = config.sys.path.join(config.destDir, registryFileName);
+  const registryFileName = `${buildConfig.namespace.toLowerCase()}.registry.json`;
+  const registryFilePath = buildConfig.sys.path.join(buildConfig.dest, registryFileName);
 
-  // add the component registry as a string to the results
-  ctx.results.componentRegistry = JSON.stringify(componentRegistry);
+  ctx.filesToWrite[registryFilePath] = JSON.stringify(projectRegistry, null, 2);
 
-  // write the registry as a json file
-  return writeFile(
-    config.sys,
-    registryFilePath, JSON.stringify(projectRegistry, null, 2)
-  );
+  return componentRegistry;
 }

@@ -1,9 +1,9 @@
-import { ComponentMeta, ComponentOptions, Logger } from '../interfaces';
+import { ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../interfaces';
 import { normalizeStyles } from './normalize-styles';
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorData(logger: Logger, classNode: ts.ClassDeclaration) {
+export function getComponentDecoratorData(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
   let metaData: ComponentMeta = null;
 
   if (!classNode.decorators) {
@@ -22,7 +22,7 @@ export function getComponentDecoratorData(logger: Logger, classNode: ts.ClassDec
           isComponent = true;
 
         } else if (isComponent) {
-          metaData = parseComponentMetaData(logger, componentChild.getText());
+          metaData = parseComponentMetaData(moduleFile, diagnostics, componentChild.getText());
         }
 
       });
@@ -34,7 +34,7 @@ export function getComponentDecoratorData(logger: Logger, classNode: ts.ClassDec
 }
 
 
-function parseComponentMetaData(logger: Logger, text: string): ComponentMeta {
+function parseComponentMetaData(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], text: string): ComponentMeta {
   try {
     const fnStr = `return ${text};`;
 
@@ -44,7 +44,7 @@ function parseComponentMetaData(logger: Logger, text: string): ComponentMeta {
     // convert user component options from user into component meta
     const cmpMeta: ComponentMeta = {};
 
-    normalizeTag(logger, userOpts, cmpMeta, text);
+    normalizeTag(moduleFile, diagnostics, userOpts, cmpMeta, text);
     normalizeStyles(userOpts, cmpMeta);
     normalizeShadow(userOpts, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
@@ -52,17 +52,24 @@ function parseComponentMetaData(logger: Logger, text: string): ComponentMeta {
     return cmpMeta;
 
   } catch (e) {
-    logger.error(`parseComponentMetaData: ${e}`);
-    logger.error(text);
+    diagnostics.push({
+      msg: `${e}: text`,
+      type: 'error',
+      filePath: moduleFile.tsFilePath
+    });
   }
   return null;
 }
 
 
-function normalizeTag(logger: Logger, userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
+function normalizeTag(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
 
   if ((<any>userOpts).selector) {
-    logger.error(`Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`);
+    diagnostics.push({
+      msg: `Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`,
+      type: 'error',
+      filePath: moduleFile.tsFilePath
+    });
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
 
