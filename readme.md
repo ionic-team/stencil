@@ -24,6 +24,7 @@ To start a new project using Stencil, clone the starter project and get to work:
 git clone git@github.com:ionic-team/stencil-starter my-app
 cd my-app
 git remote rm origin
+npm install
 ```
 
 To build your new Stencil project, just run
