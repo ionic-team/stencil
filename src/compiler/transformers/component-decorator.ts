@@ -74,7 +74,7 @@ function normalizeTag(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], use
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
 
-  if (!cmpMeta.tagNameMeta || cmpMeta.tagNameMeta.trim() === '') {
+  if (!userOpts.tag || userOpts.tag.trim() === '') {
     throw new Error(`tag missing in component decorator: ${orgText}`);
   }
 

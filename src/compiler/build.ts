@@ -6,10 +6,11 @@ import { generateDependentManifests, mergeManifests, updateManifestUrls } from '
 import { generateProjectFiles } from './build-project';
 import { optimizeHtml } from './optimize-html';
 import { updateDirectories, writeFiles } from './util';
+import { validateBuildConfig } from './validation';
 
 
 export function build(buildConfig: BuildConfig) {
-  normalizeBuildConfig(buildConfig);
+  validateBuildConfig(buildConfig);
 
   const sys = buildConfig.sys;
   const logger = buildConfig.logger;
@@ -113,78 +114,3 @@ export function build(buildConfig: BuildConfig) {
     return buildResults;
   });
 }
-
-
-export function normalizeBuildConfig(buildConfig: BuildConfig) {
-  if (!buildConfig) {
-    throw new Error(`invalid build config`);
-  }
-  if (!buildConfig.rootDir) {
-    throw new Error('config.rootDir required');
-  }
-  if (!buildConfig.logger) {
-    throw new Error(`config.logger required`);
-  }
-  if (!buildConfig.sys) {
-    throw new Error('config.sys required');
-  }
-
-  if (typeof buildConfig.namespace !== 'string') {
-    buildConfig.namespace = DEFAULT_NAMESPACE;
-  }
-
-  if (typeof buildConfig.src !== 'string') {
-    buildConfig.src = DEFAULT_SRC;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.src)) {
-    buildConfig.src = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.src);
-  }
-
-  if (typeof buildConfig.buildDest !== 'string') {
-    buildConfig.buildDest = DEFAULT_BUILD_DEST;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.buildDest)) {
-    buildConfig.buildDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.buildDest);
-  }
-
-  if (typeof buildConfig.collectionDest !== 'string') {
-    buildConfig.collectionDest = DEFAULT_COLLECTION_DEST;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.collectionDest)) {
-    buildConfig.collectionDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.collectionDest);
-  }
-
-  if (typeof buildConfig.indexSrc !== 'string') {
-    buildConfig.indexSrc = DEFAULT_INDEX_SRC;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexSrc)) {
-    buildConfig.indexSrc = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexSrc);
-  }
-
-  if (typeof buildConfig.indexDest !== 'string') {
-    buildConfig.indexDest = DEFAULT_INDEX_DEST;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexDest)) {
-    buildConfig.indexDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexDest);
-  }
-
-  buildConfig.devMode = !!buildConfig.devMode;
-  buildConfig.watch = !!buildConfig.watch;
-  buildConfig.generateCollection = !!buildConfig.generateCollection;
-  buildConfig.collections = buildConfig.collections || [];
-  buildConfig.bundles = buildConfig.bundles || [];
-  buildConfig.exclude = buildConfig.exclude || [
-    'node_modules',
-    'bower_components'
-  ];
-
-  return buildConfig;
-}
-
-
-const DEFAULT_SRC = 'src';
-const DEFAULT_BUILD_DEST = 'www/build';
-const DEFAULT_INDEX_SRC = 'src/index.html';
-const DEFAULT_INDEX_DEST = 'www/index.html';
-const DEFAULT_COLLECTION_DEST = 'dist/collection';
-const DEFAULT_NAMESPACE = 'App';

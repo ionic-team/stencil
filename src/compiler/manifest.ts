@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, CompileResults, ComponentMeta, Manifest, Bundle, StyleMeta } from './interfaces';
 import { readFile } from './util';
 import { resolveFrom } from './resolve-from';
+import { validateBundles, validateManifest } from './validation';
 
 
 export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, compileResults: CompileResults) {
@@ -14,17 +15,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
 
   logger.debug(`manifest, generateManifest, collectionDest: ${buildConfig.collectionDest}`);
 
-  // normalize bundle component tags
-  buildConfig.bundles.forEach(b => {
-    if (Array.isArray(b.components)) {
-      b.components = b.components.map(c => c.toLowerCase().trim());
-      return;
-    }
-
-    logger.error(`manifest, generateManifest: missing bundle components array, instead received: ${b.components}`);
-
-    b.components = [];
-  });
+  validateBundles(buildConfig.bundles);
 
   const fileNames = Object.keys(compileResults.moduleFiles);
 
@@ -97,19 +88,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
 
   manifest.bundles = (buildConfig.bundles && buildConfig.bundles.slice()) || [];
 
-  manifest.bundles = manifest.bundles.sort((a, b) => {
-    if (a.components && a.components.length && b.components && b.components.length) {
-      if (a.components[0].toLowerCase() < b.components[0].toLowerCase()) return -1;
-      if (a.components[0].toLowerCase() > b.components[0].toLowerCase()) return 1;
-    }
-    return 0;
-  });
-
-  manifest.components = manifest.components.sort((a, b) => {
-    if (a.tagNameMeta.toLowerCase() < b.tagNameMeta.toLowerCase()) return -1;
-    if (a.tagNameMeta.toLowerCase() > b.tagNameMeta.toLowerCase()) return 1;
-    return 0;
-  });
+  validateManifest(manifest);
 
   if (buildConfig.generateCollection) {
     const manifestFilePath = sys.path.join(buildConfig.collectionDest, MANIFEST_FILE_NAME);

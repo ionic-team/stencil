@@ -1,9 +1,8 @@
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
 import { BuildConfig, BuildContext, BundleResults, BundlerConfig } from './interfaces';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
 import { generateComponentRegistry } from './bundle-registry';
-import { validateTag } from './validation';
+import { validateBundlerConfig } from './validation';
 
 
 export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfig: BundlerConfig) {
@@ -52,63 +51,4 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
   .then(() => {
     return bundleResults;
   });
-}
-
-
-function validateBundlerConfig(bundlerConfig: BundlerConfig) {
-  bundlerConfig.attrCase = normalizeAttrCase(bundlerConfig.attrCase);
-
-  if (!bundlerConfig.manifest) {
-    throw new Error('config.manifest required');
-  }
-  if (!bundlerConfig.manifest.bundles) {
-    throw new Error('config.manifest.bundles required');
-  }
-  if (!bundlerConfig.manifest.components) {
-    throw new Error('config.manifest.components required');
-  }
-
-  // sort by tag name and ensure they're lower case
-  bundlerConfig.manifest.bundles.forEach(b => {
-    b.components = b.components.filter(c => typeof c === 'string' && c.trim().length);
-
-    if (!b.components.length) {
-      throw new Error(`No valid bundle components found within stencil config`);
-    }
-
-    b.components = b.components.map(tag => {
-      return validateTag(tag, `found in bundle component stencil config`);
-    }).sort();
-  });
-
-  bundlerConfig.manifest.components.forEach(c => {
-    c.tagNameMeta = validateTag(c.tagNameMeta, `found in bundle component stencil config`);
-  });
-
-  bundlerConfig.manifest.components = bundlerConfig.manifest.components.sort((a, b) => {
-    if (a.tagNameMeta < b.tagNameMeta) return -1;
-    if (a.tagNameMeta > b.tagNameMeta) return 1;
-    return 0;
-  });
-}
-
-
-function normalizeAttrCase(attrCase: any) {
-  if (attrCase === ATTR_LOWER_CASE || attrCase === ATTR_DASH_CASE) {
-    // already using a valid attr case value
-    return attrCase;
-  }
-
-  if (typeof attrCase === 'string') {
-    if (attrCase.trim().toLowerCase() === 'dash') {
-      return ATTR_DASH_CASE;
-    }
-
-    if (attrCase.trim().toLowerCase() === 'lower') {
-      return ATTR_LOWER_CASE;
-    }
-  }
-
-  // default to use dash-case for attributes
-  return ATTR_DASH_CASE;
 }

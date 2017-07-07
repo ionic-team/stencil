@@ -43,6 +43,14 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
     return cmpMeta;
   }).filter(c => !!c);
 
+  if (!bundleComponentMeta.length) {
+    moduleResults.diagnostics.push({
+      msg: `No components found to bundle`,
+      type: 'error'
+    });
+    return Promise.resolve(moduleResults);
+  }
+
   // loop through each bundle the user wants and create the "defineComponents"
   return bundleComponentModules(sys, ctx, bundleComponentMeta, moduleResults).then(jsModuleContent => {
 
@@ -76,7 +84,11 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
       }
 
       // in prod mode, create bundle id from hashing the content
-      moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent);
+      if (moduleContent === '') {
+        moduleResults.bundles[bundleId] = 'empty';
+      } else {
+        moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent);
+      }
     }
 
     // replace the known bundle id template with the newly created bundle id

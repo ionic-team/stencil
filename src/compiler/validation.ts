@@ -1,3 +1,123 @@
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
+import { BuildConfig, Bundle, BundlerConfig, Manifest } from './interfaces';
+
+
+export function validateBuildConfig(buildConfig: BuildConfig) {
+  if (!buildConfig) {
+    throw new Error(`invalid build config`);
+  }
+  if (!buildConfig.rootDir) {
+    throw new Error('config.rootDir required');
+  }
+  if (!buildConfig.logger) {
+    throw new Error(`config.logger required`);
+  }
+  if (!buildConfig.sys) {
+    throw new Error('config.sys required');
+  }
+
+  if (typeof buildConfig.namespace !== 'string') {
+    buildConfig.namespace = DEFAULT_NAMESPACE;
+  }
+
+  if (typeof buildConfig.src !== 'string') {
+    buildConfig.src = DEFAULT_SRC;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.src)) {
+    buildConfig.src = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.src);
+  }
+
+  if (typeof buildConfig.buildDest !== 'string') {
+    buildConfig.buildDest = DEFAULT_BUILD_DEST;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.buildDest)) {
+    buildConfig.buildDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.buildDest);
+  }
+
+  if (typeof buildConfig.collectionDest !== 'string') {
+    buildConfig.collectionDest = DEFAULT_COLLECTION_DEST;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.collectionDest)) {
+    buildConfig.collectionDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.collectionDest);
+  }
+
+  if (typeof buildConfig.indexSrc !== 'string') {
+    buildConfig.indexSrc = DEFAULT_INDEX_SRC;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexSrc)) {
+    buildConfig.indexSrc = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexSrc);
+  }
+
+  if (typeof buildConfig.indexDest !== 'string') {
+    buildConfig.indexDest = DEFAULT_INDEX_DEST;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexDest)) {
+    buildConfig.indexDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexDest);
+  }
+
+  buildConfig.devMode = !!buildConfig.devMode;
+  buildConfig.watch = !!buildConfig.watch;
+  buildConfig.generateCollection = !!buildConfig.generateCollection;
+  buildConfig.collections = buildConfig.collections || [];
+  buildConfig.bundles = buildConfig.bundles || [];
+  buildConfig.exclude = buildConfig.exclude || [
+    'node_modules',
+    'bower_components'
+  ];
+
+  return buildConfig;
+}
+
+
+export function validateBundles(bundles: Bundle[]) {
+  if (!bundles) {
+    throw new Error(`Invalid bundles`);
+  }
+
+  // normalize bundle component tags
+  // sort by tag name and ensure they're lower case
+  bundles.forEach(b => {
+    if (!Array.isArray(b.components)) {
+      throw new Error(`manifest missing bundle components array, instead received: ${b.components}`);
+    }
+
+    b.components = b.components.filter(c => typeof c === 'string' && c.trim().length);
+
+    if (!b.components.length) {
+      throw new Error(`No valid bundle components found within stencil config`);
+    }
+
+    b.components = b.components.map(tag => {
+      return validateTag(tag, `found in bundle component stencil config`);
+    }).sort();
+  });
+
+  bundles.sort((a, b) => {
+    if (a.components && a.components.length && b.components && b.components.length) {
+      if (a.components[0].toLowerCase() < b.components[0].toLowerCase()) return -1;
+      if (a.components[0].toLowerCase() > b.components[0].toLowerCase()) return 1;
+    }
+    return 0;
+  });
+}
+
+
+export function validateManifest(manifest: Manifest) {
+  if (!manifest) {
+    throw new Error(`Invalid manifest`);
+  }
+
+  manifest.bundles = manifest.bundles || [];
+  manifest.components = manifest.components || [];
+
+  validateBundles(manifest.bundles);
+
+  manifest.components.forEach(c => {
+    c.tagNameMeta = validateTag(c.tagNameMeta, `found in bundle component stencil config`);
+  });
+
+  manifest.components.sort();
+}
 
 
 export function validateTag(tag: string, suffix: string) {
@@ -42,3 +162,37 @@ export function validateTag(tag: string, suffix: string) {
 
   return tag;
 }
+
+
+export function validateBundlerConfig(bundlerConfig: BundlerConfig) {
+  bundlerConfig.attrCase = normalizeAttrCase(bundlerConfig.attrCase);
+}
+
+
+function normalizeAttrCase(attrCase: any) {
+  if (attrCase === ATTR_LOWER_CASE || attrCase === ATTR_DASH_CASE) {
+    // already using a valid attr case value
+    return attrCase;
+  }
+
+  if (typeof attrCase === 'string') {
+    if (attrCase.trim().toLowerCase() === 'dash') {
+      return ATTR_DASH_CASE;
+    }
+
+    if (attrCase.trim().toLowerCase() === 'lower') {
+      return ATTR_LOWER_CASE;
+    }
+  }
+
+  // default to use dash-case for attributes
+  return ATTR_DASH_CASE;
+}
+
+
+const DEFAULT_SRC = 'src';
+const DEFAULT_BUILD_DEST = 'www/build';
+const DEFAULT_INDEX_SRC = 'src/index.html';
+const DEFAULT_INDEX_DEST = 'www/index.html';
+const DEFAULT_COLLECTION_DEST = 'dist/collection';
+const DEFAULT_NAMESPACE = 'App';
