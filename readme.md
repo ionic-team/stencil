@@ -33,7 +33,8 @@ To build your new Stencil project, just run
 npm start
 ```
 
-This will build and watch your app for changes, as well as starting a development server, available by default at `http://localhost:8080`.
+To view the build, start an HTTP server inside of the `/www` directory.
+
 
 ## Creating components
 
@@ -43,7 +44,7 @@ Create new components by creating files with a `.tsx` extension, such as `my-com
 
 ```typescript
 // Import the Component decorator, and h, the virtual dom call that our JSX compiles to.
-import { Component, h } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -92,11 +93,11 @@ Here's an example `index.html` file that runs a Stencil app:
   <meta name="format-detection" content="telephone=no">
   <meta name="msapplication-tap-highlight" content="no">
 
-  <script src="/dist/my-app.js"></script>
+  <script src="build/app.js"></script>
 </head>
 
 <body>
-	<my-component name="Max"></my-component>
+  <my-component name="Max"></my-component>
 </body>
 
 </html>
