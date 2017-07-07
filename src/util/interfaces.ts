@@ -984,7 +984,7 @@ export interface StencilSystem {
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
   };
   generateContentHash?(content: string): string;
-  getClientCoreFile?(opts: {staticName: string, es5?: boolean, devMode: boolean}): Promise<string>;
+  getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   minifyCss?(input: string): {
     output: string;
     sourceMap?: any;

@@ -4,7 +4,7 @@ import { bundle } from './bundle';
 import { compile } from './compile';
 import { emptyDir, writeFiles } from './util';
 import { generateDependentManifests, mergeManifests, updateManifestUrls } from './manifest';
-import { generateProjectFiles } from './build-project';
+import { generateProjectFiles } from './build-project-files';
 import { optimizeHtml } from './optimize-html';
 import { validateBuildConfig } from './validation';
 

@@ -22,8 +22,8 @@ export function generateProjectFiles(buildConfig: BuildConfig, ctx: BuildContext
   let projectCoreEs5FileName: string;
 
   return Promise.all([
-    generateCore(buildConfig, false),
-    generateCore(buildConfig, true)
+    generateCore(buildConfig),
+    generateCoreEs5(buildConfig)
 
   ]).then(results => {
     const coreContent = results[0];
@@ -81,7 +81,13 @@ export function generateProjectFiles(buildConfig: BuildConfig, ctx: BuildContext
 function generateLoader(buildConfig: BuildConfig, projectFileName: string, projectCoreFileName: string, projectCoreEs5FileName: string, componentRegistry: LoadComponentRegistry[]) {
   const sys = buildConfig.sys;
 
-  return sys.getClientCoreFile({ staticName: LOADER_NAME, devMode: buildConfig.devMode }).then(stencilLoaderContent => {
+  let staticName = LOADER_NAME;
+  if (buildConfig.devMode) {
+    staticName += '.dev';
+  }
+  staticName += '.js';
+
+  return sys.getClientCoreFile({ staticName: staticName }).then(stencilLoaderContent => {
     // replace the default loader with the project's namespace and components
 
     let componentRegistryStr = JSON.stringify(componentRegistry);
@@ -111,12 +117,18 @@ function generateLoader(buildConfig: BuildConfig, projectFileName: string, proje
 }
 
 
-function generateCore(buildConfig: BuildConfig, es5: boolean) {
+function generateCore(buildConfig: BuildConfig) {
   const sys = buildConfig.sys;
 
-  return sys.getClientCoreFile({ staticName: CORE_NAME, devMode: buildConfig.devMode, es5: es5 }).then(stencilCoreContent => {
+  let staticName = CORE_NAME;
+  if (buildConfig.devMode) {
+    staticName += '.dev';
+  }
+  staticName += '.js';
+
+  return sys.getClientCoreFile({ staticName: staticName }).then(coreContent => {
     // replace the default core with the project's namespace
-    stencilCoreContent = stencilCoreContent.replace(
+    coreContent = coreContent.replace(
       PROJECT_NAMESPACE_REGEX,
       `"${buildConfig.namespace}"`
     );
@@ -124,7 +136,44 @@ function generateCore(buildConfig: BuildConfig, es5: boolean) {
     // concat the projects core code
     const projectCode: string[] = [
       generateBanner(buildConfig),
-      stencilCoreContent
+      coreContent
+    ];
+
+    return projectCode.join('');
+  });
+}
+
+
+function generateCoreEs5(buildConfig: BuildConfig) {
+  const sys = buildConfig.sys;
+
+  let staticName = CORE_NAME + '.es5';
+  if (buildConfig.devMode) {
+    staticName += '.dev';
+  }
+  staticName += '.js';
+
+  let documentRegistryPolyfill = buildConfig.sys.path.join('polyfills', 'document-register-element.js');
+
+  return Promise.all([
+    sys.getClientCoreFile({ staticName: staticName }),
+    sys.getClientCoreFile({ staticName: documentRegistryPolyfill })
+
+  ]).then(results => {
+    let coreContent = results[0];
+    let docRegistryPolyfillContent = results[1];
+
+    // replace the default core with the project's namespace
+    coreContent = coreContent.replace(
+      PROJECT_NAMESPACE_REGEX,
+      `"${buildConfig.namespace}"`
+    );
+
+    // concat the projects core code
+    const projectCode: string[] = [
+      docRegistryPolyfillContent,
+      generateBanner(buildConfig),
+      coreContent
     ];
 
     return projectCode.join('');

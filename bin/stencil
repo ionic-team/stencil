@@ -180,30 +180,20 @@ buildConfig.sys.minifyJs = function(input) {
 };
 
 
-var coreFileCache = {};
+var coreClientFileCache = {};
 buildConfig.sys.getClientCoreFile = function(opts) {
-  var fileName = opts.staticName;
-
-  if (opts.es5) {
-    fileName += '.es5';
-  }
-  if (opts.devMode) {
-    fileName += '.dev';
-  }
-  fileName += '.js';
-
-  var filePath = path.join(__dirname, '..', 'dist', 'client', fileName);
+  var filePath = path.join(__dirname, '..', 'dist', 'client', opts.staticName);
 
   return new Promise(function(resolve, reject) {
-    if (coreFileCache[filePath]) {
-      resolve(coreFileCache[filePath]);
+    if (coreClientFileCache[filePath]) {
+      resolve(coreClientFileCache[filePath]);
 
     } else {
       buildConfig.sys.fs.readFile(filePath, 'utf-8', function(err, data) {
         if (err) {
           reject(err);
         } else {
-          coreFileCache[filePath] = data;
+          coreClientFileCache[filePath] = data;
           resolve(data);
         }
       });
