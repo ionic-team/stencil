@@ -57,6 +57,31 @@ export function validateBuildConfig(buildConfig: BuildConfig) {
 
   buildConfig.devMode = !!buildConfig.devMode;
   buildConfig.watch = !!buildConfig.watch;
+
+  if (typeof buildConfig.minifyCss !== 'boolean') {
+    // if no config, minify css when it's the prod build
+    buildConfig.minifyCss = (!buildConfig.devMode);
+  }
+
+  if (typeof buildConfig.minifyJs !== 'boolean') {
+    // if no config, minify js when it's the prod build
+    buildConfig.minifyJs = (!buildConfig.devMode);
+  }
+
+  if (typeof buildConfig.hashFileNames !== 'boolean') {
+    // hashFileNames config was not provided, so let's create the default
+
+    if (buildConfig.devMode || buildConfig.watch) {
+      // dev mode should not hash filenames
+      // during watch rebuilds it should not hash filenames
+      buildConfig.hashFileNames = false;
+
+    } else {
+      // prod builds should hash filenames
+      buildConfig.hashFileNames = true;
+    }
+  }
+
   buildConfig.generateCollection = !!buildConfig.generateCollection;
   buildConfig.collections = buildConfig.collections || [];
   buildConfig.bundles = buildConfig.bundles || [];

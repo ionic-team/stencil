@@ -64,17 +64,8 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
       jsModuleContent, bundleComponentMeta
     );
 
-    if (buildConfig.devMode) {
-      // dev mode has filename from the bundled tag names
-      moduleResults.bundles[bundleId] = userBundle.components.sort().join('.').toLowerCase();
-
-      if (moduleResults.bundles[bundleId].length > 50) {
-        // can get a lil too long, so let's simmer down
-        moduleResults.bundles[bundleId] = moduleResults.bundles[bundleId].substr(0, 50);
-      }
-
-    } else {
-      // minify the JS content in prod mode
+    if (buildConfig.minifyJs) {
+      // minify js
       const minifyJsResults = sys.minifyJs(moduleContent);
       minifyJsResults.diagnostics.forEach(d => {
         moduleResults.diagnostics.push(d);
@@ -83,12 +74,19 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
       if (minifyJsResults.output) {
         moduleContent = minifyJsResults.output;
       }
+    }
 
-      // in prod mode, create bundle id from hashing the content
-      if (moduleContent === '') {
-        moduleResults.bundles[bundleId] = 'empty';
-      } else {
-        moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent);
+    if (buildConfig.hashFileNames) {
+      // create module id from hashing the content
+      moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent);
+
+    } else {
+      // create module id from list of component tags in this file
+      moduleResults.bundles[bundleId] = userBundle.components.sort().join('.').toLowerCase();
+
+      if (moduleResults.bundles[bundleId].length > 50) {
+        // can get a lil too long, so let's simmer down
+        moduleResults.bundles[bundleId] = moduleResults.bundles[bundleId].substr(0, 50);
       }
     }
 

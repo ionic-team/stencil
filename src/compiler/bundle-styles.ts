@@ -115,8 +115,24 @@ function generateModeCss(
     // ensure we've got some good objects before we start assigning stuff
     const stylesResult = stylesResults.bundles[bundleId] = stylesResults.bundles[bundleId] || {};
 
-    if (buildConfig.devMode) {
-      // dev mode has filename from the bundled tag names
+    if (buildConfig.minifyCss) {
+      // minify css
+      const minifyCssResults = sys.minifyCss(styleContent);
+      minifyCssResults.diagnostics.forEach(d => {
+        stylesResults.diagnostics.push(d);
+      });
+
+      if (minifyCssResults.output) {
+        styleContent = minifyCssResults.output;
+      }
+    }
+
+    if (buildConfig.hashFileNames) {
+      // create style id from hashing the content
+      stylesResult[modeName] = sys.generateContentHash(styleContent);
+
+    } else {
+      // create style id from list of component tags in this file
       stylesResult[modeName] = (userBundle.components.sort().join('.')).toLowerCase();
 
       if (modeName !== '$') {
@@ -128,20 +144,6 @@ function generateModeCss(
         // can get a lil too long, so let's simmer down
         stylesResult[modeName] = stylesResult[modeName].substr(0, 50);
       }
-
-    } else {
-      // prod mode, minify css
-      const minifyCssResults = sys.minifyCss(styleContent);
-      minifyCssResults.diagnostics.forEach(d => {
-        stylesResults.diagnostics.push(d);
-      });
-
-      if (minifyCssResults.output) {
-        styleContent = minifyCssResults.output;
-      }
-
-      // create bundle id from hashing the content
-      stylesResult[modeName] = sys.generateContentHash(styleContent);
     }
 
     // create the file name and path of where the bundle will be saved

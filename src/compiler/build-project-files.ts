@@ -92,7 +92,8 @@ function generateLoader(buildConfig: BuildConfig, projectFileName: string, proje
     // replace the default loader with the project's namespace and components
 
     let componentRegistryStr = JSON.stringify(componentRegistry);
-    if (!buildConfig.devMode) {
+
+    if (buildConfig.minifyJs) {
       const minifyResult = buildConfig.sys.minifyJs(componentRegistryStr);
       minifyResult.diagnostics.forEach(d => {
         buildConfig.logger[d.type](d.msg);

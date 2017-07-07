@@ -453,6 +453,9 @@ export interface BuildConfig {
   collections: Collection[];
   devMode: boolean;
   watch: boolean;
+  hashFileNames: boolean;
+  minifyCss: boolean;
+  minifyJs: boolean;
   preamble: string;
 }
 
