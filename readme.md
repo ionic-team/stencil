@@ -39,6 +39,8 @@ This will build and watch your app for changes, as well as starting a developmen
 
 Stencil components are plan ES6/TypeScript classes with some decorator metadata.
 
+Create new components by creating files with a `.tsx` extension, such as `my-component.tsx`, and place them in `src/components`.
+
 ```typescript
 // Import the Component decorator, and h, the virtual dom call that our JSX compiles to.
 import { Component, h } from '@stencil/core';
@@ -63,13 +65,49 @@ export class MyComponent {
 }
 ```
 
-Create new components by creating files of the form `my-component.tsx` in `src/components`, organized as you see fit.
-
 Note: the `.tsx` extension is required, as this is the standard for TypeScript classes that use JSX.
+
+## Hosting the app
+
+Stencil components run directly in the browser through script includes just like normal Custom Elements (because they are just that!), and run by using
+the tag just like any other HTML component:
+
+Here's an example `index.html` file that runs a Stencil app:
+
+```html
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>My App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+
+  <script src="/dist/my-app.js"></script>
+</head>
+
+<body>
+	<my-component name="Max"></my-component>
+</body>
+
+</html>
+```
 
 ## API
 
 The API for stencil closely mirrors the API for Custom Elements v1.
 
-### Components 
+### Components
+
+| Decorator      | Description                             |
+| -------------- | ---                                     |
+| `@Component()` | Indicate a class is a Stencil component |
+|                |                                         |
+| `@Prop()`      | Creates a property that will exist on the element and be data-bound to this component.  |
+| `@State()`
+
+`@Prop()`
 
