@@ -90,7 +90,7 @@ export const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 /**
  * File names and value
  */
-export const BANNER = `Built with https://stenciljs.com`;
+export const BANNER = `Built with http://stenciljs.com`;
 export const CORE_NAME = 'core';
 export const LOADER_NAME = 'loader';
 export const PROJECT_NAMESPACE_REGEX = /["']__STENCIL__APP__['"]/g;

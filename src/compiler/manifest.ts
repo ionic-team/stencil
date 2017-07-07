@@ -1,6 +1,4 @@
 import { BuildConfig, BuildContext, CompileResults, ComponentMeta, Manifest, Bundle, StyleMeta } from './interfaces';
-import { readFile } from './util';
-import { resolveFrom } from './resolve-from';
 import { validateBundles, validateManifest } from './validation';
 
 
@@ -100,24 +98,6 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
   }
 
   return manifest;
-}
-
-
-export function generateDependentManifests(buildConfig: BuildConfig) {
-  const sys = buildConfig.sys;
-
-  return Promise.all(buildConfig.collections.map(collection => {
-
-    const manifestJsonFile = resolveFrom(sys, buildConfig.rootDir, collection);
-    const manifestDir = sys.path.dirname(manifestJsonFile);
-
-    return readFile(sys, manifestJsonFile).then(manifestJsonContent => {
-      const manifest: Manifest = JSON.parse(manifestJsonContent);
-
-      return updateManifestUrls(buildConfig, manifest, manifestDir);
-    });
-
-  }));
 }
 
 

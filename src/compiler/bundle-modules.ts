@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
   Manifest, ModuleResults, StencilSystem } from './interfaces';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../util/data-serialize';
+import { generateBanner } from './util';
 
 
 export function bundleModules(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
@@ -98,7 +99,7 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
     const moduleFileName = formatJsBundleFileName(moduleResults.bundles[bundleId]);
     const moduleFilePath = sys.path.join(buildConfig.buildDest, buildConfig.namespace.toLowerCase(), moduleFileName);
 
-    ctx.filesToWrite[moduleFilePath] = moduleContent;
+    ctx.filesToWrite[moduleFilePath] = generateBanner(buildConfig) + moduleContent;
 
   }).catch(err => {
     moduleResults.diagnostics.push({

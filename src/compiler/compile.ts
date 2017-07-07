@@ -4,13 +4,12 @@ import { isTsSourceFile, readFile } from './util';
 import { transpile } from './transpile';
 
 
-export function compile(buildConfig: BuildConfig, ctx: BuildContext) {
+export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
   const logger = buildConfig.logger;
 
   const timeSpan = buildConfig.logger.createTimeSpan(`compile started`);
 
-  logger.debug(`compile, srcDir: ${buildConfig.src}`);
-  logger.debug(`compile, collectionDest: ${buildConfig.collectionDest}`);
+  logger.debug(`compileDirectory, srcDir: ${buildConfig.src}`);
 
   const compileResults: CompileResults = {
     moduleFiles: {},
@@ -19,15 +18,18 @@ export function compile(buildConfig: BuildConfig, ctx: BuildContext) {
     includedSassFiles: []
   };
 
-  return compileDirectory(buildConfig, ctx, buildConfig.src, compileResults).then(() => {
+  return compileDir(buildConfig, ctx, buildConfig.src, compileResults).then(() => {
     compileResults.manifest = generateManifest(buildConfig, ctx, compileResults);
 
   }).then(() => {
     return copySourceSassFilesToDest(buildConfig, ctx, compileResults);
 
   }).catch(err => {
-    logger.error(err);
-    err.stack && logger.debug(err.stack);
+    compileResults.diagnostics.push({
+      msg: err.toString(),
+      type: 'error',
+      stack: err.stack
+    });
 
   }).then(() => {
     timeSpan.finish(`compile finished`);
@@ -36,7 +38,33 @@ export function compile(buildConfig: BuildConfig, ctx: BuildContext) {
 }
 
 
-function compileDirectory(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
+export function compileFiles(buildConfig: BuildConfig, ctx: BuildContext, filePaths: string[]) {
+  buildConfig.logger.debug(`compileFiles: ${filePaths}`);
+
+  const compileResults: CompileResults = {
+    moduleFiles: {},
+    diagnostics: [],
+    manifest: {},
+    includedSassFiles: []
+  };
+
+  return Promise.all(filePaths.map(filePath => {
+    return compileFile(buildConfig, ctx, filePath, compileResults);
+
+  })).catch(err => {
+    compileResults.diagnostics.push({
+      msg: err.toString(),
+      type: 'error',
+      stack: err.stack
+    });
+
+  }).then(() => {
+    return compileResults;
+  });
+}
+
+
+function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
   return new Promise(resolve => {
     // loop through this directory and sub directories looking for
     // files that need to be transpiled
@@ -76,7 +104,7 @@ function compileDirectory(buildConfig: BuildConfig, ctx: BuildContext, dir: stri
             } else if (stats.isDirectory()) {
               // looks like it's yet another directory
               // let's keep drilling down
-              compileDirectory(buildConfig, ctx, readPath, compileResults).then(() => {
+              compileDir(buildConfig, ctx, readPath, compileResults).then(() => {
                 resolve();
               });
 

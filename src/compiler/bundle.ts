@@ -39,8 +39,7 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
 
     bundleResults.componentRegistry = generateComponentRegistry(bundlerConfig, styleResults, moduleResults);
 
-  })
-  .catch(err => {
+  }).catch(err => {
     bundleResults.diagnostics.push({
       msg: err.toString(),
       type: 'error',

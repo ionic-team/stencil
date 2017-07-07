@@ -1,5 +1,6 @@
-import { BANNER, CORE_NAME, LOADER_NAME, PROJECT_NAMESPACE_REGEX } from '../util/constants';
+import { CORE_NAME, LOADER_NAME, PROJECT_NAMESPACE_REGEX } from '../util/constants';
 import { BuildConfig, BuildContext } from './interfaces';
+import { generateBanner } from './util';
 import { LoadComponentRegistry, ProjectRegistry } from '../util/interfaces';
 
 
@@ -178,22 +179,4 @@ function generateCoreEs5(buildConfig: BuildConfig) {
 
     return projectCode.join('');
   });
-}
-
-
-function generateBanner(buildConfig: BuildConfig) {
-  let preamble: string[] = [];
-
-  if (buildConfig.preamble) {
-    preamble = buildConfig.preamble.split('\n');
-  }
-
-  preamble.push(BANNER);
-
-  preamble = preamble.map(l => ` * ${l}`);
-
-  preamble.unshift(`/*!`);
-  preamble.push(` */\n`);
-
-  return preamble.join('\n');
 }

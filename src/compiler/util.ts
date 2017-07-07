@@ -1,4 +1,5 @@
-import { FilesToWrite, StencilSystem } from './interfaces';
+import { BANNER } from '../util/constants';
+import { BuildConfig, FilesToWrite, StencilSystem } from './interfaces';
 
 
 export function readFile(sys: StencilSystem, filePath: string) {
@@ -193,4 +194,26 @@ export function hasCmpClass(sourceText: string, filePath: string) {
   }
 
   return true;
+}
+
+
+export function generateBanner(buildConfig: BuildConfig) {
+  let preamble: string[] = [];
+
+  if (buildConfig.preamble) {
+    preamble = buildConfig.preamble.split('\n');
+  }
+
+  preamble.push(BANNER);
+
+  if (preamble.length > 1) {
+    preamble = preamble.map(l => ` * ${l}`);
+
+    preamble.unshift(`/*!`);
+    preamble.push(` */\n`);
+
+    return preamble.join('\n');
+  }
+
+  return `/*! ${BANNER} */\n\n`;
 }

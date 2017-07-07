@@ -1,7 +1,7 @@
+import { HYDRATED_CSS } from '../util/constants';
 import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from './interfaces';
 import { formatCssBundleFileName, generateBundleId } from '../util/data-serialize';
-import { HYDRATED_CSS } from '../util/constants';
-import { readFile } from './util';
+import { generateBanner, readFile } from './util';
 
 
 export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
@@ -117,7 +117,7 @@ function generateModeCss(
 
     if (buildConfig.devMode) {
       // dev mode has filename from the bundled tag names
-      stylesResult[modeName] = (userBundle.components.sort().join('.') + '.' + modeName).toLowerCase();
+      stylesResult[modeName] = (userBundle.components.sort().join('.')).toLowerCase();
 
       if (modeName !== '$') {
         // prefix with the mode name if it's not the default mode
@@ -152,7 +152,7 @@ function generateModeCss(
       styleFileName
     );
 
-    ctx.filesToWrite[styleFilePath] = styleContent;
+    ctx.filesToWrite[styleFilePath] = generateBanner(buildConfig) + styleContent;
   });
 }
 
