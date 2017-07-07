@@ -171,7 +171,7 @@ function generateCoreEs5(buildConfig: BuildConfig) {
 
     // concat the projects core code
     const projectCode: string[] = [
-      docRegistryPolyfillContent,
+      docRegistryPolyfillContent + '\n\n',
       generateBanner(buildConfig),
       coreContent
     ];
