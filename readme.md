@@ -6,7 +6,7 @@ Stencil combines the best concepts of the most popular frontend frameworks into 
 
 Stencil components are just Web Components, so they work in any major framework or with no framework at all. In many cases, Stencil can be used as a drop in replacement for traditional frontend frameworks given the capabilities now available in the browser, though using it as such is certainly not required.
 
-Stencil also supports a number of key capabilities that Web Components do not, in particular Server Side Rendering (SSR) without the need to run a headless browser.
+Stencil also supports a number of key capabilities that Web Components do not, in particular Server Side Rendering (SSR) without the need to run a headless browser, and objects-as-properties (instead of just strings).
 
 ## Why Stencil?
 
@@ -66,6 +66,12 @@ export class MyComponent {
 ```
 
 Note: the `.tsx` extension is required, as this is the standard for TypeScript classes that use JSX.
+
+To use this component, just use it like any other HTML tag:
+
+```html
+<my-component name="Max"></my-component>
+```
 
 ## Hosting the app
 
