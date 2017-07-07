@@ -1,12 +1,12 @@
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
+import { BuildConfig, BuildContext, BundleResults, BundlerConfig } from './interfaces';
 import { bundleModules } from './bundle-modules';
-import { BuildContext, BuildConfig, BundleResults, BundlerConfig } from './interfaces';
 import { bundleStyles } from './bundle-styles';
 import { generateComponentRegistry } from './bundle-registry';
+import { validateTag } from './validation';
 
 
 export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfig: BundlerConfig) {
-  // within MAIN thread
   const logger = buildConfig.logger;
 
   const bundleResults: BundleResults = {
@@ -70,7 +70,16 @@ function validateBundlerConfig(bundlerConfig: BundlerConfig) {
 
   // sort by tag name and ensure they're lower case
   bundlerConfig.manifest.bundles.forEach(b => {
-    b.components = b.components.sort().map(c => c.toLowerCase().trim());
+    b.components = b.components
+                    .filter(c => typeof c === 'string' && c.trim().length);
+
+    if (!b.components.length) {
+      throw new Error(`No valid bundle components found within stencil config`);
+    }
+
+    b.components = b.components.map(tag => {
+      return validateTag(tag, `found in bundle component stencil config`);
+    }).sort();
   });
 
   bundlerConfig.manifest.components.forEach(c => {

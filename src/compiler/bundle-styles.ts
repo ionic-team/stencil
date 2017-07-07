@@ -5,7 +5,6 @@ import { readFile } from './util';
 
 
 export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
-  // within MAIN thread
   const timeSpan = buildConfig.logger.createTimeSpan(`bundle styles started`);
 
   // create main style results object
@@ -35,7 +34,6 @@ export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userMa
 
 
 function generateBundleCss(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest, userBundle: Bundle, stylesResults: StylesResults) {
-  // within MAIN thread
   // multiple modes can be on each component
   // and multiple components can be in each bundle
   // create css files with the common modes for the bundle's components

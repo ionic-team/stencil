@@ -4,7 +4,6 @@ import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from
 
 
 export function bundleModules(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
-  // within MAIN thread
   const timeSpan = buildConfig.logger.createTimeSpan(`bundle modules started`);
 
   // create main module results object

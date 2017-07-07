@@ -5,7 +5,6 @@ import { transpile } from './transpile';
 
 
 export function compile(buildConfig: BuildConfig, ctx: BuildContext) {
-  // within MAIN thread
   const logger = buildConfig.logger;
 
   const timeSpan = buildConfig.logger.createTimeSpan(`compile started`);
@@ -38,7 +37,6 @@ export function compile(buildConfig: BuildConfig, ctx: BuildContext) {
 
 
 function compileDirectory(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
-  // within MAIN thread
   return new Promise(resolve => {
     // loop through this directory and sub directories looking for
     // files that need to be transpiled

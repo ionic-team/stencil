@@ -1,5 +1,6 @@
 import { ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../interfaces';
 import { normalizeStyles } from './normalize-styles';
+import { validateTag } from '../validation';
 import * as ts from 'typescript';
 
 
@@ -73,42 +74,11 @@ function normalizeTag(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], use
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
 
-  cmpMeta.tagNameMeta = userOpts.tag;
-
   if (!cmpMeta.tagNameMeta || cmpMeta.tagNameMeta.trim() === '') {
-    throw `tag missing in component decorator: ${orgText}`;
+    throw new Error(`tag missing in component decorator: ${orgText}`);
   }
 
-  cmpMeta.tagNameMeta = cmpMeta.tagNameMeta.trim().toLowerCase();
-
-  if (cmpMeta.tagNameMeta.indexOf(' ') > -1) {
-    throw `"${cmpMeta.tagNameMeta}" tag cannot contain a space`;
-  }
-
-  if (cmpMeta.tagNameMeta.indexOf(',') > -1) {
-    throw `"${cmpMeta.tagNameMeta}" tag cannot be use for multiple tags`;
-  }
-
-  let invalidChars = cmpMeta.tagNameMeta.replace(/\w|-/g, '');
-  if (invalidChars !== '') {
-    throw `"${cmpMeta.tagNameMeta}" tag contains invalid characters: ${invalidChars}`;
-  }
-
-  if (cmpMeta.tagNameMeta.indexOf('-') === -1) {
-    throw `"${cmpMeta.tagNameMeta}" tag must contain a dash (-) to work as a valid web component`;
-  }
-
-  if (cmpMeta.tagNameMeta.indexOf('--') > -1) {
-    throw `"${cmpMeta.tagNameMeta}" tag cannot contain multiple dashes (--) next to each other`;
-  }
-
-  if (cmpMeta.tagNameMeta.indexOf('-') === 0) {
-    throw `"${cmpMeta.tagNameMeta}" tag cannot start with a dash (-)`;
-  }
-
-  if (cmpMeta.tagNameMeta.lastIndexOf('-') === cmpMeta.tagNameMeta.length - 1) {
-    throw `"${cmpMeta.tagNameMeta}" tag cannot end with a dash (-)`;
-  }
+  cmpMeta.tagNameMeta = validateTag(userOpts.tag, moduleFile.tsFilePath);
 }
 
 
