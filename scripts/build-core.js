@@ -19,6 +19,8 @@ const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-core');
 const BINDINGS_DIR = path.join(TRANSPILED_DIR, 'bindings');
 const BINDINGS_CLIENT_DIR = path.join(BINDINGS_DIR, 'client');
 const DIST_CLIENT_DIR = path.join(DIST_DIR, 'client');
+const POLYFILLS_SRC_DIR = path.join(ROOT_DIR, 'scripts', 'polyfills');
+const POLYFILLS_DIST_DIR = path.join(DIST_DIR, 'client', 'polyfills');
 
 const CLIENT_CORE_ENTRY_FILE = path.join(BINDINGS_CLIENT_DIR, 'core.js');
 const CLIENT_CORE_ES5_ENTRY_FILE = path.join(BINDINGS_CLIENT_DIR, 'core.es5.js');
@@ -66,6 +68,8 @@ function buildCore(isDevMode) {
     DIST_CLIENT_LOADER_PROD_FILE,
     isDevMode
   );
+
+  copyPolyfills(POLYFILLS_SRC_DIR, POLYFILLS_DIST_DIR);
 
   copyCoreDeclarationFiles();
 }
@@ -220,6 +224,11 @@ function buildLoader(loaderEntryFile, outputDevFile, outputProdFile, isDevMode) 
       }
     });
   });
+}
+
+
+function copyPolyfills(polyfillsSrcDir, polyfillsDestDir) {
+  fs.copy(polyfillsSrcDir, polyfillsDestDir);
 }
 
 
