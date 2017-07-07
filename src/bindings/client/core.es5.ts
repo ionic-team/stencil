@@ -21,8 +21,7 @@ const plt = createPlatformClient(
   createConfigController(Gbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core')),
   domCtrl,
   createQueueClient(domCtrl),
-  Gbl.staticDir,
-  true
+  Gbl.staticDir
 );
 
 plt.registerComponents(Gbl.components).forEach(cmpMeta => {

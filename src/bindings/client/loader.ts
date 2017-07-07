@@ -1,7 +1,7 @@
 import { LoadComponentRegistry, ProjectNamespace } from '../../util/interfaces';
 
 
-(function(window: any, document: HTMLDocument, projectNamespace: string, components?: LoadComponentRegistry[]) {
+(function(window: any, document: HTMLDocument, projectNamespace: string, projectFileName?: string, projectCore?: string, projectCoreEs5?: string, components?: LoadComponentRegistry[]) {
   'use strict';
 
   // create global namespace if it doesn't already exist
@@ -23,6 +23,7 @@ import { LoadComponentRegistry, ProjectNamespace } from '../../util/interfaces';
     y.pop();
     Project.staticDir = x.dataset['staticDir'] = y.join('/') + '/';
   }
+  Project.staticDir += projectFileName + '/';
 
   // auto hide components until they been fully hydrated
   x = document.createElement('style');
@@ -30,17 +31,9 @@ import { LoadComponentRegistry, ProjectNamespace } from '../../util/interfaces';
   x.innerHTML += 'ion-app:not(.hydrated){display:none}';
   document.head.appendChild(x);
 
-  // build up a path for the exact core file this browser needs
-  x = ['core'];
-
-  if (!window.customElements) {
-    // browser requires the custom elements polyfill
-    x.push('ce');
-  }
-
   // request the core file this browser needs
   y = document.createElement('script');
-  y.src = Project.staticDir + projectNamespace.toLowerCase() + '.' + x.join('.') + '.js';
+  y.src = Project.staticDir + (window.customElements ? projectCore : projectCoreEs5);
   document.head.appendChild(y);
 
   // performance.now() polyfill

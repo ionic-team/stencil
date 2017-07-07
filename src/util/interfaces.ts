@@ -419,6 +419,15 @@ export interface Manifest {
 }
 
 
+export interface ProjectRegistry {
+  namespace: string;
+  loader: string;
+  core?: string;
+  coreEs5?: string;
+  components: LoadComponentRegistry[];
+}
+
+
 export interface Bundle {
   components: string[];
   priority?: string;

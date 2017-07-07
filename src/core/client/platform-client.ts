@@ -11,7 +11,7 @@ import { parseComponentMeta, parseComponentRegistry } from '../../util/data-pars
 import { SSR_VNODE_ID } from '../../util/constants';
 
 
-export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string, loadAnimations: boolean): PlatformApi {
+export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
@@ -47,12 +47,6 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
   rootElm._initLoad = function appLoadedCallback() {
     // this will fire when all components have finished loaded
     rootElm._hasLoaded = true;
-
-    // kick off loading the auxiliary code, which has stuff that wasn't
-    // needed for the initial paint, such as the animation library
-    loadAnimations && queue.add(() => {
-      jsonp(staticDir + 'ionic.animation.js');
-    });
   };
 
 
@@ -166,7 +160,7 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
 
 
   function getBundlePath(fileName: string) {
-    return `${staticDir}${Gbl.ns.toLowerCase()}/${fileName}`;
+    return `${staticDir}${fileName}`;
   }
 
 

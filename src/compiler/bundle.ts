@@ -37,7 +37,7 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
       bundleResults.diagnostics = bundleResults.diagnostics.concat(moduleResults.diagnostics);
     }
 
-    bundleResults.componentRegistry = generateComponentRegistry(buildConfig, ctx, bundlerConfig, styleResults, moduleResults);
+    bundleResults.componentRegistry = generateComponentRegistry(bundlerConfig, styleResults, moduleResults);
 
   })
   .catch(err => {
