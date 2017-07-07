@@ -118,6 +118,6 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 
 ## Why "Stencil?"
 
-A Stencil is a tool for drawing perfect shapes easily. We want Stencil to be something you don't see in the finished product; Stencil creates plain Web Components. 
+A Stencil is a tool artists use for drawing perfect shapes easily. We want Stencil to be a similar tool for web developers: a tool not seen in the finished product.
 
 Stencil is a tool developers use to create Web Components with some powerful features baked in, but it gets out of the way at runtime.
