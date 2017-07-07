@@ -1,7 +1,15 @@
 
 
 export function validateTag(tag: string, suffix: string) {
+  if (typeof tag !== 'string') {
+    throw new Error(`Tag "${tag}" must be a string type, ${suffix}`);
+  }
+
   tag = tag.trim().toLowerCase();
+
+  if (tag.length === 0) {
+    throw new Error(`Received empty tag value, ${suffix}`);
+  }
 
   if (tag.indexOf(' ') > -1) {
     throw new Error(`"${tag}" tag cannot contain a space, ${suffix}`);

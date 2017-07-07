@@ -70,8 +70,7 @@ function validateBundlerConfig(bundlerConfig: BundlerConfig) {
 
   // sort by tag name and ensure they're lower case
   bundlerConfig.manifest.bundles.forEach(b => {
-    b.components = b.components
-                    .filter(c => typeof c === 'string' && c.trim().length);
+    b.components = b.components.filter(c => typeof c === 'string' && c.trim().length);
 
     if (!b.components.length) {
       throw new Error(`No valid bundle components found within stencil config`);
@@ -83,7 +82,13 @@ function validateBundlerConfig(bundlerConfig: BundlerConfig) {
   });
 
   bundlerConfig.manifest.components.forEach(c => {
-    c.tagNameMeta = c.tagNameMeta.toLowerCase().trim();
+    c.tagNameMeta = validateTag(c.tagNameMeta, `found in bundle component stencil config`);
+  });
+
+  bundlerConfig.manifest.components = bundlerConfig.manifest.components.sort((a, b) => {
+    if (a.tagNameMeta < b.tagNameMeta) return -1;
+    if (a.tagNameMeta > b.tagNameMeta) return 1;
+    return 0;
   });
 }
 
