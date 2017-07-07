@@ -115,3 +115,9 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 | `@Prop()`      | Creates a property that will exist on the element and be data-bound to this component.  |
 | `@State()`     | Creates a local state variable that will not be placed on the element. |
 
+
+## Why "Stencil?"
+
+A Stencil is a tool for drawing perfect shapes easily. We want Stencil to be something you don't see in the finished product; Stencil creates plain Web Components. 
+
+Stencil is a tool developers use to create Web Components with some powerful features baked in, but it gets out of the way at runtime.
