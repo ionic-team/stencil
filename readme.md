@@ -107,7 +107,5 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 | `@Component()` | Indicate a class is a Stencil component |
 |                |                                         |
 | `@Prop()`      | Creates a property that will exist on the element and be data-bound to this component.  |
-| `@State()`
-
-`@Prop()`
+| `@State()`     | Creates a local state variable that will not be placed on the element. |
 
