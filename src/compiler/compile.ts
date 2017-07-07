@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, CompileResults } from './interfaces';
 import { generateManifest } from './manifest';
-import { isTsSourceFile, readFile } from './util';
+import { isTsSourceFile, readFile, normalizeUrl } from './util';
 import { transpile } from './transpile';
 
 
@@ -139,16 +139,18 @@ function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, co
 
 function compileFile(buildConfig: BuildConfig, ctx: BuildContext, filePath: string, compileResults: CompileResults) {
   return Promise.resolve().then(() => {
-
-    return transpile(buildConfig, ctx, filePath).then(transpileResults => {
+    
+    const normalizedFilePath = normalizeUrl(filePath);
+    return transpile(buildConfig, ctx, normalizedFilePath).then(transpileResults => {
       if (transpileResults.diagnostics) {
         compileResults.diagnostics = compileResults.diagnostics.concat(transpileResults.diagnostics);
       }
       if (transpileResults.moduleFiles) {
-        Object.keys(transpileResults.moduleFiles).forEach(tsFilePath => {
-          const moduleFile = transpileResults.moduleFiles[tsFilePath];
+        Object.keys(transpileResults.moduleFiles).forEach(path => {
+          const normalizedTsFilePath = normalizeUrl(path);
+          const moduleFile = transpileResults.moduleFiles[normalizedTsFilePath];
 
-          compileResults.moduleFiles[tsFilePath] = moduleFile;
+          compileResults.moduleFiles[normalizedTsFilePath] = moduleFile;
 
           if (buildConfig.generateCollection) {
             ctx.filesToWrite[moduleFile.jsFilePath] = moduleFile.jsText;
