@@ -53,7 +53,7 @@ export class MyComponent {
   // Indicate that name should be a property on our new component
   @Prop() name: string;
 
-  @State() isVisible: boolean = true
+  @State() isVisible: boolean = true;
 
   render() {
     return (
