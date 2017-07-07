@@ -23,6 +23,7 @@
     "removeComments": true,
     "sourceMap": false,
     "types": [
+      "jest",
       "node"
     ]
   },

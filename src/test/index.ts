@@ -86,15 +86,15 @@ export function mockStencilSystem() {
     createDom: function() {
       return {
         parse: function(opts: HydrateOptions) {
-          this._dom = new jsdom.JSDOM(opts.html, {
+          (<any>this)._dom = new jsdom.JSDOM(opts.html, {
             url: opts.url,
             referrer: opts.referrer,
             userAgent: opts.userAgent,
           });
-          return this._dom.window;
+          return (<any>this)._dom.window;
         },
         serialize: function() {
-          return this._dom.serialize();
+          return (<any>this)._dom.serialize();
         }
       };
     }

@@ -2,17 +2,16 @@ import { BuildConfig, Manifest } from '../util/interfaces';
 import { BuildContext, BuildResults, BundlerConfig } from './interfaces';
 import { bundle } from './bundle';
 import { compile } from './compile';
+import { emptyDir, writeFiles } from './util';
 import { generateDependentManifests, mergeManifests, updateManifestUrls } from './manifest';
 import { generateProjectFiles } from './build-project';
 import { optimizeHtml } from './optimize-html';
-import { updateDirectories, writeFiles } from './util';
 import { validateBuildConfig } from './validation';
 
 
 export function build(buildConfig: BuildConfig) {
   validateBuildConfig(buildConfig);
 
-  const sys = buildConfig.sys;
   const logger = buildConfig.logger;
 
   const timeSpan = logger.createTimeSpan(`build, ${buildConfig.devMode ? 'dev' : 'prod'} mode, started`);
@@ -74,19 +73,7 @@ export function build(buildConfig: BuildConfig) {
 
   }).then(() => {
     // write all the files in one go
-    const filesToWrite = Object.assign({}, ctx.filesToWrite);
-    ctx.filesToWrite = {};
-
-    if (buildConfig.devMode) {
-      // dev mode
-      // only ensure the directories it needs exists and writes the files
-      return writeFiles(sys, buildConfig.rootDir, filesToWrite);
-    }
-
-    // prod mode
-    // first removes any directories and files that aren't in the files to write
-    // then ensure the directories it needs exists and writes the files
-    return updateDirectories(sys, buildConfig.rootDir, filesToWrite);
+    return writeProjectFiles(buildConfig, ctx);
 
   }).catch(err => {
     buildResults.diagnostics.push({
@@ -112,5 +99,27 @@ export function build(buildConfig: BuildConfig) {
     }
 
     return buildResults;
+  });
+}
+
+
+function writeProjectFiles(buildConfig: BuildConfig, ctx: BuildContext) {
+  const filesToWrite = Object.assign({}, ctx.filesToWrite);
+  ctx.filesToWrite = {};
+
+  if (buildConfig.devMode) {
+    // dev mode
+    // only ensure the directories it needs exists and writes the files
+    return writeFiles(buildConfig.sys, buildConfig.rootDir, filesToWrite);
+  }
+
+  // prod mode
+  // first removes any empties out the directories we'll be writing to
+  // then ensures the directories it needs exists and writes the files
+  return Promise.all([
+    emptyDir(buildConfig.sys, buildConfig.collectionDest),
+    emptyDir(buildConfig.sys, buildConfig.buildDest)
+  ]).then(() => {
+    return writeFiles(buildConfig.sys, buildConfig.rootDir, filesToWrite);
   });
 }

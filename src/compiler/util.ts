@@ -28,8 +28,10 @@ export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: Fi
 }
 
 
-export function updateDirectories(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite): Promise<any> {
-  return writeFiles(sys, rootDir, filesToWrite);
+export function emptyDir(sys: StencilSystem, dir: string) {
+  // TODO!
+  sys; dir;
+  return Promise.resolve();
 }
 
 
