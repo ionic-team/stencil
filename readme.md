@@ -6,7 +6,7 @@ Stencil combines the best concepts of the most popular frontend frameworks into 
 
 Stencil components are just Web Components, so they work in any major framework or with no framework at all. In many cases, Stencil can be used as a drop in replacement for traditional frontend frameworks given the capabilities now available in the browser, though using it as such is certainly not required.
 
-Stencil also supports a number of key capabilities that Web Components do not, in particular Server Side Rendering (SSR) without the need to run a headless browser, and objects-as-properties (instead of just strings).
+Stencil also enables a number of key capabilities on top of Web Components, in particular Server Side Rendering (SSR) without the need to run a headless browser, pre-rendering, and objects-as-properties (instead of just strings).
 
 ## Why Stencil?
 
