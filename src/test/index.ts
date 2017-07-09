@@ -1,4 +1,4 @@
-import { ComponentMeta, ConfigApi, HostElement, HostContentNodes, HydrateOptions, Ionic,
+import { ComponentMeta, ConfigApi, HostElement, HostContentNodes, HydrateOptions, Ionic, Logger,
   ProjectNamespace, DomApi, PlatformConfig, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createConfigController } from '../util/config-controller';
 import { createDomApi } from '../core/renderer/dom-api';
@@ -6,8 +6,10 @@ import { initGlobal, initGlobalNamespace } from '../core/server/global-server';
 import { createPlatformServer } from '../core/server/platform-server';
 import { createRenderer } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
+import { noop } from '../util/helpers';
+const MemoryFileSystem = require('memory-fs');
 
-const fs = require('fs');
+
 const path = require('path');
 const vm = require('vm');
 const nodeModule = require('module');
@@ -79,10 +81,6 @@ export function mockConfig(configObj: any = {}, platforms: PlatformConfig[] = []
 
 export function mockStencilSystem() {
   const sys: StencilSystem = {
-    fs: fs,
-    path: path,
-    vm: vm,
-    module: nodeModule,
     createDom: function() {
       return {
         parse: function(opts: HydrateOptions) {
@@ -97,10 +95,59 @@ export function mockStencilSystem() {
           return (<any>this)._dom.serialize();
         }
       };
-    }
+    },
+    fs: mockFs(),
+    path: path,
+    rollup: rollup,
+    sass: {
+      render: function(config, cb) {
+        Promise.resolve().then(() => {
+          config;
+          cb(null, {
+            css: `/** ${config.file} css **/`,
+            stats: []
+          });
+        });
+      }
+    },
+    typescript: require('typescript'),
+    vm: vm,
+    module: nodeModule
   };
 
   return sys;
+}
+
+var rollup = require('rollup');
+rollup.plugins = {
+  commonjs: require('rollup-plugin-commonjs'),
+  nodeResolve: require('rollup-plugin-node-resolve')
+};
+
+
+export function mockFs() {
+  return new MemoryFileSystem();
+}
+
+
+export function mockLogger() {
+  const logger: Logger = {
+    level: '',
+    debug: noop,
+    info: noop,
+    ok: noop,
+    error: noop,
+    warn: noop,
+    dim: (msg: string) => msg,
+    createTimeSpan: (startMsg: string, debug?: boolean) => {
+      return {
+        finish: () => {
+          startMsg; debug;
+        }
+      };
+    }
+  };
+  return logger;
 }
 
 

@@ -40,11 +40,11 @@ export function generateProjectFiles(buildConfig: BuildConfig, ctx: BuildContext
 
     } else {
       // prod mode renames the core file with its hashed content
-      const contentHash = sys.generateContentHash(coreContent);
+      const contentHash = sys.generateContentHash(coreContent, buildConfig.hashedFileNameLength);
       projectRegistry.core = `${projectFileName}/${projectFileName}.${contentHash}.js`;
       projectCoreFileName = `${projectFileName}.${contentHash}.js`;
 
-      const contentEs5Hash = sys.generateContentHash(coreEs5Content);
+      const contentEs5Hash = sys.generateContentHash(coreEs5Content, buildConfig.hashedFileNameLength);
       projectRegistry.coreEs5 = `${projectFileName}/${projectFileName}.${contentEs5Hash}.ce.js`;
       projectCoreEs5FileName = `${projectFileName}.${contentEs5Hash}.ce.js`;
     }

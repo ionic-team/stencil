@@ -1,17 +1,21 @@
 import { HYDRATED_CSS } from '../util/constants';
 import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from './interfaces';
 import { formatCssBundleFileName, generateBundleId } from '../util/data-serialize';
-import { generateBanner, readFile } from './util';
+import { isCssSourceFile, isSassSourceFile, generateBanner, normalizePath, readFile } from './util';
 
 
 export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
-  const timeSpan = buildConfig.logger.createTimeSpan(`bundle styles started`);
-
   // create main style results object
   const stylesResults: StylesResults = {
     bundles: {},
     diagnostics: []
   };
+
+  // do bundling if this is not a change build
+  // or it's a change build that has either changed sass or css
+  const doBundling = (!ctx.isChangeBuild || ctx.changeHasCss || ctx.changeHasSass);
+
+  const timeSpan = buildConfig.logger.createTimeSpan(`bundle styles started`, !doBundling);
 
   // go through each bundle the user wants created
   // and create css files for each mode for each bundle
@@ -99,14 +103,17 @@ function generateModeCss(
   const sys = buildConfig.sys;
 
   return Promise.all(bundleComponentMeta.map(cmpMeta => {
-    return generateComponentModeStyles(buildConfig, cmpMeta, modeName, stylesResults);
+    return generateComponentModeStyles(buildConfig, ctx, cmpMeta, modeName, stylesResults);
 
-  })).then(modeStyles => {
+  })).then(styleBundles => {
+    const writeFile = styleBundles.some(s => s.writeFile);
+    const styleContents = styleBundles.map(s => s.content);
+
     // tack on the visibility css to each component tag selector
-    modeStyles.push(appendVisibilityCss(bundleComponentMeta));
+    styleContents.push(appendVisibilityCss(bundleComponentMeta));
 
     // let's join all bundled component mode css together
-    let styleContent = modeStyles.join('\n\n').trim();
+    let styleContent = styleContents.join('\n\n').trim();
 
     // generate a unique internal id for this bundle (this isn't the hashed bundle id)
     const bundleId = generateBundleId(userBundle.components);
@@ -129,7 +136,7 @@ function generateModeCss(
 
     if (buildConfig.hashFileNames) {
       // create style id from hashing the content
-      stylesResult[modeName] = sys.generateContentHash(styleContent);
+      stylesResult[modeName] = sys.generateContentHash(styleContent, buildConfig.hashedFileNameLength);
 
     } else {
       // create style id from list of component tags in this file
@@ -146,30 +153,33 @@ function generateModeCss(
       }
     }
 
-    // create the file name and path of where the bundle will be saved
-    const styleFileName = formatCssBundleFileName(stylesResult[modeName]);
-    const styleFilePath = sys.path.join(
-      buildConfig.buildDest,
-      buildConfig.namespace.toLowerCase(),
-      styleFileName
-    );
+    if (writeFile) {
+      // create the file name and path of where the bundle will be saved
+      const styleFileName = formatCssBundleFileName(stylesResult[modeName]);
+      const styleFilePath = sys.path.join(
+        buildConfig.buildDest,
+        buildConfig.namespace.toLowerCase(),
+        styleFileName
+      );
 
-    ctx.filesToWrite[styleFilePath] = generateBanner(buildConfig) + styleContent;
+      ctx.styleBundleCount++;
+
+      ctx.filesToWrite[styleFilePath] = generateBanner(buildConfig) + styleContent;
+    }
   });
 }
 
 
 function generateComponentModeStyles(
   buildConfig: BuildConfig,
+  ctx: BuildContext,
   cmpMeta: ComponentMeta,
   modeName: string,
   stylesResults: StylesResults
 ) {
-  // within WORKER thread
   const modeStyleMeta = cmpMeta.styleMeta[modeName];
-  const sys = buildConfig.sys;
 
-  const promises: Promise<any>[] = [];
+  const promises: Promise<StyleBundleDetails>[] = [];
 
   // used to remember the exact order the user wants
   // sass render and file reads are async so it could mess with the order
@@ -178,17 +188,17 @@ function generateComponentModeStyles(
   if (modeStyleMeta) {
     if (modeStyleMeta.styleUrls) {
       modeStyleMeta.styleUrls.forEach(styleUrl => {
+        styleUrl = normalizePath(styleUrl);
+
         styleCollection[styleUrl] = '';
 
-        const ext = sys.path.extname(styleUrl).toLowerCase();
-
-        if (ext === '.scss' || ext === '.sass') {
+        if (isSassSourceFile(styleUrl)) {
           // sass file needs to be compiled
-          promises.push(compileScssFile(buildConfig, styleUrl, styleCollection, stylesResults));
+          promises.push(compileScssFile(buildConfig, ctx, cmpMeta, styleUrl, styleCollection, stylesResults));
 
-        } else if (ext === '.css') {
+        } else if (isCssSourceFile(styleUrl)) {
           // plain ol' css file
-          promises.push(readCssFile(buildConfig, styleUrl, styleCollection, stylesResults));
+          promises.push(readCssFile(buildConfig, ctx, styleUrl, styleCollection, stylesResults));
 
         } else {
           // idk
@@ -206,28 +216,50 @@ function generateComponentModeStyles(
     }
   }
 
-  return Promise.all(promises).then(() => {
+  return Promise.all(promises).then(results => {
     // we've loaded everything, let's join them together
     // using the style collection object as a way to keep the same order
-    return Object.keys(styleCollection)
-            .map(key => styleCollection[key])
-            .join('\n\n').trim();
+    const styleBundleDetails: StyleBundleDetails = {
+      content: Object.keys(styleCollection)
+                .map(key => styleCollection[key])
+                .join('\n\n').trim(),
+      writeFile: results.some(r => r.writeFile)
+    };
+    return styleBundleDetails;
   });
 }
 
 
-interface StyleCollection {
-  [styleKey: string]: string;
-}
+function compileScssFile(buildConfig: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, styleUrl: string, styleCollection: StyleCollection, stylesResults: StylesResults): Promise<StyleBundleDetails> {
+  const styleBundleDetails: StyleBundleDetails = {};
+  const sys = buildConfig.sys;
+  const scssFilePath = normalizePath(sys.path.join(buildConfig.src, styleUrl));
 
+  if (ctx.isChangeBuild && !ctx.changeHasSass) {
+    // if this is a change build, but there wasn't specifically a sass file change
+    // however we may still need to build sass if its typescript module changed
 
-function compileScssFile(buildConfig: BuildConfig, styleUrl: string, styleCollection: StyleCollection, stylesResults: StylesResults) {
+    // loop through all the changed typescript filename and see if there are corresponding js filenames
+    // if there are no filenames that match then let's not run sass
+    // yes...there could be two files that have the same filename in different directories
+    // but worst case scenario is that both of them run sass, which isn't a performance problem
+    const distFileName = sys.path.basename(cmpMeta.componentUrl, '.js');
+    const hasChangedFileName = ctx.changedFiles.some(f => {
+      const changedFileName = sys.path.basename(f);
+      return (changedFileName === distFileName + '.ts' || changedFileName === distFileName + '.tsx');
+    });
+
+    if (!hasChangedFileName && ctx.styleSassOutputs[scssFilePath]) {
+      // don't bother running sass on this, none of the changed files have the same filename
+      // use the cached version
+      styleCollection[styleUrl] = ctx.styleSassOutputs[scssFilePath];
+      styleBundleDetails.content = ctx.styleSassOutputs[scssFilePath];
+      styleBundleDetails.writeFile = false;
+      return Promise.resolve(styleBundleDetails);
+    }
+  }
+
   return new Promise(resolve => {
-    const sys = buildConfig.sys;
-
-    const scssFileName = sys.path.basename(styleUrl);
-    const scssFilePath = sys.path.join(buildConfig.src, styleUrl);
-
     const sassConfig = {
       file: scssFilePath,
       outputStyle: buildConfig.devMode ? 'expanded' : 'compressed',
@@ -242,40 +274,44 @@ function compileScssFile(buildConfig: BuildConfig, styleUrl: string, styleCollec
           stack: err.stack
         });
 
-      } else if (result.css) {
-        result.css = result.css.toString().trim();
+      } else {
 
-        if (buildConfig.devMode) {
-          styleCollection[styleUrl] = `/********** ${scssFileName} **********/\n\n${result.css}\n\n`;
+        styleBundleDetails.content = result.css.toString().trim();
+        styleCollection[styleUrl] = styleBundleDetails.content;
+        styleBundleDetails.writeFile = true;
 
-        } else {
-          styleCollection[styleUrl] = result.css;
-        }
+        ctx.sassBuildCount++;
+
+        // cache for later
+        ctx.styleSassOutputs[scssFilePath] = styleBundleDetails.content;
       }
-
-      resolve();
+      resolve(styleBundleDetails);
     });
   });
 }
 
 
-function readCssFile(buildConfig: BuildConfig, styleUrl: string, styleCollection: StyleCollection, stylesResults: StylesResults) {
+function readCssFile(buildConfig: BuildConfig, ctx: BuildContext, styleUrl: string, styleCollection: StyleCollection, stylesResults: StylesResults) {
+  const styleBundleDetails: StyleBundleDetails = {};
+
+  if (ctx.isChangeBuild && !ctx.changeHasCss) {
+    // if this is a change build, but there were no sass changes then don't bother
+    styleBundleDetails.writeFile = false;
+    return Promise.resolve(styleBundleDetails);
+  }
+
   // this is just a plain css file
   // only open it up for its content
   const sys = buildConfig.sys;
 
-  const cssFilePath = sys.path.join(buildConfig.src, styleUrl);
-  const cssFileName = sys.path.basename(styleUrl);
+  const cssFilePath = normalizePath(sys.path.join(buildConfig.src, styleUrl));
 
   return readFile(sys, cssFilePath).then(cssText => {
     cssText = cssText.toString().trim();
 
-    if (buildConfig.devMode) {
-      styleCollection[styleUrl] = `/********** ${cssFileName} **********/\n\n${cssText}`;
-
-    } else {
-      styleCollection[styleUrl] = cssText;
-    }
+    styleCollection[styleUrl] = cssText;
+    styleBundleDetails.content = cssText;
+    styleBundleDetails.writeFile = true;
 
   }).catch(err => {
     stylesResults.diagnostics.push({
@@ -284,6 +320,9 @@ function readCssFile(buildConfig: BuildConfig, styleUrl: string, styleCollection
       type: 'error',
       stack: err.stack
     });
+
+  }).then(() => {
+    return styleBundleDetails;
   });
 }
 
@@ -295,5 +334,16 @@ function appendVisibilityCss(bundleComponentMeta: ComponentMeta[]) {
   }).join(',\n');
 
   return `${selector} {\n  visibility: inherit;\n}`;
+}
+
+
+interface StyleBundleDetails {
+  content?: string;
+  writeFile?: boolean;
+}
+
+
+interface StyleCollection {
+  [styleKey: string]: string;
 }
 

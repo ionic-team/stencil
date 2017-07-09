@@ -101,8 +101,8 @@ export class CmdLogger implements Logger {
     }
   }
 
-  createTimeSpan(startMsg: string): any {
-    return new TimeSpan(this, startMsg);
+  createTimeSpan(startMsg: string, debug = false): any {
+    return new TimeSpan(this, startMsg, debug);
   }
 }
 
@@ -111,12 +111,16 @@ export class TimeSpan {
   private logger: Logger;
   private start: number;
 
-  constructor(logger: Logger, startMsg: string) {
+  constructor(logger: Logger, startMsg: string, private debug: boolean) {
     this.logger = logger;
     this.start = Date.now();
     let msg = `${startMsg} ${logger.dim('...')}`;
 
-    this.logger.info(msg);
+    if (this.debug) {
+      this.logger.debug(msg);
+    } else {
+      this.logger.info(msg);
+    }
   }
 
   finish(finishMsg: string) {
@@ -124,7 +128,11 @@ export class TimeSpan {
 
     msg += ' ' + this.logger.dim(this.timeSuffix());
 
-    this.logger.info(msg);
+    if (this.debug) {
+      this.logger.debug(msg);
+    } else {
+      this.logger.info(msg);
+    }
   }
 
   private timeSuffix() {

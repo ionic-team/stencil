@@ -437,26 +437,27 @@ export type Collection = string;
 
 
 export interface BuildConfig {
-  sys: StencilSystem;
-  logger: Logger;
-  logLevel: 'error'|'warn'|'info'|'ok'|'debug';
-  exclude: string[];
-  rootDir: string;
-  namespace: string;
-  src: string;
-  buildDest: string;
-  collectionDest: string;
-  indexSrc: string;
-  indexDest: string;
-  generateCollection: boolean;
-  bundles: Bundle[];
-  collections: Collection[];
-  devMode: boolean;
-  watch: boolean;
-  hashFileNames: boolean;
-  minifyCss: boolean;
-  minifyJs: boolean;
-  preamble: string;
+  sys?: StencilSystem;
+  logger?: Logger;
+  rootDir?: string;
+  logLevel?: 'error'|'warn'|'info'|'ok'|'debug';
+  exclude?: string[];
+  namespace?: string;
+  src?: string;
+  buildDest?: string;
+  collectionDest?: string;
+  indexSrc?: string;
+  indexDest?: string;
+  generateCollection?: boolean;
+  bundles?: Bundle[];
+  collections?: Collection[];
+  devMode?: boolean;
+  watch?: boolean;
+  hashFileNames?: boolean;
+  minifyCss?: boolean;
+  minifyJs?: boolean;
+  preamble?: string;
+  hashedFileNameLength?: number;
 }
 
 
@@ -468,9 +469,12 @@ export interface Logger {
   warn(msg: string): void;
   error(msg: string): void;
   dim(msg: string): string;
-  createTimeSpan(startMsg: string): {
-    finish(finishedMsg: string): void;
-  };
+  createTimeSpan(startMsg: string, debug?: boolean): LoggerTimeSpan;
+}
+
+
+export interface LoggerTimeSpan {
+  finish(finishedMsg: string): void;
 }
 
 
@@ -610,9 +614,11 @@ export interface StyleMeta {
 
 
 export interface ModeStyleMeta {
+  styleId?: string;
+  parsedStyleUrls?: string[];
   styleUrls?: string[];
   styleStr?: string;
-  styleId?: string;
+
 }
 
 
@@ -986,7 +992,7 @@ export interface StencilSystem {
     unlink(path: string, callback?: (err?: any) => void): void;
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
   };
-  generateContentHash?(content: string): string;
+  generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   minifyCss?(input: string): {
     output: string;
@@ -1049,6 +1055,13 @@ export interface StencilSystem {
     createContext(sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
+  watch?(paths: string | string[], opts?: any): FSWatcher;
+}
+
+
+export interface FSWatcher {
+  on(eventName: string, callback: Function): this;
+  $triggerEvent(eventName: string, path: string): void;
 }
 
 

@@ -1,5 +1,6 @@
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
 import { BuildConfig, Bundle, BundlerConfig, Manifest } from './interfaces';
+import { normalizePath } from './util';
 
 
 export function validateBuildConfig(buildConfig: BuildConfig) {
@@ -24,38 +25,45 @@ export function validateBuildConfig(buildConfig: BuildConfig) {
     buildConfig.src = DEFAULT_SRC;
   }
   if (!buildConfig.sys.path.isAbsolute(buildConfig.src)) {
-    buildConfig.src = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.src);
+    buildConfig.src = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.src));
   }
 
   if (typeof buildConfig.buildDest !== 'string') {
     buildConfig.buildDest = DEFAULT_BUILD_DEST;
   }
   if (!buildConfig.sys.path.isAbsolute(buildConfig.buildDest)) {
-    buildConfig.buildDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.buildDest);
+    buildConfig.buildDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.buildDest));
   }
 
   if (typeof buildConfig.collectionDest !== 'string') {
     buildConfig.collectionDest = DEFAULT_COLLECTION_DEST;
   }
   if (!buildConfig.sys.path.isAbsolute(buildConfig.collectionDest)) {
-    buildConfig.collectionDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.collectionDest);
+    buildConfig.collectionDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.collectionDest));
   }
 
   if (typeof buildConfig.indexSrc !== 'string') {
     buildConfig.indexSrc = DEFAULT_INDEX_SRC;
   }
   if (!buildConfig.sys.path.isAbsolute(buildConfig.indexSrc)) {
-    buildConfig.indexSrc = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexSrc);
+    buildConfig.indexSrc = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexSrc));
   }
 
   if (typeof buildConfig.indexDest !== 'string') {
     buildConfig.indexDest = DEFAULT_INDEX_DEST;
   }
   if (!buildConfig.sys.path.isAbsolute(buildConfig.indexDest)) {
-    buildConfig.indexDest = buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexDest);
+    buildConfig.indexDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexDest));
   }
 
+  if (typeof buildConfig.devMode !== 'boolean') {
+    buildConfig.devMode = true;
+  }
   buildConfig.devMode = !!buildConfig.devMode;
+
+  if (typeof buildConfig.watch !== 'boolean') {
+    buildConfig.watch = false;
+  }
   buildConfig.watch = !!buildConfig.watch;
 
   if (typeof buildConfig.minifyCss !== 'boolean') {
@@ -82,13 +90,14 @@ export function validateBuildConfig(buildConfig: BuildConfig) {
     }
   }
 
+  if (typeof buildConfig.hashedFileNameLength !== 'number') {
+    buildConfig.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
+  }
+
   buildConfig.generateCollection = !!buildConfig.generateCollection;
   buildConfig.collections = buildConfig.collections || [];
   buildConfig.bundles = buildConfig.bundles || [];
-  buildConfig.exclude = buildConfig.exclude || [
-    'node_modules',
-    'bower_components'
-  ];
+  buildConfig.exclude = buildConfig.exclude || DEFAULT_EXCLUDES;
 
   return buildConfig;
 }
@@ -221,3 +230,5 @@ const DEFAULT_INDEX_SRC = 'src/index.html';
 const DEFAULT_INDEX_DEST = 'www/index.html';
 const DEFAULT_COLLECTION_DEST = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
+const DEFAULT_HASHED_FILENAME_LENTH = 12;
+const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];

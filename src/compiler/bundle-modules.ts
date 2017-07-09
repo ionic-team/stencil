@@ -5,13 +5,17 @@ import { generateBanner } from './util';
 
 
 export function bundleModules(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
-  const timeSpan = buildConfig.logger.createTimeSpan(`bundle modules started`);
-
   // create main module results object
   const moduleResults: ModuleResults = {
     bundles: {},
     diagnostics: []
   };
+
+  // do bundling if this is not a change build
+  // or it's a change build that has either changed modules or components
+  const doBundling = (!ctx.isChangeBuild || ctx.changeHasComponentModules || ctx.changeHasNonComponentModules);
+
+  const timeSpan = buildConfig.logger.createTimeSpan(`bundle modules started`, !doBundling);
 
   return Promise.all(userManifest.bundles.map(userBundle => {
     return generateDefineComponents(buildConfig, ctx, userManifest, userBundle, moduleResults);
@@ -52,16 +56,16 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
     return Promise.resolve(moduleResults);
   }
 
-  // loop through each bundle the user wants and create the "defineComponents"
-  return bundleComponentModules(sys, ctx, bundleComponentMeta, moduleResults).then(jsModuleContent => {
+  const bundleId = generateBundleId(userBundle.components);
 
-    const bundleId = generateBundleId(userBundle.components);
+  // loop through each bundle the user wants and create the "defineComponents"
+  return bundleComponentModules(sys, ctx, bundleComponentMeta, bundleId, moduleResults).then(bundleDetails => {
 
     // format all the JS bundle content
     // insert the already bundled JS module into the defineComponents function
     let moduleContent = formatDefineComponents(
       buildConfig.namespace, STENCIL_BUNDLE_ID,
-      jsModuleContent, bundleComponentMeta
+      bundleDetails.content, bundleComponentMeta
     );
 
     if (buildConfig.minifyJs) {
@@ -78,7 +82,7 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
 
     if (buildConfig.hashFileNames) {
       // create module id from hashing the content
-      moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent);
+      moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent, buildConfig.hashedFileNameLength);
 
     } else {
       // create module id from list of component tags in this file
@@ -93,11 +97,15 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
     // replace the known bundle id template with the newly created bundle id
     moduleContent = moduleContent.replace(MODULE_ID_REGEX, moduleResults.bundles[bundleId]);
 
-    // create the file name and path of where the bundle will be saved
-    const moduleFileName = formatJsBundleFileName(moduleResults.bundles[bundleId]);
-    const moduleFilePath = sys.path.join(buildConfig.buildDest, buildConfig.namespace.toLowerCase(), moduleFileName);
+    if (bundleDetails.writeFile) {
+      // create the file name and path of where the bundle will be saved
+      const moduleFileName = formatJsBundleFileName(moduleResults.bundles[bundleId]);
+      const moduleFilePath = sys.path.join(buildConfig.buildDest, buildConfig.namespace.toLowerCase(), moduleFileName);
 
-    ctx.filesToWrite[moduleFilePath] = generateBanner(buildConfig) + moduleContent;
+      ctx.moduleBundleCount++;
+
+      ctx.filesToWrite[moduleFilePath] = generateBanner(buildConfig) + moduleContent;
+    }
 
   }).catch(err => {
     moduleResults.diagnostics.push({
@@ -112,7 +120,17 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
 }
 
 
-function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleComponentMeta: ComponentMeta[], moduleResults: ModuleResults) {
+function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleComponentMeta: ComponentMeta[], bundleId: string, moduleResults: ModuleResults) {
+  const bundleDetails: ModuleBundleDetails = {};
+
+  if (ctx.isChangeBuild && !ctx.changeHasComponentModules && !ctx.changeHasNonComponentModules && ctx.moduleBundleOutputs[bundleId]) {
+    // don't bother bundling if this is a change build but
+    // none of the changed files are modules or components
+    bundleDetails.content = ctx.moduleBundleOutputs[bundleId];
+    bundleDetails.writeFile = false;
+    return Promise.resolve(bundleDetails);
+  }
+
   const entryFileLines: string[] = [];
 
   // loop through all the components this bundle needs
@@ -134,7 +152,33 @@ function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleCom
   });
 
   // create the entry file for the bundler
-  const entryContent = entryFileLines.join('\n');
+  const moduleBundleInput = entryFileLines.join('\n');
+
+  if (ctx.isChangeBuild && ctx.changeHasComponentModules && !ctx.changeHasNonComponentModules) {
+    // this is a change build, and there are no non-component changes
+    // but there are component changes, so lets hash our files together and compare
+    // if the original content is the same then we don't need to continue the bundle
+
+    // loop through all the changed typescript filename and see if there are corresponding js filenames
+    // if there are no filenames that match then let's not bundle
+    // yes...there could be two files that have the same filename in different directories
+    // but worst case scenario is that both of them run their bundling, which isn't a performance problem
+    const hasChangedFileName = bundleComponentMeta.some(cmpMeta => {
+      const distFileName = sys.path.basename(cmpMeta.componentUrl, '.js');
+      return ctx.changedFiles.some(f => {
+        const changedFileName = sys.path.basename(f);
+        return (changedFileName === distFileName + '.ts' || changedFileName === distFileName + '.tsx');
+      });
+    });
+
+    if (!hasChangedFileName && ctx.moduleBundleOutputs[bundleId]) {
+      // don't bother bundling, none of the changed files have the same filename
+      bundleDetails.content = ctx.moduleBundleOutputs[bundleId];
+      bundleDetails.writeFile = false;
+      return Promise.resolve(bundleDetails);
+    }
+  }
+
 
   // start the bundler on our temporary file
   return sys.rollup.rollup({
@@ -148,7 +192,7 @@ function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleCom
         include: 'node_modules/**',
         sourceMap: false
       }),
-      entryInMemoryPlugin(STENCIL_BUNDLE_ID, entryContent),
+      entryInMemoryPlugin(STENCIL_BUNDLE_ID, moduleBundleInput),
       transpiledInMemoryPlugin(sys, ctx)
     ],
     onwarn: createOnWarnFn(bundleComponentMeta, moduleResults.diagnostics)
@@ -164,8 +208,19 @@ function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleCom
     });
 
     // module bundling finished, assign its content to the user's bundle
-    return `function importComponent(exports, h, t, Ionic) {\n${results.code.trim()}\n}`;
+    bundleDetails.content = `function importComponent(exports, h, t, Ionic) {\n${results.code.trim()}\n}`;
+
+    // cache for later
+    ctx.moduleBundleOutputs[bundleId] = bundleDetails.content;
+
+    bundleDetails.writeFile = true;
+    return bundleDetails;
   });
+}
+
+interface ModuleBundleDetails {
+  content?: string;
+  writeFile?: boolean;
 }
 
 
@@ -234,7 +289,7 @@ function transpiledInMemoryPlugin(sys: StencilSystem, ctx: BuildContext) {
 }
 
 
-function entryInMemoryPlugin(entryKey: string, entryFileContent: string) {
+function entryInMemoryPlugin(entryKey: string, moduleBundleInput: string) {
   // used just so we don't have to write a temporary file to disk
   // just to turn around and immediately have rollup open and read it
   return {
@@ -247,7 +302,7 @@ function entryInMemoryPlugin(entryKey: string, entryFileContent: string) {
     },
     load(sourcePath: string): string {
       if (sourcePath === entryKey) {
-        return entryFileContent;
+        return moduleBundleInput;
       }
       return null;
     }

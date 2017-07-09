@@ -1,4 +1,6 @@
 import { BuildConfig, BuildContext, CompileResults, ComponentMeta, Manifest, Bundle, StyleMeta } from './interfaces';
+import { COLLECTION_MANIFEST_FILE_NAME } from '../util/constants';
+import { normalizePath } from './util';
 import { validateBundles, validateManifest } from './validation';
 
 
@@ -37,16 +39,16 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
     cmpMeta.componentClass = f.cmpClassName;
     cmpMeta.componentUrl = f.jsFilePath.replace(buildConfig.collectionDest + sys.path.sep, '');
 
-    const componentDir = sys.path.dirname(cmpMeta.componentUrl);
+    const componentDir = normalizePath(sys.path.dirname(cmpMeta.componentUrl));
 
     if (cmpMeta.styleMeta) {
       const modeNames = Object.keys(cmpMeta.styleMeta);
 
       modeNames.forEach(modeName => {
         const cmpMode = cmpMeta.styleMeta[modeName];
-        if (cmpMode.styleUrls) {
-          cmpMode.styleUrls = cmpMode.styleUrls.map(styleUrl => {
-            return sys.path.join(componentDir, styleUrl);
+        if (cmpMode.parsedStyleUrls) {
+          cmpMode.styleUrls = cmpMode.parsedStyleUrls.map(parsedStyleUrl => {
+            return normalizePath(sys.path.join(componentDir, parsedStyleUrl));
           });
         }
       });
@@ -89,7 +91,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
   validateManifest(manifest);
 
   if (buildConfig.generateCollection) {
-    const manifestFilePath = sys.path.join(buildConfig.collectionDest, MANIFEST_FILE_NAME);
+    const manifestFilePath = normalizePath(sys.path.join(buildConfig.collectionDest, COLLECTION_MANIFEST_FILE_NAME));
     const manifestJson = JSON.stringify(manifest, null, 2);
 
     logger.debug(`manifest, write: ${manifestFilePath}`);
@@ -110,7 +112,7 @@ export function updateManifestUrls(buildConfig: BuildConfig, manifest: Manifest,
     return {
       ...comp,
       styleMeta,
-      componentUrl: sys.path.join(manifestDir, comp.componentUrl)
+      componentUrl: normalizePath(sys.path.join(manifestDir, comp.componentUrl))
     };
   });
 
@@ -128,7 +130,7 @@ function updateStyleUrls(buildConfig: BuildConfig, styleMeta: StyleMeta, manifes
     const style = styleMeta[styleMode];
 
     const styleUrls = style.styleUrls
-      .map(styleUrl => sys.path.relative(buildConfig.collectionDest, sys.path.join(manifestDir, styleUrl)));
+      .map(styleUrl => normalizePath(sys.path.relative(buildConfig.collectionDest, sys.path.join(manifestDir, styleUrl))));
 
     styleData[styleMode] = {
       ...style,
@@ -162,6 +164,3 @@ export function mergeManifests(manifestPriorityList: Manifest[]): Manifest {
     };
   }, <Manifest>{ components: [], bundles: []});
 }
-
-
-const MANIFEST_FILE_NAME = 'manifest.json';

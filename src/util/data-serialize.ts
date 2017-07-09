@@ -102,7 +102,7 @@ export function formatComponentRegistry(registry: ComponentRegistry, defaultAttr
 export function formatDefineComponents(
     namespace: string,
     moduleId: string,
-    jsModuleContent: string,
+    moduleBundleOutput: string,
     components: ComponentMeta[]
   ) {
 
@@ -124,7 +124,7 @@ export function formatDefineComponents(
       `'${moduleId}',\n`,
 
       `/**** component modules ****/`,
-      `${jsModuleContent},\n`,
+      `${moduleBundleOutput},\n`,
 
       `${componentMetaStr}`,
 

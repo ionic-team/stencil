@@ -1,5 +1,5 @@
 export * from '../util/interfaces';
-import { ComponentMeta, Diagnostic, Manifest, LoadComponentRegistry } from '../util/interfaces';
+import { ComponentMeta, Diagnostic, FSWatcher, Manifest, LoadComponentRegistry } from '../util/interfaces';
 
 
 export interface BundlerConfig {
@@ -21,13 +21,43 @@ export interface ModuleFileMeta {
 
 
 export interface BuildContext {
-  moduleFiles: ModuleFiles;
-  filesToWrite: FilesToWrite;
+  moduleFiles?: ModuleFiles;
+  moduleBundleOutputs?: ModuleBundles;
+  styleSassOutputs?: ModuleBundles;
+  filesToWrite?: FilesToWrite;
+  watcher?: FSWatcher;
+  onFinish?: Function;
+
+  isRebuild?: boolean;
+  isChangeBuild?: boolean;
+  changeHasNonComponentModules?: boolean;
+  changeHasComponentModules?: boolean;
+  changeHasSass?: boolean;
+  changeHasCss?: boolean;
+  changedFiles?: string[];
+
+  sassBuildCount?: number;
+  transpileBuildCount?: number;
+
+  moduleBundleCount?: number;
+  styleBundleCount?: number;
 }
 
 
 export interface ModuleFiles {
   [filePath: string]: ModuleFileMeta;
+}
+
+
+export interface ModuleBundles {
+  [bundleId: string]: string;
+}
+
+
+export interface BuildResults {
+  diagnostics: Diagnostic[];
+  files: string[];
+  componentRegistry: LoadComponentRegistry[];
 }
 
 
@@ -75,12 +105,5 @@ export interface StylesResults {
 
 export interface BundleResults {
   diagnostics: Diagnostic[];
-  componentRegistry: LoadComponentRegistry[];
-}
-
-
-export interface BuildResults {
-  diagnostics: Diagnostic[];
-  manifest: Manifest;
   componentRegistry: LoadComponentRegistry[];
 }

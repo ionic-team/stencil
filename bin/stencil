@@ -9,10 +9,8 @@ process.env.IONIC_CLI_BIN = __filename;
 
 var chalk = require('chalk');
 var path = require('path');
-var semver = require('semver');
 
-
-if (semver.lt(process.version, 'v6.4.0')) {
+if (require('semver').lt(process.version, 'v6.4.0')) {
   console.log('ERR' + ': Your Node.js version is ' + chalk.bold(process.version) + '. Please update to the latest Node 6 LTS version (or latest Node).');
   process.exit(1);
 }
@@ -68,8 +66,8 @@ try {
 }
 
 
-if (cmdArgs.indexOf('--prod') === -1 && cmdArgs.indexOf('-p') === -1) {
-  buildConfig.devMode = true;
+if (cmdArgs.indexOf('--prod') > -1 || cmdArgs.indexOf('-p') > -1) {
+  buildConfig.devMode = false;
 }
 
 if (cmdArgs.indexOf('--watch') > -1 || cmdArgs.indexOf('-w') > -1) {
@@ -96,15 +94,101 @@ buildConfig.logger = new stencil.CmdLogger({
 });
 
 
+var coreClientFileCache = {};
+
 buildConfig.sys = Object.defineProperties({
-  // direct reference
-  'path': path,
+
+  getClientCoreFile: function getClientCoreFile(opts) {
+    var filePath = path.join(__dirname, '..', 'dist', 'client', opts.staticName);
+
+    return new Promise(function(resolve, reject) {
+      if (coreClientFileCache[filePath]) {
+        resolve(coreClientFileCache[filePath]);
+
+      } else {
+        buildConfig.sys.fs.readFile(filePath, 'utf-8', function(err, data) {
+          if (err) {
+            reject(err);
+          } else {
+            coreClientFileCache[filePath] = data;
+            resolve(data);
+          }
+        });
+      }
+    });
+  },
+
+  generateContentHash: function generateContentHash(content, length) {
+    var crypto = require('crypto');
+    return crypto.createHash('sha1')
+                .update(content)
+                .digest('base64')
+                .replace(/\W/g, '')
+                .substr(0, length)
+                .toLowerCase();
+  },
+
+  minifyCss: function minifyCss(input) {
+    var CleanCSS = require('clean-css');
+    var result = new CleanCSS().minify(input);
+    var diagnostics = [];
+
+    if (result.errors) {
+      result.errors.forEach(function(msg) {
+        diagnostics.push({
+          msg: msg,
+          level: 'error'
+        });
+      });
+    }
+
+    if (result.warnings) {
+      result.warnings.forEach(function(msg) {
+        diagnostics.push({
+          msg: msg,
+          level: 'warn'
+        });
+      });
+    }
+
+    return {
+      output: result.styles,
+      sourceMap: result.sourceMap,
+      diagnostics: diagnostics
+    };
+  },
+
+  minifyJs: function minifyJs(input) {
+    var UglifyJS = require("uglify-js");
+    var result = UglifyJS.minify(input);
+    var diagnostics = [];
+
+    if (result.error) {
+      diagnostics.push({
+        msg: result.error.message,
+        level: 'error'
+      });
+    }
+
+    return {
+      output: result.code,
+      sourceMap: result.sourceMap,
+      diagnostics: diagnostics
+    };
+  },
+
+  path: path,
+
+  watch: function watch(paths, opts) {
+    var chokidar = require('chokidar');
+    return chokidar.watch(paths, opts);
+  }
 
 }, {
-  // on-demand getters
-  'fs': { get: function() { return require('fs') } },
-  'module': { get: function() { return require('module') } },
-  'rollup': { get: function() {
+  // sys on-demand getters
+  fs: { get: function() { return require('fs') } },
+  module: { get: function() { return require('module') } },
+  rollup: { get: function() {
       var rollup = require('rollup');
       rollup.plugins = {
         commonjs: require('rollup-plugin-commonjs'),
@@ -113,93 +197,10 @@ buildConfig.sys = Object.defineProperties({
       return rollup;
     }
   },
-  'sass': { get: function() { return require('node-sass'); } },
-  'typescript': { get: function() { return require('typescript') } },
+  sass: { get: function() { return require('node-sass'); } },
+  typescript: { get: function() { return require('typescript'); } }
 });
 
-
-buildConfig.sys.generateContentHash = function(content) {
-  var crypto = require('crypto');
-  return crypto.createHash('sha1')
-               .update(content)
-               .digest('base64')
-               .replace(/\W/g, '')
-               .substr(0, 12)
-               .toLowerCase();
-};
-
-
-buildConfig.sys.minifyCss = function(input) {
-  var CleanCSS = require('clean-css');
-  var result = new CleanCSS().minify(input);
-  var diagnostics = [];
-
-  if (result.errors) {
-    result.errors.forEach(function(msg) {
-      diagnostics.push({
-        msg: msg,
-        level: 'error'
-      });
-    });
-  }
-
-  if (result.warnings) {
-    result.warnings.forEach(function(msg) {
-      diagnostics.push({
-        msg: msg,
-        level: 'warn'
-      });
-    });
-  }
-
-  return {
-    output: result.styles,
-    sourceMap: result.sourceMap,
-    diagnostics: diagnostics
-  };
-};
-
-
-buildConfig.sys.minifyJs = function(input) {
-  var UglifyJS = require("uglify-js");
-  var result = UglifyJS.minify(input);
-  var diagnostics = [];
-
-  if (result.error) {
-    diagnostics.push({
-      msg: result.error.message,
-      level: 'error'
-    });
-  }
-
-  return {
-    output: result.code,
-    sourceMap: result.sourceMap,
-    diagnostics: diagnostics
-  };
-};
-
-
-var coreClientFileCache = {};
-buildConfig.sys.getClientCoreFile = function(opts) {
-  var filePath = path.join(__dirname, '..', 'dist', 'client', opts.staticName);
-
-  return new Promise(function(resolve, reject) {
-    if (coreClientFileCache[filePath]) {
-      resolve(coreClientFileCache[filePath]);
-
-    } else {
-      buildConfig.sys.fs.readFile(filePath, 'utf-8', function(err, data) {
-        if (err) {
-          reject(err);
-        } else {
-          coreClientFileCache[filePath] = data;
-          resolve(data);
-        }
-      });
-    }
-  });
-};
 
 
 switch (cmdArgs[2]) {

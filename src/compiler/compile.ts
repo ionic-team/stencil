@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, CompileResults } from './interfaces';
 import { generateManifest } from './manifest';
-import { isTsSourceFile, readFile, normalizeUrl } from './util';
+import { isTsSourceFile, readFile, normalizePath } from './util';
 import { transpile } from './transpile';
 
 
@@ -38,38 +38,14 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
 }
 
 
-export function compileFiles(buildConfig: BuildConfig, ctx: BuildContext, filePaths: string[]) {
-  buildConfig.logger.debug(`compileFiles: ${filePaths}`);
-
-  const compileResults: CompileResults = {
-    moduleFiles: {},
-    diagnostics: [],
-    manifest: {},
-    includedSassFiles: []
-  };
-
-  return Promise.all(filePaths.map(filePath => {
-    return compileFile(buildConfig, ctx, filePath, compileResults);
-
-  })).catch(err => {
-    compileResults.diagnostics.push({
-      msg: err.toString(),
-      type: 'error',
-      stack: err.stack
-    });
-
-  }).then(() => {
-    return compileResults;
-  });
-}
-
-
 function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
   return new Promise(resolve => {
     // loop through this directory and sub directories looking for
     // files that need to be transpiled
     const sys = buildConfig.sys;
     const logger = buildConfig.logger;
+
+    dir = normalizePath(dir);
 
     logger.debug(`compileDirectory: ${dir}`);
 
@@ -139,15 +115,15 @@ function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, co
 
 function compileFile(buildConfig: BuildConfig, ctx: BuildContext, filePath: string, compileResults: CompileResults) {
   return Promise.resolve().then(() => {
-    
-    const normalizedFilePath = normalizeUrl(filePath);
+
+    const normalizedFilePath = normalizePath(filePath);
     return transpile(buildConfig, ctx, normalizedFilePath).then(transpileResults => {
       if (transpileResults.diagnostics) {
         compileResults.diagnostics = compileResults.diagnostics.concat(transpileResults.diagnostics);
       }
       if (transpileResults.moduleFiles) {
         Object.keys(transpileResults.moduleFiles).forEach(path => {
-          const normalizedTsFilePath = normalizeUrl(path);
+          const normalizedTsFilePath = normalizePath(path);
           const moduleFile = transpileResults.moduleFiles[normalizedTsFilePath];
 
           compileResults.moduleFiles[normalizedTsFilePath] = moduleFile;
@@ -181,21 +157,23 @@ function copySourceSassFilesToDest(buildConfig: BuildConfig, ctx: BuildContext, 
   const sys = buildConfig.sys;
 
   return Promise.all(compileResults.includedSassFiles.map(sassSrcPath => {
+    sassSrcPath = normalizePath(sassSrcPath);
+
     return readFile(sys, sassSrcPath).then(sassSrcText => {
       const includeDir = sassSrcPath.indexOf(buildConfig.src) === 0;
       let sassDestPath: string;
 
       if (includeDir) {
-        sassDestPath = sys.path.join(
+        sassDestPath = normalizePath(sys.path.join(
           buildConfig.collectionDest,
           sys.path.relative(buildConfig.src, sassSrcPath)
-        );
+        ));
 
       } else {
-        sassDestPath = sys.path.join(
+        sassDestPath = normalizePath(sys.path.join(
           buildConfig.rootDir,
           sys.path.relative(buildConfig.rootDir, sassSrcPath)
-        );
+        ));
       }
 
       ctx.filesToWrite[sassDestPath] = sassSrcText;

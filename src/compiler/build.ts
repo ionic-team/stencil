@@ -1,5 +1,5 @@
 import { BuildConfig, Manifest } from '../util/interfaces';
-import { BuildContext, BuildResults, BundlerConfig } from './interfaces';
+import { BuildContext, BuildResults, BundlerConfig, LoggerTimeSpan } from './interfaces';
 import { bundle } from './bundle';
 import { compileSrcDir } from './compile';
 import { emptyDir, writeFiles } from './util';
@@ -8,33 +8,46 @@ import { generateProjectFiles } from './build-project-files';
 import { optimizeHtml } from './optimize-html';
 import { readFile } from './util';
 import { resolveFrom } from './resolve-from';
+import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
 
 
-export function build(buildConfig: BuildConfig) {
-  // validate the build config
-  validateBuildConfig(buildConfig);
-
-  const logger = buildConfig.logger;
-
+export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
   // create a timespan of the build process
-  const timeSpan = logger.createTimeSpan(`build, ${buildConfig.devMode ? 'dev' : 'prod'} mode, started`);
+  let timeSpan: LoggerTimeSpan;
 
   // create the build results which will be the returned object
   const buildResults: BuildResults = {
     diagnostics: [],
-    manifest: {},
-    componentRegistry: []
+    files: [],
+    componentRegistry: [],
   };
 
-  // create the build context
-  const ctx: BuildContext = {
-    moduleFiles: {},
-    filesToWrite: {}
-  };
+  // create the build context if it doesn't exist
+  ctx = ctx || {};
+  ctx.filesToWrite = ctx.filesToWrite || {};
+  ctx.moduleFiles = ctx.moduleFiles || {};
+  ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
+  ctx.styleSassOutputs = ctx.styleSassOutputs || {};
+  ctx.changedFiles = ctx.changedFiles || [];
+
+  // reset counts
+  ctx.sassBuildCount = 0;
+  ctx.transpileBuildCount = 0;
+  ctx.moduleBundleCount = 0;
+  ctx.styleBundleCount = 0;
+
 
   // begin the build
   return Promise.resolve().then(() => {
+    // validate the build config
+    if (!ctx.isRebuild) {
+      validateBuildConfig(buildConfig);
+    }
+
+    timeSpan = buildConfig.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${buildConfig.devMode ? 'dev' : 'prod'} mode, started`);
+
+  }).then(() => {
     // generate manifest phase
     return manifestPhase(buildConfig);
 
@@ -52,7 +65,11 @@ export function build(buildConfig: BuildConfig) {
 
   }).then(() => {
     // write all the files in one go
-    return writePhase(buildConfig, ctx);
+    return writePhase(buildConfig, ctx, buildResults);
+
+  }).then(() => {
+    // setup watcher if need be
+    return setupWatcher(buildConfig, ctx);
 
   }).catch(err => {
     // catch all phase
@@ -60,14 +77,34 @@ export function build(buildConfig: BuildConfig) {
 
   }).then(() => {
     // finalize phase
-    if (buildConfig.watch) {
-      timeSpan.finish(`rebuild ready, watching files...`);
+    if (buildConfig) {
+      buildConfig.logger.debug(`transpileBuildCount: ${ctx.transpileBuildCount}`);
+      buildConfig.logger.debug(`sassBuildCount: ${ctx.sassBuildCount}`);
+      buildConfig.logger.debug(`moduleBundleCount: ${ctx.moduleBundleCount}`);
+      buildConfig.logger.debug(`styleBundleCount: ${ctx.styleBundleCount}`);
 
-    } else {
-      timeSpan.finish(`build finished`);
+      buildResults.diagnostics.forEach(d => {
+        if (d.type === 'error' && buildConfig.logger.level === 'debug' && d.stack) {
+          buildConfig.logger.error(d.stack);
+        } else {
+          buildConfig.logger[d.type](d.msg);
+        }
+      });
+
+      if (ctx.isRebuild && buildConfig.watch) {
+        timeSpan && timeSpan.finish(`rebuild finished, watching files...`);
+
+      } else {
+        timeSpan && timeSpan.finish(`build finished`);
+      }
     }
 
-    return finalizePhase(buildConfig, buildResults);
+    if (typeof ctx.onFinish === 'function') {
+      ctx.onFinish(buildResults);
+      delete ctx.onFinish;
+    }
+
+    return buildResults;
   });
 }
 
@@ -118,6 +155,8 @@ export function bundlePhase(buildConfig: BuildConfig, ctx: BuildContext, manifes
       buildResults.diagnostics = buildResults.diagnostics.concat(bundleResults.diagnostics);
     }
 
+    buildResults.componentRegistry = bundleResults.componentRegistry;
+
     // generate the loader and core files for this project
     return generateProjectFiles(buildConfig, ctx, bundleResults.componentRegistry);
   });
@@ -142,40 +181,31 @@ export function catchAll(buildResults: BuildResults, err: any) {
 }
 
 
-export function finalizePhase(buildConfig: BuildConfig, buildResults: BuildResults) {
-  buildResults.diagnostics.forEach(d => {
-    if (d.type === 'error' && buildConfig.logger.level === 'debug' && d.stack) {
-      buildConfig.logger.error(d.stack);
-    } else {
-      buildConfig.logger[d.type](d.msg);
-    }
-  });
+export function writePhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+  buildResults.files = Object.keys(ctx.filesToWrite).sort();
 
-  return buildResults;
-}
+  const timeSpan = buildConfig.logger.createTimeSpan(`writePhase started, fileUpdates: ${buildResults.files.length}`, true);
 
-
-export function writePhase(buildConfig: BuildConfig, ctx: BuildContext) {
   // create a copy of all the files to write
   const filesToWrite = Object.assign({}, ctx.filesToWrite);
 
   // clear out the files to write for next time
   ctx.filesToWrite = {};
 
-  if (buildConfig.devMode) {
-    // dev mode
-    // only ensure the directories it needs exists and writes the files
-    return writeFiles(buildConfig.sys, buildConfig.rootDir, filesToWrite);
+  const dirPromises: Promise<any>[] = [];
+  if (buildResults.files.length > 0 && !buildConfig.devMode) {
+    // only prod mode empties directories
+    dirPromises.push(emptyDir(buildConfig.sys, buildConfig.collectionDest));
+    dirPromises.push(emptyDir(buildConfig.sys, buildConfig.buildDest));
   }
 
-  // prod mode
-  // first removes any empties out the directories we'll be writing to
-  // then ensures the directories it needs exists and writes the files
-  return Promise.all([
-    emptyDir(buildConfig.sys, buildConfig.collectionDest),
-    emptyDir(buildConfig.sys, buildConfig.buildDest)
+  return Promise.all(dirPromises).then(() => {
+    if (buildResults.files.length > 0) {
+      return writeFiles(buildConfig.sys, buildConfig.rootDir, filesToWrite);
+    }
+    return Promise.resolve();
 
-  ]).then(() => {
-    return writeFiles(buildConfig.sys, buildConfig.rootDir, filesToWrite);
+  }).then(() => {
+    timeSpan.finish(`writePhase finished`);
   });
 }

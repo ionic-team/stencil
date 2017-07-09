@@ -16,11 +16,6 @@ export function readFile(sys: StencilSystem, filePath: string) {
 
 
 export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite): Promise<any> {
-  const filePaths = Object.keys(filesToWrite);
-  if (!filePaths.length) {
-    return Promise.resolve();
-  }
-
   const directories = getDirectoriesFromFiles(sys, filesToWrite);
 
   return ensureDirectoriesExist(sys, directories, [rootDir]).then(() => {
@@ -175,12 +170,20 @@ export function isTsSourceFile(filePath: string) {
   return false;
 }
 
-export function isScssSourceFile(filePath: string) {
-  const parts = filePath.toLowerCase().split('.');
-  if (parts.length > 1) {
-    return (parts[parts.length - 1] === 'scss');
-  }
-  return false;
+
+export function isSassSourceFile(filePath: string) {
+  const ext = filePath.split('.').pop().toLowerCase();
+  return ext === 'scss' || ext === 'sass';
+}
+
+
+export function isCssSourceFile(filePath: string) {
+  return filePath.split('.').pop().toLowerCase() === 'css';
+}
+
+
+export function isDevFile(filePath: string) {
+  return isTsSourceFile(filePath) || isSassSourceFile(filePath) || isCssSourceFile(filePath);
 }
 
 
@@ -219,13 +222,21 @@ export function generateBanner(buildConfig: BuildConfig) {
 
 }
 
-export function normalizeUrl(str: string) {
-  const isExtendedLengthPath = /^\\\\\?\\/.test(str);
-  const hasNonAscii = /[^\x00-\x80]+/.test(str);
+
+export function normalizePath(str: string) {
+  // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
+  // https://github.com/sindresorhus/slash MIT
+  // By Sindre Sorhus
+  const isExtendedLengthPath = EXTENDED_PATH_REGEX.test(str);
+  const hasNonAscii = NON_ASCII_REGEX.test(str);
 
   if (isExtendedLengthPath || hasNonAscii) {
     return str;
   }
 
-  return str.replace(/\\/g, '/');
+  return str.replace(SLASH_REGEX, '/');
 }
+
+const EXTENDED_PATH_REGEX = /^\\\\\?\\/;
+const NON_ASCII_REGEX = /[^\x00-\x80]+/;
+const SLASH_REGEX = /\\/g;
