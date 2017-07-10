@@ -1,4 +1,3 @@
-import { normalizePath } from './util';
 import { StencilSystem } from './interfaces';
 
 
@@ -12,12 +11,12 @@ export function resolveFrom(sys: StencilSystem, fromDir: string, moduleId: strin
   }
 
   fromDir = sys.path.resolve(fromDir);
-  const fromFile = normalizePath(sys.path.join(fromDir, 'noop.js'));
+  const fromFile = sys.path.join(fromDir, 'noop.js');
 
   const resolveFileName = () => sys.module._resolveFilename(moduleId, {
     id: fromFile,
     filename: fromFile,
-    paths: normalizePath(sys.module._nodeModulePaths(fromDir))
+    paths: sys.module._nodeModulePaths(fromDir)
   });
 
   if (silent) {
