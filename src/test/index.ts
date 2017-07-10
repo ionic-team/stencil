@@ -97,6 +97,11 @@ export function mockStencilSystem() {
       };
     },
     fs: mockFs(),
+    getCompilerTypes: function() {
+      return [
+        path.join(__dirname, '..', 'compiler', 'types', 'jsx.d.ts')
+      ];
+    },
     path: path,
     rollup: rollup,
     sass: {
@@ -143,7 +148,8 @@ export function mockLogger() {
           startMsg; debug;
         }
       };
-    }
+    },
+    printDiagnostics: noop
   };
   return logger;
 }

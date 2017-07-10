@@ -21,6 +21,10 @@ export function toDashCase(str: string) {
   return str.replace(/([A-Z])/g, (g) => '-' + g[0].toLowerCase());
 }
 
+export function toTitleCase(str: string) {
+  return str.charAt(0).toUpperCase() + str.substr(1);
+}
+
 export function noop() {}
 
 export function pointerCoordX(ev: any): number {

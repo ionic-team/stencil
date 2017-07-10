@@ -31,8 +31,7 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "../types/jsx.d.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "compiler"

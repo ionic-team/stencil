@@ -1,5 +1,5 @@
-import { ComponentMeta, ComponentOptions } from '../interfaces';
-import { normalizePath } from '../util';
+import { ComponentMeta, ComponentOptions } from '../../interfaces';
+import { normalizePath } from '../../util';
 
 
 export function normalizeStyles(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {

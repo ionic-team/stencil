@@ -103,7 +103,7 @@ export function setupWatcher(buildConfig: BuildConfig, ctx: BuildContext) {
 
 
 function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBuild: boolean, changedFiles: string[]) {
-  // always set to full build
+  // always reset to do a full build
   ctx.isRebuild = true;
   ctx.isChangeBuild = false;
   ctx.changeHasComponentModules = true;
@@ -112,7 +112,7 @@ function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBui
   ctx.changeHasCss = true;
   ctx.changedFiles = changedFiles;
 
-  if (!requiresFullBuild && changedFiles.length) {
+  if (!ctx.lastBuildHadError && !requiresFullBuild && changedFiles.length) {
     let changeHasComponentModules = false;
     let changeHasNonComponentModules = false;
     ctx.changeHasSass = false;

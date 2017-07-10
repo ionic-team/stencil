@@ -468,6 +468,7 @@ export interface Logger {
   warn(...msg: any[]): void;
   error(...msg: any[]): void;
   createTimeSpan(startMsg: string, debug?: boolean): LoggerTimeSpan;
+  printDiagnostics(diagnostics: Diagnostic[]): void;
 }
 
 
@@ -1003,6 +1004,7 @@ export interface StencilSystem {
   };
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
+  getCompilerTypes?(): string[];
   minifyCss?(input: string): {
     output: string;
     sourceMap?: any;

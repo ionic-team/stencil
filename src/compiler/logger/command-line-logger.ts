@@ -1,16 +1,16 @@
-import { Logger, LoggerTimeSpan } from '../interfaces';
+import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../interfaces';
 
 
-export class CmdLogger implements Logger {
+export class CommandLineLogger implements Logger {
   private _level = 'info';
   private process: any;
   private chalk: any;
-  private ttyWidth: number;
+  private width: number;
 
   constructor(opts: {level: string, process: any, chalk: any}) {
     this.chalk = opts.chalk;
     this.process = opts.process;
-    this.ttyWidth = Math.max(MIN_LEN, Math.min(opts.process.stdout.columns || 0, MAX_LEN));
+    this.width = Math.max(MIN_LEN, Math.min(opts.process.stdout.columns || 0, MAX_LEN));
     this.level = opts.level;
   }
 
@@ -113,15 +113,157 @@ export class CmdLogger implements Logger {
   createTimeSpan(startMsg: string, debug = false): LoggerTimeSpan {
     return new CmdTimeSpan(this, startMsg, debug);
   }
+
+  printDiagnostics(diagnostics: Diagnostic[]) {
+    diagnostics.forEach(d => {
+      this.printDiagnostic(d);
+    });
+  }
+
+  printDiagnostic(d: Diagnostic) {
+    if (d.level === 'warn') {
+      wordWrap([d.messageText]).forEach((m, i) => {
+        if (i === 0) {
+          this.warn(m);
+        } else {
+          console.log(m);
+        }
+      });
+
+    } else if (d.header === 'build error') {
+      wordWrap([d.messageText]).forEach((m, i) => {
+        if (i === 0) {
+          this.error(m);
+        } else {
+          console.log(m);
+        }
+      });
+
+    } else {
+      this.error(d.header);
+      wordWrap([d.messageText]).forEach(m => {
+        console.log(m);
+      });
+    }
+
+    console.log('');
+
+    if (d.lines && d.lines.length) {
+      const lines = prepareLines(d.lines, 'text');
+
+      lines.forEach(l => {
+        if (!isMeaningfulLine(l.text)) {
+          return;
+        }
+
+        let msg = `L${l.lineNumber}:  `;
+        while (msg.length < INDENT.length) {
+          msg = ' ' + msg;
+        }
+
+        let text = l.text;
+        if (l.errorCharStart > -1) {
+          text = this.highlightError(text, l.errorCharStart, l.errorLength);
+        }
+
+        msg = this.dim(msg);
+
+        if (d.language === 'javascript') {
+          msg += this.jsSyntaxHighlight(text);
+        } else if (d.language === 'scss') {
+          msg += this.cssSyntaxHighlight(text);
+        } else {
+          msg += text;
+        }
+
+        console.log(msg);
+      });
+
+      console.log('');
+    }
+  }
+
+  highlightError(errorLine: string, errorCharStart: number, errorLength: number) {
+    let rightSideChars = errorLine.length - errorCharStart + errorLength - 1;
+    while (errorLine.length + INDENT.length > MAX_LEN) {
+      if (errorCharStart > (errorLine.length - errorCharStart + errorLength) && errorCharStart > 5) {
+        // larger on left side
+        errorLine = errorLine.substr(1);
+        errorCharStart--;
+
+      } else if (rightSideChars > 1) {
+        // larger on right side
+        errorLine = errorLine.substr(0, errorLine.length - 1);
+        rightSideChars--;
+
+      } else {
+        break;
+      }
+    }
+
+    const lineChars: string[] = [];
+    const lineLength = Math.max(errorLine.length, errorCharStart + errorLength);
+    for (var i = 0; i < lineLength; i++) {
+      var chr = errorLine.charAt(i);
+      if (i >= errorCharStart && i < errorCharStart + errorLength) {
+        chr = this.chalk.bgRed(chr === '' ? ' ' : chr);
+      }
+      lineChars.push(chr);
+    }
+
+    return lineChars.join('');
+  }
+
+  jsSyntaxHighlight(text: string) {
+    if (text.trim().startsWith('//')) {
+      return this.dim(text);
+    }
+
+    const words = text.split(' ').map(word => {
+      if (JS_KEYWORDS.indexOf(word) > -1) {
+        return this.chalk.cyan(word);
+      }
+      return word;
+    });
+
+    return words.join(' ');
+  }
+
+
+  cssSyntaxHighlight(text: string) {
+    let cssProp = true;
+    const safeChars = 'abcdefghijklmnopqrstuvwxyz-_';
+    const notProp = '.#,:}@$[]/*';
+
+    const chars: string[] = [];
+
+    for (var i = 0; i < text.length; i++) {
+      var c = text.charAt(i);
+
+      if (c === ';' || c === '{') {
+        cssProp = true;
+      } else if (notProp.indexOf(c) > -1) {
+        cssProp = false;
+      }
+      if (cssProp && safeChars.indexOf(c.toLowerCase()) > -1) {
+        chars.push(this.chalk.cyan(c));
+        continue;
+      }
+
+      chars.push(c);
+    }
+
+    return chars.join('');
+  }
 }
 
 
 class CmdTimeSpan {
-  private logger: CmdLogger;
+  private logger: CommandLineLogger;
   private start: number;
 
   constructor(
-    logger: CmdLogger,
+    logger: CommandLineLogger,
     startMsg: string,
     private debug: boolean
   ) {
@@ -254,6 +396,68 @@ function wordWrap(msg: any[]) {
   }
   return output;
 }
+
+
+function prepareLines(orgLines: PrintLine[], code: 'text'|'html') {
+  const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
+
+  for (let i = 0; i < 100; i++) {
+    if (!eachLineHasLeadingWhitespace(lines, code)) {
+      return lines;
+    }
+    for (let i = 0; i < lines.length; i++) {
+      (<any>lines[i])[code] = (<any>lines[i])[code].substr(1);
+      lines[i].errorCharStart--;
+      if (!(<any>lines[i])[code].length) {
+        return lines;
+      }
+    }
+  }
+
+  return lines;
+}
+
+
+function eachLineHasLeadingWhitespace(lines: PrintLine[], code: 'text'|'html') {
+  if (!lines.length) {
+    return false;
+  }
+  for (var i = 0; i < lines.length; i++) {
+    if ( !(<any>lines[i])[code] || (<any>lines[i])[code].length < 1) {
+      return false;
+    }
+    var firstChar = (<any>lines[i])[code].charAt(0);
+    if (firstChar !== ' ' && firstChar !== '\t') {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+function isMeaningfulLine(line: string) {
+  if (line) {
+    line = line.trim();
+    if (line.length) {
+      return (MEH_LINES.indexOf(line) < 0);
+    }
+  }
+  return false;
+}
+
+const MEH_LINES = [';', ':', '{', '}', '(', ')', '/**', '/*', '*/', '*', '({', '})'];
+
+
+const JS_KEYWORDS = [
+  'abstract', 'any', 'as', 'break', 'boolean', 'case', 'catch', 'class',
+  'console', 'const', 'continue', 'debugger', 'declare', 'default', 'delete',
+  'do', 'else', 'enum', 'export', 'extends', 'false', 'finally', 'for', 'from',
+  'function', 'get', 'if', 'import', 'in', 'implements', 'Infinity',
+  'instanceof', 'let', 'module', 'namespace', 'NaN', 'new', 'number', 'null',
+  'public', 'private', 'protected', 'require', 'return', 'static', 'set',
+  'string', 'super', 'switch', 'this', 'throw', 'try', 'true', 'type',
+  'typeof', 'undefined', 'var', 'void', 'with', 'while', 'yield',
+];
 
 
 const INDENT = '           ';

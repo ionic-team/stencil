@@ -1,5 +1,5 @@
-import { ModuleFiles, ModuleFileMeta } from '../interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../util/constants';
+import { ModuleFiles, ModuleFileMeta } from '../../interfaces';
+import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../../util/constants';
 import * as ts from 'typescript';
 import * as util from './util';
 

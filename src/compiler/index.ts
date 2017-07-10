@@ -1,4 +1,4 @@
 
 export { build } from './build';
-export { CmdLogger } from './logger/cmd-logger';
+export { CommandLineLogger } from './logger/command-line-logger';
 export * from './interfaces';

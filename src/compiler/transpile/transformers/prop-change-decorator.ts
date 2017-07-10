@@ -1,5 +1,5 @@
-import { ModuleFileMeta, PropChangeMeta } from '../interfaces';
-import { PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
+import { ModuleFileMeta, PropChangeMeta } from '../../interfaces';
+import { PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../../util/constants';
 import * as ts from 'typescript';
 
 

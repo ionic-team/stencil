@@ -1,5 +1,5 @@
-import { catchError } from '../util';
-import { Diagnostic, ListenMeta, ModuleFileMeta } from '../interfaces';
+import { catchError } from '../../util';
+import { Diagnostic, ListenMeta, ModuleFileMeta } from '../../interfaces';
 import * as ts from 'typescript';
 
 

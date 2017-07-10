@@ -1,7 +1,7 @@
 import { build } from '../build';
 import { BuildConfig, ComponentRegistry } from '../../util/interfaces';
 import { BuildContext, BuildResults } from '../interfaces';
-import { CmdLogger } from '../logger/cmd-logger';
+import { CommandLineLogger } from '../logger/command-line-logger';
 import { mockFs, mockLogger, mockStencilSystem } from '../../test';
 import { parseComponentRegistry } from '../../util/data-parse';
 
@@ -439,7 +439,7 @@ describe('build', () => {
 
   var logger = mockLogger();
   var chalk = require('chalk');
-  logger = new CmdLogger({
+  logger = new CommandLineLogger({
     level: 'debug',
     process: process,
     chalk: chalk

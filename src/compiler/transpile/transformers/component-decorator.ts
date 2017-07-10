@@ -1,7 +1,7 @@
-import { buildError, catchError } from '../util';
-import { ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../interfaces';
+import { buildError, catchError } from '../../util';
+import { ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../../interfaces';
 import { normalizeStyles } from './normalize-styles';
-import { validateTag } from '../validation';
+import { validateTag } from '../../validation';
 import * as ts from 'typescript';
 
 

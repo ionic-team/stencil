@@ -1,5 +1,5 @@
-import { buildError } from '../util';
-import { Diagnostic, ModuleFiles, ModuleFileMeta } from '../interfaces';
+import { buildError } from '../../util';
+import { Diagnostic, ModuleFiles, ModuleFileMeta } from '../../interfaces';
 import { getComponentDecoratorData } from './component-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';

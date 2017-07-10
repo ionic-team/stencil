@@ -1,6 +1,6 @@
-import { catchError } from '../util';
-import { ModuleFileMeta, Diagnostic, PropMeta, PropOptions } from '../interfaces';
-import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../util/constants';
+import { catchError } from '../../util';
+import { ModuleFileMeta, Diagnostic, PropMeta, PropOptions } from '../../interfaces';
+import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
 import * as ts from 'typescript';
 
 

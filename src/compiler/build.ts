@@ -2,9 +2,11 @@ import { BuildConfig, Manifest } from '../util/interfaces';
 import { BuildContext, BuildResults, BundlerConfig, LoggerTimeSpan } from './interfaces';
 import { bundle } from './bundle';
 import { catchError } from './util';
+import { cleanDiagnostics } from './logger/logger-util';
 import { compileSrcDir } from './compile';
 import { emptyDir, writeFiles } from './util';
 import { generateProjectFiles } from './build-project-files';
+import { generateHtmlDiagnostics } from './logger/generate-html-diagnostics';
 import { mergeManifests, updateManifestUrls } from './manifest';
 import { optimizeHtml } from './optimize-html';
 import { readFile } from './util';
@@ -79,14 +81,9 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
   }).then(() => {
     // finalize phase
     if (buildConfig) {
-      buildConfig.logger.debug(`transpileBuildCount: ${ctx.transpileBuildCount}`);
-      buildConfig.logger.debug(`sassBuildCount: ${ctx.sassBuildCount}`);
-      buildConfig.logger.debug(`moduleBundleCount: ${ctx.moduleBundleCount}`);
-      buildConfig.logger.debug(`styleBundleCount: ${ctx.styleBundleCount}`);
-
-      buildResults.diagnostics.forEach(d => {
-        buildConfig.logger[d.level](d.messageText);
-      });
+      buildResults.diagnostics = cleanDiagnostics(buildResults.diagnostics);
+      buildConfig.logger.printDiagnostics(buildResults.diagnostics);
+      generateHtmlDiagnostics(buildConfig, buildResults.diagnostics);
     }
 
     if (timeSpan) {
@@ -106,6 +103,8 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
       ctx.onFinish(buildResults);
       delete ctx.onFinish;
     }
+
+    ctx.lastBuildHadError = (buildResults.diagnostics.some(d => d.level === 'error'));
 
     return buildResults;
   });

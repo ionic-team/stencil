@@ -1,4 +1,4 @@
-import { ModuleFileMeta } from '../interfaces';
+import { ModuleFileMeta } from '../../interfaces';
 import * as ts from 'typescript';
 
 

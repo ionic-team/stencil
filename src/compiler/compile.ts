@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, CompileResults } from './interfaces';
 import { catchError } from './util';
 import { generateManifest } from './manifest';
 import { isTsSourceFile, readFile, normalizePath } from './util';
-import { transpile } from './transpile';
+import { transpile } from './transpile/transpile';
 
 
 export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {

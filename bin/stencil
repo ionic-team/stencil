@@ -86,7 +86,7 @@ if (cmdArgs.indexOf('--debug') > -1) {
 
 
 var stencil = require(path.join(__dirname, '..', 'dist' , 'compiler'));
-buildConfig.logger = new stencil.CmdLogger({
+buildConfig.logger = new stencil.CommandLineLogger({
   level: buildConfig.logLevel,
   process: process,
   chalk: chalk
@@ -125,6 +125,12 @@ buildConfig.sys = Object.defineProperties({
                 .replace(/\W/g, '')
                 .substr(0, length)
                 .toLowerCase();
+  },
+
+  getCompilerTypes: function getCompilerTypes() {
+    return [
+      path.join(__dirname, '..', 'dist', 'compiler', 'types', 'jsx.d.ts')
+    ];
   },
 
   minifyCss: function minifyCss(input) {
