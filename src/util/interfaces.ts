@@ -440,7 +440,7 @@ export interface BuildConfig {
   sys?: StencilSystem;
   logger?: Logger;
   rootDir?: string;
-  logLevel?: 'error'|'warn'|'info'|'ok'|'debug';
+  logLevel?: 'error'|'warn'|'info'|'debug';
   exclude?: string[];
   namespace?: string;
   src?: string;

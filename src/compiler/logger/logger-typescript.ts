@@ -32,12 +32,6 @@ function loadDiagnostic(buildConfig: BuildConfig, tsDiagnostic: ts.Diagnostic) {
     lines: []
   };
 
-  // TODO! Why the JSX errors!?
-  if (tsDiagnostic.file.fileName.indexOf('jsx.d.ts') > -1) {
-    // hack === true
-    return null;
-  }
-
   if (tsDiagnostic.file) {
     d.absFilePath = tsDiagnostic.file.fileName;
     d.relFilePath = formatFileName(buildConfig.rootDir, d.absFilePath);

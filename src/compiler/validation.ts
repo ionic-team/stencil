@@ -103,7 +103,7 @@ export function validateBuildConfig(buildConfig: BuildConfig) {
 }
 
 
-export function validateBundles(bundles: Bundle[]) {
+export function validateUserBundles(bundles: Bundle[]) {
   if (!bundles) {
     throw new Error(`Invalid bundles`);
   }
@@ -144,7 +144,7 @@ export function validateManifest(manifest: Manifest) {
   manifest.bundles = manifest.bundles || [];
   manifest.components = manifest.components || [];
 
-  validateBundles(manifest.bundles);
+  validateUserBundles(manifest.bundles);
 
   manifest.components.forEach(c => {
     c.tagNameMeta = validateTag(c.tagNameMeta, `found in bundle component stencil config`);
