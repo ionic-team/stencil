@@ -88,8 +88,7 @@ if (cmdArgs.indexOf('--debug') > -1) {
 var stencil = require(path.join(__dirname, '..', 'dist' , 'compiler'));
 buildConfig.logger = new stencil.CmdLogger({
   level: buildConfig.logLevel,
-  stream: process.stdout,
-  columns: process.stdout.columns,
+  process: process,
   chalk: chalk
 });
 

@@ -463,18 +463,16 @@ export interface BuildConfig {
 
 export interface Logger {
   level: string;
-  debug(msg: string): void;
-  info(msg: string): void;
-  ok(msg: string): void;
-  warn(msg: string): void;
-  error(msg: string): void;
-  dim(msg: string): string;
+  debug(...msg: any[]): void;
+  info(...msg: any[]): void;
+  warn(...msg: any[]): void;
+  error(...msg: any[]): void;
   createTimeSpan(startMsg: string, debug?: boolean): LoggerTimeSpan;
 }
 
 
 export interface LoggerTimeSpan {
-  finish(finishedMsg: string): void;
+  finish(finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean): void;
 }
 
 

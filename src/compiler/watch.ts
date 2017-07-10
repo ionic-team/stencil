@@ -178,5 +178,8 @@ function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBui
     ctx.styleSassOutputs = {};
   }
 
+  let msg = `changed file${changedFiles.length > 1 ? 's' : ''}: ${changedFiles.map(f => buildConfig.sys.path.basename(f)).join(', ')}`;
+  buildConfig.logger.info(msg);
+
   return build(buildConfig, ctx);
 }

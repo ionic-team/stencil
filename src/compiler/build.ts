@@ -90,13 +90,19 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
           buildConfig.logger[d.type](d.msg);
         }
       });
+    }
 
-      if (ctx.isRebuild && buildConfig.watch) {
-        timeSpan && timeSpan.finish(`rebuild finished, watching files...`);
-
-      } else {
-        timeSpan && timeSpan.finish(`build finished`);
+    if (timeSpan) {
+      let buildText = ctx.isRebuild ? 'rebuild' : 'build';
+      let buildStatus = 'finished';
+      let watchText = buildConfig.watch ? ', watching for changes...' : '';
+      let statusColor = 'green';
+      if (buildResults.diagnostics.some(d => d.type === 'error')) {
+        buildStatus = 'failed';
+        statusColor = 'red';
       }
+
+      timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
     }
 
     if (typeof ctx.onFinish === 'function') {

@@ -132,13 +132,11 @@ export function mockFs() {
 
 export function mockLogger() {
   const logger: Logger = {
-    level: '',
+    level: 'info',
     debug: noop,
     info: noop,
-    ok: noop,
     error: noop,
     warn: noop,
-    dim: (msg: string) => msg,
     createTimeSpan: (startMsg: string, debug?: boolean) => {
       return {
         finish: () => {

@@ -1,14 +1,14 @@
 import { build } from '../build';
 import { BuildConfig, ComponentRegistry } from '../../util/interfaces';
 import { BuildContext, BuildResults } from '../interfaces';
-import { CmdLogger } from '../logger';
+import { CmdLogger } from '../logger/cmd-logger';
 import { mockFs, mockLogger, mockStencilSystem } from '../../test';
 import { parseComponentRegistry } from '../../util/data-parse';
 
 
 describe('build', () => {
 
-  fit('should rebuild for two changed modules', () => {
+  it('should rebuild for two changed modules', () => {
     ctx = {};
     buildConfig.bundles = [
       { components: ['cmp-a'] },
@@ -441,8 +441,7 @@ describe('build', () => {
   var chalk = require('chalk');
   logger = new CmdLogger({
     level: 'debug',
-    stream: process.stdout,
-    columns: (<any>process.stdout).columns,
+    process: process,
     chalk: chalk
   });
   var registry: ComponentRegistry = {};
