@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, BundleResults, BundlerConfig } from './interfaces';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
+import { catchError } from './util';
 import { generateComponentRegistry } from './bundle-registry';
 import { validateBundlerConfig } from './validation';
 
@@ -40,11 +41,7 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
     bundleResults.componentRegistry = generateComponentRegistry(bundlerConfig, styleResults, moduleResults);
 
   }).catch(err => {
-    bundleResults.diagnostics.push({
-      msg: err.toString(),
-      type: 'error',
-      stack: err.stack
-    });
+    catchError(bundleResults.diagnostics, err);
 
   })
   .then(() => {

@@ -1,5 +1,6 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
   Manifest, ModuleResults, StencilSystem } from './interfaces';
+import { buildError, buildWarn, catchError } from './util';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../util/data-serialize';
 import { generateBanner } from './util';
 
@@ -21,11 +22,7 @@ export function bundleModules(buildConfig: BuildConfig, ctx: BuildContext, userM
     return generateDefineComponents(buildConfig, ctx, userManifest, userBundle, moduleResults);
 
   })).catch(err => {
-    moduleResults.diagnostics.push({
-      msg: err.toString(),
-      type: 'error',
-      stack: err.stack
-    });
+    catchError(moduleResults.diagnostics, err);
 
   }).then(() => {
     timeSpan.finish('bundle modules finished');
@@ -40,19 +37,15 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
   const bundleComponentMeta = userBundle.components.map(userBundleComponentTag => {
     const cmpMeta = userManifest.components.find(c => c.tagNameMeta === userBundleComponentTag);
     if (!cmpMeta) {
-      moduleResults.diagnostics.push({
-        msg: `Unable to find component "${userBundleComponentTag}" in available config and collection.`,
-        type: 'error'
-      });
+      const d = buildError(moduleResults.diagnostics);
+      d.messageText = `Unable to find component "${userBundleComponentTag}" in available config and collection.`;
     }
     return cmpMeta;
   }).filter(c => !!c);
 
   if (!bundleComponentMeta.length) {
-    moduleResults.diagnostics.push({
-      msg: `No components found to bundle`,
-      type: 'error'
-    });
+    const d = buildError(moduleResults.diagnostics);
+    d.messageText = `No components found to bundle`;
     return Promise.resolve(moduleResults);
   }
 
@@ -108,11 +101,7 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
     }
 
   }).catch(err => {
-    moduleResults.diagnostics.push({
-      msg: err.toString(),
-      type: 'error',
-      stack: err.stack
-    });
+    catchError(moduleResults.diagnostics, err);
 
   }).then(() => {
     return moduleResults;
@@ -238,10 +227,7 @@ function createOnWarnFn(bundleComponentMeta: ComponentMeta[], diagnostics: Diagn
       label += ': ';
     }
 
-    diagnostics.push({
-      msg: label + warning.toString(),
-      type: 'warn'
-    });
+    buildWarn(diagnostics).messageText = label + warning.toString();
   };
 }
 

@@ -1,3 +1,4 @@
+import { catchError } from '../util';
 import { ModuleFileMeta, Diagnostic, PropMeta, PropOptions } from '../interfaces';
 import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../util/constants';
 import * as ts from 'typescript';
@@ -36,11 +37,9 @@ export function getPropDecoratorMeta(moduleFile: ModuleFileMeta, diagnostics: Di
               userPropOptions = Object.assign(userPropOptions || {}, new Function(fnStr)());
 
             } catch (e) {
-              diagnostics.push({
-                msg: `parse prop options: ${e}`,
-                type: 'error',
-                filePath: moduleFile.tsFilePath
-              });
+              const d = catchError(diagnostics, e);
+              d.messageText = `parse prop options: ${e}`;
+              d.absFilePath = moduleFile.tsFilePath;
             }
           }
         });

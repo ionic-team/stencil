@@ -1,6 +1,7 @@
-import { HYDRATED_CSS } from '../util/constants';
 import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from './interfaces';
+import { buildError, catchError } from './util';
 import { formatCssBundleFileName, generateBundleId } from '../util/data-serialize';
+import { HYDRATED_CSS } from '../util/constants';
 import { isCssSourceFile, isSassSourceFile, generateBanner, normalizePath, readFile } from './util';
 
 
@@ -21,13 +22,10 @@ export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userMa
   // and create css files for each mode for each bundle
   return Promise.all(userManifest.bundles.map(userBundle => {
     return generateBundleCss(buildConfig, ctx, userManifest, userBundle, stylesResults);
+
   }))
   .catch(err => {
-    stylesResults.diagnostics.push({
-      msg: err.toString(),
-      type: 'error',
-      stack: err.stack
-    });
+    catchError(stylesResults.diagnostics, err);
 
   })
   .then(() => {
@@ -49,11 +47,7 @@ function generateBundleCss(buildConfig: BuildConfig, ctx: BuildContext, userMani
     ));
 
     if (!foundComponentMeta) {
-      stylesResults.diagnostics = stylesResults.diagnostics || [];
-      stylesResults.diagnostics.push({
-        msg: `Component tag "${userBundleComponentTag.toLowerCase()}" is defined in a bundle but no matching component was found with this tag within this project or its collections.`,
-        type: 'error'
-      });
+      buildError(stylesResults.diagnostics).messageText = `Component tag "${userBundleComponentTag.toLowerCase()}" is defined in a bundle but no matching component was found within this project or its collections.`;
     }
     return foundComponentMeta;
   }).filter(c => c);
@@ -77,11 +71,7 @@ function generateBundleCss(buildConfig: BuildConfig, ctx: BuildContext, userMani
     return generateModeCss(buildConfig, ctx, bundleComponentMeta, userBundle, modeName, stylesResults);
 
   })).catch(err => {
-    stylesResults.diagnostics.push({
-      msg: err.toString(),
-      type: 'error',
-      stack: err.stack
-    });
+    catchError(stylesResults.diagnostics, err);
 
   }).then(() => {
     return stylesResults;
@@ -202,10 +192,8 @@ function generateComponentModeStyles(
 
         } else {
           // idk
-          stylesResults.diagnostics.push({
-            msg: `style url "${styleUrl}" on component "${cmpMeta.tagNameMeta.toLowerCase()}" is not a supported file type`,
-            type: 'error'
-          });
+          const d = buildError(stylesResults.diagnostics);
+          d.messageText = `style url "${styleUrl}", on component "${cmpMeta.tagNameMeta.toLowerCase()}", is not a supported file type`;
         }
       });
     }
@@ -267,15 +255,11 @@ function compileScssFile(buildConfig: BuildConfig, ctx: BuildContext, cmpMeta: C
 
     sys.sass.render(sassConfig, (err, result) => {
       if (err) {
-        stylesResults.diagnostics.push({
-          filePath: scssFilePath,
-          msg: `${err}`,
-          type: 'error',
-          stack: err.stack
-        });
+        const d = buildError(stylesResults.diagnostics);
+        d.absFilePath = scssFilePath;
+        d.messageText = err;
 
       } else {
-
         styleBundleDetails.content = result.css.toString().trim();
         styleCollection[styleUrl] = styleBundleDetails.content;
         styleBundleDetails.writeFile = true;
@@ -314,12 +298,9 @@ function readCssFile(buildConfig: BuildConfig, ctx: BuildContext, styleUrl: stri
     styleBundleDetails.writeFile = true;
 
   }).catch(err => {
-    stylesResults.diagnostics.push({
-      filePath: cssFilePath,
-      msg: `Error opening file. ${err}`,
-      type: 'error',
-      stack: err.stack
-    });
+    const d = buildError(stylesResults.diagnostics);
+    d.messageText = `Error opening file. ${err}`;
+    d.absFilePath = cssFilePath;
 
   }).then(() => {
     return styleBundleDetails;

@@ -96,7 +96,7 @@ function generateLoader(buildConfig: BuildConfig, projectFileName: string, proje
     if (buildConfig.minifyJs) {
       const minifyResult = buildConfig.sys.minifyJs(componentRegistryStr);
       minifyResult.diagnostics.forEach(d => {
-        buildConfig.logger[d.type](d.msg);
+        buildConfig.logger[d.level](d.messageText);
       });
       if (minifyResult.output) {
         componentRegistryStr = minifyResult.output;

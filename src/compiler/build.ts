@@ -1,10 +1,11 @@
 import { BuildConfig, Manifest } from '../util/interfaces';
 import { BuildContext, BuildResults, BundlerConfig, LoggerTimeSpan } from './interfaces';
 import { bundle } from './bundle';
+import { catchError } from './util';
 import { compileSrcDir } from './compile';
 import { emptyDir, writeFiles } from './util';
-import { mergeManifests, updateManifestUrls } from './manifest';
 import { generateProjectFiles } from './build-project-files';
+import { mergeManifests, updateManifestUrls } from './manifest';
 import { optimizeHtml } from './optimize-html';
 import { readFile } from './util';
 import { resolveFrom } from './resolve-from';
@@ -73,7 +74,7 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
 
   }).catch(err => {
     // catch all phase
-    return catchAll(buildResults, err);
+    catchError(buildResults.diagnostics, err);
 
   }).then(() => {
     // finalize phase
@@ -84,11 +85,7 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
       buildConfig.logger.debug(`styleBundleCount: ${ctx.styleBundleCount}`);
 
       buildResults.diagnostics.forEach(d => {
-        if (d.type === 'error' && buildConfig.logger.level === 'debug' && d.stack) {
-          buildConfig.logger.error(d.stack);
-        } else {
-          buildConfig.logger[d.type](d.msg);
-        }
+        buildConfig.logger[d.level](d.messageText);
       });
     }
 
@@ -97,7 +94,7 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
       let buildStatus = 'finished';
       let watchText = buildConfig.watch ? ', watching for changes...' : '';
       let statusColor = 'green';
-      if (buildResults.diagnostics.some(d => d.type === 'error')) {
+      if (buildResults.diagnostics.some(d => d.level === 'error')) {
         buildStatus = 'failed';
         statusColor = 'red';
       }
@@ -115,7 +112,7 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
 }
 
 
-export function manifestPhase(buildConfig: BuildConfig) {
+function manifestPhase(buildConfig: BuildConfig) {
   const sys = buildConfig.sys;
 
   return Promise.all(buildConfig.collections.map(collection => {
@@ -133,7 +130,7 @@ export function manifestPhase(buildConfig: BuildConfig) {
 }
 
 
-export function compileSrcPhase(buildConfig: BuildConfig, ctx: BuildContext, dependentManifests: Manifest[], buildResults: BuildResults) {
+function compileSrcPhase(buildConfig: BuildConfig, ctx: BuildContext, dependentManifests: Manifest[], buildResults: BuildResults) {
   return compileSrcDir(buildConfig, ctx).then(compileResults => {
     if (compileResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(compileResults.diagnostics);
@@ -151,7 +148,7 @@ export function compileSrcPhase(buildConfig: BuildConfig, ctx: BuildContext, dep
 }
 
 
-export function bundlePhase(buildConfig: BuildConfig, ctx: BuildContext, manifest: Manifest, buildResults: BuildResults) {
+function bundlePhase(buildConfig: BuildConfig, ctx: BuildContext, manifest: Manifest, buildResults: BuildResults) {
   const bundlerConfig: BundlerConfig = {
     manifest: manifest
   };
@@ -169,7 +166,7 @@ export function bundlePhase(buildConfig: BuildConfig, ctx: BuildContext, manifes
 }
 
 
-export function optimizeHtmlPhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+function optimizeHtmlPhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
   return optimizeHtml(buildConfig, ctx).then(optimizeHtmlResults => {
     if (optimizeHtmlResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(optimizeHtmlResults.diagnostics);
@@ -178,16 +175,7 @@ export function optimizeHtmlPhase(buildConfig: BuildConfig, ctx: BuildContext, b
 }
 
 
-export function catchAll(buildResults: BuildResults, err: any) {
-  buildResults.diagnostics.push({
-    msg: err.toString(),
-    type: 'error',
-    stack: err.stack
-  });
-}
-
-
-export function writePhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+function writePhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
   buildResults.files = Object.keys(ctx.filesToWrite).sort();
 
   const timeSpan = buildConfig.logger.createTimeSpan(`writePhase started, fileUpdates: ${buildResults.files.length}`, true);

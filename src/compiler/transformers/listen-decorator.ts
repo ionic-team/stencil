@@ -1,3 +1,4 @@
+import { catchError } from '../util';
 import { Diagnostic, ListenMeta, ModuleFileMeta } from '../interfaces';
 import * as ts from 'typescript';
 
@@ -32,11 +33,9 @@ export function getListenDecoratorMeta(moduleFile: ModuleFileMeta, diagnostics: 
               Object.assign(rawListenMeta, new Function(fnStr)());
 
             } catch (e) {
-              diagnostics.push({
-                msg: `parse listener options: ${e}`,
-                type: 'error',
-                filePath: moduleFile.tsFilePath
-              });
+              const d = catchError(diagnostics, e);
+              d.messageText = `parse listener options: ${e}`;
+              d.absFilePath = moduleFile.tsFilePath;
             }
           }
         });

@@ -1,5 +1,5 @@
 import { BANNER } from '../util/constants';
-import { BuildConfig, FilesToWrite, StencilSystem } from './interfaces';
+import { BuildConfig, Diagnostic, FilesToWrite, StencilSystem } from './interfaces';
 
 
 export function readFile(sys: StencilSystem, filePath: string) {
@@ -220,6 +220,65 @@ export function generateBanner(buildConfig: BuildConfig) {
 
   return `/*! ${BANNER} */\n\n`;
 
+}
+
+
+export function buildError(diagnostics: Diagnostic[]) {
+  const d: Diagnostic = {
+    level: 'error',
+    type: 'build',
+    header: 'build error',
+    messageText: 'build error',
+    relFilePath: null,
+    absFilePath: null,
+    lines: []
+  };
+
+  diagnostics.push(d);
+
+  return d;
+}
+
+
+export function buildWarn(diagnostics: Diagnostic[]) {
+  const d: Diagnostic = {
+    level: 'warn',
+    type: 'build',
+    header: 'build warn',
+    messageText: 'build warn',
+    relFilePath: null,
+    absFilePath: null,
+    lines: []
+  };
+
+  diagnostics.push(d);
+
+  return d;
+}
+
+
+export function catchError(diagnostics: Diagnostic[], err: any) {
+  const d: Diagnostic = {
+    level: 'error',
+    type: 'build',
+    header: 'build error',
+    messageText: 'build error',
+    relFilePath: null,
+    absFilePath: null,
+    lines: []
+  };
+
+  if (err) {
+    if (err.stack) {
+      d.messageText = err.stack.toString();
+    } else {
+      d.messageText = err.toString();
+    }
+  }
+
+  diagnostics.push(d);
+
+  return d;
 }
 
 

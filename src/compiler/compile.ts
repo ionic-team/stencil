@@ -1,4 +1,5 @@
 import { BuildConfig, BuildContext, CompileResults } from './interfaces';
+import { catchError } from './util';
 import { generateManifest } from './manifest';
 import { isTsSourceFile, readFile, normalizePath } from './util';
 import { transpile } from './transpile';
@@ -25,11 +26,7 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
     return copySourceSassFilesToDest(buildConfig, ctx, compileResults);
 
   }).catch(err => {
-    compileResults.diagnostics.push({
-      msg: err.toString(),
-      type: 'error',
-      stack: err.stack
-    });
+    catchError(compileResults.diagnostics, err);
 
   }).then(() => {
     timeSpan.finish(`compile finished`);
@@ -71,10 +68,7 @@ function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, co
           sys.fs.stat(readPath, (err, stats) => {
             if (err) {
               // derp, not sure what's up here, let's just print out the error
-              compileResults.diagnostics.push({
-                msg: `compileDirectory, fs.stat: ${readPath}, ${err}`,
-                type: 'error'
-              });
+              catchError(compileResults.diagnostics, err);
               resolve();
 
             } else if (stats.isDirectory()) {

@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, Diagnostic, ModuleFileMeta, StencilSystem, TranspileResults } from './interfaces';
+import { buildError, catchError, isSassSourceFile, normalizePath, readFile } from './util';
 import { componentClass } from './transformers/component-class';
-import { isSassSourceFile, normalizePath, readFile } from './util';
 import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { removeImports } from './transformers/remove-imports';
 import { updateLifecycleMethods } from './transformers/update-lifecycle-methods';
@@ -39,11 +39,7 @@ export function transpile(buildConfig: BuildConfig, ctx: BuildContext, tsFilePat
     return processIncludedStyles(buildConfig, ctx, transpileResults.diagnostics, moduleFile);
 
   }).catch(err => {
-    transpileResults.diagnostics.push({
-      msg: err,
-      type: 'error',
-      stack: err.stack
-    });
+    catchError(transpileResults.diagnostics, err);
 
   }).then(() => {
     return transpileResults;
@@ -115,16 +111,9 @@ function transpileFile(buildConfig: BuildConfig, ctx: BuildContext, moduleFile: 
   ctx.transpileBuildCount++;
 
   tsResult.diagnostics.forEach(d => {
-    const diagnostic: Diagnostic = {
-      msg: d.messageText.toString(),
-      type: 'error',
-      filePath: d.file && d.file.fileName,
-      start: d.start,
-      length: d.length,
-      category: d.category,
-      code: d.code
-    };
-    transpileResults.diagnostics.push(diagnostic);
+    const tsError = buildError(transpileResults.diagnostics);
+    tsError.messageText = d.messageText.toString();
+    tsError.absFilePath = d.file && d.file.fileName;
   });
 
   return moduleFile;
@@ -185,11 +174,9 @@ function getIncludedSassFiles(sys: StencilSystem, diagnostics: Diagnostic[], mod
 
     sys.sass.render(sassConfig, (err, result) => {
       if (err) {
-        diagnostics.push({
-          msg: err.message,
-          filePath: err.file,
-          type: 'error'
-        });
+        const d = buildError(diagnostics);
+        d.messageText = err.message;
+        d.absFilePath = err.file;
 
       } else if (result.stats && result.stats.includedFiles) {
         result.stats.includedFiles.forEach((includedFile: string) => {

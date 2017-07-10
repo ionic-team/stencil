@@ -963,14 +963,25 @@ export interface ModuleCallbacks {
 
 
 export interface Diagnostic {
-  msg: string;
-  type: 'error'|'warn';
-  filePath?: string;
-  start?: number;
-  length?: number;
-  category?: any;
-  code?: number;
-  stack?: string;
+  level: 'error'|'warn';
+  type: 'runtime'|'build'|'typescript'|'sass';
+  header: string;
+  messageText: string;
+  language?: 'javascript'|'typescript'|'scss';
+  code?: string;
+  absFilePath?: string;
+  relFilePath?: string;
+  lines?: PrintLine[];
+}
+
+
+export interface PrintLine {
+  lineIndex: number;
+  lineNumber: number;
+  text: string;
+  html: string;
+  errorCharStart: number;
+  errorLength: number;
 }
 
 

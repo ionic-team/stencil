@@ -1,3 +1,4 @@
+import { buildError } from '../util';
 import { Diagnostic, ModuleFiles, ModuleFileMeta } from '../interfaces';
 import { getComponentDecoratorData } from './component-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
@@ -17,11 +18,9 @@ export function componentClass(moduleFiles: ModuleFiles, diagnostics: Diagnostic
 
       if (cmpMeta) {
         if (moduleFile.cmpMeta) {
-          diagnostics.push({
-            msg: `Cannot have multiple @Components in the same source file`,
-            type: 'error',
-            filePath: moduleFile.tsFilePath
-          });
+          const d = buildError(diagnostics);
+          d.messageText = `Cannot have multiple @Components in the same source file`;
+          d.absFilePath = moduleFile.tsFilePath;
           return classNode;
         }
 

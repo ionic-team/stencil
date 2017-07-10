@@ -1,3 +1,4 @@
+import { buildError, catchError } from '../util';
 import { ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../interfaces';
 import { normalizeStyles } from './normalize-styles';
 import { validateTag } from '../validation';
@@ -53,11 +54,9 @@ function parseComponentMetaData(moduleFile: ModuleFileMeta, diagnostics: Diagnos
     return cmpMeta;
 
   } catch (e) {
-    diagnostics.push({
-      msg: `${e}: text`,
-      type: 'error',
-      filePath: moduleFile.tsFilePath
-    });
+    const d = catchError(diagnostics, e);
+    d.absFilePath = moduleFile.tsFilePath;
+    d.messageText = `${e}: ${text}`;
   }
   return null;
 }
@@ -66,11 +65,10 @@ function parseComponentMetaData(moduleFile: ModuleFileMeta, diagnostics: Diagnos
 function normalizeTag(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
 
   if ((<any>userOpts).selector) {
-    diagnostics.push({
-      msg: `Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`,
-      type: 'error',
-      filePath: moduleFile.tsFilePath
-    });
+    const d = buildError(diagnostics);
+    d.messageText = `Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`;
+    d.absFilePath = moduleFile.tsFilePath;
+
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
 
