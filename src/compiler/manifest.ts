@@ -1,7 +1,7 @@
 import { BuildConfig, BuildContext, CompileResults, ComponentMeta, Manifest, Bundle, StyleMeta } from './interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../util/constants';
 import { normalizePath } from './util';
-import { validateBundles, validateManifest } from './validation';
+import { validateUserBundles, validateManifest } from './validation';
 
 
 export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, compileResults: CompileResults) {
@@ -15,7 +15,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
 
   logger.debug(`manifest, generateManifest, collectionDest: ${buildConfig.collectionDest}`);
 
-  validateBundles(buildConfig.bundles);
+  validateUserBundles(buildConfig.bundles);
 
   const fileNames = Object.keys(compileResults.moduleFiles);
 
