@@ -14,7 +14,7 @@ export function generateHtmlDiagnostics(buildConfig: BuildConfig, diagnostics: D
     });
 
   } else {
-    buildConfig.sys.fs.unlink(buildConfig.diagnosticsDest);
+    buildConfig.sys.fs.unlink(buildConfig.diagnosticsDest, () => {});
   }
 }
 
