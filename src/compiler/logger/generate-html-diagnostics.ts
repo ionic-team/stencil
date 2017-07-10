@@ -60,11 +60,17 @@ function generateDiagnosticHtml(d: Diagnostic) {
 
 
 function generateCodeBlock(d: Diagnostic) {
+  if (!d.relFilePath && (!d.lines || !d.lines.length)) {
+    return '';
+  }
+
   const c: string[] = [];
 
   c.push(` <div class="dev-diagnostic-file">`);
 
-  c.push(`  <div class="dev-diagnostic-file-header" title="${escapeHtml(d.absFilePath)}">${escapeHtml(d.relFilePath)}</div>`);
+  if (d.relFilePath) {
+    c.push(`  <div class="dev-diagnostic-file-header"${escapeHtml(d.absFilePath)}">${escapeHtml(d.relFilePath)}</div>`);
+  }
 
   if (d.lines && d.lines.length) {
     c.push(`  <div class="dev-diagnostic-blob">`);
