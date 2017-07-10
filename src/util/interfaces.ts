@@ -494,6 +494,8 @@ export interface ComponentOptions {
   styles?: string;
   shadow?: boolean;
   host?: HostMeta;
+  assetsDir?: string;
+  assetsDirs?: string[];
 }
 
 
