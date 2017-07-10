@@ -56,6 +56,13 @@ export function validateBuildConfig(buildConfig: BuildConfig) {
     buildConfig.indexDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexDest));
   }
 
+  if (typeof buildConfig.diagnosticsDest !== 'string') {
+    buildConfig.diagnosticsDest = DEFAULT_DIAGNOSTICS_DEST;
+  }
+  if (!buildConfig.sys.path.isAbsolute(buildConfig.diagnosticsDest)) {
+    buildConfig.diagnosticsDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.diagnosticsDest));
+  }
+
   if (typeof buildConfig.devMode !== 'boolean') {
     buildConfig.devMode = true;
   }
@@ -228,6 +235,7 @@ const DEFAULT_SRC = 'src';
 const DEFAULT_BUILD_DEST = 'www/build';
 const DEFAULT_INDEX_SRC = 'src/index.html';
 const DEFAULT_INDEX_DEST = 'www/index.html';
+const DEFAULT_DIAGNOSTICS_DEST = 'www/.dev-diagnostics.html';
 const DEFAULT_COLLECTION_DEST = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 12;

@@ -5,15 +5,16 @@ import { toTitleCase } from '../../util/helpers';
 
 
 export function generateHtmlDiagnostics(buildConfig: BuildConfig, diagnostics: Diagnostic[]) {
-  const diagnosticsDir = buildConfig.sys.path.dirname(buildConfig.indexDest);
-  const diagnosticsFilePath = buildConfig.sys.path.join(diagnosticsDir, DIAGNOSTICS_FILE_NAME);
-
   if (diagnostics.length) {
     const html = generateHtmlDocument(diagnostics);
-    buildConfig.sys.fs.writeFile(diagnosticsFilePath, html);
+    buildConfig.sys.fs.writeFile(buildConfig.diagnosticsDest, html, (err) => {
+      if (err) {
+        throw err;
+      }
+    });
 
   } else {
-    buildConfig.sys.fs.unlink(diagnosticsFilePath);
+    buildConfig.sys.fs.unlink(buildConfig.diagnosticsDest);
   }
 }
 
@@ -548,6 +549,3 @@ function appendJs() {
   console.log('dev diagnostics');
   `;
 }
-
-
-const DIAGNOSTICS_FILE_NAME = `.dev-diagnostics.html`;

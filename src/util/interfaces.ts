@@ -448,6 +448,7 @@ export interface BuildConfig {
   collectionDest?: string;
   indexSrc?: string;
   indexDest?: string;
+  diagnosticsDest?: string;
   generateCollection?: boolean;
   bundles?: Bundle[];
   collections?: Collection[];
