@@ -607,6 +607,7 @@ export interface ComponentMeta {
   statesMeta?: StateMeta[];
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;
+  assetsDirsMeta?: string[];
   slotMeta?: number;
   loadPriority?: number;
   componentModuleMeta?: any;
@@ -1005,7 +1006,6 @@ export interface StencilSystem {
     readdir(path: string, callback?: (err: any, files: string[]) => void): void;
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
     readFileSync(filename: string, encoding: string): string;
-    rmdir(path: string, callback?: (err?: any) => void): void;
     stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
     unlink(path: string, callback?: (err?: any) => void): void;
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
@@ -1013,6 +1013,8 @@ export interface StencilSystem {
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   getCompilerTypes?(): string[];
+  rmDir?(path: string, options: { [key: string]: any }, callback: (err: any) => void): void;
+  copyDir?(src: string, dest: string, callback: (err: any) => void): void;
   minifyCss?(input: string): {
     output: string;
     sourceMap?: any;

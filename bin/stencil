@@ -133,6 +133,16 @@ buildConfig.sys = Object.defineProperties({
     ];
   },
 
+  copyDir: function copyDir(source, dest, callback) {
+    var copyDir = require('./copyDirectory');
+    copyDir(source, dest, {}, callback);
+  },
+
+  rmDir: function rmdir(directory, options, callback) {
+    var rimraf = require('./rimraf');
+    rimraf(directory, options, callback);
+  },
+
   minifyCss: function minifyCss(input) {
     var CleanCSS = require('clean-css');
     var result = new CleanCSS().minify(input);
