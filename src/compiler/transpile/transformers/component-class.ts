@@ -25,8 +25,8 @@ export function componentClass(moduleFiles: ModuleFiles, diagnostics: Diagnostic
         }
 
         moduleFile.cmpMeta = cmpMeta;
+        moduleFile.cmpMeta.componentClass = classNode.name.getText().trim();
         moduleFile.hasCmpClass = true;
-        moduleFile.cmpClassName = classNode.name.getText().trim();
 
         getMethodDecoratorMeta(moduleFile, classNode);
         getStateDecoratorMeta(moduleFile, classNode);

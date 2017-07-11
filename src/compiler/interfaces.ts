@@ -15,7 +15,6 @@ export interface ModuleFileMeta {
   jsText?: string;
   hasCmpClass?: boolean;
   cmpMeta?: ComponentMeta;
-  cmpClassName?: string;
   includedSassFiles?: string[];
 }
 

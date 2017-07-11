@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Collection, CompileResults, ComponentMeta, Manifest, Bundle, StyleMeta } from './interfaces';
+import { BuildConfig, BuildContext, Bundle, Collection, CompileResults, ComponentMeta, Manifest, ModuleFileMeta, StyleMeta, StencilSystem } from './interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../util/constants';
 import { normalizePath } from './util';
 import { readFile } from './util';
@@ -106,7 +106,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
   const sys = buildConfig.sys;
   const logger = buildConfig.logger;
 
-  logger.debug(`manifest, generateManifest, collectionDest: ${buildConfig.collectionDest}`);
+  const manifestFilePath = normalizePath(sys.path.join(buildConfig.collectionDest, COLLECTION_MANIFEST_FILE_NAME));
 
   validateUserBundles(buildConfig.bundles);
 
@@ -129,23 +129,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
 
     const cmpMeta: ComponentMeta = Object.assign({}, <any>f.cmpMeta);
 
-    cmpMeta.componentClass = f.cmpClassName;
-    cmpMeta.componentUrl = f.jsFilePath.replace(buildConfig.collectionDest + sys.path.sep, '');
-
-    const componentDir = normalizePath(sys.path.dirname(cmpMeta.componentUrl));
-
-    if (cmpMeta.styleMeta) {
-      const modeNames = Object.keys(cmpMeta.styleMeta);
-
-      modeNames.forEach(modeName => {
-        const cmpMode = cmpMeta.styleMeta[modeName];
-        if (cmpMode.parsedStyleUrls) {
-          cmpMode.styleUrls = cmpMode.parsedStyleUrls.map(parsedStyleUrl => {
-            return normalizePath(sys.path.join(componentDir, parsedStyleUrl));
-          });
-        }
-      });
-    }
+    convertManifestUrlToRelative(buildConfig.sys, buildConfig.collectionDest, f, cmpMeta);
 
     if (!cmpMeta.listenersMeta.length) {
       delete cmpMeta.listenersMeta;
@@ -184,13 +168,38 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
   validateManifestBundles(manifest);
 
   if (buildConfig.generateCollection) {
-    const manifestFilePath = normalizePath(sys.path.join(buildConfig.collectionDest, COLLECTION_MANIFEST_FILE_NAME));
-    const manifestJson = JSON.stringify(manifest, null, 2);
+    logger.debug(`manifest, generateManifest: ${manifestFilePath}`);
 
-    logger.debug(`manifest, write: ${manifestFilePath}`);
-
-    ctx.filesToWrite[manifestFilePath] = manifestJson;
+    ctx.filesToWrite[manifestFilePath] = JSON.stringify(manifest, null, 2);
   }
 
   return manifest;
+}
+
+
+export function convertManifestUrlToRelative(sys: StencilSystem, collectionDest: string, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
+  const jsFilePath = normalizePath(moduleFile.jsFilePath);
+  collectionDest = normalizePath(collectionDest);
+
+  cmpMeta.componentUrl = sys.path.relative(collectionDest, jsFilePath);
+
+  const componentDir = normalizePath(sys.path.dirname(cmpMeta.componentUrl));
+
+  if (cmpMeta.styleMeta) {
+    cmpMeta.styleMeta = Object.assign({}, cmpMeta.styleMeta);
+
+    const modeNames = Object.keys(cmpMeta.styleMeta);
+
+    modeNames.forEach(modeName => {
+      const cmpMode = cmpMeta.styleMeta[modeName];
+
+      if (cmpMode.parsedStyleUrls) {
+        cmpMode.styleUrls = cmpMode.parsedStyleUrls.map(parsedStyleUrl => {
+          parsedStyleUrl = normalizePath(parsedStyleUrl);
+
+          return sys.path.join(componentDir, parsedStyleUrl);
+        });
+      }
+    });
+  }
 }
