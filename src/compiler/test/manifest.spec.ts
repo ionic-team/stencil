@@ -1,11 +1,58 @@
-import { convertManifestUrlToRelative } from '../manifest';
+import { Bundle, Collection, ComponentMeta, Manifest, ModuleFileMeta } from '../interfaces';
+import { convertManifestUrlToRelative, processDependentManifest } from '../manifest';
 import { mockStencilSystem } from '../../test';
-import { ComponentMeta, ModuleFileMeta } from '../interfaces';
 import { validateDependentCollection } from '../validation';
 
 
 describe('manifest', () => {
   const sys = mockStencilSystem();
+
+  describe('processDependentManifest', () => {
+
+    it('should remove components not found in user bundles if includeBundledOnly is true', () => {
+      const bundles: Bundle[] = [
+        { components: ['cmp-a'] },
+        { components: ['cmp-b', 'cmp-e'] }
+      ];
+      const dependentCollection: Collection = {
+        name: '@awesome/collection',
+        includeBundledOnly: true
+      };
+      const dependentManifest: Manifest = {
+        components: [
+          { tagNameMeta: 'cmp-a' },
+          { tagNameMeta: 'cmp-b' },
+          { tagNameMeta: 'cmp-c' },
+          { tagNameMeta: 'cmp-d' },
+          { tagNameMeta: 'cmp-e' }
+        ]
+      };
+
+      const manifest = processDependentManifest(bundles, dependentCollection, dependentManifest);
+
+      expect(manifest.components.length).toBe(3);
+      expect(manifest.components[0].tagNameMeta).toBe('cmp-a');
+      expect(manifest.components[1].tagNameMeta).toBe('cmp-b');
+      expect(manifest.components[2].tagNameMeta).toBe('cmp-e');
+    });
+
+    it('should keep all components if includeBundledOnly is falsy', () => {
+      const bundles: Bundle[] = [];
+      const dependentCollection: Collection = { name: '@awesome/collection' };
+      const dependentManifest: Manifest = {
+        components: [
+          { tagNameMeta: 'cmp-a' },
+          { tagNameMeta: 'cmp-b' },
+          { tagNameMeta: 'cmp-c' }
+        ]
+      };
+
+      const manifest = processDependentManifest(bundles, dependentCollection, dependentManifest);
+
+      expect(manifest.components.length).toBe(3);
+    });
+
+  });
 
   describe('convertManifestUrlToRelative', () => {
 

@@ -8,47 +8,69 @@ import { validateDependentCollection, validateUserBundles, validateManifestBundl
 
 export function loadDependentManifests(buildConfig: BuildConfig) {
   return Promise.all(buildConfig.collections.map(userInput => {
-    const collection = validateDependentCollection(userInput);
-    return loadDependentManifest(buildConfig, collection);
+    const dependentCollection = validateDependentCollection(userInput);
+    return loadDependentManifest(buildConfig, dependentCollection);
   }));
 }
 
 
-function loadDependentManifest(buildConfig: BuildConfig, collection: Collection) {
+function loadDependentManifest(buildConfig: BuildConfig, dependentCollection: Collection) {
   const sys = buildConfig.sys;
 
-  const manifestJsonFilePath = resolveFrom(sys, buildConfig.rootDir, collection.name);
+  const dependentManifestFilePath = resolveFrom(sys, buildConfig.rootDir, dependentCollection.name);
+  const dependentManifestDir = sys.path.dirname(dependentManifestFilePath);
 
-  const manifestDir = sys.path.dirname(manifestJsonFilePath);
+  return readFile(sys, dependentManifestFilePath).then(dependentManifestJson => {
+    let dependentManifest: Manifest = JSON.parse(dependentManifestJson);
 
-  return readFile(sys, manifestJsonFilePath).then(manifestJsonContent => {
-    return parseDependentManifest(buildConfig, manifestDir, manifestJsonContent);
+    dependentManifest = processDependentManifest(buildConfig.bundles, dependentCollection, dependentManifest);
+
+    return parseDependentManifest(buildConfig, dependentManifest, dependentManifestDir);
   });
 }
 
 
-export function parseDependentManifest(buildConfig: BuildConfig, manifestDir: string, manifestJsonContent: string) {
-  const manifest: Manifest = JSON.parse(manifestJsonContent);
+export function processDependentManifest(bundles: Bundle[], dependentCollection: Collection, dependentManifest: Manifest) {
+  if (dependentCollection.includeBundledOnly) {
+    // what was imported included every component this collection has
+    // however, the user only want to include specific components
+    // which are seen within their own bundles
+    // loop through this manifest an take out components which are not
+    // seen in the user's list of bundled components
+    dependentManifest.components = dependentManifest.components.filter(c => {
+      return bundles.some(b => b.components.indexOf(c.tagNameMeta) > -1);
+    });
+  }
 
-  return updateManifestUrls(buildConfig, manifest, manifestDir);
+  return dependentManifest;
 }
 
 
-export function updateManifestUrls(buildConfig: BuildConfig, manifest: Manifest, manifestDir: string): Manifest {
+export function parseDependentManifest(buildConfig: BuildConfig, dependentManifest: Manifest, dependentManifestDir: string) {
+
+
+  return updateManifestUrls(buildConfig, dependentManifest, dependentManifestDir);
+}
+
+
+export function updateManifestUrls(buildConfig: BuildConfig, dependentManifest: Manifest, dependentManifestDir: string): Manifest {
   const sys = buildConfig.sys;
 
-  const components = (manifest.components || []).map((comp: ComponentMeta) => {
-    const styleMeta = updateStyleUrls(buildConfig, comp.styleMeta, manifestDir);
+  const components = (dependentManifest.components || []).map((comp: ComponentMeta) => {
+    dependentManifestDir = normalizePath(dependentManifestDir);
+    comp.componentUrl = normalizePath(comp.componentUrl);
+
+    const styleMeta = updateStyleUrls(buildConfig, comp.styleMeta, dependentManifestDir);
 
     return {
       ...comp,
       styleMeta,
-      componentUrl: normalizePath(sys.path.join(manifestDir, comp.componentUrl))
+      componentUrl: normalizePath(sys.path.join(dependentManifestDir, comp.componentUrl))
     };
   });
 
   return {
-    ...manifest,
+    ...dependentManifest,
     components
   };
 }
@@ -181,7 +203,7 @@ export function convertManifestUrlToRelative(sys: StencilSystem, collectionDest:
   const jsFilePath = normalizePath(moduleFile.jsFilePath);
   collectionDest = normalizePath(collectionDest);
 
-  cmpMeta.componentUrl = sys.path.relative(collectionDest, jsFilePath);
+  cmpMeta.componentUrl = normalizePath(sys.path.relative(collectionDest, jsFilePath));
 
   const componentDir = normalizePath(sys.path.dirname(cmpMeta.componentUrl));
 
