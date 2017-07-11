@@ -5,7 +5,7 @@ export function cleanDiagnostics(diagnostics: Diagnostic[]) {
   const cleaned: Diagnostic[] = [];
 
   diagnostics.forEach(d => {
-    if (!cleaned.some(c => c.messageText === d.messageText)) {
+    if (cleaned.length < MAX_ERRORS && !cleaned.some(c => c.messageText === d.messageText)) {
       cleaned.push(d);
     }
   });
@@ -106,3 +106,6 @@ export function escapeHtml(unsafe: any) {
          .replace(/"/g, '&quot;')
          .replace(/'/g, '&#039;');
 }
+
+
+export const MAX_ERRORS = 15;

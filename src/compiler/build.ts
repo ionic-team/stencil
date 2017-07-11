@@ -7,10 +7,8 @@ import { compileSrcDir } from './compile';
 import { emptyDir, writeFiles } from './util';
 import { generateProjectFiles } from './build-project-files';
 import { generateHtmlDiagnostics } from './logger/generate-html-diagnostics';
-import { mergeManifests, updateManifestUrls } from './manifest';
+import { loadDependentManifests, mergeManifests, updateManifestUrls } from './manifest';
 import { optimizeHtml } from './optimize-html';
-import { readFile } from './util';
-import { resolveFrom } from './resolve-from';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
 
@@ -52,7 +50,7 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
 
   }).then(() => {
     // generate manifest phase
-    return manifestPhase(buildConfig);
+    return loadDependentManifests(buildConfig);
 
   }).then(dependentManifests => {
     // compile src directory phase
@@ -108,24 +106,6 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
 
     return buildResults;
   });
-}
-
-
-function manifestPhase(buildConfig: BuildConfig) {
-  const sys = buildConfig.sys;
-
-  return Promise.all(buildConfig.collections.map(collection => {
-
-    const manifestJsonFile = resolveFrom(sys, buildConfig.rootDir, collection);
-    const manifestDir = sys.path.dirname(manifestJsonFile);
-
-    return readFile(sys, manifestJsonFile).then(manifestJsonContent => {
-      const manifest: Manifest = JSON.parse(manifestJsonContent);
-
-      return updateManifestUrls(buildConfig, manifest, manifestDir);
-    });
-
-  }));
 }
 
 

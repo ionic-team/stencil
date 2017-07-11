@@ -27,8 +27,7 @@ export interface BuildContext {
   filesToWrite?: FilesToWrite;
   watcher?: FSWatcher;
   onFinish?: Function;
-  userTsConfig?: any;
-  tsHost?: any;
+  tsConfig?: any;
 
   isRebuild?: boolean;
   isChangeBuild?: boolean;

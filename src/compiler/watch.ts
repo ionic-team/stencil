@@ -128,13 +128,13 @@ function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBui
           // the changed file we already know is a component file
           changeHasComponentModules = true;
 
-          // remove its cached content
-          delete ctx.moduleFiles[changedFile];
-
         } else {
           // not in cache, so let's consider it a module change
           changeHasNonComponentModules = true;
         }
+
+        // remove its cached content
+        delete ctx.moduleFiles[changedFile];
 
       } else if (isSassSourceFile(changedFile)) {
         // we know there's a sass change

@@ -1,7 +1,8 @@
-import { BuildConfig, BuildContext, Diagnostic, ModuleFileMeta, StencilSystem, TranspileResults } from '../interfaces';
+import { BuildConfig, BuildContext, Diagnostic, ModuleFileMeta, ModuleFiles, StencilSystem, TranspileResults } from '../interfaces';
 import { buildError, catchError, isSassSourceFile, normalizePath } from '../util';
 import { componentClass } from './transformers/component-class';
-import { getTsHost, getModuleFile, getTsCompilerRootNames, getUserTsConfig } from './transpile-util';
+import { getTsHost, getTsFileNamesToCompile } from './compiler-host';
+import { getUserTsConfig } from './compiler-options';
 import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { loadTypeScriptDiagnostics } from '../logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
@@ -9,36 +10,27 @@ import { updateLifecycleMethods } from './transformers/update-lifecycle-methods'
 import * as ts from 'typescript';
 
 
-export function transpile(buildConfig: BuildConfig, ctx: BuildContext, tsFilePath: string) {
-  tsFilePath = normalizePath(tsFilePath);
+export function transpile(buildConfig: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
 
   const transpileResults: TranspileResults = {
     moduleFiles: {},
     diagnostics: []
   };
 
-  return getModuleFile(buildConfig, ctx, tsFilePath).then(moduleFile => {
-    if (ctx.isChangeBuild && !ctx.changeHasComponentModules && !ctx.changeHasNonComponentModules) {
-      // this is a change build, but it's not for any
-      // typescript modules or components so don't bother transpiling
-      return Promise.resolve(moduleFile);
+  return Promise.resolve().then(() => {
+
+    transpileModules(buildConfig, ctx, moduleFiles, transpileResults);
+
+    if (transpileResults.diagnostics.length) {
+      return Promise.resolve([]);
     }
 
-    if (typeof moduleFile.jsText === 'string' && moduleFile.hasCmpClass) {
-      // only skip transpile if we already have jsText, and this module is a component
-      // if it's a component, it's safe to say it's not being imported by another?
-      return Promise.resolve(moduleFile);
-    }
+    const transpiledFileNames = Object.keys(transpileResults.moduleFiles);
 
-    // do a full transpile
-    return transpileFile(buildConfig, ctx, moduleFile, transpileResults);
-
-  }).then(moduleFile => {
-    // we got a transpiled moduled (either through a full transpile or from cache)
-    transpileResults.moduleFiles[tsFilePath] = moduleFile;
-
-    // process each of the styles within this module
-    return processIncludedStyles(buildConfig, ctx, transpileResults.diagnostics, moduleFile);
+    return Promise.all(transpiledFileNames.map(transpiledFileName => {
+      const moduleFile = transpileResults.moduleFiles[transpiledFileName];
+      return processIncludedStyles(buildConfig, ctx, transpileResults.diagnostics, moduleFile);
+    }));
 
   }).catch(err => {
     catchError(transpileResults.diagnostics, err);
@@ -49,25 +41,24 @@ export function transpile(buildConfig: BuildConfig, ctx: BuildContext, tsFilePat
 }
 
 
-function transpileFile(buildConfig: BuildConfig, ctx: BuildContext, moduleFile: ModuleFileMeta, transpileResults: TranspileResults) {
-  const tsConfig = getUserTsConfig(buildConfig, ctx, transpileResults);
-  if (transpileResults.diagnostics.length) {
-    return moduleFile;
+function transpileModules(buildConfig: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileResults) {
+  const tsOptions = getUserTsConfig(buildConfig, ctx);
+
+  if (ctx.isChangeBuild) {
+    moduleFiles = getRebuildModules(moduleFiles);
   }
 
-  const tsCompilerOptions = tsConfig.options;
-
-  if (!ctx.tsHost) {
-    ctx.tsHost = getTsHost(buildConfig, ctx, tsCompilerOptions);
+  if (buildConfig.suppressTypeScriptErrors) {
+    tsOptions.options.lib = [];
   }
 
-  const program = ts.createProgram(
-    getTsCompilerRootNames(buildConfig, moduleFile.tsFilePath),
-    tsCompilerOptions,
-    ctx.tsHost
-  );
+  const tsHost = getTsHost(buildConfig, ctx, tsOptions.options, transpileResults);
 
-  program.emit(undefined, ctx.tsHost.writeFile, undefined, false, {
+  const tsFileNames = getTsFileNamesToCompile(buildConfig, moduleFiles);
+
+  const program = ts.createProgram(tsFileNames, tsOptions.options, tsHost);
+
+  program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
       componentClass(ctx.moduleFiles, transpileResults.diagnostics),
       removeImports(),
@@ -78,14 +69,32 @@ function transpileFile(buildConfig: BuildConfig, ctx: BuildContext, moduleFile: 
     ]
   });
 
-  ctx.transpileBuildCount++;
+  ctx.transpileBuildCount = Object.keys(transpileResults.moduleFiles).length;
 
-  const tsDiagnostics = program.getSyntacticDiagnostics()
-    .concat(program.getSemanticDiagnostics(), program.getOptionsDiagnostics());
+  if (!buildConfig.suppressTypeScriptErrors) {
+    const tsDiagnostics = program.getSyntacticDiagnostics()
+      .concat(program.getSemanticDiagnostics(), program.getOptionsDiagnostics());
 
-  loadTypeScriptDiagnostics(buildConfig, transpileResults.diagnostics, tsDiagnostics);
+    loadTypeScriptDiagnostics(buildConfig, transpileResults.diagnostics, tsDiagnostics);
+  }
+}
 
-  return moduleFile;
+
+function getRebuildModules(moduleFiles: ModuleFiles) {
+  const rebuildModuleFiles: ModuleFiles = {};
+
+  const tsFileNames = Object.keys(moduleFiles);
+  tsFileNames.forEach(tsFileName => {
+    const moduleFile = moduleFiles[tsFileName];
+
+    if (moduleFile.tsFilePath.indexOf('.d.ts') > -1) return;
+
+    if (typeof moduleFile.jsText !== 'string') {
+      rebuildModuleFiles[tsFileName] = moduleFile;
+    }
+  });
+
+  return rebuildModuleFiles;
 }
 
 

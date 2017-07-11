@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, CompileResults } from './interfaces';
 import { catchError } from './util';
 import { generateManifest } from './manifest';
+import { getModuleFile } from './transpile/compiler-host';
 import { isTsSourceFile, readFile, normalizePath } from './util';
 import { transpile } from './transpile/transpile';
 
@@ -19,7 +20,33 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
     includedSassFiles: []
   };
 
-  return compileDir(buildConfig, ctx, buildConfig.src, compileResults).then(() => {
+  return scanDir(buildConfig, ctx, buildConfig.src, compileResults).then(() => {
+    return transpile(buildConfig, ctx, compileResults.moduleFiles);
+
+  }).then(transpileResults => {
+    compileResults.diagnostics = compileResults.diagnostics.concat(transpileResults.diagnostics);
+
+    if (transpileResults.moduleFiles) {
+      Object.keys(transpileResults.moduleFiles).forEach(tsFilePath => {
+        const moduleFile = transpileResults.moduleFiles[tsFilePath];
+
+        compileResults.moduleFiles[tsFilePath] = moduleFile;
+
+        if (buildConfig.generateCollection) {
+          ctx.filesToWrite[moduleFile.jsFilePath] = moduleFile.jsText;
+        }
+
+        if (moduleFile.includedSassFiles) {
+          moduleFile.includedSassFiles.forEach(includedSassFile => {
+            if (compileResults.includedSassFiles.indexOf(includedSassFile) === -1) {
+              compileResults.includedSassFiles.push(includedSassFile);
+            }
+          });
+        }
+      });
+    }
+
+  }).then(() => {
     compileResults.manifest = generateManifest(buildConfig, ctx, compileResults);
 
   }).then(() => {
@@ -35,7 +62,7 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
 }
 
 
-function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
+function scanDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
   return new Promise(resolve => {
     // loop through this directory and sub directories looking for
     // files that need to be transpiled
@@ -44,7 +71,7 @@ function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, co
 
     dir = normalizePath(dir);
 
-    logger.debug(`compileDirectory: ${dir}`);
+    logger.debug(`compileDir: ${dir}`);
 
     sys.fs.readdir(dir, (err, files) => {
       if (err) {
@@ -74,15 +101,16 @@ function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, co
             } else if (stats.isDirectory()) {
               // looks like it's yet another directory
               // let's keep drilling down
-              compileDir(buildConfig, ctx, readPath, compileResults).then(() => {
+              scanDir(buildConfig, ctx, readPath, compileResults).then(() => {
                 resolve();
               });
 
-            } else if (stats.isFile() && isTsSourceFile(readPath)) {
+            } else if (isTsSourceFile(readPath)) {
               // woot! we found a typescript file that needs to be transpiled
               // let's send this over to our worker manager who can
               // then assign a worker to this exact file
-              compileFile(buildConfig, ctx, readPath, compileResults).then(() => {
+              getModuleFile(buildConfig, ctx, readPath).then(moduleFile => {
+                compileResults.moduleFiles[moduleFile.tsFilePath] = moduleFile;
                 resolve();
               });
 
@@ -103,42 +131,6 @@ function compileDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, co
       });
     });
 
-  });
-}
-
-
-function compileFile(buildConfig: BuildConfig, ctx: BuildContext, filePath: string, compileResults: CompileResults) {
-  return Promise.resolve().then(() => {
-
-    const normalizedFilePath = normalizePath(filePath);
-    return transpile(buildConfig, ctx, normalizedFilePath).then(transpileResults => {
-      if (transpileResults.diagnostics) {
-        compileResults.diagnostics = compileResults.diagnostics.concat(transpileResults.diagnostics);
-      }
-      if (transpileResults.moduleFiles) {
-        Object.keys(transpileResults.moduleFiles).forEach(path => {
-          const normalizedTsFilePath = normalizePath(path);
-          const moduleFile = transpileResults.moduleFiles[normalizedTsFilePath];
-
-          compileResults.moduleFiles[normalizedTsFilePath] = moduleFile;
-
-          if (buildConfig.generateCollection) {
-            ctx.filesToWrite[moduleFile.jsFilePath] = moduleFile.jsText;
-          }
-
-          if (moduleFile.includedSassFiles) {
-            moduleFile.includedSassFiles.forEach(includedSassFile => {
-              if (compileResults.includedSassFiles.indexOf(includedSassFile) === -1) {
-                compileResults.includedSassFiles.push(includedSassFile);
-              }
-            });
-          }
-        });
-      }
-
-    }).then(() => {
-      return compileResults;
-    });
   });
 }
 

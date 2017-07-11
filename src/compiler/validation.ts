@@ -1,5 +1,5 @@
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
-import { BuildConfig, Bundle, BundlerConfig, Manifest } from './interfaces';
+import { BuildConfig, Bundle, BundlerConfig, Collection, Manifest } from './interfaces';
 import { normalizePath } from './util';
 
 
@@ -102,11 +102,41 @@ export function validateBuildConfig(buildConfig: BuildConfig) {
   }
 
   buildConfig.generateCollection = !!buildConfig.generateCollection;
+
   buildConfig.collections = buildConfig.collections || [];
+  buildConfig.collections = buildConfig.collections.map(validateDependentCollection);
+
   buildConfig.bundles = buildConfig.bundles || [];
   buildConfig.exclude = buildConfig.exclude || DEFAULT_EXCLUDES;
 
   return buildConfig;
+}
+
+
+export function validateDependentCollection(userInput: any) {
+  if (!userInput || Array.isArray(userInput) || typeof userInput === 'number' || typeof userInput === 'boolean') {
+    throw new Error(`invalid collection: ${userInput}`);
+  }
+
+  let collection: Collection;
+
+  if (typeof userInput === 'string') {
+    collection = {
+      name: userInput
+    };
+
+  } else {
+    collection = userInput;
+  }
+
+  if (!collection.name || typeof collection.name !== 'string' || collection.name.trim() === '') {
+    throw new Error(`missing collection name`);
+  }
+
+  collection.name = collection.name.trim();
+  collection.includeBundledOnly = !!collection.includeBundledOnly;
+
+  return collection;
 }
 
 
@@ -143,7 +173,7 @@ export function validateUserBundles(bundles: Bundle[]) {
 }
 
 
-export function validateManifest(manifest: Manifest) {
+export function validateManifestBundles(manifest: Manifest) {
   if (!manifest) {
     throw new Error(`Invalid manifest`);
   }

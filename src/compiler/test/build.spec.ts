@@ -176,7 +176,7 @@ describe('build', () => {
     });
   });
 
-  it('should rebuild both cmp-a and cmp-b when non-component module has changed', () => {
+  it('should rebundle both cmp-a and cmp-b when non-component module has changed', () => {
     ctx = {};
     buildConfig.bundles = [
       { components: ['cmp-a'] },
@@ -197,6 +197,7 @@ describe('build', () => {
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
+        writeFileSync('/src/service.tsx', `export class MyService { constructor(){} }`);
         ctx.watcher.$triggerEvent('change', '/src/service.tsx');
 
       }).then((r: BuildResults) => {
@@ -211,7 +212,7 @@ describe('build', () => {
     });
   });
 
-  it('should not rebuild cmp-a when only cmp-b changed and no non-components have changed', () => {
+  it('should not rebuild cmp-a when only cmp-b changed', () => {
     ctx = {};
     buildConfig.bundles = [
       { components: ['cmp-a'] },
@@ -219,8 +220,8 @@ describe('build', () => {
     ];
     buildConfig.watch = true;
     writeFileSync('/src/cmp-a.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-a' }) export class CmpA {}`);
-    writeFileSync('/src/cmp-b.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-b' }) export class CmpB {}`);
-    writeFileSync('/src/service.tsx', `export class MyService {}`);
+    writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
+    writeFileSync('/src/service.tsx', `export class MyService { test() { console.log('test'); } }`);
 
     return build(buildConfig, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
@@ -233,12 +234,20 @@ describe('build', () => {
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
-        writeFileSync('/src/cmp-b.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-b' }) export class CmpB {} console.log('change');`);
+        writeFileSync('/src/cmp-b.tsx', `
+          import { MyService } from './service';
+          @Component({ tag: 'cmp-b' })
+          export class CmpB {
+            constructor() {
+              const myService = new MyService();
+              myService.test();
+            }
+          }`);
         ctx.watcher.$triggerEvent('change', '/src/cmp-b.tsx');
 
       }).then((r: BuildResults) => {
         expect(ctx.isChangeBuild).toBe(true);
-        expect(ctx.transpileBuildCount).toBe(2);
+        expect(ctx.transpileBuildCount).toBe(1);
         expect(ctx.moduleBundleCount).toBe(1);
 
         expect(wroteFile(r, 'cmp-a.js')).toBe(false);
@@ -501,7 +510,8 @@ describe('build', () => {
     buildConfig = {
       sys: sys,
       logger: logger,
-      rootDir: '/'
+      rootDir: '/',
+      suppressTypeScriptErrors: true
     };
     sys.fs = mockFs();
 
@@ -513,10 +523,6 @@ describe('build', () => {
   function mkdirSync(path: string) {
     (<any>sys.fs).mkdirSync(path);
   }
-
-  // function readFileSync(filePath: string) {
-  //   return sys.fs.readFileSync(filePath, 'utf-8');
-  // }
 
   function writeFileSync(filePath: string, data: any) {
     (<any>sys.fs).writeFileSync(filePath, data);

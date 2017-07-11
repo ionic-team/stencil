@@ -1,5 +1,5 @@
 import { BuildConfig, Diagnostic, PrintLine } from '../interfaces';
-import { formatFileName, formatHeader, splitLineBreaks } from './logger-util';
+import { formatFileName, formatHeader, splitLineBreaks, MAX_ERRORS } from './logger-util';
 import { highlight } from './highlight/highlight';
 import * as ts from 'typescript';
 
@@ -10,12 +10,11 @@ import * as ts from 'typescript';
  */
 
 export function loadTypeScriptDiagnostics(buildConfig: BuildConfig, resultsDiagnostics: Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
-  tsDiagnostics.forEach(tsDiagnostic => {
-    const d = loadDiagnostic(buildConfig, tsDiagnostic);
-    if (d) {
-      resultsDiagnostics.push(d);
-    }
-  });
+  const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
+
+  for (var i = 0; i < maxErrors; i++) {
+    resultsDiagnostics.push(loadDiagnostic(buildConfig, tsDiagnostics[i]));
+  }
 }
 
 

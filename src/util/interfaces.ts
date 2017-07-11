@@ -433,8 +433,6 @@ export interface Bundle {
   priority?: string;
 }
 
-export type Collection = string;
-
 
 export interface BuildConfig {
   sys?: StencilSystem;
@@ -459,6 +457,13 @@ export interface BuildConfig {
   minifyJs?: boolean;
   preamble?: string;
   hashedFileNameLength?: number;
+  suppressTypeScriptErrors?: boolean;
+}
+
+
+export interface Collection {
+  name: string;
+  includeBundledOnly?: boolean;
 }
 
 
