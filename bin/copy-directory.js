@@ -1,6 +1,7 @@
 // imported from ncp (this is temporary, will rewrite)
 
 var path = require('path')
+var fs = require('fs');
 
 function copyDir (source, dest, options, callback) {
   if (!callback) {

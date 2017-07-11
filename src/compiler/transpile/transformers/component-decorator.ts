@@ -2,6 +2,7 @@ import { buildError, catchError } from '../../util';
 import { ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../../interfaces';
 import { normalizeStyles } from './normalize-styles';
 import { validateTag } from '../../validation';
+import { parseComponentMetadata as normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import * as ts from 'typescript';
 
 
@@ -50,6 +51,7 @@ function parseComponentMetaData(moduleFile: ModuleFileMeta, diagnostics: Diagnos
     normalizeStyles(userOpts, cmpMeta);
     normalizeShadow(userOpts, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
+    normalizeAssetsDir(userOpts, cmpMeta);
 
     return cmpMeta;
 

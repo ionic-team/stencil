@@ -2,6 +2,7 @@
 
 const path = require('path')
 const assert = require('assert');
+const fs = require('fs');
 
 const isWindows = (process.platform === 'win32')
 

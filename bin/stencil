@@ -134,7 +134,7 @@ buildConfig.sys = Object.defineProperties({
   },
 
   copyDir: function copyDir(source, dest, callback) {
-    var copyDir = require('./copyDirectory');
+    var copyDir = require('./copy-directory');
     copyDir(source, dest, {}, callback);
   },
 
