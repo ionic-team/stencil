@@ -5,17 +5,10 @@ import { toTitleCase } from '../../util/helpers';
 
 
 export function generateHtmlDiagnostics(buildConfig: BuildConfig, diagnostics: Diagnostic[]) {
-  if (diagnostics.length) {
-    const html = generateHtmlDocument(diagnostics);
-    buildConfig.sys.fs.writeFile(buildConfig.diagnosticsDest, html, (err) => {
-      if (err) {
-        throw err;
-      }
-    });
-
-  } else {
-    buildConfig.sys.fs.unlink(buildConfig.diagnosticsDest, () => {});
-  }
+  // TODO
+  buildConfig;
+  diagnostics;
+  generateHtmlDocument;
 }
 
 

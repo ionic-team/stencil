@@ -184,7 +184,6 @@ function generateComponentModeStyles(
   const styleCollection: StyleCollection = {};
 
   if (modeStyleMeta) {
-console.log('compileScssFile', modeStyleMeta)
     if (modeStyleMeta.absStylePaths) {
       modeStyleMeta.absStylePaths.forEach(absStylePath => {
         styleCollection[absStylePath] = '';
