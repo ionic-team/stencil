@@ -1112,3 +1112,14 @@ export interface HydrateOptions {
   removeUnusedCss?: boolean;
   reduceHtmlWhitepace?: boolean;
 }
+
+declare global {
+  namespace JSX {
+    interface Element {
+    }
+    interface IntrinsicElements {
+      // HTML
+      [elemName: string]: any;
+    }
+  }
+}
