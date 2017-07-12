@@ -131,7 +131,7 @@ function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleCom
 
   }).forEach(cmpMeta => {
     // create a full path to the modules to import
-    let importPath = cmpMeta.componentUrl;
+    let importPath = cmpMeta.componentPath;
 
     // manually create the content for our temporary entry file for the bundler
     entryFileLines.push(`import { ${cmpMeta.componentClass} } from "${importPath}";`);
@@ -153,7 +153,7 @@ function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleCom
     // yes...there could be two files that have the same filename in different directories
     // but worst case scenario is that both of them run their bundling, which isn't a performance problem
     const hasChangedFileName = bundleComponentMeta.some(cmpMeta => {
-      const distFileName = sys.path.basename(cmpMeta.componentUrl, '.js');
+      const distFileName = sys.path.basename(cmpMeta.componentPath, '.js');
       return ctx.changedFiles.some(f => {
         const changedFileName = sys.path.basename(f);
         return (changedFileName === distFileName + '.ts' || changedFileName === distFileName + '.tsx');

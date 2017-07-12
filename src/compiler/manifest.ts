@@ -1,9 +1,10 @@
-import { BuildConfig, BuildContext, Bundle, Collection, CompileResults, ComponentMeta, Manifest, ModuleFileMeta, StyleMeta, StencilSystem } from './interfaces';
+import { BuildConfig, BuildContext, Bundle, Collection, CompileResults, Manifest, ModuleFileMeta } from './interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../util/constants';
 import { normalizePath } from './util';
 import { readFile } from './util';
 import { resolveFrom } from './resolve-from';
-import { validateDependentCollection, validateUserBundles, validateManifestBundles } from './validation';
+import { validateDependentCollection, validateUserBundles } from './validation';
+import { parseManifest, serializeManifest } from './manifest-data';
 
 
 export function loadDependentManifests(buildConfig: BuildConfig) {
@@ -21,11 +22,9 @@ function loadDependentManifest(buildConfig: BuildConfig, dependentCollection: Co
   const dependentManifestDir = sys.path.dirname(dependentManifestFilePath);
 
   return readFile(sys, dependentManifestFilePath).then(dependentManifestJson => {
-    let dependentManifest: Manifest = JSON.parse(dependentManifestJson);
+    const dependentManifest = parseManifest(buildConfig, dependentManifestDir, dependentManifestJson);
 
-    dependentManifest = processDependentManifest(buildConfig.bundles, dependentCollection, dependentManifest);
-
-    return parseDependentManifest(buildConfig, dependentManifest, dependentManifestDir);
+    return processDependentManifest(buildConfig.bundles, dependentCollection, dependentManifest);
   });
 }
 
@@ -46,60 +45,11 @@ export function processDependentManifest(bundles: Bundle[], dependentCollection:
 }
 
 
-export function parseDependentManifest(buildConfig: BuildConfig, dependentManifest: Manifest, dependentManifestDir: string) {
-
-
-  return updateManifestUrls(buildConfig, dependentManifest, dependentManifestDir);
-}
-
-
-export function updateManifestUrls(buildConfig: BuildConfig, dependentManifest: Manifest, dependentManifestDir: string): Manifest {
-  const sys = buildConfig.sys;
-
-  const components = (dependentManifest.components || []).map((comp: ComponentMeta) => {
-    dependentManifestDir = normalizePath(dependentManifestDir);
-    comp.componentUrl = normalizePath(comp.componentUrl);
-
-    const styleMeta = updateStyleUrls(buildConfig, comp.styleMeta, dependentManifestDir);
-
-    return {
-      ...comp,
-      styleMeta,
-      componentUrl: normalizePath(sys.path.join(dependentManifestDir, comp.componentUrl))
-    };
-  });
-
-  return {
-    ...dependentManifest,
-    components
-  };
-}
-
-
-function updateStyleUrls(buildConfig: BuildConfig, styleMeta: StyleMeta, manifestDir: string): StyleMeta {
-  const sys = buildConfig.sys;
-
-  return Object.keys(styleMeta || {}).reduce((styleData: StyleMeta, styleMode: string) => {
-    const style = styleMeta[styleMode];
-
-    const styleUrls = style.styleUrls
-      .map(styleUrl => normalizePath(sys.path.relative(buildConfig.collectionDest, sys.path.join(manifestDir, styleUrl))));
-
-    styleData[styleMode] = {
-      ...style,
-      styleUrls
-    };
-
-    return styleData;
-  }, <StyleMeta>{});
-}
-
-
 export function mergeManifests(manifestPriorityList: Manifest[]): Manifest {
-  let removedComponents: string[] = [];
+  const removedComponents: string[] = [];
 
-  return manifestPriorityList.reduce((allData: Manifest, collectionManifest: Manifest) => {
-    const bundles = (collectionManifest.bundles || []).map((bundle: Bundle) => {
+  const m = manifestPriorityList.reduce((allData, collectionManifest) => {
+    const bundles = (collectionManifest.bundles || []).map(bundle => {
         const components = (bundle.components || []).filter(tag => removedComponents.indexOf(tag) === -1);
 
         components.forEach(tag => removedComponents.push(tag));
@@ -116,112 +66,66 @@ export function mergeManifests(manifestPriorityList: Manifest[]): Manifest {
       bundles: allData.bundles.concat(bundles)
     };
   }, <Manifest>{ components: [], bundles: []});
+
+  return m;
 }
 
 
 export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, compileResults: CompileResults) {
+  const sys = buildConfig.sys;
+  const logger = buildConfig.logger;
+
+  // validate we're good to go
+  validateUserBundles(buildConfig.bundles);
+
+  // get the absolute path to the directory where the manifest will be saved
+  const manifestDir = normalizePath(buildConfig.collectionDest);
+
+  // create an absolute path to the actual manifest json file
+  const manifestFilePath = normalizePath(sys.path.join(manifestDir, COLLECTION_MANIFEST_FILE_NAME));
+
+  // create the single manifest we're going to fill up with data
   const manifest: Manifest = {
     components: [],
     bundles: []
   };
 
-  const sys = buildConfig.sys;
-  const logger = buildConfig.logger;
-
-  const manifestFilePath = normalizePath(sys.path.join(buildConfig.collectionDest, COLLECTION_MANIFEST_FILE_NAME));
-
-  validateUserBundles(buildConfig.bundles);
-
+  // get all of the filenames of the compiled files
   const fileNames = Object.keys(compileResults.moduleFiles);
+  const manifestModulesFiles: ModuleFileMeta[] = [];
 
+  // loop through the compiled files and fill up the manifest w/ serialized component data
   fileNames.forEach(fileName => {
-    const f = compileResults.moduleFiles[fileName];
+    const moduleFile = compileResults.moduleFiles[fileName];
 
-    if (!f.cmpMeta || !f.cmpMeta.tagNameMeta) return;
-
-    let includeComponent = false;
-    for (var i = 0; i < buildConfig.bundles.length; i++) {
-      if (buildConfig.bundles[i].components.indexOf(f.cmpMeta.tagNameMeta) > -1) {
-        includeComponent = true;
-        break;
-      }
+    if (!moduleFile.cmpMeta || !moduleFile.cmpMeta.tagNameMeta) {
+      // this isn't a component, let's not add it to the manifest
+      return;
     }
 
-    if (!includeComponent) return;
+    const includeComponent = buildConfig.bundles.some(b => {
+      return b.components.some(c => c === moduleFile.cmpMeta.tagNameMeta);
+    });
 
-    const cmpMeta: ComponentMeta = Object.assign({}, <any>f.cmpMeta);
-
-    convertManifestUrlToRelative(buildConfig.sys, buildConfig.collectionDest, f, cmpMeta);
-
-    if (!cmpMeta.listenersMeta.length) {
-      delete cmpMeta.listenersMeta;
+    if (!includeComponent) {
+      // looks like we shouldn't include this component
+      // cuz it wasn't in any of the build config's bundles
+      return;
     }
 
-    if (!cmpMeta.methodsMeta.length) {
-      delete cmpMeta.methodsMeta;
-    }
+    // awesome, good to go, let's add it to the manifest's components
+    manifest.components.push(moduleFile.cmpMeta);
 
-    if (!cmpMeta.propsMeta.length) {
-      delete cmpMeta.propsMeta;
-    }
-
-    if (!cmpMeta.propWillChangeMeta.length) {
-      delete cmpMeta.propWillChangeMeta;
-    }
-
-    if (!cmpMeta.propDidChangeMeta.length) {
-      delete cmpMeta.propDidChangeMeta;
-    }
-
-    // place property at the bottom
-    const slotMeta = cmpMeta.slotMeta;
-    delete cmpMeta.slotMeta;
-    cmpMeta.slotMeta = slotMeta;
-
-    const shadow = cmpMeta.isShadowMeta;
-    delete cmpMeta.isShadowMeta;
-    cmpMeta.isShadowMeta = shadow;
-
-    manifest.components.push(cmpMeta);
+    manifestModulesFiles.push(moduleFile);
   });
 
-  manifest.bundles = (buildConfig.bundles && buildConfig.bundles.slice()) || [];
-
-  validateManifestBundles(manifest);
-
   if (buildConfig.generateCollection) {
-    logger.debug(`manifest, generateManifest: ${manifestFilePath}`);
+    // if we're also generating the collection, then we want to
+    // save this manifest as a json file to disk
+    logger.debug(`manifest, serializeManifest: ${manifestFilePath}`);
 
-    ctx.filesToWrite[manifestFilePath] = JSON.stringify(manifest, null, 2);
+    ctx.filesToWrite[manifestFilePath] = serializeManifest(buildConfig, manifestDir, manifestModulesFiles);
   }
 
   return manifest;
-}
-
-
-export function convertManifestUrlToRelative(sys: StencilSystem, collectionDest: string, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
-  const jsFilePath = normalizePath(moduleFile.jsFilePath);
-  collectionDest = normalizePath(collectionDest);
-
-  cmpMeta.componentUrl = normalizePath(sys.path.relative(collectionDest, jsFilePath));
-
-  const componentDir = normalizePath(sys.path.dirname(cmpMeta.componentUrl));
-
-  if (cmpMeta.styleMeta) {
-    cmpMeta.styleMeta = Object.assign({}, cmpMeta.styleMeta);
-
-    const modeNames = Object.keys(cmpMeta.styleMeta);
-
-    modeNames.forEach(modeName => {
-      const cmpMode = cmpMeta.styleMeta[modeName];
-
-      if (cmpMode.parsedStyleUrls) {
-        cmpMode.styleUrls = cmpMode.parsedStyleUrls.map(parsedStyleUrl => {
-          parsedStyleUrl = normalizePath(parsedStyleUrl);
-
-          return sys.path.join(componentDir, parsedStyleUrl);
-        });
-      }
-    });
-  }
 }

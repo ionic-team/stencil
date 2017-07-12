@@ -1,5 +1,5 @@
 import { ComponentMeta, ComponentRegistry, MethodMeta, ListenMeta, LoadComponentRegistry,
-  Bundle, PropChangeMeta, PropMeta, StateMeta, StyleMeta } from './interfaces';
+  Bundle, PropChangeMeta, PropMeta, StateMeta, StylesMeta } from './interfaces';
 import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, HAS_SLOTS, HAS_NAMED_SLOTS, TYPE_NUMBER } from '../util/constants';
 
 
@@ -8,7 +8,7 @@ export function formatLoadComponentRegistry(cmpMeta: ComponentMeta, defaultAttrC
   const d: any[] = [
     cmpMeta.tagNameMeta.toUpperCase(),
     cmpMeta.moduleId,
-    formatStyles(cmpMeta.styleMeta),
+    formatStyles(cmpMeta.stylesMeta),
     formatSlot(cmpMeta.slotMeta),
     formatProps(cmpMeta.propsMeta, defaultAttrCase),
     cmpMeta.loadPriority
@@ -18,7 +18,7 @@ export function formatLoadComponentRegistry(cmpMeta: ComponentMeta, defaultAttrC
 }
 
 
-export function formatStyles(styleMeta: StyleMeta): any {
+export function formatStyles(styleMeta: StylesMeta): any {
   if (!styleMeta) {
     return 0;
   }

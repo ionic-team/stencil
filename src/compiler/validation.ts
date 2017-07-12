@@ -1,5 +1,5 @@
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
-import { BuildConfig, Bundle, BundlerConfig, Collection, Manifest } from './interfaces';
+import { BuildConfig, Bundle, Collection, Manifest } from './interfaces';
 import { normalizePath } from './util';
 
 
@@ -103,6 +103,8 @@ export function validateBuildConfig(buildConfig: BuildConfig) {
 
   buildConfig.generateCollection = !!buildConfig.generateCollection;
 
+  buildConfig.attrCase = normalizeAttrCase(buildConfig.attrCase);
+
   buildConfig.collections = buildConfig.collections || [];
   buildConfig.collections = buildConfig.collections.map(validateDependentCollection);
 
@@ -186,8 +188,6 @@ export function validateManifestBundles(manifest: Manifest) {
   manifest.components.forEach(c => {
     c.tagNameMeta = validateTag(c.tagNameMeta, `found in bundle component stencil config`);
   });
-
-  manifest.components.sort();
 }
 
 
@@ -232,11 +232,6 @@ export function validateTag(tag: string, suffix: string) {
   }
 
   return tag;
-}
-
-
-export function validateBundlerConfig(bundlerConfig: BundlerConfig) {
-  bundlerConfig.attrCase = normalizeAttrCase(bundlerConfig.attrCase);
 }
 
 

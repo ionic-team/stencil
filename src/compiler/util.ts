@@ -257,7 +257,7 @@ export function buildWarn(diagnostics: Diagnostic[]) {
 }
 
 
-export function catchError(diagnostics: Diagnostic[], err: any) {
+export function catchError(diagnostics: Diagnostic[], err: Error) {
   const d: Diagnostic = {
     level: 'error',
     type: 'build',
@@ -271,8 +271,14 @@ export function catchError(diagnostics: Diagnostic[], err: any) {
   if (err) {
     if (err.stack) {
       d.messageText = err.stack.toString();
+
     } else {
-      d.messageText = err.toString();
+      if (err.message) {
+        d.messageText = err.message.toString();
+
+      } else {
+        d.messageText = err.toString();
+      }
     }
   }
 

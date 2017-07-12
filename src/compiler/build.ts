@@ -1,5 +1,5 @@
 import { BuildConfig, Manifest } from '../util/interfaces';
-import { BuildContext, BuildResults, BundlerConfig, LoggerTimeSpan } from './interfaces';
+import { BuildContext, BuildResults, LoggerTimeSpan } from './interfaces';
 import { bundle } from './bundle';
 import { catchError } from './util';
 import { cleanDiagnostics } from './logger/logger-util';
@@ -7,7 +7,7 @@ import { compileSrcDir } from './compile';
 import { emptyDir, writeFiles } from './util';
 import { generateProjectFiles } from './build-project-files';
 import { generateHtmlDiagnostics } from './logger/generate-html-diagnostics';
-import { loadDependentManifests, mergeManifests, updateManifestUrls } from './manifest';
+import { loadDependentManifests, mergeManifests } from './manifest';
 import { optimizeHtml } from './optimize-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
@@ -115,24 +115,22 @@ function compileSrcPhase(buildConfig: BuildConfig, ctx: BuildContext, dependentM
       buildResults.diagnostics = buildResults.diagnostics.concat(compileResults.diagnostics);
     }
 
-    const resultsManifest: Manifest = compileResults.manifest || {};
+    // get the manifest created from this project's code
+    const projectManifest = compileResults.manifest || {};
+    projectManifest.bundles = buildConfig.bundles || [];
 
-    const localManifest = updateManifestUrls(
-      buildConfig,
-      resultsManifest,
-      buildConfig.collectionDest
-    );
-    return mergeManifests([].concat((localManifest || []), dependentManifests));
+    // merge this project's manifest with all of the dependent manifests
+    // to have one manifest to rule them all
+    const allManifests = [projectManifest].concat(dependentManifests || []);
+
+    // merge their data together
+    return mergeManifests(allManifests);
   });
 }
 
 
 function bundlePhase(buildConfig: BuildConfig, ctx: BuildContext, manifest: Manifest, buildResults: BuildResults) {
-  const bundlerConfig: BundlerConfig = {
-    manifest: manifest
-  };
-
-  return bundle(buildConfig, ctx, bundlerConfig).then(bundleResults => {
+  return bundle(buildConfig, ctx, manifest).then(bundleResults => {
     if (bundleResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(bundleResults.diagnostics);
     }

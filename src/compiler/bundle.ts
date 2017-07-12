@@ -1,13 +1,12 @@
-import { BuildConfig, BuildContext, BundleResults, BundlerConfig } from './interfaces';
+import { BuildConfig, BuildContext, BundleResults, Manifest } from './interfaces';
+import { bundleAssets } from './component-plugins/assets-plugin';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
-import { bundleAssets } from './component-plugins/assets-plugin';
 import { catchError } from './util';
 import { generateComponentRegistry } from './bundle-registry';
-import { validateBundlerConfig } from './validation';
 
 
-export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfig: BundlerConfig) {
+export function bundle(buildConfig: BuildConfig, ctx: BuildContext, manifest: Manifest) {
   const logger = buildConfig.logger;
 
   const bundleResults: BundleResults = {
@@ -19,13 +18,11 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
   logger.debug(`bundle, buildDest: ${buildConfig.buildDest}`);
 
   return Promise.resolve().then(() => {
-    validateBundlerConfig(bundlerConfig);
-
     // kick off style and module bundling at the same time
     return Promise.all([
-      bundleStyles(buildConfig, ctx, bundlerConfig.manifest),
-      bundleModules(buildConfig, ctx, bundlerConfig.manifest),
-      bundleAssets(buildConfig, ctx, bundlerConfig.manifest)
+      bundleStyles(buildConfig, ctx, manifest),
+      bundleModules(buildConfig, ctx, manifest),
+      bundleAssets(buildConfig, ctx, manifest)
     ]);
 
   }).then(results => {
@@ -45,7 +42,7 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, bundlerConfi
       bundleResults.diagnostics = bundleResults.diagnostics.concat(assetResults.diagnostics);
     }
 
-    bundleResults.componentRegistry = generateComponentRegistry(bundlerConfig, styleResults, moduleResults);
+    bundleResults.componentRegistry = generateComponentRegistry(buildConfig, manifest, styleResults, moduleResults);
 
   }).catch(err => {
     catchError(bundleResults.diagnostics, err);

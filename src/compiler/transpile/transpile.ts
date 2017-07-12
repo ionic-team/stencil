@@ -60,7 +60,7 @@ function transpileModules(buildConfig: BuildConfig, ctx: BuildContext, moduleFil
 
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
-      componentClass(ctx.moduleFiles, transpileResults.diagnostics),
+      componentClass(buildConfig, ctx.moduleFiles, transpileResults.diagnostics),
       removeImports(),
       updateLifecycleMethods()
     ],
@@ -104,7 +104,7 @@ function processIncludedStyles(buildConfig: BuildConfig, ctx: BuildContext, diag
     return Promise.resolve([]);
   }
 
-  if (!moduleFile.cmpMeta || !moduleFile.cmpMeta.styleMeta) {
+  if (!moduleFile.cmpMeta || !moduleFile.cmpMeta.stylesMeta) {
     // module isn't a component or the component doesn't have styles, so don't bother
     return Promise.resolve([]);
   }
@@ -113,18 +113,15 @@ function processIncludedStyles(buildConfig: BuildConfig, ctx: BuildContext, diag
 
   const promises: Promise<any>[] = [];
 
-  const modeNames = Object.keys(moduleFile.cmpMeta.styleMeta);
+  const modeNames = Object.keys(moduleFile.cmpMeta.stylesMeta);
   modeNames.forEach(modeName => {
-    const modeMeta = moduleFile.cmpMeta.styleMeta[modeName];
+    const modeMeta = moduleFile.cmpMeta.stylesMeta[modeName];
 
-    if (modeMeta.parsedStyleUrls) {
-      modeMeta.parsedStyleUrls.forEach(parsedStyleUrl => {
-        if (isSassSourceFile(parsedStyleUrl)) {
-          const scssFileName = sys.path.basename(parsedStyleUrl);
-          const scssFilePath = sys.path.join(sys.path.dirname(moduleFile.tsFilePath), scssFileName);
-
+    if (modeMeta.absStylePaths) {
+      modeMeta.absStylePaths.forEach(absoluteStylePath => {
+        if (isSassSourceFile(absoluteStylePath)) {
           promises.push(
-            getIncludedSassFiles(sys, diagnostics, moduleFile, scssFilePath)
+            getIncludedSassFiles(sys, diagnostics, moduleFile, absoluteStylePath)
           );
         }
       });

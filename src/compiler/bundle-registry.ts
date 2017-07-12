@@ -1,9 +1,9 @@
-import { BundlerConfig, ComponentRegistry, ModuleResults,
-  LoadComponentRegistry, StyleMeta, StylesResults } from './interfaces';
+import { BuildConfig, ComponentRegistry, Manifest, ModuleResults,
+  LoadComponentRegistry, StylesResults } from './interfaces';
 import { formatComponentRegistry } from '../util/data-serialize';
 
 
-export function generateComponentRegistry(bundlerConfig: BundlerConfig, styleResults: StylesResults, moduleResults: ModuleResults): LoadComponentRegistry[] {
+export function generateComponentRegistry(buildConfig: BuildConfig, manifest: Manifest, styleResults: StylesResults, moduleResults: ModuleResults): LoadComponentRegistry[] {
   const registry: ComponentRegistry = {};
 
   // create the minimal registry component data for each bundle
@@ -12,20 +12,19 @@ export function generateComponentRegistry(bundlerConfig: BundlerConfig, styleRes
     // separated by a period
     const components = bundleId.split('.');
     const styleResult = styleResults.bundles[bundleId];
-    let styleMeta: StyleMeta = null;
-
-    if (styleResult) {
-      Object.keys(styleResult).forEach(modeName => {
-        styleMeta = styleMeta || {};
-        styleMeta[modeName] = styleMeta[modeName] || {};
-        styleMeta[modeName].styleId = styleResult[modeName];
-      });
-    }
 
     components.forEach(tag => {
-      registry[tag] = registry[tag] || bundlerConfig.manifest.components.find(c => c.tagNameMeta === tag);
+      // merge up the style id to the style data
+      registry[tag] = registry[tag] || manifest.components.find(c => c.tagNameMeta === tag);
       if (registry[tag]) {
-        registry[tag].styleMeta = styleMeta;
+        registry[tag].stylesMeta = registry[tag].stylesMeta || {};
+
+        if (styleResult) {
+          Object.keys(styleResult).forEach(modeName => {
+            registry[tag].stylesMeta[modeName] = registry[tag].stylesMeta[modeName] || {};
+            registry[tag].stylesMeta[modeName].styleId = styleResult[modeName];
+          });
+        }
       }
     });
   });
@@ -36,12 +35,12 @@ export function generateComponentRegistry(bundlerConfig: BundlerConfig, styleRes
     const moduleId = moduleResults.bundles[bundleId];
 
     components.forEach(tag => {
-      registry[tag] = registry[tag] || bundlerConfig.manifest.components.find(c => c.tagNameMeta === tag);
+      registry[tag] = registry[tag] || manifest.components.find(c => c.tagNameMeta === tag);
       if (registry[tag]) {
         registry[tag].moduleId = moduleId;
       }
     });
   });
 
-  return formatComponentRegistry(registry, bundlerConfig.attrCase);
+  return formatComponentRegistry(registry, buildConfig.attrCase);
 }

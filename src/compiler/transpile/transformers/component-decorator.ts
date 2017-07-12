@@ -1,12 +1,12 @@
 import { buildError, catchError } from '../../util';
-import { ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../../interfaces';
+import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../../interfaces';
 import { normalizeStyles } from './normalize-styles';
 import { validateTag } from '../../validation';
 import { parseComponentMetadata as normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorData(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+export function getComponentDecoratorData(buildConfig: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
   let metaData: ComponentMeta = null;
 
   if (!classNode.decorators) {
@@ -25,7 +25,7 @@ export function getComponentDecoratorData(moduleFile: ModuleFileMeta, diagnostic
           isComponent = true;
 
         } else if (isComponent) {
-          metaData = parseComponentMetaData(moduleFile, diagnostics, componentChild.getText());
+          metaData = parseComponentMetaData(buildConfig, moduleFile, diagnostics, componentChild.getText());
         }
 
       });
@@ -37,7 +37,9 @@ export function getComponentDecoratorData(moduleFile: ModuleFileMeta, diagnostic
 }
 
 
-function parseComponentMetaData(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], text: string): ComponentMeta {
+function parseComponentMetaData(buildConfig: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], text: string): ComponentMeta {
+  let cmpMeta: ComponentMeta = null;
+
   try {
     const fnStr = `return ${text};`;
 
@@ -45,22 +47,23 @@ function parseComponentMetaData(moduleFile: ModuleFileMeta, diagnostics: Diagnos
     const userOpts: ComponentOptions = new Function(fnStr)();
 
     // convert user component options from user into component meta
-    const cmpMeta: ComponentMeta = {};
+    cmpMeta = {};
 
+    // normalize user data
     normalizeTag(moduleFile, diagnostics, userOpts, cmpMeta, text);
-    normalizeStyles(userOpts, cmpMeta);
+    normalizeStyles(buildConfig, userOpts, moduleFile, cmpMeta);
     normalizeShadow(userOpts, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
     normalizeAssetsDir(userOpts, cmpMeta);
 
-    return cmpMeta;
-
   } catch (e) {
+    // derp
     const d = catchError(diagnostics, e);
     d.absFilePath = moduleFile.tsFilePath;
     d.messageText = `${e}: ${text}`;
   }
-  return null;
+
+  return cmpMeta;
 }
 
 

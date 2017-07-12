@@ -11,8 +11,13 @@ export function cleanDiagnostics(diagnostics: Diagnostic[]) {
   });
 
   cleaned.forEach(d => {
-    if (typeof d.messageText === 'string' && d.messageText.indexOf('Error: ') === 0) {
-      d.messageText = d.messageText.substr(7);
+    if (d.messageText) {
+      if (typeof (<any>d.messageText).message === 'string') {
+        d.messageText = (<any>d.messageText).message;
+
+      } else if (typeof d.messageText === 'string' && d.messageText.indexOf('Error: ') === 0) {
+        d.messageText = d.messageText.substr(7);
+      }
     }
   });
 

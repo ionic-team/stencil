@@ -430,7 +430,7 @@ export interface ProjectRegistry {
 
 export interface Bundle {
   components: string[];
-  priority?: string;
+  priority?: number;
 }
 
 
@@ -458,6 +458,7 @@ export interface BuildConfig {
   preamble?: string;
   hashedFileNameLength?: number;
   suppressTypeScriptErrors?: boolean;
+  attrCase?: number;
 }
 
 
@@ -598,7 +599,7 @@ export interface ComponentMeta {
   tagNameMeta?: string;
   moduleId?: string;
   styleIds?: {[modeName: string]: string };
-  styleMeta?: StyleMeta;
+  stylesMeta?: StylesMeta;
   methodsMeta?: MethodMeta[];
   propsMeta?: PropMeta[];
   listenersMeta?: ListenMeta[];
@@ -612,21 +613,20 @@ export interface ComponentMeta {
   loadPriority?: number;
   componentModuleMeta?: any;
   componentClass?: string;
-  componentUrl?: string;
+  componentPath?: string;
+}
+
+
+export interface StylesMeta {
+  [modeName: string]: StyleMeta;
 }
 
 
 export interface StyleMeta {
-  [modeName: string]: ModeStyleMeta;
-}
-
-
-export interface ModeStyleMeta {
   styleId?: string;
-  parsedStyleUrls?: string[];
-  styleUrls?: string[];
+  absStylePaths?: string[];
+  cmpRelativeStylePaths?: string[];
   styleStr?: string;
-
 }
 
 

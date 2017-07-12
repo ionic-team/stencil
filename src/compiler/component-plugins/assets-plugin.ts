@@ -28,18 +28,18 @@ export function bundleAssets(buildConfig: BuildConfig, ctx: BuildContext, userMa
     diagnostics: []
   };
 
-  const doBundling = (!ctx.isChangeBuild);
+  const timeSpan = buildConfig.logger.createTimeSpan(`bundle assets started`, true);
 
-  const timeSpan = buildConfig.logger.createTimeSpan(`bundle assets started`, !doBundling);
+  const directoriesToCopy: string[] = userManifest.components
+    .filter(c => c.assetsDirsMeta && c.assetsDirsMeta.length)
+    .reduce((dirList, component) => {
+      const qualifiedPathDirs: string[] = component.assetsDirsMeta.map((dir: string) => {
+        const relativeCompUrl = buildConfig.sys.path.relative(buildConfig.collectionDest, component.componentPath);
+        return buildConfig.sys.path.resolve(buildConfig.src, relativeCompUrl, dir);
+      });
 
-  const directoriesToCopy: string[] = userManifest.components.reduce((dirList, component) => {
-    const qualifiedPathDirs: string[] = component.assetsDirsMeta.map((dir: string) => {
-      const relativeCompUrl = buildConfig.sys.path.relative(buildConfig.collectionDest, component.componentUrl);
-      return buildConfig.sys.path.resolve(buildConfig.src, relativeCompUrl, dir);
-    });
-
-    return dirList.concat(qualifiedPathDirs);
-  }, <string[]>[]);
+      return dirList.concat(qualifiedPathDirs);
+    }, <string[]>[]);
 
   const dirCopyPromises = directoriesToCopy.map((directory: string) => {
     return new Promise((resolve, reject) => {
@@ -53,6 +53,7 @@ export function bundleAssets(buildConfig: BuildConfig, ctx: BuildContext, userMa
     });
   });
 
+  ctx;
   // console.log(ctx.changedFiles);
 
   return Promise.all(dirCopyPromises).then(function() {

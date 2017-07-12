@@ -50,6 +50,14 @@ export function getTsHost(buildConfig: BuildConfig, ctx: BuildContext, tsCompile
         };
       }
 
+      if (moduleFile.cmpMeta) {
+        // if this module has component meta data, then
+        // also update the component meta's component path
+        // which should be an absolute url to the compiled js output file
+        moduleFile.cmpMeta.componentPath = jsFilePath;
+      }
+
+      // add this module to the list of files that were just transpiled
       transpileResults.moduleFiles[tsFilePath] = moduleFile;
     });
     writeByteOrderMark; onError;

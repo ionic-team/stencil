@@ -2,12 +2,6 @@ export * from '../util/interfaces';
 import { ComponentMeta, Diagnostic, FSWatcher, Manifest, LoadComponentRegistry } from '../util/interfaces';
 
 
-export interface BundlerConfig {
-  attrCase?: number;
-  manifest: Manifest;
-}
-
-
 export interface ModuleFileMeta {
   tsFilePath?: string;
   tsText?: string;

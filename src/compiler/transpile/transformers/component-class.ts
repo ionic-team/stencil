@@ -1,5 +1,5 @@
+import { BuildConfig, Diagnostic, ModuleFiles, ModuleFileMeta } from '../../interfaces';
 import { buildError } from '../../util';
-import { Diagnostic, ModuleFiles, ModuleFileMeta } from '../../interfaces';
 import { getComponentDecoratorData } from './component-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';
@@ -9,12 +9,12 @@ import { getStateDecoratorMeta } from './state-decorator';
 import * as ts from 'typescript';
 
 
-export function componentClass(moduleFiles: ModuleFiles, diagnostics: Diagnostic[]): ts.TransformerFactory<ts.SourceFile> {
+export function componentClass(buildConfig: BuildConfig, moduleFiles: ModuleFiles, diagnostics: Diagnostic[]): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
     function visitClass(moduleFile: ModuleFileMeta, classNode: ts.ClassDeclaration) {
-      const cmpMeta = getComponentDecoratorData(moduleFile, diagnostics, classNode);
+      const cmpMeta = getComponentDecoratorData(buildConfig, moduleFile, diagnostics, classNode);
 
       if (cmpMeta) {
         if (moduleFile.cmpMeta) {

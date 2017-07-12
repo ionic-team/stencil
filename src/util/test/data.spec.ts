@@ -288,7 +288,7 @@ describe('data serialize/parse', () => {
     });
 
     it('should set all of the modes', () => {
-      cmpMeta.styleMeta = {
+      cmpMeta.stylesMeta = {
         ios: { styleId: 'abc' },
         md: { styleId: 'def' }
       };
