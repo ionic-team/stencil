@@ -1,3 +1,7 @@
+import {
+  AnchorHTMLAttributes,
+  HTMLAttributes
+} from './jsx-interfaces';
 
 export interface Ionic {
   emit: EventEmit;
@@ -1115,7 +1119,128 @@ declare global {
     }
     interface IntrinsicElements {
       // HTML
+      a: AnchorHTMLAttributes;
+      abbr: HTMLAttributes;
+      address
+      area
+      article
+        abbr:HTMLAttributes<HTMLElement>, HTMLElement>;
+        address: HTMLElement>, HTMLElement>;
+        area: <AreaHTMLAttributes<HTMLAreaElement>, HTMLAreaElement>;
+        article: HTMLElement>, HTMLElement>;
+        aside: HTMLElement>, HTMLElement>;
+        audio: <AudioHTMLAttributes<HTMLAudioElement>, HTMLAudioElement>;
+        b: HTMLElement>, HTMLElement>;
+        base: <BaseHTMLAttributes<HTMLBaseElement>, HTMLBaseElement>;
+        bdi: HTMLElement>, HTMLElement>;
+        bdo: HTMLElement>, HTMLElement>;
+        big: HTMLElement>, HTMLElement>;
+        blockquote: <BlockquoteHTMLAttributes<HTMLElement>, HTMLElement>;
+        body: <HTMLAttributes<HTMLBodyElement>, HTMLBodyElement>;
+        br: <HTMLAttributes<HTMLBRElement>, HTMLBRElement>;
+        button: <ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
+        canvas: <CanvasHTMLAttributes<HTMLCanvasElement>, HTMLCanvasElement>;
+        caption: HTMLElement>, HTMLElement>;
+        cite: HTMLElement>, HTMLElement>;
+        code: HTMLElement>, HTMLElement>;
+        col: <ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
+        colgroup: <ColgroupHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
+        data: HTMLElement>, HTMLElement>;
+        datalist: <HTMLAttributes<HTMLDataListElement>, HTMLDataListElement>;
+        dd: HTMLElement>, HTMLElement>;
+        del: <DelHTMLAttributes<HTMLElement>, HTMLElement>;
+        details: <DetailsHTMLAttributes<HTMLElement>, HTMLElement>;
+        dfn: HTMLElement>, HTMLElement>;
+        dialog: HTMLElement>, HTMLElement>;
+        div: <HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+        dl: <HTMLAttributes<HTMLDListElement>, HTMLDListElement>;
+        dt: HTMLElement>, HTMLElement>;
+        em: HTMLElement>, HTMLElement>;
+        embed: <EmbedHTMLAttributes<HTMLEmbedElement>, HTMLEmbedElement>;
+        fieldset: <FieldsetHTMLAttributes<HTMLFieldSetElement>, HTMLFieldSetElement>;
+        figcaption: HTMLElement>, HTMLElement>;
+        figure: HTMLElement>, HTMLElement>;
+        footer: HTMLElement>, HTMLElement>;
+        form: <FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>;
+        h1: <HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+        h2: <HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+        h3: <HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+        h4: <HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+        h5: <HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+        h6: <HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+        head: HTMLElement>, HTMLHeadElement>;
+        header: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        hgroup: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        hr: <HTMLAttributes<HTMLHRElement>, HTMLHRElement>;
+        html: <HtmlHTMLAttributes<HTMLHtmlElement>, HTMLHtmlElement>;
+        i: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        iframe: <IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>;
+        img: <ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
+        input: <InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+        ins: <InsHTMLAttributes<HTMLModElement>, HTMLModElement>;
+        kbd: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        keygen: <KeygenHTMLAttributes<HTMLElement>, HTMLElement>;
+        label: <LabelHTMLAttributes<HTMLLabelElement>, HTMLLabelElement>;
+        legend: <HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>;
+        li: <LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>;
+        link: <LinkHTMLAttributes<HTMLLinkElement>, HTMLLinkElement>;
+        main: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        map: <MapHTMLAttributes<HTMLMapElement>, HTMLMapElement>;
+        mark: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        menu: <MenuHTMLAttributes<HTMLElement>, HTMLElement>;
+        menuitem: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        meta: <MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>;
+        meter: <MeterHTMLAttributes<HTMLElement>, HTMLElement>;
+        nav: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        noscript: <HTMLAttributes<HTMLElement>, HTMLElement>;
+        object: <ObjectHTMLAttributes<HTMLObjectElement>, HTMLObjectElement>;
+        ol: <OlHTMLAttributes<HTMLOListElement>, HTMLOListElement>;
+        optgroup: <OptgroupHTMLAttributes<HTMLOptGroupElement>, HTMLOptGroupElement>;
+        option: <OptionHTMLAttributes<HTMLOptionElement>, HTMLOptionElement>;
+        output: <OutputHTMLAttributes<HTMLElement>, HTMLElement>;
+        p: <HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>;
+        param: <ParamHTMLAttributes<HTMLParamElement>, HTMLParamElement>;
+        picture: HTMLElement>, HTMLElement>;
+        pre: <HTMLAttributes<HTMLPreElement>, HTMLPreElement>;
+        progress: <ProgressHTMLAttributes<HTMLProgressElement>, HTMLProgressElement>;
+        q: <QuoteHTMLAttributes<HTMLQuoteElement>, HTMLQuoteElement>;
+        rp: HTMLElement>, HTMLElement>;
+        rt: HTMLElement>, HTMLElement>;
+        ruby: HTMLElement>, HTMLElement>;
+        s: HTMLElement>, HTMLElement>;
+        samp: HTMLElement>, HTMLElement>;
+        script: <ScriptHTMLAttributes<HTMLScriptElement>, HTMLScriptElement>;
+        section: HTMLElement>, HTMLElement>;
+        select: <SelectHTMLAttributes<HTMLSelectElement>, HTMLSelectElement>;
+        small: HTMLElement>, HTMLElement>;
+        source: <SourceHTMLAttributes<HTMLSourceElement>, HTMLSourceElement>;
+        span: <HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
+        strong: HTMLElement>, HTMLElement>;
+        style: <StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>;
+        sub: HTMLElement>, HTMLElement>;
+        summary: HTMLElement>, HTMLElement>;
+        sup: HTMLElement>, HTMLElement>;
+        table: <TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
+        tbody: <HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+        td: <TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
+        textarea: <TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
+        tfoot: <HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+        th: <ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement>;
+        thead: <HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+        time: <TimeHTMLAttributes<HTMLElement>, HTMLElement>;
+        title: <HTMLAttributes<HTMLTitleElement>, HTMLTitleElement>;
+        tr: <HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
+        track: <TrackHTMLAttributes<HTMLTrackElement>, HTMLTrackElement>;
+        u: HTMLElement>, HTMLElement>;
+        ul: <HTMLAttributes<HTMLUListElement>, HTMLUListElement>;
+        "var": HTMLAttributes;
+        video: <VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>;
+        wbr: HTMLAttributes;
+
+
+
       [elemName: string]: any;
     }
   }
 }
+
