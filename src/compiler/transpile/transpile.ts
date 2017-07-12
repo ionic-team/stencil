@@ -1,7 +1,7 @@
 import { BuildConfig, BuildContext, Diagnostic, ModuleFileMeta, ModuleFiles, StencilSystem, TranspileResults } from '../interfaces';
 import { buildError, catchError, isSassSourceFile, normalizePath } from '../util';
 import { componentClass } from './transformers/component-class';
-import { getTsHost, getTsFileNamesToCompile } from './compiler-host';
+import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
 import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { loadTypeScriptDiagnostics } from '../logger/logger-typescript';
@@ -54,7 +54,7 @@ function transpileModules(buildConfig: BuildConfig, ctx: BuildContext, moduleFil
 
   const tsHost = getTsHost(buildConfig, ctx, tsOptions.options, transpileResults);
 
-  const tsFileNames = getTsFileNamesToCompile(buildConfig, moduleFiles);
+  const tsFileNames = Object.keys(moduleFiles);
 
   const program = ts.createProgram(tsFileNames, tsOptions.options, tsHost);
 

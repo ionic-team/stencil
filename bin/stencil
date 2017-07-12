@@ -127,12 +127,6 @@ buildConfig.sys = Object.defineProperties({
                 .toLowerCase();
   },
 
-  getCompilerTypes: function getCompilerTypes() {
-    return [
-      path.join(__dirname, '..', 'dist', 'compiler', 'types', 'jsx.d.ts')
-    ];
-  },
-
   copyDir: function copyDir(source, dest, callback) {
     var copyDir = require('./copy-directory');
     copyDir(source, dest, {}, callback);

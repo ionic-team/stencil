@@ -1012,7 +1012,6 @@ export interface StencilSystem {
   };
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
-  getCompilerTypes?(): string[];
   rmDir?(path: string, options: { [key: string]: any }, callback: (err: any) => void): void;
   copyDir?(src: string, dest: string, callback: (err: any) => void): void;
   minifyCss?(input: string): {

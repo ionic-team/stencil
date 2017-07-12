@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, ModuleFileMeta, ModuleFiles, TranspileResults } from '../interfaces';
+import { BuildConfig, BuildContext, ModuleFileMeta, TranspileResults } from '../interfaces';
 import { normalizePath, readFile } from '../util';
 import * as ts from 'typescript';
 
@@ -136,18 +136,4 @@ export function moduleFileExistsSync(buildConfig: BuildConfig, ctx: BuildContext
 
   const module = getModuleFileSync(buildConfig, ctx, tsFilePath);
   return (typeof module.tsText === 'string');
-}
-
-
-export function getTsFileNamesToCompile(buildConfig: BuildConfig, moduleFiles: ModuleFiles) {
-  const fileNames = Object.keys(moduleFiles);
-
-  if (buildConfig.suppressTypeScriptErrors) {
-    // mainly for testing
-    return fileNames;
-  }
-
-  const compilerTypes = buildConfig.sys.getCompilerTypes();
-
-  return fileNames.concat(compilerTypes);
 }

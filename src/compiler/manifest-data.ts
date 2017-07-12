@@ -109,7 +109,7 @@ export function parseComponent(buildConfig: BuildConfig, manifestDir: string, cm
   parseTag(cmpData, cmpMeta);
   parseComponentPath(buildConfig, manifestDir, cmpData, cmpMeta);
   parseComponentClass(cmpData, cmpMeta);
-  parseStyles(cmpData, cmpMeta);
+  parseStyles(buildConfig, manifestDir, cmpData, cmpMeta);
   parseProps(cmpData, cmpMeta);
   parseWillPropChange(cmpData, cmpMeta);
   parseDidPropChange(cmpData, cmpMeta);
@@ -167,14 +167,14 @@ function serializeStyles(buildConfig: BuildConfig, compiledComponentRelativeDirP
   }
 }
 
-function parseStyles(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseStyles(buildConfig: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const stylesData = cmpData.styles;
 
   cmpMeta.stylesMeta = {};
 
   if (stylesData) {
     Object.keys(stylesData).forEach(modeName => {
-      cmpMeta.stylesMeta[modeName.toLowerCase()] = parseStyle(stylesData[modeName.toLowerCase()]);
+      cmpMeta.stylesMeta[modeName.toLowerCase()] = parseStyle(buildConfig, manifestDir, stylesData[modeName.toLowerCase()]);
     });
   }
 }
@@ -204,9 +204,9 @@ function serializeStyle(buildConfig: BuildConfig, compiledComponentRelativeDirPa
   return modeStyleData;
 }
 
-function parseStyle(modeStyleData: StyleData) {
+function parseStyle(buildConfig: BuildConfig, manifestDir: string, modeStyleData: StyleData) {
   const modeStyle: StyleMeta = {
-    absStylePaths: modeStyleData.stylePaths,
+    absStylePaths: modeStyleData.stylePaths.map(stylePath => buildConfig.sys.path.join(manifestDir, stylePath)),
     styleStr: modeStyleData.style
   };
   return modeStyle;
