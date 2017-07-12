@@ -40,7 +40,6 @@ export interface ProjectNamespace {
   DomCtrl?: DomControllerApi;
   QueueCtrl?: QueueApi;
   Animation?: any;
-  ns?: string;
 }
 
 
@@ -446,7 +445,7 @@ export interface BuildConfig {
   collectionDest?: string;
   indexSrc?: string;
   indexDest?: string;
-  diagnosticsDest?: string;
+  staticBuildDir?: string;
   generateCollection?: boolean;
   bundles?: Bundle[];
   collections?: Collection[];

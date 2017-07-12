@@ -3,115 +3,114 @@ import { BuildConfig, Bundle, Collection, Manifest } from './interfaces';
 import { normalizePath } from './util';
 
 
-export function validateBuildConfig(buildConfig: BuildConfig) {
-  if (!buildConfig) {
+export function validateBuildConfig(config: BuildConfig) {
+  if (!config) {
     throw new Error(`invalid build config`);
   }
-  if (!buildConfig.rootDir) {
+  if (!config.rootDir) {
     throw new Error('config.rootDir required');
   }
-  if (!buildConfig.logger) {
+  if (!config.logger) {
     throw new Error(`config.logger required`);
   }
-  if (!buildConfig.sys) {
+  if (!config.sys) {
     throw new Error('config.sys required');
   }
 
-  if (typeof buildConfig.namespace !== 'string') {
-    buildConfig.namespace = DEFAULT_NAMESPACE;
+  if (typeof config.namespace !== 'string') {
+    config.namespace = DEFAULT_NAMESPACE;
   }
 
-  if (typeof buildConfig.src !== 'string') {
-    buildConfig.src = DEFAULT_SRC;
+  if (typeof config.src !== 'string') {
+    config.src = DEFAULT_SRC;
   }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.src)) {
-    buildConfig.src = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.src));
-  }
-
-  if (typeof buildConfig.buildDest !== 'string') {
-    buildConfig.buildDest = DEFAULT_BUILD_DEST;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.buildDest)) {
-    buildConfig.buildDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.buildDest));
+  if (!config.sys.path.isAbsolute(config.src)) {
+    config.src = normalizePath(config.sys.path.join(config.rootDir, config.src));
   }
 
-  if (typeof buildConfig.collectionDest !== 'string') {
-    buildConfig.collectionDest = DEFAULT_COLLECTION_DEST;
+  if (typeof config.buildDest !== 'string') {
+    config.buildDest = DEFAULT_BUILD_DEST;
   }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.collectionDest)) {
-    buildConfig.collectionDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.collectionDest));
-  }
-
-  if (typeof buildConfig.indexSrc !== 'string') {
-    buildConfig.indexSrc = DEFAULT_INDEX_SRC;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexSrc)) {
-    buildConfig.indexSrc = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexSrc));
+  if (!config.sys.path.isAbsolute(config.buildDest)) {
+    config.buildDest = normalizePath(config.sys.path.join(config.rootDir, config.buildDest));
   }
 
-  if (typeof buildConfig.indexDest !== 'string') {
-    buildConfig.indexDest = DEFAULT_INDEX_DEST;
+  if (typeof config.collectionDest !== 'string') {
+    config.collectionDest = DEFAULT_COLLECTION_DEST;
   }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.indexDest)) {
-    buildConfig.indexDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.indexDest));
-  }
-
-  if (typeof buildConfig.diagnosticsDest !== 'string') {
-    buildConfig.diagnosticsDest = DEFAULT_DIAGNOSTICS_DEST;
-  }
-  if (!buildConfig.sys.path.isAbsolute(buildConfig.diagnosticsDest)) {
-    buildConfig.diagnosticsDest = normalizePath(buildConfig.sys.path.join(buildConfig.rootDir, buildConfig.diagnosticsDest));
+  if (!config.sys.path.isAbsolute(config.collectionDest)) {
+    config.collectionDest = normalizePath(config.sys.path.join(config.rootDir, config.collectionDest));
   }
 
-  if (typeof buildConfig.devMode !== 'boolean') {
-    buildConfig.devMode = true;
+  if (typeof config.indexSrc !== 'string') {
+    config.indexSrc = DEFAULT_INDEX_SRC;
   }
-  buildConfig.devMode = !!buildConfig.devMode;
-
-  if (typeof buildConfig.watch !== 'boolean') {
-    buildConfig.watch = false;
+  if (!config.sys.path.isAbsolute(config.indexSrc)) {
+    config.indexSrc = normalizePath(config.sys.path.join(config.rootDir, config.indexSrc));
   }
-  buildConfig.watch = !!buildConfig.watch;
 
-  if (typeof buildConfig.minifyCss !== 'boolean') {
+  if (typeof config.indexDest !== 'string') {
+    config.indexDest = DEFAULT_INDEX_DEST;
+  }
+  if (!config.sys.path.isAbsolute(config.indexDest)) {
+    config.indexDest = normalizePath(config.sys.path.join(config.rootDir, config.indexDest));
+  }
+
+  if (typeof config.staticBuildDir !== 'string') {
+    // this is reference to the public static build directory from the client
+    // in most cases it's just "build", as in index page would end up requesting `build/app/app.js`
+    config.staticBuildDir = normalizePath(config.sys.path.relative(config.indexDest, config.buildDest));
+  }
+
+  if (typeof config.devMode !== 'boolean') {
+    config.devMode = true;
+  }
+  config.devMode = !!config.devMode;
+
+  if (typeof config.watch !== 'boolean') {
+    config.watch = false;
+  }
+  config.watch = !!config.watch;
+
+  if (typeof config.minifyCss !== 'boolean') {
     // if no config, minify css when it's the prod build
-    buildConfig.minifyCss = (!buildConfig.devMode);
+    config.minifyCss = (!config.devMode);
   }
 
-  if (typeof buildConfig.minifyJs !== 'boolean') {
+  if (typeof config.minifyJs !== 'boolean') {
     // if no config, minify js when it's the prod build
-    buildConfig.minifyJs = (!buildConfig.devMode);
+    config.minifyJs = (!config.devMode);
   }
 
-  if (typeof buildConfig.hashFileNames !== 'boolean') {
+  if (typeof config.hashFileNames !== 'boolean') {
     // hashFileNames config was not provided, so let's create the default
 
-    if (buildConfig.devMode || buildConfig.watch) {
+    if (config.devMode || config.watch) {
       // dev mode should not hash filenames
       // during watch rebuilds it should not hash filenames
-      buildConfig.hashFileNames = false;
+      config.hashFileNames = false;
 
     } else {
       // prod builds should hash filenames
-      buildConfig.hashFileNames = true;
+      config.hashFileNames = true;
     }
   }
 
-  if (typeof buildConfig.hashedFileNameLength !== 'number') {
-    buildConfig.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
+  if (typeof config.hashedFileNameLength !== 'number') {
+    config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
-  buildConfig.generateCollection = !!buildConfig.generateCollection;
+  config.generateCollection = !!config.generateCollection;
 
-  buildConfig.attrCase = normalizeAttrCase(buildConfig.attrCase);
+  config.attrCase = validateAttrCase(config.attrCase);
 
-  buildConfig.collections = buildConfig.collections || [];
-  buildConfig.collections = buildConfig.collections.map(validateDependentCollection);
+  config.collections = config.collections || [];
+  config.collections = config.collections.map(validateDependentCollection);
 
-  buildConfig.bundles = buildConfig.bundles || [];
-  buildConfig.exclude = buildConfig.exclude || DEFAULT_EXCLUDES;
+  config.bundles = config.bundles || [];
+  config.exclude = config.exclude || DEFAULT_EXCLUDES;
 
-  return buildConfig;
+  return config;
 }
 
 
@@ -235,7 +234,7 @@ export function validateTag(tag: string, suffix: string) {
 }
 
 
-function normalizeAttrCase(attrCase: any) {
+export function validateAttrCase(attrCase: any) {
   if (attrCase === ATTR_LOWER_CASE || attrCase === ATTR_DASH_CASE) {
     // already using a valid attr case value
     return attrCase;
@@ -260,7 +259,6 @@ const DEFAULT_SRC = 'src';
 const DEFAULT_BUILD_DEST = 'www/build';
 const DEFAULT_INDEX_SRC = 'src/index.html';
 const DEFAULT_INDEX_DEST = 'www/index.html';
-const DEFAULT_DIAGNOSTICS_DEST = 'www/.dev-diagnostics.html';
 const DEFAULT_COLLECTION_DEST = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 12;

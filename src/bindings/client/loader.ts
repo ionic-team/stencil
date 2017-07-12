@@ -7,7 +7,6 @@ import { LoadComponentRegistry, ProjectNamespace } from '../../util/interfaces';
   // create global namespace if it doesn't already exist
   const Project: ProjectNamespace = window[projectNamespace] = window[projectNamespace] || {};
   Project.components = Project.components || components;
-  Project.ns = projectNamespace;
 
   // find the static directory, which should be the same as this JS file
   // reusing the "x" and "y" variables for funzies
