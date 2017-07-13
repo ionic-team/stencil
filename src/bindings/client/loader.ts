@@ -1,48 +1,33 @@
 import { LoadComponentRegistry, ProjectNamespace } from '../../util/interfaces';
 
 
-(function(window: any, document: HTMLDocument, projectNamespace: string, projectFileName?: string, projectCore?: string, projectCoreEs5?: string, components?: LoadComponentRegistry[]) {
+(function(window: any, document: HTMLDocument, projectNamespace: string, projectCore?: string, projectCoreEs5?: string, components?: LoadComponentRegistry[], x?: any) {
   'use strict';
 
   // create global namespace if it doesn't already exist
-  const Project: ProjectNamespace = window[projectNamespace] = window[projectNamespace] || {};
-  Project.components = Project.components || components;
-
-  // find the static directory, which should be the same as this JS file
-  // reusing the "x" and "y" variables for funzies
-  var x: any = document.getElementsByTagName('script');
-  x = x[x.length - 1];
-
-  var y: any = <HTMLElement>document.querySelector('script[data-static-dir]');
-  if (y) {
-    Project.staticDir = y.dataset['staticDir'];
-
-  } else {
-    y = x.src.split('/');
-    y.pop();
-    Project.staticDir = x.dataset['staticDir'] = y.join('/') + '/';
-  }
-  Project.staticDir += projectFileName + '/';
+  components = components || [];
+  (window[projectNamespace] = window[projectNamespace] || {}).components = components;
 
   // auto hide components until they been fully hydrated
+  // reusing the "x" variable from the args for funzies
   x = document.createElement('style');
-  x.innerHTML = Project.components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.hydrated{visibility:inherit}';
+  x.innerHTML = components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.hydrated{visibility:inherit}';
   x.innerHTML += 'ion-app:not(.hydrated){display:none}';
   document.head.appendChild(x);
 
   // request the core file this browser needs
-  y = document.createElement('script');
-  y.src = Project.staticDir + (window.customElements ? projectCore : projectCoreEs5);
-  document.head.appendChild(y);
+  x = document.createElement('script');
+  x.src = (window.customElements ? projectCore : projectCoreEs5);
+  document.head.appendChild(x);
 
   // performance.now() polyfill
   if ('performance' in window === false) {
     window.performance = {};
   }
   if ('now' in performance === false) {
-    var navStart = Date.now();
+    x = Date.now();
     performance.now = function() {
-      return Date.now() - navStart;
+      return Date.now() - x;
     };
   }
 })(

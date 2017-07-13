@@ -92,7 +92,7 @@ function bundleClientCore(coreEntryFile, outputDevFile, outputProdFile, es6Class
 function generateClientCoreDev(bundle, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode) {
   var clientCore = bundle.generate({
     format: 'es',
-    intro: '(function(window, document, globalNamespace) {\n"use strict";\n',
+    intro: '(function(window, document, globalNamespace, staticBuildDir) {\n"use strict";\n',
     outro: '})(window, document, "' + STENCIL_GLOBAL_NAMESPACE + '");'
   });
 

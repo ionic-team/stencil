@@ -10,7 +10,7 @@ import { initGlobal } from './global-server';
 import { parseComponentMeta } from '../../util/data-parse';
 
 
-export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi): PlatformApi {
+export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, dom: DomControllerApi, staticBuildDir: string): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
@@ -122,7 +122,7 @@ export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, 
       }
 
       // create the module filePath we'll be reading
-      const moduleFilePath = sys.path.join(Gbl.staticDir, `${moduleId}.js`);
+      const moduleFilePath = sys.path.join(staticBuildDir, `${moduleId}.js`);
 
       if (!pendingModuleFileReads[moduleFilePath]) {
         // not already actively reading this file
@@ -150,7 +150,7 @@ export function createPlatformServer(sys: StencilSystem, Gbl: ProjectNamespace, 
         // this style hasn't been added to our collection yet
 
         // create the style filePath we'll be reading
-        const styleFilePath = sys.path.join(Gbl.staticDir, `${styleId}.js`);
+        const styleFilePath = sys.path.join(staticBuildDir, `${styleId}.js`);
 
         if (!pendingStyleFileReads[styleFilePath]) {
           // we're not already actively opening this file

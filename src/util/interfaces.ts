@@ -30,7 +30,6 @@ export interface IonicControllerApi {
 
 
 export interface ProjectNamespace {
-  staticDir?: string;
   components?: LoadComponentRegistry[];
   defineComponents?: (moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
   eventNameFn?: (eventName: string) => string;
@@ -1108,6 +1107,7 @@ export interface HydrateOptions {
   config?: Object;
   removeUnusedCss?: boolean;
   reduceHtmlWhitepace?: boolean;
+  staticBuildDir?: string;
 }
 
 declare global {

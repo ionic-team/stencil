@@ -23,7 +23,7 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
   const platforms = detectPlatforms(opts.url, opts.userAgent, PLATFORM_CONFIGS, 'core');
 
   // create the global namespace which singletons go on
-  const Glb = initGlobalNamespace(opts.config, platforms, staticDir);
+  const Glb = initGlobalNamespace(opts.config, platforms);
 
   // create a emulated window
   // attach data the request to the window
@@ -40,7 +40,7 @@ export function hydrateHtml(sys: StencilSystem, staticDir: string, registry: Com
   const domApi = createDomApi(win.document);
 
   // create the platform for this hydrate
-  const plt = createPlatformServer(sys, Glb, <any>win, domApi, Glb.ConfigCtrl, Glb.DomCtrl);
+  const plt = createPlatformServer(sys, Glb, <any>win, domApi, Glb.ConfigCtrl, Glb.DomCtrl, opts.staticBuildDir);
 
   // fully define each of our components onto this new platform instance
   registeredTags.forEach(tag => {

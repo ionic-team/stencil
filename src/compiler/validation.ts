@@ -17,6 +17,8 @@ export function validateBuildConfig(config: BuildConfig) {
     throw new Error('config.sys required');
   }
 
+  const path = config.sys.path;
+
   if (typeof config.namespace !== 'string') {
     config.namespace = DEFAULT_NAMESPACE;
   }
@@ -24,42 +26,44 @@ export function validateBuildConfig(config: BuildConfig) {
   if (typeof config.src !== 'string') {
     config.src = DEFAULT_SRC;
   }
-  if (!config.sys.path.isAbsolute(config.src)) {
-    config.src = normalizePath(config.sys.path.join(config.rootDir, config.src));
+  if (!path.isAbsolute(config.src)) {
+    config.src = normalizePath(path.join(config.rootDir, config.src));
   }
 
   if (typeof config.buildDest !== 'string') {
     config.buildDest = DEFAULT_BUILD_DEST;
   }
-  if (!config.sys.path.isAbsolute(config.buildDest)) {
-    config.buildDest = normalizePath(config.sys.path.join(config.rootDir, config.buildDest));
+  if (!path.isAbsolute(config.buildDest)) {
+    config.buildDest = normalizePath(path.join(config.rootDir, config.buildDest));
   }
 
   if (typeof config.collectionDest !== 'string') {
     config.collectionDest = DEFAULT_COLLECTION_DEST;
   }
-  if (!config.sys.path.isAbsolute(config.collectionDest)) {
-    config.collectionDest = normalizePath(config.sys.path.join(config.rootDir, config.collectionDest));
+  if (!path.isAbsolute(config.collectionDest)) {
+    config.collectionDest = normalizePath(path.join(config.rootDir, config.collectionDest));
   }
 
   if (typeof config.indexSrc !== 'string') {
     config.indexSrc = DEFAULT_INDEX_SRC;
   }
-  if (!config.sys.path.isAbsolute(config.indexSrc)) {
-    config.indexSrc = normalizePath(config.sys.path.join(config.rootDir, config.indexSrc));
+  if (!path.isAbsolute(config.indexSrc)) {
+    config.indexSrc = normalizePath(path.join(config.rootDir, config.indexSrc));
   }
 
   if (typeof config.indexDest !== 'string') {
     config.indexDest = DEFAULT_INDEX_DEST;
   }
-  if (!config.sys.path.isAbsolute(config.indexDest)) {
-    config.indexDest = normalizePath(config.sys.path.join(config.rootDir, config.indexDest));
+  if (!path.isAbsolute(config.indexDest)) {
+    config.indexDest = normalizePath(path.join(config.rootDir, config.indexDest));
   }
 
   if (typeof config.staticBuildDir !== 'string') {
     // this is reference to the public static build directory from the client
     // in most cases it's just "build", as in index page would end up requesting `build/app/app.js`
-    config.staticBuildDir = normalizePath(config.sys.path.relative(config.indexDest, config.buildDest));
+    config.staticBuildDir = normalizePath(
+      path.relative(path.dirname(config.indexDest), config.buildDest)
+    );
   }
 
   if (typeof config.devMode !== 'boolean') {

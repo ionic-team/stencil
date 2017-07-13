@@ -11,7 +11,7 @@ import { parseComponentMeta, parseComponentRegistry } from '../../util/data-pars
 import { SSR_VNODE_ID } from '../../util/constants';
 
 
-export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticDir: string): PlatformApi {
+export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, staticBuildDir: string): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
@@ -132,7 +132,7 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
       }
 
       // create the url we'll be requesting
-      const url = getBundlePath(`${moduleId}.js`);
+      const url = `${staticBuildDir}${moduleId}.js`;
 
       if (!pendingModuleRequests[url]) {
         // not already actively requesting this url
@@ -151,16 +151,11 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
 
         // append this link element to the head, which starts the request for the file
         const linkElm = domApi.$createElement('link');
-        linkElm.href = getBundlePath(`${styleId}.css`);
+        linkElm.href = `${staticBuildDir}${styleId}.css`;
         linkElm.rel = 'stylesheet';
         domApi.$insertBefore(domApi.$head, linkElm, domApi.$head.firstChild);
       }
     }
-  }
-
-
-  function getBundlePath(fileName: string) {
-    return `${staticDir}${fileName}`;
   }
 
 

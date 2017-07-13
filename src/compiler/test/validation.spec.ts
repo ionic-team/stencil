@@ -98,7 +98,7 @@ describe('validation', () => {
 
     it('should set default staticBuildDir and convert to relative path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.staticBuildDir)).toBe('build');
+      expect(config.staticBuildDir).toBe('build');
       expect(path.isAbsolute(config.staticBuildDir)).toBe(false);
     });
 

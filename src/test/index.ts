@@ -23,7 +23,7 @@ export function mockPlatform(IonicGbl?: ProjectNamespace) {
   const win = sys.createDom().parse({html: ''});
   const domApi = createDomApi(win.document);
 
-  const plt = createPlatformServer(sys, IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+  const plt = createPlatformServer(sys, IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl, 'build');
 
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();
@@ -61,7 +61,7 @@ export function mockIonicGlobal(config?: ConfigApi): ProjectNamespace {
   if (!config) {
     config = mockConfig({}, []);
   }
-  const IonicGbl: ProjectNamespace = initGlobalNamespace(config, [], '');
+  const IonicGbl: ProjectNamespace = initGlobalNamespace(config, []);
   return IonicGbl;
 }
 

@@ -9,6 +9,7 @@ import { PLATFORM_CONFIGS } from '../../core/platform/platform-configs';
 
 
 declare const globalNamespace: string;
+declare const staticBuildDir: string;
 
 const Gbl: ProjectNamespace = (<any>window)[globalNamespace] = (<any>window)[globalNamespace] || {};
 
@@ -21,7 +22,7 @@ const plt = createPlatformClient(
   createConfigController(Gbl.config, detectPlatforms(window.location.href, window.navigator.userAgent, PLATFORM_CONFIGS, 'core')),
   domCtrl,
   createQueueClient(domCtrl),
-  Gbl.staticDir
+  staticBuildDir
 );
 
 plt.registerComponents(Gbl.components).forEach(cmpMeta => {

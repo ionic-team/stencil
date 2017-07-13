@@ -45,7 +45,7 @@ export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
 }
 
 
-export function initGlobalNamespace(configObj: any, platforms: PlatformConfig[], staticDir: string) {
+export function initGlobalNamespace(configObj: any, platforms: PlatformConfig[]) {
   const IonicGbl: ProjectNamespace = {
     ConfigCtrl: createConfigController(configObj, platforms),
     DomCtrl: {
@@ -55,7 +55,6 @@ export function initGlobalNamespace(configObj: any, platforms: PlatformConfig[],
       now: function() { return Date.now(); },
     },
     QueueCtrl: QueueServer(),
-    staticDir: staticDir,
     controllers: {}
   };
 
