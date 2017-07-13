@@ -30,7 +30,7 @@
     "transpile.compiler": "tsc -p src/compiler/tsconfig.json",
     "transpile.core": "tsc -p src/tsconfig.json",
     "transpile.watch": "tsc -p src/compiler/tsconfig.json -w & tsc -p src/tsconfig.json -w",
-    "publish.nightly": "np prerelease --no-yarn --tag=nightly"
+    "publish": "np"
   },
   "dependencies": {
     "chalk": "^1.1.3",
