@@ -42,11 +42,19 @@ export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 
 
 function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileResults) {
-  const tsOptions = getUserTsConfig(config, ctx);
-
   if (ctx.isChangeBuild) {
-    moduleFiles = getRebuildModules(moduleFiles);
+    // if this is a change build, then narrow down
+    moduleFiles = getChangeBuildModules(moduleFiles);
   }
+
+  const tsFileNames = Object.keys(moduleFiles);
+
+  if (!tsFileNames.length) {
+    // don't bother if there are no ts files to transpile
+    return;
+  }
+
+  const tsOptions = getUserTsConfig(config, ctx);
 
   if (config.suppressTypeScriptErrors) {
     tsOptions.options.lib = [];
@@ -54,7 +62,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 
   const tsHost = getTsHost(config, ctx, tsOptions.options, transpileResults);
 
-  const tsFileNames = Object.keys(moduleFiles);
+
 
   const program = ts.createProgram(tsFileNames, tsOptions.options, tsHost);
 
@@ -80,21 +88,25 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 }
 
 
-function getRebuildModules(moduleFiles: ModuleFiles) {
-  const rebuildModuleFiles: ModuleFiles = {};
+function getChangeBuildModules(moduleFiles: ModuleFiles) {
+  const changeModuleFiles: ModuleFiles = {};
 
   const tsFileNames = Object.keys(moduleFiles);
   tsFileNames.forEach(tsFileName => {
     const moduleFile = moduleFiles[tsFileName];
 
-    if (moduleFile.tsFilePath.indexOf('.d.ts') > -1) return;
+    if (moduleFile.tsFilePath.indexOf('.d.ts') > -1) {
+      // don't bother for d.ts files
+      return;
+    }
 
     if (typeof moduleFile.jsText !== 'string') {
-      rebuildModuleFiles[tsFileName] = moduleFile;
+      // only add it to our collection when there is no jsText
+      changeModuleFiles[tsFileName] = moduleFile;
     }
   });
 
-  return rebuildModuleFiles;
+  return changeModuleFiles;
 }
 
 

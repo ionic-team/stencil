@@ -1,39 +1,42 @@
-import { build } from '../build/build';
-import { BuildConfig, ComponentRegistry } from '../../util/interfaces';
-import { BuildContext, BuildResults } from '../interfaces';
-// import { CommandLineLogger } from '../logger/command-line-logger';
-import { mockFs, mockLogger, mockStencilSystem } from '../../test';
-import { parseComponentRegistry } from '../../util/data-parse';
-import { validateBuildConfig } from '../validation';
+import { build } from '../build';
+import { BuildConfig, ComponentRegistry } from '../../../util/interfaces';
+import { BuildContext, BuildResults } from '../../interfaces';
+import { CommandLineLogger } from '../../logger/command-line-logger';
+import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
+import { parseComponentRegistry } from '../../../util/data-parse';
+import { validateBuildConfig } from '../../validation';
 
 
 describe('build', () => {
 
-  it('should ignore common web files not used in builds', () => {
-    validateBuildConfig(config);
-    const reg = config.watchIgnoredRegex;
+  it('should not rebuild from html change', () => {
+    ctx = {};
+    config.bundles = [
+      { components: ['cmp-a'] },
+      { components: ['cmp-b'] }
+    ];
+    config.watch = true;
+    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
+    writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
 
-    expect(reg.test('/asdf/.gitignore')).toBe(true);
-    expect(reg.test('/.gitignore')).toBe(true);
-    expect(reg.test('.gitignore')).toBe(true);
-    expect(reg.test('/image.jpg')).toBe(true);
-    expect(reg.test('image.jpg')).toBe(true);
-    expect(reg.test('/asdf/image.jpg')).toBe(true);
-    expect(reg.test('/asdf/image.jpeg')).toBe(true);
-    expect(reg.test('/asdf/image.png')).toBe(true);
-    expect(reg.test('/asdf/image.gif')).toBe(true);
-    expect(reg.test('/asdf/image.woff')).toBe(true);
-    expect(reg.test('/asdf/image.woff2')).toBe(true);
-    expect(reg.test('/asdf/image.ttf')).toBe(true);
-    expect(reg.test('/asdf/image.eot')).toBe(true);
+    return build(config, ctx).then(() => {
+      expect(ctx.isChangeBuild).toBeFalsy();
 
-    expect(reg.test('/asdf/image.ts')).toBe(false);
-    expect(reg.test('/asdf/image.tsx')).toBe(false);
-    expect(reg.test('/asdf/image.css')).toBe(false);
-    expect(reg.test('/asdf/image.scss')).toBe(false);
-    expect(reg.test('/asdf/image.sass')).toBe(false);
-    expect(reg.test('/asdf/image.html')).toBe(false);
-    expect(reg.test('/asdf/image.htm')).toBe(false);
+      return new Promise(resolve => {
+        ctx.onFinish = resolve;
+        ctx.watcher.$triggerEvent('change', '/src/index.html');
+
+      }).then((r: BuildResults) => {
+        expect(ctx.isChangeBuild).toBe(true);
+        expect(ctx.transpileBuildCount).toBe(0);
+        expect(ctx.moduleBundleCount).toBe(0);
+
+        expect(wroteFile(r, 'cmp-a.js')).toBe(false);
+        expect(wroteFile(r, 'cmp-b.js')).toBe(false);
+        expect(wroteFile(r, 'index.html')).toBe(true);
+      });
+    });
   });
 
   it('should rebuild for two changed modules', () => {
@@ -473,14 +476,41 @@ describe('build', () => {
     });
   });
 
+  it('should ignore common web files not used in builds', () => {
+    validateBuildConfig(config);
+    const reg = config.watchIgnoredRegex;
+
+    expect(reg.test('/asdf/.gitignore')).toBe(true);
+    expect(reg.test('/.gitignore')).toBe(true);
+    expect(reg.test('.gitignore')).toBe(true);
+    expect(reg.test('/image.jpg')).toBe(true);
+    expect(reg.test('image.jpg')).toBe(true);
+    expect(reg.test('/asdf/image.jpg')).toBe(true);
+    expect(reg.test('/asdf/image.jpeg')).toBe(true);
+    expect(reg.test('/asdf/image.png')).toBe(true);
+    expect(reg.test('/asdf/image.gif')).toBe(true);
+    expect(reg.test('/asdf/image.woff')).toBe(true);
+    expect(reg.test('/asdf/image.woff2')).toBe(true);
+    expect(reg.test('/asdf/image.ttf')).toBe(true);
+    expect(reg.test('/asdf/image.eot')).toBe(true);
+
+    expect(reg.test('/asdf/image.ts')).toBe(false);
+    expect(reg.test('/asdf/image.tsx')).toBe(false);
+    expect(reg.test('/asdf/image.css')).toBe(false);
+    expect(reg.test('/asdf/image.scss')).toBe(false);
+    expect(reg.test('/asdf/image.sass')).toBe(false);
+    expect(reg.test('/asdf/image.html')).toBe(false);
+    expect(reg.test('/asdf/image.htm')).toBe(false);
+  });
+
 
   var logger = mockLogger();
-  // var chalk = require('chalk');
-  // logger = new CommandLineLogger({
-  //   level: 'debug',
-  //   process: process,
-  //   chalk: chalk
-  // });
+  var chalk = require('chalk');
+  logger = new CommandLineLogger({
+    level: 'debug',
+    process: process,
+    chalk: chalk
+  });
   var registry: ComponentRegistry = {};
   var ctx: BuildContext = {};
   var sys = mockStencilSystem();
