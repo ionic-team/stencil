@@ -17,7 +17,8 @@ export interface BuildContext {
   moduleFiles?: ModuleFiles;
   moduleBundleOutputs?: ModuleBundles;
   styleSassOutputs?: ModuleBundles;
-  filesToWrite?: FilesToWrite;
+  filesToWrite?: FilesMap;
+  projectFiles?: FilesMap;
   watcher?: FSWatcher;
   onFinish?: Function;
   tsConfig?: any;
@@ -84,7 +85,7 @@ export interface ModuleResults {
 }
 
 
-export interface FilesToWrite {
+export interface FilesMap {
   [filePath: string]: string;
 }
 

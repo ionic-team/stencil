@@ -9,6 +9,65 @@ import { validateBuildConfig } from '../../validation';
 
 describe('build', () => {
 
+  it('should re-save project files when changed', () => {
+    ctx = {};
+    config.bundles = [
+      { components: ['cmp-a'] },
+      { components: ['cmp-b'] }
+    ];
+    config.watch = true;
+    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
+
+    return build(config, ctx).then(r => {
+      expect(wroteFile(r, 'app.js')).toBe(true);
+      expect(wroteFile(r, 'app.registry.json')).toBe(true);
+      expect(wroteFile(r, 'app.core.ce.js')).toBe(true);
+      expect(wroteFile(r, 'app.core.js')).toBe(true);
+
+      return new Promise(resolve => {
+        ctx.onFinish = resolve;
+        writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
+        ctx.watcher.$triggerEvent('add', '/src/cmp-b.tsx');
+
+      }).then((r: BuildResults) => {
+        expect(wroteFile(r, 'app.js')).toBe(true);
+        expect(wroteFile(r, 'app.registry.json')).toBe(true);
+        expect(wroteFile(r, 'app.core.ce.js')).toBe(false);
+        expect(wroteFile(r, 'app.core.js')).toBe(false);
+      });
+    });
+  });
+
+  it('should not save project files, but not resave when unchanged', () => {
+    ctx = {};
+    config.bundles = [
+      { components: ['cmp-a'] },
+      { components: ['cmp-b'] }
+    ];
+    config.watch = true;
+    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
+
+    return build(config, ctx).then(r => {
+      expect(wroteFile(r, 'app.js')).toBe(true);
+      expect(wroteFile(r, 'app.registry.json')).toBe(true);
+      expect(wroteFile(r, 'app.core.ce.js')).toBe(true);
+      expect(wroteFile(r, 'app.core.js')).toBe(true);
+
+      return new Promise(resolve => {
+        ctx.onFinish = resolve;
+        ctx.watcher.$triggerEvent('change', '/src/index.html');
+
+      }).then((r: BuildResults) => {
+        expect(wroteFile(r, 'app.js')).toBe(false);
+        expect(wroteFile(r, 'app.registry.json')).toBe(false);
+        expect(wroteFile(r, 'app.core.ce.js')).toBe(false);
+        expect(wroteFile(r, 'app.core.js')).toBe(false);
+      });
+    });
+  });
+
   it('should not rebuild from html change', () => {
     ctx = {};
     config.bundles = [
@@ -514,8 +573,8 @@ describe('build', () => {
   var registry: ComponentRegistry = {};
   var ctx: BuildContext = {};
   var sys = mockStencilSystem();
-  sys.getClientCoreFile = getClientCoreFile;
   sys.generateContentHash = generateContentHash;
+  sys.getClientCoreFile = getClientCoreFile;
   sys.minifyCss = mockMinify;
   sys.minifyJs = mockMinify;
   sys.watch = watch;
@@ -524,7 +583,10 @@ describe('build', () => {
 
 
   function getClientCoreFile(opts: {staticName: string}) {
-    return Promise.resolve(opts.staticName + '-content');
+    return Promise.resolve(`
+      (function (window, document, projectNamespace, projectFileName, projectCore, projectCoreEs5, components) {
+          // mock getClientCoreFile, staticName: ${opts.staticName}
+      })(window, document, '__STENCIL__APP__');`);
   }
 
   function generateContentHash(content: string, length: number) {

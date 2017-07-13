@@ -1,5 +1,5 @@
 import { BANNER } from '../util/constants';
-import { BuildConfig, Diagnostic, FilesToWrite, StencilSystem } from './interfaces';
+import { BuildConfig, Diagnostic, FilesMap, StencilSystem } from './interfaces';
 
 
 export function readFile(sys: StencilSystem, filePath: string) {
@@ -15,7 +15,7 @@ export function readFile(sys: StencilSystem, filePath: string) {
 }
 
 
-export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesToWrite): Promise<any> {
+export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesMap): Promise<any> {
   const directories = getDirectoriesFromFiles(sys, filesToWrite);
 
   return ensureDirectoriesExist(sys, directories, [rootDir]).then(() => {
@@ -31,7 +31,7 @@ export function emptyDir(sys: StencilSystem, dir: string) {
 }
 
 
-function writeToDisk(sys: StencilSystem, filesToWrite: FilesToWrite): Promise<any> {
+function writeToDisk(sys: StencilSystem, filesToWrite: FilesMap): Promise<any> {
   // assumes directories to be saved in already exit
   return new Promise((resolve, reject) => {
     const filePathsToWrite = Object.keys(filesToWrite);
@@ -127,7 +127,7 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
 }
 
 
-function getDirectoriesFromFiles(sys: StencilSystem, filesToWrite: FilesToWrite) {
+function getDirectoriesFromFiles(sys: StencilSystem, filesToWrite: FilesMap) {
   const directories: string[] = [];
 
   Object.keys(filesToWrite).forEach(filePath => {

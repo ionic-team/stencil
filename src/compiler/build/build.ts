@@ -26,6 +26,7 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
   // create the build context if it doesn't exist
   ctx = ctx || {};
   ctx.filesToWrite = ctx.filesToWrite || {};
+  ctx.projectFiles = ctx.projectFiles || {};
   ctx.moduleFiles = ctx.moduleFiles || {};
   ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
   ctx.styleSassOutputs = ctx.styleSassOutputs || {};

@@ -181,8 +181,26 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
     ctx.styleSassOutputs = {};
   }
 
-  let msg = `changed file${changedFiles.length > 1 ? 's' : ''}: ${changedFiles.map(f => config.sys.path.basename(f)).join(', ')}`;
-  config.logger.info(msg);
+  changedFiles.sort();
+  const totalChangedFiles = changedFiles.length;
+
+  if (totalChangedFiles > 6) {
+    const trimmedChangedFiles = changedFiles.slice(0, 5);
+    const otherFilesTotal = totalChangedFiles - trimmedChangedFiles.length;
+    let msg = `changed files: ${trimmedChangedFiles.map(f => config.sys.path.basename(f)).join(', ')}`;
+    if (otherFilesTotal > 0) {
+      msg += `, +${otherFilesTotal} other${otherFilesTotal > 1 ? 's' : ''}`;
+    }
+    config.logger.info(msg);
+
+  } else if (totalChangedFiles > 1) {
+    const msg = `changed files: ${changedFiles.map(f => config.sys.path.basename(f)).join(', ')}`;
+    config.logger.info(msg);
+
+  } else if (totalChangedFiles > 0) {
+    const msg = `changed file: ${changedFiles.map(f => config.sys.path.basename(f)).join(', ')}`;
+    config.logger.info(msg);
+  }
 
   return build(config, ctx);
 }

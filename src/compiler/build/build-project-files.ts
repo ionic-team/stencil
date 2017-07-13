@@ -10,8 +10,6 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
   config.logger.debug(`build, generateProjectFiles: ${config.namespace}`);
 
   const projectFileName = config.namespace.toLowerCase();
-  const registryFileName = `${projectFileName}.registry.json`;
-  const registryFilePath = config.sys.path.join(config.buildDest, registryFileName);
 
   const projectRegistry: ProjectRegistry = {
     namespace: config.namespace,
@@ -51,30 +49,45 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
 
     // write the project core file
     const projectCoreFilePath = sys.path.join(config.buildDest, projectFileName, projectCoreFileName);
-    config.logger.debug(`build, project core: ${projectCoreFilePath}`);
-    ctx.filesToWrite[projectCoreFilePath] = coreContent;
+    if (!ctx.projectFiles[projectCoreFilePath] || ctx.projectFiles[projectCoreFilePath] !== coreContent) {
+      // core file is actually different from our last saved version
+      config.logger.debug(`build, write project core: ${projectCoreFilePath}`);
+      ctx.filesToWrite[projectCoreFilePath] = ctx.projectFiles[projectCoreFilePath] = coreContent;
+    }
 
     // write the project core ES5 file
     const projectCoreEs5FilePath = sys.path.join(config.buildDest, projectFileName, projectCoreEs5FileName);
-    config.logger.debug(`build, project core es5: ${projectCoreEs5FilePath}`);
-    ctx.filesToWrite[projectCoreEs5FilePath] = coreEs5Content;
+    if (!ctx.projectFiles[projectCoreEs5FilePath] || ctx.projectFiles[projectCoreEs5FilePath] !== coreEs5Content) {
+      // core es5 file is actually different from our last saved version
+      config.logger.debug(`build, project core es5: ${projectCoreEs5FilePath}`);
+      ctx.filesToWrite[projectCoreEs5FilePath] = ctx.projectFiles[projectCoreEs5FilePath] = coreEs5Content;
+    }
 
   }).then(() => {
     // create the loader after creating the loader file name
     return generateLoader(config, projectFileName, projectCoreFileName, projectCoreEs5FileName, componentRegistry).then(loaderContent => {
-
       // write the project loader file
       const projectLoaderFileName = `${projectRegistry.loader}.js`;
       const projectLoaderFilePath = sys.path.join(config.buildDest, projectLoaderFileName);
-      config.logger.debug(`build, project loader: ${projectLoaderFilePath}`);
-      ctx.filesToWrite[projectLoaderFilePath] = loaderContent;
+      if (!ctx.projectFiles[projectLoaderFilePath] || ctx.projectFiles[projectLoaderFilePath] !== loaderContent) {
+        // project loader file is actually different from our last saved version
+        config.logger.debug(`build, project loader: ${projectLoaderFilePath}`);
+        ctx.filesToWrite[projectLoaderFilePath] = ctx.projectFiles[projectLoaderFilePath] = loaderContent;
+      }
     });
 
   }).then(() => {
     // create a json file for the project registry
-    config.logger.debug(`build, project registry: ${registryFilePath}`);
-    ctx.filesToWrite[registryFilePath] = JSON.stringify(projectRegistry, null, 2);
-
+    const registryFileName = `${projectFileName}.registry.json`;
+    const registryFilePath = config.sys.path.join(config.buildDest, registryFileName);
+    const registryJson = JSON.stringify(projectRegistry, null, 2);
+    if (!ctx.projectFiles[registryFilePath] || ctx.projectFiles[registryFilePath] !== registryJson) {
+      // project registry json file is actually different from our last saved version
+      config.logger.debug(`build, project registry: ${registryFilePath}`);
+      ctx.filesToWrite[registryFilePath] = ctx.projectFiles[registryFilePath] = registryJson;
+    }
+  }).catch(err => {
+    config.logger.error('generateProjectFiles', err);
   });
 }
 
