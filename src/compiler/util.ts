@@ -25,9 +25,15 @@ export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: Fi
 
 
 export function emptyDir(sys: StencilSystem, dir: string) {
-  // TODO!
-  sys; dir;
-  return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    sys.rmDir(dir, err => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
 }
 
 

@@ -109,9 +109,9 @@ module.exports = Object.defineProperties({
     });
   },
 
-  rmDir: function rmdir(directory, options, callback) {
+  rmDir: function rmdir(directory, callback) {
     var rimraf = require('./rimraf');
-    rimraf(directory, options, callback);
+    rimraf(directory, callback);
   },
 
   watch: function watch(paths, opts) {

@@ -96,6 +96,12 @@ export function mockStencilSystem() {
       };
     },
     fs: mockFs(),
+    rmDir: function(path, cb) {
+      path;
+      process.nextTick(() => {
+        cb(null);
+      });
+    },
     path: path,
     rollup: rollup,
     sass: {

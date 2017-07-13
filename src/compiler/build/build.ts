@@ -154,29 +154,44 @@ function optimizeHtmlPhase(config: BuildConfig, ctx: BuildContext, buildResults:
 
 function writePhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
   buildResults.files = Object.keys(ctx.filesToWrite).sort();
+  const totalFilesToWrite = buildResults.files.length;
 
-  const timeSpan = config.logger.createTimeSpan(`writePhase started, fileUpdates: ${buildResults.files.length}`, true);
+  const timeSpan = config.logger.createTimeSpan(`writePhase started, fileUpdates: ${totalFilesToWrite}`, true);
 
   // create a copy of all the files to write
   const filesToWrite = Object.assign({}, ctx.filesToWrite);
 
-  // clear out the files to write for next time
+  // clear out the files to write object for the next build
   ctx.filesToWrite = {};
 
-  const dirPromises: Promise<any>[] = [];
-  if (buildResults.files.length > 0 && !config.devMode) {
-    // only prod mode empties directories
-    dirPromises.push(emptyDir(config.sys, config.collectionDest));
-    dirPromises.push(emptyDir(config.sys, config.buildDest));
-  }
-
-  return Promise.all(dirPromises).then(() => {
-    if (buildResults.files.length > 0) {
+  return emptyDestDir(config, ctx).then(() => {
+    if (totalFilesToWrite > 0) {
+      // only write...when there's files to write
       return writeFiles(config.sys, config.rootDir, filesToWrite);
     }
+
+    // no files to write
     return Promise.resolve();
 
   }).then(() => {
     timeSpan.finish(`writePhase finished`);
   });
+}
+
+
+function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
+  if (ctx.isRebuild) {
+    // don't bother emptying the build directory when
+    // it's a rebuild
+    return Promise.resolve([]);
+  }
+
+  config.logger.debug(`empty dir: ${config.buildDest}`);
+  config.logger.debug(`empty dir: ${config.collectionDest}`);
+
+  // let's empty out the build dest directory
+  return Promise.all([
+    emptyDir(config.sys, config.buildDest),
+    emptyDir(config.sys, config.collectionDest)
+  ]);
 }
