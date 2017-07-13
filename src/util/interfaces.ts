@@ -1024,10 +1024,7 @@ export interface StencilSystem {
     sourceMap?: any;
     diagnostics?: Diagnostic[];
   };
-  module?: {
-    _nodeModulePaths(fromDir: string): any;
-    _resolveFilename(moduleId: string, opts: any): any;
-  };
+  resolveModule?(fromDir: string, moduleId: string): string;
   path?: {
     basename(p: string, ext?: string): string;
     dirname(p: string): string;

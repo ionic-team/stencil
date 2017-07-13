@@ -12,7 +12,6 @@ const MemoryFileSystem = require('memory-fs');
 
 const path = require('path');
 const vm = require('vm');
-const nodeModule = require('module');
 const jsdom = require('jsdom');
 
 
@@ -111,8 +110,7 @@ export function mockStencilSystem() {
       }
     },
     typescript: require('typescript'),
-    vm: vm,
-    module: nodeModule
+    vm: vm
   };
 
   return sys;

@@ -18,13 +18,16 @@ export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   };
 
   return Promise.resolve().then(() => {
-
+    // transpiling is synchronous
     transpileModules(config, ctx, moduleFiles, transpileResults);
 
     if (transpileResults.diagnostics.length) {
+      // looks like we've got some transpile errors
+      // let's not continue with processing included styles
       return Promise.resolve([]);
     }
 
+    // get a list of all the files names that were transpiled
     const transpiledFileNames = Object.keys(transpileResults.moduleFiles);
 
     return Promise.all(transpiledFileNames.map(transpiledFileName => {
@@ -54,18 +57,22 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     return;
   }
 
+  // get the tsconfig compiler options we'll use
   const tsOptions = getUserTsConfig(config, ctx);
 
   if (config.suppressTypeScriptErrors) {
+    // suppressTypeScriptErrors mainly for unit testing
     tsOptions.options.lib = [];
   }
 
+  // get the ts compiler host we'll use, which patches file operations
+  // with our in-memory file system
   const tsHost = getTsHost(config, ctx, tsOptions.options, transpileResults);
 
-
-
+  // fire up the typescript program
   const program = ts.createProgram(tsFileNames, tsOptions.options, tsHost);
 
+  // this is the big one, let's go ahead and kick off the transpiling
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
       componentClass(config, ctx.moduleFiles, transpileResults.diagnostics),
@@ -77,9 +84,11 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     ]
   });
 
+  // keep track of how many files we transpiled (great for debugging/testing)
   ctx.transpileBuildCount = Object.keys(transpileResults.moduleFiles).length;
 
   if (!config.suppressTypeScriptErrors) {
+    // suppressTypeScriptErrors mainly for unit testing
     const tsDiagnostics = program.getSyntacticDiagnostics()
       .concat(program.getSemanticDiagnostics(), program.getOptionsDiagnostics());
 
@@ -125,6 +134,8 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, diagnosti
 
   const promises: Promise<any>[] = [];
 
+  // loop through each of the style paths and see if there are any sass files
+  // for each sass file let's figure out which source sass files it uses
   const modeNames = Object.keys(moduleFile.cmpMeta.stylesMeta);
   modeNames.forEach(modeName => {
     const modeMeta = moduleFile.cmpMeta.stylesMeta[modeName];
@@ -132,6 +143,8 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, diagnosti
     if (modeMeta.absStylePaths) {
       modeMeta.absStylePaths.forEach(absoluteStylePath => {
         if (isSassFile(absoluteStylePath)) {
+          // this componet mode has a sass file, let's see which
+          // sass files are included in it
           promises.push(
             getIncludedSassFiles(sys, diagnostics, moduleFile, absoluteStylePath)
           );

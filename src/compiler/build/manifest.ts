@@ -2,7 +2,6 @@ import { BuildConfig, BuildContext, Bundle, Collection, CompileResults,
   Manifest, ModuleFileMeta } from '../interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { normalizePath, readFile } from '../util';
-import { resolveFrom } from '../resolve-from';
 import { validateDependentCollection, validateUserBundles } from '../validation';
 import { parseManifest, serializeManifest } from './manifest-data';
 
@@ -18,7 +17,7 @@ export function loadDependentManifests(config: BuildConfig) {
 function loadDependentManifest(config: BuildConfig, dependentCollection: Collection) {
   const sys = config.sys;
 
-  const dependentManifestFilePath = resolveFrom(sys, config.rootDir, dependentCollection.name);
+  const dependentManifestFilePath = sys.resolveModule(config.rootDir, dependentCollection.name);
   const dependentManifestDir = sys.path.dirname(dependentManifestFilePath);
 
   return readFile(sys, dependentManifestFilePath).then(dependentManifestJson => {

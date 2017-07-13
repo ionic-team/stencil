@@ -1,7 +1,7 @@
 import { build } from '../build';
 import { BuildConfig, ComponentRegistry } from '../../../util/interfaces';
 import { BuildContext, BuildResults } from '../../interfaces';
-import { CommandLineLogger } from '../../logger/command-line-logger';
+// import { CommandLineLogger } from '../../logger/command-line-logger';
 import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
 import { parseComponentRegistry } from '../../../util/data-parse';
 import { validateBuildConfig } from '../../validation';
@@ -505,12 +505,12 @@ describe('build', () => {
 
 
   var logger = mockLogger();
-  var chalk = require('chalk');
-  logger = new CommandLineLogger({
-    level: 'debug',
-    process: process,
-    chalk: chalk
-  });
+  // var chalk = require('chalk');
+  // logger = new CommandLineLogger({
+  //   level: 'debug',
+  //   process: process,
+  //   chalk: chalk
+  // });
   var registry: ComponentRegistry = {};
   var ctx: BuildContext = {};
   var sys = mockStencilSystem();
