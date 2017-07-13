@@ -1,5 +1,5 @@
-import { BuildConfig, BuildContext, OptimizeHtmlResults } from './interfaces';
-import { readFile } from './util';
+import { BuildConfig, BuildContext, OptimizeHtmlResults } from '../interfaces';
+import { readFile } from '../util';
 
 
 export function optimizeHtml(config: BuildConfig, ctx: BuildContext) {

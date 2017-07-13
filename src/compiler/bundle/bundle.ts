@@ -1,8 +1,8 @@
-import { BuildConfig, BuildContext, BundleResults, Manifest } from './interfaces';
-import { bundleAssets } from './component-plugins/assets-plugin';
+import { BuildConfig, BuildContext, BundleResults, Manifest } from '../interfaces';
+import { bundleAssets } from '../component-plugins/assets-plugin';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
-import { catchError } from './util';
+import { catchError } from '../util';
 import { generateComponentRegistry } from './bundle-registry';
 
 

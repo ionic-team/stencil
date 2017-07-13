@@ -1,16 +1,15 @@
-import { BuildConfig, Manifest } from '../util/interfaces';
-import { BuildContext, BuildResults, LoggerTimeSpan } from './interfaces';
-import { bundle } from './bundle';
-import { catchError } from './util';
-import { cleanDiagnostics } from './logger/logger-util';
+import { BuildConfig, Manifest } from '../../util/interfaces';
+import { BuildContext, BuildResults, LoggerTimeSpan } from '../interfaces';
+import { bundle } from '../bundle/bundle';
+import { catchError, emptyDir, writeFiles } from '../util';
+import { cleanDiagnostics } from '../logger/logger-util';
 import { compileSrcDir } from './compile';
-import { emptyDir, writeFiles } from './util';
 import { generateProjectFiles } from './build-project-files';
-import { generateHtmlDiagnostics } from './logger/generate-html-diagnostics';
+import { generateHtmlDiagnostics } from '../logger/generate-html-diagnostics';
 import { loadDependentManifests, mergeManifests } from './manifest';
 import { optimizeHtml } from './optimize-html';
 import { setupWatcher } from './watch';
-import { validateBuildConfig } from './validation';
+import { validateBuildConfig } from '../validation';
 
 
 export function build(config: BuildConfig, ctx?: BuildContext) {

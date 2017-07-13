@@ -1,8 +1,7 @@
-import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from './interfaces';
-import { buildError, catchError } from './util';
-import { formatCssBundleFileName, generateBundleId } from '../util/data-serialize';
-import { HYDRATED_CSS } from '../util/constants';
-import { isCssFile, isSassFile, generateBanner, readFile } from './util';
+import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from '../interfaces';
+import { buildError, catchError, isCssFile, isSassFile, generateBanner, readFile } from '../util';
+import { formatCssBundleFileName, generateBundleId } from '../../util/data-serialize';
+import { HYDRATED_CSS } from '../../util/constants';
 
 
 export function bundleStyles(config: BuildConfig, ctx: BuildContext, userManifest: Manifest) {

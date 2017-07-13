@@ -1,9 +1,8 @@
-import { BuildConfig, BuildContext, CompileResults } from './interfaces';
-import { catchError } from './util';
+import { BuildConfig, BuildContext, CompileResults } from '../interfaces';
+import { catchError, isTsFile, readFile, normalizePath } from '../util';
 import { generateManifest } from './manifest';
-import { getModuleFile } from './transpile/compiler-host';
-import { isTsFile, readFile, normalizePath } from './util';
-import { transpile } from './transpile/transpile';
+import { getModuleFile } from '../transpile/compiler-host';
+import { transpile } from '../transpile/transpile';
 
 
 export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {

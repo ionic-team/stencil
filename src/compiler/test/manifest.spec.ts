@@ -1,5 +1,5 @@
 import { Bundle, Collection, Manifest } from '../interfaces';
-import { processDependentManifest } from '../manifest';
+import { processDependentManifest } from '../build/manifest';
 import { validateDependentCollection } from '../validation';
 
 

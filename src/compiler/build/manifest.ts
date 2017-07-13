@@ -1,9 +1,9 @@
-import { BuildConfig, BuildContext, Bundle, Collection, CompileResults, Manifest, ModuleFileMeta } from './interfaces';
-import { COLLECTION_MANIFEST_FILE_NAME } from '../util/constants';
-import { normalizePath } from './util';
-import { readFile } from './util';
-import { resolveFrom } from './resolve-from';
-import { validateDependentCollection, validateUserBundles } from './validation';
+import { BuildConfig, BuildContext, Bundle, Collection, CompileResults,
+  Manifest, ModuleFileMeta } from '../interfaces';
+import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
+import { normalizePath, readFile } from '../util';
+import { resolveFrom } from '../resolve-from';
+import { validateDependentCollection, validateUserBundles } from '../validation';
 import { parseManifest, serializeManifest } from './manifest-data';
 
 

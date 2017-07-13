@@ -1,8 +1,7 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
-  Manifest, ModuleResults, StencilSystem } from './interfaces';
-import { buildError, buildWarn, catchError } from './util';
-import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../util/data-serialize';
-import { generateBanner } from './util';
+  Manifest, ModuleResults, StencilSystem } from '../interfaces';
+import { buildError, buildWarn, catchError, generateBanner } from '../util';
+import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
 
 export function bundleModules(config: BuildConfig, ctx: BuildContext, userManifest: Manifest) {

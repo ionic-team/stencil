@@ -1,7 +1,7 @@
-import { BuildConfig } from '../util/interfaces';
-import { BuildContext } from './interfaces';
 import { build } from './build';
-import { isTsFile, isSassFile, isCssFile, isHtmlFile, isWebDevFile, normalizePath } from './util';
+import { BuildConfig } from '../../util/interfaces';
+import { BuildContext } from '../interfaces';
+import { isCssFile, isHtmlFile, isSassFile, isTsFile, isWebDevFile, normalizePath } from '../util';
 
 
 export function setupWatcher(config: BuildConfig, ctx: BuildContext) {

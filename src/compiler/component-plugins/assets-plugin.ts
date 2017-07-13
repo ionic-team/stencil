@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentOptions, BuildConfig, BuildContext, Manifest, Diagnostic } from '../interfaces';
+import { BuildConfig, BuildContext, ComponentMeta, ComponentOptions, Diagnostic, Manifest } from '../interfaces';
 
 export interface AssetsResults {
   bundles: {

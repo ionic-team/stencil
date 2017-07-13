@@ -1,7 +1,7 @@
 import { BuildConfig, Bundle, ComponentMeta, Manifest, StyleMeta,
-  ModuleFileMeta, ListenMeta, PropMeta, PropChangeMeta } from './interfaces';
-import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
-import { normalizePath } from './util';
+  ModuleFileMeta, ListenMeta, PropMeta, PropChangeMeta } from '../interfaces';
+import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
+import { normalizePath } from '../util';
 
 
 // this maps the json data to our internal data structure

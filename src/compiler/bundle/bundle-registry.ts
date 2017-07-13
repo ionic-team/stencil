@@ -1,6 +1,6 @@
 import { BuildConfig, ComponentRegistry, Manifest, ModuleResults,
-  LoadComponentRegistry, StylesResults } from './interfaces';
-import { formatComponentRegistry } from '../util/data-serialize';
+  LoadComponentRegistry, StylesResults } from '../interfaces';
+import { formatComponentRegistry } from '../../util/data-serialize';
 
 
 export function generateComponentRegistry(config: BuildConfig, manifest: Manifest, styleResults: StylesResults, moduleResults: ModuleResults): LoadComponentRegistry[] {

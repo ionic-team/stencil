@@ -1,7 +1,7 @@
-import { CORE_NAME, LOADER_NAME, PROJECT_NAMESPACE_REGEX } from '../util/constants';
-import { BuildConfig, BuildContext } from './interfaces';
-import { generateBanner } from './util';
-import { LoadComponentRegistry, ProjectRegistry } from '../util/interfaces';
+import { CORE_NAME, LOADER_NAME, PROJECT_NAMESPACE_REGEX } from '../../util/constants';
+import { BuildConfig, BuildContext } from '../interfaces';
+import { generateBanner } from '../util';
+import { LoadComponentRegistry, ProjectRegistry } from '../../util/interfaces';
 
 
 export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, componentRegistry: LoadComponentRegistry[]) {

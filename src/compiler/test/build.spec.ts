@@ -1,4 +1,4 @@
-import { build } from '../build';
+import { build } from '../build/build';
 import { BuildConfig, ComponentRegistry } from '../../util/interfaces';
 import { BuildContext, BuildResults } from '../interfaces';
 // import { CommandLineLogger } from '../logger/command-line-logger';
