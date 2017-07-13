@@ -14,8 +14,6 @@ const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-compiler');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'compiler/index.js');
 const DEST_DIR = path.join(__dirname, '../dist/compiler');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
-const SRC_TYPES_DIR = path.join(__dirname, '../src/compiler/types');
-const DEST_TYPES_DIR = path.join(DEST_DIR, 'types');
 
 
 function bundleCompiler() {
@@ -35,13 +33,6 @@ function bundleCompiler() {
     fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
       filter: (src) => {
         return src.indexOf('.js') === -1;
-      }
-    });
-
-    // copy the compiler types d.ts files
-    fs.copy(SRC_TYPES_DIR, DEST_TYPES_DIR, (err) => {
-      if (err) {
-        console.log('Error copying compiler types', err);
       }
     });
 
