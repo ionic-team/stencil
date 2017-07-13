@@ -3,7 +3,7 @@ import { BuildConfig, ComponentRegistry, Manifest, ModuleResults,
 import { formatComponentRegistry } from '../util/data-serialize';
 
 
-export function generateComponentRegistry(buildConfig: BuildConfig, manifest: Manifest, styleResults: StylesResults, moduleResults: ModuleResults): LoadComponentRegistry[] {
+export function generateComponentRegistry(config: BuildConfig, manifest: Manifest, styleResults: StylesResults, moduleResults: ModuleResults): LoadComponentRegistry[] {
   const registry: ComponentRegistry = {};
 
   // create the minimal registry component data for each bundle
@@ -42,5 +42,5 @@ export function generateComponentRegistry(buildConfig: BuildConfig, manifest: Ma
     });
   });
 
-  return formatComponentRegistry(registry, buildConfig.attrCase);
+  return formatComponentRegistry(registry, config.attrCase);
 }

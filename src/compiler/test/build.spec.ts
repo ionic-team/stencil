@@ -4,22 +4,50 @@ import { BuildContext, BuildResults } from '../interfaces';
 // import { CommandLineLogger } from '../logger/command-line-logger';
 import { mockFs, mockLogger, mockStencilSystem } from '../../test';
 import { parseComponentRegistry } from '../../util/data-parse';
+import { validateBuildConfig } from '../validation';
 
 
 describe('build', () => {
 
+  it('should ignore common web files not used in builds', () => {
+    validateBuildConfig(config);
+    const reg = config.watchIgnoredRegex;
+
+    expect(reg.test('/asdf/.gitignore')).toBe(true);
+    expect(reg.test('/.gitignore')).toBe(true);
+    expect(reg.test('.gitignore')).toBe(true);
+    expect(reg.test('/image.jpg')).toBe(true);
+    expect(reg.test('image.jpg')).toBe(true);
+    expect(reg.test('/asdf/image.jpg')).toBe(true);
+    expect(reg.test('/asdf/image.jpeg')).toBe(true);
+    expect(reg.test('/asdf/image.png')).toBe(true);
+    expect(reg.test('/asdf/image.gif')).toBe(true);
+    expect(reg.test('/asdf/image.woff')).toBe(true);
+    expect(reg.test('/asdf/image.woff2')).toBe(true);
+    expect(reg.test('/asdf/image.ttf')).toBe(true);
+    expect(reg.test('/asdf/image.eot')).toBe(true);
+
+    expect(reg.test('/asdf/image.ts')).toBe(false);
+    expect(reg.test('/asdf/image.tsx')).toBe(false);
+    expect(reg.test('/asdf/image.css')).toBe(false);
+    expect(reg.test('/asdf/image.scss')).toBe(false);
+    expect(reg.test('/asdf/image.sass')).toBe(false);
+    expect(reg.test('/asdf/image.html')).toBe(false);
+    expect(reg.test('/asdf/image.htm')).toBe(false);
+  });
+
   it('should rebuild for two changed modules', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] },
       { components: ['cmp-b'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
     writeFileSync('/src/cmp-c.tsx', `@Component({ tag: 'cmp-c' }) export class CmpC {}`);
 
-    return build(buildConfig, ctx).then(() => {
+    return build(config, ctx).then(() => {
       expect(ctx.isChangeBuild).toBeFalsy();
 
       return new Promise(resolve => {
@@ -41,18 +69,18 @@ describe('build', () => {
 
   it('should do a full rebuild when 1 file changed, and 1 file added', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
 
-    return build(buildConfig, ctx).then(() => {
+    return build(config, ctx).then(() => {
       expect(ctx.isChangeBuild).toBeFalsy();
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
-        buildConfig.bundles = [
+        config.bundles = [
           { components: ['cmp-a'] },
           { components: ['cmp-b'] }
         ];
@@ -75,20 +103,20 @@ describe('build', () => {
 
   it('should do a full rebuild when files are deleted', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] },
       { components: ['cmp-b'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
 
-    return build(buildConfig, ctx).then(() => {
+    return build(config, ctx).then(() => {
       expect(ctx.isChangeBuild).toBeFalsy();
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
-        buildConfig.bundles = [ { components: ['cmp-a'] }];
+        config.bundles = [ { components: ['cmp-a'] }];
         unlinkSync('/src/cmp-b.tsx');
         ctx.watcher.$triggerEvent('unlink', '/src/cmp-b.tsx');
 
@@ -105,17 +133,17 @@ describe('build', () => {
 
   it('should do a full rebuild when files are added', () => {
     ctx = {};
-    buildConfig.bundles = [ { components: ['cmp-a'] }];
-    buildConfig.watch = true;
+    config.bundles = [ { components: ['cmp-a'] }];
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
 
-    return build(buildConfig, ctx).then(() => {
+    return build(config, ctx).then(() => {
       expect(ctx.isChangeBuild).toBeFalsy();
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
         writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
-        buildConfig.bundles = [
+        config.bundles = [
           { components: ['cmp-a'] },
           { components: ['cmp-b'] }
         ];
@@ -134,18 +162,18 @@ describe('build', () => {
 
   it('should build styles, but not rebuild on non-component file changes', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] },
       { components: ['cmp-b'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA {}`);
     writeFileSync('/src/cmp-a.scss', `body { color: red; }`);
     writeFileSync('/src/cmp-b.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-b', styleUrl: 'cmp-b.scss' }) export class CmpB {}`);
     writeFileSync('/src/cmp-b.scss', `body { color: red; }`);
     writeFileSync('/src/service.tsx', `export class MyService {}`);
 
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(3);
       expect(ctx.moduleBundleCount).toBe(2);
@@ -178,16 +206,16 @@ describe('build', () => {
 
   it('should rebundle both cmp-a and cmp-b when non-component module has changed', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] },
       { components: ['cmp-b'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/cmp-b.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-b' }) export class CmpB {}`);
     writeFileSync('/src/service.tsx', `export class MyService {}`);
 
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(3);
       expect(ctx.moduleBundleCount).toBe(2);
@@ -214,16 +242,16 @@ describe('build', () => {
 
   it('should not rebuild cmp-a when only cmp-b changed', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] },
       { components: ['cmp-b'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
     writeFileSync('/src/service.tsx', `export class MyService { test() { console.log('test'); } }`);
 
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(3);
       expect(ctx.moduleBundleCount).toBe(2);
@@ -259,18 +287,18 @@ describe('build', () => {
 
   it('should re-bundle styles when the changed sass file is not a direct component sass file', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] },
       { components: ['cmp-b'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA {}`);
     writeFileSync('/src/cmp-a.scss', `@import "variables"; body { color: $color; }`);
     writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b', styleUrl: 'cmp-b.scss' }) export class CmpB {}`);
     writeFileSync('/src/cmp-b.scss', `@import "variables"; body { color: $color; }`);
     writeFileSync('/src/variables.scss', `$color: red;`);
 
-    return build(buildConfig, ctx).then(() => {
+    return build(config, ctx).then(() => {
       return new Promise(resolve => {
         ctx.onFinish = resolve;
         writeFileSync('/src/variables.scss', `$color: blue;`);
@@ -294,17 +322,17 @@ describe('build', () => {
 
   it('should not re-transpile, re-bundle modules or re-bundle styles for cmp-b if only cmp-a module changed', () => {
     ctx = {};
-    buildConfig.bundles = [
+    config.bundles = [
       { components: ['cmp-a'] },
       { components: ['cmp-b'] }
     ];
-    buildConfig.watch = true;
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA {}`);
     writeFileSync('/src/cmp-a.scss', `body { color: red; }`);
     writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b', styleUrl: 'cmp-b.scss' }) export class CmpB {}`);
     writeFileSync('/src/cmp-b.scss', `body { color: blue; }`);
 
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(2);
       expect(ctx.moduleBundleCount).toBe(2);
@@ -339,12 +367,12 @@ describe('build', () => {
 
   it('should do a re-transpile, re-bundle module and re-bundle styles if component file change', () => {
     ctx = {};
-    buildConfig.bundles = [ { components: ['cmp-a'] } ];
-    buildConfig.watch = true;
+    config.bundles = [ { components: ['cmp-a'] } ];
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'sass-a.scss' }) export class CmpA {}`);
     writeFileSync('/src/sass-a.scss', `body { color: red; }`);
 
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(1);
       expect(ctx.moduleBundleCount).toBe(1);
@@ -369,12 +397,12 @@ describe('build', () => {
 
   it('should not re-transpile or re-bundle module when only a sass change', () => {
     ctx = {};
-    buildConfig.bundles = [ { components: ['cmp-a'] } ];
-    buildConfig.watch = true;
+    config.bundles = [ { components: ['cmp-a'] } ];
+    config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA {}`);
     writeFileSync('/src/cmp-a.scss', `body { color: red; }`);
 
-    return build(buildConfig, ctx).then(() => {
+    return build(config, ctx).then(() => {
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
@@ -394,11 +422,11 @@ describe('build', () => {
 
   it('should build one component w/ styleUrl', () => {
     ctx = {};
-    buildConfig.bundles = [ { components: ['cmp-a'] } ];
+    config.bundles = [ { components: ['cmp-a'] } ];
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA {}`);
     writeFileSync('/src/cmp-a.scss', `body { color: red; }`);
 
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(r.componentRegistry.length).toBe(1);
       expect(ctx.transpileBuildCount).toBe(1);
@@ -417,10 +445,10 @@ describe('build', () => {
 
   it('should build one component w/ no styles', () => {
     ctx = {};
-    buildConfig.bundles = [ { components: ['my-app'] } ];
+    config.bundles = [ { components: ['my-app'] } ];
     writeFileSync('/src/my-app.tsx', `@Component({ tag: 'my-app' }) export class MyApp {}`);
 
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(r.componentRegistry.length).toBe(1);
       expect(ctx.transpileBuildCount).toBe(1);
@@ -435,7 +463,7 @@ describe('build', () => {
 
   it('should build no components', () => {
     ctx = {};
-    return build(buildConfig, ctx).then(r => {
+    return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
       expect(r.componentRegistry.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(0);
@@ -462,7 +490,7 @@ describe('build', () => {
   sys.minifyJs = mockMinify;
   sys.watch = watch;
 
-  var buildConfig: BuildConfig = {};
+  var config: BuildConfig = {};
 
 
   function getClientCoreFile(opts: {staticName: string}) {
@@ -507,7 +535,7 @@ describe('build', () => {
     ctx = null;
     registry = {};
 
-    buildConfig = {
+    config = {
       sys: sys,
       logger: logger,
       rootDir: '/',

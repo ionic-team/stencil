@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, Diagnostic, ModuleFileMeta, ModuleFiles, StencilSystem, TranspileResults } from '../interfaces';
-import { buildError, catchError, isSassSourceFile, normalizePath } from '../util';
+import { buildError, catchError, isSassFile, normalizePath } from '../util';
 import { componentClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
@@ -10,7 +10,7 @@ import { updateLifecycleMethods } from './transformers/update-lifecycle-methods'
 import * as ts from 'typescript';
 
 
-export function transpile(buildConfig: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
+export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
 
   const transpileResults: TranspileResults = {
     moduleFiles: {},
@@ -19,7 +19,7 @@ export function transpile(buildConfig: BuildConfig, ctx: BuildContext, moduleFil
 
   return Promise.resolve().then(() => {
 
-    transpileModules(buildConfig, ctx, moduleFiles, transpileResults);
+    transpileModules(config, ctx, moduleFiles, transpileResults);
 
     if (transpileResults.diagnostics.length) {
       return Promise.resolve([]);
@@ -29,7 +29,7 @@ export function transpile(buildConfig: BuildConfig, ctx: BuildContext, moduleFil
 
     return Promise.all(transpiledFileNames.map(transpiledFileName => {
       const moduleFile = transpileResults.moduleFiles[transpiledFileName];
-      return processIncludedStyles(buildConfig, ctx, transpileResults.diagnostics, moduleFile);
+      return processIncludedStyles(config, ctx, transpileResults.diagnostics, moduleFile);
     }));
 
   }).catch(err => {
@@ -41,18 +41,18 @@ export function transpile(buildConfig: BuildConfig, ctx: BuildContext, moduleFil
 }
 
 
-function transpileModules(buildConfig: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileResults) {
-  const tsOptions = getUserTsConfig(buildConfig, ctx);
+function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileResults) {
+  const tsOptions = getUserTsConfig(config, ctx);
 
   if (ctx.isChangeBuild) {
     moduleFiles = getRebuildModules(moduleFiles);
   }
 
-  if (buildConfig.suppressTypeScriptErrors) {
+  if (config.suppressTypeScriptErrors) {
     tsOptions.options.lib = [];
   }
 
-  const tsHost = getTsHost(buildConfig, ctx, tsOptions.options, transpileResults);
+  const tsHost = getTsHost(config, ctx, tsOptions.options, transpileResults);
 
   const tsFileNames = Object.keys(moduleFiles);
 
@@ -60,7 +60,7 @@ function transpileModules(buildConfig: BuildConfig, ctx: BuildContext, moduleFil
 
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
-      componentClass(buildConfig, ctx.moduleFiles, transpileResults.diagnostics),
+      componentClass(config, ctx.moduleFiles, transpileResults.diagnostics),
       removeImports(),
       updateLifecycleMethods()
     ],
@@ -71,11 +71,11 @@ function transpileModules(buildConfig: BuildConfig, ctx: BuildContext, moduleFil
 
   ctx.transpileBuildCount = Object.keys(transpileResults.moduleFiles).length;
 
-  if (!buildConfig.suppressTypeScriptErrors) {
+  if (!config.suppressTypeScriptErrors) {
     const tsDiagnostics = program.getSyntacticDiagnostics()
       .concat(program.getSemanticDiagnostics(), program.getOptionsDiagnostics());
 
-    loadTypeScriptDiagnostics(buildConfig, transpileResults.diagnostics, tsDiagnostics);
+    loadTypeScriptDiagnostics(config, transpileResults.diagnostics, tsDiagnostics);
   }
 }
 
@@ -98,7 +98,7 @@ function getRebuildModules(moduleFiles: ModuleFiles) {
 }
 
 
-function processIncludedStyles(buildConfig: BuildConfig, ctx: BuildContext, diagnostics: Diagnostic[], moduleFile: ModuleFileMeta) {
+function processIncludedStyles(config: BuildConfig, ctx: BuildContext, diagnostics: Diagnostic[], moduleFile: ModuleFileMeta) {
   if (ctx.isChangeBuild && !ctx.changeHasSass && !ctx.changeHasCss) {
     // this is a change, but it's not for any styles so don't bother
     return Promise.resolve([]);
@@ -109,7 +109,7 @@ function processIncludedStyles(buildConfig: BuildConfig, ctx: BuildContext, diag
     return Promise.resolve([]);
   }
 
-  const sys = buildConfig.sys;
+  const sys = config.sys;
 
   const promises: Promise<any>[] = [];
 
@@ -119,7 +119,7 @@ function processIncludedStyles(buildConfig: BuildConfig, ctx: BuildContext, diag
 
     if (modeMeta.absStylePaths) {
       modeMeta.absStylePaths.forEach(absoluteStylePath => {
-        if (isSassSourceFile(absoluteStylePath)) {
+        if (isSassFile(absoluteStylePath)) {
           promises.push(
             getIncludedSassFiles(sys, diagnostics, moduleFile, absoluteStylePath)
           );

@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext } from '../interfaces';
 import * as ts from 'typescript';
 
 
-export function getUserTsConfig(buildConfig: BuildConfig, ctx: BuildContext): { options: ts.CompilerOptions } {
+export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { options: ts.CompilerOptions } {
   if (ctx.tsConfig) {
     return ctx.tsConfig;
   }
@@ -11,10 +11,10 @@ export function getUserTsConfig(buildConfig: BuildConfig, ctx: BuildContext): { 
   const options = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   // apply user config to tsconfig
-  options.outDir = buildConfig.collectionDest;
-  options.rootDir = buildConfig.src;
+  options.outDir = config.collectionDest;
+  options.rootDir = config.src;
 
-  if (buildConfig.devMode) {
+  if (config.devMode) {
     // for dev builds let's not create d.ts files
     options.declaration = false;
   }

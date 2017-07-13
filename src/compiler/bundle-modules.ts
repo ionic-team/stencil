@@ -5,7 +5,7 @@ import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from
 import { generateBanner } from './util';
 
 
-export function bundleModules(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
+export function bundleModules(config: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
   // create main module results object
   const moduleResults: ModuleResults = {
     bundles: {},
@@ -16,10 +16,10 @@ export function bundleModules(buildConfig: BuildConfig, ctx: BuildContext, userM
   // or it's a change build that has either changed modules or components
   const doBundling = (!ctx.isChangeBuild || ctx.changeHasComponentModules || ctx.changeHasNonComponentModules);
 
-  const timeSpan = buildConfig.logger.createTimeSpan(`bundle modules started`, !doBundling);
+  const timeSpan = config.logger.createTimeSpan(`bundle modules started`, !doBundling);
 
   return Promise.all(userManifest.bundles.map(userBundle => {
-    return generateDefineComponents(buildConfig, ctx, userManifest, userBundle, moduleResults);
+    return generateDefineComponents(config, ctx, userManifest, userBundle, moduleResults);
 
   })).catch(err => {
     catchError(moduleResults.diagnostics, err);
@@ -31,8 +31,8 @@ export function bundleModules(buildConfig: BuildConfig, ctx: BuildContext, userM
 }
 
 
-function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest, userBundle: Bundle, moduleResults: ModuleResults) {
-  const sys = buildConfig.sys;
+function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userManifest: Manifest, userBundle: Bundle, moduleResults: ModuleResults) {
+  const sys = config.sys;
 
   const bundleComponentMeta = userBundle.components.map(userBundleComponentTag => {
     const cmpMeta = userManifest.components.find(c => c.tagNameMeta === userBundleComponentTag);
@@ -57,11 +57,11 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
     // format all the JS bundle content
     // insert the already bundled JS module into the defineComponents function
     let moduleContent = formatDefineComponents(
-      buildConfig.namespace, STENCIL_BUNDLE_ID,
+      config.namespace, STENCIL_BUNDLE_ID,
       bundleDetails.content, bundleComponentMeta
     );
 
-    if (buildConfig.minifyJs) {
+    if (config.minifyJs) {
       // minify js
       const minifyJsResults = sys.minifyJs(moduleContent);
       minifyJsResults.diagnostics.forEach(d => {
@@ -73,9 +73,9 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
       }
     }
 
-    if (buildConfig.hashFileNames) {
+    if (config.hashFileNames) {
       // create module id from hashing the content
-      moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent, buildConfig.hashedFileNameLength);
+      moduleResults.bundles[bundleId] = sys.generateContentHash(moduleContent, config.hashedFileNameLength);
 
     } else {
       // create module id from list of component tags in this file
@@ -93,11 +93,11 @@ function generateDefineComponents(buildConfig: BuildConfig, ctx: BuildContext, u
     if (bundleDetails.writeFile) {
       // create the file name and path of where the bundle will be saved
       const moduleFileName = formatJsBundleFileName(moduleResults.bundles[bundleId]);
-      const moduleFilePath = sys.path.join(buildConfig.buildDest, buildConfig.namespace.toLowerCase(), moduleFileName);
+      const moduleFilePath = sys.path.join(config.buildDest, config.namespace.toLowerCase(), moduleFileName);
 
       ctx.moduleBundleCount++;
 
-      ctx.filesToWrite[moduleFilePath] = generateBanner(buildConfig) + moduleContent;
+      ctx.filesToWrite[moduleFilePath] = generateBanner(config) + moduleContent;
     }
 
   }).catch(err => {

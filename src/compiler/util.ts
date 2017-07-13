@@ -157,7 +157,7 @@ function sortDirectories(sys: StencilSystem, directories: string[]) {
 }
 
 
-export function isTsSourceFile(filePath: string) {
+export function isTsFile(filePath: string) {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
     if (parts[parts.length - 1] === 'ts' || parts[parts.length - 1] === 'tsx') {
@@ -171,20 +171,27 @@ export function isTsSourceFile(filePath: string) {
 }
 
 
-export function isSassSourceFile(filePath: string) {
+export function isSassFile(filePath: string) {
   const ext = filePath.split('.').pop().toLowerCase();
   return ext === 'scss' || ext === 'sass';
 }
 
 
-export function isCssSourceFile(filePath: string) {
+export function isCssFile(filePath: string) {
   return filePath.split('.').pop().toLowerCase() === 'css';
 }
 
 
-export function isDevFile(filePath: string) {
-  return isTsSourceFile(filePath) || isSassSourceFile(filePath) || isCssSourceFile(filePath);
+export function isHtmlFile(filePath: string) {
+  const ext = filePath.split('.').pop().toLowerCase();
+  return ext === 'html' || ext === 'htm';
 }
+
+export function isWebDevFile(filePath: string) {
+  const ext = filePath.split('.').pop().toLowerCase();
+  return WEB_DEV_EXT.indexOf(ext) > -1;
+}
+const WEB_DEV_EXT = ['ts', 'tsx', 'js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
 
 
 export function hasCmpClass(sourceText: string, filePath: string) {
@@ -200,11 +207,11 @@ export function hasCmpClass(sourceText: string, filePath: string) {
 }
 
 
-export function generateBanner(buildConfig: BuildConfig) {
+export function generateBanner(config: BuildConfig) {
   let preamble: string[] = [];
 
-  if (buildConfig.preamble) {
-    preamble = buildConfig.preamble.split('\n');
+  if (config.preamble) {
+    preamble = config.preamble.split('\n');
   }
 
   preamble.push(BANNER);

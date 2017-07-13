@@ -7,24 +7,24 @@ import { validateDependentCollection, validateUserBundles } from './validation';
 import { parseManifest, serializeManifest } from './manifest-data';
 
 
-export function loadDependentManifests(buildConfig: BuildConfig) {
-  return Promise.all(buildConfig.collections.map(userInput => {
+export function loadDependentManifests(config: BuildConfig) {
+  return Promise.all(config.collections.map(userInput => {
     const dependentCollection = validateDependentCollection(userInput);
-    return loadDependentManifest(buildConfig, dependentCollection);
+    return loadDependentManifest(config, dependentCollection);
   }));
 }
 
 
-function loadDependentManifest(buildConfig: BuildConfig, dependentCollection: Collection) {
-  const sys = buildConfig.sys;
+function loadDependentManifest(config: BuildConfig, dependentCollection: Collection) {
+  const sys = config.sys;
 
-  const dependentManifestFilePath = resolveFrom(sys, buildConfig.rootDir, dependentCollection.name);
+  const dependentManifestFilePath = resolveFrom(sys, config.rootDir, dependentCollection.name);
   const dependentManifestDir = sys.path.dirname(dependentManifestFilePath);
 
   return readFile(sys, dependentManifestFilePath).then(dependentManifestJson => {
-    const dependentManifest = parseManifest(buildConfig, dependentManifestDir, dependentManifestJson);
+    const dependentManifest = parseManifest(config, dependentManifestDir, dependentManifestJson);
 
-    return processDependentManifest(buildConfig.bundles, dependentCollection, dependentManifest);
+    return processDependentManifest(config.bundles, dependentCollection, dependentManifest);
   });
 }
 
@@ -71,15 +71,15 @@ export function mergeManifests(manifestPriorityList: Manifest[]): Manifest {
 }
 
 
-export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, compileResults: CompileResults) {
-  const sys = buildConfig.sys;
-  const logger = buildConfig.logger;
+export function generateManifest(config: BuildConfig, ctx: BuildContext, compileResults: CompileResults) {
+  const sys = config.sys;
+  const logger = config.logger;
 
   // validate we're good to go
-  validateUserBundles(buildConfig.bundles);
+  validateUserBundles(config.bundles);
 
   // get the absolute path to the directory where the manifest will be saved
-  const manifestDir = normalizePath(buildConfig.collectionDest);
+  const manifestDir = normalizePath(config.collectionDest);
 
   // create an absolute path to the actual manifest json file
   const manifestFilePath = normalizePath(sys.path.join(manifestDir, COLLECTION_MANIFEST_FILE_NAME));
@@ -103,7 +103,7 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
       return;
     }
 
-    const includeComponent = buildConfig.bundles.some(b => {
+    const includeComponent = config.bundles.some(b => {
       return b.components.some(c => c === moduleFile.cmpMeta.tagNameMeta);
     });
 
@@ -119,12 +119,12 @@ export function generateManifest(buildConfig: BuildConfig, ctx: BuildContext, co
     manifestModulesFiles.push(moduleFile);
   });
 
-  if (buildConfig.generateCollection) {
+  if (config.generateCollection) {
     // if we're also generating the collection, then we want to
     // save this manifest as a json file to disk
     logger.debug(`manifest, serializeManifest: ${manifestFilePath}`);
 
-    ctx.filesToWrite[manifestFilePath] = serializeManifest(buildConfig, manifestDir, manifestModulesFiles);
+    ctx.filesToWrite[manifestFilePath] = serializeManifest(config, manifestDir, manifestModulesFiles);
   }
 
   return manifest;

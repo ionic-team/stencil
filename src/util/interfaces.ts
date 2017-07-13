@@ -458,6 +458,7 @@ export interface BuildConfig {
   hashedFileNameLength?: number;
   suppressTypeScriptErrors?: boolean;
   attrCase?: number;
+  watchIgnoredRegex?: RegExp;
 }
 
 

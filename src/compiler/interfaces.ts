@@ -29,6 +29,7 @@ export interface BuildContext {
   changeHasComponentModules?: boolean;
   changeHasSass?: boolean;
   changeHasCss?: boolean;
+  changeHasHtml?: boolean;
   changedFiles?: string[];
 
   sassBuildCount?: number;

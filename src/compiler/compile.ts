@@ -2,16 +2,16 @@ import { BuildConfig, BuildContext, CompileResults } from './interfaces';
 import { catchError } from './util';
 import { generateManifest } from './manifest';
 import { getModuleFile } from './transpile/compiler-host';
-import { isTsSourceFile, readFile, normalizePath } from './util';
+import { isTsFile, readFile, normalizePath } from './util';
 import { transpile } from './transpile/transpile';
 
 
-export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
-  const logger = buildConfig.logger;
+export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
+  const logger = config.logger;
 
-  const timeSpan = buildConfig.logger.createTimeSpan(`compile started`);
+  const timeSpan = config.logger.createTimeSpan(`compile started`);
 
-  logger.debug(`compileDirectory, srcDir: ${buildConfig.src}`);
+  logger.debug(`compileDirectory, srcDir: ${config.src}`);
 
   const compileResults: CompileResults = {
     moduleFiles: {},
@@ -20,8 +20,8 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
     includedSassFiles: []
   };
 
-  return scanDir(buildConfig, ctx, buildConfig.src, compileResults).then(() => {
-    return transpile(buildConfig, ctx, compileResults.moduleFiles);
+  return scanDir(config, ctx, config.src, compileResults).then(() => {
+    return transpile(config, ctx, compileResults.moduleFiles);
 
   }).then(transpileResults => {
     compileResults.diagnostics = compileResults.diagnostics.concat(transpileResults.diagnostics);
@@ -32,7 +32,7 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
 
         compileResults.moduleFiles[tsFilePath] = moduleFile;
 
-        if (buildConfig.generateCollection) {
+        if (config.generateCollection) {
           ctx.filesToWrite[moduleFile.jsFilePath] = moduleFile.jsText;
         }
 
@@ -47,10 +47,10 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
     }
 
   }).then(() => {
-    compileResults.manifest = generateManifest(buildConfig, ctx, compileResults);
+    compileResults.manifest = generateManifest(config, ctx, compileResults);
 
   }).then(() => {
-    return copySourceSassFilesToDest(buildConfig, ctx, compileResults);
+    return copySourceSassFilesToDest(config, ctx, compileResults);
 
   }).catch(err => {
     catchError(compileResults.diagnostics, err);
@@ -62,12 +62,12 @@ export function compileSrcDir(buildConfig: BuildConfig, ctx: BuildContext) {
 }
 
 
-function scanDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
+function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileResults: CompileResults): Promise<any> {
   return new Promise(resolve => {
     // loop through this directory and sub directories looking for
     // files that need to be transpiled
-    const sys = buildConfig.sys;
-    const logger = buildConfig.logger;
+    const sys = config.sys;
+    const logger = config.logger;
 
     dir = normalizePath(dir);
 
@@ -85,7 +85,7 @@ function scanDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compi
         // let's loop through each of the files we've found so far
         const readPath = sys.path.join(dir, dirItem);
 
-        if (!isValidDirectory(buildConfig.exclude, readPath)) {
+        if (!isValidDirectory(config.exclude, readPath)) {
           // don't bother continuing for invalid directories
           return;
         }
@@ -101,15 +101,15 @@ function scanDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compi
             } else if (stats.isDirectory()) {
               // looks like it's yet another directory
               // let's keep drilling down
-              scanDir(buildConfig, ctx, readPath, compileResults).then(() => {
+              scanDir(config, ctx, readPath, compileResults).then(() => {
                 resolve();
               });
 
-            } else if (isTsSourceFile(readPath)) {
+            } else if (isTsFile(readPath)) {
               // woot! we found a typescript file that needs to be transpiled
               // let's send this over to our worker manager who can
               // then assign a worker to this exact file
-              getModuleFile(buildConfig, ctx, readPath).then(moduleFile => {
+              getModuleFile(config, ctx, readPath).then(moduleFile => {
                 compileResults.moduleFiles[moduleFile.tsFilePath] = moduleFile;
                 resolve();
               });
@@ -135,30 +135,30 @@ function scanDir(buildConfig: BuildConfig, ctx: BuildContext, dir: string, compi
 }
 
 
-function copySourceSassFilesToDest(buildConfig: BuildConfig, ctx: BuildContext, compileResults: CompileResults): Promise<any> {
-  if (!buildConfig.generateCollection) {
+function copySourceSassFilesToDest(config: BuildConfig, ctx: BuildContext, compileResults: CompileResults): Promise<any> {
+  if (!config.generateCollection) {
     return Promise.resolve();
   }
 
-  const sys = buildConfig.sys;
+  const sys = config.sys;
 
   return Promise.all(compileResults.includedSassFiles.map(sassSrcPath => {
     sassSrcPath = normalizePath(sassSrcPath);
 
     return readFile(sys, sassSrcPath).then(sassSrcText => {
-      const includeDir = sassSrcPath.indexOf(buildConfig.src) === 0;
+      const includeDir = sassSrcPath.indexOf(config.src) === 0;
       let sassDestPath: string;
 
       if (includeDir) {
         sassDestPath = normalizePath(sys.path.join(
-          buildConfig.collectionDest,
-          sys.path.relative(buildConfig.src, sassSrcPath)
+          config.collectionDest,
+          sys.path.relative(config.src, sassSrcPath)
         ));
 
       } else {
         sassDestPath = normalizePath(sys.path.join(
-          buildConfig.rootDir,
-          sys.path.relative(buildConfig.rootDir, sassSrcPath)
+          config.rootDir,
+          sys.path.relative(config.rootDir, sassSrcPath)
         ));
       }
 

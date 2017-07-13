@@ -22,20 +22,20 @@ export function parseComponentMetadata({ assetsDir, assetsDirs }: ComponentOptio
   }
 }
 
-export function bundleAssets(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest): Promise<AssetsResults> {
+export function bundleAssets(config: BuildConfig, ctx: BuildContext, userManifest: Manifest): Promise<AssetsResults> {
   const assetsResults: AssetsResults = {
     bundles: {},
     diagnostics: []
   };
 
-  const timeSpan = buildConfig.logger.createTimeSpan(`bundle assets started`, true);
+  const timeSpan = config.logger.createTimeSpan(`bundle assets started`, true);
 
   const directoriesToCopy: string[] = userManifest.components
     .filter(c => c.assetsDirsMeta && c.assetsDirsMeta.length)
     .reduce((dirList, component) => {
       const qualifiedPathDirs: string[] = component.assetsDirsMeta.map((dir: string) => {
-        const relativeCompUrl = buildConfig.sys.path.relative(buildConfig.collectionDest, component.componentPath);
-        return buildConfig.sys.path.resolve(buildConfig.src, relativeCompUrl, dir);
+        const relativeCompUrl = config.sys.path.relative(config.collectionDest, component.componentPath);
+        return config.sys.path.resolve(config.src, relativeCompUrl, dir);
       });
 
       return dirList.concat(qualifiedPathDirs);
@@ -43,8 +43,8 @@ export function bundleAssets(buildConfig: BuildConfig, ctx: BuildContext, userMa
 
   const dirCopyPromises = directoriesToCopy.map((directory: string) => {
     return new Promise((resolve, reject) => {
-      const destination = buildConfig.sys.path.join(buildConfig.collectionDest, buildConfig.sys.path.basename(directory));
-      buildConfig.sys.copyDir(directory, destination, (err) => {
+      const destination = config.sys.path.join(config.collectionDest, config.sys.path.basename(directory));
+      config.sys.copyDir(directory, destination, (err) => {
         if (err) {
           reject(err);
         }

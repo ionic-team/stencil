@@ -4,9 +4,9 @@ import { highlightError } from './highlight/highlight';
 import { toTitleCase } from '../../util/helpers';
 
 
-export function generateHtmlDiagnostics(buildConfig: BuildConfig, diagnostics: Diagnostic[]) {
+export function generateHtmlDiagnostics(config: BuildConfig, diagnostics: Diagnostic[]) {
   // TODO
-  buildConfig;
+  config;
   diagnostics;
   generateHtmlDocument;
 }

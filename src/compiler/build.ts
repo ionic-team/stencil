@@ -13,7 +13,7 @@ import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
 
 
-export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
+export function build(config: BuildConfig, ctx?: BuildContext) {
   // create a timespan of the build process
   let timeSpan: LoggerTimeSpan;
 
@@ -43,34 +43,34 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
   return Promise.resolve().then(() => {
     // validate the build config
     if (!ctx.isRebuild) {
-      validateBuildConfig(buildConfig);
+      validateBuildConfig(config);
     }
 
-    timeSpan = buildConfig.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${buildConfig.devMode ? 'dev' : 'prod'} mode, started`);
+    timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
 
   }).then(() => {
     // generate manifest phase
-    return loadDependentManifests(buildConfig);
+    return loadDependentManifests(config);
 
   }).then(dependentManifests => {
     // compile src directory phase
-    return compileSrcPhase(buildConfig, ctx, dependentManifests, buildResults);
+    return compileSrcPhase(config, ctx, dependentManifests, buildResults);
 
   }).then(manifest => {
     // bundle phase
-    return bundlePhase(buildConfig, ctx, manifest, buildResults);
+    return bundlePhase(config, ctx, manifest, buildResults);
 
   }).then(() => {
     // optimize index.html
-    return optimizeHtmlPhase(buildConfig, ctx, buildResults);
+    return optimizeHtmlPhase(config, ctx, buildResults);
 
   }).then(() => {
     // write all the files in one go
-    return writePhase(buildConfig, ctx, buildResults);
+    return writePhase(config, ctx, buildResults);
 
   }).then(() => {
     // setup watcher if need be
-    return setupWatcher(buildConfig, ctx);
+    return setupWatcher(config, ctx);
 
   }).catch(err => {
     // catch all phase
@@ -78,16 +78,16 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
 
   }).then(() => {
     // finalize phase
-    if (buildConfig) {
+    if (config) {
       buildResults.diagnostics = cleanDiagnostics(buildResults.diagnostics);
-      buildConfig.logger.printDiagnostics(buildResults.diagnostics);
-      generateHtmlDiagnostics(buildConfig, buildResults.diagnostics);
+      config.logger.printDiagnostics(buildResults.diagnostics);
+      generateHtmlDiagnostics(config, buildResults.diagnostics);
     }
 
     if (timeSpan) {
       let buildText = ctx.isRebuild ? 'rebuild' : 'build';
       let buildStatus = 'finished';
-      let watchText = buildConfig.watch ? ', watching for changes...' : '';
+      let watchText = config.watch ? ', watching for changes...' : '';
       let statusColor = 'green';
       if (buildResults.diagnostics.some(d => d.level === 'error')) {
         buildStatus = 'failed';
@@ -109,15 +109,15 @@ export function build(buildConfig: BuildConfig, ctx?: BuildContext) {
 }
 
 
-function compileSrcPhase(buildConfig: BuildConfig, ctx: BuildContext, dependentManifests: Manifest[], buildResults: BuildResults) {
-  return compileSrcDir(buildConfig, ctx).then(compileResults => {
+function compileSrcPhase(config: BuildConfig, ctx: BuildContext, dependentManifests: Manifest[], buildResults: BuildResults) {
+  return compileSrcDir(config, ctx).then(compileResults => {
     if (compileResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(compileResults.diagnostics);
     }
 
     // get the manifest created from this project's code
     const projectManifest = compileResults.manifest || {};
-    projectManifest.bundles = buildConfig.bundles || [];
+    projectManifest.bundles = config.bundles || [];
 
     // merge this project's manifest with all of the dependent manifests
     // to have one manifest to rule them all
@@ -129,8 +129,8 @@ function compileSrcPhase(buildConfig: BuildConfig, ctx: BuildContext, dependentM
 }
 
 
-function bundlePhase(buildConfig: BuildConfig, ctx: BuildContext, manifest: Manifest, buildResults: BuildResults) {
-  return bundle(buildConfig, ctx, manifest).then(bundleResults => {
+function bundlePhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest, buildResults: BuildResults) {
+  return bundle(config, ctx, manifest).then(bundleResults => {
     if (bundleResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(bundleResults.diagnostics);
     }
@@ -138,13 +138,13 @@ function bundlePhase(buildConfig: BuildConfig, ctx: BuildContext, manifest: Mani
     buildResults.componentRegistry = bundleResults.componentRegistry;
 
     // generate the loader and core files for this project
-    return generateProjectFiles(buildConfig, ctx, bundleResults.componentRegistry);
+    return generateProjectFiles(config, ctx, bundleResults.componentRegistry);
   });
 }
 
 
-function optimizeHtmlPhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
-  return optimizeHtml(buildConfig, ctx).then(optimizeHtmlResults => {
+function optimizeHtmlPhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+  return optimizeHtml(config, ctx).then(optimizeHtmlResults => {
     if (optimizeHtmlResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(optimizeHtmlResults.diagnostics);
     }
@@ -152,10 +152,10 @@ function optimizeHtmlPhase(buildConfig: BuildConfig, ctx: BuildContext, buildRes
 }
 
 
-function writePhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+function writePhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
   buildResults.files = Object.keys(ctx.filesToWrite).sort();
 
-  const timeSpan = buildConfig.logger.createTimeSpan(`writePhase started, fileUpdates: ${buildResults.files.length}`, true);
+  const timeSpan = config.logger.createTimeSpan(`writePhase started, fileUpdates: ${buildResults.files.length}`, true);
 
   // create a copy of all the files to write
   const filesToWrite = Object.assign({}, ctx.filesToWrite);
@@ -164,15 +164,15 @@ function writePhase(buildConfig: BuildConfig, ctx: BuildContext, buildResults: B
   ctx.filesToWrite = {};
 
   const dirPromises: Promise<any>[] = [];
-  if (buildResults.files.length > 0 && !buildConfig.devMode) {
+  if (buildResults.files.length > 0 && !config.devMode) {
     // only prod mode empties directories
-    dirPromises.push(emptyDir(buildConfig.sys, buildConfig.collectionDest));
-    dirPromises.push(emptyDir(buildConfig.sys, buildConfig.buildDest));
+    dirPromises.push(emptyDir(config.sys, config.collectionDest));
+    dirPromises.push(emptyDir(config.sys, config.buildDest));
   }
 
   return Promise.all(dirPromises).then(() => {
     if (buildResults.files.length > 0) {
-      return writeFiles(buildConfig.sys, buildConfig.rootDir, filesToWrite);
+      return writeFiles(config.sys, config.rootDir, filesToWrite);
     }
     return Promise.resolve();
 

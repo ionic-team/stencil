@@ -2,10 +2,10 @@ import { BuildConfig, ComponentMeta, ComponentOptions, ModuleFileMeta, StyleMeta
 import { normalizePath } from '../../util';
 
 
-export function normalizeStyles(buildConfig: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
+export function normalizeStyles(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
   normalizeStyleStr(userOpts, cmpMeta);
-  normalizeStylePath(buildConfig, userOpts, moduleFile, cmpMeta);
-  normalizeStylePaths(buildConfig, userOpts, moduleFile, cmpMeta);
+  normalizeStylePath(config, userOpts, moduleFile, cmpMeta);
+  normalizeStylePaths(config, userOpts, moduleFile, cmpMeta);
 }
 
 
@@ -20,7 +20,7 @@ function normalizeStyleStr(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
 }
 
 
-function normalizeStylePath(buildConfig: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
+function normalizeStylePath(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
   if (typeof userOpts.styleUrl === 'string' && userOpts.styleUrl.trim()) {
     // as a string
     // styleUrl: 'my-styles.scss'
@@ -28,12 +28,12 @@ function normalizeStylePath(buildConfig: BuildConfig, userOpts: ComponentOptions
     cmpMeta.stylesMeta = cmpMeta.stylesMeta || {};
     cmpMeta.stylesMeta.$ = cmpMeta.stylesMeta.$ || {};
 
-    normalizeModeStylePaths(buildConfig, moduleFile, cmpMeta.stylesMeta.$, userOpts.styleUrl);
+    normalizeModeStylePaths(config, moduleFile, cmpMeta.stylesMeta.$, userOpts.styleUrl);
   }
 }
 
 
-function normalizeStylePaths(buildConfig: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
+function normalizeStylePaths(congif: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
   if (!userOpts.styleUrls) {
     return;
   }
@@ -49,7 +49,7 @@ function normalizeStylePaths(buildConfig: BuildConfig, userOpts: ComponentOption
 
         cmpMeta.stylesMeta = cmpMeta.stylesMeta || {};
         cmpMeta.stylesMeta.$ = cmpMeta.stylesMeta.$ || {};
-        normalizeModeStylePaths(buildConfig, moduleFile, cmpMeta.stylesMeta.$, userOpts.styleUrl);
+        normalizeModeStylePaths(congif, moduleFile, cmpMeta.stylesMeta.$, userOpts.styleUrl);
       }
     });
     return;
@@ -69,7 +69,7 @@ function normalizeStylePaths(buildConfig: BuildConfig, userOpts: ComponentOption
     if (typeof styleModes[styleModeName] === 'string' && styleModes[styleModeName].trim()) {
       cmpMeta.stylesMeta = cmpMeta.stylesMeta || {};
       cmpMeta.stylesMeta[modeName] = cmpMeta.stylesMeta[modeName] || {};
-      normalizeModeStylePaths(buildConfig, moduleFile, cmpMeta.stylesMeta[styleModeName], styleModes[styleModeName]);
+      normalizeModeStylePaths(congif, moduleFile, cmpMeta.stylesMeta[styleModeName], styleModes[styleModeName]);
 
     } else if (Array.isArray(styleModes[styleModeName])) {
       const styleUrls: string[] = (<any>userOpts).styleUrls;
@@ -79,7 +79,7 @@ function normalizeStylePaths(buildConfig: BuildConfig, userOpts: ComponentOption
           cmpMeta.stylesMeta = cmpMeta.stylesMeta || {};
           cmpMeta.stylesMeta[modeName] = cmpMeta.stylesMeta[modeName] || {};
 
-          normalizeModeStylePaths(buildConfig, moduleFile, cmpMeta.stylesMeta[styleModeName], styleUrl);
+          normalizeModeStylePaths(congif, moduleFile, cmpMeta.stylesMeta[styleModeName], styleUrl);
         }
       });
     }
@@ -87,23 +87,23 @@ function normalizeStylePaths(buildConfig: BuildConfig, userOpts: ComponentOption
 }
 
 
-function normalizeModeStylePaths(buildConfig: BuildConfig, moduleFile: ModuleFileMeta, modeStyleMeta: StyleMeta, stylePath: string) {
+function normalizeModeStylePaths(config: BuildConfig, moduleFile: ModuleFileMeta, modeStyleMeta: StyleMeta, stylePath: string) {
   modeStyleMeta.cmpRelativeStylePaths = modeStyleMeta.cmpRelativeStylePaths || [];
   modeStyleMeta.absStylePaths = modeStyleMeta.absStylePaths || [];
 
   // get the absolute path of the directory which the component is sitting in
-  const componentDir = normalizePath(buildConfig.sys.path.dirname(moduleFile.tsFilePath));
+  const componentDir = normalizePath(config.sys.path.dirname(moduleFile.tsFilePath));
 
   // get the relative path from the component file to the style
   let componentRelativeStylePath = normalizePath(stylePath.trim());
 
-  if (buildConfig.sys.path.isAbsolute(componentRelativeStylePath)) {
+  if (config.sys.path.isAbsolute(componentRelativeStylePath)) {
     // this path is absolute already!
     // add to our list of style absolute paths
     modeStyleMeta.absStylePaths.push(componentRelativeStylePath);
 
     // if this is an absolute path already, let's convert it to be relative
-    componentRelativeStylePath = buildConfig.sys.path.relative(componentDir, componentRelativeStylePath);
+    componentRelativeStylePath = config.sys.path.relative(componentDir, componentRelativeStylePath);
 
     // add to our list of style relative paths
     modeStyleMeta.cmpRelativeStylePaths.push(componentRelativeStylePath);
@@ -114,7 +114,7 @@ function normalizeModeStylePaths(buildConfig: BuildConfig, moduleFile: ModuleFil
     modeStyleMeta.cmpRelativeStylePaths.push(componentRelativeStylePath);
 
     // create the absolute path to the style file
-    const absoluteStylePath = normalizePath(buildConfig.sys.path.join(componentDir, componentRelativeStylePath));
+    const absoluteStylePath = normalizePath(config.sys.path.join(componentDir, componentRelativeStylePath));
 
     // add to our list of style absolute paths
     modeStyleMeta.absStylePaths.push(absoluteStylePath);

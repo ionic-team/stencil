@@ -9,16 +9,16 @@ import * as ts from 'typescript';
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(buildConfig: BuildConfig, resultsDiagnostics: Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
+export function loadTypeScriptDiagnostics(config: BuildConfig, resultsDiagnostics: Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
   const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
 
   for (var i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadDiagnostic(buildConfig, tsDiagnostics[i]));
+    resultsDiagnostics.push(loadDiagnostic(config, tsDiagnostics[i]));
   }
 }
 
 
-function loadDiagnostic(buildConfig: BuildConfig, tsDiagnostic: ts.Diagnostic) {
+function loadDiagnostic(config: BuildConfig, tsDiagnostic: ts.Diagnostic) {
   const d: Diagnostic = {
     level: 'error',
     type: 'typescript',
@@ -33,7 +33,7 @@ function loadDiagnostic(buildConfig: BuildConfig, tsDiagnostic: ts.Diagnostic) {
 
   if (tsDiagnostic.file) {
     d.absFilePath = tsDiagnostic.file.fileName;
-    d.relFilePath = formatFileName(buildConfig.rootDir, d.absFilePath);
+    d.relFilePath = formatFileName(config.rootDir, d.absFilePath);
 
     let sourceText = tsDiagnostic.file.getText();
     let srcLines = splitLineBreaks(sourceText);
@@ -67,7 +67,7 @@ function loadDiagnostic(buildConfig: BuildConfig, tsDiagnostic: ts.Diagnostic) {
       errorLine.errorCharStart--;
     }
 
-    d.header =  formatHeader('typescript', tsDiagnostic.file.fileName, buildConfig.rootDir, errorLine.lineNumber);
+    d.header =  formatHeader('typescript', tsDiagnostic.file.fileName, config.rootDir, errorLine.lineNumber);
 
     if (errorLine.lineIndex > 0) {
       const previousLine: PrintLine = {

@@ -6,23 +6,23 @@ import { catchError } from './util';
 import { generateComponentRegistry } from './bundle-registry';
 
 
-export function bundle(buildConfig: BuildConfig, ctx: BuildContext, manifest: Manifest) {
-  const logger = buildConfig.logger;
+export function bundle(config: BuildConfig, ctx: BuildContext, manifest: Manifest) {
+  const logger = config.logger;
 
   const bundleResults: BundleResults = {
     diagnostics: [],
     componentRegistry: []
   };
 
-  logger.debug(`bundle, src: ${buildConfig.src}`);
-  logger.debug(`bundle, buildDest: ${buildConfig.buildDest}`);
+  logger.debug(`bundle, src: ${config.src}`);
+  logger.debug(`bundle, buildDest: ${config.buildDest}`);
 
   return Promise.resolve().then(() => {
     // kick off style and module bundling at the same time
     return Promise.all([
-      bundleStyles(buildConfig, ctx, manifest),
-      bundleModules(buildConfig, ctx, manifest),
-      bundleAssets(buildConfig, ctx, manifest)
+      bundleStyles(config, ctx, manifest),
+      bundleModules(config, ctx, manifest),
+      bundleAssets(config, ctx, manifest)
     ]);
 
   }).then(results => {
@@ -42,7 +42,7 @@ export function bundle(buildConfig: BuildConfig, ctx: BuildContext, manifest: Ma
       bundleResults.diagnostics = bundleResults.diagnostics.concat(assetResults.diagnostics);
     }
 
-    bundleResults.componentRegistry = generateComponentRegistry(buildConfig, manifest, styleResults, moduleResults);
+    bundleResults.componentRegistry = generateComponentRegistry(config, manifest, styleResults, moduleResults);
 
   }).catch(err => {
     catchError(bundleResults.diagnostics, err);

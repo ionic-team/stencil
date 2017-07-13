@@ -11,7 +11,7 @@ import { normalizePath } from './util';
 // couple core component meta data between specific versions of the compiler
 
 
-export function serializeManifest(buildConfig: BuildConfig, manifestDir: string, manifestModulesFiles: ModuleFileMeta[]) {
+export function serializeManifest(config: BuildConfig, manifestDir: string, manifestModulesFiles: ModuleFileMeta[]) {
   // create the single manifest we're going to fill up with data
   const manifestData: ManifestData = {
     components: [],
@@ -20,7 +20,7 @@ export function serializeManifest(buildConfig: BuildConfig, manifestDir: string,
 
   // add component data for each of the manifest files
   manifestModulesFiles.forEach(manifestModulesFile => {
-    const cmpData = serializeComponent(buildConfig, manifestDir, manifestModulesFile);
+    const cmpData = serializeComponent(config, manifestDir, manifestModulesFile);
     if (cmpData) {
       manifestData.components.push(cmpData);
     }
@@ -34,32 +34,32 @@ export function serializeManifest(buildConfig: BuildConfig, manifestDir: string,
   });
 
   // add to the manifest what the bundles should be
-  serializeBundles(manifestData, buildConfig);
+  serializeBundles(manifestData, config);
 
   // success!
   return JSON.stringify(manifestData, null, 2);
 }
 
 
-export function parseManifest(buildConfig: BuildConfig, manifestDir: string, manifestJson: string) {
+export function parseManifest(config: BuildConfig, manifestDir: string, manifestJson: string) {
   const manifestData: ManifestData = JSON.parse(manifestJson);
   const manifest: Manifest = {};
 
-  parseComponents(buildConfig, manifestDir, manifestData, manifest);
+  parseComponents(config, manifestDir, manifestData, manifest);
   parseBundles(manifestData, manifest);
 
   return manifest;
 }
 
 
-function parseComponents(buildConfig: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+function parseComponents(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
   const componentsData = manifestData.components;
 
   manifest.components = [];
 
   if (componentsData && Array.isArray(componentsData)) {
     componentsData.forEach(cmpData => {
-      const cmpMeta = parseComponent(buildConfig, manifestDir, cmpData);
+      const cmpMeta = parseComponent(config, manifestDir, cmpData);
       if (cmpMeta) {
         manifest.components.push(cmpMeta);
       }
@@ -68,7 +68,7 @@ function parseComponents(buildConfig: BuildConfig, manifestDir: string, manifest
 }
 
 
-export function serializeComponent(buildConfig: BuildConfig, manifestDir: string, moduleFile: ModuleFileMeta) {
+export function serializeComponent(config: BuildConfig, manifestDir: string, moduleFile: ModuleFileMeta) {
   if (!moduleFile || !moduleFile.cmpMeta) return null;
 
   const cmpData: ComponentData = {};
@@ -78,15 +78,15 @@ export function serializeComponent(buildConfig: BuildConfig, manifestDir: string
   const compiledComponentAbsoluteFilePath = normalizePath(moduleFile.jsFilePath);
 
   // create a relative path from the manifest file to the compiled component's output javascript file
-  const compiledComponentRelativeFilePath = normalizePath(buildConfig.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
+  const compiledComponentRelativeFilePath = normalizePath(config.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
 
   // create a relative path to the directory where the compiled component's output javascript is sitting in
-  const compiledComponentRelativeDirPath = normalizePath(buildConfig.sys.path.dirname(compiledComponentRelativeFilePath));
+  const compiledComponentRelativeDirPath = normalizePath(config.sys.path.dirname(compiledComponentRelativeFilePath));
 
   serializeTag(cmpData, cmpMeta);
   serializeComponentClass(cmpData, cmpMeta);
-  serializeComponentPath(buildConfig, manifestDir, compiledComponentAbsoluteFilePath, cmpData);
-  serializeStyles(buildConfig, compiledComponentRelativeDirPath, cmpData, cmpMeta);
+  serializeComponentPath(config, manifestDir, compiledComponentAbsoluteFilePath, cmpData);
+  serializeStyles(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeProps(cmpData, cmpMeta);
   serializeWillPropChange(cmpData, cmpMeta);
   serializeDidPropChange(cmpData, cmpMeta);
@@ -103,13 +103,13 @@ export function serializeComponent(buildConfig: BuildConfig, manifestDir: string
 }
 
 
-export function parseComponent(buildConfig: BuildConfig, manifestDir: string, cmpData: ComponentData) {
+export function parseComponent(config: BuildConfig, manifestDir: string, cmpData: ComponentData) {
   const cmpMeta: ComponentMeta = {};
 
   parseTag(cmpData, cmpMeta);
-  parseComponentPath(buildConfig, manifestDir, cmpData, cmpMeta);
+  parseComponentPath(config, manifestDir, cmpData, cmpMeta);
   parseComponentClass(cmpData, cmpMeta);
-  parseStyles(buildConfig, manifestDir, cmpData, cmpMeta);
+  parseStyles(config, manifestDir, cmpData, cmpMeta);
   parseProps(cmpData, cmpMeta);
   parseWillPropChange(cmpData, cmpMeta);
   parseDidPropChange(cmpData, cmpMeta);
@@ -135,14 +135,14 @@ function parseTag(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeComponentPath(buildConfig: BuildConfig, manifestDir: string, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
+function serializeComponentPath(config: BuildConfig, manifestDir: string, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
   // convert absolute path into a path that's relative to the manifest file
-  cmpData.componentPath = normalizePath(buildConfig.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
+  cmpData.componentPath = normalizePath(config.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
 }
 
-function parseComponentPath(buildConfig: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseComponentPath(config: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   // convert the path that's relative to the manifest file into an absolute path to the component file
-  cmpMeta.componentPath = normalizePath(buildConfig.sys.path.join(manifestDir, cmpData.componentPath));
+  cmpMeta.componentPath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
 }
 
 
@@ -155,32 +155,32 @@ function parseComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeStyles(buildConfig: BuildConfig, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeStyles(config: BuildConfig, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.stylesMeta) {
     cmpData.styles = {};
 
     const modeNames = Object.keys(cmpMeta.stylesMeta).sort();
 
     modeNames.forEach(modeName => {
-      cmpData.styles[modeName.toLowerCase()] = serializeStyle(buildConfig, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
+      cmpData.styles[modeName.toLowerCase()] = serializeStyle(config, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
     });
   }
 }
 
-function parseStyles(buildConfig: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseStyles(config: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const stylesData = cmpData.styles;
 
   cmpMeta.stylesMeta = {};
 
   if (stylesData) {
     Object.keys(stylesData).forEach(modeName => {
-      cmpMeta.stylesMeta[modeName.toLowerCase()] = parseStyle(buildConfig, manifestDir, stylesData[modeName.toLowerCase()]);
+      cmpMeta.stylesMeta[modeName.toLowerCase()] = parseStyle(config, manifestDir, stylesData[modeName.toLowerCase()]);
     });
   }
 }
 
 
-function serializeStyle(buildConfig: BuildConfig, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
+function serializeStyle(config: BuildConfig, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
   const modeStyleData: StyleData = {};
 
   if (modeStyleMeta.absStylePaths) {
@@ -191,7 +191,7 @@ function serializeStyle(buildConfig: BuildConfig, compiledComponentRelativeDirPa
       // we've already figured out the component's relative path from the manifest file
       // use the value we already created in serializeComponentPath()
       // create a relative path from the manifest file to the style path
-      return normalizePath(buildConfig.sys.path.join(compiledComponentRelativeDirPath, componentRelativeStylePath));
+      return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, componentRelativeStylePath));
     });
 
     modeStyleData.stylePaths.sort();
@@ -204,9 +204,9 @@ function serializeStyle(buildConfig: BuildConfig, compiledComponentRelativeDirPa
   return modeStyleData;
 }
 
-function parseStyle(buildConfig: BuildConfig, manifestDir: string, modeStyleData: StyleData) {
+function parseStyle(config: BuildConfig, manifestDir: string, modeStyleData: StyleData) {
   const modeStyle: StyleMeta = {
-    absStylePaths: modeStyleData.stylePaths.map(stylePath => buildConfig.sys.path.join(manifestDir, stylePath)),
+    absStylePaths: modeStyleData.stylePaths.map(stylePath => config.sys.path.join(manifestDir, stylePath)),
     styleStr: modeStyleData.style
   };
   return modeStyle;
@@ -487,14 +487,14 @@ function parseLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeBundles(manifestData: ManifestData, buildConfig: BuildConfig) {
+function serializeBundles(manifestData: ManifestData, config: BuildConfig) {
   manifestData.bundles = [];
 
-  if (invalidArrayData(buildConfig.bundles)) {
+  if (invalidArrayData(config.bundles)) {
     return;
   }
 
-  buildConfig.bundles.forEach(bundle => {
+  config.bundles.forEach(bundle => {
     if (invalidArrayData(bundle.components)) {
       return;
     }
@@ -510,7 +510,7 @@ function serializeBundles(manifestData: ManifestData, buildConfig: BuildConfig) 
     manifestData.bundles.push(bundleData);
   });
 
-  buildConfig.bundles.sort((a, b) => {
+  config.bundles.sort((a, b) => {
     if (a.components[0] < b.components[0]) return -1;
     if (a.components[0] > b.components[0]) return 1;
     return 0;

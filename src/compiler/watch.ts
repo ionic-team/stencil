@@ -1,20 +1,20 @@
 import { BuildConfig } from '../util/interfaces';
 import { BuildContext } from './interfaces';
 import { build } from './build';
-import { isDevFile, isTsSourceFile, isSassSourceFile, isCssSourceFile, normalizePath } from './util';
+import { isTsFile, isSassFile, isCssFile, isHtmlFile, isWebDevFile, normalizePath } from './util';
 
 
-export function setupWatcher(buildConfig: BuildConfig, ctx: BuildContext) {
+export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
   // only create the watcher if this is a watch build
   // and we haven't created a watcher yet
-  if (!buildConfig.watch || ctx.watcher) return;
+  if (!config.watch || ctx.watcher) return;
 
-  const logger = buildConfig.logger;
+  const logger = config.logger;
   let queueChangeBuild = false;
   let queueFullBuild = false;
 
-  ctx.watcher = buildConfig.sys.watch(buildConfig.src, {
-    ignored: /(^|[\/\\])\../,
+  ctx.watcher = config.sys.watch(config.src, {
+    ignored: config.watchIgnoredRegex,
     ignoreInitial: true
   });
 
@@ -22,8 +22,9 @@ export function setupWatcher(buildConfig: BuildConfig, ctx: BuildContext) {
     .on('change', (path: string) => {
       logger.debug(`watcher, change: ${path}, ${Date.now()}`);
 
-      if (isDevFile(path)) {
-        // queue change
+      if (isWebDevFile(path)) {
+        // web dev file was updaed
+        // queue change build
         queueChangeBuild = true;
         queue(path);
       }
@@ -31,8 +32,9 @@ export function setupWatcher(buildConfig: BuildConfig, ctx: BuildContext) {
     .on('unlink', (path: string) => {
       logger.debug(`watcher, unlink: ${path}, ${Date.now()}`);
 
-      if (isDevFile(path)) {
-        // queue change since we already knew about this file
+      if (isWebDevFile(path)) {
+        // web dev file was delete
+        // do a full rebuild
         queueFullBuild = true;
         queue();
       }
@@ -40,9 +42,9 @@ export function setupWatcher(buildConfig: BuildConfig, ctx: BuildContext) {
     .on('add', (path: string) => {
       logger.debug(`watcher, add: ${path}, ${Date.now()}`);
 
-      if (isDevFile(path)) {
-        // new dev file was added
-        // do a full rebuild to get the details
+      if (isWebDevFile(path)) {
+        // new web dev file was added
+        // do a full rebuild
         queueFullBuild = true;
         queue();
       }
@@ -84,10 +86,10 @@ export function setupWatcher(buildConfig: BuildConfig, ctx: BuildContext) {
         changedFiles.length = 0;
 
         if (queueFullBuild) {
-          watchBuild(buildConfig, ctx, true, changedFileCopies);
+          watchBuild(config, ctx, true, changedFileCopies);
 
         } else if (queueChangeBuild) {
-          watchBuild(buildConfig, ctx, false, changedFileCopies);
+          watchBuild(config, ctx, false, changedFileCopies);
         }
 
         // reset
@@ -102,7 +104,7 @@ export function setupWatcher(buildConfig: BuildConfig, ctx: BuildContext) {
 }
 
 
-function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBuild: boolean, changedFiles: string[]) {
+function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: boolean, changedFiles: string[]) {
   // always reset to do a full build
   ctx.isRebuild = true;
   ctx.isChangeBuild = false;
@@ -120,7 +122,7 @@ function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBui
 
     changedFiles.forEach(changedFile => {
 
-      if (isTsSourceFile(changedFile)) {
+      if (isTsFile(changedFile)) {
         // we know there's a module change
         const moduleFile = ctx.moduleFiles[changedFile];
         if (moduleFile && moduleFile.hasCmpClass) {
@@ -136,19 +138,20 @@ function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBui
         // remove its cached content
         delete ctx.moduleFiles[changedFile];
 
-      } else if (isSassSourceFile(changedFile)) {
-        // we know there's a sass change
+      } else if (isSassFile(changedFile)) {
         ctx.changeHasSass = true;
 
-      } else if (isCssSourceFile(changedFile)) {
-        // we know there's a css change
+      } else if (isCssFile(changedFile)) {
         ctx.changeHasCss = true;
+
+      } else if (isHtmlFile(changedFile)) {
+        ctx.changeHasHtml = true;
       }
     });
 
     // if nothing is true then something is up
-    // so let's do a full build if "isChangeBuild" is false
-    ctx.isChangeBuild = (changeHasComponentModules || changeHasNonComponentModules || ctx.changeHasSass || ctx.changeHasCss);
+    // so let's do a full build if "isChangeBuild" ends up being false
+    ctx.isChangeBuild = (changeHasComponentModules || changeHasNonComponentModules || ctx.changeHasSass || ctx.changeHasCss || ctx.changeHasHtml);
 
     if (ctx.isChangeBuild) {
       if (changeHasNonComponentModules && !changeHasComponentModules) {
@@ -178,8 +181,8 @@ function watchBuild(buildConfig: BuildConfig, ctx: BuildContext, requiresFullBui
     ctx.styleSassOutputs = {};
   }
 
-  let msg = `changed file${changedFiles.length > 1 ? 's' : ''}: ${changedFiles.map(f => buildConfig.sys.path.basename(f)).join(', ')}`;
-  buildConfig.logger.info(msg);
+  let msg = `changed file${changedFiles.length > 1 ? 's' : ''}: ${changedFiles.map(f => config.sys.path.basename(f)).join(', ')}`;
+  config.logger.info(msg);
 
-  return build(buildConfig, ctx);
+  return build(config, ctx);
 }

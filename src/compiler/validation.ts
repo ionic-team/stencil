@@ -100,6 +100,10 @@ export function validateBuildConfig(config: BuildConfig) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
+  if (!config.watchIgnoredRegex) {
+    config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
+  }
+
   config.generateCollection = !!config.generateCollection;
 
   config.attrCase = validateAttrCase(config.attrCase);
@@ -263,3 +267,4 @@ const DEFAULT_COLLECTION_DEST = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 12;
 const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
+const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;

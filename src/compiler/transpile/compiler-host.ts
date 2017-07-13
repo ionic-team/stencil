@@ -3,30 +3,30 @@ import { normalizePath, readFile } from '../util';
 import * as ts from 'typescript';
 
 
-export function getTsHost(buildConfig: BuildConfig, ctx: BuildContext, tsCompilerOptions: ts.CompilerOptions, transpileResults: TranspileResults) {
+export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOptions: ts.CompilerOptions, transpileResults: TranspileResults) {
   const tsHost = ts.createCompilerHost(tsCompilerOptions);
 
   tsHost.getSourceFile = (tsFilePath) => {
     tsFilePath = normalizePath(tsFilePath);
 
-    const module = getModuleFileSync(buildConfig, ctx, tsFilePath);
+    const module = getModuleFileSync(config, ctx, tsFilePath);
     if (module && typeof module.tsText === 'string') {
       return ts.createSourceFile(tsFilePath, module.tsText, ts.ScriptTarget.ES2015);
     }
-    buildConfig.logger.error(`tsHost.getSourceFile unable to find ${tsFilePath}`);
+    config.logger.error(`tsHost.getSourceFile unable to find ${tsFilePath}`);
     return null;
   };
 
   tsHost.fileExists = (tsFilePath) => {
     tsFilePath = normalizePath(tsFilePath);
 
-    return moduleFileExistsSync(buildConfig, ctx, tsFilePath);
+    return moduleFileExistsSync(config, ctx, tsFilePath);
   },
 
   tsHost.readFile = (tsFilePath) => {
     tsFilePath = normalizePath(tsFilePath);
 
-    let moduleFile = getModuleFileSync(buildConfig, ctx, tsFilePath);
+    let moduleFile = getModuleFileSync(config, ctx, tsFilePath);
     return moduleFile.tsText;
   },
 
@@ -67,7 +67,7 @@ export function getTsHost(buildConfig: BuildConfig, ctx: BuildContext, tsCompile
 }
 
 
-export function getModuleFile(buildConfig: BuildConfig, ctx: BuildContext, tsFilePath: string): Promise<ModuleFileMeta> {
+export function getModuleFile(config: BuildConfig, ctx: BuildContext, tsFilePath: string): Promise<ModuleFileMeta> {
   tsFilePath = normalizePath(tsFilePath);
 
   let moduleFile = ctx.moduleFiles[tsFilePath];
@@ -78,14 +78,14 @@ export function getModuleFile(buildConfig: BuildConfig, ctx: BuildContext, tsFil
     }
 
     // we have the module, but no source content, let's load it up
-    return readFile(buildConfig.sys, tsFilePath).then(tsText => {
+    return readFile(config.sys, tsFilePath).then(tsText => {
       moduleFile.tsText = tsText;
       return moduleFile;
     });
   }
 
   // never seen this ts file before, let's start a new module file
-  return readFile(buildConfig.sys, tsFilePath).then(tsText => {
+  return readFile(config.sys, tsFilePath).then(tsText => {
     moduleFile = ctx.moduleFiles[tsFilePath] = {
       tsFilePath: tsFilePath,
       tsText: tsText
@@ -96,7 +96,7 @@ export function getModuleFile(buildConfig: BuildConfig, ctx: BuildContext, tsFil
 }
 
 
-export function getModuleFileSync(buildConfig: BuildConfig, ctx: BuildContext, tsFilePath: string) {
+export function getModuleFileSync(config: BuildConfig, ctx: BuildContext, tsFilePath: string) {
   tsFilePath = normalizePath(tsFilePath);
 
   let moduleFile = ctx.moduleFiles[tsFilePath];
@@ -106,14 +106,14 @@ export function getModuleFileSync(buildConfig: BuildConfig, ctx: BuildContext, t
       // sweet, we already have this module in our cache!
       if (typeof moduleFile.tsText !== 'string') {
         // we have the module, but no source content, let's load it up
-        moduleFile.tsText = buildConfig.sys.fs.readFileSync(tsFilePath, 'utf-8');
+        moduleFile.tsText = config.sys.fs.readFileSync(tsFilePath, 'utf-8');
       }
 
     } else {
       // never seen this ts file before, let's start a new module file
       moduleFile = ctx.moduleFiles[tsFilePath] = {
         tsFilePath: tsFilePath,
-        tsText: buildConfig.sys.fs.readFileSync(tsFilePath, 'utf-8')
+        tsText: config.sys.fs.readFileSync(tsFilePath, 'utf-8')
       };
     }
 
@@ -128,12 +128,12 @@ export function getModuleFileSync(buildConfig: BuildConfig, ctx: BuildContext, t
 }
 
 
-export function moduleFileExistsSync(buildConfig: BuildConfig, ctx: BuildContext, tsFilePath: string) {
+export function moduleFileExistsSync(config: BuildConfig, ctx: BuildContext, tsFilePath: string) {
   let moduleFile = ctx.moduleFiles[tsFilePath];
   if (moduleFile) {
     return (typeof moduleFile.tsText === 'string');
   }
 
-  const module = getModuleFileSync(buildConfig, ctx, tsFilePath);
+  const module = getModuleFileSync(config, ctx, tsFilePath);
   return (typeof module.tsText === 'string');
 }

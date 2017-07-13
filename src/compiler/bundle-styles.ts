@@ -2,10 +2,10 @@ import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResul
 import { buildError, catchError } from './util';
 import { formatCssBundleFileName, generateBundleId } from '../util/data-serialize';
 import { HYDRATED_CSS } from '../util/constants';
-import { isCssSourceFile, isSassSourceFile, generateBanner, readFile } from './util';
+import { isCssFile, isSassFile, generateBanner, readFile } from './util';
 
 
-export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
+export function bundleStyles(config: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
   // create main style results object
   const stylesResults: StylesResults = {
     bundles: {},
@@ -16,12 +16,12 @@ export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userMa
   // or it's a change build that has either changed sass or css
   const doBundling = (!ctx.isChangeBuild || ctx.changeHasCss || ctx.changeHasSass);
 
-  const timeSpan = buildConfig.logger.createTimeSpan(`bundle styles started`, !doBundling);
+  const timeSpan = config.logger.createTimeSpan(`bundle styles started`, !doBundling);
 
   // go through each bundle the user wants created
   // and create css files for each mode for each bundle
   return Promise.all(userManifest.bundles.map(userBundle => {
-    return generateBundleCss(buildConfig, ctx, userManifest, userBundle, stylesResults);
+    return generateBundleCss(config, ctx, userManifest, userBundle, stylesResults);
 
   }))
   .catch(err => {
@@ -35,7 +35,7 @@ export function bundleStyles(buildConfig: BuildConfig, ctx: BuildContext, userMa
 }
 
 
-function generateBundleCss(buildConfig: BuildConfig, ctx: BuildContext, userManifest: Manifest, userBundle: Bundle, stylesResults: StylesResults) {
+function generateBundleCss(config: BuildConfig, ctx: BuildContext, userManifest: Manifest, userBundle: Bundle, stylesResults: StylesResults) {
   // multiple modes can be on each component
   // and multiple components can be in each bundle
   // create css files with the common modes for the bundle's components
@@ -68,7 +68,7 @@ function generateBundleCss(buildConfig: BuildConfig, ctx: BuildContext, userMani
   // go through each mode this bundle has
   // and create a css file for this each mode in this bundle
   return Promise.all(bundleModes.map(modeName => {
-    return generateModeCss(buildConfig, ctx, bundleComponentMeta, userBundle, modeName, stylesResults);
+    return generateModeCss(config, ctx, bundleComponentMeta, userBundle, modeName, stylesResults);
 
   })).catch(err => {
     catchError(stylesResults.diagnostics, err);
@@ -80,7 +80,7 @@ function generateBundleCss(buildConfig: BuildConfig, ctx: BuildContext, userMani
 
 
 function generateModeCss(
-  buildConfig: BuildConfig,
+  config: BuildConfig,
   ctx: BuildContext,
   bundleComponentMeta: ComponentMeta[],
   userBundle: Bundle,
@@ -89,10 +89,10 @@ function generateModeCss(
 ) {
   // loop through each component in this bundle
   // and create a css file for all the same modes
-  const sys = buildConfig.sys;
+  const sys = config.sys;
 
   return Promise.all(bundleComponentMeta.map(cmpMeta => {
-    return generateComponentModeStyles(buildConfig, ctx, cmpMeta, modeName, stylesResults);
+    return generateComponentModeStyles(config, ctx, cmpMeta, modeName, stylesResults);
 
   })).then(styleBundles => {
     const writeFile = styleBundles.some(s => s.writeFile);
@@ -111,7 +111,7 @@ function generateModeCss(
     // ensure we've got some good objects before we start assigning stuff
     const stylesResult = stylesResults.bundles[bundleId] = stylesResults.bundles[bundleId] || {};
 
-    if (buildConfig.minifyCss) {
+    if (config.minifyCss) {
       // minify css
       const minifyCssResults = sys.minifyCss(styleContent);
       minifyCssResults.diagnostics.forEach(d => {
@@ -123,9 +123,9 @@ function generateModeCss(
       }
     }
 
-    if (buildConfig.hashFileNames) {
+    if (config.hashFileNames) {
       // create style id from hashing the content
-      stylesResult[modeName] = sys.generateContentHash(styleContent, buildConfig.hashedFileNameLength);
+      stylesResult[modeName] = sys.generateContentHash(styleContent, config.hashedFileNameLength);
 
     } else {
       // create style id from list of component tags in this file
@@ -146,21 +146,21 @@ function generateModeCss(
       // create the file name and path of where the bundle will be saved
       const styleFileName = formatCssBundleFileName(stylesResult[modeName]);
       const styleFilePath = sys.path.join(
-        buildConfig.buildDest,
-        buildConfig.namespace.toLowerCase(),
+        config.buildDest,
+        config.namespace.toLowerCase(),
         styleFileName
       );
 
       ctx.styleBundleCount++;
 
-      ctx.filesToWrite[styleFilePath] = generateBanner(buildConfig) + styleContent;
+      ctx.filesToWrite[styleFilePath] = generateBanner(config) + styleContent;
     }
   });
 }
 
 
 function generateComponentModeStyles(
-  buildConfig: BuildConfig,
+  config: BuildConfig,
   ctx: BuildContext,
   cmpMeta: ComponentMeta,
   modeName: string,
@@ -188,13 +188,13 @@ function generateComponentModeStyles(
       modeStyleMeta.absStylePaths.forEach(absStylePath => {
         styleCollection[absStylePath] = '';
 
-        if (isSassSourceFile(absStylePath)) {
+        if (isSassFile(absStylePath)) {
           // sass file needs to be compiled
-          promises.push(compileScssFile(buildConfig, ctx, cmpMeta, absStylePath, styleCollection, stylesResults));
+          promises.push(compileScssFile(config, ctx, cmpMeta, absStylePath, styleCollection, stylesResults));
 
-        } else if (isCssSourceFile(absStylePath)) {
+        } else if (isCssFile(absStylePath)) {
           // plain ol' css file
-          promises.push(readCssFile(buildConfig, ctx, absStylePath, styleCollection, stylesResults));
+          promises.push(readCssFile(config, ctx, absStylePath, styleCollection, stylesResults));
 
         } else {
           // idk
@@ -224,9 +224,9 @@ function generateComponentModeStyles(
 }
 
 
-function compileScssFile(buildConfig: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, absStylePath: string, styleCollection: StyleCollection, stylesResults: StylesResults): Promise<StyleBundleDetails> {
+function compileScssFile(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, absStylePath: string, styleCollection: StyleCollection, stylesResults: StylesResults): Promise<StyleBundleDetails> {
   const styleBundleDetails: StyleBundleDetails = {};
-  const sys = buildConfig.sys;
+  const sys = config.sys;
 
   if (ctx.isChangeBuild && !ctx.changeHasSass) {
     // if this is a change build, but there wasn't specifically a sass file change
@@ -255,7 +255,7 @@ function compileScssFile(buildConfig: BuildConfig, ctx: BuildContext, cmpMeta: C
   return new Promise(resolve => {
     const sassConfig = {
       file: absStylePath,
-      outputStyle: buildConfig.devMode ? 'expanded' : 'compressed',
+      outputStyle: config.devMode ? 'expanded' : 'compressed',
     };
 
     sys.sass.render(sassConfig, (err, result) => {
@@ -280,7 +280,7 @@ function compileScssFile(buildConfig: BuildConfig, ctx: BuildContext, cmpMeta: C
 }
 
 
-function readCssFile(buildConfig: BuildConfig, ctx: BuildContext, absStylePath: string, styleCollection: StyleCollection, stylesResults: StylesResults) {
+function readCssFile(config: BuildConfig, ctx: BuildContext, absStylePath: string, styleCollection: StyleCollection, stylesResults: StylesResults) {
   const styleBundleDetails: StyleBundleDetails = {};
 
   if (ctx.isChangeBuild && !ctx.changeHasCss) {
@@ -291,7 +291,7 @@ function readCssFile(buildConfig: BuildConfig, ctx: BuildContext, absStylePath: 
 
   // this is just a plain css file
   // only open it up for its content
-  const sys = buildConfig.sys;
+  const sys = config.sys;
 
   return readFile(sys, absStylePath).then(cssText => {
     cssText = cssText.toString().trim();

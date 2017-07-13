@@ -9,12 +9,12 @@ import { getStateDecoratorMeta } from './state-decorator';
 import * as ts from 'typescript';
 
 
-export function componentClass(buildConfig: BuildConfig, moduleFiles: ModuleFiles, diagnostics: Diagnostic[]): ts.TransformerFactory<ts.SourceFile> {
+export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, diagnostics: Diagnostic[]): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
     function visitClass(moduleFile: ModuleFileMeta, classNode: ts.ClassDeclaration) {
-      const cmpMeta = getComponentDecoratorData(buildConfig, moduleFile, diagnostics, classNode);
+      const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
 
       if (cmpMeta) {
         if (moduleFile.cmpMeta) {

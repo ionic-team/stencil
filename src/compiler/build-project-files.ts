@@ -4,17 +4,17 @@ import { generateBanner } from './util';
 import { LoadComponentRegistry, ProjectRegistry } from '../util/interfaces';
 
 
-export function generateProjectFiles(buildConfig: BuildConfig, ctx: BuildContext, componentRegistry: LoadComponentRegistry[]) {
-  const sys = buildConfig.sys;
+export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, componentRegistry: LoadComponentRegistry[]) {
+  const sys = config.sys;
 
-  buildConfig.logger.debug(`build, generateProjectFiles: ${buildConfig.namespace}`);
+  config.logger.debug(`build, generateProjectFiles: ${config.namespace}`);
 
-  const projectFileName = buildConfig.namespace.toLowerCase();
+  const projectFileName = config.namespace.toLowerCase();
   const registryFileName = `${projectFileName}.registry.json`;
-  const registryFilePath = buildConfig.sys.path.join(buildConfig.buildDest, registryFileName);
+  const registryFilePath = config.sys.path.join(config.buildDest, registryFileName);
 
   const projectRegistry: ProjectRegistry = {
-    namespace: buildConfig.namespace,
+    namespace: config.namespace,
     components: componentRegistry,
     loader: projectFileName
   };
@@ -23,14 +23,14 @@ export function generateProjectFiles(buildConfig: BuildConfig, ctx: BuildContext
   let projectCoreEs5FileName: string;
 
   return Promise.all([
-    generateCore(buildConfig),
-    generateCoreEs5(buildConfig)
+    generateCore(config),
+    generateCoreEs5(config)
 
   ]).then(results => {
     const coreContent = results[0];
     const coreEs5Content = results[1];
 
-    if (buildConfig.devMode) {
+    if (config.devMode) {
       // dev mode core filename just keeps the same name, no content hashing
       projectRegistry.core = `${projectFileName}/${projectFileName}.${CORE_NAME}.js`;
       projectCoreFileName = `${projectFileName}.${CORE_NAME}.js`;
@@ -40,50 +40,50 @@ export function generateProjectFiles(buildConfig: BuildConfig, ctx: BuildContext
 
     } else {
       // prod mode renames the core file with its hashed content
-      const contentHash = sys.generateContentHash(coreContent, buildConfig.hashedFileNameLength);
+      const contentHash = sys.generateContentHash(coreContent, config.hashedFileNameLength);
       projectRegistry.core = `${projectFileName}/${projectFileName}.${contentHash}.js`;
       projectCoreFileName = `${projectFileName}.${contentHash}.js`;
 
-      const contentEs5Hash = sys.generateContentHash(coreEs5Content, buildConfig.hashedFileNameLength);
+      const contentEs5Hash = sys.generateContentHash(coreEs5Content, config.hashedFileNameLength);
       projectRegistry.coreEs5 = `${projectFileName}/${projectFileName}.${contentEs5Hash}.ce.js`;
       projectCoreEs5FileName = `${projectFileName}.${contentEs5Hash}.ce.js`;
     }
 
     // write the project core file
-    const projectCoreFilePath = sys.path.join(buildConfig.buildDest, projectFileName, projectCoreFileName);
-    buildConfig.logger.debug(`build, project core: ${projectCoreFilePath}`);
+    const projectCoreFilePath = sys.path.join(config.buildDest, projectFileName, projectCoreFileName);
+    config.logger.debug(`build, project core: ${projectCoreFilePath}`);
     ctx.filesToWrite[projectCoreFilePath] = coreContent;
 
     // write the project core ES5 file
-    const projectCoreEs5FilePath = sys.path.join(buildConfig.buildDest, projectFileName, projectCoreEs5FileName);
-    buildConfig.logger.debug(`build, project core es5: ${projectCoreEs5FilePath}`);
+    const projectCoreEs5FilePath = sys.path.join(config.buildDest, projectFileName, projectCoreEs5FileName);
+    config.logger.debug(`build, project core es5: ${projectCoreEs5FilePath}`);
     ctx.filesToWrite[projectCoreEs5FilePath] = coreEs5Content;
 
   }).then(() => {
     // create the loader after creating the loader file name
-    return generateLoader(buildConfig, projectFileName, projectCoreFileName, projectCoreEs5FileName, componentRegistry).then(loaderContent => {
+    return generateLoader(config, projectFileName, projectCoreFileName, projectCoreEs5FileName, componentRegistry).then(loaderContent => {
 
       // write the project loader file
       const projectLoaderFileName = `${projectRegistry.loader}.js`;
-      const projectLoaderFilePath = sys.path.join(buildConfig.buildDest, projectLoaderFileName);
-      buildConfig.logger.debug(`build, project loader: ${projectLoaderFilePath}`);
+      const projectLoaderFilePath = sys.path.join(config.buildDest, projectLoaderFileName);
+      config.logger.debug(`build, project loader: ${projectLoaderFilePath}`);
       ctx.filesToWrite[projectLoaderFilePath] = loaderContent;
     });
 
   }).then(() => {
     // create a json file for the project registry
-    buildConfig.logger.debug(`build, project registry: ${registryFilePath}`);
+    config.logger.debug(`build, project registry: ${registryFilePath}`);
     ctx.filesToWrite[registryFilePath] = JSON.stringify(projectRegistry, null, 2);
 
   });
 }
 
 
-function generateLoader(buildConfig: BuildConfig, projectFileName: string, projectCoreFileName: string, projectCoreEs5FileName: string, componentRegistry: LoadComponentRegistry[]) {
-  const sys = buildConfig.sys;
+function generateLoader(config: BuildConfig, projectFileName: string, projectCoreFileName: string, projectCoreEs5FileName: string, componentRegistry: LoadComponentRegistry[]) {
+  const sys = config.sys;
 
   let staticName = LOADER_NAME;
-  if (buildConfig.devMode) {
+  if (config.devMode) {
     staticName += '.dev';
   }
   staticName += '.js';
@@ -93,10 +93,10 @@ function generateLoader(buildConfig: BuildConfig, projectFileName: string, proje
 
     let componentRegistryStr = JSON.stringify(componentRegistry);
 
-    if (buildConfig.minifyJs) {
-      const minifyResult = buildConfig.sys.minifyJs(componentRegistryStr);
+    if (config.minifyJs) {
+      const minifyResult = config.sys.minifyJs(componentRegistryStr);
       minifyResult.diagnostics.forEach(d => {
-        buildConfig.logger[d.level](d.messageText);
+        config.logger[d.level](d.messageText);
       });
       if (minifyResult.output) {
         componentRegistryStr = minifyResult.output;
@@ -105,12 +105,12 @@ function generateLoader(buildConfig: BuildConfig, projectFileName: string, proje
 
     stencilLoaderContent = stencilLoaderContent.replace(
       PROJECT_NAMESPACE_REGEX,
-      `"${buildConfig.namespace}","${projectFileName}","${projectCoreFileName}","${projectCoreEs5FileName}",${componentRegistryStr}`
+      `"${config.namespace}","${projectFileName}","${projectCoreFileName}","${projectCoreEs5FileName}",${componentRegistryStr}`
     );
 
     // concat the projects loader code
     const projectCode: string[] = [
-      generateBanner(buildConfig),
+      generateBanner(config),
       stencilLoaderContent
     ];
 
@@ -119,11 +119,11 @@ function generateLoader(buildConfig: BuildConfig, projectFileName: string, proje
 }
 
 
-function generateCore(buildConfig: BuildConfig) {
-  const sys = buildConfig.sys;
+function generateCore(config: BuildConfig) {
+  const sys = config.sys;
 
   let staticName = CORE_NAME;
-  if (buildConfig.devMode) {
+  if (config.devMode) {
     staticName += '.dev';
   }
   staticName += '.js';
@@ -132,12 +132,12 @@ function generateCore(buildConfig: BuildConfig) {
     // replace the default core with the project's namespace
     coreContent = coreContent.replace(
       PROJECT_NAMESPACE_REGEX,
-      `"${buildConfig.namespace}"`
+      `"${config.namespace}"`
     );
 
     // concat the projects core code
     const projectCode: string[] = [
-      generateBanner(buildConfig),
+      generateBanner(config),
       coreContent
     ];
 
@@ -146,16 +146,16 @@ function generateCore(buildConfig: BuildConfig) {
 }
 
 
-function generateCoreEs5(buildConfig: BuildConfig) {
-  const sys = buildConfig.sys;
+function generateCoreEs5(config: BuildConfig) {
+  const sys = config.sys;
 
   let staticName = CORE_NAME + '.es5';
-  if (buildConfig.devMode) {
+  if (config.devMode) {
     staticName += '.dev';
   }
   staticName += '.js';
 
-  let documentRegistryPolyfill = buildConfig.sys.path.join('polyfills', 'document-register-element.js');
+  let documentRegistryPolyfill = config.sys.path.join('polyfills', 'document-register-element.js');
 
   return Promise.all([
     sys.getClientCoreFile({ staticName: staticName }),
@@ -168,13 +168,13 @@ function generateCoreEs5(buildConfig: BuildConfig) {
     // replace the default core with the project's namespace
     coreContent = coreContent.replace(
       PROJECT_NAMESPACE_REGEX,
-      `"${buildConfig.namespace}"`
+      `"${config.namespace}"`
     );
 
     // concat the projects core code
     const projectCode: string[] = [
       docRegistryPolyfillContent + '\n\n',
-      generateBanner(buildConfig),
+      generateBanner(config),
       coreContent
     ];
 

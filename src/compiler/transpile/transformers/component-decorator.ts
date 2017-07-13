@@ -6,7 +6,7 @@ import { parseComponentMetadata as normalizeAssetsDir } from '../../component-pl
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorData(buildConfig: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+export function getComponentDecoratorData(config: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
   let metaData: ComponentMeta = null;
 
   if (!classNode.decorators) {
@@ -25,7 +25,7 @@ export function getComponentDecoratorData(buildConfig: BuildConfig, moduleFile: 
           isComponent = true;
 
         } else if (isComponent) {
-          metaData = parseComponentMetaData(buildConfig, moduleFile, diagnostics, componentChild.getText());
+          metaData = parseComponentMetaData(config, moduleFile, diagnostics, componentChild.getText());
         }
 
       });
@@ -37,7 +37,7 @@ export function getComponentDecoratorData(buildConfig: BuildConfig, moduleFile: 
 }
 
 
-function parseComponentMetaData(buildConfig: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], text: string): ComponentMeta {
+function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], text: string): ComponentMeta {
   let cmpMeta: ComponentMeta = null;
 
   try {
@@ -51,7 +51,7 @@ function parseComponentMetaData(buildConfig: BuildConfig, moduleFile: ModuleFile
 
     // normalize user data
     normalizeTag(moduleFile, diagnostics, userOpts, cmpMeta, text);
-    normalizeStyles(buildConfig, userOpts, moduleFile, cmpMeta);
+    normalizeStyles(config, userOpts, moduleFile, cmpMeta);
     normalizeShadow(userOpts, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
     normalizeAssetsDir(userOpts, cmpMeta);
