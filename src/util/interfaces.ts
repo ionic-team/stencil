@@ -461,6 +461,7 @@ export interface BuildConfig {
   suppressTypeScriptErrors?: boolean;
   attrCase?: number;
   watchIgnoredRegex?: RegExp;
+  inlineAppLoader?: boolean;
 }
 
 
@@ -997,6 +998,7 @@ export interface PrintLine {
 
 
 export interface StencilSystem {
+  copyDir?(src: string, dest: string, callback: (err: any) => void): void;
   createDom?(): {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
@@ -1013,8 +1015,16 @@ export interface StencilSystem {
   };
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
-  rmDir?(path: string, callback: (err: any) => void): void;
-  copyDir?(src: string, dest: string, callback: (err: any) => void): void;
+  htmlParser?: {
+    parse(html: string): any;
+    serialize(node: any): string;
+    getElementsByTagName(node: any, tag: string): any[];
+    getAttribute(node: any, key: string): string;
+    removeNode(node: any): void;
+    appendChild(parentNode: any, childNode: any): void;
+    createElement(tag: string): any;
+    createText(content: string): any;
+  };
   minifyCss?(input: string): {
     output: string;
     sourceMap?: any;
@@ -1036,6 +1046,7 @@ export interface StencilSystem {
     resolve(...pathSegments: any[]): string;
     sep: string;
   };
+  rmDir?(path: string, callback: (err: any) => void): void;
   rollup?: {
     rollup: {
       (config: { entry: string; plugins?: any[]; treeshake?: boolean; onwarn?: Function; }): Promise<{

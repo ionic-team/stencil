@@ -104,6 +104,10 @@ export function validateBuildConfig(config: BuildConfig) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
+  if (typeof config.inlineAppLoader !== 'boolean') {
+    config.inlineAppLoader = true;
+  }
+
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }

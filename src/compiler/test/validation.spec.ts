@@ -36,6 +36,11 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
+    it('should default inlineAppLoader to true', () => {
+      validateBuildConfig(config);
+      expect(config.inlineAppLoader).toBe(true);
+    });
+
     it('should default generateCollection to false', () => {
       validateBuildConfig(config);
       expect(config.generateCollection).toBe(false);

@@ -50,18 +50,20 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
 
     // write the project core file
     const projectCoreFilePath = sys.path.join(config.buildDest, projectFileName, projectCoreFileName);
-    if (!ctx.projectFiles[projectCoreFilePath] || ctx.projectFiles[projectCoreFilePath] !== coreContent) {
+    if (ctx.projectFiles.core !== coreContent) {
       // core file is actually different from our last saved version
       config.logger.debug(`build, write project core: ${projectCoreFilePath}`);
-      ctx.filesToWrite[projectCoreFilePath] = ctx.projectFiles[projectCoreFilePath] = coreContent;
+      ctx.filesToWrite[projectCoreFilePath] = ctx.projectFiles.core = coreContent;
+      ctx.projectFileBuildCount++;
     }
 
     // write the project core ES5 file
     const projectCoreEs5FilePath = sys.path.join(config.buildDest, projectFileName, projectCoreEs5FileName);
-    if (!ctx.projectFiles[projectCoreEs5FilePath] || ctx.projectFiles[projectCoreEs5FilePath] !== coreEs5Content) {
+    if (ctx.projectFiles.coreEs5 !== coreEs5Content) {
       // core es5 file is actually different from our last saved version
       config.logger.debug(`build, project core es5: ${projectCoreEs5FilePath}`);
-      ctx.filesToWrite[projectCoreEs5FilePath] = ctx.projectFiles[projectCoreEs5FilePath] = coreEs5Content;
+      ctx.filesToWrite[projectCoreEs5FilePath] = ctx.projectFiles.coreEs5 = coreEs5Content;
+      ctx.projectFileBuildCount++;
     }
 
   }).then(() => {
@@ -70,10 +72,11 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
       // write the project loader file
       const projectLoaderFileName = `${projectRegistry.loader}`;
       const projectLoaderFilePath = sys.path.join(config.buildDest, projectLoaderFileName);
-      if (!ctx.projectFiles[projectLoaderFilePath] || ctx.projectFiles[projectLoaderFilePath] !== loaderContent) {
+      if (ctx.projectFiles.loader !== loaderContent) {
         // project loader file is actually different from our last saved version
         config.logger.debug(`build, project loader: ${projectLoaderFilePath}`);
-        ctx.filesToWrite[projectLoaderFilePath] = ctx.projectFiles[projectLoaderFilePath] = loaderContent;
+        ctx.filesToWrite[projectLoaderFilePath] = ctx.projectFiles.loader = loaderContent;
+        ctx.projectFileBuildCount++;
       }
     });
 
@@ -82,11 +85,13 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
     const registryFileName = `${projectFileName}.registry.json`;
     const registryFilePath = config.sys.path.join(config.buildDest, registryFileName);
     const registryJson = JSON.stringify(projectRegistry, null, 2);
-    if (!ctx.projectFiles[registryFilePath] || ctx.projectFiles[registryFilePath] !== registryJson) {
+    if (ctx.projectFiles.registryJson !== registryJson) {
       // project registry json file is actually different from our last saved version
       config.logger.debug(`build, project registry: ${registryFilePath}`);
-      ctx.filesToWrite[registryFilePath] = ctx.projectFiles[registryFilePath] = registryJson;
+      ctx.filesToWrite[registryFilePath] = ctx.projectFiles.registryJson = registryJson;
+      ctx.projectFileBuildCount++;
     }
+
   }).catch(err => {
     config.logger.error('generateProjectFiles', err);
   });

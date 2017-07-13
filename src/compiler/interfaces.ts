@@ -18,7 +18,13 @@ export interface BuildContext {
   moduleBundleOutputs?: ModuleBundles;
   styleSassOutputs?: ModuleBundles;
   filesToWrite?: FilesMap;
-  projectFiles?: FilesMap;
+  projectFiles?: {
+    loader?: string;
+    core?: string;
+    coreEs5?: string;
+    registryJson?: string;
+    indexHtml?: string;
+  };
   watcher?: FSWatcher;
   onFinish?: Function;
   tsConfig?: any;
@@ -35,6 +41,8 @@ export interface BuildContext {
 
   sassBuildCount?: number;
   transpileBuildCount?: number;
+  indexBuildCount?: number;
+  projectFileBuildCount?: number;
 
   moduleBundleCount?: number;
   styleBundleCount?: number;
@@ -73,6 +81,7 @@ export interface TranspileResults {
 
 
 export interface OptimizeHtmlResults {
+  html?: string;
   diagnostics: Diagnostic[];
 }
 

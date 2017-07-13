@@ -44,6 +44,8 @@ module.exports = Object.defineProperties({
 
   fs: require('fs'),
 
+  htmlParser: require('./html-parser'),
+
   minifyCss: function minifyCss(input) {
     var CleanCSS = require('clean-css');
     var result = new CleanCSS().minify(input);

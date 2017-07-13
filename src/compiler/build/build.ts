@@ -7,7 +7,7 @@ import { compileSrcDir } from './compile';
 import { generateProjectFiles } from './build-project-files';
 import { generateHtmlDiagnostics } from '../logger/generate-html-diagnostics';
 import { loadDependentManifests, mergeManifests } from './manifest';
-import { optimizeHtml } from './optimize-html';
+import { optimizeIndexHtml } from './optimize-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from '../validation';
 
@@ -35,6 +35,7 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
   // reset counts
   ctx.sassBuildCount = 0;
   ctx.transpileBuildCount = 0;
+  ctx.indexBuildCount = 0;
   ctx.moduleBundleCount = 0;
   ctx.styleBundleCount = 0;
 
@@ -144,7 +145,7 @@ function bundlePhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest,
 
 
 function optimizeHtmlPhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
-  return optimizeHtml(config, ctx).then(optimizeHtmlResults => {
+  return optimizeIndexHtml(config, ctx).then(optimizeHtmlResults => {
     if (optimizeHtmlResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(optimizeHtmlResults.diagnostics);
     }
