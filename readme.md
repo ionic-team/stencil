@@ -59,7 +59,7 @@ export class MyComponent {
   render() {
     return (
       <p>
-        My name is {name}
+        My name is {this.name}
       </p>
     );
   }
