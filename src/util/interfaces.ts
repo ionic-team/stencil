@@ -1115,6 +1115,9 @@ declare global {
     interface Element {
     }
     interface IntrinsicElements {
+      // Stencil elements
+      slot: jsxInterface.SlotAttributes;
+
       // HTML
       a: jsxInterface.AnchorHTMLAttributes;
       abbr: jsxInterface.HTMLAttributes;

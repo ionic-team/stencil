@@ -1,3 +1,6 @@
+export interface SlotAttributes {
+  name?: string;
+}
 export interface AnchorHTMLAttributes extends HTMLAttributes {
   download?: any;
   href?: string;
@@ -8,15 +11,15 @@ export interface AnchorHTMLAttributes extends HTMLAttributes {
 }
 
 export interface AreaHTMLAttributes extends HTMLAttributes {
-    alt?: string;
-    coords?: string;
-    download?: any;
-    href?: string;
-    hrefLang?: string;
-    media?: string;
-    rel?: string;
-    shape?: string;
-    target?: string;
+  alt?: string;
+  coords?: string;
+  download?: any;
+  href?: string;
+  hrefLang?: string;
+  media?: string;
+  rel?: string;
+  shape?: string;
+  target?: string;
 }
 
 export interface AudioHTMLAttributes extends MediaHTMLAttributes {}
