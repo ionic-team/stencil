@@ -1,4 +1,6 @@
 import * as jsxInterface from './jsx-interfaces';
+import { CssClassObject } from './jsx-interfaces';
+export { CssClassObject } from './jsx-interfaces';
 
 export interface Ionic {
   emit: EventEmit;
@@ -781,7 +783,6 @@ export interface HostContentNodes {
 }
 
 
-export type CssClassObject = { [className: string]: boolean };
 
 
 
