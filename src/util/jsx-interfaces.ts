@@ -7,6 +7,376 @@ export interface AnchorHTMLAttributes extends HTMLAttributes {
   target?: string;
 }
 
+export interface AreaHTMLAttributes extends HTMLAttributes {
+    alt?: string;
+    coords?: string;
+    download?: any;
+    href?: string;
+    hrefLang?: string;
+    media?: string;
+    rel?: string;
+    shape?: string;
+    target?: string;
+}
+
+export interface AudioHTMLAttributes extends MediaHTMLAttributes {}
+
+export interface AreaHTMLAttributes extends HTMLAttributes {
+  alt?: string;
+  coords?: string;
+  download?: any;
+  href?: string;
+  hrefLang?: string;
+  media?: string;
+  rel?: string;
+  shape?: string;
+  target?: string;
+}
+
+export interface BaseHTMLAttributes extends HTMLAttributes {
+  href?: string;
+  target?: string;
+}
+
+export interface BlockquoteHTMLAttributes extends HTMLAttributes {
+  cite?: string;
+}
+
+export interface ButtonHTMLAttributes extends HTMLAttributes {
+  autoFocus?: boolean;
+  disabled?: boolean;
+  form?: string;
+  formAction?: string;
+  formEncType?: string;
+  formMethod?: string;
+  formNoValidate?: boolean;
+  formTarget?: string;
+  name?: string;
+  type?: string;
+  value?: string | string[] | number;
+}
+
+export interface CanvasHTMLAttributes extends HTMLAttributes {
+  height?: number | string;
+  width?: number | string;
+}
+
+export interface ColHTMLAttributes extends HTMLAttributes {
+  span?: number;
+}
+
+export interface ColgroupHTMLAttributes extends HTMLAttributes {
+  span?: number;
+}
+
+export interface DetailsHTMLAttributes extends HTMLAttributes {
+  open?: boolean;
+}
+
+export interface DelHTMLAttributes extends HTMLAttributes {
+  cite?: string;
+  dateTime?: string;
+}
+
+export interface EmbedHTMLAttributes extends HTMLAttributes {
+  height?: number | string;
+  src?: string;
+  type?: string;
+  width?: number | string;
+}
+
+export interface FieldsetHTMLAttributes extends HTMLAttributes {
+  disabled?: boolean;
+  form?: string;
+  name?: string;
+}
+
+export interface FormHTMLAttributes extends HTMLAttributes {
+  acceptCharset?: string;
+  action?: string;
+  autoComplete?: string;
+  encType?: string;
+  method?: string;
+  name?: string;
+  noValidate?: boolean;
+  target?: string;
+}
+
+export interface HtmlHTMLAttributes extends HTMLAttributes {
+  manifest?: string;
+}
+
+export interface IframeHTMLAttributes extends HTMLAttributes {
+  allowFullScreen?: boolean;
+  allowTransparency?: boolean;
+  frameBorder?: number | string;
+  height?: number | string;
+  marginHeight?: number;
+  marginWidth?: number;
+  name?: string;
+  sandbox?: string;
+  scrolling?: string;
+  seamless?: boolean;
+  src?: string;
+  srcDoc?: string;
+  width?: number | string;
+}
+
+export interface ImgHTMLAttributes extends HTMLAttributes {
+  alt?: string;
+  height?: number | string;
+  sizes?: string;
+  src?: string;
+  srcSet?: string;
+  useMap?: string;
+  width?: number | string;
+}
+
+export interface InsHTMLAttributes extends HTMLAttributes {
+  cite?: string;
+  dateTime?: string;
+}
+
+export interface InputHTMLAttributes extends HTMLAttributes {
+  accept?: string;
+  alt?: string;
+  autoComplete?: string;
+  autoFocus?: boolean;
+  capture?: boolean; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
+  checked?: boolean;
+  crossOrigin?: string;
+  disabled?: boolean;
+  form?: string;
+  formAction?: string;
+  formEncType?: string;
+  formMethod?: string;
+  formNoValidate?: boolean;
+  formTarget?: string;
+  height?: number | string;
+  list?: string;
+  max?: number | string;
+  maxLength?: number;
+  min?: number | string;
+  minLength?: number;
+  multiple?: boolean;
+  name?: string;
+  pattern?: string;
+  placeholder?: string;
+  readOnly?: boolean;
+  required?: boolean;
+  size?: number;
+  src?: string;
+  step?: number | string;
+  type?: string;
+  value?: string | string[] | number;
+  width?: number | string;
+}
+
+export interface KeygenHTMLAttributes extends HTMLAttributes {
+  autoFocus?: boolean;
+  challenge?: string;
+  disabled?: boolean;
+  form?: string;
+  keyType?: string;
+  keyParams?: string;
+  name?: string;
+}
+
+export interface LabelHTMLAttributes extends HTMLAttributes {
+  form?: string;
+  htmlFor?: string;
+}
+
+export interface LiHTMLAttributes extends HTMLAttributes {
+  value?: string | string[] | number;
+}
+
+export interface LinkHTMLAttributes extends HTMLAttributes {
+  href?: string;
+  hrefLang?: string;
+  integrity?: string;
+  media?: string;
+  rel?: string;
+  sizes?: string;
+  type?: string;
+}
+
+export interface MapHTMLAttributes extends HTMLAttributes {
+  name?: string;
+}
+
+export interface MenuHTMLAttributes extends HTMLAttributes {
+  type?: string;
+}
+
+export interface MediaHTMLAttributes extends HTMLAttributes {
+  autoPlay?: boolean;
+  controls?: boolean;
+  crossOrigin?: string;
+  loop?: boolean;
+  mediaGroup?: string;
+  muted?: boolean;
+  preload?: string;
+  src?: string;
+}
+
+export interface MetaHTMLAttributes extends HTMLAttributes {
+  charSet?: string;
+  content?: string;
+  httpEquiv?: string;
+  name?: string;
+}
+
+export interface MeterHTMLAttributes extends HTMLAttributes {
+  form?: string;
+  high?: number;
+  low?: number;
+  max?: number | string;
+  min?: number | string;
+  optimum?: number;
+  value?: string | string[] | number;
+}
+
+export interface QuoteHTMLAttributes extends HTMLAttributes {
+  cite?: string;
+}
+
+export interface ObjectHTMLAttributes extends HTMLAttributes {
+  classID?: string;
+  data?: string;
+  form?: string;
+  height?: number | string;
+  name?: string;
+  type?: string;
+  useMap?: string;
+  width?: number | string;
+  wmode?: string;
+}
+
+export interface OlHTMLAttributes extends HTMLAttributes {
+  reversed?: boolean;
+  start?: number;
+}
+
+export interface OptgroupHTMLAttributes extends HTMLAttributes {
+  disabled?: boolean;
+  label?: string;
+}
+
+export interface OptionHTMLAttributes extends HTMLAttributes {
+  disabled?: boolean;
+  label?: string;
+  selected?: boolean;
+  value?: string | string[] | number;
+}
+
+export interface OutputHTMLAttributes extends HTMLAttributes {
+  form?: string;
+  htmlFor?: string;
+  name?: string;
+}
+
+export interface ParamHTMLAttributes extends HTMLAttributes {
+  name?: string;
+  value?: string | string[] | number;
+}
+
+export interface ProgressHTMLAttributes extends HTMLAttributes {
+  max?: number | string;
+  value?: string | string[] | number;
+}
+
+export interface ScriptHTMLAttributes extends HTMLAttributes {
+  async?: boolean;
+  charSet?: string;
+  crossOrigin?: string;
+  defer?: boolean;
+  integrity?: string;
+  nonce?: string;
+  src?: string;
+  type?: string;
+}
+
+export interface SelectHTMLAttributes extends HTMLAttributes {
+  autoFocus?: boolean;
+  disabled?: boolean;
+  form?: string;
+  multiple?: boolean;
+  name?: string;
+  required?: boolean;
+  size?: number;
+  value?: string | string[] | number;
+}
+
+export interface SourceHTMLAttributes extends HTMLAttributes {
+  media?: string;
+  sizes?: string;
+  src?: string;
+  srcSet?: string;
+  type?: string;
+}
+
+export interface StyleHTMLAttributes extends HTMLAttributes {
+  media?: string;
+  nonce?: string;
+  scoped?: boolean;
+  type?: string;
+}
+
+export interface TableHTMLAttributes extends HTMLAttributes {
+  cellPadding?: number | string;
+  cellSpacing?: number | string;
+  summary?: string;
+}
+
+export interface TextareaHTMLAttributes extends HTMLAttributes {
+  autoFocus?: boolean;
+  cols?: number;
+  disabled?: boolean;
+  form?: string;
+  maxLength?: number;
+  minLength?: number;
+  name?: string;
+  placeholder?: string;
+  readOnly?: boolean;
+  required?: boolean;
+  rows?: number;
+  value?: string | string[] | number;
+  wrap?: string;
+}
+
+export interface TdHTMLAttributes extends HTMLAttributes {
+  colSpan?: number;
+  headers?: string;
+  rowSpan?: number;
+}
+
+export interface ThHTMLAttributes extends HTMLAttributes {
+  colSpan?: number;
+  headers?: string;
+  rowSpan?: number;
+  scope?: string;
+}
+
+export interface TimeHTMLAttributes extends HTMLAttributes {
+  dateTime?: string;
+}
+
+export interface TrackHTMLAttributes extends HTMLAttributes {
+  default?: boolean;
+  kind?: string;
+  label?: string;
+  src?: string;
+  srcLang?: string;
+}
+
+export interface VideoHTMLAttributes extends MediaHTMLAttributes {
+  height?: number | string;
+  playsInline?: boolean;
+  poster?: string;
+  width?: number | string;
+}
+
 export interface HTMLAttributes extends DOMAttributes {
   // React-specific Attributes
   defaultChecked?: boolean;
