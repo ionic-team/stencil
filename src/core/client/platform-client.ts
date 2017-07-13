@@ -15,6 +15,7 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
+  const loadedStyles: {[styleId: string]: boolean} = {};
   const loadedModules: {[moduleId: string]: boolean} = {};
   const pendingModuleRequests: {[url: string]: boolean} = {};
 
@@ -145,9 +146,9 @@ export function createPlatformClient(Gbl: ProjectNamespace, win: Window, domApi:
 
       // we also need to load the css file in the head
       const styleId = cmpMeta.styleIds[getMode(domApi, config, elm)] || cmpMeta.styleIds.$;
-      if (styleId && !loadedModules[styleId]) {
+      if (styleId && !loadedStyles[styleId]) {
         // this style hasn't been added to the head yet
-        loadedModules[styleId] = true;
+        loadedStyles[styleId] = true;
 
         // append this link element to the head, which starts the request for the file
         const linkElm = domApi.$createElement('link');
