@@ -59,11 +59,35 @@ try {
     process.exit(1);
   }
 
-  Object.assign(config, configFile.config);
+  Object.assign(config, configFile.config)
 
 } catch(e) {
   console.log('Error reading Stencil "' + chalk.bold(configFilePath) + '" configuration file.');
   process.exit(1);
+}
+
+if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
+  console.log(`
+  ${chalk.bold(chalk.green('stencil build') + ' - Build your stencil project')}
+
+    This command line tool allows you to build stencil collections and applications.
+
+  ${chalk.bold('Usage:')}
+
+    $ ${chalk.green('stencil build [--prod] [--watch] [--debug]')}
+
+  ${chalk.bold('Options:')}
+
+    ${chalk.green('--build')} .................. Execute a production build.
+    ${chalk.green('--watch')} .................. Execute a build in watch mode.
+    ${chalk.green('--debug')} .................. Set the log level to debug.
+
+  ${chalk.bold('Examples:')}
+
+    $ ${chalk.green('stencil build --prod')}
+    $ ${chalk.green('stencil build --watch')}
+`);
+  process.exit(0);
 }
 
 
