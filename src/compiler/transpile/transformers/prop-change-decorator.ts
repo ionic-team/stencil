@@ -4,11 +4,11 @@ import * as ts from 'typescript';
 
 
 export function getPropChangeDecoratorMeta(fileMeta: ModuleFileMeta, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.propWillChangeMeta = [];
-  getPropChangeDecorator(classNode, 'PropWillChange', fileMeta.cmpMeta.propWillChangeMeta);
+  fileMeta.cmpMeta.propsWillChangeMeta = [];
+  getPropChangeDecorator(classNode, 'PropWillChange', fileMeta.cmpMeta.propsWillChangeMeta);
 
-  fileMeta.cmpMeta.propDidChangeMeta = [];
-  getPropChangeDecorator(classNode, 'PropDidChange', fileMeta.cmpMeta.propDidChangeMeta);
+  fileMeta.cmpMeta.propsDidChangeMeta = [];
+  getPropChangeDecorator(classNode, 'PropDidChange', fileMeta.cmpMeta.propsDidChangeMeta);
 }
 
 

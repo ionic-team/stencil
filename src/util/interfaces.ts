@@ -606,8 +606,8 @@ export interface ComponentMeta {
   methodsMeta?: MethodMeta[];
   propsMeta?: PropMeta[];
   listenersMeta?: ListenMeta[];
-  propWillChangeMeta?: PropChangeMeta[];
-  propDidChangeMeta?: PropChangeMeta[];
+  propsWillChangeMeta?: PropChangeMeta[];
+  propsDidChangeMeta?: PropChangeMeta[];
   statesMeta?: StateMeta[];
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;

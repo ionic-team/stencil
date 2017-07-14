@@ -138,8 +138,8 @@ export function formatComponentMeta(cmpMeta: ComponentMeta) {
   const methods = formatMethods(cmpMeta.methodsMeta);
   const states = formatStates(cmpMeta.statesMeta);
   const listeners = formatListeners(tag, cmpMeta.listenersMeta);
-  const propWillChanges = formatPropChanges(tag, 'prop will change', cmpMeta.propWillChangeMeta);
-  const propDidChanges = formatPropChanges(tag, 'prop did change', cmpMeta.propDidChangeMeta);
+  const propWillChanges = formatPropChanges(tag, 'prop will change', cmpMeta.propsWillChangeMeta);
+  const propDidChanges = formatPropChanges(tag, 'prop did change', cmpMeta.propsDidChangeMeta);
   const host = formatHost(cmpMeta.hostMeta);
   const shadow = formatShadow(cmpMeta.isShadowMeta);
 

@@ -68,36 +68,6 @@ describe('build', () => {
     });
   });
 
-  it('should not rebuild from html change', () => {
-    ctx = {};
-    config.bundles = [
-      { components: ['cmp-a'] },
-      { components: ['cmp-b'] }
-    ];
-    config.watch = true;
-    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
-    writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
-    writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
-
-    return build(config, ctx).then(() => {
-      expect(ctx.isChangeBuild).toBeFalsy();
-
-      return new Promise(resolve => {
-        ctx.onFinish = resolve;
-        ctx.watcher.$triggerEvent('change', '/src/index.html');
-
-      }).then((r: BuildResults) => {
-        expect(ctx.isChangeBuild).toBe(true);
-        expect(ctx.transpileBuildCount).toBe(0);
-        expect(ctx.moduleBundleCount).toBe(0);
-
-        expect(wroteFile(r, 'cmp-a.js')).toBe(false);
-        expect(wroteFile(r, 'cmp-b.js')).toBe(false);
-        expect(wroteFile(r, 'index.html')).toBe(true);
-      });
-    });
-  });
-
   it('should rebuild for two changed modules', () => {
     ctx = {};
     config.bundles = [

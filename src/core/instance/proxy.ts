@@ -21,12 +21,12 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
   // getters/setters with the same name, and then do change detection
   const values: ComponentInternalValues = instance.__values = {};
 
-  if (cmpMeta.propWillChangeMeta) {
+  if (cmpMeta.propsWillChangeMeta) {
     // this component has prop WILL change methods, so init the object to store them
     values.__propWillChange = {};
   }
 
-  if (cmpMeta.propDidChangeMeta) {
+  if (cmpMeta.propsDidChangeMeta) {
     // this component has prop DID change methods, so init the object to store them
     values.__propDidChange = {};
   }
@@ -38,14 +38,14 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
     // Unlike @Prop, state properties do not add getters/setters to the proxy element
     // and initial values are not checked against the proxy element or config
     for (i = 0; i < cmpMeta.statesMeta.length; i++) {
-      initProperty(false, true, '', cmpMeta.statesMeta[i], 0, instance, values, plt, elm, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
+      initProperty(false, true, '', cmpMeta.statesMeta[i], 0, instance, values, plt, elm, cmpMeta.propsWillChangeMeta, cmpMeta.propsDidChangeMeta);
     }
   }
 
   if (cmpMeta.propsMeta) {
     for (i = 0; i < cmpMeta.propsMeta.length; i++) {
       // add getters/setters for @Prop()s
-      initProperty(true, cmpMeta.propsMeta[i].isStateful, cmpMeta.propsMeta[i].attribName, cmpMeta.propsMeta[i].propName, cmpMeta.propsMeta[i].propType, instance, instance.__values, plt, elm, cmpMeta.propWillChangeMeta, cmpMeta.propDidChangeMeta);
+      initProperty(true, cmpMeta.propsMeta[i].isStateful, cmpMeta.propsMeta[i].attribName, cmpMeta.propsMeta[i].propName, cmpMeta.propsMeta[i].propType, instance, instance.__values, plt, elm, cmpMeta.propsWillChangeMeta, cmpMeta.propsDidChangeMeta);
     }
   }
 }

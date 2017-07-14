@@ -51,41 +51,41 @@ describe('data serialize/parse', () => {
     });
 
     it('should set propWillChangeMeta', () => {
-      cmpMeta.propWillChangeMeta = [
+      cmpMeta.propsWillChangeMeta = [
         ['propName', 'methodName']
       ];
 
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].propWillChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
-      expect(registry['TAG'].propWillChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
+      expect(registry['TAG'].propsWillChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
+      expect(registry['TAG'].propsWillChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
     });
 
     it('should set propDidChangeMeta', () => {
-      cmpMeta.propDidChangeMeta = [
+      cmpMeta.propsDidChangeMeta = [
         ['propName', 'methodName']
       ];
 
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].propDidChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
-      expect(registry['TAG'].propDidChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
+      expect(registry['TAG'].propsDidChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
+      expect(registry['TAG'].propsDidChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
     });
 
     it('should set no propWillChangeMeta', () => {
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].propWillChangeMeta).toBeFalsy();
+      expect(registry['TAG'].propsWillChangeMeta).toBeFalsy();
     });
 
     it('should set no propDidChangeMeta', () => {
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].propDidChangeMeta).toBeFalsy();
+      expect(registry['TAG'].propsDidChangeMeta).toBeFalsy();
     });
 
     it('should set listenersMeta', () => {

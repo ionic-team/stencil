@@ -34,7 +34,7 @@ export function serializeManifest(config: BuildConfig, manifestDir: string, mani
   });
 
   // add to the manifest what the bundles should be
-  serializeBundles(manifestData, config);
+  serializeBundles(config, manifestData);
 
   // success!
   return JSON.stringify(manifestData, null, 2);
@@ -88,8 +88,8 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeComponentPath(config, manifestDir, compiledComponentAbsoluteFilePath, cmpData);
   serializeStyles(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeProps(cmpData, cmpMeta);
-  serializeWillPropChange(cmpData, cmpMeta);
-  serializeDidPropChange(cmpData, cmpMeta);
+  serializePropsWillChange(cmpData, cmpMeta);
+  serializePropsDidChange(cmpData, cmpMeta);
   serializeStates(cmpData, cmpMeta);
   serializeListeners(cmpData, cmpMeta);
   serializeMethods(cmpData, cmpMeta);
@@ -99,7 +99,7 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeIsShadow(cmpData, cmpMeta);
   serializeLoadPriority(cmpData, cmpMeta);
 
-  return <any>cmpData;
+  return cmpData;
 }
 
 
@@ -107,12 +107,12 @@ export function parseComponent(config: BuildConfig, manifestDir: string, cmpData
   const cmpMeta: ComponentMeta = {};
 
   parseTag(cmpData, cmpMeta);
-  parseComponentPath(config, manifestDir, cmpData, cmpMeta);
   parseComponentClass(cmpData, cmpMeta);
+  parseComponentPath(config, manifestDir, cmpData, cmpMeta);
   parseStyles(config, manifestDir, cmpData, cmpMeta);
   parseProps(cmpData, cmpMeta);
-  parseWillPropChange(cmpData, cmpMeta);
-  parseDidPropChange(cmpData, cmpMeta);
+  parsePropsWillChange(cmpData, cmpMeta);
+  parsePropsDidChange(cmpData, cmpMeta);
   parseStates(cmpData, cmpMeta);
   parseListeners(cmpData, cmpMeta);
   parseMethods(cmpData, cmpMeta);
@@ -174,7 +174,7 @@ function parseStyles(config: BuildConfig, manifestDir: string, cmpData: Componen
 
   if (stylesData) {
     Object.keys(stylesData).forEach(modeName => {
-      cmpMeta.stylesMeta[modeName.toLowerCase()] = parseStyle(config, manifestDir, stylesData[modeName.toLowerCase()]);
+      cmpMeta.stylesMeta[modeName.toLowerCase()] = parseStyle(config, manifestDir, cmpData, stylesData[modeName.toLowerCase()]);
     });
   }
 }
@@ -183,7 +183,7 @@ function parseStyles(config: BuildConfig, manifestDir: string, cmpData: Componen
 function serializeStyle(config: BuildConfig, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
   const modeStyleData: StyleData = {};
 
-  if (modeStyleMeta.absStylePaths) {
+  if (modeStyleMeta.cmpRelativeStylePaths) {
     modeStyleData.stylePaths = modeStyleMeta.cmpRelativeStylePaths.map(componentRelativeStylePath => {
       // convert style paths which are relative to the component file
       // to be style paths that are relative to the manifest file
@@ -204,11 +204,27 @@ function serializeStyle(config: BuildConfig, compiledComponentRelativeDirPath: s
   return modeStyleData;
 }
 
-function parseStyle(config: BuildConfig, manifestDir: string, modeStyleData: StyleData) {
+function parseStyle(config: BuildConfig, manifestDir: string, cmpData: ComponentData, modeStyleData: StyleData) {
   const modeStyle: StyleMeta = {
-    absStylePaths: modeStyleData.stylePaths.map(stylePath => config.sys.path.join(manifestDir, stylePath)),
     styleStr: modeStyleData.style
   };
+
+  if (modeStyleData.stylePaths) {
+    modeStyle.absStylePaths = modeStyleData.stylePaths.map(stylePath => {
+      return config.sys.path.join(
+        manifestDir,
+        stylePath
+      );
+    });
+
+    modeStyle.cmpRelativeStylePaths = modeStyleData.stylePaths.map(stylePath => {
+      return config.sys.path.relative(
+        config.sys.path.dirname(cmpData.componentPath),
+        stylePath
+      );
+    });
+  }
+
   return modeStyle;
 }
 
@@ -263,12 +279,12 @@ function parseProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeWillPropChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (invalidArrayData(cmpMeta.propWillChangeMeta)) {
+function serializePropsWillChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (invalidArrayData(cmpMeta.propsWillChangeMeta)) {
     return;
   }
 
-  cmpData.propsWillChange = cmpMeta.propWillChangeMeta.map(propWillChangeMeta => {
+  cmpData.propsWillChange = cmpMeta.propsWillChangeMeta.map(propWillChangeMeta => {
     const propWillChangeData: PropChangeData = {
       name: propWillChangeMeta[0],
       method: propWillChangeMeta[1]
@@ -277,14 +293,14 @@ function serializeWillPropChange(cmpData: ComponentData, cmpMeta: ComponentMeta)
   });
 }
 
-function parseWillPropChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  const propWillChangeData = cmpData.propsDidChange;
+function parsePropsWillChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  const propWillChangeData = cmpData.propsWillChange;
 
   if (invalidArrayData(propWillChangeData)) {
     return;
   }
 
-  cmpMeta.propWillChangeMeta = propWillChangeData.map(propWillChangeData => {
+  cmpMeta.propsWillChangeMeta = propWillChangeData.map(propWillChangeData => {
     const propWillChangeMeta: PropChangeMeta = [
       propWillChangeData.name,
       propWillChangeData.method
@@ -294,12 +310,12 @@ function parseWillPropChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeDidPropChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (invalidArrayData(cmpMeta.propDidChangeMeta)) {
+function serializePropsDidChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (invalidArrayData(cmpMeta.propsDidChangeMeta)) {
     return;
   }
 
-  cmpData.propsDidChange = cmpMeta.propDidChangeMeta.map(propDidChangeMeta => {
+  cmpData.propsDidChange = cmpMeta.propsDidChangeMeta.map(propDidChangeMeta => {
     const propDidChangeData: PropChangeData = {
       name: propDidChangeMeta[0],
       method: propDidChangeMeta[1]
@@ -308,14 +324,14 @@ function serializeDidPropChange(cmpData: ComponentData, cmpMeta: ComponentMeta) 
   });
 }
 
-function parseDidPropChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parsePropsDidChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const propDidChangeData = cmpData.propsDidChange;
 
   if (invalidArrayData(propDidChangeData)) {
     return;
   }
 
-  cmpMeta.propDidChangeMeta = propDidChangeData.map(propDidChangeData => {
+  cmpMeta.propsDidChangeMeta = propDidChangeData.map(propDidChangeData => {
     const propDidChangeMeta: PropChangeMeta = [
       propDidChangeData.name,
       propDidChangeData.method
@@ -391,7 +407,6 @@ function serializeMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpMeta.methodsMeta)) {
     return;
   }
-
   cmpData.methods = cmpMeta.methodsMeta;
 }
 
@@ -400,7 +415,6 @@ function parseMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpData.methods)) {
     return;
   }
-
   cmpMeta.methodsMeta = cmpData.methods;
 }
 
@@ -409,7 +423,6 @@ function serializeHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (!cmpMeta.hostMeta || Array.isArray(cmpMeta.hostMeta) || !Object.keys(cmpMeta.hostMeta).length) {
     return;
   }
-
   cmpData.host = cmpMeta.hostMeta;
 }
 
@@ -418,7 +431,6 @@ function parseHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (!cmpData.host) {
     return;
   }
-
   cmpMeta.hostMeta = cmpData.host;
 }
 
@@ -427,7 +439,6 @@ function serializeAssetsDir(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpMeta.assetsDirsMeta)) {
     return;
   }
-
   cmpData.assetsDir = cmpMeta.assetsDirsMeta;
 }
 
@@ -436,26 +447,25 @@ function parseAssetsDir(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpData.assetsDir)) {
     return;
   }
-
   cmpMeta.assetsDirsMeta = cmpData.assetsDir;
 }
 
 
 function serializeSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.slotMeta === HAS_SLOTS) {
-    cmpData.slots = 'hasSlots';
+    cmpData.slot = 'hasSlots';
 
   } else if (cmpMeta.slotMeta === HAS_NAMED_SLOTS) {
-    cmpData.slots = 'hasNamedSlots';
+    cmpData.slot = 'hasNamedSlots';
   }
 }
 
 
 function parseSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpData.slots === 'hasSlots') {
+  if (cmpData.slot === 'hasSlots') {
     cmpMeta.slotMeta = HAS_SLOTS;
 
-  } else if (cmpData.slots === 'hasNamedSlots') {
+  } else if (cmpData.slot === 'hasNamedSlots') {
     cmpMeta.slotMeta = HAS_NAMED_SLOTS;
   }
 }
@@ -487,7 +497,7 @@ function parseLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeBundles(manifestData: ManifestData, config: BuildConfig) {
+export function serializeBundles(config: BuildConfig, manifestData: ManifestData) {
   manifestData.bundles = [];
 
   if (invalidArrayData(config.bundles)) {
@@ -518,7 +528,7 @@ function serializeBundles(manifestData: ManifestData, config: BuildConfig) {
 }
 
 
-function parseBundles(manifestData: ManifestData, manifest: Manifest) {
+export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
   manifest.bundles = [];
 
   if (invalidArrayData(manifestData.bundles)) {
@@ -580,7 +590,7 @@ export interface ComponentData {
   methods?: string[];
   host?: any;
   assetsDir?: string[];
-  slots?: 'hasSlots'|'hasNamedSlots';
+  slot?: 'hasSlots'|'hasNamedSlots';
   shadow?: boolean;
   priority?: 'low';
 }

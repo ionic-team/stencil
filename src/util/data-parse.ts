@@ -75,10 +75,10 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   cmpMeta.statesMeta = cmpMetaData[3];
 
   // component instance prop WILL change methods
-  cmpMeta.propWillChangeMeta = cmpMetaData[4];
+  cmpMeta.propsWillChangeMeta = cmpMetaData[4];
 
   // component instance prop DID change methods
-  cmpMeta.propDidChangeMeta = cmpMetaData[5];
+  cmpMeta.propsDidChangeMeta = cmpMetaData[5];
 
   // component methods
   cmpMeta.methodsMeta = cmpMetaData[6];
