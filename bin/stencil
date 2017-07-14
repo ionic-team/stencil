@@ -48,8 +48,6 @@ if (!path.isAbsolute(configFilePath)) {
   configFilePath = path.join(process.cwd(), configFilePath);
 }
 
-config.rootDir = path.dirname(configFilePath);
-
 
 try {
   var configFile = require(configFilePath);
@@ -59,11 +57,16 @@ try {
     process.exit(1);
   }
 
-  Object.assign(config, configFile.config)
+  Object.assign(config, configFile.config);
 
 } catch(e) {
   console.log('Error reading Stencil "' + chalk.bold(configFilePath) + '" configuration file.');
   process.exit(1);
+}
+
+
+if (!config.rootDir) {
+  config.rootDir = path.dirname(configFilePath);
 }
 
 
@@ -79,9 +82,10 @@ function help() {
 
   ${chalk.bold('Options:')}
 
-    ${chalk.green('--prod')} ................... Execute a production build.
-    ${chalk.green('--watch')} .................. Execute a build in watch mode.
-    ${chalk.green('--debug')} .................. Set the log level to debug.
+    ${chalk.green('--prod')} ................. Execute a production build.
+    ${chalk.green('--watch')} ................ Execute a build in watch mode.
+    ${chalk.green('--config')} ............... Stencil config file.
+    ${chalk.green('--debug')} ................ Set the log level to debug.
 
   ${chalk.bold('Examples:')}
 
@@ -115,11 +119,14 @@ if (cmdArgs.indexOf('--debug') > -1) {
 
 
 var stencil = require(path.join(__dirname, '..', 'dist' , 'compiler'));
-config.logger = new stencil.CommandLineLogger({
-  level: config.logLevel,
-  process: process,
-  chalk: chalk
-});
+
+if (!config.logger) {
+  config.logger = new stencil.CommandLineLogger({
+    level: config.logLevel,
+    process: process,
+    chalk: chalk
+  });
+}
 
 
 switch (cmdArgs[2]) {
