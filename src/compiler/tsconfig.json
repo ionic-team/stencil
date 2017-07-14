@@ -21,6 +21,7 @@
     "outDir": "../../dist/transpiled-compiler",
     "pretty": true,
     "removeComments": true,
+    "rootDir": "../",
     "sourceMap": false,
     "types": [
       "jest",
