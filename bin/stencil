@@ -66,7 +66,8 @@ try {
   process.exit(1);
 }
 
-if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
+
+function help() {
   console.log(`
   ${chalk.bold(chalk.green('stencil build') + ' - Build your stencil project')}
 
@@ -78,7 +79,7 @@ if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
 
   ${chalk.bold('Options:')}
 
-    ${chalk.green('--build')} .................. Execute a production build.
+    ${chalk.green('--prod')} ................... Execute a production build.
     ${chalk.green('--watch')} .................. Execute a build in watch mode.
     ${chalk.green('--debug')} .................. Set the log level to debug.
 
@@ -87,9 +88,12 @@ if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
     $ ${chalk.green('stencil build --prod')}
     $ ${chalk.green('stencil build --watch')}
 `);
-  process.exit(0);
 }
 
+if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
+  help();
+  process.exit(0);
+}
 
 if (cmdArgs.indexOf('--prod') > -1 || cmdArgs.indexOf('-p') > -1) {
   config.devMode = false;
@@ -124,6 +128,6 @@ switch (cmdArgs[2]) {
     break;
 
   default:
-    console.log('Invalid stencil command' + (cmdArgs[2] ? ': "' + cmdArgs[2] + '"' : ''));
+    help();
     process.exit(1);
 }
