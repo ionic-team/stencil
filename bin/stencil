@@ -71,6 +71,8 @@ if (!config.rootDir) {
 
 
 function help() {
+  var p = chalk.dim((process.platform === 'win32') ? '>' : '$');
+
   console.log(`
   ${chalk.bold(chalk.green('stencil build') + ' - Build your stencil project')}
 
@@ -78,19 +80,20 @@ function help() {
 
   ${chalk.bold('Usage:')}
 
-    $ ${chalk.green('stencil build [--prod] [--watch] [--debug]')}
+    ${p} ${chalk.green('stencil build [--prod] [--watch] [--debug]')}
 
   ${chalk.bold('Options:')}
 
     ${chalk.green('--prod')} ................. Execute a production build.
     ${chalk.green('--watch')} ................ Execute a build in watch mode.
-    ${chalk.green('--config')} ............... Stencil config file.
     ${chalk.green('--debug')} ................ Set the log level to debug.
+    ${chalk.green('--config')} ............... Stencil config file.
 
   ${chalk.bold('Examples:')}
 
-    $ ${chalk.green('stencil build --prod')}
-    $ ${chalk.green('stencil build --watch')}
+    ${p} ${chalk.green('stencil build --prod')}
+    ${p} ${chalk.green('stencil build --watch')}
+
 `);
 }
 
