@@ -32,7 +32,7 @@ function bundleCompiler() {
     // copy over all the .d.ts file too
     fs.copy(path.dirname(ENTRY_FILE), DEST_DIR, {
       filter: (src) => {
-        return src.indexOf('.js') === -1;
+        return src.indexOf('.js') === -1 && src.indexOf('.spec.') === -1;
       }
     });
 
