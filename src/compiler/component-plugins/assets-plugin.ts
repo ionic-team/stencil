@@ -34,7 +34,7 @@ export function bundleAssets(config: BuildConfig, ctx: BuildContext, userManifes
     .filter(c => c.assetsDirsMeta && c.assetsDirsMeta.length)
     .reduce((dirList, component) => {
       const qualifiedPathDirs: string[] = component.assetsDirsMeta.map((dir: string) => {
-        const relativeCompUrl = config.sys.path.relative(config.collectionDest, component.componentPath);
+        const relativeCompUrl = config.sys.path.relative(config.collectionDir, component.componentPath);
         return config.sys.path.resolve(config.src, relativeCompUrl, dir);
       });
 
@@ -43,7 +43,7 @@ export function bundleAssets(config: BuildConfig, ctx: BuildContext, userManifes
 
   const dirCopyPromises = directoriesToCopy.map((directory: string) => {
     return new Promise((resolve, reject) => {
-      const destination = config.sys.path.join(config.collectionDest, config.sys.path.basename(directory));
+      const destination = config.sys.path.join(config.collectionDir, config.sys.path.basename(directory));
       config.sys.copyDir(directory, destination, (err) => {
         if (err) {
           reject(err);

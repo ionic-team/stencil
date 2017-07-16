@@ -4,7 +4,7 @@ import { componentClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
 import { jsxToVNode } from './transformers/jsx-to-vnode';
-import { loadTypeScriptDiagnostics } from '../logger/logger-typescript';
+import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import { updateLifecycleMethods } from './transformers/update-lifecycle-methods';
 import * as ts from 'typescript';

@@ -145,7 +145,7 @@ function generateModeCss(
       // create the file name and path of where the bundle will be saved
       const styleFileName = formatCssBundleFileName(stylesResult[modeName]);
       const styleFilePath = sys.path.join(
-        config.buildDest,
+        config.buildDir,
         config.namespace.toLowerCase(),
         styleFileName
       );

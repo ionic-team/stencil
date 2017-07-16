@@ -1,12 +1,13 @@
-import { ComponentMeta, ConfigApi, HostElement, HostContentNodes, HydrateOptions, Ionic, Logger,
-  ProjectNamespace, DomApi, PlatformConfig, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
+import { BuildConfig, ComponentMeta, ConfigApi, HostElement, HostContentNodes, HydrateOptions, Ionic, Logger,
+  ProjectGlobal, DomApi, PlatformConfig, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createConfigController } from '../util/config-controller';
 import { createDomApi } from '../core/renderer/dom-api';
-import { initGlobal, initGlobalNamespace } from '../core/server/global-server';
-import { createPlatformServer } from '../core/server/platform-server';
+import { initGlobal, initProjectGlobal } from '../server/global-server';
+import { createPlatformServer } from '../server/platform-server';
 import { createRenderer } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
 import { noop } from '../util/helpers';
+import { validateBuildConfig } from '../compiler/validation';
 const MemoryFileSystem = require('memory-fs');
 
 
@@ -15,15 +16,28 @@ const vm = require('vm');
 const jsdom = require('jsdom');
 
 
-export function mockPlatform(IonicGbl?: ProjectNamespace) {
-  if (!IonicGbl) {
-    IonicGbl = mockIonicGlobal();
+export function mockPlatform(Gbl?: ProjectGlobal) {
+  if (!Gbl) {
+    Gbl = mockProjectGlobal();
   }
+  const logger = mockLogger();
   const sys = mockStencilSystem();
   const win = sys.createDom().parse({html: ''});
   const domApi = createDomApi(win.document);
 
-  const plt = createPlatformServer(sys, IonicGbl, win, domApi, IonicGbl.ConfigCtrl, IonicGbl.DomCtrl, 'build');
+  const projectBuildDir = `/build/app/`;
+
+  const plt = createPlatformServer(
+    sys,
+    logger,
+    'App',
+    Gbl,
+    win,
+    domApi,
+    Gbl.ConfigCtrl,
+    Gbl.DomCtrl,
+    projectBuildDir
+  );
 
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();
@@ -57,16 +71,16 @@ export interface MockedPlatform {
 }
 
 
-export function mockIonicGlobal(config?: ConfigApi): ProjectNamespace {
+export function mockProjectGlobal(config?: ConfigApi) {
   if (!config) {
     config = mockConfig({}, []);
   }
-  const IonicGbl: ProjectNamespace = initGlobalNamespace(config, []);
-  return IonicGbl;
+  const Gbl: ProjectGlobal = initProjectGlobal(config, []);
+  return Gbl;
 }
 
 
-export function mockInjectedIonic(IonicGbl: ProjectNamespace): Ionic {
+export function mockInjectedIonic(IonicGbl: ProjectGlobal): Ionic {
   const ionic = initGlobal(IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
   return ionic;
 }
@@ -78,48 +92,135 @@ export function mockConfig(configObj: any = {}, platforms: PlatformConfig[] = []
 }
 
 
+export function mockBuildConfig() {
+  var sys = mockStencilSystem();
+
+  const config: BuildConfig = {
+    sys: sys,
+    logger: mockLogger(),
+    rootDir: '/',
+    suppressTypeScriptErrors: true
+  };
+
+  return validateBuildConfig(config);
+}
+
+
 export function mockStencilSystem() {
   const sys: StencilSystem = {
-    createDom: function() {
-      return {
-        parse: function(opts: HydrateOptions) {
-          (<any>this)._dom = new jsdom.JSDOM(opts.html, {
-            url: opts.url,
-            referrer: opts.referrer,
-            userAgent: opts.userAgent,
-          });
-          return (<any>this)._dom.window;
-        },
-        serialize: function() {
-          return (<any>this)._dom.serialize();
-        }
-      };
+
+    copyDir: function mockCopyDir(src: string, dest: string, cb: Function) {
+      src; dest;
+      process.nextTick(() => {
+        cb(null);
+      });
     },
+
+    createDom: mockCreateDom,
+
+    generateContentHash: function mockGenerateContentHash(content: string, length: number) {
+      var crypto = require('crypto');
+      return crypto.createHash('sha1')
+                  .update(content)
+                  .digest('base64')
+                  .replace(/\W/g, '')
+                  .substr(0, length)
+                  .toLowerCase();
+    },
+
+    getClientCoreFile: mockGetClientCoreFile,
+
     fs: mockFs(),
-    rmDir: function(path, cb) {
+
+    minifyCss: mockMinify,
+
+    minifyJs: mockMinify,
+
+    path: path,
+
+    rmDir: function mockRmDir(path, cb) {
       path;
       process.nextTick(() => {
         cb(null);
       });
     },
-    path: path,
+
     rollup: rollup,
+
     sass: {
-      render: function(config, cb) {
+      render: function(config: any, cb: Function) {
         Promise.resolve().then(() => {
           config;
           cb(null, {
-            css: `/** ${config.file} css **/`,
+            css: `/** ${config.file} mock css **/`,
             stats: []
           });
         });
       }
     },
+
     typescript: require('typescript'),
-    vm: vm
+
+    vm: vm,
+
+    watch: mockWatch
   };
 
   return sys;
+}
+
+
+function mockGetClientCoreFile(opts: {staticName: string}) {
+  return Promise.resolve(`
+    (function (window, document, projectNamespace, projectFileName, projectCore, projectCoreEs5, components) {
+        // mock getClientCoreFile, staticName: ${opts.staticName}
+    })(window, document, '__STENCIL__APP__');`);
+}
+
+
+function mockWatch(paths: string): any {
+  paths;
+  const events: {[eventName: string]: Function} = {};
+
+  const watcher = {
+    on: function(eventName: string, listener: Function) {
+      events[eventName] = listener;
+      return watcher;
+    },
+    $triggerEvent: function(eventName: string, path: string) {
+      events[eventName](path);
+    }
+  };
+
+  return watcher;
+}
+
+function mockCreateDom() {
+  let dom: any;
+
+  return {
+    parse: function(opts: HydrateOptions) {
+      dom = new jsdom.JSDOM(opts.html, {
+        url: opts.url,
+        referrer: opts.referrer,
+        userAgent: opts.userAgent,
+      });
+      return dom.window;
+    },
+    serialize: function() {
+      return dom.serialize();
+    },
+    getDiagnostics: function(): any {
+      return [];
+    }
+  };
+}
+
+function mockMinify(input: string) {
+  return <any>{
+    output: `/** mock minify **/\n${input}`,
+    diagnostics: []
+  };
 }
 
 var rollup = require('rollup');
@@ -130,7 +231,26 @@ rollup.plugins = {
 
 
 export function mockFs() {
-  return new MemoryFileSystem();
+  const fs = new MemoryFileSystem();
+
+  const orgreadFileSync = fs.readFileSync;
+  fs.readFileSync = function() {
+    try {
+      return orgreadFileSync.apply(fs, arguments);
+    } catch (e) {
+      if (e.message && e.message.indexOf('invalid argument') > -1) {
+        console.log('mockFs, fs.readFileSync', arguments);
+        console.trace(e);
+      } else if (e.message && e.message.indexOf('no such file') > -1 && e.path.indexOf('node_modules') === -1) {
+        console.log('mockFs, fs.readFileSync', arguments);
+        console.trace(e);
+      } else {
+        throw e;
+      }
+    }
+  };
+
+  return fs;
 }
 
 

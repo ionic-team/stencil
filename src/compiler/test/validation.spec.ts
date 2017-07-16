@@ -36,9 +36,41 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
-    it('should default inlineAppLoader to true', () => {
+    it('should default prerenderIndex.linkRelPreloadCore', () => {
       validateBuildConfig(config);
-      expect(config.inlineAppLoader).toBe(true);
+      expect(config.prerenderIndex.linkRelPreloadCore).toBe(true);
+    });
+
+    it('should default prerenderIndex.removeUnusedCss', () => {
+      validateBuildConfig(config);
+      expect(config.prerenderIndex.removeUnusedCss).toBe(true);
+    });
+
+    it('should default prerenderIndex.reduceHtmlWhitepace', () => {
+      validateBuildConfig(config);
+      expect(config.prerenderIndex.reduceHtmlWhitepace).toBe(true);
+    });
+
+    it('should default prerenderIndex.inlineAppLoader', () => {
+      validateBuildConfig(config);
+      expect(config.prerenderIndex.inlineAppLoader).toBe(true);
+    });
+
+    it('should merge prerenderIndex config', () => {
+      config.prerenderIndex = { html: '<div></div>' };
+      validateBuildConfig(config);
+      expect(config.prerenderIndex.inlineAppLoader).toBe(true);
+    });
+
+    it('should default prerenderIndex', () => {
+      validateBuildConfig(config);
+      expect(config.prerenderIndex).toBeDefined();
+    });
+
+    it('should not set prerenderIndex if null', () => {
+      config.prerenderIndex = null;
+      validateBuildConfig(config);
+      expect(config.prerenderIndex).toBe(null);
     });
 
     it('should default generateCollection to false', () => {
@@ -101,34 +133,41 @@ describe('validation', () => {
       expect(config.devMode).toBe(true);
     });
 
-    it('should set default staticBuildDir and convert to relative path', () => {
+    it('should set publicPath from custom buildDir', () => {
+      config.indexHtmlBuild = '/my/custom/index.html';
+      config.buildDir = '/my/custom/build-dist';
       validateBuildConfig(config);
-      expect(config.staticBuildDir).toBe('build');
-      expect(path.isAbsolute(config.staticBuildDir)).toBe(false);
+      expect(config.publicPath).toBe('build-dist/');
+      expect(path.isAbsolute(config.publicPath)).toBe(false);
     });
 
-    it('should set default indexDest and convert to absolute path', () => {
+    it('should set default publicPath and convert to relative path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.indexDest)).toBe('index.html');
-      expect(path.isAbsolute(config.indexDest)).toBe(true);
+      expect(config.publicPath).toBe('build/');
     });
 
-    it('should set default indexSrc and convert to absolute path', () => {
+    it('should set default indexHtmlBuild and convert to absolute path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.indexSrc)).toBe('index.html');
-      expect(path.isAbsolute(config.indexSrc)).toBe(true);
+      expect(path.basename(config.indexHtmlBuild)).toBe('index.html');
+      expect(path.isAbsolute(config.indexHtmlBuild)).toBe(true);
     });
 
-    it('should set default collection dest dir and convert to absolute path', () => {
+    it('should set default indexHtmlSrc and convert to absolute path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.collectionDest)).toBe('collection');
-      expect(path.isAbsolute(config.collectionDest)).toBe(true);
+      expect(path.basename(config.indexHtmlSrc)).toBe('index.html');
+      expect(path.isAbsolute(config.indexHtmlSrc)).toBe(true);
     });
 
-    it('should set default build dest dir and convert to absolute path', () => {
+    it('should set default collection dir and convert to absolute path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.buildDest)).toBe('build');
-      expect(path.isAbsolute(config.buildDest)).toBe(true);
+      expect(path.basename(config.collectionDir)).toBe('collection');
+      expect(path.isAbsolute(config.collectionDir)).toBe(true);
+    });
+
+    it('should set default build dir and convert to absolute path', () => {
+      validateBuildConfig(config);
+      expect(path.basename(config.buildDir)).toBe('build');
+      expect(path.isAbsolute(config.buildDir)).toBe(true);
     });
 
     it('should set default src dir and convert to absolute path', () => {

@@ -150,7 +150,7 @@ function copySourceSassFilesToDest(config: BuildConfig, ctx: BuildContext, compi
 
       if (includeDir) {
         sassDestPath = normalizePath(sys.path.join(
-          config.collectionDest,
+          config.collectionDir,
           sys.path.relative(config.src, sassSrcPath)
         ));
 

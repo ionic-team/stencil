@@ -1,5 +1,6 @@
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
 import { BuildConfig, Bundle, Collection, Manifest } from './interfaces';
+import { HydrateOptions } from '../util/interfaces';
 import { normalizePath } from './util';
 
 
@@ -7,6 +8,12 @@ export function validateBuildConfig(config: BuildConfig) {
   if (!config) {
     throw new Error(`invalid build config`);
   }
+
+  if (config._isValidated) {
+    // don't bother if we've already validated this config
+    return config;
+  }
+
   if (!config.rootDir) {
     throw new Error('config.rootDir required');
   }
@@ -30,40 +37,45 @@ export function validateBuildConfig(config: BuildConfig) {
     config.src = normalizePath(path.join(config.rootDir, config.src));
   }
 
-  if (typeof config.buildDest !== 'string') {
-    config.buildDest = DEFAULT_BUILD_DEST;
+  if (typeof config.buildDir !== 'string') {
+    config.buildDir = DEFAULT_BUILD_DIR;
   }
-  if (!path.isAbsolute(config.buildDest)) {
-    config.buildDest = normalizePath(path.join(config.rootDir, config.buildDest));
-  }
-
-  if (typeof config.collectionDest !== 'string') {
-    config.collectionDest = DEFAULT_COLLECTION_DEST;
-  }
-  if (!path.isAbsolute(config.collectionDest)) {
-    config.collectionDest = normalizePath(path.join(config.rootDir, config.collectionDest));
+  if (!path.isAbsolute(config.buildDir)) {
+    config.buildDir = normalizePath(path.join(config.rootDir, config.buildDir));
   }
 
-  if (typeof config.indexSrc !== 'string') {
-    config.indexSrc = DEFAULT_INDEX_SRC;
+  if (typeof config.collectionDir !== 'string') {
+    config.collectionDir = DEFAULT_COLLECTION_DIR;
   }
-  if (!path.isAbsolute(config.indexSrc)) {
-    config.indexSrc = normalizePath(path.join(config.rootDir, config.indexSrc));
-  }
-
-  if (typeof config.indexDest !== 'string') {
-    config.indexDest = DEFAULT_INDEX_DEST;
-  }
-  if (!path.isAbsolute(config.indexDest)) {
-    config.indexDest = normalizePath(path.join(config.rootDir, config.indexDest));
+  if (!path.isAbsolute(config.collectionDir)) {
+    config.collectionDir = normalizePath(path.join(config.rootDir, config.collectionDir));
   }
 
-  if (typeof config.staticBuildDir !== 'string') {
-    // this is reference to the public static build directory from the client
-    // in most cases it's just "build", as in index page would end up requesting `build/app/app.js`
-    config.staticBuildDir = normalizePath(
-      path.relative(path.dirname(config.indexDest), config.buildDest)
+  if (typeof config.indexHtmlSrc !== 'string') {
+    config.indexHtmlSrc = DEFAULT_INDEX_SRC;
+  }
+  if (!path.isAbsolute(config.indexHtmlSrc)) {
+    config.indexHtmlSrc = normalizePath(path.join(config.rootDir, config.indexHtmlSrc));
+  }
+
+  if (typeof config.indexHtmlBuild !== 'string') {
+    config.indexHtmlBuild = DEFAULT_INDEX_BUILD;
+  }
+  if (!path.isAbsolute(config.indexHtmlBuild)) {
+    config.indexHtmlBuild = normalizePath(path.join(config.rootDir, config.indexHtmlBuild));
+  }
+
+  if (typeof config.publicPath !== 'string') {
+    // CLIENT SIDE ONLY! Do not use this for server-side file read/writes
+    // this is a reference to the public static directory from the index.html running from a browser
+    // in most cases it's just "build", as in index page would request scripts from `build/`
+    config.publicPath = normalizePath(
+      path.relative(path.dirname(config.indexHtmlBuild), config.buildDir)
     );
+  }
+  if (config.publicPath.charAt(config.publicPath.length - 1) !== '/') {
+    // ensure there's a trailing /
+    config.publicPath += '/';
   }
 
   if (typeof config.devMode !== 'boolean') {
@@ -104,8 +116,12 @@ export function validateBuildConfig(config: BuildConfig) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
-  if (typeof config.inlineAppLoader !== 'boolean') {
-    config.inlineAppLoader = true;
+  if (config.prerenderIndex !== null) {
+    if (config.prerenderIndex) {
+      Object.assign(config.prerenderIndex, DEFAULT_PRERENDER_INDEX);
+    } else {
+      config.prerenderIndex = DEFAULT_PRERENDER_INDEX;
+    }
   }
 
   if (!config.watchIgnoredRegex) {
@@ -121,6 +137,9 @@ export function validateBuildConfig(config: BuildConfig) {
 
   config.bundles = config.bundles || [];
   config.exclude = config.exclude || DEFAULT_EXCLUDES;
+
+  // set to true so it doesn't bother going through all this again on rebuilds
+  config._isValidated = true;
 
   return config;
 }
@@ -268,11 +287,18 @@ export function validateAttrCase(attrCase: any) {
 
 
 const DEFAULT_SRC = 'src';
-const DEFAULT_BUILD_DEST = 'www/build';
+const DEFAULT_BUILD_DIR = 'www/build';
 const DEFAULT_INDEX_SRC = 'src/index.html';
-const DEFAULT_INDEX_DEST = 'www/index.html';
-const DEFAULT_COLLECTION_DEST = 'dist/collection';
+const DEFAULT_INDEX_BUILD = 'www/index.html';
+const DEFAULT_COLLECTION_DIR = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 12;
 const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
+
+const DEFAULT_PRERENDER_INDEX: HydrateOptions = {
+  inlineAppLoader: true,
+  removeUnusedCss: true,
+  reduceHtmlWhitepace: true,
+  linkRelPreloadCore: true
+};

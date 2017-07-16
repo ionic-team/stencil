@@ -31,7 +31,7 @@ export interface IonicControllerApi {
 }
 
 
-export interface ProjectNamespace {
+export interface ProjectGlobal {
   components?: LoadComponentRegistry[];
   defineComponents?: (moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
   eventNameFn?: (eventName: string) => string;
@@ -436,6 +436,7 @@ export interface Bundle {
 
 
 export interface BuildConfig {
+  _isValidated?: boolean;
   sys?: StencilSystem;
   logger?: Logger;
   rootDir?: string;
@@ -443,11 +444,11 @@ export interface BuildConfig {
   exclude?: string[];
   namespace?: string;
   src?: string;
-  buildDest?: string;
-  collectionDest?: string;
-  indexSrc?: string;
-  indexDest?: string;
-  staticBuildDir?: string;
+  buildDir?: string;
+  collectionDir?: string;
+  indexHtmlSrc?: string;
+  indexHtmlBuild?: string;
+  publicPath?: string;
   generateCollection?: boolean;
   bundles?: Bundle[];
   collections?: Collection[];
@@ -461,7 +462,7 @@ export interface BuildConfig {
   suppressTypeScriptErrors?: boolean;
   attrCase?: number;
   watchIgnoredRegex?: RegExp;
-  inlineAppLoader?: boolean;
+  prerenderIndex?: HydrateOptions;
 }
 
 
@@ -864,7 +865,7 @@ export interface PlatformApi {
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
   isServer?: boolean;
-  onAppLoad?: (rootElm: HostElement, styles: string) => void;
+  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap) => void;
   getEventOptions: (opts?: ListenOptions) => any;
   tmpDisconnected?: boolean;
 }
@@ -975,11 +976,11 @@ export interface ModuleCallbacks {
 
 
 export interface Diagnostic {
-  level: 'error'|'warn';
-  type: 'runtime'|'build'|'typescript'|'sass';
+  level: 'error'|'warn'|'info';
+  type: 'runtime'|'build'|'typescript'|'sass'|'css'|'hydrate';
   header: string;
   messageText: string;
-  language?: 'javascript'|'typescript'|'scss';
+  language?: 'javascript'|'typescript'|'scss'|'css';
   code?: string;
   absFilePath?: string;
   relFilePath?: string;
@@ -990,10 +991,10 @@ export interface Diagnostic {
 export interface PrintLine {
   lineIndex: number;
   lineNumber: number;
-  text: string;
-  html: string;
+  text?: string;
+  html?: string;
   errorCharStart: number;
-  errorLength: number;
+  errorLength?: number;
 }
 
 
@@ -1002,6 +1003,7 @@ export interface StencilSystem {
   createDom?(): {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
+    getDiagnostics(): Diagnostic[];
   };
   fs?: {
     access(path: string, callback: (err: any) => void): void;
@@ -1015,16 +1017,6 @@ export interface StencilSystem {
   };
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
-  htmlParser?: {
-    parse(html: string): any;
-    serialize(node: any): string;
-    getElementsByTagName(node: any, tag: string): any[];
-    getAttribute(node: any, key: string): string;
-    removeNode(node: any): void;
-    appendChild(parentNode: any, childNode: any): void;
-    createElement(tag: string): any;
-    createText(content: string): any;
-  };
   minifyCss?(input: string): {
     output: string;
     sourceMap?: any;
@@ -1094,14 +1086,6 @@ export interface FSWatcher {
 }
 
 
-export interface RendererOptions {
-  registry?: ComponentRegistry;
-  staticDir?: string;
-  debug?: boolean;
-  sys?: StencilSystem;
-}
-
-
 export interface HydrateOptions {
   req?: {
     protocol: string;
@@ -1119,8 +1103,21 @@ export interface HydrateOptions {
   config?: Object;
   removeUnusedCss?: boolean;
   reduceHtmlWhitepace?: boolean;
-  staticBuildDir?: string;
+  inlineAppLoader?: boolean;
+  linkRelPreloadCore?: boolean;
 }
+
+export interface HydrateResults {
+  diagnostics: Diagnostic[];
+  html?: string;
+  styles?: string;
+}
+
+
+export interface FilesMap {
+  [filePath: string]: string;
+}
+
 
 declare global {
   namespace JSX {

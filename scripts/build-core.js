@@ -16,14 +16,13 @@ const ROOT_DIR = path.join(__dirname, '../');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
 const EXTERNS_CORE = path.join(ROOT_DIR, 'scripts', 'externs.core.js');
 const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-core');
-const BINDINGS_DIR = path.join(TRANSPILED_DIR, 'bindings');
-const BINDINGS_CLIENT_DIR = path.join(BINDINGS_DIR, 'client');
+const SRC_CLIENT_DIR = path.join(TRANSPILED_DIR, 'client');
 const DIST_CLIENT_DIR = path.join(DIST_DIR, 'client');
 const POLYFILLS_SRC_DIR = path.join(ROOT_DIR, 'scripts', 'polyfills');
 const POLYFILLS_DIST_DIR = path.join(DIST_DIR, 'client', 'polyfills');
 
-const CLIENT_CORE_ENTRY_FILE = path.join(BINDINGS_CLIENT_DIR, 'core.js');
-const CLIENT_CORE_ES5_ENTRY_FILE = path.join(BINDINGS_CLIENT_DIR, 'core.es5.js');
+const CLIENT_CORE_ENTRY_FILE = path.join(SRC_CLIENT_DIR, 'core.js');
+const CLIENT_CORE_ES5_ENTRY_FILE = path.join(SRC_CLIENT_DIR, 'core.es5.js');
 
 const DIST_CLIENT_DEV_FILE = path.join(DIST_CLIENT_DIR, 'core.dev.js');
 const DIST_CLIENT_PROD_FILE = path.join(DIST_CLIENT_DIR, 'core.js');
@@ -31,7 +30,7 @@ const DIST_CLIENT_PROD_FILE = path.join(DIST_CLIENT_DIR, 'core.js');
 const DIST_CLIENT_ES5_DEV_FILE = path.join(DIST_CLIENT_DIR, 'core.es5.dev.js');
 const DIST_CLIENT_ES5_PROD_FILE = path.join(DIST_CLIENT_DIR, 'core.es5.js');
 
-const CLIENT_LOADER_ENTRY_FILE = path.join(BINDINGS_CLIENT_DIR, 'loader.js');
+const CLIENT_LOADER_ENTRY_FILE = path.join(SRC_CLIENT_DIR, 'loader.js');
 const DIST_CLIENT_LOADER_DEV_FILE = path.join(DIST_CLIENT_DIR, 'loader.dev.js');
 const DIST_CLIENT_LOADER_PROD_FILE = path.join(DIST_CLIENT_DIR, 'loader.js');
 
@@ -71,7 +70,7 @@ function buildCore(isDevMode) {
 
   copyPolyfills(POLYFILLS_SRC_DIR, POLYFILLS_DIST_DIR);
 
-  copyCoreDeclarationFiles();
+  copyUtilFiles();
 }
 
 
@@ -92,7 +91,7 @@ function bundleClientCore(coreEntryFile, outputDevFile, outputProdFile, es6Class
 function generateClientCoreDev(bundle, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode) {
   var clientCore = bundle.generate({
     format: 'es',
-    intro: '(function(window, document, globalNamespace, staticBuildDir) {\n"use strict";\n',
+    intro: '(function(window, document, projectNamespace, publicPath) {\n"use strict";\n',
     outro: '})(window, document, "' + STENCIL_GLOBAL_NAMESPACE + '");'
   });
 
@@ -261,7 +260,8 @@ if (process.argv.indexOf('dev') > -1) {
   buildCore(false);
 }
 
-function copyCoreDeclarationFiles() {
+function copyUtilFiles() {
+  createMainIndex();
   copyMainDTs();
   copyUtilDir();
 }
@@ -280,6 +280,40 @@ function copyMainDTs() {
         return process.exit(1);
       }
     });
+  });
+}
+
+function createMainIndex() {
+  // TODO! hacky hack hack for now
+
+  const mainIndexContent = `
+'use strict';
+
+Object.defineProperties(module.exports, {
+
+  build: {
+    get: function() {
+      var compiler = require('./compiler/index');
+      return compiler.build;
+    }
+  },
+
+  createRenderer: {
+    get: function() {
+      var server = require('./server/index');
+      return server.createRenderer;
+    }
+  }
+
+});
+  `
+
+  const mainIndexPath = path.join(DIST_DIR, 'index.js');
+  fs.writeFile(mainIndexPath, mainIndexContent, function(err) {
+    if (err) {
+      console.log('Failed to write: ', mainIndexPath);
+      return process.exit(1);
+    }
   });
 }
 

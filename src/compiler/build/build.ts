@@ -2,12 +2,12 @@ import { BuildConfig, Manifest } from '../../util/interfaces';
 import { BuildContext, BuildResults, LoggerTimeSpan } from '../interfaces';
 import { bundle } from '../bundle/bundle';
 import { catchError, emptyDir, writeFiles } from '../util';
-import { cleanDiagnostics } from '../logger/logger-util';
+import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
 import { generateProjectFiles } from './build-project-files';
-import { generateHtmlDiagnostics } from '../logger/generate-html-diagnostics';
+import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { loadDependentManifests, mergeManifests } from './manifest';
-import { optimizeIndexHtml } from './optimize-html';
+import { optimizeIndexHtml } from './optimize-index-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from '../validation';
 
@@ -43,9 +43,7 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
   // begin the build
   return Promise.resolve().then(() => {
     // validate the build config
-    if (!ctx.isRebuild) {
-      validateBuildConfig(config);
-    }
+    validateBuildConfig(config);
 
     timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
 
@@ -62,12 +60,12 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
     return bundlePhase(config, ctx, manifest, buildResults);
 
   }).then(() => {
-    // optimize index.html
-    return optimizeHtmlPhase(config, ctx, buildResults);
-
-  }).then(() => {
     // write all the files in one go
     return writePhase(config, ctx, buildResults);
+
+  }).then(() => {
+    // optimize index.html
+    return optimizeHtmlPhase(config, ctx, buildResults);
 
   }).then(() => {
     // setup watcher if need be
@@ -187,12 +185,12 @@ function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
     return Promise.resolve([]);
   }
 
-  config.logger.debug(`empty dir: ${config.buildDest}`);
-  config.logger.debug(`empty dir: ${config.collectionDest}`);
+  config.logger.debug(`empty dir: ${config.buildDir}`);
+  config.logger.debug(`empty dir: ${config.collectionDir}`);
 
   // let's empty out the build dest directory
   return Promise.all([
-    emptyDir(config.sys, config.buildDest),
-    emptyDir(config.sys, config.collectionDest)
+    emptyDir(config.sys, config.buildDir),
+    emptyDir(config.sys, config.collectionDir)
   ]);
 }

@@ -10,6 +10,11 @@ module.exports = Object.defineProperties({
     copyDir(source, dest, {}, callback);
   },
 
+  createDom: function createDom() {
+    var createDom = require('./create-dom');
+    return createDom();
+  },
+
   generateContentHash: function generateContentHash(content, length) {
     var crypto = require('crypto');
     return crypto.createHash('sha1')
@@ -43,8 +48,6 @@ module.exports = Object.defineProperties({
   },
 
   fs: require('fs'),
-
-  htmlParser: require('./html-parser'),
 
   minifyCss: function minifyCss(input) {
     var CleanCSS = require('clean-css');
@@ -132,6 +135,11 @@ module.exports = Object.defineProperties({
       return rollup;
     }
   },
+
   sass: { get: function() { return require('node-sass'); } },
-  typescript: { get: function() { return require('typescript'); } }
+
+  typescript: { get: function() { return require('typescript'); } },
+
+  vm: { get: function() { return require('vm'); } }
+
 });

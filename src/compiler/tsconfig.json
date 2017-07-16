@@ -10,9 +10,8 @@
       "dom",
       "es2015"
     ],
-    "moduleResolution": "node",
     "module": "es2015",
-    "target": "es5",
+    "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -20,15 +19,10 @@
     "noUnusedParameters": true,
     "outDir": "../../dist/transpiled-compiler",
     "pretty": true,
-    "removeComments": true,
     "rootDir": "../",
-    "sourceMap": false,
-    "types": [
-      "jest",
-      "node"
-    ]
+    "target": "es5"
   },
-  "include": [
-    "**/*.ts"
+  "files": [
+    "./index.ts"
   ]
 }

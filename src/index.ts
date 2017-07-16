@@ -1,10 +1,5 @@
 import * as interfaces from './util/interfaces';
 
-export {
-  VNodeData,
-  CssClassObject,
-} from './util/interfaces';
-
 export declare const Component: interfaces.ComponentDecorator;
 
 export declare const h: interfaces.Hyperscript;
@@ -23,4 +18,8 @@ export declare const PropWillChange: interfaces.PropChangeDecorator;
 
 export declare const PropDidChange: interfaces.PropChangeDecorator;
 
-export * from './compiler';
+export { build } from './compiler/index';
+
+export { createRenderer } from './server/index';
+
+export * from './util/interfaces';

@@ -1,5 +1,5 @@
-import { BuildConfig, Bundle, ComponentMeta, Manifest, StyleMeta,
-  ModuleFileMeta, ListenMeta, PropMeta, PropChangeMeta } from '../interfaces';
+import { BuildConfig, Bundle, ComponentMeta, Manifest, ModuleFileMeta,
+  ListenMeta, PropChangeMeta, PropMeta, StyleMeta } from '../interfaces';
 import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
 import { normalizePath } from '../util';
 

@@ -9,14 +9,13 @@ describe('build-project-files', () => {
 
     it('should set the loader arguments', () => {
       config.namespace = 'MyApp';
-      const staticBuildDir = 'build/myapp';
+      config.publicPath = 'build/';
       const projectCoreFileName = 'myapp.core.js';
       const projectCoreEs5FileName = 'myapp.core.ce.js';
       const componentRegistry: LoadComponentRegistry[] = [];
 
       const projectLoader = injectProjectIntoLoader(
         config,
-        staticBuildDir,
         projectCoreFileName,
         projectCoreEs5FileName,
         componentRegistry,
@@ -28,11 +27,10 @@ describe('build-project-files', () => {
 
     it('should set the core arguments', () => {
       config.namespace = 'MyApp';
-      const staticBuildDir = 'build/myapp';
+      config.publicPath = 'build/';
 
       const projectLoader = injectProjectIntoCore(
         config,
-        staticBuildDir,
         mockStencilContent
       );
 

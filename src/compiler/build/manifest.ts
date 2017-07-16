@@ -78,7 +78,7 @@ export function generateManifest(config: BuildConfig, ctx: BuildContext, compile
   validateUserBundles(config.bundles);
 
   // get the absolute path to the directory where the manifest will be saved
-  const manifestDir = normalizePath(config.collectionDest);
+  const manifestDir = normalizePath(config.collectionDir);
 
   // create an absolute path to the actual manifest json file
   const manifestFilePath = normalizePath(sys.path.join(manifestDir, COLLECTION_MANIFEST_FILE_NAME));

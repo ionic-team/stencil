@@ -1,5 +1,5 @@
 import { ATTR_LOWER_CASE, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
-import { ComponentRegistry, ComponentMeta, LoadComponentMeta, LoadComponentRegistry } from '../util/interfaces';
+import { ComponentMeta, ComponentRegistry, LoadComponentMeta, LoadComponentRegistry } from '../util/interfaces';
 import { isDef, toDashCase } from './helpers';
 
 

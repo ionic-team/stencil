@@ -11,7 +11,7 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { optio
   const options = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   // apply user config to tsconfig
-  options.outDir = config.collectionDest;
+  options.outDir = config.collectionDir;
   options.rootDir = config.src;
 
   if (config.devMode) {

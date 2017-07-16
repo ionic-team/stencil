@@ -124,7 +124,8 @@ if (cmdArgs.indexOf('--debug') > -1) {
 var stencil = require(path.join(__dirname, '..', 'dist' , 'compiler'));
 
 if (!config.logger) {
-  config.logger = new stencil.CommandLineLogger({
+  var logger = require(path.join(__dirname, 'logger'));
+  config.logger = new logger.CommandLineLogger({
     level: config.logLevel,
     process: process,
     chalk: chalk

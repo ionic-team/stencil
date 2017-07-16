@@ -15,8 +15,6 @@ export function isNumber(v: any): v is (number) { return typeof v === 'number'; 
 
 export function isFunction(v: any): v is (Function) { return typeof v === 'function'; }
 
-export function isStringOrNumber(v: any): v is (string | number) { return isString(v) || isNumber(v); }
-
 export function toDashCase(str: string) {
   return str.replace(/([A-Z])/g, (g) => '-' + g[0].toLowerCase());
 }
@@ -32,7 +30,7 @@ export function pointerCoordX(ev: any): number {
   // or a touch depending on the given event
   if (ev) {
     var changedTouches = ev.changedTouches;
-    if (changedTouches && changedTouches.length > 0) {
+    if (changedTouches && changedTouches.length) {
       return changedTouches[0].clientX;
     }
     if (ev.pageX !== undefined) {
@@ -47,7 +45,7 @@ export function pointerCoordY(ev: any): number {
   // or a touch depending on the given event
   if (ev) {
     var changedTouches = ev.changedTouches;
-    if (changedTouches && changedTouches.length > 0) {
+    if (changedTouches && changedTouches.length) {
       return changedTouches[0].clientY;
     }
     if (ev.pageY !== undefined) {
@@ -77,7 +75,7 @@ export function getElementReference(elm: any, ref: string) {
 }
 
 export function getParentElement(elm: any) {
-  if (elm.parentElement ) {
+  if (elm.parentElement) {
     // normal element with a parent element
     return elm.parentElement;
   }
@@ -86,14 +84,4 @@ export function getParentElement(elm: any) {
     return elm.parentNode.host;
   }
   return null;
-}
-
-export function applyStyles(elm: HTMLElement, styles: {[styleProp: string]: string|number}) {
-  const styleProps = Object.keys(styles);
-
-  if (elm) {
-    for (var i = 0; i < styleProps.length; i++) {
-      (<any>elm.style)[styleProps[i]] = styles[styleProps[i]];
-    }
-  }
 }

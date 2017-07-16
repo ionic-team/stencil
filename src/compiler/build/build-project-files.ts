@@ -19,10 +19,9 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
 
   let projectCoreFileName: string;
   let projectCoreEs5FileName: string;
-  let staticBuildDir = normalizePath(config.sys.path.join(config.staticBuildDir, projectFileName));
 
   return Promise.all([
-    generateCore(config, staticBuildDir),
+    generateCore(config),
     generateCoreEs5(config)
 
   ]).then(results => {
@@ -49,7 +48,7 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
     }
 
     // write the project core file
-    const projectCoreFilePath = sys.path.join(config.buildDest, projectFileName, projectCoreFileName);
+    const projectCoreFilePath = sys.path.join(config.buildDir, projectFileName, projectCoreFileName);
     if (ctx.projectFiles.core !== coreContent) {
       // core file is actually different from our last saved version
       config.logger.debug(`build, write project core: ${projectCoreFilePath}`);
@@ -58,7 +57,7 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
     }
 
     // write the project core ES5 file
-    const projectCoreEs5FilePath = sys.path.join(config.buildDest, projectFileName, projectCoreEs5FileName);
+    const projectCoreEs5FilePath = sys.path.join(config.buildDir, projectFileName, projectCoreEs5FileName);
     if (ctx.projectFiles.coreEs5 !== coreEs5Content) {
       // core es5 file is actually different from our last saved version
       config.logger.debug(`build, project core es5: ${projectCoreEs5FilePath}`);
@@ -68,10 +67,10 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
 
   }).then(() => {
     // create the loader after creating the loader file name
-    return generateLoader(config, staticBuildDir, projectCoreFileName, projectCoreEs5FileName, componentRegistry).then(loaderContent => {
+    return generateLoader(config, projectCoreFileName, projectCoreEs5FileName, componentRegistry).then(loaderContent => {
       // write the project loader file
       const projectLoaderFileName = `${projectRegistry.loader}`;
-      const projectLoaderFilePath = sys.path.join(config.buildDest, projectLoaderFileName);
+      const projectLoaderFilePath = sys.path.join(config.buildDir, projectLoaderFileName);
       if (ctx.projectFiles.loader !== loaderContent) {
         // project loader file is actually different from our last saved version
         config.logger.debug(`build, project loader: ${projectLoaderFilePath}`);
@@ -82,11 +81,10 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
 
   }).then(() => {
     // create a json file for the project registry
-    const registryFileName = `${projectFileName}.registry.json`;
-    const registryFilePath = config.sys.path.join(config.buildDest, registryFileName);
     const registryJson = JSON.stringify(projectRegistry, null, 2);
     if (ctx.projectFiles.registryJson !== registryJson) {
       // project registry json file is actually different from our last saved version
+      const registryFilePath = getRegistryJsonFilePath(config);
       config.logger.debug(`build, project registry: ${registryFilePath}`);
       ctx.filesToWrite[registryFilePath] = ctx.projectFiles.registryJson = registryJson;
       ctx.projectFileBuildCount++;
@@ -98,7 +96,7 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
 }
 
 
-function generateLoader(config: BuildConfig, staticBuildDir: string, projectCoreFileName: string, projectCoreEs5FileName: string, componentRegistry: LoadComponentRegistry[]) {
+function generateLoader(config: BuildConfig, projectCoreFileName: string, projectCoreEs5FileName: string, componentRegistry: LoadComponentRegistry[]) {
   const sys = config.sys;
 
   let staticName = LOADER_NAME;
@@ -112,7 +110,6 @@ function generateLoader(config: BuildConfig, staticBuildDir: string, projectCore
 
     stencilLoaderContent = injectProjectIntoLoader(
       config,
-      staticBuildDir,
       projectCoreFileName,
       projectCoreEs5FileName,
       componentRegistry,
@@ -130,7 +127,7 @@ function generateLoader(config: BuildConfig, staticBuildDir: string, projectCore
 }
 
 
-export function injectProjectIntoLoader(config: BuildConfig, staticBuildDir: string, projectCoreFileName: string, projectCoreEs5FileName: string, componentRegistry: LoadComponentRegistry[], stencilLoaderContent: string) {
+export function injectProjectIntoLoader(config: BuildConfig, projectCoreFileName: string, projectCoreEs5FileName: string, componentRegistry: LoadComponentRegistry[], stencilLoaderContent: string) {
   let componentRegistryStr = JSON.stringify(componentRegistry);
 
   if (config.minifyJs) {
@@ -143,8 +140,8 @@ export function injectProjectIntoLoader(config: BuildConfig, staticBuildDir: str
     }
   }
 
-  const projectCoreUrl = normalizePath(config.sys.path.join(staticBuildDir, projectCoreFileName));
-  const projectCoreEs5Url = normalizePath(config.sys.path.join(staticBuildDir, projectCoreEs5FileName));
+  const projectCoreUrl = getProjectPublicPath(config) + '/' + projectCoreFileName;
+  const projectCoreEs5Url = getProjectPublicPath(config) + '/' + projectCoreEs5FileName;
 
   return stencilLoaderContent.replace(
     PROJECT_NAMESPACE_REGEX,
@@ -153,7 +150,7 @@ export function injectProjectIntoLoader(config: BuildConfig, staticBuildDir: str
 }
 
 
-function generateCore(config: BuildConfig, staticBuildDir: string) {
+function generateCore(config: BuildConfig) {
   const sys = config.sys;
 
   let staticName = CORE_NAME;
@@ -166,7 +163,7 @@ function generateCore(config: BuildConfig, staticBuildDir: string) {
     // concat the projects core code
     const projectCode: string[] = [
       generateBanner(config),
-      injectProjectIntoCore(config, staticBuildDir, coreContent)
+      injectProjectIntoCore(config, coreContent)
     ];
 
     return projectCode.join('');
@@ -174,11 +171,11 @@ function generateCore(config: BuildConfig, staticBuildDir: string) {
 }
 
 
-export function injectProjectIntoCore(config: BuildConfig, staticBuildDir: string, coreContent: string) {
+export function injectProjectIntoCore(config: BuildConfig, coreContent: string) {
   // replace the default core with the project's namespace
   return coreContent.replace(
     PROJECT_NAMESPACE_REGEX,
-    `"${config.namespace}","${staticBuildDir}/"`
+    `"${config.namespace}","${getProjectPublicPath(config)}/"`
   );
 }
 
@@ -217,4 +214,19 @@ function generateCoreEs5(config: BuildConfig) {
 
     return projectCode.join('');
   });
+}
+
+
+export function getRegistryJsonFilePath(config: BuildConfig) {
+  return normalizePath(config.sys.path.join(config.buildDir, `${config.namespace.toLowerCase()}.registry.json`));
+}
+
+
+export function getProjectBuildDir(config: BuildConfig) {
+  return normalizePath(config.sys.path.join(config.buildDir, config.namespace.toLowerCase()));
+}
+
+
+export function getProjectPublicPath(config: BuildConfig) {
+  return normalizePath(config.sys.path.join(config.publicPath, config.namespace.toLowerCase()));
 }

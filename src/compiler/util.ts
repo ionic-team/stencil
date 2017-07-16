@@ -15,6 +15,19 @@ export function readFile(sys: StencilSystem, filePath: string) {
 }
 
 
+export function writeFile(sys: StencilSystem, filePath: string, data: any) {
+  return new Promise<string>((resolve, reject) => {
+    sys.fs.writeFile(filePath, data, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+
 export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesMap): Promise<any> {
   const directories = getDirectoriesFromFiles(sys, filesToWrite);
 
@@ -305,10 +318,7 @@ export function normalizePath(str: string) {
   // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
   // https://github.com/sindresorhus/slash MIT
   // By Sindre Sorhus
-  const isExtendedLengthPath = EXTENDED_PATH_REGEX.test(str);
-  const hasNonAscii = NON_ASCII_REGEX.test(str);
-
-  if (isExtendedLengthPath || hasNonAscii) {
+  if (EXTENDED_PATH_REGEX.test(str) || NON_ASCII_REGEX.test(str)) {
     return str;
   }
 

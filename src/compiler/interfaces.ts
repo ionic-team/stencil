@@ -1,5 +1,5 @@
 export * from '../util/interfaces';
-import { ComponentMeta, Diagnostic, FSWatcher, Manifest, LoadComponentRegistry } from '../util/interfaces';
+import { ComponentMeta, Diagnostic, FilesMap, FSWatcher, Manifest, LoadComponentRegistry } from '../util/interfaces';
 
 
 export interface ModuleFileMeta {
@@ -91,11 +91,6 @@ export interface ModuleResults {
     [bundleId: string]: string;
   };
   diagnostics: Diagnostic[];
-}
-
-
-export interface FilesMap {
-  [filePath: string]: string;
 }
 
 

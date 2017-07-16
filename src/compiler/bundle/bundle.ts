@@ -15,7 +15,7 @@ export function bundle(config: BuildConfig, ctx: BuildContext, manifest: Manifes
   };
 
   logger.debug(`bundle, src: ${config.src}`);
-  logger.debug(`bundle, buildDest: ${config.buildDest}`);
+  logger.debug(`bundle, buildDest: ${config.buildDir}`);
 
   return Promise.resolve().then(() => {
     // kick off style and module bundling at the same time
