@@ -189,27 +189,22 @@ function generateCoreEs5(config: BuildConfig) {
   }
   staticName += '.js';
 
-  let documentRegistryPolyfill = config.sys.path.join('polyfills', 'document-register-element.js');
+  const documentRegistryPolyfill = config.sys.path.join('polyfills', 'document-register-element.js');
 
   return Promise.all([
     sys.getClientCoreFile({ staticName: staticName }),
     sys.getClientCoreFile({ staticName: documentRegistryPolyfill })
 
   ]).then(results => {
-    let coreContent = results[0];
-    let docRegistryPolyfillContent = results[1];
+    const coreContent = results[0];
+    const docRegistryPolyfillContent = results[1];
 
     // replace the default core with the project's namespace
-    coreContent = coreContent.replace(
-      PROJECT_NAMESPACE_REGEX,
-      `"${config.namespace}"`
-    );
-
-    // concat the projects core code
+    // concat the custom element polyfill and projects core code
     const projectCode: string[] = [
       docRegistryPolyfillContent + '\n\n',
       generateBanner(config),
-      coreContent
+      injectProjectIntoCore(config, coreContent)
     ];
 
     return projectCode.join('');
