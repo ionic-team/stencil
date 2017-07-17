@@ -14,8 +14,6 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
     if (opts.removeUnusedCss !== false) {
       // removeUnusedCss is the default
-      // if opts.removeUnusedCss is "undefined", then let's remove some unused css
-
       try {
         // pick out all of the selectors that are actually
         // being used in the html document
@@ -50,7 +48,6 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
   if (opts.reduceHtmlWhitepace !== false) {
     // reduceHtmlWhitepace is the default
-    // if opts.reduceHtmlWhitepace is "undefined", then let's reduce some html whitespace
     try {
       reduceHtmlWhitepace(doc.body);
 
@@ -64,7 +61,19 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     }
   }
 
-  if (opts.inlineLoaderScript) {
-    inlineLoaderScript(config, ctx, doc);
+  if (opts.inlineLoaderScript !== false) {
+    // remove the script to the external loader script request
+    // inline the loader script at the bottom of the html
+    try {
+      inlineLoaderScript(config, ctx, doc);
+
+    } catch (e) {
+      hydrateResults.diagnostics.push({
+        level: 'error',
+        type: 'hydrate',
+        header: 'Inline Loader Script',
+        messageText: e
+      });
+    }
   }
 }
