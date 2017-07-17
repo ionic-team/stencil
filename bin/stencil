@@ -136,6 +136,11 @@ if (!config.logger) {
 switch (cmdArgs[2]) {
   case 'build':
     stencil.build(config);
+    if (config.watch) {
+      process.once('SIGINT', () => {
+        process.exit(0);
+      });
+    }
     break;
 
   default:
