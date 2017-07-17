@@ -18,8 +18,6 @@ export declare const PropWillChange: interfaces.PropChangeDecorator;
 
 export declare const PropDidChange: interfaces.PropChangeDecorator;
 
-export declare const publicPath: string;
-
 export { build } from './compiler/index';
 
 export { createRenderer } from './server/index';
