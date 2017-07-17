@@ -24,4 +24,6 @@ export { build } from './compiler/index';
 
 export { createRenderer } from './server/index';
 
+export declare const publicPath: string;
+
 export * from './util/interfaces';
