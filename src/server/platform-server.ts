@@ -97,7 +97,7 @@ export function createPlatformServer(
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, injectedGlobal);
+    importFn(moduleImports, h, t, projectBuildDir, injectedGlobal);
 
     for (var i = 2; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);

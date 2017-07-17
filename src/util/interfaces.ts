@@ -365,7 +365,7 @@ export interface LoggerTimeSpan {
 
 
 export interface ModulesImporterFn {
-  (importer: any, h: Function, t: Function, Ionic: Ionic): void;
+  (importer: any, h: Function, t: Function, publicPath: string, Ionic: Ionic): void;
 }
 
 

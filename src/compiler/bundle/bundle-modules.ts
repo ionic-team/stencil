@@ -196,7 +196,7 @@ function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleCom
     });
 
     // module bundling finished, assign its content to the user's bundle
-    bundleDetails.content = `function importComponent(exports, h, t, Ionic) {\n${results.code.trim()}\n}`;
+    bundleDetails.content = `function importComponent(exports, h, t, publicPath, Ionic) {\n${results.code.trim()}\n}`;
 
     // cache for later
     ctx.moduleBundleOutputs[bundleId] = bundleDetails.content;

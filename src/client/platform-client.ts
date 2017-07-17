@@ -96,7 +96,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, injectedGlobal);
+    importFn(moduleImports, h, t, publicPath, injectedGlobal);
 
     for (var i = 2; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);
