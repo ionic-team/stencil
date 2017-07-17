@@ -383,10 +383,8 @@ export interface VideoHTMLAttributes extends MediaHTMLAttributes {
 }
 
 export interface HTMLAttributes extends DOMAttributes {
-  // React-specific Attributes
-  defaultChecked?: boolean;
-  defaultValue?: string | string[];
-  suppressContentEditableWarning?: boolean;
+  // vdom specific
+  innerHTML?: string;
 
   // Standard HTML Attributes
   accessKey?: string;
