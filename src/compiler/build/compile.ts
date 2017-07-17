@@ -31,8 +31,8 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
 
         compileResults.moduleFiles[tsFilePath] = moduleFile;
 
-        if (config.generateCollection) {
-          ctx.filesToWrite[moduleFile.jsFilePath] = moduleFile.jsText;
+        if (config.generateCollection && typeof ctx.jsFiles[moduleFile.jsFilePath] === 'string') {
+          ctx.filesToWrite[moduleFile.jsFilePath] = ctx.jsFiles[moduleFile.jsFilePath];
         }
 
         if (moduleFile.includedSassFiles) {

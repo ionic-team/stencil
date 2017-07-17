@@ -44,7 +44,7 @@ function optimizeHtml(config: BuildConfig, ctx: BuildContext, optimizeHtmlResult
     }
 
     // create a server-side renderer
-    const renderer = createRenderer(config);
+    const renderer = createRenderer(config, null, ctx);
 
     // create the hydrate options
     const hydrateOpts = Object.assign({}, config.prerenderIndex);

@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
   Manifest, ModuleResults, StencilSystem } from '../interfaces';
-import { buildError, buildWarn, catchError, generateBanner } from '../util';
+import { buildError, buildWarn, catchError, generateBanner, normalizePath } from '../util';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
 
@@ -255,18 +255,17 @@ function transpiledInMemoryPlugin(sys: StencilSystem, ctx: BuildContext) {
     },
 
     load(sourcePath: string): string {
-      const tsFileNames = Object.keys(ctx.moduleFiles);
-      for (var i = 0; i < tsFileNames.length; i++) {
-        if (ctx.moduleFiles[tsFileNames[i]].jsFilePath === sourcePath) {
-          return ctx.moduleFiles[tsFileNames[i]].jsText || '';
-        }
+      sourcePath = normalizePath(sourcePath);
+
+      if (typeof ctx.jsFiles[sourcePath] === 'string') {
+        return ctx.jsFiles[sourcePath];
       }
 
       const jsText = sys.fs.readFileSync(sourcePath, 'utf-8' );
       ctx.moduleFiles[sourcePath] = {
         jsFilePath: sourcePath,
-        jsText: jsText
       };
+      ctx.jsFiles[sourcePath] = jsText;
 
       return jsText;
     }

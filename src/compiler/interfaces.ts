@@ -6,7 +6,6 @@ export interface ModuleFileMeta {
   tsFilePath?: string;
   tsText?: string;
   jsFilePath?: string;
-  jsText?: string;
   hasCmpClass?: boolean;
   cmpMeta?: ComponentMeta;
   includedSassFiles?: string[];
@@ -15,6 +14,8 @@ export interface ModuleFileMeta {
 
 export interface BuildContext {
   moduleFiles?: ModuleFiles;
+  jsFiles?: FilesMap;
+  cssFiles?: FilesMap;
   moduleBundleOutputs?: ModuleBundles;
   styleSassOutputs?: ModuleBundles;
   filesToWrite?: FilesMap;

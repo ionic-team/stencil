@@ -1,5 +1,6 @@
 import { BuildConfig, ComponentRegistry, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
+import { BuildContext } from '../compiler/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
 import { detectPlatforms } from '../core/platform/platform-util';
@@ -10,7 +11,7 @@ import { optimizeHtml } from '../compiler/html/optimize-html';
 import { PLATFORM_CONFIGS } from '../core/platform/platform-configs';
 
 
-export function hydrateHtml(config: BuildConfig, registry: ComponentRegistry, opts: HydrateOptions, hydrateResults: HydrateResults, callback: (results?: HydrateResults) => void) {
+export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: ComponentRegistry, opts: HydrateOptions, hydrateResults: HydrateResults, callback: (results?: HydrateResults) => void) {
   const registeredTags = Object.keys(registry || {});
   let ssrIds = 0;
 
@@ -60,7 +61,8 @@ export function hydrateHtml(config: BuildConfig, registry: ComponentRegistry, op
     domApi,
     Glb.ConfigCtrl,
     Glb.DomCtrl,
-    projectBuildDir
+    projectBuildDir,
+    ctx
   );
 
   // fully define each of our components onto this new platform instance
@@ -78,7 +80,7 @@ export function hydrateHtml(config: BuildConfig, registry: ComponentRegistry, op
     if (rootElm) {
       try {
         // optimize this document!!
-        optimizeHtml(config, doc, stylesMap, opts, hydrateResults);
+        optimizeHtml(config, ctx, doc, stylesMap, opts, hydrateResults);
 
         // serialize this dom back into a string
         hydrateResults.html = dom.serialize();

@@ -1,5 +1,68 @@
 import { BANNER } from '../util/constants';
-import { BuildConfig, Diagnostic, FilesMap, StencilSystem } from './interfaces';
+import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from './interfaces';
+
+
+export function getBuildContext(ctx: BuildContext) {
+  // create the build context if it doesn't exist
+  ctx = ctx || {};
+  ctx.filesToWrite = ctx.filesToWrite || {};
+  ctx.projectFiles = ctx.projectFiles || {};
+  ctx.moduleFiles = ctx.moduleFiles || {};
+  ctx.jsFiles = ctx.jsFiles || {};
+  ctx.cssFiles = ctx.cssFiles || {};
+  ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
+  ctx.styleSassOutputs = ctx.styleSassOutputs || {};
+  ctx.changedFiles = ctx.changedFiles || [];
+
+  // reset counts
+  ctx.sassBuildCount = 0;
+  ctx.transpileBuildCount = 0;
+  ctx.indexBuildCount = 0;
+  ctx.moduleBundleCount = 0;
+  ctx.styleBundleCount = 0;
+
+  return ctx;
+}
+
+
+export function getJsFile(sys: StencilSystem, ctx: BuildContext, jsFilePath: string) {
+  jsFilePath = normalizePath(jsFilePath);
+
+  if (typeof ctx.jsFiles[jsFilePath] === 'string') {
+    return Promise.resolve(ctx.jsFiles[jsFilePath]);
+  }
+
+  return new Promise<string>((resolve, reject) => {
+    sys.fs.readFile(jsFilePath, 'utf-8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        ctx.jsFiles[jsFilePath] = data;
+        resolve(data);
+      }
+    });
+  });
+}
+
+
+export function getCssFile(sys: StencilSystem, ctx: BuildContext, cssFilePath: string) {
+  cssFilePath = normalizePath(cssFilePath);
+
+  if (typeof ctx.jsFiles[cssFilePath] === 'string') {
+    return Promise.resolve(ctx.cssFiles[cssFilePath]);
+  }
+
+  return new Promise<string>((resolve, reject) => {
+    sys.fs.readFile(cssFilePath, 'utf-8', (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        ctx.cssFiles[cssFilePath] = data;
+        resolve(data);
+      }
+    });
+  });
+}
 
 
 export function readFile(sys: StencilSystem, filePath: string) {

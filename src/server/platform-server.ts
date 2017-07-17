@@ -1,11 +1,13 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
-import { ModuleCallbacks, ComponentMeta, ComponentRegistry, ConfigApi,
-  DomApi, DomControllerApi, FilesMap, Logger, HostElement, ListenOptions,
-  PlatformApi, ProjectGlobal, StencilSystem } from '../util/interfaces';
+import { BuildContext } from '../compiler/interfaces';
+import { ComponentMeta, ComponentRegistry, ConfigApi,
+  DomApi, DomControllerApi, FilesMap, HostElement, ListenOptions, Logger,
+  ModuleCallbacks, PlatformApi, ProjectGlobal, StencilSystem } from '../util/interfaces';
 import { createRenderer } from '../core/renderer/patch';
 import { generateGlobalContext } from './global-context';
 import { getMode } from '../core/platform/mode';
 import { h, t } from '../core/renderer/h';
+import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { initGlobal } from './global-server';
 import { parseComponentMeta } from '../util/data-parse';
 
@@ -19,7 +21,8 @@ export function createPlatformServer(
   domApi: DomApi,
   config: ConfigApi,
   dom: DomControllerApi,
-  projectBuildDir: string
+  projectBuildDir: string,
+  ctx?: BuildContext
 ): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
@@ -138,25 +141,24 @@ export function createPlatformServer(
       }
 
       // create the module filePath we'll be reading
-      const moduleFilePath = sys.path.join(projectBuildDir, `${moduleId}.js`);
+      const jsFilePath = normalizePath(sys.path.join(projectBuildDir, `${moduleId}.js`));
 
-      if (!pendingModuleFileReads[moduleFilePath]) {
+      if (!pendingModuleFileReads[jsFilePath]) {
         // not already actively reading this file
         // remember that we're now actively requesting this url
-        pendingModuleFileReads[moduleFilePath] = true;
+        pendingModuleFileReads[jsFilePath] = true;
 
         // let's kick off reading the module
-        sys.fs.readFile(moduleFilePath, 'utf-8', (err, code) => {
-          delete pendingModuleFileReads[moduleFilePath];
+        // this could come from the cache or a new readFile
+        getJsFile(sys, ctx, jsFilePath).then(jsContent => {
+          // remove it from the list of file reads we're waiting on
+          delete pendingModuleFileReads[jsFilePath];
 
-          if (err) {
-            logger.error(`loadBundle, module read: ${err}`);
-            throw err;
+          // run the code in this sandboxed context
+          sys.vm.runInContext(jsContent, context, { timeout: 5000 });
 
-          } else {
-            // run the code in this sandboxed context
-            sys.vm.runInContext(code, context, { timeout: 5000 });
-          }
+        }).catch(err => {
+          logger.error(`loadBundle, module read: ${err}`);
         });
       }
 
@@ -165,7 +167,7 @@ export function createPlatformServer(
       if (styleId) {
         // we've got a style id to load up
         // create the style filePath we'll be reading
-        const styleFilePath = sys.path.join(projectBuildDir, `${styleId}.css`);
+        const styleFilePath = normalizePath(sys.path.join(projectBuildDir, `${styleId}.css`));
 
         if (!stylesMap[styleFilePath]) {
           // this style hasn't been added to our collection yet
@@ -174,21 +176,19 @@ export function createPlatformServer(
             // we're not already actively opening this file
             pendingStyleFileReads[styleFilePath] = true;
 
-            sys.fs.readFile(styleFilePath, 'utf-8', (err, styleContent) => {
+            getCssFile(sys, ctx, styleFilePath).then(cssContent => {
               delete pendingStyleFileReads[styleFilePath];
 
-              if (err) {
-                logger.error(`loadBundle, style read: ${err}`);
+              // finished reading the css file
+              // let's add the content to our collection
+              stylesMap[styleFilePath] = cssContent;
 
-              } else {
-                // finished reading the css file
-                // let's add the content to our collection
-                stylesMap[styleFilePath] = styleContent;
+              // check if the entire app is done loading or not
+              // and if this was the last thing the app was waiting on
+              rootNode._initLoad();
 
-                // check if the entire app is done loading or not
-                // and if this was the last thing the app was waiting on
-                rootNode._initLoad();
-              }
+            }).catch(err => {
+              logger.error(`loadBundle, style read: ${err}`);
             });
           }
         }

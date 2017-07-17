@@ -1,7 +1,7 @@
 import { validateAttrCase, validateBuildConfig } from '../validation';
-import { BuildConfig } from '../interfaces';
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../../util/constants';
-import { mockFs, mockLogger, mockStencilSystem } from '../../test';
+import { BuildConfig } from '../../interfaces';
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../../../util/constants';
+import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
 import * as path from 'path';
 
 
@@ -36,11 +36,6 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
-    it('should default prerenderIndex.linkRelPreloadCore', () => {
-      validateBuildConfig(config);
-      expect(config.prerenderIndex.linkRelPreloadCore).toBe(true);
-    });
-
     it('should default prerenderIndex.removeUnusedCss', () => {
       validateBuildConfig(config);
       expect(config.prerenderIndex.removeUnusedCss).toBe(true);
@@ -51,15 +46,15 @@ describe('validation', () => {
       expect(config.prerenderIndex.reduceHtmlWhitepace).toBe(true);
     });
 
-    it('should default prerenderIndex.inlineAppLoader', () => {
+    it('should default prerenderIndex.inlineLoaderScript', () => {
       validateBuildConfig(config);
-      expect(config.prerenderIndex.inlineAppLoader).toBe(true);
+      expect(config.prerenderIndex.inlineLoaderScript).toBe(true);
     });
 
     it('should merge prerenderIndex config', () => {
       config.prerenderIndex = { html: '<div></div>' };
       validateBuildConfig(config);
-      expect(config.prerenderIndex.inlineAppLoader).toBe(true);
+      expect(config.prerenderIndex.inlineLoaderScript).toBe(true);
     });
 
     it('should default prerenderIndex', () => {

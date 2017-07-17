@@ -1,6 +1,6 @@
 import { Bundle, Collection, Manifest } from '../../interfaces';
 import { processDependentManifest } from '../manifest';
-import { validateDependentCollection } from '../../validation';
+import { validateDependentCollection } from '../validation';
 
 
 describe('manifest', () => {

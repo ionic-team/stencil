@@ -47,7 +47,7 @@ export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileResults) {
   if (ctx.isChangeBuild) {
     // if this is a change build, then narrow down
-    moduleFiles = getChangeBuildModules(moduleFiles);
+    moduleFiles = getChangeBuildModules(ctx, moduleFiles);
   }
 
   const tsFileNames = Object.keys(moduleFiles);
@@ -97,7 +97,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 }
 
 
-function getChangeBuildModules(moduleFiles: ModuleFiles) {
+function getChangeBuildModules(ctx: BuildContext, moduleFiles: ModuleFiles) {
   const changeModuleFiles: ModuleFiles = {};
 
   const tsFileNames = Object.keys(moduleFiles);
@@ -109,7 +109,7 @@ function getChangeBuildModules(moduleFiles: ModuleFiles) {
       return;
     }
 
-    if (typeof moduleFile.jsText !== 'string') {
+    if (typeof ctx.jsFiles[moduleFile.jsFilePath] !== 'string') {
       // only add it to our collection when there is no jsText
       changeModuleFiles[tsFileName] = moduleFile;
     }

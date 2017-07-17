@@ -177,6 +177,8 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
   if (!ctx.isChangeBuild) {
     // completely clear out the cache
     ctx.moduleFiles = {};
+    ctx.jsFiles = {};
+    ctx.cssFiles = {};
     ctx.moduleBundleOutputs = {};
     ctx.styleSassOutputs = {};
   }

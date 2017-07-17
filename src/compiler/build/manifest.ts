@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, Bundle, Collection, CompileResults,
   Manifest, ModuleFileMeta } from '../interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { normalizePath, readFile } from '../util';
-import { validateDependentCollection, validateUserBundles } from '../validation';
+import { validateDependentCollection, validateUserBundles } from './validation';
 import { parseManifest, serializeManifest } from './manifest-data';
 
 

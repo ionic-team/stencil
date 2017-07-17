@@ -39,16 +39,17 @@ export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOpti
       if (moduleFile) {
         // we got the module we already cached
         moduleFile.jsFilePath = jsFilePath;
-        moduleFile.jsText = jsText;
 
       } else {
         // this actually shouldn't happen, but just in case
         moduleFile = ctx.moduleFiles[tsFilePath] = {
           tsFilePath: tsFilePath,
           jsFilePath: jsFilePath,
-          jsText: jsText
         };
       }
+
+      // cache the js content
+      ctx.jsFiles[jsFilePath] = jsText;
 
       if (moduleFile.cmpMeta) {
         // if this module has component meta data, then

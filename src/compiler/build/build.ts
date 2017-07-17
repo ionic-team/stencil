@@ -1,7 +1,7 @@
 import { BuildConfig, Manifest } from '../../util/interfaces';
 import { BuildContext, BuildResults, LoggerTimeSpan } from '../interfaces';
 import { bundle } from '../bundle/bundle';
-import { catchError, emptyDir, writeFiles } from '../util';
+import { catchError, emptyDir, getBuildContext, writeFiles } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
 import { generateProjectFiles } from './build-project-files';
@@ -9,7 +9,7 @@ import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnos
 import { loadDependentManifests, mergeManifests } from './manifest';
 import { optimizeIndexHtml } from './optimize-index-html';
 import { setupWatcher } from './watch';
-import { validateBuildConfig } from '../validation';
+import { validateBuildConfig } from './validation';
 
 
 export function build(config: BuildConfig, ctx?: BuildContext) {
@@ -24,21 +24,7 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
   };
 
   // create the build context if it doesn't exist
-  ctx = ctx || {};
-  ctx.filesToWrite = ctx.filesToWrite || {};
-  ctx.projectFiles = ctx.projectFiles || {};
-  ctx.moduleFiles = ctx.moduleFiles || {};
-  ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
-  ctx.styleSassOutputs = ctx.styleSassOutputs || {};
-  ctx.changedFiles = ctx.changedFiles || [];
-
-  // reset counts
-  ctx.sassBuildCount = 0;
-  ctx.transpileBuildCount = 0;
-  ctx.indexBuildCount = 0;
-  ctx.moduleBundleCount = 0;
-  ctx.styleBundleCount = 0;
-
+  ctx = getBuildContext(ctx);
 
   // begin the build
   return Promise.resolve().then(() => {

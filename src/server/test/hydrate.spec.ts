@@ -1,4 +1,5 @@
 import { BuildConfig, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { BuildContext } from '../../compiler/interfaces';
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../test';
 import { h } from '../../core/renderer/h';
@@ -8,6 +9,7 @@ import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../util/constants';
 describe('hydrate', () => {
 
   it('should load content in nested named slots', (done) => {
+    const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
     };
@@ -35,7 +37,7 @@ describe('hydrate', () => {
       `
     };
 
-    hydrateHtml(config, registry, opts, hydrateResults, () => {
+    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
@@ -58,6 +60,7 @@ describe('hydrate', () => {
   });
 
   it('should load content in nested default slot', (done) => {
+    const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
     };
@@ -82,7 +85,7 @@ describe('hydrate', () => {
       `
     };
 
-    hydrateHtml(config, registry, opts, hydrateResults, () => {
+    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
@@ -104,6 +107,7 @@ describe('hydrate', () => {
   });
 
   it('should load one component and assign ssr ids', (done) => {
+    const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
     };
@@ -120,7 +124,7 @@ describe('hydrate', () => {
       html: `<ion-test></ion-test>`
     };
 
-    hydrateHtml(config, registry, opts, hydrateResults, () => {
+    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
@@ -139,6 +143,7 @@ describe('hydrate', () => {
   });
 
   it('should do nothing when no components registered', (done) => {
+    const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
     };
@@ -147,7 +152,7 @@ describe('hydrate', () => {
       html: `<body>hello</body>`
     };
 
-    hydrateHtml(config, registry, opts, hydrateResults, () => {
+    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
       expect(hydrateResults.diagnostics.length).toBe(1);
       expect(hydrateResults.html).toBe(`<body>hello</body>`);
       done();

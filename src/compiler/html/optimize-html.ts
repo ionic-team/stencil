@@ -1,10 +1,12 @@
 import { BuildConfig, FilesMap, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { BuildContext } from '../interfaces';
 import { HtmlUsedSelectors } from './html-used-selectors';
+import { inlineLoaderScript } from './inline-loader-script';
 import { reduceHtmlWhitepace } from './reduce-html-whitespace';
 import { removeUnusedCss } from '../css/remove-unused-css';
 
 
-export function optimizeHtml(config: BuildConfig, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, hydrateResults: HydrateResults) {
+export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, hydrateResults: HydrateResults) {
   const styleFileNames = Object.keys(stylesMap);
 
   if (styleFileNames.length) {
@@ -60,5 +62,9 @@ export function optimizeHtml(config: BuildConfig, doc: Document, stylesMap: File
         messageText: e
       });
     }
+  }
+
+  if (opts.inlineLoaderScript) {
+    inlineLoaderScript(config, ctx, doc);
   }
 }

@@ -1103,8 +1103,7 @@ export interface HydrateOptions {
   config?: Object;
   removeUnusedCss?: boolean;
   reduceHtmlWhitepace?: boolean;
-  inlineAppLoader?: boolean;
-  linkRelPreloadCore?: boolean;
+  inlineLoaderScript?: boolean;
 }
 
 export interface HydrateResults {

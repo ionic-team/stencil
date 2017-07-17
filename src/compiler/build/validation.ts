@@ -1,7 +1,7 @@
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../util/constants';
-import { BuildConfig, Bundle, Collection, Manifest } from './interfaces';
-import { HydrateOptions } from '../util/interfaces';
-import { normalizePath } from './util';
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../../util/constants';
+import { BuildConfig, Bundle, Collection, Manifest } from '../interfaces';
+import { HydrateOptions } from '../../util/interfaces';
+import { normalizePath } from '../util';
 
 
 export function validateBuildConfig(config: BuildConfig) {
@@ -117,10 +117,16 @@ export function validateBuildConfig(config: BuildConfig) {
   }
 
   if (config.prerenderIndex !== null) {
-    if (config.prerenderIndex) {
-      Object.assign(config.prerenderIndex, DEFAULT_PRERENDER_INDEX);
-    } else {
-      config.prerenderIndex = DEFAULT_PRERENDER_INDEX;
+    config.prerenderIndex = Object.assign(config.prerenderIndex || {}, DEFAULT_PRERENDER_INDEX);
+
+    if (typeof config.prerenderIndex.inlineLoaderScript !== 'boolean') {
+      config.prerenderIndex.inlineLoaderScript = DEFAULT_PRERENDER_INDEX.inlineLoaderScript;
+    }
+    if (typeof config.prerenderIndex.reduceHtmlWhitepace !== 'boolean') {
+      config.prerenderIndex.reduceHtmlWhitepace = DEFAULT_PRERENDER_INDEX.reduceHtmlWhitepace;
+    }
+    if (typeof config.prerenderIndex.removeUnusedCss !== 'boolean') {
+      config.prerenderIndex.removeUnusedCss = DEFAULT_PRERENDER_INDEX.removeUnusedCss;
     }
   }
 
@@ -297,8 +303,7 @@ const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
 
 const DEFAULT_PRERENDER_INDEX: HydrateOptions = {
-  inlineAppLoader: true,
+  inlineLoaderScript: true,
   removeUnusedCss: true,
-  reduceHtmlWhitepace: true,
-  linkRelPreloadCore: true
+  reduceHtmlWhitepace: true
 };

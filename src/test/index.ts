@@ -7,7 +7,7 @@ import { createPlatformServer } from '../server/platform-server';
 import { createRenderer } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
 import { noop } from '../util/helpers';
-import { validateBuildConfig } from '../compiler/validation';
+import { validateBuildConfig } from '../compiler/build/validation';
 const MemoryFileSystem = require('memory-fs');
 
 

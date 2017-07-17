@@ -4,7 +4,7 @@ import { BuildContext, BuildResults } from '../../interfaces';
 // import { CommandLineLogger } from '../../logger/command-line-logger';
 import { mockBuildConfig } from '../../../test';
 import { parseComponentRegistry } from '../../../util/data-parse';
-import { validateBuildConfig } from '../../validation';
+import { validateBuildConfig } from '../validation';
 
 
 describe('build', () => {
@@ -39,7 +39,7 @@ describe('build', () => {
   //   });
   // });
 
-  it('should not save project files, but not resave when unchanged', () => {
+  it('should save project files, but not resave when unchanged', () => {
     ctx = {};
     config.bundles = [
       { components: ['cmp-a'] },

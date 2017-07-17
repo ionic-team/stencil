@@ -1,11 +1,13 @@
 import { BuildConfig, ComponentRegistry, HydrateOptions, HydrateResults, LoadComponentRegistry } from '../util/interfaces';
+import { BuildContext } from '../compiler/interfaces';
+import { getBuildContext } from '../compiler/util';
 import { getRegistryJsonFilePath } from '../compiler/build/build-project-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
-import { validateBuildConfig } from '../compiler/validation';
+import { validateBuildConfig } from '../compiler/build/validation';
 
 
-export function createRenderer(config: BuildConfig, registry?: ComponentRegistry) {
+export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
   // setup the config and add defaults for missing properties
   validateRendererConfig(config);
 
@@ -14,6 +16,9 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
     // if one wasn't passed in already
     registry = registerComponents(config);
   }
+
+  // create the build context if it doesn't exist
+  ctx = getBuildContext(ctx);
 
   // overload with two options for hydrateToString
   // one that returns a promise, and one that takes a callback as the last arg
@@ -42,7 +47,7 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
       validateHydrateOptions(opts);
 
       // kick off hydrated, which is an async opertion
-      hydrateHtml(config, registry, opts, hydrateResults, callback);
+      hydrateHtml(config, ctx, registry, opts, hydrateResults, callback);
 
     } catch (e) {
       hydrateResults.diagnostics.push({
