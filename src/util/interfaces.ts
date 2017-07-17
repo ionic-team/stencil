@@ -9,20 +9,11 @@ export interface Ionic {
     add: AddEventListenerApi;
   };
   theme: IonicTheme;
-  controller?: IonicController;
+  controller?: any;
   dom: DomControllerApi;
   config: ConfigApi;
-  Animation?: Animation;
   isServer: boolean;
   isClient: boolean;
-}
-
-
-export interface IonicController {
-  <LoadingController>(ctrlName: 'loading', opts: LoadingOptions): Promise<Loading>;
-  <MenuController>(ctrlName: 'menu'): Promise<MenuController>;
-  <ModalController>(ctrlName: 'modal', opts: ModalOptions): Promise<Modal>;
-  (ctrlName: string, opts?: any): Promise<IonicControllerApi>;
 }
 
 
@@ -42,121 +33,6 @@ export interface ProjectGlobal {
   DomCtrl?: DomControllerApi;
   QueueCtrl?: QueueApi;
   Animation?: any;
-}
-
-
-export interface Menu {
-  setOpen(shouldOpen: boolean, animated?: boolean): Promise<boolean>;
-  open(): Promise<boolean>;
-  close(): Promise<boolean>;
-  toggle(): Promise<boolean>;
-  enable(shouldEnable: boolean): Menu;
-  swipeEnable(shouldEnable: boolean): Menu;
-  isAnimating: boolean;
-  isOpen: boolean;
-  isRightSide: boolean;
-  enabled: boolean;
-  side: string;
-  id: string;
-  maxEdgeStart: number;
-  persistent: boolean;
-  swipeEnabled: boolean;
-  type: string;
-  width(): number;
-  getMenuElement(): HTMLElement;
-  getContentElement(): HTMLElement;
-  getBackdropElement(): HTMLElement;
-}
-
-
-export interface MenuType {
-  ani: any;
-  isOpening: boolean;
-  setOpen(shouldOpen: boolean, animated: boolean, done: Function): void;
-  setProgressStart(isOpen: boolean): void;
-  setProgessStep(stepValue: number): void;
-  setProgressEnd(shouldComplete: boolean, currentStepValue: number, velocity: number, done: Function): void;
-  destroy(): void;
-}
-
-
-export interface MenuController {
-  open(menuId?: string): Promise<boolean>;
-  close(menuId?: string): Promise<boolean>;
-  toggle(menuId?: string): Promise<boolean>;
-  enable(shouldEnable: boolean, menuId?: string): void;
-  swipeEnable(shouldEnable: boolean, menuId?: string): void;
-  isOpen(menuId?: string): boolean;
-  isEnabled(menuId?: string): boolean;
-  get(menuId?: string): Menu;
-  getOpen(): Menu;
-  getMenus(): Menu[];
-}
-
-
-export interface Modal {
-  component: string;
-  componentProps?: any;
-  id: string;
-  style?: {
-    zIndex: number;
-  };
-  showBackdrop: boolean;
-  enableBackdropDismiss: boolean;
-  enterAnimation: AnimationBuilder;
-  exitAnimation: AnimationBuilder;
-  cssClass: string;
-  present: () => Promise<void>;
-  dismiss: () => Promise<void>;
-}
-
-
-export interface ModalOptions {
-  component: string;
-  componentProps?: any;
-  showBackdrop?: boolean;
-  enableBackdropDismiss?: boolean;
-  enterAnimation?: AnimationBuilder;
-  exitAnimation?: AnimationBuilder;
-  cssClass?: string;
-}
-
-
-export interface ModalEvent {
-  detail: {
-    modal: Modal;
-  };
-}
-
-
-export interface Loading {
-  id: string;
-  style?: {
-    zIndex: number;
-  };
-  showBackdrop: boolean;
-  enterAnimation: AnimationBuilder;
-  exitAnimation: AnimationBuilder;
-  cssClass: string;
-  present: () => Promise<void>;
-  dismiss: () => Promise<void>;
-}
-
-
-export interface LoadingOptions {
-  spinner?: string;
-  content?: string;
-  cssClass?: string;
-  showBackdrop?: boolean;
-  dismissOnPageChange?: boolean;
-  duration?: number;
-}
-
-
-export interface LoadingEvent {
-  detail: {
-    loading: Loading;
-  };
 }
 
 
@@ -875,77 +751,6 @@ export interface PlatformConfig {
   name: string;
   isMatch?: {(url: string, userAgent: string): boolean};
   settings?: any;
-}
-
-
-export interface Animation {
-  new(elm?: Node|Node[]|NodeList): Animation;
-  add: (childAnimation: Animation) => Animation;
-  addElement: (elm: Node|Node[]|NodeList) => Animation;
-  afterAddClass: (className: string) => Animation;
-  afterClearStyles: (propertyNames: string[]) => Animation;
-  afterRemoveClass: (className: string) => Animation;
-  afterStyles: (styles: { [property: string]: any; }) => Animation;
-  beforeAddClass: (className: string) => Animation;
-  beforeClearStyles: (propertyNames: string[]) => Animation;
-  beforeRemoveClass: (className: string) => Animation;
-  beforeStyles: (styles: { [property: string]: any; }) => Animation;
-  destroy: () => void;
-  duration: (milliseconds: number) => Animation;
-  getDuration(opts?: PlayOptions): number;
-  easing: (name: string) => Animation;
-  easingReverse: (name: string) => Animation;
-  from: (prop: string, val: any) => Animation;
-  fromTo: (prop: string, fromVal: any, toVal: any, clearProperyAfterTransition?: boolean) => Animation;
-  hasCompleted: boolean;
-  isPlaying: boolean;
-  onFinish: (callback: (animation: Animation) => void, opts?: {oneTimeCallback?: boolean, clearExistingCallacks?: boolean}) => Animation;
-  play: (opts?: PlayOptions) => void;
-  syncPlay: () => void;
-  progressEnd: (shouldComplete: boolean, currentStepValue: number, dur: number) => void;
-  progressStep: (stepValue: number) => void;
-  progressStart: () => void;
-  reverse: (shouldReverse?: boolean) => Animation;
-  stop: (stepValue?: number) => void;
-  to: (prop: string, val: any, clearProperyAfterTransition?: boolean) => Animation;
-}
-
-
-export interface AnimationBuilder {
-  (elm?: HTMLElement): Animation;
-}
-
-
-export interface AnimationOptions {
-  animation?: string;
-  duration?: number;
-  easing?: string;
-  direction?: string;
-  isRTL?: boolean;
-  ev?: any;
-}
-
-
-export interface PlayOptions {
-  duration?: number;
-  promise?: boolean;
-}
-
-
-export interface EffectProperty {
-  effectName: string;
-  trans: boolean;
-  wc?: string;
-  to?: EffectState;
-  from?: EffectState;
-  [state: string]: any;
-}
-
-
-export interface EffectState {
-  val: any;
-  num: number;
-  effectUnit: string;
 }
 
 
