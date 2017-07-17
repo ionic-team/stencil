@@ -22,7 +22,7 @@ export function parseComponentMetadata({ assetsDir, assetsDirs }: ComponentOptio
   }
 }
 
-export function bundleAssets(config: BuildConfig, ctx: BuildContext, userManifest: Manifest): Promise<AssetsResults> {
+export function copyAssets(config: BuildConfig, ctx: BuildContext, userManifest: Manifest): Promise<AssetsResults> {
   const assetsResults: AssetsResults = {
     bundles: {},
     diagnostics: []
@@ -34,7 +34,9 @@ export function bundleAssets(config: BuildConfig, ctx: BuildContext, userManifes
     .filter(c => c.assetsDirsMeta && c.assetsDirsMeta.length)
     .reduce((dirList, component) => {
       const qualifiedPathDirs: string[] = component.assetsDirsMeta.map((dir: string) => {
-        const relativeCompUrl = config.sys.path.relative(config.collectionDir, component.componentPath);
+        const relativeCompUrl = config.sys.path.dirname(
+          config.sys.path.relative(config.collectionDir, component.componentPath)
+        );
         return config.sys.path.resolve(config.src, relativeCompUrl, dir);
       });
 

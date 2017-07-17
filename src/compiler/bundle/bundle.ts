@@ -1,5 +1,4 @@
 import { BuildConfig, BuildContext, BundleResults, Manifest } from '../interfaces';
-import { bundleAssets } from '../component-plugins/assets-plugin';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
 import { catchError } from '../util';
@@ -21,8 +20,7 @@ export function bundle(config: BuildConfig, ctx: BuildContext, manifest: Manifes
     // kick off style and module bundling at the same time
     return Promise.all([
       bundleStyles(config, ctx, manifest),
-      bundleModules(config, ctx, manifest),
-      bundleAssets(config, ctx, manifest)
+      bundleModules(config, ctx, manifest)
     ]);
 
   }).then(results => {
@@ -35,11 +33,6 @@ export function bundle(config: BuildConfig, ctx: BuildContext, manifest: Manifes
     const moduleResults = results[1];
     if (moduleResults.diagnostics && moduleResults.diagnostics.length) {
       bundleResults.diagnostics = bundleResults.diagnostics.concat(moduleResults.diagnostics);
-    }
-
-    const assetResults = results[2];
-    if (assetResults.diagnostics && assetResults.diagnostics.length) {
-      bundleResults.diagnostics = bundleResults.diagnostics.concat(assetResults.diagnostics);
     }
 
     bundleResults.componentRegistry = generateComponentRegistry(config, manifest, styleResults, moduleResults);

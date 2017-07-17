@@ -10,11 +10,13 @@ import { loadDependentManifests, mergeManifests } from './manifest';
 import { optimizeIndexHtml } from './optimize-index-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
+import { copyAssets } from '../component-plugins/assets-plugin';
 
 
 export function build(config: BuildConfig, ctx?: BuildContext) {
   // create a timespan of the build process
   let timeSpan: LoggerTimeSpan;
+  let manifestContents: Manifest;
 
   // create the build results which will be the returned object
   const buildResults: BuildResults = {
@@ -45,12 +47,17 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
     return compileSrcPhase(config, ctx, dependentManifests, buildResults);
 
   }).then(manifest => {
+    manifestContents = manifest;
     // bundle phase
     return bundlePhase(config, ctx, manifest, buildResults);
 
   }).then(() => {
     // write all the files in one go
     return writePhase(config, ctx, buildResults);
+
+  }).then(() => {
+
+    return copyPhase(config, ctx, manifestContents);
 
   }).then(() => {
     // optimize index.html
@@ -163,6 +170,10 @@ function writePhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildR
   }).then(() => {
     timeSpan.finish(`writePhase finished`);
   });
+}
+
+function copyPhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest): Promise<any> {
+  return copyAssets(config, ctx, manifest);
 }
 
 
