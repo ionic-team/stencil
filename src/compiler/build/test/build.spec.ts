@@ -84,6 +84,8 @@ describe('build', () => {
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
+        writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA { constructor() { console.log('hi'); } }`);
+        writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB { constructor() { console.log('hi'); }}`);
         ctx.watcher.$triggerEvent('change', '/src/cmp-a.tsx');
         ctx.watcher.$triggerEvent('change', '/src/cmp-b.tsx');
 

@@ -14,14 +14,16 @@ export function getBuildContext(ctx: BuildContext) {
   ctx.styleSassOutputs = ctx.styleSassOutputs || {};
   ctx.changedFiles = ctx.changedFiles || [];
 
-  // reset counts
+  return ctx;
+}
+
+
+export function resetBuildContextCounts(ctx: BuildContext) {
   ctx.sassBuildCount = 0;
   ctx.transpileBuildCount = 0;
   ctx.indexBuildCount = 0;
   ctx.moduleBundleCount = 0;
   ctx.styleBundleCount = 0;
-
-  return ctx;
 }
 
 

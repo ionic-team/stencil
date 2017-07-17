@@ -1,7 +1,7 @@
 import { BuildConfig, Manifest } from '../../util/interfaces';
 import { BuildContext, BuildResults, LoggerTimeSpan } from '../interfaces';
 import { bundle } from '../bundle/bundle';
-import { catchError, emptyDir, getBuildContext, writeFiles } from '../util';
+import { catchError, emptyDir, getBuildContext, resetBuildContextCounts, writeFiles } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
 import { generateProjectFiles } from './build-project-files';
@@ -25,6 +25,9 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
 
   // create the build context if it doesn't exist
   ctx = getBuildContext(ctx);
+
+  // reset counts
+  resetBuildContextCounts(ctx);
 
   // begin the build
   return Promise.resolve().then(() => {
@@ -88,7 +91,6 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
     }
 
     ctx.lastBuildHadError = (buildResults.diagnostics.some(d => d.level === 'error'));
-
     return buildResults;
   });
 }
