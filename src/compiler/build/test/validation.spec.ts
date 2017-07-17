@@ -171,6 +171,35 @@ describe('validation', () => {
       expect(path.isAbsolute(config.src)).toBe(true);
     });
 
+    it('should not allow special characters in namespace', () => {
+      expect(() => {
+        config.namespace = 'My-Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
+      expect(() => {
+        config.namespace = 'My/Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
+      expect(() => {
+        config.namespace = 'My%20Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should not allow number for first character of namespace', () => {
+      expect(() => {
+        config.namespace = '88MyNamespace';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should enforce namespace being at least 3 characters', () => {
+      expect(() => {
+        config.namespace = 'ab';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
     it('should set user namespace', () => {
       config.namespace = 'MyNamespace';
       validateBuildConfig(config);

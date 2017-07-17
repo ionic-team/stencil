@@ -6,20 +6,20 @@ export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: 
   const loaderExternalSrc = `${config.publicPath}${config.namespace.toLowerCase()}.js`;
 
   // remove the project loader script url request
-  const removedLoaded = removeExternalLoaderScript(config, doc, loaderExternalSrc);
+  const removedLoader = removeExternalLoaderScript(config, doc, loaderExternalSrc);
 
-  if (removedLoaded) {
+  if (removedLoader) {
     // append the loader script content to the bottom of the document
     appendInlineLoaderScript(ctx, doc);
 
   } else {
-    config.logger.error(`Loader script was not inlined into the index.html file.`)
+    config.logger.error(`Loader script was not inlined into the index.html file.`);
   }
 }
 
 
 function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderExternalSrc: string) {
-  let removedLoaded = false;
+  let removedLoader = false;
 
   const scriptElements = doc.getElementsByTagName('script');
 
@@ -29,15 +29,15 @@ function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderEx
       // pointing to the project's external loader script
       // remove the script from the document, be gone with you
       scriptElements[i].parentNode.removeChild(scriptElements[i]);
-      removedLoaded = true;
+      removedLoader = true;
     }
   }
 
-  if (!removedLoaded) {
-    config.logger.error(`External loader script "${loaderExternalSrc}" was not found in the index.html file.`)
+  if (!removedLoader) {
+    config.logger.error(`External loader script "${loaderExternalSrc}" was not found in the index.html file.`);
   }
 
-  return removedLoaded;
+  return removedLoader;
 }
 
 
