@@ -120,7 +120,7 @@ export function formatDefineComponents(
   return [
     `${namespace}.defineComponents(\n`,
 
-      `/**** module id ****/`,
+      `/**** module id (dev mode) ****/`,
       `'${moduleId}',\n`,
 
       `/**** component modules ****/`,
