@@ -33,60 +33,67 @@ export class CommandLineLogger implements Logger {
   info(...msg: any[]) {
     if (this.shouldLog('info')) {
       const lines = wordWrap(msg);
-      if (lines.length) {
-        const d = new Date();
+      this.infoPrefix(lines);
+      console.log(lines.join('\n'));
+    }
+  }
 
-        let prefix = '[' +
-          ('0' + d.getMinutes()).slice(-2) + ':' +
-          ('0' + d.getSeconds()).slice(-2) + '.' +
-          Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+  infoPrefix(lines: string[]) {
+    if (lines.length) {
+      const d = new Date();
 
-        lines[0] = this.dim(prefix) + lines[0].substr(prefix.length);
-      }
-      lines.forEach(line => {
-        console.log(line);
-      });
+      let prefix = '[' +
+        ('0' + d.getMinutes()).slice(-2) + ':' +
+        ('0' + d.getSeconds()).slice(-2) + '.' +
+        Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+
+      lines[0] = this.dim(prefix) + lines[0].substr(prefix.length);
     }
   }
 
   warn(...msg: any[]) {
     if (this.shouldLog('warn')) {
       const lines = wordWrap(msg);
-      if (lines.length) {
-        let prefix = '[ WARN  ]';
-        lines[0] = this.bold(this.chalk.yellow(prefix)) + lines[0].substr(prefix.length);
-      }
-      lines.forEach(line => {
-        console.warn(line);
-      });
+      this.warnPrefix(lines);
+      console.warn(lines.join('\n'));
+    }
+  }
+
+  warnPrefix(lines: string[]) {
+    if (lines.length) {
+      let prefix = '[ WARN  ]';
+      lines[0] = this.bold(this.chalk.yellow(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
   error(...msg: any[]) {
     if (this.shouldLog('error')) {
       const lines = wordWrap(msg);
-      if (lines.length) {
-        let prefix = '[ ERROR ]';
-        lines[0] = this.bold(this.chalk.red(prefix)) + lines[0].substr(prefix.length);
-      }
-      lines.forEach(line => {
-        console.error(line);
-      });
+      this.errorPrefix(lines);
+      console.error(lines.join('\n'));
+    }
+  }
+
+  errorPrefix(lines: string[]) {
+    if (lines.length) {
+      let prefix = '[ ERROR ]';
+      lines[0] = this.bold(this.chalk.red(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
   debug(...msg: any[]) {
     if (this.shouldLog('debug')) {
       msg.push(this.memoryUsage());
-
       const lines = wordWrap(msg);
-      if (lines.length) {
-        let prefix = '[ DEBUG ]';
-        lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
-      }
-      lines.forEach(line => {
-        console.log(line);
-      });
+      this.debugPrefix(lines);
+      console.log(lines.join('\n'));
+    }
+  }
+
+  debugPrefix(lines: string[]) {
+    if (lines.length) {
+      let prefix = '[ DEBUG ]';
+      lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
     }
   }
 
@@ -115,43 +122,25 @@ export class CommandLineLogger implements Logger {
   }
 
   printDiagnostics(diagnostics: Diagnostic[]) {
+    if (!diagnostics.length) return;
+
+    let outputLines: string[] = [''];
+
     diagnostics.forEach(d => {
-      this.printDiagnostic(d);
+      outputLines = outputLines.concat(this.printDiagnostic(d));
     });
+
+    console.log(outputLines.join('\n'));
   }
 
   printDiagnostic(d: Diagnostic) {
-    if (d.level === 'warn') {
-      wordWrap([d.messageText]).forEach((m, i) => {
-        if (i === 0) {
-          this.warn(m);
-        } else {
-          console.log(m);
-        }
-      });
+    const outputLines = wordWrap([d.messageText]);
 
-    } else if (d.header === 'build error') {
-      wordWrap([d.messageText]).forEach((m, i) => {
-        if (i === 0) {
-          this.error(m);
-        } else {
-          console.log(m);
-        }
-      });
-
-    } else {
-      if (d.header) {
-        this.error(d.header);
-        wordWrap([d.messageText]).forEach(m => {
-          console.log(m);
-        });
-
-      } else {
-        this.error(d.messageText);
-      }
+    if (d.header) {
+      outputLines.unshift(INDENT + d.header);
     }
 
-    console.log('');
+    outputLines.push('');
 
     if (d.lines && d.lines.length) {
       const lines = prepareLines(d.lines, 'text');
@@ -181,11 +170,23 @@ export class CommandLineLogger implements Logger {
           msg += text;
         }
 
-        console.log(msg);
+        outputLines.push(msg);
       });
 
-      console.log('');
+      outputLines.push('');
     }
+
+    if (d.level === 'warn') {
+      this.warnPrefix(outputLines);
+
+    } else if (d.level === 'info') {
+      this.infoPrefix(outputLines);
+
+    } else {
+      this.errorPrefix(outputLines);
+    }
+
+    return outputLines;
   }
 
   highlightError(errorLine: string, errorCharStart: number, errorLength: number) {
@@ -394,10 +395,15 @@ function wordWrap(msg: any[]) {
     } else {
       line += word + ' ';
     }
+
+    if (output.length > 25) {
+      return;
+    }
   });
   if (line.trim().length) {
     output.push(line);
   }
+
   return output;
 }
 

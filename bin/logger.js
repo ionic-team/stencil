@@ -36,17 +36,18 @@ var CommandLineLogger = (function () {
         }
         if (this.shouldLog('info')) {
             var lines = wordWrap(msg);
-            if (lines.length) {
-                var d = new Date();
-                var prefix = '[' +
-                    ('0' + d.getMinutes()).slice(-2) + ':' +
-                    ('0' + d.getSeconds()).slice(-2) + '.' +
-                    Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
-                lines[0] = this.dim(prefix) + lines[0].substr(prefix.length);
-            }
-            lines.forEach(function (line) {
-                console.log(line);
-            });
+            this.infoPrefix(lines);
+            console.log(lines.join('\n'));
+        }
+    };
+    CommandLineLogger.prototype.infoPrefix = function (lines) {
+        if (lines.length) {
+            var d = new Date();
+            var prefix = '[' +
+                ('0' + d.getMinutes()).slice(-2) + ':' +
+                ('0' + d.getSeconds()).slice(-2) + '.' +
+                Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+            lines[0] = this.dim(prefix) + lines[0].substr(prefix.length);
         }
     };
     CommandLineLogger.prototype.warn = function () {
@@ -56,13 +57,14 @@ var CommandLineLogger = (function () {
         }
         if (this.shouldLog('warn')) {
             var lines = wordWrap(msg);
-            if (lines.length) {
-                var prefix = '[ WARN  ]';
-                lines[0] = this.bold(this.chalk.yellow(prefix)) + lines[0].substr(prefix.length);
-            }
-            lines.forEach(function (line) {
-                console.warn(line);
-            });
+            this.warnPrefix(lines);
+            console.warn(lines.join('\n'));
+        }
+    };
+    CommandLineLogger.prototype.warnPrefix = function (lines) {
+        if (lines.length) {
+            var prefix = '[ WARN  ]';
+            lines[0] = this.bold(this.chalk.yellow(prefix)) + lines[0].substr(prefix.length);
         }
     };
     CommandLineLogger.prototype.error = function () {
@@ -72,13 +74,14 @@ var CommandLineLogger = (function () {
         }
         if (this.shouldLog('error')) {
             var lines = wordWrap(msg);
-            if (lines.length) {
-                var prefix = '[ ERROR ]';
-                lines[0] = this.bold(this.chalk.red(prefix)) + lines[0].substr(prefix.length);
-            }
-            lines.forEach(function (line) {
-                console.error(line);
-            });
+            this.errorPrefix(lines);
+            console.error(lines.join('\n'));
+        }
+    };
+    CommandLineLogger.prototype.errorPrefix = function (lines) {
+        if (lines.length) {
+            var prefix = '[ ERROR ]';
+            lines[0] = this.bold(this.chalk.red(prefix)) + lines[0].substr(prefix.length);
         }
     };
     CommandLineLogger.prototype.debug = function () {
@@ -89,13 +92,14 @@ var CommandLineLogger = (function () {
         if (this.shouldLog('debug')) {
             msg.push(this.memoryUsage());
             var lines = wordWrap(msg);
-            if (lines.length) {
-                var prefix = '[ DEBUG ]';
-                lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
-            }
-            lines.forEach(function (line) {
-                console.log(line);
-            });
+            this.debugPrefix(lines);
+            console.log(lines.join('\n'));
+        }
+    };
+    CommandLineLogger.prototype.debugPrefix = function (lines) {
+        if (lines.length) {
+            var prefix = '[ DEBUG ]';
+            lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
         }
     };
     CommandLineLogger.prototype.color = function (msg, color) {
@@ -119,44 +123,21 @@ var CommandLineLogger = (function () {
     };
     CommandLineLogger.prototype.printDiagnostics = function (diagnostics) {
         var _this = this;
+        if (!diagnostics.length)
+            return;
+        var outputLines = [''];
         diagnostics.forEach(function (d) {
-            _this.printDiagnostic(d);
+            outputLines = outputLines.concat(_this.printDiagnostic(d));
         });
+        console.log(outputLines.join('\n'));
     };
     CommandLineLogger.prototype.printDiagnostic = function (d) {
         var _this = this;
-        if (d.level === 'warn') {
-            wordWrap([d.messageText]).forEach(function (m, i) {
-                if (i === 0) {
-                    _this.warn(m);
-                }
-                else {
-                    console.log(m);
-                }
-            });
+        var outputLines = wordWrap([d.messageText]);
+        if (d.header) {
+            outputLines.unshift(INDENT + d.header);
         }
-        else if (d.header === 'build error') {
-            wordWrap([d.messageText]).forEach(function (m, i) {
-                if (i === 0) {
-                    _this.error(m);
-                }
-                else {
-                    console.log(m);
-                }
-            });
-        }
-        else {
-            if (d.header) {
-                this.error(d.header);
-                wordWrap([d.messageText]).forEach(function (m) {
-                    console.log(m);
-                });
-            }
-            else {
-                this.error(d.messageText);
-            }
-        }
-        console.log('');
+        outputLines.push('');
         if (d.lines && d.lines.length) {
             var lines = prepareLines(d.lines, 'text');
             lines.forEach(function (l) {
@@ -181,10 +162,20 @@ var CommandLineLogger = (function () {
                 else {
                     msg += text;
                 }
-                console.log(msg);
+                outputLines.push(msg);
             });
-            console.log('');
+            outputLines.push('');
         }
+        if (d.level === 'warn') {
+            this.warnPrefix(outputLines);
+        }
+        else if (d.level === 'info') {
+            this.infoPrefix(outputLines);
+        }
+        else {
+            this.errorPrefix(outputLines);
+        }
+        return outputLines;
     };
     CommandLineLogger.prototype.highlightError = function (errorLine, errorCharStart, errorLength) {
         var rightSideChars = errorLine.length - errorCharStart + errorLength - 1;
@@ -363,6 +354,9 @@ function wordWrap(msg) {
         }
         else {
             line += word + ' ';
+        }
+        if (output.length > 25) {
+            return;
         }
     });
     if (line.trim().length) {
