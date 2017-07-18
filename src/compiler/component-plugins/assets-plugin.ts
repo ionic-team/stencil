@@ -1,13 +1,4 @@
-import { BuildConfig, BuildContext, ComponentMeta, ComponentOptions, Diagnostic, Manifest } from '../interfaces';
-
-export interface AssetsResults {
-  bundles: {
-    [bundleId: string]: {
-      [modeName: string]: string;
-    };
-  };
-  diagnostics: Diagnostic[];
-}
+import { BuildConfig, ComponentMeta, ComponentOptions, Manifest } from '../interfaces';
 
 
 export const COMPONENT_OPTIONS_LIST = ['assetsDir', 'assetsDirs'];
@@ -22,13 +13,8 @@ export function parseComponentMetadata({ assetsDir, assetsDirs }: ComponentOptio
   }
 }
 
-export function copyAssets(config: BuildConfig, ctx: BuildContext, userManifest: Manifest): Promise<AssetsResults> {
-  const assetsResults: AssetsResults = {
-    bundles: {},
-    diagnostics: []
-  };
-
-  const timeSpan = config.logger.createTimeSpan(`bundle assets started`, true);
+export function copyAssets(config: BuildConfig, userManifest: Manifest) {
+  const timeSpan = config.logger.createTimeSpan(`copy assets started`, true);
 
   const directoriesToCopy: string[] = userManifest.components
     .filter(c => c.assetsDirsMeta && c.assetsDirsMeta.length)
@@ -55,11 +41,7 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext, userManifest:
     });
   });
 
-  ctx;
-  // console.log(ctx.changedFiles);
-
   return Promise.all(dirCopyPromises).then(function() {
-    timeSpan.finish('bundle styles finished');
-    return assetsResults;
+    timeSpan.finish('copy assets finished');
   });
 }

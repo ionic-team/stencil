@@ -42,8 +42,7 @@ describe('build', () => {
   it('should save project files, but not resave when unchanged', () => {
     ctx = {};
     config.bundles = [
-      { components: ['cmp-a'] },
-      { components: ['cmp-b'] }
+      { components: ['cmp-a'] }
     ];
     config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);

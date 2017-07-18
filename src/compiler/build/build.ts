@@ -4,25 +4,25 @@ import { bundle } from '../bundle/bundle';
 import { catchError, emptyDir, getBuildContext, resetBuildContextCounts, writeFiles } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
+import { copyAssets } from '../component-plugins/assets-plugin';
 import { generateProjectFiles } from './build-project-files';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { loadDependentManifests, mergeManifests } from './manifest';
 import { optimizeIndexHtml } from './optimize-index-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
-import { copyAssets } from '../component-plugins/assets-plugin';
 
 
 export function build(config: BuildConfig, ctx?: BuildContext) {
   // create a timespan of the build process
   let timeSpan: LoggerTimeSpan;
-  let manifestContents: Manifest;
 
   // create the build results which will be the returned object
   const buildResults: BuildResults = {
     diagnostics: [],
     files: [],
     componentRegistry: [],
+    manifest: {}
   };
 
   // create the build context if it doesn't exist
@@ -47,17 +47,15 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
     return compileSrcPhase(config, ctx, dependentManifests, buildResults);
 
   }).then(manifest => {
-    manifestContents = manifest;
+    buildResults.manifest = manifest;
+
     // bundle phase
     return bundlePhase(config, ctx, manifest, buildResults);
 
   }).then(() => {
+    // copy over asset files and
     // write all the files in one go
-    return writePhase(config, ctx, buildResults);
-
-  }).then(() => {
-
-    return copyPhase(config, ctx, manifestContents);
+    return writePhase(config, ctx, buildResults.manifest, buildResults);
 
   }).then(() => {
     // optimize index.html
@@ -74,12 +72,14 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
   }).then(() => {
     // finalize phase
     if (config) {
+      // check for config cuz it could have been undefined
       buildResults.diagnostics = cleanDiagnostics(buildResults.diagnostics);
       config.logger.printDiagnostics(buildResults.diagnostics);
       generateHtmlDiagnostics(config, buildResults.diagnostics);
     }
 
     if (timeSpan) {
+      // create a nice pretty message stating what happend
       let buildText = ctx.isRebuild ? 'rebuild' : 'build';
       let buildStatus = 'finished';
       let watchText = config.watch ? ', watching for changes...' : '';
@@ -93,11 +93,15 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
     }
 
     if (typeof ctx.onFinish === 'function') {
+      // fire off any provided onFinish fn every time the build finishes
       ctx.onFinish(buildResults);
-      delete ctx.onFinish;
     }
 
+    // remember if the last build had an error or not
+    // this is useful if the next build should do a full build or not
     ctx.lastBuildHadError = (buildResults.diagnostics.some(d => d.level === 'error'));
+
+    // return what we've learned today
     return buildResults;
   });
 }
@@ -124,6 +128,11 @@ function compileSrcPhase(config: BuildConfig, ctx: BuildContext, dependentManife
 
 
 function bundlePhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest, buildResults: BuildResults) {
+  if (buildResults.diagnostics.some(d => d.level === 'error')) {
+    // don't bother if there's already a build error
+    return Promise.resolve();
+  }
+
   return bundle(config, ctx, manifest).then(bundleResults => {
     if (bundleResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(bundleResults.diagnostics);
@@ -138,6 +147,11 @@ function bundlePhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest,
 
 
 function optimizeHtmlPhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+  if (buildResults.diagnostics.some(d => d.level === 'error')) {
+    // don't bother if there's already a build error
+    return Promise.resolve();
+  }
+
   return optimizeIndexHtml(config, ctx).then(optimizeHtmlResults => {
     if (optimizeHtmlResults.diagnostics) {
       buildResults.diagnostics = buildResults.diagnostics.concat(optimizeHtmlResults.diagnostics);
@@ -146,7 +160,14 @@ function optimizeHtmlPhase(config: BuildConfig, ctx: BuildContext, buildResults:
 }
 
 
-function writePhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+function writePhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest, buildResults: BuildResults) {
+  if (buildResults.diagnostics.some(d => d.level === 'error')) {
+    // don't bother if there's already a build error
+    // also clear out the filesToWrite for the next build
+    ctx.filesToWrite = {};
+    return Promise.resolve();
+  }
+
   buildResults.files = Object.keys(ctx.filesToWrite).sort();
   const totalFilesToWrite = buildResults.files.length;
 
@@ -159,21 +180,15 @@ function writePhase(config: BuildConfig, ctx: BuildContext, buildResults: BuildR
   ctx.filesToWrite = {};
 
   return emptyDestDir(config, ctx).then(() => {
-    if (totalFilesToWrite > 0) {
-      // only write...when there's files to write
-      return writeFiles(config.sys, config.rootDir, filesToWrite);
-    }
-
-    // no files to write
-    return Promise.resolve();
+    // kick off writing files and copying assets
+    return Promise.all([
+      writeFiles(config.sys, config.rootDir, filesToWrite),
+      copyAssets(config, manifest)
+    ]);
 
   }).then(() => {
     timeSpan.finish(`writePhase finished`);
   });
-}
-
-function copyPhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest): Promise<any> {
-  return copyAssets(config, ctx, manifest);
 }
 
 

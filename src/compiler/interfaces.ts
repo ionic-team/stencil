@@ -64,6 +64,7 @@ export interface BuildResults {
   diagnostics: Diagnostic[];
   files: string[];
   componentRegistry: LoadComponentRegistry[];
+  manifest: Manifest;
 }
 
 
