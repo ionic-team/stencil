@@ -11,8 +11,8 @@ import { LoadComponentRegistry } from '../util/interfaces';
   // auto hide components until they been fully hydrated
   // reusing the "x" variable from the args for funzies
   x = document.createElement('style');
-  x.innerHTML = components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.hydrated{visibility:inherit}';
-  x.innerHTML += 'ion-app:not(.hydrated){display:none}';
+  x.innerHTML = components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.💎{visibility:inherit}';
+  x.innerHTML += 'ion-app:not(.💎){display:none}';
   document.head.appendChild(x);
 
   // request the core file this browser needs
