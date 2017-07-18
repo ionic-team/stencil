@@ -136,7 +136,7 @@ export class CommandLineLogger implements Logger {
   printDiagnostic(d: Diagnostic) {
     const outputLines = wordWrap([d.messageText]);
 
-    if (d.header) {
+    if (d.header && d.header !== 'build error' && d.header !== 'build warn') {
       outputLines.unshift(INDENT + d.header);
     }
 

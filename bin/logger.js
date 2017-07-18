@@ -134,7 +134,7 @@ var CommandLineLogger = (function () {
     CommandLineLogger.prototype.printDiagnostic = function (d) {
         var _this = this;
         var outputLines = wordWrap([d.messageText]);
-        if (d.header) {
+        if (d.header && d.header !== 'build error' && d.header !== 'build warn') {
             outputLines.unshift(INDENT + d.header);
         }
         outputLines.push('');
