@@ -179,12 +179,20 @@ function writePhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest, 
   // clear out the files to write object for the next build
   ctx.filesToWrite = {};
 
+  // 1) empty the destination directory
+  // 2) write all of the files
+  // 3) copy all of the assets
+  // not doing write and copy at the same time incase they
+  // both try to create the same directory at the same time
   return emptyDestDir(config, ctx).then(() => {
-    // kick off writing files and copying assets
-    return Promise.all([
-      writeFiles(config.sys, config.rootDir, filesToWrite),
-      copyAssets(config, manifest)
-    ]);
+    // kick off writing files
+    return writeFiles(config.sys, config.rootDir, filesToWrite).catch(err => {
+      catchError(buildResults.diagnostics, err);
+    });
+
+  }).then(() => {
+    // kick off copying assets
+    return copyAssets(config, manifest, buildResults.diagnostics);
 
   }).then(() => {
     timeSpan.finish(`writePhase finished`);

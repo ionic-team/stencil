@@ -183,8 +183,8 @@ function generateComponentModeStyles(
   const styleCollection: StyleCollection = {};
 
   if (modeStyleMeta) {
-    if (modeStyleMeta.absStylePaths) {
-      modeStyleMeta.absStylePaths.forEach(absStylePath => {
+    if (modeStyleMeta.absolutePaths) {
+      modeStyleMeta.absolutePaths.forEach(absStylePath => {
         styleCollection[absStylePath] = '';
 
         if (isSassFile(absStylePath)) {

@@ -52,9 +52,9 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFileMeta,
     // normalize user data
     normalizeTag(moduleFile, diagnostics, userOpts, cmpMeta, text);
     normalizeStyles(config, userOpts, moduleFile, cmpMeta);
-    normalizeShadow(userOpts, cmpMeta);
+    normalizeAssetsDir(config, userOpts, moduleFile, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
-    normalizeAssetsDir(userOpts, cmpMeta);
+    normalizeShadow(userOpts, cmpMeta);
 
   } catch (e) {
     // derp

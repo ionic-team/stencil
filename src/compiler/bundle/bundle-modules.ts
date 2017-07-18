@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
-  Manifest, ModuleResults, StencilSystem } from '../interfaces';
+  FilesMap, Manifest, ModuleResults, StencilSystem } from '../interfaces';
 import { buildError, buildWarn, catchError, generateBanner, normalizePath } from '../util';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
@@ -51,7 +51,7 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userMa
   const bundleId = generateBundleId(userBundle.components);
 
   // loop through each bundle the user wants and create the "defineComponents"
-  return bundleComponentModules(sys, ctx, bundleComponentMeta, bundleId, moduleResults).then(bundleDetails => {
+  return bundleComponentModules(config, ctx, bundleComponentMeta, bundleId, moduleResults).then(bundleDetails => {
 
     // format all the JS bundle content
     // insert the already bundled JS module into the defineComponents function
@@ -108,8 +108,9 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userMa
 }
 
 
-function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleComponentMeta: ComponentMeta[], bundleId: string, moduleResults: ModuleResults) {
+function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleComponentMeta: ComponentMeta[], bundleId: string, moduleResults: ModuleResults) {
   const bundleDetails: ModuleBundleDetails = {};
+  const sys = config.sys;
 
   if (ctx.isChangeBuild && !ctx.changeHasComponentModules && !ctx.changeHasNonComponentModules && ctx.moduleBundleOutputs[bundleId]) {
     // don't bother bundling if this is a change build but
@@ -181,7 +182,7 @@ function bundleComponentModules(sys: StencilSystem, ctx: BuildContext, bundleCom
         sourceMap: false
       }),
       entryInMemoryPlugin(STENCIL_BUNDLE_ID, moduleBundleInput),
-      transpiledInMemoryPlugin(sys, ctx)
+      transpiledInMemoryPlugin(config, sys, ctx)
     ],
     onwarn: createOnWarnFn(bundleComponentMeta, moduleResults.diagnostics)
 
@@ -231,13 +232,15 @@ function createOnWarnFn(bundleComponentMeta: ComponentMeta[], diagnostics: Diagn
 }
 
 
-function transpiledInMemoryPlugin(sys: StencilSystem, ctx: BuildContext) {
+function transpiledInMemoryPlugin(config: BuildConfig, sys: StencilSystem, ctx: BuildContext) {
+  const assetsCache: FilesMap = {};
+
   return {
     name: 'transpiledInMemoryPlugin',
 
     resolveId(importee: string, importer: string): string {
       if (!sys.path.isAbsolute(importee)) {
-        importee = sys.path.resolve(importer ? sys.path.dirname(importer) : sys.path.resolve(), importee);
+        importee = normalizePath(sys.path.resolve(importer ? sys.path.dirname(importer) : sys.path.resolve(), importee));
 
         if (importee.indexOf('.js') === -1) {
           importee += '.js';
@@ -246,8 +249,41 @@ function transpiledInMemoryPlugin(sys: StencilSystem, ctx: BuildContext) {
 
       const tsFileNames = Object.keys(ctx.moduleFiles);
       for (var i = 0; i < tsFileNames.length; i++) {
-        if (ctx.moduleFiles[tsFileNames[i]].jsFilePath === importee) {
+        // see if we can find by importeE
+        var moduleFile = ctx.moduleFiles[tsFileNames[i]];
+        if (moduleFile.jsFilePath === importee) {
+          // awesome, there's a module file for this js file, we're good here
           return importee;
+        }
+      }
+
+      // let's check all of the asset directories for this path
+      // think slide's swiper dependency
+      for (i = 0; i < tsFileNames.length; i++) {
+        // see if we can find by importeR
+        moduleFile = ctx.moduleFiles[tsFileNames[i]];
+        if (moduleFile.jsFilePath === importer) {
+          // awesome, there's a module file for this js file via importeR
+          // now let's check if this module has an assets directory
+          if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
+            for (var j = 0; j < moduleFile.cmpMeta.assetsDirsMeta.length; j++) {
+              var assetsAbsPath = moduleFile.cmpMeta.assetsDirsMeta[j].absolutePath;
+              var importeeFileName = sys.path.basename(importee);
+              var assetsFilePath = normalizePath(sys.path.join(assetsAbsPath, importeeFileName));
+
+              // ok, we've got a potential absolute path where the file "could" be
+              try {
+                // let's see if it actually exists, but with readFileSync :(
+                assetsCache[assetsFilePath] = sys.fs.readFileSync(assetsFilePath, 'utf-8');
+                if (typeof assetsCache[assetsFilePath] === 'string') {
+                  return assetsFilePath;
+                }
+
+              } catch (e) {
+                config.logger.debug(`asset ${assetsFilePath} did not exist`);
+              }
+            }
+          }
         }
       }
 
@@ -258,9 +294,17 @@ function transpiledInMemoryPlugin(sys: StencilSystem, ctx: BuildContext) {
       sourcePath = normalizePath(sourcePath);
 
       if (typeof ctx.jsFiles[sourcePath] === 'string') {
+        // perfect, we already got this js file cached
         return ctx.jsFiles[sourcePath];
       }
 
+      if (typeof assetsCache[sourcePath] === 'string') {
+        // awesome, this is one of the cached asset file we already read in resolveId
+        return assetsCache[sourcePath];
+      }
+
+      // ok so it's not in one of our caches, so let's look it up directly
+      // but with readFileSync :(
       const jsText = sys.fs.readFileSync(sourcePath, 'utf-8' );
       ctx.moduleFiles[sourcePath] = {
         jsFilePath: sourcePath,

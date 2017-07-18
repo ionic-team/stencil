@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, OptimizeHtmlResults } from '../interfaces';
+import { BuildConfig, BuildContext, LoggerTimeSpan, OptimizeHtmlResults } from '../interfaces';
 import { catchError, readFile, writeFile } from '../util';
 import { createRenderer } from '../../server/index';
 
@@ -13,10 +13,12 @@ export function optimizeIndexHtml(config: BuildConfig, ctx: BuildContext) {
     return Promise.resolve(optimizeHtmlResults);
   }
 
-  const timeSpan = config.logger.createTimeSpan(`optimize index html started`);
+  let timeSpan: LoggerTimeSpan;
 
   // get the source index html content
   return readFile(config.sys, config.indexHtmlSrc).then(indexSrcHtml => {
+    timeSpan = config.logger.createTimeSpan(`optimize index html started`);
+
     // successfully got the source content
     optimizeHtmlResults.html = indexSrcHtml;
 
@@ -27,10 +29,10 @@ export function optimizeIndexHtml(config: BuildConfig, ctx: BuildContext) {
 
   }).catch(() => {
     // it's ok if there's no index file
-    config.logger.debug(`index html not found: ${config.indexHtmlSrc}`);
+    config.logger.debug(`no index html to optimize: ${config.indexHtmlSrc}`);
 
   }).then(() => {
-    timeSpan.finish(`optimize index html finished`);
+    timeSpan && timeSpan.finish(`optimize index html finished`);
     return optimizeHtmlResults;
   });
 }

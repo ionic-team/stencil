@@ -1,4 +1,4 @@
-import { BuildConfig, Bundle, ComponentMeta, Manifest, ModuleFileMeta,
+import { AssetsMeta, BuildConfig, Bundle, ComponentMeta, Manifest, ModuleFileMeta,
   ListenMeta, PropChangeMeta, PropMeta, StyleMeta } from '../interfaces';
 import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
 import { normalizePath } from '../util';
@@ -87,6 +87,7 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeComponentClass(cmpData, cmpMeta);
   serializeComponentPath(config, manifestDir, compiledComponentAbsoluteFilePath, cmpData);
   serializeStyles(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
+  serializeAssetsDir(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeProps(cmpData, cmpMeta);
   serializePropsWillChange(cmpData, cmpMeta);
   serializePropsDidChange(cmpData, cmpMeta);
@@ -94,7 +95,6 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeListeners(cmpData, cmpMeta);
   serializeMethods(cmpData, cmpMeta);
   serializeHost(cmpData, cmpMeta);
-  serializeAssetsDir(cmpData, cmpMeta);
   serializeSlots(cmpData, cmpMeta);
   serializeIsShadow(cmpData, cmpMeta);
   serializeLoadPriority(cmpData, cmpMeta);
@@ -110,6 +110,7 @@ export function parseComponent(config: BuildConfig, manifestDir: string, cmpData
   parseComponentClass(cmpData, cmpMeta);
   parseComponentPath(config, manifestDir, cmpData, cmpMeta);
   parseStyles(config, manifestDir, cmpData, cmpMeta);
+  parseAssetsDir(config, manifestDir, cmpData, cmpMeta);
   parseProps(cmpData, cmpMeta);
   parsePropsWillChange(cmpData, cmpMeta);
   parsePropsDidChange(cmpData, cmpMeta);
@@ -117,7 +118,6 @@ export function parseComponent(config: BuildConfig, manifestDir: string, cmpData
   parseListeners(cmpData, cmpMeta);
   parseMethods(cmpData, cmpMeta);
   parseHost(cmpData, cmpMeta);
-  parseAssetsDir(cmpData, cmpMeta);
   parseIsShadow(cmpData, cmpMeta);
   parseSlots(cmpData, cmpMeta);
   parseLoadPriority(cmpData, cmpMeta);
@@ -183,8 +183,8 @@ function parseStyles(config: BuildConfig, manifestDir: string, cmpData: Componen
 function serializeStyle(config: BuildConfig, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
   const modeStyleData: StyleData = {};
 
-  if (modeStyleMeta.cmpRelativeStylePaths) {
-    modeStyleData.stylePaths = modeStyleMeta.cmpRelativeStylePaths.map(componentRelativeStylePath => {
+  if (modeStyleMeta.cmpRelativePaths) {
+    modeStyleData.stylePaths = modeStyleMeta.cmpRelativePaths.map(componentRelativeStylePath => {
       // convert style paths which are relative to the component file
       // to be style paths that are relative to the manifest file
 
@@ -210,22 +210,66 @@ function parseStyle(config: BuildConfig, manifestDir: string, cmpData: Component
   };
 
   if (modeStyleData.stylePaths) {
-    modeStyle.absStylePaths = modeStyleData.stylePaths.map(stylePath => {
-      return config.sys.path.join(
+    modeStyle.absolutePaths = modeStyleData.stylePaths.map(stylePath => {
+      return normalizePath(config.sys.path.join(
         manifestDir,
         stylePath
-      );
+      ));
     });
 
-    modeStyle.cmpRelativeStylePaths = modeStyleData.stylePaths.map(stylePath => {
-      return config.sys.path.relative(
+    modeStyle.cmpRelativePaths = modeStyleData.stylePaths.map(stylePath => {
+      return normalizePath(config.sys.path.relative(
         config.sys.path.dirname(cmpData.componentPath),
         stylePath
-      );
+      ));
     });
   }
 
   return modeStyle;
+}
+
+
+function serializeAssetsDir(config: BuildConfig, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (invalidArrayData(cmpMeta.assetsDirsMeta)) {
+    return;
+  }
+
+  // convert asset paths which are relative to the component file
+  // to be asset paths that are relative to the manifest file
+
+  // we've already figured out the component's relative path from the manifest file
+  // use the value we already created in serializeComponentPath()
+  // create a relative path from the manifest file to the asset path
+
+  cmpData.assetPaths = cmpMeta.assetsDirsMeta.map(assetMeta => {
+    return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, assetMeta.cmpRelativePath));
+  }).sort();
+}
+
+
+function parseAssetsDir(config: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (invalidArrayData(cmpData.assetPaths)) {
+    return;
+  }
+
+  cmpMeta.assetsDirsMeta = cmpData.assetPaths.map(assetsPath => {
+    const assetsMeta: AssetsMeta = {
+      absolutePath: normalizePath(config.sys.path.join(
+        manifestDir,
+        assetsPath
+      )),
+      cmpRelativePath: normalizePath(config.sys.path.relative(
+        config.sys.path.dirname(cmpData.componentPath),
+        assetsPath
+      ))
+    };
+    return assetsMeta;
+
+  }).sort((a, b) => {
+    if (a.cmpRelativePath < b.cmpRelativePath) return -1;
+    if (a.cmpRelativePath > b.cmpRelativePath) return 1;
+    return 0;
+  });
 }
 
 
@@ -435,22 +479,6 @@ function parseHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeAssetsDir(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (invalidArrayData(cmpMeta.assetsDirsMeta)) {
-    return;
-  }
-  cmpData.assetsDir = cmpMeta.assetsDirsMeta;
-}
-
-
-function parseAssetsDir(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (invalidArrayData(cmpData.assetsDir)) {
-    return;
-  }
-  cmpMeta.assetsDirsMeta = cmpData.assetsDir;
-}
-
-
 function serializeSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.slotMeta === HAS_SLOTS) {
     cmpData.slot = 'hasSlots';
@@ -589,7 +617,7 @@ export interface ComponentData {
   listeners?: ListenerData[];
   methods?: string[];
   host?: any;
-  assetsDir?: string[];
+  assetPaths?: string[];
   slot?: 'hasSlots'|'hasNamedSlots';
   shadow?: boolean;
   priority?: 'low';

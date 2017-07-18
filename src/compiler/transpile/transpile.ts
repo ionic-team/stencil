@@ -140,8 +140,8 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, diagnosti
   modeNames.forEach(modeName => {
     const modeMeta = moduleFile.cmpMeta.stylesMeta[modeName];
 
-    if (modeMeta.absStylePaths) {
-      modeMeta.absStylePaths.forEach(absoluteStylePath => {
+    if (modeMeta.absolutePaths) {
+      modeMeta.absolutePaths.forEach(absoluteStylePath => {
         if (isSassFile(absoluteStylePath)) {
           // this componet mode has a sass file, let's see which
           // sass files are included in it

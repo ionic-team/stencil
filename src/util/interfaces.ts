@@ -488,7 +488,7 @@ export interface ComponentMeta {
   statesMeta?: StateMeta[];
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;
-  assetsDirsMeta?: string[];
+  assetsDirsMeta?: AssetsMeta[];
   slotMeta?: number;
   loadPriority?: number;
   componentModuleMeta?: any;
@@ -504,9 +504,15 @@ export interface StylesMeta {
 
 export interface StyleMeta {
   styleId?: string;
-  absStylePaths?: string[];
-  cmpRelativeStylePaths?: string[];
+  absolutePaths?: string[];
+  cmpRelativePaths?: string[];
   styleStr?: string;
+}
+
+
+export interface AssetsMeta {
+  absolutePath?: string;
+  cmpRelativePath?: string;
 }
 
 

@@ -88,8 +88,8 @@ function normalizeStylePaths(congif: BuildConfig, userOpts: ComponentOptions, mo
 
 
 function normalizeModeStylePaths(config: BuildConfig, moduleFile: ModuleFileMeta, modeStyleMeta: StyleMeta, stylePath: string) {
-  modeStyleMeta.cmpRelativeStylePaths = modeStyleMeta.cmpRelativeStylePaths || [];
-  modeStyleMeta.absStylePaths = modeStyleMeta.absStylePaths || [];
+  modeStyleMeta.cmpRelativePaths = modeStyleMeta.cmpRelativePaths || [];
+  modeStyleMeta.absolutePaths = modeStyleMeta.absolutePaths || [];
 
   // get the absolute path of the directory which the component is sitting in
   const componentDir = normalizePath(config.sys.path.dirname(moduleFile.tsFilePath));
@@ -100,23 +100,23 @@ function normalizeModeStylePaths(config: BuildConfig, moduleFile: ModuleFileMeta
   if (config.sys.path.isAbsolute(componentRelativeStylePath)) {
     // this path is absolute already!
     // add to our list of style absolute paths
-    modeStyleMeta.absStylePaths.push(componentRelativeStylePath);
+    modeStyleMeta.absolutePaths.push(componentRelativeStylePath);
 
     // if this is an absolute path already, let's convert it to be relative
     componentRelativeStylePath = config.sys.path.relative(componentDir, componentRelativeStylePath);
 
     // add to our list of style relative paths
-    modeStyleMeta.cmpRelativeStylePaths.push(componentRelativeStylePath);
+    modeStyleMeta.cmpRelativePaths.push(componentRelativeStylePath);
 
   } else {
     // this path is relative to the component
     // add to our list of style relative paths
-    modeStyleMeta.cmpRelativeStylePaths.push(componentRelativeStylePath);
+    modeStyleMeta.cmpRelativePaths.push(componentRelativeStylePath);
 
     // create the absolute path to the style file
     const absoluteStylePath = normalizePath(config.sys.path.join(componentDir, componentRelativeStylePath));
 
     // add to our list of style absolute paths
-    modeStyleMeta.absStylePaths.push(absoluteStylePath);
+    modeStyleMeta.absolutePaths.push(absoluteStylePath);
   }
 }

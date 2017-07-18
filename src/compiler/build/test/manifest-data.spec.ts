@@ -68,14 +68,6 @@ describe('manifest-data serialize/parse', () => {
     expect(b.slotMeta).toBe(HAS_SLOTS);
   });
 
-  it('assetsDirsMeta', () => {
-    a.assetsDirsMeta = ['svgs'];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.assetsDir[0]).toBe('svgs');
-    b = parseComponent(config, manifestDir, cmpData);
-    expect(b.assetsDirsMeta[0]).toBe('svgs');
-  });
-
   it('hostMeta', () => {
     a.hostMeta = { theme: { 'some-class': true } };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
@@ -171,17 +163,28 @@ describe('manifest-data serialize/parse', () => {
     expect(b.propsMeta[1].isStateful).toBe(false);
   });
 
+  it('assetsDirsMeta', () => {
+    a.assetsDirsMeta = [{
+      cmpRelativePath: 'svgs'
+    }];
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    expect(cmpData.assetPaths[0]).toBe('components/svgs');
+    b = parseComponent(config, manifestDir, cmpData);
+    expect(b.assetsDirsMeta[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/svgs');
+    expect(b.assetsDirsMeta[0].cmpRelativePath).toBe('svgs');
+  });
+
   it('stylesMeta stylePaths', () => {
     a.stylesMeta = {
       ios: {
-        cmpRelativeStylePaths: ['cmp-a.scss']
+        cmpRelativePaths: ['cmp-a.scss']
       }
     };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.styles.ios.stylePaths[0]).toBe('components/cmp-a.scss');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.stylesMeta.ios.cmpRelativeStylePaths[0]).toBe('cmp-a.scss');
-    expect(b.stylesMeta.ios.absStylePaths[0]).toBe('/collection/components/cmp-a.scss');
+    expect(b.stylesMeta.ios.cmpRelativePaths[0]).toBe('cmp-a.scss');
+    expect(b.stylesMeta.ios.absolutePaths[0]).toBe('/User/me/myapp/dist/collection/components/cmp-a.scss');
   });
 
   it('stylesMeta styleStr', () => {
@@ -199,7 +202,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.componentPath).toBe('components/cmp-a.js');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.componentPath).toBe('/collection/components/cmp-a.js');
+    expect(b.componentPath).toBe('/User/me/myapp/dist/collection/components/cmp-a.js');
   });
 
   it('componentClass', () => {
@@ -221,7 +224,7 @@ describe('manifest-data serialize/parse', () => {
   beforeEach(() => {
     a = {};
     moduleFile = {
-      jsFilePath: '/collection/components/cmp-a.js',
+      jsFilePath: '/User/me/myapp/dist/collection/components/cmp-a.js',
       cmpMeta: a
     };
   });
@@ -229,7 +232,7 @@ describe('manifest-data serialize/parse', () => {
   var a: ComponentMeta;
   var b: ComponentMeta;
   var moduleFile: ModuleFileMeta;
-  var manifestDir = '/collection/';
+  var manifestDir = '/User/me/myapp/dist/collection/';
   var config: BuildConfig = {
     sys: mockStencilSystem()
   };
