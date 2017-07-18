@@ -3,7 +3,7 @@ import { BuildContext } from '../../compiler/interfaces';
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../test';
 import { h } from '../../core/renderer/h';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG, HYDRATED_CSS } from '../../util/constants';
 
 
 describe('hydrate', () => {
@@ -44,7 +44,7 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrv="0" class="hydrated">
+            <ion-test ssrv="0" class="${HYDRATED_CSS}">
               <elm-a ssrc="0.0.">
                 <div slot="slot-a">inner slot-a text</div>
                 <div>default slot text</div>
@@ -92,7 +92,7 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrv="0" class="hydrated">
+            <ion-test ssrv="0" class="${HYDRATED_CSS}">
               <elm-a ssrc="0.0">
                 <!--s.0.0-->inner text<!--/-->
                 content text
@@ -131,7 +131,7 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrv="0" class="hydrated">
+            <ion-test ssrv="0" class="${HYDRATED_CSS}">
               <div ssrc="0.0."></div>
             </ion-test>
           </body>
