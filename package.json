@@ -43,6 +43,7 @@
     "chokidar": "^1.7.0",
     "clean-css": "^4.1.5",
     "jsdom": "^11.0.0",
+    "node-fetch": "^1.7.1",
     "node-sass": "^4.5.0",
     "rollup": "0.41.4",
     "rollup-plugin-commonjs": "^8.0.2",

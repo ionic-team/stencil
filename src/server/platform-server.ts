@@ -4,7 +4,6 @@ import { ComponentMeta, ComponentRegistry, ConfigApi,
   DomApi, DomControllerApi, FilesMap, HostElement, ListenOptions, Logger,
   ModuleCallbacks, PlatformApi, ProjectGlobal, StencilSystem } from '../util/interfaces';
 import { createRenderer } from '../core/renderer/patch';
-import { generateGlobalContext } from './global-context';
 import { getMode } from '../core/platform/mode';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
@@ -18,7 +17,7 @@ export function createPlatformServer(
   logger: Logger,
   projectNamespace: string,
   Gbl: ProjectGlobal,
-  win: Window,
+  win: any,
   domApi: DomApi,
   config: ConfigApi,
   dom: DomControllerApi,
@@ -52,14 +51,12 @@ export function createPlatformServer(
 
   const injectedGlobal = initGlobal(config, dom);
 
-  // generate a sandboxed context
-  const context = generateGlobalContext(win);
+  // add the project's global to the window context
+  win[projectNamespace] = Gbl;
 
-  // add the project's global to the context
-  context[projectNamespace] = Gbl;
-
-  // create the sandboxed context
-  sys.vm.createContext(context);
+  // create the sandboxed context with a new instance of a V8 Context
+  // V8 Context provides an isolated global environment
+  sys.vm.createContext(win);
 
 
   // setup the root node of all things
@@ -157,7 +154,7 @@ export function createPlatformServer(
           delete pendingModuleFileReads[jsFilePath];
 
           // run the code in this sandboxed context
-          sys.vm.runInContext(jsContent, context, { timeout: 5000 });
+          sys.vm.runInContext(jsContent, win, { timeout: 10000 });
 
         }).catch(err => {
           logger.error(`loadBundle, module read: ${err}`);

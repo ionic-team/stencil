@@ -15,6 +15,8 @@ module.exports = Object.defineProperties({
     return createDom();
   },
 
+  fs: require('fs'),
+
   generateContentHash: function generateContentHash(content, length) {
     var crypto = require('crypto');
     return crypto.createHash('sha1')
@@ -46,8 +48,6 @@ module.exports = Object.defineProperties({
       }
     });
   },
-
-  fs: require('fs'),
 
   minifyCss: function minifyCss(input) {
     var CleanCSS = require('clean-css');
@@ -119,6 +119,20 @@ module.exports = Object.defineProperties({
     rimraf(directory, callback);
   },
 
+  vm: {
+    createContext: function(sandbox) {
+      var vm = require('vm');
+      // https://github.com/tmpvar/jsdom/issues/1724
+      // manually adding a fetch polyfill until jsdom adds it
+      sandbox.fetch = require('node-fetch');
+      return vm.createContext(sandbox);
+    },
+    runInContext: function(code, contextifiedSandbox, options) {
+      var vm = require('vm');
+      vm.runInContext(code, contextifiedSandbox, options);
+    }
+  },
+
   watch: function watch(paths, opts) {
     var chokidar = require('chokidar');
     return chokidar.watch(paths, opts);
@@ -139,7 +153,5 @@ module.exports = Object.defineProperties({
   sass: { get: function() { return require('node-sass'); } },
 
   typescript: { get: function() { return require('typescript'); } },
-
-  vm: { get: function() { return require('vm'); } }
 
 });
