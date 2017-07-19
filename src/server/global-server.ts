@@ -9,8 +9,6 @@ export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
   const injectedGlobal: Ionic = {
     isServer: true,
     isClient: false,
-    theme: null,
-    emit: noop,
     listener: {
       enable: noop,
       add: () => noop

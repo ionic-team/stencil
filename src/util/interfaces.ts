@@ -2,13 +2,12 @@ import * as jsxInterface from './jsx-interfaces';
 import { CssClassObject } from './jsx-interfaces';
 export { CssClassObject } from './jsx-interfaces';
 
+
 export interface Ionic {
-  emit: EventEmit;
   listener: {
     enable: EventListenerEnable;
     add: AddEventListenerApi;
   };
-  theme: IonicTheme;
   controller?: any;
   dom: DomControllerApi;
   config: ConfigApi;
@@ -38,19 +37,6 @@ export interface ProjectGlobal {
 
 export interface AddEventListenerApi {
   (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => void, opts?: ListenOptions): Function;
-}
-
-
-export interface EventEmit {
-  (instance: any, eventName: string, data?: CustomEventOptions): void;
-}
-
-
-export interface CustomEventOptions {
-  bubbles?: boolean;
-  cancelable?: boolean;
-  composed?: boolean;
-  detail?: any;
 }
 
 
@@ -462,11 +448,6 @@ export interface PropChangeOpts {
 }
 
 
-export interface IonicTheme {
-  (instance: any, cssClassName: string, vnodeData?: VNodeData): VNodeData;
-}
-
-
 export interface ConfigApi {
   get: (key: string, fallback?: any) => any;
   getBoolean: (key: string, fallback?: boolean) => boolean;
@@ -536,6 +517,7 @@ export interface Component {
 
   // public properties
   $el?: HostElement;
+  $emit?: EmitEvent;
 
   // private properties
   __values?: ComponentInternalValues;
@@ -749,7 +731,13 @@ export interface PlatformApi {
   isServer?: boolean;
   onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap) => void;
   getEventOptions: (opts?: ListenOptions) => any;
+  emitEvent: EmitEvent;
   tmpDisconnected?: boolean;
+}
+
+
+export interface EmitEvent {
+  (elm: Element, eventName: string, data: any): void;
 }
 
 

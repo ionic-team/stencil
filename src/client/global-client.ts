@@ -1,21 +1,9 @@
 import { addEventListener, enableListener } from '../core/instance/events';
-import { Component, ConfigApi, CustomEventOptions, DomApi, DomControllerApi, ProjectGlobal,
+import { Component, ConfigApi, DomApi, DomControllerApi, ProjectGlobal,
   Ionic, ListenOptions, IonicControllerApi, PlatformApi } from '../util/interfaces';
 
 
-export function initGlobal(Gbl: ProjectGlobal, win: any, domApi: DomApi, plt: PlatformApi, config: ConfigApi, domCtrl: DomControllerApi): Ionic {
-
-  if (typeof win.CustomEvent !== 'function') {
-    // CustomEvent polyfill
-    function CustomEvent(event: any, params: any) {
-      params = params || { bubbles: false, cancelable: false, detail: undefined };
-      var evt = domApi.$createEvent();
-      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-      return evt;
-    }
-    CustomEvent.prototype = win.Event.prototype;
-    win.CustomEvent = CustomEvent;
-  }
+export function initGlobal(Gbl: ProjectGlobal, domApi: DomApi, plt: PlatformApi, config: ConfigApi, domCtrl: DomControllerApi): Ionic {
 
   // properties that can stay hidden from public use
   const controllers: any = Gbl.controllers = {};
@@ -28,23 +16,6 @@ export function initGlobal(Gbl: ProjectGlobal, win: any, domApi: DomApi, plt: Pl
   Gbl.config = config;
 
   (<Ionic>Gbl).dom = domCtrl;
-
-  (<Ionic>Gbl).emit = (instance: any, eventName: string, data: CustomEventOptions) => {
-    data = data || {};
-    if (data.bubbles === undefined) {
-      data.bubbles = true;
-    }
-    if (data.composed === undefined) {
-      // https://developers.google.com/web/fundamentals/getting-started/primers/shadowdom#events
-      data.composed = true;
-    }
-    if (Gbl.eventNameFn) {
-      eventName = Gbl.eventNameFn(eventName);
-    }
-    instance && instance.$el && instance.$el.dispatchEvent(
-      new win.CustomEvent(eventName, data)
-    );
-  };
 
   (<Ionic>Gbl).listener = {
     enable: function(instance: any, eventName: string, shouldEnable: boolean, attachTo?: string) {

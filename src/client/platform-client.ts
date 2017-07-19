@@ -29,6 +29,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
     config,
     queue,
     connectHostElement,
+    emitEvent,
     getEventOptions
   };
 
@@ -38,7 +39,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
 
 
   // create the global which will be injected into the user's instances
-  const injectedGlobal = initGlobal(Gbl, win, domApi, plt, config, domCtrl);
+  const injectedGlobal = initGlobal(Gbl, domApi, plt, config, domCtrl);
 
 
   // setup the root element which is the mighty <html> tag
@@ -187,6 +188,25 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
     domApi.$appendChild(domApi.$head, scriptElm);
   }
 
+  let WindowCustomEvent = (win as any).CustomEvent;
+  if (typeof WindowCustomEvent !== 'function') {
+    // CustomEvent polyfill
+    WindowCustomEvent = function CustomEvent(event: any, data: any) {
+      var evt = domApi.$createEvent();
+      evt.initCustomEvent(event, true, true, data.detail);
+      return evt;
+    };
+    WindowCustomEvent.prototype = (win as any).Event.prototype;
+  }
+
+  function emitEvent(elm: Element, eventName: string, data: any) {
+    data = data || {};
+    data.bubbles = data.composed = true;
+    if (Gbl.eventNameFn) {
+      eventName = Gbl.eventNameFn(eventName);
+    }
+    elm.dispatchEvent(new WindowCustomEvent(eventName, data));
+  }
 
   // test if this browser supports event options or not
   let supportsEventOptions = false;
@@ -202,8 +222,8 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
 
   function getEventOptions(opts?: ListenOptions) {
     return supportsEventOptions ? {
-        'capture': !!(opts && opts.capture),
-        'passive': !(opts && opts.passive === false)
+        capture: !!(opts && opts.capture),
+        passive: !(opts && opts.passive === false)
       } : !!(opts && opts.capture);
   }
 

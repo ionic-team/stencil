@@ -6,9 +6,10 @@ import { ComponentMeta, ComponentRegistry, ConfigApi,
 import { createRenderer } from '../core/renderer/patch';
 import { generateGlobalContext } from './global-context';
 import { getMode } from '../core/platform/mode';
-import { h, t } from '../core/renderer/h';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
+import { h, t } from '../core/renderer/h';
 import { initGlobal } from './global-server';
+import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
 
 
@@ -42,6 +43,7 @@ export function createPlatformServer(
     queue: Gbl.QueueCtrl,
     tmpDisconnected: false,
     isServer: true,
+    emitEvent: noop,
     getEventOptions
   };
 

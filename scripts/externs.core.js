@@ -25,7 +25,6 @@ function loadController(){};
 function QueueCtrl(){};
 function raf(){};
 function read(){};
-function staticDir(){};
 function write(){};
 function Animation(){};
 function ns(){};
@@ -63,6 +62,7 @@ function getNumber(){};
  * Properties set on the proxy element
  */
 function $el(){};
+function $emit(){};
 function $instance(){};
 function listeners(){};
 function $meta(){};
@@ -90,6 +90,7 @@ function attrs(){};
 function on(){};
 function props(){};
 
+
 /**
  * Compiled hyperscript props
  * Already short, just don't rename them
@@ -114,13 +115,15 @@ function l(){};
  */
 function attachShadow(){};
 function attributeChangedCallback(){};
+function composed(){};
 function connectedCallback(){};
 function customElements(){};
-function didTimeout(){};
-function host(){};
 function define(){};
+function didTimeout(){};
 function disconnectedCallback(){};
+function host(){};
 function observedAttributes(){};
+function passive(){};
 function requestIdleCallback(){};
-function timeRemaining(){};
 function shadowRoot(){};
+function timeRemaining(){};

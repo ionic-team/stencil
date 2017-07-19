@@ -3,8 +3,8 @@ import { attributeChangedCallback } from './attribute-changed';
 import { Component, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { initProxy } from './proxy';
 import { HYDRATED_CSS } from '../../util/constants';
+import { initProxy } from './proxy';
 import { queueUpdate } from './update';
 import { render } from './render';
 
@@ -52,6 +52,7 @@ export function initInstance(plt: PlatformApi, elm: HostElement) {
 
   // let's automatically add a reference to the host element on the instance
   instance.$el = elm;
+  instance.$emit = plt.emitEvent.bind(plt, elm);
 
   // so we've got an host element now, and a actual instance
   // let's wire them up together with getter/settings
