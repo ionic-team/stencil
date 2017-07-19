@@ -210,6 +210,10 @@ function mockCreateDom() {
     serialize: function() {
       return dom.serialize();
     },
+    destroy: function() {
+      dom.window.close();
+      dom = null;
+    },
     getDiagnostics: function(): any {
       return [];
     }

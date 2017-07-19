@@ -48,6 +48,11 @@ module.exports = function createDom() {
       return dom.serialize();
     },
 
+    destroy: function() {
+      dom.window.close();
+      dom = null;
+    },
+
     getDiagnostics: function() {
       return diagnostics;
     }

@@ -802,6 +802,7 @@ export interface StencilSystem {
   createDom?(): {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
+    destroy(): void;
     getDiagnostics(): Diagnostic[];
   };
   fs?: {
