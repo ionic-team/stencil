@@ -1,6 +1,5 @@
-import { BuildConfig, ComponentMeta, ConfigApi, HostElement, HostContentNodes, HydrateOptions, Ionic, Logger,
-  ProjectGlobal, DomApi, PlatformConfig, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
-import { createConfigController } from '../util/config-controller';
+import { BuildConfig, ComponentMeta, HostElement, HostContentNodes, HydrateOptions, Ionic, Logger,
+  ProjectGlobal, DomApi, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { initGlobal, initProjectGlobal } from '../server/global-server';
 import { createPlatformServer } from '../server/platform-server';
@@ -34,7 +33,6 @@ export function mockPlatform(Gbl?: ProjectGlobal) {
     Gbl,
     win,
     domApi,
-    Gbl.ConfigCtrl,
     Gbl.DomCtrl,
     projectBuildDir
   );
@@ -71,24 +69,15 @@ export interface MockedPlatform {
 }
 
 
-export function mockProjectGlobal(config?: ConfigApi) {
-  if (!config) {
-    config = mockConfig({}, []);
-  }
-  const Gbl: ProjectGlobal = initProjectGlobal(config, []);
+export function mockProjectGlobal() {
+  const Gbl: ProjectGlobal = initProjectGlobal();
   return Gbl;
 }
 
 
 export function mockInjectedIonic(IonicGbl: ProjectGlobal): Ionic {
-  const ionic = initGlobal(IonicGbl.ConfigCtrl, IonicGbl.DomCtrl);
+  const ionic = initGlobal(IonicGbl.DomCtrl);
   return ionic;
-}
-
-
-export function mockConfig(configObj: any = {}, platforms: PlatformConfig[] = []): ConfigApi {
-  const ConfigCtrl = createConfigController(configObj, platforms);
-  return ConfigCtrl;
 }
 
 

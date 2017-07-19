@@ -1,10 +1,9 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildContext } from '../compiler/interfaces';
-import { ComponentMeta, ComponentRegistry, ConfigApi,
+import { ComponentMeta, ComponentRegistry,
   DomApi, DomControllerApi, FilesMap, HostElement, ListenOptions, Logger,
   ModuleCallbacks, PlatformApi, ProjectGlobal, StencilSystem } from '../util/interfaces';
 import { createRenderer } from '../core/renderer/patch';
-import { getMode } from '../core/platform/mode';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
 import { initGlobal } from './global-server';
@@ -19,7 +18,6 @@ export function createPlatformServer(
   Gbl: ProjectGlobal,
   win: any,
   domApi: DomApi,
-  config: ConfigApi,
   dom: DomControllerApi,
   projectBuildDir: string,
   ctx?: BuildContext
@@ -38,7 +36,6 @@ export function createPlatformServer(
     getComponentMeta,
     loadBundle,
     connectHostElement,
-    config,
     queue: Gbl.QueueCtrl,
     tmpDisconnected: false,
     isServer: true,
@@ -49,7 +46,7 @@ export function createPlatformServer(
   // create the renderer which will be used to patch the vdom
   plt.render = createRenderer(plt, domApi);
 
-  const injectedGlobal = initGlobal(config, dom);
+  const injectedGlobal = initGlobal(dom);
 
   // add the project's global to the window context
   win[projectNamespace] = Gbl;
@@ -73,6 +70,14 @@ export function createPlatformServer(
   };
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
+    // set the "mode" property
+    if (!elm.mode) {
+      // looks like mode wasn't set as a property directly yet
+      // first check if there's an attribute
+      // next check the project's global, such as Ionic.mode
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Gbl.mode;
+    }
+
     assignHostContentSlots(domApi, elm, slotMeta);
   }
 
@@ -162,7 +167,8 @@ export function createPlatformServer(
       }
 
       // we also need to load this component's css file
-      const styleId = cmpMeta.styleIds[getMode(domApi, config, elm)] || cmpMeta.styleIds.$;
+      // we're already figured out and set "mode" as a property to the element
+      const styleId = cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$;
       if (styleId) {
         // we've got a style id to load up
         // create the style filePath we'll be reading

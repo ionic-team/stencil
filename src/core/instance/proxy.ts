@@ -90,11 +90,6 @@ function initProperty(
     } else if ((<any>instance)[propName] !== undefined) {
       // looks like we've got an initial value on the instance already
       internalValues[propName] = (<any>instance)[propName];
-
-    } else if (propName === 'mode') {
-      // special case for just "mode" property
-      // which all component automatically get
-      internalValues[propName] = plt.config.get(propName);
     }
 
   } else {

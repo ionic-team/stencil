@@ -3,12 +3,10 @@ import { BuildConfig, ComponentRegistry, HostElement, PlatformApi,
 import { BuildContext } from '../compiler/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
-import { detectPlatforms } from '../core/platform/platform-util';
 import { getProjectBuildDir } from '../compiler/build/build-project-files';
 import { initHostConstructor } from '../core/instance/init';
 import { initProjectGlobal } from './global-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
-import { PLATFORM_CONFIGS } from '../core/platform/platform-configs';
 
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: ComponentRegistry, opts: HydrateOptions, hydrateResults: HydrateResults, callback: (results?: HydrateResults) => void) {
@@ -28,11 +26,8 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     return callback(hydrateResults);
   }
 
-  // figure out which platform/mode they're on (ios/android)
-  const platforms = detectPlatforms(opts.url, opts.userAgent, PLATFORM_CONFIGS, 'core');
-
   // create the global namespace which singletons go on
-  const Glb = initProjectGlobal(opts.config, platforms);
+  const Glb = initProjectGlobal();
 
   // create a emulated window
   // attach data the request to the window
@@ -59,7 +54,6 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     Glb,
     win,
     domApi,
-    Glb.ConfigCtrl,
     Glb.DomCtrl,
     projectBuildDir,
     ctx

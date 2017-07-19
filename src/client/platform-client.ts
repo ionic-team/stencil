@@ -1,9 +1,8 @@
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
-import { ComponentMeta, ComponentRegistry, ConfigApi, DomControllerApi,
+import { ComponentMeta, ComponentRegistry, DomControllerApi,
   DomApi, HostElement, ProjectGlobal, ListenOptions, LoadComponentRegistry,
   ModuleCallbacks, QueueApi, PlatformApi } from '../util/interfaces';
 import { createRenderer } from '../core/renderer/patch';
-import { getMode } from '../core/platform/mode';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { initGlobal } from './global-client';
@@ -11,7 +10,7 @@ import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
-export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: DomApi, config: ConfigApi, domCtrl: DomControllerApi, queue: QueueApi, publicPath: string): PlatformApi {
+export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: DomApi, domCtrl: DomControllerApi, queue: QueueApi, publicPath: string): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
@@ -26,7 +25,6 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
     defineComponent,
     getComponentMeta,
     loadBundle,
-    config,
     queue,
     connectHostElement,
     emitEvent,
@@ -39,7 +37,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
 
 
   // create the global which will be injected into the user's instances
-  const injectedGlobal = initGlobal(Gbl, domApi, plt, config, domCtrl);
+  const injectedGlobal = initGlobal(Gbl, domApi, plt, domCtrl);
 
 
   // setup the root element which is the mighty <html> tag
@@ -64,6 +62,14 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
   }
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
+    // set the "mode" property
+    if (!elm.mode) {
+      // looks like mode wasn't set as a property directly yet
+      // first check if there's an attribute
+      // next check the project's global, such as Ionic.mode
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Gbl.mode;
+    }
+
     // host element has been connected to the DOM
     if (!domApi.$getAttribute(elm, SSR_VNODE_ID)) {
       // this host element was NOT created with SSR
@@ -146,7 +152,8 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
       }
 
       // we also need to load the css file in the head
-      const styleId = cmpMeta.styleIds[getMode(domApi, config, elm)] || cmpMeta.styleIds.$;
+      // we're already figured out and set "mode" as a property to the element
+      const styleId = cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$;
       if (styleId && !loadedStyles[styleId]) {
         // this style hasn't been added to the head yet
         loadedStyles[styleId] = true;

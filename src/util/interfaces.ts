@@ -10,7 +10,6 @@ export interface Ionic {
   };
   controller?: any;
   dom: DomControllerApi;
-  config: ConfigApi;
   isServer: boolean;
   isClient: boolean;
 }
@@ -22,13 +21,12 @@ export interface IonicControllerApi {
 
 
 export interface ProjectGlobal {
+  mode?: string;
   components?: LoadComponentRegistry[];
   defineComponents?: (moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
   eventNameFn?: (eventName: string) => string;
-  config?: Object;
   loadController?: (ctrlName: string, ctrl: any) => any;
   controllers?: {[ctrlName: string]: any};
-  ConfigCtrl?: ConfigApi;
   DomCtrl?: DomControllerApi;
   QueueCtrl?: QueueApi;
   Animation?: any;
@@ -305,6 +303,7 @@ export interface BuildConfig {
   logLevel?: 'error'|'warn'|'info'|'debug';
   exclude?: string[];
   namespace?: string;
+  entry?: string;
   src?: string;
   buildDir?: string;
   collectionDir?: string;
@@ -448,13 +447,6 @@ export interface PropChangeOpts {
 }
 
 
-export interface ConfigApi {
-  get: (key: string, fallback?: any) => any;
-  getBoolean: (key: string, fallback?: boolean) => boolean;
-  getNumber: (key: string, fallback?: number) => number;
-}
-
-
 export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
@@ -577,6 +569,8 @@ export interface HostElement extends HTMLElement {
 
   // public properties
   $instance?: Component;
+  mode?: string;
+  color?: string;
 
   // private methods
   _render: (isUpdateRender?: boolean) => void;
@@ -725,7 +719,6 @@ export interface PlatformApi {
   getComponentMeta: (elm: Element) => ComponentMeta;
   loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
   render?: RendererApi;
-  config: ConfigApi;
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
   isServer?: boolean;
@@ -738,13 +731,6 @@ export interface PlatformApi {
 
 export interface EmitEvent {
   (elm: Element, eventName: string, data: any): void;
-}
-
-
-export interface PlatformConfig {
-  name: string;
-  isMatch?: {(url: string, userAgent: string): boolean};
-  settings?: any;
 }
 
 
@@ -900,11 +886,11 @@ export interface HydrateOptions {
   cookie?: string;
   dir?: string;
   lang?: string;
-  config?: Object;
   removeUnusedCss?: boolean;
   reduceHtmlWhitepace?: boolean;
   inlineLoaderScript?: boolean;
 }
+
 
 export interface HydrateResults {
   diagnostics: Diagnostic[];

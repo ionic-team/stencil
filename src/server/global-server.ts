@@ -1,10 +1,9 @@
-import { ConfigApi, DomControllerApi, Ionic, ProjectGlobal, PlatformConfig } from '../util/interfaces';
-import { createConfigController } from '../util/config-controller';
+import { DomControllerApi, Ionic, ProjectGlobal } from '../util/interfaces';
 import { QueueServer } from './queue-server';
 import { noop } from '../util/helpers';
 
 
-export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
+export function initGlobal(DomCtrl: DomControllerApi) {
 
   const injectedGlobal: Ionic = {
     isServer: true,
@@ -13,7 +12,6 @@ export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
       enable: noop,
       add: () => noop
     },
-    config: ConfigCtrl,
     dom: DomCtrl,
     controller: serverController,
   };
@@ -43,9 +41,8 @@ export function initGlobal(ConfigCtrl: ConfigApi, DomCtrl: DomControllerApi) {
 }
 
 
-export function initProjectGlobal(configObj: any, platforms: PlatformConfig[]) {
+export function initProjectGlobal() {
   const IonicGbl: ProjectGlobal = {
-    ConfigCtrl: createConfigController(configObj, platforms),
     DomCtrl: {
       read: function(cb: Function) { process.nextTick(() => { cb(Date.now()); }); },
       write: function(cb: Function) { process.nextTick(() => { cb(Date.now()); }); },

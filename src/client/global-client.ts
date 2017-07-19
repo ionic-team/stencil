@@ -1,19 +1,15 @@
 import { addEventListener, enableListener } from '../core/instance/events';
-import { Component, ConfigApi, DomApi, DomControllerApi, ProjectGlobal,
+import { Component, DomApi, DomControllerApi, ProjectGlobal,
   Ionic, ListenOptions, IonicControllerApi, PlatformApi } from '../util/interfaces';
 
 
-export function initGlobal(Gbl: ProjectGlobal, domApi: DomApi, plt: PlatformApi, config: ConfigApi, domCtrl: DomControllerApi): Ionic {
+export function initGlobal(Gbl: ProjectGlobal, domApi: DomApi, plt: PlatformApi, domCtrl: DomControllerApi): Ionic {
 
   // properties that can stay hidden from public use
   const controllers: any = Gbl.controllers = {};
 
   (<Ionic>Gbl).isClient = true;
   (<Ionic>Gbl).isServer = false;
-
-  // properties to be exposed to public
-  // in actuality it's the exact same object
-  Gbl.config = config;
 
   (<Ionic>Gbl).dom = domCtrl;
 
