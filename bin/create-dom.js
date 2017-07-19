@@ -6,28 +6,28 @@ module.exports = function createDom() {
   var dom;
   var diagnostics = [];
 
-  virtualConsole.on('jsdomError', function(e) {
+  virtualConsole.on('jsdomError', function() {
     diagnostics.push({
       level: 'error',
       header: 'DOM Error',
       type: 'hydrate',
-      messageText: e
+      messageText: ([].slice.call(arguments)).join(' ')
     });
   });
 
-  virtualConsole.on('error', function(e) {
+  virtualConsole.on('error', function() {
     diagnostics.push({
       level: 'error',
       type: 'hydrate',
-      messageText: e
+      messageText: ([].slice.call(arguments)).join(' ')
     });
   });
 
-  virtualConsole.on('warn', function(e) {
+  virtualConsole.on('warn', function() {
     diagnostics.push({
       level: 'warn',
       type: 'hydrate',
-      messageText: e
+      messageText: ([].slice.call(arguments)).join(' ')
     });
   });
 
