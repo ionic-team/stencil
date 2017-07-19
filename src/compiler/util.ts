@@ -95,7 +95,6 @@ export function writeFile(sys: StencilSystem, filePath: string, data: any) {
 
 export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesMap): Promise<any> {
   const directories = getDirectoriesFromFiles(sys, filesToWrite);
-
   return ensureDirectoriesExist(sys, directories, [rootDir]).then(() => {
     return writeToDisk(sys, filesToWrite);
   });
@@ -119,6 +118,7 @@ function writeToDisk(sys: StencilSystem, filesToWrite: FilesMap): Promise<any> {
   // assumes directories to be saved in already exit
   return new Promise((resolve, reject) => {
     const filePathsToWrite = Object.keys(filesToWrite);
+
     let doneWriting = 0;
     let rejected = false;
 
@@ -150,7 +150,7 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
   return new Promise(resolve => {
 
     const knowExistingDirPaths = existingDirectories.map(existingDirectory => {
-      return existingDirectory.split(sys.path.sep);
+      return existingDirectory.split('/');
     });
 
     const checkDirectories = sortDirectories(sys, directories).slice();
@@ -161,9 +161,9 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
         return;
       }
 
-      const checkDirectory = checkDirectories.shift();
+      const checkDirectory = normalizePath(checkDirectories.shift());
 
-      const dirPaths = checkDirectory.split(sys.path.sep);
+      const dirPaths = checkDirectory.split('/');
       let pathSections = 1;
 
       function ensureSection() {
@@ -173,7 +173,7 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
         }
 
         const checkDirPaths = dirPaths.slice(0, pathSections);
-        const dirPath = checkDirPaths.join(sys.path.sep);
+        const dirPath = checkDirPaths.join('/');
 
         for (var i = 0; i < knowExistingDirPaths.length; i++) {
           var existingDirPaths = knowExistingDirPaths[i];
@@ -193,7 +193,7 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
           }
         }
 
-        sys.fs.mkdir(dirPath, () => {
+        sys.fs.mkdir(normalizePath(dirPath), () => {
           // not worrying about the error here
           // if there's an error, it's probably because this directory already exists
           // which is what we want, no need to check access AND mkdir
@@ -215,7 +215,7 @@ function getDirectoriesFromFiles(sys: StencilSystem, filesToWrite: FilesMap) {
   const directories: string[] = [];
 
   Object.keys(filesToWrite).forEach(filePath => {
-    const dir = sys.path.dirname(filePath);
+    const dir = normalizePath(sys.path.dirname(filePath));
     if (directories.indexOf(dir) === -1) {
       directories.push(dir);
     }
