@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
-  FilesMap, Manifest, ModuleResults, StencilSystem } from '../interfaces';
-import { buildError, buildWarn, catchError, generateBanner, normalizePath } from '../util';
+  FilesMap, Manifest, ModuleResults } from '../interfaces';
+import { buildError, buildWarn, catchError, generatePreamble, normalizePath } from '../util';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
 
@@ -96,7 +96,7 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userMa
 
       ctx.moduleBundleCount++;
 
-      ctx.filesToWrite[moduleFilePath] = generateBanner(config) + moduleContent;
+      ctx.filesToWrite[moduleFilePath] = generatePreamble(config) + moduleContent;
     }
 
   }).catch(err => {
@@ -182,9 +182,9 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleCo
         sourceMap: false
       }),
       entryInMemoryPlugin(STENCIL_BUNDLE_ID, moduleBundleInput),
-      transpiledInMemoryPlugin(config, sys, ctx)
+      transpiledInMemoryPlugin(config, ctx)
     ],
-    onwarn: createOnWarnFn(bundleComponentMeta, moduleResults.diagnostics)
+    onwarn: createOnWarnFn(moduleResults.diagnostics, bundleComponentMeta)
 
   }).catch(err => {
     throw err;
@@ -213,7 +213,7 @@ interface ModuleBundleDetails {
 }
 
 
-function createOnWarnFn(bundleComponentMeta: ComponentMeta[], diagnostics: Diagnostic[]) {
+export function createOnWarnFn(diagnostics: Diagnostic[], bundleComponentMeta?: ComponentMeta[]) {
   const previousWarns: {[key: string]: boolean} = {};
 
   return function onWarningMessage(warning: any) {
@@ -222,9 +222,12 @@ function createOnWarnFn(bundleComponentMeta: ComponentMeta[], diagnostics: Diagn
     }
     previousWarns[warning.message] = true;
 
-    let label = bundleComponentMeta.map(c => c.tagNameMeta).join(', ').trim();
-    if (label.length) {
-      label += ': ';
+    let label = '';
+    if (bundleComponentMeta) {
+      label = bundleComponentMeta.map(c => c.tagNameMeta).join(', ').trim();
+      if (label.length) {
+        label += ': ';
+      }
     }
 
     buildWarn(diagnostics).messageText = label + warning.toString();
@@ -232,7 +235,8 @@ function createOnWarnFn(bundleComponentMeta: ComponentMeta[], diagnostics: Diagn
 }
 
 
-function transpiledInMemoryPlugin(config: BuildConfig, sys: StencilSystem, ctx: BuildContext) {
+export function transpiledInMemoryPlugin(config: BuildConfig, ctx: BuildContext) {
+  const sys = config.sys;
   const assetsCache: FilesMap = {};
 
   return {
@@ -247,10 +251,17 @@ function transpiledInMemoryPlugin(config: BuildConfig, sys: StencilSystem, ctx: 
         }
       }
 
+      // it's possible the importee is a file pointing directly to the source ts file
+      // if it is a ts file path, then we're good to go
+      var moduleFile = ctx.moduleFiles[importee];
+      if (ctx.moduleFiles[importee]) {
+        return moduleFile.jsFilePath;
+      }
+
       const tsFileNames = Object.keys(ctx.moduleFiles);
       for (var i = 0; i < tsFileNames.length; i++) {
         // see if we can find by importeE
-        var moduleFile = ctx.moduleFiles[tsFileNames[i]];
+        moduleFile = ctx.moduleFiles[tsFileNames[i]];
         if (moduleFile.jsFilePath === importee) {
           // awesome, there's a module file for this js file, we're good here
           return importee;

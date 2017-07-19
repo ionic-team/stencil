@@ -291,7 +291,7 @@ export function hasCmpClass(sourceText: string, filePath: string) {
 }
 
 
-export function generateBanner(config: BuildConfig) {
+export function generatePreamble(config: BuildConfig) {
   let preamble: string[] = [];
 
   if (config.preamble) {

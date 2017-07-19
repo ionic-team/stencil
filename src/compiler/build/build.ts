@@ -141,7 +141,7 @@ function bundlePhase(config: BuildConfig, ctx: BuildContext, manifest: Manifest,
     buildResults.componentRegistry = bundleResults.componentRegistry;
 
     // generate the loader and core files for this project
-    return generateProjectFiles(config, ctx, bundleResults.componentRegistry);
+    return generateProjectFiles(config, ctx, bundleResults.componentRegistry, bundleResults.diagnostics);
   });
 }
 

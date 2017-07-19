@@ -1,10 +1,11 @@
+import { BuildConfig, BuildContext, Diagnostic } from '../interfaces';
 import { CORE_NAME, LOADER_NAME, PROJECT_NAMESPACE_REGEX } from '../../util/constants';
-import { BuildConfig, BuildContext } from '../interfaces';
-import { generateBanner, normalizePath } from '../util';
+import { createOnWarnFn, transpiledInMemoryPlugin } from '../bundle/bundle-modules';
+import { generatePreamble, normalizePath } from '../util';
 import { LoadComponentRegistry, ProjectRegistry } from '../../util/interfaces';
 
 
-export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, componentRegistry: LoadComponentRegistry[]) {
+export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, componentRegistry: LoadComponentRegistry[], diagnostics: Diagnostic[]) {
   const sys = config.sys;
 
   config.logger.debug(`build, generateProjectFiles: ${config.namespace}`);
@@ -20,11 +21,15 @@ export function generateProjectFiles(config: BuildConfig, ctx: BuildContext, com
   let projectCoreFileName: string;
   let projectCoreEs5FileName: string;
 
-  return Promise.all([
-    generateCore(config),
-    generateCoreEs5(config)
+  // bundle the project's entry file (if one was provided)
+  return generateProjectEntry(config, ctx, diagnostics).then(entryContent => {
 
-  ]).then(results => {
+    return Promise.all([
+      generateCore(config, entryContent),
+      generateCoreEs5(config, entryContent)
+    ]);
+
+  }).then(results => {
     const coreContent = results[0];
     const coreEs5Content = results[1];
 
@@ -118,7 +123,7 @@ function generateLoader(config: BuildConfig, projectCoreFileName: string, projec
 
     // concat the projects loader code
     const projectCode: string[] = [
-      generateBanner(config),
+      generatePreamble(config),
       stencilLoaderContent
     ];
 
@@ -150,7 +155,7 @@ export function injectProjectIntoLoader(config: BuildConfig, projectCoreFileName
 }
 
 
-function generateCore(config: BuildConfig) {
+function generateCore(config: BuildConfig, entryContent: string) {
   const sys = config.sys;
 
   let staticName = CORE_NAME;
@@ -162,7 +167,8 @@ function generateCore(config: BuildConfig) {
   return sys.getClientCoreFile({ staticName: staticName }).then(coreContent => {
     // concat the projects core code
     const projectCode: string[] = [
-      generateBanner(config),
+      generatePreamble(config),
+      entryContent,
       injectProjectIntoCore(config, coreContent)
     ];
 
@@ -180,7 +186,7 @@ export function injectProjectIntoCore(config: BuildConfig, coreContent: string) 
 }
 
 
-function generateCoreEs5(config: BuildConfig) {
+function generateCoreEs5(config: BuildConfig, entryContent: string) {
   const sys = config.sys;
 
   let staticName = CORE_NAME + '.es5';
@@ -203,11 +209,73 @@ function generateCoreEs5(config: BuildConfig) {
     // concat the custom element polyfill and projects core code
     const projectCode: string[] = [
       docRegistryPolyfillContent + '\n\n',
-      generateBanner(config),
+      generatePreamble(config),
+      entryContent,
       injectProjectIntoCore(config, coreContent)
     ];
 
     return projectCode.join('');
+  });
+}
+
+
+function generateProjectEntry(config: BuildConfig, ctx: BuildContext, diagnostics: Diagnostic[]) {
+  // stencil by itself does not have an entry file
+  // however, projects like Ionic can provide an entry file
+  // which will bundle whatever is in the entry, and then
+  // prepend the output content on top of stencil's core js
+  // this way projects like Ionic can provide a shared global at runtime
+
+  if (!config.entry) {
+    // looks like they never provided an entry file, which is fine, so let's skip this
+    return Promise.resolve('');
+  }
+
+  // ok, so the project also provided an entry file, so let's bundle it up and
+  // the output from this can be tacked onto the top of the project's core file
+  // start the bundler on our temporary file
+  return config.sys.rollup.rollup({
+    entry: config.entry,
+    plugins: [
+      config.sys.rollup.plugins.nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+      config.sys.rollup.plugins.commonjs({
+        include: 'node_modules/**',
+        sourceMap: false
+      }),
+      transpiledInMemoryPlugin(config, ctx)
+    ],
+    onwarn: createOnWarnFn(diagnostics)
+
+  }).catch(err => {
+    throw err;
+  })
+
+  .then(rollupBundle => {
+    // generate the bundler results
+    const results = rollupBundle.generate({
+      format: 'es'
+    });
+
+    return `(function(window, document, publicPath){\n${results.code}\n})(window, document, "${getProjectPublicPath(config)}/");\n\n`;
+
+  }).then(output => {
+
+    if (config.minifyJs) {
+      // minify js
+      const minifyJsResults = config.sys.minifyJs(output);
+      minifyJsResults.diagnostics.forEach(d => {
+        diagnostics.push(d);
+      });
+
+      if (minifyJsResults.output) {
+        output = minifyJsResults.output;
+      }
+    }
+
+    return output;
   });
 }
 

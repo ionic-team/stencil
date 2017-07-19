@@ -1,5 +1,5 @@
 import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from '../interfaces';
-import { buildError, catchError, isCssFile, isSassFile, generateBanner, readFile } from '../util';
+import { buildError, catchError, isCssFile, isSassFile, generatePreamble, readFile } from '../util';
 import { formatCssBundleFileName, generateBundleId } from '../../util/data-serialize';
 import { HYDRATED_CSS } from '../../util/constants';
 
@@ -152,7 +152,7 @@ function generateModeCss(
 
       ctx.styleBundleCount++;
 
-      ctx.filesToWrite[styleFilePath] = generateBanner(config) + styleContent;
+      ctx.filesToWrite[styleFilePath] = generatePreamble(config) + styleContent;
     }
   });
 }
