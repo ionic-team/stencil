@@ -40,8 +40,8 @@ export function validateBuildConfig(config: BuildConfig) {
 
   const path = config.sys.path;
 
-  if (typeof config.entry === 'string' && !path.isAbsolute(config.entry)) {
-    config.entry = normalizePath(path.join(config.rootDir, config.entry));
+  if (typeof config.global === 'string' && !path.isAbsolute(config.global)) {
+    config.global = normalizePath(path.join(config.rootDir, config.global));
   }
 
   if (typeof config.src !== 'string') {

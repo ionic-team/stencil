@@ -171,11 +171,11 @@ describe('validation', () => {
       expect(path.isAbsolute(config.src)).toBe(true);
     });
 
-    it('should convert entry to absolute path, if an entry was provided', () => {
-      config.entry = 'src/global/index.ts';
+    it('should convert global to absolute path, if a global property was provided', () => {
+      config.global = 'src/global/index.ts';
       validateBuildConfig(config);
-      expect(path.basename(config.entry)).toBe('index.ts');
-      expect(path.isAbsolute(config.entry)).toBe(true);
+      expect(path.basename(config.global)).toBe('index.ts');
+      expect(path.isAbsolute(config.global)).toBe(true);
     });
 
     it('should not allow special characters in namespace', () => {

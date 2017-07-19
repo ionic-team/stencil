@@ -303,7 +303,7 @@ export interface BuildConfig {
   logLevel?: 'error'|'warn'|'info'|'debug';
   exclude?: string[];
   namespace?: string;
-  entry?: string;
+  global?: string;
   src?: string;
   buildDir?: string;
   collectionDir?: string;
