@@ -10,8 +10,9 @@ process.env.IONIC_CLI_BIN = __filename;
 var chalk = require('chalk');
 var path = require('path');
 
-if (require('semver').lt(process.version, 'v6.4.0')) {
-  console.log('ERR' + ': Your Node.js version is ' + chalk.bold(process.version) + '. Please update to the latest Node 6 LTS version (or latest Node).');
+var versionMatch = process.version.match(/(\d).(\d)/);
+if (versionMatch && parseFloat(versionMatch[0]) < 6.4) {
+  console.error(chalk.red('ERR: Your Node.js version is ' + chalk.bold(process.version) + '. Please update to the latest Node LTS version.\n'));
   process.exit(1);
 }
 
@@ -53,14 +54,14 @@ try {
   var configFile = require(configFilePath);
 
   if (!configFile.config) {
-    console.log('Invalid Stencil "' + chalk.bold(configFilePath) + '" configuration file. Missing "config" property.');
+    console.error('Invalid Stencil "' + chalk.bold(configFilePath) + '" configuration file. Missing "config" property.');
     process.exit(1);
   }
 
   Object.assign(config, configFile.config);
 
 } catch(e) {
-  console.log('Error reading Stencil "' + chalk.bold(configFilePath) + '" configuration file.');
+  console.error('Error reading Stencil "' + chalk.bold(configFilePath) + '" configuration file.');
   process.exit(1);
 }
 
