@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext } from '../interfaces';
+import { BuildConfig, BuildContext } from '../../util/interfaces';
 import * as ts from 'typescript';
 
 

@@ -1,12 +1,12 @@
-import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFileMeta } from '../../interfaces';
+import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFile } from '../../../util/interfaces';
 import { buildError, catchError } from '../../util';
+import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
-import { parseComponentMetadata as normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { validateTag } from '../../build/validation';
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorData(config: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+export function getComponentDecoratorData(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
   let metaData: ComponentMeta = null;
 
   if (!classNode.decorators) {
@@ -37,7 +37,7 @@ export function getComponentDecoratorData(config: BuildConfig, moduleFile: Modul
 }
 
 
-function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], text: string): ComponentMeta {
+function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], text: string): ComponentMeta {
   let cmpMeta: ComponentMeta = null;
 
   try {
@@ -67,7 +67,7 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFileMeta,
 }
 
 
-function normalizeTag(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
+function normalizeTag(moduleFile: ModuleFile, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
 
   if ((<any>userOpts).selector) {
     const d = buildError(diagnostics);

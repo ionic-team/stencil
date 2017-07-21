@@ -1,9 +1,8 @@
-import { BuildConfig, ComponentRegistry, HostElement, PlatformApi,
+import { BuildConfig, BuildContext, ComponentRegistry, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
-import { BuildContext } from '../compiler/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
-import { getProjectBuildDir } from '../compiler/build/build-project-files';
+import { getProjectBuildDir } from '../compiler/project/generate-project-files';
 import { initHostConstructor } from '../core/instance/init';
 import { initProjectGlobal } from './global-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
@@ -60,10 +59,13 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
   );
 
   // fully define each of our components onto this new platform instance
-  registeredTags.forEach(tag => {
-    registry[tag].tagNameMeta = tag;
-    registry[tag].propsMeta = registry[tag].propsMeta || [];
-    plt.defineComponent(registry[tag]);
+  registeredTags.forEach(registryTag => {
+    // registry tags are always UPPER-CASE
+    // component meta tags are lower-case
+    registryTag = registryTag.toUpperCase();
+    registry[registryTag].tagNameMeta = registryTag.toLowerCase();
+    registry[registryTag].propsMeta = registry[registryTag].propsMeta || [];
+    plt.defineComponent(registry[registryTag]);
   });
 
   // fire off this function when the app has finished loading
@@ -84,7 +86,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
         // terminate all running timers and also remove any
         // event listeners on the window and document
-        dom.destroy();
+        // dom.destroy();
 
       } catch (e) {
         // gahh, something's up

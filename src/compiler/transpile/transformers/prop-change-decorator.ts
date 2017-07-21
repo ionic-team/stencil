@@ -1,9 +1,9 @@
-import { ModuleFileMeta, PropChangeMeta } from '../../interfaces';
+import { ModuleFile, PropChangeMeta } from '../../../util/interfaces';
 import { PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropChangeDecoratorMeta(fileMeta: ModuleFileMeta, classNode: ts.ClassDeclaration) {
+export function getPropChangeDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassDeclaration) {
   fileMeta.cmpMeta.propsWillChangeMeta = [];
   getPropChangeDecorator(classNode, 'PropWillChange', fileMeta.cmpMeta.propsWillChangeMeta);
 

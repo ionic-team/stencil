@@ -1,8 +1,8 @@
-import { BuildConfig, ComponentMeta, ComponentOptions, ModuleFileMeta, StyleMeta } from '../../interfaces';
+import { BuildConfig, ComponentMeta, ComponentOptions, ModuleFile, StyleMeta } from '../../../util/interfaces';
 import { normalizePath } from '../../util';
 
 
-export function normalizeStyles(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
+export function normalizeStyles(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta) {
   normalizeStyleStr(userOpts, cmpMeta);
   normalizeStylePath(config, userOpts, moduleFile, cmpMeta);
   normalizeStylePaths(config, userOpts, moduleFile, cmpMeta);
@@ -20,7 +20,7 @@ function normalizeStyleStr(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
 }
 
 
-function normalizeStylePath(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
+function normalizeStylePath(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta) {
   if (typeof userOpts.styleUrl === 'string' && userOpts.styleUrl.trim()) {
     // as a string
     // styleUrl: 'my-styles.scss'
@@ -33,7 +33,7 @@ function normalizeStylePath(config: BuildConfig, userOpts: ComponentOptions, mod
 }
 
 
-function normalizeStylePaths(congif: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta) {
+function normalizeStylePaths(congif: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta) {
   if (!userOpts.styleUrls) {
     return;
   }
@@ -87,7 +87,7 @@ function normalizeStylePaths(congif: BuildConfig, userOpts: ComponentOptions, mo
 }
 
 
-function normalizeModeStylePaths(config: BuildConfig, moduleFile: ModuleFileMeta, modeStyleMeta: StyleMeta, stylePath: string) {
+function normalizeModeStylePaths(config: BuildConfig, moduleFile: ModuleFile, modeStyleMeta: StyleMeta, stylePath: string) {
   modeStyleMeta.cmpRelativePaths = modeStyleMeta.cmpRelativePaths || [];
   modeStyleMeta.absolutePaths = modeStyleMeta.absolutePaths || [];
 

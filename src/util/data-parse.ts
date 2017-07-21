@@ -51,7 +51,7 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
 
   // get the component class which was added to moduleImports
   // using the tag as the key on the export object
-  cmpMeta.componentModuleMeta = moduleImports[cmpMeta.tagNameMeta];
+  cmpMeta.componentModuleMeta = moduleImports[cmpMetaData[0]];
 
   // host
   cmpMeta.hostMeta = cmpMetaData[1];

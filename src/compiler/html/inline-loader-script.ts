@@ -1,12 +1,17 @@
-import { BuildConfig } from '../../util/interfaces';
-import { BuildContext } from '../interfaces';
+import { BuildConfig, BuildContext } from '../../util/interfaces';
 
 
 export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document) {
-  const loaderExternalSrc = `${config.publicPath}${config.namespace.toLowerCase()}.js`;
+  if (!ctx.projectFiles || ctx.projectFiles.loader) {
+    // don't bother if we don't have good loader content for whatever reason
+    return;
+  }
+
+  // create the script url we'll be looking for
+  const loaderExternalSrcUrl = `${config.publicPath}${config.namespace.toLowerCase()}.js`;
 
   // remove the project loader script url request
-  const removedLoader = removeExternalLoaderScript(config, doc, loaderExternalSrc);
+  const removedLoader = removeExternalLoaderScript(config, doc, loaderExternalSrcUrl);
 
   if (removedLoader) {
     // append the loader script content to the bottom of the document
@@ -18,13 +23,13 @@ export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: 
 }
 
 
-function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderExternalSrc: string) {
+function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderExternalSrcUrl: string) {
   let removedLoader = false;
 
   const scriptElements = doc.getElementsByTagName('script');
 
   for (var i = 0; i < scriptElements.length; i++) {
-    if (scriptElements[i].src.indexOf(loaderExternalSrc) > -1) {
+    if (scriptElements[i].src.indexOf(loaderExternalSrcUrl) > -1) {
       // this is a script element with a src attribute which is
       // pointing to the project's external loader script
       // remove the script from the document, be gone with you
@@ -34,7 +39,7 @@ function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderEx
   }
 
   if (!removedLoader) {
-    config.logger.error(`External loader script "${loaderExternalSrc}" was not found in the index.html file.`);
+    config.logger.error(`External loader script "${loaderExternalSrcUrl}" was not found in the index.html file.`);
   }
 
   return removedLoader;
@@ -42,6 +47,10 @@ function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderEx
 
 
 function appendInlineLoaderScript(ctx: BuildContext, doc: Document) {
+  // now that we've removed the external script
+  // let's add the loader script back in, except let's
+  // inline the js directly into the document
+  // and append it as the last child in the body
   const scriptElm = doc.createElement('script');
   scriptElm.innerHTML = ctx.projectFiles.loader;
   doc.body.appendChild(scriptElm);

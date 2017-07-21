@@ -1,10 +1,10 @@
 import { catchError } from '../../util';
-import { ModuleFileMeta, Diagnostic, PropMeta, PropOptions } from '../../interfaces';
+import { ModuleFile, Diagnostic, PropMeta, PropOptions } from '../../../util/interfaces';
 import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
   moduleFile.cmpMeta.propsMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);

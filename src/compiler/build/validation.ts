@@ -1,6 +1,5 @@
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../../util/constants';
-import { BuildConfig, Bundle, Collection, Manifest } from '../interfaces';
-import { HydrateOptions } from '../../util/interfaces';
+import { BuildConfig, Bundle, DependentCollection, HydrateOptions } from '../../util/interfaces';
 import { normalizePath } from '../util';
 
 
@@ -156,6 +155,9 @@ export function validateBuildConfig(config: BuildConfig) {
   config.collections = config.collections.map(validateDependentCollection);
 
   config.bundles = config.bundles || [];
+
+  validateUserBundles(config.bundles);
+
   config.exclude = config.exclude || DEFAULT_EXCLUDES;
 
   // set to true so it doesn't bother going through all this again on rebuilds
@@ -170,7 +172,7 @@ export function validateDependentCollection(userInput: any) {
     throw new Error(`invalid collection: ${userInput}`);
   }
 
-  let collection: Collection;
+  let collection: DependentCollection;
 
   if (typeof userInput === 'string') {
     collection = {
@@ -221,22 +223,6 @@ export function validateUserBundles(bundles: Bundle[]) {
       if (a.components[0].toLowerCase() > b.components[0].toLowerCase()) return 1;
     }
     return 0;
-  });
-}
-
-
-export function validateManifestBundles(manifest: Manifest) {
-  if (!manifest) {
-    throw new Error(`Invalid manifest`);
-  }
-
-  manifest.bundles = manifest.bundles || [];
-  manifest.components = manifest.components || [];
-
-  validateUserBundles(manifest.bundles);
-
-  manifest.components.forEach(c => {
-    c.tagNameMeta = validateTag(c.tagNameMeta, `found in bundle component stencil config`);
   });
 }
 

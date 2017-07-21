@@ -1,5 +1,4 @@
-import { BuildConfig, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
-import { BuildContext } from '../../compiler/interfaces';
+import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../test';
 import { h } from '../../core/renderer/h';
@@ -40,6 +39,7 @@ describe('hydrate', () => {
     hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
+console.log(hydrateResults.diagnostics)
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
         <html dir="ltr">
           <head></head>
@@ -106,7 +106,7 @@ describe('hydrate', () => {
     });
   });
 
-  it('should load one component and assign ssr ids', (done) => {
+  fit('should load one component and assign ssr ids', (done) => {
     const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []

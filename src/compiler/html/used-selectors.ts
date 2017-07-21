@@ -1,24 +1,23 @@
 
 
-export class HtmlUsedSelectors {
+export class UsedSelectors {
   tags: string[] = [];
   classNames: string[] = [];
   ids: string[] = [];
   attrs: string[] = [];
 
-
   constructor(elm: Element) {
     this.collectSelectors(elm);
   }
 
-  collectSelectors(elm: Element) {
+  private collectSelectors(elm: Element) {
     var i: number;
 
     if (elm && elm.tagName) {
 
       // tags
       var tagName = elm.tagName.toLowerCase();
-      if (this.tags.indexOf('tagName') === -1) {
+      if (this.tags.indexOf(tagName) === -1) {
         this.tags.push(tagName);
       }
 
@@ -61,13 +60,4 @@ export class HtmlUsedSelectors {
       }
     }
   }
-}
-
-
-export interface ClassNameData {
-  [fullClassName: string]: {
-    fullClassName: string;
-    totalLength: number;
-    abbr?: string;
-  };
 }

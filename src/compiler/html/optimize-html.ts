@@ -1,9 +1,8 @@
-import { BuildConfig, FilesMap, HydrateOptions, HydrateResults } from '../../util/interfaces';
-import { BuildContext } from '../interfaces';
-import { HtmlUsedSelectors } from './html-used-selectors';
+import { BuildConfig, BuildContext, FilesMap, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { inlineLoaderScript } from './inline-loader-script';
 import { reduceHtmlWhitepace } from './reduce-html-whitespace';
 import { removeUnusedCss } from '../css/remove-unused-css';
+import { UsedSelectors } from './used-selectors';
 
 
 export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, hydrateResults: HydrateResults) {
@@ -17,7 +16,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
       try {
         // pick out all of the selectors that are actually
         // being used in the html document
-        const usedSelectors = new HtmlUsedSelectors(doc.documentElement);
+        const usedSelectors = new UsedSelectors(doc.documentElement);
 
         const cssFilePaths = Object.keys(stylesMap);
 
@@ -46,21 +45,6 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     }
   }
 
-  if (opts.reduceHtmlWhitepace !== false) {
-    // reduceHtmlWhitepace is the default
-    try {
-      reduceHtmlWhitepace(doc.body);
-
-    } catch (e) {
-      hydrateResults.diagnostics.push({
-        level: 'error',
-        type: 'hydrate',
-        header: 'Reduce HTML Whitespace',
-        messageText: e
-      });
-    }
-  }
-
   if (opts.inlineLoaderScript !== false) {
     // remove the script to the external loader script request
     // inline the loader script at the bottom of the html
@@ -72,6 +56,21 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
         level: 'error',
         type: 'hydrate',
         header: 'Inline Loader Script',
+        messageText: e
+      });
+    }
+  }
+
+  if (opts.reduceHtmlWhitepace !== false) {
+    // reduceHtmlWhitepace is the default
+    try {
+      reduceHtmlWhitepace(doc.body);
+
+    } catch (e) {
+      hydrateResults.diagnostics.push({
+        level: 'error',
+        type: 'hydrate',
+        header: 'Reduce HTML Whitespace',
         messageText: e
       });
     }

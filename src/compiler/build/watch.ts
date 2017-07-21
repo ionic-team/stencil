@@ -1,6 +1,5 @@
 import { build } from './build';
-import { BuildConfig } from '../../util/interfaces';
-import { BuildContext } from '../interfaces';
+import { BuildConfig, BuildContext } from '../../util/interfaces';
 import { isCssFile, isHtmlFile, isSassFile, isTsFile, isWebDevFile, normalizePath } from '../util';
 
 

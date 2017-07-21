@@ -1,14 +1,13 @@
-import { BuildContext, BuildConfig, ComponentMeta, Manifest, Bundle, StylesResults } from '../interfaces';
+import { BuildContext, BuildConfig, Bundle, Manifest, ModuleFile, StylesResults } from '../../util/interfaces';
 import { buildError, catchError, isCssFile, isSassFile, generatePreamble, readFile } from '../util';
 import { formatCssBundleFileName, generateBundleId } from '../../util/data-serialize';
 import { HYDRATED_CSS } from '../../util/constants';
 
 
-export function bundleStyles(config: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
+export function bundleStyles(config: BuildConfig, ctx: BuildContext) {
   // create main style results object
   const stylesResults: StylesResults = {
-    bundles: {},
-    diagnostics: []
+    bundles: {}
   };
 
   // do bundling if this is not a change build
@@ -19,12 +18,12 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, userManifes
 
   // go through each bundle the user wants created
   // and create css files for each mode for each bundle
-  return Promise.all(userManifest.bundles.map(userBundle => {
-    return generateBundleCss(config, ctx, userManifest, userBundle, stylesResults);
+  return Promise.all(ctx.manifest.bundles.map(userBundle => {
+    return generateBundleCss(config, ctx, ctx.manifest, userBundle, stylesResults);
 
   }))
   .catch(err => {
-    catchError(stylesResults.diagnostics, err);
+    catchError(ctx.diagnostics, err);
 
   })
   .then(() => {
@@ -34,29 +33,30 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, userManifes
 }
 
 
-function generateBundleCss(config: BuildConfig, ctx: BuildContext, userManifest: Manifest, userBundle: Bundle, stylesResults: StylesResults) {
+function generateBundleCss(config: BuildConfig, ctx: BuildContext, projectManifest: Manifest, userBundle: Bundle, stylesResults: StylesResults) {
   // multiple modes can be on each component
   // and multiple components can be in each bundle
   // create css files with the common modes for the bundle's components
 
   // collect only the component meta data this bundle needs
-  const bundleComponentMeta = userBundle.components.sort().map(userBundleComponentTag => {
-    const foundComponentMeta = userManifest.components.find(manifestComponent => (
-      manifestComponent.tagNameMeta === userBundleComponentTag
+  const bundleModuleFiles = userBundle.components.sort().map(userBundleComponentTag => {
+    const foundComponentMeta = projectManifest.modulesFiles.find(modulesFile => (
+      modulesFile.cmpMeta.tagNameMeta === userBundleComponentTag
     ));
 
     if (!foundComponentMeta) {
-      buildError(stylesResults.diagnostics).messageText = `Component tag "${userBundleComponentTag.toLowerCase()}" is defined in a bundle but no matching component was found within this project or its collections.`;
+      buildError(ctx.diagnostics).messageText = `Component tag "${userBundleComponentTag.toLowerCase()}" is defined in a bundle but no matching component was found within this project or its collections.`;
     }
     return foundComponentMeta;
   }).filter(c => c);
 
   // figure out all of the possible modes this bundle has
   let bundleModes: string[] = [];
-  bundleComponentMeta
-    .filter(cmpMeta => cmpMeta.stylesMeta)
-    .forEach(cmpMeta => {
-      Object.keys(cmpMeta.stylesMeta).forEach(modeName => {
+
+  bundleModuleFiles
+    .filter(moduleFile => moduleFile.cmpMeta.stylesMeta)
+    .forEach(moduleFile => {
+      Object.keys(moduleFile.cmpMeta.stylesMeta).forEach(modeName => {
         if (bundleModes.indexOf(modeName) === -1) {
           bundleModes.push(modeName);
         }
@@ -67,10 +67,10 @@ function generateBundleCss(config: BuildConfig, ctx: BuildContext, userManifest:
   // go through each mode this bundle has
   // and create a css file for this each mode in this bundle
   return Promise.all(bundleModes.map(modeName => {
-    return generateModeCss(config, ctx, bundleComponentMeta, userBundle, modeName, stylesResults);
+    return generateModeCss(config, ctx, bundleModuleFiles, userBundle, modeName, stylesResults);
 
   })).catch(err => {
-    catchError(stylesResults.diagnostics, err);
+    catchError(ctx.diagnostics, err);
 
   }).then(() => {
     return stylesResults;
@@ -81,7 +81,7 @@ function generateBundleCss(config: BuildConfig, ctx: BuildContext, userManifest:
 function generateModeCss(
   config: BuildConfig,
   ctx: BuildContext,
-  bundleComponentMeta: ComponentMeta[],
+  bundleModuleFiles: ModuleFile[],
   userBundle: Bundle,
   modeName: string,
   stylesResults: StylesResults
@@ -90,15 +90,15 @@ function generateModeCss(
   // and create a css file for all the same modes
   const sys = config.sys;
 
-  return Promise.all(bundleComponentMeta.map(cmpMeta => {
-    return generateComponentModeStyles(config, ctx, cmpMeta, modeName, stylesResults);
+  return Promise.all(bundleModuleFiles.map(moduleFile => {
+    return generateComponentModeStyles(config, ctx, moduleFile, modeName);
 
   })).then(styleBundles => {
     const writeFile = styleBundles.some(s => s.writeFile);
     const styleContents = styleBundles.map(s => s.content);
 
     // tack on the visibility css to each component tag selector
-    styleContents.push(appendVisibilityCss(bundleComponentMeta));
+    styleContents.push(appendVisibilityCss(bundleModuleFiles));
 
     // let's join all bundled component mode css together
     let styleContent = styleContents.join('\n\n').trim();
@@ -114,7 +114,7 @@ function generateModeCss(
       // minify css
       const minifyCssResults = sys.minifyCss(styleContent);
       minifyCssResults.diagnostics.forEach(d => {
-        stylesResults.diagnostics.push(d);
+        ctx.diagnostics.push(d);
       });
 
       if (minifyCssResults.output) {
@@ -161,12 +161,11 @@ function generateModeCss(
 function generateComponentModeStyles(
   config: BuildConfig,
   ctx: BuildContext,
-  cmpMeta: ComponentMeta,
-  modeName: string,
-  stylesResults: StylesResults
+  moduleFile: ModuleFile,
+  modeName: string
 ) {
 
-  if (!cmpMeta.stylesMeta) {
+  if (!moduleFile.cmpMeta.stylesMeta) {
     const emptyStyleBundleDetails: StyleBundleDetails = {
       content: '',
       writeFile: false
@@ -174,7 +173,7 @@ function generateComponentModeStyles(
     return Promise.resolve(emptyStyleBundleDetails);
   }
 
-  const modeStyleMeta = cmpMeta.stylesMeta[modeName];
+  const modeStyleMeta = moduleFile.cmpMeta.stylesMeta[modeName];
 
   const promises: Promise<StyleBundleDetails>[] = [];
 
@@ -189,16 +188,16 @@ function generateComponentModeStyles(
 
         if (isSassFile(absStylePath)) {
           // sass file needs to be compiled
-          promises.push(compileScssFile(config, ctx, cmpMeta, absStylePath, styleCollection, stylesResults));
+          promises.push(compileScssFile(config, ctx, moduleFile, absStylePath, styleCollection));
 
         } else if (isCssFile(absStylePath)) {
           // plain ol' css file
-          promises.push(readCssFile(config, ctx, absStylePath, styleCollection, stylesResults));
+          promises.push(readCssFile(config, ctx, absStylePath, styleCollection));
 
         } else {
           // idk
-          const d = buildError(stylesResults.diagnostics);
-          d.messageText = `style url "${absStylePath}", on component "${cmpMeta.tagNameMeta.toLowerCase()}", is not a supported file type`;
+          const d = buildError(ctx.diagnostics);
+          d.messageText = `style url "${absStylePath}", on component "${moduleFile.cmpMeta.tagNameMeta.toLowerCase()}", is not a supported file type`;
         }
       });
     }
@@ -223,7 +222,7 @@ function generateComponentModeStyles(
 }
 
 
-function compileScssFile(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, absStylePath: string, styleCollection: StyleCollection, stylesResults: StylesResults): Promise<StyleBundleDetails> {
+function compileScssFile(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, absStylePath: string, styleCollection: StyleCollection): Promise<StyleBundleDetails> {
   const styleBundleDetails: StyleBundleDetails = {};
   const sys = config.sys;
 
@@ -235,7 +234,7 @@ function compileScssFile(config: BuildConfig, ctx: BuildContext, cmpMeta: Compon
     // if there are no filenames that match then let's not run sass
     // yes...there could be two files that have the same filename in different directories
     // but worst case scenario is that both of them run sass, which isn't a performance problem
-    const distFileName = sys.path.basename(cmpMeta.componentPath, '.js');
+    const distFileName = sys.path.basename(moduleFile.jsFilePath, '.js');
     const hasChangedFileName = ctx.changedFiles.some(f => {
       const changedFileName = sys.path.basename(f);
       return (changedFileName === distFileName + '.ts' || changedFileName === distFileName + '.tsx');
@@ -259,7 +258,7 @@ function compileScssFile(config: BuildConfig, ctx: BuildContext, cmpMeta: Compon
 
     sys.sass.render(sassConfig, (err, result) => {
       if (err) {
-        const d = buildError(stylesResults.diagnostics);
+        const d = buildError(ctx.diagnostics);
         d.absFilePath = absStylePath;
         d.messageText = err;
 
@@ -279,7 +278,7 @@ function compileScssFile(config: BuildConfig, ctx: BuildContext, cmpMeta: Compon
 }
 
 
-function readCssFile(config: BuildConfig, ctx: BuildContext, absStylePath: string, styleCollection: StyleCollection, stylesResults: StylesResults) {
+function readCssFile(config: BuildConfig, ctx: BuildContext, absStylePath: string, styleCollection: StyleCollection) {
   const styleBundleDetails: StyleBundleDetails = {};
 
   if (ctx.isChangeBuild && !ctx.changeHasCss) {
@@ -300,7 +299,7 @@ function readCssFile(config: BuildConfig, ctx: BuildContext, absStylePath: strin
     styleBundleDetails.writeFile = true;
 
   }).catch(err => {
-    const d = buildError(stylesResults.diagnostics);
+    const d = buildError(ctx.diagnostics);
     d.messageText = `Error opening CSS file. ${err}`;
     d.absFilePath = absStylePath;
 
@@ -310,10 +309,10 @@ function readCssFile(config: BuildConfig, ctx: BuildContext, absStylePath: strin
 }
 
 
-function appendVisibilityCss(bundleComponentMeta: ComponentMeta[]) {
+function appendVisibilityCss(bundleModuleFiles: ModuleFile[]) {
   // always tack this css to each component tag css
-  const selector = bundleComponentMeta.map(c => {
-    return `${c.tagNameMeta}.${HYDRATED_CSS}`;
+  const selector = bundleModuleFiles.map(moduleFile => {
+    return `${moduleFile.cmpMeta.tagNameMeta}.${HYDRATED_CSS}`;
   }).join(',\n');
 
   return `${selector} {\n  visibility: inherit;\n}`;

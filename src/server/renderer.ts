@@ -1,7 +1,7 @@
-import { BuildConfig, ComponentRegistry, HydrateOptions, HydrateResults, LoadComponentRegistry } from '../util/interfaces';
-import { BuildContext } from '../compiler/interfaces';
+import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions,
+  HydrateResults, LoadComponentRegistry } from '../util/interfaces';
 import { getBuildContext } from '../compiler/util';
-import { getRegistryJsonFilePath } from '../compiler/build/build-project-files';
+import { getRegistryJsonFilePath } from '../compiler/project/generate-project-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
 import { validateBuildConfig } from '../compiler/build/validation';

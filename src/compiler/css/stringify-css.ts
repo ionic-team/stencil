@@ -5,13 +5,13 @@
  * https://github.com/reworkcss/css/blob/master/LICENSE
  */
 import { getSelectors } from './get-selectors';
-import { HtmlUsedSelectors } from '../html/html-used-selectors';
+import { UsedSelectors } from '../html/used-selectors';
 
 
 export class StringifyCss {
-  usedSelectors: HtmlUsedSelectors;
+  usedSelectors: UsedSelectors;
 
-  constructor(usedSelectors: HtmlUsedSelectors) {
+  constructor(usedSelectors: UsedSelectors) {
     this.usedSelectors = usedSelectors;
   }
 

@@ -1,6 +1,5 @@
-import { BuildConfig, BuildContext, CompileResults } from '../interfaces';
+import { BuildConfig, BuildContext, CompileResults } from '../../util/interfaces';
 import { catchError, isTsFile, readFile, normalizePath } from '../util';
-import { generateManifest } from './manifest';
 import { getModuleFile } from '../transpile/compiler-host';
 import { transpile } from '../transpile/transpile';
 
@@ -14,8 +13,6 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
 
   const compileResults: CompileResults = {
     moduleFiles: {},
-    diagnostics: [],
-    manifest: {},
     includedSassFiles: []
   };
 
@@ -23,8 +20,6 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
     return transpile(config, ctx, compileResults.moduleFiles);
 
   }).then(transpileResults => {
-    compileResults.diagnostics = compileResults.diagnostics.concat(transpileResults.diagnostics);
-
     if (transpileResults.moduleFiles) {
       Object.keys(transpileResults.moduleFiles).forEach(tsFilePath => {
         const moduleFile = transpileResults.moduleFiles[tsFilePath];
@@ -46,13 +41,10 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
     }
 
   }).then(() => {
-    compileResults.manifest = generateManifest(config, ctx, compileResults);
-
-  }).then(() => {
     return copySourceSassFilesToDest(config, ctx, compileResults);
 
   }).catch(err => {
-    catchError(compileResults.diagnostics, err);
+    catchError(ctx.diagnostics, err);
 
   }).then(() => {
     timeSpan.finish(`compile finished`);
@@ -94,7 +86,7 @@ function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileRes
           sys.fs.stat(readPath, (err, stats) => {
             if (err) {
               // derp, not sure what's up here, let's just print out the error
-              catchError(compileResults.diagnostics, err);
+              catchError(ctx.diagnostics, err);
               resolve();
 
             } else if (stats.isDirectory()) {

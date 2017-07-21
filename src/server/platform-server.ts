@@ -1,6 +1,5 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
-import { BuildContext } from '../compiler/interfaces';
-import { ComponentMeta, ComponentRegistry,
+import { BuildContext, ComponentMeta, ComponentRegistry,
   DomApi, DomControllerApi, FilesMap, HostElement, ListenOptions, Logger,
   ModuleCallbacks, PlatformApi, ProjectGlobal, StencilSystem } from '../util/interfaces';
 import { createRenderer } from '../core/renderer/patch';
@@ -83,15 +82,18 @@ export function createPlatformServer(
 
 
   function getComponentMeta(elm: Element) {
-    return registry[elm.tagName];
+    // registry tags are always UPPER-CASE
+    return registry[elm.tagName.toUpperCase()];
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
-    registry[cmpMeta.tagNameMeta] = cmpMeta;
+    // registry tags are always UPPER-CASE
+    const registryTag = cmpMeta.tagNameMeta.toUpperCase();
+    registry[registryTag] = cmpMeta;
 
     if (cmpMeta.componentModuleMeta) {
       // for unit testing
-      moduleImports[cmpMeta.tagNameMeta] = cmpMeta.componentModuleMeta;
+      moduleImports[registryTag] = cmpMeta.componentModuleMeta;
     }
   }
 
@@ -168,7 +170,7 @@ export function createPlatformServer(
 
       // we also need to load this component's css file
       // we're already figured out and set "mode" as a property to the element
-      const styleId = cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$;
+      const styleId = cmpMeta.styleIds && (cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$);
       if (styleId) {
         // we've got a style id to load up
         // create the style filePath we'll be reading

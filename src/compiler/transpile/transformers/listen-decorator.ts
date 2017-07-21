@@ -1,9 +1,9 @@
 import { catchError } from '../../util';
-import { Diagnostic, ListenMeta, ModuleFileMeta } from '../../interfaces';
+import { Diagnostic, ListenMeta, ModuleFile } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
-export function getListenDecoratorMeta(moduleFile: ModuleFileMeta, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
   moduleFile.cmpMeta.listenersMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
@@ -66,7 +66,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFileMeta, diagnostics: 
 }
 
 
-function validateListener(fileMeta: ModuleFileMeta, eventName: string, rawListenMeta: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
+function validateListener(fileMeta: ModuleFile, eventName: string, rawListenMeta: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
   eventName = eventName.trim();
   if (!eventName) return;
 

@@ -1,13 +1,13 @@
 import { BuildConfig } from '../../../util/interfaces';
-import { HtmlUsedSelectors } from '../../html/html-used-selectors';
 import { mockHtml } from '../../../test';
 import { removeUnusedCss } from '../remove-unused-css';
+import { UsedSelectors } from '../../html/used-selectors';
 
 
 describe('removeUnusedCss', () => {
 
   it('should remove unused nested selectors', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <div dir="ltr">
         <h1>Used</h1>
         <h2>Used</h2>
@@ -24,7 +24,7 @@ describe('removeUnusedCss', () => {
   });
 
   it('should remove unused nested selectors', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <div>
         <button id="usedId" class="my-used" mph="88">Unused</button>
       </div>
@@ -45,7 +45,7 @@ describe('removeUnusedCss', () => {
   });
 
   it('should keep used nested selectors', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <div>
         <label id="usedId" class="my-used" mph="88">Used</label>
       </div>
@@ -69,7 +69,7 @@ describe('removeUnusedCss', () => {
   });
 
   it('should remove unused id selector', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <div>
         <label id="usedId">Used</label>
         <div id="another-UsedId">Used</div>
@@ -92,7 +92,7 @@ describe('removeUnusedCss', () => {
   });
 
   it('should remove unused attr selector', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <label mph="88">Used</label>
     `));
 
@@ -108,7 +108,7 @@ describe('removeUnusedCss', () => {
   });
 
   it('should remove unused tag selector', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <label class="div">Used</label>
     `));
 
@@ -122,7 +122,7 @@ describe('removeUnusedCss', () => {
   });
 
   it('should remove unused classname in multi-selector', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <div class="used-class"></div>
     `));
 
@@ -137,7 +137,7 @@ describe('removeUnusedCss', () => {
   });
 
   it('should remove unused classname', () => {
-    let usedSelectors = new HtmlUsedSelectors(mockHtml(`
+    let usedSelectors = new UsedSelectors(mockHtml(`
       <div class="used-class"></div>
     `));
 

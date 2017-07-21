@@ -1,14 +1,13 @@
-import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic,
-  FilesMap, Manifest, ModuleResults } from '../interfaces';
+import { BuildConfig, BuildContext, Bundle, Diagnostic, FilesMap,
+  Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
 import { buildError, buildWarn, catchError, generatePreamble, normalizePath } from '../util';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
 
-export function bundleModules(config: BuildConfig, ctx: BuildContext, userManifest: Manifest) {
+export function bundleModules(config: BuildConfig, ctx: BuildContext) {
   // create main module results object
   const moduleResults: ModuleResults = {
-    bundles: {},
-    diagnostics: []
+    bundles: {}
   };
 
   // do bundling if this is not a change build
@@ -17,11 +16,11 @@ export function bundleModules(config: BuildConfig, ctx: BuildContext, userManife
 
   const timeSpan = config.logger.createTimeSpan(`bundle modules started`, !doBundling);
 
-  return Promise.all(userManifest.bundles.map(userBundle => {
-    return generateDefineComponents(config, ctx, userManifest, userBundle, moduleResults);
+  return Promise.all(ctx.manifest.bundles.map(userBundle => {
+    return generateDefineComponents(config, ctx, ctx.manifest, userBundle, moduleResults);
 
   })).catch(err => {
-    catchError(moduleResults.diagnostics, err);
+    catchError(ctx.diagnostics, err);
 
   }).then(() => {
     timeSpan.finish('bundle modules finished');
@@ -30,20 +29,23 @@ export function bundleModules(config: BuildConfig, ctx: BuildContext, userManife
 }
 
 
-function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userManifest: Manifest, userBundle: Bundle, moduleResults: ModuleResults) {
+function generateDefineComponents(config: BuildConfig, ctx: BuildContext, projectManifest: Manifest, userBundle: Bundle, moduleResults: ModuleResults) {
   const sys = config.sys;
 
-  const bundleComponentMeta = userBundle.components.map(userBundleComponentTag => {
-    const cmpMeta = userManifest.components.find(c => c.tagNameMeta === userBundleComponentTag);
+  const bundleModuleFiles = userBundle.components.map(userBundleComponentTag => {
+    const cmpMeta = projectManifest.modulesFiles.find(moduleFile => {
+      return moduleFile.cmpMeta.tagNameMeta === userBundleComponentTag;
+    });
+
     if (!cmpMeta) {
-      const d = buildError(moduleResults.diagnostics);
+      const d = buildError(ctx.diagnostics);
       d.messageText = `Unable to find component "${userBundleComponentTag}" in available config and collection.`;
     }
     return cmpMeta;
   }).filter(c => !!c);
 
-  if (!bundleComponentMeta.length) {
-    const d = buildError(moduleResults.diagnostics);
+  if (!bundleModuleFiles.length) {
+    const d = buildError(ctx.diagnostics);
     d.messageText = `No components found to bundle`;
     return Promise.resolve(moduleResults);
   }
@@ -51,20 +53,20 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userMa
   const bundleId = generateBundleId(userBundle.components);
 
   // loop through each bundle the user wants and create the "defineComponents"
-  return bundleComponentModules(config, ctx, bundleComponentMeta, bundleId, moduleResults).then(bundleDetails => {
+  return bundleComponentModules(config, ctx, bundleModuleFiles, bundleId).then(bundleDetails => {
 
     // format all the JS bundle content
     // insert the already bundled JS module into the defineComponents function
     let moduleContent = formatDefineComponents(
       config.namespace, STENCIL_BUNDLE_ID,
-      bundleDetails.content, bundleComponentMeta
+      bundleDetails.content, bundleModuleFiles
     );
 
     if (config.minifyJs) {
       // minify js
       const minifyJsResults = sys.minifyJs(moduleContent);
       minifyJsResults.diagnostics.forEach(d => {
-        moduleResults.diagnostics.push(d);
+        ctx.diagnostics.push(d);
       });
 
       if (minifyJsResults.output) {
@@ -100,7 +102,7 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userMa
     }
 
   }).catch(err => {
-    catchError(moduleResults.diagnostics, err);
+    catchError(ctx.diagnostics, err);
 
   }).then(() => {
     return moduleResults;
@@ -108,7 +110,7 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, userMa
 }
 
 
-function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleComponentMeta: ComponentMeta[], bundleId: string, moduleResults: ModuleResults) {
+function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleModuleFiles: ModuleFile[], bundleId: string) {
   const bundleDetails: ModuleBundleDetails = {};
   const sys = config.sys;
 
@@ -124,20 +126,20 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleCo
 
   // loop through all the components this bundle needs
   // and generate a string of the JS file to be generated
-  bundleComponentMeta.sort((a, b) => {
-    if (a.tagNameMeta.toLowerCase() < b.tagNameMeta.toLowerCase()) return -1;
-    if (a.tagNameMeta.toLowerCase() > b.tagNameMeta.toLowerCase()) return 1;
+  bundleModuleFiles.sort((a, b) => {
+    if (a.cmpMeta.tagNameMeta.toLowerCase() < b.cmpMeta.tagNameMeta.toLowerCase()) return -1;
+    if (a.cmpMeta.tagNameMeta.toLowerCase() > b.cmpMeta.tagNameMeta.toLowerCase()) return 1;
     return 0;
 
-  }).forEach(cmpMeta => {
+  }).forEach(moduleFile => {
     // create a full path to the modules to import
-    let importPath = cmpMeta.componentPath;
+    let importPath = moduleFile.jsFilePath;
 
     // manually create the content for our temporary entry file for the bundler
-    entryFileLines.push(`import { ${cmpMeta.componentClass} } from "${importPath}";`);
+    entryFileLines.push(`import { ${moduleFile.cmpMeta.componentClass} } from "${importPath}";`);
 
     // export map should always use UPPER CASE tag name
-    entryFileLines.push(`exports['${cmpMeta.tagNameMeta.toUpperCase()}'] = ${cmpMeta.componentClass};`);
+    entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${moduleFile.cmpMeta.componentClass};`);
   });
 
   // create the entry file for the bundler
@@ -152,8 +154,8 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleCo
     // if there are no filenames that match then let's not bundle
     // yes...there could be two files that have the same filename in different directories
     // but worst case scenario is that both of them run their bundling, which isn't a performance problem
-    const hasChangedFileName = bundleComponentMeta.some(cmpMeta => {
-      const distFileName = sys.path.basename(cmpMeta.componentPath, '.js');
+    const hasChangedFileName = bundleModuleFiles.some(moduleFile => {
+      const distFileName = sys.path.basename(moduleFile.jsFilePath, '.js');
       return ctx.changedFiles.some(f => {
         const changedFileName = sys.path.basename(f);
         return (changedFileName === distFileName + '.ts' || changedFileName === distFileName + '.tsx');
@@ -184,7 +186,7 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleCo
       entryInMemoryPlugin(STENCIL_BUNDLE_ID, moduleBundleInput),
       transpiledInMemoryPlugin(config, ctx)
     ],
-    onwarn: createOnWarnFn(moduleResults.diagnostics, bundleComponentMeta)
+    onwarn: createOnWarnFn(ctx.diagnostics, bundleModuleFiles)
 
   }).catch(err => {
     throw err;
@@ -213,7 +215,7 @@ interface ModuleBundleDetails {
 }
 
 
-export function createOnWarnFn(diagnostics: Diagnostic[], bundleComponentMeta?: ComponentMeta[]) {
+export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
   const previousWarns: {[key: string]: boolean} = {};
 
   return function onWarningMessage(warning: any) {
@@ -223,8 +225,8 @@ export function createOnWarnFn(diagnostics: Diagnostic[], bundleComponentMeta?: 
     previousWarns[warning.message] = true;
 
     let label = '';
-    if (bundleComponentMeta) {
-      label = bundleComponentMeta.map(c => c.tagNameMeta).join(', ').trim();
+    if (bundleModulesFiles) {
+      label = bundleModulesFiles.map(moduleFile => moduleFile.cmpMeta.tagNameMeta).join(', ').trim();
       if (label.length) {
         label += ': ';
       }

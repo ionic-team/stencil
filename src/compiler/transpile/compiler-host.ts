@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, ModuleFileMeta, TranspileResults } from '../interfaces';
+import { BuildConfig, BuildContext, ModuleFile, TranspileResults } from '../../util/interfaces';
 import { normalizePath, readFile } from '../util';
 import * as ts from 'typescript';
 
@@ -51,13 +51,6 @@ export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOpti
       // cache the js content
       ctx.jsFiles[jsFilePath] = jsText;
 
-      if (moduleFile.cmpMeta) {
-        // if this module has component meta data, then
-        // also update the component meta's component path
-        // which should be an absolute url to the compiled js output file
-        moduleFile.cmpMeta.componentPath = jsFilePath;
-      }
-
       // add this module to the list of files that were just transpiled
       transpileResults.moduleFiles[tsFilePath] = moduleFile;
     });
@@ -68,7 +61,7 @@ export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOpti
 }
 
 
-export function getModuleFile(config: BuildConfig, ctx: BuildContext, tsFilePath: string): Promise<ModuleFileMeta> {
+export function getModuleFile(config: BuildConfig, ctx: BuildContext, tsFilePath: string): Promise<ModuleFile> {
   tsFilePath = normalizePath(tsFilePath);
 
   let moduleFile = ctx.moduleFiles[tsFilePath];

@@ -1,6 +1,8 @@
-import { AssetsMeta, BuildConfig, Bundle, ComponentMeta, Manifest, ModuleFileMeta,
-  ListenMeta, PropChangeMeta, PropMeta, StyleMeta } from '../interfaces';
-import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
+import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
+  ComponentMeta, ComponentData, Manifest, ManifestData, ModuleFile, ListenerData,
+  ListenMeta, PropChangeData, PropChangeMeta, PropData, PropMeta, StyleData, StyleMeta } from '../../util/interfaces';
+import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS,
+  PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
@@ -11,7 +13,28 @@ import { normalizePath } from '../util';
 // couple core component meta data between specific versions of the compiler
 
 
-export function serializeManifest(config: BuildConfig, manifestDir: string, manifestModulesFiles: ModuleFileMeta[]) {
+export function writeProjectManifest(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+
+  // get the absolute path to the directory where the manifest will be saved
+  const manifestDir = normalizePath(config.collectionDir);
+
+  // create an absolute file path to the actual manifest json file
+  const manifestFilePath = normalizePath(config.sys.path.join(manifestDir, COLLECTION_MANIFEST_FILE_NAME));
+
+  config.logger.debug(`manifest, serializeProjectManifest: ${manifestFilePath}`);
+
+  // serialize the manifest into a json string and
+  // add it to the list of files we need to write when we're ready
+  buildResults.manifest = serializeProjectManifest(config, manifestDir, ctx.manifest);
+
+  if (config.generateCollection) {
+    // don't bother serializing/writing the manifest if we're not creating a collection
+    ctx.filesToWrite[manifestFilePath] = JSON.stringify(buildResults.manifest, null, 2);
+  }
+}
+
+
+export function serializeProjectManifest(config: BuildConfig, manifestDir: string, manifest: Manifest) {
   // create the single manifest we're going to fill up with data
   const manifestData: ManifestData = {
     components: [],
@@ -19,10 +42,12 @@ export function serializeManifest(config: BuildConfig, manifestDir: string, mani
   };
 
   // add component data for each of the manifest files
-  manifestModulesFiles.forEach(manifestModulesFile => {
-    const cmpData = serializeComponent(config, manifestDir, manifestModulesFile);
-    if (cmpData) {
-      manifestData.components.push(cmpData);
+  manifest.modulesFiles.forEach(modulesFile => {
+    if (!modulesFile.isCollectionDependency) {
+      const cmpData = serializeComponent(config, manifestDir, modulesFile);
+      if (cmpData) {
+        manifestData.components.push(cmpData);
+      }
     }
   });
 
@@ -36,39 +61,46 @@ export function serializeManifest(config: BuildConfig, manifestDir: string, mani
   // add to the manifest what the bundles should be
   serializeBundles(config, manifestData);
 
+  // set the global path if it exists
+  serializeProjectGlobal(config, manifestDir, manifestData, manifest);
+
   // success!
-  return JSON.stringify(manifestData, null, 2);
+  return manifestData;
 }
 
 
-export function parseManifest(config: BuildConfig, manifestDir: string, manifestJson: string) {
+export function parseDependentManifest(config: BuildConfig, collectionName: string, manifestDir: string, manifestJson: string) {
   const manifestData: ManifestData = JSON.parse(manifestJson);
-  const manifest: Manifest = {};
+  const manifest: Manifest = {
+    manifestName: collectionName
+  };
 
-  parseComponents(config, manifestDir, manifestData, manifest);
+  parseComponents(config, true, manifestDir, manifestData, manifest);
   parseBundles(manifestData, manifest);
+  parseGlobal(config, manifestDir, manifestData, manifest);
 
   return manifest;
 }
 
 
-function parseComponents(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+function parseComponents(config: BuildConfig, isCollectionDependency: boolean, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
   const componentsData = manifestData.components;
 
-  manifest.components = [];
+  manifest.modulesFiles = [];
 
   if (componentsData && Array.isArray(componentsData)) {
     componentsData.forEach(cmpData => {
-      const cmpMeta = parseComponent(config, manifestDir, cmpData);
-      if (cmpMeta) {
-        manifest.components.push(cmpMeta);
+      const moduleFile = parseComponent(config, manifestDir, cmpData);
+      if (moduleFile) {
+        moduleFile.isCollectionDependency = isCollectionDependency;
+        manifest.modulesFiles.push(moduleFile);
       }
     });
   }
 }
 
 
-export function serializeComponent(config: BuildConfig, manifestDir: string, moduleFile: ModuleFileMeta) {
+export function serializeComponent(config: BuildConfig, manifestDir: string, moduleFile: ModuleFile) {
   if (!moduleFile || !moduleFile.cmpMeta) return null;
 
   const cmpData: ComponentData = {};
@@ -104,11 +136,14 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
 
 
 export function parseComponent(config: BuildConfig, manifestDir: string, cmpData: ComponentData) {
-  const cmpMeta: ComponentMeta = {};
+  const moduleFile: ModuleFile = {
+    cmpMeta: {}
+  };
+  const cmpMeta = moduleFile.cmpMeta;
 
   parseTag(cmpData, cmpMeta);
   parseComponentClass(cmpData, cmpMeta);
-  parseComponentPath(config, manifestDir, cmpData, cmpMeta);
+  parseModuleJsFilePath(config, manifestDir, cmpData, moduleFile);
   parseStyles(config, manifestDir, cmpData, cmpMeta);
   parseAssetsDir(config, manifestDir, cmpData, cmpMeta);
   parseProps(cmpData, cmpMeta);
@@ -122,7 +157,7 @@ export function parseComponent(config: BuildConfig, manifestDir: string, cmpData
   parseSlots(cmpData, cmpMeta);
   parseLoadPriority(cmpData, cmpMeta);
 
-  return cmpMeta;
+  return moduleFile;
 }
 
 
@@ -140,9 +175,10 @@ function serializeComponentPath(config: BuildConfig, manifestDir: string, compil
   cmpData.componentPath = normalizePath(config.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
 }
 
-function parseComponentPath(config: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  // convert the path that's relative to the manifest file into an absolute path to the component file
-  cmpMeta.componentPath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
+function parseModuleJsFilePath(config: BuildConfig, manifestDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
+  // convert the path that's relative to the manifest file
+  // into an absolute path to the component's js file path
+  moduleFile.jsFilePath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
 }
 
 
@@ -581,72 +617,24 @@ export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
 }
 
 
+export function serializeProjectGlobal(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+  if (!manifest.global) {
+    return;
+  }
+
+  manifestData.global = normalizePath(config.sys.path.relative(manifestDir, manifest.global.jsFilePath));
+}
+
+
+export function parseGlobal(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+  if (typeof manifestData.global !== 'string') return;
+
+  manifest.global = {
+    jsFilePath: normalizePath(config.sys.path.join(manifestDir, manifestData.global))
+  };
+}
+
+
 function invalidArrayData(arr: any[]) {
   return (!arr || !Array.isArray(arr) || arr.length === 0);
-}
-
-
-// this maps the json data to our internal data structure
-// apping is so that the internal data structure "could"
-// change, but the external user data will always use the same api
-// consider these property values to be locked in as is
-// there should be a VERY good reason to have to rename them
-// DO NOT UPDATE PROPERTY KEYS COMING FROM THE INPUT DATA!!
-// DO NOT UPDATE PROPERTY KEYS COMING FROM THE INPUT DATA!!
-// DO NOT UPDATE PROPERTY KEYS COMING FROM THE INPUT DATA!!
-
-export interface ManifestData {
-  bundles?: BundleData[];
-  components?: ComponentData[];
-}
-
-export interface BundleData {
-  components?: string[];
-  priority?: 'low';
-}
-
-export interface ComponentData {
-  tag?: string;
-  componentPath?: string;
-  componentClass?: string;
-  styles?: StylesData;
-  props?: PropData[];
-  propsWillChange?: PropChangeData[];
-  propsDidChange?: PropChangeData[];
-  states?: string[];
-  listeners?: ListenerData[];
-  methods?: string[];
-  host?: any;
-  assetPaths?: string[];
-  slot?: 'hasSlots'|'hasNamedSlots';
-  shadow?: boolean;
-  priority?: 'low';
-}
-
-export interface StylesData {
-  [modeName: string]: StyleData;
-}
-
-export interface StyleData {
-  stylePaths?: string[];
-  style?: string;
-}
-
-export interface PropData {
-  name?: string;
-  type?: 'boolean'|'number';
-  stateful?: boolean;
-}
-
-export interface PropChangeData {
-  name: string;
-  method: string;
-}
-
-export interface ListenerData {
-  event: string;
-  method: string;
-  capture?: boolean;
-  passive?: boolean;
-  enabled?: boolean;
 }

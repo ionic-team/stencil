@@ -1,6 +1,5 @@
 import { build } from '../build';
-import { BuildConfig, ComponentRegistry } from '../../../util/interfaces';
-import { BuildContext, BuildResults } from '../../interfaces';
+import { BuildConfig, BuildContext, BuildResults, ComponentRegistry } from '../../../util/interfaces';
 // import { CommandLineLogger } from '../../logger/command-line-logger';
 import { mockBuildConfig } from '../../../test';
 import { parseComponentRegistry } from '../../../util/data-parse';
@@ -83,8 +82,8 @@ describe('build', () => {
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
-        writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA { constructor() { console.log('hi'); } }`);
-        writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB { constructor() { console.log('hi'); }}`);
+        writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA { constructor() { 'hi'; } }`);
+        writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB { constructor() { 'hi'; }}`);
         ctx.watcher.$triggerEvent('change', '/src/cmp-a.tsx');
         ctx.watcher.$triggerEvent('change', '/src/cmp-b.tsx');
 
@@ -282,7 +281,7 @@ describe('build', () => {
     config.watch = true;
     writeFileSync('/src/cmp-a.tsx', `import { MyService } from './service'; @Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
-    writeFileSync('/src/service.tsx', `export class MyService { test() { console.log('test'); } }`);
+    writeFileSync('/src/service.tsx', `export class MyService { test() { 'test'; } }`);
 
     return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
@@ -379,7 +378,7 @@ describe('build', () => {
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
-        writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA { constructor() { console.log('file change'); } }`);
+        writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA { constructor() { 'file change'; } }`);
         ctx.watcher.$triggerEvent('change', '/src/cmp-a.tsx');
 
       }).then((r: BuildResults) => {
@@ -415,7 +414,7 @@ describe('build', () => {
 
       return new Promise(resolve => {
         ctx.onFinish = resolve;
-        writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'sass-a.scss' }) export class CmpA { constructor() { console.log('file change'); } }`);
+        writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'sass-a.scss' }) export class CmpA { constructor() { 'file change'; } }`);
         ctx.watcher.$triggerEvent('change', '/src/cmp-a.tsx');
 
       }).then((r: BuildResults) => {
@@ -461,7 +460,7 @@ describe('build', () => {
 
     return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
-      expect(r.componentRegistry.length).toBe(1);
+      expect(r.manifest.components.length).toBe(1);
       expect(ctx.transpileBuildCount).toBe(1);
       expect(ctx.sassBuildCount).toBe(1);
       expect(ctx.moduleBundleCount).toBe(1);
@@ -470,27 +469,26 @@ describe('build', () => {
       expect(wroteFile(r, 'cmp-a.js')).toBe(true);
       expect(wroteFile(r, 'cmp-a.css')).toBe(true);
 
-      const cmpMeta = parseComponentRegistry(r.componentRegistry[0], registry);
-      expect(cmpMeta.tagNameMeta).toBe('CMP-A');
-      expect(cmpMeta.styleIds).toEqual({'$': 'cmp-a'});
+      const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
+      expect(cmpMeta.styles.$.stylePaths[0]).toEqual('cmp-a.scss');
     });
   });
 
   it('should build one component w/ no styles', () => {
     ctx = {};
     config.bundles = [ { components: ['cmp-a'] } ];
-    writeFileSync('/src/cmpa-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
 
     return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(0);
-      expect(r.componentRegistry.length).toBe(1);
+      expect(r.manifest.components.length).toBe(1);
       expect(ctx.transpileBuildCount).toBe(1);
       expect(ctx.sassBuildCount).toBe(0);
       expect(ctx.moduleBundleCount).toBe(1);
       expect(ctx.styleBundleCount).toBe(0);
 
-      const cmpMeta = parseComponentRegistry(r.componentRegistry[0], registry);
-      expect(cmpMeta.tagNameMeta).toBe('CMP-A');
+      const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
+      expect(cmpMeta).toBeDefined();
     });
   });
 
@@ -498,7 +496,7 @@ describe('build', () => {
     ctx = {};
     return build(config, ctx).then(r => {
       expect(r.diagnostics.length).toBe(1);
-      expect(r.componentRegistry.length).toBe(0);
+      expect(r.manifest.components.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(0);
       expect(ctx.sassBuildCount).toBe(0);
       expect(ctx.moduleBundleCount).toBe(0);

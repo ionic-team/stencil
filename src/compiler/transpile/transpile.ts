@@ -1,4 +1,5 @@
-import { BuildConfig, BuildContext, Diagnostic, ModuleFileMeta, ModuleFiles, StencilSystem, TranspileResults } from '../interfaces';
+import { BuildConfig, BuildContext, Diagnostic, ModuleFile,
+  ModuleFiles, StencilSystem, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath } from '../util';
 import { componentClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
@@ -13,15 +14,14 @@ import * as ts from 'typescript';
 export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
 
   const transpileResults: TranspileResults = {
-    moduleFiles: {},
-    diagnostics: []
+    moduleFiles: {}
   };
 
   return Promise.resolve().then(() => {
     // transpiling is synchronous
     transpileModules(config, ctx, moduleFiles, transpileResults);
 
-    if (transpileResults.diagnostics.length) {
+    if (ctx.diagnostics.length) {
       // looks like we've got some transpile errors
       // let's not continue with processing included styles
       return Promise.resolve([]);
@@ -32,11 +32,11 @@ export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 
     return Promise.all(transpiledFileNames.map(transpiledFileName => {
       const moduleFile = transpileResults.moduleFiles[transpiledFileName];
-      return processIncludedStyles(config, ctx, transpileResults.diagnostics, moduleFile);
+      return processIncludedStyles(config, ctx, moduleFile);
     }));
 
   }).catch(err => {
-    catchError(transpileResults.diagnostics, err);
+    catchError(ctx.diagnostics, err);
 
   }).then(() => {
     return transpileResults;
@@ -75,7 +75,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   // this is the big one, let's go ahead and kick off the transpiling
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
-      componentClass(config, ctx.moduleFiles, transpileResults.diagnostics),
+      componentClass(config, ctx.moduleFiles, ctx.diagnostics),
       removeImports(),
       updateLifecycleMethods()
     ],
@@ -92,7 +92,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     const tsDiagnostics = program.getSyntacticDiagnostics()
       .concat(program.getSemanticDiagnostics(), program.getOptionsDiagnostics());
 
-    loadTypeScriptDiagnostics(config, transpileResults.diagnostics, tsDiagnostics);
+    loadTypeScriptDiagnostics(config, ctx.diagnostics, tsDiagnostics);
   }
 }
 
@@ -119,7 +119,7 @@ function getChangeBuildModules(ctx: BuildContext, moduleFiles: ModuleFiles) {
 }
 
 
-function processIncludedStyles(config: BuildConfig, ctx: BuildContext, diagnostics: Diagnostic[], moduleFile: ModuleFileMeta) {
+function processIncludedStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile) {
   if (ctx.isChangeBuild && !ctx.changeHasSass && !ctx.changeHasCss) {
     // this is a change, but it's not for any styles so don't bother
     return Promise.resolve([]);
@@ -146,7 +146,7 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, diagnosti
           // this componet mode has a sass file, let's see which
           // sass files are included in it
           promises.push(
-            getIncludedSassFiles(sys, diagnostics, moduleFile, absoluteStylePath)
+            getIncludedSassFiles(sys, ctx.diagnostics, moduleFile, absoluteStylePath)
           );
         }
       });
@@ -158,7 +158,7 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, diagnosti
 }
 
 
-function getIncludedSassFiles(sys: StencilSystem, diagnostics: Diagnostic[], moduleFile: ModuleFileMeta, scssFilePath: string) {
+function getIncludedSassFiles(sys: StencilSystem, diagnostics: Diagnostic[], moduleFile: ModuleFile, scssFilePath: string) {
   return new Promise(resolve => {
     scssFilePath = normalizePath(scssFilePath);
 

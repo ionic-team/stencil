@@ -1,8 +1,8 @@
-import { ModuleFileMeta } from '../../interfaces';
+import { ModuleFile } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
-export function getStateDecoratorMeta(fileMeta: ModuleFileMeta, classNode: ts.ClassDeclaration) {
+export function getStateDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassDeclaration) {
   fileMeta.cmpMeta.statesMeta = [];
 
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);

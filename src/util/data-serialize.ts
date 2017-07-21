@@ -1,5 +1,5 @@
-import { ComponentMeta, ComponentRegistry, MethodMeta, ListenMeta, LoadComponentRegistry,
-  Bundle, PropChangeMeta, PropMeta, StateMeta, StylesMeta } from './interfaces';
+import { Bundle, ComponentMeta, ComponentRegistry, ListenMeta, LoadComponentRegistry, MethodMeta,
+  ModuleFile, PropChangeMeta, PropMeta, StateMeta, StylesMeta } from './interfaces';
 import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, HAS_SLOTS, HAS_NAMED_SLOTS, TYPE_NUMBER } from '../util/constants';
 
 
@@ -103,18 +103,18 @@ export function formatDefineComponents(
     namespace: string,
     moduleId: string,
     moduleBundleOutput: string,
-    components: ComponentMeta[]
+    moduleFiles: ModuleFile[]
   ) {
 
   // ensure we've got a standard order of the components
-  components = components.sort((a, b) => {
-    if (a.tagNameMeta < b.tagNameMeta) return -1;
-    if (a.tagNameMeta > b.tagNameMeta) return 1;
+  moduleFiles = moduleFiles.sort((a, b) => {
+    if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
+    if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
     return 0;
   });
 
-  const componentMetaStr = components.map(cmpMeta => {
-    return formatComponentMeta(cmpMeta);
+  const componentMetaStr = moduleFiles.map(moduleFile => {
+    return formatComponentMeta(moduleFile.cmpMeta);
   }).join(',\n');
 
   return [

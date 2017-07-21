@@ -1,10 +1,10 @@
 import { BuildConfig, Diagnostic } from '../../util/interfaces';
-import { HtmlUsedSelectors } from '../html/html-used-selectors';
 import { parseCss } from './parse-css';
 import { StringifyCss } from './stringify-css';
+import { UsedSelectors } from '../html/used-selectors';
 
 
-export function removeUnusedCss(config: BuildConfig, usedSelectors: HtmlUsedSelectors, cssContent: string, cssFilePath?: string, diagnostics?: Diagnostic[]) {
+export function removeUnusedCss(config: BuildConfig, usedSelectors: UsedSelectors, cssContent: string, cssFilePath?: string, diagnostics?: Diagnostic[]) {
   let cleanedCss = cssContent;
 
   try {

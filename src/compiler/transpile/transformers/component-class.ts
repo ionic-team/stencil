@@ -1,4 +1,4 @@
-import { BuildConfig, Diagnostic, ModuleFiles, ModuleFileMeta } from '../../interfaces';
+import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile } from '../../../util/interfaces';
 import { buildError } from '../../util';
 import { getComponentDecoratorData } from './component-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
@@ -13,7 +13,7 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
 
   return (transformContext) => {
 
-    function visitClass(moduleFile: ModuleFileMeta, classNode: ts.ClassDeclaration) {
+    function visitClass(moduleFile: ModuleFile, classNode: ts.ClassDeclaration) {
       const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
 
       if (cmpMeta) {
@@ -41,7 +41,7 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
     }
 
 
-    function visit(fileMeta: ModuleFileMeta, node: ts.Node): ts.VisitResult<ts.Node> {
+    function visit(fileMeta: ModuleFile, node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:

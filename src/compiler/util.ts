@@ -1,15 +1,20 @@
 import { BANNER } from '../util/constants';
-import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from './interfaces';
+import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from '../util/interfaces';
 
 
 export function getBuildContext(ctx: BuildContext) {
   // create the build context if it doesn't exist
   ctx = ctx || {};
+
+  ctx.diagnostics = ctx.diagnostics || [];
+  ctx.manifest = ctx.manifest || {};
+  ctx.registry = ctx.registry || {};
   ctx.filesToWrite = ctx.filesToWrite || {};
   ctx.projectFiles = ctx.projectFiles || {};
   ctx.moduleFiles = ctx.moduleFiles || {};
   ctx.jsFiles = ctx.jsFiles || {};
   ctx.cssFiles = ctx.cssFiles || {};
+  ctx.dependentManifests = ctx.dependentManifests || {};
   ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
   ctx.styleSassOutputs = ctx.styleSassOutputs || {};
   ctx.changedFiles = ctx.changedFiles || [];
@@ -18,7 +23,10 @@ export function getBuildContext(ctx: BuildContext) {
 }
 
 
-export function resetBuildContextCounts(ctx: BuildContext) {
+export function resetBuildContext(ctx: BuildContext) {
+  ctx.registry = {};
+  ctx.manifest = {};
+  ctx.diagnostics = [];
   ctx.sassBuildCount = 0;
   ctx.transpileBuildCount = 0;
   ctx.indexBuildCount = 0;
@@ -29,6 +37,10 @@ export function resetBuildContextCounts(ctx: BuildContext) {
 
 export function getJsFile(sys: StencilSystem, ctx: BuildContext, jsFilePath: string) {
   jsFilePath = normalizePath(jsFilePath);
+
+  if (typeof ctx.filesToWrite[jsFilePath] === 'string') {
+    return Promise.resolve(ctx.filesToWrite[jsFilePath]);
+  }
 
   if (typeof ctx.jsFiles[jsFilePath] === 'string') {
     return Promise.resolve(ctx.jsFiles[jsFilePath]);
@@ -50,7 +62,11 @@ export function getJsFile(sys: StencilSystem, ctx: BuildContext, jsFilePath: str
 export function getCssFile(sys: StencilSystem, ctx: BuildContext, cssFilePath: string) {
   cssFilePath = normalizePath(cssFilePath);
 
-  if (typeof ctx.jsFiles[cssFilePath] === 'string') {
+  if (typeof ctx.filesToWrite[cssFilePath] === 'string') {
+    return Promise.resolve(ctx.filesToWrite[cssFilePath]);
+  }
+
+  if (typeof ctx.cssFiles[cssFilePath] === 'string') {
     return Promise.resolve(ctx.cssFiles[cssFilePath]);
   }
 
@@ -70,19 +86,6 @@ export function getCssFile(sys: StencilSystem, ctx: BuildContext, cssFilePath: s
 export function readFile(sys: StencilSystem, filePath: string) {
   return new Promise<string>((resolve, reject) => {
     sys.fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
-
-
-export function writeFile(sys: StencilSystem, filePath: string, data: any) {
-  return new Promise<string>((resolve, reject) => {
-    sys.fs.writeFile(filePath, data, (err) => {
       if (err) {
         reject(err);
       } else {
@@ -150,10 +153,10 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
   return new Promise(resolve => {
 
     const knowExistingDirPaths = existingDirectories.map(existingDirectory => {
-      return existingDirectory.split('/');
+      return normalizePath(existingDirectory).split('/');
     });
 
-    const checkDirectories = sortDirectories(sys, directories).slice();
+    const checkDirectories = sortDirectories(directories).slice();
 
     function ensureDir() {
       if (checkDirectories.length === 0) {
@@ -161,6 +164,7 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
         return;
       }
 
+      // double check this path has been normalized with / paths
       const checkDirectory = normalizePath(checkDirectories.shift());
 
       const dirPaths = checkDirectory.split('/');
@@ -173,6 +177,8 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
         }
 
         const checkDirPaths = dirPaths.slice(0, pathSections);
+
+        // should have already been normalized to / paths
         const dirPath = checkDirPaths.join('/');
 
         for (var i = 0; i < knowExistingDirPaths.length; i++) {
@@ -197,7 +203,8 @@ function ensureDirectoriesExist(sys: StencilSystem, directories: string[], exist
           // not worrying about the error here
           // if there's an error, it's probably because this directory already exists
           // which is what we want, no need to check access AND mkdir
-          knowExistingDirPaths.push(dirPath.split(sys.path.sep));
+          // should have already been normalized to / paths
+          knowExistingDirPaths.push(dirPath.split('/'));
           pathSections++;
           ensureSection();
         });
@@ -225,10 +232,11 @@ function getDirectoriesFromFiles(sys: StencilSystem, filesToWrite: FilesMap) {
 }
 
 
-function sortDirectories(sys: StencilSystem, directories: string[]) {
+function sortDirectories(directories: string[]) {
   return directories.sort((a, b) => {
-    const aPaths = a.split(sys.path.sep).length;
-    const bPaths = b.split(sys.path.sep).length;
+    // should have already been normalized to / paths
+    const aPaths = a.split('/').length;
+    const bPaths = b.split('/').length;
 
     if (aPaths < bPaths) return -1;
     if (aPaths > bPaths) return 1;

@@ -1,11 +1,31 @@
-import { BuildConfig, ComponentMeta, Manifest } from '../../../util/interfaces';
-import { ModuleFileMeta } from '../../interfaces';
+import { BuildConfig, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../test';
-import { parseBundles, parseComponent, serializeBundles, serializeComponent, ManifestData } from '../manifest-data';
+import { parseBundles, parseComponent, parseGlobal, serializeBundles, serializeComponent, serializeProjectGlobal } from '../manifest-data';
 import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
 
 
 describe('manifest-data serialize/parse', () => {
+
+  it('parseGlobal', () => {
+    const manifestData: ManifestData = {
+      global: 'global/my-global.js'
+    };
+    const manifest: Manifest = {};
+    parseGlobal(config, manifestDir, manifestData, manifest);
+    expect(manifest.global.jsFilePath).toBe('/User/me/myapp/dist/collection/global/my-global.js');
+  });
+
+  it('serializeProjectGlobal', () => {
+    const manifestData: ManifestData = {};
+    const manifest: Manifest = {
+      global: {
+        jsFilePath: '/User/me/myapp/dist/collection/global/my-global.js'
+      }
+    };
+
+    serializeProjectGlobal(config, manifestDir, manifestData, manifest);
+    expect(manifestData.global).toBe('global/my-global.js');
+  });
 
   it('parseBundles', () => {
     const manifestData: ManifestData = {
@@ -41,7 +61,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.priority).toBe('low');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.loadPriority).toBe(PRIORITY_LOW);
+    expect(b.cmpMeta.loadPriority).toBe(PRIORITY_LOW);
   });
 
   it('isShadowMeta', () => {
@@ -49,7 +69,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.shadow).toBe(true);
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.isShadowMeta).toBe(true);
+    expect(b.cmpMeta.isShadowMeta).toBe(true);
   });
 
   it('slotMeta HAS_NAMED_SLOTS', () => {
@@ -57,7 +77,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.slot).toBe('hasNamedSlots');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.slotMeta).toBe(HAS_NAMED_SLOTS);
+    expect(b.cmpMeta.slotMeta).toBe(HAS_NAMED_SLOTS);
   });
 
   it('slotMeta HAS_SLOTS', () => {
@@ -65,7 +85,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.slot).toBe('hasSlots');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.slotMeta).toBe(HAS_SLOTS);
+    expect(b.cmpMeta.slotMeta).toBe(HAS_SLOTS);
   });
 
   it('hostMeta', () => {
@@ -73,7 +93,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.host.theme['some-class']).toBe(true);
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.hostMeta.theme['some-class']).toBe(true);
+    expect(b.cmpMeta.hostMeta.theme['some-class']).toBe(true);
   });
 
   it('methodsMeta', () => {
@@ -82,8 +102,8 @@ describe('manifest-data serialize/parse', () => {
     expect(cmpData.methods[0]).toBe('methodA');
     expect(cmpData.methods[1]).toBe('methodB');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.methodsMeta[0]).toBe('methodA');
-    expect(b.methodsMeta[1]).toBe('methodB');
+    expect(b.cmpMeta.methodsMeta[0]).toBe('methodA');
+    expect(b.cmpMeta.methodsMeta[1]).toBe('methodB');
   });
 
   it('listeners', () => {
@@ -97,11 +117,11 @@ describe('manifest-data serialize/parse', () => {
     expect(cmpData.listeners[0].capture).toBe(true);
     expect(cmpData.listeners[0].enabled).toBe(true);
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.listenersMeta[0].eventName).toBe('eventA');
-    expect(b.listenersMeta[0].eventMethodName).toBe('methodA');
-    expect(b.listenersMeta[0].eventPassive).toBe(true);
-    expect(b.listenersMeta[0].eventCapture).toBe(true);
-    expect(b.listenersMeta[0].eventEnabled).toBe(true);
+    expect(b.cmpMeta.listenersMeta[0].eventName).toBe('eventA');
+    expect(b.cmpMeta.listenersMeta[0].eventMethodName).toBe('methodA');
+    expect(b.cmpMeta.listenersMeta[0].eventPassive).toBe(true);
+    expect(b.cmpMeta.listenersMeta[0].eventCapture).toBe(true);
+    expect(b.cmpMeta.listenersMeta[0].eventEnabled).toBe(true);
   });
 
   it('statesMeta', () => {
@@ -110,8 +130,8 @@ describe('manifest-data serialize/parse', () => {
     expect(cmpData.states[0]).toBe('stateA');
     expect(cmpData.states[1]).toBe('stateB');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.statesMeta[0]).toBe('stateA');
-    expect(b.statesMeta[1]).toBe('stateB');
+    expect(b.cmpMeta.statesMeta[0]).toBe('stateA');
+    expect(b.cmpMeta.statesMeta[1]).toBe('stateB');
   });
 
   it('propsDidChange', () => {
@@ -125,10 +145,10 @@ describe('manifest-data serialize/parse', () => {
     expect(cmpData.propsDidChange[1].name).toBe('nameB');
     expect(cmpData.propsDidChange[1].method).toBe('methodB');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.propsDidChangeMeta[0][0]).toBe('nameA');
-    expect(b.propsDidChangeMeta[0][1]).toBe('methodA');
-    expect(b.propsDidChangeMeta[1][0]).toBe('nameB');
-    expect(b.propsDidChangeMeta[1][1]).toBe('methodB');
+    expect(b.cmpMeta.propsDidChangeMeta[0][0]).toBe('nameA');
+    expect(b.cmpMeta.propsDidChangeMeta[0][1]).toBe('methodA');
+    expect(b.cmpMeta.propsDidChangeMeta[1][0]).toBe('nameB');
+    expect(b.cmpMeta.propsDidChangeMeta[1][1]).toBe('methodB');
   });
 
   it('propsWillChange', () => {
@@ -142,10 +162,10 @@ describe('manifest-data serialize/parse', () => {
     expect(cmpData.propsWillChange[1].name).toBe('nameB');
     expect(cmpData.propsWillChange[1].method).toBe('methodB');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.propsWillChangeMeta[0][0]).toBe('nameA');
-    expect(b.propsWillChangeMeta[0][1]).toBe('methodA');
-    expect(b.propsWillChangeMeta[1][0]).toBe('nameB');
-    expect(b.propsWillChangeMeta[1][1]).toBe('methodB');
+    expect(b.cmpMeta.propsWillChangeMeta[0][0]).toBe('nameA');
+    expect(b.cmpMeta.propsWillChangeMeta[0][1]).toBe('methodA');
+    expect(b.cmpMeta.propsWillChangeMeta[1][0]).toBe('nameB');
+    expect(b.cmpMeta.propsWillChangeMeta[1][1]).toBe('methodB');
   });
 
   it('propsMeta', () => {
@@ -155,12 +175,12 @@ describe('manifest-data serialize/parse', () => {
     ];
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.propsMeta[0].propName).toBe('nameA');
-    expect(b.propsMeta[0].propType).toBe(TYPE_BOOLEAN);
-    expect(b.propsMeta[0].isStateful).toBe(true);
-    expect(b.propsMeta[1].propName).toBe('nameB');
-    expect(b.propsMeta[1].propType).toBe(TYPE_NUMBER);
-    expect(b.propsMeta[1].isStateful).toBe(false);
+    expect(b.cmpMeta.propsMeta[0].propName).toBe('nameA');
+    expect(b.cmpMeta.propsMeta[0].propType).toBe(TYPE_BOOLEAN);
+    expect(b.cmpMeta.propsMeta[0].isStateful).toBe(true);
+    expect(b.cmpMeta.propsMeta[1].propName).toBe('nameB');
+    expect(b.cmpMeta.propsMeta[1].propType).toBe(TYPE_NUMBER);
+    expect(b.cmpMeta.propsMeta[1].isStateful).toBe(false);
   });
 
   it('assetsDirsMeta', () => {
@@ -170,8 +190,8 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.assetPaths[0]).toBe('components/svgs');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.assetsDirsMeta[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/svgs');
-    expect(b.assetsDirsMeta[0].cmpRelativePath).toBe('svgs');
+    expect(b.cmpMeta.assetsDirsMeta[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/svgs');
+    expect(b.cmpMeta.assetsDirsMeta[0].cmpRelativePath).toBe('svgs');
   });
 
   it('stylesMeta stylePaths', () => {
@@ -183,8 +203,8 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.styles.ios.stylePaths[0]).toBe('components/cmp-a.scss');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.stylesMeta.ios.cmpRelativePaths[0]).toBe('cmp-a.scss');
-    expect(b.stylesMeta.ios.absolutePaths[0]).toBe('/User/me/myapp/dist/collection/components/cmp-a.scss');
+    expect(b.cmpMeta.stylesMeta.ios.cmpRelativePaths[0]).toBe('cmp-a.scss');
+    expect(b.cmpMeta.stylesMeta.ios.absolutePaths[0]).toBe('/User/me/myapp/dist/collection/components/cmp-a.scss');
   });
 
   it('stylesMeta styleStr', () => {
@@ -195,14 +215,14 @@ describe('manifest-data serialize/parse', () => {
     };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     b = parseComponent(config, manifestDir, cmpData);
-    expect(a.stylesMeta.ios.styleStr).toBe(b.stylesMeta.ios.styleStr);
+    expect(a.stylesMeta.ios.styleStr).toBe(b.cmpMeta.stylesMeta.ios.styleStr);
   });
 
-  it('componentPath', () => {
+  it('js file path', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.componentPath).toBe('components/cmp-a.js');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.componentPath).toBe('/User/me/myapp/dist/collection/components/cmp-a.js');
+    expect(b.jsFilePath).toBe('/User/me/myapp/dist/collection/components/cmp-a.js');
   });
 
   it('componentClass', () => {
@@ -210,7 +230,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.componentClass).toBe('ComponentClass');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.componentClass).toBe(a.componentClass);
+    expect(b.cmpMeta.componentClass).toBe(a.componentClass);
   });
 
   it('tag name', () => {
@@ -218,7 +238,7 @@ describe('manifest-data serialize/parse', () => {
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.tag).toBe(a.tagNameMeta);
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.tagNameMeta).toBe(a.tagNameMeta);
+    expect(b.cmpMeta.tagNameMeta).toBe(a.tagNameMeta);
   });
 
   beforeEach(() => {
@@ -230,8 +250,8 @@ describe('manifest-data serialize/parse', () => {
   });
 
   var a: ComponentMeta;
-  var b: ComponentMeta;
-  var moduleFile: ModuleFileMeta;
+  var b: ModuleFile;
+  var moduleFile: ModuleFile;
   var manifestDir = '/User/me/myapp/dist/collection/';
   var config: BuildConfig = {
     sys: mockStencilSystem()

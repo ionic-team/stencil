@@ -1,9 +1,9 @@
-import { AssetsMeta, BuildConfig, ComponentOptions, ComponentMeta, Diagnostic, Manifest, ModuleFileMeta } from '../interfaces';
+import { AssetsMeta, BuildConfig, BuildContext, ComponentOptions, ComponentMeta, ModuleFile } from '../../util/interfaces';
 import { catchError, normalizePath } from '../util';
-import { getProjectBuildDir } from '../build/build-project-files';
+import { getProjectBuildDir } from '../project/generate-project-files';
 
 
-export function parseComponentMetadata(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta)  {
+export function normalizeAssetsDir(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta)  {
   if (userOpts.assetsDir) {
     normalizeAssetDir(config, moduleFile, cmpMeta, userOpts.assetsDir);
   }
@@ -16,7 +16,7 @@ export function parseComponentMetadata(config: BuildConfig, userOpts: ComponentO
 }
 
 
-function normalizeAssetDir(config: BuildConfig, moduleFile: ModuleFileMeta, cmpMeta: ComponentMeta, assetsDir: string) {
+function normalizeAssetDir(config: BuildConfig, moduleFile: ModuleFile, cmpMeta: ComponentMeta, assetsDir: string) {
   if (typeof assetsDir !== 'string' || assetsDir.trim() === '') return;
 
   const assetsMeta: AssetsMeta = {};
@@ -47,23 +47,29 @@ function normalizeAssetDir(config: BuildConfig, moduleFile: ModuleFileMeta, cmpM
 }
 
 
-export function copyAssets(config: BuildConfig, userManifest: Manifest, diagnostics: Diagnostic[]) {
+export function copyAssets(config: BuildConfig, ctx: BuildContext) {
   const timeSpan = config.logger.createTimeSpan(`copy assets started`, true);
 
   // get a list of all the directories to copy
   // these paths should be absolute
-  const assetDirsToCopy = userManifest.components
-    .filter(c => c.assetsDirsMeta && c.assetsDirsMeta.length)
-    .reduce((dirList, component) => {
-      const qualifiedPathDirs = component.assetsDirsMeta.map(assetDirAbsolutePath => {
-        return assetDirAbsolutePath;
-      });
-    return dirList.concat(qualifiedPathDirs);
-  }, <AssetsMeta[]>[]);
+  const copyToBuildDir: AssetsMeta[] = [];
+  const copyToCollectionDir: AssetsMeta[] = [];
+
+  ctx.manifest.modulesFiles.forEach(moduleFile => {
+    if (!moduleFile.cmpMeta.assetsDirsMeta || !moduleFile.cmpMeta.assetsDirsMeta.length) return;
+
+    moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
+      copyToBuildDir.push(assetsMeta);
+
+      if (!moduleFile.isCollectionDependency) {
+        copyToCollectionDir.push(assetsMeta);
+      }
+    });
+  });
 
 
   // copy all of the files in asset directories to the project's build directory
-  let dirCopyPromises = assetDirsToCopy.map(assetsMeta => {
+  let dirCopyPromises = copyToBuildDir.map(assetsMeta => {
     return new Promise((resolve, reject) => {
       // figure out what the path is to the component directory
       const buildDirDestination = normalizePath(config.sys.path.join(
@@ -88,7 +94,7 @@ export function copyAssets(config: BuildConfig, userManifest: Manifest, diagnost
   if (config.generateCollection) {
 
     // copy all of the files in asset directories to the project's collection directory
-    dirCopyPromises = dirCopyPromises.concat(assetDirsToCopy.map(assetsMeta => {
+    dirCopyPromises = dirCopyPromises.concat(copyToCollectionDir.map(assetsMeta => {
       return new Promise((resolve, reject) => {
         // figure out what the path is to the component directory
         const collectionDirDestination = normalizePath(config.sys.path.join(
@@ -109,7 +115,7 @@ export function copyAssets(config: BuildConfig, userManifest: Manifest, diagnost
   }
 
   return Promise.all(dirCopyPromises).catch(err => {
-    catchError(diagnostics, err);
+    catchError(ctx.diagnostics, err);
 
   }).then(function() {
     timeSpan.finish('copy assets finished');
