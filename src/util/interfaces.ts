@@ -727,25 +727,10 @@ export interface DomApi {
 export type Key = string | number;
 
 
-export interface Hyperscript {
-  (sel: any): VNode;
-  (sel: Node, data: VNodeData): VNode;
-  (sel: any, data: VNodeData): VNode;
-  (sel: any, text: string): VNode;
-  (sel: any, children: Array<VNode | undefined | null>): VNode;
-  (sel: any, data: VNodeData, text: string): VNode;
-  (sel: any, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
-  (sel: any, data: VNodeData, children: VNode): VNode;
-}
-
-
 export interface HostContentNodes {
   defaultSlot?: Node[];
   namedSlots?: {[slotName: string]: Node[]};
 }
-
-
-
 
 
 export interface VNode {
@@ -1006,7 +991,22 @@ export interface FilesMap {
 }
 
 
+export interface Hyperscript {
+  (sel: any): VNode;
+  (sel: Node, data: VNodeData): VNode;
+  (sel: any, data: VNodeData): VNode;
+  (sel: any, text: string): VNode;
+  (sel: any, children: Array<VNode | undefined | null>): VNode;
+  (sel: any, data: VNodeData, text: string): VNode;
+  (sel: any, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
+  (sel: any, data: VNodeData, children: VNode): VNode;
+}
+
+
 declare global {
+
+  const h: Hyperscript;
+
   namespace JSX {
     interface Element {
     }
