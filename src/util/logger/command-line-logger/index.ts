@@ -330,8 +330,7 @@ const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
 
 
 function wordWrap(msg: any[]) {
-  const output: string[] = [];
-
+  const lines: string[] = [];
   const words: any[] = [];
 
   msg.forEach(m => {
@@ -348,10 +347,7 @@ function wordWrap(msg: any[]) {
         }
       });
 
-    } else if (typeof m === 'number' || typeof m === 'boolean') {
-      words.push(m.toString());
-
-    } else if (typeof m === 'function') {
+    } else if (typeof m === 'number' || typeof m === 'boolean' || typeof m === 'function') {
       words.push(m.toString());
 
     } else if (Array.isArray(m)) {
@@ -371,40 +367,41 @@ function wordWrap(msg: any[]) {
 
   let line = INDENT;
   words.forEach(word => {
+    if (lines.length > 25) {
+      return;
+    }
+
     if (typeof word === 'function') {
       if (line.trim().length) {
-        output.push(line);
+        lines.push(line);
       }
-      output.push(word());
+      lines.push(word());
       line = INDENT;
 
     } else if (INDENT.length + word.length > MAX_LEN) {
       // word is too long to play nice, just give it its own line
       if (line.trim().length) {
-        output.push(line);
+        lines.push(line);
       }
-      output.push(INDENT + word);
+      lines.push(INDENT + word);
       line = INDENT;
 
     } else if ((word.length + line.length) > MAX_LEN) {
       // this word would make the line too long
       // print the line now, then start a new one
-      output.push(line);
+      lines.push(line);
       line = INDENT + word + ' ';
 
     } else {
       line += word + ' ';
     }
-
-    if (output.length > 25) {
-      return;
-    }
   });
+
   if (line.trim().length) {
-    output.push(line);
+    lines.push(line);
   }
 
-  return output;
+  return lines;
 }
 
 
