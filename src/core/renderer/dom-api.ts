@@ -2,7 +2,7 @@ import { DomApi } from '../../util/interfaces';
 
 
 export function createDomApi(document: Document): DomApi {
-  // using the $ prefix so that closure if
+  // using the $ prefix so that closure is
   // cool with property renaming each of these
 
   return {

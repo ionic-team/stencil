@@ -140,7 +140,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
       }
 
       // create the url we'll be requesting
-      const url = `${publicPath}${moduleId}.js`;
+      const url = publicPath + moduleId + '.js';
 
       if (!pendingModuleRequests[url]) {
         // not already actively requesting this url
@@ -152,7 +152,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
       }
 
       // we also need to load the css file in the head
-      // we're already figured out and set "mode" as a property to the element
+      // we've already figured out and set "mode" as a property to the element
       const styleId = cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$;
       if (styleId && !loadedStyles[styleId]) {
         // this style hasn't been added to the head yet
@@ -160,7 +160,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
 
         // append this link element to the head, which starts the request for the file
         const linkElm = domApi.$createElement('link');
-        linkElm.href = `${publicPath}${styleId}.css`;
+        linkElm.href = publicPath + styleId + '.css';
         linkElm.rel = 'stylesheet';
         domApi.$insertBefore(domApi.$head, linkElm, domApi.$head.firstChild);
       }
