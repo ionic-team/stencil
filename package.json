@@ -49,7 +49,7 @@
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "typescript": "2.4.0",
-    "uglify-js": "^3.0.21"
+    "uglify-es": "^3.0.26"
   },
   "devDependencies": {
     "@types/babel-core": "^6.7.14",
