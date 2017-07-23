@@ -57,7 +57,7 @@ module.exports = Object.defineProperties({
     if (result.errors) {
       result.errors.forEach(function(msg) {
         diagnostics.push({
-          msg: msg,
+          messageText: msg,
           level: 'error'
         });
       });
@@ -66,7 +66,7 @@ module.exports = Object.defineProperties({
     if (result.warnings) {
       result.warnings.forEach(function(msg) {
         diagnostics.push({
-          msg: msg,
+          messageText: msg,
           level: 'warn'
         });
       });
@@ -86,7 +86,7 @@ module.exports = Object.defineProperties({
 
     if (result.error) {
       diagnostics.push({
-        msg: result.error.message,
+        messageText: result.error.message,
         level: 'error'
       });
     }
