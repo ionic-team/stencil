@@ -33,19 +33,19 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-function generateBundleCss(config: BuildConfig, ctx: BuildContext, projectManifest: Manifest, userBundle: Bundle, stylesResults: StylesResults) {
+function generateBundleCss(config: BuildConfig, ctx: BuildContext, appManifest: Manifest, userBundle: Bundle, stylesResults: StylesResults) {
   // multiple modes can be on each component
   // and multiple components can be in each bundle
   // create css files with the common modes for the bundle's components
 
   // collect only the component meta data this bundle needs
   const bundleModuleFiles = userBundle.components.sort().map(userBundleComponentTag => {
-    const foundComponentMeta = projectManifest.modulesFiles.find(modulesFile => (
+    const foundComponentMeta = appManifest.modulesFiles.find(modulesFile => (
       modulesFile.cmpMeta.tagNameMeta === userBundleComponentTag
     ));
 
     if (!foundComponentMeta) {
-      buildError(ctx.diagnostics).messageText = `Component tag "${userBundleComponentTag.toLowerCase()}" is defined in a bundle but no matching component was found within this project or its collections.`;
+      buildError(ctx.diagnostics).messageText = `Component tag "${userBundleComponentTag.toLowerCase()}" is defined in a bundle but no matching component was found within this app or its collections.`;
     }
     return foundComponentMeta;
   }).filter(c => c);

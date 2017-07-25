@@ -1,12 +1,12 @@
 import { BuildConfig, BuildContext, BuildResults } from '../../util/interfaces';
 import { catchError, emptyDir, writeFiles } from '../util';
 import { copyAssets } from '../component-plugins/assets-plugin';
-import { writeProjectManifest } from '../manifest/manifest-data';
+import { writeAppManifest } from '../manifest/manifest-data';
 
 
 export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
   // serialize and write the manifest file if need be
-  writeProjectManifest(config, ctx, buildResults);
+  writeAppManifest(config, ctx, buildResults);
 
   buildResults.files = Object.keys(ctx.filesToWrite).sort();
   const totalFilesToWrite = buildResults.files.length;

@@ -1,67 +1,73 @@
 import { attachListeners } from './events';
 import { attributeChangedCallback } from './attribute-changed';
-import { Component, HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { HYDRATED_CSS } from '../../util/constants';
+import { initComponentEvents } from './events';
 import { initProxy } from './proxy';
 import { queueUpdate } from './update';
 import { render } from './render';
 
 
 export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement) {
-  Object.defineProperties(HostElementConstructor, {
-    'connectedCallback': {
-      value: function() {
-        connectedCallback(plt, (<HostElement>this));
-      }
-    },
-    'attributeChangedCallback': {
-      value: function(attribName: string, oldVal: string, newVal: string) {
-        attributeChangedCallback(plt, (<HostElement>this), attribName, oldVal, newVal);
-      }
-    },
-    'disconnectedCallback': {
-      value: function() {
-        disconnectedCallback(plt, (<HostElement>this));
-      }
-    },
-    _queueUpdate: {
-      value: function() {
-        queueUpdate(plt, (<HostElement>this));
-      }
-    },
-    _initLoad: {
-      value: function() {
-        initLoad(plt, (<HostElement>this));
-      }
-    },
-    _render: {
-      value: function(isInitialRender: boolean) {
-        render(plt, (<HostElement>this), isInitialRender);
-      }
-    }
-  });
+
+  HostElementConstructor.connectedCallback = function() {
+    connectedCallback(plt, (this as HostElement));
+  };
+
+  HostElementConstructor.attributeChangedCallback = function(attribName: string, oldVal: string, newVal: string) {
+    attributeChangedCallback(plt, (this as HostElement), attribName, oldVal, newVal);
+  };
+
+  HostElementConstructor.disconnectedCallback = function() {
+    disconnectedCallback(plt, (this as HostElement));
+  };
+
+  HostElementConstructor._queueUpdate = function() {
+    queueUpdate(plt, (this as HostElement));
+  };
+
+  HostElementConstructor._initLoad = function() {
+    initLoad(plt, (this as HostElement));
+  };
+
+  HostElementConstructor._render = function(isInitialRender: boolean) {
+    render(plt, (this as HostElement), isInitialRender);
+  };
 }
 
 
-export function initInstance(plt: PlatformApi, elm: HostElement) {
+export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   // using the component's class, let's create a new instance
   const cmpMeta = plt.getComponentMeta(elm);
-  const instance: Component = elm.$instance = new cmpMeta.componentModuleMeta();
+  const instance: ComponentInstance = elm.$instance = new cmpMeta.componentModule();
 
   // let's automatically add a reference to the host element on the instance
-  instance.$el = elm;
-  instance.$emit = plt.emitEvent.bind(plt, elm);
+  instance.__el = elm;
+
+  if (cmpMeta.hostElementMember) {
+    // also add a getter to the element reference using
+    // the member name the component meta provided
+    Object.defineProperty(instance, cmpMeta.hostElementMember, {
+      get: function() {
+        return (this as ComponentInstance).__el;
+      }
+    });
+  }
 
   // so we've got an host element now, and a actual instance
   // let's wire them up together with getter/settings
   // the setters are use for change detection and knowing when to re-render
   initProxy(plt, elm, instance, cmpMeta);
 
+  // add each of the event emitters which wire up instance methods
+  // to fire off dom events from the host element
+  initComponentEvents(plt, cmpMeta.eventsMeta, instance);
+
   // fire off the user's componentWillLoad method (if one was provided)
-  // componentWillLoad only runs ONCE, after instance.$el has been assigned
-  // the host element, but BEFORE render() has been called
+  // componentWillLoad only runs ONCE, after instance's element has been
+  // assigned as the host element, but BEFORE render() has been called
   instance.componentWillLoad && instance.componentWillLoad();
 }
 
@@ -86,8 +92,8 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     elm._hasLoaded = true;
 
     // fire off the user's componentDidLoad method (if one was provided)
-    // componentDidLoad only runs ONCE, after instance.$el has been assigned
-    // the host element, and AFTER render() has been called
+    // componentDidLoad only runs ONCE, after the instance's element has been
+    // assigned as the host element, and AFTER render() has been called
     instance.componentDidLoad && instance.componentDidLoad();
 
     // add the css class that this element has officially hydrated

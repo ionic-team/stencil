@@ -1,6 +1,6 @@
 import { BuildConfig, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../test';
-import { parseBundles, parseComponent, parseGlobal, serializeBundles, serializeComponent, serializeProjectGlobal } from '../manifest-data';
+import { parseBundles, parseComponent, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
 import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
 
 
@@ -15,7 +15,7 @@ describe('manifest-data serialize/parse', () => {
     expect(manifest.global.jsFilePath).toBe('/User/me/myapp/dist/collection/global/my-global.js');
   });
 
-  it('serializeProjectGlobal', () => {
+  it('serializeAppGlobal', () => {
     const manifestData: ManifestData = {};
     const manifest: Manifest = {
       global: {
@@ -23,7 +23,7 @@ describe('manifest-data serialize/parse', () => {
       }
     };
 
-    serializeProjectGlobal(config, manifestDir, manifestData, manifest);
+    serializeAppGlobal(config, manifestDir, manifestData, manifest);
     expect(manifestData.global).toBe('global/my-global.js');
   });
 
@@ -88,6 +88,37 @@ describe('manifest-data serialize/parse', () => {
     expect(b.cmpMeta.slotMeta).toBe(HAS_SLOTS);
   });
 
+  it('eventsMeta', () => {
+    a.eventsMeta = [
+      { eventName: 'zzEvent' },
+      { eventName: 'aa-event', eventMethodName: 'methodName', eventBubbles: false, eventCancelable: false, eventComposed: false }
+    ];
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    expect(cmpData.events.length).toBe(2);
+    b = parseComponent(config, manifestDir, cmpData);
+    expect(b.cmpMeta.eventsMeta.length).toBe(2);
+
+    expect(b.cmpMeta.eventsMeta[0].eventName).toBe('aa-event');
+    expect(b.cmpMeta.eventsMeta[0].eventMethodName).toBe('methodName');
+    expect(b.cmpMeta.eventsMeta[0].eventBubbles).toBe(false);
+    expect(b.cmpMeta.eventsMeta[0].eventCancelable).toBe(false);
+    expect(b.cmpMeta.eventsMeta[0].eventComposed).toBe(false);
+
+    expect(b.cmpMeta.eventsMeta[1].eventName).toBe('zzEvent');
+    expect(b.cmpMeta.eventsMeta[1].eventMethodName).toBe('zzEvent');
+    expect(b.cmpMeta.eventsMeta[1].eventBubbles).toBe(true);
+    expect(b.cmpMeta.eventsMeta[1].eventCancelable).toBe(true);
+    expect(b.cmpMeta.eventsMeta[1].eventComposed).toBe(true);
+  });
+
+  it('hostElementMember', () => {
+    a.hostElementMember = 'myElement';
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    expect(cmpData.hostElement).toBe('myElement');
+    b = parseComponent(config, manifestDir, cmpData);
+    expect(b.cmpMeta.hostElementMember).toBe('myElement');
+  });
+
   it('hostMeta', () => {
     a.hostMeta = { theme: { 'some-class': true } };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
@@ -106,22 +137,38 @@ describe('manifest-data serialize/parse', () => {
     expect(b.cmpMeta.methodsMeta[1]).toBe('methodB');
   });
 
-  it('listeners', () => {
+  it('listenersMeta', () => {
     a.listenersMeta = [
+      { eventName: 'eventB', eventMethodName: 'methodB', eventPassive: false, eventCapture: false, eventEnabled: false },
       { eventName: 'eventA', eventMethodName: 'methodA', eventPassive: true, eventCapture: true, eventEnabled: true }
     ];
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    expect(cmpData.listeners.length).toBe(2);
+
     expect(cmpData.listeners[0].event).toBe('eventA');
     expect(cmpData.listeners[0].method).toBe('methodA');
-    expect(cmpData.listeners[0].passive).toBe(true);
-    expect(cmpData.listeners[0].capture).toBe(true);
-    expect(cmpData.listeners[0].enabled).toBe(true);
+    expect(cmpData.listeners[0].passive).toBeUndefined();
+    expect(cmpData.listeners[0].capture).toBeUndefined();
+    expect(cmpData.listeners[0].enabled).toBeUndefined();
+
+    expect(cmpData.listeners[1].event).toBe('eventB');
+    expect(cmpData.listeners[1].method).toBe('methodB');
+    expect(cmpData.listeners[1].passive).toBe(false);
+    expect(cmpData.listeners[1].capture).toBe(false);
+    expect(cmpData.listeners[1].enabled).toBe(false);
+
     b = parseComponent(config, manifestDir, cmpData);
     expect(b.cmpMeta.listenersMeta[0].eventName).toBe('eventA');
     expect(b.cmpMeta.listenersMeta[0].eventMethodName).toBe('methodA');
     expect(b.cmpMeta.listenersMeta[0].eventPassive).toBe(true);
     expect(b.cmpMeta.listenersMeta[0].eventCapture).toBe(true);
     expect(b.cmpMeta.listenersMeta[0].eventEnabled).toBe(true);
+
+    expect(b.cmpMeta.listenersMeta[1].eventName).toBe('eventB');
+    expect(b.cmpMeta.listenersMeta[1].eventMethodName).toBe('methodB');
+    expect(b.cmpMeta.listenersMeta[1].eventPassive).toBe(false);
+    expect(b.cmpMeta.listenersMeta[1].eventCapture).toBe(false);
+    expect(b.cmpMeta.listenersMeta[1].eventEnabled).toBe(false);
   });
 
   it('statesMeta', () => {

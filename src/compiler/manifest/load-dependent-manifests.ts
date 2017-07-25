@@ -4,7 +4,7 @@ import { parseDependentManifest } from './manifest-data';
 
 
 export function loadDependentManifests(config: BuildConfig, ctx: BuildContext) {
-  // load up all of the collections which this project is dependent on
+  // load up all of the collections which this app is dependent on
   return Promise.all(config.collections.map(configCollection => {
     return loadDependentManifest(config, ctx, configCollection);
   }));

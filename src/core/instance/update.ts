@@ -1,4 +1,4 @@
-import { initInstance } from './init';
+import { initComponentInstance } from './init';
 import { HostElement, PlatformApi } from '../../util/interfaces';
 
 
@@ -27,7 +27,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
 
     if (isInitialLoad) {
       // haven't created a component instance for this host element yet
-      initInstance(plt, elm);
+      initComponentInstance(plt, elm);
     }
 
     // if this component has a render function, let's fire

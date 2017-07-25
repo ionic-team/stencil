@@ -1,5 +1,6 @@
 import { ATTR_LOWER_CASE, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
-import { ComponentMeta, ComponentRegistry, LoadComponentMeta, LoadComponentRegistry } from '../util/interfaces';
+import { ComponentMeta, ComponentRegistry, LoadComponentMeta,
+  ComponentEventData, ComponentListenersData, LoadComponentRegistry } from '../util/interfaces';
 import { isDef, toDashCase } from './helpers';
 
 
@@ -45,13 +46,13 @@ export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, r
 }
 
 
-export function parseComponentMeta(registry: ComponentRegistry, moduleImports: any, cmpMetaData: LoadComponentMeta): ComponentMeta {
+export function parseComponentMeta(registry: ComponentRegistry, moduleImports: any, cmpMetaData: LoadComponentMeta) {
   // tag name will always be upper case
   const cmpMeta = registry[cmpMetaData[0]];
 
   // get the component class which was added to moduleImports
   // using the tag as the key on the export object
-  cmpMeta.componentModuleMeta = moduleImports[cmpMetaData[0]];
+  cmpMeta.componentModule = moduleImports[cmpMetaData[0]];
 
   // host
   cmpMeta.hostMeta = cmpMetaData[1];
@@ -60,13 +61,13 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   if (cmpMetaData[2]) {
     cmpMeta.listenersMeta = [];
     for (var i = 0; i < cmpMetaData[2].length; i++) {
-      var data = cmpMetaData[2][i];
+      var data: any = cmpMetaData[2][i];
       cmpMeta.listenersMeta.push({
-        eventMethodName: data[0],
-        eventName: data[1],
-        eventCapture: !!data[2],
-        eventPassive: !!data[3],
-        eventEnabled: !!data[4],
+        eventMethodName: (data as ComponentListenersData)[0],
+        eventName: (data as ComponentListenersData)[1],
+        eventCapture: !!(data as ComponentListenersData)[2],
+        eventPassive: !!(data as ComponentListenersData)[3],
+        eventEnabled: !!(data as ComponentListenersData)[4],
       });
     }
   }
@@ -80,10 +81,30 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   // component instance prop DID change methods
   cmpMeta.propsDidChangeMeta = cmpMetaData[5];
 
-  // component methods
-  cmpMeta.methodsMeta = cmpMetaData[6];
+  // component instance events
+  if (cmpMetaData[6]) {
+    cmpMeta.eventsMeta = [];
+    for (i = 0; i < cmpMetaData[6].length; i++) {
+      data = cmpMetaData[6][i];
+      cmpMeta.eventsMeta.push({
+        eventName: (data as ComponentEventData)[0],
+        eventMethodName: (data as ComponentEventData)[1],
+        eventBubbles: !!(data as ComponentEventData)[2],
+        eventCancelable: !!(data as ComponentEventData)[3],
+        eventComposed: !!(data as ComponentEventData)[4],
+      });
+    }
+  }
 
-  return cmpMeta;
+  // component methods
+  cmpMeta.methodsMeta = cmpMetaData[7];
+
+  // member name which the component instance should
+  // use when referencing the host element
+  cmpMeta.hostElementMember = cmpMetaData[8];
+
+  // is shadow
+  cmpMeta.isShadowMeta = !!cmpMetaData[9];
 }
 
 

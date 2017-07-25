@@ -1,71 +1,41 @@
 
 /**
- * Externs are used so these properties are not
- * mistakenly renamed. When two JS files are compiled at different
- * times, there are cerain properties that need to NOT be renamed so
+ * Externs are used so these properties are not mistakenly
+ * renamed. When two JS files are compiled at different times,
+ * there are cerain properties that need to NOT be renamed so
  * each JS file can communicate against the known property names.
  *
  * https://developers.google.com/closure/compiler/docs/api-tutorial3
  */
 
+/**
+ * Core Global
+ * Internal core singleton injected into app and component's scope
+ */
+function addListener(){};
+function dom(){};
+function emit(){};
+function enableListener(){};
+function eventNameFn(){};
+function isClient(){};
+function isServer(){};
+function mode(){};
+
 
 /**
- * Global window.PROJECT
- * Each binding can provide it's own values to window.Ionic
+ * App Global - window.App
+ * Properties which get added to the app's global
  */
 function components(){};
-function ConfigCtrl(){};
 function defineComponents(){};
-function dom(){};
-function DomCtrl(){};
-function eventNameFn(){};
-function flush(){};
-function load(){};
-function loadController(){};
-function QueueCtrl(){};
-function raf(){};
-function read(){};
-function write(){};
-function Animation(){};
-function ns(){};
-
-
-/**
- * Injected Ionic
- * Passed into user's closure so it's globally available
- * to all of the user's code.
- */
-function Ionic(){};
-function config(){};
-function controllers(){};
-function create(){};
-function dismiss(){};
-function emit(){};
-function listen(){};
-function modal(){};
-function overlay(){};
-function present(){};
-function theme(){};
-
-
-/**
- * Config API
- * Each binding provides its own Config
- */
-function get(){};
-function getBoolean(){};
-function getNumber(){};
 
 
 /**
  * Proxy Element
  * Properties set on the proxy element
  */
-function $el(){};
-function $emit(){};
 function $instance(){};
 function listeners(){};
-function $meta(){};
 function $(){};
 
 
@@ -95,23 +65,23 @@ function props(){};
  * Compiled hyperscript props
  * Already short, just don't rename them
  */
-function e(){};
-function t(){};
-function h(){};
-function c(){};
-function p(){};
 function a(){};
-function o(){};
-function s(){};
+function c(){};
+function e(){};
+function h(){};
 function k(){};
+function l(){};
 function m(){};
 function n(){};
-function l(){};
+function o(){};
+function p(){};
+function s(){};
+function t(){};
 
 
 /**
  * Web Standards
- * Window and document stuff closure doesn't know not to rename yet
+ * Window and document stuff closure doesn't know not to rename
  */
 function attachShadow(){};
 function attributeChangedCallback(){};
@@ -122,8 +92,10 @@ function define(){};
 function didTimeout(){};
 function disconnectedCallback(){};
 function host(){};
+function now(){};
 function observedAttributes(){};
 function passive(){};
+function performance(){};
 function requestIdleCallback(){};
 function shadowRoot(){};
 function timeRemaining(){};

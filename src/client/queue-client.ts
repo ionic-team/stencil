@@ -1,9 +1,8 @@
-import { DomControllerApi, QueueApi } from '../util/interfaces';
+import { DomControllerApi, Now, QueueApi } from '../util/interfaces';
 import { PRIORITY_HIGH, PRIORITY_LOW } from '../util/constants';
 
 
-export function createQueueClient(domCtrl: DomControllerApi): QueueApi {
-  const now = domCtrl.now;
+export function createQueueClient(domCtrl: DomControllerApi, now: Now): QueueApi {
   const raf = domCtrl.raf;
   const highPromise = Promise.resolve();
 
@@ -12,7 +11,7 @@ export function createQueueClient(domCtrl: DomControllerApi): QueueApi {
   const lowCallbacks: Function[] = [];
 
   let resolvePending = false;
-  let ricPending = false;
+  let rafPending = false;
 
 
   function doHighPriority() {
@@ -44,7 +43,7 @@ export function createQueueClient(domCtrl: DomControllerApi): QueueApi {
     }
 
     // check to see if we still have work to do
-    if (ricPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
+    if (rafPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
       // everyone just settle down now
       // we already don't have time to do anything in this callback
       // let's throw the next one in a requestAnimationFrame
@@ -64,7 +63,7 @@ export function createQueueClient(domCtrl: DomControllerApi): QueueApi {
       mediumCallbacks.shift()();
     }
 
-    if (ricPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
+    if (rafPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
       // still more to do yet, but we've run out of time
       // let's let this thing cool off and try again in the next ric
       raf(doWork);
@@ -92,9 +91,9 @@ export function createQueueClient(domCtrl: DomControllerApi): QueueApi {
         mediumCallbacks.push(cb);
       }
 
-      if (!ricPending) {
+      if (!rafPending) {
         // not already pending work to do, so let's tee it up
-        ricPending = true;
+        rafPending = true;
         raf(doWork);
       }
     }

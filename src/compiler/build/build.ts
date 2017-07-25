@@ -1,25 +1,25 @@
-import { BuildConfig, BuildContext, BuildResults, LoggerTimeSpan } from '../../util/interfaces';
+import { BuildConfig, BuildResults, LoggerTimeSpan } from '../../util/interfaces';
 import { bundle } from '../bundle/bundle';
 import { catchError, getBuildContext, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
-import { generateProjectFiles } from '../project/generate-project-files';
-import { generateProjectManifest } from '../manifest/generate-manifest';
+import { generateAppFiles } from '../app/generate-app-files';
+import { generateAppManifest } from '../manifest/generate-manifest';
 import { optimizeIndexHtml } from './optimize-index-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
 import { writeBuildFiles } from './write-build';
 
 
-export function build(config: BuildConfig, ctx?: BuildContext) {
+export function build(config: BuildConfig, context?: any) {
   // create a timespan of the build process
   let timeSpan: LoggerTimeSpan;
 
   // create the build context if it doesn't exist
   // the buid context is the same object used for all builds and rebuilds
   // ctx is where stuff is cached for fast in-memory lookups later
-  ctx = getBuildContext(ctx);
+  const ctx = getBuildContext(context);
 
   // reset the build context, this is important for rebuilds
   resetBuildContext(ctx);
@@ -46,17 +46,17 @@ export function build(config: BuildConfig, ctx?: BuildContext) {
     return compileSrcDir(config, ctx);
 
   }).then(compileResults => {
-    // generation the project manifest from the compiled results
+    // generation the app manifest from the compiled results
     // and from all the dependent collections
-    return generateProjectManifest(config, ctx, compileResults.moduleFiles);
+    return generateAppManifest(config, ctx, compileResults.moduleFiles);
 
   }).then(() => {
     // bundle modules and styles into separate files phase
     return bundle(config, ctx);
 
   }).then(() => {
-    // generate the project files, such as app.js, app.core.js
-    return generateProjectFiles(config, ctx);
+    // generate the app files, such as app.js, app.core.js
+    return generateAppFiles(config, ctx);
 
   }).then(() => {
     // optimize index.html

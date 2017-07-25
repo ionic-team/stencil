@@ -23,7 +23,7 @@ export function toTitleCase(str: string) {
   return str.charAt(0).toUpperCase() + str.substr(1);
 }
 
-export function noop() {}
+export function noop(): any {}
 
 export function pointerCoordX(ev: any): number {
   // get X coordinates for either a mouse click

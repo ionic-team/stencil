@@ -1,15 +1,10 @@
-import { DomControllerApi, RafCallback } from '../util/interfaces';
+import { DomControllerApi, Now, RafCallback } from '../util/interfaces';
 
 
-export function createDomControllerClient(win: Window): DomControllerApi {
+export function createDomControllerClient(win: Window, now: Now): DomControllerApi {
   const readCBs: RafCallback[] = [];
   const writeCBs: RafCallback[] = [];
   let rafPending = false;
-
-
-  function now() {
-    return win.performance.now();
-  }
 
 
   function raf(cb: FrameRequestCallback): number {
@@ -71,7 +66,6 @@ export function createDomControllerClient(win: Window): DomControllerApi {
   return {
     read: domRead,
     write: domWrite,
-    raf: raf,
-    now: now
+    raf: raf
   };
 }

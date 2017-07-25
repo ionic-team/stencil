@@ -4,8 +4,8 @@ import { createRenderer } from '../../server/index';
 
 
 export function optimizeIndexHtml(config: BuildConfig, ctx: BuildContext) {
-  if (ctx.isRebuild && ctx.projectFileBuildCount === 0) {
-    // no need to rebuild index.html if there were no project file changes
+  if (ctx.isRebuild && ctx.appFileBuildCount === 0) {
+    // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
   }
 
@@ -70,14 +70,14 @@ function optimizeHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: stri
 
 
 function writeIndexDest(config: BuildConfig, ctx: BuildContext, optimizedHtml: string) {
-  if (ctx.projectFiles.indexHtml === optimizedHtml) {
+  if (ctx.appFiles.indexHtml === optimizedHtml) {
     // only write to disk if the html content is different than last time
     return;
   }
 
   // add the optimized html to our list of files to write
   // and cache the html to check against for next time
-  ctx.filesToWrite[config.indexHtmlBuild] = ctx.projectFiles.indexHtml = optimizedHtml;
+  ctx.filesToWrite[config.indexHtmlBuild] = ctx.appFiles.indexHtml = optimizedHtml;
 
   // keep track of how many times we built the index file
   // useful for debugging/testing

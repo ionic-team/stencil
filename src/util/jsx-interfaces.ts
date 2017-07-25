@@ -1,4 +1,4 @@
-export type CssClassObject = { [className: string]: boolean };
+export type CssClassMap = { [className: string]: boolean };
 
 export interface SlotAttributes {
   name?: string;
@@ -388,7 +388,7 @@ export interface HTMLAttributes extends DOMAttributes {
 
   // Standard HTML Attributes
   accessKey?: string;
-  class?: string | CssClassObject;
+  class?: string | CssClassMap;
   contentEditable?: boolean;
   contextMenu?: string;
   dir?: string;
@@ -438,7 +438,7 @@ export interface HTMLAttributes extends DOMAttributes {
 export interface SVGAttributes extends DOMAttributes {
   // Attributes which also defined in HTMLAttributes
   // See comment in SVGDOMPropertyConfig.js
-  class?: string | CssClassObject;
+  class?: string | CssClassMap;
   color?: string;
   height?: number | string;
   id?: string;

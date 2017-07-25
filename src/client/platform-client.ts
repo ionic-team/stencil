@@ -1,16 +1,20 @@
+import { addEventListener, enableEventListener } from '../core/instance/events';
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
-import { ComponentMeta, ComponentRegistry, DomControllerApi,
-  DomApi, HostElement, ProjectGlobal, ListenOptions, LoadComponentRegistry,
-  ModuleCallbacks, QueueApi, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ComponentRegistry, CoreGlobal, EventEmitterData,
+  HostElement, AppGlobal, ListenOptions, LoadComponentRegistry,
+  ModuleCallbacks, PlatformApi } from '../util/interfaces';
+import { createDomControllerClient } from './dom-controller-client';
+import { createDomApi } from '../core/renderer/dom-api';
 import { createRenderer } from '../core/renderer/patch';
+import { createQueueClient } from './queue-client';
+import { getNowFunction } from './now';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
-import { initGlobal } from './global-client';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
-export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: DomApi, domCtrl: DomControllerApi, queue: QueueApi, publicPath: string): PlatformApi {
+export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Window, doc: Document, publicPath: string): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
@@ -18,26 +22,45 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
   const loadedStyles: {[styleId: string]: boolean} = {};
   const pendingModuleRequests: {[url: string]: boolean} = {};
 
+  const domApi = createDomApi(doc);
+  const now = getNowFunction(win);
 
-  // create the platform api which will be passed around for external use
+  // initialize Core global object
+  Core.dom = createDomControllerClient(win, now);
+
+  Core.addListener = function addListener(elm, eventName, cb, opts) {
+    return addEventListener(plt, elm, eventName, cb, opts);
+  };
+
+  Core.enableListener = function enableListener(instance, eventName, enabled, attachTo) {
+    enableEventListener(plt, instance, eventName, enabled, attachTo);
+  };
+
+  Core.emit = function emitEvent(elm: Element, eventName: string, data: EventEmitterData) {
+    elm.dispatchEvent(new WindowCustomEvent(
+      Core.eventNameFn ? Core.eventNameFn(eventName) : eventName,
+      data
+    ));
+  };
+
+  Core.isClient = true;
+  Core.isServer = false;
+
+
+  // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
     registerComponents,
     defineComponent,
     getComponentMeta,
     loadBundle,
-    queue,
+    queue: createQueueClient(Core.dom, now),
     connectHostElement,
-    emitEvent,
+    emitEvent: Core.emit,
     getEventOptions
   };
 
-
   // create the renderer that will be used
   plt.render = createRenderer(plt, domApi);
-
-
-  // create the global which will be injected into the user's instances
-  const injectedGlobal = initGlobal(Gbl, domApi, plt, domCtrl);
 
 
   // setup the root element which is the mighty <html> tag
@@ -66,8 +89,8 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
-      // next check the project's global, such as Ionic.mode
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Gbl.mode;
+      // next check the app's global
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Core.mode;
     }
 
     // host element has been connected to the DOM
@@ -98,14 +121,16 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
   }
 
 
-  Gbl.defineComponents = function defineComponents(moduleId, importFn) {
+  App.defineComponents = function defineComponents(moduleId, importFn) {
     const args = arguments;
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, publicPath, injectedGlobal);
+    importFn(moduleImports, h, t, Core, publicPath);
 
     for (var i = 2; i < args.length; i++) {
+      // parse the external component data into internal component meta data
+      // then add our set of prototype methods to the component module
       parseComponentMeta(registry, moduleImports, args[i]);
     }
 
@@ -198,21 +223,12 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
   let WindowCustomEvent = (win as any).CustomEvent;
   if (typeof WindowCustomEvent !== 'function') {
     // CustomEvent polyfill
-    WindowCustomEvent = function CustomEvent(event: any, data: any) {
+    WindowCustomEvent = function CustomEvent(event: any, data: EventEmitterData) {
       var evt = domApi.$createEvent();
-      evt.initCustomEvent(event, true, true, data.detail);
+      evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
       return evt;
     };
     WindowCustomEvent.prototype = (win as any).Event.prototype;
-  }
-
-  function emitEvent(elm: Element, eventName: string, data: any) {
-    data = data || {};
-    data.bubbles = data.composed = true;
-    if (Gbl.eventNameFn) {
-      eventName = Gbl.eventNameFn(eventName);
-    }
-    elm.dispatchEvent(new WindowCustomEvent(eventName, data));
   }
 
   // test if this browser supports event options or not
@@ -233,6 +249,7 @@ export function createPlatformClient(Gbl: ProjectGlobal, win: Window, domApi: Do
         passive: !(opts && opts.passive === false)
       } : !!(opts && opts.capture);
   }
+
 
   return plt;
 }

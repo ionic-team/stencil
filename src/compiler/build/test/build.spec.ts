@@ -8,7 +8,7 @@ import { validateBuildConfig } from '../validation';
 
 describe('build', () => {
 
-  // it('should re-save project files when changed', () => {
+  // it('should re-save app files when changed', () => {
   //   ctx = {};
   //   config.bundles = [
   //     { components: ['cmp-a'] },
@@ -38,7 +38,7 @@ describe('build', () => {
   //   });
   // });
 
-  it('should save project files, but not resave when unchanged', () => {
+  it('should save app files, but not resave when unchanged', () => {
     ctx = {};
     config.bundles = [
       { components: ['cmp-a'] }

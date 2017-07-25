@@ -1,40 +1,28 @@
 import * as jsxInterface from './jsx-interfaces';
-import { CssClassObject } from './jsx-interfaces';
-export { CssClassObject } from './jsx-interfaces';
+import { CssClassMap } from './jsx-interfaces';
+export { CssClassMap } from './jsx-interfaces';
 
 
-export interface Ionic {
-  listener: {
-    enable: EventListenerEnable;
-    add: AddEventListenerApi;
-  };
-  controller?: any;
-  dom: DomControllerApi;
-  isServer: boolean;
-  isClient: boolean;
-}
-
-
-export interface IonicControllerApi {
-  load?: (opts?: any) => Promise<any>;
-}
-
-
-export interface ProjectGlobal {
+export interface CoreGlobal {
+  addListener?: AddEventListenerApi;
+  dom?: DomControllerApi;
+  emit?: (elm: Element, eventName: string, data?: EventEmitterData) => void;
+  enableListener?: EventListenerEnable;
+  eventNameFn?: (eventName: string) => string;
+  isClient?: boolean;
+  isServer?: boolean;
   mode?: string;
+}
+
+
+export interface AppGlobal {
   components?: LoadComponentRegistry[];
   defineComponents?: (moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
-  eventNameFn?: (eventName: string) => string;
-  loadController?: (ctrlName: string, ctrl: any) => any;
-  controllers?: {[ctrlName: string]: any};
-  DomCtrl?: DomControllerApi;
-  QueueCtrl?: QueueApi;
-  Animation?: any;
 }
 
 
 export interface AddEventListenerApi {
-  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: (ev?: any) => void, opts?: ListenOptions): Function;
+  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
 }
 
 
@@ -48,67 +36,8 @@ export interface EventListenerCallback {
 }
 
 
-export interface GestureDetail {
-  type?: string;
-  event?: UIEvent;
-  startX?: number;
-  startY?: number;
-  startTimeStamp?: number;
-  currentX?: number;
-  currentY?: number;
-  velocityX?: number;
-  velocityY?: number;
-  deltaX?: number;
-  deltaY?: number;
-  directionX?: 'left'|'right';
-  directionY?: 'up'|'down';
-  velocityDirectionX?: 'left'|'right';
-  velocityDirectionY?: 'up'|'down';
-  timeStamp?: number;
-}
-
-
-export interface GestureCallback {
-  (detail?: GestureDetail): boolean|void;
-}
-
-
-export interface ScrollDetail extends GestureDetail {
-  scrollTop?: number;
-  scrollLeft?: number;
-  scrollHeight?: number;
-  scrollWidth?: number;
-  contentHeight?: number;
-  contentWidth?: number;
-  contentTop?: number;
-  contentBottom?: number;
-  domWrite?: DomControllerCallback;
-  contentElement?: HTMLElement;
-  fixedElement?: HTMLElement;
-  scrollElement?: HTMLElement;
-  headerElement?: HTMLElement;
-  footerElement?: HTMLElement;
-}
-
-
-export interface ScrollCallback {
-  (detail?: ScrollDetail): boolean|void;
-}
-
-
-export interface ContentDimensions {
-  contentHeight: number;
-  contentTop: number;
-  contentBottom: number;
-
-  contentWidth: number;
-  contentLeft: number;
-
-  scrollHeight: number;
-  scrollTop: number;
-
-  scrollWidth: number;
-  scrollLeft: number;
+export interface EventEmitter {
+  emit: (data?: any) => void;
 }
 
 
@@ -118,11 +47,15 @@ export interface QueueApi {
 }
 
 
+export interface Now {
+  (): number;
+}
+
+
 export interface DomControllerApi {
   read: DomControllerCallback;
   write: DomControllerCallback;
   raf: DomControllerCallback;
-  now(): number;
 }
 
 export interface RafCallback {
@@ -222,14 +155,24 @@ export interface LoadComponentMeta {
   [5]: PropChangeMeta[];
 
   /**
+   * component instance events
+   */
+  [6]: EventMeta[];
+
+  /**
    * methods
    */
-  [6]: MethodMeta[];
+  [7]: MethodMeta[];
+
+  /**
+   * host element member name
+   */
+  [8]: string;
 
   /**
    * shadow
    */
-  [7]: boolean;
+  [9]: boolean;
 }
 
 
@@ -256,6 +199,34 @@ export interface ComponentListenersData {
 
   /**
    * enabled
+   */
+  [4]: number;
+}
+
+
+export interface ComponentEventData {
+  /**
+   * eventName
+   */
+  [0]: string;
+
+  /**
+   * instanceMethodName
+   */
+  [1]: string;
+
+  /**
+   * eventBubbles
+   */
+  [2]: number;
+
+  /**
+   * eventCancelable
+   */
+  [3]: number;
+
+  /**
+   * eventComposed
    */
   [4]: number;
 }
@@ -294,7 +265,7 @@ export interface ModuleFile {
 }
 
 
-export interface ProjectRegistry {
+export interface AppRegistry {
   namespace: string;
   loader: string;
   core?: string;
@@ -357,7 +328,7 @@ export interface BuildContext {
   styleSassOutputs?: ModuleBundles;
   filesToWrite?: FilesMap;
   dependentManifests?: {[collectionName: string]: Manifest};
-  projectFiles?: {
+  appFiles?: {
     loader?: string;
     core?: string;
     coreEs5?: string;
@@ -380,7 +351,7 @@ export interface BuildContext {
   sassBuildCount?: number;
   transpileBuildCount?: number;
   indexBuildCount?: number;
-  projectFileBuildCount?: number;
+  appFileBuildCount?: number;
 
   moduleBundleCount?: number;
   styleBundleCount?: number;
@@ -452,7 +423,7 @@ export interface LoggerTimeSpan {
 
 
 export interface ModulesImporterFn {
-  (importer: any, h: Function, t: Function, publicPath: string, Ionic: Ionic): void;
+  (importer: any, h: Function, t: Function, Core: CoreGlobal, pubicPath: string): void;
 }
 
 
@@ -509,6 +480,33 @@ export interface MethodDecorator {
 export interface MethodOptions {}
 
 
+export interface ElementDecorator {
+  (): any;
+}
+
+
+export interface EventDecorator {
+  (opts?: EventOptions): any;
+}
+
+
+export interface EventOptions {
+  eventName?: string;
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
+}
+
+
+export interface EventMeta {
+  eventName?: string;
+  eventMethodName?: string;
+  eventBubbles?: boolean;
+  eventCancelable?: boolean;
+  eventComposed?: boolean;
+}
+
+
 export interface ListenDecorator {
   (eventName: string, opts?: ListenOptions): any;
 }
@@ -557,6 +555,7 @@ export interface ComponentMeta {
   stylesMeta?: StylesMeta;
   methodsMeta?: MethodMeta[];
   propsMeta?: PropMeta[];
+  eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
   propsWillChangeMeta?: PropChangeMeta[];
   propsDidChangeMeta?: PropChangeMeta[];
@@ -564,9 +563,10 @@ export interface ComponentMeta {
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;
   assetsDirsMeta?: AssetsMeta[];
+  hostElementMember?: string;
   slotMeta?: number;
   loadPriority?: number;
-  componentModuleMeta?: any;
+  componentModule?: any;
   componentClass?: string;
 }
 
@@ -595,7 +595,7 @@ export interface HostMeta {
 }
 
 
-export interface Component {
+export interface ComponentInstance {
   componentWillLoad?: () => void;
   componentDidLoad?: () => void;
   componentWillUpdate?: () => void;
@@ -608,12 +608,9 @@ export interface Component {
   mode?: string;
   color?: string;
 
-  // public properties
-  $el?: HostElement;
-  $emit?: EmitEvent;
-
   // private properties
   __values?: ComponentInternalValues;
+  __el?: HostElement;
 
   [memberName: string]: any;
 }
@@ -636,7 +633,7 @@ export interface ComponentInternalValues {
 }
 
 
-export interface BaseInputComponent extends Component {
+export interface BaseInputComponent extends ComponentInstance {
   disabled: boolean;
   hasFocus: boolean;
   value: string;
@@ -653,7 +650,7 @@ export interface BooleanInputComponent extends BaseInputComponent {
 
 
 export interface ComponentModule {
-  new (): Component;
+  new (): ComponentInstance;
 }
 
 
@@ -670,7 +667,7 @@ export interface HostElement extends HTMLElement {
   disconnectedCallback?: () => void;
 
   // public properties
-  $instance?: Component;
+  $instance?: ComponentInstance;
   mode?: string;
   color?: string;
 
@@ -740,7 +737,7 @@ export interface VNode {
   vchildren: VNode[];
   vprops: any;
   vattrs: any;
-  vclass: CssClassObject;
+  vclass: CssClassMap;
   vstyle: any;
   vlisteners: any;
   vkey: Key;
@@ -754,7 +751,7 @@ export interface VNode {
 export interface VNodeData {
   props?: any;
   attrs?: any;
-  class?: CssClassObject;
+  class?: CssClassMap;
   style?: any;
   on?: any;
   key?: Key;
@@ -776,7 +773,7 @@ export interface VNodeProdData {
   /**
    * css classes
    */
-  c?: CssClassObject;
+  c?: CssClassMap;
   /**
    * styles
    */
@@ -808,16 +805,18 @@ export interface PlatformApi {
   render?: RendererApi;
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
-  isServer?: boolean;
   onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap) => void;
   getEventOptions: (opts?: ListenOptions) => any;
-  emitEvent: EmitEvent;
+  emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;
 }
 
 
-export interface EmitEvent {
-  (elm: Element, eventName: string, data: any): void;
+export interface EventEmitterData {
+  detail?: any;
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
 }
 
 
@@ -1005,6 +1004,12 @@ export interface Hyperscript {
 
 declare global {
 
+  const Core: CoreGlobal;
+
+  const publicPath: string;
+
+  const appNamespace: string;
+
   const h: Hyperscript;
 
   namespace JSX {
@@ -1166,6 +1171,8 @@ export interface ComponentData {
   states?: string[];
   listeners?: ListenerData[];
   methods?: string[];
+  events?: EventData[];
+  hostElement?: string;
   host?: any;
   assetPaths?: string[];
   slot?: 'hasSlots'|'hasNamedSlots';
@@ -1199,4 +1206,12 @@ export interface ListenerData {
   capture?: boolean;
   passive?: boolean;
   enabled?: boolean;
+}
+
+export interface EventData {
+  event: string;
+  method?: string;
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
 }

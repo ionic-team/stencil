@@ -1,5 +1,5 @@
 import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
-  ComponentMeta, ComponentData, Manifest, ManifestData, ModuleFile, ListenerData,
+  ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropChangeData, PropChangeMeta, PropData, PropMeta, StyleData, StyleMeta } from '../../util/interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS,
   PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
@@ -13,7 +13,7 @@ import { normalizePath } from '../util';
 // couple core component meta data between specific versions of the compiler
 
 
-export function writeProjectManifest(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+export function writeAppManifest(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
 
   // get the absolute path to the directory where the manifest will be saved
   const manifestDir = normalizePath(config.collectionDir);
@@ -21,11 +21,11 @@ export function writeProjectManifest(config: BuildConfig, ctx: BuildContext, bui
   // create an absolute file path to the actual manifest json file
   const manifestFilePath = normalizePath(config.sys.path.join(manifestDir, COLLECTION_MANIFEST_FILE_NAME));
 
-  config.logger.debug(`manifest, serializeProjectManifest: ${manifestFilePath}`);
+  config.logger.debug(`manifest, serializeAppManifest: ${manifestFilePath}`);
 
   // serialize the manifest into a json string and
   // add it to the list of files we need to write when we're ready
-  buildResults.manifest = serializeProjectManifest(config, manifestDir, ctx.manifest);
+  buildResults.manifest = serializeAppManifest(config, manifestDir, ctx.manifest);
 
   if (config.generateCollection) {
     // don't bother serializing/writing the manifest if we're not creating a collection
@@ -34,7 +34,7 @@ export function writeProjectManifest(config: BuildConfig, ctx: BuildContext, bui
 }
 
 
-export function serializeProjectManifest(config: BuildConfig, manifestDir: string, manifest: Manifest) {
+export function serializeAppManifest(config: BuildConfig, manifestDir: string, manifest: Manifest) {
   // create the single manifest we're going to fill up with data
   const manifestData: ManifestData = {
     components: [],
@@ -62,7 +62,7 @@ export function serializeProjectManifest(config: BuildConfig, manifestDir: strin
   serializeBundles(config, manifestData);
 
   // set the global path if it exists
-  serializeProjectGlobal(config, manifestDir, manifestData, manifest);
+  serializeAppGlobal(config, manifestDir, manifestData, manifest);
 
   // success!
   return manifestData;
@@ -126,6 +126,8 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeStates(cmpData, cmpMeta);
   serializeListeners(cmpData, cmpMeta);
   serializeMethods(cmpData, cmpMeta);
+  serializeEvents(cmpData, cmpMeta);
+  serializeHostElementMember(cmpData, cmpMeta);
   serializeHost(cmpData, cmpMeta);
   serializeSlots(cmpData, cmpMeta);
   serializeIsShadow(cmpData, cmpMeta);
@@ -152,6 +154,8 @@ export function parseComponent(config: BuildConfig, manifestDir: string, cmpData
   parseStates(cmpData, cmpMeta);
   parseListeners(cmpData, cmpMeta);
   parseMethods(cmpData, cmpMeta);
+  parseEvents(cmpData, cmpMeta);
+  parseHostElementMember(cmpData, cmpMeta);
   parseHost(cmpData, cmpMeta);
   parseIsShadow(cmpData, cmpMeta);
   parseSlots(cmpData, cmpMeta);
@@ -449,16 +453,21 @@ function serializeListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
       event: listenerMeta.eventName,
       method: listenerMeta.eventMethodName
     };
-    if (listenerMeta.eventPassive) {
-      listenerData.passive = true;
+    if (listenerMeta.eventPassive === false) {
+      listenerData.passive = false;
     }
-    if (listenerMeta.eventEnabled) {
-      listenerData.enabled = true;
+    if (listenerMeta.eventEnabled === false) {
+      listenerData.enabled = false;
     }
-    if (listenerMeta.eventCapture) {
-      listenerData.capture = true;
+    if (listenerMeta.eventCapture === false) {
+      listenerData.capture = false;
     }
     return listenerData;
+
+  }).sort((a, b) => {
+    if (a.event.toLowerCase() < b.event.toLowerCase()) return -1;
+    if (a.event.toLowerCase() > b.event.toLowerCase()) return 1;
+    return 0;
   });
 }
 
@@ -474,9 +483,9 @@ function parseListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     const listener: ListenMeta = {
       eventName: listenerData.event,
       eventMethodName: listenerData.method,
-      eventPassive: !!listenerData.passive,
-      eventEnabled: !!listenerData.enabled,
-      eventCapture: !!listenerData.capture
+      eventPassive: (listenerData.passive !== false),
+      eventEnabled: (listenerData.enabled !== false),
+      eventCapture: (listenerData.capture !== false)
     };
     return listener;
   });
@@ -496,6 +505,79 @@ function parseMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     return;
   }
   cmpMeta.methodsMeta = cmpData.methods;
+}
+
+
+function serializeEvents(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (invalidArrayData(cmpMeta.eventsMeta)) {
+    return;
+  }
+
+  cmpData.events = cmpMeta.eventsMeta.map(eventMeta => {
+    const eventData: EventData = {
+      event: eventMeta.eventName
+    };
+    if (eventMeta.eventMethodName !== eventMeta.eventName) {
+      eventData.method = eventMeta.eventMethodName;
+    }
+    if (eventMeta.eventBubbles === false) {
+      eventData.bubbles = false;
+    }
+    if (eventMeta.eventCancelable === false) {
+      eventData.cancelable = false;
+    }
+    if (eventMeta.eventComposed === false) {
+      eventData.composed = false;
+    }
+    return eventData;
+
+  }).sort((a, b) => {
+    if (a.event.toLowerCase() < b.event.toLowerCase()) return -1;
+    if (a.event.toLowerCase() > b.event.toLowerCase()) return 1;
+    return 0;
+  });
+}
+
+
+function parseEvents(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  const eventsData = cmpData.events;
+
+  if (invalidArrayData(eventsData)) {
+    return;
+  }
+
+  cmpMeta.eventsMeta = eventsData.map(eventData => {
+    const eventMeta: EventMeta = {
+      eventName: eventData.event,
+      eventMethodName: eventData.event
+    };
+
+    if (eventData.method) {
+      eventMeta.eventMethodName = eventData.method;
+    }
+
+    eventMeta.eventBubbles = (eventData.bubbles !== false);
+    eventMeta.eventCancelable = (eventData.cancelable !== false);
+    eventMeta.eventComposed = (eventData.composed !== false);
+
+    return eventMeta;
+  });
+}
+
+
+function serializeHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (typeof cmpMeta.hostElementMember !== 'string') {
+    return;
+  }
+  cmpData.hostElement = cmpMeta.hostElementMember;
+}
+
+
+function parseHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (typeof cmpData.hostElement !== 'string') {
+    return;
+  }
+  cmpMeta.hostElementMember = cmpData.hostElement;
 }
 
 
@@ -617,7 +699,7 @@ export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
 }
 
 
-export function serializeProjectGlobal(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+export function serializeAppGlobal(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
   if (!manifest.global) {
     return;
   }

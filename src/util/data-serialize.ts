@@ -1,5 +1,5 @@
-import { Bundle, ComponentMeta, ComponentRegistry, ListenMeta, LoadComponentRegistry, MethodMeta,
-  ModuleFile, PropChangeMeta, PropMeta, StateMeta, StylesMeta } from './interfaces';
+import { Bundle, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta, LoadComponentRegistry,
+  MethodMeta, ModuleFile, PropChangeMeta, PropMeta, StateMeta, StylesMeta } from './interfaces';
 import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, HAS_SLOTS, HAS_NAMED_SLOTS, TYPE_NUMBER } from '../util/constants';
 
 
@@ -135,12 +135,14 @@ export function formatDefineComponents(
 
 export function formatComponentMeta(cmpMeta: ComponentMeta) {
   const tag = cmpMeta.tagNameMeta.toLowerCase();
-  const methods = formatMethods(cmpMeta.methodsMeta);
+  const host = formatHost(cmpMeta.hostMeta);
   const states = formatStates(cmpMeta.statesMeta);
   const listeners = formatListeners(tag, cmpMeta.listenersMeta);
   const propWillChanges = formatPropChanges(tag, 'prop will change', cmpMeta.propsWillChangeMeta);
   const propDidChanges = formatPropChanges(tag, 'prop did change', cmpMeta.propsDidChangeMeta);
-  const host = formatHost(cmpMeta.hostMeta);
+  const events = formatEvents(tag, cmpMeta.eventsMeta);
+  const methods = formatMethods(cmpMeta.methodsMeta);
+  const hostElementMember = formatHostElementMember(cmpMeta.hostElementMember);
   const shadow = formatShadow(cmpMeta.isShadowMeta);
 
   const d: string[] = [];
@@ -151,29 +153,20 @@ export function formatComponentMeta(cmpMeta: ComponentMeta) {
   d.push(`/** ${tag}: [3] states **/\n${states}`);
   d.push(`/** ${tag}: [4] propWillChanges **/\n${propWillChanges}`);
   d.push(`/** ${tag}: [5] propDidChanges **/\n${propDidChanges}`);
-  d.push(`/** ${tag}: [6] methods **/\n${methods}`);
-  d.push(`/** ${tag}: [7] shadow **/\n${shadow}`);
+  d.push(`/** ${tag}: [6] events **/\n${events}`);
+  d.push(`/** ${tag}: [7] methods **/\n${methods}`);
+  d.push(`/** ${tag}: [8] hostElementMember **/\n${hostElementMember}`);
+  d.push(`/** ${tag}: [9] shadow **/\n${shadow}`);
 
   return `\n/***************** ${tag} *****************/\n[\n` + trimFalsyDataStr(d).join(',\n\n') + `\n\n]`;
 }
 
 
-export function formatJsBundleFileName(jsBundleId: string) {
-  return `${jsBundleId}.js`;
-}
-
-
-export function formatCssBundleFileName(cssBundleId: string) {
-  return `${cssBundleId}.css`;
-}
-
-
-function formatMethods(methods: MethodMeta[]) {
-  if (!methods || !methods.length) {
-    return '0 /* no methods */';
+function formatHost(val: any) {
+  if (val === undefined) {
+    return '0 /* no host data */';
   }
-
-  return `['` + methods.join(`', '`) + `']`;
+  return JSON.stringify(val);
 }
 
 
@@ -204,11 +197,11 @@ function formatListeners(label: string, listeners: ListenMeta[]) {
 function formatListenerOpts(label: string, listener: ListenMeta, listenerIndex: number) {
   const t = [
     `    /***** ${label} listener[${listenerIndex}]  ${listener.eventName} -> ${listener.eventName}() *****/\n` +
-    `    /* [0] eventMethod ***/ '${listener.eventMethodName}'`,
-    `    /* [1] eventName *****/ '${listener.eventName}'`,
-    `    /* [2] eventCapture **/ ${formatBoolean(listener.eventCapture)}`,
-    `    /* [3] eventPassive **/ ${formatBoolean(listener.eventPassive)}`,
-    `    /* [4] eventEnabled **/ ${formatBoolean(listener.eventEnabled)}`,
+    `    /* [0] instance method **/ '${listener.eventMethodName}'`,
+    `    /* [1] event name *******/ '${listener.eventName}'`,
+    `    /* [2] use capture ******/ ${formatBoolean(listener.eventCapture)}`,
+    `    /* [3] use passive ******/ ${formatBoolean(listener.eventPassive)}`,
+    `    /* [4] is enabled *******/ ${formatBoolean(listener.eventEnabled)}`,
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
@@ -248,11 +241,50 @@ function formatPropChangeOpts(label: string, propChangeType: string, propChange:
 }
 
 
-function formatHost(val: any) {
-  if (val === undefined) {
-    return '0 /* no host data */';
+function formatEvents(label: string, events: EventMeta[]) {
+  if (!events || !events.length) {
+    return '0 /* no events */';
   }
-  return JSON.stringify(val);
+
+  const t: string[] = [];
+
+  events.forEach(eventMeta => {
+    t.push(formatEventOpts(label, eventMeta));
+  });
+
+  return `[\n` + t.join(',\n') + `\n]`;
+}
+
+
+function formatEventOpts(label: string, eventMeta: EventMeta) {
+  const t = [
+    `    /*****  ${label} ${eventMeta.eventName} ***** /\n` +
+    `    /* [0] event name ***/ '${eventMeta.eventName}'`,
+    `    /* [1] method name **/ '${eventMeta.eventMethodName}'`,
+    `    /* [2] bubbles ******/ '${formatBoolean(eventMeta.eventBubbles)}'`,
+    `    /* [3] cancelable ***/ '${formatBoolean(eventMeta.eventCancelable)}'`,
+    `    /* [4] composed *****/ '${formatBoolean(eventMeta.eventComposed)}'`
+  ];
+
+  return `  [\n` + t.join(',\n') + `\n  ]`;
+}
+
+
+function formatMethods(methods: MethodMeta[]) {
+  if (!methods || !methods.length) {
+    return '0 /* no methods */';
+  }
+
+  return `['` + methods.join(`', '`) + `']`;
+}
+
+
+function formatHostElementMember(val: any) {
+  if (typeof val !== 'string') {
+    return `0 /* no host element member name */`;
+  }
+
+  return `'${val.trim()}'`;
 }
 
 
@@ -260,6 +292,16 @@ function formatShadow(val: boolean) {
   return val ?
     '1 /* use shadow dom */' :
     '0 /* do not use shadow dom */';
+}
+
+
+export function formatJsBundleFileName(jsBundleId: string) {
+  return `${jsBundleId}.js`;
+}
+
+
+export function formatCssBundleFileName(cssBundleId: string) {
+  return `${cssBundleId}.css`;
 }
 
 

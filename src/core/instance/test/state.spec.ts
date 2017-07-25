@@ -1,5 +1,5 @@
 import { mockPlatform, mockDomApi } from '../../../test';
-import { ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
+import { ComponentMeta, ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
 import { initProxy } from '../proxy';
 
 
@@ -44,7 +44,7 @@ describe('instance state', () => {
   const plt: PlatformApi = <any>mockPlatform();
   const domApi = mockDomApi();
   let elm: HostElement;
-  let instance: any;
+  let instance: ComponentInstance;
   let cmpMeta: ComponentMeta;
 
   class TestInstance {
@@ -55,7 +55,7 @@ describe('instance state', () => {
     elm = domApi.$createElement('ion-cmp') as any;
     instance = new TestInstance();
     elm.$instance = instance;
-    instance.$el = elm;
+    instance.__el = elm;
   });
 
 });

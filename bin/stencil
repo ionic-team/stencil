@@ -33,14 +33,14 @@ var config = {
 
 var configFileName = 'stencil.config.js';
 
-var projectConfigFileNameCmdIndex = cmdArgs.indexOf('--config');
-if (projectConfigFileNameCmdIndex > -1) {
-  configFileName = cmdArgs[projectConfigFileNameCmdIndex + 1];
+var appConfigFileNameCmdIndex = cmdArgs.indexOf('--config');
+if (appConfigFileNameCmdIndex > -1) {
+  configFileName = cmdArgs[appConfigFileNameCmdIndex + 1];
 
 } else {
-  projectConfigFileNameCmdIndex = cmdArgs.indexOf('-c');
-  if (projectConfigFileNameCmdIndex > -1) {
-    configFileName = cmdArgs[projectConfigFileNameCmdIndex + 1];
+  appConfigFileNameCmdIndex = cmdArgs.indexOf('-c');
+  if (appConfigFileNameCmdIndex > -1) {
+    configFileName = cmdArgs[appConfigFileNameCmdIndex + 1];
   }
 }
 

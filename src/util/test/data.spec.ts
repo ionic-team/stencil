@@ -1,8 +1,8 @@
+import { ATTR_DASH_CASE, ATTR_LOWER_CASE, HAS_SLOTS, PRIORITY_LOW,
+  PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
 import { formatComponentMeta, formatLoadComponentRegistry } from '../data-serialize';
 import { parseComponentMeta, parseComponentRegistry, parsePropertyValue } from '../data-parse';
 import { ComponentMeta, ComponentRegistry } from '../interfaces';
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE, HAS_SLOTS, PRIORITY_LOW,
-  PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
 
 
 describe('data serialize/parse', () => {
@@ -11,7 +11,36 @@ describe('data serialize/parse', () => {
 
     beforeEach(() => {
       registry = {};
-      cmpMeta = registry['TAG'] = { tagNameMeta: 'TAG' };
+      cmpMeta = { tagNameMeta: 'TAG' };
+      registry['TAG'] = { tagNameMeta: 'TAG' };
+    });
+
+    it('should set eventsMeta', () => {
+      cmpMeta.eventsMeta = [
+        {
+          eventName: 'open',
+          eventMethodName: 'openMethod',
+          eventBubbles: true,
+          eventCancelable: true,
+          eventComposed: true
+        }
+      ];
+
+      const format = formatComponentMeta(cmpMeta);
+      parseComponentMeta(registry, moduleImports, evalStr(format));
+
+      expect(registry['TAG'].eventsMeta[0].eventName).toBe('open');
+      expect(registry['TAG'].eventsMeta[0].eventMethodName).toBe('openMethod');
+      expect(registry['TAG'].eventsMeta[0].eventBubbles).toBe(true);
+      expect(registry['TAG'].eventsMeta[0].eventCancelable).toBe(true);
+      expect(registry['TAG'].eventsMeta[0].eventComposed).toBe(true);
+    });
+
+    it('should set no eventsMeta', () => {
+      const format = formatComponentMeta(cmpMeta);
+      parseComponentMeta(registry, moduleImports, evalStr(format));
+
+      expect(registry['TAG'].eventsMeta).toBeFalsy();
     });
 
     it('should set shadow dom', () => {
@@ -28,6 +57,22 @@ describe('data serialize/parse', () => {
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
       expect(registry['TAG'].isShadowMeta).toBeFalsy();
+    });
+
+    it('should set host element member name', () => {
+      cmpMeta.hostElementMember = 'myHostElement';
+
+      const format = formatComponentMeta(cmpMeta);
+      parseComponentMeta(registry, moduleImports, evalStr(format));
+
+      expect(registry['TAG'].hostElementMember).toEqual('myHostElement');
+    });
+
+    it('should set no host element member name', () => {
+      const format = formatComponentMeta(cmpMeta);
+      parseComponentMeta(registry, moduleImports, evalStr(format));
+
+      expect(registry['TAG'].hostElementMember).toBeFalsy();
     });
 
     it('should set hostMeta', () => {
@@ -150,11 +195,11 @@ describe('data serialize/parse', () => {
       expect(registry['TAG'].methodsMeta).toBeFalsy();
     });
 
-    it('should set componentModuleMeta', () => {
+    it('should set componentModule', () => {
       const format = formatComponentMeta(cmpMeta);
-      parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(cmpMeta.componentModuleMeta).toEqual(moduleImports.TAG);
+      parseComponentMeta(registry, moduleImports, evalStr(format));
+      expect(registry['TAG'].componentModule).toEqual(moduleImports.TAG);
     });
 
   });

@@ -1,10 +1,11 @@
-import { CssClassObject } from '../util/interfaces';
+import { CssClassMap } from '../util/interfaces';
 
-export function createThemedClasses(mode: string, color: string, classList: string): CssClassObject {
-  let allClassObj: CssClassObject = {};
+
+export function createThemedClasses(mode: string, color: string, classList: string) {
+  const allClasses: CssClassMap = {};
 
   return classList.split(' ')
-    .reduce((classObj: CssClassObject, classString: string): CssClassObject => {
+    .reduce((classObj: CssClassMap, classString: string): CssClassMap => {
       classObj[classString] = true;
 
       if (mode) {
@@ -17,5 +18,5 @@ export function createThemedClasses(mode: string, color: string, classList: stri
       }
 
       return classObj;
-    }, allClassObj);
+    }, allClasses);
 }

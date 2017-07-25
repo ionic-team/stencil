@@ -34,8 +34,6 @@ const CLIENT_LOADER_ENTRY_FILE = path.join(SRC_CLIENT_DIR, 'loader.js');
 const DIST_CLIENT_LOADER_DEV_FILE = path.join(DIST_CLIENT_DIR, 'loader.dev.js');
 const DIST_CLIENT_LOADER_PROD_FILE = path.join(DIST_CLIENT_DIR, 'loader.js');
 
-const STENCIL_GLOBAL_NAMESPACE = '__STENCIL__APP__';
-
 
 fs.ensureDirSync(DIST_CLIENT_DIR);
 
@@ -91,8 +89,8 @@ function bundleClientCore(coreEntryFile, outputDevFile, outputProdFile, es6Class
 function generateClientCoreDev(bundle, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode) {
   var clientCore = bundle.generate({
     format: 'es',
-    intro: '(function(window, document, projectNamespace, publicPath) {\n"use strict";\n',
-    outro: '})(window, document, "' + STENCIL_GLOBAL_NAMESPACE + '");'
+    intro: '(function(window, document, Core, appNamespace, publicPath) {\n"use strict";\n',
+    outro: '})(window, document, Core, appNamespace, publicPath);'
   });
 
   var devCode = clientCore.code;
@@ -178,18 +176,6 @@ function runClosure(inputFile, outputProdFile, es6ClassHack) {
 
       fs.unlink(inputFile);
     }
-
-    // (function(B,U){
-    var match = /\(function\((.*?)\)\{/.exec(prodCode);
-    if (!match) {
-      match = /\(function\((.*?)\)\ {/.exec(prodCode);
-      if (!match) {
-        console.log(prodCode);
-        throw 'addUseStrict: something done changed!';
-      }
-    }
-
-    prodCode = prodCode.replace(match[0], '(function(' + match[1] + '){"use-strict";')
 
     fs.writeFile(outputProdFile, prodCode, (err) => {
       if (err) {

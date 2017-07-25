@@ -3,13 +3,13 @@ import { createOnWarnFn, transpiledInMemoryPlugin } from '../bundle/bundle-modul
 import { getJsFile } from '../util';
 
 
-export function generateProjectGlobal(config: BuildConfig, ctx: BuildContext, publicPath: string) {
+export function generateAppGlobal(config: BuildConfig, ctx: BuildContext) {
   let globalJsContents: string[] = [];
 
-  return loadDependentGlobalJsContents(config, ctx, publicPath).then(dependentGlobalJsContents => {
+  return loadDependentGlobalJsContents(config, ctx).then(dependentGlobalJsContents => {
     globalJsContents = globalJsContents.concat(dependentGlobalJsContents.filter(c => c));
 
-    return bundleProjectGlobal(config, ctx, publicPath).then(projectGlobalJsContent => {
+    return bundleProjectGlobal(config, ctx).then(projectGlobalJsContent => {
       if (projectGlobalJsContent) {
         globalJsContents.push(projectGlobalJsContent);
       }
@@ -21,7 +21,7 @@ export function generateProjectGlobal(config: BuildConfig, ctx: BuildContext, pu
 }
 
 
-function loadDependentGlobalJsContents(config: BuildConfig, ctx: BuildContext, publicPath: string): Promise<string[]> {
+function loadDependentGlobalJsContents(config: BuildConfig, ctx: BuildContext): Promise<string[]> {
   if (!ctx.manifest.dependentManifests) {
     return Promise.resolve([]);
   }
@@ -31,18 +31,18 @@ function loadDependentGlobalJsContents(config: BuildConfig, ctx: BuildContext, p
 
   return Promise.all(dependentManifests.map(dependentManifest => {
     return getJsFile(config.sys, ctx, dependentManifest.global.jsFilePath).then(jsContent => {
-      return wrapGlobalJs(config, ctx, dependentManifest.manifestName, jsContent, publicPath);
+      return wrapGlobalJs(config, ctx, dependentManifest.manifestName, jsContent);
     });
   }));
 }
 
 
-function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, publicPath: string): Promise<string> {
+function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext): Promise<string> {
   // stencil by itself does not have a global file
-  // however, projects like Ionic can provide a global file
+  // however, other collections can provide a global js
   // which will bundle whatever is in the global, and then
-  // prepend the output content on top of stencil's core js
-  // this way projects like Ionic can provide a shared global at runtime
+  // prepend the output content on top of the core js
+  // this way external collections can provide a shared global at runtime
 
   if (!config.global) {
     // looks like they never provided an entry file, which is fine, so let's skip this
@@ -76,9 +76,7 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, publicPath:
     const results = rollupBundle.generate({
       format: 'es'
     });
-
-    const globalJsName = config.namespace;
-    return wrapGlobalJs(config, ctx, globalJsName, results.code, publicPath);
+    return wrapGlobalJs(config, ctx, config.namespace, results.code);
 
   }).then(output => {
 
@@ -89,14 +87,14 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, publicPath:
 }
 
 
-function wrapGlobalJs(config: BuildConfig, ctx: BuildContext, globalJsName: string, jsContent: string, publicPath: string) {
+function wrapGlobalJs(config: BuildConfig, ctx: BuildContext, globalJsName: string, jsContent: string) {
   jsContent = (jsContent || '').trim();
-
-  jsContent = `\n/** ${globalJsName || ''} global **/\n"use strict";\n${jsContent}\n\n`;
 
   if (!config.minifyJs) {
     // just format it a touch better in dev mode
-    let lines = jsContent.split(/\r?\n/);
+    jsContent = `\n/** ${globalJsName || ''} global **/\n\n${jsContent}`;
+
+    const lines = jsContent.split(/\r?\n/);
     jsContent = lines.map(line => {
       if (line.length) {
         return '    ' + line;
@@ -105,7 +103,7 @@ function wrapGlobalJs(config: BuildConfig, ctx: BuildContext, globalJsName: stri
     }).join('\n');
   }
 
-  jsContent = `(function(window, document, publicPath){${jsContent}})(window, document, "${publicPath}/");\n`;
+  jsContent = `\n(function(publicPath){${jsContent}\n})(publicPath);\n`;
 
   if (config.minifyJs) {
     // minify js
@@ -114,7 +112,7 @@ function wrapGlobalJs(config: BuildConfig, ctx: BuildContext, globalJsName: stri
       ctx.diagnostics.push(d);
     });
 
-    if (minifyJsResults.output) {
+    if (!minifyJsResults.diagnostics.length) {
       jsContent = minifyJsResults.output;
     }
   }

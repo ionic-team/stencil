@@ -1,5 +1,5 @@
 import { validateAttrCase, validateBuildConfig } from '../validation';
-import { BuildConfig } from '../../interfaces';
+import { BuildConfig } from '../../../util/interfaces';
 import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../../../util/constants';
 import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
 import * as path from 'path';

@@ -1,6 +1,6 @@
 import { AssetsMeta, BuildConfig, BuildContext, ComponentOptions, ComponentMeta, ModuleFile } from '../../util/interfaces';
 import { catchError, normalizePath } from '../util';
-import { getProjectBuildDir } from '../project/generate-project-files';
+import { getAppBuildDir } from '../app/generate-app-files';
 
 
 export function normalizeAssetsDir(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta)  {
@@ -68,12 +68,12 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
   });
 
 
-  // copy all of the files in asset directories to the project's build directory
+  // copy all of the files in asset directories to the app's build directory
   let dirCopyPromises = copyToBuildDir.map(assetsMeta => {
     return new Promise((resolve, reject) => {
       // figure out what the path is to the component directory
       const buildDirDestination = normalizePath(config.sys.path.join(
-        getProjectBuildDir(config),
+        getAppBuildDir(config),
         assetsMeta.cmpRelativePath
       ));
 
@@ -93,7 +93,7 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
   // but only do this copy when the generateCollection flag is set to true
   if (config.generateCollection) {
 
-    // copy all of the files in asset directories to the project's collection directory
+    // copy all of the files in asset directories to the app's collection directory
     dirCopyPromises = dirCopyPromises.concat(copyToCollectionDir.map(assetsMeta => {
       return new Promise((resolve, reject) => {
         // figure out what the path is to the component directory

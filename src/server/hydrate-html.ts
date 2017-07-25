@@ -1,10 +1,8 @@
-import { BuildConfig, BuildContext, ComponentRegistry, HostElement, PlatformApi,
+import { BuildConfig, BuildContext, ComponentRegistry, CoreGlobal, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
-import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
-import { getProjectBuildDir } from '../compiler/project/generate-project-files';
+import { getAppBuildDir } from '../compiler/app/generate-app-files';
 import { initHostConstructor } from '../core/instance/init';
-import { initProjectGlobal } from './global-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
 
 
@@ -25,11 +23,9 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     return callback(hydrateResults);
   }
 
-  // create the global namespace which singletons go on
-  const Glb = initProjectGlobal();
-
   // create a emulated window
   // attach data the request to the window
+  const coreGlobal: CoreGlobal = {};
   const dom = config.sys.createDom();
   const win = dom.parse(opts);
   const doc = win.document;
@@ -39,22 +35,17 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
   normalizeDirection(doc, opts);
   normalizeLanguage(doc, opts);
 
-  // create the DOM api which we'll use during hydrate
-  const domApi = createDomApi(win.document);
-
-  // get the path to the project's build directory
-  const projectBuildDir = getProjectBuildDir(config);
+  // get the path to the app's build directory
+  const appBuildDir = getAppBuildDir(config);
 
   // create the platform
   const plt = createPlatformServer(
+    coreGlobal,
     config.sys,
     config.logger,
     config.namespace,
-    Glb,
     win,
-    domApi,
-    Glb.DomCtrl,
-    projectBuildDir,
+    appBuildDir,
     ctx
   );
 

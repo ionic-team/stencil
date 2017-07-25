@@ -2,7 +2,7 @@ import { PRIORITY_HIGH, PRIORITY_LOW } from '../util/constants';
 import { QueueApi } from '../util/interfaces';
 
 
-export function QueueServer(): QueueApi {
+export function createQueueServer(): QueueApi {
   const highCallbacks: Function[] = [];
   const mediumCallbacks: Function[] = [];
   const lowCallbacks: Function[] = [];

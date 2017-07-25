@@ -1,9 +1,9 @@
-import { Component, HostElement, ListenMeta, ListenOptions, PlatformApi } from '../../util/interfaces';
+import { ComponentInstance, EventEmitterData, EventMeta, HostElement, ListenMeta, ListenOptions, PlatformApi } from '../../util/interfaces';
 import { getElementReference, noop } from '../../util/helpers';
 import { KEY_CODE_MAP } from '../../util/constants';
 
 
-export function attachListeners(plt: PlatformApi, listeners: ListenMeta[], elm: HostElement, instance: Component) {
+export function attachListeners(plt: PlatformApi, listeners: ListenMeta[], elm: HostElement, instance: ComponentInstance) {
   if (listeners) {
     for (var i = 0; i < listeners.length; i++) {
       var listener = listeners[i];
@@ -21,9 +21,11 @@ export function attachListeners(plt: PlatformApi, listeners: ListenMeta[], elm: 
 }
 
 
-export function enableListener(plt: PlatformApi, elm: HostElement, instance: Component, eventName: string, shouldEnable: boolean, attachTo?: string) {
+export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string) {
   if (instance) {
-    const listenerMeta = plt.getComponentMeta(elm).listenersMeta;
+    const elm = instance.__el;
+    const cmpMeta = plt.getComponentMeta(elm);
+    const listenerMeta = cmpMeta.listenersMeta;
 
     if (listenerMeta) {
       const deregisterFns = elm._listeners = elm._listeners || {};
@@ -35,7 +37,7 @@ export function enableListener(plt: PlatformApi, elm: HostElement, instance: Com
 
           if (shouldEnable && !deregisterFns[eventName]) {
             var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(plt, instance.$el, attachToEventName, (<any>instance)[listener.eventMethodName].bind(instance), listener);
+            deregisterFns[eventName] = addEventListener(plt, elm, attachToEventName, (<any>instance)[listener.eventMethodName].bind(instance), listener);
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();
@@ -51,12 +53,8 @@ export function enableListener(plt: PlatformApi, elm: HostElement, instance: Com
 
 
 export function addEventListener(plt: PlatformApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): any}, opts: ListenOptions) {
-  if (!elm) {
-    return noop;
-  }
-
   var splt = eventName.split(':');
-  if (splt.length > 1) {
+  if (elm && splt.length > 1) {
     // document:mousemove
     // parent:touchend
     // body:keyup.enter
@@ -88,9 +86,8 @@ export function addEventListener(plt: PlatformApi, elm: HTMLElement|HTMLDocument
 
     // test if this is the user's interaction
     if (isUserInteraction(eventName)) {
-      // so it's very important to flush the queue now
-      // so that the app reflects whatever they just did
-      // basically don't let requestIdleCallback delay the important
+      // so turns out that it's very important to flush the queue now
+      // this way the app immediately reflects whatever the user just did
       plt.queue.flush();
     }
   };
@@ -131,5 +128,26 @@ export function detachListeners(elm: HostElement) {
     }
 
     elm._listeners = null;
+  }
+}
+
+
+export function initComponentEvents(plt: PlatformApi, componentEvents: EventMeta[], instance: ComponentInstance) {
+  if (componentEvents) {
+    componentEvents.forEach(eventMeta => {
+
+      instance[eventMeta.eventMethodName] = {
+        emit: function eventEmitter(data: any) {
+          const eventData: EventEmitterData = {
+            bubbles: eventMeta.eventBubbles,
+            composed: eventMeta.eventComposed,
+            cancelable: eventMeta.eventCancelable,
+            detail: data
+          };
+          plt.emitEvent(instance.__el, eventMeta.eventName, eventData);
+        }
+      };
+
+    });
   }
 }

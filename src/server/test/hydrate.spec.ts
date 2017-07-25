@@ -14,7 +14,7 @@ describe('hydrate', () => {
     };
     const registry: ComponentRegistry = {
       'ION-TEST': {
-        componentModuleMeta: class {
+        componentModule: class {
           render() {
             return h('elm-a', 0, [
               h(SLOT_TAG, { a: { name: 'slot-a' }}),
@@ -39,7 +39,6 @@ describe('hydrate', () => {
     hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
-console.log(hydrateResults.diagnostics)
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
         <html dir="ltr">
           <head></head>
@@ -66,7 +65,7 @@ console.log(hydrateResults.diagnostics)
     };
     const registry: ComponentRegistry = {
       'ION-TEST': {
-        componentModuleMeta: class {
+        componentModule: class {
           render() {
             return h('elm-a', 0, [
               'inner text',
@@ -106,14 +105,14 @@ console.log(hydrateResults.diagnostics)
     });
   });
 
-  fit('should load one component and assign ssr ids', (done) => {
+  it('should load one component and assign ssr ids', (done) => {
     const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
     };
     const registry: ComponentRegistry = {
       'ION-TEST': {
-        componentModuleMeta: class {
+        componentModule: class {
           render() {
             return h('div', 0);
           }

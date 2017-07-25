@@ -1,5 +1,5 @@
 import { mockPlatform, mockDomApi } from '../../../test';
-import { ComponentMeta, PlatformApi } from '../../../util/interfaces';
+import { ComponentMeta, ComponentInstance, PlatformApi } from '../../../util/interfaces';
 import { ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
 import { initProxy } from '../proxy';
 
@@ -78,7 +78,7 @@ describe('instance change detection', () => {
   let plt: PlatformApi;
   const domApi = mockDomApi();
   let elm: any;
-  let instance: any;
+  let instance: ComponentInstance;
 
   class TwinPines {
     num = 88;
@@ -133,7 +133,7 @@ describe('instance change detection', () => {
     elm = domApi.$createElement('ion-cmp') as any;
     instance = new TwinPines();
     elm.$instance = instance;
-    instance.$el = elm;
+    instance.__el = elm;
   });
 
 });

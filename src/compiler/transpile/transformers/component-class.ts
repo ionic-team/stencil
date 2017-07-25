@@ -1,6 +1,8 @@
 import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile } from '../../../util/interfaces';
 import { buildError } from '../../util';
 import { getComponentDecoratorData } from './component-decorator';
+import { getElementDecoratorMeta } from './element-decorator';
+import { getEventDecoratorMeta } from './event-decorator';
 import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropDecoratorMeta } from './prop-decorator';
@@ -28,6 +30,8 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
         moduleFile.cmpMeta.componentClass = classNode.name.getText().trim();
         moduleFile.hasCmpClass = true;
 
+        getElementDecoratorMeta(moduleFile, classNode);
+        getEventDecoratorMeta(moduleFile, diagnostics, classNode);
         getMethodDecoratorMeta(moduleFile, classNode);
         getStateDecoratorMeta(moduleFile, classNode);
         getPropDecoratorMeta(moduleFile, diagnostics, classNode);

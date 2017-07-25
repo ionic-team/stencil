@@ -1,5 +1,5 @@
 import { catchError } from '../../util';
-import { Diagnostic, ListenMeta, ModuleFile } from '../../../util/interfaces';
+import { Diagnostic, ListenMeta, ListenOptions, ModuleFile } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
@@ -12,7 +12,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
     let isListen = false;
     let methodName: string = null;
     let eventName: string = null;
-    let rawListenMeta: ListenMeta = {};
+    let rawListenOpts: ListenOptions = {};
 
     memberNode.forEachChild(n => {
 
@@ -30,7 +30,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
           } else if (n.kind === ts.SyntaxKind.ObjectLiteralExpression && eventName) {
             try {
               const fnStr = `return ${n.getText()};`;
-              Object.assign(rawListenMeta, new Function(fnStr)());
+              Object.assign(rawListenOpts, new Function(fnStr)());
 
             } catch (e) {
               const d = catchError(diagnostics, e);
@@ -51,7 +51,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 
     if (isListen && eventName && methodName) {
       eventName.split(',').forEach(evName => {
-        validateListener(moduleFile, evName, rawListenMeta, methodName, memberNode);
+        validateListener(moduleFile, evName, rawListenOpts, methodName, memberNode);
       });
     }
   });
@@ -66,7 +66,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 }
 
 
-function validateListener(fileMeta: ModuleFile, eventName: string, rawListenMeta: ListenMeta, methodName: string, memberNode: ts.ClassElement) {
+function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts: ListenOptions, methodName: string, memberNode: ts.ClassElement) {
   eventName = eventName.trim();
   if (!eventName) return;
 
@@ -94,40 +94,40 @@ function validateListener(fileMeta: ModuleFile, eventName: string, rawListenMeta
     rawEventName = splt[0];
   }
 
-  const listener: ListenMeta = Object.assign({}, rawListenMeta);
+  const listenMeta: ListenMeta = {
+    eventName: eventName,
+    eventMethodName: methodName
+  };
 
-  listener.eventName = eventName;
-  listener.eventMethodName = methodName;
-
-  if (listener.eventCapture === undefined) {
+  if (rawListenOpts.capture === undefined) {
     // default to not use capture if it wasn't provided
-    listener.eventCapture = false;
+    listenMeta.eventCapture = false;
   }
-  listener.eventCapture = !!listener.eventCapture;
+  listenMeta.eventCapture = !!listenMeta.eventCapture;
 
-  if (listener.eventPassive === undefined) {
+  if (rawListenOpts.passive === undefined) {
     // they didn't set if it should be passive or not
     // so let's figure out some good defaults depending
     // on what type of event this is
 
     if (PASSIVE_TRUE_DEFAULTS.indexOf(rawEventName.toLowerCase()) > -1) {
       // good list of known events that we should default to passive
-      listener.eventPassive = true;
+      listenMeta.eventPassive = true;
 
     } else {
       // play it safe and have all others default to NOT be passive
-      listener.eventPassive = false;
+      listenMeta.eventPassive = false;
     }
   }
-  listener.eventPassive = !!listener.eventPassive;
+  listenMeta.eventPassive = !!listenMeta.eventPassive;
 
-  if (listener.eventEnabled === undefined) {
+  if (rawListenOpts.enabled === undefined) {
     // default to enabled if it wasn't provided
-    listener.eventEnabled = true;
+    listenMeta.eventEnabled = true;
   }
-  listener.eventEnabled = !!listener.eventEnabled;
+  listenMeta.eventEnabled = !!listenMeta.eventEnabled;
 
-  fileMeta.cmpMeta.listenersMeta.push(listener);
+  fileMeta.cmpMeta.listenersMeta.push(listenMeta);
 
   // gathered valid meta data
   // remove decorator entirely

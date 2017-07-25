@@ -1,24 +1,24 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildContext, ComponentMeta, ComponentRegistry,
-  DomApi, DomControllerApi, FilesMap, HostElement, ListenOptions, Logger,
-  ModuleCallbacks, PlatformApi, ProjectGlobal, StencilSystem } from '../util/interfaces';
+  CoreGlobal, FilesMap, HostElement, ListenOptions, Logger,
+  ModuleCallbacks, PlatformApi, AppGlobal, StencilSystem } from '../util/interfaces';
+import { createDomApi } from '../core/renderer/dom-api';
+import { createDomControllerServer } from './dom-controller-server';
+import { createQueueServer } from './queue-server';
 import { createRenderer } from '../core/renderer/patch';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
-import { initGlobal } from './global-server';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
 
 
 export function createPlatformServer(
+  Core: CoreGlobal,
   sys: StencilSystem,
   logger: Logger,
-  projectNamespace: string,
-  Gbl: ProjectGlobal,
+  appNamespace: string,
   win: any,
-  domApi: DomApi,
-  dom: DomControllerApi,
-  projectBuildDir: string,
+  appBuildDir: string,
   ctx?: BuildContext
 ): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
@@ -30,30 +30,44 @@ export function createPlatformServer(
   const stylesMap: FilesMap = {};
 
 
-  const plt: PlatformApi = {
-    defineComponent,
-    getComponentMeta,
-    loadBundle,
-    connectHostElement,
-    queue: Gbl.QueueCtrl,
-    tmpDisconnected: false,
-    isServer: true,
-    emitEvent: noop,
-    getEventOptions
-  };
+  // initialize Core global object
+  Core.addListener = noop;
+  Core.enableListener = noop;
+  Core.emit = noop;
+  Core.dom = createDomControllerServer();
+  Core.isClient = false;
+  Core.isServer = true;
 
-  // create the renderer which will be used to patch the vdom
-  plt.render = createRenderer(plt, domApi);
 
-  const injectedGlobal = initGlobal(dom);
+  // create the app global
+  const App: AppGlobal = {};
 
-  // add the project's global to the window context
-  win[projectNamespace] = Gbl;
+  // add the app's global to the window context
+  win[appNamespace] = App;
 
   // create the sandboxed context with a new instance of a V8 Context
   // V8 Context provides an isolated global environment
   sys.vm.createContext(win);
 
+
+  // create the DOM api which we'll use during hydrate
+  const domApi = createDomApi(win.document);
+
+  // create the platform api which is used throughout common core code
+  const plt: PlatformApi = {
+    defineComponent,
+    getComponentMeta,
+    loadBundle,
+    connectHostElement,
+    queue: createQueueServer(),
+    tmpDisconnected: false,
+    emitEvent: noop,
+    getEventOptions
+  };
+
+
+  // create the renderer which will be used to patch the vdom
+  plt.render = createRenderer(plt, domApi);
 
   // setup the root node of all things
   // which is the mighty <html> tag
@@ -73,8 +87,8 @@ export function createPlatformServer(
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
-      // next check the project's global, such as Ionic.mode
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Gbl.mode;
+      // next check the app's global
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Core.mode;
     }
 
     assignHostContentSlots(domApi, elm, slotMeta);
@@ -91,19 +105,19 @@ export function createPlatformServer(
     const registryTag = cmpMeta.tagNameMeta.toUpperCase();
     registry[registryTag] = cmpMeta;
 
-    if (cmpMeta.componentModuleMeta) {
+    if (cmpMeta.componentModule) {
       // for unit testing
-      moduleImports[registryTag] = cmpMeta.componentModuleMeta;
+      moduleImports[registryTag] = cmpMeta.componentModule;
     }
   }
 
 
-  Gbl.defineComponents = function defineComponents(module, importFn) {
+  App.defineComponents = function defineComponents(module, importFn) {
     const args = arguments;
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, projectBuildDir, injectedGlobal);
+    importFn(moduleImports, h, t, Core, appBuildDir);
 
     for (var i = 2; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);
@@ -124,7 +138,7 @@ export function createPlatformServer(
 
 
   function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
-    if (cmpMeta.componentModuleMeta) {
+    if (cmpMeta.componentModule) {
       // we already have the module loaded
       // (this is probably a unit test)
       cb();
@@ -147,7 +161,7 @@ export function createPlatformServer(
       }
 
       // create the module filePath we'll be reading
-      const jsFilePath = normalizePath(sys.path.join(projectBuildDir, `${moduleId}.js`));
+      const jsFilePath = normalizePath(sys.path.join(appBuildDir, `${moduleId}.js`));
 
       if (!pendingModuleFileReads[jsFilePath]) {
         // not already actively reading this file
@@ -174,7 +188,7 @@ export function createPlatformServer(
       if (styleId) {
         // we've got a style id to load up
         // create the style filePath we'll be reading
-        const styleFilePath = normalizePath(sys.path.join(projectBuildDir, `${styleId}.css`));
+        const styleFilePath = normalizePath(sys.path.join(appBuildDir, `${styleId}.css`));
 
         if (!stylesMap[styleFilePath]) {
           // this style hasn't been added to our collection yet

@@ -1,11 +1,11 @@
-import { Component, ComponentMeta, ComponentInternalValues,
+import { ComponentInstance, ComponentMeta, ComponentInternalValues,
   HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { parsePropertyValue } from '../../util/data-parse';
 import { PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
 import { queueUpdate } from './update';
 
 
-export function initProxy(plt: PlatformApi, elm: HostElement, instance: Component, cmpMeta: ComponentMeta) {
+export function initProxy(plt: PlatformApi, elm: HostElement, instance: ComponentInstance, cmpMeta: ComponentMeta) {
   let i = 0;
 
   if (cmpMeta.methodsMeta) {
@@ -51,7 +51,7 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
 }
 
 
-function initMethod(methodName: string, elm: HostElement, instance: Component) {
+function initMethod(methodName: string, elm: HostElement, instance: ComponentInstance) {
   // add a getter on the dom's element instance
   // pointed at the instance's method
   Object.defineProperty(elm, methodName, {
@@ -67,7 +67,7 @@ function initProperty(
   attrName: string,
   propName: string,
   propType: number,
-  instance: Component,
+  instance: ComponentInstance,
   internalValues: ComponentInternalValues,
   plt: PlatformApi,
   elm: HostElement,

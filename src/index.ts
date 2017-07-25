@@ -1,25 +1,54 @@
-import * as interfaces from './util/interfaces';
+import {
+  BuildConfig,
+  ComponentDecorator,
+  CssClassMap,
+  ElementDecorator,
+  EventDecorator,
+  EventEmitter,
+  HydrateOptions,
+  ListenDecorator,
+  MethodDecorator,
+  AppGlobal,
+  PropDecorator,
+  PropChangeDecorator,
+  StateDecorator,
+  StencilSystem,
+  VNodeData
+} from './util/interfaces';
 
-export declare const Component: interfaces.ComponentDecorator;
 
-export declare const Ionic: interfaces.Ionic;
+export declare const Component: ComponentDecorator;
 
-export declare const Listen: interfaces.ListenDecorator;
+export declare const Element: ElementDecorator;
 
-export declare const Method: interfaces.MethodDecorator;
+export declare const Event: EventDecorator;
 
-export declare const Prop: interfaces.PropDecorator;
+export declare const Listen: ListenDecorator;
 
-export declare const State: interfaces.StateDecorator;
+export declare const Method: MethodDecorator;
 
-export declare const PropWillChange: interfaces.PropChangeDecorator;
+export declare const Prop: PropDecorator;
 
-export declare const PropDidChange: interfaces.PropChangeDecorator;
+export declare const PropWillChange: PropChangeDecorator;
+
+export declare const PropDidChange: PropChangeDecorator;
+
+export declare const State: StateDecorator;
 
 export { build } from './compiler/index';
 
 export { createRenderer } from './server/index';
 
-export declare const publicPath: string;
+export interface HostElement extends HTMLElement {
+  $instance: any;
+}
 
-export * from './util/interfaces';
+export {
+  BuildConfig,
+  CssClassMap,
+  EventEmitter,
+  HydrateOptions,
+  AppGlobal,
+  StencilSystem,
+  VNodeData
+};

@@ -9,7 +9,7 @@ describe('instance update', () => {
   it('should render state', (done) => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
-      componentModuleMeta: class {
+      componentModule: class {
         value = '88';
         render() {
           return [
@@ -41,7 +41,7 @@ describe('instance update', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
-      componentModuleMeta: class {
+      componentModule: class {
         render() {
           return [
             h('grasshopper', 0, 'hi')
@@ -62,7 +62,7 @@ describe('instance update', () => {
   it('should not run renderer when no render() fn', (done) => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
-      componentModuleMeta: class {}
+      componentModule: class {}
     });
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
@@ -77,7 +77,7 @@ describe('instance update', () => {
     let createdInstance = false;
     const cmpMeta: ComponentMeta = {
       tagNameMeta: 'ion-test',
-      componentModuleMeta: class {
+      componentModule: class {
         constructor() {
           createdInstance = true;
         }

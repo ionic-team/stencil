@@ -94,4 +94,4 @@ export const BANNER = `Built with http://stenciljs.com`;
 export const COLLECTION_MANIFEST_FILE_NAME = 'collection-manifest.json';
 export const CORE_NAME = 'core';
 export const LOADER_NAME = 'loader';
-export const PROJECT_NAMESPACE_REGEX = /["']__STENCIL__APP__['"]/g;
+export const APP_NAMESPACE_REGEX = /["']__STENCIL__APP__['"]/g;

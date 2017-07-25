@@ -10,7 +10,7 @@ export function getBuildContext(ctx: BuildContext) {
   ctx.manifest = ctx.manifest || {};
   ctx.registry = ctx.registry || {};
   ctx.filesToWrite = ctx.filesToWrite || {};
-  ctx.projectFiles = ctx.projectFiles || {};
+  ctx.appFiles = ctx.appFiles || {};
   ctx.moduleFiles = ctx.moduleFiles || {};
   ctx.jsFiles = ctx.jsFiles || {};
   ctx.cssFiles = ctx.cssFiles || {};

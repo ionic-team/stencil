@@ -1,4 +1,4 @@
-import { CssClassObject, VNode as IVNode } from '../../util/interfaces';
+import { CssClassMap, VNode as IVNode } from '../../util/interfaces';
 
 
 export class VNode implements IVNode {
@@ -6,7 +6,7 @@ export class VNode implements IVNode {
   vtext: string;
   vchildren: VNode[];
 
-  vclass: CssClassObject;
+  vclass: CssClassMap;
   vprops: any;
   vattrs: any;
   vstyle: any;

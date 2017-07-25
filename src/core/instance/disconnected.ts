@@ -19,7 +19,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     if (instance) {
       // call the user's componentDidUnload if there is one
       instance.componentDidUnload && instance.componentDidUnload();
-      elm.$instance = instance.$el = instance.__values = instance.__values.__propWillChange = instance.__values.__propDidChange = null;
+      elm.$instance = instance.__el = instance.__values = instance.__values.__propWillChange = instance.__values.__propDidChange = null;
     }
 
     // detatch any event listeners that may have been added

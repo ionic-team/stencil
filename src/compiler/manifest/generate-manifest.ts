@@ -4,9 +4,9 @@ import { loadDependentManifests } from './load-dependent-manifests';
 import { mergeDependentManifests } from './merge-manifests';
 
 
-export function generateProjectManifest(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
-  // create the project manifest we're going to fill up with data
-  // the data will be both the project's data, and the collections it depends on
+export function generateAppManifest(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
+  // create the app manifest we're going to fill up with data
+  // the data will be both the app's data, and the collections it depends on
   ctx.manifest = {
     modulesFiles: [],
     bundles: [],
@@ -15,9 +15,9 @@ export function generateProjectManifest(config: BuildConfig, ctx: BuildContext, 
   };
 
   return Promise.resolve().then(() => {
-    // add the project's compiled components to the manifest
-    addProjectBundles(config, ctx.manifest);
-    return addProjectComponents(config, ctx.manifest, moduleFiles);
+    // add the app's compiled components to the manifest
+    addAppBundles(config, ctx.manifest);
+    return addAppComponents(config, ctx.manifest, moduleFiles);
 
   }).then(() => {
     // load each of the manifests for each dependent collection
@@ -25,7 +25,7 @@ export function generateProjectManifest(config: BuildConfig, ctx: BuildContext, 
 
   }).then(dependentManifests => {
     // merge the loaded dependent manifests
-    // into the project's manifest
+    // into the app's manifest
     return mergeDependentManifests(ctx.manifest, dependentManifests);
 
   }).catch(err => {
@@ -36,7 +36,7 @@ export function generateProjectManifest(config: BuildConfig, ctx: BuildContext, 
 }
 
 
-export function addProjectComponents(config: BuildConfig, manifest: Manifest, moduleFiles: ModuleFiles) {
+export function addAppComponents(config: BuildConfig, manifest: Manifest, moduleFiles: ModuleFiles) {
   // get all of the filenames of the compiled files
   const filePaths = Object.keys(moduleFiles);
 
@@ -66,7 +66,7 @@ export function addProjectComponents(config: BuildConfig, manifest: Manifest, mo
 }
 
 
-export function addProjectBundles(config: BuildConfig, manifest: Manifest) {
+export function addAppBundles(config: BuildConfig, manifest: Manifest) {
   config.bundles.forEach(configBundle => {
     manifest.bundles.push({
       components: configBundle.components.slice(),

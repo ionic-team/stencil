@@ -29,11 +29,11 @@ export function bundleModules(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-function generateDefineComponents(config: BuildConfig, ctx: BuildContext, projectManifest: Manifest, userBundle: Bundle, moduleResults: ModuleResults) {
+function generateDefineComponents(config: BuildConfig, ctx: BuildContext, appManifest: Manifest, userBundle: Bundle, moduleResults: ModuleResults) {
   const sys = config.sys;
 
   const bundleModuleFiles = userBundle.components.map(userBundleComponentTag => {
-    const cmpMeta = projectManifest.modulesFiles.find(moduleFile => {
+    const cmpMeta = appManifest.modulesFiles.find(moduleFile => {
       return moduleFile.cmpMeta.tagNameMeta === userBundleComponentTag;
     });
 
@@ -69,7 +69,7 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, projec
         ctx.diagnostics.push(d);
       });
 
-      if (minifyJsResults.output) {
+      if (!minifyJsResults.diagnostics.length) {
         moduleContent = minifyJsResults.output;
       }
     }
@@ -195,11 +195,14 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
   .then(rollupBundle => {
     // generate the bundler results
     const results = rollupBundle.generate({
-      format: 'es'
+      format: 'es',
+      globals: function(id: string) {
+        console.log('globals', id);
+      }
     });
 
     // module bundling finished, assign its content to the user's bundle
-    bundleDetails.content = `function importComponent(exports, h, t, publicPath, Ionic) {\n${results.code.trim()}\n}`;
+    bundleDetails.content = `function importComponent(exports, h, t, Core, publicPath) {\n${results.code.trim()}\n}`;
 
     // cache for later
     ctx.moduleBundleOutputs[bundleId] = bundleDetails.content;

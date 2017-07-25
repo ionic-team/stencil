@@ -1,27 +1,15 @@
-import { createDomApi } from '../core/renderer/dom-api';
-import { createDomControllerClient } from './dom-client';
+import { AppGlobal } from '../util/interfaces';
 import { createPlatformClient } from './platform-client';
-import { createQueueClient } from './queue-client';
-import { ProjectGlobal } from '../util/interfaces';
 
 
-declare const projectNamespace: string;
-declare const publicPath: string;
+const App: AppGlobal = (<any>window)[appNamespace] = (<any>window)[appNamespace] || {};
 
-const Gbl: ProjectGlobal = (<any>window)[projectNamespace] = (<any>window)[projectNamespace] || {};
+const plt = createPlatformClient(Core, App, window, document, publicPath);
 
-const domCtrl = createDomControllerClient(window);
-
-const plt = createPlatformClient(
-  Gbl,
-  window,
-  createDomApi(document),
-  domCtrl,
-  createQueueClient(domCtrl),
-  publicPath
-);
-
-plt.registerComponents(Gbl.components).forEach(cmpMeta => {
+plt.registerComponents(App.components).forEach(cmpMeta => {
+  // note that we're extending HTMLElement the raw ES5 way
+  // this is why there are two core files, and the browser
+  // figures out which one it should use on-demand
   function HostElement(self: any) {
     return HTMLElement.call(this, self);
   }

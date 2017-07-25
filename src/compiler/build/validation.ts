@@ -85,10 +85,10 @@ export function validateBuildConfig(config: BuildConfig) {
     config.publicPath = normalizePath(
       path.relative(path.dirname(config.indexHtmlBuild), config.buildDir)
     );
-  }
-  if (config.publicPath.charAt(config.publicPath.length - 1) !== '/') {
-    // ensure there's a trailing /
-    config.publicPath += '/';
+    if (config.publicPath.charAt(config.publicPath.length - 1) !== '/') {
+      // ensure there's a trailing /
+      config.publicPath += '/';
+    }
   }
 
   if (typeof config.devMode !== 'boolean') {

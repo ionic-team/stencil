@@ -1,7 +1,6 @@
-import { BuildConfig, ComponentMeta, HostElement, HostContentNodes, HydrateOptions, Ionic, Logger,
-  ProjectGlobal, DomApi, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
+import { BuildConfig, ComponentMeta, CoreGlobal, DomApi, HostElement, HostContentNodes,
+  HydrateOptions, Logger, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
-import { initGlobal, initProjectGlobal } from '../server/global-server';
 import { createPlatformServer } from '../server/platform-server';
 import { createRenderer } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
@@ -15,26 +14,24 @@ const vm = require('vm');
 const jsdom = require('jsdom');
 
 
-export function mockPlatform(Gbl?: ProjectGlobal) {
-  if (!Gbl) {
-    Gbl = mockProjectGlobal();
-  }
+export function mockPlatform() {
   const logger = mockLogger();
   const sys = mockStencilSystem();
   const win = sys.createDom().parse({html: ''});
   const domApi = createDomApi(win.document);
 
-  const projectBuildDir = `/build/app/`;
+  const appBuildDir = `/build/app/`;
+  const coreGlobal: CoreGlobal = {
+    mode: 'md'
+  };
 
   const plt = createPlatformServer(
+    coreGlobal,
     sys,
     logger,
     'App',
-    Gbl,
     win,
-    domApi,
-    Gbl.DomCtrl,
-    projectBuildDir
+    appBuildDir
   );
 
   const $mockedQueue = plt.queue = mockQueue();
@@ -66,18 +63,6 @@ export function mockPlatform(Gbl?: ProjectGlobal) {
 export interface MockedPlatform {
   $flushQueue?: (cb: Function) => void;
   $flushLoadBundle?: (cb: Function) => void;
-}
-
-
-export function mockProjectGlobal() {
-  const Gbl: ProjectGlobal = initProjectGlobal();
-  return Gbl;
-}
-
-
-export function mockInjectedIonic(IonicGbl: ProjectGlobal): Ionic {
-  const ionic = initGlobal(IonicGbl.DomCtrl);
-  return ionic;
 }
 
 
@@ -161,7 +146,7 @@ export function mockStencilSystem() {
 
 function mockGetClientCoreFile(opts: {staticName: string}) {
   return Promise.resolve(`
-    (function (window, document, projectNamespace, projectFileName, projectCore, projectCoreEs5, components) {
+    (function (window, document, apptNamespace, appFileName, appCore, appCoreEs5, components) {
         // mock getClientCoreFile, staticName: ${opts.staticName}
     })(window, document, '__STENCIL__APP__');`);
 }
@@ -337,8 +322,8 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
   if (cmpMeta.tagNameMeta) {
     cmpMeta.tagNameMeta = cmpMeta.tagNameMeta.toUpperCase();
   }
-  if (!cmpMeta.componentModuleMeta) {
-    cmpMeta.componentModuleMeta = class {};
+  if (!cmpMeta.componentModule) {
+    cmpMeta.componentModule = class {};
   }
   if (!cmpMeta.propsMeta) {
     cmpMeta.propsMeta = [];
