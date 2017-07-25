@@ -1,5 +1,5 @@
 import { BuildContext, BuildConfig, Bundle, Manifest, ModuleFile, StylesResults } from '../../util/interfaces';
-import { buildError, catchError, isCssFile, isSassFile, generatePreamble, readFile } from '../util';
+import { buildError, catchError, isCssFile, isSassFile, generatePreamble, normalizePath, readFile } from '../util';
 import { formatCssBundleFileName, generateBundleId } from '../../util/data-serialize';
 import { HYDRATED_CSS } from '../../util/constants';
 
@@ -144,11 +144,11 @@ function generateModeCss(
     if (writeFile) {
       // create the file name and path of where the bundle will be saved
       const styleFileName = formatCssBundleFileName(stylesResult[modeName]);
-      const styleFilePath = sys.path.join(
+      const styleFilePath = normalizePath(sys.path.join(
         config.buildDir,
         config.namespace.toLowerCase(),
         styleFileName
-      );
+      ));
 
       ctx.styleBundleCount++;
 

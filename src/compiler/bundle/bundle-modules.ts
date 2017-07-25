@@ -94,7 +94,7 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, appMan
     if (bundleDetails.writeFile) {
       // create the file name and path of where the bundle will be saved
       const moduleFileName = formatJsBundleFileName(moduleResults.bundles[bundleId]);
-      const moduleFilePath = sys.path.join(config.buildDir, config.namespace.toLowerCase(), moduleFileName);
+      const moduleFilePath = normalizePath(sys.path.join(config.buildDir, config.namespace.toLowerCase(), moduleFileName));
 
       ctx.moduleBundleCount++;
 
