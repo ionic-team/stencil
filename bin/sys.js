@@ -80,7 +80,7 @@ module.exports = Object.defineProperties({
   },
 
   minifyJs: function minifyJs(input) {
-    var UglifyJS = require('uglify-js');
+    var UglifyJS = require('uglify-es');
     var result = UglifyJS.minify(input);
     var diagnostics = [];
 
