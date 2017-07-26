@@ -84,6 +84,10 @@ export function addEventListener(plt: PlatformApi, elm: HTMLElement|HTMLDocument
     // fire the component's event listener callback
     userEventListener(ev);
 
+    // if this element is a host element then let's
+    // queue it up for an update
+    (elm as HostElement)._queueUpdate && (elm as HostElement)._queueUpdate();
+
     // test if this is the user's interaction
     if (isUserInteraction(eventName)) {
       // so turns out that it's very important to flush the queue now
