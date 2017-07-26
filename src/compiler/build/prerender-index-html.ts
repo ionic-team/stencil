@@ -3,7 +3,7 @@ import { catchError, readFile } from '../util';
 import { createRenderer } from '../../server/index';
 
 
-export function optimizeIndexHtml(config: BuildConfig, ctx: BuildContext) {
+export function prerenderIndexHtml(config: BuildConfig, ctx: BuildContext) {
   if (ctx.isRebuild && ctx.appFileBuildCount === 0) {
     // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
@@ -13,24 +13,24 @@ export function optimizeIndexHtml(config: BuildConfig, ctx: BuildContext) {
 
   // get the source index html content
   return readFile(config.sys, config.indexHtmlSrc).then(indexSrcHtml => {
-    timeSpan = config.logger.createTimeSpan(`optimize index html started`);
+    timeSpan = config.logger.createTimeSpan(`prerender index html started`);
 
     // now let's optimize this thang (which is async)
-    return optimizeHtml(config, ctx, indexSrcHtml).catch(err => {
+    return prerenderHtml(config, ctx, indexSrcHtml).catch(err => {
       catchError(ctx.diagnostics, err);
     });
 
   }).catch(() => {
     // it's ok if there's no index file
-    config.logger.debug(`no index html to optimize: ${config.indexHtmlSrc}`);
+    config.logger.debug(`no index html to prerender: ${config.indexHtmlSrc}`);
 
   }).then(() => {
-    timeSpan && timeSpan.finish(`optimize index html finished`);
+    timeSpan && timeSpan.finish(`prerender index html finished`);
   });
 }
 
 
-function optimizeHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string) {
+function prerenderHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string) {
   return Promise.resolve().then(() => {
     if (!config.prerenderIndex) {
       // don't bother with a renderer if we don't need one
@@ -69,15 +69,15 @@ function optimizeHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: stri
 }
 
 
-function writeIndexDest(config: BuildConfig, ctx: BuildContext, optimizedHtml: string) {
-  if (ctx.appFiles.indexHtml === optimizedHtml) {
+function writeIndexDest(config: BuildConfig, ctx: BuildContext, prerenderedHtml: string) {
+  if (ctx.appFiles.indexHtml === prerenderedHtml) {
     // only write to disk if the html content is different than last time
     return;
   }
 
-  // add the optimized html to our list of files to write
+  // add the prerendered html to our list of files to write
   // and cache the html to check against for next time
-  ctx.filesToWrite[config.indexHtmlBuild] = ctx.appFiles.indexHtml = optimizedHtml;
+  ctx.filesToWrite[config.indexHtmlBuild] = ctx.appFiles.indexHtml = prerenderedHtml;
 
   // keep track of how many times we built the index file
   // useful for debugging/testing

@@ -6,7 +6,7 @@ import { compileSrcDir } from './compile';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
-import { optimizeIndexHtml } from './optimize-index-html';
+import { prerenderIndexHtml } from './prerender-index-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
 import { writeBuildFiles } from './write-build';
@@ -59,8 +59,8 @@ export function build(config: BuildConfig, context?: any) {
     return generateAppFiles(config, ctx);
 
   }).then(() => {
-    // optimize index.html
-    return optimizeIndexHtml(config, ctx);
+    // prerender index.html
+    return prerenderIndexHtml(config, ctx);
 
   }).then(() => {
     // write all the files and copy asset files

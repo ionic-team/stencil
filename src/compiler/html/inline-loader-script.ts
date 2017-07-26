@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext } from '../../util/interfaces';
 
 
 export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document) {
-  if (!ctx.appFiles || ctx.appFiles.loader) {
+  if (!ctx.appFiles || !ctx.appFiles.loader) {
     // don't bother if we don't have good loader content for whatever reason
     return;
   }
