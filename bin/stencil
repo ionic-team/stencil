@@ -103,9 +103,7 @@ if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
   process.exit(0);
 }
 
-if (cmdArgs.indexOf('--prod') > -1) {
-  config.devMode = false;
-} else if (cmdArgs.indexOf('--dev')) {
+if (cmdArgs.indexOf('--dev') > -1) {
   config.devMode = true;
 }
 
