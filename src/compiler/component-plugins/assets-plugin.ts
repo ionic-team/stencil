@@ -48,6 +48,12 @@ function normalizeAssetDir(config: BuildConfig, moduleFile: ModuleFile, cmpMeta:
 
 
 export function copyAssets(config: BuildConfig, ctx: BuildContext) {
+
+  if (skipAssetsCopy(config, ctx)) {
+    // no need to recopy all assets again
+    return Promise.resolve();
+  }
+
   const timeSpan = config.logger.createTimeSpan(`copy assets started`, true);
 
   // get a list of all the directories to copy
@@ -120,4 +126,42 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
   }).then(function() {
     timeSpan.finish('copy assets finished');
   });
+}
+
+
+export function skipAssetsCopy(config: BuildConfig, ctx: BuildContext) {
+  // always copy assets if it's not a rebuild
+  if (!ctx.isRebuild) return false;
+
+  // assume we want to skip copying assets again
+  let shouldSkipAssetsCopy = true;
+
+  // loop through each of the changed files
+  ctx.changedFiles.forEach(changedFile => {
+    // get the directory of where the changed file is in
+    const changedFileDirPath = normalizePath(config.sys.path.dirname(changedFile));
+
+    // loop through all the possible asset directories
+    ctx.manifest.modulesFiles.forEach(moduleFile => {
+      if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
+
+        // loop through each of the asset directories of each component
+        moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsDir => {
+          // get the absolute of the asset directory
+          const assetDirPath = normalizePath(assetsDir.absolutePath);
+
+          // if the changed file directory is this asset directory
+          // then we should recopy everything over again
+          if (changedFileDirPath === assetDirPath) {
+            shouldSkipAssetsCopy = false;
+            return;
+          }
+        });
+
+      }
+    });
+
+  });
+
+  return shouldSkipAssetsCopy;
 }
