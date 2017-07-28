@@ -13,11 +13,11 @@ export function validateBuildConfig(config: BuildConfig) {
     return config;
   }
 
-  if (!config.rootDir) {
-    throw new Error('config.rootDir required');
-  }
   if (!config.logger) {
     throw new Error(`config.logger required`);
+  }
+  if (!config.rootDir) {
+    throw new Error('config.rootDir required');
   }
   if (!config.sys) {
     throw new Error('config.sys required');
