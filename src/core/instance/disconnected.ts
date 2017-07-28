@@ -1,4 +1,4 @@
-import { detachListeners } from './events';
+import { detachListeners } from './listeners';
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { invokeDestroy } from '../renderer/patch';
 

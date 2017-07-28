@@ -1,10 +1,10 @@
-import { attachListeners } from './events';
+import { attachListeners } from './listeners';
 import { attributeChangedCallback } from './attribute-changed';
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { HYDRATED_CSS } from '../../util/constants';
-import { initComponentEvents } from './events';
+import { initEventEmitters } from './events';
 import { initProxy } from './proxy';
 import { queueUpdate } from './update';
 import { render } from './render';
@@ -63,7 +63,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
 
   // add each of the event emitters which wire up instance methods
   // to fire off dom events from the host element
-  initComponentEvents(plt, cmpMeta.eventsMeta, instance);
+  initEventEmitters(plt, cmpMeta.eventsMeta, instance);
 
   // fire off the user's componentWillLoad method (if one was provided)
   // componentWillLoad only runs ONCE, after instance's element has been

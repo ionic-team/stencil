@@ -1,4 +1,4 @@
-import { addEventListener, enableEventListener } from '../core/instance/events';
+import { addEventListener, enableEventListener } from '../core/instance/listeners';
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
 import { ComponentMeta, ComponentRegistry, CoreGlobal, EventEmitterData,
   HostElement, AppGlobal, ListenOptions, LoadComponentRegistry,
