@@ -92,7 +92,7 @@ function help() {
 
   ${chalk.bold('Examples:')}
 
-    ${p} ${chalk.green('stencil build --prod')}
+    ${p} ${chalk.green('stencil build --dev')}
     ${p} ${chalk.green('stencil build --watch')}
 
 `);
