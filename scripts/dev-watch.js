@@ -19,7 +19,6 @@ function watchCompiler() {
 
 function watchCore() {
   [
-    'bindings',
     'core',
     'util'
   ].forEach(dir => {

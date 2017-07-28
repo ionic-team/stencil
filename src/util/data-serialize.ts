@@ -11,6 +11,7 @@ export function formatLoadComponentRegistry(cmpMeta: ComponentMeta, defaultAttrC
     formatStyles(cmpMeta.stylesMeta),
     formatSlot(cmpMeta.slotMeta),
     formatProps(cmpMeta.propsMeta, defaultAttrCase),
+    formatListeners(cmpMeta.listenersMeta),
     cmpMeta.loadPriority
   ];
 
@@ -88,6 +89,24 @@ function formatProps(props: PropMeta[], defaultAttrCase: number) {
 }
 
 
+function formatListeners(listeners: ListenMeta[]) {
+  if (!listeners || !listeners.length) {
+    return 0;
+  }
+
+  return listeners.map(listener => {
+    const d: any[] = [
+      listener.eventName,
+      listener.eventMethodName,
+      listener.eventDisabled,
+      listener.eventPassive,
+      listener.eventCapture
+    ];
+    return trimFalsyData(d);
+  });
+}
+
+
 export function formatComponentRegistry(registry: ComponentRegistry, defaultAttrCase: number) {
   // ensure we've got a standard order of the components
   return Object.keys(registry).sort().map(tag => {
@@ -137,7 +156,6 @@ export function formatComponentMeta(cmpMeta: ComponentMeta) {
   const tag = cmpMeta.tagNameMeta.toLowerCase();
   const host = formatHost(cmpMeta.hostMeta);
   const states = formatStates(cmpMeta.statesMeta);
-  const listeners = formatListeners(tag, cmpMeta.listenersMeta);
   const propWillChanges = formatPropChanges(tag, 'prop will change', cmpMeta.propsWillChangeMeta);
   const propDidChanges = formatPropChanges(tag, 'prop did change', cmpMeta.propsDidChangeMeta);
   const events = formatEvents(tag, cmpMeta.eventsMeta);
@@ -149,14 +167,13 @@ export function formatComponentMeta(cmpMeta: ComponentMeta) {
 
   d.push(`/** ${tag}: [0] tag **/\n'${tag.toUpperCase()}'`);
   d.push(`/** ${tag}: [1] host **/\n${host}`);
-  d.push(`/** ${tag}: [2] listeners **/\n${listeners}`);
-  d.push(`/** ${tag}: [3] states **/\n${states}`);
-  d.push(`/** ${tag}: [4] propWillChanges **/\n${propWillChanges}`);
-  d.push(`/** ${tag}: [5] propDidChanges **/\n${propDidChanges}`);
-  d.push(`/** ${tag}: [6] events **/\n${events}`);
-  d.push(`/** ${tag}: [7] methods **/\n${methods}`);
-  d.push(`/** ${tag}: [8] hostElementMember **/\n${hostElementMember}`);
-  d.push(`/** ${tag}: [9] shadow **/\n${shadow}`);
+  d.push(`/** ${tag}: [2] states **/\n${states}`);
+  d.push(`/** ${tag}: [3] propWillChanges **/\n${propWillChanges}`);
+  d.push(`/** ${tag}: [4] propDidChanges **/\n${propDidChanges}`);
+  d.push(`/** ${tag}: [5] events **/\n${events}`);
+  d.push(`/** ${tag}: [6] methods **/\n${methods}`);
+  d.push(`/** ${tag}: [7] hostElementMember **/\n${hostElementMember}`);
+  d.push(`/** ${tag}: [8] shadow **/\n${shadow}`);
 
   return `\n/***************** ${tag} *****************/\n[\n` + trimFalsyDataStr(d).join(',\n\n') + `\n\n]`;
 }
@@ -176,35 +193,6 @@ function formatStates(states: StateMeta[]) {
   }
 
   return `['` + states.join(`', '`) + `']`;
-}
-
-
-function formatListeners(label: string, listeners: ListenMeta[]) {
-  if (!listeners || !listeners.length) {
-    return '0 /* no listeners */';
-  }
-
-  const t: string[] = [];
-
-  listeners.forEach((listener, listenerIndex) => {
-    t.push(formatListenerOpts(label, listener, listenerIndex));
-  });
-
-  return `[\n` + t.join(',\n') + `\n]`;
-}
-
-
-function formatListenerOpts(label: string, listener: ListenMeta, listenerIndex: number) {
-  const t = [
-    `    /***** ${label} listener[${listenerIndex}]  ${listener.eventName} -> ${listener.eventName}() *****/\n` +
-    `    /* [0] instance method **/ '${listener.eventMethodName}'`,
-    `    /* [1] event name *******/ '${listener.eventName}'`,
-    `    /* [2] use capture ******/ ${formatBoolean(listener.eventCapture)}`,
-    `    /* [3] use passive ******/ ${formatBoolean(listener.eventPassive)}`,
-    `    /* [4] is enabled *******/ ${formatBoolean(listener.eventEnabled)}`,
-  ];
-
-  return `  [\n` + t.join(',\n') + `\n  ]`;
 }
 
 

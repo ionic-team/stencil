@@ -133,27 +133,6 @@ describe('data serialize/parse', () => {
       expect(registry['TAG'].propsDidChangeMeta).toBeFalsy();
     });
 
-    it('should set listenersMeta', () => {
-      cmpMeta.listenersMeta = [
-        {
-          eventName: 'click',
-          eventMethodName: 'method1',
-          eventCapture: true,
-          eventPassive: true,
-          eventEnabled: false
-        }
-      ];
-
-      const format = formatComponentMeta(cmpMeta);
-      parseComponentMeta(registry, moduleImports, evalStr(format));
-
-      expect(registry['TAG'].listenersMeta[0].eventName).toBe('click');
-      expect(registry['TAG'].listenersMeta[0].eventMethodName).toBe('method1');
-      expect(registry['TAG'].listenersMeta[0].eventCapture).toBe(true);
-      expect(registry['TAG'].listenersMeta[0].eventEnabled).toBe(false);
-      expect(registry['TAG'].listenersMeta[0].eventPassive).toBe(true);
-    });
-
     it('should set no listenersMeta', () => {
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
@@ -208,6 +187,60 @@ describe('data serialize/parse', () => {
 
     beforeEach(() => {
       cmpMeta = { tagNameMeta: 'TAG' };
+    });
+
+    it('should set listenersMeta eventCapture', () => {
+      cmpMeta.listenersMeta = [{ eventCapture: false }];
+      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      cmpMeta = parseComponentRegistry(format, {});
+      expect(cmpMeta.listenersMeta[0].eventCapture).toBe(false);
+
+      cmpMeta.listenersMeta = [{ eventCapture: true }];
+      format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      cmpMeta = parseComponentRegistry(format, {});
+      expect(cmpMeta.listenersMeta[0].eventCapture).toBe(true);
+    });
+
+    it('should set listenersMeta eventDisabled', () => {
+      cmpMeta.listenersMeta = [{ eventDisabled: false }];
+      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      cmpMeta = parseComponentRegistry(format, {});
+      expect(cmpMeta.listenersMeta[0].eventDisabled).toBe(false);
+
+      cmpMeta.listenersMeta = [{ eventDisabled: true }];
+      format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      cmpMeta = parseComponentRegistry(format, {});
+      expect(cmpMeta.listenersMeta[0].eventDisabled).toBe(true);
+    });
+
+    it('should set listenersMeta eventPassive', () => {
+      cmpMeta.listenersMeta = [{ eventPassive: false }];
+      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      cmpMeta = parseComponentRegistry(format, {});
+      expect(cmpMeta.listenersMeta[0].eventPassive).toBe(false);
+
+      cmpMeta.listenersMeta = [{ eventPassive: true }];
+      format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      cmpMeta = parseComponentRegistry(format, {});
+      expect(cmpMeta.listenersMeta[0].eventPassive).toBe(true);
+    });
+
+    it('should set listenersMeta event name and method', () => {
+      cmpMeta.listenersMeta = [
+        {
+          eventName: 'click',
+          eventMethodName: 'method1',
+          eventCapture: false,
+          eventPassive: false,
+          eventDisabled: false
+        }
+      ];
+
+      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      cmpMeta = parseComponentRegistry(format, {});
+
+      expect(cmpMeta.listenersMeta[0].eventName).toBe('click');
+      expect(cmpMeta.listenersMeta[0].eventMethodName).toBe('method1');
     });
 
     it('should set load priority', () => {

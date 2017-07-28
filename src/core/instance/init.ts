@@ -1,4 +1,3 @@
-import { attachListeners } from './listeners';
 import { attributeChangedCallback } from './attribute-changed';
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
@@ -8,9 +7,12 @@ import { initEventEmitters } from './events';
 import { initProxy } from './proxy';
 import { queueUpdate } from './update';
 import { render } from './render';
+import { replayQueuedEventsOnInstance } from './listeners';
 
 
 export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement) {
+  // let's wire up our functions to the host element's prototype
+  // we can also inject our platform into each one that needs that api
 
   HostElementConstructor.connectedCallback = function() {
     connectedCallback(plt, (this as HostElement));
@@ -29,7 +31,7 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
   };
 
   HostElementConstructor._initLoad = function() {
-    initLoad(plt, (this as HostElement));
+    initLoad((this as HostElement));
   };
 
   HostElementConstructor._render = function(isInitialRender: boolean) {
@@ -65,6 +67,10 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   // to fire off dom events from the host element
   initEventEmitters(plt, cmpMeta.eventsMeta, instance);
 
+  // reply any event listeners on the instance that were queued up between the time
+  // the element was connected and before the instance was ready
+  replayQueuedEventsOnInstance(elm);
+
   // fire off the user's componentWillLoad method (if one was provided)
   // componentWillLoad only runs ONCE, after instance's element has been
   // assigned as the host element, but BEFORE render() has been called
@@ -72,7 +78,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
 }
 
 
-export function initLoad(plt: PlatformApi, elm: HostElement): any {
+export function initLoad(elm: HostElement): any {
   const instance = elm.$instance;
 
   // it's possible that we've already decided to destroy this element
@@ -83,9 +89,6 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
     elm._activelyLoadingChildren = null;
-
-    // the element is within the DOM now, so let's attach the event listeners
-    attachListeners(plt, plt.getComponentMeta(elm).listenersMeta, elm, instance);
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)

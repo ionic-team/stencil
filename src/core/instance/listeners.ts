@@ -1,22 +1,73 @@
-import { ComponentInstance, HostElement, ListenMeta, ListenOptions, PlatformApi } from '../../util/interfaces';
+import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { getElementReference, noop } from '../../util/helpers';
 import { KEY_CODE_MAP } from '../../util/constants';
 
 
-export function attachListeners(plt: PlatformApi, listeners: ListenMeta[], elm: HostElement, instance: ComponentInstance) {
+export function initElementListeners(plt: PlatformApi, elm: HostElement) {
+  // so the element was just connected, which means it's in the DOM
+  // however, the component instance hasn't been created yet
+  // but what if an event it should be listening to get emitted right now??
+  // let's add our listeners right now to our element, and if it happens
+  // to receive events between now and the instance being created let's
+  // queue up all of the event data and fire it off on the instance when it's ready
+  const cmpMeta = plt.getComponentMeta(elm);
+  const listeners = cmpMeta.listenersMeta;
+
   if (listeners) {
     for (var i = 0; i < listeners.length; i++) {
       var listener = listeners[i];
-      if (listener.eventEnabled !== false) {
-        (elm._listeners = elm._listeners || {})[listener.eventName] = addEventListener(
-          plt,
-          elm,
-          listener.eventName,
-          (<any>instance)[listener.eventMethodName].bind(instance),
-          listener
-        );
-      }
+      if (listener.eventDisabled) continue;
+
+      (elm._listeners = elm._listeners || {})[listener.eventName] = addEventListener(
+        plt,
+        elm,
+        listener.eventName,
+        createListenerCallback(elm, listener.eventMethodName),
+        listener.eventCapture,
+        listener.eventPassive
+      );
     }
+  }
+}
+
+
+export function createListenerCallback(elm: HostElement, eventMethodName: string) {
+  // create the function that gets called when the element receives
+  // an event which it should be listening for
+  return function onEvent(ev?: any) {
+    if (elm.$instance) {
+      // instance is ready, let's call it's member method for this event
+      elm.$instance[eventMethodName](ev);
+
+    } else {
+      // instance is not ready!!
+      // let's queue up this event data and replay it later
+      // when the instance is ready
+      (elm._queuedEvents = elm._queuedEvents || []).push(eventMethodName, ev);
+    }
+  };
+}
+
+
+export function replayQueuedEventsOnInstance(elm: HostElement) {
+  // the element has an instance now and
+  // we already added the event listeners to the element
+  const queuedEvents = elm._queuedEvents;
+
+  if (queuedEvents) {
+    // events may have already fired before the instance was even ready
+    // now that the instance is ready, let's replay all of the events that
+    // we queued up earlier that were originally meant for the instance
+    for (var i = 0; i < queuedEvents.length; i += 2) {
+      // data was added in sets of two
+      // first item the eventMethodName
+      // second item is the event data
+      // take a look at initElementListener()
+      elm.$instance[queuedEvents[i]](queuedEvents[i + 1]);
+    }
+
+    // no longer need this data, be gone with you
+    delete elm._queuedEvents;
   }
 }
 
@@ -37,7 +88,14 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
 
           if (shouldEnable && !deregisterFns[eventName]) {
             var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
-            deregisterFns[eventName] = addEventListener(plt, elm, attachToEventName, (<any>instance)[listener.eventMethodName].bind(instance), listener);
+            deregisterFns[eventName] = addEventListener(
+              plt,
+              elm,
+              attachToEventName,
+              createListenerCallback(elm, listener.eventMethodName),
+              listener.eventCapture,
+              listener.eventPassive
+            );
 
           } else if (!shouldEnable && deregisterFns[eventName]) {
             deregisterFns[eventName]();
@@ -52,8 +110,17 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
 }
 
 
-export function addEventListener(plt: PlatformApi, elm: HTMLElement|HTMLDocument|Window, eventName: string, userEventListener: {(ev?: any): any}, opts: ListenOptions) {
-  var splt = eventName.split(':');
+export function addEventListener(
+  plt: PlatformApi,
+  elm: HTMLElement|HTMLDocument|Window,
+  eventName: string,
+  listenerCallback: {(ev?: any): any},
+  useCapture: boolean,
+  usePassive: boolean
+) {
+  // depending on the event name, we could actually be
+  // attaching this element to something like the document or window
+  let splt = eventName.split(':');
   if (elm && splt.length > 1) {
     // document:mousemove
     // parent:touchend
@@ -63,43 +130,60 @@ export function addEventListener(plt: PlatformApi, elm: HTMLElement|HTMLDocument
   }
 
   if (!elm) {
+    // something's up, let's not continue and just return a noop()
     return noop;
   }
 
+  // test to see if we're looking for an exact keycode
   splt = eventName.split('.');
   let testKeyCode = 0;
 
   if (splt.length > 1) {
+    // looks like this listener is also looking for a keycode
     // keyup.enter
     eventName = splt[0];
     testKeyCode = KEY_CODE_MAP[splt[1]];
   }
 
-  const eventListener = (ev: any) => {
+  // create the our internal event listener callback we'll be firing off
+  // within it is the user's event listener callback and some other goodies
+  function eventListener(ev: any) {
     if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
-      // we're looking for a specific keycode but this wasn't it
+      // we're looking for a specific keycode
+      // but the one we were given wasn't the right keycode
       return;
     }
 
-    // fire the component's event listener callback
-    userEventListener(ev);
+    // fire the user's component event listener callback
+    // if the instance isn't ready yet, this listener is already
+    // set to handle that and re-queue the update when it is ready
+    listenerCallback(ev);
 
-    // if this element is a host element then let's
-    // queue it up for an update
-    (elm as HostElement)._queueUpdate && (elm as HostElement)._queueUpdate();
+    if ((elm as HostElement).$instance) {
+      // only queue an update if this element itself is a host element
+      // and only queue an update if host element's instance is ready
+      // once its instance has been created, it'll then queue the update again
 
-    // test if this is the user's interaction
-    if (isUserInteraction(eventName)) {
-      // so turns out that it's very important to flush the queue now
-      // this way the app immediately reflects whatever the user just did
-      plt.queue.flush();
+      // queue it up for an update which then runs a re-render
+      (elm as HostElement)._queueUpdate();
+
+      // test if this is the user's interaction
+      if (isUserInteraction(eventName)) {
+        // so turns out that it's very important to flush the queue NOW
+        // this way the app immediately reflects whatever the user just did
+        plt.queue.flush();
+      }
     }
-  };
+  }
 
-  const eventListenerOpts = plt.getEventOptions(opts);
+  // get our event listener options
+  // mainly this is used to set passive events if this browser supports it
+  const eventListenerOpts = plt.getEventOptions(useCapture, usePassive);
 
+  // ok, good to go, let's add the actual listener to the dom element
   elm.addEventListener(eventName, eventListener, eventListenerOpts);
 
+  // return a function which is used to remove this very same listener
   return function removeListener() {
     if (elm) {
       elm.removeEventListener(eventName, eventListener, eventListenerOpts);

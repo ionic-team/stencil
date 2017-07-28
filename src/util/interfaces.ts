@@ -94,32 +94,40 @@ export interface LoadComponentRegistry {
   /**
    * props
    */
-  [4]: {
-    /**
-     * prop name
-     */
-    [0]: string;
+  [4]: ComponentPropertyData[];
 
-    /**
-     * attrib case
-     */
-    [1]: number;
-
-    /**
-     * prop type
-     */
-    [2]: number;
-
-    /**
-     * is stateful
-     */
-    [3]: number;
-  }[];
+  /**
+   * listeners
+   */
+  [5]: ComponentListenersData[];
 
   /**
    * load priority
    */
-  [5]: number;
+  [6]: number;
+}
+
+
+export interface ComponentPropertyData {
+  /**
+   * prop name
+   */
+  [0]: string;
+
+  /**
+   * attrib case
+   */
+  [1]: number;
+
+  /**
+   * prop type
+   */
+  [2]: number;
+
+  /**
+   * is stateful
+   */
+  [3]: number;
 }
 
 
@@ -135,44 +143,39 @@ export interface LoadComponentMeta {
   [1]: any;
 
   /**
-   * listeners
-   */
-  [2]: ComponentListenersData[];
-
-  /**
    * states
    */
-  [3]: StateMeta[];
+  [2]: StateMeta[];
 
   /**
    * prop WILL change
    */
-  [4]: PropChangeMeta[];
+  [3]: PropChangeMeta[];
 
   /**
    * prop DID change
    */
-  [5]: PropChangeMeta[];
+  [4]: PropChangeMeta[];
 
   /**
    * component instance events
    */
-  [6]: EventMeta[];
+  [5]: EventMeta[];
 
   /**
    * methods
    */
-  [7]: MethodMeta[];
+  [6]: MethodMeta[];
 
   /**
    * host element member name
    */
-  [8]: string;
+  [7]: string;
 
   /**
    * shadow
    */
-  [9]: boolean;
+  [8]: boolean;
 }
 
 
@@ -525,7 +528,7 @@ export interface ListenMeta {
   eventName?: string;
   eventCapture?: boolean;
   eventPassive?: boolean;
-  eventEnabled?: boolean;
+  eventDisabled?: boolean;
 }
 
 
@@ -685,6 +688,7 @@ export interface HostElement extends HTMLElement {
   _hostContentNodes?: HostContentNodes;
   _isQueuedForUpdate?: boolean;
   _listeners?: ComponentActiveListeners;
+  _queuedEvents?: any[];
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
 }
@@ -806,7 +810,7 @@ export interface PlatformApi {
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
   onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap) => void;
-  getEventOptions: (opts?: ListenOptions) => any;
+  getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;
 }

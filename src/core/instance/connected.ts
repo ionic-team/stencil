@@ -1,5 +1,6 @@
 import { getParentElement } from '../../util/helpers';
 import { HostElement, PlatformApi } from '../../util/interfaces';
+import { initElementListeners } from './listeners';
 import { PRIORITY_HIGH } from '../../util/constants';
 
 
@@ -12,6 +13,11 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
 
     // if somehow this node was reused, ensure we've removed this property
     delete elm._hasDestroyed;
+
+    // initialize our event listeners on the host element
+    // we do this now so that we can listening to events that may
+    // have fired even before the instance is ready
+    initElementListeners(plt, elm);
 
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can

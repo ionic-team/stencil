@@ -1,7 +1,7 @@
 import { addEventListener, enableEventListener } from '../core/instance/listeners';
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
 import { ComponentMeta, ComponentRegistry, CoreGlobal, EventEmitterData,
-  HostElement, AppGlobal, ListenOptions, LoadComponentRegistry,
+  HostElement, AppGlobal, LoadComponentRegistry,
   ModuleCallbacks, PlatformApi } from '../util/interfaces';
 import { createDomControllerClient } from './dom-controller-client';
 import { createDomApi } from '../core/renderer/dom-api';
@@ -29,7 +29,7 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
   Core.dom = createDomControllerClient(win, now);
 
   Core.addListener = function addListener(elm, eventName, cb, opts) {
-    return addEventListener(plt, elm, eventName, cb, opts);
+    return addEventListener(plt, elm, eventName, cb, opts.capture, opts.passive);
   };
 
   Core.enableListener = function enableListener(instance, eventName, enabled, attachTo) {
@@ -243,11 +243,11 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
     );
   } catch (e) {}
 
-  function getEventOptions(opts?: ListenOptions) {
+  function getEventOptions(useCapture: boolean, usePassive: boolean) {
     return supportsEventOptions ? {
-        capture: !!(opts && opts.capture),
-        passive: !(opts && opts.passive === false)
-      } : !!(opts && opts.capture);
+        capture: !!useCapture,
+        passive: !!usePassive
+      } : !!useCapture;
   }
 
 

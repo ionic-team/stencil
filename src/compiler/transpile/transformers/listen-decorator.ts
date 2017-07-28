@@ -121,11 +121,8 @@ function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts
   }
   listenMeta.eventPassive = !!listenMeta.eventPassive;
 
-  if (rawListenOpts.enabled === undefined) {
-    // default to enabled if it wasn't provided
-    listenMeta.eventEnabled = true;
-  }
-  listenMeta.eventEnabled = !!listenMeta.eventEnabled;
+  // default to enabled=true if it wasn't provided
+  listenMeta.eventDisabled = (rawListenOpts.enabled === false);
 
   fileMeta.cmpMeta.listenersMeta.push(listenMeta);
 

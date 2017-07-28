@@ -456,7 +456,7 @@ function serializeListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     if (listenerMeta.eventPassive === false) {
       listenerData.passive = false;
     }
-    if (listenerMeta.eventEnabled === false) {
+    if (listenerMeta.eventDisabled === true) {
       listenerData.enabled = false;
     }
     if (listenerMeta.eventCapture === false) {
@@ -484,7 +484,7 @@ function parseListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
       eventName: listenerData.event,
       eventMethodName: listenerData.method,
       eventPassive: (listenerData.passive !== false),
-      eventEnabled: (listenerData.enabled !== false),
+      eventDisabled: (listenerData.enabled === false),
       eventCapture: (listenerData.capture !== false)
     };
     return listener;
