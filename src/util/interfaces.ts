@@ -883,6 +883,7 @@ export interface StencilSystem {
   };
   fs?: {
     access(path: string, callback: (err: any) => void): void;
+    accessSync(path: string | Buffer, mode?: number): void
     mkdir(path: string, callback?: (err?: any) => void): void;
     readdir(path: string, callback?: (err: any, files: string[]) => void): void;
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
@@ -890,6 +891,7 @@ export interface StencilSystem {
     stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
     unlink(path: string, callback?: (err?: any) => void): void;
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
+    writeFileSync(filename: string, data: any, options?: { encoding?: string; mode?: number; flag?: string; }): void;
   };
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;

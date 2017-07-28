@@ -6,6 +6,7 @@ import { compileSrcDir } from './compile';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
+import { initIndexHtml } from '../html/init-index-html';
 import { prerenderIndexHtml } from './prerender-index-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
@@ -31,6 +32,15 @@ export function build(config: BuildConfig, context?: any) {
 
   // validate the build config
   if (!isConfigValid(config, buildResults.diagnostics)) {
+    // invalid build config, let's not continue
+    return Promise.resolve(buildResults);
+  }
+
+  // create an initial index.html file if one doesn't already exist
+  // this is synchronous on purpose
+  if (!initIndexHtml(config, ctx, buildResults.diagnostics)) {
+    // error initializing the index.html file
+    // something's wrong, so let's not continue
     return Promise.resolve(buildResults);
   }
 
