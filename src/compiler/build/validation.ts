@@ -91,14 +91,10 @@ export function validateBuildConfig(config: BuildConfig) {
     }
   }
 
-  if (typeof config.devMode !== 'boolean') {
-    config.devMode = true;
-  }
+  // default devMode false
   config.devMode = !!config.devMode;
 
-  if (typeof config.watch !== 'boolean') {
-    config.watch = false;
-  }
+  // default watch false
   config.watch = !!config.watch;
 
   if (typeof config.minifyCss !== 'boolean') {

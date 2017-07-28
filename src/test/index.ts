@@ -73,7 +73,8 @@ export function mockBuildConfig() {
     sys: sys,
     logger: mockLogger(),
     rootDir: '/',
-    suppressTypeScriptErrors: true
+    suppressTypeScriptErrors: true,
+    devMode: true
   };
 
   return validateBuildConfig(config);

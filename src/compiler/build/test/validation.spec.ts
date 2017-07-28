@@ -91,9 +91,17 @@ describe('validation', () => {
       expect(config.hashFileNames).toBe(true);
     });
 
-    it('should default hashFileNames to false', () => {
+    it('should default hashFileNames to false in dev mode', () => {
+      config.devMode = true;
       validateBuildConfig(config);
       expect(config.hashFileNames).toBe(false);
+    });
+
+    it('should set minifyJs to true', () => {
+      config.devMode = true;
+      config.minifyJs = true;
+      validateBuildConfig(config);
+      expect(config.minifyJs).toBe(true);
     });
 
     it('should default minifyJs to true in prod mode', () => {
@@ -102,20 +110,29 @@ describe('validation', () => {
       expect(config.minifyJs).toBe(true);
     });
 
+    it('should default minifyJs to false in dev mode', () => {
+      config.devMode = true;
+      validateBuildConfig(config);
+      expect(config.minifyJs).toBe(false);
+    });
+
+    it('should set minifyCss to true', () => {
+      config.devMode = true;
+      config.minifyCss = true;
+      validateBuildConfig(config);
+      expect(config.minifyCss).toBe(true);
+    });
+
     it('should default minifyCss to true in prod mode', () => {
       config.devMode = false;
       validateBuildConfig(config);
       expect(config.minifyCss).toBe(true);
     });
 
-    it('should default minifyCss to false', () => {
+    it('should default minifyCss to false in dev mode', () => {
+      config.devMode = true;
       validateBuildConfig(config);
       expect(config.minifyCss).toBe(false);
-    });
-
-    it('should default minifyJs to false', () => {
-      validateBuildConfig(config);
-      expect(config.minifyJs).toBe(false);
     });
 
     it('should default watch to false', () => {
@@ -123,9 +140,21 @@ describe('validation', () => {
       expect(config.watch).toBe(false);
     });
 
-    it('should default devMode to true', () => {
+    it('should set devMode to false', () => {
+      config.devMode = false;
+      validateBuildConfig(config);
+      expect(config.devMode).toBe(false);
+    });
+
+    it('should set devMode to true', () => {
+      config.devMode = true;
       validateBuildConfig(config);
       expect(config.devMode).toBe(true);
+    });
+
+    it('should default devMode to false', () => {
+      validateBuildConfig(config);
+      expect(config.devMode).toBe(false);
     });
 
     it('should set publicPath from custom buildDir', () => {

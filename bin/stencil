@@ -81,11 +81,11 @@ function help() {
 
   ${chalk.bold('Usage:')}
 
-    ${p} ${chalk.green('stencil build [--prod] [--watch] [--debug]')}
+    ${p} ${chalk.green('stencil build [--dev] [--watch] [--debug]')}
 
   ${chalk.bold('Options:')}
 
-    ${chalk.green('--prod')} ................. Execute a production build.
+    ${chalk.green('--dev')} .................. Execute a development build.
     ${chalk.green('--watch')} ................ Execute a build in watch mode.
     ${chalk.green('--debug')} ................ Set the log level to debug.
     ${chalk.green('--config')} ............... Stencil config file.
@@ -103,11 +103,13 @@ if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
   process.exit(0);
 }
 
-if (cmdArgs.indexOf('--prod') > -1 || cmdArgs.indexOf('-p') > -1) {
+if (cmdArgs.indexOf('--prod') > -1) {
   config.devMode = false;
+} else if (cmdArgs.indexOf('--dev')) {
+  config.devMode = true;
 }
 
-if (cmdArgs.indexOf('--watch') > -1 || cmdArgs.indexOf('-w') > -1) {
+if (cmdArgs.indexOf('--watch') > -1) {
   config.watch = true;
 }
 
