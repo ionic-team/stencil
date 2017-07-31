@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, ModuleFile, TranspileResults } from '../../util/interfaces';
-import { normalizePath, readFile } from '../util';
+import { normalizePath, isDtsFile, isJsFile, readFile } from '../util';
 import * as ts from 'typescript';
 
 
@@ -30,30 +30,66 @@ export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOpti
     return moduleFile.tsText;
   },
 
-  tsHost.writeFile = (jsFilePath: string, jsText: string, writeByteOrderMark: boolean, onError: any, sourceFiles: ts.SourceFile[]): void => {
-    sourceFiles.forEach(sourceFile => {
-      const tsFilePath = normalizePath(sourceFile.fileName);
-      jsFilePath = normalizePath(jsFilePath);
+  tsHost.writeFile = (outputPath: string, outputText: string, writeByteOrderMark: boolean, onError: any, sourceFiles: ts.SourceFile[]): void => {
+    outputPath = normalizePath(outputPath);
 
-      let moduleFile = ctx.moduleFiles[tsFilePath];
-      if (moduleFile) {
-        // we got the module we already cached
-        moduleFile.jsFilePath = jsFilePath;
+    function writeFileInMemory(sourceFile: ts.SourceFile) {
+      const tsFilePath = normalizePath(sourceFile.fileName);
+
+      if (isJsFile(outputPath)) {
+        // js file
+        const jsFilePath = outputPath;
+
+        let moduleFile = ctx.moduleFiles[tsFilePath];
+        if (moduleFile) {
+          // we got the module we already cached
+          moduleFile.jsFilePath = jsFilePath;
+
+        } else {
+          // this actually shouldn't happen, but just in case
+          moduleFile = ctx.moduleFiles[tsFilePath] = {
+            tsFilePath: tsFilePath,
+            jsFilePath: jsFilePath,
+          };
+        }
+
+        // cache the js content
+        ctx.jsFiles[jsFilePath] = outputText;
+
+        // add this module to the list of files that were just transpiled
+        transpileResults.moduleFiles[tsFilePath] = moduleFile;
+
+      } else if (isDtsFile(outputPath)) {
+        // .d.ts file
+        const dtsFilePath = outputPath;
+
+        let moduleFile = ctx.moduleFiles[tsFilePath];
+        if (moduleFile) {
+          // we got the module we already cached
+          moduleFile.dtsFilePath = dtsFilePath;
+
+        } else {
+          // this actually shouldn't happen, but just in case
+          moduleFile = ctx.moduleFiles[tsFilePath] = {
+            tsFilePath: tsFilePath,
+            dtsFilePath: dtsFilePath,
+          };
+        }
+
+        // write the .d.ts file
+        ctx.filesToWrite[dtsFilePath] = outputText;
+
+        // add this module to the list of files that were just transpiled
+        transpileResults.moduleFiles[tsFilePath] = moduleFile;
 
       } else {
-        // this actually shouldn't happen, but just in case
-        moduleFile = ctx.moduleFiles[tsFilePath] = {
-          tsFilePath: tsFilePath,
-          jsFilePath: jsFilePath,
-        };
+        // idk, this shouldn't happen
+        config.logger.debug(`unknown transpiled output: ${outputPath}`);
       }
 
-      // cache the js content
-      ctx.jsFiles[jsFilePath] = jsText;
+    }
 
-      // add this module to the list of files that were just transpiled
-      transpileResults.moduleFiles[tsFilePath] = moduleFile;
-    });
+    sourceFiles.forEach(writeFileInMemory);
     writeByteOrderMark; onError;
   };
 

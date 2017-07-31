@@ -260,6 +260,7 @@ export interface Manifest {
 export interface ModuleFile {
   tsFilePath?: string;
   tsText?: string;
+  dtsFilePath?: string;
   jsFilePath?: string;
   hasCmpClass?: boolean;
   cmpMeta?: ComponentMeta;

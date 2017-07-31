@@ -14,12 +14,13 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { optio
   options.outDir = config.collectionDir;
   options.rootDir = config.src;
 
-  if (config.devMode) {
-    // for dev builds let's not create d.ts files
-    options.declaration = false;
+  if (config.generateCollection && !config.devMode) {
+    // generate .d.ts files when generating a collection and in prod mode
+    options.declaration = true;
 
   } else {
-    options.declaration = true;
+    // for dev builds let's not create d.ts files
+    options.declaration = false;
   }
 
   return ctx.tsConfig = {
