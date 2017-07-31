@@ -1,14 +1,18 @@
-import { BuildConfig, BuildContext, AppRegistry } from '../../util/interfaces';
+import { AppRegistry, BuildConfig, BuildContext } from '../../util/interfaces';
 import { CORE_NAME } from '../../util/constants';
 import { formatComponentRegistry } from '../../util/data-serialize';
 import { generateCore, generateCoreEs5 } from './app-core';
 import { generateLoader } from './app-loader';
 import { generateAppGlobal } from './app-global';
-import { normalizePath } from '../util';
+import { hasError, normalizePath } from '../util';
 
 
 export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   const sys = config.sys;
+
+  if (hasError(ctx.diagnostics)) {
+    return Promise.resolve();
+  }
 
   config.logger.debug(`build, generateAppFiles: ${config.namespace}`);
 

@@ -387,6 +387,11 @@ export function catchError(diagnostics: Diagnostic[], err: Error) {
 }
 
 
+export function hasError(diagnostics: Diagnostic[]) {
+  return diagnostics.some(d => d.level === 'error');
+}
+
+
 export function normalizePath(str: string) {
   // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
   // https://github.com/sindresorhus/slash MIT

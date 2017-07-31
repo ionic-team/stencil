@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, Manifest, ModuleFiles } from '../../util/interfaces';
-import { catchError } from '../util';
+import { catchError, hasError } from '../util';
 import { loadDependentManifests } from './load-dependent-manifests';
 import { mergeDependentManifests } from './merge-manifests';
 
@@ -13,6 +13,10 @@ export function generateAppManifest(config: BuildConfig, ctx: BuildContext, modu
     global: null,
     dependentManifests: []
   };
+
+  if (hasError(ctx.diagnostics)) {
+    return Promise.resolve();
+  }
 
   return Promise.resolve().then(() => {
     // add the app's compiled components to the manifest

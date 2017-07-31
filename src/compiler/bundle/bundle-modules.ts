@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, Bundle, Diagnostic, FilesMap,
   Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
-import { buildError, buildWarn, catchError, generatePreamble, normalizePath } from '../util';
+import { buildError, buildWarn, catchError, hasError, generatePreamble, normalizePath } from '../util';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
 
@@ -9,6 +9,10 @@ export function bundleModules(config: BuildConfig, ctx: BuildContext) {
   const moduleResults: ModuleResults = {
     bundles: {}
   };
+
+  if (hasError(ctx.diagnostics)) {
+    return Promise.resolve(moduleResults);
+  }
 
   // do bundling if this is not a change build
   // or it's a change build that has either changed modules or components

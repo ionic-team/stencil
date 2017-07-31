@@ -54,5 +54,4 @@ export function generateComponentRegistry(manifest: Manifest, styleResults: Styl
   });
 
   return registry;
-  // return formatComponentRegistry(registry, config.attrCase);
 }

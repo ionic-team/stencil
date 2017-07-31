@@ -1,6 +1,6 @@
 import { BuildConfig, BuildResults, Diagnostic } from '../../util/interfaces';
 import { bundle } from '../bundle/bundle';
-import { catchError, getBuildContext, resetBuildContext } from '../util';
+import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
@@ -94,7 +94,7 @@ export function build(config: BuildConfig, context?: any) {
     let watchText = config.watch ? ', watching for changes...' : '';
     let statusColor = 'green';
 
-    if (ctx.diagnostics.some(d => d.level === 'error')) {
+    if (hasError(ctx.diagnostics)) {
       buildStatus = 'failed';
       statusColor = 'red';
     }
@@ -108,7 +108,7 @@ export function build(config: BuildConfig, context?: any) {
 
     // remember if the last build had an error or not
     // this is useful if the next build should do a full build or not
-    ctx.lastBuildHadError = (ctx.diagnostics.some(d => d.level === 'error'));
+    ctx.lastBuildHadError = hasError(ctx.diagnostics);
 
     // return what we've learned today
     return buildResults;

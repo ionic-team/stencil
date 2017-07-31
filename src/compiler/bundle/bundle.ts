@@ -1,11 +1,15 @@
 import { BuildConfig, BuildContext } from '../../util/interfaces';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
-import { catchError } from '../util';
+import { catchError, hasError } from '../util';
 import { generateComponentRegistry } from './bundle-registry';
 
 
 export function bundle(config: BuildConfig, ctx: BuildContext) {
+  if (hasError(ctx.diagnostics)) {
+    return Promise.resolve();
+  }
+
   const logger = config.logger;
 
   logger.debug(`bundle, src: ${config.src}`);

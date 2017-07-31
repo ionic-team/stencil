@@ -1,5 +1,5 @@
 import { BuildContext, BuildConfig, Bundle, Manifest, ModuleFile, StylesResults } from '../../util/interfaces';
-import { buildError, catchError, isCssFile, isSassFile, generatePreamble, normalizePath, readFile } from '../util';
+import { buildError, catchError, hasError, isCssFile, isSassFile, generatePreamble, normalizePath, readFile } from '../util';
 import { formatCssBundleFileName, generateBundleId } from '../../util/data-serialize';
 import { HYDRATED_CSS } from '../../util/constants';
 
@@ -9,6 +9,10 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext) {
   const stylesResults: StylesResults = {
     bundles: {}
   };
+
+  if (hasError(ctx.diagnostics)) {
+    return Promise.resolve(stylesResults);
+  }
 
   // do bundling if this is not a change build
   // or it's a change build that has either changed sass or css

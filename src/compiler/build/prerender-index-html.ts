@@ -1,10 +1,10 @@
 import { BuildConfig, BuildContext, LoggerTimeSpan } from '../../util/interfaces';
-import { catchError, readFile } from '../util';
+import { catchError, hasError, readFile } from '../util';
 import { createRenderer } from '../../server/index';
 
 
 export function prerenderIndexHtml(config: BuildConfig, ctx: BuildContext) {
-  if (ctx.isRebuild && ctx.appFileBuildCount === 0) {
+  if (ctx.isRebuild && ctx.appFileBuildCount === 0 || hasError(ctx.diagnostics)) {
     // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
   }

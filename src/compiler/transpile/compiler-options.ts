@@ -17,6 +17,9 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { optio
   if (config.devMode) {
     // for dev builds let's not create d.ts files
     options.declaration = false;
+
+  } else {
+    options.declaration = true;
   }
 
   return ctx.tsConfig = {

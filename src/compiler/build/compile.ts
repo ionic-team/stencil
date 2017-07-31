@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, CompileResults } from '../../util/interfaces';
-import { catchError, isTsFile, readFile, normalizePath } from '../util';
+import { catchError, hasError, isTsFile, readFile, normalizePath } from '../util';
 import { getModuleFile } from '../transpile/compiler-host';
 import { transpile } from '../transpile/transpile';
 
@@ -7,14 +7,18 @@ import { transpile } from '../transpile/transpile';
 export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
   const logger = config.logger;
 
-  const timeSpan = config.logger.createTimeSpan(`compile started`);
-
-  logger.debug(`compileDirectory, srcDir: ${config.src}`);
-
   const compileResults: CompileResults = {
     moduleFiles: {},
     includedSassFiles: []
   };
+
+  if (hasError(ctx.diagnostics)) {
+    return Promise.resolve(compileResults);
+  }
+
+  const timeSpan = config.logger.createTimeSpan(`compile started`);
+
+  logger.debug(`compileDirectory, srcDir: ${config.src}`);
 
   return scanDir(config, ctx, config.src, compileResults).then(() => {
     return transpile(config, ctx, compileResults.moduleFiles);
