@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, Bundle, Diagnostic, FilesMap,
   Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
 import { buildError, buildWarn, catchError, hasError, generatePreamble, normalizePath } from '../util';
+import { loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
 
@@ -58,6 +59,9 @@ function generateDefineComponents(config: BuildConfig, ctx: BuildContext, appMan
 
   // loop through each bundle the user wants and create the "defineComponents"
   return bundleComponentModules(config, ctx, bundleModuleFiles, bundleId).then(bundleDetails => {
+    if (hasError(ctx.diagnostics)) {
+      return;
+    }
 
     // format all the JS bundle content
     // insert the already bundled JS module into the defineComponents function
@@ -193,10 +197,14 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     onwarn: createOnWarnFn(ctx.diagnostics, bundleModuleFiles)
 
   }).catch(err => {
-    throw err;
-  })
+    loadRollupDiagnostics(config, ctx.diagnostics, err);
+    return null;
 
-  .then(rollupBundle => {
+  }).then(rollupBundle => {
+    if (hasError(ctx.diagnostics) || !rollupBundle) {
+      return bundleDetails;
+    }
+
     // generate the bundler results
     const results = rollupBundle.generate({
       format: 'es',
