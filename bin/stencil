@@ -103,6 +103,12 @@ if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
   process.exit(0);
 }
 
+if (cmdArgs.indexOf('--version') > -1 || cmdArgs.indexOf('-v') > -1) {
+  var packageJson = require(path.join(__dirname, '../package.json'));
+  console.log(packageJson.version);
+  process.exit(0);
+}
+
 if (cmdArgs.indexOf('--dev') > -1) {
   config.devMode = true;
 }
