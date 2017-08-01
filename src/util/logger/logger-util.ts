@@ -2,13 +2,7 @@ import { Diagnostic, PrintLine } from '../interfaces';
 
 
 export function cleanDiagnostics(diagnostics: Diagnostic[]) {
-  const cleaned: Diagnostic[] = [];
-
-  diagnostics.forEach(d => {
-    if (cleaned.length < MAX_ERRORS && !cleaned.some(c => c.messageText === d.messageText)) {
-      cleaned.push(d);
-    }
-  });
+  const cleaned: Diagnostic[] = diagnostics.slice(0, MAX_ERRORS);
 
   cleaned.forEach(d => {
     if (d.messageText) {
