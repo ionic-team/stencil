@@ -1,7 +1,7 @@
-import { BuildConfig, BuildContext, Bundle, Diagnostic, FilesMap,
+import { BuildConfig, BuildContext, Bundle, FilesMap,
   Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
-import { buildError, buildWarn, catchError, hasError, generatePreamble, normalizePath } from '../util';
-import { loadRollupDiagnostics } from '../../util/logger/logger-rollup';
+import { buildError, catchError, hasError, generatePreamble, normalizePath } from '../util';
+import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { formatDefineComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
 
@@ -228,38 +228,6 @@ interface ModuleBundleDetails {
   content?: string;
   writeFile?: boolean;
 }
-
-
-export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
-  const previousWarns: {[key: string]: boolean} = {};
-
-  return function onWarningMessage(warning: any) {
-    if (warning && warning.message in previousWarns) {
-      return;
-    }
-    if (warning && warning.message) {
-      if (INGORE_BUNDLE_MSGS.some(m => warning.message.indexOf(m) > -1)) {
-        return;
-      }
-    }
-    previousWarns[warning.message] = true;
-
-    let label = '';
-    if (bundleModulesFiles) {
-      label = bundleModulesFiles.map(moduleFile => moduleFile.cmpMeta.tagNameMeta).join(', ').trim();
-      if (label.length) {
-        label += ': ';
-      }
-    }
-
-    buildWarn(diagnostics).messageText = label + warning.toString();
-  };
-}
-
-
-const INGORE_BUNDLE_MSGS = [
-  `'this' keyword is equivalent to 'undefined' at the top level`
-];
 
 
 export function transpiledInMemoryPlugin(config: BuildConfig, ctx: BuildContext) {

@@ -1,19 +1,25 @@
 import { BuildConfig, BuildContext } from '../../util/interfaces';
-import { createOnWarnFn, transpiledInMemoryPlugin } from '../bundle/bundle-modules';
-import { getJsFile } from '../util';
+import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
+import { hasError } from '../util';
+import { transpiledInMemoryPlugin } from '../bundle/bundle-modules';
 
 
 export function generateAppGlobal(config: BuildConfig, ctx: BuildContext) {
   let globalJsContents: string[] = [];
 
-  return loadDependentGlobalJsContents(config, ctx).then(dependentGlobalJsContents => {
-    globalJsContents = globalJsContents.concat(dependentGlobalJsContents.filter(c => c));
+  return Promise.all([
+    loadDependentGlobalJsContents(config, ctx),
+    bundleProjectGlobal(config, ctx, config.namespace, config.global)
 
-    return bundleProjectGlobal(config, ctx).then(projectGlobalJsContent => {
-      if (projectGlobalJsContent) {
-        globalJsContents.push(projectGlobalJsContent);
-      }
-    });
+  ]).then(results => {
+    const dependentGlobalJsContents = results[0];
+    const projectGlobalJsContent = results[1];
+
+    globalJsContents = globalJsContents.concat(dependentGlobalJsContents);
+
+    if (projectGlobalJsContent) {
+      globalJsContents.push(projectGlobalJsContent);
+    }
 
   }).then(() => {
     return globalJsContents;
@@ -30,21 +36,19 @@ function loadDependentGlobalJsContents(config: BuildConfig, ctx: BuildContext): 
                                .filter(m => m.global && m.global.jsFilePath);
 
   return Promise.all(dependentManifests.map(dependentManifest => {
-    return getJsFile(config.sys, ctx, dependentManifest.global.jsFilePath).then(jsContent => {
-      return wrapGlobalJs(config, ctx, dependentManifest.manifestName, jsContent);
-    });
+    return bundleProjectGlobal(config, ctx, dependentManifest.manifestName, dependentManifest.global.jsFilePath);
   }));
 }
 
 
-function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext): Promise<string> {
+function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, namespace: string, entry: string): Promise<string> {
   // stencil by itself does not have a global file
   // however, other collections can provide a global js
   // which will bundle whatever is in the global, and then
   // prepend the output content on top of the core js
   // this way external collections can provide a shared global at runtime
 
-  if (!config.global) {
+  if (!entry) {
     // looks like they never provided an entry file, which is fine, so let's skip this
     return Promise.resolve(null);
   }
@@ -53,7 +57,7 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext): Promise<st
   // the output from this can be tacked onto the top of the project's core file
   // start the bundler on our temporary file
   return config.sys.rollup.rollup({
-    entry: config.global,
+    entry: entry,
     plugins: [
       config.sys.rollup.plugins.nodeResolve({
         jsnext: true,
@@ -68,15 +72,21 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext): Promise<st
     onwarn: createOnWarnFn(ctx.diagnostics)
 
   }).catch(err => {
-    throw err;
+    loadRollupDiagnostics(config, ctx.diagnostics, err);
+    return null;
+
   })
 
   .then(rollupBundle => {
     // generate the bundler results
+    if (hasError(ctx.diagnostics) || !rollupBundle) {
+      return '';
+    }
+
     const results = rollupBundle.generate({
       format: 'es'
     });
-    return wrapGlobalJs(config, ctx, config.namespace, results.code);
+    return wrapGlobalJs(config, ctx, namespace, results.code);
 
   }).then(output => {
 

@@ -1,4 +1,5 @@
-import { BuildConfig, Diagnostic, PrintLine } from '../interfaces';
+import { BuildConfig, Diagnostic, ModuleFile, PrintLine } from '../interfaces';
+import { buildWarn } from '../../compiler/util';
 import { formatFileName, formatHeader, splitLineBreaks } from './logger-util';
 import { highlight } from './highlight/highlight';
 
@@ -97,3 +98,35 @@ export function loadRollupDiagnostics(config: BuildConfig, resultsDiagnostics: D
 
   resultsDiagnostics.push(d);
 }
+
+
+export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
+  const previousWarns: {[key: string]: boolean} = {};
+
+  return function onWarningMessage(warning: any) {
+    if (warning && warning.message in previousWarns) {
+      return;
+    }
+    if (warning && warning.code) {
+      if (INGORE_BUNDLE_CODES.indexOf(warning.code) > -1) {
+        return;
+      }
+    }
+    previousWarns[warning.message] = true;
+
+    let label = '';
+    if (bundleModulesFiles) {
+      label = bundleModulesFiles.map(moduleFile => moduleFile.cmpMeta.tagNameMeta).join(', ').trim();
+      if (label.length) {
+        label += ': ';
+      }
+    }
+
+    buildWarn(diagnostics).messageText = label + warning.toString();
+  };
+}
+
+
+const INGORE_BUNDLE_CODES = [
+  `THIS_IS_UNDEFINED`
+];
