@@ -237,6 +237,11 @@ export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: M
     if (warning && warning.message in previousWarns) {
       return;
     }
+    if (warning && warning.message) {
+      if (INGORE_BUNDLE_MSGS.some(m => warning.message.indexOf(m) > -1)) {
+        return;
+      }
+    }
     previousWarns[warning.message] = true;
 
     let label = '';
@@ -250,6 +255,11 @@ export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: M
     buildWarn(diagnostics).messageText = label + warning.toString();
   };
 }
+
+
+const INGORE_BUNDLE_MSGS = [
+  `'this' keyword is equivalent to 'undefined' at the top level`
+];
 
 
 export function transpiledInMemoryPlugin(config: BuildConfig, ctx: BuildContext) {
