@@ -8,9 +8,9 @@ export function loadRollupDiagnostics(config: BuildConfig, resultsDiagnostics: D
     level: 'error',
     type: 'build',
     language: 'javascript',
-    header: 'bundle error',
+    header: 'build error',
     code: rollupError.code,
-    messageText: rollupErrorMessage(rollupError.code),
+    messageText: rollupError.message,
     relFilePath: null,
     absFilePath: null,
     lines: []
@@ -97,12 +97,3 @@ export function loadRollupDiagnostics(config: BuildConfig, resultsDiagnostics: D
 
   resultsDiagnostics.push(d);
 }
-
-
-function rollupErrorMessage(code: string) {
-  if (code === 'PARSE_ERROR') {
-    return 'Parse Error';
-  }
-  return code;
-}
-
