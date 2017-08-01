@@ -27,15 +27,27 @@ export function update(plt: PlatformApi, elm: HostElement) {
 
     if (isInitialLoad) {
       // haven't created a component instance for this host element yet
-      initComponentInstance(plt, elm);
+      try {
+        initComponentInstance(plt, elm);
+      } catch (e) {
+        plt.onError('INSTANCE', e);
+      }
     }
 
     // if this component has a render function, let's fire
     // it off and generate a vnode for this
-    elm._render(!isInitialLoad);
+    try {
+      elm._render(!isInitialLoad);
+    } catch (e) {
+      plt.onError('RENDER', e);
+    }
 
     if (isInitialLoad) {
-      elm._initLoad();
+      try {
+        elm._initLoad();
+      } catch (e) {
+        plt.onError('LOAD', e);
+      }
     }
   }
 }

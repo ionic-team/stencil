@@ -1,4 +1,4 @@
-import { BuildConfig, ComponentMeta, CoreGlobal, DomApi, HostElement, HostContentNodes,
+import { BuildConfig, ComponentMeta, CoreGlobal, Diagnostic, DomApi, HostElement, HostContentNodes,
   HydrateOptions, Logger, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
@@ -15,7 +15,7 @@ const jsdom = require('jsdom');
 
 
 export function mockPlatform() {
-  const logger = mockLogger();
+  const diagnostics: Diagnostic[] = [];
   const sys = mockStencilSystem();
   const win = sys.createDom().parse({html: ''});
   const domApi = createDomApi(win.document);
@@ -28,10 +28,10 @@ export function mockPlatform() {
   const plt = createPlatformServer(
     coreGlobal,
     sys,
-    logger,
     'App',
     win,
-    appBuildDir
+    appBuildDir,
+    diagnostics
   );
 
   const $mockedQueue = plt.queue = mockQueue();

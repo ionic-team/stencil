@@ -1,7 +1,8 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildContext, ComponentMeta, ComponentRegistry,
-  CoreGlobal, FilesMap, HostElement, ListenOptions, Logger,
+  CoreGlobal, Diagnostic, FilesMap, HostElement, ListenOptions,
   ModuleCallbacks, PlatformApi, AppGlobal, StencilSystem } from '../util/interfaces';
+import { catchError } from '../compiler/util';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
@@ -15,10 +16,10 @@ import { parseComponentMeta } from '../util/data-parse';
 export function createPlatformServer(
   Core: CoreGlobal,
   sys: StencilSystem,
-  logger: Logger,
   appNamespace: string,
   win: any,
   appBuildDir: string,
+  diagnostics: Diagnostic[],
   ctx?: BuildContext
 ): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
@@ -62,7 +63,8 @@ export function createPlatformServer(
     queue: createQueueServer(),
     tmpDisconnected: false,
     emitEvent: noop,
-    getEventOptions
+    getEventOptions,
+    onError
   };
 
 
@@ -178,7 +180,7 @@ export function createPlatformServer(
           sys.vm.runInContext(jsContent, win, { timeout: 10000 });
 
         }).catch(err => {
-          logger.error(`loadBundle, module read: ${err}`);
+          onError('LOAD_BUNDLE', err);
         });
       }
 
@@ -209,7 +211,7 @@ export function createPlatformServer(
               rootNode._initLoad();
 
             }).catch(err => {
-              logger.error(`loadBundle, style read: ${err}`);
+              onError('LOAD_BUNDLE', err);
             });
           }
         }
@@ -222,6 +224,11 @@ export function createPlatformServer(
       'capture': !!(opts && opts.capture),
       'passive': !(opts && opts.passive === false)
     };
+  }
+
+  function onError(type: string, err: any) {
+    const d = catchError(diagnostics, err);
+    d.type = type;
   }
 
   return plt;

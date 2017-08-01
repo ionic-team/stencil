@@ -42,10 +42,10 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
   const plt = createPlatformServer(
     coreGlobal,
     config.sys,
-    config.logger,
     config.namespace,
     win,
     appBuildDir,
+    hydrateResults.diagnostics,
     ctx
   );
 

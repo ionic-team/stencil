@@ -56,7 +56,8 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
     queue: createQueueClient(Core.dom, now),
     connectHostElement,
     emitEvent: Core.emit,
-    getEventOptions
+    getEventOptions,
+    onError
   };
 
   // create the renderer that will be used
@@ -248,6 +249,10 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
         capture: !!useCapture,
         passive: !!usePassive
       } : !!useCapture;
+  }
+
+  function onError(err: any) {
+    console.error(err);
   }
 
 

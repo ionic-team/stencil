@@ -814,6 +814,7 @@ export interface PlatformApi {
   getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;
+  onError: (type: string, err: any) => void;
 }
 
 
@@ -853,7 +854,7 @@ export interface ModuleCallbacks {
 
 export interface Diagnostic {
   level: 'error'|'warn'|'info';
-  type: 'runtime'|'build'|'typescript'|'sass'|'css'|'hydrate';
+  type: string;
   header: string;
   messageText: string;
   language?: 'javascript'|'typescript'|'scss'|'css';

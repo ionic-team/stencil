@@ -31,7 +31,7 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
   };
 
   HostElementConstructor._initLoad = function() {
-    initLoad((this as HostElement));
+    initLoad(plt, (this as HostElement));
   };
 
   HostElementConstructor._render = function(isInitialRender: boolean) {
@@ -69,16 +69,24 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
 
   // reply any event listeners on the instance that were queued up between the time
   // the element was connected and before the instance was ready
-  replayQueuedEventsOnInstance(elm);
+  try {
+    replayQueuedEventsOnInstance(elm);
+  } catch (e) {
+    plt.onError('QUEUE_EVENTS', e);
+  }
 
   // fire off the user's componentWillLoad method (if one was provided)
   // componentWillLoad only runs ONCE, after instance's element has been
   // assigned as the host element, but BEFORE render() has been called
-  instance.componentWillLoad && instance.componentWillLoad();
+  try {
+    instance.componentWillLoad && instance.componentWillLoad();
+  } catch (e) {
+    plt.onError('WILL_LOAD', e);
+  }
 }
 
 
-export function initLoad(elm: HostElement): any {
+export function initLoad(plt: PlatformApi, elm: HostElement): any {
   const instance = elm.$instance;
 
   // it's possible that we've already decided to destroy this element
@@ -97,7 +105,11 @@ export function initLoad(elm: HostElement): any {
     // fire off the user's componentDidLoad method (if one was provided)
     // componentDidLoad only runs ONCE, after the instance's element has been
     // assigned as the host element, and AFTER render() has been called
-    instance.componentDidLoad && instance.componentDidLoad();
+    try {
+      instance.componentDidLoad && instance.componentDidLoad();
+    } catch (e) {
+      plt.onError('DID_LOAD', e);
+    }
 
     // add the css class that this element has officially hydrated
     elm.classList.add(HYDRATED_CSS);
