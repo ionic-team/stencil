@@ -30,70 +30,71 @@ export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOpti
     return moduleFile.tsText;
   },
 
-  tsHost.writeFile = (outputPath: string, outputText: string, writeByteOrderMark: boolean, onError: any, sourceFiles: ts.SourceFile[]): void => {
-    outputPath = normalizePath(outputPath);
-
-    function writeFileInMemory(sourceFile: ts.SourceFile) {
-      const tsFilePath = normalizePath(sourceFile.fileName);
-
-      if (isJsFile(outputPath)) {
-        // js file
-        const jsFilePath = outputPath;
-
-        let moduleFile = ctx.moduleFiles[tsFilePath];
-        if (moduleFile) {
-          // we got the module we already cached
-          moduleFile.jsFilePath = jsFilePath;
-
-        } else {
-          // this actually shouldn't happen, but just in case
-          moduleFile = ctx.moduleFiles[tsFilePath] = {
-            tsFilePath: tsFilePath,
-            jsFilePath: jsFilePath,
-          };
-        }
-
-        // cache the js content
-        ctx.jsFiles[jsFilePath] = outputText;
-
-        // add this module to the list of files that were just transpiled
-        transpileResults.moduleFiles[tsFilePath] = moduleFile;
-
-      } else if (isDtsFile(outputPath)) {
-        // .d.ts file
-        const dtsFilePath = outputPath;
-
-        let moduleFile = ctx.moduleFiles[tsFilePath];
-        if (moduleFile) {
-          // we got the module we already cached
-          moduleFile.dtsFilePath = dtsFilePath;
-
-        } else {
-          // this actually shouldn't happen, but just in case
-          moduleFile = ctx.moduleFiles[tsFilePath] = {
-            tsFilePath: tsFilePath,
-            dtsFilePath: dtsFilePath,
-          };
-        }
-
-        // write the .d.ts file
-        ctx.filesToWrite[dtsFilePath] = outputText;
-
-        // add this module to the list of files that were just transpiled
-        transpileResults.moduleFiles[tsFilePath] = moduleFile;
-
-      } else {
-        // idk, this shouldn't happen
-        config.logger.debug(`unknown transpiled output: ${outputPath}`);
-      }
-
-    }
-
-    sourceFiles.forEach(writeFileInMemory);
+  tsHost.writeFile = (outputFilePath: string, outputText: string, writeByteOrderMark: boolean, onError: any, sourceFiles: ts.SourceFile[]): void => {
+    sourceFiles.forEach(sourceFile => {
+      writeFileInMemory(config, ctx, transpileResults, sourceFile, outputFilePath, outputText);
+    });
     writeByteOrderMark; onError;
   };
 
   return tsHost;
+}
+
+
+function writeFileInMemory(config: BuildConfig, ctx: BuildContext, transpileResults: TranspileResults, sourceFile: ts.SourceFile, outputFilePath: string, outputText: string) {
+  const tsFilePath = normalizePath(sourceFile.fileName);
+  outputFilePath = normalizePath(outputFilePath);
+
+  if (isJsFile(outputFilePath)) {
+    // js file
+    const jsFilePath = outputFilePath;
+
+    let moduleFile = ctx.moduleFiles[tsFilePath];
+    if (moduleFile) {
+      // we got the module we already cached
+      moduleFile.jsFilePath = jsFilePath;
+
+    } else {
+      // this actually shouldn't happen, but just in case
+      moduleFile = ctx.moduleFiles[tsFilePath] = {
+        tsFilePath: tsFilePath,
+        jsFilePath: jsFilePath,
+      };
+    }
+
+    // cache the js content
+    ctx.jsFiles[jsFilePath] = outputText;
+
+    // add this module to the list of files that were just transpiled
+    transpileResults.moduleFiles[tsFilePath] = moduleFile;
+
+  } else if (isDtsFile(outputFilePath)) {
+    // .d.ts file
+    const dtsFilePath = outputFilePath;
+
+    let moduleFile = ctx.moduleFiles[tsFilePath];
+    if (moduleFile) {
+      // we got the module we already cached
+      moduleFile.dtsFilePath = dtsFilePath;
+
+    } else {
+      // this actually shouldn't happen, but just in case
+      moduleFile = ctx.moduleFiles[tsFilePath] = {
+        tsFilePath: tsFilePath,
+        dtsFilePath: dtsFilePath,
+      };
+    }
+
+    // write the .d.ts file
+    ctx.filesToWrite[dtsFilePath] = outputText;
+
+    // add this module to the list of files that were just transpiled
+    transpileResults.moduleFiles[tsFilePath] = moduleFile;
+
+  } else {
+    // idk, this shouldn't happen
+    config.logger.debug(`unknown transpiled output: ${outputFilePath}`);
+  }
 }
 
 
