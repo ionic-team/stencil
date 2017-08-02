@@ -95,3 +95,15 @@ export const COLLECTION_MANIFEST_FILE_NAME = 'collection-manifest.json';
 export const CORE_NAME = 'core';
 export const LOADER_NAME = 'loader';
 export const APP_NAMESPACE_REGEX = /["']__STENCIL__APP__['"]/g;
+
+
+/**
+ * Errors
+ */
+export const LOAD_BUNDLE_ERROR = 1;
+export const QUEUE_EVENTS_ERROR = 2;
+export const WILL_LOAD_ERROR = 3;
+export const DID_LOAD_ERROR = 4;
+export const INIT_INSTANCE_ERROR = 5;
+export const RENDER_ERROR = 6;
+export const INITIAL_LOAD_ERROR = 7;

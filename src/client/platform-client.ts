@@ -251,8 +251,8 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
       } : !!useCapture;
   }
 
-  function onError(err: any) {
-    console.error(err);
+  function onError(type: number, err: any, elm: HostElement) {
+    console.error(type, err, elm.tagName);
   }
 
 

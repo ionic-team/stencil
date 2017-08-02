@@ -2,7 +2,7 @@ import { attributeChangedCallback } from './attribute-changed';
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { HYDRATED_CSS } from '../../util/constants';
+import { HYDRATED_CSS, DID_LOAD_ERROR, QUEUE_EVENTS_ERROR, WILL_LOAD_ERROR } from '../../util/constants';
 import { initEventEmitters } from './events';
 import { initProxy } from './proxy';
 import { queueUpdate } from './update';
@@ -72,7 +72,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   try {
     replayQueuedEventsOnInstance(elm);
   } catch (e) {
-    plt.onError('QUEUE_EVENTS', e);
+    plt.onError(QUEUE_EVENTS_ERROR, e, elm);
   }
 
   // fire off the user's componentWillLoad method (if one was provided)
@@ -81,7 +81,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   try {
     instance.componentWillLoad && instance.componentWillLoad();
   } catch (e) {
-    plt.onError('WILL_LOAD', e);
+    plt.onError(WILL_LOAD_ERROR, e, elm);
   }
 }
 
@@ -108,7 +108,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     try {
       instance.componentDidLoad && instance.componentDidLoad();
     } catch (e) {
-      plt.onError('DID_LOAD', e);
+      plt.onError(DID_LOAD_ERROR, e, elm);
     }
 
     // add the css class that this element has officially hydrated

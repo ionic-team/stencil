@@ -19,6 +19,10 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     // have fired even before the instance is ready
     initElementListeners(plt, elm);
 
+    // register this component as an actively
+    // loading child to its parent component
+    registerWithParentComponent(plt, elm);
+
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can
     // ensure the "mode" attribute has been added to the element
@@ -27,10 +31,6 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     plt.queue.add(() => {
       // get the component meta data about this component
       const cmpMeta = plt.getComponentMeta(elm);
-
-      // async tick has happened, so all of the child
-      // nodes and host attributes should now be in the DOM
-      collectHostContent(plt, elm);
 
       // only collects slot references if this component even has slots
       plt.connectHostElement(elm, cmpMeta.slotMeta);
@@ -48,7 +48,7 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
 }
 
 
-function collectHostContent(plt: PlatformApi, elm: HostElement) {
+function registerWithParentComponent(plt: PlatformApi, elm: HostElement) {
   // find the first ancestor host element (if there is one) and register
   // this element as one of the actively loading child elements for its ancestor
   let ancestorHostElement = elm;

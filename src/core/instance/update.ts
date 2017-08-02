@@ -1,5 +1,6 @@
 import { initComponentInstance } from './init';
 import { HostElement, PlatformApi } from '../../util/interfaces';
+import { INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, RENDER_ERROR } from '../../util/constants';
 
 
 export function queueUpdate(plt: PlatformApi, elm: HostElement) {
@@ -30,7 +31,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
       try {
         initComponentInstance(plt, elm);
       } catch (e) {
-        plt.onError('INSTANCE', e);
+        plt.onError(INIT_INSTANCE_ERROR, e, elm);
       }
     }
 
@@ -39,14 +40,14 @@ export function update(plt: PlatformApi, elm: HostElement) {
     try {
       elm._render(!isInitialLoad);
     } catch (e) {
-      plt.onError('RENDER', e);
+      plt.onError(RENDER_ERROR, e, elm);
     }
 
     if (isInitialLoad) {
       try {
         elm._initLoad();
       } catch (e) {
-        plt.onError('LOAD', e);
+        plt.onError(INITIAL_LOAD_ERROR, e, elm);
       }
     }
   }

@@ -814,7 +814,7 @@ export interface PlatformApi {
   getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;
-  onError: (type: string, err: any) => void;
+  onError: (type: number, err: any, elm: HostElement) => void;
 }
 
 

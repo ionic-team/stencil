@@ -2,13 +2,13 @@ import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildContext, ComponentMeta, ComponentRegistry,
   CoreGlobal, Diagnostic, FilesMap, HostElement, ListenOptions,
   ModuleCallbacks, PlatformApi, AppGlobal, StencilSystem } from '../util/interfaces';
-import { catchError } from '../compiler/util';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
 import { createRenderer } from '../core/renderer/patch';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
+import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, LOAD_BUNDLE_ERROR, QUEUE_EVENTS_ERROR, RENDER_ERROR, WILL_LOAD_ERROR } from '../util/constants';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
 
@@ -180,7 +180,7 @@ export function createPlatformServer(
           sys.vm.runInContext(jsContent, win, { timeout: 10000 });
 
         }).catch(err => {
-          onError('LOAD_BUNDLE', err);
+          onError(LOAD_BUNDLE_ERROR, err, elm);
         });
       }
 
@@ -211,7 +211,7 @@ export function createPlatformServer(
               rootNode._initLoad();
 
             }).catch(err => {
-              onError('LOAD_BUNDLE', err);
+              onError(LOAD_BUNDLE_ERROR, err, elm);
             });
           }
         }
@@ -226,9 +226,43 @@ export function createPlatformServer(
     };
   }
 
-  function onError(type: string, err: any) {
-    const d = catchError(diagnostics, err);
-    d.type = type;
+  function onError(type: number, err: Error, elm: HostElement) {
+    const d: Diagnostic = {
+      type: 'runtime',
+      header: 'Runtime error detected',
+      level: 'error',
+      messageText: err ? err.message ? err.message : err.toString() : null
+    };
+
+    switch (type) {
+      case LOAD_BUNDLE_ERROR:
+        d.header += ' while loading bundle';
+        break;
+      case QUEUE_EVENTS_ERROR:
+        d.header += ' while running initial events';
+        break;
+      case WILL_LOAD_ERROR:
+        d.header += ' during componentWillLoad()';
+        break;
+      case DID_LOAD_ERROR:
+        d.header += ' during componentDidLoad()';
+        break;
+      case INIT_INSTANCE_ERROR:
+        d.header += ' while initializing instance';
+        break;
+      case RENDER_ERROR:
+        d.header += ' while rendering';
+        break;
+      case INITIAL_LOAD_ERROR:
+        d.header += ' during initial load';
+        break;
+    }
+
+    if (elm && elm.tagName) {
+      d.header += ': ' + elm.tagName.toLowerCase();
+    }
+
+    diagnostics.push(d);
   }
 
   return plt;
