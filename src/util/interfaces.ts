@@ -1011,140 +1011,142 @@ export interface Hyperscript {
   (sel: any, data: VNodeData, children: VNode): VNode;
 }
 
+export interface IntrinsicElementsInterface {
+  // Stencil elements
+  slot: jsxInterface.SlotAttributes;
+
+  // HTML
+  a: jsxInterface.AnchorHTMLAttributes;
+  abbr: jsxInterface.HTMLAttributes;
+  address: jsxInterface.HTMLAttributes;
+  area: jsxInterface.AreaHTMLAttributes;
+  article: jsxInterface.HTMLAttributes;
+  aside: jsxInterface.HTMLAttributes;
+  audio: jsxInterface.AudioHTMLAttributes;
+  b: jsxInterface.HTMLAttributes;
+  base: jsxInterface.BaseHTMLAttributes;
+  bdi: jsxInterface.HTMLAttributes;
+  bdo: jsxInterface.HTMLAttributes;
+  big: jsxInterface.HTMLAttributes;
+  blockquote: jsxInterface.BlockquoteHTMLAttributes;
+  body: jsxInterface.HTMLAttributes;
+  br: jsxInterface.HTMLAttributes;
+  button: jsxInterface.ButtonHTMLAttributes;
+  canvas: jsxInterface.CanvasHTMLAttributes;
+  caption: jsxInterface.HTMLAttributes;
+  cite: jsxInterface.HTMLAttributes;
+  code: jsxInterface.HTMLAttributes;
+  col: jsxInterface.ColHTMLAttributes;
+  colgroup: jsxInterface.ColgroupHTMLAttributes;
+  data: jsxInterface.HTMLAttributes;
+  datalist: jsxInterface.HTMLAttributes;
+  dd: jsxInterface.HTMLAttributes;
+  del: jsxInterface.DelHTMLAttributes;
+  details: jsxInterface.DetailsHTMLAttributes;
+  dfn: jsxInterface.HTMLAttributes;
+  dialog: jsxInterface.HTMLAttributes;
+  div: jsxInterface.HTMLAttributes;
+  dl: jsxInterface.HTMLAttributes;
+  dt: jsxInterface.HTMLAttributes;
+  em: jsxInterface.HTMLAttributes;
+  embed: jsxInterface.EmbedHTMLAttributes;
+  fieldset: jsxInterface.FieldsetHTMLAttributes;
+  figcaption: jsxInterface.HTMLAttributes;
+  figure: jsxInterface.HTMLAttributes;
+  footer: jsxInterface.HTMLAttributes;
+  form: jsxInterface.FormHTMLAttributes;
+  h1: jsxInterface.HTMLAttributes;
+  h2: jsxInterface.HTMLAttributes;
+  h3: jsxInterface.HTMLAttributes;
+  h4: jsxInterface.HTMLAttributes;
+  h5: jsxInterface.HTMLAttributes;
+  h6: jsxInterface.HTMLAttributes;
+  head: jsxInterface.HTMLAttributes;
+  header: jsxInterface.HTMLAttributes;
+  hgroup: jsxInterface.HTMLAttributes;
+  hr: jsxInterface.HTMLAttributes;
+  html: jsxInterface.HTMLAttributes;
+  i: jsxInterface.HTMLAttributes;
+  iframe: jsxInterface.IframeHTMLAttributes;
+  img: jsxInterface.ImgHTMLAttributes;
+  input: jsxInterface.InputHTMLAttributes;
+  ins: jsxInterface.InsHTMLAttributes;
+  kbd: jsxInterface.HTMLAttributes;
+  keygen: jsxInterface.KeygenHTMLAttributes;
+  label: jsxInterface.LabelHTMLAttributes;
+  legend: jsxInterface.HTMLAttributes;
+  li: jsxInterface.LiHTMLAttributes;
+  link: jsxInterface.LinkHTMLAttributes;
+  main: jsxInterface.HTMLAttributes;
+  map: jsxInterface.MapHTMLAttributes;
+  mark: jsxInterface.HTMLAttributes;
+  menu: jsxInterface.MenuHTMLAttributes;
+  menuitem: jsxInterface.HTMLAttributes;
+  meta: jsxInterface.MetaHTMLAttributes;
+  meter: jsxInterface.MeterHTMLAttributes;
+  nav: jsxInterface.HTMLAttributes;
+  noscript: jsxInterface.HTMLAttributes;
+  object: jsxInterface.ObjectHTMLAttributes;
+  ol: jsxInterface.OlHTMLAttributes;
+  optgroup: jsxInterface.OptgroupHTMLAttributes;
+  option: jsxInterface.OptionHTMLAttributes;
+  output: jsxInterface.OutputHTMLAttributes;
+  p: jsxInterface.HTMLAttributes;
+  param: jsxInterface.ParamHTMLAttributes;
+  picture: jsxInterface.HTMLAttributes;
+  pre: jsxInterface.HTMLAttributes;
+  progress: jsxInterface.ProgressHTMLAttributes;
+  q: jsxInterface.QuoteHTMLAttributes;
+  rp: jsxInterface.HTMLAttributes;
+  rt: jsxInterface.HTMLAttributes;
+  ruby: jsxInterface.HTMLAttributes;
+  s: jsxInterface.HTMLAttributes;
+  samp: jsxInterface.HTMLAttributes;
+  script: jsxInterface.ScriptHTMLAttributes;
+  section: jsxInterface.HTMLAttributes;
+  select: jsxInterface.SelectHTMLAttributes;
+  small: jsxInterface.HTMLAttributes;
+  source: jsxInterface.SourceHTMLAttributes;
+  span: jsxInterface.HTMLAttributes;
+  strong: jsxInterface.HTMLAttributes;
+  style: jsxInterface.StyleHTMLAttributes;
+  sub: jsxInterface.HTMLAttributes;
+  summary: jsxInterface.HTMLAttributes;
+  sup: jsxInterface.HTMLAttributes;
+  table: jsxInterface.TableHTMLAttributes;
+  tbody: jsxInterface.HTMLAttributes;
+  td: jsxInterface.TdHTMLAttributes;
+  textarea: jsxInterface.TextareaHTMLAttributes;
+  tfoot: jsxInterface.HTMLAttributes;
+  th: jsxInterface.ThHTMLAttributes;
+  thead: jsxInterface.HTMLAttributes;
+  time: jsxInterface.TimeHTMLAttributes;
+  title: jsxInterface.HTMLAttributes;
+  tr: jsxInterface.HTMLAttributes;
+  track: jsxInterface.TrackHTMLAttributes;
+  u: jsxInterface.HTMLAttributes;
+  ul: jsxInterface.HTMLAttributes;
+  'var': jsxInterface.HTMLAttributes;
+  video: jsxInterface.VideoHTMLAttributes;
+  wbr: jsxInterface.HTMLAttributes;
+  [elemName: string]: any;
+}
+
 
 declare global {
 
-  const Core: CoreGlobal;
-
-  const publicPath: string;
-
-  const appNamespace: string;
-
-  const h: Hyperscript;
+  // these must be "var" variables
+  // so that they could be re-declared by
+  // other collections, do not use "const" or "let"
+  var Core: CoreGlobal;
+  var publicPath: string;
+  var appNamespace: string;
+  var h: Hyperscript;
 
   namespace JSX {
     interface Element {
     }
-    interface IntrinsicElements {
-      // Stencil elements
-      slot: jsxInterface.SlotAttributes;
-
-      // HTML
-      a: jsxInterface.AnchorHTMLAttributes;
-      abbr: jsxInterface.HTMLAttributes;
-      address: jsxInterface.HTMLAttributes;
-      area: jsxInterface.AreaHTMLAttributes;
-      article: jsxInterface.HTMLAttributes;
-      aside: jsxInterface.HTMLAttributes;
-      audio: jsxInterface.AudioHTMLAttributes;
-      b: jsxInterface.HTMLAttributes;
-      base: jsxInterface.BaseHTMLAttributes;
-      bdi: jsxInterface.HTMLAttributes;
-      bdo: jsxInterface.HTMLAttributes;
-      big: jsxInterface.HTMLAttributes;
-      blockquote: jsxInterface.BlockquoteHTMLAttributes;
-      body: jsxInterface.HTMLAttributes;
-      br: jsxInterface.HTMLAttributes;
-      button: jsxInterface.ButtonHTMLAttributes;
-      canvas: jsxInterface.CanvasHTMLAttributes;
-      caption: jsxInterface.HTMLAttributes;
-      cite: jsxInterface.HTMLAttributes;
-      code: jsxInterface.HTMLAttributes;
-      col: jsxInterface.ColHTMLAttributes;
-      colgroup: jsxInterface.ColgroupHTMLAttributes;
-      data: jsxInterface.HTMLAttributes;
-      datalist: jsxInterface.HTMLAttributes;
-      dd: jsxInterface.HTMLAttributes;
-      del: jsxInterface.DelHTMLAttributes;
-      details: jsxInterface.DetailsHTMLAttributes;
-      dfn: jsxInterface.HTMLAttributes;
-      dialog: jsxInterface.HTMLAttributes;
-      div: jsxInterface.HTMLAttributes;
-      dl: jsxInterface.HTMLAttributes;
-      dt: jsxInterface.HTMLAttributes;
-      em: jsxInterface.HTMLAttributes;
-      embed: jsxInterface.EmbedHTMLAttributes;
-      fieldset: jsxInterface.FieldsetHTMLAttributes;
-      figcaption: jsxInterface.HTMLAttributes;
-      figure: jsxInterface.HTMLAttributes;
-      footer: jsxInterface.HTMLAttributes;
-      form: jsxInterface.FormHTMLAttributes;
-      h1: jsxInterface.HTMLAttributes;
-      h2: jsxInterface.HTMLAttributes;
-      h3: jsxInterface.HTMLAttributes;
-      h4: jsxInterface.HTMLAttributes;
-      h5: jsxInterface.HTMLAttributes;
-      h6: jsxInterface.HTMLAttributes;
-      head: jsxInterface.HTMLAttributes;
-      header: jsxInterface.HTMLAttributes;
-      hgroup: jsxInterface.HTMLAttributes;
-      hr: jsxInterface.HTMLAttributes;
-      html: jsxInterface.HTMLAttributes;
-      i: jsxInterface.HTMLAttributes;
-      iframe: jsxInterface.IframeHTMLAttributes;
-      img: jsxInterface.ImgHTMLAttributes;
-      input: jsxInterface.InputHTMLAttributes;
-      ins: jsxInterface.InsHTMLAttributes;
-      kbd: jsxInterface.HTMLAttributes;
-      keygen: jsxInterface.KeygenHTMLAttributes;
-      label: jsxInterface.LabelHTMLAttributes;
-      legend: jsxInterface.HTMLAttributes;
-      li: jsxInterface.LiHTMLAttributes;
-      link: jsxInterface.LinkHTMLAttributes;
-      main: jsxInterface.HTMLAttributes;
-      map: jsxInterface.MapHTMLAttributes;
-      mark: jsxInterface.HTMLAttributes;
-      menu: jsxInterface.MenuHTMLAttributes;
-      menuitem: jsxInterface.HTMLAttributes;
-      meta: jsxInterface.MetaHTMLAttributes;
-      meter: jsxInterface.MeterHTMLAttributes;
-      nav: jsxInterface.HTMLAttributes;
-      noscript: jsxInterface.HTMLAttributes;
-      object: jsxInterface.ObjectHTMLAttributes;
-      ol: jsxInterface.OlHTMLAttributes;
-      optgroup: jsxInterface.OptgroupHTMLAttributes;
-      option: jsxInterface.OptionHTMLAttributes;
-      output: jsxInterface.OutputHTMLAttributes;
-      p: jsxInterface.HTMLAttributes;
-      param: jsxInterface.ParamHTMLAttributes;
-      picture: jsxInterface.HTMLAttributes;
-      pre: jsxInterface.HTMLAttributes;
-      progress: jsxInterface.ProgressHTMLAttributes;
-      q: jsxInterface.QuoteHTMLAttributes;
-      rp: jsxInterface.HTMLAttributes;
-      rt: jsxInterface.HTMLAttributes;
-      ruby: jsxInterface.HTMLAttributes;
-      s: jsxInterface.HTMLAttributes;
-      samp: jsxInterface.HTMLAttributes;
-      script: jsxInterface.ScriptHTMLAttributes;
-      section: jsxInterface.HTMLAttributes;
-      select: jsxInterface.SelectHTMLAttributes;
-      small: jsxInterface.HTMLAttributes;
-      source: jsxInterface.SourceHTMLAttributes;
-      span: jsxInterface.HTMLAttributes;
-      strong: jsxInterface.HTMLAttributes;
-      style: jsxInterface.StyleHTMLAttributes;
-      sub: jsxInterface.HTMLAttributes;
-      summary: jsxInterface.HTMLAttributes;
-      sup: jsxInterface.HTMLAttributes;
-      table: jsxInterface.TableHTMLAttributes;
-      tbody: jsxInterface.HTMLAttributes;
-      td: jsxInterface.TdHTMLAttributes;
-      textarea: jsxInterface.TextareaHTMLAttributes;
-      tfoot: jsxInterface.HTMLAttributes;
-      th: jsxInterface.ThHTMLAttributes;
-      thead: jsxInterface.HTMLAttributes;
-      time: jsxInterface.TimeHTMLAttributes;
-      title: jsxInterface.HTMLAttributes;
-      tr: jsxInterface.HTMLAttributes;
-      track: jsxInterface.TrackHTMLAttributes;
-      u: jsxInterface.HTMLAttributes;
-      ul: jsxInterface.HTMLAttributes;
-      'var': jsxInterface.HTMLAttributes;
-      video: jsxInterface.VideoHTMLAttributes;
-      wbr: jsxInterface.HTMLAttributes;
-      [elemName: string]: any;
-    }
+    type IntrinsicElements = IntrinsicElementsInterface;
   }
 }
 
