@@ -31,13 +31,21 @@ export function loadRollupDiagnostics(config: BuildConfig, resultsDiagnostics: D
       } catch (e) {}
 
       const errorLine: PrintLine = {
-        lineIndex: rollupError.loc.line,
-        lineNumber: rollupError.loc.line + 1,
-        text: srcLines[rollupError.loc.line],
-        html: htmlLines[rollupError.loc.line],
+        lineIndex: rollupError.loc.line - 1,
+        lineNumber: rollupError.loc.line,
+        text: srcLines[rollupError.loc.line - 1],
+        html: htmlLines[rollupError.loc.line - 1],
         errorCharStart: rollupError.loc.column,
-        errorLength: 1
+        errorLength: 0
       };
+
+      let highlightLine = errorLine.text.substr(rollupError.loc.column);
+      for (var i = 0; i < highlightLine.length; i++) {
+        if (CHAR_BREAK.indexOf(highlightLine.charAt(i)) > -1) {
+          break;
+        }
+        errorLine.errorLength++;
+      }
 
       if (errorLine.html && errorLine.html.indexOf('class="hljs') === -1) {
         try {
@@ -98,6 +106,8 @@ export function loadRollupDiagnostics(config: BuildConfig, resultsDiagnostics: D
 
   resultsDiagnostics.push(d);
 }
+
+const CHAR_BREAK = [' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`'];
 
 
 export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
