@@ -101,17 +101,42 @@ module.exports = Object.defineProperties({
   path: require('path'),
 
   resolveModule: function resolveModule(fromDir, moduleId) {
-    var module = require('module');
+    var Module = require('module');
     var path = require('path');
+    var fs = require('fs');
 
     fromDir = path.resolve(fromDir);
     var fromFile = path.join(fromDir, 'noop.js');
 
-    return module._resolveFilename(moduleId, {
+    var dir = Module._resolveFilename(moduleId, {
       id: fromFile,
       filename: fromFile,
-      paths: module._nodeModulePaths(fromDir)
+      paths: Module._nodeModulePaths(fromDir)
     });
+
+    var root = path.parse(fromDir).root;
+    var packageJson, packageJsonFilePath, packageData;
+
+    while (dir !== root) {
+      dir = path.dirname(dir);
+      packageJsonFilePath = path.join(dir, 'package.json');
+
+      try {
+        packageJson = fs.readFileSync(packageJsonFilePath);
+      } catch (e) {
+        continue;
+      }
+
+      packageData = JSON.parse(packageJson);
+
+      if (!packageData.collection) {
+        throw new Error('stencil collection "' + moduleId + '" is missing the "collection" key from its package.json: ' + packageJsonFilePath);
+      }
+
+      return path.join(dir, packageData.collection);
+    }
+
+    throw new Error('error loading "' + moduleId + '" from "' + fromDir + '"');
   },
 
   rmDir: function rmdir(directory, callback) {
