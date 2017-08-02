@@ -53,7 +53,7 @@ export function generateCoreEs5(config: BuildConfig, globalJsContent: string[]) 
 }
 
 
-function wrapCoreJs(config: BuildConfig, jsContent: string) {
+export function wrapCoreJs(config: BuildConfig, jsContent: string) {
   const publicPath = getAppPublicPath(config);
 
   const output = [
@@ -75,4 +75,9 @@ export function getAppPublicPath(config: BuildConfig) {
       config.namespace.toLowerCase()
     )
   ) + '/';
+}
+
+
+export function getAppFileName(config: BuildConfig) {
+  return config.namespace.toLowerCase();
 }

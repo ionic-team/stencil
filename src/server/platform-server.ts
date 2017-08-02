@@ -14,7 +14,6 @@ import { parseComponentMeta } from '../util/data-parse';
 
 
 export function createPlatformServer(
-  Core: CoreGlobal,
   sys: StencilSystem,
   appNamespace: string,
   win: any,
@@ -32,6 +31,7 @@ export function createPlatformServer(
 
 
   // initialize Core global object
+  const Core: CoreGlobal = {};
   Core.addListener = noop;
   Core.enableListener = noop;
   Core.emit = noop;
@@ -39,6 +39,9 @@ export function createPlatformServer(
   Core.isClient = false;
   Core.isServer = true;
 
+  // add the Core global to the window context
+  // Note: "Core" is not on the window context on the client-side
+  win.Core = Core;
 
   // create the app global
   const App: AppGlobal = {};
@@ -50,6 +53,8 @@ export function createPlatformServer(
   // V8 Context provides an isolated global environment
   sys.vm.createContext(win);
 
+  // execute the global scripts (if there are any)
+  runGlobalScripts();
 
   // create the DOM api which we'll use during hydrate
   const domApi = createDomApi(win.document);
@@ -224,6 +229,14 @@ export function createPlatformServer(
       'capture': !!(opts && opts.capture),
       'passive': !(opts && opts.passive === false)
     };
+  }
+
+  function runGlobalScripts() {
+    if (!ctx.appFiles.global) {
+      return;
+    }
+
+    sys.vm.runInContext(ctx.appFiles.global, win);
   }
 
   function onError(type: number, err: Error, elm: HostElement) {

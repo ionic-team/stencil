@@ -1,9 +1,9 @@
 import { AppRegistry, BuildConfig, BuildContext } from '../../util/interfaces';
-import { CORE_NAME } from '../../util/constants';
+import { CORE_NAME, GLOBAL_NAME } from '../../util/constants';
 import { formatComponentRegistry } from '../../util/data-serialize';
-import { generateCore, generateCoreEs5 } from './app-core';
+import { generateCore, generateCoreEs5, getAppFileName} from './app-core';
 import { generateLoader } from './app-loader';
-import { generateAppGlobal } from './app-global';
+import { generateAppGlobal, generateGlobalJs } from './app-global';
 import { hasError, normalizePath } from '../util';
 
 
@@ -16,7 +16,7 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 
   config.logger.debug(`build, generateAppFiles: ${config.namespace}`);
 
-  const appFileName = config.namespace.toLowerCase();
+  const appFileName = getAppFileName(config);
 
   const appRegistry: AppRegistry = {
     namespace: config.namespace,
@@ -28,10 +28,20 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   let appCoreEs5FileName: string;
 
   // bundle the app's entry file (if one was provided)
-  return generateAppGlobal(config, ctx).then(globalJsContent => {
+  return generateAppGlobal(config, ctx).then(globalJsContents => {
+    if (globalJsContents.length) {
+      appRegistry.global = `${appFileName}.${GLOBAL_NAME}.js`;
+
+      const globalJsContent = generateGlobalJs(config, globalJsContents);
+      const appGlobalFilePath = getGlobalFilePath(config);
+
+      config.logger.debug(`build, app global: ${appGlobalFilePath}`);
+      ctx.filesToWrite[appGlobalFilePath] = ctx.appFiles.global = globalJsContent;
+    }
+
     return Promise.all([
-      generateCore(config, globalJsContent),
-      generateCoreEs5(config, globalJsContent)
+      generateCore(config, globalJsContents),
+      generateCoreEs5(config, globalJsContents)
     ]);
 
   }).then(results => {
@@ -94,9 +104,9 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     const registryJson = JSON.stringify(appRegistry, null, 2);
     if (ctx.appFiles.registryJson !== registryJson) {
       // app registry json file is actually different from our last saved version
-      const registryFilePath = normalizePath(getRegistryJsonFilePath(config));
-      config.logger.debug(`build, app registry: ${registryFilePath}`);
-      ctx.filesToWrite[registryFilePath] = ctx.appFiles.registryJson = registryJson;
+      const appRegistryFilePath = getRegistryJsonFilePath(config);
+      config.logger.debug(`build, app registry: ${appRegistryFilePath}`);
+      ctx.filesToWrite[appRegistryFilePath] = ctx.appFiles.registryJson = registryJson;
       ctx.appFileBuildCount++;
     }
 
@@ -106,12 +116,19 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-
 export function getRegistryJsonFilePath(config: BuildConfig) {
-  return normalizePath(config.sys.path.join(config.buildDir, `${config.namespace.toLowerCase()}.registry.json`));
+  const appFileName = getAppFileName(config);
+  return normalizePath(config.sys.path.join(config.buildDir, `${appFileName}.registry.json`));
+}
+
+
+export function getGlobalFilePath(config: BuildConfig) {
+  const appFileName = getAppFileName(config);
+  return normalizePath(config.sys.path.join(config.buildDir, `${appFileName}.${GLOBAL_NAME}.js`));
 }
 
 
 export function getAppBuildDir(config: BuildConfig) {
-  return normalizePath(config.sys.path.join(config.buildDir, config.namespace.toLowerCase()));
+  const appFileName = getAppFileName(config);
+  return normalizePath(config.sys.path.join(config.buildDir, appFileName));
 }

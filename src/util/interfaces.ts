@@ -274,6 +274,7 @@ export interface AppRegistry {
   loader: string;
   core?: string;
   coreEs5?: string;
+  global?: string;
   components: LoadComponentRegistry[];
 }
 
@@ -336,6 +337,7 @@ export interface BuildContext {
     loader?: string;
     core?: string;
     coreEs5?: string;
+    global?: string;
     registryJson?: string;
     indexHtml?: string;
   };

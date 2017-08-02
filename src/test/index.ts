@@ -1,4 +1,4 @@
-import { BuildConfig, ComponentMeta, CoreGlobal, Diagnostic, DomApi, HostElement, HostContentNodes,
+import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostElement, HostContentNodes,
   HydrateOptions, Logger, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
@@ -21,12 +21,8 @@ export function mockPlatform() {
   const domApi = createDomApi(win.document);
 
   const appBuildDir = `/build/app/`;
-  const coreGlobal: CoreGlobal = {
-    mode: 'md'
-  };
 
   const plt = createPlatformServer(
-    coreGlobal,
     sys,
     'App',
     win,

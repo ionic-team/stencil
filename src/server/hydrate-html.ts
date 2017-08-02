@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, ComponentRegistry, CoreGlobal, HostElement, PlatformApi,
+import { BuildConfig, BuildContext, ComponentRegistry, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
 import { createPlatformServer } from './platform-server';
 import { getAppBuildDir } from '../compiler/app/generate-app-files';
@@ -25,7 +25,6 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
   // create a emulated window
   // attach data the request to the window
-  const coreGlobal: CoreGlobal = {};
   const dom = config.sys.createDom();
   const win = dom.parse(opts);
   const doc = win.document;
@@ -40,7 +39,6 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
   // create the platform
   const plt = createPlatformServer(
-    coreGlobal,
     config.sys,
     config.namespace,
     win,

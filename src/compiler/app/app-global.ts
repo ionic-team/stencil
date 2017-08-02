@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext } from '../../util/interfaces';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
-import { hasError } from '../util';
+import { getAppPublicPath } from './app-core';
+import { hasError, generatePreamble } from '../util';
 import { transpiledInMemoryPlugin } from '../bundle/bundle-modules';
 
 
@@ -128,4 +129,22 @@ function wrapGlobalJs(config: BuildConfig, ctx: BuildContext, globalJsName: stri
   }
 
   return jsContent;
+}
+
+
+export function generateGlobalJs(config: BuildConfig, globalJsContents: string[]) {
+  let content = `/* ${config.namespace} Global is used during Server-Side Rendering and Prerendering */\n`;
+  content += `/* this script is not requested or used client-side */\n`;
+
+  const publicPath = getAppPublicPath(config);
+
+  const output = [
+    generatePreamble(config),
+    `(function(appNamespace,publicPath){`,
+    `"use strict";\n`,
+    globalJsContents.join('\n').trim(),
+    `\n})("${config.namespace}","${publicPath}");`
+  ].join('');
+
+  return output;
 }
