@@ -2,9 +2,20 @@ import { Diagnostic, PrintLine } from '../interfaces';
 
 
 export function cleanDiagnostics(diagnostics: Diagnostic[]) {
-  const cleaned: Diagnostic[] = diagnostics.slice(0, MAX_ERRORS);
+  const cleaned: Diagnostic[] = [];
 
-  cleaned.forEach(d => {
+  const maxErrors = Math.min(diagnostics.length, MAX_ERRORS);
+  const dups: {[key: string]: boolean} = {};
+
+  for (var i = 0; i < maxErrors; i++) {
+    var d = diagnostics[i];
+
+    var key = d.absFilePath + d.code + d.messageText + d.type;
+    if (dups[key]) {
+      continue;
+    }
+    dups[key] = true;
+
     if (d.messageText) {
       if (typeof (<any>d.messageText).message === 'string') {
         d.messageText = (<any>d.messageText).message;
@@ -13,7 +24,9 @@ export function cleanDiagnostics(diagnostics: Diagnostic[]) {
         d.messageText = d.messageText.substr(7);
       }
     }
-  });
+
+    cleaned.push(d);
+  }
 
   return cleaned;
 }
