@@ -20,8 +20,9 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
 
       if (cmpMeta) {
         if (moduleFile.cmpMeta) {
+          let relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
           const d = buildError(diagnostics);
-          d.messageText = `Cannot have multiple @Components in the same source file`;
+          d.messageText = `Cannot have multiple @Components in the same source file: ${relPath}`;
           d.absFilePath = moduleFile.tsFilePath;
           return classNode;
         }
