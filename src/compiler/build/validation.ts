@@ -159,6 +159,8 @@ export function validateBuildConfig(config: BuildConfig) {
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
 
+  config.logger.debug(`validated build config`);
+
   return config;
 }
 

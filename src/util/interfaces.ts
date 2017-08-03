@@ -285,7 +285,7 @@ export interface Bundle {
 
 
 export interface BuildConfig {
-  _isValidated?: boolean;
+  configPath?: string;
   sys?: StencilSystem;
   logger?: Logger;
   rootDir?: string;
@@ -313,6 +313,7 @@ export interface BuildConfig {
   attrCase?: number;
   watchIgnoredRegex?: RegExp;
   prerenderIndex?: HydrateOptions;
+  _isValidated?: boolean;
 }
 
 
@@ -898,6 +899,7 @@ export interface StencilSystem {
   };
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
+  loadConfigFile?(configPath: string): BuildConfig;
   minifyCss?(input: string): {
     output: string;
     sourceMap?: any;
@@ -963,6 +965,7 @@ export interface StencilSystem {
 
 export interface FSWatcher {
   on(eventName: string, callback: Function): this;
+  add(path: string|string[]): this;
   $triggerEvent(eventName: string, path: string): void;
 }
 

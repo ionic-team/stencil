@@ -8,6 +8,8 @@ export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
   // and we haven't created a watcher yet
   if (!config.watch || ctx.watcher) return;
 
+  config.logger.debug(`setupWatcher: ${config.src}`);
+
   const logger = config.logger;
   let queueChangeBuild = false;
   let queueFullBuild = false;
@@ -17,9 +19,25 @@ export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
     ignoreInitial: true
   });
 
+  if (config.configPath) {
+    config.configPath = normalizePath(config.configPath);
+    config.logger.debug(`watch configPath: ${config.configPath}`);
+    ctx.watcher.add(config.configPath);
+  }
+
   ctx.watcher
     .on('change', (path: string) => {
+      path = normalizePath(path);
       logger.debug(`watcher, change: ${path}, ${Date.now()}`);
+
+      if (path === config.configPath) {
+        // the actual stencil config file changed
+        // this is a big deal, so do a full rebuild
+        configFileReload(config);
+        queueFullBuild = true;
+        queue();
+        return;
+      }
 
       if (isWebDevFile(path)) {
         // web dev file was updaed
@@ -204,4 +222,36 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
   }
 
   return build(config, ctx);
+}
+
+
+function configFileReload(existingConfig: BuildConfig) {
+  existingConfig.logger.debug(`reload config file: ${existingConfig.configPath}`);
+
+  const updatedConfig = existingConfig.sys.loadConfigFile(existingConfig.configPath);
+
+  // just update the existing config in place
+  // not everything should be overwritten or merged
+  // pick and choose what's ok to update
+  existingConfig._isValidated = false;
+  existingConfig.attrCase = updatedConfig.attrCase;
+  existingConfig.buildDir = updatedConfig.buildDir;
+  existingConfig.bundles = updatedConfig.bundles;
+  existingConfig.collectionDir = updatedConfig.collectionDir;
+  existingConfig.collections = updatedConfig.collections;
+  existingConfig.exclude = updatedConfig.exclude;
+  existingConfig.generateCollection = updatedConfig.generateCollection;
+  existingConfig.global = updatedConfig.global;
+  existingConfig.hashedFileNameLength = updatedConfig.hashedFileNameLength;
+  existingConfig.hashFileNames = updatedConfig.hashFileNames;
+  existingConfig.indexHtmlBuild = updatedConfig.indexHtmlBuild;
+  existingConfig.indexHtmlSrc = updatedConfig.indexHtmlSrc;
+  existingConfig.minifyCss = updatedConfig.minifyCss;
+  existingConfig.minifyJs = updatedConfig.minifyJs;
+  existingConfig.namespace = updatedConfig.namespace;
+  existingConfig.preamble = updatedConfig.preamble;
+  existingConfig.prerenderIndex = updatedConfig.prerenderIndex;
+  existingConfig.publicPath = updatedConfig.publicPath;
+  existingConfig.src = updatedConfig.src;
+  existingConfig.watchIgnoredRegex = updatedConfig.watchIgnoredRegex;
 }

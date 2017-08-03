@@ -1,7 +1,8 @@
 'use strict';
 
+var fs = require('fs');
+var path = require('path');
 var coreClientFileCache = {};
-
 
 module.exports = Object.defineProperties({
 
@@ -15,7 +16,7 @@ module.exports = Object.defineProperties({
     return createDom();
   },
 
-  fs: require('fs'),
+  fs: fs,
 
   generateContentHash: function generateContentHash(content, length) {
     var crypto = require('crypto');
@@ -28,8 +29,6 @@ module.exports = Object.defineProperties({
   },
 
   getClientCoreFile: function getClientCoreFile(opts) {
-    var fs = require('fs');
-    var path = require('path');
     var filePath = path.join(__dirname, '..', 'dist', 'client', opts.staticName);
 
     return new Promise(function(resolve, reject) {
@@ -47,6 +46,33 @@ module.exports = Object.defineProperties({
         });
       }
     });
+  },
+
+  loadConfigFile: function loadConfigFile(configPath) {
+    var config, configFileData;
+
+    try {
+      delete require.cache[require.resolve(configPath)];
+      configFileData = require(configPath);
+
+      if (!configFileData.config) {
+        console.error('Invalid Stencil "' + configPath + '" configuration file. Missing "config" property.');
+        process.exit(1);
+      }
+
+      config = configFileData.config;
+      config.configPath = configPath;
+
+    } catch(e) {
+      console.error('Error reading Stencil "' + configPath + '" configuration file.');
+      process.exit(1);
+    }
+
+    if (!config.rootDir) {
+      config.rootDir = path.dirname(configPath);
+    }
+
+    return config;
   },
 
   minifyCss: function minifyCss(input) {
@@ -98,12 +124,10 @@ module.exports = Object.defineProperties({
     };
   },
 
-  path: require('path'),
+  path: path,
 
   resolveModule: function resolveModule(fromDir, moduleId) {
     var Module = require('module');
-    var path = require('path');
-    var fs = require('fs');
 
     fromDir = path.resolve(fromDir);
     var fromFile = path.join(fromDir, 'noop.js');
