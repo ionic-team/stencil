@@ -50,7 +50,7 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, dia
     cmpMeta = {};
 
     // normalize user data
-    normalizeTag(moduleFile, diagnostics, userOpts, cmpMeta, text);
+    normalizeTag(config, moduleFile, diagnostics, userOpts, cmpMeta, text);
     normalizeStyles(config, userOpts, moduleFile, cmpMeta);
     normalizeAssetsDir(config, userOpts, moduleFile, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
@@ -60,6 +60,7 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, dia
     // derp
     const d = catchError(diagnostics, e);
     d.absFilePath = moduleFile.tsFilePath;
+    d.relFilePath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
     d.messageText = `${e}: ${text}`;
   }
 
@@ -67,12 +68,13 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, dia
 }
 
 
-function normalizeTag(moduleFile: ModuleFile, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
+function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
 
   if ((<any>userOpts).selector) {
     const d = buildError(diagnostics);
     d.messageText = `Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`;
     d.absFilePath = moduleFile.tsFilePath;
+    d.relFilePath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
 
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }

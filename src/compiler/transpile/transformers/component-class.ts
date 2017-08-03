@@ -19,8 +19,8 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
       const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
 
       if (cmpMeta) {
-        if (moduleFile.cmpMeta) {
-          let relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
+        if (moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta !== cmpMeta.tagNameMeta) {
+          const relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
           const d = buildError(diagnostics);
           d.messageText = `Cannot have multiple @Components in the same source file: ${relPath}`;
           d.absFilePath = moduleFile.tsFilePath;
