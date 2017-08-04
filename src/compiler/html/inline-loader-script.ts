@@ -8,7 +8,7 @@ export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: 
   }
 
   // create the script url we'll be looking for
-  const loaderExternalSrcUrl = `${config.publicPath}/${config.namespace.toLowerCase()}.js`;
+  const loaderExternalSrcUrl = `${config.publicPath}${config.namespace.toLowerCase()}.js`;
 
   // remove the app loader script url request
   const removedLoader = removeExternalLoaderScript(config, doc, loaderExternalSrcUrl);
