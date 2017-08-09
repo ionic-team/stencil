@@ -54,7 +54,9 @@ if (cmdArgs.indexOf('--version') > -1 || cmdArgs.indexOf('-v') > -1) {
   process.exit(0);
 }
 
-if (cmdArgs.indexOf('--dev') > -1) {
+if (cmdArgs.indexOf('--prod') > -1) {
+  config.devMode = false;
+} else if (cmdArgs.indexOf('--dev') > -1) {
   config.devMode = true;
 }
 
