@@ -37,7 +37,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   };
 
   Context.emit = function emitEvent(elm: Element, eventName: string, data: EventEmitterData) {
-    elm.dispatchEvent(new WindowCustomEvent(
+    elm && elm.dispatchEvent(new WindowCustomEvent(
       Context.eventNameFn ? Context.eventNameFn(eventName) : eventName,
       data
     ));
