@@ -105,7 +105,9 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     // fire off the user's componentDidLoad method (if one was provided)
     // componentDidLoad only runs ONCE, after the instance's element has been
     // assigned as the host element, and AFTER render() has been called
+    // we'll also fire this method off on the element, just to
     try {
+      elm.componentDidLoad && elm.componentDidLoad();
       instance.componentDidLoad && instance.componentDidLoad();
     } catch (e) {
       plt.onError(DID_LOAD_ERROR, e, elm);

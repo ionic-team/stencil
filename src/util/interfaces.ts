@@ -672,6 +672,9 @@ export interface HostElement extends HTMLElement {
   attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
 
+  // PUBLIC METHODS
+  componentDidLoad?: () => void;
+
   // public properties
   $instance?: ComponentInstance;
   mode?: string;
