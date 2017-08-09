@@ -1,7 +1,8 @@
-import { TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
-import { ComponentMeta, ComponentRegistry, LoadComponentMeta,
-  ComponentEventData, ComponentListenersData, ComponentMemberData, LoadComponentRegistry } from '../util/interfaces';
+import { ATTR_LOWER_CASE, MEMBER_PROP, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
+import { ComponentMeta, ComponentRegistry, LoadComponentMeta, ComponentEventData,
+  ComponentListenersData, ComponentMemberData, LoadComponentRegistry } from '../util/interfaces';
 import { isDef } from './helpers';
+import { toDashCase } from '../util/helpers';
 
 
 export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry) {
@@ -11,8 +12,8 @@ export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, r
     membersMeta: {
       // every component defaults to always have
       // the mode and color properties
-      'mode': {},
-      'color': {}
+      'mode': { memberType: MEMBER_PROP },
+      'color': { memberType: MEMBER_PROP }
     }
   };
 
@@ -63,6 +64,7 @@ function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberDat
       var d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
+        attribName: Context.attr === ATTR_LOWER_CASE ? d[0].toLowerCase() : toDashCase(d[0]),
         propType: d[2],
         ctrlId: d[3]
       };

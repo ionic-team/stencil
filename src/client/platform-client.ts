@@ -1,6 +1,5 @@
 import { addEventListener, enableEventListener } from '../core/instance/listeners';
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
-import { ATTR_LOWER_CASE, SSR_VNODE_ID } from '../util/constants';
 import { ComponentMeta, ComponentRegistry, CoreContext, EventEmitterData,
   HostElement, AppGlobal, LoadComponentRegistry,
   ModuleCallbacks, PlatformApi } from '../util/interfaces';
@@ -12,7 +11,7 @@ import { getNowFunction } from './now';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
-import { toDashCase } from '../util/helpers';
+import { SSR_VNODE_ID } from '../util/constants';
 
 
 export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string): PlatformApi {
@@ -128,7 +127,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       observedAttributes.push(
         // dynamically generate the attribute name from the prop name
         // also add it to our array of attributes we need to observe
-        cmpMeta.membersMeta[propName].attribName = Context.attr === ATTR_LOWER_CASE ? propName.toLowerCase() : toDashCase(propName)
+        cmpMeta.membersMeta[propName].attribName
       );
     }
 

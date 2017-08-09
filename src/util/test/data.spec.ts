@@ -320,7 +320,9 @@ describe('data serialize/parse', () => {
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.membersMeta.color).toBeDefined();
+      expect(cmpMeta.membersMeta.color.memberType).toBe(MEMBER_PROP);
       expect(cmpMeta.membersMeta.mode).toBeDefined();
+      expect(cmpMeta.membersMeta.mode.memberType).toBe(MEMBER_PROP);
     });
 
     it('should set all of the modes', () => {
