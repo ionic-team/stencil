@@ -48,7 +48,7 @@
     "rollup": "0.41.4",
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "typescript": "2.4.0",
+    "typescript": "^2.5.0-dev.20170803",
     "uglify-es": "^3.0.26"
   },
   "devDependencies": {
