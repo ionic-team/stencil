@@ -14,14 +14,24 @@ const stack: any[] = [];
 
 
 export function h(nodeName: number, vnodeData: VNodeProdData): VNode;
+export function h(nodeName: number, vnodeData: number): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData): VNode;
+export function h(nodeName: string, vnodeData: number): VNode;
+export function h(nodeName: string, vnodeData: number, childa: number): VNode;
+export function h(nodeName: string, vnodeData: number, childa: VNode): VNode;
+export function h(nodeName: string, vnodeData: string): VNode;
+export function h(nodeName: string, vnodeData: number, childa: string): VNode;
+export function h(nodeName: string, vnodeData: string, childa: string): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: string): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: number): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: any[]): VNode;
+export function h(nodeName: string, vnodeData: number, childa: any[]): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode): VNode;
+export function h(nodeName: string, vnodeData: number, childa: VNode, childb: VNode): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, childb: string): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, childb: string): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode, childb: VNode): VNode;
-export function h(nodeName: any, vnodeData: VNodeProdData, child?: any) {
+export function h(nodeName: any, vnodeData: any, child?: any) {
   let children: any[], lastSimple: boolean, simple: boolean, i: number;
 
   for (i = arguments.length; i-- > 2; ) {
@@ -63,20 +73,20 @@ export function h(nodeName: any, vnodeData: VNodeProdData, child?: any) {
 
   if (vnodeData) {
     // data object was provided
-    vnode.vattrs = vnodeData.a;
-    vnode.vprops = vnodeData.p;
-    vnode.vclass = vnodeData.c;
-    vnode.vstyle = vnodeData.s;
-    vnode.vlisteners = vnodeData.o;
-    vnode.vkey = vnodeData.k;
-    vnode.vnamespace = vnodeData.n;
+    vnode.vattrs = (vnodeData as VNodeProdData).a;
+    vnode.vprops = (vnodeData as VNodeProdData).p;
+    vnode.vclass = (vnodeData as VNodeProdData).c;
+    vnode.vstyle = (vnodeData as VNodeProdData).s;
+    vnode.vlisteners = (vnodeData as VNodeProdData).o;
+    vnode.vkey = (vnodeData as VNodeProdData).k;
+    vnode.vnamespace = (vnodeData as VNodeProdData).n;
 
     // x = undefined: always check both data and children
     // x = 0 skip checking only data on update
     // x = 1 skip checking only children on update
     // x = 2 skip checking both data and children on update
-    vnode.skipDataOnUpdate = vnodeData.x === 0 || vnodeData.x === 2;
-    vnode.skipChildrenOnUpdate = vnodeData.x > 0;
+    vnode.skipDataOnUpdate = (vnodeData as VNodeProdData).x === 0 || (vnodeData as VNodeProdData).x === 2;
+    vnode.skipChildrenOnUpdate = (vnodeData as VNodeProdData).x > 0;
 
   } else {
     // no data object was provided
