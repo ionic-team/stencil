@@ -53,7 +53,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     // component meta tags are lower-case
     registryTag = registryTag.toUpperCase();
     registry[registryTag].tagNameMeta = registryTag.toLowerCase();
-    registry[registryTag].propsMeta = registry[registryTag].propsMeta || [];
+    registry[registryTag].membersMeta = registry[registryTag].membersMeta || {};
     plt.defineComponent(registry[registryTag]);
   });
 

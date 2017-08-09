@@ -73,7 +73,9 @@ if (cmdArgs.indexOf('--debug') > -1) {
 }
 
 
-var stencil = require(path.join(__dirname, '..', 'dist' , 'compiler'));
+var stencil = require(path.join(__dirname, '../dist/compiler'));
+
+config.sys.compiler = require(path.join(__dirname, '../package.json'));
 
 if (!config.logger) {
   var logger = require(path.join(__dirname, 'logger'));

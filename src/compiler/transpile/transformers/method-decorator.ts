@@ -1,10 +1,9 @@
 import { ModuleFile } from '../../../util/interfaces';
+import { MEMBER_METHOD } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
 export function getMethodDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.methodsMeta = [];
-
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
   const methodMemebers = decoratedMembers.filter(n => n.kind === ts.SyntaxKind.MethodDeclaration);
 
@@ -24,10 +23,10 @@ export function getMethodDecoratorMeta(fileMeta: ModuleFile, classNode: ts.Class
     });
 
     if (isMethod && methodName) {
-      fileMeta.cmpMeta.methodsMeta.push(methodName);
+      fileMeta.cmpMeta.membersMeta[methodName] = {
+        memberType: MEMBER_METHOD
+      };
       methodNode.decorators = undefined;
     }
   });
-
-  fileMeta.cmpMeta.methodsMeta = fileMeta.cmpMeta.methodsMeta.sort();
 }

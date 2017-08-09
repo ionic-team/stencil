@@ -47,7 +47,7 @@ function getPropChangeDecorator(classNode: ts.ClassDeclaration, decoratorName: s
     });
 
     if (isPropChange && propName && methodName) {
-      const propChange: PropChangeMeta = [];
+      const propChange: any = [];
 
       propChange[PROP_CHANGE_PROP_NAME] = propName;
       propChange[PROP_CHANGE_METHOD_NAME] = methodName;

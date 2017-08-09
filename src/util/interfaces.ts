@@ -2,8 +2,9 @@ import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
 
 
-export interface CoreGlobal {
+export interface CoreContext {
   addListener?: AddEventListenerApi;
+  attr?: number;
   dom?: DomControllerApi;
   emit?: (elm: Element, eventName: string, data?: EventEmitterData) => void;
   enableListener?: EventListenerEnable;
@@ -11,17 +12,18 @@ export interface CoreGlobal {
   isClient?: boolean;
   isServer?: boolean;
   mode?: string;
+  [contextId: string]: any;
 }
 
 
 export interface AppGlobal {
   components?: LoadComponentRegistry[];
-  defineComponents?: (moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
+  loadComponents?: (moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
 }
 
 
 export interface AddEventListenerApi {
-  (elm: HTMLElement|HTMLDocument|Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
+  (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
 }
 
 
@@ -79,21 +81,21 @@ export interface LoadComponentRegistry {
   [1]: string;
 
   /**
+   * controller module ids
+   */
+  [2]: string[];
+
+  /**
    * map of the mode styles and css bundle ids
    */
-  [2]: {
+  [3]: {
     [modeName: string]: string
   };
 
   /**
-   * slot
+   * members
    */
-  [3]: number;
-
-  /**
-   * props
-   */
-  [4]: ComponentPropertyData[];
+  [4]: ComponentMemberData[];
 
   /**
    * listeners
@@ -101,20 +103,25 @@ export interface LoadComponentRegistry {
   [5]: ComponentListenersData[];
 
   /**
-   * load priority
+   * slot
    */
   [6]: number;
+
+  /**
+   * load priority
+   */
+  [7]: number;
 }
 
 
-export interface ComponentPropertyData {
+export interface ComponentMemberData {
   /**
-   * prop name
+   * member name
    */
   [0]: string;
 
   /**
-   * attrib case
+   * member type
    */
   [1]: number;
 
@@ -124,9 +131,9 @@ export interface ComponentPropertyData {
   [2]: number;
 
   /**
-   * is stateful
+   * controller id
    */
-  [3]: number;
+  [3]: string;
 }
 
 
@@ -137,44 +144,34 @@ export interface LoadComponentMeta {
   [0]: string;
 
   /**
+   * members
+   */
+  [1]: ComponentMemberData[];
+
+  /**
    * host
    */
-  [1]: any;
-
-  /**
-   * states
-   */
-  [2]: StateMeta[];
-
-  /**
-   * prop WILL change
-   */
-  [3]: PropChangeMeta[];
-
-  /**
-   * prop DID change
-   */
-  [4]: PropChangeMeta[];
+  [2]: any;
 
   /**
    * component instance events
    */
-  [5]: EventMeta[];
+  [3]: ComponentEventData[];
 
   /**
-   * methods
+   * prop WILL change
    */
-  [6]: MethodMeta[];
+  [4]: PropChangeMeta[];
 
   /**
-   * host element member name
+   * prop DID change
    */
-  [7]: string;
+  [5]: PropChangeMeta[];
 
   /**
    * shadow
    */
-  [8]: boolean;
+  [6]: boolean;
 }
 
 
@@ -261,7 +258,6 @@ export interface ModuleFile {
   tsText?: string;
   dtsFilePath?: string;
   jsFilePath?: string;
-  hasCmpClass?: boolean;
   cmpMeta?: ComponentMeta;
   includedSassFiles?: string[];
   isCollectionDependency?: boolean;
@@ -310,7 +306,6 @@ export interface BuildConfig {
   preamble?: string;
   hashedFileNameLength?: number;
   suppressTypeScriptErrors?: boolean;
-  attrCase?: number;
   watchIgnoredRegex?: RegExp;
   prerenderIndex?: HydrateOptions;
   _isValidated?: boolean;
@@ -429,7 +424,7 @@ export interface LoggerTimeSpan {
 
 
 export interface ModulesImporterFn {
-  (importer: any, h: Function, t: Function, Core: CoreGlobal, pubicPath: string): void;
+  (importer: any, h: Function, t: Function, Core: CoreContext, pubicPath: string): void;
 }
 
 
@@ -461,21 +456,23 @@ export interface PropDecorator {
 
 
 export interface PropOptions {
-  type?: string;
+  context?: string;
+  controller?: string;
   state?: boolean;
 }
 
 
-export interface PropMeta {
-  propName?: string;
-  propType?: number;
-  attribName?: string;
-  attribCase?: number;
-  isStateful?: boolean;
+export interface MembersMeta {
+  [memberName: string]: MemberMeta;
 }
 
 
-export type MethodMeta = string;
+export interface MemberMeta {
+  memberType?: number;
+  propType?: number;
+  attribName?: string;
+  ctrlId?: string;
+}
 
 
 export interface MethodDecorator {
@@ -540,9 +537,6 @@ export interface StateDecorator {
 }
 
 
-export type StateMeta = string;
-
-
 export interface PropChangeDecorator {
   (propName: string): any;
 }
@@ -557,19 +551,17 @@ export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
   moduleId?: string;
+  controllerModuleIds?: string[];
   styleIds?: {[modeName: string]: string };
   stylesMeta?: StylesMeta;
-  methodsMeta?: MethodMeta[];
-  propsMeta?: PropMeta[];
+  membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
   propsWillChangeMeta?: PropChangeMeta[];
   propsDidChangeMeta?: PropChangeMeta[];
-  statesMeta?: StateMeta[];
   isShadowMeta?: boolean;
   hostMeta?: HostMeta;
   assetsDirsMeta?: AssetsMeta[];
-  hostElementMember?: string;
   slotMeta?: number;
   loadPriority?: number;
   componentModule?: any;
@@ -882,6 +874,10 @@ export interface PrintLine {
 
 export interface StencilSystem {
   copyDir?(src: string, dest: string, callback: (err: any) => void): void;
+  compiler?: {
+    name: string;
+    version: string;
+  };
   createDom?(): {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
@@ -1022,12 +1018,11 @@ declare global {
   // these must be "var" variables
   // so that they could be re-declared by
   // other collections, do not use "const" or "let"
-  var Core: CoreGlobal;
+  var Context: CoreContext;
   var publicPath: string;
   var appNamespace: string;
   var h: Hyperscript;
 }
-
 
 
 // this maps the json data to our internal data structure
@@ -1043,6 +1038,10 @@ export interface ManifestData {
   bundles?: BundleData[];
   components?: ComponentData[];
   global?: string;
+  compiler?: {
+    name: string;
+    version: string;
+  };
 }
 
 export interface BundleData {
@@ -1058,11 +1057,12 @@ export interface ComponentData {
   props?: PropData[];
   propsWillChange?: PropChangeData[];
   propsDidChange?: PropChangeData[];
-  states?: string[];
+  states?: StateData[];
   listeners?: ListenerData[];
-  methods?: string[];
+  methods?: MethodData[];
   events?: EventData[];
-  hostElement?: string;
+  context?: ControllerData[];
+  hostElement?: HostElementData;
   host?: any;
   assetPaths?: string[];
   slot?: 'hasSlots'|'hasNamedSlots';
@@ -1090,6 +1090,10 @@ export interface PropChangeData {
   method: string;
 }
 
+export interface StateData {
+  name: string;
+}
+
 export interface ListenerData {
   event: string;
   method: string;
@@ -1098,10 +1102,24 @@ export interface ListenerData {
   enabled?: boolean;
 }
 
+export interface MethodData {
+  name: string;
+}
+
 export interface EventData {
   event: string;
   method?: string;
   bubbles?: boolean;
   cancelable?: boolean;
   composed?: boolean;
+}
+
+export interface ControllerData {
+  name: string;
+  controllerComponent?: string;
+  context?: string;
+}
+
+export interface HostElementData {
+  name: string;
 }

@@ -53,5 +53,13 @@ export function generateComponentRegistry(manifest: Manifest, styleResults: Styl
     });
   });
 
+  Object.keys(registry).forEach(componentTag => {
+    const cmpMeta = registry[componentTag];
+
+    cmpMeta.controllerModuleIds = [];
+
+    // TODO: load controller module ids
+  });
+
   return registry;
 }

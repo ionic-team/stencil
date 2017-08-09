@@ -132,16 +132,11 @@ function generateModeCss(
 
     } else {
       // create style id from list of component tags in this file
-      stylesResult[modeName] = (userBundle.components.sort().join('.')).toLowerCase();
+      stylesResult[modeName] = userBundle.components[0].toLowerCase();
 
       if (modeName !== '$') {
         // prefix with the mode name if it's not the default mode
         stylesResult[modeName] = modeName + '.' + stylesResult[modeName];
-      }
-
-      if (stylesResult[modeName].length > 50) {
-        // can get a lil too long, so let's simmer down
-        stylesResult[modeName] = stylesResult[modeName].substr(0, 50);
       }
     }
 

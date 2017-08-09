@@ -1,10 +1,9 @@
 import { ModuleFile } from '../../../util/interfaces';
+import { MEMBER_ELEMENT_REF } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
 export function getElementDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.hostElementMember = null;
-
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
@@ -32,7 +31,9 @@ export function getElementDecoratorMeta(fileMeta: ModuleFile, classNode: ts.Clas
     });
 
     if (isElement && hostElementMember) {
-      fileMeta.cmpMeta.hostElementMember = hostElementMember;
+      fileMeta.cmpMeta.membersMeta[hostElementMember] = {
+        memberType: MEMBER_ELEMENT_REF
+      };
       memberNode.decorators = undefined;
     }
   });

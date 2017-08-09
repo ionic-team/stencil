@@ -8,6 +8,7 @@ import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropDecoratorMeta } from './prop-decorator';
 import { getPropChangeDecoratorMeta } from './prop-change-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
+import { removeClassDecorator } from './util';
 import * as ts from 'typescript';
 
 
@@ -29,13 +30,16 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
 
         moduleFile.cmpMeta = cmpMeta;
         moduleFile.cmpMeta.componentClass = classNode.name.getText().trim();
-        moduleFile.hasCmpClass = true;
 
+        // membersMeta is shared with @Prop, @State, @Method, @Element
+        moduleFile.cmpMeta.membersMeta = {};
         getElementDecoratorMeta(moduleFile, classNode);
-        getEventDecoratorMeta(moduleFile, diagnostics, classNode);
         getMethodDecoratorMeta(moduleFile, classNode);
         getStateDecoratorMeta(moduleFile, classNode);
         getPropDecoratorMeta(moduleFile, diagnostics, classNode);
+
+        // others
+        getEventDecoratorMeta(moduleFile, diagnostics, classNode);
         getListenDecoratorMeta(moduleFile, diagnostics, classNode);
         getPropChangeDecoratorMeta(moduleFile, classNode);
 
@@ -63,7 +67,7 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
     return (tsSourceFile) => {
       const moduleFile = moduleFiles[tsSourceFile.fileName];
       if (moduleFile) {
-        moduleFile.hasCmpClass = false;
+        moduleFile.cmpMeta = null;
         return visit(moduleFile, tsSourceFile) as ts.SourceFile;
       }
 
@@ -71,17 +75,4 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
     };
   };
 
-}
-
-
-function removeClassDecorator(classNode: ts.ClassDeclaration) {
-  return ts.createClassDeclaration(
-      undefined!, // <-- that's what's removing the decorator
-
-      // everything else should be the same
-      classNode.modifiers!,
-      classNode.name!,
-      classNode.typeParameters!,
-      classNode.heritageClauses!,
-      classNode.members);
 }

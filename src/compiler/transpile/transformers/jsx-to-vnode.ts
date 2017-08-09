@@ -197,7 +197,7 @@ function updateFileMetaWithSlots(fileMeta: ModuleFile, props: ts.Expression) {
   // checking if there is a default slot and/or named slots in the compiler
   // so that during runtime there is less work to do
 
-  if (!fileMeta || !fileMeta.hasCmpClass) {
+  if (!fileMeta || !fileMeta.cmpMeta) {
     return;
   }
 

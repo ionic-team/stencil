@@ -48,16 +48,6 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   // let's automatically add a reference to the host element on the instance
   instance.__el = elm;
 
-  if (cmpMeta.hostElementMember) {
-    // also add a getter to the element reference using
-    // the member name the component meta provided
-    Object.defineProperty(instance, cmpMeta.hostElementMember, {
-      get: function() {
-        return (this as ComponentInstance).__el;
-      }
-    });
-  }
-
   // so we've got an host element now, and a actual instance
   // let's wire them up together with getter/settings
   // the setters are use for change detection and knowing when to re-render

@@ -2,7 +2,7 @@ import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFile } 
 import { buildError, catchError } from '../../util';
 import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
-import { validateTag } from '../../build/validation';
+import { validateComponentTag } from '../../build/validation';
 import * as ts from 'typescript';
 
 
@@ -37,7 +37,7 @@ export function getComponentDecoratorData(config: BuildConfig, moduleFile: Modul
 }
 
 
-function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], text: string): ComponentMeta {
+function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], text: string) {
   let cmpMeta: ComponentMeta = null;
 
   try {
@@ -69,12 +69,13 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, dia
 
 
 function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
+  const relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
 
   if ((<any>userOpts).selector) {
     const d = buildError(diagnostics);
     d.messageText = `Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`;
     d.absFilePath = moduleFile.tsFilePath;
-    d.relFilePath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
+    d.relFilePath = relPath;
 
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
@@ -83,7 +84,7 @@ function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: 
     throw new Error(`tag missing in component decorator: ${orgText}`);
   }
 
-  cmpMeta.tagNameMeta = validateTag(userOpts.tag, moduleFile.tsFilePath);
+  cmpMeta.tagNameMeta = validateComponentTag(userOpts.tag, relPath);
 }
 
 

@@ -1,5 +1,6 @@
 import { mockPlatform, mockDomApi } from '../../../test';
 import { ComponentMeta, ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
+import { MEMBER_STATE } from '../../../util/constants';
 import { initProxy } from '../proxy';
 
 
@@ -7,7 +8,9 @@ describe('instance state', () => {
 
   it('should not set state on element', () => {
     cmpMeta = {
-      statesMeta: ['state']
+      membersMeta: {
+        'state': { memberType: MEMBER_STATE }
+      }
     };
     initProxy(plt, elm, instance, cmpMeta);
 
@@ -18,7 +21,9 @@ describe('instance state', () => {
 
   it('should set state on instance', () => {
     cmpMeta = {
-      statesMeta: ['state']
+      membersMeta: {
+        'state': { memberType: MEMBER_STATE }
+      }
     };
     initProxy(plt, elm, instance, cmpMeta);
 

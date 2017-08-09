@@ -1,8 +1,9 @@
 import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
-  ListenMeta, PropChangeData, PropChangeMeta, PropData, PropMeta, StyleData, StyleMeta } from '../../util/interfaces';
-import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS,
-  PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
+  ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
+import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_PROP, MEMBER_PROP_STATE,
+  MEMBER_METHOD, MEMBER_PROP_CONTEXT, MEMBER_ELEMENT_REF, MEMBER_STATE, PRIORITY_LOW,
+  TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
@@ -38,7 +39,11 @@ export function serializeAppManifest(config: BuildConfig, manifestDir: string, m
   // create the single manifest we're going to fill up with data
   const manifestData: ManifestData = {
     components: [],
-    bundles: []
+    bundles: [],
+    compiler: {
+      name: config.sys.compiler.name,
+      version: config.sys.compiler.version
+    }
   };
 
   // add component data for each of the manifest files
@@ -126,8 +131,9 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeStates(cmpData, cmpMeta);
   serializeListeners(cmpData, cmpMeta);
   serializeMethods(cmpData, cmpMeta);
-  serializeEvents(cmpData, cmpMeta);
+  serializeContextMember(cmpData, cmpMeta);
   serializeHostElementMember(cmpData, cmpMeta);
+  serializeEvents(cmpData, cmpMeta);
   serializeHost(cmpData, cmpMeta);
   serializeSlots(cmpData, cmpMeta);
   serializeIsShadow(cmpData, cmpMeta);
@@ -154,8 +160,9 @@ export function parseComponent(config: BuildConfig, manifestDir: string, cmpData
   parseStates(cmpData, cmpMeta);
   parseListeners(cmpData, cmpMeta);
   parseMethods(cmpData, cmpMeta);
-  parseEvents(cmpData, cmpMeta);
+  parseContextMember(cmpData, cmpMeta);
   parseHostElementMember(cmpData, cmpMeta);
+  parseEvents(cmpData, cmpMeta);
   parseHost(cmpData, cmpMeta);
   parseIsShadow(cmpData, cmpMeta);
   parseSlots(cmpData, cmpMeta);
@@ -314,27 +321,31 @@ function parseAssetsDir(config: BuildConfig, manifestDir: string, cmpData: Compo
 
 
 function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (!cmpMeta.propsMeta || !cmpMeta.propsMeta.length) {
-    return;
-  }
+  if (!cmpMeta.membersMeta) return;
 
-  cmpData.props = cmpMeta.propsMeta.map(propMeta => {
-    const propData: PropData = {
-      name: propMeta.propName
-    };
+  Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
+    const member = cmpMeta.membersMeta[memberName];
 
-    if (propMeta.propType === TYPE_BOOLEAN) {
-      propData.type = 'boolean';
+    if (member.memberType === MEMBER_PROP || member.memberType === MEMBER_PROP_STATE) {
+      cmpData.props = cmpData.props || [];
 
-    } else if (propMeta.propType === TYPE_NUMBER) {
-      propData.type = 'number';
+      const propData: PropData = {
+        name: memberName
+      };
+
+      if (member.propType === TYPE_BOOLEAN) {
+        propData.type = 'boolean';
+
+      } else if (member.propType === TYPE_NUMBER) {
+        propData.type = 'number';
+      }
+
+      if (member.memberType === MEMBER_PROP_STATE) {
+        propData.stateful = true;
+      }
+
+      cmpData.props.push(propData);
     }
-
-    if (propMeta.isStateful) {
-      propData.stateful = true;
-    }
-
-    return propData;
   });
 }
 
@@ -345,20 +356,23 @@ function parseProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     return;
   }
 
-  cmpMeta.propsMeta = propsData.map(propData => {
-    const propMeta: PropMeta = {
-      propName: propData.name,
-      isStateful: !!propData.stateful
-    };
+  cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
-    if (propData.type === 'boolean') {
-      propMeta.propType = TYPE_BOOLEAN;
+  propsData.forEach(propData => {
+    cmpMeta.membersMeta[propData.name] = {};
 
-    } else if (propData.type === 'number') {
-      propMeta.propType = TYPE_NUMBER;
+    if (propData.stateful) {
+      cmpMeta.membersMeta[propData.name].memberType = MEMBER_PROP_STATE;
+    } else {
+      cmpMeta.membersMeta[propData.name].memberType = MEMBER_PROP;
     }
 
-    return propMeta;
+    if (propData.type === 'boolean') {
+      cmpMeta.membersMeta[propData.name].propType = TYPE_BOOLEAN;
+
+    } else if (propData.type === 'number') {
+      cmpMeta.membersMeta[propData.name].propType = TYPE_NUMBER;
+    }
   });
 }
 
@@ -426,11 +440,19 @@ function parsePropsDidChange(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 
 function serializeStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (invalidArrayData(cmpMeta.statesMeta)) {
-    return;
-  }
+  if (!cmpMeta.membersMeta) return;
 
-  cmpData.states = cmpMeta.statesMeta;
+  Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
+    const member = cmpMeta.membersMeta[memberName];
+
+    if (member.memberType === MEMBER_STATE) {
+      cmpData.states = cmpData.states || [];
+
+      cmpData.states.push({
+        name: memberName
+      });
+    }
+  });
 }
 
 
@@ -439,7 +461,13 @@ function parseStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     return;
   }
 
-  cmpMeta.statesMeta = cmpData.states;
+  cmpMeta.membersMeta = cmpMeta.membersMeta || {};
+
+  cmpData.states.forEach(stateData => {
+    cmpMeta.membersMeta[stateData.name] = {
+      memberType: MEMBER_STATE
+    };
+  });
 }
 
 
@@ -493,10 +521,19 @@ function parseListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 
 function serializeMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (invalidArrayData(cmpMeta.methodsMeta)) {
-    return;
-  }
-  cmpData.methods = cmpMeta.methodsMeta;
+  if (!cmpMeta.membersMeta) return;
+
+  Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
+    const member = cmpMeta.membersMeta[memberName];
+
+    if (member.memberType === MEMBER_METHOD) {
+      cmpData.methods = cmpData.methods || [];
+
+      cmpData.methods.push({
+        name: memberName
+      });
+    }
+  });
 }
 
 
@@ -504,7 +541,80 @@ function parseMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpData.methods)) {
     return;
   }
-  cmpMeta.methodsMeta = cmpData.methods;
+
+  cmpMeta.membersMeta = cmpMeta.membersMeta || {};
+
+  cmpData.methods.forEach(methodData => {
+    cmpMeta.membersMeta[methodData.name] = {
+      memberType: MEMBER_METHOD
+    };
+  });
+}
+
+
+function serializeContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (!cmpMeta.membersMeta) return;
+
+  Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+    const member = cmpMeta.membersMeta[memberName];
+
+    if (member.ctrlId) {
+      if (member.memberType === MEMBER_PROP_CONTEXT) {
+        cmpData.context = cmpData.context || [];
+
+        cmpData.context.push({
+          name: memberName,
+          context: member.ctrlId
+        });
+      }
+    }
+  });
+}
+
+
+function parseContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (invalidArrayData(cmpData.context)) {
+    return;
+  }
+
+  cmpData.context.forEach(methodData => {
+    if (methodData.context) {
+      cmpMeta.membersMeta = cmpMeta.membersMeta || {};
+
+      cmpMeta.membersMeta[methodData.name] = {
+        memberType: MEMBER_PROP_CONTEXT,
+        ctrlId: methodData.context
+      };
+    }
+  });
+}
+
+
+function serializeHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (!cmpMeta.membersMeta) return;
+
+  Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+    const member = cmpMeta.membersMeta[memberName];
+
+    if (member.memberType === MEMBER_ELEMENT_REF) {
+      cmpData.hostElement = {
+        name: memberName
+      };
+    }
+  });
+}
+
+
+function parseHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (!cmpData.hostElement) {
+    return;
+  }
+
+  cmpMeta.membersMeta = cmpMeta.membersMeta || {};
+
+  cmpMeta.membersMeta[cmpData.hostElement.name] = {
+    memberType: MEMBER_ELEMENT_REF
+  };
 }
 
 
@@ -562,22 +672,6 @@ function parseEvents(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
     return eventMeta;
   });
-}
-
-
-function serializeHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (typeof cmpMeta.hostElementMember !== 'string') {
-    return;
-  }
-  cmpData.hostElement = cmpMeta.hostElementMember;
-}
-
-
-function parseHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (typeof cmpData.hostElement !== 'string') {
-    return;
-  }
-  cmpMeta.hostElementMember = cmpData.hostElement;
 }
 
 
@@ -719,4 +813,10 @@ export function parseGlobal(config: BuildConfig, manifestDir: string, manifestDa
 
 function invalidArrayData(arr: any[]) {
   return (!arr || !Array.isArray(arr) || arr.length === 0);
+}
+
+function nameSort(a: string, b: string) {
+  if (a.toLowerCase() < b.toLowerCase()) return -1;
+  if (a.toLowerCase() > b.toLowerCase()) return 1;
+  return 0;
 }

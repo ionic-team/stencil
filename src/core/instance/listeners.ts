@@ -112,7 +112,7 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
 
 export function addEventListener(
   plt: PlatformApi,
-  elm: HTMLElement|HTMLDocument|Window,
+  elm: Element|HTMLDocument|Window,
   eventName: string,
   listenerCallback: {(ev?: any): any},
   useCapture: boolean,

@@ -1,6 +1,19 @@
 import * as ts from 'typescript';
 
 
+export function removeClassDecorator(classNode: ts.ClassDeclaration) {
+  return ts.createClassDeclaration(
+      undefined!, // <-- that's what's removing the decorator
+
+      // everything else should be the same
+      classNode.modifiers!,
+      classNode.name!,
+      classNode.typeParameters!,
+      classNode.heritageClauses!,
+      classNode.members);
+}
+
+
 export class ObjectMap {
   [key: string]: ts.Expression | ObjectMap
 }
@@ -29,14 +42,12 @@ export function getTextOfPropertyName(name: ts.PropertyName): string {
 
 export function isStringOrNumericLiteral(node: ts.Node): node is ts.StringLiteral | ts.NumericLiteral {
   const kind = node.kind;
-  return kind === ts.SyntaxKind.StringLiteral
-      || kind === ts.SyntaxKind.NumericLiteral;
+  return kind === ts.SyntaxKind.StringLiteral || kind === ts.SyntaxKind.NumericLiteral;
 }
 
 
-
 export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpression): ObjectMap {
-  const attrs: ts.ObjectLiteralElementLike[] = objectLiteral.properties;
+  const attrs: ts.ObjectLiteralElementLike[] = (objectLiteral.properties as any);
 
   return attrs.reduce((final: ObjectMap, attr: ts.PropertyAssignment) => {
     const name = getTextOfPropertyName(attr.name);

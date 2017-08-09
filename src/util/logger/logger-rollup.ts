@@ -138,5 +138,5 @@ export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: M
 
 
 const INGORE_BUNDLE_CODES = [
-  `THIS_IS_UNDEFINED`
+  `THIS_IS_UNDEFINED`, `NON_EXISTENT_EXPORT`
 ];

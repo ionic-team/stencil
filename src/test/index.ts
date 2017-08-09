@@ -80,6 +80,11 @@ export function mockBuildConfig() {
 export function mockStencilSystem() {
   const sys: StencilSystem = {
 
+    compiler: {
+      name: 'test',
+      version: 'test'
+    },
+
     copyDir: function mockCopyDir(src: string, dest: string, cb: Function) {
       src; dest;
       process.nextTick(() => {
@@ -322,8 +327,8 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
   if (!cmpMeta.componentModule) {
     cmpMeta.componentModule = class {};
   }
-  if (!cmpMeta.propsMeta) {
-    cmpMeta.propsMeta = [];
+  if (!cmpMeta.membersMeta) {
+    cmpMeta.membersMeta = {};
   }
   if (!cmpMeta.styleIds) {
     cmpMeta.styleIds = {};

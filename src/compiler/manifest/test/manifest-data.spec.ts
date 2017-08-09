@@ -1,7 +1,9 @@
 import { BuildConfig, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../test';
 import { parseBundles, parseComponent, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
-import { HAS_NAMED_SLOTS, HAS_SLOTS, PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
+import { HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD, MEMBER_PROP,
+  MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT, MEMBER_STATE,
+  PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
 
 
 describe('manifest-data serialize/parse', () => {
@@ -112,11 +114,13 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('hostElementMember', () => {
-    a.hostElementMember = 'myElement';
+    a.membersMeta = {
+      'myElement': { memberType: MEMBER_ELEMENT_REF }
+    };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.hostElement).toBe('myElement');
+    expect(cmpData.hostElement.name).toBe('myElement');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.cmpMeta.hostElementMember).toBe('myElement');
+    expect(b.cmpMeta.membersMeta.myElement.memberType).toBe(MEMBER_ELEMENT_REF);
   });
 
   it('hostMeta', () => {
@@ -128,13 +132,16 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('methodsMeta', () => {
-    a.methodsMeta = ['methodA', 'methodB'];
+    a.membersMeta = {
+      'methodA': { memberType: MEMBER_METHOD },
+      'methodB': { memberType: MEMBER_METHOD }
+    };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.methods[0]).toBe('methodA');
-    expect(cmpData.methods[1]).toBe('methodB');
+    expect(cmpData.methods[0].name).toBe('methodA');
+    expect(cmpData.methods[1].name).toBe('methodB');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.cmpMeta.methodsMeta[0]).toBe('methodA');
-    expect(b.cmpMeta.methodsMeta[1]).toBe('methodB');
+    expect(b.cmpMeta.membersMeta.methodA.memberType).toBe(MEMBER_METHOD);
+    expect(b.cmpMeta.membersMeta.methodB.memberType).toBe(MEMBER_METHOD);
   });
 
   it('listenersMeta', () => {
@@ -172,13 +179,16 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('statesMeta', () => {
-    a.statesMeta = ['stateA', 'stateB'];
+    a.membersMeta = {
+      'stateA': { memberType: MEMBER_STATE },
+      'stateB': { memberType: MEMBER_STATE }
+    };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.states[0]).toBe('stateA');
-    expect(cmpData.states[1]).toBe('stateB');
+    expect(cmpData.states[0].name).toBe('stateA');
+    expect(cmpData.states[1].name).toBe('stateB');
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.cmpMeta.statesMeta[0]).toBe('stateA');
-    expect(b.cmpMeta.statesMeta[1]).toBe('stateB');
+    expect(b.cmpMeta.membersMeta.stateA.memberType).toBe(MEMBER_STATE);
+    expect(b.cmpMeta.membersMeta.stateB.memberType).toBe(MEMBER_STATE);
   });
 
   it('propsDidChange', () => {
@@ -215,19 +225,47 @@ describe('manifest-data serialize/parse', () => {
     expect(b.cmpMeta.propsWillChangeMeta[1][1]).toBe('methodB');
   });
 
-  it('propsMeta', () => {
-    a.propsMeta = [
-      { propName: 'nameA', propType: TYPE_BOOLEAN, isStateful: true },
-      { propName: 'nameB', propType: TYPE_NUMBER, isStateful: false }
-    ];
+  it('membersMeta el', () => {
+    a.membersMeta = {
+      'el': { memberType: MEMBER_ELEMENT_REF }
+    };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     b = parseComponent(config, manifestDir, cmpData);
-    expect(b.cmpMeta.propsMeta[0].propName).toBe('nameA');
-    expect(b.cmpMeta.propsMeta[0].propType).toBe(TYPE_BOOLEAN);
-    expect(b.cmpMeta.propsMeta[0].isStateful).toBe(true);
-    expect(b.cmpMeta.propsMeta[1].propName).toBe('nameB');
-    expect(b.cmpMeta.propsMeta[1].propType).toBe(TYPE_NUMBER);
-    expect(b.cmpMeta.propsMeta[1].isStateful).toBe(false);
+
+    expect(b.cmpMeta.membersMeta.el.memberType).toBe(MEMBER_ELEMENT_REF);
+  });
+
+  it('membersMeta state', () => {
+    a.membersMeta = {
+      'state': { memberType: MEMBER_STATE }
+    };
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    b = parseComponent(config, manifestDir, cmpData);
+
+    expect(b.cmpMeta.membersMeta.state.memberType).toBe(MEMBER_STATE);
+    expect(b.cmpMeta.membersMeta.state.propType).toBeUndefined();
+  });
+
+  it('membersMeta prop state', () => {
+    a.membersMeta = {
+      'propState': { memberType: MEMBER_PROP_STATE, propType: TYPE_NUMBER }
+    };
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    b = parseComponent(config, manifestDir, cmpData);
+
+    expect(b.cmpMeta.membersMeta.propState.memberType).toBe(MEMBER_PROP_STATE);
+    expect(b.cmpMeta.membersMeta.propState.propType).toBe(TYPE_NUMBER);
+  });
+
+  it('membersMeta prop', () => {
+    a.membersMeta = {
+      'prop': { memberType: MEMBER_PROP, propType: TYPE_BOOLEAN }
+    };
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    b = parseComponent(config, manifestDir, cmpData);
+
+    expect(b.cmpMeta.membersMeta.prop.memberType).toBe(MEMBER_PROP);
+    expect(b.cmpMeta.membersMeta.prop.propType).toBe(TYPE_BOOLEAN);
   });
 
   it('assetsDirsMeta', () => {

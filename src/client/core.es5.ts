@@ -4,7 +4,7 @@ import { createPlatformClient } from './platform-client';
 
 const App: AppGlobal = (<any>window)[appNamespace] = (<any>window)[appNamespace] || {};
 
-const plt = createPlatformClient(Core, App, window, document, publicPath);
+const plt = createPlatformClient(Context, App, window, document, publicPath);
 
 plt.registerComponents(App.components).forEach(cmpMeta => {
   // note that we're extending HTMLElement the raw ES5 way

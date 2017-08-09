@@ -1,4 +1,4 @@
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE, HAS_SLOTS, PRIORITY_LOW,
+import { HAS_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD, MEMBER_STATE, MEMBER_PROP, PRIORITY_LOW,
   PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
 import { formatComponentMeta, formatLoadComponentRegistry } from '../data-serialize';
 import { parseComponentMeta, parseComponentRegistry, parsePropertyValue } from '../data-parse';
@@ -57,22 +57,6 @@ describe('data serialize/parse', () => {
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
       expect(registry['TAG'].isShadowMeta).toBeFalsy();
-    });
-
-    it('should set host element member name', () => {
-      cmpMeta.hostElementMember = 'myHostElement';
-
-      const format = formatComponentMeta(cmpMeta);
-      parseComponentMeta(registry, moduleImports, evalStr(format));
-
-      expect(registry['TAG'].hostElementMember).toEqual('myHostElement');
-    });
-
-    it('should set no host element member name', () => {
-      const format = formatComponentMeta(cmpMeta);
-      parseComponentMeta(registry, moduleImports, evalStr(format));
-
-      expect(registry['TAG'].hostElementMember).toBeFalsy();
     });
 
     it('should set hostMeta', () => {
@@ -140,38 +124,48 @@ describe('data serialize/parse', () => {
       expect(registry['TAG'].listenersMeta).toBeFalsy();
     });
 
-    it('should set statesMeta', () => {
-      cmpMeta.statesMeta = ['method1', 'method2'];
+    it('should set host element member name', () => {
+      cmpMeta.membersMeta = {
+        'myHostElement': { memberType: MEMBER_ELEMENT_REF }
+      };
 
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].statesMeta[0]).toEqual('method1');
-      expect(registry['TAG'].statesMeta[1]).toEqual('method2');
+      expect(registry['TAG'].membersMeta.myHostElement.memberType).toEqual(MEMBER_ELEMENT_REF);
     });
 
-    it('should set no statesMeta', () => {
+    it('should set no host element member name', () => {
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].statesMeta).toBeFalsy();
+      expect(registry['TAG'].membersMeta).toBeUndefined();
+    });
+
+    it('should set statesMeta', () => {
+      cmpMeta.membersMeta = {
+        'state1': { memberType: MEMBER_STATE },
+        'state2': { memberType: MEMBER_STATE }
+      };
+
+      const format = formatComponentMeta(cmpMeta);
+      parseComponentMeta(registry, moduleImports, evalStr(format));
+
+      expect(registry['TAG'].membersMeta.state1.memberType).toEqual(MEMBER_STATE);
+      expect(registry['TAG'].membersMeta.state2.memberType).toEqual(MEMBER_STATE);
     });
 
     it('should set methodsMeta', () => {
-      cmpMeta.methodsMeta = ['method1', 'method2'];
+      cmpMeta.membersMeta = {
+        'method1': { memberType: MEMBER_METHOD },
+        'method2': { memberType: MEMBER_METHOD }
+      };
 
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].methodsMeta[0]).toEqual('method1');
-      expect(registry['TAG'].methodsMeta[1]).toEqual('method2');
-    });
-
-    it('should set no methodsMeta', () => {
-      const format = formatComponentMeta(cmpMeta);
-      parseComponentMeta(registry, moduleImports, evalStr(format));
-
-      expect(registry['TAG'].methodsMeta).toBeFalsy();
+      expect(registry['TAG'].membersMeta.method1.memberType).toEqual(MEMBER_METHOD);
+      expect(registry['TAG'].membersMeta.method2.memberType).toEqual(MEMBER_METHOD);
     });
 
     it('should set componentModule', () => {
@@ -191,36 +185,36 @@ describe('data serialize/parse', () => {
 
     it('should set listenersMeta eventCapture', () => {
       cmpMeta.listenersMeta = [{ eventCapture: false }];
-      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      let format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
       expect(cmpMeta.listenersMeta[0].eventCapture).toBe(false);
 
       cmpMeta.listenersMeta = [{ eventCapture: true }];
-      format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
       expect(cmpMeta.listenersMeta[0].eventCapture).toBe(true);
     });
 
     it('should set listenersMeta eventDisabled', () => {
       cmpMeta.listenersMeta = [{ eventDisabled: false }];
-      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      let format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
       expect(cmpMeta.listenersMeta[0].eventDisabled).toBe(false);
 
       cmpMeta.listenersMeta = [{ eventDisabled: true }];
-      format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
       expect(cmpMeta.listenersMeta[0].eventDisabled).toBe(true);
     });
 
     it('should set listenersMeta eventPassive', () => {
       cmpMeta.listenersMeta = [{ eventPassive: false }];
-      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      let format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
       expect(cmpMeta.listenersMeta[0].eventPassive).toBe(false);
 
       cmpMeta.listenersMeta = [{ eventPassive: true }];
-      format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
       expect(cmpMeta.listenersMeta[0].eventPassive).toBe(true);
     });
@@ -236,7 +230,7 @@ describe('data serialize/parse', () => {
         }
       ];
 
-      let format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      let format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.listenersMeta[0].eventName).toBe('click');
@@ -246,14 +240,14 @@ describe('data serialize/parse', () => {
     it('should set load priority', () => {
       cmpMeta.loadPriority = PRIORITY_LOW;
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.loadPriority).toBe(PRIORITY_LOW);
     });
 
     it('should set not load priority', () => {
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.loadPriority).toBeFalsy();
@@ -262,107 +256,71 @@ describe('data serialize/parse', () => {
     it('should set has slot', () => {
       cmpMeta.slotMeta = HAS_SLOTS;
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.slotMeta).toBe(HAS_SLOTS);
     });
 
     it('should set no slot', () => {
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.slotMeta).toBeFalsy();
     });
 
-    it('should set attribute lower case from config', () => {
-      cmpMeta.propsMeta = [
-        { propName: 'propName1' },
-        { propName: 'propName2', attribCase: ATTR_DASH_CASE }
-      ];
+    it('should not add a non-attribute property to the load registry', () => {
+      cmpMeta.membersMeta = {
+        'notAnAttributPropery': {}
+      };
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_LOWER_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.propsMeta[2].attribName).toEqual('propname1');
-      expect(cmpMeta.propsMeta[3].attribName).toEqual('prop-name2');
+      expect(cmpMeta.membersMeta.notAnAttributPropery).toBeUndefined();
     });
 
-    it('should set attribute dash case', () => {
-      cmpMeta.propsMeta = [
-        { propName: 'propName1' },
-        { propName: 'propName2', attribCase: ATTR_LOWER_CASE }
-      ];
+    it('should set any type prop', () => {
+      cmpMeta.membersMeta = {
+        'str': { memberType: MEMBER_PROP, attribName: 'str' },
+      };
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.propsMeta[2].attribName).toEqual('prop-name1');
-      expect(cmpMeta.propsMeta[3].attribName).toEqual('propname2');
+      expect(cmpMeta.membersMeta.str.propType).toBeUndefined();
     });
 
     it('should set number prop', () => {
-      cmpMeta.propsMeta = [
-        { propName: 'num', propType: TYPE_NUMBER },
-        { propName: 'str' },
-      ];
+      cmpMeta.membersMeta = {
+        'num': { memberType: MEMBER_PROP, attribName: 'num', propType: TYPE_NUMBER }
+      };
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.propsMeta[2].propName).toEqual('num');
-      expect(cmpMeta.propsMeta[2].propType).toEqual(TYPE_NUMBER);
-
-      expect(cmpMeta.propsMeta[3].propName).toEqual('str');
-      expect(cmpMeta.propsMeta[3].propType).toBeUndefined();
+      expect(cmpMeta.membersMeta.num.propType).toEqual(TYPE_NUMBER);
     });
 
     it('should set boolean prop', () => {
-      cmpMeta.propsMeta = [
-        { propName: 'boo', propType: TYPE_BOOLEAN }
-      ];
+      cmpMeta.membersMeta = {
+        'boo': { memberType: MEMBER_PROP, attribName: 'boo', propType: TYPE_BOOLEAN }
+      };
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.propsMeta[2].propName).toEqual('boo');
-      expect(cmpMeta.propsMeta[2].propType).toEqual(TYPE_BOOLEAN);
-    });
-
-    it('should set is stateful prop true', () => {
-      cmpMeta.propsMeta = [
-        { propName: 'prop', isStateful: true }
-      ];
-
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
-      cmpMeta = parseComponentRegistry(format, {});
-
-      expect(cmpMeta.propsMeta[2].propName).toEqual('prop');
-      expect(cmpMeta.propsMeta[2].isStateful).toEqual(true);
-    });
-
-    it('should default is stateful prop false', () => {
-      cmpMeta.propsMeta = [
-        { propName: 'prop' }
-      ];
-
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
-      cmpMeta = parseComponentRegistry(format, {});
-
-      expect(cmpMeta.propsMeta[2].propName).toEqual('prop');
-      expect(cmpMeta.propsMeta[2].isStateful).toEqual(false);
+      expect(cmpMeta.membersMeta.boo.propType).toEqual(TYPE_BOOLEAN);
     });
 
     it('should always set color/mode even with no props', () => {
-      cmpMeta.propsMeta = null;
+      cmpMeta.membersMeta = null;
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.propsMeta.length).toEqual(2);
-      expect(cmpMeta.propsMeta[0].propName).toEqual('color');
-      expect(cmpMeta.propsMeta[0].attribName).toEqual('color');
-      expect(cmpMeta.propsMeta[1].propName).toEqual('mode');
+      expect(cmpMeta.membersMeta.color).toBeDefined();
+      expect(cmpMeta.membersMeta.mode).toBeDefined();
     });
 
     it('should set all of the modes', () => {
@@ -371,7 +329,7 @@ describe('data serialize/parse', () => {
         md: { styleId: 'def' }
       };
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.styleIds.ios).toBe('abc');
@@ -381,7 +339,7 @@ describe('data serialize/parse', () => {
     it('should set mode moduleId', () => {
       cmpMeta.moduleId = '1.21';
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.moduleId).toEqual('1.21');
@@ -390,7 +348,7 @@ describe('data serialize/parse', () => {
     it('should set tagName', () => {
       cmpMeta = { tagNameMeta: 'MY-TAG-NAME' };
 
-      const format = formatLoadComponentRegistry(cmpMeta, ATTR_DASH_CASE);
+      const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.tagNameMeta).toEqual('MY-TAG-NAME');

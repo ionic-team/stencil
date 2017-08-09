@@ -1,10 +1,9 @@
 import { ModuleFile } from '../../../util/interfaces';
+import { MEMBER_STATE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
 export function getStateDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassDeclaration) {
-  fileMeta.cmpMeta.statesMeta = [];
-
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
@@ -32,14 +31,10 @@ export function getStateDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassD
     });
 
     if (isState && propName) {
-      fileMeta.cmpMeta.statesMeta.push(propName);
+      fileMeta.cmpMeta.membersMeta[propName] = {
+        memberType: MEMBER_STATE
+      };
       memberNode.decorators = undefined;
     }
-  });
-
-  fileMeta.cmpMeta.statesMeta = fileMeta.cmpMeta.statesMeta.sort((a, b) => {
-    if (a.toLowerCase() < b.toLowerCase()) return -1;
-    if (a.toLowerCase() > b.toLowerCase()) return 1;
-    return 0;
   });
 }

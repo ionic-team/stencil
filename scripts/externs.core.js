@@ -13,6 +13,7 @@
  * Internal core singleton injected into app and component's scope
  */
 function addListener(){};
+function attr(){};
 function dom(){};
 function emit(){};
 function enableListener(){};
@@ -27,7 +28,7 @@ function mode(){};
  * Properties which get added to the app's global
  */
 function components(){};
-function defineComponents(){};
+function loadComponents(){};
 
 
 /**

@@ -46,14 +46,6 @@ export function getEventDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagn
       validateEvent(moduleFile, rawEventMeta, methodName, memberNode);
     }
   });
-
-  moduleFile.cmpMeta.eventsMeta = moduleFile.cmpMeta.eventsMeta.sort((a, b) => {
-    if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
-    if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
-    if (a.eventMethodName.toLowerCase() < b.eventMethodName.toLowerCase()) return -1;
-    if (a.eventMethodName.toLowerCase() > b.eventMethodName.toLowerCase()) return 1;
-    return 0;
-  });
 }
 
 

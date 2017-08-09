@@ -9,6 +9,17 @@
 
 
 /**
+ * Member Types
+ */
+export const MEMBER_PROP = 1;
+export const MEMBER_PROP_STATE = 2;
+export const MEMBER_PROP_CONTEXT = 3;
+export const MEMBER_STATE = 4;
+export const MEMBER_METHOD = 5;
+export const MEMBER_ELEMENT_REF = 6;
+
+
+/**
  * Prop Change Meta Indexes
  */
 export const PROP_CHANGE_PROP_NAME = 0;
@@ -26,7 +37,6 @@ export const TYPE_NUMBER = 2;
 /**
  * JS Property to Attribute Name Options
  */
-export const ATTR_DASH_CASE = 0;
 export const ATTR_LOWER_CASE = 1;
 
 

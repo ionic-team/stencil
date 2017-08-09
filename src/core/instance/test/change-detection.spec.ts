@@ -1,6 +1,6 @@
 import { mockPlatform, mockDomApi } from '../../../test';
 import { ComponentMeta, ComponentInstance, PlatformApi } from '../../../util/interfaces';
-import { ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
+import { TYPE_ANY, TYPE_BOOLEAN, MEMBER_PROP, TYPE_NUMBER } from '../../../util/constants';
 import { initProxy } from '../proxy';
 
 
@@ -89,43 +89,33 @@ describe('instance change detection', () => {
   }
 
   let cmpMeta: ComponentMeta = {
-    propsMeta: [
-      {
-        propName: 'num',
+    membersMeta: {
+      'num': {
+        memberType: MEMBER_PROP,
         attribName: 'num',
-        propType: TYPE_NUMBER,
-        attribCase: ATTR_DASH_CASE,
-        isStateful: false
+        propType: TYPE_NUMBER
       },
-      {
-        propName: 'str',
+      'str': {
+        memberType: MEMBER_PROP,
         attribName: 'str',
-        propType: TYPE_ANY,
-        attribCase: ATTR_DASH_CASE,
-        isStateful: false
+        propType: TYPE_ANY
       },
-      {
-        propName: 'bool',
+      'bool': {
+        memberType: MEMBER_PROP,
         attribName: 'bool',
-        propType: TYPE_BOOLEAN,
-        attribCase: ATTR_DASH_CASE,
-        isStateful: false
+        propType: TYPE_BOOLEAN
       },
-      {
-        propName: 'arr',
+      'arr': {
+        memberType: MEMBER_PROP,
         attribName: 'arr',
-        propType: TYPE_ANY,
-        attribCase: ATTR_DASH_CASE,
-        isStateful: false
+        propType: TYPE_ANY
       },
-      {
-        propName: 'obj',
+      'obj': {
+        memberType: MEMBER_PROP,
         attribName: 'obj',
-        propType: TYPE_ANY,
-        attribCase: ATTR_DASH_CASE,
-        isStateful: false
+        propType: TYPE_ANY
       }
-    ]
+    }
   };
 
   beforeEach(() => {

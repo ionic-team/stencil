@@ -301,19 +301,6 @@ export function isWebDevFile(filePath: string) {
 const WEB_DEV_EXT = ['ts', 'tsx', 'js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
 
 
-export function hasCmpClass(sourceText: string, filePath: string) {
-  if (filePath.indexOf('.tsx') === -1) {
-    return false;
-  }
-
-  if (sourceText.indexOf('@Component') === -1) {
-    return false;
-  }
-
-  return true;
-}
-
-
 export function generatePreamble(config: BuildConfig) {
   let preamble: string[] = [];
 

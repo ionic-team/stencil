@@ -1,6 +1,7 @@
 import { addEventListener, enableEventListener } from '../core/instance/listeners';
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
-import { ComponentMeta, ComponentRegistry, CoreGlobal, EventEmitterData,
+import { ATTR_LOWER_CASE, SSR_VNODE_ID } from '../util/constants';
+import { ComponentMeta, ComponentRegistry, CoreContext, EventEmitterData,
   HostElement, AppGlobal, LoadComponentRegistry,
   ModuleCallbacks, PlatformApi } from '../util/interfaces';
 import { createDomControllerClient } from './dom-controller-client';
@@ -11,10 +12,10 @@ import { getNowFunction } from './now';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
-import { SSR_VNODE_ID } from '../util/constants';
+import { toDashCase } from '../util/helpers';
 
 
-export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Window, doc: Document, publicPath: string): PlatformApi {
+export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
@@ -26,25 +27,25 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
   const now = getNowFunction(win);
 
   // initialize Core global object
-  Core.dom = createDomControllerClient(win, now);
+  Context.dom = createDomControllerClient(win, now);
 
-  Core.addListener = function addListener(elm, eventName, cb, opts) {
-    return addEventListener(plt, elm, eventName, cb, opts.capture, opts.passive);
+  Context.addListener = function addListener(elm, eventName, cb, opts) {
+    return addEventListener(plt, elm, eventName, cb, opts && opts.capture, opts && opts.passive);
   };
 
-  Core.enableListener = function enableListener(instance, eventName, enabled, attachTo) {
+  Context.enableListener = function enableListener(instance, eventName, enabled, attachTo) {
     enableEventListener(plt, instance, eventName, enabled, attachTo);
   };
 
-  Core.emit = function emitEvent(elm: Element, eventName: string, data: EventEmitterData) {
+  Context.emit = function emitEvent(elm: Element, eventName: string, data: EventEmitterData) {
     elm.dispatchEvent(new WindowCustomEvent(
-      Core.eventNameFn ? Core.eventNameFn(eventName) : eventName,
+      Context.eventNameFn ? Context.eventNameFn(eventName) : eventName,
       data
     ));
   };
 
-  Core.isClient = true;
-  Core.isServer = false;
+  Context.isClient = true;
+  Context.isServer = false;
 
 
   // create the platform api which is used throughout common core code
@@ -53,9 +54,9 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
     defineComponent,
     getComponentMeta,
     loadBundle,
-    queue: createQueueClient(Core.dom, now),
+    queue: createQueueClient(Context.dom, now),
     connectHostElement,
-    emitEvent: Core.emit,
+    emitEvent: Context.emit,
     getEventOptions,
     onError
   };
@@ -91,7 +92,7 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Core.mode;
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
 
     // host element has been connected to the DOM
@@ -115,19 +116,35 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
     initHostConstructor(plt, HostElementConstructor.prototype);
 
     // add which attributes should be observed
-    HostElementConstructor.observedAttributes = cmpMeta.propsMeta.filter(p => p.attribName).map(p => p.attribName);
+    const observedAttributes: string[] = [];
+
+    // at this point the membersMeta only includes attributes which should
+    // be observed, it does not include all props yet, so it's safe to
+    // loop through all of the props (attrs) and observed them
+    for (var propName in cmpMeta.membersMeta) {
+      // initialize the actual attribute name used vs. the prop name
+      // for example, "myProp" would be "my-prop" as an attribute
+      // and these can be configured to be all lower case or dash case (default)
+      observedAttributes.push(
+        // dynamically generate the attribute name from the prop name
+        // also add it to our array of attributes we need to observe
+        cmpMeta.membersMeta[propName].attribName = Context.attr === ATTR_LOWER_CASE ? propName.toLowerCase() : toDashCase(propName)
+      );
+    }
+
+    HostElementConstructor.observedAttributes = observedAttributes;
 
     // define the custom element
     win.customElements.define(cmpMeta.tagNameMeta.toLowerCase(), HostElementConstructor);
   }
 
 
-  App.defineComponents = function defineComponents(moduleId, importFn) {
+  App.loadComponents = function loadComponents(moduleId, importFn) {
     const args = arguments;
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, Core, publicPath);
+    importFn(moduleImports, h, t, Context, publicPath);
 
     for (var i = 2; i < args.length; i++) {
       // parse the external component data into internal component meta data
@@ -165,17 +182,11 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
         moduleCallbacks[moduleId] = [cb];
       }
 
-      // create the url we'll be requesting
-      const url = publicPath + moduleId + '.js';
+      // start the request for the component module
+      requestModule(moduleId);
 
-      if (!pendingModuleRequests[url]) {
-        // not already actively requesting this url
-        // remember that we're now actively requesting this url
-        pendingModuleRequests[url] = true;
-
-        // let's kick off the module request
-        jsonp(url);
-      }
+      // also kick off any requests for controllers this module will need
+      cmpMeta.controllerModuleIds.forEach(requestModule);
 
       // we also need to load the css file in the head
       // we've already figured out and set "mode" as a property to the element
@@ -194,7 +205,20 @@ export function createPlatformClient(Core: CoreGlobal, App: AppGlobal, win: Wind
   }
 
 
-  function jsonp(url: string) {
+  function requestModule(moduleId: string) {
+    // create the url we'll be requesting
+    const url = publicPath + moduleId + '.js';
+
+    if (pendingModuleRequests[url]) {
+      // we're already actively requesting this url
+      // no need to do another request
+      return;
+    }
+
+    // let's kick off the module request
+    // remember that we're now actively requesting this url
+    pendingModuleRequests[url] = true;
+
     // create a sript element to add to the document.head
     var scriptElm = domApi.$createElement('script');
     scriptElm.charset = 'utf-8';

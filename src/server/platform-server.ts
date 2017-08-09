@@ -1,6 +1,6 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildContext, ComponentMeta, ComponentRegistry,
-  CoreGlobal, Diagnostic, FilesMap, HostElement, ListenOptions,
+  CoreContext, Diagnostic, FilesMap, HostElement,
   ModuleCallbacks, PlatformApi, AppGlobal, StencilSystem } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createDomControllerServer } from './dom-controller-server';
@@ -31,17 +31,17 @@ export function createPlatformServer(
 
 
   // initialize Core global object
-  const Core: CoreGlobal = {};
-  Core.addListener = noop;
-  Core.enableListener = noop;
-  Core.emit = noop;
-  Core.dom = createDomControllerServer();
-  Core.isClient = false;
-  Core.isServer = true;
+  const Context: CoreContext = {};
+  Context.addListener = noop;
+  Context.dom = createDomControllerServer();
+  Context.enableListener = noop;
+  Context.emit = noop;
+  Context.isClient = false;
+  Context.isServer = true;
 
   // add the Core global to the window context
   // Note: "Core" is not on the window context on the client-side
-  win.Core = Core;
+  win.Core = Context;
 
   // create the app global
   const App: AppGlobal = {};
@@ -95,7 +95,7 @@ export function createPlatformServer(
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Core.mode;
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
 
     assignHostContentSlots(domApi, elm, slotMeta);
@@ -119,12 +119,12 @@ export function createPlatformServer(
   }
 
 
-  App.defineComponents = function defineComponents(module, importFn) {
+  App.loadComponents = function loadComponents(module, importFn) {
     const args = arguments;
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, Core, appBuildDir);
+    importFn(moduleImports, h, t, Context, appBuildDir);
 
     for (var i = 2; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i]);
@@ -224,15 +224,15 @@ export function createPlatformServer(
     }
   }
 
-  function getEventOptions(opts: ListenOptions) {
+  function getEventOptions(useCapture?: boolean, usePassive?: boolean) {
     return {
-      'capture': !!(opts && opts.capture),
-      'passive': !(opts && opts.passive === false)
+      'capture': !!(useCapture),
+      'passive': !!(usePassive)
     };
   }
 
   function runGlobalScripts() {
-    if (!ctx.appFiles.global) {
+    if (!ctx || !ctx.appFiles || ctx.appFiles.global) {
       return;
     }
 

@@ -1,4 +1,3 @@
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../../util/constants';
 import { BuildConfig, Bundle, DependentCollection, HydrateOptions } from '../../util/interfaces';
 import { normalizePath } from '../util';
 
@@ -145,8 +144,6 @@ export function validateBuildConfig(config: BuildConfig) {
 
   config.generateCollection = !!config.generateCollection;
 
-  config.attrCase = validateAttrCase(config.attrCase);
-
   config.collections = config.collections || [];
   config.collections = config.collections.map(validateDependentCollection);
 
@@ -211,7 +208,7 @@ export function validateUserBundles(bundles: Bundle[]) {
     }
 
     b.components = b.components.map(tag => {
-      return validateTag(tag, `found in bundle component stencil config`);
+      return validateComponentTag(tag, `found in bundle component stencil config`);
     }).sort();
   });
 
@@ -225,7 +222,7 @@ export function validateUserBundles(bundles: Bundle[]) {
 }
 
 
-export function validateTag(tag: string, suffix: string) {
+export function validateComponentTag(tag: string, suffix: string) {
   if (typeof tag !== 'string') {
     throw new Error(`Tag "${tag}" must be a string type, ${suffix}`);
   }
@@ -269,34 +266,13 @@ export function validateTag(tag: string, suffix: string) {
 }
 
 
-export function validateAttrCase(attrCase: any) {
-  if (attrCase === ATTR_LOWER_CASE || attrCase === ATTR_DASH_CASE) {
-    // already using a valid attr case value
-    return attrCase;
-  }
-
-  if (typeof attrCase === 'string') {
-    if (attrCase.trim().toLowerCase() === 'dash') {
-      return ATTR_DASH_CASE;
-    }
-
-    if (attrCase.trim().toLowerCase() === 'lower') {
-      return ATTR_LOWER_CASE;
-    }
-  }
-
-  // default to use dash-case for attributes
-  return ATTR_DASH_CASE;
-}
-
-
 const DEFAULT_SRC = 'src';
 const DEFAULT_BUILD_DIR = 'www/build';
 const DEFAULT_INDEX_SRC = 'src/index.html';
 const DEFAULT_INDEX_BUILD = 'www/index.html';
 const DEFAULT_COLLECTION_DIR = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
-const DEFAULT_HASHED_FILENAME_LENTH = 12;
+const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
 

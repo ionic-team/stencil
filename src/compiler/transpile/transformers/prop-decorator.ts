@@ -1,12 +1,10 @@
 import { catchError } from '../../util';
-import { ModuleFile, Diagnostic, PropMeta, PropOptions } from '../../../util/interfaces';
-import { TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
+import { Diagnostic, ModuleFile, MemberMeta, PropOptions } from '../../../util/interfaces';
+import { MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT, TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
 export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
-  moduleFile.cmpMeta.propsMeta = [];
-
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
@@ -14,9 +12,9 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
     let propName: string = null;
     let propType: number = null;
     let userPropOptions: PropOptions = null;
+    let shouldObserveAttribute = false;
 
     memberNode.forEachChild(n => {
-
       if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1) {
         const child = n.getChildAt(1);
         const firstToken = child.getFirstToken();
@@ -29,6 +27,8 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
           // If the first token is @State
           isProp = true;
         }
+
+        if (!isProp) return;
 
         n.getChildAt(1).forEachChild(n => {
           if (n.kind === ts.SyntaxKind.ObjectLiteralExpression) {
@@ -50,10 +50,22 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
 
         } else if (!propType) {
           if (n.kind === ts.SyntaxKind.BooleanKeyword) {
+            // @Prop() myBoolean: boolean;
             propType = TYPE_BOOLEAN;
+            shouldObserveAttribute = true;
 
           } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
+            // @Prop() myNumber: number;
             propType = TYPE_NUMBER;
+            shouldObserveAttribute = true;
+
+          } else if (n.kind === ts.SyntaxKind.StringKeyword) {
+            // @Prop() myString: string;
+            shouldObserveAttribute = true;
+
+          } else if (n.kind === ts.SyntaxKind.AnyKeyword) {
+            // @Prop() myAny: any;
+            shouldObserveAttribute = true;
           }
         }
 
@@ -62,40 +74,39 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
     });
 
     if (isProp && propName) {
-      const prop: PropMeta = {
-        propName: propName
+      if (EXCLUDE_PROP_NAMES.indexOf(propName) > -1) {
+        // these automatically get added at runtime, so don't bother here
+        memberNode.decorators = undefined;
+        return;
+      }
+
+      const propMeta: MemberMeta = moduleFile.cmpMeta.membersMeta[propName] = {
+        memberType: MEMBER_PROP
       };
 
       if (propType) {
-        prop.propType = propType;
+        propMeta.propType = propType;
       }
 
       if (userPropOptions) {
-        if (typeof userPropOptions.type === 'string') {
-          userPropOptions.type = userPropOptions.type.toLowerCase().trim();
-
-          if (userPropOptions.type === 'boolean') {
-            prop.propType = TYPE_BOOLEAN;
-
-          } else if (userPropOptions.type === 'number') {
-            prop.propType = TYPE_NUMBER;
-          }
+        if (typeof userPropOptions.context === 'string') {
+          propMeta.memberType = MEMBER_PROP_CONTEXT;
+          propMeta.ctrlId = userPropOptions.context;
         }
 
         if (typeof userPropOptions.state === 'boolean') {
-          prop.isStateful = !!userPropOptions.state;
+          propMeta.memberType = MEMBER_PROP_STATE;
         }
       }
 
-      moduleFile.cmpMeta.propsMeta.push(prop);
+      if (shouldObserveAttribute) {
+        propMeta.attribName = propName;
+      }
 
       memberNode.decorators = undefined;
     }
   });
-
-  moduleFile.cmpMeta.propsMeta = moduleFile.cmpMeta.propsMeta.sort((a, b) => {
-    if (a.propName.toLowerCase() < b.propName.toLowerCase()) return -1;
-    if (a.propName.toLowerCase() > b.propName.toLowerCase()) return 1;
-    return 0;
-  });
 }
+
+
+const EXCLUDE_PROP_NAMES = ['mode', 'color'];

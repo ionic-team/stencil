@@ -1,63 +1,73 @@
-import { ATTR_LOWER_CASE, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
+import { TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
 import { ComponentMeta, ComponentRegistry, LoadComponentMeta,
-  ComponentEventData, ComponentListenersData, ComponentPropertyData, LoadComponentRegistry } from '../util/interfaces';
-import { isDef, toDashCase } from './helpers';
+  ComponentEventData, ComponentListenersData, ComponentMemberData, LoadComponentRegistry } from '../util/interfaces';
+import { isDef } from './helpers';
 
 
 export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry) {
   // tag name will always be upper case
   const cmpMeta: ComponentMeta = {
     tagNameMeta: cmpRegistryData[0],
-    propsMeta: [
+    membersMeta: {
       // every component defaults to always have
       // the mode and color properties
-      // but only observe the color attribute
-      // mode cannot change after the component was created
-      { propName: 'color', attribName: 'color' },
-      { propName: 'mode' },
-    ]
+      'mode': {},
+      'color': {}
+    }
   };
 
+  // this comonent's module id
   cmpMeta.moduleId = cmpRegistryData[1];
 
+  // array of all the controller module ids this component uses
+  cmpMeta.controllerModuleIds = cmpRegistryData[2];
+
   // map of the modes w/ bundle id and style data
-  cmpMeta.styleIds = cmpRegistryData[2] || {};
+  cmpMeta.styleIds = cmpRegistryData[3] || {};
 
-  // slot
-  cmpMeta.slotMeta = cmpRegistryData[3];
-
-  if (cmpRegistryData[4]) {
-    // parse prop meta
-    for (var i = 0; i < cmpRegistryData[4].length; i++) {
-      var d: any = cmpRegistryData[4][i];
-      cmpMeta.propsMeta.push({
-        propName: (d as ComponentPropertyData)[0],
-        attribName: ((d as ComponentPropertyData)[1] === ATTR_LOWER_CASE ? (d as ComponentPropertyData)[0].toLowerCase() : toDashCase((d as ComponentPropertyData)[0])),
-        propType: (d as ComponentPropertyData)[2],
-        isStateful: !!(d as ComponentPropertyData)[3]
-      });
-    }
-  }
+  // parse member meta
+  // this data only includes props that are attributes that need to be observed
+  // it does not include all of the props yet
+  parseMembersData(cmpMeta, cmpRegistryData[4]);
 
   if (cmpRegistryData[5]) {
     // parse listener meta
-    cmpMeta.listenersMeta = [];
-    for (i = 0; i < cmpRegistryData[5].length; i++) {
-      d = cmpRegistryData[5][i];
-      cmpMeta.listenersMeta.push({
-        eventName: (d as ComponentListenersData)[0],
-        eventMethodName: (d as ComponentListenersData)[1],
-        eventDisabled: !!(d as ComponentListenersData)[2],
-        eventPassive: !!(d as ComponentListenersData)[3],
-        eventCapture: !!(d as ComponentListenersData)[4]
-      });
-    }
+    cmpMeta.listenersMeta = cmpRegistryData[5].map(parseListenerData);
   }
 
+  // slot
+  cmpMeta.slotMeta = cmpRegistryData[6];
+
   // bundle load priority
-  cmpMeta.loadPriority = cmpRegistryData[6];
+  cmpMeta.loadPriority = cmpRegistryData[7];
 
   return registry[cmpMeta.tagNameMeta] = cmpMeta;
+}
+
+
+function parseListenerData(listenerData: ComponentListenersData) {
+  return {
+    eventName: listenerData[0],
+    eventMethodName: listenerData[1],
+    eventDisabled: !!listenerData[2],
+    eventPassive: !!listenerData[3],
+    eventCapture: !!listenerData[4]
+  };
+}
+
+
+function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberData[]) {
+  if (memberData) {
+    cmpMeta.membersMeta = cmpMeta.membersMeta || {};
+    for (var i = 0; i < memberData.length; i++) {
+      var d = memberData[i];
+      cmpMeta.membersMeta[d[0]] = {
+        memberType: d[1],
+        propType: d[2],
+        ctrlId: d[3]
+      };
+    }
+  }
 }
 
 
@@ -69,57 +79,36 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   // using the tag as the key on the export object
   cmpMeta.componentModule = moduleImports[cmpMetaData[0]];
 
-  // host
-  cmpMeta.hostMeta = cmpMetaData[1];
+  // component members
+  parseMembersData(cmpMeta, cmpMetaData[1]);
 
-  // component listeners
-  if (cmpMetaData[2]) {
-    cmpMeta.listenersMeta = [];
-    for (var i = 0; i < cmpMetaData[2].length; i++) {
-      var data: any = cmpMetaData[2][i];
-      cmpMeta.listenersMeta.push({
-        eventMethodName: (data as ComponentListenersData)[0],
-        eventName: (data as ComponentListenersData)[1],
-        eventCapture: !!(data as ComponentListenersData)[2],
-        eventPassive: !!(data as ComponentListenersData)[3],
-        eventDisabled: !!(data as ComponentListenersData)[4],
-      });
-    }
-  }
-
-  // component states
-  cmpMeta.statesMeta = cmpMetaData[2];
-
-  // component instance prop WILL change methods
-  cmpMeta.propsWillChangeMeta = cmpMetaData[3];
-
-  // component instance prop DID change methods
-  cmpMeta.propsDidChangeMeta = cmpMetaData[4];
+  // host element meta
+  cmpMeta.hostMeta = cmpMetaData[2];
 
   // component instance events
-  if (cmpMetaData[5]) {
-    cmpMeta.eventsMeta = [];
-    for (i = 0; i < cmpMetaData[5].length; i++) {
-      data = cmpMetaData[5][i];
-      cmpMeta.eventsMeta.push({
-        eventName: (data as ComponentEventData)[0],
-        eventMethodName: (data as ComponentEventData)[1],
-        eventBubbles: !!(data as ComponentEventData)[2],
-        eventCancelable: !!(data as ComponentEventData)[3],
-        eventComposed: !!(data as ComponentEventData)[4],
-      });
-    }
+  if (cmpMetaData[3]) {
+    cmpMeta.eventsMeta = cmpMetaData[3].map(parseEventData);
   }
 
-  // component methods
-  cmpMeta.methodsMeta = cmpMetaData[6];
+  // component instance prop WILL change methods
+  cmpMeta.propsWillChangeMeta = cmpMetaData[4];
 
-  // member name which the component instance should
-  // use when referencing the host element
-  cmpMeta.hostElementMember = cmpMetaData[7];
+  // component instance prop DID change methods
+  cmpMeta.propsDidChangeMeta = cmpMetaData[5];
 
   // is shadow
-  cmpMeta.isShadowMeta = !!cmpMetaData[8];
+  cmpMeta.isShadowMeta = !!cmpMetaData[6];
+}
+
+
+function parseEventData(d: ComponentEventData) {
+  return {
+    eventName: d[0],
+    eventMethodName: d[1] || d[0],
+    eventBubbles: !d[2],
+    eventCancelable: !d[3],
+    eventComposed: !d[4]
+  };
 }
 
 

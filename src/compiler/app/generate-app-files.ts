@@ -20,7 +20,7 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 
   const appRegistry: AppRegistry = {
     namespace: config.namespace,
-    components: formatComponentRegistry(ctx.registry, config.attrCase),
+    components: formatComponentRegistry(ctx.registry),
     loader: `${appFileName}.js`,
   };
 

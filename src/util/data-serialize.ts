@@ -1,17 +1,20 @@
 import { Bundle, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta, LoadComponentRegistry,
-  MethodMeta, ModuleFile, PropChangeMeta, PropMeta, StateMeta, StylesMeta } from './interfaces';
-import { ATTR_LOWER_CASE, ATTR_DASH_CASE, TYPE_ANY, TYPE_BOOLEAN, HAS_SLOTS, HAS_NAMED_SLOTS, TYPE_NUMBER } from '../util/constants';
+  MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
+import { HAS_SLOTS, HAS_NAMED_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD,
+  MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT,
+  MEMBER_STATE, TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
 
 
-export function formatLoadComponentRegistry(cmpMeta: ComponentMeta, defaultAttrCase: number): LoadComponentRegistry {
+export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadComponentRegistry {
   // ensure we've got a standard order of the components
   const d: any[] = [
     cmpMeta.tagNameMeta.toUpperCase(),
     cmpMeta.moduleId,
+    cmpMeta.controllerModuleIds,
     formatStyles(cmpMeta.stylesMeta),
-    formatSlot(cmpMeta.slotMeta),
-    formatProps(cmpMeta.propsMeta, defaultAttrCase),
+    formatObserveAttributeProps(cmpMeta.membersMeta),
     formatListeners(cmpMeta.listenersMeta),
+    formatSlot(cmpMeta.slotMeta),
     cmpMeta.loadPriority
   ];
 
@@ -45,46 +48,50 @@ function formatSlot(val: number) {
 }
 
 
-function formatProps(props: PropMeta[], defaultAttrCase: number) {
-  if (!props || !props.length) {
+function formatObserveAttributeProps(membersMeta: MembersMeta) {
+  if (!membersMeta) {
     return 0;
   }
 
-  return props.map(prop => {
+  const observeAttrs: any[] = [];
+
+  const memberNames = Object.keys(membersMeta).sort();
+
+  memberNames.forEach(memberName => {
+    const memberMeta = membersMeta[memberName];
+
+    if (!memberMeta.attribName) {
+      return;
+    }
+
     const d: any[] = [
-      prop.propName,
+      memberName,
+      memberMeta.memberType
     ];
 
-    if (prop.attribCase === undefined) {
-      // if individual prop wasn't set with an option
-      // then use the config's default
-      prop.attribCase = defaultAttrCase;
-    }
-
-    if (prop.attribCase === ATTR_LOWER_CASE) {
-      d.push(prop.attribCase);
-
-    } else {
-      d.push(ATTR_DASH_CASE);
-    }
-
-    if (prop.propType === TYPE_BOOLEAN) {
+    if (memberMeta.propType === TYPE_BOOLEAN) {
       d.push(TYPE_BOOLEAN);
 
-    } else if (prop.propType === TYPE_NUMBER) {
+    } else if (memberMeta.propType === TYPE_NUMBER) {
       d.push(TYPE_NUMBER);
 
     } else {
       d.push(TYPE_ANY);
     }
 
-    if (prop.isStateful) {
-      d.push(1);
-    } else {
-      d.push(0);
+    if (memberMeta.ctrlId) {
+      d.push(memberMeta.ctrlId);
     }
 
-    return trimFalsyData(d);
+    observeAttrs.push(d);
+  });
+
+  if (!observeAttrs.length) {
+    return 0;
+  }
+
+  return observeAttrs.map(p => {
+    return trimFalsyData(p);
   });
 }
 
@@ -98,27 +105,27 @@ function formatListeners(listeners: ListenMeta[]) {
     const d: any[] = [
       listener.eventName,
       listener.eventMethodName,
-      listener.eventDisabled,
-      listener.eventPassive,
-      listener.eventCapture
+      listener.eventDisabled ? 1 : 0,
+      listener.eventPassive ? 1 : 0,
+      listener.eventCapture ? 1 : 0
     ];
     return trimFalsyData(d);
   });
 }
 
 
-export function formatComponentRegistry(registry: ComponentRegistry, defaultAttrCase: number) {
+export function formatComponentRegistry(registry: ComponentRegistry) {
   // ensure we've got a standard order of the components
   return Object.keys(registry).sort().map(tag => {
     if (registry[tag]) {
-      return formatLoadComponentRegistry(registry[tag], defaultAttrCase);
+      return formatLoadComponentRegistry(registry[tag]);
     }
     return null;
   }).filter(c => c);
 }
 
 
-export function formatDefineComponents(
+export function formatLoadComponents(
     namespace: string,
     moduleId: string,
     moduleBundleOutput: string,
@@ -137,10 +144,10 @@ export function formatDefineComponents(
   }).join(',\n');
 
   return [
-    `${namespace}.defineComponents(\n`,
+    `${namespace}.loadComponents(\n`,
 
       `/**** module id (dev mode) ****/`,
-      `'${moduleId}',\n`,
+      `"${moduleId}",\n`,
 
       `/**** component modules ****/`,
       `${moduleBundleOutput},\n`,
@@ -154,28 +161,101 @@ export function formatDefineComponents(
 
 export function formatComponentMeta(cmpMeta: ComponentMeta) {
   const tag = cmpMeta.tagNameMeta.toLowerCase();
+  const members = formatMembers(cmpMeta.membersMeta);
   const host = formatHost(cmpMeta.hostMeta);
-  const states = formatStates(cmpMeta.statesMeta);
   const propWillChanges = formatPropChanges(tag, 'prop will change', cmpMeta.propsWillChangeMeta);
   const propDidChanges = formatPropChanges(tag, 'prop did change', cmpMeta.propsDidChangeMeta);
   const events = formatEvents(tag, cmpMeta.eventsMeta);
-  const methods = formatMethods(cmpMeta.methodsMeta);
-  const hostElementMember = formatHostElementMember(cmpMeta.hostElementMember);
   const shadow = formatShadow(cmpMeta.isShadowMeta);
 
   const d: string[] = [];
 
-  d.push(`/** ${tag}: [0] tag **/\n'${tag.toUpperCase()}'`);
-  d.push(`/** ${tag}: [1] host **/\n${host}`);
-  d.push(`/** ${tag}: [2] states **/\n${states}`);
-  d.push(`/** ${tag}: [3] propWillChanges **/\n${propWillChanges}`);
-  d.push(`/** ${tag}: [4] propDidChanges **/\n${propDidChanges}`);
-  d.push(`/** ${tag}: [5] events **/\n${events}`);
-  d.push(`/** ${tag}: [6] methods **/\n${methods}`);
-  d.push(`/** ${tag}: [7] hostElementMember **/\n${hostElementMember}`);
-  d.push(`/** ${tag}: [8] shadow **/\n${shadow}`);
+  d.push(`/** ${tag}: tag **/\n"${tag.toUpperCase()}"`);
+  d.push(`/** ${tag}: members **/\n${members}`);
+  d.push(`/** ${tag}: host **/\n${host}`);
+  d.push(`/** ${tag}: events **/\n${events}`);
+  d.push(`/** ${tag}: propWillChanges **/\n${propWillChanges}`);
+  d.push(`/** ${tag}: propDidChanges **/\n${propDidChanges}`);
+  d.push(`/** ${tag}: shadow **/\n${shadow}`);
 
   return `\n/***************** ${tag} *****************/\n[\n` + trimFalsyDataStr(d).join(',\n\n') + `\n\n]`;
+}
+
+
+function formatMembers(membersMeta: MembersMeta) {
+  if (!membersMeta) {
+    return '0 /* no members */';
+  }
+
+  const memberNames = Object.keys(membersMeta).sort((a, b) => {
+    if (a.toLowerCase() < b.toLowerCase()) return -1;
+    if (a.toLowerCase() > b.toLowerCase()) return 1;
+    return 0;
+  });
+
+  if (!memberNames.length) {
+    return '0 /* no members */';
+  }
+
+  const members = memberNames.map(memberName => {
+    return formatMemberMeta(memberName, membersMeta[memberName]);
+  });
+
+  return `[${members}\n]`;
+}
+
+
+function formatMemberMeta(memberName: string, memberMeta: MemberMeta) {
+  const d: string[] = [];
+
+  d.push(`"${memberName}"`);
+  d.push(formatMemberType(memberMeta.memberType));
+  d.push(formatPropType(memberMeta.propType));
+  d.push(formatPropContext(memberMeta.ctrlId));
+
+  return '\n  [ ' + trimFalsyDataStr(d).join(', ') + ' ]';
+}
+
+
+function formatMemberType(val: number) {
+  if (val === MEMBER_ELEMENT_REF) {
+    return `/** element ref **/ ${MEMBER_ELEMENT_REF}`;
+  }
+  if (val === MEMBER_METHOD) {
+    return `/** method **/ ${MEMBER_METHOD}`;
+  }
+  if (val === MEMBER_PROP) {
+    return `/** prop **/ ${MEMBER_PROP}`;
+  }
+  if (val === MEMBER_PROP_STATE) {
+    return `/** prop state **/ ${MEMBER_PROP_STATE}`;
+  }
+  if (val === MEMBER_STATE) {
+    return `/** state **/ ${MEMBER_STATE}`;
+  }
+  if (val === MEMBER_PROP_CONTEXT) {
+    return `/** prop global **/ ${MEMBER_PROP_CONTEXT}`;
+  }
+  return `/** unknown ****/ 0`;
+}
+
+
+function formatPropType(val: number) {
+  if (val === TYPE_BOOLEAN) {
+    return `/** type boolean **/ ${TYPE_BOOLEAN}`;
+  }
+  if (val === TYPE_NUMBER) {
+    return `/** type number **/ ${TYPE_NUMBER}`;
+  }
+  return `/** type any **/ ${TYPE_ANY}`;
+}
+
+
+function formatPropContext(val: string) {
+  if (val === undefined) {
+    return `0`;
+  }
+  return `/** context ***/ "${val}"`;
 }
 
 
@@ -184,15 +264,6 @@ function formatHost(val: any) {
     return '0 /* no host data */';
   }
   return JSON.stringify(val);
-}
-
-
-function formatStates(states: StateMeta[]) {
-  if (!states || !states.length) {
-    return '0 /* no states */';
-  }
-
-  return `['` + states.join(`', '`) + `']`;
 }
 
 
@@ -221,8 +292,8 @@ function formatPropChanges(label: string, propChangeType: string, propChange: Pr
 function formatPropChangeOpts(label: string, propChangeType: string, propChange: PropChangeMeta, index: number) {
   const t = [
     `    /*****  ${label} ${propChangeType} [${index}] ***** /\n` +
-    `    /* [0] prop name **/ '${propChange[0]}'`,
-    `    /* [1] call fn *****/ '${propChange[1]}'`
+    `    /* prop name **/ "${propChange[0]}"`,
+    `    /* call fn *****/ "${propChange[1]}"`
   ];
 
   return `  [\n` + t.join(',\n') + `\n  ]`;
@@ -247,32 +318,14 @@ function formatEvents(label: string, events: EventMeta[]) {
 function formatEventOpts(label: string, eventMeta: EventMeta) {
   const t = [
     `    /*****  ${label} ${eventMeta.eventName} ***** /\n` +
-    `    /* [0] event name ***/ '${eventMeta.eventName}'`,
-    `    /* [1] method name **/ '${eventMeta.eventMethodName}'`,
-    `    /* [2] bubbles ******/ '${formatBoolean(eventMeta.eventBubbles)}'`,
-    `    /* [3] cancelable ***/ '${formatBoolean(eventMeta.eventCancelable)}'`,
-    `    /* [4] composed *****/ '${formatBoolean(eventMeta.eventComposed)}'`
+    `    /* event name ***/ "${eventMeta.eventName}"`,
+    `    /* method name **/ ${eventMeta.eventMethodName !== eventMeta.eventName ? '"' + eventMeta.eventMethodName + '"' : 0}`,
+    `    /* disable bubbles **/ ${formatBoolean(!eventMeta.eventBubbles)}`,
+    `    /* disable cancelable **/ ${formatBoolean(!eventMeta.eventCancelable)}`,
+    `    /* disable composed **/ ${formatBoolean(!eventMeta.eventComposed)}`
   ];
 
-  return `  [\n` + t.join(',\n') + `\n  ]`;
-}
-
-
-function formatMethods(methods: MethodMeta[]) {
-  if (!methods || !methods.length) {
-    return '0 /* no methods */';
-  }
-
-  return `['` + methods.join(`', '`) + `']`;
-}
-
-
-function formatHostElementMember(val: any) {
-  if (typeof val !== 'string') {
-    return `0 /* no host element member name */`;
-  }
-
-  return `'${val.trim()}'`;
+  return `  [\n` + trimFalsyDataStr(t).join(',\n') + `\n  ]`;
 }
 
 

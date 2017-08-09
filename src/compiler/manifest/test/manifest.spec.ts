@@ -1,4 +1,4 @@
-import { Bundle, DependentCollection, Manifest } from '../../interfaces';
+import { Bundle, DependentCollection, Manifest } from '../../../util/interfaces';
 import { filterDependentComponents } from '../load-dependent-manifests';
 import { validateDependentCollection } from '../../build/validation';
 

@@ -58,7 +58,7 @@ export function wrapCoreJs(config: BuildConfig, jsContent: string) {
 
   const output = [
     generatePreamble(config),
-    `(function(Core,appNamespace,publicPath){`,
+    `(function(Context,appNamespace,publicPath){`,
     `"use strict";\n`,
     jsContent.trim(),
     `\n})({},"${config.namespace}","${publicPath}");`

@@ -1,38 +1,11 @@
-import { validateAttrCase, validateBuildConfig } from '../validation';
+import { ATTR_LOWER_CASE } from '../../../util/constants';
+import { validateBuildConfig } from '../validation';
 import { BuildConfig } from '../../../util/interfaces';
-import { ATTR_DASH_CASE, ATTR_LOWER_CASE } from '../../../util/constants';
 import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
 import * as path from 'path';
 
 
 describe('validation', () => {
-
-  describe('validateAttrCase', () => {
-
-    it('should set lower case', () => {
-      var attrCase = validateAttrCase('lower');
-      expect(attrCase).toBe(ATTR_LOWER_CASE);
-    });
-
-    it('should set dash case', () => {
-      var attrCase = validateAttrCase('dash');
-      expect(attrCase).toBe(ATTR_DASH_CASE);
-    });
-
-    it('should keep attribute dash case when given constant', () => {
-      var attrCase = validateAttrCase(ATTR_DASH_CASE);
-      expect(attrCase).toBe(ATTR_DASH_CASE);
-
-      attrCase = validateAttrCase(ATTR_LOWER_CASE);
-      expect(attrCase).toBe(ATTR_LOWER_CASE);
-    });
-
-    it('should default attribute dash case', () => {
-      var attrCase = validateAttrCase(config.attrCase);
-      expect(attrCase).toBe(ATTR_DASH_CASE);
-    });
-
-  });
 
   describe('validateBuildConfig', () => {
 
@@ -75,7 +48,7 @@ describe('validation', () => {
 
     it('should default hashedFileNameLength', () => {
       validateBuildConfig(config);
-      expect(config.hashedFileNameLength).toBe(12);
+      expect(config.hashedFileNameLength).toBe(8);
     });
 
     it('should default hashFileNames to false in watch mode despite prod mode', () => {
