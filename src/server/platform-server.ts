@@ -43,7 +43,7 @@ export function createPlatformServer(
 
   // add the Core global to the window context
   // Note: "Core" is not on the window context on the client-side
-  win.Core = Context;
+  win.Context = Context;
 
   // create the app global
   const App: AppGlobal = {};
@@ -236,7 +236,7 @@ export function createPlatformServer(
   }
 
   function runGlobalScripts() {
-    if (!ctx || !ctx.appFiles || ctx.appFiles.global) {
+    if (!ctx || !ctx.appFiles || !ctx.appFiles.global) {
       return;
     }
 
