@@ -12,8 +12,9 @@ export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, r
     membersMeta: {
       // every component defaults to always have
       // the mode and color properties
+      // but only color should observe any attribute changes
       'mode': { memberType: MEMBER_PROP },
-      'color': { memberType: MEMBER_PROP }
+      'color': { memberType: MEMBER_PROP, attribName: 'color' }
     }
   };
 

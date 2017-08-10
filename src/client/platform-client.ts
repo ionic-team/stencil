@@ -128,11 +128,13 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       // initialize the actual attribute name used vs. the prop name
       // for example, "myProp" would be "my-prop" as an attribute
       // and these can be configured to be all lower case or dash case (default)
-      observedAttributes.push(
-        // dynamically generate the attribute name from the prop name
-        // also add it to our array of attributes we need to observe
-        cmpMeta.membersMeta[propName].attribName
-      );
+      if (cmpMeta.membersMeta[propName].attribName) {
+        observedAttributes.push(
+          // dynamically generate the attribute name from the prop name
+          // also add it to our array of attributes we need to observe
+          cmpMeta.membersMeta[propName].attribName
+        );
+      }
     }
 
     HostElementConstructor.observedAttributes = observedAttributes;
