@@ -609,7 +609,7 @@ function serializeConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) 
 
 
 function parseConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (invalidArrayData(cmpData.context)) {
+  if (invalidArrayData(cmpData.connect)) {
     return;
   }
 
