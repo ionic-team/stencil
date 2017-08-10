@@ -86,7 +86,7 @@ export function createPlatformServer(
   rootNode._activelyLoadingChildren = [];
   rootNode._initLoad = function appLoadedCallback() {
     // check we've only fully loaded when all of the styles have loaded also
-    if (plt.onAppLoad && Object.keys(pendingStyleFileReads).length === 0) {
+    if (plt.onAppLoad && Object.keys(pendingStyleFileReads).length === 0 && !rootNode._hasLoaded) {
       rootNode._hasLoaded = true;
 
       plt.onAppLoad(rootNode, stylesMap);
@@ -195,7 +195,13 @@ export function createPlatformServer(
 
       // we also need to load this component's css file
       // we're already figured out and set "mode" as a property to the element
-      const styleId = cmpMeta.styleIds && (cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$);
+      let styleId: any = cmpMeta.styleIds && (cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$);
+      if (!styleId && cmpMeta.stylesMeta) {
+        const stylesMeta = cmpMeta.stylesMeta[elm.mode] || cmpMeta.stylesMeta.$;
+        if (stylesMeta) {
+          styleId = stylesMeta.styleId;
+        }
+      }
       if (styleId) {
         // we've got a style id to load up
         // create the style filePath we'll be reading
