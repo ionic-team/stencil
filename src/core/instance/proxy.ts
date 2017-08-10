@@ -29,7 +29,7 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
 
       if (memberType === MEMBER_PROP_CONTEXT) {
         // @Prop({ context: 'config' })
-        var contextObj = Context[memberMeta.ctrlId];
+        var contextObj = plt.getContextItem(memberMeta.ctrlId);
         contextObj && defineProperty(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
 
       } else if (memberType === MEMBER_PROP_CONNECT) {

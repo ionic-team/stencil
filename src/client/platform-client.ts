@@ -55,6 +55,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     defineComponent,
     getComponentMeta,
     propConnect,
+    getContextItem,
     loadBundle,
     queue: createQueueClient(Context.dom, now),
     connectHostElement,
@@ -282,6 +283,10 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     const obj: any = {};
     proxyControllerProp(domApi, controllerComponents, obj, ctrlTag, 'create');
     return obj;
+  }
+
+  function getContextItem(contextKey: string) {
+    return Context[contextKey];
   }
 
   return plt;

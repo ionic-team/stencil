@@ -798,6 +798,7 @@ export interface PlatformApi {
   registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
+  getContextItem: (contextKey: string) => any;
   propConnect: (ctrlTag: string) => PropConnect;
   loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
   render?: RendererApi;

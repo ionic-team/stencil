@@ -66,6 +66,7 @@ export function createPlatformServer(
     defineComponent,
     getComponentMeta,
     propConnect,
+    getContextItem,
     loadBundle,
     connectHostElement,
     queue: createQueueServer(),
@@ -285,6 +286,10 @@ export function createPlatformServer(
     const obj: any = {};
     proxyControllerProp(domApi, controllerComponents, obj, ctrlTag, 'create');
     return obj;
+  }
+
+  function getContextItem(contextKey: string) {
+    return Context[contextKey];
   }
 
   return plt;
