@@ -1,7 +1,7 @@
 import { addEventListener, enableEventListener } from '../core/instance/listeners';
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
-import { ComponentMeta, ComponentRegistry, CoreContext, EventEmitterData,
-  HostElement, AppGlobal, LoadComponentRegistry,
+import { ComponentMeta, ComponentRegistry, CoreContext,
+  EventEmitterData, HostElement, AppGlobal, LoadComponentRegistry,
   ModuleCallbacks, PlatformApi } from '../util/interfaces';
 import { createDomControllerClient } from './dom-controller-client';
 import { createDomApi } from '../core/renderer/dom-api';
@@ -11,6 +11,7 @@ import { getNowFunction } from './now';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
+import { proxyControllerProp } from '../core/instance/proxy';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
@@ -21,6 +22,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   const loadedModules: {[moduleId: string]: boolean} = {};
   const loadedStyles: {[styleId: string]: boolean} = {};
   const pendingModuleRequests: {[url: string]: boolean} = {};
+  const controllerComponents: {[tag: string]: HostElement} = {};
 
   const domApi = createDomApi(doc);
   const now = getNowFunction(win);
@@ -52,6 +54,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     registerComponents,
     defineComponent,
     getComponentMeta,
+    propConnect,
     loadBundle,
     queue: createQueueClient(Context.dom, now),
     connectHostElement,
@@ -184,9 +187,6 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       // start the request for the component module
       requestModule(moduleId);
 
-      // also kick off any requests for controllers this module will need
-      cmpMeta.controllerModuleIds.forEach(requestModule);
-
       // we also need to load the css file in the head
       // we've already figured out and set "mode" as a property to the element
       const styleId = cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$;
@@ -278,6 +278,11 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     console.error(type, err, elm.tagName);
   }
 
+  function propConnect(ctrlTag: string) {
+    const obj: any = {};
+    proxyControllerProp(domApi, controllerComponents, obj, ctrlTag, 'create');
+    return obj;
+  }
 
   return plt;
 }

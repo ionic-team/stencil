@@ -81,36 +81,31 @@ export interface LoadComponentRegistry {
   [1]: string;
 
   /**
-   * controller module ids
-   */
-  [2]: string[];
-
-  /**
    * map of the mode styles and css bundle ids
    */
-  [3]: {
+  [2]: {
     [modeName: string]: string
   };
 
   /**
    * members
    */
-  [4]: ComponentMemberData[];
+  [3]: ComponentMemberData[];
 
   /**
    * listeners
    */
-  [5]: ComponentListenersData[];
+  [4]: ComponentListenersData[];
 
   /**
    * slot
    */
-  [6]: number;
+  [5]: number;
 
   /**
    * load priority
    */
-  [7]: number;
+  [6]: number;
 }
 
 
@@ -457,7 +452,7 @@ export interface PropDecorator {
 
 export interface PropOptions {
   context?: string;
-  controller?: string;
+  connect?: string;
   state?: boolean;
 }
 
@@ -551,7 +546,6 @@ export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
   moduleId?: string;
-  controllerModuleIds?: string[];
   styleIds?: {[modeName: string]: string };
   stylesMeta?: StylesMeta;
   membersMeta?: MembersMeta;
@@ -664,8 +658,8 @@ export interface HostElement extends HTMLElement {
   attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
 
-  // PUBLIC METHODS
-  componentDidLoad?: () => void;
+  // public methods
+  componentOnReady?: (cb: (elm: HostElement) => void) => void;
 
   // public properties
   $instance?: ComponentInstance;
@@ -689,6 +683,7 @@ export interface HostElement extends HTMLElement {
   _queuedEvents?: any[];
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
+  _onReadyCallbacks: ((elm: HostElement) => void)[];
 }
 
 
@@ -803,6 +798,7 @@ export interface PlatformApi {
   registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
+  propConnect: (ctrlTag: string) => PropConnect;
   loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
   render?: RendererApi;
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
@@ -812,6 +808,11 @@ export interface PlatformApi {
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;
   onError: (type: number, err: any, elm: HostElement) => void;
+}
+
+
+export interface PropConnect {
+  create(opts?: any): Promise<any>;
 }
 
 
@@ -1061,7 +1062,8 @@ export interface ComponentData {
   listeners?: ListenerData[];
   methods?: MethodData[];
   events?: EventData[];
-  context?: ControllerData[];
+  connect?: ConnectData[];
+  context?: ContextData[];
   hostElement?: HostElementData;
   host?: any;
   assetPaths?: string[];
@@ -1114,10 +1116,14 @@ export interface EventData {
   composed?: boolean;
 }
 
-export interface ControllerData {
+export interface ConnectData {
   name: string;
-  controllerComponent?: string;
-  context?: string;
+  tag?: string;
+}
+
+export interface ContextData {
+  name: string;
+  id?: string;
 }
 
 export interface HostElementData {

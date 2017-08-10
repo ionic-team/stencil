@@ -1,6 +1,7 @@
 import { catchError } from '../../util';
 import { Diagnostic, ModuleFile, MemberMeta, PropOptions } from '../../../util/interfaces';
-import { MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT, TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
+import { MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONNECT,
+  MEMBER_PROP_CONTEXT, TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -89,6 +90,11 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
       }
 
       if (userPropOptions) {
+        if (typeof userPropOptions.connect === 'string') {
+          propMeta.memberType = MEMBER_PROP_CONNECT;
+          propMeta.ctrlId = userPropOptions.connect;
+        }
+
         if (typeof userPropOptions.context === 'string') {
           propMeta.memberType = MEMBER_PROP_CONTEXT;
           propMeta.ctrlId = userPropOptions.context;

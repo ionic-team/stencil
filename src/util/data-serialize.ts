@@ -1,7 +1,7 @@
 import { Bundle, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta, LoadComponentRegistry,
   MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
 import { HAS_SLOTS, HAS_NAMED_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD,
-  MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT,
+  MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT,
   MEMBER_STATE, TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
 
 
@@ -10,7 +10,6 @@ export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadCompone
   const d: any[] = [
     cmpMeta.tagNameMeta.toUpperCase(),
     cmpMeta.moduleId,
-    cmpMeta.controllerModuleIds,
     formatStyles(cmpMeta.stylesMeta),
     formatObserveAttributeProps(cmpMeta.membersMeta),
     formatListeners(cmpMeta.listenersMeta),
@@ -233,8 +232,11 @@ function formatMemberType(val: number) {
   if (val === MEMBER_STATE) {
     return `/** state **/ ${MEMBER_STATE}`;
   }
+  if (val === MEMBER_PROP_CONNECT) {
+    return `/** prop connect **/ ${MEMBER_PROP_CONNECT}`;
+  }
   if (val === MEMBER_PROP_CONTEXT) {
-    return `/** prop global **/ ${MEMBER_PROP_CONTEXT}`;
+    return `/** prop context **/ ${MEMBER_PROP_CONTEXT}`;
   }
   return `/** unknown ****/ 0`;
 }

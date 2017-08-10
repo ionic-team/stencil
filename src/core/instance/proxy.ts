@@ -1,7 +1,7 @@
 import { ComponentInstance, ComponentMeta, ComponentInternalValues,
-  HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
+  DomApi, HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { parsePropertyValue } from '../../util/data-parse';
-import { MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT,
+import { MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT, MEMBER_PROP_CONNECT,
   MEMBER_STATE, MEMBER_ELEMENT_REF, PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
 import { queueUpdate } from './update';
 
@@ -31,6 +31,10 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
         // @Prop({ context: 'config' })
         var contextObj = Context[memberMeta.ctrlId];
         contextObj && defineProperty(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
+
+      } else if (memberType === MEMBER_PROP_CONNECT) {
+        // @Prop({ connect: 'ion-loading-ctrl' })
+        defineProperty(instance, memberName, plt.propConnect(memberMeta.ctrlId));
 
       } else if (memberType === MEMBER_METHOD) {
         // add a value getter on the dom's element instance
@@ -201,3 +205,24 @@ function defineProperty(obj: any, propertyKey: string, value: any, getter?: any,
   }
   Object.defineProperty(obj, propertyKey, descriptor);
 }
+
+
+export function proxyControllerProp(domApi: DomApi, controllerComponents: {[tag: string]: HostElement}, obj: any, ctrlTag: string, proxyMethodName: string) {
+  obj[proxyMethodName] = function() {
+    const orgArgs = arguments;
+
+    return new Promise(resolve => {
+      let ctrlElm = controllerComponents[ctrlTag];
+
+      if (!ctrlElm) {
+        ctrlElm = controllerComponents[ctrlTag] = domApi.$createElement(ctrlTag) as any;
+        domApi.$appendChild(domApi.$body, ctrlElm);
+      }
+
+      ctrlElm.componentOnReady((ctrlElm: any) => {
+        ctrlElm[proxyMethodName].apply(ctrlElm, orgArgs).then(resolve);
+      });
+    });
+  };
+}
+

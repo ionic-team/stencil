@@ -26,6 +26,10 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
     disconnectedCallback(plt, (this as HostElement));
   };
 
+  HostElementConstructor.componentOnReady = function(cb: (elm: HostElement) => void) {
+    componentOnReady((this as HostElement), cb);
+  };
+
   HostElementConstructor._queueUpdate = function() {
     queueUpdate(plt, (this as HostElement));
   };
@@ -37,6 +41,17 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
   HostElementConstructor._render = function(isInitialRender: boolean) {
     render(plt, (this as HostElement), isInitialRender);
   };
+}
+
+
+function componentOnReady(elm: HostElement, cb: (elm: HostElement) => void) {
+  if (!elm._hasDestroyed) {
+    if (elm._hasLoaded) {
+      cb(elm);
+    } else {
+      (elm._onReadyCallbacks = elm._onReadyCallbacks || []).push(cb);
+    }
+  }
 }
 
 
@@ -92,13 +107,22 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     // all of this element's children have loaded (if any)
     elm._hasLoaded = true;
 
-    // fire off the user's componentDidLoad method (if one was provided)
-    // componentDidLoad only runs ONCE, after the instance's element has been
-    // assigned as the host element, and AFTER render() has been called
-    // we'll also fire this method off on the element, just to
     try {
-      elm.componentDidLoad && elm.componentDidLoad();
+      // fire off the user's elm.componentOnReady() callbacks that were
+      // put directly on the element (well before anything was ready)
+      if (elm._onReadyCallbacks) {
+        elm._onReadyCallbacks.forEach(cb => {
+          cb(elm);
+        });
+        delete elm._onReadyCallbacks;
+      }
+
+      // fire off the user's componentDidLoad method (if one was provided)
+      // componentDidLoad only runs ONCE, after the instance's element has been
+      // assigned as the host element, and AFTER render() has been called
+      // we'll also fire this method off on the element, just to
       instance.componentDidLoad && instance.componentDidLoad();
+
     } catch (e) {
       plt.onError(DID_LOAD_ERROR, e, elm);
     }

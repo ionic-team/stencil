@@ -5,7 +5,7 @@ import { isDef } from './helpers';
 import { toDashCase } from '../util/helpers';
 
 
-export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry) {
+export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry, attr?: number) {
   // tag name will always be upper case
   const cmpMeta: ComponentMeta = {
     tagNameMeta: cmpRegistryData[0],
@@ -20,27 +20,24 @@ export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, r
   // this comonent's module id
   cmpMeta.moduleId = cmpRegistryData[1];
 
-  // array of all the controller module ids this component uses
-  cmpMeta.controllerModuleIds = cmpRegistryData[2];
-
   // map of the modes w/ bundle id and style data
-  cmpMeta.styleIds = cmpRegistryData[3] || {};
+  cmpMeta.styleIds = cmpRegistryData[2] || {};
 
   // parse member meta
   // this data only includes props that are attributes that need to be observed
   // it does not include all of the props yet
-  parseMembersData(cmpMeta, cmpRegistryData[4]);
+  parseMembersData(cmpMeta, cmpRegistryData[3], attr);
 
-  if (cmpRegistryData[5]) {
+  if (cmpRegistryData[4]) {
     // parse listener meta
-    cmpMeta.listenersMeta = cmpRegistryData[5].map(parseListenerData);
+    cmpMeta.listenersMeta = cmpRegistryData[4].map(parseListenerData);
   }
 
   // slot
-  cmpMeta.slotMeta = cmpRegistryData[6];
+  cmpMeta.slotMeta = cmpRegistryData[5];
 
   // bundle load priority
-  cmpMeta.loadPriority = cmpRegistryData[7];
+  cmpMeta.loadPriority = cmpRegistryData[6];
 
   return registry[cmpMeta.tagNameMeta] = cmpMeta;
 }
@@ -57,14 +54,14 @@ function parseListenerData(listenerData: ComponentListenersData) {
 }
 
 
-function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberData[]) {
+function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberData[], attr?: number) {
   if (memberData) {
     cmpMeta.membersMeta = cmpMeta.membersMeta || {};
     for (var i = 0; i < memberData.length; i++) {
       var d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        attribName: Context.attr === ATTR_LOWER_CASE ? d[0].toLowerCase() : toDashCase(d[0]),
+        attribName: attr === ATTR_LOWER_CASE ? d[0].toLowerCase() : toDashCase(d[0]),
         propType: d[2],
         ctrlId: d[3]
       };
@@ -73,7 +70,7 @@ function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberDat
 }
 
 
-export function parseComponentMeta(registry: ComponentRegistry, moduleImports: any, cmpMetaData: LoadComponentMeta) {
+export function parseComponentMeta(registry: ComponentRegistry, moduleImports: any, cmpMetaData: LoadComponentMeta, attr?: number) {
   // tag name will always be upper case
   const cmpMeta = registry[cmpMetaData[0]];
 
@@ -82,7 +79,7 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
   cmpMeta.componentModule = moduleImports[cmpMetaData[0]];
 
   // component members
-  parseMembersData(cmpMeta, cmpMetaData[1]);
+  parseMembersData(cmpMeta, cmpMetaData[1], attr);
 
   // host element meta
   cmpMeta.hostMeta = cmpMetaData[2];

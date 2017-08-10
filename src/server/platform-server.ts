@@ -11,6 +11,7 @@ import { h, t } from '../core/renderer/h';
 import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, LOAD_BUNDLE_ERROR, QUEUE_EVENTS_ERROR, RENDER_ERROR, WILL_LOAD_ERROR } from '../util/constants';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
+import { proxyControllerProp } from '../core/instance/proxy';
 
 
 export function createPlatformServer(
@@ -28,6 +29,7 @@ export function createPlatformServer(
   const pendingModuleFileReads: {[url: string]: boolean} = {};
   const pendingStyleFileReads: {[url: string]: boolean} = {};
   const stylesMap: FilesMap = {};
+  const controllerComponents: {[tag: string]: HostElement} = {};
 
 
   // initialize Core global object
@@ -63,6 +65,7 @@ export function createPlatformServer(
   const plt: PlatformApi = {
     defineComponent,
     getComponentMeta,
+    propConnect,
     loadBundle,
     connectHostElement,
     queue: createQueueServer(),
@@ -127,7 +130,7 @@ export function createPlatformServer(
     importFn(moduleImports, h, t, Context, appBuildDir);
 
     for (var i = 2; i < args.length; i++) {
-      parseComponentMeta(registry, moduleImports, args[i]);
+      parseComponentMeta(registry, moduleImports, args[i], Context.attr);
     }
 
     // fire off all the callbacks waiting on this bundle to load
@@ -276,6 +279,12 @@ export function createPlatformServer(
     }
 
     diagnostics.push(d);
+  }
+
+  function propConnect(ctrlTag: string) {
+    const obj: any = {};
+    proxyControllerProp(domApi, controllerComponents, obj, ctrlTag, 'create');
+    return obj;
   }
 
   return plt;
