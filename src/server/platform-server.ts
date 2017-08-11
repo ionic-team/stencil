@@ -85,13 +85,17 @@ export function createPlatformServer(
   const rootNode = <HostElement>domApi.$documentElement;
   rootNode._activelyLoadingChildren = [];
   rootNode._initLoad = function appLoadedCallback() {
-    // check we've only fully loaded when all of the styles have loaded also
-    if (plt.onAppLoad && Object.keys(pendingStyleFileReads).length === 0 && !rootNode._hasLoaded) {
-      rootNode._hasLoaded = true;
-
-      plt.onAppLoad(rootNode, stylesMap);
-    }
+    rootNode._hasLoaded = true;
+    appLoaded();
   };
+
+  function appLoaded() {
+    if (rootNode._hasLoaded && Object.keys(pendingStyleFileReads).length === 0) {
+      // the root node has loaded
+      // and there are no css files still loading
+      plt.onAppLoad && plt.onAppLoad(rootNode, stylesMap);
+    }
+  }
 
   function connectHostElement(elm: HostElement, slotMeta: number) {
     // set the "mode" property
@@ -223,7 +227,7 @@ export function createPlatformServer(
 
               // check if the entire app is done loading or not
               // and if this was the last thing the app was waiting on
-              rootNode._initLoad();
+              appLoaded();
 
             }).catch(err => {
               onError(LOAD_BUNDLE_ERROR, err, elm);
