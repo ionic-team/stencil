@@ -65,7 +65,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     if (rootElm) {
       try {
         // optimize this document!!
-        optimizeHtml(config, ctx, doc, stylesMap, opts, hydrateResults);
+        optimizeHtml(config, ctx, doc, stylesMap, opts, hydrateResults.diagnostics);
 
         // serialize this dom back into a string
         hydrateResults.html = dom.serialize();

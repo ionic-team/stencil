@@ -985,7 +985,8 @@ export interface HydrateOptions {
   cookie?: string;
   dir?: string;
   lang?: string;
-  removeUnusedCss?: boolean;
+  inlineStyles?: boolean;
+  removeUnusedStyles?: boolean;
   reduceHtmlWhitepace?: boolean;
   inlineLoaderScript?: boolean;
 }

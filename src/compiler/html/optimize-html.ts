@@ -1,47 +1,21 @@
-import { BuildConfig, BuildContext, FilesMap, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Diagnostic, FilesMap, HydrateOptions } from '../../util/interfaces';
 import { inlineLoaderScript } from './inline-loader-script';
 import { reduceHtmlWhitepace } from './reduce-html-whitespace';
-import { removeUnusedCss } from '../css/remove-unused-css';
-import { UsedSelectors } from './used-selectors';
+import { inlineStyles } from '../css/inline-styles';
 
 
-export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, hydrateResults: HydrateResults) {
-  const styleFileNames = Object.keys(stylesMap);
+export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, diagnostics: Diagnostic[]) {
+  if (opts.inlineStyles !== false) {
+    try {
+      inlineStyles(config, doc, stylesMap, opts, diagnostics);
 
-  if (styleFileNames.length) {
-    let styles = '';
-
-    if (opts.removeUnusedCss !== false) {
-      // removeUnusedCss is the default
-      try {
-        // pick out all of the selectors that are actually
-        // being used in the html document
-        const usedSelectors = new UsedSelectors(doc.documentElement);
-
-        const cssFilePaths = Object.keys(stylesMap);
-
-        styles = cssFilePaths.map(cssFilePath => {
-          return removeUnusedCss(config, usedSelectors, stylesMap[cssFilePath], cssFilePath, hydrateResults.diagnostics);
-        }).join('');
-
-      } catch (e) {
-        hydrateResults.diagnostics.push({
-          level: 'error',
-          type: 'hydrate',
-          header: 'HTML Selector Parse',
-          messageText: e
-        });
-      }
-
-    } else {
-      styles = styleFileNames.map(styleFileName => stylesMap[styleFileName]).join('');
-    }
-
-    // insert our styles to the head of the document
-    if (styles) {
-      const styleElm = doc.createElement('style');
-      styleElm.innerHTML = styles;
-      doc.head.insertBefore(styleElm, doc.head.firstChild);
+    } catch (e) {
+      diagnostics.push({
+        level: 'error',
+        type: 'hydrate',
+        header: 'Inline Styles',
+        messageText: e
+      });
     }
   }
 
@@ -52,7 +26,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
       inlineLoaderScript(config, ctx, doc);
 
     } catch (e) {
-      hydrateResults.diagnostics.push({
+      diagnostics.push({
         level: 'error',
         type: 'hydrate',
         header: 'Inline Loader Script',
@@ -67,7 +41,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
       reduceHtmlWhitepace(doc.body);
 
     } catch (e) {
-      hydrateResults.diagnostics.push({
+      diagnostics.push({
         level: 'error',
         type: 'hydrate',
         header: 'Reduce HTML Whitespace',

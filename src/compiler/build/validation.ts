@@ -133,8 +133,11 @@ export function validateBuildConfig(config: BuildConfig) {
     if (typeof config.prerenderIndex.reduceHtmlWhitepace !== 'boolean') {
       config.prerenderIndex.reduceHtmlWhitepace = DEFAULT_PRERENDER_INDEX.reduceHtmlWhitepace;
     }
-    if (typeof config.prerenderIndex.removeUnusedCss !== 'boolean') {
-      config.prerenderIndex.removeUnusedCss = DEFAULT_PRERENDER_INDEX.removeUnusedCss;
+    if (typeof config.prerenderIndex.inlineStyles !== 'boolean') {
+      config.prerenderIndex.inlineStyles = DEFAULT_PRERENDER_INDEX.removeUnusedStyles;
+    }
+    if (typeof config.prerenderIndex.removeUnusedStyles !== 'boolean') {
+      config.prerenderIndex.removeUnusedStyles = DEFAULT_PRERENDER_INDEX.removeUnusedStyles;
     }
   }
 
@@ -278,6 +281,7 @@ const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?
 
 const DEFAULT_PRERENDER_INDEX: HydrateOptions = {
   inlineLoaderScript: true,
-  removeUnusedCss: true,
+  inlineStyles: true,
+  removeUnusedStyles: true,
   reduceHtmlWhitepace: true
 };

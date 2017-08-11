@@ -201,7 +201,15 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
         const linkElm = domApi.$createElement('link');
         linkElm.href = publicPath + styleId + '.css';
         linkElm.rel = 'stylesheet';
-        domApi.$insertBefore(domApi.$head, linkElm, domApi.$head.firstChild);
+
+        // insert these styles after the last styles we've already inserted
+        // which could include the SSR styles, or the loader's hydrate css script's styles
+        const insertedStyles = domApi.$head.querySelectorAll('[data-styles]');
+        let insertBeforeRef = insertedStyles[insertedStyles.length - 1] || domApi.$head.firstChild;
+        if (insertBeforeRef) {
+          insertBeforeRef = insertBeforeRef.nextSibling;
+        }
+        domApi.$insertBefore(domApi.$head, linkElm, insertBeforeRef);
       }
     }
   }

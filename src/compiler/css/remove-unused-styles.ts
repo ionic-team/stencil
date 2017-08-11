@@ -4,7 +4,7 @@ import { StringifyCss } from './stringify-css';
 import { UsedSelectors } from '../html/used-selectors';
 
 
-export function removeUnusedCss(config: BuildConfig, usedSelectors: UsedSelectors, cssContent: string, cssFilePath?: string, diagnostics?: Diagnostic[]) {
+export function removeUnusedStyles(config: BuildConfig, usedSelectors: UsedSelectors, cssContent: string, cssFilePath?: string, diagnostics?: Diagnostic[]) {
   let cleanedCss = cssContent;
 
   try {
