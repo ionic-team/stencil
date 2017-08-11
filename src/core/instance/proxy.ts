@@ -1,8 +1,9 @@
 import { ComponentInstance, ComponentMeta, ComponentInternalValues,
   DomApi, HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
-import { parsePropertyValue } from '../../util/data-parse';
+import { isDef } from '../../util/helpers';
 import { MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT, MEMBER_PROP_CONNECT,
   MEMBER_STATE, MEMBER_ELEMENT_REF, PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
+import { parsePropertyValue } from '../../util/data-parse';
 import { queueUpdate } from './update';
 
 
@@ -30,7 +31,9 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
       if (memberType === MEMBER_PROP_CONTEXT) {
         // @Prop({ context: 'config' })
         var contextObj = plt.getContextItem(memberMeta.ctrlId);
-        contextObj && defineProperty(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
+        if (isDef(contextObj)) {
+          defineProperty(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
+        }
 
       } else if (memberType === MEMBER_PROP_CONNECT) {
         // @Prop({ connect: 'ion-loading-ctrl' })
@@ -168,17 +171,17 @@ function initProp(
     // @Prop() and @Prop({ state: true })
     // have both getters and setters on the DOM element
     // @State() getters and setters should not be assigned to the element
-    defineProperty(elm, memberName, 0, getValue, setValue);
+    defineProperty(elm, memberName, undefined, getValue, setValue);
   }
 
   if (memberType === MEMBER_PROP_STATE || memberType === MEMBER_STATE) {
     // @Prop({ state: true }) and @State()
     // have both getters and setters on the instance
-    defineProperty(instance, memberName, 0, getValue, setValue);
+    defineProperty(instance, memberName, undefined, getValue, setValue);
 
   } else if (memberType === MEMBER_PROP) {
     // @Prop() only has getters, but not setters on the instance
-    defineProperty(instance, memberName, 0, getValue, function invalidSetValue() {
+    defineProperty(instance, memberName, undefined, getValue, function invalidSetValue() {
       // this is not a stateful @Prop()
       // so do not update the instance or host element
       // TODO: remove this warning in prod mode
@@ -194,14 +197,16 @@ function defineProperty(obj: any, propertyKey: string, value: any, getter?: any,
   const descriptor: PropertyDescriptor = {
     configurable: true
   };
-  if (value) {
+  if (value !== undefined) {
     descriptor.value = value;
-  }
-  if (getter) {
-    descriptor.get = getter;
-  }
-  if (setter) {
-    descriptor.set = setter;
+
+  } else {
+    if (getter) {
+      descriptor.get = getter;
+    }
+    if (setter) {
+      descriptor.set = setter;
+    }
   }
   Object.defineProperty(obj, propertyKey, descriptor);
 }
