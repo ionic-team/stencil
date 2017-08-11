@@ -29,7 +29,7 @@
     "dev": "(npm run transpile && node scripts/dev-watch.js) & npm run transpile.watch",
     "publish": "np",
     "start": "npm install && npm run build",
-    "test": "(jest --no-cache || true)",
+    "test": "jest --no-cache",
     "test.watch": "jest --watch",
     "transpile": "npm run transpile.compiler && npm run transpile.core",
     "transpile.compiler": "tsc -p src/compiler/tsconfig.json",

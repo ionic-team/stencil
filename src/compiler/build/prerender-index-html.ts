@@ -43,8 +43,12 @@ function prerenderHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: str
     // create the hydrate options
     const hydrateOpts = Object.assign({}, rendererConfig.prerenderIndex);
 
+    // create a deep copy of the registry so any changes inside the render
+    // don't affect what we'll be saving
+    const registry = JSON.parse(JSON.stringify(ctx.registry));
+
     // create a server-side renderer
-    const renderer = createRenderer(rendererConfig, ctx.registry, ctx);
+    const renderer = createRenderer(rendererConfig, registry, ctx);
 
     // set the input html which we just read from the src index html file
     hydrateOpts.html = indexSrcHtml;

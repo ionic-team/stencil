@@ -9,9 +9,14 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
-    it('should default prerenderIndex.removeUnusedCss', () => {
+    it('should default prerenderIndex.inlineStyles', () => {
       validateBuildConfig(config);
-      expect(config.prerenderIndex.removeUnusedCss).toBe(true);
+      expect(config.prerenderIndex.inlineStyles).toBe(true);
+    });
+
+    it('should default prerenderIndex.removeUnusedStyles', () => {
+      validateBuildConfig(config);
+      expect(config.prerenderIndex.removeUnusedStyles).toBe(true);
     });
 
     it('should default prerenderIndex.reduceHtmlWhitepace', () => {

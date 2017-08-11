@@ -1,10 +1,10 @@
 import { BuildConfig } from '../../../util/interfaces';
 import { mockHtml } from '../../../test';
-import { removeUnusedCss } from '../remove-unused-css';
+import { removeUnusedStyles } from '../remove-unused-styles';
 import { UsedSelectors } from '../../html/used-selectors';
 
 
-describe('removeUnusedCss', () => {
+describe('removeUnusedStyles', () => {
 
   it('should remove unused nested selectors', () => {
     let usedSelectors = new UsedSelectors(mockHtml(`
@@ -14,7 +14,7 @@ describe('removeUnusedCss', () => {
       </div>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       [dir="ltr"] h1+h2 { font: used; }
       [dir="ltr"] h1+h3 { font: unused; }
     `);
@@ -30,7 +30,7 @@ describe('removeUnusedCss', () => {
       </div>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       div label { font: used; }
       div label#usedId { font: used; }
       div label#usedId.my-used { font: used; }
@@ -51,7 +51,7 @@ describe('removeUnusedCss', () => {
       </div>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       div { font: used; }
       label { font: used; }
       div label { font: used; }
@@ -76,7 +76,7 @@ describe('removeUnusedCss', () => {
       </div>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       label { font: used; }
       label#usedId { font: used; }
       label#unusedId { font: unused; }
@@ -96,7 +96,7 @@ describe('removeUnusedCss', () => {
       <label mph="88">Used</label>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       label { font: used; }
       label[mph="88"] { font: used; }
       label[unused="val"] { font: unused; }
@@ -112,7 +112,7 @@ describe('removeUnusedCss', () => {
       <label class="div">Used</label>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       div { font: unused }
       label { font: used }
     `);
@@ -126,7 +126,7 @@ describe('removeUnusedCss', () => {
       <div class="used-class"></div>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       .unused-class, .unused-class2 { font: unused }
       .used-class { font: used }
     `);
@@ -141,7 +141,7 @@ describe('removeUnusedCss', () => {
       <div class="used-class"></div>
     `));
 
-    let css = removeUnusedCss(config, usedSelectors, `
+    let css = removeUnusedStyles(config, usedSelectors, `
       .used-class { font: used }
       .unused-class { font: unused }
     `);
