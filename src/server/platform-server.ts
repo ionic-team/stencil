@@ -8,7 +8,8 @@ import { createQueueServer } from './queue-server';
 import { createRenderer } from '../core/renderer/patch';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
-import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, LOAD_BUNDLE_ERROR, QUEUE_EVENTS_ERROR, RENDER_ERROR, WILL_LOAD_ERROR } from '../util/constants';
+import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, LOAD_BUNDLE_ERROR, MEMBER_PROP,
+  QUEUE_EVENTS_ERROR, RENDER_ERROR, WILL_LOAD_ERROR } from '../util/constants';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
 import { proxyControllerProp } from '../core/instance/proxy';
@@ -116,6 +117,12 @@ export function createPlatformServer(
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
+    // default mode and color props
+    cmpMeta.membersMeta = cmpMeta.membersMeta || {};
+
+    cmpMeta.membersMeta.mode = { memberType: MEMBER_PROP };
+    cmpMeta.membersMeta.color = { memberType: MEMBER_PROP, attribName: 'color' };
+
     // registry tags are always UPPER-CASE
     const registryTag = cmpMeta.tagNameMeta.toUpperCase();
     registry[registryTag] = cmpMeta;
