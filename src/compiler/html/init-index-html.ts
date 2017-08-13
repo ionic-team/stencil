@@ -20,22 +20,11 @@ export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostic
     config.sys.fs.accessSync(config.indexHtmlSrc);
 
   } catch (e) {
-    // there is no src index.html file, which is fine
+    // there is no src index.html file in the config, which is fine
     // since there is no src index file at all, don't bother
     // this isn't actually an error, don't worry about it
     return true;
   }
-
-  try {
-    // we do know they have a src index.html file
-    // let's see if we're already written a build index.html
-    config.sys.fs.accessSync(config.indexHtmlBuild);
-
-    // if we got here, then that means they already have an index.html build file
-    // so we're good, no need to overwrite the existing one with a filler one
-    return true;
-
-  } catch (e) {}
 
   try {
     // ok, so we haven't written an index.html build file yet
