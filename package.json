@@ -39,16 +39,16 @@
     "transpile.watch": "tsc -p src/compiler/tsconfig.json -w & tsc -p src/tsconfig.json -w"
   },
   "dependencies": {
-    "chalk": "^1.1.3",
+    "chalk": "^2.1.0",
     "chokidar": "^1.7.0",
     "clean-css": "^4.1.5",
     "jsdom": "^11.0.0",
     "node-fetch": "^1.7.1",
     "node-sass": "^4.5.0",
-    "rollup": "0.41.4",
-    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup": "^0.47.2",
+    "rollup-plugin-commonjs": "^8.1.0",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "typescript": "^2.5.0-dev.20170803",
+    "typescript": "^2.5.0-dev.20170808",
     "uglify-es": "^3.0.26"
   },
   "devDependencies": {
@@ -76,9 +76,15 @@
     "memory-fs": "^0.4.1",
     "np": "^2.16.0",
     "rimraf": "2.6.1",
-    "tslint": "^5.1.0",
+    "tslint": "^5.6.0",
     "tslint-ionic-rules": "0.0.8"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ionic-team/stencil-starter.git"
+  },
+  "author": "Ionic Team",
+  "homepage": "https://github.com/ionic-team/stencil",
   "jest": {
     "testEnvironment": "node",
     "moduleFileExtensions": [

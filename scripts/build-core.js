@@ -77,7 +77,7 @@ function bundleClientCore(coreEntryFile, outputDevFile, outputProdFile, es6Class
     entry: coreEntryFile
   })
   .then((bundle) => {
-    generateClientCoreDev(bundle, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode);
+    return generateClientCoreDev(bundle, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode);
   })
   .catch(err => {
     console.log(err);
@@ -87,32 +87,33 @@ function bundleClientCore(coreEntryFile, outputDevFile, outputProdFile, es6Class
 
 
 function generateClientCoreDev(bundle, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode) {
-  var clientCore = bundle.generate({
+  return bundle.generate({
     format: 'es',
     intro: '(function(window, document, Context, appNamespace, publicPath) {\n"use strict";\n',
     outro: '})(window, document, Context, appNamespace, publicPath);'
-  });
 
-  var devCode = clientCore.code;
+  }).then(clientCore => {
+    var devCode = clientCore.code;
 
-  devCode = transpile(devCode);
+    devCode = transpile(devCode);
 
-  if (es5) {
-    // uber transpile hack so we can do without the polyfill runtimes
-    devCode = devCode.replace(/class VNode \{\}/g, 'var VNode = function VNode() {}');
-  }
+    if (es5) {
+      // uber transpile hack so we can do without the polyfill runtimes
+      devCode = devCode.replace(/class VNode \{\}/g, 'var VNode = function VNode() {}');
+    }
 
-  fs.writeFile(outputDevFile, devCode, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('built dev:', outputDevFile);
+    fs.writeFile(outputDevFile, devCode, (err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('built dev:', outputDevFile);
+      }
+    });
+
+    if (!isDevMode) {
+      generateClientCoreProd(devCode, outputDevFile, outputProdFile, es6ClassHack)
     }
   });
-
-  if (!isDevMode) {
-    generateClientCoreProd(devCode, outputDevFile, outputProdFile, es6ClassHack)
-  }
 }
 
 

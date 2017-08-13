@@ -263,7 +263,7 @@ export interface AppRegistry {
   namespace: string;
   loader: string;
   core?: string;
-  coreEs5?: string;
+  corePolyfilled?: string;
   global?: string;
   components: LoadComponentRegistry[];
 }
@@ -326,7 +326,7 @@ export interface BuildContext {
   appFiles?: {
     loader?: string;
     core?: string;
-    coreEs5?: string;
+    corePolyfilled?: string;
     global?: string;
     registryJson?: string;
     indexHtml?: string;
@@ -935,10 +935,10 @@ export interface StencilSystem {
           globals?: {[key: string]: any};
           moduleName?: string;
           plugins?: any;
-        }): {
+        }): Promise<{
           code: string;
           map: any;
-        }}
+        }>}
       }>;
     };
     plugins: { [pluginName: string]: any };

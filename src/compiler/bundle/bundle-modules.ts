@@ -194,7 +194,7 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
 
   }).catch(err => {
     loadRollupDiagnostics(config, ctx.diagnostics, err);
-    return null;
+    // return null;
 
   }).then(rollupBundle => {
     if (hasError(ctx.diagnostics) || !rollupBundle) {
@@ -202,18 +202,20 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     }
 
     // generate the bundler results
-    const results = rollupBundle.generate({
+    return rollupBundle.generate({
       format: 'es'
+
+    }).then(results => {
+      // module bundling finished, assign its content to the user's bundle
+      bundleDetails.content = `function importComponent(exports, h, t, Context, publicPath) {\n${results.code.trim()}\n}`;
+
+      // cache for later
+      ctx.moduleBundleOutputs[bundleId] = bundleDetails.content;
+
+      bundleDetails.writeFile = true;
+      return bundleDetails;
+
     });
-
-    // module bundling finished, assign its content to the user's bundle
-    bundleDetails.content = `function importComponent(exports, h, t, Context, publicPath) {\n${results.code.trim()}\n}`;
-
-    // cache for later
-    ctx.moduleBundleOutputs[bundleId] = bundleDetails.content;
-
-    bundleDetails.writeFile = true;
-    return bundleDetails;
   });
 }
 

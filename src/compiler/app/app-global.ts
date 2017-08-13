@@ -74,7 +74,7 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, namespace: 
 
   }).catch(err => {
     loadRollupDiagnostics(config, ctx.diagnostics, err);
-    return null;
+    // return null;
 
   })
 
@@ -84,10 +84,12 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, namespace: 
       return '';
     }
 
-    const results = rollupBundle.generate({
+    return rollupBundle.generate({
       format: 'es'
+
+    }).then(results => {
+      return wrapGlobalJs(config, ctx, namespace, results.code);
     });
-    return wrapGlobalJs(config, ctx, namespace, results.code);
 
   }).then(output => {
 
