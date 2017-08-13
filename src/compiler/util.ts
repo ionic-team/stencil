@@ -319,8 +319,7 @@ export function generatePreamble(config: BuildConfig) {
     return preamble.join('\n');
   }
 
-  return `/*! ${BANNER} */\n\n`;
-
+  return `/*! ${BANNER} */\n`;
 }
 
 

@@ -22,33 +22,47 @@ export function generateCore(config: BuildConfig, globalJsContent: string[]) {
 }
 
 
-export function generateCoreEs5(config: BuildConfig, globalJsContent: string[]) {
+export function generateCoreES5WithPolyfills(config: BuildConfig, globalJsContent: string[]) {
+  const sys = config.sys;
   let staticName = CORE_NAME + '.es5';
   if (config.devMode) {
     staticName += '.dev';
   }
   staticName += '.js';
 
-  const documentRegistryPolyfill = config.sys.path.join('polyfills', 'document-register-element.js');
+  const readFilePromises: Promise<string>[] = [];
 
-  return Promise.all([
-    config.sys.getClientCoreFile({ staticName: staticName }),
-    config.sys.getClientCoreFile({ staticName: documentRegistryPolyfill })
+  // first concat all of the polyfills
+  [
+    'document-register-element.js',
+    'fetch.js',
+    'performance-now.js'
+  ].forEach(polyfillFile => {
+    const staticName = sys.path.join('polyfills', polyfillFile);
+    readFilePromises.push(sys.getClientCoreFile({ staticName: staticName }));
+  });
 
-  ]).then(results => {
-    const coreContent = results[0];
-    const docRegistryPolyfillContent = results[1];
+  // concat the main core file
+  readFilePromises.push(sys.getClientCoreFile({ staticName: staticName }));
+
+  return Promise.all(readFilePromises).then(results => {
+    const docRegistryPolyfillContent = results[0];
+    const fetchPolyfillContent = results[1];
+    const perfNowPolyfillContent = results[2];
+
+    const coreContent = wrapCoreJs(config, [
+      globalJsContent.join('\n'),
+      results[3]
+    ].join('\n').trim());
 
     // replace the default core with the project's namespace
     // concat the custom element polyfill and projects core code
-    const jsContent = [
-      docRegistryPolyfillContent + '\n\n',
-      generatePreamble(config),
-      globalJsContent.join('\n'),
+    return [
+      docRegistryPolyfillContent,
+      fetchPolyfillContent,
+      perfNowPolyfillContent,
       coreContent
     ].join('\n').trim();
-
-    return wrapCoreJs(config, jsContent);
   });
 }
 

@@ -11,21 +11,21 @@ describe('build-project-files', () => {
     it('should set the loader arguments', () => {
       config.namespace = 'MyApp';
       config.publicPath = 'build/';
-      const publicpath = getAppPublicPath(config);
-      const projectCoreFileName = 'myapp.core.js';
-      const projectCoreEs5FileName = 'myapp.core.ce.js';
+      const publicPath = getAppPublicPath(config);
+      const appCoreFileName = 'myapp.core.js';
+      const appCorePolyfilledFileName = 'myapp.core.pf.js';
       const componentRegistry: LoadComponentRegistry[] = [];
 
       const projectLoader = injectAppIntoLoader(
         config,
-        projectCoreFileName,
-        projectCoreEs5FileName,
-        publicpath,
+        appCoreFileName,
+        appCorePolyfilledFileName,
+        publicPath,
         componentRegistry,
         mockStencilContent
       );
 
-      expect(projectLoader).toBe(`("MyApp","build/myapp/myapp.core.js","build/myapp/myapp.core.ce.js",[])`);
+      expect(projectLoader).toBe(`("MyApp","build/myapp/myapp.core.js","build/myapp/myapp.core.pf.js",[])`);
     });
 
   });

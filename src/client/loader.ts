@@ -1,7 +1,7 @@
 import { LoadComponentRegistry } from '../util/interfaces';
 
 
-(function(window: any, document: Document, appNamespace: string, appCore?: string, appCoreEs5?: string, components?: LoadComponentRegistry[], x?: any) {
+(function(window: any, document: Document, appNamespace: string, appCore?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any) {
   'use strict';
 
   // create global namespace if it doesn't already exist
@@ -12,12 +12,11 @@ import { LoadComponentRegistry } from '../util/interfaces';
   x = document.createElement('style');
   x.setAttribute('data-styles', '');
   x.innerHTML = (components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.💎{visibility:inherit}').toLowerCase();
-  x.innerHTML += 'ion-app:not(.💎){display:none}';
   document.head.insertBefore(x, document.head.firstChild);
 
   // request the core file this browser needs
   x = document.createElement('script');
-  x.src = (window.customElements ? appCore : appCoreEs5);
+  x.src = (window.customElements && window.fetch) ? appCore : appCorePolyfilled;
   document.head.appendChild(x);
 
 })(window, document, '__STENCIL__APP__');

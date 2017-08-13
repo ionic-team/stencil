@@ -21,7 +21,7 @@ describe('build', () => {
   //   return build(config, ctx).then(r => {
   //     expect(wroteFile(r, 'app.js')).toBe(true);
   //     expect(wroteFile(r, 'app.registry.json')).toBe(true);
-  //     expect(wroteFile(r, 'app.core.ce.js')).toBe(true);
+  //     expect(wroteFile(r, 'app.core.pf.js')).toBe(true);
   //     expect(wroteFile(r, 'app.core.js')).toBe(true);
 
   //     return new Promise(resolve => {
@@ -32,7 +32,7 @@ describe('build', () => {
   //     }).then((r: BuildResults) => {
   //       expect(wroteFile(r, 'app.js')).toBe(true);
   //       expect(wroteFile(r, 'app.registry.json')).toBe(true);
-  //       expect(wroteFile(r, 'app.core.ce.js')).toBe(false);
+  //       expect(wroteFile(r, 'app.core.pf.js')).toBe(false);
   //       expect(wroteFile(r, 'app.core.js')).toBe(false);
   //     });
   //   });
@@ -50,7 +50,7 @@ describe('build', () => {
     return build(config, ctx).then(r => {
       expect(wroteFile(r, 'app.js')).toBe(true);
       expect(wroteFile(r, 'app.registry.json')).toBe(true);
-      expect(wroteFile(r, 'app.core.ce.js')).toBe(true);
+      expect(wroteFile(r, 'app.core.pf.js')).toBe(true);
       expect(wroteFile(r, 'app.core.js')).toBe(true);
 
       return new Promise(resolve => {
@@ -60,7 +60,7 @@ describe('build', () => {
       }).then((r: BuildResults) => {
         expect(wroteFile(r, 'app.js')).toBe(false);
         expect(wroteFile(r, 'app.registry.json')).toBe(false);
-        expect(wroteFile(r, 'app.core.ce.js')).toBe(false);
+        expect(wroteFile(r, 'app.core.pf.js')).toBe(false);
         expect(wroteFile(r, 'app.core.js')).toBe(false);
       });
     });

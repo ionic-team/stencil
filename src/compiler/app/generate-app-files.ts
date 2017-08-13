@@ -1,7 +1,7 @@
 import { AppRegistry, BuildConfig, BuildContext } from '../../util/interfaces';
 import { CORE_NAME, GLOBAL_NAME } from '../../util/constants';
 import { formatComponentRegistry } from '../../util/data-serialize';
-import { generateCore, generateCoreEs5, getAppFileName} from './app-core';
+import { generateCore, generateCoreES5WithPolyfills, getAppFileName} from './app-core';
 import { generateLoader } from './app-loader';
 import { generateAppGlobal, generateGlobalJs } from './app-global';
 import { hasError, normalizePath } from '../util';
@@ -25,7 +25,7 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   };
 
   let appCoreFileName: string;
-  let appCoreEs5FileName: string;
+  let appCorePolyfilledFileName: string;
 
   // bundle the app's entry file (if one was provided)
   return generateAppGlobal(config, ctx).then(globalJsContents => {
@@ -41,20 +41,20 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 
     return Promise.all([
       generateCore(config, globalJsContents),
-      generateCoreEs5(config, globalJsContents)
+      generateCoreES5WithPolyfills(config, globalJsContents)
     ]);
 
   }).then(results => {
     const coreContent = results[0];
-    const coreEs5Content = results[1];
+    const coreEs5WithPolyfilledContent = results[1];
 
     if (config.devMode) {
       // dev mode core filename just keeps the same name, no content hashing
       appRegistry.core = `${appFileName}/${appFileName}.${CORE_NAME}.js`;
       appCoreFileName = `${appFileName}.${CORE_NAME}.js`;
 
-      appRegistry.coreEs5 = `${appFileName}/${appFileName}.${CORE_NAME}.ce.js`;
-      appCoreEs5FileName = `${appFileName}.${CORE_NAME}.ce.js`;
+      appRegistry.corePolyfilled = `${appFileName}/${appFileName}.${CORE_NAME}.pf.js`;
+      appCorePolyfilledFileName = `${appFileName}.${CORE_NAME}.pf.js`;
 
     } else {
       // prod mode renames the core file with its hashed content
@@ -62,9 +62,9 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
       appRegistry.core = `${appFileName}/${appFileName}.${contentHash}.js`;
       appCoreFileName = `${appFileName}.${contentHash}.js`;
 
-      const contentEs5Hash = sys.generateContentHash(coreEs5Content, config.hashedFileNameLength);
-      appRegistry.coreEs5 = `${appFileName}/${appFileName}.${contentEs5Hash}.ce.js`;
-      appCoreEs5FileName = `${appFileName}.${contentEs5Hash}.ce.js`;
+      const contentPolyfilledHash = sys.generateContentHash(coreEs5WithPolyfilledContent, config.hashedFileNameLength);
+      appRegistry.corePolyfilled = `${appFileName}/${appFileName}.${contentPolyfilledHash}.pf.js`;
+      appCorePolyfilledFileName = `${appFileName}.${contentPolyfilledHash}.pf.js`;
     }
 
     // write the app core file
@@ -76,18 +76,18 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
       ctx.appFileBuildCount++;
     }
 
-    // write the app core ES5 file
-    const appCoreEs5FilePath = normalizePath(sys.path.join(config.buildDir, appFileName, appCoreEs5FileName));
-    if (ctx.appFiles.coreEs5 !== coreEs5Content) {
-      // core es5 file is actually different from our last saved version
-      config.logger.debug(`build, app core es5: ${appCoreEs5FilePath}`);
-      ctx.filesToWrite[appCoreEs5FilePath] = ctx.appFiles.coreEs5 = coreEs5Content;
+    // write the app core polyfilled file
+    const appCorePolyfilledFilePath = normalizePath(sys.path.join(config.buildDir, appFileName, appCorePolyfilledFileName));
+    if (ctx.appFiles.corePolyfilled !== coreEs5WithPolyfilledContent) {
+      // core polyfilled file is actually different from our last saved version
+      config.logger.debug(`build, app core polyfilled: ${appCorePolyfilledFilePath}`);
+      ctx.filesToWrite[appCorePolyfilledFilePath] = ctx.appFiles.corePolyfilled = coreEs5WithPolyfilledContent;
       ctx.appFileBuildCount++;
     }
 
   }).then(() => {
     // create the loader after creating the loader file name
-    return generateLoader(config, appCoreFileName, appCoreEs5FileName, appRegistry.components).then(loaderContent => {
+    return generateLoader(config, appCoreFileName, appCorePolyfilledFileName, appRegistry.components).then(loaderContent => {
       // write the app loader file
       const appLoaderFileName = `${appRegistry.loader}`;
       const appLoaderFilePath = normalizePath(sys.path.join(config.buildDir, appLoaderFileName));

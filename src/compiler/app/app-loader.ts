@@ -7,7 +7,7 @@ import { getAppPublicPath } from './app-core';
 export function generateLoader(
   config: BuildConfig,
   appCoreFileName: string,
-  appCoreEs5FileName: string,
+  appCorePolyfilledFileName: string,
   componentRegistry: LoadComponentRegistry[]
 ) {
   const sys = config.sys;
@@ -26,7 +26,7 @@ export function generateLoader(
     stencilLoaderContent = injectAppIntoLoader(
       config,
       appCoreFileName,
-      appCoreEs5FileName,
+      appCorePolyfilledFileName,
       publicPath,
       componentRegistry,
       stencilLoaderContent
@@ -46,19 +46,19 @@ export function generateLoader(
 export function injectAppIntoLoader(
   config: BuildConfig,
   appCoreFileName: string,
-  appCoreEs5FileName: string,
+  appCorePolyfilledFileName: string,
   publicPath: string,
   componentRegistry: LoadComponentRegistry[],
   stencilLoaderContent: string
 ) {
   let componentRegistryStr = JSON.stringify(componentRegistry);
 
-  const projectCoreUrl = publicPath + appCoreFileName;
-  const projectCoreEs5Url = publicPath + appCoreEs5FileName;
+  const appCoreUrl = publicPath + appCoreFileName;
+  const appCorePolyfilledUrl = publicPath + appCorePolyfilledFileName;
 
   stencilLoaderContent = stencilLoaderContent.replace(
     APP_NAMESPACE_REGEX,
-    `"${config.namespace}","${projectCoreUrl}","${projectCoreEs5Url}",${componentRegistryStr}`
+    `"${config.namespace}","${appCoreUrl}","${appCorePolyfilledUrl}",${componentRegistryStr}`
   );
 
   if (config.minifyJs) {
