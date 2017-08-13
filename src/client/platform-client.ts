@@ -7,7 +7,6 @@ import { createDomControllerClient } from './dom-controller-client';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createRenderer } from '../core/renderer/patch';
 import { createQueueClient } from './queue-client';
-import { getNowFunction } from './now';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
@@ -25,7 +24,9 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   const controllerComponents: {[tag: string]: HostElement} = {};
 
   const domApi = createDomApi(doc);
-  const now = getNowFunction(win);
+  const now = function() {
+    return win.performance.now();
+  };
 
   // initialize Core global object
   Context.dom = createDomControllerClient(win, now);
