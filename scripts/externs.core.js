@@ -92,6 +92,7 @@ function customElements(){};
 function define(){};
 function didTimeout(){};
 function disconnectedCallback(){};
+function fetch(){};
 function host(){};
 function now(){};
 function observedAttributes(){};
