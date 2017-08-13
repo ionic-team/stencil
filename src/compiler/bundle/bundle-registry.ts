@@ -16,9 +16,13 @@ export function generateComponentRegistry(manifest: Manifest, styleResults: Styl
 
       // merge up the style id to the style data
       if (!registry[registryTag]) {
-        registry[registryTag] = manifest.modulesFiles.find(modulesFile => {
+        const moduleFile = manifest.modulesFiles.find(modulesFile => {
           return modulesFile.cmpMeta.tagNameMeta === tag;
-        }).cmpMeta;
+        });
+
+        if (moduleFile) {
+          registry[registryTag] = moduleFile.cmpMeta;
+        }
       }
 
       if (registry[registryTag]) {
@@ -42,9 +46,13 @@ export function generateComponentRegistry(manifest: Manifest, styleResults: Styl
       const registryTag = tag.toUpperCase();
 
       if (!registry[registryTag]) {
-        registry[registryTag] = manifest.modulesFiles.find(modulesFile => {
+        const moduleFile = manifest.modulesFiles.find(modulesFile => {
           return modulesFile.cmpMeta.tagNameMeta === tag;
-        }).cmpMeta;
+        });
+
+        if (moduleFile) {
+          registry[registryTag] = moduleFile.cmpMeta;
+        }
       }
 
       if (registry[registryTag]) {
