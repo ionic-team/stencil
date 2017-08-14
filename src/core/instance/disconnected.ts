@@ -6,7 +6,7 @@ import { invokeDestroy } from '../renderer/patch';
 export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
   // only disconnect if we're not temporarily disconnected
   // tmpDisconnected will happen when slot nodes are being relocated
-  if (!plt.tmpDisconnected) {
+  if (!plt.tmpDisconnected && isDisconnected(elm)) {
 
     // ok, let's officially destroy this thing
     // set this to true so that any of our pending async stuff
@@ -40,4 +40,15 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // (possible that it got disconnected, but the node was reused)
     elm._root = elm._vnode = elm._ancestorHostElement = elm._activelyLoadingChildren = elm._hasConnected = elm._isQueuedForUpdate = elm._hasLoaded = null;
   }
+}
+
+
+function isDisconnected(elm: HTMLElement) {
+  while (elm) {
+    if (elm.parentElement === null) {
+      return elm.tagName !== 'HTML';
+    }
+    elm = elm.parentElement;
+  }
+  return false;
 }
