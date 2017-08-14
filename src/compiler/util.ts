@@ -389,7 +389,7 @@ export function catchError(diagnostics: Diagnostic[], err: Error) {
 
 
 export function hasError(diagnostics: Diagnostic[]) {
-  return diagnostics.some(d => d.level === 'error');
+  return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 }
 
 

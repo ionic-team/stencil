@@ -1,4 +1,5 @@
 import { BuildConfig, BuildResults, Diagnostic } from '../../util/interfaces';
+import { buildIndexHtml } from './index-html';
 import { bundle } from '../bundle/bundle';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
@@ -7,7 +8,6 @@ import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnos
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
 import { initIndexHtml } from '../html/init-index-html';
-import { prerenderIndexHtml } from './prerender-index-html';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
 import { writeBuildFiles } from './write-build';
@@ -68,7 +68,7 @@ export function build(config: BuildConfig, context?: any) {
 
   }).then(() => {
     // prerender index.html
-    return prerenderIndexHtml(config, ctx);
+    return buildIndexHtml(config, ctx);
 
   }).then(() => {
     // write all the files and copy asset files

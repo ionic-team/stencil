@@ -1,19 +1,23 @@
-import { BuildConfig, BuildContext, LoggerTimeSpan } from '../../util/interfaces';
+import { BuildConfig, BuildContext } from '../../util/interfaces';
 import { catchError, hasError, readFile } from '../util';
 import { createRenderer } from '../../server/index';
 
 
-export function prerenderIndexHtml(config: BuildConfig, ctx: BuildContext) {
+export function buildIndexHtml(config: BuildConfig, ctx: BuildContext) {
   if (ctx.isRebuild && ctx.appFileBuildCount === 0 || hasError(ctx.diagnostics)) {
     // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
   }
 
-  let timeSpan: LoggerTimeSpan;
-
   // get the source index html content
   return readFile(config.sys, config.indexHtmlSrc).then(indexSrcHtml => {
-    timeSpan = config.logger.createTimeSpan(`prerender index html started`);
+
+    if (!config.prerenderIndex) {
+      // don't bother with a renderer if we don't need one
+      // just copy over the src index.html file
+      writeIndexDest(config, ctx, indexSrcHtml);
+      return Promise.resolve();
+    }
 
     // now let's optimize this thang (which is async)
     return prerenderHtml(config, ctx, indexSrcHtml).catch(err => {
@@ -22,21 +26,15 @@ export function prerenderIndexHtml(config: BuildConfig, ctx: BuildContext) {
 
   }).catch(() => {
     // it's ok if there's no index file
-    config.logger.debug(`no index html to prerender: ${config.indexHtmlSrc}`);
-
-  }).then(() => {
-    timeSpan && timeSpan.finish(`prerender index html finished`);
+    config.logger.debug(`no index html: ${config.indexHtmlSrc}`);
   });
 }
 
 
 function prerenderHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string) {
-  return Promise.resolve().then(() => {
-    if (!config.prerenderIndex) {
-      // don't bother with a renderer if we don't need one
-      return Promise.resolve();
-    }
+  const timeSpan = config.logger.createTimeSpan(`prerender index html started`);
 
+  return Promise.resolve().then(() => {
     // create the renderer config
     const rendererConfig = Object.assign({}, config);
 
@@ -69,19 +67,21 @@ function prerenderHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: str
       catchError(ctx.diagnostics, err);
     });
 
+  }).then(() => {
+    timeSpan.finish(`prerender index html finished`);
   });
 }
 
 
-function writeIndexDest(config: BuildConfig, ctx: BuildContext, prerenderedHtml: string) {
-  if (ctx.appFiles.indexHtml === prerenderedHtml) {
+function writeIndexDest(config: BuildConfig, ctx: BuildContext, indexHtml: string) {
+  if (ctx.appFiles.indexHtml === indexHtml) {
     // only write to disk if the html content is different than last time
     return;
   }
 
   // add the prerendered html to our list of files to write
   // and cache the html to check against for next time
-  ctx.filesToWrite[config.indexHtmlBuild] = ctx.appFiles.indexHtml = prerenderedHtml;
+  ctx.filesToWrite[config.indexHtmlBuild] = ctx.appFiles.indexHtml = indexHtml;
 
   // keep track of how many times we built the index file
   // useful for debugging/testing
