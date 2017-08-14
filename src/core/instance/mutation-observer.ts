@@ -35,7 +35,7 @@ function createElementReset(plt: PlatformApi, elm: HostElement): () => void {
 export function startObserving(plt: PlatformApi, elm: HostElement): void {
   if (plt.isClient && elm._observer) {
     return elm._observer.observe(elm, {
-      childList: true
+      'childList': true
     });
   }
 }
