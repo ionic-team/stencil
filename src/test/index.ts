@@ -29,6 +29,7 @@ export function mockPlatform() {
     appBuildDir,
     diagnostics
   );
+  plt.isClient = true;
 
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();

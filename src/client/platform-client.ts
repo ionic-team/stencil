@@ -62,7 +62,8 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     connectHostElement,
     emitEvent: Context.emit,
     getEventOptions,
-    onError
+    onError,
+    isClient: true
   };
 
   // create the renderer that will be used

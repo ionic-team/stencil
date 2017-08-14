@@ -683,6 +683,7 @@ export interface HostElement extends HTMLElement {
   _queuedEvents?: any[];
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
+  _observer?: MutationObserver;
   _onReadyCallbacks: ((elm: HostElement) => void)[];
 }
 
@@ -809,6 +810,7 @@ export interface PlatformApi {
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;
   onError: (type: number, err: any, elm: HostElement) => void;
+  isClient?: boolean;
 }
 
 

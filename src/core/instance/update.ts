@@ -1,5 +1,6 @@
 import { initComponentInstance } from './init';
 import { HostElement, PlatformApi } from '../../util/interfaces';
+import { stopObserving, startObserving } from './mutation-observer';
 import { INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, RENDER_ERROR } from '../../util/constants';
 
 
@@ -35,6 +36,9 @@ export function update(plt: PlatformApi, elm: HostElement) {
       }
     }
 
+    // stop the observer so that we do not observe our own changes
+    stopObserving(plt, elm);
+
     // if this component has a render function, let's fire
     // it off and generate a vnode for this
     try {
@@ -42,6 +46,9 @@ export function update(plt: PlatformApi, elm: HostElement) {
     } catch (e) {
       plt.onError(RENDER_ERROR, e, elm);
     }
+
+    // after render we need to start the observer back up.
+    startObserving(plt, elm);
 
     if (isInitialLoad) {
       try {
