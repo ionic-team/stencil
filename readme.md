@@ -33,8 +33,6 @@ To build your new Stencil project, just run
 npm start
 ```
 
-To view the build, start an HTTP server inside of the `/www` directory.
-
 
 ## Creating components
 
@@ -43,8 +41,7 @@ Stencil components are plan ES6/TypeScript classes with some decorator metadata.
 Create new components by creating files with a `.tsx` extension, such as `my-component.tsx`, and place them in `src/components`.
 
 ```typescript
-// Import the Component decorator, and h, the virtual dom call that our JSX compiles to.
-import { Component, h, Prop, State } from '@stencil/core';
+import { Component, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -52,14 +49,16 @@ import { Component, h, Prop, State } from '@stencil/core';
 })
 export class MyComponent {
   // Indicate that name should be a property on our new component
-  @Prop() name: string;
+  @Prop() first: string;
+
+  @Prop() last: string;
 
   @State() isVisible: boolean = true;
 
   render() {
     return (
       <p>
-        My name is {this.name}
+        Hello, my name is {this.first} {this.last}
       </p>
     );
   }
@@ -71,18 +70,16 @@ Note: the `.tsx` extension is required, as this is the standard for TypeScript c
 To use this component, just use it like any other HTML tag:
 
 ```html
-<my-component name="Max"></my-component>
+<my-component first="Stencil" last="JS"></my-component>
 ```
 
 ## Hosting the app
 
-Stencil components run directly in the browser through script includes just like normal Custom Elements (because they are just that!), and run by using
-the tag just like any other HTML component:
+Stencil components run directly in the browser through script includes just like normal Custom Elements (because they are just that!), and run by using the tag just like any other HTML component:
 
 Here's an example `index.html` file that runs a Stencil app:
 
 ```html
-
 <!DOCTYPE html>
 <html>
 
@@ -97,7 +94,7 @@ Here's an example `index.html` file that runs a Stencil app:
 </head>
 
 <body>
-  <my-component name="Max"></my-component>
+  <my-component first="Stencil" last="JS"></my-component>
 </body>
 
 </html>
@@ -115,6 +112,7 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 |                |                                         |
 | `@Prop()`      | Creates a property that will exist on the element and be data-bound to this component.  |
 | `@State()`     | Creates a local state variable that will not be placed on the element. |
+| `@Method()`    | Expose specifc methods the be publicly accessible. |
 
 
 ## Why "Stencil?"
