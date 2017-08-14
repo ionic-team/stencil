@@ -1,6 +1,7 @@
 import { detachListeners } from './listeners';
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { invokeDestroy } from '../renderer/patch';
+import { propagateElementLoaded } from './init';
 
 
 export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -12,6 +13,10 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // set this to true so that any of our pending async stuff
     // doesn't continue since we already decided to destroy this node
     elm._hasDestroyed = true;
+
+    // double check that we've informed the ancestor host elements
+    // that they're good to go and loaded (cuz this one is on its way out)
+    propagateElementLoaded(elm);
 
     // call instance Did Unload and destroy instance stuff
     // if we've created an instance for this
