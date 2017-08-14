@@ -284,7 +284,7 @@ export interface BuildConfig {
   exclude?: string[];
   namespace?: string;
   global?: string;
-  src?: string;
+  srcDir?: string;
   buildDir?: string;
   collectionDir?: string;
   indexHtmlSrc?: string;

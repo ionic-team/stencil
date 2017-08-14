@@ -8,13 +8,13 @@ export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
   // and we haven't created a watcher yet
   if (!config.watch || ctx.watcher) return;
 
-  config.logger.debug(`setupWatcher: ${config.src}`);
+  config.logger.debug(`setupWatcher: ${config.srcDir}`);
 
   const logger = config.logger;
   let queueChangeBuild = false;
   let queueFullBuild = false;
 
-  ctx.watcher = config.sys.watch(config.src, {
+  ctx.watcher = config.sys.watch(config.srcDir, {
     ignored: config.watchIgnoredRegex,
     ignoreInitial: true
   });
@@ -251,6 +251,6 @@ function configFileReload(existingConfig: BuildConfig) {
   existingConfig.preamble = updatedConfig.preamble;
   existingConfig.prerenderIndex = updatedConfig.prerenderIndex;
   existingConfig.publicPath = updatedConfig.publicPath;
-  existingConfig.src = updatedConfig.src;
+  existingConfig.srcDir = updatedConfig.srcDir;
   existingConfig.watchIgnoredRegex = updatedConfig.watchIgnoredRegex;
 }

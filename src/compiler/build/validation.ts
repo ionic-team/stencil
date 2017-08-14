@@ -42,11 +42,16 @@ export function validateBuildConfig(config: BuildConfig) {
     config.global = normalizePath(path.join(config.rootDir, config.global));
   }
 
-  if (typeof config.src !== 'string') {
-    config.src = DEFAULT_SRC;
+  if (typeof (config as any).src === 'string') {
+    // deprecated: 2017-08-14
+    console.warn(`stencil config property "src" has been renamed to "srcDir"`);
+    config.srcDir = (config as any).src;
   }
-  if (!path.isAbsolute(config.src)) {
-    config.src = normalizePath(path.join(config.rootDir, config.src));
+  if (typeof config.srcDir !== 'string') {
+    config.srcDir = DEFAULT_SRC_DIR;
+  }
+  if (!path.isAbsolute(config.srcDir)) {
+    config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
   }
 
   if (typeof config.buildDir !== 'string') {
@@ -269,7 +274,7 @@ export function validateComponentTag(tag: string, suffix: string) {
 }
 
 
-const DEFAULT_SRC = 'src';
+const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_BUILD_DIR = 'www/build';
 const DEFAULT_INDEX_SRC = 'src/index.html';
 const DEFAULT_INDEX_BUILD = 'www/index.html';

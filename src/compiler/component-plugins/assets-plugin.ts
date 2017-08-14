@@ -105,7 +105,7 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
         // figure out what the path is to the component directory
         const collectionDirDestination = normalizePath(config.sys.path.join(
           config.collectionDir,
-          config.sys.path.relative(config.src, assetsMeta.absolutePath)
+          config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
         ));
 
         // let's copy!

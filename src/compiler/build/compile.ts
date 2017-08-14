@@ -18,9 +18,9 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
 
   const timeSpan = config.logger.createTimeSpan(`compile started`);
 
-  logger.debug(`compileDirectory, srcDir: ${config.src}`);
+  logger.debug(`compileDirectory, srcDir: ${config.srcDir}`);
 
-  return scanDir(config, ctx, config.src, compileResults).then(() => {
+  return scanDir(config, ctx, config.srcDir, compileResults).then(() => {
     return transpile(config, ctx, compileResults.moduleFiles);
 
   }).then(transpileResults => {
@@ -141,13 +141,13 @@ function copySourceSassFilesToDest(config: BuildConfig, ctx: BuildContext, compi
     sassSrcPath = normalizePath(sassSrcPath);
 
     return readFile(sys, sassSrcPath).then(sassSrcText => {
-      const includeDir = sassSrcPath.indexOf(config.src) === 0;
+      const includeDir = sassSrcPath.indexOf(config.srcDir) === 0;
       let sassDestPath: string;
 
       if (includeDir) {
         sassDestPath = normalizePath(sys.path.join(
           config.collectionDir,
-          sys.path.relative(config.src, sassSrcPath)
+          sys.path.relative(config.srcDir, sassSrcPath)
         ));
 
       } else {

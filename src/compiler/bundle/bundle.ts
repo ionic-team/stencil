@@ -12,8 +12,8 @@ export function bundle(config: BuildConfig, ctx: BuildContext) {
 
   const logger = config.logger;
 
-  logger.debug(`bundle, src: ${config.src}`);
-  logger.debug(`bundle, buildDest: ${config.buildDir}`);
+  logger.debug(`bundle, srcDir: ${config.srcDir}`);
+  logger.debug(`bundle, buildDir: ${config.buildDir}`);
 
   return Promise.resolve().then(() => {
     // kick off style and module bundling at the same time

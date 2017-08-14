@@ -12,7 +12,7 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { optio
 
   // apply user config to tsconfig
   options.outDir = config.collectionDir;
-  options.rootDir = config.src;
+  options.rootDir = config.srcDir;
 
   if (config.generateCollection && !config.devMode) {
     // generate .d.ts files when generating a collection and in prod mode
