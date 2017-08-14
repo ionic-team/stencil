@@ -9,41 +9,50 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
+    it('should default prerenderIndex.include', () => {
+      validateBuildConfig(config);
+      expect(config.prerender.include[0].url).toBe('/');
+    });
+
+    it('should default prerenderIndex.crawl', () => {
+      validateBuildConfig(config);
+      expect(config.prerender.crawl).toBe(true);
+    });
+
+    it('should default prerenderIndex.prerenderDir', () => {
+      validateBuildConfig(config);
+      expect(config.prerender.prerenderDir).toBe(`dist/prerender`);
+    });
+
     it('should default prerenderIndex.inlineStyles', () => {
       validateBuildConfig(config);
-      expect(config.prerenderIndex.inlineStyles).toBe(true);
+      expect(config.prerender.inlineStyles).toBe(true);
     });
 
     it('should default prerenderIndex.removeUnusedStyles', () => {
       validateBuildConfig(config);
-      expect(config.prerenderIndex.removeUnusedStyles).toBe(true);
+      expect(config.prerender.removeUnusedStyles).toBe(true);
     });
 
-    it('should default prerenderIndex.reduceHtmlWhitepace', () => {
+    it('should default prerenderIndex.collapseWhitespace', () => {
       validateBuildConfig(config);
-      expect(config.prerenderIndex.reduceHtmlWhitepace).toBe(true);
+      expect(config.prerender.collapseWhitespace).toBe(true);
     });
 
     it('should default prerenderIndex.inlineLoaderScript', () => {
       validateBuildConfig(config);
-      expect(config.prerenderIndex.inlineLoaderScript).toBe(true);
-    });
-
-    it('should merge prerenderIndex config', () => {
-      config.prerenderIndex = { html: '<div></div>' };
-      validateBuildConfig(config);
-      expect(config.prerenderIndex.inlineLoaderScript).toBe(true);
+      expect(config.prerender.inlineLoaderScript).toBe(true);
     });
 
     it('should default prerenderIndex', () => {
       validateBuildConfig(config);
-      expect(config.prerenderIndex).toBeDefined();
+      expect(config.prerender).toBeDefined();
     });
 
     it('should not set prerenderIndex if null', () => {
-      config.prerenderIndex = null;
+      config.prerender = null;
       validateBuildConfig(config);
-      expect(config.prerenderIndex).toBe(null);
+      expect(config.prerender).toBe(null);
     });
 
     it('should default generateCollection to false', () => {

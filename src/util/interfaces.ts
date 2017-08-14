@@ -302,8 +302,45 @@ export interface BuildConfig {
   hashedFileNameLength?: number;
   suppressTypeScriptErrors?: boolean;
   watchIgnoredRegex?: RegExp;
-  prerenderIndex?: HydrateOptions;
+  prerender?: PrerenderConfig;
   _isValidated?: boolean;
+}
+
+
+export interface RenderOptions {
+  collapseWhitespace?: boolean;
+  inlineStyles?: boolean;
+  removeUnusedStyles?: boolean;
+  inlineLoaderScript?: boolean;
+}
+
+
+export interface PrerenderConfig extends RenderOptions {
+  crawl?: boolean;
+  include?: PrerenderConfigUrl[];
+  prerenderDir?: string;
+}
+
+
+export interface PrerenderConfigUrl {
+  url: string;
+}
+
+
+export interface HydrateOptions extends RenderOptions {
+  req?: {
+    protocol: string;
+    get: (key: string) => string;
+    originalUrl: string;
+    url: string;
+  };
+  html?: string;
+  url?: string;
+  referrer?: string;
+  userAgent?: string;
+  cookie?: string;
+  dir?: string;
+  lang?: string;
 }
 
 
@@ -970,27 +1007,6 @@ export interface FSWatcher {
   on(eventName: string, callback: Function): this;
   add(path: string|string[]): this;
   $triggerEvent(eventName: string, path: string): void;
-}
-
-
-export interface HydrateOptions {
-  req?: {
-    protocol: string;
-    get: (key: string) => string;
-    originalUrl: string;
-    url: string;
-  };
-  html?: string;
-  url?: string;
-  referrer?: string;
-  userAgent?: string;
-  cookie?: string;
-  dir?: string;
-  lang?: string;
-  inlineStyles?: boolean;
-  removeUnusedStyles?: boolean;
-  reduceHtmlWhitepace?: boolean;
-  inlineLoaderScript?: boolean;
 }
 
 

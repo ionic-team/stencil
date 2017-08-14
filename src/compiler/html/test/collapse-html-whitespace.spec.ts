@@ -1,8 +1,8 @@
 import { mockHtml } from '../../../test';
-import { reduceHtmlWhitepace } from '../reduce-html-whitespace';
+import { collapseHtmlWhitepace } from '../collapse-html-whitespace';
 
 
-describe('reduceHtmlWhitepace', () => {
+describe('collapseHtmlWhitepace', () => {
 
   it('should remove multiple spaces, new lines and comments between used text nodes', () => {
     const node = mockHtml(`
@@ -16,7 +16,7 @@ describe('reduceHtmlWhitepace', () => {
       </div>
     `);
 
-    reduceHtmlWhitepace(node);
+    collapseHtmlWhitepace(node);
 
     expect(node.outerHTML).toBe(`<div> <i></i> text-a <!--comment-a--> text-b <span> <!--comment-b--> </span><b></b> <!--comment-c--> text-c </div>`);
   });
@@ -33,7 +33,7 @@ describe('reduceHtmlWhitepace', () => {
             </div>
     `);
 
-    reduceHtmlWhitepace(node);
+    collapseHtmlWhitepace(node);
 
     expect(node.outerHTML).toBe(`<div> text-a text-b <span> </span> text-c </div>`);
   });
@@ -49,7 +49,7 @@ describe('reduceHtmlWhitepace', () => {
             </div>
     `);
 
-    reduceHtmlWhitepace(node);
+    collapseHtmlWhitepace(node);
 
     expect(node.outerHTML).toBe(`<div> <span> </span> </div>`);
   });
@@ -57,7 +57,7 @@ describe('reduceHtmlWhitepace', () => {
   it('should remove multiple spaces', () => {
     const node = mockHtml(`<div>   <span>   </span>   </div>`);
 
-    reduceHtmlWhitepace(node);
+    collapseHtmlWhitepace(node);
 
     expect(node.outerHTML).toBe(`<div> <span> </span> </div>`);
   });
@@ -65,7 +65,7 @@ describe('reduceHtmlWhitepace', () => {
   it('should do nothing for elements with no whitespace', () => {
     const node = mockHtml(`<div><span></span></div>`);
 
-    reduceHtmlWhitepace(node);
+    collapseHtmlWhitepace(node);
 
     expect(node.outerHTML).toBe(`<div><span></span></div>`);
   });

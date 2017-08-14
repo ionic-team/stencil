@@ -1,7 +1,7 @@
 import { COMMENT_NODE, TEXT_NODE } from '../../util/constants';
 
 
-export function reduceHtmlWhitepace(node: Node) {
+export function collapseHtmlWhitepace(node: Node) {
   // this isn't about reducing HTML filesize (cuz it doesn't really matter after gzip)
   // this is more about having many less nodes for the client side to
   // have to climb through while it's creating vnodes from this HTML
@@ -31,7 +31,7 @@ export function reduceHtmlWhitepace(node: Node) {
       }
 
     } else if (childNode.childNodes) {
-      reduceHtmlWhitepace(childNode);
+      collapseHtmlWhitepace(childNode);
     }
 
     lastWhitespaceTextNode = null;

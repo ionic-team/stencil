@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, Diagnostic, FilesMap, HydrateOptions } from '../../util/interfaces';
 import { inlineLoaderScript } from './inline-loader-script';
-import { reduceHtmlWhitepace } from './reduce-html-whitespace';
+import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineStyles } from '../css/inline-styles';
 
 
@@ -35,10 +35,10 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     }
   }
 
-  if (opts.reduceHtmlWhitepace !== false) {
+  if (opts.collapseWhitespace !== false) {
     // reduceHtmlWhitepace is the default
     try {
-      reduceHtmlWhitepace(doc.body);
+      collapseHtmlWhitepace(doc.body);
 
     } catch (e) {
       diagnostics.push({

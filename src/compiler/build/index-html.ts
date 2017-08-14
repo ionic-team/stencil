@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext } from '../../util/interfaces';
+import { BuildConfig, BuildContext, HydrateOptions } from '../../util/interfaces';
 import { catchError, hasError, readFile } from '../util';
 import { createRenderer } from '../../server/index';
 
@@ -12,7 +12,7 @@ export function buildIndexHtml(config: BuildConfig, ctx: BuildContext) {
   // get the source index html content
   return readFile(config.sys, config.indexHtmlSrc).then(indexSrcHtml => {
 
-    if (!config.prerenderIndex) {
+    if (!config.prerender) {
       // don't bother with a renderer if we don't need one
       // just copy over the src index.html file
       writeIndexDest(config, ctx, indexSrcHtml);
@@ -38,8 +38,11 @@ function prerenderHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: str
     // create the renderer config
     const rendererConfig = Object.assign({}, config);
 
-    // create the hydrate options
-    const hydrateOpts = Object.assign({}, rendererConfig.prerenderIndex);
+    // create the hydrate options from the prerender config
+    const hydrateOpts: HydrateOptions = Object.assign({}, config.prerender);
+
+    // set the input html which we just read from the src index html file
+    hydrateOpts.html = indexSrcHtml;
 
     // create a deep copy of the registry so any changes inside the render
     // don't affect what we'll be saving
@@ -47,9 +50,6 @@ function prerenderHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: str
 
     // create a server-side renderer
     const renderer = createRenderer(rendererConfig, registry, ctx);
-
-    // set the input html which we just read from the src index html file
-    hydrateOpts.html = indexSrcHtml;
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html

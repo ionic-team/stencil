@@ -1,4 +1,4 @@
-import { BuildConfig, Bundle, DependentCollection, HydrateOptions } from '../../util/interfaces';
+import { BuildConfig, Bundle, DependentCollection, PrerenderConfig } from '../../util/interfaces';
 import { normalizePath } from '../util';
 
 
@@ -129,21 +129,8 @@ export function validateBuildConfig(config: BuildConfig) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
-  if (config.prerenderIndex !== null) {
-    config.prerenderIndex = Object.assign(config.prerenderIndex || {}, DEFAULT_PRERENDER_INDEX);
-
-    if (typeof config.prerenderIndex.inlineLoaderScript !== 'boolean') {
-      config.prerenderIndex.inlineLoaderScript = DEFAULT_PRERENDER_INDEX.inlineLoaderScript;
-    }
-    if (typeof config.prerenderIndex.reduceHtmlWhitepace !== 'boolean') {
-      config.prerenderIndex.reduceHtmlWhitepace = DEFAULT_PRERENDER_INDEX.reduceHtmlWhitepace;
-    }
-    if (typeof config.prerenderIndex.inlineStyles !== 'boolean') {
-      config.prerenderIndex.inlineStyles = DEFAULT_PRERENDER_INDEX.removeUnusedStyles;
-    }
-    if (typeof config.prerenderIndex.removeUnusedStyles !== 'boolean') {
-      config.prerenderIndex.removeUnusedStyles = DEFAULT_PRERENDER_INDEX.removeUnusedStyles;
-    }
+  if (config.prerender !== null && config.prerender !== false) {
+    config.prerender = Object.assign(config.prerender || {}, DEFAULT_PRERENDER_CONFIG);
   }
 
   if (!config.watchIgnoredRegex) {
@@ -284,9 +271,14 @@ const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
 
-const DEFAULT_PRERENDER_INDEX: HydrateOptions = {
+const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
+  prerenderDir: 'dist/prerender',
+  crawl: true,
+  include: [
+    { url: '/' }
+  ],
   inlineLoaderScript: true,
   inlineStyles: true,
   removeUnusedStyles: true,
-  reduceHtmlWhitepace: true
+  collapseWhitespace: true
 };

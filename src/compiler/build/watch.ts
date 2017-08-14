@@ -249,7 +249,7 @@ function configFileReload(existingConfig: BuildConfig) {
   existingConfig.minifyJs = updatedConfig.minifyJs;
   existingConfig.namespace = updatedConfig.namespace;
   existingConfig.preamble = updatedConfig.preamble;
-  existingConfig.prerenderIndex = updatedConfig.prerenderIndex;
+  existingConfig.prerender = updatedConfig.prerender;
   existingConfig.publicPath = updatedConfig.publicPath;
   existingConfig.srcDir = updatedConfig.srcDir;
   existingConfig.watchIgnoredRegex = updatedConfig.watchIgnoredRegex;
