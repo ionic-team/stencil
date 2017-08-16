@@ -1,14 +1,13 @@
 import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../interfaces';
+import * as chalk from 'chalk';
 
 
 export class CommandLineLogger implements Logger {
   private _level = 'info';
   private process: any;
-  private chalk: any;
   private width: number;
 
-  constructor(opts: {level: string, process: any, chalk: any}) {
-    this.chalk = opts.chalk;
+  constructor(opts: {level: string, process: any}) {
     this.process = opts.process;
     this.width = Math.max(MIN_LEN, Math.min(opts.process.stdout.columns || 0, MAX_LEN));
     this.level = opts.level;
@@ -23,7 +22,7 @@ export class CommandLineLogger implements Logger {
       l = l.toLowerCase().trim();
 
       if (LOG_LEVELS.indexOf(l) === -1) {
-        this.error(`Invalid log level '${this.chalk.bold(l)}' (choose from: ${LOG_LEVELS.map(l => this.chalk.bold(l)).join(', ')})`);
+        this.error(`Invalid log level '${chalk.bold(l)}' (choose from: ${LOG_LEVELS.map(l => chalk.bold(l)).join(', ')})`);
       } else {
         this._level = l;
       }
@@ -62,7 +61,7 @@ export class CommandLineLogger implements Logger {
   warnPrefix(lines: string[]) {
     if (lines.length) {
       let prefix = '[ WARN  ]';
-      lines[0] = this.bold(this.chalk.yellow(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(chalk.yellow(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
@@ -77,7 +76,7 @@ export class CommandLineLogger implements Logger {
   errorPrefix(lines: string[]) {
     if (lines.length) {
       let prefix = '[ ERROR ]';
-      lines[0] = this.bold(this.chalk.red(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = this.bold(chalk.red(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
@@ -93,20 +92,20 @@ export class CommandLineLogger implements Logger {
   debugPrefix(lines: string[]) {
     if (lines.length) {
       let prefix = '[ DEBUG ]';
-      lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
+      lines[0] = chalk.cyan(prefix) + lines[0].substr(prefix.length);
     }
   }
 
   color(msg: string, color: string) {
-    return this.chalk[color](msg);
+    return (chalk as any)[color](msg);
   }
 
   bold(msg: string) {
-    return this.chalk.bold(msg);
+    return chalk.bold(msg);
   }
 
   dim(msg: string) {
-    return this.chalk.dim(msg);
+    return chalk.dim(msg);
   }
 
   memoryUsage() {
@@ -212,7 +211,7 @@ export class CommandLineLogger implements Logger {
     for (var i = 0; i < lineLength; i++) {
       var chr = errorLine.charAt(i);
       if (i >= errorCharStart && i < errorCharStart + errorLength) {
-        chr = this.chalk.bgRed(chr === '' ? ' ' : chr);
+        chr = chalk.bgRed(chr === '' ? ' ' : chr);
       }
       lineChars.push(chr);
     }
@@ -227,7 +226,7 @@ export class CommandLineLogger implements Logger {
 
     const words = text.split(' ').map(word => {
       if (JS_KEYWORDS.indexOf(word) > -1) {
-        return this.chalk.cyan(word);
+        return chalk.cyan(word);
       }
       return word;
     });
@@ -251,7 +250,7 @@ export class CommandLineLogger implements Logger {
         cssProp = false;
       }
       if (cssProp && safeChars.indexOf(c.toLowerCase()) > -1) {
-        chars.push(this.chalk.cyan(c));
+        chars.push(chalk.cyan(c));
         continue;
       }
 

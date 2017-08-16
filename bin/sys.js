@@ -2,19 +2,22 @@
 
 var fs = require('fs');
 var path = require('path');
+var util = require('./util');
 var coreClientFileCache = {};
+
 
 module.exports = Object.defineProperties({
 
-  copyDir: function copyDir(source, dest, callback) {
-    var copyDir = require('./copy-directory');
-    copyDir(source, dest, {}, callback);
-  },
+  copy: util.fsExtra.copy,
 
   createDom: function createDom() {
     var createDom = require('./create-dom');
     return createDom();
   },
+
+  emptyDir: util.fsExtra.emptyDir,
+
+  ensureDir: util.fsExtra.ensureDir,
 
   fs: fs,
 
@@ -76,8 +79,8 @@ module.exports = Object.defineProperties({
   },
 
   minifyCss: function minifyCss(input) {
-    var CleanCSS = require('clean-css');
-    var result = new CleanCSS().minify(input);
+    var cleanCSS = require('./clean-css');
+    var result = cleanCSS.minify(input);
     var diagnostics = [];
 
     if (result.errors) {
@@ -126,6 +129,8 @@ module.exports = Object.defineProperties({
 
   path: path,
 
+  remove: util.fsExtra.remove,
+
   resolveModule: function resolveModule(fromDir, moduleId) {
     var Module = require('module');
 
@@ -163,17 +168,12 @@ module.exports = Object.defineProperties({
     throw new Error('error loading "' + moduleId + '" from "' + fromDir + '"');
   },
 
-  rmDir: function rmdir(directory, callback) {
-    var rimraf = require('./rimraf');
-    rimraf(directory, callback);
-  },
-
   vm: {
     createContext: function(sandbox) {
       var vm = require('vm');
       // https://github.com/tmpvar/jsdom/issues/1724
       // manually adding a fetch polyfill until jsdom adds it
-      sandbox.fetch = require('node-fetch');
+      sandbox.fetch = require('./node-fetch');
       return vm.createContext(sandbox);
     },
     runInContext: function(code, contextifiedSandbox, options) {

@@ -86,7 +86,7 @@ export function mockStencilSystem() {
       version: 'test'
     },
 
-    copyDir: function mockCopyDir(src: string, dest: string, cb: Function) {
+    copy: function mockCopyDir(src: string, dest: string, cb: Function) {
       src; dest;
       process.nextTick(() => {
         cb(null);
@@ -115,7 +115,7 @@ export function mockStencilSystem() {
 
     path: path,
 
-    rmDir: function mockRmDir(path, cb) {
+    remove: function mockRmDir(path, cb) {
       path;
       process.nextTick(() => {
         cb(null);

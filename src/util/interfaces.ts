@@ -914,7 +914,7 @@ export interface PrintLine {
 
 
 export interface StencilSystem {
-  copyDir?(src: string, dest: string, callback: (err: any) => void): void;
+  copy?(src: string, dest: string, callback: (err: any) => void): void;
   compiler?: {
     name: string;
     version: string;
@@ -925,6 +925,8 @@ export interface StencilSystem {
     destroy(): void;
     getDiagnostics(): Diagnostic[];
   };
+  emptyDir?(dir: string, callback: (err: any) => void): void;
+  ensureDir?(dir: string, callback: (err: any) => void): void;
   fs?: {
     access(path: string, callback: (err: any) => void): void;
     accessSync(path: string | Buffer, mode?: number): void
@@ -961,7 +963,7 @@ export interface StencilSystem {
     resolve(...pathSegments: any[]): string;
     sep: string;
   };
-  rmDir?(path: string, callback: (err: any) => void): void;
+  remove?(path: string, callback: (err: any) => void): void;
   rollup?: {
     rollup: {
       (config: { entry: string; plugins?: any[]; treeshake?: boolean; onwarn?: Function; }): Promise<{

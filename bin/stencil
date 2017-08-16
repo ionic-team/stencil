@@ -7,13 +7,13 @@ process.on('unhandledRejection', function(r) { console.error(r) });
 process.env.IONIC_CLI_BIN = __filename;
 
 
-var chalk = require('chalk');
+var util = require('./util');
 var path = require('path');
 
 var minVersion = 6.11;
 var versionMatch = process.version.match(/(\d+).(\d+)/);
 if (versionMatch && parseFloat(versionMatch[0]) < minVersion) {
-  console.error(chalk.red('ERR: Your Node.js version is ' + chalk.bold(process.version) + '. Please update to the latest Node LTS version.\n'));
+  console.error(util.chalk.red('ERR: Your Node.js version is ' + util.chalk.bold(process.version) + '. Please update to the latest Node LTS version.\n'));
   process.exit(1);
 }
 
@@ -81,11 +81,9 @@ var stencil = require(path.join(__dirname, '../dist/compiler'));
 config.sys.compiler = require(path.join(__dirname, '../package.json'));
 
 if (!config.logger) {
-  var logger = require(path.join(__dirname, 'logger'));
-  config.logger = new logger.CommandLineLogger({
+  config.logger = new util.logger.CommandLineLogger({
     level: config.logLevel,
-    process: process,
-    chalk: chalk
+    process: process
   });
 }
 
@@ -101,7 +99,7 @@ switch (cmdArgs[2]) {
     break;
 
   default:
-    console.error(chalk.red.bold('\n  Invalid stencil command, please see the options below:'));
+    console.error(util.chalk.red.bold('\n  Invalid stencil command, please see the options below:'));
     require('./help')();
     process.exit(1);
 }

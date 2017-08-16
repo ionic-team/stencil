@@ -84,7 +84,7 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
       ));
 
       // let's copy!
-      config.sys.copyDir(assetsMeta.absolutePath, buildDirDestination, (err) => {
+      config.sys.copy(assetsMeta.absolutePath, buildDirDestination, (err) => {
         if (err) {
           reject(err);
         } else {
@@ -109,7 +109,7 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
         ));
 
         // let's copy!
-        config.sys.copyDir(assetsMeta.absolutePath, collectionDirDestination, (err) => {
+        config.sys.copy(assetsMeta.absolutePath, collectionDirDestination, (err) => {
           if (err) {
             reject(err);
           } else {
