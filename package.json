@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.0.5-4",
+  "version": "0.0.5-6",
   "license": "MIT",
   "bin": {
     "stencil": "./bin/stencil"
@@ -42,6 +42,9 @@
     "chokidar": "^1.7.0",
     "jsdom": "^11.1.0",
     "node-sass": "^4.5.0",
+    "rollup": "^0.47.2",
+    "rollup-plugin-commonjs": "^8.1.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "typescript": "^2.5.0-dev.20170808",
     "uglify-es": "^3.0.26"
   },
@@ -74,9 +77,6 @@
     "node-fetch": "^1.7.2",
     "np": "^2.16.0",
     "rimraf": "2.6.1",
-    "rollup": "^0.47.2",
-    "rollup-plugin-commonjs": "^8.1.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
     "tslint": "^5.6.0",
     "tslint-ionic-rules": "0.0.8",
     "webpack": "^3.5.4"

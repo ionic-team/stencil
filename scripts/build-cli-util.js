@@ -5,7 +5,6 @@ const webpack = require('webpack');
 
 bundle('clean-css.js');
 bundle('node-fetch.js');
-bundle('rollup.js');
 bundle('util.js');
 
 
