@@ -11,6 +11,7 @@ export interface CoreContext {
   eventNameFn?: (eventName: string) => string;
   isClient?: boolean;
   isServer?: boolean;
+  isPrerender?: boolean;
   mode?: string;
   [contextId: string]: any;
 }
@@ -341,6 +342,7 @@ export interface HydrateOptions extends RenderOptions {
   cookie?: string;
   dir?: string;
   lang?: string;
+  isPrerender?: boolean;
 }
 
 

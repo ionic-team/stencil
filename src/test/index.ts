@@ -27,7 +27,8 @@ export function mockPlatform() {
     'App',
     win,
     appBuildDir,
-    diagnostics
+    diagnostics,
+    false
   );
   plt.isClient = true;
 

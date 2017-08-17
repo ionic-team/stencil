@@ -43,6 +43,7 @@ function prerenderHtml(config: BuildConfig, ctx: BuildContext, indexSrcHtml: str
 
     // set the input html which we just read from the src index html file
     hydrateOpts.html = indexSrcHtml;
+    hydrateOpts.isPrerender = true;
 
     // create a deep copy of the registry so any changes inside the render
     // don't affect what we'll be saving

@@ -44,6 +44,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     win,
     appBuildDir,
     hydrateResults.diagnostics,
+    opts.isPrerender,
     ctx
   );
 

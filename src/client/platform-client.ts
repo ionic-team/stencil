@@ -47,7 +47,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   };
 
   Context.isClient = true;
-  Context.isServer = false;
+  Context.isServer = Context.isPrerender = false;
 
 
   // create the platform api which is used throughout common core code

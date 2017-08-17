@@ -21,6 +21,7 @@ export function createPlatformServer(
   win: any,
   appBuildDir: string,
   diagnostics: Diagnostic[],
+  isPrerender: boolean,
   ctx?: BuildContext
 ): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
@@ -41,6 +42,7 @@ export function createPlatformServer(
   Context.emit = noop;
   Context.isClient = false;
   Context.isServer = true;
+  Context.isPrerender = isPrerender;
 
   // add the Core global to the window context
   // Note: "Core" is not on the window context on the client-side
