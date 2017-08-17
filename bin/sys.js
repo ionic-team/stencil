@@ -190,10 +190,12 @@ module.exports = Object.defineProperties({
 }, {
   // sys on-demand getters
   rollup: { get: function() {
-      var rollup = require('rollup');
+      var rollupUtil = require('./rollup');
+      var rollup = rollupUtil.rollup;
+
       rollup.plugins = {
-        commonjs: require('rollup-plugin-commonjs'),
-        nodeResolve: require('rollup-plugin-node-resolve')
+        commonjs: rollupUtil.rollupPluginCommonjs.default,
+        nodeResolve: rollupUtil.rollupPluginNodeResolve.default
       };
       return rollup;
     }
