@@ -4,7 +4,7 @@ import { createRenderer } from '../../server/index';
 
 
 export function buildIndexHtml(config: BuildConfig, ctx: BuildContext) {
-  if (ctx.isRebuild && ctx.appFileBuildCount === 0 || hasError(ctx.diagnostics)) {
+  if ((ctx.isRebuild && !ctx.changeHasSass && ctx.appFileBuildCount === 0) || hasError(ctx.diagnostics)) {
     // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
   }
