@@ -59,9 +59,11 @@ export function addAppComponents(config: BuildConfig, manifest: Manifest, module
     });
 
     if (!includeComponent) {
-      // looks like we shouldn't include this component
-      // cuz it wasn't in any of the build config's bundles
-      return;
+      // didn't find this component in the config bundles
+      // so let's go ahead and just add it for them
+      manifest.bundles.push({
+        components: [moduleFile.cmpMeta.tagNameMeta]
+      });
     }
 
     // awesome, good to go, let's add it to the manifest's components
