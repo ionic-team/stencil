@@ -120,3 +120,5 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 A Stencil is a tool artists use for drawing perfect shapes easily. We want Stencil to be a similar tool for web developers: a tool that helps web developers build powerful Web Components and apps that use them, but without creating non-standard runtime requirements.
 
 Stencil is a tool developers use to create Web Components with some powerful features baked in, but it gets out of the way at runtime.
+
+Note: Stencil and Ionic are completely independent projects. Stencil does not prescribe any specific UI framework, but Ionic is the largest user of Stencil (today!)
