@@ -10,7 +10,7 @@ process.env.IONIC_CLI_BIN = __filename;
 var util = require('./util');
 var path = require('path');
 
-var minVersion = 6.11;
+var minVersion = 6.10;
 var versionMatch = process.version.match(/(\d+).(\d+)/);
 if (versionMatch && parseFloat(versionMatch[0]) < minVersion) {
   console.error(util.chalk.red('ERR: Your Node.js version is ' + util.chalk.bold(process.version) + '. Please update to the latest Node LTS version.\n'));
