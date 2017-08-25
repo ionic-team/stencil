@@ -23,7 +23,7 @@ Compared to using Custom Elements directly, inside of every Stencil component is
 To start a new project using Stencil, clone the starter project and get to work:
 
 ```bash
-git clone git@github.com:ionic-team/stencil-starter my-app
+git clone https://github.com/ionic-team/stencil-starter.git my-app
 cd my-app
 git remote rm origin
 npm install
