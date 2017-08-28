@@ -1,4 +1,5 @@
 import {
+  AddEventListener,
   BuildConfig,
   ComponentDecorator,
   CssClassMap,
@@ -46,6 +47,7 @@ export interface HostElement extends HTMLElement {
 }
 
 export {
+  AddEventListener,
   BuildConfig,
   CssClassMap,
   DomController,

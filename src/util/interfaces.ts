@@ -3,7 +3,7 @@ export { CssClassMap } from './jsx-interfaces';
 
 
 export interface CoreContext {
-  addListener?: AddEventListenerApi;
+  addListener?: AddEventListener;
   attr?: number;
   dom?: DomController;
   emit?: (elm: Element, eventName: string, data?: EventEmitterData) => void;
@@ -23,7 +23,7 @@ export interface AppGlobal {
 }
 
 
-export interface AddEventListenerApi {
+export interface AddEventListener {
   (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
 }
 
