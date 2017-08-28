@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 const LIFECYCLE_MAP: {[methodName: string]: string} = {
   'ionViewWillLoad': 'componentWillLoad',
   'ionViewDidLoad': 'componentDidLoad',
-  'ionViewDidUnload': 'componentDidunload',
+  'ionViewDidUnload': 'componentDidUnload',
   'ionViewWillUpdate': 'componentWillUpdate',
   'ionViewDidUpdate': 'componentDidUpdate',
 };
