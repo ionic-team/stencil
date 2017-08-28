@@ -5,7 +5,7 @@ export { CssClassMap } from './jsx-interfaces';
 export interface CoreContext {
   addListener?: AddEventListenerApi;
   attr?: number;
-  dom?: DomControllerApi;
+  dom?: DomController;
   emit?: (elm: Element, eventName: string, data?: EventEmitterData) => void;
   enableListener?: EventListenerEnable;
   eventNameFn?: (eventName: string) => string;
@@ -54,7 +54,7 @@ export interface Now {
 }
 
 
-export interface DomControllerApi {
+export interface DomController {
   read: DomControllerCallback;
   write: DomControllerCallback;
   raf: DomControllerCallback;

@@ -1,8 +1,8 @@
-import { DomControllerApi, Now, QueueApi } from '../util/interfaces';
+import { DomController, Now, QueueApi } from '../util/interfaces';
 import { PRIORITY_HIGH, PRIORITY_LOW } from '../util/constants';
 
 
-export function createQueueClient(domCtrl: DomControllerApi, now: Now): QueueApi {
+export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
   const raf = domCtrl.raf;
   const highPromise = Promise.resolve();
 
