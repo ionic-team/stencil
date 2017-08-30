@@ -14,11 +14,11 @@ import { LoadComponentRegistry } from '../util/interfaces';
   x.innerHTML = (components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.💎{visibility:inherit}').toLowerCase();
   document.head.insertBefore(x, document.head.firstChild);
 
-  // request the core file this browser needs
-  // test for native support of custom elements, fetch and Promise
-  // if any of those are not supported, then use the core file w/ polyfills
+  // request the core this browser needs
+  // test for native support of custom elements and fetch
+  // if either of those are not supported, then use the core w/ polyfills
   x = document.createElement('script');
-  x.src = (window.customElements && window.fetch && typeof Promise !== 'undefined' && Promise.toString().indexOf('[native code]') !== -1) ? appCore : appCorePolyfilled;
+  x.src = (window.customElements && window.fetch) ? appCore : appCorePolyfilled;
   document.head.appendChild(x);
 
 })(window, document, '__STENCIL__APP__');
