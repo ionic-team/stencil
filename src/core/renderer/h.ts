@@ -32,9 +32,11 @@ export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, ch
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, childb: string): VNode;
 export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode, childb: VNode): VNode;
 export function h(nodeName: any, vnodeData: any, child?: any) {
-  let children: any[], lastSimple: boolean, simple: boolean, i: number;
+  var children: any[];
+  var lastSimple = false;
+  var simple = false;
 
-  for (i = arguments.length; i-- > 2; ) {
+  for (var i = arguments.length; i-- > 2; ) {
     stack.push(arguments[i]);
   }
 

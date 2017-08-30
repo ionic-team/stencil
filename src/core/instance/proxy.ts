@@ -146,7 +146,7 @@ function initProp(
     if (newVal !== oldVal) {
       // gadzooks! the property's value has changed!!
 
-      if (internalValues.__propWillChange && internalValues.__propWillChange[memberName]) {
+      if (internalValues.__propWillChange !== undefined && internalValues.__propWillChange[memberName]) {
         // this instance is watching for when this property WILL change
         internalValues.__propWillChange[memberName](newVal, oldVal);
       }
@@ -154,7 +154,7 @@ function initProp(
       // set our new value!
       internalValues[memberName] = newVal;
 
-      if (internalValues.__propDidChange && internalValues.__propDidChange[memberName]) {
+      if (internalValues.__propDidChange !== undefined && internalValues.__propDidChange[memberName]) {
         // this instance is watching for when this property DID change
         internalValues.__propDidChange[memberName](newVal, oldVal);
       }
