@@ -895,8 +895,8 @@ declare global {
       onClickCapture?: EventHandler<MouseEvent>;
       onContextMenu?: EventHandler<MouseEvent>;
       onContextMenuCapture?: EventHandler<MouseEvent>;
-      onDoubleClick?: EventHandler<MouseEvent>;
-      onDoubleClickCapture?: EventHandler<MouseEvent>;
+      onDblClick?: EventHandler<MouseEvent>;
+      onDblClickCapture?: EventHandler<MouseEvent>;
       onDrag?: EventHandler<DragEvent>;
       onDragCapture?: EventHandler<DragEvent>;
       onDragEnd?: EventHandler<DragEvent>;
