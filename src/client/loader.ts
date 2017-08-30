@@ -15,8 +15,10 @@ import { LoadComponentRegistry } from '../util/interfaces';
   document.head.insertBefore(x, document.head.firstChild);
 
   // request the core file this browser needs
+  // test for native support of custom elements, fetch and Promise
+  // if any of those are not supported, then use the core file w/ polyfills
   x = document.createElement('script');
-  x.src = (window.customElements && window.fetch) ? appCore : appCorePolyfilled;
+  x.src = (window.customElements && window.fetch && typeof Promise !== 'undefined' && Promise.toString().indexOf('[native code]') !== -1) ? appCore : appCorePolyfilled;
   document.head.appendChild(x);
 
 })(window, document, '__STENCIL__APP__');
