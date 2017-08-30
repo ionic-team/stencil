@@ -2,7 +2,7 @@ import { attributeChangedCallback } from './attribute-changed';
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { HYDRATED_CSS, DID_LOAD_ERROR, QUEUE_EVENTS_ERROR, WILL_LOAD_ERROR } from '../../util/constants';
+import { HYDRATED_CSS, DID_LOAD_ERROR, QUEUE_EVENTS_ERROR } from '../../util/constants';
 import { initEventEmitters } from './events';
 import { createMutationObserver } from './mutation-observer';
 import { initProxy } from './proxy';
@@ -85,15 +85,6 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   // children. When mutations occur rerender.  This only creates the observer
   // it does not start observing.
   createMutationObserver(plt, elm);
-
-  // fire off the user's componentWillLoad method (if one was provided)
-  // componentWillLoad only runs ONCE, after instance's element has been
-  // assigned as the host element, but BEFORE render() has been called
-  try {
-    instance.componentWillLoad && instance.componentWillLoad();
-  } catch (e) {
-    plt.onError(WILL_LOAD_ERROR, e, elm);
-  }
 }
 
 

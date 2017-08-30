@@ -22,7 +22,7 @@ function createElementReset(plt: PlatformApi, elm: HostElement): () => void {
     elm._vnode = null;
     plt.connectHostElement(elm, cmpMeta.slotMeta);
     stopObserving(plt, elm);
-    elm._render(false);
+    elm._render();
     startObserving(plt, elm);
   };
 }

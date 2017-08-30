@@ -8,13 +8,6 @@ export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boole
   const instance = elm.$instance;
   const cmpMeta = plt.getComponentMeta(elm);
 
-  if (isUpdateRender) {
-    // fire off the user's componentWillUpdate method (if one was provided)
-    // componentWillUpdate runs BEFORE render() has been called
-    // but only BEFORE an UPDATE and not before the intial render
-    instance.componentWillUpdate && instance.componentWillUpdate();
-  }
-
   // if this component has a render function, let's fire
   // it off and generate the child vnodes for this host element
   // note that we do not create the host element cuz it already exists

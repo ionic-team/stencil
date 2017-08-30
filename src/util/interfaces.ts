@@ -627,9 +627,9 @@ export interface HostMeta {
 
 
 export interface ComponentInstance {
-  componentWillLoad?: () => void;
+  componentWillLoad?: () => Promise<void>;
   componentDidLoad?: () => void;
-  componentWillUpdate?: () => void;
+  componentWillUpdate?: () => Promise<void>;
   componentDidUpdate?: () => void;
   componentDidUnload?: () => void;
 
