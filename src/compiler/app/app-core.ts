@@ -37,6 +37,7 @@ export function generateCoreES5WithPolyfills(config: BuildConfig, globalJsConten
     'document-register-element.js',
     'promise.js',
     'fetch.js',
+    'request-animation-frame.js',
     'closest.js',
     'performance-now.js'
   ].forEach(polyfillFile => {
@@ -48,28 +49,15 @@ export function generateCoreES5WithPolyfills(config: BuildConfig, globalJsConten
   readFilePromises.push(sys.getClientCoreFile({ staticName: staticName }));
 
   return Promise.all(readFilePromises).then(results => {
-    const docRegistryPolyfillContent = results[0];
-    const promisePolyfillContent = results[1];
-    const fetchPolyfillContent = results[2];
-    const closestPolyfillContent = results[3];
-    const perfNowPolyfillContent = results[4];
-    let coreContent = results[5];
-
-    // wrap the core content
-    coreContent = wrapCoreJs(config, [
+    // wrap the core content code
+    // which is the last result in the array
+    results[results.length - 1] = wrapCoreJs(config, [
       globalJsContent.join('\n'),
-      coreContent
+      results[results.length - 1]
     ].join('\n').trim());
 
     // concat the polyfills above the core content
-    return [
-      docRegistryPolyfillContent,
-      promisePolyfillContent,
-      fetchPolyfillContent,
-      closestPolyfillContent,
-      perfNowPolyfillContent,
-      coreContent
-    ].join('\n').trim();
+    return results.join('\n').trim();
   });
 }
 
