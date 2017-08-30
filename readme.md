@@ -38,7 +38,7 @@ npm start
 
 ## Creating components
 
-Stencil components are plan ES6/TypeScript classes with some decorator metadata.
+Stencil components are plain ES6/TypeScript classes with some decorator metadata.
 
 Create new components by creating files with a `.tsx` extension, such as `my-component.tsx`, and place them in `src/components`.
 
@@ -110,11 +110,11 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 
 | Decorator      | Description                             |
 | -------------- | ---                                     |
-| `@Component()` | Indicate a class is a Stencil component |
+| `@Component()` | Indicate a class is a Stencil component. |
 |                |                                         |
 | `@Prop()`      | Creates a property that will exist on the element and be data-bound to this component.  |
 | `@State()`     | Creates a local state variable that will not be placed on the element. |
-| `@Method()`    | Expose specifc methods the be publicly accessible. |
+| `@Method()`    | Expose specifc methods to be publicly accessible. |
 
 
 ## Why "Stencil?"
