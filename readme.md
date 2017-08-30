@@ -122,3 +122,14 @@ The API for stencil closely mirrors the API for Custom Elements v1.
 A Stencil is a tool artists use for drawing perfect shapes easily. We want Stencil to be a similar tool for web developers: a tool that helps web developers build powerful Web Components and apps that use them, but without creating non-standard runtime requirements.
 
 Stencil is a tool developers use to create Web Components with some powerful features baked in, but it gets out of the way at runtime.
+
+
+## Browser Support
+
+Web Components, specifically Custom Elements, are natively supported in Chrome and Safari and are coming to both Edge and Firefox. A dynamic loader is already included in order to only load the polyfills for the browsers that require them. Additionally, Stencil polyfills `fetch` and `Promise` for browsers that do not support them natively.
+
+ - Chrome (and all Chromium based browsers)
+ - Safari
+ - Edge
+ - Firefox
+ - IE 11
