@@ -1,3 +1,4 @@
+[![npm][npm-badge]][npm-badge-url]
 # Stencil: A Compiler for Web Components
 
 Stencil is a compiler for building fast web apps using Web Components.
@@ -149,3 +150,6 @@ For the small minority of browsers that do not support modern browser features a
  - [requestAnimationFrame()](https://gist.github.com/paulirish/1579671)
  - [Element.closest](https://github.com/jonathantneal/closest)
  - [Element.matches](https://github.com/jonathantneal/closest)
+
+[npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg
+[npm-badge-url]: https://www.npmjs.com/package/@stencil/core
