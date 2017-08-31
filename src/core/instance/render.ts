@@ -1,21 +1,21 @@
+import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
 import { createThemedClasses } from '../../util/theme';
 import { h } from '../renderer/h';
-import { HostElement, PlatformApi } from '../../util/interfaces';
 import { VNode as VNodeObj } from '../renderer/vnode';
 
 
-export function render(plt: PlatformApi, elm: HostElement, isUpdateRender: boolean) {
+export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMeta, isUpdateRender: boolean) {
   const instance = elm.$instance;
-  const cmpMeta = plt.getComponentMeta(elm);
 
   // if this component has a render function, let's fire
   // it off and generate the child vnodes for this host element
   // note that we do not create the host element cuz it already exists
-  const vnodeChildren = instance.render && instance.render();
-  let vnodeHostData: any = instance.hostData && instance.hostData();
   const hostMeta = cmpMeta.hostMeta;
 
-  if (vnodeChildren || vnodeHostData || hostMeta) {
+  if (instance.render || instance.hostData || hostMeta) {
+    const vnodeChildren = instance.render && instance.render();
+    let vnodeHostData: any = instance.hostData && instance.hostData();
+
     if (hostMeta) {
       vnodeHostData = Object.keys(hostMeta).reduce((hostData, key) => {
         switch (key) {

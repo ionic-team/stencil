@@ -40,7 +40,7 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
   };
 
   HostElementConstructor._render = function(isInitialRender: boolean) {
-    render(plt, (this as HostElement), isInitialRender);
+    render(plt, (this as HostElement), plt.getComponentMeta((this as HostElement)), isInitialRender);
   };
 }
 
