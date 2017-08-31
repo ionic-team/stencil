@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 
 bundle('clean-css.js');
-bundle('node-fetch.js');
+bundle('patch-fetch-xhr.js');
 bundle('util.js');
 
 

@@ -1,33 +1,28 @@
-import { BuildConfig, BuildResults, Diagnostic } from '../../util/interfaces';
-import { prerenderIndexHtml } from '../prerender/prerender-index-html';
+import { BuildConfig, BuildResults } from '../../util/interfaces';
 import { bundle } from '../bundle/bundle';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { compileSrcDir } from './compile';
-import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
+import { compileSrcDir } from '../build/compile';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
-import { initIndexHtml } from '../html/init-index-html';
-import { setupWatcher } from './watch';
-import { validateBuildConfig } from './validation';
-import { writeBuildFiles } from './write-build';
+import { isConfigValid } from '../build/build';
+import { prerenderApp } from './prerender-app';
+import { writeBuildFiles } from '../build/write-build';
 
 
-export function build(config: BuildConfig, context?: any) {
-  // create the build context if it doesn't exist
-  // the buid context is the same object used for all builds and rebuilds
+export function prerender(config: BuildConfig) {
+  // create the build context
   // ctx is where stuff is cached for fast in-memory lookups later
-  const ctx = getBuildContext(context);
+  const ctx = getBuildContext();
 
-  // reset the build context, this is important for rebuilds
+  // reset the build context
   resetBuildContext(ctx);
 
   // create the build results that get returned
   const buildResults: BuildResults = {
     files: [],
     diagnostics: [],
-    manifest: {},
-    changedFiles: ctx.isRebuild ? ctx.changedFiles : null
+    manifest: {}
   };
 
   // validate the build config
@@ -36,16 +31,8 @@ export function build(config: BuildConfig, context?: any) {
     return Promise.resolve(buildResults);
   }
 
-  // create an initial index.html file if one doesn't already exist
-  // this is synchronous on purpose
-  if (!initIndexHtml(config, ctx, buildResults.diagnostics)) {
-    // error initializing the index.html file
-    // something's wrong, so let's not continue
-    return Promise.resolve(buildResults);
-  }
-
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
+  const timeSpan = config.logger.createTimeSpan(`prerender, ${config.devMode ? 'dev' : 'prod'} mode, started`);
 
   // begin the build
   return Promise.resolve().then(() => {
@@ -67,16 +54,16 @@ export function build(config: BuildConfig, context?: any) {
     return generateAppFiles(config, ctx);
 
   }).then(() => {
-    // prerender index.html
-    return prerenderIndexHtml(config, ctx);
+    // copy over the entire www dir
+    return copyWWW(config);
+
+  }).then(() => {
+    // prerender that app
+    return prerenderApp(config, ctx);
 
   }).then(() => {
     // write all the files and copy asset files
     return writeBuildFiles(config, ctx, buildResults);
-
-  }).then(() => {
-    // setup watcher if need be
-    return setupWatcher(config, ctx);
 
   }).catch(err => {
     // catch all phase
@@ -86,12 +73,11 @@ export function build(config: BuildConfig, context?: any) {
     // finalize phase
     buildResults.diagnostics = cleanDiagnostics(ctx.diagnostics);
     config.logger.printDiagnostics(buildResults.diagnostics);
-    generateHtmlDiagnostics(config, buildResults.diagnostics);
+
+    config.logger.info(`prerendered urls:`, ctx.prerenderedUrls);
 
     // create a nice pretty message stating what happend
-    let buildText = ctx.isRebuild ? 'rebuild' : 'build';
     let buildStatus = 'finished';
-    let watchText = config.watch ? ', watching for changes...' : '';
     let statusColor = 'green';
 
     if (hasError(ctx.diagnostics)) {
@@ -99,7 +85,7 @@ export function build(config: BuildConfig, context?: any) {
       statusColor = 'red';
     }
 
-    timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+    timeSpan.finish(`prerender ${buildStatus}`, statusColor, true, true);
 
     if (typeof ctx.onFinish === 'function') {
       // fire off any provided onFinish fn every time the build finishes
@@ -110,28 +96,22 @@ export function build(config: BuildConfig, context?: any) {
     // this is useful if the next build should do a full build or not
     ctx.lastBuildHadError = hasError(ctx.diagnostics);
 
+    if (ctx.localPrerenderServer) {
+      ctx.localPrerenderServer.close();
+      delete ctx.localPrerenderServer;
+    }
+
     // return what we've learned today
     return buildResults;
   });
 }
 
 
-export function isConfigValid(config: BuildConfig, diagnostics: Diagnostic[]) {
-  try {
-    // validate the build config
-    validateBuildConfig(config);
+function copyWWW(config: BuildConfig) {
+  const prerenderDir = config.prerender.prerenderDir;
+  const wwwDir = config.wwwDir;
 
-  } catch (e) {
-    if (config.logger) {
-      catchError(diagnostics, e);
-      config.logger.printDiagnostics(diagnostics);
-      generateHtmlDiagnostics(config, diagnostics);
-
-    } else {
-      console.error(e);
-    }
-    return false;
-  }
-
-  return true;
+  return config.sys.emptyDir(prerenderDir).then(() => {
+    return config.sys.copy(wwwDir, prerenderDir);
+  });
 }

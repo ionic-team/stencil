@@ -9,6 +9,11 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
+    it('should default prerenderIndex.maxConcurrent', () => {
+      validateBuildConfig(config);
+      expect(config.prerender.maxConcurrent).toBe(4);
+    });
+
     it('should default prerenderIndex.include', () => {
       validateBuildConfig(config);
       expect(config.prerender.include[0].url).toBe('/');
@@ -21,7 +26,7 @@ describe('validation', () => {
 
     it('should default prerenderIndex.prerenderDir', () => {
       validateBuildConfig(config);
-      expect(config.prerender.prerenderDir).toBe(`dist/prerender`);
+      expect(config.prerender.prerenderDir).toBeDefined();
     });
 
     it('should default prerenderIndex.inlineStyles', () => {
@@ -145,10 +150,10 @@ describe('validation', () => {
     });
 
     it('should set publicPath from custom buildDir', () => {
-      config.indexHtmlBuild = '/my/custom/index.html';
-      config.buildDir = '/my/custom/build-dist';
+      config.wwwDir = 'some-www';
+      config.buildDir = 'some-build';
       validateBuildConfig(config);
-      expect(config.publicPath).toBe('build-dist/');
+      expect(config.publicPath).toBe('some-build/');
       expect(path.isAbsolute(config.publicPath)).toBe(false);
     });
 
@@ -157,16 +162,16 @@ describe('validation', () => {
       expect(config.publicPath).toBe('build/');
     });
 
-    it('should set default indexHtmlBuild and convert to absolute path', () => {
+    it('should set default wwwIndexHtml and convert to absolute path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.indexHtmlBuild)).toBe('index.html');
-      expect(path.isAbsolute(config.indexHtmlBuild)).toBe(true);
+      expect(path.basename(config.wwwIndexHtml)).toBe('index.html');
+      expect(path.isAbsolute(config.wwwIndexHtml)).toBe(true);
     });
 
     it('should set default indexHtmlSrc and convert to absolute path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.indexHtmlSrc)).toBe('index.html');
-      expect(path.isAbsolute(config.indexHtmlSrc)).toBe(true);
+      expect(path.basename(config.srcIndexHtml)).toBe('index.html');
+      expect(path.isAbsolute(config.srcIndexHtml)).toBe(true);
     });
 
     it('should set default collection dir and convert to absolute path', () => {
@@ -175,9 +180,26 @@ describe('validation', () => {
       expect(path.isAbsolute(config.collectionDir)).toBe(true);
     });
 
+    it('should set default www dir and convert to absolute path', () => {
+      validateBuildConfig(config);
+      expect(path.basename(config.wwwDir)).toBe('www');
+      expect(path.isAbsolute(config.wwwDir)).toBe(true);
+    });
+
     it('should set default build dir and convert to absolute path', () => {
       validateBuildConfig(config);
-      expect(path.basename(config.buildDir)).toBe('build');
+      const parts = config.buildDir.split(path.sep);
+      expect(parts[parts.length - 1]).toBe('build');
+      expect(parts[parts.length - 2]).toBe('www');
+      expect(path.isAbsolute(config.buildDir)).toBe(true);
+    });
+
+    it('should set build dir w/ custom www', () => {
+      config.wwwDir = 'custom-www';
+      validateBuildConfig(config);
+      const parts = config.buildDir.split(path.sep);
+      expect(parts[parts.length - 1]).toBe('build');
+      expect(parts[parts.length - 2]).toBe('custom-www');
       expect(path.isAbsolute(config.buildDir)).toBe(true);
     });
 

@@ -76,22 +76,14 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
 
   // copy all of the files in asset directories to the app's build directory
   let dirCopyPromises = copyToBuildDir.map(assetsMeta => {
-    return new Promise((resolve, reject) => {
-      // figure out what the path is to the component directory
-      const buildDirDestination = normalizePath(config.sys.path.join(
-        getAppBuildDir(config),
-        assetsMeta.cmpRelativePath
-      ));
+    // figure out what the path is to the component directory
+    const buildDirDestination = normalizePath(config.sys.path.join(
+      getAppBuildDir(config),
+      assetsMeta.cmpRelativePath
+    ));
 
-      // let's copy!
-      config.sys.copy(assetsMeta.absolutePath, buildDirDestination, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
+    // let's copy!
+    return config.sys.copy(assetsMeta.absolutePath, buildDirDestination);
   });
 
 
@@ -101,22 +93,14 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
 
     // copy all of the files in asset directories to the app's collection directory
     dirCopyPromises = dirCopyPromises.concat(copyToCollectionDir.map(assetsMeta => {
-      return new Promise((resolve, reject) => {
-        // figure out what the path is to the component directory
-        const collectionDirDestination = normalizePath(config.sys.path.join(
-          config.collectionDir,
-          config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
-        ));
+      // figure out what the path is to the component directory
+      const collectionDirDestination = normalizePath(config.sys.path.join(
+        config.collectionDir,
+        config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+      ));
 
-        // let's copy!
-        config.sys.copy(assetsMeta.absolutePath, collectionDirDestination, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      });
+      // let's copy!
+      return config.sys.copy(assetsMeta.absolutePath, collectionDirDestination);
     }));
   }
 

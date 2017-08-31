@@ -101,6 +101,10 @@ switch (cmdArgs[2]) {
     }
     break;
 
+  case 'prerender':
+    stencil.prerender(config);
+    break;
+
   default:
     console.error(util.chalk.red.bold('\n  Invalid stencil command, please see the options below:'));
     require('./help')();

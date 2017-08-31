@@ -1,16 +1,35 @@
-import { BuildConfig, BuildContext, Diagnostic, FilesMap, HydrateOptions } from '../../util/interfaces';
-import { inlineLoaderScript } from './inline-loader-script';
+import { BuildConfig, BuildContext, FilesMap, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
+import { inlineLoaderScript } from './inline-loader-script';
 import { inlineStyles } from '../css/inline-styles';
+import { insertCanonicalLink } from './canonical-link';
 
 
-export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, diagnostics: Diagnostic[]) {
-  if (opts.inlineStyles !== false) {
+export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, results: HydrateResults) {
+  if (opts.isPrerender) {
+    insertIsPrerendered(doc);
+  }
+
+  if (opts.canonicalLink !== false) {
     try {
-      inlineStyles(config, doc, stylesMap, opts, diagnostics);
+      insertCanonicalLink(config, doc, results.url);
 
     } catch (e) {
-      diagnostics.push({
+      results.diagnostics.push({
+        level: 'error',
+        type: 'hydrate',
+        header: 'Insert Canonical Link',
+        messageText: e
+      });
+    }
+  }
+
+  if (opts.inlineStyles !== false) {
+    try {
+      inlineStyles(config, doc, stylesMap, opts, results.diagnostics);
+
+    } catch (e) {
+      results.diagnostics.push({
         level: 'error',
         type: 'hydrate',
         header: 'Inline Styles',
@@ -26,7 +45,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
       inlineLoaderScript(config, ctx, doc);
 
     } catch (e) {
-      diagnostics.push({
+      results.diagnostics.push({
         level: 'error',
         type: 'hydrate',
         header: 'Inline Loader Script',
@@ -35,13 +54,13 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     }
   }
 
-  if (opts.collapseWhitespace !== false) {
-    // reduceHtmlWhitepace is the default
+  if (opts.collapseWhitespace !== false && !config.devMode) {
+    // collapseWhitespace is the default
     try {
-      collapseHtmlWhitepace(doc.body);
+      collapseHtmlWhitepace(doc.documentElement);
 
     } catch (e) {
-      diagnostics.push({
+      results.diagnostics.push({
         level: 'error',
         type: 'hydrate',
         header: 'Reduce HTML Whitespace',
@@ -49,4 +68,16 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
       });
     }
   }
+}
+
+
+function insertIsPrerendered(doc: Document) {
+  // <meta name="prerendered">
+  let prerenderedMeta = doc.head.querySelector('meta[name="prerendered"]');
+  if (prerenderedMeta) return;
+
+  prerenderedMeta = doc.createElement('meta');
+  prerenderedMeta.setAttribute('name', 'prerendered');
+
+  doc.head.appendChild(prerenderedMeta);
 }

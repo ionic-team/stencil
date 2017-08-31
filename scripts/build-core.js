@@ -285,6 +285,13 @@ Object.defineProperties(module.exports, {
     }
   },
 
+  prerender: {
+    get: function() {
+      var compiler = require('./compiler/index');
+      return compiler.prerender;
+    }
+  },
+
   createRenderer: {
     get: function() {
       var server = require('./server/index');

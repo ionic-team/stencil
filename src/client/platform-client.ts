@@ -48,6 +48,8 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   Context.isClient = true;
   Context.isServer = Context.isPrerender = false;
+  Context.window = win;
+  Context.document = doc;
 
 
   // create the platform api which is used throughout common core code

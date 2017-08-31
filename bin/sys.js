@@ -8,16 +8,46 @@ var coreClientFileCache = {};
 
 module.exports = Object.defineProperties({
 
-  copy: util.fsExtra.copy,
+  copy: function(src, dest) {
+    return new Promise(function(resolve, reject) {
+      util.fsExtra.copy(src, dest, function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  },
 
   createDom: function createDom() {
     var createDom = require('./create-dom');
     return createDom();
   },
 
-  emptyDir: util.fsExtra.emptyDir,
+  emptyDir: function(dir) {
+    return new Promise(function(resolve, reject) {
+      util.fsExtra.emptyDir(dir, function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  },
 
-  ensureDir: util.fsExtra.ensureDir,
+  ensureDir: function(dir) {
+    return new Promise(function(resolve, reject) {
+      util.fsExtra.ensureDir(dir, function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  },
 
   fs: fs,
 
@@ -129,7 +159,17 @@ module.exports = Object.defineProperties({
 
   path: path,
 
-  remove: util.fsExtra.remove,
+  remove: function(dir) {
+    return new Promise(function(resolve, reject) {
+      util.fsExtra.remove(dir, function(err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+  },
 
   resolveModule: function resolveModule(fromDir, moduleId) {
     var Module = require('module');
@@ -169,11 +209,13 @@ module.exports = Object.defineProperties({
   },
 
   vm: {
-    createContext: function(sandbox) {
+    createContext: function(ctx, wwwDir, sandbox) {
       var vm = require('vm');
       // https://github.com/tmpvar/jsdom/issues/1724
       // manually adding a fetch polyfill until jsdom adds it
-      sandbox.fetch = require('./node-fetch');
+      var p = require('./patch-fetch-xhr');
+      p.patchFetchXhr(ctx, wwwDir, sandbox);
+
       return vm.createContext(sandbox);
     },
     runInContext: function(code, contextifiedSandbox, options) {
@@ -202,5 +244,7 @@ module.exports = Object.defineProperties({
   sass: { get: function() { return require('node-sass'); } },
 
   typescript: { get: function() { return require('typescript'); } },
+
+  url: { get: function() { return require('url'); } },
 
 });

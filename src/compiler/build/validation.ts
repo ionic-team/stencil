@@ -54,11 +54,18 @@ export function validateBuildConfig(config: BuildConfig) {
     config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
   }
 
+  if (typeof config.wwwDir !== 'string') {
+    config.wwwDir = DEFAULT_WWW_DIR;
+  }
+  if (!path.isAbsolute(config.wwwDir)) {
+    config.wwwDir = normalizePath(path.join(config.rootDir, config.wwwDir));
+  }
+
   if (typeof config.buildDir !== 'string') {
     config.buildDir = DEFAULT_BUILD_DIR;
   }
   if (!path.isAbsolute(config.buildDir)) {
-    config.buildDir = normalizePath(path.join(config.rootDir, config.buildDir));
+    config.buildDir = normalizePath(path.join(config.wwwDir, config.buildDir));
   }
 
   if (typeof config.collectionDir !== 'string') {
@@ -68,31 +75,31 @@ export function validateBuildConfig(config: BuildConfig) {
     config.collectionDir = normalizePath(path.join(config.rootDir, config.collectionDir));
   }
 
-  if (typeof config.indexHtmlSrc !== 'string') {
-    config.indexHtmlSrc = DEFAULT_INDEX_SRC;
+  if (typeof config.srcIndexHtml !== 'string') {
+    config.srcIndexHtml = normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML));
   }
-  if (!path.isAbsolute(config.indexHtmlSrc)) {
-    config.indexHtmlSrc = normalizePath(path.join(config.rootDir, config.indexHtmlSrc));
+  if (!path.isAbsolute(config.srcIndexHtml)) {
+    config.srcIndexHtml = normalizePath(path.join(config.rootDir, config.srcIndexHtml));
   }
 
-  if (typeof config.indexHtmlBuild !== 'string') {
-    config.indexHtmlBuild = DEFAULT_INDEX_BUILD;
+  if (typeof config.wwwIndexHtml !== 'string') {
+    config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, DEFAULT_INDEX_HTML));
   }
-  if (!path.isAbsolute(config.indexHtmlBuild)) {
-    config.indexHtmlBuild = normalizePath(path.join(config.rootDir, config.indexHtmlBuild));
+  if (!path.isAbsolute(config.wwwIndexHtml)) {
+    config.wwwIndexHtml = normalizePath(path.join(config.rootDir, config.wwwDir));
   }
 
   if (typeof config.publicPath !== 'string') {
     // CLIENT SIDE ONLY! Do not use this for server-side file read/writes
     // this is a reference to the public static directory from the index.html running from a browser
-    // in most cases it's just "build", as in index page would request scripts from `build/`
+    // in most cases it's just "build", as in index page would request scripts from `/build/`
     config.publicPath = normalizePath(
-      path.relative(path.dirname(config.indexHtmlBuild), config.buildDir)
+      path.relative(config.wwwDir, config.buildDir)
     );
-    if (config.publicPath.charAt(config.publicPath.length - 1) !== '/') {
-      // ensure there's a trailing /
-      config.publicPath += '/';
-    }
+  }
+  if (config.publicPath.charAt(config.publicPath.length - 1) !== '/') {
+    // ensure there's a trailing /
+    config.publicPath += '/';
   }
 
   // default devMode false
@@ -130,7 +137,14 @@ export function validateBuildConfig(config: BuildConfig) {
   }
 
   if (config.prerender !== null && config.prerender !== false) {
-    config.prerender = Object.assign(config.prerender || {}, DEFAULT_PRERENDER_CONFIG);
+    config.prerender = Object.assign(DEFAULT_PRERENDER_CONFIG, config.prerender);
+
+    if (!path.isAbsolute(config.prerender.prerenderDir)) {
+      config.prerender.prerenderDir = normalizePath(path.join(config.rootDir, config.prerender.prerenderDir));
+    }
+
+  } else {
+    config.prerender = null;
   }
 
   if (!config.watchIgnoredRegex) {
@@ -262,16 +276,16 @@ export function validateComponentTag(tag: string, suffix: string) {
 
 
 const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_BUILD_DIR = 'www/build';
-const DEFAULT_INDEX_SRC = 'src/index.html';
-const DEFAULT_INDEX_BUILD = 'www/index.html';
+const DEFAULT_WWW_DIR = 'www';
+const DEFAULT_BUILD_DIR = 'build';
+const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_COLLECTION_DIR = 'dist/collection';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
 
-const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
+export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
   prerenderDir: 'dist/prerender',
   crawl: true,
   include: [
@@ -280,5 +294,7 @@ const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
   inlineLoaderScript: true,
   inlineStyles: true,
   removeUnusedStyles: true,
-  collapseWhitespace: true
+  collapseWhitespace: true,
+  maxConcurrent: 4,
+  host: 'dev.prerender.stenciljs.com'
 };

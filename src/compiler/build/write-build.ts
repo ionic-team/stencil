@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, BuildResults } from '../../util/interfaces';
-import { catchError, emptyDir, writeFiles } from '../util';
+import { catchError, writeFiles } from '../util';
 import { copyAssets } from '../component-plugins/assets-plugin';
 import { writeAppManifest } from '../manifest/manifest-data';
 
@@ -52,7 +52,7 @@ function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
 
   // let's empty out the build dest directory
   return Promise.all([
-    emptyDir(config.sys, config.buildDir),
-    emptyDir(config.sys, config.collectionDir)
+    config.sys.emptyDir(config.buildDir),
+    config.sys.emptyDir(config.collectionDir)
   ]);
 }

@@ -1,7 +1,6 @@
 import { BuildConfig, BuildContext, ComponentRegistry, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
 import { createPlatformServer } from './platform-server';
-import { getAppBuildDir } from '../compiler/app/generate-app-files';
 import { initHostConstructor } from '../core/instance/init';
 import { optimizeHtml } from '../compiler/html/optimize-html';
 
@@ -34,15 +33,11 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
   normalizeDirection(doc, opts);
   normalizeLanguage(doc, opts);
 
-  // get the path to the app's build directory
-  const appBuildDir = getAppBuildDir(config);
-
   // create the platform
   const plt = createPlatformServer(
-    config.sys,
-    config.namespace,
+    config,
     win,
-    appBuildDir,
+    doc,
     hydrateResults.diagnostics,
     opts.isPrerender,
     ctx
@@ -66,7 +61,10 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     if (rootElm) {
       try {
         // optimize this document!!
-        optimizeHtml(config, ctx, doc, stylesMap, opts, hydrateResults.diagnostics);
+        optimizeHtml(config, ctx, doc, stylesMap, opts, hydrateResults);
+
+        // gather up all of the <a> tag information in the doc
+        collectAnchors(doc, hydrateResults);
 
         // serialize this dom back into a string
         hydrateResults.html = dom.serialize();
@@ -76,7 +74,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
         // terminate all running timers and also remove any
         // event listeners on the window and document
-        // dom.destroy();
+        dom.destroy();
 
       } catch (e) {
         // gahh, something's up
@@ -162,6 +160,22 @@ export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo
 }
 
 
+function collectAnchors(doc: Document, hydrateResults: HydrateResults) {
+  const anchorElements = doc.querySelectorAll('a');
+
+  for (var i = 0; i < anchorElements.length; i++) {
+    var attrs: any = {};
+    var anchorAttrs = anchorElements[i].attributes;
+
+    for (var j = 0; j < anchorAttrs.length; j++) {
+      attrs[anchorAttrs[j].nodeName.toLowerCase()] = anchorAttrs[j].nodeValue;
+    }
+
+    hydrateResults.anchors.push(attrs);
+  }
+}
+
+
 function normalizeDirection(doc: Document, opts: HydrateOptions) {
   let dir = doc.body.getAttribute('dir');
   if (dir) {
@@ -219,3 +233,4 @@ function normalizeLanguage(doc: Document, opts: HydrateOptions) {
 export interface ConnectedInfo {
   elementCount: number;
 }
+

@@ -243,8 +243,8 @@ function configFileReload(existingConfig: BuildConfig) {
   existingConfig.global = updatedConfig.global;
   existingConfig.hashedFileNameLength = updatedConfig.hashedFileNameLength;
   existingConfig.hashFileNames = updatedConfig.hashFileNames;
-  existingConfig.indexHtmlBuild = updatedConfig.indexHtmlBuild;
-  existingConfig.indexHtmlSrc = updatedConfig.indexHtmlSrc;
+  existingConfig.wwwIndexHtml = updatedConfig.wwwIndexHtml;
+  existingConfig.srcIndexHtml = updatedConfig.srcIndexHtml;
   existingConfig.minifyCss = updatedConfig.minifyCss;
   existingConfig.minifyJs = updatedConfig.minifyJs;
   existingConfig.namespace = updatedConfig.namespace;

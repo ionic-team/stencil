@@ -12,6 +12,8 @@ export interface CoreContext {
   isClient?: boolean;
   isServer?: boolean;
   isPrerender?: boolean;
+  window?: Window;
+  document?: Document;
   mode?: string;
   [contextId: string]: any;
 }
@@ -286,10 +288,11 @@ export interface BuildConfig {
   namespace?: string;
   global?: string;
   srcDir?: string;
+  wwwDir?: string;
   buildDir?: string;
   collectionDir?: string;
-  indexHtmlSrc?: string;
-  indexHtmlBuild?: string;
+  srcIndexHtml?: string;
+  wwwIndexHtml?: string;
   publicPath?: string;
   generateCollection?: boolean;
   bundles?: Bundle[];
@@ -313,18 +316,34 @@ export interface RenderOptions {
   inlineStyles?: boolean;
   removeUnusedStyles?: boolean;
   inlineLoaderScript?: boolean;
+  canonicalLink?: boolean;
 }
 
 
 export interface PrerenderConfig extends RenderOptions {
   crawl?: boolean;
-  include?: PrerenderConfigUrl[];
+  include?: PrerenderLocation[];
   prerenderDir?: string;
+  maxConcurrent?: number;
+  userAgent?: string;
+  cookie?: string;
+  dir?: string;
+  lang?: string;
+  host?: string;
 }
 
 
-export interface PrerenderConfigUrl {
-  url: string;
+export interface PrerenderLocation {
+  pathname?: string;
+  url?: string;
+  status?: PrerenderStatus;
+}
+
+
+export enum PrerenderStatus {
+  pending = 1,
+  processing = 2,
+  complete = 3
 }
 
 
@@ -350,7 +369,7 @@ export interface BuildResults {
   files: string[];
   diagnostics: Diagnostic[];
   manifest: ManifestData;
-  changedFiles: string[];
+  changedFiles?: string[];
 }
 
 
@@ -390,11 +409,15 @@ export interface BuildContext {
 
   moduleBundleCount?: number;
   styleBundleCount?: number;
+  localPrerenderServer?: any;
+  prerenderedUrls?: number;
 
   diagnostics?: Diagnostic[];
   registry?: ComponentRegistry;
   manifest?: Manifest;
   onFinish?: (buildResults: BuildResults) => void;
+
+  prerenderUrlQueue?: PrerenderLocation[];
 }
 
 
@@ -916,7 +939,7 @@ export interface PrintLine {
 
 
 export interface StencilSystem {
-  copy?(src: string, dest: string, callback: (err: any) => void): void;
+  copy?(src: string, dest: string): Promise<void>;
   compiler?: {
     name: string;
     version: string;
@@ -927,8 +950,8 @@ export interface StencilSystem {
     destroy(): void;
     getDiagnostics(): Diagnostic[];
   };
-  emptyDir?(dir: string, callback: (err: any) => void): void;
-  ensureDir?(dir: string, callback: (err: any) => void): void;
+  emptyDir?(dir: string): Promise<void>;
+  ensureDir?(dir: string): Promise<void>;
   fs?: {
     access(path: string, callback: (err: any) => void): void;
     accessSync(path: string | Buffer, mode?: number): void
@@ -965,7 +988,7 @@ export interface StencilSystem {
     resolve(...pathSegments: any[]): string;
     sep: string;
   };
-  remove?(path: string, callback: (err: any) => void): void;
+  remove?(path: string): Promise<void>;
   rollup?: {
     rollup: {
       (config: { entry: string; plugins?: any[]; treeshake?: boolean; onwarn?: Function; }): Promise<{
@@ -999,11 +1022,32 @@ export interface StencilSystem {
     ): void;
   };
   typescript?: any;
+  url?: {
+    parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
+    format(url: Url): string;
+    resolve(from: string, to: string): string;
+  };
   vm?: {
-    createContext(sandbox?: any): any;
+    createContext(ctx: BuildContext, wwwDir: string, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
   watch?(paths: string | string[], opts?: any): FSWatcher;
+}
+
+
+export interface Url {
+  href?: string;
+  protocol?: string;
+  auth?: string;
+  hostname?: string;
+  port?: string;
+  host?: string;
+  pathname?: string;
+  search?: string;
+  query?: string | any;
+  slashes?: boolean;
+  hash?: string;
+  path?: string;
 }
 
 
@@ -1016,8 +1060,15 @@ export interface FSWatcher {
 
 export interface HydrateResults {
   diagnostics: Diagnostic[];
+  url?: string;
   html?: string;
   styles?: string;
+  anchors?: HydrateAnchor[];
+}
+
+
+export interface HydrateAnchor {
+  [attrName: string]: string;
 }
 
 

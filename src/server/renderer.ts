@@ -1,10 +1,10 @@
 import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions,
   HydrateResults, LoadComponentRegistry } from '../util/interfaces';
+import { DEFAULT_PRERENDER_CONFIG, validateBuildConfig } from '../compiler/build/validation';
 import { getBuildContext } from '../compiler/util';
 import { getRegistryJsonFilePath } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
-import { validateBuildConfig } from '../compiler/build/validation';
 
 
 export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
@@ -29,7 +29,8 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
     const hydrateResults: HydrateResults = {
       diagnostics: [],
       html: opts.html,
-      styles: null
+      styles: null,
+      anchors: []
     };
 
     // only create a promise if the last argument
@@ -44,7 +45,8 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
 
     try {
       // validate the hydrate options and add any missing info
-      validateHydrateOptions(opts);
+      validateHydrateOptions(config, opts);
+      hydrateResults.url = opts.url;
 
       // kick off hydrated, which is an async opertion
       hydrateHtml(config, ctx, registry, opts, hydrateResults, callback);
@@ -109,7 +111,7 @@ function registerComponents(config: BuildConfig) {
 }
 
 
-function validateHydrateOptions(opts: HydrateOptions) {
+function validateHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
   const req = opts.req;
 
   if (req && typeof req.get === 'function') {
@@ -120,6 +122,16 @@ function validateHydrateOptions(opts: HydrateOptions) {
     if (!opts.userAgent) opts.userAgent = req.get('user-agent');
     if (!opts.cookie) opts.cookie = req.get('cookie');
   }
+
+  if (!opts.url) {
+    opts.url = '/';
+  }
+
+  const urlObj = config.sys.url.parse(opts.url);
+  if (!urlObj.protocol) urlObj.protocol = 'https:';
+  if (!urlObj.hostname) urlObj.hostname = DEFAULT_PRERENDER_CONFIG.host;
+
+  opts.url = config.sys.url.format(urlObj);
 }
 
 

@@ -15,19 +15,16 @@ export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: 
   loaderExternalSrcUrl += config.namespace.toLowerCase() + '.js';
 
   // remove the app loader script url request
-  const removedLoader = removeExternalLoaderScript(config, doc, loaderExternalSrcUrl);
+  const removedLoader = removeExternalLoaderScript(doc, loaderExternalSrcUrl);
 
   if (removedLoader) {
     // append the loader script content to the bottom of the document
     appendInlineLoaderScript(ctx, doc);
-
-  } else {
-    config.logger.error(`Loader script was not inlined into the index.html file.`);
   }
 }
 
 
-function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderExternalSrcUrl: string) {
+function removeExternalLoaderScript(doc: Document, loaderExternalSrcUrl: string) {
   let removedLoader = false;
 
   const scriptElements = doc.getElementsByTagName('script');
@@ -40,10 +37,6 @@ function removeExternalLoaderScript(config: BuildConfig, doc: Document, loaderEx
       scriptElements[i].parentNode.removeChild(scriptElements[i]);
       removedLoader = true;
     }
-  }
-
-  if (!removedLoader) {
-    config.logger.error(`External loader script "${loaderExternalSrcUrl}" was not found in the index.html file.`);
   }
 
   return removedLoader;

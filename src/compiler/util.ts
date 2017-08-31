@@ -2,7 +2,7 @@ import { BANNER } from '../util/constants';
 import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from '../util/interfaces';
 
 
-export function getBuildContext(ctx: BuildContext) {
+export function getBuildContext(ctx?: BuildContext) {
   // create the build context if it doesn't exist
   ctx = ctx || {};
 
@@ -32,6 +32,8 @@ export function resetBuildContext(ctx: BuildContext) {
   ctx.indexBuildCount = 0;
   ctx.moduleBundleCount = 0;
   ctx.styleBundleCount = 0;
+  ctx.prerenderedUrls = 0;
+  delete ctx.localPrerenderServer;
 }
 
 
@@ -100,19 +102,6 @@ export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: Fi
   const directories = getDirectoriesFromFiles(sys, filesToWrite);
   return ensureDirectoriesExist(sys, directories, [rootDir]).then(() => {
     return writeToDisk(sys, filesToWrite);
-  });
-}
-
-
-export function emptyDir(sys: StencilSystem, dir: string) {
-  return new Promise((resolve, reject) => {
-    sys.remove(dir, err => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
   });
 }
 

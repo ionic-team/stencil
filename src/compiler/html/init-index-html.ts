@@ -17,7 +17,7 @@ export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostic
 
   try {
     // check if there's even a src index.html file
-    config.sys.fs.accessSync(config.indexHtmlSrc);
+    config.sys.fs.accessSync(config.srcIndexHtml);
 
   } catch (e) {
     // there is no src index.html file in the config, which is fine
@@ -30,7 +30,7 @@ export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostic
     // ok, so we haven't written an index.html build file yet
     // and we do know they have a src one, so let's write a
     // filler index.html file that shows while the first build is happening
-    config.sys.fs.writeFileSync(config.indexHtmlBuild, FILLER_INDEX_BUILD);
+    config.sys.fs.writeFileSync(config.wwwIndexHtml, FILLER_INDEX_BUILD);
 
   } catch (e) {
     catchError(diagnostics, e);

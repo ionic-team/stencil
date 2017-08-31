@@ -1,4 +1,4 @@
-import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostElement, HostContentNodes,
+import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostElement,
   HydrateOptions, Logger, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
@@ -12,21 +12,20 @@ const MemoryFileSystem = require('memory-fs');
 const path = require('path');
 const vm = require('vm');
 const jsdom = require('jsdom');
+const typescript = require('typescript');
+const url = require('url');
 
 
 export function mockPlatform() {
   const diagnostics: Diagnostic[] = [];
-  const sys = mockStencilSystem();
-  const win = sys.createDom().parse({html: ''});
+  const config = mockBuildConfig();
+  const win = config.sys.createDom().parse({html: ''});
   const domApi = createDomApi(win.document);
 
-  const appBuildDir = `/build/app/`;
-
   const plt = createPlatformServer(
-    sys,
-    'App',
+    config,
     win,
-    appBuildDir,
+    win.document,
     diagnostics,
     false
   );
@@ -87,14 +86,26 @@ export function mockStencilSystem() {
       version: 'test'
     },
 
-    copy: function mockCopyDir(src: string, dest: string, cb: Function) {
+    copy: function mockCopyDir(src: string, dest: string) {
       src; dest;
-      process.nextTick(() => {
-        cb(null);
+      return new Promise(resolve => {
+        resolve();
       });
     },
 
     createDom: mockCreateDom,
+
+    emptyDir: function() {
+      return new Promise(resolve => {
+        resolve();
+      });
+    },
+
+    ensureDir: function() {
+      return new Promise(resolve => {
+        resolve();
+      });
+    },
 
     generateContentHash: function mockGenerateContentHash(content: string, length: number) {
       var crypto = require('crypto');
@@ -116,10 +127,10 @@ export function mockStencilSystem() {
 
     path: path,
 
-    remove: function mockRmDir(path, cb) {
+    remove: function mockRmDir(path) {
       path;
-      process.nextTick(() => {
-        cb(null);
+      return new Promise(resolve => {
+        resolve();
       });
     },
 
@@ -137,9 +148,19 @@ export function mockStencilSystem() {
       }
     },
 
-    typescript: require('typescript'),
+    typescript: typescript,
 
-    vm: vm,
+    url: url,
+
+    vm: {
+      createContext: function(ctx, wwwDir, sandbox) {
+        ctx; wwwDir;
+        return vm.createContext(sandbox);
+      },
+      runInContext: function(code, contextifiedSandbox, options) {
+        vm.runInContext(code, contextifiedSandbox, options);
+      }
+    },
 
     watch: mockWatch
   };
@@ -216,6 +237,8 @@ export function mockFs() {
   const fs = new MemoryFileSystem();
 
   const orgreadFileSync = fs.readFileSync;
+  const orgwriteFileSync = fs.writeFileSync;
+
   fs.readFileSync = function() {
     try {
       return orgreadFileSync.apply(fs, arguments);
@@ -230,6 +253,10 @@ export function mockFs() {
         throw e;
       }
     }
+  };
+
+  fs.writeFileSync = function() {
+    return orgwriteFileSync.apply(fs, arguments);
   };
 
   return fs;
