@@ -8,7 +8,7 @@
  */
 
 import { VNode as VNodeObj } from './vnode';
-import { VNode, VNodeProdData } from '../../util/interfaces';
+import { CssClassMap, VNode, VNodeProdData } from '../../util/interfaces';
 
 const stack: any[] = [];
 
@@ -77,7 +77,20 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     // data object was provided
     vnode.vattrs = (vnodeData as VNodeProdData).a;
     vnode.vprops = (vnodeData as VNodeProdData).p;
-    vnode.vclass = (vnodeData as VNodeProdData).c;
+
+    if (typeof (vnodeData as VNodeProdData).c === 'string') {
+      vnode.vclass = {};
+      let cssClasses = ((vnodeData as VNodeProdData).c as string).split(' ');
+      for (i = 0; i < cssClasses.length; i++) {
+        if (cssClasses[i]) {
+          vnode.vclass[cssClasses[i]] = true;
+        }
+      }
+
+    } else {
+      vnode.vclass = (vnodeData as VNodeProdData).c as CssClassMap;
+    }
+
     vnode.vstyle = (vnodeData as VNodeProdData).s;
     vnode.vlisteners = (vnodeData as VNodeProdData).o;
     vnode.vkey = (vnodeData as VNodeProdData).k;

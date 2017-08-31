@@ -96,7 +96,22 @@ describe('h()', () => {
     expect(vnode.vchildren[1].vtag).toBe('child-b');
   });
 
-  it('should add class', () => {
+  it('should add multiple classes from string, w/ extra whitespace', () => {
+    var vnode = h('div', { c: '  dragons   love  tacos  ' });
+    expect(vnode.vclass).toBeDefined();
+    expect(Object.keys(vnode.vclass).length).toBe(3);
+    expect(vnode.vclass['dragons']).toBe(true);
+    expect(vnode.vclass['love']).toBe(true);
+    expect(vnode.vclass['tacos']).toBe(true);
+  });
+
+  it('should add one class from string', () => {
+    var vnode = h('div', { c: 'some-class' });
+    expect(vnode.vclass).toBeDefined();
+    expect(vnode.vclass['some-class']).toBe(true);
+  });
+
+  it('should add class from map of classnames and booleans', () => {
     var vnode = h('div', { c: { enabled: true, checked: false } });
     expect(vnode.vclass).toBeDefined();
     expect(vnode.vclass.enabled).toBe(true);
