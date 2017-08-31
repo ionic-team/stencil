@@ -63,10 +63,13 @@ describe('app-core', () => {
 
     it('includes the required polyfills', () => {
       core.generateCoreES5WithPolyfills(config, ['']);
-      expect(mockGetClientCoreFile.mock.calls.length).toEqual(4);
+      expect(mockGetClientCoreFile.mock.calls.length).toEqual(7);
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'polyfills/document-register-element.js' });
-      expect(mockGetClientCoreFile.mock.calls[1][0]).toEqual({ staticName: 'polyfills/fetch.js' });
-      expect(mockGetClientCoreFile.mock.calls[2][0]).toEqual({ staticName: 'polyfills/performance-now.js' });
+      expect(mockGetClientCoreFile.mock.calls[1][0]).toEqual({ staticName: 'polyfills/promise.js' });
+      expect(mockGetClientCoreFile.mock.calls[2][0]).toEqual({ staticName: 'polyfills/fetch.js' });
+      expect(mockGetClientCoreFile.mock.calls[3][0]).toEqual({ staticName: 'polyfills/request-animation-frame.js' });
+      expect(mockGetClientCoreFile.mock.calls[4][0]).toEqual({ staticName: 'polyfills/closest.js' });
+      expect(mockGetClientCoreFile.mock.calls[5][0]).toEqual({ staticName: 'polyfills/performance-now.js' });
     });
 
     it('uses the core file name', () => {
@@ -85,20 +88,26 @@ describe('app-core', () => {
     it('genertes the full wrapped content', async () => {
       const preamble = generatePreamble(config).trim();
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am document register element'));
+      mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am promise'));
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am fetch'));
+      mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am raf'));
+      mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am closest'));
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am performance now'));
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am core'));
       const res = await core.generateCoreES5WithPolyfills(config, ['global line 1', 'global line 2']);
       const lines = res.split('\n');
       expect(lines[0]).toEqual('I am document register element');
-      expect(lines[1]).toEqual('I am fetch');
-      expect(lines[2]).toEqual('I am performance now');
-      expect(lines[3]).toEqual(preamble);
-      expect(lines[4]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
-      expect(lines[5]).toEqual('global line 1');
-      expect(lines[6]).toEqual('global line 2');
-      expect(lines[7]).toEqual('I am core');
-      expect(lines[8]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[1]).toEqual('I am promise');
+      expect(lines[2]).toEqual('I am fetch');
+      expect(lines[3]).toEqual('I am raf');
+      expect(lines[4]).toEqual('I am closest');
+      expect(lines[5]).toEqual('I am performance now');
+      expect(lines[6]).toEqual(preamble);
+      expect(lines[7]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
+      expect(lines[8]).toEqual('global line 1');
+      expect(lines[9]).toEqual('global line 2');
+      expect(lines[10]).toEqual('I am core');
+      expect(lines[11]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
   });
 
