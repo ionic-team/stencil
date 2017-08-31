@@ -2650,7 +2650,7 @@ let supportLevel = (() => {
 	}
 
 	if ('CI' in env) {
-		if ('TRAVIS' in env || env.CI === 'Travis' || 'CIRCLECI' in env) {
+		if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'].some(sign => sign in env) || env.CI_NAME === 'codeship') {
 			return 1;
 		}
 
@@ -2675,7 +2675,7 @@ let supportLevel = (() => {
 		}
 	}
 
-	if (/^(screen|xterm)-256(?:color)?/.test(env.TERM)) {
+	if (/-256(color)?$/i.test(env.TERM)) {
 		return 2;
 	}
 
