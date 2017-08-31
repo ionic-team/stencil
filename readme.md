@@ -123,6 +123,8 @@ A Stencil is a tool artists use for drawing perfect shapes easily. We want Stenc
 
 Stencil is a tool developers use to create Web Components with some powerful features baked in, but it gets out of the way at runtime.
 
+[Using Web Components in Ionic - Polymer Summit 2017](https://youtu.be/UfD-k7aHkQE)
+
 
 ## Browser Support
 
