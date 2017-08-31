@@ -126,10 +126,24 @@ Stencil is a tool developers use to create Web Components with some powerful fea
 
 ## Browser Support
 
-Web Components, specifically Custom Elements, are natively supported in Chrome and Safari and are coming to both Edge and Firefox. A dynamic loader is already included in order to only load the polyfills for the browsers that require them. Additionally, Stencil polyfills `fetch` and `Promise` for browsers that do not support them natively.
+Web Components, specifically Custom Elements, are natively supported in Chrome and Safari and are coming to both Edge and Firefox. A dynamic polyfill loader is already included in order to only load the polyfills for the browsers that are missing specific features.
 
  - Chrome (and all Chromium based browsers)
  - Safari
  - Edge
  - Firefox
  - IE 11
+
+
+## Polyfills
+
+For the small minority of browsers that do not support modern browser features and APIs, Stencil will automatically polyfill them on-demand. What this means is that for browsers that already support the feature natively, they will not have to download and parse any unnecessary JavaScript. The great news is that in today's web landscape, most modern APIs are already shipping for what Stencil requires. Polyfills which are loaded on-demand include:
+
+ - [Custom Element](https://github.com/WebReflection/document-register-element)
+ - [Promise](https://github.com/stefanpenner/es6-promise)
+ - [fetch](https://github.com/github/fetch)
+ - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+ - [performance.now()](https://gist.github.com/paulirish/5438650)
+ - [requestAnimationFrame()](https://gist.github.com/paulirish/1579671)
+ - [Element.closest](https://github.com/jonathantneal/closest)
+ - [Element.matches](https://github.com/jonathantneal/closest)
