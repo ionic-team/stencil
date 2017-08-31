@@ -4884,7 +4884,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_chalk__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_chalk___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_chalk__);
 
-var CommandLineLogger = (function () {
+var CommandLineLogger = /** @class */ (function () {
     function CommandLineLogger(opts) {
         this._level = 'info';
         this.process = opts.process;
@@ -5121,7 +5121,7 @@ var CommandLineLogger = (function () {
     return CommandLineLogger;
 }());
 
-var CmdTimeSpan = (function () {
+var CmdTimeSpan = /** @class */ (function () {
     function CmdTimeSpan(logger, startMsg, debug) {
         this.debug = debug;
         this.logger = logger;
