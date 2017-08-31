@@ -35,6 +35,7 @@ export function generateCoreES5WithPolyfills(config: BuildConfig, globalJsConten
   // first load up all of the polyfill content
   [
     'document-register-element.js',
+    'object-assign.js',
     'promise.js',
     'fetch.js',
     'request-animation-frame.js',
