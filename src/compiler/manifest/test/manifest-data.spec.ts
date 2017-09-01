@@ -2,7 +2,7 @@ import { BuildConfig, ComponentMeta, Manifest, ManifestData, ModuleFile } from '
 import { mockStencilSystem } from '../../../test';
 import { parseBundles, parseComponent, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
 import { HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD, MEMBER_PROP,
-  MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT, MEMBER_STATE,
+  MEMBER_PROP_MUTABLE, MEMBER_PROP_CONTEXT, MEMBER_STATE,
   PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
 
 
@@ -246,15 +246,15 @@ describe('manifest-data serialize/parse', () => {
     expect(b.cmpMeta.membersMeta.state.propType).toBeUndefined();
   });
 
-  it('membersMeta prop state', () => {
+  it('membersMeta prop mutable', () => {
     a.membersMeta = {
-      'propState': { memberType: MEMBER_PROP_STATE, propType: TYPE_NUMBER }
+      'propMutable': { memberType: MEMBER_PROP_MUTABLE, propType: TYPE_NUMBER }
     };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     b = parseComponent(config, manifestDir, cmpData);
 
-    expect(b.cmpMeta.membersMeta.propState.memberType).toBe(MEMBER_PROP_STATE);
-    expect(b.cmpMeta.membersMeta.propState.propType).toBe(TYPE_NUMBER);
+    expect(b.cmpMeta.membersMeta.propMutable.memberType).toBe(MEMBER_PROP_MUTABLE);
+    expect(b.cmpMeta.membersMeta.propMutable.propType).toBe(TYPE_NUMBER);
   });
 
   it('membersMeta prop', () => {
