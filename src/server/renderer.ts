@@ -149,7 +149,7 @@ function validateRendererConfig(config: BuildConfig) {
     // if a logger was not provided then use the
     // defaul stencil command line logger found in bin
     const path = require('path');
-    const logger = require(path.join(__dirname, '../../bin/logger'));
+    const logger = require(path.join(__dirname, '../../bin/util')).logger;
     config.logger = new logger.CommandLineLogger({
       level: config.logLevel,
       process: process,
