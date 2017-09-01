@@ -1,6 +1,6 @@
 import { mockPlatform, mockDomApi } from '../../../test';
 import { ComponentMeta, ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
-import { MEMBER_PROP, MEMBER_PROP_STATE, TYPE_ANY } from '../../../util/constants';
+import { MEMBER_PROP, MEMBER_PROP_MUTABLE, TYPE_ANY } from '../../../util/constants';
 import { initProxy } from '../proxy';
 
 
@@ -26,7 +26,7 @@ describe('instance prop', () => {
   it('should set both getter/setter prop on instance w/ isStateful option', () => {
     cmpMeta = {
       membersMeta: {'prop': {
-        memberType: MEMBER_PROP_STATE,
+        memberType: MEMBER_PROP_MUTABLE,
         attribName: 'prop',
         propType: TYPE_ANY
       }}

@@ -515,6 +515,11 @@ export interface PropDecorator {
 export interface PropOptions {
   context?: string;
   connect?: string;
+  mutable?: boolean;
+
+  /**
+   * "state" has been deprecated. Please use "mutable" instead.
+   */
   state?: boolean;
 }
 
@@ -1159,7 +1164,7 @@ export interface StyleData {
 export interface PropData {
   name?: string;
   type?: 'boolean'|'number';
-  stateful?: boolean;
+  mutable?: boolean;
 }
 
 export interface PropChangeData {

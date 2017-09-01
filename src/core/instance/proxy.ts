@@ -1,7 +1,7 @@
 import { ComponentInstance, ComponentMeta, ComponentInternalValues,
   DomApi, HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { isDef } from '../../util/helpers';
-import { MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONTEXT, MEMBER_PROP_CONNECT,
+import { MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONTEXT, MEMBER_PROP_CONNECT,
   MEMBER_STATE, MEMBER_ELEMENT_REF, PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
 import { parsePropertyValue } from '../../util/data-parse';
 import { queueUpdate } from './update';
@@ -90,7 +90,7 @@ function initProp(
   } else {
     // @Prop() property, so check initial value from the proxy element and instance
     // before we create getters/setters on this same property name
-    // we do this for @Prop(state: true) also
+    // we do this for @Prop({ mutable: true }) also
     const hostAttrValue = elm.getAttribute(attribName);
     if (hostAttrValue !== null) {
       // looks like we've got an initial value from the attribute
@@ -167,15 +167,15 @@ function initProp(
     }
   }
 
-  if (memberType === MEMBER_PROP || memberType === MEMBER_PROP_STATE) {
-    // @Prop() and @Prop({ state: true })
+  if (memberType === MEMBER_PROP || memberType === MEMBER_PROP_MUTABLE) {
+    // @Prop() or @Prop({ mutable: true })
     // have both getters and setters on the DOM element
     // @State() getters and setters should not be assigned to the element
     defineProperty(elm, memberName, undefined, getValue, setValue);
   }
 
-  if (memberType === MEMBER_PROP_STATE || memberType === MEMBER_STATE) {
-    // @Prop({ state: true }) and @State()
+  if (memberType === MEMBER_PROP_MUTABLE || memberType === MEMBER_STATE) {
+    // @Prop({ mutable: true }) or @State()
     // have both getters and setters on the instance
     defineProperty(instance, memberName, undefined, getValue, setValue);
 

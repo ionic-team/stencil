@@ -1,6 +1,6 @@
 import { catchError } from '../../util';
 import { Diagnostic, ModuleFile, MemberMeta, PropOptions } from '../../../util/interfaces';
-import { MEMBER_PROP, MEMBER_PROP_STATE, MEMBER_PROP_CONNECT,
+import { MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT,
   MEMBER_PROP_CONTEXT, TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
 import * as ts from 'typescript';
 
@@ -101,7 +101,18 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
         }
 
         if (typeof userPropOptions.state === 'boolean') {
-          propMeta.memberType = MEMBER_PROP_STATE;
+          diagnostics.push({
+            level: 'warn',
+            type: 'build',
+            header: '@Prop({ state: true }) option has been deprecated',
+            messageText: `"state" has been renamed to @Prop({ mutable: true }) ${moduleFile.tsFilePath}`,
+            absFilePath: moduleFile.tsFilePath
+          });
+          userPropOptions.mutable = userPropOptions.state;
+        }
+
+        if (typeof userPropOptions.mutable === 'boolean') {
+          propMeta.memberType = MEMBER_PROP_MUTABLE;
         }
       }
 

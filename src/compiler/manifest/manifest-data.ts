@@ -1,7 +1,7 @@
 import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
-import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_PROP, MEMBER_PROP_STATE,
+import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_PROP, MEMBER_PROP_MUTABLE,
   MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT, MEMBER_ELEMENT_REF, MEMBER_STATE, PRIORITY_LOW,
   TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
 import { normalizePath } from '../util';
@@ -328,7 +328,7 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
     const member = cmpMeta.membersMeta[memberName];
 
-    if (member.memberType === MEMBER_PROP || member.memberType === MEMBER_PROP_STATE) {
+    if (member.memberType === MEMBER_PROP || member.memberType === MEMBER_PROP_MUTABLE) {
       cmpData.props = cmpData.props || [];
 
       const propData: PropData = {
@@ -342,8 +342,8 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
         propData.type = 'number';
       }
 
-      if (member.memberType === MEMBER_PROP_STATE) {
-        propData.stateful = true;
+      if (member.memberType === MEMBER_PROP_MUTABLE) {
+        propData.mutable = true;
       }
 
       cmpData.props.push(propData);
@@ -363,8 +363,8 @@ function parseProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   propsData.forEach(propData => {
     cmpMeta.membersMeta[propData.name] = {};
 
-    if (propData.stateful) {
-      cmpMeta.membersMeta[propData.name].memberType = MEMBER_PROP_STATE;
+    if (propData.mutable) {
+      cmpMeta.membersMeta[propData.name].memberType = MEMBER_PROP_MUTABLE;
     } else {
       cmpMeta.membersMeta[propData.name].memberType = MEMBER_PROP;
     }

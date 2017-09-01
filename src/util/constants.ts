@@ -12,7 +12,7 @@
  * Member Types
  */
 export const MEMBER_PROP = 1;
-export const MEMBER_PROP_STATE = 2;
+export const MEMBER_PROP_MUTABLE = 2;
 export const MEMBER_PROP_CONTEXT = 3;
 export const MEMBER_PROP_CONNECT = 4;
 export const MEMBER_STATE = 5;
