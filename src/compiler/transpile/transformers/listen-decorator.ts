@@ -51,7 +51,10 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 
     if (isListen && eventName && methodName) {
       eventName.split(',').forEach(evName => {
-        validateListener(moduleFile, evName, rawListenOpts, methodName, memberNode);
+        const listenMeta = validateListener(moduleFile, evName, rawListenOpts, methodName, memberNode);
+        if (listenMeta) {
+          moduleFile.cmpMeta.listenersMeta.push(listenMeta);
+        }
       });
     }
   });
@@ -66,9 +69,9 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 }
 
 
-function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts: ListenOptions, methodName: string, memberNode: ts.ClassElement) {
-  eventName = eventName.trim();
-  if (!eventName) return;
+export function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts: ListenOptions, methodName: string, memberNode: ts.ClassElement) {
+  eventName = eventName && eventName.trim();
+  if (!eventName) return null;
 
   let rawEventName = eventName;
 
@@ -77,10 +80,11 @@ function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts
     throw `@Listen can only contain one colon: ${eventName} in ${fileMeta.tsFilePath}`;
   }
   if (splt.length > 1) {
-    if (VALID_ELEMENT_REF_PREFIXES.indexOf(splt[0]) === -1) {
-      throw `invalid @Listen prefix "${splt[0]}" for "${eventName}" in ${fileMeta.tsFilePath}`;
+    let prefix = splt[0].toLowerCase().trim();
+    if (!isValidElementRefPrefix(prefix)) {
+      throw `invalid @Listen prefix "${prefix}" for "${eventName}" in ${fileMeta.tsFilePath}`;
     }
-    rawEventName = splt[1];
+    rawEventName = splt[1].toLowerCase().trim();
   }
 
   splt = rawEventName.split('.');
@@ -88,10 +92,11 @@ function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts
     throw `@Listen can only contain one period: ${eventName} in ${fileMeta.tsFilePath}`;
   }
   if (splt.length > 1) {
-    if (VALID_KEYCODE_SUFFIX.indexOf(splt[1]) === -1) {
-      throw `invalid @Listen suffix "${splt[1]}" for "${eventName}" in ${fileMeta.tsFilePath}`;
+    let suffix = splt[1].toLowerCase().trim();
+    if (!isValidKeycodeSuffix(suffix)) {
+      throw `invalid @Listen suffix "${suffix}" for "${eventName}" in ${fileMeta.tsFilePath}`;
     }
-    rawEventName = splt[0];
+    rawEventName = splt[0].toLowerCase().trim();
   }
 
   const listenMeta: ListenMeta = {
@@ -99,13 +104,17 @@ function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts
     eventMethodName: methodName
   };
 
-  if (rawListenOpts.capture === undefined) {
+  if (typeof rawListenOpts.capture === 'boolean') {
+    listenMeta.eventCapture = rawListenOpts.capture;
+  } else {
     // default to not use capture if it wasn't provided
     listenMeta.eventCapture = false;
   }
-  listenMeta.eventCapture = !!listenMeta.eventCapture;
 
-  if (rawListenOpts.passive === undefined) {
+  if (typeof rawListenOpts.passive === 'boolean') {
+    listenMeta.eventPassive = rawListenOpts.passive;
+
+  } else {
     // they didn't set if it should be passive or not
     // so let's figure out some good defaults depending
     // on what type of event this is
@@ -119,16 +128,25 @@ function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts
       listenMeta.eventPassive = false;
     }
   }
-  listenMeta.eventPassive = !!listenMeta.eventPassive;
 
   // default to enabled=true if it wasn't provided
   listenMeta.eventDisabled = (rawListenOpts.enabled === false);
 
-  fileMeta.cmpMeta.listenersMeta.push(listenMeta);
-
   // gathered valid meta data
   // remove decorator entirely
   memberNode.decorators = undefined;
+
+  return listenMeta;
+}
+
+
+export function isValidElementRefPrefix(prefix: string) {
+  return (VALID_ELEMENT_REF_PREFIXES.indexOf(prefix) > -1);
+}
+
+
+export function isValidKeycodeSuffix(prefix: string) {
+  return (VALID_KEYCODE_SUFFIX.indexOf(prefix) > -1);
 }
 
 
@@ -149,5 +167,5 @@ const VALID_ELEMENT_REF_PREFIXES = [
 
 
 const VALID_KEYCODE_SUFFIX = [
-  'enter', 'escape', 'space', 'tab'
+  'enter', 'escape', 'space', 'tab', 'up', 'right', 'down', 'left'
 ];
