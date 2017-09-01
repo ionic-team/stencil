@@ -9,49 +9,49 @@ describe('listen decorator', () => {
     it('should set disabled true', () => {
       const eventName = 'click';
       const rawListenOpts: ListenOptions = { enabled: false };
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventDisabled).toBe(true);
     });
 
     it('should set disabled false', () => {
       const eventName = 'click';
       const rawListenOpts: ListenOptions = { enabled: true };
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventDisabled).toBe(false);
     });
 
     it('should default disabled false', () => {
       const eventName = 'click';
       const rawListenOpts: ListenOptions = {};
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventDisabled).toBe(false);
     });
 
     it('should set passive false', () => {
       const eventName = 'click';
       const rawListenOpts: ListenOptions = { passive: false };
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventPassive).toBe(false);
     });
 
     it('should set passive true', () => {
       const eventName = 'click';
       const rawListenOpts: ListenOptions = { passive: true };
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventPassive).toBe(true);
     });
 
     it('should default passive true for recommended passive event', () => {
       const eventName = 'document:scroll';
       const rawListenOpts: ListenOptions = {};
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventPassive).toBe(true);
     });
 
     it('should default passive false for non-recommended passive event', () => {
       const eventName = 'click';
       const rawListenOpts: ListenOptions = {};
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventPassive).toBe(false);
     });
 
@@ -60,27 +60,27 @@ describe('listen decorator', () => {
       const rawListenOpts: ListenOptions = {
         capture: false
       };
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventCapture).toBe(false);
     });
 
     it('should default capture false', () => {
       const eventName = 'click';
       const rawListenOpts: ListenOptions = {};
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventCapture).toBe(false);
     });
 
     it('should get event name w/ suffix', () => {
       const eventName = 'keyup.enter';
       const rawListenOpts: ListenOptions = {};
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventName).toBe('keyup.enter');
     });
     it('should get event name w/ prefix', () => {
       const eventName = 'document:mousemove';
       const rawListenOpts: ListenOptions = {};
-      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+      const r = validateListener(fileMeta, eventName, rawListenOpts, methodName);
       expect(r.eventName).toBe('document:mousemove');
     });
 
@@ -89,7 +89,7 @@ describe('listen decorator', () => {
       const rawListenOpts: ListenOptions = {};
 
       expect(() => {
-        validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+        validateListener(fileMeta, eventName, rawListenOpts, methodName);
       }).toThrowError(/invalid @Listen suffix/);
     });
 
@@ -98,7 +98,7 @@ describe('listen decorator', () => {
       const rawListenOpts: ListenOptions = {};
 
       expect(() => {
-        validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+        validateListener(fileMeta, eventName, rawListenOpts, methodName);
       }).toThrowError(/only contain one period/);
     });
 
@@ -107,7 +107,7 @@ describe('listen decorator', () => {
       const rawListenOpts: ListenOptions = {};
 
       expect(() => {
-        validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+        validateListener(fileMeta, eventName, rawListenOpts, methodName);
       }).toThrowError(/invalid @Listen prefix/);
     });
 
@@ -116,22 +116,21 @@ describe('listen decorator', () => {
       const rawListenOpts: ListenOptions = {};
 
       expect(() => {
-        validateListener(fileMeta, eventName, rawListenOpts, methodName, memberNode);
+        validateListener(fileMeta, eventName, rawListenOpts, methodName);
       }).toThrowError(/only contain one colon/);
     });
 
     it('should return null when no event name', () => {
       const rawListenOpts: ListenOptions = {};
-      let r = validateListener(fileMeta, '', rawListenOpts, methodName, memberNode);
+      let r = validateListener(fileMeta, '', rawListenOpts, methodName);
       expect(r).toBe(null);
 
-      r = validateListener(fileMeta, null, rawListenOpts, methodName, memberNode);
+      r = validateListener(fileMeta, null, rawListenOpts, methodName);
       expect(r).toBe(null);
     });
 
     var fileMeta: ModuleFile = {};
     var methodName = 'myMethod';
-    var memberNode: any = {};
 
   });
 

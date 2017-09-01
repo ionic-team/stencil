@@ -51,9 +51,13 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 
     if (isListen && eventName && methodName) {
       eventName.split(',').forEach(evName => {
-        const listenMeta = validateListener(moduleFile, evName, rawListenOpts, methodName, memberNode);
+        const listenMeta = validateListener(moduleFile, evName, rawListenOpts, methodName);
         if (listenMeta) {
           moduleFile.cmpMeta.listenersMeta.push(listenMeta);
+
+          // gathered valid meta data
+          // remove decorator entirely
+          memberNode.decorators = undefined;
         }
       });
     }
@@ -69,7 +73,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 }
 
 
-export function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts: ListenOptions, methodName: string, memberNode: ts.ClassElement) {
+export function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts: ListenOptions, methodName: string) {
   eventName = eventName && eventName.trim();
   if (!eventName) return null;
 
@@ -131,10 +135,6 @@ export function validateListener(fileMeta: ModuleFile, eventName: string, rawLis
 
   // default to enabled=true if it wasn't provided
   listenMeta.eventDisabled = (rawListenOpts.enabled === false);
-
-  // gathered valid meta data
-  // remove decorator entirely
-  memberNode.decorators = undefined;
 
   return listenMeta;
 }
