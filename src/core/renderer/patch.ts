@@ -110,6 +110,7 @@ export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
             if (isDef(ssrId) && childNode.nodeType === 3) {
               // SSR ONLY: add the text node's end comment
               domApi.$appendChild(elm, domApi.$createComment('/'));
+              domApi.$appendChild(elm, domApi.$createTextNode(' '));
             }
           }
         }
