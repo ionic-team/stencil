@@ -2650,7 +2650,7 @@ let supportLevel = (() => {
 	}
 
 	if ('CI' in env) {
-		if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'].some(sign => sign in env) || env.CI_NAME === 'codeship') {
+		if ('TRAVIS' in env || env.CI === 'Travis' || 'CIRCLECI' in env) {
 			return 1;
 		}
 
@@ -2675,7 +2675,7 @@ let supportLevel = (() => {
 		}
 	}
 
-	if (/-256(color)?$/i.test(env.TERM)) {
+	if (/^(screen|xterm)-256(?:color)?/.test(env.TERM)) {
 		return 2;
 	}
 
@@ -4884,7 +4884,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_chalk__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_chalk___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_chalk__);
 
-var CommandLineLogger = /** @class */ (function () {
+var CommandLineLogger = (function () {
     function CommandLineLogger(opts) {
         this._level = 'info';
         this.process = opts.process;
@@ -5121,7 +5121,7 @@ var CommandLineLogger = /** @class */ (function () {
     return CommandLineLogger;
 }());
 
-var CmdTimeSpan = /** @class */ (function () {
+var CmdTimeSpan = (function () {
     function CmdTimeSpan(logger, startMsg, debug) {
         this.debug = debug;
         this.logger = logger;
