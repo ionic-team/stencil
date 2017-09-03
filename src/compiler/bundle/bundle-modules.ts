@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, Bundle, FilesMap,
   Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
 import { buildError, catchError, hasError, generatePreamble, normalizePath } from '../util';
+import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { formatLoadComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
@@ -207,7 +208,12 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
 
     }).then(results => {
       // module bundling finished, assign its content to the user's bundle
+      // wrap our component code with our own iife
       bundleDetails.content = `function importComponent(exports, h, t, Context, publicPath) {\n${results.code.trim()}\n}`;
+
+      // replace build time expressions, like process.env.NODE_ENV === 'production'
+      // with a hard coded boolean
+      bundleDetails.content = buildExpressionReplacer(config, bundleDetails.content);
 
       // cache for later
       ctx.moduleBundleOutputs[bundleId] = bundleDetails.content;

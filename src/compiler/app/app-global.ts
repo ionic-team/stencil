@@ -1,4 +1,5 @@
 import { BuildConfig, BuildContext } from '../../util/interfaces';
+import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { getAppPublicPath } from './app-core';
 import { hasError, generatePreamble } from '../util';
@@ -88,6 +89,13 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, namespace: 
       format: 'es'
 
     }).then(results => {
+      // cool, so we balled up all of the globals into one string
+
+      // replace build time expressions, like process.env.NODE_ENV === 'production'
+      // with a hard coded boolean
+      results.code = buildExpressionReplacer(config, results.code);
+
+      // wrap our globals code with our own iife
       return wrapGlobalJs(config, ctx, namespace, results.code);
     });
 
