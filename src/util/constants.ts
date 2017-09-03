@@ -60,8 +60,8 @@ export const HAS_NAMED_SLOTS = 2;
 /**
  * SSR Attribute Names
  */
-export const SSR_VNODE_ID = 'ssrv';
-export const SSR_CHILD_ID = 'ssrc';
+export const SSR_VNODE_ID = 'data-ssrv';
+export const SSR_CHILD_ID = 'data-ssrc';
 
 
 /**

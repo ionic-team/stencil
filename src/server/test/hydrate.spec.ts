@@ -43,8 +43,8 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrv="0" class="${HYDRATED_CSS}">
-              <elm-a ssrc="0.0.">
+            <ion-test data-ssrv="0" class="${HYDRATED_CSS}">
+              <elm-a data-ssrc="0.0.">
                 <div slot="slot-a">inner slot-a text</div>
                 <div>default slot text</div>
                 <div slot="slot-b">inner slot-b text</div>
@@ -91,8 +91,8 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrv="0" class="${HYDRATED_CSS}">
-              <elm-a ssrc="0.0">
+            <ion-test data-ssrv="0" class="${HYDRATED_CSS}">
+              <elm-a data-ssrc="0.0">
                 <!--s.0.0-->inner text<!--/-->
                 content text
               </elm-a>
@@ -130,8 +130,8 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test ssrv="0" class="${HYDRATED_CSS}">
-              <div ssrc="0.0."></div>
+            <ion-test data-ssrv="0" class="${HYDRATED_CSS}">
+              <div data-ssrc="0.0."></div>
             </ion-test>
           </body>
         </html>
