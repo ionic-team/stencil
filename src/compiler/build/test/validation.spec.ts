@@ -1,5 +1,5 @@
 import { ATTR_LOWER_CASE } from '../../../util/constants';
-import { validateBuildConfig } from '../validation';
+import { setProcessEnvironment, validateBuildConfig } from '../validation';
 import { BuildConfig } from '../../../util/interfaces';
 import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
 import * as path from 'path';
@@ -288,6 +288,22 @@ describe('validation', () => {
       expect(() => {
         validateBuildConfig(undefined);
       }).toThrowError('invalid build config');
+    });
+
+  });
+
+  describe('setProcessEnvironment', () => {
+
+    it('should set NODE_ENV production', () => {
+      config.devMode = false;
+      setProcessEnvironment(config);
+      expect(process.env.NODE_ENV).toBe('production');
+    });
+
+    it('should set NODE_ENV development', () => {
+      config.devMode = true;
+      setProcessEnvironment(config);
+      expect(process.env.NODE_ENV).toBe('development');
     });
 
   });

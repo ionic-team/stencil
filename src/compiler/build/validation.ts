@@ -167,7 +167,14 @@ export function validateBuildConfig(config: BuildConfig) {
 
   config.logger.debug(`validated build config`);
 
+  setProcessEnvironment(config);
+
   return config;
+}
+
+
+export function setProcessEnvironment(config: BuildConfig) {
+  process.env.NODE_ENV = config.devMode ? 'development' : 'production';
 }
 
 
