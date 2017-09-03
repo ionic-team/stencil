@@ -13,24 +13,43 @@ export function createVNodesFromSsr(domApi: DomApi, rootElm: Element) {
       i: number,
       ilen = allSsrElms.length,
       j: number,
-      jlen: number;
+      jlen: number,
+      ssrChildAttrsToRemove: HostElement[] = [],
+      commentsToRemove: any[] = [];
 
   if ((<HostElement>rootElm)._hasLoaded = ilen > 0) {
     for (i = 0; i < ilen; i++) {
       elm = allSsrElms[i];
+
+      // get the ssr vnode id of this element
       ssrVNodeId = domApi.$getAttribute(elm, SSR_VNODE_ID);
+
+      // remove the ssr vnode id attribute, basically just to be pretty
+      domApi.$removeAttribute(allSsrElms[i], SSR_VNODE_ID);
+
+      // create the vnode object we'll be storing all the parsed data in
       ssrVNode = elm._vnode = new VNodeObj();
       ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm).toLowerCase();
 
+      // loop through all the vnode's child nodes looking for
+      // specific child vnodes of this parent vnode
       for (j = 0, jlen = elm.childNodes.length; j < jlen; j++) {
-        addChildSsrVNodes(domApi, elm.childNodes[j], ssrVNode, ssrVNodeId, true);
+        addChildSsrVNodes(domApi, elm.childNodes[j], ssrVNode, ssrVNodeId, true, ssrChildAttrsToRemove, commentsToRemove);
       }
+    }
+
+    while (elm = ssrChildAttrsToRemove.pop()) {
+      domApi.$removeAttribute(elm, SSR_CHILD_ID);
+    }
+
+    while (elm = commentsToRemove.pop()) {
+      domApi.$removeChild(elm.parentNode, elm);
     }
   }
 }
 
 
-function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVNodeId: string, checkNestedElements: boolean) {
+function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVNodeId: string, checkNestedElements: boolean, ssrChildAttrsToRemove: HTMLElement[], commentsToRemove: Comment[]) {
   var nodeType = domApi.$nodeType(node);
   var previousComment: Comment;
   var childVNodeId: string,
@@ -41,6 +60,9 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
     childVNodeId = domApi.$getAttribute(node, SSR_CHILD_ID);
 
     if (childVNodeId) {
+      // remove the ssr child vnode id attribute, basically just to be pretty
+      ssrChildAttrsToRemove.push(node as HTMLElement);
+
       // split the start comment's data with a period
       childVNodeSplt = childVNodeId.split('.');
 
@@ -71,7 +93,7 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
 
     // keep drilling down through the elements
     for (var i = 0; i < node.childNodes.length; i++) {
-      addChildSsrVNodes(domApi, <any>node.childNodes[i], parentVNode, ssrVNodeId, checkNestedElements);
+      addChildSsrVNodes(domApi, <any>node.childNodes[i], parentVNode, ssrVNodeId, checkNestedElements, ssrChildAttrsToRemove, commentsToRemove);
     }
 
   } else if (nodeType === TEXT_NODE &&
@@ -96,6 +118,9 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
 
       // add our child vnode to a specific index of the vnode's children
       parentVNode.vchildren[<any>childVNodeSplt[2]] = childVNode;
+
+      // remove the comment node
+      commentsToRemove.push(previousComment, <Comment>node.nextSibling);
     }
   }
 }
