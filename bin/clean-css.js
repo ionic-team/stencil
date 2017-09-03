@@ -4913,6 +4913,7 @@ var DEFAULT_ROUNDING_PRECISION = __webpack_require__(31).DEFAULT;
 var WHOLE_PIXEL_VALUE = /(?:^|\s|\()(-?\d+)px/;
 var TIME_VALUE = /^(\-?[\d\.]+)(m?s)$/;
 
+var HEX_VALUE_PATTERN = /[0-9a-f]/i;
 var PROPERTY_NAME_PATTERN = /^(?:\-chrome\-|\-[\w\-]+\w|\w[\w\-]+\w|\-\-\S+)$/;
 var IMPORT_PREFIX_PATTERN = /^@import/i;
 var QUOTED_PATTERN = /^('.*'|".*")$/;
@@ -4982,11 +4983,15 @@ function optimizeColors(name, value, compatibility) {
     .replace(/hsl\((-?\d+),(-?\d+)%?,(-?\d+)%?\)/g, function (match, hue, saturation, lightness) {
       return shortenHsl(hue, saturation, lightness);
     })
-    .replace(/(^|[^='"])#([0-9a-f]{6})($|[^0-9a-f])/gi, function (match, prefix, color, suffix) {
-      if (color[0] == color[1] && color[2] == color[3] && color[4] == color[5]) {
-        return (prefix + '#' + color[0] + color[2] + color[4]).toLowerCase() + suffix;
+    .replace(/(^|[^='"])#([0-9a-f]{6})/gi, function (match, prefix, color, at, inputValue) {
+      var suffix = inputValue[at + match.length];
+
+      if (suffix && HEX_VALUE_PATTERN.test(suffix)) {
+        return match;
+      } else if (color[0] == color[1] && color[2] == color[3] && color[4] == color[5]) {
+        return (prefix + '#' + color[0] + color[2] + color[4]).toLowerCase();
       } else {
-        return (prefix + '#' + color).toLowerCase() + suffix;
+        return (prefix + '#' + color).toLowerCase();
       }
     })
     .replace(/(^|[^='"])#([0-9a-f]{3})/gi, function (match, prefix, color) {
@@ -12830,7 +12835,6 @@ function inlineLocalStylesheet(uri, mediaQuery, metadata, inlinerContext) {
     path.resolve(inlinerContext.rebaseTo, uri);
   var relativeToCurrentPath = path.relative(currentPath, absoluteUri);
   var importedStyles;
-  var importedTokens;
   var isAllowed = isAllowedResource(uri, false, inlinerContext.inline);
   var normalizedPath = normalizePath(relativeToCurrentPath);
   var isLoaded = normalizedPath in inlinerContext.externalContext.sourcesContent;
@@ -12858,10 +12862,14 @@ function inlineLocalStylesheet(uri, mediaQuery, metadata, inlinerContext) {
     inlinerContext.externalContext.sourcesContent[normalizedPath] = importedStyles;
     inlinerContext.externalContext.stats.originalSize += importedStyles.length;
 
-    importedTokens = fromStyles(importedStyles, inlinerContext.externalContext, inlinerContext, function (tokens) { return tokens; });
-    importedTokens = wrapInMedia(importedTokens, mediaQuery, metadata);
+    return fromStyles(importedStyles, inlinerContext.externalContext, inlinerContext, function (importedTokens) {
+      importedTokens = wrapInMedia(importedTokens, mediaQuery, metadata);
 
-    inlinerContext.outputTokens = inlinerContext.outputTokens.concat(importedTokens);
+      inlinerContext.outputTokens = inlinerContext.outputTokens.concat(importedTokens);
+      inlinerContext.sourceTokens = inlinerContext.sourceTokens.slice(1);
+
+      return doInlineImports(inlinerContext);
+    });
   }
 
   inlinerContext.sourceTokens = inlinerContext.sourceTokens.slice(1);
@@ -13637,6 +13645,7 @@ function intoTokens(source, externalContext, internalContext, isNested) {
   var wasCommentStart = false;
   var isCommentEnd;
   var wasCommentEnd = false;
+  var isCommentEndMarker;
   var isEscaped;
   var wasEscaped = false;
   var seekingValue = false;
@@ -13651,7 +13660,8 @@ function intoTokens(source, externalContext, internalContext, isNested) {
     isNewLineNix = character == Marker.NEW_LINE_NIX;
     isNewLineWin = character == Marker.NEW_LINE_NIX && source[position.index - 1] == Marker.NEW_LINE_WIN;
     isCommentStart = !wasCommentEnd && level != Level.COMMENT && !isQuoted && character == Marker.ASTERISK && source[position.index - 1] == Marker.FORWARD_SLASH;
-    isCommentEnd = !wasCommentStart && level == Level.COMMENT && character == Marker.FORWARD_SLASH && source[position.index - 1] == Marker.ASTERISK;
+    isCommentEndMarker = !wasCommentStart && !isQuoted && character == Marker.FORWARD_SLASH && source[position.index - 1] == Marker.ASTERISK;
+    isCommentEnd = level == Level.COMMENT && isCommentEndMarker;
 
     metadata = buffer.length === 0 ?
       [position.line, position.column, position.source] :
@@ -13687,6 +13697,9 @@ function intoTokens(source, externalContext, internalContext, isNested) {
       level = levels.pop();
       metadata = metadatas.pop() || null;
       buffer = buffers.pop() || [];
+    } else if (isCommentEndMarker && source[position.index + 1] != Marker.ASTERISK) {
+      externalContext.warnings.push('Unexpected \'*/\' at ' + formatPosition([position.line, position.column, position.source]) + '.');
+      buffer = [];
     } else if (character == Marker.SINGLE_QUOTE && !isQuoted) {
       // single quotation start, e.g. a[href^='https<--
       levels.push(level);
