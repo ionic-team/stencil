@@ -3,6 +3,7 @@ import { BuildConfig, BuildContext, ComponentRegistry, HostElement, PlatformApi,
 import { createPlatformServer } from './platform-server';
 import { initHostConstructor } from '../core/instance/init';
 import { optimizeHtml } from '../compiler/html/optimize-html';
+import { SSR_VNODE_ID } from '../util/constants';
 
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: ComponentRegistry, opts: HydrateOptions, hydrateResults: HydrateResults, callback: (results?: HydrateResults) => void) {
@@ -104,7 +105,22 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
   // and to connect any elements it may have just appened to the DOM
   const pltRender = plt.render;
   plt.render = function render(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, hostContentNodes: HostContentNodes) {
-    newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ssrIds++);
+    let ssrId: number;
+    let existingSsrId: string;
+
+    // this may have been patched more than once
+    // so reuse the ssr id if it already has one
+    if (oldVNode && oldVNode.elm) {
+      existingSsrId = (oldVNode.elm as HTMLElement).getAttribute(SSR_VNODE_ID);
+    }
+
+    if (existingSsrId) {
+      ssrId = parseInt(existingSsrId, 10);
+    } else {
+      ssrId = ssrIds++;
+    }
+
+    newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ssrId);
 
     connectElement(plt, <HostElement>newVNode.elm, connectedInfo);
 
