@@ -4,6 +4,7 @@ import { bundle } from '../bundle/bundle';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
+import { copyTasks } from './copy-tasks';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
@@ -69,6 +70,10 @@ export function build(config: BuildConfig, context?: any) {
   }).then(() => {
     // prerender index.html
     return prerenderIndexHtml(config, ctx);
+
+  }).then(() => {
+    // copy all assets
+    return copyTasks(config, ctx);
 
   }).then(() => {
     // write all the files and copy asset files

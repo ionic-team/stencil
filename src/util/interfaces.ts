@@ -307,7 +307,21 @@ export interface BuildConfig {
   suppressTypeScriptErrors?: boolean;
   watchIgnoredRegex?: RegExp;
   prerender?: PrerenderConfig;
+  copy?: CopyTasks;
   _isValidated?: boolean;
+}
+
+
+export interface CopyTasks {
+  [copyTaskName: string]: CopyTask;
+}
+
+
+export interface CopyTask {
+  src?: string;
+  dest?: string;
+  filter?: (from?: string, to?: string) => boolean;
+  isDirectory?: boolean;
 }
 
 
@@ -944,7 +958,9 @@ export interface PrintLine {
 
 
 export interface StencilSystem {
-  copy?(src: string, dest: string): Promise<void>;
+  copy?(src: string, dest: string, opts?: {
+    filter?: (src: string, dest?: string) => boolean;
+  }): Promise<void>;
   compiler?: {
     name: string;
     version: string;
@@ -971,6 +987,11 @@ export interface StencilSystem {
   };
   generateContentHash?(content: string, length: number): string;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
+  glob?(pattern: string, options: {
+    cwd?: string;
+    nodir?: boolean;
+  }): Promise<string[]>;
+  isGlob?(str: string): boolean;
   loadConfigFile?(configPath: string): BuildConfig;
   minifyCss?(input: string): {
     output: string;

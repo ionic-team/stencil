@@ -138,7 +138,7 @@ function writeToDisk(sys: StencilSystem, filesToWrite: FilesMap): Promise<any> {
 }
 
 
-function ensureDirectoriesExist(sys: StencilSystem, directories: string[], existingDirectories: string[]) {
+export function ensureDirectoriesExist(sys: StencilSystem, directories: string[], existingDirectories: string[]) {
   return new Promise(resolve => {
 
     const knowExistingDirPaths = existingDirectories.map(existingDirectory => {

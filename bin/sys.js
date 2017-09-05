@@ -8,9 +8,10 @@ var coreClientFileCache = {};
 
 module.exports = Object.defineProperties({
 
-  copy: function(src, dest) {
+  copy: function(src, dest, opts) {
     return new Promise(function(resolve, reject) {
-      util.fsExtra.copy(src, dest, function(err) {
+      opts = opts || {};
+      util.fsExtra.copy(src, dest, opts, function(err) {
         if (err) {
           reject(err);
         } else {
@@ -81,6 +82,18 @@ module.exports = Object.defineProperties({
     });
   },
 
+  glob: function(pattern, opts) {
+    return new Promise(function(resolve, reject) {
+      util.glob(pattern, opts, (err, files) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(files);
+        }
+      });
+    });
+  },
+
   loadConfigFile: function loadConfigFile(configPath) {
     var config, configFileData;
 
@@ -106,6 +119,10 @@ module.exports = Object.defineProperties({
     }
 
     return config;
+  },
+
+  isGlob: function(str) {
+    return util.isGlob(str);
   },
 
   minifyCss: function minifyCss(input) {
