@@ -153,13 +153,19 @@ describe('validation', () => {
       config.wwwDir = 'some-www';
       config.buildDir = 'some-build';
       validateBuildConfig(config);
-      expect(config.publicPath).toBe('some-build/');
-      expect(path.isAbsolute(config.publicPath)).toBe(false);
+      expect(config.publicPath).toBe('/some-build/');
+      expect(path.isAbsolute(config.publicPath)).toBe(true);
     });
 
-    it('should set default publicPath and convert to relative path', () => {
+    it('should set publicPath and not force absolute path, but suffix with /', () => {
+      config.publicPath = 'my-crazy-public-path';
       validateBuildConfig(config);
-      expect(config.publicPath).toBe('build/');
+      expect(config.publicPath).toBe('my-crazy-public-path/');
+    });
+
+    it('should set default publicPath and convert to absolute path', () => {
+      validateBuildConfig(config);
+      expect(config.publicPath).toBe('/build/');
     });
 
     it('should set default wwwIndexHtml and convert to absolute path', () => {
