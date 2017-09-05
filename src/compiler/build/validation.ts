@@ -299,8 +299,8 @@ const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
 
 const DEFAULT_COPY_TASKS: CopyTasks = {
-  copyAssets: { src: 'assets' },
-  copyManifest: { src: 'manifest.json' }
+  assets: { src: 'assets' },
+  manifestJson: { src: 'manifest.json' }
 };
 
 export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {

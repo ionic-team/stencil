@@ -14,6 +14,7 @@ const vm = require('vm');
 const jsdom = require('jsdom');
 const typescript = require('typescript');
 const url = require('url');
+const isGlob = require('is-glob');
 
 
 export function mockPlatform() {
@@ -120,6 +121,10 @@ export function mockStencilSystem() {
     getClientCoreFile: mockGetClientCoreFile,
 
     fs: mockFs(),
+
+    isGlob: function(str) {
+      return isGlob(str);
+    },
 
     minifyCss: mockMinify,
 
