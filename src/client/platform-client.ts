@@ -49,6 +49,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   Context.isClient = true;
   Context.isServer = Context.isPrerender = false;
   Context.window = win;
+  Context.location = win.location;
   Context.document = doc;
 
 

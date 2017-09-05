@@ -46,6 +46,7 @@ export function createPlatformServer(
   Context.isServer = true;
   Context.isPrerender = isPrerender;
   Context.window = win;
+  Context.location = win.location;
   Context.document = doc;
 
   // add the Core global to the window context
