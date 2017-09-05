@@ -142,7 +142,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
 export function propagateElementLoaded(elm: HostElement) {
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
-  if (elm._ancestorHostElement) {
+  if (elm._ancestorHostElement && elm._ancestorHostElement._activelyLoadingChildren) {
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
