@@ -1,5 +1,6 @@
-import { BuildConfig, Bundle, CopyTasks, DependentCollection, PrerenderConfig } from '../../util/interfaces';
+import { BuildConfig, Bundle, CopyTasks, DependentCollection } from '../../util/interfaces';
 import { normalizePath } from '../util';
+import { validatePrerenderConfig } from '../prerender/validate-prerender-config';
 import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
 
 
@@ -141,24 +142,7 @@ export function validateBuildConfig(config: BuildConfig) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
-  if (config.prerender) {
-    if (typeof config.prerender !== 'object' || Array.isArray(config.prerender)) {
-      config.prerender = {};
-    }
-
-    config.prerender = Object.assign({}, DEFAULT_PRERENDER_CONFIG, config.prerender);
-
-    if (!config.prerender.prerenderDir) {
-      config.prerender.prerenderDir = config.wwwDir;
-    }
-
-    if (!path.isAbsolute(config.prerender.prerenderDir)) {
-      config.prerender.prerenderDir = normalizePath(path.join(config.rootDir, config.prerender.prerenderDir));
-    }
-
-  } else {
-    config.prerender = null;
-  }
+  validatePrerenderConfig(config);
 
   if (config.copy) {
     config.copy = Object.assign({}, DEFAULT_COPY_TASKS, config.copy);
@@ -316,17 +300,4 @@ const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?
 const DEFAULT_COPY_TASKS: CopyTasks = {
   assets: { src: 'assets' },
   manifestJson: { src: 'manifest.json' }
-};
-
-export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
-  crawl: true,
-  include: [
-    { url: '/' }
-  ],
-  inlineLoaderScript: true,
-  inlineStyles: true,
-  removeUnusedStyles: true,
-  collapseWhitespace: true,
-  maxConcurrent: 4,
-  host: 'dev.prerender.stenciljs.com'
 };
