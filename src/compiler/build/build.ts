@@ -1,4 +1,4 @@
-import { BuildConfig, BuildResults, Diagnostic } from '../../util/interfaces';
+import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
 import { bundle } from '../bundle/bundle';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
@@ -80,6 +80,10 @@ export function build(config: BuildConfig, context?: any) {
     return writeBuildFiles(config, ctx, buildResults);
 
   }).then(() => {
+    // copy index file if it doesn't exist
+    return copyIndexHtml(config, ctx);
+
+  }).then(() => {
     // setup watcher if need be
     return setupWatcher(config, ctx);
 
@@ -139,4 +143,32 @@ export function isConfigValid(config: BuildConfig, diagnostics: Diagnostic[]) {
   }
 
   return true;
+}
+
+
+function copyIndexHtml(config: BuildConfig, ctx: BuildContext) {
+  return new Promise(resolve => {
+    config.sys.fs.readFile(config.srcIndexHtml, 'utf-8', (err, srcIndexContent) => {
+      if (err) {
+        // src index.html doesn't even exist, skip this
+        resolve();
+
+      } else {
+        // only save the file if we have to
+        if (ctx.appFiles.indexHtml !== srcIndexContent) {
+          ctx.appFiles.indexHtml = srcIndexContent;
+
+          config.sys.fs.writeFile(config.wwwIndexHtml, srcIndexContent, (err) => {
+            if (err) {
+              config.logger.error(err);
+            }
+            resolve();
+          });
+
+        } else {
+          resolve();
+        }
+      }
+    });
+  });
 }
