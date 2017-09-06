@@ -1,94 +1,24 @@
 #!/usr/bin/env node
-
 'use strict';
 
 process.title = 'stencil';
 process.on('unhandledRejection', function(r) { console.error(r) });
 process.env.IONIC_CLI_BIN = __filename;
 
-
-var util = require('./util');
+var util = require('../dist/cli/util');
+var sys = require('./sys');
 var path = require('path');
 
-var cmdArgs = process.argv;
-try {
-  var npmRunArgs = process.env.npm_config_argv;
-  if (npmRunArgs) {
-    cmdArgs = cmdArgs.concat(JSON.parse(npmRunArgs).original);
-  }
-} catch (e) {}
-
-
-if (cmdArgs.indexOf('--skip-node-check') === -1) {
-  var minVersion = 6.11;
-  var versionMatch = process.version.match(/(\d+).(\d+)/);
-  if (versionMatch && parseFloat(versionMatch[0]) < minVersion) {
-    console.error(util.chalk.red('ERR: Your Node.js version is ' + util.chalk.bold(process.version) + '. Please update to the latest Node LTS version.\n'));
-    process.exit(1);
-  }
-}
-
-
-var sys = require('./sys');
-var configPath = 'stencil.config.js';
-
-var appConfigFileNameCmdIndex = cmdArgs.indexOf('--config');
-if (appConfigFileNameCmdIndex > -1) {
-  configPath = cmdArgs[appConfigFileNameCmdIndex + 1];
-}
-
-if (!path.isAbsolute(configPath)) {
-  configPath = path.join(process.cwd(), configPath);
-}
-
-var config = sys.loadConfigFile(configPath);
-
-config.process = process;
-config.sys = sys;
-
+var cmdArgs = util.cliConfig.getCmdArgs(process);
 
 if (cmdArgs.indexOf('--help') > -1 || cmdArgs.indexOf('-h') > -1) {
   require('./help')();
   process.exit(0);
 }
 
-if (cmdArgs.indexOf('--version') > -1 || cmdArgs.indexOf('-v') > -1) {
-  var packageJson = require(path.join(__dirname, '../package.json'));
-  console.log(packageJson.version);
-  process.exit(0);
-}
+var config = util.cliConfig.parseConfig(process, cmdArgs, sys);
 
-if (cmdArgs.indexOf('--prod') > -1) {
-  config.devMode = false;
-} else if (cmdArgs.indexOf('--dev') > -1) {
-  config.devMode = true;
-}
-
-if (cmdArgs.indexOf('--watch') > -1) {
-  config.watch = true;
-}
-
-if (cmdArgs.indexOf('--debug') > -1) {
-  config.logLevel = 'debug';
-
-} else {
-  var logLevelCmdIndex = cmdArgs.indexOf('--log-level');
-  if (logLevelCmdIndex > -1) {
-    config.logLevel = cmdArgs[logLevelCmdIndex + 1];
-  }
-}
-
-if (cmdArgs.indexOf('--prerender') === -1) {
-  config.prerender = false;
-
-} else if (!config.prerender) {
-  config.prerender = true;
-}
-
-
-var stencil = require(path.join(__dirname, '../dist/compiler'));
-
-config.sys.compiler = require(path.join(__dirname, '../package.json'));
+config.sys.compiler = require('../package.json');
 
 if (!config.logger) {
   config.logger = new util.logger.CommandLineLogger({
@@ -97,10 +27,11 @@ if (!config.logger) {
   });
 }
 
-
 switch (cmdArgs[2]) {
   case 'build':
+    var stencil = require('../dist/compiler');
     stencil.build(config);
+
     if (config.watch) {
       process.once('SIGINT', () => {
         process.exit(0);

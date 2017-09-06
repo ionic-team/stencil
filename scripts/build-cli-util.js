@@ -12,7 +12,7 @@ function bundle(entryFileName) {
   webpack({
     entry: path.join(__dirname, 'cli-entries', entryFileName),
     output: {
-      path: path.join(__dirname, '../bin'),
+      path: path.join(__dirname, '../dist/cli'),
       filename: entryFileName,
       libraryTarget: 'commonjs'
     },

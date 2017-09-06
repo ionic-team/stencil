@@ -18,11 +18,13 @@ export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostic
   try {
     // check if there's even a src index.html file
     config.sys.fs.accessSync(config.srcIndexHtml);
+    ctx.hasIndexHtml = true;
 
   } catch (e) {
     // there is no src index.html file in the config, which is fine
     // since there is no src index file at all, don't bother
     // this isn't actually an error, don't worry about it
+    ctx.hasIndexHtml = false;
     return true;
   }
 
@@ -47,6 +49,13 @@ const FILLER_INDEX_BUILD = `
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 <head>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(registration => {
+        registration.unregister();
+      });
+    }
+  </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Initializing First Build...</title>

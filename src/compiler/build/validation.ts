@@ -1,5 +1,6 @@
 import { BuildConfig, Bundle, CopyTasks, DependentCollection, PrerenderConfig } from '../../util/interfaces';
 import { normalizePath } from '../util';
+import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
 
 
 export function validateBuildConfig(config: BuildConfig) {
@@ -168,6 +169,8 @@ export function validateBuildConfig(config: BuildConfig) {
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }
+
+  validateServiceWorkerConfig(config);
 
   config.generateCollection = !!config.generateCollection;
 

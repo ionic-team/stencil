@@ -1,6 +1,8 @@
 
 exports.chalk = require('chalk');
 
+exports.cliConfig = require('./cli-config');
+
 exports.fsExtra = require('fs-extra');
 
 exports.glob = require('glob');

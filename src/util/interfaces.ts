@@ -309,7 +309,32 @@ export interface BuildConfig {
   watchIgnoredRegex?: RegExp;
   prerender?: PrerenderConfig|boolean;
   copy?: CopyTasks;
+  serviceWorker?: ServiceWorkerConfig|boolean;
   _isValidated?: boolean;
+}
+
+
+export interface ServiceWorkerConfig {
+  // https://workboxjs.org/reference-docs/latest/module-workbox-build.html#.Configuration
+  swDest?: string;
+  swSrc?: string;
+  globPatterns?: string[];
+  globDirectory?: string|string[];
+  globIgnores?: string|string[];
+  templatedUrls?: any;
+  maximumFileSizeToCacheInBytes?: number;
+  manifestTransforms?: any;
+  modifyUrlPrefix?: any;
+  dontCacheBustUrlsMatching?: any;
+  navigateFallback?: string;
+  navigateFallbackWhitelist?: any[];
+  cacheId?: string;
+  skipWaiting?: boolean;
+  clientsClaim?: boolean;
+  directoryIndex?: string;
+  runtimeCaching?: any[];
+  ignoreUrlParametersMatching?: any[];
+  handleFetch?: boolean;
 }
 
 
@@ -406,6 +431,7 @@ export interface BuildContext {
   };
   watcher?: FSWatcher;
   tsConfig?: any;
+  hasIndexHtml?: boolean;
 
   isRebuild?: boolean;
   isChangeBuild?: boolean;
@@ -1059,6 +1085,15 @@ export interface StencilSystem {
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
   watch?(paths: string | string[], opts?: any): FSWatcher;
+  workbox?: Workbox;
+}
+
+
+export interface Workbox {
+  generateSW(swConfig: any): Promise<any>;
+  generateFileManifest(): Promise<any>;
+  getFileManifestEntries(): Promise<any>;
+  injectManifest(): Promise<any>;
 }
 
 

@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var util = require('./util');
+var util = require('../dist/cli/util');
 var coreClientFileCache = {};
 
 
@@ -126,7 +126,7 @@ module.exports = Object.defineProperties({
   },
 
   minifyCss: function minifyCss(input) {
-    var cleanCSS = require('./clean-css');
+    var cleanCSS = require('../dist/cli/clean-css');
     var result = cleanCSS.minify(input);
     var diagnostics = [];
 
@@ -230,7 +230,7 @@ module.exports = Object.defineProperties({
       var vm = require('vm');
       // https://github.com/tmpvar/jsdom/issues/1724
       // manually adding a fetch polyfill until jsdom adds it
-      var p = require('./patch-fetch-xhr');
+      var p = require('../dist/cli/patch-fetch-xhr');
       p.patchFetchXhr(ctx, wwwDir, sandbox);
 
       return vm.createContext(sandbox);
@@ -263,5 +263,7 @@ module.exports = Object.defineProperties({
   typescript: { get: function() { return require('typescript'); } },
 
   url: { get: function() { return require('url'); } },
+
+  workbox: { get: function() { return require('workbox-build'); } }
 
 });
