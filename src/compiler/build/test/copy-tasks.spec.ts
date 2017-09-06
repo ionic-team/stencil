@@ -1,9 +1,36 @@
 import { BuildConfig, CopyTask } from '../../../util/interfaces';
-import { getSrcAbsPath, getDestAbsPath, getGlobCopyTask, processCopyTask } from '../copy-tasks';
+import { getSrcAbsPath, getDestAbsPath, getGlobCopyTask, processCopyTask, processCopyTasks } from '../copy-tasks';
 import { mockStencilSystem, mockFs } from '../../../test';
 
 
 describe('copy tasks', () => {
+
+  describe('processCopyTasks', () => {
+
+    it('should throw error when dest is a glob', () => {
+      expect(() => {
+        const copyTask: CopyTask = {
+          src: 'assets',
+          dest: '**/*'
+        };
+        processCopyTasks(config, [], copyTask);
+      }).toThrowError(/cannot be a glob/);
+    });
+
+    it('should throw error when missing src', () => {
+      expect(() => {
+        const copyTask: CopyTask = {};
+        processCopyTasks(config, [], copyTask);
+      }).toThrowError(/missing "src" property/);
+    });
+
+    it('should resolve with null copy task', () => {
+      return processCopyTasks(config, [], null).then(r => {
+        expect(r).toBe(null);
+      });
+    });
+
+  });
 
   describe('getGlobCopyTask', () => {
 

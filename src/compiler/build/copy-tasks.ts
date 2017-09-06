@@ -45,13 +45,18 @@ export function copyTasks(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-function processCopyTasks(config: BuildConfig, allCopyTasks: CopyTask[], copyTask: CopyTask): Promise<any> {
+export function processCopyTasks(config: BuildConfig, allCopyTasks: CopyTask[], copyTask: CopyTask): Promise<any> {
+  if (!copyTask) {
+    // possible null was set, which is fine, just skip over this one
+    return Promise.resolve(null);
+  }
+
   if (!copyTask.src) {
     throw new Error(`copyTask missing "src" property`);
   }
 
   if (copyTask.dest && config.sys.isGlob(copyTask.dest)) {
-    throw new Error(`copyTask "dest" property cannot have "${copyTask.dest}" as a glob`);
+    throw new Error(`copyTask "dest" property cannot be a glob: ${copyTask.dest}`);
   }
 
   if (config.sys.isGlob(copyTask.src)) {

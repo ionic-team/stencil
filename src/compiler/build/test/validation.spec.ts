@@ -316,6 +316,15 @@ describe('validation', () => {
 
   describe('copy tasks', () => {
 
+    it('should remove default copy task', () => {
+      config.copy = {
+        assets: null
+      };
+      validateBuildConfig(config);
+      expect(config.copy.assets).toBe(null);
+      expect(config.copy.manifestJson.src).toBe('manifest.json');
+    });
+
     it('should add copy task and keep defaults', () => {
       config.copy = {
         someTask: { src: 'some-dir' }
