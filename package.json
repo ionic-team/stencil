@@ -10,6 +10,7 @@
   },
   "files": [
     "bin",
+    "dist/cli",
     "dist/client",
     "dist/compiler",
     "dist/server",
