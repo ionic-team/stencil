@@ -495,7 +495,7 @@ describe('build', () => {
   it('should build no components', () => {
     ctx = {};
     return build(config, ctx).then(r => {
-      expect(r.diagnostics.length).toBe(1);
+      expect(r.diagnostics.length).toBe(0);
       expect(r.manifest.components.length).toBe(0);
       expect(ctx.transpileBuildCount).toBe(0);
       expect(ctx.sassBuildCount).toBe(0);

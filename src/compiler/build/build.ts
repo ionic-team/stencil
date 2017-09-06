@@ -1,5 +1,4 @@
 import { BuildConfig, BuildResults, Diagnostic } from '../../util/interfaces';
-import { prerenderIndexHtml } from '../prerender/prerender-index-html';
 import { bundle } from '../bundle/bundle';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
@@ -66,10 +65,6 @@ export function build(config: BuildConfig, context?: any) {
   }).then(() => {
     // generate the app files, such as app.js, app.core.js
     return generateAppFiles(config, ctx);
-
-  }).then(() => {
-    // prerender index.html
-    return prerenderIndexHtml(config, ctx);
 
   }).then(() => {
     // copy all assets
