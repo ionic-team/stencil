@@ -1,21 +1,15 @@
-import { BuildConfig, BuildContext, HydrateResults, PrerenderStatus, PrerenderLocation } from '../../util/interfaces';
+import { BuildConfig, BuildContext, HydrateResults, PrerenderConfig, PrerenderStatus, PrerenderLocation } from '../../util/interfaces';
 import { buildError, catchError, hasError, readFile } from '../util';
 import { prerenderUrl } from './prerender-url';
 
 
 export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
-  if (hasError(ctx.diagnostics)) {
+  if (hasError(ctx.diagnostics) || !config.prerender) {
     // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
   }
 
-  if (!config.prerender || !config.prerender.include || !config.prerender.include.length) {
-    const d = buildError(ctx.diagnostics);
-    d.messageText = `Missing prerender config`;
-    return Promise.resolve();
-  }
-
-  const prerenderHost = `http://${config.prerender.host}`;
+  const prerenderHost = `http://${(config.prerender as PrerenderConfig).host}`;
 
   getUrlsToPrerender(config, prerenderHost, ctx);
 
@@ -24,6 +18,9 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
     d.messageText = `No urls found in the prerender config`;
     return Promise.resolve();
   }
+
+  // keep track of how long the entire build process takes
+  const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
   // get the source index html content
   return readFile(config.sys, config.srcIndexHtml).then(indexSrcHtml => {
@@ -35,16 +32,28 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
   }).catch(() => {
     const d = buildError(ctx.diagnostics);
     d.messageText = `missing index html: ${config.srcIndexHtml}`;
+
+  }).then(() => {
+    if (hasError(ctx.diagnostics)) {
+      timeSpan.finish(`prerendering failed`);
+    } else {
+      timeSpan.finish(`prerendered urls: ${ctx.prerenderedUrls}`);
+    }
+
+    if (ctx.localPrerenderServer) {
+      ctx.localPrerenderServer.close();
+      delete ctx.localPrerenderServer;
+    }
   });
 }
 
 
 function drainPrerenderQueue(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string, resolve: Function) {
 
-  for (var i = 0; i < config.prerender.maxConcurrent; i++) {
+  for (var i = 0; i < (config.prerender as PrerenderConfig).maxConcurrent; i++) {
     var activelyProcessingCount = ctx.prerenderUrlQueue.filter(p => p.status === PrerenderStatus.processing).length;
 
-    if (activelyProcessingCount >= config.prerender.maxConcurrent) {
+    if (activelyProcessingCount >= (config.prerender as PrerenderConfig).maxConcurrent) {
       // whooaa, slow down there buddy, let's not get carried away
       return;
     }
@@ -79,7 +88,7 @@ function runNextPrerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtm
     // merge any diagnostics we just got from this
     ctx.diagnostics = ctx.diagnostics.concat(results.diagnostics);
 
-    if (config.prerender.crawl !== false) {
+    if ((config.prerender as PrerenderConfig).crawl !== false) {
       crawlAnchorsForNextUrls(config, ctx, results);
     }
 
@@ -103,7 +112,7 @@ function writePrerenderDest(config: BuildConfig, results: HydrateResults) {
   const parsedUrl = config.sys.url.parse(results.url);
 
   const dir = config.sys.path.join(
-    config.prerender.prerenderDir,
+    (config.prerender as PrerenderConfig).prerenderDir,
     parsedUrl.pathname
   );
 
@@ -184,9 +193,9 @@ function addUrlToProcess(config: BuildConfig, windowLocationHref: string, ctx: B
 function getUrlsToPrerender(config: BuildConfig, windowLocationHref: string, ctx: BuildContext) {
   ctx.prerenderUrlQueue = [];
 
-  if (!config.prerender.include) return;
+  if (!(config.prerender as PrerenderConfig).include) return;
 
-  config.prerender.include.forEach(prerenderUrl => {
+  (config.prerender as PrerenderConfig).include.forEach(prerenderUrl => {
     addUrlToProcess(config, windowLocationHref, ctx, prerenderUrl.url);
   });
 }

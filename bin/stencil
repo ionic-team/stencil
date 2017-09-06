@@ -78,6 +78,13 @@ if (cmdArgs.indexOf('--debug') > -1) {
   }
 }
 
+if (cmdArgs.indexOf('--prerender') === -1) {
+  config.prerender = false;
+
+} else if (!config.prerender) {
+  config.prerender = true;
+}
+
 
 var stencil = require(path.join(__dirname, '../dist/compiler'));
 
@@ -99,10 +106,6 @@ switch (cmdArgs[2]) {
         process.exit(0);
       });
     }
-    break;
-
-  case 'prerender':
-    stencil.prerender(config);
     break;
 
   default:

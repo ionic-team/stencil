@@ -307,7 +307,7 @@ export interface BuildConfig {
   hashedFileNameLength?: number;
   suppressTypeScriptErrors?: boolean;
   watchIgnoredRegex?: RegExp;
-  prerender?: PrerenderConfig;
+  prerender?: PrerenderConfig|boolean;
   copy?: CopyTasks;
   _isValidated?: boolean;
 }

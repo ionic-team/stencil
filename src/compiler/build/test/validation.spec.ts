@@ -1,6 +1,6 @@
 import { ATTR_LOWER_CASE } from '../../../util/constants';
 import { setProcessEnvironment, validateBuildConfig } from '../validation';
-import { BuildConfig } from '../../../util/interfaces';
+import { BuildConfig, PrerenderConfig } from '../../../util/interfaces';
 import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
 import * as path from 'path';
 
@@ -9,53 +9,84 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
-    it('should default prerenderIndex.maxConcurrent', () => {
+    it('should set prerenderIndex.maxConcurrent', () => {
+      config.prerender = {
+        maxConcurrent: 8
+      };
       validateBuildConfig(config);
-      expect(config.prerender.maxConcurrent).toBe(4);
+      expect((config.prerender as PrerenderConfig).maxConcurrent).toBe(8);
+    });
+
+    it('should default prerenderIndex.maxConcurrent', () => {
+      config.prerender = true;
+      validateBuildConfig(config);
+      expect((config.prerender as PrerenderConfig).maxConcurrent).toBe(4);
     });
 
     it('should default prerenderIndex.include', () => {
+      config.prerender = true;
       validateBuildConfig(config);
-      expect(config.prerender.include[0].url).toBe('/');
+      expect((config.prerender as PrerenderConfig).include[0].url).toBe('/');
     });
 
     it('should default prerenderIndex.crawl', () => {
+      config.prerender = true;
       validateBuildConfig(config);
-      expect(config.prerender.crawl).toBe(true);
+      expect((config.prerender as PrerenderConfig).crawl).toBe(true);
     });
 
-    it('should default prerenderIndex.prerenderDir', () => {
+    it('should set prerenderIndex.prerenderDir', () => {
+      config.prerender = {
+        prerenderDir: 'some-prerender-dir'
+      };
       validateBuildConfig(config);
-      expect(config.prerender.prerenderDir).toBeDefined();
+      expect(config.sys.path.basename(config.prerender.prerenderDir)).toBe('some-prerender-dir');
+    });
+
+    it('should default prerenderIndex.prerenderDir to wwwDir', () => {
+      config.prerender = true;
+      validateBuildConfig(config);
+      expect((config.prerender as PrerenderConfig).prerenderDir).toBe(config.wwwDir);
     });
 
     it('should default prerenderIndex.inlineStyles', () => {
+      config.prerender = true;
       validateBuildConfig(config);
-      expect(config.prerender.inlineStyles).toBe(true);
+      expect((config.prerender as PrerenderConfig).inlineStyles).toBe(true);
     });
 
     it('should default prerenderIndex.removeUnusedStyles', () => {
+      config.prerender = true;
       validateBuildConfig(config);
-      expect(config.prerender.removeUnusedStyles).toBe(true);
+      expect((config.prerender as PrerenderConfig).removeUnusedStyles).toBe(true);
     });
 
     it('should default prerenderIndex.collapseWhitespace', () => {
+      config.prerender = true;
       validateBuildConfig(config);
-      expect(config.prerender.collapseWhitespace).toBe(true);
+      expect((config.prerender as PrerenderConfig).collapseWhitespace).toBe(true);
     });
 
     it('should default prerenderIndex.inlineLoaderScript', () => {
+      config.prerender = true;
       validateBuildConfig(config);
-      expect(config.prerender.inlineLoaderScript).toBe(true);
+      expect((config.prerender as PrerenderConfig).inlineLoaderScript).toBe(true);
     });
 
-    it('should default prerenderIndex', () => {
+    it('should default prerenderIndex values', () => {
+      config.prerender = true;
       validateBuildConfig(config);
       expect(config.prerender).toBeDefined();
     });
 
-    it('should not set prerenderIndex if null', () => {
+    it('should not set prerenderIndex if false', () => {
       config.prerender = null;
+      validateBuildConfig(config);
+      expect(config.prerender).toBe(null);
+    });
+
+    it('should not set prerenderIndex if null', () => {
+      config.prerender = false;
       validateBuildConfig(config);
       expect(config.prerender).toBe(null);
     });

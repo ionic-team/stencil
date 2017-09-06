@@ -140,8 +140,16 @@ export function validateBuildConfig(config: BuildConfig) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
-  if (config.prerender !== null && config.prerender !== false) {
+  if (config.prerender) {
+    if (typeof config.prerender !== 'object' || Array.isArray(config.prerender)) {
+      config.prerender = {};
+    }
+
     config.prerender = Object.assign({}, DEFAULT_PRERENDER_CONFIG, config.prerender);
+
+    if (!config.prerender.prerenderDir) {
+      config.prerender.prerenderDir = config.wwwDir;
+    }
 
     if (!path.isAbsolute(config.prerender.prerenderDir)) {
       config.prerender.prerenderDir = normalizePath(path.join(config.rootDir, config.prerender.prerenderDir));
@@ -308,7 +316,6 @@ const DEFAULT_COPY_TASKS: CopyTasks = {
 };
 
 export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
-  prerenderDir: 'dist/prerender',
   crawl: true,
   include: [
     { url: '/' }

@@ -7,22 +7,19 @@ module.exports = function help() {
   console.log(`
   ${chalk.bold('Build:')}
 
-    ${p} ${chalk.green('stencil build [--dev] [--watch] [--debug]')}
+    ${p} ${chalk.green('stencil build [--dev] [--watch] [--prerender] [--debug]')}
 
       ${chalk.green('--dev')} .................. Execute a development build.
       ${chalk.green('--watch')} ................ Execute a build in watch mode.
+      ${chalk.green('--prerender')} ............ Prerender URLs.
       ${chalk.green('--debug')} ................ Set the log level to debug.
       ${chalk.green('--config')} ............... Stencil config file.
-
-  ${chalk.bold('Prerender:')}
-
-    ${p} ${chalk.green('stencil prerender')}
 
   ${chalk.bold('Examples:')}
 
     ${p} ${chalk.green('stencil build --dev')}
     ${p} ${chalk.green('stencil build --watch')}
-    ${p} ${chalk.green('stencil prerender')}
+    ${p} ${chalk.green('stencil build --prerender')}
 
 `);
 }

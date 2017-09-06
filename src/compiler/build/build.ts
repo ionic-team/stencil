@@ -8,6 +8,7 @@ import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnos
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
 import { initIndexHtml } from '../html/init-index-html';
+import { prerenderApp } from '../prerender/prerender-app';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from './validation';
 import { writeBuildFiles } from './write-build';
@@ -69,6 +70,10 @@ export function build(config: BuildConfig, context?: any) {
   }).then(() => {
     // copy all assets
     return copyTasks(config, ctx);
+
+  }).then(() => {
+    // prerender that app
+    return prerenderApp(config, ctx);
 
   }).then(() => {
     // write all the files and copy asset files
