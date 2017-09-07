@@ -3,6 +3,7 @@ import { BuildConfig, ServiceWorkerConfig } from '../../util/interfaces';
 
 export function validateServiceWorkerConfig(config: BuildConfig) {
   if (!config.serviceWorker) {
+    config.serviceWorker = null;
     return;
   }
 

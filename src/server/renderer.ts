@@ -1,10 +1,11 @@
 import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions,
   HydrateResults, LoadComponentRegistry } from '../util/interfaces';
-import { DEFAULT_PRERENDER_CONFIG, validateBuildConfig } from '../compiler/build/validation';
+import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
 import { getBuildContext } from '../compiler/util';
 import { getRegistryJsonFilePath } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
+import { validateBuildConfig } from '../compiler/build/validation';
 
 
 export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
