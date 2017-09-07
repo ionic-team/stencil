@@ -1,8 +1,16 @@
-import { BuildConfig, BuildContext, CompileResults } from '../../util/interfaces';
+import { BuildConfig, BuildContext, CompileResults, ModuleFiles } from '../../util/interfaces';
 import { catchError, hasError, isTsFile, readFile, normalizePath } from '../util';
-import { getModuleFile } from '../transpile/compiler-host';
-import { transpile } from '../transpile/transpile';
+import { getModuleFile, getModuleFileSync } from '../transpile/compiler-host';
+import { transpile, transpileSync } from '../transpile/transpile';
 
+
+export function compileFileSync(config: BuildConfig, ctx: BuildContext, filePath: string): string {
+  let moduleFiles: ModuleFiles = {};
+  moduleFiles[filePath] = getModuleFileSync(config, ctx, filePath);
+  const transpileResults = transpileSync(config, ctx, moduleFiles);
+  const moduleFile = transpileResults.moduleFiles[filePath];
+  return ctx.jsFiles[moduleFile.jsFilePath];
+}
 
 export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
   const logger = config.logger;

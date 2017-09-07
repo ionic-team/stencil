@@ -98,4 +98,14 @@ describe('testing utilities', () => {
       expect(c.sum()).toEqual(73);
     });
   });
+
+  describe('transpile', () => {
+    it('syncronously transpiles the specified file', () => {
+      const res = util.transpile(`${__dirname}/test-class.tsx`);
+      // just some sanity checks, validating the whole string may be too fragile
+      expect(res).toContain('TestClass.prototype.sum = function');
+      expect(res).toContain('TestClass.prototype.render = function');
+      expect(res).toContain('h("div",');
+    });
+  });
 });
