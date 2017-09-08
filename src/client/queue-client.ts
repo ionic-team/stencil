@@ -1,14 +1,13 @@
 import { DomController, Now, QueueApi } from '../util/interfaces';
-import { PRIORITY_HIGH, PRIORITY_LOW } from '../util/constants';
+import { PRIORITY_HIGH } from '../util/constants';
 
 
 export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
   const raf = domCtrl.raf;
   const highPromise = Promise.resolve();
 
-  const highCallbacks: Function[] = [];
-  const mediumCallbacks: Function[] = [];
-  const lowCallbacks: Function[] = [];
+  const highPriority: Function[] = [];
+  const lowPriority: Function[] = [];
 
   let resolvePending = false;
   let rafPending = false;
@@ -17,8 +16,8 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
   function doHighPriority() {
     // holy geez we need to get this stuff done and fast
     // all high priority callbacks should be fired off immediately
-    while (highCallbacks.length > 0) {
-      highCallbacks.shift()();
+    while (highPriority.length > 0) {
+      highPriority.shift()();
     }
     resolvePending = false;
   }
@@ -30,20 +29,12 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
     // always run all of the high priority work if there is any
     doHighPriority();
 
-    while (mediumCallbacks.length > 0 && (now() - start < 40)) {
-      mediumCallbacks.shift()();
-    }
-
-    if (mediumCallbacks.length === 0) {
-      // we successfully drained the medium queue or the medium queue is empty
-      // so now let's drain the low queue with our remaining time
-      while (lowCallbacks.length > 0 && (now() - start < 40)) {
-        lowCallbacks.shift()();
-      }
+    while (lowPriority.length > 0 && (now() - start < 40)) {
+      lowPriority.shift()();
     }
 
     // check to see if we still have work to do
-    if (rafPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
+    if (rafPending = (lowPriority.length > 0)) {
       // everyone just settle down now
       // we already don't have time to do anything in this callback
       // let's throw the next one in a requestAnimationFrame
@@ -59,11 +50,11 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
     // always force a bunch of medium callbacks to run, but still have
     // a throttle on how many can run in a certain time
     const start = now();
-    while (mediumCallbacks.length > 0 && (now() - start < 4)) {
-      mediumCallbacks.shift()();
+    while (lowPriority.length > 0 && (now() - start < 4)) {
+      lowPriority.shift()();
     }
 
-    if (rafPending = (mediumCallbacks.length > 0 || lowCallbacks.length > 0)) {
+    if (rafPending = (lowPriority.length > 0)) {
       // still more to do yet, but we've run out of time
       // let's let this thing cool off and try again in the next ric
       raf(doWork);
@@ -73,7 +64,7 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
   function add(cb: Function, priority?: number) {
     if (priority === PRIORITY_HIGH) {
       // uses Promise.resolve() for next tick
-      highCallbacks.push(cb);
+      highPriority.push(cb);
 
       if (!resolvePending) {
         // not already pending work to do, so let's tee it up
@@ -82,14 +73,9 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
       }
 
     } else {
-      if (priority === PRIORITY_LOW) {
-        lowCallbacks.push(cb);
-
-      } else {
-        // defaults to medium priority
-        // uses requestIdleCallback
-        mediumCallbacks.push(cb);
-      }
+      // defaults to low priority
+      // uses requestAnimationFrame
+      lowPriority.push(cb);
 
       if (!rafPending) {
         // not already pending work to do, so let's tee it up
