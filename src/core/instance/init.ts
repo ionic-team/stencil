@@ -28,7 +28,14 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
   };
 
   HostElementConstructor.componentOnReady = function(cb: (elm: HostElement) => void) {
+    let promise: Promise<any>;
+    if (!cb) {
+      promise = new Promise(resolve => {
+        cb = resolve;
+      });
+    }
     componentOnReady((this as HostElement), cb);
+    return promise;
   };
 
   HostElementConstructor._queueUpdate = function() {

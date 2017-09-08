@@ -767,7 +767,7 @@ export interface HostElement extends HTMLElement {
   disconnectedCallback?: () => void;
 
   // public methods
-  componentOnReady?: (cb: (elm: HostElement) => void) => void;
+  componentOnReady?: (cb?: (elm: HostElement) => void) => Promise<void>;
 
   // public properties
   $instance?: ComponentInstance;
