@@ -33,7 +33,6 @@ export function validateServiceWorkerConfig(config: BuildConfig) {
 const DEFAULT_SW_CONFIG: ServiceWorkerConfig = {
   skipWaiting: true,
   clientsClaim: true,
-  navigateFallback: 'index.html',
   globPatterns: [
     '**/*.{js,css,json,html,ico,png,svg}'
   ]
