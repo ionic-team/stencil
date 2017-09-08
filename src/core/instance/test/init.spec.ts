@@ -7,21 +7,26 @@ describe('instance init', () => {
 
   describe('initLoad', () => {
 
-    it('should call multiple componentOnReady promises', (done) => {
+    it('should call multiple componentOnReady promises', () => {
       initHostConstructor(plt, elm);
 
       let called1 = false;
       let called2 = false;
 
-      elm.componentOnReady().then(() => {
+      let p1 = elm.componentOnReady().then(() => {
         called1 = true;
+      });
 
-      }).then(() => {
+      let p2 = elm.componentOnReady().then(() => {
         called2 = true;
-        done();
       });
 
       initLoad(plt, elm);
+
+      return Promise.all([p1, p2]).then(() => {
+        expect(called1).toBe(true);
+        expect(called2).toBe(true);
+      });
     });
 
     it('should call multiple componentOnReady callbacks', () => {
