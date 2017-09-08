@@ -29,7 +29,7 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { optio
 }
 
 
-const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
+export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
 
   // to allow jsx to work
   jsx: ts.JsxEmit.React,

@@ -5,6 +5,7 @@ import { componentClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
 import { jsxToVNode } from './transformers/jsx-to-vnode';
+import { updateFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import { updateLifecycleMethods } from './transformers/update-lifecycle-methods';
@@ -80,7 +81,8 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
       updateLifecycleMethods()
     ],
     after: [
-      jsxToVNode(ctx.moduleFiles)
+      jsxToVNode,
+      updateFileMetaFromSlot(ctx.moduleFiles)
     ]
   });
 

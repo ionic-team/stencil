@@ -1,54 +1,48 @@
-import { ModuleFiles, ModuleFile } from '../../../util/interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../../util/constants';
+import { SLOT_TAG } from '../../../util/constants';
 import * as ts from 'typescript';
 import * as util from './util';
 
 
-export function jsxToVNode(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
+export function jsxToVNode(transformContext: ts.TransformationContext) {
 
-  return (transformContext: ts.TransformationContext) => {
+  return (tsSourceFile: ts.SourceFile) => {
+    return visit(tsSourceFile, null) as ts.SourceFile;
 
-    function visit(moduleFile: ModuleFile, node: ts.Node, parentNamespace: string): ts.VisitResult<ts.Node> {
-
+    function visit(node: ts.Node, parentNamespace: string): ts.VisitResult<ts.Node> {
       switch (node.kind) {
         case ts.SyntaxKind.CallExpression:
           const callNode = node as ts.CallExpression;
+          let parentNamespaceResponse;
 
           if ((<ts.Identifier>callNode.expression).text === 'h') {
-            const data: ParentData = { namespace: parentNamespace };
 
-            node = convertJsxToVNode(moduleFile, callNode, data);
+            [node, parentNamespaceResponse] = convertJsxToVNode(callNode, parentNamespace);
 
-            if (data.namespace) {
-              parentNamespace = data.namespace;
+            if (parentNamespaceResponse) {
+              parentNamespace = parentNamespaceResponse;
             }
           }
 
         default:
           return ts.visitEachChild(node, (node) => {
-            return visit(moduleFile, node, parentNamespace);
+            return visit(node, parentNamespace);
           }, transformContext);
       }
     }
-
-    return (tsSourceFile) => {
-      const moduleFile = moduleFiles[tsSourceFile.fileName];
-      return visit(moduleFile, tsSourceFile, null) as ts.SourceFile;
-    };
   };
 }
 
 
-function convertJsxToVNode(fileMeta: ModuleFile, callNode: ts.CallExpression, data: ParentData) {
+function convertJsxToVNode(callNode: ts.CallExpression, parentNamespace: string | null): [ts.CallExpression, string | null] {
   const [tag, props, ...children] = callNode.arguments;
   const tagName = (<ts.StringLiteral>tag).text.trim().toLowerCase();
   let newArgs: ts.Expression[] = [];
-  const vnodeData: VNodeData = {};
+  let vnodeData: VNodeData = {};
+  let namespace: string = null;
 
   if (tagName === 'slot') {
     // this is a slot element
     newArgs.push(ts.createNumericLiteral(SLOT_TAG.toString()));
-    updateFileMetaWithSlots(fileMeta, props);
 
   } else {
     // normal html element
@@ -56,33 +50,27 @@ function convertJsxToVNode(fileMeta: ModuleFile, callNode: ts.CallExpression, da
   }
 
   // check if there should be a namespace: <svg> or <math>
-  if (data.namespace) {
-    vnodeData.n = ts.createLiteral(data.namespace);
-
-  } else {
-    const namespace = NAMESPACE_MAP[tagName];
-    if (namespace) {
-      vnodeData.n = ts.createLiteral(namespace);
-      data.namespace = namespace;
-    }
-  }
+  namespace = parentNamespace || NAMESPACE_MAP[tagName];
 
   // If call has props and it is an object -> h('div', {})
   if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
     const jsxAttrs = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
 
-    parseJsxAttrs(vnodeData, jsxAttrs);
-  }
+    vnodeData = alterJsxAttrs(jsxAttrs, namespace);
 
-  // create the vnode data arg, if there is any vnode data
-  if (Object.keys(vnodeData).length) {
-    newArgs.push(util.objectMapToObjectLiteral(vnodeData));
+    // create the vnode data arg, if there is any vnode data
+    if (Object.keys(vnodeData).length) {
+      newArgs.push(util.objectMapToObjectLiteral(vnodeData));
 
+    } else {
+      // If there are no props then set the value as a zero
+      newArgs.push(ts.createLiteral(0));
+    }
+  } else if (props && props.kind === ts.SyntaxKind.CallExpression) {
+    newArgs.push(props);
   } else {
-    // If there are no props then set the value as a zero
     newArgs.push(ts.createLiteral(0));
   }
-
 
   // If there are children then add them to the end of the arg list.
   if (children && children.length > 0) {
@@ -91,16 +79,24 @@ function convertJsxToVNode(fileMeta: ModuleFile, callNode: ts.CallExpression, da
     );
   }
 
-  return ts.updateCall(callNode, callNode.expression, null, newArgs);
+  return [
+    ts.updateCall(callNode, callNode.expression, null, newArgs),
+    namespace
+  ];
 }
 
 
-function parseJsxAttrs(vnodeData: VNodeData, jsxAttrs: util.ObjectMap) {
+function alterJsxAttrs(jsxAttrs: util.ObjectMap, namespace: string | null): VNodeData {
   let classNameStr = '';
   let styleStr = '';
   let eventListeners: any = null;
   let attrs: any = null;
   let props: any = null;
+  const vnodeData: VNodeData = {};
+
+  if (namespace) {
+    vnodeData.n = ts.createLiteral(namespace);
+  }
 
   for (var jsxAttrName in jsxAttrs) {
     var exp: ts.Expression = <any>jsxAttrs[jsxAttrName];
@@ -190,37 +186,9 @@ function parseJsxAttrs(vnodeData: VNodeData, jsxAttrs: util.ObjectMap) {
   if (props) {
     vnodeData.p = util.objectMapToObjectLiteral(props);
   }
+
+  return vnodeData;
 }
-
-
-function updateFileMetaWithSlots(fileMeta: ModuleFile, props: ts.Expression) {
-  // checking if there is a default slot and/or named slots in the compiler
-  // so that during runtime there is less work to do
-
-  if (!fileMeta || !fileMeta.cmpMeta) {
-    return;
-  }
-
-  if (fileMeta.cmpMeta.slotMeta === undefined) {
-    fileMeta.cmpMeta.slotMeta = HAS_SLOTS;
-  }
-
-  if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
-    const jsxAttrs = util.objectLiteralToObjectMap(props as ts.ObjectLiteralExpression);
-
-    for (var attrName in jsxAttrs) {
-      if (attrName.toLowerCase().trim() === 'name') {
-        var attrValue: string = (<any>jsxAttrs[attrName]).text.trim();
-
-        if (attrValue.length > 0) {
-          fileMeta.cmpMeta.slotMeta = HAS_NAMED_SLOTS;
-          break;
-        }
-      }
-    }
-  }
-}
-
 
 function updateVNodeChildren(items: ts.Expression[]): ts.Expression[] {
   return items.map(node => {
@@ -390,8 +358,4 @@ interface VNodeData {
    * namespace
    */
   n?: any;
-}
-
-interface ParentData {
-  namespace?: string;
 }
