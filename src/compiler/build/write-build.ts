@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, BuildResults } from '../../util/interfaces';
 import { catchError, writeFiles } from '../util';
-import { copyAssets } from '../component-plugins/assets-plugin';
+import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { writeAppManifest } from '../manifest/manifest-data';
 
 
@@ -31,8 +31,8 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
     });
 
   }).then(() => {
-    // kick off copying assets
-    return copyAssets(config, ctx);
+    // kick off copying component assets
+    return copyComponentAssets(config, ctx);
 
   }).then(() => {
     timeSpan.finish(`writePhase finished`);
@@ -42,17 +42,22 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
 
 function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
   if (ctx.isRebuild) {
-    // don't bother emptying the build directory when
-    // it's a rebuild
+    // don't bother emptying the directories when it's a rebuild
     return Promise.resolve([]);
   }
 
-  config.logger.debug(`empty dir: ${config.buildDir}`);
-  config.logger.debug(`empty dir: ${config.collectionDir}`);
+  config.logger.debug(`empty buildDir: ${config.buildDir}`);
+
+  // empty promises :(
+  const emptyPromises = [
+    config.sys.emptyDir(config.buildDir)
+  ];
+
+  if (config.generateCollection) {
+    config.logger.debug(`empty collectionDir: ${config.collectionDir}`);
+    emptyPromises.push(config.sys.emptyDir(config.collectionDir));
+  }
 
   // let's empty out the build dest directory
-  return Promise.all([
-    config.sys.emptyDir(config.buildDir),
-    config.sys.emptyDir(config.collectionDir)
-  ]);
+  return Promise.all(emptyPromises);
 }

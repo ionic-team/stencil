@@ -47,7 +47,7 @@ function normalizeAssetDir(config: BuildConfig, moduleFile: ModuleFile, cmpMeta:
 }
 
 
-export function copyAssets(config: BuildConfig, ctx: BuildContext) {
+export function copyComponentAssets(config: BuildConfig, ctx: BuildContext) {
 
   if (skipAssetsCopy(config, ctx)) {
     // no need to recopy all assets again
@@ -107,7 +107,7 @@ export function copyAssets(config: BuildConfig, ctx: BuildContext) {
   return Promise.all(dirCopyPromises).catch(err => {
     catchError(ctx.diagnostics, err);
 
-  }).then(function() {
+  }).then(() => {
     timeSpan.finish('copy assets finished');
   });
 }

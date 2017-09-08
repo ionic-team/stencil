@@ -1,11 +1,21 @@
 import { BuildConfig, BuildContext, HydrateResults, PrerenderConfig, PrerenderStatus, PrerenderLocation } from '../../util/interfaces';
-import { buildError, catchError, hasError, readFile } from '../util';
+import { buildError, catchError, hasError, normalizePath } from '../util';
 import { prerenderUrl } from './prerender-url';
 
 
 export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
   if (hasError(ctx.diagnostics) || !config.prerender) {
     // no need to rebuild index.html if there were no app file changes
+    return Promise.resolve();
+  }
+
+  // if there was src index.html file, then the process before this one
+  // would have already loaded and updated the src index to its www path
+  // get the www index html content for the template for all prerendered pages
+  const indexHtml = ctx.filesToWrite[config.wwwIndexHtml];
+  if (!indexHtml) {
+    // looks like we don't have an index html file, which is fine
+    config.logger.debug(`missing index.html for prerendering`);
     return Promise.resolve();
   }
 
@@ -22,16 +32,11 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
   // keep track of how long the entire build process takes
   const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
-  // get the source index html content
-  return readFile(config.sys, config.srcIndexHtml).then(indexSrcHtml => {
-    // let's do this
-    return new Promise(resolve => {
-      drainPrerenderQueue(config, ctx, indexSrcHtml, resolve);
-    });
+  return new Promise(resolve => {
+    drainPrerenderQueue(config, ctx, indexHtml, resolve);
 
-  }).catch(() => {
-    const d = buildError(ctx.diagnostics);
-    d.messageText = `missing index html: ${config.srcIndexHtml}`;
+  }).catch(err => {
+    catchError(ctx.diagnostics, err);
 
   }).then(() => {
     if (hasError(ctx.diagnostics)) {
@@ -92,7 +97,7 @@ function runNextPrerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtm
       crawlAnchorsForNextUrls(config, ctx, results);
     }
 
-    writePrerenderDest(config, results);
+    writePrerenderDest(config, ctx, results);
 
   }).catch(err => {
     // darn, idk, bad news
@@ -108,30 +113,21 @@ function runNextPrerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtm
 }
 
 
-function writePrerenderDest(config: BuildConfig, results: HydrateResults) {
+function writePrerenderDest(config: BuildConfig, ctx: BuildContext, results: HydrateResults) {
   const parsedUrl = config.sys.url.parse(results.url);
 
+  // figure out the directory where this file will be saved
   const dir = config.sys.path.join(
     (config.prerender as PrerenderConfig).prerenderDir,
     parsedUrl.pathname
   );
 
-  const filePath = config.sys.path.join(
-    dir,
-    `index.html`
-  );
+  // create the full path where this will be saved (normalize for windowz)
+  const filePath = normalizePath(config.sys.path.join(dir, `index.html`));
 
-  return config.sys.ensureDir(dir).then(() => {
-    return new Promise((resolve, reject) => {
-      config.sys.fs.writeFile(filePath, results.html, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-  });
+  // add the prerender html content it to our collection of
+  // files that need to be saved when we're all ready
+  ctx.filesToWrite[filePath] = results.html;
 }
 
 

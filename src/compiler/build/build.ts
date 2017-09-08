@@ -74,12 +74,12 @@ export function build(config: BuildConfig, context?: any) {
     return copyTasks(config, ctx);
 
   }).then(() => {
-    // prerender that app
-    return prerenderApp(config, ctx);
-
-  }).then(() => {
     // build index file and service worker
     return generateIndexHtml(config, ctx);
+
+  }).then(() => {
+    // prerender that app
+    return prerenderApp(config, ctx);
 
   }).then(() => {
     // write all the files and copy asset files
