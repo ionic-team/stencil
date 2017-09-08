@@ -153,19 +153,22 @@ export function propagateElementLoaded(elm: HostElement) {
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
-    let ancestorsActivelyLoadingChildren = elm._ancestorHostElement._activelyLoadingChildren;
-    let index = ancestorsActivelyLoadingChildren && ancestorsActivelyLoadingChildren.indexOf(elm);
-    if (index > -1) {
-      // yup, this element is in the list of child elements to wait on
-      // remove it so we can work to get the length down to 0
-      ancestorsActivelyLoadingChildren.splice(index, 1);
-    }
+    const ancestorsActivelyLoadingChildren = elm._ancestorHostElement._activelyLoadingChildren;
 
-    // the ancestor's initLoad method will do the actual checks
-    // to see if the ancestor is actually loaded or not
-    // then let's call the ancestor's initLoad method if there's no length
-    // (which actually ends up as this method again but for the ancestor)
-    !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement._initLoad();
+    if (ancestorsActivelyLoadingChildren) {
+      let index = ancestorsActivelyLoadingChildren.indexOf(elm);
+      if (index > -1) {
+        // yup, this element is in the list of child elements to wait on
+        // remove it so we can work to get the length down to 0
+        ancestorsActivelyLoadingChildren.splice(index, 1);
+      }
+
+      // the ancestor's initLoad method will do the actual checks
+      // to see if the ancestor is actually loaded or not
+      // then let's call the ancestor's initLoad method if there's no length
+      // (which actually ends up as this method again but for the ancestor)
+      !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement._initLoad();
+    }
 
     // fuhgeddaboudit, no need to keep a reference after this element loaded
     delete elm._ancestorHostElement;
