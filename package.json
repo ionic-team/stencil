@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.0.5-16",
+  "version": "0.0.5-17",
   "license": "MIT",
   "bin": {
     "stencil": "./bin/stencil"
