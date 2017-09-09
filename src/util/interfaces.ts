@@ -783,6 +783,7 @@ export interface HostElement extends HTMLElement {
   _activelyLoadingChildren?: HostElement[];
   _ancestorHostElement?: HostElement;
   _hasConnected?: boolean;
+  _hasRendered?: boolean;
   _hasDestroyed?: boolean;
   _hasLoaded?: boolean;
   _hostContentNodes?: HostContentNodes;
@@ -792,6 +793,7 @@ export interface HostElement extends HTMLElement {
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
   _observer?: MutationObserver;
+  _onRenderCallbacks: (() => void)[];
   _onReadyCallbacks: ((elm: HostElement) => void)[];
 }
 

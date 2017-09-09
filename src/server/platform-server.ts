@@ -9,7 +9,7 @@ import { createRenderer } from '../core/renderer/patch';
 import { getAppFileName } from '../compiler/app/app-core';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
-import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, LOAD_BUNDLE_ERROR, MEMBER_PROP,
+import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, DID_UPDATE_ERROR, LOAD_BUNDLE_ERROR, MEMBER_PROP,
   QUEUE_EVENTS_ERROR, RENDER_ERROR, WILL_LOAD_ERROR } from '../util/constants';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
@@ -93,18 +93,19 @@ export function createPlatformServer(
 
   // setup the root node of all things
   // which is the mighty <html> tag
-  const rootNode = <HostElement>domApi.$documentElement;
-  rootNode._activelyLoadingChildren = [];
-  rootNode._initLoad = function appLoadedCallback() {
-    rootNode._hasLoaded = true;
+  const rootElm = <HostElement>domApi.$documentElement;
+  rootElm._hasRendered = true;
+  rootElm._activelyLoadingChildren = [];
+  rootElm._initLoad = function appLoadedCallback() {
+    rootElm._hasLoaded = true;
     appLoaded();
   };
 
   function appLoaded() {
-    if (rootNode._hasLoaded && Object.keys(pendingStyleFileReads).length === 0) {
+    if (rootElm._hasLoaded && Object.keys(pendingStyleFileReads).length === 0) {
       // the root node has loaded
       // and there are no css files still loading
-      plt.onAppLoad && plt.onAppLoad(rootNode, stylesMap);
+      plt.onAppLoad && plt.onAppLoad(rootElm, stylesMap);
     }
   }
 
@@ -297,8 +298,8 @@ export function createPlatformServer(
       case RENDER_ERROR:
         d.header += ' while rendering';
         break;
-      case INITIAL_LOAD_ERROR:
-        d.header += ' during initial load';
+      case DID_UPDATE_ERROR:
+        d.header += ' while updating';
         break;
     }
 

@@ -76,6 +76,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded
   const rootElm = <HostElement>domApi.$documentElement;
+  rootElm._hasRendered = true;
   rootElm._activelyLoadingChildren = [];
   rootElm._initLoad = function appLoadedCallback() {
     // this will fire when all components have finished loaded

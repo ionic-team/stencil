@@ -1,10 +1,41 @@
-import { waitForLoad, mockConnect, mockDefine, mockPlatform } from '../../../test';
-import { ComponentMeta } from '../../../util/interfaces';
+import { waitForLoad, mockConnect, mockDefine, mockElement, mockPlatform } from '../../../test';
+import { ComponentMeta, HostElement } from '../../../util/interfaces';
 import { h } from '../../renderer/h';
+import { renderUpdate } from '../update';
 
 
 describe('instance update', () => {
-  const plt = mockPlatform();
+  const plt = mockPlatform() as any;
+
+  describe('renderUpdate', () => {
+
+    it('should fire off componentDidUpdate if its on the instance and isInitialLoad is false', () => {
+      class MyComponent {
+        ranLifeCycle = false;
+        componentDidUpdate() {
+          this.ranLifeCycle = true;
+        }
+      }
+      const elm = mockElement('ion-tag') as HostElement;
+      elm.$instance = new MyComponent();
+      renderUpdate(plt, elm, false);
+      expect(elm.$instance.ranLifeCycle).toBe(true);
+    });
+
+    it('should not fire off componentDidUpdate if its on the instance and isInitialLoad is true', () => {
+      class MyComponent {
+        ranLifeCycle = false;
+        componentDidUpdate() {
+          this.ranLifeCycle = true;
+        }
+      }
+      const elm = mockElement('ion-tag') as HostElement;
+      elm.$instance = new MyComponent();
+      renderUpdate(plt, elm, true);
+      expect(elm.$instance.ranLifeCycle).toBe(false);
+    });
+
+  });
 
   it('should render state', (done) => {
     mockDefine(plt, {

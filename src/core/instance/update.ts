@@ -1,7 +1,7 @@
-import { initComponentInstance } from './init';
 import { HostElement, PlatformApi } from '../../util/interfaces';
+import { initComponentInstance } from './init';
 import { stopObserving, startObserving } from './mutation-observer';
-import { INIT_INSTANCE_ERROR, INITIAL_LOAD_ERROR, RENDER_ERROR, WILL_LOAD_ERROR, WILL_UPDATE_ERROR } from '../../util/constants';
+import { DID_UPDATE_ERROR, INIT_INSTANCE_ERROR, RENDER_ERROR, WILL_LOAD_ERROR, WILL_UPDATE_ERROR } from '../../util/constants';
 
 
 export function queueUpdate(plt: PlatformApi, elm: HostElement) {
@@ -26,9 +26,23 @@ export function update(plt: PlatformApi, elm: HostElement) {
   // this node, so be sure to do nothing if we've already disconnected
   if (!elm._hasDestroyed) {
     const isInitialLoad = !elm.$instance;
-    let userPromise: Promise<void> = null;
+    let userPromise: Promise<void>;
 
     if (isInitialLoad) {
+      const ancestorHostElement = elm._ancestorHostElement;
+      if (ancestorHostElement && !ancestorHostElement._hasRendered) {
+        // this is the intial load
+        // this element has an ancestor host element
+        // but the ancestor host element has NOT rendered yet
+        // so let's just cool our jets and wait for the ancestor to render
+        (ancestorHostElement._onRenderCallbacks = ancestorHostElement._onRenderCallbacks || []).push(() => {
+          // this will get fired off when the ancestor host element
+          // finally gets around to rendering its lazy self
+          update(plt, elm);
+        });
+        return;
+      }
+
       // haven't created a component instance for this host element yet
       try {
         // create the instance from the user's component class
@@ -81,7 +95,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
 }
 
 
-function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean) {
+export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean) {
   // stop the observer so that we do not observe our own changes
   stopObserving(plt, elm);
 
@@ -89,6 +103,8 @@ function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean
   // it off and generate a vnode for this
   try {
     elm._render(!isInitialLoad);
+    // _hasRendered was just set
+    // _onRenderCallbacks were all just fired off
 
   } catch (e) {
     plt.onError(RENDER_ERROR, e, elm);
@@ -97,11 +113,21 @@ function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean
   // after render we need to start the observer back up.
   startObserving(plt, elm);
 
-  if (isInitialLoad) {
-    try {
+  try {
+    if (isInitialLoad) {
+      // so this was the initial load i guess
       elm._initLoad();
-    } catch (e) {
-      plt.onError(INITIAL_LOAD_ERROR, e, elm);
+      // componentDidLoad just fired off
+
+    } else {
+      // fire off the user's componentDidUpdate method (if one was provided)
+      // componentDidUpdate runs AFTER render() has been called
+      // but only AFTER an UPDATE and not after the intial render
+      elm.$instance.componentDidUpdate && elm.$instance.componentDidUpdate();
     }
+
+  } catch (e) {
+    // derp
+    plt.onError(DID_UPDATE_ERROR, e, elm);
   }
 }

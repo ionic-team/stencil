@@ -51,10 +51,16 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
     elm._vnode = plt.render(oldVNode, h(null, vnodeHostData, vnodeChildren), isUpdateRender, elm._hostContentNodes);
   }
 
-  if (isUpdateRender) {
-    // fire off the user's componentDidUpdate method (if one was provided)
-    // componentDidUpdate runs AFTER render() has been called
-    // but only AFTER an UPDATE and not after the intial render
-    instance.componentDidUpdate && instance.componentDidUpdate();
+  // it's official, this element has rendered
+  elm._hasRendered = true;
+
+  if (elm._onRenderCallbacks) {
+    // ok, so turns out there are some child host elements
+    // waiting on this parent element to load
+    // let's fire off all update callbacks waiting
+    elm._onRenderCallbacks.forEach(cb => {
+      cb();
+    });
+    delete elm._onRenderCallbacks;
   }
 }

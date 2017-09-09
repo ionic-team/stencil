@@ -44,30 +44,6 @@ describe('instance render', () => {
     expect(elm._vnode).toBeUndefined();
   });
 
-  it('should fire off componentDidUpdate if its on the instance and isUpdateRender is set', () => {
-    class MyComponent {
-      ranLifeCycle = false;
-      componentDidUpdate() {
-        this.ranLifeCycle = true;
-      }
-    }
-    elm.$instance = new MyComponent();
-    render(plt, elm, {}, true);
-    expect(elm.$instance.ranLifeCycle).toBe(true);
-  });
-
-  it('should not fire off componentDidUpdate if its on the instance and isUpdateRender is not set', () => {
-    class MyComponent {
-      ranLifeCycle = false;
-      componentDidUpdate() {
-        this.ranLifeCycle = true;
-      }
-    }
-    elm.$instance = new MyComponent();
-    render(plt, elm, {}, false);
-    expect(elm.$instance.ranLifeCycle).toBe(false);
-  });
-
   var plt = mockPlatform() as PlatformApi;
   var elm: HostElement;
 
