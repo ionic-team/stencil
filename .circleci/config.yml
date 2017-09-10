@@ -1,0 +1,22 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/stencil
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      # for Closure Compiler
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends openjdk-7-jre-headless
+
+      - restore_cache:
+          keys:
+            - npm-cache-{{ checksum "package-lock.json" }}
+      - run: npm install --no-save
+      - save_cache:
+          key: npm-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
+
+      - run: npm run build
+      - run: npm test
