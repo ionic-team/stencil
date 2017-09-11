@@ -1,5 +1,4 @@
-import { BuildConfig, BuildContext, Diagnostic, ModuleFile,
-  ModuleFiles, StencilSystem, TranspileResults } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, StencilSystem, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath } from '../util';
 import { componentClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
@@ -42,6 +41,14 @@ export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   }).then(() => {
     return transpileResults;
   });
+}
+
+export function transpileSync(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles): TranspileResults {
+  const transpileResults: TranspileResults = {
+    moduleFiles: {}
+  };
+  transpileModules(config, ctx, moduleFiles, transpileResults);
+  return transpileResults;
 }
 
 
