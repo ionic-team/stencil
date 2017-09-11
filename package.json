@@ -21,11 +21,12 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.cli-util",
+    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing-util && npm run build.cli-util",
     "build.compiler": "npm run transpile.compiler && node scripts/build-compiler.js",
     "build.core": "npm run transpile.core && node scripts/build-core.js",
     "build.cli-util": "npm run transpile.logger && node scripts/build-cli-util.js",
     "build.server": "npm run transpile.server && node scripts/build-server.js",
+    "build.testing-util": "npm run transpile.testing-util && node scripts/build-testing-util.js",
     "clean": "rimraf dist/",
     "dev": "(npm run transpile && node scripts/dev-watch.js) & npm run transpile.watch",
     "publish": "np",
@@ -37,6 +38,7 @@
     "transpile.core": "tsc -p src/tsconfig.json",
     "transpile.logger": "tsc -p src/util/logger/command-line-logger/tsconfig.json",
     "transpile.server": "tsc -p src/server/tsconfig.json",
+    "transpile.testing-util": "tsc -p src/testing/tsconfig.json",
     "transpile.watch": "tsc -p src/compiler/tsconfig.json -w & tsc -p src/tsconfig.json -w"
   },
   "dependencies": {
