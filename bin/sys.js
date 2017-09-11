@@ -230,8 +230,11 @@ module.exports = Object.defineProperties({
       var vm = require('vm');
       // https://github.com/tmpvar/jsdom/issues/1724
       // manually adding a fetch polyfill until jsdom adds it
-      var p = require('../dist/cli/patch-fetch-xhr');
-      p.patchFetchXhr(ctx, wwwDir, sandbox);
+      var patchFetch = require('../dist/cli/patch-fetch-xhr');
+      patchFetch.patchFetchXhr(ctx, wwwDir, sandbox);
+
+      var patchRaf = require('../dist/cli/patch-raf');
+      patchRaf.patchRaf(sandbox);
 
       return vm.createContext(sandbox);
     },

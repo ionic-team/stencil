@@ -5,6 +5,7 @@ const webpack = require('webpack');
 
 bundle('clean-css.js');
 bundle('patch-fetch-xhr.js');
+bundle('patch-raf.js');
 bundle('util.js');
 
 
