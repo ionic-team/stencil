@@ -205,6 +205,104 @@ describe('jsx-to-vnode transform', () => {
     });
   });
 
+  describe('properties and attributes that can take either a boolean or string', () => {
+    it('simple test with properties (string = "true")', () => {
+      const source =
+        `var TagName = "span";\n` +
+        `<TagName contentEditable="true">HI</TagName>\n`
+        ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "p": { "contentEditable": "true" } }, t("HI"));\n`
+      );
+    });
+
+    it('simple test with properties (string = "false")', () => {
+      const source =
+        `var TagName = "span";\n` +
+        `<TagName contentEditable="false">HI</TagName>\n`
+        ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "p": { "contentEditable": "false" } }, t("HI"));\n`
+      );
+    });
+
+    it('simple test with properties (boolean = true)', () => {
+      const source =
+      `var TagName = "span";\n` +
+      `<TagName contentEditable={true}>HI</TagName>\n`
+      ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "p": { "contentEditable": true } }, t("HI"));\n`
+      );
+    });
+
+    it('simple test with properties (boolean = false)', () => {
+      const source =
+      `var TagName = "span";\n` +
+      `<TagName contentEditable={false}>HI</TagName>\n`
+      ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "p": { "contentEditable": false } }, t("HI"));\n`
+      );
+    });
+
+    it('simple test with attributes (boolean = true)', () => {
+      const source =
+      `var TagName = "span";\n` +
+      `<TagName contenteditable={true}>HI</TagName>\n`
+      ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "a": { "contenteditable": true } }, t("HI"));\n`
+      );
+    });
+
+    it('simple test with attributes (boolean = false)', () => {
+      const source =
+      `var TagName = "span";\n` +
+      `<TagName contenteditable={false}>HI</TagName>\n`
+      ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "a": { "contenteditable": false } }, t("HI"));\n`
+      );
+    });
+
+    it('simple test with attributes (string = "true")', () => {
+      const source =
+      `var TagName = "span";\n` +
+      `<TagName contenteditable="true">HI</TagName>\n`
+      ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "a": { "contenteditable": "true" } }, t("HI"));\n`
+      );
+    });
+
+    it('simple test with attributes (string = "false")', () => {
+      const source =
+      `var TagName = "span";\n` +
+      `<TagName contenteditable="false">HI</TagName>\n`
+      ;
+
+      expect(customJsxTransform(source)).toEqual(
+        `var TagName = "span";\n` +
+        `h(TagName, { "a": { "contenteditable": "false" } }, t("HI"));\n`
+      );
+    });
+  });
+
 
   describe('children -> jsx', () => {
   });

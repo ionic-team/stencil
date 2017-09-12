@@ -524,7 +524,8 @@ declare global {
       // Standard HTML Attributes
       accessKey?: string;
       class?: string | CssClassMap;
-      contentEditable?: boolean;
+      contentEditable?: boolean | string;
+      contenteditable?: boolean | string;
       contextMenu?: string;
       dir?: string;
       draggable?: boolean;
