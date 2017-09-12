@@ -22,7 +22,9 @@ function getPropChangeDecorator(classNode: ts.ClassDeclaration, decoratorName: s
 
     memberNode.forEachChild(n => {
 
-      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 &&
+      if (n.kind === ts.SyntaxKind.Decorator &&
+          n.getChildCount() > 1 &&
+          n.getChildAt(1).getFirstToken() &&
           n.getChildAt(1).getFirstToken().getText() === decoratorName) {
 
         isPropChange = true;

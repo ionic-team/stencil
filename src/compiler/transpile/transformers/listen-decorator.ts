@@ -16,7 +16,10 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 
     memberNode.forEachChild(n => {
 
-      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Listen') {
+      if (n.kind === ts.SyntaxKind.Decorator &&
+          n.getChildCount() > 1 &&
+          n.getChildAt(1).getFirstToken() &&
+          n.getChildAt(1).getFirstToken().getText() === 'Listen') {
         isListen = true;
 
         n.getChildAt(1).forEachChild(n => {

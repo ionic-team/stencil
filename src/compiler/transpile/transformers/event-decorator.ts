@@ -14,8 +14,10 @@ export function getEventDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagn
     let rawEventMeta: EventMeta = {};
 
     memberNode.forEachChild(n => {
-
-      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Event') {
+      if (n.kind === ts.SyntaxKind.Decorator &&
+          n.getChildCount() > 1 &&
+          n.getChildAt(1).getFirstToken() &&
+          n.getChildAt(1).getFirstToken().getText() === 'Event') {
         isEvent = true;
 
         n.getChildAt(1).forEachChild(n => {
