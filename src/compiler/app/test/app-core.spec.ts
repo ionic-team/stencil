@@ -44,10 +44,10 @@ describe('app-core', () => {
       const lines = res.split('\n');
       expect(lines[0]).toEqual(preamble);
       expect(lines[1]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
-      expect(lines[2]).toEqual('global line 1');
-      expect(lines[3]).toEqual('global line 2');
-      expect(lines[4]).toEqual('I am core');
-      expect(lines[5]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[3]).toEqual('global line 1');
+      expect(lines[4]).toEqual('global line 2');
+      expect(lines[5]).toEqual('I am core');
+      expect(lines[6]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
   });
 
@@ -107,10 +107,10 @@ describe('app-core', () => {
       expect(lines[6]).toEqual('I am performance now');
       expect(lines[7]).toEqual(preamble);
       expect(lines[8]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
-      expect(lines[9]).toEqual('global line 1');
-      expect(lines[10]).toEqual('global line 2');
-      expect(lines[11]).toEqual('I am core');
-      expect(lines[12]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[10]).toEqual('global line 1');
+      expect(lines[11]).toEqual('global line 2');
+      expect(lines[12]).toEqual('I am core');
+      expect(lines[13]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
   });
 
@@ -150,13 +150,13 @@ describe('app-core', () => {
     it('wraps the JS content in an IFEE', () => {
       const lines = core.wrapCoreJs(config, 'this is JavaScript code, really it is').split('\n');
       expect(lines[1]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
-      expect(lines[2]).toEqual('this is JavaScript code, really it is');
-      expect(lines[3]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[3]).toEqual('this is JavaScript code, really it is');
+      expect(lines[4]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
 
     it('trims the JS content', () => {
       const lines = core.wrapCoreJs(config, '  this is JavaScript code, really it is     ').split('\n');
-      expect(lines[2]).toEqual('this is JavaScript code, really it is');
+      expect(lines[3]).toEqual('this is JavaScript code, really it is');
     });
   });
 });

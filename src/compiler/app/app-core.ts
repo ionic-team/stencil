@@ -70,6 +70,8 @@ export function wrapCoreJs(config: BuildConfig, jsContent: string) {
     generatePreamble(config),
     `(function(Context,appNamespace,publicPath){`,
     `"use strict";\n`,
+    `var s=document.querySelector("script[data-core='${APP_CORE_FILENAME_PLACEHOLDER}'][data-path]");`,
+    `if(s){publicPath=s.getAttribute('data-path');}\n`,
     jsContent.trim(),
     `\n})({},"${config.namespace}","${publicPath}");`
   ].join('');
@@ -91,3 +93,6 @@ export function getAppPublicPath(config: BuildConfig) {
 export function getAppFileName(config: BuildConfig) {
   return config.namespace.toLowerCase();
 }
+
+
+export const APP_CORE_FILENAME_PLACEHOLDER = '__APP_CORE_FILENAME__';

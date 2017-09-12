@@ -1,7 +1,7 @@
 import { AppRegistry, BuildConfig, BuildContext } from '../../util/interfaces';
 import { CORE_NAME, GLOBAL_NAME } from '../../util/constants';
 import { formatComponentRegistry } from '../../util/data-serialize';
-import { generateCore, generateCoreES5WithPolyfills, getAppFileName} from './app-core';
+import { generateCore, generateCoreES5WithPolyfills, getAppFileName, APP_CORE_FILENAME_PLACEHOLDER } from './app-core';
 import { generateLoader } from './app-loader';
 import { generateAppGlobal, generateGlobalJs } from './app-global';
 import { hasError, normalizePath } from '../util';
@@ -45,8 +45,8 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     ]);
 
   }).then(results => {
-    const coreContent = results[0];
-    const coreEs5WithPolyfilledContent = results[1];
+    let coreContent = results[0];
+    let coreEs5WithPolyfilledContent = results[1];
 
     if (config.devMode) {
       // dev mode core filename just keeps the same name, no content hashing
@@ -69,6 +69,10 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 
     // write the app core file
     const appCoreFilePath = normalizePath(sys.path.join(config.buildDir, appFileName, appCoreFileName));
+
+    // update the app core filename within the content
+    coreContent = coreContent.replace(APP_CORE_FILENAME_PLACEHOLDER, appCoreFileName);
+
     if (ctx.appFiles.core !== coreContent) {
       // core file is actually different from our last saved version
       config.logger.debug(`build, write app core: ${appCoreFilePath}`);
@@ -78,6 +82,10 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 
     // write the app core polyfilled file
     const appCorePolyfilledFilePath = normalizePath(sys.path.join(config.buildDir, appFileName, appCorePolyfilledFileName));
+
+    // update the app core filename within the content
+    coreEs5WithPolyfilledContent = coreEs5WithPolyfilledContent.replace(APP_CORE_FILENAME_PLACEHOLDER, appCoreFileName);
+
     if (ctx.appFiles.corePolyfilled !== coreEs5WithPolyfilledContent) {
       // core polyfilled file is actually different from our last saved version
       config.logger.debug(`build, app core polyfilled: ${appCorePolyfilledFilePath}`);

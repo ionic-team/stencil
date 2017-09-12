@@ -18,7 +18,11 @@ export function generateLoader(
   }
   staticName += '.js';
 
-  const publicPath = getAppPublicPath(config);
+  let publicPath = getAppPublicPath(config);
+
+  if (publicPath.endsWith('/')) {
+    publicPath = publicPath.substr(0, publicPath.length - 1);
+  }
 
   return sys.getClientCoreFile({ staticName: staticName }).then(stencilLoaderContent => {
     // replace the default loader with the project's namespace and components
@@ -51,14 +55,11 @@ export function injectAppIntoLoader(
   componentRegistry: LoadComponentRegistry[],
   stencilLoaderContent: string
 ) {
-  let componentRegistryStr = JSON.stringify(componentRegistry);
-
-  const appCoreUrl = publicPath + appCoreFileName;
-  const appCorePolyfilledUrl = publicPath + appCorePolyfilledFileName;
+  const componentRegistryStr = JSON.stringify(componentRegistry);
 
   stencilLoaderContent = stencilLoaderContent.replace(
     APP_NAMESPACE_REGEX,
-    `"${config.namespace}","${appCoreUrl}","${appCorePolyfilledUrl}",${componentRegistryStr}`
+    `"${config.namespace}","${publicPath}","${appCoreFileName}","${appCorePolyfilledFileName}",${componentRegistryStr}`
   );
 
   if (config.minifyJs) {
