@@ -28,8 +28,8 @@ export function writeAppManifest(config: BuildConfig, ctx: BuildContext, buildRe
   // add it to the list of files we need to write when we're ready
   buildResults.manifest = serializeAppManifest(config, manifestDir, ctx.manifest);
 
-  if (config.generateCollection) {
-    // don't bother serializing/writing the manifest if we're not creating a collection
+  if (config.generateDistribution) {
+    // don't bother serializing/writing the manifest if we're not creating a distribution
     ctx.filesToWrite[manifestFilePath] = JSON.stringify(buildResults.manifest, null, 2);
   }
 }

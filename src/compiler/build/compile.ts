@@ -38,7 +38,7 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
 
         compileResults.moduleFiles[tsFilePath] = moduleFile;
 
-        if (config.generateCollection && typeof ctx.jsFiles[moduleFile.jsFilePath] === 'string') {
+        if (config.generateDistribution && typeof ctx.jsFiles[moduleFile.jsFilePath] === 'string') {
           ctx.filesToWrite[moduleFile.jsFilePath] = ctx.jsFiles[moduleFile.jsFilePath];
         }
 
@@ -139,7 +139,7 @@ function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileRes
 
 
 function copySourceSassFilesToDest(config: BuildConfig, ctx: BuildContext, compileResults: CompileResults): Promise<any> {
-  if (!config.generateCollection) {
+  if (!config.generateDistribution) {
     return Promise.resolve();
   }
 

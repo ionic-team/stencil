@@ -138,7 +138,7 @@ describe('build-project-files', () => {
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__STENCIL__APP__') yeah me too`));
       const res = await callGenerateLoader();
       let lines = res.split('\n');
-      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp","myapp.core.js","myapp.core.pf.js",[]) yeah me too`);
+      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]) yeah me too`);
     });
   });
 
@@ -156,7 +156,6 @@ describe('build-project-files', () => {
       config,
       p.appCoreFileName || 'myapp.core.js',
       p.appCorePolyfillFileName || 'myapp.core.pf.js',
-      getAppPublicPath(config),
       p.componentRegistry || [],
       mockStencilContent
     );

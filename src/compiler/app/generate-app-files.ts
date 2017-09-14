@@ -33,10 +33,22 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
       appRegistry.global = `${appFileName}.${GLOBAL_NAME}.js`;
 
       const globalJsContent = generateGlobalJs(config, globalJsContents);
-      const appGlobalFilePath = getGlobalFilePath(config);
 
-      config.logger.debug(`build, app global: ${appGlobalFilePath}`);
-      ctx.filesToWrite[appGlobalFilePath] = ctx.appFiles.global = globalJsContent;
+      ctx.appFiles.global = globalJsContent;
+
+      if (config.generateWWW) {
+        const appGlobalWWWFilePath = getGlobalWWW(config);
+
+        config.logger.debug(`build, app global www: ${appGlobalWWWFilePath}`);
+        ctx.filesToWrite[appGlobalWWWFilePath] = globalJsContent;
+      }
+
+      if (config.generateDistribution) {
+        const appGlobalDistFilePath = getGlobalDist(config);
+
+        config.logger.debug(`build, app global dist: ${appGlobalDistFilePath}`);
+        ctx.filesToWrite[appGlobalDistFilePath] = globalJsContent;
+      }
     }
 
     return Promise.all([
@@ -67,29 +79,50 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
       appCorePolyfilledFileName = `${appFileName}.${contentPolyfilledHash}.pf.js`;
     }
 
-    // write the app core file
-    const appCoreFilePath = normalizePath(sys.path.join(config.buildDir, appFileName, appCoreFileName));
 
     // update the app core filename within the content
     coreContent = coreContent.replace(APP_CORE_FILENAME_PLACEHOLDER, appCoreFileName);
 
     if (ctx.appFiles.core !== coreContent) {
       // core file is actually different from our last saved version
-      config.logger.debug(`build, write app core: ${appCoreFilePath}`);
-      ctx.filesToWrite[appCoreFilePath] = ctx.appFiles.core = coreContent;
+      config.logger.debug(`build, write app core: ${appCoreFileName}`);
+      ctx.appFiles.core = coreContent;
+
+      if (config.generateWWW) {
+        // write the www/build app core file
+        const appCoreWWW = normalizePath(sys.path.join(config.buildDir, appFileName, appCoreFileName));
+        ctx.filesToWrite[appCoreWWW] = coreContent;
+      }
+
+      if (config.generateDistribution) {
+        // write the dist/ app core file
+        const appCoreDist = normalizePath(sys.path.join(config.distDir, appFileName, appCoreFileName));
+        ctx.filesToWrite[appCoreDist] = coreContent;
+      }
+
       ctx.appFileBuildCount++;
     }
-
-    // write the app core polyfilled file
-    const appCorePolyfilledFilePath = normalizePath(sys.path.join(config.buildDir, appFileName, appCorePolyfilledFileName));
 
     // update the app core filename within the content
     coreEs5WithPolyfilledContent = coreEs5WithPolyfilledContent.replace(APP_CORE_FILENAME_PLACEHOLDER, appCoreFileName);
 
     if (ctx.appFiles.corePolyfilled !== coreEs5WithPolyfilledContent) {
       // core polyfilled file is actually different from our last saved version
-      config.logger.debug(`build, app core polyfilled: ${appCorePolyfilledFilePath}`);
-      ctx.filesToWrite[appCorePolyfilledFilePath] = ctx.appFiles.corePolyfilled = coreEs5WithPolyfilledContent;
+      config.logger.debug(`build, app core polyfilled: ${appCoreFileName}`);
+      ctx.appFiles.corePolyfilled = coreEs5WithPolyfilledContent;
+
+      if (config.generateWWW) {
+        // write the www/build app core polyfilled file
+        const appCorePolyfilledWWW = normalizePath(sys.path.join(config.buildDir, appFileName, appCorePolyfilledFileName));
+        ctx.filesToWrite[appCorePolyfilledWWW] = coreEs5WithPolyfilledContent;
+      }
+
+      if (config.generateDistribution) {
+        // write the dist app core polyfilled file
+        const appCorePolyfilledDist = normalizePath(sys.path.join(config.distDir, appFileName, appCorePolyfilledFileName));
+        ctx.filesToWrite[appCorePolyfilledDist] = coreEs5WithPolyfilledContent;
+      }
+
       ctx.appFileBuildCount++;
     }
 
@@ -97,12 +130,21 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     // create the loader after creating the loader file name
     return generateLoader(config, appCoreFileName, appCorePolyfilledFileName, appRegistry.components).then(loaderContent => {
       // write the app loader file
-      const appLoaderFileName = `${appRegistry.loader}`;
-      const appLoaderFilePath = normalizePath(sys.path.join(config.buildDir, appLoaderFileName));
       if (ctx.appFiles.loader !== loaderContent) {
         // app loader file is actually different from our last saved version
-        config.logger.debug(`build, app loader: ${appLoaderFilePath}`);
-        ctx.filesToWrite[appLoaderFilePath] = ctx.appFiles.loader = loaderContent;
+        config.logger.debug(`build, app loader: ${appRegistry.loader}`);
+        ctx.appFiles.loader = loaderContent;
+
+        if (config.generateWWW) {
+          const appLoaderWWW = normalizePath(sys.path.join(config.buildDir, appRegistry.loader));
+          ctx.filesToWrite[appLoaderWWW] = loaderContent;
+        }
+
+        if (config.generateDistribution) {
+          const appLoaderDist = normalizePath(sys.path.join(config.distDir, appRegistry.loader));
+          ctx.filesToWrite[appLoaderDist] = loaderContent;
+        }
+
         ctx.appFileBuildCount++;
       }
     });
@@ -112,9 +154,20 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     const registryJson = JSON.stringify(appRegistry, null, 2);
     if (ctx.appFiles.registryJson !== registryJson) {
       // app registry json file is actually different from our last saved version
-      const appRegistryFilePath = getRegistryJsonFilePath(config);
-      config.logger.debug(`build, app registry: ${appRegistryFilePath}`);
-      ctx.filesToWrite[appRegistryFilePath] = ctx.appFiles.registryJson = registryJson;
+      ctx.appFiles.registryJson = registryJson;
+
+      if (config.generateWWW) {
+        const appRegistryWWW = getRegistryJsonWWW(config);
+        config.logger.debug(`build, app www registry: ${appRegistryWWW}`);
+        ctx.filesToWrite[appRegistryWWW] = registryJson;
+      }
+
+      if (config.generateDistribution) {
+        const appRegistryDist = getRegistryJsonDist(config);
+        config.logger.debug(`build, app dist registry: ${appRegistryDist}`);
+        ctx.filesToWrite[appRegistryDist] = registryJson;
+      }
+
       ctx.appFileBuildCount++;
     }
 
@@ -124,19 +177,36 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-export function getRegistryJsonFilePath(config: BuildConfig) {
+export function getRegistryJsonWWW(config: BuildConfig) {
   const appFileName = getAppFileName(config);
   return normalizePath(config.sys.path.join(config.buildDir, `${appFileName}.registry.json`));
 }
 
 
-export function getGlobalFilePath(config: BuildConfig) {
+export function getRegistryJsonDist(config: BuildConfig) {
+  const appFileName = getAppFileName(config);
+  return normalizePath(config.sys.path.join(config.distDir, `${appFileName}.registry.json`));
+}
+
+
+export function getGlobalWWW(config: BuildConfig) {
   const appFileName = getAppFileName(config);
   return normalizePath(config.sys.path.join(config.buildDir, `${appFileName}.${GLOBAL_NAME}.js`));
 }
 
 
-export function getAppBuildDir(config: BuildConfig) {
+export function getGlobalDist(config: BuildConfig) {
+  const appFileName = getAppFileName(config);
+  return normalizePath(config.sys.path.join(config.distDir, `${appFileName}.${GLOBAL_NAME}.js`));
+}
+
+
+export function getAppWWWBuildDir(config: BuildConfig) {
   const appFileName = getAppFileName(config);
   return normalizePath(config.sys.path.join(config.buildDir, appFileName));
+}
+
+export function getAppDistDir(config: BuildConfig) {
+  const appFileName = getAppFileName(config);
+  return normalizePath(config.sys.path.join(config.distDir, appFileName));
 }

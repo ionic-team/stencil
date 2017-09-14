@@ -70,11 +70,18 @@ export function validateBuildConfig(config: BuildConfig) {
     config.buildDir = normalizePath(path.join(config.wwwDir, config.buildDir));
   }
 
+  if (typeof config.distDir !== 'string') {
+    config.distDir = DEFAULT_DIST_DIR;
+  }
+  if (!path.isAbsolute(config.distDir)) {
+    config.distDir = normalizePath(path.join(config.rootDir, config.distDir));
+  }
+
   if (typeof config.collectionDir !== 'string') {
     config.collectionDir = DEFAULT_COLLECTION_DIR;
   }
   if (!path.isAbsolute(config.collectionDir)) {
-    config.collectionDir = normalizePath(path.join(config.rootDir, config.collectionDir));
+    config.collectionDir = normalizePath(path.join(config.distDir, config.collectionDir));
   }
 
   if (typeof config.srcIndexHtml !== 'string') {
@@ -156,7 +163,11 @@ export function validateBuildConfig(config: BuildConfig) {
 
   validateServiceWorkerConfig(config);
 
-  config.generateCollection = !!config.generateCollection;
+  config.generateDistribution = !!config.generateDistribution;
+
+  if (typeof config.generateWWW !== 'boolean') {
+    config.generateWWW = true;
+  }
 
   config.collections = config.collections || [];
   config.collections = config.collections.map(validateDependentCollection);
@@ -291,7 +302,8 @@ const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_WWW_DIR = 'www';
 const DEFAULT_BUILD_DIR = 'build';
 const DEFAULT_INDEX_HTML = 'index.html';
-const DEFAULT_COLLECTION_DIR = 'dist/collection';
+const DEFAULT_DIST_DIR = 'dist';
+const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];

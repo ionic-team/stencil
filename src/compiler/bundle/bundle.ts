@@ -13,7 +13,14 @@ export function bundle(config: BuildConfig, ctx: BuildContext) {
   const logger = config.logger;
 
   logger.debug(`bundle, srcDir: ${config.srcDir}`);
-  logger.debug(`bundle, buildDir: ${config.buildDir}`);
+
+  if (config.generateWWW) {
+    logger.debug(`bundle, buildDir: ${config.buildDir}`);
+  }
+
+  if (config.generateDistribution) {
+    logger.debug(`bundle, distDir: ${config.distDir}`);
+  }
 
   return Promise.resolve().then(() => {
     // kick off style and module bundling at the same time

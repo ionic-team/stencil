@@ -99,11 +99,19 @@ function generateLoadComponentModules(config: BuildConfig, ctx: BuildContext, ap
     if (bundleDetails.writeFile) {
       // create the file name and path of where the bundle will be saved
       const moduleFileName = formatJsBundleFileName(moduleResults.bundles[bundleId]);
-      const moduleFilePath = normalizePath(sys.path.join(config.buildDir, config.namespace.toLowerCase(), moduleFileName));
+      const fileContent = generatePreamble(config) + moduleContent;
+
+      if (config.generateWWW) {
+        const moduleWWW = normalizePath(sys.path.join(config.buildDir, config.namespace.toLowerCase(), moduleFileName));
+        ctx.filesToWrite[moduleWWW] = fileContent;
+      }
+
+      if (config.generateDistribution) {
+        const moduleDist = normalizePath(sys.path.join(config.distDir, config.namespace.toLowerCase(), moduleFileName));
+        ctx.filesToWrite[moduleDist] = fileContent;
+      }
 
       ctx.moduleBundleCount++;
-
-      ctx.filesToWrite[moduleFilePath] = generatePreamble(config) + moduleContent;
     }
 
   }).catch(err => {

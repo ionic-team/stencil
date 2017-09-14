@@ -17,8 +17,8 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { optio
   options.outDir = config.collectionDir;
   options.rootDir = config.srcDir;
 
-  if (config.generateCollection && !config.devMode) {
-    // generate .d.ts files when generating a collection and in prod mode
+  if (config.generateDistribution && !config.devMode) {
+    // generate .d.ts files when generating a distribution and in prod mode
     options.declaration = true;
 
   } else {

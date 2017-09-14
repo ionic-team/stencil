@@ -4,7 +4,7 @@ import { injectRegisterServiceWorker, injectUnregisterServiceWorker } from '../s
 
 
 export function generateIndexHtml(config: BuildConfig, ctx: BuildContext) {
-  if ((ctx.isRebuild && ctx.appFileBuildCount === 0) || hasError(ctx.diagnostics)) {
+  if ((ctx.isRebuild && ctx.appFileBuildCount === 0) || hasError(ctx.diagnostics) || !config.generateWWW) {
     // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
   }

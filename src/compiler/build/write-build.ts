@@ -1,5 +1,5 @@
-import { BuildConfig, BuildContext, BuildResults } from '../../util/interfaces';
-import { catchError, writeFiles } from '../util';
+import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
+import { buildError, buildWarn, catchError, writeFiles } from '../util';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { writeAppManifest } from '../manifest/manifest-data';
 
@@ -32,7 +32,11 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
 
   }).then(() => {
     // kick off copying component assets
-    return copyComponentAssets(config, ctx);
+    // and copy www/build to dist/ if generateDistribution is enabled
+    return Promise.all([
+      copyComponentAssets(config, ctx),
+      generateDistribution(config, ctx.diagnostics)
+    ]);
 
   }).then(() => {
     timeSpan.finish(`writePhase finished`);
@@ -40,22 +44,115 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
 }
 
 
-function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
-  if (ctx.isRebuild) {
-    // don't bother emptying the directories when it's a rebuild
-    return Promise.resolve([]);
+export function generateDistribution(config: BuildConfig, diagnostics: Diagnostic[]): Promise<any> {
+  if (!config.generateDistribution) {
+    // don't bother
+    return Promise.resolve();
   }
 
-  config.logger.debug(`empty buildDir: ${config.buildDir}`);
+  return Promise.all([
+    readPackageJson(config, diagnostics),
+    generatePackageModuleResolve(config)
+  ]);
+}
 
+
+function readPackageJson(config: BuildConfig, diagnostics: Diagnostic[]) {
+  const packageJsonPath = config.sys.path.join(config.rootDir, 'package.json');
+
+  return new Promise((resolve, reject) => {
+    config.sys.fs.readFile(packageJsonPath, 'utf-8', (err, packageJsonText) => {
+      if (err) {
+        reject(`Missing "package.json" file for distribution: ${packageJsonPath}`);
+        return;
+      }
+
+      try {
+        const packageJsonData = JSON.parse(packageJsonText);
+        validatePackageJson(config, diagnostics, packageJsonData);
+        resolve();
+
+      } catch (e) {
+        reject(e);
+      }
+    });
+  });
+}
+
+
+export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic[], packageJsonData: any) {
+  let distDir = config.sys.path.relative(config.rootDir, config.distDir);
+  distDir += '/';
+
+  if (packageJsonData.files) {
+    if ((packageJsonData.files as string[]).indexOf(distDir) === -1 && (packageJsonData.files as string[]).indexOf('./' + distDir) === -1) {
+      const err = buildError(diagnostics);
+      err.header = `package.json error`;
+      err.messageText = `package.json "files" array must contain the distribution directory "${distDir}" when generating a distribution.`;
+    }
+  }
+
+  const main = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.js');
+  if (packageJsonData.main !== main) {
+    const err = buildError(diagnostics);
+    err.header = `package.json error`;
+    err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
+  }
+
+  const types = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.d.ts');
+  if (packageJsonData.types !== types) {
+    const err = buildError(diagnostics);
+    err.header = `package.json error`;
+    err.messageText = `package.json "types" property is required when generating a distribution and must be set to: ${types}`;
+  }
+
+  const browser = config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), config.namespace.toLowerCase() + '.js');
+  if (packageJsonData.browser !== browser) {
+    const err = buildError(diagnostics);
+    err.header = `package.json error`;
+    err.messageText = `package.json "browser" property is required when generating a distribution and must be set to: ${browser}`;
+  }
+
+  if (typeof config.namespace !== 'string' || config.namespace.toLowerCase().trim() === 'app') {
+    const err = buildWarn(diagnostics);
+    err.header = `config warning`;
+    err.messageText = `When generating a distribution it is recommended to choose a unique namespace, which can be updated in the stencil.config.js file.`;
+  }
+}
+
+
+function generatePackageModuleResolve(config: BuildConfig) {
+  const packageResolver = config.sys.path.join(config.collectionDir, 'index.js');
+
+  return new Promise((resolve, reject) => {
+    config.sys.fs.writeFile(packageResolver, '', err => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
+
+function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
   // empty promises :(
-  const emptyPromises = [
-    config.sys.emptyDir(config.buildDir)
-  ];
+  const emptyPromises: Promise<any>[] = [];
 
-  if (config.generateCollection) {
-    config.logger.debug(`empty collectionDir: ${config.collectionDir}`);
-    emptyPromises.push(config.sys.emptyDir(config.collectionDir));
+  if (!ctx.isRebuild) {
+    // don't bother emptying the directories when it's a rebuild
+
+    if (config.generateWWW) {
+      config.logger.debug(`empty buildDir: ${config.buildDir}`);
+      emptyPromises.push(config.sys.emptyDir(config.buildDir));
+    }
+
+    if (config.generateDistribution) {
+      config.logger.debug(`empty distDir: ${config.distDir}`);
+      emptyPromises.push(config.sys.emptyDir(config.distDir));
+    }
+
   }
 
   // let's empty out the build dest directory

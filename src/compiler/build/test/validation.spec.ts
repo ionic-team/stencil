@@ -9,11 +9,6 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
-    it('should default generateCollection to false', () => {
-      validateBuildConfig(config);
-      expect(config.generateCollection).toBe(false);
-    });
-
     it('should default hashedFileNameLength', () => {
       validateBuildConfig(config);
       expect(config.hashedFileNameLength).toBe(8);
@@ -129,10 +124,38 @@ describe('validation', () => {
       expect(path.isAbsolute(config.srcIndexHtml)).toBe(true);
     });
 
+    it('should set default dist dir and convert to absolute path', () => {
+      validateBuildConfig(config);
+      expect(path.basename(config.distDir)).toBe('dist');
+      expect(path.isAbsolute(config.distDir)).toBe(true);
+    });
+
     it('should set default collection dir and convert to absolute path', () => {
       validateBuildConfig(config);
       expect(path.basename(config.collectionDir)).toBe('collection');
       expect(path.isAbsolute(config.collectionDir)).toBe(true);
+    });
+
+    it('should set generateDistribution to true', () => {
+      config.generateDistribution = true;
+      validateBuildConfig(config);
+      expect(config.generateDistribution).toBe(true);
+    });
+
+    it('should default generateDistribution to false', () => {
+      validateBuildConfig(config);
+      expect(config.generateDistribution).toBe(false);
+    });
+
+    it('should set generateWWW to false', () => {
+      config.generateWWW = false;
+      validateBuildConfig(config);
+      expect(config.generateWWW).toBe(false);
+    });
+
+    it('should default generateWWW to true', () => {
+      validateBuildConfig(config);
+      expect(config.generateWWW).toBe(true);
     });
 
     it('should set default www dir and convert to absolute path', () => {

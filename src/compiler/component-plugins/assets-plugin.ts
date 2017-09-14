@@ -1,6 +1,6 @@
 import { AssetsMeta, BuildConfig, BuildContext, ComponentOptions, ComponentMeta, ModuleFile } from '../../util/interfaces';
 import { catchError, normalizePath } from '../util';
-import { getAppBuildDir } from '../app/generate-app-files';
+import { getAppDistDir, getAppWWWBuildDir } from '../app/generate-app-files';
 
 
 export function normalizeAssetsDir(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta)  {
@@ -73,35 +73,51 @@ export function copyComponentAssets(config: BuildConfig, ctx: BuildContext) {
     });
   });
 
+  const dirCopyPromises: Promise<any>[] = [];
 
-  // copy all of the files in asset directories to the app's build directory
-  let dirCopyPromises = copyToBuildDir.map(assetsMeta => {
+  // copy all of the files in asset directories to the app's build and/or dist directory
+  copyToBuildDir.forEach(assetsMeta => {
     // figure out what the path is to the component directory
-    const buildDirDestination = normalizePath(config.sys.path.join(
-      getAppBuildDir(config),
-      assetsMeta.cmpRelativePath
-    ));
+    if (config.generateWWW) {
+      const wwwBuildDirDestination = normalizePath(config.sys.path.join(
+        getAppWWWBuildDir(config),
+        assetsMeta.cmpRelativePath
+      ));
 
-    // let's copy!
-    return config.sys.copy(assetsMeta.absolutePath, buildDirDestination);
+      // let's copy to the www/build directory!
+      const copyToWWWBuildDir = config.sys.copy(assetsMeta.absolutePath, wwwBuildDirDestination);
+      dirCopyPromises.push(copyToWWWBuildDir);
+    }
+
+    if (config.generateDistribution) {
+      const distDirDestination = normalizePath(config.sys.path.join(
+        getAppDistDir(config),
+        assetsMeta.cmpRelativePath
+      ));
+
+      // let's copy to the www/build directory!
+      const copyToDistDir = config.sys.copy(assetsMeta.absolutePath, distDirDestination);
+      dirCopyPromises.push(copyToDistDir);
+    }
   });
 
 
   // copy all of the files in asset directories to the dist/collection directory
   // but only do this copy when the generateCollection flag is set to true
-  if (config.generateCollection) {
+  if (config.generateDistribution) {
 
     // copy all of the files in asset directories to the app's collection directory
-    dirCopyPromises = dirCopyPromises.concat(copyToCollectionDir.map(assetsMeta => {
+    copyToCollectionDir.forEach(assetsMeta => {
       // figure out what the path is to the component directory
       const collectionDirDestination = normalizePath(config.sys.path.join(
         config.collectionDir,
         config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
       ));
 
-      // let's copy!
-      return config.sys.copy(assetsMeta.absolutePath, collectionDirDestination);
-    }));
+      // let's copy to the dist/collection directory!
+      const copyToCollectionDir = config.sys.copy(assetsMeta.absolutePath, collectionDirDestination);
+      dirCopyPromises.push(copyToCollectionDir);
+    });
   }
 
   return Promise.all(dirCopyPromises).catch(err => {

@@ -4,7 +4,7 @@ import { prerenderUrl } from './prerender-url';
 
 
 export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
-  if (hasError(ctx.diagnostics) || !config.prerender) {
+  if (hasError(ctx.diagnostics) || !config.prerender || !config.generateWWW) {
     // no need to rebuild index.html if there were no app file changes
     return Promise.resolve();
   }

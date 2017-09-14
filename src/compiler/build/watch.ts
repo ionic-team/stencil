@@ -235,11 +235,13 @@ function configFileReload(existingConfig: BuildConfig) {
   // pick and choose what's ok to update
   existingConfig._isValidated = false;
   existingConfig.buildDir = updatedConfig.buildDir;
+  existingConfig.distDir = updatedConfig.distDir;
   existingConfig.bundles = updatedConfig.bundles;
   existingConfig.collectionDir = updatedConfig.collectionDir;
   existingConfig.collections = updatedConfig.collections;
   existingConfig.exclude = updatedConfig.exclude;
-  existingConfig.generateCollection = updatedConfig.generateCollection;
+  existingConfig.generateDistribution = updatedConfig.generateDistribution;
+  existingConfig.generateWWW = updatedConfig.generateWWW;
   existingConfig.global = updatedConfig.global;
   existingConfig.hashedFileNameLength = updatedConfig.hashedFileNameLength;
   existingConfig.hashFileNames = updatedConfig.hashFileNames;

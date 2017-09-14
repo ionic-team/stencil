@@ -291,11 +291,13 @@ export interface BuildConfig {
   srcDir?: string;
   wwwDir?: string;
   buildDir?: string;
+  distDir?: string;
   collectionDir?: string;
   srcIndexHtml?: string;
   wwwIndexHtml?: string;
   publicPath?: string;
-  generateCollection?: boolean;
+  generateDistribution?: boolean;
+  generateWWW?: boolean;
   bundles?: Bundle[];
   collections?: DependentCollection[];
   devMode?: boolean;

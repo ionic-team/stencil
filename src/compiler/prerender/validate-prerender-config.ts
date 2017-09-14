@@ -3,7 +3,7 @@ import { normalizePath } from '../util';
 
 
 export function validatePrerenderConfig(config: BuildConfig) {
-  if (config.prerender) {
+  if (config.prerender && config.generateWWW) {
     if (typeof config.prerender !== 'object' || Array.isArray(config.prerender)) {
       config.prerender = {};
     }

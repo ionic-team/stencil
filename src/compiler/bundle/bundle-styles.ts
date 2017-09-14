@@ -143,15 +143,29 @@ function generateModeCss(
     if (writeFile) {
       // create the file name and path of where the bundle will be saved
       const styleFileName = formatCssBundleFileName(stylesResult[modeName]);
-      const styleFilePath = normalizePath(sys.path.join(
-        config.buildDir,
-        config.namespace.toLowerCase(),
-        styleFileName
-      ));
+      const fileContent = generatePreamble(config) + styleContent;
+
+      if (config.generateWWW) {
+        const styleFilePath = normalizePath(sys.path.join(
+          config.buildDir,
+          config.namespace.toLowerCase(),
+          styleFileName
+        ));
+
+        ctx.filesToWrite[styleFilePath] = fileContent;
+      }
+
+      if (config.generateDistribution) {
+        const styleFilePath = normalizePath(sys.path.join(
+          config.distDir,
+          config.namespace.toLowerCase(),
+          styleFileName
+        ));
+
+        ctx.filesToWrite[styleFilePath] = fileContent;
+      }
 
       ctx.styleBundleCount++;
-
-      ctx.filesToWrite[styleFilePath] = generatePreamble(config) + styleContent;
     }
   });
 }

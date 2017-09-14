@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions,
   HydrateResults, LoadComponentRegistry } from '../util/interfaces';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
 import { getBuildContext } from '../compiler/util';
-import { getRegistryJsonFilePath } from '../compiler/app/generate-app-files';
+import { getRegistryJsonWWW } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
 import { validateBuildConfig } from '../compiler/build/validation';
@@ -77,7 +77,7 @@ function registerComponents(config: BuildConfig) {
   let registry: ComponentRegistry = null;
 
   try {
-    const registryJsonFilePath = getRegistryJsonFilePath(config);
+    const registryJsonFilePath = getRegistryJsonWWW(config);
 
     // open up the registry json file
     const cmpRegistryJson = config.sys.fs.readFileSync(registryJsonFilePath, 'utf-8');

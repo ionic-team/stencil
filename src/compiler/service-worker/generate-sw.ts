@@ -3,7 +3,7 @@ import { catchError } from '../util';
 
 
 export function generateServiceWorker(config: BuildConfig, ctx: BuildContext) {
-  if (!ctx.hasIndexHtml) {
+  if (!ctx.hasIndexHtml || !config.generateWWW) {
     config.logger.debug(`generateServiceWorker, no index.html, so skipping sw build`);
     return Promise.resolve();
   }

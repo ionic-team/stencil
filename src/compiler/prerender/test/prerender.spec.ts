@@ -158,6 +158,7 @@ describe('prerender', () => {
     rootDir: '/User/some/path/',
     srcDir: '/User/some/path/src/',
     wwwDir: '/User/some/path/www/',
+    generateWWW: true,
     suppressTypeScriptErrors: true
   };
 
