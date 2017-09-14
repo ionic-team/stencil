@@ -17,7 +17,9 @@
     "dist/testing",
     "dist/util",
     "dist/index.js",
-    "dist/index.d.ts"
+    "dist/index.d.ts",
+    "testing.d.ts",
+    "testing.js"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

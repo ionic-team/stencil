@@ -19,9 +19,10 @@ export function render(platform: PlatformApi, html: string): Promise<HostElement
   return waitForLoad(platform, node);
 }
 
-export function transpile(tsFileName: string): string {
+export function transpile(tsFileName: string, srcDir: string): string {
   const config = mockBuildConfig();
   config._isTesting = true;
+  config.srcDir = srcDir;
   config.sys.fs = require('fs');
   const ctx = getBuildContext();
   return compileFileSync(config, ctx, tsFileName);

@@ -249,13 +249,14 @@ if (process.argv.indexOf('dev') > -1) {
 
 function copyUtilFiles() {
   createMainIndex();
-  copyMainDTs();
+  copyMainDTs('index.d.ts');
+  copyMainDTs('testing.d.ts');
   copyUtilDir();
 }
 
-function copyMainDTs() {
-  const readMainDTsPath = path.join(TRANSPILED_DIR, 'index.d.ts');
-  const writeMainDTsPath = path.join(DIST_DIR, 'index.d.ts');
+function copyMainDTs(fname) {
+  const readMainDTsPath = path.join(TRANSPILED_DIR, fname);
+  const writeMainDTsPath = path.join(DIST_DIR, fname);
   fs.readFile(readMainDTsPath, function(err, data) {
     if (err) {
       console.log('Failed to read: ', readMainDTsPath);
@@ -289,27 +290,6 @@ Object.defineProperties(module.exports, {
     get: function() {
       var server = require('./server/index');
       return server.createRenderer;
-    }
-  },
-
-  register: {
-    get: function() {
-      var util = require('./testing/index');
-      return util.register;
-    }
-  },
-
-  render: {
-    get: function() {
-      var util = require('./testing/index');
-      return util.render;
-    }
-  },
-
-  transpile: {
-    get: function() {
-      var util = require('./testing/index');
-      return util.transpile;
     }
   }
 
