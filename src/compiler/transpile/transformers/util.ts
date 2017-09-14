@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 
 
-export function removeClassDecorator(classNode: ts.ClassDeclaration) {
+export function removeClassDecorator(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
   return ts.createClassDeclaration(
       undefined!, // <-- that's what's removing the decorator
 

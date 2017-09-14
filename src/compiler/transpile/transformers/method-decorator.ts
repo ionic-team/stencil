@@ -1,9 +1,10 @@
-import { ModuleFile } from '../../../util/interfaces';
+import { MembersMeta } from '../../../util/interfaces';
 import { MEMBER_METHOD } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getMethodDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassDeclaration) {
+export function getMethodDecoratorMeta(classNode: ts.ClassDeclaration) {
+  const membersMeta: MembersMeta = {};
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
   const methodMemebers = decoratedMembers.filter(n => n.kind === ts.SyntaxKind.MethodDeclaration);
 
@@ -23,10 +24,14 @@ export function getMethodDecoratorMeta(fileMeta: ModuleFile, classNode: ts.Class
     });
 
     if (isMethod && methodName) {
-      fileMeta.cmpMeta.membersMeta[methodName] = {
+      membersMeta[methodName] = {
         memberType: MEMBER_METHOD
       };
+
+      // Remove decorator
       methodNode.decorators = undefined;
     }
   });
+
+  return membersMeta;
 }

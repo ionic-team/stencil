@@ -19,34 +19,35 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
     function visitClass(moduleFile: ModuleFile, classNode: ts.ClassDeclaration) {
       const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
 
-      if (cmpMeta) {
-        if (moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta !== cmpMeta.tagNameMeta) {
-          const relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
-          const d = buildError(diagnostics);
-          d.messageText = `Cannot have multiple @Components in the same source file: ${relPath}`;
-          d.absFilePath = moduleFile.tsFilePath;
-          return classNode;
-        }
-
-        moduleFile.cmpMeta = cmpMeta;
-        moduleFile.cmpMeta.componentClass = classNode.name.getText().trim();
-
-        // membersMeta is shared with @Prop, @State, @Method, @Element
-        moduleFile.cmpMeta.membersMeta = {};
-        getElementDecoratorMeta(moduleFile, classNode);
-        getMethodDecoratorMeta(moduleFile, classNode);
-        getStateDecoratorMeta(moduleFile, classNode);
-        getPropDecoratorMeta(moduleFile, diagnostics, classNode);
-
-        // others
-        getEventDecoratorMeta(moduleFile, diagnostics, classNode);
-        getListenDecoratorMeta(moduleFile, diagnostics, classNode);
-        getPropChangeDecoratorMeta(moduleFile, classNode);
-
-        return removeClassDecorator(classNode);
+      if (!cmpMeta) {
+        return classNode;
       }
 
-      return classNode;
+      if (moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta !== cmpMeta.tagNameMeta) {
+        const relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
+        const d = buildError(diagnostics);
+        d.messageText = `Cannot have multiple @Components in the same source file: ${relPath}`;
+        d.absFilePath = moduleFile.tsFilePath;
+        return classNode;
+      }
+
+      moduleFile.cmpMeta = {
+        ...cmpMeta,
+        componentClass: classNode.name.getText().trim(),
+        membersMeta: {
+          // membersMeta is shared with @Prop, @State, @Method, @Element
+          ...getElementDecoratorMeta(classNode),
+          ...getMethodDecoratorMeta(classNode),
+          ...getStateDecoratorMeta(classNode),
+          ...getPropDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode)
+        },
+        eventsMeta: getEventDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),
+        listenersMeta: getListenDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),
+        ...getPropChangeDecoratorMeta(classNode)
+      };
+
+      // Return Class Declaration with Decorator removed
+      return removeClassDecorator(classNode);
     }
 
 
