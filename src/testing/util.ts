@@ -1,8 +1,8 @@
-import { initHostConstructor } from '../instance/init';
-import { getBuildContext } from '../../compiler/util';
-import { compileFileSync } from '../../compiler/build/compile';
-import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
-import { MockedPlatform, mockConnect, mockDefine, mockPlatform, mockBuildConfig } from '../../test';
+import { initHostConstructor } from '../core/instance/init';
+import { getBuildContext } from '../compiler/util';
+import { compileFileSync } from '../compiler/build/compile';
+import { ComponentMeta, HostElement, PlatformApi } from '../util/interfaces';
+import { MockedPlatform, mockConnect, mockDefine, mockPlatform, mockBuildConfig } from '../test/index';
 
 export function register(components?: Array<ComponentMeta>): PlatformApi {
   const platform = mockPlatform();
@@ -21,6 +21,7 @@ export function render(platform: PlatformApi, html: string): Promise<HostElement
 
 export function transpile(tsFileName: string): string {
   const config = mockBuildConfig();
+  config._isTesting = true;
   config.sys.fs = require('fs');
   const ctx = getBuildContext();
   return compileFileSync(config, ctx, tsFileName);

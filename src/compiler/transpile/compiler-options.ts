@@ -9,6 +9,9 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext): { optio
 
   // // force defaults
   const options = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
+  if (config._isTesting) {
+    options.module = ts.ModuleKind.CommonJS;
+  }
 
   // apply user config to tsconfig
   options.outDir = config.collectionDir;

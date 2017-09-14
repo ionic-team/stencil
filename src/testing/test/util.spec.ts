@@ -1,4 +1,4 @@
-import { h } from '../../../core/renderer/h';
+import { h } from '../../core/renderer/h';
 import * as util from '../util';
 
 class IonTest {

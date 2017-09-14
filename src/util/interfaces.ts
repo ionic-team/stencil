@@ -311,6 +311,7 @@ export interface BuildConfig {
   copy?: CopyTasks;
   serviceWorker?: ServiceWorkerConfig|boolean;
   _isValidated?: boolean;
+  _isTesting?: boolean;
 }
 
 

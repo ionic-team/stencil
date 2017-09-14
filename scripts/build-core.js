@@ -290,6 +290,27 @@ Object.defineProperties(module.exports, {
       var server = require('./server/index');
       return server.createRenderer;
     }
+  },
+
+  register: {
+    get: function() {
+      var util = require('./testing/index');
+      return util.register;
+    }
+  },
+
+  render: {
+    get: function() {
+      var util = require('./testing/index');
+      return util.render;
+    }
+  },
+
+  transpile: {
+    get: function() {
+      var util = require('./testing/index');
+      return util.transpile;
+    }
   }
 
 });
