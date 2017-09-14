@@ -88,8 +88,8 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
       updateLifecycleMethods()
     ],
     after: [
-      jsxToVNode,
-      updateFileMetaFromSlot(ctx.moduleFiles)
+      updateFileMetaFromSlot(ctx.moduleFiles),
+      jsxToVNode
     ]
   });
 
