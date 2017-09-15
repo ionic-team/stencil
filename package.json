@@ -34,6 +34,7 @@
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
     "test.watch": "jest --watch",
+    "prepublishOnly": "npm run build",
     "transpile": "npm run transpile.compiler && npm run transpile.core",
     "transpile.compiler": "tsc -p src/compiler/tsconfig.json",
     "transpile.core": "tsc -p src/tsconfig.json",
