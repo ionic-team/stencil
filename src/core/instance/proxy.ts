@@ -213,8 +213,8 @@ function defineProperty(obj: any, propertyKey: string, value: any, getter?: any,
 
 export function proxyController(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string) {
   return {
-    create: proxyProp(domApi, controllerComponents, ctrlTag, 'create'),
-    componentOnReady: proxyProp(domApi, controllerComponents, ctrlTag, 'componentOnReady')
+    'create': proxyProp(domApi, controllerComponents, ctrlTag, 'create'),
+    'componentOnReady': proxyProp(domApi, controllerComponents, ctrlTag, 'componentOnReady')
   };
 }
 
