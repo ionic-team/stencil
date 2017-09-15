@@ -30,7 +30,7 @@
     "build.testing-util": "npm run transpile.testing-util && node scripts/build-testing-util.js",
     "clean": "rimraf dist/",
     "dev": "(npm run transpile && node scripts/dev-watch.js) & npm run transpile.watch",
-    "publish": "np",
+    "deploy": "np",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
     "test.watch": "jest --watch",
