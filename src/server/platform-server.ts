@@ -13,7 +13,7 @@ import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, DID_UPDATE_ERROR, LOAD_BUNDLE_ERRO
   QUEUE_EVENTS_ERROR, RENDER_ERROR, WILL_LOAD_ERROR } from '../util/constants';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
-import { proxyControllerProp } from '../core/instance/proxy';
+import { proxyController } from '../core/instance/proxy';
 
 
 export function createPlatformServer(
@@ -311,9 +311,7 @@ export function createPlatformServer(
   }
 
   function propConnect(ctrlTag: string) {
-    const obj: any = {};
-    proxyControllerProp(domApi, controllerComponents, obj, ctrlTag, 'create');
-    return obj;
+    return proxyController(domApi, controllerComponents, ctrlTag);
   }
 
   function getContextItem(contextKey: string) {

@@ -10,7 +10,7 @@ import { createQueueClient } from './queue-client';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
-import { proxyControllerProp } from '../core/instance/proxy';
+import { proxyController } from '../core/instance/proxy';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
@@ -296,9 +296,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   }
 
   function propConnect(ctrlTag: string) {
-    const obj: any = {};
-    proxyControllerProp(domApi, controllerComponents, obj, ctrlTag, 'create');
-    return obj;
+    return proxyController(domApi, controllerComponents, ctrlTag);
   }
 
   function getContextItem(contextKey: string) {
