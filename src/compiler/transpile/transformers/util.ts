@@ -1,12 +1,14 @@
 import * as ts from 'typescript';
 
 
-export function removeClassDecorator(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
+export function updateComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
   return ts.createClassDeclaration(
       undefined!, // <-- that's what's removing the decorator
 
+      // Make the component the default export
+      [ts.createToken(ts.SyntaxKind.ExportKeyword), ts.createToken(ts.SyntaxKind.DefaultKeyword)],
+
       // everything else should be the same
-      classNode.modifiers!,
       classNode.name!,
       classNode.typeParameters!,
       classNode.heritageClauses!,
@@ -81,6 +83,41 @@ export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpressio
   });
 
   return ts.createObjectLiteral(newProperties);
+}
+
+/**
+ * Convert a js value into typescript AST
+ * @param val array, object, string, boolean, or number
+ */
+export function convertValueToLiteral(val: any) {
+  if (Array.isArray(val)) {
+    return arrayToArrayLiteral(val);
+  }
+  if (typeof val === 'object') {
+    return objectToObjectLiteral(val);
+  }
+  return ts.createLiteral(val);
+}
+
+/**
+ * Convert a js object into typescript AST
+ * @param obj key value object
+ */
+function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExpression {
+  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key: string): ts.ObjectLiteralElementLike => {
+    return ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key]) as ts.Expression);
+  });
+
+  return ts.createObjectLiteral(newProperties);
+}
+
+/**
+ * Convert a js array into typescript AST
+ * @param list array
+ */
+function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
+  const newList: any[] = list.map(convertValueToLiteral);
+  return ts.createArrayLiteral(newList);
 }
 
 

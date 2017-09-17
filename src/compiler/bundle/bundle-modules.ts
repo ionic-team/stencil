@@ -149,7 +149,7 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     let importPath = moduleFile.jsFilePath;
 
     // manually create the content for our temporary entry file for the bundler
-    entryFileLines.push(`import { ${moduleFile.cmpMeta.componentClass} } from "${importPath}";`);
+    entryFileLines.push(`import ${moduleFile.cmpMeta.componentClass} from "${importPath}";`);
 
     // export map should always use UPPER CASE tag name
     entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${moduleFile.cmpMeta.componentClass};`);

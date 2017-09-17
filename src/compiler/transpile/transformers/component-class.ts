@@ -8,7 +8,7 @@ import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropDecoratorMeta } from './prop-decorator';
 import { getPropChangeDecoratorMeta } from './prop-change-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
-import { removeClassDecorator } from './util';
+import { updateComponentClass, convertValueToLiteral } from './util';
 import * as ts from 'typescript';
 
 
@@ -46,8 +46,18 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
         ...getPropChangeDecoratorMeta(classNode)
       };
 
-      // Return Class Declaration with Decorator removed
-      return removeClassDecorator(classNode);
+      const meta: ts.Expression = convertValueToLiteral(moduleFile.cmpMeta);
+
+      return [
+        // create 'export const metadata = { .... }'
+        ts.createVariableStatement(
+          [ts.createToken(ts.SyntaxKind.ExportKeyword), ts.createToken(ts.SyntaxKind.ConstKeyword)],
+          [ts.createVariableDeclaration('metadata', undefined, meta)]
+        ),
+
+        // Return Class Declaration with Decorator removed and as default export
+        updateComponentClass(classNode)
+      ];
     }
 
 

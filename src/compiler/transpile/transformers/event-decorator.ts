@@ -43,7 +43,7 @@ export function getEventDecoratorMeta(tsFilePath: string, diagnostics: Diagnosti
 
 
     if (isEvent && methodName) {
-      let eventMeta = validateEvent(rawEventMeta, methodName, memberNode);
+      let eventMeta = validateEvent(rawEventMeta, methodName);
       if (eventsMeta) {
         memberNode.decorators = undefined;
         eventsMeta.push(eventMeta);
@@ -55,7 +55,7 @@ export function getEventDecoratorMeta(tsFilePath: string, diagnostics: Diagnosti
 }
 
 
-function validateEvent(rawEventOpts: EventOptions, methodName: string, memberNode: ts.ClassElement): EventMeta | null {
+function validateEvent(rawEventOpts: EventOptions, methodName: string): EventMeta | null {
 
   methodName = methodName.trim();
   if (!methodName) {
