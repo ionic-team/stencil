@@ -37,6 +37,10 @@ exports.parseConfig = function(process, cmdArgs, sys) {
   }
 
   var config = sys.loadConfigFile(configPath);
+  if (!config) {
+    return null;
+  }
+
   config.sys = sys;
 
   if (cmdArgs.indexOf('--version') > -1 || cmdArgs.indexOf('-v') > -1) {
