@@ -9,6 +9,16 @@ class IonTest {
   }
 }
 
+var IonTestES5 = (function() {
+  function IonTestES5() { }
+  IonTestES5.prototype.render = function() {
+    return [
+      h('div', 0, 'hi')
+    ];
+  };
+  return IonTestES5;
+}());
+
 class IonThingOne {
   render() {
     return [
@@ -71,6 +81,17 @@ describe('testing utilities', () => {
       expect(node.innerHTML.toString()).toEqual('<div>hi</div>');
     });
 
+    it('renders transpiled components', async () => {
+      const plt = util.register(
+        [{
+          tagNameMeta: 'ion-test-es5',
+          componentModule: IonTestES5
+        }]
+      );
+      const node = await util.render(plt, '<ion-test-es5></ion-test-es5>');
+      expect(node.innerHTML.toString()).toEqual('<div>hi</div>');
+    });
+
     it('renders a node that can be queried for tests', async () => {
       const plt = util.register(
         [{
@@ -101,7 +122,7 @@ describe('testing utilities', () => {
 
   describe('transpile', () => {
     it('syncronously transpiles the specified file', () => {
-      const res = util.transpile(`${__dirname}/test-class.tsx`);
+      const res = util.transpile(`${__dirname}/test-class.tsx`, `${__dirname}`);
       // just some sanity checks, validating the whole string may be too fragile
       expect(res).toContain('TestClass.prototype.sum = function');
       expect(res).toContain('TestClass.prototype.render = function');

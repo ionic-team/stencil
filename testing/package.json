@@ -1,0 +1,13 @@
+{
+  "name": "@stencil/core",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "../dist/testing/index.js",
+  "types": "../dist/testing/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ionic-team/stencil-starter.git"
+  },
+  "author": "Ionic Team",
+  "homepage": "https://github.com/ionic-team/stencil"
+}
