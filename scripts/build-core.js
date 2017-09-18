@@ -249,14 +249,13 @@ if (process.argv.indexOf('dev') > -1) {
 
 function copyUtilFiles() {
   createMainIndex();
-  copyMainDTs('index.d.ts');
-  copyMainDTs('testing.d.ts');
+  copyMainDTs();
   copyUtilDir();
 }
 
-function copyMainDTs(fname) {
-  const readMainDTsPath = path.join(TRANSPILED_DIR, fname);
-  const writeMainDTsPath = path.join(DIST_DIR, fname);
+function copyMainDTs() {
+  const readMainDTsPath = path.join(TRANSPILED_DIR, 'index.d.ts');
+  const writeMainDTsPath = path.join(DIST_DIR, 'index.d.ts');
   fs.readFile(readMainDTsPath, function(err, data) {
     if (err) {
       console.log('Failed to read: ', readMainDTsPath);
