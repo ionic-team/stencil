@@ -9,16 +9,5 @@
     "url": "git+https://github.com/ionic-team/stencil-starter.git"
   },
   "author": "Ionic Team",
-  "homepage": "https://github.com/ionic-team/stencil",
-  "jest": {
-    "testEnvironment": "node",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.(ts)$": "<rootDir>/scripts/jest.preprocessor.js"
-    },
-    "testRegex": "/src/.*\\.spec\\.(ts|js)$"
-  }
+  "homepage": "https://github.com/ionic-team/stencil"
 }
