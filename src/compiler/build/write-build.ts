@@ -1,5 +1,6 @@
 import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
 import { buildError, buildWarn, catchError, writeFiles } from '../util';
+import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { writeAppManifest } from '../manifest/manifest-data';
 
@@ -111,6 +112,13 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "browser" property is required when generating a distribution and must be set to: ${browser}`;
+  }
+
+  const collection = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
+  if (packageJsonData.collection !== collection) {
+    const err = buildError(diagnostics);
+    err.header = `package.json error`;
+    err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collection}`;
   }
 
   if (typeof config.namespace !== 'string' || config.namespace.toLowerCase().trim() === 'app') {

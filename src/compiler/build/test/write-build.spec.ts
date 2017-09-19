@@ -9,6 +9,18 @@ describe('write-build', () => {
 
   describe('updatePackageJson', () => {
 
+    it('should error when missing collection property', () => {
+      packageJsonData.files = [
+        'dist/'
+      ];
+      packageJsonData.main = 'dist/collection/index.js';
+      packageJsonData.types = 'dist/collection/index.d.ts';
+      packageJsonData.browser = 'dist/somenamespace.js';
+      validatePackageJson(config, diagnostics, packageJsonData);
+      expect(diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
+      expect(diagnostics[0].messageText).toMatch(/dist\/collection\/collection-manifest.json/);
+    });
+
     it('should error when missing browser property', () => {
       packageJsonData.files = [
         'dist/'
