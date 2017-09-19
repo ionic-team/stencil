@@ -293,6 +293,8 @@ export interface BuildConfig {
   buildDir?: string;
   distDir?: string;
   collectionDir?: string;
+  emptyDist?: boolean;
+  emptyWWW?: boolean;
   srcIndexHtml?: string;
   wwwIndexHtml?: string;
   publicPath?: string;

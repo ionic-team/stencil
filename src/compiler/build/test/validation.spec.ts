@@ -130,6 +130,28 @@ describe('validation', () => {
       expect(path.isAbsolute(config.distDir)).toBe(true);
     });
 
+    it('should set default emptyDist to false', () => {
+      validateBuildConfig(config);
+      expect(config.emptyDist).toBe(false);
+    });
+
+    it('should set emptyDist to true', () => {
+      config.emptyDist = true;
+      validateBuildConfig(config);
+      expect(config.emptyDist).toBe(true);
+    });
+
+    it('should set default emptyWWW to false', () => {
+      validateBuildConfig(config);
+      expect(config.emptyWWW).toBe(false);
+    });
+
+    it('should set emptyWWW to true', () => {
+      config.emptyWWW = true;
+      validateBuildConfig(config);
+      expect(config.emptyWWW).toBe(true);
+    });
+
     it('should set default collection dir and convert to absolute path', () => {
       validateBuildConfig(config);
       expect(path.basename(config.collectionDir)).toBe('collection');
