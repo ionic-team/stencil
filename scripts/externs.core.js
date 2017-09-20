@@ -19,8 +19,12 @@ function emit(){};
 function enableListener(){};
 function eventNameFn(){};
 function isClient(){};
+function isPrerender(){};
 function isServer(){};
 function mode(){};
+function raf(){};
+function read(){};
+function write(){};
 
 
 /**
