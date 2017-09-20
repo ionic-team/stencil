@@ -19,15 +19,7 @@ var IonTestES5 = (function() {
   return IonTestES5;
 }());
 
-class IonThingOne {
-  render() {
-    return [
-      h('div', 0, 'thing')
-    ];
-  }
-}
-
-class IonThingTwo {
+class IonThing {
   x = 18;
   y = 24;
   sum() { return this.x + this.y; }
@@ -45,74 +37,50 @@ class IonThingTwo {
 }
 
 describe('testing utilities', () => {
-  describe('register', () => {
-    it('returns a platform', () => {
-      const plt = util.register();
-      expect(plt).toBeTruthy();
-      expect(typeof plt.defineComponent).toEqual('function');
-      expect(typeof plt.getComponentMeta).toEqual('function');
-      expect(typeof plt.getContextItem).toEqual('function');
-    });
-
-    it('registers the components', () => {
-      const plt = util.register(
-        [{
-          tagNameMeta: 'ion-test',
-          componentModule: IonTest
-        }, {
-          tagNameMeta: 'ion-thing-one',
-          componentModule: IonThingOne
-        }]
-      );
-      expect(plt.getComponentMeta({ tagName: 'ion-test' } as Element)).toBeTruthy();
-      expect(plt.getComponentMeta({ tagName: 'ion-thing-one' } as Element)).toBeTruthy();
-    });
-  });
-
   describe('render', () => {
     it('renders the specified component', async () => {
-      const plt = util.register(
+      util.register(
         [{
           tagNameMeta: 'ion-test',
           componentModule: IonTest
         }]
       );
-      const node = await util.render(plt, '<ion-test></ion-test>');
+      const node = await util.render('<ion-test></ion-test>');
       expect(node.innerHTML.toString()).toEqual('<div>hi</div>');
     });
 
     it('renders transpiled components', async () => {
-      const plt = util.register(
+      util.register(
         [{
           tagNameMeta: 'ion-test-es5',
           componentModule: IonTestES5
         }]
       );
-      const node = await util.render(plt, '<ion-test-es5></ion-test-es5>');
+      const node = await util.render('<ion-test-es5></ion-test-es5>');
       expect(node.innerHTML.toString()).toEqual('<div>hi</div>');
     });
 
     it('renders a node that can be queried for tests', async () => {
-      const plt = util.register(
+      util.register(
         [{
-          tagNameMeta: 'ion-thing-two',
-          componentModule: IonThingTwo
+          tagNameMeta: 'ion-thing',
+          componentModule: IonThing
         }]
       );
-      const node = await util.render(plt, '<ion-thing-two></ion-thing-two>');
+      const node = await util.render('<ion-thing></ion-thing>');
       const children = node.getElementsByClassName('child-thing');
       expect(children.length).toEqual(4);
     });
 
     it('allows the component class itself to be tested', async () => {
-      const plt = util.register(
+      util.register(
         [{
-          tagNameMeta: 'ion-thing-two',
-          componentModule: IonThingTwo
+          tagNameMeta: 'ion-thing',
+          componentModule: IonThing
         }]
       );
-      const node = await util.render(plt, '<ion-thing-two></ion-thing-two>');
-      const c: IonThingTwo = node.$instance as IonThingTwo;
+      const node = await util.render('<ion-thing></ion-thing>');
+      const c: IonThing = node.$instance as IonThing;
       expect(c.sum()).toEqual(42);
       c.x = 25;
       c.y = 48;
