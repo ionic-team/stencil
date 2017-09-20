@@ -23,6 +23,13 @@ export function toTitleCase(str: string) {
   return str.charAt(0).toUpperCase() + str.substr(1);
 }
 
+export function dashToPascalCase(word: string) {
+  return word.split('-').map((segment: string) => {
+    segment = segment.toLocaleLowerCase();
+    return segment.charAt(0).toUpperCase() + segment.slice(1);
+  }).join('');
+}
+
 export function noop(): any {}
 
 export function pointerCoordX(ev: any): number {

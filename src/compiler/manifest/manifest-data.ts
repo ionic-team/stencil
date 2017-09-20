@@ -121,7 +121,6 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   const compiledComponentRelativeDirPath = normalizePath(config.sys.path.dirname(compiledComponentRelativeFilePath));
 
   serializeTag(cmpData, cmpMeta);
-  serializeComponentClass(cmpData, cmpMeta);
   serializeComponentPath(config, manifestDir, compiledComponentAbsoluteFilePath, cmpData);
   serializeStyles(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeAssetsDir(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
@@ -151,7 +150,6 @@ export function parseComponent(config: BuildConfig, manifestDir: string, cmpData
   const cmpMeta = moduleFile.cmpMeta;
 
   parseTag(cmpData, cmpMeta);
-  parseComponentClass(cmpData, cmpMeta);
   parseModuleJsFilePath(config, manifestDir, cmpData, moduleFile);
   parseStyles(config, manifestDir, cmpData, cmpMeta);
   parseAssetsDir(config, manifestDir, cmpData, cmpMeta);
@@ -193,16 +191,6 @@ function parseModuleJsFilePath(config: BuildConfig, manifestDir: string, cmpData
   // into an absolute path to the component's js file path
   moduleFile.jsFilePath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
 }
-
-
-function serializeComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  cmpData.componentClass = cmpMeta.componentClass;
-}
-
-function parseComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  cmpMeta.componentClass = cmpData.componentClass;
-}
-
 
 function serializeStyles(config: BuildConfig, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.stylesMeta) {

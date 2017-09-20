@@ -8,7 +8,7 @@ import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropDecoratorMeta } from './prop-decorator';
 import { getPropChangeDecoratorMeta } from './prop-change-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
-import { updateComponentClass, convertValueToLiteral } from './util';
+import { updateComponentClass } from './util';
 import * as ts from 'typescript';
 
 
@@ -33,7 +33,6 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
 
       moduleFile.cmpMeta = {
         ...cmpMeta,
-        componentClass: classNode.name.getText().trim(),
         membersMeta: {
           // membersMeta is shared with @Prop, @State, @Method, @Element
           ...getElementDecoratorMeta(classNode),
@@ -46,18 +45,8 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
         ...getPropChangeDecoratorMeta(classNode)
       };
 
-      const meta: ts.Expression = convertValueToLiteral(moduleFile.cmpMeta);
-
-      return [
-        // create 'export const metadata = { .... }'
-        ts.createVariableStatement(
-          [ts.createToken(ts.SyntaxKind.ExportKeyword), ts.createToken(ts.SyntaxKind.ConstKeyword)],
-          [ts.createVariableDeclaration('metadata', undefined, meta)]
-        ),
-
-        // Return Class Declaration with Decorator removed and as default export
-        updateComponentClass(classNode)
-      ];
+      // Return Class Declaration with Decorator removed and as default export
+      return updateComponentClass(classNode);
     }
 
 

@@ -6,12 +6,11 @@ import * as ts from 'typescript';
 export function getMethodDecoratorMeta(classNode: ts.ClassDeclaration) {
   const membersMeta: MembersMeta = {};
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-  const methodMemebers = decoratedMembers.filter(n => n.kind === ts.SyntaxKind.MethodDeclaration);
+  const methodMembers = decoratedMembers.filter(n => n.kind === ts.SyntaxKind.MethodDeclaration);
 
-  methodMemebers.forEach(methodNode => {
+  methodMembers.forEach(methodNode => {
     let isMethod = false;
     let methodName: string = null;
-
     methodNode.forEachChild(n => {
       if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1 && n.getChildAt(1).getFirstToken().getText() === 'Method') {
         isMethod = true;

@@ -670,7 +670,6 @@ export interface ComponentMeta {
   slotMeta?: number;
   loadPriority?: number;
   componentModule?: any;
-  componentClass?: string;
 }
 
 
@@ -1197,7 +1196,6 @@ export interface BundleData {
 export interface ComponentData {
   tag?: string;
   componentPath?: string;
-  componentClass?: string;
   styles?: StylesData;
   props?: PropData[];
   propsWillChange?: PropChangeData[];

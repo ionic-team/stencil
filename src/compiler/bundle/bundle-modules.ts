@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, Bundle, FilesMap,
   Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
 import { buildError, catchError, hasError, generatePreamble, normalizePath } from '../util';
+import { dashToPascalCase } from '../../util/helpers';
 import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { formatLoadComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
@@ -127,6 +128,8 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
   const bundleDetails: ModuleBundleDetails = {};
   const sys = config.sys;
 
+
+
   if (ctx.isChangeBuild && !ctx.changeHasComponentModules && !ctx.changeHasNonComponentModules && ctx.moduleBundleOutputs[bundleId]) {
     // don't bother bundling if this is a change build but
     // none of the changed files are modules or components
@@ -149,10 +152,11 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     let importPath = moduleFile.jsFilePath;
 
     // manually create the content for our temporary entry file for the bundler
-    entryFileLines.push(`import ${moduleFile.cmpMeta.componentClass} from "${importPath}";`);
+    const importName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
+    entryFileLines.push(`import ${importName} from "${importPath}";`);
 
     // export map should always use UPPER CASE tag name
-    entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${moduleFile.cmpMeta.componentClass};`);
+    entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${importName};`);
   });
 
   // create the entry file for the bundler
@@ -182,7 +186,6 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
       return Promise.resolve(bundleDetails);
     }
   }
-
 
   // start the bundler on our temporary file
   return sys.rollup.rollup({

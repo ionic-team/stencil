@@ -7,7 +7,9 @@ import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { updateFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
-import { updateLifecycleMethods } from './transformers/update-lifecycle-methods';
+import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
+import addMetadataExport from './transformers/add-metadata-export';
+import addJsxTypes from './transformers/add-jsx-types';
 import * as ts from 'typescript';
 
 
@@ -84,8 +86,10 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
       componentClass(config, ctx.moduleFiles, ctx.diagnostics),
+      addMetadataExport(ctx.moduleFiles),
+      addJsxTypes(ctx.moduleFiles),
       removeImports(),
-      updateLifecycleMethods()
+      renameLifecycleMethods()
     ],
     after: [
       updateFileMetaFromSlot(ctx.moduleFiles),

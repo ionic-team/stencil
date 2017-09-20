@@ -124,3 +124,14 @@ function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
 export function isEmptyArgs(arg: any) {
   return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';
 }
+
+export function transformSourceFile(sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
+  const transformed = ts.transform(ts.createSourceFile('source.ts', sourceText, ts.ScriptTarget.ES2015), transformers);
+  const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed }, {
+      onEmitNode: transformed.emitNodeWithNotification,
+      substituteNode: transformed.substituteNode
+  });
+  const result = printer.printBundle(ts.createBundle(transformed.transformed));
+  transformed.dispose();
+  return result;
+}
