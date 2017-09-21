@@ -13,8 +13,8 @@ describe('write-build', () => {
       packageJsonData.files = [
         '.\\dist'
       ];
-      packageJsonData.main = 'dist\\collection/index.js';
-      packageJsonData.types = 'dist\\collection/index.d.ts';
+      packageJsonData.main = 'dist\\collection\\index.js';
+      packageJsonData.types = 'dist\\collection\\index.d.ts';
       packageJsonData.browser = 'dist\\somenamespace.js';
       packageJsonData.collection = 'dist\\collection\\collection-manifest.json';
       validatePackageJson(config, diagnostics, packageJsonData);
