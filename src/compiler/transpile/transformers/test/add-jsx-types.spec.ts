@@ -11,6 +11,7 @@ describe('add-jsx-types transform', () => {
       const files: ModuleFiles = {
         'source.ts': {
           cmpMeta: {
+            componentClass: 'Redirect',
             eventsMeta: [],
             hostMeta: {},
             isShadowMeta: false,
@@ -36,7 +37,7 @@ describe('add-jsx-types transform', () => {
 `import { Component, Prop } from "@stencil/core";
 import { ActiveRouter, RouterHistory } from "../../global/interfaces";
 
-export class StencilRouterRedirect {
+export class Redirect {
     activeRouter: ActiveRouter;
     url: string;
     componentWillLoad() {
@@ -53,7 +54,7 @@ export class StencilRouterRedirect {
       expect(output).toEqual(
 `import { Component, Prop } from "@stencil/core";
 import { ActiveRouter, RouterHistory } from "../../global/interfaces";
-export class StencilRouterRedirect {
+export class Redirect {
     activeRouter: ActiveRouter;
     url: string;
     componentWillLoad() {
@@ -64,7 +65,7 @@ export class StencilRouterRedirect {
         return history.replace(this.url, {});
     }
 }
-interface HTMLStencilRouterRedirectElement extends StencilRouterRedirect, HTMLElement {
+interface HTMLStencilRouterRedirectElement extends Redirect, HTMLElement {
 }
 declare var HTMLStencilRouterRedirectElement: {
     prototype: HTMLStencilRouterRedirectElement;

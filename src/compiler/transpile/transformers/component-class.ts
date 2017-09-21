@@ -33,6 +33,7 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
 
       moduleFile.cmpMeta = {
         ...cmpMeta,
+        componentClass: classNode.name.getText().trim(),
         membersMeta: {
           // membersMeta is shared with @Prop, @State, @Method, @Element
           ...getElementDecoratorMeta(classNode),

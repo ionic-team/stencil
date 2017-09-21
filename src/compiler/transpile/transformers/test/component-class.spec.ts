@@ -59,6 +59,7 @@ describe('vnode-slot transform', () => {
       expect(fileMetaArray).toEqual({
         'module.tsx': {
           cmpMeta: {
+            componentClass: 'Redirect',
             eventsMeta: [],
             hostMeta: {},
             isShadowMeta: false,

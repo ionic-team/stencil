@@ -310,6 +310,14 @@ describe('manifest-data serialize/parse', () => {
     expect(b.jsFilePath).toBe('/User/me/myapp/dist/collection/components/cmp-a.js');
   });
 
+  it('componentClass', () => {
+    a.componentClass = 'ComponentClass';
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    expect(cmpData.componentClass).toBe('ComponentClass');
+    b = parseComponent(config, manifestDir, cmpData);
+    expect(b.cmpMeta.componentClass).toBe(a.componentClass);
+  });
+
   it('tag name', () => {
     a.tagNameMeta = 'ion-tag';
     const cmpData = serializeComponent(config, manifestDir, moduleFile);

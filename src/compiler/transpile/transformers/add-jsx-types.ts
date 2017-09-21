@@ -9,7 +9,7 @@ import * as ts from 'typescript';
       }
     }
 */
-function createJSXNamespace(tagName: string, ) {
+function createJSXNamespace(tagName: string) {
   const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
   const type = ts.createTypeReferenceNode(ts.createIdentifier(`JSXElements.${jsxInterfaceName}`), []);
   const member = ts.createPropertySignature(
@@ -176,8 +176,8 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
   return (transformContext) => {
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
       const tagName = cmpMeta.tagNameMeta;
-      const className = dashToPascalCase(tagName);
-      const interfaceName = `HTML${className}Element`;
+      const className = cmpMeta.componentClass;
+      const interfaceName = `HTML${dashToPascalCase(tagName)}Element`;
       // const memberMeta = moduleFile.cmpMeta.membersMeta;
 
       const moduleBlock = ts.createModuleBlock([
