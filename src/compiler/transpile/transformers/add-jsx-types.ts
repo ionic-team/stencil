@@ -49,7 +49,7 @@ function createJSXElementsNamespace() {
   const type = ts.createTypeReferenceNode(ts.createIdentifier('JSXElements.StencilRouterRedirectAttributes'), []);
   const member = ts.createPropertySignature(
     undefined,
-    'stencil-router-redirect',
+    ts.createLiteral('stencil-router-redirect'),
     undefined,
     type,
     undefined
@@ -81,7 +81,7 @@ function createHTMLElementTagNameMap() {
   const type = ts.createTypeReferenceNode(ts.createIdentifier('HTMLRedirectElement'), []);
   const member = ts.createPropertySignature(
     undefined,
-    'stencil-router-redirect',
+    ts.createLiteral('stencil-router-redirect'),
     undefined,
     type,
     undefined
@@ -105,7 +105,7 @@ function createElementTagNameMap() {
   const type = ts.createTypeReferenceNode(ts.createIdentifier('HTMLRedirectElement'), []);
   const member = ts.createPropertySignature(
     undefined,
-    'stencil-router-redirect',
+    ts.createLiteral('stencil-router-redirect'),
     undefined,
     type,
     undefined
@@ -125,6 +125,7 @@ function createElementTagNameMap() {
     prototype: HTMLRedirectElement;
     new(): HTMLRedirectElement;
   }
+*/
 function createDeclareHTMLElement() {
   const type = ts.createTypeReferenceNode(ts.createIdentifier('HTMLRedirectElement'), []);
   const member = ts.createPropertySignature(
@@ -134,24 +135,21 @@ function createDeclareHTMLElement() {
     type,
     undefined
   );
-  const member2 = ts.createPropertySignature(
+  const member2 = ts.createConstructSignature(
     undefined,
-    'new()',
     undefined,
-    type,
-    undefined
+    type
   );
 
   return ts.createVariableStatement(
     [ts.createToken(ts.SyntaxKind.DeclareKeyword)],
     [ts.createVariableDeclaration(
       'HTMLRedirectElement',
-      ts.createType,
+      ts.createTypeLiteralNode([member, member2]),
       undefined
     )]
   );
 }
-*/
 /*
   interface HTMLRedirectElement extends Redirect, HTMLElement {}
 */
@@ -169,7 +167,6 @@ function createHTMLElementInterface() {
     undefined
   );
 }
-
 
 export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
 
@@ -189,8 +186,8 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
 
       const globalBlock = ts.createModuleDeclaration(
         undefined,
-        undefined,
-        undefined,
+        [ts.createToken(ts.SyntaxKind.DeclareKeyword)],
+        ts.createIdentifier('global'),
         moduleBlock,
         ts.NodeFlags.GlobalAugmentation
       );
@@ -198,7 +195,7 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
       return [
         classNode,
         createHTMLElementInterface(),
-        // createDeclareHTMLElement(),
+        createDeclareHTMLElement(),
         globalBlock
       ];
     }
