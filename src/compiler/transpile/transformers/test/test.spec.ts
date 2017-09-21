@@ -1,7 +1,7 @@
 import { updateFileMetaFromSlot } from '../vnode-slots';
 import { DEFAULT_COMPILER_OPTIONS } from '../../compiler-options';
 import { ModuleFiles, ModuleFile } from '../../../../util/interfaces';
-import { transformSourceFile } from '../util';
+import { transformSourceString } from '../util';
 import * as ts from 'typescript';
 
 
@@ -55,7 +55,7 @@ export class Redirect {
         return history.replace(this.url, {});
     }
 }`;
-      const output = transformSourceFile(source, [update]);
+      const output = transformSourceString(source, [update]);
 
       expect(output).toEqual(source + '\nexport const var test = "hi";\n');
     });

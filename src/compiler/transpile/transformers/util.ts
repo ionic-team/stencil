@@ -1,4 +1,5 @@
 import * as ts from 'typescript';
+import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
 
 
 export function updateComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
@@ -125,7 +126,7 @@ export function isEmptyArgs(arg: any) {
   return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';
 }
 
-export function transformSourceFile(sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
+export function transformSourceString(sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
   const transformed = ts.transform(ts.createSourceFile('source.ts', sourceText, ts.ScriptTarget.ES2015), transformers);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed }, {
       onEmitNode: transformed.emitNodeWithNotification,
@@ -134,4 +135,13 @@ export function transformSourceFile(sourceText: string, transformers: ts.Transfo
   const result = printer.printBundle(ts.createBundle(transformed.transformed));
   transformed.dispose();
   return result;
+}
+
+export function transformSourceFile(sourceText: string, transformers: ts.CustomTransformers) {
+  return ts.transpileModule(sourceText, {
+    transformers,
+    compilerOptions: Object.assign({}, DEFAULT_COMPILER_OPTIONS, {
+      target: ts.ScriptTarget.ES2017
+    })
+  }).outputText;
 }
