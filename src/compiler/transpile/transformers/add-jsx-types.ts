@@ -1,5 +1,9 @@
 import { ModuleFiles, ComponentMeta } from '../../../util/interfaces';
 import { dashToPascalCase } from  '../../../util/helpers';
+import {
+  TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER,
+  MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE
+} from '../../../util/constants';
 import * as ts from 'typescript';
 
 /*
@@ -43,18 +47,27 @@ function createJSXNamespace(tagName: string) {
       }
     }
   */
-function createJSXElementsNamespace(tagName: string) {
-  const members = ['url'].map(p => {
-    const type = ts.createTypeReferenceNode(ts.createIdentifier('string'), []);
+function createJSXElementsNamespace(tagName: string, cmpMeta: ComponentMeta) {
+  const memberTypes = {
+    [TYPE_ANY]: 'any',
+    [TYPE_BOOLEAN]: 'boolean',
+    [TYPE_NUMBER]: 'number',
+  };
+  const members = Object.keys(cmpMeta.membersMeta)
+    .filter((memberName) => {
+      return [MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE].indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1;
+    })
+    .map((memberName) => {
+      const member = cmpMeta.membersMeta[memberName];
+      const type = ts.createIdentifier(memberTypes[member.propType || TYPE_ANY]);
       return ts.createPropertySignature(
         undefined,
-        p,
+        memberName,
         ts.createToken(ts.SyntaxKind.QuestionToken),
-        type,
+        ts.createTypeReferenceNode(type, []),
         undefined
       );
-    }
-  );
+    });
 
   const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
   const namespaceBlock = ts.createInterfaceDeclaration(
@@ -184,7 +197,7 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
         createHTMLElementTagNameMap(tagName, interfaceName),
         createElementTagNameMap(tagName, interfaceName),
         createJSXNamespace(tagName),
-        createJSXElementsNamespace(tagName)
+        createJSXElementsNamespace(tagName, cmpMeta)
       ]);
 
       const globalBlock = ts.createModuleDeclaration(

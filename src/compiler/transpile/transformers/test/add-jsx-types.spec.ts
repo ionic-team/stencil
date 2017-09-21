@@ -1,6 +1,10 @@
 import addJsxTypes from '../add-jsx-types';
 import { ModuleFiles } from '../../../../util/interfaces';
 import { transformSourceString } from '../util';
+import {
+  TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER,
+  MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE, MEMBER_STATE, MEMBER_PROP_CONTEXT
+} from '../../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -19,12 +23,21 @@ describe('add-jsx-types transform', () => {
             membersMeta: {
               activeRouter: {
                 ctrlId: 'activeRouter',
-                memberType: 3,
+                memberType: MEMBER_PROP_CONTEXT
               },
               url: {
                 attribName: 'url',
-                memberType: 1,
+                memberType: MEMBER_STATE,
               },
+              thing: {
+                attribName: 'thing',
+                memberType: MEMBER_PROP
+              },
+              other: {
+                attribName: 'otherNumber',
+                memberType: MEMBER_METHOD,
+                propType: TYPE_NUMBER
+              }
             },
             propsDidChangeMeta: [],
             propsWillChangeMeta: [],
@@ -85,7 +98,8 @@ declare global {
     }
     namespace JSXElements {
         export interface StencilRouterRedirectAttributes extends HTMLAttributes {
-            url?: string;
+            thing?: any;
+            other?: number;
         }
     }
 }`
