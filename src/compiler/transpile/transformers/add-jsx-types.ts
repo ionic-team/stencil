@@ -1,4 +1,5 @@
 import { ModuleFiles, ComponentMeta } from '../../../util/interfaces';
+import { dashToPascalCase } from  '../../../util/helpers';
 import * as ts from 'typescript';
 
 /*
@@ -8,31 +9,28 @@ import * as ts from 'typescript';
       }
     }
 */
-function createJSXNamespace() {
-  const members = ['url'].map(p => {
-    const type = ts.createTypeReferenceNode(ts.createIdentifier('string'), []);
-      return ts.createPropertySignature(
-        undefined,
-        p,
-        ts.createToken(ts.SyntaxKind.QuestionToken),
-        type,
-        undefined
-      );
-    }
+function createJSXNamespace(tagName: string, ) {
+  const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
+  const type = ts.createTypeReferenceNode(ts.createIdentifier(`JSXElements.${jsxInterfaceName}`), []);
+  const member = ts.createPropertySignature(
+    undefined,
+    ts.createLiteral(tagName),
+    undefined,
+    type,
+    undefined
   );
-
   const namespaceBlock = ts.createInterfaceDeclaration(
     undefined,
     undefined,
     'IntrinsicElements',
     undefined,
     undefined,
-    members
+    [member]
   );
   return ts.createModuleDeclaration(
     undefined,
     undefined,
-    ts.createLiteral('JSX'),
+    ts.createIdentifier('JSX'),
     ts.createModuleBlock([namespaceBlock]),
     ts.NodeFlags.Namespace
   );
@@ -45,28 +43,33 @@ function createJSXNamespace() {
       }
     }
   */
-function createJSXElementsNamespace() {
-  const type = ts.createTypeReferenceNode(ts.createIdentifier('JSXElements.StencilRouterRedirectAttributes'), []);
-  const member = ts.createPropertySignature(
-    undefined,
-    ts.createLiteral('stencil-router-redirect'),
-    undefined,
-    type,
-    undefined
+function createJSXElementsNamespace(tagName: string) {
+  const members = ['url'].map(p => {
+    const type = ts.createTypeReferenceNode(ts.createIdentifier('string'), []);
+      return ts.createPropertySignature(
+        undefined,
+        p,
+        ts.createToken(ts.SyntaxKind.QuestionToken),
+        type,
+        undefined
+      );
+    }
   );
+
+  const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
   const namespaceBlock = ts.createInterfaceDeclaration(
     undefined,
     [ts.createToken(ts.SyntaxKind.ExportKeyword)],
-    'StencilRouterRedirectAttributes',
+    jsxInterfaceName,
     undefined,
     [ts.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [ts.createExpressionWithTypeArguments(undefined, ts.createIdentifier('HTMLAttributes'))])],
-    [member]
+    members
   );
 
   return ts.createModuleDeclaration(
     undefined,
     undefined,
-    ts.createLiteral('JSXElements'),
+    ts.createIdentifier('JSXElements'),
     ts.createModuleBlock([namespaceBlock]),
     ts.NodeFlags.Namespace
   );
@@ -77,11 +80,11 @@ function createJSXElementsNamespace() {
       'stencil-router-redirect': HTMLRedirectElement
     }
 */
-function createHTMLElementTagNameMap() {
-  const type = ts.createTypeReferenceNode(ts.createIdentifier('HTMLRedirectElement'), []);
+function createHTMLElementTagNameMap(tagName: string, interfaceName: string) {
+  const type = ts.createTypeReferenceNode(ts.createIdentifier(interfaceName), []);
   const member = ts.createPropertySignature(
     undefined,
-    ts.createLiteral('stencil-router-redirect'),
+    ts.createLiteral(tagName),
     undefined,
     type,
     undefined
@@ -101,11 +104,11 @@ function createHTMLElementTagNameMap() {
       'stencil-router-redirect': HTMLRedirectElement
     }
 */
-function createElementTagNameMap() {
-  const type = ts.createTypeReferenceNode(ts.createIdentifier('HTMLRedirectElement'), []);
+function createElementTagNameMap(tagName: string, interfaceName: string) {
+  const type = ts.createTypeReferenceNode(ts.createIdentifier(interfaceName), []);
   const member = ts.createPropertySignature(
     undefined,
-    ts.createLiteral('stencil-router-redirect'),
+    ts.createLiteral(tagName),
     undefined,
     type,
     undefined
@@ -113,7 +116,7 @@ function createElementTagNameMap() {
   return ts.createInterfaceDeclaration(
     undefined,
     undefined,
-    'HTMLElementTagNameMap',
+    'ElementTagNameMap',
     undefined,
     undefined,
     [member]
@@ -126,16 +129,16 @@ function createElementTagNameMap() {
     new(): HTMLRedirectElement;
   }
 */
-function createDeclareHTMLElement() {
-  const type = ts.createTypeReferenceNode(ts.createIdentifier('HTMLRedirectElement'), []);
-  const member = ts.createPropertySignature(
+function createDeclareHTMLElement(interfaceName: string) {
+  const type = ts.createTypeReferenceNode(ts.createIdentifier(interfaceName), []);
+  const prototypeMember = ts.createPropertySignature(
     undefined,
     'prototype',
     undefined,
     type,
     undefined
   );
-  const member2 = ts.createConstructSignature(
+  const constructorMember = ts.createConstructSignature(
     undefined,
     undefined,
     type
@@ -144,8 +147,8 @@ function createDeclareHTMLElement() {
   return ts.createVariableStatement(
     [ts.createToken(ts.SyntaxKind.DeclareKeyword)],
     [ts.createVariableDeclaration(
-      'HTMLRedirectElement',
-      ts.createTypeLiteralNode([member, member2]),
+      interfaceName,
+      ts.createTypeLiteralNode([prototypeMember, constructorMember]),
       undefined
     )]
   );
@@ -154,14 +157,14 @@ function createDeclareHTMLElement() {
   interface HTMLRedirectElement extends Redirect, HTMLElement {}
 */
 
-function createHTMLElementInterface() {
+function createHTMLElementInterface(interfaceName: string, className: string) {
   return ts.createInterfaceDeclaration(
     undefined,
     undefined,
-    'HTMLRedirectElement',
+    interfaceName,
     undefined,
     [ts.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-      ts.createExpressionWithTypeArguments(undefined, ts.createIdentifier('Redirect')),
+      ts.createExpressionWithTypeArguments(undefined, ts.createIdentifier(className)),
       ts.createExpressionWithTypeArguments(undefined, ts.createIdentifier('HTMLElement'))
     ])],
     undefined
@@ -173,15 +176,15 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
   return (transformContext) => {
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
       const tagName = cmpMeta.tagNameMeta;
-      tagName;
+      const className = dashToPascalCase(tagName);
+      const interfaceName = `HTML${className}Element`;
       // const memberMeta = moduleFile.cmpMeta.membersMeta;
-      // const pascalCaseTagName = dashToPascalCase(tagName);
 
       const moduleBlock = ts.createModuleBlock([
-        createHTMLElementTagNameMap(),
-        createElementTagNameMap(),
-        createJSXNamespace(),
-        createJSXElementsNamespace()
+        createHTMLElementTagNameMap(tagName, interfaceName),
+        createElementTagNameMap(tagName, interfaceName),
+        createJSXNamespace(tagName),
+        createJSXElementsNamespace(tagName)
       ]);
 
       const globalBlock = ts.createModuleDeclaration(
@@ -194,8 +197,8 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
 
       return [
         classNode,
-        createHTMLElementInterface(),
-        createDeclareHTMLElement(),
+        createHTMLElementInterface(interfaceName, className),
+        createDeclareHTMLElement(interfaceName),
         globalBlock
       ];
     }

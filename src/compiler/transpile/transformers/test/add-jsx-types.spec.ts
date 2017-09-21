@@ -36,7 +36,7 @@ describe('add-jsx-types transform', () => {
 `import { Component, Prop } from "@stencil/core";
 import { ActiveRouter, RouterHistory } from "../../global/interfaces";
 
-export class Redirect {
+export class StencilRouterRedirect {
     activeRouter: ActiveRouter;
     url: string;
     componentWillLoad() {
@@ -51,7 +51,43 @@ export class Redirect {
       const output = transformSourceString(source, [addJsxTypes(files)]);
 
       expect(output).toEqual(
-        `h("example-element", { "c": { "red": true } }, t("HI"));\n`
+`import { Component, Prop } from "@stencil/core";
+import { ActiveRouter, RouterHistory } from "../../global/interfaces";
+export class StencilRouterRedirect {
+    activeRouter: ActiveRouter;
+    url: string;
+    componentWillLoad() {
+        const history: RouterHistory = this.activeRouter.get("history");
+        if (!history) {
+            return;
+        }
+        return history.replace(this.url, {});
+    }
+}
+interface HTMLStencilRouterRedirectElement extends StencilRouterRedirect, HTMLElement {
+}
+declare var HTMLStencilRouterRedirectElement: {
+    prototype: HTMLStencilRouterRedirectElement;
+    new (): HTMLStencilRouterRedirectElement;
+};
+declare global {
+    interface HTMLElementTagNameMap {
+        "stencil-router-redirect": HTMLStencilRouterRedirectElement;
+    }
+    interface ElementTagNameMap {
+        "stencil-router-redirect": HTMLStencilRouterRedirectElement;
+    }
+    namespace JSX {
+        interface IntrinsicElements {
+            "stencil-router-redirect": JSXElements.StencilRouterRedirectAttributes;
+        }
+    }
+    namespace JSXElements {
+        export interface StencilRouterRedirectAttributes extends HTMLAttributes {
+            url?: string;
+        }
+    }
+}`
       );
     });
   });
