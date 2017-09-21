@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/
 import { buildError, buildWarn, catchError, writeFiles } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
-import { writeAppManifest } from '../manifest/manifest-data';
+import { writeAppManifest, COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 
 
 export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
@@ -36,7 +36,7 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
     // and copy www/build to dist/ if generateDistribution is enabled
     return Promise.all([
       copyComponentAssets(config, ctx),
-      generateDistribution(config, ctx.diagnostics)
+      generateDistribution(config, ctx)
     ]);
 
   }).then(() => {
@@ -45,14 +45,15 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
 }
 
 
-export function generateDistribution(config: BuildConfig, diagnostics: Diagnostic[]): Promise<any> {
+export function generateDistribution(config: BuildConfig, ctx: BuildContext): Promise<any> {
   if (!config.generateDistribution) {
     // don't bother
     return Promise.resolve();
   }
 
   return Promise.all([
-    readPackageJson(config, diagnostics),
+    readPackageJson(config, ctx.diagnostics),
+    copySourceCollectionComponentsToDistribution(config, ctx),
     generatePackageModuleResolve(config)
   ]);
 }
@@ -141,6 +142,25 @@ function generatePackageModuleResolve(config: BuildConfig) {
       }
     });
   });
+}
+
+
+function copySourceCollectionComponentsToDistribution(config: BuildConfig, ctx: BuildContext) {
+  // for any components that are dependencies, such as ionicons is a dependency of ionic
+  // then we need to copy the dependency to the dist so it just works downstream
+  const promises: Promise<any>[] = [];
+
+  ctx.manifest.modulesFiles.forEach(moduleFile => {
+    if (!moduleFile.isCollectionDependency || !moduleFile.originalCollectionComponentPath) return;
+
+    const src = moduleFile.jsFilePath;
+    const dest = config.sys.path.join(config.collectionDir, COLLECTION_DEPENDENCIES_DIR, moduleFile.originalCollectionComponentPath);
+    const copyPromise = config.sys.copy(src, dest);
+
+    promises.push(copyPromise);
+  });
+
+  return Promise.all(promises);
 }
 
 

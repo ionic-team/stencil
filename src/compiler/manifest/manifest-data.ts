@@ -48,7 +48,7 @@ export function serializeAppManifest(config: BuildConfig, manifestDir: string, m
 
   // add component data for each of the manifest files
   manifest.modulesFiles.forEach(modulesFile => {
-    if (!modulesFile.isCollectionDependency) {
+    if (!modulesFile.excludeFromCollection) {
       const cmpData = serializeComponent(config, manifestDir, modulesFile);
       if (cmpData) {
         manifestData.components.push(cmpData);
@@ -80,7 +80,7 @@ export function parseDependentManifest(config: BuildConfig, collectionName: stri
     manifestName: collectionName
   };
 
-  parseComponents(config, true, manifestDir, manifestData, manifest);
+  parseComponents(config, manifestDir, manifestData, manifest);
   parseBundles(manifestData, manifest);
   parseGlobal(config, manifestDir, manifestData, manifest);
 
@@ -88,20 +88,37 @@ export function parseDependentManifest(config: BuildConfig, collectionName: stri
 }
 
 
-function parseComponents(config: BuildConfig, isCollectionDependency: boolean, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+function parseComponents(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
   const componentsData = manifestData.components;
 
-  manifest.modulesFiles = [];
-
-  if (componentsData && Array.isArray(componentsData)) {
-    componentsData.forEach(cmpData => {
-      const moduleFile = parseComponent(config, manifestDir, cmpData);
-      if (moduleFile) {
-        moduleFile.isCollectionDependency = isCollectionDependency;
-        manifest.modulesFiles.push(moduleFile);
-      }
-    });
+  if (!componentsData || !Array.isArray(componentsData)) {
+    manifest.modulesFiles = [];
+    return;
   }
+
+  manifest.modulesFiles = componentsData.map(cmpData => {
+    return parseComponentDataToModuleFile(config, manifestDir, cmpData);
+  });
+}
+
+
+export function excludeFromCollection(config: BuildConfig, cmpData: ComponentData) {
+  // this is a component from a collection dependency
+  // however, this project may also become a collection
+  // for example, "ionicons" is a dependency of "ionic"
+  // and "ionic" is it's own stand-alone collection, so within
+  // ionic's collection we want ionicons to just work
+
+  // cmpData is a component from a collection dependency
+  // if this component is listed in this config's bundles
+  // then we'll need to ensure it also becomes apart of this collection
+  const isInBundle = config.bundles && config.bundles.some(bundle => {
+    return bundle.components && bundle.components.some(tag => tag === cmpData.tag);
+  });
+
+  // if it's not in the config bundle then it's safe to exclude
+  // this component from going into this build's collection
+  return !isInBundle;
 }
 
 
@@ -122,9 +139,9 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
 
   serializeTag(cmpData, cmpMeta);
   serializeComponentClass(cmpData, cmpMeta);
-  serializeComponentPath(config, manifestDir, compiledComponentAbsoluteFilePath, cmpData);
-  serializeStyles(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
-  serializeAssetsDir(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
+  serializeComponentPath(config, manifestDir, moduleFile, compiledComponentAbsoluteFilePath, cmpData);
+  serializeStyles(config, moduleFile, compiledComponentRelativeDirPath, cmpData, cmpMeta);
+  serializeAssetsDir(config, moduleFile, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeProps(cmpData, cmpMeta);
   serializePropsWillChange(cmpData, cmpMeta);
   serializePropsDidChange(cmpData, cmpMeta);
@@ -144,9 +161,11 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
 }
 
 
-export function parseComponent(config: BuildConfig, manifestDir: string, cmpData: ComponentData) {
+export function parseComponentDataToModuleFile(config: BuildConfig, manifestDir: string, cmpData: ComponentData) {
   const moduleFile: ModuleFile = {
-    cmpMeta: {}
+    cmpMeta: {},
+    isCollectionDependency: true,
+    excludeFromCollection: excludeFromCollection(config, cmpData)
   };
   const cmpMeta = moduleFile.cmpMeta;
 
@@ -183,15 +202,24 @@ function parseTag(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeComponentPath(config: BuildConfig, manifestDir: string, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
-  // convert absolute path into a path that's relative to the manifest file
-  cmpData.componentPath = normalizePath(config.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
+function serializeComponentPath(config: BuildConfig, manifestDir: string, moduleFile: ModuleFile, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
+  if (moduleFile.isCollectionDependency && moduleFile.originalCollectionComponentPath) {
+    // use the original path from its collection if there was one
+    cmpData.componentPath = normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, moduleFile.originalCollectionComponentPath));
+
+  } else {
+    // convert absolute path into a path that's relative to the manifest file
+    cmpData.componentPath = normalizePath(config.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
+  }
 }
 
 function parseModuleJsFilePath(config: BuildConfig, manifestDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
   // convert the path that's relative to the manifest file
   // into an absolute path to the component's js file path
   moduleFile.jsFilePath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
+
+  // remember the original component path from its collection
+  moduleFile.originalCollectionComponentPath = cmpData.componentPath;
 }
 
 
@@ -204,14 +232,14 @@ function parseComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeStyles(config: BuildConfig, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeStyles(config: BuildConfig, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.stylesMeta) {
     cmpData.styles = {};
 
     const modeNames = Object.keys(cmpMeta.stylesMeta).sort();
 
     modeNames.forEach(modeName => {
-      cmpData.styles[modeName.toLowerCase()] = serializeStyle(config, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
+      cmpData.styles[modeName.toLowerCase()] = serializeStyle(config, moduleFile, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
     });
   }
 }
@@ -229,19 +257,27 @@ function parseStyles(config: BuildConfig, manifestDir: string, cmpData: Componen
 }
 
 
-function serializeStyle(config: BuildConfig, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
+function serializeStyle(config: BuildConfig, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
   const modeStyleData: StyleData = {};
 
   if (modeStyleMeta.cmpRelativePaths) {
-    modeStyleData.stylePaths = modeStyleMeta.cmpRelativePaths.map(componentRelativeStylePath => {
-      // convert style paths which are relative to the component file
-      // to be style paths that are relative to the manifest file
+    if (moduleFile.isCollectionDependency) {
+      // this is from a collection, let's use the original paths
+      modeStyleData.stylePaths = modeStyleMeta.originalCollectionPaths.map(originalCollectionPath => {
+        return normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, originalCollectionPath));
+      });
 
-      // we've already figured out the component's relative path from the manifest file
-      // use the value we already created in serializeComponentPath()
-      // create a relative path from the manifest file to the style path
-      return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, componentRelativeStylePath));
-    });
+    } else {
+      modeStyleData.stylePaths = modeStyleMeta.cmpRelativePaths.map(componentRelativeStylePath => {
+        // convert style paths which are relative to the component file
+        // to be style paths that are relative to the manifest file
+
+        // we've already figured out the component's relative path from the manifest file
+        // use the value we already created in serializeComponentPath()
+        // create a relative path from the manifest file to the style path
+        return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, componentRelativeStylePath));
+      });
+    }
 
     modeStyleData.stylePaths.sort();
   }
@@ -272,13 +308,15 @@ function parseStyle(config: BuildConfig, manifestDir: string, cmpData: Component
         stylePath
       ));
     });
+
+    modeStyle.originalCollectionPaths = modeStyleData.stylePaths.slice();
   }
 
   return modeStyle;
 }
 
 
-function serializeAssetsDir(config: BuildConfig, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeAssetsDir(config: BuildConfig, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpMeta.assetsDirsMeta)) {
     return;
   }
@@ -291,6 +329,10 @@ function serializeAssetsDir(config: BuildConfig, compiledComponentRelativeDirPat
   // create a relative path from the manifest file to the asset path
 
   cmpData.assetPaths = cmpMeta.assetsDirsMeta.map(assetMeta => {
+    if (moduleFile.isCollectionDependency && assetMeta.originalCollectionPath) {
+      return normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, assetMeta.originalCollectionPath));
+    }
+
     return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, assetMeta.cmpRelativePath));
   }).sort();
 }
@@ -310,7 +352,8 @@ function parseAssetsDir(config: BuildConfig, manifestDir: string, cmpData: Compo
       cmpRelativePath: normalizePath(config.sys.path.relative(
         config.sys.path.dirname(cmpData.componentPath),
         assetsPath
-      ))
+      )),
+      originalCollectionPath: normalizePath(assetsPath)
     };
     return assetsMeta;
 
@@ -856,3 +899,5 @@ function nameSort(a: string, b: string) {
   if (a.toLowerCase() > b.toLowerCase()) return 1;
   return 0;
 }
+
+export const COLLECTION_DEPENDENCIES_DIR = 'dependencies';

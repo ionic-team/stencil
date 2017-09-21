@@ -260,6 +260,8 @@ export interface ModuleFile {
   cmpMeta?: ComponentMeta;
   includedSassFiles?: string[];
   isCollectionDependency?: boolean;
+  excludeFromCollection?: boolean;
+  originalCollectionComponentPath?: string;
 }
 
 
@@ -685,6 +687,7 @@ export interface StyleMeta {
   styleId?: string;
   absolutePaths?: string[];
   cmpRelativePaths?: string[];
+  originalCollectionPaths?: string[];
   styleStr?: string;
 }
 
@@ -692,6 +695,7 @@ export interface StyleMeta {
 export interface AssetsMeta {
   absolutePath?: string;
   cmpRelativePath?: string;
+  originalCollectionPath?: string;
 }
 
 
