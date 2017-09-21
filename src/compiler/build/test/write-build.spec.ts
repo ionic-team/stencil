@@ -1,4 +1,4 @@
-import { validatePackageJson } from '../write-build';
+import { validatePackageJson, validatePackageFiles } from '../write-build';
 import { validateBuildConfig } from '../validation';
 import { BuildConfig, BuildContext, BuildResults, ComponentRegistry, Diagnostic } from '../../../util/interfaces';
 import { mockBuildConfig } from '../../../test';
@@ -51,9 +51,33 @@ describe('write-build', () => {
       expect(diagnostics[0].messageText).toMatch(/dist\/collection\/index.js/);
     });
 
+    it('should validate files "dist/"', () => {
+      packageJsonData.files = ['dist/'];
+      validatePackageFiles(config, diagnostics, packageJsonData);
+      expect(diagnostics.length).toBe(0);
+    });
+
+    it('should validate files "./dist/"', () => {
+      packageJsonData.files = ['./dist/'];
+      validatePackageFiles(config, diagnostics, packageJsonData);
+      expect(diagnostics.length).toBe(0);
+    });
+
+    it('should validate files "./dist"', () => {
+      packageJsonData.files = ['./dist'];
+      validatePackageFiles(config, diagnostics, packageJsonData);
+      expect(diagnostics.length).toBe(0);
+    });
+
+    it('should validate files "dist"', () => {
+      packageJsonData.files = ['dist'];
+      validatePackageFiles(config, diagnostics, packageJsonData);
+      expect(diagnostics.length).toBe(0);
+    });
+
     it('should error when files array misses dist/', () => {
       packageJsonData.files = [];
-      validatePackageJson(config, diagnostics, packageJsonData);
+      validatePackageFiles(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/array must contain the distribution directory/);
       expect(diagnostics[0].messageText).toMatch(/"dist\/"/);
     });

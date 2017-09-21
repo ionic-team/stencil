@@ -83,16 +83,7 @@ function readPackageJson(config: BuildConfig, diagnostics: Diagnostic[]) {
 
 
 export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic[], packageJsonData: any) {
-  let distDir = config.sys.path.relative(config.rootDir, config.distDir);
-  distDir += '/';
-
-  if (packageJsonData.files) {
-    if ((packageJsonData.files as string[]).indexOf(distDir) === -1 && (packageJsonData.files as string[]).indexOf('./' + distDir) === -1) {
-      const err = buildError(diagnostics);
-      err.header = `package.json error`;
-      err.messageText = `package.json "files" array must contain the distribution directory "${distDir}" when generating a distribution.`;
-    }
-  }
+  validatePackageFiles(config, diagnostics, packageJsonData);
 
   const main = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.js');
   if (packageJsonData.main !== main) {
@@ -126,6 +117,29 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
     const err = buildWarn(diagnostics);
     err.header = `config warning`;
     err.messageText = `When generating a distribution it is recommended to choose a unique namespace, which can be updated in the stencil.config.js file.`;
+  }
+}
+
+
+export function validatePackageFiles(config: BuildConfig, diagnostics: Diagnostic[], packageJsonData: any) {
+  if (packageJsonData.files) {
+    const distDir = config.sys.path.relative(config.rootDir, config.distDir);
+
+    const validPaths = [
+      `${distDir}`,
+      `${distDir}/`,
+      `./${distDir}`,
+      `./${distDir}/`
+    ];
+
+    const containsDistDir = (packageJsonData.files as string[])
+            .some(userPath => validPaths.some(validPath => userPath === validPath));
+
+    if (!containsDistDir) {
+      const err = buildError(diagnostics);
+      err.header = `package.json error`;
+      err.messageText = `package.json "files" array must contain the distribution directory "${distDir}/" when generating a distribution.`;
+    }
   }
 }
 
