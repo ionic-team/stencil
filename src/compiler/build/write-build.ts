@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
-import { buildError, buildWarn, catchError, writeFiles } from '../util';
+import { buildError, buildWarn, catchError, normalizePath, writeFiles } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { writeAppManifest, COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
@@ -82,32 +82,32 @@ function readPackageJson(config: BuildConfig, diagnostics: Diagnostic[]) {
 }
 
 
-export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic[], packageJsonData: any) {
-  validatePackageFiles(config, diagnostics, packageJsonData);
+export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic[], data: any) {
+  validatePackageFiles(config, diagnostics, data);
 
-  const main = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.js');
-  if (packageJsonData.main !== main) {
+  const main = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.js'));
+  if (!data.main || normalizePath(data.main) !== main) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
   }
 
-  const types = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.d.ts');
-  if (packageJsonData.types !== types) {
+  const types = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.d.ts'));
+  if (!data.types || normalizePath(data.types) !== types) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "types" property is required when generating a distribution and must be set to: ${types}`;
   }
 
-  const browser = config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), config.namespace.toLowerCase() + '.js');
-  if (packageJsonData.browser !== browser) {
+  const browser = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), config.namespace.toLowerCase() + '.js'));
+  if (!data.browser || normalizePath(data.browser) !== browser) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "browser" property is required when generating a distribution and must be set to: ${browser}`;
   }
 
-  const collection = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
-  if (packageJsonData.collection !== collection) {
+  const collection = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME));
+  if (!data.collection || normalizePath(data.collection) !== collection) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collection}`;
@@ -123,22 +123,22 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
 
 export function validatePackageFiles(config: BuildConfig, diagnostics: Diagnostic[], packageJsonData: any) {
   if (packageJsonData.files) {
-    const distDir = config.sys.path.relative(config.rootDir, config.distDir);
+    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, config.distDir));
 
     const validPaths = [
-      `${distDir}`,
-      `${distDir}/`,
-      `./${distDir}`,
-      `./${distDir}/`
+      `${actualDistDir}`,
+      `${actualDistDir}/`,
+      `./${actualDistDir}`,
+      `./${actualDistDir}/`
     ];
 
     const containsDistDir = (packageJsonData.files as string[])
-            .some(userPath => validPaths.some(validPath => userPath === validPath));
+            .some(userPath => validPaths.some(validPath => normalizePath(userPath) === validPath));
 
     if (!containsDistDir) {
       const err = buildError(diagnostics);
       err.header = `package.json error`;
-      err.messageText = `package.json "files" array must contain the distribution directory "${distDir}/" when generating a distribution.`;
+      err.messageText = `package.json "files" array must contain the distribution directory "${actualDistDir}/" when generating a distribution.`;
     }
   }
 }

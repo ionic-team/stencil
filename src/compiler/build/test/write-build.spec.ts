@@ -9,6 +9,18 @@ describe('write-build', () => {
 
   describe('updatePackageJson', () => {
 
+    it('should validate windows paths', () => {
+      packageJsonData.files = [
+        '.\\dist'
+      ];
+      packageJsonData.main = 'dist\\collection/index.js';
+      packageJsonData.types = 'dist\\collection/index.d.ts';
+      packageJsonData.browser = 'dist\\somenamespace.js';
+      packageJsonData.collection = 'dist\\collection\\collection-manifest.json';
+      validatePackageJson(config, diagnostics, packageJsonData);
+      expect(diagnostics.length).toBe(0);
+    });
+
     it('should error when missing collection property', () => {
       packageJsonData.files = [
         'dist/'
