@@ -9,7 +9,7 @@ export default function addMetadataExport(moduleFiles: ModuleFiles): ts.Transfor
       const meta: ts.Expression = convertValueToLiteral(cmpMeta);
       const metaDataExportNode = ts.createVariableStatement(
         [ts.createToken(ts.SyntaxKind.ExportKeyword), ts.createToken(ts.SyntaxKind.ConstKeyword)],
-        [ts.createVariableDeclaration('metadat', undefined, meta)]
+        [ts.createVariableDeclaration('metadata', undefined, meta)]
       );
       return [
         classNode,
