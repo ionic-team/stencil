@@ -149,6 +149,12 @@ export function validateBuildConfig(config: BuildConfig) {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
 
+  config.generateDistribution = !!config.generateDistribution;
+
+  if (typeof config.generateWWW !== 'boolean') {
+    config.generateWWW = true;
+  }
+
   validatePrerenderConfig(config);
 
   if (config.copy) {
@@ -163,11 +169,8 @@ export function validateBuildConfig(config: BuildConfig) {
 
   validateServiceWorkerConfig(config);
 
-  config.generateDistribution = !!config.generateDistribution;
-
-  if (typeof config.generateWWW !== 'boolean') {
-    config.generateWWW = true;
-  }
+  config.emptyDist = !!config.emptyDist;
+  config.emptyWWW = !!config.emptyWWW;
 
   config.collections = config.collections || [];
   config.collections = config.collections.map(validateDependentCollection);

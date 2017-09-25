@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.0.5-23",
+  "version": "0.0.6-0",
   "license": "MIT",
   "bin": {
     "stencil": "./bin/stencil"
@@ -17,7 +17,8 @@
     "dist/testing",
     "dist/util",
     "dist/index.js",
-    "dist/index.d.ts"
+    "dist/index.d.ts",
+    "testing"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

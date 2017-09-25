@@ -40,8 +40,6 @@ export declare const State: StateDecorator;
 
 export { build } from './compiler/index';
 
-export { register, render } from './testing/index';   // I really want @stencil/core/testing and not in here, but will worry about that later
-
 export { createRenderer } from './server/index';
 
 export interface HostElement extends HTMLElement {

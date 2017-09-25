@@ -19,6 +19,7 @@ module.exports = function help() {
 
     ${p} ${chalk.green('stencil build --dev --watch')}
     ${p} ${chalk.green('stencil build --prerender')}
+    ${p} ${chalk.green('stencil init')}
 
 `);
 }

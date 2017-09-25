@@ -1,7 +1,8 @@
 import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
-import { buildError, buildWarn, catchError, writeFiles } from '../util';
+import { buildError, buildWarn, catchError, normalizePath, writeFiles } from '../util';
+import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
-import { writeAppManifest } from '../manifest/manifest-data';
+import { writeAppManifest, COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 
 
 export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
@@ -35,7 +36,7 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
     // and copy www/build to dist/ if generateDistribution is enabled
     return Promise.all([
       copyComponentAssets(config, ctx),
-      generateDistribution(config, ctx.diagnostics)
+      generateDistribution(config, ctx)
     ]);
 
   }).then(() => {
@@ -44,14 +45,15 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
 }
 
 
-export function generateDistribution(config: BuildConfig, diagnostics: Diagnostic[]): Promise<any> {
+export function generateDistribution(config: BuildConfig, ctx: BuildContext): Promise<any> {
   if (!config.generateDistribution) {
     // don't bother
     return Promise.resolve();
   }
 
   return Promise.all([
-    readPackageJson(config, diagnostics),
+    readPackageJson(config, ctx.diagnostics),
+    copySourceCollectionComponentsToDistribution(config, ctx),
     generatePackageModuleResolve(config)
   ]);
 }
@@ -80,43 +82,64 @@ function readPackageJson(config: BuildConfig, diagnostics: Diagnostic[]) {
 }
 
 
-export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic[], packageJsonData: any) {
-  let distDir = config.sys.path.relative(config.rootDir, config.distDir);
-  distDir += '/';
+export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic[], data: any) {
+  validatePackageFiles(config, diagnostics, data);
 
-  if (packageJsonData.files) {
-    if ((packageJsonData.files as string[]).indexOf(distDir) === -1 && (packageJsonData.files as string[]).indexOf('./' + distDir) === -1) {
-      const err = buildError(diagnostics);
-      err.header = `package.json error`;
-      err.messageText = `package.json "files" array must contain the distribution directory "${distDir}" when generating a distribution.`;
-    }
-  }
-
-  const main = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.js');
-  if (packageJsonData.main !== main) {
+  const main = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.js'));
+  if (!data.main || normalizePath(data.main) !== main) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
   }
 
-  const types = config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.d.ts');
-  if (packageJsonData.types !== types) {
+  const types = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.d.ts'));
+  if (!data.types || normalizePath(data.types) !== types) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "types" property is required when generating a distribution and must be set to: ${types}`;
   }
 
-  const browser = config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), config.namespace.toLowerCase() + '.js');
-  if (packageJsonData.browser !== browser) {
+  const browser = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), config.namespace.toLowerCase() + '.js'));
+  if (!data.browser || normalizePath(data.browser) !== browser) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "browser" property is required when generating a distribution and must be set to: ${browser}`;
+  }
+
+  const collection = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME));
+  if (!data.collection || normalizePath(data.collection) !== collection) {
+    const err = buildError(diagnostics);
+    err.header = `package.json error`;
+    err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collection}`;
   }
 
   if (typeof config.namespace !== 'string' || config.namespace.toLowerCase().trim() === 'app') {
     const err = buildWarn(diagnostics);
     err.header = `config warning`;
     err.messageText = `When generating a distribution it is recommended to choose a unique namespace, which can be updated in the stencil.config.js file.`;
+  }
+}
+
+
+export function validatePackageFiles(config: BuildConfig, diagnostics: Diagnostic[], packageJsonData: any) {
+  if (packageJsonData.files) {
+    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, config.distDir));
+
+    const validPaths = [
+      `${actualDistDir}`,
+      `${actualDistDir}/`,
+      `./${actualDistDir}`,
+      `./${actualDistDir}/`
+    ];
+
+    const containsDistDir = (packageJsonData.files as string[])
+            .some(userPath => validPaths.some(validPath => normalizePath(userPath) === validPath));
+
+    if (!containsDistDir) {
+      const err = buildError(diagnostics);
+      err.header = `package.json error`;
+      err.messageText = `package.json "files" array must contain the distribution directory "${actualDistDir}/" when generating a distribution.`;
+    }
   }
 }
 
@@ -136,6 +159,25 @@ function generatePackageModuleResolve(config: BuildConfig) {
 }
 
 
+function copySourceCollectionComponentsToDistribution(config: BuildConfig, ctx: BuildContext) {
+  // for any components that are dependencies, such as ionicons is a dependency of ionic
+  // then we need to copy the dependency to the dist so it just works downstream
+  const promises: Promise<any>[] = [];
+
+  ctx.manifest.modulesFiles.forEach(moduleFile => {
+    if (!moduleFile.isCollectionDependency || !moduleFile.originalCollectionComponentPath) return;
+
+    const src = moduleFile.jsFilePath;
+    const dest = config.sys.path.join(config.collectionDir, COLLECTION_DEPENDENCIES_DIR, moduleFile.originalCollectionComponentPath);
+    const copyPromise = config.sys.copy(src, dest);
+
+    promises.push(copyPromise);
+  });
+
+  return Promise.all(promises);
+}
+
+
 function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
   // empty promises :(
   const emptyPromises: Promise<any>[] = [];
@@ -143,12 +185,12 @@ function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
   if (!ctx.isRebuild) {
     // don't bother emptying the directories when it's a rebuild
 
-    if (config.generateWWW) {
+    if (config.generateWWW && !config.emptyWWW) {
       config.logger.debug(`empty buildDir: ${config.buildDir}`);
       emptyPromises.push(config.sys.emptyDir(config.buildDir));
     }
 
-    if (config.generateDistribution) {
+    if (config.generateDistribution && !config.emptyDist) {
       config.logger.debug(`empty distDir: ${config.distDir}`);
       emptyPromises.push(config.sys.emptyDir(config.distDir));
     }

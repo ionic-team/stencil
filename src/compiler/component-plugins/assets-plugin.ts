@@ -1,5 +1,6 @@
 import { AssetsMeta, BuildConfig, BuildContext, ComponentOptions, ComponentMeta, ModuleFile } from '../../util/interfaces';
 import { catchError, normalizePath } from '../util';
+import { COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 import { getAppDistDir, getAppWWWBuildDir } from '../app/generate-app-files';
 
 
@@ -67,7 +68,7 @@ export function copyComponentAssets(config: BuildConfig, ctx: BuildContext) {
     moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
       copyToBuildDir.push(assetsMeta);
 
-      if (!moduleFile.isCollectionDependency) {
+      if (!moduleFile.excludeFromCollection) {
         copyToCollectionDir.push(assetsMeta);
       }
     });
@@ -109,10 +110,7 @@ export function copyComponentAssets(config: BuildConfig, ctx: BuildContext) {
     // copy all of the files in asset directories to the app's collection directory
     copyToCollectionDir.forEach(assetsMeta => {
       // figure out what the path is to the component directory
-      const collectionDirDestination = normalizePath(config.sys.path.join(
-        config.collectionDir,
-        config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
-      ));
+      const collectionDirDestination = getCollectionDirDestination(config, assetsMeta);
 
       // let's copy to the dist/collection directory!
       const copyToCollectionDir = config.sys.copy(assetsMeta.absolutePath, collectionDirDestination);
@@ -126,6 +124,25 @@ export function copyComponentAssets(config: BuildConfig, ctx: BuildContext) {
   }).then(() => {
     timeSpan.finish('copy assets finished');
   });
+}
+
+
+export function getCollectionDirDestination(config: BuildConfig, assetsMeta: AssetsMeta) {
+  // figure out what the path is to the component directory
+
+  if (assetsMeta.originalCollectionPath) {
+    // this is from another collection, so reuse the same path it had
+    return normalizePath(config.sys.path.join(
+      config.collectionDir,
+      COLLECTION_DEPENDENCIES_DIR,
+      assetsMeta.originalCollectionPath
+    ));
+  }
+
+  return normalizePath(config.sys.path.join(
+    config.collectionDir,
+    config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+  ));
 }
 
 

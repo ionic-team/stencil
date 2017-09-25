@@ -31,7 +31,7 @@ export function injectUnregisterServiceWorker(indexHtml: string) {
 function getRegisterSwScript(swUrl: string) {
   return `
   <script>
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('${swUrl}')
           .then(reg => console.log('service worker registered', reg))
@@ -45,7 +45,7 @@ function getRegisterSwScript(swUrl: string) {
 
 const UNREGSITER_SW = `
   <script>
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       // auto-unregister service worker during dev mode
       navigator.serviceWorker.ready.then(registration => {
         registration.unregister().then(() => {

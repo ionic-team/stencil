@@ -103,7 +103,7 @@ module.exports = Object.defineProperties({
 
       if (!configFileData.config) {
         console.error('Invalid Stencil "' + configPath + '" configuration file. Missing "config" property.');
-        process.exit(1);
+        return null;
       }
 
       config = configFileData.config;
@@ -111,7 +111,7 @@ module.exports = Object.defineProperties({
 
     } catch(e) {
       console.error('Error reading Stencil "' + configPath + '" configuration file.');
-      process.exit(1);
+      return null;
     }
 
     if (!config.rootDir) {

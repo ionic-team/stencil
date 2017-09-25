@@ -142,6 +142,7 @@ declare global {
       download?: any;
       href?: string;
       hrefLang?: string;
+      hreflang?: string;
       media?: string;
       rel?: string;
       target?: string;
@@ -153,6 +154,7 @@ declare global {
       download?: any;
       href?: string;
       hrefLang?: string;
+      hreflang?: string;
       media?: string;
       rel?: string;
       shape?: string;
@@ -167,6 +169,7 @@ declare global {
       download?: any;
       href?: string;
       hrefLang?: string;
+      hreflang?: string;
       media?: string;
       rel?: string;
       shape?: string;
@@ -187,10 +190,15 @@ declare global {
       disabled?: boolean;
       form?: string;
       formAction?: string;
+      formaction?: string;
       formEncType?: string;
+      formenctype?: string;
       formMethod?: string;
+      formmethod?: string;
       formNoValidate?: boolean;
+      formnovalidate?: boolean;
       formTarget?: string;
+      formtarget?: string;
       name?: string;
       type?: string;
       value?: string | string[] | number;
@@ -216,6 +224,7 @@ declare global {
     export interface DelHTMLAttributes extends HTMLAttributes {
       cite?: string;
       dateTime?: string;
+      datetime?: string;
     }
 
     export interface EmbedHTMLAttributes extends HTMLAttributes {
@@ -233,12 +242,16 @@ declare global {
 
     export interface FormHTMLAttributes extends HTMLAttributes {
       acceptCharset?: string;
+      acceptcharset?: string;
       action?: string;
       autoComplete?: string;
+      autocomplete?: string;
       encType?: string;
+      enctype?: string;
       method?: string;
       name?: string;
       noValidate?: boolean;
+      novalidate?: boolean | string;
       target?: string;
     }
 
@@ -248,17 +261,23 @@ declare global {
 
     export interface IframeHTMLAttributes extends HTMLAttributes {
       allowFullScreen?: boolean;
+      allowfullScreen?: string | boolean;
       allowTransparency?: boolean;
+      allowtransparency?: string | boolean;
       frameBorder?: number | string;
+      frameborder?: number | string;
       height?: number | string;
       marginHeight?: number;
+      marginheight?: string | number;
       marginWidth?: number;
+      marginwidth?: string | number;
       name?: string;
       sandbox?: string;
       scrolling?: string;
       seamless?: boolean;
       src?: string;
       srcDoc?: string;
+      srcdoc?: string;
       width?: number | string;
     }
 
@@ -268,41 +287,55 @@ declare global {
       sizes?: string;
       src?: string;
       srcSet?: string;
+      srcset?: string;
       useMap?: string;
+      usemap?: string;
       width?: number | string;
     }
 
     export interface InsHTMLAttributes extends HTMLAttributes {
       cite?: string;
       dateTime?: string;
+      datetime?: string;
     }
 
     export interface InputHTMLAttributes extends HTMLAttributes {
       accept?: string;
       alt?: string;
       autoComplete?: string;
+      autocomplete?: string;
       autoFocus?: boolean;
+      autofocus?: boolean | string;
       capture?: boolean; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
       checked?: boolean;
       crossOrigin?: string;
+      crossorigin?: string;
       disabled?: boolean;
       form?: string;
       formAction?: string;
+      formaction?: string;
       formEncType?: string;
+      formenctype?: string;
       formMethod?: string;
+      formmethod?: string;
       formNoValidate?: boolean;
+      formnovalidate?: boolean;
       formTarget?: string;
+      formtarget?: string;
       height?: number | string;
       list?: string;
       max?: number | string;
       maxLength?: number;
+      maxlength?: number | string;
       min?: number | string;
       minLength?: number;
+      minlength?: number | string;
       multiple?: boolean;
       name?: string;
       pattern?: string;
       placeholder?: string;
       readOnly?: boolean;
+      readonly?: boolean | string;
       required?: boolean;
       size?: number;
       src?: string;
@@ -314,17 +347,21 @@ declare global {
 
     export interface KeygenHTMLAttributes extends HTMLAttributes {
       autoFocus?: boolean;
+      autofocus?: boolean | string;
       challenge?: string;
       disabled?: boolean;
       form?: string;
       keyType?: string;
+      keytype?: string;
       keyParams?: string;
+      keyparams?: string;
       name?: string;
     }
 
     export interface LabelHTMLAttributes extends HTMLAttributes {
       form?: string;
       htmlFor?: string;
+      htmlfor?: string;
     }
 
     export interface LiHTMLAttributes extends HTMLAttributes {
@@ -334,6 +371,7 @@ declare global {
     export interface LinkHTMLAttributes extends HTMLAttributes {
       href?: string;
       hrefLang?: string;
+      hreflang?: string;
       integrity?: string;
       media?: string;
       rel?: string;
@@ -351,10 +389,13 @@ declare global {
 
     export interface MediaHTMLAttributes extends HTMLAttributes {
       autoPlay?: boolean;
+      autoplay?: boolean | string;
       controls?: boolean;
       crossOrigin?: string;
+      crossorigin?: string;
       loop?: boolean;
       mediaGroup?: string;
+      mediagroup?: string;
       muted?: boolean;
       preload?: string;
       src?: string;
@@ -362,8 +403,10 @@ declare global {
 
     export interface MetaHTMLAttributes extends HTMLAttributes {
       charSet?: string;
+      charset?: string;
       content?: string;
       httpEquiv?: string;
+      httpequiv?: string;
       name?: string;
     }
 
@@ -383,12 +426,14 @@ declare global {
 
     export interface ObjectHTMLAttributes extends HTMLAttributes {
       classID?: string;
+      classid?: string;
       data?: string;
       form?: string;
       height?: number | string;
       name?: string;
       type?: string;
       useMap?: string;
+      usemap?: string;
       width?: number | string;
       wmode?: string;
     }
@@ -413,6 +458,7 @@ declare global {
     export interface OutputHTMLAttributes extends HTMLAttributes {
       form?: string;
       htmlFor?: string;
+      htmlfor?: string;
       name?: string;
     }
 
@@ -429,7 +475,9 @@ declare global {
     export interface ScriptHTMLAttributes extends HTMLAttributes {
       async?: boolean;
       charSet?: string;
+      charset?: string;
       crossOrigin?: string;
+      crossorigin?: string;
       defer?: boolean;
       integrity?: string;
       nonce?: string;
@@ -465,20 +513,26 @@ declare global {
 
     export interface TableHTMLAttributes extends HTMLAttributes {
       cellPadding?: number | string;
+      cellpadding?: number | string;
       cellSpacing?: number | string;
+      cellspacing?: number | string;
       summary?: string;
     }
 
     export interface TextareaHTMLAttributes extends HTMLAttributes {
       autoFocus?: boolean;
+      autofocus?: boolean | string;
       cols?: number;
       disabled?: boolean;
       form?: string;
       maxLength?: number;
+      maxlength?: number | string;
       minLength?: number;
+      minlength?: number | string;
       name?: string;
       placeholder?: string;
       readOnly?: boolean;
+      readonly?: boolean | string;
       required?: boolean;
       rows?: number;
       value?: string | string[] | number;
@@ -495,6 +549,7 @@ declare global {
       colSpan?: number;
       headers?: string;
       rowSpan?: number;
+      rowspan?: number | string;
       scope?: string;
     }
 
@@ -508,11 +563,13 @@ declare global {
       label?: string;
       src?: string;
       srcLang?: string;
+      srclang?: string;
     }
 
     export interface VideoHTMLAttributes extends MediaHTMLAttributes {
       height?: number | string;
       playsInline?: boolean;
+      playsinline?: boolean | string;
       poster?: string;
       width?: number | string;
     }
@@ -527,6 +584,7 @@ declare global {
       contentEditable?: boolean | string;
       contenteditable?: boolean | string;
       contextMenu?: string;
+      contextmenu?: string;
       dir?: string;
       draggable?: boolean;
       hidden?: boolean;
@@ -534,14 +592,18 @@ declare global {
       lang?: string;
       slot?: string;
       spellCheck?: boolean;
+      spellcheck?: boolean | string;
       style?: { [key: string]: string };
       tabIndex?: number;
+      tabindex?: number | string;
       title?: string;
 
       // Unknown
       inputMode?: string;
+      inputmode?: string;
       is?: string;
       radioGroup?: string; // <command>, <menuitem>
+      radiogroup?: string;
 
       // WAI-ARIA
       role?: string;
@@ -558,14 +620,22 @@ declare global {
 
       // Non-standard Attributes
       autoCapitalize?: string;
+      autocapitalize?: string;
       autoCorrect?: string;
+      autocorrect?: string;
       autoSave?: string;
+      autosave?: string;
       color?: string;
       itemProp?: string;
+      itemprop?: string;
       itemScope?: boolean;
+      itemscope?: boolean;
       itemType?: string;
+      itemtype?: string;
       itemID?: string;
+      itemid?: string;
       itemRef?: string;
+      itemref?: string;
       results?: number;
       security?: string;
       unselectable?: boolean;
