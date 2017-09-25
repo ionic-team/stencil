@@ -231,12 +231,8 @@ function parseComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   cmpMeta.componentClass = cmpData.componentClass;
 }
 
-<<<<<<< HEAD
-function serializeStyles(config: BuildConfig, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
-=======
 
 function serializeStyles(config: BuildConfig, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
->>>>>>> master
   if (cmpMeta.stylesMeta) {
     cmpData.styles = {};
 
