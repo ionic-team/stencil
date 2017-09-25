@@ -10,7 +10,7 @@ Before submitting an issue, please consult our [docs](https://stenciljs.com/).
 **I'm submitting a ...**  (check one with "x")
 [ ] bug report
 [ ] feature request
-[ ] support request => Please do not submit support requests here, use one of these channels: https://forum.ionicframework.com/ or http://ionicworldwide.herokuapp.com/
+[ ] support request => Please do not submit support requests here, use one of these channels: https://forum.ionicframework.com/ or https://stencil-worldwide.slack.com
 
 **Current behavior:**
 <!-- Describe how the bug manifests. -->
