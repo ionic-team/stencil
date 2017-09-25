@@ -1,5 +1,6 @@
 import { BuildConfig, BuildContext, ModuleFile, TranspileResults } from '../../util/interfaces';
 import { normalizePath, isDtsFile, isJsFile, readFile } from '../util';
+import { createTypesAsString }  from './transformers/add-jsx-types';
 import * as ts from 'typescript';
 
 
@@ -76,6 +77,9 @@ function writeFileInMemory(config: BuildConfig, ctx: BuildContext, transpileResu
     if (moduleFile) {
       // we got the module we already cached
       moduleFile.dtsFilePath = dtsFilePath;
+      if (moduleFile.cmpMeta) {
+        outputText += createTypesAsString(moduleFile.cmpMeta);
+      }
 
     } else {
       // this actually shouldn't happen, but just in case

@@ -1,10 +1,65 @@
-import { ModuleFiles, ComponentMeta } from '../../../util/interfaces';
+import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
 import { dashToPascalCase } from  '../../../util/helpers';
 import {
   TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER,
   MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE
 } from '../../../util/constants';
 import * as ts from 'typescript';
+
+
+export function createTypesAsString(cmpMeta: ComponentMeta) {
+  const tagName = cmpMeta.tagNameMeta;
+  const className = cmpMeta.componentClass;
+  const interfaceName = `HTML${dashToPascalCase(tagName)}Element`;
+  const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
+  const interfaceOptions = membersToInterfaceOptions(cmpMeta.membersMeta);
+
+  return `
+interface ${interfaceName} extends ${className}, HTMLElement {
+}
+declare var ${interfaceName}: {
+  prototype: ${interfaceName};
+  new (): ${interfaceName};
+};
+declare global {
+  interface HTMLElementTagNameMap {
+      "${tagName}": ${interfaceName};
+  }
+  interface ElementTagNameMap {
+      "${tagName}": ${interfaceName};
+  }
+  namespace JSX {
+      interface IntrinsicElements {
+          "${tagName}": JSXElements.${jsxInterfaceName};
+      }
+  }
+  namespace JSXElements {
+      export interface ${jsxInterfaceName} extends HTMLAttributes {
+        ${Object.keys(interfaceOptions).map((key: string) => `
+          ${key}?: ${interfaceOptions[key]}`
+        )}
+      }
+  }
+}
+`;
+}
+
+function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
+  const memberTypes = {
+    [TYPE_ANY]: 'any',
+    [TYPE_BOOLEAN]: 'boolean',
+    [TYPE_NUMBER]: 'number',
+  };
+  return Object.keys(membersMeta)
+    .filter((memberName) => {
+      return [MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE].indexOf(membersMeta[memberName].memberType) !== -1;
+    })
+    .reduce((obj, memberName) => {
+      const member = membersMeta[memberName];
+      obj[memberName] = memberTypes[member.propType || TYPE_ANY];
+      return obj;
+    }, <{ [key: string]: string }>{});
+}
 
 /*
     namespace JSX {

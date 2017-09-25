@@ -9,7 +9,6 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
 import addMetadataExport from './transformers/add-metadata-export';
-import addJsxTypes from './transformers/add-jsx-types';
 import * as ts from 'typescript';
 
 
@@ -87,7 +86,6 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     before: [
       componentClass(config, ctx.moduleFiles, ctx.diagnostics),
       addMetadataExport(ctx.moduleFiles),
-      addJsxTypes(ctx.moduleFiles),
       removeImports(),
       renameLifecycleMethods()
     ],
