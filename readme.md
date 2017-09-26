@@ -1,7 +1,7 @@
 [![npm][npm-badge]][npm-badge-url]
 # Stencil: A Compiler for Web Components
 
-Stencil is a simple Web Component compiler that generates vanilla Custom Elements. Build faster apps that work in any framework, or with none at all.
+Stencil is a simple compiler for generating Web Components.
 
 Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool.  Stencil takes TypeScript, JSX, a tiny virtual DOM layer, efficient one-way data binding, an asynchronous rendering pipeline (similar to React Fiber), and lazy-loading out of the box, and generates 100% standards-based Web Components that run in any browser supporting the Custom Elements v1 spec.
 
