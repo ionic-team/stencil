@@ -9,6 +9,7 @@ import { getPropDecoratorMeta } from './prop-decorator';
 import { getPropChangeDecoratorMeta } from './prop-change-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
 import { updateComponentClass } from './util';
+import { dashToPascalCase } from  '../../../util/helpers';
 import * as ts from 'typescript';
 
 
@@ -33,6 +34,7 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
 
       moduleFile.cmpMeta = {
         ...cmpMeta,
+        tagNameAsPascal: dashToPascalCase(cmpMeta.tagNameMeta),
         componentClass: classNode.name.getText().trim(),
         membersMeta: {
           // membersMeta is shared with @Prop, @State, @Method, @Element

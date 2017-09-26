@@ -1,7 +1,6 @@
 import { BuildConfig, BuildContext, Bundle, FilesMap,
   Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
 import { buildError, catchError, hasError, generatePreamble, normalizePath } from '../util';
-import { dashToPascalCase } from '../../util/helpers';
 import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { formatLoadComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
@@ -152,11 +151,10 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     let importPath = moduleFile.jsFilePath;
 
     // manually create the content for our temporary entry file for the bundler
-    const importName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
-    entryFileLines.push(`import ${importName} from "${importPath}";`);
+    entryFileLines.push(`import { ${moduleFile.cmpMeta.componentClass} as ${moduleFile.cmpMeta.tagNameAsPascal} } from "${importPath}";`);
 
     // export map should always use UPPER CASE tag name
-    entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${importName};`);
+    entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${moduleFile.cmpMeta.tagNameAsPascal};`);
   });
 
   // create the entry file for the bundler
@@ -216,8 +214,8 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     // generate the bundler results
     return rollupBundle.generate({
       format: 'es'
-
     }).then(results => {
+
       // module bundling finished, assign its content to the user's bundle
       // wrap our component code with our own iife
       bundleDetails.content = `function importComponent(exports, h, t, Context, publicPath) {\n${results.code.trim()}\n}`;

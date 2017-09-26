@@ -7,14 +7,24 @@ export default function addMetadataExport(moduleFiles: ModuleFiles): ts.Transfor
   return (transformContext) => {
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
       const meta: ts.Expression = convertValueToLiteral(cmpMeta);
-      const metaDataExportNode = ts.createVariableStatement(
-        [ts.createToken(ts.SyntaxKind.ExportKeyword), ts.createToken(ts.SyntaxKind.ConstKeyword)],
-        [ts.createVariableDeclaration('metadata', undefined, meta)]
+
+      const metadataProperty = ts.createProperty(
+        undefined,
+        undefined,
+        'metadata',
+        undefined,
+        undefined,
+        meta
       );
-      return [
+      return ts.updateClassDeclaration(
         classNode,
-        metaDataExportNode
-      ];
+        classNode.decorators,
+        classNode.modifiers,
+        classNode.name,
+        classNode.typeParameters,
+        classNode.heritageClauses,
+        classNode.members.concat(metadataProperty)
+      );
     }
 
     function visit(node: ts.Node, cmpMeta: ComponentMeta): ts.VisitResult<ts.Node> {

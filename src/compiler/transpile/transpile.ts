@@ -8,7 +8,7 @@ import { updateFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
-import addMetadataExport from './transformers/add-metadata-export';
+import { createTypesAsString }  from './transformers/add-jsx-types';
 import * as ts from 'typescript';
 
 
@@ -52,6 +52,27 @@ export function transpileSync(config: BuildConfig, ctx: BuildContext, moduleFile
   return transpileResults;
 }
 
+function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, options: ts.CompilerOptions) {
+  const componentFile = Object.keys(ctx.moduleFiles).reduce((finalString, moduleFileName) => {
+    const moduleFile = ctx.moduleFiles[moduleFileName];
+    if (moduleFile.cmpMeta) {
+      const importPath = config.sys.path
+        .relative(options.outDir, moduleFile.jsFilePath)
+        .replace(/\.js$/, '');
+
+      finalString += `
+import { ${moduleFile.cmpMeta.componentClass} as ${moduleFile.cmpMeta.tagNameAsPascal} } from './${importPath}';
+${createTypesAsString(moduleFile.cmpMeta)}
+`;
+    }
+    return finalString;
+  }, '');
+
+  const rootFilePath = config.sys.path.join(options.rootDir, 'components.d.ts');
+  const distFilePath = config.sys.path.join(options.outDir, 'components.d.ts');
+  ctx.filesToWrite[rootFilePath] = componentFile;
+  ctx.filesToWrite[distFilePath] = componentFile;
+}
 
 function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileResults) {
   if (ctx.isChangeBuild) {
@@ -73,7 +94,6 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     // suppressTypeScriptErrors mainly for unit testing
     tsOptions.options.lib = [];
   }
-
   // get the ts compiler host we'll use, which patches file operations
   // with our in-memory file system
   const tsHost = getTsHost(config, ctx, tsOptions.options, transpileResults);
@@ -85,7 +105,6 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
       componentClass(config, ctx.moduleFiles, ctx.diagnostics),
-      addMetadataExport(ctx.moduleFiles),
       removeImports(),
       renameLifecycleMethods()
     ],
@@ -94,6 +113,9 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
       jsxToVNode
     ]
   });
+
+  // Generate d.ts files for component types
+  generateComponentTypesFile(config, ctx, tsOptions.options);
 
   // keep track of how many files we transpiled (great for debugging/testing)
   ctx.transpileBuildCount = Object.keys(transpileResults.moduleFiles).length;

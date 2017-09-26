@@ -7,7 +7,7 @@ export function updateComponentClass(classNode: ts.ClassDeclaration): ts.ClassDe
       undefined!, // <-- that's what's removing the decorator
 
       // Make the component the default export
-      [ts.createToken(ts.SyntaxKind.ExportKeyword), ts.createToken(ts.SyntaxKind.DefaultKeyword)],
+      [ts.createToken(ts.SyntaxKind.ExportKeyword)],
 
       // everything else should be the same
       classNode.name!,

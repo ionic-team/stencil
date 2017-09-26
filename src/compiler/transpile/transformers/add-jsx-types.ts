@@ -1,5 +1,4 @@
 import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
-import { dashToPascalCase } from  '../../../util/helpers';
 import {
   TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER,
   MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE
@@ -9,13 +8,12 @@ import * as ts from 'typescript';
 
 export function createTypesAsString(cmpMeta: ComponentMeta) {
   const tagName = cmpMeta.tagNameMeta;
-  const className = cmpMeta.componentClass;
-  const interfaceName = `HTML${dashToPascalCase(tagName)}Element`;
-  const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
+  const interfaceName = `HTML${cmpMeta.tagNameAsPascal}Element`;
+  const jsxInterfaceName = `${cmpMeta.tagNameAsPascal}Attributes`;
   const interfaceOptions = membersToInterfaceOptions(cmpMeta.membersMeta);
 
   return `
-interface ${interfaceName} extends ${className}, HTMLElement {
+interface ${interfaceName} extends ${cmpMeta.tagNameAsPascal}, HTMLElement {
 }
 declare var ${interfaceName}: {
   prototype: ${interfaceName};
@@ -47,7 +45,7 @@ declare global {
 function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
   const memberTypes = {
     [TYPE_ANY]: 'any',
-    [TYPE_BOOLEAN]: 'boolean',
+    [TYPE_BOOLEAN]: 'boolean | "true" | "false"',
     [TYPE_NUMBER]: 'number',
   };
   return Object.keys(membersMeta)
@@ -68,8 +66,8 @@ function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: s
       }
     }
 */
-function createJSXNamespace(tagName: string) {
-  const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
+function createJSXNamespace(tagName: string, tagNameAsPascal: string) {
+  const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
   const type = ts.createTypeReferenceNode(ts.createIdentifier(`JSXElements.${jsxInterfaceName}`), []);
   const member = ts.createPropertySignature(
     undefined,
@@ -102,7 +100,7 @@ function createJSXNamespace(tagName: string) {
       }
     }
   */
-function createJSXElementsNamespace(tagName: string, cmpMeta: ComponentMeta) {
+function createJSXElementsNamespace(cmpMeta: ComponentMeta) {
   const memberTypes = {
     [TYPE_ANY]: 'any',
     [TYPE_BOOLEAN]: 'boolean',
@@ -124,7 +122,7 @@ function createJSXElementsNamespace(tagName: string, cmpMeta: ComponentMeta) {
       );
     });
 
-  const jsxInterfaceName = `${dashToPascalCase(tagName)}Attributes`;
+  const jsxInterfaceName = `${cmpMeta.tagNameAsPascal}Attributes`;
   const namespaceBlock = ts.createInterfaceDeclaration(
     undefined,
     [ts.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -245,14 +243,14 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
       const tagName = cmpMeta.tagNameMeta;
       const className = cmpMeta.componentClass;
-      const interfaceName = `HTML${dashToPascalCase(tagName)}Element`;
+      const interfaceName = `HTML${cmpMeta.tagNameAsPascal}Element`;
       // const memberMeta = moduleFile.cmpMeta.membersMeta;
 
       const moduleBlock = ts.createModuleBlock([
         createHTMLElementTagNameMap(tagName, interfaceName),
         createElementTagNameMap(tagName, interfaceName),
-        createJSXNamespace(tagName),
-        createJSXElementsNamespace(tagName, cmpMeta)
+        createJSXNamespace(tagName, cmpMeta.tagNameAsPascal),
+        createJSXElementsNamespace(cmpMeta)
       ]);
 
       const globalBlock = ts.createModuleDeclaration(

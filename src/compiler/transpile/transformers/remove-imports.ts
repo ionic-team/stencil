@@ -21,7 +21,7 @@ export function removeImports(): ts.TransformerFactory<ts.SourceFile> {
   return (transformContext) => {
 
     function visitImport(importNode: ts.ImportDeclaration) {
-      if (typeof importNode.importClause.namedBindings === 'undefined') {
+      if (!importNode.importClause || typeof importNode.importClause.namedBindings === 'undefined') {
         return ts.visitEachChild(importNode, visit, transformContext);
       }
 
