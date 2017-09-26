@@ -92,7 +92,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ionic-team/stencil-starter.git"
+    "url": "git+https://github.com/ionic-team/stencil.git"
   },
   "author": "Ionic Team",
   "homepage": "https://github.com/ionic-team/stencil",
@@ -100,11 +100,12 @@
     "testEnvironment": "node",
     "moduleFileExtensions": [
       "ts",
+      "tsx",
       "js"
     ],
     "transform": {
-      "^.+\\.(ts)$": "<rootDir>/scripts/jest.preprocessor.js"
+      "^.+\\.(ts|tsx)$": "<rootDir>/scripts/jest.preprocessor.js"
     },
-    "testRegex": "/src/.*\\.spec\\.(ts|js)$"
+    "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$"
   }
 }
