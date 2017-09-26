@@ -1,7 +1,7 @@
 import { BuildConfig } from '../../../util/interfaces';
 import { CORE_NAME } from '../../../util/constants';
 import { generatePreamble } from '../../util';
-import { mockStencilSystem } from '../../../test';
+import { mockStencilSystem } from '../../../testing/mocks';
 
 import * as core from '../app-core';
 

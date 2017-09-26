@@ -1,5 +1,5 @@
 import { ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
-import { mockPlatform, mockElement } from '../../../test';
+import { mockPlatform, mockElement } from '../../../testing/mocks';
 import { render } from '../render';
 import { h } from '../../renderer/h';
 

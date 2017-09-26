@@ -1,4 +1,4 @@
-import { waitForLoad, mockConnect, mockDefine, mockPlatform } from '../../../test';
+import { waitForLoad, mockConnect, mockDefine, mockPlatform } from '../../../testing/mocks';
 
 
 describe('instance connected', () => {

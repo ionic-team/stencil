@@ -1,4 +1,4 @@
-import { waitForLoad, mockConnect, mockDefine, mockElement, mockPlatform } from '../../../test';
+import { waitForLoad, mockConnect, mockDefine, mockElement, mockPlatform } from '../../../testing/mocks';
 import { ComponentMeta, HostElement } from '../../../util/interfaces';
 import { h } from '../../renderer/h';
 import { renderUpdate } from '../update';

@@ -1,7 +1,7 @@
 import { validatePackageJson, validatePackageFiles } from '../write-build';
 import { validateBuildConfig } from '../validation';
 import { BuildConfig, BuildContext, BuildResults, ComponentRegistry, Diagnostic } from '../../../util/interfaces';
-import { mockBuildConfig } from '../../../test';
+import { mockBuildConfig } from '../../../testing/mocks';
 import * as path from 'path';
 
 

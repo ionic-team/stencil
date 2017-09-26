@@ -1,4 +1,4 @@
-import { mockHtml } from '../../../test';
+import { mockHtml } from '../../../testing/mocks';
 import { collapseHtmlWhitepace } from '../collapse-html-whitespace';
 
 

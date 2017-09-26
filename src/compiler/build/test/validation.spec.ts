@@ -1,7 +1,7 @@
 import { ATTR_LOWER_CASE } from '../../../util/constants';
 import { setProcessEnvironment, validateBuildConfig } from '../validation';
 import { BuildConfig, PrerenderConfig } from '../../../util/interfaces';
-import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
+import { mockFs, mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import * as path from 'path';
 
 

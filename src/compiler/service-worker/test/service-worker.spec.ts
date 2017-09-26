@@ -1,5 +1,5 @@
 import { BuildConfig, ServiceWorkerConfig } from '../../../util/interfaces';
-import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
+import { mockFs, mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateServiceWorkerConfig } from '../validate-sw-config';
 import { normalizePath } from '../../../compiler/util';
 

@@ -1,4 +1,4 @@
-import { mockPlatform, mockDomApi } from '../../../test';
+import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
 import { initLoad, initHostConstructor } from '../init';
 

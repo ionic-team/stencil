@@ -1,5 +1,5 @@
 import { h } from '../h';
-import { mockRenderer, mockElement } from '../../../test';
+import { mockRenderer, mockElement } from '../../../testing/mocks';
 import { VNode } from '../vnode';
 
 

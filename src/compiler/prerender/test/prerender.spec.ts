@@ -1,5 +1,5 @@
 import { BuildConfig, PrerenderConfig } from '../../../util/interfaces';
-import { mockFs, mockLogger, mockStencilSystem } from '../../../test';
+import { mockFs, mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { normalizePrerenderUrl } from '../prerender-app';
 import { validatePrerenderConfig } from '../validate-prerender-config';
 

@@ -1,7 +1,7 @@
 import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
 import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../../util/constants';
-import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../test';
+import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
 
 
 describe('Component slot', () => {

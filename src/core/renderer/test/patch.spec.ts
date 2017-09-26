@@ -1,7 +1,7 @@
 import { h } from '../h';
 import { VNode } from '../vnode';
 import { toVNode } from '../to-vnode';
-import { mockElement, mockDomApi, mockRenderer, mockTextNode } from '../../../test';
+import { mockElement, mockDomApi, mockRenderer, mockTextNode } from '../../../testing/mocks';
 import { SVG_NS } from '../../../util/constants';
 const shuffle = require('knuth-shuffle').knuthShuffle;
 

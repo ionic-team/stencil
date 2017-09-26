@@ -1,4 +1,4 @@
-import { mockDomApi } from '../../../test';
+import { mockDomApi } from '../../../testing/mocks';
 import { HostElement } from '../../../util/interfaces';
 import { createListenerCallback, replayQueuedEventsOnInstance } from '../listeners';
 
