@@ -87,3 +87,42 @@ export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpressio
 export function isEmptyArgs(arg: any) {
   return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';
 }
+
+
+/**
+ * Convert a js value into typescript AST
+ * @param val array, object, string, boolean, or number
+ * @returns Typescript Object Literal, Array Literal, String Literal, Boolean Literal, Numeric Literal
+ */
+export function convertValueToLiteral(val: any) {
+  if (Array.isArray(val)) {
+    return arrayToArrayLiteral(val);
+  }
+  if (typeof val === 'object') {
+    return objectToObjectLiteral(val);
+  }
+  return ts.createLiteral(val);
+}
+
+/**
+ * Convert a js object into typescript AST
+ * @param obj key value object
+ * @returns Typescript Object Literal Expression
+ */
+function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExpression {
+  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key: string): ts.ObjectLiteralElementLike => {
+    return ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key]) as ts.Expression);
+  });
+
+  return ts.createObjectLiteral(newProperties);
+}
+
+/**
+ * Convert a js array into typescript AST
+ * @param list array
+ * @returns Typescript Array Literal Expression
+ */
+function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
+  const newList: any[] = list.map(convertValueToLiteral);
+  return ts.createArrayLiteral(newList);
+}

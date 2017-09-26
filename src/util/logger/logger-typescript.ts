@@ -1,4 +1,4 @@
-import { BuildConfig, Diagnostic, PrintLine } from '../interfaces';
+import { Diagnostic, PrintLine } from '../interfaces';
 import { formatFileName, formatHeader, splitLineBreaks, MAX_ERRORS } from './logger-util';
 import { highlight } from './highlight/highlight';
 import * as ts from 'typescript';
@@ -9,16 +9,16 @@ import * as ts from 'typescript';
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(config: BuildConfig, resultsDiagnostics: Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
+export function loadTypeScriptDiagnostics(rootDir: string, resultsDiagnostics: Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
   const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
 
   for (var i = 0; i < maxErrors; i++) {
-    resultsDiagnostics.push(loadDiagnostic(config, tsDiagnostics[i]));
+    resultsDiagnostics.push(loadDiagnostic(rootDir, tsDiagnostics[i]));
   }
 }
 
 
-function loadDiagnostic(config: BuildConfig, tsDiagnostic: ts.Diagnostic) {
+function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
   const d: Diagnostic = {
     level: 'error',
     type: 'typescript',
@@ -33,7 +33,7 @@ function loadDiagnostic(config: BuildConfig, tsDiagnostic: ts.Diagnostic) {
 
   if (tsDiagnostic.file) {
     d.absFilePath = tsDiagnostic.file.fileName;
-    d.relFilePath = formatFileName(config.rootDir, d.absFilePath);
+    d.relFilePath = formatFileName(rootDir, d.absFilePath);
 
     let sourceText = tsDiagnostic.file.getText();
     let srcLines = splitLineBreaks(sourceText);
@@ -67,7 +67,7 @@ function loadDiagnostic(config: BuildConfig, tsDiagnostic: ts.Diagnostic) {
       errorLine.errorCharStart--;
     }
 
-    d.header =  formatHeader('typescript', tsDiagnostic.file.fileName, config.rootDir, errorLine.lineNumber);
+    d.header =  formatHeader('typescript', tsDiagnostic.file.fileName, rootDir, errorLine.lineNumber);
 
     if (errorLine.lineIndex > 0) {
       const previousLine: PrintLine = {

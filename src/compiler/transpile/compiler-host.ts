@@ -1,9 +1,9 @@
-import { BuildConfig, BuildContext, ModuleFile, TranspileResults } from '../../util/interfaces';
+import { BuildConfig, BuildContext, ModuleFile, TranspileModulesResults } from '../../util/interfaces';
 import { normalizePath, isDtsFile, isJsFile, readFile } from '../util';
 import * as ts from 'typescript';
 
 
-export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOptions: ts.CompilerOptions, transpileResults: TranspileResults) {
+export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOptions: ts.CompilerOptions, transpileResults: TranspileModulesResults) {
   const tsHost = ts.createCompilerHost(tsCompilerOptions);
 
   tsHost.getSourceFile = (tsFilePath) => {
@@ -41,7 +41,7 @@ export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOpti
 }
 
 
-function writeFileInMemory(config: BuildConfig, ctx: BuildContext, transpileResults: TranspileResults, sourceFile: ts.SourceFile, outputFilePath: string, outputText: string) {
+function writeFileInMemory(config: BuildConfig, ctx: BuildContext, transpileResults: TranspileModulesResults, sourceFile: ts.SourceFile, outputFilePath: string, outputText: string) {
   const tsFilePath = normalizePath(sourceFile.fileName);
   outputFilePath = normalizePath(outputFilePath);
 

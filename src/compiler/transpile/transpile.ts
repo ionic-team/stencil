@@ -1,25 +1,26 @@
-import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, StencilSystem, TranspileResults } from '../../util/interfaces';
+import addMetadataExport from './transformers/add-metadata-export';
+import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, StencilSystem, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath } from '../util';
-import { componentClass } from './transformers/component-class';
+import { componentTsFileClass, componentModuleFileClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
 import { jsxToVNode } from './transformers/jsx-to-vnode';
-import { updateFileMetaFromSlot } from './transformers/vnode-slots';
+import { updateFileMetaFromSlot, updateModuleFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import { updateLifecycleMethods } from './transformers/update-lifecycle-methods';
 import * as ts from 'typescript';
 
 
-export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
+export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
 
-  const transpileResults: TranspileResults = {
+  const transpileResults: TranspileModulesResults = {
     moduleFiles: {}
   };
 
   return Promise.resolve().then(() => {
     // transpiling is synchronous
-    transpileModules(config, ctx, moduleFiles, transpileResults);
+    transpileModules(config, ctx, moduleFiles, null, transpileResults);
 
     if (ctx.diagnostics.length) {
       // looks like we've got some transpile errors
@@ -43,16 +44,50 @@ export function transpile(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   });
 }
 
-export function transpileSync(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles): TranspileResults {
-  const transpileResults: TranspileResults = {
-    moduleFiles: {}
+
+export function transpileModule(config: BuildConfig, input: string, compilerOptions?: any, path?: string) {
+  const fileMeta: ModuleFile = {
+    tsFilePath: path || 'transpileModule.tsx'
   };
-  transpileModules(config, ctx, moduleFiles, transpileResults);
-  return transpileResults;
+  const diagnostics: Diagnostic[] = [];
+  const results: TranspileResults = {
+    code: null,
+    diagnostics: null,
+    cmpMeta: null
+  };
+
+  const transpileOpts = {
+    compilerOptions: compilerOptions,
+    transformers: {
+      before: [
+        componentModuleFileClass(config, fileMeta, diagnostics),
+        removeImports(),
+        updateLifecycleMethods(),
+        addMetadataExport(fileMeta)
+      ],
+      after: [
+        updateModuleFileMetaFromSlot(fileMeta),
+        jsxToVNode
+      ]
+    }
+  };
+
+  const tsResults = ts.transpileModule(input, transpileOpts);
+
+  loadTypeScriptDiagnostics('', diagnostics, tsResults.diagnostics);
+
+  if (diagnostics.length) {
+    results.diagnostics = diagnostics;
+  }
+
+  results.code = tsResults.outputText;
+  results.cmpMeta = fileMeta.cmpMeta;
+
+  return results;
 }
 
 
-function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileResults) {
+function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileOptions: any, transpileResults: TranspileModulesResults) {
   if (ctx.isChangeBuild) {
     // if this is a change build, then narrow down
     moduleFiles = getChangeBuildModules(ctx, moduleFiles);
@@ -66,7 +101,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   }
 
   // get the tsconfig compiler options we'll use
-  const tsOptions = getUserTsConfig(config, ctx);
+  const tsOptions = getUserTsConfig(config, ctx, transpileOptions);
 
   if (config.suppressTypeScriptErrors) {
     // suppressTypeScriptErrors mainly for unit testing
@@ -83,7 +118,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   // this is the big one, let's go ahead and kick off the transpiling
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
-      componentClass(config, ctx.moduleFiles, ctx.diagnostics),
+      componentTsFileClass(config, ctx.moduleFiles, ctx.diagnostics),
       removeImports(),
       updateLifecycleMethods()
     ],
@@ -101,7 +136,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     const tsDiagnostics = program.getSyntacticDiagnostics()
       .concat(program.getSemanticDiagnostics(), program.getOptionsDiagnostics());
 
-    loadTypeScriptDiagnostics(config, ctx.diagnostics, tsDiagnostics);
+    loadTypeScriptDiagnostics(config.rootDir, ctx.diagnostics, tsDiagnostics);
   }
 }
 
