@@ -13,7 +13,7 @@ import { SLOT_TAG, SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
 import { updateElement } from './update-element';
 
 
-export function createRenderer(plt: PlatformApi, domApi: DomApi): RendererApi {
+export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererApi {
   // createRenderer() is only created once per app
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component

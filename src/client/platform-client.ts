@@ -5,7 +5,7 @@ import { ComponentMeta, ComponentRegistry, CoreContext,
   ModuleCallbacks, PlatformApi } from '../util/interfaces';
 import { createDomControllerClient } from './dom-controller-client';
 import { createDomApi } from '../core/renderer/dom-api';
-import { createRenderer } from '../core/renderer/patch';
+import { createRendererPatch } from '../core/renderer/patch';
 import { createQueueClient } from './queue-client';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
@@ -70,7 +70,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   };
 
   // create the renderer that will be used
-  plt.render = createRenderer(plt, domApi);
+  plt.render = createRendererPatch(plt, domApi);
 
 
   // setup the root element which is the mighty <html> tag
