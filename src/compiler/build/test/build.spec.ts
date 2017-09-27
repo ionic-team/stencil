@@ -1,6 +1,6 @@
 import { build } from '../build';
 import { BuildConfig, BuildContext, BuildResults, ComponentRegistry } from '../../../util/interfaces';
-import { mockBuildConfig } from '../../../testing/mocks';
+import { mockBuildConfig, mockFs } from '../../../testing/mocks';
 import { parseComponentRegistry } from '../../../util/data-parse';
 import { validateBuildConfig } from '../validation';
 
@@ -501,13 +501,6 @@ describe('build', () => {
   });
 
 
-  // var logger = mockLogger();
-  // var chalk = require('chalk');
-  // logger = new CommandLineLogger({
-  //   level: 'debug',
-  //   process: process,
-  //   chalk: chalk
-  // });
   var registry: ComponentRegistry = {};
   var ctx: BuildContext = {};
   var config: BuildConfig = {};
@@ -517,6 +510,7 @@ describe('build', () => {
     registry = {};
 
     config = mockBuildConfig();
+    config.sys.fs = mockFs();
 
     mkdirSync('/');
     mkdirSync('/src');

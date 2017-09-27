@@ -6,15 +6,6 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
 import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../compiler/build/validation';
-const MemoryFileSystem = require('memory-fs');
-
-
-const path = require('path');
-const vm = require('vm');
-const jsdom = require('jsdom');
-const typescript = require('typescript');
-const url = require('url');
-const isGlob = require('is-glob');
 
 
 export function mockPlatform() {
@@ -120,9 +111,10 @@ export function mockStencilSystem() {
 
     getClientCoreFile: mockGetClientCoreFile,
 
-    fs: mockFs(),
+    fs: null,
 
     isGlob: function(str) {
+      const isGlob = require('is-glob');
       return isGlob(str);
     },
 
@@ -130,7 +122,7 @@ export function mockStencilSystem() {
 
     minifyJs: mockMinify,
 
-    path: path,
+    path: require('path'),
 
     remove: function mockRmDir(path) {
       path;
@@ -153,17 +145,17 @@ export function mockStencilSystem() {
       }
     },
 
-    typescript: typescript,
+    typescript: require('typescript'),
 
-    url: url,
+    url: require('url'),
 
     vm: {
       createContext: function(ctx, wwwDir, sandbox) {
         ctx; wwwDir;
-        return vm.createContext(sandbox);
+        return require('vm').createContext(sandbox);
       },
       runInContext: function(code, contextifiedSandbox, options) {
-        vm.runInContext(code, contextifiedSandbox, options);
+        require('vm').runInContext(code, contextifiedSandbox, options);
       }
     },
 
@@ -200,6 +192,7 @@ function mockWatch(paths: string): any {
 }
 
 function mockCreateDom() {
+  const jsdom = require('jsdom');
   let dom: any;
 
   return {
@@ -239,6 +232,7 @@ rollup.plugins = {
 
 
 export function mockFs() {
+  const MemoryFileSystem = require('memory-fs');
   const fs = new MemoryFileSystem();
 
   const orgreadFileSync = fs.readFileSync;
@@ -340,16 +334,19 @@ export function mockQueue() {
 
 
 export function mockHtml(html: string): Element {
+  const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(html.trim()).firstChild;
 }
 
 
 export function mockElement(tag: string): Element {
+  const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
 }
 
 
 export function mockTextNode(text: string): Element {
+  const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(text).firstChild;
 }
 
@@ -375,6 +372,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
 
 
 export function mockConnect(plt: MockedPlatform, html: string) {
+  const jsdom = require('jsdom');
   const rootNode = jsdom.JSDOM.fragment(html);
 
   connectComponents(plt, rootNode);
