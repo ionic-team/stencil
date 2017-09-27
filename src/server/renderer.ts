@@ -1,5 +1,4 @@
-import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions,
-  HydrateResults, LoadComponentRegistry } from '../util/interfaces';
+import * as interfaces from '../util/interfaces';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
 import { getBuildContext } from '../compiler/util';
 import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
@@ -8,7 +7,7 @@ import { parseComponentRegistry } from '../util/data-parse';
 import { validateBuildConfig } from '../compiler/build/validation';
 
 
-export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
+export function createRenderer(config: interfaces.BuildConfig, registry?: interfaces.ComponentRegistry, ctx?: interfaces.BuildContext) {
   ctx = ctx || {};
 
   // setup the config and add defaults for missing properties
@@ -22,11 +21,11 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
 
   // overload with two options for hydrateToString
   // one that returns a promise, and one that takes a callback as the last arg
-  function hydrateToString(hydrateOpts: HydrateOptions): Promise<HydrateResults>;
-  function hydrateToString(hydrateOpts: HydrateOptions, callback: (hydrateResults: HydrateResults) => void): void;
-  function hydrateToString(opts: HydrateOptions, callback?: (hydrateResults: HydrateResults) => void): any {
+  function hydrateToString(hydrateOpts: interfaces.HydrateOptions): Promise<interfaces.HydrateResults>;
+  function hydrateToString(hydrateOpts: interfaces.HydrateOptions, callback: (hydrateResults: interfaces.HydrateResults) => void): void;
+  function hydrateToString(opts: interfaces.HydrateOptions, callback?: (hydrateResults: interfaces.HydrateResults) => void): any {
 
-    const hydrateResults: HydrateResults = {
+    const hydrateResults: interfaces.HydrateResults = {
       diagnostics: [],
       html: opts.html,
       styles: null,
@@ -67,13 +66,14 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
   }
 
   return {
-    hydrateToString: hydrateToString
+    hydrateToString: hydrateToString,
+    logger: config.logger
   };
 }
 
 
-function registerComponents(config: BuildConfig) {
-  let registry: ComponentRegistry = null;
+function registerComponents(config: interfaces.BuildConfig) {
+  let registry: interfaces.ComponentRegistry = null;
 
   try {
     const registryJsonFilePath = getRegistryJsonWWW(config);
@@ -85,7 +85,7 @@ function registerComponents(config: BuildConfig) {
     const registryData = JSON.parse(cmpRegistryJson);
 
     // object should have the components property on it
-    const components: LoadComponentRegistry[] = registryData.components;
+    const components: interfaces.LoadComponentRegistry[] = registryData.components;
 
     if (Array.isArray(components) && components.length > 0) {
       // i think we're good, let's create a registry
@@ -111,7 +111,7 @@ function registerComponents(config: BuildConfig) {
 }
 
 
-function validateHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
+function validateHydrateOptions(config: interfaces.BuildConfig, opts: interfaces.HydrateOptions) {
   const req = opts.req;
 
   if (req && typeof req.get === 'function') {
@@ -135,7 +135,7 @@ function validateHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
 }
 
 
-function validateRendererConfig(config: BuildConfig, ctx: BuildContext) {
+function validateRendererConfig(config: interfaces.BuildConfig, ctx: interfaces.BuildContext) {
   if (!config.sys && require) {
     // assuming we're in a node environment,
     // if the config was not provided then use the
@@ -165,7 +165,7 @@ function validateRendererConfig(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-function loadAppGlobal(config: BuildConfig, ctx: BuildContext) {
+function loadAppGlobal(config: interfaces.BuildConfig, ctx: interfaces.BuildContext) {
   ctx.appFiles = ctx.appFiles || {};
 
   if (ctx.appFiles.global) {
