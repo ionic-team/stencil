@@ -10,7 +10,7 @@ const LIFECYCLE_MAP: {[methodName: string]: string} = {
 };
 
 
-export function updateLifecycleMethods(): ts.TransformerFactory<ts.SourceFile> {
+export default function renameLifecycleMethods(): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 

@@ -8,7 +8,9 @@ import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { updateFileMetaFromSlot, updateModuleFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
-import { updateLifecycleMethods } from './transformers/update-lifecycle-methods';
+import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
+import { createTypesAsString }  from './transformers/add-jsx-types';
+import { dashToPascalCase } from '../../util/helpers';
 import * as ts from 'typescript';
 
 
@@ -62,7 +64,7 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
       before: [
         componentModuleFileClass(config, fileMeta, diagnostics),
         removeImports(),
-        updateLifecycleMethods(),
+        renameLifecycleMethods(),
         addMetadataExport(fileMeta)
       ],
       after: [
@@ -86,6 +88,28 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
   return results;
 }
 
+function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, options: ts.CompilerOptions) {
+  const componentFile = Object.keys(ctx.moduleFiles).sort().reduce((finalString, moduleFileName) => {
+    const moduleFile = ctx.moduleFiles[moduleFileName];
+
+    if (moduleFile.cmpMeta) {
+      const importPath = config.sys.path
+        .relative(options.outDir, moduleFile.jsFilePath)
+        .replace(/\.js$/, '');
+
+      finalString += `
+import { ${moduleFile.cmpMeta.componentClass} as ${dashToPascalCase(moduleFile.cmpMeta.tagNameMeta)} } from './${importPath}';
+${createTypesAsString(moduleFile.cmpMeta)}
+`;
+    }
+    return finalString;
+  }, '');
+
+  const rootFilePath = config.sys.path.join(options.rootDir, 'components.d.ts');
+  const distFilePath = config.sys.path.join(options.outDir, 'components.d.ts');
+  ctx.filesToWrite[rootFilePath] = componentFile;
+  ctx.filesToWrite[distFilePath] = componentFile;
+}
 
 function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileOptions: any, transpileResults: TranspileModulesResults) {
   if (ctx.isChangeBuild) {
@@ -107,7 +131,6 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     // suppressTypeScriptErrors mainly for unit testing
     tsOptions.options.lib = [];
   }
-
   // get the ts compiler host we'll use, which patches file operations
   // with our in-memory file system
   const tsHost = getTsHost(config, ctx, tsOptions.options, transpileResults);
@@ -120,13 +143,16 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     before: [
       componentTsFileClass(config, ctx.moduleFiles, ctx.diagnostics),
       removeImports(),
-      updateLifecycleMethods()
+      renameLifecycleMethods()
     ],
     after: [
       updateFileMetaFromSlot(ctx.moduleFiles),
       jsxToVNode
     ]
   });
+
+  // Generate d.ts files for component types
+  generateComponentTypesFile(config, ctx, tsOptions.options);
 
   // keep track of how many files we transpiled (great for debugging/testing)
   ctx.transpileBuildCount = Object.keys(transpileResults.moduleFiles).length;

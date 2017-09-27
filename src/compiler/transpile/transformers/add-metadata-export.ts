@@ -32,7 +32,6 @@ export default function addMetadataExport(moduleFile: ModuleFile): ts.Transforme
       switch (node.kind) {
         case ts.SyntaxKind.ClassDeclaration:
           return visitClass(node as ts.ClassDeclaration, cmpMeta);
-
         default:
           return ts.visitEachChild(node, (node) => {
             return visit(node, cmpMeta);

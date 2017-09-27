@@ -2,6 +2,7 @@ import { BuildConfig, BuildContext, Bundle, FilesMap,
   Manifest, ModuleFile, ModuleResults } from '../../util/interfaces';
 import { buildError, catchError, hasError, generatePreamble, normalizePath } from '../util';
 import { buildExpressionReplacer } from '../build/replacer';
+import { dashToPascalCase } from '../../util/helpers';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { formatLoadComponents, formatJsBundleFileName, generateBundleId } from '../../util/data-serialize';
 
@@ -127,6 +128,8 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
   const bundleDetails: ModuleBundleDetails = {};
   const sys = config.sys;
 
+
+
   if (ctx.isChangeBuild && !ctx.changeHasComponentModules && !ctx.changeHasNonComponentModules && ctx.moduleBundleOutputs[bundleId]) {
     // don't bother bundling if this is a change build but
     // none of the changed files are modules or components
@@ -147,12 +150,13 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
   }).forEach(moduleFile => {
     // create a full path to the modules to import
     let importPath = moduleFile.jsFilePath;
+    let tagNameAsPascal = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
 
     // manually create the content for our temporary entry file for the bundler
-    entryFileLines.push(`import { ${moduleFile.cmpMeta.componentClass} } from "${importPath}";`);
+    entryFileLines.push(`import { ${moduleFile.cmpMeta.componentClass} as ${tagNameAsPascal} } from "${importPath}";`);
 
     // export map should always use UPPER CASE tag name
-    entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${moduleFile.cmpMeta.componentClass};`);
+    entryFileLines.push(`exports['${moduleFile.cmpMeta.tagNameMeta.toUpperCase()}'] = ${tagNameAsPascal};`);
   });
 
   // create the entry file for the bundler
@@ -183,7 +187,6 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     }
   }
 
-
   // start the bundler on our temporary file
   return sys.rollup.rollup({
     input: STENCIL_BUNDLE_ID,
@@ -213,8 +216,8 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
     // generate the bundler results
     return rollupBundle.generate({
       format: 'es'
-
     }).then(results => {
+
       // module bundling finished, assign its content to the user's bundle
       // wrap our component code with our own iife
       bundleDetails.content = `function importComponent(exports, h, t, Context, publicPath) {\n${results.code.trim()}\n}`;

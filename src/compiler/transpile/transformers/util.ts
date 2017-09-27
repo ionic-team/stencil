@@ -1,16 +1,24 @@
 import * as ts from 'typescript';
+import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
 
 
-export function removeClassDecorator(classNode: ts.ClassDeclaration) {
+export function updateComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
   return ts.createClassDeclaration(
       undefined!, // <-- that's what's removing the decorator
 
+      // Make the component the default export
+      [ts.createToken(ts.SyntaxKind.ExportKeyword)],
+
       // everything else should be the same
-      classNode.modifiers!,
       classNode.name!,
       classNode.typeParameters!,
       classNode.heritageClauses!,
       classNode.members);
+}
+
+
+export function isEmptyArgs(arg: any) {
+  return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';
 }
 
 
@@ -25,7 +33,7 @@ export function isInstanceOfObjectMap(object: any): object is ObjectMap {
     !object.hasOwnProperty('end');
 }
 
-export function getTextOfPropertyName(name: ts.PropertyName): string {
+function getTextOfPropertyName(name: ts.PropertyName): string {
   switch (name.kind) {
   case ts.SyntaxKind.Identifier:
     return (<ts.Identifier>name).text;
@@ -33,18 +41,13 @@ export function getTextOfPropertyName(name: ts.PropertyName): string {
   case ts.SyntaxKind.NumericLiteral:
     return (<ts.LiteralExpression>name).text;
   case ts.SyntaxKind.ComputedPropertyName:
-    if (isStringOrNumericLiteral((<ts.ComputedPropertyName>name).expression)) {
+    const expression = (<ts.ComputedPropertyName>name).expression;
+    if (ts.isStringLiteral(expression) || ts.isNumericLiteral(expression)) {
       return (<ts.LiteralExpression>(<ts.ComputedPropertyName>name).expression).text;
     }
   }
   return undefined;
 }
-
-export function isStringOrNumericLiteral(node: ts.Node): node is ts.StringLiteral | ts.NumericLiteral {
-  const kind = node.kind;
-  return kind === ts.SyntaxKind.StringLiteral || kind === ts.SyntaxKind.NumericLiteral;
-}
-
 
 export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpression): ObjectMap {
   const attrs: ts.ObjectLiteralElementLike[] = (objectLiteral.properties as any);
@@ -83,12 +86,6 @@ export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpressio
   return ts.createObjectLiteral(newProperties);
 }
 
-
-export function isEmptyArgs(arg: any) {
-  return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';
-}
-
-
 /**
  * Convert a js value into typescript AST
  * @param val array, object, string, boolean, or number
@@ -125,4 +122,36 @@ function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExp
 function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
   const newList: any[] = list.map(convertValueToLiteral);
   return ts.createArrayLiteral(newList);
+}
+
+/**
+ * Execute an array of transforms over a string containing typescript source
+ * @param sourceText Typescript source as a string
+ * @param transformers Array of transforms to run agains the source string
+ * @returns a string
+ */
+export function transformSourceString(sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
+  const transformed = ts.transform(ts.createSourceFile('source.ts', sourceText, ts.ScriptTarget.ES2015), transformers);
+  const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed }, {
+      onEmitNode: transformed.emitNodeWithNotification,
+      substituteNode: transformed.substituteNode
+  });
+  const result = printer.printBundle(ts.createBundle(transformed.transformed));
+  transformed.dispose();
+  return result;
+}
+
+/**
+ * Execute transforms over a string containing typescript source
+ * @param sourceText Typescript source as a string
+ * @param transformers Object containing before and after transforms to run against the source string
+ * @returns a string
+ */
+export function transformSourceFile(sourceText: string, transformers: ts.CustomTransformers) {
+  return ts.transpileModule(sourceText, {
+    transformers,
+    compilerOptions: Object.assign({}, DEFAULT_COMPILER_OPTIONS, {
+      target: ts.ScriptTarget.ES2017
+    })
+  }).outputText;
 }

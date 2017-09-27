@@ -1,11 +1,10 @@
 import { catchError } from '../../util';
-import { Diagnostic, ListenMeta, ListenOptions, ModuleFile } from '../../../util/interfaces';
+import { Diagnostic, ListenMeta, ListenOptions } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
-export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
-  moduleFile.cmpMeta.listenersMeta = [];
-
+export function getListenDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration): ListenMeta[] {
+  const listenersMeta: ListenMeta[] = [];
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
@@ -15,7 +14,6 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
     let rawListenOpts: ListenOptions = {};
 
     memberNode.forEachChild(n => {
-
       if (n.kind === ts.SyntaxKind.Decorator &&
           n.getChildCount() > 1 &&
           n.getChildAt(1).getFirstToken() &&
@@ -38,7 +36,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
             } catch (e) {
               const d = catchError(diagnostics, e);
               d.messageText = `parse listener options: ${e}`;
-              d.absFilePath = moduleFile.tsFilePath;
+              d.absFilePath = tsFilePath;
             }
           }
         });
@@ -48,25 +46,22 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
           methodName = n.getText().trim();
         }
       }
-
     });
 
 
     if (isListen && eventName && methodName) {
       eventName.split(',').forEach(evName => {
-        const listenMeta = validateListener(moduleFile, evName, rawListenOpts, methodName);
-        if (listenMeta) {
-          moduleFile.cmpMeta.listenersMeta.push(listenMeta);
+        const listenMeta = validateListener(tsFilePath, evName, rawListenOpts, methodName);
 
-          // gathered valid meta data
-          // remove decorator entirely
+        if (listenMeta) {
+          listenersMeta.push(listenMeta);
           memberNode.decorators = undefined;
         }
       });
     }
   });
 
-  moduleFile.cmpMeta.listenersMeta = moduleFile.cmpMeta.listenersMeta.sort((a, b) => {
+  return listenersMeta.sort((a, b) => {
     if (a.eventName.toLowerCase() < b.eventName.toLowerCase()) return -1;
     if (a.eventName.toLowerCase() > b.eventName.toLowerCase()) return 1;
     if (a.eventMethodName.toLowerCase() < b.eventMethodName.toLowerCase()) return -1;
@@ -76,7 +71,7 @@ export function getListenDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diag
 }
 
 
-export function validateListener(fileMeta: ModuleFile, eventName: string, rawListenOpts: ListenOptions, methodName: string) {
+export function validateListener(tsFilePath: string, eventName: string, rawListenOpts: ListenOptions, methodName: string): ListenMeta | null {
   eventName = eventName && eventName.trim();
   if (!eventName) return null;
 
@@ -84,24 +79,24 @@ export function validateListener(fileMeta: ModuleFile, eventName: string, rawLis
 
   let splt = eventName.split(':');
   if (splt.length > 2) {
-    throw `@Listen can only contain one colon: ${eventName} in ${fileMeta.tsFilePath}`;
+    throw `@Listen can only contain one colon: ${eventName} in ${tsFilePath}`;
   }
   if (splt.length > 1) {
     let prefix = splt[0].toLowerCase().trim();
     if (!isValidElementRefPrefix(prefix)) {
-      throw `invalid @Listen prefix "${prefix}" for "${eventName}" in ${fileMeta.tsFilePath}`;
+      throw `invalid @Listen prefix "${prefix}" for "${eventName}" in ${tsFilePath}`;
     }
     rawEventName = splt[1].toLowerCase().trim();
   }
 
   splt = rawEventName.split('.');
   if (splt.length > 2) {
-    throw `@Listen can only contain one period: ${eventName} in ${fileMeta.tsFilePath}`;
+    throw `@Listen can only contain one period: ${eventName} in ${tsFilePath}`;
   }
   if (splt.length > 1) {
     let suffix = splt[1].toLowerCase().trim();
     if (!isValidKeycodeSuffix(suffix)) {
-      throw `invalid @Listen suffix "${suffix}" for "${eventName}" in ${fileMeta.tsFilePath}`;
+      throw `invalid @Listen suffix "${suffix}" for "${eventName}" in ${tsFilePath}`;
     }
     rawEventName = splt[0].toLowerCase().trim();
   }

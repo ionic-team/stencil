@@ -1,11 +1,10 @@
 import { catchError } from '../../util';
-import { Diagnostic, EventMeta, EventOptions, ModuleFile } from '../../../util/interfaces';
+import { Diagnostic, EventMeta, EventOptions } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
-export function getEventDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
-  moduleFile.cmpMeta.eventsMeta = [];
-
+export function getEventDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration): EventMeta[] {
+  let eventsMeta: EventMeta[] = [];
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
@@ -30,7 +29,7 @@ export function getEventDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagn
             } catch (e) {
               const d = catchError(diagnostics, e);
               d.messageText = `parse event options: ${e}`;
-              d.absFilePath = moduleFile.tsFilePath;
+              d.absFilePath = tsFilePath;
             }
           }
         });
@@ -40,20 +39,28 @@ export function getEventDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagn
           methodName = n.getText().trim();
         }
       }
-
     });
 
 
     if (isEvent && methodName) {
-      validateEvent(moduleFile, rawEventMeta, methodName, memberNode);
+      let eventMeta = validateEvent(rawEventMeta, methodName);
+      if (eventsMeta) {
+        memberNode.decorators = undefined;
+        eventsMeta.push(eventMeta);
+      }
     }
   });
+
+  return eventsMeta;
 }
 
 
-function validateEvent(fileMeta: ModuleFile, rawEventOpts: EventOptions, methodName: string, memberNode: ts.ClassElement) {
+function validateEvent(rawEventOpts: EventOptions, methodName: string): EventMeta | null {
+
   methodName = methodName.trim();
-  if (!methodName) return;
+  if (!methodName) {
+    return null;
+  }
 
   const eventMeta: EventMeta = {
     eventMethodName: methodName,
@@ -70,9 +77,5 @@ function validateEvent(fileMeta: ModuleFile, rawEventOpts: EventOptions, methodN
 
   eventMeta.eventComposed = typeof rawEventOpts.composed === 'boolean' ? rawEventOpts.composed : true;
 
-  fileMeta.cmpMeta.eventsMeta.push(eventMeta);
-
-  // gathered valid meta data
-  // remove decorator entirely
-  memberNode.decorators = undefined;
+  return eventMeta;
 }

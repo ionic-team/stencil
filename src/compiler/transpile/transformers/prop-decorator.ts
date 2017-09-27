@@ -1,11 +1,12 @@
 import { catchError } from '../../util';
-import { Diagnostic, ModuleFile, MemberMeta, PropOptions } from '../../../util/interfaces';
+import { Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../util/interfaces';
 import { MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT,
   MEMBER_PROP_CONTEXT, TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+  const membersMeta: MembersMeta = {};
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
@@ -40,7 +41,7 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
             } catch (e) {
               const d = catchError(diagnostics, e);
               d.messageText = `parse prop options: ${e}`;
-              d.absFilePath = moduleFile.tsFilePath;
+              d.absFilePath = tsFilePath;
             }
           }
         });
@@ -69,9 +70,7 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
             shouldObserveAttribute = true;
           }
         }
-
       }
-
     });
 
     if (isProp && propName) {
@@ -81,7 +80,7 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
         return;
       }
 
-      const propMeta: MemberMeta = moduleFile.cmpMeta.membersMeta[propName] = {
+      const propMeta: MemberMeta = membersMeta[propName] = {
         memberType: MEMBER_PROP
       };
 
@@ -105,8 +104,8 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
             level: 'warn',
             type: 'build',
             header: '@Prop({ state: true }) option has been deprecated',
-            messageText: `"state" has been renamed to @Prop({ mutable: true }) ${moduleFile.tsFilePath}`,
-            absFilePath: moduleFile.tsFilePath
+            messageText: `"state" has been renamed to @Prop({ mutable: true }) ${tsFilePath}`,
+            absFilePath: tsFilePath
           });
           userPropOptions.mutable = userPropOptions.state;
         }
@@ -120,9 +119,12 @@ export function getPropDecoratorMeta(moduleFile: ModuleFile, diagnostics: Diagno
         propMeta.attribName = propName;
       }
 
+      // Remove decorator
       memberNode.decorators = undefined;
     }
   });
+
+  return membersMeta;
 }
 
 
