@@ -152,8 +152,7 @@ function validateRendererConfig(config: BuildConfig, ctx: BuildContext) {
     const logger = require(path.join(__dirname, '../cli/util')).logger;
     config.logger = new logger.CommandLineLogger({
       level: config.logLevel,
-      process: process,
-      chalk: require('chalk')
+      process: process
     });
   }
 
