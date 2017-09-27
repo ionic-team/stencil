@@ -17,7 +17,7 @@ function bundleTestingUtils() {
   console.log('bundling testing utilites...');
 
   rollup.rollup({
-    entry: ENTRY_FILE,
+    input: ENTRY_FILE,
     external: [
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
@@ -36,7 +36,7 @@ function bundleTestingUtils() {
     // bundle up the testing utilities into one js file
     bundle.write({
       format: 'cjs',
-      dest: DEST_FILE
+      file: DEST_FILE
 
     }).then(() => {
       console.log(`bundled compiler: ${DEST_FILE}`);

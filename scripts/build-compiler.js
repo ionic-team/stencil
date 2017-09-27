@@ -20,7 +20,7 @@ function bundleCompiler() {
   console.log('bundling compiler...');
 
   rollup.rollup({
-    entry: ENTRY_FILE,
+    input: ENTRY_FILE,
     external: [
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
@@ -39,7 +39,7 @@ function bundleCompiler() {
     // bundle up the compiler into one js file
     bundle.write({
       format: 'cjs',
-      dest: DEST_FILE
+      file: DEST_FILE
 
     }).then(() => {
       console.log(`bundled compiler: ${DEST_FILE}`);
