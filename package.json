@@ -10,14 +10,7 @@
   },
   "files": [
     "bin",
-    "dist/cli",
-    "dist/client",
-    "dist/compiler",
-    "dist/server",
-    "dist/testing",
-    "dist/util",
-    "dist/index.js",
-    "dist/index.d.ts",
+    "dist",
     "testing"
   ],
   "main": "dist/index.js",
@@ -30,7 +23,6 @@
     "build.server": "npm run transpile.server && node scripts/build-server.js",
     "build.testing-util": "npm run transpile.testing-util && node scripts/build-testing-util.js",
     "clean": "rimraf dist/",
-    "dev": "(npm run transpile && node scripts/dev-watch.js) & npm run transpile.watch",
     "deploy": "np",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
@@ -41,19 +33,18 @@
     "transpile.core": "tsc -p src/tsconfig.json",
     "transpile.logger": "tsc -p src/util/logger/command-line-logger/tsconfig.json",
     "transpile.server": "tsc -p src/server/tsconfig.json",
-    "transpile.testing-util": "tsc -p src/testing/tsconfig.json",
-    "transpile.watch": "tsc -p src/compiler/tsconfig.json -w & tsc -p src/tsconfig.json -w"
+    "transpile.testing-util": "tsc -p src/testing/tsconfig.json"
   },
   "dependencies": {
-    "chokidar": "^1.7.0",
-    "jsdom": "^11.1.0",
-    "node-sass": "^4.5.0",
-    "rollup": "^0.47.2",
-    "rollup-plugin-commonjs": "^8.1.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "typescript": "^2.5.0-dev.20170808",
-    "uglify-es": "^3.0.26",
-    "workbox-build": "^2.0.0"
+    "chokidar": "1.7.0",
+    "jsdom": "11.2.0",
+    "node-sass": "4.5.3",
+    "rollup": "0.50.0",
+    "rollup-plugin-commonjs": "8.2.0",
+    "rollup-plugin-node-resolve": "3.0.0",
+    "typescript": "2.5.3",
+    "uglify-es": "3.1.2",
+    "workbox-build": "2.0.3"
   },
   "devDependencies": {
     "@types/babel-core": "^6.7.14",
