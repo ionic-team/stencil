@@ -186,7 +186,7 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
 
   // start the bundler on our temporary file
   return sys.rollup.rollup({
-    entry: STENCIL_BUNDLE_ID,
+    input: STENCIL_BUNDLE_ID,
     plugins: [
       sys.rollup.plugins.nodeResolve({
         jsnext: true,

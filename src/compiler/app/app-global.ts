@@ -59,7 +59,7 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, namespace: 
   // the output from this can be tacked onto the top of the project's core file
   // start the bundler on our temporary file
   return config.sys.rollup.rollup({
-    entry: entry,
+    input: entry,
     plugins: [
       config.sys.rollup.plugins.nodeResolve({
         jsnext: true,
