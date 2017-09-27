@@ -2,24 +2,23 @@ import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions,
   HydrateResults, LoadComponentRegistry } from '../util/interfaces';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
 import { getBuildContext } from '../compiler/util';
-import { getRegistryJsonWWW } from '../compiler/app/generate-app-files';
+import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
 import { validateBuildConfig } from '../compiler/build/validation';
 
 
 export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
+  ctx = ctx || {};
+
   // setup the config and add defaults for missing properties
-  validateRendererConfig(config);
+  validateRendererConfig(config, ctx);
 
   if (!registry) {
     // figure out the component registry
     // if one wasn't passed in already
     registry = registerComponents(config);
   }
-
-  // create the build context if it doesn't exist
-  ctx = getBuildContext(ctx);
 
   // overload with two options for hydrateToString
   // one that returns a promise, and one that takes a callback as the last arg
@@ -136,7 +135,7 @@ function validateHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
 }
 
 
-function validateRendererConfig(config: BuildConfig) {
+function validateRendererConfig(config: BuildConfig, ctx: BuildContext) {
   if (!config.sys && require) {
     // assuming we're in a node environment,
     // if the config was not provided then use the
@@ -159,4 +158,28 @@ function validateRendererConfig(config: BuildConfig) {
   }
 
   validateBuildConfig(config);
+
+  // create the build context if it doesn't exist
+  getBuildContext(ctx);
+
+  loadAppGlobal(config, ctx);
+}
+
+
+function loadAppGlobal(config: BuildConfig, ctx: BuildContext) {
+  ctx.appFiles = ctx.appFiles || {};
+
+  if (ctx.appFiles.global) {
+    // already loaded the global js content
+    return;
+  }
+
+  // let's load the app global js content
+  const appGlobalPath = getGlobalWWW(config);
+  try {
+    ctx.appFiles.global = config.sys.fs.readFileSync(appGlobalPath, 'utf-8');
+
+  } catch (e) {
+    config.logger.debug(`missing app global: ${appGlobalPath}`);
+  }
 }
