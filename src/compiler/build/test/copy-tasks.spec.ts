@@ -1,6 +1,6 @@
 import { BuildConfig, CopyTask } from '../../../util/interfaces';
 import { getSrcAbsPath, getDestAbsPath, getGlobCopyTask, processCopyTask, processCopyTasks } from '../copy-tasks';
-import { mockStencilSystem, mockFs } from '../../../test';
+import { mockStencilSystem, mockFs } from '../../../testing/mocks';
 
 
 describe('copy tasks', () => {

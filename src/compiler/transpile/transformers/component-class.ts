@@ -8,53 +8,45 @@ import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropDecoratorMeta } from './prop-decorator';
 import { getPropChangeDecoratorMeta } from './prop-change-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
-import { removeClassDecorator } from './util';
+import { updateComponentClass } from './util';
 import * as ts from 'typescript';
 
 
-export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, diagnostics: Diagnostic[]): ts.TransformerFactory<ts.SourceFile> {
+export function componentModuleFileClass(config: BuildConfig, fileMeta: ModuleFile, diagnostics: Diagnostic[]): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
-
-    function visitClass(moduleFile: ModuleFile, classNode: ts.ClassDeclaration) {
-      const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
-
-      if (cmpMeta) {
-        if (moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta !== cmpMeta.tagNameMeta) {
-          const relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
-          const d = buildError(diagnostics);
-          d.messageText = `Cannot have multiple @Components in the same source file: ${relPath}`;
-          d.absFilePath = moduleFile.tsFilePath;
-          return classNode;
-        }
-
-        moduleFile.cmpMeta = cmpMeta;
-        moduleFile.cmpMeta.componentClass = classNode.name.getText().trim();
-
-        // membersMeta is shared with @Prop, @State, @Method, @Element
-        moduleFile.cmpMeta.membersMeta = {};
-        getElementDecoratorMeta(moduleFile, classNode);
-        getMethodDecoratorMeta(moduleFile, classNode);
-        getStateDecoratorMeta(moduleFile, classNode);
-        getPropDecoratorMeta(moduleFile, diagnostics, classNode);
-
-        // others
-        getEventDecoratorMeta(moduleFile, diagnostics, classNode);
-        getListenDecoratorMeta(moduleFile, diagnostics, classNode);
-        getPropChangeDecoratorMeta(moduleFile, classNode);
-
-        return removeClassDecorator(classNode);
-      }
-
-      return classNode;
-    }
-
 
     function visit(fileMeta: ModuleFile, node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(fileMeta, node as ts.ClassDeclaration);
+          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration);
+
+        default:
+          return ts.visitEachChild(node, (node) => {
+            return visit(fileMeta, node);
+          }, transformContext);
+      }
+    }
+
+
+    return (tsSourceFile) => {
+      return visit(fileMeta, tsSourceFile) as ts.SourceFile;
+    };
+  };
+
+}
+
+
+export function componentTsFileClass(config: BuildConfig, moduleFiles: ModuleFiles, diagnostics: Diagnostic[]): ts.TransformerFactory<ts.SourceFile> {
+
+  return (transformContext) => {
+
+    function visit(fileMeta: ModuleFile, node: ts.Node): ts.VisitResult<ts.Node> {
+      switch (node.kind) {
+
+        case ts.SyntaxKind.ClassDeclaration:
+          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration);
 
         default:
           return ts.visitEachChild(node, (node) => {
@@ -75,4 +67,40 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
     };
   };
 
+}
+
+
+
+function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+  const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
+
+  if (!cmpMeta) {
+    return classNode;
+  }
+
+  if (moduleFile.cmpMeta && moduleFile.cmpMeta.tagNameMeta !== cmpMeta.tagNameMeta) {
+    const relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
+    const d = buildError(diagnostics);
+    d.messageText = `Cannot have multiple @Components in the same source file: ${relPath}`;
+    d.absFilePath = moduleFile.tsFilePath;
+    return classNode;
+  }
+
+  moduleFile.cmpMeta = {
+    ...cmpMeta,
+    componentClass: classNode.name.getText().trim(),
+    membersMeta: {
+      // membersMeta is shared with @Prop, @State, @Method, @Element
+      ...getElementDecoratorMeta(classNode),
+      ...getMethodDecoratorMeta(classNode),
+      ...getStateDecoratorMeta(classNode),
+      ...getPropDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode)
+    },
+    eventsMeta: getEventDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),
+    listenersMeta: getListenDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),
+    ...getPropChangeDecoratorMeta(classNode)
+  };
+
+  // Return Class Declaration with Decorator removed and as default export
+  return updateComponentClass(classNode);
 }

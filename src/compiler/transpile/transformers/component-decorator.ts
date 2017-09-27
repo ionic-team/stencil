@@ -46,6 +46,10 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, dia
     // parse user component options
     const userOpts: ComponentOptions = new Function(fnStr)();
 
+    if (!userOpts.tag || userOpts.tag.trim() === '') {
+      throw new Error(`tag missing in component decorator: ${text}`);
+    }
+
     // convert user component options from user into component meta
     cmpMeta = {};
 
@@ -69,13 +73,11 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, dia
 
 
 function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
-  const relPath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
-
   if ((<any>userOpts).selector) {
     const d = buildError(diagnostics);
     d.messageText = `Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`;
     d.absFilePath = moduleFile.tsFilePath;
-    d.relFilePath = relPath;
+    d.relFilePath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
 
     cmpMeta.tagNameMeta = (<any>userOpts).selector;
   }
@@ -84,7 +86,7 @@ function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: 
     throw new Error(`tag missing in component decorator: ${orgText}`);
   }
 
-  cmpMeta.tagNameMeta = validateComponentTag(userOpts.tag, relPath);
+  cmpMeta.tagNameMeta = validateComponentTag(userOpts.tag);
 }
 
 

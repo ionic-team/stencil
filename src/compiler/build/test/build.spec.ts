@@ -1,42 +1,11 @@
 import { build } from '../build';
 import { BuildConfig, BuildContext, BuildResults, ComponentRegistry } from '../../../util/interfaces';
-// import { CommandLineLogger } from '../../logger/command-line-logger';
-import { mockBuildConfig } from '../../../test';
+import { mockBuildConfig, mockFs } from '../../../testing/mocks';
 import { parseComponentRegistry } from '../../../util/data-parse';
 import { validateBuildConfig } from '../validation';
 
 
 describe('build', () => {
-
-  // it('should re-save app files when changed', () => {
-  //   ctx = {};
-  //   config.bundles = [
-  //     { components: ['cmp-a'] },
-  //     { components: ['cmp-b'] }
-  //   ];
-  //   config.watch = true;
-  //   writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
-  //   writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
-
-  //   return build(config, ctx).then(r => {
-  //     expect(wroteFile(r, 'app.js')).toBe(true);
-  //     expect(wroteFile(r, 'app.registry.json')).toBe(true);
-  //     expect(wroteFile(r, 'app.core.pf.js')).toBe(true);
-  //     expect(wroteFile(r, 'app.core.js')).toBe(true);
-
-  //     return new Promise(resolve => {
-  //       ctx.onFinish = resolve;
-  //       writeFileSync('/src/cmp-b.tsx', `@Component({ tag: 'cmp-b' }) export class CmpB {}`);
-  //       ctx.watcher.$triggerEvent('add', '/src/cmp-b.tsx');
-
-  //     }).then((r: BuildResults) => {
-  //       expect(wroteFile(r, 'app.js')).toBe(true);
-  //       expect(wroteFile(r, 'app.registry.json')).toBe(true);
-  //       expect(wroteFile(r, 'app.core.pf.js')).toBe(false);
-  //       expect(wroteFile(r, 'app.core.js')).toBe(false);
-  //     });
-  //   });
-  // });
 
   it('should save app files, but not resave when unchanged', () => {
     ctx = {};
@@ -532,13 +501,6 @@ describe('build', () => {
   });
 
 
-  // var logger = mockLogger();
-  // var chalk = require('chalk');
-  // logger = new CommandLineLogger({
-  //   level: 'debug',
-  //   process: process,
-  //   chalk: chalk
-  // });
   var registry: ComponentRegistry = {};
   var ctx: BuildContext = {};
   var config: BuildConfig = {};
@@ -548,6 +510,7 @@ describe('build', () => {
     registry = {};
 
     config = mockBuildConfig();
+    config.sys.fs = mockFs();
 
     mkdirSync('/');
     mkdirSync('/src');

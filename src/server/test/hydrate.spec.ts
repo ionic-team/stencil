@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { hydrateHtml } from '../hydrate-html';
-import { mockBuildConfig, compareHtml } from '../../test';
+import { mockBuildConfig, compareHtml } from '../../testing/mocks';
 import { h } from '../../core/renderer/h';
 import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG, HYDRATED_CSS } from '../../util/constants';
 

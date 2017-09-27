@@ -1,9 +1,10 @@
-import { ModuleFile } from '../../../util/interfaces';
+import { MembersMeta } from '../../../util/interfaces';
 import { MEMBER_STATE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getStateDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassDeclaration) {
+export function getStateDecoratorMeta(classNode: ts.ClassDeclaration) {
+  const membersMeta: MembersMeta = {};
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   decoratedMembers.forEach(memberNode => {
@@ -31,10 +32,12 @@ export function getStateDecoratorMeta(fileMeta: ModuleFile, classNode: ts.ClassD
     });
 
     if (isState && propName) {
-      fileMeta.cmpMeta.membersMeta[propName] = {
+      membersMeta[propName] = {
         memberType: MEMBER_STATE
       };
       memberNode.decorators = undefined;
     }
   });
+
+  return membersMeta;
 }

@@ -132,7 +132,7 @@ export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: M
       }
     }
 
-    buildWarn(diagnostics).messageText = label + warning.toString();
+    buildWarn(diagnostics).messageText = label + (warning.message || warning);
   };
 }
 

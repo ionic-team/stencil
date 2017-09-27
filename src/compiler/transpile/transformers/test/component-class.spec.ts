@@ -1,6 +1,6 @@
 import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile, ComponentMeta } from '../../../../util/interfaces';
-import { mockBuildConfig } from '../../../../test';
-import { componentClass } from '../component-class';
+import { mockBuildConfig } from '../../../../testing/mocks';
+import { componentTsFileClass } from '../component-class';
 import { DEFAULT_COMPILER_OPTIONS } from '../../compiler-options';
 import * as ts from 'typescript';
 
@@ -10,7 +10,7 @@ function customJsxTransform(source, fileMetaArray: ModuleFiles) {
 
   return ts.transpileModule(source, {
     transformers: {
-        before: [componentClass(config, fileMetaArray, [] as Diagnostic[])]
+        before: [componentTsFileClass(config, fileMetaArray, [] as Diagnostic[])]
     },
     compilerOptions: Object.assign({}, DEFAULT_COMPILER_OPTIONS, {
       target: ts.ScriptTarget.ES2017

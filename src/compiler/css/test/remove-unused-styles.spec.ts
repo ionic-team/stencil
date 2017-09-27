@@ -1,5 +1,5 @@
 import { BuildConfig } from '../../../util/interfaces';
-import { mockHtml } from '../../../test';
+import { mockHtml } from '../../../testing/mocks';
 import { removeUnusedStyles } from '../remove-unused-styles';
 import { UsedSelectors } from '../../html/used-selectors';
 

@@ -1,7 +1,7 @@
 [![npm][npm-badge]][npm-badge-url]
 # Stencil: A Compiler for Web Components
 
-Stencil is a compiler for building fast web apps using Web Components.
+Stencil is a simple compiler for generating Web Components.
 
 Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool.  Stencil takes TypeScript, JSX, a tiny virtual DOM layer, efficient one-way data binding, an asynchronous rendering pipeline (similar to React Fiber), and lazy-loading out of the box, and generates 100% standards-based Web Components that run in any browser supporting the Custom Elements v1 spec.
 
@@ -75,6 +75,12 @@ To use this component, just use it like any other HTML tag:
 ```html
 <my-component first="Stencil" last="JS"></my-component>
 ```
+
+## Naming Components
+
+When creating new component tags, we recommend _not_ using `stencil` in the component name (ex: `<stencil-datepicker>`). This is because the generated component has little to nothing to do with Stencil; it's just a web component!
+
+Instead, use a prefix that fits your company or any name for a group of related components. For example, all of the Ionic generated web components use the prefix `ion`.
 
 ## Hosting the app
 
