@@ -89,7 +89,7 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
 }
 
 function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, options: ts.CompilerOptions) {
-  const componentFile = Object.keys(ctx.moduleFiles).reduce((finalString, moduleFileName) => {
+  const componentFile = Object.keys(ctx.moduleFiles).sort().reduce((finalString, moduleFileName) => {
     const moduleFile = ctx.moduleFiles[moduleFileName];
 
     if (moduleFile.cmpMeta) {
