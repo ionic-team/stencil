@@ -1,16 +1,8 @@
-import { BuildConfig, BuildContext, CompileResults, ModuleFiles } from '../../util/interfaces';
+import { BuildConfig, BuildContext, CompileResults } from '../../util/interfaces';
 import { catchError, hasError, isTsFile, readFile, normalizePath } from '../util';
-import { getModuleFile, getModuleFileSync } from '../transpile/compiler-host';
-import { transpile, transpileSync } from '../transpile/transpile';
+import { getModuleFile } from '../transpile/compiler-host';
+import { transpileFiles } from '../transpile/transpile';
 
-
-export function compileFileSync(config: BuildConfig, ctx: BuildContext, filePath: string): string {
-  let moduleFiles: ModuleFiles = {};
-  moduleFiles[filePath] = getModuleFileSync(config, ctx, filePath);
-  const transpileResults = transpileSync(config, ctx, moduleFiles);
-  const moduleFile = transpileResults.moduleFiles[filePath];
-  return ctx.jsFiles[moduleFile.jsFilePath];
-}
 
 export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
   const logger = config.logger;
@@ -29,7 +21,7 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
   logger.debug(`compileDirectory, srcDir: ${config.srcDir}`);
 
   return scanDir(config, ctx, config.srcDir, compileResults).then(() => {
-    return transpile(config, ctx, compileResults.moduleFiles);
+    return transpileFiles(config, ctx, compileResults.moduleFiles);
 
   }).then(transpileResults => {
     if (transpileResults.moduleFiles) {

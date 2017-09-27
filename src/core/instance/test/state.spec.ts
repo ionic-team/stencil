@@ -1,4 +1,4 @@
-import { mockPlatform, mockDomApi } from '../../../test';
+import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentMeta, ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
 import { MEMBER_STATE } from '../../../util/constants';
 import { initProxy } from '../proxy';

@@ -66,7 +66,6 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
       }
     }
 
-
     return (tsSourceFile) => {
       const moduleFile = moduleFiles[tsSourceFile.fileName];
       if (moduleFile) {
@@ -77,5 +76,4 @@ export function componentClass(config: BuildConfig, moduleFiles: ModuleFiles, di
       return tsSourceFile;
     };
   };
-
 }

@@ -2,7 +2,7 @@ import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostE
   HydrateOptions, Logger, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
-import { createRenderer } from '../core/renderer/patch';
+import { createRendererPatch } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
 import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../compiler/build/validation';
@@ -48,7 +48,7 @@ export function mockPlatform() {
     $loadBundleQueue.flush(cb);
   };
 
-  const renderer = createRenderer(plt, domApi);
+  const renderer = createRendererPatch(plt, domApi);
 
   plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, hostElementContentNode?: HostContentNodes) {
     return renderer(oldVNode, newVNode, isUpdate, hostElementContentNode);
@@ -307,7 +307,7 @@ export function mockDomApi(document?: any) {
 
 export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi): any {
   plt = plt || mockPlatform();
-  return createRenderer(<PlatformApi>plt, domApi || mockDomApi());
+  return createRendererPatch(<PlatformApi>plt, domApi || mockDomApi());
 }
 
 

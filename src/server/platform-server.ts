@@ -5,7 +5,7 @@ import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry,
 import { createDomApi } from '../core/renderer/dom-api';
 import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
-import { createRenderer } from '../core/renderer/patch';
+import { createRendererPatch } from '../core/renderer/patch';
 import { getAppFileName } from '../compiler/app/app-core';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
@@ -89,7 +89,7 @@ export function createPlatformServer(
 
 
   // create the renderer which will be used to patch the vdom
-  plt.render = createRenderer(plt, domApi);
+  plt.render = createRendererPatch(plt, domApi);
 
   // setup the root node of all things
   // which is the mighty <html> tag

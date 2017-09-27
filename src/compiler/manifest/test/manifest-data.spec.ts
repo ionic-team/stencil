@@ -1,5 +1,5 @@
 import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
-import { mockStencilSystem } from '../../../test';
+import { mockStencilSystem } from '../../../testing/mocks';
 import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
 import { HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD, MEMBER_PROP,
   MEMBER_PROP_MUTABLE, MEMBER_PROP_CONTEXT, MEMBER_STATE,

@@ -1,4 +1,4 @@
-import { mockElement, mockDomApi } from '../../../test';
+import { mockElement, mockDomApi } from '../../../testing/mocks';
 import { toVNode } from '../to-vnode';
 
 

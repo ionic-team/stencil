@@ -15,11 +15,13 @@ export function jsxToVNode(transformContext: ts.TransformationContext) {
           let parentNamespaceResponse;
 
           if ((<ts.Identifier>callNode.expression).text === 'h') {
+            const tag = callNode.arguments[0];
+            if (tag && typeof (tag as ts.StringLiteral).text === 'string') {
+              [node, parentNamespaceResponse] = convertJsxToVNode(callNode, parentNamespace);
 
-            [node, parentNamespaceResponse] = convertJsxToVNode(callNode, parentNamespace);
-
-            if (parentNamespaceResponse) {
-              parentNamespace = parentNamespaceResponse;
+              if (parentNamespaceResponse) {
+                parentNamespace = parentNamespaceResponse;
+              }
             }
           }
 

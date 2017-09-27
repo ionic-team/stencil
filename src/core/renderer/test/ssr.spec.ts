@@ -1,8 +1,8 @@
-import { createRenderer } from '../patch';
+import { createRendererPatch } from '../patch';
 import { createVNodesFromSsr } from '../slot';
 import { h } from '../h';
 import { HostContentNodes, VNode } from '../../../util/interfaces';
-import { mockPlatform, mockDomApi, removeWhitespaceFromNodes } from '../../../test';
+import { mockPlatform, mockDomApi, removeWhitespaceFromNodes } from '../../../testing/mocks';
 import { SSR_VNODE_ID, SSR_CHILD_ID, SLOT_TAG } from '../../../util/constants';
 import { VNode as VNodeObj } from '../vnode';
 
@@ -191,6 +191,6 @@ describe('ssr', () => {
 
 
   var plt = mockPlatform();
-  var patch = createRenderer(<any>plt, domApi);
+  var patch = createRendererPatch(<any>plt, domApi);
 
 });

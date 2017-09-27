@@ -243,7 +243,7 @@ export function validateUserBundles(bundles: Bundle[]) {
     }
 
     b.components = b.components.map(tag => {
-      return validateComponentTag(tag, `found in bundle component stencil config`);
+      return validateComponentTag(tag);
     }).sort();
   });
 
@@ -257,44 +257,44 @@ export function validateUserBundles(bundles: Bundle[]) {
 }
 
 
-export function validateComponentTag(tag: string, suffix: string) {
+export function validateComponentTag(tag: string) {
   if (typeof tag !== 'string') {
-    throw new Error(`Tag "${tag}" must be a string type, ${suffix}`);
+    throw new Error(`Tag "${tag}" must be a string type`);
   }
 
   tag = tag.trim().toLowerCase();
 
   if (tag.length === 0) {
-    throw new Error(`Received empty tag value, ${suffix}`);
+    throw new Error(`Received empty tag value`);
   }
 
   if (tag.indexOf(' ') > -1) {
-    throw new Error(`"${tag}" tag cannot contain a space, ${suffix}`);
+    throw new Error(`"${tag}" tag cannot contain a space`);
   }
 
   if (tag.indexOf(',') > -1) {
-    throw new Error(`"${tag}" tag cannot be use for multiple tags, ${suffix}`);
+    throw new Error(`"${tag}" tag cannot be use for multiple tags`);
   }
 
   let invalidChars = tag.replace(/\w|-/g, '');
   if (invalidChars !== '') {
-    throw new Error(`"${tag}" tag contains invalid characters: ${invalidChars}, ${suffix}`);
+    throw new Error(`"${tag}" tag contains invalid characters: ${invalidChars}`);
   }
 
   if (tag.indexOf('-') === -1) {
-    throw new Error(`"${tag}" tag must contain a dash (-) to work as a valid web component, ${suffix}`);
+    throw new Error(`"${tag}" tag must contain a dash (-) to work as a valid web component`);
   }
 
   if (tag.indexOf('--') > -1) {
-    throw new Error(`"${tag}" tag cannot contain multiple dashes (--) next to each other, ${suffix}`);
+    throw new Error(`"${tag}" tag cannot contain multiple dashes (--) next to each other`);
   }
 
   if (tag.indexOf('-') === 0) {
-    throw new Error(`"${tag}" tag cannot start with a dash (-), ${suffix}`);
+    throw new Error(`"${tag}" tag cannot start with a dash (-)`);
   }
 
   if (tag.lastIndexOf('-') === tag.length - 1) {
-    throw new Error(`"${tag}" tag cannot end with a dash (-), ${suffix}`);
+    throw new Error(`"${tag}" tag cannot end with a dash (-)`);
   }
 
   return tag;

@@ -1,7 +1,7 @@
 import { generateLoader, injectAppIntoLoader } from '../app-loader';
 import { getAppPublicPath } from '../app-core';
 import { BuildConfig, LoadComponentRegistry } from '../../../util/interfaces';
-import { mockLogger, mockStencilSystem } from '../../../test';
+import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { generatePreamble } from '../../util';
 
 

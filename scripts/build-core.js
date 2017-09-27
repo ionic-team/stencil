@@ -14,6 +14,7 @@ const rollup = require('rollup');
 
 const ROOT_DIR = path.join(__dirname, '../');
 const DIST_DIR = path.join(ROOT_DIR, 'dist');
+const SRC_DIR = path.join(ROOT_DIR, 'src');
 const EXTERNS_CORE = path.join(ROOT_DIR, 'scripts', 'externs.core.js');
 const TRANSPILED_DIR = path.join(DIST_DIR, 'transpiled-core');
 const SRC_CLIENT_DIR = path.join(TRANSPILED_DIR, 'client');
@@ -248,7 +249,7 @@ if (process.argv.indexOf('dev') > -1) {
 }
 
 function copyUtilFiles() {
-  createMainIndex();
+  copyMainIndex();
   copyMainDTs();
   copyUtilDir();
 }
@@ -270,38 +271,16 @@ function copyMainDTs() {
   });
 }
 
-function createMainIndex() {
-  // TODO! hacky hack hack for now
-
-  const mainIndexContent = `
-'use strict';
-
-Object.defineProperties(module.exports, {
-
-  build: {
-    get: function() {
-      var compiler = require('./compiler/index');
-      return compiler.build;
-    }
-  },
-
-  createRenderer: {
-    get: function() {
-      var server = require('./server/index');
-      return server.createRenderer;
-    }
-  }
-
-});
-  `
-
-  const mainIndexPath = path.join(DIST_DIR, 'index.js');
-  fs.writeFile(mainIndexPath, mainIndexContent, function(err) {
+function copyMainIndex() {
+  const srcIndexPath = path.join(SRC_DIR, 'index.js');
+  const destIndexPath = path.join(DIST_DIR, 'index.js');
+  fs.copy(srcIndexPath, destIndexPath, (err) => {
     if (err) {
-      console.log('Failed to write: ', mainIndexPath);
+      console.log('Failed to write: ', destIndexPath);
       return process.exit(1);
     }
   });
+
 }
 
 function copyUtilDir() {

@@ -14,15 +14,9 @@ export function updateFileMetaFromSlot(moduleFiles: ModuleFiles): ts.Transformer
     function visit(fileName: string, node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
         case ts.SyntaxKind.CallExpression:
-          const callNode = node as ts.CallExpression;
-
-          if ((<ts.Identifier>callNode.expression).text === 'h') {
-            const [tag, props] = callNode.arguments;
-            const tagName = (<ts.StringLiteral>tag).text.trim().toLowerCase();
-
-            if (tagName === 'slot') {
-              moduleFiles[fileName] = updateFileMetaWithSlots(moduleFiles[fileName], props);
-            }
+          const fileMeta = updateFileMeta(node as ts.CallExpression, moduleFiles[fileName]);
+          if (fileMeta) {
+            moduleFiles[fileName] = fileMeta;
           }
 
         default:
@@ -33,6 +27,45 @@ export function updateFileMetaFromSlot(moduleFiles: ModuleFiles): ts.Transformer
     }
   };
 }
+
+
+export function updateModuleFileMetaFromSlot(moduleFile: ModuleFile): ts.TransformerFactory<ts.SourceFile> {
+
+  return (transformContext: ts.TransformationContext) => {
+    return (tsSourceFile) => {
+      return visit(tsSourceFile.fileName, tsSourceFile) as ts.SourceFile;
+    };
+
+    function visit(fileName: string, node: ts.Node): ts.VisitResult<ts.Node> {
+      switch (node.kind) {
+        case ts.SyntaxKind.CallExpression:
+          updateFileMeta(node as ts.CallExpression, moduleFile);
+
+        default:
+          return ts.visitEachChild(node, (node) => {
+            return visit(fileName, node);
+          }, transformContext);
+      }
+    }
+  };
+}
+
+
+function updateFileMeta(callNode: ts.CallExpression, fileMeta: ModuleFile) {
+  if (fileMeta && (<ts.Identifier>callNode.expression).text === 'h') {
+    const [tag, props] = callNode.arguments;
+
+    if (tag && typeof (tag as ts.StringLiteral).text === 'string') {
+      const tagName = (tag as ts.StringLiteral).text.trim().toLowerCase();
+
+      if (tagName === 'slot') {
+        return updateFileMetaWithSlots(fileMeta, props);
+      }
+    }
+  }
+  return null;
+}
+
 
 function updateFileMetaWithSlots(fileMeta: ModuleFile, props: ts.Expression): ModuleFile {
   // checking if there is a default slot and/or named slots in the compiler

@@ -58,6 +58,12 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
   // and all components have finished hydrating
   plt.onAppLoad = (rootElm, stylesMap) => {
 
+    if (config._isTesting) {
+      (hydrateResults as any).__testPlatform = plt;
+    }
+
+    hydrateResults.root = rootElm;
+
     // all synchronous operations next
     if (rootElm) {
       try {
@@ -65,17 +71,23 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
         optimizeHtml(config, ctx, doc, stylesMap, opts, hydrateResults);
 
         // gather up all of the <a> tag information in the doc
-        collectAnchors(doc, hydrateResults);
+        if (opts.collectAnchors !== false) {
+          collectAnchors(doc, hydrateResults);
+        }
 
         // serialize this dom back into a string
-        hydrateResults.html = dom.serialize();
+        if (opts.serializeHtml !== false) {
+          hydrateResults.html = dom.serialize();
+        }
 
         // also collect up any dom errors that may have happened
         hydrateResults.diagnostics = hydrateResults.diagnostics.concat(dom.getDiagnostics());
 
         // terminate all running timers and also remove any
         // event listeners on the window and document
-        dom.destroy();
+        if (opts.serializeHtml !== false) {
+          dom.destroy();
+        }
 
       } catch (e) {
         // gahh, something's up
@@ -108,16 +120,18 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     let ssrId: number;
     let existingSsrId: string;
 
-    // this may have been patched more than once
-    // so reuse the ssr id if it already has one
-    if (oldVNode && oldVNode.elm) {
-      existingSsrId = (oldVNode.elm as HTMLElement).getAttribute(SSR_VNODE_ID);
-    }
+    if (opts.ssrIds !== false) {
+      // this may have been patched more than once
+      // so reuse the ssr id if it already has one
+      if (oldVNode && oldVNode.elm) {
+        existingSsrId = (oldVNode.elm as HTMLElement).getAttribute(SSR_VNODE_ID);
+      }
 
-    if (existingSsrId) {
-      ssrId = parseInt(existingSsrId, 10);
-    } else {
-      ssrId = ssrIds++;
+      if (existingSsrId) {
+        ssrId = parseInt(existingSsrId, 10);
+      } else {
+        ssrId = ssrIds++;
+      }
     }
 
     newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ssrId);
