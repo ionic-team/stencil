@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-import * as ts from 'typescript';
-import { convertValueToLiteral } from './util';
-import { ModuleFiles, ComponentMeta } from '../../../util/interfaces';
-
-export default function addMetadataExport(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
-=======
 import { convertValueToLiteral } from './util';
 import { ComponentMeta, ModuleFile } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
 export default function addMetadataExport(moduleFile: ModuleFile): ts.TransformerFactory<ts.SourceFile> {
->>>>>>> master
 
   return (transformContext) => {
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
@@ -19,11 +11,7 @@ export default function addMetadataExport(moduleFile: ModuleFile): ts.Transforme
 
       const metadataProperty = ts.createProperty(
         undefined,
-<<<<<<< HEAD
-        undefined,
-=======
         [ts.createToken(ts.SyntaxKind.StaticKeyword)],
->>>>>>> master
         'metadata',
         undefined,
         undefined,
@@ -44,10 +32,6 @@ export default function addMetadataExport(moduleFile: ModuleFile): ts.Transforme
       switch (node.kind) {
         case ts.SyntaxKind.ClassDeclaration:
           return visitClass(node as ts.ClassDeclaration, cmpMeta);
-<<<<<<< HEAD
-=======
-
->>>>>>> master
         default:
           return ts.visitEachChild(node, (node) => {
             return visit(node, cmpMeta);
@@ -56,15 +40,7 @@ export default function addMetadataExport(moduleFile: ModuleFile): ts.Transforme
     }
 
     return (tsSourceFile) => {
-<<<<<<< HEAD
-      const moduleFile = moduleFiles[tsSourceFile.fileName];
-      if (moduleFile) {
-        return visit(tsSourceFile, moduleFile.cmpMeta) as ts.SourceFile;
-      }
-      return tsSourceFile;
-=======
       return visit(tsSourceFile, moduleFile.cmpMeta) as ts.SourceFile;
->>>>>>> master
     };
   };
 

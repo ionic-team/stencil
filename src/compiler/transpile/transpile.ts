@@ -63,7 +63,7 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
       before: [
         componentModuleFileClass(config, fileMeta, diagnostics),
         removeImports(),
-        updateLifecycleMethods(),
+        renameLifecycleMethods(),
         addMetadataExport(fileMeta)
       ],
       after: [
