@@ -685,7 +685,6 @@ export interface ComponentMeta {
   loadPriority?: number;
   componentModule?: any;
   componentClass?: string;
-  tagNameAsPascal?: string;
 }
 
 

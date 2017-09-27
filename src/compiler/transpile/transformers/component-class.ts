@@ -1,5 +1,4 @@
 import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile } from '../../../util/interfaces';
-import { dashToPascalCase } from '../../../util/helpers';
 import { buildError } from '../../util';
 import { getComponentDecoratorData } from './component-decorator';
 import { getElementDecoratorMeta } from './element-decorator';
@@ -89,7 +88,6 @@ function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Di
 
   moduleFile.cmpMeta = {
     ...cmpMeta,
-    tagNameAsPascal: dashToPascalCase(cmpMeta.tagNameMeta),
     componentClass: classNode.name.getText().trim(),
     membersMeta: {
       // membersMeta is shared with @Prop, @State, @Method, @Element

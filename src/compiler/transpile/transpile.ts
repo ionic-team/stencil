@@ -10,6 +10,7 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
 import { createTypesAsString }  from './transformers/add-jsx-types';
+import { dashToPascalCase } from '../../util/helpers';
 import * as ts from 'typescript';
 
 
@@ -90,13 +91,14 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
 function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, options: ts.CompilerOptions) {
   const componentFile = Object.keys(ctx.moduleFiles).reduce((finalString, moduleFileName) => {
     const moduleFile = ctx.moduleFiles[moduleFileName];
+
     if (moduleFile.cmpMeta) {
       const importPath = config.sys.path
         .relative(options.outDir, moduleFile.jsFilePath)
         .replace(/\.js$/, '');
 
       finalString += `
-import { ${moduleFile.cmpMeta.componentClass} as ${moduleFile.cmpMeta.tagNameAsPascal} } from './${importPath}';
+import { ${moduleFile.cmpMeta.componentClass} as ${dashToPascalCase(moduleFile.cmpMeta.tagNameMeta)} } from './${importPath}';
 ${createTypesAsString(moduleFile.cmpMeta)}
 `;
     }

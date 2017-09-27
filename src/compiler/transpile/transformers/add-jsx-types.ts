@@ -3,17 +3,19 @@ import {
   TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER,
   MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE
 } from '../../../util/constants';
+import { dashToPascalCase } from '../../../util/helpers';
 import * as ts from 'typescript';
 
 
 export function createTypesAsString(cmpMeta: ComponentMeta) {
   const tagName = cmpMeta.tagNameMeta;
-  const interfaceName = `HTML${cmpMeta.tagNameAsPascal}Element`;
-  const jsxInterfaceName = `${cmpMeta.tagNameAsPascal}Attributes`;
+  const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
+  const interfaceName = `HTML${tagNameAsPascal}Element`;
+  const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
   const interfaceOptions = membersToInterfaceOptions(cmpMeta.membersMeta);
 
   return `
-interface ${interfaceName} extends ${cmpMeta.tagNameAsPascal}, HTMLElement {
+interface ${interfaceName} extends ${tagNameAsPascal}, HTMLElement {
 }
 declare var ${interfaceName}: {
   prototype: ${interfaceName};
@@ -122,7 +124,8 @@ function createJSXElementsNamespace(cmpMeta: ComponentMeta) {
       );
     });
 
-  const jsxInterfaceName = `${cmpMeta.tagNameAsPascal}Attributes`;
+  const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
+  const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
   const namespaceBlock = ts.createInterfaceDeclaration(
     undefined,
     [ts.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -243,13 +246,14 @@ export default function addJsxTypes(moduleFiles: ModuleFiles): ts.TransformerFac
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
       const tagName = cmpMeta.tagNameMeta;
       const className = cmpMeta.componentClass;
-      const interfaceName = `HTML${cmpMeta.tagNameAsPascal}Element`;
+      const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
+      const interfaceName = `HTML${tagNameAsPascal}Element`;
       // const memberMeta = moduleFile.cmpMeta.membersMeta;
 
       const moduleBlock = ts.createModuleBlock([
         createHTMLElementTagNameMap(tagName, interfaceName),
         createElementTagNameMap(tagName, interfaceName),
-        createJSXNamespace(tagName, cmpMeta.tagNameAsPascal),
+        createJSXNamespace(tagName, tagNameAsPascal),
         createJSXElementsNamespace(cmpMeta)
       ]);
 

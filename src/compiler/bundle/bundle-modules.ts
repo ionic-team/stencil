@@ -150,7 +150,7 @@ function bundleComponentModules(config: BuildConfig, ctx: BuildContext, bundleMo
   }).forEach(moduleFile => {
     // create a full path to the modules to import
     let importPath = moduleFile.jsFilePath;
-    let tagNameAsPascal = moduleFile.cmpMeta.tagNameAsPascal || dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
+    let tagNameAsPascal = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
 
     // manually create the content for our temporary entry file for the bundler
     entryFileLines.push(`import { ${moduleFile.cmpMeta.componentClass} as ${tagNameAsPascal} } from "${importPath}";`);
