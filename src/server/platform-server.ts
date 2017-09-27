@@ -101,11 +101,11 @@ export function createPlatformServer(
     appLoaded();
   };
 
-  function appLoaded() {
-    if (rootElm._hasLoaded && Object.keys(pendingStyleFileReads).length === 0) {
+  function appLoaded(failureDiagnostic?: Diagnostic) {
+    if ((rootElm._hasLoaded && Object.keys(pendingStyleFileReads).length === 0) || failureDiagnostic) {
       // the root node has loaded
       // and there are no css files still loading
-      plt.onAppLoad && plt.onAppLoad(rootElm, stylesMap);
+      plt.onAppLoad && plt.onAppLoad(rootElm, stylesMap, failureDiagnostic);
     }
   }
 
@@ -211,7 +211,8 @@ export function createPlatformServer(
           config.sys.vm.runInContext(jsContent, win, { timeout: 10000 });
 
         }).catch(err => {
-          onError(LOAD_BUNDLE_ERROR, err, elm);
+          const d = onError(LOAD_BUNDLE_ERROR, err, elm);
+          appLoaded(d);
         });
       }
 
@@ -248,7 +249,8 @@ export function createPlatformServer(
               appLoaded();
 
             }).catch(err => {
-              onError(LOAD_BUNDLE_ERROR, err, elm);
+              const d = onError(LOAD_BUNDLE_ERROR, err, elm);
+              appLoaded(d);
             });
           }
         }
@@ -308,6 +310,8 @@ export function createPlatformServer(
     }
 
     diagnostics.push(d);
+
+    return d;
   }
 
   function propConnect(ctrlTag: string) {

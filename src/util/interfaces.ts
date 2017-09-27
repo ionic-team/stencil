@@ -934,7 +934,7 @@ export interface PlatformApi {
   render?: RendererApi;
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
-  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap) => void;
+  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
   getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;

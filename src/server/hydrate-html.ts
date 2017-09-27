@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, ComponentRegistry, HostElement, PlatformApi,
+import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
 import { createPlatformServer } from './platform-server';
 import { initHostConstructor } from '../core/instance/init';
@@ -56,10 +56,16 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
   // fire off this function when the app has finished loading
   // and all components have finished hydrating
-  plt.onAppLoad = (rootElm, stylesMap) => {
+  plt.onAppLoad = (rootElm, stylesMap, failureDiagnostic: Diagnostic) => {
 
     if (config._isTesting) {
       (hydrateResults as any).__testPlatform = plt;
+    }
+
+    if (failureDiagnostic) {
+      hydrateResults.html = generateFailureDiagnostic(failureDiagnostic);
+      callback(hydrateResults);
+      return;
     }
 
     hydrateResults.root = rootElm;
@@ -260,7 +266,16 @@ function normalizeLanguage(doc: Document, opts: HydrateOptions) {
 }
 
 
+function generateFailureDiagnostic(d: Diagnostic) {
+  return `
+    <div style="padding: 20px;">
+      <div style="font-weight: bold;">${d.header}</div>
+      <div>${d.messageText}</div>
+    </div>
+  `;
+}
+
+
 export interface ConnectedInfo {
   elementCount: number;
 }
-
