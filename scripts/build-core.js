@@ -75,7 +75,7 @@ function buildCore(isDevMode) {
 
 function bundleClientCore(coreEntryFile, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode) {
   rollup.rollup({
-    entry: coreEntryFile
+    input: coreEntryFile
   })
   .then((bundle) => {
     return generateClientCoreDev(bundle, outputDevFile, outputProdFile, es6ClassHack, es5, isDevMode);
