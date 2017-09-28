@@ -242,7 +242,7 @@ export function isTsFile(filePath: string) {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
     if (parts[parts.length - 1] === 'ts' || parts[parts.length - 1] === 'tsx') {
-      if (parts.length > 2 && parts[parts.length - 2] === 'd') {
+      if (parts.length > 2 && (parts[parts.length - 2] === 'd' || parts[parts.length - 2] === 'spec')) {
         return false;
       }
       return true;
@@ -262,8 +262,16 @@ export function isDtsFile(filePath: string) {
 
 
 export function isJsFile(filePath: string) {
-  const ext = filePath.split('.').pop().toLowerCase();
-  return ext === 'js';
+  const parts = filePath.toLowerCase().split('.');
+  if (parts.length > 1) {
+    if (parts[parts.length - 1] === 'js') {
+      if (parts.length > 2 && parts[parts.length - 2] === 'spec') {
+        return false;
+      }
+      return true;
+    }
+  }
+  return false;
 }
 
 
