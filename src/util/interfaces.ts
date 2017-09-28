@@ -862,17 +862,9 @@ export interface VNode {
   vtag: string|number;
   vtext: string;
   vchildren: VNode[];
-  vprops: any;
   vattrs: any;
-  vclass: CssClassMap;
-  vstyle: any;
-  vlisteners: any;
-  vkey: Key;
   elm: Element|Node;
-  vnamespace: any;
   assignedListener: any;
-  skipDataOnUpdate: boolean;
-  skipChildrenOnUpdate: boolean;
 }
 
 export interface VNodeData {
@@ -889,38 +881,11 @@ export interface VNodeData {
  * used by production compiler
  */
 export interface VNodeProdData {
-  /**
-   * props
-   */
-  p?: any;
-  /**
-   * attrs
-   */
-  a?: any;
-  /**
-   * css classes
-   */
-  c?: CssClassMap|string;
-  /**
-   * styles
-   */
-  s?: any;
-  /**
-   * on (event listeners)
-   */
-  o?: any;
-  /**
-   * key
-   */
-  k?: Key;
-  /**
-   * namespace
-   */
-  n?: any;
-  /**
-   * check once
-   */
-  x?: number;
+  key?: Key;
+  class?: CssClassMap | string;
+  className?: CssClassMap | string;
+  style?: any;
+  [key: string]: any;
 }
 
 

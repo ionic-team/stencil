@@ -4,7 +4,6 @@ import { buildError, catchError, isSassFile, normalizePath } from '../util';
 import { componentTsFileClass, componentModuleFileClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
-import { jsxToVNode } from './transformers/jsx-to-vnode';
 import { updateFileMetaFromSlot, updateModuleFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
@@ -68,8 +67,7 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
         addMetadataExport(fileMeta)
       ],
       after: [
-        updateModuleFileMetaFromSlot(fileMeta),
-        jsxToVNode
+        updateModuleFileMetaFromSlot(fileMeta)
       ]
     }
   };
@@ -146,8 +144,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
       renameLifecycleMethods()
     ],
     after: [
-      updateFileMetaFromSlot(ctx.moduleFiles),
-      jsxToVNode
+      updateFileMetaFromSlot(ctx.moduleFiles)
     ]
   });
 
