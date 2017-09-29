@@ -9,7 +9,7 @@
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
-import { SLOT_TAG, SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
+import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
 import { updateElement, eventProxy } from './update-dom-node';
 
 let isSvgMode = false;
@@ -23,7 +23,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   function createElm(vnode: VNode, parentElm: Node, childIndex: number) {
     let i = 0;
 
-    if (vnode.vtag === SLOT_TAG) {
+    if (vnode.vtag === 'slot') {
 
       if (hostContentNodes) {
         // special case for manually relocating host content nodes
@@ -283,7 +283,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     if (isUndef(newVnode.vtext)) {
       // element node
 
-      if ((!isUpdate) && newVnode.vtag !== SLOT_TAG) {
+      if ((!isUpdate) && newVnode.vtag !== 'slot') {
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
@@ -376,7 +376,7 @@ function hasChildNodes(children: VNode[]) {
   // doesn't have to climb down and check so many elements
   if (children) {
     for (var i = 0; i < children.length; i++) {
-      if (children[i].vtag !== SLOT_TAG || hasChildNodes(children[i].vchildren)) {
+      if (children[i].vtag !== 'slot' || hasChildNodes(children[i].vchildren)) {
         return true;
       }
     }

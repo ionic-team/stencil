@@ -138,11 +138,11 @@ describe('ssr', () => {
     });
 
     it('should add default slot comments', () => {
-      newVnode = h('ion-test', 0, [
-        h('div', 0, [
-          h(SLOT_TAG, 0)
-        ])
-      ]);
+      newVnode = h('ion-test', null,
+        h('div', null,
+          h('slot', null)
+        )
+      );
 
       const defaultContentNode = domApi.$createElement('child-a');
       elm.appendChild(defaultContentNode);
@@ -162,12 +162,12 @@ describe('ssr', () => {
     });
 
     it('should add same ssr to all elements', () => {
-      newVnode = h('ion-test', 0, [
-        h('div', 0, [
-          h('button', 0, 'Text 1'),
-          h('span', 0, 'Text 2')
-        ])
-      ]);
+      newVnode = h('ion-test', null,
+        h('div', null,
+          h('button', null, 'Text 1'),
+          h('span', null, 'Text 2')
+        )
+      );
 
       ssrVNode = patch(oldVnode, newVnode, false, null, 1);
       elm = <any>ssrVNode.elm;

@@ -1,6 +1,6 @@
 import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../../util/constants';
 import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
 
 
@@ -14,7 +14,7 @@ describe('Component slot', () => {
       slotMeta: HAS_SLOTS,
       componentModule: class {
         render() {
-          return h('spider', 0, h(SLOT_TAG, 0));
+          return h('spider', null, h('slot', null));
         }
       }
     });
@@ -36,7 +36,7 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('monkey', 0, h(SLOT_TAG, { a: { name: 'start' } }));
+          return h('monkey', null, h('slot', { name: 'start' }));
         }
       }
     });
@@ -54,8 +54,8 @@ describe('Component slot', () => {
 
   it('no content', (done) => {
     mount({
-      parentVNode: h('lion', 0, h('ion-child', 0)),
-      childVNode: h(SLOT_TAG, 0)
+      parentVNode: h('lion', null, h('ion-child', null)),
+      childVNode: h('slot', null)
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes.length).toBe(1);
       expect(parentElm.childNodes[0].nodeName).toBe('LION');
@@ -77,8 +77,8 @@ describe('Component slot', () => {
 
   it('no content, nested child slot', (done) => {
     mount({
-      parentVNode: h('giraffe', 0, h('ion-child', 0)),
-      childVNode: h('fish', 0, h(SLOT_TAG, 0))
+      parentVNode: h('giraffe', null, h('ion-child', null)),
+      childVNode: h('fish', null, h('slot', null))
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes.length).toBe(1);
       expect(parentElm.childNodes[0].nodeName).toBe('GIRAFFE');
@@ -107,12 +107,12 @@ describe('Component slot', () => {
 
   it('should put parent content in child default slot', done => {
     mount({
-      parentVNode: h('hippo', 0, [
-        h('ion-child', 0, [
-          h('aardvark', 0, parentInstance.msg)
-        ])
-      ]),
-      childVNode: h(SLOT_TAG, 0)
+      parentVNode: h('hippo', null,
+        h('ion-child', null,
+          h('aardvark', null, parentInstance.msg)
+        )
+      ),
+      childVNode: h('slot', null)
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes[0].nodeName).toBe('HIPPO');
       expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
@@ -135,16 +135,16 @@ describe('Component slot', () => {
 
   it('should put parent content in child nested default slot', done => {
     mount({
-      parentVNode: h('badger', 0, [
-        h('ion-child', 0, [
-          h('dingo', 0, parentInstance.msg)
-        ])
-      ]),
-      childVNode: h('camel', 0, [
-        h('owl', 0, [
-          h(SLOT_TAG, 0)
-        ])
-      ])
+      parentVNode: h('badger', null,
+        h('ion-child', null,
+          h('dingo', null, parentInstance.msg)
+        )
+      ),
+      childVNode: h('camel', null,
+        h('owl', null,
+          h('slot', null)
+        )
+      )
     }, (parentElm, childElm) => {
       expect(parentElm.childNodes[0].nodeName).toBe('BADGER');
       expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
@@ -178,11 +178,11 @@ describe('Component slot', () => {
         msg = 'parent message';
 
         render() {
-          return h('cheetah', 0, [
-            h('ion-child', 0, [
-              h('bear', 0, this.msg)
-            ])
-          ]);
+          return h('cheetah', null,
+            h('ion-child', null,
+              h('bear', null, this.msg)
+            )
+          );
         }
       }
     });
@@ -192,9 +192,9 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('chipmunk', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('chipmunk', null,
+            h('slot', null)
+          );
         }
       }
     });
@@ -242,9 +242,9 @@ describe('Component slot', () => {
         msg = 'parent message';
 
         render() {
-          return h('ion-child', 0, [
-            h('whale', 0, this.msg)
-          ]);
+          return h('ion-child', null,
+            h('whale', null, this.msg)
+          );
         }
       }
     });
@@ -254,9 +254,9 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('bull', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('bull', null,
+            h('slot', null)
+          );
         }
       }
     });
@@ -299,10 +299,10 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('ion-child', 0, [
-            h('falcon', { a: { slot: 'start' } }, ++values),
-            h('eagle', { a: { slot: 'start' } }, ++values),
-          ]);
+          return h('ion-child', null,
+            h('falcon', { slot: 'start' }, ++values),
+            h('eagle', { slot: 'start' }, ++values),
+          );
         }
       }
     });
@@ -312,11 +312,11 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('mouse', 0, [
-            h(SLOT_TAG, 0),
-            h(SLOT_TAG, { a: { name: 'start' } }),
-            h(SLOT_TAG, { a: { name: 'end' } })
-          ]);
+          return h('mouse', null,
+            h('slot', null),
+            h('slot', { name: 'start' }),
+            h('slot', { name: 'end' })
+          );
         }
       }
     });
@@ -356,7 +356,7 @@ describe('Component slot', () => {
 
   });
 
-  it('should only render nested named slots and default slot', done => {
+  it('should only render nested named slots and default slot', () => {
     let values = 0;
 
     mockDefine(plt, {
@@ -364,11 +364,11 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('ion-child', 0, [
-            h('butterfly', 0, (++values).toString()),
+          return h('ion-child', null,
+            h('butterfly', null, (++values).toString()),
             h('fox', { a: { slot: 'end' } }, ++values),
             h('ferret', { a: { slot: 'start' } }, ++values)
-          ]);
+          );
         }
       }
     });
@@ -378,23 +378,23 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('flamingo', 0, [
-            h(SLOT_TAG, { a: { name: 'start' } }),
-            h('horse', 0, [
-              h(SLOT_TAG, 0),
-              h('bullfrog', 0, [
-                h(SLOT_TAG, { a: { name: 'end' } })
-              ])
-            ])
-          ]);
+          return h('flamingo', null,
+            h('slot', { name: 'start' }),
+            h('horse', null,
+              h('slot', null),
+              h('bullfrog', null,
+                h('slot', { name: 'end' })
+              )
+            )
+          );
         }
       }
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
 
-    waitForLoad(plt, node, 'ion-parent').then(parentElm => {
-      waitForLoad(plt, parentElm, 'ion-child').then(() => {
+    return waitForLoad(plt, node, 'ion-parent').then(parentElm => {
+      return waitForLoad(plt, parentElm, 'ion-child').then(() => {
 
         expect(parentElm.childNodes[0].nodeName).toBe('ION-CHILD');
         expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('FLAMINGO');
@@ -432,13 +432,11 @@ describe('Component slot', () => {
         expect(parentElm.childNodes[0].childNodes[0].childNodes[1].childNodes[1].nodeName).toBe('BULLFROG');
         expect(parentElm.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].nodeName).toBe('FOX');
         expect(parentElm.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].textContent).toBe('8');
-
-        done();
       });
     });
   });
 
-  it('should allow nested default slots', done => {
+  it('should allow nested default slots', () => {
     let values = 0;
 
     mockDefine(plt, {
@@ -446,11 +444,11 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('test-1', 0, [
-            h('test-2', 0, [
-              h('goat', 0, (++values).toString())
-            ])
-          ]);
+          return h('test-1', null,
+            h('test-2', null,
+              h('goat', null, (++values).toString())
+            )
+          );
         }
       }
     });
@@ -460,9 +458,9 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('seal', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('seal', null,
+            h('slot', null)
+          );
         }
       }
     });
@@ -472,18 +470,18 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('goose', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('goose', null,
+            h('slot', null)
+          );
         }
       }
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
 
-    waitForLoad(plt, node, 'ion-parent').then(elm => {
-      waitForLoad(plt, elm, 'test-1').then(() => {
-        waitForLoad(plt, elm, 'test-2').then(() => {
+    return waitForLoad(plt, node, 'ion-parent').then(elm => {
+      return waitForLoad(plt, elm, 'test-1').then(() => {
+        return waitForLoad(plt, elm, 'test-2').then(() => {
 
           expect(elm.childNodes[0].nodeName).toBe('TEST-1');
           expect(elm.childNodes[0].childNodes[0].nodeName).toBe('SEAL');
@@ -509,8 +507,6 @@ describe('Component slot', () => {
           expect(elm.childNodes[0].childNodes[0].childNodes[0].childNodes[0].nodeName).toBe('GOOSE');
           expect(elm.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].nodeName).toBe('GOAT');
           expect(elm.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].textContent).toBe('3');
-
-          done();
         });
       });
     });
