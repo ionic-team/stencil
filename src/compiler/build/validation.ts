@@ -4,7 +4,7 @@ import { validatePrerenderConfig } from '../prerender/validate-prerender-config'
 import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
 
 
-export function validateBuildConfig(config: BuildConfig) {
+export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boolean) {
   if (!config) {
     throw new Error(`invalid build config`);
   }
@@ -186,7 +186,9 @@ export function validateBuildConfig(config: BuildConfig) {
 
   config.logger.debug(`validated build config`);
 
-  setProcessEnvironment(config);
+  if (setEnvVariables !== false) {
+    setProcessEnvironment(config);
+  }
 
   return config;
 }

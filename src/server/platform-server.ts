@@ -171,6 +171,8 @@ export function createPlatformServer(
 
 
   function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
+    loadModuleStyles(cmpMeta, elm);
+
     if (cmpMeta.componentModule) {
       // we already have the module loaded
       // (this is probably a unit test)
@@ -215,44 +217,47 @@ export function createPlatformServer(
           appLoaded(d);
         });
       }
+    }
+  }
 
-      // we also need to load this component's css file
-      // we're already figured out and set "mode" as a property to the element
-      let styleId: any = cmpMeta.styleIds && (cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$);
-      if (!styleId && cmpMeta.stylesMeta) {
-        const stylesMeta = cmpMeta.stylesMeta[elm.mode] || cmpMeta.stylesMeta.$;
-        if (stylesMeta) {
-          styleId = stylesMeta.styleId;
-        }
+
+  function loadModuleStyles(cmpMeta: ComponentMeta, elm: HostElement) {
+    // we need to load this component's css file
+    // we're already figured out and set "mode" as a property to the element
+    let styleId: any = cmpMeta.styleIds && (cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$);
+    if (!styleId && cmpMeta.stylesMeta) {
+      const stylesMeta = cmpMeta.stylesMeta[elm.mode] || cmpMeta.stylesMeta.$;
+      if (stylesMeta) {
+        styleId = stylesMeta.styleId;
       }
-      if (styleId) {
-        // we've got a style id to load up
-        // create the style filePath we'll be reading
-        const styleFilePath = normalizePath(config.sys.path.join(appBuildDir, `${styleId}.css`));
+    }
+    if (styleId) {
+      // we've got a style id to load up
+      // create the style filePath we'll be reading
+      const styleFilePath = normalizePath(config.sys.path.join(appBuildDir, `${styleId}.css`));
 
-        if (!stylesMap[styleFilePath]) {
-          // this style hasn't been added to our collection yet
+      if (!stylesMap[styleFilePath]) {
+        // this style hasn't been added to our collection yet
 
-          if (!pendingStyleFileReads[styleFilePath]) {
-            // we're not already actively opening this file
-            pendingStyleFileReads[styleFilePath] = true;
+        if (!pendingStyleFileReads[styleFilePath]) {
+          // we're not already actively opening this file
+          pendingStyleFileReads[styleFilePath] = true;
 
-            getCssFile(config.sys, ctx, styleFilePath).then(cssContent => {
-              delete pendingStyleFileReads[styleFilePath];
+          getCssFile(config.sys, ctx, styleFilePath).then(cssContent => {
+            delete pendingStyleFileReads[styleFilePath];
 
-              // finished reading the css file
-              // let's add the content to our collection
-              stylesMap[styleFilePath] = cssContent;
+            // finished reading the css file
+            // let's add the content to our collection
+            stylesMap[styleFilePath] = cssContent;
 
-              // check if the entire app is done loading or not
-              // and if this was the last thing the app was waiting on
-              appLoaded();
+            // check if the entire app is done loading or not
+            // and if this was the last thing the app was waiting on
+            appLoaded();
 
-            }).catch(err => {
-              const d = onError(LOAD_BUNDLE_ERROR, err, elm);
-              appLoaded(d);
-            });
-          }
+          }).catch(err => {
+            const d = onError(LOAD_BUNDLE_ERROR, err, elm);
+            appLoaded(d);
+          });
         }
       }
     }

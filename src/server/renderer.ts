@@ -1,4 +1,4 @@
-import * as interfaces from '../util/interfaces';
+import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults, LoadComponentRegistry } from '../util/interfaces';
 import { buildError, getBuildContext } from '../compiler/util';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
 import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
@@ -7,11 +7,16 @@ import { parseComponentRegistry } from '../util/data-parse';
 import { validateBuildConfig } from '../compiler/build/validation';
 
 
-export function createRenderer(config: interfaces.BuildConfig, registry?: interfaces.ComponentRegistry, ctx?: interfaces.BuildContext) {
+export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
+  validateBuildConfig(config);
+
   ctx = ctx || {};
 
-  // setup the config and add defaults for missing properties
-  validateRendererConfig(config, ctx);
+  // init the buid context
+  getBuildContext(ctx);
+
+  // load the app global file into the context
+  loadAppGlobal(config, ctx);
 
   if (!registry) {
     // figure out the component registry
@@ -21,14 +26,14 @@ export function createRenderer(config: interfaces.BuildConfig, registry?: interf
 
   // overload with two options for hydrateToString
   // one that returns a promise, and one that takes a callback as the last arg
-  function hydrateToString(hydrateOpts: interfaces.HydrateOptions): Promise<interfaces.HydrateResults> {
+  function hydrateToString(hydrateOpts: HydrateOptions): Promise<HydrateResults> {
 
     // validate the hydrate options and add any missing info
     normalizeHydrateOptions(config, hydrateOpts);
 
     // kick off hydrated, which is an async opertion
     return hydrateHtml(config, ctx, registry, hydrateOpts).catch(err => {
-      const hydrateResults: interfaces.HydrateResults = {
+      const hydrateResults: HydrateResults = {
         diagnostics: [buildError(err)],
         html: hydrateOpts.html,
         styles: null,
@@ -39,14 +44,13 @@ export function createRenderer(config: interfaces.BuildConfig, registry?: interf
   }
 
   return {
-    hydrateToString: hydrateToString,
-    logger: config.logger
+    hydrateToString: hydrateToString
   };
 }
 
 
-function registerComponents(config: interfaces.BuildConfig) {
-  let registry: interfaces.ComponentRegistry = null;
+function registerComponents(config: BuildConfig) {
+  let registry: ComponentRegistry = null;
 
   try {
     const registryJsonFilePath = getRegistryJsonWWW(config);
@@ -58,7 +62,7 @@ function registerComponents(config: interfaces.BuildConfig) {
     const registryData = JSON.parse(cmpRegistryJson);
 
     // object should have the components property on it
-    const components: interfaces.LoadComponentRegistry[] = registryData.components;
+    const components: LoadComponentRegistry[] = registryData.components;
 
     if (Array.isArray(components) && components.length > 0) {
       // i think we're good, let's create a registry
@@ -84,7 +88,7 @@ function registerComponents(config: interfaces.BuildConfig) {
 }
 
 
-function normalizeHydrateOptions(config: interfaces.BuildConfig, opts: interfaces.HydrateOptions) {
+function normalizeHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
   const req = opts.req;
 
   if (req && typeof req.get === 'function') {
@@ -108,37 +112,7 @@ function normalizeHydrateOptions(config: interfaces.BuildConfig, opts: interface
 }
 
 
-function validateRendererConfig(config: interfaces.BuildConfig, ctx: interfaces.BuildContext) {
-  if (!config.sys && require) {
-    // assuming we're in a node environment,
-    // if the config was not provided then use the
-    // defaul stencil sys found in bin
-    const path = require('path');
-    config.sys = require(path.join(__dirname, '../../bin/sys'));
-  }
-
-  if (!config.logger && require) {
-    // assuming we're in a node environment,
-    // if a logger was not provided then use the
-    // defaul stencil command line logger found in bin
-    const path = require('path');
-    const logger = require(path.join(__dirname, '../cli/util')).logger;
-    config.logger = new logger.CommandLineLogger({
-      level: config.logLevel,
-      process: process
-    });
-  }
-
-  validateBuildConfig(config);
-
-  // create the build context if it doesn't exist
-  getBuildContext(ctx);
-
-  loadAppGlobal(config, ctx);
-}
-
-
-function loadAppGlobal(config: interfaces.BuildConfig, ctx: interfaces.BuildContext) {
+function loadAppGlobal(config: BuildConfig, ctx: BuildContext) {
   ctx.appFiles = ctx.appFiles || {};
 
   if (ctx.appFiles.global) {

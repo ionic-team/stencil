@@ -121,7 +121,7 @@ export class CommandLineLogger implements Logger {
   }
 
   printDiagnostics(diagnostics: Diagnostic[]) {
-    if (!diagnostics.length) return;
+    if (!diagnostics || !diagnostics.length) return;
 
     let outputLines: string[] = [''];
 
