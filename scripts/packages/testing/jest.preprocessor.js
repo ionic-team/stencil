@@ -1,6 +1,6 @@
 var path = require('path');
 var ts = require('typescript');
-var testing = require('../dist/testing/index');
+var testing = require('./index');
 
 
 var injectTestingScript = [

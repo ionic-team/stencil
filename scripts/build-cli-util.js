@@ -28,6 +28,10 @@ function bundle(entryFileName) {
   });
 }
 
+const SRC_BIN_DIR = path.join(__dirname, './bin');
+const DEST_BIN_DIR = path.join(__dirname, '../dist/bin');
+fs.copySync(SRC_BIN_DIR, DEST_BIN_DIR);
+
 
 const TRANSPILED_LOGGER_DIR = path.join(__dirname, '../dist/transpiled-logger');
 process.on('exit', (code) => {

@@ -2,7 +2,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var util = require('../dist/cli/util');
+var util = require('../cli/util');
 var coreClientFileCache = {};
 
 
@@ -63,7 +63,7 @@ module.exports = Object.defineProperties({
   },
 
   getClientCoreFile: function getClientCoreFile(opts) {
-    var filePath = path.join(__dirname, '..', 'dist', 'client', opts.staticName);
+    var filePath = path.join(__dirname, '../client', opts.staticName);
 
     return new Promise(function(resolve, reject) {
       if (coreClientFileCache[filePath]) {
@@ -126,7 +126,7 @@ module.exports = Object.defineProperties({
   },
 
   minifyCss: function minifyCss(input) {
-    var cleanCSS = require('../dist/cli/clean-css');
+    var cleanCSS = require('../cli/clean-css');
     var result = cleanCSS.minify(input);
     var diagnostics = [];
 
@@ -230,10 +230,10 @@ module.exports = Object.defineProperties({
       var vm = require('vm');
       // https://github.com/tmpvar/jsdom/issues/1724
       // manually adding a fetch polyfill until jsdom adds it
-      var patchFetch = require('../dist/cli/patch-fetch-xhr');
+      var patchFetch = require('../cli/patch-fetch-xhr');
       patchFetch.patchFetchXhr(ctx, wwwDir, sandbox);
 
-      var patchRaf = require('../dist/cli/patch-raf');
+      var patchRaf = require('../cli/patch-raf');
       patchRaf.patchRaf(sandbox);
 
       return vm.createContext(sandbox);

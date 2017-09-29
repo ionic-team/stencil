@@ -249,7 +249,6 @@ if (process.argv.indexOf('dev') > -1) {
 }
 
 function copyUtilFiles() {
-  copyMainIndex();
   copyMainDTs();
   copyUtilDir();
 }
@@ -271,17 +270,6 @@ function copyMainDTs() {
   });
 }
 
-function copyMainIndex() {
-  const srcIndexPath = path.join(SRC_DIR, 'index.js');
-  const destIndexPath = path.join(DIST_DIR, 'index.js');
-  fs.copy(srcIndexPath, destIndexPath, (err) => {
-    if (err) {
-      console.log('Failed to write: ', destIndexPath);
-      return process.exit(1);
-    }
-  });
-
-}
 
 function copyUtilDir() {
   const readUtilDirPath = path.join(TRANSPILED_DIR, 'util');

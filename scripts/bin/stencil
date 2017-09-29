@@ -5,7 +5,7 @@ process.title = 'stencil';
 process.on('unhandledRejection', function(r) { console.error(r) });
 process.env.IONIC_CLI_BIN = __filename;
 
-var util = require('../dist/cli/util');
+var util = require('../cli/util');
 var sys = require('./sys');
 var path = require('path');
 
@@ -38,7 +38,7 @@ if (!config.logger) {
 
 switch (cmdArgs[2]) {
   case 'build':
-    var stencil = require('../dist/compiler');
+    var stencil = require('../compiler');
     stencil.build(config);
 
     if (config.watch) {

@@ -1,0 +1,6 @@
+{
+  "name": "@stencil/core-testing",
+  "private": true,
+  "main": "./index.js",
+  "types": "./index.d.ts"
+}

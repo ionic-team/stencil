@@ -2,32 +2,21 @@
   "name": "@stencil/core",
   "version": "0.0.6-3",
   "license": "MIT",
-  "bin": {
-    "stencil": "./bin/stencil"
-  },
-  "engines": {
-    "node": ">=6.11.0"
-  },
-  "files": [
-    "bin",
-    "dist",
-    "testing"
-  ],
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing-util && npm run build.cli-util",
+    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing-util && npm run build.cli-util && npm run build.package",
     "build.compiler": "npm run transpile.compiler && node scripts/build-compiler.js",
     "build.core": "npm run transpile.core && node scripts/build-core.js",
     "build.cli-util": "npm run transpile.logger && node scripts/build-cli-util.js",
+    "build.package": "node scripts/build-package.js",
     "build.server": "npm run transpile.server && node scripts/build-server.js",
     "build.testing-util": "npm run transpile.testing-util && node scripts/build-testing-util.js",
     "clean": "rimraf dist/",
-    "deploy": "np",
+    "deploy": "cd dist/ np",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
     "test.watch": "jest --watch",
     "prepublishOnly": "npm run build",
+    "postpublish": "node scripts/post-publish.js",
     "transpile": "npm run transpile.compiler && npm run transpile.core",
     "transpile.compiler": "tsc -p src/compiler/tsconfig.json",
     "transpile.core": "tsc -p src/tsconfig.json",
@@ -86,7 +75,22 @@
     "url": "git+https://github.com/ionic-team/stencil.git"
   },
   "author": "Ionic Team",
-  "homepage": "https://github.com/ionic-team/stencil",
+  "homepage": "https://stenciljs.com/",
+  "description": "A Compiler for Web Components",
+  "keywords": [
+    "web components",
+    "components",
+    "custom elements",
+    "stencil",
+    "ionic",
+    "webapp",
+    "pwa"
+  ],
+  "bin": {
+    "stencil": "./dist/bin/stencil"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "jest": {
     "testEnvironment": "node",
     "moduleFileExtensions": [
