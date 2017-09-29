@@ -859,7 +859,8 @@ export interface HostContentNodes {
 
 export interface VNode {
   // using v prefixes largely so closure has no issue property renaming
-  vtag: string|number;
+  vtag: string | number;
+  vkey: string | number;
   vtext: string;
   vchildren: VNode[];
   vattrs: any;

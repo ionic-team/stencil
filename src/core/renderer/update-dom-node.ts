@@ -1,25 +1,26 @@
 import { PlatformApi, VNode } from '../../util/interfaces';
 
 
-const EMPTY: any = { vattrs: {} };
+const EMPTY: any = {};
 let DEFAULT_OPTS: any = null;
 
 export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean): void {
   let name;
-  let elm = newVnode.elm as any;
-  oldVnode = oldVnode || EMPTY;
+  const elm = newVnode.elm as any;
+  const oldVnodeAttrs = (oldVnode != null && oldVnode.vattrs != null) ? oldVnode.vattrs : EMPTY;
+  const newVnodeAttrs = (newVnode.vattrs != null) ? newVnode.vattrs : EMPTY;
 
   // remove attributes no longer present on the vnode by setting them to undefined
-  for (name in oldVnode.vattrs) {
-    if (!(newVnode.vattrs && newVnode.vattrs[name] !== null) && oldVnode.vattrs[name] !== null) {
-      setAccessor(plt, elm, name, oldVnode.vattrs[name], oldVnode.vattrs[name] = undefined, isSvgMode);
+  for (name in oldVnodeAttrs) {
+    if (!(newVnodeAttrs && newVnodeAttrs[name] != null) && oldVnodeAttrs[name] != null) {
+      setAccessor(plt, elm, name, oldVnodeAttrs[name], oldVnodeAttrs[name] = undefined, isSvgMode);
     }
   }
 
   // add new & update changed attributes
-  for (name in newVnode.vattrs) {
-    if (!(name in oldVnode.vattrs) || newVnode.vattrs[name] !== (name === 'value' || name === 'checked' ? elm[name] : oldVnode.vattrs[name])) {
-      setAccessor(plt, elm, name, oldVnode.vattrs[name], oldVnode.vattrs[name] = newVnode.vattrs[name], isSvgMode);
+  for (name in newVnodeAttrs) {
+    if (!(name in oldVnodeAttrs) || newVnodeAttrs[name] !== (name === 'value' || name === 'checked' ? elm[name] : oldVnodeAttrs[name])) {
+      setAccessor(plt, elm, name, oldVnodeAttrs[name], oldVnodeAttrs[name] = newVnodeAttrs[name], isSvgMode);
     }
   }
 }
@@ -30,20 +31,33 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
 
   // Class
   if (name === 'class' && !isSvg) {
+    newValue = newValue || {};
+    oldValue = oldValue || {};
+
+    let newClassNameString = '';
+    let oldClassNameString = '';
+
     for (key in oldValue) {
-      if (!newValue[key]) {
-        elm.classList.remove(key);
+      if (oldValue[key]) {
+        oldClassNameString += ' ' + key;
       }
     }
 
     for (key in newValue) {
-      if (newValue[key] !== oldValue[key]) {
-        elm.classList[newValue[key] ? 'add' : 'remove'](key);
+      if (newValue[key]) {
+        newClassNameString += ' ' + key;
       }
+    }
+
+    if (oldClassNameString !== newClassNameString && newClassNameString !== '') {
+      elm.className = newClassNameString;
     }
 
   // Style
   } else if (name === 'style') {
+    oldValue = oldValue || {};
+    newValue = newValue || {};
+
     for (key in oldValue) {
       if (!newValue[key]) {
         (elm as any).style[key] = '';

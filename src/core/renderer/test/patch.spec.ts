@@ -38,39 +38,33 @@ describe('renderer', () => {
   describe('created element', () => {
 
     it('has tag', () => {
-      elm = patch(vnode0, h('div', 0)).elm;
+      elm = patch(vnode0, h('div', null)).elm;
       expect(elm.tagName).toEqual('DIV');
     });
 
-    it('has correct namespace manually given', () => {
-      elm = patch(vnode0, h('div', 0, h('div', {n: 'whatever'}))).elm;
-      expect(elm.firstChild.namespaceURI).toEqual('whatever');
+    it('should automatically get svg namespace', function() {
+      var SVGNamespace = 'http://www.w3.org/2000/svg';
+      var XHTMLNamespace = 'http://www.w3.org/1999/xhtml';
+
+      const svgElm = mockElement('svg');
+
+      elm = patch(svgElm, h('svg', [
+        h('foreignObject', [
+          h('div', ['I am HTML embedded in SVG'])
+        ])
+      ])).elm;
+
+      expect(elm.namespaceURI).toEqual(SVGNamespace);
+      expect(elm.firstChild.namespaceURI).toEqual(SVGNamespace);
+      expect(elm.firstChild.firstChild.namespaceURI).toEqual(XHTMLNamespace);
+
+      // verify that svg tag with extra selectors gets svg namespace
+      elm = patch(svgElm, h('svg', null)).elm;
+      expect(elm.namespaceURI).toEqual(SVGNamespace);
     });
 
-    // TODO!!!
-    // fit('should automatically get svg namespace', function() {
-    //   var SVGNamespace = 'http://www.w3.org/2000/svg';
-    //   var XHTMLNamespace = 'http://www.w3.org/1999/xhtml';
-
-    //   const svgElm = mockElement('svg');
-
-    //   elm = patch(svgElm, h('svg', [
-    //     h('foreignObject', [
-    //       h('div', ['I am HTML embedded in SVG'])
-    //     ])
-    //   ])).elm;
-
-    //   expect(elm.namespaceURI).toEqual(SVGNamespace);
-    //   expect(elm.firstChild.namespaceURI).toEqual(SVGNamespace);
-    //   expect(elm.firstChild.firstChild.namespaceURI).toEqual(XHTMLNamespace);
-
-    //   // verify that svg tag with extra selectors gets svg namespace
-    //   elm = patch(svgElm, h('svg#some-id')).elm;
-    //   expect(elm.namespaceURI).toEqual(SVGNamespace);
-    // });
-
     it('receives css classes', () => {
-      let vnode1 = h('div', 0, h('i', { c: { i: true, am: true, a: true, 'class': true } }));
+      let vnode1 = h('div', null, h('i', { class: { i: true, am: true, a: true, 'class': true } }));
       elm = patch(vnode0, vnode1).elm;
 
       expect(elm.firstChild.classList.contains('am')).toBeTruthy();
@@ -80,7 +74,7 @@ describe('renderer', () => {
     });
 
     it('can create elements with text content', () => {
-      elm = patch(vnode0, h('div', 0, 'I am a string')).elm;
+      elm = patch(vnode0, h('div', null, 'I am a string')).elm;
       expect(elm.innerHTML).toEqual('I am a string');
     });
 
@@ -89,9 +83,9 @@ describe('renderer', () => {
   describe('patching an element', () => {
 
     it('changes the elements classes', () => {
-      var vnode1 = h('i', {c: {i: true, am: true, horse: true}});
-      var vnode2 = h('i', {c: {i: true, am: true, horse: false}});
-      patch(vnode0, vnode1);
+      var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
+      var vnode2 = h('i', { class: {i: true, am: true, horse: false } });
+      console.log(patch(vnode0, vnode1).elm.classList);
       elm = patch(vnode1, vnode2).elm;
       expect(elm.classList.contains('i')).toBeTruthy();
       expect(elm.classList.contains('am')).toBeTruthy();
@@ -99,8 +93,8 @@ describe('renderer', () => {
     });
 
     it('changes classes in selector', () => {
-      var vnode1 = h('i', {c: {i: true, am: true, horse: true}});
-      var vnode2 = h('i', {c: {i: true, am: true, horse: false}});
+      var vnode1 = h('i', { class: { i: true, am: true, horse: true } });
+      var vnode2 = h('i', { class: { i: true, am: true, horse: false } });
       patch(vnode0, vnode1);
       elm = patch(vnode1, vnode2).elm;
       expect(elm.classList.contains('i')).toBeTruthy();
@@ -109,9 +103,9 @@ describe('renderer', () => {
     });
 
     it('preserves memoized classes', () => {
-      var cachedClass = {i: true, am: true, horse: false};
-      var vnode1 = h('i', {c: cachedClass});
-      var vnode2 = h('i', {c: cachedClass});
+      var cachedClass = { i: true, am: true, horse: false };
+      var vnode1 = h('i', { class: cachedClass });
+      var vnode2 = h('i', { class: cachedClass });
       elm = patch(vnode0, vnode1).elm;
       expect(elm.classList.contains('i')).toBeTruthy();
       expect(elm.classList.contains('am')).toBeTruthy();
@@ -123,8 +117,8 @@ describe('renderer', () => {
     });
 
     it('removes missing classes', () => {
-      var vnode1 = h('i', {c: {i: true, am: true, horse: true}});
-      var vnode2 = h('i', {c: {i: true, am: true}});
+      var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
+      var vnode2 = h('i', { class: {i: true, am: true } });
       patch(vnode0, vnode1);
       elm = patch(vnode1, vnode2).elm;
       expect(elm.classList.contains('i')).toBeTruthy();
@@ -144,7 +138,7 @@ describe('renderer', () => {
         prevElm.className = 'class';
         prevElm.appendChild(h2);
 
-        var nextVNode = h('div', 0, h('span', 0, 'Hi'));
+        var nextVNode = h('div', null, h('span', null, 'Hi'));
         elm = patch(toVNode(domApi, prevElm), nextVNode).elm;
 
         expect(elm).toEqual(prevElm);
@@ -169,7 +163,7 @@ describe('renderer', () => {
         prevElm.appendChild(text);
         prevElm.appendChild(h2);
 
-        var nextVNode = h('div', 0, 'Foobar');
+        var nextVNode = h('div', null, 'Foobar');
         elm = patch(toVNode(domApi, prevElm), nextVNode).elm;
 
         expect(elm).toEqual(prevElm);
@@ -194,7 +188,7 @@ describe('renderer', () => {
         prevElm.appendChild(text);
         prevElm.appendChild(h2);
 
-        var nextVNode = h('div', 0, h('h2', 0, 'Hello'));
+        var nextVNode = h('div', null, h('h2', null, 'Hello'));
         elm = patch(toVNode(domApi, prevElm), nextVNode).elm;
 
         expect(elm).toEqual(prevElm);
@@ -213,14 +207,14 @@ describe('renderer', () => {
         if (n == null) {
           return n;
         } else if (typeof n === 'string') {
-          return h('span', 0, n);
+          return h('span', null, n);
         } else {
-          return h('span', {k: n}, n.toString());
+          return h('span', { key: n }, n.toString());
         }
       }
 
       function vnodeMap(arr: number[]) {
-        return h.apply(null, ['span', 0].concat(arr.map(spanNum)));
+        return h.apply(null, ['span', null, ...arr.map(spanNum)]);
       }
 
       describe('addition of elements', () => {
@@ -274,7 +268,7 @@ describe('renderer', () => {
 
         it('adds children to parent with no children', () => {
           var vnode1 = h('span', {k: 'span'});
-          var vnode2 = h('span', {k: 'span'}, [1, 2, 3].map(spanNum));
+          var vnode2 = h('span', {k: 'span'}, ...[1, 2, 3].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(0);
@@ -284,7 +278,7 @@ describe('renderer', () => {
         });
 
         it('removes all children from parent', () => {
-          var vnode1 = h('span', {k: 'span'}, [1, 2, 3].map(spanNum));
+          var vnode1 = h('span', {k: 'span'}, ...[1, 2, 3].map(spanNum));
           var vnode2 = h('span', {k: 'span'});
           elm = patch(vnode0, vnode1).elm;
           expect(map(inner, elm.children)).toEqual(['1', '2', '3']);
@@ -293,8 +287,8 @@ describe('renderer', () => {
         });
 
         it('update one child with same key but different sel', () => {
-          var vnode1 = h('span', {k: 'spans'}, [1, 2, 3].map(spanNum));
-          var vnode2 = h('span', {k: 'span'}, [spanNum(1), h('i', {k: 2}, '2'), spanNum(3)]);
+          var vnode1 = h('span', {k: 'spans'}, ...[1, 2, 3].map(spanNum));
+          var vnode2 = h('span', {k: 'span'}, ...[spanNum(1), h('i', {k: 2}, '2'), spanNum(3)]);
           elm = patch(vnode0, vnode1).elm;
           expect(map(inner, elm.children)).toEqual(['1', '2', '3']);
           elm = patch(vnode1, vnode2).elm;
@@ -308,8 +302,8 @@ describe('renderer', () => {
       describe('removal of elements', () => {
 
         it('removes elements from the beginning', () => {
-          var vnode1 = h('span', 0, [1, 2, 3, 4, 5].map(spanNum));
-          var vnode2 = h('span', 0, [3, 4, 5].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3, 4, 5].map(spanNum));
+          var vnode2 = h('span', null, ...[3, 4, 5].map(spanNum));
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(5);
           elm = patch(vnode1, vnode2).elm;
@@ -317,8 +311,8 @@ describe('renderer', () => {
         });
 
         it('removes elements from the end', () => {
-          var vnode1 = h('span', 0, [1, 2, 3, 4, 5].map(spanNum));
-          var vnode2 = h('span', 0, [1, 2, 3].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3, 4, 5].map(spanNum));
+          var vnode2 = h('span', null, ...[1, 2, 3].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(5);
@@ -332,8 +326,8 @@ describe('renderer', () => {
         });
 
         it('removes elements from the middle', () => {
-          var vnode1 = h('span', 0, [1, 2, 3, 4, 5].map(spanNum));
-          var vnode2 = h('span', 0, [1, 2, 4, 5].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3, 4, 5].map(spanNum));
+          var vnode2 = h('span', null, ...[1, 2, 4, 5].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(5);
@@ -350,8 +344,8 @@ describe('renderer', () => {
         it('removes child svg elements', () => {
           vnode0.elm = mockElement('svg');
 
-          var a = h('svg', {n: SVG_NS}, h('g', 0), h('g', 0));
-          var b = h('svg', {n: SVG_NS}, h('g', 0));
+          var a = h('svg', {n: SVG_NS}, h('g', null), h('g', null));
+          var b = h('svg', {n: SVG_NS}, h('g', null));
 
           var resultA = patch(vnode0, a);
           expect(resultA.elm.childNodes.length).toEqual(2);
@@ -365,8 +359,8 @@ describe('renderer', () => {
       describe('element reordering', () => {
 
         it('moves element forward', () => {
-          var vnode1 = h('span', 0, [1, 2, 3, 4].map(spanNum));
-          var vnode2 = h('span', 0, [2, 3, 1, 4].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3, 4].map(spanNum));
+          var vnode2 = h('span', null, ...[2, 3, 1, 4].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(4);
@@ -393,8 +387,8 @@ describe('renderer', () => {
         });
 
         it('moves element to end', () => {
-          var vnode1 = h('span', 0, [1, 2, 3].map(spanNum));
-          var vnode2 = h('span', 0, [2, 3, 1].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3].map(spanNum));
+          var vnode2 = h('span', null, ...[2, 3, 1].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(3);
@@ -407,8 +401,8 @@ describe('renderer', () => {
         });
 
         it('moves element backwards', () => {
-          var vnode1 = h('span', 0, [1, 2, 3, 4].map(spanNum));
-          var vnode2 = h('span', 0, [1, 4, 2, 3].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3, 4].map(spanNum));
+          var vnode2 = h('span', null, ...[1, 4, 2, 3].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(4);
@@ -422,8 +416,8 @@ describe('renderer', () => {
         });
 
         it('swaps first and last', () => {
-          var vnode1 = h('span', 0, [1, 2, 3, 4].map(spanNum));
-          var vnode2 = h('span', 0, [4, 2, 3, 1].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3, 4].map(spanNum));
+          var vnode2 = h('span', null, ...[4, 2, 3, 1].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(4);
@@ -441,8 +435,8 @@ describe('renderer', () => {
       describe('combinations of additions, removals and reorderings', () => {
 
         it('move to left and replace', () => {
-          var vnode1 = h('span', 0, [1, 2, 3, 4, 5].map(spanNum));
-          var vnode2 = h('span', 0, [4, 1, 2, 3, 6].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 2, 3, 4, 5].map(spanNum));
+          var vnode2 = h('span', null, ...[4, 1, 2, 3, 6].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(5);
@@ -457,8 +451,8 @@ describe('renderer', () => {
         });
 
         it('moves to left and leaves hole', () => {
-          var vnode1 = h('span', 0, [1, 4, 5].map(spanNum));
-          var vnode2 = h('span', 0, [4, 6].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 4, 5].map(spanNum));
+          var vnode2 = h('span', null, ...[4, 6].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(3);
@@ -468,8 +462,8 @@ describe('renderer', () => {
         });
 
         it('handles moved and set to undefined element ending at the end', () => {
-          var vnode1 = h('span', 0, [2, 4, 5].map(spanNum));
-          var vnode2 = h('span', 0, [4, 5, 3].map(spanNum));
+          var vnode1 = h('span', null, ...[2, 4, 5].map(spanNum));
+          var vnode2 = h('span', null, ...[4, 5, 3].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.children.length).toEqual(3);
@@ -482,8 +476,8 @@ describe('renderer', () => {
         });
 
         it('moves a key in non-keyed nodes with a size up', () => {
-          var vnode1 = h('span', 0, [1, 'a', 'b', 'c'].map(spanNum));
-          var vnode2 = h('span', 0, ['d', 'a', 'b', 'c', 1, 'e'].map(spanNum));
+          var vnode1 = h('span', null, ...[1, 'a', 'b', 'c'].map(spanNum));
+          var vnode2 = h('span', null, ...['d', 'a', 'b', 'c', 1, 'e'].map(spanNum));
 
           elm = patch(vnode0, vnode1).elm;
           expect(elm.childNodes.length).toEqual(4);
@@ -497,8 +491,8 @@ describe('renderer', () => {
       });
 
       it('reverses elements', () => {
-        var vnode1 = h('span', 0, [1, 2, 3, 4, 5, 6, 7, 8].map(spanNum));
-        var vnode2 = h('span', 0, [8, 7, 6, 5, 4, 3, 2, 1].map(spanNum));
+        var vnode1 = h('span', null, ...[1, 2, 3, 4, 5, 6, 7, 8].map(spanNum));
+        var vnode2 = h('span', null, ...[8, 7, 6, 5, 4, 3, 2, 1].map(spanNum));
 
         elm = patch(vnode0, vnode1).elm;
         expect(elm.children.length).toEqual(8);
@@ -508,8 +502,8 @@ describe('renderer', () => {
       });
 
       it('something', () => {
-        var vnode1 = h('span', 0, [0, 1, 2, 3, 4, 5].map(spanNum));
-        var vnode2 = h('span', 0, [4, 3, 2, 1, 5, 0].map(spanNum));
+        var vnode1 = h('span', null, ...[0, 1, 2, 3, 4, 5].map(spanNum));
+        var vnode2 = h('span', null, ...[4, 3, 2, 1, 5, 0].map(spanNum));
 
         elm = patch(vnode0, vnode1).elm;
         expect(elm.children.length).toEqual(6);
@@ -530,7 +524,7 @@ describe('renderer', () => {
         }
 
         for (n = 0; n < samples; ++n) {
-          var vnode1 = h('span', 0, arr.map(function(n) {
+          var vnode1 = h('span', null, ...arr.map(function(n) {
             return spanNumWithOpacity(n, '1');
           }));
 
@@ -544,7 +538,7 @@ describe('renderer', () => {
             opacities[i] = Math.random().toFixed(5).toString();
           }
 
-          var vnode2 = h('span', 0, arr.map(function(n) {
+          var vnode2 = h('span', null, ...arr.map(function(n) {
             return spanNumWithOpacity(shufArr[n], opacities[n]);
           }));
 
@@ -557,8 +551,8 @@ describe('renderer', () => {
       });
 
       it('supports null/undefined children', () => {
-        var vnode1 = h('i', 0, [0, 1, 2, 3, 4, 5].map(spanNum));
-        var vnode2 = h('i', 0, [null, 2, undefined, null, 1, 0, null, 5, 4, null, 3, undefined].map(spanNum));
+        var vnode1 = h('i', null, ...[0, 1, 2, 3, 4, 5].map(spanNum));
+        var vnode2 = h('i', null, ...[null, 2, undefined, null, 1, 0, null, 5, 4, null, 3, undefined].map(spanNum));
 
         elm = patch(vnode0, vnode1).elm;
         expect(elm.children.length).toEqual(6);
@@ -568,9 +562,9 @@ describe('renderer', () => {
       });
 
       it('supports all null/undefined children', () => {
-        var vnode1 = h('i', 0, [0, 1, 2, 3, 4, 5].map(spanNum));
-        var vnode2 = h('i', 0, [null, null, undefined, null, null, undefined]);
-        var vnode3 = h('i', 0, [5, 4, 3, 2, 1, 0].map(spanNum));
+        var vnode1 = h('i', null, ...[0, 1, 2, 3, 4, 5].map(spanNum));
+        var vnode2 = h('i', null, ...[null, null, undefined, null, null, undefined]);
+        var vnode3 = h('i', null, ...[5, 4, 3, 2, 1, 0].map(spanNum));
 
         patch(vnode0, vnode1);
 
@@ -595,7 +589,7 @@ describe('renderer', () => {
           }
 
           shuffle(arr);
-          vnode2 = h('div', 0, arr.map(spanNum));
+          vnode2 = h('div', null, ...arr.map(spanNum));
 
           elm = patch(vnode1, vnode2).elm;
           expect(map(inner, elm.children)).toEqual(arr.filter(function(x) {return x != null; }));
@@ -606,8 +600,8 @@ describe('renderer', () => {
     describe('updating children without keys', () => {
 
       it('appends elements', () => {
-        var vnode1 = h('div', 0, h('span', 0, 'Hello'));
-        var vnode2 = h('div', 0, h('span', 0, 'Hello'), h('span', 0, 'World'));
+        var vnode1 = h('div', null, h('span', null, 'Hello'));
+        var vnode2 = h('div', null, h('span', null, 'Hello'), h('span', null, 'World'));
 
         elm = patch(vnode0, vnode1).elm;
         expect(map(inner, elm.children)).toEqual(['Hello']);
@@ -617,11 +611,11 @@ describe('renderer', () => {
       });
 
       it('handles unmoved text nodes', () => {
-        var vnode1 = h('div', 0, [
+        var vnode1 = h('div', null, ...[
           'Text',
-          h('span', 0, 'Span')
+          h('span', null, 'Span')
         ]);
-        var vnode2 = h('div', 0, ['Text', h('span', 0, 'Span')]);
+        var vnode2 = h('div', null, ...['Text', h('span', null, 'Span')]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(elm.childNodes[0].textContent).toEqual('Text');
@@ -631,8 +625,8 @@ describe('renderer', () => {
       });
 
       it('handles changing text children', () => {
-        var vnode1 = h('div', 0, ['Text', h('span', 0, 'Span')]);
-        var vnode2 = h('div', 0, ['Text2', h('span', 0, 'Span')]);
+        var vnode1 = h('div', null, ...['Text', h('span', null, 'Span')]);
+        var vnode2 = h('div', null, ...['Text2', h('span', null, 'Span')]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(elm.childNodes[0].textContent).toEqual('Text');
@@ -642,8 +636,8 @@ describe('renderer', () => {
       });
 
       it('prepends element', () => {
-        var vnode1 = h('div', 0, [h('span', 0, 'World')]);
-        var vnode2 = h('div', 0, [h('span', 0, 'Hello'), h('span', 0, 'World')]);
+        var vnode1 = h('div', null, ...[h('span', null, 'World')]);
+        var vnode2 = h('div', null, ...[h('span', null, 'Hello'), h('span', null, 'World')]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(map(inner, elm.children)).toEqual(['World']);
@@ -653,8 +647,8 @@ describe('renderer', () => {
       });
 
       it('prepends element of different tag type', () => {
-        var vnode1 = h('div', 0, [h('span', 0, 'World')]);
-        var vnode2 = h('div', 0, [h('div', 0, 'Hello'), h('span', 0, 'World')]);
+        var vnode1 = h('div', null, ...[h('span', null, 'World')]);
+        var vnode2 = h('div', null, ...[h('div', null, 'Hello'), h('span', null, 'World')]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(map(inner, elm.children)).toEqual(['World']);
@@ -665,8 +659,8 @@ describe('renderer', () => {
       });
 
       it('removes elements', () => {
-        var vnode1 = h('div', 0, [h('span', 0, 'One'), h('span', 0, 'Two'), h('span', 0, 'Three')]);
-        var vnode2 = h('div', 0, [h('span', 0, 'One'), h('span', 0, 'Three')]);
+        var vnode1 = h('div', null, ...[h('span', null, 'One'), h('span', null, 'Two'), h('span', null, 'Three')]);
+        var vnode2 = h('div', null, ...[h('span', null, 'One'), h('span', null, 'Three')]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(map(inner, elm.children)).toEqual(['One', 'Two', 'Three']);
@@ -676,8 +670,8 @@ describe('renderer', () => {
       });
 
       it('removes a single text node', () => {
-        var vnode1 = h('div', 0, 'One');
-        var vnode2 = h('div', 0);
+        var vnode1 = h('div', null, 'One');
+        var vnode2 = h('div', null);
 
         elm = patch(vnode0, vnode1).elm;
         expect(elm.textContent).toEqual('One');
@@ -687,8 +681,8 @@ describe('renderer', () => {
       });
 
       it('removes a single text node when children are updated', () => {
-        var vnode1 = h('div', 0, 'One');
-        var vnode2 = h('div', 0, [ h('div', 0, 'Two'), h('span', 0, 'Three') ]);
+        var vnode1 = h('div', null, 'One');
+        var vnode2 = h('div', null, ...[ h('div', null, 'Two'), h('span', null, 'Three') ]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(elm.textContent).toEqual('One');
@@ -698,10 +692,10 @@ describe('renderer', () => {
       });
 
       it('should replace elements created with Array().map with text', () => {
-        var a = Array.from(Array(2)).map(() => h('div', 0, 'a'));
+        var a = Array.from(Array(2)).map(() => h('div', null, 'a'));
 
-        var vnode1 = h('span', 0, a);
-        var vnode2 = h('span', 0, 'just text');
+        var vnode1 = h('span', null, ...a);
+        var vnode2 = h('span', null, 'just text');
 
         elm = patch(vnode0, vnode1).elm;
 
@@ -714,8 +708,8 @@ describe('renderer', () => {
       });
 
       it('removes a text node among other elements', () => {
-        var vnode1 = h('div', 0, [ 'One', h('span', 0, 'Two') ]);
-        var vnode2 = h('div', 0, [ h('div', 0, 'Three')]);
+        var vnode1 = h('div', null, ...[ 'One', h('span', null, 'Two') ]);
+        var vnode2 = h('div', null, ...[ h('div', null, 'Three')]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(map(prop('textContent'), elm.childNodes)).toEqual(['One', 'Two']);
@@ -728,8 +722,8 @@ describe('renderer', () => {
       });
 
       it('reorders elements', () => {
-        var vnode1 = h('div', 0, [h('span', 0, 'One'), h('div', 0, 'Two'), h('b', 0, 'Three')]);
-        var vnode2 = h('div', 0, [h('b', 0, 'Three'), h('span', 0, 'One'), h('div', 0, 'Two')]);
+        var vnode1 = h('div', null, ...[h('span', null, 'One'), h('div', null, 'Two'), h('b', null, 'Three')]);
+        var vnode2 = h('div', null, ...[h('b', null, 'Three'), h('span', null, 'One'), h('div', null, 'Two')]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(map(inner, elm.children)).toEqual(['One', 'Two', 'Three']);
@@ -740,9 +734,9 @@ describe('renderer', () => {
       });
 
       it('supports null/undefined children', () => {
-        var vnode1 = h('i', 0, [null, h('i', 0, '1'), h('i', 0, '2'), null]);
-        var vnode2 = h('i', 0, [h('i', 0, '2'), undefined, undefined, h('i', 0, '1'), undefined]);
-        var vnode3 = h('i', 0, [null, h('i', 0, '1'), undefined, null, h('i', 0, '2'), undefined, null]);
+        var vnode1 = h('i', null, ...[null, h('i', null, '1'), h('i', null, '2'), null]);
+        var vnode2 = h('i', null, ...[h('i', null, '2'), undefined, undefined, h('i', null, '1'), undefined]);
+        var vnode3 = h('i', null, ...[null, h('i', null, '1'), undefined, null, h('i', null, '2'), undefined, null]);
 
         elm = patch(vnode0, vnode1).elm;
         expect(map(inner, elm.children)).toEqual(['1', '2']);
@@ -755,9 +749,9 @@ describe('renderer', () => {
       });
 
       it('supports all null/undefined children', () => {
-        var vnode1 = h('i', 0, [h('i', 0, '1'), h('i', 0, '2')]);
-        var vnode2 = h('i', 0, [null, 0, undefined]);
-        var vnode3 = h('i', 0, [h('i', 0, '2'), h('i', 0, '1')]);
+        var vnode1 = h('i', null, ...[h('i', null, '1'), h('i', null, '2')]);
+        var vnode2 = h('i', null, ...[null, null, undefined]);
+        var vnode3 = h('i', null, ...[h('i', null, '2'), h('i', null, '1')]);
 
         patch(vnode0, vnode1);
 

@@ -212,7 +212,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
           oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
         }
 
-        idxInOld = oldKeyToIdx[newStartVnode.vattrs.key];
+        idxInOld = oldKeyToIdx[newStartVnode.vkey];
 
         if (isUndef(idxInOld)) {
           // new element
@@ -253,7 +253,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   function isSameVnode(vnode1: VNode, vnode2: VNode) {
     // compare if two vnode to see if they're "technically" the same
     // need to have the same element tag, and same key to be the same
-    return vnode1.vtag === vnode2.vtag && vnode1.vattrs.key === vnode2.vattrs.key;
+    return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
   }
 
   function createKeyToOldIdx(children: VNode[], beginIdx: number, endIdx: number) {
@@ -262,7 +262,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     for (i = beginIdx; i <= endIdx; ++i) {
       ch = children[i];
       if (ch != null) {
-        key = ch.vattrs.key;
+        key = ch.vkey;
         if (key !== undefined) {
           map.k = i;
         }
@@ -276,6 +276,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     const elm: HostElement = newVnode.elm = <any>oldVnode.elm;
     const oldChildren = oldVnode.vchildren;
     const newChildren = newVnode.vchildren;
+
+    isSvgMode = newVnode.elm.parentElement !== null && (newVnode.elm as SVGElement).ownerSVGElement !== undefined;
 
     if (isUndef(newVnode.vtext)) {
       // element node
@@ -327,7 +329,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
 
   return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, ssrPatchId?: number) {
-    isSvgMode = newVnode.elm.parentElement !== null && (newVnode.elm as SVGElement).ownerSVGElement !== undefined;
+
 
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally

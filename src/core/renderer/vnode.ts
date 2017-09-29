@@ -7,6 +7,7 @@ export class VNode implements IVNode {
   vchildren: VNode[];
 
   vattrs: any;
+  vkey: string | number;
 
   elm: Element|Node;
   assignedListener: any;

@@ -148,12 +148,12 @@ describe('h()', () => {
 
   it('should add key string', () => {
     var vnode = h('div', { key: 'my-key' });
-    expect(vnode.vattrs.key).toBe('my-key');
+    expect(vnode.vkey).toBe('my-key');
   });
 
   it('should add key number', () => {
     var vnode = h('div', { key: 88 });
-    expect(vnode.vattrs.key).toBe(88);
+    expect(vnode.vkey).toBe(88);
   });
 
   it('can create vnode with proper tag', () => {
