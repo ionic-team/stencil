@@ -106,6 +106,10 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMet
   // if the component doesn't even have slots then we'll skip over all of this code
   const childNodes = elm.childNodes;
 
+  if (slotMeta && !elm.$defaultHolder) {
+    domApi.$insertBefore(elm, (elm.$defaultHolder = domApi.$createComment('')), childNodes[0]);
+  }
+
   if (slotMeta === HAS_NAMED_SLOTS) {
     // looks like this component has named slots
     // so let's loop through each of the childNodes to the host element

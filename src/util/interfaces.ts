@@ -790,6 +790,7 @@ export interface HostElement extends HTMLElement {
 
   // public properties
   $instance?: ComponentInstance;
+  $defaultHolder?: Comment;
   mode?: string;
   color?: string;
 

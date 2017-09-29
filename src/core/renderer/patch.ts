@@ -121,6 +121,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   }
 
   function addVnodes(parentElm: Node, before: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
+    const containerElm = ((parentElm as HostElement).$defaultHolder && (parentElm as HostElement).$defaultHolder.parentNode) || parentElm;
     let childNode: Node;
 
     for (; startIdx <= endIdx; ++startIdx) {
@@ -136,7 +137,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
         if (isDef(childNode)) {
           vnodeChild.elm = childNode;
-          domApi.$insertBefore(parentElm, childNode, before);
+          domApi.$insertBefore(containerElm, childNode, before);
         }
       }
     }
