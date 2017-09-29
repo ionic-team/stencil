@@ -11,7 +11,7 @@
     "build.server": "npm run transpile.server && node scripts/build-server.js",
     "build.testing-util": "npm run transpile.testing-util && node scripts/build-testing-util.js",
     "clean": "rimraf dist/",
-    "deploy": "cd dist/ np",
+    "deploy": "cd dist/ && np",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
     "test.watch": "jest --watch",
