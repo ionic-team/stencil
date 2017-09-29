@@ -1,14 +1,13 @@
 import { PlatformApi, VNode } from '../../util/interfaces';
 
 
-const EMPTY: any = {};
 let DEFAULT_OPTS: any = null;
 
 export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean): void {
   let name;
   const elm = newVnode.elm as any;
-  const oldVnodeAttrs = (oldVnode != null && oldVnode.vattrs != null) ? oldVnode.vattrs : EMPTY;
-  const newVnodeAttrs = (newVnode.vattrs != null) ? newVnode.vattrs : EMPTY;
+  const oldVnodeAttrs = (oldVnode != null && oldVnode.vattrs != null) ? oldVnode.vattrs : {};
+  const newVnodeAttrs = (newVnode.vattrs != null) ? newVnode.vattrs : {};
 
   // remove attributes no longer present on the vnode by setting them to undefined
   for (name in oldVnodeAttrs) {
