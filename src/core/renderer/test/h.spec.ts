@@ -96,7 +96,6 @@ describe('h()', () => {
 
   it('should add multiple classes from string, w/ extra whitespace', () => {
     var vnode = h('div', { class: '  dragons   love  tacos  ' });
-    console.log(vnode);
     expect(vnode.vattrs.class).toBeDefined();
     expect(Object.keys(vnode.vattrs.class).length).toBe(3);
     expect(vnode.vattrs.class['dragons']).toBe(true);

@@ -19,9 +19,9 @@ describe('event listeners', () => {
 
     function clicked(ev: UIEvent) { result.push(ev); }
 
-    var vnode = h('div', { o: {click: clicked} }, [
-      h('a', 'Click my parent'),
-    ]);
+    var vnode = h('div', { onclick: clicked },
+      h('a', 'Click my parent')
+    );
 
     elm = patch(vnode0, vnode).elm;
     elm.click();
@@ -32,13 +32,13 @@ describe('event listeners', () => {
   it('does not attach new listener', () => {
     const result: any[] = [];
 
-    var vnode1 = h('div', {o: {click: () => { result.push(1); }}}, [
+    var vnode1 = h('div', { onclick: () => { result.push(1); } },
       h('a', 'Click my parent'),
-    ]);
+    );
 
-    var vnode2 = h('div', {o: {click: () => { result.push(2); }}}, [
+    var vnode2 = h('div', { onclick: () => { result.push(2); } },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
@@ -55,9 +55,9 @@ describe('event listeners', () => {
 
     function clicked(ev: UIEvent) { result.push(ev); }
 
-    var vnode = h('div', {o: {click: [clicked, 1]}}, [
+    var vnode = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode).elm;
     elm.click();
@@ -70,17 +70,17 @@ describe('event listeners', () => {
 
     function clicked(ev: UIEvent) { result.push(ev); }
 
-    var vnode1 = h('div', {o: {click: [clicked, 1]}}, [
+    var vnode1 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
-    var vnode2 = h('div', {o: {click: [clicked, 2]}}, [
+    var vnode2 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
-    var vnode3 = h('div', {o: {click: [clicked, 3]}}, [
+    var vnode3 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
@@ -101,17 +101,17 @@ describe('event listeners', () => {
 
     function clicked() { result.push([].slice.call(arguments, 0, arguments.length - 2)); }
 
-    var vnode1 = h('div', {o: {click: [clicked, 1, 2, 3]}}, [
+    var vnode1 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
-    var vnode2 = h('div', {o: {click: [clicked, 1, 2]}}, [
+    var vnode2 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
-    var vnode3 = h('div', {o: {click: [clicked, 2, 3]}}, [
+    var vnode3 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
@@ -138,9 +138,9 @@ describe('event listeners', () => {
 
     function clicked(ev: UIEvent) { result.push(ev); }
 
-    var vnode1 = h('div', {o: {click: clicked}}, [
+    var vnode1 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
@@ -148,9 +148,9 @@ describe('event listeners', () => {
 
     expect(result.length).toBe(2);
 
-    var vnode2 = h('div', {o: {}}, [
+    var vnode2 = h('div', {o: {}},
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode1, vnode2).elm;
     elm.click();
@@ -164,18 +164,18 @@ describe('event listeners', () => {
 
     function clicked(ev: UIEvent) { result.push(ev); }
 
-    var vnode1 = h('div', {o: {click: [[clicked], [clicked], [clicked]]}}, [
+    var vnode1 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
 
     expect(result.length).toBe(3);
 
-    var vnode2 = h('div', {o: {click: [[clicked], [clicked]]}}, [
+    var vnode2 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode1, vnode2).elm;
     elm.click();
@@ -194,9 +194,9 @@ describe('event listeners', () => {
       result.push(vnode);
     }
 
-    var vnode1 = h('div', {o: {click: clicked }}, [
+    var vnode1 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
@@ -220,9 +220,9 @@ describe('event listeners', () => {
       result.push(vnode);
     }
 
-    var vnode1 = h('div', {o: {click: [clicked, 'my-arg'] }}, [
+    var vnode1 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
@@ -248,9 +248,9 @@ describe('event listeners', () => {
       result.push(vnode);
     }
 
-    var vnode1 = h('div', {o: {click: [clicked, 88, 'mph'] }}, [
+    var vnode1 = h('div', { onclick: clicked },
       h('a', 'Click my parent'),
-    ]);
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();
@@ -267,15 +267,13 @@ describe('event listeners', () => {
   it('shared handlers in parent and child nodes', () => {
     const result: any[] = [];
 
-    var sharedHandlers = {
-      click: function(ev: any) {
-        result.push(ev);
-      }
-    };
+    function click(ev: any) {
+      result.push(ev);
+    }
 
-    var vnode1 = h('div', {o: sharedHandlers}, [
-      h('a', {o: sharedHandlers}, 'Click my parent'),
-    ]);
+    var vnode1 = h('div', { onclick: click },
+      h('a', { onclick: click }, 'Click my parent'),
+    );
 
     elm = patch(vnode0, vnode1).elm;
     elm.click();

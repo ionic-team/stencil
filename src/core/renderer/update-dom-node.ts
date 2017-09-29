@@ -100,19 +100,26 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
 
   // Element Attributes
   } else {
-    let ns = isSvg && (name !== (name = name.replace(/^xlink\:?/, '')));
+    let nsXlink = (name !== (name = name.replace(/^xlink\:?/, '')));
+    let nsXml = (name !== (name = name.replace(/^xml\:?/, '')));
 
-    if (newValue === null || newValue === false) {
-      if (ns) {
-        elm.removeAttributeNS('http://www.w3.org/1999/xlink', name.toLowerCase());
+    if (BOOLEAN_ATTRS[name] === 1 && (!newValue || newValue === 'false')) {
+      if (nsXlink) {
+        elm.removeAttributeNS(XLINK_NS, name.toLowerCase());
+
+      } else if (nsXml) {
+        elm.removeAttributeNS(XML_NS, name.toLowerCase());
 
       } else {
         elm.removeAttribute(name);
       }
 
     } else if (typeof newValue !== 'function') {
-      if (ns) {
-        elm.setAttributeNS('http://www.w3.org/1999/xlink', name.toLowerCase(), newValue);
+      if (nsXlink) {
+        elm.setAttributeNS(XLINK_NS, name.toLowerCase(), newValue);
+
+      } else if (nsXml) {
+        elm.setAttributeNS(XML_NS, name.toLowerCase(), newValue);
 
       } else {
         elm.setAttribute(name, newValue);
@@ -138,3 +145,25 @@ function setProperty(elm: any, name: string, value: any) {
 export function eventProxy(this: any, e: Event) {
   return (this as any)._listeners[e.type](e);
 }
+
+const BOOLEAN_ATTRS: any = {
+  'allowfullscreen': 1,
+  'async': 1,
+  'autofocus': 1,
+  'autoplay': 1,
+  'checked': 1,
+  'controls': 1,
+  'disabled': 1,
+  'enabled': 1,
+  'formnovalidate': 1,
+  'hidden': 1,
+  'multiple': 1,
+  'noresize': 1,
+  'readonly': 1,
+  'required': 1,
+  'selected': 1,
+  'spellcheck': 1,
+};
+
+const XLINK_NS = 'http://www.w3.org/1999/xlink';
+var XML_NS = 'http://www.w3.org/XML/1998/namespace';

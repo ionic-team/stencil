@@ -85,7 +85,6 @@ describe('renderer', () => {
     it('changes the elements classes', () => {
       var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
       var vnode2 = h('i', { class: {i: true, am: true, horse: false } });
-      console.log(patch(vnode0, vnode1).elm.classList);
       elm = patch(vnode1, vnode2).elm;
       expect(elm.classList.contains('i')).toBeTruthy();
       expect(elm.classList.contains('am')).toBeTruthy();

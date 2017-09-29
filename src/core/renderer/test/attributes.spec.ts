@@ -2,6 +2,14 @@ import { h } from '../h';
 import { mockRenderer, mockElement } from '../../../testing/mocks';
 import { VNode } from '../vnode';
 
+function printAttributes(attrs: any) {
+  let output = '';
+  for (var i = attrs.length - 1; i >= 0; i -= 1) {
+    output += attrs[i].name + '->' + attrs[i].value + '\n';
+  }
+  return output;
+}
+
 
 describe('attributes', function() {
   const patch = mockRenderer();
@@ -15,17 +23,17 @@ describe('attributes', function() {
   });
 
   it('have their provided values', function() {
-    var vnode1 = h('div', {a: {href: '/foo', minlength: 1, value: true}});
+    var vnode1 = h('div', { href: '/foo', minlength: 1, value: true });
     elm = patch(vnode0, vnode1).elm;
     expect(elm.getAttribute('href')).toEqual('/foo');
     expect(elm.getAttribute('minlength')).toEqual('1');
     expect(elm.getAttribute('value')).toEqual('true');
   });
 
-  it('can be memoized', function() {
-    var cachedAttrs = {href: '/foo', minlength: 1, value: true};
-    var vnode1 = h('div', {a: cachedAttrs});
-    var vnode2 = h('div', {a: cachedAttrs});
+  it('can be memoized', async function() {
+    var cachedAttrs = { href: '/foo', minlength: 1, value: true };
+    var vnode1 = h('div', cachedAttrs);
+    var vnode2 = h('div', cachedAttrs);
     elm = patch(vnode0, vnode1).elm;
     expect(elm.getAttribute('href')).toEqual('/foo');
     expect(elm.getAttribute('minlength')).toEqual('1');
@@ -37,7 +45,7 @@ describe('attributes', function() {
   });
 
   it('are not omitted when falsy values are provided', function() {
-    var vnode1 = h('div', {a: {href: null, minlength: 0, value: false}});
+    var vnode1 = h('div', {href: null, minlength: 0, value: false });
     elm = patch(vnode0, vnode1).elm;
     expect(elm.getAttribute('href')).toEqual('null');
     expect(elm.getAttribute('minlength')).toEqual('0');
@@ -45,7 +53,7 @@ describe('attributes', function() {
   });
 
   it('are set correctly when namespaced', function() {
-    var vnode1 = h('div', {a: {'xlink:href': '#foo'}});
+    var vnode1 = h('div', { 'xlink:href': '#foo' });
     elm = patch(vnode0, vnode1).elm;
     expect(elm.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).toEqual('#foo');
   });
@@ -55,7 +63,7 @@ describe('attributes', function() {
     elm.id = 'myId';
     elm.className = 'myClass';
     vnode0.elm = elm;
-    var vnode1 = h('div', {a: {}}, 'Hello');
+    var vnode1 = h('div', null, 'Hello');
     elm = patch(vnode0, vnode1).elm;
     expect(elm.tagName).toEqual('DIV');
     expect(elm.id).toEqual('myId');
@@ -65,65 +73,53 @@ describe('attributes', function() {
 
   describe('boolean attribute', function() {
 
-    it('is present and empty string if the value is truthy', function() {
-      var vnode1 = h('div', {a: {required: true, readonly: 1, noresize: 'truthy'}});
+    it('is present if the value is truthy', function() {
+      var vnode1 = h('div', { required: true, readonly: 1, noresize: 'truthy' });
       elm = patch(vnode0, vnode1).elm;
       expect(elm.hasAttribute('required')).toEqual(true);
-      expect(elm.getAttribute('required')).toEqual('');
+      expect(elm.getAttribute('required')).toEqual('true');
       expect(elm.hasAttribute('readonly')).toEqual(true);
-      expect(elm.getAttribute('readonly')).toEqual('');
+      expect(elm.getAttribute('readonly')).toEqual('1');
       expect(elm.hasAttribute('noresize')).toEqual(true);
-      expect(elm.getAttribute('noresize')).toEqual('');
+      expect(elm.getAttribute('noresize')).toEqual('truthy');
     });
 
     it('is omitted if the value is falsy', function() {
-      var vnode1 = h('div', {a: {required: false, readonly: 0, noresize: null}});
+      var vnode1 = h('div', { required: false, readonly: 'false', noresize: null });
       elm = patch(vnode0, vnode1).elm;
       expect(elm.getAttribute('required')).toEqual(null);
       expect(elm.getAttribute('readonly')).toEqual(null);
       expect(elm.getAttribute('noresize')).toEqual(null);
     });
-
-  });
-
-  describe('Object.prototype property', function() {
-    it('is not considered as a boolean attribute and shouldn\'t be omitted', function() {
-      var vnode1 = h('div', {a: {constructor: true}});
-      elm = patch(vnode0, vnode1).elm;
-      expect(elm.getAttribute('constructor')).toEqual('true');
-      var vnode2 = h('div', {a: {constructor: false}});
-      elm = patch(vnode0, vnode2).elm;
-      expect(elm.getAttribute('constructor')).toEqual('false');
-    });
   });
 
   describe('svg', function () {
 
-    it('adds correctly xlink namespaced attribute', function(){
+    it('adds correctly xlink namespaced attribute', function() {
       var xlinkNS = 'http://www.w3.org/1999/xlink';
       var testUrl = '/test';
-      var a = h('svg', {}, [
+      var a = h('svg', {},
         h('div', {
-          a: { 'xlink:href': testUrl }
-        }, [])
-      ]);
+          'xlink:href': testUrl
+        })
+      );
 
       vnode0.elm = mockElement('svg');
       var result: any = patch(vnode0, a).elm;
       expect(result.childNodes.length).toEqual(1);
-      expect(result.childNodes[0].getAttribute('xlink:href')).toEqual(testUrl);
+      expect(result.childNodes[0].getAttribute('href')).toEqual(testUrl);
       expect(result.childNodes[0].getAttributeNS(xlinkNS, 'href')).toEqual(testUrl);
     });
 
-    it('adds correctly xml namespaced attribute', function(){
+    it('adds correctly xml namespaced attribute', function() {
       var xmlNS = 'http://www.w3.org/XML/1998/namespace';
       var testAttrValue = 'und';
-      var a = h('svg', { a: { 'xml:lang': testAttrValue } }, []);
+      var a = h('svg', { 'xml:lang': testAttrValue });
 
       vnode0.elm = mockElement('svg');
       var result: any = patch(vnode0, a).elm;
       expect(result.getAttributeNS(xmlNS, 'lang')).toEqual(testAttrValue);
-      expect(result.getAttribute('xml:lang')).toEqual(testAttrValue);
+      expect(result.getAttribute('lang')).toEqual(testAttrValue);
     });
   });
 
