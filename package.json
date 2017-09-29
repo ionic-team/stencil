@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.0.6-3",
+  "version": "0.0.6-4",
   "license": "MIT",
   "scripts": {
     "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing-util && npm run build.cli-util && npm run build.package",
@@ -11,12 +11,11 @@
     "build.server": "npm run transpile.server && node scripts/build-server.js",
     "build.testing-util": "npm run transpile.testing-util && node scripts/build-testing-util.js",
     "clean": "rimraf dist/",
-    "deploy": "cd dist/ && np",
+    "deploy": "cd dist/ && np && node ../scripts/post-publish.js",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
     "test.watch": "jest --watch",
     "prepublishOnly": "npm run build",
-    "postpublish": "node scripts/post-publish.js",
     "transpile": "npm run transpile.compiler && npm run transpile.core",
     "transpile.compiler": "tsc -p src/compiler/tsconfig.json",
     "transpile.core": "tsc -p src/tsconfig.json",
