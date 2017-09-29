@@ -277,7 +277,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     const oldChildren = oldVnode.vchildren;
     const newChildren = newVnode.vchildren;
 
-    isSvgMode = newVnode.elm.parentElement !== null && (newVnode.elm as SVGElement).ownerSVGElement !== undefined;
+    isSvgMode = newVnode.elm && newVnode.elm.parentElement != null && (newVnode.elm as SVGElement).ownerSVGElement !== undefined;
+    isSvgMode = newVnode.vtag === 'svg' ? true : (newVnode.vtag === 'foreignObject' ? false : isSvgMode);
 
     if (isUndef(newVnode.vtext)) {
       // element node

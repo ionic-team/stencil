@@ -42,27 +42,6 @@ describe('renderer', () => {
       expect(elm.tagName).toEqual('DIV');
     });
 
-    it('should automatically get svg namespace', function() {
-      var SVGNamespace = 'http://www.w3.org/2000/svg';
-      var XHTMLNamespace = 'http://www.w3.org/1999/xhtml';
-
-      const svgElm = mockElement('svg');
-
-      elm = patch(svgElm, h('svg', [
-        h('foreignObject', [
-          h('div', ['I am HTML embedded in SVG'])
-        ])
-      ])).elm;
-
-      expect(elm.namespaceURI).toEqual(SVGNamespace);
-      expect(elm.firstChild.namespaceURI).toEqual(SVGNamespace);
-      expect(elm.firstChild.firstChild.namespaceURI).toEqual(XHTMLNamespace);
-
-      // verify that svg tag with extra selectors gets svg namespace
-      elm = patch(svgElm, h('svg', null)).elm;
-      expect(elm.namespaceURI).toEqual(SVGNamespace);
-    });
-
     it('receives css classes', () => {
       let vnode1 = h('div', null, h('i', { class: { i: true, am: true, a: true, 'class': true } }));
       elm = patch(vnode0, vnode1).elm;
@@ -77,7 +56,6 @@ describe('renderer', () => {
       elm = patch(vnode0, h('div', null, 'I am a string')).elm;
       expect(elm.innerHTML).toEqual('I am a string');
     });
-
   });
 
   describe('patching an element', () => {
@@ -85,7 +63,8 @@ describe('renderer', () => {
     it('changes the elements classes', () => {
       var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
       var vnode2 = h('i', { class: {i: true, am: true, horse: false } });
-      elm = patch(vnode1, vnode2).elm;
+      patch(vnode0, vnode1);
+      elm = patch(vnode0, vnode2).elm;
       expect(elm.classList.contains('i')).toBeTruthy();
       expect(elm.classList.contains('am')).toBeTruthy();
       expect(!elm.classList.contains('horse')).toBeTruthy();

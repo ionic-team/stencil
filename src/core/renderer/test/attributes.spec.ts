@@ -2,14 +2,6 @@ import { h } from '../h';
 import { mockRenderer, mockElement } from '../../../testing/mocks';
 import { VNode } from '../vnode';
 
-function printAttributes(attrs: any) {
-  let output = '';
-  for (var i = attrs.length - 1; i >= 0; i -= 1) {
-    output += attrs[i].name + '->' + attrs[i].value + '\n';
-  }
-  return output;
-}
-
 
 describe('attributes', function() {
   const patch = mockRenderer();
