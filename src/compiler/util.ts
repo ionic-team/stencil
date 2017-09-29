@@ -293,9 +293,9 @@ export function isHtmlFile(filePath: string) {
 
 export function isWebDevFile(filePath: string) {
   const ext = filePath.split('.').pop().toLowerCase();
-  return WEB_DEV_EXT.indexOf(ext) > -1;
+  return (WEB_DEV_EXT.indexOf(ext) > -1 || isTsFile(filePath));
 }
-const WEB_DEV_EXT = ['ts', 'tsx', 'js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
+const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
 
 
 export function generatePreamble(config: BuildConfig) {

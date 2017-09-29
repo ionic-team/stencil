@@ -438,6 +438,7 @@ export interface BuildContext {
     global?: string;
     registryJson?: string;
     indexHtml?: string;
+    components_d_ts?: string;
   };
   watcher?: FSWatcher;
   tsConfig?: any;

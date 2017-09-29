@@ -173,6 +173,10 @@ describe('util', () => {
       expect(util.isWebDevFile('foo.sass')).toEqual(true);
     });
 
+    it('should return false for d.ts file', () => {
+      expect(util.isWebDevFile('components.d.ts')).toEqual(false);
+    });
+
     it('should return false for other types of files', () => {
       expect(util.isWebDevFile('foo.txt')).toEqual(false);
     });
