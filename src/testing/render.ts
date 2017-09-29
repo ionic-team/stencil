@@ -1,56 +1,52 @@
-import { BuildConfig, ComponentMeta, ComponentRegistry, HydrateOptions, HydrateResults, PlatformApi } from '../util/interfaces';
-import { hydrateHtml } from '../server/hydrate-html';
+import { BuildConfig, ComponentMeta, ComponentRegistry, HydrateOptions, PlatformApi } from '../util/interfaces';
 import { getBuildContext } from '../compiler/util';
+import { hydrateHtml } from '../server/hydrate-html';
 import { mockLogger, mockStencilSystem } from './mocks';
 import { validateBuildConfig } from '../compiler/build/validation';
 
 
-export function render(opts: RenderTestOptions): Promise<any> {
+export async function render(opts: RenderTestOptions): Promise<any> {
   validateRenderOptions(opts);
 
-  return new Promise((resolve, reject) => {
-    const config = getTestBuildConfig();
-    const ctx = getBuildContext();
-    const results: HydrateResults = { diagnostics: [] };
-    const registry: ComponentRegistry = {};
+  const config = getTestBuildConfig();
+  const ctx = getBuildContext();
+  const registry: ComponentRegistry = {};
 
-    const hydrateOpts: HydrateOptions = {
-      html: opts.html,
-      isPrerender: false,
-      collectAnchors: false,
-      serializeHtml: false,
-      inlineLoaderScript: false,
-      inlineStyles: false,
-      removeUnusedStyles: false,
-      canonicalLink: false,
-      collapseWhitespace: false,
-      ssrIds: false
-    };
+  const hydrateOpts: HydrateOptions = {
+    html: opts.html,
+    isPrerender: false,
+    collectAnchors: false,
+    serializeHtml: false,
+    inlineLoaderScript: false,
+    inlineStyles: false,
+    removeUnusedStyles: false,
+    canonicalLink: false,
+    collapseWhitespace: false,
+    ssrIds: false
+  };
 
-    opts.components.forEach(testCmp => {
-      if (testCmp && testCmp.metadata) {
-        const cmpMeta: ComponentMeta = testCmp.metadata;
-        cmpMeta.componentModule = testCmp;
-        registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
-      }
-    });
-
-    hydrateHtml(config, ctx, registry, hydrateOpts, results, () => {
-      if (results.diagnostics.length) {
-        const msg = results.diagnostics.map(d => d.messageText).join('\n');
-        reject(msg);
-        return;
-      }
-
-      const rootElm = (results.root && results.root.children.length > 1 && results.root.children[1].firstElementChild) || null;
-      if (rootElm) {
-        (rootElm as any).__testPlatform = (results as any).__testPlatform;
-        delete (results as any).__testPlatform;
-      }
-      resolve(rootElm);
-    });
-
+  opts.components.forEach(testCmp => {
+    if (testCmp && testCmp.metadata) {
+      const cmpMeta: ComponentMeta = testCmp.metadata;
+      cmpMeta.componentModule = testCmp;
+      registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
+    }
   });
+
+  const results = await hydrateHtml(config, ctx, registry, hydrateOpts);
+
+  if (results.diagnostics.length) {
+    const msg = results.diagnostics.map(d => d.messageText).join('\n');
+    throw new Error(msg);
+  }
+
+  const rootElm = (results.root && results.root.children.length > 1 && results.root.children[1].firstElementChild) || null;
+  if (rootElm) {
+    (rootElm as any).__testPlatform = (results as any).__testPlatform;
+    delete (results as any).__testPlatform;
+  }
+
+  return rootElm;
 }
 
 

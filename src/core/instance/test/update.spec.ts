@@ -37,7 +37,7 @@ describe('instance update', () => {
 
   });
 
-  it('should render state', (done) => {
+  it('should render state', () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentModule: class {
@@ -52,7 +52,7 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    waitForLoad(plt, node, 'ion-test', (elm) => {
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm._vnode.elm.textContent).toBe('88');
 
       const instance: any = elm.$instance;
@@ -62,13 +62,11 @@ describe('instance update', () => {
 
       plt.$flushQueue(() => {
         expect(elm._vnode.elm.textContent).toBe('99');
-
-        done();
       });
     });
   });
 
-  it('should render text', (done) => {
+  it('should render text', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
@@ -83,14 +81,13 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    waitForLoad(plt, node, 'ion-test', (elm) => {
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.childNodes[0].nodeName).toBe('GRASSHOPPER');
       expect(elm.childNodes[0].textContent).toBe('hi');
-      done();
     });
   });
 
-  it('should not run renderer when no render() fn', (done) => {
+  it('should not run renderer when no render() fn', () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentModule: class {}
@@ -98,13 +95,12 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    waitForLoad(plt, node, 'ion-test', (elm) => {
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm._vnode).toBeUndefined();
-      done();
     });
   });
 
-  it('should create $instance', (done) => {
+  it('should create $instance', () => {
     let createdInstance = false;
     const cmpMeta: ComponentMeta = {
       tagNameMeta: 'ion-test',
@@ -118,9 +114,8 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    waitForLoad(plt, node, 'ion-test', (elm) => {
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.$instance).toBeDefined();
-      done();
     });
   });
 

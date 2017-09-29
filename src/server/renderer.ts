@@ -1,6 +1,6 @@
 import * as interfaces from '../util/interfaces';
+import { buildError, getBuildContext } from '../compiler/util';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
-import { getBuildContext } from '../compiler/util';
 import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
@@ -21,48 +21,21 @@ export function createRenderer(config: interfaces.BuildConfig, registry?: interf
 
   // overload with two options for hydrateToString
   // one that returns a promise, and one that takes a callback as the last arg
-  function hydrateToString(hydrateOpts: interfaces.HydrateOptions): Promise<interfaces.HydrateResults>;
-  function hydrateToString(hydrateOpts: interfaces.HydrateOptions, callback: (hydrateResults: interfaces.HydrateResults) => void): void;
-  function hydrateToString(opts: interfaces.HydrateOptions, callback?: (hydrateResults: interfaces.HydrateResults) => void): any {
+  function hydrateToString(hydrateOpts: interfaces.HydrateOptions): Promise<interfaces.HydrateResults> {
 
-    const hydrateResults: interfaces.HydrateResults = {
-      diagnostics: [],
-      html: opts.html,
-      styles: null,
-      anchors: []
-    };
+    // validate the hydrate options and add any missing info
+    normalizeHydrateOptions(config, hydrateOpts);
 
-    // only create a promise if the last argument
-    // is not a callback function
-    // always resolve cuz any errors are in the diagnostics
-    let promise: Promise<any>;
-    if (typeof callback !== 'function') {
-      promise = new Promise(resolve => {
-        callback = resolve;
-      });
-    }
-
-    try {
-      // validate the hydrate options and add any missing info
-      validateHydrateOptions(config, opts);
-      hydrateResults.url = opts.url;
-
-      // kick off hydrated, which is an async opertion
-      hydrateHtml(config, ctx, registry, opts, hydrateResults, callback);
-
-    } catch (e) {
-      hydrateResults.diagnostics.push({
-        type: 'hydrate',
-        level: 'error',
-        header: 'Hydrate HTML',
-        messageText: e
-      });
-      callback(hydrateResults);
-    }
-
-    // the promise will be undefined if a callback
-    // was passed in as the last argument to hydrateToString()
-    return promise;
+    // kick off hydrated, which is an async opertion
+    return hydrateHtml(config, ctx, registry, hydrateOpts).catch(err => {
+      const hydrateResults: interfaces.HydrateResults = {
+        diagnostics: [buildError(err)],
+        html: hydrateOpts.html,
+        styles: null,
+        anchors: []
+      };
+      return hydrateResults;
+    });
   }
 
   return {
@@ -111,7 +84,7 @@ function registerComponents(config: interfaces.BuildConfig) {
 }
 
 
-function validateHydrateOptions(config: interfaces.BuildConfig, opts: interfaces.HydrateOptions) {
+function normalizeHydrateOptions(config: interfaces.BuildConfig, opts: interfaces.HydrateOptions) {
   const req = opts.req;
 
   if (req && typeof req.get === 'function') {
