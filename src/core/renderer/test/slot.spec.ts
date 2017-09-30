@@ -366,8 +366,8 @@ describe('Component slot', () => {
         render() {
           return h('ion-child', null,
             h('butterfly', null, (++values).toString()),
-            h('fox', { a: { slot: 'end' } }, ++values),
-            h('ferret', { a: { slot: 'start' } }, ++values)
+            h('fox', { slot: 'end' }, ++values),
+            h('ferret', { slot: 'start' }, ++values)
           );
         }
       }
