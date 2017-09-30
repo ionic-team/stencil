@@ -1,9 +1,11 @@
 import { h } from '../h';
 import { VNode } from '../vnode';
-import { mockElement, mockRenderer } from '../../../testing/mocks';
+import { mockElement, mockRenderer, mockDomApi, mockSVGElement } from '../../../testing/mocks';
+import { toVNode } from '../to-vnode';
 
 describe('renderer', () => {
   const patch = mockRenderer();
+  const domApi = mockDomApi();
 
   var elm: any;
   var vnode0: any;
@@ -25,9 +27,9 @@ describe('renderer', () => {
       var SVGNamespace = 'http://www.w3.org/2000/svg';
       var XHTMLNamespace = 'http://www.w3.org/1999/xhtml';
 
-      const svgElm = mockElement('svg');
-      vnode0.elm = svgElm;
-      elm = patch(vnode0, null, h('svg', null,
+      const svgElm = mockSVGElement();
+      const vnode1 = toVNode(domApi, svgElm);
+      elm = patch(vnode1, h('svg', null,
         h('foreignObject', null,
           h('div', null, 'I am HTML embedded in SVG')
         )

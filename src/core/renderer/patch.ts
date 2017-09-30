@@ -74,7 +74,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
     } else {
       // create element
-      const elm = vnode.elm = (isSvgMode ? domApi.$createElementNS('http://www.w3.org/2000/svg', vnode.vtag) : domApi.$createElement(vnode.vtag));
+      const elm = vnode.elm = (isSvgMode || vnode.vtag === 'svg' ? domApi.$createElementNS('http://www.w3.org/2000/svg', vnode.vtag) : domApi.$createElement(vnode.vtag));
+      isSvgMode = vnode.vtag === 'svg' ? true : (vnode.vtag === 'foreignObject' ? false : isSvgMode);
 
       // add css classes, attrs, props, listeners, etc.
       updateElement(plt, null, vnode, isSvgMode);

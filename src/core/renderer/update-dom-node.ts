@@ -100,26 +100,19 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
 
   // Element Attributes
   } else {
-    let nsXlink = (name !== (name = name.replace(/^xlink\:?/, '')));
-    let nsXml = (name !== (name = name.replace(/^xml\:?/, '')));
+    let ns = (name !== (name = name.replace(/^xlink\:?/, '')));
 
     if (BOOLEAN_ATTRS[name] === 1 && (!newValue || newValue === 'false')) {
-      if (nsXlink) {
+      if (ns) {
         elm.removeAttributeNS(XLINK_NS, name.toLowerCase());
-
-      } else if (nsXml) {
-        elm.removeAttributeNS(XML_NS, name.toLowerCase());
 
       } else {
         elm.removeAttribute(name);
       }
 
     } else if (typeof newValue !== 'function') {
-      if (nsXlink) {
+      if (ns) {
         elm.setAttributeNS(XLINK_NS, name.toLowerCase(), newValue);
-
-      } else if (nsXml) {
-        elm.setAttributeNS(XML_NS, name.toLowerCase(), newValue);
 
       } else {
         elm.setAttribute(name, newValue);
@@ -166,4 +159,3 @@ const BOOLEAN_ATTRS: any = {
 };
 
 const XLINK_NS = 'http://www.w3.org/1999/xlink';
-var XML_NS = 'http://www.w3.org/XML/1998/namespace';
