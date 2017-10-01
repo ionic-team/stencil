@@ -110,9 +110,9 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, opti
     const moduleFile = ctx.moduleFiles[moduleFileName];
 
     if (moduleFile.cmpMeta) {
-      const importPath = config.sys.path
+      const importPath = normalizePath(config.sys.path
         .relative(options.outDir, moduleFile.jsFilePath)
-        .replace(/\.js$/, '');
+        .replace(/\.js$/, ''));
 
       finalString +=
         `import { ${moduleFile.cmpMeta.componentClass} as ${dashToPascalCase(moduleFile.cmpMeta.tagNameMeta)} } from './${importPath}';\n` +
