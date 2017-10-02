@@ -44,9 +44,9 @@ describe('Component slot', () => {
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.firstElementChild.nodeName).toBe('MONKEY');
-      expect(elm.firstElementChild.childNodes[0].nodeName).toBe('TIGER');
-      expect(elm.firstElementChild.childNodes[0].textContent).toBe('88');
-      expect(elm.firstElementChild.childNodes[0].childNodes.length).toBe(1);
+      expect(elm.firstElementChild.firstElementChild.nodeName).toBe('TIGER');
+      expect(elm.firstElementChild.firstElementChild.textContent).toBe('88');
+      expect(elm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
     });
   });
 
@@ -55,10 +55,10 @@ describe('Component slot', () => {
       parentVNode: h('lion', null, h('ion-child', null)),
       childVNode: h('slot', null)
     });
-    expect(parentElm.childNodes.length).toBe(1);
-    expect(parentElm.childNodes[0].nodeName).toBe('LION');
-    expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes.length).toBe(0);
+    expect(parentElm.childNodes.length).toBe(2);
+    expect(parentElm.firstElementChild.nodeName).toBe('LION');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
 
     parentElm._render();
     childElm._render();
@@ -75,13 +75,13 @@ describe('Component slot', () => {
       parentVNode: h('giraffe', null, h('ion-child', null)),
       childVNode: h('fish', null, h('slot', null))
     });
-    expect(parentElm.childNodes.length).toBe(1);
-    expect(parentElm.childNodes[0].nodeName).toBe('GIRAFFE');
-    expect(parentElm.childNodes[0].childNodes.length).toBe(1);
-    expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes.length).toBe(1);
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].nodeName).toBe('FISH');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].childNodes.length).toBe(0);
+    expect(parentElm.childNodes.length).toBe(2);
+    expect(parentElm.firstElementChild.nodeName).toBe('GIRAFFE');
+    expect(parentElm.firstElementChild.childNodes.length).toBe(1);
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FISH');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.childNodes.length).toBe(1);
 
     parentElm._render();
     childElm._render();
@@ -105,10 +105,10 @@ describe('Component slot', () => {
       ),
       childVNode: h('slot', null)
     });
-    expect(parentElm.childNodes[0].nodeName).toBe('HIPPO');
-    expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].nodeName).toBe('AARDVARK');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].textContent).toBe('parent message');
+    expect(parentElm.firstElementChild.nodeName).toBe('HIPPO');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('AARDVARK');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
     parentElm._render();
     childElm._render();
@@ -135,12 +135,12 @@ describe('Component slot', () => {
       )
     });
 
-    expect(parentElm.childNodes[0].nodeName).toBe('BADGER');
-    expect(parentElm.childNodes[0].childNodes[0].nodeName).toBe('ION-CHILD');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].nodeName).toBe('CAMEL');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].childNodes[0].nodeName).toBe('OWL');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].nodeName).toBe('DINGO');
-    expect(parentElm.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].textContent).toBe('parent message');
+    expect(parentElm.firstElementChild.nodeName).toBe('BADGER');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
     childElm._render();
     parentElm._render();
@@ -452,28 +452,28 @@ describe('Component slot', () => {
         parentElm._render();
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
-        expect(parentElm.firstElementChild.childNodes[0].nodeName).toBe('FLAMINGO');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].nodeName).toBe('FERRET');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].textContent).toBe('6');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].nodeName).toBe('HORSE');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].textContent).toBe('4');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].textContent).toBe('5');
+        expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FERRET');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('6');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].nodeName).toBe('HORSE');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].textContent).toBe('4');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('5');
 
         parentElm._render();
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
-        expect(parentElm.firstElementChild.childNodes[0].nodeName).toBe('FLAMINGO');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].nodeName).toBe('FERRET');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].textContent).toBe('9');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].nodeName).toBe('HORSE');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].textContent).toBe('7');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].textContent).toBe('8');
+        expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FERRET');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('9');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].nodeName).toBe('HORSE');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].textContent).toBe('7');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('8');
       });
     });
   });
