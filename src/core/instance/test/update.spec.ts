@@ -57,8 +57,6 @@ describe('instance update', () => {
 
       const instance: any = elm.$instance;
       instance.value = '99';
-      console.log('-----------------');
-      console.log(elm.$instance.value);
 
       elm._queueUpdate();
 
