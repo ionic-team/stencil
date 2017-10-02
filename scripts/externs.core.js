@@ -39,6 +39,7 @@ function loadComponents(){};
  * Proxy Element
  * Properties set on the proxy element
  */
+function $defaultHolder(){};
 function $instance(){};
 function listeners(){};
 function $(){};

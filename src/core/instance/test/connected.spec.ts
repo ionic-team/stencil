@@ -4,23 +4,21 @@ import { waitForLoad, mockConnect, mockDefine, mockPlatform } from '../../../tes
 describe('instance connected', () => {
   const plt = mockPlatform();
 
-  it('should create $instance', (done) => {
+  it('should create $instance', () => {
     mockDefine(plt, { tagNameMeta: 'ion-test' });
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
-    waitForLoad(plt, node, 'ion-test', (elm) => {
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.$instance).toBeDefined();
-      done();
     });
   });
 
-  it('should set $hasConnected', (done) => {
+  it('should set $hasConnected', () => {
     mockDefine(plt, { tagNameMeta: 'ion-test' });
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
-    waitForLoad(plt, node, 'ion-test', (elm) => {
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm._hasConnected).toBe(true);
-      done();
     });
   });
 

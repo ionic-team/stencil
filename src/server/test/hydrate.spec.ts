@@ -2,12 +2,12 @@ import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateRe
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../testing/mocks';
 import { h } from '../../core/renderer/h';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG, HYDRATED_CSS } from '../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS, HYDRATED_CSS } from '../../util/constants';
 
 
 describe('hydrate', () => {
 
-  it('should load content in nested named slots', (done) => {
+  it('should load content in nested named slots', () => {
     const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
@@ -16,11 +16,11 @@ describe('hydrate', () => {
       'ION-TEST': {
         componentModule: class {
           render() {
-            return h('elm-a', 0, [
-              h(SLOT_TAG, { a: { name: 'slot-a' }}),
-              h(SLOT_TAG, 0),
-              h(SLOT_TAG, { a: { name: 'slot-b' }})
-            ]);
+            return h('elm-a', null,
+              h('slot', { a: { name: 'slot-a' }}),
+              h('slot', null),
+              h('slot', { a: { name: 'slot-b' }})
+            );
           }
         },
         slotMeta: HAS_NAMED_SLOTS
@@ -36,7 +36,7 @@ describe('hydrate', () => {
       `
     };
 
-    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
+    return hydrateHtml(config, ctx, registry, opts).then(hydrateResults => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
@@ -53,12 +53,10 @@ describe('hydrate', () => {
           </body>
         </html>
       `));
-
-      done();
     });
   });
 
-  it('should load content in nested default slot', (done) => {
+  it('should load content in nested default slot', () => {
     const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
@@ -67,10 +65,10 @@ describe('hydrate', () => {
       'ION-TEST': {
         componentModule: class {
           render() {
-            return h('elm-a', 0, [
+            return h('elm-a', null,
               'inner text',
-              h(SLOT_TAG, 0)
-            ]);
+              h('slot', null)
+            );
           }
         },
         slotMeta: HAS_SLOTS
@@ -84,7 +82,7 @@ describe('hydrate', () => {
       `
     };
 
-    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
+    return hydrateHtml(config, ctx, registry, opts).then(hydrateResults => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
@@ -100,12 +98,10 @@ describe('hydrate', () => {
           </body>
         </html>
       `));
-
-      done();
     });
   });
 
-  it('should load one component and assign ssr ids', (done) => {
+  it('should load one component and assign ssr ids', () => {
     const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
@@ -123,7 +119,7 @@ describe('hydrate', () => {
       html: `<ion-test></ion-test>`
     };
 
-    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
+    return hydrateHtml(config, ctx, registry, opts).then(hydrateResults => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
@@ -136,12 +132,10 @@ describe('hydrate', () => {
           </body>
         </html>
       `));
-
-      done();
     });
   });
 
-  it('should do nothing when no components registered', (done) => {
+  it('should do nothing when no components registered', () => {
     const ctx: BuildContext = {};
     const hydrateResults: HydrateResults = {
       diagnostics: []
@@ -151,10 +145,9 @@ describe('hydrate', () => {
       html: `<body>hello</body>`
     };
 
-    hydrateHtml(config, ctx, registry, opts, hydrateResults, () => {
+    return hydrateHtml(config, ctx, registry, opts).then(hydrateResults => {
       expect(hydrateResults.diagnostics.length).toBe(1);
       expect(hydrateResults.html).toBe(`<body>hello</body>`);
-      done();
     });
   });
 

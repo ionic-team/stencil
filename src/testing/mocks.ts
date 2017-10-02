@@ -31,12 +31,16 @@ export function mockPlatform() {
     $loadBundleQueue.add(cb);
   };
 
-  (<MockedPlatform>plt).$flushQueue = function(cb: Function) {
-    $mockedQueue.flush(cb);
+  (<MockedPlatform>plt).$flushQueue = function() {
+    return new Promise(resolve => {
+      $mockedQueue.flush(resolve);
+    });
   };
 
-  (<MockedPlatform>plt).$flushLoadBundle = function(cb: Function) {
-    $loadBundleQueue.flush(cb);
+  (<MockedPlatform>plt).$flushLoadBundle = function() {
+    return new Promise(resolve => {
+      $loadBundleQueue.flush(resolve);
+    });
   };
 
   const renderer = createRendererPatch(plt, domApi);
@@ -50,8 +54,8 @@ export function mockPlatform() {
 
 
 export interface MockedPlatform {
-  $flushQueue?: (cb: Function) => void;
-  $flushLoadBundle?: (cb: Function) => void;
+  $flushQueue?: () => Promise<any>;
+  $flushLoadBundle?: () => Promise<any>;
 }
 
 
@@ -405,31 +409,26 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
 }
 
 
-export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string, cb?: (elm: HostElement) => void): Promise<HostElement> {
-  return new Promise((resolve: (elm: HostElement) => void) => {
-    const elm: HostElement = rootNode.tagName === tag.toUpperCase() ? rootNode : rootNode.querySelector(tag);
+export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Promise<HostElement> {
+  const elm: HostElement = rootNode.tagName === tag.toUpperCase() ? rootNode : rootNode.querySelector(tag);
 
-    plt.$flushQueue(() => {
-      // flush to read attribute mode on host elment
-      plt.$flushLoadBundle(() => {
-        // flush to load component mode data
-        plt.$flushQueue(() => {
-          // flush to do the update
-          connectComponents(plt, elm);
-          cb && cb(elm);
-          resolve(elm);
-        });
+  return plt.$flushQueue().then(() => {
+    // flush to read attribute mode on host elment
+    return plt.$flushLoadBundle().then(() => {
+      // flush to load component mode data
+      return plt.$flushQueue().then(() => {
+        // flush to do the update
+        connectComponents(plt, elm);
+        return elm;
       });
     });
-
-  }).catch(err => {
-    console.error('waitForLoad', err);
-    return null;
   });
 }
 
+
 export function compareHtml(input: string) {
   return input.replace(/(\s*)/g, '')
+              .replace(/<!---->/g, '')
               .toLowerCase()
               .trim();
 }

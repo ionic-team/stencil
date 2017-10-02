@@ -1,16 +1,22 @@
-import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions,
-  HydrateResults, LoadComponentRegistry } from '../util/interfaces';
+import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults, LoadComponentRegistry } from '../util/interfaces';
+import { buildError, getBuildContext } from '../compiler/util';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
-import { getBuildContext } from '../compiler/util';
-import { getRegistryJsonWWW } from '../compiler/app/generate-app-files';
+import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
 import { validateBuildConfig } from '../compiler/build/validation';
 
 
 export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
-  // setup the config and add defaults for missing properties
-  validateRendererConfig(config);
+  validateBuildConfig(config);
+
+  ctx = ctx || {};
+
+  // init the buid context
+  getBuildContext(ctx);
+
+  // load the app global file into the context
+  loadAppGlobal(config, ctx);
 
   if (!registry) {
     // figure out the component registry
@@ -18,53 +24,23 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
     registry = registerComponents(config);
   }
 
-  // create the build context if it doesn't exist
-  ctx = getBuildContext(ctx);
-
   // overload with two options for hydrateToString
   // one that returns a promise, and one that takes a callback as the last arg
-  function hydrateToString(hydrateOpts: HydrateOptions): Promise<HydrateResults>;
-  function hydrateToString(hydrateOpts: HydrateOptions, callback: (hydrateResults: HydrateResults) => void): void;
-  function hydrateToString(opts: HydrateOptions, callback?: (hydrateResults: HydrateResults) => void): any {
+  function hydrateToString(hydrateOpts: HydrateOptions): Promise<HydrateResults> {
 
-    const hydrateResults: HydrateResults = {
-      diagnostics: [],
-      html: opts.html,
-      styles: null,
-      anchors: []
-    };
+    // validate the hydrate options and add any missing info
+    normalizeHydrateOptions(config, hydrateOpts);
 
-    // only create a promise if the last argument
-    // is not a callback function
-    // always resolve cuz any errors are in the diagnostics
-    let promise: Promise<any>;
-    if (typeof callback !== 'function') {
-      promise = new Promise(resolve => {
-        callback = resolve;
-      });
-    }
-
-    try {
-      // validate the hydrate options and add any missing info
-      validateHydrateOptions(config, opts);
-      hydrateResults.url = opts.url;
-
-      // kick off hydrated, which is an async opertion
-      hydrateHtml(config, ctx, registry, opts, hydrateResults, callback);
-
-    } catch (e) {
-      hydrateResults.diagnostics.push({
-        type: 'hydrate',
-        level: 'error',
-        header: 'Hydrate HTML',
-        messageText: e
-      });
-      callback(hydrateResults);
-    }
-
-    // the promise will be undefined if a callback
-    // was passed in as the last argument to hydrateToString()
-    return promise;
+    // kick off hydrated, which is an async opertion
+    return hydrateHtml(config, ctx, registry, hydrateOpts).catch(err => {
+      const hydrateResults: HydrateResults = {
+        diagnostics: [buildError(err)],
+        html: hydrateOpts.html,
+        styles: null,
+        anchors: []
+      };
+      return hydrateResults;
+    });
   }
 
   return {
@@ -112,7 +88,7 @@ function registerComponents(config: BuildConfig) {
 }
 
 
-function validateHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
+function normalizeHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
   const req = opts.req;
 
   if (req && typeof req.get === 'function') {
@@ -136,27 +112,20 @@ function validateHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
 }
 
 
-function validateRendererConfig(config: BuildConfig) {
-  if (!config.sys && require) {
-    // assuming we're in a node environment,
-    // if the config was not provided then use the
-    // defaul stencil sys found in bin
-    const path = require('path');
-    config.sys = require(path.join(__dirname, '../../bin/sys'));
+function loadAppGlobal(config: BuildConfig, ctx: BuildContext) {
+  ctx.appFiles = ctx.appFiles || {};
+
+  if (ctx.appFiles.global) {
+    // already loaded the global js content
+    return;
   }
 
-  if (!config.logger && require) {
-    // assuming we're in a node environment,
-    // if a logger was not provided then use the
-    // defaul stencil command line logger found in bin
-    const path = require('path');
-    const logger = require(path.join(__dirname, '../cli/util')).logger;
-    config.logger = new logger.CommandLineLogger({
-      level: config.logLevel,
-      process: process,
-      chalk: require('chalk')
-    });
-  }
+  // let's load the app global js content
+  const appGlobalPath = getGlobalWWW(config);
+  try {
+    ctx.appFiles.global = config.sys.fs.readFileSync(appGlobalPath, 'utf-8');
 
-  validateBuildConfig(config);
+  } catch (e) {
+    config.logger.debug(`missing app global: ${appGlobalPath}`);
+  }
 }

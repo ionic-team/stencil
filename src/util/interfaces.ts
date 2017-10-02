@@ -438,6 +438,7 @@ export interface BuildContext {
     global?: string;
     registryJson?: string;
     indexHtml?: string;
+    components_d_ts?: string;
   };
   watcher?: FSWatcher;
   tsConfig?: any;
@@ -790,6 +791,7 @@ export interface HostElement extends HTMLElement {
 
   // public properties
   $instance?: ComponentInstance;
+  $defaultHolder?: Comment;
   mode?: string;
   color?: string;
 
@@ -900,7 +902,7 @@ export interface PlatformApi {
   render?: RendererApi;
   connectHostElement: (elm: HostElement, slotMeta: number) => void;
   queue: QueueApi;
-  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap) => void;
+  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
   getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;

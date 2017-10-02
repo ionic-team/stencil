@@ -1,8 +1,8 @@
-var fs = require('fs');
-var path = require('path');
 
 
 module.exports = function init() {
+  var fs = require('fs');
+  var path = require('path');
   var configPath = path.join(process.cwd(), 'stencil.config.js');
   fs.writeFileSync(configPath, DEFAULT_CONFIG);
   console.log('Created ' + configPath);

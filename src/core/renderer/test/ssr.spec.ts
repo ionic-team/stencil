@@ -3,7 +3,7 @@ import { createVNodesFromSsr } from '../slot';
 import { h } from '../h';
 import { HostContentNodes, VNode } from '../../../util/interfaces';
 import { mockPlatform, mockDomApi, removeWhitespaceFromNodes } from '../../../testing/mocks';
-import { SSR_VNODE_ID, SSR_CHILD_ID, SLOT_TAG } from '../../../util/constants';
+import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../../util/constants';
 import { VNode as VNodeObj } from '../vnode';
 
 
