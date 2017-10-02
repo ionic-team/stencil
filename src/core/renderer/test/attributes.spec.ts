@@ -102,17 +102,6 @@ describe('attributes', function() {
       expect(result.childNodes[0].getAttribute('href')).toEqual(testUrl);
       expect(result.childNodes[0].getAttributeNS(xlinkNS, 'href')).toEqual(testUrl);
     });
-
-    it('adds correctly xml namespaced attribute', function() {
-      var xmlNS = 'http://www.w3.org/XML/1998/namespace';
-      var testAttrValue = 'und';
-      var a = h('svg', { 'xml:lang': testAttrValue });
-
-      vnode0.elm = mockElement('svg');
-      var result: any = patch(vnode0, a).elm;
-      expect(result.getAttributeNS(xmlNS, 'lang')).toEqual(testAttrValue);
-      expect(result.getAttribute('lang')).toEqual(testAttrValue);
-    });
   });
 
 });
