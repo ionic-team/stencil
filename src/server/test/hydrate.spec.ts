@@ -17,9 +17,9 @@ describe('hydrate', () => {
         componentModule: class {
           render() {
             return h('elm-a', null,
-              h('slot', { a: { name: 'slot-a' }}),
+              h('slot', { name: 'slot-a' }),
               h('slot', null),
-              h('slot', { a: { name: 'slot-b' }})
+              h('slot', { name: 'slot-b' })
             );
           }
         },
@@ -110,7 +110,7 @@ describe('hydrate', () => {
       'ION-TEST': {
         componentModule: class {
           render() {
-            return h('div', 0);
+            return h('div', null);
           }
         }
       }
