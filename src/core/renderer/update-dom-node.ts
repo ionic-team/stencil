@@ -48,7 +48,7 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
       }
     }
 
-    if (oldClassNameString !== newClassNameString && newClassNameString !== '') {
+    if (oldClassNameString !== newClassNameString) {
       elm.className = newClassNameString;
     }
 
