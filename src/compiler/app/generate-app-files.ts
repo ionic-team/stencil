@@ -60,15 +60,7 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     let coreContent = results[0];
     let coreEs5WithPolyfilledContent = results[1];
 
-    if (config.devMode) {
-      // dev mode core filename just keeps the same name, no content hashing
-      appRegistry.core = `${appFileName}/${appFileName}.${CORE_NAME}.js`;
-      appCoreFileName = `${appFileName}.${CORE_NAME}.js`;
-
-      appRegistry.corePolyfilled = `${appFileName}/${appFileName}.${CORE_NAME}.pf.js`;
-      appCorePolyfilledFileName = `${appFileName}.${CORE_NAME}.pf.js`;
-
-    } else {
+    if (config.minifyJs) {
       // prod mode renames the core file with its hashed content
       const contentHash = sys.generateContentHash(coreContent, config.hashedFileNameLength);
       appRegistry.core = `${appFileName}/${appFileName}.${contentHash}.js`;
@@ -77,6 +69,14 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
       const contentPolyfilledHash = sys.generateContentHash(coreEs5WithPolyfilledContent, config.hashedFileNameLength);
       appRegistry.corePolyfilled = `${appFileName}/${appFileName}.${contentPolyfilledHash}.pf.js`;
       appCorePolyfilledFileName = `${appFileName}.${contentPolyfilledHash}.pf.js`;
+
+    } else {
+      // dev mode core filename just keeps the same name, no content hashing
+      appRegistry.core = `${appFileName}/${appFileName}.${CORE_NAME}.js`;
+      appCoreFileName = `${appFileName}.${CORE_NAME}.js`;
+
+      appRegistry.corePolyfilled = `${appFileName}/${appFileName}.${CORE_NAME}.pf.js`;
+      appCorePolyfilledFileName = `${appFileName}.${CORE_NAME}.pf.js`;
     }
 
 

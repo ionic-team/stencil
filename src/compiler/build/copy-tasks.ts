@@ -3,7 +3,12 @@ import { catchError, ensureDirectoriesExist } from '../util';
 
 
 export function copyTasks(config: BuildConfig, ctx: BuildContext) {
-  if (!config.copy || !config.generateWWW) {
+  if (!config.copy) {
+    config.logger.debug(`copy tasks disabled`);
+    return Promise.resolve();
+  }
+
+  if (!config.generateWWW) {
     return Promise.resolve();
   }
 

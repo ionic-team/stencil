@@ -24,14 +24,15 @@ describe('app-core', () => {
       config.sys.getClientCoreFile = mockGetClientCoreFile;
     });
 
-    it('uses the core file name', () => {
+    it('uses the core minified file name', () => {
+      config.minifyJs = true;
       core.generateCore(config, ['']);
       expect(mockGetClientCoreFile.mock.calls.length).toEqual(1);
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: `${CORE_NAME}.js` });
     });
 
     it('uses the core dev file name', () => {
-      config.devMode = true;
+      config.minifyJs = false;
       core.generateCore(config, ['']);
       expect(mockGetClientCoreFile.mock.calls.length).toEqual(1);
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: `${CORE_NAME}.dev.js` });
@@ -73,14 +74,15 @@ describe('app-core', () => {
       expect(mockGetClientCoreFile.mock.calls[6][0]).toEqual({ staticName: 'polyfills/performance-now.js' });
     });
 
-    it('uses the core file name', () => {
+    it('uses the core minified file name', () => {
+      config.minifyJs = true;
       core.generateCoreES5WithPolyfills(config, ['']);
       const lastCall = mockGetClientCoreFile.mock.calls.length - 1;
       expect(mockGetClientCoreFile.mock.calls[lastCall][0]).toEqual({ staticName: `${CORE_NAME}.es5.js` });
     });
 
-    it('uses the core dev file name', () => {
-      config.devMode = true;
+    it('uses the core non-minified file name', () => {
+      config.minifyJs = false;
       core.generateCoreES5WithPolyfills(config, ['']);
       const lastCall = mockGetClientCoreFile.mock.calls.length - 1;
       expect(mockGetClientCoreFile.mock.calls[lastCall][0]).toEqual({ staticName: `${CORE_NAME}.es5.dev.js` });

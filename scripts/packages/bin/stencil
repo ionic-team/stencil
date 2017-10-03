@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+'use strict';
+
+var cli = require('./index');
+cli.run(process, 6.11);

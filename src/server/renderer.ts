@@ -4,7 +4,7 @@ import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerend
 import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentRegistry } from '../util/data-parse';
-import { validateBuildConfig } from '../compiler/build/validation';
+import { validateBuildConfig } from '../util/validate-config';
 
 
 export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {

@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, ServiceWorkerConfig } from '../../util/interfaces';
-import { hasError, readFile } from '../util';
+import { catchError, hasError, readFile } from '../util';
 import { injectRegisterServiceWorker, injectUnregisterServiceWorker } from '../service-worker/inject-sw-script';
 
 
@@ -12,11 +12,15 @@ export function generateIndexHtml(config: BuildConfig, ctx: BuildContext) {
   // get the source index html content
   return readFile(config.sys, config.srcIndexHtml).then(indexSrcHtml => {
     // set the index content to be written
-    return setIndexHtmlContent(config, ctx, indexSrcHtml);
+    try {
+      return setIndexHtmlContent(config, ctx, indexSrcHtml);
+    } catch (e) {
+      catchError(ctx.diagnostics, e);
+    }
 
-  }).catch(() => {
+  }).catch(err => {
     // it's ok if there's no index file
-    config.logger.debug(`no index html: ${config.srcIndexHtml}`);
+    config.logger.debug(`no index html: ${config.srcIndexHtml}: ${err}`);
   });
 }
 

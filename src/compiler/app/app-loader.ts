@@ -13,7 +13,7 @@ export function generateLoader(
   const sys = config.sys;
 
   let staticName = LOADER_NAME;
-  if (config.devMode) {
+  if (!config.minifyJs) {
     staticName += '.dev';
   }
   staticName += '.js';

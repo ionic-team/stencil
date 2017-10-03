@@ -3,6 +3,7 @@
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
+    "declaration": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "lib": [
@@ -16,8 +17,9 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../../../../dist/transpiled-logger",
+    "outDir": "../../../dist/transpiled-cli",
     "pretty": true,
+    "rootDir": "../../",
     "target": "es5"
   },
   "files": [

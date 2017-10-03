@@ -1,10 +1,11 @@
-'use strict';
+import { Diagnostic } from '../interfaces';
 
-module.exports = function createDom() {
+
+export function createDom() {
   var jsdom = require('jsdom');
   var virtualConsole = new jsdom.VirtualConsole();
-  var dom;
-  var diagnostics = [];
+  var dom: any;
+  var diagnostics: Diagnostic[] = [];
 
   virtualConsole.on('jsdomError', function() {
     diagnostics.push({
@@ -31,9 +32,10 @@ module.exports = function createDom() {
     });
   });
 
+
   return {
 
-    parse: function parse(opts) {
+    parse(opts: any) {
       dom = new jsdom.JSDOM(opts.html, {
         virtualConsole: virtualConsole,
         url: opts.url,
@@ -44,19 +46,19 @@ module.exports = function createDom() {
       return dom.window;
     },
 
-    serialize: function serialize() {
+    serialize() {
       return dom.serialize();
     },
 
-    destroy: function() {
+    destroy() {
       dom.window.close();
       dom = null;
     },
 
-    getDiagnostics: function() {
+    getDiagnostics() {
       return diagnostics;
     }
 
   };
 
-};
+}

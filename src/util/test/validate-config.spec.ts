@@ -1,13 +1,25 @@
-import { ATTR_LOWER_CASE } from '../../../util/constants';
-import { setProcessEnvironment, validateBuildConfig } from '../validation';
-import { BuildConfig, PrerenderConfig } from '../../../util/interfaces';
-import { mockFs, mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { BuildConfig } from '../interfaces';
+import { mockFs, mockLogger, mockStencilSystem } from '../../testing/mocks';
+import { setProcessEnvironment, validateBuildConfig } from '../validate-config';
 import * as path from 'path';
 
 
 describe('validation', () => {
 
   describe('validateBuildConfig', () => {
+
+    it('should throw error when hashedFileNameLength to small', () => {
+      expect(() => {
+        config.hashedFileNameLength = 3;
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should set hashedFileNameLength', () => {
+      config.hashedFileNameLength = 6;
+      validateBuildConfig(config);
+      expect(config.hashedFileNameLength).toBe(6);
+    });
 
     it('should default hashedFileNameLength', () => {
       validateBuildConfig(config);
@@ -309,6 +321,18 @@ describe('validation', () => {
   });
 
   describe('copy tasks', () => {
+
+    it('should disable copy task with null', () => {
+      config.copy = null;
+      validateBuildConfig(config);
+      expect(config.copy).toBe(null);
+    });
+
+    it('should disable copy task with false', () => {
+      (config.copy as any) = false;
+      validateBuildConfig(config);
+      expect(config.copy).toBe(null);
+    });
 
     it('should remove default copy task', () => {
       config.copy = {

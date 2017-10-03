@@ -1,15 +1,15 @@
-import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../interfaces';
+import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../interfaces';
 import * as chalk from 'chalk';
 
 
-export class CommandLineLogger implements Logger {
+export class NodeLogger implements Logger {
   private _level = 'info';
-  private process: any;
+  private process: NodeJS.Process;
   private width: number;
 
-  constructor(opts: {level: string, process: any}) {
+  constructor(opts: { level?: string, process: NodeJS.Process }) {
     this.process = opts.process;
-    this.width = Math.max(MIN_LEN, Math.min(opts.process.stdout.columns || 0, MAX_LEN));
+    this.width = Math.max(MIN_LEN, Math.min((process.stdout as any).columns || 0, MAX_LEN));
     this.level = opts.level;
   }
 
@@ -263,11 +263,11 @@ export class CommandLineLogger implements Logger {
 
 
 class CmdTimeSpan {
-  private logger: CommandLineLogger;
+  private logger: NodeLogger;
   private start: number;
 
   constructor(
-    logger: CommandLineLogger,
+    logger: NodeLogger,
     startMsg: string,
     private debug: boolean
   ) {
