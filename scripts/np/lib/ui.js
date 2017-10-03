@@ -72,7 +72,7 @@ module.exports = options => {
 			type: 'list',
 			name: 'tag',
 			message: 'How should this pre-release version be tagged in npm?',
-			when: answers => !pkg.private && version.isPrereleaseVersion(answers.version) && !options.tag,
+			when: answers => version.isPrereleaseVersion(answers.version) && !options.tag,
 			choices: () => execa.stdout('npm', ['view', '--json', pkg.name, 'dist-tags'])
 				.then(stdout => {
 					const existingPrereleaseTags = Object.keys(JSON.parse(stdout))

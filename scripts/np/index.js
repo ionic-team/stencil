@@ -57,7 +57,7 @@ module.exports = (input, opts) => {
 			task: () => gitTasks(opts)
 		}
 	], {
-		showSubtasks: false
+		showSubtasks: true
 	});
 
 	if (runCleanup) {
@@ -121,16 +121,23 @@ module.exports = (input, opts) => {
 	if (runPublish) {
 		tasks.add({
 			title: 'Publishing npm package in "dist"',
-			task: () => exec('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), {
-				cwd: path.join(process.cwd(), 'dist')
-			})
+			task: () => {
+				const npmInstallArgs = [
+					'publish',
+					'./package.tgz'
+				];
+				if (opts.tag) {
+					npmInstallArgs.push('--tag', opts.tag);
+				}
+
+				return exec('npm', npmInstallArgs, {
+					cwd: path.join(process.cwd(), 'dist')
+				})
+			}
 		});
 
 		tasks.add({
 			title: 'Pushing to Github',
-			skip: () => {
-				return true;
-			},
 			task: () => exec('git', ['push', '--follow-tags'])
 		});
 	}
