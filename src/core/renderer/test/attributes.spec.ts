@@ -39,7 +39,7 @@ describe('attributes', function() {
   it('are not omitted when falsy values are provided', function() {
     var vnode1 = h('div', {href: null, minlength: 0, value: false });
     elm = patch(vnode0, vnode1).elm;
-    expect(elm.getAttribute('href')).toEqual('null');
+    expect(elm.getAttribute('href')).toEqual(null);
     expect(elm.getAttribute('minlength')).toEqual('0');
     expect(elm.getAttribute('value')).toEqual('false');
   });
