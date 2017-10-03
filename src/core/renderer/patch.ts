@@ -294,12 +294,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
       if (isDef(oldChildren) && isDef(newChildren)) {
         // looks like there's child vnodes for both the old and new vnodes
-
-        if (!isUpdate) {
-          // either this is the first render of an element OR it's an update
-          // AND we already know it's possible that the children could have changed
-          updateChildren(elm, oldChildren, newChildren);
-        }
+        updateChildren(elm, oldChildren, newChildren);
 
       } else if (isDef(newChildren)) {
         // no old child vnodes, but there are new child vnodes to add

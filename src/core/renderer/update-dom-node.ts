@@ -91,8 +91,11 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
   /**
    * Properties
    * - list and type are attributes that get applied as values on the element
+   * - all svgs get values as attributes not props
+   * - check if elm contains name or if the value is array, object, or function
    */
-  } else if (name !== 'list' && name !== 'type' && !isSvg && name in elm) {
+  } else if (name !== 'list' && name !== 'type' && !isSvg && newValue != null &&
+      (name in elm || ['object', 'function'].indexOf(typeof newValue) !== -1)) {
     setProperty(elm, name, newValue === null ? '' : newValue);
     if (newValue === undefined) {
       delete (elm as any)[name];

@@ -37,14 +37,6 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
     let oldVNode = elm._vnode || new VNodeObj();
     oldVNode.elm = elm;
 
-    // normalize host data keys to abbr. key
-    if (vnodeHostData) {
-      vnodeHostData.a = vnodeHostData['attrs'];
-      vnodeHostData.c = vnodeHostData['class'];
-      vnodeHostData.s = vnodeHostData['style'];
-      vnodeHostData.o = vnodeHostData['on'];
-    }
-
     // each patch always gets a new vnode
     // the host element itself isn't patched because it already exists
     // kick off the actual render and any DOM updates

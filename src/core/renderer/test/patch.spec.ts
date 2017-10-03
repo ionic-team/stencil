@@ -128,6 +128,27 @@ describe('renderer', () => {
         expect(elm.childNodes[0].textContent).toEqual('Hi');
       });
 
+      it('can remove previous children of the root element with update', () => {
+        var h2 = mockElement('h2');
+        h2.textContent = 'Hello';
+
+        var prevElm = mockElement('div');
+        prevElm.id = 'id';
+        prevElm.className = 'class';
+        prevElm.appendChild(h2);
+
+        var nextVNode = h('div', null, h('span', null, 'Hi'));
+        elm = patch(toVNode(domApi, prevElm), nextVNode, true).elm;
+
+        expect(elm).toEqual(prevElm);
+        expect(elm.tagName).toEqual('DIV');
+        expect(elm.id).toEqual('id');
+        expect(elm.className).toEqual('class');
+        expect(elm.childNodes.length).toEqual(1);
+        expect(elm.childNodes[0].tagName).toEqual('SPAN');
+        expect(elm.childNodes[0].textContent).toEqual('Hi');
+      });
+
       it('can remove some children of the root element', () => {
         var h2 = mockElement('h2');
         h2.textContent = 'Hello';
