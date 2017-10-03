@@ -29,17 +29,8 @@ module.exports = (input, opts) => {
 	opts = Object.assign({
 		cleanup: true,
 		publish: true,
-		yarn: hasYarn()
+		yarn: false
 	}, opts);
-
-	if (!hasYarn() && opts.yarn) {
-		throw new Error('Could not use Yarn without yarn.lock file');
-	}
-
-	// TODO: remove sometime far in the future
-	if (opts.skipCleanup) {
-		opts.cleanup = false;
-	}
 
 	const runTests = !opts.yolo;
 	const runCleanup = opts.cleanup && !opts.yolo;
@@ -57,7 +48,7 @@ module.exports = (input, opts) => {
 			task: () => gitTasks(opts)
 		}
 	], {
-		showSubtasks: true
+		showSubtasks: false
 	});
 
 	if (runCleanup) {
@@ -67,72 +58,59 @@ module.exports = (input, opts) => {
 				task: () => del('node_modules')
 			},
 			{
-				title: 'Installing dependencies using Yarn',
-				enabled: () => opts.yarn === true,
-				task: () => exec('yarn', ['install', '--frozen-lockfile']).catch(err => {
-					if (err.stderr.startsWith('error Your lockfile needs to be updated')) {
-						throw new Error('yarn.lock file is outdated. Run yarn, commit the updated lockfile and try again.');
-					}
-					throw err;
-				})
-			},
-			{
-				title: 'Installing dependencies using npm',
-				enabled: () => opts.yarn === false,
+				title: 'Install npm dependencies',
 				task: () => exec('npm', ['install', '--no-package-lock'])
 			}
 		]);
 	}
 
+	tasks.add({
+		title: 'Build @stencil/core',
+		task: () => {
+			return exec('npm', ['run', 'build'], { cwd: path.join(__dirname, '../..') });
+		}
+	});
+
 	if (runTests) {
 		tasks.add({
-			title: 'Running tests',
+			title: 'Run tests',
 			task: () => exec('npm', ['test'])
 		});
 	}
 
 	tasks.add([
 		{
-			title: 'Bumping "root" version using Yarn',
-			enabled: () => opts.yarn === true,
-			task: () => exec('yarn', ['version', '--new-version', input])
+			title: 'Bump package.json version',
+			task: () => {
+				return exec('npm', ['version', input], { cwd: path.join(__dirname, '../..') });
+			}
 		},
 		{
-			title: 'Bumping "root" version using npm',
-			enabled: () => opts.yarn === false,
-			task: () => exec('npm', ['version', input])
-		},
-		{
-			title: 'Bumping "dist" version using Yarn',
-			enabled: () => opts.yarn === true,
-			task: () => exec('yarn', ['version', '--new-version', input], {
-				cwd: path.join(process.cwd(), 'dist')
-			})
-		},
-		{
-			title: 'Bumping "dist" version using npm',
-			enabled: () => opts.yarn === false,
-			task: () => exec('npm', ['version', input], {
-				cwd: path.join(process.cwd(), 'dist')
-			})
+			title: 'Create "dist" @stencil/core package',
+			task: () => {
+				return exec('node', ['./build-package'], { cwd: path.join(__dirname, '..') });
+			}
 		}
 	]);
 
 	if (runPublish) {
 		tasks.add({
-			title: 'Publishing npm package in "dist"',
+			title: 'Publish "dist" @stencil/core package',
 			task: () => {
-				const npmInstallArgs = [
+				const args = [
 					'publish',
-					'./package.tgz'
+					'package.tgz',
+					'--new-version',
+					input
 				];
 				if (opts.tag) {
-					npmInstallArgs.push('--tag', opts.tag);
+					args.push('--tag', opts.tag);
 				}
 
-				return exec('npm', npmInstallArgs, {
-					cwd: path.join(process.cwd(), 'dist')
-				})
+				// yarn publish package.tgz --tag next --new-version 0.0.6-6
+
+				// yarn cuz npm has a bug with "npm publish <tarball>""
+				return exec('yarn', args, { cwd: path.join(__dirname, '../../dist') });
 			}
 		});
 

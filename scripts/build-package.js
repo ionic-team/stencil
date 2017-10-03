@@ -54,8 +54,6 @@ const DIST_README = path.join(DST_DIR, 'readme.md');
 fs.copySync(SRC_README, DIST_README);
 
 
-console.log('createTarball');
-
 const packageFileName = 'package.tgz';
 const tmpFilePath = path.join(os.tmpdir(), packageFileName);
 
@@ -72,8 +70,6 @@ tar.c(tarOpt, ['./']).then(() => {
   fs.move(tarOpt.file, distPackageTarball, { clobber: true }, (err) => {
     if (err) {
       console.log(err);
-    } else {
-      console.log('created npm package:', distPackageTarball);
     }
   });
 });
