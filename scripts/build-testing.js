@@ -7,7 +7,7 @@ const path = require('path');
 const rollup = require('rollup');
 
 
-const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-testing-util');
+const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-testing');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'testing/index.js');
 const DEST_DIR = path.join(__dirname, '../dist/testing');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');

@@ -2,7 +2,7 @@ import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFile } 
 import { buildError, catchError } from '../../util';
 import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
-import { validateComponentTag } from '../../build/validation';
+import { validateComponentTag } from '../../../util/validate-config';
 import * as ts from 'typescript';
 
 

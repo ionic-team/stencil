@@ -1,4 +1,4 @@
-import { BuildConfig, BuildResults, Diagnostic } from '../../util/interfaces';
+import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
 import { bundle } from '../bundle/bundle';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
@@ -12,7 +12,9 @@ import { generateAppManifest } from '../manifest/generate-manifest';
 import { initIndexHtml } from '../html/init-index-html';
 import { prerenderApp } from '../prerender/prerender-app';
 import { setupWatcher } from './watch';
-import { validateBuildConfig } from './validation';
+import { validateBuildConfig } from '../../util/validate-config';
+import { validatePrerenderConfig } from '../prerender/validate-prerender-config';
+import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
 import { writeBuildFiles } from './write-build';
 
 
@@ -34,7 +36,7 @@ export function build(config: BuildConfig, context?: any) {
   };
 
   // validate the build config
-  if (!isConfigValid(config, buildResults.diagnostics)) {
+  if (!isConfigValid(config, ctx, buildResults.diagnostics)) {
     // invalid build config, let's not continue
     return Promise.resolve(buildResults);
   }
@@ -131,10 +133,15 @@ export function build(config: BuildConfig, context?: any) {
 }
 
 
-export function isConfigValid(config: BuildConfig, diagnostics: Diagnostic[]) {
+export function isConfigValid(config: BuildConfig, ctx: BuildContext, diagnostics: Diagnostic[]) {
   try {
     // validate the build config
-    validateBuildConfig(config);
+    validateBuildConfig(config, true);
+
+    if (!ctx.isRebuild) {
+      validatePrerenderConfig(config);
+      validateServiceWorkerConfig(config);
+    }
 
   } catch (e) {
     if (config.logger) {

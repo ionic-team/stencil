@@ -266,7 +266,7 @@ function compileScssFile(config: BuildConfig, ctx: BuildContext, moduleFile: Mod
   return new Promise(resolve => {
     const sassConfig = {
       file: absStylePath,
-      outputStyle: config.devMode ? 'expanded' : 'compressed',
+      outputStyle: config.minifyCss ? 'compressed' : 'expanded',
     };
 
     sys.sass.render(sassConfig, (err, result) => {

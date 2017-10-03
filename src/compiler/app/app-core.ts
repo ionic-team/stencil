@@ -5,7 +5,7 @@ import { generatePreamble, normalizePath } from '../util';
 
 export function generateCore(config: BuildConfig, globalJsContent: string[]) {
   let staticName = CORE_NAME;
-  if (config.devMode) {
+  if (!config.minifyJs) {
     staticName += '.dev';
   }
   staticName += '.js';
@@ -25,7 +25,7 @@ export function generateCore(config: BuildConfig, globalJsContent: string[]) {
 export function generateCoreES5WithPolyfills(config: BuildConfig, globalJsContent: string[]) {
   const sys = config.sys;
   let staticName = CORE_NAME + '.es5';
-  if (config.devMode) {
+  if (!config.minifyJs) {
     staticName += '.dev';
   }
   staticName += '.js';

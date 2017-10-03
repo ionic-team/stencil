@@ -5,7 +5,7 @@ import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init';
 import { noop } from '../util/helpers';
-import { validateBuildConfig } from '../compiler/build/validation';
+import { validateBuildConfig } from '../util/validate-config';
 
 
 export function mockPlatform() {

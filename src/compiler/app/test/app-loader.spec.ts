@@ -116,14 +116,15 @@ describe('build-project-files', () => {
       config.sys.getClientCoreFile = mockGetClientCoreFile;
     });
 
-    it('gets the client core file', () => {
+    it('gets the client core minified file', () => {
+      config.minifyJs = true;
       callGenerateLoader();
       expect(mockGetClientCoreFile.mock.calls.length).toEqual(1);
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'loader.js' });
     });
 
-    it('uses the dev loader if devMode', () => {
-      config.devMode = true;
+    it('gets the client core non-minified file', () => {
+      config.minifyJs = false;
       callGenerateLoader();
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'loader.dev.js' });
     });

@@ -27,8 +27,8 @@
     "**/*.tsx"
   ],
   "exclude": [
+    "cli",
     "compiler",
-    "server",
-    "util/logger/command-line-logger"
+    "server"
   ]
 }

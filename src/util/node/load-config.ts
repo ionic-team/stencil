@@ -1,57 +1,55 @@
-import { BuildConfig } from '../util/interfaces';
-import { validateBuildConfig } from '../compiler/build/validation';
+import { BuildConfig, Logger } from '../../util/interfaces';
+import { getNodeSys } from './node-sys';
+import { NodeLogger } from './node-logger';
 import * as fs from 'fs';
 import * as path from 'path';
 
 
 export function loadConfig(config: string | BuildConfig) {
+  const logger = new NodeLogger({ process });
+
   if (!config || Array.isArray(config) || typeof config === 'function' || typeof config === 'number' || typeof config === 'boolean') {
-    console.error(`Invalid config: ${config}`);
+    logger.error(`Invalid config: ${config}`);
     process.exit(1);
   }
 
-  let rtnConfig: BuildConfig;
+  let buildConfig: BuildConfig;
   let configPath: string;
 
   if (typeof config === 'string') {
     configPath = config;
-    rtnConfig = loadConfigFromPath(configPath);
+    buildConfig = loadConfigFile(process, configPath, logger);
 
   } else {
     // looks like it's already a build config object
-    rtnConfig = (config as BuildConfig);
+    buildConfig = (config as BuildConfig);
   }
 
-  if (!rtnConfig.sys) {
+  if (!buildConfig.sys) {
     // if the config was not provided then use the
     // defaul stencil sys found in bin
-    rtnConfig.sys = require(path.join(__dirname, '../bin/sys'));
+    buildConfig.sys = getNodeSys(path.join(__dirname, '../'), logger);
   }
 
-  if (!rtnConfig.logger) {
+  if (!buildConfig.logger) {
     // if a logger was not provided then use the
     // defaul stencil command line logger found in bin
-    const logger = require(path.join(__dirname, '../cli/util')).logger;
-    rtnConfig.logger = new logger.CommandLineLogger({
-      level: rtnConfig.logLevel,
-      process: process
-    });
+    buildConfig.logger = logger;
   }
 
-  return validateBuildConfig(rtnConfig, false);
+  return buildConfig;
 }
 
 
-function loadConfigFromPath(configPath: string) {
+export function loadConfigFile(process: NodeJS.Process, configPath: string, logger: Logger) {
   let config: BuildConfig;
 
   if (!path.isAbsolute(configPath)) {
-    console.error(`Stencil configuration file "${configPath}" must be an absolute path.`);
+    logger.error(`Stencil configuration file "${configPath}" must be an absolute path.`);
     process.exit(1);
   }
 
   try {
-
     const fileStat = fs.statSync(configPath);
     if (fileStat.isDirectory()) {
       // this is only a directory, so let's just assume we're looking for in stencil.config.js
@@ -61,22 +59,21 @@ function loadConfigFromPath(configPath: string) {
 
     // the passed in config was a string, so it's probably a path to the config we need to load
     const configFileData = require(configPath);
-
     if (!configFileData.config) {
-      console.error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);
+      logger.error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);
       process.exit(1);
     }
 
     config = configFileData.config;
     config.configPath = configPath;
 
-  } catch (e) {
-    console.error(`Error reading Stencil "${configPath}" configuration file.`, e);
-    process.exit(1);
-  }
+    if (!config.rootDir && configPath) {
+      config.rootDir = path.dirname(configPath);
+    }
 
-  if (!config.rootDir && configPath) {
-    config.rootDir = path.dirname(configPath);
+  } catch (e) {
+    logger.error(`Error reading Stencil configuration file "${configPath}".`, e);
+    process.exit(1);
   }
 
   return config;

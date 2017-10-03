@@ -20,7 +20,7 @@ const DEST_PACKAGE_JSON = path.join(__dirname, '../dist/package.json');
 const srcPackageJson = require(SRC_PACKAGE_JSON);
 
 const destPackageJson = {
-  name: '@stencil/core',
+  name: srcPackageJson.name,
   version: srcPackageJson.version,
   license: srcPackageJson.license,
   description: srcPackageJson.description,

@@ -286,7 +286,7 @@ export interface BuildConfig {
   sys?: StencilSystem;
   logger?: Logger;
   rootDir?: string;
-  logLevel?: 'error'|'warn'|'info'|'debug';
+  logLevel?: 'error'|'warn'|'info'|'debug'|string;
   exclude?: string[];
   namespace?: string;
   global?: string;
@@ -989,7 +989,7 @@ export interface ModuleCallbacks {
 export interface Diagnostic {
   level: 'error'|'warn'|'info';
   type: string;
-  header: string;
+  header?: string;
   messageText: string;
   language?: 'javascript'|'typescript'|'scss'|'css';
   code?: string;

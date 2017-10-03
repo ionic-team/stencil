@@ -2,7 +2,7 @@ import { BuildConfig, ComponentMeta, ComponentRegistry, HydrateOptions, Platform
 import { getBuildContext } from '../compiler/util';
 import { hydrateHtml } from '../server/hydrate-html';
 import { mockLogger, mockStencilSystem } from './mocks';
-import { validateBuildConfig } from '../compiler/build/validation';
+import { validateBuildConfig } from '../util/validate-config';
 
 
 export async function render(opts: RenderTestOptions): Promise<any> {

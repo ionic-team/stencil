@@ -1,7 +1,5 @@
-import { BuildConfig, Bundle, CopyTasks, DependentCollection } from '../../util/interfaces';
-import { normalizePath } from '../util';
-import { validatePrerenderConfig } from '../prerender/validate-prerender-config';
-import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
+import { BuildConfig, Bundle, CopyTasks, DependentCollection } from './interfaces';
+import { normalizePath } from '../compiler/util';
 
 
 export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boolean) {
@@ -125,11 +123,13 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     // if no config, minify css when it's the prod build
     config.minifyCss = (!config.devMode);
   }
+  config.logger.debug(`minifyCss: ${config.minifyCss}`);
 
   if (typeof config.minifyJs !== 'boolean') {
     // if no config, minify js when it's the prod build
     config.minifyJs = (!config.devMode);
   }
+  config.logger.debug(`minifyJs: ${config.minifyJs}`);
 
   if (typeof config.hashFileNames !== 'boolean') {
     // hashFileNames config was not provided, so let's create the default
@@ -144,10 +144,17 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
       config.hashFileNames = true;
     }
   }
+  config.logger.debug(`hashFileNames: ${config.hashFileNames}`);
 
   if (typeof config.hashedFileNameLength !== 'number') {
     config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
+  if (config.hashFileNames) {
+    if (config.hashedFileNameLength < 4) {
+      throw new Error(`config.hashedFileNameLength must be at least 4 characters`);
+    }
+  }
+  config.logger.debug(`hashedFileNameLength: ${config.hashedFileNameLength}`);
 
   config.generateDistribution = !!config.generateDistribution;
 
@@ -155,19 +162,22 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.generateWWW = true;
   }
 
-  validatePrerenderConfig(config);
-
   if (config.copy) {
+    // merge user copy tasks into the default
     config.copy = Object.assign({}, DEFAULT_COPY_TASKS, config.copy);
+
+  } else if (config.copy === null || (config.copy as any) === false) {
+    // manually forcing to skip the copy task
+    config.copy = null;
+
   } else {
+    // use the default copy tasks
     config.copy = Object.assign({}, DEFAULT_COPY_TASKS);
   }
 
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }
-
-  validateServiceWorkerConfig(config);
 
   config.emptyDist = !!config.emptyDist;
   config.emptyWWW = !!config.emptyWWW;
@@ -244,9 +254,7 @@ export function validateUserBundles(bundles: Bundle[]) {
       throw new Error(`No valid bundle components found within stencil config`);
     }
 
-    b.components = b.components.map(tag => {
-      return validateComponentTag(tag);
-    }).sort();
+    b.components = b.components.map(tag => validateComponentTag(tag)).sort();
   });
 
   bundles.sort((a, b) => {

@@ -1,6 +1,6 @@
 import { BuildConfig } from '../util/interfaces';
 import { createRenderer } from './renderer';
-import { loadConfig } from './load-config';
+import { loadConfig } from '../util/node/load-config';
 
 
 export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
