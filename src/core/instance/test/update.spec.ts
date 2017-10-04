@@ -44,7 +44,7 @@ describe('instance update', () => {
         value = '88';
         render() {
           return [
-            h('ion-test', 0, this.value)
+            h('ion-test', null, this.value)
           ];
         }
       }
@@ -73,7 +73,7 @@ describe('instance update', () => {
       componentModule: class {
         render() {
           return [
-            h('grasshopper', 0, 'hi')
+            h('grasshopper', null, 'hi')
           ];
         }
       }

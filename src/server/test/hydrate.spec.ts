@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateRe
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../testing/mocks';
 import { h } from '../../core/renderer/h';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG, HYDRATED_CSS } from '../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS, HYDRATED_CSS } from '../../util/constants';
 
 
 describe('hydrate', () => {
@@ -16,11 +16,11 @@ describe('hydrate', () => {
       'ION-TEST': {
         componentModule: class {
           render() {
-            return h('elm-a', 0, [
-              h(SLOT_TAG, { a: { name: 'slot-a' }}),
-              h(SLOT_TAG, 0),
-              h(SLOT_TAG, { a: { name: 'slot-b' }})
-            ]);
+            return h('elm-a', null,
+              h('slot', { name: 'slot-a' }),
+              h('slot', null),
+              h('slot', { name: 'slot-b' })
+            );
           }
         },
         slotMeta: HAS_NAMED_SLOTS
@@ -65,10 +65,10 @@ describe('hydrate', () => {
       'ION-TEST': {
         componentModule: class {
           render() {
-            return h('elm-a', 0, [
+            return h('elm-a', null,
               'inner text',
-              h(SLOT_TAG, 0)
-            ]);
+              h('slot', null)
+            );
           }
         },
         slotMeta: HAS_SLOTS
@@ -110,7 +110,7 @@ describe('hydrate', () => {
       'ION-TEST': {
         componentModule: class {
           render() {
-            return h('div', 0);
+            return h('div', null);
           }
         }
       }

@@ -342,6 +342,10 @@ export function mockHtml(html: string): Element {
   return jsdom.JSDOM.fragment(html.trim()).firstChild;
 }
 
+export function mockSVGElement(): Element {
+  const jsdom = require('jsdom');
+  return jsdom.JSDOM.fragment(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`).firstChild;
+}
 
 export function mockElement(tag: string): Element {
   const jsdom = require('jsdom');

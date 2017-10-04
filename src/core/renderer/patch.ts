@@ -9,8 +9,10 @@
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
-import { SLOT_TAG, SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
-import { updateElement } from './update-element';
+import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
+import { updateElement, eventProxy } from './update-dom-node';
+
+let isSvgMode = false;
 
 
 export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererApi {
@@ -21,7 +23,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   function createElm(vnode: VNode, parentElm: Node, childIndex: number) {
     let i = 0;
 
-    if (vnode.vtag === SLOT_TAG) {
+    if (vnode.vtag === 'slot') {
 
       if (hostContentNodes) {
         // special case for manually relocating host content nodes
@@ -72,10 +74,11 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
     } else {
       // create element
-      const elm = vnode.elm = (vnode.vnamespace ? domApi.$createElementNS(vnode.vnamespace, vnode.vtag) : domApi.$createElement(vnode.vtag));
+      const elm = vnode.elm = (isSvgMode || vnode.vtag === 'svg' ? domApi.$createElementNS('http://www.w3.org/2000/svg', vnode.vtag) : domApi.$createElement(vnode.vtag));
+      isSvgMode = vnode.vtag === 'svg' ? true : (vnode.vtag === 'foreignObject' ? false : isSvgMode);
 
       // add css classes, attrs, props, listeners, etc.
-      updateElement(plt, domApi, null, vnode);
+      updateElement(plt, null, vnode, isSvgMode);
 
       const children = vnode.vchildren;
 
@@ -276,24 +279,22 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     const oldChildren = oldVnode.vchildren;
     const newChildren = newVnode.vchildren;
 
+    isSvgMode = newVnode.elm && newVnode.elm.parentElement != null && (newVnode.elm as SVGElement).ownerSVGElement !== undefined;
+    isSvgMode = newVnode.vtag === 'svg' ? true : (newVnode.vtag === 'foreignObject' ? false : isSvgMode);
+
     if (isUndef(newVnode.vtext)) {
       // element node
 
-      if ((!isUpdate || !newVnode.skipDataOnUpdate) && newVnode.vtag !== SLOT_TAG) {
+      if (newVnode.vtag !== 'slot') {
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
-        updateElement(plt, domApi, oldVnode, newVnode);
+        updateElement(plt, oldVnode, newVnode, isSvgMode);
       }
 
       if (isDef(oldChildren) && isDef(newChildren)) {
         // looks like there's child vnodes for both the old and new vnodes
-
-        if (!isUpdate || !newVnode.skipChildrenOnUpdate) {
-          // either this is the first render of an element OR it's an update
-          // AND we already know it's possible that the children could have changed
-          updateChildren(elm, oldChildren, newChildren);
-        }
+        updateChildren(elm, oldChildren, newChildren);
 
       } else if (isDef(newChildren)) {
         // no old child vnodes, but there are new child vnodes to add
@@ -326,6 +327,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
 
   return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, ssrPatchId?: number) {
+
+
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
@@ -349,9 +352,10 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
 
 export function invokeDestroy(vnode: VNode) {
-  if (vnode.vlisteners && vnode.assignedListener) {
-    for (var key in vnode.vlisteners) {
-      vnode.elm.removeEventListener(key, vnode.vlisteners, false);
+  const elm = (vnode.elm as any);
+  if (elm._listeners) {
+    for (var key in elm._listeners) {
+      elm.removeEventListener(key, eventProxy, false);
     }
   }
 
@@ -369,7 +373,7 @@ function hasChildNodes(children: VNode[]) {
   // doesn't have to climb down and check so many elements
   if (children) {
     for (var i = 0; i < children.length; i++) {
-      if (children[i].vtag !== SLOT_TAG || hasChildNodes(children[i].vchildren)) {
+      if (children[i].vtag !== 'slot' || hasChildNodes(children[i].vchildren)) {
         return true;
       }
     }

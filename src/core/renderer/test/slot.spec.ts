@@ -1,6 +1,6 @@
 import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, SLOT_TAG } from '../../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../../util/constants';
 import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
 
 
@@ -14,7 +14,7 @@ describe('Component slot', () => {
       slotMeta: HAS_SLOTS,
       componentModule: class {
         render() {
-          return h('spider', 0, h(SLOT_TAG, 0));
+          return h('spider', null, h('slot', null));
         }
       }
     });
@@ -35,7 +35,7 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('monkey', 0, h(SLOT_TAG, { a: { name: 'start' } }));
+          return h('monkey', null, h('slot', { name: 'start' }));
         }
       }
     });
@@ -44,116 +44,115 @@ describe('Component slot', () => {
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.firstElementChild.nodeName).toBe('MONKEY');
-      expect(elm.firstElementChild.childNodes[0].nodeName).toBe('TIGER');
-      expect(elm.firstElementChild.childNodes[0].textContent).toBe('88');
-      expect(elm.firstElementChild.childNodes[0].childNodes.length).toBe(1);
+      expect(elm.firstElementChild.firstElementChild.nodeName).toBe('TIGER');
+      expect(elm.firstElementChild.firstElementChild.textContent).toBe('88');
+      expect(elm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
     });
   });
 
-  it('no content', () => {
-    return mount({
-      parentVNode: h('lion', 0, h('ion-child', 0)),
-      childVNode: h(SLOT_TAG, 0)
-    }).then(({parentElm, childElm}) => {
-      expect(parentElm.firstElementChild.nodeName).toBe('LION');
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.childNodes[0].nodeName).toBe('#comment');
-
-      parentElm._render();
-      childElm._render();
-      parentElm._render();
-      childElm._render();
-
-      expect(parentElm.firstElementChild.nodeName).toBe('LION');
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.childNodes[0].nodeName).toBe('#comment');
+  it('no content', async () => {
+    const { parentElm, childElm } = await mount({
+      parentVNode: h('lion', null, h('ion-child', null)),
+      childVNode: h('slot', null)
     });
+    expect(parentElm.childNodes.length).toBe(2);
+    expect(parentElm.firstElementChild.nodeName).toBe('LION');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
+
+    parentElm._render();
+    childElm._render();
+    parentElm._render();
+    childElm._render();
+
+    expect(parentElm.firstElementChild.nodeName).toBe('LION');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.childNodes[0].nodeName).toBe('#comment');
   });
 
-  it('no content, nested child slot', () => {
-    return mount({
-      parentVNode: h('giraffe', 0, h('ion-child', 0)),
-      childVNode: h('fish', 0, h(SLOT_TAG, 0))
-    }).then(({parentElm, childElm}) => {
-      expect(parentElm.firstElementChild.nodeName).toBe('GIRAFFE');
-      expect(parentElm.firstElementChild.childNodes.length).toBe(1);
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FISH');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.childNodes.length).toBe(1);
-
-      parentElm._render();
-      childElm._render();
-      parentElm._render();
-      childElm._render();
-
-      expect(parentElm.firstElementChild.nodeName).toBe('GIRAFFE');
-      expect(parentElm.firstElementChild.childNodes.length).toBe(1);
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FISH');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.childNodes.length).toBe(1);
+  it('no content, nested child slot', async () => {
+    const { parentElm, childElm } = await mount({
+      parentVNode: h('giraffe', null, h('ion-child', null)),
+      childVNode: h('fish', null, h('slot', null))
     });
+    expect(parentElm.childNodes.length).toBe(2);
+    expect(parentElm.firstElementChild.nodeName).toBe('GIRAFFE');
+    expect(parentElm.firstElementChild.childNodes.length).toBe(1);
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FISH');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.childNodes.length).toBe(1);
+
+    parentElm._render();
+    childElm._render();
+    parentElm._render();
+    childElm._render();
+
+    expect(parentElm.firstElementChild.nodeName).toBe('GIRAFFE');
+    expect(parentElm.firstElementChild.childNodes.length).toBe(1);
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FISH');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.childNodes.length).toBe(1);
   });
 
-  it('should put parent content in child default slot', () => {
-    return mount({
-      parentVNode: h('hippo', 0, [
-        h('ion-child', 0, [
-          h('aardvark', 0, parentInstance.msg)
-        ])
-      ]),
-      childVNode: h(SLOT_TAG, 0)
-    }).then(({parentElm, childElm}) => {
-      expect(parentElm.firstElementChild.nodeName).toBe('HIPPO');
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('AARDVARK');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
-
-      parentElm._render();
-      childElm._render();
-      parentElm._render();
-      childElm._render();
-
-      expect(parentElm.firstElementChild.nodeName).toBe('HIPPO');
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('AARDVARK');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
+  it('should put parent content in child default slot', async () => {
+    const { parentElm, childElm } = await mount({
+      parentVNode: h('hippo', null,
+        h('ion-child', null,
+          h('aardvark', null, parentInstance.msg)
+        )
+      ),
+      childVNode: h('slot', null)
     });
+    expect(parentElm.firstElementChild.nodeName).toBe('HIPPO');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('AARDVARK');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
+
+    parentElm._render();
+    childElm._render();
+    parentElm._render();
+    childElm._render();
+
+    expect(parentElm.firstElementChild.nodeName).toBe('HIPPO');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('AARDVARK');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
   });
 
-  it('should put parent content in child nested default slot', () => {
-    return mount({
-      parentVNode: h('badger', 0, [
-        h('ion-child', 0, [
-          h('dingo', 0, parentInstance.msg)
-        ])
-      ]),
-      childVNode: h('camel', 0, [
-        h('owl', 0, [
-          h(SLOT_TAG, 0)
-        ])
-      ])
-    }).then(({parentElm, childElm}) => {
-      expect(parentElm.firstElementChild.nodeName).toBe('BADGER');
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
-
-      childElm._render();
-      parentElm._render();
-      childElm._render();
-      parentElm._render();
-
-      expect(parentElm.firstElementChild.nodeName).toBe('BADGER');
-      expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
-      expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
+  it('should put parent content in child nested default slot', async () => {
+    const { parentElm, childElm } = await mount({
+      parentVNode: h('badger', null,
+        h('ion-child', null,
+          h('dingo', null, parentInstance.msg)
+        )
+      ),
+      childVNode: h('camel', null,
+        h('owl', null,
+          h('slot', null)
+        )
+      )
     });
+
+    expect(parentElm.firstElementChild.nodeName).toBe('BADGER');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
+
+    childElm._render();
+    parentElm._render();
+    childElm._render();
+    parentElm._render();
+
+    expect(parentElm.firstElementChild.nodeName).toBe('BADGER');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
   });
 
   it('should render conditional content into a nested default slot', () => {
@@ -165,9 +164,9 @@ describe('Component slot', () => {
         msg = 'parent message';
 
         render() {
-          return h('ion-child', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('ion-child', null,
+            h('slot', null)
+          );
         }
       }
     });
@@ -186,8 +185,8 @@ describe('Component slot', () => {
 
           if (this.test === 2) {
             return [
-              h('div', 0, 'content 1'),
-              h('div', 0, 'content 2')
+              h('div', null, 'content 1'),
+              h('div', null, 'content 2')
             ];
           }
 
@@ -195,7 +194,7 @@ describe('Component slot', () => {
             return null;
           }
 
-          return  h('div', 0, 'content 4');
+          return  h('div', null, 'content 4');
         }
       }
     });
@@ -228,11 +227,11 @@ describe('Component slot', () => {
         msg = 'parent message';
 
         render() {
-          return h('cheetah', 0, [
-            h('ion-child', 0, [
-              h('bear', 0, this.msg)
-            ])
-          ]);
+          return h('cheetah', null,
+            h('ion-child', null,
+              h('bear', null, this.msg)
+            )
+          );
         }
       }
     });
@@ -242,9 +241,9 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('chipmunk', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('chipmunk', null,
+            h('slot', null)
+          );
         }
       }
     });
@@ -290,9 +289,9 @@ describe('Component slot', () => {
         msg = 'parent message';
 
         render() {
-          return h('ion-child', 0, [
-            h('whale', 0, this.msg)
-          ]);
+          return h('ion-child', null,
+            h('whale', null, this.msg)
+          );
         }
       }
     });
@@ -302,9 +301,9 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('bull', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('bull', null,
+            h('slot', null)
+          );
         }
       }
     });
@@ -345,10 +344,10 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('ion-child', 0, [
-            h('falcon', { a: { slot: 'start' } }, ++values),
-            h('eagle', { a: { slot: 'start' } }, ++values),
-          ]);
+          return h('ion-child', null,
+            h('falcon', { slot: 'start' }, ++values),
+            h('eagle', { slot: 'start' }, ++values),
+          );
         }
       }
     });
@@ -358,11 +357,11 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('mouse', 0, [
-            h(SLOT_TAG, 0),
-            h(SLOT_TAG, { a: { name: 'start' } }),
-            h(SLOT_TAG, { a: { name: 'end' } })
-          ]);
+          return h('mouse', null,
+            h('slot', null),
+            h('slot', { name: 'start' }),
+            h('slot', { name: 'end' })
+          );
         }
       }
     });
@@ -408,11 +407,11 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('ion-child', 0, [
-            h('butterfly', 0, (++values).toString()),
-            h('fox', { a: { slot: 'end' } }, ++values),
-            h('ferret', { a: { slot: 'start' } }, ++values)
-          ]);
+          return h('ion-child', null,
+            h('butterfly', null, (++values).toString()),
+            h('fox', { slot: 'end' }, ++values),
+            h('ferret', { slot: 'start' }, ++values)
+          );
         }
       }
     });
@@ -422,15 +421,15 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('flamingo', 0, [
-            h(SLOT_TAG, { a: { name: 'start' } }),
-            h('horse', 0, [
-              h(SLOT_TAG, 0),
-              h('bullfrog', 0, [
-                h(SLOT_TAG, { a: { name: 'end' } })
-              ])
-            ])
-          ]);
+          return h('flamingo', null,
+            h('slot', { name: 'start' }),
+            h('horse', null,
+              h('slot', null),
+              h('bullfrog', null,
+                h('slot', { name: 'end' })
+              )
+            )
+          );
         }
       }
     });
@@ -453,28 +452,28 @@ describe('Component slot', () => {
         parentElm._render();
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
-        expect(parentElm.firstElementChild.childNodes[0].nodeName).toBe('FLAMINGO');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].nodeName).toBe('FERRET');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].textContent).toBe('6');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].nodeName).toBe('HORSE');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].textContent).toBe('4');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].textContent).toBe('5');
+        expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FERRET');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('6');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].nodeName).toBe('HORSE');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].textContent).toBe('4');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('5');
 
         parentElm._render();
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
-        expect(parentElm.firstElementChild.childNodes[0].nodeName).toBe('FLAMINGO');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].nodeName).toBe('FERRET');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[0].textContent).toBe('9');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].nodeName).toBe('HORSE');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[1].textContent).toBe('7');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
-        expect(parentElm.firstElementChild.childNodes[0].childNodes[1].childNodes[2].childNodes[0].textContent).toBe('8');
+        expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FERRET');
+        expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('9');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].nodeName).toBe('HORSE');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].nodeName).toBe('BUTTERFLY');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[1].textContent).toBe('7');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].nodeName).toBe('BULLFROG');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
+        expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('8');
       });
     });
   });
@@ -487,11 +486,11 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('test-1', 0, [
-            h('test-2', 0, [
-              h('goat', 0, (++values).toString())
-            ])
-          ]);
+          return h('test-1', null,
+            h('test-2', null,
+              h('goat', null, (++values).toString())
+            )
+          );
         }
       }
     });
@@ -501,9 +500,9 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('seal', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('seal', null,
+            h('slot', null)
+          );
         }
       }
     });
@@ -513,9 +512,9 @@ describe('Component slot', () => {
       slotMeta: HAS_NAMED_SLOTS,
       componentModule: class {
         render() {
-          return h('goose', 0, [
-            h(SLOT_TAG, 0)
-          ]);
+          return h('goose', null,
+            h('slot', null)
+          );
         }
       }
     });

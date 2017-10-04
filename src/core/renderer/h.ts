@@ -8,29 +8,28 @@
  */
 
 import { VNode as VNodeObj } from './vnode';
-import { CssClassMap, VNode, VNodeProdData } from '../../util/interfaces';
+import { VNode, VNodeProdData } from '../../util/interfaces';
 
 const stack: any[] = [];
 
+export type ChildType = VNode | number | string;
 
-export function h(nodeName: number, vnodeData: VNodeProdData): VNode;
-export function h(nodeName: number, vnodeData: number): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData): VNode;
-export function h(nodeName: string, vnodeData: number): VNode;
-export function h(nodeName: string, vnodeData: number, childa: number): VNode;
-export function h(nodeName: string, vnodeData: number, childa: VNode): VNode;
+export function h(nodeName: string, vnodeData: null): VNode;
+export function h(nodeName: string, vnodeData: null, child: string): VNode;
+export function h(nodeName: string, vnodeData: null, child: number): VNode;
+export function h(nodeName: string, vnodeData: null, ...children: ChildType[]): VNode;
 export function h(nodeName: string, vnodeData: string): VNode;
-export function h(nodeName: string, vnodeData: number, childa: string): VNode;
-export function h(nodeName: string, vnodeData: string, childa: string): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, childa: string): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, childa: number): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, childa: any[]): VNode;
-export function h(nodeName: string, vnodeData: number, childa: any[]): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode): VNode;
-export function h(nodeName: string, vnodeData: number, childa: VNode, childb: VNode): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, childb: string): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, childa: string, childb: string): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, childa: VNode, childb: VNode): VNode;
+export function h(nodeName: string, vnodeData: string, child: string): VNode;
+export function h(nodeName: string, vnodeData: string, child: number): VNode;
+export function h(nodeName: string, vnodeData: string, ...children: ChildType[]): VNode;
+export function h(nodeName: string, vnodeData: number): VNode;
+export function h(nodeName: string, vnodeData: number, child: string): VNode;
+export function h(nodeName: string, vnodeData: number, child: number): VNode;
+export function h(nodeName: string, vnodeData: number, ...children: ChildType[]): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, child: string): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, child: number): VNode;
+export function h(nodeName: string, vnodeData: VNodeProdData, ...children: ChildType[]): VNode;
 export function h(nodeName: any, vnodeData: any, child?: any) {
   var children: any[];
   var lastSimple = false;
@@ -69,54 +68,31 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     }
   }
 
+  vnodeData = (vnodeData === null) ? undefined : vnodeData;
+
   let vnode = new VNodeObj();
   vnode.vtag = nodeName;
   vnode.vchildren = children;
+  vnode.vattrs = (vnodeData == null) ? undefined : vnodeData;
+  vnode.vkey = vnode.vattrs == null ? undefined : vnode.vattrs.key;
 
-  if (vnodeData) {
-    // data object was provided
-    vnode.vattrs = (vnodeData as VNodeProdData).a;
-    vnode.vprops = (vnodeData as VNodeProdData).p;
-
-    if (typeof (vnodeData as VNodeProdData).c === 'string') {
-      vnode.vclass = {};
-      let cssClasses = ((vnodeData as VNodeProdData).c as string).split(' ');
-      for (i = 0; i < cssClasses.length; i++) {
-        if (cssClasses[i]) {
-          vnode.vclass[cssClasses[i]] = true;
-        }
-      }
-
-    } else {
-      vnode.vclass = (vnodeData as VNodeProdData).c as CssClassMap;
+  // normalize class / classname attributes
+  if (vnode.vattrs) {
+    if (vnode.vattrs.className) {
+      vnode.vattrs.class = vnode.vattrs.className;
     }
+    if (vnode.vattrs.class && typeof vnode.vattrs.class === 'string') {
+      const classList = vnode.vattrs.class.trim().split(/\s+/);
+      vnode.vattrs.class = {};
 
-    vnode.vstyle = (vnodeData as VNodeProdData).s;
-    vnode.vlisteners = (vnodeData as VNodeProdData).o;
-    vnode.vkey = (vnodeData as VNodeProdData).k;
-    vnode.vnamespace = (vnodeData as VNodeProdData).n;
-
-    // x = undefined: always check both data and children
-    // x = 0 skip checking only data on update
-    // x = 1 skip checking only children on update
-    // x = 2 skip checking both data and children on update
-    vnode.skipDataOnUpdate = (vnodeData as VNodeProdData).x === 0 || (vnodeData as VNodeProdData).x === 2;
-    vnode.skipChildrenOnUpdate = (vnodeData as VNodeProdData).x > 0;
-
-  } else {
-    // no data object was provided
-    // so no data, so don't both checking data
-    vnode.skipDataOnUpdate = true;
-
-    // since no data was provided, than no x was provided
-    // if no x was provided then we need to always check children
-    // if if there are no children at all, then we know never to check children
-    vnode.skipChildrenOnUpdate = (!children || children.length === 0);
+      for (let i = classList.length - 1; i > -1; i -= 1) {
+        vnode.vattrs.class[classList[i]] = true;
+      }
+    }
   }
 
   return vnode;
 }
-
 
 export function t(textValue: any) {
   const vnode = new VNodeObj();
