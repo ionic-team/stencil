@@ -23,7 +23,6 @@ const srcPackageJson = require(SRC_PACKAGE_JSON);
 
 const bundledDependencies = [
   'chalk',
-  'chokidar',
   'clean-css',
   'glob',
   'is-glob',

@@ -23,6 +23,7 @@
     "transpile.testing": "tsc -p src/testing/tsconfig.json"
   },
   "dependencies": {
+    "chokidar": "1.7.0",
     "node-sass": "4.5.3",
     "typescript": "2.5.3"
   },
@@ -46,7 +47,6 @@
     "babel-plugin-transform-es2015-shorthand-properties": "^6.22.0",
     "babel-plugin-transform-es2015-template-literals": "^6.22.0",
     "chalk": "^2.1.0",
-    "chokidar": "1.7.0",
     "clean-css": "^4.1.8",
     "fs-extra": "^2.1.2",
     "glob": "^7.1.2",
