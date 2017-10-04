@@ -26,20 +26,6 @@ function cleanUpDependency(dependencyDir, dependencyName) {
 
   // console.log('cleanUpDependency', dependencyName, packageData.license);
 
-  Object.keys(packageData).forEach(key => {
-    if (keepPackageJsonProps.indexOf(key) === -1) {
-      delete packageData[key];
-    }
-  });
-
-  delete packageData.devDependencies;
-  delete packageData.scripts;
-  delete packageData.description;
-  delete packageData.keywords;
-  delete packageData.scripts;
-
-  fs.writeJsonSync(packageJsonFilename, packageData);
-
   const testFiles = path.join(
     dependencyDir,
     '**/+(test|example|examples|benchmark|docs|doc)/**'
@@ -55,24 +41,6 @@ function cleanUpDependency(dependencyDir, dependencyName) {
   );
   glob.sync(unlinkFiles, { absolute: true, nocase: true, dot: true }).forEach(removeUnnecessary);
 }
-
-const keepPackageJsonProps = [
-  'author',
-  'bin',
-  'bundleDependencies',
-  'config',
-  'contributors',
-  'dependencies',
-  'homepage',
-  'license',
-  'main',
-  'module',
-  'browser',
-  'types',
-  'name',
-  'repository',
-  'version'
-];
 
 
 const unlink = [
@@ -108,10 +76,7 @@ const unlink = [
   '.npmignore',
   '.coveralls.yml',
   'component.json',
-  'karma.config.js',
-  'karma.conf.js',
   '.gitmodules',
-  '.tonic_example.js',
   'issue_template.md'
 ];
 
