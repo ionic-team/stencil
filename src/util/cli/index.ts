@@ -51,20 +51,19 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
   // override the config values with any cli arguments
   overrideConfigFromArgv(config, argv);
 
-  if (!config.sys) {
-    // if the config was not provided then use the
-    // defaul stencil sys found in bin
-    config.sys = getNodeSys(path.join(__dirname, '../'), logger);
-  }
-
   if (!config.logger) {
     // if a logger was not provided then use the
-    // defaul stencil command line logger found in bin
+    // default stencil command line logger
     config.logger = logger;
   }
 
   if (config.logLevel) {
     config.logger.level = config.logLevel;
+  }
+
+  if (!config.sys) {
+    // if the config was not provided then use the default node sys
+    config.sys = getNodeSys(path.join(__dirname, '../'), config.logger);
   }
 
   switch (task) {

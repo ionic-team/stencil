@@ -25,16 +25,15 @@ export function loadConfig(config: string | BuildConfig) {
     buildConfig = (config as BuildConfig);
   }
 
-  if (!buildConfig.sys) {
-    // if the config was not provided then use the
-    // defaul stencil sys found in bin
-    buildConfig.sys = getNodeSys(path.join(__dirname, '../'), logger);
-  }
-
   if (!buildConfig.logger) {
     // if a logger was not provided then use the
     // defaul stencil command line logger found in bin
     buildConfig.logger = logger;
+  }
+
+  if (!buildConfig.sys) {
+    // if the config was not provided then use the default node sys
+    buildConfig.sys = getNodeSys(path.join(__dirname, '../'), buildConfig.logger);
   }
 
   return buildConfig;
