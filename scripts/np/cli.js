@@ -16,7 +16,6 @@ const cli = meow(`
 
 	Options
 	  --any-branch  Allow publishing from any branch
-	  --no-publish  Skips publishing
 	  --tag         Publish under a given dist-tag
 
 	Examples

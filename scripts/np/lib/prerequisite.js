@@ -45,9 +45,6 @@ module.exports = (input, pkg, opts) => {
 			title: 'Check git tag existence',
 			task: () => execa('git', ['fetch'])
 				.then(() => {
-					if (opts.yarn) {
-						return execa.stdout('yarn', ['config', 'get', 'version-tag-prefix']);
-					}
 					return execa.stdout('npm', ['config', 'get', 'tag-version-prefix']);
 				})
 				.then(

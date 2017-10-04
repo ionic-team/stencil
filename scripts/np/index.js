@@ -24,27 +24,14 @@ const exec = (cmd, args, opts) => {
 };
 
 
-// npm4 cuz npm5 has a bug with "npm publish <tarball>"
 const rootDir = path.join(__dirname, '../..');
-const nodeModuleBinDir = path.join(rootDir, 'node_modules/.bin');
 const scriptsDir = path.join(rootDir, 'scripts');
-const distDir = path.join(rootDir, 'dist');
-const npmExe = path.join(nodeModuleBinDir, 'npm');
+const dstDir = path.join(rootDir, 'dist');
 
 
 module.exports = (input, opts) => {
 	input = input || 'patch';
 
-	opts = Object.assign({
-		cleanup: true,
-		publish: true,
-		yarn: false
-	}, opts);
-
-	const runTests = !opts.yolo;
-	const runCleanup = opts.cleanup && !opts.yolo;
-	const runPublish = opts.publish;
-	const runGit = opts.git;
 	const pkg = util.readPkg();
 
 	const tasks = new Listr([
@@ -55,75 +42,54 @@ module.exports = (input, opts) => {
 		{
 			title: 'Git',
 			task: () => gitTasks(opts)
-		}
-	], {
-		showSubtasks: false
-	});
-
-	if (runCleanup) {
-		tasks.add([
-			{
-				title: 'Cleanup',
-				task: () => del('node_modules')
-			},
-			{
-				title: 'Install npm dependencies',
-				task: () => exec('npm', ['install', '--no-package-lock'], { cwd: rootDir })
-			}
-		]);
-	}
-
-	tasks.add({
-		title: 'Build @stencil/core',
-		task: () => {
-			return exec('node', [npmExe, 'run', 'build'], { cwd: rootDir });
-		}
-	});
-
-	if (runTests) {
-		tasks.add({
-			title: 'Run tests',
-			task: () => exec('node', [npmExe, 'test'], { cwd: rootDir })
-		});
-	}
-
-	tasks.add([
-		{
-			title: 'Bump package.json version',
-			task: () => {
-				return exec('node', [npmExe, 'version', input], { cwd: rootDir });
-			}
 		},
 		{
-			title: 'Create "dist" @stencil/core package',
-			task: () => {
-				return exec('node', ['./build-package.js'], { cwd: scriptsDir });
-			}
-		}
-	]);
-
-	if (runPublish) {
-		tasks.add({
+			title: 'Cleanup',
+			task: () => del('node_modules')
+		},
+		{
+			title: 'Install root dependencies',
+			task: () => exec('npm', ['install', '--no-package-lock'], { cwd: rootDir })
+		},
+		{
+			title: 'Build @stencil/core',
+			task: () => exec('npm', ['run', 'build'], { cwd: rootDir })
+		},
+		{
+			title: 'Run tests',
+			task: () => exec('npm', ['test'], { cwd: rootDir })
+		},
+		{
+			title: 'Bump package.json version',
+			task: () => exec('npm', ['version', input], { cwd: rootDir })
+		},
+		{
+			title: 'Prepare "dist" @stencil/core package',
+			task: () => exec('node', ['prepare-package.js'], { cwd: scriptsDir })
+		},
+		{
+			title: 'Install "dist" @stencil/core dependencies',
+			task: () => exec('npm', ['install', '--no-package-lock'], { cwd: dstDir })
+		},
+		{
+			title: 'Dedupe "dist" @stencil/core dependencies',
+			task: () => exec('npm', ['dedupe'], { cwd: dstDir })
+		},
+		{
+			title: 'Cleanup "dist" @stencil/core package',
+			task: () => exec('node', ['post-package.js'], { cwd: scriptsDir })
+		},
+		{
 			title: 'Publish "dist" @stencil/core package',
-			task: () => {
-				const args = [
-					npmExe,
-					'publish',
-					'package.tgz'
-				];
-				if (opts.tag) {
-					args.push('--tag', opts.tag);
-				}
-
-				return exec('node', args, { cwd: distDir });
-			}
-		});
-
-		tasks.add({
+			task: () => exec('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir })
+		},
+		{
 			title: 'Pushing to Github',
-			task: () => exec('git', ['push', '--follow-tags'])
-		});
-	}
+			task: () => exec('git', ['push', '--follow-tags'], { cwd: rootDir })
+		}
+
+	], { showSubtasks: false });
+
 
 	return tasks.run()
 		.then(() => readPkgUp())
