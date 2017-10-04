@@ -11,7 +11,12 @@ export function generateAppManifest(config: BuildConfig, ctx: BuildContext, modu
     modulesFiles: [],
     bundles: [],
     global: null,
-    dependentManifests: []
+    dependentManifests: [],
+    compiler: {
+      name: config.sys.compiler.name,
+      version: config.sys.compiler.version,
+      typescriptVersion: config.sys.compiler.typescriptVersion
+    }
   };
 
   if (hasError(ctx.diagnostics)) {

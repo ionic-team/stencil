@@ -249,6 +249,14 @@ export interface Manifest {
   bundles?: Bundle[];
   global?: ModuleFile;
   dependentManifests?: Manifest[];
+  compiler?: ManifestCompiler;
+}
+
+
+export interface ManifestCompiler {
+  name: string;
+  version: string;
+  typescriptVersion?: string;
 }
 
 

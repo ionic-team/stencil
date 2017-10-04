@@ -5,6 +5,7 @@ import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_PROP,
   MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT, MEMBER_ELEMENT_REF, MEMBER_STATE, PRIORITY_LOW,
   TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
 import { normalizePath } from '../util';
+import { validateManifestCompatibility } from './manifest-compatibility';
 
 
 // this maps the json data to our internal data structure
@@ -78,12 +79,19 @@ export function serializeAppManifest(config: BuildConfig, manifestDir: string, m
 export function parseDependentManifest(config: BuildConfig, collectionName: string, manifestDir: string, manifestJson: string) {
   const manifestData: ManifestData = JSON.parse(manifestJson);
   const manifest: Manifest = {
-    manifestName: collectionName
+    manifestName: collectionName,
+    compiler: {
+      name: manifestData.compiler.name,
+      version: manifestData.compiler.version,
+      typescriptVersion: manifestData.compiler.typescriptVersion
+    }
   };
 
   parseComponents(config, manifestDir, manifestData, manifest);
   parseBundles(manifestData, manifest);
   parseGlobal(config, manifestDir, manifestData, manifest);
+
+  validateManifestCompatibility(config, manifestDir, manifest);
 
   return manifest;
 }
