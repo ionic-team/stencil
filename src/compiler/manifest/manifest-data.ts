@@ -42,7 +42,8 @@ export function serializeAppManifest(config: BuildConfig, manifestDir: string, m
     bundles: [],
     compiler: {
       name: config.sys.compiler.name,
-      version: config.sys.compiler.version
+      version: config.sys.compiler.version,
+      typescriptVersion: config.sys.compiler.typescriptVersion
     }
   };
 

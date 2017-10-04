@@ -1187,6 +1187,7 @@ export interface ManifestData {
   compiler?: {
     name: string;
     version: string;
+    typescriptVersion?: string;
   };
 }
 

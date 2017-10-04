@@ -18,9 +18,23 @@ function loadDependentManifest(config: BuildConfig, ctx: BuildContext, dependent
     return Promise.resolve(ctx.dependentManifests[dependentCollection.name]);
   }
 
+  // figure out the path to the dependent collection's package.json
+  const dependentPackageJsonFilePath = config.sys.resolveModule(config.rootDir, dependentCollection.name);
+
+  // parse the dependent collection's package.json
+  const packageData = JSON.parse(config.sys.fs.readFileSync(dependentPackageJsonFilePath, 'utf-8'));
+
+  // verify this package has a "collection" property in its package.json
+  if (!packageData.collection) {
+    throw new Error(`stencil collection "${dependentCollection.name}" is missing the "collection" key from its package.json: ${dependentPackageJsonFilePath}`);
+  }
+
+  // get the root directory of the dependency
+  const dependentPackageRootDir = config.sys.path.dirname(dependentPackageJsonFilePath);
+
   // figure out the full path to the collection manifest file
   const dependentManifestFilePath = normalizePath(
-    config.sys.resolveModule(config.rootDir, dependentCollection.name)
+    config.sys.path.join(dependentPackageRootDir, packageData.collection)
   );
 
   // we haven't cached the dependent manifest yet, let's read this file

@@ -1,6 +1,7 @@
-import { BuildConfig, Diagnostic, Logger, StencilSystem } from '../interfaces';
+import { BuildConfig, Diagnostic, Logger, PackageJsonData, StencilSystem } from '../interfaces';
 import { createContext, runInContext } from './node-context';
 import { createDom } from './node-dom';
+import { normalizePath } from '../../compiler/util';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -8,13 +9,26 @@ import * as path from 'path';
 export function getNodeSys(distRootDir: string, logger: Logger) {
   const coreClientFileCache: {[key: string]: string} = {};
 
-  const packageJsonData = require(path.join(distRootDir, 'package.json')) as { name: string; version: string };
+  let packageJsonData: PackageJsonData;
+  try {
+    packageJsonData = require(path.join(distRootDir, 'package.json'));
+  } catch (e) {
+    throw new Error(`unable to resolve "package.json" from: ${distRootDir}`);
+  }
+
+  let typescriptPackageJson: PackageJsonData;
+  try {
+    typescriptPackageJson = require(resolveModule(distRootDir, 'typescript')) as PackageJsonData;
+  } catch (e) {
+    throw new Error(`unable to resolve "typescript" from: ${distRootDir}`);
+  }
 
   const sys: StencilSystem = {
 
     compiler: {
       name: packageJsonData.name,
-      version: packageJsonData.version
+      version: packageJsonData.version,
+      typescriptVersion: typescriptPackageJson.version
     },
 
     copy(src, dest, opts) {
@@ -207,44 +221,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
       });
     },
 
-    resolveModule(fromDir, moduleId) {
-      const Module = require('module');
-
-      fromDir = path.resolve(fromDir);
-      const fromFile = path.join(fromDir, 'noop.js');
-
-      let dir = Module._resolveFilename(moduleId, {
-        id: fromFile,
-        filename: fromFile,
-        paths: Module._nodeModulePaths(fromDir)
-      });
-
-      const root = path.parse(fromDir).root;
-      let packageJson: string;
-      let packageJsonFilePath: any;
-      let packageData: any;
-
-      while (dir !== root) {
-        dir = path.dirname(dir);
-        packageJsonFilePath = path.join(dir, 'package.json');
-
-        try {
-          packageJson = fs.readFileSync(packageJsonFilePath, 'utf-8');
-        } catch (e) {
-          continue;
-        }
-
-        packageData = JSON.parse(packageJson);
-
-        if (!packageData.collection) {
-          throw new Error(`stencil collection "${moduleId}" is missing the "collection" key from its package.json: ${packageJsonFilePath}`);
-        }
-
-        return path.join(dir, packageData.collection);
-      }
-
-      throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
-    },
+    resolveModule,
 
     vm: {
       createContext,
@@ -283,4 +260,36 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
   });
 
   return sys;
+}
+
+
+function resolveModule(fromDir: string, moduleId: string) {
+  const Module = require('module');
+
+  fromDir = path.resolve(fromDir);
+  const fromFile = path.join(fromDir, 'noop.js');
+
+  let dir = Module._resolveFilename(moduleId, {
+    id: fromFile,
+    filename: fromFile,
+    paths: Module._nodeModulePaths(fromDir)
+  });
+
+  const root = path.parse(fromDir).root;
+  let packageJsonFilePath: any;
+
+  while (dir !== root) {
+    dir = path.dirname(dir);
+    packageJsonFilePath = path.join(dir, 'package.json');
+
+    try {
+      fs.accessSync(packageJsonFilePath);
+    } catch (e) {
+      continue;
+    }
+
+    return normalizePath(packageJsonFilePath);
+  }
+
+  throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
 }
