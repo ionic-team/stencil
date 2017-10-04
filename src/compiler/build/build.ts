@@ -24,6 +24,10 @@ export function build(config: BuildConfig, context?: any) {
   // ctx is where stuff is cached for fast in-memory lookups later
   const ctx = getBuildContext(context);
 
+  if (!ctx.isRebuild) {
+    config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
+  }
+
   // reset the build context, this is important for rebuilds
   resetBuildContext(ctx);
 

@@ -280,7 +280,16 @@ export function mockLogger() {
         }
       };
     },
-    printDiagnostics: noop
+    printDiagnostics: noop,
+    red: (msg) => msg,
+    green: (msg) => msg,
+    yellow: (msg) => msg,
+    blue: (msg) => msg,
+    magenta: (msg) => msg,
+    cyan: (msg) => msg,
+    gray: (msg) => msg,
+    bold: (msg) => msg,
+    dim: (msg) => msg
   };
   return logger;
 }

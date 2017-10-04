@@ -531,6 +531,15 @@ export interface Logger {
   error(...msg: any[]): void;
   createTimeSpan(startMsg: string, debug?: boolean): LoggerTimeSpan;
   printDiagnostics(diagnostics: Diagnostic[]): void;
+  red(msg: string): string;
+  green(msg: string): string;
+  yellow(msg: string): string;
+  blue(msg: string): string;
+  magenta(msg: string): string;
+  cyan(msg: string): string;
+  gray(msg: string): string;
+  bold(msg: string): string;
+  dim(msg: string): string;
 }
 
 
@@ -982,6 +991,7 @@ export interface StencilSystem {
   compiler?: {
     name: string;
     version: string;
+    typescriptVersion?: string;
   };
   createDom?(): {
     parse(hydrateOptions: HydrateOptions): Window;
@@ -1077,6 +1087,12 @@ export interface StencilSystem {
   };
   watch?(paths: string | string[], opts?: any): FSWatcher;
   workbox?: Workbox;
+}
+
+
+export interface PackageJsonData {
+  name: string;
+  version: string;
 }
 
 

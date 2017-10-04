@@ -96,8 +96,36 @@ export class NodeLogger implements Logger {
     }
   }
 
-  color(msg: string, color: string) {
+  color(msg: string, color: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {
     return (chalk as any)[color](msg);
+  }
+
+  red(msg: string) {
+    return chalk.red(msg);
+  }
+
+  green(msg: string) {
+    return chalk.green(msg);
+  }
+
+  yellow(msg: string) {
+    return chalk.yellow(msg);
+  }
+
+  blue(msg: string) {
+    return chalk.blue(msg);
+  }
+
+  magenta(msg: string) {
+    return chalk.magenta(msg);
+  }
+
+  cyan(msg: string) {
+    return chalk.cyan(msg);
+  }
+
+  gray(msg: string) {
+    return chalk.gray(msg);
   }
 
   bold(msg: string) {
@@ -282,7 +310,7 @@ class CmdTimeSpan {
     }
   }
 
-  finish(msg: string, color?: string, bold?: boolean, newLineSuffix?: boolean) {
+  finish(msg: string, color?: 'red', bold?: boolean, newLineSuffix?: boolean) {
     if (color) {
       msg = this.logger.color(msg, color);
     }
