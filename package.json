@@ -4,7 +4,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli",
+    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run prepare.package",
     "build.cli": "npm run transpile.cli && node scripts/build-cli.js",
     "build.compiler": "npm run transpile.compiler && node scripts/build-compiler.js",
     "build.core": "npm run transpile.core && node scripts/build-core.js",
@@ -12,6 +12,7 @@
     "build.testing": "npm run transpile.testing && node scripts/build-testing.js",
     "clean": "rimraf dist/",
     "deploy": "node scripts/np/cli.js",
+    "prepare.package": "node scripts/prepare-package.js",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
     "test.watch": "jest --watch",
