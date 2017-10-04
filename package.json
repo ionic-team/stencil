@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.0.6-7",
+  "version": "0.0.6-8",
   "license": "MIT",
   "private": true,
   "scripts": {
