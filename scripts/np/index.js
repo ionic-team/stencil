@@ -23,6 +23,15 @@ const exec = (cmd, args, opts) => {
 	).filter(Boolean);
 };
 
+
+// npm4 cuz npm5 has a bug with "npm publish <tarball>"
+const rootDir = path.join(__dirname, '../..');
+const nodeModuleBinDir = path.join(rootDir, 'node_modules/.bin');
+const scriptsDir = path.join(rootDir, 'scripts');
+const distDir = path.join(rootDir, 'dist');
+const npmExe = path.join(nodeModuleBinDir, 'npm');
+
+
 module.exports = (input, opts) => {
 	input = input || 'patch';
 
@@ -59,7 +68,7 @@ module.exports = (input, opts) => {
 			},
 			{
 				title: 'Install npm dependencies',
-				task: () => exec('npm', ['install', '--no-package-lock'])
+				task: () => exec('npm', ['install', '--no-package-lock'], { cwd: rootDir })
 			}
 		]);
 	}
@@ -67,14 +76,14 @@ module.exports = (input, opts) => {
 	tasks.add({
 		title: 'Build @stencil/core',
 		task: () => {
-			return exec('npm', ['run', 'build'], { cwd: path.join(__dirname, '../..') });
+			return exec('node', [npmExe, 'run', 'build'], { cwd: rootDir });
 		}
 	});
 
 	if (runTests) {
 		tasks.add({
 			title: 'Run tests',
-			task: () => exec('npm', ['test'])
+			task: () => exec('node', [npmExe, 'test'], { cwd: rootDir })
 		});
 	}
 
@@ -82,13 +91,13 @@ module.exports = (input, opts) => {
 		{
 			title: 'Bump package.json version',
 			task: () => {
-				return exec('npm', ['version', input], { cwd: path.join(__dirname, '../..') });
+				return exec('node', [npmExe, 'version', input], { cwd: rootDir });
 			}
 		},
 		{
 			title: 'Create "dist" @stencil/core package',
 			task: () => {
-				return exec('node', ['./build-package'], { cwd: path.join(__dirname, '..') });
+				return exec('node', ['./build-package.js'], { cwd: scriptsDir });
 			}
 		}
 	]);
@@ -98,19 +107,15 @@ module.exports = (input, opts) => {
 			title: 'Publish "dist" @stencil/core package',
 			task: () => {
 				const args = [
+					npmExe,
 					'publish',
-					'package.tgz',
-					'--new-version',
-					input
+					'package.tgz'
 				];
 				if (opts.tag) {
 					args.push('--tag', opts.tag);
 				}
 
-				// yarn publish package.tgz --tag next --new-version 0.0.6-6
-
-				// yarn cuz npm has a bug with "npm publish <tarball>""
-				return exec('yarn', args, { cwd: path.join(__dirname, '../../dist') });
+				return exec('node', args, { cwd: distDir });
 			}
 		});
 
