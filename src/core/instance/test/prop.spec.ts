@@ -1,6 +1,6 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentMeta, ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
-import { MEMBER_PROP, MEMBER_PROP_MUTABLE, PROP_TYPE } from '../../../util/constants';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { initProxy } from '../proxy';
 
 
@@ -9,7 +9,7 @@ describe('instance prop', () => {
   it('should set both getter/setter prop on element', () => {
     cmpMeta = {
       membersMeta: {'prop': {
-        memberType: MEMBER_PROP,
+        memberType: MEMBER_TYPE.Prop,
         attribName: 'prop',
         propType: PROP_TYPE.Any
       }}
@@ -26,7 +26,7 @@ describe('instance prop', () => {
   it('should set both getter/setter prop on instance w/ isStateful option', () => {
     cmpMeta = {
       membersMeta: {'prop': {
-        memberType: MEMBER_PROP_MUTABLE,
+        memberType: MEMBER_TYPE.PropMutable,
         attribName: 'prop',
         propType: PROP_TYPE.Any
       }}
@@ -43,7 +43,7 @@ describe('instance prop', () => {
   it('should set only getter prop on instance', () => {
     cmpMeta = {
       membersMeta: {'prop': {
-        memberType: MEMBER_PROP,
+        memberType: MEMBER_TYPE.Prop,
         attribName: 'prop',
         propType: PROP_TYPE.Any
       }}

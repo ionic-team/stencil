@@ -1,5 +1,4 @@
-import { HAS_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD, MEMBER_STATE, MEMBER_PROP, PRIORITY_LOW,
-  PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, PROP_TYPE } from '../constants';
+import { MEMBER_TYPE, PRIORITY, PROP_CHANGE, PROP_TYPE, SLOT } from '../constants';
 import { formatComponentMeta, formatLoadComponentRegistry } from '../data-serialize';
 import { parseComponentMeta, parseComponentRegistry, parsePropertyValue } from '../data-parse';
 import { ComponentMeta, ComponentRegistry } from '../interfaces';
@@ -87,8 +86,8 @@ describe('data serialize/parse', () => {
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].propsWillChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
-      expect(registry['TAG'].propsWillChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
+      expect(registry['TAG'].propsWillChangeMeta[0][PROP_CHANGE.PropName]).toBe('propName');
+      expect(registry['TAG'].propsWillChangeMeta[0][PROP_CHANGE.MethodName]).toBe('methodName');
     });
 
     it('should set propDidChangeMeta', () => {
@@ -99,8 +98,8 @@ describe('data serialize/parse', () => {
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].propsDidChangeMeta[0][PROP_CHANGE_PROP_NAME]).toBe('propName');
-      expect(registry['TAG'].propsDidChangeMeta[0][PROP_CHANGE_METHOD_NAME]).toBe('methodName');
+      expect(registry['TAG'].propsDidChangeMeta[0][PROP_CHANGE.PropName]).toBe('propName');
+      expect(registry['TAG'].propsDidChangeMeta[0][PROP_CHANGE.MethodName]).toBe('methodName');
     });
 
     it('should set no propWillChangeMeta', () => {
@@ -126,13 +125,13 @@ describe('data serialize/parse', () => {
 
     it('should set host element member name', () => {
       cmpMeta.membersMeta = {
-        'myHostElement': { memberType: MEMBER_ELEMENT_REF }
+        'myHostElement': { memberType: MEMBER_TYPE.Element }
       };
 
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].membersMeta.myHostElement.memberType).toEqual(MEMBER_ELEMENT_REF);
+      expect(registry['TAG'].membersMeta.myHostElement.memberType).toEqual(MEMBER_TYPE.Element);
     });
 
     it('should set no host element member name', () => {
@@ -144,28 +143,28 @@ describe('data serialize/parse', () => {
 
     it('should set statesMeta', () => {
       cmpMeta.membersMeta = {
-        'state1': { memberType: MEMBER_STATE },
-        'state2': { memberType: MEMBER_STATE }
+        'state1': { memberType: MEMBER_TYPE.State },
+        'state2': { memberType: MEMBER_TYPE.State }
       };
 
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].membersMeta.state1.memberType).toEqual(MEMBER_STATE);
-      expect(registry['TAG'].membersMeta.state2.memberType).toEqual(MEMBER_STATE);
+      expect(registry['TAG'].membersMeta.state1.memberType).toEqual(MEMBER_TYPE.State);
+      expect(registry['TAG'].membersMeta.state2.memberType).toEqual(MEMBER_TYPE.State);
     });
 
     it('should set methodsMeta', () => {
       cmpMeta.membersMeta = {
-        'method1': { memberType: MEMBER_METHOD },
-        'method2': { memberType: MEMBER_METHOD }
+        'method1': { memberType: MEMBER_TYPE.Method },
+        'method2': { memberType: MEMBER_TYPE.Method }
       };
 
       const format = formatComponentMeta(cmpMeta);
       parseComponentMeta(registry, moduleImports, evalStr(format));
 
-      expect(registry['TAG'].membersMeta.method1.memberType).toEqual(MEMBER_METHOD);
-      expect(registry['TAG'].membersMeta.method2.memberType).toEqual(MEMBER_METHOD);
+      expect(registry['TAG'].membersMeta.method1.memberType).toEqual(MEMBER_TYPE.Method);
+      expect(registry['TAG'].membersMeta.method2.memberType).toEqual(MEMBER_TYPE.Method);
     });
 
     it('should set componentModule', () => {
@@ -238,12 +237,12 @@ describe('data serialize/parse', () => {
     });
 
     it('should set load priority', () => {
-      cmpMeta.loadPriority = PRIORITY_LOW;
+      cmpMeta.loadPriority = PRIORITY.Low;
 
       const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.loadPriority).toBe(PRIORITY_LOW);
+      expect(cmpMeta.loadPriority).toBe(PRIORITY.Low);
     });
 
     it('should set not load priority', () => {
@@ -254,12 +253,12 @@ describe('data serialize/parse', () => {
     });
 
     it('should set has slot', () => {
-      cmpMeta.slotMeta = HAS_SLOTS;
+      cmpMeta.slotMeta = SLOT.HasSlots;
 
       const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.slotMeta).toBe(HAS_SLOTS);
+      expect(cmpMeta.slotMeta).toBe(SLOT.HasSlots);
     });
 
     it('should set no slot', () => {
@@ -282,7 +281,7 @@ describe('data serialize/parse', () => {
 
     it('should set any type prop', () => {
       cmpMeta.membersMeta = {
-        'str': { memberType: MEMBER_PROP, attribName: 'str' },
+        'str': { memberType: MEMBER_TYPE.Prop, attribName: 'str' },
       };
 
       const format = formatLoadComponentRegistry(cmpMeta);
@@ -293,7 +292,7 @@ describe('data serialize/parse', () => {
 
     it('should set number prop', () => {
       cmpMeta.membersMeta = {
-        'num': { memberType: MEMBER_PROP, attribName: 'num', propType: PROP_TYPE.Number }
+        'num': { memberType: MEMBER_TYPE.Prop, attribName: 'num', propType: PROP_TYPE.Number }
       };
 
       const format = formatLoadComponentRegistry(cmpMeta);
@@ -304,7 +303,7 @@ describe('data serialize/parse', () => {
 
     it('should set boolean prop', () => {
       cmpMeta.membersMeta = {
-        'boo': { memberType: MEMBER_PROP, attribName: 'boo', propType: PROP_TYPE.Boolean }
+        'boo': { memberType: MEMBER_TYPE.Prop, attribName: 'boo', propType: PROP_TYPE.Boolean }
       };
 
       const format = formatLoadComponentRegistry(cmpMeta);
@@ -315,7 +314,7 @@ describe('data serialize/parse', () => {
 
     it('should set string prop', () => {
       cmpMeta.membersMeta = {
-        'boo': { memberType: MEMBER_PROP, attribName: 'boo', propType: PROP_TYPE.String }
+        'boo': { memberType: MEMBER_TYPE.Prop, attribName: 'boo', propType: PROP_TYPE.String }
       };
 
       const format = formatLoadComponentRegistry(cmpMeta);
@@ -331,9 +330,9 @@ describe('data serialize/parse', () => {
       cmpMeta = parseComponentRegistry(format, {});
 
       expect(cmpMeta.membersMeta.color).toBeDefined();
-      expect(cmpMeta.membersMeta.color.memberType).toBe(MEMBER_PROP);
+      expect(cmpMeta.membersMeta.color.memberType).toBe(MEMBER_TYPE.Prop);
       expect(cmpMeta.membersMeta.mode).toBeDefined();
-      expect(cmpMeta.membersMeta.mode.memberType).toBe(MEMBER_PROP);
+      expect(cmpMeta.membersMeta.mode.memberType).toBe(MEMBER_TYPE.Prop);
     });
 
     it('should set all of the modes', () => {

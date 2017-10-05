@@ -1,5 +1,5 @@
 import { MembersMeta } from '../../../util/interfaces';
-import { MEMBER_ELEMENT_REF } from '../../../util/constants';
+import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -33,7 +33,7 @@ export function getElementDecoratorMeta(classNode: ts.ClassDeclaration) {
 
     if (isElement && hostElementMember) {
       membersMeta[hostElementMember] = {
-        memberType: MEMBER_ELEMENT_REF
+        memberType: MEMBER_TYPE.Element
       };
 
       // Remove decorator

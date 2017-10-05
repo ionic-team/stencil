@@ -1,6 +1,6 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentMeta, ComponentInstance, PlatformApi } from '../../../util/interfaces';
-import { MEMBER_PROP, PROP_TYPE } from '../../../util/constants';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { initProxy } from '../proxy';
 
 
@@ -91,27 +91,27 @@ describe('instance change detection', () => {
   let cmpMeta: ComponentMeta = {
     membersMeta: {
       'num': {
-        memberType: MEMBER_PROP,
+        memberType: MEMBER_TYPE.Prop,
         attribName: 'num',
         propType: PROP_TYPE.Number
       },
       'str': {
-        memberType: MEMBER_PROP,
+        memberType: MEMBER_TYPE.Prop,
         attribName: 'str',
         propType: PROP_TYPE.String
       },
       'bool': {
-        memberType: MEMBER_PROP,
+        memberType: MEMBER_TYPE.Prop,
         attribName: 'bool',
         propType: PROP_TYPE.Boolean
       },
       'arr': {
-        memberType: MEMBER_PROP,
+        memberType: MEMBER_TYPE.Prop,
         attribName: 'arr',
         propType: PROP_TYPE.Any
       },
       'obj': {
-        memberType: MEMBER_PROP,
+        memberType: MEMBER_TYPE.Prop,
         attribName: 'obj',
         propType: PROP_TYPE.Any
       }

@@ -1,8 +1,6 @@
 import { Bundle, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta, LoadComponentRegistry,
   MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD,
-  MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT,
-  MEMBER_STATE, PROP_TYPE } from '../util/constants';
+import { MEMBER_TYPE, PROP_TYPE, SLOT } from '../util/constants';
 
 
 export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadComponentRegistry {
@@ -37,13 +35,13 @@ export function formatStyles(styleMeta: StylesMeta): any {
 
 
 function formatSlot(val: number) {
-  if (val === HAS_SLOTS) {
-    return HAS_SLOTS;
+  if (val === SLOT.HasSlots) {
+    return SLOT.HasSlots;
   }
-  if (val === HAS_NAMED_SLOTS) {
-    return HAS_NAMED_SLOTS;
+  if (val === SLOT.HasNamedSlots) {
+    return SLOT.HasNamedSlots;
   }
-  return 0;
+  return SLOT.NoSlots;
 }
 
 
@@ -214,26 +212,26 @@ function formatMemberMeta(memberName: string, memberMeta: MemberMeta) {
 
 
 function formatMemberType(val: number) {
-  if (val === MEMBER_ELEMENT_REF) {
-    return `/** element ref **/ ${MEMBER_ELEMENT_REF}`;
+  if (val === MEMBER_TYPE.Element) {
+    return `/** element ref **/ ${MEMBER_TYPE.Element}`;
   }
-  if (val === MEMBER_METHOD) {
-    return `/** method **/ ${MEMBER_METHOD}`;
+  if (val === MEMBER_TYPE.Method) {
+    return `/** method **/ ${MEMBER_TYPE.Method}`;
   }
-  if (val === MEMBER_PROP) {
-    return `/** prop **/ ${MEMBER_PROP}`;
+  if (val === MEMBER_TYPE.Prop) {
+    return `/** prop **/ ${MEMBER_TYPE.Prop}`;
   }
-  if (val === MEMBER_PROP_MUTABLE) {
-    return `/** prop mutable **/ ${MEMBER_PROP_MUTABLE}`;
+  if (val === MEMBER_TYPE.PropMutable) {
+    return `/** prop mutable **/ ${MEMBER_TYPE.PropMutable}`;
   }
-  if (val === MEMBER_STATE) {
-    return `/** state **/ ${MEMBER_STATE}`;
+  if (val === MEMBER_TYPE.State) {
+    return `/** state **/ ${MEMBER_TYPE.State}`;
   }
-  if (val === MEMBER_PROP_CONNECT) {
-    return `/** prop connect **/ ${MEMBER_PROP_CONNECT}`;
+  if (val === MEMBER_TYPE.PropConnect) {
+    return `/** prop connect **/ ${MEMBER_TYPE.PropConnect}`;
   }
-  if (val === MEMBER_PROP_CONTEXT) {
-    return `/** prop context **/ ${MEMBER_PROP_CONTEXT}`;
+  if (val === MEMBER_TYPE.PropContext) {
+    return `/** prop context **/ ${MEMBER_TYPE.PropContext}`;
   }
   return `/** unknown ****/ 0`;
 }

@@ -9,8 +9,7 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { getAppFileName } from '../compiler/app/app-core';
 import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
-import { DID_LOAD_ERROR, INIT_INSTANCE_ERROR, DID_UPDATE_ERROR, LOAD_BUNDLE_ERROR, MEMBER_PROP,
-  QUEUE_EVENTS_ERROR, RENDER_ERROR, WILL_LOAD_ERROR } from '../util/constants';
+import { MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
@@ -131,8 +130,8 @@ export function createPlatformServer(
     // default mode and color props
     cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
-    cmpMeta.membersMeta.mode = { memberType: MEMBER_PROP };
-    cmpMeta.membersMeta.color = { memberType: MEMBER_PROP, attribName: 'color' };
+    cmpMeta.membersMeta.mode = { memberType: MEMBER_TYPE.Prop };
+    cmpMeta.membersMeta.color = { memberType: MEMBER_TYPE.Prop, attribName: 'color' };
 
     // registry tags are always UPPER-CASE
     const registryTag = cmpMeta.tagNameMeta.toUpperCase();
@@ -213,7 +212,7 @@ export function createPlatformServer(
           config.sys.vm.runInContext(jsContent, win, { timeout: 10000 });
 
         }).catch(err => {
-          const d = onError(LOAD_BUNDLE_ERROR, err, elm);
+          const d = onError(RUNTIME_ERROR.LoadBundleError, err, elm);
           appLoaded(d);
         });
       }
@@ -255,7 +254,7 @@ export function createPlatformServer(
             appLoaded();
 
           }).catch(err => {
-            const d = onError(LOAD_BUNDLE_ERROR, err, elm);
+            const d = onError(RUNTIME_ERROR.LoadBundleError, err, elm);
             appLoaded(d);
           });
         }
@@ -278,7 +277,7 @@ export function createPlatformServer(
     config.sys.vm.runInContext(ctx.appFiles.global, win);
   }
 
-  function onError(type: number, err: Error, elm: HostElement) {
+  function onError(type: RUNTIME_ERROR, err: Error, elm: HostElement) {
     const d: Diagnostic = {
       type: 'runtime',
       header: 'Runtime error detected',
@@ -287,25 +286,25 @@ export function createPlatformServer(
     };
 
     switch (type) {
-      case LOAD_BUNDLE_ERROR:
+      case RUNTIME_ERROR.LoadBundleError:
         d.header += ' while loading bundle';
         break;
-      case QUEUE_EVENTS_ERROR:
+      case RUNTIME_ERROR.QueueEventsError:
         d.header += ' while running initial events';
         break;
-      case WILL_LOAD_ERROR:
+      case RUNTIME_ERROR.WillLoadError:
         d.header += ' during componentWillLoad()';
         break;
-      case DID_LOAD_ERROR:
+      case RUNTIME_ERROR.DidLoadError:
         d.header += ' during componentDidLoad()';
         break;
-      case INIT_INSTANCE_ERROR:
+      case RUNTIME_ERROR.InitInstanceError:
         d.header += ' while initializing instance';
         break;
-      case RENDER_ERROR:
+      case RUNTIME_ERROR.RenderError:
         d.header += ' while rendering';
         break;
-      case DID_UPDATE_ERROR:
+      case RUNTIME_ERROR.DidUpdateError:
         d.header += ' while updating';
         break;
     }

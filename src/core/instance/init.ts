@@ -2,13 +2,13 @@ import { attributeChangedCallback } from './attribute-changed';
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { DID_LOAD_ERROR, QUEUE_EVENTS_ERROR } from '../../util/constants';
 import { initEventEmitters } from './events';
 import { createMutationObserver } from './mutation-observer';
 import { initProxy } from './proxy';
 import { queueUpdate } from './update';
 import { render } from './render';
 import { replayQueuedEventsOnInstance } from './listeners';
+import { RUNTIME_ERROR } from '../../util/constants';
 
 
 export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement, hydratedCssClass?: string) {
@@ -85,7 +85,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   try {
     replayQueuedEventsOnInstance(elm);
   } catch (e) {
-    plt.onError(QUEUE_EVENTS_ERROR, e, elm);
+    plt.onError(RUNTIME_ERROR.QueueEventsError, e, elm);
   }
 
   // Create a mutation observer that will identify changes to the elements
@@ -128,7 +128,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
       instance.componentDidLoad && instance.componentDidLoad();
 
     } catch (e) {
-      plt.onError(DID_LOAD_ERROR, e, elm);
+      plt.onError(RUNTIME_ERROR.DidLoadError, e, elm);
     }
 
     // add the css class that this element has officially hydrated

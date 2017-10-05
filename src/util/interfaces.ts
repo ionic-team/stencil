@@ -1,6 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
-import { PROP_TYPE } from './constants';
+import { MEMBER_TYPE, PROP_TYPE } from './constants';
 
 
 export interface CoreContext {
@@ -600,7 +600,7 @@ export interface MembersMeta {
 
 
 export interface MemberMeta {
-  memberType?: number;
+  memberType?: MEMBER_TYPE;
   propType?: PROP_TYPE;
   attribName?: string;
   ctrlId?: string;

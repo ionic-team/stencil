@@ -1,5 +1,5 @@
 import { MembersMeta } from '../../../util/interfaces';
-import { MEMBER_METHOD } from '../../../util/constants';
+import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -24,7 +24,7 @@ export function getMethodDecoratorMeta(classNode: ts.ClassDeclaration) {
 
     if (isMethod && methodName) {
       membersMeta[methodName] = {
-        memberType: MEMBER_METHOD
+        memberType: MEMBER_TYPE.Method
       };
 
       // Remove decorator

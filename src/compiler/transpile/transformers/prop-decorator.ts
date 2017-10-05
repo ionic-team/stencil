@@ -1,7 +1,6 @@
 import { catchError } from '../../util';
 import { Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../util/interfaces';
-import { MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT,
-  MEMBER_PROP_CONTEXT, PROP_TYPE } from '../../../util/constants';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -86,7 +85,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
       }
 
       const propMeta: MemberMeta = membersMeta[propName] = {
-        memberType: MEMBER_PROP
+        memberType: MEMBER_TYPE.Prop
       };
 
       if (propType) {
@@ -95,12 +94,12 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
       if (userPropOptions) {
         if (typeof userPropOptions.connect === 'string') {
-          propMeta.memberType = MEMBER_PROP_CONNECT;
+          propMeta.memberType = MEMBER_TYPE.PropConnect;
           propMeta.ctrlId = userPropOptions.connect;
         }
 
         if (typeof userPropOptions.context === 'string') {
-          propMeta.memberType = MEMBER_PROP_CONTEXT;
+          propMeta.memberType = MEMBER_TYPE.PropContext;
           propMeta.ctrlId = userPropOptions.context;
         }
 
@@ -116,7 +115,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
         }
 
         if (typeof userPropOptions.mutable === 'boolean') {
-          propMeta.memberType = MEMBER_PROP_MUTABLE;
+          propMeta.memberType = MEMBER_TYPE.PropMutable;
         }
       }
 

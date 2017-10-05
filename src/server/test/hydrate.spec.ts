@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateRe
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../testing/mocks';
 import { h } from '../../core/renderer/h';
-import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../util/constants';
+import { SLOT } from '../../util/constants';
 
 
 describe('hydrate', () => {
@@ -23,7 +23,7 @@ describe('hydrate', () => {
             );
           }
         },
-        slotMeta: HAS_NAMED_SLOTS
+        slotMeta: SLOT.HasNamedSlots
       }
     };
     const opts: HydrateOptions = {
@@ -71,7 +71,7 @@ describe('hydrate', () => {
             );
           }
         },
-        slotMeta: HAS_SLOTS
+        slotMeta: SLOT.HasSlots
       }
     };
     const opts: HydrateOptions = {

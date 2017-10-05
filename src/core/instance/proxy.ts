@@ -1,8 +1,7 @@
 import { ComponentInstance, ComponentMeta, ComponentInternalValues,
   DomApi, HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { isDef } from '../../util/helpers';
-import { MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONTEXT, MEMBER_PROP_CONNECT,
-  MEMBER_STATE, MEMBER_ELEMENT_REF, PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../util/constants';
+import { MEMBER_TYPE, PROP_CHANGE } from '../../util/constants';
 import { parsePropertyValue } from '../../util/data-parse';
 import { queueUpdate } from './update';
 
@@ -28,23 +27,23 @@ export function initProxy(plt: PlatformApi, elm: HostElement, instance: Componen
       var memberMeta = cmpMeta.membersMeta[memberName];
       var memberType = memberMeta.memberType;
 
-      if (memberType === MEMBER_PROP_CONTEXT) {
+      if (memberType === MEMBER_TYPE.PropContext) {
         // @Prop({ context: 'config' })
         var contextObj = plt.getContextItem(memberMeta.ctrlId);
         if (isDef(contextObj)) {
           defineProperty(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
         }
 
-      } else if (memberType === MEMBER_PROP_CONNECT) {
+      } else if (memberType === MEMBER_TYPE.PropConnect) {
         // @Prop({ connect: 'ion-loading-ctrl' })
         defineProperty(instance, memberName, plt.propConnect(memberMeta.ctrlId));
 
-      } else if (memberType === MEMBER_METHOD) {
+      } else if (memberType === MEMBER_TYPE.Method) {
         // add a value getter on the dom's element instance
         // pointed at the instance's method
         defineProperty(elm, memberName, instance[memberName].bind(instance));
 
-      } else if (memberType === MEMBER_ELEMENT_REF) {
+      } else if (memberType === MEMBER_TYPE.Element) {
         // add a getter to the element reference using
         // the member name the component meta provided
         defineProperty(instance, memberName, elm);
@@ -82,7 +81,7 @@ function initProp(
   propDidChangeMeta: PropChangeMeta[]
 ) {
 
-  if (memberType === MEMBER_STATE) {
+  if (memberType === MEMBER_TYPE.State) {
     // @State() property, so copy the value directly from the instance
     // before we create getters/setters on this same property name
     internalValues[memberName] = (<any>instance)[memberName];
@@ -110,12 +109,12 @@ function initProp(
   if (propWillChangeMeta) {
     // there are prop WILL change methods for this component
     for (; i < propWillChangeMeta.length; i++) {
-      if (propWillChangeMeta[i][PROP_CHANGE_PROP_NAME] === memberName) {
+      if (propWillChangeMeta[i][PROP_CHANGE.PropName] === memberName) {
         // cool, we should watch for changes to this property
         // let's bind their watcher function and add it to our list
         // of watchers, so any time this property changes we should
         // also fire off their @PropWillChange() method
-        internalValues.__propWillChange[memberName] = (<any>instance)[propWillChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
+        internalValues.__propWillChange[memberName] = (<any>instance)[propWillChangeMeta[i][PROP_CHANGE.MethodName]].bind(instance);
       }
     }
   }
@@ -123,12 +122,12 @@ function initProp(
   if (propDidChangeMeta) {
     // there are prop DID change methods for this component
     for (i = 0; i < propDidChangeMeta.length; i++) {
-      if (propDidChangeMeta[i][PROP_CHANGE_PROP_NAME] === memberName) {
+      if (propDidChangeMeta[i][PROP_CHANGE.PropName] === memberName) {
         // cool, we should watch for changes to this property
         // let's bind their watcher function and add it to our list
         // of watchers, so any time this property changes we should
         // also fire off their @PropDidChange() method
-        internalValues.__propDidChange[memberName] = (<any>instance)[propDidChangeMeta[i][PROP_CHANGE_METHOD_NAME]].bind(instance);
+        internalValues.__propDidChange[memberName] = (<any>instance)[propDidChangeMeta[i][PROP_CHANGE.MethodName]].bind(instance);
       }
     }
   }
@@ -167,19 +166,19 @@ function initProp(
     }
   }
 
-  if (memberType === MEMBER_PROP || memberType === MEMBER_PROP_MUTABLE) {
+  if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
     // @Prop() or @Prop({ mutable: true })
     // have both getters and setters on the DOM element
     // @State() getters and setters should not be assigned to the element
     defineProperty(elm, memberName, undefined, getValue, setValue);
   }
 
-  if (memberType === MEMBER_PROP_MUTABLE || memberType === MEMBER_STATE) {
+  if (memberType === MEMBER_TYPE.PropMutable || memberType === MEMBER_TYPE.State) {
     // @Prop({ mutable: true }) or @State()
     // have both getters and setters on the instance
     defineProperty(instance, memberName, undefined, getValue, setValue);
 
-  } else if (memberType === MEMBER_PROP) {
+  } else if (memberType === MEMBER_TYPE.Prop) {
     // @Prop() only has getters, but not setters on the instance
     defineProperty(instance, memberName, undefined, getValue, function invalidSetValue() {
       // this is not a stateful @Prop()

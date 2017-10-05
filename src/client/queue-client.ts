@@ -1,5 +1,5 @@
 import { DomController, Now, QueueApi } from '../util/interfaces';
-import { PRIORITY_HIGH } from '../util/constants';
+import { PRIORITY } from '../util/constants';
 
 
 export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
@@ -62,7 +62,7 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
   }
 
   function add(cb: Function, priority?: number) {
-    if (priority === PRIORITY_HIGH) {
+    if (priority === PRIORITY.High) {
       // uses Promise.resolve() for next tick
       highPriority.push(cb);
 

@@ -1,4 +1,4 @@
-import { COMMENT_NODE, TEXT_NODE } from '../../util/constants';
+import { NODE_TYPE } from '../../util/constants';
 
 
 export function collapseHtmlWhitepace(node: Node) {
@@ -15,7 +15,7 @@ export function collapseHtmlWhitepace(node: Node) {
   for (var i = node.childNodes.length - 1; i >= 0; i--) {
     var childNode = node.childNodes[i];
 
-    if (childNode.nodeType === TEXT_NODE || childNode.nodeType === COMMENT_NODE) {
+    if (childNode.nodeType === NODE_TYPE.TextNode || childNode.nodeType === NODE_TYPE.CommentNode) {
 
       childNode.nodeValue = childNode.nodeValue.replace(REDUCE_WHITESPACE_REGEX, ' ');
 

@@ -1,30 +1,25 @@
-/**
- * This constants file is largely for minification tricks, and to
- * have easy to read variable names. Enums would make more sense
- * in most cases, but doing values like this as constants allows
- * minifiers to just place the raw value directly in source, and in
- * production there is no variable at all. For example, the minifier
- * turns data[BUNDLE_ID] turns into data[0] for production builds.
- */
-
 
 /**
  * Member Types
  */
-export const MEMBER_PROP = 1;
-export const MEMBER_PROP_MUTABLE = 2;
-export const MEMBER_PROP_CONTEXT = 3;
-export const MEMBER_PROP_CONNECT = 4;
-export const MEMBER_STATE = 5;
-export const MEMBER_METHOD = 6;
-export const MEMBER_ELEMENT_REF = 7;
+export const enum MEMBER_TYPE {
+  Prop = 1,
+  PropMutable = 2,
+  PropContext = 3,
+  PropConnect = 4,
+  State = 5,
+  Method = 6,
+  Element = 7,
+}
 
 
 /**
  * Prop Change Meta Indexes
  */
-export const PROP_CHANGE_PROP_NAME = 0;
-export const PROP_CHANGE_METHOD_NAME = 1;
+export const enum PROP_CHANGE {
+  PropName = 0,
+  MethodName = 1,
+}
 
 
 /**
@@ -41,23 +36,39 @@ export const enum PROP_TYPE {
 /**
  * JS Property to Attribute Name Options
  */
-export const ATTR_LOWER_CASE = 1;
+export const enum ATTR_CASE {
+  LowerCase = 1,
+}
 
 
 /**
  * Priority Levels
  */
-export const PRIORITY_HIGH = 3;
-export const PRIORITY_MEDIUM = 2;
-export const PRIORITY_LOW = 1;
+export const enum PRIORITY {
+  Low = 1,
+  Medium = 2,
+  High = 3,
+}
 
 
 /**
  * Slot Meta
  */
-export const SLOT_TAG = 0;
-export const HAS_SLOTS = 1;
-export const HAS_NAMED_SLOTS = 2;
+export const enum SLOT {
+  NoSlots = 0,
+  HasSlots = 1,
+  HasNamedSlots = 2,
+}
+
+
+/**
+ * Node Types
+ */
+export const enum NODE_TYPE {
+  ElementNode = 1,
+  TextNode = 3,
+  CommentNode = 8,
+}
 
 
 /**
@@ -65,14 +76,6 @@ export const HAS_NAMED_SLOTS = 2;
  */
 export const SSR_VNODE_ID = 'data-ssrv';
 export const SSR_CHILD_ID = 'data-ssrc';
-
-
-/**
- * Node Types
- */
-export const ELEMENT_NODE = 1;
-export const TEXT_NODE = 3;
-export const COMMENT_NODE = 8;
 
 
 /**
@@ -110,13 +113,15 @@ export const APP_NAMESPACE_REGEX = /["']__STENCIL__APP__['"]/g;
 
 
 /**
- * Errors
+ * Runtime Errors
  */
-export const LOAD_BUNDLE_ERROR = 1;
-export const QUEUE_EVENTS_ERROR = 2;
-export const WILL_LOAD_ERROR = 3;
-export const DID_LOAD_ERROR = 4;
-export const WILL_UPDATE_ERROR = 5;
-export const DID_UPDATE_ERROR = 6;
-export const INIT_INSTANCE_ERROR = 7;
-export const RENDER_ERROR = 8;
+export const enum RUNTIME_ERROR {
+  LoadBundleError = 1,
+  QueueEventsError = 2,
+  WillLoadError = 3,
+  DidLoadError = 4,
+  WillUpdateError = 5,
+  DidUpdateError = 6,
+  InitInstanceError = 7,
+  RenderError = 8,
+}

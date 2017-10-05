@@ -1,8 +1,6 @@
-import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
-import {
-  MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE, PROP_TYPE
-} from '../../../util/constants';
 import { dashToPascalCase } from '../../../util/helpers';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
+import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
@@ -52,7 +50,7 @@ function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: s
   };
   return Object.keys(membersMeta)
     .filter((memberName) => {
-      return [MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE].indexOf(membersMeta[memberName].memberType) !== -1;
+      return [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable].indexOf(membersMeta[memberName].memberType) !== -1;
     })
     .reduce((obj, memberName) => {
       const member = membersMeta[memberName];
@@ -111,7 +109,7 @@ function createJSXElementsNamespace(cmpMeta: ComponentMeta) {
   };
   const members = Object.keys(cmpMeta.membersMeta)
     .filter((memberName) => {
-      return [MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE].indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1;
+      return [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable].indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1;
     })
     .map((memberName) => {
       const member = cmpMeta.membersMeta[memberName];

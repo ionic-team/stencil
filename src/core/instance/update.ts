@@ -1,7 +1,7 @@
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { initComponentInstance } from './init';
+import { RUNTIME_ERROR } from '../../util/constants';
 import { stopObserving, startObserving } from './mutation-observer';
-import { DID_UPDATE_ERROR, INIT_INSTANCE_ERROR, RENDER_ERROR, WILL_LOAD_ERROR, WILL_UPDATE_ERROR } from '../../util/constants';
 
 
 export function queueUpdate(plt: PlatformApi, elm: HostElement) {
@@ -56,11 +56,11 @@ export function update(plt: PlatformApi, elm: HostElement) {
             userPromise = elm.$instance.componentWillLoad();
           }
         } catch (e) {
-          plt.onError(WILL_LOAD_ERROR, e, elm);
+          plt.onError(RUNTIME_ERROR.WillLoadError, e, elm);
         }
 
       } catch (e) {
-        plt.onError(INIT_INSTANCE_ERROR, e, elm);
+        plt.onError(RUNTIME_ERROR.InitInstanceError, e, elm);
       }
 
     } else {
@@ -74,7 +74,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
           userPromise = elm.$instance.componentWillUpdate();
         }
       } catch (e) {
-        plt.onError(WILL_UPDATE_ERROR, e, elm);
+        plt.onError(RUNTIME_ERROR.WillUpdateError, e, elm);
       }
     }
 
@@ -107,7 +107,7 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
     // _onRenderCallbacks were all just fired off
 
   } catch (e) {
-    plt.onError(RENDER_ERROR, e, elm);
+    plt.onError(RUNTIME_ERROR.RenderError, e, elm);
   }
 
   // after render we need to start the observer back up.
@@ -128,6 +128,6 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
 
   } catch (e) {
     // derp
-    plt.onError(DID_UPDATE_ERROR, e, elm);
+    plt.onError(RUNTIME_ERROR.DidUpdateError, e, elm);
   }
 }
