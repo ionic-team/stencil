@@ -53,7 +53,7 @@ export function injectAppIntoLoader(
 
   stencilLoaderContent = stencilLoaderContent.replace(
     APP_NAMESPACE_REGEX,
-    `"${config.namespace}","${publicPath}","${appCoreFileName}","${appCorePolyfilledFileName}",${componentRegistryStr}`
+    `"${config.namespace}","${config.hydratedCssClass}","${publicPath}","${appCoreFileName}","${appCorePolyfilledFileName}",${componentRegistryStr}`
   );
 
   if (config.minifyJs) {

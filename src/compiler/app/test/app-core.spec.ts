@@ -38,17 +38,17 @@ describe('app-core', () => {
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: `${CORE_NAME}.dev.js` });
     });
 
-    it('genertes the full wrapped content', async () => {
+    it('generates the full wrapped content', async () => {
       const preamble = generatePreamble(config).trim();
       mockGetClientCoreFile.mockReturnValue(Promise.resolve('I am core'));
       const res = await core.generateCore(config, ['global line 1', 'global line 2']);
       const lines = res.split('\n');
       expect(lines[0]).toEqual(preamble);
-      expect(lines[1]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
+      expect(lines[1]).toEqual(`(function(Context,appNamespace,hydratedCssClass,publicPath){"use strict";`);
       expect(lines[3]).toEqual('global line 1');
       expect(lines[4]).toEqual('global line 2');
       expect(lines[5]).toEqual('I am core');
-      expect(lines[6]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[6]).toEqual(`})({},"${config.namespace}","${config.hydratedCssClass}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
   });
 
@@ -88,7 +88,7 @@ describe('app-core', () => {
       expect(mockGetClientCoreFile.mock.calls[lastCall][0]).toEqual({ staticName: `${CORE_NAME}.es5.dev.js` });
     });
 
-    it('genertes the full wrapped content', async () => {
+    it('generates the full wrapped content', async () => {
       const preamble = generatePreamble(config).trim();
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am document register element'));
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am object assign'));
@@ -108,11 +108,11 @@ describe('app-core', () => {
       expect(lines[5]).toEqual('I am closest');
       expect(lines[6]).toEqual('I am performance now');
       expect(lines[7]).toEqual(preamble);
-      expect(lines[8]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
+      expect(lines[8]).toEqual(`(function(Context,appNamespace,hydratedCssClass,publicPath){"use strict";`);
       expect(lines[10]).toEqual('global line 1');
       expect(lines[11]).toEqual('global line 2');
       expect(lines[12]).toEqual('I am core');
-      expect(lines[13]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[13]).toEqual(`})({},"${config.namespace}","${config.hydratedCssClass}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
   });
 
@@ -151,9 +151,9 @@ describe('app-core', () => {
 
     it('wraps the JS content in an IFEE', () => {
       const lines = core.wrapCoreJs(config, 'this is JavaScript code, really it is').split('\n');
-      expect(lines[1]).toEqual(`(function(Context,appNamespace,publicPath){"use strict";`);
+      expect(lines[1]).toEqual(`(function(Context,appNamespace,hydratedCssClass,publicPath){"use strict";`);
       expect(lines[3]).toEqual('this is JavaScript code, really it is');
-      expect(lines[4]).toEqual(`})({},"${config.namespace}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[4]).toEqual(`})({},"${config.namespace}","${config.hydratedCssClass}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
 
     it('trims the JS content', () => {

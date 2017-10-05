@@ -14,7 +14,7 @@ import { proxyController } from '../core/instance/proxy';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
-export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string): PlatformApi {
+export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
   const registry: ComponentRegistry = { 'HTML': {} };
   const moduleImports: {[tag: string]: any} = {};
   const moduleCallbacks: ModuleCallbacks = {};
@@ -122,7 +122,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
     // initialize the properties on the component module prototype
-    initHostConstructor(plt, HostElementConstructor.prototype);
+    initHostConstructor(plt, HostElementConstructor.prototype, hydratedCssClass);
 
     // add which attributes should be observed
     const observedAttributes: string[] = [];

@@ -2,7 +2,7 @@ import { attributeChangedCallback } from './attribute-changed';
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { HYDRATED_CSS, DID_LOAD_ERROR, QUEUE_EVENTS_ERROR } from '../../util/constants';
+import { DID_LOAD_ERROR, QUEUE_EVENTS_ERROR } from '../../util/constants';
 import { initEventEmitters } from './events';
 import { createMutationObserver } from './mutation-observer';
 import { initProxy } from './proxy';
@@ -11,7 +11,7 @@ import { render } from './render';
 import { replayQueuedEventsOnInstance } from './listeners';
 
 
-export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement) {
+export function initHostConstructor(plt: PlatformApi, HostElementConstructor: HostElement, hydratedCssClass?: string) {
   // let's wire up our functions to the host element's prototype
   // we can also inject our platform into each one that needs that api
 
@@ -43,7 +43,7 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
   };
 
   HostElementConstructor._initLoad = function() {
-    initLoad(plt, (this as HostElement));
+    initLoad(plt, (this as HostElement), hydratedCssClass);
   };
 
   HostElementConstructor._render = function(isInitialRender: boolean) {
@@ -95,7 +95,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
 }
 
 
-export function initLoad(plt: PlatformApi, elm: HostElement): any {
+export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: string): any {
   const instance = elm.$instance;
 
   // it's possible that we've already decided to destroy this element
@@ -132,7 +132,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement): any {
     }
 
     // add the css class that this element has officially hydrated
-    elm.classList.add(HYDRATED_CSS);
+    elm.classList.add(hydratedCssClass);
 
     // ( •_•)
     // ( •_•)>⌐■-■

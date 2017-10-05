@@ -316,6 +316,7 @@ export interface BuildConfig {
   prerender?: PrerenderConfig|boolean;
   copy?: CopyTasks;
   serviceWorker?: ServiceWorkerConfig|boolean;
+  hydratedCssClass?: string;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -1166,6 +1167,7 @@ declare global {
   // other collections, do not use "const" or "let"
   var Context: CoreContext;
   var publicPath: string;
+  var hydratedCssClass: string;
   var appNamespace: string;
   var h: Hyperscript;
 }

@@ -1,7 +1,6 @@
 import { BuildContext, BuildConfig, Bundle, Manifest, ModuleFile, StylesResults } from '../../util/interfaces';
 import { buildError, catchError, hasError, isCssFile, isSassFile, generatePreamble, normalizePath, readFile } from '../util';
 import { formatCssBundleFileName, generateBundleId } from '../../util/data-serialize';
-import { HYDRATED_CSS } from '../../util/constants';
 
 
 export function bundleStyles(config: BuildConfig, ctx: BuildContext) {
@@ -102,7 +101,7 @@ function generateModeCss(
     const styleContents = styleBundles.map(s => s.content);
 
     // tack on the visibility css to each component tag selector
-    styleContents.push(appendVisibilityCss(bundleModuleFiles));
+    styleContents.push(appendVisibilityCss(config, bundleModuleFiles));
 
     // let's join all bundled component mode css together
     let styleContent = styleContents.join('\n\n').trim();
@@ -322,10 +321,10 @@ function readCssFile(config: BuildConfig, ctx: BuildContext, absStylePath: strin
 }
 
 
-function appendVisibilityCss(bundleModuleFiles: ModuleFile[]) {
+function appendVisibilityCss(config: BuildConfig, bundleModuleFiles: ModuleFile[]) {
   // always tack this css to each component tag css
   const selector = bundleModuleFiles.map(moduleFile => {
-    return `${moduleFile.cmpMeta.tagNameMeta}.${HYDRATED_CSS}`;
+    return `${moduleFile.cmpMeta.tagNameMeta}.${config.hydratedCssClass}`;
   }).join(',\n');
 
   return `${selector} {\n  visibility: inherit;\n}`;

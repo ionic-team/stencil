@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateRe
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../testing/mocks';
 import { h } from '../../core/renderer/h';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, HYDRATED_CSS } from '../../util/constants';
+import { HAS_SLOTS, HAS_NAMED_SLOTS } from '../../util/constants';
 
 
 describe('hydrate', () => {
@@ -43,7 +43,7 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test data-ssrv="0" class="${HYDRATED_CSS}">
+            <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
               <elm-a data-ssrc="0.0.">
                 <div slot="slot-a">inner slot-a text</div>
                 <div>default slot text</div>
@@ -89,7 +89,7 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test data-ssrv="0" class="${HYDRATED_CSS}">
+            <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
               <elm-a data-ssrc="0.0">
                 <!--s.0.0-->inner text<!--/-->
                 content text
@@ -126,7 +126,7 @@ describe('hydrate', () => {
         <html dir="ltr">
           <head></head>
           <body>
-            <ion-test data-ssrv="0" class="${HYDRATED_CSS}">
+            <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
               <div data-ssrc="0.0."></div>
             </ion-test>
           </body>

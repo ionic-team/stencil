@@ -88,13 +88,6 @@ export const KEY_CODE_MAP: {[key: string]: number} = {
 
 
 /**
- * CSS class that gets added to the host element
- * after the component has fully hydrated
- */
-export const HYDRATED_CSS = '💎';
-
-
-/**
  * Namespaces
  */
 export const SVG_NS = 'http://www.w3.org/2000/svg';
