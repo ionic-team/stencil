@@ -3,14 +3,14 @@ var LazyIframe = (function () {
     }
     LazyIframe.prototype.componentDidLoad = function () {
         var _this = this;
-        if ('IntersectionObserver' in window) {
+        if ("IntersectionObserver" in window) {
             this.io = new IntersectionObserver(function (data) {
                 if (data[0].isIntersecting) {
                     _this.handleIframe();
                     _this.cleanup();
                 }
             });
-            this.io.observe(this.el.querySelector('iframe'));
+            this.io.observe(this.el.querySelector("iframe"));
         }
         else {
             this.handleIframe();
@@ -32,8 +32,7 @@ var LazyIframe = (function () {
         }
     };
     LazyIframe.prototype.render = function () {
-        return (h("div", null,
-            h("iframe", { frameBorder: "0", title: this.title, allowFullScreen: true, width: "560", height: "315", src: this.realSrc })));
+        return (h("div", null, h("iframe", { "width": "560", "height": "315", "frameBorder": "0", "title": this.title, "allowFullScreen": true, "src": this.realSrc })));
     };
     return LazyIframe;
 }());

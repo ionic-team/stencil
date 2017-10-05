@@ -1,16 +1,16 @@
-import matchPath from '../../utils/match-path';
+import matchPath from "../../utils/match-path";
 var RouteLink = (function () {
     function RouteLink() {
         this.unsubscribe = function () { return; };
         this.exact = false;
         this.custom = false;
-        this.activeClass = 'link-active';
+        this.activeClass = "link-active";
         this.match = null;
     }
     // Identify if the current route is a match.
     RouteLink.prototype.computeMatch = function (pathname) {
         if (!pathname) {
-            var location_1 = this.activeRouter.get('location');
+            var location_1 = this.activeRouter.get("location");
             pathname = location_1.pathname;
         }
         var match = matchPath(pathname, {
@@ -39,10 +39,10 @@ var RouteLink = (function () {
     RouteLink.prototype.handleClick = function (e) {
         e.preventDefault();
         if (!this.activeRouter) {
-            console.warn('<stencil-route-link> wasn\'t passed an instance of the router as the "router" prop!');
+            console.warn("<stencil-route-link> wasn't passed an instance of the router as the \"router\" prop!");
             return;
         }
-        var history = this.activeRouter.get('history');
+        var history = this.activeRouter.get("history");
         return history.push(this.url, {});
     };
     RouteLink.prototype.render = function () {
@@ -50,12 +50,10 @@ var RouteLink = (function () {
             _a[this.activeClass] = this.match !== null,
             _a);
         if (this.custom) {
-            return (h("span", { class: classes, onClick: this.handleClick.bind(this) },
-                h("slot", null)));
+            return (h("span", { "class": classes, "onclick": this.handleClick.bind(this) }, h("slot", null)));
         }
         else {
-            return (h("a", { class: classes, href: this.url, onClick: this.handleClick.bind(this) },
-                h("slot", null)));
+            return (h("a", { "class": classes, "onclick": this.handleClick.bind(this), "href": this.url }, h("slot", null)));
         }
         var _a;
     };
