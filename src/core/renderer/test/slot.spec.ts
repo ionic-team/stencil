@@ -1,12 +1,10 @@
 import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
-import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
+import { mockConnect, mockDefine, mockPlatform, waitForLoad, MockedPlatform } from '../../../testing/mocks';
 import { SLOT } from '../../../util/constants';
 
 
 describe('Component slot', () => {
-  const plt = mockPlatform();
-
 
   it('should relocate nested default slot nodes', () => {
     mockDefine(plt, {
@@ -558,8 +556,11 @@ describe('Component slot', () => {
     msg: ''
   };
 
+  var plt: MockedPlatform;
+
   beforeEach(() => {
     parentInstance.msg = 'parent message';
+    plt = mockPlatform();
   });
 
   function mount(options: {parentVNode: VNode, childVNode: VNode}): Promise<{ parentElm?: HostElement, childElm?: HostElement }> {

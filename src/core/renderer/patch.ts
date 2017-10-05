@@ -352,16 +352,18 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
 
 export function invokeDestroy(vnode: VNode) {
-  const elm = (vnode.elm as any);
-  if (elm._listeners) {
-    for (var key in elm._listeners) {
-      elm.removeEventListener(key, eventProxy, false);
+  if (vnode) {
+    const elm = (vnode.elm as any);
+    if (elm._listeners) {
+      for (var key in elm._listeners) {
+        elm.removeEventListener(key, eventProxy, false);
+      }
     }
-  }
 
-  if (isDef(vnode.vchildren)) {
-    for (var i = 0; i < vnode.vchildren.length; ++i) {
-      vnode.vchildren[i] && invokeDestroy(vnode.vchildren[i]);
+    if (isDef(vnode.vchildren)) {
+      for (var i = 0; i < vnode.vchildren.length; ++i) {
+        invokeDestroy(vnode.vchildren[i]);
+      }
     }
   }
 }

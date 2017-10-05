@@ -5,7 +5,6 @@ import { renderUpdate } from '../update';
 
 
 describe('instance update', () => {
-  const plt = mockPlatform() as any;
 
   describe('renderUpdate', () => {
 
@@ -117,6 +116,13 @@ describe('instance update', () => {
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.$instance).toBeDefined();
     });
+  });
+
+
+  var plt: any;
+
+  beforeEach(() => {
+    plt = mockPlatform();
   });
 
 });

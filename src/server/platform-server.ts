@@ -58,6 +58,9 @@ export function createPlatformServer(
   // add the app's global to the window context
   win[config.namespace] = App;
 
+  // keep a global set of tags we've already defined
+  const globalDefined: { [tagName: string]: boolean } = win.$definedComponents = win.$definedComponents || {};
+
   const appWwwDir = config.wwwDir;
   const appBuildDir = config.sys.path.join(config.buildDir, getAppFileName(config));
 
@@ -83,7 +86,8 @@ export function createPlatformServer(
     tmpDisconnected: false,
     emitEvent: noop,
     getEventOptions,
-    onError
+    onError,
+    isDefinedComponent
   };
 
 
@@ -93,9 +97,9 @@ export function createPlatformServer(
   // setup the root node of all things
   // which is the mighty <html> tag
   const rootElm = <HostElement>domApi.$documentElement;
-  rootElm._hasRendered = true;
-  rootElm._activelyLoadingChildren = [];
-  rootElm._initLoad = function appLoadedCallback() {
+  rootElm.$rendered = true;
+  rootElm.$activeLoading = [];
+  rootElm.$initLoad = function appLoadedCallback() {
     rootElm._hasLoaded = true;
     appLoaded();
   };
@@ -135,12 +139,22 @@ export function createPlatformServer(
 
     // registry tags are always UPPER-CASE
     const registryTag = cmpMeta.tagNameMeta.toUpperCase();
-    registry[registryTag] = cmpMeta;
 
-    if (cmpMeta.componentModule) {
-      // for unit testing
-      moduleImports[registryTag] = cmpMeta.componentModule;
+    if (!globalDefined[registryTag]) {
+      globalDefined[registryTag] = true;
+
+      registry[registryTag] = cmpMeta;
+
+      if (cmpMeta.componentModule) {
+        // for unit testing
+        moduleImports[registryTag] = cmpMeta.componentModule;
+      }
     }
+  }
+
+  function isDefinedComponent(elm: Element) {
+    // registry tags are always UPPER-CASE
+    return !!(globalDefined[elm.tagName.toUpperCase()] || registry[elm.tagName.toUpperCase()]);
   }
 
 

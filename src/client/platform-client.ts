@@ -52,11 +52,14 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   Context.location = win.location;
   Context.document = doc;
 
+  // keep a global set of tags we've already defined
+  const globalDefined: string[] = (win as any).definedComponents = (win as any).definedComponents || [];
 
   // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
     registerComponents,
     defineComponent,
+    isDefinedComponent,
     getComponentMeta,
     propConnect,
     getContextItem,
@@ -76,9 +79,9 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded
   const rootElm = <HostElement>domApi.$documentElement;
-  rootElm._hasRendered = true;
-  rootElm._activelyLoadingChildren = [];
-  rootElm._initLoad = function appLoadedCallback() {
+  rootElm.$rendered = true;
+  rootElm.$activeLoading = [];
+  rootElm.$initLoad = function appLoadedCallback() {
     // this will fire when all components have finished loaded
     rootElm._hasLoaded = true;
   };
@@ -121,32 +124,44 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
 
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
-    // initialize the properties on the component module prototype
-    initHostConstructor(plt, HostElementConstructor.prototype, hydratedCssClass);
+    const tagName = cmpMeta.tagNameMeta.toLowerCase();
 
-    // add which attributes should be observed
-    const observedAttributes: string[] = [];
+    if (globalDefined.indexOf(tagName) === -1) {
+      // keep an array of all the defined components, useful for external frameworks
+      globalDefined.push(tagName);
 
-    // at this point the membersMeta only includes attributes which should
-    // be observed, it does not include all props yet, so it's safe to
-    // loop through all of the props (attrs) and observed them
-    for (var propName in cmpMeta.membersMeta) {
-      // initialize the actual attribute name used vs. the prop name
-      // for example, "myProp" would be "my-prop" as an attribute
-      // and these can be configured to be all lower case or dash case (default)
-      if (cmpMeta.membersMeta[propName].attribName) {
-        observedAttributes.push(
-          // dynamically generate the attribute name from the prop name
-          // also add it to our array of attributes we need to observe
-          cmpMeta.membersMeta[propName].attribName
-        );
+      // initialize the properties on the component module prototype
+      initHostConstructor(plt, HostElementConstructor.prototype, hydratedCssClass);
+
+      // add which attributes should be observed
+      const observedAttributes: string[] = [];
+
+      // at this point the membersMeta only includes attributes which should
+      // be observed, it does not include all props yet, so it's safe to
+      // loop through all of the props (attrs) and observed them
+      for (var propName in cmpMeta.membersMeta) {
+        // initialize the actual attribute name used vs. the prop name
+        // for example, "myProp" would be "my-prop" as an attribute
+        // and these can be configured to be all lower case or dash case (default)
+        if (cmpMeta.membersMeta[propName].attribName) {
+          observedAttributes.push(
+            // dynamically generate the attribute name from the prop name
+            // also add it to our array of attributes we need to observe
+            cmpMeta.membersMeta[propName].attribName
+          );
+        }
       }
+
+      HostElementConstructor.observedAttributes = observedAttributes;
+
+      // define the custom element
+      win.customElements.define(tagName, HostElementConstructor);
     }
+  }
 
-    HostElementConstructor.observedAttributes = observedAttributes;
 
-    // define the custom element
-    win.customElements.define(cmpMeta.tagNameMeta.toLowerCase(), HostElementConstructor);
+  function isDefinedComponent(elm: Element) {
+    return globalDefined.indexOf(elm.tagName.toLowerCase()) > -1 || !!getComponentMeta(elm);
   }
 
 

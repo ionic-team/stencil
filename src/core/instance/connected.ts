@@ -7,9 +7,9 @@ import { PRIORITY } from '../../util/constants';
 export function connectedCallback(plt: PlatformApi, elm: HostElement) {
   // do not reconnect if we've already created an instance for this element
 
-  if (!elm._hasConnected) {
+  if (!elm.$connected) {
     // first time we've connected
-    elm._hasConnected = true;
+    elm.$connected = true;
 
     // if somehow this node was reused, ensure we've removed this property
     delete elm._hasDestroyed;
@@ -48,14 +48,14 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
 }
 
 
-function registerWithParentComponent(plt: PlatformApi, elm: HostElement) {
+export function registerWithParentComponent(plt: PlatformApi, elm: HostElement) {
   // find the first ancestor host element (if there is one) and register
   // this element as one of the actively loading child elements for its ancestor
   let ancestorHostElement = elm;
 
   while (ancestorHostElement = getParentElement(ancestorHostElement)) {
     // climb up the ancestors looking for the first registered component
-    if (plt.getComponentMeta(ancestorHostElement)) {
+    if (plt.isDefinedComponent(ancestorHostElement)) {
       // we found this elements the first ancestor host element
       // if the ancestor already loaded then do nothing, it's too late
       if (!ancestorHostElement._hasLoaded) {
@@ -65,11 +65,7 @@ function registerWithParentComponent(plt: PlatformApi, elm: HostElement) {
 
         // ensure there is an array to contain a reference to each of the child elements
         // and set this element as one of the ancestor's child elements it should wait on
-        if (ancestorHostElement._activelyLoadingChildren) {
-          ancestorHostElement._activelyLoadingChildren.push(elm);
-        } else {
-          ancestorHostElement._activelyLoadingChildren = [elm];
-        }
+        (ancestorHostElement.$activeLoading = ancestorHostElement.$activeLoading || []).push(elm);
       }
       break;
     }

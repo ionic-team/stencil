@@ -30,12 +30,12 @@ export function update(plt: PlatformApi, elm: HostElement) {
 
     if (isInitialLoad) {
       const ancestorHostElement = elm._ancestorHostElement;
-      if (ancestorHostElement && !ancestorHostElement._hasRendered) {
+      if (ancestorHostElement && !ancestorHostElement.$rendered) {
         // this is the intial load
         // this element has an ancestor host element
         // but the ancestor host element has NOT rendered yet
         // so let's just cool our jets and wait for the ancestor to render
-        (ancestorHostElement._onRenderCallbacks = ancestorHostElement._onRenderCallbacks || []).push(() => {
+        (ancestorHostElement.$onRender = ancestorHostElement.$onRender || []).push(() => {
           // this will get fired off when the ancestor host element
           // finally gets around to rendering its lazy self
           update(plt, elm);
@@ -116,7 +116,7 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
   try {
     if (isInitialLoad) {
       // so this was the initial load i guess
-      elm._initLoad();
+      elm.$initLoad();
       // componentDidLoad just fired off
 
     } else {

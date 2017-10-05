@@ -42,7 +42,7 @@ export function initHostConstructor(plt: PlatformApi, HostElementConstructor: Ho
     queueUpdate(plt, (this as HostElement));
   };
 
-  HostElementConstructor._initLoad = function() {
+  HostElementConstructor.$initLoad = function() {
     initLoad(plt, (this as HostElement), hydratedCssClass);
   };
 
@@ -100,12 +100,12 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
 
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
-  if (instance && !elm._hasDestroyed && (!elm._activelyLoadingChildren || !elm._activelyLoadingChildren.length)) {
+  if (instance && !elm._hasDestroyed && (!elm.$activeLoading || !elm.$activeLoading.length)) {
 
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
-    elm._activelyLoadingChildren = null;
+    elm.$activeLoading = null;
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
@@ -153,7 +153,7 @@ export function propagateElementLoaded(elm: HostElement) {
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
-    const ancestorsActivelyLoadingChildren = elm._ancestorHostElement._activelyLoadingChildren;
+    const ancestorsActivelyLoadingChildren = elm._ancestorHostElement.$activeLoading;
 
     if (ancestorsActivelyLoadingChildren) {
       let index = ancestorsActivelyLoadingChildren.indexOf(elm);
@@ -167,7 +167,7 @@ export function propagateElementLoaded(elm: HostElement) {
       // to see if the ancestor is actually loaded or not
       // then let's call the ancestor's initLoad method if there's no length
       // (which actually ends up as this method again but for the ancestor)
-      !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement._initLoad();
+      !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement.$initLoad();
     }
 
     // fuhgeddaboudit, no need to keep a reference after this element loaded

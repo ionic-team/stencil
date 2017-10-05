@@ -44,15 +44,15 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
   }
 
   // it's official, this element has rendered
-  elm._hasRendered = true;
+  elm.$rendered = true;
 
-  if (elm._onRenderCallbacks) {
+  if (elm.$onRender) {
     // ok, so turns out there are some child host elements
     // waiting on this parent element to load
     // let's fire off all update callbacks waiting
-    elm._onRenderCallbacks.forEach(cb => {
+    elm.$onRender.forEach(cb => {
       cb();
     });
-    delete elm._onRenderCallbacks;
+    delete elm.$onRender;
   }
 }

@@ -11,8 +11,8 @@ export interface CoreContext {
   enableListener?: EventListenerEnable;
   eventNameFn?: (eventName: string) => string;
   isClient?: boolean;
-  isServer?: boolean;
   isPrerender?: boolean;
+  isServer?: boolean;
   window?: Window;
   location?: Location;
   document?: Document;
@@ -805,36 +805,35 @@ export interface HostElement extends HTMLElement {
   attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
 
-  // public methods
-  componentOnReady?: (cb?: (elm: HostElement) => void) => Promise<void>;
-
-  // public properties
-  $instance?: ComponentInstance;
+  // public members which can be used externally and should
+  // not be property renamed (these should all be in externs)
+  // HOWEVER!!! Don't use these :)
+  $activeLoading?: HostElement[];
+  $connected?: boolean;
   $defaultHolder?: Comment;
-  mode?: string;
+  $initLoad: () => void;
+  $instance?: ComponentInstance;
+  $rendered?: boolean;
+  $onRender: (() => void)[];
+  componentOnReady?: (cb?: (elm: HostElement) => void) => Promise<void>;
   color?: string;
+  mode?: string;
 
-  // private methods
-  _render: (isUpdateRender?: boolean) => void;
-  _initLoad: () => void;
-  _queueUpdate: () => void;
-
-  // private properties
-  _activelyLoadingChildren?: HostElement[];
+  // private members which are only internal to
+  // this runtime and can be safely property renamed
   _ancestorHostElement?: HostElement;
-  _hasConnected?: boolean;
-  _hasRendered?: boolean;
   _hasDestroyed?: boolean;
   _hasLoaded?: boolean;
   _hostContentNodes?: HostContentNodes;
   _isQueuedForUpdate?: boolean;
   _listeners?: ComponentActiveListeners;
+  _observer?: MutationObserver;
+  _onReadyCallbacks: ((elm: HostElement) => void)[];
   _queuedEvents?: any[];
+  _queueUpdate: () => void;
+  _render: (isUpdateRender?: boolean) => void;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
-  _observer?: MutationObserver;
-  _onRenderCallbacks: (() => void)[];
-  _onReadyCallbacks: ((elm: HostElement) => void)[];
 }
 
 
@@ -914,6 +913,7 @@ export interface VNodeProdData {
 export interface PlatformApi {
   registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
+  isDefinedComponent?: (elm: Element) => boolean;
   getComponentMeta: (elm: Element) => ComponentMeta;
   getContextItem: (contextKey: string) => any;
   propConnect: (ctrlTag: string) => PropConnect;

@@ -402,7 +402,7 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
   if (!node) return;
 
   if (node.tagName) {
-    if (!node._hasConnected) {
+    if (!node.$connected) {
       const cmpMeta = (<PlatformApi>plt).getComponentMeta(node);
       if (cmpMeta) {
         initHostConstructor((<PlatformApi>plt), node);

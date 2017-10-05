@@ -174,7 +174,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
 
 export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo: ConnectedInfo, hydratedCssClass: string) {
-  if (!elm._hasConnected) {
+  if (!elm.$connected) {
     // only connect elements which is a registered component
     const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta) {

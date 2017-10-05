@@ -25,6 +25,7 @@ function mode(){};
 function raf(){};
 function read(){};
 function write(){};
+function $definedComponents(){};
 
 
 /**
@@ -36,13 +37,19 @@ function loadComponents(){};
 
 
 /**
- * Proxy Element
- * Properties set on the proxy element
+ * Host Element
+ * Properties set on the host element
  */
+function $activeLoading(){};
+function $connected(){};
 function $defaultHolder(){};
+function $initLoad(){};
 function $instance(){};
-function listeners(){};
+function $rendered(){};
+function $onRender(){};
 function $(){};
+function componentOnReady() {};
+function listeners(){};
 
 
 /**
@@ -96,8 +103,7 @@ function connectedCallback(){};
 function customElements(){};
 function define(){};
 function didTimeout(){};
-function disconnectedCallback() { };
-function componentOnReady() { };
+function disconnectedCallback() {};
 function fetch(){};
 function host(){};
 function now(){};

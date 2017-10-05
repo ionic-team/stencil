@@ -24,7 +24,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     if (instance) {
       // call the user's componentDidUnload if there is one
       instance.componentDidUnload && instance.componentDidUnload();
-      elm.$instance = instance.__el = elm.$defaultHolder = instance.__values = instance.__values.__propWillChange = instance.__values.__propDidChange = null;
+      elm.$instance = instance.__el = instance.__values = instance.__values.__propWillChange = instance.__values.__propDidChange = null;
     }
 
     // detatch any event listeners that may have been added
@@ -32,7 +32,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     detachListeners(elm);
 
     // destroy the vnode and child vnodes if they exist
-    elm._vnode && invokeDestroy(elm._vnode);
+    invokeDestroy(elm._vnode);
 
     if (elm._hostContentNodes) {
       // overreacting here just to reduce any memory leak issues
@@ -43,7 +43,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // set it all to null to ensure we forget references
     // and reset values incase this node gets reused somehow
     // (possible that it got disconnected, but the node was reused)
-    elm._root = elm._vnode = elm._ancestorHostElement = elm._activelyLoadingChildren = elm._hasConnected = elm._isQueuedForUpdate = elm._hasLoaded = elm._observer = null;
+    elm.$activeLoading = elm.$connected = elm.$defaultHolder = elm._root = elm._vnode = elm._ancestorHostElement = elm._hasLoaded = elm._isQueuedForUpdate = elm._observer = null;
   }
 }
 

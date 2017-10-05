@@ -13,12 +13,12 @@ describe('instance connected', () => {
     });
   });
 
-  it('should set $hasConnected', () => {
+  it('should set $connected', () => {
     mockDefine(plt, { tagNameMeta: 'ion-test' });
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
     return waitForLoad(plt, node, 'ion-test').then(elm => {
-      expect(elm._hasConnected).toBe(true);
+      expect(elm.$connected).toBe(true);
     });
   });
 
