@@ -3,7 +3,7 @@ import { mockStencilSystem } from '../../../testing/mocks';
 import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
 import { HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD, MEMBER_PROP,
   MEMBER_PROP_MUTABLE, MEMBER_PROP_CONTEXT, MEMBER_STATE,
-  PRIORITY_LOW, TYPE_BOOLEAN, TYPE_NUMBER } from '../../../util/constants';
+  PRIORITY_LOW, PROP_TYPE } from '../../../util/constants';
 
 
 describe('manifest-data serialize/parse', () => {
@@ -248,24 +248,35 @@ describe('manifest-data serialize/parse', () => {
 
   it('membersMeta prop mutable', () => {
     a.membersMeta = {
-      'propMutable': { memberType: MEMBER_PROP_MUTABLE, propType: TYPE_NUMBER }
+      'propMutable': { memberType: MEMBER_PROP_MUTABLE, propType: PROP_TYPE.Number }
     };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.propMutable.memberType).toBe(MEMBER_PROP_MUTABLE);
-    expect(b.cmpMeta.membersMeta.propMutable.propType).toBe(TYPE_NUMBER);
+    expect(b.cmpMeta.membersMeta.propMutable.propType).toBe(PROP_TYPE.Number);
   });
 
-  it('membersMeta prop', () => {
+  it('membersMeta prop type boolean', () => {
     a.membersMeta = {
-      'prop': { memberType: MEMBER_PROP, propType: TYPE_BOOLEAN }
+      'prop': { memberType: MEMBER_PROP, propType: PROP_TYPE.Boolean }
     };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.prop.memberType).toBe(MEMBER_PROP);
-    expect(b.cmpMeta.membersMeta.prop.propType).toBe(TYPE_BOOLEAN);
+    expect(b.cmpMeta.membersMeta.prop.propType).toBe(PROP_TYPE.Boolean);
+  });
+
+  it('membersMeta prop type string', () => {
+    a.membersMeta = {
+      'prop': { memberType: MEMBER_PROP, propType: PROP_TYPE.String }
+    };
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
+
+    expect(b.cmpMeta.membersMeta.prop.memberType).toBe(MEMBER_PROP);
+    expect(b.cmpMeta.membersMeta.prop.propType).toBe(PROP_TYPE.String);
   });
 
   it('assetsDirsMeta', () => {

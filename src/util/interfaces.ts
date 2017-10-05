@@ -1,5 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
+import { PROP_TYPE } from './constants';
 
 
 export interface CoreContext {
@@ -600,7 +601,7 @@ export interface MembersMeta {
 
 export interface MemberMeta {
   memberType?: number;
-  propType?: number;
+  propType?: PROP_TYPE;
   attribName?: string;
   ctrlId?: string;
 }
@@ -1231,7 +1232,7 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number';
+  type?: 'boolean'|'number'|'string';
   mutable?: boolean;
 }
 

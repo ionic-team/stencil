@@ -1,6 +1,6 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentMeta, ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
-import { MEMBER_PROP, MEMBER_PROP_MUTABLE, TYPE_ANY } from '../../../util/constants';
+import { MEMBER_PROP, MEMBER_PROP_MUTABLE, PROP_TYPE } from '../../../util/constants';
 import { initProxy } from '../proxy';
 
 
@@ -11,7 +11,7 @@ describe('instance prop', () => {
       membersMeta: {'prop': {
         memberType: MEMBER_PROP,
         attribName: 'prop',
-        propType: TYPE_ANY
+        propType: PROP_TYPE.Any
       }}
     };
     initProxy(plt, elm, instance, cmpMeta);
@@ -28,7 +28,7 @@ describe('instance prop', () => {
       membersMeta: {'prop': {
         memberType: MEMBER_PROP_MUTABLE,
         attribName: 'prop',
-        propType: TYPE_ANY
+        propType: PROP_TYPE.Any
       }}
     };
     initProxy(plt, elm, instance, cmpMeta);
@@ -45,7 +45,7 @@ describe('instance prop', () => {
       membersMeta: {'prop': {
         memberType: MEMBER_PROP,
         attribName: 'prop',
-        propType: TYPE_ANY
+        propType: PROP_TYPE.Any
       }}
     };
     initProxy(plt, elm, instance, cmpMeta);

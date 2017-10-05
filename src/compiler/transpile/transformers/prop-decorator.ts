@@ -1,7 +1,7 @@
 import { catchError } from '../../util';
 import { Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../util/interfaces';
 import { MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT,
-  MEMBER_PROP_CONTEXT, TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
+  MEMBER_PROP_CONTEXT, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -53,18 +53,21 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
         } else if (!propType) {
           if (n.kind === ts.SyntaxKind.BooleanKeyword || n.kind === ts.SyntaxKind.TrueKeyword || n.kind === ts.SyntaxKind.FalseKeyword) {
             // @Prop() myBoolean: boolean;
-            propType = TYPE_BOOLEAN;
+            // @Prop() myBoolean = true;
+            // @Prop() myBoolean = false;
+            propType = PROP_TYPE.Boolean;
             shouldObserveAttribute = true;
 
           } else if (n.kind === ts.SyntaxKind.NumberKeyword || n.kind === ts.SyntaxKind.NumericLiteral) {
             // @Prop() myNumber: number;
             // @Prop() myNumber = 88;
-            propType = TYPE_NUMBER;
+            propType = PROP_TYPE.Number;
             shouldObserveAttribute = true;
 
           } else if (n.kind === ts.SyntaxKind.StringKeyword || n.kind === ts.SyntaxKind.StringLiteral) {
             // @Prop() myString: string;
             // @Prop() myString = 'some string';
+            propType = PROP_TYPE.String;
             shouldObserveAttribute = true;
 
           } else if (n.kind === ts.SyntaxKind.AnyKeyword) {

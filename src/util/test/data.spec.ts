@@ -1,5 +1,5 @@
 import { HAS_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD, MEMBER_STATE, MEMBER_PROP, PRIORITY_LOW,
-  PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, TYPE_BOOLEAN, TYPE_NUMBER } from '../constants';
+  PROP_CHANGE_PROP_NAME, PROP_CHANGE_METHOD_NAME, PROP_TYPE } from '../constants';
 import { formatComponentMeta, formatLoadComponentRegistry } from '../data-serialize';
 import { parseComponentMeta, parseComponentRegistry, parsePropertyValue } from '../data-parse';
 import { ComponentMeta, ComponentRegistry } from '../interfaces';
@@ -293,24 +293,35 @@ describe('data serialize/parse', () => {
 
     it('should set number prop', () => {
       cmpMeta.membersMeta = {
-        'num': { memberType: MEMBER_PROP, attribName: 'num', propType: TYPE_NUMBER }
+        'num': { memberType: MEMBER_PROP, attribName: 'num', propType: PROP_TYPE.Number }
       };
 
       const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.membersMeta.num.propType).toEqual(TYPE_NUMBER);
+      expect(cmpMeta.membersMeta.num.propType).toEqual(PROP_TYPE.Number);
     });
 
     it('should set boolean prop', () => {
       cmpMeta.membersMeta = {
-        'boo': { memberType: MEMBER_PROP, attribName: 'boo', propType: TYPE_BOOLEAN }
+        'boo': { memberType: MEMBER_PROP, attribName: 'boo', propType: PROP_TYPE.Boolean }
       };
 
       const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.membersMeta.boo.propType).toEqual(TYPE_BOOLEAN);
+      expect(cmpMeta.membersMeta.boo.propType).toEqual(PROP_TYPE.Boolean);
+    });
+
+    it('should set string prop', () => {
+      cmpMeta.membersMeta = {
+        'boo': { memberType: MEMBER_PROP, attribName: 'boo', propType: PROP_TYPE.String }
+      };
+
+      const format = formatLoadComponentRegistry(cmpMeta);
+      cmpMeta = parseComponentRegistry(format, {});
+
+      expect(cmpMeta.membersMeta.boo.propType).toEqual(PROP_TYPE.String);
     });
 
     it('should always set color/mode even with no props', () => {
@@ -364,35 +375,35 @@ describe('data serialize/parse', () => {
     describe('number', () => {
 
       it('should convert number 1 to number 1', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, 1)).toBe(1);
+        expect(parsePropertyValue(PROP_TYPE.Number, 1)).toBe(1);
       });
 
       it('should convert number 0 to number 0', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, 0)).toBe(0);
+        expect(parsePropertyValue(PROP_TYPE.Number, 0)).toBe(0);
       });
 
       it('should convert string "0" to number 0', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, '0')).toBe(0);
+        expect(parsePropertyValue(PROP_TYPE.Number, '0')).toBe(0);
       });
 
       it('should convert string "88" to number 88', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, '88')).toBe(88);
+        expect(parsePropertyValue(PROP_TYPE.Number, '88')).toBe(88);
       });
 
       it('should convert empty string "" to NaN', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, '')).toEqual(NaN);
+        expect(parsePropertyValue(PROP_TYPE.Number, '')).toEqual(NaN);
       });
 
       it('should convert any string "anyword" to NaN', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, 'anyword')).toEqual(NaN);
+        expect(parsePropertyValue(PROP_TYPE.Number, 'anyword')).toEqual(NaN);
       });
 
       it('should keep number undefined as undefined', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, undefined)).toEqual(undefined);
+        expect(parsePropertyValue(PROP_TYPE.Number, undefined)).toEqual(undefined);
       });
 
       it('should keep number null as null', () => {
-        expect(parsePropertyValue(TYPE_NUMBER, null)).toBe(null);
+        expect(parsePropertyValue(PROP_TYPE.Number, null)).toBe(null);
       });
 
     });
@@ -400,43 +411,43 @@ describe('data serialize/parse', () => {
     describe('boolean', () => {
 
       it('should set boolean 1 as true', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, 1)).toBe(true);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, 1)).toBe(true);
       });
 
       it('should set boolean 0 as false', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, 0)).toBe(false);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, 0)).toBe(false);
       });
 
       it('should keep boolean true as boolean true', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, true)).toBe(true);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, true)).toBe(true);
       });
 
       it('should keep boolean false as boolean false', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, false)).toBe(false);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, false)).toBe(false);
       });
 
       it('should convert string "false" to boolean false', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, 'false')).toBe(false);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, 'false')).toBe(false);
       });
 
       it('should convert string "true" to boolean true', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, 'true')).toBe(true);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, 'true')).toBe(true);
       });
 
       it('should convert empty string "" to boolean true', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, '')).toBe(true);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, '')).toBe(true);
       });
 
       it('should convert any string "anyword" to boolean true', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, 'anyword')).toBe(true);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, 'anyword')).toBe(true);
       });
 
       it('should keep boolean undefined as undefined', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, undefined)).toBe(undefined);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, undefined)).toBe(undefined);
       });
 
       it('should keep boolean null as null', () => {
-        expect(parsePropertyValue(TYPE_BOOLEAN, null)).toBe(null);
+        expect(parsePropertyValue(PROP_TYPE.Boolean, null)).toBe(null);
       });
 
     });

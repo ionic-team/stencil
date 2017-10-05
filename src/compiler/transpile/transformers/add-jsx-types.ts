@@ -1,7 +1,6 @@
 import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
 import {
-  TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER,
-  MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE
+  MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE, PROP_TYPE
 } from '../../../util/constants';
 import { dashToPascalCase } from '../../../util/helpers';
 import * as ts from 'typescript';
@@ -46,9 +45,10 @@ declare global {
 
 function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
   const memberTypes = {
-    [TYPE_ANY]: 'any',
-    [TYPE_BOOLEAN]: 'boolean | "true" | "false"',
-    [TYPE_NUMBER]: 'number',
+    [PROP_TYPE.Any]: 'any',
+    [PROP_TYPE.String]: 'string',
+    [PROP_TYPE.Boolean]: 'boolean | "true" | "false"',
+    [PROP_TYPE.Number]: 'number',
   };
   return Object.keys(membersMeta)
     .filter((memberName) => {
@@ -56,7 +56,7 @@ function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: s
     })
     .reduce((obj, memberName) => {
       const member = membersMeta[memberName];
-      obj[memberName] = memberTypes[member.propType || TYPE_ANY];
+      obj[memberName] = memberTypes[member.propType || PROP_TYPE.Any];
       return obj;
     }, <{ [key: string]: string }>{});
 }
@@ -104,9 +104,10 @@ function createJSXNamespace(tagName: string, tagNameAsPascal: string) {
   */
 function createJSXElementsNamespace(cmpMeta: ComponentMeta) {
   const memberTypes = {
-    [TYPE_ANY]: 'any',
-    [TYPE_BOOLEAN]: 'boolean',
-    [TYPE_NUMBER]: 'number',
+    [PROP_TYPE.Any]: 'any',
+    [PROP_TYPE.String]: 'string',
+    [PROP_TYPE.Boolean]: 'boolean | "true" | "false"',
+    [PROP_TYPE.Number]: 'number',
   };
   const members = Object.keys(cmpMeta.membersMeta)
     .filter((memberName) => {
@@ -114,7 +115,7 @@ function createJSXElementsNamespace(cmpMeta: ComponentMeta) {
     })
     .map((memberName) => {
       const member = cmpMeta.membersMeta[memberName];
-      const type = ts.createIdentifier(memberTypes[member.propType || TYPE_ANY]);
+      const type = ts.createIdentifier(memberTypes[member.propType || PROP_TYPE.Any]);
       return ts.createPropertySignature(
         undefined,
         memberName,

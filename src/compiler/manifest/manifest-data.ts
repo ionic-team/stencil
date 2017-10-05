@@ -2,8 +2,8 @@ import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_PROP, MEMBER_PROP_MUTABLE,
-  MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT, MEMBER_ELEMENT_REF, MEMBER_STATE, PRIORITY_LOW,
-  TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
+  MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT, MEMBER_ELEMENT_REF,
+  PROP_TYPE, MEMBER_STATE, PRIORITY_LOW } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
@@ -379,11 +379,14 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
         name: memberName
       };
 
-      if (member.propType === TYPE_BOOLEAN) {
+      if (member.propType === PROP_TYPE.Boolean) {
         propData.type = 'boolean';
 
-      } else if (member.propType === TYPE_NUMBER) {
+      } else if (member.propType === PROP_TYPE.Number) {
         propData.type = 'number';
+
+      } else if (member.propType === PROP_TYPE.String) {
+        propData.type = 'string';
       }
 
       if (member.memberType === MEMBER_PROP_MUTABLE) {
@@ -414,10 +417,13 @@ function parseProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     }
 
     if (propData.type === 'boolean') {
-      cmpMeta.membersMeta[propData.name].propType = TYPE_BOOLEAN;
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Boolean;
 
     } else if (propData.type === 'number') {
-      cmpMeta.membersMeta[propData.name].propType = TYPE_NUMBER;
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Number;
+
+    } else if (propData.type === 'string') {
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.String;
     }
   });
 }

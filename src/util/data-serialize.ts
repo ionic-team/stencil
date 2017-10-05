@@ -2,7 +2,7 @@ import { Bundle, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta, LoadCo
   MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
 import { HAS_SLOTS, HAS_NAMED_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD,
   MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT,
-  MEMBER_STATE, TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
+  MEMBER_STATE, PROP_TYPE } from '../util/constants';
 
 
 export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadComponentRegistry {
@@ -68,14 +68,11 @@ function formatObserveAttributeProps(membersMeta: MembersMeta) {
       memberMeta.memberType
     ];
 
-    if (memberMeta.propType === TYPE_BOOLEAN) {
-      d.push(TYPE_BOOLEAN);
-
-    } else if (memberMeta.propType === TYPE_NUMBER) {
-      d.push(TYPE_NUMBER);
+    if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String) {
+      d.push(memberMeta.propType);
 
     } else {
-      d.push(TYPE_ANY);
+      d.push(PROP_TYPE.Any);
     }
 
     if (memberMeta.ctrlId) {
@@ -243,13 +240,16 @@ function formatMemberType(val: number) {
 
 
 function formatPropType(val: number) {
-  if (val === TYPE_BOOLEAN) {
-    return `/** type boolean **/ ${TYPE_BOOLEAN}`;
+  if (val === PROP_TYPE.String) {
+    return `/** type string **/ ${PROP_TYPE.String}`;
   }
-  if (val === TYPE_NUMBER) {
-    return `/** type number **/ ${TYPE_NUMBER}`;
+  if (val === PROP_TYPE.Boolean) {
+    return `/** type boolean **/ ${PROP_TYPE.Boolean}`;
   }
-  return `/** type any **/ ${TYPE_ANY}`;
+  if (val === PROP_TYPE.Number) {
+    return `/** type number **/ ${PROP_TYPE.Number}`;
+  }
+  return `/** type any **/ ${PROP_TYPE.Any}`;
 }
 
 

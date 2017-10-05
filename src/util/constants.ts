@@ -30,9 +30,12 @@ export const PROP_CHANGE_METHOD_NAME = 1;
 /**
  * Property Types
  */
-export const TYPE_ANY = 0;
-export const TYPE_BOOLEAN = 1;
-export const TYPE_NUMBER = 2;
+export const enum PROP_TYPE {
+  Any = 0,
+  String = 1,
+  Boolean = 2,
+  Number = 3,
+}
 
 
 /**
