@@ -1,14 +1,15 @@
-import createHistory from '../../utils/createBrowserHistory';
+import createHistory from "../../utils/createBrowserHistory";
 var Router = (function () {
     function Router() {
-        this.root = '/';
+        this.root = "/";
         // A suffix to append to the page title whenever
         // it's updated through RouteTitle
-        this.titleSuffix = '';
+        this.titleSuffix = "";
         this.unsubscribe = function () { };
         this.match = null;
     }
     Router.prototype.titleSuffixChanged = function (newValue) {
+        console.log("title suffix changed");
         this.activeRouter.set({
             titleSuffix: newValue
         });

@@ -12,7 +12,7 @@ const directory = __dirname;
 describe('vnode-slot transform', () => {
 
   let i;
-  for (i = 7/* fileList.length - 1 */; i >= 0; i -= 1) {
+  for (i = fileList.length - 1; i >= 0; i -= 1) {
     const fileName = fileList[i];
 
     it(`should match the expected output for ${fileName}`, async () => {

@@ -1,12 +1,13 @@
-var __assign = (this && this.__assign) || Object.assign || function(t) {
+var __assign = (this && this.__assign) || Object.assign || function (t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
+        for (var p in s)
+            if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
     }
     return t;
 };
-import matchPath from '../../utils/match-path';
+import matchPath from "../../utils/match-path";
 var Route = (function () {
     function Route() {
         this.unsubscribe = function () { return; };
@@ -19,7 +20,7 @@ var Route = (function () {
     // Identify if the current route is a match.
     Route.prototype.computeMatch = function (pathname) {
         if (!pathname) {
-            var location_1 = this.activeRouter.get('location');
+            var location_1 = this.activeRouter.get("location");
             pathname = location_1.pathname;
         }
         var newMatch = matchPath(pathname, {
@@ -64,7 +65,7 @@ var Route = (function () {
         // component props defined in route
         // the history api
         // current match data including params
-        var childProps = __assign({}, this.componentProps, { history: this.activeRouter.get('history'), match: this.match });
+        var childProps = __assign({}, this.componentProps, { history: this.activeRouter.get("history"), match: this.match });
         // If there is a routerRender defined then use
         // that and pass the component and component props with it.
         if (this.routeRender) {
@@ -72,7 +73,9 @@ var Route = (function () {
         }
         if (this.component) {
             var ChildComponent = this.component;
-            return h(ChildComponent, __assign({}, childProps));
+            // This is a temporary fix until we get the JSX transform working correctly with child components
+            var vdomrender = h;
+            return vdomrender(ChildComponent, { p: childProps });
         }
     };
     return Route;
