@@ -1,6 +1,6 @@
 import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile, ComponentMeta } from '../../../../../util/interfaces';
 import { mockBuildConfig } from '../../../../../testing/mocks';
-import { DEFAULT_COMPILER_OPTIONS } from '../../compiler-options';
+import { DEFAULT_COMPILER_OPTIONS } from '../../../compiler-options';
 import * as ts from 'typescript';
 
 
@@ -81,3 +81,5 @@ describe('vnode-slot transform', () => {
         },
       });
     });
+  });
+});

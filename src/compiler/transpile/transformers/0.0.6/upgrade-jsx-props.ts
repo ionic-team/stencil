@@ -30,11 +30,12 @@ export function upgradJsxProps(transformContext: ts.TransformationContext) {
 }
 
 function upgradeCall(callNode: ts.CallExpression): ts.CallExpression {
-  const [tag, props, children] = callNode.arguments;
+  const [tag, props, ...children] = callNode.arguments;
   let newArgs: ts.Expression[] = [];
 
   newArgs.push(upgradeTagName(tag));
   newArgs.push(upgradeProps(props));
+
 
   if (children != null) {
     newArgs = newArgs.concat(upgradeChildren(children));
@@ -111,16 +112,20 @@ function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralEx
   return util.objectMapToObjectLiteral(upgradedProps);
 }
 
-function upgradeChildren(children: ts.Expression): ts.Expression {
-  if (ts.isStringLiteral(children) || ts.isNumericLiteral(children)) {
-    return children;
+function upgradeChildren(children: ts.Expression[]): ts.Expression[] {
+  return children.map(upgradeChild);
+}
+
+function upgradeChild(child: ts.Expression): ts.Expression {
+  if (ts.isStringLiteral(child) || ts.isNumericLiteral(child)) {
+    return child;
   }
 
-  if (ts.isCallExpression(children) && (<ts.Identifier>children.expression).text === 'h') {
-
+  if (ts.isCallExpression(child) && (<ts.Identifier>child.expression).text === 't') {
+    return (<ts.CallExpression>child).arguments[0];
   }
 
-  if (ts.isArrayLiteralExpression(children)) {
-
+  if (ts.isCallExpression(child) && (<ts.Identifier>child.expression).text === 'h') {
+    return upgradeCall(child);
   }
 }
