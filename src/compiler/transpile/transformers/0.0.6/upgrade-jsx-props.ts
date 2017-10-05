@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 import * as util from '../util';
 
 
-export function upgradJsxProps(transformContext: ts.TransformationContext) {
+export default function upgradeJsxProps(transformContext: ts.TransformationContext) {
 
   return (tsSourceFile: ts.SourceFile) => {
     return visit(tsSourceFile) as ts.SourceFile;
@@ -41,7 +41,12 @@ function upgradeCall(callNode: ts.CallExpression): ts.CallExpression {
     newArgs = newArgs.concat(upgradeChildren(children));
   }
 
-  return ts.updateCall(callNode, callNode.expression, null, newArgs);
+  return ts.updateCall(
+    callNode,
+    callNode.expression,
+    undefined,
+    newArgs
+  );
 }
 
 function upgradeTagName(tagName: ts.Expression) {
@@ -53,18 +58,17 @@ function upgradeTagName(tagName: ts.Expression) {
 }
 
 function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralExpression {
+
   let upgradedProps: util.ObjectMap = {};
   let propName: string;
 
-  if (ts.isNumericLiteral(props) &&
-      (<ts.NumericLiteral>props).text === '0') {
+  if (!ts.isObjectLiteralExpression(props)) {
     return ts.createNull();
   }
+  let objectProps = util.objectLiteralToObjectMap(<ts.ObjectLiteralExpression>props);
 
-  const objectProps = util.objectLiteralToObjectMap(<ts.ObjectLiteralExpression>props);
-
-  upgradedProps = Object.keys(props).reduce((newProps, propName) => {
-    const propValue = props[propName];
+  upgradedProps = Object.keys(objectProps).reduce((newProps, propName) => {
+    const propValue = objectProps[propName];
 
     // If the propname is c, s, or k then map to proper name
     if (propName === 'c') {
@@ -90,7 +94,7 @@ function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralEx
     if (propName === 'p' || propName === 'a') {
       return {
         ...newProps,
-        ...propValue
+        ...(propValue as util.ObjectMap)
       };
     }
 
@@ -109,6 +113,15 @@ function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralEx
     }
   }, upgradedProps);
 
+  try {
+    Object.keys(upgradedProps);
+  } catch (e) {
+    console.log(upgradedProps);
+    console.log(objectProps);
+    console.log(props);
+    throw e;
+  }
+
   return util.objectMapToObjectLiteral(upgradedProps);
 }
 
@@ -117,15 +130,9 @@ function upgradeChildren(children: ts.Expression[]): ts.Expression[] {
 }
 
 function upgradeChild(child: ts.Expression): ts.Expression {
-  if (ts.isStringLiteral(child) || ts.isNumericLiteral(child)) {
-    return child;
-  }
-
   if (ts.isCallExpression(child) && (<ts.Identifier>child.expression).text === 't') {
     return (<ts.CallExpression>child).arguments[0];
   }
 
-  if (ts.isCallExpression(child) && (<ts.Identifier>child.expression).text === 'h') {
-    return upgradeCall(child);
-  }
+  return child;
 }

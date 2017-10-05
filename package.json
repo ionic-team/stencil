@@ -67,6 +67,7 @@
     "tslint": "^5.6.0",
     "tslint-ionic-rules": "0.0.8",
     "uglify-es": "3.1.2",
+    "util.promisify": "^1.0.0",
     "webpack": "^3.5.4",
     "workbox-build": "2.0.3"
   },
