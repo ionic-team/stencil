@@ -1,9 +1,7 @@
 import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
-import { COLLECTION_MANIFEST_FILE_NAME, HAS_NAMED_SLOTS, HAS_SLOTS, MEMBER_PROP, MEMBER_PROP_MUTABLE,
-  MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT, MEMBER_ELEMENT_REF, MEMBER_STATE, PRIORITY_LOW,
-  TYPE_BOOLEAN, TYPE_NUMBER } from '../../util/constants';
+import { COLLECTION_MANIFEST_FILE_NAME, MEMBER_TYPE, PROP_TYPE, PRIORITY, SLOT } from '../../util/constants';
 import { normalizePath } from '../util';
 import { validateManifestCompatibility } from './manifest-compatibility';
 
@@ -380,21 +378,24 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
     const member = cmpMeta.membersMeta[memberName];
 
-    if (member.memberType === MEMBER_PROP || member.memberType === MEMBER_PROP_MUTABLE) {
+    if (member.memberType === MEMBER_TYPE.Prop || member.memberType === MEMBER_TYPE.PropMutable) {
       cmpData.props = cmpData.props || [];
 
       const propData: PropData = {
         name: memberName
       };
 
-      if (member.propType === TYPE_BOOLEAN) {
+      if (member.propType === PROP_TYPE.Boolean) {
         propData.type = 'boolean';
 
-      } else if (member.propType === TYPE_NUMBER) {
+      } else if (member.propType === PROP_TYPE.Number) {
         propData.type = 'number';
+
+      } else if (member.propType === PROP_TYPE.String) {
+        propData.type = 'string';
       }
 
-      if (member.memberType === MEMBER_PROP_MUTABLE) {
+      if (member.memberType === MEMBER_TYPE.PropMutable) {
         propData.mutable = true;
       }
 
@@ -416,16 +417,19 @@ function parseProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     cmpMeta.membersMeta[propData.name] = {};
 
     if (propData.mutable) {
-      cmpMeta.membersMeta[propData.name].memberType = MEMBER_PROP_MUTABLE;
+      cmpMeta.membersMeta[propData.name].memberType = MEMBER_TYPE.PropMutable;
     } else {
-      cmpMeta.membersMeta[propData.name].memberType = MEMBER_PROP;
+      cmpMeta.membersMeta[propData.name].memberType = MEMBER_TYPE.Prop;
     }
 
     if (propData.type === 'boolean') {
-      cmpMeta.membersMeta[propData.name].propType = TYPE_BOOLEAN;
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Boolean;
 
     } else if (propData.type === 'number') {
-      cmpMeta.membersMeta[propData.name].propType = TYPE_NUMBER;
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Number;
+
+    } else if (propData.type === 'string') {
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.String;
     }
   });
 }
@@ -499,7 +503,7 @@ function serializeStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
     const member = cmpMeta.membersMeta[memberName];
 
-    if (member.memberType === MEMBER_STATE) {
+    if (member.memberType === MEMBER_TYPE.State) {
       cmpData.states = cmpData.states || [];
 
       cmpData.states.push({
@@ -519,7 +523,7 @@ function parseStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
   cmpData.states.forEach(stateData => {
     cmpMeta.membersMeta[stateData.name] = {
-      memberType: MEMBER_STATE
+      memberType: MEMBER_TYPE.State
     };
   });
 }
@@ -580,7 +584,7 @@ function serializeMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
     const member = cmpMeta.membersMeta[memberName];
 
-    if (member.memberType === MEMBER_METHOD) {
+    if (member.memberType === MEMBER_TYPE.Method) {
       cmpData.methods = cmpData.methods || [];
 
       cmpData.methods.push({
@@ -600,7 +604,7 @@ function parseMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
   cmpData.methods.forEach(methodData => {
     cmpMeta.membersMeta[methodData.name] = {
-      memberType: MEMBER_METHOD
+      memberType: MEMBER_TYPE.Method
     };
   });
 }
@@ -612,7 +616,7 @@ function serializeContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) 
   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
     const member = cmpMeta.membersMeta[memberName];
 
-    if (member.ctrlId && member.memberType === MEMBER_PROP_CONTEXT) {
+    if (member.ctrlId && member.memberType === MEMBER_TYPE.PropContext) {
       cmpData.context = cmpData.context || [];
 
       cmpData.context.push({
@@ -634,7 +638,7 @@ function parseContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
       cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
       cmpMeta.membersMeta[methodData.name] = {
-        memberType: MEMBER_PROP_CONTEXT,
+        memberType: MEMBER_TYPE.PropContext,
         ctrlId: methodData.id
       };
     }
@@ -648,7 +652,7 @@ function serializeConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) 
   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
     const member = cmpMeta.membersMeta[memberName];
 
-    if (member.ctrlId && member.memberType === MEMBER_PROP_CONNECT) {
+    if (member.ctrlId && member.memberType === MEMBER_TYPE.PropConnect) {
       cmpData.connect = cmpData.connect || [];
 
       cmpData.connect.push({
@@ -670,7 +674,7 @@ function parseConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
       cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
       cmpMeta.membersMeta[methodData.name] = {
-        memberType: MEMBER_PROP_CONNECT,
+        memberType: MEMBER_TYPE.PropConnect,
         ctrlId: methodData.tag
       };
     }
@@ -684,7 +688,7 @@ function serializeHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMe
   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
     const member = cmpMeta.membersMeta[memberName];
 
-    if (member.memberType === MEMBER_ELEMENT_REF) {
+    if (member.memberType === MEMBER_TYPE.Element) {
       cmpData.hostElement = {
         name: memberName
       };
@@ -701,7 +705,7 @@ function parseHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) 
   cmpMeta.membersMeta = cmpMeta.membersMeta || {};
 
   cmpMeta.membersMeta[cmpData.hostElement.name] = {
-    memberType: MEMBER_ELEMENT_REF
+    memberType: MEMBER_TYPE.Element
   };
 }
 
@@ -780,10 +784,10 @@ function parseHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 
 function serializeSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpMeta.slotMeta === HAS_SLOTS) {
+  if (cmpMeta.slotMeta === SLOT.HasSlots) {
     cmpData.slot = 'hasSlots';
 
-  } else if (cmpMeta.slotMeta === HAS_NAMED_SLOTS) {
+  } else if (cmpMeta.slotMeta === SLOT.HasNamedSlots) {
     cmpData.slot = 'hasNamedSlots';
   }
 }
@@ -791,10 +795,10 @@ function serializeSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 function parseSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpData.slot === 'hasSlots') {
-    cmpMeta.slotMeta = HAS_SLOTS;
+    cmpMeta.slotMeta = SLOT.HasSlots;
 
   } else if (cmpData.slot === 'hasNamedSlots') {
-    cmpMeta.slotMeta = HAS_NAMED_SLOTS;
+    cmpMeta.slotMeta = SLOT.HasNamedSlots;
   }
 }
 
@@ -812,7 +816,7 @@ function parseIsShadow(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 
 function serializeLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpMeta.loadPriority === PRIORITY_LOW) {
+  if (cmpMeta.loadPriority === PRIORITY.Low) {
     cmpData.priority = 'low';
   }
 }
@@ -820,7 +824,7 @@ function serializeLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 function parseLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpData.priority === 'low') {
-    cmpMeta.loadPriority = PRIORITY_LOW;
+    cmpMeta.loadPriority = PRIORITY.Low;
   }
 }
 
@@ -841,7 +845,7 @@ export function serializeBundles(config: BuildConfig, manifestData: ManifestData
       components: bundle.components.map(tag => tag.toLowerCase()).sort()
     };
 
-    if (bundle.priority === PRIORITY_LOW) {
+    if (bundle.priority === PRIORITY.Low) {
       bundleData.priority = 'low';
     }
 
@@ -873,7 +877,7 @@ export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
     };
 
     if (bundleData.priority === 'low') {
-      bundle.priority = PRIORITY_LOW;
+      bundle.priority = PRIORITY.Low;
     }
 
     manifest.bundles.push(bundle);

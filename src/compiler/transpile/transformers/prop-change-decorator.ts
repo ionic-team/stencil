@@ -1,5 +1,5 @@
 import { PropChangeMeta } from '../../../util/interfaces';
-import { PROP_CHANGE_METHOD_NAME, PROP_CHANGE_PROP_NAME } from '../../../util/constants';
+import { PROP_CHANGE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -52,8 +52,8 @@ function getPropChangeDecorator(classNode: ts.ClassDeclaration, decoratorName: s
     if (isPropChange && propName && methodName) {
       const propChange: any = [];
 
-      propChange[PROP_CHANGE_PROP_NAME] = propName;
-      propChange[PROP_CHANGE_METHOD_NAME] = methodName;
+      propChange[PROP_CHANGE.PropName] = propName;
+      propChange[PROP_CHANGE.MethodName] = methodName;
 
       propChangeMeta.push(propChange);
 
@@ -62,10 +62,10 @@ function getPropChangeDecorator(classNode: ts.ClassDeclaration, decoratorName: s
   });
 
   return propChangeMeta.sort((a, b) => {
-    if (a[PROP_CHANGE_PROP_NAME].toLowerCase() < b[PROP_CHANGE_PROP_NAME].toLowerCase()) return -1;
-    if (a[PROP_CHANGE_PROP_NAME].toLowerCase() > b[PROP_CHANGE_PROP_NAME].toLowerCase()) return 1;
-    if (a[PROP_CHANGE_METHOD_NAME] < b[PROP_CHANGE_METHOD_NAME]) return -1;
-    if (a[PROP_CHANGE_METHOD_NAME] > b[PROP_CHANGE_METHOD_NAME]) return 1;
+    if (a[PROP_CHANGE.PropName].toLowerCase() < b[PROP_CHANGE.PropName].toLowerCase()) return -1;
+    if (a[PROP_CHANGE.PropName].toLowerCase() > b[PROP_CHANGE.PropName].toLowerCase()) return 1;
+    if (a[PROP_CHANGE.MethodName] < b[PROP_CHANGE.MethodName]) return -1;
+    if (a[PROP_CHANGE.MethodName] > b[PROP_CHANGE.MethodName]) return 1;
     return 0;
   });
 }

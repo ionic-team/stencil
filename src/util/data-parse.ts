@@ -1,4 +1,4 @@
-import { ATTR_LOWER_CASE, MEMBER_PROP, TYPE_BOOLEAN, TYPE_NUMBER } from './constants';
+import { ATTR_CASE, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { ComponentMeta, ComponentRegistry, LoadComponentMeta, ComponentEventData,
   ComponentListenersData, ComponentMemberData, LoadComponentRegistry } from '../util/interfaces';
 import { isDef } from './helpers';
@@ -13,8 +13,8 @@ export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, r
       // every component defaults to always have
       // the mode and color properties
       // but only color should observe any attribute changes
-      'mode': { memberType: MEMBER_PROP },
-      'color': { memberType: MEMBER_PROP, attribName: 'color' }
+      'mode': { memberType: MEMBER_TYPE.Prop },
+      'color': { memberType: MEMBER_TYPE.Prop, attribName: 'color' }
     }
   };
 
@@ -62,7 +62,7 @@ function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberDat
       var d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        attribName: attr === ATTR_LOWER_CASE ? d[0].toLowerCase() : toDashCase(d[0]),
+        attribName: attr === ATTR_CASE.LowerCase ? d[0].toLowerCase() : toDashCase(d[0]),
         propType: d[2],
         ctrlId: d[3]
       };
@@ -115,13 +115,13 @@ function parseEventData(d: ComponentEventData) {
 export function parsePropertyValue(propType: number, propValue: any) {
   // ensure this value is of the correct prop type
   if (isDef(propValue)) {
-    if (propType === TYPE_BOOLEAN) {
-      // per the HTML spec, any string value means it is a boolean "true" value
+    if (propType === PROP_TYPE.Boolean) {
+      // per the HTML spec, any string value means it is a boolean true value
       // but we'll cheat here and say that the string "false" is the boolean false
       return (propValue === 'false' ? false :  propValue === '' || !!propValue);
     }
 
-    if (propType === TYPE_NUMBER) {
+    if (propType === PROP_TYPE.Number) {
       // force it to be a number
       return parseFloat(propValue);
     }

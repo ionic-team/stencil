@@ -1,5 +1,5 @@
 import { MembersMeta } from '../../../util/interfaces';
-import { MEMBER_STATE } from '../../../util/constants';
+import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -33,7 +33,7 @@ export function getStateDecoratorMeta(classNode: ts.ClassDeclaration) {
 
     if (isState && propName) {
       membersMeta[propName] = {
-        memberType: MEMBER_STATE
+        memberType: MEMBER_TYPE.State
       };
       memberNode.decorators = undefined;
     }

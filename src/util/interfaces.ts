@@ -1,5 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
+import { MEMBER_TYPE, PROP_TYPE } from './constants';
 
 
 export interface CoreContext {
@@ -324,6 +325,7 @@ export interface BuildConfig {
   prerender?: PrerenderConfig|boolean;
   copy?: CopyTasks;
   serviceWorker?: ServiceWorkerConfig|boolean;
+  hydratedCssClass?: string;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -606,8 +608,8 @@ export interface MembersMeta {
 
 
 export interface MemberMeta {
-  memberType?: number;
-  propType?: number;
+  memberType?: MEMBER_TYPE;
+  propType?: PROP_TYPE;
   attribName?: string;
   ctrlId?: string;
 }
@@ -1174,6 +1176,7 @@ declare global {
   // other collections, do not use "const" or "let"
   var Context: CoreContext;
   var publicPath: string;
+  var hydratedCssClass: string;
   var appNamespace: string;
   var h: Hyperscript;
 }
@@ -1237,7 +1240,7 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number';
+  type?: 'boolean'|'number'|'string';
   mutable?: boolean;
 }
 

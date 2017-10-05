@@ -1,7 +1,6 @@
 import { catchError } from '../../util';
 import { Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../util/interfaces';
-import { MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT,
-  MEMBER_PROP_CONTEXT, TYPE_NUMBER, TYPE_BOOLEAN } from '../../../util/constants';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -51,18 +50,23 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
           propName = n.getText();
 
         } else if (!propType) {
-          if (n.kind === ts.SyntaxKind.BooleanKeyword) {
+          if (n.kind === ts.SyntaxKind.BooleanKeyword || n.kind === ts.SyntaxKind.TrueKeyword || n.kind === ts.SyntaxKind.FalseKeyword) {
             // @Prop() myBoolean: boolean;
-            propType = TYPE_BOOLEAN;
+            // @Prop() myBoolean = true;
+            // @Prop() myBoolean = false;
+            propType = PROP_TYPE.Boolean;
             shouldObserveAttribute = true;
 
-          } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
+          } else if (n.kind === ts.SyntaxKind.NumberKeyword || n.kind === ts.SyntaxKind.NumericLiteral) {
             // @Prop() myNumber: number;
-            propType = TYPE_NUMBER;
+            // @Prop() myNumber = 88;
+            propType = PROP_TYPE.Number;
             shouldObserveAttribute = true;
 
-          } else if (n.kind === ts.SyntaxKind.StringKeyword) {
+          } else if (n.kind === ts.SyntaxKind.StringKeyword || n.kind === ts.SyntaxKind.StringLiteral) {
             // @Prop() myString: string;
+            // @Prop() myString = 'some string';
+            propType = PROP_TYPE.String;
             shouldObserveAttribute = true;
 
           } else if (n.kind === ts.SyntaxKind.AnyKeyword) {
@@ -81,7 +85,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
       }
 
       const propMeta: MemberMeta = membersMeta[propName] = {
-        memberType: MEMBER_PROP
+        memberType: MEMBER_TYPE.Prop
       };
 
       if (propType) {
@@ -90,12 +94,12 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
       if (userPropOptions) {
         if (typeof userPropOptions.connect === 'string') {
-          propMeta.memberType = MEMBER_PROP_CONNECT;
+          propMeta.memberType = MEMBER_TYPE.PropConnect;
           propMeta.ctrlId = userPropOptions.connect;
         }
 
         if (typeof userPropOptions.context === 'string') {
-          propMeta.memberType = MEMBER_PROP_CONTEXT;
+          propMeta.memberType = MEMBER_TYPE.PropContext;
           propMeta.ctrlId = userPropOptions.context;
         }
 
@@ -111,7 +115,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
         }
 
         if (typeof userPropOptions.mutable === 'boolean') {
-          propMeta.memberType = MEMBER_PROP_MUTABLE;
+          propMeta.memberType = MEMBER_TYPE.PropMutable;
         }
       }
 

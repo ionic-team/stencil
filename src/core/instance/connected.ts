@@ -1,7 +1,7 @@
 import { getParentElement } from '../../util/helpers';
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { initElementListeners } from './listeners';
-import { PRIORITY_HIGH } from '../../util/constants';
+import { PRIORITY } from '../../util/constants';
 
 
 export function connectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -43,7 +43,7 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
         elm._queueUpdate();
       });
 
-    }, PRIORITY_HIGH);
+    }, PRIORITY.High);
   }
 }
 

@@ -1,8 +1,6 @@
 import { Bundle, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta, LoadComponentRegistry,
   MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
-import { HAS_SLOTS, HAS_NAMED_SLOTS, MEMBER_ELEMENT_REF, MEMBER_METHOD,
-  MEMBER_PROP, MEMBER_PROP_MUTABLE, MEMBER_PROP_CONNECT, MEMBER_PROP_CONTEXT,
-  MEMBER_STATE, TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER } from '../util/constants';
+import { MEMBER_TYPE, PROP_TYPE, SLOT } from '../util/constants';
 
 
 export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadComponentRegistry {
@@ -37,13 +35,13 @@ export function formatStyles(styleMeta: StylesMeta): any {
 
 
 function formatSlot(val: number) {
-  if (val === HAS_SLOTS) {
-    return HAS_SLOTS;
+  if (val === SLOT.HasSlots) {
+    return SLOT.HasSlots;
   }
-  if (val === HAS_NAMED_SLOTS) {
-    return HAS_NAMED_SLOTS;
+  if (val === SLOT.HasNamedSlots) {
+    return SLOT.HasNamedSlots;
   }
-  return 0;
+  return SLOT.NoSlots;
 }
 
 
@@ -68,14 +66,11 @@ function formatObserveAttributeProps(membersMeta: MembersMeta) {
       memberMeta.memberType
     ];
 
-    if (memberMeta.propType === TYPE_BOOLEAN) {
-      d.push(TYPE_BOOLEAN);
-
-    } else if (memberMeta.propType === TYPE_NUMBER) {
-      d.push(TYPE_NUMBER);
+    if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String) {
+      d.push(memberMeta.propType);
 
     } else {
-      d.push(TYPE_ANY);
+      d.push(PROP_TYPE.Any);
     }
 
     if (memberMeta.ctrlId) {
@@ -217,39 +212,42 @@ function formatMemberMeta(memberName: string, memberMeta: MemberMeta) {
 
 
 function formatMemberType(val: number) {
-  if (val === MEMBER_ELEMENT_REF) {
-    return `/** element ref **/ ${MEMBER_ELEMENT_REF}`;
+  if (val === MEMBER_TYPE.Element) {
+    return `/** element ref **/ ${MEMBER_TYPE.Element}`;
   }
-  if (val === MEMBER_METHOD) {
-    return `/** method **/ ${MEMBER_METHOD}`;
+  if (val === MEMBER_TYPE.Method) {
+    return `/** method **/ ${MEMBER_TYPE.Method}`;
   }
-  if (val === MEMBER_PROP) {
-    return `/** prop **/ ${MEMBER_PROP}`;
+  if (val === MEMBER_TYPE.Prop) {
+    return `/** prop **/ ${MEMBER_TYPE.Prop}`;
   }
-  if (val === MEMBER_PROP_MUTABLE) {
-    return `/** prop mutable **/ ${MEMBER_PROP_MUTABLE}`;
+  if (val === MEMBER_TYPE.PropMutable) {
+    return `/** prop mutable **/ ${MEMBER_TYPE.PropMutable}`;
   }
-  if (val === MEMBER_STATE) {
-    return `/** state **/ ${MEMBER_STATE}`;
+  if (val === MEMBER_TYPE.State) {
+    return `/** state **/ ${MEMBER_TYPE.State}`;
   }
-  if (val === MEMBER_PROP_CONNECT) {
-    return `/** prop connect **/ ${MEMBER_PROP_CONNECT}`;
+  if (val === MEMBER_TYPE.PropConnect) {
+    return `/** prop connect **/ ${MEMBER_TYPE.PropConnect}`;
   }
-  if (val === MEMBER_PROP_CONTEXT) {
-    return `/** prop context **/ ${MEMBER_PROP_CONTEXT}`;
+  if (val === MEMBER_TYPE.PropContext) {
+    return `/** prop context **/ ${MEMBER_TYPE.PropContext}`;
   }
   return `/** unknown ****/ 0`;
 }
 
 
 function formatPropType(val: number) {
-  if (val === TYPE_BOOLEAN) {
-    return `/** type boolean **/ ${TYPE_BOOLEAN}`;
+  if (val === PROP_TYPE.String) {
+    return `/** type string **/ ${PROP_TYPE.String}`;
   }
-  if (val === TYPE_NUMBER) {
-    return `/** type number **/ ${TYPE_NUMBER}`;
+  if (val === PROP_TYPE.Boolean) {
+    return `/** type boolean **/ ${PROP_TYPE.Boolean}`;
   }
-  return `/** type any **/ ${TYPE_ANY}`;
+  if (val === PROP_TYPE.Number) {
+    return `/** type number **/ ${PROP_TYPE.Number}`;
+  }
+  return `/** type any **/ ${PROP_TYPE.Any}`;
 }
 
 

@@ -1,5 +1,4 @@
-import { COMMENT_NODE, ELEMENT_NODE, HAS_NAMED_SLOTS, HAS_SLOTS,
-  SSR_CHILD_ID, SSR_VNODE_ID, TEXT_NODE } from '../../util/constants';
+import { NODE_TYPE, SLOT, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { DomApi, HostElement, VNode } from '../../util/interfaces';
 import { t } from './h';
 import { VNode as VNodeObj } from './vnode';
@@ -37,7 +36,7 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
       childVNodeSplt: string[],
       childVNode: VNode;
 
-  if (checkNestedElements && nodeType === ELEMENT_NODE) {
+  if (checkNestedElements && nodeType === NODE_TYPE.ElementNode) {
     childVNodeId = domApi.$getAttribute(node, SSR_CHILD_ID);
 
     if (childVNodeId) {
@@ -74,9 +73,9 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
       addChildSsrVNodes(domApi, <any>node.childNodes[i], parentVNode, ssrVNodeId, checkNestedElements);
     }
 
-  } else if (nodeType === TEXT_NODE &&
+  } else if (nodeType === NODE_TYPE.TextNode &&
             (previousComment = <Comment>node.previousSibling) &&
-            domApi.$nodeType(previousComment) === COMMENT_NODE) {
+            domApi.$nodeType(previousComment) === NODE_TYPE.CommentNode) {
 
     // split the start comment's data with a period
     childVNodeSplt = domApi.$getTextContent(previousComment).split('.');
@@ -110,7 +109,7 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMet
     domApi.$insertBefore(elm, (elm.$defaultHolder = domApi.$createComment('')), childNodes[0]);
   }
 
-  if (slotMeta === HAS_NAMED_SLOTS) {
+  if (slotMeta === SLOT.HasNamedSlots) {
     // looks like this component has named slots
     // so let's loop through each of the childNodes to the host element
     // and pick out the ones that have a slot attribute
@@ -153,7 +152,7 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMet
       namedSlots: namedSlots
     };
 
-  } else if (slotMeta === HAS_SLOTS) {
+  } else if (slotMeta === SLOT.HasSlots) {
     // this component doesn't have named slots, but it does
     // have at least a default slot, so the work here is alot easier than
     // when we're not looping through each element and reading attribute values

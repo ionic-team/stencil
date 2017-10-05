@@ -1,4 +1,4 @@
-import { PRIORITY_HIGH, PRIORITY_LOW } from '../util/constants';
+import { PRIORITY } from '../util/constants';
 import { QueueApi } from '../util/interfaces';
 
 
@@ -31,10 +31,10 @@ export function createQueueServer(): QueueApi {
   }
 
   function add(cb: Function, priority?: number) {
-    if (priority === PRIORITY_HIGH) {
+    if (priority === PRIORITY.High) {
       highCallbacks.push(cb);
 
-    } else if (priority === PRIORITY_LOW) {
+    } else if (priority === PRIORITY.Low) {
       lowCallbacks.push(cb);
 
     } else {

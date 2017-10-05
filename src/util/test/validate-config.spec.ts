@@ -8,6 +8,17 @@ describe('validation', () => {
 
   describe('validateBuildConfig', () => {
 
+    it('should set hydratedCssClass', () => {
+      config.hydratedCssClass = '💎';
+      validateBuildConfig(config);
+      expect(config.hydratedCssClass).toBe('💎');
+    });
+
+    it('should default hydratedCssClass', () => {
+      validateBuildConfig(config);
+      expect(config.hydratedCssClass).toBe('hydrated');
+    });
+
     it('should throw error when hashedFileNameLength to small', () => {
       expect(() => {
         config.hashedFileNameLength = 3;

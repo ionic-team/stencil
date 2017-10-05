@@ -147,7 +147,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
       newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ssrId);
 
-      connectElement(plt, <HostElement>newVNode.elm, connectedInfo);
+      connectElement(plt, <HostElement>newVNode.elm, connectedInfo, config.hydratedCssClass);
 
       return newVNode;
     };
@@ -155,7 +155,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     // loop through each node and start connecting/hydrating
     // any elements that are host elements to components
     // this kicks off all the async loading and hydrating
-    connectElement(plt, <any>win.document.body, connectedInfo);
+    connectElement(plt, <any>win.document.body, connectedInfo, config.hydratedCssClass);
 
     if (connectedInfo.elementCount === 0) {
       // what gives, never found ANY host elements to connect!
@@ -173,7 +173,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 }
 
 
-export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo: ConnectedInfo) {
+export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo: ConnectedInfo, hydratedCssClass: string) {
   if (!elm._hasConnected) {
     // only connect elements which is a registered component
     const cmpMeta = plt.getComponentMeta(elm);
@@ -181,7 +181,7 @@ export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo
       // init our host element functions
       // not using Element.prototype on purpose
       if (!elm.connectedCallback) {
-        initHostConstructor(plt, elm);
+        initHostConstructor(plt, elm, hydratedCssClass);
       }
 
       // cool, let the element know it's been connected
@@ -196,7 +196,7 @@ export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo
   if (elmChildren) {
     // continue drilling down through child elements
     for (var i = 0, l = elmChildren.length; i < l; i++) {
-      connectElement(plt, <HostElement>elmChildren[i], connectedInfo);
+      connectElement(plt, <HostElement>elmChildren[i], connectedInfo, hydratedCssClass);
     }
   }
 }

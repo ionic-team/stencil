@@ -68,12 +68,12 @@ export function wrapCoreJs(config: BuildConfig, jsContent: string) {
 
   const output = [
     generatePreamble(config),
-    `(function(Context,appNamespace,publicPath){`,
+    `(function(Context,appNamespace,hydratedCssClass,publicPath){`,
     `"use strict";\n`,
     `var s=document.querySelector("script[data-core='${APP_CORE_FILENAME_PLACEHOLDER}'][data-path]");`,
     `if(s){publicPath=s.getAttribute('data-path');}\n`,
     jsContent.trim(),
-    `\n})({},"${config.namespace}","${publicPath}");`
+    `\n})({},"${config.namespace}","${config.hydratedCssClass}","${publicPath}");`
   ].join('');
 
   return output;

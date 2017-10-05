@@ -179,6 +179,10 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }
 
+  if (typeof config.hydratedCssClass !== 'string') {
+    config.hydratedCssClass = DEFAULT_HYDRATED_CSS_CLASS;
+  }
+
   config.emptyDist = !!config.emptyDist;
   config.emptyWWW = !!config.emptyWWW;
 
@@ -321,6 +325,7 @@ const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
+const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';
 
 const DEFAULT_COPY_TASKS: CopyTasks = {
   assets: { src: 'assets' },

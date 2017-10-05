@@ -1,9 +1,6 @@
-import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
-import {
-  TYPE_ANY, TYPE_BOOLEAN, TYPE_NUMBER,
-  MEMBER_PROP, MEMBER_METHOD, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE
-} from '../../../util/constants';
 import { dashToPascalCase } from '../../../util/helpers';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
+import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
@@ -46,17 +43,18 @@ declare global {
 
 function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
   const memberTypes = {
-    [TYPE_ANY]: 'any',
-    [TYPE_BOOLEAN]: 'boolean | "true" | "false"',
-    [TYPE_NUMBER]: 'number',
+    [PROP_TYPE.Any]: 'any',
+    [PROP_TYPE.String]: 'string',
+    [PROP_TYPE.Boolean]: 'boolean | "true" | "false"',
+    [PROP_TYPE.Number]: 'number',
   };
   return Object.keys(membersMeta)
     .filter((memberName) => {
-      return [MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE].indexOf(membersMeta[memberName].memberType) !== -1;
+      return [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable].indexOf(membersMeta[memberName].memberType) !== -1;
     })
     .reduce((obj, memberName) => {
       const member = membersMeta[memberName];
-      obj[memberName] = memberTypes[member.propType || TYPE_ANY];
+      obj[memberName] = memberTypes[member.propType || PROP_TYPE.Any];
       return obj;
     }, <{ [key: string]: string }>{});
 }
@@ -104,17 +102,18 @@ function createJSXNamespace(tagName: string, tagNameAsPascal: string) {
   */
 function createJSXElementsNamespace(cmpMeta: ComponentMeta) {
   const memberTypes = {
-    [TYPE_ANY]: 'any',
-    [TYPE_BOOLEAN]: 'boolean',
-    [TYPE_NUMBER]: 'number',
+    [PROP_TYPE.Any]: 'any',
+    [PROP_TYPE.String]: 'string',
+    [PROP_TYPE.Boolean]: 'boolean | "true" | "false"',
+    [PROP_TYPE.Number]: 'number',
   };
   const members = Object.keys(cmpMeta.membersMeta)
     .filter((memberName) => {
-      return [MEMBER_METHOD, MEMBER_PROP, MEMBER_PROP_CONNECT, MEMBER_PROP_MUTABLE].indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1;
+      return [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable].indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1;
     })
     .map((memberName) => {
       const member = cmpMeta.membersMeta[memberName];
-      const type = ts.createIdentifier(memberTypes[member.propType || TYPE_ANY]);
+      const type = ts.createIdentifier(memberTypes[member.propType || PROP_TYPE.Any]);
       return ts.createPropertySignature(
         undefined,
         memberName,

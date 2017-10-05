@@ -2,6 +2,7 @@ import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile, ComponentMeta } from 
 import { mockBuildConfig } from '../../../../testing/mocks';
 import { componentTsFileClass } from '../component-class';
 import { DEFAULT_COMPILER_OPTIONS } from '../../compiler-options';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -67,11 +68,12 @@ describe('vnode-slot transform', () => {
             membersMeta: {
               activeRouter: {
                 ctrlId: 'activeRouter',
-                memberType: 3,
+                memberType: MEMBER_TYPE.PropContext,
               },
               url: {
                 attribName: 'url',
-                memberType: 1,
+                memberType: MEMBER_TYPE.Prop,
+                propType: PROP_TYPE.String
               },
             },
             propsDidChangeMeta: [],
