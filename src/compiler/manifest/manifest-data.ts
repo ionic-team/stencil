@@ -3,6 +3,7 @@ import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData
   ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME, MEMBER_TYPE, PROP_TYPE, PRIORITY, SLOT } from '../../util/constants';
 import { normalizePath } from '../util';
+import { validateManifestCompatibility } from './manifest-compatibility';
 
 
 // this maps the json data to our internal data structure
@@ -76,12 +77,19 @@ export function serializeAppManifest(config: BuildConfig, manifestDir: string, m
 export function parseDependentManifest(config: BuildConfig, collectionName: string, manifestDir: string, manifestJson: string) {
   const manifestData: ManifestData = JSON.parse(manifestJson);
   const manifest: Manifest = {
-    manifestName: collectionName
+    manifestName: collectionName,
+    compiler: {
+      name: manifestData.compiler.name,
+      version: manifestData.compiler.version,
+      typescriptVersion: manifestData.compiler.typescriptVersion
+    }
   };
 
   parseComponents(config, manifestDir, manifestData, manifest);
   parseBundles(manifestData, manifest);
   parseGlobal(config, manifestDir, manifestData, manifest);
+
+  validateManifestCompatibility(config, manifestDir, manifest);
 
   return manifest;
 }
