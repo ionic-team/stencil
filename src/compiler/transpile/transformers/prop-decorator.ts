@@ -51,18 +51,20 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
           propName = n.getText();
 
         } else if (!propType) {
-          if (n.kind === ts.SyntaxKind.BooleanKeyword) {
+          if (n.kind === ts.SyntaxKind.BooleanKeyword || n.kind === ts.SyntaxKind.TrueKeyword || n.kind === ts.SyntaxKind.FalseKeyword) {
             // @Prop() myBoolean: boolean;
             propType = TYPE_BOOLEAN;
             shouldObserveAttribute = true;
 
-          } else if (n.kind === ts.SyntaxKind.NumberKeyword) {
+          } else if (n.kind === ts.SyntaxKind.NumberKeyword || n.kind === ts.SyntaxKind.NumericLiteral) {
             // @Prop() myNumber: number;
+            // @Prop() myNumber = 88;
             propType = TYPE_NUMBER;
             shouldObserveAttribute = true;
 
-          } else if (n.kind === ts.SyntaxKind.StringKeyword) {
+          } else if (n.kind === ts.SyntaxKind.StringKeyword || n.kind === ts.SyntaxKind.StringLiteral) {
             // @Prop() myString: string;
+            // @Prop() myString = 'some string';
             shouldObserveAttribute = true;
 
           } else if (n.kind === ts.SyntaxKind.AnyKeyword) {
