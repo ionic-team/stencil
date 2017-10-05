@@ -1,8 +1,7 @@
-import { BuildConfig } from '../../util/interfaces';
+import { BuildConfig, Logger } from '../../util/interfaces';
 import { isAbsolute, join } from 'path';
 import { normalizePath } from '../../compiler/util';
 import { writeFile } from 'fs';
-import chalk from 'chalk';
 
 
 export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
@@ -70,25 +69,25 @@ export function getConfigFilePath(process: NodeJS.Process, argv: CliArgv) {
 
 
 
-export function help(process: NodeJS.Process) {
-  var p = chalk.dim((process.platform === 'win32') ? '>' : '$');
+export function help(process: NodeJS.Process, logger: Logger) {
+  var p = logger.dim((process.platform === 'win32') ? '>' : '$');
 
   console.log(`
-  ${chalk.bold('Build:')} ${chalk.dim('Build components for development or production.')}
+  ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}
 
-    ${p} ${chalk.green('stencil build [--dev] [--watch] [--prerender] [--debug]')}
+    ${p} ${logger.green('stencil build [--dev] [--watch] [--prerender] [--debug]')}
 
-      ${chalk.green('--dev')} ${chalk.dim('..................')} Execute a development build.
-      ${chalk.green('--watch')} ${chalk.dim('................')} Execute a build in watch mode.
-      ${chalk.green('--prerender')} ${chalk.dim('............')} Prerender URLs.
-      ${chalk.green('--debug')} ${chalk.dim('................')} Set the log level to debug.
-      ${chalk.green('--config')} ${chalk.dim('...............')} Stencil config file.
+      ${logger.green('--dev')} ${logger.dim('..................')} Execute a development build.
+      ${logger.green('--watch')} ${logger.dim('................')} Execute a build in watch mode.
+      ${logger.green('--prerender')} ${logger.dim('............')} Prerender URLs.
+      ${logger.green('--debug')} ${logger.dim('................')} Set the log level to debug.
+      ${logger.green('--config')} ${logger.dim('...............')} Stencil config file.
 
-  ${chalk.bold('Examples:')}
+  ${logger.bold('Examples:')}
 
-    ${p} ${chalk.green('stencil build --dev --watch')}
-    ${p} ${chalk.green('stencil build --prerender')}
-    ${p} ${chalk.green('stencil init')}
+    ${p} ${logger.green('stencil build --dev --watch')}
+    ${p} ${logger.green('stencil build --prerender')}
+    ${p} ${logger.green('stencil init')}
 
 `);
 }

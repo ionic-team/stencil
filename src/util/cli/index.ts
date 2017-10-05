@@ -17,7 +17,7 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
 
 
   if (argv.help) {
-    help(process);
+    help(process, logger);
     return process.exit(0);
   }
 
@@ -80,7 +80,7 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
 
     default:
       logger.error(`Invalid stencil command, please see the options below:`);
-      help(process);
+      help(process, logger);
       break;
   }
 }
