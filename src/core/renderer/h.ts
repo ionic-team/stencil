@@ -81,13 +81,16 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     if (vnode.vattrs.className) {
       vnode.vattrs.class = vnode.vattrs.className;
     }
-    if (vnode.vattrs.class && typeof vnode.vattrs.class === 'string') {
-      const classList = vnode.vattrs.class.trim().split(/\s+/);
-      vnode.vattrs.class = {};
+    if (vnode.vattrs.class && typeof vnode.vattrs.class === 'object') {
+      let key, classNameString = '';
 
-      for (let i = classList.length - 1; i > -1; i -= 1) {
-        vnode.vattrs.class[classList[i]] = true;
+      for (key in vnode.vattrs.class) {
+        if (vnode.vattrs.class[key] === true) {
+          classNameString += ' ' + key;
+        }
       }
+
+      vnode.vattrs.class = classNameString.substr(1);
     }
   }
 

@@ -30,26 +30,8 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
 
   // Class
   if (name === 'class' && !isSvg) {
-    newValue = newValue || {};
-    oldValue = oldValue || {};
-
-    let newClassNameString = '';
-    let oldClassNameString = '';
-
-    for (key in oldValue) {
-      if (oldValue[key] === true) {
-        oldClassNameString += ' ' + key;
-      }
-    }
-
-    for (key in newValue) {
-      if (newValue[key] === true) {
-        newClassNameString += ' ' + key;
-      }
-    }
-
-    if (oldClassNameString !== newClassNameString) {
-      elm.className = newClassNameString;
+    if (oldValue !== newValue) {
+      elm.className = newValue;
     }
 
   // Style

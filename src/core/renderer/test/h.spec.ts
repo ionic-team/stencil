@@ -94,26 +94,28 @@ describe('h()', () => {
     expect(vnode.vchildren[1].vtag).toBe('child-b');
   });
 
-  it('should add multiple classes from string, w/ extra whitespace', () => {
+  it('should have class exactly as passed if string w/ extra whitespace', () => {
     var vnode = h('div', { class: '  dragons   love  tacos  ' });
     expect(vnode.vattrs.class).toBeDefined();
-    expect(Object.keys(vnode.vattrs.class).length).toBe(3);
-    expect(vnode.vattrs.class['dragons']).toBe(true);
-    expect(vnode.vattrs.class['love']).toBe(true);
-    expect(vnode.vattrs.class['tacos']).toBe(true);
+    expect(vnode.vattrs.class).toEqual('  dragons   love  tacos  ');
+  });
+
+  it('should have class based on classes as keys of an object', () => {
+    var vnode = h('div', { class: { 'dragons': true, 'love': true, 'tacos': true } });
+    expect(vnode.vattrs.class).toBeDefined();
+    expect(vnode.vattrs.class).toEqual('dragons love tacos');
   });
 
   it('should add one class from string', () => {
     var vnode = h('div', { class: 'some-class' });
     expect(vnode.vattrs.class).toBeDefined();
-    expect(vnode.vattrs.class['some-class']).toBe(true);
+    expect(vnode.vattrs.class).toEqual('some-class');
   });
 
   it('should add class from map of classnames and booleans', () => {
     var vnode = h('div', { class: { enabled: true, checked: false } });
     expect(vnode.vattrs.class).toBeDefined();
-    expect(vnode.vattrs.class.enabled).toBe(true);
-    expect(vnode.vattrs.class.checked).toBe(false);
+    expect(vnode.vattrs.class).toEqual('enabled');
   });
 
   it('should add props', () => {
