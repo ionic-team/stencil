@@ -8,7 +8,12 @@ import {
   HydrateOptions,
   AppGlobal,
   StencilSystem,
-  VNodeData
+  VNodeData,
+  ComponentWillLoad,
+  ComponentDidLoad,
+  ComponentWillUpdate,
+  ComponentDidUpdate,
+  ComponentDidUnload
 } from './util/interfaces';
 
 export * from './util/decorators';
@@ -27,5 +32,10 @@ export {
   HydrateOptions,
   AppGlobal,
   StencilSystem,
-  VNodeData
+  VNodeData,
+  ComponentWillLoad,
+  ComponentDidLoad,
+  ComponentWillUpdate,
+  ComponentDidUpdate,
+  ComponentDidUnload
 };

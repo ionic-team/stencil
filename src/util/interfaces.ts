@@ -1286,3 +1286,23 @@ export interface ContextData {
 export interface HostElementData {
   name: string;
 }
+
+export interface ComponentWillLoad {
+  componentWillLoad: () => Promise<void> | void;
+}
+
+export interface ComponentDidLoad {
+  componentDidLoad: () => void;
+}
+
+export interface ComponentWillUpdate {
+  componentWillUpdate: () => Promise<void> | void;
+}
+
+export interface ComponentDidUpdate {
+  componentDidUpdate: () => void;
+}
+
+export interface ComponentDidUnload {
+  componentDidUnload: () => void;
+}
