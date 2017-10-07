@@ -1110,7 +1110,7 @@ export interface Workbox {
   generateSW(swConfig: any): Promise<any>;
   generateFileManifest(): Promise<any>;
   getFileManifestEntries(): Promise<any>;
-  injectManifest(): Promise<any>;
+  injectManifest(swConfig: any): Promise<any>;
 }
 
 
