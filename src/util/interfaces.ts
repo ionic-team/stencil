@@ -42,8 +42,8 @@ export interface EventListenerCallback {
 }
 
 
-export interface EventEmitter {
-  emit: (data?: any) => void;
+export interface EventEmitter<T= any> {
+  emit: (data?: T) => void;
 }
 
 
@@ -937,8 +937,8 @@ export interface PropConnect {
 }
 
 
-export interface EventEmitterData {
-  detail?: any;
+export interface EventEmitterData<T = any> {
+  detail?: T;
   bubbles?: boolean;
   cancelable?: boolean;
   composed?: boolean;
