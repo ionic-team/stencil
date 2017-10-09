@@ -16,6 +16,7 @@ import { validateBuildConfig } from '../../util/validate-config';
 import { validatePrerenderConfig } from '../prerender/validate-prerender-config';
 import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
 import { writeBuildFiles } from './write-build';
+import { upgradeDependentComponents } from '../upgrade-dependents/index';
 
 
 export function build(config: BuildConfig, context?: any) {
@@ -66,6 +67,11 @@ export function build(config: BuildConfig, context?: any) {
     // generation the app manifest from the compiled results
     // and from all the dependent collections
     return generateAppManifest(config, ctx, compileResults.moduleFiles);
+
+  }).then(() => {
+    // Look at all dependent components from outside collections and
+    // upgrade the components if need be
+    return upgradeDependentComponents(config, ctx);
 
   }).then(() => {
     // bundle modules and styles into separate files phase

@@ -1,11 +1,11 @@
 import { BuildConfig, Manifest } from '../../util/interfaces';
 
 
-export function validateManifestCompatibility(config: BuildConfig, manifestDir: string, manifest: Manifest) {
+export function validateManifestCompatibility(config: BuildConfig, manifest: Manifest): number[] {
   if (!manifest.compiler) {
     // if there is no compiler data at all then this was probably
     // set on purpose and we should avoid doing any upgrading
-    return;
+    return [];
   }
 
   try {
@@ -18,21 +18,14 @@ export function validateManifestCompatibility(config: BuildConfig, manifestDir: 
     const manifestCompilerVersion = parseCompilerVersion(manifest.compiler.version);
 
     // figure out which compiler upgrades, if any, we need to do
-    const upgrades = calculateRequiredUpgrades(manifestCompilerVersion);
+    return calculateRequiredUpgrades(manifestCompilerVersion);
 
-    upgrades.forEach(upgrade => {
-      try {
-        // let's do this!
-        doUpgrade(config, manifestDir, manifestCompilerVersion, upgrade);
-
-      } catch (e) {
-        config.logger.error(`error performing compiler upgrade: ${e}`);
-      }
-    });
 
   } catch (e) {
     config.logger.error(`error parsing compiler version: ${e}`);
   }
+
+  return [];
 }
 
 
@@ -48,17 +41,6 @@ export function calculateRequiredUpgrades(v: Semver) {
   }
 
   return upgrades;
-}
-
-
-function doUpgrade(config: BuildConfig, manifestDir: string, manifestCompilerVersion: Semver, upgrade: CompilerUpgrade) {
-
-  switch (upgrade) {
-    case CompilerUpgrade.JSX_Upgrade_From_0_0_5:
-      config.logger.debug(`JSX_Upgrade_From_0_0_5, manifestDir: ${manifestDir}, manifestCompilerVersion: ${manifestCompilerVersion}`);
-      break;
-  }
-
 }
 
 

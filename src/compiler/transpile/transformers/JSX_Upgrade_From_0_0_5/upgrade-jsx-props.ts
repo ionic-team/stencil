@@ -1,4 +1,3 @@
-import { SLOT_TAG } from '../../../../util/constants';
 import * as ts from 'typescript';
 import * as util from '../util';
 
@@ -60,7 +59,6 @@ function upgradeTagName(tagName: ts.Expression) {
 function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralExpression {
 
   let upgradedProps: util.ObjectMap = {};
-  let propName: string;
 
   if (!ts.isObjectLiteralExpression(props)) {
     return ts.createNull();
@@ -103,7 +101,7 @@ function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralEx
       const eventListeners = Object.keys(propValue).reduce((newValue, eventName) => {
         return {
           ...newValue,
-          [`on${eventName}`]: propValue[eventName]
+          [`on${eventName}`]: (propValue as util.ObjectMap)[eventName]
         };
       }, {});
       return {
@@ -111,6 +109,7 @@ function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralEx
         ...eventListeners
       };
     }
+    return newProps;
   }, upgradedProps);
 
   try {

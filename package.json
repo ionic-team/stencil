@@ -24,6 +24,7 @@
     "transpile.testing": "tsc -p src/testing/tsconfig.json"
   },
   "dependencies": {
+    "@types/util.promisify": "^1.0.0",
     "chokidar": "1.7.0",
     "node-sass": "4.5.3",
     "typescript": "2.5.3"
