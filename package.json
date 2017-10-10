@@ -26,7 +26,8 @@
   "dependencies": {
     "chokidar": "1.7.0",
     "node-sass": "4.5.3",
-    "typescript": "2.5.3"
+    "typescript": "2.5.3",
+    "util.promisify": "1.0.0"
   },
   "devDependencies": {
     "@types/babel-core": "^6.7.14",
@@ -68,7 +69,6 @@
     "tslint": "^5.6.0",
     "tslint-ionic-rules": "0.0.8",
     "uglify-es": "3.1.2",
-    "util.promisify": "^1.0.0",
     "webpack": "^3.5.4",
     "workbox-build": "2.0.3"
   },
