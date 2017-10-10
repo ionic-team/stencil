@@ -1,4 +1,5 @@
 [![npm][npm-badge]][npm-badge-url]
+[![Build Status][circle-badge]][circle-badge-url]
 # Stencil: A Compiler for Web Components
 
 Stencil is a simple compiler for generating Web Components.
@@ -159,3 +160,5 @@ For the small minority of browsers that do not support modern browser features a
 
 [npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg
 [npm-badge-url]: https://www.npmjs.com/package/@stencil/core
+[circle-badge]: https://circleci.com/gh/ionic-team/stencil.svg?style=shield
+[circle-badge-url]: https://circleci.com/gh/ionic-team/stencil
