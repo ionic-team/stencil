@@ -1,11 +1,13 @@
-import * as promisify from 'util.promisify';
+import * as util from 'util';
 import * as ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
 import { transformSourceString } from '../../util';
 import upgradeJsxProps from '../upgrade-jsx-props';
 
-const readFileAsync = promisify(fs.readFile);
+require('util.promisify').shim();
+
+const readFileAsync = util.promisify(fs.readFile);
 const fileList = fs.readdirSync(path.join(__dirname, './pre-update'));
 const directory = __dirname;
 

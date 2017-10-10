@@ -24,7 +24,6 @@
     "transpile.testing": "tsc -p src/testing/tsconfig.json"
   },
   "dependencies": {
-    "@types/util.promisify": "^1.0.0",
     "chokidar": "1.7.0",
     "node-sass": "4.5.3",
     "typescript": "2.5.3"
@@ -37,6 +36,7 @@
     "@types/jest": "18.1.1",
     "@types/jsdom": "^11.0.0",
     "@types/node": "7.0.5",
+    "@types/util.promisify": "^1.0.0",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.24.0",
     "babel-plugin-transform-define": "^1.2.0",

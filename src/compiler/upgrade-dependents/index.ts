@@ -1,14 +1,16 @@
 import { BuildConfig, BuildContext, Manifest } from '../../util/interfaces';
 import { validateManifestCompatibility, CompilerUpgrade } from './manifest-compatibility';
 import { transformSourceString } from '../transpile/transformers/util';
-import promisify from 'util.promisify';
+import * as util from 'util';
 import upgradeFrom0_0_5 from '../transpile/transformers/JSX_Upgrade_From_0_0_5/upgrade-jsx-props';
 import ts from 'typescript';
+
+require('util.promisify').shim();
 
 
 export async function upgradeDependentComponents(config: BuildConfig, ctx: BuildContext) {
 
-  const fsReadFilePr = promisify(config.sys.fs.readFile);
+  const fsReadFilePr = util.promisify(config.sys.fs.readFile);
   const doUpgrade = createDoUpgrade(config, ctx, fsReadFilePr);
 
   return Promise.all(Object.keys(ctx.dependentManifests).map(async function(collectionName) {
