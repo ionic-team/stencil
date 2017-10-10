@@ -27,10 +27,12 @@ export class ObjectMap {
 }
 
 export function isInstanceOfObjectMap(object: any): object is ObjectMap {
-  return !object.hasOwnProperty('kind') &&
-    !object.hasOwnProperty('flags') &&
-    !object.hasOwnProperty('pos') &&
-    !object.hasOwnProperty('end');
+    return (
+      !object.hasOwnProperty('kind') &&
+      !object.hasOwnProperty('flags') &&
+      !object.hasOwnProperty('pos') &&
+      !object.hasOwnProperty('end')
+    );
 }
 
 function getTextOfPropertyName(name: ts.PropertyName): string {
@@ -77,7 +79,7 @@ export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpressio
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(objMap).map((key: string): ts.ObjectLiteralElementLike => {
     let value = objMap[key];
 
-    if (isInstanceOfObjectMap(value)) {
+    if (!ts.isIdentifier(value) && isInstanceOfObjectMap(value)) {
       return ts.createPropertyAssignment(ts.createLiteral(key), objectMapToObjectLiteral(value));
     }
     return ts.createPropertyAssignment(ts.createLiteral(key), value as ts.Expression);
@@ -130,8 +132,8 @@ function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
  * @param transformers Array of transforms to run agains the source string
  * @returns a string
  */
-export function transformSourceString(sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
-  const transformed = ts.transform(ts.createSourceFile('source.ts', sourceText, ts.ScriptTarget.ES2015), transformers);
+export function transformSourceString(fileName: string, sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
+  const transformed = ts.transform(ts.createSourceFile(fileName, sourceText, ts.ScriptTarget.ES2015), transformers);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed }, {
       onEmitNode: transformed.emitNodeWithNotification,
       substituteNode: transformed.substituteNode

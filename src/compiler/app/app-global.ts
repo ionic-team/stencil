@@ -143,9 +143,6 @@ function wrapGlobalJs(config: BuildConfig, ctx: BuildContext, globalJsName: stri
 
 
 export function generateGlobalJs(config: BuildConfig, globalJsContents: string[]) {
-  let content = `/* ${config.namespace} Global is used during Server-Side Rendering and Prerendering */\n`;
-  content += `/* this script is not requested or used client-side */\n`;
-
   const publicPath = getAppPublicPath(config);
 
   const output = [

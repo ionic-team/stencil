@@ -45,7 +45,12 @@ function createDoUpgrade(config: BuildConfig, ctx: BuildContext, fsReadFilePr: (
     await Promise.all(manifest.modulesFiles.map(async function(moduleFile) {
 
       const source = await fsReadFilePr(moduleFile.jsFilePath, 'utf8');
-      const output = transformSourceString(source, upgradeTransforms);
+      let output = '';
+      try {
+        output = transformSourceString(moduleFile.jsFilePath, source, upgradeTransforms);
+      } catch (e) {
+        config.logger.error(`error performing compiler upgrade on ${moduleFile.jsFilePath}: ${e}`);
+      }
       ctx.jsFiles[moduleFile.jsFilePath] = output;
     }));
   };

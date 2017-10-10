@@ -323,7 +323,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   }
 
   // internal variables to be reused per patch() call
-  let isUpdate: boolean, hostContentNodes: HostContentNodes, ssrId: number;
+  let hostContentNodes: HostContentNodes, ssrId: number;
 
 
   return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, ssrPatchId?: number) {
@@ -332,7 +332,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
-    isUpdate = isUpdatePatch;
+    isUpdatePatch;
     hostContentNodes = hostElementContentNodes;
     ssrId = ssrPatchId;
 

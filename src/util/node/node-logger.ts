@@ -5,11 +5,9 @@ import * as chalk from 'chalk';
 export class NodeLogger implements Logger {
   private _level = 'info';
   private process: NodeJS.Process;
-  private width: number;
 
   constructor(opts: { level?: string, process: NodeJS.Process }) {
     this.process = opts.process;
-    this.width = Math.max(MIN_LEN, Math.min((process.stdout as any).columns || 0, MAX_LEN));
     this.level = opts.level;
   }
 
@@ -495,5 +493,4 @@ const JS_KEYWORDS = [
 
 
 const INDENT = '           ';
-const MIN_LEN = 80;
 const MAX_LEN = 120;

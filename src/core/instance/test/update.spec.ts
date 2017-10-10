@@ -100,12 +100,10 @@ describe('instance update', () => {
   });
 
   it('should create $instance', () => {
-    let createdInstance = false;
     const cmpMeta: ComponentMeta = {
       tagNameMeta: 'ion-test',
       componentModule: class {
         constructor() {
-          createdInstance = true;
         }
       }
     };
