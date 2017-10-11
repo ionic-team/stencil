@@ -26,7 +26,7 @@
   "dependencies": {
     "chokidar": "1.7.0",
     "node-sass": "4.5.3",
-    "typescript": "2.5.3",
+    "typescript": "^2.6.0-dev.20171011",
     "util.promisify": "1.0.0"
   },
   "devDependencies": {
