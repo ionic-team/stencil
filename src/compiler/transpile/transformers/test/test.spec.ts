@@ -55,7 +55,7 @@ export class Redirect {
         return history.replace(this.url, {});
     }
 }`;
-      const output = transformSourceString(source, [update]);
+      const output = transformSourceString('source.ts', source, [update]);
 
       expect(output).toEqual(source + '\nexport const var test = "hi";\n');
     });

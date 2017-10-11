@@ -23,7 +23,7 @@ describe('vnode-slot transform', () => {
         readFileAsync(path.join(__dirname, './post-update', fileName), { encoding: 'utf8'})
       ]);
 
-      const output = transformSourceString(source, [upgradeJsxProps]);
+      const output = transformSourceString(fileName, source, [upgradeJsxProps]);
       expect(
         output
       ).toEqual(
