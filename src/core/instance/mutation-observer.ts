@@ -20,7 +20,7 @@ function createElementReset(plt: PlatformApi, elm: HostElement): () => void {
   return () => {
     const cmpMeta = plt.getComponentMeta(elm);
     elm._vnode = null;
-    plt.connectHostElement(elm, cmpMeta.slotMeta);
+    plt.connectHostElement(cmpMeta, elm);
     stopObserving(plt, elm);
     elm._render();
     startObserving(plt, elm);

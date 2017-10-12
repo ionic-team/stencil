@@ -15,8 +15,9 @@ const cli = meow(`
 	    ${version.SEMVER_INCREMENTS.join(' | ')} | 1.2.3
 
 	Options
-	  --any-branch  Allow publishing from any branch
-	  --tag         Publish under a given dist-tag
+		--any-branch  Allow publishing from any branch
+		--tag         Publish under a given dist-tag
+		--dry-run     Do everything but git tag, commit and npm publish
 
 	Examples
 	  $ np

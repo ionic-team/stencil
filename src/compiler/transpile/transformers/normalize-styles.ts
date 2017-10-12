@@ -1,4 +1,5 @@
 import { BuildConfig, ComponentMeta, ComponentOptions, ModuleFile, StyleMeta } from '../../../util/interfaces';
+import { DEFAULT_STYLE_MODE } from '../../../util/constants';
 import { normalizePath } from '../../util';
 
 
@@ -13,9 +14,9 @@ function normalizeStyleStr(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
   if (typeof userOpts.styles === 'string' && userOpts.styles.trim().length) {
 
     cmpMeta.stylesMeta = cmpMeta.stylesMeta || {};
-    cmpMeta.stylesMeta.$ = cmpMeta.stylesMeta.$ || {};
+    cmpMeta.stylesMeta[DEFAULT_STYLE_MODE] = cmpMeta.stylesMeta[DEFAULT_STYLE_MODE] || {};
 
-    cmpMeta.stylesMeta.$.styleStr = userOpts.styles.trim();
+    cmpMeta.stylesMeta[DEFAULT_STYLE_MODE].styleStr = userOpts.styles.trim();
   }
 }
 
@@ -26,9 +27,9 @@ function normalizeStylePath(config: BuildConfig, userOpts: ComponentOptions, mod
     // styleUrl: 'my-styles.scss'
 
     cmpMeta.stylesMeta = cmpMeta.stylesMeta || {};
-    cmpMeta.stylesMeta.$ = cmpMeta.stylesMeta.$ || {};
+    cmpMeta.stylesMeta[DEFAULT_STYLE_MODE] = cmpMeta.stylesMeta[DEFAULT_STYLE_MODE] || {};
 
-    normalizeModeStylePaths(config, moduleFile, cmpMeta.stylesMeta.$, userOpts.styleUrl);
+    normalizeModeStylePaths(config, moduleFile, cmpMeta.stylesMeta[DEFAULT_STYLE_MODE], userOpts.styleUrl);
   }
 }
 
@@ -48,8 +49,8 @@ function normalizeStylePaths(congif: BuildConfig, userOpts: ComponentOptions, mo
       if (styleUrl && typeof styleUrl === 'string' && styleUrl.trim()) {
 
         cmpMeta.stylesMeta = cmpMeta.stylesMeta || {};
-        cmpMeta.stylesMeta.$ = cmpMeta.stylesMeta.$ || {};
-        normalizeModeStylePaths(congif, moduleFile, cmpMeta.stylesMeta.$, userOpts.styleUrl);
+        cmpMeta.stylesMeta[DEFAULT_STYLE_MODE] = cmpMeta.stylesMeta[DEFAULT_STYLE_MODE] || {};
+        normalizeModeStylePaths(congif, moduleFile, cmpMeta.stylesMeta[DEFAULT_STYLE_MODE], userOpts.styleUrl);
       }
     });
     return;

@@ -13,7 +13,7 @@ import { formatHeader } from '../../util/logger/logger-util';
 var commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
 
-export function parseCss(config: BuildConfig, css: string, filePath: string): {
+export function parseCss(config: BuildConfig, css: string, filePath?: string): {
   type: string;
   stylesheet: {
     source: string;

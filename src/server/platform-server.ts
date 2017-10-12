@@ -1,15 +1,15 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry,
   CoreContext, Diagnostic, FilesMap, HostElement,
-  ModuleCallbacks, PlatformApi, AppGlobal } from '../util/interfaces';
+  BundleCallbacks, PlatformApi, AppGlobal } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { getAppFileName } from '../compiler/app/app-core';
-import { getCssFile, getJsFile, normalizePath } from '../compiler/util';
+import { ENCAPSULATION_TYPE, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
+import { getAppFileName } from '../compiler/app/generate-app-files';
+import { getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
-import { MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
@@ -23,12 +23,11 @@ export function createPlatformServer(
   isPrerender: boolean,
   ctx?: BuildContext
 ): PlatformApi {
-  const registry: ComponentRegistry = { 'HTML': {} };
+  const registry: ComponentRegistry = { 'html': {} };
   const moduleImports: {[tag: string]: any} = {};
-  const moduleCallbacks: ModuleCallbacks = {};
-  const loadedModules: {[moduleId: string]: boolean} = {};
-  const pendingModuleFileReads: {[url: string]: boolean} = {};
-  const pendingStyleFileReads: {[url: string]: boolean} = {};
+  const bundleCallbacks: BundleCallbacks = {};
+  const loadedBundles: {[bundleId: string]: boolean} = {};
+  const pendingBundleFileReads: {[url: string]: boolean} = {};
   const stylesMap: FilesMap = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
 
@@ -82,6 +81,7 @@ export function createPlatformServer(
     getContextItem,
     loadBundle,
     connectHostElement,
+    attachStyles: noop,
     queue: createQueueServer(),
     tmpDisconnected: false,
     emitEvent: noop,
@@ -92,7 +92,7 @@ export function createPlatformServer(
 
 
   // create the renderer which will be used to patch the vdom
-  plt.render = createRendererPatch(plt, domApi);
+  plt.render = createRendererPatch(plt, domApi, false);
 
   // setup the root node of all things
   // which is the mighty <html> tag
@@ -105,14 +105,14 @@ export function createPlatformServer(
   };
 
   function appLoaded(failureDiagnostic?: Diagnostic) {
-    if ((rootElm._hasLoaded && Object.keys(pendingStyleFileReads).length === 0) || failureDiagnostic) {
+    if (rootElm._hasLoaded || failureDiagnostic) {
       // the root node has loaded
       // and there are no css files still loading
       plt.onAppLoad && plt.onAppLoad(rootElm, stylesMap, failureDiagnostic);
     }
   }
 
-  function connectHostElement(elm: HostElement, slotMeta: number) {
+  function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -121,13 +121,13 @@ export function createPlatformServer(
       elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
 
-    assignHostContentSlots(domApi, elm, slotMeta);
+    assignHostContentSlots(domApi, elm, cmpMeta.slotMeta);
   }
 
 
   function getComponentMeta(elm: Element) {
-    // registry tags are always UPPER-CASE
-    return registry[elm.tagName.toUpperCase()];
+    // registry tags are always lower-case
+    return registry[elm.tagName.toLowerCase()];
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
@@ -137,8 +137,8 @@ export function createPlatformServer(
     cmpMeta.membersMeta.mode = { memberType: MEMBER_TYPE.Prop };
     cmpMeta.membersMeta.color = { memberType: MEMBER_TYPE.Prop, attribName: 'color' };
 
-    // registry tags are always UPPER-CASE
-    const registryTag = cmpMeta.tagNameMeta.toUpperCase();
+    // registry tags are always lower-case
+    const registryTag = cmpMeta.tagNameMeta.toLowerCase();
 
     if (!globalDefined[registryTag]) {
       globalDefined[registryTag] = true;
@@ -153,12 +153,11 @@ export function createPlatformServer(
   }
 
   function isDefinedComponent(elm: Element) {
-    // registry tags are always UPPER-CASE
-    return !!(globalDefined[elm.tagName.toUpperCase()] || registry[elm.tagName.toUpperCase()]);
+    return !!(globalDefined[elm.tagName.toLowerCase()] || registry[elm.tagName.toLowerCase()]);
   }
 
 
-  App.loadComponents = function loadComponents(module, importFn) {
+  App.loadComponents = function loadComponents(bundleId, importFn) {
     const args = arguments;
 
     // import component function
@@ -170,22 +169,29 @@ export function createPlatformServer(
     }
 
     // fire off all the callbacks waiting on this bundle to load
-    var callbacks = moduleCallbacks[module];
+    var callbacks = bundleCallbacks[bundleId];
     if (callbacks) {
       for (i = 0; i < callbacks.length; i++) {
         callbacks[i]();
       }
-      delete moduleCallbacks[module];
+      delete bundleCallbacks[bundleId];
     }
 
     // remember that we've already loaded this bundle
-    loadedModules[module] = true;
+    loadedBundles[bundleId] = true;
+  };
+
+
+  App.loadStyles = function loadStyles() {
+    // jsonp callback from requested bundles
+    const args = arguments;
+    for (var i = 0; i < args.length; i += 2) {
+      stylesMap[args[i]] = args[i + 1];
+    }
   };
 
 
   function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
-    loadModuleStyles(cmpMeta, elm);
-
     if (cmpMeta.componentModule) {
       // we already have the module loaded
       // (this is probably a unit test)
@@ -193,85 +199,43 @@ export function createPlatformServer(
       return;
     }
 
-    const moduleId = cmpMeta.moduleId;
+    const bundleId: string = cmpMeta.bundleIds[elm.mode] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds as any);
 
-    if (loadedModules[moduleId]) {
-      // sweet, we've already loaded this module
+    if (loadedBundles[bundleId]) {
+      // sweet, we've already loaded this bundle
       cb();
 
     } else {
-      // never seen this module before, let's start loading the file
+      // never seen this bundle before, let's start loading the file
       // and add it to the bundle callbacks to fire when it's loaded
-      if (moduleCallbacks[moduleId]) {
-        moduleCallbacks[moduleId].push(cb);
-      } else {
-        moduleCallbacks[moduleId] = [cb];
+      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
+
+      let requestBundleId = bundleId;
+      if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+        requestBundleId += '.sc';
       }
+      requestBundleId += '.js';
 
-      // create the module filePath we'll be reading
-      const jsFilePath = normalizePath(config.sys.path.join(appBuildDir, `${moduleId}.js`));
+      // create the bundle filePath we'll be reading
+      const jsFilePath = normalizePath(config.sys.path.join(appBuildDir, requestBundleId));
 
-      if (!pendingModuleFileReads[jsFilePath]) {
+      if (!pendingBundleFileReads[jsFilePath]) {
         // not already actively reading this file
         // remember that we're now actively requesting this url
-        pendingModuleFileReads[jsFilePath] = true;
+        pendingBundleFileReads[jsFilePath] = true;
 
-        // let's kick off reading the module
+        // let's kick off reading the bundle
         // this could come from the cache or a new readFile
         getJsFile(config.sys, ctx, jsFilePath).then(jsContent => {
           // remove it from the list of file reads we're waiting on
-          delete pendingModuleFileReads[jsFilePath];
+          delete pendingBundleFileReads[jsFilePath];
 
           // run the code in this sandboxed context
           config.sys.vm.runInContext(jsContent, win, { timeout: 10000 });
 
         }).catch(err => {
-          const d = onError(RUNTIME_ERROR.LoadBundleError, err, elm);
-          appLoaded(d);
+          onError(err, RUNTIME_ERROR.LoadBundleError, elm, true);
         });
-      }
-    }
-  }
-
-
-  function loadModuleStyles(cmpMeta: ComponentMeta, elm: HostElement) {
-    // we need to load this component's css file
-    // we're already figured out and set "mode" as a property to the element
-    let styleId: any = cmpMeta.styleIds && (cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$);
-    if (!styleId && cmpMeta.stylesMeta) {
-      const stylesMeta = cmpMeta.stylesMeta[elm.mode] || cmpMeta.stylesMeta.$;
-      if (stylesMeta) {
-        styleId = stylesMeta.styleId;
-      }
-    }
-    if (styleId) {
-      // we've got a style id to load up
-      // create the style filePath we'll be reading
-      const styleFilePath = normalizePath(config.sys.path.join(appBuildDir, `${styleId}.css`));
-
-      if (!stylesMap[styleFilePath]) {
-        // this style hasn't been added to our collection yet
-
-        if (!pendingStyleFileReads[styleFilePath]) {
-          // we're not already actively opening this file
-          pendingStyleFileReads[styleFilePath] = true;
-
-          getCssFile(config.sys, ctx, styleFilePath).then(cssContent => {
-            delete pendingStyleFileReads[styleFilePath];
-
-            // finished reading the css file
-            // let's add the content to our collection
-            stylesMap[styleFilePath] = cssContent;
-
-            // check if the entire app is done loading or not
-            // and if this was the last thing the app was waiting on
-            appLoaded();
-
-          }).catch(err => {
-            const d = onError(RUNTIME_ERROR.LoadBundleError, err, elm);
-            appLoaded(d);
-          });
-        }
       }
     }
   }
@@ -291,7 +255,7 @@ export function createPlatformServer(
     config.sys.vm.runInContext(ctx.appFiles.global, win);
   }
 
-  function onError(type: RUNTIME_ERROR, err: Error, elm: HostElement) {
+  function onError(err: Error, type: RUNTIME_ERROR, elm: HostElement, appFailure: boolean) {
     const d: Diagnostic = {
       type: 'runtime',
       header: 'Runtime error detected',
@@ -329,7 +293,9 @@ export function createPlatformServer(
 
     diagnostics.push(d);
 
-    return d;
+    if (appFailure) {
+      appLoaded(d);
+    }
   }
 
   function propConnect(ctrlTag: string) {

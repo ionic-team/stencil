@@ -1,5 +1,5 @@
-import { getParentElement } from '../../util/helpers';
 import { HostElement, PlatformApi } from '../../util/interfaces';
+import { getParentElement } from '../../util/helpers';
 import { initElementListeners } from './listeners';
 import { PRIORITY } from '../../util/constants';
 
@@ -33,7 +33,7 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
       const cmpMeta = plt.getComponentMeta(elm);
 
       // only collects slot references if this component even has slots
-      plt.connectHostElement(elm, cmpMeta.slotMeta);
+      plt.connectHostElement(cmpMeta, elm);
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous

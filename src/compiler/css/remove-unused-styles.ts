@@ -21,7 +21,7 @@ export function removeUnusedStyles(config: BuildConfig, usedSelectors: UsedSelec
     try {
       // convert the parsed css back into a string
       // but only keeping what was found in our active selectors
-      const stringify = new StringifyCss(usedSelectors);
+      const stringify = new StringifyCss({ usedSelectors });
       cleanedCss = stringify.compile(cssAst);
 
     } catch (e) {
@@ -45,4 +45,3 @@ export function removeUnusedStyles(config: BuildConfig, usedSelectors: UsedSelec
 
   return cleanedCss;
 }
-

@@ -17,7 +17,12 @@ function bundleCompiler() {
   console.log('bundling server...');
 
   rollup.rollup({
-    input: ENTRY_FILE
+    input: ENTRY_FILE,
+    external: [
+      'fs',
+      'path',
+      'chalk'
+    ]
 
   }).then(bundle => {
 

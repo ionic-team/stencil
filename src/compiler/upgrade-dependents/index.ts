@@ -1,17 +1,13 @@
 import { BuildConfig, BuildContext, Manifest } from '../../util/interfaces';
-import { validateManifestCompatibility, CompilerUpgrade } from './manifest-compatibility';
+import { CompilerUpgrade, validateManifestCompatibility } from './manifest-compatibility';
 import { transformSourceString } from '../transpile/transformers/util';
-import * as util from 'util';
 import upgradeFrom0_0_5 from '../transpile/transformers/JSX_Upgrade_From_0_0_5/upgrade-jsx-props';
 import ts from 'typescript';
-
-require('util.promisify').shim();
 
 
 export async function upgradeDependentComponents(config: BuildConfig, ctx: BuildContext) {
 
-  const fsReadFilePr = util.promisify(config.sys.fs.readFile);
-  const doUpgrade = createDoUpgrade(config, ctx, fsReadFilePr);
+  const doUpgrade = createDoUpgrade(config, ctx);
 
   return Promise.all(Object.keys(ctx.dependentManifests).map(async function(collectionName) {
     const manifest = ctx.dependentManifests[collectionName];
@@ -26,7 +22,7 @@ export async function upgradeDependentComponents(config: BuildConfig, ctx: Build
 }
 
 
-function createDoUpgrade(config: BuildConfig, ctx: BuildContext, fsReadFilePr: (...args: any[]) => Promise<any>) {
+function createDoUpgrade(config: BuildConfig, ctx: BuildContext) {
 
   return async (manifest: Manifest, upgrades: CompilerUpgrade[]): Promise<void> => {
     const upgradeTransforms: ts.TransformerFactory<ts.SourceFile>[] = (upgrades.map((upgrade) => {
@@ -44,14 +40,24 @@ function createDoUpgrade(config: BuildConfig, ctx: BuildContext, fsReadFilePr: (
 
     await Promise.all(manifest.modulesFiles.map(async function(moduleFile) {
 
-      const source = await fsReadFilePr(moduleFile.jsFilePath, 'utf8');
-      let output = '';
-      try {
-        output = transformSourceString(moduleFile.jsFilePath, source, upgradeTransforms);
-      } catch (e) {
-        config.logger.error(`error performing compiler upgrade on ${moduleFile.jsFilePath}: ${e}`);
-      }
-      ctx.jsFiles[moduleFile.jsFilePath] = output;
+      return new Promise((resolve, reject) => {
+        config.sys.fs.readFile(moduleFile.jsFilePath, 'utf8', (err, source) => {
+          if (err) {
+            reject(err);
+          } else {
+            let output = '';
+
+            try {
+              output = transformSourceString(moduleFile.jsFilePath, source, upgradeTransforms);
+            } catch (e) {
+              config.logger.error(`error performing compiler upgrade on ${moduleFile.jsFilePath}: ${e}`);
+            }
+            ctx.jsFiles[moduleFile.jsFilePath] = output;
+
+            resolve();
+          }
+        });
+      });
     }));
   };
 }

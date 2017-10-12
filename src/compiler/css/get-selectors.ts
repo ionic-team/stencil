@@ -2,7 +2,7 @@
 
 export function getSelectors(sel: string) {
   // reusing global SELECTORS since this is a synchronous operation
-  SELECTORS.tags.length = SELECTORS.classNames.length = SELECTORS.ids.length = SELECTORS.attrs.length = 0;
+  SELECTORS.all.length = SELECTORS.tags.length = SELECTORS.classNames.length = SELECTORS.ids.length = SELECTORS.attrs.length = 0;
 
   sel = sel.replace(/\./g, ' .')
            .replace(/\#/g, ' #')
@@ -45,7 +45,8 @@ export function getSelectors(sel: string) {
 }
 
 
-const SELECTORS: { tags: string[], classNames: string[], ids: string[], attrs: string[] } = {
+const SELECTORS: { all: string[], tags: string[], classNames: string[], ids: string[], attrs: string[] } = {
+  all: [],
   tags: [],
   classNames: [],
   ids: [],

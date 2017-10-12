@@ -1,7 +1,7 @@
 import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
-import { COLLECTION_MANIFEST_FILE_NAME, MEMBER_TYPE, PROP_TYPE, PRIORITY, SLOT } from '../../util/constants';
+import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION_TYPE, MEMBER_TYPE, PROP_TYPE, PRIORITY, SLOT_META } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
@@ -158,7 +158,7 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeEvents(cmpData, cmpMeta);
   serializeHost(cmpData, cmpMeta);
   serializeSlots(cmpData, cmpMeta);
-  serializeIsShadow(cmpData, cmpMeta);
+  serializeEncapsulation(cmpData, cmpMeta);
   serializeLoadPriority(cmpData, cmpMeta);
 
   return cmpData;
@@ -189,7 +189,7 @@ export function parseComponentDataToModuleFile(config: BuildConfig, manifestDir:
   parseHostElementMember(cmpData, cmpMeta);
   parseEvents(cmpData, cmpMeta);
   parseHost(cmpData, cmpMeta);
-  parseIsShadow(cmpData, cmpMeta);
+  parseEncapsulation(cmpData, cmpMeta);
   parseSlots(cmpData, cmpMeta);
   parseLoadPriority(cmpData, cmpMeta);
 
@@ -240,10 +240,10 @@ function serializeStyles(config: BuildConfig, moduleFile: ModuleFile, compiledCo
   if (cmpMeta.stylesMeta) {
     cmpData.styles = {};
 
-    const modeNames = Object.keys(cmpMeta.stylesMeta).sort();
+    const modeNames = Object.keys(cmpMeta.stylesMeta).map(m => m.toLowerCase()).sort();
 
     modeNames.forEach(modeName => {
-      cmpData.styles[modeName.toLowerCase()] = serializeStyle(config, moduleFile, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
+      cmpData.styles[modeName] = serializeStyle(config, moduleFile, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
     });
   }
 }
@@ -255,7 +255,8 @@ function parseStyles(config: BuildConfig, manifestDir: string, cmpData: Componen
 
   if (stylesData) {
     Object.keys(stylesData).forEach(modeName => {
-      cmpMeta.stylesMeta[modeName.toLowerCase()] = parseStyle(config, manifestDir, cmpData, stylesData[modeName.toLowerCase()]);
+      modeName = modeName.toLowerCase();
+      cmpMeta.stylesMeta[modeName] = parseStyle(config, manifestDir, cmpData, stylesData[modeName]);
     });
   }
 }
@@ -781,10 +782,10 @@ function parseHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 
 function serializeSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpMeta.slotMeta === SLOT.HasSlots) {
+  if (cmpMeta.slotMeta === SLOT_META.HasSlots) {
     cmpData.slot = 'hasSlots';
 
-  } else if (cmpMeta.slotMeta === SLOT.HasNamedSlots) {
+  } else if (cmpMeta.slotMeta === SLOT_META.HasNamedSlots) {
     cmpData.slot = 'hasNamedSlots';
   }
 }
@@ -792,23 +793,34 @@ function serializeSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 function parseSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpData.slot === 'hasSlots') {
-    cmpMeta.slotMeta = SLOT.HasSlots;
+    cmpMeta.slotMeta = SLOT_META.HasSlots;
 
   } else if (cmpData.slot === 'hasNamedSlots') {
-    cmpMeta.slotMeta = SLOT.HasNamedSlots;
+    cmpMeta.slotMeta = SLOT_META.HasNamedSlots;
   }
 }
 
 
-function serializeIsShadow(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpMeta.isShadowMeta) {
+function serializeEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
     cmpData.shadow = true;
+
+  } else if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ScopedCss) {
+    cmpData.scoped = true;
   }
 }
 
 
-function parseIsShadow(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  cmpMeta.isShadowMeta = !!cmpData.shadow;
+function parseEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+  if (cmpData.shadow === true) {
+    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ShadowDom;
+
+  } else if (cmpData.scoped === true) {
+    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ScopedCss;
+
+  } else {
+    cmpMeta.encapsulation = ENCAPSULATION_TYPE.NoEncapsulation;
+  }
 }
 
 

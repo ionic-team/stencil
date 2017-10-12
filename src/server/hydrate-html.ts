@@ -1,9 +1,9 @@
 import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
 import { createPlatformServer } from './platform-server';
+import { ENCAPSULATION_TYPE, SSR_VNODE_ID } from '../util/constants';
 import { initHostConstructor } from '../core/instance/init';
 import { optimizeHtml } from '../compiler/html/optimize-html';
-import { SSR_VNODE_ID } from '../util/constants';
 
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
@@ -57,10 +57,8 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
     // fully define each of our components onto this new platform instance
     registeredTags.forEach(registryTag => {
-      // registry tags are always UPPER-CASE
-      // component meta tags are lower-case
-      registryTag = registryTag.toUpperCase();
-      registry[registryTag].tagNameMeta = registryTag.toLowerCase();
+      registryTag = registryTag.toLowerCase();
+      registry[registryTag].tagNameMeta = registryTag;
       registry[registryTag].membersMeta = registry[registryTag].membersMeta || {};
       plt.defineComponent(registry[registryTag]);
     });
@@ -145,7 +143,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
         }
       }
 
-      newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ssrId);
+      newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ENCAPSULATION_TYPE.NoEncapsulation, ssrId);
 
       connectElement(plt, <HostElement>newVNode.elm, connectedInfo, config.hydratedCssClass);
 

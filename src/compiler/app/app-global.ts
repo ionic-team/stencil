@@ -3,7 +3,7 @@ import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { getAppPublicPath } from './app-core';
 import { hasError, generatePreamble } from '../util';
-import { transpiledInMemoryPlugin } from '../bundle/bundle-modules';
+import { transpiledInMemoryPlugin } from '../bundle/component-modules';
 
 
 export function generateAppGlobal(config: BuildConfig, ctx: BuildContext) {

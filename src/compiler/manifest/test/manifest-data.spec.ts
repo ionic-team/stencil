@@ -1,7 +1,7 @@
 import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
-import { MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT } from '../../../util/constants';
+import { ENCAPSULATION_TYPE, MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT_META } from '../../../util/constants';
 
 
 describe('manifest-data serialize/parse', () => {
@@ -64,28 +64,38 @@ describe('manifest-data serialize/parse', () => {
     expect(b.cmpMeta.loadPriority).toBe(PRIORITY.Low);
   });
 
-  it('isShadowMeta', () => {
-    a.isShadowMeta = true;
+  it('scoped css encapsulation', () => {
+    a.encapsulation = ENCAPSULATION_TYPE.ScopedCss;
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    expect(cmpData.scoped).toBe(true);
+    expect(cmpData.shadow).toBeFalsy();
+    b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
+    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION_TYPE.ScopedCss);
+  });
+
+  it('shadow dom encapsulation', () => {
+    a.encapsulation = ENCAPSULATION_TYPE.ShadowDom;
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.shadow).toBe(true);
+    expect(cmpData.scoped).toBeFalsy();
     b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
-    expect(b.cmpMeta.isShadowMeta).toBe(true);
+    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION_TYPE.ShadowDom);
   });
 
   it('slotMeta HAS_NAMED_SLOTS', () => {
-    a.slotMeta = SLOT.HasNamedSlots;
+    a.slotMeta = SLOT_META.HasNamedSlots;
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.slot).toBe('hasNamedSlots');
     b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
-    expect(b.cmpMeta.slotMeta).toBe(SLOT.HasNamedSlots);
+    expect(b.cmpMeta.slotMeta).toBe(SLOT_META.HasNamedSlots);
   });
 
   it('slotMeta HAS_SLOTS', () => {
-    a.slotMeta = SLOT.HasSlots;
+    a.slotMeta = SLOT_META.HasSlots;
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.slot).toBe('hasSlots');
     b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
-    expect(b.cmpMeta.slotMeta).toBe(SLOT.HasSlots);
+    expect(b.cmpMeta.slotMeta).toBe(SLOT_META.HasSlots);
   });
 
   it('eventsMeta', () => {

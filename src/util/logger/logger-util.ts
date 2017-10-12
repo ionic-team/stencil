@@ -33,6 +33,8 @@ export function cleanDiagnostics(diagnostics: Diagnostic[]) {
 
 
 export function formatFileName(rootDir: string, fileName: string) {
+  if (!rootDir || !fileName) return '';
+
   fileName = fileName.replace(rootDir, '');
   if (/\/|\\/.test(fileName.charAt(0))) {
     fileName = fileName.substr(1);

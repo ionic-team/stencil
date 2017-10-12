@@ -197,7 +197,7 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
     ctx.jsFiles = {};
     ctx.cssFiles = {};
     ctx.moduleBundleOutputs = {};
-    ctx.styleSassOutputs = {};
+    ctx.styleSassUnscopedOutputs = {};
   }
 
   changedFiles.sort();

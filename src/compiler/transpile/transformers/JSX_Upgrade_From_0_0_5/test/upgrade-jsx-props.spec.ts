@@ -5,9 +5,7 @@ import * as path from 'path';
 import { transformSourceString } from '../../util';
 import upgradeJsxProps from '../upgrade-jsx-props';
 
-require('util.promisify').shim();
 
-const readFileAsync = util.promisify(fs.readFile);
 const fileList = fs.readdirSync(path.join(__dirname, './pre-update'));
 const directory = __dirname;
 
@@ -19,8 +17,8 @@ describe('vnode-slot transform', () => {
 
     it(`should match the expected output for ${fileName}`, async () => {
       const [source, final] = await Promise.all([
-        readFileAsync(path.join(__dirname, './pre-update', fileName), { encoding: 'utf8'}),
-        readFileAsync(path.join(__dirname, './post-update', fileName), { encoding: 'utf8'})
+        fs.readFileSync(path.join(__dirname, './pre-update', fileName), { encoding: 'utf8'}),
+        fs.readFileSync(path.join(__dirname, './post-update', fileName), { encoding: 'utf8'})
       ]);
 
       const output = transformSourceString(fileName, source, [upgradeJsxProps]);

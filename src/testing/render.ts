@@ -29,7 +29,7 @@ export async function render(opts: RenderTestOptions): Promise<any> {
     if (testCmp && testCmp.metadata) {
       const cmpMeta: ComponentMeta = testCmp.metadata;
       cmpMeta.componentModule = testCmp;
-      registry[cmpMeta.tagNameMeta.toUpperCase()] = cmpMeta;
+      registry[cmpMeta.tagNameMeta] = cmpMeta;
     }
   });
 

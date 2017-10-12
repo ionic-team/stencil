@@ -1,4 +1,5 @@
 import { BuildConfig, BuildContext } from '../../util/interfaces';
+import { getAppFileName } from '../app/generate-app-files';
 
 
 export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document) {
@@ -12,7 +13,7 @@ export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: 
   if (loaderExternalSrcUrl.charAt(loaderExternalSrcUrl.length - 1) !== '/') {
     loaderExternalSrcUrl += '/';
   }
-  loaderExternalSrcUrl += config.namespace.toLowerCase() + '.js';
+  loaderExternalSrcUrl += getAppFileName(config) + '.js';
 
   // remove the app loader script url request
   const removedLoader = removeExternalLoaderScript(doc, loaderExternalSrcUrl);

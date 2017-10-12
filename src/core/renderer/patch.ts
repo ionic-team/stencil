@@ -8,6 +8,7 @@
  */
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
+import { ENCAPSULATION_TYPE } from '../../util/constants';
 import { isDef, isUndef } from '../../util/helpers';
 import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
 import { updateElement, eventProxy } from './update-dom-node';
@@ -15,7 +16,7 @@ import { updateElement, eventProxy } from './update-dom-node';
 let isSvgMode = false;
 
 
-export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererApi {
+export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNativeShadowDom: boolean): RendererApi {
   // createRenderer() is only created once per app
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
@@ -23,7 +24,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   function createElm(vnode: VNode, parentElm: Node, childIndex: number) {
     let i = 0;
 
-    if (vnode.vtag === 'slot') {
+    if (vnode.vtag === 'slot' && !useNativeShadowDom) {
 
       if (hostContentNodes) {
         // special case for manually relocating host content nodes
@@ -80,6 +81,12 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       // add css classes, attrs, props, listeners, etc.
       updateElement(plt, null, vnode, isSvgMode);
 
+      if (scopeId !== null && elm._scopeId !== scopeId) {
+        // if there is a scopeId and this is the initial render
+        // then let's add the scopeId as an attribute
+        domApi.$setAttribute(elm, (elm._scopeId = scopeId), '');
+      }
+
       const children = vnode.vchildren;
 
       if (isDef(ssrId)) {
@@ -88,7 +95,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
         // give this element the SSR child id that can be read by the client
         domApi.$setAttribute(
-          vnode.elm,
+          elm,
           SSR_CHILD_ID,
           ssrId + '.' + childIndex + (hasChildNodes(children) ? '' : '.')
         );
@@ -274,22 +281,22 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     return map;
   }
 
-  function patchVNode(oldVnode: VNode, newVnode: VNode) {
-    const elm: HostElement = newVnode.elm = <any>oldVnode.elm;
-    const oldChildren = oldVnode.vchildren;
-    const newChildren = newVnode.vchildren;
+  function patchVNode(oldVNode: VNode, newVNode: VNode) {
+    const elm: HostElement = newVNode.elm = <any>oldVNode.elm;
+    const oldChildren = oldVNode.vchildren;
+    const newChildren = newVNode.vchildren;
 
-    isSvgMode = newVnode.elm && newVnode.elm.parentElement != null && (newVnode.elm as SVGElement).ownerSVGElement !== undefined;
-    isSvgMode = newVnode.vtag === 'svg' ? true : (newVnode.vtag === 'foreignObject' ? false : isSvgMode);
+    isSvgMode = newVNode.elm && newVNode.elm.parentElement != null && (newVNode.elm as SVGElement).ownerSVGElement !== undefined;
+    isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
 
-    if (isUndef(newVnode.vtext)) {
+    if (isUndef(newVNode.vtext)) {
       // element node
 
-      if (newVnode.vtag !== 'slot') {
+      if (newVNode.vtag !== 'slot') {
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
-        updateElement(plt, oldVnode, newVnode, isSvgMode);
+        updateElement(plt, oldVNode, newVNode, isSvgMode);
       }
 
       if (isDef(oldChildren) && isDef(newChildren)) {
@@ -298,7 +305,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
       } else if (isDef(newChildren)) {
         // no old child vnodes, but there are new child vnodes to add
-        if (isDef(oldVnode.vtext)) {
+        if (isDef(oldVNode.vtext)) {
           // the old vnode was text, so be sure to clear it out
           domApi.$setTextContent(elm, '');
         }
@@ -313,40 +320,57 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
       // this element has slotted content
       let parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
-      domApi.$setTextContent(parentElement, newVnode.vtext);
+      domApi.$setTextContent(parentElement, newVNode.vtext);
       elm._hostContentNodes.defaultSlot = [parentElement.childNodes[0]];
 
-    } else {
+    } else if (oldVNode.vtext !== newVNode.vtext) {
       // update the text content for the text only vnode
-      domApi.$setTextContent(elm, newVnode.vtext);
+      // and also only if the text is different than before
+      domApi.$setTextContent(elm, newVNode.vtext);
     }
   }
 
   // internal variables to be reused per patch() call
-  let hostContentNodes: HostContentNodes, ssrId: number;
+  let isUpdate: boolean,
+      hostContentNodes: HostContentNodes,
+      useNativeShadowDom: boolean,
+      ssrId: number,
+      scopeId: string;
 
 
-  return function patch(oldVnode: VNode, newVnode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, ssrPatchId?: number) {
-
-
+  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION_TYPE, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
     isUpdatePatch;
     hostContentNodes = hostElementContentNodes;
     ssrId = ssrPatchId;
+    const tag = domApi.$tagName(oldVNode.elm).toLowerCase();
+    scopeId = (encapsulation === ENCAPSULATION_TYPE.ScopedCss || (encapsulation === ENCAPSULATION_TYPE.ShadowDom && !supportsNativeShadowDom)) ? 'data-' + tag : null;
+
+    // use native shadow dom only if the component wants to use it
+    // and if this browser supports native shadow dom
+    useNativeShadowDom = (encapsulation === ENCAPSULATION_TYPE.ShadowDom && supportsNativeShadowDom);
+
+    if (!isUpdate && useNativeShadowDom) {
+      // this component SHOULD use native slot/shadow dom
+      // this browser DOES support native shadow dom
+      // and this is the first render
+      // let's create that shadow root
+      oldVNode.elm = (oldVNode.elm as HTMLElement).attachShadow({ mode: 'open' });
+    }
 
     // synchronous patch
-    patchVNode(oldVnode, newVnode);
+    patchVNode(oldVNode, newVNode);
 
     if (isDef(ssrId)) {
       // SSR ONLY: we've been given an SSR id, so the host element
       // should be given the ssr id attribute
-      domApi.$setAttribute(oldVnode.elm, SSR_VNODE_ID, ssrId);
+      domApi.$setAttribute(oldVNode.elm, SSR_VNODE_ID, ssrId);
     }
 
     // return our new vnode
-    return newVnode;
+    return newVNode;
   };
 }
 

@@ -10,9 +10,11 @@ import { UsedSelectors } from '../html/used-selectors';
 
 export class StringifyCss {
   usedSelectors: UsedSelectors;
+  scopeIdSelector: string;
 
-  constructor(usedSelectors: UsedSelectors) {
-    this.usedSelectors = usedSelectors;
+  constructor(opts: StringifyCssOptions) {
+    this.usedSelectors = opts.usedSelectors;
+    this.scopeIdSelector = opts.scopeIdSelector;
   }
 
   /**
@@ -186,69 +188,77 @@ export class StringifyCss {
     var decls = node.declarations;
     if (!decls.length) return '';
 
-    var j: number;
-    for (var i = node.selectors.length - 1; i >= 0; i--) {
+    var i: number, j: number;
+
+    for (i = node.selectors.length - 1; i >= 0; i--) {
       var sel = getSelectors(node.selectors[i]);
-      var include = true;
 
-      // classes
-      var jlen = sel.classNames.length;
-      if (jlen > 0) {
-        for (j = 0; j < jlen; j++) {
-          if (this.usedSelectors.classNames.indexOf(sel.classNames[j]) === -1) {
-            include = false;
-            break;
-          }
-        }
-      }
+      if (this.usedSelectors) {
+        var include = true;
 
-      // tags
-      if (include) {
-        jlen = sel.tags.length;
+        // classes
+        var jlen = sel.classNames.length;
         if (jlen > 0) {
           for (j = 0; j < jlen; j++) {
-            if (this.usedSelectors.tags.indexOf(sel.tags[j]) === -1) {
+            if (this.usedSelectors.classNames.indexOf(sel.classNames[j]) === -1) {
               include = false;
               break;
             }
           }
         }
-      }
 
-      // attrs
-      if (include) {
-        jlen = sel.attrs.length;
-        if (jlen > 0) {
-          for (j = 0; j < jlen; j++) {
-            if (this.usedSelectors.attrs.indexOf(sel.attrs[j]) === -1) {
-              include = false;
-              break;
+        // tags
+        if (include) {
+          jlen = sel.tags.length;
+          if (jlen > 0) {
+            for (j = 0; j < jlen; j++) {
+              if (this.usedSelectors.tags.indexOf(sel.tags[j]) === -1) {
+                include = false;
+                break;
+              }
             }
           }
         }
-      }
 
-      // ids
-      if (include) {
-        jlen = sel.ids.length;
-        if (jlen > 0) {
-          for (j = 0; j < jlen; j++) {
-            if (this.usedSelectors.ids.indexOf(sel.ids[j]) === -1) {
-              include = false;
-              break;
+        // attrs
+        if (include) {
+          jlen = sel.attrs.length;
+          if (jlen > 0) {
+            for (j = 0; j < jlen; j++) {
+              if (this.usedSelectors.attrs.indexOf(sel.attrs[j]) === -1) {
+                include = false;
+                break;
+              }
             }
           }
         }
+
+        // ids
+        if (include) {
+          jlen = sel.ids.length;
+          if (jlen > 0) {
+            for (j = 0; j < jlen; j++) {
+              if (this.usedSelectors.ids.indexOf(sel.ids[j]) === -1) {
+                include = false;
+                break;
+              }
+            }
+          }
+        }
+
+        if (!include) {
+          node.selectors.splice(i, 1);
+        }
       }
 
-      if (!include) {
-        node.selectors.splice(i, 1);
+      if (this.scopeIdSelector) {
+        node.selectors[i] = addScopeId(node.selectors[i], this.scopeIdSelector);
       }
     }
 
     if (node.selectors.length === 0) return '';
 
-    return node.selectors + '{' + this.mapVisit(decls) + '}';
+    return `${node.selectors}{${this.mapVisit(decls)}}`;
   }
 
   /**
@@ -259,4 +269,24 @@ export class StringifyCss {
     return node.property + ':' + node.value + ';';
   }
 
+}
+
+
+export function addScopeId(selector: string, scopeIdCss: string) {
+  const pseudo = selector.split(':');
+  const parts = pseudo[0].split(/\s+/g);
+
+  for (var i = 0; i < parts.length; i++) {
+    parts[i] += scopeIdCss;
+  }
+
+  pseudo[0] = parts.join(' ');
+
+  return pseudo.join(':');
+}
+
+
+export interface StringifyCssOptions {
+  scopeIdSelector?: string;
+  usedSelectors?: UsedSelectors;
 }

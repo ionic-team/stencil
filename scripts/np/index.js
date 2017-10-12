@@ -37,11 +37,13 @@ module.exports = (input, opts) => {
 	const tasks = new Listr([
 		{
 			title: 'Prerequisite check',
-			task: () => prerequisiteTasks(input, pkg, opts)
+			task: () => prerequisiteTasks(input, pkg, opts),
+			skip: () => opts.dryRun
 		},
 		{
 			title: 'Git',
-			task: () => gitTasks(opts)
+			task: () => gitTasks(opts),
+			skip: () => opts.dryRun
 		},
 		{
 			title: 'Cleanup',
@@ -61,7 +63,8 @@ module.exports = (input, opts) => {
 		},
 		{
 			title: 'Bump package.json version',
-			task: () => exec('npm', ['version', input], { cwd: rootDir })
+			task: () => exec('npm', ['version', input], { cwd: rootDir }),
+			skip: () => opts.dryRun
 		},
 		{
 			title: 'Prepare "dist" @stencil/core package',
@@ -81,11 +84,13 @@ module.exports = (input, opts) => {
 		},
 		{
 			title: 'Publish "dist" @stencil/core package',
-			task: () => exec('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir })
+			task: () => exec('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir }),
+			skip: () => opts.dryRun
 		},
 		{
 			title: 'Pushing to Github',
-			task: () => exec('git', ['push', '--follow-tags'], { cwd: rootDir })
+			task: () => exec('git', ['push', '--follow-tags'], { cwd: rootDir }),
+			skip: () => opts.dryRun
 		}
 
 	], { showSubtasks: false });

@@ -21,8 +21,8 @@ export function inlineStyles(config: BuildConfig, doc: Document, stylesMap: File
 
       const cssFilePaths = Object.keys(stylesMap);
 
-      styles = cssFilePaths.map(cssFilePath => {
-        return removeUnusedStyles(config, usedSelectors, stylesMap[cssFilePath], cssFilePath, diagnostics);
+      styles = cssFilePaths.map(styleTag => {
+        return removeUnusedStyles(config, usedSelectors, stylesMap[styleTag], styleTag, diagnostics);
       });
 
     } catch (e) {

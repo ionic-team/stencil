@@ -1,6 +1,7 @@
 import { BuildConfig } from '../../util/interfaces';
 import { CORE_NAME } from '../../util/constants';
 import { generatePreamble, normalizePath } from '../util';
+import { getAppFileName } from './generate-app-files';
 
 
 export function generateCore(config: BuildConfig, globalJsContent: string[]) {
@@ -84,14 +85,9 @@ export function getAppPublicPath(config: BuildConfig) {
   return normalizePath(
     config.sys.path.join(
       config.publicPath,
-      config.namespace.toLowerCase()
+      getAppFileName(config)
     )
   ) + '/';
-}
-
-
-export function getAppFileName(config: BuildConfig) {
-  return config.namespace.toLowerCase();
 }
 
 

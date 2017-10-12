@@ -1,9 +1,9 @@
 import { createRendererPatch } from '../patch';
 import { createVNodesFromSsr } from '../slot';
+import { ENCAPSULATION_TYPE, SSR_VNODE_ID, SSR_CHILD_ID } from '../../../util/constants';
 import { h } from '../h';
 import { HostContentNodes, VNode } from '../../../util/interfaces';
 import { mockPlatform, mockDomApi, removeWhitespaceFromNodes } from '../../../testing/mocks';
-import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../../util/constants';
 import { VNode as VNodeObj } from '../vnode';
 
 
@@ -153,7 +153,7 @@ describe('ssr', () => {
         ]
       };
 
-      ssrVNode = patch(oldVnode, newVnode, false, hostContentNodes, 1);
+      ssrVNode = patch(oldVnode, newVnode, false, hostContentNodes, ENCAPSULATION_TYPE.NoEncapsulation, 1);
       elm = removeWhitespaceFromNodes(ssrVNode.elm);
 
       expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
@@ -169,7 +169,7 @@ describe('ssr', () => {
         )
       );
 
-      ssrVNode = patch(oldVnode, newVnode, false, null, 1);
+      ssrVNode = patch(oldVnode, newVnode, false, null, ENCAPSULATION_TYPE.NoEncapsulation, 1);
       elm = <any>ssrVNode.elm;
 
       expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
@@ -191,6 +191,6 @@ describe('ssr', () => {
 
 
   var plt = mockPlatform();
-  var patch = createRendererPatch(<any>plt, domApi);
+  var patch = createRendererPatch(<any>plt, domApi, false);
 
 });

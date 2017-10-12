@@ -1,5 +1,6 @@
 import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFile } from '../../../util/interfaces';
 import { buildError, catchError } from '../../util';
+import { ENCAPSULATION_TYPE } from '../../../util/constants';
 import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
 import { validateComponentTag } from '../../../util/validate-config';
@@ -58,7 +59,7 @@ function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, dia
     normalizeStyles(config, userOpts, moduleFile, cmpMeta);
     normalizeAssetsDir(config, userOpts, moduleFile, cmpMeta);
     normalizeHost(userOpts, cmpMeta);
-    normalizeShadow(userOpts, cmpMeta);
+    normalizeEncapsulation(userOpts, cmpMeta);
 
   } catch (e) {
     // derp
@@ -90,23 +91,17 @@ function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: 
 }
 
 
-function normalizeShadow(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
-  const rawShadowValue: any = userOpts.shadow;
+export function normalizeEncapsulation(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
+  // default to NOT use shadow dom or scoped css...to start, debatable later on
 
-  // default to NOT use shadow dom
-  cmpMeta.isShadowMeta = false;
+  if (typeof userOpts.shadow === 'boolean') {
+    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ShadowDom;
 
-  // try to figure out a best guess depending on the value they put in
-  if (rawShadowValue !== undefined) {
-    if (typeof rawShadowValue === 'string') {
-      if (rawShadowValue.toLowerCase().trim() === 'true') {
-        cmpMeta.isShadowMeta = true;
-      }
+  } else if (typeof userOpts.scoped === 'boolean') {
+    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ScopedCss;
 
-    } else {
-      // ensure it's a boolean
-      cmpMeta.isShadowMeta = !!rawShadowValue;
-    }
+  } else {
+    cmpMeta.encapsulation = ENCAPSULATION_TYPE.NoEncapsulation;
   }
 }
 

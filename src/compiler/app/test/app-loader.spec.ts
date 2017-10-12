@@ -28,13 +28,13 @@ describe('build-project-files', () => {
 
     it('should set the loader arguments', () => {
       const projectLoader = callInjectAppIntoLoader({ componentRegistry: [['my-app', 'MyApp.Module', { Mode1: 'something', Mode2: 'Something Else' }, [], [], 42, 73]] });
-      expect(projectLoader).toBe(`("MyApp","hydrated","build/myapp/","myapp.core.js","myapp.core.pf.js",[["my-app","MyApp.Module",{"Mode1":"something","Mode2":"Something Else"},[],[],42,73]])`);
+      expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[["my-app","MyApp.Module",{"Mode1":"something","Mode2":"Something Else"},[],[],42,73]])`);
     });
 
     it('only replaces the magic string', () => {
       mockStencilContent = `(This is bogus text'__STENCIL__APP__'yeah, me too)`;
       const projectLoader = callInjectAppIntoLoader();
-      expect(projectLoader).toBe(`(This is bogus text"MyApp","hydrated","build/myapp/","myapp.core.js","myapp.core.pf.js",[]yeah, me too)`);
+      expect(projectLoader).toBe(`(This is bogus text"MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]yeah, me too)`);
     });
 
     describe('with minifyJs true', () => {
@@ -45,7 +45,7 @@ describe('build-project-files', () => {
       it('calls the minify routine', () => {
         callInjectAppIntoLoader();
         expect(mockMinify.mock.calls.length).toEqual(1);
-        expect(mockMinify.mock.calls[0][0]).toEqual(`("MyApp","hydrated","build/myapp/","myapp.core.js","myapp.core.pf.js",[])`);
+        expect(mockMinify.mock.calls[0][0]).toEqual(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[])`);
       });
 
       it('returns minified output', () => {
@@ -93,7 +93,7 @@ describe('build-project-files', () => {
             output: 'b'
           });
           const projectLoader = callInjectAppIntoLoader();
-          expect(projectLoader).toBe(`("MyApp","hydrated","build/myapp/","myapp.core.js","myapp.core.pf.js",[])`);
+          expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[])`);
         });
       });
     });
@@ -140,7 +140,7 @@ describe('build-project-files', () => {
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__STENCIL__APP__') yeah me too`));
       const res = await callGenerateLoader();
       let lines = res.split('\n');
-      expect(lines[1]).toEqual(`pretend i am code ("MyApp","hydrated","build/myapp/","myapp.core.js","myapp.core.pf.js",[]) yeah me too`);
+      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]) yeah me too`);
     });
   });
 

@@ -2,7 +2,7 @@ import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile, ComponentMeta } from 
 import { mockBuildConfig } from '../../../../testing/mocks';
 import { componentTsFileClass } from '../component-class';
 import { DEFAULT_COMPILER_OPTIONS } from '../../compiler-options';
-import { MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
+import { ENCAPSULATION_TYPE, MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -63,7 +63,7 @@ describe('vnode-slot transform', () => {
             componentClass: 'Redirect',
             eventsMeta: [],
             hostMeta: {},
-            isShadowMeta: false,
+            encapsulation: ENCAPSULATION_TYPE.NoEncapsulation,
             listenersMeta: [],
             membersMeta: {
               activeRouter: {

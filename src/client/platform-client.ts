@@ -1,32 +1,29 @@
 import { addEventListener, enableEventListener } from '../core/instance/listeners';
 import { assignHostContentSlots, createVNodesFromSsr } from '../core/renderer/slot';
-import { ComponentMeta, ComponentRegistry, CoreContext,
-  EventEmitterData, HostElement, AppGlobal, LoadComponentRegistry,
-  ModuleCallbacks, PlatformApi } from '../util/interfaces';
+import { AppGlobal, BundleCallbacks, ComponentMeta, ComponentRegistry, CoreContext,
+  EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../util/interfaces';
 import { createDomControllerClient } from './dom-controller-client';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createRendererPatch } from '../core/renderer/patch';
 import { createQueueClient } from './queue-client';
+import { ENCAPSULATION_TYPE, RUNTIME_ERROR, SSR_VNODE_ID } from '../util/constants';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
-import { SSR_VNODE_ID } from '../util/constants';
+import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
 
 export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
-  const registry: ComponentRegistry = { 'HTML': {} };
+  const registry: ComponentRegistry = { 'html': {} };
   const moduleImports: {[tag: string]: any} = {};
-  const moduleCallbacks: ModuleCallbacks = {};
-  const loadedModules: {[moduleId: string]: boolean} = {};
-  const loadedStyles: {[styleId: string]: boolean} = {};
-  const pendingModuleRequests: {[url: string]: boolean} = {};
+  const bundleCallbacks: BundleCallbacks = {};
+  const loadedBundles: {[bundleId: string]: boolean} = {};
+  const styleTemplates: StyleTemplates = {};
+  const pendingBundleRequests: {[url: string]: boolean} = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
-
   const domApi = createDomApi(doc);
-  const now = function() {
-    return win.performance.now();
-  };
+  const now = () => win.performance.now();
 
   // initialize Core global object
   Context.dom = createDomControllerClient(win, now);
@@ -66,19 +63,21 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     loadBundle,
     queue: createQueueClient(Context.dom, now),
     connectHostElement,
+    attachStyles,
     emitEvent: Context.emit,
     getEventOptions,
     onError,
     isClient: true
   };
 
-  // create the renderer that will be used
-  plt.render = createRendererPatch(plt, domApi);
+  const supportsNativeShadowDom = !!(Element.prototype.attachShadow);
 
+  // create the renderer that will be used
+  plt.render = createRendererPatch(plt, domApi, supportsNativeShadowDom);
 
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded
-  const rootElm = <HostElement>domApi.$documentElement;
+  const rootElm = domApi.$documentElement as HostElement;
   rootElm.$rendered = true;
   rootElm.$activeLoading = [];
   rootElm.$initLoad = function appLoadedCallback() {
@@ -95,10 +94,10 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   function getComponentMeta(elm: Element) {
     // get component meta using the element
     // important that the registry has upper case tag names
-    return registry[elm.tagName];
+    return registry[elm.tagName.toLowerCase()];
   }
 
-  function connectHostElement(elm: HostElement, slotMeta: number) {
+  function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -108,10 +107,18 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     }
 
     // host element has been connected to the DOM
-    if (!domApi.$getAttribute(elm, SSR_VNODE_ID)) {
+    if (!domApi.$getAttribute(elm, SSR_VNODE_ID) && !useShadowDom(supportsNativeShadowDom, cmpMeta)) {
+      // only required when we're not using native shadow dom (slot)
       // this host element was NOT created with SSR
       // let's pick out the inner content for slot projection
-      assignHostContentSlots(domApi, elm, slotMeta);
+      assignHostContentSlots(domApi, elm, cmpMeta.slotMeta);
+    }
+
+    if (!supportsNativeShadowDom && cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+      // this component should use shadow dom
+      // but this browser doesn't support it
+      // so let's polyfill a few things for the user
+      (elm as any).shadowRoot = elm;
     }
   }
 
@@ -124,7 +131,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
 
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
-    const tagName = cmpMeta.tagNameMeta.toLowerCase();
+    const tagName = cmpMeta.tagNameMeta;
 
     if (globalDefined.indexOf(tagName) === -1) {
       // keep an array of all the defined components, useful for external frameworks
@@ -152,6 +159,8 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
         }
       }
 
+      // set the array of all the attributes to keep an eye on
+      // https://www.youtube.com/watch?v=RBs21CFBALI
       HostElementConstructor.observedAttributes = observedAttributes;
 
       // define the custom element
@@ -161,11 +170,14 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
 
   function isDefinedComponent(elm: Element) {
+    // check if this component is already defined or not
     return globalDefined.indexOf(elm.tagName.toLowerCase()) > -1 || !!getComponentMeta(elm);
   }
 
 
-  App.loadComponents = function loadComponents(moduleId, importFn) {
+  App.loadComponents = function loadComponents(bundleId, importFn) {
+    // https://youtu.be/Z-FPimCmbX8?t=31
+    // jsonp tag team callback from requested bundles contain tags
     const args = arguments;
 
     // import component function
@@ -174,81 +186,82 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
     for (var i = 2; i < args.length; i++) {
       // parse the external component data into internal component meta data
-      // then add our set of prototype methods to the component module
+      // then add our set of prototype methods to the component bundle
       parseComponentMeta(registry, moduleImports, args[i]);
     }
 
-    // fire off all the callbacks waiting on this module to load
-    var callbacks = moduleCallbacks[moduleId];
+    // fire off all the callbacks waiting on this bundle to load
+    var callbacks = bundleCallbacks[bundleId];
     if (callbacks) {
       for (i = 0; i < callbacks.length; i++) {
         callbacks[i]();
       }
-      delete moduleCallbacks[moduleId];
+      delete bundleCallbacks[bundleId];
     }
 
-    // remember that we've already loaded this module
-    loadedModules[moduleId] = true;
+    // remember that we've already loaded this bundle
+    loadedBundles[bundleId] = true;
+  };
+
+
+  App.loadStyles = function loadStyles() {
+    // jsonp callback from requested bundles
+    // either directly add styles to document.head or add the
+    // styles to a template tag to be cloned later for shadow roots
+    const args = arguments;
+    let templateElm: HTMLTemplateElement;
+
+    for (var i = 0; i < args.length; i += 2) {
+      // create the template element which will hold the styles
+      // adding it to the dom via <template> so that we can
+      // clone this for each potential shadow root that will need these styles
+      // otherwise it'll be cloned and added to the entire document
+      // but that's for the renderer to figure out later
+      styleTemplates[args[i]] = templateElm = domApi.$createElement('template');
+
+      // add the style text to the template element
+      templateElm.innerHTML = `<style>${args[i + 1]}</style>`;
+
+      // give it an unique id
+      templateElm.id = `tmp-${args[i]}`;
+
+      // add our new element to the head
+      domApi.$appendChild(domApi.$head, templateElm);
+    }
   };
 
 
   function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
-    const moduleId = cmpMeta.moduleId;
+    const bundleId: string = cmpMeta.bundleIds[elm.mode] || (cmpMeta.bundleIds as any);
 
-    if (loadedModules[moduleId]) {
-      // sweet, we've already loaded this module
+    if (loadedBundles[bundleId]) {
+      // sweet, we've already loaded this bundle
       cb();
 
     } else {
-      // never seen this module before, let's start the request
+      // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
-      if (moduleCallbacks[moduleId]) {
-        moduleCallbacks[moduleId].push(cb);
-      } else {
-        moduleCallbacks[moduleId] = [cb];
-      }
+      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
 
-      // start the request for the component module
-      requestModule(moduleId);
-
-      // we also need to load the css file in the head
-      // we've already figured out and set "mode" as a property to the element
-      const styleId = cmpMeta.styleIds[elm.mode] || cmpMeta.styleIds.$;
-      if (styleId && !loadedStyles[styleId]) {
-        // this style hasn't been added to the head yet
-        loadedStyles[styleId] = true;
-
-        // append this link element to the head, which starts the request for the file
-        const linkElm = domApi.$createElement('link');
-        linkElm.href = publicPath + styleId + '.css';
-        linkElm.rel = 'stylesheet';
-
-        // insert these styles after the last styles we've already inserted
-        // which could include the SSR styles, or the loader's hydrate css script's styles
-        const insertedStyles = domApi.$head.querySelectorAll('[data-styles]');
-        let insertBeforeRef = insertedStyles[insertedStyles.length - 1] || domApi.$head.firstChild;
-        if (insertBeforeRef) {
-          insertBeforeRef = insertBeforeRef.nextSibling;
-        }
-        domApi.$insertBefore(domApi.$head, linkElm, insertBeforeRef);
-      }
+      // figure out which bundle to request and kick it off
+      requestBundle(cmpMeta, bundleId);
     }
   }
 
 
-  function requestModule(moduleId: string) {
+  function requestBundle(cmpMeta: ComponentMeta, bundleId: string) {
     // create the url we'll be requesting
-    const url = publicPath + moduleId + '.js';
+    const url = publicPath + bundleId + ((useScopedCss(supportsNativeShadowDom, cmpMeta) ? '.sc' : '') + '.js');
 
-    if (pendingModuleRequests[url]) {
+    if (pendingBundleRequests[url]) {
       // we're already actively requesting this url
       // no need to do another request
       return;
     }
 
-    // let's kick off the module request
+    // let's kick off the bundle request
     // remember that we're now actively requesting this url
-    pendingModuleRequests[url] = true;
+    pendingBundleRequests[url] = true;
 
     // create a sript element to add to the document.head
     var scriptElm = domApi.$createElement('script');
@@ -265,7 +278,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       domApi.$removeChild(scriptElm.parentNode, scriptElm);
 
       // remove from our list of active requests
-      delete pendingModuleRequests[url];
+      delete pendingBundleRequests[url];
     }
 
     // add script completed listener to this script element
@@ -276,7 +289,44 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     domApi.$appendChild(domApi.$head, scriptElm);
   }
 
-  let WindowCustomEvent = (win as any).CustomEvent;
+
+  function attachStyles(cmpMeta: ComponentMeta, elm: HostElement) {
+    const tagForStyles = cmpMeta.tagNameMeta;
+    const templateElm = styleTemplates[tagForStyles];
+
+    if (templateElm) {
+      let styleContainerNode: Node = domApi.$head;
+
+      if (supportsNativeShadowDom) {
+        if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+          styleContainerNode = elm.shadowRoot;
+
+        } else {
+          while ((elm as Node) = domApi.$parentNode(elm)) {
+            if ((elm as any).host && (elm as any).host.shadowRoot) {
+              styleContainerNode = (elm as any).host.shadowRoot;
+              break;
+            }
+          }
+        }
+      }
+
+      const appliedStyles = ((styleContainerNode as HostElement)._appliedStyles = (styleContainerNode as HostElement)._appliedStyles || {});
+
+      if (!appliedStyles[tagForStyles]) {
+        // we haven't added these styles to this element yet
+        const styleElm = templateElm.content.cloneNode(true) as HTMLStyleElement;
+
+        domApi.$insertBefore(styleContainerNode, styleElm, styleContainerNode.firstChild);
+
+        // remember we don't need to do this again for this element
+        appliedStyles[tagForStyles] = true;
+      }
+    }
+  }
+
+
+  var WindowCustomEvent = (win as any).CustomEvent;
   if (typeof WindowCustomEvent !== 'function') {
     // CustomEvent polyfill
     WindowCustomEvent = function CustomEvent(event: any, data: EventEmitterData) {
@@ -288,7 +338,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   }
 
   // test if this browser supports event options or not
-  let supportsEventOptions = false;
+  var supportsEventOptions = false;
   try {
     win.addEventListener('eopt', null,
       Object.defineProperty({}, 'passive', {
@@ -306,8 +356,8 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       } : !!useCapture;
   }
 
-  function onError(type: number, err: any, elm: HostElement) {
-    console.error(type, err, elm.tagName);
+  function onError(err: Error, type: RUNTIME_ERROR, elm: HostElement) {
+    console.error(err, type, elm && elm.tagName);
   }
 
   function propConnect(ctrlTag: string) {
@@ -319,4 +369,9 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   }
 
   return plt;
+}
+
+
+export interface StyleTemplates {
+  [tag: string]: HTMLTemplateElement;
 }

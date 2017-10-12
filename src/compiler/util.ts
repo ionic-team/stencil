@@ -1,4 +1,4 @@
-import { BANNER } from '../util/constants';
+import { BANNER, ENCAPSULATION_TYPE } from '../util/constants';
 import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from '../util/interfaces';
 
 
@@ -15,8 +15,12 @@ export function getBuildContext(ctx?: BuildContext) {
   ctx.jsFiles = ctx.jsFiles || {};
   ctx.cssFiles = ctx.cssFiles || {};
   ctx.dependentManifests = ctx.dependentManifests || {};
+  ctx.compiledFileCache = ctx.compiledFileCache || {};
   ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
-  ctx.styleSassOutputs = ctx.styleSassOutputs || {};
+  ctx.styleSassUnscopedOutputs = ctx.styleSassUnscopedOutputs || {};
+  ctx.styleSassScopedOutputs = ctx.styleSassScopedOutputs || {};
+  ctx.styleCssUnscopedOutputs = ctx.styleCssUnscopedOutputs || {};
+  ctx.styleCssScopedOutputs = ctx.styleCssScopedOutputs || {};
   ctx.changedFiles = ctx.changedFiles || [];
 
   return ctx;
@@ -54,30 +58,6 @@ export function getJsFile(sys: StencilSystem, ctx: BuildContext, jsFilePath: str
         reject(err);
       } else {
         ctx.jsFiles[jsFilePath] = data;
-        resolve(data);
-      }
-    });
-  });
-}
-
-
-export function getCssFile(sys: StencilSystem, ctx: BuildContext, cssFilePath: string) {
-  cssFilePath = normalizePath(cssFilePath);
-
-  if (typeof ctx.filesToWrite[cssFilePath] === 'string') {
-    return Promise.resolve(ctx.filesToWrite[cssFilePath]);
-  }
-
-  if (typeof ctx.cssFiles[cssFilePath] === 'string') {
-    return Promise.resolve(ctx.cssFiles[cssFilePath]);
-  }
-
-  return new Promise<string>((resolve, reject) => {
-    sys.fs.readFile(cssFilePath, 'utf-8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        ctx.cssFiles[cssFilePath] = data;
         resolve(data);
       }
     });
@@ -387,6 +367,11 @@ export function catchError(diagnostics: Diagnostic[], err: Error) {
 
 export function hasError(diagnostics: Diagnostic[]) {
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
+}
+
+
+export function componentRequiresScopedStyles(encapsulation: ENCAPSULATION_TYPE) {
+  return (encapsulation === ENCAPSULATION_TYPE.ScopedCss || encapsulation === ENCAPSULATION_TYPE.ShadowDom);
 }
 
 

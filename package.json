@@ -12,6 +12,7 @@
     "build.testing": "npm run transpile.testing && node scripts/build-testing.js",
     "clean": "rimraf dist/",
     "deploy": "node scripts/np/cli.js",
+    "deploy.dryrun": "node scripts/np/cli.js --dry-run",
     "prepare.package": "node scripts/prepare-package.js",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
@@ -26,8 +27,7 @@
   "dependencies": {
     "chokidar": "1.7.0",
     "node-sass": "4.5.3",
-    "typescript": "^2.6.0-rc",
-    "util.promisify": "1.0.0"
+    "typescript": "^2.6.0-rc"
   },
   "devDependencies": {
     "@types/babel-core": "^6.7.14",
@@ -37,7 +37,6 @@
     "@types/jest": "18.1.1",
     "@types/jsdom": "^11.0.0",
     "@types/node": "7.0.5",
-    "@types/util.promisify": "^1.0.0",
     "babel-cli": "^6.24.0",
     "babel-core": "^6.24.0",
     "babel-plugin-transform-define": "^1.2.0",
@@ -50,7 +49,7 @@
     "babel-plugin-transform-es2015-shorthand-properties": "^6.22.0",
     "babel-plugin-transform-es2015-template-literals": "^6.22.0",
     "chalk": "^2.1.0",
-    "clean-css": "^4.1.8",
+    "clean-css": "^4.1.9",
     "fs-extra": "^2.1.2",
     "glob": "^7.1.2",
     "google-closure-compiler": "20170218.0.0",

@@ -22,9 +22,12 @@ function bundleCompiler() {
   rollup.rollup({
     input: ENTRY_FILE,
     external: [
+      'fs',
+      'path',
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
-      'typescript'
+      'typescript',
+      'util'
     ]
 
   }).then(bundle => {

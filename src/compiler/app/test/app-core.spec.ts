@@ -4,6 +4,8 @@ import { generatePreamble } from '../../util';
 import { mockStencilSystem } from '../../../testing/mocks';
 
 import * as core from '../app-core';
+import { getAppFileName } from '../generate-app-files';
+
 
 describe('app-core', () => {
   let config: BuildConfig;
@@ -119,7 +121,7 @@ describe('app-core', () => {
   describe('getAppFileName', () => {
     it('returns the lower-cased namespace', () => {
       config.namespace = 'BarnAcleBobSBigBoaTs';
-      expect(core.getAppFileName(config)).toEqual('barnaclebobsbigboats');
+      expect(getAppFileName(config)).toEqual('barnaclebobsbigboats');
     });
   });
 

@@ -56,11 +56,11 @@ export function update(plt: PlatformApi, elm: HostElement) {
             userPromise = elm.$instance.componentWillLoad();
           }
         } catch (e) {
-          plt.onError(RUNTIME_ERROR.WillLoadError, e, elm);
+          plt.onError(e, RUNTIME_ERROR.WillLoadError, elm);
         }
 
       } catch (e) {
-        plt.onError(RUNTIME_ERROR.InitInstanceError, e, elm);
+        plt.onError(e, RUNTIME_ERROR.InitInstanceError, elm, true);
       }
 
     } else {
@@ -74,7 +74,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
           userPromise = elm.$instance.componentWillUpdate();
         }
       } catch (e) {
-        plt.onError(RUNTIME_ERROR.WillUpdateError, e, elm);
+        plt.onError(e, RUNTIME_ERROR.WillUpdateError, elm);
       }
     }
 
@@ -107,7 +107,7 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
     // _onRenderCallbacks were all just fired off
 
   } catch (e) {
-    plt.onError(RUNTIME_ERROR.RenderError, e, elm);
+    plt.onError(e, RUNTIME_ERROR.RenderError, elm, true);
   }
 
   // after render we need to start the observer back up.
@@ -128,6 +128,6 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
 
   } catch (e) {
     // derp
-    plt.onError(RUNTIME_ERROR.DidUpdateError, e, elm);
+    plt.onError(e, RUNTIME_ERROR.DidUpdateError, elm, true);
   }
 }

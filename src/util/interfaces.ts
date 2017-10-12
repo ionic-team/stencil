@@ -1,6 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
-import { MEMBER_TYPE, PROP_TYPE } from './constants';
+import { ENCAPSULATION_TYPE, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_META } from './constants';
 
 
 export interface CoreContext {
@@ -23,7 +23,8 @@ export interface CoreContext {
 
 export interface AppGlobal {
   components?: LoadComponentRegistry[];
-  loadComponents?: (moduleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
+  loadComponents?: (bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
+  loadStyles?: (styleId: string, styleText: string) => void;
 }
 
 
@@ -81,16 +82,16 @@ export interface LoadComponentRegistry {
   [0]: string;
 
   /**
-   * module id
+   * map of bundle ids
    */
-  [1]: string;
-
-  /**
-   * map of the mode styles and css bundle ids
-   */
-  [2]: {
+  [1]: {
     [modeName: string]: string
   };
+
+  /**
+   * has styles
+   */
+  [2]: boolean;
 
   /**
    * members
@@ -98,19 +99,24 @@ export interface LoadComponentRegistry {
   [3]: ComponentMemberData[];
 
   /**
-   * listeners
+   * encapsulated
    */
-  [4]: ComponentListenersData[];
+  [4]: ENCAPSULATION_TYPE;
 
   /**
    * slot
    */
-  [5]: number;
+  [5]: SLOT_META;
+
+  /**
+   * listeners
+   */
+  [6]: ComponentListenersData[];
 
   /**
    * load priority
    */
-  [6]: number;
+  [7]: PRIORITY;
 }
 
 
@@ -169,9 +175,9 @@ export interface LoadComponentMeta {
   [5]: PropChangeMeta[];
 
   /**
-   * shadow
+   * encapsulation
    */
-  [6]: boolean;
+  [6]: ENCAPSULATION_TYPE;
 }
 
 
@@ -287,6 +293,25 @@ export interface AppRegistry {
 export interface Bundle {
   components: string[];
   priority?: number;
+}
+
+
+export interface ManifestBundle {
+  components?: string[];
+  moduleFiles: ModuleFile[];
+  compiledModeStyles?: CompiledModeStyles[];
+  compiledModuleText?: string;
+  priority?: number;
+}
+
+
+export interface CompiledModeStyles {
+  tag?: string;
+  modeName?: string;
+  styleOrder?: number;
+  unscopedStyles?: string;
+  scopedStyles?: string;
+  writeFile?: boolean;
 }
 
 
@@ -437,8 +462,12 @@ export interface BuildContext {
   moduleFiles?: ModuleFiles;
   jsFiles?: FilesMap;
   cssFiles?: FilesMap;
+  compiledFileCache?: ModuleBundles;
   moduleBundleOutputs?: ModuleBundles;
-  styleSassOutputs?: ModuleBundles;
+  styleSassUnscopedOutputs?: ModuleBundles;
+  styleSassScopedOutputs?: ModuleBundles;
+  styleCssUnscopedOutputs?: ModuleBundles;
+  styleCssScopedOutputs?: ModuleBundles;
   filesToWrite?: FilesMap;
   dependentManifests?: {[collectionName: string]: Manifest};
   appFiles?: {
@@ -511,22 +540,6 @@ export interface TranspileResults {
 }
 
 
-export interface ModuleResults {
-  bundles: {
-    [bundleId: string]: string;
-  };
-}
-
-
-export interface StylesResults {
-  bundles: {
-    [bundleId: string]: {
-      [modeName: string]: string;
-    };
-  };
-}
-
-
 export interface DependentCollection {
   name: string;
   includeBundledOnly?: boolean;
@@ -573,6 +586,7 @@ export interface ComponentOptions {
   styleUrl?: string;
   styleUrls?: string[] | ModeStyles;
   styles?: string;
+  scoped?: boolean;
   shadow?: boolean;
   host?: HostMeta;
   assetsDir?: string;
@@ -690,21 +704,25 @@ export interface PropChangeOpts {
 export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
-  moduleId?: string;
-  styleIds?: {[modeName: string]: string };
+  bundleIds?: BundleIds;
   stylesMeta?: StylesMeta;
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
   propsWillChangeMeta?: PropChangeMeta[];
   propsDidChangeMeta?: PropChangeMeta[];
-  isShadowMeta?: boolean;
+  encapsulation?: ENCAPSULATION_TYPE;
   hostMeta?: HostMeta;
   assetsDirsMeta?: AssetsMeta[];
-  slotMeta?: number;
+  slotMeta?: SLOT_META;
   loadPriority?: number;
   componentModule?: any;
   componentClass?: string;
+}
+
+
+export interface BundleIds {
+  [modeName: string]: string;
 }
 
 
@@ -794,7 +812,7 @@ export interface ComponentModule {
 
 
 export interface ComponentRegistry {
-  // registry tag must always be UPPER-CASE
+  // registry tag must always be lower-case
   [registryTag: string]: ComponentMeta;
 }
 
@@ -834,11 +852,12 @@ export interface HostElement extends HTMLElement {
   _render: (isUpdateRender?: boolean) => void;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
+  _appliedStyles?: { [tagNameForStyles: string]: boolean };
 }
 
 
 export interface RendererApi {
-  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, ssrId?: number): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION_TYPE, ssrId?: number): VNode;
 }
 
 
@@ -919,14 +938,15 @@ export interface PlatformApi {
   propConnect: (ctrlTag: string) => PropConnect;
   loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
   render?: RendererApi;
-  connectHostElement: (elm: HostElement, slotMeta: number) => void;
+  connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
   queue: QueueApi;
   onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
   getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   tmpDisconnected?: boolean;
-  onError: (type: number, err: any, elm: HostElement) => void;
+  onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   isClient?: boolean;
+  attachStyles: (cmpMeta: ComponentMeta, elm: HostElement) => void;
 }
 
 
@@ -966,8 +986,8 @@ export interface IdleOptions {
 }
 
 
-export interface ModuleCallbacks {
-  [moduleId: string]: Function[];
+export interface BundleCallbacks {
+  [bundleId: string]: Function[];
 }
 
 
@@ -1226,6 +1246,7 @@ export interface ComponentData {
   assetPaths?: string[];
   slot?: 'hasSlots'|'hasNamedSlots';
   shadow?: boolean;
+  scoped?: boolean;
   priority?: 'low';
 }
 

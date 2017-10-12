@@ -1,7 +1,7 @@
 import { LoadComponentRegistry } from '../util/interfaces';
 
 
-(function(window: any, document: Document, appNamespace?: string, hydrateCssClass?: string, publicPath?: string, appCore?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any, i?: number) {
+(function(window: any, document: Document, appNamespace?: string, publicPath?: string, appCore?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any, i?: number) {
   'use strict';
 
   // create global namespace if it doesn't already exist
@@ -10,8 +10,7 @@ import { LoadComponentRegistry } from '../util/interfaces';
   // auto hide components until they been fully hydrated
   // reusing the "x" variable from the args for funzies
   x = document.createElement('style');
-  x.setAttribute('data-styles', '');
-  x.innerHTML = (components.map(function(c) { return c[0]; }).join(',') + '{visibility:hidden}.' + hydrateCssClass + '{visibility:inherit}').toLowerCase();
+  x.innerHTML = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; }).join() + '{visibility:hidden}';
   document.head.insertBefore(x, document.head.firstChild);
 
   // get this current script

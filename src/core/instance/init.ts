@@ -85,7 +85,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   try {
     replayQueuedEventsOnInstance(elm);
   } catch (e) {
-    plt.onError(RUNTIME_ERROR.QueueEventsError, e, elm);
+    plt.onError(e, RUNTIME_ERROR.QueueEventsError, elm);
   }
 
   // Create a mutation observer that will identify changes to the elements
@@ -128,7 +128,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
       instance.componentDidLoad && instance.componentDidLoad();
 
     } catch (e) {
-      plt.onError(RUNTIME_ERROR.DidLoadError, e, elm);
+      plt.onError(e, RUNTIME_ERROR.DidLoadError, elm);
     }
 
     // add the css class that this element has officially hydrated
@@ -142,7 +142,6 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
     // the deepest elements load first then bubbles up
     propagateElementLoaded(elm);
   }
-
 }
 
 

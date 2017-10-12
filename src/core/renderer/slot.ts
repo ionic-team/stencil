@@ -1,4 +1,4 @@
-import { NODE_TYPE, SLOT, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
+import { NODE_TYPE, SLOT_META, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { DomApi, HostElement, VNode } from '../../util/interfaces';
 import { t } from './h';
 import { VNode as VNodeObj } from './vnode';
@@ -100,7 +100,7 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
 }
 
 
-export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMeta: number) {
+export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMeta: SLOT_META) {
   // compiler has already figured out if this component has slots or not
   // if the component doesn't even have slots then we'll skip over all of this code
   const childNodes = elm.childNodes;
@@ -109,7 +109,7 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMet
     domApi.$insertBefore(elm, (elm.$defaultHolder = domApi.$createComment('')), childNodes[0]);
   }
 
-  if (slotMeta === SLOT.HasNamedSlots) {
+  if (slotMeta === SLOT_META.HasNamedSlots) {
     // looks like this component has named slots
     // so let's loop through each of the childNodes to the host element
     // and pick out the ones that have a slot attribute
@@ -152,7 +152,7 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMet
       namedSlots: namedSlots
     };
 
-  } else if (slotMeta === SLOT.HasSlots) {
+  } else if (slotMeta === SLOT_META.HasSlots) {
     // this component doesn't have named slots, but it does
     // have at least a default slot, so the work here is alot easier than
     // when we're not looping through each element and reading attribute values

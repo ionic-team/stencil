@@ -6,7 +6,7 @@ import { toDashCase } from '../util/helpers';
 
 
 export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry, attr?: number) {
-  // tag name will always be upper case
+  // tag name will always be lower case
   const cmpMeta: ComponentMeta = {
     tagNameMeta: cmpRegistryData[0],
     membersMeta: {
@@ -18,27 +18,27 @@ export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, r
     }
   };
 
-  // this comonent's module id
-  cmpMeta.moduleId = cmpRegistryData[1];
-
   // map of the modes w/ bundle id and style data
-  cmpMeta.styleIds = cmpRegistryData[2] || {};
+  cmpMeta.bundleIds = cmpRegistryData[1];
 
   // parse member meta
   // this data only includes props that are attributes that need to be observed
   // it does not include all of the props yet
   parseMembersData(cmpMeta, cmpRegistryData[3], attr);
 
-  if (cmpRegistryData[4]) {
-    // parse listener meta
-    cmpMeta.listenersMeta = cmpRegistryData[4].map(parseListenerData);
-  }
+  // encapsulation
+  cmpMeta.encapsulation = cmpRegistryData[4];
 
   // slot
   cmpMeta.slotMeta = cmpRegistryData[5];
 
+  if (cmpRegistryData[6]) {
+    // parse listener meta
+    cmpMeta.listenersMeta = cmpRegistryData[6].map(parseListenerData);
+  }
+
   // bundle load priority
-  cmpMeta.loadPriority = cmpRegistryData[6];
+  cmpMeta.loadPriority = cmpRegistryData[7];
 
   return registry[cmpMeta.tagNameMeta] = cmpMeta;
 }
@@ -72,7 +72,7 @@ function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberDat
 
 
 export function parseComponentMeta(registry: ComponentRegistry, moduleImports: any, cmpMetaData: LoadComponentMeta, attr?: number) {
-  // tag name will always be upper case
+  // tag name will always be lowser case
   const cmpMeta = registry[cmpMetaData[0]];
 
   // get the component class which was added to moduleImports
@@ -95,9 +95,6 @@ export function parseComponentMeta(registry: ComponentRegistry, moduleImports: a
 
   // component instance prop DID change methods
   cmpMeta.propsDidChangeMeta = cmpMetaData[5];
-
-  // is shadow
-  cmpMeta.isShadowMeta = !!cmpMetaData[6];
 }
 
 

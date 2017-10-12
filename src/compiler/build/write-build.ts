@@ -2,6 +2,7 @@ import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/
 import { buildError, buildWarn, catchError, normalizePath, writeFiles } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
+import { getAppFileName } from '../app/generate-app-files';
 import { writeAppManifest, COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 
 
@@ -99,7 +100,7 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
     err.messageText = `package.json "types" property is required when generating a distribution and must be set to: ${types}`;
   }
 
-  const browser = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), config.namespace.toLowerCase() + '.js'));
+  const browser = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), getAppFileName(config) + '.js'));
   if (!data.browser || normalizePath(data.browser) !== browser) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;

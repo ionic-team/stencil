@@ -1,5 +1,5 @@
 import { ModuleFiles, ModuleFile } from '../../../util/interfaces';
-import { SLOT } from '../../../util/constants';
+import { SLOT_META } from '../../../util/constants';
 import * as ts from 'typescript';
 import * as util from './util';
 
@@ -76,7 +76,7 @@ function updateFileMetaWithSlots(fileMeta: ModuleFile, props: ts.Expression): Mo
   }
 
   if (fileMeta.cmpMeta.slotMeta === undefined) {
-    fileMeta.cmpMeta.slotMeta = SLOT.HasSlots;
+    fileMeta.cmpMeta.slotMeta = SLOT_META.HasSlots;
   }
 
   if (props && props.kind === ts.SyntaxKind.ObjectLiteralExpression) {
@@ -87,7 +87,7 @@ function updateFileMetaWithSlots(fileMeta: ModuleFile, props: ts.Expression): Mo
         var attrValue: string = (<any>jsxAttrs[attrName]).text.trim();
 
         if (attrValue.length > 0) {
-          fileMeta.cmpMeta.slotMeta = SLOT.HasNamedSlots;
+          fileMeta.cmpMeta.slotMeta = SLOT_META.HasNamedSlots;
           break;
         }
       }

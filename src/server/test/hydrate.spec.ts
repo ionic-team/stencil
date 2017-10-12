@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateRe
 import { hydrateHtml } from '../hydrate-html';
 import { mockBuildConfig, compareHtml } from '../../testing/mocks';
 import { h } from '../../core/renderer/h';
-import { SLOT } from '../../util/constants';
+import { SLOT_META } from '../../util/constants';
 
 
 describe('hydrate', () => {
@@ -13,7 +13,7 @@ describe('hydrate', () => {
       diagnostics: []
     };
     const registry: ComponentRegistry = {
-      'ION-TEST': {
+      'ion-test': {
         componentModule: class {
           render() {
             return h('elm-a', null,
@@ -23,7 +23,7 @@ describe('hydrate', () => {
             );
           }
         },
-        slotMeta: SLOT.HasNamedSlots
+        slotMeta: SLOT_META.HasNamedSlots
       }
     };
     const opts: HydrateOptions = {
@@ -62,7 +62,7 @@ describe('hydrate', () => {
       diagnostics: []
     };
     const registry: ComponentRegistry = {
-      'ION-TEST': {
+      'ion-test': {
         componentModule: class {
           render() {
             return h('elm-a', null,
@@ -71,7 +71,7 @@ describe('hydrate', () => {
             );
           }
         },
-        slotMeta: SLOT.HasSlots
+        slotMeta: SLOT_META.HasSlots
       }
     };
     const opts: HydrateOptions = {
@@ -107,7 +107,7 @@ describe('hydrate', () => {
       diagnostics: []
     };
     const registry: ComponentRegistry = {
-      'ION-TEST': {
+      'ion-test': {
         componentModule: class {
           render() {
             return h('div', null);

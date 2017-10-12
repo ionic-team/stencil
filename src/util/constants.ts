@@ -54,10 +54,20 @@ export const enum PRIORITY {
 /**
  * Slot Meta
  */
-export const enum SLOT {
+export const enum SLOT_META {
   NoSlots = 0,
   HasSlots = 1,
   HasNamedSlots = 2,
+}
+
+
+/**
+ * Encapsulation
+ */
+export const enum ENCAPSULATION_TYPE {
+  NoEncapsulation = 0,
+  ShadowDom = 1,
+  ScopedCss = 2,
 }
 
 
@@ -77,6 +87,8 @@ export const enum NODE_TYPE {
 export const SSR_VNODE_ID = 'data-ssrv';
 export const SSR_CHILD_ID = 'data-ssrc';
 
+
+export const DEFAULT_STYLE_MODE = '$';
 
 /**
  * Key Name to Key Code Map
