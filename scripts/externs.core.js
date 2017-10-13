@@ -34,6 +34,7 @@ function $definedComponents(){};
  */
 function components(){};
 function loadComponents(){};
+function loadStyles(){};
 
 
 /**
