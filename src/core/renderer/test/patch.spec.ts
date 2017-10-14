@@ -1,8 +1,9 @@
 import { h } from '../h';
 import { VNode } from '../vnode';
 import { toVNode } from '../to-vnode';
-import { mockElement, mockDomApi, mockRenderer, mockTextNode } from '../../../testing/mocks';
-import { SVG_NS } from '../../../util/constants';
+import { mockElement, mockDomApi, mockRenderer, mockPlatform, mockTextNode } from '../../../testing/mocks';
+import { ENCAPSULATION, SVG_NS } from '../../../util/constants';
+import { PlatformApi } from '../../../util/interfaces';
 const shuffle = require('knuth-shuffle').knuthShuffle;
 
 
@@ -23,8 +24,8 @@ function map(fn: any, list: any) {
 var inner = prop('innerHTML');
 
 describe('renderer', () => {
-  const patch = mockRenderer();
   const domApi = mockDomApi();
+  const patch = mockRenderer(null, domApi);
 
   var elm: any;
   var vnode0: any;
@@ -33,6 +34,41 @@ describe('renderer', () => {
     elm = mockElement('div');
     vnode0 = new VNode();
     vnode0.elm = elm;
+  });
+
+  describe('shadow dom', () => {
+    const supportsShadowDom = true;
+    const plt: PlatformApi = mockPlatform(supportsShadowDom) as any;
+    const patch = mockRenderer(plt as any, domApi);
+
+    it('adds host scope id to root element', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ShadowDom).elm;
+      expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
+    });
+
+  });
+
+  describe('scoped css', () => {
+
+    it('adds scope id to child elements', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0, h('my-tag', null, h('div', null)), false, null, ENCAPSULATION.ScopedCss).elm;
+      expect(elm.firstChild.hasAttribute('data-my-tag')).toBe(true);
+    });
+
+    it('adds host scope id to root element', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ScopedCss).elm;
+      expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
+    });
+
   });
 
   describe('created element', () => {

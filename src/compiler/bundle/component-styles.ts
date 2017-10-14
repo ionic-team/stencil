@@ -1,7 +1,7 @@
 import { BuildContext, BuildConfig, ModuleFile, ComponentMeta, CompiledModeStyles } from '../../util/interfaces';
 import { buildError, isCssFile, isSassFile, readFile, normalizePath } from '../util';
-import { ENCAPSULATION_TYPE } from '../../util/constants';
-import { scopeCss } from '../css/scope-css';
+import { ENCAPSULATION } from '../../util/constants';
+import { scopeComponentCss } from '../css/scope-css';
 
 
 
@@ -109,7 +109,7 @@ export function groupComponentModeStyles(tag: string, modeName: string, allCmpSt
 function setHydratedCss(config: BuildConfig, cmpMeta: ComponentMeta, compiledModeStyles: CompiledModeStyles) {
   const tagSelector = `${cmpMeta.tagNameMeta}.${config.hydratedCssClass}`;
 
-  if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     const hostSelector = `:host(.${config.hydratedCssClass})`;
 
     compiledModeStyles.unscopedStyles = appendHydratedCss(
@@ -125,7 +125,7 @@ function setHydratedCss(config: BuildConfig, cmpMeta: ComponentMeta, compiledMod
     );
   }
 
-  if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom || cmpMeta.encapsulation === ENCAPSULATION_TYPE.ScopedCss) {
+  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom || cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
     compiledModeStyles.scopedStyles = appendHydratedCss(
       compiledModeStyles.scopedStyles,
       tagSelector
@@ -181,7 +181,7 @@ function compileSassFile(config: BuildConfig, ctx: BuildContext, moduleFile: Mod
         d.messageText = err;
 
       } else {
-        fillStyleText(config, ctx, moduleFile.cmpMeta, compileSassDetails, result.css.toString(), absStylePath);
+        fillStyleText(config, ctx, moduleFile.cmpMeta, compileSassDetails, result.css.toString());
 
         compileSassDetails.writeFile = true;
         ctx.sassBuildCount++;
@@ -214,7 +214,7 @@ function readCssFile(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentM
   const sys = config.sys;
 
   return readFile(sys, absStylePath).then(cssText => {
-    fillStyleText(config, ctx, cmpMeta, readCssDetails, cssText.toString(), absStylePath);
+    fillStyleText(config, ctx, cmpMeta, readCssDetails, cssText.toString());
 
     readCssDetails.writeFile = true;
 
@@ -238,13 +238,13 @@ function readInlineStyles(config: BuildConfig, ctx: BuildContext, cmpMeta: Compo
     styleOrder: styleOrder
   };
 
-  fillStyleText(config, ctx, cmpMeta, inlineStylesDetail, styleStr, null);
+  fillStyleText(config, ctx, cmpMeta, inlineStylesDetail, styleStr);
 
   return Promise.resolve(inlineStylesDetail);
 }
 
 
-export function fillStyleText(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, compiledModeStyles: CompiledModeStyles, unscopedStyles: string, fileName: string) {
+export function fillStyleText(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, compiledModeStyles: CompiledModeStyles, unscopedStyles: string) {
   compiledModeStyles.unscopedStyles = null;
   compiledModeStyles.scopedStyles = null;
 
@@ -263,20 +263,9 @@ export function fillStyleText(config: BuildConfig, ctx: BuildContext, cmpMeta: C
       }
     }
 
-    if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+    if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
       // only create scoped styles if we need to
-      const scopeIdSelector = getScopeIdSelector(cmpMeta.tagNameMeta);
-      compiledModeStyles.scopedStyles = scopeCss(config, unscopedStyles, scopeIdSelector, fileName);
+      compiledModeStyles.scopedStyles = scopeComponentCss(ctx, cmpMeta, unscopedStyles);
     }
   }
-}
-
-
-export function getScopeIdSelector(tag: string) {
-  return `[${getScopeId(tag)}]`;
-}
-
-
-export function getScopeId(tag: string) {
-  return `data-${tag}`;
 }

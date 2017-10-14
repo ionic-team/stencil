@@ -1,7 +1,7 @@
 import { BuildContext, BuildConfig, ComponentMeta, CompiledModeStyles, ModuleFile } from '../../../util/interfaces';
 import { componentRequiresScopedStyles } from '../../util';
-import { ENCAPSULATION_TYPE } from '../../../util/constants';
-import { fillStyleText, getScopeId, getScopeIdSelector, groupComponentModeStyles } from '../component-styles';
+import { ENCAPSULATION } from '../../../util/constants';
+import { fillStyleText, groupComponentModeStyles } from '../component-styles';
 
 
 describe('component-styles', () => {
@@ -11,10 +11,10 @@ describe('component-styles', () => {
     it('should create scoped styles', () => {
       const cmpMeta: ComponentMeta = {
         tagNameMeta: 'my-tag',
-        encapsulation: ENCAPSULATION_TYPE.ScopedCss
+        encapsulation: ENCAPSULATION.ScopedCss
       };
       const compiledModeStyles: CompiledModeStyles = {};
-      fillStyleText(config, ctx, cmpMeta, compiledModeStyles, 'h1{color:blue;}', null);
+      fillStyleText(config, ctx, cmpMeta, compiledModeStyles, 'h1{color:blue;}');
       expect(compiledModeStyles.unscopedStyles).toBe('h1{color:blue;}');
       expect(compiledModeStyles.scopedStyles).toBe('h1[data-my-tag]{color:blue;}');
     });
@@ -24,7 +24,7 @@ describe('component-styles', () => {
         tagNameMeta: 'my-tag'
       };
       const compiledModeStyles: CompiledModeStyles = {};
-      fillStyleText(config, ctx, cmpMeta, compiledModeStyles, 'h1{color:blue;}', null);
+      fillStyleText(config, ctx, cmpMeta, compiledModeStyles, 'h1{color:blue;}');
       expect(compiledModeStyles.unscopedStyles).toBe('h1{color:blue;}');
       expect(compiledModeStyles.scopedStyles).toBe(null);
     });
@@ -50,30 +50,18 @@ describe('component-styles', () => {
 
   });
 
-  describe('scope id', () => {
-
-    it('add data- prefix to tag', () => {
-      expect(getScopeId('my-tag')).toBe('data-my-tag');
-    });
-
-    it('add data- prefix to css attribute', () => {
-      expect(getScopeIdSelector('my-tag')).toBe('[data-my-tag]');
-    });
-
-  });
-
   describe('componentRequiresScopedStyles', () => {
 
     it('create scoped for scoped css', () => {
-      expect(componentRequiresScopedStyles(ENCAPSULATION_TYPE.ScopedCss)).toBe(true);
+      expect(componentRequiresScopedStyles(ENCAPSULATION.ScopedCss)).toBe(true);
     });
 
     it('create scoped for shadow dom', () => {
-      expect(componentRequiresScopedStyles(ENCAPSULATION_TYPE.ShadowDom)).toBe(true);
+      expect(componentRequiresScopedStyles(ENCAPSULATION.ShadowDom)).toBe(true);
     });
 
     it('not create scoped', () => {
-      expect(componentRequiresScopedStyles(ENCAPSULATION_TYPE.NoEncapsulation)).toBe(false);
+      expect(componentRequiresScopedStyles(ENCAPSULATION.NoEncapsulation)).toBe(false);
     });
 
   });

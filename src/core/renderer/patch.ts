@@ -352,12 +352,19 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
     // and if this browser supports native shadow dom
     useNativeShadowDom = (encapsulation === ENCAPSULATION.ShadowDom && supportsNativeShadowDom);
 
-    if (!isUpdate && useNativeShadowDom) {
-      // this component SHOULD use native slot/shadow dom
-      // this browser DOES support native shadow dom
-      // and this is the first render
-      // let's create that shadow root
-      oldVNode.elm = (oldVNode.elm as HTMLElement).attachShadow({ mode: 'open' });
+    if (!isUpdate) {
+      if (useNativeShadowDom) {
+        // this component SHOULD use native slot/shadow dom
+        // this browser DOES support native shadow dom
+        // and this is the first render
+        // let's create that shadow root
+        oldVNode.elm = (oldVNode.elm as HTMLElement).attachShadow({ mode: 'open' });
+
+      } else if (scopeId) {
+        // this host element should use scoped css
+        // add the scope attribute to the host
+        domApi.$setAttribute(oldVNode.elm, scopeId + '-host', '');
+      }
     }
 
     // synchronous patch

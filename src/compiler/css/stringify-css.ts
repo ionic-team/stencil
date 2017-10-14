@@ -10,11 +10,9 @@ import { UsedSelectors } from '../html/used-selectors';
 
 export class StringifyCss {
   usedSelectors: UsedSelectors;
-  scopeIdSelector: string;
 
   constructor(opts: StringifyCssOptions) {
     this.usedSelectors = opts.usedSelectors;
-    this.scopeIdSelector = opts.scopeIdSelector;
   }
 
   /**
@@ -250,10 +248,6 @@ export class StringifyCss {
           node.selectors.splice(i, 1);
         }
       }
-
-      if (this.scopeIdSelector) {
-        node.selectors[i] = addScopeId(node.selectors[i], this.scopeIdSelector);
-      }
     }
 
     if (node.selectors.length === 0) return '';
@@ -272,21 +266,6 @@ export class StringifyCss {
 }
 
 
-export function addScopeId(selector: string, scopeIdCss: string) {
-  const pseudo = selector.split(':');
-  const parts = pseudo[0].split(/\s+/g);
-
-  for (var i = 0; i < parts.length; i++) {
-    parts[i] += scopeIdCss;
-  }
-
-  pseudo[0] = parts.join(' ');
-
-  return pseudo.join(':');
-}
-
-
 export interface StringifyCssOptions {
-  scopeIdSelector?: string;
   usedSelectors?: UsedSelectors;
 }

@@ -1,5 +1,5 @@
 import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, Logger, PlatformApi, StencilSystem, VNode } from '../util/interfaces';
+  HydrateOptions, Logger, PlatformApi, RendererApi, StencilSystem, VNode } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
@@ -8,7 +8,7 @@ import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../util/validate-config';
 
 
-export function mockPlatform() {
+export function mockPlatform(supportsShadowDom?: boolean) {
   const diagnostics: Diagnostic[] = [];
   const config = mockBuildConfig();
   const win = config.sys.createDom().parse({html: ''});
@@ -19,7 +19,9 @@ export function mockPlatform() {
     win,
     win.document,
     diagnostics,
-    false
+    false,
+    null,
+    supportsShadowDom
   );
   plt.isClient = true;
 
@@ -320,7 +322,7 @@ export function mockDomApi(document?: any) {
 }
 
 
-export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi): any {
+export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi): RendererApi {
   plt = plt || mockPlatform();
   return createRendererPatch(<PlatformApi>plt, domApi || mockDomApi(), false);
 }

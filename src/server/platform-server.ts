@@ -21,7 +21,8 @@ export function createPlatformServer(
   doc: any,
   diagnostics: Diagnostic[],
   isPrerender: boolean,
-  ctx?: BuildContext
+  ctx?: BuildContext,
+  supportsShadowDom?: boolean
 ): PlatformApi {
   const registry: ComponentRegistry = { 'html': {} };
   const moduleImports: {[tag: string]: any} = {};
@@ -92,7 +93,7 @@ export function createPlatformServer(
 
 
   // create the renderer which will be used to patch the vdom
-  plt.render = createRendererPatch(plt, domApi, false);
+  plt.render = createRendererPatch(plt, domApi, supportsShadowDom);
 
   // setup the root node of all things
   // which is the mighty <html> tag
