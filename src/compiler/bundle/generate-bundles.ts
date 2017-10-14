@@ -71,7 +71,7 @@ export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifest
 
   let unscopedContent = unscopedContents.join('\n');
 
-  const bundleId = getBundleId(config, manifestBundle.components, modeName, unscopedContent);
+  const bundleId = getBundleId(config, manifestBundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta), modeName, unscopedContent);
 
   unscopedContent = replaceDefaulBundleId(unscopedContent, bundleId);
 
