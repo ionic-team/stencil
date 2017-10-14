@@ -64,7 +64,7 @@ export const enum SLOT_META {
 /**
  * Encapsulation
  */
-export const enum ENCAPSULATION_TYPE {
+export const enum ENCAPSULATION {
   NoEncapsulation = 0,
   ShadowDom = 1,
   ScopedCss = 2,

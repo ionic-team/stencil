@@ -1,4 +1,4 @@
-import { ENCAPSULATION_TYPE, MEMBER_TYPE, PRIORITY, PROP_CHANGE, PROP_TYPE, SLOT_META } from '../constants';
+import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_CHANGE, PROP_TYPE, SLOT_META } from '../constants';
 import { formatComponentMeta, formatLoadComponentRegistry } from '../data-serialize';
 import { parseComponentMeta, parseComponentRegistry, parsePropertyValue } from '../data-parse';
 import { ComponentMeta, ComponentRegistry } from '../interfaces';
@@ -252,19 +252,19 @@ describe('data serialize/parse', () => {
     });
 
     it('should set scoped css encapsulation', () => {
-      cmpMeta.encapsulation = ENCAPSULATION_TYPE.ShadowDom;
+      cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
       const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.encapsulation).toBe(ENCAPSULATION_TYPE.ShadowDom);
+      expect(cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
     });
 
     it('should set scoped css encapsulation', () => {
-      cmpMeta.encapsulation = ENCAPSULATION_TYPE.ScopedCss;
+      cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
       const format = formatLoadComponentRegistry(cmpMeta);
       cmpMeta = parseComponentRegistry(format, {});
 
-      expect(cmpMeta.encapsulation).toBe(ENCAPSULATION_TYPE.ScopedCss);
+      expect(cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
     });
 
     it('should set no encapsulation', () => {

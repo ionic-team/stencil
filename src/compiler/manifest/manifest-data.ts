@@ -1,7 +1,7 @@
 import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
-import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION_TYPE, MEMBER_TYPE, PROP_TYPE, PRIORITY, SLOT_META } from '../../util/constants';
+import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, SLOT_META } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
@@ -802,10 +802,10 @@ function parseSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
 
 function serializeEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     cmpData.shadow = true;
 
-  } else if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ScopedCss) {
+  } else if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
     cmpData.scoped = true;
   }
 }
@@ -813,13 +813,13 @@ function serializeEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) 
 
 function parseEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpData.shadow === true) {
-    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ShadowDom;
+    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
 
   } else if (cmpData.scoped === true) {
-    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ScopedCss;
+    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
 
   } else {
-    cmpMeta.encapsulation = ENCAPSULATION_TYPE.NoEncapsulation;
+    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
   }
 }
 

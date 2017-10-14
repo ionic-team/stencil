@@ -1,7 +1,7 @@
 import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
-import { ENCAPSULATION_TYPE, MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT_META } from '../../../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT_META } from '../../../util/constants';
 
 
 describe('manifest-data serialize/parse', () => {
@@ -65,21 +65,21 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('scoped css encapsulation', () => {
-    a.encapsulation = ENCAPSULATION_TYPE.ScopedCss;
+    a.encapsulation = ENCAPSULATION.ScopedCss;
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.scoped).toBe(true);
     expect(cmpData.shadow).toBeFalsy();
     b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
-    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION_TYPE.ScopedCss);
+    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
   });
 
   it('shadow dom encapsulation', () => {
-    a.encapsulation = ENCAPSULATION_TYPE.ShadowDom;
+    a.encapsulation = ENCAPSULATION.ShadowDom;
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.shadow).toBe(true);
     expect(cmpData.scoped).toBeFalsy();
     b = parseComponentDataToModuleFile(config, manifestDir, cmpData);
-    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION_TYPE.ShadowDom);
+    expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
   });
 
   it('slotMeta HAS_NAMED_SLOTS', () => {

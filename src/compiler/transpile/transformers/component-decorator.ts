@@ -1,6 +1,6 @@
 import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFile } from '../../../util/interfaces';
 import { buildError, catchError } from '../../util';
-import { ENCAPSULATION_TYPE } from '../../../util/constants';
+import { ENCAPSULATION } from '../../../util/constants';
 import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
 import { validateComponentTag } from '../../../util/validate-config';
@@ -95,13 +95,13 @@ export function normalizeEncapsulation(userOpts: ComponentOptions, cmpMeta: Comp
   // default to NOT use shadow dom or scoped css...to start, debatable later on
 
   if (typeof userOpts.shadow === 'boolean') {
-    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ShadowDom;
+    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
 
   } else if (typeof userOpts.scoped === 'boolean') {
-    cmpMeta.encapsulation = ENCAPSULATION_TYPE.ScopedCss;
+    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
 
   } else {
-    cmpMeta.encapsulation = ENCAPSULATION_TYPE.NoEncapsulation;
+    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
   }
 }
 

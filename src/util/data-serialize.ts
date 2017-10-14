@@ -1,6 +1,6 @@
 import { BundleIds, ComponentMeta, ComponentRegistry, CompiledModeStyles, EventMeta, ListenMeta,
   LoadComponentRegistry, MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
-import { ENCAPSULATION_TYPE, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../util/constants';
 
 
 export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadComponentRegistry {
@@ -377,14 +377,14 @@ function formatEventOpts(label: string, eventMeta: EventMeta) {
 }
 
 
-function formatEncapsulation(val: ENCAPSULATION_TYPE) {
-  if (val === ENCAPSULATION_TYPE.ShadowDom) {
-    return ENCAPSULATION_TYPE.ShadowDom;
+function formatEncapsulation(val: ENCAPSULATION) {
+  if (val === ENCAPSULATION.ShadowDom) {
+    return ENCAPSULATION.ShadowDom;
   }
-  if (val === ENCAPSULATION_TYPE.ScopedCss) {
-    return ENCAPSULATION_TYPE.ScopedCss;
+  if (val === ENCAPSULATION.ScopedCss) {
+    return ENCAPSULATION.ScopedCss;
   }
-  return ENCAPSULATION_TYPE.NoEncapsulation;
+  return ENCAPSULATION.NoEncapsulation;
 }
 
 

@@ -9,7 +9,7 @@ import {
   setBundleModeIds,
   writeBundleFile
 } from '../generate-bundles';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION_TYPE } from '../../../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { mockStencilSystem } from '../../../testing/mocks';
 
 
@@ -135,7 +135,7 @@ describe('generate-bundles', () => {
 
     it('scoped styles required for shadow dom w/ styles', () => {
       const allModuleFiles: ModuleFile[] =  [
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION_TYPE.ShadowDom, stylesMeta: {} } },
+        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION.ShadowDom, stylesMeta: {} } },
         { cmpMeta: { tagNameMeta: 'cmp-a', stylesMeta: { $: {}, md: {} } } },
         { }
       ];
@@ -146,7 +146,7 @@ describe('generate-bundles', () => {
 
     it('scoped styles required for scoped css w/ styles', () => {
       const allModuleFiles: ModuleFile[] =  [
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION_TYPE.ScopedCss, stylesMeta: {} } },
+        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION.ScopedCss, stylesMeta: {} } },
         { cmpMeta: { tagNameMeta: 'cmp-a', stylesMeta: { $: {}, md: {} } } },
         { }
       ];

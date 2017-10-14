@@ -1,7 +1,7 @@
 import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
 import { createPlatformServer } from './platform-server';
-import { ENCAPSULATION_TYPE, SSR_VNODE_ID } from '../util/constants';
+import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { initHostConstructor } from '../core/instance/init';
 import { optimizeHtml } from '../compiler/html/optimize-html';
 
@@ -143,7 +143,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
         }
       }
 
-      newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ENCAPSULATION_TYPE.NoEncapsulation, ssrId);
+      newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ENCAPSULATION.NoEncapsulation, ssrId);
 
       connectElement(plt, <HostElement>newVNode.elm, connectedInfo, config.hydratedCssClass);
 

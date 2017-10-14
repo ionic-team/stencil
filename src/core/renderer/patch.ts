@@ -8,7 +8,7 @@
  */
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
-import { ENCAPSULATION_TYPE } from '../../util/constants';
+import { ENCAPSULATION } from '../../util/constants';
 import { isDef, isUndef } from '../../util/helpers';
 import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
 import { updateElement, eventProxy } from './update-dom-node';
@@ -338,7 +338,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
       scopeId: string;
 
 
-  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION_TYPE, ssrPatchId?: number) {
+  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
@@ -346,11 +346,11 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
     hostContentNodes = hostElementContentNodes;
     ssrId = ssrPatchId;
     const tag = domApi.$tagName(oldVNode.elm).toLowerCase();
-    scopeId = (encapsulation === ENCAPSULATION_TYPE.ScopedCss || (encapsulation === ENCAPSULATION_TYPE.ShadowDom && !supportsNativeShadowDom)) ? 'data-' + tag : null;
+    scopeId = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !supportsNativeShadowDom)) ? 'data-' + tag : null;
 
     // use native shadow dom only if the component wants to use it
     // and if this browser supports native shadow dom
-    useNativeShadowDom = (encapsulation === ENCAPSULATION_TYPE.ShadowDom && supportsNativeShadowDom);
+    useNativeShadowDom = (encapsulation === ENCAPSULATION.ShadowDom && supportsNativeShadowDom);
 
     if (!isUpdate && useNativeShadowDom) {
       // this component SHOULD use native slot/shadow dom

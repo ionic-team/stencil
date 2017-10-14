@@ -6,7 +6,7 @@ import { createDomControllerClient } from './dom-controller-client';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createRendererPatch } from '../core/renderer/patch';
 import { createQueueClient } from './queue-client';
-import { ENCAPSULATION_TYPE, RUNTIME_ERROR, SSR_VNODE_ID } from '../util/constants';
+import { ENCAPSULATION, RUNTIME_ERROR, SSR_VNODE_ID } from '../util/constants';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
 import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
@@ -114,7 +114,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       assignHostContentSlots(domApi, elm, cmpMeta.slotMeta);
     }
 
-    if (!supportsNativeShadowDom && cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+    if (!supportsNativeShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
       // this component should use shadow dom
       // but this browser doesn't support it
       // so let's polyfill a few things for the user
@@ -298,7 +298,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       let styleContainerNode: Node = domApi.$head;
 
       if (supportsNativeShadowDom) {
-        if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+        if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
           styleContainerNode = elm.shadowRoot;
 
         } else {

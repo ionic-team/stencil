@@ -6,7 +6,7 @@ import { createDomApi } from '../core/renderer/dom-api';
 import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { ENCAPSULATION_TYPE, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
+import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { getAppFileName } from '../compiler/app/generate-app-files';
 import { getJsFile, normalizePath } from '../compiler/util';
 import { h, t } from '../core/renderer/h';
@@ -211,7 +211,7 @@ export function createPlatformServer(
       (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
 
       let requestBundleId = bundleId;
-      if (cmpMeta.encapsulation === ENCAPSULATION_TYPE.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION_TYPE.ShadowDom) {
+      if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
         requestBundleId += '.sc';
       }
       requestBundleId += '.js';

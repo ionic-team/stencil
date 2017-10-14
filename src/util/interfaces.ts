@@ -1,6 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
-import { ENCAPSULATION_TYPE, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_META } from './constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_META } from './constants';
 
 
 export interface CoreContext {
@@ -101,7 +101,7 @@ export interface LoadComponentRegistry {
   /**
    * encapsulated
    */
-  [4]: ENCAPSULATION_TYPE;
+  [4]: ENCAPSULATION;
 
   /**
    * slot
@@ -177,7 +177,7 @@ export interface LoadComponentMeta {
   /**
    * encapsulation
    */
-  [6]: ENCAPSULATION_TYPE;
+  [6]: ENCAPSULATION;
 }
 
 
@@ -297,11 +297,10 @@ export interface Bundle {
 
 
 export interface ManifestBundle {
-  components?: string[];
   moduleFiles: ModuleFile[];
   compiledModeStyles?: CompiledModeStyles[];
   compiledModuleText?: string;
-  priority?: number;
+  priority?: PRIORITY;
 }
 
 
@@ -711,7 +710,7 @@ export interface ComponentMeta {
   listenersMeta?: ListenMeta[];
   propsWillChangeMeta?: PropChangeMeta[];
   propsDidChangeMeta?: PropChangeMeta[];
-  encapsulation?: ENCAPSULATION_TYPE;
+  encapsulation?: ENCAPSULATION;
   hostMeta?: HostMeta;
   assetsDirsMeta?: AssetsMeta[];
   slotMeta?: SLOT_META;
@@ -857,7 +856,7 @@ export interface HostElement extends HTMLElement {
 
 
 export interface RendererApi {
-  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION_TYPE, ssrId?: number): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION, ssrId?: number): VNode;
 }
 
 
