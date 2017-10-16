@@ -12,24 +12,11 @@ import { VNode, VNodeProdData } from '../../util/interfaces';
 
 const stack: any[] = [];
 
+export type PropsType = VNodeProdData | number | string | null;
 export type ChildType = VNode | number | string;
 
-export function h(nodeName: string, vnodeData: null): VNode;
-export function h(nodeName: string, vnodeData: null, child: string): VNode;
-export function h(nodeName: string, vnodeData: null, child: number): VNode;
-export function h(nodeName: string, vnodeData: null, ...children: ChildType[]): VNode;
-export function h(nodeName: string, vnodeData: string): VNode;
-export function h(nodeName: string, vnodeData: string, child: string): VNode;
-export function h(nodeName: string, vnodeData: string, child: number): VNode;
-export function h(nodeName: string, vnodeData: string, ...children: ChildType[]): VNode;
-export function h(nodeName: string, vnodeData: number): VNode;
-export function h(nodeName: string, vnodeData: number, child: string): VNode;
-export function h(nodeName: string, vnodeData: number, child: number): VNode;
-export function h(nodeName: string, vnodeData: number, ...children: ChildType[]): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, child: string): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, child: number): VNode;
-export function h(nodeName: string, vnodeData: VNodeProdData, ...children: ChildType[]): VNode;
+export function h(nodeName: string, vnodeData: PropsType, child?: ChildType): VNode;
+export function h(nodeName: string, vnodeData: PropsType, ...children: ChildType[]): VNode;
 export function h(nodeName: any, vnodeData: any, child?: any) {
   var children: any[];
   var lastSimple = false;
