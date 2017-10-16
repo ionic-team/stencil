@@ -103,7 +103,6 @@ describe('instance update', () => {
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
-      console.log(elm.childNodes);
       expect(elm.childNodes[0].nodeType).toBe(3); // Node.TEXT_NODE
       expect(elm.childNodes[0].textContent).toBe('');
       expect(elm.childNodes[1].nodeType).toBe(1); // Node.ELEMENT_NODE

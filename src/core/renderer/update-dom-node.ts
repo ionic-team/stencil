@@ -31,7 +31,20 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
   // Class
   if (name === 'class' && !isSvg) {
     if (oldValue !== newValue) {
-      elm.className = newValue;
+      let oldList = (oldValue == null) ? [] : oldValue.trim().split(/\s+/);
+      let newList = (newValue == null) ? [] : newValue.trim().split(/\s+/);
+      let i, listLength;
+
+      for (i = 0, listLength = oldList.length; i < listLength; i += 1) {
+        if (newList.indexOf(oldList[i]) === -1) {
+          elm.classList.remove(oldList[i]);
+        }
+      }
+      for (i = 0, listLength = newList.length; i < listLength; i += 1) {
+        if (oldList.indexOf(newList[i]) === -1) {
+          elm.classList.add(newList[i]);
+        }
+      }
     }
 
   // Style

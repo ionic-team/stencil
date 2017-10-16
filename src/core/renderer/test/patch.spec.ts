@@ -96,17 +96,16 @@ describe('renderer', () => {
 
   describe('patching an element', () => {
 
-    it('changes the elements classes', () => {
-      var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
-      var vnode2 = h('i', { class: {i: true, am: true, horse: false } });
-      patch(vnode0, vnode1);
-      elm = patch(vnode0, vnode2).elm;
+    it('does not remove classes of previous from dom if vdom does not document them', () => {
+      elm.classList.add('horse');
+      var vnode1 = h('i', { class: {i: true, am: true } });
+      elm = patch(vnode0, vnode1).elm;
       expect(elm.classList.contains('i')).toBeTruthy();
       expect(elm.classList.contains('am')).toBeTruthy();
-      expect(!elm.classList.contains('horse')).toBeTruthy();
+      expect(elm.classList.contains('horse')).toBeTruthy();
     });
 
-    it('changes classes in selector', () => {
+    it('changes elements classes from previous vnode', () => {
       var vnode1 = h('i', { class: { i: true, am: true, horse: true } });
       var vnode2 = h('i', { class: { i: true, am: true, horse: false } });
       patch(vnode0, vnode1);
