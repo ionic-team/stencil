@@ -33,6 +33,26 @@ describe('instance render', () => {
     expect(elm._vnode.vchildren[0].vchildren[0].vtext).toBe('text');
   });
 
+  it('should create a vnode for non null values of an array and create text for null values', () => {
+    class MyComponent {
+      render() {
+        return [
+          null,
+          h('div', 0, 'text'),
+          null
+        ];
+      }
+    }
+
+    elm.$instance = new MyComponent();
+    render(plt, elm, {}, false);
+    expect(elm._vnode).toBeDefined();
+    expect(elm._vnode.vchildren[0].vtext).toBe('');
+    expect(elm._vnode.vchildren[1].vtag).toBe('div');
+    expect(elm._vnode.vchildren[1].vchildren[0].vtext).toBe('text');
+    expect(elm._vnode.vchildren[2].vtext).toBe('');
+  });
+
   it('should not create a vnode when there is no render() or hostData() or hostMeta', () => {
     class MyComponent {}
 

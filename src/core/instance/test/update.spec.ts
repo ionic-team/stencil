@@ -86,6 +86,34 @@ describe('instance update', () => {
     });
   });
 
+  it('should render text where null values exist in an array', () => {
+    mockDefine(plt, {
+      tagNameMeta: 'ion-test',
+      componentModule: class {
+        render() {
+          return [
+            null,
+            h('grasshopper', null, 'hi'),
+            null
+          ];
+        }
+      }
+    });
+
+    const node = mockConnect(plt, '<ion-test></ion-test>');
+
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
+      console.log(elm.childNodes);
+      expect(elm.childNodes[0].nodeType).toBe(3); // Node.TEXT_NODE
+      expect(elm.childNodes[0].textContent).toBe('');
+      expect(elm.childNodes[1].nodeType).toBe(1); // Node.ELEMENT_NODE
+      expect(elm.childNodes[1].nodeName).toBe('GRASSHOPPER');
+      expect(elm.childNodes[1].textContent).toBe('hi');
+      expect(elm.childNodes[2].nodeType).toBe(3); // Node.TEXT_NODE
+      expect(elm.childNodes[2].textContent).toBe('');
+    });
+  });
+
   it('should not run renderer when no render() fn', () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
