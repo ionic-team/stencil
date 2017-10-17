@@ -145,10 +145,25 @@ export function validatePackageFiles(config: BuildConfig, diagnostics: Diagnosti
 }
 
 
-function generatePackageModuleResolve(config: BuildConfig) {
+async function generatePackageModuleResolve(config: BuildConfig) {
+  const PromiseList: Promise<any>[] = [];
   const packageResolver = config.sys.path.join(config.collectionDir, 'index.js');
 
-  return new Promise((resolve, reject) => {
+  // If index.d.ts file exists at the root then copy it.
+  try {
+    await config.sys.ensureFile(config.sys.path.join(config.srcDir, 'index.d.ts'));
+    PromiseList.push(config.sys.copy(
+      config.sys.path.join(config.srcDir, 'index.d.ts'),
+      config.sys.path.join(config.collectionDir, 'index.d.ts')
+    ));
+  } catch (e) {}
+
+  PromiseList.push(config.sys.copy(
+    config.sys.path.join(config.srcDir, 'components.d.ts'),
+    config.sys.path.join(config.collectionDir, 'components.d.ts')
+  ));
+
+  PromiseList.push(new Promise((resolve, reject) => {
     config.sys.fs.writeFile(packageResolver, '', err => {
       if (err) {
         reject(err);
@@ -156,7 +171,9 @@ function generatePackageModuleResolve(config: BuildConfig) {
         resolve();
       }
     });
-  });
+  }));
+
+  return Promise.all(PromiseList);
 }
 
 

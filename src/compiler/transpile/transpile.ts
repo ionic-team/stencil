@@ -127,12 +127,6 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, opti
   // cache this for rebuilds to avoid unnecessary writes
   ctx.appFiles.components_d_ts = componentFile;
 
-  // Only generate components.d.ts file in dist if generateDistributon is set to true in the config.
-  if (config.generateDistribution) {
-    const distFilePath = config.sys.path.join(options.outDir, 'components.d.ts');
-    ctx.filesToWrite[distFilePath] = componentFile;
-  }
-
   const rootFilePath = config.sys.path.join(options.rootDir, 'components.d.ts');
   ctx.filesToWrite[rootFilePath] = componentFile;
 }
