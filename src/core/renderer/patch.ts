@@ -385,7 +385,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
 export function invokeDestroy(vnode: VNode) {
   if (vnode) {
     const elm = (vnode.elm as any);
-    if (elm._listeners) {
+    if (elm && elm._listeners) {
       for (var key in elm._listeners) {
         elm.removeEventListener(key, eventProxy, false);
       }
