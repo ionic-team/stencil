@@ -135,7 +135,7 @@ function setHydratedCss(config: BuildConfig, cmpMeta: ComponentMeta, compiledMod
 
 
 function appendHydratedCss(styles: string, selector: string, important?: boolean) {
-  return `${styles}\n${selector}{visibility:inherit${important ? ' !important' : ''}}`;
+  return `${styles || ''}\n${selector}{visibility:inherit${important ? ' !important' : ''}}`;
 }
 
 
