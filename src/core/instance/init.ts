@@ -3,7 +3,6 @@ import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfac
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initEventEmitters } from './events';
-import { createMutationObserver } from './mutation-observer';
 import { initProxy } from './proxy';
 import { queueUpdate } from './update';
 import { render } from './render';
@@ -87,11 +86,6 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement) {
   } catch (e) {
     plt.onError(e, RUNTIME_ERROR.QueueEventsError, elm);
   }
-
-  // Create a mutation observer that will identify changes to the elements
-  // children. When mutations occur rerender.  This only creates the observer
-  // it does not start observing.
-  createMutationObserver(plt, elm);
 }
 
 

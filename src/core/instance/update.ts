@@ -1,7 +1,6 @@
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { initComponentInstance } from './init';
 import { RUNTIME_ERROR } from '../../util/constants';
-import { stopObserving, startObserving } from './mutation-observer';
 
 
 export function queueUpdate(plt: PlatformApi, elm: HostElement) {
@@ -96,9 +95,6 @@ export function update(plt: PlatformApi, elm: HostElement) {
 
 
 export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean) {
-  // stop the observer so that we do not observe our own changes
-  stopObserving(plt, elm);
-
   // if this component has a render function, let's fire
   // it off and generate a vnode for this
   try {
@@ -109,9 +105,6 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
   } catch (e) {
     plt.onError(e, RUNTIME_ERROR.RenderError, elm, true);
   }
-
-  // after render we need to start the observer back up.
-  startObserving(plt, elm);
 
   try {
     if (isInitialLoad) {
