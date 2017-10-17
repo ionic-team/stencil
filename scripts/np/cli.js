@@ -49,7 +49,11 @@ Promise
 	})
 	.then(options => np(options.version, options))
 	.then(pkg => {
-		console.log(`\n ${pkg.name} ${pkg.version} published 🎉`);
+		if (cli.flags.dryRun) {
+			console.log(`\n ${pkg.name} dryrun publish finished 🕵️`);
+		} else {
+			console.log(`\n ${pkg.name} ${pkg.version} published 🎉`);
+		}
 	})
 	.catch(err => {
 		console.error(`\n${logSymbols.error} ${err.message}`);
