@@ -34,7 +34,7 @@ module.exports = (input, opts) => {
 
 	const pkg = util.readPkg();
 
-	const tasks = new Listr([
+	const tasks = [
 		{
 			title: 'Prerequisite check',
 			task: () => prerequisiteTasks(input, pkg, opts),
@@ -82,21 +82,30 @@ module.exports = (input, opts) => {
 			title: 'Cleanup "dist" @stencil/core package',
 			task: () => exec('node', ['post-package.js'], { cwd: scriptsDir })
 		},
-		{
+	];
+
+	if (opts.dryRun) {
+		// dry run
+		tasks.push({
+			title: 'Create dist/core.tar.gz package',
+			task: () => exec('tar', ['-zcf', 'core.tar.gz', './'], { cwd: dstDir }),
+		});
+
+	} else {
+		// publish
+		tasks.push({
 			title: 'Publish "dist" @stencil/core package',
-			task: () => exec('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir }),
-			skip: () => opts.dryRun
+			task: () => exec('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir })
 		},
 		{
 			title: 'Pushing to Github',
-			task: () => exec('git', ['push', '--follow-tags'], { cwd: rootDir }),
-			skip: () => opts.dryRun
-		}
+			task: () => exec('git', ['push', '--follow-tags'], { cwd: rootDir })
+		});
+	}
 
-	], { showSubtasks: false });
+	const listr = new Listr(tasks, { showSubtasks: false });
 
-
-	return tasks.run()
+	return listr.run()
 		.then(() => readPkgUp())
 		.then(result => result.pkg);
 };
