@@ -139,6 +139,16 @@ describe('renderer', () => {
       expect(!elm.classList.contains('horse')).toBeTruthy();
     });
 
+    it('removes classes when class set to empty string', () => {
+      var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
+      var vnode2 = h('i', { class: '' });
+      patch(vnode0, vnode1);
+      elm = patch(vnode1, vnode2).elm;
+      expect(elm.classList.contains('i')).toBeFalsy();
+      expect(elm.classList.contains('am')).toBeFalsy();
+      expect(!elm.classList.contains('horse')).toBeTruthy();
+    });
+
 
     describe('using toVNode()', () => {
 
