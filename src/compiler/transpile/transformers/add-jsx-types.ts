@@ -32,8 +32,8 @@ declare global {
   }
   namespace JSXElements {
       export interface ${jsxInterfaceName} extends HTMLAttributes {
-          mode?: 'string',
-          color?: 'string',
+          mode?: string,
+          color?: string,
         ${Object.keys(interfaceOptions).map((key: string) => `
           ${key}?: ${interfaceOptions[key]}`
         )}
