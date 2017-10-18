@@ -31,10 +31,10 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
   // Class
   if (name === 'class' && !isSvg) {
     if (oldValue !== newValue) {
-      const oldList: string = (oldValue == null || oldValue === '') ? [] : oldValue.trim().split(/\s+/);
-      const newList: string = (newValue == null || newValue === '') ? [] : newValue.trim().split(/\s+/);
+      const oldList: string[] = (oldValue == null || oldValue === '') ? [] : oldValue.trim().split(/\s+/);
+      const newList: string[] = (newValue == null || newValue === '') ? [] : newValue.trim().split(/\s+/);
 
-      let classList: string[] = !!elm.className ? elm.className.trim().split(/\s+/) : [];
+      let classList: string[] = (elm.className == null || elm.className === '') ? [] : elm.className.trim().split(/\s+/);
 
       let i: number, listLength: number;
 
