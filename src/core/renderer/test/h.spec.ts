@@ -100,6 +100,12 @@ describe('h()', () => {
     expect(vnode.vattrs.class).toEqual('  dragons   love  tacos  ');
   });
 
+  it('should have class exactly as passed if string w/ duplicates', () => {
+    var vnode = h("div", { class: 'middle aligned center aligned' });
+    expect(vnode.vattrs.class).toBeDefined();
+    expect(vnode.vattrs.class).toEqual('middle aligned center aligned');
+  });
+
   it('should have class based on classes as keys of an object', () => {
     var vnode = h('div', { class: { 'dragons': true, 'love': true, 'tacos': true } });
     expect(vnode.vattrs.class).toBeDefined();
