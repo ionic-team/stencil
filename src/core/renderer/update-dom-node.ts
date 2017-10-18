@@ -45,7 +45,7 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
       }
       for (i = 0, listLength = newList.length; i < listLength; i += 1) {
         if (oldList.indexOf(newList[i]) === -1) {
-          classList.push(newList[i]);
+          classList = [...classList, newList[i]];
         }
       }
 
