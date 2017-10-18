@@ -31,20 +31,25 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
   // Class
   if (name === 'class' && !isSvg) {
     if (oldValue !== newValue) {
-      let oldList = (oldValue == null || oldValue === '') ? [] : oldValue.trim().split(/\s+/);
-      let newList = (newValue == null || newValue === '') ? [] : newValue.trim().split(/\s+/);
-      let i, listLength;
+      const oldList: string = (oldValue == null || oldValue === '') ? [] : oldValue.trim().split(/\s+/);
+      const newList: string = (newValue == null || newValue === '') ? [] : newValue.trim().split(/\s+/);
+
+      let classList: string[] = !!elm.className ? elm.className.trim().split(/\s+/) : [];
+
+      let i: number, listLength: number;
 
       for (i = 0, listLength = oldList.length; i < listLength; i += 1) {
         if (newList.indexOf(oldList[i]) === -1) {
-          elm.classList.remove(oldList[i]);
+          classList = classList.filter((c: string) => c !== oldList[i]);
         }
       }
       for (i = 0, listLength = newList.length; i < listLength; i += 1) {
         if (oldList.indexOf(newList[i]) === -1) {
-          elm.classList.add(newList[i]);
+          classList.push(newList[i]);
         }
       }
+
+      elm.className = classList.join(' ');
     }
 
   // Style
