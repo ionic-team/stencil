@@ -322,9 +322,10 @@ export function mockDomApi(document?: any) {
 }
 
 
-export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi): RendererApi {
-  plt = plt || mockPlatform();
-  return createRendererPatch(<PlatformApi>plt, domApi || mockDomApi(), false);
+export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi, supportsNativeShadowDom?: boolean): RendererApi {
+  supportsNativeShadowDom = !!supportsNativeShadowDom;
+  plt = plt || mockPlatform(supportsNativeShadowDom);
+  return createRendererPatch(<PlatformApi>plt, domApi || mockDomApi(), supportsNativeShadowDom);
 }
 
 
