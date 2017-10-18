@@ -241,15 +241,32 @@ describe('validation', () => {
 
     it('should not allow special characters in namespace', () => {
       expect(() => {
-        config.namespace = 'My-Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-      expect(() => {
         config.namespace = 'My/Namespace';
         validateBuildConfig(config);
       }).toThrow();
       expect(() => {
         config.namespace = 'My%20Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should not allow spaces in namespace', () => {
+      expect(() => {
+        config.namespace = 'My Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should not allow dash for last character of namespace', () => {
+      expect(() => {
+        config.namespace = 'MyNamespace-';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should not allow dash for first character of namespace', () => {
+      expect(() => {
+        config.namespace = '-MyNamespace';
         validateBuildConfig(config);
       }).toThrow();
     });
@@ -266,6 +283,12 @@ describe('validation', () => {
         config.namespace = 'ab';
         validateBuildConfig(config);
       }).toThrow();
+    });
+
+    it('should allow dash in the namespace', () => {
+      config.namespace = 'My-Namespace';
+      validateBuildConfig(config);
+      expect(config.namespace).toBe('My-Namespace');
     });
 
     it('should set user namespace', () => {

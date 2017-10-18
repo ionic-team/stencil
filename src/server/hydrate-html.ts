@@ -175,7 +175,7 @@ export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo
   if (!elm.$connected) {
     // only connect elements which is a registered component
     const cmpMeta = plt.getComponentMeta(elm);
-    if (cmpMeta) {
+    if (cmpMeta && cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
       // init our host element functions
       // not using Element.prototype on purpose
       if (!elm.connectedCallback) {

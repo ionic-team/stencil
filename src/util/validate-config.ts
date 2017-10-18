@@ -25,16 +25,7 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
   if (typeof config.namespace !== 'string') {
     config.namespace = DEFAULT_NAMESPACE;
   }
-  const invalidNamespaceChars = config.namespace.replace(/\w/g, '');
-  if (invalidNamespaceChars !== '') {
-    throw new Error(`Namespace "${config.namespace}" contains invalid characters: ${invalidNamespaceChars}`);
-  }
-  if (config.namespace.length < 3) {
-    throw new Error(`Namespace "${config.namespace}" must be at least 3 characters`);
-  }
-  if (/^\d+$/.test(config.namespace.charAt(0))) {
-    throw new Error(`Namespace "${config.namespace}" cannot have a number for the first character`);
-  }
+  config.namespace = validateNamespace(config.namespace);
 
   const path = config.sys.path;
 
@@ -205,6 +196,30 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
   }
 
   return config;
+}
+
+
+function validateNamespace(namespace: string) {
+  namespace = namespace.trim();
+
+  const invalidNamespaceChars = namespace.replace(/(\w)|(\-)/g, '');
+  if (invalidNamespaceChars !== '') {
+    throw new Error(`Namespace "${namespace}" contains invalid characters: ${invalidNamespaceChars}`);
+  }
+  if (namespace.length < 3) {
+    throw new Error(`Namespace "${namespace}" must be at least 3 characters`);
+  }
+  if (/^\d+$/.test(namespace.charAt(0))) {
+    throw new Error(`Namespace "${namespace}" cannot have a number for the first character`);
+  }
+  if (namespace.charAt(0) === '-') {
+    throw new Error(`Namespace "${namespace}" cannot have a dash for the first character`);
+  }
+  if (namespace.charAt(namespace.length - 1) === '-') {
+    throw new Error(`Namespace "${namespace}" cannot have a dash for the last character`);
+  }
+
+  return namespace;
 }
 
 
