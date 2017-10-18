@@ -342,7 +342,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
-    isUpdatePatch;
+    isUpdate = isUpdatePatch;
     hostContentNodes = hostElementContentNodes;
     ssrId = ssrPatchId;
     const tag = domApi.$tagName(oldVNode.elm).toLowerCase();
