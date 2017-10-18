@@ -88,6 +88,12 @@ describe('renderer', () => {
       expect(!elm.classList.contains('not')).toBeTruthy();
     });
 
+    it('should not remove duplicate css classes', () => {
+      let vnode1 = h('div', { class: 'middle aligned center aligned' }, 'Hello');
+      elm = patch(vnode0, vnode1).elm;
+      expect(elm.className).toEqual('middle aligned center aligned');
+    })
+
     it('can create elements with text content', () => {
       elm = patch(vnode0, h('div', null, 'I am a string')).elm;
       expect(elm.innerHTML).toEqual('I am a string');

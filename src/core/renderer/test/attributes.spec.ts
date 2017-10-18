@@ -63,12 +63,6 @@ describe('attributes', function() {
     expect(elm.textContent).toEqual('Hello');
   });
 
-  it('should not remove duplicate class names', function() {
-    var vnode1 = h('div', { class: 'middle aligned center aligned' }, 'Hello');
-    elm = patch(vnode0, vnode1).elm;
-    expect(elm.className).toEqual('middle aligned center aligned');
-  });
-
   describe('boolean attribute', function() {
 
     it('is present if the value is truthy', function() {
