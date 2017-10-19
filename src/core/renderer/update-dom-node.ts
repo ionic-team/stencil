@@ -90,14 +90,11 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
    * - check if elm contains name or if the value is array, object, or function
    */
   } else if (name !== 'list' && name !== 'type' && !isSvg &&
-      (name in elm || ['object', 'function', 'undefined'].indexOf(typeof newValue) !== -1)) {
+      (name in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)) {
     setProperty(elm, name, newValue);
-    if (newValue === undefined) {
-      delete (elm as any)[name];
-    }
 
   // Element Attributes
-  } else {
+  } else if (newValue != null) {
     let ns = (name !== (name = name.replace(/^xlink\:?/, '')));
 
     if (BOOLEAN_ATTRS[name] === 1 && (!newValue || newValue === 'false')) {
