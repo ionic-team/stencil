@@ -91,7 +91,10 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
    */
   } else if (name !== 'list' && name !== 'type' && !isSvg &&
       (name in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)) {
-    setProperty(elm, name, newValue);
+    setProperty(elm, name, newValue == null ? '' : newValue);
+    if (newValue == null || newValue === false) {
+      elm.removeAttribute(name);
+    }
 
   // Element Attributes
   } else if (newValue != null) {
