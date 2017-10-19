@@ -945,7 +945,7 @@ export interface PlatformApi {
   tmpDisconnected?: boolean;
   onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   isClient?: boolean;
-  attachStyles: (cmpMeta: ComponentMeta, elm: HostElement) => void;
+  attachStyles: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
 }
 
 

@@ -290,9 +290,9 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   }
 
 
-  function attachStyles(cmpMeta: ComponentMeta, elm: HostElement) {
-    const tagForStyles = cmpMeta.tagNameMeta;
-    const templateElm = styleTemplates[tagForStyles];
+  function attachStyles(cmpMeta: ComponentMeta, modeName: string, elm: HostElement) {
+    const styleId = cmpMeta.tagNameMeta + (modeName ? `_${modeName}` : ``);
+    const templateElm = styleTemplates[styleId];
 
     if (templateElm) {
       let styleContainerNode: Node = domApi.$head;
@@ -313,14 +313,14 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
       const appliedStyles = ((styleContainerNode as HostElement)._appliedStyles = (styleContainerNode as HostElement)._appliedStyles || {});
 
-      if (!appliedStyles[tagForStyles]) {
+      if (!appliedStyles[styleId]) {
         // we haven't added these styles to this element yet
         const styleElm = templateElm.content.cloneNode(true) as HTMLStyleElement;
 
         domApi.$insertBefore(styleContainerNode, styleElm, styleContainerNode.firstChild);
 
         // remember we don't need to do this again for this element
-        appliedStyles[tagForStyles] = true;
+        appliedStyles[styleId] = true;
       }
     }
   }

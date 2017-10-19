@@ -1,6 +1,6 @@
 import { BundleIds, ComponentMeta, ComponentRegistry, CompiledModeStyles, EventMeta, ListenMeta,
   LoadComponentRegistry, MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../util/constants';
 
 
 export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadComponentRegistry {
@@ -188,7 +188,11 @@ export function formatLoadStyles(namespace: string, bundleStyles: CompiledModeSt
 
     if (styles.length > 0) {
       // arg EVEN
-      args.push(bundleStyle.tag);
+      let styleId = bundleStyle.tag;
+      if (bundleStyle.modeName !== DEFAULT_STYLE_MODE) {
+        styleId += '_' + bundleStyle.modeName;
+      }
+      args.push(styleId);
 
       // arg ODD
       args.push(styles);
