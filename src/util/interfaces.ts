@@ -132,14 +132,19 @@ export interface ComponentMemberData {
   [1]: number;
 
   /**
-   * prop type
+   * is attribute to observe
    */
   [2]: number;
 
   /**
+   * prop type
+   */
+  [3]: number;
+
+  /**
    * controller id
    */
-  [3]: string;
+  [4]: string;
 }
 
 

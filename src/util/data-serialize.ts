@@ -3,12 +3,12 @@ import { BundleIds, ComponentMeta, ComponentRegistry, CompiledModeStyles, EventM
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../util/constants';
 
 
-export function formatLoadComponentRegistry(cmpMeta: ComponentMeta): LoadComponentRegistry {
+export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegistry {
   const d: any[] = [
     cmpMeta.tagNameMeta,
     formatBundleIds(cmpMeta.bundleIds),
     formatHasStyles(cmpMeta.stylesMeta),
-    formatObserveAttributeProps(cmpMeta.membersMeta),
+    formatProps(cmpMeta.membersMeta),
     formatEncapsulation(cmpMeta.encapsulation),
     formatSlot(cmpMeta.slotMeta),
     formatListeners(cmpMeta.listenersMeta),
@@ -66,7 +66,7 @@ function formatSlot(val: number) {
 }
 
 
-function formatObserveAttributeProps(membersMeta: MembersMeta) {
+function formatProps(membersMeta: MembersMeta) {
   if (!membersMeta) {
     return 0;
   }
@@ -78,14 +78,19 @@ function formatObserveAttributeProps(membersMeta: MembersMeta) {
   memberNames.forEach(memberName => {
     const memberMeta = membersMeta[memberName];
 
-    if (!memberMeta.attribName) {
-      return;
-    }
-
     const d: any[] = [
       memberName,
       memberMeta.memberType
     ];
+
+    if (typeof memberMeta.attribName === 'string') {
+      // observe the attribute
+      d.push(1);
+
+    } else {
+      // do not observe the attribute
+      d.push(0);
+    }
 
     if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String) {
       d.push(memberMeta.propType);
@@ -133,7 +138,7 @@ export function formatComponentRegistry(registry: ComponentRegistry) {
   // ensure we've got a standard order of the components
   return Object.keys(registry).sort().map(tag => {
     if (registry[tag]) {
-      return formatLoadComponentRegistry(registry[tag]);
+      return formatComponentLoader(registry[tag]);
     }
     return null;
   }).filter(c => c);

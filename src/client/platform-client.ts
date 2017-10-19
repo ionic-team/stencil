@@ -9,7 +9,7 @@ import { createQueueClient } from './queue-client';
 import { ENCAPSULATION, RUNTIME_ERROR, SSR_VNODE_ID } from '../util/constants';
 import { h, t } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init';
-import { parseComponentMeta, parseComponentRegistry } from '../util/data-parse';
+import { parseComponentMeta, parseComponentLoaders } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
 import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
@@ -126,7 +126,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   function registerComponents(components: LoadComponentRegistry[]) {
     // this is the part that just registers the minimal amount of data
     // it's basically a map of the component tag name to its associated external bundles
-    return (components || []).map(data => parseComponentRegistry(data, registry));
+    return (components || []).map(data => parseComponentLoaders(data, registry));
   }
 
 
