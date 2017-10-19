@@ -20,7 +20,6 @@ export function getEventDecoratorMeta(tsFilePath: string, diagnostics: Diagnosti
         isEvent = true;
 
         n.getChildAt(1).forEachChild(n => {
-
           if (n.kind === ts.SyntaxKind.ObjectLiteralExpression) {
             try {
               const fnStr = `return ${n.getText()};`;
@@ -33,14 +32,17 @@ export function getEventDecoratorMeta(tsFilePath: string, diagnostics: Diagnosti
             }
           }
         });
-
       } else if (isEvent) {
         if (n.kind === ts.SyntaxKind.Identifier && !methodName) {
           methodName = n.getText().trim();
+        } else if (n.kind === ts.SyntaxKind.ComputedPropertyName &&
+                   n.getChildCount() === 3 &&
+                   !methodName) {
+          const literal = n.getChildAt(1).getText();
+          methodName = literal.substring(1, literal.length - 1);
         }
       }
     });
-
 
     if (isEvent && methodName) {
       let eventMeta = validateEvent(rawEventMeta, methodName);
