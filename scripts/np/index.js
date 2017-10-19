@@ -47,11 +47,13 @@ module.exports = (input, opts) => {
 		},
 		{
 			title: 'Cleanup',
-			task: () => del('node_modules')
+			task: () => del('node_modules'),
+			skip: () => opts.dryRun
 		},
 		{
 			title: 'Install root dependencies',
-			task: () => exec('npm', ['install', '--no-package-lock'], { cwd: rootDir })
+			task: () => exec('npm', ['install'], { cwd: rootDir }),
+			skip: () => opts.dryRun
 		},
 		{
 			title: 'Build @stencil/core',
