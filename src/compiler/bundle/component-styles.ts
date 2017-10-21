@@ -170,6 +170,7 @@ function compileSassFile(config: BuildConfig, ctx: BuildContext, moduleFile: Mod
 
   return new Promise(resolve => {
     const sassConfig = {
+      ...config.sassConfig,
       file: absStylePath,
       outputStyle: config.minifyCss ? 'compressed' : 'expanded',
     };
