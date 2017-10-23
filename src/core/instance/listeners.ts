@@ -115,12 +115,18 @@ export function addEventListener(
   elm: Element|HTMLDocument|Window,
   eventName: string,
   listenerCallback: {(ev?: any): any},
-  useCapture: boolean,
-  usePassive: boolean
+  useCapture?: boolean,
+  usePassive?: boolean
 ) {
   // depending on the event name, we could actually be
   // attaching this element to something like the document or window
   let splt = eventName.split(':');
+  let testKeyCode = 0;
+
+  // get our event listener options
+  // mainly this is used to set passive events if this browser supports it
+  const eventListenerOpts = plt.getEventOptions(useCapture, usePassive);
+
   if (elm && splt.length > 1) {
     // document:mousemove
     // parent:touchend
@@ -136,7 +142,6 @@ export function addEventListener(
 
   // test to see if we're looking for an exact keycode
   splt = eventName.split('.');
-  let testKeyCode = 0;
 
   if (splt.length > 1) {
     // looks like this listener is also looking for a keycode
@@ -163,46 +168,19 @@ export function addEventListener(
       // only queue an update if this element itself is a host element
       // and only queue an update if host element's instance is ready
       // once its instance has been created, it'll then queue the update again
-
       // queue it up for an update which then runs a re-render
       (elm as HostElement)._queueUpdate();
-
-      // test if this is the user's interaction
-      if (isUserInteraction(eventName)) {
-        // so turns out that it's very important to flush the queue NOW
-        // this way the app immediately reflects whatever the user just did
-        plt.queue.flush();
-      }
     }
   }
-
-  // get our event listener options
-  // mainly this is used to set passive events if this browser supports it
-  const eventListenerOpts = plt.getEventOptions(useCapture, usePassive);
 
   // ok, good to go, let's add the actual listener to the dom element
   elm.addEventListener(eventName, eventListener, eventListenerOpts);
 
   // return a function which is used to remove this very same listener
   return function removeListener() {
-    if (elm) {
-      elm.removeEventListener(eventName, eventListener, eventListenerOpts);
-    }
+    elm && elm.removeEventListener(eventName, eventListener, eventListenerOpts);
   };
 }
-
-
-function isUserInteraction(eventName: string) {
-  for (var i = 0; i < USER_INTERACTIONS.length; i++) {
-    if (eventName.indexOf(USER_INTERACTIONS[i]) > -1) {
-      return true;
-    }
-  }
-  return false;
-}
-
-
-const USER_INTERACTIONS = ['touch', 'mouse', 'pointer', 'key', 'focus', 'blur', 'drag'];
 
 
 export function detachListeners(elm: HostElement) {
