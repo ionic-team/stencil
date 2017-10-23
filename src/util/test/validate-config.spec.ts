@@ -232,6 +232,13 @@ describe('validation', () => {
       expect(path.isAbsolute(config.srcDir)).toBe(true);
     });
 
+    it('should set src dir and convert to absolute path', () => {
+      config.srcDir = 'app';
+      validateBuildConfig(config);
+      expect(path.basename(config.srcDir)).toBe('app');
+      expect(path.isAbsolute(config.srcDir)).toBe(true);
+    });
+
     it('should convert global to absolute path, if a global property was provided', () => {
       config.global = 'src/global/index.ts';
       validateBuildConfig(config);
