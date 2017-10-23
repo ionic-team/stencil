@@ -165,7 +165,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     },
 
     minifyCss(input) {
-      const CleanCSS = require('./clean-css');
+      const CleanCSS = require('./clean-css').cleanCss;
       const result = new CleanCSS().minify(input);
       const diagnostics: Diagnostic[] = [];
 
