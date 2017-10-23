@@ -23,6 +23,8 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     throw new Error(`unable to resolve "typescript" from: ${distRootDir}`);
   }
 
+  const sysUtil = require('./sys-util');
+
   const sys: StencilSystem = {
 
     compiler: {
@@ -34,8 +36,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     copy(src, dest, opts) {
       return new Promise((resolve, reject) => {
         opts = opts || {};
-        const fsExtra = require('fs-extra');
-        fsExtra.copy(src, dest, opts, (err: any) => {
+        sysUtil.fsExtra.copy(src, dest, opts, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -49,8 +50,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     emptyDir(dir: any) {
       return new Promise((resolve, reject) => {
-        const fsExtra = require('fs-extra');
-        fsExtra.emptyDir(dir, (err: any) => {
+        sysUtil.fsExtra.emptyDir(dir, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -62,8 +62,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     ensureDir(dir: any) {
       return new Promise((resolve, reject) => {
-        const fsExtra = require('fs-extra');
-        fsExtra.ensureDir(dir, (err: any) => {
+        sysUtil.fsExtra.ensureDir(dir, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -74,14 +73,12 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     },
 
     ensureDirSync(dir: any) {
-      const fsExtra = require('fs-extra');
-      fsExtra.ensureDirSync(dir);
+      sysUtil.fsExtra.ensureDirSync(dir);
     },
 
     ensureFile(file: any) {
       return new Promise((resolve, reject) => {
-        const fsExtra = require('fs-extra');
-        fsExtra.ensureFile(file, (err: any) => {
+        sysUtil.fsExtra.ensureFile(file, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -125,8 +122,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     glob(pattern, opts) {
       return new Promise((resolve, reject) => {
-        const glob = require('glob');
-        glob(pattern, opts, (err: any, files: string[]) => {
+        sysUtil.glob(pattern, opts, (err: any, files: string[]) => {
           if (err) {
             reject(err);
           } else {
@@ -165,12 +161,11 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     },
 
     isGlob(str: string) {
-      const isGlob = require('is-glob');
-      return isGlob(str);
+      return sysUtil.isGlob(str);
     },
 
     minifyCss(input) {
-      const CleanCSS = require('clean-css');
+      const CleanCSS = require('./clean-css');
       const result = new CleanCSS().minify(input);
       const diagnostics: Diagnostic[] = [];
 
@@ -228,8 +223,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     remove(dir) {
       return new Promise((resolve, reject) => {
-        const fsExtra = require('fs-extra');
-        fsExtra.remove(dir, (err: any) => {
+        sysUtil.fsExtra.remove(dir, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -240,6 +234,8 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     },
 
     resolveModule,
+
+    semver: sysUtil.semver,
 
     vm: {
       createContext,
