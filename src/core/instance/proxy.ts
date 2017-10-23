@@ -16,10 +16,9 @@ export function proxyHostElementPrototype(plt: PlatformApi, membersMeta: Members
 
     if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
       // @Prop() or @Prop({ mutable: true })
-      defineProperty(
+      definePropertyGetterSetter(
         hostPrototype,
         memberName,
-        false,
         function getHostElementProp() {
           // host element getter (cannot be arrow fn)
           // yup, ugly, srynotsry
@@ -36,7 +35,7 @@ export function proxyHostElementPrototype(plt: PlatformApi, membersMeta: Members
       // @Method()
       // add a placeholder noop value on the host element's prototype
       // incase this method gets called before setup
-      defineProperty(hostPrototype, memberName, noop);
+      definePropertyValue(hostPrototype, memberName, noop);
     }
   });
 }
@@ -122,10 +121,9 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
 
     // add getter/setter to the component instance
     // these will be pointed to the internal data set from the above checks
-    defineProperty(
+    definePropertyGetterSetter(
       instance,
       memberName,
-      false,
       getComponentProp,
       setComponentProp
     );
@@ -138,24 +136,24 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     // @Element()
     // add a getter to the element reference using
     // the member name the component meta provided
-    defineProperty(instance, memberName, elm);
+    definePropertyValue(instance, memberName, elm);
 
   } else if (memberType === MEMBER_TYPE.Method) {
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
-    defineProperty(elm, memberName, instance[memberName].bind(instance));
+    definePropertyValue(elm, memberName, instance[memberName].bind(instance));
 
   } else if (memberType === MEMBER_TYPE.PropContext) {
     // @Prop({ context: 'config' })
     var contextObj = plt.getContextItem(memberMeta.ctrlId);
     if (contextObj) {
-      defineProperty(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
+      definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
     }
 
   } else if (memberType === MEMBER_TYPE.PropConnect) {
     // @Prop({ connect: 'ion-loading-ctrl' })
-    defineProperty(instance, memberName, plt.propConnect(memberMeta.ctrlId));
+    definePropertyValue(instance, memberName, plt.propConnect(memberMeta.ctrlId));
   }
 }
 
@@ -210,23 +208,22 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
 }
 
 
-function defineProperty(obj: any, propertyKey: string, value: any, getter?: any, setter?: any) {
+function definePropertyValue(obj: any, propertyKey: string, value: any) {
   // minification shortcut
-  const descriptor: PropertyDescriptor = {
-    configurable: true
-  };
-  if (value !== undefined) {
-    descriptor.value = value;
+  Object.defineProperty(obj, propertyKey, {
+    'configurable': true,
+    'value': value
+  });
+}
 
-  } else {
-    if (getter) {
-      descriptor.get = getter;
-    }
-    if (setter) {
-      descriptor.set = setter;
-    }
-  }
-  Object.defineProperty(obj, propertyKey, descriptor);
+
+function definePropertyGetterSetter(obj: any, propertyKey: string, get: any, set: any) {
+  // minification shortcut
+  Object.defineProperty(obj, propertyKey, {
+    'configurable': true,
+    'get': get,
+    'set': set
+  });
 }
 
 
