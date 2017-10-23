@@ -4,8 +4,10 @@ import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
 import { initHostConstructor } from '../core/instance/init-host';
+import { initComponentInstance } from '../core/instance/init-component';
 import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../util/validate-config';
+import { ComponentInstance } from '../util/interfaces';
 
 
 export function mockPlatform(supportsShadowDom?: boolean) {
@@ -55,7 +57,7 @@ export function mockPlatform(supportsShadowDom?: boolean) {
 }
 
 
-export interface MockedPlatform {
+export interface MockedPlatform extends PlatformApi {
   $flushQueue?: () => Promise<any>;
   $flushLoadBundle?: () => Promise<any>;
 }
@@ -372,6 +374,13 @@ export function mockElement(tag: string): Element {
   return jsdom.JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
 }
 
+export function mockComponentInstance(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta = {}): ComponentInstance {
+  mockDefine(plt, cmpMeta);
+
+  const el = domApi.$createElement('ion-cmp') as any;
+  initComponentInstance(plt, el);
+  return el.$instance;
+}
 
 export function mockTextNode(text: string): Element {
   const jsdom = require('jsdom');
@@ -380,6 +389,9 @@ export function mockTextNode(text: string): Element {
 
 
 export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
+  if (!cmpMeta.tagNameMeta) {
+    cmpMeta.tagNameMeta = 'ion-cmp';
+  }
   if (!cmpMeta.componentModule) {
     cmpMeta.componentModule = class {};
   }
@@ -392,6 +404,16 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
   return cmpMeta;
 }
 
+export function mockEvent(domApi: DomApi, name: string, detail: any = {}): CustomEvent {
+  const evt = domApi.$createEvent();
+  evt.initCustomEvent(name, false, false, detail);
+  return evt;
+}
+
+export function mockDispatchEvent(domApi: DomApi, el: HTMLElement, name: string, detail: any = {}): boolean {
+  const event = mockEvent(domApi, name, detail);
+  return el.dispatchEvent(event);
+}
 
 export function mockConnect(plt: MockedPlatform, html: string) {
   const jsdom = require('jsdom');
@@ -426,17 +448,16 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
 export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Promise<HostElement> {
   const elm: HostElement = rootNode.tagName === tag.toLowerCase() ? rootNode : rootNode.querySelector(tag);
 
-  return plt.$flushQueue().then(() => {
+  return plt.$flushQueue()
     // flush to read attribute mode on host elment
-    return plt.$flushLoadBundle().then(() => {
-      // flush to load component mode data
-      return plt.$flushQueue().then(() => {
-        // flush to do the update
-        connectComponents(plt, elm);
-        return elm;
-      });
+    .then(() => plt.$flushLoadBundle())
+    // flush to load component mode data
+    .then(() => plt.$flushQueue())
+    .then(() => {
+      // flush to do the update
+      connectComponents(plt, elm);
+      return elm;
     });
-  });
 }
 
 

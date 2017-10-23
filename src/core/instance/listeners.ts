@@ -72,7 +72,7 @@ export function replayQueuedEventsOnInstance(elm: HostElement) {
 }
 
 
-export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string) {
+export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element) {
   if (instance) {
     const elm = instance.__el;
     const cmpMeta = plt.getComponentMeta(elm);
@@ -85,28 +85,34 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
         var listener = listenerMeta[i];
 
         if (listener.eventName === eventName) {
-
-          if (shouldEnable && !deregisterFns[eventName]) {
-            var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
+          var fn = deregisterFns[eventName];
+          if (shouldEnable && !fn) {
+            var attachToEventName = eventName;
+            var element = elm;
+            if (typeof attachTo === 'string') {
+              attachToEventName = `${attachTo}:${eventName}`;
+            } else if (typeof attachTo === 'object') {
+              element = attachTo as HostElement;
+            }
             deregisterFns[eventName] = addEventListener(
               plt,
-              elm,
+              element,
               attachToEventName,
               createListenerCallback(elm, listener.eventMethodName),
               listener.eventCapture,
               listener.eventPassive
             );
 
-          } else if (!shouldEnable && deregisterFns[eventName]) {
+          } else if (!shouldEnable && fn) {
             deregisterFns[eventName]();
-            delete elm._listeners[eventName];
+            delete deregisterFns[eventName];
           }
-
-          return;
+          return true;
         }
       }
     }
   }
+  return false;
 }
 
 
