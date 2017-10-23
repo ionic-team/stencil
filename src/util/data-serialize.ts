@@ -92,11 +92,11 @@ function formatProps(membersMeta: MembersMeta) {
       d.push(0);
     }
 
-    if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String) {
+    if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String || memberMeta.propType === PROP_TYPE.Any) {
       d.push(memberMeta.propType);
 
     } else {
-      d.push(PROP_TYPE.Any);
+      d.push(PROP_TYPE.Unknown);
     }
 
     if (memberMeta.ctrlId) {
@@ -261,6 +261,14 @@ function formatMemberMeta(memberName: string, memberMeta: MemberMeta) {
 
   d.push(`"${memberName}"`);
   d.push(formatMemberType(memberMeta.memberType));
+  if (typeof memberMeta.attribName === 'string') {
+    // observe the attribute
+    d.push('/** observe attribute **/ 1');
+
+  } else {
+    // do not observe the attribute
+    d.push('/** do not observe attribute **/ 0');
+  }
   d.push(formatPropType(memberMeta.propType));
   d.push(formatPropContext(memberMeta.ctrlId));
 

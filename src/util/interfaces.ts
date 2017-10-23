@@ -770,7 +770,6 @@ export interface ComponentInstance {
   color?: string;
 
   // private properties
-  __values?: ComponentInternalValues;
   __el?: HostElement;
 
   [memberName: string]: any;
@@ -788,8 +787,6 @@ export interface ComponentActivePropChanges {
 
 
 export interface ComponentInternalValues {
-  __propWillChange?: ComponentActivePropChanges;
-  __propDidChange?: ComponentActivePropChanges;
   [propName: string]: any;
 }
 
@@ -857,6 +854,7 @@ export interface HostElement extends HTMLElement {
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
   _appliedStyles?: { [tagNameForStyles: string]: boolean };
+  _values?: ComponentInternalValues;
 }
 
 
@@ -1111,6 +1109,10 @@ export interface StencilSystem {
       cb: (err: any, result: {css: string; stats: any}) => void
     ): void;
   };
+  semver?: {
+    gt: (a: string, b: string, loose?: boolean) => boolean;
+    lt: (a: string, b: string, loose?: boolean) => boolean;
+  };
   typescript?: any;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
@@ -1267,7 +1269,7 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number'|'string';
+  type?: 'boolean'|'number'|'string'|'any';
   mutable?: boolean;
 }
 

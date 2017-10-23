@@ -8,7 +8,7 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { createQueueClient } from './queue-client';
 import { ENCAPSULATION, RUNTIME_ERROR, SSR_VNODE_ID } from '../util/constants';
 import { h, t } from '../core/renderer/h';
-import { initHostConstructor } from '../core/instance/init';
+import { initHostConstructor } from '../core/instance/init-host';
 import { parseComponentMeta, parseComponentLoaders } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
 import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
@@ -80,7 +80,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   const rootElm = domApi.$documentElement as HostElement;
   rootElm.$rendered = true;
   rootElm.$activeLoading = [];
-  rootElm.$initLoad = function appLoadedCallback() {
+  rootElm.$initLoad = () => {
     // this will fire when all components have finished loaded
     rootElm._hasLoaded = true;
   };
@@ -137,8 +137,8 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       // keep an array of all the defined components, useful for external frameworks
       globalDefined.push(tagName);
 
-      // initialize the properties on the component module prototype
-      initHostConstructor(plt, HostElementConstructor.prototype, hydratedCssClass);
+      // initialize the members on the host element prototype
+      initHostConstructor(plt, cmpMeta, HostElementConstructor.prototype, hydratedCssClass);
 
       // add which attributes should be observed
       const observedAttributes: string[] = [];
@@ -186,7 +186,6 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
     for (var i = 2; i < args.length; i++) {
       // parse the external component data into internal component meta data
-      // then add our set of prototype methods to the component bundle
       parseComponentMeta(registry, moduleImports, args[i]);
     }
 
@@ -291,15 +290,14 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
 
   function attachStyles(cmpMeta: ComponentMeta, modeName: string, elm: HostElement) {
-    const styleId = cmpMeta.tagNameMeta + (modeName ? `_${modeName}` : ``);
-    const templateElm = styleTemplates[styleId];
+    const templateElm = styleTemplates[cmpMeta.tagNameMeta + '_' + modeName] || styleTemplates[cmpMeta.tagNameMeta];
 
     if (templateElm) {
-      let styleContainerNode: Node = domApi.$head;
+      let styleContainerNode: HTMLElement = domApi.$head;
 
       if (supportsNativeShadowDom) {
         if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-          styleContainerNode = elm.shadowRoot;
+          styleContainerNode = (elm.shadowRoot as any);
 
         } else {
           while ((elm as Node) = domApi.$parentNode(elm)) {
@@ -313,14 +311,15 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
       const appliedStyles = ((styleContainerNode as HostElement)._appliedStyles = (styleContainerNode as HostElement)._appliedStyles || {});
 
-      if (!appliedStyles[styleId]) {
+      if (!appliedStyles[templateElm.id]) {
         // we haven't added these styles to this element yet
         const styleElm = templateElm.content.cloneNode(true) as HTMLStyleElement;
 
-        domApi.$insertBefore(styleContainerNode, styleElm, styleContainerNode.firstChild);
+        const insertReferenceNode = styleContainerNode.querySelector('[data-visibility]');
+        domApi.$insertBefore(styleContainerNode, styleElm, (insertReferenceNode && insertReferenceNode.nextSibling) || styleContainerNode.firstChild);
 
         // remember we don't need to do this again for this element
-        appliedStyles[styleId] = true;
+        appliedStyles[templateElm.id] = true;
       }
     }
   }

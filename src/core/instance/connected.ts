@@ -1,10 +1,10 @@
-import { HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
 import { getParentElement } from '../../util/helpers';
 import { initElementListeners } from './listeners';
 import { PRIORITY } from '../../util/constants';
 
 
-export function connectedCallback(plt: PlatformApi, elm: HostElement) {
+export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement) {
   // do not reconnect if we've already created an instance for this element
 
   if (!elm.$connected) {
@@ -29,9 +29,6 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     // place in high priority since it's not much work and we need
     // to know as fast as possible, but still an async tick in between
     plt.queue.add(() => {
-      // get the component meta data about this component
-      const cmpMeta = plt.getComponentMeta(elm);
-
       // only collects slot references if this component even has slots
       plt.connectHostElement(cmpMeta, elm);
 

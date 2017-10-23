@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement, 
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
 import { createPlatformServer } from './platform-server';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
-import { initHostConstructor } from '../core/instance/init';
+import { initHostConstructor } from '../core/instance/init-host';
 import { optimizeHtml } from '../compiler/html/optimize-html';
 
 
@@ -179,7 +179,7 @@ export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo
       // init our host element functions
       // not using Element.prototype on purpose
       if (!elm.connectedCallback) {
-        initHostConstructor(plt, elm, hydratedCssClass);
+        initHostConstructor(plt, cmpMeta, elm, hydratedCssClass);
       }
 
       // cool, let the element know it's been connected

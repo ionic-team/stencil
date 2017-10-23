@@ -109,7 +109,7 @@ function parseEventData(d: ComponentEventData) {
 }
 
 
-export function parsePropertyValue(propType: number, propValue: any) {
+export function parsePropertyValue(propType: PROP_TYPE, propValue: any) {
   // ensure this value is of the correct prop type
   if (isDef(propValue)) {
     if (propType === PROP_TYPE.Boolean) {

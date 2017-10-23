@@ -101,7 +101,7 @@ function parseComponents(config: BuildConfig, manifestDir: string, manifestData:
   }
 
   manifest.modulesFiles = componentsData.map(cmpData => {
-    return parseComponentDataToModuleFile(config, manifestDir, cmpData);
+    return parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
   });
 }
 
@@ -165,7 +165,7 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
 }
 
 
-export function parseComponentDataToModuleFile(config: BuildConfig, manifestDir: string, cmpData: ComponentData) {
+export function parseComponentDataToModuleFile(config: BuildConfig, manifest: Manifest, manifestDir: string, cmpData: ComponentData) {
   const moduleFile: ModuleFile = {
     cmpMeta: {},
     isCollectionDependency: true,
@@ -178,7 +178,7 @@ export function parseComponentDataToModuleFile(config: BuildConfig, manifestDir:
   parseModuleJsFilePath(config, manifestDir, cmpData, moduleFile);
   parseStyles(config, manifestDir, cmpData, cmpMeta);
   parseAssetsDir(config, manifestDir, cmpData, cmpMeta);
-  parseProps(cmpData, cmpMeta);
+  parseProps(config, manifest, cmpData, cmpMeta);
   parsePropsWillChange(cmpData, cmpMeta);
   parsePropsDidChange(cmpData, cmpMeta);
   parseStates(cmpData, cmpMeta);
@@ -391,6 +391,9 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
       } else if (member.propType === PROP_TYPE.String) {
         propData.type = 'string';
+
+      } else if (member.propType === PROP_TYPE.Any) {
+        propData.type = 'any';
       }
 
       if (member.memberType === MEMBER_TYPE.PropMutable) {
@@ -402,7 +405,7 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   });
 }
 
-function parseProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseProps(config: BuildConfig, manifest: Manifest, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const propsData = cmpData.props;
 
   if (invalidArrayData(propsData)) {
@@ -428,6 +431,17 @@ function parseProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
     } else if (propData.type === 'string') {
       cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.String;
+
+    } else if (propData.type === 'any') {
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Any;
+
+    } else if (!manifest.compiler || !manifest.compiler.version || config.sys.semver.lt(manifest.compiler.version, '0.0.6-23')) {
+      // older compilers didn't remember "any" type
+      cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Any;
+    }
+
+    if (cmpMeta.membersMeta[propData.name].propType) {
+      cmpMeta.membersMeta[propData.name].attribName = propData.name;
     }
   });
 }
