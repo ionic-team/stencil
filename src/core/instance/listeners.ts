@@ -1,6 +1,7 @@
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { getElementReference, noop } from '../../util/helpers';
 import { KEY_CODE_MAP } from '../../util/constants';
+import { queueUpdate } from './update';
 
 
 export function initElementListeners(plt: PlatformApi, elm: HostElement) {
@@ -169,7 +170,7 @@ export function addEventListener(
       // and only queue an update if host element's instance is ready
       // once its instance has been created, it'll then queue the update again
       // queue it up for an update which then runs a re-render
-      (elm as HostElement)._queueUpdate();
+      queueUpdate(plt, (elm as HostElement));
     }
   }
 

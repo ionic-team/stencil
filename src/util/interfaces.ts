@@ -849,8 +849,6 @@ export interface HostElement extends HTMLElement {
   _observer?: MutationObserver;
   _onReadyCallbacks: ((elm: HostElement) => void)[];
   _queuedEvents?: any[];
-  _queueUpdate: () => void;
-  _render: (isUpdateRender?: boolean) => void;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
   _appliedStyles?: { [tagNameForStyles: string]: boolean };
@@ -948,6 +946,8 @@ export interface PlatformApi {
   tmpDisconnected?: boolean;
   onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   isClient?: boolean;
+  isPrerender?: boolean;
+  isServer?: boolean;
   attachStyles: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
 }
 

@@ -1,5 +1,6 @@
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { initComponentInstance } from './init-component';
+import { render } from './render';
 import { RUNTIME_ERROR } from '../../util/constants';
 
 
@@ -92,7 +93,7 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
   // if this component has a render function, let's fire
   // it off and generate a vnode for this
   try {
-    elm._render(!isInitialLoad);
+    render(plt, elm, plt.getComponentMeta(elm), isInitialLoad);
     // _hasRendered was just set
     // _onRenderCallbacks were all just fired off
 

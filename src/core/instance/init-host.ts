@@ -4,8 +4,6 @@ import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initLoad } from './init-component';
 import { proxyHostElementPrototype } from './proxy';
-import { queueUpdate } from './update';
-import { render } from './render';
 
 
 export function initHostConstructor(plt: PlatformApi, cmpMeta: ComponentMeta, HostElementConstructor: HostElement, hydratedCssClass?: string) {
@@ -40,16 +38,8 @@ export function initHostConstructor(plt: PlatformApi, cmpMeta: ComponentMeta, Ho
     return promise;
   };
 
-  HostElementConstructor._queueUpdate = function() {
-    queueUpdate(plt, (this as HostElement));
-  };
-
   HostElementConstructor.$initLoad = function() {
     initLoad(plt, (this as HostElement), hydratedCssClass);
-  };
-
-  HostElementConstructor._render = function(isInitialRender: boolean) {
-    render(plt, (this as HostElement), plt.getComponentMeta((this as HostElement)), isInitialRender);
   };
 
   // add getters/setters to the host element members

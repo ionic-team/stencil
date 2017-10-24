@@ -2,6 +2,7 @@ import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
 import { getParentElement } from '../../util/helpers';
 import { initElementListeners } from './listeners';
 import { PRIORITY } from '../../util/constants';
+import { queueUpdate } from './update';
 
 
 export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement) {
@@ -34,10 +35,10 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.loadBundle(cmpMeta, elm, function loadComponentCallback() {
+      plt.loadBundle(cmpMeta, elm, () => {
         // we've fully loaded the component mode data
         // let's queue it up to be rendered next
-        elm._queueUpdate();
+        queueUpdate(plt, elm);
       });
 
     }, PRIORITY.High);

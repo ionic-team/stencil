@@ -1,4 +1,6 @@
 import { HostElement, PlatformApi } from '../../util/interfaces';
+import { render } from './render';
+
 
 /**
  * Create a mutation observer for the elm.
@@ -22,7 +24,7 @@ function createElementReset(plt: PlatformApi, elm: HostElement): () => void {
     elm._vnode = null;
     plt.connectHostElement(cmpMeta, elm);
     stopObserving(plt, elm);
-    elm._render();
+    render(plt, elm, plt.getComponentMeta(elm), false);
     startObserving(plt, elm);
   };
 }
