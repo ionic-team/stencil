@@ -122,6 +122,11 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
   }
   config.logger.debug(`minifyJs: ${config.minifyJs}`);
 
+  if (typeof config.hashFileNames !== 'boolean' && typeof (config as any).hashFilenames === 'boolean') {
+    config.hashFileNames = (config as any).hashFilenames;
+    config.logger.warn(`"hashFilenames" was used in the config, did you mean "hashFileNames"? (Has a capital N)`);
+  }
+
   if (typeof config.hashFileNames !== 'boolean') {
     // hashFileNames config was not provided, so let's create the default
 

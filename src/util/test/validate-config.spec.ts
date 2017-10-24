@@ -56,6 +56,12 @@ describe('validation', () => {
       expect(config.hashFileNames).toBe(false);
     });
 
+    it('should set hashFileNames from hashFilenames', () => {
+      (config as any).hashFilenames = false;
+      validateBuildConfig(config);
+      expect(config.hashFileNames).toBe(false);
+    });
+
     it('should set minifyJs to true', () => {
       config.devMode = true;
       config.minifyJs = true;
