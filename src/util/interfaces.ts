@@ -355,6 +355,7 @@ export interface BuildConfig {
   copy?: CopyTasks;
   serviceWorker?: ServiceWorkerConfig|boolean;
   hydratedCssClass?: string;
+  sassConfig?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
