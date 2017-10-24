@@ -103,10 +103,15 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
           elm._values[memberName] = (elm as any)[memberName];
         }
 
-        // we've already created getters/setters on the
-        // host elements's prototype so we're good
-        // to delete the "own" property
-        delete (elm as any)[memberName];
+        if (plt.isClient) {
+          // within the browser, the element's prototype
+          // already has its getter/setter set, but on the
+          // server the prototype is shared causing issues
+          // so instead the server's elm has the getter/setter
+          // on the actual element instance, not its prototype
+          // for the client, let's delete its "own" property
+          delete (elm as any)[memberName];
+        }
       }
     }
 
