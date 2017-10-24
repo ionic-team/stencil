@@ -11,6 +11,8 @@
       "runtimeArgs": [
         "--inspect-brk",
         "./node_modules/.bin/jest",
+        "--config",
+        "jest.debugger.json",
         "-i",
         "--env",
         "jest-environment-node-debug"

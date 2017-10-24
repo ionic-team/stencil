@@ -99,18 +99,13 @@
   "types": "./dist/index.d.ts",
   "jest": {
     "testEnvironment": "node",
-    "globals": {
-      "ts-jest": {
-        "tsConfigFile": "./src/tsconfig.json"
-      }
-    },
     "moduleFileExtensions": [
       "ts",
       "tsx",
       "js"
     ],
     "transform": {
-      "^.+\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "^.+\\.(ts|tsx)$": "<rootDir>/scripts/jest.preprocessor.js"
     },
     "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$"
   }
