@@ -66,14 +66,15 @@ describe('app-core', () => {
 
     it('includes the required polyfills', () => {
       core.generateCoreES5WithPolyfills(config, ['']);
-      expect(mockGetClientCoreFile.mock.calls.length).toEqual(8);
-      expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'polyfills/document-register-element.js' });
-      expect(mockGetClientCoreFile.mock.calls[1][0]).toEqual({ staticName: 'polyfills/object-assign.js' });
-      expect(mockGetClientCoreFile.mock.calls[2][0]).toEqual({ staticName: 'polyfills/promise.js' });
-      expect(mockGetClientCoreFile.mock.calls[3][0]).toEqual({ staticName: 'polyfills/fetch.js' });
-      expect(mockGetClientCoreFile.mock.calls[4][0]).toEqual({ staticName: 'polyfills/request-animation-frame.js' });
-      expect(mockGetClientCoreFile.mock.calls[5][0]).toEqual({ staticName: 'polyfills/closest.js' });
-      expect(mockGetClientCoreFile.mock.calls[6][0]).toEqual({ staticName: 'polyfills/performance-now.js' });
+      expect(mockGetClientCoreFile.mock.calls.length).toEqual(9);
+      expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'polyfills/template.js' });
+      expect(mockGetClientCoreFile.mock.calls[1][0]).toEqual({ staticName: 'polyfills/document-register-element.js' });
+      expect(mockGetClientCoreFile.mock.calls[2][0]).toEqual({ staticName: 'polyfills/object-assign.js' });
+      expect(mockGetClientCoreFile.mock.calls[3][0]).toEqual({ staticName: 'polyfills/promise.js' });
+      expect(mockGetClientCoreFile.mock.calls[4][0]).toEqual({ staticName: 'polyfills/fetch.js' });
+      expect(mockGetClientCoreFile.mock.calls[5][0]).toEqual({ staticName: 'polyfills/request-animation-frame.js' });
+      expect(mockGetClientCoreFile.mock.calls[6][0]).toEqual({ staticName: 'polyfills/closest.js' });
+      expect(mockGetClientCoreFile.mock.calls[7][0]).toEqual({ staticName: 'polyfills/performance-now.js' });
     });
 
     it('uses the core minified file name', () => {
@@ -92,6 +93,7 @@ describe('app-core', () => {
 
     it('generates the full wrapped content', async () => {
       const preamble = generatePreamble(config).trim();
+      mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am template'));
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am document register element'));
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am object assign'));
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am promise'));
@@ -102,19 +104,20 @@ describe('app-core', () => {
       mockGetClientCoreFile.mockReturnValueOnce(Promise.resolve('I am core'));
       const res = await core.generateCoreES5WithPolyfills(config, ['global line 1', 'global line 2']);
       const lines = res.split('\n');
-      expect(lines[0]).toEqual('I am document register element');
-      expect(lines[1]).toEqual('I am object assign');
-      expect(lines[2]).toEqual('I am promise');
-      expect(lines[3]).toEqual('I am fetch');
-      expect(lines[4]).toEqual('I am raf');
-      expect(lines[5]).toEqual('I am closest');
-      expect(lines[6]).toEqual('I am performance now');
-      expect(lines[7]).toEqual(preamble);
-      expect(lines[8]).toEqual(`(function(Context,appNamespace,hydratedCssClass,publicPath){"use strict";`);
-      expect(lines[10]).toEqual('global line 1');
-      expect(lines[11]).toEqual('global line 2');
-      expect(lines[12]).toEqual('I am core');
-      expect(lines[13]).toEqual(`})({},"${config.namespace}","${config.hydratedCssClass}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
+      expect(lines[0]).toEqual('I am template');
+      expect(lines[1]).toEqual('I am document register element');
+      expect(lines[2]).toEqual('I am object assign');
+      expect(lines[3]).toEqual('I am promise');
+      expect(lines[4]).toEqual('I am fetch');
+      expect(lines[5]).toEqual('I am raf');
+      expect(lines[6]).toEqual('I am closest');
+      expect(lines[7]).toEqual('I am performance now');
+      expect(lines[8]).toEqual(preamble);
+      expect(lines[9]).toEqual(`(function(Context,appNamespace,hydratedCssClass,publicPath){"use strict";`);
+      expect(lines[11]).toEqual('global line 1');
+      expect(lines[12]).toEqual('global line 2');
+      expect(lines[13]).toEqual('I am core');
+      expect(lines[14]).toEqual(`})({},"${config.namespace}","${config.hydratedCssClass}","Projects/Ionic/Stencil/willywendleswetwasabi/");`);
     });
   });
 
