@@ -21,26 +21,6 @@ const DST_PACKAGE_JSON = path.join(__dirname, '../dist/package.json');
 
 const srcPackageJson = require(SRC_PACKAGE_JSON);
 
-const bundledDependencies = [
-  'chalk',
-  'clean-css',
-  'glob',
-  'is-glob',
-  'jsdom',
-  'minimist',
-  'node-fetch',
-  'rollup',
-  'rollup-plugin-commonjs',
-  'rollup-plugin-node-resolve',
-  'uglify-es',
-  'workbox-build'
-];
-
-const distDependencies = {};
-bundledDependencies.forEach(bundledDependency => {
-  distDependencies[bundledDependency] = srcPackageJson.devDependencies[bundledDependency];
-});
-
 
 const dstPackageJson = {
   name: srcPackageJson.name,
@@ -53,7 +33,7 @@ const dstPackageJson = {
   bin: {
     stencil: './bin/stencil'
   },
-  dependencies: distDependencies,
+  dependencies: srcPackageJson.dependencies,
   repository: srcPackageJson.repository,
   author: srcPackageJson.author,
   homepage: srcPackageJson.homepage,
@@ -73,6 +53,3 @@ fs.copySync(SRC_LICENSE, DIST_LICENSE);
 const SRC_README = path.join(__dirname, '../readme.md');
 const DIST_README = path.join(DST_DIR, 'readme.md');
 fs.copySync(SRC_README, DIST_README);
-
-
-exports.bundledDependencies = bundledDependencies;

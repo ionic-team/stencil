@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.0.6-21",
+  "version": "0.0.6-22",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -8,11 +8,13 @@
     "build.cli": "npm run transpile.cli && node scripts/build-cli.js",
     "build.compiler": "npm run transpile.compiler && node scripts/build-compiler.js",
     "build.core": "npm run transpile.core && node scripts/build-core.js",
+    "build.core.tar": "tar -zcf ./dist/core.tar.gz ./dist",
+    "build.deps": "node scripts/build-local-deps.js",
     "build.server": "npm run transpile.server && node scripts/build-server.js",
     "build.testing": "npm run transpile.testing && node scripts/build-testing.js",
     "clean": "rimraf dist/",
     "deploy": "node scripts/np/cli.js",
-    "dryrun": "node scripts/np/cli.js 99.99.99 --test --dry-run",
+    "dryrun": "npm run build && npm run test && npm run prepare.package && cd ./dist && npm install && cd .. && npm run build.deps && npm run build.core.tar",
     "prepare.package": "node scripts/prepare-package.js",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
@@ -26,8 +28,14 @@
   },
   "dependencies": {
     "chokidar": "1.7.0",
+    "jsdom": "11.3.0",
     "node-sass": "4.5.3",
-    "typescript": "^2.6.0-rc"
+    "rollup": "0.50.0",
+    "rollup-plugin-commonjs": "8.2.4",
+    "rollup-plugin-node-resolve": "3.0.0",
+    "typescript": "^2.6.0-rc",
+    "uglify-es": "3.1.3",
+    "workbox-build": "2.1.0"
   },
   "devDependencies": {
     "@types/babel-core": "^6.7.14",
@@ -55,21 +63,16 @@
     "google-closure-compiler": "20170218.0.0",
     "is-glob": "^4.0.0",
     "jest": "19.0.2",
-    "jsdom": "11.2.0",
     "knuth-shuffle": "1.0.1",
     "memory-fs": "^0.4.1",
     "minimist": "1.2.0",
     "node-fetch": "^1.7.2",
     "np": "2.16.0",
     "rimraf": "2.6.1",
-    "rollup": "0.50.0",
-    "rollup-plugin-commonjs": "8.2.0",
-    "rollup-plugin-node-resolve": "3.0.0",
+    "semver": "^5.4.1",
     "tslint": "^5.6.0",
     "tslint-ionic-rules": "0.0.8",
-    "uglify-es": "3.1.3",
-    "webpack": "^3.5.4",
-    "workbox-build": "2.0.3"
+    "webpack": "^3.5.4"
   },
   "repository": {
     "type": "git",

@@ -132,14 +132,19 @@ export interface ComponentMemberData {
   [1]: number;
 
   /**
-   * prop type
+   * is attribute to observe
    */
   [2]: number;
 
   /**
+   * prop type
+   */
+  [3]: number;
+
+  /**
    * controller id
    */
-  [3]: string;
+  [4]: string;
 }
 
 
@@ -350,6 +355,7 @@ export interface BuildConfig {
   copy?: CopyTasks;
   serviceWorker?: ServiceWorkerConfig|boolean;
   hydratedCssClass?: string;
+  sassConfig?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -765,7 +771,6 @@ export interface ComponentInstance {
   color?: string;
 
   // private properties
-  __values?: ComponentInternalValues;
   __el?: HostElement;
 
   [memberName: string]: any;
@@ -783,8 +788,6 @@ export interface ComponentActivePropChanges {
 
 
 export interface ComponentInternalValues {
-  __propWillChange?: ComponentActivePropChanges;
-  __propDidChange?: ComponentActivePropChanges;
   [propName: string]: any;
 }
 
@@ -847,11 +850,10 @@ export interface HostElement extends HTMLElement {
   _observer?: MutationObserver;
   _onReadyCallbacks: ((elm: HostElement) => void)[];
   _queuedEvents?: any[];
-  _queueUpdate: () => void;
-  _render: (isUpdateRender?: boolean) => void;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
   _appliedStyles?: { [tagNameForStyles: string]: boolean };
+  _values?: ComponentInternalValues;
 }
 
 
@@ -945,7 +947,9 @@ export interface PlatformApi {
   tmpDisconnected?: boolean;
   onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   isClient?: boolean;
-  attachStyles: (cmpMeta: ComponentMeta, elm: HostElement) => void;
+  isPrerender?: boolean;
+  isServer?: boolean;
+  attachStyles: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
 }
 
 
@@ -1106,6 +1110,10 @@ export interface StencilSystem {
       cb: (err: any, result: {css: string; stats: any}) => void
     ): void;
   };
+  semver?: {
+    gt: (a: string, b: string, loose?: boolean) => boolean;
+    lt: (a: string, b: string, loose?: boolean) => boolean;
+  };
   typescript?: any;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
@@ -1131,7 +1139,7 @@ export interface Workbox {
   generateSW(swConfig: any): Promise<any>;
   generateFileManifest(): Promise<any>;
   getFileManifestEntries(): Promise<any>;
-  injectManifest(): Promise<any>;
+  injectManifest(swConfig: any): Promise<any>;
 }
 
 
@@ -1262,7 +1270,7 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number'|'string';
+  type?: 'boolean'|'number'|'string'|'any';
   mutable?: boolean;
 }
 

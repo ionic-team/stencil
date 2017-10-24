@@ -1,8 +1,8 @@
-import { HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentMeta, HostElement } from '../../util/interfaces';
 import { parsePropertyValue } from '../../util/data-parse';
 
 
-export function attributeChangedCallback(plt: PlatformApi, elm: HostElement, attribName: string, oldVal: string, newVal: string) {
+export function attributeChangedCallback(cmpMeta: ComponentMeta, elm: HostElement, attribName: string, oldVal: string, newVal: string) {
   // only react if the attribute values actually changed
   if (oldVal !== newVal) {
 
@@ -11,7 +11,7 @@ export function attributeChangedCallback(plt: PlatformApi, elm: HostElement, att
 
     // using the known component meta data
     // look up to see if we have a property wired up to this attribute name
-    const propsMeta = plt.getComponentMeta(elm).membersMeta;
+    const propsMeta = cmpMeta.membersMeta;
     if (propsMeta) {
       for (var propName in propsMeta) {
         if (propsMeta[propName].attribName === attribName) {

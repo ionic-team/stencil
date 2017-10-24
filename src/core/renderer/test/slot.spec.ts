@@ -1,6 +1,7 @@
 import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
-import { mockConnect, mockDefine, mockPlatform, waitForLoad, MockedPlatform } from '../../../testing/mocks';
+import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
+import { render } from '../../instance/render';
 import { SLOT_META } from '../../../util/constants';
 
 
@@ -58,10 +59,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
     expect(parentElm.firstElementChild.firstElementChild.childNodes.length).toBe(1);
 
-    parentElm._render();
-    childElm._render();
-    parentElm._render();
-    childElm._render();
+    render(plt, parentElm, {}, false);
+    render(plt, childElm, {}, false);
+    render(plt, parentElm, {}, false);
+    render(plt, childElm, {}, false);
 
     expect(parentElm.firstElementChild.nodeName).toBe('LION');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -81,10 +82,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('FISH');
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.childNodes.length).toBe(1);
 
-    parentElm._render();
-    childElm._render();
-    parentElm._render();
-    childElm._render();
+    render(plt, parentElm, {}, false);
+    render(plt, childElm, {}, false);
+    render(plt, parentElm, {}, false);
+    render(plt, childElm, {}, false);
 
     expect(parentElm.firstElementChild.nodeName).toBe('GIRAFFE');
     expect(parentElm.firstElementChild.childNodes.length).toBe(1);
@@ -108,10 +109,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('AARDVARK');
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
-    parentElm._render();
-    childElm._render();
-    parentElm._render();
-    childElm._render();
+    render(plt, parentElm, {}, false);
+    render(plt, childElm, {}, false);
+    render(plt, parentElm, {}, false);
+    render(plt, childElm, {}, false);
 
     expect(parentElm.firstElementChild.nodeName).toBe('HIPPO');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -140,10 +141,10 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('DINGO');
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
-    childElm._render();
-    parentElm._render();
-    childElm._render();
-    parentElm._render();
+    render(plt, childElm, {}, false);
+    render(plt, parentElm, {}, false);
+    render(plt, childElm, {}, false);
+    render(plt, parentElm, {}, false);
 
     expect(parentElm.firstElementChild.nodeName).toBe('BADGER');
     expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -154,7 +155,7 @@ describe('Component slot', () => {
   });
 
   it('should render conditional content into a nested default slot', () => {
-
+    var plt: any = mockPlatform();
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
       slotMeta: SLOT_META.HasNamedSlots,
@@ -204,16 +205,17 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.textContent).toBe('');
 
-        childElm._render();
+        render(plt, childElm, {}, false);
         expect(parentElm.firstElementChild.textContent).toBe('content 1content 2');
 
-        childElm._render();
+        render(plt, childElm, {}, false);
         expect(parentElm.firstElementChild.textContent).toBe('');
 
-        childElm._render();
+        render(plt, childElm, {}, false);
         expect(parentElm.firstElementChild.textContent).toBe('content 4');
       });
     });
+
   });
 
   it('should update parent content in child default slot', () => {
@@ -258,7 +260,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
         parentElm.$instance.msg = 'change 1';
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -267,7 +269,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
         parentElm.$instance.msg = 'change 2';
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -316,7 +318,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
         parentElm.$instance.msg = 'change 1';
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -324,7 +326,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
         parentElm.$instance.msg = 'change 2';
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -375,7 +377,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].nodeName).toBe('EAGLE');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].textContent).toBe('2');
 
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -384,7 +386,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].nodeName).toBe('EAGLE');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].textContent).toBe('4');
 
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -447,7 +449,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('2');
 
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -460,7 +462,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('5');
 
-        parentElm._render();
+        render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -530,7 +532,7 @@ describe('Component slot', () => {
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('1');
 
-          elm._render();
+          render(plt, elm, {}, false);
 
           expect(elm.firstElementChild.nodeName).toBe('TEST-1');
           expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -539,7 +541,7 @@ describe('Component slot', () => {
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('2');
 
-          elm._render();
+          render(plt, elm, {}, false);
 
           expect(elm.firstElementChild.nodeName).toBe('TEST-1');
           expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -556,7 +558,7 @@ describe('Component slot', () => {
     msg: ''
   };
 
-  var plt: MockedPlatform;
+  var plt: any;
 
   beforeEach(() => {
     parentInstance.msg = 'parent message';

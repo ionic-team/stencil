@@ -1,7 +1,6 @@
 import { detachListeners } from './listeners';
 import { HostElement, PlatformApi } from '../../util/interfaces';
-import { invokeDestroy } from '../renderer/patch';
-import { propagateElementLoaded } from './init';
+import { propagateElementLoaded } from './init-component';
 
 
 export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -18,32 +17,29 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // that they're good to go and loaded (cuz this one is on its way out)
     propagateElementLoaded(elm);
 
-    // call instance Did Unload and destroy instance stuff
-    // if we've created an instance for this
-    const instance = elm.$instance;
-    if (instance) {
-      // call the user's componentDidUnload if there is one
-      instance.componentDidUnload && instance.componentDidUnload();
-      elm.$instance = instance.__el = instance.__values = instance.__values.__propWillChange = instance.__values.__propDidChange = null;
-    }
-
     // detatch any event listeners that may have been added
     // this will also set _listeners to null if there are any
     detachListeners(elm);
-
-    // destroy the vnode and child vnodes if they exist
-    invokeDestroy(elm._vnode);
 
     if (elm._hostContentNodes) {
       // overreacting here just to reduce any memory leak issues
       elm._hostContentNodes = elm._hostContentNodes.defaultSlot = elm._hostContentNodes.namedSlots = null;
     }
 
+    // call instance Did Unload and destroy instance stuff
+    // if we've created an instance for this
+    const instance = elm.$instance;
+    if (instance) {
+      // call the user's componentDidUnload if there is one
+      instance.componentDidUnload && instance.componentDidUnload();
+      elm.$instance = instance.__el = null;
+    }
+
     // fuhgeddaboudit
     // set it all to null to ensure we forget references
     // and reset values incase this node gets reused somehow
     // (possible that it got disconnected, but the node was reused)
-    elm.$activeLoading = elm.$connected = elm.$defaultHolder = elm._root = elm._vnode = elm._ancestorHostElement = elm._hasLoaded = elm._isQueuedForUpdate = elm._observer = null;
+    elm.$activeLoading = elm.$connected = elm.$defaultHolder = elm._root = elm._values = elm._vnode = elm._ancestorHostElement = elm._hasLoaded = elm._isQueuedForUpdate = elm._observer = null;
   }
 }
 

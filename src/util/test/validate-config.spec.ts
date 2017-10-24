@@ -56,6 +56,12 @@ describe('validation', () => {
       expect(config.hashFileNames).toBe(false);
     });
 
+    it('should set hashFileNames from hashFilenames', () => {
+      (config as any).hashFilenames = false;
+      validateBuildConfig(config);
+      expect(config.hashFileNames).toBe(false);
+    });
+
     it('should set minifyJs to true', () => {
       config.devMode = true;
       config.minifyJs = true;
@@ -229,6 +235,13 @@ describe('validation', () => {
     it('should set default src dir and convert to absolute path', () => {
       validateBuildConfig(config);
       expect(path.basename(config.srcDir)).toBe('src');
+      expect(path.isAbsolute(config.srcDir)).toBe(true);
+    });
+
+    it('should set src dir and convert to absolute path', () => {
+      config.srcDir = 'app';
+      validateBuildConfig(config);
+      expect(path.basename(config.srcDir)).toBe('app');
       expect(path.isAbsolute(config.srcDir)).toBe(true);
     });
 

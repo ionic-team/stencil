@@ -11,6 +11,7 @@ import { LoadComponentRegistry } from '../util/interfaces';
   // reusing the "x" variable from the args for funzies
   x = document.createElement('style');
   x.innerHTML = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; }).join() + '{visibility:hidden}';
+  x.setAttribute('data-visibility', '');
   document.head.insertBefore(x, document.head.firstChild);
 
   // get this current script

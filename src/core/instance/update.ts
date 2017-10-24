@@ -1,5 +1,6 @@
 import { HostElement, PlatformApi } from '../../util/interfaces';
-import { initComponentInstance } from './init';
+import { initComponentInstance } from './init-component';
+import { render } from './render';
 import { RUNTIME_ERROR } from '../../util/constants';
 
 
@@ -42,24 +43,20 @@ export function update(plt: PlatformApi, elm: HostElement) {
         return;
       }
 
-      // haven't created a component instance for this host element yet
+      // haven't created a component instance for this host element yet!
+      // create the instance from the user's component class
+      // https://www.youtube.com/watch?v=olLxrojmvMg
+      initComponentInstance(plt, elm);
+
+      // fire off the user's componentWillLoad method (if one was provided)
+      // componentWillLoad only runs ONCE, after instance's element has been
+      // assigned as the host element, but BEFORE render() has been called
       try {
-        // create the instance from the user's component class
-        initComponentInstance(plt, elm);
-
-        // fire off the user's componentWillLoad method (if one was provided)
-        // componentWillLoad only runs ONCE, after instance's element has been
-        // assigned as the host element, but BEFORE render() has been called
-        try {
-          if (elm.$instance.componentWillLoad) {
-            userPromise = elm.$instance.componentWillLoad();
-          }
-        } catch (e) {
-          plt.onError(e, RUNTIME_ERROR.WillLoadError, elm);
+        if (elm.$instance.componentWillLoad) {
+          userPromise = elm.$instance.componentWillLoad();
         }
-
       } catch (e) {
-        plt.onError(e, RUNTIME_ERROR.InitInstanceError, elm, true);
+        plt.onError(e, RUNTIME_ERROR.WillLoadError, elm);
       }
 
     } else {
@@ -81,13 +78,11 @@ export function update(plt: PlatformApi, elm: HostElement) {
       // looks like the user return a promise!
       // let's not actually kick off the render
       // until the user has resolved their promise
-      userPromise.then(function componentWillLoadResolved() {
-        renderUpdate(plt, elm, isInitialLoad);
-      });
+      userPromise.then(() => renderUpdate(plt, elm, isInitialLoad));
 
     } else {
       // user never returned a promise so there's
-      // no need to wait on anything, let's do the render now
+      // no need to wait on anything, let's do the render now my friend
       renderUpdate(plt, elm, isInitialLoad);
     }
   }
@@ -98,7 +93,7 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: 
   // if this component has a render function, let's fire
   // it off and generate a vnode for this
   try {
-    elm._render(!isInitialLoad);
+    render(plt, elm, plt.getComponentMeta(elm), isInitialLoad);
     // _hasRendered was just set
     // _onRenderCallbacks were all just fired off
 

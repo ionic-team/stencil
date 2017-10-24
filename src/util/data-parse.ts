@@ -5,7 +5,7 @@ import { isDef } from './helpers';
 import { toDashCase } from '../util/helpers';
 
 
-export function parseComponentRegistry(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry, attr?: number) {
+export function parseComponentLoaders(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry, attr?: number) {
   // tag name will always be lower case
   const cmpMeta: ComponentMeta = {
     tagNameMeta: cmpRegistryData[0],
@@ -62,9 +62,9 @@ function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberDat
       var d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        attribName: attr === ATTR_CASE.LowerCase ? d[0].toLowerCase() : toDashCase(d[0]),
-        propType: d[2],
-        ctrlId: d[3]
+        attribName: d[2] ? attr === ATTR_CASE.LowerCase ? d[0].toLowerCase() : toDashCase(d[0]) : (0 as any),
+        propType: d[3],
+        ctrlId: d[4]
       };
     }
   }
@@ -109,7 +109,7 @@ function parseEventData(d: ComponentEventData) {
 }
 
 
-export function parsePropertyValue(propType: number, propValue: any) {
+export function parsePropertyValue(propType: PROP_TYPE, propValue: any) {
   // ensure this value is of the correct prop type
   if (isDef(propValue)) {
     if (propType === PROP_TYPE.Boolean) {

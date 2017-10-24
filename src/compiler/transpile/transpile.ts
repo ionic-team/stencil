@@ -1,5 +1,5 @@
 import addMetadataExport from './transformers/add-metadata-export';
-import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, StencilSystem, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath } from '../util';
 import { componentTsFileClass, componentModuleFileClass } from './transformers/component-class';
 import { getTsHost } from './compiler-host';
@@ -219,8 +219,6 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, moduleFil
     return Promise.resolve([]);
   }
 
-  const sys = config.sys;
-
   const promises: Promise<any>[] = [];
 
   // loop through each of the style paths and see if there are any sass files
@@ -235,7 +233,7 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, moduleFil
           // this componet mode has a sass file, let's see which
           // sass files are included in it
           promises.push(
-            getIncludedSassFiles(sys, ctx.diagnostics, moduleFile, absoluteStylePath)
+            getIncludedSassFiles(config, ctx.diagnostics, moduleFile, absoluteStylePath)
           );
         }
       });
@@ -247,11 +245,12 @@ function processIncludedStyles(config: BuildConfig, ctx: BuildContext, moduleFil
 }
 
 
-function getIncludedSassFiles(sys: StencilSystem, diagnostics: Diagnostic[], moduleFile: ModuleFile, scssFilePath: string) {
+function getIncludedSassFiles(config: BuildConfig, diagnostics: Diagnostic[], moduleFile: ModuleFile, scssFilePath: string) {
   return new Promise(resolve => {
     scssFilePath = normalizePath(scssFilePath);
 
     const sassConfig = {
+      ...config.sassConfig,
       file: scssFilePath
     };
 
@@ -261,7 +260,7 @@ function getIncludedSassFiles(sys: StencilSystem, diagnostics: Diagnostic[], mod
       moduleFile.includedSassFiles.push(scssFilePath);
     }
 
-    sys.sass.render(sassConfig, (err, result) => {
+    config.sys.sass.render(sassConfig, (err, result) => {
       if (err) {
         const d = buildError(diagnostics);
         d.messageText = err.message;

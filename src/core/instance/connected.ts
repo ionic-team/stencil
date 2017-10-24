@@ -1,10 +1,11 @@
-import { HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
 import { getParentElement } from '../../util/helpers';
 import { initElementListeners } from './listeners';
 import { PRIORITY } from '../../util/constants';
+import { queueUpdate } from './update';
 
 
-export function connectedCallback(plt: PlatformApi, elm: HostElement) {
+export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement) {
   // do not reconnect if we've already created an instance for this element
 
   if (!elm.$connected) {
@@ -29,18 +30,15 @@ export function connectedCallback(plt: PlatformApi, elm: HostElement) {
     // place in high priority since it's not much work and we need
     // to know as fast as possible, but still an async tick in between
     plt.queue.add(() => {
-      // get the component meta data about this component
-      const cmpMeta = plt.getComponentMeta(elm);
-
       // only collects slot references if this component even has slots
       plt.connectHostElement(cmpMeta, elm);
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.loadBundle(cmpMeta, elm, function loadComponentCallback() {
+      plt.loadBundle(cmpMeta, elm, () => {
         // we've fully loaded the component mode data
         // let's queue it up to be rendered next
-        elm._queueUpdate();
+        queueUpdate(plt, elm);
       });
 
     }, PRIORITY.High);

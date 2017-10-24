@@ -26,10 +26,11 @@ export const enum PROP_CHANGE {
  * Property Types
  */
 export const enum PROP_TYPE {
-  Any = 0,
-  String = 1,
-  Boolean = 2,
-  Number = 3,
+  Unknown = 0,
+  Any = 1,
+  String = 2,
+  Boolean = 3,
+  Number = 4,
 }
 
 

@@ -11,7 +11,7 @@ import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, V
 import { ENCAPSULATION } from '../../util/constants';
 import { isDef, isUndef } from '../../util/helpers';
 import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
-import { updateElement, eventProxy } from './update-dom-node';
+import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
 
@@ -155,14 +155,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
 
   function removeVnodes(parentElm: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
     for (; startIdx <= endIdx; ++startIdx) {
-      var vnode = vnodes[startIdx];
-
-      if (isDef(vnode)) {
-        if (isDef(vnode.elm)) {
-          invokeDestroy(vnode);
-        }
-
-        domApi.$removeChild(parentElm, vnode.elm);
+      if (isDef(vnodes[startIdx])) {
+        domApi.$removeChild(parentElm, vnodes[startIdx].elm);
       }
     }
   }
@@ -379,24 +373,6 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
     // return our new vnode
     return newVNode;
   };
-}
-
-
-export function invokeDestroy(vnode: VNode) {
-  if (vnode) {
-    const elm = (vnode.elm as any);
-    if (elm && elm._listeners) {
-      for (var key in elm._listeners) {
-        elm.removeEventListener(key, eventProxy, false);
-      }
-    }
-
-    if (isDef(vnode.vchildren)) {
-      for (var i = 0; i < vnode.vchildren.length; ++i) {
-        invokeDestroy(vnode.vchildren[i]);
-      }
-    }
-  }
 }
 
 
