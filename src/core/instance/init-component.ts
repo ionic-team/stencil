@@ -1,3 +1,4 @@
+import { callNodeRefs } from '../renderer/patch';
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { initEventEmitters } from './events';
 import { replayQueuedEventsOnInstance } from './listeners';
@@ -72,6 +73,9 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
       // assigned as the host element, and AFTER render() has been called
       // we'll also fire this method off on the element, just to
       instance.componentDidLoad && instance.componentDidLoad();
+
+      // fire off the ref if it exists
+      callNodeRefs(elm._vnode);
 
     } catch (e) {
       plt.onError(e, RUNTIME_ERROR.DidLoadError, elm);

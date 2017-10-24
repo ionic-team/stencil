@@ -60,8 +60,11 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
   let vnode = new VNodeObj();
   vnode.vtag = nodeName;
   vnode.vchildren = children;
-  vnode.vattrs = (vnodeData == null) ? undefined : vnodeData;
-  vnode.vkey = vnode.vattrs == null ? undefined : vnode.vattrs.key;
+  if (vnodeData != null) {
+    vnode.vattrs = vnodeData;
+    vnode.vkey = vnodeData.key;
+    vnode.vref = vnodeData.ref;
+  }
 
   // normalize class / classname attributes
   if (vnode.vattrs) {

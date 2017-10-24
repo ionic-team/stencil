@@ -376,6 +376,17 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
 }
 
 
+export function callNodeRefs(vNode: VNode, isDestroy?: boolean) {
+  if (vNode) {
+    vNode.vref && vNode.vref(isDestroy ? null : vNode.elm);
+
+    vNode.vchildren && vNode.vchildren.forEach(vChild => {
+      callNodeRefs(vChild, isDestroy);
+    });
+  }
+}
+
+
 function hasChildNodes(children: VNode[]) {
   // SSR ONLY: check if there are any more nested child elements
   // if there aren't, this info is useful so the client runtime

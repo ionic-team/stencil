@@ -106,6 +106,27 @@ describe('h()', () => {
     expect(vnode.vattrs.class).toEqual('dragons love tacos');
   });
 
+  it('should set vkey', () => {
+    var vnode = h('div', { key: 'my-key' });
+    expect(vnode.vkey).toBe('my-key');
+  });
+
+  it('should not set vkey', () => {
+    var vnode = h('div', null);
+    expect(vnode.vkey).toBeUndefined();
+  });
+
+  it('should set vref', () => {
+    const ref = () => {};
+    var vnode = h('div', { ref: ref });
+    expect(vnode.vref).toBe(ref);
+  });
+
+  it('should not set vref', () => {
+    var vnode = h('div', {});
+    expect(vnode.vref).toBeUndefined();
+  });
+
   it('should add one class from string', () => {
     var vnode = h('div', { class: 'some-class' });
     expect(vnode.vattrs.class).toBeDefined();

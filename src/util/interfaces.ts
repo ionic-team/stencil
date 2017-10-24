@@ -904,8 +904,8 @@ export interface VNode {
   vtext: string;
   vchildren: VNode[];
   vattrs: any;
+  vref: (elm: any) => void;
   elm: Element|Node;
-  assignedListener: any;
 }
 
 export interface VNodeData {

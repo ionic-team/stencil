@@ -1,3 +1,4 @@
+import { callNodeRefs } from '../renderer/patch';
 import { detachListeners } from './listeners';
 import { HostElement, PlatformApi } from '../../util/interfaces';
 import { propagateElementLoaded } from './init-component';
@@ -16,6 +17,8 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // double check that we've informed the ancestor host elements
     // that they're good to go and loaded (cuz this one is on its way out)
     propagateElementLoaded(elm);
+
+    callNodeRefs(elm._vnode, true);
 
     // detatch any event listeners that may have been added
     // this will also set _listeners to null if there are any

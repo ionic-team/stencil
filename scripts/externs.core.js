@@ -73,24 +73,7 @@ function render(){};
 function attrs(){};
 function on(){};
 function props(){};
-
-
-/**
- * Compiled hyperscript props
- * Already short, just don't rename them
- */
-function a(){};
-function c(){};
-function e(){};
-function h(){};
-function k(){};
-function l(){};
-function m(){};
-function n(){};
-function o(){};
-function p(){};
-function s(){};
-function t(){};
+function ref(){};
 
 
 /**
