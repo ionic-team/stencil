@@ -68,19 +68,19 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
 
   // normalize class / classname attributes
   if (vnode.vattrs) {
-    if (vnode.vattrs.className) {
-      vnode.vattrs.class = vnode.vattrs.className;
+    if (vnode.vattrs['className']) {
+      vnode.vattrs['class'] = vnode.vattrs['className'];
     }
-    if (vnode.vattrs.class && typeof vnode.vattrs.class === 'object') {
+    if (vnode.vattrs['class'] && typeof vnode.vattrs['class'] === 'object') {
       let key, classNameString = '';
 
-      for (key in vnode.vattrs.class) {
-        if (vnode.vattrs.class[key] === true) {
+      for (key in vnode.vattrs['class']) {
+        if (vnode.vattrs['class'][key] === true) {
           classNameString += ' ' + key;
         }
       }
 
-      vnode.vattrs.class = classNameString.substr(1);
+      vnode.vattrs['class'] = classNameString.substr(1);
     }
   }
 
