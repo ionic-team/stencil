@@ -149,6 +149,7 @@ Web Components, specifically Custom Elements, are natively supported in Chrome a
 
 For the small minority of browsers that do not support modern browser features and APIs, Stencil will automatically polyfill them on-demand. What this means is that for browsers that already support the feature natively, they will not have to download and parse any unnecessary JavaScript. The great news is that in today's web landscape, most modern APIs are already shipping for what Stencil requires. Polyfills which are loaded on-demand include:
 
+ - [Minimal polyfill for <template>](https://github.com/webcomponents/template)
  - [Custom Element](https://github.com/WebReflection/document-register-element)
  - [Promise](https://github.com/stefanpenner/es6-promise)
  - [fetch](https://github.com/github/fetch)
