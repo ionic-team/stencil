@@ -13,8 +13,10 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
   const hostMeta = cmpMeta.hostMeta;
 
   if (instance.render || instance.hostData || hostMeta) {
+    plt.activeRender = true;
     const vnodeChildren = instance.render && instance.render();
-    let vnodeHostData: any = instance.hostData && instance.hostData();
+    let vnodeHostData = instance.hostData && instance.hostData();
+    plt.activeRender = false;
 
     if (hostMeta) {
       vnodeHostData = Object.keys(hostMeta).reduce((hostData, key) => {
@@ -34,7 +36,7 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
 
     // if we haven't already created a vnode, then we give the renderer the actual element
     // if this is a re-render, then give the renderer the last vnode we already created
-    let oldVNode = elm._vnode || new VNodeObj();
+    const oldVNode = elm._vnode || new VNodeObj();
     oldVNode.elm = elm;
 
     // each patch always gets a new vnode

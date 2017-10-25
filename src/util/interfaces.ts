@@ -931,25 +931,26 @@ export interface VNodeProdData {
 
 
 export interface PlatformApi {
-  registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
+  activeRender?: boolean;
+  attachStyles: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
+  connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
-  isDefinedComponent?: (elm: Element) => boolean;
+  emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
   getContextItem: (contextKey: string) => any;
-  propConnect: (ctrlTag: string) => PropConnect;
-  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
-  render?: RendererApi;
-  connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
-  queue: QueueApi;
-  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
   getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
-  emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
-  tmpDisconnected?: boolean;
-  onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   isClient?: boolean;
+  isDefinedComponent?: (elm: Element) => boolean;
   isPrerender?: boolean;
   isServer?: boolean;
-  attachStyles: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
+  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
+  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
+  onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
+  propConnect: (ctrlTag: string) => PropConnect;
+  queue: QueueApi;
+  registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
+  render?: RendererApi;
+  tmpDisconnected?: boolean;
 }
 
 
