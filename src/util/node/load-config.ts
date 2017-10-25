@@ -1,8 +1,6 @@
 import { BuildConfig, Logger } from '../../util/interfaces';
 import { getNodeSys } from './node-sys';
 import { NodeLogger } from './node-logger';
-import * as fs from 'fs';
-import * as path from 'path';
 
 
 export function loadConfig(config: string | BuildConfig) {
@@ -33,6 +31,7 @@ export function loadConfig(config: string | BuildConfig) {
 
   if (!buildConfig.sys) {
     // if the config was not provided then use the default node sys
+    const path = require('path');
     buildConfig.sys = getNodeSys(path.join(__dirname, '../'), buildConfig.logger);
   }
 
@@ -41,6 +40,8 @@ export function loadConfig(config: string | BuildConfig) {
 
 
 export function loadConfigFile(process: NodeJS.Process, configPath: string, logger: Logger) {
+  const fs = require('fs');
+  const path = require('path');
   let config: BuildConfig;
 
   if (!path.isAbsolute(configPath)) {

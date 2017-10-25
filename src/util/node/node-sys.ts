@@ -2,12 +2,44 @@ import { BuildConfig, Diagnostic, Logger, PackageJsonData, StencilSystem } from 
 import { createContext, runInContext } from './node-context';
 import { createDom } from './node-dom';
 import { normalizePath } from '../../compiler/util';
-import * as fs from 'fs';
-import * as path from 'path';
 
 
 export function getNodeSys(distRootDir: string, logger: Logger) {
+  const fs = require('fs');
+  const path = require('path');
   const coreClientFileCache: {[key: string]: string} = {};
+
+
+  function resolveModule(fromDir: string, moduleId: string) {
+    const Module = require('module');
+
+    fromDir = path.resolve(fromDir);
+    const fromFile = path.join(fromDir, 'noop.js');
+
+    let dir = Module._resolveFilename(moduleId, {
+      id: fromFile,
+      filename: fromFile,
+      paths: Module._nodeModulePaths(fromDir)
+    });
+
+    const root = path.parse(fromDir).root;
+    let packageJsonFilePath: any;
+
+    while (dir !== root) {
+      dir = path.dirname(dir);
+      packageJsonFilePath = path.join(dir, 'package.json');
+
+      try {
+        fs.accessSync(packageJsonFilePath);
+      } catch (e) {
+        continue;
+      }
+
+      return normalizePath(packageJsonFilePath);
+    }
+
+    throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
+  }
 
   let packageJsonData: PackageJsonData;
   try {
@@ -108,7 +140,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
           resolve(coreClientFileCache[filePath]);
 
         } else {
-          fs.readFile(filePath, 'utf-8', (err, data) => {
+          fs.readFile(filePath, 'utf-8', (err: Error, data: string) => {
             if (err) {
               reject(err);
             } else {
@@ -274,36 +306,4 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
   });
 
   return sys;
-}
-
-
-function resolveModule(fromDir: string, moduleId: string) {
-  const Module = require('module');
-
-  fromDir = path.resolve(fromDir);
-  const fromFile = path.join(fromDir, 'noop.js');
-
-  let dir = Module._resolveFilename(moduleId, {
-    id: fromFile,
-    filename: fromFile,
-    paths: Module._nodeModulePaths(fromDir)
-  });
-
-  const root = path.parse(fromDir).root;
-  let packageJsonFilePath: any;
-
-  while (dir !== root) {
-    dir = path.dirname(dir);
-    packageJsonFilePath = path.join(dir, 'package.json');
-
-    try {
-      fs.accessSync(packageJsonFilePath);
-    } catch (e) {
-      continue;
-    }
-
-    return normalizePath(packageJsonFilePath);
-  }
-
-  throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
 }
