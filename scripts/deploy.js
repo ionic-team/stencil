@@ -154,41 +154,44 @@ function runTasks(opts) {
 			task: () => execa('npm', ['run', 'prepare.package'], { cwd: scriptsDir })
 		},
 		{
-			title: 'Install "dist" @stencil/core dependencies',
-			task: () => execa('npm', ['install', '--no-package-lock'], { cwd: dstDir })
-		},
-		{
 			title: 'Build "dist" @stencil/core local dependencies',
 			task: () => execa('npm', ['run', 'build.deps'], { cwd: scriptsDir })
 		}
 	);
 
 	if (opts.publish) {
-		publish
-		tasks.push({
-			title: 'Publish "dist" @stencil/core package',
-			task: () => execa('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir })
-		},
-		{
-			title: 'Pushing to Github',
-			task: () => execa('git', ['push', '--follow-tags'], { cwd: rootDir })
-		});
+		// publish
+		tasks.push(
+			{
+				title: 'Publish "dist" @stencil/core package',
+				task: () => execa('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir })
+			},
+			{
+				title: 'Pushing to Github',
+				task: () => execa('git', ['push', '--follow-tags'], { cwd: rootDir })
+			}
+		);
 
 	} else {
 		// dry run
-		tasks.push({
-			title: 'Create dist/core.tar.gz package',
-			task: () => execa('tar', ['-zcf', 'core.tar.gz', './'], { cwd: dstDir }),
-		});
+		tasks.push(
+			{
+				title: 'Install "dist" @stencil/core dependencies',
+				task: () => execa('npm', ['install', '--no-package-lock'], { cwd: dstDir })
+			},
+			{
+				title: 'Create dist/core.tar.gz package',
+				task: () => execa('tar', ['-zcf', 'core.tar.gz', './'], { cwd: dstDir }),
+			}
+		);
 	}
 
 	const listr = new Listr(tasks, { showSubtasks: false });
 
 	return listr.run()
-		.then(() => readPkgUp())
 		.then(() => {
 			if (opts.publish) {
-				console.log(`\n ${pkg.name} ${pkg.version} published 🎉\n`);
+				console.log(`\n ${pkg.name} ${newVersion} published 🎉\n`);
 			} else {
 				console.log(`\n ${pkg.name} dryrun finished 🕵️\n`);
 			}
