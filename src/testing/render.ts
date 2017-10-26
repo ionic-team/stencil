@@ -4,6 +4,7 @@ import { hydrateHtml } from '../server/hydrate-html';
 import { mockLogger, mockStencilSystem } from './mocks';
 import { validateBuildConfig } from '../util/validate-config';
 
+import './expect';
 
 export async function render(opts: RenderTestOptions): Promise<any> {
   validateRenderOptions(opts);

@@ -101,6 +101,7 @@
   "types": "./dist/index.d.ts",
   "jest": {
     "testEnvironment": "node",
+    "setupTestFrameworkScriptFile": "<rootDir>/scripts/setupTests.js",
     "moduleFileExtensions": [
       "ts",
       "tsx",

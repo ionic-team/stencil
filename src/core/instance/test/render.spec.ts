@@ -1,9 +1,7 @@
 import { ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
 import { mockPlatform, mockElement } from '../../../testing/mocks';
-import { testClasslist, testAttributes } from '../../../testing/utils';
 import { render } from '../render';
 import { h } from '../../renderer/h';
-
 
 describe('instance render', () => {
 
@@ -79,8 +77,7 @@ describe('instance render', () => {
       }
 
       doRender(MyComponent);
-
-      testClasslist(elm, ['a', 'clAss', 'My-class_']);
+      expect(elm).toMatchClasses(['a', 'clAss', 'My-class_']);
     });
 
     it('should set attributes', () => {
@@ -101,8 +98,8 @@ describe('instance render', () => {
 
       doRender(MyComponent);
 
-      testClasslist(elm, ['a', 'b', 'c', 'my-class']);
-      testAttributes(elm, {
+      expect(elm).toMatchClasses(['a', 'b', 'c', 'my-class']);
+      expect(elm).toMatchAttributes({
         side: '  left   top ',
         empty: '',
         class: 'a b c my-class',
@@ -131,8 +128,8 @@ describe('instance render', () => {
 
       doRender(MyComponent);
 
-      testClasslist(elm, ['a', 'hola']);
-      testAttributes(elm, {
+      expect(elm).toMatchClasses(['a', 'hola']);
+      expect(elm).toMatchAttributes({
         class: 'a hola',
         number: '12',
         appear: 'true'
@@ -148,7 +145,7 @@ describe('instance render', () => {
         }
       });
 
-      testClasslist(elm, ['my-component']);
+      expect(elm).toMatchClasses(['my-component']);
     });
 
     it('should apply theme with mode', () => {
@@ -162,7 +159,7 @@ describe('instance render', () => {
         }
       });
 
-      testClasslist(elm, ['my-component', 'my-component-ios']);
+      expect(elm).toMatchClasses(['my-component', 'my-component-ios']);
     });
 
     it('should apply theme with mode and color', () => {
@@ -177,7 +174,7 @@ describe('instance render', () => {
         }
       });
 
-      testClasslist(elm, [
+      expect(elm).toMatchClasses([
         'my-component',
         'my-component-md',
         'my-component-main',
@@ -211,7 +208,7 @@ describe('instance render', () => {
         }
       });
 
-      testClasslist(elm, [
+      expect(elm).toMatchClasses([
         'a',
         'hola',
         'my-component',
@@ -220,7 +217,7 @@ describe('instance render', () => {
         'my-component-md-main'
       ]);
 
-      testAttributes(elm, {
+      expect(elm).toMatchAttributes({
         'class': 'a hola my-component my-component-md my-component-main my-component-md-main',
         'number': '12',
         'appear': 'true',
