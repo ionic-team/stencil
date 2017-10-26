@@ -1039,7 +1039,7 @@ export interface StencilSystem {
   ensureFile?(dir: string): Promise<void>;
   fs?: {
     access(path: string, callback: (err: any) => void): void;
-    accessSync(path: string | Buffer, mode?: number): void
+    accessSync(path: string, mode?: number): void
     mkdir(path: string, callback?: (err?: any) => void): void;
     readdir(path: string, callback?: (err: any, files: string[]) => void): void;
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;

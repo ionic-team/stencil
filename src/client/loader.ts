@@ -1,7 +1,7 @@
 import { LoadComponentRegistry } from '../util/interfaces';
 
 
-(function(window: any, document: Document, appNamespace?: string, publicPath?: string, appCore?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any, i?: number) {
+(function(window: any, document: Document, appNamespace?: string, publicPath?: string, appCore?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any, i?: number, css?: string[]) {
   'use strict';
 
   // create global namespace if it doesn't already exist
@@ -9,10 +9,13 @@ import { LoadComponentRegistry } from '../util/interfaces';
 
   // auto hide components until they been fully hydrated
   // reusing the "x" variable from the args for funzies
-  x = document.createElement('style');
-  x.innerHTML = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; }).join() + '{visibility:hidden}';
-  x.setAttribute('data-visibility', '');
-  document.head.insertBefore(x, document.head.firstChild);
+  css = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
+  if (css.length) {
+    x = document.createElement('style');
+    x.innerHTML = css.join() + '{visibility:hidden}';
+    x.setAttribute('data-visibility', '');
+    document.head.insertBefore(x, document.head.firstChild);
+  }
 
   // get this current script
   appNamespace = appNamespace.toLowerCase();
