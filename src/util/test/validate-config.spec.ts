@@ -6,7 +6,7 @@ import * as path from 'path';
 
 describe('validation', () => {
 
-  describe('validateBuildConfig', () => {
+  describe('hydrate css', () => {
 
     it('should set hydratedCssClass', () => {
       config.hydratedCssClass = '💎';
@@ -18,6 +18,11 @@ describe('validation', () => {
       validateBuildConfig(config);
       expect(config.hydratedCssClass).toBe('hydrated');
     });
+
+  });
+
+
+  describe('hashed filenames', () => {
 
     it('should throw error when hashedFileNameLength to small', () => {
       expect(() => {
@@ -62,6 +67,11 @@ describe('validation', () => {
       expect(config.hashFileNames).toBe(false);
     });
 
+  });
+
+
+  describe('minifyJs', () => {
+
     it('should set minifyJs to true', () => {
       config.devMode = true;
       config.minifyJs = true;
@@ -81,6 +91,11 @@ describe('validation', () => {
       expect(config.minifyJs).toBe(false);
     });
 
+  });
+
+
+  describe('minifyCss', () => {
+
     it('should set minifyCss to true', () => {
       config.devMode = true;
       config.minifyCss = true;
@@ -99,6 +114,11 @@ describe('validation', () => {
       validateBuildConfig(config);
       expect(config.minifyCss).toBe(false);
     });
+
+  });
+
+
+  describe('validateBuildConfig', () => {
 
     it('should default watch to false', () => {
       validateBuildConfig(config);
@@ -252,6 +272,45 @@ describe('validation', () => {
       expect(path.isAbsolute(config.global)).toBe(true);
     });
 
+    it('should throw error for missing sys', () => {
+      expect(() => {
+        config.sys = null;
+        validateBuildConfig(config);
+      }).toThrowError('config.sys required');
+    });
+
+    it('should throw error for missing logger', () => {
+      expect(() => {
+        config.logger = null;
+        validateBuildConfig(config);
+      }).toThrowError('config.logger required');
+    });
+
+    it('should throw error for missing rootDir', () => {
+      expect(() => {
+        config.rootDir = null;
+        validateBuildConfig(config);
+      }).toThrowError('config.rootDir required');
+      expect(() => {
+        config.rootDir = undefined;
+        validateBuildConfig(config);
+      }).toThrowError('config.rootDir required');
+    });
+
+    it('should throw error for blank config', () => {
+      expect(() => {
+        validateBuildConfig(null);
+      }).toThrowError('invalid build config');
+      expect(() => {
+        validateBuildConfig(undefined);
+      }).toThrowError('invalid build config');
+    });
+
+  });
+
+
+  describe('namespace', () => {
+
     it('should not allow special characters in namespace', () => {
       expect(() => {
         config.namespace = 'My/Namespace';
@@ -298,6 +357,12 @@ describe('validation', () => {
       }).toThrow();
     });
 
+    it('should allow underscore in the namespace', () => {
+      config.namespace = 'My_Namespace';
+      validateBuildConfig(config);
+      expect(config.namespace).toBe('My_Namespace');
+    });
+
     it('should allow dash in the namespace', () => {
       config.namespace = 'My-Namespace';
       validateBuildConfig(config);
@@ -315,57 +380,8 @@ describe('validation', () => {
       expect(config.namespace).toBe('App');
     });
 
-    it('should throw error for missing sys', () => {
-      expect(() => {
-        config.sys = null;
-        validateBuildConfig(config);
-      }).toThrowError('config.sys required');
-    });
-
-    it('should throw error for missing logger', () => {
-      expect(() => {
-        config.logger = null;
-        validateBuildConfig(config);
-      }).toThrowError('config.logger required');
-    });
-
-    it('should throw error for missing rootDir', () => {
-      expect(() => {
-        config.rootDir = null;
-        validateBuildConfig(config);
-      }).toThrowError('config.rootDir required');
-      expect(() => {
-        config.rootDir = undefined;
-        validateBuildConfig(config);
-      }).toThrowError('config.rootDir required');
-    });
-
-    it('should throw error for blank config', () => {
-      expect(() => {
-        validateBuildConfig(null);
-      }).toThrowError('invalid build config');
-      expect(() => {
-        validateBuildConfig(undefined);
-      }).toThrowError('invalid build config');
-    });
-
   });
 
-  describe('setProcessEnvironment', () => {
-
-    it('should set NODE_ENV production', () => {
-      config.devMode = false;
-      setProcessEnvironment(config);
-      expect(process.env.NODE_ENV).toBe('production');
-    });
-
-    it('should set NODE_ENV development', () => {
-      config.devMode = true;
-      setProcessEnvironment(config);
-      expect(process.env.NODE_ENV).toBe('development');
-    });
-
-  });
 
   describe('copy tasks', () => {
 
@@ -431,6 +447,24 @@ describe('validation', () => {
     });
 
   });
+
+
+  describe('setProcessEnvironment', () => {
+
+    it('should set NODE_ENV production', () => {
+      config.devMode = false;
+      setProcessEnvironment(config);
+      expect(process.env.NODE_ENV).toBe('production');
+    });
+
+    it('should set NODE_ENV development', () => {
+      config.devMode = true;
+      setProcessEnvironment(config);
+      expect(process.env.NODE_ENV).toBe('development');
+    });
+
+  });
+
 
   var sys = mockStencilSystem();
   var config: BuildConfig;
