@@ -94,10 +94,10 @@ function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: 
 export function normalizeEncapsulation(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
   // default to NOT use shadow dom or scoped css...to start, debatable later on
 
-  if (typeof userOpts.shadow === 'boolean') {
+  if (userOpts.shadow === true) {
     cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
 
-  } else if (typeof userOpts.scoped === 'boolean') {
+  } else if (userOpts.scoped === true) {
     cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
 
   } else {

@@ -7,6 +7,15 @@ describe('component decorator', () => {
 
   describe('normalizeEncapsulation', () => {
 
+    it('force shadow encapsulation false', () => {
+      const cmpMeta: ComponentMeta = {};
+      normalizeEncapsulation({
+        tag: 'ion-tag',
+        shadow: false
+      }, cmpMeta);
+      expect(cmpMeta.encapsulation).toBe(ENCAPSULATION.NoEncapsulation);
+    });
+
     it('force shadow encapsulation with both shadow and scoped set', () => {
       const cmpMeta: ComponentMeta = {};
       normalizeEncapsulation({
