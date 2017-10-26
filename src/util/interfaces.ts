@@ -899,13 +899,13 @@ export interface HostContentNodes {
 
 export interface VNode {
   // using v prefixes largely so closure has no issue property renaming
-  vtag: string | number;
-  vkey: string | number;
-  vtext: string;
-  vchildren: VNode[];
-  vattrs: any;
-  vref: (elm: any) => void;
-  elm: Element|Node;
+  vtag?: string | number;
+  vkey?: string | number;
+  vtext?: string;
+  vchildren?: VNode[];
+  vattrs?: any;
+  vref?: (elm: any) => void;
+  elm?: Element|Node;
 }
 
 export interface VNodeData {

@@ -1,27 +1,24 @@
 import { addEventListener } from '../instance/listeners';
+import { EMPTY_ARR, EMPTY_OBJ } from '../../util/constants';
 import { PlatformApi, VNode } from '../../util/interfaces';
 
 
-const EMPTY_OBJ: any = {};
-const EMPTY_ARR: any[] = [];
-
-
 export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, propName?: string): void {
-  const elm = newVnode.elm as any;
-  const oldVnodeAttrs = (oldVnode != null && oldVnode.vattrs != null) ? oldVnode.vattrs : {};
-  const newVnodeAttrs = (newVnode.vattrs != null) ? newVnode.vattrs : {};
+  const elm = (newVnode.elm as any).host || (newVnode.elm as any);
+  const oldVnodeAttrs = (oldVnode && oldVnode.vattrs) || EMPTY_OBJ;
+  const newVnodeAttrs = newVnode.vattrs || EMPTY_OBJ;
 
   // remove attributes no longer present on the vnode by setting them to undefined
   for (propName in oldVnodeAttrs) {
     if (!(newVnodeAttrs && newVnodeAttrs[propName] != null) && oldVnodeAttrs[propName] != null) {
-      setAccessor(plt, elm, propName, oldVnodeAttrs[propName], oldVnodeAttrs[propName] = undefined, isSvgMode);
+      setAccessor(plt, elm, propName, oldVnodeAttrs[propName], undefined, isSvgMode);
     }
   }
 
   // add new & update changed attributes
   for (propName in newVnodeAttrs) {
     if (!(propName in oldVnodeAttrs) || newVnodeAttrs[propName] !== (propName === 'value' || propName === 'checked' ? elm[propName] : oldVnodeAttrs[propName])) {
-      setAccessor(plt, elm, propName, oldVnodeAttrs[propName], oldVnodeAttrs[propName] = newVnodeAttrs[propName], isSvgMode);
+      setAccessor(plt, elm, propName, oldVnodeAttrs[propName], newVnodeAttrs[propName], isSvgMode);
     }
   }
 }

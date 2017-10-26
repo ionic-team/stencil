@@ -89,7 +89,19 @@ export const SSR_VNODE_ID = 'data-ssrv';
 export const SSR_CHILD_ID = 'data-ssrc';
 
 
+/**
+ * Default style mode id
+ */
 export const DEFAULT_STYLE_MODE = '$';
+
+
+/**
+ * Reusable empty obj/array
+ * Don't add values to these!!
+ */
+export const EMPTY_OBJ: any = {};
+export const EMPTY_ARR: any[] = [];
+
 
 /**
  * Key Name to Key Code Map
