@@ -94,7 +94,8 @@ describe('setAccessor', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm.getAttribute('myprop')).toBe('false');
+
+    expect(elm).toMatchAttributes({ 'myprop': 'false' });
   });
 
   it('should set true boolean to attribute', () => {
@@ -103,7 +104,7 @@ describe('setAccessor', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm.getAttribute('myprop')).toBe('true');
+    expect(elm).toMatchAttributes({ 'myprop': 'true' });
   });
 
   it('should set number to attribute', () => {
@@ -112,7 +113,7 @@ describe('setAccessor', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm.getAttribute('myprop')).toBe('88');
+    expect(elm).toMatchAttributes({ 'myprop': '88' });
   });
 
   it('should set string to attribute', () => {
@@ -121,7 +122,7 @@ describe('setAccessor', () => {
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false);
     expect(elm.myprop).toBeUndefined();
-    expect(elm.getAttribute('myprop')).toBe('stringval');
+    expect(elm).toMatchAttributes({ 'myprop': 'stringval' });
   });
 
   var elm: any;
@@ -184,8 +185,7 @@ describe('setAccessor for inputs', () => {
         let inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
-        expect(inputElm.hasAttribute(propName)).toBe(true);
-        expect(inputElm.getAttribute(propName)).toBe(newValue.toString());
+        expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
       }
 
       it(`aria-disabled should be added when set to true`, () => {
@@ -222,7 +222,7 @@ describe('setAccessor for inputs', () => {
         let inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
-        expect(inputElm.hasAttribute(propName)).toBe(false);
+        expect(inputElm).toMatchAttributes({ });
       }
       it(`accept`, () => {
         testSpecialAttribute('accept', undefined, undefined);
@@ -267,8 +267,7 @@ describe('setAccessor for inputs', () => {
         let inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
-        expect(inputElm.hasAttribute(propName)).toBe(true);
-        expect(inputElm.getAttribute(propName)).toBe(newValue.toString());
+        expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
         expect((inputElm as any)[propName]).toBe(newValue);
       }
 
@@ -333,8 +332,7 @@ describe('setAccessor for inputs', () => {
         let inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
-        expect(inputElm.hasAttribute(propName)).toBe(true);
-        expect(inputElm.getAttribute(propName)).toBe('');
+        expect(inputElm).toMatchAttributes({ [propName]: '' });
         expect((inputElm as any)[propName]).toBe(newValue);
       }
 
@@ -376,8 +374,7 @@ describe('setAccessor for inputs', () => {
         let inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
-        expect(inputElm.hasAttribute(propName)).toBe(true);
-        expect(inputElm.getAttribute(propName)).toBe(newValue.toString());
+        expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
         expect((inputElm as any)[propName]).toBe(newValue.toString());
       }
 
