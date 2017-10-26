@@ -128,15 +128,27 @@ describe('h()', () => {
   });
 
   it('should add one class from string', () => {
-    var vnode = h('div', { class: 'some-class' });
+    var vnode = h('div', { class: 'some-class and another-class' });
     expect(vnode.vattrs.class).toBeDefined();
-    expect(vnode.vattrs.class).toEqual('some-class');
+    expect(vnode.vattrs.class).toEqual('some-class and another-class');
   });
 
   it('should add class from map of classnames and booleans', () => {
     var vnode = h('div', { class: { enabled: true, checked: false } });
     expect(vnode.vattrs.class).toBeDefined();
     expect(vnode.vattrs.class).toEqual('enabled');
+  });
+
+  it('should add class from className string', () => {
+    var vnode = h('div', { className: 'one point twenty-one gigawatts' });
+    expect(vnode.vattrs.class).toBeDefined();
+    expect(vnode.vattrs.class).toEqual('one point twenty-one gigawatts');
+  });
+
+  it('should add class from className map of classnames and booleans', () => {
+    var vnode = h('div', { className: { save: true, the: true, clock: true, tower: true, hillvalley: false } });
+    expect(vnode.vattrs.class).toBeDefined();
+    expect(vnode.vattrs.class).toEqual('save the clock tower');
   });
 
   it('should add props', () => {

@@ -55,32 +55,29 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     }
   }
 
-  vnodeData = (vnodeData === null) ? undefined : vnodeData;
-
-  let vnode = new VNodeObj();
+  const vnode = new VNodeObj();
   vnode.vtag = nodeName;
   vnode.vchildren = children;
-  if (vnodeData != null) {
+
+  if (vnodeData) {
     vnode.vattrs = vnodeData;
     vnode.vkey = vnodeData.key;
     vnode.vref = vnodeData.ref;
-  }
 
-  // normalize class / classname attributes
-  if (vnode.vattrs) {
-    if (vnode.vattrs['className']) {
-      vnode.vattrs['class'] = vnode.vattrs['className'];
+    // normalize class / classname attributes
+    if (vnodeData['className']) {
+      vnodeData['class'] = vnodeData['className'];
     }
-    if (vnode.vattrs['class'] && typeof vnode.vattrs['class'] === 'object') {
-      let key, classNameString = '';
 
-      for (key in vnode.vattrs['class']) {
-        if (vnode.vattrs['class'][key] === true) {
-          classNameString += ' ' + key;
+    if (typeof vnodeData['class'] === 'object') {
+      for (let key in vnodeData['class']) {
+        if (vnodeData['class'][key]) {
+          stack.push(key);
         }
       }
 
-      vnode.vattrs['class'] = classNameString.substr(1);
+      vnodeData['class'] = stack.join(' ');
+      stack.length = 0;
     }
   }
 
