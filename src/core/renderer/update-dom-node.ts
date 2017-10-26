@@ -28,20 +28,26 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
   if (name === 'class' && !isSvg) {
     // Class
     if (oldValue !== newValue) {
-      let oldList = (oldValue == null || oldValue === '') ? EMPTY_ARR : oldValue.trim().split(/\s+/);
-      let newList = (newValue == null || newValue === '') ? EMPTY_ARR : newValue.trim().split(/\s+/);
+      const oldList: string[] = (oldValue == null || oldValue === '') ? EMPTY_ARR : oldValue.trim().split(/\s+/);
+      const newList: string[] = (newValue == null || newValue === '') ? EMPTY_ARR : newValue.trim().split(/\s+/);
+
+      let classList: string[] = (elm.className == null || elm.className === '') ? EMPTY_ARR : elm.className.trim().split(/\s+/);
+
+      let i: number, listLength: number;
 
       for (i = 0, ilen = oldList.length; i < ilen; i++) {
         if (newList.indexOf(oldList[i]) === -1) {
-          elm.classList.remove(oldList[i]);
+          classList = classList.filter((c: string) => c !== oldList[i]);
         }
       }
 
       for (i = 0, ilen = newList.length; i < ilen; i++) {
         if (oldList.indexOf(newList[i]) === -1) {
-          elm.classList.add(newList[i]);
+          classList = [...classList, newList[i]];
         }
       }
+
+      elm.className = classList.join(' ');
     }
 
   } else if (name === 'style') {
