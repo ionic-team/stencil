@@ -79,6 +79,7 @@ export const enum NODE_TYPE {
   ElementNode = 1,
   TextNode = 3,
   CommentNode = 8,
+  DocumentFragment = 11,
 }
 
 

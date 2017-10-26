@@ -1,10 +1,13 @@
 import { addEventListener } from '../instance/listeners';
-import { EMPTY_ARR, EMPTY_OBJ } from '../../util/constants';
+import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
 import { PlatformApi, VNode } from '../../util/interfaces';
 
 
 export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, propName?: string): void {
-  const elm = (newVnode.elm as any).host || (newVnode.elm as any);
+  // if the element passed in is a shadow root, which is a document fragment
+  // then we want to be adding attrs/props to the shadow root's "host" element
+  // if it's not a shadow root, then we add attrs/props to the same element
+  const elm = (newVnode.elm.nodeType === NODE_TYPE.DocumentFragment && (newVnode.elm as ShadowRoot).host) ? (newVnode.elm as ShadowRoot).host : (newVnode.elm as any);
   const oldVnodeAttrs = (oldVnode && oldVnode.vattrs) || EMPTY_OBJ;
   const newVnodeAttrs = newVnode.vattrs || EMPTY_OBJ;
 
@@ -32,8 +35,6 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
       const newList: string[] = (newValue == null || newValue === '') ? EMPTY_ARR : newValue.trim().split(/\s+/);
 
       let classList: string[] = (elm.className == null || elm.className === '') ? EMPTY_ARR : elm.className.trim().split(/\s+/);
-
-      let i: number, listLength: number;
 
       for (i = 0, ilen = oldList.length; i < ilen; i++) {
         if (newList.indexOf(oldList[i]) === -1) {

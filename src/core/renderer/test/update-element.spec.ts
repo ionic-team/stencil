@@ -1,6 +1,8 @@
 import { updateElement } from '../update-dom-node';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
+import { NODE_TYPE } from '../../../util/constants';
 import { VNode } from '../../../util/interfaces';
+
 
 describe('updateElement', () => {
 
@@ -78,9 +80,10 @@ describe('updateElement', () => {
     }).not.toThrow();
   });
 
-  it('should use shadow root element when using shadow dom', () => {
+  it('should use host element on shadow root element when using shadow dom', () => {
     const elm: any = {
-      host: mockElement('my-tag') as HTMLElement
+      host: mockElement('div') as HTMLElement,
+      nodeType: NODE_TYPE.DocumentFragment
     };
     const oldVNode: VNode = null;
     const newVnode: VNode = {
@@ -93,6 +96,22 @@ describe('updateElement', () => {
     updateElement(plt, oldVNode, newVnode, false);
     expect(elm.host.className).toBe('mr fusion');
     expect(elm.host.style.color).toBe('gray');
+  });
+
+  it('should use host element when using an element with a "host" property', () => {
+    const elm: any = mockElement('a') as HTMLElement;
+    elm.host = 'localhost:8888';
+    const oldVNode: VNode = null;
+    const newVnode: VNode = {
+      elm: elm,
+      vattrs: {
+        class: 'mr fusion',
+        style: { color: 'gray' }
+      }
+    };
+    updateElement(plt, oldVNode, newVnode, false);
+    expect(elm.className).toBe('mr fusion');
+    expect(elm.style.color).toBe('gray');
   });
 
   it('should use host element when not shadow dom', () => {
