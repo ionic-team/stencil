@@ -2,6 +2,7 @@ import { h } from '../h';
 import { VNode } from '../vnode';
 import { toVNode } from '../to-vnode';
 import { mockElement, mockDomApi, mockRenderer, mockTextNode } from '../../../testing/mocks';
+import { testClasslist } from '../../../testing/utils';
 import { ENCAPSULATION, SVG_NS } from '../../../util/constants';
 const shuffle = require('knuth-shuffle').knuthShuffle;
 
@@ -111,10 +112,7 @@ describe('renderer', () => {
       let vnode1 = h('div', null, h('i', { class: { i: true, am: true, a: true, 'class': true } }));
       elm = patch(vnode0, vnode1).elm;
 
-      expect(elm.firstChild.classList.contains('am')).toBeTruthy();
-      expect(elm.firstChild.classList.contains('a')).toBeTruthy();
-      expect(elm.firstChild.classList.contains('class')).toBeTruthy();
-      expect(!elm.classList.contains('not')).toBeTruthy();
+      testClasslist(elm.firstChild, ['i', 'am', 'a', 'class']);
     });
 
     it('can create elements with text content', () => {
