@@ -289,6 +289,7 @@ export interface AppRegistry {
   namespace: string;
   loader: string;
   core?: string;
+  coreSsr?: string;
   corePolyfilled?: string;
   global?: string;
   components: LoadComponentRegistry[];
@@ -316,6 +317,50 @@ export interface CompiledModeStyles {
   unscopedStyles?: string;
   scopedStyles?: string;
   writeFile?: boolean;
+}
+
+
+export interface CoreBuildConditionals {
+  coreId?: string;
+  fileName?: string;
+  polyfills?: boolean;
+
+  _build_es2015?: boolean;
+  _build_es5?: boolean;
+  _build_verbose_error?: boolean;
+  _build_custom_slot?: boolean;
+
+  _build_ssr_parser?: boolean;
+  _build_ssr_serializer?: boolean;
+
+  _build_styles?: boolean;
+  _build_scoped_css?: boolean;
+  _build_shadow_dom?: boolean;
+
+  _build_render?: boolean;
+  _build_host_render?: boolean;
+  _build_svg_render?: boolean;
+
+  // decorators
+  _build_element?: boolean;
+  _build_event?: boolean;
+  _build_listener?: boolean;
+  _build_method?: boolean;
+  _build_observe_attr?: boolean;
+  _build_prop?: boolean;
+  _build_prop_connect?: boolean;
+  _build_prop_context?: boolean;
+  _build_prop_did_change?: boolean;
+  _build_prop_will_change?: boolean;
+  _build_state?: boolean;
+
+  // lifecycle events
+  _build_did_load?: boolean;
+  _build_will_load?: boolean;
+  _build_did_update?: boolean;
+  _build_will_update?: boolean;
+  _build_did_unload?: boolean;
+  _build_will_unload?: boolean;
 }
 
 
@@ -465,6 +510,7 @@ export interface BuildResults {
 
 export interface BuildContext {
   moduleFiles?: ModuleFiles;
+  manifestBundles?: ManifestBundle[];
   jsFiles?: FilesMap;
   cssFiles?: FilesMap;
   compiledFileCache?: ModuleBundles;
@@ -483,10 +529,12 @@ export interface BuildContext {
     registryJson?: string;
     indexHtml?: string;
     components_d_ts?: string;
+    [key: string]: string;
   };
   watcher?: FSWatcher;
   tsConfig?: any;
   hasIndexHtml?: boolean;
+  coreBuildConditionals?: CoreBuildConditionals;
 
   isRebuild?: boolean;
   isChangeBuild?: boolean;
@@ -1057,12 +1105,12 @@ export interface StencilSystem {
   }): Promise<string[]>;
   isGlob?(str: string): boolean;
   loadConfigFile?(configPath: string): BuildConfig;
-  minifyCss?(input: string): {
+  minifyCss?(input: string, opts?: any): {
     output: string;
     sourceMap?: any;
     diagnostics?: Diagnostic[];
   };
-  minifyJs?(input: string): {
+  minifyJs?(input: string, opts?: any): {
     output: string;
     sourceMap?: any;
     diagnostics?: Diagnostic[];

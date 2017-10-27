@@ -14,6 +14,7 @@
     ],
     "module": "es2015",
     "moduleResolution": "node",
+    "noEmitHelpers": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -23,12 +24,7 @@
     "target": "es2015"
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "cli",
-    "compiler",
-    "server"
+    "index.ts",
+    "client/*.ts"
   ]
 }

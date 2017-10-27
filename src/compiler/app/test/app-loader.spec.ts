@@ -10,7 +10,7 @@ describe('build-project-files', () => {
   let config: BuildConfig;
 
   beforeEach(() => {
-    mockStencilContent = `('__STENCIL__APP__')`;
+    mockStencilContent = `('__APP__')`;
     config = {
       logger: mockLogger(),
       sys: mockStencilSystem(),
@@ -32,7 +32,7 @@ describe('build-project-files', () => {
     });
 
     it('only replaces the magic string', () => {
-      mockStencilContent = `(This is bogus text'__STENCIL__APP__'yeah, me too)`;
+      mockStencilContent = `(This is bogus text'__APP__'yeah, me too)`;
       const projectLoader = callInjectAppIntoLoader();
       expect(projectLoader).toBe(`(This is bogus text"MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]yeah, me too)`);
     });
@@ -137,7 +137,7 @@ describe('build-project-files', () => {
     });
 
     it('includes the injected app', async () => {
-      mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__STENCIL__APP__') yeah me too`));
+      mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
       const res = await callGenerateLoader();
       let lines = res.split('\n');
       expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]) yeah me too`);

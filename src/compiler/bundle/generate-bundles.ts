@@ -11,6 +11,8 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, manifest
   });
 
   ctx.registry = generateComponentRegistry(manifestBundles);
+
+  return manifestBundles;
 }
 
 

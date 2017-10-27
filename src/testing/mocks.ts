@@ -186,7 +186,7 @@ function mockGetClientCoreFile(opts: {staticName: string}) {
   return Promise.resolve(`
     (function (window, document, apptNamespace, appFileName, appCore, appCorePolyfilled, components) {
         // mock getClientCoreFile, staticName: ${opts.staticName}
-    })(window, document, '__STENCIL__APP__');`);
+    })(window, document, '__APP__');`);
 }
 
 

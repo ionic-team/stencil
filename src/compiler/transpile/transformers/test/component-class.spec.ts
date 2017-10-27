@@ -1,4 +1,4 @@
-import { BuildConfig, Diagnostic, ModuleFiles, ModuleFile, ComponentMeta } from '../../../../util/interfaces';
+import { BuildConfig, BuildContext, Diagnostic, ModuleFiles, ModuleFile, ComponentMeta } from '../../../../util/interfaces';
 import { mockBuildConfig } from '../../../../testing/mocks';
 import { componentTsFileClass } from '../component-class';
 import { DEFAULT_COMPILER_OPTIONS } from '../../compiler-options';
@@ -8,10 +8,11 @@ import * as ts from 'typescript';
 
 function customJsxTransform(source, fileMetaArray: ModuleFiles) {
   const config = mockBuildConfig();
+  var ctx: BuildContext = { coreBuild: {} };
 
   return ts.transpileModule(source, {
     transformers: {
-        before: [componentTsFileClass(config, fileMetaArray, [] as Diagnostic[])]
+        before: [componentTsFileClass(config, ctx, fileMetaArray, [] as Diagnostic[])]
     },
     compilerOptions: Object.assign({}, DEFAULT_COMPILER_OPTIONS, {
       target: ts.ScriptTarget.ES2017
@@ -114,4 +115,5 @@ describe('vnode-slot transform', () => {
       expect(customJsxTransform(source, fileMetaArray)).toMatch(/Green/);
     });
   });
+
 });
