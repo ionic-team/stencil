@@ -34,7 +34,7 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
 export function createListenerCallback(elm: HostElement, eventMethodName: string) {
   // create the function that gets called when the element receives
   // an event which it should be listening for
-  return function onEvent(ev?: any) {
+  return (ev?: any) => {
     if (elm.$instance) {
       // instance is ready, let's call it's member method for this event
       elm.$instance[eventMethodName](ev);
@@ -177,19 +177,19 @@ export function addEventListener(
   elm.addEventListener(eventName, eventListener, eventListenerOpts);
 
   // return a function which is used to remove this very same listener
-  return function removeListener() {
+  return () => {
     elm && elm.removeEventListener(eventName, eventListener, eventListenerOpts);
   };
 }
 
 
-export function detachListeners(elm: HostElement) {
+export function detachListeners(elm: HostElement, i?: number) {
   const deregisterFns = elm._listeners;
 
   if (deregisterFns) {
     const eventNames = Object.keys(deregisterFns);
 
-    for (var i = 0; i < eventNames.length; i++) {
+    for (i = 0; i < eventNames.length; i++) {
       deregisterFns[eventNames[i]]();
     }
 

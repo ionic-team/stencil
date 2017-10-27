@@ -28,15 +28,15 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   // initialize Core global object
   Context.dom = createDomControllerClient(win, now);
 
-  Context.addListener = function addListener(elm, eventName, cb, opts) {
+  Context.addListener = (elm, eventName, cb, opts) => {
     return addEventListener(plt, elm, eventName, cb, opts && opts.capture, opts && opts.passive);
   };
 
-  Context.enableListener = function enableListener(instance, eventName, enabled, attachTo) {
+  Context.enableListener = (instance, eventName, enabled, attachTo) => {
     enableEventListener(plt, instance, eventName, enabled, attachTo);
   };
 
-  Context.emit = function emitEvent(elm: Element, eventName: string, data: EventEmitterData) {
+  Context.emit = (elm: Element, eventName: string, data: EventEmitterData) => {
     elm && elm.dispatchEvent(new WindowCustomEvent(
       Context.eventNameFn ? Context.eventNameFn(eventName) : eventName,
       data
@@ -175,7 +175,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   }
 
 
-  App.loadComponents = function loadComponents(bundleId, importFn) {
+  App.loadComponents = (bundleId, importFn) => {
     // https://youtu.be/Z-FPimCmbX8?t=31
     // jsonp tag team callback from requested bundles contain tags
     const args = arguments;
@@ -203,7 +203,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   };
 
 
-  App.loadStyles = function loadStyles() {
+  App.loadStyles = () => {
     // jsonp callback from requested bundles
     // either directly add styles to document.head or add the
     // styles to a template tag to be cloned later for shadow roots
@@ -328,7 +328,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   var WindowCustomEvent = (win as any).CustomEvent;
   if (typeof WindowCustomEvent !== 'function') {
     // CustomEvent polyfill
-    WindowCustomEvent = function CustomEvent(event: any, data: EventEmitterData) {
+    WindowCustomEvent = (event: any, data: EventEmitterData) => {
       var evt = domApi.$createEvent();
       evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
       return evt;

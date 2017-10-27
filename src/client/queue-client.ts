@@ -61,32 +61,29 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
     }
   }
 
-  function add(cb: Function, priority?: number) {
-    if (priority === PRIORITY.High) {
-      // uses Promise.resolve() for next tick
-      highPriority.push(cb);
+  return {
+    add: (cb: Function, priority?: number) => {
+      if (priority === PRIORITY.High) {
+        // uses Promise.resolve() for next tick
+        highPriority.push(cb);
 
-      if (!resolvePending) {
-        // not already pending work to do, so let's tee it up
-        resolvePending = true;
-        highPromise.then(doHighPriority);
-      }
+        if (!resolvePending) {
+          // not already pending work to do, so let's tee it up
+          resolvePending = true;
+          highPromise.then(doHighPriority);
+        }
 
-    } else {
-      // defaults to low priority
-      // uses requestAnimationFrame
-      lowPriority.push(cb);
+      } else {
+        // defaults to low priority
+        // uses requestAnimationFrame
+        lowPriority.push(cb);
 
-      if (!rafPending) {
-        // not already pending work to do, so let's tee it up
-        rafPending = true;
-        raf(doWork);
+        if (!rafPending) {
+          // not already pending work to do, so let's tee it up
+          rafPending = true;
+          raf(doWork);
+        }
       }
     }
-  }
-
-  return {
-    add: add,
-    flush: flush
   };
 }

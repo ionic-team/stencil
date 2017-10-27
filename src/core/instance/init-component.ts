@@ -54,7 +54,7 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
-    delete elm.$activeLoading;
+    elm.$activeLoading = null;
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)

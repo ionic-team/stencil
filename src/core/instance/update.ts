@@ -10,7 +10,7 @@ export function queueUpdate(plt: PlatformApi, elm: HostElement) {
     elm._isQueuedForUpdate = true;
 
     // run the patch in the next tick
-    plt.queue.add(function queueUpdateNextTick() {
+    plt.queue.add(() => {
       // no longer queued
       elm._isQueuedForUpdate = false;
 

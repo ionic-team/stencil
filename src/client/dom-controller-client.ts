@@ -12,26 +12,6 @@ export function createDomControllerClient(win: Window, now: Now): DomController 
   }
 
 
-  function domRead(cb: RafCallback) {
-    readCBs.push(cb);
-
-    if (!rafPending) {
-      rafPending = true;
-      raf(rafFlush);
-    }
-  }
-
-
-  function domWrite(cb: RafCallback) {
-    writeCBs.push(cb);
-
-    if (!rafPending) {
-      rafPending = true;
-      raf(rafFlush);
-    }
-  }
-
-
   function rafFlush(timeStamp: number, startTime?: number, cb?: RafCallback, err?: any) {
     try {
       startTime = now();
@@ -64,8 +44,24 @@ export function createDomControllerClient(win: Window, now: Now): DomController 
   }
 
   return {
-    read: domRead,
-    write: domWrite,
+
+    read: (cb: RafCallback) => {
+      readCBs.push(cb);
+      if (!rafPending) {
+        rafPending = true;
+        raf(rafFlush);
+      }
+    },
+
+    write: (cb: RafCallback) => {
+      writeCBs.push(cb);
+
+      if (!rafPending) {
+        rafPending = true;
+        raf(rafFlush);
+      }
+    },
+
     raf: raf
   };
 }

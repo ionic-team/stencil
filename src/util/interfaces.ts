@@ -50,7 +50,7 @@ export interface EventEmitter<T= any> {
 
 export interface QueueApi {
   add: (cb: Function, priority?: number) => void;
-  flush: (cb?: Function) => void;
+  flush?: (cb?: Function) => void;
 }
 
 
