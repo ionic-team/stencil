@@ -218,6 +218,7 @@ var RESERVED_PROPERTIES: string[] = [
   'read',
   'write',
   '$definedComponents',
+  'dispatchEvent',
 
 
   /**
