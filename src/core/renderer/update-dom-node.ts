@@ -1,6 +1,7 @@
 import { addEventListener } from '../instance/listeners';
 import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
 import { PlatformApi, VNode } from '../../util/interfaces';
+import { toLowerCase } from '../../util/helpers';
 
 
 export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, propName?: string): void {
@@ -72,7 +73,7 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
     // Event Handlers
     // adding an standard event listener, like <button onClick=...> or something
 
-    name = name.toLowerCase().substring(2);
+    name = toLowerCase(name).substring(2);
     const listeners = (elm._listeners = elm._listeners || {});
 
     if (newValue) {
@@ -112,7 +113,7 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
 
     if (BOOLEAN_ATTRS[name] === 1 && (!newValue || newValue === 'false')) {
       if (i) {
-        elm.removeAttributeNS(XLINK_NS, name.toLowerCase());
+        elm.removeAttributeNS(XLINK_NS, toLowerCase(name));
 
       } else {
         elm.removeAttribute(name);
@@ -120,7 +121,7 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
 
     } else if (typeof newValue !== 'function') {
       if (i) {
-        elm.setAttributeNS(XLINK_NS, name.toLowerCase(), newValue);
+        elm.setAttributeNS(XLINK_NS, toLowerCase(name), newValue);
 
       } else {
         elm.setAttribute(name, newValue);

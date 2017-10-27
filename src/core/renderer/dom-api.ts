@@ -1,4 +1,5 @@
 import { DomApi } from '../../util/interfaces';
+import { toLowerCase } from '../../util/helpers';
 
 
 export function createDomApi(document: Document): DomApi {
@@ -37,7 +38,7 @@ export function createDomApi(document: Document): DomApi {
 
     $nextSibling: (node: Node) => node.nextSibling,
 
-    $tagName: (elm: Element) => elm.tagName,
+    $tagName: (elm: Element) => toLowerCase(elm.tagName),
 
     $getTextContent: (node: any) => node.textContent,
 

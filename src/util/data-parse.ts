@@ -1,8 +1,7 @@
 import { ATTR_CASE, MEMBER_TYPE, PROP_TYPE } from './constants';
 import { ComponentMeta, ComponentRegistry, LoadComponentMeta, ComponentEventData,
   ComponentListenersData, ComponentMemberData, LoadComponentRegistry } from '../util/interfaces';
-import { isDef } from './helpers';
-import { toDashCase } from '../util/helpers';
+import { isDef, toDashCase, toLowerCase } from './helpers';
 
 
 export function parseComponentLoaders(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry, attr?: number) {
@@ -62,7 +61,7 @@ function parseMembersData(cmpMeta: ComponentMeta, memberData: ComponentMemberDat
       var d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        attribName: d[2] ? attr === ATTR_CASE.LowerCase ? d[0].toLowerCase() : toDashCase(d[0]) : (0 as any),
+        attribName: d[2] ? attr === ATTR_CASE.LowerCase ? toLowerCase(d[0]) : toDashCase(d[0]) : (0 as any),
         propType: d[3],
         ctrlId: d[4]
       };

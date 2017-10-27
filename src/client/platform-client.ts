@@ -94,7 +94,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   function getComponentMeta(elm: Element) {
     // get component meta using the element
     // important that the registry has upper case tag names
-    return registry[elm.tagName.toLowerCase()];
+    return registry[domApi.$tagName(elm)];
   }
 
   function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
@@ -171,7 +171,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   function isDefinedComponent(elm: Element) {
     // check if this component is already defined or not
-    return globalDefined.indexOf(elm.tagName.toLowerCase()) > -1 || !!getComponentMeta(elm);
+    return globalDefined.indexOf(domApi.$tagName(elm)) > -1 || !!getComponentMeta(elm);
   }
 
 

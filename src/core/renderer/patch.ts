@@ -339,7 +339,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
     isUpdate = isUpdatePatch;
     hostContentNodes = hostElementContentNodes;
     ssrId = ssrPatchId;
-    const tag = domApi.$tagName(oldVNode.elm).toLowerCase();
+    const tag = domApi.$tagName(oldVNode.elm);
     scopeId = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !supportsNativeShadowDom)) ? 'data-' + tag : null;
 
     // use native shadow dom only if the component wants to use it

@@ -19,7 +19,7 @@ export function createVNodesFromSsr(domApi: DomApi, rootElm: Element) {
       elm = allSsrElms[i];
       ssrVNodeId = domApi.$getAttribute(elm, SSR_VNODE_ID);
       ssrVNode = elm._vnode = new VNodeObj();
-      ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm).toLowerCase();
+      ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm);
 
       for (j = 0, jlen = elm.childNodes.length; j < jlen; j++) {
         addChildSsrVNodes(domApi, elm.childNodes[j], ssrVNode, ssrVNodeId, true);
@@ -47,7 +47,7 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
       if (childVNodeSplt[0] === ssrVNodeId) {
         // cool, this element is a child to the parent vnode
         childVNode = new VNodeObj();
-        childVNode.vtag = domApi.$tagName(childVNode.elm = node).toLowerCase();
+        childVNode.vtag = domApi.$tagName(childVNode.elm = node);
 
         // this is a new child vnode
         // so ensure its parent vnode has the vchildren array
