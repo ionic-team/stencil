@@ -36,16 +36,30 @@ export function generateCore(config: BuildConfig, ctx: BuildContext, globalJsCon
 
 
 function generateCoreBuild(config: BuildConfig, ctx: BuildContext, coreBuild: CoreBuildConditionals, globalJsContent: string[], coreContent: string, polyfillsContent: string) {
-
-  // concat the global js and transpiled code together
-  let jsContent = [
-    globalJsContent.join('\n'),
-    coreContent
-  ].join('\n').trim();
-
+  // mega-minify the core w/ property renaming, but not the user's globals
   // hardcode which features should and should not go in the core builds
   // process the transpiled code by removing unused code and minify when configured to do so
-  jsContent = buildCoreContent(config, ctx, coreBuild, jsContent);
+  let jsContent = buildCoreContent(config, ctx, coreBuild, coreContent);
+
+  let globalContent = globalJsContent.join('\n').trim();
+  if (globalContent.length) {
+    // we've got global js to put in the core build too
+
+    if (config.minifyJs) {
+      // let's do another quick minify with
+      // of just the user's globals, but not a mega minify
+      const globalMinifyResults = config.sys.minifyJs(globalContent);
+      if (globalMinifyResults.diagnostics) {
+        ctx.diagnostics.push(...globalMinifyResults.diagnostics);
+
+      } else {
+        globalContent = globalMinifyResults.output.trim();
+      }
+    }
+
+    // concat the global js and transpiled code together
+    jsContent = `${globalContent};\n${jsContent}`;
+  }
 
   // wrap the core js code together
   jsContent = wrapCoreJs(config, jsContent);
