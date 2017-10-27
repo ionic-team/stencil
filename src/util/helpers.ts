@@ -1,3 +1,6 @@
+import { DomApi } from './interfaces';
+import { NODE_TYPE } from './constants';
+
 
 export const isDef = (v: any) => v !== undefined && v !== null;
 
@@ -26,15 +29,15 @@ export const dashToPascalCase = (word: string) => word.split('-').map((segment: 
 
 export const noop = (): any => {};
 
-export function getElementReference(elm: any, ref: string) {
+export function getElementReference(domApi: DomApi, elm: any, ref: string) {
   if (ref === 'child') {
     return elm.firstElementChild;
   }
   if (ref === 'parent') {
-    return getParentElement(elm) || elm;
+    return getParentElement(domApi, elm) || elm;
   }
   if (ref === 'body') {
-    return elm.ownerDocument.body;
+    return domApi.$body;
   }
   if (ref === 'document') {
     return elm.ownerDocument;
@@ -45,13 +48,10 @@ export function getElementReference(elm: any, ref: string) {
   return elm;
 }
 
-export function getParentElement(elm: any): any {
-  if (elm.parentElement) {
-    // normal element with a parent element
-    return elm.parentElement;
-  }
-  if (elm.parentNode && elm.parentNode.host) {
-    // shadow dom's document fragment
-    return elm.parentNode.host;
-  }
+export function getParentElement(domApi: DomApi, elm: Node, parentNode?: any): any {
+  // if the parent node is a document fragment (shadow root)
+  // then use the "host" property on it
+  // otherwise use the parent node
+  parentNode = domApi.$parentNode(elm);
+  return parentNode && domApi.$nodeType(parentNode) === NODE_TYPE.DocumentFragment ? parentNode.host : parentNode;
 }

@@ -51,7 +51,7 @@ export function registerWithParentComponent(plt: PlatformApi, elm: HostElement) 
   // this element as one of the actively loading child elements for its ancestor
   let ancestorHostElement = elm;
 
-  while (ancestorHostElement = getParentElement(ancestorHostElement)) {
+  while (ancestorHostElement = getParentElement(plt.domApi, ancestorHostElement)) {
     // climb up the ancestors looking for the first registered component
     if (plt.isDefinedComponent(ancestorHostElement)) {
       // we found this elements the first ancestor host element

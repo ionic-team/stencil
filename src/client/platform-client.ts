@@ -54,20 +54,21 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
-    registerComponents,
-    defineComponent,
-    isDefinedComponent,
-    getComponentMeta,
-    propConnect,
-    getContextItem,
-    loadBundle,
-    queue: createQueueClient(Context.dom, now),
-    connectHostElement,
     attachStyles,
+    connectHostElement,
+    domApi,
+    defineComponent,
     emitEvent: Context.emit,
+    getComponentMeta,
+    getContextItem,
     getEventOptions,
+    isClient: true,
+    isDefinedComponent,
+    loadBundle,
     onError,
-    isClient: true
+    propConnect,
+    queue: createQueueClient(Context.dom, now),
+    registerComponents,
   };
 
   const supportsNativeShadowDom = !!(Element.prototype.attachShadow);
@@ -175,7 +176,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   }
 
 
-  App.loadComponents = (bundleId, importFn) => {
+  App.loadComponents = function loadComponents(bundleId, importFn) {
     // https://youtu.be/Z-FPimCmbX8?t=31
     // jsonp tag team callback from requested bundles contain tags
     const args = arguments;
@@ -203,7 +204,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   };
 
 
-  App.loadStyles = () => {
+  App.loadStyles = function loadStyles() {
     // jsonp callback from requested bundles
     // either directly add styles to document.head or add the
     // styles to a template tag to be cloned later for shadow roots

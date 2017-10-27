@@ -76,19 +76,20 @@ export function createPlatformServer(
 
   // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
-    defineComponent,
-    getComponentMeta,
-    propConnect,
-    getContextItem,
-    loadBundle,
-    connectHostElement,
     attachStyles: noop,
-    queue: createQueueServer(),
-    tmpDisconnected: false,
+    connectHostElement,
+    defineComponent,
+    domApi,
     emitEvent: noop,
     getEventOptions,
+    getComponentMeta,
+    getContextItem,
+    isDefinedComponent,
+    loadBundle,
     onError,
-    isDefinedComponent
+    propConnect,
+    queue: createQueueServer(),
+    tmpDisconnected: false,
   };
 
 

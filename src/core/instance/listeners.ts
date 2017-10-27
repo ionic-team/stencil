@@ -137,7 +137,7 @@ export function addEventListener(
     // document:mousemove
     // parent:touchend
     // body:keyup.enter
-    elm = getElementReference(elm, splt[0]);
+    elm = getElementReference(plt.domApi, elm, splt[0]);
     eventName = splt[1];
   }
 

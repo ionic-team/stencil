@@ -983,6 +983,7 @@ export interface PlatformApi {
   attachStyles: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
   connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
+  domApi?: DomApi;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
   getContextItem: (contextKey: string) => any;
