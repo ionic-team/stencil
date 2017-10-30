@@ -71,14 +71,6 @@ describe('renderer', () => {
   });
 
   describe('functional component', () => {
-`
-<span>
-  <FunctionalComp>
-    <span>Test</span>
-  </FunctionalComp>
-</span>
-`;
-
 
     it('should render a basic component', () => {
       function functionalComp({children, ...props}: any) {
