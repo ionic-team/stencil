@@ -12,24 +12,23 @@ import { VNode, VNodeProdData } from '../../util/interfaces';
 
 const stack: any[] = [];
 
+export type PropsType = VNodeProdData | number | string | null;
 export type ChildType = VNode | number | string;
-export type PropType = VNodeProdData | number | string | null;
 
 
-interface ComponentProps<C extends Component<any, any> | FunctionalComponent<any>> {
+export interface ComponentProps {
   children?: JSX.Element[];
   key?: string | number | any;
 }
 
 
 export interface FunctionalComponent<PropsType> {
-  (props?: PropsType & ComponentProps<this>): JSX.Element;
-  displayName?: string;
+  (props?: PropsType & ComponentProps): JSX.Element;
 }
 
 
-export function h(nodeName: string | FunctionalComponent, vnodeData: PropType, child?: ChildType): VNode;
-export function h(nodeName: string, vnodeData: PropType, ...children: ChildType[]): VNode;
+export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, child?: ChildType): VNode;
+export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, ...children: ChildType[]): VNode;
 export function h(nodeName: any, vnodeData: any, child?: any) {
   var children: any[];
   var lastSimple = false;
@@ -68,29 +67,29 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     }
   }
 
-  vnodeData = (vnodeData === null) ? undefined : vnodeData;
-
-  let vnode = new VNodeObj();
+  const vnode = new VNodeObj();
   vnode.vtag = nodeName;
   vnode.vchildren = children;
-  vnode.vattrs = (vnodeData == null) ? undefined : vnodeData;
-  vnode.vkey = vnode.vattrs == null ? undefined : vnode.vattrs.key;
 
-  // normalize class / classname attributes
-  if (vnode.vattrs) {
-    if (vnode.vattrs.className) {
-      vnode.vattrs.class = vnode.vattrs.className;
+  if (vnodeData) {
+    vnode.vattrs = vnodeData;
+    vnode.vkey = vnodeData.key;
+    vnode.vref = vnodeData.ref;
+
+    // normalize class / classname attributes
+    if (vnodeData['className']) {
+      vnodeData['class'] = vnodeData['className'];
     }
-    if (vnode.vattrs.class && typeof vnode.vattrs.class === 'object') {
-      let key, classNameString = '';
 
-      for (key in vnode.vattrs.class) {
-        if (vnode.vattrs.class[key] === true) {
-          classNameString += ' ' + key;
+    if (typeof vnodeData['class'] === 'object') {
+      for (let key in vnodeData['class']) {
+        if (vnodeData['class'][key]) {
+          stack.push(key);
         }
       }
 
-      vnode.vattrs.class = classNameString.substr(1);
+      vnodeData['class'] = stack.join(' ');
+      stack.length = 0;
     }
   }
 

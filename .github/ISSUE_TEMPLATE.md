@@ -1,16 +1,19 @@
-**Resources:**
-Before submitting an issue, please consult our [docs](https://stenciljs.com/).
+<!--
+NOTE:
+Before submitting an issue, please consult our docs -> https://stenciljs.com/
+-->
 
-**Stencil version:** (run `npm list @stencil/core` from a terminal/cmd prompt and paste output below):
-
+**Stencil version:**
+<!-- (run `npm list @stencil/core` from a terminal/cmd prompt and paste output below): -->
 ```
- insert the output from npm list @stencil/core here
+ @stencil/core@<version>
 ```
 
-**I'm submitting a ...**  (check one with "x")
-[ ] bug report
-[ ] feature request
-[ ] support request => Please do not submit support requests here, use one of these channels: https://forum.ionicframework.com/ or https://stencil-worldwide.slack.com
+**I'm submitting a:**
+<!-- (check one with "x") -->
+- [ ] bug report
+- [ ] feature request
+- [ ] support request => Please do not submit support requests here, use one of these channels: https://forum.ionicframework.com/ or https://stencil-worldwide.slack.com
 
 **Current behavior:**
 <!-- Describe how the bug manifests. -->
@@ -24,8 +27,8 @@ Before submitting an issue, please consult our [docs](https://stenciljs.com/).
 
 **Related code:**
 
-```
-insert any relevant code here
+```tsx
+// insert any relevant code here
 ```
 
 **Other information:**

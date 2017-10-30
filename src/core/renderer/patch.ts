@@ -8,10 +8,10 @@
  */
 
 import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
-import { ENCAPSULATION_TYPE } from '../../util/constants';
+import { ENCAPSULATION } from '../../util/constants';
 import { isDef, isUndef } from '../../util/helpers';
 import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
-import { updateElement, eventProxy } from './update-dom-node';
+import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
 
@@ -155,14 +155,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
 
   function removeVnodes(parentElm: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
     for (; startIdx <= endIdx; ++startIdx) {
-      var vnode = vnodes[startIdx];
-
-      if (isDef(vnode)) {
-        if (isDef(vnode.elm)) {
-          invokeDestroy(vnode);
-        }
-
-        domApi.$removeChild(parentElm, vnode.elm);
+      if (isDef(vnodes[startIdx])) {
+        domApi.$removeChild(parentElm, vnodes[startIdx].elm);
       }
     }
   }
@@ -338,26 +332,33 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
       scopeId: string;
 
 
-  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION_TYPE, ssrPatchId?: number) {
+  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
-    isUpdatePatch;
+    isUpdate = isUpdatePatch;
     hostContentNodes = hostElementContentNodes;
     ssrId = ssrPatchId;
     const tag = domApi.$tagName(oldVNode.elm).toLowerCase();
-    scopeId = (encapsulation === ENCAPSULATION_TYPE.ScopedCss || (encapsulation === ENCAPSULATION_TYPE.ShadowDom && !supportsNativeShadowDom)) ? 'data-' + tag : null;
+    scopeId = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !supportsNativeShadowDom)) ? 'data-' + tag : null;
 
     // use native shadow dom only if the component wants to use it
     // and if this browser supports native shadow dom
-    useNativeShadowDom = (encapsulation === ENCAPSULATION_TYPE.ShadowDom && supportsNativeShadowDom);
+    useNativeShadowDom = (encapsulation === ENCAPSULATION.ShadowDom && supportsNativeShadowDom);
 
-    if (!isUpdate && useNativeShadowDom) {
-      // this component SHOULD use native slot/shadow dom
-      // this browser DOES support native shadow dom
-      // and this is the first render
-      // let's create that shadow root
-      oldVNode.elm = (oldVNode.elm as HTMLElement).attachShadow({ mode: 'open' });
+    if (!isUpdate) {
+      if (useNativeShadowDom) {
+        // this component SHOULD use native slot/shadow dom
+        // this browser DOES support native shadow dom
+        // and this is the first render
+        // let's create that shadow root
+        oldVNode.elm = (oldVNode.elm as HTMLElement).attachShadow({ mode: 'open' });
+
+      } else if (scopeId) {
+        // this host element should use scoped css
+        // add the scope attribute to the host
+        domApi.$setAttribute(oldVNode.elm, scopeId + '-host', '');
+      }
     }
 
     // synchronous patch
@@ -375,20 +376,13 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
 }
 
 
-export function invokeDestroy(vnode: VNode) {
-  if (vnode) {
-    const elm = (vnode.elm as any);
-    if (elm._listeners) {
-      for (var key in elm._listeners) {
-        elm.removeEventListener(key, eventProxy, false);
-      }
-    }
+export function callNodeRefs(vNode: VNode, isDestroy?: boolean) {
+  if (vNode) {
+    vNode.vref && vNode.vref(isDestroy ? null : vNode.elm);
 
-    if (isDef(vnode.vchildren)) {
-      for (var i = 0; i < vnode.vchildren.length; ++i) {
-        invokeDestroy(vnode.vchildren[i]);
-      }
-    }
+    vNode.vchildren && vNode.vchildren.forEach(vChild => {
+      callNodeRefs(vChild, isDestroy);
+    });
   }
 }
 

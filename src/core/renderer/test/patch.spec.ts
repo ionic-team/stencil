@@ -2,7 +2,8 @@ import { h } from '../h';
 import { VNode } from '../vnode';
 import { toVNode } from '../to-vnode';
 import { mockElement, mockDomApi, mockRenderer, mockTextNode } from '../../../testing/mocks';
-import { SVG_NS } from '../../../util/constants';
+import { testClasslist } from '../../../testing/utils';
+import { ENCAPSULATION, SVG_NS } from '../../../util/constants';
 const shuffle = require('knuth-shuffle').knuthShuffle;
 
 
@@ -23,8 +24,8 @@ function map(fn: any, list: any) {
 var inner = prop('innerHTML');
 
 describe('renderer', () => {
-  const patch = mockRenderer();
   const domApi = mockDomApi();
+  const patch = mockRenderer(null, domApi);
 
   var elm: any;
   var vnode0: any;
@@ -33,6 +34,71 @@ describe('renderer', () => {
     elm = mockElement('div');
     vnode0 = new VNode();
     vnode0.elm = elm;
+  });
+
+  describe('shadow dom', () => {
+    const supportsShadowDom = true;
+    const patch = mockRenderer(null, domApi, supportsShadowDom);
+
+    it('does not attachShadow on update render', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      let shadowOpts: any;
+      elm.attachShadow = (opts: any) => {
+        shadowOpts = opts;
+      };
+      elm = patch(vnode0, h('my-tag', null), true, null, ENCAPSULATION.ShadowDom).elm;
+      expect(shadowOpts).toBeUndefined();
+    });
+
+    it('attachShadow on first render', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      let shadowOpts: any;
+      elm.attachShadow = (opts: any) => {
+        shadowOpts = opts;
+        elm.shadowRoot = mockElement('shadowRoot');
+        return elm;
+      };
+      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ShadowDom).elm;
+      expect(elm.shadowRoot).toBeDefined();
+      expect(shadowOpts).toBeDefined();
+      expect(shadowOpts.mode).toBe('open');
+    });
+
+  });
+
+  describe('scoped css', () => {
+
+    it('adds host scope id to shadow dom encapsulation root element, but doesnt support SD', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm.attachShadow = () => {
+        return elm;
+      };
+      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ShadowDom).elm;
+      expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
+    });
+
+    it('adds scope id to child elements', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0, h('my-tag', null, h('div', null)), false, null, ENCAPSULATION.ScopedCss).elm;
+      expect(elm.firstChild.hasAttribute('data-my-tag')).toBe(true);
+    });
+
+    it('adds host scope id to scoped css encapsulation root element', () => {
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ScopedCss).elm;
+      expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
+    });
+
   });
 
   describe('created element', () => {
@@ -46,10 +112,13 @@ describe('renderer', () => {
       let vnode1 = h('div', null, h('i', { class: { i: true, am: true, a: true, 'class': true } }));
       elm = patch(vnode0, vnode1).elm;
 
-      expect(elm.firstChild.classList.contains('am')).toBeTruthy();
-      expect(elm.firstChild.classList.contains('a')).toBeTruthy();
-      expect(elm.firstChild.classList.contains('class')).toBeTruthy();
-      expect(!elm.classList.contains('not')).toBeTruthy();
+      expect(elm.firstChild).toMatchClasses(['i', 'am', 'a', 'class']);
+    });
+
+    it('should not remove duplicate css classes', () => {
+      let vnode1 = h('div', { class: 'middle aligned center aligned' }, 'Hello');
+      elm = patch(vnode0, vnode1).elm;
+      expect(elm.className).toEqual('middle aligned center aligned');
     });
 
     it('can create elements with text content', () => {
@@ -60,24 +129,21 @@ describe('renderer', () => {
 
   describe('patching an element', () => {
 
-    it('changes the elements classes', () => {
-      var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
-      var vnode2 = h('i', { class: {i: true, am: true, horse: false } });
-      patch(vnode0, vnode1);
-      elm = patch(vnode0, vnode2).elm;
-      expect(elm.classList.contains('i')).toBeTruthy();
-      expect(elm.classList.contains('am')).toBeTruthy();
-      expect(!elm.classList.contains('horse')).toBeTruthy();
+    it('does not remove classes of previous from dom if vdom does not document them', () => {
+      elm.classList.add('horse');
+      var vnode1 = h('i', { class: {i: true, am: true } });
+      elm = patch(vnode0, vnode1).elm;
+
+      expect(elm).toMatchClasses(['i', 'am', 'horse']);
     });
 
-    it('changes classes in selector', () => {
+    it('changes elements classes from previous vnode', () => {
       var vnode1 = h('i', { class: { i: true, am: true, horse: true } });
       var vnode2 = h('i', { class: { i: true, am: true, horse: false } });
       patch(vnode0, vnode1);
       elm = patch(vnode1, vnode2).elm;
-      expect(elm.classList.contains('i')).toBeTruthy();
-      expect(elm.classList.contains('am')).toBeTruthy();
-      expect(!elm.classList.contains('horse')).toBeTruthy();
+
+      expect(elm).toMatchClasses(['i', 'am']);
     });
 
     it('preserves memoized classes', () => {
@@ -85,13 +151,10 @@ describe('renderer', () => {
       var vnode1 = h('i', { class: cachedClass });
       var vnode2 = h('i', { class: cachedClass });
       elm = patch(vnode0, vnode1).elm;
-      expect(elm.classList.contains('i')).toBeTruthy();
-      expect(elm.classList.contains('am')).toBeTruthy();
-      expect(!elm.classList.contains('horse')).toBeTruthy();
+      expect(elm).toMatchClasses(['i', 'am']);
+
       elm = patch(vnode1, vnode2).elm;
-      expect(elm.classList.contains('i')).toBeTruthy();
-      expect(elm.classList.contains('am')).toBeTruthy();
-      expect(!elm.classList.contains('horse')).toBeTruthy();
+      expect(elm).toMatchClasses(['i', 'am']);
     });
 
     it('removes missing classes', () => {
@@ -99,9 +162,15 @@ describe('renderer', () => {
       var vnode2 = h('i', { class: {i: true, am: true } });
       patch(vnode0, vnode1);
       elm = patch(vnode1, vnode2).elm;
-      expect(elm.classList.contains('i')).toBeTruthy();
-      expect(elm.classList.contains('am')).toBeTruthy();
-      expect(!elm.classList.contains('horse')).toBeTruthy();
+      expect(elm).toMatchClasses(['i', 'am']);
+    });
+
+    it('removes classes when class set to empty string', () => {
+      var vnode1 = h('i', { class: {i: true, am: true, horse: true } });
+      var vnode2 = h('i', { class: '' });
+      patch(vnode0, vnode1);
+      elm = patch(vnode1, vnode2).elm;
+      expect(elm).toMatchClasses([]);
     });
 
 

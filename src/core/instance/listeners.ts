@@ -72,7 +72,7 @@ export function replayQueuedEventsOnInstance(elm: HostElement) {
 }
 
 
-export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string) {
+export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element) {
   if (instance) {
     const elm = instance.__el;
     const cmpMeta = plt.getComponentMeta(elm);
@@ -85,28 +85,34 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
         var listener = listenerMeta[i];
 
         if (listener.eventName === eventName) {
-
-          if (shouldEnable && !deregisterFns[eventName]) {
-            var attachToEventName = attachTo ? `${attachTo}:${eventName}` : eventName;
+          var fn = deregisterFns[eventName];
+          if (shouldEnable && !fn) {
+            var attachToEventName = eventName;
+            var element = elm;
+            if (typeof attachTo === 'string') {
+              attachToEventName = `${attachTo}:${eventName}`;
+            } else if (typeof attachTo === 'object') {
+              element = attachTo as HostElement;
+            }
             deregisterFns[eventName] = addEventListener(
               plt,
-              elm,
+              element,
               attachToEventName,
               createListenerCallback(elm, listener.eventMethodName),
               listener.eventCapture,
               listener.eventPassive
             );
 
-          } else if (!shouldEnable && deregisterFns[eventName]) {
+          } else if (!shouldEnable && fn) {
             deregisterFns[eventName]();
-            delete elm._listeners[eventName];
+            delete deregisterFns[eventName];
           }
-
-          return;
+          return true;
         }
       }
     }
   }
+  return false;
 }
 
 
@@ -115,12 +121,18 @@ export function addEventListener(
   elm: Element|HTMLDocument|Window,
   eventName: string,
   listenerCallback: {(ev?: any): any},
-  useCapture: boolean,
-  usePassive: boolean
+  useCapture?: boolean,
+  usePassive?: boolean
 ) {
   // depending on the event name, we could actually be
   // attaching this element to something like the document or window
   let splt = eventName.split(':');
+  let testKeyCode = 0;
+
+  // get our event listener options
+  // mainly this is used to set passive events if this browser supports it
+  const eventListenerOpts = plt.getEventOptions(useCapture, usePassive);
+
   if (elm && splt.length > 1) {
     // document:mousemove
     // parent:touchend
@@ -134,75 +146,41 @@ export function addEventListener(
     return noop;
   }
 
+  let eventListener = listenerCallback;
+
   // test to see if we're looking for an exact keycode
   splt = eventName.split('.');
-  let testKeyCode = 0;
 
   if (splt.length > 1) {
     // looks like this listener is also looking for a keycode
     // keyup.enter
     eventName = splt[0];
     testKeyCode = KEY_CODE_MAP[splt[1]];
-  }
 
-  // create the our internal event listener callback we'll be firing off
-  // within it is the user's event listener callback and some other goodies
-  function eventListener(ev: any) {
-    if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
-      // we're looking for a specific keycode
-      // but the one we were given wasn't the right keycode
-      return;
-    }
-
-    // fire the user's component event listener callback
-    // if the instance isn't ready yet, this listener is already
-    // set to handle that and re-queue the update when it is ready
-    listenerCallback(ev);
-
-    if ((elm as HostElement).$instance) {
-      // only queue an update if this element itself is a host element
-      // and only queue an update if host element's instance is ready
-      // once its instance has been created, it'll then queue the update again
-
-      // queue it up for an update which then runs a re-render
-      (elm as HostElement)._queueUpdate();
-
-      // test if this is the user's interaction
-      if (isUserInteraction(eventName)) {
-        // so turns out that it's very important to flush the queue NOW
-        // this way the app immediately reflects whatever the user just did
-        plt.queue.flush();
+    eventListener = (ev: any) => {
+      // create the our internal event listener callback we'll be firing off
+      // within it is the user's event listener callback and some other goodies
+      if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
+        // we're looking for a specific keycode
+        // but the one we were given wasn't the right keycode
+        return;
       }
-    }
-  }
 
-  // get our event listener options
-  // mainly this is used to set passive events if this browser supports it
-  const eventListenerOpts = plt.getEventOptions(useCapture, usePassive);
+      // fire the user's component event listener callback
+      // if the instance isn't ready yet, this listener is already
+      // set to handle that and re-queue the update when it is ready
+      listenerCallback(ev);
+    };
+  }
 
   // ok, good to go, let's add the actual listener to the dom element
   elm.addEventListener(eventName, eventListener, eventListenerOpts);
 
   // return a function which is used to remove this very same listener
   return function removeListener() {
-    if (elm) {
-      elm.removeEventListener(eventName, eventListener, eventListenerOpts);
-    }
+    elm && elm.removeEventListener(eventName, eventListener, eventListenerOpts);
   };
 }
-
-
-function isUserInteraction(eventName: string) {
-  for (var i = 0; i < USER_INTERACTIONS.length; i++) {
-    if (eventName.indexOf(USER_INTERACTIONS[i]) > -1) {
-      return true;
-    }
-  }
-  return false;
-}
-
-
-const USER_INTERACTIONS = ['touch', 'mouse', 'pointer', 'key', 'focus', 'blur', 'drag'];
 
 
 export function detachListeners(elm: HostElement) {

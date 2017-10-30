@@ -1,7 +1,7 @@
 import { waitForLoad, mockConnect, mockDefine, mockElement, mockPlatform } from '../../../testing/mocks';
 import { ComponentMeta, HostElement } from '../../../util/interfaces';
 import { h } from '../../renderer/h';
-import { renderUpdate } from '../update';
+import { renderUpdate, queueUpdate } from '../update';
 
 
 describe('instance update', () => {
@@ -57,7 +57,7 @@ describe('instance update', () => {
       const instance: any = elm.$instance;
       instance.value = '99';
 
-      elm._queueUpdate();
+      queueUpdate(plt, elm);
 
       plt.$flushQueue(() => {
         expect(elm._vnode.elm.textContent).toBe('99');
@@ -83,6 +83,33 @@ describe('instance update', () => {
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.childNodes[0].nodeName).toBe('GRASSHOPPER');
       expect(elm.childNodes[0].textContent).toBe('hi');
+    });
+  });
+
+  it('should render text where null values exist in an array', () => {
+    mockDefine(plt, {
+      tagNameMeta: 'ion-test',
+      componentModule: class {
+        render() {
+          return [
+            null,
+            h('grasshopper', null, 'hi'),
+            null
+          ];
+        }
+      }
+    });
+
+    const node = mockConnect(plt, '<ion-test></ion-test>');
+
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
+      expect(elm.childNodes[0].nodeType).toBe(3); // Node.TEXT_NODE
+      expect(elm.childNodes[0].textContent).toBe('');
+      expect(elm.childNodes[1].nodeType).toBe(1); // Node.ELEMENT_NODE
+      expect(elm.childNodes[1].nodeName).toBe('GRASSHOPPER');
+      expect(elm.childNodes[1].textContent).toBe('hi');
+      expect(elm.childNodes[2].nodeType).toBe(3); // Node.TEXT_NODE
+      expect(elm.childNodes[2].textContent).toBe('');
     });
   });
 

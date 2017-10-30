@@ -1,40 +1,31 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentMeta, ComponentInstance, PlatformApi } from '../../../util/interfaces';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
-import { initProxy } from '../proxy';
+import { proxyComponentInstance } from '../proxy';
 
 
-describe('instance change detection', () => {
+describe('set instance property', () => {
 
   describe('has changed', () => {
 
-    it('number changed', () => {
+    it('instance number changed', () => {
       spyOn(plt.queue, 'add');
-
-      initProxy(plt, elm, instance, cmpMeta);
-
-      elm.num = 141.622;
-
+      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      instance.num = 141.622;
       expect(plt.queue.add).toHaveBeenCalled();
     });
 
-    it('string changed', () => {
+    it('instance string changed', () => {
       spyOn(plt.queue, 'add');
-
-      initProxy(plt, elm, instance, cmpMeta);
-
-      elm.str = 'kph';
-
+      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      instance.str = 'kph';
       expect(plt.queue.add).toHaveBeenCalled();
     });
 
-    it('boolean changed', () => {
+    it('instance boolean changed', () => {
       spyOn(plt.queue, 'add');
-
-      initProxy(plt, elm, instance, cmpMeta);
-
-      elm.bool = false;
-
+      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      instance.bool = false;
       expect(plt.queue.add).toHaveBeenCalled();
     });
 
@@ -42,33 +33,24 @@ describe('instance change detection', () => {
 
   describe('no change', () => {
 
-    it('number unchanged', () => {
+    it('instance number unchanged', () => {
       spyOn(plt.queue, 'add');
-
-      initProxy(plt, elm, instance, cmpMeta);
-
-      elm.num = 88;
-
+      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      instance.num = 88;
       expect(plt.queue.add).not.toHaveBeenCalled();
     });
 
-    it('string unchanged', () => {
+    it('instance string unchanged', () => {
       spyOn(plt.queue, 'add');
-
-      initProxy(plt, elm, instance, cmpMeta);
-
-      elm.str = 'mph';
-
+      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      instance.str = 'mph';
       expect(plt.queue.add).not.toHaveBeenCalled();
     });
 
-    it('boolean unchanged', () => {
+    it('instance boolean unchanged', () => {
       spyOn(plt.queue, 'add');
-
-      initProxy(plt, elm, instance, cmpMeta);
-
-      elm.bool = true;
-
+      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      instance.bool = true;
       expect(plt.queue.add).not.toHaveBeenCalled();
     });
 
@@ -91,27 +73,27 @@ describe('instance change detection', () => {
   let cmpMeta: ComponentMeta = {
     membersMeta: {
       'num': {
-        memberType: MEMBER_TYPE.Prop,
+        memberType: MEMBER_TYPE.State,
         attribName: 'num',
         propType: PROP_TYPE.Number
       },
       'str': {
-        memberType: MEMBER_TYPE.Prop,
+        memberType: MEMBER_TYPE.State,
         attribName: 'str',
         propType: PROP_TYPE.String
       },
       'bool': {
-        memberType: MEMBER_TYPE.Prop,
+        memberType: MEMBER_TYPE.State,
         attribName: 'bool',
         propType: PROP_TYPE.Boolean
       },
       'arr': {
-        memberType: MEMBER_TYPE.Prop,
+        memberType: MEMBER_TYPE.State,
         attribName: 'arr',
         propType: PROP_TYPE.Any
       },
       'obj': {
-        memberType: MEMBER_TYPE.Prop,
+        memberType: MEMBER_TYPE.State,
         attribName: 'obj',
         propType: PROP_TYPE.Any
       }

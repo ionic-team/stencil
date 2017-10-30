@@ -6,7 +6,7 @@ import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-
 
 
 export function generateComponentModules(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
-  const bundleCacheKey = getModuleBundleCacheKey(manifestBundle.components);
+  const bundleCacheKey = getModuleBundleCacheKey(manifestBundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta));
 
   if (canSkipBuild(config, ctx, manifestBundle.moduleFiles, bundleCacheKey)) {
     // don't bother bundling if this is a change build but

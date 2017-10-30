@@ -1,9 +1,11 @@
 import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement, PlatformApi,
   HostContentNodes, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
+import { connectedCallback } from '../core/instance/connected';
 import { createPlatformServer } from './platform-server';
-import { ENCAPSULATION_TYPE, SSR_VNODE_ID } from '../util/constants';
-import { initHostConstructor } from '../core/instance/init';
+import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
+import { initLoad } from '../core/instance/init-component';
 import { optimizeHtml } from '../compiler/html/optimize-html';
+import { proxyHostElementPrototype } from '../core/instance/proxy';
 
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
@@ -143,7 +145,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
         }
       }
 
-      newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ENCAPSULATION_TYPE.NoEncapsulation, ssrId);
+      newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, ENCAPSULATION.NoEncapsulation, ssrId);
 
       connectElement(plt, <HostElement>newVNode.elm, connectedInfo, config.hydratedCssClass);
 
@@ -158,12 +160,6 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     if (connectedInfo.elementCount === 0) {
       // what gives, never found ANY host elements to connect!
       // ok we're just done i guess, idk
-      hydrateResults.diagnostics.push({
-        header: 'Hydrate Components',
-        level: 'info',
-        type: 'hydrate',
-        messageText: 'No elements connected'
-      });
       hydrateResults.html = opts.html;
       resolve(hydrateResults);
     }
@@ -175,15 +171,15 @@ export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo
   if (!elm.$connected) {
     // only connect elements which is a registered component
     const cmpMeta = plt.getComponentMeta(elm);
-    if (cmpMeta) {
-      // init our host element functions
-      // not using Element.prototype on purpose
-      if (!elm.connectedCallback) {
-        initHostConstructor(plt, elm, hydratedCssClass);
-      }
+    if (cmpMeta && cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
 
-      // cool, let the element know it's been connected
-      elm.connectedCallback();
+      elm.$initLoad = () => {
+        initLoad(plt, elm, hydratedCssClass);
+      };
+
+      proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
+
+      connectedCallback(plt, cmpMeta, elm);
 
       // keep count of how many host elements we actually connected
       connectedInfo.elementCount++;

@@ -8,7 +8,7 @@ export class VNode implements IVNode {
 
   vattrs: any;
   vkey: string | number;
+  vref: (elm: HTMLElement) => void;
 
   elm: Element|Node;
-  assignedListener: any;
 }

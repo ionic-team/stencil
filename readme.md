@@ -155,6 +155,7 @@ For the small minority of browsers that do not support modern browser features a
  - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
  - [performance.now()](https://gist.github.com/paulirish/5438650)
  - [requestAnimationFrame()](https://gist.github.com/paulirish/1579671)
+ - [`<template>`](https://github.com/webcomponents/template)
  - [Element.closest](https://github.com/jonathantneal/closest)
  - [Element.matches](https://github.com/jonathantneal/closest)
 

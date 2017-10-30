@@ -100,22 +100,61 @@ describe('h()', () => {
     expect(vnode.vattrs.class).toEqual('  dragons   love  tacos  ');
   });
 
+  it('should have class exactly as passed if string w/ duplicates', () => {
+    var vnode = h("div", { class: 'middle aligned center aligned' });
+    expect(vnode.vattrs.class).toBeDefined();
+    expect(vnode.vattrs.class).toEqual('middle aligned center aligned');
+  });
+
   it('should have class based on classes as keys of an object', () => {
     var vnode = h('div', { class: { 'dragons': true, 'love': true, 'tacos': true } });
     expect(vnode.vattrs.class).toBeDefined();
     expect(vnode.vattrs.class).toEqual('dragons love tacos');
   });
 
+  it('should set vkey', () => {
+    var vnode = h('div', { key: 'my-key' });
+    expect(vnode.vkey).toBe('my-key');
+  });
+
+  it('should not set vkey', () => {
+    var vnode = h('div', null);
+    expect(vnode.vkey).toBeUndefined();
+  });
+
+  it('should set vref', () => {
+    const ref = () => {};
+    var vnode = h('div', { ref: ref });
+    expect(vnode.vref).toBe(ref);
+  });
+
+  it('should not set vref', () => {
+    var vnode = h('div', {});
+    expect(vnode.vref).toBeUndefined();
+  });
+
   it('should add one class from string', () => {
-    var vnode = h('div', { class: 'some-class' });
+    var vnode = h('div', { class: 'some-class and another-class' });
     expect(vnode.vattrs.class).toBeDefined();
-    expect(vnode.vattrs.class).toEqual('some-class');
+    expect(vnode.vattrs.class).toEqual('some-class and another-class');
   });
 
   it('should add class from map of classnames and booleans', () => {
     var vnode = h('div', { class: { enabled: true, checked: false } });
     expect(vnode.vattrs.class).toBeDefined();
     expect(vnode.vattrs.class).toEqual('enabled');
+  });
+
+  it('should add class from className string', () => {
+    var vnode = h('div', { className: 'one point twenty-one gigawatts' });
+    expect(vnode.vattrs.class).toBeDefined();
+    expect(vnode.vattrs.class).toEqual('one point twenty-one gigawatts');
+  });
+
+  it('should add class from className map of classnames and booleans', () => {
+    var vnode = h('div', { className: { save: true, the: true, clock: true, tower: true, hillvalley: false } });
+    expect(vnode.vattrs.class).toBeDefined();
+    expect(vnode.vattrs.class).toEqual('save the clock tower');
   });
 
   it('should add props', () => {

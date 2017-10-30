@@ -1,5 +1,5 @@
 import { ComponentMeta } from '../../../util/interfaces';
-import { ENCAPSULATION_TYPE } from '../../../util/constants';
+import { ENCAPSULATION } from '../../../util/constants';
 import { useShadowDom, useScopedCss } from '../encapsulation';
 
 
@@ -10,7 +10,7 @@ describe('render encapsulation', () => {
     it('should not use scoped when component wants no encapsulation', () => {
       const supportsShadowDom = true;
       const cmpMeta: ComponentMeta = {
-        encapsulation: ENCAPSULATION_TYPE.NoEncapsulation
+        encapsulation: ENCAPSULATION.NoEncapsulation
       };
       expect(useScopedCss(supportsShadowDom, cmpMeta)).toBe(false);
     });
@@ -18,7 +18,7 @@ describe('render encapsulation', () => {
     it('use scoped when component wants shadow, but shadow is not supported', () => {
       const supportsShadowDom = false;
       const cmpMeta: ComponentMeta = {
-        encapsulation: ENCAPSULATION_TYPE.ShadowDom
+        encapsulation: ENCAPSULATION.ShadowDom
       };
       expect(useScopedCss(supportsShadowDom, cmpMeta)).toBe(true);
     });
@@ -26,7 +26,7 @@ describe('render encapsulation', () => {
     it('use scoped when component wants no scoped', () => {
       const supportsShadowDom = true;
       const cmpMeta: ComponentMeta = {
-        encapsulation: ENCAPSULATION_TYPE.ScopedCss
+        encapsulation: ENCAPSULATION.ScopedCss
       };
       expect(useScopedCss(supportsShadowDom, cmpMeta)).toBe(true);
     });
@@ -38,7 +38,7 @@ describe('render encapsulation', () => {
     it('use shadow when component wants shadow, and its supported', () => {
       const supportsShadowDom = true;
       const cmpMeta: ComponentMeta = {
-        encapsulation: ENCAPSULATION_TYPE.ShadowDom
+        encapsulation: ENCAPSULATION.ShadowDom
       };
       expect(useShadowDom(supportsShadowDom, cmpMeta)).toBe(true);
     });
@@ -46,7 +46,7 @@ describe('render encapsulation', () => {
     it('should not use shadow when component wants shadow, but its not supported', () => {
       const supportsShadowDom = false;
       const cmpMeta: ComponentMeta = {
-        encapsulation: ENCAPSULATION_TYPE.ShadowDom
+        encapsulation: ENCAPSULATION.ShadowDom
       };
       expect(useShadowDom(supportsShadowDom, cmpMeta)).toBe(false);
     });
@@ -54,7 +54,7 @@ describe('render encapsulation', () => {
     it('should not use shadow when component wants scoped css encapsulation', () => {
       const supportsShadowDom = true;
       const cmpMeta: ComponentMeta = {
-        encapsulation: ENCAPSULATION_TYPE.ScopedCss
+        encapsulation: ENCAPSULATION.ScopedCss
       };
       expect(useShadowDom(supportsShadowDom, cmpMeta)).toBe(false);
     });
@@ -62,7 +62,7 @@ describe('render encapsulation', () => {
     it('should not use shadow when component does not want any encapsulation', () => {
       const supportsShadowDom = true;
       const cmpMeta: ComponentMeta = {
-        encapsulation: ENCAPSULATION_TYPE.NoEncapsulation
+        encapsulation: ENCAPSULATION.NoEncapsulation
       };
       expect(useShadowDom(supportsShadowDom, cmpMeta)).toBe(false);
     });

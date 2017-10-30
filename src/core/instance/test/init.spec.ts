@@ -1,6 +1,7 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
-import { ComponentInstance, HostElement, PlatformApi } from '../../../util/interfaces';
-import { initLoad, initHostConstructor } from '../init';
+import { ComponentInstance, ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
+import { initHostConstructor } from '../init-host';
+import { initLoad } from '../init-component';
 
 
 describe('instance init', () => {
@@ -8,7 +9,7 @@ describe('instance init', () => {
   describe('initLoad', () => {
 
     it('should call multiple componentOnReady promises', () => {
-      initHostConstructor(plt, elm);
+      initHostConstructor(plt, cmpMeta, elm);
 
       let called1 = false;
       let called2 = false;
@@ -30,7 +31,7 @@ describe('instance init', () => {
     });
 
     it('should call multiple componentOnReady callbacks', () => {
-      initHostConstructor(plt, elm);
+      initHostConstructor(plt, cmpMeta, elm);
 
       let called1 = false;
       let called2 = false;
@@ -53,12 +54,14 @@ describe('instance init', () => {
   const domApi = mockDomApi();
   let elm: HostElement;
   let instance: ComponentInstance;
+  let cmpMeta: ComponentMeta;
 
   class TestInstance {
     state = 'value';
   }
 
   beforeEach(() => {
+    cmpMeta = {};
     elm = domApi.$createElement('ion-cmp') as any;
     instance = new TestInstance();
     elm.$instance = instance;

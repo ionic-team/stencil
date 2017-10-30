@@ -13,8 +13,6 @@ export function isString(v: any): v is (string) { return typeof v === 'string'; 
 
 export function isNumber(v: any): v is (number) { return typeof v === 'number'; }
 
-export function isFunction(v: any): v is (Function) { return typeof v === 'function'; }
-
 export function toDashCase(str: string) {
   return str.replace(/([A-Z])/g, (g) => '-' + g[0].toLowerCase());
 }

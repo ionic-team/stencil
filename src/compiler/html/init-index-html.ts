@@ -32,6 +32,7 @@ export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostic
     // ok, so we haven't written an index.html build file yet
     // and we do know they have a src one, so let's write a
     // filler index.html file that shows while the first build is happening
+    config.sys.ensureDirSync(config.wwwDir);
     config.sys.fs.writeFileSync(config.wwwIndexHtml, FILLER_INDEX_BUILD);
 
   } catch (e) {

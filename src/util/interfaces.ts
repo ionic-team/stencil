@@ -1,6 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
-import { ENCAPSULATION_TYPE, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_META } from './constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_META } from './constants';
 
 
 export interface CoreContext {
@@ -34,7 +34,7 @@ export interface AddEventListener {
 
 
 export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, attachTo?: string): void;
+  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element): void;
 }
 
 
@@ -101,7 +101,7 @@ export interface LoadComponentRegistry {
   /**
    * encapsulated
    */
-  [4]: ENCAPSULATION_TYPE;
+  [4]: ENCAPSULATION;
 
   /**
    * slot
@@ -132,14 +132,19 @@ export interface ComponentMemberData {
   [1]: number;
 
   /**
-   * prop type
+   * is attribute to observe
    */
   [2]: number;
 
   /**
+   * prop type
+   */
+  [3]: number;
+
+  /**
    * controller id
    */
-  [3]: string;
+  [4]: string;
 }
 
 
@@ -177,7 +182,7 @@ export interface LoadComponentMeta {
   /**
    * encapsulation
    */
-  [6]: ENCAPSULATION_TYPE;
+  [6]: ENCAPSULATION;
 }
 
 
@@ -297,11 +302,10 @@ export interface Bundle {
 
 
 export interface ManifestBundle {
-  components?: string[];
   moduleFiles: ModuleFile[];
   compiledModeStyles?: CompiledModeStyles[];
   compiledModuleText?: string;
-  priority?: number;
+  priority?: PRIORITY;
 }
 
 
@@ -351,6 +355,7 @@ export interface BuildConfig {
   copy?: CopyTasks;
   serviceWorker?: ServiceWorkerConfig|boolean;
   hydratedCssClass?: string;
+  sassConfig?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -711,7 +716,7 @@ export interface ComponentMeta {
   listenersMeta?: ListenMeta[];
   propsWillChangeMeta?: PropChangeMeta[];
   propsDidChangeMeta?: PropChangeMeta[];
-  encapsulation?: ENCAPSULATION_TYPE;
+  encapsulation?: ENCAPSULATION;
   hostMeta?: HostMeta;
   assetsDirsMeta?: AssetsMeta[];
   slotMeta?: SLOT_META;
@@ -766,7 +771,6 @@ export interface ComponentInstance {
   color?: string;
 
   // private properties
-  __values?: ComponentInternalValues;
   __el?: HostElement;
 
   [memberName: string]: any;
@@ -784,8 +788,6 @@ export interface ComponentActivePropChanges {
 
 
 export interface ComponentInternalValues {
-  __propWillChange?: ComponentActivePropChanges;
-  __propDidChange?: ComponentActivePropChanges;
   [propName: string]: any;
 }
 
@@ -848,16 +850,15 @@ export interface HostElement extends HTMLElement {
   _observer?: MutationObserver;
   _onReadyCallbacks: ((elm: HostElement) => void)[];
   _queuedEvents?: any[];
-  _queueUpdate: () => void;
-  _render: (isUpdateRender?: boolean) => void;
   _root?: HTMLElement | ShadowRoot;
   _vnode: VNode;
   _appliedStyles?: { [tagNameForStyles: string]: boolean };
+  _values?: ComponentInternalValues;
 }
 
 
 export interface RendererApi {
-  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION_TYPE, ssrId?: number): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION, ssrId?: number): VNode;
 }
 
 
@@ -898,13 +899,13 @@ export interface HostContentNodes {
 
 export interface VNode {
   // using v prefixes largely so closure has no issue property renaming
-  vtag: string | number;
-  vkey: string | number;
-  vtext: string;
-  vchildren: VNode[];
-  vattrs: any;
-  elm: Element|Node;
-  assignedListener: any;
+  vtag?: string | number;
+  vkey?: string | number;
+  vtext?: string;
+  vchildren?: VNode[];
+  vattrs?: any;
+  vref?: (elm: any) => void;
+  elm?: Element|Node;
 }
 
 export interface VNodeData {
@@ -930,23 +931,26 @@ export interface VNodeProdData {
 
 
 export interface PlatformApi {
-  registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
+  activeRender?: boolean;
+  attachStyles: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
+  connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
-  isDefinedComponent?: (elm: Element) => boolean;
+  emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
   getComponentMeta: (elm: Element) => ComponentMeta;
   getContextItem: (contextKey: string) => any;
-  propConnect: (ctrlTag: string) => PropConnect;
-  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
-  render?: RendererApi;
-  connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
-  queue: QueueApi;
-  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
   getEventOptions: (useCapture?: boolean, usePassive?: boolean) => any;
-  emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
-  tmpDisconnected?: boolean;
-  onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   isClient?: boolean;
-  attachStyles: (cmpMeta: ComponentMeta, elm: HostElement) => void;
+  isDefinedComponent?: (elm: Element) => boolean;
+  isPrerender?: boolean;
+  isServer?: boolean;
+  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
+  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
+  onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
+  propConnect: (ctrlTag: string) => PropConnect;
+  queue: QueueApi;
+  registerComponents?: (components?: LoadComponentRegistry[]) => ComponentMeta[];
+  render?: RendererApi;
+  tmpDisconnected?: boolean;
 }
 
 
@@ -1031,9 +1035,11 @@ export interface StencilSystem {
   };
   emptyDir?(dir: string): Promise<void>;
   ensureDir?(dir: string): Promise<void>;
+  ensureDirSync?(dir: string): void;
+  ensureFile?(dir: string): Promise<void>;
   fs?: {
     access(path: string, callback: (err: any) => void): void;
-    accessSync(path: string | Buffer, mode?: number): void
+    accessSync(path: string, mode?: number): void
     mkdir(path: string, callback?: (err?: any) => void): void;
     readdir(path: string, callback?: (err: any, files: string[]) => void): void;
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
@@ -1105,6 +1111,10 @@ export interface StencilSystem {
       cb: (err: any, result: {css: string; stats: any}) => void
     ): void;
   };
+  semver?: {
+    gt: (a: string, b: string, loose?: boolean) => boolean;
+    lt: (a: string, b: string, loose?: boolean) => boolean;
+  };
   typescript?: any;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
@@ -1130,7 +1140,7 @@ export interface Workbox {
   generateSW(swConfig: any): Promise<any>;
   generateFileManifest(): Promise<any>;
   getFileManifestEntries(): Promise<any>;
-  injectManifest(): Promise<any>;
+  injectManifest(swConfig: any): Promise<any>;
 }
 
 
@@ -1261,7 +1271,7 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number'|'string';
+  type?: 'boolean'|'number'|'string'|'any';
   mutable?: boolean;
 }
 

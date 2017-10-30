@@ -26,10 +26,11 @@ export const enum PROP_CHANGE {
  * Property Types
  */
 export const enum PROP_TYPE {
-  Any = 0,
-  String = 1,
-  Boolean = 2,
-  Number = 3,
+  Unknown = 0,
+  Any = 1,
+  String = 2,
+  Boolean = 3,
+  Number = 4,
 }
 
 
@@ -64,7 +65,7 @@ export const enum SLOT_META {
 /**
  * Encapsulation
  */
-export const enum ENCAPSULATION_TYPE {
+export const enum ENCAPSULATION {
   NoEncapsulation = 0,
   ShadowDom = 1,
   ScopedCss = 2,
@@ -78,6 +79,7 @@ export const enum NODE_TYPE {
   ElementNode = 1,
   TextNode = 3,
   CommentNode = 8,
+  DocumentFragment = 11,
 }
 
 
@@ -88,7 +90,19 @@ export const SSR_VNODE_ID = 'data-ssrv';
 export const SSR_CHILD_ID = 'data-ssrc';
 
 
+/**
+ * Default style mode id
+ */
 export const DEFAULT_STYLE_MODE = '$';
+
+
+/**
+ * Reusable empty obj/array
+ * Don't add values to these!!
+ */
+export const EMPTY_OBJ: any = {};
+export const EMPTY_ARR: any[] = [];
+
 
 /**
  * Key Name to Key Code Map

@@ -22,10 +22,10 @@ describe('build', () => {
       expect(ctx.moduleBundleCount).toBe(1);
       expect(ctx.styleBundleCount).toBe(1);
 
-      // expect(wroteFile(r, 'cmp-a.js')).toBe(true);
+      expect(wroteFile(r, 'cmp-a.js')).toBe(true);
 
-      // const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
-      // expect(cmpMeta.styles.$.stylePaths[0]).toEqual('cmp-a.scss');
+      const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
+      expect(cmpMeta.styles.$.stylePaths[0]).toEqual('cmp-a.scss');
     });
   });
 

@@ -1,12 +1,34 @@
-import { BuildConfig } from '../../util/interfaces';
-import { parseCss } from './parse-css';
-import { StringifyCss } from './stringify-css';
+import { BuildContext, ComponentMeta } from '../../util/interfaces';
+import { catchError } from '../util';
+import { ShadowCss } from './shadow-css';
 
 
-export function scopeCss(config: BuildConfig, cssContent: string, scopeIdSelector: string, filePath?: string) {
-  const cssAst = parseCss(config, cssContent, filePath);
+export function scopeComponentCss(ctx: BuildContext, cmpMeta: ComponentMeta, cssText: string) {
+  try {
+    const scopeAttribute = getScopeAttribute(cmpMeta);
+    const hostScopeAttr = getHostScopeAttribute(cmpMeta);
 
-  const stringifyCss = new StringifyCss({ scopeIdSelector });
+    cssText = scopeCss(cssText, scopeAttribute, hostScopeAttr);
 
-  return stringifyCss.compile(cssAst);
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
+
+  return cssText;
+}
+
+
+export function scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string) {
+  const sc = new ShadowCss();
+  return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr);
+}
+
+
+export function getScopeAttribute(cmpMeta: ComponentMeta) {
+  return `data-${cmpMeta.tagNameMeta}`;
+}
+
+
+export function getHostScopeAttribute(cmpMeta: ComponentMeta) {
+  return `data-${cmpMeta.tagNameMeta}-host`;
 }

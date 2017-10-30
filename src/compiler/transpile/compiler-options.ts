@@ -61,14 +61,8 @@ export function getUserTsConfig(config: BuildConfig, ctx: BuildContext, transpil
   options.outDir = config.collectionDir;
   options.rootDir = config.srcDir;
 
-  if (config.generateDistribution && !config.devMode) {
-    // generate .d.ts files when generating a distribution and in prod mode
-    options.declaration = true;
-
-  } else {
-    // for dev builds let's not create d.ts files
-    options.declaration = false;
-  }
+  // generate .d.ts files when generating a distribution and in prod mode
+  options.declaration = config.generateDistribution;
 
   return ctx.tsConfig = {
     options: options

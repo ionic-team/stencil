@@ -32,6 +32,8 @@ declare global {
   }
   namespace JSXElements {
       export interface ${jsxInterfaceName} extends HTMLAttributes {
+          mode?: string,
+          color?: string,
         ${Object.keys(interfaceOptions).map((key: string) => `
           ${key}?: ${interfaceOptions[key]}`
         )}
@@ -45,7 +47,7 @@ function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: s
   const memberTypes = {
     [PROP_TYPE.Any]: 'any',
     [PROP_TYPE.String]: 'string',
-    [PROP_TYPE.Boolean]: 'boolean | "true" | "false"',
+    [PROP_TYPE.Boolean]: 'boolean',
     [PROP_TYPE.Number]: 'number',
   };
   return Object.keys(membersMeta)

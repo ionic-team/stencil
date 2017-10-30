@@ -19,10 +19,8 @@ function bundle() {
   rollup.rollup({
     input: ENTRY_FILE,
     external: [
-      'chalk',
       'fs',
-      'path',
-      'minimist'
+      'path'
     ]
 
   }).then(bundle => {

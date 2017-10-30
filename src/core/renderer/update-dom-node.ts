@@ -1,94 +1,117 @@
+import { addEventListener } from '../instance/listeners';
+import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
 import { PlatformApi, VNode } from '../../util/interfaces';
 
 
-let DEFAULT_OPTS: any = null;
-
-export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean): void {
-  let name;
-  const elm = newVnode.elm as any;
-  const oldVnodeAttrs = (oldVnode != null && oldVnode.vattrs != null) ? oldVnode.vattrs : {};
-  const newVnodeAttrs = (newVnode.vattrs != null) ? newVnode.vattrs : {};
+export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, propName?: string): void {
+  // if the element passed in is a shadow root, which is a document fragment
+  // then we want to be adding attrs/props to the shadow root's "host" element
+  // if it's not a shadow root, then we add attrs/props to the same element
+  const elm = (newVnode.elm.nodeType === NODE_TYPE.DocumentFragment && (newVnode.elm as ShadowRoot).host) ? (newVnode.elm as ShadowRoot).host : (newVnode.elm as any);
+  const oldVnodeAttrs = (oldVnode && oldVnode.vattrs) || EMPTY_OBJ;
+  const newVnodeAttrs = newVnode.vattrs || EMPTY_OBJ;
 
   // remove attributes no longer present on the vnode by setting them to undefined
-  for (name in oldVnodeAttrs) {
-    if (!(newVnodeAttrs && newVnodeAttrs[name] != null) && oldVnodeAttrs[name] != null) {
-      setAccessor(plt, elm, name, oldVnodeAttrs[name], oldVnodeAttrs[name] = undefined, isSvgMode);
+  for (propName in oldVnodeAttrs) {
+    if (!(newVnodeAttrs && newVnodeAttrs[propName] != null) && oldVnodeAttrs[propName] != null) {
+      setAccessor(plt, elm, propName, oldVnodeAttrs[propName], undefined, isSvgMode);
     }
   }
 
   // add new & update changed attributes
-  for (name in newVnodeAttrs) {
-    if (!(name in oldVnodeAttrs) || newVnodeAttrs[name] !== (name === 'value' || name === 'checked' ? elm[name] : oldVnodeAttrs[name])) {
-      setAccessor(plt, elm, name, oldVnodeAttrs[name], oldVnodeAttrs[name] = newVnodeAttrs[name], isSvgMode);
+  for (propName in newVnodeAttrs) {
+    if (!(propName in oldVnodeAttrs) || newVnodeAttrs[propName] !== (propName === 'value' || propName === 'checked' ? elm[propName] : oldVnodeAttrs[propName])) {
+      setAccessor(plt, elm, propName, oldVnodeAttrs[propName], newVnodeAttrs[propName], isSvgMode);
     }
   }
 }
 
 
-function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, newValue: any, isSvg: boolean) {
-  let key;
-
-  // Class
+export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, newValue: any, isSvg: boolean, i?: any, ilen?: number) {
   if (name === 'class' && !isSvg) {
+    // Class
     if (oldValue !== newValue) {
-      elm.className = newValue;
+      const oldList: string[] = (oldValue == null || oldValue === '') ? EMPTY_ARR : oldValue.trim().split(/\s+/);
+      const newList: string[] = (newValue == null || newValue === '') ? EMPTY_ARR : newValue.trim().split(/\s+/);
+
+      let classList: string[] = (elm.className == null || elm.className === '') ? EMPTY_ARR : elm.className.trim().split(/\s+/);
+
+      for (i = 0, ilen = oldList.length; i < ilen; i++) {
+        if (newList.indexOf(oldList[i]) === -1) {
+          classList = classList.filter((c: string) => c !== oldList[i]);
+        }
+      }
+
+      for (i = 0, ilen = newList.length; i < ilen; i++) {
+        if (oldList.indexOf(newList[i]) === -1) {
+          classList = [...classList, newList[i]];
+        }
+      }
+
+      elm.className = classList.join(' ');
     }
 
-  // Style
   } else if (name === 'style') {
-    oldValue = oldValue || {};
-    newValue = newValue || {};
+    // Style
+    oldValue = oldValue || EMPTY_OBJ;
+    newValue = newValue || EMPTY_OBJ;
 
-    for (key in oldValue) {
-      if (!newValue[key]) {
-        (elm as any).style[key] = '';
+    for (i in oldValue) {
+      if (!newValue[i]) {
+        (elm as any).style[i] = '';
       }
     }
 
-    for (key in newValue) {
-      if (newValue[key] !== oldValue[key]) {
-        (elm as any).style[key] = newValue[key];
+    for (i in newValue) {
+      if (newValue[i] !== oldValue[i]) {
+        (elm as any).style[i] = newValue[i];
       }
     }
 
-  // Event Handlers
-  } else if (name[0] === 'o' && name[1] === 'n') {
+  } else if (name[0] === 'o' && name[1] === 'n' && (!(name in elm))) {
+    // Event Handlers
+    // adding an standard event listener, like <button onClick=...> or something
 
-    if (!DEFAULT_OPTS) {
-      DEFAULT_OPTS = plt.getEventOptions();
-    }
     name = name.toLowerCase().substring(2);
+    const listeners = (elm._listeners = elm._listeners || {});
 
     if (newValue) {
       if (!oldValue) {
-        elm.addEventListener(name, eventProxy, DEFAULT_OPTS);
+        // add listener
+        listeners[name] = addEventListener(plt, elm, name, newValue);
       }
 
-    } else {
-      elm.removeEventListener(name, eventProxy, DEFAULT_OPTS);
+    } else if (listeners[name]) {
+      // remove listener
+      listeners[name]();
     }
 
-    (elm._listeners || (elm._listeners = {}))[name] = newValue;
-
-  /**
-   * Properties
-   * - list and type are attributes that get applied as values on the element
-   * - all svgs get values as attributes not props
-   * - check if elm contains name or if the value is array, object, or function
-   */
   } else if (name !== 'list' && name !== 'type' && !isSvg &&
-      (name in elm || ['object', 'function'].indexOf(typeof newValue) !== -1)) {
-    setProperty(elm, name, newValue === null ? '' : newValue);
-    if (newValue === undefined) {
-      delete (elm as any)[name];
+    (name in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)) {
+    // Properties
+    // - list and type are attributes that get applied as values on the element
+    // - all svgs get values as attributes not props
+    // - check if elm contains name or if the value is array, object, or function
+
+    const cmpMeta = plt.getComponentMeta(elm);
+    if (cmpMeta && cmpMeta.membersMeta && name in cmpMeta.membersMeta) {
+      // setting a known @Prop on this element
+      setProperty(elm, name, newValue);
+
+    } else {
+      // property setting a prop on a native property, like "value" or something
+      setProperty(elm, name, newValue == null ? '' : newValue);
+      if (newValue == null || newValue === false) {
+        elm.removeAttribute(name);
+      }
     }
 
-  // Element Attributes
-  } else {
-    let ns = (name !== (name = name.replace(/^xlink\:?/, '')));
+  } else if (newValue != null) {
+    // Element Attributes
+    i = (name !== (name = name.replace(/^xlink\:?/, '')));
 
     if (BOOLEAN_ATTRS[name] === 1 && (!newValue || newValue === 'false')) {
-      if (ns) {
+      if (i) {
         elm.removeAttributeNS(XLINK_NS, name.toLowerCase());
 
       } else {
@@ -96,7 +119,7 @@ function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, ne
       }
 
     } else if (typeof newValue !== 'function') {
-      if (ns) {
+      if (i) {
         elm.setAttributeNS(XLINK_NS, name.toLowerCase(), newValue);
 
       } else {
@@ -116,13 +139,6 @@ function setProperty(elm: any, name: string, value: any) {
   } catch (e) { }
 }
 
-
-/**
- * Proxy an event to hooked event handlers
- */
-export function eventProxy(this: any, e: Event) {
-  return (this as any)._listeners[e.type](e);
-}
 
 const BOOLEAN_ATTRS: any = {
   'allowfullscreen': 1,

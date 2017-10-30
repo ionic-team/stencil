@@ -6,7 +6,7 @@ import * as path from 'path';
 
 describe('validation', () => {
 
-  describe('validateBuildConfig', () => {
+  describe('hydrate css', () => {
 
     it('should set hydratedCssClass', () => {
       config.hydratedCssClass = '💎';
@@ -18,6 +18,11 @@ describe('validation', () => {
       validateBuildConfig(config);
       expect(config.hydratedCssClass).toBe('hydrated');
     });
+
+  });
+
+
+  describe('hashed filenames', () => {
 
     it('should throw error when hashedFileNameLength to small', () => {
       expect(() => {
@@ -56,6 +61,17 @@ describe('validation', () => {
       expect(config.hashFileNames).toBe(false);
     });
 
+    it('should set hashFileNames from hashFilenames', () => {
+      (config as any).hashFilenames = false;
+      validateBuildConfig(config);
+      expect(config.hashFileNames).toBe(false);
+    });
+
+  });
+
+
+  describe('minifyJs', () => {
+
     it('should set minifyJs to true', () => {
       config.devMode = true;
       config.minifyJs = true;
@@ -75,6 +91,11 @@ describe('validation', () => {
       expect(config.minifyJs).toBe(false);
     });
 
+  });
+
+
+  describe('minifyCss', () => {
+
     it('should set minifyCss to true', () => {
       config.devMode = true;
       config.minifyCss = true;
@@ -93,6 +114,11 @@ describe('validation', () => {
       validateBuildConfig(config);
       expect(config.minifyCss).toBe(false);
     });
+
+  });
+
+
+  describe('validateBuildConfig', () => {
 
     it('should default watch to false', () => {
       validateBuildConfig(config);
@@ -232,51 +258,18 @@ describe('validation', () => {
       expect(path.isAbsolute(config.srcDir)).toBe(true);
     });
 
+    it('should set src dir and convert to absolute path', () => {
+      config.srcDir = 'app';
+      validateBuildConfig(config);
+      expect(path.basename(config.srcDir)).toBe('app');
+      expect(path.isAbsolute(config.srcDir)).toBe(true);
+    });
+
     it('should convert global to absolute path, if a global property was provided', () => {
       config.global = 'src/global/index.ts';
       validateBuildConfig(config);
       expect(path.basename(config.global)).toBe('index.ts');
       expect(path.isAbsolute(config.global)).toBe(true);
-    });
-
-    it('should not allow special characters in namespace', () => {
-      expect(() => {
-        config.namespace = 'My-Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-      expect(() => {
-        config.namespace = 'My/Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-      expect(() => {
-        config.namespace = 'My%20Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should not allow number for first character of namespace', () => {
-      expect(() => {
-        config.namespace = '88MyNamespace';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should enforce namespace being at least 3 characters', () => {
-      expect(() => {
-        config.namespace = 'ab';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should set user namespace', () => {
-      config.namespace = 'MyNamespace';
-      validateBuildConfig(config);
-      expect(config.namespace).toBe('MyNamespace');
-    });
-
-    it('should set default namespace', () => {
-      validateBuildConfig(config);
-      expect(config.namespace).toBe('App');
     });
 
     it('should throw error for missing sys', () => {
@@ -315,21 +308,80 @@ describe('validation', () => {
 
   });
 
-  describe('setProcessEnvironment', () => {
 
-    it('should set NODE_ENV production', () => {
-      config.devMode = false;
-      setProcessEnvironment(config);
-      expect(process.env.NODE_ENV).toBe('production');
+  describe('namespace', () => {
+
+    it('should not allow special characters in namespace', () => {
+      expect(() => {
+        config.namespace = 'My/Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
+      expect(() => {
+        config.namespace = 'My%20Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
     });
 
-    it('should set NODE_ENV development', () => {
-      config.devMode = true;
-      setProcessEnvironment(config);
-      expect(process.env.NODE_ENV).toBe('development');
+    it('should not allow spaces in namespace', () => {
+      expect(() => {
+        config.namespace = 'My Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should not allow dash for last character of namespace', () => {
+      expect(() => {
+        config.namespace = 'MyNamespace-';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should not allow dash for first character of namespace', () => {
+      expect(() => {
+        config.namespace = '-MyNamespace';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should not allow number for first character of namespace', () => {
+      expect(() => {
+        config.namespace = '88MyNamespace';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should enforce namespace being at least 3 characters', () => {
+      expect(() => {
+        config.namespace = 'ab';
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should allow underscore in the namespace', () => {
+      config.namespace = 'My_Namespace';
+      validateBuildConfig(config);
+      expect(config.namespace).toBe('My_Namespace');
+    });
+
+    it('should allow dash in the namespace', () => {
+      config.namespace = 'My-Namespace';
+      validateBuildConfig(config);
+      expect(config.namespace).toBe('My-Namespace');
+    });
+
+    it('should set user namespace', () => {
+      config.namespace = 'MyNamespace';
+      validateBuildConfig(config);
+      expect(config.namespace).toBe('MyNamespace');
+    });
+
+    it('should set default namespace', () => {
+      validateBuildConfig(config);
+      expect(config.namespace).toBe('App');
     });
 
   });
+
 
   describe('copy tasks', () => {
 
@@ -395,6 +447,24 @@ describe('validation', () => {
     });
 
   });
+
+
+  describe('setProcessEnvironment', () => {
+
+    it('should set NODE_ENV production', () => {
+      config.devMode = false;
+      setProcessEnvironment(config);
+      expect(process.env.NODE_ENV).toBe('production');
+    });
+
+    it('should set NODE_ENV development', () => {
+      config.devMode = true;
+      setProcessEnvironment(config);
+      expect(process.env.NODE_ENV).toBe('development');
+    });
+
+  });
+
 
   var sys = mockStencilSystem();
   var config: BuildConfig;

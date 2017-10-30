@@ -3,7 +3,7 @@ import { buildError, getBuildContext } from '../compiler/util';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
 import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
 import { hydrateHtml } from './hydrate-html';
-import { parseComponentRegistry } from '../util/data-parse';
+import { parseComponentLoaders } from '../util/data-parse';
 import { validateBuildConfig } from '../util/validate-config';
 
 
@@ -73,7 +73,7 @@ function registerComponents(config: BuildConfig) {
       components.forEach(cmpRegistryData => {
         // parse the LoadComponentRegistry data and
         // move it to the ComponentRegistry data
-        parseComponentRegistry(cmpRegistryData, registry);
+        parseComponentLoaders(cmpRegistryData, registry);
       });
 
     } else {

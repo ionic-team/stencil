@@ -1,4 +1,4 @@
-import { BANNER, ENCAPSULATION_TYPE } from '../util/constants';
+import { BANNER, ENCAPSULATION } from '../util/constants';
 import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from '../util/interfaces';
 
 
@@ -370,8 +370,8 @@ export function hasError(diagnostics: Diagnostic[]) {
 }
 
 
-export function componentRequiresScopedStyles(encapsulation: ENCAPSULATION_TYPE) {
-  return (encapsulation === ENCAPSULATION_TYPE.ScopedCss || encapsulation === ENCAPSULATION_TYPE.ShadowDom);
+export function componentRequiresScopedStyles(encapsulation: ENCAPSULATION) {
+  return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
 }
 
 

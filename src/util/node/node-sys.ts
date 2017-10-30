@@ -2,12 +2,44 @@ import { BuildConfig, Diagnostic, Logger, PackageJsonData, StencilSystem } from 
 import { createContext, runInContext } from './node-context';
 import { createDom } from './node-dom';
 import { normalizePath } from '../../compiler/util';
-import * as fs from 'fs';
-import * as path from 'path';
 
 
 export function getNodeSys(distRootDir: string, logger: Logger) {
+  const fs = require('fs');
+  const path = require('path');
   const coreClientFileCache: {[key: string]: string} = {};
+
+
+  function resolveModule(fromDir: string, moduleId: string) {
+    const Module = require('module');
+
+    fromDir = path.resolve(fromDir);
+    const fromFile = path.join(fromDir, 'noop.js');
+
+    let dir = Module._resolveFilename(moduleId, {
+      id: fromFile,
+      filename: fromFile,
+      paths: Module._nodeModulePaths(fromDir)
+    });
+
+    const root = path.parse(fromDir).root;
+    let packageJsonFilePath: any;
+
+    while (dir !== root) {
+      dir = path.dirname(dir);
+      packageJsonFilePath = path.join(dir, 'package.json');
+
+      try {
+        fs.accessSync(packageJsonFilePath);
+      } catch (e) {
+        continue;
+      }
+
+      return normalizePath(packageJsonFilePath);
+    }
+
+    throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
+  }
 
   let packageJsonData: PackageJsonData;
   try {
@@ -23,6 +55,8 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     throw new Error(`unable to resolve "typescript" from: ${distRootDir}`);
   }
 
+  const sysUtil = require('./sys-util');
+
   const sys: StencilSystem = {
 
     compiler: {
@@ -34,8 +68,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     copy(src, dest, opts) {
       return new Promise((resolve, reject) => {
         opts = opts || {};
-        const fsExtra = require('fs-extra');
-        fsExtra.copy(src, dest, opts, (err: any) => {
+        sysUtil.fsExtra.copy(src, dest, opts, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -49,8 +82,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     emptyDir(dir: any) {
       return new Promise((resolve, reject) => {
-        const fsExtra = require('fs-extra');
-        fsExtra.emptyDir(dir, (err: any) => {
+        sysUtil.fsExtra.emptyDir(dir, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -62,8 +94,23 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     ensureDir(dir: any) {
       return new Promise((resolve, reject) => {
-        const fsExtra = require('fs-extra');
-        fsExtra.ensureDir(dir, (err: any) => {
+        sysUtil.fsExtra.ensureDir(dir, (err: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    },
+
+    ensureDirSync(dir: any) {
+      sysUtil.fsExtra.ensureDirSync(dir);
+    },
+
+    ensureFile(file: any) {
+      return new Promise((resolve, reject) => {
+        sysUtil.fsExtra.ensureFile(file, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -93,7 +140,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
           resolve(coreClientFileCache[filePath]);
 
         } else {
-          fs.readFile(filePath, 'utf-8', (err, data) => {
+          fs.readFile(filePath, 'utf-8', (err: Error, data: string) => {
             if (err) {
               reject(err);
             } else {
@@ -107,8 +154,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     glob(pattern, opts) {
       return new Promise((resolve, reject) => {
-        const glob = require('glob');
-        glob(pattern, opts, (err: any, files: string[]) => {
+        sysUtil.glob(pattern, opts, (err: any, files: string[]) => {
           if (err) {
             reject(err);
           } else {
@@ -147,12 +193,11 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     },
 
     isGlob(str: string) {
-      const isGlob = require('is-glob');
-      return isGlob(str);
+      return sysUtil.isGlob(str);
     },
 
     minifyCss(input) {
-      const CleanCSS = require('clean-css');
+      const CleanCSS = require('./clean-css').cleanCss;
       const result = new CleanCSS().minify(input);
       const diagnostics: Diagnostic[] = [];
 
@@ -210,8 +255,7 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
 
     remove(dir) {
       return new Promise((resolve, reject) => {
-        const fsExtra = require('fs-extra');
-        fsExtra.remove(dir, (err: any) => {
+        sysUtil.fsExtra.remove(dir, (err: any) => {
           if (err) {
             reject(err);
           } else {
@@ -222,6 +266,8 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     },
 
     resolveModule,
+
+    semver: sysUtil.semver,
 
     vm: {
       createContext,
@@ -260,36 +306,4 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
   });
 
   return sys;
-}
-
-
-function resolveModule(fromDir: string, moduleId: string) {
-  const Module = require('module');
-
-  fromDir = path.resolve(fromDir);
-  const fromFile = path.join(fromDir, 'noop.js');
-
-  let dir = Module._resolveFilename(moduleId, {
-    id: fromFile,
-    filename: fromFile,
-    paths: Module._nodeModulePaths(fromDir)
-  });
-
-  const root = path.parse(fromDir).root;
-  let packageJsonFilePath: any;
-
-  while (dir !== root) {
-    dir = path.dirname(dir);
-    packageJsonFilePath = path.join(dir, 'package.json');
-
-    try {
-      fs.accessSync(packageJsonFilePath);
-    } catch (e) {
-      continue;
-    }
-
-    return normalizePath(packageJsonFilePath);
-  }
-
-  throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
 }

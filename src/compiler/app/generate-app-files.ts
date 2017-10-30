@@ -58,7 +58,7 @@ export function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     let coreContent = results[0];
     let coreEs5WithPolyfilledContent = results[1];
 
-    if (config.minifyJs) {
+    if (config.hashFileNames) {
       // prod mode renames the core file with its hashed content
       const contentHash = sys.generateContentHash(coreContent, config.hashedFileNameLength);
       appRegistry.core = `${appFileName}.${contentHash}.js`;

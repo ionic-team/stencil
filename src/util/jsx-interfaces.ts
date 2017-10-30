@@ -577,6 +577,7 @@ declare global {
     export interface HTMLAttributes extends DOMAttributes {
       // vdom specific
       innerHTML?: string;
+      ref?: (elm?: HTMLElement) => void;
 
       // Standard HTML Attributes
       accessKey?: string;

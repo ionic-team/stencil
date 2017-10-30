@@ -1,214 +1,236 @@
-import { ComponentInstance, ComponentMeta, ComponentInternalValues,
-  DomApi, HostElement, PlatformApi, PropChangeMeta } from '../../util/interfaces';
-import { isDef } from '../../util/helpers';
+import { ComponentInstance, ComponentMeta, DomApi, HostElement,
+  MembersMeta, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { MEMBER_TYPE, PROP_CHANGE } from '../../util/constants';
+import { noop } from '../../util/helpers';
 import { parsePropertyValue } from '../../util/data-parse';
 import { queueUpdate } from './update';
 
 
-export function initProxy(plt: PlatformApi, elm: HostElement, instance: ComponentInstance, cmpMeta: ComponentMeta) {
-  // used to store instance data internally so that we can add
-  // getters/setters with the same name, and then do change detection
-  const values: ComponentInternalValues = instance.__values = {};
+export function proxyHostElementPrototype(plt: PlatformApi, membersMeta: MembersMeta, hostPrototype: HostElement) {
+  // create getters/setters on the host element prototype to represent the public API
+  // the setters allows us to know when data has changed so we can re-render
 
-  if (cmpMeta.propsWillChangeMeta) {
-    // this component has prop WILL change methods, so init the object to store them
-    values.__propWillChange = {};
+  membersMeta && Object.keys(membersMeta).forEach(memberName => {
+    // add getters/setters
+    const memberType = membersMeta[memberName].memberType;
+
+    if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
+      // @Prop() or @Prop({ mutable: true })
+      definePropertyGetterSetter(
+        hostPrototype,
+        memberName,
+        function getHostElementProp() {
+          // host element getter (cannot be arrow fn)
+          // yup, ugly, srynotsry
+          // but its creating _values if it doesn't already exist
+          return ((this as HostElement)._values = (this as HostElement)._values || {})[memberName];
+        },
+        function setHostElementProp(newValue: any) {
+          // host element setter (cannot be arrow fn)
+          setValue(plt, (this as HostElement), memberName, newValue);
+        }
+      );
+
+    } else if (memberType === MEMBER_TYPE.Method) {
+      // @Method()
+      // add a placeholder noop value on the host element's prototype
+      // incase this method gets called before setup
+      definePropertyValue(hostPrototype, memberName, noop);
+    }
+  });
+}
+
+
+export function proxyComponentInstance(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement, instance: ComponentInstance) {
+  // at this point we've got a specific node of a host element, and created a component class instance
+  // and we've already created getters/setters on both the host element and component class prototypes
+  // let's upgrade any data that might have been set on the host element already
+  // and let's have the getters/setters kick in and do their jobs
+
+  // let's automatically add a reference to the host element on the instance
+  instance.__el = elm;
+
+  // create the _values object if it doesn't already exist
+  // this will hold all of the internal getter/setter values
+  elm._values = elm._values || {};
+
+  cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+    defineMember(plt, cmpMeta, elm, instance, memberName);
+  });
+}
+
+
+export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement, instance: ComponentInstance, memberName: string) {
+  const memberMeta = cmpMeta.membersMeta[memberName];
+  const memberType = memberMeta.memberType;
+
+  function getComponentProp() {
+    // component instance prop/state getter
+    // get the property value directly from our internal values
+    const elm: HostElement = (this as ComponentInstance).__el;
+    return elm._values[memberName];
   }
 
-  if (cmpMeta.propsDidChangeMeta) {
-    // this component has prop DID change methods, so init the object to store them
-    values.__propDidChange = {};
+  function setComponentProp(newValue: any) {
+    // component instance prop/state setter (cannot be arrow fn)
+    const elm: HostElement = (this as ComponentInstance).__el;
+
+    if (memberType !== MEMBER_TYPE.Prop) {
+      setValue(plt, elm, memberName, newValue);
+
+    } else {
+      console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
+    }
   }
 
-  if (cmpMeta.membersMeta) {
-    for (var memberName in cmpMeta.membersMeta) {
-      // add getters/setters for @Prop()s
-      var memberMeta = cmpMeta.membersMeta[memberName];
-      var memberType = memberMeta.memberType;
+  if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.State || memberType === MEMBER_TYPE.PropMutable) {
 
-      if (memberType === MEMBER_TYPE.PropContext) {
-        // @Prop({ context: 'config' })
-        var contextObj = plt.getContextItem(memberMeta.ctrlId);
-        if (isDef(contextObj)) {
-          defineProperty(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
+    if (memberType !== MEMBER_TYPE.State) {
+      if (memberMeta.attribName && (elm._values[memberName] === undefined || elm._values[memberName] === '')) {
+        // check the prop value from the host element attribute
+        const hostAttrValue = elm.getAttribute(memberMeta.attribName);
+        if (hostAttrValue != null) {
+          // looks like we've got an attribute value
+          // let's set it to our internal values
+          elm._values[memberName] = parsePropertyValue(memberMeta.propType, hostAttrValue);
+        }
+      }
+      if (elm.hasOwnProperty(memberName)) {
+        // @Prop or @Prop({mutable:true})
+        // property values on the host element should override
+        // any default values on the component instance
+        if (elm._values[memberName] === undefined) {
+          elm._values[memberName] = (elm as any)[memberName];
         }
 
-      } else if (memberType === MEMBER_TYPE.PropConnect) {
-        // @Prop({ connect: 'ion-loading-ctrl' })
-        defineProperty(instance, memberName, plt.propConnect(memberMeta.ctrlId));
-
-      } else if (memberType === MEMBER_TYPE.Method) {
-        // add a value getter on the dom's element instance
-        // pointed at the instance's method
-        defineProperty(elm, memberName, instance[memberName].bind(instance));
-
-      } else if (memberType === MEMBER_TYPE.Element) {
-        // add a getter to the element reference using
-        // the member name the component meta provided
-        defineProperty(instance, memberName, elm);
-
-      } else {
-        // @Prop and @State
-        initProp(
-          memberName,
-          memberType,
-          memberMeta.attribName,
-          memberMeta.propType,
-          values,
-          plt,
-          elm,
-          instance,
-          cmpMeta.propsWillChangeMeta,
-          cmpMeta.propsDidChangeMeta
-        );
+        if (plt.isClient) {
+          // within the browser, the element's prototype
+          // already has its getter/setter set, but on the
+          // server the prototype is shared causing issues
+          // so instead the server's elm has the getter/setter
+          // on the actual element instance, not its prototype
+          // for the client, let's delete its "own" property
+          delete (elm as any)[memberName];
+        }
       }
     }
+
+    if (instance.hasOwnProperty(memberName) && elm._values[memberName] === undefined) {
+      // @Prop() or @Prop({mutable:true}) or @State()
+      // we haven't yet got a value from the above checks so let's
+      // read any "own" property instance values already set
+      // to our internal value as the source of getter data
+      // we're about to define a property and it'll overwrite this "own" property
+      elm._values[memberName] = (instance as any)[memberName];
+    }
+
+    // add getter/setter to the component instance
+    // these will be pointed to the internal data set from the above checks
+    definePropertyGetterSetter(
+      instance,
+      memberName,
+      getComponentProp,
+      setComponentProp
+    );
+
+    // add watchers to props if they exist
+    proxyPropChangeMethods(cmpMeta.propsWillChangeMeta, PROP_WILL_CHG, elm, instance, memberName);
+    proxyPropChangeMethods(cmpMeta.propsDidChangeMeta, PROP_DID_CHG, elm, instance, memberName);
+
+  } else if (memberType === MEMBER_TYPE.Element) {
+    // @Element()
+    // add a getter to the element reference using
+    // the member name the component meta provided
+    definePropertyValue(instance, memberName, elm);
+
+  } else if (memberType === MEMBER_TYPE.Method) {
+    // @Method()
+    // add a property "value" on the host element
+    // which we'll bind to the instance's method
+    definePropertyValue(elm, memberName, instance[memberName].bind(instance));
+
+  } else if (memberType === MEMBER_TYPE.PropContext) {
+    // @Prop({ context: 'config' })
+    var contextObj = plt.getContextItem(memberMeta.ctrlId);
+    if (contextObj) {
+      definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
+    }
+
+  } else if (memberType === MEMBER_TYPE.PropConnect) {
+    // @Prop({ connect: 'ion-loading-ctrl' })
+    definePropertyValue(instance, memberName, plt.propConnect(memberMeta.ctrlId));
   }
 }
 
 
-function initProp(
-  memberName: string,
-  memberType: number,
-  attribName: string,
-  propType: number,
-  internalValues: ComponentInternalValues,
-  plt: PlatformApi,
-  elm: HostElement,
-  instance: ComponentInstance,
-  propWillChangeMeta: PropChangeMeta[],
-  propDidChangeMeta: PropChangeMeta[]
-) {
+export function proxyPropChangeMethods(propChangeMeta: PropChangeMeta[], prefix: string, elm: HostElement, instance: ComponentInstance, memberName: string) {
+  // there are prop WILL change methods for this component
+  const propChangeMthd = propChangeMeta && propChangeMeta.find(m => m[PROP_CHANGE.PropName] === memberName);
 
-  if (memberType === MEMBER_TYPE.State) {
-    // @State() property, so copy the value directly from the instance
-    // before we create getters/setters on this same property name
-    internalValues[memberName] = (<any>instance)[memberName];
+  if (propChangeMthd) {
+    // cool, we should watch for changes to this property
+    // let's bind their watcher function and add it to our list
+    // of watchers, so any time this property changes we should
+    // also fire off their method
+    elm._values[prefix + memberName] = (instance as any)[propChangeMthd[PROP_CHANGE.MethodName]].bind(instance);
+  }
+}
 
-  } else {
-    // @Prop() property, so check initial value from the proxy element and instance
-    // before we create getters/setters on this same property name
-    // we do this for @Prop({ mutable: true }) also
-    const hostAttrValue = elm.getAttribute(attribName);
-    if (hostAttrValue !== null) {
-      // looks like we've got an initial value from the attribute
-      internalValues[memberName] = parsePropertyValue(propType, hostAttrValue);
 
-    } else if ((<any>elm)[memberName] !== undefined) {
-      // looks like we've got an initial value on the proxy element
-      internalValues[memberName] = parsePropertyValue(propType, (<any>elm)[memberName]);
+export function setValue(plt: PlatformApi, elm: HostElement, memberName: string, newVal: any) {
+  // get the internal values object, which should always come from the host element instance
+  // create the _values object if it doesn't already exist
+  const internalValues = (elm._values = elm._values || {});
 
-    } else if ((<any>instance)[memberName] !== undefined) {
-      // looks like we've got an initial value on the instance already
-      internalValues[memberName] = (<any>instance)[memberName];
+  // check our new property value against our internal value
+  const oldVal = internalValues[memberName];
+
+  if (newVal !== oldVal) {
+    // gadzooks! the property's value has changed!!
+
+    if (internalValues[PROP_WILL_CHG + memberName]) {
+      // this instance is watching for when this property WILL change
+      internalValues[PROP_WILL_CHG + memberName](newVal, oldVal);
     }
-  }
 
-  let i = 0;
-  if (propWillChangeMeta) {
-    // there are prop WILL change methods for this component
-    for (; i < propWillChangeMeta.length; i++) {
-      if (propWillChangeMeta[i][PROP_CHANGE.PropName] === memberName) {
-        // cool, we should watch for changes to this property
-        // let's bind their watcher function and add it to our list
-        // of watchers, so any time this property changes we should
-        // also fire off their @PropWillChange() method
-        internalValues.__propWillChange[memberName] = (<any>instance)[propWillChangeMeta[i][PROP_CHANGE.MethodName]].bind(instance);
-      }
+    // set our new value!
+    // https://youtu.be/dFtLONl4cNc?t=22
+    internalValues[memberName] = newVal;
+
+    if (internalValues[PROP_DID_CHG + memberName]) {
+      // this instance is watching for when this property DID change
+      internalValues[PROP_DID_CHG + memberName](newVal, oldVal);
     }
-  }
 
-  if (propDidChangeMeta) {
-    // there are prop DID change methods for this component
-    for (i = 0; i < propDidChangeMeta.length; i++) {
-      if (propDidChangeMeta[i][PROP_CHANGE.PropName] === memberName) {
-        // cool, we should watch for changes to this property
-        // let's bind their watcher function and add it to our list
-        // of watchers, so any time this property changes we should
-        // also fire off their @PropDidChange() method
-        internalValues.__propDidChange[memberName] = (<any>instance)[propDidChangeMeta[i][PROP_CHANGE.MethodName]].bind(instance);
-      }
-    }
-  }
-
-  function getValue() {
-    // get the property value directly from our internal values
-    return internalValues[memberName];
-  }
-
-  function setValue(newVal: any) {
-    // check our new property value against our internal value
-    const oldVal = internalValues[memberName];
-
-    // TODO: account for Arrays/Objects
-    if (newVal !== oldVal) {
-      // gadzooks! the property's value has changed!!
-
-      if (internalValues.__propWillChange && internalValues.__propWillChange[memberName]) {
-        // this instance is watching for when this property WILL change
-        internalValues.__propWillChange[memberName](newVal, oldVal);
-      }
-
-      // set our new value!
-      internalValues[memberName] = newVal;
-
-      if (internalValues.__propDidChange && internalValues.__propDidChange[memberName]) {
-        // this instance is watching for when this property DID change
-        internalValues.__propDidChange[memberName](newVal, oldVal);
-      }
-
-      // looks like this value actually changed, we've got work to do!
-      // queue that we need to do an update, don't worry
-      // about queuing up millions cuz this function
-      // ensures it only runs once
+    if (elm.$instance && !plt.activeRender) {
+      // looks like this value actually changed, so we've got work to do!
+      // but only if we've already created an instance, otherwise just chill out
+      // queue that we need to do an update, but don't worry about queuing
+      // up millions cuz this function ensures it only runs once
       queueUpdate(plt, elm);
     }
   }
-
-  if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
-    // @Prop() or @Prop({ mutable: true })
-    // have both getters and setters on the DOM element
-    // @State() getters and setters should not be assigned to the element
-    defineProperty(elm, memberName, undefined, getValue, setValue);
-  }
-
-  if (memberType === MEMBER_TYPE.PropMutable || memberType === MEMBER_TYPE.State) {
-    // @Prop({ mutable: true }) or @State()
-    // have both getters and setters on the instance
-    defineProperty(instance, memberName, undefined, getValue, setValue);
-
-  } else if (memberType === MEMBER_TYPE.Prop) {
-    // @Prop() only has getters, but not setters on the instance
-    defineProperty(instance, memberName, undefined, getValue, function invalidSetValue() {
-      // this is not a stateful @Prop()
-      // so do not update the instance or host element
-      // TODO: remove this warning in prod mode
-      console.warn(`@Prop() "${memberName}" on "${elm.tagName.toLowerCase()}" cannot be modified.`);
-    });
-  }
-
 }
 
 
-function defineProperty(obj: any, propertyKey: string, value: any, getter?: any, setter?: any) {
+function definePropertyValue(obj: any, propertyKey: string, value: any) {
   // minification shortcut
-  const descriptor: PropertyDescriptor = {
-    configurable: true
-  };
-  if (value !== undefined) {
-    descriptor.value = value;
-
-  } else {
-    if (getter) {
-      descriptor.get = getter;
-    }
-    if (setter) {
-      descriptor.set = setter;
-    }
-  }
-  Object.defineProperty(obj, propertyKey, descriptor);
+  Object.defineProperty(obj, propertyKey, {
+    'configurable': true,
+    'value': value
+  });
 }
+
+
+function definePropertyGetterSetter(obj: any, propertyKey: string, get: any, set: any) {
+  // minification shortcut
+  Object.defineProperty(obj, propertyKey, {
+    'configurable': true,
+    'get': get,
+    'set': set
+  });
+}
+
 
 export function proxyController(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string) {
   return {
@@ -216,6 +238,7 @@ export function proxyController(domApi: DomApi, controllerComponents: { [tag: st
     'componentOnReady': proxyProp(domApi, controllerComponents, ctrlTag, 'componentOnReady')
   };
 }
+
 
 export function loadComponent(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string): Promise<any> {
   return new Promise(resolve => {
@@ -231,6 +254,7 @@ export function loadComponent(domApi: DomApi, controllerComponents: { [tag: stri
   });
 }
 
+
 function proxyProp(domApi: DomApi, controllerComponents: { [tag: string]: HostElement }, ctrlTag: string, proxyMethodName: string) {
   return function () {
     const args = arguments;
@@ -238,3 +262,7 @@ function proxyProp(domApi: DomApi, controllerComponents: { [tag: string]: HostEl
       .then(ctrlElm => ctrlElm[proxyMethodName].apply(ctrlElm, args));
   };
 }
+
+
+const PROP_WILL_CHG = '$$wc';
+const PROP_DID_CHG = '$$dc';

@@ -1,7 +1,7 @@
+import { BuildResults, Logger } from '../interfaces';
 import { getNodeSys } from '../node/node-sys';
 import { getConfigFilePath, parseArgv, help, init, isValidNodeVersion, overrideConfigFromArgv } from './cli-utils';
 import { loadConfigFile } from '../node/load-config';
-import { Logger } from '../interfaces';
 import { NodeLogger } from '../node/node-logger';
 import * as path from 'path';
 
@@ -69,7 +69,9 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
   switch (task) {
     case 'build':
       var stencil = require(path.join(__dirname, '../compiler/index.js'));
-      stencil.build(config);
+      stencil.build(config).then((results: BuildResults) => {
+        config.logger.printDiagnostics(results.diagnostics);
+      });
 
       if (config.watch) {
         process.once('SIGINT', () => {
@@ -79,7 +81,7 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
       break;
 
     default:
-      logger.error(`Invalid stencil command, please see the options below:`);
+      config.logger.error(`Invalid stencil command, please see the options below:`);
       help(process, logger);
       break;
   }
