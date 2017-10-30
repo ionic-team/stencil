@@ -23,7 +23,7 @@ export interface ComponentProps {
 
 
 export interface FunctionalComponent<PropsType> {
-  (props?: PropsType & ComponentProps): JSX.Element;
+  (props?: PropsType & ComponentProps): VNode;
 }
 
 
@@ -92,7 +92,6 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
       stack.length = 0;
     }
   }
-
   return vnode;
 }
 

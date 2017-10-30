@@ -24,6 +24,13 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
   function createElm(vnode: VNode, parentElm: Node, childIndex: number) {
     let i = 0;
 
+    if (typeof vnode.vtag === 'function') {
+      vnode = vnode.vtag({
+        ...vnode.vattrs,
+        children: vnode.vchildren
+      });
+    }
+
     if (vnode.vtag === 'slot' && !useNativeShadowDom) {
 
       if (hostContentNodes) {
