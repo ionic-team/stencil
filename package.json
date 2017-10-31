@@ -33,7 +33,7 @@
     "rollup": "0.50.0",
     "rollup-plugin-commonjs": "8.2.4",
     "rollup-plugin-node-resolve": "3.0.0",
-    "typescript": "^2.6.0-rc",
+    "typescript": "^2.6.1",
     "uglify-es": "3.1.3",
     "workbox-build": "2.1.0"
   },
