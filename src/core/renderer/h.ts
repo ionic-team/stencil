@@ -92,6 +92,7 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
       stack.length = 0;
     }
   }
+
   return vnode;
 }
 
