@@ -2,6 +2,7 @@ import { BuildConfig, BuildContext, FilesMap, ManifestBundle, ModuleFile } from 
 import { hasError, normalizePath } from '../util';
 import { buildExpressionReplacer } from '../build/replacer';
 import { dashToPascalCase } from '../../util/helpers';
+import localResolution from './rollup-plugins/local-resolution';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 
 
@@ -38,7 +39,8 @@ function bundleComponents(config: BuildConfig, ctx: BuildContext, manifestBundle
         sourceMap: false
       }),
       entryInMemoryPlugin(IN_MEMORY_INPUT, moduleBundleInput),
-      transpiledInMemoryPlugin(config, ctx)
+      transpiledInMemoryPlugin(config, ctx),
+      localResolution(config),
     ],
     onwarn: createOnWarnFn(ctx.diagnostics, manifestBundle.moduleFiles)
 
