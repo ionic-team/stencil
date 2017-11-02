@@ -29,12 +29,12 @@ export interface AppGlobal {
 
 
 export interface AddEventListener {
-  (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
+  (elm: Element | Document | Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
 }
 
 
 export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element): void;
+  (instance: any, eventName: string, enabled: boolean, attachTo?: string | Element): void;
 }
 
 
@@ -279,6 +279,7 @@ export interface ModuleFile {
   jsFilePath?: string;
   cmpMeta?: ComponentMeta;
   includedSassFiles?: string[];
+  includedStylusFiles?: string[];
   isCollectionDependency?: boolean;
   excludeFromCollection?: boolean;
   originalCollectionComponentPath?: string;
@@ -324,7 +325,7 @@ export interface BuildConfig {
   sys?: StencilSystem;
   logger?: Logger;
   rootDir?: string;
-  logLevel?: 'error'|'warn'|'info'|'debug'|string;
+  logLevel?: 'error' | 'warn' | 'info' | 'debug' | string;
   exclude?: string[];
   namespace?: string;
   global?: string;
@@ -351,11 +352,12 @@ export interface BuildConfig {
   hashedFileNameLength?: number;
   suppressTypeScriptErrors?: boolean;
   watchIgnoredRegex?: RegExp;
-  prerender?: PrerenderConfig|boolean;
+  prerender?: PrerenderConfig | boolean;
   copy?: CopyTasks;
-  serviceWorker?: ServiceWorkerConfig|boolean;
+  serviceWorker?: ServiceWorkerConfig | boolean;
   hydratedCssClass?: string;
   sassConfig?: any;
+  stylusConfig?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -366,8 +368,8 @@ export interface ServiceWorkerConfig {
   swDest?: string;
   swSrc?: string;
   globPatterns?: string[];
-  globDirectory?: string|string[];
-  globIgnores?: string|string[];
+  globDirectory?: string | string[];
+  globIgnores?: string | string[];
   templatedUrls?: any;
   maximumFileSizeToCacheInBytes?: number;
   manifestTransforms?: any;
@@ -474,7 +476,7 @@ export interface BuildContext {
   styleCssUnscopedOutputs?: ModuleBundles;
   styleCssScopedOutputs?: ModuleBundles;
   filesToWrite?: FilesMap;
-  dependentManifests?: {[collectionName: string]: Manifest};
+  dependentManifests?: { [collectionName: string]: Manifest };
   appFiles?: {
     loader?: string;
     core?: string;
@@ -494,11 +496,13 @@ export interface BuildContext {
   changeHasNonComponentModules?: boolean;
   changeHasComponentModules?: boolean;
   changeHasSass?: boolean;
+  changeHasStylus?: boolean;
   changeHasCss?: boolean;
   changeHasHtml?: boolean;
   changedFiles?: string[];
 
   sassBuildCount?: number;
+  stylusBuildCount?: number;
   transpileBuildCount?: number;
   indexBuildCount?: number;
   appFileBuildCount?: number;
@@ -530,6 +534,7 @@ export interface ModuleBundles {
 export interface CompileResults {
   moduleFiles: ModuleFiles;
   includedSassFiles?: string[];
+  includedStylusFiles?: string[];
 }
 
 
@@ -639,7 +644,7 @@ export interface MethodDecorator {
 }
 
 
-export interface MethodOptions {}
+export interface MethodOptions { }
 
 
 export interface ElementDecorator {
@@ -809,7 +814,7 @@ export interface BooleanInputComponent extends BaseInputComponent {
 
 
 export interface ComponentModule {
-  new (): ComponentInstance;
+  new(): ComponentInstance;
 }
 
 
@@ -893,7 +898,7 @@ export type Key = string | number;
 
 export interface HostContentNodes {
   defaultSlot?: Node[];
-  namedSlots?: {[slotName: string]: Node[]};
+  namedSlots?: { [slotName: string]: Node[] };
 }
 
 
@@ -905,7 +910,7 @@ export interface VNode {
   vchildren?: VNode[];
   vattrs?: any;
   vref?: (elm: any) => void;
-  elm?: Element|Node;
+  elm?: Element | Node;
 }
 
 export interface VNodeData {
@@ -996,11 +1001,11 @@ export interface BundleCallbacks {
 
 
 export interface Diagnostic {
-  level: 'error'|'warn'|'info';
+  level: 'error' | 'warn' | 'info';
   type: string;
   header?: string;
   messageText: string;
-  language?: 'javascript'|'typescript'|'scss'|'css';
+  language?: 'javascript' | 'typescript' | 'scss' | 'css';
   code?: string;
   absFilePath?: string;
   relFilePath?: string;
@@ -1050,7 +1055,7 @@ export interface StencilSystem {
     writeFileSync(filename: string, data: any, options?: { encoding?: string; mode?: number; flag?: string; }): void;
   };
   generateContentHash?(content: string, length: number): string;
-  getClientCoreFile?(opts: {staticName: string}): Promise<string>;
+  getClientCoreFile?(opts: { staticName: string }): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;
     nodir?: boolean;
@@ -1082,19 +1087,21 @@ export interface StencilSystem {
   rollup?: {
     rollup: {
       (config: { input: string; plugins?: any[]; treeshake?: boolean; onwarn?: Function; }): Promise<{
-        generate: {(config: {
-          format?: string;
-          banner?: string;
-          footer?: string;
-          exports?: string;
-          external?: string[];
-          globals?: {[key: string]: any};
-          moduleName?: string;
-          plugins?: any;
-        }): Promise<{
-          code: string;
-          map: any;
-        }>}
+        generate: {
+          (config: {
+            format?: string;
+            banner?: string;
+            footer?: string;
+            exports?: string;
+            external?: string[];
+            globals?: { [key: string]: any };
+            moduleName?: string;
+            plugins?: any;
+          }): Promise<{
+            code: string;
+            map: any;
+          }>
+        }
       }>;
     };
     plugins: { [pluginName: string]: any };
@@ -1108,7 +1115,33 @@ export interface StencilSystem {
         outFile?: string;
         outputStyle?: string;
       },
-      cb: (err: any, result: {css: string; stats: any}) => void
+      cb: (err: any, result: { css: string; stats: any }) => void
+    ): void;
+  };
+  stylus?: {
+    // (str, options, fn)
+    // see: https://github.com/stylus/stylus/blob/dev/lib/stylus.js#L80
+    render(
+      code: string,
+
+      // see https://github.com/stylus/stylus/blob/dev/lib/renderer.js
+      // options.globals = options.globals || {};
+      // options.functions = options.functions || {};
+      // options.use = options.use || [];
+      // options.use = Array.isArray(options.use) ? options.use : [options.use];
+      // options.imports = [join(__dirname, 'functions')];
+      // options.paths = options.paths || [];
+      // options.filename = options.filename || 'stylus';
+      // options.Evaluator = options.Evaluator || Evaluator;
+      config: {
+        cache?: boolean,
+        globals?: Object; // globals available
+        functions?: Object; // functions available
+        use?: string[]; // plugins to use
+        paths?: string[]; // paths to include for lookup
+        filename?: string; // filename of the file being rendered
+      },
+      cb: (err: any, result: string) => void
     ): void;
   };
   semver?: {
@@ -1162,7 +1195,7 @@ export interface Url {
 
 export interface FSWatcher {
   on(eventName: string, callback: Function): this;
-  add(path: string|string[]): this;
+  add(path: string | string[]): this;
   $triggerEvent(eventName: string, path: string): void;
 }
 
@@ -1254,7 +1287,7 @@ export interface ComponentData {
   hostElement?: HostElementData;
   host?: any;
   assetPaths?: string[];
-  slot?: 'hasSlots'|'hasNamedSlots';
+  slot?: 'hasSlots' | 'hasNamedSlots';
   shadow?: boolean;
   scoped?: boolean;
   priority?: 'low';
@@ -1271,7 +1304,7 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number'|'string'|'any';
+  type?: 'boolean' | 'number' | 'string' | 'any';
   mutable?: boolean;
 }
 

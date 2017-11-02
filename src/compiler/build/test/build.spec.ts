@@ -8,9 +8,9 @@ import * as path from 'path';
 
 describe('build', () => {
 
-  it('should build one component w/ styleUrl', () => {
+  it('should build one component w/ SASS styleUrl', () => {
     ctx = {};
-    config.bundles = [ { components: ['cmp-a'] } ];
+    config.bundles = [{ components: ['cmp-a'] }];
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA {}`);
     writeFileSync('/src/cmp-a.scss', `body { color: red; }`);
 
@@ -29,9 +29,31 @@ describe('build', () => {
     });
   });
 
+  it('should build one component w/ Stylus styleUrl', () => {
+    ctx = {};
+    config.bundles = [{ components: ['cmp-a'] }];
+    // NOTE: uses mockFS, see config.sys.fs = mockFs();
+    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.styl' }) export class CmpA {}`);
+    writeFileSync('/src/cmp-a.styl', `body { color: red; }`);
+
+    return build(config, ctx).then(r => {
+      expect(r.diagnostics.length).toBe(0);
+      expect(r.manifest.components.length).toBe(1);
+      expect(ctx.transpileBuildCount).toBe(1);
+      expect(ctx.stylusBuildCount).toBe(1);
+      expect(ctx.moduleBundleCount).toBe(1);
+      expect(ctx.styleBundleCount).toBe(1);
+
+      expect(wroteFile(r, 'cmp-a.js')).toBe(true);
+
+      const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
+      expect(cmpMeta.styles.$.stylePaths[0]).toEqual('cmp-a.styl');
+    });
+  });
+
   it('should build one component w/ no styles', () => {
     ctx = {};
-    config.bundles = [ { components: ['cmp-a'] } ];
+    config.bundles = [{ components: ['cmp-a'] }];
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
 
     return build(config, ctx).then(r => {

@@ -1,5 +1,7 @@
-import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, Logger, PlatformApi, RendererApi, StencilSystem, VNode } from '../util/interfaces';
+import {
+  BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostElement,
+  HydrateOptions, Logger, PlatformApi, RendererApi, StencilSystem, VNode
+} from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
@@ -13,7 +15,7 @@ import { ComponentInstance } from '../util/interfaces';
 export function mockPlatform(supportsShadowDom?: boolean) {
   const diagnostics: Diagnostic[] = [];
   const config = mockBuildConfig();
-  const win = config.sys.createDom().parse({html: ''});
+  const win = config.sys.createDom().parse({ html: '' });
   const domApi = createDomApi(win.document);
 
   const plt = createPlatformServer(
@@ -30,18 +32,18 @@ export function mockPlatform(supportsShadowDom?: boolean) {
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();
 
-  plt.loadBundle = function(a: any, elm: HostElement, cb: Function) {
+  plt.loadBundle = function (a: any, elm: HostElement, cb: Function) {
     a; elm;
     $loadBundleQueue.add(cb);
   };
 
-  (<MockedPlatform>plt).$flushQueue = function() {
+  (<MockedPlatform>plt).$flushQueue = function () {
     return new Promise(resolve => {
       $mockedQueue.flush(resolve);
     });
   };
 
-  (<MockedPlatform>plt).$flushLoadBundle = function() {
+  (<MockedPlatform>plt).$flushLoadBundle = function () {
     return new Promise(resolve => {
       $loadBundleQueue.flush(resolve);
     });
@@ -49,7 +51,7 @@ export function mockPlatform(supportsShadowDom?: boolean) {
 
   const renderer = createRendererPatch(plt, domApi, false);
 
-  plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, hostElementContentNode?: HostContentNodes) {
+  plt.render = function (oldVNode: VNode, newVNode: VNode, isUpdate: boolean, hostElementContentNode?: HostContentNodes) {
     return renderer(oldVNode, newVNode, isUpdate, hostElementContentNode);
   };
 
@@ -95,13 +97,13 @@ export function mockStencilSystem() {
 
     createDom: mockCreateDom,
 
-    emptyDir: function() {
+    emptyDir: function () {
       return new Promise(resolve => {
         resolve();
       });
     },
 
-    ensureDir: function() {
+    ensureDir: function () {
       return new Promise(resolve => {
         resolve();
       });
@@ -110,18 +112,18 @@ export function mockStencilSystem() {
     generateContentHash: function mockGenerateContentHash(content: string, length: number) {
       var crypto = require('crypto');
       return crypto.createHash('sha1')
-                  .update(content)
-                  .digest('base64')
-                  .replace(/\W/g, '')
-                  .substr(0, length)
-                  .toLowerCase();
+        .update(content)
+        .digest('base64')
+        .replace(/\W/g, '')
+        .substr(0, length)
+        .toLowerCase();
     },
 
     getClientCoreFile: mockGetClientCoreFile,
 
     fs: null,
 
-    isGlob: function(str) {
+    isGlob: function (str) {
       const isGlob = require('is-glob');
       return isGlob(str);
     },
@@ -142,7 +144,7 @@ export function mockStencilSystem() {
     rollup: rollup,
 
     sass: {
-      render: function(config: any, cb: Function) {
+      render: function (config: any, cb: Function) {
         Promise.resolve().then(() => {
           config;
 
@@ -161,16 +163,36 @@ export function mockStencilSystem() {
       }
     },
 
+    stylus: {
+      render: function (strToRender: string, config: any, cb: Function) {
+        Promise.resolve().then(() => {
+          config;
+
+          let content: string;
+          if (sys.fs) {
+            content = strToRender;
+          } else {
+            content = `/** ${config.file} mock css **/`;
+          }
+
+          cb(null, {
+            css: content,
+            stats: []
+          });
+        });
+      }
+    },
+
     typescript: require('typescript'),
 
     url: require('url'),
 
     vm: {
-      createContext: function(ctx, wwwDir, sandbox) {
+      createContext: function (ctx, wwwDir, sandbox) {
         ctx; wwwDir;
         return require('vm').createContext(sandbox);
       },
-      runInContext: function(code, contextifiedSandbox, options) {
+      runInContext: function (code, contextifiedSandbox, options) {
         require('vm').runInContext(code, contextifiedSandbox, options);
       }
     },
@@ -182,7 +204,7 @@ export function mockStencilSystem() {
 }
 
 
-function mockGetClientCoreFile(opts: {staticName: string}) {
+function mockGetClientCoreFile(opts: { staticName: string }) {
   return Promise.resolve(`
     (function (window, document, apptNamespace, appFileName, appCore, appCorePolyfilled, components) {
         // mock getClientCoreFile, staticName: ${opts.staticName}
@@ -192,14 +214,14 @@ function mockGetClientCoreFile(opts: {staticName: string}) {
 
 function mockWatch(paths: string): any {
   paths;
-  const events: {[eventName: string]: Function} = {};
+  const events: { [eventName: string]: Function } = {};
 
   const watcher = {
-    on: function(eventName: string, listener: Function) {
+    on: function (eventName: string, listener: Function) {
       events[eventName] = listener;
       return watcher;
     },
-    $triggerEvent: function(eventName: string, path: string) {
+    $triggerEvent: function (eventName: string, path: string) {
       events[eventName](path);
     }
   };
@@ -212,7 +234,7 @@ function mockCreateDom() {
   let dom: any;
 
   return {
-    parse: function(opts: HydrateOptions) {
+    parse: function (opts: HydrateOptions) {
       dom = new jsdom.JSDOM(opts.html, {
         url: opts.url,
         referrer: opts.referrer,
@@ -220,14 +242,14 @@ function mockCreateDom() {
       });
       return dom.window;
     },
-    serialize: function() {
+    serialize: function () {
       return dom.serialize();
     },
-    destroy: function() {
+    destroy: function () {
       dom.window.close();
       dom = null;
     },
-    getDiagnostics: function(): any {
+    getDiagnostics: function (): any {
       return [];
     }
   };
@@ -254,15 +276,15 @@ export function mockFs() {
   const orgreadFileSync = fs.readFileSync;
   const orgwriteFileSync = fs.writeFileSync;
 
-  fs.readFileSync = function() {
+  fs.readFileSync = function (...args: any[]) {
     try {
-      return orgreadFileSync.apply(fs, arguments);
+      return orgreadFileSync.apply(fs, args);
     } catch (e) {
       if (e.message && e.message.indexOf('invalid argument') > -1) {
-        console.log('mockFs, fs.readFileSync', arguments);
+        console.log('mockFs, fs.readFileSync', ...args);
         console.trace(e);
       } else if (e.message && e.message.indexOf('no such file') > -1 && e.path.indexOf('node_modules') === -1) {
-        console.log('mockFs, fs.readFileSync', arguments);
+        console.log('mockFs, fs.readFileSync', ...args);
         console.trace(e);
       } else {
         throw e;
@@ -270,7 +292,7 @@ export function mockFs() {
     }
   };
 
-  fs.writeFileSync = function() {
+  fs.writeFileSync = function () {
     return orgwriteFileSync.apply(fs, arguments);
   };
 
@@ -393,7 +415,7 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
     cmpMeta.tagNameMeta = 'ion-cmp';
   }
   if (!cmpMeta.componentModule) {
-    cmpMeta.componentModule = class {};
+    cmpMeta.componentModule = class { };
   }
   if (!cmpMeta.membersMeta) {
     cmpMeta.membersMeta = {};
@@ -463,9 +485,9 @@ export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Pr
 
 export function compareHtml(input: string) {
   return input.replace(/(\s*)/g, '')
-              .replace(/<!---->/g, '')
-              .toLowerCase()
-              .trim();
+    .replace(/<!---->/g, '')
+    .toLowerCase()
+    .trim();
 }
 
 

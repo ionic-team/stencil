@@ -1,8 +1,7 @@
 import { BuildContext, BuildConfig, ModuleFile, ComponentMeta, CompiledModeStyles } from '../../util/interfaces';
-import { buildError, isCssFile, isSassFile, readFile, normalizePath } from '../util';
+import { buildError, isCssFile, isSassFile, isStylusFile, readFile, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
 import { scopeComponentCss } from '../css/scope-css';
-
 
 
 export function generateComponentStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile) {
@@ -55,6 +54,10 @@ function generateAllComponentModeStyles(config: BuildConfig, ctx: BuildContext, 
         if (isSassFile(absStylePath)) {
           // sass file needs to be compiled
           promises.push(compileSassFile(config, ctx, moduleFile, absStylePath, styleOrder));
+
+        } else if (isStylusFile(absStylePath)) {
+          // stylus file needs to be compiled
+          promises.push(compileStylusFile(config, ctx, moduleFile, absStylePath, styleOrder));
 
         } else if (isCssFile(absStylePath)) {
           // plain ol' css file
@@ -138,6 +141,54 @@ function appendHydratedCss(styles: string, selector: string, important?: boolean
   return `${styles || ''}\n${selector}{visibility:inherit${important ? ' !important' : ''}}`;
 }
 
+function compileStylusFile(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, absStylePath: string, styleOrder: number): Promise<CompiledModeStyles> {
+  const compileStylusDetails: CompiledModeStyles = {
+    styleOrder: styleOrder,
+    writeFile: false
+  };
+
+  // Note: Caching should be handled by Stylus
+  // done via `cache: true` option in Stylus config
+  // - see stylus?: interface in interfaces.ts)
+
+  return new Promise(resolve => {
+    const stylusConfig = {
+      ...config.stylusConfig,
+      filename: absStylePath
+    };
+
+    // for optimised CSS
+    if (config.minifyCss) {
+      stylusConfig.use = stylusConfig.use || [];
+
+      // uses stylus plugin: sapegin/csso-stylus
+      stylusConfig.use.push('csso-stylus');
+    }
+
+    const strToRender = config.sys.fs.readFileSync(absStylePath, 'utf-8');
+
+    config.sys.stylus.render(strToRender, stylusConfig, (err, result) => {
+      if (err) {
+        const d = buildError(ctx.diagnostics);
+        d.absFilePath = absStylePath;
+        d.messageText = err;
+      } else {
+        const css = result;
+        // .css.toString()
+        fillStyleText(config, ctx, moduleFile.cmpMeta, compileStylusDetails, css);
+
+        compileStylusDetails.writeFile = true;
+        ctx.stylusBuildCount++;
+
+        // TODO: cache for later
+        // ctx.styleStylusUnscopedOutputs[absStylePath] = compileStylusDetails.unscopedStyles;
+        // ctx.styleStylusScopedOutputs[absStylePath] = compileStylusDetails.scopedStyles;
+        resolve(compileStylusDetails);
+      }
+    });
+  });
+}
+
 
 function compileSassFile(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, absStylePath: string, styleOrder: number): Promise<CompiledModeStyles> {
   const compileSassDetails: CompiledModeStyles = {
@@ -175,6 +226,8 @@ function compileSassFile(config: BuildConfig, ctx: BuildContext, moduleFile: Mod
       outputStyle: config.minifyCss ? 'compressed' : 'expanded',
     };
 
+    // (opts, cb)
+    // see: https://github.com/sass/node-sass/blob/master/lib/index.js#L286
     config.sys.sass.render(sassConfig, (err, result) => {
       if (err) {
         const d = buildError(ctx.diagnostics);

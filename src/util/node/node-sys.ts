@@ -7,7 +7,7 @@ import { normalizePath } from '../../compiler/util';
 export function getNodeSys(distRootDir: string, logger: Logger) {
   const fs = require('fs');
   const path = require('path');
-  const coreClientFileCache: {[key: string]: string} = {};
+  const coreClientFileCache: { [key: string]: string } = {};
 
 
   function resolveModule(fromDir: string, moduleId: string) {
@@ -125,11 +125,11 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     generateContentHash(content, length) {
       const crypto = require('crypto');
       return crypto.createHash('sha1')
-                    .update(content)
-                    .digest('base64')
-                    .replace(/\W/g, '')
-                    .substr(0, length)
-                    .toLowerCase();
+        .update(content)
+        .digest('base64')
+        .replace(/\W/g, '')
+        .substr(0, length)
+        .toLowerCase();
     },
 
     getClientCoreFile(opts) {
@@ -285,7 +285,8 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
   Object.defineProperties(sys, {
     // sys on-demand getters
 
-    rollup: { get: () => {
+    rollup: {
+      get: () => {
         const rollup = require('rollup');
         rollup.plugins = {
           commonjs: require('rollup-plugin-commonjs'),
@@ -296,6 +297,8 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
     },
 
     sass: { get: () => require('node-sass') },
+
+    stylus: { get: () => require('stylus') },
 
     typescript: { get: () => require('typescript') },
 

@@ -1,6 +1,6 @@
 import { build } from './build';
 import { BuildConfig, BuildContext } from '../../util/interfaces';
-import { isCssFile, isHtmlFile, isSassFile, isTsFile, isWebDevFile, normalizePath } from '../util';
+import { isCssFile, isHtmlFile, isSassFile, isStylusFile, isTsFile, isWebDevFile, normalizePath } from '../util';
 
 
 export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
@@ -128,6 +128,7 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
   ctx.changeHasComponentModules = true;
   ctx.changeHasNonComponentModules = true;
   ctx.changeHasSass = true;
+  ctx.changeHasStylus = true;
   ctx.changeHasCss = true;
   ctx.changedFiles = changedFiles;
 
@@ -135,6 +136,7 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
     let changeHasComponentModules = false;
     let changeHasNonComponentModules = false;
     ctx.changeHasSass = false;
+    ctx.changeHasStylus = false;
     ctx.changeHasCss = false;
 
     changedFiles.forEach(changedFile => {
@@ -157,6 +159,9 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
 
       } else if (isSassFile(changedFile)) {
         ctx.changeHasSass = true;
+
+      } else if (isStylusFile(changedFile)) {
+        ctx.changeHasStylus = true;
 
       } else if (isCssFile(changedFile)) {
         ctx.changeHasCss = true;
