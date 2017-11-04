@@ -20,12 +20,12 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
         const child = n.getChildAt(1);
         const firstToken = child.getFirstToken();
 
-        // If the first token is @State()
+        // If the first token is @Prop()
         if (firstToken && firstToken.getText() === 'Prop') {
           isProp = true;
 
         } else if (!firstToken && child.getText() === 'Prop') {
-          // If the first token is @State
+          // If the first token is @Prop
           isProp = true;
         }
 
