@@ -33,6 +33,19 @@ describe('component-styles', () => {
 
   describe('groupComponentModeStyles', () => {
 
+    it(`should allow @ in selectors`, () => {
+      const cmpMeta: ComponentMeta = { tagNameMeta: 'my-tag' };
+      const modeName = 'ios';
+      const compiledModeStyles: CompiledModeStyles[] = [
+        { unscopedStyles: `.container--small\@tablet{}`, scopedStyles: '.container--small\@tablet{}' }
+      ];
+
+      const groupedCmpStyleDetail = groupComponentModeStyles(cmpMeta.tagNameMeta, modeName, compiledModeStyles);
+
+      expect(groupedCmpStyleDetail.unscopedStyles).toBe(`.container--small\\@tablet{}`);
+      expect(groupedCmpStyleDetail.scopedStyles).toBe(`.container--small\\@tablet{}`);
+    });
+
     it('should concat w/ correct order and group', () => {
       const cmpMeta: ComponentMeta = { tagNameMeta: 'my-tag' };
       const modeName = 'ios';

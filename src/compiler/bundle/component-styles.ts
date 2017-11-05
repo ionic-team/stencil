@@ -97,12 +97,21 @@ export function groupComponentModeStyles(tag: string, modeName: string, allCmpSt
 
   // create the unscoped css by combining
   // all of the styles this component should use
-  compiledModeStyles.unscopedStyles = allCmpStyleDetails.map(s => s.unscopedStyles || '').join('\n\n').trim();
+  compiledModeStyles.unscopedStyles = joinCmpStyleDetails(allCmpStyleDetails.map(s => s.unscopedStyles || ''));
 
   // group all scoped css
-  compiledModeStyles.scopedStyles = allCmpStyleDetails.map(s => s.scopedStyles || '').join('\n\n').trim();
+  compiledModeStyles.scopedStyles = joinCmpStyleDetails(allCmpStyleDetails.map(s => s.scopedStyles || ''));
 
   return compiledModeStyles;
+}
+
+
+function joinCmpStyleDetails(styles: string[]) {
+  let content = styles.join('\n\n').trim();
+
+  content = content.replace(/\@/g, `\\@`);
+
+  return content;
 }
 
 
