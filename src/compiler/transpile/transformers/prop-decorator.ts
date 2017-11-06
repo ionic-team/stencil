@@ -71,6 +71,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
           } else if (n.kind === ts.SyntaxKind.AnyKeyword) {
             // @Prop() myAny: any;
+            propType = PROP_TYPE.Any;
             shouldObserveAttribute = true;
           }
         }
