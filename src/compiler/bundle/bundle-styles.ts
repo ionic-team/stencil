@@ -10,8 +10,8 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
   }
 
   // do bundling if this is not a change build
-  // or it's a change build that has either changed sass or css
-  const doBundling = (!ctx.isChangeBuild || ctx.changeHasCss || ctx.changeHasSass);
+  // or it's a change build that has either changed sass,stylus or css
+  const doBundling = (!ctx.isChangeBuild || ctx.changeHasCss || ctx.changeHasSass || ctx.changeHasStylus);
 
   const timeSpan = config.logger.createTimeSpan(`bundle styles started`, !doBundling);
 
@@ -21,13 +21,13 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
     return generateBundleComponentStyles(config, ctx, manifestBundle);
 
   }))
-  .catch(err => {
-    catchError(ctx.diagnostics, err);
+    .catch(err => {
+      catchError(ctx.diagnostics, err);
 
-  })
-  .then(() => {
-    timeSpan.finish('bundle styles finished');
-  });
+    })
+    .then(() => {
+      timeSpan.finish('bundle styles finished');
+    });
 }
 
 
@@ -46,11 +46,11 @@ function generateBundleComponentStyles(config: BuildConfig, ctx: BuildContext, m
 
 export function getModuleFilesWithStyles(allModuleFiles: ModuleFile[]): ModuleFile[] {
   return allModuleFiles
-          .filter(m => m.cmpMeta && m.cmpMeta.stylesMeta && Object.keys(m.cmpMeta.stylesMeta).length)
-          .sort((a, b) => {
-            if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
-            if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
-            return 0;
-          });
+    .filter(m => m.cmpMeta && m.cmpMeta.stylesMeta && Object.keys(m.cmpMeta.stylesMeta).length)
+    .sort((a, b) => {
+      if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
+      if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+      return 0;
+    });
 }
 

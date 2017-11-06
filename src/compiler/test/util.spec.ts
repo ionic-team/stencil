@@ -117,6 +117,28 @@ describe('util', () => {
     });
   });
 
+  describe('isStylusFile', () => {
+    it('should return true for .styl and .stylus files', () => {
+      expect(util.isStylusFile('.styl')).toEqual(true);
+      expect(util.isStylusFile('foo.stylus')).toEqual(true);
+      expect(util.isStylusFile('foo/bar.styl')).toEqual(true);
+      expect(util.isStylusFile('.stylus')).toEqual(true);
+    });
+
+    it('should return false for other types of files', () => {
+      expect(util.isStylusFile('.stss')).toEqual(false);
+      expect(util.isStylusFile('foo.html')).toEqual(false);
+      expect(util.isStylusFile('foo/bar.css')).toEqual(false);
+    });
+
+    it('should be case insensitive', () => {
+      expect(util.isStylusFile('.sTyl')).toEqual(true);
+      expect(util.isStylusFile('foo.STYLus')).toEqual(true);
+      expect(util.isStylusFile('.sTyl')).toEqual(true);
+      expect(util.isStylusFile('foo/bar.stYL')).toEqual(true);
+    });
+  });
+
   describe('isCssFile', () => {
     it('should return true for .css', () => {
       expect(util.isCssFile('.css')).toEqual(true);

@@ -71,6 +71,11 @@ export class MyComponent {
 
 Note: the `.tsx` extension is required, as this is the standard for TypeScript classes that use JSX.
 
+The `@Component` decorator takes a config object which provides details on how to decorate the class so it turns into a Custom Element.
+
+- `tag` is the name of the custom element when used as a html tag inthe DOM.
+- `styleUrl` points to a style file (CSS, SASS or Stylus)
+
 To use this component, just use it like any other HTML tag:
 
 ```html

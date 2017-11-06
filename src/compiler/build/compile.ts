@@ -9,7 +9,8 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
 
   const compileResults: CompileResults = {
     moduleFiles: {},
-    includedSassFiles: []
+    includedSassFiles: [],
+    includedStylusFiles: []
   };
 
   if (hasError(ctx.diagnostics)) {
@@ -34,6 +35,7 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
           ctx.filesToWrite[moduleFile.jsFilePath] = ctx.jsFiles[moduleFile.jsFilePath];
         }
 
+        // TODO: make more generic, avoid copy/paste duplication
         if (moduleFile.includedSassFiles) {
           moduleFile.includedSassFiles.forEach(includedSassFile => {
             if (compileResults.includedSassFiles.indexOf(includedSassFile) === -1) {
@@ -41,12 +43,26 @@ export function compileSrcDir(config: BuildConfig, ctx: BuildContext) {
             }
           });
         }
+
+        if (moduleFile.includedStylusFiles) {
+          moduleFile.includedStylusFiles.forEach(includedStylusFile => {
+            if (compileResults.includedStylusFiles.indexOf(includedStylusFile) === -1) {
+              compileResults.includedStylusFiles.push(includedStylusFile);
+            }
+          });
+        }
+
       });
     }
-
+    // return Promise.resolve(transpileResults);
+    // transpileResults
   }).then(() => {
-    return copySourceSassFilesToDest(config, ctx, compileResults);
-
+    let stylus = copySourceStyleFilesToDest(config, ctx, compileResults, 'includedStylusFiles');
+    let sass = copySourceStyleFilesToDest(config, ctx, compileResults, 'includedSassFiles');
+    return {
+      sass,
+      stylus
+    };
   }).catch(err => {
     catchError(ctx.diagnostics, err);
 
@@ -130,34 +146,35 @@ function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileRes
 }
 
 
-function copySourceSassFilesToDest(config: BuildConfig, ctx: BuildContext, compileResults: CompileResults): Promise<any> {
+function copySourceStyleFilesToDest(config: BuildConfig, ctx: BuildContext, compileResults: CompileResults, filesName: 'includedSassFiles' | 'includedStylusFiles'): Promise<any> {
   if (!config.generateDistribution) {
     return Promise.resolve();
   }
 
   const sys = config.sys;
+  const files: string[] = compileResults[filesName];
 
-  return Promise.all(compileResults.includedSassFiles.map(sassSrcPath => {
-    sassSrcPath = normalizePath(sassSrcPath);
+  return Promise.all(files.map(srcPath => {
+    srcPath = normalizePath(srcPath);
 
-    return readFile(sys, sassSrcPath).then(sassSrcText => {
-      const includeDir = sassSrcPath.indexOf(config.srcDir) === 0;
-      let sassDestPath: string;
+    return readFile(sys, srcPath).then(styleSrcText => {
+      const includeDir = srcPath.indexOf(config.srcDir) === 0;
+      let destPath: string;
 
       if (includeDir) {
-        sassDestPath = normalizePath(sys.path.join(
+        destPath = normalizePath(sys.path.join(
           config.collectionDir,
-          sys.path.relative(config.srcDir, sassSrcPath)
+          sys.path.relative(config.srcDir, srcPath)
         ));
 
       } else {
-        sassDestPath = normalizePath(sys.path.join(
+        destPath = normalizePath(sys.path.join(
           config.rootDir,
-          sys.path.relative(config.rootDir, sassSrcPath)
+          sys.path.relative(config.rootDir, srcPath)
         ));
       }
 
-      ctx.filesToWrite[sassDestPath] = sassSrcText;
+      ctx.filesToWrite[destPath] = styleSrcText;
     });
   }));
 }

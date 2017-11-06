@@ -32,6 +32,7 @@ export function resetBuildContext(ctx: BuildContext) {
   ctx.manifest = {};
   ctx.diagnostics = [];
   ctx.sassBuildCount = 0;
+  ctx.stylusBuildCount = 0;
   ctx.transpileBuildCount = 0;
   ctx.indexBuildCount = 0;
   ctx.moduleBundleCount = 0;
@@ -260,11 +261,14 @@ export function isSassFile(filePath: string) {
   return ext === 'scss' || ext === 'sass';
 }
 
+export function isStylusFile(filePath: string) {
+  const ext = filePath.split('.').pop().toLowerCase();
+  return ext === 'styl' || ext === 'stylus';
+}
 
 export function isCssFile(filePath: string) {
   return filePath.split('.').pop().toLowerCase() === 'css';
 }
-
 
 export function isHtmlFile(filePath: string) {
   const ext = filePath.split('.').pop().toLowerCase();
@@ -275,7 +279,7 @@ export function isWebDevFile(filePath: string) {
   const ext = filePath.split('.').pop().toLowerCase();
   return (WEB_DEV_EXT.indexOf(ext) > -1 || isTsFile(filePath));
 }
-const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
+const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'styl', 'stylus'];
 
 
 export function generatePreamble(config: BuildConfig) {
