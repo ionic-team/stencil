@@ -1,8 +1,7 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry,
-  CoreContext, Diagnostic, FilesMap, HostElement,
+  CoreContext, Diagnostic, DomApi, FilesMap, HostElement,
   BundleCallbacks, PlatformApi, AppGlobal } from '../util/interfaces';
-import { createDomApi } from '../core/renderer/dom-api';
 import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
@@ -19,10 +18,10 @@ export function createPlatformServer(
   config: BuildConfig,
   win: any,
   doc: any,
+  domApi: DomApi,
   diagnostics: Diagnostic[],
   isPrerender: boolean,
-  ctx?: BuildContext,
-  supportsShadowDom?: boolean
+  ctx?: BuildContext
 ): PlatformApi {
   const registry: ComponentRegistry = { 'html': {} };
   const moduleImports: {[tag: string]: any} = {};
@@ -71,29 +70,26 @@ export function createPlatformServer(
   // execute the global scripts (if there are any)
   runGlobalScripts();
 
-  // create the DOM api which we'll use during hydrate
-  const domApi = createDomApi(win.document);
-
   // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
-    defineComponent,
-    getComponentMeta,
-    propConnect,
-    getContextItem,
-    loadBundle,
-    connectHostElement,
     attachStyles: noop,
+    connectHostElement,
+    defineComponent,
+    domApi,
+    emitEvent: noop,
+    getComponentMeta,
+    getContextItem,
+    isDefinedComponent,
+    loadBundle,
+    onError,
+    propConnect,
     queue: createQueueServer(),
     tmpDisconnected: false,
-    emitEvent: noop,
-    getEventOptions,
-    onError,
-    isDefinedComponent
   };
 
 
   // create the renderer which will be used to patch the vdom
-  plt.render = createRendererPatch(plt, domApi, supportsShadowDom);
+  plt.render = createRendererPatch(plt, domApi);
 
   // setup the root node of all things
   // which is the mighty <html> tag
@@ -240,13 +236,6 @@ export function createPlatformServer(
         });
       }
     }
-  }
-
-  function getEventOptions(useCapture?: boolean, usePassive?: boolean) {
-    return {
-      'capture': !!(useCapture),
-      'passive': !!(usePassive)
-    };
   }
 
   function runGlobalScripts() {

@@ -1,6 +1,7 @@
 import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic,
   HostElement, HydrateOptions, HydrateResults, PlatformApi, VNode } from '../util/interfaces';
 import { connectedCallback } from '../core/instance/connected';
+import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { initLoad } from '../core/instance/init-component';
@@ -41,6 +42,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     const dom = config.sys.createDom();
     const win = dom.parse(opts);
     const doc = win.document;
+    const domApi = createDomApi(win, doc);
 
     // normalize dir and lang before connecting elements
     // so that the info is their incase they read it at runtime
@@ -52,6 +54,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
       config,
       win,
       doc,
+      domApi,
       hydrateResults.diagnostics,
       opts.isPrerender,
       ctx
