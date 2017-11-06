@@ -10,11 +10,6 @@ const NODE_MODULES_DIR = path.join(__dirname, '../node_modules');
 fs.copySync(SRC_PACKAGES_DIR, DST_DIR);
 
 
-// create an empty index.js file so node resolve works
-const DST_MAIN_INDEXJS = path.join(DST_DIR, './index.js');
-fs.writeFileSync(DST_MAIN_INDEXJS, '// @stencil/core');
-
-
 // generate the slimmed down package.json file for npm
 const SRC_PACKAGE_JSON = path.join(__dirname, '../package.json');
 const DST_PACKAGE_JSON = path.join(__dirname, '../dist/package.json');

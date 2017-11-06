@@ -132,15 +132,15 @@ function runTasks(opts) {
 		{
 			title: 'Build @stencil/core',
 			task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
-		},
-		{
-			title: 'Run tests',
-			task: () => execa('npm', ['test'], { cwd: rootDir })
 		}
 	);
 
 	if (opts.publish) {
 		tasks.push(
+			{
+				title: 'Run tests',
+				task: () => execa('npm', ['test'], { cwd: rootDir })
+			},
 			{
 				title: 'Bump package.json version',
 				task: () => execa('npm', ['version', opts.version], { cwd: rootDir }),

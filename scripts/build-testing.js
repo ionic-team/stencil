@@ -5,6 +5,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const rollupResolve = require('rollup-plugin-node-resolve');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-testing');
@@ -22,6 +23,9 @@ function bundleTestingUtils() {
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
       'typescript'
+    ],
+    plugins: [
+      rollupResolve()
     ]
 
   }).then(bundle => {

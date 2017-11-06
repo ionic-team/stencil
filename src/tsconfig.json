@@ -23,12 +23,7 @@
     "target": "es2015"
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx"
-  ],
-  "exclude": [
-    "cli",
-    "compiler",
-    "server"
+    "index.ts",
+    "client/*.ts"
   ]
 }
