@@ -30,6 +30,7 @@ export function getBuildContext(ctx?: BuildContext) {
 export function resetBuildContext(ctx: BuildContext) {
   ctx.registry = {};
   ctx.manifest = {};
+  (ctx.buildConditionals as any) = {};
   ctx.diagnostics = [];
   ctx.sassBuildCount = 0;
   ctx.transpileBuildCount = 0;

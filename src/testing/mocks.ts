@@ -10,20 +10,20 @@ import { validateBuildConfig } from '../util/validate-config';
 import { ComponentInstance } from '../util/interfaces';
 
 
-export function mockPlatform(supportsShadowDom?: boolean) {
+export function mockPlatform(win?: any, domApi?: DomApi) {
   const diagnostics: Diagnostic[] = [];
   const config = mockBuildConfig();
-  const win = config.sys.createDom().parse({html: ''});
-  const domApi = createDomApi(win.document);
+  win = win || config.sys.createDom().parse({html: ''});
+  domApi = domApi || createDomApi(win, win.document);
 
   const plt = createPlatformServer(
     config,
     win,
     win.document,
+    domApi,
     diagnostics,
     false,
-    null,
-    supportsShadowDom
+    null
   );
   plt.isClient = true;
 
@@ -47,7 +47,7 @@ export function mockPlatform(supportsShadowDom?: boolean) {
     });
   };
 
-  const renderer = createRendererPatch(plt, domApi, false);
+  const renderer = createRendererPatch(plt, domApi);
 
   plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, hostElementContentNode?: HostContentNodes) {
     return renderer(oldVNode, newVNode, isUpdate, hostElementContentNode);
@@ -186,7 +186,7 @@ function mockGetClientCoreFile(opts: {staticName: string}) {
   return Promise.resolve(`
     (function (window, document, apptNamespace, appFileName, appCore, appCorePolyfilled, components) {
         // mock getClientCoreFile, staticName: ${opts.staticName}
-    })(window, document, '__STENCIL__APP__');`);
+    })(window, document, '__APP__');`);
 }
 
 
@@ -319,15 +319,16 @@ export function mockDocument(window?: Window) {
 }
 
 
-export function mockDomApi(document?: any) {
-  return createDomApi(document || <any>mockDocument());
+export function mockDomApi(win?: any, doc?: any) {
+  win = win || mockWindow();
+  doc = doc || win.document;
+  return createDomApi(win, doc);
 }
 
 
-export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi, supportsNativeShadowDom?: boolean): RendererApi {
-  supportsNativeShadowDom = !!supportsNativeShadowDom;
-  plt = plt || mockPlatform(supportsNativeShadowDom);
-  return createRendererPatch(<PlatformApi>plt, domApi || mockDomApi(), supportsNativeShadowDom);
+export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi): RendererApi {
+  plt = plt || mockPlatform();
+  return createRendererPatch(<PlatformApi>plt, domApi || mockDomApi());
 }
 
 
@@ -369,7 +370,7 @@ export function mockSVGElement(): Element {
   return jsdom.JSDOM.fragment(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`).firstChild;
 }
 
-export function mockElement(tag: string): Element {
+export function mockElement(tag: string = 'div'): Element {
   const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
 }
@@ -379,7 +380,7 @@ export function mockComponentInstance(plt: PlatformApi, domApi: DomApi, cmpMeta:
 
   const el = domApi.$createElement('ion-cmp') as any;
   initComponentInstance(plt, el);
-  return el.$instance;
+  return el._instance;
 }
 
 export function mockTextNode(text: string): Element {
@@ -405,14 +406,14 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
 }
 
 export function mockEvent(domApi: DomApi, name: string, detail: any = {}): CustomEvent {
-  const evt = domApi.$createEvent();
+  const evt = (domApi.$documentElement.parentNode as Document).createEvent('CustomEvent');
   evt.initCustomEvent(name, false, false, detail);
   return evt;
 }
 
 export function mockDispatchEvent(domApi: DomApi, el: HTMLElement, name: string, detail: any = {}): boolean {
-  const event = mockEvent(domApi, name, detail);
-  return el.dispatchEvent(event);
+  const ev = mockEvent(domApi, name, detail);
+  return el.dispatchEvent(ev);
 }
 
 export function mockConnect(plt: MockedPlatform, html: string) {

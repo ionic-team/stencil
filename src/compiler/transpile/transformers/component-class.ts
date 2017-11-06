@@ -29,7 +29,6 @@ export function componentModuleFileClass(config: BuildConfig, fileMeta: ModuleFi
       }
     }
 
-
     return (tsSourceFile) => {
       return visit(fileMeta, tsSourceFile) as ts.SourceFile;
     };

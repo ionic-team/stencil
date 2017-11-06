@@ -10,7 +10,7 @@ describe('build-project-files', () => {
   let config: BuildConfig;
 
   beforeEach(() => {
-    mockStencilContent = `('__STENCIL__APP__')`;
+    mockStencilContent = `('__APP__')`;
     config = {
       logger: mockLogger(),
       sys: mockStencilSystem(),
@@ -27,84 +27,17 @@ describe('build-project-files', () => {
     });
 
     it('should set the loader arguments', () => {
-      const projectLoader = callInjectAppIntoLoader({ componentRegistry: [['my-app', 'MyApp.Module', { Mode1: 'something', Mode2: 'Something Else' }, [], [], 42, 73]] });
-      expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[["my-app","MyApp.Module",{"Mode1":"something","Mode2":"Something Else"},[],[],42,73]])`);
+      const loadCmp: LoadComponentRegistry = ['my-app', { Mode1: 'something', Mode2: 'Something Else' }, false, null, null, null, null, null];
+      const projectLoader = callInjectAppIntoLoader({
+        componentRegistry: [loadCmp]
+      });
+      expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[["my-app",{"Mode1":"something","Mode2":"Something Else"},false,null,null,null,null,null]])`);
     });
 
     it('only replaces the magic string', () => {
-      mockStencilContent = `(This is bogus text'__STENCIL__APP__'yeah, me too)`;
+      mockStencilContent = `(This is bogus text'__APP__'yeah, me too)`;
       const projectLoader = callInjectAppIntoLoader();
       expect(projectLoader).toBe(`(This is bogus text"MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]yeah, me too)`);
-    });
-
-    describe('with minifyJs true', () => {
-      beforeEach(() => {
-        config.minifyJs = true;
-      });
-
-      it('calls the minify routine', () => {
-        callInjectAppIntoLoader();
-        expect(mockMinify.mock.calls.length).toEqual(1);
-        expect(mockMinify.mock.calls[0][0]).toEqual(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[])`);
-      });
-
-      it('returns minified output', () => {
-        mockMinify.mockReturnValue({
-          diagnostics: [],
-          output: 'a'
-        });
-        const projectLoader = callInjectAppIntoLoader();
-        expect(projectLoader).toEqual('a');
-      });
-
-      describe('with diagnostic messages', () => {
-        it('logs the messages', () => {
-          const errorMock = jest.fn();
-          const warnMock = jest.fn();
-          config.logger.error = errorMock;
-          config.logger.warn = warnMock;
-          mockMinify.mockReturnValue({
-            diagnostics: [{
-              level: 'error',
-              messageText: 'no workie workie'
-            }, {
-              level: 'warn',
-              messageText: 'meh'
-            }, {
-              level: 'error',
-              messageText: 'nope'
-            }],
-            output: 'b'
-          });
-          callInjectAppIntoLoader();
-          expect(errorMock.mock.calls.length).toEqual(2);
-          expect(warnMock.mock.calls.length).toEqual(1);
-          expect(errorMock.mock.calls[0][0]).toEqual('no workie workie');
-          expect(errorMock.mock.calls[1][0]).toEqual('nope');
-          expect(warnMock.mock.calls[0][0]).toEqual('meh');
-        });
-
-        it('returns the non-minified data', () => {
-          mockMinify.mockReturnValue({
-            diagnostics: [{
-              level: 'error',
-              messageText: 'no workie workie'
-            }],
-            output: 'b'
-          });
-          const projectLoader = callInjectAppIntoLoader();
-          expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[])`);
-        });
-      });
-    });
-
-    describe('with minifyJs falsey', () => {
-      it('does not minify', () => {
-        callInjectAppIntoLoader();
-        config.minifyJs = false;
-        callInjectAppIntoLoader();
-        expect(mockMinify.mock.calls.length).toEqual(0);
-      });
     });
 
   });
@@ -124,20 +57,14 @@ describe('build-project-files', () => {
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'loader.js' });
     });
 
-    it('gets the client core non-minified file', () => {
-      config.minifyJs = false;
-      callGenerateLoader();
-      expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'loader.dev.js' });
-    });
-
     it('includes the generted banner', async () => {
       const preamble = generatePreamble(config); // lack of DI makes this harder to test, so will just pre-calc
       const res = await callGenerateLoader();
-      expect(res).toEqual(preamble);
+      expect(res).toEqual(preamble.trim());
     });
 
     it('includes the injected app', async () => {
-      mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__STENCIL__APP__') yeah me too`));
+      mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
       const res = await callGenerateLoader();
       let lines = res.split('\n');
       expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]) yeah me too`);
@@ -148,6 +75,7 @@ describe('build-project-files', () => {
     namespace?: string,
     publicPath?: string,
     appCoreFileName?: string,
+    appCoreSsrFileName?: string,
     appCorePolyfillFileName?: string,
     componentRegistry?: Array<LoadComponentRegistry>
   }): string {

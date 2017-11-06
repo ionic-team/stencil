@@ -178,8 +178,10 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 
   if (!config.suppressTypeScriptErrors) {
     // suppressTypeScriptErrors mainly for unit testing
-    const tsDiagnostics = program.getSyntacticDiagnostics()
-      .concat(program.getSemanticDiagnostics(), program.getOptionsDiagnostics());
+    const tsDiagnostics: ts.Diagnostic[] = [];
+    program.getSyntacticDiagnostics().forEach(d => tsDiagnostics.push(d));
+    program.getSemanticDiagnostics().forEach(d => tsDiagnostics.push(d));
+    program.getOptionsDiagnostics().forEach(d => tsDiagnostics.push(d));
 
     loadTypeScriptDiagnostics(config.rootDir, ctx.diagnostics, tsDiagnostics);
   }
