@@ -7,8 +7,9 @@ export function scopeComponentCss(ctx: BuildContext, cmpMeta: ComponentMeta, css
   try {
     const scopeAttribute = getScopeAttribute(cmpMeta);
     const hostScopeAttr = getHostScopeAttribute(cmpMeta);
+    const slotScopeAttr = getSlotScopeAttribute(cmpMeta);
 
-    cssText = scopeCss(cssText, scopeAttribute, hostScopeAttr);
+    cssText = scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
 
   } catch (e) {
     catchError(ctx.diagnostics, e);
@@ -18,9 +19,9 @@ export function scopeComponentCss(ctx: BuildContext, cmpMeta: ComponentMeta, css
 }
 
 
-export function scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string) {
+export function scopeCss(cssText: string, scopeAttribute: string, hostScopeAttr: string, slotScopeAttr: string) {
   const sc = new ShadowCss();
-  return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr);
+  return sc.shimCssText(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
 }
 
 
@@ -31,4 +32,9 @@ export function getScopeAttribute(cmpMeta: ComponentMeta) {
 
 export function getHostScopeAttribute(cmpMeta: ComponentMeta) {
   return `data-${cmpMeta.tagNameMeta}-host`;
+}
+
+
+export function getSlotScopeAttribute(cmpMeta: ComponentMeta) {
+  return `data-${cmpMeta.tagNameMeta}-slot`;
 }

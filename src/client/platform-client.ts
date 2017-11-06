@@ -111,7 +111,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       // only required when we're not using native shadow dom (slot)
       // this host element was NOT created with SSR
       // let's pick out the inner content for slot projection
-      assignHostContentSlots(domApi, elm, cmpMeta.slotMeta);
+      assignHostContentSlots(domApi, cmpMeta, elm, elm.childNodes);
     }
 
     if (!supportsNativeShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {

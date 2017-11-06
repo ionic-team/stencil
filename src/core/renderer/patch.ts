@@ -26,6 +26,10 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
 
     if (vnode.vtag === 'slot' && !useNativeShadowDom) {
 
+      if (scopeId) {
+        domApi.$setAttribute(parentElm, scopeId + '-slot', '');
+      }
+
       if (hostContentNodes) {
         // special case for manually relocating host content nodes
         // to their new home in either a named slot or the default slot
@@ -131,7 +135,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi, supportsNa
   }
 
   function addVnodes(parentElm: Node, before: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
-    const containerElm = ((parentElm as HostElement).$defaultHolder && (parentElm as HostElement).$defaultHolder.parentNode) || parentElm;
+    const containerElm = ((parentElm as HostElement)._defaultHolder && (parentElm as HostElement)._defaultHolder.parentNode) || parentElm;
     let childNode: Node;
 
     for (; startIdx <= endIdx; ++startIdx) {

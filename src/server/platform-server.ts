@@ -122,7 +122,8 @@ export function createPlatformServer(
       elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
 
-    assignHostContentSlots(domApi, elm, cmpMeta.slotMeta);
+    // pick out all of the light dom nodes from the host element
+    assignHostContentSlots(domApi, cmpMeta, elm, elm.childNodes);
   }
 
 

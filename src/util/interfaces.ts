@@ -830,7 +830,6 @@ export interface HostElement extends HTMLElement {
   // HOWEVER!!! Don't use these :)
   $activeLoading?: HostElement[];
   $connected?: boolean;
-  $defaultHolder?: Comment;
   $initLoad: () => void;
   $instance?: ComponentInstance;
   $rendered?: boolean;
@@ -842,6 +841,7 @@ export interface HostElement extends HTMLElement {
   // private members which are only internal to
   // this runtime and can be safely property renamed
   _ancestorHostElement?: HostElement;
+  _defaultHolder?: Comment;
   _hasDestroyed?: boolean;
   _hasLoaded?: boolean;
   _hostContentNodes?: HostContentNodes;
