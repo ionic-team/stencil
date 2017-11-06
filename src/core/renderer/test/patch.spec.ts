@@ -69,6 +69,67 @@ describe('renderer', () => {
 
   });
 
+  describe('functional component', () => {
+
+    it('should render a basic component', () => {
+      function functionalComp({children, ...props}: any) {
+        return h('span', props, children);
+      }
+
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0,
+        h('my-tag', null,
+          h(functionalComp, { class: 'functional-cmp' })
+        )
+      ).elm;
+      expect(elm.childNodes[0].tagName).toBe('SPAN');
+      expect(elm.childNodes[0].textContent).toBe('');
+      expect(elm.childNodes[0].className).toBe('functional-cmp');
+    });
+
+    it('should render as a sibling component', () => {
+      function functionalComp({children, ...props}: any) {
+        return h('span', props, children);
+      }
+
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0,
+        h('my-tag', null,
+          h('span', null, 'Test Child'),
+          h(functionalComp, { class: 'functional-cmp' })
+        )
+      ).elm;
+      expect(elm.childNodes[0].tagName).toBe('SPAN');
+      expect(elm.childNodes[0].textContent).toBe('Test Child');
+      expect(elm.childNodes[1].tagName).toBe('SPAN');
+      expect(elm.childNodes[1].textContent).toBe('');
+      expect(elm.childNodes[1].className).toBe('functional-cmp');
+    });
+    it('should render children', () => {
+      function functionalComp({children, ...props}: any) {
+        return h('span', props, children);
+      }
+
+      elm = mockElement('my-tag');
+      vnode0 = new VNode();
+      vnode0.elm = elm;
+      elm = patch(vnode0,
+        h('my-tag', null,
+          h(functionalComp, { class: 'functional-cmp' },
+            h('span', null, 'Test Child'),
+          )
+        )
+      ).elm;
+      expect(elm.childNodes[0].tagName).toBe('SPAN');
+      expect(elm.childNodes[0].className).toBe('functional-cmp');
+      expect(elm.childNodes[0].textContent).toBe('Test Child');
+    });
+  });
+
   describe('scoped css', () => {
 
     it('adds host scope id to shadow dom encapsulation root element, but doesnt support SD', () => {
