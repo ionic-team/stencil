@@ -18,8 +18,8 @@ import { getScopeAttribute, getHostScopeAttribute, scopeCss } from '../scope-css
 
 describe('ShadowCss', function() {
 
-  function s(css: string, contentAttr: string, hostAttr: string = '') {
-    const shim = scopeCss(css, contentAttr, hostAttr);
+  function s(css: string, contentAttr: string, hostAttr: string = '', slotAttr: string = '') {
+    const shim = scopeCss(css, contentAttr, hostAttr, slotAttr);
     const nlRegexp = /\n/g;
     return normalizeCSS(shim.replace(nlRegexp, ''));
   }
@@ -177,6 +177,45 @@ describe('ShadowCss', function() {
       expect(s(':host-context([a=b]) {}', 'a', 'a-host'))
           .toEqual('[a=b][a-host], [a="b"] [a-host] {}');
     });
+  });
+
+  describe(('::slotted'), () => {
+
+    it('should handle *', () => {
+      const r = s('::slotted(*) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('[data-ion-tag-slot] > * {}');
+    });
+
+    it('should handle :host complex selector', () => {
+      const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('[data-ion-tag-host] > [data-ion-tag-slot] > *:nth-of-type(2n - 1) {}');
+    });
+
+    it('should handle host-context complex selector', () => {
+      const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('[data-ion-tag-host].red > [data-ion-tag-slot] > *:nth-of-type(2n - 1), .red [data-ion-tag-host] > [data-ion-tag-slot] > *:nth-of-type(2n - 1) {}');
+    });
+
+    it('should handle left side selector', () => {
+      const r = s('div::slotted(ul) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('div[data-ion-tag-slot] > ul {}');
+    });
+
+    it('should handle tag selector', () => {
+      const r = s('::slotted(ul) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('[data-ion-tag-slot] > ul {}');
+    });
+
+    it('should handle class selector', () => {
+      const r = s('::slotted(.foo) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('[data-ion-tag-slot] > .foo {}');
+    });
+
+    it('should handle multiple selector', () => {
+      const r = s('::slotted(ul), ::slotted(li) {}', 'data-ion-tag', 'data-ion-tag-host', 'data-ion-tag-slot');
+      expect(r).toEqual('[data-ion-tag-slot] > ul, [data-ion-tag-slot] > li {}');
+    });
+
   });
 
   it('should support polyfill-next-selector', () => {

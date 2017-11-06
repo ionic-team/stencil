@@ -151,11 +151,12 @@ export class ShadowCss {
   * - selector is the attribute added to all elements inside the host,
   * - hostSelector is the attribute added to the host itself.
   */
-  shimCssText(cssText: string, selector: string, hostSelector: string = ''): string {
+  shimCssText(cssText: string, selector: string, hostSelector: string = '', slotSelector: string = ''): string {
     const sourceMappingUrl: string = extractSourceMappingUrl(cssText);
     cssText = stripComments(cssText);
     cssText = this._insertDirectives(cssText);
-    return this._scopeCssText(cssText, selector, hostSelector) + sourceMappingUrl;
+
+    return this._scopeCssText(cssText, selector, hostSelector, slotSelector) + sourceMappingUrl;
   }
 
   private _insertDirectives(cssText: string): string {
@@ -214,17 +215,21 @@ export class ShadowCss {
    *
    *  scopeName .foo { ... }
   */
-  private _scopeCssText(cssText: string, scopeSelector: string, hostSelector: string): string {
+  private _scopeCssText(cssText: string, scopeSelector: string, hostSelector: string, slotSelector: string): string {
     const unscopedRules = this._extractUnscopedRulesFromCssText(cssText);
     // replace :host and :host-context -shadowcsshost and -shadowcsshost respectively
     cssText = this._insertPolyfillHostInCssText(cssText);
     cssText = this._convertColonHost(cssText);
     cssText = this._convertColonHostContext(cssText);
+    cssText = this._convertColonSlotted(cssText, slotSelector);
     cssText = this._convertShadowDOMSelectors(cssText);
     if (scopeSelector) {
-      cssText = this._scopeSelectors(cssText, scopeSelector, hostSelector);
+      cssText = this._scopeSelectors(cssText, scopeSelector, hostSelector, slotSelector);
     }
     cssText = cssText + '\n' + unscopedRules;
+
+    cssText = cssText.replace(/-shadowcsshost-no-combinator/g, `[${hostSelector}]`);
+
     return cssText.trim();
   }
 
@@ -264,6 +269,27 @@ export class ShadowCss {
   */
   private _convertColonHost(cssText: string): string {
     return this._convertColonRule(cssText, _cssColonHostRe, this._colonHostPartReplacer);
+  }
+
+  /*
+   * convert a rule like ::slotted(.foo) { }
+  */
+  private _convertColonSlotted(cssText: string, slotAttr: string): string {
+    const regExp = _cssColonSlottedRe;
+
+    return cssText.replace(regExp, function(...m: string[]) {
+      if (m[2]) {
+        let compound = m[2].trim();
+        let suffix = m[3];
+
+        let sel = '[' + slotAttr + '] > ' + compound + suffix;
+
+        return sel;
+
+      } else {
+        return _polyfillHostNoCombinator + m[3];
+      }
+    });
   }
 
   /*
@@ -325,29 +351,34 @@ export class ShadowCss {
   }
 
   // change a selector like 'div' to 'name div'
-  private _scopeSelectors(cssText: string, scopeSelector: string, hostSelector: string): string {
+  private _scopeSelectors(cssText: string, scopeSelector: string, hostSelector: string, slotSelector: string): string {
     return processRules(cssText, (rule: CssRule) => {
       let selector = rule.selector;
       let content = rule.content;
       if (rule.selector[0] !== '@') {
         selector =
-            this._scopeSelector(rule.selector, scopeSelector, hostSelector, this.strictStyling);
+            this._scopeSelector(rule.selector, scopeSelector, hostSelector, slotSelector, this.strictStyling);
       } else if (
           rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') ||
           rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
-        content = this._scopeSelectors(rule.content, scopeSelector, hostSelector);
+        content = this._scopeSelectors(rule.content, scopeSelector, hostSelector, slotSelector);
       }
       return new CssRule(selector, content);
     });
   }
 
   private _scopeSelector(
-      selector: string, scopeSelector: string, hostSelector: string, strict: boolean): string {
+      selector: string, scopeSelector: string, hostSelector: string, slotSelector: string, strict: boolean): string {
     return selector.split(',')
         .map(part => part.trim().split(_shadowDeepSelectors))
         .map((deepParts) => {
           const [shallowPart, ...otherParts] = deepParts;
           const applyScope = (shallowPart: string) => {
+
+            if (shallowPart.indexOf('[' + slotSelector + ']') > -1) {
+              return shallowPart;
+            }
+
             if (this._selectorNeedsScoping(shallowPart, scopeSelector)) {
               return strict ?
                   this._applyStrictSelectorScope(shallowPart, scopeSelector, hostSelector) :
@@ -460,8 +491,10 @@ export class ShadowCss {
   }
 
   private _insertPolyfillHostInCssText(selector: string): string {
-    return selector.replace(_colonHostContextRe, _polyfillHostContext)
-        .replace(_colonHostRe, _polyfillHost);
+    return selector
+      .replace(_colonHostContextRe, _polyfillHostContext)
+      .replace(_colonHostRe, _polyfillHost)
+      .replace(_colonSlottedRe, _polyfillSlotted);
   }
 }
 
@@ -503,6 +536,7 @@ const _cssContentRuleRe = /(polyfill-rule)[^}]*(content:[\s]*(['"])(.*?)\3)[;\s]
 const _cssContentUnscopedRuleRe =
     /(polyfill-unscoped-rule)[^}]*(content:[\s]*(['"])(.*?)\3)[;\s]*[^}]*}/gim;
 const _polyfillHost = '-shadowcsshost';
+const _polyfillSlotted = '-shadowcssslotted';
 // note: :host-context pre-processed to -shadowcsshostcontext.
 const _polyfillHostContext = '-shadowcsscontext';
 const _parenSuffix = ')(?:\\((' +
@@ -510,6 +544,7 @@ const _parenSuffix = ')(?:\\((' +
     ')\\))?([^,{]*)';
 const _cssColonHostRe = new RegExp('(' + _polyfillHost + _parenSuffix, 'gim');
 const _cssColonHostContextRe = new RegExp('(' + _polyfillHostContext + _parenSuffix, 'gim');
+const _cssColonSlottedRe = new RegExp('(' + _polyfillSlotted + _parenSuffix, 'gim');
 const _polyfillHostNoCombinator = _polyfillHost + '-no-combinator';
 const _polyfillHostNoCombinatorRe = /-shadowcsshost-no-combinator([^\s]*)/;
 const _shadowDOMSelectorsRe = [
@@ -527,6 +562,7 @@ const _shadowDeepSelectors = /(?:>>>)|(?:\/deep\/)|(?:::ng-deep)/g;
 const _selectorReSuffix = '([>\\s~+\[.,{:][\\s\\S]*)?$';
 const _polyfillHostRe = /-shadowcsshost/gim;
 const _colonHostRe = /:host/gim;
+const _colonSlottedRe = /::slotted/gim;
 const _colonHostContextRe = /:host-context/gim;
 
 const _commentRe = /\/\*\s*[\s\S]*?\*\//g;

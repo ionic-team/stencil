@@ -1,5 +1,5 @@
-import { NODE_TYPE, SLOT_META, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
-import { DomApi, HostElement, VNode } from '../../util/interfaces';
+import { ComponentMeta, DomApi, HostElement, VNode } from '../../util/interfaces';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { t } from './h';
 import { VNode as VNodeObj } from './vnode';
 
@@ -100,28 +100,31 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
 }
 
 
-export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMeta: SLOT_META) {
+export function assignHostContentSlots(domApi: DomApi, cmpMeta: ComponentMeta, elm: HostElement, childNodes: NodeList) {
   // compiler has already figured out if this component has slots or not
   // if the component doesn't even have slots then we'll skip over all of this code
-  const childNodes = elm.childNodes;
 
-  if (slotMeta && !elm.$defaultHolder) {
-    domApi.$insertBefore(elm, (elm.$defaultHolder = domApi.$createComment('')), childNodes[0]);
-  }
-
-  if (slotMeta === SLOT_META.HasNamedSlots) {
-    // looks like this component has named slots
+  if (cmpMeta.slotMeta) {
+    // looks like this component has slots
     // so let's loop through each of the childNodes to the host element
     // and pick out the ones that have a slot attribute
     // if it doesn't have a slot attribute, than it's a default slot
+
+    if (!elm._defaultHolder) {
+      // create a comment to represent where the original
+      // content was first placed, which is useful later on
+      domApi.$insertBefore(elm, (elm._defaultHolder = domApi.$createComment('')), childNodes[0]);
+    }
+
     let slotName: string;
     let defaultSlot: Node[];
     let namedSlots: {[slotName: string]: Node[]};
+    let i = 0;
 
-    for (let i = 0, childNodeLen = childNodes.length; i < childNodeLen; i++) {
+    for (; i < childNodes.length; i++) {
       var childNode = childNodes[i];
 
-      if (domApi.$nodeType(childNode) === 1 && ((slotName = domApi.$getAttribute(childNode, 'slot')) != null)) {
+      if (domApi.$nodeType(childNode) === NODE_TYPE.ElementNode && ((slotName = domApi.$getAttribute(childNode, 'slot')) != null)) {
         // is element node
         // this element has a slot name attribute
         // so this element will end up getting relocated into
@@ -151,14 +154,5 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, slotMet
       defaultSlot: defaultSlot,
       namedSlots: namedSlots
     };
-
-  } else if (slotMeta === SLOT_META.HasSlots) {
-    // this component doesn't have named slots, but it does
-    // have at least a default slot, so the work here is alot easier than
-    // when we're not looping through each element and reading attribute values
-    elm._hostContentNodes = {
-      defaultSlot: childNodes.length ? Array.apply(null, childNodes) : null
-    };
   }
-
 }
