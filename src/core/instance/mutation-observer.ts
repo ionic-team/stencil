@@ -12,7 +12,7 @@ export function createMutationObserver(plt: PlatformApi, elm: HostElement): void
   if (plt.isClient) {
     const elementReset = createElementReset(plt, elm);
 
-    elm._observer = new MutationObserver(function(mutations) {
+    elm._observer = new MutationObserver(mutations => {
       mutations.forEach(elementReset);
     });
   }

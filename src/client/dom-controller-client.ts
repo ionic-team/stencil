@@ -1,35 +1,10 @@
 import { DomController, Now, RafCallback } from '../util/interfaces';
 
 
-export function createDomControllerClient(win: Window, now: Now): DomController {
+export function createDomControllerClient(win: Window, now: Now, rafPending?: boolean): DomController {
   const readCBs: RafCallback[] = [];
   const writeCBs: RafCallback[] = [];
-  let rafPending = false;
-
-
-  function raf(cb: FrameRequestCallback): number {
-    return win.requestAnimationFrame(cb);
-  }
-
-
-  function domRead(cb: RafCallback) {
-    readCBs.push(cb);
-
-    if (!rafPending) {
-      rafPending = true;
-      raf(rafFlush);
-    }
-  }
-
-
-  function domWrite(cb: RafCallback) {
-    writeCBs.push(cb);
-
-    if (!rafPending) {
-      rafPending = true;
-      raf(rafFlush);
-    }
-  }
+  const raf = (cb: FrameRequestCallback): number => win.requestAnimationFrame(cb);
 
 
   function rafFlush(timeStamp: number, startTime?: number, cb?: RafCallback, err?: any) {
@@ -64,8 +39,25 @@ export function createDomControllerClient(win: Window, now: Now): DomController 
   }
 
   return {
-    read: domRead,
-    write: domWrite,
+
+    read: (cb: RafCallback) => {
+      readCBs.push(cb);
+
+      if (!rafPending) {
+        rafPending = true;
+        raf(rafFlush);
+      }
+    },
+
+    write: (cb: RafCallback) => {
+      writeCBs.push(cb);
+
+      if (!rafPending) {
+        rafPending = true;
+        raf(rafFlush);
+      }
+    },
+
     raf: raf
   };
 }

@@ -82,9 +82,9 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     }
 
     if (typeof vnodeData['class'] === 'object') {
-      for (let key in vnodeData['class']) {
-        if (vnodeData['class'][key]) {
-          stack.push(key);
+      for ((i as any) in vnodeData['class']) {
+        if (vnodeData['class'][i]) {
+          stack.push(i);
         }
       }
 

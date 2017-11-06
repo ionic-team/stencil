@@ -18,9 +18,7 @@ import {
 
 export * from './util/decorators';
 
-export interface HostElement extends HTMLElement {
-  $instance: any;
-}
+export interface HostElement extends HTMLElement {}
 
 export {
   AddEventListener,
