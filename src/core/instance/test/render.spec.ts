@@ -227,7 +227,7 @@ describe('instance render', () => {
   });
 
   function doRender(cmp: any, meta: ComponentMeta = {}) {
-    const instance = elm.$instance = new cmp();
+    const instance = elm._instance = new cmp();
     render(plt, elm, meta, false);
     return instance;
   }

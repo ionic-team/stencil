@@ -1,3 +1,4 @@
+import { Build } from '../../util/build-conditionals';
 import { ComponentInstance, ComponentMeta, DomApi, HostElement,
   MembersMeta, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { MEMBER_TYPE, PROP_CHANGE } from '../../util/constants';
@@ -68,7 +69,7 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     // component instance prop/state getter
     // get the property value directly from our internal values
     const elm: HostElement = (this as ComponentInstance).__el;
-    return elm._values[memberName];
+    return elm && elm._values && elm._values[memberName];
   }
 
   function setComponentProp(newValue: any) {
@@ -78,7 +79,7 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     if (memberType !== MEMBER_TYPE.Prop) {
       setValue(plt, elm, memberName, newValue);
 
-    } else {
+    } else if (Build.verboseError) {
       console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
     }
   }
@@ -134,29 +135,34 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     );
 
     // add watchers to props if they exist
-    proxyPropChangeMethods(cmpMeta.propsWillChangeMeta, PROP_WILL_CHG, elm, instance, memberName);
-    proxyPropChangeMethods(cmpMeta.propsDidChangeMeta, PROP_DID_CHG, elm, instance, memberName);
+    if (Build.propDidChange) {
+      proxyPropChangeMethods(cmpMeta.propsWillChangeMeta, PROP_WILL_CHG, elm, instance, memberName);
+    }
 
-  } else if (memberType === MEMBER_TYPE.Element) {
+    if (Build.propWillChange) {
+      proxyPropChangeMethods(cmpMeta.propsDidChangeMeta, PROP_DID_CHG, elm, instance, memberName);
+    }
+
+  } else if (Build.element && memberType === MEMBER_TYPE.Element) {
     // @Element()
     // add a getter to the element reference using
     // the member name the component meta provided
     definePropertyValue(instance, memberName, elm);
 
-  } else if (memberType === MEMBER_TYPE.Method) {
+  } else if (Build.method && memberType === MEMBER_TYPE.Method) {
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
     definePropertyValue(elm, memberName, instance[memberName].bind(instance));
 
-  } else if (memberType === MEMBER_TYPE.PropContext) {
+  } else if (Build.propContext && memberType === MEMBER_TYPE.PropContext) {
     // @Prop({ context: 'config' })
     var contextObj = plt.getContextItem(memberMeta.ctrlId);
     if (contextObj) {
       definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
     }
 
-  } else if (memberType === MEMBER_TYPE.PropConnect) {
+  } else if (Build.propConnect && memberType === MEMBER_TYPE.PropConnect) {
     // @Prop({ connect: 'ion-loading-ctrl' })
     definePropertyValue(instance, memberName, plt.propConnect(memberMeta.ctrlId));
   }
@@ -188,7 +194,7 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
 
-    if (internalValues[PROP_WILL_CHG + memberName]) {
+    if (Build.propWillChange && internalValues[PROP_WILL_CHG + memberName]) {
       // this instance is watching for when this property WILL change
       internalValues[PROP_WILL_CHG + memberName](newVal, oldVal);
     }
@@ -197,12 +203,12 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
     // https://youtu.be/dFtLONl4cNc?t=22
     internalValues[memberName] = newVal;
 
-    if (internalValues[PROP_DID_CHG + memberName]) {
+    if (Build.propDidChange && internalValues[PROP_DID_CHG + memberName]) {
       // this instance is watching for when this property DID change
       internalValues[PROP_DID_CHG + memberName](newVal, oldVal);
     }
 
-    if (elm.$instance && !plt.activeRender) {
+    if (elm._instance && !plt.activeRender) {
       // looks like this value actually changed, so we've got work to do!
       // but only if we've already created an instance, otherwise just chill out
       // queue that we need to do an update, but don't worry about queuing

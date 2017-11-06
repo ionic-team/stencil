@@ -6,12 +6,12 @@ describe('connected', () => {
   describe('instance connected', () => {
     const plt = mockPlatform();
 
-    it('should create $instance', () => {
+    it('should create _instance', () => {
       mockDefine(plt, { tagNameMeta: 'ion-test' });
 
       const node = mockConnect(plt, '<ion-test></ion-test>');
       return waitForLoad(plt, node, 'ion-test').then(elm => {
-        expect(elm.$instance).toBeDefined();
+        expect(elm._instance).toBeDefined();
       });
     });
 

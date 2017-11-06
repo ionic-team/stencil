@@ -37,7 +37,7 @@ describe('renderer', () => {
 
   describe('shadow dom', () => {
     const supportsShadowDom = true;
-    const patch = mockRenderer(null, domApi, supportsShadowDom);
+    const patch = mockRenderer(null, domApi);
 
     it('does not attachShadow on update render', () => {
       elm = mockElement('my-tag');
@@ -52,6 +52,10 @@ describe('renderer', () => {
     });
 
     it('attachShadow on first render', () => {
+      const domApi = mockDomApi();
+      domApi.$supportsShadowDom = true;
+      const patch = mockRenderer(null, domApi);
+
       elm = mockElement('my-tag');
       vnode0 = new VNode();
       vnode0.elm = elm;

@@ -1,4 +1,5 @@
 import { attributeChangedCallback } from './attribute-changed';
+import { Build } from '../../util/build-conditionals';
 import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
@@ -16,23 +17,22 @@ export function initHostConstructor(plt: PlatformApi, cmpMeta: ComponentMeta, Ho
     connectedCallback(plt, cmpMeta, (this as HostElement));
   };
 
-  HostElementConstructor.attributeChangedCallback = function(attribName: string, oldVal: string, newVal: string) {
-    // the browser has just informed us that an attribute
-    // on the host element has changed
-    attributeChangedCallback(cmpMeta, (this as HostElement), attribName, oldVal, newVal);
-  };
+  if (Build.observeAttr) {
+    HostElementConstructor.attributeChangedCallback = function(attribName: string, oldVal: string, newVal: string) {
+      // the browser has just informed us that an attribute
+      // on the host element has changed
+      attributeChangedCallback(cmpMeta.membersMeta, (this as HostElement), attribName, oldVal, newVal);
+    };
+  }
 
   HostElementConstructor.disconnectedCallback = function() {
     // the element has left the builing
     disconnectedCallback(plt, (this as HostElement));
   };
 
-  HostElementConstructor.componentOnReady = function(cb: (elm: HostElement) => void) {
-    let promise: Promise<any>;
+  HostElementConstructor.componentOnReady = function(cb: (elm: HostElement) => void, promise?: Promise<any>) {
     if (!cb) {
-      promise = new Promise(resolve => {
-        cb = resolve;
-      });
+      promise = new Promise(resolve => cb = resolve);
     }
     componentOnReady((this as HostElement), cb);
     return promise;

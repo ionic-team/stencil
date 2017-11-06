@@ -259,7 +259,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('BEAR');
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
-        parentElm.$instance.msg = 'change 1';
+        parentElm._instance.msg = 'change 1';
         render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
@@ -268,7 +268,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('BEAR');
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
-        parentElm.$instance.msg = 'change 2';
+        parentElm._instance.msg = 'change 2';
         render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
@@ -317,7 +317,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('WHALE');
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
-        parentElm.$instance.msg = 'change 1';
+        parentElm._instance.msg = 'change 1';
         render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -325,7 +325,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('WHALE');
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
-        parentElm.$instance.msg = 'change 2';
+        parentElm._instance.msg = 'change 2';
         render(plt, parentElm, {}, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');

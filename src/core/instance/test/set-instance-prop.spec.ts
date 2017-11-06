@@ -104,7 +104,7 @@ describe('set instance property', () => {
     plt = <any>mockPlatform();
     elm = domApi.$createElement('ion-cmp') as any;
     instance = new TwinPines();
-    elm.$instance = instance;
+    elm._instance = instance;
     instance.__el = elm;
   });
 

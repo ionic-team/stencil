@@ -1,8 +1,8 @@
 import { createRendererPatch } from '../patch';
-import { createVNodesFromSsr } from '../slot';
+import { createVNodesFromSsr } from '../ssr';
+import { DomApi, HostContentNodes, RendererApi, VNode } from '../../../util/interfaces';
 import { ENCAPSULATION, SSR_VNODE_ID, SSR_CHILD_ID } from '../../../util/constants';
 import { h } from '../h';
-import { HostContentNodes, VNode } from '../../../util/interfaces';
 import { mockPlatform, mockDomApi, removeWhitespaceFromNodes } from '../../../testing/mocks';
 import { VNode as VNodeObj } from '../vnode';
 
@@ -183,14 +183,13 @@ describe('ssr', () => {
   });
 
 
-  var domApi = mockDomApi();
+  var domApi: DomApi;
+  var patch: RendererApi;
+  var plt = mockPlatform();
 
   beforeEach(() => {
     domApi = mockDomApi();
+    patch = createRendererPatch(<any>plt, domApi);
   });
-
-
-  var plt = mockPlatform();
-  var patch = createRendererPatch(<any>plt, domApi, false);
 
 });

@@ -1,5 +1,5 @@
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
-import { getElementReference, noop } from '../../util/helpers';
+import { noop } from '../../util/helpers';
 import { KEY_CODE_MAP } from '../../util/constants';
 
 
@@ -11,22 +11,20 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
   // to receive events between now and the instance being created let's
   // queue up all of the event data and fire it off on the instance when it's ready
   const cmpMeta = plt.getComponentMeta(elm);
-  const listeners = cmpMeta.listenersMeta;
 
-  if (listeners) {
-    for (var i = 0; i < listeners.length; i++) {
-      var listener = listeners[i];
-      if (listener.eventDisabled) continue;
-
-      (elm._listeners = elm._listeners || {})[listener.eventName] = addEventListener(
-        plt,
-        elm,
-        listener.eventName,
-        createListenerCallback(elm, listener.eventMethodName),
-        listener.eventCapture,
-        listener.eventPassive
-      );
-    }
+  if (cmpMeta.listenersMeta) {
+    cmpMeta.listenersMeta.forEach(listener => {
+      if (!listener.eventDisabled) {
+        (elm._listeners = elm._listeners || {})[listener.eventName] = addListener(
+          plt,
+          elm,
+          listener.eventName,
+          createListenerCallback(elm, listener.eventMethodName),
+          listener.eventCapture,
+          listener.eventPassive
+        );
+      }
+    });
   }
 }
 
@@ -34,10 +32,10 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
 export function createListenerCallback(elm: HostElement, eventMethodName: string) {
   // create the function that gets called when the element receives
   // an event which it should be listening for
-  return function onEvent(ev?: any) {
-    if (elm.$instance) {
+  return (ev?: any) => {
+    if (elm._instance) {
       // instance is ready, let's call it's member method for this event
-      elm.$instance[eventMethodName](ev);
+      elm._instance[eventMethodName](ev);
 
     } else {
       // instance is not ready!!
@@ -49,7 +47,7 @@ export function createListenerCallback(elm: HostElement, eventMethodName: string
 }
 
 
-export function replayQueuedEventsOnInstance(elm: HostElement) {
+export function replayQueuedEventsOnInstance(elm: HostElement, i?: number) {
   // the element has an instance now and
   // we already added the event listeners to the element
   const queuedEvents = elm._queuedEvents;
@@ -58,16 +56,16 @@ export function replayQueuedEventsOnInstance(elm: HostElement) {
     // events may have already fired before the instance was even ready
     // now that the instance is ready, let's replay all of the events that
     // we queued up earlier that were originally meant for the instance
-    for (var i = 0; i < queuedEvents.length; i += 2) {
+    for (i = 0; i < queuedEvents.length; i += 2) {
       // data was added in sets of two
       // first item the eventMethodName
       // second item is the event data
       // take a look at initElementListener()
-      elm.$instance[queuedEvents[i]](queuedEvents[i + 1]);
+      elm._instance[queuedEvents[i]](queuedEvents[i + 1]);
     }
 
     // no longer need this data, be gone with you
-    delete elm._queuedEvents;
+    elm._queuedEvents = null;
   }
 }
 
@@ -86,15 +84,19 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
 
         if (listener.eventName === eventName) {
           var fn = deregisterFns[eventName];
+
           if (shouldEnable && !fn) {
             var attachToEventName = eventName;
             var element = elm;
+
             if (typeof attachTo === 'string') {
               attachToEventName = `${attachTo}:${eventName}`;
+
             } else if (typeof attachTo === 'object') {
               element = attachTo as HostElement;
             }
-            deregisterFns[eventName] = addEventListener(
+
+            deregisterFns[eventName] = addListener(
               plt,
               element,
               attachToEventName,
@@ -105,8 +107,9 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
 
           } else if (!shouldEnable && fn) {
             deregisterFns[eventName]();
-            delete deregisterFns[eventName];
+            deregisterFns[eventName] = null;
           }
+
           return true;
         }
       }
@@ -116,28 +119,25 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
 }
 
 
-export function addEventListener(
+export function addListener(
   plt: PlatformApi,
   elm: Element|HTMLDocument|Window,
   eventName: string,
   listenerCallback: {(ev?: any): any},
   useCapture?: boolean,
-  usePassive?: boolean
+  usePassive?: boolean,
+  splt?: string[],
+  eventListener?: Function
 ) {
-  // depending on the event name, we could actually be
-  // attaching this element to something like the document or window
-  let splt = eventName.split(':');
-  let testKeyCode = 0;
-
-  // get our event listener options
-  // mainly this is used to set passive events if this browser supports it
-  const eventListenerOpts = plt.getEventOptions(useCapture, usePassive);
+  // depending on the event name, we could actually be attaching
+  // this element to something like the document or window
+  splt = eventName.split(':');
 
   if (elm && splt.length > 1) {
     // document:mousemove
     // parent:touchend
     // body:keyup.enter
-    elm = getElementReference(elm, splt[0]);
+    elm = plt.domApi.$elementRef(elm, splt[0]);
     eventName = splt[1];
   }
 
@@ -146,7 +146,7 @@ export function addEventListener(
     return noop;
   }
 
-  let eventListener = listenerCallback;
+  eventListener = listenerCallback;
 
   // test to see if we're looking for an exact keycode
   splt = eventName.split('.');
@@ -155,44 +155,25 @@ export function addEventListener(
     // looks like this listener is also looking for a keycode
     // keyup.enter
     eventName = splt[0];
-    testKeyCode = KEY_CODE_MAP[splt[1]];
 
     eventListener = (ev: any) => {
-      // create the our internal event listener callback we'll be firing off
-      // within it is the user's event listener callback and some other goodies
-      if (testKeyCode > 0 && ev.keyCode !== testKeyCode) {
-        // we're looking for a specific keycode
-        // but the one we were given wasn't the right keycode
-        return;
+      // wrap the user's event listener with our own check to test
+      // if this keyboard event has the keycode they're looking for
+      if (ev.keyCode === KEY_CODE_MAP[splt[1]]) {
+        listenerCallback(ev);
       }
-
-      // fire the user's component event listener callback
-      // if the instance isn't ready yet, this listener is already
-      // set to handle that and re-queue the update when it is ready
-      listenerCallback(ev);
     };
   }
 
-  // ok, good to go, let's add the actual listener to the dom element
-  elm.addEventListener(eventName, eventListener, eventListenerOpts);
-
-  // return a function which is used to remove this very same listener
-  return function removeListener() {
-    elm && elm.removeEventListener(eventName, eventListener, eventListenerOpts);
-  };
+  // good to go now, add the event listener
+  // and the returned value is a function to remove the same event listener
+  return plt.domApi.$addEventListener(elm, eventName, eventListener, useCapture, usePassive);
 }
 
 
 export function detachListeners(elm: HostElement) {
-  const deregisterFns = elm._listeners;
-
-  if (deregisterFns) {
-    const eventNames = Object.keys(deregisterFns);
-
-    for (var i = 0; i < eventNames.length; i++) {
-      deregisterFns[eventNames[i]]();
-    }
-
+  if (elm._listeners) {
+    Object.keys(elm._listeners).forEach(eventName => elm._listeners[eventName]());
     elm._listeners = null;
   }
 }
