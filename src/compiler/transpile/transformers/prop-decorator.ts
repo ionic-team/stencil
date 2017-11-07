@@ -81,6 +81,8 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
         if (error) {
           diagnostics.push(error);
+
+          prop.decorators = undefined;
           return allMembers;
         }
         memberData.attribType = {
@@ -93,6 +95,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
       allMembers[attribName] = memberData;
 
+      prop.decorators = undefined;
       return allMembers;
     }, {} as MembersMeta);
 }

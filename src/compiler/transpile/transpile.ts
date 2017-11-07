@@ -9,7 +9,6 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
 import { createTypesAsString }  from './transformers/add-jsx-types';
-import { dashToPascalCase } from '../../util/helpers';
 import * as ts from 'typescript';
 
 
@@ -113,8 +112,7 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, opti
         .replace(/\.js$/, ''));
 
       finalString +=
-        `import { ${moduleFile.cmpMeta.componentClass} as ${dashToPascalCase(moduleFile.cmpMeta.tagNameMeta)} } from './${importPath}';\n` +
-        `${createTypesAsString(moduleFile.cmpMeta)}\n`;
+        `${createTypesAsString(moduleFile.cmpMeta, importPath)}\n`;
     }
     return finalString;
   }, componentsFileContent);

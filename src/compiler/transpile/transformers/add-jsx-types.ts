@@ -1,17 +1,23 @@
 import { dashToPascalCase } from '../../../util/helpers';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
-import { ModuleFiles, ComponentMeta, MembersMeta } from '../../../util/interfaces';
+import { ModuleFiles, ComponentMeta, MembersMeta, MemberMeta } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
-export function createTypesAsString(cmpMeta: ComponentMeta) {
+export function createTypesAsString(cmpMeta: ComponentMeta, importPath: string) {
   const tagName = cmpMeta.tagNameMeta;
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
-  const interfaceOptions = membersToInterfaceOptions(cmpMeta.membersMeta);
+  const [ typesToImport, interfaceOptions ] = membersToInterfaceOptions(cmpMeta.membersMeta);
+  (<MembersMeta>cmpMeta.membersMeta);
 
   return `
+import {
+  ${cmpMeta.componentClass} as ${dashToPascalCase(cmpMeta.tagNameMeta)} ${ typesToImport.map(tti => `
+  ${tti}`)}
+} from './${importPath}';
+
 interface ${interfaceName} extends ${tagNameAsPascal}, HTMLElement {
 }
 declare var ${interfaceName}: {
@@ -43,22 +49,25 @@ declare global {
 `;
 }
 
-function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
-  const memberTypes = {
-    [PROP_TYPE.Any]: 'any',
-    [PROP_TYPE.String]: 'string',
-    [PROP_TYPE.Boolean]: 'boolean',
-    [PROP_TYPE.Number]: 'number',
-  };
-  return Object.keys(membersMeta)
+function membersToInterfaceOptions(membersMeta: MembersMeta): [ string[], { [key: string]: string } ] {
+  const typesToImport: string[] = [];
+  const interfaceData = Object.keys(membersMeta)
     .filter((memberName) => {
       return [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable].indexOf(membersMeta[memberName].memberType) !== -1;
     })
     .reduce((obj, memberName) => {
-      const member = membersMeta[memberName];
-      obj[memberName] = memberTypes[member.propType || PROP_TYPE.Any];
+      const member: MemberMeta = membersMeta[memberName];
+      obj[memberName] = member.attribType.text;
+      if (member.attribType.isReferencedType) {
+        typesToImport.push(member.attribType.text);
+      }
       return obj;
     }, <{ [key: string]: string }>{});
+
+  return [
+    typesToImport,
+    interfaceData
+  ];
 }
 
 /*
