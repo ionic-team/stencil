@@ -252,7 +252,7 @@ describe('prop-decorator transform', () => {
     `;
     const [ metadata, diagnostics ] = customJsxTransform(source);
     expect(diagnostics.length).toBe(1);
-    expect(diagnostics[0].header).toEqual('Prop has referenced interface that is not exported');
+    expect(diagnostics[0].header).toEqual('Prop has referenced interface that is not exported defaulting to any');
   });
 
   it('@Prop() type as some obscure type', () => {

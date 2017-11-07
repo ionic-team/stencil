@@ -72,6 +72,10 @@ describe('vnode-slot transform', () => {
               },
               url: {
                 attribName: 'url',
+                attribType: {
+                  isReferencedType: false,
+                  text: 'string',
+                },
                 memberType: MEMBER_TYPE.Prop,
                 propType: PROP_TYPE.String
               },
