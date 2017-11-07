@@ -48,7 +48,6 @@ describe('prop-decorator transform', () => {
       }
     `;
     const metadata = customJsxTransform(source);
-
     expect(metadata).toEqual({
     });
   });
@@ -60,7 +59,6 @@ describe('prop-decorator transform', () => {
       }
     `;
     const metadata = customJsxTransform(source);
-
     expect(metadata).toEqual({
       'activeRouter': {
         'ctrlId': 'activeRouter',
@@ -68,56 +66,127 @@ describe('prop-decorator transform', () => {
       }
     });
   });
-
-  it('@Prop() type defined as string ', () => {
-    const source = `
-      class Redirect {
-        @Prop() url: string;
-      }
-    `;
-    const metadata = customJsxTransform(source);
-
-    expect(metadata).toEqual({
-      'url': {
-        'attribName': 'url',
-        'memberType': MEMBER_TYPE.Prop,
-        'propType': PROP_TYPE.String
-      }
+  describe('String Props', () => {
+    it('@Prop() type defined as string ', () => {
+      const source = `
+        class Redirect {
+          @Prop() url: string;
+        }
+      `;
+      const metadata = customJsxTransform(source);
+      expect(metadata).toEqual({
+        'url': {
+          'attribName': 'url',
+          'attribType': 'string',
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.String
+        }
+      });
+    });
+    it('@Prop() inferred as a string ', () => {
+      const source = `
+        class Redirect {
+          @Prop() url = '';
+        }
+      `;
+      const metadata = customJsxTransform(source);
+      expect(metadata).toEqual({
+        'url': {
+          'attribName': 'url',
+          'attribType': 'string',
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.String
+        }
+      });
     });
   });
 
-  it('@Prop() type defined as boolean', () => {
-    const source = `
-      class Redirect {
-        @Prop() show: boolean;
-      }
-    `;
-    const metadata = customJsxTransform(source);
-
-    expect(metadata).toEqual({
-      'show': {
-        'attribName': 'show',
-        'memberType': MEMBER_TYPE.Prop,
-        'propType': PROP_TYPE.Boolean
-      }
+  describe('Boolean Props', () => {
+    it('@Prop() type defined as boolean', () => {
+      const source = `
+        class Redirect {
+          @Prop() show: boolean;
+        }
+      `;
+      const metadata = customJsxTransform(source);
+      expect(metadata).toEqual({
+        'show': {
+          'attribName': 'show',
+          'attribType': 'boolean',
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Boolean
+        }
+      });
+    });
+    it('@Prop() inferred as a boolean', () => {
+      const source = `
+        class Redirect {
+          @Prop() show = true;
+        }
+      `;
+      const metadata = customJsxTransform(source);
+      expect(metadata).toEqual({
+        'show': {
+          'attribName': 'show',
+          'attribType': 'boolean',
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Boolean
+        }
+      });
     });
   });
-  it('@Prop() type defined as number', () => {
-    const source = `
-      class Redirect {
-        @Prop() count: number;
-      }
-    `;
-    const metadata = customJsxTransform(source);
 
-    expect(metadata).toEqual({
-      'count': {
-        'attribName': 'count',
-        'memberType': MEMBER_TYPE.Prop,
-        'propType': PROP_TYPE.Number
-      }
+  describe('Numberic Props', () => {
+    it('@Prop() type defined as number', () => {
+      const source = `
+        class Redirect {
+          @Prop() count: number;
+        }
+      `;
+      const metadata = customJsxTransform(source);
+      expect(metadata).toEqual({
+        'count': {
+          'attribName': 'count',
+          'attribType': 'number',
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Number
+        }
+      });
+    });
+    it('@Prop() inferred as a number', () => {
+      const source = `
+        class Redirect {
+          @Prop() count = 0;
+        }
+      `;
+      const metadata = customJsxTransform(source);
+      expect(metadata).toEqual({
+        'count': {
+          'attribName': 'count',
+          'attribType': 'number',
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Number
+        }
+      });
+    });
+    it('@Prop() union as a number', () => {
+      const source = `
+        class Redirect {
+          @Prop() count: 1 | 2;
+        }
+      `;
+      const metadata = customJsxTransform(source);
+      expect(metadata).toEqual({
+        'count': {
+          'attribName': 'count',
+          'attribType': '1 | 2',
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      });
     });
   });
+
   it('@Prop() type defined as any', () => {
     const source = `
       class Redirect {
@@ -125,10 +194,10 @@ describe('prop-decorator transform', () => {
       }
     `;
     const metadata = customJsxTransform(source);
-
     expect(metadata).toEqual({
       'objectAnyThing': {
         'attribName': 'objectAnyThing',
+        'attribType': 'any',
         'memberType': MEMBER_TYPE.Prop,
         'propType': PROP_TYPE.Any
       }
