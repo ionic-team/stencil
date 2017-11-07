@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
-import { buildError, buildWarn, catchError, normalizePath, writeFiles } from '../util';
+import { buildError, buildWarn, catchError, normalizePath, readFile, writeFiles } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { getAppFileName } from '../app/generate-app-files';
@@ -151,11 +151,17 @@ async function generatePackageModuleResolve(config: BuildConfig) {
 
   // If index.d.ts file exists at the root then copy it.
   try {
-    await config.sys.ensureFile(config.sys.path.join(config.srcDir, 'index.d.ts'));
-    PromiseList.push(config.sys.copy(
-      config.sys.path.join(config.srcDir, 'index.d.ts'),
-      config.sys.path.join(config.collectionDir, 'index.d.ts')
-    ));
+    let indexDtsContent = await readFile(config.sys, config.sys.path.join(config.srcDir, 'index.d.ts'));
+    if (typeof indexDtsContent === 'string') {
+      indexDtsContent = indexDtsContent.trim();
+      if (indexDtsContent.length) {
+        // don't bother copying this file if there is no content
+        PromiseList.push(config.sys.copy(
+          config.sys.path.join(config.srcDir, 'index.d.ts'),
+          config.sys.path.join(config.collectionDir, 'index.d.ts')
+        ));
+      }
+    }
   } catch (e) {}
 
   PromiseList.push(config.sys.copy(
