@@ -70,7 +70,7 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
       }
     }
 
-  } else if (Build.listener && name[0] === 'o' && name[1] === 'n' && (!(name in elm))) {
+  } else if (name[0] === 'o' && name[1] === 'n' && (!(name in elm))) {
     // Event Handlers
     // adding an standard event listener, like <button onClick=...> or something
 
