@@ -4,7 +4,7 @@ import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration): MembersMeta {
+export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   return decoratedMembers
@@ -60,14 +60,35 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
         }
       } else {
         memberData.memberType = MEMBER_TYPE.Prop;
-        memberData.attribName = attribName;
+        let attribTypeText;
+        let error: Diagnostic = undefined;
 
         if (!prop.type) {
-          memberData.attribType = inferPropType(prop.initializer);
+          attribTypeText = inferPropType(prop.initializer);
+          if (!attribTypeText) {
+            error = {
+              level: 'warn',
+              type: 'build',
+              header: 'Prop type provided is not supported',
+              messageText: `'${prop.getFullText()}' from ${tsFilePath}`,
+              absFilePath: tsFilePath
+            };
+          }
         } else {
-          memberData.attribType = prop.type.getFullText().trim();
+          error = checkType(prop.type, sourceFile, tsFilePath);
+          attribTypeText = prop.type.getFullText().trim();
         }
-        memberData['propType'] = propTypeFromTSType(memberData.attribType);
+
+        if (error) {
+          diagnostics.push(error);
+          return allMembers;
+        }
+        memberData.attribType = {
+          text: attribTypeText,
+          isReferencedType: !!(prop.type && ts.isTypeReferenceNode(prop.type))
+        };
+        memberData.attribName = attribName;
+        memberData.propType = propTypeFromTSType(attribTypeText);
       }
 
       allMembers[attribName] = memberData;
@@ -79,6 +100,30 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
 const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 
+function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): Diagnostic | undefined {
+  if (ts.isTypeReferenceNode(type)) {
+    let typeName = type.typeName.getText();
+
+    const isExported = sourceFile.statements.some(st => (
+      ts.isInterfaceDeclaration(st) &&
+      (<ts.Identifier>st.name).getText() === typeName) &&
+      Array.isArray(st.modifiers) &&
+      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword)
+    );
+    if (!isExported) {
+      return {
+        level: 'warn',
+        type: 'build',
+        header: 'Prop has referenced interface that is not exported',
+        messageText: `Interface '${typeName}' must be exported from ${tsFilePath}`,
+        absFilePath: tsFilePath
+      } as Diagnostic;
+    }
+  }
+
+  return undefined;
+}
+
 function inferPropType(expression: ts.Expression) {
   if (ts.isStringLiteral(expression)) {
     return 'string';
@@ -89,8 +134,15 @@ function inferPropType(expression: ts.Expression) {
   if ([ ts.SyntaxKind.BooleanKeyword, ts.SyntaxKind.TrueKeyword, ts.SyntaxKind.FalseKeyword ].indexOf(expression.kind) !== -1) {
     return 'boolean';
   }
+  if ((ts.SyntaxKind.NullKeyword === expression.kind) ||
+      (ts.SyntaxKind.UndefinedKeyword === expression.kind) ||
+      (ts.isRegularExpressionLiteral(expression)) ||
+      (ts.isArrayLiteralExpression(expression)) ||
+      (ts.isObjectLiteralExpression(expression))) {
+    return 'any';
+  }
 
-  return 'any';
+  return undefined;
 }
 
 function propTypeFromTSType(type: string) {

@@ -4,10 +4,12 @@ import { getPropDecoratorMeta } from '../prop-decorator';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
 import * as ts from 'typescript';
 
-function customJsxTransform(source) {
+function customJsxTransform(source): [MembersMeta, Diagnostic[]] {
   let metadata: MembersMeta = {};
+  let diagnosticList: Diagnostic[] = [];
 
   function visitFile(): ts.TransformerFactory<ts.SourceFile> {
+    let sourceFile: ts.SourceFile;
     return (transformContext) => {
       function visit(node: ts.Node): ts.VisitResult<ts.Node> {
         switch (node.kind) {
@@ -21,12 +23,13 @@ function customJsxTransform(source) {
         }
       }
       return (tsSourceFile) => {
+        sourceFile = tsSourceFile;
         return visit(tsSourceFile) as ts.SourceFile;
       };
     };
 
     function visitClass(classNode: ts.ClassDeclaration) {
-      metadata = getPropDecoratorMeta('/tsfilepath.ts', [] as Diagnostic[], classNode);
+      metadata = getPropDecoratorMeta('/tsfilepath.ts', diagnosticList, classNode, sourceFile);
       return classNode;
     }
   }
@@ -38,7 +41,7 @@ function customJsxTransform(source) {
     ]
   });
 
-  return metadata;
+  return [ metadata, diagnosticList ];
 }
 
 describe('prop-decorator transform', () => {
@@ -47,7 +50,8 @@ describe('prop-decorator transform', () => {
       class Redirect {
       }
     `;
-    const metadata = customJsxTransform(source);
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(0);
     expect(metadata).toEqual({
     });
   });
@@ -58,7 +62,8 @@ describe('prop-decorator transform', () => {
         @Prop({ context: 'activeRouter' }) activeRouter: ActiveRouter;
       }
     `;
-    const metadata = customJsxTransform(source);
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(0);
     expect(metadata).toEqual({
       'activeRouter': {
         'ctrlId': 'activeRouter',
@@ -73,11 +78,15 @@ describe('prop-decorator transform', () => {
           @Prop() url: string;
         }
       `;
-      const metadata = customJsxTransform(source);
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
       expect(metadata).toEqual({
         'url': {
           'attribName': 'url',
-          'attribType': 'string',
+          'attribType': {
+            'text': 'string',
+            'isReferencedType': false
+          },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.String
         }
@@ -89,11 +98,15 @@ describe('prop-decorator transform', () => {
           @Prop() url = '';
         }
       `;
-      const metadata = customJsxTransform(source);
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
       expect(metadata).toEqual({
         'url': {
           'attribName': 'url',
-          'attribType': 'string',
+          'attribType': {
+            'text': 'string',
+            'isReferencedType': false
+          },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.String
         }
@@ -108,11 +121,15 @@ describe('prop-decorator transform', () => {
           @Prop() show: boolean;
         }
       `;
-      const metadata = customJsxTransform(source);
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
       expect(metadata).toEqual({
         'show': {
           'attribName': 'show',
-          'attribType': 'boolean',
+          'attribType': {
+            'text': 'boolean',
+            'isReferencedType': false
+          },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Boolean
         }
@@ -124,11 +141,15 @@ describe('prop-decorator transform', () => {
           @Prop() show = true;
         }
       `;
-      const metadata = customJsxTransform(source);
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
       expect(metadata).toEqual({
         'show': {
           'attribName': 'show',
-          'attribType': 'boolean',
+          'attribType': {
+            'text': 'boolean',
+            'isReferencedType': false
+          },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Boolean
         }
@@ -143,11 +164,15 @@ describe('prop-decorator transform', () => {
           @Prop() count: number;
         }
       `;
-      const metadata = customJsxTransform(source);
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
       expect(metadata).toEqual({
         'count': {
           'attribName': 'count',
-          'attribType': 'number',
+          'attribType': {
+            'text': 'number',
+            'isReferencedType': false
+          },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Number
         }
@@ -159,11 +184,15 @@ describe('prop-decorator transform', () => {
           @Prop() count = 0;
         }
       `;
-      const metadata = customJsxTransform(source);
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
       expect(metadata).toEqual({
         'count': {
           'attribName': 'count',
-          'attribType': 'number',
+          'attribType': {
+            'text': 'number',
+            'isReferencedType': false
+          },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Number
         }
@@ -175,11 +204,15 @@ describe('prop-decorator transform', () => {
           @Prop() count: 1 | 2;
         }
       `;
-      const metadata = customJsxTransform(source);
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
       expect(metadata).toEqual({
         'count': {
           'attribName': 'count',
-          'attribType': '1 | 2',
+          'attribType': {
+            'text': '1 | 2',
+            'isReferencedType': false
+          },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Any
         }
@@ -193,11 +226,53 @@ describe('prop-decorator transform', () => {
         @Prop() objectAnyThing: any;
       }
     `;
-    const metadata = customJsxTransform(source);
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(0);
     expect(metadata).toEqual({
       'objectAnyThing': {
         'attribName': 'objectAnyThing',
-        'attribType': 'any',
+        'attribType': {
+          'text': 'any',
+          'isReferencedType': false
+        },
+        'memberType': MEMBER_TYPE.Prop,
+        'propType': PROP_TYPE.Any
+      }
+    });
+  });
+
+  it('@Prop() type defined and not exported', () => {
+    const source = `
+      interface Thing {
+        red: boolean;
+      }
+      class Redirect {
+        @Prop() objectAnyThing: Thing;
+      }
+    `;
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(1);
+    expect(diagnostics[0].header).toEqual('Prop has referenced interface that is not exported');
+  });
+
+  it('@Prop() type as some obscure type', () => {
+    const source = `
+      export interface Thing {
+        red: boolean;
+      }
+      class Redirect {
+        @Prop() objectAnyThing: Thing;
+      }
+    `;
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(0);
+    expect(metadata).toEqual({
+      'objectAnyThing': {
+        'attribName': 'objectAnyThing',
+        'attribType': {
+          'text': 'Thing',
+          'isReferencedType': true
+        },
         'memberType': MEMBER_TYPE.Prop,
         'propType': PROP_TYPE.Any
       }

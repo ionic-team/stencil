@@ -630,7 +630,10 @@ export interface MemberMeta {
   memberType?: MEMBER_TYPE;
   propType?: PROP_TYPE;
   attribName?: string;
-  attribType?: string;
+  attribType?: {
+    text: string;
+    isReferencedType: boolean;
+  };
   ctrlId?: string;
 }
 
