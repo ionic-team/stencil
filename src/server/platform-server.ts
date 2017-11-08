@@ -8,7 +8,7 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { getAppFileName } from '../compiler/app/generate-app-files';
 import { getJsFile, normalizePath } from '../compiler/util';
-import { h, t } from '../core/renderer/h';
+import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';
 import { parseComponentMeta } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
@@ -160,7 +160,7 @@ export function createPlatformServer(
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, Context, appBuildDir);
+    importFn(moduleImports, h, Context, appBuildDir);
 
     for (var i = 2; i < args.length; i++) {
       parseComponentMeta(registry, moduleImports, args[i], Context.attr);

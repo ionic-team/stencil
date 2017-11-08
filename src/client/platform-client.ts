@@ -9,7 +9,7 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { createVNodesFromSsr } from '../core/renderer/ssr';
 import { createQueueClient } from './queue-client';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
-import { h, t } from '../core/renderer/h';
+import { h } from '../core/renderer/h';
 import { initHostConstructor } from '../core/instance/init-host';
 import { parseComponentMeta, parseComponentLoaders } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
@@ -157,7 +157,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
     // import component function
     // inject globals
-    importFn(moduleImports, h, t, Context, publicPath);
+    importFn(moduleImports, h, Context, publicPath);
 
     for (var i = 2; i < args.length; i++) {
       // parse the external component data into internal component meta data
