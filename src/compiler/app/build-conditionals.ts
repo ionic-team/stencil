@@ -1,12 +1,10 @@
-import { BuildConfig, BuildContext, ComponentMeta, BuildConditionals, ManifestBundle } from '../../util/interfaces';
+import { BuildContext, ComponentMeta, BuildConditionals, ManifestBundle } from '../../util/interfaces';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
-export function setBuildConditionals(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export function setBuildConditionals(ctx: BuildContext, manifestBundles: ManifestBundle[]) {
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
-
-  const timeSpan = config.logger.createTimeSpan('setBuildConditionals start', true);
 
   manifestBundles.forEach(manifestBundle => {
     manifestBundle.moduleFiles.forEach(moduleFile => {
@@ -16,8 +14,6 @@ export function setBuildConditionals(config: BuildConfig, ctx: BuildContext, man
       }
     });
   });
-
-  timeSpan.finish('setBuildConditionals finish');
 
   return coreBuild;
 }

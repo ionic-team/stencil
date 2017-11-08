@@ -6,11 +6,15 @@ import { getAppFileName } from '../app/generate-app-files';
 
 
 export function generateBundles(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+  const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
+
   manifestBundles.forEach(manifestBundle => {
     generateBundleFiles(config, ctx, manifestBundle);
   });
 
   ctx.registry = generateComponentRegistry(manifestBundles);
+
+  timeSpan.finish(`generate bundles finished`);
 
   return manifestBundles;
 }

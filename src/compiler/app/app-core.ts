@@ -9,7 +9,7 @@ export function generateCore(config: BuildConfig, ctx: BuildContext, globalJsCon
   const staticName = 'core.build.js';
 
   // figure out which sections should be included
-  ctx.buildConditionals = setBuildConditionals(config, ctx, ctx.manifestBundles);
+  ctx.buildConditionals = setBuildConditionals(ctx, ctx.manifestBundles);
 
   // create a list of builds we need to do
   const coreBuilds = getCoreBuilds(ctx.buildConditionals);

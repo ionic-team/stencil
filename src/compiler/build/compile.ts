@@ -62,11 +62,8 @@ function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileRes
     // loop through this directory and sub directories looking for
     // files that need to be transpiled
     const sys = config.sys;
-    const logger = config.logger;
 
     dir = normalizePath(dir);
-
-    logger.debug(`compileDir: ${dir}`);
 
     sys.fs.readdir(dir, (err, files) => {
       if (err) {
