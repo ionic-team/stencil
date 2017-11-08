@@ -19,7 +19,7 @@
     "outDir": "../../dist/transpiled-compiler",
     "pretty": true,
     "rootDir": "../",
-    "target": "es5"
+    "target": "es2015"
   },
   "files": [
     "./index.ts"
