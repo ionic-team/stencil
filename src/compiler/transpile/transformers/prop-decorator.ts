@@ -59,36 +59,38 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
           memberData.memberType = MEMBER_TYPE.PropMutable;
         }
       } else {
-        memberData.memberType = MEMBER_TYPE.Prop;
-        let attribTypeText;
-        let typeError: Diagnostic = undefined;
+        let attribType;
+        let typeWarning: Diagnostic;
 
+        // If the @Prop() attribute does not have a defined type then infer it
         if (!prop.type) {
-          attribTypeText = inferPropType(prop.initializer);
+          let attribTypeText = inferPropType(prop.initializer);
           if (!attribTypeText) {
-            typeError = {
+            attribTypeText = 'any';
+            typeWarning = {
               level: 'warn',
               type: 'build',
-              header: 'Prop type provided is not supported defaulting to any',
+              header: 'Prop type provided is not supported, defaulting to any',
               messageText: `'${prop.getFullText()}' from ${tsFilePath}`,
               absFilePath: tsFilePath
             };
           }
+          attribType = {
+            text: attribTypeText,
+            isReferencedType: false
+          };
         } else {
-          typeError = checkType(prop.type, sourceFile, tsFilePath);
-          attribTypeText = prop.type.getFullText().trim();
+          [ attribType, typeWarning] = checkType(prop.type, sourceFile, tsFilePath);
         }
 
-        if (typeError) {
-          diagnostics.push(typeError);
-          attribTypeText = 'any';
+        if (typeWarning) {
+          diagnostics.push(typeWarning);
         }
-        memberData.attribType = {
-          text: attribTypeText,
-          isReferencedType: !!(!typeError && prop.type && ts.isTypeReferenceNode(prop.type))
-        };
+
+        memberData.memberType = MEMBER_TYPE.Prop;
+        memberData.attribType = attribType;
         memberData.attribName = attribName;
-        memberData.propType = propTypeFromTSType(attribTypeText);
+        memberData.propType = propTypeFromTSType(attribType.text);
       }
 
       allMembers[attribName] = memberData;
@@ -98,36 +100,94 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
     }, {} as MembersMeta);
 }
 
+interface AttributeTypeInfo {
+  text: string;
+  isReferencedType: boolean;
+  importedFrom?: string;
+}
 
 const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 
-function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): Diagnostic | undefined {
+function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
   if (ts.isTypeReferenceNode(type)) {
-    let typeName = type.typeName.getText();
-
-    const isExported = sourceFile.statements.some(st => {
-      let isInterfaceDeclaration = ((ts.isInterfaceDeclaration(st) &&
-        (<ts.Identifier>st.name).getText() === typeName) &&
-        Array.isArray(st.modifiers) &&
-        st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword));
-
-      let isExportDeclaration = ts.isNamedExports(st) &&
-        (<ts.NamedExports>st).elements.some(nee => nee.name.getText() === typeName);
-
-      return isInterfaceDeclaration || isExportDeclaration;
-    });
-    if (!isExported) {
-      return {
-        level: 'warn',
-        type: 'build',
-        header: 'Prop has referenced interface that is not exported defaulting to any',
-        messageText: `Interface '${typeName}' must be exported from ${tsFilePath}`,
-        absFilePath: tsFilePath
-      } as Diagnostic;
-    }
+    return checkTypeRefencedNode(type, sourceFile, tsFilePath);
   }
 
-  return undefined;
+  return [
+    {
+      text: type.getFullText().trim(),
+      isReferencedType: false
+    },
+    undefined
+  ];
+}
+
+function checkTypeRefencedNode(type: ts.TypeReferenceNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
+  let typeName = type.typeName.getText();
+
+  // Loop through all top level exports to find if any reference to the type
+  const isExported = sourceFile.statements.some(st => {
+    // Is the interface defined in the file and exported
+    const isInterfaceDeclarationExported = ((ts.isInterfaceDeclaration(st) &&
+      (<ts.Identifier>st.name).getText() === typeName) &&
+      Array.isArray(st.modifiers) &&
+      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword));
+
+    // Is the interface exported through a named export
+    const isTypeInExportDeclaration = ts.isExportDeclaration(st) &&
+      ts.isNamedExports(st.exportClause) &&
+      st.exportClause.elements.some(nee => nee.name.getText() === typeName);
+
+    return isInterfaceDeclarationExported || isTypeInExportDeclaration;
+  });
+
+  if (isExported) {
+    return [
+      {
+        text: typeName,
+        isReferencedType: true,
+      },
+      undefined
+    ];
+  }
+
+  // Loop through all top level imports to find any reference to the type
+  const importTypeDeclaration = sourceFile.statements.find(st => {
+    const statement = ts.isImportDeclaration(st) &&
+      ts.isImportClause(st.importClause) &&
+      st.importClause.namedBindings &&  ts.isNamedImports(st.importClause.namedBindings) &&
+      Array.isArray(st.importClause.namedBindings.elements) &&
+      st.importClause.namedBindings.elements.find(nbe => nbe.name.getText() === typeName);
+    if (!statement) {
+      return false;
+    }
+    return true;
+  });
+
+  if (importTypeDeclaration) {
+    return [
+      {
+        text: typeName,
+        isReferencedType: true,
+        importedFrom: (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text
+      },
+      undefined
+    ];
+  }
+
+  return [
+    {
+      text: 'any',
+      isReferencedType: false,
+    },
+    {
+      level: 'warn',
+      type: 'build',
+      header: 'Prop has referenced interface that is not exported, defaulting type to any',
+      messageText: `Interface '${typeName}' must be exported from ${tsFilePath}`,
+      absFilePath: tsFilePath
+    }
+  ];
 }
 
 function inferPropType(expression: ts.Expression) {

@@ -71,6 +71,7 @@ describe('prop-decorator transform', () => {
       }
     });
   });
+
   describe('String Props', () => {
     it('@Prop() type defined as string ', () => {
       const source = `
@@ -241,41 +242,111 @@ describe('prop-decorator transform', () => {
     });
   });
 
-  it('@Prop() type defined and not exported', () => {
-    const source = `
-      interface Thing {
-        red: boolean;
-      }
-      class Redirect {
-        @Prop() objectAnyThing: Thing;
-      }
-    `;
-    const [ metadata, diagnostics ] = customJsxTransform(source);
-    expect(diagnostics.length).toBe(1);
-    expect(diagnostics[0].header).toEqual('Prop has referenced interface that is not exported defaulting to any');
-  });
+  describe('Reference type exports', () => {
+    it('@Prop() type defined and not exported', () => {
+      const source = `
+        interface Thing {
+          red: boolean;
+        }
+        class Redirect {
+          @Prop() objectAnyThing: Thing;
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(1);
+      expect(diagnostics[0].header).toEqual('Prop has referenced interface that is not exported, defaulting type to any');
+    });
 
-  it('@Prop() type as some obscure type', () => {
-    const source = `
-      export interface Thing {
-        red: boolean;
-      }
-      class Redirect {
-        @Prop() objectAnyThing: Thing;
-      }
-    `;
-    const [ metadata, diagnostics ] = customJsxTransform(source);
-    expect(diagnostics.length).toBe(0);
-    expect(metadata).toEqual({
-      'objectAnyThing': {
-        'attribName': 'objectAnyThing',
-        'attribType': {
-          'text': 'Thing',
-          'isReferencedType': true
-        },
-        'memberType': MEMBER_TYPE.Prop,
-        'propType': PROP_TYPE.Any
-      }
+    it('@Prop() type as a referenced interface that is exported', () => {
+      const source = `
+        export interface Thing {
+          red: boolean;
+        }
+        class Redirect {
+          @Prop() objectAnyThing: Thing;
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'Thing',
+            'isReferencedType': true
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      });
+    });
+    it('@Prop() type as a referenced interface that is not exported', () => {
+      const source = `
+        interface Thing {
+          red: boolean;
+        }
+        export { Thing };
+        class Redirect {
+          @Prop() objectAnyThing: Thing;
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'Thing',
+            'isReferencedType': true
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      });
+    });
+    it('@Prop() type as a referenced interface that is imported and exported', () => {
+      const source = `
+        import { Thing } from '../../interfaces';
+        export { Thing };
+        class Redirect {
+          @Prop() objectAnyThing: Thing;
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'Thing',
+            'isReferencedType': true
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      });
+    });
+    it('@Prop() type as a referenced interface that is imported and not exported', () => {
+      const source = `
+        import { Thing } from '../../interfaces';
+        class Redirect {
+          @Prop() objectAnyThing: Thing;
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'Thing',
+            'isReferencedType': true,
+            'importedFrom': '../../interfaces'
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      });
     });
   });
 });
