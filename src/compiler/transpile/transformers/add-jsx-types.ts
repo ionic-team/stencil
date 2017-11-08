@@ -3,19 +3,39 @@ import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { ModuleFiles, ComponentMeta, MembersMeta, MemberMeta } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
+const METADATA_MEMBERS_TYPED = [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable];
+
+export interface ImportData {
+  [key: string]: string[];
+}
+
+export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: ComponentMeta, filePath: string) {
+  return Object.keys(cmpMeta.membersMeta)
+  .filter((memberName) => {
+    return METADATA_MEMBERS_TYPED.indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1;
+  })
+  .reduce((obj, memberName) => {
+    const member: MemberMeta = cmpMeta.membersMeta[memberName];
+    let importFileLocation = member.attribType.importedFrom;
+    if (!importFileLocation) {
+      importFileLocation = filePath;
+    }
+    obj[member.attribType.importedFrom] = (obj[importFileLocation] || []).concat([member.attribType.text]);
+    return obj;
+  }, importDataObj);
+}
 
 export function createTypesAsString(cmpMeta: ComponentMeta, importPath: string) {
   const tagName = cmpMeta.tagNameMeta;
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
-  const [ typesToImport, interfaceOptions ] = membersToInterfaceOptions(cmpMeta.membersMeta);
+  const interfaceOptions = membersToInterfaceOptions(cmpMeta.membersMeta);
   (<MembersMeta>cmpMeta.membersMeta);
 
   return `
 import {
-  ${cmpMeta.componentClass} as ${dashToPascalCase(cmpMeta.tagNameMeta)} ${ typesToImport.map(tti => `
-  ${tti}`)}
+  ${cmpMeta.componentClass} as ${dashToPascalCase(cmpMeta.tagNameMeta)}
 } from './${importPath}';
 
 interface ${interfaceName} extends ${tagNameAsPascal}, HTMLElement {
@@ -49,25 +69,19 @@ declare global {
 `;
 }
 
-function membersToInterfaceOptions(membersMeta: MembersMeta): [ string[], { [key: string]: string } ] {
-  const typesToImport: string[] = [];
+function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
   const interfaceData = Object.keys(membersMeta)
     .filter((memberName) => {
-      return [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable].indexOf(membersMeta[memberName].memberType) !== -1;
+      return METADATA_MEMBERS_TYPED.indexOf(membersMeta[memberName].memberType) !== -1;
     })
     .reduce((obj, memberName) => {
       const member: MemberMeta = membersMeta[memberName];
       obj[memberName] = member.attribType.text;
-      if (member.attribType.isReferencedType) {
-        typesToImport.push(member.attribType.text);
-      }
+
       return obj;
     }, <{ [key: string]: string }>{});
 
-  return [
-    typesToImport,
-    interfaceData
-  ];
+  return interfaceData;
 }
 
 /*

@@ -1,5 +1,5 @@
 import { catchError } from '../../util';
-import { Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../util/interfaces';
+import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo } from '../../../util/interfaces';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
@@ -100,11 +100,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
     }, {} as MembersMeta);
 }
 
-interface AttributeTypeInfo {
-  text: string;
-  isReferencedType: boolean;
-  importedFrom?: string;
-}
+
 
 const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 

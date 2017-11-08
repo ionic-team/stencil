@@ -625,15 +625,17 @@ export interface MembersMeta {
   [memberName: string]: MemberMeta;
 }
 
+export interface AttributeTypeInfo {
+  text: string;
+  isReferencedType: boolean;
+  importedFrom?: string;
+}
 
 export interface MemberMeta {
   memberType?: MEMBER_TYPE;
   propType?: PROP_TYPE;
   attribName?: string;
-  attribType?: {
-    text: string;
-    isReferencedType: boolean;
-  };
+  attribType?: AttributeTypeInfo;
   ctrlId?: string;
 }
 
