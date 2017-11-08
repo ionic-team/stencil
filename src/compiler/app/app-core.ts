@@ -71,14 +71,14 @@ function generateCoreBuild(config: BuildConfig, ctx: BuildContext, coreBuild: Bu
     jsContent = polyfillsContent + '\n' + jsContent;
   }
 
+  const appFileName = getAppFileName(config);
+  coreBuild.fileName = getBuildFilename(config, appFileName, coreBuild.coreId, jsContent);
+
   if (ctx.appFiles[coreBuild.coreId] === jsContent) {
     // build is identical from last, no need to resave
     return;
   }
   ctx.appFiles[coreBuild.coreId] = jsContent;
-
-  const appFileName = getAppFileName(config);
-  coreBuild.fileName = getBuildFilename(config, appFileName, coreBuild.coreId, jsContent);
 
   // update the app core filename within the content
   jsContent = jsContent.replace(APP_CORE_FILENAME_PLACEHOLDER, coreBuild.fileName);
