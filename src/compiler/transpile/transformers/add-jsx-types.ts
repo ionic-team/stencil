@@ -1,6 +1,7 @@
 import { dashToPascalCase } from '../../../util/helpers';
+import { normalizePath } from '../../util';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
-import { ModuleFiles, ComponentMeta, MembersMeta, MemberMeta } from '../../../util/interfaces';
+import { ModuleFiles, ComponentMeta, MembersMeta, MemberMeta, BuildConfig } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 const METADATA_MEMBERS_TYPED = [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable];
@@ -9,10 +10,12 @@ export interface ImportData {
   [key: string]: string[];
 }
 
-export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: ComponentMeta, filePath: string) {
+export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: ComponentMeta, filePath: string, config: BuildConfig) {
+  console.log(`filePath => ${filePath}`);
   return Object.keys(cmpMeta.membersMeta)
   .filter((memberName) => {
-    return METADATA_MEMBERS_TYPED.indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1;
+    return METADATA_MEMBERS_TYPED.indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1 &&
+      cmpMeta.membersMeta[memberName].attribType.isReferencedType;
   })
   .reduce((obj, memberName) => {
     const member: MemberMeta = cmpMeta.membersMeta[memberName];
@@ -20,7 +23,17 @@ export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: C
     if (!importFileLocation) {
       importFileLocation = filePath;
     }
-    obj[member.attribType.importedFrom] = (obj[importFileLocation] || []).concat([member.attribType.text]);
+    importFileLocation = normalizePath(
+      config.sys.path.resolve(
+        config.sys.path.dirname(filePath),
+        importFileLocation)
+    );
+
+    obj[importFileLocation] = obj[importFileLocation] || [];
+    if (obj[importFileLocation].indexOf(member.attribType.text) === -1) {
+      obj[importFileLocation].push(member.attribType.text);
+    }
+
     return obj;
   }, importDataObj);
 }
