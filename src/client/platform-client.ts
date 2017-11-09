@@ -227,7 +227,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   function requestBundle(cmpMeta: ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
     // create the url we'll be requesting
-    url = publicPath + bundleId + ((Build.scopedCss && (useScopedCss(domApi.$supportsShadowDom, cmpMeta)) ? '.sc' : '') + '.js');
+    url = publicPath + bundleId + (((Build.scopedCss || Build.shadowDom) && (useScopedCss(domApi.$supportsShadowDom, cmpMeta)) ? '.sc' : '') + '.js');
 
     function onScriptComplete() {
       clearTimeout(tmrId);
