@@ -71,6 +71,26 @@ describe('prop-decorator transform', () => {
       }
     });
   });
+  it('@Prop() no type defined', () => {
+    const source = `
+      class Redirect {
+        @Prop() url;
+      }
+    `;
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(1);
+    expect(metadata).toEqual({
+      'url': {
+        'attribName': 'url',
+        'attribType': {
+          'text': 'any',
+          'isReferencedType': false
+        },
+        'memberType': MEMBER_TYPE.Prop,
+        'propType': PROP_TYPE.Any
+      }
+    });
+  });
 
   describe('String Props', () => {
     it('@Prop() type defined as string ', () => {

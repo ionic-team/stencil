@@ -116,7 +116,7 @@ const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 
 function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
   const text = type.getFullText().trim();
-  const isReferencedType = ts.isTypeReferenceNode(type) && DEFINED_TYPE_REFERENCES.indexOf(text) === -1;
+  const isReferencedType = (ts.isTypeReferenceNode(type) && DEFINED_TYPE_REFERENCES.indexOf(text) === -1);
 
   if (isReferencedType) {
     return checkTypeRefencedNode(<ts.TypeReferenceNode>type, sourceFile, tsFilePath);
@@ -199,7 +199,10 @@ function checkTypeRefencedNode(type: ts.TypeReferenceNode, sourceFile: ts.Source
   ];
 }
 
-function inferPropType(expression: ts.Expression) {
+function inferPropType(expression: ts.Expression | undefined) {
+  if (expression == null) {
+    return undefined;
+  }
   if (ts.isStringLiteral(expression)) {
     return 'string';
   }
