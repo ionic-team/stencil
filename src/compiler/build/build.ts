@@ -43,6 +43,8 @@ export function build(config: BuildConfig, context?: any) {
   // validate the build config
   if (!isConfigValid(config, ctx, buildResults.diagnostics)) {
     // invalid build config, let's not continue
+    config.logger.printDiagnostics(buildResults.diagnostics);
+    generateHtmlDiagnostics(config, buildResults.diagnostics);
     return Promise.resolve(buildResults);
   }
 
@@ -51,6 +53,8 @@ export function build(config: BuildConfig, context?: any) {
   if (!initIndexHtml(config, ctx, buildResults.diagnostics)) {
     // error initializing the index.html file
     // something's wrong, so let's not continue
+    config.logger.printDiagnostics(buildResults.diagnostics);
+    generateHtmlDiagnostics(config, buildResults.diagnostics);
     return Promise.resolve(buildResults);
   }
 
@@ -156,9 +160,6 @@ export function isConfigValid(config: BuildConfig, ctx: BuildContext, diagnostic
   } catch (e) {
     if (config.logger) {
       catchError(diagnostics, e);
-      config.logger.printDiagnostics(diagnostics);
-      generateHtmlDiagnostics(config, diagnostics);
-
     } else {
       console.error(e);
     }
