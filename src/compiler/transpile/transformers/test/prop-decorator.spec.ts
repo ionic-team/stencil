@@ -56,6 +56,26 @@ describe('prop-decorator transform', () => {
     });
   });
 
+  it('@Prop( connect )', () => {
+    const source = `
+      @Component({
+        tag: 'bar-directions',
+        styleUrl: 'bar-directions.scss'
+      })
+      export class BarDirections {
+        @Prop({ connect: 'ion-loading-controller' }) loadingCtrl: LoadingController;
+      }
+    `;
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(0);
+    expect(metadata).toEqual({
+      'loadingCtrl': {
+        'ctrlId': 'ion-loading-controller',
+        'memberType': MEMBER_TYPE.PropConnect
+      }
+    });
+  });
+
   it('@Prop( context )', () => {
     const source = `
       class Redirect {
@@ -71,6 +91,49 @@ describe('prop-decorator transform', () => {
       }
     });
   });
+
+  it('@Prop( state )', () => {
+    const source = `
+      class Redirect {
+        @Prop({ state: true }) thing: boolean;
+      }
+    `;
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(1);
+    expect(metadata).toEqual({
+      'thing': {
+        'attribName': 'thing',
+        'attribType': {
+          'text': 'boolean',
+          'isReferencedType': false
+        },
+        'memberType': MEMBER_TYPE.PropMutable,
+        'propType': PROP_TYPE.Boolean
+      }
+    });
+  });
+
+  it('@Prop( mutable )', () => {
+    const source = `
+      class Redirect {
+        @Prop({ mutable: true }) thing: boolean;
+      }
+    `;
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(0);
+    expect(metadata).toEqual({
+      'thing': {
+        'attribName': 'thing',
+        'attribType': {
+          'text': 'boolean',
+          'isReferencedType': false
+        },
+        'memberType': MEMBER_TYPE.PropMutable,
+        'propType': PROP_TYPE.Boolean
+      }
+    });
+  });
+
   it('@Prop() no type defined', () => {
     const source = `
       class Redirect {

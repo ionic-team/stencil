@@ -13,6 +13,7 @@ const DEFINED_TYPE_REFERENCES = [
   'RegExp',
   'String'
 ];
+const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 
 export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
@@ -43,33 +44,16 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
       const propOptions: PropOptions = suppliedOptions[0];
       const attribName = (<ts.Identifier>prop.name).text;
 
-      if (propOptions) {
-        if (typeof propOptions.connect === 'string') {
-          memberData.memberType = MEMBER_TYPE.PropConnect;
-          memberData.ctrlId = propOptions.connect;
-        }
+      if (propOptions && typeof propOptions.connect === 'string') {
+        memberData.memberType = MEMBER_TYPE.PropConnect;
+        memberData.ctrlId = propOptions.connect;
 
-        if (typeof propOptions.context === 'string') {
-          memberData.memberType = MEMBER_TYPE.PropContext;
-          memberData.ctrlId = propOptions.context;
-        }
+      } else if (propOptions && typeof propOptions.context === 'string') {
+        memberData.memberType = MEMBER_TYPE.PropContext;
+        memberData.ctrlId = propOptions.context;
 
-        if (typeof propOptions.state === 'boolean') {
-          diagnostics.push({
-            level: 'warn',
-            type: 'build',
-            header: '@Prop({ state: true }) option has been deprecated',
-            messageText: `"state" has been renamed to @Prop({ mutable: true }) ${tsFilePath}`,
-            absFilePath: tsFilePath
-          });
-          propOptions.mutable = propOptions.state;
-        }
-
-        if (typeof propOptions.mutable === 'boolean') {
-          memberData.memberType = MEMBER_TYPE.PropMutable;
-        }
       } else {
-        let attribType;
+        let attribType: AttributeTypeInfo;
         let typeWarning: Diagnostic;
 
         // If the @Prop() attribute does not have a defined type then infer it
@@ -97,7 +81,23 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
           diagnostics.push(typeWarning);
         }
 
-        memberData.memberType = MEMBER_TYPE.Prop;
+        if (propOptions && typeof propOptions.state === 'boolean') {
+          diagnostics.push({
+            level: 'warn',
+            type: 'build',
+            header: '@Prop({ state: true }) option has been deprecated',
+            messageText: `"state" has been renamed to @Prop({ mutable: true }) ${tsFilePath}`,
+            absFilePath: tsFilePath
+          });
+          propOptions.mutable = propOptions.state;
+        }
+
+        if (propOptions && typeof propOptions.mutable === 'boolean') {
+          memberData.memberType = MEMBER_TYPE.PropMutable;
+        } else {
+          memberData.memberType = MEMBER_TYPE.Prop;
+        }
+
         memberData.attribType = attribType;
         memberData.attribName = attribName;
         memberData.propType = propTypeFromTSType(attribType.text);
@@ -112,7 +112,6 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
 
 
-const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 
 function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
   const text = type.getFullText().trim();

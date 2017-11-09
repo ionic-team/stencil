@@ -4,7 +4,7 @@ import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { ModuleFiles, ComponentMeta, MembersMeta, MemberMeta, BuildConfig } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
-const METADATA_MEMBERS_TYPED = [MEMBER_TYPE.Method, MEMBER_TYPE.Prop, MEMBER_TYPE.PropConnect, MEMBER_TYPE.PropMutable];
+const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
 
 export interface ImportData {
   [key: string]: string[];
@@ -22,12 +22,15 @@ export interface ImportData {
 export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: ComponentMeta, filePath: string, config: BuildConfig) {
   return Object.keys(cmpMeta.membersMeta)
   .filter((memberName) => {
-    return METADATA_MEMBERS_TYPED.indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1 &&
-      cmpMeta.membersMeta[memberName].attribType.isReferencedType;
+    const member: MemberMeta = cmpMeta.membersMeta[memberName];
+
+    return METADATA_MEMBERS_TYPED.indexOf(member.memberType) !== -1 &&
+      member.attribType.isReferencedType;
   })
   .reduce((obj, memberName) => {
     const member: MemberMeta = cmpMeta.membersMeta[memberName];
     let importFileLocation = member.attribType.importedFrom;
+
     if (!importFileLocation) {
       importFileLocation = filePath;
     }
