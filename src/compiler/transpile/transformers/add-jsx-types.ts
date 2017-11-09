@@ -10,8 +10,16 @@ export interface ImportData {
   [key: string]: string[];
 }
 
+/**
+ * Find all referenced types by a component and add them to the importDataObj and return the newly
+ * updated importDataObj
+ *
+ * @param importDataObj key/value of type import file, each value is an array of imported types
+ * @param cmpMeta the metadata for the component that is referencing the types
+ * @param filePath the path of the component file
+ * @param config general config that all of stencil uses
+ */
 export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: ComponentMeta, filePath: string, config: BuildConfig) {
-  console.log(`filePath => ${filePath}`);
   return Object.keys(cmpMeta.membersMeta)
   .filter((memberName) => {
     return METADATA_MEMBERS_TYPED.indexOf(cmpMeta.membersMeta[memberName].memberType) !== -1 &&
@@ -38,6 +46,12 @@ export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: C
   }, importDataObj);
 }
 
+/**
+ * Generate a string based on the types that are defined within a component.
+ *
+ * @param cmpMeta the metadata for the component that a type definition string is generated for
+ * @param importPath the path of the component file
+ */
 export function createTypesAsString(cmpMeta: ComponentMeta, importPath: string) {
   const tagName = cmpMeta.tagNameMeta;
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);

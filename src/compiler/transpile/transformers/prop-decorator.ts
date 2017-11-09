@@ -3,6 +3,16 @@ import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo } f
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
+const DEFINED_TYPE_REFERENCES = [
+  'Array',
+  'Date',
+  'Function',
+  'Number',
+  'Object',
+  'ReadonlyArray',
+  'RegExp',
+  'String'
+];
 
 export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
@@ -105,14 +115,17 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 
 function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
-  if (ts.isTypeReferenceNode(type)) {
-    return checkTypeRefencedNode(type, sourceFile, tsFilePath);
+  const text = type.getFullText().trim();
+  const isReferencedType = ts.isTypeReferenceNode(type) && DEFINED_TYPE_REFERENCES.indexOf(text) === -1;
+
+  if (isReferencedType) {
+    return checkTypeRefencedNode(<ts.TypeReferenceNode>type, sourceFile, tsFilePath);
   }
 
   return [
     {
-      text: type.getFullText().trim(),
-      isReferencedType: false
+      text,
+      isReferencedType
     },
     undefined
   ];

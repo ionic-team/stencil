@@ -123,7 +123,6 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, opti
 
   const typeImportString = Object.keys(typeImportData).reduce((finalString: string, filePath: string) => {
 
-    console.log(`outDir => ${options.outDir}`);
     const typeData = typeImportData[filePath];
     const importFilePath = normalizePath(
       config.sys.path.relative(options.outDir, filePath)
