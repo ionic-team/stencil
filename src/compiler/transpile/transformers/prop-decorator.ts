@@ -1,109 +1,60 @@
 import { catchError } from '../../util';
-import { Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../util/interfaces';
+import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo } from '../../../util/interfaces';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
+const DEFINED_TYPE_REFERENCES = [
+  'Array',
+  'Date',
+  'Function',
+  'Number',
+  'Object',
+  'ReadonlyArray',
+  'RegExp',
+  'String'
+];
 
-export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
-  const membersMeta: MembersMeta = {};
+export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
-  decoratedMembers.forEach(memberNode => {
-    let isProp = false;
-    let propName: string = null;
-    let propType: number = null;
-    let userPropOptions: PropOptions = null;
-    let shouldObserveAttribute = false;
+  return decoratedMembers
+    .filter((prop: ts.PropertyDeclaration) => (
+      prop.decorators.some((decorator: ts.Decorator) => decorator.getFullText().indexOf('Prop(') !== -1) &&
+      (EXCLUDE_PROP_NAMES.indexOf((<ts.Identifier>prop.name).text) === -1)
+    ))
+    .reduce((allMembers: MembersMeta, prop: ts.PropertyDeclaration) => {
+      const memberData: MemberMeta = {};
 
-    memberNode.forEachChild(n => {
-      if (n.kind === ts.SyntaxKind.Decorator && n.getChildCount() > 1) {
-        const child = n.getChildAt(1);
-        const firstToken = child.getFirstToken();
+      const propDecorator = prop.decorators.find((decorator: ts.Decorator) => (
+        decorator.getFullText().indexOf('Prop(') !== -1)
+      );
+      const suppliedOptions = (<ts.CallExpression>propDecorator.expression).arguments
+        .map(arg => {
+          try {
+            const fnStr = `return ${arg.getText()};`;
+            return new Function(fnStr)();
 
-        // If the first token is @Prop()
-        if (firstToken && firstToken.getText() === 'Prop') {
-          isProp = true;
-
-        } else if (!firstToken && child.getText() === 'Prop') {
-          // If the first token is @Prop
-          isProp = true;
-        }
-
-        if (!isProp) return;
-
-        n.getChildAt(1).forEachChild(n => {
-          if (n.kind === ts.SyntaxKind.ObjectLiteralExpression) {
-            try {
-              const fnStr = `return ${n.getText()};`;
-              userPropOptions = Object.assign(userPropOptions || {}, new Function(fnStr)());
-
-            } catch (e) {
-              const d = catchError(diagnostics, e);
-              d.messageText = `parse prop options: ${e}`;
-              d.absFilePath = tsFilePath;
-            }
+          } catch (e) {
+            const d = catchError(diagnostics, e);
+            d.messageText = `parse prop options: ${e}`;
+            d.absFilePath = tsFilePath;
           }
         });
+      const propOptions: PropOptions = suppliedOptions[0];
+      const attribName = (<ts.Identifier>prop.name).text;
 
-      } else if (isProp) {
-        if (n.kind === ts.SyntaxKind.Identifier && !propName) {
-          propName = n.getText();
-
-        } else if (!propType) {
-          if (n.kind === ts.SyntaxKind.BooleanKeyword || n.kind === ts.SyntaxKind.TrueKeyword || n.kind === ts.SyntaxKind.FalseKeyword) {
-            // @Prop() myBoolean: boolean;
-            // @Prop() myBoolean = true;
-            // @Prop() myBoolean = false;
-            propType = PROP_TYPE.Boolean;
-            shouldObserveAttribute = true;
-
-          } else if (n.kind === ts.SyntaxKind.NumberKeyword || n.kind === ts.SyntaxKind.NumericLiteral) {
-            // @Prop() myNumber: number;
-            // @Prop() myNumber = 88;
-            propType = PROP_TYPE.Number;
-            shouldObserveAttribute = true;
-
-          } else if (n.kind === ts.SyntaxKind.StringKeyword || n.kind === ts.SyntaxKind.StringLiteral) {
-            // @Prop() myString: string;
-            // @Prop() myString = 'some string';
-            propType = PROP_TYPE.String;
-            shouldObserveAttribute = true;
-
-          } else if (n.kind === ts.SyntaxKind.AnyKeyword) {
-            // @Prop() myAny: any;
-            shouldObserveAttribute = true;
-          }
-        }
-      }
-    });
-
-    if (isProp && propName) {
-      if (EXCLUDE_PROP_NAMES.indexOf(propName) > -1) {
-        // these automatically get added at runtime, so don't bother here
-        memberNode.decorators = undefined;
-        return;
-      }
-
-      const propMeta: MemberMeta = membersMeta[propName] = {
-        memberType: MEMBER_TYPE.Prop
-      };
-
-      if (propType) {
-        propMeta.propType = propType;
-      }
-
-      if (userPropOptions) {
-        if (typeof userPropOptions.connect === 'string') {
-          propMeta.memberType = MEMBER_TYPE.PropConnect;
-          propMeta.ctrlId = userPropOptions.connect;
+      if (propOptions) {
+        if (typeof propOptions.connect === 'string') {
+          memberData.memberType = MEMBER_TYPE.PropConnect;
+          memberData.ctrlId = propOptions.connect;
         }
 
-        if (typeof userPropOptions.context === 'string') {
-          propMeta.memberType = MEMBER_TYPE.PropContext;
-          propMeta.ctrlId = userPropOptions.context;
+        if (typeof propOptions.context === 'string') {
+          memberData.memberType = MEMBER_TYPE.PropContext;
+          memberData.ctrlId = propOptions.context;
         }
 
-        if (typeof userPropOptions.state === 'boolean') {
+        if (typeof propOptions.state === 'boolean') {
           diagnostics.push({
             level: 'warn',
             type: 'build',
@@ -111,25 +62,174 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
             messageText: `"state" has been renamed to @Prop({ mutable: true }) ${tsFilePath}`,
             absFilePath: tsFilePath
           });
-          userPropOptions.mutable = userPropOptions.state;
+          propOptions.mutable = propOptions.state;
         }
 
-        if (typeof userPropOptions.mutable === 'boolean') {
-          propMeta.memberType = MEMBER_TYPE.PropMutable;
+        if (typeof propOptions.mutable === 'boolean') {
+          memberData.memberType = MEMBER_TYPE.PropMutable;
         }
+      } else {
+        let attribType;
+        let typeWarning: Diagnostic;
+
+        // If the @Prop() attribute does not have a defined type then infer it
+        if (!prop.type) {
+          let attribTypeText = inferPropType(prop.initializer);
+          if (!attribTypeText) {
+            attribTypeText = 'any';
+            typeWarning = {
+              level: 'warn',
+              type: 'build',
+              header: 'Prop type provided is not supported, defaulting to any',
+              messageText: `'${prop.getFullText()}' from ${tsFilePath}`,
+              absFilePath: tsFilePath
+            };
+          }
+          attribType = {
+            text: attribTypeText,
+            isReferencedType: false
+          };
+        } else {
+          [ attribType, typeWarning] = checkType(prop.type, sourceFile, tsFilePath);
+        }
+
+        if (typeWarning) {
+          diagnostics.push(typeWarning);
+        }
+
+        memberData.memberType = MEMBER_TYPE.Prop;
+        memberData.attribType = attribType;
+        memberData.attribName = attribName;
+        memberData.propType = propTypeFromTSType(attribType.text);
       }
 
-      if (shouldObserveAttribute) {
-        propMeta.attribName = propName;
-      }
+      allMembers[attribName] = memberData;
 
-      // Remove decorator
-      memberNode.decorators = undefined;
-    }
-  });
-
-  return membersMeta;
+      prop.decorators = undefined;
+      return allMembers;
+    }, {} as MembersMeta);
 }
 
 
+
 const EXCLUDE_PROP_NAMES = ['mode', 'color'];
+
+function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
+  const text = type.getFullText().trim();
+  const isReferencedType = ts.isTypeReferenceNode(type) && DEFINED_TYPE_REFERENCES.indexOf(text) === -1;
+
+  if (isReferencedType) {
+    return checkTypeRefencedNode(<ts.TypeReferenceNode>type, sourceFile, tsFilePath);
+  }
+
+  return [
+    {
+      text,
+      isReferencedType
+    },
+    undefined
+  ];
+}
+
+function checkTypeRefencedNode(type: ts.TypeReferenceNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
+  let typeName = type.typeName.getText();
+
+  // Loop through all top level exports to find if any reference to the type
+  const isExported = sourceFile.statements.some(st => {
+    // Is the interface defined in the file and exported
+    const isInterfaceDeclarationExported = ((ts.isInterfaceDeclaration(st) &&
+      (<ts.Identifier>st.name).getText() === typeName) &&
+      Array.isArray(st.modifiers) &&
+      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword));
+
+    // Is the interface exported through a named export
+    const isTypeInExportDeclaration = ts.isExportDeclaration(st) &&
+      ts.isNamedExports(st.exportClause) &&
+      st.exportClause.elements.some(nee => nee.name.getText() === typeName);
+
+    return isInterfaceDeclarationExported || isTypeInExportDeclaration;
+  });
+
+  if (isExported) {
+    return [
+      {
+        text: typeName,
+        isReferencedType: true,
+      },
+      undefined
+    ];
+  }
+
+  // Loop through all top level imports to find any reference to the type
+  const importTypeDeclaration = sourceFile.statements.find(st => {
+    const statement = ts.isImportDeclaration(st) &&
+      ts.isImportClause(st.importClause) &&
+      st.importClause.namedBindings &&  ts.isNamedImports(st.importClause.namedBindings) &&
+      Array.isArray(st.importClause.namedBindings.elements) &&
+      st.importClause.namedBindings.elements.find(nbe => nbe.name.getText() === typeName);
+    if (!statement) {
+      return false;
+    }
+    return true;
+  });
+
+  if (importTypeDeclaration) {
+    return [
+      {
+        text: typeName,
+        isReferencedType: true,
+        importedFrom: (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text
+      },
+      undefined
+    ];
+  }
+
+  return [
+    {
+      text: 'any',
+      isReferencedType: false,
+    },
+    {
+      level: 'warn',
+      type: 'build',
+      header: 'Prop has referenced interface that is not exported, defaulting type to any',
+      messageText: `Interface '${typeName}' must be exported from ${tsFilePath}`,
+      absFilePath: tsFilePath
+    }
+  ];
+}
+
+function inferPropType(expression: ts.Expression) {
+  if (ts.isStringLiteral(expression)) {
+    return 'string';
+  }
+  if (ts.isNumericLiteral(expression)) {
+    return 'number';
+  }
+  if ([ ts.SyntaxKind.BooleanKeyword, ts.SyntaxKind.TrueKeyword, ts.SyntaxKind.FalseKeyword ].indexOf(expression.kind) !== -1) {
+    return 'boolean';
+  }
+  if ((ts.SyntaxKind.NullKeyword === expression.kind) ||
+      (ts.SyntaxKind.UndefinedKeyword === expression.kind) ||
+      (ts.isRegularExpressionLiteral(expression)) ||
+      (ts.isArrayLiteralExpression(expression)) ||
+      (ts.isObjectLiteralExpression(expression))) {
+    return 'any';
+  }
+
+  return undefined;
+}
+
+function propTypeFromTSType(type: string) {
+  switch (type) {
+  case 'string':
+    return PROP_TYPE.String;
+  case 'number':
+    return PROP_TYPE.Number;
+  case 'boolean':
+    return PROP_TYPE.Boolean;
+  case 'any':
+  default:
+    return PROP_TYPE.Any;
+  }
+}

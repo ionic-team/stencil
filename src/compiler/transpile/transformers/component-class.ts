@@ -16,21 +16,21 @@ export function componentModuleFileClass(config: BuildConfig, fileMeta: ModuleFi
 
   return (transformContext) => {
 
-    function visit(fileMeta: ModuleFile, node: ts.Node): ts.VisitResult<ts.Node> {
+    function visit(fileMeta: ModuleFile, node: ts.Node, sourceFile: ts.SourceFile): ts.VisitResult<ts.Node> {
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration);
+          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration, sourceFile);
 
         default:
           return ts.visitEachChild(node, (node) => {
-            return visit(fileMeta, node);
+            return visit(fileMeta, node, sourceFile);
           }, transformContext);
       }
     }
 
     return (tsSourceFile) => {
-      return visit(fileMeta, tsSourceFile) as ts.SourceFile;
+      return visit(fileMeta, tsSourceFile, tsSourceFile) as ts.SourceFile;
     };
   };
 
@@ -41,25 +41,24 @@ export function componentTsFileClass(config: BuildConfig, moduleFiles: ModuleFil
 
   return (transformContext) => {
 
-    function visit(fileMeta: ModuleFile, node: ts.Node): ts.VisitResult<ts.Node> {
+    function visit(fileMeta: ModuleFile, node: ts.Node, sourceFile: ts.SourceFile): ts.VisitResult<ts.Node> {
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration);
+          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration, sourceFile);
 
         default:
           return ts.visitEachChild(node, (node) => {
-            return visit(fileMeta, node);
+            return visit(fileMeta, node, sourceFile);
           }, transformContext);
       }
     }
-
 
     return (tsSourceFile) => {
       const moduleFile = moduleFiles[tsSourceFile.fileName];
       if (moduleFile) {
         moduleFile.cmpMeta = null;
-        return visit(moduleFile, tsSourceFile) as ts.SourceFile;
+        return visit(moduleFile, tsSourceFile, tsSourceFile) as ts.SourceFile;
       }
 
       return tsSourceFile;
@@ -70,7 +69,7 @@ export function componentTsFileClass(config: BuildConfig, moduleFiles: ModuleFil
 
 
 
-function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
+function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
   const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
 
   if (!cmpMeta) {
@@ -93,7 +92,7 @@ function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Di
       ...getElementDecoratorMeta(classNode),
       ...getMethodDecoratorMeta(classNode),
       ...getStateDecoratorMeta(classNode),
-      ...getPropDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode)
+      ...getPropDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode, sourceFile)
     },
     eventsMeta: getEventDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),
     listenersMeta: getListenDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),
