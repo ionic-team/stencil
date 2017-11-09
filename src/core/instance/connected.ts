@@ -1,5 +1,5 @@
+import { Build } from '../../util/build-conditionals';
 import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
-import { getParentElement } from '../../util/helpers';
 import { initElementListeners } from './listeners';
 import { PRIORITY } from '../../util/constants';
 import { queueUpdate } from './update';
@@ -13,12 +13,14 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
     elm.$connected = true;
 
     // if somehow this node was reused, ensure we've removed this property
-    delete elm._hasDestroyed;
+    elm._hasDestroyed = null;
 
-    // initialize our event listeners on the host element
-    // we do this now so that we can listening to events that may
-    // have fired even before the instance is ready
-    initElementListeners(plt, elm);
+    if (Build.listener) {
+      // initialize our event listeners on the host element
+      // we do this now so that we can listening to events that may
+      // have fired even before the instance is ready
+      initElementListeners(plt, elm);
+    }
 
     // register this component as an actively
     // loading child to its parent component
@@ -35,23 +37,23 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.loadBundle(cmpMeta, elm, () => {
+      plt.loadBundle(cmpMeta, elm, () =>
         // we've fully loaded the component mode data
         // let's queue it up to be rendered next
-        queueUpdate(plt, elm);
-      });
+        queueUpdate(plt, elm)
+      );
 
     }, PRIORITY.High);
   }
 }
 
 
-export function registerWithParentComponent(plt: PlatformApi, elm: HostElement) {
+export function registerWithParentComponent(plt: PlatformApi, elm: HostElement, ancestorHostElement?: HostElement) {
   // find the first ancestor host element (if there is one) and register
   // this element as one of the actively loading child elements for its ancestor
-  let ancestorHostElement = elm;
+  ancestorHostElement = elm;
 
-  while (ancestorHostElement = getParentElement(ancestorHostElement)) {
+  while (ancestorHostElement = plt.domApi.$parentElement(ancestorHostElement)) {
     // climb up the ancestors looking for the first registered component
     if (plt.isDefinedComponent(ancestorHostElement)) {
       // we found this elements the first ancestor host element

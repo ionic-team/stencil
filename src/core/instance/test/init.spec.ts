@@ -64,7 +64,7 @@ describe('instance init', () => {
     cmpMeta = {};
     elm = domApi.$createElement('ion-cmp') as any;
     instance = new TestInstance();
-    elm.$instance = instance;
+    elm._instance = instance;
     instance.__el = elm;
   });
 

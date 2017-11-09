@@ -6,7 +6,7 @@ export function initEventEmitters(plt: PlatformApi, componentEvents: EventMeta[]
     componentEvents.forEach(eventMeta => {
 
       instance[eventMeta.eventMethodName] = {
-        emit: function eventEmitter(data: any) {
+        emit: (data: any) => {
           const eventData: EventEmitterData = {
             bubbles: eventMeta.eventBubbles,
             composed: eventMeta.eventComposed,

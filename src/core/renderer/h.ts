@@ -15,8 +15,20 @@ const stack: any[] = [];
 export type PropsType = VNodeProdData | number | string | null;
 export type ChildType = VNode | number | string;
 
-export function h(nodeName: string, vnodeData: PropsType, child?: ChildType): VNode;
-export function h(nodeName: string, vnodeData: PropsType, ...children: ChildType[]): VNode;
+
+export interface ComponentProps {
+  children?: JSX.Element[];
+  key?: string | number | any;
+}
+
+
+export interface FunctionalComponent<PropsType> {
+  (props?: PropsType & ComponentProps): VNode;
+}
+
+
+export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, child?: ChildType): VNode;
+export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, ...children: ChildType[]): VNode;
 export function h(nodeName: any, vnodeData: any, child?: any) {
   var children: any[];
   var lastSimple = false;
@@ -70,9 +82,9 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     }
 
     if (typeof vnodeData['class'] === 'object') {
-      for (let key in vnodeData['class']) {
-        if (vnodeData['class'][key]) {
-          stack.push(key);
+      for ((i as any) in vnodeData['class']) {
+        if (vnodeData['class'][i]) {
+          stack.push(i);
         }
       }
 

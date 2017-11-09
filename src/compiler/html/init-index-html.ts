@@ -52,7 +52,7 @@ const FILLER_INDEX_BUILD = `
 <head>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(registration => {
+      navigator.serviceWorker.ready.then(function(registration) {
         registration.unregister();
       });
     }

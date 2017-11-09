@@ -32,10 +32,10 @@ function getRegisterSwScript(swUrl: string) {
   return `
   <script>
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-      window.addEventListener('load', () => {
+      window.addEventListener('load', function(){
         navigator.serviceWorker.register('${swUrl}')
-          .then(reg => console.log('service worker registered', reg))
-          .catch(err => console.log('service worker error', err));
+          .then(function(reg) { console.log('service worker registered', reg) })
+          .catch(function(err) { console.log('service worker error', err) });
       });
     }
   </script>
@@ -47,10 +47,8 @@ const UNREGSITER_SW = `
   <script>
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       // auto-unregister service worker during dev mode
-      navigator.serviceWorker.ready.then(registration => {
-        registration.unregister().then(() => {
-          location.reload(true);
-        });
+      navigator.serviceWorker.ready.then(function(registration) {
+        registration.unregister().then(function() { location.reload(true) });
       });
     }
   </script>

@@ -93,7 +93,13 @@ export class NodeLogger implements Logger {
 
   debugPrefix(lines: string[]) {
     if (lines.length) {
-      let prefix = '[ DEBUG ]';
+      const d = new Date();
+
+      let prefix = '[' +
+        ('0' + d.getMinutes()).slice(-2) + ':' +
+        ('0' + d.getSeconds()).slice(-2) + '.' +
+        Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+
       lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
     }
   }

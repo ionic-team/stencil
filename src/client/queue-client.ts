@@ -2,15 +2,11 @@ import { DomController, Now, QueueApi } from '../util/interfaces';
 import { PRIORITY } from '../util/constants';
 
 
-export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
+export function createQueueClient(domCtrl: DomController, now: Now, resolvePending?: boolean, rafPending?: boolean): QueueApi {
   const raf = domCtrl.raf;
   const highPromise = Promise.resolve();
-
   const highPriority: Function[] = [];
   const lowPriority: Function[] = [];
-
-  let resolvePending = false;
-  let rafPending = false;
 
 
   function doHighPriority() {
@@ -23,8 +19,8 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
   }
 
 
-  function doWork() {
-    const start = now();
+  function doWork(start?: number) {
+    start = now();
 
     // always run all of the high priority work if there is any
     doHighPriority();
@@ -43,13 +39,13 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
     }
   }
 
-  function flush() {
+  function flush(start?: number) {
     // always run all of the high priority work if there is any
     doHighPriority();
 
     // always force a bunch of medium callbacks to run, but still have
     // a throttle on how many can run in a certain time
-    const start = now();
+    start = now();
     while (lowPriority.length > 0 && (now() - start < 4)) {
       lowPriority.shift()();
     }
@@ -61,32 +57,29 @@ export function createQueueClient(domCtrl: DomController, now: Now): QueueApi {
     }
   }
 
-  function add(cb: Function, priority?: number) {
-    if (priority === PRIORITY.High) {
-      // uses Promise.resolve() for next tick
-      highPriority.push(cb);
+  return {
+    add: (cb: Function, priority?: number) => {
+      if (priority === PRIORITY.High) {
+        // uses Promise.resolve() for next tick
+        highPriority.push(cb);
 
-      if (!resolvePending) {
-        // not already pending work to do, so let's tee it up
-        resolvePending = true;
-        highPromise.then(doHighPriority);
-      }
+        if (!resolvePending) {
+          // not already pending work to do, so let's tee it up
+          resolvePending = true;
+          highPromise.then(doHighPriority);
+        }
 
-    } else {
-      // defaults to low priority
-      // uses requestAnimationFrame
-      lowPriority.push(cb);
+      } else {
+        // defaults to low priority
+        // uses requestAnimationFrame
+        lowPriority.push(cb);
 
-      if (!rafPending) {
-        // not already pending work to do, so let's tee it up
-        rafPending = true;
-        raf(doWork);
+        if (!rafPending) {
+          // not already pending work to do, so let's tee it up
+          rafPending = true;
+          raf(doWork);
+        }
       }
     }
-  }
-
-  return {
-    add: add,
-    flush: flush
   };
 }

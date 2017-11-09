@@ -37,7 +37,7 @@ describe('proxyHostElementPrototype', () => {
     proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
     const prop = Object.getOwnPropertyDescriptor(elm, 'myMethod');
     expect(prop.value).toBeDefined();
-    expect(prop.value.name).toBe('noop');
+    expect(typeof prop.value).toBe('function');
   });
 
   it('does nothing for member types we dont care about on the host', () => {

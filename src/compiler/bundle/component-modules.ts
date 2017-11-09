@@ -76,7 +76,7 @@ function bundleComponents(config: BuildConfig, ctx: BuildContext, manifestBundle
 
 
 export function wrapComponentImports(content: string) {
-  return `function importComponent(exports, h, t, Context, publicPath) {\n"use strict";\n${content}\n}`;
+  return `function importComponent(exports, h, Context, publicPath) {\n"use strict";\n${content}\n}`;
 }
 
 

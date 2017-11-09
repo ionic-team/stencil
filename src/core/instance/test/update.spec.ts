@@ -16,9 +16,9 @@ describe('instance update', () => {
         }
       }
       const elm = mockElement('ion-tag') as HostElement;
-      elm.$instance = new MyComponent();
+      elm._instance = new MyComponent();
       renderUpdate(plt, elm, false);
-      expect(elm.$instance.ranLifeCycle).toBe(true);
+      expect(elm._instance.ranLifeCycle).toBe(true);
     });
 
     it('should not fire off componentDidUpdate if its on the instance and isInitialLoad is true', () => {
@@ -29,9 +29,9 @@ describe('instance update', () => {
         }
       }
       const elm = mockElement('ion-tag') as HostElement;
-      elm.$instance = new MyComponent();
+      elm._instance = new MyComponent();
       renderUpdate(plt, elm, true);
-      expect(elm.$instance.ranLifeCycle).toBe(false);
+      expect(elm._instance.ranLifeCycle).toBe(false);
     });
 
   });
@@ -54,7 +54,7 @@ describe('instance update', () => {
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm._vnode.elm.textContent).toBe('88');
 
-      const instance: any = elm.$instance;
+      const instance: any = elm._instance;
       instance.value = '99';
 
       queueUpdate(plt, elm);
@@ -126,7 +126,7 @@ describe('instance update', () => {
     });
   });
 
-  it('should create $instance', () => {
+  it('should create _instance', () => {
     const cmpMeta: ComponentMeta = {
       tagNameMeta: 'ion-test',
       componentModule: class {
@@ -139,7 +139,7 @@ describe('instance update', () => {
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
-      expect(elm.$instance).toBeDefined();
+      expect(elm._instance).toBeDefined();
     });
   });
 

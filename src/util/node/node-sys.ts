@@ -230,9 +230,9 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
       };
     },
 
-    minifyJs(input) {
+    minifyJs(input, opts?: any) {
       const UglifyJS = require('uglify-es');
-      const result = UglifyJS.minify(input);
+      const result = UglifyJS.minify(input, opts);
       const diagnostics: Diagnostic[] = [];
 
       if (result.error) {

@@ -4,8 +4,21 @@ import { prerenderUrl } from './prerender-url';
 
 
 export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
-  if (hasError(ctx.diagnostics) || !config.prerender || !config.generateWWW) {
+  if (hasError(ctx.diagnostics)) {
     // no need to rebuild index.html if there were no app file changes
+    config.logger.debug(`prerenderApp, skipping because build has errors`);
+    return Promise.resolve();
+  }
+
+  if (!config.prerender) {
+    // no need to rebuild index.html if there were no app file changes
+    config.logger.debug(`prerenderApp, skipping because config.prerender is falsy`);
+    return Promise.resolve();
+  }
+
+  if (!config.generateWWW) {
+    // no need to rebuild index.html if there were no app file changes
+    config.logger.debug(`prerenderApp, skipping because config.generateWWW is falsy`);
     return Promise.resolve();
   }
 
@@ -15,7 +28,7 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
   const indexHtml = ctx.filesToWrite[config.wwwIndexHtml];
   if (!indexHtml) {
     // looks like we don't have an index html file, which is fine
-    config.logger.debug(`missing index.html for prerendering`);
+    config.logger.debug(`prerenderApp, missing index.html for prerendering`);
     return Promise.resolve();
   }
 

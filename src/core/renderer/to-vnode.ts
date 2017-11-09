@@ -12,7 +12,7 @@ export function toVNode(domApi: DomApi, node: Node): VNode {
 
     if (nodeType === 1) {
       // element node
-      vnode.vtag = domApi.$tagName(node).toLowerCase();
+      vnode.vtag = domApi.$tagName(node);
 
       const childNodes = domApi.$childNodes(node);
       let childVnode: VNode;

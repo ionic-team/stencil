@@ -74,11 +74,13 @@ export const enum ENCAPSULATION {
 
 /**
  * Node Types
+ * https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
  */
 export const enum NODE_TYPE {
   ElementNode = 1,
   TextNode = 3,
   CommentNode = 8,
+  DocumentNode = 9,
   DocumentFragment = 11,
 }
 
@@ -135,7 +137,7 @@ export const COLLECTION_MANIFEST_FILE_NAME = 'collection-manifest.json';
 export const CORE_NAME = 'core';
 export const GLOBAL_NAME = 'global';
 export const LOADER_NAME = 'loader';
-export const APP_NAMESPACE_REGEX = /["']__STENCIL__APP__['"]/g;
+export const APP_NAMESPACE_REGEX = /["']__APP__['"]/g;
 
 
 /**

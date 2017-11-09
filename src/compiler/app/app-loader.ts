@@ -10,15 +10,9 @@ export function generateLoader(
   appCorePolyfilledFileName: string,
   componentRegistry: LoadComponentRegistry[]
 ) {
-  const sys = config.sys;
+  const staticName = `${LOADER_NAME}.js`;
 
-  let staticName = LOADER_NAME;
-  if (!config.minifyJs) {
-    staticName += '.dev';
-  }
-  staticName += '.js';
-
-  return sys.getClientCoreFile({ staticName: staticName }).then(stencilLoaderContent => {
+  return config.sys.getClientCoreFile({ staticName: staticName }).then(stencilLoaderContent => {
     // replace the default loader with the project's namespace and components
 
     stencilLoaderContent = injectAppIntoLoader(
@@ -29,13 +23,24 @@ export function generateLoader(
       stencilLoaderContent
     );
 
+    if (config.minifyJs) {
+      // minify the loader
+      const minifyJsResults = config.sys.minifyJs(stencilLoaderContent);
+      minifyJsResults.diagnostics.forEach(d => {
+        config.logger[d.level](d.messageText);
+      });
+      if (!minifyJsResults.diagnostics.length) {
+        stencilLoaderContent = minifyJsResults.output;
+      }
+    }
+
     // concat the app's loader code
     const appCode: string[] = [
       generatePreamble(config),
       stencilLoaderContent
     ];
 
-    return appCode.join('');
+    return appCode.join('').trim();
   });
 }
 
@@ -55,16 +60,6 @@ export function injectAppIntoLoader(
     APP_NAMESPACE_REGEX,
     `"${config.namespace}","${publicPath}","${appCoreFileName}","${appCorePolyfilledFileName}",${componentRegistryStr}`
   );
-
-  if (config.minifyJs) {
-    const minifyJsResults = config.sys.minifyJs(stencilLoaderContent);
-    minifyJsResults.diagnostics.forEach(d => {
-      config.logger[d.level](d.messageText);
-    });
-    if (!minifyJsResults.diagnostics.length) {
-      stencilLoaderContent = minifyJsResults.output;
-    }
-  }
 
   return stencilLoaderContent;
 }
