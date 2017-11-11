@@ -1,1 +1,2 @@
-require('../src/testing/expect');
+
+expect.extend(require('../src/testing/expect'));
