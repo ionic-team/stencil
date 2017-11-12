@@ -27,10 +27,18 @@ function minifyCore(config: BuildConfig, coreBuild: BuildConditionals, input: st
   const opts: any = Object.assign({}, config.minifyJs ? PROD_MINIFY_OPTS : DEV_MINIFY_OPTS);
 
   opts.ecma = 5;
+  opts.output.ecma = 5;
+  opts.compress.ecma = 5;
+  opts.compress.toplevel = true;
+  opts.compress.arrows = false;
+  opts.compress.unsafe_arrows = false;
+  opts.compress.unsafe_methods = false;
 
   if (config.minifyJs) {
     if (!coreBuild.es5) {
       opts.ecma = 6;
+      opts.output.ecma = 6;
+      opts.compress.ecma = 6;
       opts.compress.unsafe_arrows = true;
       opts.compress.unsafe_methods = true;
     }
@@ -91,7 +99,6 @@ const DEV_MINIFY_OPTS: any = {
     side_effects: false,
     switches: false,
     typeofs: false,
-    toplevel: true,
     top_retain: false,
     unsafe: false,
     unsafe_arrows: false,

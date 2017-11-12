@@ -108,5 +108,5 @@ function copyLoader() {
 
 
 process.on('exit', (code) => {
-  // fs.removeSync(TRANSPILED_DIR);
+  fs.removeSync(TRANSPILED_DIR);
 });
