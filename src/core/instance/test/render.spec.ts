@@ -2,7 +2,6 @@ import { ComponentMeta, HostElement, PlatformApi } from '../../../util/interface
 import { mockPlatform, mockElement } from '../../../testing/mocks';
 import { render } from '../render';
 import { h } from '../../renderer/h';
-import { platform } from 'os';
 
 describe('instance render', () => {
 

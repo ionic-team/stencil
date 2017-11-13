@@ -11,7 +11,7 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
   // if this component has a render function, let's fire
   // it off and generate the child vnodes for this host element
   // note that we do not create the host element cuz it already exists
-  const hostMeta = cmpMeta.hostMeta;
+  const hostMeta =  cmpMeta.hostMeta;
 
   if (instance.render || instance.hostData || hostMeta) {
     // tell the platform we're actively rendering

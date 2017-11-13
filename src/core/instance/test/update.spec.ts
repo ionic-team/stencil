@@ -2,6 +2,7 @@ import { waitForLoad, mockConnect, mockDefine, mockElement, mockPlatform } from 
 import { ComponentMeta, HostElement } from '../../../util/interfaces';
 import { h } from '../../renderer/h';
 import { renderUpdate, queueUpdate } from '../update';
+import { Build } from '../../../util/build-conditionals';
 
 
 describe('instance update', () => {
@@ -50,7 +51,7 @@ describe('instance update', () => {
     });
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
-
+    Build.hostData = false;
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm._vnode.elm.textContent).toBe('88');
 
@@ -61,6 +62,7 @@ describe('instance update', () => {
 
       plt.$flushQueue(() => {
         expect(elm._vnode.elm.textContent).toBe('99');
+        Build.hostData = true;
       });
     });
   });
