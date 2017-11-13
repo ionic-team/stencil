@@ -13,15 +13,13 @@ const DEFINED_TYPE_REFERENCES = [
   'RegExp',
   'String'
 ];
-const EXCLUDE_PROP_NAMES = ['mode', 'color'];
 
 export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   return decoratedMembers
     .filter((prop: ts.PropertyDeclaration) => (
-      prop.decorators.some((decorator: ts.Decorator) => decorator.getFullText().indexOf('Prop(') !== -1) &&
-      (EXCLUDE_PROP_NAMES.indexOf((<ts.Identifier>prop.name).text) === -1)
+      prop.decorators.some((decorator: ts.Decorator) => decorator.getFullText().indexOf('Prop(') !== -1)
     ))
     .reduce((allMembers: MembersMeta, prop: ts.PropertyDeclaration) => {
       const memberData: MemberMeta = {};

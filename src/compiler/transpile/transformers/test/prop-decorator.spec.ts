@@ -134,6 +134,37 @@ describe('prop-decorator transform', () => {
     });
   });
 
+  it('@Prop() named color or mode', () => {
+    const source = `
+      class Redirect {
+        @Prop() color: string;
+        @Prop() mode: string;
+      }
+    `;
+    const [ metadata, diagnostics ] = customJsxTransform(source);
+    expect(diagnostics.length).toBe(0);
+    expect(metadata).toEqual({
+      'color': {
+        'attribName': 'color',
+        'attribType': {
+          'text': 'string',
+          'isReferencedType': false
+        },
+        'memberType': MEMBER_TYPE.Prop,
+        'propType': PROP_TYPE.String
+      },
+      'mode': {
+        'attribName': 'mode',
+        'attribType': {
+          'text': 'string',
+          'isReferencedType': false
+        },
+        'memberType': MEMBER_TYPE.Prop,
+        'propType': PROP_TYPE.String
+      }
+    });
+  });
+
   it('@Prop() no type defined', () => {
     const source = `
       class Redirect {
