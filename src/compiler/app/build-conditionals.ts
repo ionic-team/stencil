@@ -114,10 +114,6 @@ export function setBuildFromComponentContent(coreBuild: BuildConditionals, jsTex
     coreBuild.hostData = (jsText.indexOf('hostData') > -1);
   }
 
-  if (!coreBuild.render) {
-    coreBuild.render = (jsText.indexOf('render') > -1);
-  }
-
   if (!coreBuild.svg) {
     jsText = jsText.toLowerCase();
     coreBuild.svg = (jsText.indexOf('svg') > -1);

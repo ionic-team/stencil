@@ -79,10 +79,8 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
         elm._instance.componentDidLoad && elm._instance.componentDidLoad();
       }
 
-      if (Build.render) {
-        // fire off the ref if it exists
-        callNodeRefs(elm._vnode);
-      }
+      // fire off the ref if it exists
+      callNodeRefs(elm._vnode);
 
     } catch (e) {
       plt.onError(e, RUNTIME_ERROR.DidLoadError, elm);

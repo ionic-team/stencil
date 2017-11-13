@@ -400,7 +400,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
 
 export function callNodeRefs(vNode: VNode, isDestroy?: boolean) {
-  if (Build.render && vNode) {
+  if (vNode) {
     vNode.vref && vNode.vref(isDestroy ? null : vNode.elm);
 
     vNode.vchildren && vNode.vchildren.forEach(vChild => {

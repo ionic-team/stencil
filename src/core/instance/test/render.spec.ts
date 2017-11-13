@@ -2,6 +2,7 @@ import { ComponentMeta, HostElement, PlatformApi } from '../../../util/interface
 import { mockPlatform, mockElement } from '../../../testing/mocks';
 import { render } from '../render';
 import { h } from '../../renderer/h';
+import { platform } from 'os';
 
 describe('instance render', () => {
 
@@ -59,6 +60,16 @@ describe('instance render', () => {
 
     expect(elm._vnode).toBeUndefined();
   });
+
+  it('should apply css even if there is not render function', () => {
+    class MyComponent { }
+    spyOn(plt, 'attachStyles');
+    const cmp = {loadPriority: 12345678};
+
+    doRender(MyComponent, cmp);
+    expect(plt.attachStyles).toHaveBeenCalledWith(cmp, undefined, elm);
+  });
+
 
   describe('hostData()', () => {
     it('should set classes', () => {
@@ -153,13 +164,16 @@ describe('instance render', () => {
         mode = 'ios';
       }
 
-      doRender(MyComponent, {
+      const cmp = {
         hostMeta: {
           theme: 'my-component'
         }
-      });
+      };
+      spyOn(plt, 'attachStyles');
+      doRender(MyComponent, cmp);
 
       expect(elm).toMatchClasses(['my-component', 'my-component-ios']);
+      expect(plt.attachStyles).toHaveBeenCalledWith(cmp, 'ios', elm);
     });
 
     it('should apply theme with mode and color', () => {

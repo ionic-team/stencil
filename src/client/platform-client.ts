@@ -64,10 +64,8 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoaders(data, registry))
   };
 
-  if (Build.render) {
-    // create the renderer that will be used
-    plt.render = createRendererPatch(plt, domApi);
-  }
+  // create the renderer that will be used
+  plt.render = createRendererPatch(plt, domApi);
 
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded

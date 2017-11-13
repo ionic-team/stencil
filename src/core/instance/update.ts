@@ -93,7 +93,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
 
 
 export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean) {
-  if (Build.render || Build.hostData) {
+  if (Build.hostData) {
     // if this component has a render function, let's fire
     // it off and generate a vnode for this
     try {

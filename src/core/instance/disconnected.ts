@@ -20,10 +20,8 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // that they're good to go and loaded (cuz this one is on its way out)
     propagateElementLoaded(elm);
 
-    if (Build.render) {
-      // since we're disconnecting, call all of the JSX ref's with null
-      callNodeRefs(elm._vnode, true);
-    }
+    // since we're disconnecting, call all of the JSX ref's with null
+    callNodeRefs(elm._vnode, true);
 
     // detatch any event listeners that may have been added
     // this will also set _listeners to null if there are any

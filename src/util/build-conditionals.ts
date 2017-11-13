@@ -11,7 +11,6 @@ export const Build: BuildConditionals = {
   scopedCss: true,
   shadowDom: true,
 
-  render: true,
   hostData: true,
   hostTheme: true,
   svg: true,

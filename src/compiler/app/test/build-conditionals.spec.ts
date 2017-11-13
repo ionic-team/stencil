@@ -19,12 +19,6 @@ describe('build conditionals', () => {
       expect(coreBuild.svg).toBeTruthy();
     });
 
-    it('render', () => {
-      const jsText = `render`;
-      setBuildFromComponentContent(coreBuild, jsText);
-      expect(coreBuild.render).toBeTruthy();
-    });
-
     it('hostData', () => {
       const jsText = `hostData`;
       setBuildFromComponentContent(coreBuild, jsText);
