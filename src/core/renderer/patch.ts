@@ -359,7 +359,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       ssrId = ssrPatchId;
     }
 
-    if (Build.scopedCss) {
+    if (Build.scopedCss || Build.shadowDom) {
       scopeId = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
     }
 
