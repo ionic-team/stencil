@@ -462,5 +462,27 @@ describe('prop-decorator transform', () => {
         }
       });
     });
+    it('@Prop() type as a referenced interface that is imported and not exported', () => {
+      const source = `
+        import { Thing } from '@stencil/core';
+        class Redirect {
+          @Prop() objectAnyThing: Thing;
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'Thing',
+            'isReferencedType': true,
+            'importedFrom': '@stencil/core'
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      });
+    });
   });
 });

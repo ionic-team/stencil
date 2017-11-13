@@ -34,11 +34,15 @@ export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: C
     if (!importFileLocation) {
       importFileLocation = filePath;
     }
-    importFileLocation = normalizePath(
-      config.sys.path.resolve(
-        config.sys.path.dirname(filePath),
-        importFileLocation)
-    );
+
+    // If this is a relative path make it absolute
+    if (importFileLocation.startsWith('.')) {
+      importFileLocation = normalizePath(
+        config.sys.path.resolve(
+          config.sys.path.dirname(filePath),
+          importFileLocation)
+      );
+    }
 
     obj[importFileLocation] = obj[importFileLocation] || [];
     if (obj[importFileLocation].indexOf(member.attribType.text) === -1) {
@@ -68,13 +72,13 @@ import {
   ${cmpMeta.componentClass} as ${dashToPascalCase(cmpMeta.tagNameMeta)}
 } from './${importPath}';
 
-interface ${interfaceName} extends ${tagNameAsPascal}, HTMLElement {
-}
-declare var ${interfaceName}: {
-  prototype: ${interfaceName};
-  new (): ${interfaceName};
-};
 declare global {
+  interface ${interfaceName} extends ${tagNameAsPascal}, HTMLElement {
+  }
+  declare var ${interfaceName}: {
+    prototype: ${interfaceName};
+    new (): ${interfaceName};
+  };
   interface HTMLElementTagNameMap {
       "${tagName}": ${interfaceName};
   }
@@ -88,8 +92,6 @@ declare global {
   }
   namespace JSXElements {
       export interface ${jsxInterfaceName} extends HTMLAttributes {
-          mode?: string,
-          color?: string,
         ${Object.keys(interfaceOptions).map((key: string) => `
           ${key}?: ${interfaceOptions[key]}`
         )}
