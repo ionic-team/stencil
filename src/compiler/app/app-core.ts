@@ -154,6 +154,7 @@ export function getCorePolyfills(config: BuildConfig) {
   // first load up all of the polyfill content
   const readFilePromises = [
     'document-register-element.js',
+    'array-find.js',
     'object-assign.js',
     'promise.js',
     'fetch.js',
