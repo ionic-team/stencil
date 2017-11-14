@@ -25,7 +25,6 @@ export interface ImportData {
 export function updateReferenceTypeImports(importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: ComponentMeta, filePath: string, config: BuildConfig) {
 
   function getIncrememntTypeName(name: string): string {
-    console.log(allTypes[name]);
     if (allTypes[name] == null) {
       allTypes[name] = 1;
       return name;
