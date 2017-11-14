@@ -1,7 +1,7 @@
 import { AssetsMeta, BuildConfig, BuildContext, ComponentOptions, ComponentMeta, ModuleFile } from '../../util/interfaces';
 import { catchError, normalizePath } from '../util';
 import { COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
-import { getAppDistDir, getAppWWWBuildDir } from '../app/generate-app-files';
+import { getAppDistDir, getAppWWWBuildDir } from '../app/app-file-naming';
 
 
 export function normalizeAssetsDir(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta)  {

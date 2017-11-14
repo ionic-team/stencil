@@ -188,7 +188,6 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
         ctx.changeHasNonComponentModules = false;
       }
     }
-
   }
 
   if (!ctx.isChangeBuild) {

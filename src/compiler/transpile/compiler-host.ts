@@ -46,7 +46,7 @@ function writeFileInMemory(config: BuildConfig, ctx: BuildContext, transpileResu
   outputFilePath = normalizePath(outputFilePath);
 
   if (isJsFile(outputFilePath)) {
-    // js file
+    // transpiled file is a js file
     const jsFilePath = outputFilePath;
 
     let moduleFile = ctx.moduleFiles[tsFilePath];
@@ -69,7 +69,7 @@ function writeFileInMemory(config: BuildConfig, ctx: BuildContext, transpileResu
     transpileResults.moduleFiles[tsFilePath] = moduleFile;
 
   } else if (isDtsFile(outputFilePath)) {
-    // .d.ts file
+    // transpiled file is a .d.ts file
     const dtsFilePath = outputFilePath;
 
     let moduleFile = ctx.moduleFiles[tsFilePath];

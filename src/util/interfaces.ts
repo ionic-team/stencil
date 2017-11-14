@@ -85,7 +85,7 @@ export interface LoadComponentRegistry {
    * map of bundle ids
    */
   [1]: {
-    [modeName: string]: string
+    [modeName: string]: any[];
   };
 
   /**
@@ -287,7 +287,7 @@ export interface ModuleFile {
 
 export interface AppRegistry {
   namespace: string;
-  loader: string;
+  loader?: string;
   core?: string;
   corePolyfilled?: string;
   global?: string;
@@ -321,7 +321,6 @@ export interface CompiledModeStyles {
 
 export interface BuildConditionals {
   coreId?: 'core' | 'core.pf';
-  fileName?: string;
   polyfills?: boolean;
   verboseError: boolean;
   es5?: boolean;
@@ -330,10 +329,11 @@ export interface BuildConditionals {
   ssrServerSide: boolean;
 
   // encapsulation
-  customSlot: boolean;
   styles: boolean;
-  scopedCss: boolean;
+
+  // dom
   shadowDom: boolean;
+  slot: boolean;
 
   // vdom
   hostData: boolean;
@@ -361,8 +361,10 @@ export interface BuildConditionals {
 
   // svg
   svg: boolean;
-
 }
+
+
+export type SourceTarget = 'es5' | 'es2015';
 
 
 export interface BuildConfig {
@@ -372,6 +374,7 @@ export interface BuildConfig {
   rootDir?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   exclude?: string[];
+  es5Fallback?: boolean;
   namespace?: string;
   global?: string;
   srcDir?: string;
@@ -533,9 +536,7 @@ export interface BuildContext {
     [key: string]: string;
   };
   watcher?: FSWatcher;
-  tsConfig?: any;
   hasIndexHtml?: boolean;
-  buildConditionals?: BuildConditionals;
 
   isRebuild?: boolean;
   isChangeBuild?: boolean;
@@ -788,7 +789,12 @@ export interface ComponentMeta {
 
 
 export interface BundleIds {
-  [modeName: string]: string;
+  [modeName: string]: BundleId;
+}
+
+export interface BundleId {
+  es2015?: string;
+  es5?: string;
 }
 
 

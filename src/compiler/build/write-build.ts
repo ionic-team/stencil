@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/
 import { buildError, buildWarn, catchError, normalizePath, readFile, writeFiles } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
-import { getAppFileName } from '../app/generate-app-files';
+import { getAppFileName } from '../app/app-file-naming';
 import { writeAppManifest, COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 
 

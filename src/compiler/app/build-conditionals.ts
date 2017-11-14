@@ -22,6 +22,14 @@ export function setBuildConditionals(ctx: BuildContext, manifestBundles: Manifes
 export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta: ComponentMeta) {
   if (!cmpMeta) return;
 
+  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+    coreBuild.shadowDom = true;
+  }
+
+  if (cmpMeta.slotMeta) {
+    coreBuild.slot = true;
+  }
+
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
     memberNames.forEach(memberName => {
@@ -54,19 +62,6 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
 
   if (cmpMeta.listenersMeta && cmpMeta.listenersMeta.length) {
     coreBuild.listener = true;
-  }
-
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-    coreBuild.shadowDom = true;
-
-  } else if (cmpMeta.slotMeta) {
-    // not using shadow dom
-    // and this component is using a slot
-    coreBuild.customSlot = true;
-  }
-
-  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
-    coreBuild.scopedCss = true;
   }
 
   if (cmpMeta.stylesMeta) {

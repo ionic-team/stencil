@@ -28,7 +28,7 @@ function createDoUpgrade(config: BuildConfig, ctx: BuildContext) {
     const upgradeTransforms: ts.TransformerFactory<ts.SourceFile>[] = (upgrades.map((upgrade) => {
       switch (upgrade) {
         case CompilerUpgrade.JSX_Upgrade_From_0_0_5:
-          config.logger.info(`JSX_Upgrade_From_0_0_5, manifestCompilerVersion: ${manifest.compiler.version}`);
+          config.logger.debug(`JSX_Upgrade_From_0_0_5, manifestCompilerVersion: ${manifest.compiler.version}`);
           return upgradeFrom0_0_5 as ts.TransformerFactory<ts.SourceFile>;
       }
       return () => (tsSourceFile: ts.SourceFile) => (tsSourceFile);

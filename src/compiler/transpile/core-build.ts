@@ -36,6 +36,37 @@ export function transpileCoreBuild(coreBuild: BuildConditionals, input: string) 
 }
 
 
+export function transpileToEs5(input: string) {
+  const diagnostics: Diagnostic[] = [];
+  const results: TranspileResults = {
+    code: null,
+    diagnostics: null
+  };
+
+  const transpileOpts: ts.TranspileOptions = {
+    compilerOptions: {
+      allowJs: true,
+      declaration: false,
+      target: ts.ScriptTarget.ES5
+    }
+  };
+
+  const tsResults = ts.transpileModule(input, transpileOpts);
+
+  loadTypeScriptDiagnostics('', diagnostics, tsResults.diagnostics);
+
+  if (diagnostics.length) {
+    results.diagnostics = diagnostics;
+    results.code = input;
+    return results;
+  }
+
+  results.code = tsResults.outputText;
+
+  return results;
+}
+
+
 function getCompilerOptions(coreBuild: BuildConditionals) {
   const opts: ts.CompilerOptions = {
     allowJs: true,

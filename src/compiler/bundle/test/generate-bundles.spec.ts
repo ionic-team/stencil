@@ -4,11 +4,11 @@ import {
   containsDefaultMode,
   containsNonDefaultModes,
   getBundleId,
-  getBundleFileName,
   getManifestBundleModes,
   setBundleModeIds,
   writeBundleFile
 } from '../generate-bundles';
+import { getBundleFileName } from '../../app/app-file-naming';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { mockStencilSystem } from '../../../testing/mocks';
 
@@ -47,16 +47,24 @@ describe('generate-bundles', () => {
       const moduleFiles: ModuleFile[] = [
         { cmpMeta: { bundleIds: {} } }
       ];
-      setBundleModeIds(moduleFiles, null, 'bundle-id');
-      expect(moduleFiles[0].cmpMeta.bundleIds[DEFAULT_STYLE_MODE]).toBe('bundle-id');
+      setBundleModeIds(moduleFiles, null, 'bundle-id', 'es2015');
+      expect(moduleFiles[0].cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es2015).toBe('bundle-id');
     });
 
-    it('should set mode with mode name', () => {
+    it('should set mode with es2015 mode name', () => {
       const moduleFiles: ModuleFile[] = [
         { cmpMeta: { bundleIds: {} } }
       ];
-      setBundleModeIds(moduleFiles, 'ios', 'bundle-id');
-      expect(moduleFiles[0].cmpMeta.bundleIds.ios).toBe('bundle-id');
+      setBundleModeIds(moduleFiles, 'ios', 'bundle-id', 'es2015');
+      expect(moduleFiles[0].cmpMeta.bundleIds.ios.es2015).toBe('bundle-id');
+    });
+
+    it('should set mode with es5 mode name', () => {
+      const moduleFiles: ModuleFile[] = [
+        { cmpMeta: { bundleIds: {} } }
+      ];
+      setBundleModeIds(moduleFiles, 'ios', 'bundle-id', 'es5');
+      expect(moduleFiles[0].cmpMeta.bundleIds.ios.es5).toBe('bundle-id');
     });
 
   });

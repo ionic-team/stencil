@@ -75,40 +75,28 @@ describe('build conditionals', () => {
       expect(Object.keys(coreBuild).length).toBe(1);
     });
 
-    it('customSlot when using now using shadow dom but is using a slot', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
-      cmpMeta.slotMeta = SLOT_META.HasSlots;
-      setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.customSlot).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(2);
-    });
-
-    it('scopedCss', () => {
-      cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
-      setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.scopedCss).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
-    });
-
     it('shadowDom', () => {
       cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.shadowDom).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
+    });
+
+    it('slot', () => {
+      cmpMeta.slotMeta = SLOT_META.HasSlots;
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild.slot).toBeTruthy();
     });
 
     it('listener', () => {
       cmpMeta.listenersMeta = [{}];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.listener).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('event', () => {
       cmpMeta.eventsMeta = [{}];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.event).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('element', () => {
@@ -117,7 +105,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.element).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('method', () => {
@@ -126,7 +113,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.method).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('propContext', () => {
@@ -135,7 +121,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.propContext).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('propConnect', () => {
@@ -144,7 +129,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.propConnect).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('observeAttr w/ "any" prop type', () => {
@@ -154,7 +138,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.observeAttr).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('observeAttr w/ boolean prop type', () => {
@@ -164,7 +147,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.observeAttr).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('observeAttr w/ number prop type', () => {
@@ -174,7 +156,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.observeAttr).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('observeAttr w/ string prop type', () => {
@@ -184,7 +165,6 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.observeAttr).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
     });
 
     it('do not set observeAttr w/out valid prop type', () => {

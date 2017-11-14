@@ -3,13 +3,12 @@ import { BuildConditionals } from './interfaces';
 
 export const Build: BuildConditionals = {
   verboseError: true,
-  customSlot: true,
 
+  shadowDom: true,
+  slot: true,
   ssrServerSide: true,
 
   styles: true,
-  scopedCss: true,
-  shadowDom: true,
 
   hostData: true,
   hostTheme: true,

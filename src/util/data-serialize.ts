@@ -34,13 +34,19 @@ export function formatBundleIds(bundleIds: BundleIds): any {
   }
 
   if (modes.length === 1) {
-    return bundleIds[modes[0]];
+    return [
+      bundleIds[modes[0]].es2015,
+      bundleIds[modes[0]].es5
+    ];
   }
 
-  const bundleIdObj: BundleIds = {};
+  const bundleIdObj: any = {};
 
   modes.forEach(modeName => {
-    bundleIdObj[modeName] = bundleIds[modeName];
+    bundleIdObj[modeName] = [
+      bundleIds[modeName].es2015,
+      bundleIds[modeName].es5
+    ];
   });
 
   return bundleIdObj;

@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, BuildConditionals } from '../../util/interfaces';
+import { BuildConfig, BuildContext, BuildConditionals, SourceTarget } from '../../util/interfaces';
 import { transpileCoreBuild } from '../transpile/core-build';
 
 
@@ -12,7 +12,9 @@ export function buildCoreContent(config: BuildConfig, ctx: BuildContext, coreBui
 
   coreContent = transpileResults.code;
 
-  const minifyResults = minifyCore(config, coreBuild, coreContent);
+  const sourceTarget: SourceTarget = coreBuild.es5 ? 'es5' : 'es2015';
+
+  const minifyResults = minifyCore(config, sourceTarget, coreContent);
 
   if (minifyResults.diagnostics && minifyResults.diagnostics.length) {
     ctx.diagnostics.push(...minifyResults.diagnostics);
@@ -23,24 +25,21 @@ export function buildCoreContent(config: BuildConfig, ctx: BuildContext, coreBui
 }
 
 
-function minifyCore(config: BuildConfig, coreBuild: BuildConditionals, input: string) {
+function minifyCore(config: BuildConfig, sourceTarget: SourceTarget, input: string) {
   const opts: any = Object.assign({}, config.minifyJs ? PROD_MINIFY_OPTS : DEV_MINIFY_OPTS);
 
-  opts.ecma = 5;
-  opts.output.ecma = 5;
-  opts.compress.ecma = 5;
+  if (sourceTarget === 'es5') {
+    opts.ecma = 5;
+    opts.output.ecma = 5;
+    opts.compress.ecma = 5;
+    opts.compress.arrows = false;
+  }
+
   opts.compress.toplevel = true;
-  opts.compress.arrows = false;
-  opts.compress.unsafe_arrows = false;
-  opts.compress.unsafe_methods = false;
 
   if (config.minifyJs) {
-    if (!coreBuild.es5) {
-      opts.ecma = 6;
-      opts.output.ecma = 6;
-      opts.compress.ecma = 6;
-      opts.compress.unsafe_arrows = true;
-      opts.compress.unsafe_methods = true;
+    if (sourceTarget !== 'es5') {
+      opts.compress.arrows = true;
     }
 
     opts.mangle.properties.reserved = RESERVED_PROPERTIES.slice();
@@ -138,7 +137,7 @@ const DEV_MINIFY_OPTS: any = {
 
 const PROD_MINIFY_OPTS: any = {
   compress: {
-    arrows: true,
+    arrows: false,
     booleans: true,
     cascade: true,
     collapse_vars: true,

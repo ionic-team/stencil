@@ -11,14 +11,12 @@ export function bundle(config: BuildConfig, ctx: BuildContext) {
     return Promise.resolve();
   }
 
-  const logger = config.logger;
-
   if (config.generateWWW) {
-    logger.debug(`bundle, buildDir: ${config.buildDir}`);
+    config.logger.debug(`bundle, buildDir: ${config.buildDir}`);
   }
 
   if (config.generateDistribution) {
-    logger.debug(`bundle, distDir: ${config.distDir}`);
+    config.logger.debug(`bundle, distDir: ${config.distDir}`);
   }
 
   ctx.manifestBundles = getManifestBundles(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
@@ -35,7 +33,11 @@ export function bundle(config: BuildConfig, ctx: BuildContext) {
   ]).then(() => {
     // both styles and modules are done bundling
     // generate the actual files to write
-    generateBundles(config, ctx, ctx.manifestBundles);
+    generateBundles(config, ctx, ctx.manifestBundles, 'es2015');
+
+    if (config.es5Fallback) {
+      generateBundles(config, ctx, ctx.manifestBundles, 'es5');
+    }
 
   }).catch(err => {
     catchError(ctx.diagnostics, err);

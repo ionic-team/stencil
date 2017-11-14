@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext } from '../../util/interfaces';
-import { getAppFileName } from '../app/generate-app-files';
+import { getAppFileName } from '../app/app-file-naming';
 
 
 export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document) {

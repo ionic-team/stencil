@@ -2,13 +2,13 @@ import addMetadataExport from './transformers/add-metadata-export';
 import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath } from '../util';
 import { componentTsFileClass, componentModuleFileClass } from './transformers/component-class';
+import { createTypesAsString, ImportData, updateReferenceTypeImports }  from './transformers/add-jsx-types';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
 import { updateFileMetaFromSlot, updateModuleFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
-import { createTypesAsString, updateReferenceTypeImports, ImportData }  from './transformers/add-jsx-types';
 import * as ts from 'typescript';
 
 
@@ -20,7 +20,7 @@ export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFil
 
   return Promise.resolve().then(() => {
     // transpiling is synchronous
-    transpileModules(config, ctx, moduleFiles, null, transpileResults);
+    transpileModules(config, ctx, moduleFiles, transpileResults);
 
     if (ctx.diagnostics.length) {
       // looks like we've got some transpile errors
@@ -91,7 +91,7 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
  * @param ctx build context
  * @param options compiler options from tsconfig
  */
-function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, options: ts.CompilerOptions) {
+function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext) {
   let typeImportData: ImportData = {};
   const allTypes: { [key: string]: number } = {};
   let componentsFileContent =
@@ -111,7 +111,7 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, opti
     if (moduleFile.cmpMeta) {
       const importPath = normalizePath(
         config.sys.path
-          .relative(options.outDir, moduleFile.jsFilePath)
+          .relative(config.collectionDir, moduleFile.jsFilePath)
           .replace(/\.js$/, '')
       );
       typeImportData = updateReferenceTypeImports(typeImportData, allTypes, moduleFile.cmpMeta, moduleFile.jsFilePath, config);
@@ -128,7 +128,7 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, opti
     let importFilePath: string;
     if (filePath.startsWith('.') || filePath.startsWith('/')) {
       importFilePath = './' + normalizePath(
-        config.sys.path.relative(options.outDir, filePath)
+        config.sys.path.relative(config.collectionDir, filePath)
       );
     } else {
       importFilePath = filePath;
@@ -157,11 +157,11 @@ ${typeData.map(td => {
   // cache this for rebuilds to avoid unnecessary writes
   ctx.appFiles.components_d_ts = componentsFileContent;
 
-  const rootFilePath = config.sys.path.join(options.rootDir, 'components.d.ts');
+  const rootFilePath = config.sys.path.join(config.srcDir, 'components.d.ts');
   ctx.filesToWrite[rootFilePath] = componentsFileContent;
 }
 
-function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileOptions: any, transpileResults: TranspileModulesResults) {
+function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles, transpileResults: TranspileModulesResults) {
   if (ctx.isChangeBuild) {
     // if this is a change build, then narrow down
     moduleFiles = getChangeBuildModules(ctx, moduleFiles);
@@ -174,19 +174,32 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
     return;
   }
 
+  // fire up the typescript program
+  let timespace = config.logger.createTimeSpan('transpile es2015 start', true);
+  transpileProgram(config, ctx, tsFileNames, transpileResults);
+  timespace.finish(`transpile es2015 finished`);
+
+  // Generate d.ts files for component types
+  generateComponentTypesFile(config, ctx);
+}
+
+
+function transpileProgram(config: BuildConfig, ctx: BuildContext, tsFileNames: string[], transpileResults: TranspileModulesResults) {
+
   // get the tsconfig compiler options we'll use
-  const tsOptions = getUserTsConfig(config, ctx, transpileOptions);
+  const tsOptions = getUserTsConfig(config);
 
   if (config.suppressTypeScriptErrors) {
     // suppressTypeScriptErrors mainly for unit testing
-    tsOptions.options.lib = [];
+    tsOptions.lib = [];
   }
+
   // get the ts compiler host we'll use, which patches file operations
   // with our in-memory file system
-  const tsHost = getTsHost(config, ctx, tsOptions.options, transpileResults);
+  const tsHost = getTsHost(config, ctx, tsOptions, transpileResults);
 
   // fire up the typescript program
-  const program = ts.createProgram(tsFileNames, tsOptions.options, tsHost);
+  const program = ts.createProgram(tsFileNames, tsOptions, tsHost);
 
   // this is the big one, let's go ahead and kick off the transpiling
   program.emit(undefined, tsHost.writeFile, undefined, false, {
@@ -199,9 +212,6 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
       updateFileMetaFromSlot(ctx.moduleFiles)
     ]
   });
-
-  // Generate d.ts files for component types
-  generateComponentTypesFile(config, ctx, tsOptions.options);
 
   // keep track of how many files we transpiled (great for debugging/testing)
   ctx.transpileBuildCount = Object.keys(transpileResults.moduleFiles).length;

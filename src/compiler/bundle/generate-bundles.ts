@@ -1,35 +1,71 @@
-import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry, CompiledModeStyles, ModuleFile, ManifestBundle } from '../../util/interfaces';
-import { componentRequiresScopedStyles, generatePreamble, normalizePath } from '../util';
+import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry, CompiledModeStyles, ModuleFile, ManifestBundle, SourceTarget } from '../../util/interfaces';
+import { componentRequiresScopedStyles, generatePreamble, pathJoin } from '../util';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { formatLoadComponents, formatLoadStyles } from '../../util/data-serialize';
-import { getAppFileName } from '../app/generate-app-files';
+import { getAppFileName, getBundleFileName, getAppWWWBuildDir } from '../app/app-file-naming';
+import { transpileToEs5 } from '../transpile/core-build';
 
 
-export function generateBundles(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
-  const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
+export function generateBundles(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], sourceTarget: SourceTarget) {
+  const timeSpan = config.logger.createTimeSpan(`generate ${sourceTarget} bundles started`, config.devMode);
 
   manifestBundles.forEach(manifestBundle => {
-    generateBundleFiles(config, ctx, manifestBundle);
+    generateBundleFiles(config, ctx, manifestBundle, sourceTarget);
   });
 
   ctx.registry = generateComponentRegistry(manifestBundles);
 
-  timeSpan.finish(`generate bundles finished`);
+  timeSpan.finish(`generate ${sourceTarget} bundles finished`);
 
   return manifestBundles;
 }
 
 
-function generateBundleFiles(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
+function generateBundleFiles(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, sourceTarget: SourceTarget) {
   manifestBundle.moduleFiles.forEach(moduleFile => {
-    moduleFile.cmpMeta.bundleIds = {};
+    moduleFile.cmpMeta.bundleIds = moduleFile.cmpMeta.bundleIds || {};
   });
 
-  let moduleText = formatLoadComponents(config.namespace, MODULE_ID, manifestBundle.compiledModuleText, manifestBundle.moduleFiles);
+  let compiledModuleText = manifestBundle.compiledModuleText;
+
+  if (sourceTarget === 'es5') {
+    const transpileResults = transpileToEs5(compiledModuleText);
+    if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
+      ctx.diagnostics.push(...transpileResults.diagnostics);
+    } else {
+      compiledModuleText = transpileResults.code;
+    }
+  }
+
+  let moduleText = formatLoadComponents(
+    config.namespace,
+    MODULE_ID,
+    compiledModuleText,
+    manifestBundle.moduleFiles
+  );
 
   if (config.minifyJs) {
     // minify js
-    const minifyJsResults = config.sys.minifyJs(moduleText);
+    const opts: any = { output: {}, compress: {}, mangle: {} };
+    if (sourceTarget === 'es5') {
+      opts.ecma = 5;
+      opts.output.ecma = 5;
+      opts.compress.ecma = 5;
+      opts.compress.arrows = false;
+    }
+
+    if (config.logLevel === 'debug') {
+      opts.mangle.keep_fnames = true;
+      opts.compress.drop_console = false;
+      opts.compress.drop_debugger = false;
+      opts.output.beautify = true;
+      opts.output.bracketize = true;
+      opts.output.indent_level = 2;
+      opts.output.comments = 'all';
+      opts.output.preserve_line = true;
+    }
+
+    const minifyJsResults = config.sys.minifyJs(moduleText, opts);
     minifyJsResults.diagnostics.forEach(d => {
       ctx.diagnostics.push(d);
     });
@@ -48,27 +84,27 @@ function generateBundleFiles(config: BuildConfig, ctx: BuildContext, manifestBun
       const bundleStyles = manifestBundle.compiledModeStyles.filter(cms => cms.modeName === DEFAULT_STYLE_MODE);
       bundleStyles.push(...manifestBundle.compiledModeStyles.filter(cms => cms.modeName === modeName));
 
-      writeBundleFile(config, ctx, manifestBundle, moduleText, modeName, bundleStyles);
+      writeBundleFile(config, ctx, manifestBundle, moduleText, modeName, bundleStyles, sourceTarget);
     });
 
   } else if (modes.length) {
     modes.forEach(modeName => {
       const bundleStyles = manifestBundle.compiledModeStyles.filter(cms => cms.modeName === modeName);
 
-      writeBundleFile(config, ctx, manifestBundle, moduleText, modeName, bundleStyles);
+      writeBundleFile(config, ctx, manifestBundle, moduleText, modeName, bundleStyles, sourceTarget);
     });
 
   } else {
-    writeBundleFile(config, ctx, manifestBundle, moduleText, null, []);
+    writeBundleFile(config, ctx, manifestBundle, moduleText, null, [], sourceTarget);
   }
 }
 
 
-export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, moduleText: string, modeName: string, bundleStyles: CompiledModeStyles[]) {
+export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, moduleText: string, modeName: string, bundleStyles: CompiledModeStyles[], sourceTarget: SourceTarget) {
   const unscopedStyleText = formatLoadStyles(config.namespace, bundleStyles, false);
 
   const unscopedContents = [
-    generatePreamble(config)
+    generatePreamble(config, sourceTarget)
   ];
   if (unscopedStyleText.length) {
     unscopedContents.push(unscopedStyleText);
@@ -83,20 +119,15 @@ export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifest
 
   const unscopedFileName = getBundleFileName(bundleId, false);
 
-  setBundleModeIds(manifestBundle.moduleFiles, modeName, bundleId);
+  setBundleModeIds(manifestBundle.moduleFiles, modeName, bundleId, sourceTarget);
 
-  const unscopedWwwBuildPath = normalizePath(config.sys.path.join(
-    config.buildDir,
-    getAppFileName(config),
-    unscopedFileName
-  ));
+  const unscopedWwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), unscopedFileName);
 
   // use wwwFilePath as the cache key
   if (ctx.compiledFileCache[unscopedWwwBuildPath] === unscopedContent) {
     // unchanged, no need to resave
     return;
   }
-
   // cache for later
   ctx.compiledFileCache[unscopedWwwBuildPath] = unscopedContent;
 
@@ -107,11 +138,12 @@ export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifest
 
   if (config.generateDistribution) {
     // write the unscoped css to the dist build
-    const unscopedDistPath = normalizePath(config.sys.path.join(
+    const unscopedDistPath = pathJoin(
+      config,
       config.distDir,
       getAppFileName(config),
       unscopedFileName
-    ));
+    );
     ctx.filesToWrite[unscopedDistPath] = unscopedContent;
   }
 
@@ -119,7 +151,7 @@ export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifest
     const scopedStyleText = formatLoadStyles(config.namespace, bundleStyles, true);
 
     const scopedContents = [
-      generatePreamble(config)
+      generatePreamble(config, sourceTarget)
     ];
 
     if (scopedStyleText.length) {
@@ -133,34 +165,41 @@ export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifest
 
     if (config.generateWWW) {
       // write the scoped css to the www build
-      const scopedWwwPath = normalizePath(config.sys.path.join(
-        config.buildDir,
-        getAppFileName(config),
+      const scopedWwwPath = pathJoin(config,
+        getAppWWWBuildDir(config),
         scopedFileName
-      ));
+      );
       ctx.filesToWrite[scopedWwwPath] = scopedFileContent;
     }
 
     if (config.generateDistribution) {
       // write the scoped css to the dist build
-      const scopedDistPath = normalizePath(config.sys.path.join(
-        config.distDir,
-        getAppFileName(config),
-        scopedFileName
-      ));
+      const scopedDistPath = pathJoin(config, scopedFileName);
       ctx.filesToWrite[scopedDistPath] = scopedFileContent;
     }
   }
 }
 
 
-export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bundleId: string) {
+export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bundleId: string, sourceTarget: SourceTarget) {
   moduleFiles.forEach(moduleFile => {
     if (modeName) {
-      moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+      moduleFile.cmpMeta.bundleIds[modeName] = moduleFile.cmpMeta.bundleIds[modeName] || {};
+      if (sourceTarget === 'es5') {
+        moduleFile.cmpMeta.bundleIds[modeName].es5 = bundleId;
+      } else {
+        moduleFile.cmpMeta.bundleIds[modeName].es2015 = bundleId;
+      }
+
     } else {
-      moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE] = bundleId;
+      moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE] = moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || {};
+      if (sourceTarget === 'es5') {
+        moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es5 = bundleId;
+      } else {
+        moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es2015 = bundleId;
+      }
     }
+
   });
 }
 
@@ -185,11 +224,6 @@ export function generateComponentRegistry(manifestBundles: ManifestBundle[]) {
   });
 
   return registry;
-}
-
-
-export function getBundleFileName(bundleId: string, scoped: boolean) {
-  return `${bundleId}${scoped ? '.sc' : ''}.js`;
 }
 
 

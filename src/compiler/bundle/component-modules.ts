@@ -1,12 +1,12 @@
 import { BuildConfig, BuildContext, FilesMap, ManifestBundle, ModuleFile } from '../../util/interfaces';
-import { hasError, normalizePath } from '../util';
 import { buildExpressionReplacer } from '../build/replacer';
-import { dashToPascalCase } from '../../util/helpers';
-import localResolution from './rollup-plugins/local-resolution';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
+import { dashToPascalCase } from '../../util/helpers';
+import { hasError, normalizePath } from '../util';
+import localResolution from './rollup-plugins/local-resolution';
 
 
-export function generateComponentModules(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
+export function generateComponentModules(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle): Promise<any> {
   const bundleCacheKey = getModuleBundleCacheKey(manifestBundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta));
 
   if (canSkipBuild(config, ctx, manifestBundle.moduleFiles, bundleCacheKey)) {
@@ -20,7 +20,6 @@ export function generateComponentModules(config: BuildConfig, ctx: BuildContext,
   // returned value is array of strings so it needs to be joined here
   const moduleBundleInput = createInMemoryBundleInput(manifestBundle.moduleFiles).join('\n');
 
-  // start the bundler on our temporary file
   return bundleComponents(config, ctx, manifestBundle, moduleBundleInput, bundleCacheKey);
 }
 
@@ -57,21 +56,28 @@ function bundleComponents(config: BuildConfig, ctx: BuildContext, manifestBundle
       format: 'es'
 
     }).then(results => {
-      // module bundling finished, assign its content to the user's bundle
-      // wrap our component code with our own iife
-      manifestBundle.compiledModuleText = wrapComponentImports(results.code.trim());
 
-      // replace build time expressions, like process.env.NODE_ENV === 'production'
-      // with a hard coded boolean
-      manifestBundle.compiledModuleText = buildExpressionReplacer(config, manifestBundle.compiledModuleText);
+      bundleComponentsResults(config, ctx, manifestBundle, bundleCacheKey, results.code.trim());
 
-      // cache for later
-      ctx.moduleBundleOutputs[bundleCacheKey] = manifestBundle.compiledModuleText;
-
-      // keep track of module bundling for testing
-      ctx.moduleBundleCount++;
     });
   });
+}
+
+
+function bundleComponentsResults(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, bundleCacheKey: string, resultsCode: string) {
+  // module bundling finished, assign its content to the user's bundle
+  // wrap our component code with our own iife
+  manifestBundle.compiledModuleText = wrapComponentImports(resultsCode);
+
+  // replace build time expressions, like process.env.NODE_ENV === 'production'
+  // with a hard coded boolean
+  manifestBundle.compiledModuleText = buildExpressionReplacer(config, manifestBundle.compiledModuleText);
+
+  // cache for later
+  ctx.moduleBundleOutputs[bundleCacheKey] = manifestBundle.compiledModuleText;
+
+  // keep track of module bundling for testing
+  ctx.moduleBundleCount++;
 }
 
 
@@ -165,6 +171,7 @@ export function transpiledInMemoryPlugin(config: BuildConfig, ctx: BuildContext)
       ctx.moduleFiles[sourcePath] = {
         jsFilePath: sourcePath,
       };
+
       ctx.jsFiles[sourcePath] = jsText;
 
       return jsText;

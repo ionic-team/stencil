@@ -18,7 +18,7 @@ export function parseComponentLoaders(cmpRegistryData: LoadComponentRegistry, re
   };
 
   // map of the modes w/ bundle id and style data
-  cmpMeta.bundleIds = cmpRegistryData[1];
+  cmpMeta.bundleIds = cmpRegistryData[1] as any;
 
   // parse member meta
   // this data only includes props that are attributes that need to be observed

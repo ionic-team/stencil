@@ -1,8 +1,8 @@
-import { generateLoader, injectAppIntoLoader } from '../app-loader';
+import { AppRegistry, BuildConfig, BuildContext, LoadComponentRegistry } from '../../../util/interfaces';
 import { getAppPublicPath } from '../app-core';
-import { BuildConfig, LoadComponentRegistry } from '../../../util/interfaces';
-import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { generateLoader, injectAppIntoLoader } from '../app-loader';
 import { generatePreamble } from '../../util';
+import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 
 
 describe('build-project-files', () => {
@@ -80,8 +80,8 @@ describe('build-project-files', () => {
     componentRegistry?: Array<LoadComponentRegistry>
   }): string {
     let p = params || {};
-    config.namespace = p.namespace || 'MyApp';
-    config.publicPath = p.publicPath || 'build/';
+    config.namespace = 'MyApp';
+    config.publicPath = 'build/';
     return injectAppIntoLoader(
       config,
       p.appCoreFileName || 'myapp.core.js',
@@ -91,21 +91,29 @@ describe('build-project-files', () => {
     );
   }
 
-  function callGenerateLoader(params?: {
+  async function callGenerateLoader(params?: {
     namespace?: string,
     publicPath?: string,
     appCoreFileName?: string,
     appCorePolyfillFileName?: string,
     componentRegistry?: Array<LoadComponentRegistry>
-  }): Promise<string> {
-    let p = params || {};
-    config.namespace = p.namespace || 'MyApp';
-    config.publicPath = p.publicPath || 'build/';
-    return generateLoader(
+  }) {
+    config.namespace = 'MyApp';
+    config.publicPath = 'build/';
+
+    let ctx: BuildContext = { appFiles: {} };
+
+    let appRegistry: AppRegistry = {
+      core: 'myapp.core.js',
+      corePolyfilled: 'myapp.core.pf.js',
+      components: [],
+      namespace: config.namespace
+    };
+
+    return await generateLoader(
       config,
-      p.appCoreFileName || 'myapp.core.js',
-      p.appCorePolyfillFileName || 'myapp.core.pf.js',
-      p.componentRegistry || []
+      ctx,
+      appRegistry
     );
   }
 
