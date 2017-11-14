@@ -10,22 +10,19 @@ describe('cli', () => {
   describe('getConfigFilePath', () => {
 
     it('should get absolute config path from argv', () => {
-      const argv: CliArgv = { config: '/my-absolute-path/some.config.js' };
-      const configPath = getConfigFilePath(process, argv);
+      const configPath = getConfigFilePath(process, '/my-absolute-path/some.config.js');
       expect(configPath).toBe('/my-absolute-path/some.config.js');
     });
 
     it('should get cwd relative config path from argv', () => {
-      const argv: CliArgv = { config: 'some.config.js' };
       process.cwd = () => '/my-cwd';
-      const configPath = getConfigFilePath(process, argv);
+      const configPath = getConfigFilePath(process, 'some.config.js');
       expect(configPath).toBe('/my-cwd/some.config.js');
     });
 
     it('should default config path from process.cwd()', () => {
-      const argv: CliArgv = {};
       process.cwd = () => '/my-cwd';
-      const configPath = getConfigFilePath(process, argv);
+      const configPath = getConfigFilePath(process, '/my-cwd');
       expect(configPath).toBe('/my-cwd');
     });
 
@@ -165,6 +162,10 @@ describe('cli', () => {
       process.argv[3] = '/my-config.js';
       argv = parseArgv(process);
       expect(argv.config).toBe('/my-config.js');
+
+      process.argv[2] = '--es5';
+      argv = parseArgv(process);
+      expect(argv.es5).toBe(true);
     });
 
   });

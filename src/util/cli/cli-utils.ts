@@ -48,19 +48,23 @@ export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
     // so force it generate with our defaults
     config.serviceWorker = true;
   }
+
+  if (argv.es5) {
+    config.es5Fallback = true;
+  }
 }
 
 
-export function getConfigFilePath(process: NodeJS.Process, argv: CliArgv) {
-  if (argv.config) {
-    if (!isAbsolute(argv.config)) {
+export function getConfigFilePath(process: NodeJS.Process, configArg: string) {
+  if (configArg) {
+    if (!isAbsolute(configArg)) {
       // passed in a custom stencil config location
       // but it's relative, so prefix the cwd
-      return normalizePath(join(process.cwd(), argv.config));
+      return normalizePath(join(process.cwd(), configArg));
     }
 
     // config path already an absolute path, we're good here
-    return normalizePath(argv.config);
+    return normalizePath(configArg);
   }
 
   // nothing was passed in, use the current working directory
@@ -136,15 +140,16 @@ export function parseArgv(process: NodeJS.Process) {
 
 const ARG_OPTS: any = {
   boolean: [
-    'prod',
-    'dev',
-    'watch',
     'debug',
-    'prerender',
+    'dev',
+    'es5',
     'help',
-    'version',
+    'prod',
+    'prerender',
     'service-worker',
-    'skip-node-check'
+    'skip-node-check',
+    'version',
+    'watch'
   ],
   string: [
     'config',
@@ -162,6 +167,7 @@ export interface CliArgv {
   config?: string;
   debug?: boolean;
   dev?: boolean;
+  es5?: boolean;
   help?: boolean;
   logLevel?: string;
   prerender?: boolean;

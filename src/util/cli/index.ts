@@ -41,7 +41,7 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
     return process.exit(0);
   }
 
-  const configPath = getConfigFilePath(process, argv);
+  const configPath = getConfigFilePath(process, argv.config);
   const config = loadConfigFile(process, configPath, logger);
   if (!config) {
     logger.warn(`"stencil init" can be used to generate the "stencil.config.js" file.`);
