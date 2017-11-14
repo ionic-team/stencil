@@ -25,7 +25,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
   const now = () => win.performance.now();
-  const raf = window.requestAnimationFrame;
+  const raf = (cb: FrameRequestCallback) => window.requestAnimationFrame(cb);
 
   if (Build.listener) {
     Context.addListener = (elm, eventName, cb, opts) => addListener(plt, elm, eventName, cb, opts && opts.capture, opts && opts.passive);
