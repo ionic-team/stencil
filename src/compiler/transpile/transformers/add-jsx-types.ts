@@ -7,7 +7,10 @@ import * as ts from 'typescript';
 const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
 
 export interface ImportData {
-  [key: string]: string[];
+  [key: string]: Array<{
+    localName: string;
+    importName?: string;
+  }>;
 }
 
 /**
@@ -19,7 +22,19 @@ export interface ImportData {
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: ComponentMeta, filePath: string, config: BuildConfig) {
+export function updateReferenceTypeImports(importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: ComponentMeta, filePath: string, config: BuildConfig) {
+
+  function getIncrememntTypeName(name: string): string {
+    console.log(allTypes[name]);
+    if (allTypes[name] == null) {
+      allTypes[name] = 1;
+      return name;
+    }
+
+    allTypes[name] += 1;
+    return `${name}${allTypes[name]}`;
+  }
+
   return Object.keys(cmpMeta.membersMeta)
   .filter((memberName) => {
     const member: MemberMeta = cmpMeta.membersMeta[memberName];
@@ -55,9 +70,17 @@ export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: C
       }
 
       obj[importFileLocation] = obj[importFileLocation] || [];
-      if (obj[importFileLocation].indexOf(typeName) === -1) {
-        obj[importFileLocation].push(typeName);
+
+      // If this file already has a reference to this type move on
+      if (obj[importFileLocation].find(df => df.localName === typeName)) {
+        return;
       }
+
+      const newTypeName = getIncrememntTypeName(typeName);
+      obj[importFileLocation].push({
+        localName: typeName,
+        importName: newTypeName
+      });
     });
 
     return obj;
