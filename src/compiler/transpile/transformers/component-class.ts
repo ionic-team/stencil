@@ -20,7 +20,7 @@ export function componentModuleFileClass(config: BuildConfig, fileMeta: ModuleFi
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration, sourceFile);
+          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration, sourceFile, transformContext);
 
         default:
           return ts.visitEachChild(node, (node) => {
@@ -45,7 +45,7 @@ export function componentTsFileClass(config: BuildConfig, moduleFiles: ModuleFil
       switch (node.kind) {
 
         case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration, sourceFile);
+          return visitClass(config, fileMeta, diagnostics, node as ts.ClassDeclaration, sourceFile, transformContext);
 
         default:
           return ts.visitEachChild(node, (node) => {
@@ -69,7 +69,7 @@ export function componentTsFileClass(config: BuildConfig, moduleFiles: ModuleFil
 
 
 
-function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
+function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, transformContext: ts.TransformationContext) {
   const cmpMeta = getComponentDecoratorData(config, moduleFile, diagnostics, classNode);
 
   if (!cmpMeta) {
@@ -92,7 +92,7 @@ function visitClass(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Di
       ...getElementDecoratorMeta(classNode),
       ...getMethodDecoratorMeta(classNode),
       ...getStateDecoratorMeta(classNode),
-      ...getPropDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode, sourceFile)
+      ...getPropDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode, sourceFile, transformContext)
     },
     eventsMeta: getEventDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),
     listenersMeta: getListenDecoratorMeta(moduleFile.tsFilePath, diagnostics, classNode),

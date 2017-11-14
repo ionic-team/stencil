@@ -124,13 +124,18 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, opti
   const typeImportString = Object.keys(typeImportData).reduce((finalString: string, filePath: string) => {
 
     const typeData = typeImportData[filePath];
-    const importFilePath = normalizePath(
-      config.sys.path.relative(options.outDir, filePath)
-    );
+    let importFilePath: string;
+    if (filePath.startsWith('.') || filePath.startsWith('/')) {
+      importFilePath = './' + normalizePath(
+        config.sys.path.relative(options.outDir, filePath)
+      );
+    } else {
+      importFilePath = filePath;
+    }
     finalString +=
 `import {
 ${typeData.map(td => `  ${td},`).join('\n')}
-} from './${importFilePath}';\n`;
+} from '${importFilePath}';\n`;
 
     return finalString;
   }, '');

@@ -1,20 +1,10 @@
 import { catchError } from '../../util';
-import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo } from '../../../util/interfaces';
+import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo, AttributeTypeReference } from '../../../util/interfaces';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
+import { isTypeReferenceNode } from 'typescript';
 
-const DEFINED_TYPE_REFERENCES = [
-  'Array',
-  'Date',
-  'Function',
-  'Number',
-  'Object',
-  'ReadonlyArray',
-  'RegExp',
-  'String'
-];
-
-export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): MembersMeta {
+export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, transformContext: ts.TransformationContext): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   return decoratedMembers
@@ -52,31 +42,26 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
       } else {
         let attribType: AttributeTypeInfo;
-        let typeWarning: Diagnostic;
 
         // If the @Prop() attribute does not have a defined type then infer it
         if (!prop.type) {
           let attribTypeText = inferPropType(prop.initializer);
+
           if (!attribTypeText) {
             attribTypeText = 'any';
-            typeWarning = {
+            diagnostics.push({
               level: 'warn',
               type: 'build',
               header: 'Prop type provided is not supported, defaulting to any',
               messageText: `'${prop.getFullText()}' from ${tsFilePath}`,
               absFilePath: tsFilePath
-            };
+            });
           }
           attribType = {
             text: attribTypeText,
-            isReferencedType: false
           };
         } else {
-          [ attribType, typeWarning] = checkType(prop.type, sourceFile, tsFilePath);
-        }
-
-        if (typeWarning) {
-          diagnostics.push(typeWarning);
+          attribType = getAttributeTypeInfo(prop.type, sourceFile, transformContext);
         }
 
         if (propOptions && typeof propOptions.state === 'boolean') {
@@ -111,27 +96,69 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
 
 
-function checkType(type: ts.TypeNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
-  const text = type.getFullText().trim();
-  const isReferencedType = (ts.isTypeReferenceNode(type) && DEFINED_TYPE_REFERENCES.indexOf(text) === -1);
+function getAttributeTypeInfo(type: ts.TypeNode, sourceFile: ts.SourceFile, transformContext: ts.TransformationContext): AttributeTypeInfo {
+  const typeInfo: AttributeTypeInfo = {
+    text: type.getFullText().trim()
+  };
+  const typeReferences = getAllTypeReferences(type, transformContext)
+    .reduce((allReferences, rt)  => {
+      allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
+      return allReferences;
+    }, {} as { [key: string]: AttributeTypeReference});
 
-  if (isReferencedType) {
-    return checkTypeRefencedNode(<ts.TypeReferenceNode>type, sourceFile, tsFilePath);
+  if (Object.keys(typeReferences).length > 0) {
+    typeInfo.typeReferences = typeReferences;
   }
-
-  return [
-    {
-      text,
-      isReferencedType
-    },
-    undefined
-  ];
+  return typeInfo;
 }
 
-function checkTypeRefencedNode(type: ts.TypeReferenceNode, sourceFile: ts.SourceFile, tsFilePath: string): [ AttributeTypeInfo, Diagnostic | undefined ] {
-  let typeName = type.typeName.getText();
+function getAllTypeReferences(node: ts.TypeNode, transformContext: ts.TransformationContext): string[] {
+  const referencedTypes: string[] = [];
 
-  // Loop through all top level exports to find if any reference to the type
+  function visit(node: ts.Node): ts.VisitResult<ts.Node> {
+    switch (node.kind) {
+    case ts.SyntaxKind.TypeReference:
+      referencedTypes.push((<ts.TypeReferenceNode>node).typeName.getText().trim());
+      if ((<ts.TypeReferenceNode>node).typeArguments) {
+        (<ts.TypeReferenceNode>node).typeArguments
+          .filter(ta => isTypeReferenceNode(ta))
+          .forEach(tr => referencedTypes.push((<ts.TypeReferenceNode>tr).typeName.getText().trim()));
+      }
+    default:
+      return ts.visitEachChild(node, (node) => {
+        return visit(node);
+      }, transformContext);
+    }
+  }
+
+  visit(node);
+
+  return referencedTypes;
+}
+
+function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): AttributeTypeReference {
+
+  // Loop through all top level imports to find any reference to the type for 'import' reference location
+  const importTypeDeclaration = sourceFile.statements.find(st => {
+    const statement = ts.isImportDeclaration(st) &&
+      ts.isImportClause(st.importClause) &&
+      st.importClause.namedBindings &&  ts.isNamedImports(st.importClause.namedBindings) &&
+      Array.isArray(st.importClause.namedBindings.elements) &&
+      st.importClause.namedBindings.elements.find(nbe => nbe.name.getText() === typeName);
+    if (!statement) {
+      return false;
+    }
+    return true;
+  });
+
+  if (importTypeDeclaration) {
+    return {
+      referenceLocation: 'import',
+      importReferenceLocation: (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text
+    };
+  }
+
+  // Loop through all top level exports to find if any reference to the type for 'local' reference location
   const isExported = sourceFile.statements.some(st => {
     // Is the interface defined in the file and exported
     const isInterfaceDeclarationExported = ((ts.isInterfaceDeclaration(st) &&
@@ -148,52 +175,16 @@ function checkTypeRefencedNode(type: ts.TypeReferenceNode, sourceFile: ts.Source
   });
 
   if (isExported) {
-    return [
-      {
-        text: typeName,
-        isReferencedType: true,
-      },
-      undefined
-    ];
+    return {
+      referenceLocation: 'local'
+    };
   }
 
-  // Loop through all top level imports to find any reference to the type
-  const importTypeDeclaration = sourceFile.statements.find(st => {
-    const statement = ts.isImportDeclaration(st) &&
-      ts.isImportClause(st.importClause) &&
-      st.importClause.namedBindings &&  ts.isNamedImports(st.importClause.namedBindings) &&
-      Array.isArray(st.importClause.namedBindings.elements) &&
-      st.importClause.namedBindings.elements.find(nbe => nbe.name.getText() === typeName);
-    if (!statement) {
-      return false;
-    }
-    return true;
-  });
 
-  if (importTypeDeclaration) {
-    return [
-      {
-        text: typeName,
-        isReferencedType: true,
-        importedFrom: (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text
-      },
-      undefined
-    ];
-  }
-
-  return [
-    {
-      text: 'any',
-      isReferencedType: false,
-    },
-    {
-      level: 'warn',
-      type: 'build',
-      header: 'Prop has referenced interface that is not exported, defaulting type to any',
-      messageText: `Interface '${typeName}' must be exported from ${tsFilePath}`,
-      absFilePath: tsFilePath
-    }
-  ];
+  // This is most likely a global type, if it is a local that is not exported then typescript will inform the dev
+  return {
+    referenceLocation: 'global',
+  };
 }
 
 function inferPropType(expression: ts.Expression | undefined) {

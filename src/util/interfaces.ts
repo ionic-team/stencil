@@ -674,10 +674,16 @@ export interface MembersMeta {
   [memberName: string]: MemberMeta;
 }
 
+export interface AttributeTypeReference {
+  referenceLocation: 'local' | 'global' | 'import';
+  importReferenceLocation?: string;
+}
+
 export interface AttributeTypeInfo {
   text: string;
-  isReferencedType: boolean;
-  importedFrom?: string;
+  typeReferences?: {
+    [key: string]: AttributeTypeReference;
+  };
 }
 
 export interface MemberMeta {

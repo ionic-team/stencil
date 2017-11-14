@@ -25,29 +25,40 @@ export function updateReferenceTypeImports(importDataObj: ImportData, cmpMeta: C
     const member: MemberMeta = cmpMeta.membersMeta[memberName];
 
     return METADATA_MEMBERS_TYPED.indexOf(member.memberType) !== -1 &&
-      member.attribType.isReferencedType;
+      member.attribType.typeReferences;
   })
   .reduce((obj, memberName) => {
     const member: MemberMeta = cmpMeta.membersMeta[memberName];
-    let importFileLocation = member.attribType.importedFrom;
+    Object.keys(member.attribType.typeReferences).forEach(typeName => {
+      var type = member.attribType.typeReferences[typeName];
+      let importFileLocation: string;
 
-    if (!importFileLocation) {
-      importFileLocation = filePath;
-    }
+      // If global then there is no import statement needed
+      if (type.referenceLocation === 'global') {
+        return;
 
-    // If this is a relative path make it absolute
-    if (importFileLocation.startsWith('.')) {
-      importFileLocation = normalizePath(
-        config.sys.path.resolve(
-          config.sys.path.dirname(filePath),
-          importFileLocation)
-      );
-    }
+      // If local then import location is the current file
+      } else if (type.referenceLocation === 'local') {
+        importFileLocation = filePath;
 
-    obj[importFileLocation] = obj[importFileLocation] || [];
-    if (obj[importFileLocation].indexOf(member.attribType.text) === -1) {
-      obj[importFileLocation].push(member.attribType.text);
-    }
+      } else if (type.referenceLocation === 'import') {
+        importFileLocation = type.importReferenceLocation;
+      }
+
+      // If this is a relative path make it absolute
+      if (importFileLocation.startsWith('.')) {
+        importFileLocation = normalizePath(
+          config.sys.path.resolve(
+            config.sys.path.dirname(filePath),
+            importFileLocation)
+        );
+      }
+
+      obj[importFileLocation] = obj[importFileLocation] || [];
+      if (obj[importFileLocation].indexOf(typeName) === -1) {
+        obj[importFileLocation].push(typeName);
+      }
+    });
 
     return obj;
   }, importDataObj);
@@ -75,27 +86,27 @@ import {
 declare global {
   interface ${interfaceName} extends ${tagNameAsPascal}, HTMLElement {
   }
-  declare var ${interfaceName}: {
+  var ${interfaceName}: {
     prototype: ${interfaceName};
     new (): ${interfaceName};
   };
   interface HTMLElementTagNameMap {
-      "${tagName}": ${interfaceName};
+    "${tagName}": ${interfaceName};
   }
   interface ElementTagNameMap {
-      "${tagName}": ${interfaceName};
+    "${tagName}": ${interfaceName};
   }
   namespace JSX {
-      interface IntrinsicElements {
-          "${tagName}": JSXElements.${jsxInterfaceName};
-      }
+    interface IntrinsicElements {
+      "${tagName}": JSXElements.${jsxInterfaceName};
+    }
   }
   namespace JSXElements {
-      export interface ${jsxInterfaceName} extends HTMLAttributes {
-        ${Object.keys(interfaceOptions).map((key: string) => `
-          ${key}?: ${interfaceOptions[key]}`
-        )}
-      }
+    export interface ${jsxInterfaceName} extends HTMLAttributes {
+      ${Object.keys(interfaceOptions).map((key: string) => `
+        ${key}?: ${interfaceOptions[key]}`
+      )}
+    }
   }
 }
 `;

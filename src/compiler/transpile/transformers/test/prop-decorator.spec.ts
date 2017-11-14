@@ -14,7 +14,7 @@ function customJsxTransform(source): [MembersMeta, Diagnostic[]] {
       function visit(node: ts.Node): ts.VisitResult<ts.Node> {
         switch (node.kind) {
           case ts.SyntaxKind.ClassDeclaration:
-            return visitClass(node as ts.ClassDeclaration);
+            return visitClass(node as ts.ClassDeclaration, transformContext);
 
           default:
             return ts.visitEachChild(node, (node) => {
@@ -28,8 +28,8 @@ function customJsxTransform(source): [MembersMeta, Diagnostic[]] {
       };
     };
 
-    function visitClass(classNode: ts.ClassDeclaration) {
-      metadata = getPropDecoratorMeta('/tsfilepath.ts', diagnosticList, classNode, sourceFile);
+    function visitClass(classNode: ts.ClassDeclaration, transformContext) {
+      metadata = getPropDecoratorMeta('/tsfilepath.ts', diagnosticList, classNode, sourceFile, transformContext);
       return classNode;
     }
   }
@@ -105,7 +105,6 @@ describe('prop-decorator transform', () => {
         'attribName': 'thing',
         'attribType': {
           'text': 'boolean',
-          'isReferencedType': false
         },
         'memberType': MEMBER_TYPE.PropMutable,
         'propType': PROP_TYPE.Boolean
@@ -126,7 +125,6 @@ describe('prop-decorator transform', () => {
         'attribName': 'thing',
         'attribType': {
           'text': 'boolean',
-          'isReferencedType': false
         },
         'memberType': MEMBER_TYPE.PropMutable,
         'propType': PROP_TYPE.Boolean
@@ -148,7 +146,6 @@ describe('prop-decorator transform', () => {
         'attribName': 'color',
         'attribType': {
           'text': 'string',
-          'isReferencedType': false
         },
         'memberType': MEMBER_TYPE.Prop,
         'propType': PROP_TYPE.String
@@ -157,7 +154,6 @@ describe('prop-decorator transform', () => {
         'attribName': 'mode',
         'attribType': {
           'text': 'string',
-          'isReferencedType': false
         },
         'memberType': MEMBER_TYPE.Prop,
         'propType': PROP_TYPE.String
@@ -178,7 +174,6 @@ describe('prop-decorator transform', () => {
         'attribName': 'url',
         'attribType': {
           'text': 'any',
-          'isReferencedType': false
         },
         'memberType': MEMBER_TYPE.Prop,
         'propType': PROP_TYPE.Any
@@ -200,7 +195,6 @@ describe('prop-decorator transform', () => {
           'attribName': 'url',
           'attribType': {
             'text': 'string',
-            'isReferencedType': false
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.String
@@ -220,7 +214,6 @@ describe('prop-decorator transform', () => {
           'attribName': 'url',
           'attribType': {
             'text': 'string',
-            'isReferencedType': false
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.String
@@ -243,7 +236,6 @@ describe('prop-decorator transform', () => {
           'attribName': 'show',
           'attribType': {
             'text': 'boolean',
-            'isReferencedType': false
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Boolean
@@ -263,7 +255,6 @@ describe('prop-decorator transform', () => {
           'attribName': 'show',
           'attribType': {
             'text': 'boolean',
-            'isReferencedType': false
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Boolean
@@ -286,7 +277,6 @@ describe('prop-decorator transform', () => {
           'attribName': 'count',
           'attribType': {
             'text': 'number',
-            'isReferencedType': false
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Number
@@ -306,7 +296,6 @@ describe('prop-decorator transform', () => {
           'attribName': 'count',
           'attribType': {
             'text': 'number',
-            'isReferencedType': false
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Number
@@ -326,12 +315,11 @@ describe('prop-decorator transform', () => {
           'attribName': 'count',
           'attribType': {
             'text': '1 | 2',
-            'isReferencedType': false
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Any
         }
-      });
+      } as MembersMeta);
     });
   });
 
@@ -347,16 +335,15 @@ describe('prop-decorator transform', () => {
       'objectAnyThing': {
         'attribName': 'objectAnyThing',
         'attribType': {
-          'text': 'any',
-          'isReferencedType': false
+          'text': 'any'
         },
         'memberType': MEMBER_TYPE.Prop,
         'propType': PROP_TYPE.Any
       }
-    });
+    } as MembersMeta);
   });
 
-  describe('Reference type exports', () => {
+  describe('Reference type exports but is not exported', () => {
     it('@Prop() type defined and not exported', () => {
       const source = `
         interface Thing {
@@ -367,8 +354,21 @@ describe('prop-decorator transform', () => {
         }
       `;
       const [ metadata, diagnostics ] = customJsxTransform(source);
-      expect(diagnostics.length).toBe(1);
-      expect(diagnostics[0].header).toEqual('Prop has referenced interface that is not exported, defaulting type to any');
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'Thing',
+            'typeReferences': {
+              'Thing': {
+                'referenceLocation': 'global'
+              }
+            }
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      } as MembersMeta);
     });
 
     it('@Prop() type as a referenced interface that is exported', () => {
@@ -387,12 +387,16 @@ describe('prop-decorator transform', () => {
           'attribName': 'objectAnyThing',
           'attribType': {
             'text': 'Thing',
-            'isReferencedType': true
+            'typeReferences': {
+              'Thing': {
+                'referenceLocation': 'local'
+              }
+            }
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Any
         }
-      });
+      } as MembersMeta);
     });
     it('@Prop() type as a referenced interface that is not exported', () => {
       const source = `
@@ -411,12 +415,16 @@ describe('prop-decorator transform', () => {
           'attribName': 'objectAnyThing',
           'attribType': {
             'text': 'Thing',
-            'isReferencedType': true
+            'typeReferences': {
+              'Thing': {
+                'referenceLocation': 'local'
+              }
+            }
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Any
         }
-      });
+      } as MembersMeta);
     });
     it('@Prop() type as a referenced interface that is imported and exported', () => {
       const source = `
@@ -433,12 +441,17 @@ describe('prop-decorator transform', () => {
           'attribName': 'objectAnyThing',
           'attribType': {
             'text': 'Thing',
-            'isReferencedType': true
+            'typeReferences': {
+              'Thing': {
+                'referenceLocation': 'import',
+                'importReferenceLocation': '../../interfaces'
+              }
+            }
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Any
         }
-      });
+      } as MembersMeta);
     });
     it('@Prop() type as a referenced interface that is imported and not exported', () => {
       const source = `
@@ -454,13 +467,17 @@ describe('prop-decorator transform', () => {
           'attribName': 'objectAnyThing',
           'attribType': {
             'text': 'Thing',
-            'isReferencedType': true,
-            'importedFrom': '../../interfaces'
+            'typeReferences': {
+              'Thing': {
+                'referenceLocation': 'import',
+                'importReferenceLocation': '../../interfaces'
+              }
+            }
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Any
         }
-      });
+      } as MembersMeta);
     });
     it('@Prop() type as a referenced interface that is imported and not exported', () => {
       const source = `
@@ -476,13 +493,102 @@ describe('prop-decorator transform', () => {
           'attribName': 'objectAnyThing',
           'attribType': {
             'text': 'Thing',
-            'isReferencedType': true,
-            'importedFrom': '@stencil/core'
+            'typeReferences': {
+              'Thing': {
+                'referenceLocation': 'import',
+                'importReferenceLocation': '@stencil/core'
+              }
+            }
           },
           'memberType': MEMBER_TYPE.Prop,
           'propType': PROP_TYPE.Any
         }
-      });
+      } as MembersMeta);
+    });
+    it('@Prop() type as a referenced interface that is in an array', () => {
+      const source = `
+        import { Thing } from '@stencil/core';
+        class Redirect {
+          @Prop() objectAnyThing: Thing[];
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'Thing[]',
+            'typeReferences': {
+              'Thing': {
+                'referenceLocation': 'import',
+                'importReferenceLocation': '@stencil/core'
+              }
+            }
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      } as MembersMeta);
+    });
+    it('@Prop() type as a referenced interface that is in an a union', () => {
+      const source = `
+        import { Thing, OtherThing } from '@stencil/core';
+        class Redirect {
+          @Prop() objectAnyThing: OtherThing | Thing[];
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': 'OtherThing | Thing[]',
+            'typeReferences': {
+              'OtherThing': {
+                'referenceLocation': 'import',
+                'importReferenceLocation': '@stencil/core'
+              },
+              'Thing': {
+                'referenceLocation': 'import',
+                'importReferenceLocation': '@stencil/core'
+              }
+            }
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      } as MembersMeta);
+    });
+    it('@Prop() type as a referenced interface that is in a function', () => {
+      const source = `
+        import { Thing, OtherThing } from '@stencil/core';
+        class Redirect {
+          @Prop() objectAnyThing: (_) => Promise<OtherThing>;
+        }
+      `;
+      const [ metadata, diagnostics ] = customJsxTransform(source);
+      expect(diagnostics.length).toBe(0);
+      expect(metadata).toEqual({
+        'objectAnyThing': {
+          'attribName': 'objectAnyThing',
+          'attribType': {
+            'text': '(_) => Promise<OtherThing>',
+            'typeReferences': {
+              'OtherThing': {
+                'referenceLocation': 'import',
+                'importReferenceLocation': '@stencil/core'
+              },
+              'Promise': {
+                'referenceLocation': 'global',
+              }
+            }
+          },
+          'memberType': MEMBER_TYPE.Prop,
+          'propType': PROP_TYPE.Any
+        }
+      } as MembersMeta);
     });
   });
 });
