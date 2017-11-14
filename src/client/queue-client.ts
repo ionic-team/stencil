@@ -1,9 +1,8 @@
-import { DomController, Now, QueueApi } from '../util/interfaces';
+import { Now, QueueApi, DomControllerCallback } from '../util/interfaces';
 import { PRIORITY } from '../util/constants';
 
 
-export function createQueueClient(domCtrl: DomController, now: Now, resolvePending?: boolean, rafPending?: boolean): QueueApi {
-  const raf = domCtrl.raf;
+export function createQueueClient(raf: DomControllerCallback, now: Now, resolvePending?: boolean, rafPending?: boolean): QueueApi {
   const highPromise = Promise.resolve();
   const highPriority: Function[] = [];
   const lowPriority: Function[] = [];
@@ -45,8 +44,8 @@ export function createQueueClient(domCtrl: DomController, now: Now, resolvePendi
 
     // always force a bunch of medium callbacks to run, but still have
     // a throttle on how many can run in a certain time
-    start = now();
-    while (lowPriority.length > 0 && (now() - start < 4)) {
+    start = 4 + now();
+    while (lowPriority.length > 0 && (now() < start)) {
       lowPriority.shift()();
     }
 

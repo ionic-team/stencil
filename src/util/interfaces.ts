@@ -6,7 +6,6 @@ import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_ME
 export interface CoreContext {
   addListener?: AddEventListener;
   attr?: number;
-  dom?: DomController;
   emit?: (elm: Element, eventName: string, data?: EventEmitterData) => void;
   enableListener?: EventListenerEnable;
   eventNameFn?: (eventName: string) => string;
@@ -58,12 +57,6 @@ export interface Now {
   (): number;
 }
 
-
-export interface DomController {
-  read: DomControllerCallback;
-  write: DomControllerCallback;
-  raf: DomControllerCallback;
-}
 
 export interface RafCallback {
   (timeStamp?: number): void;

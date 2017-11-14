@@ -2,7 +2,6 @@ import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry,
   CoreContext, Diagnostic, DomApi, FilesMap, HostElement,
   BundleCallbacks, PlatformApi, AppGlobal } from '../util/interfaces';
-import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
@@ -37,7 +36,6 @@ export function createPlatformServer(
   // initialize Core global object
   const Context: CoreContext = {};
   Context.addListener = noop;
-  Context.dom = createDomControllerServer();
   Context.enableListener = noop;
   Context.emit = noop;
   Context.isClient = false;

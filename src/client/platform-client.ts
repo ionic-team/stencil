@@ -3,7 +3,6 @@ import { AppGlobal, BundleCallbacks, ComponentMeta, ComponentRegistry, CoreConte
   EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { Build } from '../util/build-conditionals';
-import { createDomControllerClient } from './dom-controller-client';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createRendererPatch } from '../core/renderer/patch';
 import { createVNodesFromSsr } from '../core/renderer/ssr';
@@ -26,9 +25,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
   const now = () => win.performance.now();
-
-  // initialize Core global object
-  Context.dom = createDomControllerClient(win, now);
+  const raf = window.requestAnimationFrame;
 
   if (Build.listener) {
     Context.addListener = (elm, eventName, cb, opts) => addListener(plt, elm, eventName, cb, opts && opts.capture, opts && opts.passive);
@@ -60,7 +57,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     loadBundle,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
-    queue: createQueueClient(Context.dom, now),
+    queue: createQueueClient(raf, now),
     registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoaders(data, registry))
   };
 
