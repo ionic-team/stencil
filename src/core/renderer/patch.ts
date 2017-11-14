@@ -31,9 +31,9 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       });
     }
 
-    if (vnode.vtag === 'slot' && !useNativeShadowDom) {
+    if (Build.slot && vnode.vtag === 'slot' && !useNativeShadowDom) {
 
-      if (Build.customSlot && hostContentNodes) {
+      if (hostContentNodes) {
         if (scopeId) {
           domApi.$setAttribute(parentElm, scopeId + '-slot', '');
         }
@@ -95,7 +95,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       // add css classes, attrs, props, listeners, etc.
       updateElement(plt, null, vnode, isSvgMode);
 
-      if (Build.scopedCss && scopeId !== null && elm._scopeId !== scopeId) {
+      if (scopeId !== null && elm._scopeId !== scopeId) {
         // if there is a scopeId and this is the initial render
         // then let's add the scopeId as an attribute
         domApi.$setAttribute(elm, (elm._scopeId = scopeId), '');
@@ -327,7 +327,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         removeVnodes(elm, oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (Build.customSlot && elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
+    } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
       // this element has slotted content
       let parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
       domApi.$setTextContent(parentElement, newVNode.vtext);
@@ -359,9 +359,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       ssrId = ssrPatchId;
     }
 
-    if (Build.scopedCss || Build.shadowDom) {
-      scopeId = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
-    }
+    scopeId = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
 
     if (Build.shadowDom) {
       // use native shadow dom only if the component wants to use it
@@ -377,7 +375,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         // let's create that shadow root
         oldVNode.elm = domApi.$attachShadow(oldVNode.elm, { mode: 'open' });
 
-      } else if (Build.scopedCss && scopeId) {
+      } else if (scopeId) {
         // this host element should use scoped css
         // add the scope attribute to the host
         domApi.$setAttribute(oldVNode.elm, scopeId + '-host', '');

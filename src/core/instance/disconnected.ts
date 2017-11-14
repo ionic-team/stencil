@@ -27,7 +27,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // this will also set _listeners to null if there are any
     detachListeners(elm);
 
-    if (Build.customSlot && elm._hostContentNodes) {
+    if (Build.slot && elm._hostContentNodes) {
       // overreacting here just to reduce any memory leak issues
       elm._hostContentNodes = elm._hostContentNodes.defaultSlot = elm._hostContentNodes.namedSlots = null;
     }

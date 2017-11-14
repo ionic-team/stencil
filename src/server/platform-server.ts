@@ -6,7 +6,7 @@ import { createDomControllerServer } from './dom-controller-server';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
-import { getAppFileName } from '../compiler/app/generate-app-files';
+import { getAppFileName } from '../compiler/app/app-file-naming';
 import { getJsFile, normalizePath } from '../compiler/util';
 import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';
@@ -197,7 +197,7 @@ export function createPlatformServer(
       return;
     }
 
-    const bundleId: string = cmpMeta.bundleIds[elm.mode] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds as any);
+    const bundleId: string = (cmpMeta.bundleIds[elm.mode] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds as any)).es2015;
 
     if (loadedBundles[bundleId]) {
       // sweet, we've already loaded this bundle

@@ -1,7 +1,7 @@
 import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults, LoadComponentRegistry } from '../util/interfaces';
 import { buildError, getBuildContext } from '../compiler/util';
 import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
-import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/generate-app-files';
+import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentLoaders } from '../util/data-parse';
 import { validateBuildConfig } from '../util/validate-config';

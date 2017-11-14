@@ -33,7 +33,7 @@ import { LoadComponentRegistry } from '../util/interfaces';
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = document.createElement('script');
-  x.src = publicPath + ((window.customElements && window.fetch) ? appCore : appCorePolyfilled);
+  x.src = publicPath + (('noModule' in x && window.customElements && window.fetch) ? appCore : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
   x.setAttribute('data-core', appCore);
   document.head.appendChild(x);
