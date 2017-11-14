@@ -6,6 +6,35 @@ import * as path from 'path';
 
 describe('validation', () => {
 
+  describe('es5 fallback', () => {
+
+    it('set es5Fallback false', () => {
+      config.es5Fallback = false;
+      validateBuildConfig(config);
+      expect(config.es5Fallback).toBe(false);
+    });
+
+    it('set es5Fallback true', () => {
+      config.es5Fallback = true;
+      validateBuildConfig(config);
+      expect(config.es5Fallback).toBe(true);
+    });
+
+    it('prod mode default to both es2015 and es5', () => {
+      config.devMode = false;
+      validateBuildConfig(config);
+      expect(config.es5Fallback).toBe(true);
+    });
+
+    it('dev mode default to only es2015', () => {
+      config.devMode = true;
+      validateBuildConfig(config);
+      expect(config.es5Fallback).toBe(false);
+    });
+
+  });
+
+
   describe('hydrate css', () => {
 
     it('should set hydratedCssClass', () => {
