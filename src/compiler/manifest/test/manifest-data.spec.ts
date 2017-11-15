@@ -1,6 +1,6 @@
 import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../testing/mocks';
-import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal } from '../manifest-data';
+import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal, serializeAppManifest } from '../manifest-data';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT_META } from '../../../util/constants';
 
 
@@ -13,6 +13,30 @@ describe('manifest-data serialize/parse', () => {
     const manifest: Manifest = {};
     parseGlobal(config, manifestDir, manifestData, manifest);
     expect(manifest.global.jsFilePath).toBe('/User/me/myapp/dist/collection/global/my-global.js');
+  });
+
+  it('serializeAppManifest', () => {
+    config.bundles = [
+      { components: ['cmp-a', 'cmp-b'] },
+      { components: ['cmp-c'] }
+    ];
+    manifest.bundles = [
+      { components: ['cmp-b', 'cmp-a'] },
+      { components: ['cmp-d'] },
+      { components: ['cmp-c'] }
+    ];
+    manifest.modulesFiles = [moduleFile];
+    const outManifest = serializeAppManifest(config, manifestDir, manifest);
+
+    expect(outManifest.bundles).toEqual([
+      { components: ['cmp-a', 'cmp-b'] },
+      { components: ['cmp-c'] },
+      { components: ['cmp-d'] }
+    ]);
+    expect(outManifest.components).toHaveLength(1);
+    expect(outManifest.compiler.name).toEqual('test');
+    expect(outManifest.compiler.version).toEqual('test');
+    expect(outManifest.compiler.typescriptVersion).toEqual('test');
   });
 
   it('serializeAppGlobal', () => {
@@ -42,7 +66,8 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('serializeBundles', () => {
-    config.bundles = [
+    const manifest: Manifest = {};
+    manifest.bundles = [
       { components: ['cmp-a', 'cmp-b'] },
       { components: ['cmp-c'] }
     ];
@@ -50,7 +75,7 @@ describe('manifest-data serialize/parse', () => {
     const manifestData: ManifestData = {
       bundles: []
     };
-    serializeBundles(config, manifestData);
+    serializeBundles(manifestData, manifest);
     expect(manifestData.bundles[0].components[0]).toBe('cmp-a');
     expect(manifestData.bundles[0].components[1]).toBe('cmp-b');
     expect(manifestData.bundles[1].components[0]).toBe('cmp-c');

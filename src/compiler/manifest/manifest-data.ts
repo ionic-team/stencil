@@ -63,7 +63,7 @@ export function serializeAppManifest(config: BuildConfig, manifestDir: string, m
   });
 
   // add to the manifest what the bundles should be
-  serializeBundles(config, manifestData);
+  serializeBundles(manifestData, manifest);
 
   // set the global path if it exists
   serializeAppGlobal(config, manifestDir, manifestData, manifest);
@@ -852,14 +852,15 @@ function parseLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-export function serializeBundles(config: BuildConfig, manifestData: ManifestData) {
+export function serializeBundles(manifestData: ManifestData, manifest: Manifest) {
   manifestData.bundles = [];
 
-  if (invalidArrayData(config.bundles)) {
+  const bundles = manifest.bundles;
+  if (invalidArrayData(bundles)) {
     return;
   }
 
-  config.bundles.forEach(bundle => {
+  bundles.forEach(bundle => {
     if (invalidArrayData(bundle.components)) {
       return;
     }
@@ -875,7 +876,7 @@ export function serializeBundles(config: BuildConfig, manifestData: ManifestData
     manifestData.bundles.push(bundleData);
   });
 
-  config.bundles.sort((a, b) => {
+  manifestData.bundles.sort((a, b) => {
     if (a.components[0] < b.components[0]) return -1;
     if (a.components[0] > b.components[0]) return 1;
     return 0;

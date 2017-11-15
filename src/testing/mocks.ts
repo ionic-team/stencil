@@ -83,7 +83,8 @@ export function mockStencilSystem() {
 
     compiler: {
       name: 'test',
-      version: 'test'
+      version: 'test',
+      typescriptVersion: 'test'
     },
 
     copy: function mockCopyDir(src: string, dest: string) {
