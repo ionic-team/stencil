@@ -1,7 +1,7 @@
 import { LoadComponentRegistry } from '../util/interfaces';
 
 
-(function(window: any, document: Document, appNamespace?: string, publicPath?: string, appCore?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any, i?: any) {
+(function(window: any, document: Document, appNamespace?: string, publicPath?: string, appCore?: string, appCoreSsr?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any, i?: any) {
   'use strict';
 
   // create global namespace if it doesn't already exist
@@ -33,7 +33,7 @@ import { LoadComponentRegistry } from '../util/interfaces';
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = document.createElement('script');
-  x.src = publicPath + (('noModule' in x && window.customElements && window.fetch) ? appCore : appCorePolyfilled);
+  x.src = publicPath + (('noModule' in x && window.customElements && window.fetch) ? (document.documentElement.hasAttribute('data-ssr') ? appCoreSsr : appCore) : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
   x.setAttribute('data-core', appCore);
   document.head.appendChild(x);

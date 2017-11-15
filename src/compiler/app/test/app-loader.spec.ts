@@ -1,5 +1,4 @@
 import { AppRegistry, BuildConfig, BuildContext, LoadComponentRegistry } from '../../../util/interfaces';
-import { getAppPublicPath } from '../app-core';
 import { generateLoader, injectAppIntoLoader } from '../app-loader';
 import { generatePreamble } from '../../util';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
@@ -31,13 +30,13 @@ describe('build-project-files', () => {
       const projectLoader = callInjectAppIntoLoader({
         componentRegistry: [loadCmp]
       });
-      expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[["my-app",{"Mode1":"something","Mode2":"Something Else"},false,null,null,null,null,null]])`);
+      expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.ssr.js","myapp.core.pf.js",[["my-app",{"Mode1":"something","Mode2":"Something Else"},false,null,null,null,null,null]])`);
     });
 
     it('only replaces the magic string', () => {
       mockStencilContent = `(This is bogus text'__APP__'yeah, me too)`;
       const projectLoader = callInjectAppIntoLoader();
-      expect(projectLoader).toBe(`(This is bogus text"MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]yeah, me too)`);
+      expect(projectLoader).toBe(`(This is bogus text"MyApp","build/myapp/","myapp.core.js","myapp.core.ssr.js","myapp.core.pf.js",[]yeah, me too)`);
     });
 
   });
@@ -67,7 +66,7 @@ describe('build-project-files', () => {
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
       const res = await callGenerateLoader();
       let lines = res.split('\n');
-      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js",[]) yeah me too`);
+      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.ssr.js","myapp.core.pf.js",[]) yeah me too`);
     });
   });
 
@@ -85,6 +84,7 @@ describe('build-project-files', () => {
     return injectAppIntoLoader(
       config,
       p.appCoreFileName || 'myapp.core.js',
+      p.appCoreSsrFileName || 'myapp.core.ssr.js',
       p.appCorePolyfillFileName || 'myapp.core.pf.js',
       p.componentRegistry || [],
       mockStencilContent
@@ -94,8 +94,6 @@ describe('build-project-files', () => {
   async function callGenerateLoader(params?: {
     namespace?: string,
     publicPath?: string,
-    appCoreFileName?: string,
-    appCorePolyfillFileName?: string,
     componentRegistry?: Array<LoadComponentRegistry>
   }) {
     config.namespace = 'MyApp';
@@ -105,6 +103,7 @@ describe('build-project-files', () => {
 
     let appRegistry: AppRegistry = {
       core: 'myapp.core.js',
+      coreSsr: 'myapp.core.ssr.js',
       corePolyfilled: 'myapp.core.pf.js',
       components: [],
       namespace: config.namespace

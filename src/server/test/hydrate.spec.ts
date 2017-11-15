@@ -40,7 +40,7 @@ describe('hydrate', () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
-        <html dir="ltr">
+        <html dir="ltr" data-ssr="">
           <head></head>
           <body>
             <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
@@ -86,7 +86,7 @@ describe('hydrate', () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
-        <html dir="ltr">
+        <html dir="ltr" data-ssr="">
           <head></head>
           <body>
             <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
@@ -123,7 +123,7 @@ describe('hydrate', () => {
       expect(hydrateResults.diagnostics.length).toBe(0);
 
       expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
-        <html dir="ltr">
+        <html dir="ltr" data-ssr="">
           <head></head>
           <body>
             <ion-test data-ssrv="0" class="${config.hydratedCssClass}">

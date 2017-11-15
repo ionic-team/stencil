@@ -6,9 +6,7 @@ import { insertCanonicalLink } from './canonical-link';
 
 
 export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, results: HydrateResults) {
-  if (opts.isPrerender) {
-    insertIsPrerendered(doc);
-  }
+  setHtmlDataSsrAttr(doc);
 
   if (opts.canonicalLink !== false) {
     try {
@@ -71,13 +69,6 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 }
 
 
-function insertIsPrerendered(doc: Document) {
-  // <meta name="prerendered">
-  let prerenderedMeta = doc.head.querySelector('meta[name="prerendered"]');
-  if (prerenderedMeta) return;
-
-  prerenderedMeta = doc.createElement('meta');
-  prerenderedMeta.setAttribute('name', 'prerendered');
-
-  doc.head.appendChild(prerenderedMeta);
+function setHtmlDataSsrAttr(doc: Document) {
+  doc.documentElement.setAttribute('data-ssr', '');
 }

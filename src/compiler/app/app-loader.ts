@@ -19,6 +19,7 @@ export async function generateLoader(
   loaderContent = injectAppIntoLoader(
     config,
     appRegistry.core,
+    appRegistry.coreSsr,
     appRegistry.corePolyfilled,
     appRegistry.components,
     loaderContent
@@ -38,7 +39,24 @@ export async function generateLoader(
 
     if (config.minifyJs) {
       // minify the loader
-      const minifyJsResults = config.sys.minifyJs(loaderContent);
+      const opts: any = { output: {}, compress: {}, mangle: {} };
+      opts.ecma = 5;
+      opts.output.ecma = 5;
+      opts.compress.ecma = 5;
+      opts.compress.arrows = false;
+
+      if (config.logLevel === 'debug') {
+        opts.mangle.keep_fnames = true;
+        opts.compress.drop_console = false;
+        opts.compress.drop_debugger = false;
+        opts.output.beautify = true;
+        opts.output.bracketize = true;
+        opts.output.indent_level = 2;
+        opts.output.comments = 'all';
+        opts.output.preserve_line = true;
+      }
+
+      const minifyJsResults = config.sys.minifyJs(loaderContent, opts);
       minifyJsResults.diagnostics.forEach(d => {
         config.logger[d.level](d.messageText);
       });
@@ -67,6 +85,7 @@ export async function generateLoader(
 export function injectAppIntoLoader(
   config: BuildConfig,
   appCoreFileName: string,
+  appCoreSsrFileName: string,
   appCorePolyfilledFileName: string,
   componentRegistry: LoadComponentRegistry[],
   loaderContent: string
@@ -77,7 +96,7 @@ export function injectAppIntoLoader(
 
   loaderContent = loaderContent.replace(
     APP_NAMESPACE_REGEX,
-    `"${config.namespace}","${publicPath}","${appCoreFileName}","${appCorePolyfilledFileName}",${componentRegistryStr}`
+    `"${config.namespace}","${publicPath}","${appCoreFileName}","${appCoreSsrFileName}","${appCorePolyfilledFileName}",${componentRegistryStr}`
   );
 
   return loaderContent;
