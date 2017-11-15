@@ -77,6 +77,7 @@ export function getCorePolyfills(config: BuildConfig) {
   // first load up all of the polyfill content
   const readFilePromises = [
     'document-register-element.js',
+    'template.js',
     'array-find.js',
     'object-assign.js',
     'promise.js',
@@ -91,7 +92,7 @@ export function getCorePolyfills(config: BuildConfig) {
 
   return Promise.all(readFilePromises).then(results => {
     // concat the polyfills
-    return results.join('\n').trim();
+    return generatePreamble(config, 'es5') + results.join('\n').trim();
   });
 }
 
