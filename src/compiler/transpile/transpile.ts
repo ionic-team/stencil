@@ -1,6 +1,6 @@
 import addMetadataExport from './transformers/add-metadata-export';
 import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
-import { buildError, catchError, isSassFile, normalizePath } from '../util';
+import { buildError, catchError, isSassFile, normalizePath, hasError } from '../util';
 import { componentTsFileClass, componentModuleFileClass } from './transformers/component-class';
 import { createTypesAsString, ImportData, updateReferenceTypeImports }  from './transformers/add-jsx-types';
 import { getTsHost } from './compiler-host';
@@ -22,7 +22,7 @@ export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFil
     // transpiling is synchronous
     transpileModules(config, ctx, moduleFiles, transpileResults);
 
-    if (ctx.diagnostics.length) {
+    if (hasError(ctx.diagnostics)) {
       // looks like we've got some transpile errors
       // let's not continue with processing included styles
       return Promise.resolve([]);
