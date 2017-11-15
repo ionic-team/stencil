@@ -170,7 +170,7 @@ export function formatLoadComponents(
   }).join(',\n');
 
   return [
-    `${namespace}.loadComponents(\n`,
+    `${getWindowNamespace(namespace)}.loadComponents(\n`,
 
       `/**** module id (dev mode) ****/`,
       `"${moduleId}",\n`,
@@ -214,7 +214,16 @@ export function formatLoadStyles(namespace: string, bundleStyles: CompiledModeSt
     return '';
   }
 
-  return `${namespace}.loadStyles("${args.join(`","`)}");`;
+  return `${getWindowNamespace(namespace)}.loadStyles("${args.join(`","`)}");`;
+}
+
+
+export function getWindowNamespace(namespace: string) {
+  if (namespace.includes('-')) {
+    return `window['${namespace}']`;
+  }
+
+  return namespace;
 }
 
 
