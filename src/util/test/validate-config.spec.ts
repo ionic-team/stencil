@@ -349,6 +349,10 @@ describe('validation', () => {
         config.namespace = 'My%20Namespace';
         validateBuildConfig(config);
       }).toThrow();
+      expect(() => {
+        config.namespace = 'My:Namespace';
+        validateBuildConfig(config);
+      }).toThrow();
     });
 
     it('should not allow spaces in namespace', () => {
@@ -384,6 +388,12 @@ describe('validation', () => {
         config.namespace = 'ab';
         validateBuildConfig(config);
       }).toThrow();
+    });
+
+    it('should allow $ in the namespace', () => {
+      config.namespace = '$MyNamespace';
+      validateBuildConfig(config);
+      expect(config.namespace).toBe('$MyNamespace');
     });
 
     it('should allow underscore in the namespace', () => {

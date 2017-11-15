@@ -218,7 +218,7 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
 function validateNamespace(namespace: string) {
   namespace = namespace.trim();
 
-  const invalidNamespaceChars = namespace.replace(/(\w)|(\-)/g, '');
+  const invalidNamespaceChars = namespace.replace(/(\w)|(\-)|(\$)/g, '');
   if (invalidNamespaceChars !== '') {
     throw new Error(`Namespace "${namespace}" contains invalid characters: ${invalidNamespaceChars}`);
   }
