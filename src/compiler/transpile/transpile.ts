@@ -129,7 +129,7 @@ function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext) {
     if (filePath.startsWith('.') || filePath.startsWith('/')) {
       importFilePath = './' + normalizePath(
         config.sys.path.relative(config.collectionDir, filePath)
-      );
+      ).replace(/\.js$/, '');
     } else {
       importFilePath = filePath;
     }
