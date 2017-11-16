@@ -439,6 +439,7 @@ export interface CopyTask {
   dest?: string;
   filter?: (from?: string, to?: string) => boolean;
   isDirectory?: boolean;
+  warn?: boolean;
 }
 
 

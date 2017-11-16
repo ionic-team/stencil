@@ -21,16 +21,13 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
   // clear out the files to write object for the next build
   ctx.filesToWrite = {};
 
-  // 1) empty the destination directory
+  // 1) destination directory has already been emptied earlier in the build
   // 2) write all of the files
   // 3) copy all of the assets
   // not doing write and copy at the same time incase they
   // both try to create the same directory at the same time
-  return emptyDestDir(config, ctx).then(() => {
-    // kick off writing files
-    return writeFiles(config.sys, config.rootDir, filesToWrite).catch(err => {
-      catchError(ctx.diagnostics, err);
-    });
+  return writeFiles(config.sys, config.rootDir, filesToWrite).catch(err => {
+    catchError(ctx.diagnostics, err);
 
   }).then(() => {
     // kick off copying component assets
@@ -202,7 +199,7 @@ function copySourceCollectionComponentsToDistribution(config: BuildConfig, ctx: 
 }
 
 
-function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
+export function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
   // empty promises :(
   const emptyPromises: Promise<any>[] = [];
 

@@ -57,11 +57,11 @@ export function processCopyTasks(config: BuildConfig, allCopyTasks: CopyTask[], 
   }
 
   if (!copyTask.src) {
-    throw new Error(`copyTask missing "src" property`);
+    throw new Error(`copy missing "src" property`);
   }
 
   if (copyTask.dest && config.sys.isGlob(copyTask.dest)) {
-    throw new Error(`copyTask "dest" property cannot be a glob: ${copyTask.dest}`);
+    throw new Error(`copy "dest" property cannot be a glob: ${copyTask.dest}`);
   }
 
   if (config.sys.isGlob(copyTask.src)) {
@@ -75,11 +75,14 @@ export function processCopyTasks(config: BuildConfig, allCopyTasks: CopyTask[], 
   return new Promise(resolve => {
     config.sys.fs.stat(processedCopyTask.src, (err, stats) => {
       if (err) {
-        config.logger.debug(`copyTask, ${processedCopyTask.src}: ${err}`);
+        if (copyTask.warn !== false) {
+          config.logger.warn(`copy, ${processedCopyTask.src}: ${err}`);
+        }
         resolve();
 
       } else {
         processedCopyTask.isDirectory = stats.isDirectory();
+        config.logger.debug(`copy, ${processedCopyTask.src} to ${processedCopyTask.dest}, isDirectory: ${processedCopyTask.isDirectory}`);
         allCopyTasks.push(processedCopyTask);
         resolve();
       }

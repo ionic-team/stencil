@@ -4,18 +4,19 @@ import { catchError, getBuildContext, hasError, resetBuildContext } from '../uti
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from './compile';
 import { copyTasks } from './copy-tasks';
+import { emptyDestDir, writeBuildFiles } from './write-build';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateIndexHtml } from '../html/generate-index-html';
 import { generateServiceWorker } from '../service-worker/generate-sw';
 import { generateAppManifest } from '../manifest/generate-manifest';
+import { getAppFileName } from '../app/app-file-naming';
 import { initIndexHtml } from '../html/init-index-html';
 import { prerenderApp } from '../prerender/prerender-app';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from '../../util/validate-config';
 import { validatePrerenderConfig } from '../prerender/validate-prerender-config';
 import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
-import { writeBuildFiles } from './write-build';
 import { upgradeDependentComponents } from '../upgrade-dependents/index';
 
 
@@ -59,7 +60,7 @@ export function build(config: BuildConfig, context?: any) {
   }
 
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
+  const timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${getAppFileName(config)}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
 
   // begin the build
   return Promise.resolve().then(() => {
@@ -84,6 +85,12 @@ export function build(config: BuildConfig, context?: any) {
   }).then(() => {
     // generate the app files, such as app.js, app.core.js
     return generateAppFiles(config, ctx);
+
+  }).then(() => {
+    // empty the build dest directory
+    // doing this now incase the
+    // copy tasks add to the dest directories
+    return emptyDestDir(config, ctx);
 
   }).then(() => {
     // copy all assets
