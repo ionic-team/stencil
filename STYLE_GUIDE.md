@@ -1,10 +1,7 @@
-# Official Stencil's Style Guide
+# Stencil Style Guide
 
-## Disclosure
+This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing [Ionic Core](http://ionicframework.com/) components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your teams own preference.
 
-This is a renference guide created and enforced internally by the core team of stencil.
-We recommend to follow it for outsiders too, but it is not mandatory.
-Some projects though, could have a different policy of how stricly this guide must be applied.
 
 ## File structure
 
@@ -29,16 +26,6 @@ Example from ioni-core:
 │   ├── card-content.md.scss
 │   ├── card-content.scss
 │   └── card-content.tsx
-├── card-header
-│   ├── card-header.ios.scss
-│   ├── card-header.md.scss
-│   ├── card-header.scss
-│   └── card-header.tsx
-├── card-subtitle
-│   ├── card-subtitle.ios.scss
-│   ├── card-subtitle.md.scss
-│   ├── card-subtitle.scss
-│   └── card-subtitle.tsx
 ├── card-title
 │   ├── card-title.ios.scss
 │   ├── card-title.md.scss
@@ -64,13 +51,14 @@ Or tabs, where all them live in the same folder:
 │           └── index.html
 ```
 
+
 ## Naming
 ### HTML tag
 
 #### Prefix
-The prefix has a mayor role when you are creating a collection of components intended to be used across diferent projects, like ionic-core. WCs are not scoped, ie. they are globally declared, that means an "unique" prefix is needed to prevent collisions, they are help to quickly indentify the collection of an component.
+The prefix has a mayor role when you are creating a collection of components intended to be used across diferent projects, like @ionic/core. Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of an component. Additionally, web components are required to contain a "-" dash within the tag name, so using the part to namespace your components is a natural fit.
 
-We don't recommend using "stencil" as prefix, since stencil DOES NOT emit stencil components, but standard compliant web components.
+We don't recommend using "stencil" as prefix, since Stencil DOES NOT emit stencil components, but rather the output is simply standard compliant web components.
 
 DO NOT do this:
 ```
@@ -80,9 +68,11 @@ stnl-component
 
 Instead, use your own naming or brand.
 
+
 #### Name
 
 Components are not actions, they are conceptually "things". It is better to use nouns, instead of verbs, such us: "animation" instead of "animating". "input", "tab", "nav", "menu" are some examples.
+
 
 #### Modifiers
 
@@ -100,9 +90,10 @@ ion-card-content
 ion-card-footer
 ```
 
+
 ### Component (TS class)
 
-The name of the ES6 class of the components SHOULD NOT have prefix since classes are scoped. There is not risk of collision.
+The name of the ES6 class of the components SHOULD NOT have prefix since classes are scoped. There is no risk of collision.
 
 ```ts
 @Component({tag: 'ion-menu'})
@@ -115,26 +106,28 @@ export class MenuController {}
 export class PageHome {}
 ```
 
+
 ## TypeScript
 
 1. **Follow** [tslint-ionic-rules](https://github.com/ionic-team/tslint-ionic-rules/blob/master/tslint.js)
 
-2. **Use private variables and methods as much possible:** They are useful to detect deadcode and enforce encapsulation.
-
-3. **Variable decorators should be inlined.**
+2. **Variable decorators should be inlined.**
 
  ```ts
 @Prop() name: string;
-@Element() private el: HTMLElement;
+@Element() el: HTMLElement;
 ```
 
-4. **Method decorator should be multi-line**
+3. **Method decorator should be multi-line**
 
  ```ts
 @Listen('click')
 onClick() {
 }
 ```
+
+4. **Use private variables and methods as much possible:** They are useful to detect deadcode and enforce encapsulation. Note that this is a feature which TypeScript provides to help harden your code, but using `private`, `public` or `protected` does not make a difference in the actual JavaScript output.
+
 
 ## Code organization
 
@@ -160,49 +153,44 @@ onClick() {
 export class Something {
 
   /**
-   * 1. Private variables
+   * 1. Own Properties
+   * Always set a the type if a default value
+   * has not been set. If a default value is being
+   * set, then type is already inferred.
    */
-  private internal: string;
-  private text = 'default';
-  private number = 1;
+  someText = 'default';
+  num: number
 
   /**
-   * 2. Public variables, references to the instance might need to access.
+   * 2. Reference to host HTML element.
+   * Inlined decorator
    */
-  mode: string;
-  color: string;
-  isAnimating: boolean = false;
-  isRightSide: boolean = false;
-  width: number = null;
-
+  @Element() el: HTMLElement;
 
   /**
-   * 3. Reference to host HTML element.
-   * Private and inlined decorator
+   * 3. State() variables
+   * Inlined decorator, alphabetical order.
    */
-  @Element() private el: HTMLElement;
-
-  /**
-   * 4. State() variables
-   * Inlined decorator.
-   */
+  @State() isValidated: boolean;
   @State() status = 0;
 
   /**
-   * 5. Internal props (context and connect)
-   * Inlined decorator.
+   * 4. Internal props (context and connect)
+   * Inlined decorator, alphabetical order.
    */
   @Prop({ context: 'config' }) config: Config;
   @Prop({ connect: 'ion-menu-controller' }) lazyMenuCtrl: Lazy<MenuController>;
 
   /**
-   * 6. Input public API
-   * Inlined decorator.
+   * 5. Public Property API
+   * Inlined decorator, alphabetical order. These are
+   * different than "own properties" in that public props
+   * are exposed as properties and attributes on the host element.
    */
   @Prop() content: string;
+  @Prop() enabled: boolean;
   @Prop() menuId: string;
-  @Prop() type: string = 'overlay';
-  @Prop({ mutable: true }) enabled: boolean;
+  @Prop() type = 'overlay';
 
   /**
    * NOTE: Prop lifecycle events SHOULD go just behind the Prop they listen to.
@@ -210,65 +198,76 @@ export class Something {
    * - Refacting the instance variable name, must also update the name in @PropDidChange()
    * - Code is easier to follow and maintain.
    */
-  @Prop() swipeEnabled: boolean = true;
+  @Prop() swipeEnabled = true;
   @PropDidChange('swipeEnabled')
   swipeEnabledChange() {
     this.updateState();
   }
 
   /**
-   * 7. Events section
-   * Inlined decorator.
+   * 6. Events section
+   * Inlined decorator, alphabetical order.
    */
+  @Event() ionClose: EventEmitter;
   @Event() ionDrag: EventEmitter;
   @Event() ionOpen: EventEmitter;
-  @Event() ionClose: EventEmitter;
 
   /**
-   * 8. Component lifecycle events
-   * Lifecycle methods SHOULD be protected.
+   * 7. Component lifecycle events
+   * Ordered by their natural call order, for example
+   * WillLoad should go before DidLoad.
    */
-  protected componentWillLoad() {}
-  protected componentDidLoad() {}
-  protected componentDidUnload() {}
+  componentWillLoad() {}
+  componentDidLoad() {}
+  componentDidUnload() {}
 
   /**
-   * 9. Listeners
+   * 8. Listeners
    * It is ok to place them in a different location
-   * if makes more sense in the context.
+   * if makes more sense in the context. Recommend
+   * starting a listener method with "on".
    *
    * Always use two lines.
    */
-  @Listen('click', {enabled: false})
-  protected onClick(ev: UIEvent) {
+  @Listen('click', { enabled: false })
+  onClick(ev: UIEvent) {
     console.log('hi!')
   }
 
   /**
-   * 10. Public methods API
-   * Always use two lines
+   * 9. Public methods API
+   * These methods are exposed on the host element.
+   * Always use two lines.
    */
   @Method()
-  open() { }
-
-  @Method()
-  close() {}
-
-  /**
-   * 11. Private methods
-   * Internal business logic
-   */
-  private prepareAnimation(): Promise<void> {
+  open() {
+    ...
   }
 
-  private updateState() {
+  @Method()
+  close() {
+    ...
   }
 
   /**
-   * 12. hostData() function
-   * SHOULD be protected
+   * 10. Local methods
+   * Internal business logic. These methods cannot be
+   * called from the host element.
    */
-  protected hostData() {
+  prepareAnimation(): Promise<void> {
+    ...
+  }
+
+  updateState() {
+    ...
+  }
+
+  /**
+   * 11. hostData() function
+   * Used to dynamically set host element attributes.
+   * Should be placed directly above render()
+   */
+  hostData() {
     return {
       attribute: 'navigation',
       side: this.isRightSide ? 'right' : 'left',
@@ -280,11 +279,10 @@ export class Something {
   }
 
   /**
-   * 13. render() function
-   * Always the last one in the class
-   * SHOULD be protected
+   * 12. render() function
+   * Always the last one in the class.
    */
-  protected render() {
+  render() {
     return (
       <div class='menu-inner page-inner'>
         <slot></slot>
