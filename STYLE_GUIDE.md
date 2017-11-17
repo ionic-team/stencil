@@ -88,7 +88,6 @@ ion-menu-controller
 ion-card
 ion-card-header
 ion-card-content
-ion-card-footer
 ```
 
 
@@ -97,14 +96,15 @@ ion-card-footer
 The name of the ES6 class of the components SHOULD NOT have prefix since classes are scoped. There is no risk of collision.
 
 ```ts
-@Component({tag: 'ion-menu'})
-export class Menu {}
+@Component({
+  tag: 'ion-button'
+})
+export class Button { ... }
 
-@Component({tag: 'ion-menu-controller'})
-export class MenuController {}
-
-@Component({tag: 'page-home'})
-export class PageHome {}
+@Component({
+  tag: 'ion-menu'
+})
+export class Menu { ... }
 ```
 
 
@@ -124,6 +124,7 @@ export class PageHome {}
  ```ts
 @Listen('click')
 onClick() {
+  ...
 }
 ```
 
