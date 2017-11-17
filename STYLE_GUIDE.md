@@ -36,10 +36,8 @@ Or tabs, where all of them live in the same folder:
 
 ```
 ├── tabs
-│   ├── page-tab.tsx
 │   ├── tab-bar.tsx
 │   ├── tab-button.tsx
-│   ├── tab-highlight.tsx
 │   ├── tab.tsx
 │   ├── tabs.ios.scss
 │   ├── tabs.md.scss
@@ -56,9 +54,9 @@ Or tabs, where all of them live in the same folder:
 ### HTML tag
 
 #### Prefix
-The prefix has a major role when you are creating a collection of components intended to be used across diferent projects, like @ionic/core. Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of an component. Additionally, web components are required to contain a "-" dash within the tag name, so using the part to namespace your components is a natural fit.
+The prefix has a major role when you are creating a collection of components intended to be used across diferent projects, like [@ionic/core](https://www.npmjs.com/package/@ionic/core). Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of an component. Additionally, web components are required to contain a "-" dash within the tag name, so using the first section to namespace your components is a natural fit.
 
-We don't recommend using "stencil" as prefix, since Stencil DOES NOT emit stencil components, but rather the output is simply standard compliant web components.
+We do not recommend using "stencil" as prefix, since Stencil DOES NOT emit stencil components, but rather the output is simply standards compliant web components.
 
 DO NOT do this:
 ```
@@ -66,8 +64,11 @@ stencil-component
 stnl-component
 ```
 
-Instead, use your own naming or brand.
-
+Instead, use your own naming or brand. For example, [Ionic](http://ionicframework.com/) components are all prefixed with `ion-`.
+```
+ion-button
+ion-header
+```
 
 #### Name
 
@@ -155,7 +156,7 @@ export class Something {
 
   /**
    * 1. Own Properties
-   * Always set a the type if a default value has not
+   * Always set the type if a default value has not
    * been set. If a default value is being set, then type
    * is already inferred. List the own properties in
    * alphabetical order. Note that because these properties
