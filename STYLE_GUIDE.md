@@ -56,7 +56,7 @@ Or tabs, where all them live in the same folder:
 ### HTML tag
 
 #### Prefix
-The prefix has a mayor role when you are creating a collection of components intended to be used across diferent projects, like @ionic/core. Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of an component. Additionally, web components are required to contain a "-" dash within the tag name, so using the part to namespace your components is a natural fit.
+The prefix has a major role when you are creating a collection of components intended to be used across diferent projects, like @ionic/core. Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of an component. Additionally, web components are required to contain a "-" dash within the tag name, so using the part to namespace your components is a natural fit.
 
 We don't recommend using "stencil" as prefix, since Stencil DOES NOT emit stencil components, but rather the output is simply standard compliant web components.
 
