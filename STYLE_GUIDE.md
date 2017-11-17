@@ -191,6 +191,7 @@ export class Something {
    * Inlined decorator, alphabetical order. These are
    * different than "own properties" in that public props
    * are exposed as properties and attributes on the host element.
+   * Requires JSDocs for public API documentation.
    */
   @Prop() content: string;
   @Prop() enabled: boolean;
@@ -212,6 +213,7 @@ export class Something {
   /**
    * 6. Events section
    * Inlined decorator, alphabetical order.
+   * Requires JSDocs for public API documentation.
    */
   @Event() ionClose: EventEmitter;
   @Event() ionDrag: EventEmitter;
@@ -231,7 +233,6 @@ export class Something {
    * It is ok to place them in a different location
    * if makes more sense in the context. Recommend
    * starting a listener method with "on".
-   *
    * Always use two lines.
    */
   @Listen('click', { enabled: false })
@@ -243,6 +244,7 @@ export class Something {
    * 9. Public methods API
    * These methods are exposed on the host element.
    * Always use two lines.
+   * Requires JSDocs for public API documentation.
    */
   @Method()
   open() {
