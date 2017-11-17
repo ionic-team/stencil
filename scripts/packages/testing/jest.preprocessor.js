@@ -14,7 +14,7 @@ var injectTestingScript = [
 
 module.exports = {
   process: function(sourceText, filePath) {
-    if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+    if (filePath.endsWith('.js') || filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
       var opts = {
         module: 'commonjs'
       };
