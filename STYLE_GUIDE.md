@@ -154,12 +154,15 @@ export class Something {
 
   /**
    * 1. Own Properties
-   * Always set a the type if a default value
-   * has not been set. If a default value is being
-   * set, then type is already inferred.
+   * Always set a the type if a default value has not
+   * been set. If a default value is being set, then type
+   * is already inferred. List the own properties in
+   * alphabetical order. Note that because these properties
+   * do not have the @Prop() decorator, they will not be exposed
+   * publicly on the host element, but only used internally.
    */
+  num: number;
   someText = 'default';
-  num: number
 
   /**
    * 2. Reference to host HTML element.
