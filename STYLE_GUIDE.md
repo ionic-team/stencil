@@ -1,6 +1,6 @@
 # Stencil Style Guide
 
-This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing [Ionic Core](http://ionicframework.com/) components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your teams own preference.
+This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing [Ionic Core](http://ionicframework.com/) components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your team's own preference.
 
 
 ## File structure
@@ -9,7 +9,7 @@ This is a component style guide created and enforced internally by the core team
 - Implementation (.tsx) and styles of a component should live in the same folder.
 - One component per folder unless components share the styles and are strongly coupled.
 
-Example from ioni-core:
+Example from ionic-core:
 
 ```
 ├── card
@@ -32,7 +32,7 @@ Example from ioni-core:
 │   ├── card-title.scss
 ```
 
-Or tabs, where all them live in the same folder:
+Or tabs, where all of them live in the same folder:
 
 ```
 ├── tabs
