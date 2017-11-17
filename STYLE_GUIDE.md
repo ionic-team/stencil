@@ -1,6 +1,6 @@
 # Stencil Style Guide
 
-This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing [Ionic Core](http://ionicframework.com/) components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your team's own preference.
+This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing [Ionic Core](http://ionicframework.com/) components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your teams own preference.
 
 
 ## File structure
@@ -9,7 +9,7 @@ This is a component style guide created and enforced internally by the core team
 - Implementation (.tsx) and styles of a component should live in the same folder.
 - One component per folder unless components share the styles and are strongly coupled.
 
-Example from ionic-core:
+Example from ioni-core:
 
 ```
 ├── card
@@ -32,7 +32,7 @@ Example from ionic-core:
 │   ├── card-title.scss
 ```
 
-Or tabs, where all of them live in the same folder:
+Or tabs, where all them live in the same folder:
 
 ```
 ├── tabs
@@ -128,10 +128,11 @@ onClick() {
 
 4. **Use private variables and methods as much possible:** They are useful to detect deadcode and enforce encapsulation. Note that this is a feature which TypeScript provides to help harden your code, but using `private`, `public` or `protected` does not make a difference in the actual JavaScript output.
 
+5. **Code with Method/Prop/Event/Component decorators should have jsdocs:** This allows for documentation generation and for better user experience in an editor that has TypeScript intellisense
 
 ## Code organization
 
-### Newspaper Metaphor from The Robert C. Martin's Clean Code
+### Newspaper Metaphor from The Robert C. Martin's _Clean Code_
 
 > The source file should be organized like a newspaper article, with the highest level summary at the top, and more and more details further down. Functions called from the top function come directly below it, and so on down to the lowest level and most detailed functions at the bottom. This is a good way to organize the source code, even though IDE:s make the location of functions less important, since it is so easy to navigate in and out of them.
 
