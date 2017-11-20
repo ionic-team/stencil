@@ -227,6 +227,10 @@ export class Something {
    */
   componentWillLoad() {}
   componentDidLoad() {}
+  componentWillEnter() {}
+  componentDidEnter() {}
+  componentWillLeave() {}
+  componentDidLeave() {}
   componentDidUnload() {}
 
   /**
