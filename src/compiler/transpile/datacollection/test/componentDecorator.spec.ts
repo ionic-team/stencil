@@ -7,32 +7,90 @@ import { gatherMetadata } from './testUtils';
 describe('component decorator', () => {
 
   describe('getComponentDecoratorMeta', () => {
-    it('default no encapsulation', () => {
+    it('simple decorator', () => {
       let response;
-      const sourceFilePath = path.resolve(__dirname, './exampleComponent');
+      const sourceFilePath = path.resolve(__dirname, './fixtures/component-simple');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
         response = getComponentDecoratorMeta(checker, classNode);
       });
 
-      expect(response.tagNameMeta).toEqual('ion-action-sheet');
-      expect(response.encapsulation).toEqual(ENCAPSULATION.NoEncapsulation);
-      expect(response.jsdoc).toEqual({
-        documentation: 'This is an actionSheet class',
-        name: 'ActionSheet',
-        type: 'typeof ActionSheet'
+      expect(response).toEqual({
+        tagNameMeta: 'ion-action-sheet',
+        stylesMeta: {},
+        encapsulation: ENCAPSULATION.NoEncapsulation,
+        jsdoc: {
+          documentation: '',
+          name: 'ActionSheet',
+          type: 'typeof ActionSheet'
+        }
       });
-      expect(response.hostMeta).toEqual({
-        theme: 'action-sheet'
+    });
+
+    it('shadow encapsulation', () => {
+      let response;
+      const sourceFilePath = path.resolve(__dirname, './fixtures/component-shadow');
+      const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+        response = getComponentDecoratorMeta(checker, classNode);
       });
-      expect(response.stylesMeta).toEqual({
-        ios: {
-          styleUrls: ['action-sheet.ios.scss']
+
+      expect(response).toEqual({
+        tagNameMeta: 'ion-action-sheet',
+        stylesMeta: {},
+        encapsulation: ENCAPSULATION.ShadowDom,
+        jsdoc: {
+          documentation: '',
+          name: 'ActionSheet',
+          type: 'typeof ActionSheet'
+        }
+      });
+    });
+
+    it('scoped encapsulation', () => {
+      let response;
+      const sourceFilePath = path.resolve(__dirname, './fixtures/component-scoped');
+      const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+        response = getComponentDecoratorMeta(checker, classNode);
+      });
+
+      expect(response).toEqual({
+        tagNameMeta: 'ion-action-sheet',
+        stylesMeta: {},
+        encapsulation: ENCAPSULATION.ScopedCss,
+        jsdoc: {
+          documentation: '',
+          name: 'ActionSheet',
+          type: 'typeof ActionSheet'
+        }
+      });
+    });
+
+    it('should gather jsdoc and hostmeta and styles', () => {
+      let response;
+      const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
+      const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+        response = getComponentDecoratorMeta(checker, classNode);
+      });
+
+      expect(response).toEqual({
+        tagNameMeta: 'ion-action-sheet',
+        encapsulation: ENCAPSULATION.NoEncapsulation,
+        jsdoc: {
+          documentation: 'This is an actionSheet class',
+          name: 'ActionSheet',
+          type: 'typeof ActionSheet'
         },
-        md: {
-          styleUrls: ['action-sheet.md.scss']
+        hostMeta: {
+          theme: 'action-sheet'
+        },
+        stylesMeta: {
+          ios: {
+            styleUrls: ['action-sheet.ios.scss']
+          },
+          md: {
+            styleUrls: ['action-sheet.md.scss']
+          }
         }
       });
     });
   });
-
 });
