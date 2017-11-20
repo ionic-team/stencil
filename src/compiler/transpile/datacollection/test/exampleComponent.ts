@@ -4,6 +4,9 @@ import { Animation, AnimationBuilder, AnimationController, Config } from '../../
 import iOSEnterAnimation from './animations/ios.enter';
 import iOSLeaveAnimation from './animations/ios.leave';
 
+/**
+ * This is an actionSheet class
+ */
 @Component({
   tag: 'ion-action-sheet',
   styleUrls: {

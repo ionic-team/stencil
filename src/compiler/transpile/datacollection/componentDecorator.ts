@@ -1,13 +1,17 @@
 import { ComponentOptions, ComponentMeta } from '../../../util/interfaces';
 import { ENCAPSULATION } from '../../../util/constants';
-import { evalText } from './utils';
+import { evalText, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
-export function getComponentDecoratorMeta (node: ts.ClassDeclaration): ComponentMeta | undefined {
+export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
   let cmpMeta: ComponentMeta = {};
+  let symbol = checker.getSymbolAtLocation(node.name);
+
   if (!node.decorators) {
     return;
   }
+
+  cmpMeta.jsdoc = serializeSymbol(checker, symbol);
 
   const componentDecorator = node.decorators.find(dec => {
     if (!ts.isCallExpression(dec.expression)) {
@@ -34,6 +38,14 @@ export function getComponentDecoratorMeta (node: ts.ClassDeclaration): Component
       componentOptions.shadow ? ENCAPSULATION.ShadowDom :
       componentOptions.scoped ? ENCAPSULATION.ScopedCss :
       ENCAPSULATION.NoEncapsulation;
+
+  cmpMeta.stylesMeta = {};
+  Object.keys(componentOptions.styleUrls || {}).reduce((styleUrls, styleType: string) => {
+    styleUrls[styleType] = {
+      styleUrls: [].concat(componentOptions.styleUrls[styleType])
+    };
+    return styleUrls;
+  }, cmpMeta.stylesMeta as { [key: string]: any });
 
   return cmpMeta;
 }

@@ -778,6 +778,13 @@ export interface ComponentMeta {
   loadPriority?: number;
   componentModule?: any;
   componentClass?: string;
+  jsdoc?: JSDoc;
+}
+
+export interface JSDoc {
+  name: string;
+  documentation: string;
+  type: string;
 }
 
 

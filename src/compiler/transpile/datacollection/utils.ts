@@ -1,3 +1,4 @@
+import { JSDoc } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 export function evalText(text: string) {
@@ -13,4 +14,12 @@ export function getDeclarationParameters(decorator: ts.Decorator): any[] {
   }
 
   return [];
+}
+
+export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): JSDoc {
+  return {
+      name: symbol.getName(),
+      documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
+      type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!))
+  };
 }
