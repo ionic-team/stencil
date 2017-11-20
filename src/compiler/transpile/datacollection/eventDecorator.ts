@@ -1,7 +1,7 @@
 import { ComponentOptions, EventMeta, EventOptions } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
 import { getDeclarationParameters } from './utils';
-import ts from 'typescript';
+import * as ts from 'typescript';
 import { isCallExpression } from 'babel-types';
 
 export function getEventDecoratorMeta(node: ts.ClassDeclaration): EventMeta[] {

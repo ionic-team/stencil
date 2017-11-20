@@ -1,7 +1,7 @@
 import { ComponentOptions, ComponentMeta, PropChangeMeta } from '../../../util/interfaces';
 import { PROP_CHANGE } from '../../../util/constants';
 import { getDeclarationParameters } from './utils';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 export function getPropChangeDecoratorMeta(node: ts.ClassDeclaration): ComponentMeta {
   return node.members

@@ -1,6 +1,6 @@
 import { ComponentOptions, ComponentMeta } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 export function getMethodDecoratorMeta (node: ts.ClassDeclaration): ComponentMeta {
   return node.members

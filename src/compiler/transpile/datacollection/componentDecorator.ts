@@ -1,7 +1,7 @@
 import { ComponentOptions, ComponentMeta } from '../../../util/interfaces';
 import { ENCAPSULATION } from '../../../util/constants';
 import { evalText } from './utils';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 export function getComponentDecoratorMeta (node: ts.ClassDeclaration): ComponentMeta | undefined {
   let cmpMeta: ComponentMeta = {};

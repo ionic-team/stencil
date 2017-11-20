@@ -8,7 +8,7 @@ import { getEventDecoratorMeta } from './eventDecorator';
 import { getListenDecoratorMeta } from './listenDecorator';
 import { getPropChangeDecoratorMeta } from './propChangeDecorator';
 
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 export function gatherMetadata(program) {
   const checker = program.getTypeChecker();

@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 export function evalText(text: string) {
   const fnStr = `return ${text};`;
