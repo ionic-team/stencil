@@ -31,7 +31,7 @@ export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
   }
 
   if (config.devMode) {
-    if (argv.serviceWorker && !config.serviceWorker) {
+    if (argv.serviceWorker && config.serviceWorker === undefined) {
       // dev mode, but forcing service worker
       // but they didn't provide a sw config
       // so still force it to generate w/ our defaults
@@ -43,7 +43,7 @@ export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
       config.serviceWorker = false;
     }
 
-  } else if (!config.serviceWorker) {
+  } else if (config.serviceWorker === undefined) {
     // prod mode, and they didn't provide a sw config
     // so force it generate with our defaults
     config.serviceWorker = true;
