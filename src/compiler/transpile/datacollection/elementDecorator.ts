@@ -2,7 +2,7 @@ import { ComponentOptions, MembersMeta } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
-export function getElementDecoratorMeta (node: ts.ClassDeclaration): MembersMeta {
+export function getElementDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): MembersMeta {
   return node.members
     .filter(member => {
       return (ts.isPropertyDeclaration(member) && Array.isArray(member.decorators));

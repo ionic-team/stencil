@@ -686,6 +686,7 @@ export interface MemberMeta {
   attribName?: string;
   attribType?: AttributeTypeInfo;
   ctrlId?: string;
+  jsdoc: JSDoc;
 }
 
 
