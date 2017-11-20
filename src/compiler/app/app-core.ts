@@ -1,7 +1,7 @@
 import { BuildConfig, BuildContext, BuildConditionals, SourceTarget } from '../../util/interfaces';
 import { buildCoreContent } from './build-core-content';
 import { generatePreamble, pathJoin } from '../util';
-import { getAppPublicPath, getAppDistDir, getAppWWWBuildDir, getCoreFilename } from './app-file-naming';
+import { getAppPublicPath, getAppFileName, getAppDistDir, getAppWWWBuildDir, getCoreFilename } from './app-file-naming';
 
 
 export async function generateCore(config: BuildConfig, ctx: BuildContext, sourceTarget: SourceTarget, globalJsContent: string, buildConditionals: BuildConditionals) {
@@ -38,7 +38,7 @@ export async function generateCore(config: BuildConfig, ctx: BuildContext, sourc
   ctx.appFiles[buildConditionals.coreId] = jsContent;
 
   // update the app core filename within the content
-  jsContent = jsContent.replace(APP_CORE_FILENAME_PLACEHOLDER, coreFilename);
+  jsContent = jsContent.replace(APP_NAMESPACE_PLACEHOLDER, getAppFileName(config));
 
   if (config.generateWWW) {
     // write the www/build/ app core file
@@ -63,7 +63,7 @@ export function wrapCoreJs(config: BuildConfig, sourceTarget: SourceTarget, jsCo
     generatePreamble(config, sourceTarget),
     `(function(Context,appNamespace,hydratedCssClass,publicPath){`,
     `"use strict";\n`,
-    `var s=document.querySelector("script[data-core='${APP_CORE_FILENAME_PLACEHOLDER}'][data-path]");`,
+    `var s=document.querySelector("script[data-namespace='${APP_NAMESPACE_PLACEHOLDER}']");`,
     `if(s){publicPath=s.getAttribute('data-path');}\n`,
     jsContent.trim(),
     `\n})({},"${config.namespace}","${config.hydratedCssClass}","${publicPath}");`
@@ -97,4 +97,4 @@ export function getCorePolyfills(config: BuildConfig) {
 }
 
 
-export const APP_CORE_FILENAME_PLACEHOLDER = '__APP_CORE_FILENAME__';
+export const APP_NAMESPACE_PLACEHOLDER = '__APPNAMESPACE__';

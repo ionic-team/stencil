@@ -35,7 +35,7 @@ import { LoadComponentRegistry } from '../util/interfaces';
   x = document.createElement('script');
   x.src = publicPath + (('noModule' in x && window.customElements && window.fetch) ? (document.documentElement.hasAttribute('data-ssr') ? appCoreSsr : appCore) : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
-  x.setAttribute('data-core', appCore);
+  x.setAttribute('data-namespace', appNamespace);
   document.head.appendChild(x);
 
 })(window, document, '__APP__');
