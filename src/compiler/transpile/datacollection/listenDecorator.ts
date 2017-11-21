@@ -1,10 +1,10 @@
 import { ComponentOptions, ListenMeta, ListenOptions } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
-import { getDeclarationParameters } from './utils';
+import { getDeclarationParameters, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 import { isCallExpression } from 'babel-types';
 
-export function getListenDecoratorMeta(node: ts.ClassDeclaration): ListenMeta[] {
+export function getListenDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ListenMeta[] {
   return node.members
     .filter(member => {
       return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
@@ -18,14 +18,21 @@ export function getListenDecoratorMeta(node: ts.ClassDeclaration): ListenMeta[] 
 
       return eventName.split(',').reduce((lml, eventName) => {
         if (eventName) {
-          lml.push(validateListener(eventName.trim(), <ListenOptions>listenOptions, member.name.getText()));
+          const symbol = checker.getSymbolAtLocation(member.name);
+          const jsdoc = serializeSymbol(checker, symbol);
+
+          lml.push({
+            ...validateListener(eventName.trim(), <ListenOptions>listenOptions, member.name.getText()),
+            jsdoc
+          });
         }
+        return lml;
       }, listenMetaList);
     }, [] as ListenMeta[]);
 }
 
 
-export function validateListener(eventName: string, rawListenOpts: ListenOptions, methodName: string): ListenMeta | null {
+export function validateListener(eventName: string, rawListenOpts: ListenOptions = {}, methodName: string): ListenMeta | null {
   let rawEventName = eventName;
 
   let splt = eventName.split(':');
@@ -58,6 +65,7 @@ export function validateListener(eventName: string, rawListenOpts: ListenOptions
     eventName: eventName,
     eventMethodName: methodName
   };
+
 
   listenMeta.eventCapture = (typeof rawListenOpts.capture === 'boolean') ? rawListenOpts.capture : false;
 
