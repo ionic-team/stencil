@@ -1,9 +1,9 @@
-import { ComponentOptions, ComponentMeta } from '../../../util/interfaces';
+import { ComponentOptions, MembersMeta } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 import { serializeSymbol } from './utils';
 
-export function getMethodDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta {
+export function getMethodDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): MembersMeta {
   return node.members
   .filter(member => {
     return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
@@ -26,5 +26,5 @@ export function getMethodDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDe
     }
 
     return membersMeta;
-  }, {} as ComponentMeta);
+  }, {} as MembersMeta);
 }
