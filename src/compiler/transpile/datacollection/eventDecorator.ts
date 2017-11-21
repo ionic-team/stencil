@@ -2,9 +2,9 @@ import { ComponentOptions, EventMeta, EventOptions } from '../../../util/interfa
 import { MEMBER_TYPE } from '../../../util/constants';
 import { getDeclarationParameters } from './utils';
 import * as ts from 'typescript';
-import { isCallExpression } from 'babel-types';
+import { serializeSymbol } from './utils';
 
-export function getEventDecoratorMeta(node: ts.ClassDeclaration): EventMeta[] {
+export function getEventDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): EventMeta[] {
   return node.members
     .filter(member => {
       return (ts.isPropertyDeclaration(member) && Array.isArray(member.decorators));
@@ -15,16 +15,20 @@ export function getEventDecoratorMeta(node: ts.ClassDeclaration): EventMeta[] {
       });
 
       const [ eventOptions ] = getDeclarationParameters(elementDecorator);
+      const metadata: EventMeta = convertOptionsToMeta(<EventOptions>eventOptions, member.name.getText());
 
-      if (eventOptions) {
-        membersMeta.push(convertOptionsToMeta(<EventOptions>eventOptions, member.name.getText()));
+      if (metadata) {
+        const symbol = checker.getSymbolAtLocation(member.name);
+        metadata.jsdoc = serializeSymbol(checker, symbol);
+
+        membersMeta.push(metadata);
       }
 
       return membersMeta;
     }, [] as EventMeta[]);
 }
 
-function convertOptionsToMeta(rawEventOpts: EventOptions, methodName: string): EventMeta | null {
+function convertOptionsToMeta(rawEventOpts: EventOptions = {}, methodName: string): EventMeta | null {
 
   if (!methodName) {
     return null;
@@ -40,9 +44,7 @@ function convertOptionsToMeta(rawEventOpts: EventOptions, methodName: string): E
   }
 
   eventMeta.eventBubbles = typeof rawEventOpts.bubbles === 'boolean' ? rawEventOpts.bubbles : true;
-
   eventMeta.eventCancelable = typeof rawEventOpts.cancelable === 'boolean' ? rawEventOpts.cancelable : true;
-
   eventMeta.eventComposed = typeof rawEventOpts.composed === 'boolean' ? rawEventOpts.composed : true;
 
   return eventMeta;
