@@ -1,9 +1,9 @@
 import { ComponentOptions, ComponentMeta, PropChangeMeta } from '../../../util/interfaces';
 import { PROP_CHANGE } from '../../../util/constants';
-import { getDeclarationParameters } from './utils';
+import { getDeclarationParameters, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
-export function getPropChangeDecoratorMeta(node: ts.ClassDeclaration): ComponentMeta {
+export function getPropChangeDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta {
   return node.members
     .filter(member => {
       return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
@@ -28,7 +28,7 @@ export function getPropChangeDecoratorMeta(node: ts.ClassDeclaration): Component
 
         metaObj.push({
           [PROP_CHANGE.PropName]: watchedName,
-          [PROP_CHANGE.MethodName]: member.name.getText()
+          [PROP_CHANGE.MethodName]: member.name.getText(),
         });
       }
 
