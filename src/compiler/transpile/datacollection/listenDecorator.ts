@@ -1,10 +1,9 @@
-import { ComponentOptions, ListenMeta, ListenOptions } from '../../../util/interfaces';
-import { MEMBER_TYPE } from '../../../util/constants';
+import { ListenMeta, ListenOptions } from '../../../util/interfaces';
 import { getDeclarationParameters, serializeSymbol } from './utils';
 import * as ts from 'typescript';
-import { isCallExpression } from 'babel-types';
 
 export function getListenDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ListenMeta[] {
+  const initialValue: ListenMeta[] = [];
   return node.members
     .filter(member => {
       return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
@@ -18,21 +17,23 @@ export function getListenDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDe
         return listenMetaList;
       }
 
-      const [ eventName, listenOptions ] = getDeclarationParameters(elementDecorator);
+      const [ eventName, listenOptions ] = getDeclarationParameters<string, ListenOptions>(elementDecorator);
 
-      return eventName.split(',').reduce((lml, eventName) => {
-        if (eventName) {
-          const symbol = checker.getSymbolAtLocation(member.name);
-          const jsdoc = serializeSymbol(checker, symbol);
+      return eventName
+        .split(',')
+        .reduce((lml, eventName) => {
+          if (eventName) {
+            const symbol = checker.getSymbolAtLocation(member.name);
+            const jsdoc = serializeSymbol(checker, symbol);
 
-          lml.push({
-            ...validateListener(eventName.trim(), <ListenOptions>listenOptions, member.name.getText()),
-            jsdoc
-          });
-        }
-        return lml;
-      }, listenMetaList);
-    }, [] as ListenMeta[]);
+            lml.push({
+              ...validateListener(eventName.trim(), <ListenOptions>listenOptions, member.name.getText()),
+              jsdoc
+            });
+          }
+          return lml;
+        }, listenMetaList);
+    }, initialValue);
 }
 
 

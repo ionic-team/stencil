@@ -10,7 +10,7 @@ describe('@PropDidChange/@PropWillChange decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/propchange-simple');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-      response = getPropChangeDecoratorMeta(checker, classNode);
+      response = getPropChangeDecoratorMeta(classNode);
     });
 
     expect(response).toEqual({

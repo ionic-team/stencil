@@ -1,7 +1,6 @@
 import { build } from '../build';
 import { BuildConfig, BuildContext, BuildResults, ComponentRegistry } from '../../../util/interfaces';
 import { mockBuildConfig, mockFs } from '../../../testing/mocks';
-import { parseComponentRegistry } from '../../../util/data-parse';
 import { validateBuildConfig } from '../../../util/validate-config';
 import * as path from 'path';
 

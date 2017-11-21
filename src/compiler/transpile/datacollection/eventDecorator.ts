@@ -1,5 +1,4 @@
-import { ComponentOptions, EventMeta, EventOptions } from '../../../util/interfaces';
-import { MEMBER_TYPE } from '../../../util/constants';
+import { EventMeta, EventOptions } from '../../../util/interfaces';
 import { getDeclarationParameters } from './utils';
 import * as ts from 'typescript';
 import { serializeSymbol } from './utils';
@@ -17,8 +16,8 @@ export function getEventDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDec
         return membersMeta;
       }
 
-      const [ eventOptions ] = getDeclarationParameters(elementDecorator);
-      const metadata: EventMeta = convertOptionsToMeta(<EventOptions>eventOptions, member.name.getText());
+      const [ eventOptions ] = getDeclarationParameters<EventOptions>(elementDecorator);
+      const metadata: EventMeta = convertOptionsToMeta(eventOptions, member.name.getText());
 
       if (metadata) {
         const symbol = checker.getSymbolAtLocation(member.name);

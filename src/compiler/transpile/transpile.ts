@@ -1,14 +1,15 @@
 import addMetadataExport from './transformers/add-metadata-export';
 import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath } from '../util';
-import { componentTsFileClass, componentModuleFileClass } from './transformers/component-class';
 import { createTypesAsString, ImportData, updateReferenceTypeImports }  from './transformers/add-jsx-types';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
 import { updateFileMetaFromSlot, updateModuleFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
+import { removeDecorators } from './transformers/remove-decorators';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
+import { gatherMetadata } from './datacollection/index';
 import * as ts from 'typescript';
 
 
@@ -46,6 +47,7 @@ export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFil
 
 
 export function transpileModule(config: BuildConfig, input: string, compilerOptions?: any, path?: string) {
+  config;
   const fileMeta: ModuleFile = {
     tsFilePath: path || 'transpileModule.tsx'
   };
@@ -60,8 +62,8 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
     compilerOptions: compilerOptions,
     transformers: {
       before: [
-        componentModuleFileClass(config, fileMeta, diagnostics),
         removeImports(),
+        removeDecorators(),
         renameLifecycleMethods(),
         addMetadataExport(fileMeta)
       ],
@@ -201,10 +203,13 @@ function transpileProgram(config: BuildConfig, ctx: BuildContext, tsFileNames: s
   // fire up the typescript program
   const program = ts.createProgram(tsFileNames, tsOptions, tsHost);
 
+  const metadata = gatherMetadata(program);
+  console.log(metadata);
+
   // this is the big one, let's go ahead and kick off the transpiling
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
-      componentTsFileClass(config, ctx.moduleFiles, ctx.diagnostics),
+      removeDecorators(),
       removeImports(),
       renameLifecycleMethods()
     ],

@@ -1,9 +1,13 @@
-import { ComponentOptions, ComponentMeta, PropChangeMeta } from '../../../util/interfaces';
+import { ComponentMeta, PropChangeMeta } from '../../../util/interfaces';
 import { PROP_CHANGE } from '../../../util/constants';
-import { getDeclarationParameters, serializeSymbol } from './utils';
+import { getDeclarationParameters } from './utils';
 import * as ts from 'typescript';
 
-export function getPropChangeDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta {
+export function getPropChangeDecoratorMeta(node: ts.ClassDeclaration): ComponentMeta {
+  if (!Array.isArray(node.members)) {
+    return {};
+  }
+
   return node.members
     .filter(member => {
       return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
@@ -17,7 +21,7 @@ export function getPropChangeDecoratorMeta(checker: ts.TypeChecker, node: ts.Cla
         return membersMeta;
       }
 
-      const [ watchedName ] = getDeclarationParameters(propChangeDecorator);
+      const [watchedName] = getDeclarationParameters(propChangeDecorator);
 
       if (ts.isCallExpression(propChangeDecorator.expression) && propChangeDecorator && watchedName) {
         const decoratorName = propChangeDecorator.expression.expression.getText();

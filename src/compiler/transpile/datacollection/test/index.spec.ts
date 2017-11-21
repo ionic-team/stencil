@@ -249,12 +249,12 @@ describe('component decorator', () => {
         },
         'stylesMeta': {
           'ios': {
-            'styleUrls': [
+            'cmpRelativePaths': [
               'action-sheet.ios.scss',
             ],
           },
           'md': {
-            'styleUrls': [
+            'cmpRelativePaths': [
               'action-sheet.md.scss',
             ],
           },

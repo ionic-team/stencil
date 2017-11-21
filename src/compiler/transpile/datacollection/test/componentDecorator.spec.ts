@@ -16,6 +16,7 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         tagNameMeta: 'ion-action-sheet',
+        hostMeta: {},
         stylesMeta: {},
         encapsulation: ENCAPSULATION.NoEncapsulation,
         jsdoc: {
@@ -35,6 +36,7 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         tagNameMeta: 'ion-action-sheet',
+        hostMeta: {},
         stylesMeta: {},
         encapsulation: ENCAPSULATION.ShadowDom,
         jsdoc: {
@@ -54,6 +56,7 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         tagNameMeta: 'ion-action-sheet',
+        hostMeta: {},
         stylesMeta: {},
         encapsulation: ENCAPSULATION.ScopedCss,
         jsdoc: {
@@ -84,10 +87,10 @@ describe('component decorator', () => {
         },
         stylesMeta: {
           ios: {
-            styleUrls: ['action-sheet.ios.scss']
+            cmpRelativePaths: ['action-sheet.ios.scss']
           },
           md: {
-            styleUrls: ['action-sheet.md.scss']
+            cmpRelativePaths: ['action-sheet.md.scss']
           }
         }
       });

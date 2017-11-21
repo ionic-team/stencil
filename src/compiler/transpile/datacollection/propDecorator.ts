@@ -209,6 +209,7 @@ function inferPropType(expression: ts.Expression | undefined) {
       (ts.isObjectLiteralExpression(expression))) {
     return 'any';
   }
+  return undefined;
 }
 
 function propTypeFromTSType(type: string) {

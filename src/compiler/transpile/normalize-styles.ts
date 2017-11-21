@@ -1,6 +1,6 @@
-import { BuildConfig, ComponentMeta, ComponentOptions, ModuleFile, StyleMeta } from '../../../util/interfaces';
-import { DEFAULT_STYLE_MODE } from '../../../util/constants';
-import { normalizePath } from '../../util';
+import { BuildConfig, ComponentMeta, ComponentOptions, ModuleFile, StyleMeta } from '../../util/interfaces';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
+import { normalizePath } from '../util';
 
 
 export function normalizeStyles(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta) {

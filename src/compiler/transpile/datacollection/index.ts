@@ -1,4 +1,4 @@
-import { ComponentMeta, ModuleFile, Diagnostic } from '../../../util/interfaces';
+import { ComponentRegistry, ComponentMeta, Diagnostic } from '../../../util/interfaces';
 import { getComponentDecoratorMeta } from './componentDecorator';
 import { getElementDecoratorMeta } from './elementDecorator';
 import { getMethodDecoratorMeta } from './methodDecorator';
@@ -10,9 +10,9 @@ import { getPropChangeDecoratorMeta } from './propChangeDecorator';
 
 import * as ts from 'typescript';
 
-export function gatherMetadata(program) {
+export function gatherMetadata(program: ts.Program) {
   const checker = program.getTypeChecker();
-  const componentMetaList: ComponentMeta[] = [];
+  const componentMetaList: ComponentRegistry = {};
   const diagnostics: Diagnostic[] = [];
 
   const visitFile = visitFactory(checker, componentMetaList, diagnostics);
@@ -25,9 +25,9 @@ export function gatherMetadata(program) {
   }
 }
 
-function visitFactory(checker: ts.TypeChecker, componentMetaList: ComponentMeta[], diagnostics: Diagnostic[]) {
+function visitFactory(checker: ts.TypeChecker, componentMetaList: ComponentRegistry, diagnostics: Diagnostic[]) {
 
-  return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
+  return function visit(node: ts.Node, sourceFile: ts.SourceFile): ts.Node {
     if (ts.isClassDeclaration(node)) {
       const cmpMeta = visitClass(checker, node as ts.ClassDeclaration, sourceFile, diagnostics);
       if (cmpMeta) {
@@ -45,7 +45,7 @@ export function visitClass(checker: ts.TypeChecker, classNode: ts.ClassDeclarati
   let componentMeta: ComponentMeta = getComponentDecoratorMeta(checker, classNode);
 
   if (!componentMeta) {
-    return;
+    return undefined;
   }
 
   componentMeta = {
@@ -60,7 +60,7 @@ export function visitClass(checker: ts.TypeChecker, classNode: ts.ClassDeclarati
     },
     eventsMeta: getEventDecoratorMeta(checker, classNode),
     listenersMeta: getListenDecoratorMeta(checker, classNode),
-    ...getPropChangeDecoratorMeta(checker, classNode)
+    ...getPropChangeDecoratorMeta(classNode)
   };
 
   // Return Class Declaration with Decorator removed and as default export

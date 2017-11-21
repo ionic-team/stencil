@@ -745,6 +745,7 @@ export interface ListenMeta {
   eventCapture?: boolean;
   eventPassive?: boolean;
   eventDisabled?: boolean;
+  jsdoc?: JSDoc;
 }
 
 

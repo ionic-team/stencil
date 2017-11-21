@@ -1,6 +1,6 @@
-import { ComponentOptions, ComponentMeta } from '../../../util/interfaces';
-import { ENCAPSULATION } from '../../../util/constants';
-import { evalText, serializeSymbol } from './utils';
+import { ComponentOptions, ComponentMeta, ModeStyles } from '../../../util/interfaces';
+import { ENCAPSULATION, DEFAULT_STYLE_MODE } from '../../../util/constants';
+import { getDeclarationParameters, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
 export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
@@ -8,7 +8,7 @@ export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.Cla
   let symbol = checker.getSymbolAtLocation(node.name);
 
   if (!node.decorators) {
-    return;
+    return undefined;
   }
 
   cmpMeta.jsdoc = serializeSymbol(checker, symbol);
@@ -21,31 +21,42 @@ export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.Cla
   });
 
   if (!componentDecorator) {
-    return;
+    return undefined;
   }
 
-  const [ componentOptionsLiteral ] = (<ts.CallExpression>componentDecorator.expression).arguments;
-
-  const componentOptions = evalText(componentOptionsLiteral.getText());
+  const [ componentOptions ] = getDeclarationParameters<ComponentOptions>(componentDecorator);
 
   if (!componentOptions.tag || componentOptions.tag.trim() === '') {
     throw new Error(`tag missing in component decorator: ${JSON.stringify(componentOptions, null, 2)}`);
   }
 
   cmpMeta.tagNameMeta = componentOptions.tag;
-  cmpMeta.hostMeta = componentOptions.host;
+  cmpMeta.hostMeta = componentOptions.host || {};
   cmpMeta.encapsulation =
       componentOptions.shadow ? ENCAPSULATION.ShadowDom :
       componentOptions.scoped ? ENCAPSULATION.ScopedCss :
       ENCAPSULATION.NoEncapsulation;
 
   cmpMeta.stylesMeta = {};
-  Object.keys(componentOptions.styleUrls || {}).reduce((styleUrls, styleType: string) => {
-    styleUrls[styleType] = {
-      styleUrls: [].concat(componentOptions.styleUrls[styleType])
+
+  // If Component Options styleUrls is an array then add to default style mode
+  if (Array.isArray(componentOptions.styleUrls)) {
+    cmpMeta.stylesMeta = {
+      [DEFAULT_STYLE_MODE]: {
+        cmpRelativePaths: componentOptions.styleUrls
+      }
     };
-    return styleUrls;
-  }, cmpMeta.stylesMeta as { [key: string]: any });
+  } else {
+    Object.keys(componentOptions.styleUrls || {}).reduce((stylesMeta, styleType) => {
+      let styleUrls = <ModeStyles>componentOptions.styleUrls;
+
+      stylesMeta[styleType] = {
+        cmpRelativePaths: [].concat(styleUrls[styleType])
+      };
+
+      return stylesMeta;
+    }, cmpMeta.stylesMeta);
+  }
 
   return cmpMeta;
 }

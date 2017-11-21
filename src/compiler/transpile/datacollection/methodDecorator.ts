@@ -1,4 +1,4 @@
-import { ComponentOptions, MembersMeta } from '../../../util/interfaces';
+import { MembersMeta } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 import { serializeSymbol } from './utils';
