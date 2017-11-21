@@ -29,7 +29,9 @@ const compilerOptions: CompilerOptions = {
   'target': ts.ScriptTarget.ES2015
 };
 
-export type GatherMetadataCallback = (checker: ts.TypeChecker, classNode: ts.ClassDeclaration) => void;
+export type GatherMetadataCallback = (
+  checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile?: ts.SourceFile, diagnostics?: Diagnostic[]
+) => void;
 
 export function gatherMetadata(sourceFilePath: string, callback: GatherMetadataCallback) {
   const program = ts.createProgram([sourceFilePath], compilerOptions);
@@ -50,7 +52,7 @@ export function gatherMetadata(sourceFilePath: string, callback: GatherMetadataC
 function visitFactory(checker: ts.TypeChecker, componentMetaList: ComponentMeta[], diagnostics: Diagnostic[], callback: GatherMetadataCallback) {
   return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
     if (ts.isClassDeclaration(node)) {
-      callback(checker, node);
+      callback(checker, node, sourceFile, diagnostics);
       return node;
     }
     return ts.forEachChild(node, (node) => {

@@ -3,8 +3,9 @@ import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo, At
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 import { isTypeReferenceNode } from 'typescript';
+import { serializeSymbol } from './utils';
 
-export function getPropDecoratorMeta(classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): MembersMeta {
+export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   return decoratedMembers
@@ -30,6 +31,7 @@ export function getPropDecoratorMeta(classNode: ts.ClassDeclaration, sourceFile:
         });
       const propOptions: PropOptions = suppliedOptions[0];
       const attribName = (<ts.Identifier>prop.name).text;
+      const symbol = checker.getSymbolAtLocation(prop.name);
 
       if (propOptions && typeof propOptions.connect === 'string') {
         memberData.memberType = MEMBER_TYPE.PropConnect;
@@ -81,11 +83,10 @@ export function getPropDecoratorMeta(classNode: ts.ClassDeclaration, sourceFile:
         memberData.attribType = attribType;
         memberData.attribName = attribName;
         memberData.propType = propTypeFromTSType(attribType.text);
+        memberData.jsdoc = serializeSymbol(checker, symbol);
       }
 
       allMembers[attribName] = memberData;
-
-      prop.decorators = undefined;
       return allMembers;
     }, {} as MembersMeta);
 }
