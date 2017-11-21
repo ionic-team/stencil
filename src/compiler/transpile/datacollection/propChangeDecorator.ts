@@ -13,6 +13,9 @@ export function getPropChangeDecoratorMeta(checker: ts.TypeChecker, node: ts.Cla
         return (ts.isCallExpression(dec.expression) &&
           ['PropWillChange', 'PropDidChange'].indexOf(dec.expression.expression.getText()) !== -1);
       });
+      if (propChangeDecorator == null) {
+        return membersMeta;
+      }
 
       const [ watchedName ] = getDeclarationParameters(propChangeDecorator);
 

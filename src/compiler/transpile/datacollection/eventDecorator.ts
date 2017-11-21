@@ -13,6 +13,9 @@ export function getEventDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDec
       const elementDecorator = member.decorators.find(dec => {
         return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Event');
       });
+      if (elementDecorator == null) {
+        return membersMeta;
+      }
 
       const [ eventOptions ] = getDeclarationParameters(elementDecorator);
       const metadata: EventMeta = convertOptionsToMeta(<EventOptions>eventOptions, member.name.getText());

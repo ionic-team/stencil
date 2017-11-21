@@ -12,6 +12,10 @@ export function getMethodDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDe
     const elementDecorator = member.decorators.find(dec => {
       return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Method');
     });
+    if (elementDecorator == null) {
+      return membersMeta;
+    }
+
     const symbol = checker.getSymbolAtLocation(member.name);
 
     if (elementDecorator) {

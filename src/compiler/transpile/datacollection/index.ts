@@ -29,7 +29,7 @@ function visitFactory(checker: ts.TypeChecker, componentMetaList: ComponentMeta[
 
   return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
     if (ts.isClassDeclaration(node)) {
-      const cmpMeta = visitClass(node as ts.ClassDeclaration, checker, sourceFile, diagnostics);
+      const cmpMeta = visitClass(checker, node as ts.ClassDeclaration, sourceFile, diagnostics);
       if (cmpMeta) {
         componentMetaList[sourceFile.fileName] = cmpMeta;
       }
@@ -41,8 +41,8 @@ function visitFactory(checker: ts.TypeChecker, componentMetaList: ComponentMeta[
   };
 }
 
-function visitClass(classNode: ts.ClassDeclaration, checker: ts.TypeChecker, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): ComponentMeta | undefined {
-  let componentMeta: ComponentMeta = getComponentDecoratorMeta(classNode);
+export function visitClass(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): ComponentMeta | undefined {
+  let componentMeta: ComponentMeta = getComponentDecoratorMeta(checker, classNode);
 
   if (!componentMeta) {
     return;
@@ -53,14 +53,14 @@ function visitClass(classNode: ts.ClassDeclaration, checker: ts.TypeChecker, sou
     componentClass: classNode.name.getText().trim(),
     membersMeta: {
       // membersMeta is shared with @Prop, @State, @Method, @Element
-      ...getElementDecoratorMeta(classNode),
-      ...getMethodDecoratorMeta(classNode),
+      ...getElementDecoratorMeta(checker, classNode),
+      ...getMethodDecoratorMeta(checker, classNode),
       ...getStateDecoratorMeta(classNode),
-      ...getPropDecoratorMeta(classNode, sourceFile, diagnostics)
+      ...getPropDecoratorMeta(checker, classNode, sourceFile, diagnostics)
     },
-    eventsMeta: getEventDecoratorMeta(classNode),
-    listenersMeta: getListenDecoratorMeta(classNode),
-    ...getPropChangeDecoratorMeta(classNode)
+    eventsMeta: getEventDecoratorMeta(checker, classNode),
+    listenersMeta: getListenDecoratorMeta(checker, classNode),
+    ...getPropChangeDecoratorMeta(checker, classNode)
   };
 
   // Return Class Declaration with Decorator removed and as default export

@@ -14,6 +14,10 @@ export function getListenDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDe
         return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Listen');
       });
 
+      if (elementDecorator == null) {
+        return listenMetaList;
+      }
+
       const [ eventName, listenOptions ] = getDeclarationParameters(elementDecorator);
 
       return eventName.split(',').reduce((lml, eventName) => {

@@ -18,6 +18,10 @@ export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Clas
       const propDecorator = prop.decorators.find((decorator: ts.Decorator) => (
         decorator.getFullText().indexOf('Prop(') !== -1)
       );
+      if (propDecorator == null) {
+        return allMembers;
+      }
+
       const suppliedOptions = (<ts.CallExpression>propDecorator.expression).arguments
         .map(arg => {
           try {
