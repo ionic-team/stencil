@@ -223,6 +223,7 @@ var RESERVED_PROPERTIES: string[] = [
   'mode',
   'raf',
   'read',
+  'ref',
   'write',
   '$definedComponents',
 

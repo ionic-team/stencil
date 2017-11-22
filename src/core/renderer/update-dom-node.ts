@@ -99,7 +99,7 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
       // setting a known @Prop on this element
       setProperty(elm, name, newValue);
 
-    } else {
+    } else if (name !== 'ref') {
       // property setting a prop on a native property, like "value" or something
       setProperty(elm, name, newValue == null ? '' : newValue);
       if (newValue == null || newValue === false) {
