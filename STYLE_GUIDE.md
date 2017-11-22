@@ -5,9 +5,9 @@ This is a component style guide created and enforced internally by the core team
 
 ## File structure
 
-- Only one component per file.
-- Implementation (.tsx) and styles of a component should live in the same folder.
-- One component per folder unless components share the styles and are strongly coupled.
+- One component per file.
+- One component per directory. Though it may make sense to group similar components into the same directory, we've found it's easier to document components when each one has its own directory.
+- Implementation (.tsx) and styles of a component should live in the same directory.
 
 Example from ionic-core:
 
@@ -30,23 +30,6 @@ Example from ionic-core:
 │   ├── card-title.ios.scss
 │   ├── card-title.md.scss
 │   ├── card-title.scss
-```
-
-Or tabs, where all of them live in the same folder:
-
-```
-├── tabs
-│   ├── tab-bar.tsx
-│   ├── tab-button.tsx
-│   ├── tab.tsx
-│   ├── tabs.ios.scss
-│   ├── tabs.md.scss
-│   ├── tabs.scss
-│   ├── tabs.tsx
-│   └── test
-│       └── basic
-│           ├── e2e.js
-│           └── index.html
 ```
 
 
