@@ -208,7 +208,7 @@ declare global {
   }
   namespace JSXElements {
     export interface ${jsxInterfaceName} extends HTMLAttributes {
-      ${Object.keys(interfaceOptions).map((key: string) => `${key}?: ${interfaceOptions[key]}`).join('\n')}
+      ${Object.keys(interfaceOptions).map((key: string) => `${key}?: ${interfaceOptions[key]}`).join('\n      ')}
     }
   }
 }
