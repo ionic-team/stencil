@@ -118,17 +118,26 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   const tsHost = getTsHost(config, ctx, tsOptions, transpileResults);
 
   // fire up the typescript program
-  const program = ts.createProgram(tsFileNames, tsOptions, tsHost);
+  const checkProgram = ts.createProgram(tsFileNames, tsOptions, tsHost);
 
   // Gather component metadata and type info
-  const metadata = gatherMetadata(program.getTypeChecker(), program.getSourceFiles());
+  const metadata = gatherMetadata(checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
 
   Object.keys(metadata).forEach(tsFilePath => {
     ctx.moduleFiles[tsFilePath].cmpMeta = metadata[tsFilePath];
   });
 
   // Generate d.ts files for component types
-  generateComponentTypesFile(config, ctx, metadata);
+  const [ componentsFilePath, componentsFileContent ] = generateComponentTypesFile(config, metadata);
+  if (ctx.appFiles.components_d_ts !== componentsFileContent) {
+    // the components.d.ts file is unchanged, no need to resave
+    config.sys.fs.writeFileSync(componentsFilePath, componentsFileContent, { encoding: 'utf8' });
+  }
+
+  // cache this for rebuilds to avoid unnecessary writes
+  ctx.appFiles.components_d_ts = componentsFileContent;
+
+  const program = ts.createProgram(tsFileNames.concat(componentsFilePath), tsOptions, tsHost, checkProgram);
 
   transpileProgram(program, tsHost, config, ctx, transpileResults);
   timespace.finish(`transpile es2015 finished`);

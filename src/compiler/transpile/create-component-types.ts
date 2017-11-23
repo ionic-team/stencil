@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentRegistry, MembersMeta, MemberMeta, BuildConfig, BuildContext } from '../../util/interfaces';
+import { ComponentMeta, ComponentRegistry, MembersMeta, MemberMeta, BuildConfig } from '../../util/interfaces';
 import { normalizePath } from '../util';
 import { dashToPascalCase } from '../../util/helpers';
 import { MEMBER_TYPE } from '../../util/constants';
@@ -14,12 +14,11 @@ export interface ImportData {
 }
 
 /**
- * Generate the component.d.ts file that contains types for all components and add to the ctx.filesToWrite array
+ * Generate the component.d.ts file that contains types for all components
  * @param config the project build configuration
- * @param ctx build context
  * @param options compiler options from tsconfig
  */
-export function generateComponentTypesFile(config: BuildConfig, ctx: BuildContext, cmpList: ComponentRegistry) {
+export function generateComponentTypesFile(config: BuildConfig, cmpList: ComponentRegistry): [ string, string ] {
   let typeImportData: ImportData = {};
   const allTypes: { [key: string]: number } = {};
   let componentsFileContent =
@@ -40,7 +39,7 @@ export function generateComponentTypesFile(config: BuildConfig, ctx: BuildContex
       const cmpMeta = cmpList[moduleFileName];
       const importPath = config.sys.path.relative(config.srcDir, moduleFileName)
           .replace(/\.tsx$/, '');
-          console.log(importPath);
+
       typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmpMeta, moduleFileName, config);
 
       finalString +=
@@ -77,17 +76,7 @@ ${typeData.map(td => {
   componentsFileContent += typeImportString + componentFileString;
   const rootFilePath = config.sys.path.join(config.srcDir, 'components.d.ts');
 
-  if (ctx.appFiles.components_d_ts === componentsFileContent) {
-    // the components.d.ts file is unchanged, no need to resave
-    return rootFilePath;
-  }
-
-  // cache this for rebuilds to avoid unnecessary writes
-  ctx.appFiles.components_d_ts = componentsFileContent;
-
-  config.sys.fs.writeFileSync(rootFilePath, componentsFileContent, { encoding: 'utf8' });
-
-  return rootFilePath;
+  return [ rootFilePath, componentsFileContent ];
 }
 
 
