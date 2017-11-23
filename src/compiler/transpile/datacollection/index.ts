@@ -10,33 +10,32 @@ import { getPropChangeDecoratorMeta } from './propChangeDecorator';
 
 import * as ts from 'typescript';
 
-export function gatherMetadata(program: ts.Program) {
-  const checker = program.getTypeChecker();
+export function gatherMetadata(typechecker: ts.TypeChecker, sourceFileList: ReadonlyArray<ts.SourceFile>): ComponentRegistry {
   const componentMetaList: ComponentRegistry = {};
   const diagnostics: Diagnostic[] = [];
 
-  const visitFile = visitFactory(checker, componentMetaList, diagnostics);
+  const visitFile = visitFactory(typechecker, componentMetaList, diagnostics);
 
   // Visit every sourceFile in the program
-  for (const sourceFile of program.getSourceFiles()) {
+  for (const sourceFile of sourceFileList) {
     ts.forEachChild(sourceFile, (node) => {
-      return visitFile(node, node as ts.SourceFile);
+      visitFile(node, node as ts.SourceFile);
     });
   }
+  return componentMetaList;
 }
 
 function visitFactory(checker: ts.TypeChecker, componentMetaList: ComponentRegistry, diagnostics: Diagnostic[]) {
 
-  return function visit(node: ts.Node, sourceFile: ts.SourceFile): ts.Node {
+  return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
     if (ts.isClassDeclaration(node)) {
       const cmpMeta = visitClass(checker, node as ts.ClassDeclaration, sourceFile, diagnostics);
       if (cmpMeta) {
-        componentMetaList[sourceFile.fileName] = cmpMeta;
+        componentMetaList[sourceFile.getSourceFile().fileName] = cmpMeta;
       }
-      return node;
     }
-    return ts.forEachChild(node, (node) => {
-      return visit(node, sourceFile);
+    ts.forEachChild(node, (node) => {
+      visit(node, sourceFile);
     });
   };
 }

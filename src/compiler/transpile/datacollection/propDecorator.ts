@@ -140,8 +140,10 @@ function getAllTypeReferences(node: ts.TypeNode): string[] {
 
 function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): AttributeTypeReference {
 
+  const sourceFileObj = sourceFile.getSourceFile();
+
   // Loop through all top level imports to find any reference to the type for 'import' reference location
-  const importTypeDeclaration = sourceFile.statements.find(st => {
+  const importTypeDeclaration = sourceFileObj.statements.find(st => {
     const statement = ts.isImportDeclaration(st) &&
       ts.isImportClause(st.importClause) &&
       st.importClause.namedBindings &&  ts.isNamedImports(st.importClause.namedBindings) &&
@@ -161,7 +163,7 @@ function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): 
   }
 
   // Loop through all top level exports to find if any reference to the type for 'local' reference location
-  const isExported = sourceFile.statements.some(st => {
+  const isExported = sourceFileObj.statements.some(st => {
     // Is the interface defined in the file and exported
     const isInterfaceDeclarationExported = ((ts.isInterfaceDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName) &&

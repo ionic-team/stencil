@@ -42,8 +42,11 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
  * @param classNode
  */
 function isComponentClass(classNode: ts.ClassDeclaration) {
+  if (!Array.isArray(classNode.decorators)) {
+    return false;
+  }
   const componentDecoratorIndex = classNode.decorators.findIndex(dec =>
-   (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === name)
+   (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Component')
   );
   return (componentDecoratorIndex !== -1);
 }
