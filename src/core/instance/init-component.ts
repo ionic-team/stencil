@@ -64,6 +64,9 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
     elm._hasLoaded = true;
 
     try {
+      // fire off the ref if it exists
+      callNodeRefs(elm._vnode);
+
       // fire off the user's elm.componentOnReady() callbacks that were
       // put directly on the element (well before anything was ready)
       if (elm._onReadyCallbacks) {
@@ -78,9 +81,6 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
         // we'll also fire this method off on the element, just to
         elm._instance.componentDidLoad && elm._instance.componentDidLoad();
       }
-
-      // fire off the ref if it exists
-      callNodeRefs(elm._vnode);
 
     } catch (e) {
       plt.onError(e, RUNTIME_ERROR.DidLoadError, elm);

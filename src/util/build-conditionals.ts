@@ -6,6 +6,7 @@ export const Build: BuildConditionals = {
 
   shadowDom: true,
   slot: true,
+  ssrClientSide: true,
   ssrServerSide: true,
 
   styles: true,

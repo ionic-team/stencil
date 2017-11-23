@@ -7,6 +7,9 @@ export default function addMetadataExport(moduleFile: ModuleFile): ts.Transforme
 
   return (transformContext) => {
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
+      if (!cmpMeta) {
+        return classNode;
+      }
       const meta: ts.Expression = convertValueToLiteral(cmpMeta);
 
       const metadataProperty = ts.createProperty(

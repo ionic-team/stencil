@@ -56,6 +56,14 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
     });
   }
 
+  if (cmpMeta.propsDidChangeMeta && cmpMeta.propsDidChangeMeta.length > 0) {
+    coreBuild.propDidChange = true;
+  }
+
+  if (cmpMeta.propsWillChangeMeta && cmpMeta.propsWillChangeMeta.length > 0) {
+    coreBuild.propWillChange = true;
+  }
+
   if (cmpMeta.eventsMeta && cmpMeta.eventsMeta.length) {
     coreBuild.event = true;
   }

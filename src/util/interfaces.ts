@@ -282,6 +282,7 @@ export interface AppRegistry {
   namespace: string;
   loader?: string;
   core?: string;
+  coreSsr?: string;
   corePolyfilled?: string;
   global?: string;
   components: LoadComponentRegistry[];
@@ -313,12 +314,13 @@ export interface CompiledModeStyles {
 
 
 export interface BuildConditionals {
-  coreId?: 'core' | 'core.pf';
+  coreId?: 'core' | 'core.ssr' | 'core.pf';
   polyfills?: boolean;
   verboseError: boolean;
   es5?: boolean;
 
   // ssr
+  ssrClientSide: boolean;
   ssrServerSide: boolean;
 
   // encapsulation
@@ -437,6 +439,7 @@ export interface CopyTask {
   dest?: string;
   filter?: (from?: string, to?: string) => boolean;
   isDirectory?: boolean;
+  warn?: boolean;
 }
 
 

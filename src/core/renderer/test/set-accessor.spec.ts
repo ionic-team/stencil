@@ -39,9 +39,18 @@ describe('setAccessor', () => {
     expect(elm.hasAttribute('myprop')).toBe(false);
   });
 
+  it('should not set ref as a property', () => {
+    const oldValue: any = 'someval';
+    const newValue: any = function meFun() {};
+
+    setAccessor(plt, elm, 'ref', oldValue, newValue, false);
+    expect(elm.ref).toBeUndefined();
+    expect(elm.hasAttribute('ref')).toBe(false);
+  });
+
   it('should set function property to child', () => {
     const oldValue: any = 'someval';
-    const newValue: any = function meFun(){};
+    const newValue: any = function meFun() {};
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false);
     expect(elm.myprop).toBe(newValue);

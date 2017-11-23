@@ -28,9 +28,18 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   // figure out which sections should be included in the core build
   const buildConditionals = setBuildConditionals(ctx, ctx.manifestBundles);
   buildConditionals.coreId = 'core';
+  buildConditionals.ssrClientSide = false;
 
   const coreFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionals);
   appRegistry.core = coreFilename;
+
+
+  const buildConditionalsSsr = setBuildConditionals(ctx, ctx.manifestBundles);
+  buildConditionalsSsr.coreId = 'core.ssr';
+  buildConditionalsSsr.ssrClientSide = true;
+
+  const coreSsrFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionalsSsr);
+  appRegistry.coreSsr = coreSsrFilename;
 
 
   if (config.es5Fallback) {
@@ -41,6 +50,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     buildConditionalsEs5.coreId = 'core.pf';
     buildConditionalsEs5.es5 = true;
     buildConditionalsEs5.polyfills = true;
+    buildConditionalsEs5.ssrClientSide = true;
 
     const coreFilenameEs5 = await generateCore(config, ctx, 'es5', globalJsContentsEs5, buildConditionalsEs5);
     appRegistry.corePolyfilled = coreFilenameEs5;

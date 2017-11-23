@@ -1,7 +1,6 @@
 import { build } from '../build';
 import { BuildConfig, BuildContext, BuildResults, ComponentRegistry } from '../../../util/interfaces';
 import { mockBuildConfig, mockFs } from '../../../testing/mocks';
-import { parseComponentRegistry } from '../../../util/data-parse';
 import { validateBuildConfig } from '../../../util/validate-config';
 import * as path from 'path';
 
@@ -14,6 +13,7 @@ describe('rebuild', () => {
       { components: ['cmp-a'] }
     ];
     config.watch = true;
+    config.es5Fallback = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
 

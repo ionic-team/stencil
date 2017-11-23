@@ -66,9 +66,9 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
     config.sys = getNodeSys(path.join(__dirname, '../'), config.logger);
   }
 
+  var stencil = require(path.join(__dirname, '../compiler/index.js'));
   switch (task) {
     case 'build':
-      var stencil = require(path.join(__dirname, '../compiler/index.js'));
       stencil.build(config).catch((err: any) => {
         config.logger.error(err);
       });
@@ -78,6 +78,12 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
           return process.exit(0);
         });
       }
+      break;
+
+    case 'docs':
+      stencil.docs(config).catch((err: any) => {
+        config.logger.error(err);
+      });
       break;
 
     default:

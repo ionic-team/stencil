@@ -218,7 +218,7 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
 function validateNamespace(namespace: string) {
   namespace = namespace.trim();
 
-  const invalidNamespaceChars = namespace.replace(/(\w)|(\-)/g, '');
+  const invalidNamespaceChars = namespace.replace(/(\w)|(\-)|(\$)/g, '');
   if (invalidNamespaceChars !== '') {
     throw new Error(`Namespace "${namespace}" contains invalid characters: ${invalidNamespaceChars}`);
   }
@@ -359,6 +359,6 @@ const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?
 const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';
 
 const DEFAULT_COPY_TASKS: CopyTasks = {
-  assets: { src: 'assets' },
-  manifestJson: { src: 'manifest.json' }
+  assets: { src: 'assets', warn: false },
+  manifestJson: { src: 'manifest.json', warn: false }
 };

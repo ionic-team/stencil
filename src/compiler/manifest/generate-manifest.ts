@@ -32,7 +32,7 @@ export function generateAppManifest(config: BuildConfig, ctx: BuildContext, modu
     // load each of the manifests for each dependent collection
     return loadDependentManifests(config, ctx);
 
-  }).then(dependentManifests => {
+    }).then(dependentManifests => {
     // merge the loaded dependent manifests
     // into the app's manifest
     return mergeDependentManifests(ctx.manifest, dependentManifests);
@@ -59,11 +59,11 @@ export function addAppComponents(config: BuildConfig, manifest: Manifest, module
     }
 
     // see if this component tag shows up in any config's bundles
-    const includeComponent = config.bundles.some(bundle => {
+    const includedComponent = config.bundles.some(bundle => {
       return bundle.components.some(c => c === moduleFile.cmpMeta.tagNameMeta);
     });
 
-    if (!includeComponent) {
+    if (!includedComponent) {
       // didn't find this component in the config bundles
       // so let's go ahead and just add it for them
       manifest.bundles.push({

@@ -99,6 +99,24 @@ describe('cli', () => {
       expect(config.serviceWorker).toBe(true);
     });
 
+    it('should not enable service worker in prod mode if service worker config is false', () => {
+      config.devMode = false;
+      config.serviceWorker = false;
+      const argv: CliArgv = {};
+      overrideConfigFromArgv(config, argv);
+      validateBuildConfig(config);
+      expect(config.serviceWorker).toBe(false);
+    });
+
+    it('should not enable service worker in dev mode if service worker config is false', () => {
+      config.devMode = true;
+      config.serviceWorker = false;
+      const argv: CliArgv = {};
+      overrideConfigFromArgv(config, argv);
+      validateBuildConfig(config);
+      expect(config.serviceWorker).toBe(false);
+    });
+
   });
 
   describe('parseCmdArgs', () => {
