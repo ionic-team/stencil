@@ -76,11 +76,13 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     // component instance prop/state setter (cannot be arrow fn)
     const elm: HostElement = (this as ComponentInstance).__el;
 
-    if (memberType !== MEMBER_TYPE.Prop) {
-      setValue(plt, elm, memberName, newValue);
+    if (elm) {
+      if (memberType !== MEMBER_TYPE.Prop) {
+        setValue(plt, elm, memberName, newValue);
 
-    } else if (Build.verboseError) {
-      console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
+      } else if (Build.verboseError) {
+        console.warn(`@Prop() "${memberName}" on "${elm.tagName}" cannot be modified.`);
+      }
     }
   }
 
