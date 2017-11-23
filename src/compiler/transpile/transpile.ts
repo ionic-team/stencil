@@ -132,12 +132,16 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   if (ctx.appFiles.components_d_ts !== componentsFileContent) {
     // the components.d.ts file is unchanged, no need to resave
     config.sys.fs.writeFileSync(componentsFilePath, componentsFileContent, { encoding: 'utf8' });
+    ctx.moduleFiles[componentsFilePath] = {
+      tsFilePath: componentsFilePath,
+      tsText: componentsFileContent
+    };
   }
 
   // cache this for rebuilds to avoid unnecessary writes
   ctx.appFiles.components_d_ts = componentsFileContent;
 
-  const program = ts.createProgram(tsFileNames.concat(componentsFilePath), tsOptions, tsHost, checkProgram);
+  const program = ts.createProgram(tsFileNames, tsOptions, tsHost, checkProgram);
 
   transpileProgram(program, tsHost, config, ctx, transpileResults);
   timespace.finish(`transpile es2015 finished`);
