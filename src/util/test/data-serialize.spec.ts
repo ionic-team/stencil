@@ -42,6 +42,15 @@ describe('data serialize', () => {
       expect(r.split('(')[0]).toBe(`App.loadComponents`);
     });
 
+    it('should inject iife', () => {
+      const namespace = 'App';
+      const moduleId = 'moduleId';
+      const r = formatLoadComponents(namespace, moduleId, 'hola', []);
+      expect(r.includes(`/**** component modules ****/
+function importComponent(exports, h, Context, publicPath) {
+"use strict";
+hola
+},`)).toBeTruthy();
+    });
   });
-
 });

@@ -66,8 +66,7 @@ function bundleComponents(config: BuildConfig, ctx: BuildContext, manifestBundle
 
 function bundleComponentsResults(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, bundleCacheKey: string, resultsCode: string) {
   // module bundling finished, assign its content to the user's bundle
-  // wrap our component code with our own iife
-  manifestBundle.compiledModuleText = wrapComponentImports(resultsCode);
+  manifestBundle.compiledModuleText = resultsCode;
 
   // replace build time expressions, like process.env.NODE_ENV === 'production'
   // with a hard coded boolean

@@ -55,7 +55,7 @@ export function transpileToEs5(input: string) {
 
   loadTypeScriptDiagnostics('', diagnostics, tsResults.diagnostics);
 
-  if (diagnostics.length) {
+  if (diagnostics.length > 0) {
     results.diagnostics = diagnostics;
     results.code = input;
     return results;

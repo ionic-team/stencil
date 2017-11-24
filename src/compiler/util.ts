@@ -365,7 +365,10 @@ export function catchError(diagnostics: Diagnostic[], err: Error) {
 }
 
 
-export function hasError(diagnostics: Diagnostic[]) {
+export function hasError(diagnostics: Diagnostic[]): boolean {
+  if (!diagnostics) {
+    return false;
+  }
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 }
 
