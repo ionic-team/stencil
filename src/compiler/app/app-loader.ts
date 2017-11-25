@@ -61,7 +61,7 @@ export async function generateLoader(
         config.logger[d.level](d.messageText);
       });
       if (!minifyJsResults.diagnostics.length) {
-        loaderContent = minifyJsResults.output;
+        ctx.appFiles.loader = loaderContent = minifyJsResults.output;
       }
     }
 
