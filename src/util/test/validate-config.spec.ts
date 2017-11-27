@@ -210,7 +210,7 @@ describe('validation', () => {
 
     it('should set default emptyDist to false', () => {
       validateBuildConfig(config);
-      expect(config.emptyDist).toBe(false);
+      expect(config.emptyDist).toBe(true);
     });
 
     it('should set emptyDist to true', () => {
@@ -221,7 +221,7 @@ describe('validation', () => {
 
     it('should set default emptyWWW to false', () => {
       validateBuildConfig(config);
-      expect(config.emptyWWW).toBe(false);
+      expect(config.emptyWWW).toBe(true);
     });
 
     it('should set emptyWWW to true', () => {

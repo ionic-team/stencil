@@ -190,8 +190,13 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     }
   }
 
-  config.emptyDist = !!config.emptyDist;
-  config.emptyWWW = !!config.emptyWWW;
+  if (typeof config.emptyDist !== 'boolean') {
+    config.emptyDist = true;
+  }
+
+  if (typeof config.emptyWWW !== 'boolean') {
+    config.emptyWWW = true;
+  }
 
   config.collections = config.collections || [];
   config.collections = config.collections.map(validateDependentCollection);

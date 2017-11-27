@@ -206,12 +206,12 @@ export function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
   if (!ctx.isRebuild) {
     // don't bother emptying the directories when it's a rebuild
 
-    if (config.generateWWW && !config.emptyWWW) {
+    if (config.generateWWW && config.emptyWWW) {
       config.logger.debug(`empty buildDir: ${config.buildDir}`);
       emptyPromises.push(config.sys.emptyDir(config.buildDir));
     }
 
-    if (config.generateDistribution && !config.emptyDist) {
+    if (config.generateDistribution && config.emptyDist) {
       config.logger.debug(`empty distDir: ${config.distDir}`);
       emptyPromises.push(config.sys.emptyDir(config.distDir));
     }
