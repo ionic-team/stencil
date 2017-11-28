@@ -32,10 +32,10 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
 
 
 function generateBundleComponentStyles(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
-  const moduleFilesWithStyles = getModuleFilesWithStyles(manifestBundle.moduleFiles);
+  const bundleModes = getManifestBundleModes(manifestBundle.moduleFiles);
 
-  const promises = moduleFilesWithStyles.map(moduleFile => {
-    return generateComponentStyles(config, ctx, moduleFile).then(compiledModeStyles => {
+  const promises = manifestBundle. moduleFiles.filter(m => m.cmpMeta).map(moduleFile => {
+    return generateComponentStyles(config, ctx, moduleFile, bundleModes).then(compiledModeStyles => {
       manifestBundle.compiledModeStyles.push(...compiledModeStyles);
     });
   });
@@ -44,13 +44,17 @@ function generateBundleComponentStyles(config: BuildConfig, ctx: BuildContext, m
 }
 
 
-export function getModuleFilesWithStyles(allModuleFiles: ModuleFile[]): ModuleFile[] {
-  return allModuleFiles
-          .filter(m => m.cmpMeta && m.cmpMeta.stylesMeta && Object.keys(m.cmpMeta.stylesMeta).length)
-          .sort((a, b) => {
-            if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
-            if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
-            return 0;
-          });
+export function getManifestBundleModes(bundleModuleFiles: ModuleFile[]) {
+  const allBundleModes: string[] = [];
+
+  bundleModuleFiles.filter(m => m.cmpMeta && m.cmpMeta.stylesMeta && Object.keys(m.cmpMeta.stylesMeta).length).forEach(moduleFile => {
+    Object.keys(moduleFile.cmpMeta.stylesMeta).forEach(styleModeName => {
+      if (!allBundleModes.includes(styleModeName)) {
+        allBundleModes.push(styleModeName);
+      }
+    });
+  });
+
+  return allBundleModes.sort();
 }
 

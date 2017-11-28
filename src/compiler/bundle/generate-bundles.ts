@@ -3,6 +3,7 @@ import { componentRequiresScopedStyles, generatePreamble, pathJoin, hasError } f
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { formatLoadComponents, formatLoadStyles } from '../../util/data-serialize';
 import { getAppFileName, getBundleFileName, getAppWWWBuildDir } from '../app/app-file-naming';
+import { getManifestBundleModes } from './bundle-styles';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
@@ -241,23 +242,6 @@ export function getBundleId(config: BuildConfig, components: string[], modeName:
   }
 
   return components[0] + '.' + modeName;
-}
-
-
-export function getManifestBundleModes(moduleFiles: ModuleFile[]) {
-  const modes: string[] = [];
-
-  moduleFiles.forEach(m => {
-    if (m.cmpMeta && m.cmpMeta.stylesMeta) {
-      Object.keys(m.cmpMeta.stylesMeta).forEach(modeName => {
-        if (modes.indexOf(modeName) === -1) {
-          modes.push(modeName);
-        }
-      });
-    }
-  });
-
-  return modes.sort();
 }
 
 

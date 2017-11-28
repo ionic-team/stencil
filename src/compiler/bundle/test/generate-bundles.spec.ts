@@ -117,28 +117,6 @@ describe('generate-bundles', () => {
 
   });
 
-  describe('getManifestBundleModes', () => {
-
-    it('get all modes', () => {
-      const allModuleFiles: ModuleFile[] =  [
-        { cmpMeta: { tagNameMeta: 'cmp-d', stylesMeta: { ios: {}, md: {} } } },
-        { cmpMeta: { tagNameMeta: 'cmp-a', stylesMeta: { $: {}, md: {} } } },
-        { cmpMeta: { tagNameMeta: 'cmp-b', stylesMeta: { ios: {}, wp: {} } } },
-        { cmpMeta: { tagNameMeta: 'cmp-c' } },
-        { }
-      ];
-
-      const modes = getManifestBundleModes(allModuleFiles);
-
-      expect(modes[0]).toBe('$');
-      expect(modes[1]).toBe('ios');
-      expect(modes[2]).toBe('md');
-      expect(modes[3]).toBe('wp');
-      expect(modes.length).toBe(4);
-    });
-
-  });
-
   describe('bundleRequiresScopedStyles', () => {
 
     it('scoped styles required for shadow dom w/ styles', () => {

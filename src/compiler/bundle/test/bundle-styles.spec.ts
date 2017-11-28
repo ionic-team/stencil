@@ -1,10 +1,10 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, ModuleFile } from '../../../util/interfaces';
-import { getModuleFilesWithStyles } from '../bundle-styles';
+import { getManifestBundleModes } from '../bundle-styles';
 
 
 describe('bundle-styles', () => {
 
-  describe('getModuleFilesWithStyles', () => {
+  describe('getManifestBundleModes', () => {
 
     it('only get module files with style meta', () => {
       const allModuleFiles: ModuleFile[] =  [
@@ -15,11 +15,11 @@ describe('bundle-styles', () => {
         { }
       ];
 
-      const moduleFiles = getModuleFilesWithStyles(allModuleFiles);
+      const modes = getManifestBundleModes(allModuleFiles);
 
-      expect(moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-b');
-      expect(moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-d');
-      expect(moduleFiles.length).toBe(2);
+      expect(modes[0]).toBe('ios');
+      expect(modes[1]).toBe('md');
+      expect(modes.length).toBe(2);
     });
 
   });
