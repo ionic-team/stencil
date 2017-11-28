@@ -117,6 +117,13 @@ describe('cli', () => {
       expect(config.serviceWorker).toBe(false);
     });
 
+    it('should enable docs generate', () => {
+      const argv: CliArgv = { docs: true };
+      overrideConfigFromArgv(config, argv);
+      validateBuildConfig(config);
+      expect(config.generateDocs).toBe(true);
+    });
+
   });
 
   describe('parseCmdArgs', () => {
@@ -184,6 +191,10 @@ describe('cli', () => {
       process.argv[2] = '--es5';
       argv = parseArgv(process);
       expect(argv.es5).toBe(true);
+
+      process.argv[2] = '--docs';
+      argv = parseArgv(process);
+      expect(argv.docs).toBe(true);
     });
 
   });

@@ -400,6 +400,7 @@ export interface BuildConfig {
   serviceWorker?: ServiceWorkerConfig|boolean;
   hydratedCssClass?: string;
   sassConfig?: any;
+  generateDocs?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }

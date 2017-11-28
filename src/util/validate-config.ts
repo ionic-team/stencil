@@ -198,6 +198,10 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.emptyWWW = true;
   }
 
+  if (typeof config.generateDocs !== 'boolean') {
+    config.generateDocs = false;
+  }
+
   config.collections = config.collections || [];
   config.collections = config.collections.map(validateDependentCollection);
 
