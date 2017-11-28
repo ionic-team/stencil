@@ -3,6 +3,14 @@ import { transpileCoreBuild } from '../transpile/core-build';
 
 
 export function buildCoreContent(config: BuildConfig, ctx: BuildContext, coreBuild: BuildConditionals, coreContent: string) {
+  const cacheKey = getCoreCacheKey(coreBuild);
+
+  if (typeof ctx.coreBuilds[cacheKey] === 'string') {
+    return ctx.coreBuilds[cacheKey];
+  }
+
+  const timespan = config.logger.createTimeSpan(`buildCoreContent ${coreBuild.coreId} start`, true);
+
   const transpileResults = transpileCoreBuild(coreBuild, coreContent);
 
   if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
@@ -21,7 +29,24 @@ export function buildCoreContent(config: BuildConfig, ctx: BuildContext, coreBui
     return coreContent;
   }
 
+  timespan.finish(`buildCoreContent ${coreBuild.coreId} finished`);
+
+  ctx.coreBuilds[cacheKey] = minifyResults.output;
+
   return minifyResults.output;
+}
+
+
+function getCoreCacheKey(coreBuild: BuildConditionals) {
+  const cacheKey: string[] = [];
+
+  Object.keys(coreBuild).forEach(key => {
+    if ((coreBuild as any)[key]) {
+      cacheKey.push(key);
+    }
+  });
+
+  return cacheKey.sort().join('_');
 }
 
 

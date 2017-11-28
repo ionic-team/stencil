@@ -137,11 +137,11 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     );
 
     // add watchers to props if they exist
-    if (Build.propDidChange) {
+    if (Build.didChange) {
       proxyPropChangeMethods(cmpMeta.propsWillChangeMeta, PROP_WILL_CHG, elm, instance, memberName);
     }
 
-    if (Build.propWillChange) {
+    if (Build.willChange) {
       proxyPropChangeMethods(cmpMeta.propsDidChangeMeta, PROP_DID_CHG, elm, instance, memberName);
     }
 
@@ -196,7 +196,7 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
 
-    if (Build.propWillChange && internalValues[PROP_WILL_CHG + memberName]) {
+    if (Build.willChange && internalValues[PROP_WILL_CHG + memberName]) {
       // this instance is watching for when this property WILL change
       internalValues[PROP_WILL_CHG + memberName](newVal, oldVal);
     }
@@ -205,7 +205,7 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
     // https://youtu.be/dFtLONl4cNc?t=22
     internalValues[memberName] = newVal;
 
-    if (Build.propDidChange && internalValues[PROP_DID_CHG + memberName]) {
+    if (Build.didChange && internalValues[PROP_DID_CHG + memberName]) {
       // this instance is watching for when this property DID change
       internalValues[PROP_DID_CHG + memberName](newVal, oldVal);
     }
