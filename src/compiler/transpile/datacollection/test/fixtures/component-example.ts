@@ -24,31 +24,37 @@ class ActionSheet {
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has loaded.
+   * @type {EventEmitter}
    */
   @Event() ionActionSheetDidLoad: EventEmitter;
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has presented.
+   * @type {EventEmitter}
    */
   @Event() ionActionSheetDidPresent: EventEmitter;
 
   /**
    * @output {ActionSheetEvent} Emitted before the alert has presented.
+   * @type {EventEmitter}
    */
   @Event() ionActionSheetWillPresent: EventEmitter;
 
   /**
    * @output {ActionSheetEvent} Emitted before the alert has dismissed.
+   * @type {EventEmitter}
    */
   @Event() ionActionSheetWillDismiss: EventEmitter;
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has dismissed.
+   * @type {EventEmitter}
    */
   @Event() ionActionSheetDidDismiss: EventEmitter;
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has unloaded.
+   * @type {EventEmitter}
    */
   @Event() ionActionSheetDidUnload: EventEmitter;
 
