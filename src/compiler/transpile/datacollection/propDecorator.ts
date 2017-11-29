@@ -156,9 +156,10 @@ function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): 
   });
 
   if (importTypeDeclaration) {
+    const localImportPath = (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text;
     return {
       referenceLocation: 'import',
-      importReferenceLocation: (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text
+      importReferenceLocation: localImportPath
     };
   }
 

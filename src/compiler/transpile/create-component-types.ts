@@ -38,7 +38,7 @@ export function generateComponentTypesFile(config: BuildConfig, cmpList: Compone
     .reduce((finalString, moduleFileName) => {
       const cmpMeta = cmpList[moduleFileName];
       const importPath = config.sys.path.relative(config.srcDir, moduleFileName)
-          .replace(/\.tsx$/, '');
+          .replace(/\.(tsx|ts)$/, '');
 
       typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmpMeta, moduleFileName, config);
 
@@ -52,10 +52,10 @@ export function generateComponentTypesFile(config: BuildConfig, cmpList: Compone
 
     const typeData = typeImportData[filePath];
     let importFilePath: string;
-    if (filePath.startsWith('.') || filePath.startsWith('/')) {
+    if (config.sys.path.isAbsolute(filePath)) {
       importFilePath = './' + normalizePath(
-        config.sys.path.relative(config.collectionDir, filePath)
-      );
+        config.sys.path.relative(config.srcDir, filePath)
+      ).replace(/\.(tsx|ts)$/, '');
     } else {
       importFilePath = filePath;
     }
@@ -68,7 +68,7 @@ ${typeData.map(td => {
     return `  ${td.localName} as ${td.importName},`;
   }
 }).join('\n')}
-} from './${importFilePath}';\n`;
+} from '${importFilePath}';\n`;
 
     return finalString;
   }, '');
@@ -129,15 +129,11 @@ function updateReferenceTypeImports(importDataObj: ImportData, allTypes: { [key:
 
       // If this is a relative path make it absolute
       if (importFileLocation.startsWith('.')) {
-        importFileLocation = path.relative(
-          config.srcDir,
-          path.normalize(
-            path.join(
-              path.dirname(filePath),
-              importFileLocation
-            )
-          )
-        );
+        importFileLocation =
+          path.resolve(
+            path.dirname(filePath),
+            importFileLocation
+          );
       }
 
       obj[importFileLocation] = obj[importFileLocation] || [];
@@ -197,7 +193,7 @@ declare global {
   }
   namespace JSXElements {
     export interface ${jsxInterfaceName} extends HTMLAttributes {
-      ${Object.keys(interfaceOptions).map((key: string) => `${key}?: ${interfaceOptions[key]}`).join('\n      ')}
+      ${Object.keys(interfaceOptions).map((key: string) => `${key}?: ${interfaceOptions[key]};`).join('\n      ')}
     }
   }
 }
