@@ -17,6 +17,7 @@ describe('component decorator', () => {
       expect(response).toEqual({
         'componentClass': 'ActionSheet',
         'encapsulation': 0,
+        'assetsDirsMeta': [],
         'eventsMeta': [
           {
             'eventBubbles': true,
@@ -249,12 +250,12 @@ describe('component decorator', () => {
         },
         'stylesMeta': {
           'ios': {
-            'cmpRelativePaths': [
+            'originalComponentPaths': [
               'action-sheet.ios.scss',
             ],
           },
           'md': {
-            'cmpRelativePaths': [
+            'originalComponentPaths': [
               'action-sheet.md.scss',
             ],
           },

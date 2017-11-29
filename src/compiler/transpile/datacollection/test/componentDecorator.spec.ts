@@ -23,7 +23,8 @@ describe('component decorator', () => {
           documentation: '',
           name: 'ActionSheet',
           type: 'typeof ActionSheet'
-        }
+        },
+        assetsDirsMeta: []
       });
     });
 
@@ -43,7 +44,8 @@ describe('component decorator', () => {
           documentation: '',
           name: 'ActionSheet',
           type: 'typeof ActionSheet'
-        }
+        },
+        assetsDirsMeta: []
       });
     });
 
@@ -58,6 +60,7 @@ describe('component decorator', () => {
         tagNameMeta: 'ion-action-sheet',
         hostMeta: {},
         stylesMeta: {},
+        assetsDirsMeta: [],
         encapsulation: ENCAPSULATION.ScopedCss,
         jsdoc: {
           documentation: '',
@@ -87,12 +90,13 @@ describe('component decorator', () => {
         },
         stylesMeta: {
           ios: {
-            cmpRelativePaths: ['action-sheet.ios.scss']
+            originalComponentPaths: ['action-sheet.ios.scss']
           },
           md: {
-            cmpRelativePaths: ['action-sheet.md.scss']
+            originalComponentPaths: ['action-sheet.md.scss']
           }
-        }
+        },
+        assetsDirsMeta: [],
       });
     });
   });
