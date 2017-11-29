@@ -1,29 +1,25 @@
-import { AssetsMeta, BuildConfig, BuildContext, ComponentOptions, ComponentMeta, ModuleFile } from '../../util/interfaces';
+import { AssetsMeta, BuildConfig, BuildContext } from '../../util/interfaces';
 import { catchError, normalizePath } from '../util';
 import { COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 import { getAppDistDir, getAppWWWBuildDir } from '../app/app-file-naming';
 
 
-export function normalizeAssetsDir(config: BuildConfig, userOpts: ComponentOptions, moduleFile: ModuleFile, cmpMeta: ComponentMeta)  {
-  if (userOpts.assetsDir) {
-    normalizeAssetDir(config, moduleFile, cmpMeta, userOpts.assetsDir);
-  }
-
-  if (Array.isArray(userOpts.assetsDirs)) {
-    userOpts.assetsDirs.forEach(assetsDir => {
-      normalizeAssetDir(config, moduleFile, cmpMeta, assetsDir);
-    });
-  }
+export function normalizeAssetsDir(config: BuildConfig, componentFilePath: string, assetsMetas: AssetsMeta[])  {
+  return assetsMetas.map((assetMeta) => {
+    return {
+      ...assetMeta,
+      ...normalizeAssetDir(config, componentFilePath, assetMeta.originalComponentPath)
+    };
+  });
 }
 
 
-function normalizeAssetDir(config: BuildConfig, moduleFile: ModuleFile, cmpMeta: ComponentMeta, assetsDir: string) {
-  if (typeof assetsDir !== 'string' || assetsDir.trim() === '') return;
+function normalizeAssetDir(config: BuildConfig, componentFilePath: string, assetsDir: string): AssetsMeta {
 
   const assetsMeta: AssetsMeta = {};
 
   // get the absolute path of the directory which the component is sitting in
-  const componentDir = normalizePath(config.sys.path.dirname(moduleFile.tsFilePath));
+  const componentDir = normalizePath(config.sys.path.dirname(componentFilePath));
 
   // get the relative path from the component file to the assets directory
   assetsDir = normalizePath(assetsDir.trim());
@@ -44,7 +40,7 @@ function normalizeAssetDir(config: BuildConfig, moduleFile: ModuleFile, cmpMeta:
     assetsMeta.absolutePath = normalizePath(config.sys.path.join(componentDir, assetsDir));
   }
 
-  (cmpMeta.assetsDirsMeta = cmpMeta.assetsDirsMeta || []).push(assetsMeta);
+  return assetsMeta;
 }
 
 

@@ -3,8 +3,9 @@ import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo, At
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 import { isTypeReferenceNode } from 'typescript';
+import { serializeSymbol } from './utils';
 
-export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, transformContext: ts.TransformationContext): MembersMeta {
+export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): MembersMeta {
   const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
 
   return decoratedMembers
@@ -17,6 +18,10 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
       const propDecorator = prop.decorators.find((decorator: ts.Decorator) => (
         decorator.getFullText().indexOf('Prop(') !== -1)
       );
+      if (propDecorator == null) {
+        return allMembers;
+      }
+
       const suppliedOptions = (<ts.CallExpression>propDecorator.expression).arguments
         .map(arg => {
           try {
@@ -26,11 +31,11 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
           } catch (e) {
             const d = catchError(diagnostics, e);
             d.messageText = `parse prop options: ${e}`;
-            d.absFilePath = tsFilePath;
           }
         });
       const propOptions: PropOptions = suppliedOptions[0];
       const attribName = (<ts.Identifier>prop.name).text;
+      const symbol = checker.getSymbolAtLocation(prop.name);
 
       if (propOptions && typeof propOptions.connect === 'string') {
         memberData.memberType = MEMBER_TYPE.PropConnect;
@@ -53,15 +58,14 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
               level: 'warn',
               type: 'build',
               header: 'Prop type provided is not supported, defaulting to any',
-              messageText: `'${prop.getFullText()}' from ${tsFilePath}`,
-              absFilePath: tsFilePath
+              messageText: `'${prop.getFullText()}'`,
             });
           }
           attribType = {
             text: attribTypeText,
           };
         } else {
-          attribType = getAttributeTypeInfo(prop.type, sourceFile, transformContext);
+          attribType = getAttributeTypeInfo(prop.type, sourceFile);
         }
 
         if (propOptions && typeof propOptions.state === 'boolean') {
@@ -69,8 +73,7 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
             level: 'warn',
             type: 'build',
             header: '@Prop({ state: true }) option has been deprecated',
-            messageText: `"state" has been renamed to @Prop({ mutable: true }) ${tsFilePath}`,
-            absFilePath: tsFilePath
+            messageText: `"state" has been renamed to @Prop({ mutable: true })`,
           });
           propOptions.mutable = propOptions.state;
         }
@@ -84,11 +87,10 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
         memberData.attribType = attribType;
         memberData.attribName = attribName;
         memberData.propType = propTypeFromTSType(attribType.text);
+        memberData.jsdoc = serializeSymbol(checker, symbol);
       }
 
       allMembers[attribName] = memberData;
-
-      prop.decorators = undefined;
       return allMembers;
     }, {} as MembersMeta);
 }
@@ -96,11 +98,11 @@ export function getPropDecoratorMeta(tsFilePath: string, diagnostics: Diagnostic
 
 
 
-function getAttributeTypeInfo(type: ts.TypeNode, sourceFile: ts.SourceFile, transformContext: ts.TransformationContext): AttributeTypeInfo {
+function getAttributeTypeInfo(type: ts.TypeNode, sourceFile: ts.SourceFile): AttributeTypeInfo {
   const typeInfo: AttributeTypeInfo = {
     text: type.getFullText().trim()
   };
-  const typeReferences = getAllTypeReferences(type, transformContext)
+  const typeReferences = getAllTypeReferences(type)
     .reduce((allReferences, rt)  => {
       allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
       return allReferences;
@@ -112,7 +114,7 @@ function getAttributeTypeInfo(type: ts.TypeNode, sourceFile: ts.SourceFile, tran
   return typeInfo;
 }
 
-function getAllTypeReferences(node: ts.TypeNode, transformContext: ts.TransformationContext): string[] {
+function getAllTypeReferences(node: ts.TypeNode): string[] {
   const referencedTypes: string[] = [];
 
   function visit(node: ts.Node): ts.VisitResult<ts.Node> {
@@ -125,9 +127,9 @@ function getAllTypeReferences(node: ts.TypeNode, transformContext: ts.Transforma
           .forEach(tr => referencedTypes.push((<ts.TypeReferenceNode>tr).typeName.getText().trim()));
       }
     default:
-      return ts.visitEachChild(node, (node) => {
+      return ts.forEachChild(node, (node) => {
         return visit(node);
-      }, transformContext);
+      });
     }
   }
 
@@ -138,8 +140,10 @@ function getAllTypeReferences(node: ts.TypeNode, transformContext: ts.Transforma
 
 function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): AttributeTypeReference {
 
+  const sourceFileObj = sourceFile.getSourceFile();
+
   // Loop through all top level imports to find any reference to the type for 'import' reference location
-  const importTypeDeclaration = sourceFile.statements.find(st => {
+  const importTypeDeclaration = sourceFileObj.statements.find(st => {
     const statement = ts.isImportDeclaration(st) &&
       ts.isImportClause(st.importClause) &&
       st.importClause.namedBindings &&  ts.isNamedImports(st.importClause.namedBindings) &&
@@ -152,14 +156,15 @@ function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): 
   });
 
   if (importTypeDeclaration) {
+    const localImportPath = (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text;
     return {
       referenceLocation: 'import',
-      importReferenceLocation: (<ts.StringLiteral>(<ts.ImportDeclaration>importTypeDeclaration).moduleSpecifier).text
+      importReferenceLocation: localImportPath
     };
   }
 
   // Loop through all top level exports to find if any reference to the type for 'local' reference location
-  const isExported = sourceFile.statements.some(st => {
+  const isExported = sourceFileObj.statements.some(st => {
     // Is the interface defined in the file and exported
     const isInterfaceDeclarationExported = ((ts.isInterfaceDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName) &&
@@ -207,7 +212,6 @@ function inferPropType(expression: ts.Expression | undefined) {
       (ts.isObjectLiteralExpression(expression))) {
     return 'any';
   }
-
   return undefined;
 }
 
