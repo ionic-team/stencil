@@ -208,26 +208,37 @@ describe('validation', () => {
       expect(path.isAbsolute(config.distDir)).toBe(true);
     });
 
-    it('should set default emptyDist to false', () => {
-      validateBuildConfig(config);
-      expect(config.emptyDist).toBe(false);
-    });
-
-    it('should set emptyDist to true', () => {
-      config.emptyDist = true;
+    it('should set default emptyDist to true', () => {
       validateBuildConfig(config);
       expect(config.emptyDist).toBe(true);
     });
 
-    it('should set default emptyWWW to false', () => {
+    it('should set emptyDist to false', () => {
+      config.emptyDist = false;
+      validateBuildConfig(config);
+      expect(config.emptyDist).toBe(false);
+    });
+
+    it('should set default emptyWWW to true', () => {
+      validateBuildConfig(config);
+      expect(config.emptyWWW).toBe(true);
+    });
+
+    it('should set emptyWWW to false', () => {
+      config.emptyWWW = false;
       validateBuildConfig(config);
       expect(config.emptyWWW).toBe(false);
     });
 
-    it('should set emptyWWW to true', () => {
-      config.emptyWWW = true;
+    it('should set default generateDocs to false', () => {
       validateBuildConfig(config);
-      expect(config.emptyWWW).toBe(true);
+      expect(config.generateDocs).toBe(false);
+    });
+
+    it('should set generateDocs to true', () => {
+      config.generateDocs = true;
+      validateBuildConfig(config);
+      expect(config.generateDocs).toBe(true);
     });
 
     it('should set default collection dir and convert to absolute path', () => {

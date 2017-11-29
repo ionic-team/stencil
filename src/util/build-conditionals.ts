@@ -23,8 +23,8 @@ export const Build: BuildConditionals = {
   method: true,
   propConnect: true,
   propContext: true,
-  propDidChange: true,
-  propWillChange: true,
+  didChange: true,
+  willChange: true,
 
   // lifecycle events
   cmpDidLoad: true,

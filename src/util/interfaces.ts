@@ -341,8 +341,8 @@ export interface BuildConditionals {
   method: boolean;
   propConnect: boolean;
   propContext: boolean;
-  propDidChange: boolean;
-  propWillChange: boolean;
+  didChange: boolean;
+  willChange: boolean;
 
   // lifecycle events
   cmpDidLoad: boolean;
@@ -400,6 +400,7 @@ export interface BuildConfig {
   serviceWorker?: ServiceWorkerConfig|boolean;
   hydratedCssClass?: string;
   sassConfig?: any;
+  generateDocs?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -531,6 +532,7 @@ export interface BuildContext {
     components_d_ts?: string;
     [key: string]: string;
   };
+  coreBuilds?: {[cacheKey: string]: string};
   watcher?: FSWatcher;
   hasIndexHtml?: boolean;
 

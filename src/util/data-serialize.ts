@@ -1,6 +1,7 @@
 import { BundleIds, ComponentMeta, ComponentRegistry, CompiledModeStyles, EventMeta, ListenMeta,
   LoadComponentRegistry, MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../util/constants';
+import { wrapComponentImports } from '../compiler/bundle/component-modules';
 
 
 export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegistry {
@@ -168,6 +169,9 @@ export function formatLoadComponents(
   const componentMetaStr = moduleFiles.map(moduleFile => {
     return formatComponentMeta(moduleFile.cmpMeta);
   }).join(',\n');
+
+  // wrap our component code with our own iife
+  moduleBundleOutput = wrapComponentImports(moduleBundleOutput);
 
   return [
     `${getWindowNamespace(namespace)}.loadComponents(\n`,

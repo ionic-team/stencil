@@ -57,11 +57,11 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
   }
 
   if (cmpMeta.propsDidChangeMeta && cmpMeta.propsDidChangeMeta.length > 0) {
-    coreBuild.propDidChange = true;
+    coreBuild.didChange = true;
   }
 
   if (cmpMeta.propsWillChangeMeta && cmpMeta.propsWillChangeMeta.length > 0) {
-    coreBuild.propWillChange = true;
+    coreBuild.willChange = true;
   }
 
   if (cmpMeta.eventsMeta && cmpMeta.eventsMeta.length) {

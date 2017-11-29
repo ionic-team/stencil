@@ -11,6 +11,7 @@ export function getBuildContext(ctx?: BuildContext) {
   ctx.registry = ctx.registry || {};
   ctx.filesToWrite = ctx.filesToWrite || {};
   ctx.appFiles = ctx.appFiles || {};
+  ctx.coreBuilds = ctx.coreBuilds || {};
   ctx.moduleFiles = ctx.moduleFiles || {};
   ctx.jsFiles = ctx.jsFiles || {};
   ctx.cssFiles = ctx.cssFiles || {};
@@ -365,7 +366,10 @@ export function catchError(diagnostics: Diagnostic[], err: Error) {
 }
 
 
-export function hasError(diagnostics: Diagnostic[]) {
+export function hasError(diagnostics: Diagnostic[]): boolean {
+  if (!diagnostics) {
+    return false;
+  }
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 }
 

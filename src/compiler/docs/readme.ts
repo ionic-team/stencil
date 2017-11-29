@@ -4,11 +4,18 @@ import { BuildConfig, BuildContext, ModuleFile } from '../../util/interfaces';
 import { readFile } from '../util';
 
 
-export function genereateReadmes(config: BuildConfig, ctx: BuildContext) {
+export function genereateReadmes(config: BuildConfig, ctx: BuildContext): Promise<any> {
+  if (!config.generateDocs) {
+    return Promise.resolve();
+  }
+
   const cmpDirectories: string[] = [];
   const promises: Promise<any>[] = [];
+  const warnings: string[] = [];
 
-  Object.keys(ctx.moduleFiles).forEach(filePath => {
+  const moduleFiles = Object.keys(ctx.moduleFiles).sort();
+
+  moduleFiles.forEach(filePath => {
     const moduleFile = ctx.moduleFiles[filePath];
 
     if (!moduleFile.cmpMeta) {
@@ -17,8 +24,11 @@ export function genereateReadmes(config: BuildConfig, ctx: BuildContext) {
 
     const dirPath = config.sys.path.dirname(moduleFile.tsFilePath);
 
-    if (cmpDirectories.indexOf(dirPath) > -1) {
-      config.logger.error(`multiple components found in: ${dirPath}`);
+    if (cmpDirectories.includes(dirPath)) {
+      if (!warnings.includes(dirPath)) {
+        config.logger.warn(`multiple components found in: ${dirPath}`);
+        warnings.push(dirPath);
+      }
 
     } else {
       cmpDirectories.push(dirPath);
@@ -32,8 +42,6 @@ export function genereateReadmes(config: BuildConfig, ctx: BuildContext) {
 
 
 async function genereateReadme(config: BuildConfig, moduleFile: ModuleFile, dirPath: string) {
-  config.logger.info(`generated docs: ${moduleFile.cmpMeta.tagNameMeta}`);
-
   const readMePath = config.sys.path.join(dirPath, 'readme.md');
 
   return readFile(config.sys, readMePath).then(content => {
@@ -61,6 +69,7 @@ function createReadme(config: BuildConfig, moduleFile: ModuleFile, readMePath: s
       if (err) {
         reject(err);
       } else {
+        config.logger.info(`created readme docs: ${moduleFile.cmpMeta.tagNameMeta}`);
         resolve();
       }
     });
@@ -92,11 +101,18 @@ function updateReadme(config: BuildConfig, moduleFile: ModuleFile, readMePath: s
 
   addAutoGenerate(moduleFile.cmpMeta, content);
 
+  const updatedContent = content.join('\n');
+
+  if (updatedContent.trim() === existingContent.trim()) {
+    return Promise.resolve(true);
+  }
+
   return new Promise((resolve, reject) => {
-    config.sys.fs.writeFile(readMePath, content.join('\n'), (err) => {
+    config.sys.fs.writeFile(readMePath, updatedContent, (err) => {
       if (err) {
         reject(err);
       } else {
+        config.logger.info(`updated readme docs: ${moduleFile.cmpMeta.tagNameMeta}`);
         resolve(true);
       }
     });

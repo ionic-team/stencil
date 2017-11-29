@@ -52,6 +52,10 @@ export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
   if (argv.es5) {
     config.es5Fallback = true;
   }
+
+  if (argv.docs) {
+    config.generateDocs = true;
+  }
 }
 
 
@@ -86,6 +90,7 @@ export function help(process: NodeJS.Process, logger: Logger) {
       ${logger.green('--prerender')} ${logger.dim('............')} Prerender URLs.
       ${logger.green('--debug')} ${logger.dim('................')} Set the log level to debug.
       ${logger.green('--config')} ${logger.dim('...............')} Stencil config file.
+      ${logger.green('--docs')} ${logger.dim('.................')} Generate readme.md docs for each component
 
   ${logger.bold('Examples:')}
 
@@ -142,6 +147,7 @@ const ARG_OPTS: any = {
   boolean: [
     'debug',
     'dev',
+    'docs',
     'es5',
     'help',
     'prod',
@@ -167,6 +173,7 @@ export interface CliArgv {
   config?: string;
   debug?: boolean;
   dev?: boolean;
+  docs?: boolean;
   es5?: boolean;
   help?: boolean;
   logLevel?: string;

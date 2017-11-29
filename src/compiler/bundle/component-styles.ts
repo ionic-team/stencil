@@ -5,10 +5,8 @@ import { scopeComponentCss } from '../css/scope-css';
 
 
 
-export function generateComponentStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile) {
-  const modes = Object.keys(moduleFile.cmpMeta.stylesMeta);
-
-  const promises = modes.map(modeName => {
+export function generateComponentStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, bundleModes: string[]) {
+  const promises = bundleModes.map(modeName => {
     return generateComponentModeStyles(config, ctx, moduleFile, modeName);
   });
 
@@ -38,6 +36,7 @@ export function generateComponentModeStyles(
 
 
 function generateAllComponentModeStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, modeName: string) {
+  moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
   const modeStyleMeta = moduleFile.cmpMeta.stylesMeta[modeName];
   const promises: Promise<CompiledModeStyles>[] = [];
 
@@ -72,6 +71,19 @@ function generateAllComponentModeStyles(config: BuildConfig, ctx: BuildContext, 
       // plain styles as a string
       promises.push(readInlineStyles(config, ctx, moduleFile.cmpMeta, modeStyleMeta.styleStr, styleOrder));
     }
+
+  } else {
+    // containing bundle has this mode
+    // but turns out this component doesn't have this mode
+    const stylesDetail: CompiledModeStyles = {
+      styleOrder: 0,
+      modeName: modeName,
+      tag: moduleFile.cmpMeta.tagNameMeta,
+      scopedStyles: ' ',
+      unscopedStyles: ' ',
+      writeFile: false
+    };
+    promises.push(Promise.resolve(stylesDetail));
   }
 
   return Promise.all(promises);

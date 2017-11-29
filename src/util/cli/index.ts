@@ -81,6 +81,7 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
       break;
 
     case 'docs':
+      config.generateDocs = true;
       stencil.docs(config).catch((err: any) => {
         config.logger.error(err);
       });

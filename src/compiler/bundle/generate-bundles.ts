@@ -1,8 +1,9 @@
 import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry, CompiledModeStyles, ModuleFile, ManifestBundle, SourceTarget } from '../../util/interfaces';
-import { componentRequiresScopedStyles, generatePreamble, pathJoin } from '../util';
+import { componentRequiresScopedStyles, generatePreamble, pathJoin, hasError } from '../util';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { formatLoadComponents, formatLoadStyles } from '../../util/data-serialize';
 import { getAppFileName, getBundleFileName, getAppWWWBuildDir } from '../app/app-file-naming';
+import { getManifestBundleModes } from './bundle-styles';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
@@ -30,11 +31,14 @@ function generateBundleFiles(config: BuildConfig, ctx: BuildContext, manifestBun
 
   if (sourceTarget === 'es5') {
     const transpileResults = transpileToEs5(compiledModuleText);
-    if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
+    const transpileDiagnostics = transpileResults.diagnostics;
+    if (transpileDiagnostics && transpileDiagnostics.length > 0) {
       ctx.diagnostics.push(...transpileResults.diagnostics);
-    } else {
-      compiledModuleText = transpileResults.code;
     }
+    if (hasError(transpileDiagnostics)) {
+      return;
+    }
+    compiledModuleText = transpileResults.code;
   }
 
   let moduleText = formatLoadComponents(
@@ -238,23 +242,6 @@ export function getBundleId(config: BuildConfig, components: string[], modeName:
   }
 
   return components[0] + '.' + modeName;
-}
-
-
-export function getManifestBundleModes(moduleFiles: ModuleFile[]) {
-  const modes: string[] = [];
-
-  moduleFiles.forEach(m => {
-    if (m.cmpMeta && m.cmpMeta.stylesMeta) {
-      Object.keys(m.cmpMeta.stylesMeta).forEach(modeName => {
-        if (modes.indexOf(modeName) === -1) {
-          modes.push(modeName);
-        }
-      });
-    }
-  });
-
-  return modes.sort();
 }
 
 
