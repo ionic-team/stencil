@@ -32,7 +32,9 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
     }
 
     return (tsSourceFile) => {
-      return visit(tsSourceFile) as ts.SourceFile;
+      const file = visit(tsSourceFile) as ts.SourceFile;
+      // console.log(file.getSourceFile().getFullText());
+      return file;
     };
   };
 }
@@ -74,14 +76,17 @@ function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaratio
  * @param decorators array of decorators
  * @param name name to remove
  */
-function removeDecoratorByName(decorators: ts.NodeArray<ts.Decorator>, name: string): ts.NodeArray<ts.Decorator> {
-  const componentDecoratorIndex = decorators.findIndex(dec =>
+function removeDecoratorByName(decoratorList: ts.NodeArray<ts.Decorator>, name: string): ts.NodeArray<ts.Decorator> {
+  const componentDecoratorIndex = decoratorList.findIndex(dec =>
    (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === name)
   );
 
   if (componentDecoratorIndex === -1) {
-    return decorators;
+    return decoratorList;
   }
 
-  return ts.createNodeArray(decorators.slice().splice(componentDecoratorIndex, 1));
+  const updatedDecoratorList = decoratorList.slice();
+  updatedDecoratorList.splice(componentDecoratorIndex, 1);
+
+  return ts.createNodeArray(updatedDecoratorList);
 }
