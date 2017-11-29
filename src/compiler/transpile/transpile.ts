@@ -7,11 +7,12 @@ import { updateFileMetaFromSlot, updateModuleFileMetaFromSlot } from './transfor
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import { removeDecorators } from './transformers/remove-decorators';
+import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
+import { normalizeStyles } from './normalize-styles';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
 import * as ts from 'typescript';
-
 
 export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
 
@@ -125,6 +126,8 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
 
   Object.keys(metadata).forEach(tsFilePath => {
     ctx.moduleFiles[tsFilePath].cmpMeta = metadata[tsFilePath];
+    ctx.moduleFiles[tsFilePath].cmpMeta.stylesMeta = normalizeStyles(config, tsFilePath, metadata[tsFilePath].stylesMeta);
+    ctx.moduleFiles[tsFilePath].cmpMeta.assetsDirsMeta = normalizeAssetsDir(config, tsFilePath, metadata[tsFilePath].assetsDirsMeta);
   });
 
   // Generate d.ts files for component types

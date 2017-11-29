@@ -815,6 +815,7 @@ export interface StyleMeta {
   styleId?: string;
   absolutePaths?: string[];
   cmpRelativePaths?: string[];
+  originalComponentPaths?: string[];
   originalCollectionPaths?: string[];
   styleStr?: string;
 }
@@ -823,6 +824,7 @@ export interface StyleMeta {
 export interface AssetsMeta {
   absolutePath?: string;
   cmpRelativePath?: string;
+  originalComponentPath?: string;
   originalCollectionPath?: string;
 }
 

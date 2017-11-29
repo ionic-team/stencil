@@ -1,4 +1,4 @@
-import { ComponentOptions, ComponentMeta, ModeStyles } from '../../../util/interfaces';
+import { ComponentOptions, ComponentMeta, ModeStyles, AssetsMeta } from '../../../util/interfaces';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE } from '../../../util/constants';
 import { getDeclarationParameters, serializeSymbol } from './utils';
 import * as ts from 'typescript';
@@ -30,32 +30,79 @@ export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.Cla
     throw new Error(`tag missing in component decorator: ${JSON.stringify(componentOptions, null, 2)}`);
   }
 
+  // normalizeTag
   cmpMeta.tagNameMeta = componentOptions.tag;
+
+  // normalizeHost
   cmpMeta.hostMeta = componentOptions.host || {};
+
+  // normalizeEncapsulation
   cmpMeta.encapsulation =
       componentOptions.shadow ? ENCAPSULATION.ShadowDom :
       componentOptions.scoped ? ENCAPSULATION.ScopedCss :
       ENCAPSULATION.NoEncapsulation;
 
+  // noramlizeStyles
   cmpMeta.stylesMeta = {};
 
-  // If Component Options styleUrls is an array then add to default style mode
-  if (Array.isArray(componentOptions.styleUrls)) {
+  // styles: 'div { padding: 10px }'
+  if (typeof componentOptions.styles === 'string' && componentOptions.styles.trim().length) {
     cmpMeta.stylesMeta = {
       [DEFAULT_STYLE_MODE]: {
-        cmpRelativePaths: componentOptions.styleUrls
+        styleStr: componentOptions.styles.trim()
       }
     };
+  }
+
+  // styleUrl: 'my-styles.scss'
+  if (typeof componentOptions.styleUrl === 'string' && componentOptions.styleUrl.trim()) {
+    cmpMeta.stylesMeta = {
+      [DEFAULT_STYLE_MODE]: {
+        originalComponentPaths: [componentOptions.styleUrl]
+      }
+    };
+
+  // styleUrls: ['my-styles.scss', 'my-other-styles']
+  } else if (Array.isArray(componentOptions.styleUrls)) {
+    cmpMeta.stylesMeta = {
+      [DEFAULT_STYLE_MODE]: {
+        originalComponentPaths: componentOptions.styleUrls
+      }
+    };
+
+  // styleUrls: {
+  //   ios: 'badge.ios.scss',
+  //   md: 'badge.md.scss',
+  //   wp: 'badge.wp.scss'
+  // }
   } else {
     Object.keys(componentOptions.styleUrls || {}).reduce((stylesMeta, styleType) => {
       let styleUrls = <ModeStyles>componentOptions.styleUrls;
 
       stylesMeta[styleType] = {
-        cmpRelativePaths: [].concat(styleUrls[styleType])
+        originalComponentPaths: [].concat(styleUrls[styleType])
       };
 
       return stylesMeta;
     }, cmpMeta.stylesMeta);
+  }
+
+
+  cmpMeta.assetsDirsMeta = [];
+
+  // assetsDir: './somedir'
+  if (componentOptions.assetsDir) {
+    const assetsMeta: AssetsMeta = {
+      originalComponentPath: componentOptions.assetsDir
+    };
+    cmpMeta.assetsDirsMeta.push(assetsMeta);
+  }
+
+  // assetsDirs: ['./somedir', '../someotherdir']
+  if (Array.isArray(componentOptions.assetsDirs)) {
+    cmpMeta.assetsDirsMeta = cmpMeta.assetsDirsMeta.concat(
+      componentOptions.assetsDirs.map(assetDir => ({ originalComponentPath: assetDir }))
+    );
   }
 
   return cmpMeta;
