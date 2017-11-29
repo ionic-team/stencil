@@ -24,39 +24,33 @@ class ActionSheet {
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has loaded.
-   * @type {EventEmitter}
    */
-  @Event() ionActionSheetDidLoad: EventEmitter;
+  @Event() ionActionSheetDidLoad: any;
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has presented.
-   * @type {EventEmitter}
    */
-  @Event() ionActionSheetDidPresent: EventEmitter;
+  @Event() ionActionSheetDidPresent: any;
 
   /**
    * @output {ActionSheetEvent} Emitted before the alert has presented.
-   * @type {EventEmitter}
    */
-  @Event() ionActionSheetWillPresent: EventEmitter;
+  @Event() ionActionSheetWillPresent: any;
 
   /**
    * @output {ActionSheetEvent} Emitted before the alert has dismissed.
-   * @type {EventEmitter}
    */
-  @Event() ionActionSheetWillDismiss: EventEmitter;
+  @Event() ionActionSheetWillDismiss: any;
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has dismissed.
-   * @type {EventEmitter}
    */
-  @Event() ionActionSheetDidDismiss: EventEmitter;
+  @Event() ionActionSheetDidDismiss: any;
 
   /**
    * @output {ActionSheetEvent} Emitted after the alert has unloaded.
-   * @type {EventEmitter}
    */
-  @Event() ionActionSheetDidUnload: EventEmitter;
+  @Event() ionActionSheetDidUnload: any;
 
   @Prop({ connect: 'ion-animation-controller' }) animationCtrl: AnimationController;
   @Prop({ context: 'config' }) config: Config;

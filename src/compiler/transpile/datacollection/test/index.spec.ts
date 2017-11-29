@@ -28,7 +28,7 @@ describe('component decorator', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidLoad',
-              'type': 'EventEmitter',
+              'type': 'any',
             },
           },
           {
@@ -40,7 +40,7 @@ describe('component decorator', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidPresent',
-              'type': 'EventEmitter',
+              'type': 'any',
             },
           },
           {
@@ -52,7 +52,7 @@ describe('component decorator', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetWillPresent',
-              'type': 'EventEmitter',
+              'type': 'any',
             },
           },
           {
@@ -64,7 +64,7 @@ describe('component decorator', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetWillDismiss',
-              'type': 'EventEmitter',
+              'type': 'any',
             },
           },
           {
@@ -76,7 +76,7 @@ describe('component decorator', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidDismiss',
-              'type': 'EventEmitter',
+              'type': 'any',
             },
           },
           {
@@ -88,7 +88,7 @@ describe('component decorator', () => {
             'jsdoc': {
               'documentation': '',
               'name': 'ionActionSheetDidUnload',
-              'type': 'EventEmitter',
+              'type': 'any',
             },
           },
         ],
