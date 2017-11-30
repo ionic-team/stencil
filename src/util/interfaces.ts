@@ -1129,6 +1129,7 @@ export interface StencilSystem {
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
     readFileSync(filename: string, encoding: string): string;
     stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
+    statSync(path: string): { isFile(): boolean; isDirectory(): boolean; };
     unlink(path: string, callback?: (err?: any) => void): void;
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;
     writeFileSync(filename: string, data: any, options?: { encoding?: string; mode?: number; flag?: string; }): void;
