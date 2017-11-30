@@ -901,6 +901,7 @@ export interface HostElement extends HTMLElement {
   connectedCallback: () => void;
   attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
+  forceUpdate: () => void;
 
   // public members which can be used externally and should
   // not be property renamed (these should all be in externs)
