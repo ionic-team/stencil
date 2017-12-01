@@ -55,6 +55,7 @@
     "knuth-shuffle": "1.0.1",
     "listr": "^0.13.0",
     "memory-fs": "^0.4.1",
+    "minimatch": "^3.0.4",
     "node-fetch": "^1.7.2",
     "read-pkg-up": "^2.0.0",
     "rimraf": "^2.6.2",

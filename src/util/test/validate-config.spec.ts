@@ -35,6 +35,24 @@ describe('validation', () => {
   });
 
 
+  describe('include/exclude globs', () => {
+
+    it('should default include glob', () => {
+      validateBuildConfig(config);
+      expect(config.includeSrc).toEqual([
+        '/User/some/path/src/**/*.ts',
+        '/User/some/path/src/**/*.tsx'
+      ]);
+    });
+
+    it('should default exclude glob', () => {
+      validateBuildConfig(config);
+      expect(config.excludeSrc).toEqual(['**/test/**', '**/*.spec.*']);
+    });
+
+  });
+
+
   describe('hydrate css', () => {
 
     it('should set hydratedCssClass', () => {

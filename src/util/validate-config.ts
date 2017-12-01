@@ -202,14 +202,23 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.generateDocs = false;
   }
 
+  if (!Array.isArray(config.includeSrc)) {
+    config.includeSrc = DEFAULT_INCLUDES.map(include => {
+      return config.sys.path.join(config.srcDir, include);
+    });
+  }
+
+  if (!Array.isArray(config.excludeSrc)) {
+    config.excludeSrc = DEFAULT_EXCLUDES.slice();
+  }
+
+
   config.collections = config.collections || [];
   config.collections = config.collections.map(validateDependentCollection);
 
   config.bundles = config.bundles || [];
 
   validateUserBundles(config.bundles);
-
-  config.exclude = config.exclude || DEFAULT_EXCLUDES;
 
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
@@ -363,7 +372,8 @@ const DEFAULT_DIST_DIR = 'dist';
 const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 8;
-const DEFAULT_EXCLUDES = ['node_modules', 'bower_components'];
+const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
+const DEFAULT_EXCLUDES = ['**/test/**', '**/*.spec.*'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;
 const DEFAULT_HYDRATED_CSS_CLASS = 'hydrated';
 

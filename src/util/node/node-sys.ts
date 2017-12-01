@@ -251,6 +251,10 @@ export function getNodeSys(distRootDir: string, logger: Logger) {
       };
     },
 
+    minimatch(filePath, pattern, opts) {
+      return sysUtil.minimatch(filePath, pattern, opts);
+    },
+
     path,
 
     remove(dir) {

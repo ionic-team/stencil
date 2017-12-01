@@ -368,7 +368,6 @@ export interface BuildConfig {
   logger?: Logger;
   rootDir?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
-  exclude?: string[];
   es5Fallback?: boolean;
   namespace?: string;
   global?: string;
@@ -401,6 +400,8 @@ export interface BuildConfig {
   hydratedCssClass?: string;
   sassConfig?: any;
   generateDocs?: boolean;
+  includeSrc?: string[];
+  excludeSrc?: string[];
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -1152,6 +1153,7 @@ export interface StencilSystem {
     sourceMap?: any;
     diagnostics?: Diagnostic[];
   };
+  minimatch?(path: string, pattern: string, opts?: any): boolean;
   resolveModule?(fromDir: string, moduleId: string): string;
   path?: {
     basename(p: string, ext?: string): string;

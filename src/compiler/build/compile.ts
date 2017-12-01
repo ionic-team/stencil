@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, CompileResults } from '../../util/interfaces';
-import { catchError, hasError, isTsFile, readFile, normalizePath } from '../util';
+import { catchError, hasError, readFile, normalizePath } from '../util';
 import { getModuleFile } from '../transpile/compiler-host';
 import { transpileFiles } from '../transpile/transpile';
 
@@ -77,11 +77,6 @@ function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileRes
         // let's loop through each of the files we've found so far
         const readPath = sys.path.join(dir, dirItem);
 
-        if (!isValidDirectory(config.exclude, readPath)) {
-          // don't bother continuing for invalid directories
-          return;
-        }
-
         promises.push(new Promise(resolve => {
 
           sys.fs.stat(readPath, (err, stats) => {
@@ -97,7 +92,7 @@ function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileRes
                 resolve();
               });
 
-            } else if (isTsFile(readPath)) {
+            } else if (isIncludePath(config, readPath)) {
               // woot! we found a typescript file that needs to be transpiled
               // let's send this over to our worker manager who can
               // then assign a worker to this exact file
@@ -124,6 +119,23 @@ function scanDir(config: BuildConfig, ctx: BuildContext, dir: string, compileRes
     });
 
   });
+}
+
+
+export function isIncludePath(config: BuildConfig, readPath: string) {
+  for (var i = 0; i < config.excludeSrc.length; i++) {
+    if (config.sys.minimatch(readPath, config.excludeSrc[i])) {
+      return false;
+    }
+  }
+
+  for (i = 0; i < config.includeSrc.length; i++) {
+    if (config.sys.minimatch(readPath, config.includeSrc[i])) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 
@@ -157,14 +169,4 @@ function copySourceSassFilesToDest(config: BuildConfig, ctx: BuildContext, compi
       ctx.filesToWrite[sassDestPath] = sassSrcText;
     });
   }));
-}
-
-
-function isValidDirectory(exclude: string[], filePath: string) {
-  for (var i = 0; i < exclude.length; i++) {
-    if (filePath.indexOf(exclude[i]) > -1) {
-      return false;
-    }
-  }
-  return true;
 }

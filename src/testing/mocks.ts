@@ -131,6 +131,11 @@ export function mockStencilSystem() {
 
     minifyJs: mockMinify,
 
+    minimatch(filePath, pattern, opts) {
+      const minimatch = require('minimatch');
+      return minimatch(filePath, pattern, opts);
+    },
+
     path: require('path'),
 
     remove: function mockRmDir(path) {

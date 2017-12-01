@@ -238,7 +238,8 @@ function configFileReload(existingConfig: BuildConfig) {
   existingConfig.bundles = updatedConfig.bundles;
   existingConfig.collectionDir = updatedConfig.collectionDir;
   existingConfig.collections = updatedConfig.collections;
-  existingConfig.exclude = updatedConfig.exclude;
+  existingConfig.includeSrc = updatedConfig.includeSrc;
+  existingConfig.excludeSrc = updatedConfig.excludeSrc;
   existingConfig.generateDistribution = updatedConfig.generateDistribution;
   existingConfig.generateWWW = updatedConfig.generateWWW;
   existingConfig.global = updatedConfig.global;
