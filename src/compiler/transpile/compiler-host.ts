@@ -8,12 +8,12 @@ export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOpti
 
   tsHost.getSourceFile = (filePath) => {
     const cachedValue = readFromCache(ctx, filePath);
-    if (cachedValue) {
+    if (cachedValue != null) {
       return ts.createSourceFile(filePath, cachedValue, ts.ScriptTarget.ES2015);
     }
 
     const diskValue = readFileFromDisk(config, filePath);
-    if (diskValue) {
+    if (diskValue != null) {
       return ts.createSourceFile(filePath, diskValue, ts.ScriptTarget.ES2015);
     }
 
