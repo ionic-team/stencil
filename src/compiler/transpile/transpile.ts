@@ -125,9 +125,16 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   const metadata = gatherMetadata(checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
 
   Object.keys(metadata).forEach(tsFilePath => {
-    ctx.moduleFiles[tsFilePath].cmpMeta = metadata[tsFilePath];
-    ctx.moduleFiles[tsFilePath].cmpMeta.stylesMeta = normalizeStyles(config, tsFilePath, metadata[tsFilePath].stylesMeta);
-    ctx.moduleFiles[tsFilePath].cmpMeta.assetsDirsMeta = normalizeAssetsDir(config, tsFilePath, metadata[tsFilePath].assetsDirsMeta);
+    const fileMetadata = metadata[tsFilePath];
+    // normalize metadata
+    fileMetadata.stylesMeta = normalizeStyles(config, tsFilePath, fileMetadata.stylesMeta);
+    fileMetadata.assetsDirsMeta = normalizeAssetsDir(config, tsFilePath, fileMetadata.assetsDirsMeta);
+
+    // assign metadata to module files
+    const moduleFile = ctx.moduleFiles[tsFilePath];
+    if (moduleFile) {
+      moduleFile.cmpMeta = fileMetadata;
+    }
   });
 
   // Generate d.ts files for component types
