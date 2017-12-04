@@ -37,8 +37,8 @@ export function generateComponentTypesFile(config: BuildConfig, cmpList: Compone
     .sort()
     .reduce((finalString, moduleFileName) => {
       const cmpMeta = cmpList[moduleFileName];
-      const importPath = config.sys.path.relative(config.srcDir, moduleFileName)
-          .replace(/\.(tsx|ts)$/, '');
+      const importPath = normalizePath(config.sys.path.relative(config.srcDir, moduleFileName)
+          .replace(/\.(tsx|ts)$/, ''));
 
       typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmpMeta, moduleFileName, config);
 
@@ -53,7 +53,7 @@ export function generateComponentTypesFile(config: BuildConfig, cmpList: Compone
     const typeData = typeImportData[filePath];
     let importFilePath: string;
     if (config.sys.path.isAbsolute(filePath)) {
-      importFilePath = './' + normalizePath(
+      importFilePath = normalizePath('./' +
         config.sys.path.relative(config.srcDir, filePath)
       ).replace(/\.(tsx|ts)$/, '');
     } else {
