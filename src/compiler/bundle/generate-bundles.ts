@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry, CompiledMo
 import { componentRequiresScopedStyles, generatePreamble, pathJoin, hasError } from '../util';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { formatLoadComponents, formatLoadStyles } from '../../util/data-serialize';
-import { getAppFileName, getBundleFileName, getAppWWWBuildDir } from '../app/app-file-naming';
+import { getAppFileName, getBundleFileName, getAppDistDir, getAppWWWBuildDir } from '../app/app-file-naming';
 import { getManifestBundleModes } from './bundle-styles';
 import { transpileToEs5 } from '../transpile/core-build';
 
@@ -178,7 +178,9 @@ export function writeBundleFile(config: BuildConfig, ctx: BuildContext, manifest
 
     if (config.generateDistribution) {
       // write the scoped css to the dist build
-      const scopedDistPath = pathJoin(config, scopedFileName);
+      const scopedDistPath = pathJoin(config,
+        getAppDistDir(config),
+        scopedFileName);
       ctx.filesToWrite[scopedDistPath] = scopedFileContent;
     }
   }
