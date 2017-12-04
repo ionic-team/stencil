@@ -119,7 +119,8 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   const tsHost = getTsHost(config, ctx, tsOptions, transpileResults);
 
   // fire up the typescript program
-  const checkProgram = ts.createProgram(tsFileNames, tsOptions, tsHost);
+  const componentsFilePath = config.sys.path.join(config.srcDir, 'components.d.ts');
+  const checkProgram = ts.createProgram(tsFileNames.filter(fileName => fileName !== componentsFilePath), tsOptions, tsHost);
 
   // Gather component metadata and type info
   const metadata = gatherMetadata(checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
@@ -138,7 +139,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   });
 
   // Generate d.ts files for component types
-  const [ componentsFilePath, componentsFileContent ] = generateComponentTypesFile(config, metadata);
+  const componentsFileContent = generateComponentTypesFile(config, metadata);
   if (ctx.appFiles.components_d_ts !== componentsFileContent) {
     // the components.d.ts file is unchanged, no need to resave
     config.sys.fs.writeFileSync(componentsFilePath, componentsFileContent, { encoding: 'utf8' });

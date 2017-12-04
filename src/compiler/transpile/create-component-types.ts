@@ -18,7 +18,7 @@ export interface ImportData {
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-export function generateComponentTypesFile(config: BuildConfig, cmpList: ComponentRegistry): [ string, string ] {
+export function generateComponentTypesFile(config: BuildConfig, cmpList: ComponentRegistry): string {
   let typeImportData: ImportData = {};
   const allTypes: { [key: string]: number } = {};
   let componentsFileContent =
@@ -74,9 +74,8 @@ ${typeData.map(td => {
   }, '');
 
   componentsFileContent += typeImportString + componentFileString;
-  const rootFilePath = config.sys.path.join(config.srcDir, 'components.d.ts');
 
-  return [ rootFilePath, componentsFileContent ];
+  return componentsFileContent;
 }
 
 
