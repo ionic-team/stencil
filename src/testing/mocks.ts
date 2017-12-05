@@ -316,7 +316,15 @@ export function mockLogger() {
 export function mockWindow(opts: HydrateOptions = {}) {
   opts.userAgent = opts.userAgent || 'test';
 
-  return mockStencilSystem().createDom().parse(opts);
+  const window = mockStencilSystem().createDom().parse(opts);
+
+  (window as any).requestAnimationFrame = function(callback: Function) {
+    setTimeout(() => {
+      callback(Date.now());
+    });
+  };
+
+  return window;
 }
 
 

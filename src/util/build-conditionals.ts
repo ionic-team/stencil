@@ -4,6 +4,7 @@ import { BuildConditionals } from './interfaces';
 export const Build: BuildConditionals = {
   verboseError: true,
 
+  cssVarShim: true,
   shadowDom: true,
   slot: true,
   ssrClientSide: true,

@@ -318,6 +318,7 @@ export interface BuildConditionals {
   polyfills?: boolean;
   verboseError: boolean;
   es5?: boolean;
+  cssVarShim?: boolean;
 
   // ssr
   ssrClientSide: boolean;

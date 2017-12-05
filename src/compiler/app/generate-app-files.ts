@@ -50,6 +50,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     buildConditionalsEs5.coreId = 'core.pf';
     buildConditionalsEs5.es5 = true;
     buildConditionalsEs5.polyfills = true;
+    buildConditionalsEs5.cssVarShim = true;
     buildConditionalsEs5.ssrClientSide = true;
 
     const coreFilenameEs5 = await generateCore(config, ctx, 'es5', globalJsContentsEs5, buildConditionalsEs5);
