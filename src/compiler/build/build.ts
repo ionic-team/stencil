@@ -8,7 +8,7 @@ import { emptyDestDir, writeBuildFiles } from './write-build';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateIndexHtml } from '../html/generate-index-html';
-import { genereateReadmes } from '../docs/readme';
+import { genereateReadmes } from '../docs/generate-readmes';
 import { generateServiceWorker } from '../service-worker/generate-sw';
 import { generateAppManifest } from '../manifest/generate-manifest';
 import { getAppFileName } from '../app/app-file-naming';
