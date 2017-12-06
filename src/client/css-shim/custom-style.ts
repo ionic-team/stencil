@@ -14,7 +14,7 @@ export class CustomStyle {
 
 
   constructor(private win: Window, doc: Document) {
-    this.supportsCssVars = !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', '--var(t)'));
+    this.supportsCssVars = !!((win as any).CSS && (win as any).CSS.supports && (win as any).CSS.supports('color', 'var(--c)'));
 
     if (!this.supportsCssVars) {
       this.documentOwner = doc.documentElement;

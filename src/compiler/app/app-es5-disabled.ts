@@ -75,7 +75,7 @@ function getDisabledMessageScript() {
     document.getElementById('esModules').textContent = !!('noModule' in document.createElement('script'));
     document.getElementById('customElements').textContent = !!(window.customElements);
     document.getElementById('fetch').textContent = !!(window.fetch);
-    document.getElementById('cssVariables').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', '--var(t)');
+    document.getElementById('cssVariables').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)');
   `;
 
   // timeout just to ensure <body> is ready
