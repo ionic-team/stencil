@@ -65,6 +65,7 @@ function getDisabledMessageScript() {
     <li>ES Module Imports: <span id="esModules"></span></li>
     <li>Custom Elements: <span id="customElements"></span></li>
     <li>fetch(): <span id="fetch"></span></li>
+    <li>CSS Variables: <span id="cssVariables"></span></li>
   </ul>
   `;
 
@@ -74,6 +75,7 @@ function getDisabledMessageScript() {
     document.getElementById('esModules').textContent = !!('noModule' in document.createElement('script'));
     document.getElementById('customElements').textContent = !!(window.customElements);
     document.getElementById('fetch').textContent = !!(window.fetch);
+    document.getElementById('cssVariables').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('--t', 0);
   `;
 
   // timeout just to ensure <body> is ready
