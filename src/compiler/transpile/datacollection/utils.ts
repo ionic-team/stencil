@@ -21,6 +21,24 @@ export const getDeclarationParameters: GetDeclarationParameters = (decorator: ts
   });
 };
 
+export function isPropertyWithDecorators(member: ts.ClassElement): boolean {
+  return ts.isPropertyDeclaration(member)
+    && Array.isArray(member.decorators)
+    && member.decorators.length > 0;
+}
+
+export function isDecoratorNamed(name: string) {
+  return (dec: ts.Decorator): boolean => {
+    return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === name);
+  };
+}
+
+export function isMethodWithDecorators(member: ts.ClassElement): boolean {
+  return ts.isMethodDeclaration(member)
+    && Array.isArray(member.decorators)
+    && member.decorators.length > 0;
+}
+
 export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): JSDoc {
   return {
       name: symbol.getName(),

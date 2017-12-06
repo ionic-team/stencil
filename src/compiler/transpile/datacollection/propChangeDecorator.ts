@@ -1,6 +1,6 @@
 import { ComponentMeta, PropChangeMeta } from '../../../util/interfaces';
 import { PROP_CHANGE } from '../../../util/constants';
-import { getDeclarationParameters } from './utils';
+import { getDeclarationParameters, isMethodWithDecorators } from './utils';
 import * as ts from 'typescript';
 
 export function getPropChangeDecoratorMeta(node: ts.ClassDeclaration): ComponentMeta {
@@ -9,9 +9,7 @@ export function getPropChangeDecoratorMeta(node: ts.ClassDeclaration): Component
   }
 
   return node.members
-    .filter(member => {
-      return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
-    })
+    .filter(isMethodWithDecorators)
     .reduce((membersMeta, member) => {
       const propChangeDecorator = member.decorators.find(dec => {
         return (ts.isCallExpression(dec.expression) &&

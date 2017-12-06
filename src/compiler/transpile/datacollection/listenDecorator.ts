@@ -1,41 +1,31 @@
 import { ListenMeta, ListenOptions } from '../../../util/interfaces';
-import { getDeclarationParameters, serializeSymbol } from './utils';
+import { getDeclarationParameters, serializeSymbol, isMethodWithDecorators, isDecoratorNamed } from './utils';
 import * as ts from 'typescript';
 
 export function getListenDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ListenMeta[] {
-  const initialValue: ListenMeta[] = [];
-  return node.members
-    .filter(member => {
-      return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
-    })
-    .reduce((listenMetaList, member) => {
-      const elementDecorator = member.decorators.find(dec => {
-        return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Listen');
+  const listeners: ListenMeta[] = [];
+  const methods = node.members.filter(isMethodWithDecorators);
+
+  methods.forEach(member => {
+    member.decorators
+      .filter(isDecoratorNamed('Listen'))
+      .map(dec => getDeclarationParameters<string, ListenOptions>(dec))
+      .forEach(([listenText, listenOptions]) => {
+        listenText.split(',').forEach(eventName => {
+          const symbol = checker.getSymbolAtLocation(member.name);
+          const jsdoc = serializeSymbol(checker, symbol);
+
+          listeners.push({
+            ...validateListener(eventName.trim(), listenOptions, member.name.getText()),
+            jsdoc
+          });
+        });
       });
-
-      if (elementDecorator == null) {
-        return listenMetaList;
-      }
-
-      const [ eventName, listenOptions ] = getDeclarationParameters<string, ListenOptions>(elementDecorator);
-
-      return eventName
-        .split(',')
-        .reduce((lml, eventName) => {
-          if (eventName) {
-            const symbol = checker.getSymbolAtLocation(member.name);
-            const jsdoc = serializeSymbol(checker, symbol);
-
-            lml.push({
-              ...validateListener(eventName.trim(), <ListenOptions>listenOptions, member.name.getText()),
-              jsdoc
-            });
-          }
-          return lml;
-        }, listenMetaList);
-    }, initialValue);
+  });
+  return listeners;
 }
 
+// export function getListenDecoratorMeta
 
 export function validateListener(eventName: string, rawListenOpts: ListenOptions = {}, methodName: string): ListenMeta | null {
   let rawEventName = eventName;

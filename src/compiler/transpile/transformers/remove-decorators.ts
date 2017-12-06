@@ -58,13 +58,11 @@ function isComponentClass(classNode: ts.ClassDeclaration) {
  * @param classNode
  */
 function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
-  classNode.decorators = removeDecoratorByName(classNode.decorators, 'Component');
+  classNode.decorators = removeDecoratorsByName(classNode.decorators, ['Component']);
 
   classNode.members.forEach((member) => {
     if (Array.isArray(member.decorators)) {
-      DECORATORS_TO_REMOVE.forEach((name) => {
-        member.decorators = removeDecoratorByName(member.decorators, name);
-      });
+      member.decorators = removeDecoratorsByName(member.decorators, DECORATORS_TO_REMOVE);
     }
   });
 
@@ -76,17 +74,15 @@ function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaratio
  * @param decorators array of decorators
  * @param name name to remove
  */
-function removeDecoratorByName(decoratorList: ts.NodeArray<ts.Decorator>, name: string): ts.NodeArray<ts.Decorator> {
-  const componentDecoratorIndex = decoratorList.findIndex(dec =>
-   (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === name)
-  );
+function removeDecoratorsByName(decoratorList: ts.NodeArray<ts.Decorator>, names: string[]): ts.NodeArray<ts.Decorator> {
+  const updatedDecoratorList = decoratorList.filter(dec => {
+    const toRemove = ts.isCallExpression(dec.expression) && names.indexOf(dec.expression.expression.getText()) >= 0;
+    return !toRemove;
+  });
 
-  if (componentDecoratorIndex === -1) {
+  if (updatedDecoratorList.length !== decoratorList.length) {
+    return ts.createNodeArray(updatedDecoratorList);
+  } else {
     return decoratorList;
   }
-
-  const updatedDecoratorList = decoratorList.slice();
-  updatedDecoratorList.splice(componentDecoratorIndex, 1);
-
-  return ts.createNodeArray(updatedDecoratorList);
 }
