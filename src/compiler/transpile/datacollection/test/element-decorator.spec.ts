@@ -1,8 +1,8 @@
 import { MEMBER_TYPE } from '../../../../util/constants';
-import { getElementDecoratorMeta } from '../elementDecorator';
+import { getElementDecoratorMeta } from '../element-decorator';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { gatherMetadata } from './testUtils';
+import { gatherMetadata } from './test-utils';
 
 describe('element decorator', () => {
 

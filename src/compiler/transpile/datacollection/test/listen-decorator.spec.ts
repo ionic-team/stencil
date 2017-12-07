@@ -1,8 +1,8 @@
 import { MEMBER_TYPE } from '../../../../util/constants';
-import { getListenDecoratorMeta } from '../listenDecorator';
+import { getListenDecoratorMeta } from '../listen-decorator';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { gatherMetadata } from './testUtils';
+import { gatherMetadata } from './test-utils';
 
 describe('listen decorator', () => {
 

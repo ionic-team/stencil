@@ -2,7 +2,7 @@ import { ENCAPSULATION } from '../../../../util/constants';
 import { visitClass } from '../index';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { gatherMetadata } from './testUtils';
+import { gatherMetadata } from './test-utils';
 
 describe('component decorator', () => {
 

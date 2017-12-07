@@ -1,111 +1,103 @@
-import { BuildConfig, ComponentMeta, ComponentOptions, Diagnostic, ModuleFile } from '../../../util/interfaces';
-import { buildError, catchError } from '../../util';
-import { ENCAPSULATION } from '../../../util/constants';
-import { normalizeAssetsDir } from '../../component-plugins/assets-plugin';
-import { normalizeStyles } from './normalize-styles';
-import { validateComponentTag } from '../../../util/validate-config';
+import { ComponentOptions, ComponentMeta, ModeStyles, AssetsMeta } from '../../../util/interfaces';
+import { ENCAPSULATION, DEFAULT_STYLE_MODE } from '../../../util/constants';
+import { getDeclarationParameters, serializeSymbol, isDecoratorNamed } from './utils';
 import * as ts from 'typescript';
 
+export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
+  let cmpMeta: ComponentMeta = {};
+  let symbol = checker.getSymbolAtLocation(node.name);
 
-export function getComponentDecoratorData(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], classNode: ts.ClassDeclaration) {
-  let metaData: ComponentMeta = null;
-
-  if (!classNode.decorators) {
-    return metaData;
+  if (!node.decorators) {
+    return undefined;
   }
 
-  let isComponent = false;
+  cmpMeta.jsdoc = serializeSymbol(checker, symbol);
 
-  classNode.decorators.forEach(decorator => {
+  const componentDecorator = node.decorators.find(isDecoratorNamed('Component'));
+  if (!componentDecorator) {
+    return undefined;
+  }
 
-    decorator.forEachChild(decoratorChild => {
+  const [ componentOptions ] = getDeclarationParameters<ComponentOptions>(componentDecorator);
 
-      decoratorChild.forEachChild(componentChild => {
+  if (!componentOptions.tag || componentOptions.tag.trim() === '') {
+    throw new Error(`tag missing in component decorator: ${JSON.stringify(componentOptions, null, 2)}`);
+  }
 
-        if (componentChild.getText().trim() === 'Component') {
-          isComponent = true;
+  // normalizeTag
+  cmpMeta.tagNameMeta = componentOptions.tag;
 
-        } else if (isComponent) {
-          metaData = parseComponentMetaData(config, moduleFile, diagnostics, componentChild.getText());
-        }
+  // normalizeHost
+  cmpMeta.hostMeta = componentOptions.host || {};
 
-      });
+  // normalizeEncapsulation
+  cmpMeta.encapsulation =
+      componentOptions.shadow ? ENCAPSULATION.ShadowDom :
+      componentOptions.scoped ? ENCAPSULATION.ScopedCss :
+      ENCAPSULATION.NoEncapsulation;
 
-    });
-  });
+  // noramlizeStyles
+  cmpMeta.stylesMeta = {};
 
-  return metaData;
-}
+  // styles: 'div { padding: 10px }'
+  if (typeof componentOptions.styles === 'string' && componentOptions.styles.trim().length) {
+    cmpMeta.stylesMeta = {
+      [DEFAULT_STYLE_MODE]: {
+        styleStr: componentOptions.styles.trim()
+      }
+    };
+  }
+
+  // styleUrl: 'my-styles.scss'
+  if (typeof componentOptions.styleUrl === 'string' && componentOptions.styleUrl.trim()) {
+    cmpMeta.stylesMeta = {
+      [DEFAULT_STYLE_MODE]: {
+        originalComponentPaths: [componentOptions.styleUrl]
+      }
+    };
+
+  // styleUrls: ['my-styles.scss', 'my-other-styles']
+  } else if (Array.isArray(componentOptions.styleUrls)) {
+    cmpMeta.stylesMeta = {
+      [DEFAULT_STYLE_MODE]: {
+        originalComponentPaths: componentOptions.styleUrls
+      }
+    };
+
+  // styleUrls: {
+  //   ios: 'badge.ios.scss',
+  //   md: 'badge.md.scss',
+  //   wp: 'badge.wp.scss'
+  // }
+  } else {
+    Object.keys(componentOptions.styleUrls || {}).reduce((stylesMeta, styleType) => {
+      let styleUrls = <ModeStyles>componentOptions.styleUrls;
+
+      stylesMeta[styleType] = {
+        originalComponentPaths: [].concat(styleUrls[styleType])
+      };
+
+      return stylesMeta;
+    }, cmpMeta.stylesMeta);
+  }
 
 
-function parseComponentMetaData(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], text: string) {
-  let cmpMeta: ComponentMeta = null;
+  cmpMeta.assetsDirsMeta = [];
 
-  try {
-    const fnStr = `return ${text};`;
+  // assetsDir: './somedir'
+  if (componentOptions.assetsDir) {
+    const assetsMeta: AssetsMeta = {
+      originalComponentPath: componentOptions.assetsDir
+    };
+    cmpMeta.assetsDirsMeta.push(assetsMeta);
+  }
 
-    // parse user component options
-    const userOpts: ComponentOptions = new Function(fnStr)();
-
-    if (!userOpts.tag || userOpts.tag.trim() === '') {
-      throw new Error(`tag missing in component decorator: ${text}`);
-    }
-
-    // convert user component options from user into component meta
-    cmpMeta = {};
-
-    // normalize user data
-    normalizeTag(config, moduleFile, diagnostics, userOpts, cmpMeta, text);
-    normalizeStyles(config, userOpts, moduleFile, cmpMeta);
-    normalizeAssetsDir(config, userOpts, moduleFile, cmpMeta);
-    normalizeHost(userOpts, cmpMeta);
-    normalizeEncapsulation(userOpts, cmpMeta);
-
-  } catch (e) {
-    // derp
-    const d = catchError(diagnostics, e);
-    d.absFilePath = moduleFile.tsFilePath;
-    d.relFilePath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
-    d.messageText = `${e}: ${text}`;
+  // assetsDirs: ['./somedir', '../someotherdir']
+  if (Array.isArray(componentOptions.assetsDirs)) {
+    cmpMeta.assetsDirsMeta = cmpMeta.assetsDirsMeta.concat(
+      componentOptions.assetsDirs.map(assetDir => ({ originalComponentPath: assetDir }))
+    );
   }
 
   return cmpMeta;
-}
-
-
-function normalizeTag(config: BuildConfig, moduleFile: ModuleFile, diagnostics: Diagnostic[], userOpts: ComponentOptions, cmpMeta: ComponentMeta, orgText: string) {
-  if ((<any>userOpts).selector) {
-    const d = buildError(diagnostics);
-    d.messageText = `Please use "tag" instead of "selector" in component decorator: ${(<any>userOpts).selector}`;
-    d.absFilePath = moduleFile.tsFilePath;
-    d.relFilePath = config.sys.path.relative(config.rootDir, moduleFile.tsFilePath);
-
-    cmpMeta.tagNameMeta = (<any>userOpts).selector;
-  }
-
-  if (!userOpts.tag || userOpts.tag.trim() === '') {
-    throw new Error(`tag missing in component decorator: ${orgText}`);
-  }
-
-  cmpMeta.tagNameMeta = validateComponentTag(userOpts.tag);
-}
-
-
-export function normalizeEncapsulation(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
-  // default to NOT use shadow dom or scoped css...to start, debatable later on
-
-  if (userOpts.shadow === true) {
-    cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
-
-  } else if (userOpts.scoped === true) {
-    cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
-
-  } else {
-    cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
-  }
-}
-
-
-function normalizeHost(userOpts: ComponentOptions, cmpMeta: ComponentMeta) {
-  cmpMeta.hostMeta = userOpts.host || {};
 }
