@@ -31,11 +31,7 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
       }
     }
 
-    return (tsSourceFile) => {
-      const file = visit(tsSourceFile) as ts.SourceFile;
-      // console.log(file.getSourceFile().getFullText());
-      return file;
-    };
+    return (tsSourceFile) => visit(tsSourceFile) as ts.SourceFile;
   };
 }
 
@@ -80,9 +76,13 @@ function removeDecoratorsByName(decoratorList: ts.NodeArray<ts.Decorator>, names
     return !toRemove;
   });
 
+  if (updatedDecoratorList.length === 0 && decoratorList.length > 0) {
+    return undefined;
+  }
+
   if (updatedDecoratorList.length !== decoratorList.length) {
     return ts.createNodeArray(updatedDecoratorList);
-  } else {
-    return decoratorList;
   }
+
+  return decoratorList;
 }
