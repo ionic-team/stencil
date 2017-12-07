@@ -54,12 +54,12 @@ export function visitClass(checker: ts.TypeChecker, classNode: ts.ClassDeclarati
       // membersMeta is shared with @Prop, @State, @Method, @Element
       ...getElementDecoratorMeta(checker, classNode),
       ...getMethodDecoratorMeta(checker, classNode),
-      ...getStateDecoratorMeta(classNode),
+      ...getStateDecoratorMeta(checker, classNode),
       ...getPropDecoratorMeta(checker, classNode, sourceFile, diagnostics)
     },
     eventsMeta: getEventDecoratorMeta(checker, classNode),
     listenersMeta: getListenDecoratorMeta(checker, classNode),
-    ...getPropChangeDecoratorMeta(classNode)
+    ...getPropChangeDecoratorMeta(checker, classNode)
   };
 
   // Return Class Declaration with Decorator removed and as default export

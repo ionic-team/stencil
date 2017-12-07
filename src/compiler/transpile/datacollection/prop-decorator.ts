@@ -3,21 +3,14 @@ import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo, At
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 import { isTypeReferenceNode } from 'typescript';
-import { serializeSymbol } from './utils';
+import { serializeSymbol, isDecoratorNamed } from './utils';
 
 export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): MembersMeta {
-  const decoratedMembers = classNode.members.filter(n => n.decorators && n.decorators.length);
-
-  return decoratedMembers
-    .filter((prop: ts.PropertyDeclaration) => (
-      prop.decorators.some((decorator: ts.Decorator) => decorator.getFullText().indexOf('Prop(') !== -1)
-    ))
+  return classNode.members
+    .filter(member => Array.isArray(member.decorators) && member.decorators.length > 0)
     .reduce((allMembers: MembersMeta, prop: ts.PropertyDeclaration) => {
       const memberData: MemberMeta = {};
-
-      const propDecorator = prop.decorators.find((decorator: ts.Decorator) => (
-        decorator.getFullText().indexOf('Prop(') !== -1)
-      );
+      const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
       if (propDecorator == null) {
         return allMembers;
       }

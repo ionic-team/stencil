@@ -10,22 +10,31 @@ describe('@PropDidChange/@PropWillChange decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/propchange-simple');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-      response = getPropChangeDecoratorMeta(classNode);
+      response = getPropChangeDecoratorMeta(null, classNode);
     });
 
     expect(response).toEqual({
       propsDidChangeMeta: [
-         {
+        {
            '0': 'checked',
            '1': 'checkedChanged'
-         },
-       ],
-       propsWillChangeMeta: [
-         {
-           '0': 'checked',
-           '1': 'checkedWillChange'
-         },
-       ],
+        }, {
+          '0': 'event1',
+          '1': 'method'
+        }, {
+          '0': 'event2',
+          '1': 'method'
+        }
+      ],
+      propsWillChangeMeta: [
+        {
+          '0': 'checked',
+          '1': 'checkedWillChange'
+        }, {
+          '0': 'event3',
+          '1': 'method'
+        }
+      ],
     });
   });
 

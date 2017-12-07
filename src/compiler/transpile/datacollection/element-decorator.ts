@@ -1,12 +1,11 @@
 import { MembersMeta } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
-import { isPropertyWithDecorators, isDecoratorNamed } from './utils';
+import { isDecoratorNamed, isPropertyWithDecorators } from './utils';
 
-export function getElementDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): MembersMeta {
+export function getElementDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration): MembersMeta {
   checker;
-
-  return node.members
+  return classNode.members
     .filter(isPropertyWithDecorators)
     .reduce((membersMeta, member) => {
       const elementDecorator = member.decorators.find(isDecoratorNamed('Element'));

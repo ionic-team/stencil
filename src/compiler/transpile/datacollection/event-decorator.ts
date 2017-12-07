@@ -1,10 +1,10 @@
 import { EventMeta, EventOptions } from '../../../util/interfaces';
-import { getDeclarationParameters, isPropertyWithDecorators, isDecoratorNamed } from './utils';
+import { getDeclarationParameters, isDecoratorNamed, isPropertyWithDecorators } from './utils';
 import * as ts from 'typescript';
 import { serializeSymbol } from './utils';
 
-export function getEventDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): EventMeta[] {
-  return node.members
+export function getEventDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration): EventMeta[] {
+  return classNode.members
     .filter(isPropertyWithDecorators)
     .reduce((membersMeta, member) => {
       const elementDecorator = member.decorators.find(isDecoratorNamed('Event'));
