@@ -199,7 +199,7 @@ export function formatLoadStyles(namespace: string, bundleStyles: CompiledModeSt
   });
 
   bundleStyles.forEach(bundleStyle => {
-    const styles = (scoped ? bundleStyle.scopedStyles : bundleStyle.unscopedStyles).replace(/\n/g, `\\n`).replace(/\"/g, `\\"`).trim();
+    const styles = (scoped ? bundleStyle.scopedStyles : bundleStyle.unscopedStyles).replace(/\r\n|\r|\n/g, `\\n`).replace(/\"/g, `\\"`).trim();
 
     if (styles.length > 0) {
       // arg EVEN
