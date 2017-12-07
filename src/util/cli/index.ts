@@ -1,6 +1,6 @@
-import { Logger } from '../interfaces';
+import { BuildResults, Logger } from '../interfaces';
 import { getNodeSys } from '../node/node-sys';
-import { getConfigFilePath, parseArgv, help, init, isValidNodeVersion, overrideConfigFromArgv } from './cli-utils';
+import { getConfigFilePath, hasError, help, init, isValidNodeVersion, overrideConfigFromArgv, parseArgv } from './cli-utils';
 import { loadConfigFile } from '../node/load-config';
 import { NodeLogger } from '../node/node-logger';
 import * as path from 'path';
@@ -69,8 +69,14 @@ export function run(process: NodeJS.Process, minNodeVersion?: number, logger?: L
   var stencil = require(path.join(__dirname, '../compiler/index.js'));
   switch (task) {
     case 'build':
-      stencil.build(config).catch((err: any) => {
+      stencil.build(config).then((results: BuildResults) => {
+        if (!config.watch && hasError(results && results.diagnostics)) {
+          process.exit(1);
+        }
+
+      }).catch((err: any) => {
         config.logger.error(err);
+        process.exit(1);
       });
 
       if (config.watch) {

@@ -1,4 +1,4 @@
-import { BuildConfig, Logger } from '../../util/interfaces';
+import { BuildConfig, Diagnostic, Logger } from '../../util/interfaces';
 import { isAbsolute, join } from 'path';
 import { normalizePath } from '../../compiler/util';
 import { writeFile } from 'fs';
@@ -203,4 +203,11 @@ function getCmdArgs(process: NodeJS.Process) {
 export function isValidNodeVersion(minNodeVersion: number, currentVersion: string) {
   const versionMatch = currentVersion.match(/(\d+).(\d+)/);
   return (versionMatch && parseFloat(versionMatch[0]) >= minNodeVersion);
+}
+
+export function hasError(diagnostics: Diagnostic[]): boolean {
+  if (!diagnostics) {
+    return false;
+  }
+  return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
 }
