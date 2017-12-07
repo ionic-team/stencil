@@ -1,6 +1,6 @@
 import { ComponentOptions, ComponentMeta, ModeStyles, AssetsMeta } from '../../../util/interfaces';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE } from '../../../util/constants';
-import { getDeclarationParameters, serializeSymbol } from './utils';
+import { getDeclarationParameters, serializeSymbol, isDecoratorNamed } from './utils';
 import * as ts from 'typescript';
 
 export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
@@ -13,13 +13,7 @@ export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.Cla
 
   cmpMeta.jsdoc = serializeSymbol(checker, symbol);
 
-  const componentDecorator = node.decorators.find(dec => {
-    if (!ts.isCallExpression(dec.expression)) {
-      return false;
-    }
-    return dec.expression.expression.getText() === 'Component';
-  });
-
+  const componentDecorator = node.decorators.find(isDecoratorNamed('Component'));
   if (!componentDecorator) {
     return undefined;
   }

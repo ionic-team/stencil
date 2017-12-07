@@ -25,6 +25,42 @@ describe('listen decorator', () => {
           name: 'viewDidLoad',
           type: '(ev: any) => void',
         },
+      },
+      {
+        eventCapture: false,
+        eventDisabled: false,
+        eventMethodName: 'method',
+        eventName: 'test',
+        eventPassive: false,
+        jsdoc: {
+          documentation: '',
+          name: 'method',
+          type: '() => void',
+        },
+      },
+      {
+        eventCapture: false,
+        eventDisabled: true,
+        eventMethodName: 'method',
+        eventName: 'test2',
+        eventPassive: false,
+        jsdoc: {
+          documentation: '',
+          name: 'method',
+          type: '() => void',
+        },
+      },
+      {
+        eventCapture: false,
+        eventDisabled: true,
+        eventMethodName: 'method',
+        eventName: 'test3',
+        eventPassive: false,
+        jsdoc: {
+          documentation: '',
+          name: 'method',
+          type: '() => void',
+        },
       }
     ]);
   });

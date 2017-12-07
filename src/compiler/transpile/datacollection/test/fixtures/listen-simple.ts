@@ -27,4 +27,10 @@ class ActionSheet {
       delete this.actionSheetResolves[actionSheet.actionSheetId];
     }
   }
+
+  @Listen('test')
+  @Listen('test2, test3', { enabled: false })
+  protected method() {
+
+  }
 }

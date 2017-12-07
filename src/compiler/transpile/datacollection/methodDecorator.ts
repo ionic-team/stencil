@@ -1,17 +1,13 @@
 import { MembersMeta } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
-import { serializeSymbol } from './utils';
+import { serializeSymbol, isMethodWithDecorators, isDecoratorNamed } from './utils';
 
 export function getMethodDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): MembersMeta {
   return node.members
-  .filter(member => {
-    return (ts.isMethodDeclaration(member) && Array.isArray(member.decorators));
-  })
+  .filter(isMethodWithDecorators)
   .reduce((membersMeta, member) => {
-    const elementDecorator = member.decorators.find(dec => {
-      return (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Method');
-    });
+    const elementDecorator = member.decorators.find(isDecoratorNamed('Method'));
     if (elementDecorator == null) {
       return membersMeta;
     }
