@@ -59,7 +59,6 @@ function getDisabledMessageScript() {
     <code>npm run dev --prod</code>
   </pre>
 
-
   <h2>Current Browser's Support:</h2>
   <ul>
     <li>ES Module Imports: <span id="esModules"></span></li>
@@ -67,15 +66,21 @@ function getDisabledMessageScript() {
     <li>fetch(): <span id="fetch"></span></li>
     <li>CSS Variables: <span id="cssVariables"></span></li>
   </ul>
+
+  <h2>Current Browser:</h2>
+  <pre>
+    <code id="currentBrowser"></code>
+  </pre>
   `;
 
   const script = `
     document.body.innerHTML = '${html.replace(/\r\n|\r|\n/g, '').replace(/\'/g, `\\'`).trim()}';
 
+    document.getElementById('currentBrowser').textContent = window.navigator.userAgent;
     document.getElementById('esModules').textContent = !!('noModule' in document.createElement('script'));
     document.getElementById('customElements').textContent = !!(window.customElements);
     document.getElementById('fetch').textContent = !!(window.fetch);
-    document.getElementById('cssVariables').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)');
+    document.getElementById('cssVariables').textContent = !!(window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'));
   `;
 
   // timeout just to ensure <body> is ready
