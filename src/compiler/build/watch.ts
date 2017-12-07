@@ -1,5 +1,6 @@
 import { build } from './build';
 import { BuildConfig, BuildContext } from '../../util/interfaces';
+import { copyTasks, isCopyTaskFile } from './copy-tasks';
 import { isCssFile, isHtmlFile, isSassFile, isTsFile, isWebDevFile, normalizePath } from '../util';
 
 
@@ -39,17 +40,24 @@ export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
         return;
       }
 
-      if (isWebDevFile(path)) {
+      if (isCopyTaskFile(config, path)) {
+        startCopyTasks();
+
+      } else if (isWebDevFile(path)) {
         // web dev file was updaed
         // queue change build
         queueChangeBuild = true;
         queue(path);
       }
+
     })
     .on('unlink', (path: string) => {
       logger.debug(`watcher, unlink: ${path}, ${Date.now()}`);
 
-      if (isWebDevFile(path)) {
+      if (isCopyTaskFile(config, path)) {
+        startCopyTasks();
+
+      } else if (isWebDevFile(path)) {
         // web dev file was delete
         // do a full rebuild
         queueFullBuild = true;
@@ -59,7 +67,10 @@ export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
     .on('add', (path: string) => {
       logger.debug(`watcher, add: ${path}, ${Date.now()}`);
 
-      if (isWebDevFile(path)) {
+      if (isCopyTaskFile(config, path)) {
+        startCopyTasks();
+
+      } else if (isWebDevFile(path)) {
         // new web dev file was added
         // do a full rebuild
         queueFullBuild = true;
@@ -69,16 +80,26 @@ export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
     .on('addDir', (path: string) => {
       logger.debug(`watcher, addDir: ${path}, ${Date.now()}`);
 
-      // no clue what's up, do a full rebuild
-      queueFullBuild = true;
-      queue();
+      if (isCopyTaskFile(config, path)) {
+        startCopyTasks();
+
+      } else {
+        // no clue what's up, do a full rebuild
+        queueFullBuild = true;
+        queue();
+      }
     })
     .on('unlinkDir', (path: string) => {
       logger.debug(`watcher, unlinkDir: ${path}, ${Date.now()}`);
 
-      // no clue what's up, do a full rebuild
-      queueFullBuild = true;
-      queue();
+      if (isCopyTaskFile(config, path)) {
+        startCopyTasks();
+
+      } else {
+        // no clue what's up, do a full rebuild
+        queueFullBuild = true;
+        queue();
+      }
     })
     .on('error', (err: any) => {
       logger.error(err);
@@ -118,6 +139,16 @@ export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
 
     }, 50);
   }
+
+  var copyTaskTmr: any;
+  function startCopyTasks() {
+    clearTimeout(copyTaskTmr);
+
+    copyTaskTmr = setTimeout(() => {
+      copyTasks(config, ctx);
+    }, 80);
+  }
+
 }
 
 

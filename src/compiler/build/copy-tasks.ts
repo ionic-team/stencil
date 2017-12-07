@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, CopyTask } from '../../util/interfaces';
-import { catchError, ensureDirectoriesExist } from '../util';
+import { catchError, ensureDirectoriesExist, normalizePath } from '../util';
 
 
 export function copyTasks(config: BuildConfig, ctx: BuildContext) {
@@ -9,10 +9,6 @@ export function copyTasks(config: BuildConfig, ctx: BuildContext) {
   }
 
   if (!config.generateWWW) {
-    return Promise.resolve();
-  }
-
-  if (ctx.isRebuild) {
     return Promise.resolve();
   }
 
@@ -165,4 +161,44 @@ export function getDestAbsPath(config: BuildConfig, src: string, dest?: string) 
   }
 
   return config.sys.path.join(config.wwwDir, src);
+}
+
+
+export function isCopyTaskFile(config: BuildConfig, filePath: string) {
+  if (!config.copy) {
+    // there is no copy config
+    return false;
+  }
+
+  const copyTaskNames = Object.keys(config.copy);
+  if (!copyTaskNames.length) {
+    // there are no copy tasks
+    return false;
+  }
+
+  filePath = normalizePath(filePath);
+
+  // go through all the copy tasks and see if this path matches
+  for (var i = 0; i < copyTaskNames.length; i++) {
+    var copySrc = config.copy[copyTaskNames[i]].src;
+
+    if (config.sys.isGlob(copySrc)) {
+      // test the glob
+      copySrc = config.sys.path.join(config.srcDir, copySrc);
+      if (config.sys.minimatch(filePath, copySrc)) {
+        return true;
+      }
+
+    } else {
+      copySrc = normalizePath(getSrcAbsPath(config, copySrc));
+
+      var relPath = config.sys.path.relative(copySrc, filePath);
+
+      if (!relPath.startsWith('.')) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }

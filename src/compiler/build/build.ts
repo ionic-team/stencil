@@ -95,7 +95,11 @@ export function build(config: BuildConfig, context?: any) {
 
   }).then(() => {
     // copy all assets
-    return copyTasks(config, ctx);
+    if (!ctx.isRebuild) {
+      return copyTasks(config, ctx);
+    } else {
+      return Promise.resolve();
+    }
 
   }).then(() => {
     // build index file and service worker

@@ -1,5 +1,5 @@
 import { BuildConfig, CopyTask } from '../../../util/interfaces';
-import { getSrcAbsPath, getDestAbsPath, getGlobCopyTask, processCopyTask, processCopyTasks } from '../copy-tasks';
+import { getSrcAbsPath, getDestAbsPath, getGlobCopyTask, isCopyTaskFile, processCopyTask, processCopyTasks } from '../copy-tasks';
 import { mockStencilSystem, mockFs } from '../../../testing/mocks';
 
 
@@ -134,14 +134,130 @@ describe('copy tasks', () => {
 
   });
 
+  describe('isCopyTaskFile', () => {
+
+    it('not copy abs path src file', () => {
+      config.copy = {
+        assets: {
+          src: '/User/marty/my-app/src/assets/image.jpg'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/something-else/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(false);
+    });
+
+    it('copy abs path src file', () => {
+      config.copy = {
+        assets: {
+          src: '/User/marty/my-app/src/assets/image.jpg'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/assets/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(true);
+    });
+
+    it('not copy relative path src file', () => {
+      config.copy = {
+        assets: {
+          src: './assets/image.jpg'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/something-else/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(false);
+    });
+
+    it('copy relative path src file', () => {
+      config.copy = {
+        assets: {
+          src: './assets/image.jpg'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/assets/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(true);
+    });
+
+    it('not copy abs path src dir', () => {
+      config.copy = {
+        assets: {
+          src: '/User/marty/my-app/src/assets'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/something-else/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(false);
+    });
+
+    it('copy abs path src dir', () => {
+      config.copy = {
+        assets: {
+          src: '/User/marty/my-app/src/assets'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/assets/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(true);
+    });
+
+    it('not copy relative path src dir', () => {
+      config.copy = {
+        assets: {
+          src: 'assets'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/something-else/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(false);
+    });
+
+    it('copy relative path src dir', () => {
+      config.copy = {
+        assets: {
+          src: 'assets'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/assets/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(true);
+    });
+
+    it('copy assets glob file', () => {
+      config.copy = {
+        assets: {
+          src: 'assets/**/*.jpg'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/assets/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(true);
+    });
+
+    it('copy assets glob wildcard', () => {
+      config.copy = {
+        assets: {
+          src: 'assets/*'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/assets/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(true);
+    });
+
+    it('not copy assets glob wildcard', () => {
+      config.copy = {
+        assets: {
+          src: 'assets/*'
+        }
+      };
+      const filePath = '/User/marty/my-app/src/something-else/image.jpg';
+      expect(isCopyTaskFile(config, filePath)).toBe(false);
+    });
+
+  });
+
 
   var config: BuildConfig;
   var sys = mockStencilSystem();
 
-  config = {
-    sys: sys,
-    srcDir: '/User/marty/my-app/src',
-    wwwDir: '/User/marty/my-app/www'
-  };
+  beforeEach(() => {
+    config = {
+      sys: sys,
+      srcDir: '/User/marty/my-app/src',
+      wwwDir: '/User/marty/my-app/www'
+    };
+  });
 
 });
