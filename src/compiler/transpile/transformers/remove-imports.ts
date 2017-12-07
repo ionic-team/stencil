@@ -26,6 +26,7 @@ export function removeImports(): ts.TransformerFactory<ts.SourceFile> {
       }
 
       const importSpecifiers: ts.ImportSpecifier[] = [];
+      let hasKeeperImport = false;
 
       importNode.importClause.namedBindings.forEachChild(nb => {
         if (nb.kind === ts.SyntaxKind.ImportSpecifier) {
@@ -34,8 +35,15 @@ export function removeImports(): ts.TransformerFactory<ts.SourceFile> {
           if (REMOVE_GLOBALS.indexOf(importSpecifier.name.text) === -1) {
             importSpecifiers.push(importSpecifier);
           }
+        } else {
+          hasKeeperImport = true;
         }
       });
+
+      if (importSpecifiers.length === 0 && !hasKeeperImport) {
+        // no named imports left, so let's remove the import statement entirely
+        return null;
+      }
 
       const namedImports = ts.createNamedImports(importSpecifiers);
       const newImportClause = ts.updateImportClause(importNode.importClause, importNode.importClause.name, namedImports);
