@@ -1,4 +1,4 @@
-import { addListener, enableEventListener } from '../core/instance/listeners';
+import { enableEventListener } from '../core/instance/listeners';
 import { AppGlobal, BundleCallbacks, ComponentMeta, ComponentRegistry, CoreContext,
   EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
@@ -30,7 +30,6 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   const raf = (cb: FrameRequestCallback) => window.requestAnimationFrame(cb);
 
   if (Build.listener) {
-    Context.addListener = (elm, eventName, cb, opts) => addListener(plt, elm, eventName, cb, opts && opts.capture, opts && opts.passive);
     Context.enableListener = (instance, eventName, enabled, attachTo) => enableEventListener(plt, instance, eventName, enabled, attachTo);
   }
 

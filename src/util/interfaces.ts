@@ -4,7 +4,6 @@ import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_ME
 
 
 export interface CoreContext {
-  addListener?: AddEventListener;
   attr?: number;
   emit?: (elm: Element, eventName: string, data?: EventEmitterData) => void;
   enableListener?: EventListenerEnable;
@@ -927,7 +926,6 @@ export interface HostElement extends HTMLElement {
   _hostContentNodes?: HostContentNodes;
   _instance?: ComponentInstance;
   _isQueuedForUpdate?: boolean;
-  _listeners?: ComponentActiveListeners;
   _observer?: MutationObserver;
   _onReadyCallbacks: ((elm: HostElement) => void)[];
   _queuedEvents?: any[];
@@ -967,7 +965,8 @@ export interface DomApi {
   $removeAttribute(elm: any, key: string): void;
   $elementRef?(elm: any, referenceName: string): any;
   $parentElement?(node: Node): any;
-  $addEventListener?(elm: any, eventName: string, eventListener: any, useCapture: boolean, usePassive: boolean): Function;
+  $addEventListener?(elm: any, eventName: string, eventListener: any, useCapture?: boolean, usePassive?: boolean, attachTo?: string|Element): void;
+  $removeEventListener?(elm: any, eventName?: string): any;
   $dispatchEvent?(elm: Element, eventName: string, data: any): void;
   $supportsShadowDom?: boolean;
   $supportsEventOptions?: boolean;

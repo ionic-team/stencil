@@ -1,6 +1,5 @@
 import { Build } from '../../util/build-conditionals';
 import { callNodeRefs } from '../renderer/patch';
-import { detachListeners } from './listeners';
 import { DomApi, HostElement, PlatformApi } from '../../util/interfaces';
 import { NODE_TYPE } from '../../util/constants';
 import { propagateElementLoaded } from './init-component';
@@ -24,8 +23,9 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     callNodeRefs(elm._vnode, true);
 
     // detatch any event listeners that may have been added
-    // this will also set _listeners to null if there are any
-    detachListeners(elm);
+    // because we're not passing an exact event name it'll
+    // remove all of this element's event, which is good
+    plt.domApi.$removeEventListener(elm);
 
     if (Build.slot && elm._hostContentNodes) {
       // overreacting here just to reduce any memory leak issues

@@ -1,6 +1,4 @@
 import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
-import { noop } from '../../util/helpers';
-import { KEY_CODE_MAP } from '../../util/constants';
 
 
 export function initElementListeners(plt: PlatformApi, elm: HostElement) {
@@ -13,15 +11,17 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
   const cmpMeta = plt.getComponentMeta(elm);
 
   if (cmpMeta.listenersMeta) {
-    cmpMeta.listenersMeta.forEach(listener => {
-      if (!listener.eventDisabled) {
-        (elm._listeners = elm._listeners || {})[listener.eventName] = addListener(
-          plt,
+    // we've got listens
+    cmpMeta.listenersMeta.forEach(listenMeta => {
+      // go through each listener
+      if (!listenMeta.eventDisabled) {
+        // only add ones that are not already disabled
+        plt.domApi.$addEventListener(
           elm,
-          listener.eventName,
-          createListenerCallback(elm, listener.eventMethodName),
-          listener.eventCapture,
-          listener.eventPassive
+          listenMeta.eventName,
+          createListenerCallback(elm, listenMeta.eventMethodName),
+          listenMeta.eventCapture,
+          listenMeta.eventPassive
         );
       }
     });
@@ -47,6 +47,41 @@ export function createListenerCallback(elm: HostElement, eventMethodName: string
 }
 
 
+export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element) {
+  if (instance) {
+    // cool, we've got an instance, it's get the element it's on
+    const elm = instance.__el;
+    const cmpMeta = plt.getComponentMeta(elm);
+
+    if (cmpMeta && cmpMeta.listenersMeta) {
+      // alrighty, so this cmp has listener meta
+
+      if (shouldEnable) {
+        // we want to enable this event
+        // find which listen meta we're talking about
+        const listenMeta = cmpMeta.listenersMeta.find(l => l.eventName === eventName);
+        if (listenMeta) {
+          // found the listen meta, so let's add the listener
+          plt.domApi.$addEventListener(
+            elm,
+            eventName,
+            (ev: any) => instance[listenMeta.eventMethodName](ev),
+            listenMeta.eventCapture,
+            listenMeta.eventPassive,
+            attachTo
+          );
+        }
+
+      } else {
+        // we're disabling the event listener
+        // so let's just remove it entirely
+        plt.domApi.$removeEventListener(elm, eventName);
+      }
+    }
+  }
+}
+
+
 export function replayQueuedEventsOnInstance(elm: HostElement, i?: number) {
   // the element has an instance now and
   // we already added the event listeners to the element
@@ -66,114 +101,5 @@ export function replayQueuedEventsOnInstance(elm: HostElement, i?: number) {
 
     // no longer need this data, be gone with you
     elm._queuedEvents = null;
-  }
-}
-
-
-export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element) {
-  if (instance) {
-    const elm = instance.__el;
-    const cmpMeta = plt.getComponentMeta(elm);
-    const listenerMeta = cmpMeta.listenersMeta;
-
-    if (listenerMeta) {
-      const deregisterFns = elm._listeners = elm._listeners || {};
-
-      for (var i = 0; i < listenerMeta.length; i++) {
-        var listener = listenerMeta[i];
-
-        if (listener.eventName === eventName) {
-          var fn = deregisterFns[eventName];
-
-          if (shouldEnable && !fn) {
-            var attachToEventName = eventName;
-            var element = elm;
-
-            if (typeof attachTo === 'string') {
-              attachToEventName = `${attachTo}:${eventName}`;
-
-            } else if (typeof attachTo === 'object') {
-              element = attachTo as HostElement;
-            }
-
-            deregisterFns[eventName] = addListener(
-              plt,
-              element,
-              attachToEventName,
-              createListenerCallback(elm, listener.eventMethodName),
-              listener.eventCapture,
-              listener.eventPassive
-            );
-
-          } else if (!shouldEnable && fn) {
-            deregisterFns[eventName]();
-            deregisterFns[eventName] = null;
-          }
-
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
-
-export function addListener(
-  plt: PlatformApi,
-  elm: Element|HTMLDocument|Window,
-  eventName: string,
-  listenerCallback: {(ev?: any): any},
-  useCapture?: boolean,
-  usePassive?: boolean,
-  splt?: string[],
-  eventListener?: Function
-) {
-  // depending on the event name, we could actually be attaching
-  // this element to something like the document or window
-  splt = eventName.split(':');
-
-  if (elm && splt.length > 1) {
-    // document:mousemove
-    // parent:touchend
-    // body:keyup.enter
-    elm = plt.domApi.$elementRef(elm, splt[0]);
-    eventName = splt[1];
-  }
-
-  if (!elm) {
-    // something's up, let's not continue and just return a noop()
-    return noop;
-  }
-
-  eventListener = listenerCallback;
-
-  // test to see if we're looking for an exact keycode
-  splt = eventName.split('.');
-
-  if (splt.length > 1) {
-    // looks like this listener is also looking for a keycode
-    // keyup.enter
-    eventName = splt[0];
-
-    eventListener = (ev: any) => {
-      // wrap the user's event listener with our own check to test
-      // if this keyboard event has the keycode they're looking for
-      if (ev.keyCode === KEY_CODE_MAP[splt[1]]) {
-        listenerCallback(ev);
-      }
-    };
-  }
-
-  // good to go now, add the event listener
-  // and the returned value is a function to remove the same event listener
-  return plt.domApi.$addEventListener(elm, eventName, eventListener, useCapture, usePassive);
-}
-
-
-export function detachListeners(elm: HostElement) {
-  if (elm._listeners) {
-    Object.keys(elm._listeners).forEach(eventName => elm._listeners[eventName]());
-    elm._listeners = null;
   }
 }

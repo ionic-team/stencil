@@ -1,6 +1,6 @@
 import { Build } from '../../util/build-conditionals';
 import { DomApi, EventEmitterData } from '../../util/interfaces';
-import { NODE_TYPE } from '../../util/constants';
+import { KEY_CODE_MAP, NODE_TYPE } from '../../util/constants';
 import { toLowerCase } from '../../util/helpers';
 
 
@@ -8,6 +8,7 @@ export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): 
   // using the $ prefix so that closure is
   // cool with property renaming each of these
 
+  const unregisterListenerFns = new WeakMap<Node, ElementUnregisterListeners>();
 
   const domApi: DomApi = {
 
@@ -69,19 +70,6 @@ export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): 
     $removeAttribute: (elm, key) =>
       elm.removeAttribute(key),
 
-    $addEventListener: (elm, eventName, eventListener, useCapture, usePassive, eventListenerOpts?: any) => {
-      eventListenerOpts = domApi.$supportsEventOptions ? {
-        capture: !!useCapture,
-        passive: !!usePassive
-      } : !!useCapture;
-
-      // ok, good to go, let's add the actual listener to the dom element
-      elm.addEventListener(eventName, eventListener, eventListenerOpts);
-
-      // return a function which is used to remove this very same listener
-      return () => elm && elm.removeEventListener(eventName, eventListener, eventListenerOpts);
-    },
-
     $elementRef: (elm: any, referenceName: string) => {
       if (referenceName === 'child') {
         return elm.firstElementChild;
@@ -99,6 +87,115 @@ export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): 
         return win;
       }
       return elm;
+    },
+
+    $addEventListener: (assignerElm, eventName, listenerCallback, useCapture, usePassive, attachTo, eventListenerOpts?: any, splt?: string[]) => {
+      // remember the original name before we possibly change it
+      const assignersEventName = eventName;
+      let attachToElm = assignerElm;
+
+      // get the existing unregister listeners for
+      // this element from the unregister listeners weakmap
+      let assignersUnregListeners = unregisterListenerFns.get(assignerElm);
+
+      if (assignersUnregListeners && assignersUnregListeners[assignersEventName]) {
+        // removed any existing listeners for this event for the assigner element
+        // this element already has this listener, so let's unregister it now
+        assignersUnregListeners[assignersEventName]();
+      }
+
+      if (typeof attachTo === 'string') {
+        // attachTo is a string, and is probably something like
+        // "parent", "window", or "document"
+        // and the eventName would be like "mouseover" or "mousemove"
+        attachToElm = domApi.$elementRef(assignerElm, attachTo);
+
+      } else if (typeof attachTo === 'object') {
+        // we were passed in an actual element to attach to
+        attachToElm = attachTo;
+
+      } else {
+        // depending on the event name, we could actually be attaching
+        // this element to something like the document or window
+        splt = eventName.split(':');
+
+        if (splt.length > 1) {
+          // document:mousemove
+          // parent:touchend
+          // body:keyup.enter
+          attachToElm = domApi.$elementRef(assignerElm, splt[0]);
+          eventName = splt[1];
+        }
+      }
+
+      if (!attachToElm) {
+        // somehow we're referencing an element that doesn't exist
+        // let's not continue
+        return;
+      }
+
+      let eventListener = listenerCallback;
+
+      // test to see if we're looking for an exact keycode
+      splt = eventName.split('.');
+
+      if (splt.length > 1) {
+        // looks like this listener is also looking for a keycode
+        // keyup.enter
+        eventName = splt[0];
+
+        eventListener = (ev: any) => {
+          // wrap the user's event listener with our own check to test
+          // if this keyboard event has the keycode they're looking for
+          if (ev.keyCode === KEY_CODE_MAP[splt[1]]) {
+            listenerCallback(ev);
+          }
+        };
+      }
+
+      // create the actual event listener options to use
+      // this browser may not support event options
+      eventListenerOpts = domApi.$supportsEventOptions ? {
+        capture: !!useCapture,
+        passive: !!usePassive
+      } : !!useCapture;
+
+      // ok, good to go, let's add the actual listener to the dom element
+      attachToElm.addEventListener(eventName, eventListener, eventListenerOpts);
+
+      if (!assignersUnregListeners) {
+        // we don't already have a collection, let's create it
+        unregisterListenerFns.set(assignerElm, assignersUnregListeners = {});
+      }
+
+      // add the unregister listener to this element's collection
+      assignersUnregListeners[assignersEventName] = () => {
+        // looks like it's time to say goodbye
+        attachToElm && attachToElm.removeEventListener(eventName, eventListener, eventListenerOpts);
+        assignersUnregListeners[assignersEventName] = null;
+      };
+    },
+
+    $removeEventListener: (elm, eventName) => {
+      // get the unregister listener functions for this element
+      const assignersUnregListeners = unregisterListenerFns.get(elm);
+
+      if (assignersUnregListeners) {
+        // this element has unregister listeners
+        if (eventName) {
+          // passed in one specific event name to remove
+          assignersUnregListeners[eventName] && assignersUnregListeners[eventName]();
+
+        } else {
+          // remove all event listeners
+          Object.keys(assignersUnregListeners).forEach(assignersEventName => {
+            assignersUnregListeners[assignersEventName] && assignersUnregListeners[assignersEventName]();
+          });
+
+          // sure it's weakmap, but we're here, so let's just delete it now
+          unregisterListenerFns.delete(elm);
+        }
+      }
     }
 
   };
@@ -145,4 +242,8 @@ export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): 
   };
 
   return domApi;
+}
+
+interface ElementUnregisterListeners {
+  [referenceName: string]: Function;
 }

@@ -1,4 +1,3 @@
-import { addListener } from '../instance/listeners';
 import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
 import { PlatformApi, VNode } from '../../util/interfaces';
 import { toLowerCase } from '../../util/helpers';
@@ -72,19 +71,16 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
   } else if (name[0] === 'o' && name[1] === 'n' && (!(name in elm))) {
     // Event Handlers
     // adding an standard event listener, like <button onClick=...> or something
-
-    name = toLowerCase(name).substring(2);
-    const listeners = (elm._listeners = elm._listeners || {});
-
+    name = toLowerCase(name.substring(2));
     if (newValue) {
       if (!oldValue) {
         // add listener
-        listeners[name] = addListener(plt, elm, name, newValue);
+        plt.domApi.$addEventListener(elm, name, newValue);
       }
 
-    } else if (listeners[name]) {
+    } else {
       // remove listener
-      listeners[name]();
+      plt.domApi.$removeEventListener(elm, name);
     }
 
   } else if (name !== 'list' && name !== 'type' && !isSvg &&

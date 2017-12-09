@@ -1,6 +1,6 @@
-import { mockDomApi, mockPlatform, mockComponentInstance, mockDispatchEvent, mockWindow } from '../../../testing/mocks';
+import { createListenerCallback, enableEventListener, replayQueuedEventsOnInstance } from '../listeners';
 import { DomApi, HostElement } from '../../../util/interfaces';
-import { createListenerCallback, replayQueuedEventsOnInstance, addListener, enableEventListener } from '../listeners';
+import { mockComponentInstance, mockDispatchEvent, mockDomApi, mockPlatform, mockWindow } from '../../../testing/mocks';
 
 
 describe('instance listeners', () => {
@@ -235,9 +235,11 @@ describe('instance listeners', () => {
         expect(options.capture).toEqual(capture);
       };
 
-      const rm = addListener(plt, el, eventName, f, capture, passive);
+      domApi.$addEventListener(el, eventName, f, capture, passive);
+
       expect(calledAdd).toBeTruthy();
       expect(calledRm).toBeFalsy();
+
       if (keyCode !== false) {
         internalCallback({keyCode: keyCode + 1});
         expect(calledCallback).toBeFalsy();
@@ -246,7 +248,7 @@ describe('instance listeners', () => {
       internalCallback({keyCode: keyCode});
       expect(calledCallback).toBeTruthy();
 
-      rm();
+      domApi.$removeEventListener(el, eventName);
       expect(calledRm).toBeTruthy();
     }
   });
