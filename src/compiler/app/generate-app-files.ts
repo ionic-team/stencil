@@ -33,13 +33,13 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   const coreFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionals);
   appRegistry.core = coreFilename;
 
-
   const buildConditionalsSsr = setBuildConditionals(ctx, ctx.manifestBundles);
   buildConditionalsSsr.coreId = 'core.ssr';
   buildConditionalsSsr.ssrClientSide = true;
 
   const coreSsrFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionalsSsr);
   appRegistry.coreSsr = coreSsrFilename;
+  ctx.appCoreWWWPath = coreSsrFilename;
 
 
   if (config.es5Fallback) {

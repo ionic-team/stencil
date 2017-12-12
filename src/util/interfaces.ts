@@ -468,6 +468,36 @@ export interface PrerenderConfig extends RenderOptions {
 }
 
 
+export interface PrerenderResult {
+  url: string;
+  hostname: string;
+  path: string;
+  components: HydrateComponent[];
+  styleUrls: string[];
+  scriptUrls: string[];
+  imgUrls: string[];
+}
+
+
+export interface HostConfig {
+  hosting?: {
+    rules?: HostRule[];
+  };
+}
+
+
+export interface HostRule {
+  include: string;
+  headers: HostRuleHeader[];
+}
+
+
+export interface HostRuleHeader {
+  name?: string;
+  value?: string;
+}
+
+
 export interface PrerenderLocation {
   pathname?: string;
   url?: string;
@@ -533,6 +563,7 @@ export interface BuildContext {
     components_d_ts?: string;
     [key: string]: string;
   };
+  appCoreWWWPath?: string;
   coreBuilds?: {[cacheKey: string]: string};
   watcher?: FSWatcher;
   hasIndexHtml?: boolean;
@@ -555,7 +586,7 @@ export interface BuildContext {
   moduleBundleCount?: number;
   styleBundleCount?: number;
   localPrerenderServer?: any;
-  prerenderedUrls?: number;
+  prerenderResults?: PrerenderResult[];
 
   diagnostics?: Diagnostic[];
   registry?: ComponentRegistry;
@@ -1261,6 +1292,17 @@ export interface HydrateResults {
   styles?: string;
   anchors?: HydrateAnchor[];
   root?: HTMLElement;
+  components?: HydrateComponent[];
+  styleUrls?: string[];
+  scriptUrls?: string[];
+  imgUrls?: string[];
+}
+
+
+export interface HydrateComponent {
+  tag: string;
+  count?: number;
+  depth?: number;
 }
 
 

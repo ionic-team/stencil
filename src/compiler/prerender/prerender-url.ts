@@ -36,7 +36,17 @@ export function prerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtm
       // let's use this updated html for the index content now
       Object.assign(results, hydratedResults);
 
-      ctx.prerenderedUrls++;
+      const url = config.sys.url.parse(hydratedResults.url);
+
+      ctx.prerenderResults.push({
+        url: hydratedResults.url,
+        hostname: url.hostname,
+        path: url.path,
+        components: hydratedResults.components,
+        styleUrls: hydratedResults.styleUrls,
+        scriptUrls: hydratedResults.scriptUrls,
+        imgUrls: hydratedResults.imgUrls
+      });
     });
 
   }).catch(err => {

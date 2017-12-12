@@ -37,7 +37,11 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
         diagnostics: [buildError(err)],
         html: hydrateOpts.html,
         styles: null,
-        anchors: []
+        anchors: [],
+        components: [],
+        styleUrls: [],
+        scriptUrls: [],
+        imgUrls: []
       };
       return hydrateResults;
     });

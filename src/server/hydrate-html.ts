@@ -17,7 +17,11 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
       url: opts.url,
       html: opts.html,
       styles: null,
-      anchors: []
+      anchors: [],
+      components: [],
+      styleUrls: [],
+      scriptUrls: [],
+      imgUrls: []
     };
 
     const registeredTags = Object.keys(registry || {});
@@ -122,11 +126,6 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
       resolve(hydrateResults);
     };
 
-    // keep a collection of all the host elements we connected
-    const connectedInfo: ConnectedInfo = {
-      elementCount: 0
-    };
-
     // patch the render function that we can add SSR ids
     // and to connect any elements it may have just appened to the DOM
     const pltRender = plt.render;
@@ -150,7 +149,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
       newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, encapsulation, ssrId);
 
-      connectElement(plt, <HostElement>newVNode.elm, connectedInfo, config.hydratedCssClass);
+      connectElement(plt, <HostElement>newVNode.elm, hydrateResults, config.hydratedCssClass);
 
       return newVNode;
     };
@@ -158,9 +157,9 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
     // loop through each node and start connecting/hydrating
     // any elements that are host elements to components
     // this kicks off all the async loading and hydrating
-    connectElement(plt, <any>win.document.body, connectedInfo, config.hydratedCssClass);
+    connectElement(plt, <any>win.document.body, hydrateResults, config.hydratedCssClass);
 
-    if (connectedInfo.elementCount === 0) {
+    if (hydrateResults.components.length === 0) {
       // what gives, never found ANY host elements to connect!
       // ok we're just done i guess, idk
       hydrateResults.html = opts.html;
@@ -170,22 +169,60 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 }
 
 
-export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo: ConnectedInfo, hydratedCssClass: string) {
+export function connectElement(plt: PlatformApi, elm: HostElement, hydrateResults: HydrateResults, hydratedCssClass: string) {
   if (!elm.$connected) {
     // only connect elements which is a registered component
+    const tagName = elm.tagName.toLowerCase();
     const cmpMeta = plt.getComponentMeta(elm);
-    if (cmpMeta && cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
 
-      elm.$initLoad = () => {
-        initLoad(plt, elm, hydratedCssClass);
-      };
+    if (cmpMeta) {
 
-      proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
+      if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
+        elm.$initLoad = () => {
+          initLoad(plt, elm, hydratedCssClass);
+        };
 
-      connectedCallback(plt, cmpMeta, elm);
+        proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
 
-      // keep count of how many host elements we actually connected
-      connectedInfo.elementCount++;
+        connectedCallback(plt, cmpMeta, elm);
+      }
+
+      const depth = getDepth(elm);
+
+      const cmp = hydrateResults.components.find(c => c.tag === tagName);
+      if (cmp) {
+        cmp.count++;
+        if (depth > cmp.depth) {
+          cmp.depth = depth;
+        }
+
+      } else {
+        hydrateResults.components.push({
+          tag: tagName,
+          count: 1,
+          depth: depth
+        });
+      }
+
+    } else if (tagName === 'script') {
+      const src = (elm as any).src;
+      if (src && hydrateResults.scriptUrls.indexOf(src) === -1) {
+        hydrateResults.scriptUrls.push(src);
+      }
+
+    } else if (tagName === 'link') {
+      const href = (elm as any).href;
+      const rel = ((elm as any).rel || '').toLowerCase();
+      if (rel === 'stylesheet' && href && hydrateResults.styleUrls.indexOf(href) === -1) {
+        hydrateResults.styleUrls.push(href);
+      }
+
+    } else if (tagName === 'img') {
+      const src = (elm as any).src;
+      if (src && hydrateResults.imgUrls.indexOf(src) === -1) {
+        hydrateResults.imgUrls.push(src);
+      }
+
     }
   }
 
@@ -193,7 +230,7 @@ export function connectElement(plt: PlatformApi, elm: HostElement, connectedInfo
   if (elmChildren) {
     // continue drilling down through child elements
     for (var i = 0, l = elmChildren.length; i < l; i++) {
-      connectElement(plt, <HostElement>elmChildren[i], connectedInfo, hydratedCssClass);
+      connectElement(plt, <HostElement>elmChildren[i], hydrateResults, hydratedCssClass);
     }
   }
 }
@@ -269,6 +306,18 @@ function normalizeLanguage(doc: Document, opts: HydrateOptions) {
 }
 
 
+function getDepth(elm: Node) {
+  let depth = 0;
+
+  while (elm.parentNode) {
+    depth++;
+    elm = elm.parentNode;
+  }
+
+  return depth;
+}
+
+
 function generateFailureDiagnostic(d: Diagnostic) {
   return `
     <div style="padding: 20px;">
@@ -276,9 +325,4 @@ function generateFailureDiagnostic(d: Diagnostic) {
       <div>${d.messageText}</div>
     </div>
   `;
-}
-
-
-export interface ConnectedInfo {
-  elementCount: number;
 }

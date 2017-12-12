@@ -1,5 +1,6 @@
 import { BuildConfig, BuildContext, HydrateResults, PrerenderConfig, PrerenderStatus, PrerenderLocation } from '../../util/interfaces';
 import { buildError, catchError, hasError, normalizePath } from '../util';
+import { generateHostConfig } from './host-config';
 import { prerenderUrl } from './prerender-url';
 
 
@@ -45,8 +46,13 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
   // keep track of how long the entire build process takes
   const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
+  ctx.prerenderResults = [];
+
   return new Promise(resolve => {
     drainPrerenderQueue(config, ctx, indexHtml, resolve);
+
+  }).then(() => {
+    return generateHostConfig(config, ctx, ctx.prerenderResults);
 
   }).catch(err => {
     catchError(ctx.diagnostics, err);
@@ -55,7 +61,7 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
     if (hasError(ctx.diagnostics)) {
       timeSpan.finish(`prerendering failed`);
     } else {
-      timeSpan.finish(`prerendered urls: ${ctx.prerenderedUrls}`);
+      timeSpan.finish(`prerendered urls: ${ctx.prerenderResults.length}`);
     }
 
     if (ctx.localPrerenderServer) {
