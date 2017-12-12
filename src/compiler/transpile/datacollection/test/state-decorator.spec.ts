@@ -10,7 +10,7 @@ describe('state decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/state-example');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-      response = getStateDecoratorMeta(classNode);
+      response = getStateDecoratorMeta(null, classNode);
     });
 
     expect(response).toEqual({

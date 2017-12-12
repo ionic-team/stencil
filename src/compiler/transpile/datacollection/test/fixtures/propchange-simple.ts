@@ -38,4 +38,11 @@ class ActionSheet {
     this.emitStyle();
   }
 
+  @PropDidChange('event1')
+  @PropDidChange('event2')
+  @PropWillChange('event3')
+  protected method() {
+
+  }
+
 }
