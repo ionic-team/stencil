@@ -137,11 +137,11 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     );
 
     // add watchers to props if they exist
-    if (Build.didChange) {
+    if (Build.willChange) {
       proxyPropChangeMethods(cmpMeta.propsWillChangeMeta, PROP_WILL_CHG, elm, instance, memberName);
     }
 
-    if (Build.willChange) {
+    if (Build.didChange) {
       proxyPropChangeMethods(cmpMeta.propsDidChangeMeta, PROP_DID_CHG, elm, instance, memberName);
     }
 
