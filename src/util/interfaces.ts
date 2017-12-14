@@ -370,7 +370,8 @@ export interface BuildConfig {
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   es5Fallback?: boolean;
   namespace?: string;
-  global?: string;
+  globalScript?: string;
+  globalStyle?: string[];
   srcDir?: string;
   wwwDir?: string;
   buildDir?: string;
@@ -448,6 +449,7 @@ export interface CopyTask {
 export interface RenderOptions {
   collapseWhitespace?: boolean;
   inlineStyles?: boolean;
+  inlineAssetsMaxSize?: number;
   removeUnusedStyles?: boolean;
   inlineLoaderScript?: boolean;
   canonicalLink?: boolean;
@@ -562,6 +564,9 @@ export interface BuildContext {
     indexHtml?: string;
     components_d_ts?: string;
     [key: string]: string;
+  };
+  appGlobalStyles?: {
+    content?: string;
   };
   appCoreWWWPath?: string;
   coreBuilds?: {[cacheKey: string]: string};
@@ -1160,7 +1165,7 @@ export interface StencilSystem {
     readdir(path: string, callback?: (err: any, files: string[]) => void): void;
     readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
     readFileSync(filename: string, encoding: string): string;
-    stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; }) => any): void;
+    stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; size: number; }) => any): void;
     statSync(path: string): { isFile(): boolean; isDirectory(): boolean; };
     unlink(path: string, callback?: (err?: any) => void): void;
     writeFile(filename: string, data: any, callback?: (err: any) => void): void;

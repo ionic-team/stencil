@@ -30,6 +30,7 @@ export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
   ],
   inlineLoaderScript: true,
   inlineStyles: true,
+  inlineAssetsMaxSize: 5000,
   removeUnusedStyles: true,
   collapseWhitespace: true,
   maxConcurrent: 4,

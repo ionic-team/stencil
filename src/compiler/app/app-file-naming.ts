@@ -67,6 +67,12 @@ export function getCoreFilename(config: BuildConfig, coreId: string, jsContent: 
 }
 
 
+export function getGlobalStyleFilename(config: BuildConfig) {
+  const appFileName = getAppFileName(config);
+  return `${appFileName}.css`;
+}
+
+
 export function getBundleFileName(bundleId: string, scoped: boolean) {
   return `${bundleId}${scoped ? '.sc' : ''}.js`;
 }

@@ -11,6 +11,7 @@ export function getBuildContext(ctx?: BuildContext) {
   ctx.registry = ctx.registry || {};
   ctx.filesToWrite = ctx.filesToWrite || {};
   ctx.appFiles = ctx.appFiles || {};
+  ctx.appGlobalStyles = ctx.appGlobalStyles || {};
   ctx.coreBuilds = ctx.coreBuilds || {};
   ctx.moduleFiles = ctx.moduleFiles || {};
   ctx.jsFiles = ctx.jsFiles || {};

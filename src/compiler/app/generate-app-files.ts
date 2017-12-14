@@ -1,9 +1,10 @@
 import { AppRegistry, BuildConfig, BuildContext } from '../../util/interfaces';
 import { formatComponentRegistry } from '../../util/data-serialize';
 import { generateCore } from './app-core';
-import { generateAppGlobal } from './app-global';
+import { generateAppGlobalScript } from './app-global-scripts';
 import { generateAppRegistry } from './app-registry';
 import { generateEs5DisabledMessage } from './app-es5-disabled';
+import { generateGlobalStyles } from './app-global-styles';
 import { generateLoader } from './app-loader';
 import { hasError } from '../util';
 import { setBuildConditionals } from './build-conditionals';
@@ -23,7 +24,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   };
 
   // normal es2015 build
-  const globalJsContentsEs2015 = await generateAppGlobal(config, ctx, 'es2015', appRegistry);
+  const globalJsContentsEs2015 = await generateAppGlobalScript(config, ctx, 'es2015', appRegistry);
 
   // figure out which sections should be included in the core build
   const buildConditionals = setBuildConditionals(ctx, ctx.manifestBundles);
@@ -44,7 +45,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 
   if (config.es5Fallback) {
     // es5 build (if needed)
-    const globalJsContentsEs5 = await generateAppGlobal(config, ctx, 'es5', appRegistry);
+    const globalJsContentsEs5 = await generateAppGlobalScript(config, ctx, 'es5', appRegistry);
 
     const buildConditionalsEs5 = setBuildConditionals(ctx, ctx.manifestBundles);
     buildConditionalsEs5.coreId = 'core.pf';
@@ -67,6 +68,9 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
 
   // create the loader after creating the loader file name
   await generateLoader(config, ctx, appRegistry);
+
+  // create the global styles
+  await generateGlobalStyles(config, ctx);
 
   timespan.finish(`generateAppFiles: ${config.namespace} finished`);
 }

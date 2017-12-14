@@ -1,7 +1,8 @@
 import { BuildConfig, BuildContext, FilesMap, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineLoaderScript } from './inline-loader-script';
-import { inlineStyles } from '../css/inline-styles';
+import { inlineComponentStyles } from '../css/inline-styles';
+import { inlineExternalAssets } from './inline-external-assets';
 import { insertCanonicalLink } from './canonical-link';
 
 
@@ -24,17 +25,32 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
   if (opts.inlineStyles !== false) {
     try {
-      inlineStyles(config, doc, stylesMap, opts, results.diagnostics);
+      inlineComponentStyles(config, doc, stylesMap, opts, results.diagnostics);
 
     } catch (e) {
       results.diagnostics.push({
         level: 'error',
         type: 'hydrate',
-        header: 'Inline Styles',
+        header: 'Inline Component Styles',
         messageText: e
       });
     }
   }
+
+  if (opts.inlineAssetsMaxSize > 0) {
+    try {
+      inlineExternalAssets(config, ctx, opts, doc);
+
+    } catch (e) {
+      results.diagnostics.push({
+        level: 'error',
+        type: 'hydrate',
+        header: 'Inline External Styles',
+        messageText: e
+      });
+    }
+  }
+
 
   if (opts.inlineLoaderScript !== false) {
     // remove the script to the external loader script request

@@ -323,11 +323,18 @@ describe('validation', () => {
       expect(path.isAbsolute(config.srcDir)).toBe(true);
     });
 
-    it('should convert global to absolute path, if a global property was provided', () => {
-      config.global = 'src/global/index.ts';
+    it('should convert globalScript to absolute path, if a globalScript property was provided', () => {
+      config.globalScript = 'src/global/index.ts';
       validateBuildConfig(config);
-      expect(path.basename(config.global)).toBe('index.ts');
-      expect(path.isAbsolute(config.global)).toBe(true);
+      expect(path.basename(config.globalScript)).toBe('index.ts');
+      expect(path.isAbsolute(config.globalScript)).toBe(true);
+    });
+
+    it('should convert globalStyle string to absolute path array, if a globalStyle property was provided', () => {
+      config.globalStyle = 'src/global/styles.css' as any;
+      validateBuildConfig(config);
+      expect(path.basename(config.globalStyle[0])).toBe('styles.css');
+      expect(path.isAbsolute(config.globalStyle[0])).toBe(true);
     });
 
     it('should throw error for missing sys', () => {

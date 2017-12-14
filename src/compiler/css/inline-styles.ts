@@ -3,7 +3,7 @@ import { removeUnusedStyles } from './remove-unused-styles';
 import { UsedSelectors } from '../html/used-selectors';
 
 
-export function inlineStyles(config: BuildConfig, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, diagnostics: Diagnostic[]) {
+export function inlineComponentStyles(config: BuildConfig, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, diagnostics: Diagnostic[]) {
   const styleFileNames = Object.keys(stylesMap);
 
   if (!styleFileNames.length) {

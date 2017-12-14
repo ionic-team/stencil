@@ -7,7 +7,7 @@ import { transpiledInMemoryPlugin } from '../bundle/component-modules';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
-export async function generateAppGlobal(config: BuildConfig, ctx: BuildContext, sourceTarget: SourceTarget, appRegistry: AppRegistry) {
+export async function generateAppGlobalScript(config: BuildConfig, ctx: BuildContext, sourceTarget: SourceTarget, appRegistry: AppRegistry) {
   const globalJsContents = await generateAppGlobalContents(config, ctx, sourceTarget);
 
   if (globalJsContents.length) {
@@ -41,7 +41,7 @@ export function generateAppGlobalContents(config: BuildConfig, ctx: BuildContext
 
   return Promise.all([
     loadDependentGlobalJsContents(config, ctx, sourceTarget),
-    bundleProjectGlobal(config, ctx, sourceTarget, config.namespace, config.global)
+    bundleProjectGlobal(config, ctx, sourceTarget, config.namespace, config.globalScript)
 
   ]).then(results => {
     const dependentGlobalJsContents = results[0];
@@ -129,7 +129,7 @@ function bundleProjectGlobal(config: BuildConfig, ctx: BuildContext, sourceTarge
 
   }).then(output => {
 
-    ctx.manifest.global = ctx.moduleFiles[config.global];
+    ctx.manifest.global = ctx.moduleFiles[config.globalScript];
 
     return output;
   });

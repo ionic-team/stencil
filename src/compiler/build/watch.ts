@@ -273,7 +273,8 @@ function configFileReload(existingConfig: BuildConfig) {
   existingConfig.excludeSrc = updatedConfig.excludeSrc;
   existingConfig.generateDistribution = updatedConfig.generateDistribution;
   existingConfig.generateWWW = updatedConfig.generateWWW;
-  existingConfig.global = updatedConfig.global;
+  existingConfig.globalScript = updatedConfig.globalScript;
+  existingConfig.globalStyle = updatedConfig.globalStyle;
   existingConfig.hashedFileNameLength = updatedConfig.hashedFileNameLength;
   existingConfig.hashFileNames = updatedConfig.hashFileNames;
   existingConfig.wwwIndexHtml = updatedConfig.wwwIndexHtml;

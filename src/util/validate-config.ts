@@ -29,13 +29,28 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
 
   const path = config.sys.path;
 
-  if (typeof config.global === 'string' && !path.isAbsolute(config.global)) {
-    config.global = normalizePath(path.join(config.rootDir, config.global));
+  if (typeof (config as any).global === 'string') {
+    // deprecated: 2017-12-12
+    config.logger.warn(`stencil config property "global" has been renamed to "globalScript"`);
+    config.globalScript = (config as any).global;
+  }
+
+  if (typeof config.globalScript === 'string' && !path.isAbsolute(config.globalScript)) {
+    config.globalScript = normalizePath(path.join(config.rootDir, config.globalScript));
+  }
+
+  if (typeof config.globalStyle === 'string') {
+    config.globalStyle = [config.globalStyle];
+  }
+  if (Array.isArray(config.globalStyle)) {
+    config.globalStyle = config.globalStyle.map(globalStyle => {
+      return normalizePath(path.join(config.rootDir, globalStyle));
+    });
   }
 
   if (typeof (config as any).src === 'string') {
     // deprecated: 2017-08-14
-    console.warn(`stencil config property "src" has been renamed to "srcDir"`);
+    config.logger.warn(`stencil config property "src" has been renamed to "srcDir"`);
     config.srcDir = (config as any).src;
   }
   if (typeof config.srcDir !== 'string') {
