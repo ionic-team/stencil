@@ -7,11 +7,14 @@ import * as path from 'path';
 const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
 
 export interface ImportData {
-  [key: string]: Array<{
-    localName: string;
-    importName?: string;
-  }>;
+  [key: string]: MemberNameData[];
 }
+
+export interface MemberNameData {
+  localName: string;
+  importName?: string;
+}
+
 
 /**
  * Generate the component.d.ts file that contains types for all components
@@ -61,7 +64,7 @@ export function generateComponentTypesFile(config: BuildConfig, cmpList: Compone
     }
     finalString +=
 `import {
-${typeData.map(td => {
+${typeData.sort(sortImportNames).map(td => {
   if (td.localName === td.importName) {
     return `  ${td.importName},`;
   } else {
@@ -76,6 +79,18 @@ ${typeData.map(td => {
   componentsFileContent += typeImportString + componentFileString;
 
   return componentsFileContent;
+}
+
+
+function sortImportNames(a: MemberNameData, b: MemberNameData) {
+  const aName = a.localName.toLowerCase();
+  const bName = b.localName.toLowerCase();
+
+  if (aName < bName) return -1;
+  if (aName > bName) return 1;
+  if (a.localName < b.localName) return -1;
+  if (a.localName > b.localName) return 1;
+  return 0;
 }
 
 
@@ -192,12 +207,25 @@ declare global {
   }
   namespace JSXElements {
     export interface ${jsxInterfaceName} extends HTMLAttributes {
-      ${Object.keys(interfaceOptions).map((key: string) => `${key}?: ${interfaceOptions[key]};`).join('\n      ')}
+      ${Object.keys(interfaceOptions).sort(sortInterfaceMembers).map((key: string) => `${key}?: ${interfaceOptions[key]};`).join('\n      ')}
     }
   }
 }
 `;
 }
+
+
+function sortInterfaceMembers(a: string, b: string) {
+  const aLower = a.toLowerCase();
+  const bLower = b.toLowerCase();
+
+  if (aLower < bLower) return -1;
+  if (aLower > bLower) return 1;
+  if (a < b) return -1;
+  if (a > b) return 1;
+  return 0;
+}
+
 
 function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
   const interfaceData = Object.keys(membersMeta)
