@@ -19,10 +19,8 @@ module.exports = {
         module: 'commonjs'
       };
 
-      if (filePath.endsWith('.tsx')) {
-        opts.jsx = ts.JsxEmit.React;
-        opts.jsxFactory = 'h';
-      }
+      opts.jsx = ts.JsxEmit.React;
+      opts.jsxFactory = 'h';
 
       sourceText = injectTestingScript + sourceText;
 

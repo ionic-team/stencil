@@ -3,7 +3,7 @@ import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, Transpi
 import { buildError, catchError, isSassFile, normalizePath, hasError } from '../util';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
-import { updateFileMetaFromSlot, updateModuleFileMetaFromSlot } from './transformers/vnode-slots';
+import { updateFileMetaFromSlot } from './transformers/vnode-slots';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { removeImports } from './transformers/remove-imports';
 import { removeDecorators } from './transformers/remove-decorators';
@@ -12,6 +12,7 @@ import { normalizeStyles } from './normalize-styles';
 import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
+// import { createCompilerHostWithMap } from './utils';
 import * as ts from 'typescript';
 
 export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
@@ -49,17 +50,31 @@ export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFil
 /**
  * This is only used during TESTING
  */
-export function transpileModule(config: BuildConfig, input: string, compilerOptions?: any, path?: string) {
-  config;
-  const fileMeta: ModuleFile = {
-    tsFilePath: path || 'transpileModule.tsx'
-  };
+export function transpileModule(config: BuildConfig, compilerOptions: ts.CompilerOptions, path: string, input: string) {
+  const moduleFiles: ModuleFiles = {};
   const diagnostics: Diagnostic[] = [];
   const results: TranspileResults = {
     code: null,
     diagnostics: null,
     cmpMeta: null
   };
+
+  const checkProgram = ts.createProgram([path], compilerOptions);
+
+  // Gather component metadata and type info
+  const metadata = gatherMetadata(checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
+  Object.keys(metadata).forEach(tsFilePath => {
+    const fileMetadata = metadata[tsFilePath];
+    // normalize metadata
+    fileMetadata.stylesMeta = normalizeStyles(config, tsFilePath, fileMetadata.stylesMeta);
+    fileMetadata.assetsDirsMeta = normalizeAssetsDir(config, tsFilePath, fileMetadata.assetsDirsMeta);
+
+    // assign metadata to module files
+    const moduleFile = moduleFiles[tsFilePath];
+    if (moduleFile) {
+      moduleFile.cmpMeta = fileMetadata;
+    }
+  });
 
   const transpileOpts = {
     compilerOptions: compilerOptions,
@@ -68,10 +83,10 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
         removeImports(),
         removeDecorators(),
         renameLifecycleMethods(),
-        addMetadataExport(fileMeta)
+        addMetadataExport(moduleFiles)
       ],
       after: [
-        updateModuleFileMetaFromSlot(fileMeta)
+        updateFileMetaFromSlot(moduleFiles)
       ]
     }
   };
@@ -85,7 +100,6 @@ export function transpileModule(config: BuildConfig, input: string, compilerOpti
   }
 
   results.code = tsResults.outputText;
-  results.cmpMeta = fileMeta.cmpMeta;
 
   return results;
 }

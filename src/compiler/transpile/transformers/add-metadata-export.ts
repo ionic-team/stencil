@@ -1,9 +1,9 @@
 import { convertValueToLiteral } from './util';
-import { ComponentMeta, ModuleFile } from '../../../util/interfaces';
+import { ComponentMeta, ModuleFiles } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
-export default function addMetadataExport(moduleFile: ModuleFile): ts.TransformerFactory<ts.SourceFile> {
+export default function addMetadataExport(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
@@ -43,7 +43,9 @@ export default function addMetadataExport(moduleFile: ModuleFile): ts.Transforme
     }
 
     return (tsSourceFile) => {
-      return visit(tsSourceFile, moduleFile.cmpMeta) as ts.SourceFile;
+      const moduleFile = moduleFiles[tsSourceFile.fileName];
+      const metadata = moduleFile ? moduleFile.cmpMeta : null;
+      return visit(tsSourceFile, metadata) as ts.SourceFile;
     };
   };
 

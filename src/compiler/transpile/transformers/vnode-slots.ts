@@ -28,29 +28,6 @@ export function updateFileMetaFromSlot(moduleFiles: ModuleFiles): ts.Transformer
   };
 }
 
-
-export function updateModuleFileMetaFromSlot(moduleFile: ModuleFile): ts.TransformerFactory<ts.SourceFile> {
-
-  return (transformContext: ts.TransformationContext) => {
-    return (tsSourceFile) => {
-      return visit(tsSourceFile.fileName, tsSourceFile) as ts.SourceFile;
-    };
-
-    function visit(fileName: string, node: ts.Node): ts.VisitResult<ts.Node> {
-      switch (node.kind) {
-        case ts.SyntaxKind.CallExpression:
-          updateFileMeta(node as ts.CallExpression, moduleFile);
-
-        default:
-          return ts.visitEachChild(node, (node) => {
-            return visit(fileName, node);
-          }, transformContext);
-      }
-    }
-  };
-}
-
-
 function updateFileMeta(callNode: ts.CallExpression, fileMeta: ModuleFile) {
   if (fileMeta && (<ts.Identifier>callNode.expression).text === 'h') {
     const [tag, props] = callNode.arguments;
