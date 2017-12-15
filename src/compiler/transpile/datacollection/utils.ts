@@ -46,3 +46,10 @@ export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): JSD
       type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!))
   };
 }
+
+export function isMethod(member: ts.ClassElement, methodName: string): boolean {
+  if (ts.isMethodDeclaration(member)) {
+    return member.getFirstToken().getText() === methodName;
+  }
+  return false;
+}

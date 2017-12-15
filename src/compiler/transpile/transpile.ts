@@ -62,7 +62,7 @@ export function transpileModule(config: BuildConfig, compilerOptions: ts.Compile
   const checkProgram = ts.createProgram([path], compilerOptions);
 
   // Gather component metadata and type info
-  const metadata = gatherMetadata(checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
+  const metadata = gatherMetadata(config, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
   Object.keys(metadata).forEach(tsFilePath => {
     const fileMetadata = metadata[tsFilePath];
     // normalize metadata
@@ -137,7 +137,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   const checkProgram = ts.createProgram(tsFileNames.filter(fileName => fileName !== componentsFilePath), tsOptions, tsHost);
 
   // Gather component metadata and type info
-  const metadata = gatherMetadata(checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
+  const metadata = gatherMetadata(config, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
 
   Object.keys(metadata).forEach(tsFilePath => {
     const fileMetadata = metadata[tsFilePath];
