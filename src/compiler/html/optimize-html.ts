@@ -37,21 +37,6 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     }
   }
 
-  if (opts.inlineAssetsMaxSize > 0) {
-    try {
-      inlineExternalAssets(config, ctx, opts, doc);
-
-    } catch (e) {
-      results.diagnostics.push({
-        level: 'error',
-        type: 'hydrate',
-        header: 'Inline External Styles',
-        messageText: e
-      });
-    }
-  }
-
-
   if (opts.inlineLoaderScript !== false) {
     // remove the script to the external loader script request
     // inline the loader script at the bottom of the html
@@ -63,6 +48,20 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
         level: 'error',
         type: 'hydrate',
         header: 'Inline Loader Script',
+        messageText: e
+      });
+    }
+  }
+
+  if (opts.inlineAssetsMaxSize > 0) {
+    try {
+      inlineExternalAssets(config, ctx, opts, doc);
+
+    } catch (e) {
+      results.diagnostics.push({
+        level: 'error',
+        type: 'hydrate',
+        header: 'Inline External Styles',
         messageText: e
       });
     }
