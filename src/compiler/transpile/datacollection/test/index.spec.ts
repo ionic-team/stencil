@@ -3,6 +3,8 @@ import { visitClass } from '../index';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { gatherMetadata } from './test-utils';
+import { mockBuildConfig } from '../../../../testing/mocks';
+
 
 describe('component decorator', () => {
 
@@ -11,7 +13,7 @@ describe('component decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
-        response = visitClass(checker, classNode, sourceFile, diagnostics);
+        response = visitClass(config, checker, classNode, sourceFile, diagnostics);
       });
 
       expect(response).toEqual({
@@ -265,4 +267,5 @@ describe('component decorator', () => {
     });
   });
 
+  var config = mockBuildConfig();
 });

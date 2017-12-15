@@ -39,7 +39,7 @@ function generateMemberMarkdown(cmpMeta: ComponentMeta) {
       }
 
     } else if (memberMeta.memberType === MEMBER_TYPE.Method) {
-      methods.addRow(memberName);
+      methods.addRow(memberName, memberMeta);
     }
   });
 

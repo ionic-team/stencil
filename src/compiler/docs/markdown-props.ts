@@ -1,3 +1,4 @@
+import { getMemberDocumentation } from './docs-util';
 import { MemberMeta } from '../../util/interfaces';
 import { PROP_TYPE } from '../../util/constants';
 
@@ -44,6 +45,13 @@ class Row {
     content.push(``);
     content.push(getPropType(this.memberMeta.propType));
     content.push(``);
+
+    const doc = getMemberDocumentation(this.memberMeta.jsdoc);
+    if (doc) {
+      content.push(doc);
+      content.push(``);
+    }
+
     content.push(``);
 
     return content;

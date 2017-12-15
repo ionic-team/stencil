@@ -1,10 +1,12 @@
+import { getMemberDocumentation } from './docs-util';
+import { MemberMeta } from '../../util/interfaces';
 
 
 export class MarkdownMethods {
   private rows: Row[] = [];
 
-  addRow(memberName: string) {
-    this.rows.push(new Row(memberName));
+  addRow(memberName: string, memberMeta: MemberMeta) {
+    this.rows.push(new Row(memberName, memberMeta));
   }
 
   toMarkdown() {
@@ -33,13 +35,20 @@ export class MarkdownMethods {
 
 class Row {
 
-  constructor(public memberName: string) {}
+  constructor(public memberName: string, private memberMeta: MemberMeta) {}
 
   toMarkdown() {
     const content: string[] = [];
 
     content.push(`#### ${this.memberName}()`);
     content.push(``);
+
+    const doc = getMemberDocumentation(this.memberMeta.jsdoc);
+    if (doc) {
+      content.push(doc);
+      content.push(``);
+    }
+
     content.push(``);
 
     return content;
