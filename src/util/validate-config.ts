@@ -88,6 +88,13 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.collectionDir = normalizePath(path.join(config.distDir, config.collectionDir));
   }
 
+  if (typeof config.typesDir !== 'string') {
+    config.typesDir = DEFAULT_TYPES_DIR;
+  }
+  if (!path.isAbsolute(config.typesDir)) {
+    config.typesDir = normalizePath(path.join(config.distDir, config.typesDir));
+  }
+
   if (typeof config.srcIndexHtml !== 'string') {
     config.srcIndexHtml = normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML));
   }
@@ -385,6 +392,7 @@ const DEFAULT_BUILD_DIR = 'build';
 const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_DIST_DIR = 'dist';
 const DEFAULT_COLLECTION_DIR = 'collection';
+const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_NAMESPACE = 'App';
 const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];

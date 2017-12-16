@@ -14,7 +14,7 @@ describe('write-build', () => {
         '.\\dist'
       ];
       packageJsonData.main = 'dist\\collection\\index.js';
-      packageJsonData.types = 'dist\\collection\\index.d.ts';
+      packageJsonData.types = 'dist\\types\\index.d.ts';
       packageJsonData.browser = 'dist\\somenamespace.js';
       packageJsonData.collection = 'dist\\collection\\collection-manifest.json';
       validatePackageJson(config, diagnostics, packageJsonData);
@@ -26,7 +26,7 @@ describe('write-build', () => {
         'dist/'
       ];
       packageJsonData.main = 'dist/collection/index.js';
-      packageJsonData.types = 'dist/collection/index.d.ts';
+      packageJsonData.types = 'dist/types/index.d.ts';
       packageJsonData.browser = 'dist/somenamespace.js';
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
@@ -38,7 +38,7 @@ describe('write-build', () => {
         'dist/'
       ];
       packageJsonData.main = 'dist/collection/index.js';
-      packageJsonData.types = 'dist/collection/index.d.ts';
+      packageJsonData.types = 'dist/types/index.d.ts';
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "browser" property is required/);
       expect(diagnostics[0].messageText).toMatch(/dist\/somenamespace.js/);
@@ -51,7 +51,7 @@ describe('write-build', () => {
       packageJsonData.main = 'dist/collection/index.js';
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "types" property is required/);
-      expect(diagnostics[0].messageText).toMatch(/dist\/collection\/index.d.ts/);
+      expect(diagnostics[0].messageText).toMatch(/dist\/types\/index.d.ts/);
     });
 
     it('should error when missing main property', () => {

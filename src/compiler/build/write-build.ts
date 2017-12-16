@@ -90,7 +90,7 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
     err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
   }
 
-  const types = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), 'index.d.ts'));
+  const types = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.typesDir), 'index.d.ts'));
   if (!data.types || normalizePath(data.types) !== types) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
@@ -155,7 +155,7 @@ async function generatePackageModuleResolve(config: BuildConfig) {
         // don't bother copying this file if there is no content
         PromiseList.push(config.sys.copy(
           config.sys.path.join(config.srcDir, 'index.d.ts'),
-          config.sys.path.join(config.collectionDir, 'index.d.ts')
+          config.sys.path.join(config.typesDir, 'index.d.ts')
         ));
       }
     }
@@ -163,7 +163,7 @@ async function generatePackageModuleResolve(config: BuildConfig) {
 
   PromiseList.push(config.sys.copy(
     config.sys.path.join(config.srcDir, 'components.d.ts'),
-    config.sys.path.join(config.collectionDir, 'components.d.ts')
+    config.sys.path.join(config.typesDir, 'components.d.ts')
   ));
 
   PromiseList.push(new Promise((resolve, reject) => {

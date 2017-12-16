@@ -265,6 +265,12 @@ describe('validation', () => {
       expect(path.isAbsolute(config.collectionDir)).toBe(true);
     });
 
+    it('should set default types dir and convert to absolute path', () => {
+      validateBuildConfig(config);
+      expect(path.basename(config.typesDir)).toBe('types');
+      expect(path.isAbsolute(config.typesDir)).toBe(true);
+    });
+
     it('should set generateDistribution to true', () => {
       config.generateDistribution = true;
       validateBuildConfig(config);

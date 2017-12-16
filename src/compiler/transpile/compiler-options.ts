@@ -48,6 +48,9 @@ export function getUserTsConfig(config: BuildConfig): ts.CompilerOptions {
 
   // generate .d.ts files when generating a distribution and in prod mode
   options.declaration = config.generateDistribution;
+  if (config.generateDistribution) {
+    options.declarationDir = config.typesDir;
+  }
 
   return options;
 }
