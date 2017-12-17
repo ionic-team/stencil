@@ -1,19 +1,20 @@
 import addMetadataExport from './transformers/add-metadata-export';
 import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath, hasError } from '../util';
-import { getTsHost } from './compiler-host';
-import { getUserTsConfig } from './compiler-options';
-import { updateFileMetaFromSlot } from './transformers/vnode-slots';
-import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import { removeImports } from './transformers/remove-imports';
-import { removeDecorators } from './transformers/remove-decorators';
-import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
-import { normalizeStyles } from './normalize-styles';
-import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
+import { COMPONENTS_DTS } from '../build/distribution';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
-// import { createCompilerHostWithMap } from './utils';
+import { getTsHost } from './compiler-host';
+import { getUserTsConfig } from './compiler-options';
+import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
+import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
+import { normalizeStyles } from './normalize-styles';
+import { removeDecorators } from './transformers/remove-decorators';
+import { removeImports } from './transformers/remove-imports';
+import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
+import { updateFileMetaFromSlot } from './transformers/vnode-slots';
 import * as ts from 'typescript';
+
 
 export function transpileFiles(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
 
@@ -133,7 +134,7 @@ function transpileModules(config: BuildConfig, ctx: BuildContext, moduleFiles: M
   const tsHost = getTsHost(config, ctx, tsOptions, transpileResults);
 
   // fire up the typescript program
-  const componentsFilePath = config.sys.path.join(config.srcDir, 'components.d.ts');
+  const componentsFilePath = config.sys.path.join(config.srcDir, COMPONENTS_DTS);
   const checkProgram = ts.createProgram(tsFileNames.filter(fileName => fileName !== componentsFilePath), tsOptions, tsHost);
 
   // Gather component metadata and type info

@@ -1,11 +1,10 @@
-import { validatePackageJson, validatePackageFiles } from '../write-build';
-import { validateBuildConfig } from '../validation';
+import { validatePackageJson, validatePackageFiles } from '../distribution';
 import { BuildConfig, BuildContext, BuildResults, ComponentRegistry, Diagnostic } from '../../../util/interfaces';
 import { mockBuildConfig } from '../../../testing/mocks';
 import * as path from 'path';
 
 
-describe('write-build', () => {
+describe('distribution', () => {
 
   describe('updatePackageJson', () => {
 
@@ -13,9 +12,8 @@ describe('write-build', () => {
       packageJsonData.files = [
         '.\\dist'
       ];
-      packageJsonData.main = 'dist\\collection\\index.js';
+      packageJsonData.main = 'dist/somenamespace.js';
       packageJsonData.types = 'dist\\types\\index.d.ts';
-      packageJsonData.browser = 'dist\\somenamespace.js';
       packageJsonData.collection = 'dist\\collection\\collection-manifest.json';
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics.length).toBe(0);
@@ -25,30 +23,18 @@ describe('write-build', () => {
       packageJsonData.files = [
         'dist/'
       ];
-      packageJsonData.main = 'dist/collection/index.js';
+      packageJsonData.main = 'dist/somenamespace.js';
       packageJsonData.types = 'dist/types/index.d.ts';
-      packageJsonData.browser = 'dist/somenamespace.js';
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
       expect(diagnostics[0].messageText).toMatch(/dist\/collection\/collection-manifest.json/);
-    });
-
-    it('should error when missing browser property', () => {
-      packageJsonData.files = [
-        'dist/'
-      ];
-      packageJsonData.main = 'dist/collection/index.js';
-      packageJsonData.types = 'dist/types/index.d.ts';
-      validatePackageJson(config, diagnostics, packageJsonData);
-      expect(diagnostics[0].messageText).toMatch(/package.json "browser" property is required/);
-      expect(diagnostics[0].messageText).toMatch(/dist\/somenamespace.js/);
     });
 
     it('should error when missing types property', () => {
       packageJsonData.files = [
         'dist/'
       ];
-      packageJsonData.main = 'dist/collection/index.js';
+      packageJsonData.main = 'dist/somenamespace.js';
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "types" property is required/);
       expect(diagnostics[0].messageText).toMatch(/dist\/types\/index.d.ts/);
@@ -60,7 +46,7 @@ describe('write-build', () => {
       ];
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "main" property is required/);
-      expect(diagnostics[0].messageText).toMatch(/dist\/collection\/index.js/);
+      expect(diagnostics[0].messageText).toMatch(/dist\/somenamespace.js/);
     });
 
     it('should validate files "dist/"', () => {

@@ -558,6 +558,7 @@ export interface BuildContext {
   dependentManifests?: {[collectionName: string]: Manifest};
   appFiles?: {
     loader?: string;
+    loaderContent?: string;
     core?: string;
     corePolyfilled?: string;
     global?: string;

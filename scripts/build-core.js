@@ -18,7 +18,6 @@ fs.ensureDirSync(DIST_CLIENT_DIR);
 
 // tasks
 bundleClientCore();
-copyLoader();
 createIndexJs();
 copyMainDTs();
 copyPolyfills();
@@ -97,13 +96,6 @@ function createIndexJs() {
   // create an empty index.js file so node resolve works
   const writeMainJsPath = path.join(DST_DIR, 'index.js');
   fs.writeFileSync(writeMainJsPath, '// @stencil/core');
-}
-
-
-function copyLoader() {
-  const srcLoaderPath = path.join(TRANSPILED_DIR, 'client/loader.js');
-  const dstLoaderPath = path.join(DST_DIR, 'client/loader.js');
-  fs.copySync(srcLoaderPath, dstLoaderPath);
 }
 
 

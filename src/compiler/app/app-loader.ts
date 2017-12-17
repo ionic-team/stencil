@@ -25,17 +25,11 @@ export async function generateLoader(
     loaderContent
   );
 
-  // concat the app's loader code
-  loaderContent = [
-    generatePreamble(config),
-    loaderContent
-  ].join('').trim();
-
   // write the app loader file
-  if (ctx.appFiles.loader !== loaderContent) {
+  if (ctx.appFiles.loaderContent !== loaderContent) {
     // app loader file is actually different from our last saved version
     config.logger.debug(`build, app loader: ${appLoaderFileName}`);
-    ctx.appFiles.loader = loaderContent;
+    ctx.appFiles.loaderContent = loaderContent;
 
     if (config.minifyJs) {
       // minify the loader
@@ -61,9 +55,13 @@ export async function generateLoader(
         config.logger[d.level](d.messageText);
       });
       if (!minifyJsResults.diagnostics.length) {
-        ctx.appFiles.loader = loaderContent = minifyJsResults.output;
+        loaderContent = minifyJsResults.output;
       }
     }
+
+    loaderContent = generatePreamble(config) + loaderContent;
+
+    ctx.appFiles.loader = loaderContent;
 
     if (config.generateWWW) {
       const appLoaderWWW = pathJoin(config, config.buildDir, appLoaderFileName);

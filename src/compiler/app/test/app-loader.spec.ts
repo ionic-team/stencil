@@ -26,7 +26,7 @@ describe('build-project-files', () => {
     });
 
     it('should set the loader arguments', () => {
-      const loadCmp: LoadComponentRegistry = ['my-app', { Mode1: 'something', Mode2: 'Something Else' }, false, null, null, null, null, null];
+      const loadCmp: any = ['my-app', { Mode1: 'something', Mode2: 'Something Else' }, false, null, null, null, null, null];
       const projectLoader = callInjectAppIntoLoader({
         componentRegistry: [loadCmp]
       });
@@ -54,12 +54,6 @@ describe('build-project-files', () => {
       callGenerateLoader();
       expect(mockGetClientCoreFile.mock.calls.length).toEqual(1);
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'loader.js' });
-    });
-
-    it('includes the generted banner', async () => {
-      const preamble = generatePreamble(config); // lack of DI makes this harder to test, so will just pre-calc
-      const res = await callGenerateLoader();
-      expect(res).toEqual(preamble.trim());
     });
 
     it('includes the injected app', async () => {

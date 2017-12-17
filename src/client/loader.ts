@@ -1,41 +1,56 @@
 import { LoadComponentRegistry } from '../util/interfaces';
 
 
-(function(window: any, document: Document, appNamespace?: string, publicPath?: string, appCore?: string, appCoreSsr?: string, appCorePolyfilled?: string, components?: LoadComponentRegistry[], x?: any, i?: any) {
-  'use strict';
-
+export function init(win: any, doc: HTMLDocument, appNamespace: string, publicPath: string, appCore: string, appCoreSsr: string, appCorePolyfilled: string, components: LoadComponentRegistry[], x?: any, y?: any) {
   // create global namespace if it doesn't already exist
-  (window[appNamespace] = window[appNamespace] || {}).components = components = components || [];
+  (win[appNamespace] = win[appNamespace] || {}).components = components;
 
-  // auto hide components until they been fully hydrated
-  // reusing the "x" and "i" variables from the args for funzies
-  // note: filter and map must stay es5 and must not use arrow functions
-  i = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
-  if (i.length) {
-    x = document.createElement('style');
-    x.innerHTML = i.join() + '{visibility:hidden}';
+  y = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
+  if (y.length) {
+    // auto hide components until they been fully hydrated
+    // reusing the "x" and "i" variables from the args for funzies
+    x = doc.createElement('style');
+    x.innerHTML = y.join() + '{visibility:hidden}';
     x.setAttribute('data-visibility', '');
-    document.head.insertBefore(x, document.head.firstChild);
+    doc.head.insertBefore(x, doc.head.firstChild);
   }
 
   // get this current script
+  // script tag cannot use "async" attribute
   appNamespace = appNamespace.toLowerCase();
-  x = document.scripts;
-  for (i = x.length - 1; i >= 0; i--) {
-    if (x[i].src && x[i].src.split('/').pop() === appNamespace + '.js') {
-      publicPath = x[i].src.replace(appNamespace + '.js', appNamespace + '/');
-      break;
-    }
+  x = doc.scripts[doc.scripts.length - 1];
+  if (x && x.src) {
+    y = x.src.split('/').slice(0, -1);
+    publicPath = (y.join('/')) + (y.length ? '/' : '') + appNamespace + '/';
   }
 
   // request the core this browser needs
   // test for native support of custom elements and fetch
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
-  x = document.createElement('script');
-  x.src = publicPath + (('noModule' in x && window.customElements && window.fetch && (window.CSS && window.CSS.supports && window.CSS.supports('color', 'var(--c)'))) ? (document.documentElement.hasAttribute('data-ssr') ? appCoreSsr : appCore) : appCorePolyfilled);
+  x = doc.createElement('script');
+  x.src = publicPath + ((supportsCustomElements(x) && supportsEsModules(win) && supportsFetch(win) && supportsCssVariables(win)) ? (requiresSsrClient(doc) ? appCoreSsr : appCore) : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
   x.setAttribute('data-namespace', appNamespace);
-  document.head.appendChild(x);
+  doc.head.appendChild(x);
+}
 
-})(window, document, '__APP__');
+export function supportsCustomElements(scriptElm: HTMLScriptElement) {
+  return 'noModule' in scriptElm;
+}
+
+export function supportsEsModules(win: Window) {
+  return win.customElements;
+}
+
+export function supportsFetch(win: Window) {
+  return win.fetch;
+}
+
+export function supportsCssVariables(win: any) {
+  return (win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'));
+}
+
+export function requiresSsrClient(doc: HTMLDocument) {
+  return doc.documentElement.hasAttribute('data-ssr');
+}
