@@ -246,6 +246,7 @@ var RESERVED_PROPERTIES: string[] = [
   'isPrerender',
   'isServer',
   'mode',
+  'publicPath',
   'raf',
   'read',
   'ref',

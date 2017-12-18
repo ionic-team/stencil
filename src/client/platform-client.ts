@@ -41,6 +41,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   Context.window = win;
   Context.location = win.location;
   Context.document = doc;
+  Context.publicPath = publicPath;
 
   // keep a global set of tags we've already defined
   const globalDefined: {[tag: string]: boolean} = (win as any).definedComponents = (win as any).definedComponents || {};

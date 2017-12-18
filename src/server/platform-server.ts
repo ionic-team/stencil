@@ -44,6 +44,7 @@ export function createPlatformServer(
   Context.window = win;
   Context.location = win.location;
   Context.document = doc;
+  Context.publicPath = publicPath;
 
   // add the Core global to the window context
   // Note: "Core" is not on the window context on the client-side
