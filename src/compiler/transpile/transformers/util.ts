@@ -16,6 +16,20 @@ export function updateComponentClass(classNode: ts.ClassDeclaration): ts.ClassDe
       classNode.members);
 }
 
+/**
+ * Check if class has component decorator
+ * @param classNode
+ */
+export function isComponentClass(classNode: ts.ClassDeclaration) {
+  if (!Array.isArray(classNode.decorators)) {
+    return false;
+  }
+  const componentDecoratorIndex = classNode.decorators.findIndex(dec =>
+   (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Component')
+  );
+  return (componentDecoratorIndex !== -1);
+}
+
 
 export function isEmptyArgs(arg: any) {
   return arg && arg.kind === ts.SyntaxKind.NumericLiteral && arg.text === '0';

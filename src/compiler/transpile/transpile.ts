@@ -6,6 +6,7 @@ import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
+import { injectRenderH } from './transformers/inject-render-h';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
@@ -81,6 +82,7 @@ export function transpileModule(config: BuildConfig, compilerOptions: ts.Compile
     compilerOptions: compilerOptions,
     transformers: {
       before: [
+        injectRenderH(),
         removeImports(),
         removeDecorators(),
         renameLifecycleMethods(),
@@ -179,6 +181,7 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
   // this is the big one, let's go ahead and kick off the transpiling
   program.emit(undefined, tsHost.writeFile, undefined, false, {
     before: [
+      injectRenderH(),
       removeDecorators(),
       removeImports(),
       renameLifecycleMethods()

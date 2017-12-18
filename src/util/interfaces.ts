@@ -664,7 +664,7 @@ export interface LoggerTimeSpan {
 
 
 export interface ModulesImporterFn {
-  (importer: any, h: Function, Core: CoreContext, pubicPath: string): void;
+  (importer: any, h: Function, Core: CoreContext, publicPath: string): void;
 }
 
 
@@ -880,7 +880,7 @@ export interface ComponentInstance {
   componentDidUpdate?: () => void;
   componentDidUnload?: () => void;
 
-  render?: () => any;
+  render?: (h?: Function) => any;
   hostData?: () => VNodeData;
 
   mode?: string;
@@ -1336,14 +1336,10 @@ export interface Hyperscript {
 
 
 declare global {
-
   // these must be "var" variables
   // so that they could be re-declared by
   // other collections, do not use "const" or "let"
-  var Context: CoreContext;
-  var publicPath: string;
-  var hydratedCssClass: string;
-  var appNamespace: string;
+  // "h" function is global so JSX doesn't throw typescript errors
   var h: Hyperscript;
 }
 

@@ -1,6 +1,12 @@
-import { AppGlobal } from '../util/interfaces';
+import { AppGlobal, CoreContext } from '../util/interfaces';
 import { Build } from '../util/build-conditionals';
 import { createPlatformClient } from './platform-client';
+
+
+declare const appNamespace: string;
+declare const Context: CoreContext;
+declare const hydratedCssClass: string;
+declare const publicPath: string;
 
 
 const App: AppGlobal = (<any>window)[appNamespace] = (<any>window)[appNamespace] || {};

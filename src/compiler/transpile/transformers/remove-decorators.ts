@@ -1,3 +1,4 @@
+import { isComponentClass } from './util';
 import * as ts from 'typescript';
 
 // same as the "declare" variables in the root index.ts file
@@ -35,19 +36,6 @@ export function removeDecorators(): ts.TransformerFactory<ts.SourceFile> {
   };
 }
 
-/**
- * Check if class has component decorator
- * @param classNode
- */
-function isComponentClass(classNode: ts.ClassDeclaration) {
-  if (!Array.isArray(classNode.decorators)) {
-    return false;
-  }
-  const componentDecoratorIndex = classNode.decorators.findIndex(dec =>
-   (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Component')
-  );
-  return (componentDecoratorIndex !== -1);
-}
 
 /**
  * Visit the component class and remove decorators

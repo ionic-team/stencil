@@ -18,7 +18,7 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
     // if a value is changed within a render() then
     // this tells the platform not to queue the change
     plt.activeRender = true;
-    const vnodeChildren = instance.render && instance.render();
+    const vnodeChildren = instance.render && instance.render(h);
 
     let vnodeHostData: VNodeData;
     if (Build.hostData) {
