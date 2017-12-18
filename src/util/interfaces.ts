@@ -880,7 +880,7 @@ export interface ComponentInstance {
   componentDidUpdate?: () => void;
   componentDidUnload?: () => void;
 
-  render?: (h?: Function) => any;
+  render?: () => any;
   hostData?: () => VNodeData;
 
   mode?: string;
