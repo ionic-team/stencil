@@ -44,7 +44,6 @@ export function createPlatformServer(
   Context.window = win;
   Context.location = win.location;
   Context.document = doc;
-  Context.publicPath = publicPath;
 
   // add the Core global to the window context
   // Note: "Core" is not on the window context on the client-side
@@ -61,6 +60,7 @@ export function createPlatformServer(
 
   const appWwwDir = config.wwwDir;
   const appBuildDir = config.sys.path.join(config.buildDir, getAppFileName(config));
+  Context.publicPath = appBuildDir;
 
   // create the sandboxed context with a new instance of a V8 Context
   // V8 Context provides an isolated global environment
