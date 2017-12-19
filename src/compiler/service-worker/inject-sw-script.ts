@@ -34,7 +34,19 @@ function getRegisterSwScript(swUrl: string) {
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       window.addEventListener('load', function(){
         navigator.serviceWorker.register('${swUrl}')
-          .then(function(reg) { console.log('service worker registered', reg) })
+          .then(function(reg) {
+            console.log('service worker registered', reg);
+
+            reg.onupdatefound = function() {
+              var installingWorker = reg.installing;
+
+              installingWorker.onstatechange = function() {
+                if (installingWorker.state === 'installed') {
+                  window.dispatchEvent(new Event('swUpdate'))
+                }
+              }
+            }
+          })
           .catch(function(err) { console.log('service worker error', err) });
       });
     }
