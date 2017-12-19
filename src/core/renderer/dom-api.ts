@@ -210,14 +210,17 @@ export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): 
 
   if (Build.event) {
     WindowCustomEvent = win.CustomEvent;
-    if (typeof WindowCustomEvent !== 'function') {
-      // CustomEvent polyfill
-      WindowCustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
-        evt = doc.createEvent('CustomEvent');
-        evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
-        return evt;
-      };
-      WindowCustomEvent.prototype = win.Event.prototype;
+
+    if (Build.es5) {
+      if (typeof WindowCustomEvent !== 'function') {
+        // CustomEvent polyfill
+        WindowCustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
+          evt = doc.createEvent('CustomEvent');
+          evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
+          return evt;
+        };
+        WindowCustomEvent.prototype = win.Event.prototype;
+      }
     }
 
     // test if this browser supports event options or not
