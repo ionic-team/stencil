@@ -37,7 +37,7 @@ describe('distribution', () => {
       packageJsonData.main = 'dist/somenamespace.js';
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "types" property is required/);
-      expect(diagnostics[0].messageText).toMatch(/dist\/types\/index.d.ts/);
+      expect(diagnostics[0].messageText).toMatch(/dist\/types\/components.d.ts/);
     });
 
     it('should error when missing main property', () => {

@@ -3,7 +3,8 @@ import { buildError, buildWarn, normalizePath } from '../util';
 import { COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { getAppFileName } from '../app/app-file-naming';
-import { readFile } from '../util';
+import { pathJoin, readFile } from '../util';
+
 
 
 export function generateDistribution(config: BuildConfig, ctx: BuildContext): Promise<any> {
@@ -20,26 +21,19 @@ export function generateDistribution(config: BuildConfig, ctx: BuildContext): Pr
 }
 
 
-function readPackageJson(config: BuildConfig, diagnostics: Diagnostic[]) {
+async function readPackageJson(config: BuildConfig, diagnostics: Diagnostic[]) {
   const packageJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 
-  return new Promise((resolve, reject) => {
-    config.sys.fs.readFile(packageJsonPath, 'utf-8', (err, packageJsonText) => {
-      if (err) {
-        reject(`Missing "package.json" file for distribution: ${packageJsonPath}`);
-        return;
-      }
+  let packageJsonText: string;
 
-      try {
-        const packageJsonData = JSON.parse(packageJsonText);
-        validatePackageJson(config, diagnostics, packageJsonData);
-        resolve();
+  try {
+    packageJsonText = await readFile(config.sys, packageJsonPath);
+  } catch (e) {
+    throw `Missing "package.json" file for distribution: ${packageJsonPath}`;
+  }
 
-      } catch (e) {
-        reject(e);
-      }
-    });
-  });
+  const packageJsonData = JSON.parse(packageJsonText);
+  validatePackageJson(config, diagnostics, packageJsonData);
 }
 
 
@@ -49,21 +43,16 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
   validatePackageFiles(config, diagnostics, data);
 
   const mainFileName = appNamespace + '.js';
-  const main = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.distDir), mainFileName));
+  const main = pathJoin(config, config.sys.path.relative(config.rootDir, config.distDir), mainFileName);
   if (!data.main || normalizePath(data.main) !== main) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
   }
 
-  const types = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.typesDir), 'index.d.ts'));
-  if (!data.types || normalizePath(data.types) !== types) {
-    const err = buildError(diagnostics);
-    err.header = `package.json error`;
-    err.messageText = `package.json "types" property is required when generating a distribution and must be set to: ${types}`;
-  }
+  validatePackageJsonTypes(config, diagnostics, data);
 
-  const collection = normalizePath(config.sys.path.join(config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME));
+  const collection = pathJoin(config, config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
   if (!data.collection || normalizePath(data.collection) !== collection) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
@@ -73,7 +62,21 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
   if (typeof config.namespace !== 'string' || config.namespace.toLowerCase().trim() === 'app') {
     const err = buildWarn(diagnostics);
     err.header = `config warning`;
-    err.messageText = `When generating a distribution it is recommended to choose a unique namespace, which can be updated in the stencil.config.js file.`;
+    err.messageText = `When generating a distribution it is recommended to choose a unique namespace, which can be updated using the "namespace" config property within the stencil.config.js file.`;
+  }
+}
+
+
+function validatePackageJsonTypes(config: BuildConfig, diagnostics: Diagnostic[], data: any) {
+  const indexDtsFileAbsPath = config.sys.path.join(config.typesDir, 'index.d.ts');
+  const indexDtsFileRelPath = pathJoin(config, config.sys.path.relative(config.rootDir, indexDtsFileAbsPath));
+  const componentsDtsFileAbsPath = config.sys.path.join(config.typesDir, 'components.d.ts');
+  const componentsDtsFileRelPath = pathJoin(config, config.sys.path.relative(config.rootDir, componentsDtsFileAbsPath));
+
+  if (!data.types || (normalizePath(data.types) !== indexDtsFileRelPath && normalizePath(data.types) !== componentsDtsFileRelPath)) {
+    const err = buildError(diagnostics);
+    err.header = `package.json error`;
+    err.messageText = `package.json "types" property is required when generating a distribution. Recommended entry d.ts file is: ${componentsDtsFileRelPath}`;
   }
 }
 
