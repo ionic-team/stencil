@@ -10,7 +10,17 @@ export default function addMetadataExport(moduleFiles: ModuleFiles): ts.Transfor
       if (!cmpMeta) {
         return classNode;
       }
-      const meta: ts.Expression = convertValueToLiteral(cmpMeta);
+      const meta: ts.Expression = convertValueToLiteral({
+        tagNameMeta: cmpMeta.tagNameMeta,
+        hostMeta: cmpMeta.hostMeta,
+        encapsulation: cmpMeta.encapsulation,
+        stylesMeta: cmpMeta.stylesMeta,
+        assetsDirMeta: cmpMeta.assetsDirsMeta,
+        componentClass: cmpMeta.componentClass,
+        membersMeta: cmpMeta.membersMeta,
+        eventsMeta: cmpMeta.eventsMeta,
+        listenersMeta: cmpMeta.listenersMeta
+      });
 
       const metadataProperty = ts.createProperty(
         undefined,
@@ -27,7 +37,7 @@ export default function addMetadataExport(moduleFiles: ModuleFiles): ts.Transfor
         classNode.name,
         classNode.typeParameters,
         classNode.heritageClauses,
-        classNode.members.concat(metadataProperty)
+        [ ...classNode.members, metadataProperty]
       );
     }
 

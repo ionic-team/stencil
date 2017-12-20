@@ -63,26 +63,28 @@ export function transpileModule(config: BuildConfig, compilerOptions: ts.Compile
   const checkProgram = ts.createProgram([path], compilerOptions);
 
   // Gather component metadata and type info
-  const metadata = gatherMetadata(config, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
-  Object.keys(metadata).forEach(tsFilePath => {
-    const fileMetadata = metadata[tsFilePath];
+  const files = checkProgram.getSourceFiles().filter(sf => sf.getSourceFile().fileName === path);
+  const metadata = gatherMetadata(config, checkProgram.getTypeChecker(), files);
+
+  if (Object.keys(metadata).length > 0) {
+    const fileMetadata = metadata[path];
+
     // normalize metadata
-    fileMetadata.stylesMeta = normalizeStyles(config, tsFilePath, fileMetadata.stylesMeta);
-    fileMetadata.assetsDirsMeta = normalizeAssetsDir(config, tsFilePath, fileMetadata.assetsDirsMeta);
+    fileMetadata.stylesMeta = normalizeStyles(config, path, fileMetadata.stylesMeta);
+    fileMetadata.assetsDirsMeta = normalizeAssetsDir(config, path, fileMetadata.assetsDirsMeta);
 
     // assign metadata to module files
-    const moduleFile = moduleFiles[tsFilePath];
-    if (moduleFile) {
-      moduleFile.cmpMeta = fileMetadata;
-    }
-  });
+    moduleFiles['module.tsx'] = {
+      cmpMeta: fileMetadata
+    };
+  }
 
   const transpileOpts = {
     compilerOptions: compilerOptions,
     transformers: {
       before: [
-        removeImports(),
         removeDecorators(),
+        removeImports(),
         renameLifecycleMethods(),
         addMetadataExport(moduleFiles)
       ],
@@ -91,7 +93,6 @@ export function transpileModule(config: BuildConfig, compilerOptions: ts.Compile
       ]
     }
   };
-
   const tsResults = ts.transpileModule(input, transpileOpts);
 
   loadTypeScriptDiagnostics('', diagnostics, tsResults.diagnostics);
@@ -101,6 +102,7 @@ export function transpileModule(config: BuildConfig, compilerOptions: ts.Compile
   }
 
   results.code = tsResults.outputText;
+  results.cmpMeta = moduleFiles['module.tsx'] ? moduleFiles['module.tsx'].cmpMeta : null;
 
   return results;
 }
