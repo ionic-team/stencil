@@ -23,9 +23,9 @@ function runTasks(opts) {
   const pkg = readPkg();
 
   const tasks = [];
-  let newVersion;
+  let newVersion = getNewVersion(pkg.version, opts.version);
 
-  if (opts.publish) {
+  if (opts.prepare) {
     tasks.push(
       {
         title: 'Validate version',
@@ -34,13 +34,16 @@ function runTasks(opts) {
             throw new Error(`Version should be either ${SEMVER_INCREMENTS.join(', ')}, or a valid semver version.`);
           }
 
-          newVersion = getNewVersion(pkg.version, opts.version);
-
           if (!isVersionGreater(pkg.version, newVersion)) {
             throw new Error(`New version \`${newVersion}\` should be higher than current version \`${pkg.version}\``);
           }
         }
-      },
+      }
+    )
+  }
+
+  if (opts.publish) {
+    tasks.push(
       {
         title: 'Check for pre-release version',
         task: () => {
@@ -48,7 +51,12 @@ function runTasks(opts) {
             throw new Error('You must specify a dist-tag using --tag when publishing a pre-release version. This prevents accidentally tagging unstable versions as "latest". https://docs.npmjs.com/cli/dist-tag');
           }
         }
-      },
+      }
+    )
+  }
+
+  if (opts.prepare || opts.publish) {
+    tasks.push(
       {
         title: 'Check npm version',
         skip: () => isVersionLower('6.0.0', process.version),
@@ -136,36 +144,49 @@ function runTasks(opts) {
     }
   );
 
-  if (opts.publish) {
+  if (opts.prepare || opts.publish) {
     tasks.push(
       {
         title: 'Run tests',
         task: () => execa('npm', ['test'], { cwd: rootDir })
-      },
-      {
-        title: 'Bump package.json version',
-        task: () => execa('npm', ['version', opts.version], { cwd: rootDir }),
       }
     );
   }
 
-  tasks.push(
-    {
-      title: 'Prepare "dist" @stencil/core package',
-      task: () => execa('npm', ['run', 'prepare.package'], { cwd: scriptsDir })
-    },
-    {
-      title: 'Build "dist" @stencil/core local dependencies',
-      task: () => execa('npm', ['run', 'build.deps'], { cwd: scriptsDir })
-    }
-  );
+  if (opts.prepare){
+    tasks.push(
+      {
+        title: 'Set package.json version',
+        task: () => execa('npm', ['run', 'set.version', opts.version], { cwd: rootDir }),
+      },
+      {
+        title: 'Generate CHANGELOG',
+        task: () => execa('npm', ['run', 'changelog'], { cwd: rootDir }),
+      },
+    );
+  } else {
+    tasks.push(
+      {
+        title: 'Prepare "dist" @stencil/core package',
+        task: () => execa('npm', ['run', 'prepare.package'], { cwd: scriptsDir })
+      },
+      {
+        title: 'Build "dist" @stencil/core local dependencies',
+        task: () => execa('npm', ['run', 'build.deps'], { cwd: scriptsDir })
+      }
+    );
+  }
 
   if (opts.publish) {
-    // publish
+    publish
     tasks.push(
       {
         title: 'Publish "dist" @stencil/core package',
         task: () => execa('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir })
+      },
+      {
+        title: 'Tagging the latest commit',
+        task: () => execa('git', ['tag', `v${opts.version}`], { cwd: rootDir })
       },
       {
         title: 'Pushing to Github',
@@ -173,7 +194,7 @@ function runTasks(opts) {
       }
     );
 
-  } else {
+  } else if (!opts.prepare) {
     // dry run
     tasks.push(
       {
@@ -200,8 +221,10 @@ function runTasks(opts) {
 
   return listr.run()
     .then(() => {
-      if (opts.publish) {
-        console.log(`\n ${pkg.name} ${newVersion} published 🎉\n`);
+      if (opts.prepare) {
+        console.log(`\n ${pkg.name} ${newVersion} prepared, check the diffs and commit\n`);
+      } else if (opts.publish) {
+        console.log(`\n ${pkg.name} ${newVersion} published!! 🎉\n`);
       } else {
         console.log(`\n ${pkg.name} dryrun finished 🕵️\n`);
       }
@@ -213,11 +236,11 @@ function runTasks(opts) {
 }
 
 
-function deployUI() {
+function prepareUI() {
   const pkg = readPkg();
   const oldVersion = pkg.version;
 
-  console.log(`\nPublish a new version of ${chalk.bold.magenta(pkg.name)} ${chalk.dim(`(${oldVersion})`)}\n`);
+  console.log(`\nPrepare to publish a new version of ${chalk.bold.magenta(pkg.name)} ${chalk.dim(`(${oldVersion})`)}\n`);
 
   const prompts = [
     {
@@ -256,10 +279,41 @@ function deployUI() {
       }
     },
     {
+      type: 'confirm',
+      name: 'confirm',
+      message: answers => {
+        return `Will bump from ${chalk.cyan(oldVersion)} to ${chalk.cyan(answers.version)}. Continue?`;
+      }
+    }
+  ];
+
+  return inquirer
+    .prompt(prompts)
+    .then(answers => {
+      if (answers.confirm){
+        answers.prepare = true;
+        answers.publish = false;
+        runTasks(answers);
+      }
+    })
+    .catch(err => {
+      console.log('\n', chalk.red(err), '\n');
+      process.exit(0);
+    });
+}
+
+function publishUI() {
+  const pkg = readPkg();
+  const version = pkg.version;
+
+  console.log(`\nPublish a new version of ${chalk.bold.magenta(pkg.name)} ${chalk.dim(`(${version})`)}\n`);
+
+  const prompts = [
+    {
       type: 'list',
       name: 'tag',
       message: 'How should this pre-release version be tagged in npm?',
-      when: answers => isPrereleaseVersion(answers.version),
+      when: answers => isPrereleaseVersion(version),
       choices: () => execa.stdout('npm', ['view', '--json', pkg.name, 'dist-tags'])
         .then(stdout => {
           const existingPrereleaseTags = Object.keys(JSON.parse(stdout))
@@ -283,7 +337,7 @@ function deployUI() {
       type: 'input',
       name: 'tag',
       message: 'Tag',
-      when: answers => !pkg.private && isPrereleaseVersion(answers.version) && !answers.tag,
+      when: answers => !pkg.private && isPrereleaseVersion(version) && !answers.tag,
       validate: input => {
         if (input.length === 0) {
           return 'Please specify a tag, for example, `next`.';
@@ -300,7 +354,7 @@ function deployUI() {
         const tag = answers.tag;
         const tagPart = tag ? ` and tag this release in npm as ${tag}` : '';
 
-        return `Will bump from ${chalk.cyan(oldVersion)} to ${chalk.cyan(answers.version + tagPart)}. Continue?`;
+        return `Will publish ${chalk.cyan(version + tagPart)}. Continue?`;
       }
     }
   ];
@@ -308,8 +362,12 @@ function deployUI() {
   return inquirer
     .prompt(prompts)
     .then(answers => {
-      answers.publish = true;
-      runTasks(answers);
+      if (answers.confirm){
+        answers.version = version;
+        answers.prepare = false;
+        answers.publish = true;
+        runTasks(answers);
+      }
     })
     .catch(err => {
       console.log('\n', chalk.red(err), '\n');
@@ -363,7 +421,6 @@ const readPkg = () => {
   return pkg;
 };
 
-
 function prettyVersionDiff(oldVersion, inc) {
   const newVersion = getNewVersion(oldVersion, inc).split('.');
   oldVersion = oldVersion.split('.');
@@ -385,11 +442,13 @@ function prettyVersionDiff(oldVersion, inc) {
   return output.join(chalk.reset.dim('.'));
 }
 
+let prepare = process.argv.slice(2).indexOf('--publish') === -1;
+let publish = !prepare && process.argv.slice(2).indexOf('--dry-run') === -1;
 
-var publish = process.argv.slice(2).indexOf('--dry-run') === -1;
-
-if (publish) {
-  deployUI();
+if (prepare) {
+  prepareUI();
+} else if (publish) {
+  publishUI();
 } else {
-  runTasks({ publish: false, version: '0.0.1-test', tag: 'test' });
+  runTasks({ prepare: false, publish: false, version: '0.0.1-test', tag: 'test' });
 }
