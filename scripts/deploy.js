@@ -162,7 +162,7 @@ function runTasks(opts) {
       {
         title: 'Generate CHANGELOG',
         task: () => execa('npm', ['run', 'changelog'], { cwd: rootDir }),
-      },
+      }
     );
   } else {
     tasks.push(
