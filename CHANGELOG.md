@@ -1,3 +1,15 @@
+<a name="0.1.1-0"></a>
+## [0.1.1-0](https://github.com/ionic-team/stencil/compare/v0.1.0...v0.1.1-0) (2017-12-22)
+
+
+### Bug Fixes
+
+* correct metadata in testing. fixes [#355](https://github.com/ionic-team/stencil/issues/355) ([6b19e6b](https://github.com/ionic-team/stencil/commit/6b19e6b))
+* correct transpile test to not use absolute paths. ([aa58050](https://github.com/ionic-team/stencil/commit/aa58050))
+* **helpers:** fix dash case and pascal case helpers ([cf0e38a](https://github.com/ionic-team/stencil/commit/cf0e38a))
+
+
+
 <a name="0.1.0"></a>
 # [0.1.0](https://github.com/ionic-team/stencil/compare/v0.0.9-4...v0.1.0) (2017-12-20)
 
