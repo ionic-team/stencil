@@ -18,7 +18,7 @@
     "deploy": "node scripts/deploy.js --publish",
     "dryrun": "node scripts/deploy.js --dry-run",
     "prepare.package": "node scripts/prepare-package.js",
-    "predeplpoy": "node scripts/deploy.js",
+    "predeploy": "node scripts/deploy.js",
     "set.version": "node scripts/set-version.js",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
