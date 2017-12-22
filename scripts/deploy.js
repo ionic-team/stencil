@@ -190,7 +190,7 @@ function runTasks(opts) {
       },
       {
         title: 'Pushing to Github',
-        task: () => execa('git', ['push', '--follow-tags'], { cwd: rootDir })
+        task: () => execa('git', ['push', '--tags'], { cwd: rootDir })
       }
     );
 
@@ -442,7 +442,7 @@ function prettyVersionDiff(oldVersion, inc) {
   return output.join(chalk.reset.dim('.'));
 }
 
-let prepare = process.argv.slice(2).indexOf('--publish') === -1;
+let prepare = process.argv.slice(2).indexOf('--prepare') > -1;
 let publish = !prepare && process.argv.slice(2).indexOf('--dry-run') === -1;
 
 if (prepare) {
