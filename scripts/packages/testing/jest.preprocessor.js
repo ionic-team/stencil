@@ -2,7 +2,6 @@ var path = require('path');
 var ts = require('typescript');
 var testing = require('./index');
 
-
 var injectTestingScript = [
   'var StencilTesting = require("@stencil/core/testing");',
   'var h = StencilTesting.h;',
@@ -14,7 +13,11 @@ var injectTestingScript = [
 
 module.exports = {
   process: function(sourceText, filePath) {
-    if (filePath.endsWith('.js') || filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+    if (filePath.endsWith('.d.ts')) {
+      return '';
+    }
+
+    else if (filePath.endsWith('.tsx')) {
       var opts = {
         module: 'commonjs'
       };
@@ -33,6 +36,13 @@ module.exports = {
       return results.code;
     }
 
-    return sourceText;
+    else {
+      return ts.transpile(
+        sourceText,
+        {},
+        filePath,
+        []
+      );
+    }
   }
 };
