@@ -1,17 +1,17 @@
 import { Build } from '../../util/build-conditionals';
-import { ComponentMeta, HostElement, PlatformApi, VNodeData } from '../../util/interfaces';
+import { ComponentConstructor, HostElement, PlatformApi, VNodeData } from '../../util/interfaces';
 import { createThemedClasses } from '../../util/theme';
 import { h } from '../renderer/h';
 import { VNode as VNodeObj } from '../renderer/vnode';
 
 
-export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMeta, isUpdateRender: boolean) {
+export function render(plt: PlatformApi, elm: HostElement, cmpConstructor: ComponentConstructor, isUpdateRender: boolean) {
   const instance = elm._instance;
 
   // if this component has a render function, let's fire
   // it off and generate the child vnodes for this host element
   // note that we do not create the host element cuz it already exists
-  const hostMeta =  cmpMeta.hostMeta;
+  const hostMeta = cmpConstructor.host;
 
   if (instance.render || instance.hostData || hostMeta) {
     // tell the platform we're actively rendering
@@ -63,14 +63,14 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
       h(null, vnodeHostData, vnodeChildren),
       isUpdateRender,
       elm._hostContentNodes,
-      cmpMeta.encapsulation
+      cmpConstructor.encapsulation
     );
   }
   if (Build.styles) {
     // attach the styles this component needs, if any
     // this fn figures out if the styles should go in a
     // shadow root or if they should be global
-    plt.attachStyles(cmpMeta, instance.mode, elm);
+    plt.attachStyles(plt.domApi, cmpConstructor, instance.mode, elm);
   }
 
   // it's official, this element has rendered

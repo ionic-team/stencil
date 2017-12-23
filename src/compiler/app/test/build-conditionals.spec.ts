@@ -1,5 +1,5 @@
 import { BuildConditionals, ComponentMeta } from '../../../util/interfaces';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../../../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { setBuildFromComponentMeta, setBuildFromComponentContent } from '../build-conditionals';
 
 
@@ -79,12 +79,6 @@ describe('build conditionals', () => {
       cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.shadowDom).toBeTruthy();
-    });
-
-    it('slot', () => {
-      cmpMeta.slotMeta = SLOT_META.HasSlots;
-      setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(coreBuild.slot).toBeTruthy();
     });
 
     it('listener', () => {

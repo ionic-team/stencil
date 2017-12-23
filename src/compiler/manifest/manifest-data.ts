@@ -1,7 +1,7 @@
 import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropChangeData, PropChangeMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
-import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, SLOT_META } from '../../util/constants';
+import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
@@ -157,9 +157,7 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
   serializeHostElementMember(cmpData, cmpMeta);
   serializeEvents(cmpData, cmpMeta);
   serializeHost(cmpData, cmpMeta);
-  serializeSlots(cmpData, cmpMeta);
   serializeEncapsulation(cmpData, cmpMeta);
-  serializeLoadPriority(cmpData, cmpMeta);
 
   return cmpData;
 }
@@ -190,8 +188,6 @@ export function parseComponentDataToModuleFile(config: BuildConfig, manifest: Ma
   parseEvents(cmpData, cmpMeta);
   parseHost(cmpData, cmpMeta);
   parseEncapsulation(cmpData, cmpMeta);
-  parseSlots(cmpData, cmpMeta);
-  parseLoadPriority(cmpData, cmpMeta);
 
   return moduleFile;
 }
@@ -795,26 +791,6 @@ function parseHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpMeta.slotMeta === SLOT_META.HasSlots) {
-    cmpData.slot = 'hasSlots';
-
-  } else if (cmpMeta.slotMeta === SLOT_META.HasNamedSlots) {
-    cmpData.slot = 'hasNamedSlots';
-  }
-}
-
-
-function parseSlots(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpData.slot === 'hasSlots') {
-    cmpMeta.slotMeta = SLOT_META.HasSlots;
-
-  } else if (cmpData.slot === 'hasNamedSlots') {
-    cmpMeta.slotMeta = SLOT_META.HasNamedSlots;
-  }
-}
-
-
 function serializeEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     cmpData.shadow = true;
@@ -834,20 +810,6 @@ function parseEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 
   } else {
     cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
-  }
-}
-
-
-function serializeLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpMeta.loadPriority === PRIORITY.Low) {
-    cmpData.priority = 'low';
-  }
-}
-
-
-function parseLoadPriority(cmpData: ComponentData, cmpMeta: ComponentMeta) {
-  if (cmpData.priority === 'low') {
-    cmpMeta.loadPriority = PRIORITY.Low;
   }
 }
 

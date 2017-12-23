@@ -27,7 +27,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
     // remove all of this element's event, which is good
     plt.domApi.$removeEventListener(elm);
 
-    if (Build.slot && elm._hostContentNodes) {
+    if (elm._hostContentNodes) {
       // overreacting here just to reduce any memory leak issues
       elm._hostContentNodes = elm._hostContentNodes.defaultSlot = elm._hostContentNodes.namedSlots = null;
     }

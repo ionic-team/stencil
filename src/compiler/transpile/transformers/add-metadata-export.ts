@@ -3,6 +3,18 @@ import { ComponentMeta, ModuleFiles } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
+/**
+ * 1) Add static "properties" from previously gathered component metadata
+ * 2) Add static "encapsulation"
+ * 3) Add static "host"
+ * 4) Add static "events"
+ * 5) Add static "style"
+ * 6) Add static "styleId"
+ * 7) Add h() fn: const { h } = Namespace;
+ * 8) Export component class with tag names as PascalCase
+ */
+
+
 export default function addMetadataExport(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {

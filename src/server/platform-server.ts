@@ -1,15 +1,14 @@
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry,
   CoreContext, Diagnostic, DomApi, FilesMap, HostElement,
-  BundleCallbacks, PlatformApi, AppGlobal } from '../util/interfaces';
+  PlatformApi, AppGlobal } from '../util/interfaces';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
+import { dashToPascalCase } from '../util/helpers';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { getAppFileName } from '../compiler/app/app-file-naming';
-import { getJsFile, normalizePath } from '../compiler/util';
 import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';
-import { parseComponentMeta } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
 
 
@@ -23,10 +22,6 @@ export function createPlatformServer(
   ctx?: BuildContext
 ): PlatformApi {
   const registry: ComponentRegistry = { 'html': {} };
-  const moduleImports: {[tag: string]: any} = {};
-  const bundleCallbacks: BundleCallbacks = {};
-  const loadedBundles: {[bundleId: string]: boolean} = {};
-  const pendingBundleFileReads: {[url: string]: boolean} = {};
   const stylesMap: FilesMap = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
 
@@ -51,6 +46,9 @@ export function createPlatformServer(
 
   // create the app global
   const App: AppGlobal = {};
+
+  // add the h() fn to the app's global namespace
+  App.h = h;
 
   // add the app's global to the window context
   win[config.namespace] = App;
@@ -108,7 +106,7 @@ export function createPlatformServer(
     }
   }
 
-  function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
+  function connectHostElement(_cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -118,7 +116,7 @@ export function createPlatformServer(
     }
 
     // pick out all of the light dom nodes from the host element
-    assignHostContentSlots(domApi, cmpMeta, elm, elm.childNodes);
+    assignHostContentSlots(domApi, elm, elm.childNodes);
   }
 
 
@@ -141,11 +139,6 @@ export function createPlatformServer(
       globalDefined[registryTag] = true;
 
       registry[registryTag] = cmpMeta;
-
-      if (cmpMeta.componentModule) {
-        // for unit testing
-        moduleImports[registryTag] = cmpMeta.componentModule;
-      }
     }
   }
 
@@ -154,87 +147,33 @@ export function createPlatformServer(
   }
 
 
-  App.loadComponents = function loadComponents(bundleId, importFn) {
-    const args = arguments;
+  function loadBundle(cmpMeta: ComponentMeta, modeName: string, cb: Function): void {
+    // synchronous in nodejs
+    if (!cmpMeta.componentConstructor) {
+      try {
+        const bundleId: string = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds as any)).es5;
 
-    // import component function
-    // inject globals
-    importFn(moduleImports, h, Context, appBuildDir);
+        let requestBundleId = bundleId;
+        if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+          requestBundleId += '.sc';
+        }
+        requestBundleId += '.js';
 
-    for (var i = 2; i < args.length; i++) {
-      parseComponentMeta(registry, moduleImports, args[i], Context.attr);
-    }
+        const jsFilePath = config.sys.path.join(appBuildDir, requestBundleId);
+        const module = require(jsFilePath);
 
-    // fire off all the callbacks waiting on this bundle to load
-    var callbacks = bundleCallbacks[bundleId];
-    if (callbacks) {
-      for (i = 0; i < callbacks.length; i++) {
-        callbacks[i]();
+        cmpMeta.componentConstructor = module[dashToPascalCase(cmpMeta.tagNameMeta)];
+
+      } catch (e) {
+        onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
       }
-      delete bundleCallbacks[bundleId];
-    }
 
-    // remember that we've already loaded this bundle
-    loadedBundles[bundleId] = true;
-  };
-
-
-  App.loadStyles = function loadStyles() {
-    // jsonp callback from requested bundles
-    const args = arguments;
-    for (var i = 0; i < args.length; i += 2) {
-      stylesMap[args[i]] = args[i + 1];
-    }
-  };
-
-
-  function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
-    if (cmpMeta.componentModule) {
-      // we already have the module loaded
-      // (this is probably a unit test)
-      cb();
-      return;
-    }
-
-    const bundleId: string = (cmpMeta.bundleIds[elm.mode] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds as any)).es2015;
-
-    if (loadedBundles[bundleId]) {
-      // sweet, we've already loaded this bundle
-      cb();
-
-    } else {
-      // never seen this bundle before, let's start loading the file
-      // and add it to the bundle callbacks to fire when it's loaded
-      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
-
-      let requestBundleId = bundleId;
-      if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-        requestBundleId += '.sc';
-      }
-      requestBundleId += '.js';
-
-      // create the bundle filePath we'll be reading
-      const jsFilePath = normalizePath(config.sys.path.join(appBuildDir, requestBundleId));
-
-      if (!pendingBundleFileReads[jsFilePath]) {
-        // not already actively reading this file
-        // remember that we're now actively requesting this url
-        pendingBundleFileReads[jsFilePath] = true;
-
-        // let's kick off reading the bundle
-        // this could come from the cache or a new readFile
-        getJsFile(config.sys, ctx, jsFilePath).then(jsContent => {
-          // remove it from the list of file reads we're waiting on
-          delete pendingBundleFileReads[jsFilePath];
-
-          // run the code in this sandboxed context
-          config.sys.vm.runInContext(jsContent, win, { timeout: 10000 });
-
-        }).catch(err => {
-          onError(err, RUNTIME_ERROR.LoadBundleError, elm, true);
-        });
+      if (!cmpMeta.componentConstructor) {
+        return;
       }
     }
+
+    cb();
   }
 
   function runGlobalScripts() {

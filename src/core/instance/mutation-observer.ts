@@ -21,10 +21,11 @@ export function createMutationObserver(plt: PlatformApi, elm: HostElement): void
 function createElementReset(plt: PlatformApi, elm: HostElement): () => void {
   return () => {
     const cmpMeta = plt.getComponentMeta(elm);
+    const componentConstructor = plt.getComponentMeta(elm).componentConstructor;
     elm._vnode = null;
     plt.connectHostElement(cmpMeta, elm);
     stopObserving(plt, elm);
-    render(plt, elm, plt.getComponentMeta(elm), false);
+    render(plt, elm, componentConstructor, false);
     startObserving(plt, elm);
   };
 }

@@ -1,5 +1,5 @@
 import { Build } from '../../util/build-conditionals';
-import { ComponentInstance, ComponentMeta, DomApi, HostElement,
+import { ComponentInstance, ComponentConstructor, ComponentConstructorProperty, DomApi, HostElement,
   MembersMeta, PlatformApi, PropChangeMeta } from '../../util/interfaces';
 import { MEMBER_TYPE, PROP_CHANGE } from '../../util/constants';
 import { noop } from '../../util/helpers';
@@ -42,7 +42,7 @@ export function proxyHostElementPrototype(plt: PlatformApi, membersMeta: Members
 }
 
 
-export function proxyComponentInstance(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement, instance: ComponentInstance) {
+export function proxyComponentInstance(plt: PlatformApi, cmpConstructor: ComponentConstructor, elm: HostElement, instance: ComponentInstance) {
   // at this point we've got a specific node of a host element, and created a component class instance
   // and we've already created getters/setters on both the host element and component class prototypes
   // let's upgrade any data that might have been set on the host element already
@@ -55,15 +55,22 @@ export function proxyComponentInstance(plt: PlatformApi, cmpMeta: ComponentMeta,
   // this will hold all of the internal getter/setter values
   elm._values = elm._values || {};
 
-  cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-    defineMember(plt, cmpMeta, elm, instance, memberName);
+  // define each of the members and initialize what their role is
+  const properties = cmpConstructor.properties;
+  properties && Object.keys(properties).forEach(memberName => {
+    defineMember(plt, cmpConstructor, properties[memberName], elm, instance, memberName);
   });
 }
 
 
-export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement, instance: ComponentInstance, memberName: string) {
-  const memberMeta = cmpMeta.membersMeta[memberName];
-  const memberType = memberMeta.memberType;
+export function defineMember(
+  plt: PlatformApi,
+  cmpConstructor: ComponentConstructor,
+  property: ComponentConstructorProperty,
+  elm: HostElement,
+  instance: ComponentInstance,
+  memberName: string
+) {
 
   function getComponentProp() {
     // component instance prop/state getter
@@ -77,7 +84,7 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     const elm: HostElement = (this as ComponentInstance).__el;
 
     if (elm) {
-      if (memberType !== MEMBER_TYPE.Prop) {
+      if (property.state || property.mutable) {
         setValue(plt, elm, memberName, newValue);
 
       } else if (Build.verboseError) {
@@ -86,16 +93,16 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
     }
   }
 
-  if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.State || memberType === MEMBER_TYPE.PropMutable) {
+  if (property.type || property.state) {
 
-    if (memberType !== MEMBER_TYPE.State) {
-      if (memberMeta.attribName && (elm._values[memberName] === undefined || elm._values[memberName] === '')) {
+    if (!property.state) {
+      if (property.attr && (elm._values[memberName] === undefined || elm._values[memberName] === '')) {
         // check the prop value from the host element attribute
-        const hostAttrValue = elm.getAttribute(memberMeta.attribName);
+        const hostAttrValue = plt.domApi.$getAttribute(elm, property.attr);
         if (hostAttrValue != null) {
           // looks like we've got an attribute value
           // let's set it to our internal values
-          elm._values[memberName] = parsePropertyValue(memberMeta.propType, hostAttrValue);
+          elm._values[memberName] = parsePropertyValue(property.type, hostAttrValue);
         }
       }
       if (elm.hasOwnProperty(memberName)) {
@@ -138,35 +145,35 @@ export function defineMember(plt: PlatformApi, cmpMeta: ComponentMeta, elm: Host
 
     // add watchers to props if they exist
     if (Build.willChange) {
-      proxyPropChangeMethods(cmpMeta.propsWillChangeMeta, PROP_WILL_CHG, elm, instance, memberName);
+      proxyPropChangeMethods(cmpConstructor.willChange, PROP_WILL_CHG, elm, instance, memberName);
     }
 
     if (Build.didChange) {
-      proxyPropChangeMethods(cmpMeta.propsDidChangeMeta, PROP_DID_CHG, elm, instance, memberName);
+      proxyPropChangeMethods(cmpConstructor.didChange, PROP_DID_CHG, elm, instance, memberName);
     }
 
-  } else if (Build.element && memberType === MEMBER_TYPE.Element) {
+  } else if (Build.element && property.elementRef) {
     // @Element()
     // add a getter to the element reference using
     // the member name the component meta provided
     definePropertyValue(instance, memberName, elm);
 
-  } else if (Build.method && memberType === MEMBER_TYPE.Method) {
+  } else if (Build.method && property.method) {
     // @Method()
     // add a property "value" on the host element
     // which we'll bind to the instance's method
     definePropertyValue(elm, memberName, instance[memberName].bind(instance));
 
-  } else if (Build.propContext && memberType === MEMBER_TYPE.PropContext) {
+  } else if (Build.propContext && property.context) {
     // @Prop({ context: 'config' })
-    var contextObj = plt.getContextItem(memberMeta.ctrlId);
+    var contextObj = plt.getContextItem(property.context);
     if (contextObj) {
       definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
     }
 
-  } else if (Build.propConnect && memberType === MEMBER_TYPE.PropConnect) {
+  } else if (Build.propConnect && property.connect) {
     // @Prop({ connect: 'ion-loading-ctrl' })
-    definePropertyValue(instance, memberName, plt.propConnect(memberMeta.ctrlId));
+    definePropertyValue(instance, memberName, plt.propConnect(property.connect));
   }
 }
 

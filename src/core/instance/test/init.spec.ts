@@ -1,6 +1,6 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentInstance, ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
-import { initHostConstructor } from '../init-host';
+import { initHostElementConstructor } from '../init-host';
 import { initLoad } from '../init-component';
 
 
@@ -9,7 +9,7 @@ describe('instance init', () => {
   describe('initLoad', () => {
 
     it('should call multiple componentOnReady promises', () => {
-      initHostConstructor(plt, cmpMeta, elm);
+      initHostElementConstructor(plt, cmpMeta, elm);
 
       let called1 = false;
       let called2 = false;
@@ -31,7 +31,7 @@ describe('instance init', () => {
     });
 
     it('should call multiple componentOnReady callbacks', () => {
-      initHostConstructor(plt, cmpMeta, elm);
+      initHostElementConstructor(plt, cmpMeta, elm);
 
       let called1 = false;
       let called2 = false;

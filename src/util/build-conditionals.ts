@@ -6,7 +6,6 @@ export const Build: BuildConditionals = {
 
   cssVarShim: true,
   shadowDom: true,
-  slot: true,
   ssrClientSide: true,
   ssrServerSide: true,
 

@@ -1,8 +1,11 @@
-import { Now, QueueApi, DomControllerCallback } from '../util/interfaces';
+import { DomControllerCallback, Now, QueueApi } from '../util/interfaces';
 import { PRIORITY } from '../util/constants';
 
 
-export function createQueueClient(raf: DomControllerCallback, now: Now, resolvePending?: boolean, rafPending?: boolean): QueueApi {
+export function createQueueClient(win: Window, resolvePending?: boolean, rafPending?: boolean): QueueApi {
+  const now: Now = () => win.performance.now();
+  const raf: DomControllerCallback = (cb: FrameRequestCallback) => window.requestAnimationFrame(cb);
+
   const highPromise = Promise.resolve();
   const highPriority: Function[] = [];
   const lowPriority: Function[] = [];

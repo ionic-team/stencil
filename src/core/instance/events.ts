@@ -1,19 +1,18 @@
-import { ComponentInstance, EventEmitterData, EventMeta, PlatformApi } from '../../util/interfaces';
+import { ComponentInstance, ComponentConstructorEvent, EventEmitterData, PlatformApi } from '../../util/interfaces';
 
 
-export function initEventEmitters(plt: PlatformApi, componentEvents: EventMeta[], instance: ComponentInstance) {
-  if (componentEvents) {
-    componentEvents.forEach(eventMeta => {
+export function initEventEmitters(plt: PlatformApi, cmpEvents: ComponentConstructorEvent[], instance: ComponentInstance) {
+  if (cmpEvents) {
+    cmpEvents.forEach(eventMeta => {
 
-      instance[eventMeta.eventMethodName] = {
+      instance[eventMeta.name] = {
         emit: (data: any) => {
-          const eventData: EventEmitterData = {
-            bubbles: eventMeta.eventBubbles,
-            composed: eventMeta.eventComposed,
-            cancelable: eventMeta.eventCancelable,
+          plt.emitEvent(instance.__el, eventMeta.name, {
+            bubbles: eventMeta.bubbles,
+            composed: eventMeta.composed,
+            cancelable: eventMeta.cancelable,
             detail: data
-          };
-          plt.emitEvent(instance.__el, eventMeta.eventName, eventData);
+          } as EventEmitterData);
         }
       };
 

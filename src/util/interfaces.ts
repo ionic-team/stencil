@@ -1,6 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_META } from './constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR } from './constants';
 
 
 export interface CoreContext {
@@ -19,10 +19,15 @@ export interface CoreContext {
 }
 
 
+export interface CommonJsImporter {
+  (moduleImports: CommonJsModuleImports): void;
+}
+
+
 export interface AppGlobal {
   components?: LoadComponentRegistry[];
-  loadComponents?: (bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
-  loadStyles?: (styleId: string, styleText: string) => void;
+  loadComponents?: (importFn: CommonJsImporter) => void;
+  h?: Function;
 }
 
 
@@ -96,19 +101,9 @@ export interface LoadComponentRegistry {
   [4]: ENCAPSULATION;
 
   /**
-   * slot
-   */
-  [5]: SLOT_META;
-
-  /**
    * listeners
    */
-  [6]: ComponentListenersData[];
-
-  /**
-   * load priority
-   */
-  [7]: PRIORITY;
+  [5]: ComponentListenersData[];
 }
 
 
@@ -137,44 +132,6 @@ export interface ComponentMemberData {
    * controller id
    */
   [4]: string;
-}
-
-
-export interface LoadComponentMeta {
-  /**
-   * tag name (ION-BADGE)
-   */
-  [0]: string;
-
-  /**
-   * members
-   */
-  [1]: ComponentMemberData[];
-
-  /**
-   * host
-   */
-  [2]: any;
-
-  /**
-   * component instance events
-   */
-  [3]: ComponentEventData[];
-
-  /**
-   * prop WILL change
-   */
-  [4]: PropChangeMeta[];
-
-  /**
-   * prop DID change
-   */
-  [5]: PropChangeMeta[];
-
-  /**
-   * encapsulation
-   */
-  [6]: ENCAPSULATION;
 }
 
 
@@ -328,7 +285,6 @@ export interface BuildConditionals {
 
   // dom
   shadowDom: boolean;
-  slot: boolean;
 
   // vdom
   hostData: boolean;
@@ -663,8 +619,8 @@ export interface LoggerTimeSpan {
 }
 
 
-export interface ModulesImporterFn {
-  (importer: any, h: Function, Core: CoreContext, publicPath: string): void;
+export interface CommonJsModuleImports {
+  [moduleId: string]: ComponentConstructor;
 }
 
 
@@ -732,6 +688,57 @@ export interface MemberMeta {
   ctrlId?: string;
   jsdoc?: JSDoc;
 }
+
+
+export interface ImportedModule {
+  [pascalCaseTag: string]: ComponentConstructor;
+}
+
+
+export interface ComponentConstructor {
+  is?: string;
+  properties?: ComponentConstructorProperties;
+  events?: ComponentConstructorEvent[];
+  willChange?: PropChangeMeta[];
+  didChange?: PropChangeMeta[];
+  host?: any;
+  style?: string;
+  styleMode?: string;
+  encapsulation?: Encapsulation;
+
+}
+
+
+export type Encapsulation = 'shadow' | 'scoped' | 'none';
+
+
+export interface ComponentConstructorProperties {
+  [propName: string]: ComponentConstructorProperty;
+}
+
+
+export interface ComponentConstructorProperty {
+  attr?: string;
+  connect?: string;
+  context?: string;
+  elementRef?: boolean;
+  method?: boolean;
+  mutable?: boolean;
+  state?: boolean;
+  type?: PropertyType;
+}
+
+export type PropertyType = StringConstructor | BooleanConstructor | NumberConstructor | 'Any';
+
+
+export interface ComponentConstructorEvent {
+  name?: string;
+  method?: string;
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
+}
+
 
 
 export interface MethodDecorator {
@@ -818,15 +825,14 @@ export interface ComponentMeta {
   listenersMeta?: ListenMeta[];
   propsWillChangeMeta?: PropChangeMeta[];
   propsDidChangeMeta?: PropChangeMeta[];
-  encapsulation?: ENCAPSULATION;
   hostMeta?: HostMeta;
+  encapsulation?: ENCAPSULATION;
   assetsDirsMeta?: AssetsMeta[];
-  slotMeta?: SLOT_META;
-  loadPriority?: number;
-  componentModule?: any;
+  componentConstructor?: ComponentConstructor;
   componentClass?: string;
   jsdoc?: JSDoc;
 }
+
 
 export interface JSDoc {
   name: string;
@@ -890,6 +896,28 @@ export interface ComponentInstance {
   __el?: HostElement;
 
   [memberName: string]: any;
+}
+
+
+export abstract class ComponentModule {
+  abstract componentWillLoad?: () => Promise<void>;
+  abstract componentDidLoad?: () => void;
+  abstract componentWillUpdate?: () => Promise<void>;
+  abstract componentDidUpdate?: () => void;
+  abstract componentDidUnload?: () => void;
+
+  abstract render?: () => any;
+  abstract hostData?: () => VNodeData;
+
+  abstract mode?: string;
+  abstract color?: string;
+
+  abstract __el?: HostElement;
+
+  [memberName: string]: any;
+
+  abstract get is(): string;
+  abstract get properties(): string;
 }
 
 
@@ -974,7 +1002,7 @@ export interface HostElement extends HTMLElement {
 
 
 export interface RendererApi {
-  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION, ssrId?: number): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: Encapsulation, ssrId?: number): VNode;
 }
 
 
@@ -1055,7 +1083,7 @@ export interface VNodeProdData {
 
 export interface PlatformApi {
   activeRender?: boolean;
-  attachStyles?: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
+  attachStyles?: (domApi: DomApi, cmpConstructor: ComponentConstructor, modeName: string, elm: HostElement) => void;
   connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   domApi?: DomApi;
@@ -1066,7 +1094,7 @@ export interface PlatformApi {
   isDefinedComponent?: (elm: Element) => boolean;
   isPrerender?: boolean;
   isServer?: boolean;
-  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
+  loadBundle: (cmpMeta: ComponentMeta, modeName: string, cb: Function) => void;
   onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
   onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   propConnect: (ctrlTag: string) => PropConnect;

@@ -2,7 +2,6 @@ import { h } from '../h';
 import { HostElement, VNode } from '../../../util/interfaces';
 import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
 import { render } from '../../instance/render';
-import { SLOT_META } from '../../../util/constants';
 
 
 describe('Component slot', () => {
@@ -10,12 +9,11 @@ describe('Component slot', () => {
   it('should relocate nested default slot nodes', () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
-      slotMeta: SLOT_META.HasSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('spider', null, h('slot', null));
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-test>88</ion-test>');
@@ -31,12 +29,11 @@ describe('Component slot', () => {
   it('should relocate nested named slot nodes', () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('monkey', null, h('slot', { name: 'start' }));
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-test><tiger slot="start">88</tiger></ion-test>');
@@ -158,8 +155,7 @@ describe('Component slot', () => {
     var plt: any = mockPlatform();
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         msg = 'parent message';
 
         render() {
@@ -167,13 +163,12 @@ describe('Component slot', () => {
             h('slot', null)
           );
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         test = 0;
         render() {
           this.test++;
@@ -195,7 +190,7 @@ describe('Component slot', () => {
 
           return  h('div', null, 'content 4');
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
@@ -222,8 +217,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         msg = 'parent message';
 
         render() {
@@ -233,19 +227,18 @@ describe('Component slot', () => {
             )
           );
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('chipmunk', null,
             h('slot', null)
           );
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
@@ -284,8 +277,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         msg = 'parent message';
 
         render() {
@@ -293,19 +285,18 @@ describe('Component slot', () => {
             h('whale', null, this.msg)
           );
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('bull', null,
             h('slot', null)
           );
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
@@ -341,21 +332,19 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('ion-child', null,
             h('falcon', { slot: 'start' }, ++values),
             h('eagle', { slot: 'start' }, ++values),
           );
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('mouse', null,
             h('slot', null),
@@ -363,7 +352,7 @@ describe('Component slot', () => {
             h('slot', { name: 'end' })
           );
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
@@ -404,8 +393,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('ion-child', null,
             h('butterfly', null, (++values).toString()),
@@ -413,13 +401,12 @@ describe('Component slot', () => {
             h('ferret', { slot: 'start' }, ++values)
           );
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('flamingo', null,
             h('slot', { name: 'start' }),
@@ -431,7 +418,7 @@ describe('Component slot', () => {
             )
           );
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
@@ -483,8 +470,7 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('test-1', null,
             h('test-2', null,
@@ -492,31 +478,29 @@ describe('Component slot', () => {
             )
           );
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'test-1',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('seal', null,
             h('slot', null)
           );
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'test-2',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return h('goose', null,
             h('slot', null)
           );
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');
@@ -570,22 +554,20 @@ describe('Component slot', () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return options.parentVNode;
         }
-      }
+      } as any
     });
 
     mockDefine(plt, {
       tagNameMeta: 'ion-child',
-      slotMeta: SLOT_META.HasNamedSlots,
-      componentModule: class {
+      componentConstructor: class {
         render() {
           return options.childVNode;
         }
-      }
+      } as any
     });
 
     const node = mockConnect(plt, '<ion-parent></ion-parent>');

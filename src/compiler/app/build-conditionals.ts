@@ -26,10 +26,6 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
     coreBuild.shadowDom = true;
   }
 
-  if (cmpMeta.slotMeta) {
-    coreBuild.slot = true;
-  }
-
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
     memberNames.forEach(memberName => {

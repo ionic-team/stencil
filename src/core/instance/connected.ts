@@ -37,7 +37,7 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.loadBundle(cmpMeta, elm, () =>
+      plt.loadBundle(cmpMeta, elm.mode, () =>
         // we've fully loaded the component mode data
         // let's queue it up to be rendered next
         queueUpdate(plt, elm)

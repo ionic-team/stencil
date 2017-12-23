@@ -39,7 +39,10 @@ function bundleClientCore() {
 
     }).then(clientCore => {
 
-      fs.writeFile(outputFile, clientCore.code.trim(), (err) => {
+      let code = clientCore.code.trim();
+      code = dynamicImportFnHack(code);
+
+      fs.writeFile(outputFile, code, (err) => {
         if (err) {
           console.log(err);
         } else {
@@ -53,6 +56,13 @@ function bundleClientCore() {
     console.log(err);
     console.log(err.stack);
   });
+}
+
+
+function dynamicImportFnHack(input) {
+  // typescript is all tripped all by import()
+  // nothing a good ol' string replace can't fix ;)
+  return input.replace(/ __import\(/g, ' import(');
 }
 
 

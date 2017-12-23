@@ -1,29 +1,29 @@
 import { Build } from '../../util/build-conditionals';
 import { callNodeRefs } from '../renderer/patch';
-import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentConstructor, HostElement, PlatformApi } from '../../util/interfaces';
 import { initEventEmitters } from './events';
 import { replayQueuedEventsOnInstance } from './listeners';
 import { RUNTIME_ERROR } from '../../util/constants';
 import { proxyComponentInstance } from './proxy';
 
 
-export function initComponentInstance(plt: PlatformApi, elm: HostElement, cmpMeta?: ComponentMeta) {
+export function initComponentInstance(plt: PlatformApi, elm: HostElement, componentConstructor?: ComponentConstructor) {
   try {
     // using the user's component class, let's create a new instance
-    cmpMeta = plt.getComponentMeta(elm);
-    elm._instance = new cmpMeta.componentModule();
+    componentConstructor = plt.getComponentMeta(elm).componentConstructor;
+    elm._instance = new (componentConstructor as any)();
 
     // ok cool, we've got an host element now, and a actual instance
     // and there were no errors creating the instance
 
     // let's upgrade the data on the host element
     // and let the getters/setters do their jobs
-    proxyComponentInstance(plt, cmpMeta, elm, elm._instance);
+    proxyComponentInstance(plt, componentConstructor, elm, elm._instance);
 
     if (Build.event) {
       // add each of the event emitters which wire up instance methods
       // to fire off dom events from the host element
-      initEventEmitters(plt, cmpMeta.eventsMeta, elm._instance);
+      initEventEmitters(plt, componentConstructor.events, elm._instance);
     }
 
     if (Build.listener) {

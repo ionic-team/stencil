@@ -1,7 +1,7 @@
 import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal, serializeAppManifest } from '../manifest-data';
-import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT_META } from '../../../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
 
 
 describe('manifest-data serialize/parse', () => {
@@ -81,14 +81,6 @@ describe('manifest-data serialize/parse', () => {
     expect(manifestData.bundles[1].components[0]).toBe('cmp-c');
   });
 
-  it('loadPriority', () => {
-    a.loadPriority = PRIORITY.Low;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.priority).toBe('low');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.loadPriority).toBe(PRIORITY.Low);
-  });
-
   it('scoped css encapsulation', () => {
     a.encapsulation = ENCAPSULATION.ScopedCss;
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
@@ -105,22 +97,6 @@ describe('manifest-data serialize/parse', () => {
     expect(cmpData.scoped).toBeFalsy();
     b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
     expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
-  });
-
-  it('slotMeta HAS_NAMED_SLOTS', () => {
-    a.slotMeta = SLOT_META.HasNamedSlots;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.slot).toBe('hasNamedSlots');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.slotMeta).toBe(SLOT_META.HasNamedSlots);
-  });
-
-  it('slotMeta HAS_SLOTS', () => {
-    a.slotMeta = SLOT_META.HasSlots;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.slot).toBe('hasSlots');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.slotMeta).toBe(SLOT_META.HasSlots);
   });
 
   it('eventsMeta', () => {

@@ -53,16 +53,6 @@ export const enum PRIORITY {
 
 
 /**
- * Slot Meta
- */
-export const enum SLOT_META {
-  NoSlots = 0,
-  HasSlots = 1,
-  HasNamedSlots = 2,
-}
-
-
-/**
  * Encapsulation
  */
 export const enum ENCAPSULATION {

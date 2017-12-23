@@ -8,7 +8,7 @@ import { proxyHostElementPrototype } from './proxy';
 import { queueUpdate } from './update';
 
 
-export function initHostConstructor(plt: PlatformApi, cmpMeta: ComponentMeta, HostElementConstructor: HostElement, hydratedCssClass?: string) {
+export function initHostElementConstructor(plt: PlatformApi, cmpMeta: ComponentMeta, HostElementConstructor: HostElement, hydratedCssClass?: string) {
   // let's wire up our functions to the host element's prototype
   // we can also inject our platform into each one that needs that api
   // note: these cannot be arrow functions cuz "this" is important here hombre

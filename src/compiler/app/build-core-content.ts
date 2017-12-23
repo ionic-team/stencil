@@ -278,6 +278,23 @@ var RESERVED_PROPERTIES: string[] = [
 
 
   /**
+   * Component Constructor static properties
+   */
+  'is',
+  'properties',
+  'attr',
+  'elementRef',
+  'events',
+  'mutable',
+  'state',
+  'didChange',
+  'host',
+  'style',
+  'styleMode',
+  'willChange',
+
+
+  /**
    * Component Instance
    * Methods set on the user's component
    */

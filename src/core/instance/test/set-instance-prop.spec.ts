@@ -1,5 +1,5 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
-import { ComponentMeta, ComponentInstance, PlatformApi } from '../../../util/interfaces';
+import { ComponentMeta, ComponentConstructor, ComponentInstance, PlatformApi } from '../../../util/interfaces';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { proxyComponentInstance } from '../proxy';
 
@@ -10,21 +10,21 @@ describe('set instance property', () => {
 
     it('instance number changed', () => {
       spyOn(plt.queue, 'add');
-      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance);
       instance.num = 141.622;
       expect(plt.queue.add).toHaveBeenCalled();
     });
 
     it('instance string changed', () => {
       spyOn(plt.queue, 'add');
-      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance);
       instance.str = 'kph';
       expect(plt.queue.add).toHaveBeenCalled();
     });
 
     it('instance boolean changed', () => {
       spyOn(plt.queue, 'add');
-      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance);
       instance.bool = false;
       expect(plt.queue.add).toHaveBeenCalled();
     });
@@ -35,21 +35,21 @@ describe('set instance property', () => {
 
     it('instance number unchanged', () => {
       spyOn(plt.queue, 'add');
-      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance);
       instance.num = 88;
       expect(plt.queue.add).not.toHaveBeenCalled();
     });
 
     it('instance string unchanged', () => {
       spyOn(plt.queue, 'add');
-      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance);
       instance.str = 'mph';
       expect(plt.queue.add).not.toHaveBeenCalled();
     });
 
     it('instance boolean unchanged', () => {
       spyOn(plt.queue, 'add');
-      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance);
       instance.bool = true;
       expect(plt.queue.add).not.toHaveBeenCalled();
     });
@@ -70,32 +70,32 @@ describe('set instance property', () => {
     obj = { 'flux': 'plutonium' };
   }
 
-  let cmpMeta: ComponentMeta = {
-    membersMeta: {
+  let cmpConstructor: ComponentConstructor = {
+    properties: {
       'num': {
-        memberType: MEMBER_TYPE.State,
-        attribName: 'num',
-        propType: PROP_TYPE.Number
+        mutable: true,
+        attr: 'num',
+        type: Number
       },
       'str': {
-        memberType: MEMBER_TYPE.State,
-        attribName: 'str',
-        propType: PROP_TYPE.String
+        mutable: true,
+        attr: 'str',
+        type: String
       },
       'bool': {
-        memberType: MEMBER_TYPE.State,
-        attribName: 'bool',
-        propType: PROP_TYPE.Boolean
+        mutable: true,
+        attr: 'bool',
+        type: Boolean
       },
       'arr': {
-        memberType: MEMBER_TYPE.State,
-        attribName: 'arr',
-        propType: PROP_TYPE.Any
+        mutable: true,
+        attr: 'arr',
+        type: 'Any'
       },
       'obj': {
-        memberType: MEMBER_TYPE.State,
-        attribName: 'obj',
-        propType: PROP_TYPE.Any
+        mutable: true,
+        attr: 'obj',
+        type: 'Any'
       }
     }
   };

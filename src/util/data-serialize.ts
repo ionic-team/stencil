@@ -1,6 +1,6 @@
-import { BundleIds, ComponentMeta, ComponentRegistry, CompiledModeStyles, EventMeta, ListenMeta,
+import { BundleIds, ComponentMeta, ComponentConstructorProperty, ComponentConstructorProperties, ComponentRegistry, CompiledModeStyles, EventMeta, ListenMeta,
   LoadComponentRegistry, MemberMeta, MembersMeta, ModuleFile, PropChangeMeta, StylesMeta } from './interfaces';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, SLOT_META } from '../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
 import { wrapComponentImports } from '../compiler/bundle/component-modules';
 
 
@@ -11,9 +11,7 @@ export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegi
     formatHasStyles(cmpMeta.stylesMeta),
     formatProps(cmpMeta.membersMeta),
     formatEncapsulation(cmpMeta.encapsulation),
-    formatSlot(cmpMeta.slotMeta),
-    formatListeners(cmpMeta.listenersMeta),
-    cmpMeta.loadPriority
+    formatListeners(cmpMeta.listenersMeta)
   ];
 
   return <any>trimFalsyData(d);
@@ -59,17 +57,6 @@ export function formatHasStyles(stylesMeta: StylesMeta) {
     return 1;
   }
   return 0;
-}
-
-
-function formatSlot(val: number) {
-  if (val === SLOT_META.HasSlots) {
-    return SLOT_META.HasSlots;
-  }
-  if (val === SLOT_META.HasNamedSlots) {
-    return SLOT_META.HasNamedSlots;
-  }
-  return SLOT_META.NoSlots;
 }
 
 
@@ -231,10 +218,77 @@ export function getWindowNamespace(namespace: string) {
 }
 
 
+export function formatComponentConstructorProperties(membersMeta: MembersMeta) {
+  if (!membersMeta) {
+    return null;
+  }
+
+  const memberNames = Object.keys(membersMeta).sort((a, b) => {
+    if (a.toLowerCase() < b.toLowerCase()) return -1;
+    if (a.toLowerCase() > b.toLowerCase()) return 1;
+    return 0;
+  });
+
+  if (!memberNames.length) {
+    return null;
+  }
+
+  const properties: ComponentConstructorProperties = {};
+
+  memberNames.forEach(memberName => {
+    const property = formatComponentConstructorProperty(membersMeta[memberName]);
+    properties[memberName] = property;
+  });
+
+  return properties;
+}
+
+
+function formatComponentConstructorProperty(memberMeta: MemberMeta) {
+  const property: ComponentConstructorProperty = {};
+
+  if (memberMeta.memberType === MEMBER_TYPE.State) {
+    property.state = true;
+
+  } else if (memberMeta.memberType === MEMBER_TYPE.Element) {
+    property.elementRef = true;
+
+  } else if (memberMeta.memberType === MEMBER_TYPE.Method) {
+    property.method = true;
+
+  } else if (memberMeta.memberType === MEMBER_TYPE.PropConnect) {
+    property.connect = memberMeta.ctrlId;
+
+  } else if (memberMeta.memberType === MEMBER_TYPE.PropContext) {
+    property.context = memberMeta.ctrlId;
+
+  } else {
+    if (memberMeta.propType === PROP_TYPE.String) {
+      property.type = String;
+
+    } else if (memberMeta.propType === PROP_TYPE.Boolean) {
+      property.type = Boolean;
+
+    } else if (memberMeta.propType === PROP_TYPE.Number) {
+      property.type = Number;
+
+    } else if (memberMeta.propType === PROP_TYPE.Any) {
+      property.type = 'Any';
+    }
+
+    if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {
+      property.mutable = true;
+    }
+  }
+
+  return property;
+}
+
+
 export function formatComponentMeta(cmpMeta: ComponentMeta) {
   const tag = cmpMeta.tagNameMeta.toLowerCase();
   const members = formatMembers(cmpMeta.membersMeta);
-  const host = formatHost(cmpMeta.hostMeta);
+  const host = formatHost(null);
   const propWillChanges = formatPropChanges(tag, 'prop will change', cmpMeta.propsWillChangeMeta);
   const propDidChanges = formatPropChanges(tag, 'prop did change', cmpMeta.propsDidChangeMeta);
   const events = formatEvents(tag, cmpMeta.eventsMeta);

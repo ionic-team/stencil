@@ -4,7 +4,7 @@ import { KEY_CODE_MAP, NODE_TYPE } from '../../util/constants';
 import { toLowerCase } from '../../util/helpers';
 
 
-export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): DomApi {
+export function createDomApi(win: any, doc: Document): DomApi {
   // using the $ prefix so that closure is
   // cool with property renaming each of these
 
@@ -209,19 +209,20 @@ export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): 
 
 
   if (Build.event) {
-    WindowCustomEvent = win.CustomEvent;
 
     if (Build.es5) {
-      if (typeof WindowCustomEvent !== 'function') {
+      if (typeof win.CustomEvent !== 'function') {
         // CustomEvent polyfill
-        WindowCustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
+        win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
           evt = doc.createEvent('CustomEvent');
           evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
           return evt;
         };
-        WindowCustomEvent.prototype = win.Event.prototype;
+        win.CustomEvent.prototype = win.Event.prototype;
       }
     }
+
+    domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
 
     // test if this browser supports event options or not
     try {
@@ -231,8 +232,6 @@ export function createDomApi(win: any, doc: Document, WindowCustomEvent?: any): 
         })
       );
     } catch (e) {}
-
-    domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new WindowCustomEvent(eventName, data));
   }
 
 

@@ -1,4 +1,4 @@
-import { ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
+import { HostElement, PlatformApi, ComponentConstructor } from '../../../util/interfaces';
 import { proxyComponentInstance } from '../proxy';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { MEMBER_TYPE } from '../../../util/constants';
@@ -7,47 +7,47 @@ import { MEMBER_TYPE } from '../../../util/constants';
 describe('proxyComponentInstance', () => {
 
   it('should get attr value even if existin data is empty string', () => {
-    cmpMeta.membersMeta = {
-      propVal: { memberType: MEMBER_TYPE.Prop, attribName: 'prop-val' }
+    cmpConstructor.properties = {
+      propVal: { type: String, attr: 'prop-val' }
     };
     elm._values = { propVal: '' };
     elm.setAttribute('prop-val', 'elm-attr-val');
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
 
     expect(instance.propVal).toBe('elm-attr-val');
   });
 
   it('should prioritize elm prop over instance prop', () => {
-    cmpMeta.membersMeta = {
-      propVal: { memberType: MEMBER_TYPE.Prop, attribName: 'prop-val' }
+    cmpConstructor.properties = {
+      propVal: { type: String, attr: 'prop-val' }
     };
     (elm as any).propVal = 'elm-prop-val';
     instance.propVal = 'instance-prop-val';
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
 
     expect(instance.propVal).toBe('elm-prop-val');
   });
 
   it('should prioritize elm attr value over elm prop and instance prop', () => {
-    cmpMeta.membersMeta = {
-      propVal: { memberType: MEMBER_TYPE.Prop, attribName: 'prop-val' }
+    cmpConstructor.properties = {
+      propVal: { type: String, attr: 'prop-val' }
     };
     elm.setAttribute('prop-val', 'elm-attr-val');
     (elm as any).propVal = 'elm-prop-val';
     instance.propVal = 'instance-prop-val';
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
 
     expect(instance.propVal).toBe('elm-attr-val');
   });
 
   it('should get instance prop values for prop/prop mutable', () => {
-    cmpMeta.membersMeta = {
-      propVal: { memberType: MEMBER_TYPE.Prop },
-      propMutableVal: { memberType: MEMBER_TYPE.PropMutable }
+    cmpConstructor.properties = {
+      propVal: { type: String },
+      propMutableVal: { type: String, mutable: true }
     };
     instance.propVal = 'prop-val';
     instance.propMutableVal = 'prop-mutable-val';
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
 
     expect(instance.propVal).toBe('prop-val');
     expect(instance.propMutableVal).toBe('prop-mutable-val');
@@ -64,13 +64,13 @@ describe('proxyComponentInstance', () => {
   });
 
   it('should get elm prop values for prop/prop mutable', () => {
-    cmpMeta.membersMeta = {
-      propVal: { memberType: MEMBER_TYPE.Prop },
-      propMutableVal: { memberType: MEMBER_TYPE.PropMutable }
+    cmpConstructor.properties = {
+      propVal: { type: String },
+      propMutableVal: { type: String, mutable: true }
     };
     (elm as any).propVal = 'prop-val';
     (elm as any).propMutableVal = 'prop-mutable-val';
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
 
     expect(instance.propVal).toBe('prop-val');
     expect(instance.propMutableVal).toBe('prop-mutable-val');
@@ -87,13 +87,13 @@ describe('proxyComponentInstance', () => {
   });
 
   it('should get elm attr values for prop/prop mutable', () => {
-    cmpMeta.membersMeta = {
-      propVal: { memberType: MEMBER_TYPE.Prop, attribName: 'prop-val' },
-      propMutableVal: { memberType: MEMBER_TYPE.PropMutable, attribName: 'prop-mutable-val' }
+    cmpConstructor.properties = {
+      propVal: { type: String, attr: 'prop-val' },
+      propMutableVal: { type: String, mutable: true, attr: 'prop-mutable-val' }
     };
     elm.setAttribute('prop-val', 'prop-val');
     elm.setAttribute('prop-mutable-val', 'prop-mutable-val');
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
 
     expect(instance.propVal).toBe('prop-val');
     expect(instance.propMutableVal).toBe('prop-mutable-val');
@@ -110,11 +110,11 @@ describe('proxyComponentInstance', () => {
   });
 
   it('should get instance property values for state and set getter/setter', () => {
-    cmpMeta.membersMeta = {
-      stateVal: { memberType: MEMBER_TYPE.State }
+    cmpConstructor.properties = {
+      stateVal: { state: true }
     };
     instance.stateVal = 'some-val';
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     expect(instance.stateVal).toBe('some-val');
     const stateVal = Object.getOwnPropertyDescriptor(instance, 'stateVal');
     expect(stateVal.value).toBeUndefined();
@@ -123,28 +123,28 @@ describe('proxyComponentInstance', () => {
   });
 
   it('should not get elm property values for state', () => {
-    cmpMeta.membersMeta = {
-      mystate: { memberType: MEMBER_TYPE.State, attribName: 'mystate' }
+    cmpConstructor.properties = {
+      mystate: { state: true }
     };
     (elm as any).mystate = 'invalid';
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     expect(instance.mystate).toBeUndefined();
   });
 
   it('should not get elm attribute values for state', () => {
-    cmpMeta.membersMeta = {
-      mystate: { memberType: MEMBER_TYPE.State, attribName: 'mystate' }
+    cmpConstructor.properties = {
+      mystate: { state: true }
     };
     elm.setAttribute('mystate', 'invalid');
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     expect(instance.mystate).toBeUndefined();
   });
 
   it('defines element', () => {
-    cmpMeta.membersMeta = {
-      myElement: { memberType: MEMBER_TYPE.Element }
+    cmpConstructor.properties = {
+      myElement: { elementRef: true }
     };
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     const myElement = Object.getOwnPropertyDescriptor(instance, 'myElement');
     expect(myElement.value).toBe(elm);
     expect(myElement.get).toBeUndefined();
@@ -154,19 +154,19 @@ describe('proxyComponentInstance', () => {
 
   it('defines prop context', () => {
     spyOn(plt, 'getContextItem');
-    cmpMeta.membersMeta = {
-      myPropContext: { memberType: MEMBER_TYPE.PropContext, ctrlId: 'ctrlId' }
+    cmpConstructor.properties = {
+      myPropContext: { context: 'ctrlId' }
     };
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     expect(plt.getContextItem).toHaveBeenCalled();
   });
 
   it('defines prop connect', () => {
     spyOn(plt, 'propConnect');
-    cmpMeta.membersMeta = {
-      myPropConnect: { memberType: MEMBER_TYPE.PropConnect, ctrlId: 'ctrlId' }
+    cmpConstructor.properties = {
+      myPropConnect: { connect: 'ctrlId' }
     };
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     const myPropConnect = Object.getOwnPropertyDescriptor(instance, 'myPropConnect');
     expect(plt.propConnect).toHaveBeenCalled();
     expect(myPropConnect).toBeDefined();
@@ -174,28 +174,28 @@ describe('proxyComponentInstance', () => {
 
   it('reused existing internal values', () => {
     elm._values = { mph: 88 };
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     expect(elm._values.mph).toBe(88);
   });
 
   it('create new internal values', () => {
-    proxyComponentInstance(plt, cmpMeta, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
     expect(elm._values).toBeDefined();
   });
 
   it('do nothing for no members', () => {
     expect(() => {
-      proxyComponentInstance(plt, cmpMeta, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance);
     }).not.toThrow();
   });
 
   var plt: PlatformApi = mockPlatform() as any;
-  var cmpMeta: ComponentMeta;
+  var cmpConstructor: ComponentConstructor;
   var elm: HostElement;
   var instance: any;
 
   beforeEach(() => {
-    cmpMeta = {};
+    cmpConstructor = {};
     elm = mockElement('my-cmp') as any;
     instance = {};
   });

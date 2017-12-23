@@ -1,5 +1,5 @@
 import { ComponentMeta } from '../interfaces';
-import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT_META } from '../constants';
+import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../constants';
 import { formatComponentLoader } from '../data-serialize';
 import { parseComponentLoaders, parsePropertyValue } from '../data-parse';
 
@@ -66,38 +66,6 @@ describe('data serialize/parse', () => {
       expect(cmpMeta.listenersMeta[0].eventMethodName).toBe('method1');
     });
 
-    it('should set load priority', () => {
-      cmpMeta.loadPriority = PRIORITY.Low;
-
-      const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
-
-      expect(cmpMeta.loadPriority).toBe(PRIORITY.Low);
-    });
-
-    it('should set not load priority', () => {
-      const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
-
-      expect(cmpMeta.loadPriority).toBeFalsy();
-    });
-
-    it('should set has slot', () => {
-      cmpMeta.slotMeta = SLOT_META.HasSlots;
-
-      const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
-
-      expect(cmpMeta.slotMeta).toBe(SLOT_META.HasSlots);
-    });
-
-    it('should set no slot', () => {
-      const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
-
-      expect(cmpMeta.slotMeta).toBeFalsy();
-    });
-
     it('should set scoped css encapsulation', () => {
       cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
       const format = formatComponentLoader(cmpMeta);
@@ -119,20 +87,6 @@ describe('data serialize/parse', () => {
       cmpMeta = parseComponentLoaders(format, {});
 
       expect(cmpMeta.encapsulation).toBeFalsy();
-    });
-
-    it('should set ctrlId', () => {
-      cmpMeta.membersMeta = {
-        'someCtrl': {
-          ctrlId: 'myCtrlId'
-        }
-      };
-
-      const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
-
-      expect(cmpMeta.membersMeta.someCtrl).toBeDefined();
-      expect(cmpMeta.membersMeta.someCtrl.ctrlId).toBe('myCtrlId');
     });
 
     it('should add a non-attribute property to the load registry', () => {
@@ -281,90 +235,6 @@ describe('data serialize/parse', () => {
 
   });
 
-
-  describe('parsePropertyValue', () => {
-
-    describe('number', () => {
-
-      it('should convert number 1 to number 1', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, 1)).toBe(1);
-      });
-
-      it('should convert number 0 to number 0', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, 0)).toBe(0);
-      });
-
-      it('should convert string "0" to number 0', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, '0')).toBe(0);
-      });
-
-      it('should convert string "88" to number 88', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, '88')).toBe(88);
-      });
-
-      it('should convert empty string "" to NaN', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, '')).toEqual(NaN);
-      });
-
-      it('should convert any string "anyword" to NaN', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, 'anyword')).toEqual(NaN);
-      });
-
-      it('should keep number undefined as undefined', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, undefined)).toEqual(undefined);
-      });
-
-      it('should keep number null as null', () => {
-        expect(parsePropertyValue(PROP_TYPE.Number, null)).toBe(null);
-      });
-
-    });
-
-    describe('boolean', () => {
-
-      it('should set boolean 1 as true', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, 1)).toBe(true);
-      });
-
-      it('should set boolean 0 as false', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, 0)).toBe(false);
-      });
-
-      it('should keep boolean true as boolean true', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, true)).toBe(true);
-      });
-
-      it('should keep boolean false as boolean false', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, false)).toBe(false);
-      });
-
-      it('should convert string "false" to boolean false', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, 'false')).toBe(false);
-      });
-
-      it('should convert string "true" to boolean true', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, 'true')).toBe(true);
-      });
-
-      it('should convert empty string "" to boolean true', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, '')).toBe(true);
-      });
-
-      it('should convert any string "anyword" to boolean true', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, 'anyword')).toBe(true);
-      });
-
-      it('should keep boolean undefined as undefined', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, undefined)).toBe(undefined);
-      });
-
-      it('should keep boolean null as null', () => {
-        expect(parsePropertyValue(PROP_TYPE.Boolean, null)).toBe(null);
-      });
-
-    });
-
-  });
 
   var cmpMeta: ComponentMeta = {};
 
