@@ -504,3 +504,18 @@ function trimFalsyDataStr(d: string[]) {
 
   return d;
 }
+
+
+export function getJsPathBundlePlaceholder(tagName: string) {
+  return `/**jspath:${tagName}**/`;
+}
+
+
+export function getStylePlaceholder(tagName: string) {
+  return `/**style:${tagName}**/`;
+}
+
+
+export function getStyleIdPlaceholder(tagName: string) {
+  return `/**style-id:${tagName}**/`;
+}

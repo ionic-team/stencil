@@ -1,20 +1,9 @@
 import { convertValueToLiteral, getImportNameMapFromStyleMeta, StyleImport } from './util';
 import { ComponentMeta, ModuleFiles } from '../../../util/interfaces';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
+import { getStylePlaceholder, getStyleIdPlaceholder } from '../../../util/data-serialize';
 import { formatComponentConstructorProperties } from '../../../util/data-serialize';
 import * as ts from 'typescript';
-import { ENCAPSULATION } from '../../../util/constants';
-
-
-/**
- * 1) Add static "properties" from previously gathered component metadata
- * 2) Add static "encapsulation"
- * 3) Add static "host"
- * 4) Add static "events"
- * 5) Add static "style"
- * 6) Add static "styleId"
- * 7) Add h() fn: const { h } = Namespace;
- * 8) Export component class with tag names as PascalCase
- */
 
 
 export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
@@ -48,10 +37,18 @@ export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.Trans
             return all.concat(getImportNameMapFromStyleMeta(cmpMeta.stylesMeta[smn]));
           }, [] as StyleImport[])
           .map(obj => obj.importName);
+
         if (stylesMeta.length > 0) {
-          newMembers.push(createGetter('style', ts.createArrayLiteral(
-            stylesMeta.map(sm => ts.createIdentifier(sm))
-          )));
+          // awesome, we know we've got styles!
+          // let's add the placeholder which we'll use later
+          // after we generate the css
+          newMembers.push(createGetter('style', convertValueToLiteral(getStylePlaceholder(cmpMeta.tagNameMeta))));
+
+          if (!cmpMeta.stylesMeta[DEFAULT_STYLE_MODE]) {
+            // if there's only one style, then there's no need for styleId
+            // but if there are numerous style modes, then we'll need to add this
+            newMembers.push(createGetter('styleId', convertValueToLiteral(getStyleIdPlaceholder(cmpMeta.tagNameMeta))));
+          }
         }
       }
 
