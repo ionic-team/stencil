@@ -1,4 +1,5 @@
 import { BuildConfig } from '../../../util/interfaces';
+import * as path from 'path';
 
 
 export default function localResolver(config: BuildConfig) {
@@ -12,10 +13,10 @@ export default function localResolver(config: BuildConfig) {
         return null;
       }
 
-      const basename = config.sys.path.basename(importer);
+      const basename = path.basename(importer);
       const directory = importer.split(basename)[0];
 
-      const dirIndexFile = config.sys.path.join(directory + importee, 'index.js');
+      const dirIndexFile = path.join(directory + importee, 'index.js');
 
       try {
         await config.sys.ensureFile(dirIndexFile);

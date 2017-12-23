@@ -3,8 +3,8 @@ import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getAppPublicPath, getGlobalFileName, getGlobalDist, getGlobalWWW } from './app-file-naming';
-import { transpiledInMemoryPlugin } from '../bundle/component-modules';
 import { transpileToEs5 } from '../transpile/core-build';
+import transpiledInMemoryPlugin from '../bundle/rollup-plugins/transpile-in-memory';
 
 
 export async function generateAppGlobalScript(config: BuildConfig, ctx: BuildContext, sourceTarget: SourceTarget, appRegistry: AppRegistry) {

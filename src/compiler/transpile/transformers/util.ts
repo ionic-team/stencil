@@ -1,5 +1,8 @@
+import { StyleMeta } from '../../../util/interfaces';
 import * as ts from 'typescript';
+import * as path from 'path';
 import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
+import { dashToPascalCase } from '../../../util/helpers';
 
 
 export function updateComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
@@ -108,6 +111,15 @@ export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpressio
  * @returns Typescript Object Literal, Array Literal, String Literal, Boolean Literal, Numeric Literal
  */
 export function convertValueToLiteral(val: any) {
+  if (val === String) {
+    return ts.createIdentifier('String');
+  }
+  if (val === Number) {
+    return ts.createIdentifier('Number');
+  }
+  if (val === Boolean) {
+    return ts.createIdentifier('Boolean');
+  }
   if (Array.isArray(val)) {
     return arrayToArrayLiteral(val);
   }
@@ -123,6 +135,9 @@ export function convertValueToLiteral(val: any) {
  * @returns Typescript Object Literal Expression
  */
 function objectToObjectLiteral(obj: { [key: string]: any }): ts.ObjectLiteralExpression {
+  if (Object.keys(obj).length === 0) {
+    return ts.createObjectLiteral([]);
+  }
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key: string): ts.ObjectLiteralElementLike => {
     return ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key]) as ts.Expression);
   });
@@ -170,4 +185,26 @@ export function transformSourceFile(sourceText: string, transformers: ts.CustomT
       target: ts.ScriptTarget.ES2017
     })
   }).outputText;
+}
+
+export function createImportNameFromUrl(importUrl: string) {
+  const ext = path.extname(importUrl);
+  const baseName = path.basename(importUrl, ext);
+
+  return dashToPascalCase(baseName);
+}
+
+export interface StyleImport {
+  importName: string;
+  absolutePath: string;
+}
+
+export function getImportNameMapFromStyleMeta(styleMeta: StyleMeta): StyleImport[] {
+  return styleMeta.absolutePaths.map((ocp) => {
+    const importName = createImportNameFromUrl(ocp) + 'Css';
+    return {
+      importName,
+      absolutePath: ocp,
+    };
+  });
 }
