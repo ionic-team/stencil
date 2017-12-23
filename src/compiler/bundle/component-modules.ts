@@ -1,11 +1,10 @@
 import { BuildConfig, BuildContext, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { hasError } from '../util';
 import { buildExpressionReplacer } from '../build/replacer';
 import localResolution from './rollup-plugins/local-resolution';
 import transpiledInMemoryPlugin from './rollup-plugins/transpile-in-memory';
 import stencilManifestsToInputs from './rollup-plugins/stencil-manifest-to-imports';
-import scss from './rollup-plugins/scss';
-import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 
 
 export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
@@ -52,9 +51,6 @@ async function bundleComponents(config: BuildConfig, ctx: BuildContext, manifest
         config.sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
-        }),
-        scss({
-          output: false
         }),
         stencilManifestsToInputs(manifestBundle),
         transpiledInMemoryPlugin(config, ctx),

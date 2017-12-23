@@ -1,10 +1,10 @@
-import graphIt from './rollup-plugins/graph-it';
-import { hasError } from '../util';
-import transpiledInMemoryPlugin from './rollup-plugins/transpile-in-memory';
-import stencilManifestsToInputs from './rollup-plugins/stencil-manifest-to-imports';
 import { BuildConfig, BuildContext, ManifestBundle } from '../../util/interfaces';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
-import scss from './rollup-plugins/scss';
+import graphIt from './rollup-plugins/graph-it';
+import { hasError } from '../util';
+import stencilManifestsToInputs from './rollup-plugins/stencil-manifest-to-imports';
+import transpiledInMemoryPlugin from './rollup-plugins/transpile-in-memory';
+
 
 export async function createDependencyGraph(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
   // start the bundler on our temporary file
@@ -21,9 +21,6 @@ export async function createDependencyGraph(config: BuildConfig, ctx: BuildConte
         config.sys.rollup.plugins.commonjs({
           include: 'node_modules/**',
           sourceMap: false
-        }),
-        scss({
-          output: false
         }),
         stencilManifestsToInputs(manifestBundle),
         transpiledInMemoryPlugin(config, ctx),
