@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults, LoadComponentRegistry } from '../util/interfaces';
 import { buildError, getBuildContext } from '../compiler/util';
-import { DEFAULT_PRERENDER_CONFIG } from '../compiler/prerender/validate-prerender-config';
+import { DEFAULT_PRERENDER_CONFIG, DEFAULT_SSR_CONFIG } from '../compiler/prerender/validate-prerender-config';
 import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { parseComponentLoaders } from '../util/data-parse';
@@ -29,7 +29,7 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
   function hydrateToString(hydrateOpts: HydrateOptions): Promise<HydrateResults> {
 
     // validate the hydrate options and add any missing info
-    normalizeHydrateOptions(config, hydrateOpts);
+    hydrateOpts = normalizeHydrateOptions(config, hydrateOpts);
 
     // kick off hydrated, which is an async opertion
     return hydrateHtml(config, ctx, registry, hydrateOpts).catch(err => {
@@ -92,7 +92,8 @@ function registerComponents(config: BuildConfig) {
 }
 
 
-function normalizeHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
+function normalizeHydrateOptions(config: BuildConfig, inputOpts: HydrateOptions) {
+  const opts = Object.assign({}, DEFAULT_SSR_CONFIG, inputOpts);
   const req = opts.req;
 
   if (req && typeof req.get === 'function') {
@@ -113,6 +114,8 @@ function normalizeHydrateOptions(config: BuildConfig, opts: HydrateOptions) {
   if (!urlObj.hostname) urlObj.hostname = DEFAULT_PRERENDER_CONFIG.host;
 
   opts.url = config.sys.url.format(urlObj);
+
+  return opts;
 }
 
 

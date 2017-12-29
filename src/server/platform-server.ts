@@ -1,15 +1,14 @@
+import { AppGlobal, BuildConfig, BuildContext, CommonJsModuleImports,
+  ComponentMeta, ComponentRegistry, CoreContext, Diagnostic, DomApi,
+  HostElement, PlatformApi } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
-import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry,
-  CoreContext, Diagnostic, DomApi, FilesMap, HostElement,
-  PlatformApi, AppGlobal } from '../util/interfaces';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { dashToPascalCase } from '../util/helpers';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
-import { getAppFileName } from '../compiler/app/app-file-naming';
 import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';
 import { proxyController } from '../core/instance/proxy';
+import { toDashCase } from '../util/helpers';
 
 
 export function createPlatformServer(
@@ -22,7 +21,7 @@ export function createPlatformServer(
   ctx?: BuildContext
 ): PlatformApi {
   const registry: ComponentRegistry = { 'html': {} };
-  const stylesMap: FilesMap = {};
+  const styles: string[] = [];
   const controllerComponents: {[tag: string]: HostElement} = {};
 
   // init build context
@@ -57,7 +56,7 @@ export function createPlatformServer(
   const globalDefined: { [tagName: string]: boolean } = win.$definedComponents = win.$definedComponents || {};
 
   const appWwwDir = config.wwwDir;
-  const appBuildDir = config.sys.path.join(config.buildDir, getAppFileName(config));
+  const appBuildDir = config.sys.path.join(config.buildDir, config.fsNamespace);
   Context.publicPath = appBuildDir;
 
   // create the sandboxed context with a new instance of a V8 Context
@@ -102,7 +101,7 @@ export function createPlatformServer(
     if (rootElm._hasLoaded || failureDiagnostic) {
       // the root node has loaded
       // and there are no css files still loading
-      plt.onAppLoad && plt.onAppLoad(rootElm, stylesMap, failureDiagnostic);
+      plt.onAppLoad && plt.onAppLoad(rootElm, styles, failureDiagnostic);
     }
   }
 
@@ -142,6 +141,29 @@ export function createPlatformServer(
     }
   }
 
+
+  App.loadComponents = function loadComponents(importer) {
+    try {
+      // requested component constructors are placed on the moduleImports object
+      const moduleImports: CommonJsModuleImports = {};
+      importer(moduleImports);
+
+      // let's add a reference to the constructors on each components metadata
+      // each key in moduleImports is a PascalCased tag name
+      Object.keys(moduleImports).forEach(pascalCasedTagName => {
+        const cmpMeta = registry[toDashCase(pascalCasedTagName)];
+        if (cmpMeta) {
+          // connect the component's constructor to its metadata
+          cmpMeta.componentConstructor = moduleImports[pascalCasedTagName];
+        }
+      });
+
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+
   function isDefinedComponent(elm: Element) {
     return !!(globalDefined[elm.tagName.toLowerCase()] || registry[elm.tagName.toLowerCase()]);
   }
@@ -151,30 +173,28 @@ export function createPlatformServer(
     // synchronous in nodejs
     if (!cmpMeta.componentConstructor) {
       try {
-        const bundleId: string = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds as any)).es5;
-
-        let requestBundleId = bundleId;
-        if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-          requestBundleId += '.sc';
-        }
-        requestBundleId += '.js';
-
-        const jsFilePath = config.sys.path.join(appBuildDir, requestBundleId);
-        const module = require(jsFilePath);
-
-        cmpMeta.componentConstructor = module[dashToPascalCase(cmpMeta.tagNameMeta)];
+        const bundleId = getBundleId(cmpMeta, modeName);
+        const fileName = getBundleFilename(cmpMeta, bundleId);
+        const jsFilePath = config.sys.path.join(appBuildDir, fileName);
+        const jsCode = config.sys.fs.readFileSync(jsFilePath, 'utf-8');
+        config.sys.vm.runInContext(jsCode, win);
 
       } catch (e) {
         onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
-      }
-
-      if (!cmpMeta.componentConstructor) {
-        return;
+        cmpMeta.componentConstructor = function() {} as any;
       }
     }
 
     cb();
   }
+
+
+  plt.attachStyles = function attachStyles(_domApi, cmpConstructor, _modeName, _elm) {
+    if (cmpConstructor.style) {
+      styles.push(cmpConstructor.style);
+    }
+  };
+
 
   function runGlobalScripts() {
     if (!ctx || !ctx.appFiles || !ctx.appFiles.global) {
@@ -189,8 +209,13 @@ export function createPlatformServer(
       type: 'runtime',
       header: 'Runtime error detected',
       level: 'error',
-      messageText: err ? err.message ? err.message : err.toString() : null
+      messageText: err ? err.message ? err.message : err.toString() : ''
     };
+
+    if (err && err.stack) {
+      d.messageText += '\n' + err.stack;
+      d.messageText = d.messageText.trim();
+    }
 
     switch (type) {
       case RUNTIME_ERROR.LoadBundleError:
@@ -236,4 +261,21 @@ export function createPlatformServer(
   }
 
   return plt;
+}
+
+
+export function getBundleId(cmpMeta: ComponentMeta, modeName: string) {
+  const bundleArr: string[] = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds)) as any;
+
+  // index 1 is the es5/umd module
+  return bundleArr[1];
+}
+
+
+export function getBundleFilename(cmpMeta: ComponentMeta, bundleId: string) {
+  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+    bundleId += '.sc';
+  }
+  bundleId += '.js';
+  return bundleId;
 }

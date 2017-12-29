@@ -14,15 +14,6 @@ export const enum MEMBER_TYPE {
 
 
 /**
- * Prop Change Meta Indexes
- */
-export const enum PROP_CHANGE {
-  PropName = 0,
-  MethodName = 1,
-}
-
-
-/**
  * Property Types
  */
 export const enum PROP_TYPE {

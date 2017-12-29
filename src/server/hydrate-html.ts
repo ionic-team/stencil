@@ -74,7 +74,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
     // fire off this function when the app has finished loading
     // and all components have finished hydrating
-    plt.onAppLoad = (rootElm, stylesMap, failureDiagnostic: Diagnostic) => {
+    plt.onAppLoad = (rootElm, styles, failureDiagnostic: Diagnostic) => {
 
       if (config._isTesting) {
         (hydrateResults as any).__testPlatform = plt;
@@ -92,7 +92,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
       if (rootElm) {
         try {
           // optimize this document!!
-          optimizeHtml(config, ctx, doc, stylesMap, opts, hydrateResults);
+          optimizeHtml(config, ctx, doc, styles, opts, hydrateResults);
 
           // gather up all of the <a> tag information in the doc
           if (opts.collectAnchors !== false) {
