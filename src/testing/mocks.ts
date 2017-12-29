@@ -166,6 +166,8 @@ export function mockStencilSystem() {
       }
     },
 
+    semver: require('semver'),
+
     typescript: require('typescript'),
 
     url: require('url'),
