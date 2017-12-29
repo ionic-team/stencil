@@ -1,6 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR } from './constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, RUNTIME_ERROR } from './constants';
 
 
 export interface CoreContext {
@@ -26,7 +26,7 @@ export interface CommonJsImporter {
 
 export interface AppGlobal {
   components?: LoadComponentRegistry[];
-  loadComponents?: (importFn: CommonJsImporter) => void;
+  loadComponents?: (importFn: CommonJsImporter, bundleId: string) => void;
   h?: Function;
 }
 
@@ -191,19 +191,6 @@ export interface ComponentEventData {
 }
 
 
-export interface PropChangeMeta {
-  /**
-   * prop name
-   */
-  [0]?: string;
-
-  /**
-   * fn name
-   */
-  [1]?: string;
-}
-
-
 export interface Manifest {
   manifestName?: string;
   modulesFiles?: ModuleFile[];
@@ -247,26 +234,15 @@ export interface AppRegistry {
 
 export interface Bundle {
   components: string[];
-  priority?: number;
 }
 
 
 export interface ManifestBundle {
+  bundleId?: string;
   cacheKey?: string;
   moduleFiles: ModuleFile[];
-  compiledModeStyles?: CompiledModeStyles[];
   compiledModuleText?: string;
-  priority?: PRIORITY;
-}
-
-
-export interface CompiledModeStyles {
-  tag?: string;
-  modeName?: string;
-  styleOrder?: number;
-  unscopedStyles?: string;
-  scopedStyles?: string;
-  writeFile?: boolean;
+  compiledModuleLegacyText?: string;
 }
 
 
@@ -327,6 +303,7 @@ export interface BuildConfig {
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   es5Fallback?: boolean;
   namespace?: string;
+  fsNamespace?: string;
   globalScript?: string;
   globalStyle?: string[];
   srcDir?: string;
@@ -405,12 +382,12 @@ export interface CopyTask {
 
 
 export interface RenderOptions {
-  collapseWhitespace?: boolean;
-  inlineStyles?: boolean;
-  inlineAssetsMaxSize?: number;
-  removeUnusedStyles?: boolean;
-  inlineLoaderScript?: boolean;
   canonicalLink?: boolean;
+  collapseWhitespace?: boolean;
+  inlineAssetsMaxSize?: number;
+  inlineLoaderScript?: boolean;
+  inlineStyles?: boolean;
+  removeUnusedStyles?: boolean;
   ssrIds?: boolean;
 }
 
@@ -509,13 +486,10 @@ export interface BuildContext {
   moduleFiles?: ModuleFiles;
   manifestBundles?: ManifestBundle[];
   jsFiles?: FilesMap;
-  cssFiles?: FilesMap;
-  compiledFileCache?: ModuleBundles;
+  compiledFileCache?: FilesMap;
+  rollupCache?: { [cacheKey: string]: any };
   moduleBundleOutputs?: ModuleBundles;
-  styleSassUnscopedOutputs?: ModuleBundles;
-  styleSassScopedOutputs?: ModuleBundles;
-  styleCssUnscopedOutputs?: ModuleBundles;
-  styleCssScopedOutputs?: ModuleBundles;
+  moduleBundleLegacyOutputs?: ModuleBundles;
   filesToWrite?: FilesMap;
   dependentManifests?: {[collectionName: string]: Manifest};
   appFiles?: {
@@ -693,6 +667,8 @@ export interface MemberMeta {
   attribType?: AttributeTypeInfo;
   ctrlId?: string;
   jsdoc?: JSDoc;
+  willChangeMethodNames?: string[];
+  didChangeMethodNames?: string[];
 }
 
 
@@ -705,13 +681,10 @@ export interface ComponentConstructor {
   is?: string;
   properties?: ComponentConstructorProperties;
   events?: ComponentConstructorEvent[];
-  willChange?: PropChangeMeta[];
-  didChange?: PropChangeMeta[];
   host?: any;
   style?: string;
   styleMode?: string;
   encapsulation?: Encapsulation;
-
 }
 
 
@@ -732,9 +705,14 @@ export interface ComponentConstructorProperty {
   mutable?: boolean;
   state?: boolean;
   type?: PropertyType;
+  willChange?: ComponentConstructorPropertyChange[];
+  didChange?: ComponentConstructorPropertyChange[];
 }
 
 export type PropertyType = StringConstructor | BooleanConstructor | NumberConstructor | 'Any';
+
+
+export type ComponentConstructorPropertyChange = string;
 
 
 export interface ComponentConstructorEvent {
@@ -829,8 +807,6 @@ export interface ComponentMeta {
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
-  propsWillChangeMeta?: PropChangeMeta[];
-  propsDidChangeMeta?: PropChangeMeta[];
   hostMeta?: HostMeta;
   encapsulation?: ENCAPSULATION;
   assetsDirsMeta?: AssetsMeta[];
@@ -869,6 +845,8 @@ export interface StyleMeta {
   originalComponentPaths?: string[];
   originalCollectionPaths?: string[];
   styleStr?: string;
+  compiledStyleText?: string;
+  compiledStyleTextScoped?: string;
 }
 
 
@@ -1101,7 +1079,7 @@ export interface PlatformApi {
   isPrerender?: boolean;
   isServer?: boolean;
   loadBundle: (cmpMeta: ComponentMeta, modeName: string, cb: Function) => void;
-  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
+  onAppLoad?: (rootElm: HostElement, styles: string[], failureDiagnostic?: Diagnostic) => void;
   onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   propConnect: (ctrlTag: string) => PropConnect;
   queue: QueueApi;
@@ -1214,7 +1192,6 @@ export interface StencilSystem {
     nodir?: boolean;
   }): Promise<string[]>;
   isGlob?(str: string): boolean;
-  loadConfigFile?(configPath: string): BuildConfig;
   minifyCss?(input: string, opts?: any): {
     output: string;
     sourceMap?: any;
@@ -1240,26 +1217,9 @@ export interface StencilSystem {
   remove?(path: string): Promise<void>;
   rollup?: {
     rollup: {
-      (config: { entry?: any, input?: string; external?: Function; plugins?: any[]; treeshake?: boolean; onwarn?: Function; }): Promise<{
-        imports: any,
-        exports: any,
-        modules: any,
-        generate: {(config: {
-          format?: string;
-          banner?: string;
-          footer?: string;
-          exports?: string;
-          external?: string[];
-          globals?: {[key: string]: any};
-          moduleName?: string;
-          plugins?: any;
-        }): Promise<{
-          code: string;
-          map: any;
-        }>}
-      }>;
+      (config: RollupInputConfig): Promise<RollupBundle>;
     };
-    plugins: { [pluginName: string]: any };
+    plugins: RollupPlugins;
   };
   sass?: {
     render(
@@ -1275,7 +1235,9 @@ export interface StencilSystem {
   };
   semver?: {
     gt: (a: string, b: string, loose?: boolean) => boolean;
+    gte: (a: string, b: string, loose?: boolean) => boolean;
     lt: (a: string, b: string, loose?: boolean) => boolean;
+    lte: (a: string, b: string, loose?: boolean) => boolean;
   };
   typescript?: any;
   url?: {
@@ -1289,6 +1251,45 @@ export interface StencilSystem {
   };
   watch?(paths: string | string[], opts?: any): FSWatcher;
   workbox?: Workbox;
+}
+
+
+export interface RollupInputConfig {
+  entry?: any;
+  input?: string;
+  cache?: any;
+  external?: Function;
+  plugins?: any[];
+  onwarn?: Function;
+}
+
+export interface RollupBundle {
+  generate: {(config: RollupGenerateConfig): Promise<RollupGenerateResults>};
+}
+
+
+export interface RollupGenerateConfig {
+  format: 'es' | 'cjs';
+  intro?: string;
+  outro?: string;
+  banner?: string;
+  footer?: string;
+  exports?: string;
+  external?: string[];
+  globals?: {[key: string]: any};
+  moduleName?: string;
+  strict?: boolean;
+}
+
+
+export interface RollupGenerateResults {
+  code: string;
+  map: any;
+}
+
+
+export interface RollupPlugins {
+  [pluginName: string]: any;
 }
 
 
@@ -1412,8 +1413,6 @@ export interface ComponentData {
   componentClass?: string;
   styles?: StylesData;
   props?: PropData[];
-  propsWillChange?: PropChangeData[];
-  propsDidChange?: PropChangeData[];
   states?: StateData[];
   listeners?: ListenerData[];
   methods?: MethodData[];
@@ -1440,13 +1439,10 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number'|'string'|'any';
+  type?: 'Boolean'|'Number'|'String'|'Any';
   mutable?: boolean;
-}
-
-export interface PropChangeData {
-  name: string;
-  method: string;
+  willChange?: string[];
+  didChange?: string[];
 }
 
 export interface StateData {
