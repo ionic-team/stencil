@@ -19,7 +19,7 @@ import { toDashCase } from '../util/helpers';
 import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
 
-export function createPlatformClientEs5(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
+export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
   const registry: ComponentRegistry = { 'html': {} };
   const bundleCallbacks: BundleCallbacks = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
@@ -150,50 +150,41 @@ export function createPlatformClientEs5(Context: CoreContext, App: AppGlobal, wi
   }
 
 
-  App.loadComponents = function loadComponents(importer) {
-    // https://youtu.be/Z-FPimCmbX8?t=31
-    // jsonp tag team back again from requested bundle
+  App.loadComponents = function loadComponents(importer, bundleId) {
+    try {
+      // requested component constructors are placed on the moduleImports object
+      const moduleImports: CommonJsModuleImports = {};
+      importer(moduleImports);
 
-    // requested component constructors are placed on the moduleImports object
-    const moduleImports: CommonJsModuleImports = {};
-    importer(moduleImports);
-
-    // let's add a reference to the constructors on each components metadata
-    // each key in moduleImports is a PascalCased tag name
-    let bundleIds: string[] = [];
-    Object.keys(moduleImports).forEach(pascalCasedTagName => {
-      const cmpMeta = registry[toDashCase(pascalCasedTagName)];
-      if (cmpMeta) {
-        // connect the component's constructor to its metadata
-        cmpMeta.componentConstructor = moduleImports[pascalCasedTagName];
-
-        if (Array.isArray(cmpMeta.bundleIds)) {
-          bundleIds = bundleIds.concat(cmpMeta.bundleIds);
-        } else {
-          Object.keys(cmpMeta.bundleIds).forEach(key => {
-            bundleIds = bundleIds.concat(cmpMeta.bundleIds[key] as any);
-          });
+      // let's add a reference to the constructors on each components metadata
+      // each key in moduleImports is a PascalCased tag name
+      Object.keys(moduleImports).forEach(pascalCasedTagName => {
+        const cmpMeta = registry[toDashCase(pascalCasedTagName)];
+        if (cmpMeta) {
+          // connect the component's constructor to its metadata
+          cmpMeta.componentConstructor = moduleImports[pascalCasedTagName];
         }
-      }
-    });
+      });
+
+    } catch (e) {
+      console.error(e);
+    }
 
     // fire off all the callbacks waiting on this bundle to load
-    bundleIds.forEach(bundleId => {
-      const callbacks = bundleCallbacks[bundleId];
-      if (callbacks) {
-        for (var i = 0; i < callbacks.length; i++) {
-          try {
-            callbacks[i]();
-          } catch (e) {
-            console.error(e);
-          }
+    const callbacks = bundleCallbacks[bundleId];
+    if (callbacks) {
+      for (var i = 0; i < callbacks.length; i++) {
+        try {
+          callbacks[i]();
+        } catch (e) {
+          console.error(e);
         }
-        bundleCallbacks[bundleId] = null;
       }
+      bundleCallbacks[bundleId] = null;
+    }
 
-      // remember that we've already loaded this bundle
-      loadedBundles[bundleId] = true;
-    });
+    // remember that we've already loaded this bundle
+    loadedBundles[bundleId] = true;
   };
 
 

@@ -1,7 +1,7 @@
 import { Build } from '../../util/build-conditionals';
 import { ComponentInstance, ComponentConstructor, ComponentConstructorProperty, DomApi, HostElement,
-  MembersMeta, PlatformApi, PropChangeMeta } from '../../util/interfaces';
-import { MEMBER_TYPE, PROP_CHANGE } from '../../util/constants';
+  MembersMeta, PlatformApi, ComponentConstructorPropertyChange } from '../../util/interfaces';
+import { MEMBER_TYPE } from '../../util/constants';
 import { noop } from '../../util/helpers';
 import { parsePropertyValue } from '../../util/data-parse';
 import { queueUpdate } from './update';
@@ -58,14 +58,13 @@ export function proxyComponentInstance(plt: PlatformApi, cmpConstructor: Compone
   // define each of the members and initialize what their role is
   const properties = cmpConstructor.properties;
   properties && Object.keys(properties).forEach(memberName => {
-    defineMember(plt, cmpConstructor, properties[memberName], elm, instance, memberName);
+    defineMember(plt, properties[memberName], elm, instance, memberName);
   });
 }
 
 
 export function defineMember(
   plt: PlatformApi,
-  cmpConstructor: ComponentConstructor,
   property: ComponentConstructorProperty,
   elm: HostElement,
   instance: ComponentInstance,
@@ -145,11 +144,11 @@ export function defineMember(
 
     // add watchers to props if they exist
     if (Build.willChange) {
-      proxyPropChangeMethods(cmpConstructor.willChange, PROP_WILL_CHG, elm, instance, memberName);
+      proxyPropChangeMethods(property.willChange, WILL_CHG_PREFIX, elm, instance);
     }
 
     if (Build.didChange) {
-      proxyPropChangeMethods(cmpConstructor.didChange, PROP_DID_CHG, elm, instance, memberName);
+      proxyPropChangeMethods(property.didChange, DID_CHG_PREFIX, elm, instance);
     }
 
   } else if (Build.element && property.elementRef) {
@@ -178,16 +177,16 @@ export function defineMember(
 }
 
 
-export function proxyPropChangeMethods(propChangeMeta: PropChangeMeta[], prefix: string, elm: HostElement, instance: ComponentInstance, memberName: string) {
+export function proxyPropChangeMethods(changeMethodNames: ComponentConstructorPropertyChange[], prefix: string, elm: HostElement, instance: ComponentInstance) {
   // there are prop WILL change methods for this component
-  const propChangeMthd = propChangeMeta && propChangeMeta.find(m => m[PROP_CHANGE.PropName] === memberName);
-
-  if (propChangeMthd) {
-    // cool, we should watch for changes to this property
-    // let's bind their watcher function and add it to our list
-    // of watchers, so any time this property changes we should
-    // also fire off their method
-    elm._values[prefix + memberName] = (instance as any)[propChangeMthd[PROP_CHANGE.MethodName]].bind(instance);
+  if (changeMethodNames) {
+    changeMethodNames.forEach(methodName => {
+      // cool, we should watch for changes to this property
+      // let's bind their watcher function and add it to our list
+      // of watchers, so any time this property changes we should
+      // also fire off their method
+      elm._values[prefix + methodName] = (instance as any)[methodName].bind(instance);
+    });
   }
 }
 
@@ -203,18 +202,18 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
 
-    if (Build.willChange && internalValues[PROP_WILL_CHG + memberName]) {
+    if (Build.willChange && internalValues[WILL_CHG_PREFIX + memberName]) {
       // this instance is watching for when this property WILL change
-      internalValues[PROP_WILL_CHG + memberName](newVal, oldVal);
+      internalValues[WILL_CHG_PREFIX + memberName](newVal, oldVal);
     }
 
     // set our new value!
     // https://youtu.be/dFtLONl4cNc?t=22
     internalValues[memberName] = newVal;
 
-    if (Build.didChange && internalValues[PROP_DID_CHG + memberName]) {
+    if (Build.didChange && internalValues[DID_CHG_PREFIX + memberName]) {
       // this instance is watching for when this property DID change
-      internalValues[PROP_DID_CHG + memberName](newVal, oldVal);
+      internalValues[DID_CHG_PREFIX + memberName](newVal, oldVal);
     }
 
     if (elm._instance && !plt.activeRender) {
@@ -279,5 +278,5 @@ function proxyProp(domApi: DomApi, controllerComponents: { [tag: string]: HostEl
 }
 
 
-const PROP_WILL_CHG = '$$wc';
-const PROP_DID_CHG = '$$dc';
+const WILL_CHG_PREFIX = 'w-';
+const DID_CHG_PREFIX = 'd-';

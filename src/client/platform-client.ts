@@ -156,18 +156,27 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
       // dynamic es module import() => woot!
       __import(url).then(importedModule => {
+        try {
+          // async loading of the module is done
+          if (!cmpMeta.componentConstructor) {
+            // we haven't initialized the component module yet
+            // get the component constructor from the module
+            cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
+          }
 
-        // async loading of the module is done
-        if (!cmpMeta.componentConstructor) {
-          // we haven't initialized the component module yet
-          // get the component constructor from the module
-          cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
-        }
+          if (Build.styles) {
+            // initialize this components styles
+            // it is possible for the same component to have difficult styles applied in the same app
+            initStyleTemplate(domApi, cmpMeta.componentConstructor);
+          }
 
-        if (Build.styles) {
-          // initialize this components styles
-          // it is possible for the same component to have difficult styles applied in the same app
-          initStyleTemplate(domApi, cmpMeta.componentConstructor);
+        } catch (e) {
+          // oh man, something's up
+          console.error(e);
+
+          // provide a bogus component constructor
+          // so the rest of the app acts as normal
+          cmpMeta.componentConstructor = class {} as any;
         }
 
         // bundle all loaded up, let's continue

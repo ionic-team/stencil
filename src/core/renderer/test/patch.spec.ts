@@ -2,7 +2,7 @@ import { h } from '../h';
 import { VNode } from '../vnode';
 import { toVNode } from '../to-vnode';
 import { mockElement, mockDomApi, mockRenderer, mockTextNode } from '../../../testing/mocks';
-import { ENCAPSULATION, SVG_NS } from '../../../util/constants';
+import { SVG_NS } from '../../../util/constants';
 const shuffle = require('knuth-shuffle').knuthShuffle;
 
 
@@ -47,7 +47,7 @@ describe('renderer', () => {
       elm.attachShadow = (opts: any) => {
         shadowOpts = opts;
       };
-      elm = patch(vnode0, h('my-tag', null), true, null, ENCAPSULATION.ShadowDom).elm;
+      elm = patch(vnode0, h('my-tag', null), true, null, 'shadow').elm;
       expect(shadowOpts).toBeUndefined();
     });
 
@@ -65,7 +65,7 @@ describe('renderer', () => {
         elm.shadowRoot = mockElement('shadowRoot');
         return elm;
       };
-      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ShadowDom).elm;
+      elm = patch(vnode0, h('my-tag', null), false, null, 'shadow').elm;
       expect(elm.shadowRoot).toBeDefined();
       expect(shadowOpts).toBeDefined();
       expect(shadowOpts.mode).toBe('open');
@@ -143,7 +143,7 @@ describe('renderer', () => {
       elm.attachShadow = () => {
         return elm;
       };
-      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ShadowDom).elm;
+      elm = patch(vnode0, h('my-tag', null), false, null, 'shadow').elm;
       expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
     });
 
@@ -151,7 +151,7 @@ describe('renderer', () => {
       elm = mockElement('my-tag');
       vnode0 = new VNode();
       vnode0.elm = elm;
-      elm = patch(vnode0, h('my-tag', null, h('div', null)), false, null, ENCAPSULATION.ScopedCss).elm;
+      elm = patch(vnode0, h('my-tag', null, h('div', null)), false, null, 'scoped').elm;
       expect(elm.firstChild.hasAttribute('data-my-tag')).toBe(true);
     });
 
@@ -159,7 +159,7 @@ describe('renderer', () => {
       elm = mockElement('my-tag');
       vnode0 = new VNode();
       vnode0.elm = elm;
-      elm = patch(vnode0, h('my-tag', null), false, null, ENCAPSULATION.ScopedCss).elm;
+      elm = patch(vnode0, h('my-tag', null), false, null, 'scoped').elm;
       expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
     });
 
