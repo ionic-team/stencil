@@ -20,12 +20,11 @@ export default function upgradeFromMetadata(config: BuildConfig, manifestBundles
     }
 
     const moduleFile = manifestBundle.moduleFiles.find(m => m.cmpMeta && normalizePath(m.jsFilePath) === tsFilePath);
-    const cmpMeta = moduleFile.cmpMeta;
 
     if (moduleFile) {
-      tsSourceFile = upgradeModuleFile(tsSourceFile, cmpMeta);
-      tsSourceFile = upgradeExport(tsSourceFile, cmpMeta);
-      tsSourceFile = upgradeBundleExports(config, tsSourceFile, manifestBundle, cmpMeta.tagNameMeta);
+      tsSourceFile = upgradeModuleFile(config, tsSourceFile, moduleFile.cmpMeta);
+      tsSourceFile = upgradeExport(tsSourceFile, moduleFile.cmpMeta);
+      tsSourceFile = upgradeBundleExports(config, tsSourceFile, manifestBundle, moduleFile.cmpMeta.tagNameMeta);
     }
 
     return tsSourceFile;
@@ -33,8 +32,8 @@ export default function upgradeFromMetadata(config: BuildConfig, manifestBundles
 }
 
 
-function upgradeModuleFile(tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
-  const staticMembers = addStaticMeta(cmpMeta);
+function upgradeModuleFile(config: BuildConfig, tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
+  const staticMembers = addStaticMeta(config, cmpMeta);
 
   const newStatements: any = Object.keys(staticMembers).map(memberName => {
     return ts.createBinary(

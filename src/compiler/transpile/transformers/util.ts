@@ -1,23 +1,8 @@
-import { StyleMeta } from '../../../util/interfaces';
-import * as ts from 'typescript';
-import * as path from 'path';
-import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
 import { dashToPascalCase } from '../../../util/helpers';
+import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
+import { StyleMeta, BuildConfig } from '../../../util/interfaces';
+import * as ts from 'typescript';
 
-
-export function updateComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaration {
-  return ts.createClassDeclaration(
-      undefined!, // <-- that's what's removing the decorator
-
-      // Make the component the default export
-      [ts.createToken(ts.SyntaxKind.ExportKeyword)],
-
-      // everything else should be the same
-      classNode.name!,
-      classNode.typeParameters!,
-      classNode.heritageClauses!,
-      classNode.members);
-}
 
 /**
  * Check if class has component decorator
@@ -187,9 +172,9 @@ export function transformSourceFile(sourceText: string, transformers: ts.CustomT
   }).outputText;
 }
 
-export function createImportNameFromUrl(importUrl: string) {
-  const ext = path.extname(importUrl);
-  const baseName = path.basename(importUrl, ext);
+export function createImportNameFromUrl(config: BuildConfig, importUrl: string) {
+  const ext = config.sys.path.extname(importUrl);
+  const baseName = config.sys.path.basename(importUrl, ext);
 
   return dashToPascalCase(baseName);
 }
@@ -199,9 +184,9 @@ export interface StyleImport {
   absolutePath: string;
 }
 
-export function getImportNameMapFromStyleMeta(styleMeta: StyleMeta): StyleImport[] {
+export function getImportNameMapFromStyleMeta(config: BuildConfig, styleMeta: StyleMeta): StyleImport[] {
   return styleMeta.absolutePaths.map((ocp) => {
-    const importName = createImportNameFromUrl(ocp) + 'Css';
+    const importName = createImportNameFromUrl(config, ocp) + 'Css';
     return {
       importName,
       absolutePath: ocp,

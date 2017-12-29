@@ -1,17 +1,17 @@
+import { BuildConfig, ComponentMeta, ModuleFiles } from '../../../util/interfaces';
 import { convertValueToLiteral, getImportNameMapFromStyleMeta, StyleImport } from './util';
-import { ComponentMeta, ModuleFiles } from '../../../util/interfaces';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getStylePlaceholder, getStyleIdPlaceholder } from '../../../util/data-serialize';
 import { formatComponentConstructorEvents, formatComponentConstructorProperties } from '../../../util/data-serialize';
 import * as ts from 'typescript';
 
 
-export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
+export default function addComponentMetadata(config: BuildConfig, moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
-      const staticMembers = addStaticMeta(cmpMeta);
+      const staticMembers = addStaticMeta(config, cmpMeta);
 
       const newMembers = Object.keys(staticMembers).map(memberName => {
         return createGetter(memberName, (staticMembers as any)[memberName]);
@@ -50,7 +50,7 @@ export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.Trans
 }
 
 
-export function addStaticMeta(cmpMeta: ComponentMeta) {
+export function addStaticMeta(config: BuildConfig, cmpMeta: ComponentMeta) {
   const staticMembers: ConstructorComponentMeta = {};
 
   staticMembers.is = convertValueToLiteral(cmpMeta.tagNameMeta);
@@ -79,7 +79,7 @@ export function addStaticMeta(cmpMeta: ComponentMeta) {
   if (cmpMeta.stylesMeta && Object.keys(cmpMeta.stylesMeta).length > 0) {
     const stylesMeta = Object.keys(cmpMeta.stylesMeta)
       .reduce((all, smn) => {
-        return all.concat(getImportNameMapFromStyleMeta(cmpMeta.stylesMeta[smn]));
+        return all.concat(getImportNameMapFromStyleMeta(config, cmpMeta.stylesMeta[smn]));
       }, [] as StyleImport[])
       .map(obj => obj.importName);
 
