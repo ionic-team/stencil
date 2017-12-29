@@ -1,7 +1,6 @@
-import { BuildConfig, Diagnostic, Logger } from '../../util/interfaces';
+import { BuildConfig, Diagnostic } from '../util/interfaces';
 import { isAbsolute, join } from 'path';
-import { normalizePath } from '../../compiler/util';
-import { writeFile } from 'fs';
+import { normalizePath } from '../compiler/util';
 
 
 export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
@@ -76,60 +75,6 @@ export function getConfigFilePath(process: NodeJS.Process, configArg: string) {
 }
 
 
-
-export function help(process: NodeJS.Process, logger: Logger) {
-  var p = logger.dim((process.platform === 'win32') ? '>' : '$');
-
-  console.log(`
-  ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}
-
-    ${p} ${logger.green('stencil build [--dev] [--watch] [--prerender] [--debug]')}
-
-      ${logger.green('--dev')} ${logger.dim('..................')} Execute a development build.
-      ${logger.green('--watch')} ${logger.dim('................')} Execute a build in watch mode.
-      ${logger.green('--prerender')} ${logger.dim('............')} Prerender URLs.
-      ${logger.green('--debug')} ${logger.dim('................')} Set the log level to debug.
-      ${logger.green('--config')} ${logger.dim('...............')} Stencil config file.
-      ${logger.green('--docs')} ${logger.dim('.................')} Generate readme.md docs for each component
-
-  ${logger.bold('Examples:')}
-
-    ${p} ${logger.green('stencil build --dev --watch')}
-    ${p} ${logger.green('stencil build --prerender')}
-    ${p} ${logger.green('stencil init')}
-
-`);
-}
-
-
-export function init(process: NodeJS.Process) {
-  var configPath = join(process.cwd(), 'stencil.config.js');
-
-  writeFile(configPath, DEFAULT_CONFIG, (err) => {
-    if (err) {
-      console.error(err);
-
-    } else {
-      console.log(`Created ${configPath}`);
-    }
-  });
-}
-
-
-var DEFAULT_CONFIG = `
-exports.config = {
-  namespace: 'App',
-  bundles: [],
-  collections: []
-};
-
-exports.devServer = {
-  root: 'www',
-  watchGlob: '**/**'
-};
-`;
-
-
 export function parseArgv(process: NodeJS.Process) {
   const minimist = require('minimist');
   const cmdArgs = getCmdArgs(process);
@@ -199,11 +144,6 @@ function getCmdArgs(process: NodeJS.Process) {
   return cmdArgs;
 }
 
-
-export function isValidNodeVersion(minNodeVersion: number, currentVersion: string) {
-  const versionMatch = currentVersion.match(/(\d+).(\d+)/);
-  return (versionMatch && parseFloat(versionMatch[0]) >= minNodeVersion);
-}
 
 export function hasError(diagnostics: Diagnostic[]): boolean {
   if (!diagnostics) {

@@ -1,5 +1,15 @@
 #!/usr/bin/env node
 'use strict';
 
-var cli = require('./index');
-cli.run(process, 6.11);
+process.title = 'stencil';
+
+var path = require('path');
+var cli = require(path.join(__dirname, '../cli/index.js'));
+var compiler = require(path.join(__dirname, '../compiler/index.js'));
+var nodeSys = require(path.join(__dirname, '../sys/node/index.js'));
+
+var sys = new nodeSys.NodeSystem();
+var logger = new nodeSys.NodeLogger();
+var minNodeVersion = '6.11.0';
+
+cli.run(process, sys, logger, compiler, minNodeVersion);

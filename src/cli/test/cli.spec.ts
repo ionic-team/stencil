@@ -1,8 +1,8 @@
-import { BuildConfig } from '../../../util/interfaces';
+import { BuildConfig } from '../../util/interfaces';
 import { getConfigFilePath, parseArgv, overrideConfigFromArgv, CliArgv } from '../cli-utils';
-import { mockStencilSystem } from '../../../testing/mocks';
+import { mockStencilSystem } from '../../testing/mocks';
 import { run } from '../index';
-import { validateBuildConfig } from '../../../util/validate-config';
+import { validateBuildConfig } from '../../util/validate-config';
 
 
 describe('cli', () => {
@@ -201,7 +201,7 @@ describe('cli', () => {
 
 
   it('should error when min node version not met', () => {
-    run(process, 46.0, logger);
+    run(process, config.sys, logger, {}, '99.99.99');
     expect(error).toContain('Please update to the latest Node LTS version');
     expect(exitCode).toBe(1);
   });

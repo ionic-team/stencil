@@ -1,7 +1,7 @@
 import { AppGlobal, CoreContext } from '../util/interfaces';
 import { Build } from '../util/build-conditionals';
 import { createPlatformClient } from './platform-client';
-import { createPlatformClientEs5 } from './platform-client-es5';
+import { createPlatformClientLegacy } from './platform-client-legacy';
 
 
 declare const appNamespace: string;
@@ -14,7 +14,7 @@ const App: AppGlobal = (<any>window)[appNamespace] = (<any>window)[appNamespace]
 
 
 if (Build.es5) {
-  const plt = createPlatformClientEs5(Context, App, window, document, publicPath, hydratedCssClass);
+  const plt = createPlatformClientLegacy(Context, App, window, document, publicPath, hydratedCssClass);
 
   plt.registerComponents(App.components).forEach(cmpMeta => {
     // es5 way of extending HTMLElement
