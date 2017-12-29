@@ -15,3 +15,8 @@ node_modules/
 
 **/dist/
 **/www/build/
+
+# local npm link dev files
+/compiler.js
+/server.js
+/testing.js

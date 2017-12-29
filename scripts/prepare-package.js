@@ -40,11 +40,18 @@ fs.writeJsonSync(DST_PACKAGE_JSON, dstPackageJson);
 
 // copy the license
 const SRC_LICENSE = path.join(__dirname, '../LICENSE');
-const DIST_LICENSE = path.join(DST_DIR, 'LICENSE');
-fs.copySync(SRC_LICENSE, DIST_LICENSE);
+const DST_LICENSE = path.join(DST_DIR, 'LICENSE');
+fs.copySync(SRC_LICENSE, DST_LICENSE);
 
 
 // copy the readme
 const SRC_README = path.join(__dirname, '../readme.md');
-const DIST_README = path.join(DST_DIR, 'readme.md');
-fs.copySync(SRC_README, DIST_README);
+const DST_README = path.join(DST_DIR, 'readme.md');
+fs.copySync(SRC_README, DST_README);
+
+
+// copy the npm link files for
+// local npm link development
+const SRC_NPM_LINK = path.join(__dirname, './npm-link');
+const ROOT_DIR = path.join(__dirname, '../');
+fs.copySync(SRC_NPM_LINK, ROOT_DIR);

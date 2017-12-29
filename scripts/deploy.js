@@ -169,10 +169,6 @@ function runTasks(opts) {
       {
         title: 'Prepare "dist" @stencil/core package',
         task: () => execa('npm', ['run', 'prepare.package'], { cwd: scriptsDir })
-      },
-      {
-        title: 'Build "dist" @stencil/core local dependencies',
-        task: () => execa('npm', ['run', 'build.deps'], { cwd: scriptsDir })
       }
     );
   }
