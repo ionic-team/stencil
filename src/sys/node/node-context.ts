@@ -1,4 +1,4 @@
-import { BuildContext } from '../interfaces';
+import { BuildContext } from '../../util/interfaces';
 
 
 export function createContext(ctx: BuildContext, wwwDir: string, sandbox: any) {
@@ -16,17 +16,18 @@ export function createContext(ctx: BuildContext, wwwDir: string, sandbox: any) {
 function patchFetch(ctx: BuildContext, wwwDir: string, sandbox: any) {
 
   function fetch(input: any, init: any) {
-    var nodeFetch = require('node-fetch');
+    var path = require('path');
+    var nf = require(path.join(__dirname, './node-fetch.js'));
     createServer(ctx, wwwDir);
 
     if (typeof input === 'string') {
       // fetch(url)
-      return nodeFetch(normalizeUrl(input), init);
+      return nf.nodeFetch(normalizeUrl(input), init);
 
     } else {
       // fetch(Request)
       input.url = normalizeUrl(input.url);
-      return nodeFetch(input, init);
+      return nf.nodeFetch(input, init);
     }
   }
 

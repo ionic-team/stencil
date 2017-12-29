@@ -1,4 +1,4 @@
-import { Diagnostic } from '../interfaces';
+import { Diagnostic } from '../../util/interfaces';
 
 
 export function createDom() {
