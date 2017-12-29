@@ -17,6 +17,7 @@ describe('component decorator', () => {
     // DEFAULT_COMPILER_OPTIONS.module = ts.ModuleKind.CommonJS;
     const results = transpileModule(config, DEFAULT_COMPILER_OPTIONS, filePath, ts.sys.readFile(filePath, 'utf8'));
     expect(typeof results.code).toBe('string');
-    expect(Object.keys(results.cmpMeta).length).toEqual(12);
+    expect(Object.keys(results.cmpMeta).length).toEqual(10);
   });
+
 });

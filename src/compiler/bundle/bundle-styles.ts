@@ -1,5 +1,6 @@
 import { BuildContext, BuildConfig, ManifestBundle, ModuleFile } from '../../util/interfaces';
 import { catchError, hasError } from '../util';
+import { ENCAPSULATION } from '../../util/constants';
 import { generateComponentStyles } from './component-styles';
 
 
@@ -18,7 +19,7 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
   // go through each bundle the user wants created
   // and create css files for each mode for each bundle
   return Promise.all(manifestBundles.map(manifestBundle => {
-    return generateBundleComponentStyles(config, ctx, manifestBundle);
+    return bundleComponentStyles(config, ctx, manifestBundle);
 
   }))
   .catch(err => {
@@ -31,23 +32,17 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
 }
 
 
-function generateBundleComponentStyles(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
-  const bundleModes = getManifestBundleModes(manifestBundle.moduleFiles);
-
-  const promises = manifestBundle. moduleFiles.filter(m => m.cmpMeta).map(moduleFile => {
-    return generateComponentStyles(config, ctx, moduleFile, bundleModes).then(compiledModeStyles => {
-      manifestBundle.compiledModeStyles.push(...compiledModeStyles);
-    });
-  });
-
-  return Promise.all(promises);
+function bundleComponentStyles(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
+  return Promise.all(manifestBundle.moduleFiles.filter(m => m.cmpMeta).map(moduleFile => {
+    return generateComponentStyles(config, ctx, moduleFile);
+  }));
 }
 
 
 export function getManifestBundleModes(bundleModuleFiles: ModuleFile[]) {
   const allBundleModes: string[] = [];
 
-  bundleModuleFiles.filter(m => m.cmpMeta && m.cmpMeta.stylesMeta && Object.keys(m.cmpMeta.stylesMeta).length).forEach(moduleFile => {
+  bundleModuleFiles.filter(m => m.cmpMeta && m.cmpMeta.stylesMeta).forEach(moduleFile => {
     Object.keys(moduleFile.cmpMeta.stylesMeta).forEach(styleModeName => {
       if (!allBundleModes.includes(styleModeName)) {
         allBundleModes.push(styleModeName);
@@ -58,3 +53,14 @@ export function getManifestBundleModes(bundleModuleFiles: ModuleFile[]) {
   return allBundleModes.sort();
 }
 
+
+export function componentRequiresScopedStyles(encapsulation: ENCAPSULATION) {
+  return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
+}
+
+
+export function bundleRequiresScopedStyles(moduleFiles: ModuleFile[]) {
+  return moduleFiles
+          .filter(m => m.cmpMeta && m.cmpMeta.stylesMeta)
+          .some(m => componentRequiresScopedStyles(m.cmpMeta.encapsulation));
+}

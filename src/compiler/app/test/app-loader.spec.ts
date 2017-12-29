@@ -74,6 +74,7 @@ describe('build-project-files', () => {
   }): string {
     let p = params || {};
     config.namespace = 'MyApp';
+    config.fsNamespace = config.namespace.toLowerCase();
     config.publicPath = 'build/';
     return injectAppIntoLoader(
       config,
@@ -91,6 +92,7 @@ describe('build-project-files', () => {
     componentRegistry?: Array<LoadComponentRegistry>
   }) {
     config.namespace = 'MyApp';
+    config.fsNamespace = config.namespace.toLowerCase();
     config.publicPath = 'build/';
 
     let ctx: BuildContext = { appFiles: {} };

@@ -2,11 +2,12 @@ import { BuildConfig, BuildContext, Bundle, Diagnostic, ManifestBundle, ModuleFi
 import { buildError, catchError, hasError } from '../util';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
-import { ENCAPSULATION, PRIORITY } from '../../util/constants';
+import { ENCAPSULATION } from '../../util/constants';
 import { generateBundles } from './generate-bundles';
+import { upgradeDependentComponents } from '../upgrade-dependents/index';
 
 
-export function bundle(config: BuildConfig, ctx: BuildContext) {
+export async function bundle(config: BuildConfig, ctx: BuildContext) {
   if (hasError(ctx.diagnostics)) {
     return Promise.resolve();
   }
@@ -19,29 +20,38 @@ export function bundle(config: BuildConfig, ctx: BuildContext) {
     config.logger.debug(`bundle, distDir: ${config.distDir}`);
   }
 
-  ctx.manifestBundles = getManifestBundles(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
+  const timeSpan = config.logger.createTimeSpan(`bundle started`, true);
 
-  ctx.manifestBundles = validateBundleModules(ctx.manifestBundles);
+  try {
+    // get all of the manifest bundles
+    ctx.manifestBundles = getManifestBundles(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
 
-  ctx.manifestBundles = sortBundles(ctx.manifestBundles);
+    // check they're good to go
+    ctx.manifestBundles = validateBundleModules(ctx.manifestBundles);
+
+    // always consistently sort them
+    ctx.manifestBundles = sortBundles(ctx.manifestBundles);
+
+    // Look at all dependent components from outside collections and
+    // upgrade the components to be compatible with this version if need be
+    await upgradeDependentComponents(config, ctx, ctx.manifestBundles);
 
   // kick off style and module bundling at the same time
-  return Promise.all([
-    bundleStyles(config, ctx, ctx.manifestBundles),
-    bundleModules(config, ctx, ctx.manifestBundles)
+    await Promise.all([
+      bundleStyles(config, ctx, ctx.manifestBundles),
+      bundleModules(config, ctx, ctx.manifestBundles)
+    ]);
 
-  ]).then(() => {
     // both styles and modules are done bundling
-    // generate the actual files to write
-    generateBundles(config, ctx, ctx.manifestBundles, 'es2015');
+    // inject the styles into the modules and
+    // generate each of the output bundles
+    generateBundles(config, ctx, ctx.manifestBundles);
 
-    if (config.es5Fallback) {
-      generateBundles(config, ctx, ctx.manifestBundles, 'es5');
-    }
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
 
-  }).catch(err => {
-    catchError(ctx.diagnostics, err);
-  });
+  timeSpan.finish(`bundle finished`);
 }
 
 
@@ -49,7 +59,7 @@ export function getManifestBundles(moduleFiles: ModuleFile[], bundles: Bundle[],
   const manifestBundles: ManifestBundle[] = [];
 
   bundles.filter(b => b.components && b.components.length).forEach(bundle => {
-    const manifestBundle = createManifestBundle([], bundle.priority);
+    const manifestBundle = createManifestBundle([]);
 
     bundle.components.forEach(tag => {
       const cmpMeta = moduleFiles.find(modulesFile => modulesFile.cmpMeta.tagNameMeta === tag);
@@ -136,13 +146,13 @@ export function validateManifestBundle(validatedBundles: ManifestBundle[], manif
     validatedBundles.push(manifestBundle);
   }
   if (scopedCss.length) {
-    validatedBundles.push(createManifestBundle(scopedCss, manifestBundle.priority));
+    validatedBundles.push(createManifestBundle(scopedCss));
   }
   if (shadowCss.length) {
-    validatedBundles.push(createManifestBundle(shadowCss, manifestBundle.priority));
+    validatedBundles.push(createManifestBundle(shadowCss));
   }
   if (plainCss.length) {
-    validatedBundles.push(createManifestBundle(plainCss, manifestBundle.priority));
+    validatedBundles.push(createManifestBundle(plainCss));
   }
 }
 
@@ -167,12 +177,10 @@ export function findPrimaryEncapsulation(moduleFiles: ModuleFile[]) {
 }
 
 
-function createManifestBundle(moduleFiles: ModuleFile[], priority: PRIORITY) {
+function createManifestBundle(moduleFiles: ModuleFile[]) {
   const manifestBundle: ManifestBundle = {
     moduleFiles: moduleFiles,
-    compiledModeStyles: [],
-    compiledModuleText: '',
-    priority: priority
+    compiledModuleText: ''
   };
   return manifestBundle;
 }

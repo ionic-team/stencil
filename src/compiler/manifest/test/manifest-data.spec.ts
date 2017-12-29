@@ -1,6 +1,6 @@
 import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../testing/mocks';
-import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal, serializeAppManifest } from '../manifest-data';
+import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal, serializeAppManifest, parseWillChangeDeprecated, parseDidChangeDeprecated } from '../manifest-data';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
 
 
@@ -201,37 +201,41 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('propsDidChange', () => {
-    a.propsDidChangeMeta = [
-      ['nameA', 'methodA'],
-      ['nameB', 'methodB']
-    ];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.propsDidChange[0].name).toBe('nameA');
-    expect(cmpData.propsDidChange[0].method).toBe('methodA');
-    expect(cmpData.propsDidChange[1].name).toBe('nameB');
-    expect(cmpData.propsDidChange[1].method).toBe('methodB');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.propsDidChangeMeta[0][0]).toBe('nameA');
-    expect(b.cmpMeta.propsDidChangeMeta[0][1]).toBe('methodA');
-    expect(b.cmpMeta.propsDidChangeMeta[1][0]).toBe('nameB');
-    expect(b.cmpMeta.propsDidChangeMeta[1][1]).toBe('methodB');
+    const cmpData: any = {
+      propsDidChange: [
+        {
+          name: 'nameA',
+          method: 'methodA'
+        },
+        {
+          name: 'nameB',
+          method: 'methodB'
+        }
+      ]
+    };
+    const cmpMeta: ComponentMeta = {};
+    parseDidChangeDeprecated(cmpData, cmpMeta);
+    expect(cmpMeta.membersMeta.nameA.didChangeMethodNames[0]).toBe('methodA');
+    expect(cmpMeta.membersMeta.nameB.didChangeMethodNames[0]).toBe('methodB');
   });
 
   it('propsWillChange', () => {
-    a.propsWillChangeMeta = [
-      ['nameA', 'methodA'],
-      ['nameB', 'methodB']
-    ];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.propsWillChange[0].name).toBe('nameA');
-    expect(cmpData.propsWillChange[0].method).toBe('methodA');
-    expect(cmpData.propsWillChange[1].name).toBe('nameB');
-    expect(cmpData.propsWillChange[1].method).toBe('methodB');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.propsWillChangeMeta[0][0]).toBe('nameA');
-    expect(b.cmpMeta.propsWillChangeMeta[0][1]).toBe('methodA');
-    expect(b.cmpMeta.propsWillChangeMeta[1][0]).toBe('nameB');
-    expect(b.cmpMeta.propsWillChangeMeta[1][1]).toBe('methodB');
+    const cmpData: any = {
+      propsWillChange: [
+        {
+          name: 'nameA',
+          method: 'methodA'
+        },
+        {
+          name: 'nameB',
+          method: 'methodB'
+        }
+      ]
+    };
+    const cmpMeta: ComponentMeta = {};
+    parseWillChangeDeprecated(cmpData, cmpMeta);
+    expect(cmpMeta.membersMeta.nameA.willChangeMethodNames[0]).toBe('methodA');
+    expect(cmpMeta.membersMeta.nameB.willChangeMethodNames[0]).toBe('methodB');
   });
 
   it('membersMeta el', () => {

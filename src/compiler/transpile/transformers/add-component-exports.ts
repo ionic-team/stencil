@@ -56,7 +56,7 @@ function removeComponentExport(classNode: ts.ClassDeclaration) {
 }
 
 
-function addComponentExport(tsSourceFile: ts.SourceFile, componentClassName: string, tagName: string) {
+export function addComponentExport(tsSourceFile: ts.SourceFile, componentClassName: string, tagName: string) {
   const componentName = ts.createIdentifier(componentClassName);
   const exportAsName = ts.createIdentifier(dashToPascalCase(tagName));
 
@@ -74,10 +74,18 @@ function addComponentExport(tsSourceFile: ts.SourceFile, componentClassName: str
 
 
 function addBundleExports(config: BuildConfig, tsSourceFile: ts.SourceFile, tagName: string) {
-  const containingBundle = getContainingBundle(config, tagName);
+  const containingBundle = config.bundles.find(b => Array.isArray(b.components) && b.components.indexOf(tagName) > -1);
+  if (!containingBundle) {
+    return tsSourceFile;
+  }
 
-  if (containingBundle && containingBundle.components.length > 1) {
-    containingBundle.components.filter(t => t !== tagName).forEach(tagName => {
+  return addBundleExportsFromTags(tsSourceFile, containingBundle.components, tagName);
+}
+
+
+export function addBundleExportsFromTags(tsSourceFile: ts.SourceFile, bundleTagNames: string[], tagName: string) {
+  if (bundleTagNames && bundleTagNames.length > 1) {
+    bundleTagNames.filter(t => t !== tagName).forEach(tagName => {
       const pascalCaseComponentName = ts.createIdentifier(dashToPascalCase(tagName));
 
       tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [
@@ -95,12 +103,4 @@ function addBundleExports(config: BuildConfig, tsSourceFile: ts.SourceFile, tagN
   }
 
   return tsSourceFile;
-}
-
-
-function getContainingBundle(config: BuildConfig, tagName: string) {
-  if (Array.isArray(config.bundles)) {
-    return config.bundles.find(b => Array.isArray(b.components) && b.components.indexOf(tagName) > -1);
-  }
-  return null;
 }

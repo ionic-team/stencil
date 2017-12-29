@@ -3,14 +3,14 @@ import { catchError } from '../util';
 import { createRenderer } from '../../server/index';
 
 
-export function prerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
+export async function prerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
   const timeSpan = config.logger.createTimeSpan(`prerender, started: ${prerenderLocation.pathname}`);
 
   const results: HydrateResults = {
     diagnostics: []
   };
 
-  return Promise.resolve().then(() => {
+  try {
     // create the renderer config
     const rendererConfig = Object.assign({}, config);
 
@@ -31,30 +31,30 @@ export function prerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtm
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
-    return renderer.hydrateToString(hydrateOpts).then(hydratedResults => {
-      // hydrating to string is done!!
-      // let's use this updated html for the index content now
-      Object.assign(results, hydratedResults);
+    const hydratedResults = await renderer.hydrateToString(hydrateOpts);
 
-      const url = config.sys.url.parse(hydratedResults.url);
+    // hydrating to string is done!!
+    // let's use this updated html for the index content now
+    Object.assign(results, hydratedResults);
 
-      ctx.prerenderResults.push({
-        url: hydratedResults.url,
-        hostname: url.hostname,
-        path: url.path,
-        components: hydratedResults.components,
-        styleUrls: hydratedResults.styleUrls,
-        scriptUrls: hydratedResults.scriptUrls,
-        imgUrls: hydratedResults.imgUrls
-      });
+    const url = config.sys.url.parse(hydratedResults.url);
+
+    ctx.prerenderResults.push({
+      url: hydratedResults.url,
+      hostname: url.hostname,
+      path: url.path,
+      components: hydratedResults.components,
+      styleUrls: hydratedResults.styleUrls,
+      scriptUrls: hydratedResults.scriptUrls,
+      imgUrls: hydratedResults.imgUrls
     });
 
-  }).catch(err => {
+  } catch (e) {
     // ahh man! what happened!
-    catchError(ctx.diagnostics, err);
+    catchError(ctx.diagnostics, e);
+  }
 
-  }).then(() => {
-    timeSpan.finish(`prerender, finished: ${prerenderLocation.pathname}`);
-    return results;
-  });
+  timeSpan.finish(`prerender, finished: ${prerenderLocation.pathname}`);
+
+  return results;
 }

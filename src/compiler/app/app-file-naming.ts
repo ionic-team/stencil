@@ -3,44 +3,43 @@ import { GLOBAL_NAME } from '../../util/constants';
 import { pathJoin } from '../util';
 
 
-export function getAppFileName(config: BuildConfig) {
-  return config.namespace.toLowerCase();
-}
-
-
 export function getAppWWWBuildDir(config: BuildConfig) {
-  const appFileName = getAppFileName(config);
-  return pathJoin(config, config.buildDir, appFileName);
+  return pathJoin(config, config.buildDir, config.fsNamespace);
 }
 
 
 export function getAppDistDir(config: BuildConfig) {
-  const appFileName = getAppFileName(config);
-  return pathJoin(config, config.distDir, appFileName);
+  return pathJoin(config, config.distDir, config.fsNamespace);
 }
 
 
 export function getRegistryJsonWWW(config: BuildConfig) {
-  const appFileName = getAppFileName(config);
-  return pathJoin(config, getAppWWWBuildDir(config), `${appFileName}.registry.json`);
+  return pathJoin(config, getAppWWWBuildDir(config), `${config.fsNamespace}.registry.json`);
 }
 
 
 export function getRegistryJsonDist(config: BuildConfig) {
-  const appFileName = getAppFileName(config);
-  return pathJoin(config, config.distDir, `${appFileName}.registry.json`);
+  return pathJoin(config, config.distDir, `${config.fsNamespace}.registry.json`);
 }
 
 
 export function getLoaderFileName(config: BuildConfig) {
-  const appFileName = getAppFileName(config);
-  return `${appFileName}.js`;
+  return `${config.fsNamespace}.js`;
+}
+
+
+export function getLoaderWWW(config: BuildConfig) {
+  return pathJoin(config, config.buildDir, getLoaderFileName(config));
+}
+
+
+export function getLoaderDist(config: BuildConfig) {
+  return pathJoin(config, config.distDir, getLoaderFileName(config));
 }
 
 
 export function getGlobalFileName(config: BuildConfig) {
-  const appFileName = getAppFileName(config);
-  return `${appFileName}.${GLOBAL_NAME}.js`;
+  return `${config.fsNamespace}.${GLOBAL_NAME}.js`;
 }
 
 
@@ -55,29 +54,27 @@ export function getGlobalDist(config: BuildConfig) {
 
 
 export function getCoreFilename(config: BuildConfig, coreId: string, jsContent: string) {
-  const appFileName = getAppFileName(config);
   if (config.hashFileNames) {
     // prod mode renames the core file with its hashed content
     const contentHash = config.sys.generateContentHash(jsContent, config.hashedFileNameLength);
-    return `${appFileName}.${contentHash}.js`;
+    return `${config.fsNamespace}.${contentHash}.js`;
   }
 
   // dev file name
-  return `${appFileName}.${coreId}.js`;
+  return `${config.fsNamespace}.${coreId}.js`;
 }
 
 
 export function getGlobalStyleFilename(config: BuildConfig) {
-  const appFileName = getAppFileName(config);
-  return `${appFileName}.css`;
+  return `${config.fsNamespace}.css`;
 }
 
 
-export function getBundleFileName(bundleId: string, scoped: boolean) {
-  return `${bundleId}${scoped ? '.sc' : ''}.js`;
+export function getBundleFilename(bundleId: string) {
+  return `${bundleId}.js`;
 }
 
 
 export function getAppPublicPath(config: BuildConfig) {
-  return pathJoin(config, config.publicPath, getAppFileName(config)) + '/';
+  return pathJoin(config, config.publicPath, config.fsNamespace) + '/';
 }

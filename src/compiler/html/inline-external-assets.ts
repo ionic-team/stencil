@@ -41,27 +41,57 @@ function inlineScript(config: BuildConfig, ctx: BuildContext, opts: HydrateOptio
 
 
 function getAssetContent(config: BuildConfig, ctx: BuildContext, opts: HydrateOptions, assetUrl: string) {
+  // figure out the url's so we can check the hostnames
   const fromUrl = config.sys.url.parse(opts.url);
   const toUrl = config.sys.url.parse(assetUrl);
 
   if (fromUrl.hostname !== toUrl.hostname) {
+    // not the same hostname, so we wouldn't have the file content
     return null;
   }
 
+  // figure out the local file path
   const filePath = getFilePathFromUrl(config, fromUrl, toUrl);
 
-  const toWriteContent = ctx.filesToWrite[filePath];
-  if (!toWriteContent) {
+  // first see if we already have cached file text
+  // this would happen if it's being prerendered
+  let content = ctx.filesToWrite[filePath];
+
+  if (!content) {
+    // doesn't look like we've got a copy cached to be written
+    // check if we cached it in our appFiles object
+    content = ctx.appFiles[filePath];
+  }
+
+  if (!content) {
+    // doesn't look like we've got it cached in app files
+    try {
+      // try looking it up directly
+      content = config.sys.fs.readFileSync(filePath, 'utf-8');
+
+      // cool we found it, cache it for later
+      ctx.appFiles[filePath] = content;
+
+    } catch (e) {
+      // something is up, don't bother trying to inline the content
+      config.logger.debug(`getAssetContent error`, e);
+    }
+  }
+
+  if (!content) {
+    // never found the content for this file
     return null;
   }
 
-  const fileSize = toWriteContent.length;
+  // rough estimate of size
+  const fileSize = content.length;
 
   if (fileSize > opts.inlineAssetsMaxSize) {
+    // welp, considered too big, don't inline
     return null;
   }
 
-  return toWriteContent;
+  return content;
 }
 
 

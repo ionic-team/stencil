@@ -29,8 +29,9 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
     memberNames.forEach(memberName => {
-      const memberType = cmpMeta.membersMeta[memberName].memberType;
-      const propType = cmpMeta.membersMeta[memberName].propType;
+      const memberMeta = cmpMeta.membersMeta[memberName];
+      const memberType = memberMeta.memberType;
+      const propType = memberMeta.propType;
 
       if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
         if (propType === PROP_TYPE.String || propType === PROP_TYPE.Number || propType === PROP_TYPE.Boolean || propType === PROP_TYPE.Any) {
@@ -49,15 +50,15 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
       } else if (memberType === MEMBER_TYPE.Element) {
         coreBuild.element = true;
       }
+
+      if (memberMeta.willChangeMethodNames && memberMeta.willChangeMethodNames.length > 0) {
+        coreBuild.willChange = true;
+      }
+
+      if (memberMeta.didChangeMethodNames && memberMeta.didChangeMethodNames.length > 0) {
+        coreBuild.didChange = true;
+      }
     });
-  }
-
-  if (cmpMeta.propsDidChangeMeta && cmpMeta.propsDidChangeMeta.length > 0) {
-    coreBuild.didChange = true;
-  }
-
-  if (cmpMeta.propsWillChangeMeta && cmpMeta.propsWillChangeMeta.length > 0) {
-    coreBuild.willChange = true;
   }
 
   if (cmpMeta.eventsMeta && cmpMeta.eventsMeta.length) {

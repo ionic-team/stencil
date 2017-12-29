@@ -16,6 +16,8 @@ export default function memory(config: InMemoryConfig = {}) {
   let contents = isContents(config.contents) ? String(config.contents) : null;
 
   return {
+      name: 'inMemoryPlugin',
+
       options(options: any) {
         const entry: InMemoryConfig = options.entry;
         if (entry && typeof entry === 'object') {

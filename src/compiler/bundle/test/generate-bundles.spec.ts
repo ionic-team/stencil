@@ -1,45 +1,11 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, ManifestBundle, ModuleFile } from '../../../util/interfaces';
-import {
-  bundleRequiresScopedStyles,
-  containsDefaultMode,
-  containsNonDefaultModes,
-  getBundleId,
-  getManifestBundleModes,
-  setBundleModeIds,
-  writeBundleFile
-} from '../generate-bundles';
-import { getBundleFileName } from '../../app/app-file-naming';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
+import { bundleRequiresScopedStyles } from '../bundle-styles';
+import { getBundleIdDev, getBundleIdHashed, setBundleModeIds } from '../generate-bundles';
 import { mockStencilSystem } from '../../../testing/mocks';
 
 
 describe('generate-bundles', () => {
-
-  describe('containsNonDefaultModes', () => {
-
-    it('should not contain non default', () => {
-      expect(containsDefaultMode(['ios'])).toBe(false);
-      expect(containsDefaultMode([])).toBe(false);
-    });
-
-    it('should contain non default', () => {
-      expect(containsNonDefaultModes(['$', 'ios'])).toBe(true);
-    });
-
-  });
-
-  describe('containsDefaultMode', () => {
-
-    it('should not contain default', () => {
-      expect(containsDefaultMode(['ios', 'md'])).toBe(false);
-      expect(containsDefaultMode([])).toBe(false);
-    });
-
-    it('should contain default', () => {
-      expect(containsDefaultMode(['$', 'ios'])).toBe(true);
-    });
-
-  });
 
   describe('setBundleModeIds', () => {
 
@@ -47,7 +13,7 @@ describe('generate-bundles', () => {
       const moduleFiles: ModuleFile[] = [
         { cmpMeta: { bundleIds: {} } }
       ];
-      setBundleModeIds(moduleFiles, null, 'bundle-id', 'es2015');
+      setBundleModeIds(moduleFiles, null, 'bundle-id');
       expect(moduleFiles[0].cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es2015).toBe('bundle-id');
     });
 
@@ -55,7 +21,7 @@ describe('generate-bundles', () => {
       const moduleFiles: ModuleFile[] = [
         { cmpMeta: { bundleIds: {} } }
       ];
-      setBundleModeIds(moduleFiles, 'ios', 'bundle-id', 'es2015');
+      setBundleModeIds(moduleFiles, 'ios', 'bundle-id');
       expect(moduleFiles[0].cmpMeta.bundleIds.ios.es2015).toBe('bundle-id');
     });
 
@@ -69,50 +35,42 @@ describe('generate-bundles', () => {
 
   });
 
-  describe('getBundleFileName', () => {
-
-    it('get filename from bundle id and scoped', () => {
-      const fileName = getBundleFileName('bundle-id', true);
-      expect(fileName).toBe('bundle-id.sc.js');
-    });
-
-    it('get filename from bundle id only', () => {
-      const fileName = getBundleFileName('bundle-id', false);
-      expect(fileName).toBe('bundle-id.js');
-    });
-
-  });
-
   describe('getBundleId', () => {
 
     it('get bundle id from hashed content', () => {
       const config: BuildConfig = { hashFileNames: true, hashedFileNameLength: 4 };
       config.sys = mockStencilSystem();
 
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], 'ios', 'h1{color:blue;}');
-
-      expect(styleId).toBe('ehrd');
+      const id = getBundleIdHashed(config, 'abcdefg');
+      expect(id).toBe('l7xh');
     });
 
     it('get bundle id from components and mode', () => {
-      const config: BuildConfig = {};
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], 'ios', 'h1{color:blue;}');
-
-      expect(styleId).toBe('cmp-a.ios');
+      const id = getBundleIdDev(['cmp-a', 'cmp-b'], 'ios', false);
+      expect(id).toBe('cmp-a.ios');
     });
 
     it('get bundle id from components and default mode', () => {
-      const config: BuildConfig = {};
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], '$', 'h1{color:blue;}');
+      const id = getBundleIdDev(['cmp-a', 'cmp-b'], 'ios', false);
+      expect(id).toBe('cmp-a.ios');
+    });
 
-      expect(styleId).toBe('cmp-a');
+    it('get bundle id from components, mode, scoped css', () => {
+      const config: BuildConfig = {};
+      const id = getBundleIdDev(['cmp-a', 'cmp-b'], 'md', true);
+      expect(id).toBe('cmp-a.md.sc');
+    });
+
+    it('get bundle id from components, mode, scoped css, es5', () => {
+      const config: BuildConfig = {};
+      const id = getBundleIdDev(['cmp-a', 'cmp-b'], 'md', true, 'es5');
+      expect(id).toBe('cmp-a.md.sc.es5');
     });
 
     it('get bundle id from components and null mode', () => {
       const config: BuildConfig = {};
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], null, 'h1{color:blue;}');
-
-      expect(styleId).toBe('cmp-a');
+      const id = getBundleIdDev(['cmp-a', 'cmp-b'], null, false);
+      expect(id).toBe('cmp-a');
     });
 
   });

@@ -39,8 +39,7 @@ function updateBundles(appManifest: Manifest, dependentManifest: Manifest) {
   dependentManifest.bundles.forEach(dependentBundle => {
     // make a fresh copy
     const cleanedBundled: Bundle = {
-      components: [],
-      priority: dependentBundle.priority
+      components: []
     };
 
     dependentBundle.components.forEach(dependentBundleComponentTag => {

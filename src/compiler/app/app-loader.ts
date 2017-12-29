@@ -1,7 +1,7 @@
 import { AppRegistry, BuildConfig, BuildContext, LoadComponentRegistry } from '../../util/interfaces';
 import { APP_NAMESPACE_REGEX, LOADER_NAME } from '../../util/constants';
-import { generatePreamble, pathJoin } from '../util';
-import { getAppPublicPath, getLoaderFileName } from './app-file-naming';
+import { generatePreamble } from '../util';
+import { getAppPublicPath, getLoaderFileName, getLoaderDist, getLoaderWWW } from './app-file-naming';
 
 
 export async function generateLoader(
@@ -59,18 +59,20 @@ export async function generateLoader(
       }
     }
 
-    loaderContent = generatePreamble(config) + loaderContent;
+    loaderContent = generatePreamble(config) + '\n' + loaderContent;
 
     ctx.appFiles.loader = loaderContent;
 
     if (config.generateWWW) {
-      const appLoaderWWW = pathJoin(config, config.buildDir, appLoaderFileName);
+      const appLoaderWWW = getLoaderWWW(config);
       ctx.filesToWrite[appLoaderWWW] = loaderContent;
+      ctx.appFiles[appLoaderWWW] = loaderContent;
     }
 
     if (config.generateDistribution) {
-      const appLoaderDist = pathJoin(config, config.distDir, appLoaderFileName);
+      const appLoaderDist = getLoaderDist(config);
       ctx.filesToWrite[appLoaderDist] = loaderContent;
+      ctx.appFiles[appLoaderDist] = loaderContent;
     }
 
     ctx.appFileBuildCount++;

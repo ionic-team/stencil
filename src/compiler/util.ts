@@ -1,5 +1,5 @@
-import { BANNER, ENCAPSULATION } from '../util/constants';
-import { BuildConfig, BuildContext, Diagnostic, FilesMap, SourceTarget, StencilSystem } from '../util/interfaces';
+import { BANNER } from '../util/constants';
+import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from '../util/interfaces';
 
 
 export function getBuildContext(ctx?: BuildContext) {
@@ -15,14 +15,11 @@ export function getBuildContext(ctx?: BuildContext) {
   ctx.coreBuilds = ctx.coreBuilds || {};
   ctx.moduleFiles = ctx.moduleFiles || {};
   ctx.jsFiles = ctx.jsFiles || {};
-  ctx.cssFiles = ctx.cssFiles || {};
+  ctx.rollupCache = ctx.rollupCache || {};
   ctx.dependentManifests = ctx.dependentManifests || {};
   ctx.compiledFileCache = ctx.compiledFileCache || {};
   ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
-  ctx.styleSassUnscopedOutputs = ctx.styleSassUnscopedOutputs || {};
-  ctx.styleSassScopedOutputs = ctx.styleSassScopedOutputs || {};
-  ctx.styleCssUnscopedOutputs = ctx.styleCssUnscopedOutputs || {};
-  ctx.styleCssScopedOutputs = ctx.styleCssScopedOutputs || {};
+  ctx.moduleBundleLegacyOutputs = ctx.moduleBundleLegacyOutputs || {};
   ctx.changedFiles = ctx.changedFiles || [];
 
   return ctx;
@@ -40,30 +37,6 @@ export function resetBuildContext(ctx: BuildContext) {
   ctx.styleBundleCount = 0;
   ctx.prerenderResults = [];
   delete ctx.localPrerenderServer;
-}
-
-
-export function getJsFile(sys: StencilSystem, ctx: BuildContext, jsFilePath: string) {
-  jsFilePath = normalizePath(jsFilePath);
-
-  if (typeof ctx.filesToWrite[jsFilePath] === 'string') {
-    return Promise.resolve(ctx.filesToWrite[jsFilePath]);
-  }
-
-  if (typeof ctx.jsFiles[jsFilePath] === 'string') {
-    return Promise.resolve(ctx.jsFiles[jsFilePath]);
-  }
-
-  return new Promise<string>((resolve, reject) => {
-    sys.fs.readFile(jsFilePath, 'utf-8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        ctx.jsFiles[jsFilePath] = data;
-        resolve(data);
-      }
-    });
-  });
 }
 
 
@@ -280,7 +253,7 @@ export function isWebDevFile(filePath: string) {
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
 
 
-export function generatePreamble(config: BuildConfig, sourceTarget?: SourceTarget) {
+export function generatePreamble(config: BuildConfig) {
   let preamble: string[] = [];
 
   if (config.preamble) {
@@ -293,12 +266,12 @@ export function generatePreamble(config: BuildConfig, sourceTarget?: SourceTarge
     preamble = preamble.map(l => ` * ${l}`);
 
     preamble.unshift(`/*!`);
-    preamble.push(` */\n`);
+    preamble.push(` */`);
 
     return preamble.join('\n');
   }
 
-  return `/*! ${BANNER}${sourceTarget === 'es5' ? ' (es5)' : ''} */\n`;
+  return `/*! ${BANNER} */`;
 }
 
 
@@ -372,11 +345,6 @@ export function hasError(diagnostics: Diagnostic[]): boolean {
     return false;
   }
   return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
-}
-
-
-export function componentRequiresScopedStyles(encapsulation: ENCAPSULATION) {
-  return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
 }
 
 

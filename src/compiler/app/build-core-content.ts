@@ -94,7 +94,6 @@ const DEV_MINIFY_OPTS: any = {
   compress: {
     arrows: false,
     booleans: false,
-    cascade: false,
     collapse_vars: false,
     comparisons: false,
     conditionals: true, // must set for dead_code removal
@@ -164,7 +163,6 @@ const PROD_MINIFY_OPTS: any = {
   compress: {
     arrows: false,
     booleans: true,
-    cascade: true,
     collapse_vars: true,
     comparisons: true,
     conditionals: true,

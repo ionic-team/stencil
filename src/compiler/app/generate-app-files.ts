@@ -24,28 +24,28 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   };
 
   // normal es2015 build
-  const globalJsContentsEs2015 = await generateAppGlobalScript(config, ctx, 'es2015', appRegistry);
+  const globalJsContentsEs2015 = await generateAppGlobalScript(config, ctx, appRegistry);
 
   // figure out which sections should be included in the core build
   const buildConditionals = setBuildConditionals(ctx, ctx.manifestBundles);
   buildConditionals.coreId = 'core';
   buildConditionals.ssrClientSide = false;
 
-  const coreFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionals);
+  const coreFilename = await generateCore(config, ctx, globalJsContentsEs2015, buildConditionals);
   appRegistry.core = coreFilename;
 
   const buildConditionalsSsr = setBuildConditionals(ctx, ctx.manifestBundles);
   buildConditionalsSsr.coreId = 'core.ssr';
   buildConditionalsSsr.ssrClientSide = true;
 
-  const coreSsrFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionalsSsr);
+  const coreSsrFilename = await generateCore(config, ctx, globalJsContentsEs2015, buildConditionalsSsr);
   appRegistry.coreSsr = coreSsrFilename;
   ctx.appCoreWWWPath = coreSsrFilename;
 
 
   if (config.es5Fallback) {
     // es5 build (if needed)
-    const globalJsContentsEs5 = await generateAppGlobalScript(config, ctx, 'es5', appRegistry);
+    const globalJsContentsEs5 = await generateAppGlobalScript(config, ctx, appRegistry, 'es5');
 
     const buildConditionalsEs5 = setBuildConditionals(ctx, ctx.manifestBundles);
     buildConditionalsEs5.coreId = 'core.pf';
@@ -54,7 +54,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
     buildConditionalsEs5.cssVarShim = true;
     buildConditionalsEs5.ssrClientSide = true;
 
-    const coreFilenameEs5 = await generateCore(config, ctx, 'es5', globalJsContentsEs5, buildConditionalsEs5);
+    const coreFilenameEs5 = await generateCore(config, ctx, globalJsContentsEs5, buildConditionalsEs5);
     appRegistry.corePolyfilled = coreFilenameEs5;
 
   } else if (config.generateWWW) {

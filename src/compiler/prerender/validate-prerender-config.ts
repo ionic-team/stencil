@@ -1,4 +1,4 @@
-import { BuildConfig, PrerenderConfig } from '../../util/interfaces';
+import { BuildConfig, PrerenderConfig, RenderOptions } from '../../util/interfaces';
 import { normalizePath } from '../util';
 
 
@@ -8,7 +8,7 @@ export function validatePrerenderConfig(config: BuildConfig) {
       config.prerender = {};
     }
 
-    config.prerender = Object.assign({}, DEFAULT_PRERENDER_CONFIG, config.prerender);
+    config.prerender = Object.assign({}, DEFAULT_SSR_CONFIG, DEFAULT_PRERENDER_CONFIG, config.prerender);
 
     if (!config.prerender.prerenderDir) {
       config.prerender.prerenderDir = config.wwwDir;
@@ -28,11 +28,15 @@ export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
   include: [
     { url: '/' }
   ],
+  maxConcurrent: 4,
+  host: 'dev.prerender.stenciljs.com'
+};
+
+
+export const DEFAULT_SSR_CONFIG: RenderOptions = {
+  collapseWhitespace: true,
   inlineLoaderScript: true,
   inlineStyles: true,
   inlineAssetsMaxSize: 5000,
   removeUnusedStyles: true,
-  collapseWhitespace: true,
-  maxConcurrent: 4,
-  host: 'dev.prerender.stenciljs.com'
 };

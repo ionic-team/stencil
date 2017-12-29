@@ -80,8 +80,7 @@ export function addAppComponents(config: BuildConfig, manifest: Manifest, module
 export function addAppBundles(config: BuildConfig, manifest: Manifest) {
   config.bundles.forEach(configBundle => {
     manifest.bundles.push({
-      components: configBundle.components.slice(),
-      priority: configBundle.priority
+      components: configBundle.components.slice()
     });
   });
 }

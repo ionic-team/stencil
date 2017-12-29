@@ -1,8 +1,9 @@
 import { BuildConfig, BuildContext, ManifestBundle } from '../../util/interfaces';
+import bundleInputEntry from './rollup-plugins/bundle-input-entry';
+import bundleResolution from './rollup-plugins/bundle-resolution';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import graphIt from './rollup-plugins/graph-it';
 import { hasError } from '../util';
-import stencilManifestsToInputs from './rollup-plugins/stencil-manifest-to-imports';
 import transpiledInMemoryPlugin from './rollup-plugins/transpile-in-memory';
 
 
@@ -13,7 +14,7 @@ export async function createDependencyGraph(config: BuildConfig, ctx: BuildConte
     rollupBundle = await config.sys.rollup.rollup({
       input: manifestBundle.cacheKey,
       plugins: [
-        graphIt(ctx.graphData, manifestBundle.cacheKey),
+        graphIt(config, ctx.graphData, manifestBundle.cacheKey),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -22,7 +23,8 @@ export async function createDependencyGraph(config: BuildConfig, ctx: BuildConte
           include: 'node_modules/**',
           sourceMap: false
         }),
-        stencilManifestsToInputs(manifestBundle),
+        bundleInputEntry(ctx,  manifestBundle),
+        bundleResolution(manifestBundle),
         transpiledInMemoryPlugin(config, ctx),
       ],
       onwarn: createOnWarnFn(ctx.diagnostics, manifestBundle.moduleFiles)

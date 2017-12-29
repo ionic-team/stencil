@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, HostConfig, HostRule, HostRuleHeader, HydrateComponent, ManifestBundle, PrerenderResult, ServiceWorkerConfig } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { getBundleFileName, getAppWWWBuildDir } from '../app/app-file-naming';
+import { getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { pathJoin, readFile } from '../util';
 
 
@@ -111,7 +111,7 @@ export function getBundleIds(manifestBundles: ManifestBundle[], components: Hydr
 
 
 function getBundleUrl(config: BuildConfig, bundleId: string) {
-  const unscopedFileName = getBundleFileName(bundleId, false);
+  const unscopedFileName = getBundleFilename(bundleId);
   const unscopedWwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), unscopedFileName);
   return pathJoin(config, '/', config.sys.path.relative(config.wwwDir, unscopedWwwBuildPath));
 }

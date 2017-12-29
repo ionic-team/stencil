@@ -11,17 +11,15 @@ import { generateIndexHtml } from '../html/generate-index-html';
 import { genereateReadmes } from '../docs/generate-readmes';
 import { generateServiceWorker } from '../service-worker/generate-sw';
 import { generateAppManifest } from '../manifest/generate-manifest';
-import { getAppFileName } from '../app/app-file-naming';
 import { initIndexHtml } from '../html/init-index-html';
 import { prerenderApp } from '../prerender/prerender-app';
 import { setupWatcher } from './watch';
 import { validateBuildConfig } from '../../util/validate-config';
 import { validatePrerenderConfig } from '../prerender/validate-prerender-config';
 import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
-import { upgradeDependentComponents } from '../upgrade-dependents/index';
 
 
-export function build(config: BuildConfig, context?: any) {
+export async function build(config: BuildConfig, context?: any) {
   // create the build context if it doesn't exist
   // the buid context is the same object used for all builds and rebuilds
   // ctx is where stuff is cached for fast in-memory lookups later
@@ -47,7 +45,7 @@ export function build(config: BuildConfig, context?: any) {
     // invalid build config, let's not continue
     config.logger.printDiagnostics(buildResults.diagnostics);
     generateHtmlDiagnostics(config, buildResults.diagnostics);
-    return Promise.resolve(buildResults);
+    return buildResults;
   }
 
   // create an initial index.html file if one doesn't already exist
@@ -57,109 +55,91 @@ export function build(config: BuildConfig, context?: any) {
     // something's wrong, so let's not continue
     config.logger.printDiagnostics(buildResults.diagnostics);
     generateHtmlDiagnostics(config, buildResults.diagnostics);
-    return Promise.resolve(buildResults);
+    return buildResults;
   }
 
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${getAppFileName(config)}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
+  const timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
 
-  // begin the build
-  return Promise.resolve().then(() => {
+  try {
+    // begin the build
     // async scan the src directory for ts files
     // then transpile them all in one go
-    return compileSrcDir(config, ctx);
+    const compileResults = await compileSrcDir(config, ctx);
 
-  }).then(compileResults => {
     // generation the app manifest from the compiled results
     // and from all the dependent collections
-    return generateAppManifest(config, ctx, compileResults.moduleFiles);
+    await generateAppManifest(config, ctx, compileResults.moduleFiles);
 
-  }).then(() => {
-    // Look at all dependent components from outside collections and
-    // upgrade the components if need be
-    return upgradeDependentComponents(config, ctx);
-
-  }).then(() => {
     // bundle modules and styles into separate files phase
-    return bundle(config, ctx);
+    await bundle(config, ctx);
 
-  }).then(() => {
     // generate the app files, such as app.js, app.core.js
-    return generateAppFiles(config, ctx);
+    await generateAppFiles(config, ctx);
 
-  }).then(() => {
     // empty the build dest directory
     // doing this now incase the
     // copy tasks add to the dest directories
-    return emptyDestDir(config, ctx);
+    await emptyDestDir(config, ctx);
 
-  }).then(() => {
     // copy all assets
     if (!ctx.isRebuild) {
-      return copyTasks(config, ctx);
-    } else {
-      return Promise.resolve();
+      // only do the initial copy on the first build
+      await copyTasks(config, ctx);
     }
 
-  }).then(() => {
     // build index file and service worker
-    return generateIndexHtml(config, ctx);
+    await generateIndexHtml(config, ctx);
 
-  }).then(() => {
-    // prerender that app
-    return prerenderApp(config, ctx);
-
-  }).then(() => {
     // generate each of the readmes
-    return genereateReadmes(config, ctx);
+    await genereateReadmes(config, ctx);
 
-  }).then(() => {
     // write all the files and copy asset files
-    return writeBuildFiles(config, ctx, buildResults);
+    await writeBuildFiles(config, ctx, buildResults);
 
-  }).then(() => {
     // generate the service worker
-    return generateServiceWorker(config, ctx);
+    await generateServiceWorker(config, ctx);
 
-  }).then(() => {
+    // prerender that app
+    await prerenderApp(config, ctx);
+
     // setup watcher if need be
-    return setupWatcher(config, ctx);
+    await setupWatcher(config, ctx);
 
-  }).catch(err => {
-    // catch all phase
-    catchError(ctx.diagnostics, err);
+  } catch (e) {
+    // catch all
+    catchError(ctx.diagnostics, e);
+  }
 
-  }).then(() => {
-    // finalize phase
-    buildResults.diagnostics = cleanDiagnostics(ctx.diagnostics);
-    config.logger.printDiagnostics(buildResults.diagnostics);
-    generateHtmlDiagnostics(config, buildResults.diagnostics);
+  // finalize phase
+  buildResults.diagnostics = cleanDiagnostics(ctx.diagnostics);
+  config.logger.printDiagnostics(buildResults.diagnostics);
+  generateHtmlDiagnostics(config, buildResults.diagnostics);
 
-    // create a nice pretty message stating what happend
-    let buildText = ctx.isRebuild ? 'rebuild' : 'build';
-    let buildStatus = 'finished';
-    let watchText = config.watch ? ', watching for changes...' : '';
-    let statusColor = 'green';
+  // create a nice pretty message stating what happend
+  const buildText = ctx.isRebuild ? 'rebuild' : 'build';
+  const watchText = config.watch ? ', watching for changes...' : '';
+  let buildStatus = 'finished';
+  let statusColor = 'green';
 
-    if (hasError(ctx.diagnostics)) {
-      buildStatus = 'failed';
-      statusColor = 'red';
-    }
+  if (hasError(ctx.diagnostics)) {
+    buildStatus = 'failed';
+    statusColor = 'red';
+  }
 
-    timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
+  timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
 
-    if (typeof ctx.onFinish === 'function') {
-      // fire off any provided onFinish fn every time the build finishes
-      ctx.onFinish(buildResults);
-    }
+  if (typeof ctx.onFinish === 'function') {
+    // fire off any provided onFinish fn every time the build finishes
+    ctx.onFinish(buildResults);
+  }
 
-    // remember if the last build had an error or not
-    // this is useful if the next build should do a full build or not
-    ctx.lastBuildHadError = hasError(ctx.diagnostics);
+  // remember if the last build had an error or not
+  // this is useful if the next build should do a full build or not
+  ctx.lastBuildHadError = hasError(ctx.diagnostics);
 
-    // return what we've learned today
-    return buildResults;
-  });
+  // return what we've learned today
+  return buildResults;
 }
 
 

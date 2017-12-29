@@ -1,36 +1,40 @@
 import { BuildConfig, BuildContext, HydrateResults, PrerenderConfig, PrerenderStatus, PrerenderLocation } from '../../util/interfaces';
-import { buildError, catchError, hasError, normalizePath } from '../util';
+import { buildError, catchError, hasError, normalizePath, readFile } from '../util';
 import { generateHostConfig } from './host-config';
 import { prerenderUrl } from './prerender-url';
 
 
-export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
+export async function prerenderApp(config: BuildConfig, ctx: BuildContext) {
   if (hasError(ctx.diagnostics)) {
     // no need to rebuild index.html if there were no app file changes
     config.logger.debug(`prerenderApp, skipping because build has errors`);
-    return Promise.resolve();
+    return;
   }
 
   if (!config.prerender) {
     // no need to rebuild index.html if there were no app file changes
     config.logger.debug(`prerenderApp, skipping because config.prerender is falsy`);
-    return Promise.resolve();
+    return;
   }
 
   if (!config.generateWWW) {
     // no need to rebuild index.html if there were no app file changes
     config.logger.debug(`prerenderApp, skipping because config.generateWWW is falsy`);
-    return Promise.resolve();
+    return;
   }
 
   // if there was src index.html file, then the process before this one
   // would have already loaded and updated the src index to its www path
   // get the www index html content for the template for all prerendered pages
-  const indexHtml = ctx.filesToWrite[config.wwwIndexHtml];
-  if (!indexHtml) {
+  let indexHtml: string = null;
+  try {
+    indexHtml = await readFile(config.sys, config.wwwIndexHtml);
+  } catch (e) {}
+
+  if (typeof indexHtml !== 'string') {
     // looks like we don't have an index html file, which is fine
     config.logger.debug(`prerenderApp, missing index.html for prerendering`);
-    return Promise.resolve();
+    return;
   }
 
   const prerenderHost = `http://${(config.prerender as PrerenderConfig).host}`;
@@ -40,7 +44,7 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
   if (!ctx.prerenderUrlQueue.length) {
     const d = buildError(ctx.diagnostics);
     d.messageText = `No urls found in the prerender config`;
-    return Promise.resolve();
+    return;
   }
 
   // keep track of how long the entire build process takes
@@ -48,27 +52,27 @@ export function prerenderApp(config: BuildConfig, ctx: BuildContext) {
 
   ctx.prerenderResults = [];
 
-  return new Promise(resolve => {
-    drainPrerenderQueue(config, ctx, indexHtml, resolve);
+  try {
+    await new Promise(resolve => {
+      drainPrerenderQueue(config, ctx, indexHtml, resolve);
+    });
 
-  }).then(() => {
-    return generateHostConfig(config, ctx, ctx.prerenderResults);
+    await generateHostConfig(config, ctx, ctx.prerenderResults);
 
-  }).catch(err => {
-    catchError(ctx.diagnostics, err);
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
 
-  }).then(() => {
-    if (hasError(ctx.diagnostics)) {
-      timeSpan.finish(`prerendering failed`);
-    } else {
-      timeSpan.finish(`prerendered urls: ${ctx.prerenderResults.length}`);
-    }
+  if (hasError(ctx.diagnostics)) {
+    timeSpan.finish(`prerendering failed`);
+  } else {
+    timeSpan.finish(`prerendered urls: ${ctx.prerenderResults.length}`);
+  }
 
-    if (ctx.localPrerenderServer) {
-      ctx.localPrerenderServer.close();
-      delete ctx.localPrerenderServer;
-    }
-  });
+  if (ctx.localPrerenderServer) {
+    ctx.localPrerenderServer.close();
+    delete ctx.localPrerenderServer;
+  }
 }
 
 

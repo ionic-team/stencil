@@ -7,7 +7,7 @@ import { transpileToEs5 } from '../transpile/core-build';
 import transpiledInMemoryPlugin from '../bundle/rollup-plugins/transpile-in-memory';
 
 
-export async function generateAppGlobalScript(config: BuildConfig, ctx: BuildContext, sourceTarget: SourceTarget, appRegistry: AppRegistry) {
+export async function generateAppGlobalScript(config: BuildConfig, ctx: BuildContext, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
   const globalJsContents = await generateAppGlobalContents(config, ctx, sourceTarget);
 
   if (globalJsContents.length) {
@@ -200,7 +200,7 @@ export function generateGlobalJs(config: BuildConfig, globalJsContents: string[]
   const publicPath = getAppPublicPath(config);
 
   const output = [
-    generatePreamble(config, 'es2015'),
+    generatePreamble(config) + '\n',
     `(function(appNamespace,publicPath){`,
     `"use strict";\n`,
     globalJsContents.join('\n').trim(),
