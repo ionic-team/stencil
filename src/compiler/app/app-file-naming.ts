@@ -1,5 +1,4 @@
 import { BuildConfig } from '../../util/interfaces';
-import { GLOBAL_NAME } from '../../util/constants';
 import { pathJoin } from '../util';
 
 
@@ -39,7 +38,7 @@ export function getLoaderDist(config: BuildConfig) {
 
 
 export function getGlobalFileName(config: BuildConfig) {
-  return `${config.fsNamespace}.${GLOBAL_NAME}.js`;
+  return `${config.fsNamespace}.global.js`;
 }
 
 

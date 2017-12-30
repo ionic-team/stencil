@@ -1,30 +1,51 @@
 import { getJsPathBundlePlaceholder } from '../../../util/data-serialize';
-import { ManifestBundle } from '../../../util/interfaces';
+import { ModuleFiles, ManifestBundle } from '../../../util/interfaces';
 
 
-export default function bundleResolver(manifestBundle: ManifestBundle) {
+export default function bundleResolver(manifestBundle: ManifestBundle, moduleFiles: ModuleFiles) {
+  const checkStarsWith = getJsPathBundlePlaceholder('').substr(0, 4);
+
   return {
     name: 'bundleResolverPlugin',
 
     resolveId(importee: string) {
-      // get the module file uses the placeholder id
-      const moduleFile = getModuleFileByPlaceholdId(manifestBundle, importee);
-      if (moduleFile) {
-        return moduleFile.jsFilePath;
+      if (importee.startsWith(checkStarsWith)) {
+        // get the js file path using the placeholder id
+        return getJsFilePathByPlaceholdId(manifestBundle, moduleFiles, importee);
       }
 
       return null;
-    },
+    }
   };
 }
 
 
-function getModuleFileByPlaceholdId(manifestBundle: ManifestBundle, placeholderId: string) {
-  return manifestBundle.moduleFiles.find(m => {
-    if (m.cmpMeta && m.jsFilePath) {
-      const jsPathBundlePlaceholder = getJsPathBundlePlaceholder(m.cmpMeta.tagNameMeta);
-      return jsPathBundlePlaceholder === placeholderId;
+function getJsFilePathByPlaceholdId(manifestBundle: ManifestBundle, moduleFiles: ModuleFiles, placeholderId: string) {
+  // check the manifest bundle files
+  let modulePlaceholderId: string;
+
+  let moduleFile = manifestBundle.moduleFiles.find(m => {
+    if (m.cmpMeta && typeof m.jsFilePath === 'string') {
+      modulePlaceholderId = getJsPathBundlePlaceholder(m.cmpMeta.tagNameMeta);
+      return modulePlaceholderId === placeholderId;
     }
     return false;
   });
+  if (moduleFile) {
+    return moduleFile.jsFilePath;
+  }
+
+  // check all of the app's module files
+  for (var key in moduleFiles) {
+    moduleFile = moduleFiles[key];
+
+    if (moduleFile.cmpMeta && typeof moduleFile.jsFilePath === 'string') {
+      modulePlaceholderId = getJsPathBundlePlaceholder(moduleFile.cmpMeta.tagNameMeta);
+      if (modulePlaceholderId === placeholderId) {
+        return moduleFile.jsFilePath;
+      }
+    }
+  }
+
+  return null;
 }

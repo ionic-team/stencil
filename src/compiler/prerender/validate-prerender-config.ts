@@ -18,6 +18,8 @@ export function validatePrerenderConfig(config: BuildConfig) {
       config.prerender.prerenderDir = normalizePath(config.sys.path.join(config.rootDir, config.prerender.prerenderDir));
     }
 
+    config.es5Fallback = true;
+
   } else {
     config.prerender = null;
   }

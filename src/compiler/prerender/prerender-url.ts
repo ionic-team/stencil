@@ -22,12 +22,8 @@ export async function prerenderUrl(config: BuildConfig, ctx: BuildContext, index
     // set the input html which we just read from the src index html file
     hydrateOpts.html = indexSrcHtml;
 
-    // create a deep copy of the registry so any changes inside the render
-    // don't affect what we'll be saving
-    const registry = JSON.parse(JSON.stringify(ctx.registry));
-
     // create a server-side renderer
-    const renderer = createRenderer(rendererConfig, registry, ctx);
+    const renderer = createRenderer(rendererConfig, ctx);
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
@@ -36,18 +32,6 @@ export async function prerenderUrl(config: BuildConfig, ctx: BuildContext, index
     // hydrating to string is done!!
     // let's use this updated html for the index content now
     Object.assign(results, hydratedResults);
-
-    const url = config.sys.url.parse(hydratedResults.url);
-
-    ctx.prerenderResults.push({
-      url: hydratedResults.url,
-      hostname: url.hostname,
-      path: url.path,
-      components: hydratedResults.components,
-      styleUrls: hydratedResults.styleUrls,
-      scriptUrls: hydratedResults.scriptUrls,
-      imgUrls: hydratedResults.imgUrls
-    });
 
   } catch (e) {
     // ahh man! what happened!

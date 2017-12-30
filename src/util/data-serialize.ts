@@ -4,10 +4,20 @@ import { BundleIds, ComponentMeta, ComponentConstructorProperty,
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
 
 
+export function formatComponentLoaderRegistry(cmpRegistry: ComponentRegistry) {
+  // ensure we've got a standard order of the components
+  return Object.keys(cmpRegistry).sort().map(tag => {
+    const cmpMeta = cmpRegistry[tag];
+    cmpMeta.tagNameMeta = tag.toLowerCase().trim();
+    return formatComponentLoader(cmpMeta);
+  });
+}
+
+
 export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegistry {
   const d: any[] = [
     /* 0 */ cmpMeta.tagNameMeta,
-    /* 1 */ formatBundleIds(cmpMeta.bundleIds),
+    /* 1 */ formatLoaderBundleIds(cmpMeta.bundleIds),
     /* 2 */ formatHasStyles(cmpMeta.stylesMeta),
     /* 3 */ formatMembers(cmpMeta.membersMeta),
     /* 4 */ formatEncapsulation(cmpMeta.encapsulation),
@@ -18,9 +28,9 @@ export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegi
 }
 
 
-export function formatBundleIds(bundleIds: BundleIds): any {
+export function formatLoaderBundleIds(bundleIds: BundleIds): any {
   if (!bundleIds) {
-    return 'invalid-bundle-id';
+    return `invalid-bundle-id`;
   }
 
   if (typeof bundleIds === 'string') {
@@ -29,12 +39,12 @@ export function formatBundleIds(bundleIds: BundleIds): any {
 
   const modes = Object.keys(bundleIds).sort();
   if (!modes.length) {
-    return 'invalid-bundle-id';
+    return `invalid-bundle-id`;
   }
 
   if (modes.length === 1) {
     return [
-      bundleIds[modes[0]].es2015,
+      bundleIds[modes[0]].esm,
       bundleIds[modes[0]].es5
     ];
   }
@@ -43,7 +53,7 @@ export function formatBundleIds(bundleIds: BundleIds): any {
 
   modes.forEach(modeName => {
     bundleIdObj[modeName] = [
-      bundleIds[modeName].es2015,
+      bundleIds[modeName].esm,
       bundleIds[modeName].es5
     ];
   });
@@ -136,17 +146,6 @@ function formatListeners(listeners: ListenMeta[]) {
     ];
     return trimFalsyData(d);
   });
-}
-
-
-export function formatComponentRegistry(registry: ComponentRegistry) {
-  // ensure we've got a standard order of the components
-  return Object.keys(registry).sort().map(tag => {
-    if (registry[tag]) {
-      return formatComponentLoader(registry[tag]);
-    }
-    return null;
-  }).filter(c => c);
 }
 
 
@@ -275,22 +274,22 @@ function trimFalsyData(d: string[]) {
 
 
 export function getJsPathBundlePlaceholder(tagName: string) {
-  return `/***:js-path:${tagName}:***/`;
+  return `/**js-path-placeholder:${tagName}:**/`;
 }
 
 
 export function getStylePlaceholder(tagName: string) {
-  return `/***:style:${tagName}:***/`;
+  return `/**style-placeholder:${tagName}:**/`;
 }
 
 
 export function getStyleIdPlaceholder(tagName: string) {
-  return `/***:style-id:${tagName}:***/`;
+  return `/**style-id-placeholder:${tagName}:**/`;
 }
 
 
 export function getBundleIdPlaceholder() {
-  return `/***:bundle-id:***/`;
+  return `/**:bundle-id:**/`;
 }
 
 

@@ -2,7 +2,7 @@ import { BuildConfig } from '../../util/interfaces';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from '../build/compile';
-import { genereateReadmes } from './generate-readmes';
+import { generateReadmes } from './generate-readmes';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { isConfigValid } from '../build/build';
 
@@ -32,7 +32,7 @@ export function docs(config: BuildConfig) {
 
   }).then(() => {
     // generate each of the readmes
-    return genereateReadmes(config, ctx);
+    return generateReadmes(config, ctx);
 
   }).catch(err => {
     // catch all phase

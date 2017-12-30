@@ -222,13 +222,19 @@ export interface ModuleFile {
 
 
 export interface AppRegistry {
-  namespace: string;
+  namespace?: string;
+  fsNamespace?: string;
   loader?: string;
   core?: string;
   coreSsr?: string;
   corePolyfilled?: string;
   global?: string;
-  components: LoadComponentRegistry[];
+  components?: AppRegistryComponents;
+}
+
+
+export interface AppRegistryComponents {
+  [tagName: string]: BundleIds;
 }
 
 
@@ -484,7 +490,6 @@ export interface GraphData {
 export interface BuildContext {
   graphData?: GraphData;
   moduleFiles?: ModuleFiles;
-  manifestBundles?: ManifestBundle[];
   jsFiles?: FilesMap;
   compiledFileCache?: FilesMap;
   rollupCache?: { [cacheKey: string]: any };
@@ -527,16 +532,13 @@ export interface BuildContext {
   appFileBuildCount?: number;
 
   moduleBundleCount?: number;
-  styleBundleCount?: number;
   localPrerenderServer?: any;
-  prerenderResults?: PrerenderResult[];
 
   diagnostics?: Diagnostic[];
-  registry?: ComponentRegistry;
   manifest?: Manifest;
   onFinish?: (buildResults: BuildResults) => void;
 
-  prerenderUrlQueue?: PrerenderLocation[];
+  cmpRegistry?: ComponentRegistry;
 }
 
 
@@ -828,7 +830,7 @@ export interface BundleIds {
 }
 
 export interface BundleId {
-  es2015?: string;
+  esm?: string;
   es5?: string;
 }
 

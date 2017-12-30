@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, FilesMap } from '../../../util/interfaces';
-import { normalizePath } from '../../util';
+import { normalizePath, readFile } from '../../util';
 
 export default function transpiledInMemoryPlugin(config: BuildConfig, ctx: BuildContext) {
   const sys = config.sys;
@@ -66,7 +66,7 @@ export default function transpiledInMemoryPlugin(config: BuildConfig, ctx: Build
       return null;
     },
 
-    load(sourcePath: string): string {
+    async load(sourcePath: string) {
       sourcePath = normalizePath(sourcePath);
 
       if (typeof ctx.jsFiles[sourcePath] === 'string') {
@@ -80,8 +80,7 @@ export default function transpiledInMemoryPlugin(config: BuildConfig, ctx: Build
       }
 
       // ok so it's not in one of our caches, so let's look it up directly
-      // but with readFileSync :(
-      const jsText = sys.fs.readFileSync(sourcePath, 'utf-8' );
+      const jsText = await readFile(sys, sourcePath);
       ctx.moduleFiles[sourcePath] = {
         jsFilePath: sourcePath,
       };

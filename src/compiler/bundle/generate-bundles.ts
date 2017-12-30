@@ -24,9 +24,11 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, manifest
   }
 
   // create the registry of all the components
-  ctx.registry = generateComponentRegistry(manifestBundles);
+  const cmpRegistry = generateComponentRegistry(manifestBundles);
 
   timeSpan.finish(`generate bundles finished`);
+
+  return cmpRegistry;
 }
 
 
@@ -268,7 +270,7 @@ export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bu
       if (sourceTarget === 'es5') {
         moduleFile.cmpMeta.bundleIds[modeName].es5 = bundleId;
       } else {
-        moduleFile.cmpMeta.bundleIds[modeName].es2015 = bundleId;
+        moduleFile.cmpMeta.bundleIds[modeName].esm = bundleId;
       }
 
     } else {
@@ -276,16 +278,17 @@ export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bu
       if (sourceTarget === 'es5') {
         moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es5 = bundleId;
       } else {
-        moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es2015 = bundleId;
+        moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE].esm = bundleId;
       }
     }
 
   });
 }
 
+
 export function generateComponentRegistry(manifestBundles: ManifestBundle[]) {
   const registryComponents: ComponentMeta[] = [];
-  const registry: ComponentRegistry = {};
+  const cmpRegistry: ComponentRegistry = {};
 
   manifestBundles.forEach(manifestBundle => {
     manifestBundle.moduleFiles.filter(m => m.cmpMeta).forEach(moduleFile => {
@@ -299,8 +302,8 @@ export function generateComponentRegistry(manifestBundles: ManifestBundle[]) {
     return 0;
 
   }).forEach(cmpMeta => {
-    registry[cmpMeta.tagNameMeta] = cmpMeta;
+    cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
   });
 
-  return registry;
+  return cmpRegistry;
 }

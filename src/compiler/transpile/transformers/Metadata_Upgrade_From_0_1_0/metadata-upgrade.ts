@@ -67,7 +67,7 @@ function upgradeExport(tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
     return tsSourceFile;
   }
 
-  return addComponentExport(tsSourceFile, cmpMeta.componentClass, cmpMeta.tagNameMeta);
+  return addComponentExport(tsSourceFile, cmpMeta);
 }
 
 

@@ -1,7 +1,7 @@
 import { ComponentMeta } from '../interfaces';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../constants';
 import { formatComponentLoader } from '../data-serialize';
-import { parseComponentLoaders, parsePropertyValue } from '../data-parse';
+import { parseComponentLoader, parsePropertyValue } from '../data-parse';
 
 
 describe('data serialize/parse', () => {
@@ -15,36 +15,36 @@ describe('data serialize/parse', () => {
     it('should set listenersMeta eventCapture', () => {
       cmpMeta.listenersMeta = [{ eventCapture: false }];
       let format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
       expect(cmpMeta.listenersMeta[0].eventCapture).toBe(false);
 
       cmpMeta.listenersMeta = [{ eventCapture: true }];
       format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
       expect(cmpMeta.listenersMeta[0].eventCapture).toBe(true);
     });
 
     it('should set listenersMeta eventDisabled', () => {
       cmpMeta.listenersMeta = [{ eventDisabled: false }];
       let format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
       expect(cmpMeta.listenersMeta[0].eventDisabled).toBe(false);
 
       cmpMeta.listenersMeta = [{ eventDisabled: true }];
       format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
       expect(cmpMeta.listenersMeta[0].eventDisabled).toBe(true);
     });
 
     it('should set listenersMeta eventPassive', () => {
       cmpMeta.listenersMeta = [{ eventPassive: false }];
       let format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
       expect(cmpMeta.listenersMeta[0].eventPassive).toBe(false);
 
       cmpMeta.listenersMeta = [{ eventPassive: true }];
       format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
       expect(cmpMeta.listenersMeta[0].eventPassive).toBe(true);
     });
 
@@ -60,7 +60,7 @@ describe('data serialize/parse', () => {
       ];
 
       let format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.listenersMeta[0].eventName).toBe('click');
       expect(cmpMeta.listenersMeta[0].eventMethodName).toBe('method1');
@@ -69,7 +69,7 @@ describe('data serialize/parse', () => {
     it('should set scoped css encapsulation', () => {
       cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
     });
@@ -77,14 +77,14 @@ describe('data serialize/parse', () => {
     it('should set scoped css encapsulation', () => {
       cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
     });
 
     it('should set no encapsulation', () => {
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.encapsulation).toBeFalsy();
     });
@@ -95,7 +95,7 @@ describe('data serialize/parse', () => {
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.notAnAttributPropery).toBeDefined();
       expect(cmpMeta.membersMeta.notAnAttributPropery.attribName).toBe(0);
@@ -107,7 +107,7 @@ describe('data serialize/parse', () => {
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.nonAttrib.propType).toBeUndefined();
       expect(cmpMeta.membersMeta.nonAttrib.attribName).toBe(0);
@@ -119,7 +119,7 @@ describe('data serialize/parse', () => {
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.any.propType).toBeUndefined();
       expect(cmpMeta.membersMeta.any.attribName).toBe('any');
@@ -131,7 +131,7 @@ describe('data serialize/parse', () => {
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.num.propType).toEqual(PROP_TYPE.Number);
       expect(cmpMeta.membersMeta.num.attribName).toEqual('num');
@@ -143,7 +143,7 @@ describe('data serialize/parse', () => {
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.boo.propType).toEqual(PROP_TYPE.Boolean);
       expect(cmpMeta.membersMeta.boo.attribName).toEqual('boo');
@@ -155,7 +155,7 @@ describe('data serialize/parse', () => {
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.str.propType).toEqual(PROP_TYPE.String);
       expect(cmpMeta.membersMeta.str.attribName).toEqual('str');
@@ -165,7 +165,7 @@ describe('data serialize/parse', () => {
       cmpMeta.membersMeta = null;
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.color).toBeDefined();
       expect(cmpMeta.membersMeta.color.memberType).toBe(MEMBER_TYPE.Prop);
@@ -193,12 +193,12 @@ describe('data serialize/parse', () => {
 
     it('should set all of the bundle ids as an object', () => {
       cmpMeta.bundleIds = {
-        ios: { es2015: 'abc'},
-        md: { es2015: 'def'}
+        ios: { esm: 'abc'},
+        md: { esm: 'def'}
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.bundleIds.ios[0]).toBe('abc');
       expect(cmpMeta.bundleIds.md[0]).toBe('def');
@@ -206,11 +206,11 @@ describe('data serialize/parse', () => {
 
     it('should set the default bundle id as a string', () => {
       cmpMeta.bundleIds = {
-        $: { es2015: 'default-id'}
+        $: { esm: 'default-id'}
       };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.bundleIds[0]).toBe('default-id');
     });
@@ -219,7 +219,7 @@ describe('data serialize/parse', () => {
       (cmpMeta.bundleIds as any) = 'bundleid';
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.bundleIds).toBe('bundleid');
     });
@@ -228,7 +228,7 @@ describe('data serialize/parse', () => {
       cmpMeta = { tagNameMeta: 'MY-TAG-NAME' };
 
       const format = formatComponentLoader(cmpMeta);
-      cmpMeta = parseComponentLoaders(format, {});
+      cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.tagNameMeta).toEqual('MY-TAG-NAME');
     });

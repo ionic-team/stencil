@@ -1,18 +1,20 @@
-import { AppRegistry, BuildConfig, BuildContext, LoadComponentRegistry } from '../../util/interfaces';
-import { APP_NAMESPACE_REGEX, LOADER_NAME } from '../../util/constants';
+import { AppRegistry, BuildConfig, BuildContext, ComponentRegistry } from '../../util/interfaces';
+import { APP_NAMESPACE_REGEX } from '../../util/constants';
 import { generatePreamble } from '../util';
 import { getAppPublicPath, getLoaderFileName, getLoaderDist, getLoaderWWW } from './app-file-naming';
+import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 
 
 export async function generateLoader(
   config: BuildConfig,
   ctx: BuildContext,
-  appRegistry: AppRegistry
+  appRegistry: AppRegistry,
+  cmpRegistry: ComponentRegistry
 ) {
   const appLoaderFileName = getLoaderFileName(config);
   appRegistry.loader = `../${appLoaderFileName}`;
 
-  const clientLoaderSource = `${LOADER_NAME}.js`;
+  const clientLoaderSource = `loader.js`;
 
   let loaderContent = await config.sys.getClientCoreFile({ staticName: clientLoaderSource });
 
@@ -21,7 +23,7 @@ export async function generateLoader(
     appRegistry.core,
     appRegistry.coreSsr,
     appRegistry.corePolyfilled,
-    appRegistry.components,
+    cmpRegistry,
     loaderContent
   );
 
@@ -32,34 +34,13 @@ export async function generateLoader(
     ctx.appFiles.loaderContent = loaderContent;
 
     if (config.minifyJs) {
-      // minify the loader
-      const opts: any = { output: {}, compress: {}, mangle: {} };
-      opts.ecma = 5;
-      opts.output.ecma = 5;
-      opts.compress.ecma = 5;
-      opts.compress.arrows = false;
+      // minify
+      loaderContent = minifyLoader(config, loaderContent);
 
-      if (config.logLevel === 'debug') {
-        opts.mangle.keep_fnames = true;
-        opts.compress.drop_console = false;
-        opts.compress.drop_debugger = false;
-        opts.output.beautify = true;
-        opts.output.bracketize = true;
-        opts.output.indent_level = 2;
-        opts.output.comments = 'all';
-        opts.output.preserve_line = true;
-      }
-
-      const minifyJsResults = config.sys.minifyJs(loaderContent, opts);
-      minifyJsResults.diagnostics.forEach(d => {
-        config.logger[d.level](d.messageText);
-      });
-      if (!minifyJsResults.diagnostics.length) {
-        loaderContent = minifyJsResults.output;
-      }
+    } else {
+      // dev
+      loaderContent = generatePreamble(config) + '\n' + loaderContent;
     }
-
-    loaderContent = generatePreamble(config) + '\n' + loaderContent;
 
     ctx.appFiles.loader = loaderContent;
 
@@ -82,22 +63,62 @@ export async function generateLoader(
 }
 
 
+function minifyLoader(config: BuildConfig, jsText: string) {
+  // minify the loader
+  const opts: any = { output: {}, compress: {}, mangle: {} };
+  opts.ecma = 5;
+  opts.output.ecma = 5;
+  opts.compress.ecma = 5;
+  opts.compress.arrows = false;
+
+  if (config.logLevel === 'debug') {
+    opts.mangle.keep_fnames = true;
+    opts.compress.drop_console = false;
+    opts.compress.drop_debugger = false;
+    opts.output.beautify = true;
+    opts.output.bracketize = true;
+    opts.output.indent_level = 2;
+    opts.output.comments = 'all';
+    opts.output.preserve_line = true;
+  }
+
+  opts.output.preamble = generatePreamble(config);
+
+  const minifyJsResults = config.sys.minifyJs(jsText, opts);
+  minifyJsResults.diagnostics.forEach(d => {
+    config.logger[d.level](d.messageText);
+  });
+
+  if (!minifyJsResults.diagnostics.length) {
+    jsText = minifyJsResults.output;
+  }
+
+  return jsText;
+}
+
+
 export function injectAppIntoLoader(
   config: BuildConfig,
   appCoreFileName: string,
   appCoreSsrFileName: string,
   appCorePolyfilledFileName: string,
-  componentRegistry: LoadComponentRegistry[],
+  cmpRegistry: ComponentRegistry,
   loaderContent: string
 ) {
-  const componentRegistryStr = JSON.stringify(componentRegistry);
+  const cmpLoaderRegistry = formatComponentLoaderRegistry(cmpRegistry);
+
+  const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
 
   const publicPath = getAppPublicPath(config);
 
-  loaderContent = loaderContent.replace(
-    APP_NAMESPACE_REGEX,
-    `"${config.namespace}","${publicPath}","${appCoreFileName}","${appCoreSsrFileName}","${appCorePolyfilledFileName}",${componentRegistryStr}`
-  );
+  const loaderArgs = [
+    `"${config.namespace}"`,
+    `"${publicPath}"`,
+    `"${appCoreFileName}"`,
+    `"${appCoreSsrFileName}"`,
+    `"${appCorePolyfilledFileName}"`,
+    cmpLoaderRegistryStr
+  ].join(',');
 
-  return loaderContent;
+  return loaderContent.replace(APP_NAMESPACE_REGEX, loaderArgs);
 }

@@ -1,13 +1,13 @@
-import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults, LoadComponentRegistry } from '../util/interfaces';
+import { BuildConfig, BuildContext, HydrateOptions, HydrateResults } from '../util/interfaces';
 import { buildError, getBuildContext } from '../compiler/util';
 import { DEFAULT_PRERENDER_CONFIG, DEFAULT_SSR_CONFIG } from '../compiler/prerender/validate-prerender-config';
-import { getRegistryJsonWWW, getGlobalWWW } from '../compiler/app/app-file-naming';
+import { getGlobalWWW, getRegistryJsonWWW } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
-import { parseComponentLoaders } from '../util/data-parse';
+import { parseComponentRegistryJsonFile } from '../compiler/app/app-registry';
 import { validateBuildConfig } from '../util/validate-config';
 
 
-export function createRenderer(config: BuildConfig, registry?: ComponentRegistry, ctx?: BuildContext) {
+export function createRenderer(config: BuildConfig, ctx?: BuildContext) {
   validateBuildConfig(config);
 
   ctx = ctx || {};
@@ -18,10 +18,11 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
   // load the app global file into the context
   loadAppGlobal(config, ctx);
 
-  if (!registry) {
-    // figure out the component registry
+  if (!ctx.cmpRegistry) {
+    // load the app registry if we haven't already
     // if one wasn't passed in already
-    registry = registerComponents(config);
+    // and cache this for later reuse
+    ctx.cmpRegistry = loadComponentRegistry(config);
   }
 
   // overload with two options for hydrateToString
@@ -32,7 +33,7 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
     hydrateOpts = normalizeHydrateOptions(config, hydrateOpts);
 
     // kick off hydrated, which is an async opertion
-    return hydrateHtml(config, ctx, registry, hydrateOpts).catch(err => {
+    return hydrateHtml(config, ctx, ctx.cmpRegistry, hydrateOpts).catch(err => {
       const hydrateResults: HydrateResults = {
         diagnostics: [buildError(err)],
         html: hydrateOpts.html,
@@ -50,45 +51,6 @@ export function createRenderer(config: BuildConfig, registry?: ComponentRegistry
   return {
     hydrateToString: hydrateToString
   };
-}
-
-
-function registerComponents(config: BuildConfig) {
-  let registry: ComponentRegistry = null;
-
-  try {
-    const registryJsonFilePath = getRegistryJsonWWW(config);
-
-    // open up the registry json file
-    const cmpRegistryJson = config.sys.fs.readFileSync(registryJsonFilePath, 'utf-8');
-
-    // parse the json into js object
-    const registryData = JSON.parse(cmpRegistryJson);
-
-    // object should have the components property on it
-    const components: LoadComponentRegistry[] = registryData.components;
-
-    if (Array.isArray(components) && components.length > 0) {
-      // i think we're good, let's create a registry
-      // object to fill up with component data
-      registry = {};
-
-      // each component should be a LoadComponentRegistry interface
-      components.forEach(cmpRegistryData => {
-        // parse the LoadComponentRegistry data and
-        // move it to the ComponentRegistry data
-        parseComponentLoaders(cmpRegistryData, registry);
-      });
-
-    } else {
-      throw new Error(`No components were found within the registry data`);
-    }
-
-  } catch (e) {
-    throw new Error(`Unable to open component registry: ${e}`);
-  }
-
-  return registry;
 }
 
 
@@ -116,6 +78,12 @@ function normalizeHydrateOptions(config: BuildConfig, inputOpts: HydrateOptions)
   opts.url = config.sys.url.format(urlObj);
 
   return opts;
+}
+
+
+function loadComponentRegistry(config: BuildConfig) {
+  const registryJsonFilePath = getRegistryJsonWWW(config);
+  return parseComponentRegistryJsonFile(config, registryJsonFilePath);
 }
 
 

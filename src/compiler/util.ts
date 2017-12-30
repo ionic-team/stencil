@@ -8,7 +8,6 @@ export function getBuildContext(ctx?: BuildContext) {
 
   ctx.diagnostics = ctx.diagnostics || [];
   ctx.manifest = ctx.manifest || {};
-  ctx.registry = ctx.registry || {};
   ctx.filesToWrite = ctx.filesToWrite || {};
   ctx.appFiles = ctx.appFiles || {};
   ctx.appGlobalStyles = ctx.appGlobalStyles || {};
@@ -27,15 +26,12 @@ export function getBuildContext(ctx?: BuildContext) {
 
 
 export function resetBuildContext(ctx: BuildContext) {
-  ctx.registry = {};
   ctx.manifest = {};
   ctx.diagnostics = [];
   ctx.sassBuildCount = 0;
   ctx.transpileBuildCount = 0;
   ctx.indexBuildCount = 0;
   ctx.moduleBundleCount = 0;
-  ctx.styleBundleCount = 0;
-  ctx.prerenderResults = [];
   delete ctx.localPrerenderServer;
 }
 

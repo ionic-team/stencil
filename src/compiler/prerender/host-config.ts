@@ -4,7 +4,7 @@ import { getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { pathJoin, readFile } from '../util';
 
 
-export async function generateHostConfig(config: BuildConfig, ctx: BuildContext, prerenderResults: PrerenderResult[]) {
+export async function generateHostConfig(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], prerenderResults: PrerenderResult[]) {
   const hostConfig: HostConfig = {
     hosting: {
       rules: []
@@ -18,7 +18,7 @@ export async function generateHostConfig(config: BuildConfig, ctx: BuildContext,
   });
 
   prerenderResults.forEach(prerenderResult => {
-    const hostRule = generateHostRule(config, ctx, prerenderResult);
+    const hostRule = generateHostRule(config, ctx, manifestBundles, prerenderResult);
     if (hostRule) {
       hostConfig.hosting.rules.push(hostRule);
     }
@@ -34,10 +34,10 @@ export async function generateHostConfig(config: BuildConfig, ctx: BuildContext,
 }
 
 
-export function generateHostRule(config: BuildConfig, ctx: BuildContext, prerenderResult: PrerenderResult) {
+export function generateHostRule(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], prerenderResult: PrerenderResult) {
   const hostRule: HostRule = {
     include: prerenderResult.path,
-    headers: generateHostRuleHeaders(config, ctx, prerenderResult)
+    headers: generateHostRuleHeaders(config, ctx, manifestBundles, prerenderResult)
   };
 
   if (hostRule.headers.length === 0) {
@@ -48,12 +48,12 @@ export function generateHostRule(config: BuildConfig, ctx: BuildContext, prerend
 }
 
 
-export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, prerenderResult: PrerenderResult) {
+export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], prerenderResult: PrerenderResult) {
   const hostRuleHeaders: HostRuleHeader[] = [];
 
   addStyles(config, hostRuleHeaders, prerenderResult);
   addCoreJs(config, ctx.appCoreWWWPath, hostRuleHeaders);
-  addBundles(config, ctx.manifestBundles, hostRuleHeaders, prerenderResult.components);
+  addBundles(config, manifestBundles, hostRuleHeaders, prerenderResult.components);
   addScripts(config, hostRuleHeaders, prerenderResult);
   addImgs(config, hostRuleHeaders, prerenderResult);
 
@@ -98,11 +98,11 @@ export function getBundleIds(manifestBundles: ManifestBundle[], components: Hydr
         bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE];
       }
 
-      if (!bundleId || !bundleId.es2015 || bundleIds.indexOf(bundleId.es2015) > -1) {
+      if (!bundleId || !bundleId.esm || bundleIds.indexOf(bundleId.esm) > -1) {
         return;
       }
 
-      bundleIds.push(bundleId.es2015);
+      bundleIds.push(bundleId.esm);
     });
   });
 

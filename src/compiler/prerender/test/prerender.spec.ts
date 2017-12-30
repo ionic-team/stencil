@@ -78,6 +78,12 @@ describe('prerender', () => {
       expect(config.prerender).toBeDefined();
     });
 
+    it('should always set es5 build when prerendering', () => {
+      config.prerender = true;
+      validatePrerenderConfig(config);
+      expect(config.es5Fallback).toBe(true);
+    });
+
     it('should not set prerenderIndex if false', () => {
       config.prerender = null;
       validatePrerenderConfig(config);

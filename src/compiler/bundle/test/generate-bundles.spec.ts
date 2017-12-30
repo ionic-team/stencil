@@ -14,7 +14,7 @@ describe('generate-bundles', () => {
         { cmpMeta: { bundleIds: {} } }
       ];
       setBundleModeIds(moduleFiles, null, 'bundle-id');
-      expect(moduleFiles[0].cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es2015).toBe('bundle-id');
+      expect(moduleFiles[0].cmpMeta.bundleIds[DEFAULT_STYLE_MODE].esm).toBe('bundle-id');
     });
 
     it('should set mode with es2015 mode name', () => {
@@ -22,7 +22,7 @@ describe('generate-bundles', () => {
         { cmpMeta: { bundleIds: {} } }
       ];
       setBundleModeIds(moduleFiles, 'ios', 'bundle-id');
-      expect(moduleFiles[0].cmpMeta.bundleIds.ios.es2015).toBe('bundle-id');
+      expect(moduleFiles[0].cmpMeta.bundleIds.ios.esm).toBe('bundle-id');
     });
 
     it('should set mode with es5 mode name', () => {

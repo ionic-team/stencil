@@ -6,11 +6,12 @@ import { compileSrcDir } from './compile';
 import { copyTasks } from './copy-tasks';
 import { emptyDestDir, writeBuildFiles } from './write-build';
 import { generateAppFiles } from '../app/generate-app-files';
+import { generateAppManifest } from '../manifest/generate-manifest';
+import { generateBundles } from '../bundle/generate-bundles';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateIndexHtml } from '../html/generate-index-html';
-import { genereateReadmes } from '../docs/generate-readmes';
+import { generateReadmes } from '../docs/generate-readmes';
 import { generateServiceWorker } from '../service-worker/generate-sw';
-import { generateAppManifest } from '../manifest/generate-manifest';
 import { initIndexHtml } from '../html/init-index-html';
 import { prerenderApp } from '../prerender/prerender-app';
 import { setupWatcher } from './watch';
@@ -72,10 +73,15 @@ export async function build(config: BuildConfig, context?: any) {
     await generateAppManifest(config, ctx, compileResults.moduleFiles);
 
     // bundle modules and styles into separate files phase
-    await bundle(config, ctx);
+    const manifestBundles = await bundle(config, ctx);
+
+    // both styles and modules are done bundling
+    // inject the styles into the modules and
+    // generate each of the output bundles
+    const cmpRegistry = generateBundles(config, ctx, manifestBundles);
 
     // generate the app files, such as app.js, app.core.js
-    await generateAppFiles(config, ctx);
+    await generateAppFiles(config, ctx, manifestBundles, cmpRegistry);
 
     // empty the build dest directory
     // doing this now incase the
@@ -92,7 +98,7 @@ export async function build(config: BuildConfig, context?: any) {
     await generateIndexHtml(config, ctx);
 
     // generate each of the readmes
-    await genereateReadmes(config, ctx);
+    await generateReadmes(config, ctx);
 
     // write all the files and copy asset files
     await writeBuildFiles(config, ctx, buildResults);
@@ -101,7 +107,7 @@ export async function build(config: BuildConfig, context?: any) {
     await generateServiceWorker(config, ctx);
 
     // prerender that app
-    await prerenderApp(config, ctx);
+    await prerenderApp(config, ctx, manifestBundles);
 
     // setup watcher if need be
     await setupWatcher(config, ctx);

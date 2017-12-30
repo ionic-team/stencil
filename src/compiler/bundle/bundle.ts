@@ -3,13 +3,14 @@ import { buildError, catchError, hasError } from '../util';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
 import { ENCAPSULATION } from '../../util/constants';
-import { generateBundles } from './generate-bundles';
 import { upgradeDependentComponents } from '../upgrade-dependents/index';
 
 
 export async function bundle(config: BuildConfig, ctx: BuildContext) {
+  let manifestBundles: ManifestBundle[] = [];
+
   if (hasError(ctx.diagnostics)) {
-    return Promise.resolve();
+    return manifestBundles;
   }
 
   if (config.generateWWW) {
@@ -24,34 +25,31 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
 
   try {
     // get all of the manifest bundles
-    ctx.manifestBundles = getManifestBundles(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
+    manifestBundles = getManifestBundles(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
 
     // check they're good to go
-    ctx.manifestBundles = validateBundleModules(ctx.manifestBundles);
+    manifestBundles = validateBundleModules(manifestBundles);
 
     // always consistently sort them
-    ctx.manifestBundles = sortBundles(ctx.manifestBundles);
+    manifestBundles = sortBundles(manifestBundles);
 
     // Look at all dependent components from outside collections and
     // upgrade the components to be compatible with this version if need be
-    await upgradeDependentComponents(config, ctx, ctx.manifestBundles);
+    await upgradeDependentComponents(config, ctx, manifestBundles);
 
   // kick off style and module bundling at the same time
     await Promise.all([
-      bundleStyles(config, ctx, ctx.manifestBundles),
-      bundleModules(config, ctx, ctx.manifestBundles)
+      bundleStyles(config, ctx, manifestBundles),
+      bundleModules(config, ctx, manifestBundles)
     ]);
-
-    // both styles and modules are done bundling
-    // inject the styles into the modules and
-    // generate each of the output bundles
-    generateBundles(config, ctx, ctx.manifestBundles);
 
   } catch (e) {
     catchError(ctx.diagnostics, e);
   }
 
   timeSpan.finish(`bundle finished`);
+
+  return manifestBundles;
 }
 
 

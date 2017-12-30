@@ -4,7 +4,7 @@ import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-
 import { generatePreamble, hasError } from '../util';
 import { getAppPublicPath, getGlobalFileName, getGlobalDist, getGlobalWWW } from './app-file-naming';
 import { transpileToEs5 } from '../transpile/core-build';
-import transpiledInMemoryPlugin from '../bundle/rollup-plugins/transpile-in-memory';
+import transpiledInMemoryPlugin from '../bundle/rollup-plugins/transpiled-in-memory';
 
 
 export async function generateAppGlobalScript(config: BuildConfig, ctx: BuildContext, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {

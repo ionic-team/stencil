@@ -1,64 +1,45 @@
-import { BuildConfig, BuildContext } from '../../../util/interfaces';
+import { BuildConfig, BuildContext, ComponentMeta } from '../../../util/interfaces';
 import { dashToPascalCase } from '../../../util/helpers';
 import { getJsPathBundlePlaceholder } from '../../../util/data-serialize';
 import * as ts from 'typescript';
 
 
 export function addComponentExports(config: BuildConfig, ctx: BuildContext): ts.TransformerFactory<ts.SourceFile> {
-
-  return (transformContext) => {
-    let componentClassName: string;
-
-    function visitComponentFile(tsSourceFile: ts.SourceFile, tagName: string): ts.Node {
-      tsSourceFile = visit(tsSourceFile, tagName) as ts.SourceFile;
-      tsSourceFile = addComponentExport(tsSourceFile, componentClassName, tagName);
-      tsSourceFile = addBundleExports(config, tsSourceFile, tagName);
+  return () => {
+    function visitComponentFile(tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta): ts.Node {
+      tsSourceFile = addComponentExport(tsSourceFile, cmpMeta);
+      tsSourceFile = addBundleExports(config, tsSourceFile, cmpMeta.tagNameMeta);
       return tsSourceFile;
-    }
-
-    function visitClass(classNode: ts.ClassDeclaration) {
-      componentClassName = classNode.name.text;
-      classNode = removeComponentExport(classNode);
-      return classNode;
-    }
-
-    function visit(node: ts.Node, tagName: string): ts.VisitResult<ts.Node> {
-      switch (node.kind) {
-        case ts.SyntaxKind.ClassDeclaration:
-          return visitClass(node as ts.ClassDeclaration);
-        default:
-          return ts.visitEachChild(node, (node) => {
-            return visit(node, tagName);
-          }, transformContext);
-      }
     }
 
     return (tsSourceFile) => {
       const moduleFile = ctx.moduleFiles[tsSourceFile.fileName];
       if (moduleFile && moduleFile.cmpMeta) {
-        return visitComponentFile(tsSourceFile, moduleFile.cmpMeta.tagNameMeta) as ts.SourceFile;
+        // this source file is a component
+        return visitComponentFile(tsSourceFile, moduleFile.cmpMeta) as ts.SourceFile;
       }
+
+      // not a component
       return tsSourceFile;
     };
   };
 }
 
 
-function removeComponentExport(classNode: ts.ClassDeclaration) {
-  if (classNode.modifiers) {
-    classNode.modifiers = ts.createNodeArray(
-      classNode.modifiers.filter(m => {
-        return m.kind !== ts.SyntaxKind.ExportKeyword && m.kind !== ts.SyntaxKind.DefaultKeyword;
-      })
-    );
+export function addComponentExport(tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
+  const pascalCaseTagName = dashToPascalCase(cmpMeta.tagNameMeta);
+  if (cmpMeta.componentClass === pascalCaseTagName) {
+    // the current component export is using the correct pascal cased tag name format
+    // "ion-button" tag the class name should be "IonButton"
+    // user isn't required to name their class name like this, but if they already
+    // did then cool, let's not add another export
+    return tsSourceFile;
   }
-  return classNode;
-}
 
-
-export function addComponentExport(tsSourceFile: ts.SourceFile, componentClassName: string, tagName: string) {
-  const componentName = ts.createIdentifier(componentClassName);
-  const exportAsName = ts.createIdentifier(dashToPascalCase(tagName));
+  // the component's current export isn't using the correct export name
+  // we're expecting, so let's add one and leave the existing export alone
+  const componentName = ts.createIdentifier(cmpMeta.componentClass);
+  const exportAsName = ts.createIdentifier(pascalCaseTagName);
 
   return ts.updateSourceFileNode(tsSourceFile, [
     ...tsSourceFile.statements,
@@ -74,33 +55,40 @@ export function addComponentExport(tsSourceFile: ts.SourceFile, componentClassNa
 
 
 function addBundleExports(config: BuildConfig, tsSourceFile: ts.SourceFile, tagName: string) {
+  // find the bundle this component belongs in, if any
   const containingBundle = config.bundles.find(b => Array.isArray(b.components) && b.components.indexOf(tagName) > -1);
   if (!containingBundle) {
     return tsSourceFile;
   }
 
+  // cool, let's go ahead and add them component exports
   return addBundleExportsFromTags(tsSourceFile, containingBundle.components, tagName);
 }
 
 
 export function addBundleExportsFromTags(tsSourceFile: ts.SourceFile, bundleTagNames: string[], tagName: string) {
-  if (bundleTagNames && bundleTagNames.length > 1) {
-    bundleTagNames.filter(t => t !== tagName).forEach(tagName => {
-      const pascalCaseComponentName = ts.createIdentifier(dashToPascalCase(tagName));
+  // add an export for each of the other components found in this bundle
+  // this allows the bundler later on in the process to group the components together
 
-      tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [
-        ...tsSourceFile.statements,
-        ts.createExportDeclaration(
-          undefined,
-          undefined,
-          ts.createNamedExports([
-            ts.createExportSpecifier(pascalCaseComponentName, pascalCaseComponentName)
-          ]),
-          ts.createLiteral(getJsPathBundlePlaceholder(tagName))
-        )
-      ]);
-    });
-  }
+  // find all of the components in the bundle that isn't this component
+  const otherTagsInBundle = bundleTagNames.filter(t => t !== tagName);
+
+  // add an export for the other components that go into this bundle
+  otherTagsInBundle.forEach(tagName => {
+    const pascalCaseComponentName = ts.createIdentifier(dashToPascalCase(tagName));
+
+    tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [
+      ...tsSourceFile.statements,
+      ts.createExportDeclaration(
+        undefined,
+        undefined,
+        ts.createNamedExports([
+          ts.createExportSpecifier(pascalCaseComponentName, pascalCaseComponentName)
+        ]),
+        ts.createLiteral(getJsPathBundlePlaceholder(tagName))
+      )
+    ]);
+  });
 
   return tsSourceFile;
 }

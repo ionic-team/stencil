@@ -3,7 +3,7 @@ import { ComponentMeta, ComponentRegistry, ComponentListenersData, LoadComponent
 import { isDef, toDashCase, toLowerCase } from './helpers';
 
 
-export function parseComponentLoaders(cmpRegistryData: LoadComponentRegistry, registry: ComponentRegistry, attr?: number) {
+export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmpRegistry: ComponentRegistry, attr?: number) {
   // tag name will always be lower case
   const cmpMeta: ComponentMeta = {
     tagNameMeta: cmpRegistryData[0],
@@ -42,7 +42,7 @@ export function parseComponentLoaders(cmpRegistryData: LoadComponentRegistry, re
     cmpMeta.listenersMeta = cmpRegistryData[5].map(parseListenerData);
   }
 
-  return registry[cmpMeta.tagNameMeta] = cmpMeta;
+  return cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
 }
 
 function parseListenerData(listenerData: ComponentListenersData) {

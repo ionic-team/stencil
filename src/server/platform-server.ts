@@ -131,13 +131,9 @@ export function createPlatformServer(
     cmpMeta.membersMeta.mode = { memberType: MEMBER_TYPE.Prop };
     cmpMeta.membersMeta.color = { memberType: MEMBER_TYPE.Prop, attribName: 'color' };
 
-    // registry tags are always lower-case
-    const registryTag = cmpMeta.tagNameMeta.toLowerCase();
-
-    if (!globalDefined[registryTag]) {
-      globalDefined[registryTag] = true;
-
-      registry[registryTag] = cmpMeta;
+    if (!globalDefined[cmpMeta.tagNameMeta]) {
+      globalDefined[cmpMeta.tagNameMeta] = true;
+      registry[cmpMeta.tagNameMeta] = cmpMeta;
     }
   }
 
@@ -265,10 +261,10 @@ export function createPlatformServer(
 
 
 export function getBundleId(cmpMeta: ComponentMeta, modeName: string) {
-  const bundleArr: string[] = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds)) as any;
+  const bundleIds = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE]);
 
-  // index 1 is the es5/umd module
-  return bundleArr[1];
+  // server side should use the es5 builds, which use the loadComponents jsonp callback
+  return bundleIds.es5;
 }
 
 

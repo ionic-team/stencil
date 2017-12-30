@@ -1,5 +1,5 @@
-import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic,
-  HostElement, HydrateOptions, HydrateResults, PlatformApi, VNode } from '../util/interfaces';
+import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement,
+  HydrateOptions, HydrateResults, PlatformApi, VNode } from '../util/interfaces';
 import { connectedCallback } from '../core/instance/connected';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
@@ -9,7 +9,7 @@ import { optimizeHtml } from '../compiler/html/optimize-html';
 import { proxyHostElementPrototype } from '../core/instance/proxy';
 
 
-export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
+export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
   return new Promise(resolve => {
 
     const hydrateResults: HydrateResults = {
@@ -24,7 +24,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
       imgUrls: []
     };
 
-    const registeredTags = Object.keys(registry || {});
+    const registeredTags = Object.keys(cmpRegistry || {});
     let ssrIds = 0;
 
     // if there are no components registered at all
@@ -66,10 +66,8 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, registry: Co
 
     // fully define each of our components onto this new platform instance
     registeredTags.forEach(registryTag => {
-      registryTag = registryTag.toLowerCase();
-      registry[registryTag].tagNameMeta = registryTag;
-      registry[registryTag].membersMeta = registry[registryTag].membersMeta || {};
-      plt.defineComponent(registry[registryTag]);
+      cmpRegistry[registryTag].tagNameMeta = registryTag.toLowerCase().trim();
+      plt.defineComponent(cmpRegistry[registryTag]);
     });
 
     // fire off this function when the app has finished loading

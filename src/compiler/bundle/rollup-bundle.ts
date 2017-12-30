@@ -1,11 +1,10 @@
 import { BuildConfig, BuildContext, ManifestBundle, RollupBundle } from '../../util/interfaces';
-import bundleInputEntry from './rollup-plugins/bundle-input-entry';
 import bundleResolution from './rollup-plugins/bundle-resolution';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import localResolution from './rollup-plugins/local-resolution';
-import transpiledInMemoryPlugin from './rollup-plugins/transpile-in-memory';
+import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 
 
 export async function runRollup(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
@@ -13,7 +12,7 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, manifest
 
   try {
     rollupBundle = await config.sys.rollup.rollup({
-      input: manifestBundle.cacheKey,
+      input: getBundleEntryInput(manifestBundle),
       cache: ctx.rollupCache[manifestBundle.cacheKey],
       plugins: [
         config.sys.rollup.plugins.nodeResolve({
@@ -24,8 +23,7 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, manifest
           include: 'node_modules/**',
           sourceMap: false
         }),
-        bundleInputEntry(ctx,  manifestBundle),
-        bundleResolution(manifestBundle),
+        bundleResolution(manifestBundle, ctx.moduleFiles),
         transpiledInMemoryPlugin(config, ctx),
         localResolution(config),
       ],
@@ -47,6 +45,31 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, manifest
   ctx.rollupCache[manifestBundle.cacheKey] = rollupBundle;
 
   return rollupBundle;
+}
+
+
+export function getBundleEntryInput(manifestBundle: ManifestBundle) {
+  // every component in the bundle has already inject imports pointing
+  // to the other components in the bundle from the typescript transforms
+  // any one of the transpiled components could act as the entry input
+  if (!manifestBundle.moduleFiles || !manifestBundle.moduleFiles.length) {
+    throw new Error(`invalid manifest bundle entry input: ${manifestBundle.cacheKey}`);
+  }
+
+  let components = manifestBundle.moduleFiles.filter(m => m.cmpMeta && m.jsFilePath);
+  if (!components.length) {
+    throw new Error(`no valid components found in bundle entry input: ${manifestBundle.cacheKey}`);
+  }
+
+  // sort by tagname so we're consisten
+  components = components.sort((a, b) => {
+    if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
+    if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+    return 0;
+  });
+
+  // use the first component in the bundle as the entry input
+  return components[0].jsFilePath;
 }
 
 

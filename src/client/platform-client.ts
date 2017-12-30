@@ -13,7 +13,7 @@ import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { h } from '../core/renderer/h';
 import { initHostElementConstructor } from '../core/instance/init-host';
 import { initStyleTemplate } from '../core/instance/styles';
-import { parseComponentLoaders } from '../util/data-parse';
+import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy';
 import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
@@ -58,7 +58,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: createQueueClient(win),
-    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoaders(data, registry))
+    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoader(data, registry))
   };
 
   // create the renderer that will be used
