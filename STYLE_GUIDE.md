@@ -1,6 +1,6 @@
 # Stencil Style Guide
 
-This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing [Ionic Core](http://ionicframework.com/) components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your team's own preference.
+This is a component style guide created and enforced internally by the core team of Stencil, for the purpose of standardizing [Ionic Core](https://ionicframework.com/) components. This should only be used as a reference for other teams in creating their own style guides. Feel free to modify to your team's own preference.
 
 
 ## File structure
@@ -47,7 +47,7 @@ stencil-component
 stnl-component
 ```
 
-Instead, use your own naming or brand. For example, [Ionic](http://ionicframework.com/) components are all prefixed with `ion-`.
+Instead, use your own naming or brand. For example, [Ionic](https://ionicframework.com/) components are all prefixed with `ion-`.
 ```
 ion-button
 ion-header
