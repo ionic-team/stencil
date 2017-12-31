@@ -17,7 +17,7 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, bundles:
     generateBundle(config, ctx, bundle);
   });
 
-  if (config.es5Fallback) {
+  if (config.buildEs5) {
     bundles.forEach(bundle => {
       generateBundle(config, ctx, bundle, 'es5');
     });

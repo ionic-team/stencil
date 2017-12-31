@@ -199,14 +199,14 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.hydratedCssClass = DEFAULT_HYDRATED_CSS_CLASS;
   }
 
-  if (typeof config.es5Fallback !== 'boolean') {
+  if (typeof config.buildEs5 !== 'boolean') {
     if (config.devMode) {
       // default dev mode only builds es2015
-      config.es5Fallback = false;
+      config.buildEs5 = false;
 
     } else {
       // default prod mode builds both es2015 and es5
-      config.es5Fallback = true;
+      config.buildEs5 = true;
     }
   }
 

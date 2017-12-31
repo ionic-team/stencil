@@ -13,7 +13,7 @@ describe('rebuild', () => {
       { components: ['cmp-a'] }
     ];
     config.watch = true;
-    config.es5Fallback = true;
+    config.buildEs5 = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
 

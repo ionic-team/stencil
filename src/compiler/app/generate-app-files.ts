@@ -39,7 +39,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, b
   ctx.appCoreWWWPath = coreSsrFilename;
 
 
-  if (config.es5Fallback) {
+  if (config.buildEs5) {
     // es5 build (if needed)
     const globalJsContentsEs5 = await generateAppGlobalScript(config, ctx, appRegistry, 'es5');
 

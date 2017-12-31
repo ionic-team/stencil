@@ -6,30 +6,30 @@ import * as path from 'path';
 
 describe('validation', () => {
 
-  describe('es5 fallback', () => {
+  describe('es5 build', () => {
 
-    it('set es5Fallback false', () => {
-      config.es5Fallback = false;
+    it('set buildEs5 false', () => {
+      config.buildEs5 = false;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(false);
+      expect(config.buildEs5).toBe(false);
     });
 
     it('set es5Fallback true', () => {
-      config.es5Fallback = true;
+      config.buildEs5 = true;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(true);
+      expect(config.buildEs5).toBe(true);
     });
 
     it('prod mode default to both es2015 and es5', () => {
       config.devMode = false;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(true);
+      expect(config.buildEs5).toBe(true);
     });
 
     it('dev mode default to only es2015', () => {
       config.devMode = true;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(false);
+      expect(config.buildEs5).toBe(false);
     });
 
   });

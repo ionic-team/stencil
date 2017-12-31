@@ -250,12 +250,16 @@ export interface Bundle {
   compiledModuleText?: string;
   compiledModuleLegacyText?: string;
   bundleBuilds?: BundleBuild[];
+  requiresScopedCss?: boolean;
 }
 
 
 export interface BundleBuild {
   modeName: string;
-  encapsulation: ENCAPSULATION;
+  isScopedCss: boolean;
+  isLegacyJs: boolean;
+  fileName?: string;
+  jsText?: string;
 }
 
 
@@ -314,7 +318,7 @@ export interface BuildConfig {
   logger?: Logger;
   rootDir?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
-  es5Fallback?: boolean;
+  buildEs5?: boolean;
   namespace?: string;
   fsNamespace?: string;
   globalScript?: string;

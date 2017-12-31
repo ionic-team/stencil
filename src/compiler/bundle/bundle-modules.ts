@@ -84,7 +84,7 @@ export async function generateComponentModules(config: BuildConfig, ctx: BuildCo
   // cache for later
   ctx.moduleBundleOutputs[bundles.cacheKey] = bundles.compiledModuleText;
 
-  if (config.es5Fallback) {
+  if (config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks
     // bundle using commonjs using jsonp callback
     bundles.compiledModuleLegacyText = await generateLegacyModule(config, rollupBundle);
