@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Bundle, ComponentMeta, ManifestBundle, ModuleFile } from '../../../util/interfaces';
+import { BuildConfig, BuildContext, ComponentMeta, ModuleFile } from '../../../util/interfaces';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { bundleRequiresScopedStyles } from '../bundle-styles';
 import { getBundleIdDev, getBundleIdHashed, setBundleModeIds } from '../generate-bundles';

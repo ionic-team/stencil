@@ -1,10 +1,10 @@
-import { BuildConfig, BuildContext, HostConfig, HostRule, HostRuleHeader, HydrateComponent, ManifestBundle, PrerenderResult, ServiceWorkerConfig } from '../../util/interfaces';
+import { BuildConfig, BuildContext, HostConfig, HostRule, HostRuleHeader, HydrateComponent, Bundle, PrerenderResult, ServiceWorkerConfig } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { pathJoin, readFile } from '../util';
 
 
-export async function generateHostConfig(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], prerenderResults: PrerenderResult[]) {
+export async function generateHostConfig(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], prerenderResults: PrerenderResult[]) {
   const hostConfig: HostConfig = {
     hosting: {
       rules: []
@@ -18,7 +18,7 @@ export async function generateHostConfig(config: BuildConfig, ctx: BuildContext,
   });
 
   prerenderResults.forEach(prerenderResult => {
-    const hostRule = generateHostRule(config, ctx, manifestBundles, prerenderResult);
+    const hostRule = generateHostRule(config, ctx, bundles, prerenderResult);
     if (hostRule) {
       hostConfig.hosting.rules.push(hostRule);
     }
@@ -34,10 +34,10 @@ export async function generateHostConfig(config: BuildConfig, ctx: BuildContext,
 }
 
 
-export function generateHostRule(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], prerenderResult: PrerenderResult) {
+export function generateHostRule(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], prerenderResult: PrerenderResult) {
   const hostRule: HostRule = {
     include: prerenderResult.path,
-    headers: generateHostRuleHeaders(config, ctx, manifestBundles, prerenderResult)
+    headers: generateHostRuleHeaders(config, ctx, bundles, prerenderResult)
   };
 
   if (hostRule.headers.length === 0) {
@@ -48,12 +48,12 @@ export function generateHostRule(config: BuildConfig, ctx: BuildContext, manifes
 }
 
 
-export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], prerenderResult: PrerenderResult) {
+export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], prerenderResult: PrerenderResult) {
   const hostRuleHeaders: HostRuleHeader[] = [];
 
   addStyles(config, hostRuleHeaders, prerenderResult);
   addCoreJs(config, ctx.appCoreWWWPath, hostRuleHeaders);
-  addBundles(config, manifestBundles, hostRuleHeaders, prerenderResult.components);
+  addBundles(config, bundles, hostRuleHeaders, prerenderResult.components);
   addScripts(config, hostRuleHeaders, prerenderResult);
   addImgs(config, hostRuleHeaders, prerenderResult);
 
@@ -68,10 +68,10 @@ function addCoreJs(config: BuildConfig, appCoreWWWPath: string, hostRuleHeaders:
 }
 
 
-export function addBundles(config: BuildConfig, manifestBundles: ManifestBundle[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
+export function addBundles(config: BuildConfig, bundles: Bundle[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
   components = sortComponents(components);
 
-  const bundleIds = getBundleIds(manifestBundles, components);
+  const bundleIds = getBundleIds(bundles, components);
 
   bundleIds.forEach(bundleId => {
     if (hostRuleHeaders.length < MAX_LINK_REL_PRELOAD_COUNT) {
@@ -83,11 +83,11 @@ export function addBundles(config: BuildConfig, manifestBundles: ManifestBundle[
 }
 
 
-export function getBundleIds(manifestBundles: ManifestBundle[], components: HydrateComponent[]) {
+export function getBundleIds(bundles: Bundle[], components: HydrateComponent[]) {
   const bundleIds: string[] = [];
 
   components.forEach(cmp => {
-    manifestBundles.forEach(mb => {
+    bundles.forEach(mb => {
       const moduleFile = mb.moduleFiles.find(mf => mf.cmpMeta && mf.cmpMeta.tagNameMeta === cmp.tag);
       if (!moduleFile) {
         return;

@@ -1,13 +1,13 @@
-import { BuildContext, ComponentMeta, BuildConditionals, ManifestBundle } from '../../util/interfaces';
+import { BuildContext, ComponentMeta, BuildConditionals, Bundle } from '../../util/interfaces';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
-export function setBuildConditionals(ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export function setBuildConditionals(ctx: BuildContext, bundles: Bundle[]) {
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
 
-  manifestBundles.forEach(manifestBundle => {
-    manifestBundle.moduleFiles.forEach(moduleFile => {
+  bundles.forEach(bundle => {
+    bundle.moduleFiles.forEach(moduleFile => {
       if (moduleFile.cmpMeta) {
         setBuildFromComponentMeta(coreBuild, moduleFile.cmpMeta);
         setBuildFromComponentContent(coreBuild, ctx.jsFiles[moduleFile.jsFilePath]);

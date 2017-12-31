@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Bundle, DependentCollection, Manifest } from '../../util/interfaces';
+import { BuildConfig, BuildContext, ManifestBundle, DependentCollection, Manifest } from '../../util/interfaces';
 import { normalizePath, readFile } from '../util';
 import { parseDependentManifest } from './manifest-data';
 
@@ -57,7 +57,7 @@ function loadDependentManifest(config: BuildConfig, ctx: BuildContext, dependent
 }
 
 
-export function filterDependentComponents(bundles: Bundle[], dependentCollection: DependentCollection, dependentManifest: Manifest) {
+export function filterDependentComponents(manifetBundles: ManifestBundle[], dependentCollection: DependentCollection, dependentManifest: Manifest) {
   if (dependentCollection.includeBundledOnly) {
     // what was imported included every component this collection has
     // however, the user only want to include specific components
@@ -65,7 +65,7 @@ export function filterDependentComponents(bundles: Bundle[], dependentCollection
     // loop through this manifest an take out components which are not
     // seen in the user's list of bundled components
     dependentManifest.modulesFiles = dependentManifest.modulesFiles.filter(modulesFile => {
-      return bundles.some(b => b.components.indexOf(modulesFile.cmpMeta.tagNameMeta) > -1);
+      return manifetBundles.some(b => b.components.indexOf(modulesFile.cmpMeta.tagNameMeta) > -1);
     });
   }
 }

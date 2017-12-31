@@ -1,30 +1,30 @@
 import { addBundleExportsFromTags, addComponentExport } from '../add-component-exports';
 import { addStaticMeta } from '../add-component-metadata';
-import { BuildConfig, ComponentMeta, ManifestBundle } from '../../../../util/interfaces';
+import { BuildConfig, ComponentMeta, Bundle } from '../../../../util/interfaces';
 import { dashToPascalCase } from '../../../../util/helpers';
 import { normalizePath } from '../../../util';
 import * as ts from 'typescript';
 
 
-export default function upgradeFromMetadata(config: BuildConfig, manifestBundles: ManifestBundle[]) {
+export default function upgradeFromMetadata(config: BuildConfig, bundles: Bundle[]) {
 
   return (tsSourceFile: ts.SourceFile) => {
     const tsFilePath = normalizePath(tsSourceFile.fileName);
 
-    const manifestBundle = manifestBundles.find(m => {
+    const bundle = bundles.find(m => {
       return m.moduleFiles.some(m => m.cmpMeta && normalizePath(m.jsFilePath) === tsFilePath);
     });
 
-    if (!manifestBundle) {
+    if (!bundle) {
       return tsSourceFile;
     }
 
-    const moduleFile = manifestBundle.moduleFiles.find(m => m.cmpMeta && normalizePath(m.jsFilePath) === tsFilePath);
+    const moduleFile = bundle.moduleFiles.find(m => m.cmpMeta && normalizePath(m.jsFilePath) === tsFilePath);
 
     if (moduleFile) {
       tsSourceFile = upgradeModuleFile(config, tsSourceFile, moduleFile.cmpMeta);
       tsSourceFile = upgradeExport(tsSourceFile, moduleFile.cmpMeta);
-      tsSourceFile = upgradeBundleExports(config, tsSourceFile, manifestBundle, moduleFile.cmpMeta.tagNameMeta);
+      tsSourceFile = upgradeBundleExports(config, tsSourceFile, bundle, moduleFile.cmpMeta.tagNameMeta);
     }
 
     return tsSourceFile;
@@ -71,8 +71,8 @@ function upgradeExport(tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
 }
 
 
-function upgradeBundleExports(_config: BuildConfig, tsSourceFile: ts.SourceFile, manifestBundle: ManifestBundle, tagName: string) {
-  const bundleTagNames = manifestBundle.moduleFiles
+function upgradeBundleExports(_config: BuildConfig, tsSourceFile: ts.SourceFile, bundle: Bundle, tagName: string) {
+  const bundleTagNames = bundle.moduleFiles
     .filter(m => {
       if (m.cmpMeta && m.jsFilePath.indexOf('__tests__') === -1) {
         return true;

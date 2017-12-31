@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, ManifestBundle, RollupBundle } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, RollupBundle } from '../../util/interfaces';
 import bundleResolution from './rollup-plugins/bundle-resolution';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
@@ -7,13 +7,13 @@ import localResolution from './rollup-plugins/local-resolution';
 import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 
 
-export async function runRollup(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
+export async function runRollup(config: BuildConfig, ctx: BuildContext, bundle: Bundle) {
   let rollupBundle: RollupBundle;
 
   try {
     rollupBundle = await config.sys.rollup.rollup({
-      input: getBundleEntryInput(manifestBundle),
-      cache: ctx.rollupCache[manifestBundle.cacheKey],
+      input: getBundleEntryInput(bundle),
+      cache: ctx.rollupCache[bundle.cacheKey],
       plugins: [
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
@@ -23,11 +23,11 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, manifest
           include: 'node_modules/**',
           sourceMap: false
         }),
-        bundleResolution(manifestBundle, ctx.moduleFiles),
+        bundleResolution(bundle, ctx.moduleFiles),
         transpiledInMemoryPlugin(config, ctx),
         localResolution(config),
       ],
-      onwarn: createOnWarnFn(ctx.diagnostics, manifestBundle.moduleFiles)
+      onwarn: createOnWarnFn(ctx.diagnostics, bundle.moduleFiles)
 
     });
 
@@ -42,23 +42,23 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, manifest
   // cache for later
   // watch out for any rollup cache bugs
   // https://github.com/rollup/rollup/issues/1372
-  ctx.rollupCache[manifestBundle.cacheKey] = rollupBundle;
+  ctx.rollupCache[bundle.cacheKey] = rollupBundle;
 
   return rollupBundle;
 }
 
 
-export function getBundleEntryInput(manifestBundle: ManifestBundle) {
+export function getBundleEntryInput(bundle: Bundle) {
   // every component in the bundle has already inject imports pointing
   // to the other components in the bundle from the typescript transforms
   // any one of the transpiled components could act as the entry input
-  if (!manifestBundle.moduleFiles || !manifestBundle.moduleFiles.length) {
-    throw new Error(`invalid manifest bundle entry input: ${manifestBundle.cacheKey}`);
+  if (!bundle.moduleFiles || !bundle.moduleFiles.length) {
+    throw new Error(`invalid manifest bundle entry input: ${bundle.cacheKey}`);
   }
 
-  let components = manifestBundle.moduleFiles.filter(m => m.cmpMeta && m.jsFilePath);
+  let components = bundle.moduleFiles.filter(m => m.cmpMeta && m.jsFilePath);
   if (!components.length) {
-    throw new Error(`no valid components found in bundle entry input: ${manifestBundle.cacheKey}`);
+    throw new Error(`no valid components found in bundle entry input: ${bundle.cacheKey}`);
   }
 
   // sort by tagname so we're consisten

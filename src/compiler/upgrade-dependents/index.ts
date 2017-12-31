@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Manifest, ManifestBundle } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Manifest, Bundle } from '../../util/interfaces';
 import { CompilerUpgrade, validateManifestCompatibility } from './manifest-compatibility';
 import { transformSourceString } from '../transpile/transformers/util';
 import upgradeFrom0_0_5 from '../transpile/transformers/JSX_Upgrade_From_0_0_5/upgrade-jsx-props';
@@ -6,8 +6,8 @@ import upgradeFromMetadata from '../transpile/transformers/Metadata_Upgrade_From
 import ts from 'typescript';
 
 
-export async function upgradeDependentComponents(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
-  const doUpgrade = createDoUpgrade(config, ctx, manifestBundles);
+export async function upgradeDependentComponents(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
+  const doUpgrade = createDoUpgrade(config, ctx, bundles);
 
   return Promise.all(Object.keys(ctx.dependentManifests).map(async collectionName => {
     const manifest = ctx.dependentManifests[collectionName];
@@ -22,7 +22,7 @@ export async function upgradeDependentComponents(config: BuildConfig, ctx: Build
 }
 
 
-function createDoUpgrade(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+function createDoUpgrade(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
 
   return async (manifest: Manifest, upgrades: CompilerUpgrade[]): Promise<void> => {
     const upgradeTransforms: ts.TransformerFactory<ts.SourceFile>[] = (upgrades.map((upgrade) => {
@@ -34,7 +34,7 @@ function createDoUpgrade(config: BuildConfig, ctx: BuildContext, manifestBundles
         case CompilerUpgrade.Metadata_Upgrade_From_0_1_0:
           config.logger.debug(`Metadata_Upgrade_From_0_1_0, manifestCompilerVersion: ${manifest.compiler.version}`);
           return () => {
-            return upgradeFromMetadata(config, manifestBundles);
+            return upgradeFromMetadata(config, bundles);
           };
       }
       return () => (tsSourceFile: ts.SourceFile) => (tsSourceFile);

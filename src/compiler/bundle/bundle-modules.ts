@@ -1,10 +1,10 @@
-import { BuildConfig, BuildContext, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, ModuleFile } from '../../util/interfaces';
 import { catchError, hasError } from '../util';
 import { createDependencyGraph } from './create-dependency-graph';
 import { generateEsModule, generateLegacyModule, runRollup } from './rollup-bundle';
 
 
-export async function bundleModules(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export async function bundleModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
   // create main module results object
   if (hasError(ctx.diagnostics)) {
     return;
@@ -19,15 +19,15 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, mani
   ctx.graphData = {};
 
   try {
-    await Promise.all(manifestBundles.map(manifestBundle => {
-      manifestBundle.cacheKey = getModuleBundleCacheKey(manifestBundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta));
-      return createDependencyGraph(config, ctx, manifestBundle);
+    await Promise.all(bundles.map(bundles => {
+      bundles.cacheKey = getModuleBundleCacheKey(bundles.moduleFiles.map(m => m.cmpMeta.tagNameMeta));
+      return createDependencyGraph(config, ctx, bundles);
     }));
 
     ctx.graphData = remapData(ctx.graphData);
 
-    await Promise.all(manifestBundles.map(manifestBundle => {
-      return generateComponentModules(config, ctx, manifestBundle);
+    await Promise.all(bundles.map(bundle => {
+      return generateComponentModules(config, ctx, bundle);
     }));
 
   } catch (err) {
@@ -62,12 +62,12 @@ function remapData(graphData: any) {
 
 
 
-export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
-  if (canSkipBuild(config, ctx, manifestBundle.moduleFiles, manifestBundle.cacheKey)) {
+export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle) {
+  if (canSkipBuild(config, ctx, bundles.moduleFiles, bundles.cacheKey)) {
     // don't bother bundling if this is a change build but
     // none of the changed files are modules or components
-    manifestBundle.compiledModuleText = ctx.moduleBundleOutputs[manifestBundle.cacheKey];
-    manifestBundle.compiledModuleLegacyText = ctx.moduleBundleLegacyOutputs[manifestBundle.cacheKey];
+    bundles.compiledModuleText = ctx.moduleBundleOutputs[bundles.cacheKey];
+    bundles.compiledModuleLegacyText = ctx.moduleBundleLegacyOutputs[bundles.cacheKey];
     return Promise.resolve();
   }
 
@@ -76,21 +76,21 @@ export async function generateComponentModules(config: BuildConfig, ctx: BuildCo
 
   // run rollup, but don't generate yet
   // returned rollup bundle can be reused for es module and legacy
-  const rollupBundle = await runRollup(config, ctx, manifestBundle);
+  const rollupBundle = await runRollup(config, ctx, bundles);
 
   // bundle using only es modules and dynamic imports
-  manifestBundle.compiledModuleText = await generateEsModule(config, rollupBundle);
+  bundles.compiledModuleText = await generateEsModule(config, rollupBundle);
 
   // cache for later
-  ctx.moduleBundleOutputs[manifestBundle.cacheKey] = manifestBundle.compiledModuleText;
+  ctx.moduleBundleOutputs[bundles.cacheKey] = bundles.compiledModuleText;
 
   if (config.es5Fallback) {
     // only create legacy modules when generating es5 fallbacks
     // bundle using commonjs using jsonp callback
-    manifestBundle.compiledModuleLegacyText = await generateLegacyModule(config, rollupBundle);
+    bundles.compiledModuleLegacyText = await generateLegacyModule(config, rollupBundle);
 
     // cache for later
-    ctx.moduleBundleLegacyOutputs[manifestBundle.cacheKey] = manifestBundle.compiledModuleLegacyText;
+    ctx.moduleBundleLegacyOutputs[bundles.cacheKey] = bundles.compiledModuleLegacyText;
   }
 }
 

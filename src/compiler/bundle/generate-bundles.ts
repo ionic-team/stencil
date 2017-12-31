@@ -1,5 +1,5 @@
-import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry, ManifestBundle, ModuleFile, SourceTarget } from '../../util/interfaces';
-import { bundleRequiresScopedStyles, getManifestBundleModes } from './bundle-styles';
+import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry, Bundle, ModuleFile, SourceTarget } from '../../util/interfaces';
+import { bundleRequiresScopedStyles, getBundleModes } from './bundle-styles';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { generatePreamble, hasError, pathJoin } from '../util';
 import { getAppDistDir, getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
@@ -7,24 +7,24 @@ import { getStylePlaceholder, getStyleIdPlaceholder, replaceBundleIdPlaceholder 
 import { transpileToEs5 } from '../transpile/core-build';
 
 
-export function generateBundles(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export function generateBundles(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
   // both styles and modules are done bundling
   // combine the styles and modules together
   // generate the actual files to write
   const timeSpan = config.logger.createTimeSpan(`generate bundles started`, true);
 
-  manifestBundles.forEach(manifestBundle => {
-    generateBundle(config, ctx, manifestBundle);
+  bundles.forEach(bundle => {
+    generateBundle(config, ctx, bundle);
   });
 
   if (config.es5Fallback) {
-    manifestBundles.forEach(manifestBundle => {
-      generateBundle(config, ctx, manifestBundle, 'es5');
+    bundles.forEach(bundle => {
+      generateBundle(config, ctx, bundle, 'es5');
     });
   }
 
   // create the registry of all the components
-  const cmpRegistry = generateComponentRegistry(manifestBundles);
+  const cmpRegistry = generateComponentRegistry(bundles);
 
   timeSpan.finish(`generate bundles finished`);
 
@@ -32,14 +32,14 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, manifest
 }
 
 
-function generateBundle(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, sourceTarget?: SourceTarget) {
+function generateBundle(config: BuildConfig, ctx: BuildContext, bundle: Bundle, sourceTarget?: SourceTarget) {
   // init the bundle id for each component in this bundle
-  manifestBundle.moduleFiles.forEach(moduleFile => {
+  bundle.moduleFiles.forEach(moduleFile => {
     moduleFile.cmpMeta.bundleIds = moduleFile.cmpMeta.bundleIds || {};
   });
 
   // get the already bundled js modules for this source target
-  let jsText = getBundleJsText(ctx, manifestBundle, sourceTarget);
+  let jsText = getBundleJsText(ctx, bundle, sourceTarget);
 
   if (config.minifyJs) {
     // minify the bundle js text
@@ -47,52 +47,52 @@ function generateBundle(config: BuildConfig, ctx: BuildContext, manifestBundle: 
   }
 
   // create unscoped css bundles
-  generateBundleModes(config, ctx, manifestBundle, jsText, false, sourceTarget);
+  generateBundleModes(config, ctx, bundle, jsText, false, sourceTarget);
 
-  if (bundleRequiresScopedStyles(manifestBundle.moduleFiles)) {
+  if (bundleRequiresScopedStyles(bundle.moduleFiles)) {
     // create scoped css bundles
-    generateBundleModes(config, ctx, manifestBundle, jsText, true, sourceTarget);
+    generateBundleModes(config, ctx, bundle, jsText, true, sourceTarget);
   }
 }
 
 
-function generateBundleModes(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, jsText: string, isScopedCss: boolean, sourceTarget?: SourceTarget) {
+function generateBundleModes(config: BuildConfig, ctx: BuildContext, bundle: Bundle, jsText: string, isScopedCss: boolean, sourceTarget?: SourceTarget) {
   // get all the possible modes used within this bundle
   // reverse source so the default style mode is taken care of last
-  const modeNames = getManifestBundleModes(manifestBundle.moduleFiles).reverse();
+  const modeNames = getBundleModes(bundle.moduleFiles).reverse();
 
   if (modeNames.length) {
     modeNames.forEach(modeName => {
-      jsText = injectStyleModes(manifestBundle, modeName, jsText, isScopedCss);
+      jsText = injectStyleModes(bundle, modeName, jsText, isScopedCss);
 
       if (modeName !== DEFAULT_STYLE_MODE) {
         // possible that most components in a bundle has styles for a mode
         // but one of the components doesn't, so we need to inject the default
         // for this bundle. Think grouping ion-fixed, that has no mode styles,
         // but it's being bundled with ion-button, which does.
-        jsText = injectStyleModes(manifestBundle, DEFAULT_STYLE_MODE, jsText, isScopedCss);
+        jsText = injectStyleModes(bundle, DEFAULT_STYLE_MODE, jsText, isScopedCss);
       }
 
-      generateBundleMode(config, ctx, manifestBundle, jsText, modeName, isScopedCss, sourceTarget);
+      generateBundleMode(config, ctx, bundle, jsText, modeName, isScopedCss, sourceTarget);
     });
 
   } else {
     // this bundle doesn't have any modes, so go with the default
-    jsText = injectStyleModes(manifestBundle, DEFAULT_STYLE_MODE, jsText, isScopedCss);
-    generateBundleMode(config, ctx, manifestBundle, jsText, DEFAULT_STYLE_MODE, isScopedCss, sourceTarget);
+    jsText = injectStyleModes(bundle, DEFAULT_STYLE_MODE, jsText, isScopedCss);
+    generateBundleMode(config, ctx, bundle, jsText, DEFAULT_STYLE_MODE, isScopedCss, sourceTarget);
   }
 }
 
 
-function generateBundleMode(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle, jsText: string, modeName: string, isScopedCss: boolean, sourceTarget?: SourceTarget) {
+function generateBundleMode(config: BuildConfig, ctx: BuildContext, bundle: Bundle, jsText: string, modeName: string, isScopedCss: boolean, sourceTarget?: SourceTarget) {
   // create the bundle id
-  manifestBundle.bundleId = getBundleId(config, manifestBundle, modeName, jsText, isScopedCss, sourceTarget);
+  bundle.bundleId = getBundleId(config, bundle, modeName, jsText, isScopedCss, sourceTarget);
 
   // assign the bundle id to each of the components
-  setBundleModeIds(manifestBundle.moduleFiles, modeName, manifestBundle.bundleId, sourceTarget);
+  setBundleModeIds(bundle.moduleFiles, modeName, bundle.bundleId, sourceTarget);
 
   // create the file name
-  const fileName = getBundleFilename(manifestBundle.bundleId);
+  const fileName = getBundleFilename(bundle.bundleId);
 
   // get the absolute path to where it'll be saved in www
   const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
@@ -102,7 +102,7 @@ function generateBundleMode(config: BuildConfig, ctx: BuildContext, manifestBund
 
   // update the bundle id placeholder with the actual bundle id
   // this is used by jsonp callbacks to know which bundle loaded
-  jsText = replaceBundleIdPlaceholder(jsText, manifestBundle.bundleId);
+  jsText = replaceBundleIdPlaceholder(jsText, bundle.bundleId);
 
   // use wwwBuildPath as the cache key
   if (ctx.compiledFileCache[wwwBuildPath] === jsText) {
@@ -125,8 +125,8 @@ function generateBundleMode(config: BuildConfig, ctx: BuildContext, manifestBund
 }
 
 
-function injectStyleModes(manifestBundle: ManifestBundle, modeName: string, jsText: string, isScopedCss: boolean) {
-  manifestBundle.moduleFiles.forEach(moduleFile => {
+function injectStyleModes(bundle: Bundle, modeName: string, jsText: string, isScopedCss: boolean) {
+  bundle.moduleFiles.forEach(moduleFile => {
     jsText = injectComponentStyleMode(moduleFile.cmpMeta, modeName, jsText, isScopedCss);
   });
 
@@ -164,15 +164,15 @@ function injectComponentStyleMode(cmpMeta: ComponentMeta, modeName: string, jsTe
 }
 
 
-function getBundleJsText(ctx: BuildContext, manifestBundle: ManifestBundle, sourceTarget?: SourceTarget) {
+function getBundleJsText(ctx: BuildContext, bundle: Bundle, sourceTarget?: SourceTarget) {
   if (sourceTarget === 'es5') {
     // use legacy bundling with commonjs/jsonp modules
     // and transpile the build to es5
-    return transileEs5Bundle(ctx, manifestBundle.compiledModuleLegacyText);
+    return transileEs5Bundle(ctx, bundle.compiledModuleLegacyText);
   }
 
   // already have es modules with es6 target
-  return manifestBundle.compiledModuleText;
+  return bundle.compiledModuleText;
 }
 
 
@@ -233,13 +233,13 @@ function minifyBundleJs(config: BuildConfig, ctx: BuildContext, jsText: string, 
 }
 
 
-export function getBundleId(config: BuildConfig, manifestBundle: ManifestBundle, modeName: string, jsText: string, isScopedCss?: boolean, sourceTarget?: SourceTarget) {
+export function getBundleId(config: BuildConfig, bundle: Bundle, modeName: string, jsText: string, isScopedCss?: boolean, sourceTarget?: SourceTarget) {
   if (config.hashFileNames) {
     // create style id from hashing the content
     return getBundleIdHashed(config, jsText);
   }
 
-  const tags = manifestBundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta);
+  const tags = bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta);
   return getBundleIdDev(tags, modeName, isScopedCss, sourceTarget);
 }
 
@@ -286,12 +286,12 @@ export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bu
 }
 
 
-export function generateComponentRegistry(manifestBundles: ManifestBundle[]) {
+export function generateComponentRegistry(bundles: Bundle[]) {
   const registryComponents: ComponentMeta[] = [];
   const cmpRegistry: ComponentRegistry = {};
 
-  manifestBundles.forEach(manifestBundle => {
-    manifestBundle.moduleFiles.filter(m => m.cmpMeta).forEach(moduleFile => {
+  bundles.forEach(bundle => {
+    bundle.moduleFiles.filter(m => m.cmpMeta).forEach(moduleFile => {
       registryComponents.push(moduleFile.cmpMeta);
     });
   });

@@ -1,15 +1,15 @@
 import { Bundle, Diagnostic, ManifestBundle, ModuleFile } from '../../../util/interfaces';
 import { ENCAPSULATION } from '../../../util/constants';
-import { getManifestBundles, findPrimaryEncapsulation, sortBundles, validateManifestBundle } from '../bundle';
+import { getBundlesFromManifest, findPrimaryEncapsulation, sortBundles, validateBundle } from '../bundle';
 
 
 describe('bundle', () => {
 
-  describe('validateManifestBundle', () => {
+  describe('validateBundle', () => {
 
     it('should add when majority shadow, secondary scoped and no encapsulation', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
+      const validatedBundles: Bundle[] = [];
+      const bundle: Bundle = {
         moduleFiles: [
           { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom, stylesMeta: {} } },
           { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom, stylesMeta: {} } },
@@ -20,7 +20,7 @@ describe('bundle', () => {
           { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation, stylesMeta: {} } }
         ],
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
+      validateBundle(validatedBundles, bundle);
       expect(validatedBundles.length).toBe(3);
       expect(validatedBundles[0].moduleFiles.length).toBe(4);
       expect(validatedBundles[0].moduleFiles[0].cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
@@ -36,62 +36,62 @@ describe('bundle', () => {
     });
 
     it('should add when all no encapsulation', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
+      const validatedBundles: Bundle[] = [];
+      const bundle: Bundle = {
         moduleFiles: [
           { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation } },
           { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation } }
         ],
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
+      validateBundle(validatedBundles, bundle);
       expect(validatedBundles.length).toBe(1);
       expect(validatedBundles[0].moduleFiles.length).toBe(2);
     });
 
     it('should add when all scoped', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
+      const validatedBundles: Bundle[] = [];
+      const bundle: Bundle = {
         moduleFiles: [
           { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } },
           { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } }
         ],
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
+      validateBundle(validatedBundles, bundle);
       expect(validatedBundles.length).toBe(1);
       expect(validatedBundles[0].moduleFiles.length).toBe(2);
     });
 
     it('should add when all shadow', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
+      const validatedBundles: Bundle[] = [];
+      const bundle: Bundle = {
         moduleFiles: [
           { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom } },
           { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom } }
         ]
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
+      validateBundle(validatedBundles, bundle);
       expect(validatedBundles.length).toBe(1);
       expect(validatedBundles[0].moduleFiles.length).toBe(2);
     });
 
     it('should add when only 1 module', () => {
-      const validatedBundles: ManifestBundle[] = [];
+      const validatedBundles: Bundle[] = [];
       const moduleFile: ModuleFile = {};
-      const manifestBundle: ManifestBundle = {
+      const bundle: Bundle = {
         moduleFiles: [moduleFile]
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
-      expect(validatedBundles[0]).toBe(manifestBundle);
+      validateBundle(validatedBundles, bundle);
+      expect(validatedBundles[0]).toBe(bundle);
       expect(validatedBundles[0].moduleFiles[0]).toBe(moduleFile);
       expect(validatedBundles.length).toBe(1);
     });
 
     it('should not add when no module files', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
+      const validatedBundles: Bundle[] = [];
+      const bundle: Bundle = {
         moduleFiles: []
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
+      validateBundle(validatedBundles, bundle);
       expect(validatedBundles.length).toBe(0);
     });
 
@@ -125,10 +125,10 @@ describe('bundle', () => {
 
   });
 
-  describe('getManifestBundles', () => {
+  describe('getBundlesFromManifest', () => {
 
     it('should error when component isnt found in bundle', () => {
-      const bundles: Bundle[] = [
+      const manifestBundles: ManifestBundle[] = [
         { components: ['cmp-b', 'cmp-a', 'cmp-z'] },
       ];
       const allModuleFiles: ModuleFile[] =  [
@@ -137,15 +137,15 @@ describe('bundle', () => {
       ];
       const diagnostics: Diagnostic[] = [];
 
-      const manifestBundles = getManifestBundles(allModuleFiles, bundles, diagnostics);
+      const bundles = getBundlesFromManifest(allModuleFiles, manifestBundles, diagnostics);
 
-      expect(manifestBundles.length).toBe(1);
-      expect(manifestBundles[0].moduleFiles.length).toBe(2);
+      expect(bundles.length).toBe(1);
+      expect(bundles[0].moduleFiles.length).toBe(2);
       expect(diagnostics.length).toBe(1);
     });
 
     it('not bundle with no components', () => {
-      const bundles: Bundle[] = [
+      const manifestBundles: ManifestBundle[] = [
         { components: ['cmp-d', 'cmp-e'] },
         { components: ['cmp-b', 'cmp-a'] },
         { components: [] },
@@ -158,14 +158,14 @@ describe('bundle', () => {
       ];
       const diagnostics: Diagnostic[] = [];
 
-      const manifestBundles = getManifestBundles(allModuleFiles, bundles, diagnostics);
+      const bundles = getBundlesFromManifest(allModuleFiles, manifestBundles, diagnostics);
 
-      expect(manifestBundles.length).toBe(2);
+      expect(bundles.length).toBe(2);
       expect(diagnostics.length).toBe(0);
     });
 
     it('load bundles and sort alpha', () => {
-      const bundles: Bundle[] = [
+      const manifestBundles: ManifestBundle[] = [
         { components: ['cmp-e', 'cmp-d'] },
         { components: ['cmp-b', 'cmp-a'] },
         { components: ['cmp-c'] },
@@ -180,15 +180,15 @@ describe('bundle', () => {
       ];
       const diagnostics: Diagnostic[] = [];
 
-      let manifestBundles = getManifestBundles(allModuleFiles, bundles, diagnostics);
-      manifestBundles = sortBundles(manifestBundles);
+      let bundles = getBundlesFromManifest(allModuleFiles, manifestBundles, diagnostics);
+      bundles = sortBundles(bundles);
 
-      expect(manifestBundles[0].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-a');
-      expect(manifestBundles[0].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-b');
-      expect(manifestBundles[1].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-c');
-      expect(manifestBundles[2].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-d');
-      expect(manifestBundles[2].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-e');
-      expect(manifestBundles.length).toBe(3);
+      expect(bundles[0].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-a');
+      expect(bundles[0].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-b');
+      expect(bundles[1].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-c');
+      expect(bundles[2].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-d');
+      expect(bundles[2].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-e');
+      expect(bundles.length).toBe(3);
       expect(diagnostics.length).toBe(0);
     });
 

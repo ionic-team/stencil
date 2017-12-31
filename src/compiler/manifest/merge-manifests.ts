@@ -1,4 +1,4 @@
-import { Bundle, Manifest } from '../../util/interfaces';
+import { ManifestBundle, Manifest } from '../../util/interfaces';
 
 
 export function mergeDependentManifests(appManifest: Manifest, dependentManifests: Manifest[]) {
@@ -11,7 +11,7 @@ export function mergeDependentManifests(appManifest: Manifest, dependentManifest
     concatModuleFiles(appManifest, dependentManifest);
 
     // update which components go in which bundles
-    updateBundles(appManifest, dependentManifest);
+    updateManifestBundles(appManifest, dependentManifest);
 
     // add the dependent manfiest to the app manifests
     appManifest.dependentManifests.push(dependentManifest);
@@ -29,7 +29,7 @@ function concatModuleFiles(appManifest: Manifest, dependentManifest: Manifest) {
 }
 
 
-function updateBundles(appManifest: Manifest, dependentManifest: Manifest) {
+function updateManifestBundles(appManifest: Manifest, dependentManifest: Manifest) {
   if (!Array.isArray(dependentManifest.modulesFiles) || !Array.isArray(dependentManifest.bundles)) return;
 
   // if any component is in the app's bundle config
@@ -38,7 +38,7 @@ function updateBundles(appManifest: Manifest, dependentManifest: Manifest) {
 
   dependentManifest.bundles.forEach(dependentBundle => {
     // make a fresh copy
-    const cleanedBundled: Bundle = {
+    const cleanedBundled: ManifestBundle = {
       components: []
     };
 

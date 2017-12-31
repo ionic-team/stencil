@@ -1,4 +1,4 @@
-import { AssetsMeta, BuildConfig, BuildContext, BuildResults, Bundle, BundleData,
+import { AssetsMeta, BuildConfig, BuildContext, BuildResults, ManifestBundle, BundleData,
   ComponentMeta, ComponentData, EventData, EventMeta, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
@@ -840,11 +840,11 @@ export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
       return;
     }
 
-    const bundle: Bundle = {
+    const manifestBundle: ManifestBundle = {
       components: bundleData.components.sort()
     };
 
-    manifest.bundles.push(bundle);
+    manifest.bundles.push(manifestBundle);
   });
 }
 

@@ -1,8 +1,8 @@
 import { getJsPathBundlePlaceholder } from '../../../util/data-serialize';
-import { ModuleFiles, ManifestBundle } from '../../../util/interfaces';
+import { ModuleFiles, Bundle } from '../../../util/interfaces';
 
 
-export default function bundleResolver(manifestBundle: ManifestBundle, moduleFiles: ModuleFiles) {
+export default function bundleResolver(bundle: Bundle, moduleFiles: ModuleFiles) {
   const checkStarsWith = getJsPathBundlePlaceholder('').substr(0, 4);
 
   return {
@@ -11,7 +11,7 @@ export default function bundleResolver(manifestBundle: ManifestBundle, moduleFil
     resolveId(importee: string) {
       if (importee.startsWith(checkStarsWith)) {
         // get the js file path using the placeholder id
-        return getJsFilePathByPlaceholdId(manifestBundle, moduleFiles, importee);
+        return getJsFilePathByPlaceholdId(bundle, moduleFiles, importee);
       }
 
       return null;
@@ -20,11 +20,11 @@ export default function bundleResolver(manifestBundle: ManifestBundle, moduleFil
 }
 
 
-function getJsFilePathByPlaceholdId(manifestBundle: ManifestBundle, moduleFiles: ModuleFiles, placeholderId: string) {
+function getJsFilePathByPlaceholdId(bundle: Bundle, moduleFiles: ModuleFiles, placeholderId: string) {
   // check the manifest bundle files
   let modulePlaceholderId: string;
 
-  let moduleFile = manifestBundle.moduleFiles.find(m => {
+  let moduleFile = bundle.moduleFiles.find(m => {
     if (m.cmpMeta && typeof m.jsFilePath === 'string') {
       modulePlaceholderId = getJsPathBundlePlaceholder(m.cmpMeta.tagNameMeta);
       return modulePlaceholderId === placeholderId;

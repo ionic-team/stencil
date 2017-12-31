@@ -1,4 +1,4 @@
-import { BuildConfig, Bundle, CopyTasks, DependentCollection } from './interfaces';
+import { BuildConfig, ManifestBundle, CopyTasks, DependentCollection } from './interfaces';
 import { dashToPascalCase } from '../util/helpers';
 import { normalizePath } from '../compiler/util';
 
@@ -323,14 +323,14 @@ export function validateDependentCollection(userInput: any) {
 }
 
 
-export function validateUserBundles(bundles: Bundle[]) {
-  if (!bundles) {
+export function validateUserBundles(manifestBundles: ManifestBundle[]) {
+  if (!manifestBundles) {
     throw new Error(`Invalid bundles`);
   }
 
   // normalize bundle component tags
   // sort by tag name and ensure they're lower case
-  bundles.forEach(b => {
+  manifestBundles.forEach(b => {
     if (!Array.isArray(b.components)) {
       throw new Error(`manifest missing bundle components array, instead received: ${b.components}`);
     }
@@ -344,7 +344,7 @@ export function validateUserBundles(bundles: Bundle[]) {
     b.components = b.components.map(tag => validateComponentTag(tag)).sort();
   });
 
-  bundles.sort((a, b) => {
+  manifestBundles.sort((a, b) => {
     if (a.components && a.components.length && b.components && b.components.length) {
       if (a.components[0].toLowerCase() < b.components[0].toLowerCase()) return -1;
       if (a.components[0].toLowerCase() > b.components[0].toLowerCase()) return 1;

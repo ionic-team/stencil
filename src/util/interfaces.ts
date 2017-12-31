@@ -194,10 +194,15 @@ export interface ComponentEventData {
 export interface Manifest {
   manifestName?: string;
   modulesFiles?: ModuleFile[];
-  bundles?: Bundle[];
+  bundles?: ManifestBundle[];
   global?: ModuleFile;
   dependentManifests?: Manifest[];
   compiler?: ManifestCompiler;
+}
+
+
+export interface ManifestBundle {
+  components: string[];
 }
 
 
@@ -239,16 +244,18 @@ export interface AppRegistryComponents {
 
 
 export interface Bundle {
-  components: string[];
-}
-
-
-export interface ManifestBundle {
   bundleId?: string;
   cacheKey?: string;
   moduleFiles: ModuleFile[];
   compiledModuleText?: string;
   compiledModuleLegacyText?: string;
+  bundleBuilds?: BundleBuild[];
+}
+
+
+export interface BundleBuild {
+  modeName: string;
+  encapsulation: ENCAPSULATION;
 }
 
 
@@ -325,7 +332,7 @@ export interface BuildConfig {
   publicPath?: string;
   generateDistribution?: boolean;
   generateWWW?: boolean;
-  bundles?: Bundle[];
+  bundles?: ManifestBundle[];
   collections?: DependentCollection[];
   devMode?: boolean;
   watch?: boolean;

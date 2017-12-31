@@ -73,15 +73,15 @@ export async function build(config: BuildConfig, context?: any) {
     await generateAppManifest(config, ctx, compileResults.moduleFiles);
 
     // bundle modules and styles into separate files phase
-    const manifestBundles = await bundle(config, ctx);
+    const bundles = await bundle(config, ctx);
 
     // both styles and modules are done bundling
     // inject the styles into the modules and
     // generate each of the output bundles
-    const cmpRegistry = generateBundles(config, ctx, manifestBundles);
+    const cmpRegistry = generateBundles(config, ctx, bundles);
 
     // generate the app files, such as app.js, app.core.js
-    await generateAppFiles(config, ctx, manifestBundles, cmpRegistry);
+    await generateAppFiles(config, ctx, bundles, cmpRegistry);
 
     // empty the build dest directory
     // doing this now incase the
@@ -107,7 +107,7 @@ export async function build(config: BuildConfig, context?: any) {
     await generateServiceWorker(config, ctx);
 
     // prerender that app
-    await prerenderApp(config, ctx, manifestBundles);
+    await prerenderApp(config, ctx, bundles);
 
     // setup watcher if need be
     await setupWatcher(config, ctx);

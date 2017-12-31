@@ -1,4 +1,4 @@
-import { BuildConfig, HostConfig, HostRuleHeader, HydrateComponent, ManifestBundle } from '../../../util/interfaces';
+import { BuildConfig, Bundle, HostConfig, HostRuleHeader, HydrateComponent } from '../../../util/interfaces';
 import { addBundles, formatLinkRelPreloadHeader, getBundleIds, mergeUserHostConfig, sortComponents } from '../host-config';
 
 
@@ -7,7 +7,7 @@ describe('host-config', () => {
   describe('getBundleIds', () => {
 
     it('get used components', () => {
-      const manifestBundles: ManifestBundle[] = [
+      const bundles: Bundle[] = [
         {
           moduleFiles: [
             {
@@ -63,7 +63,7 @@ describe('host-config', () => {
         { tag: 'cmp-c' },
         { tag: 'cmp-d' }
       ];
-      const bundleIds = getBundleIds(manifestBundles, components);
+      const bundleIds = getBundleIds(bundles, components);
 
       expect(bundleIds.length).toBe(2);
       expect(bundleIds[0]).toBe('bundle-a');

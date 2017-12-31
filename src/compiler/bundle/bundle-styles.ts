@@ -1,10 +1,10 @@
-import { BuildContext, BuildConfig, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { BuildContext, BuildConfig, Bundle, ModuleFile } from '../../util/interfaces';
 import { catchError, hasError } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
 import { generateComponentStyles } from './component-styles';
 
 
-export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export function bundleStyles(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
   // create main style results object
   if (hasError(ctx.diagnostics)) {
     return Promise.resolve();
@@ -18,8 +18,8 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
 
   // go through each bundle the user wants created
   // and create css files for each mode for each bundle
-  return Promise.all(manifestBundles.map(manifestBundle => {
-    return bundleComponentStyles(config, ctx, manifestBundle);
+  return Promise.all(bundles.map(bundle => {
+    return bundleComponentStyles(config, ctx, bundle);
 
   }))
   .catch(err => {
@@ -32,14 +32,14 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
 }
 
 
-function bundleComponentStyles(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
-  return Promise.all(manifestBundle.moduleFiles.filter(m => m.cmpMeta).map(moduleFile => {
+function bundleComponentStyles(config: BuildConfig, ctx: BuildContext, bundles: Bundle) {
+  return Promise.all(bundles.moduleFiles.filter(m => m.cmpMeta).map(moduleFile => {
     return generateComponentStyles(config, ctx, moduleFile);
   }));
 }
 
 
-export function getManifestBundleModes(bundleModuleFiles: ModuleFile[]) {
+export function getBundleModes(bundleModuleFiles: ModuleFile[]) {
   const allBundleModes: string[] = [];
 
   bundleModuleFiles.filter(m => m.cmpMeta && m.cmpMeta.stylesMeta).forEach(moduleFile => {

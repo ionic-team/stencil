@@ -1,10 +1,10 @@
-import { BuildConfig, BuildContext, HydrateResults, ManifestBundle, PrerenderConfig, PrerenderStatus, PrerenderLocation, PrerenderResult } from '../../util/interfaces';
+import { BuildConfig, BuildContext, HydrateResults, Bundle, PrerenderConfig, PrerenderStatus, PrerenderLocation, PrerenderResult } from '../../util/interfaces';
 import { buildError, catchError, hasError, normalizePath, readFile } from '../util';
 import { generateHostConfig } from './host-config';
 import { prerenderUrl } from './prerender-url';
 
 
-export async function prerenderApp(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export async function prerenderApp(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
   const prerenderResults: PrerenderResult[] = [];
 
   if (hasError(ctx.diagnostics)) {
@@ -56,7 +56,7 @@ export async function prerenderApp(config: BuildConfig, ctx: BuildContext, manif
       drainPrerenderQueue(config, ctx, prerenderQueue, indexHtml, prerenderResults, resolve);
     });
 
-    await generateHostConfig(config, ctx, manifestBundles, prerenderResults);
+    await generateHostConfig(config, ctx, bundles, prerenderResults);
 
   } catch (e) {
     catchError(ctx.diagnostics, e);

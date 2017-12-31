@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, ComponentRegistry, ManifestBundle } from '../../util/interfaces';
+import { BuildConfig, BuildContext, ComponentRegistry, Bundle } from '../../util/interfaces';
 import { createAppRegistry, writeAppRegistry } from './app-registry';
 import { generateAppGlobalScript } from './app-global-scripts';
 import { generateCore } from './app-core';
@@ -9,7 +9,7 @@ import { hasError } from '../util';
 import { setBuildConditionals } from './build-conditionals';
 
 
-export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[], cmpRegistry: ComponentRegistry) {
+export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], cmpRegistry: ComponentRegistry) {
   if (hasError(ctx.diagnostics)) {
     return;
   }
@@ -23,14 +23,14 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, m
   const globalJsContentsEs2015 = await generateAppGlobalScript(config, ctx, appRegistry);
 
   // figure out which sections should be included in the core build
-  const buildConditionals = setBuildConditionals(ctx, manifestBundles);
+  const buildConditionals = setBuildConditionals(ctx, bundles);
   buildConditionals.coreId = 'core';
   buildConditionals.ssrClientSide = false;
 
   const coreFilename = await generateCore(config, ctx, globalJsContentsEs2015, buildConditionals);
   appRegistry.core = coreFilename;
 
-  const buildConditionalsSsr = setBuildConditionals(ctx, manifestBundles);
+  const buildConditionalsSsr = setBuildConditionals(ctx, bundles);
   buildConditionalsSsr.coreId = 'core.ssr';
   buildConditionalsSsr.ssrClientSide = true;
 
@@ -43,7 +43,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, m
     // es5 build (if needed)
     const globalJsContentsEs5 = await generateAppGlobalScript(config, ctx, appRegistry, 'es5');
 
-    const buildConditionalsEs5 = setBuildConditionals(ctx, manifestBundles);
+    const buildConditionalsEs5 = setBuildConditionals(ctx, bundles);
     buildConditionalsEs5.coreId = 'core.pf';
     buildConditionalsEs5.es5 = true;
     buildConditionalsEs5.polyfills = true;
