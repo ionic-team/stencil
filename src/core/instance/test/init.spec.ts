@@ -1,7 +1,7 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentInstance, ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
-import { initHostElementConstructor } from '../init-host';
-import { initLoad } from '../init-component';
+import { initHostElement } from '../init-host-element';
+import { initComponentLoaded } from '../init-component-instance';
 
 
 describe('instance init', () => {
@@ -9,7 +9,7 @@ describe('instance init', () => {
   describe('initLoad', () => {
 
     it('should call multiple componentOnReady promises', () => {
-      initHostElementConstructor(plt, cmpMeta, elm);
+      initHostElement(plt, cmpMeta, elm);
 
       let called1 = false;
       let called2 = false;
@@ -22,7 +22,7 @@ describe('instance init', () => {
         called2 = true;
       });
 
-      initLoad(plt, elm);
+      initComponentLoaded(plt, elm);
 
       return Promise.all([p1, p2]).then(() => {
         expect(called1).toBe(true);
@@ -31,7 +31,7 @@ describe('instance init', () => {
     });
 
     it('should call multiple componentOnReady callbacks', () => {
-      initHostElementConstructor(plt, cmpMeta, elm);
+      initHostElement(plt, cmpMeta, elm);
 
       let called1 = false;
       let called2 = false;
@@ -43,7 +43,7 @@ describe('instance init', () => {
         called2 = true;
       });
 
-      initLoad(plt, elm);
+      initComponentLoaded(plt, elm);
       expect(called1).toBe(true);
       expect(called2).toBe(true);
     });

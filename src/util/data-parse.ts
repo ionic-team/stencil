@@ -1,4 +1,4 @@
-import { ATTR_CASE, MEMBER_TYPE, PROP_TYPE } from './constants';
+import { ATTR_CASE, PROP_TYPE } from './constants';
 import { ComponentMeta, ComponentRegistry, ComponentListenersData, LoadComponentRegistry, PropertyType } from '../util/interfaces';
 import { isDef, toDashCase, toLowerCase } from './helpers';
 
@@ -11,12 +11,12 @@ export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmp
       // every component defaults to always have
       // the mode and color properties
       // but only color should observe any attribute changes
-      'mode': { memberType: MEMBER_TYPE.Prop },
-      'color': { memberType: MEMBER_TYPE.Prop, attribName: 'color' }
+      'color': { attribName: 'color' }
     }
   };
 
-  // map of the modes w/ bundle id and style data
+  // map of the bundle ids
+  // can contain modes, and array of esm and es5 bundle ids
   cmpMeta.bundleIds = cmpRegistryData[1] as any;
 
   // parse member meta

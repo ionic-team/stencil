@@ -236,6 +236,7 @@ const PROD_MINIFY_OPTS: any = {
 var RESERVED_PROPERTIES: string[] = [
   'addListener',
   'attr',
+  'color',
   'dom',
   'emit',
   'enableListener',
@@ -249,7 +250,7 @@ var RESERVED_PROPERTIES: string[] = [
   'read',
   'ref',
   'write',
-  '$definedComponents',
+  '$definedCmps',
 
 
   /**

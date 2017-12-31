@@ -1,7 +1,7 @@
-import { HostElement, PlatformApi, ComponentConstructor } from '../../../util/interfaces';
-import { proxyComponentInstance } from '../proxy';
-import { mockElement, mockPlatform } from '../../../testing/mocks';
+import { ComponentConstructor, HostElement, PlatformApi } from '../../../util/interfaces';
 import { MEMBER_TYPE } from '../../../util/constants';
+import { mockElement, mockPlatform } from '../../../testing/mocks';
+import { proxyComponentInstance } from '../proxy-component-instance';
 
 
 describe('proxyComponentInstance', () => {

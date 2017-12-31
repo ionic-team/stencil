@@ -6,7 +6,7 @@ export function initStyleTemplate(domApi: DomApi, cmpConstructor: ComponentConst
   const style = cmpConstructor.style;
   if (style) {
     // we got a style mode for this component, let's create an id for this style
-    const styleModeId = 's-' + cmpConstructor.is + (cmpConstructor.styleMode || '');
+    const styleModeId = cmpConstructor.is + (cmpConstructor.styleMode || '');
 
     if (!(cmpConstructor as any)[styleModeId]) {
       // we don't have this style mode id initialized yet
@@ -44,13 +44,13 @@ export function initStyleTemplate(domApi: DomApi, cmpConstructor: ComponentConst
 
 export function attachStyles(domApi: DomApi, cmpConstructor: ComponentConstructor, modeName: string, elm: HostElement, styleElm?: HTMLStyleElement) {
   // first see if we've got a style for a specific mode
-  let styleModeId = 's-' + cmpConstructor.is + (modeName || '');
+  let styleModeId = cmpConstructor.is + (modeName || '');
   let styleTemplate = (cmpConstructor as any)[styleModeId];
 
   if (!styleTemplate) {
     // didn't find a style for this mode
     // now let's check if there's a default style for this component
-    styleModeId = 's-' + cmpConstructor.is;
+    styleModeId = cmpConstructor.is;
     styleTemplate = (cmpConstructor as any)[styleModeId];
   }
 

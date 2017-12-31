@@ -161,16 +161,13 @@ describe('data serialize/parse', () => {
       expect(cmpMeta.membersMeta.str.attribName).toEqual('str');
     });
 
-    it('should always set color/mode even with no props', () => {
+    it('should always set color even with no props', () => {
       cmpMeta.membersMeta = null;
 
       const format = formatComponentLoader(cmpMeta);
       cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.membersMeta.color).toBeDefined();
-      expect(cmpMeta.membersMeta.color.memberType).toBe(MEMBER_TYPE.Prop);
-      expect(cmpMeta.membersMeta.mode).toBeDefined();
-      expect(cmpMeta.membersMeta.mode.memberType).toBe(MEMBER_TYPE.Prop);
     });
 
     it('should set has styles', () => {

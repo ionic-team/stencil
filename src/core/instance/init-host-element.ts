@@ -3,12 +3,12 @@ import { Build } from '../../util/build-conditionals';
 import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
-import { initLoad } from './init-component';
-import { proxyHostElementPrototype } from './proxy';
+import { initComponentLoaded } from './init-component-instance';
+import { proxyHostElementPrototype } from './proxy-host-element';
 import { queueUpdate } from './update';
 
 
-export function initHostElementConstructor(plt: PlatformApi, cmpMeta: ComponentMeta, HostElementConstructor: HostElement, hydratedCssClass?: string) {
+export function initHostElement(plt: PlatformApi, cmpMeta: ComponentMeta, HostElementConstructor: HostElement, hydratedCssClass?: string) {
   // let's wire up our functions to the host element's prototype
   // we can also inject our platform into each one that needs that api
   // note: these cannot be arrow functions cuz "this" is important here hombre
@@ -40,7 +40,7 @@ export function initHostElementConstructor(plt: PlatformApi, cmpMeta: ComponentM
   };
 
   HostElementConstructor.$initLoad = function() {
-    initLoad(plt, (this as HostElement), hydratedCssClass);
+    initComponentLoaded(plt, (this as HostElement), hydratedCssClass);
   };
 
   HostElementConstructor.forceUpdate = function() {

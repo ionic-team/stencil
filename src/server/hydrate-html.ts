@@ -4,9 +4,9 @@ import { connectedCallback } from '../core/instance/connected';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
-import { initLoad } from '../core/instance/init-component';
+import { initComponentLoaded } from '../core/instance/init-component-instance';
 import { optimizeHtml } from '../compiler/html/optimize-html';
-import { proxyHostElementPrototype } from '../core/instance/proxy';
+import { proxyHostElementPrototype } from '../core/instance/proxy-host-element';
 
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
@@ -177,7 +177,7 @@ export function connectElement(plt: PlatformApi, elm: HostElement, hydrateResult
 
       if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
         elm.$initLoad = () => {
-          initLoad(plt, elm, hydratedCssClass);
+          initComponentLoaded(plt, elm, hydratedCssClass);
         };
 
         proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);

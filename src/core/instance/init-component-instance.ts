@@ -1,10 +1,10 @@
 import { Build } from '../../util/build-conditionals';
 import { callNodeRefs } from '../renderer/patch';
 import { ComponentConstructor, HostElement, PlatformApi } from '../../util/interfaces';
-import { initEventEmitters } from './events';
+import { initEventEmitters } from './init-event-emitters';
 import { replayQueuedEventsOnInstance } from './listeners';
 import { RUNTIME_ERROR } from '../../util/constants';
-import { proxyComponentInstance } from './proxy';
+import { proxyComponentInstance } from './proxy-component-instance';
 
 
 export function initComponentInstance(plt: PlatformApi, elm: HostElement, componentConstructor?: ComponentConstructor) {
@@ -48,7 +48,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement, compon
 }
 
 
-export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: string): any {
+export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydratedCssClass?: string): any {
   // all is good, this component has been told it's time to finish loading
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
@@ -95,12 +95,12 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    propagateElementLoaded(elm);
+    propagateComponentLoaded(elm);
   }
 }
 
 
-export function propagateElementLoaded(elm: HostElement, index?: number, ancestorsActivelyLoadingChildren?: HostElement[]) {
+export function propagateComponentLoaded(elm: HostElement, index?: number, ancestorsActivelyLoadingChildren?: HostElement[]) {
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
   if (elm._ancestorHostElement) {

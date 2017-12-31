@@ -7,7 +7,7 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';
-import { proxyController } from '../core/instance/proxy';
+import { proxyController } from '../core/instance/proxy-controller';
 import { toDashCase } from '../util/helpers';
 
 
@@ -51,9 +51,6 @@ export function createPlatformServer(
 
   // add the app's global to the window context
   win[config.namespace] = App;
-
-  // keep a global set of tags we've already defined
-  const globalDefined: { [tagName: string]: boolean } = win.$definedComponents = win.$definedComponents || {};
 
   const appWwwDir = config.wwwDir;
   const appBuildDir = config.sys.path.join(config.buildDir, config.fsNamespace);
@@ -131,8 +128,7 @@ export function createPlatformServer(
     cmpMeta.membersMeta.mode = { memberType: MEMBER_TYPE.Prop };
     cmpMeta.membersMeta.color = { memberType: MEMBER_TYPE.Prop, attribName: 'color' };
 
-    if (!globalDefined[cmpMeta.tagNameMeta]) {
-      globalDefined[cmpMeta.tagNameMeta] = true;
+    if (!registry[cmpMeta.tagNameMeta]) {
       registry[cmpMeta.tagNameMeta] = cmpMeta;
     }
   }
@@ -161,7 +157,7 @@ export function createPlatformServer(
 
 
   function isDefinedComponent(elm: Element) {
-    return !!(globalDefined[elm.tagName.toLowerCase()] || registry[elm.tagName.toLowerCase()]);
+    return !!(registry[elm.tagName.toLowerCase()]);
   }
 
 
@@ -177,7 +173,7 @@ export function createPlatformServer(
 
       } catch (e) {
         onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
-        cmpMeta.componentConstructor = function() {} as any;
+        cmpMeta.componentConstructor = class {} as any;
       }
     }
 

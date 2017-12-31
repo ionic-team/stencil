@@ -1,6 +1,6 @@
 import { Build } from '../../util/build-conditionals';
 import { HostElement, PlatformApi } from '../../util/interfaces';
-import { initComponentInstance } from './init-component';
+import { initComponentInstance } from './init-component-instance';
 import { render } from './render';
 import { RUNTIME_ERROR } from '../../util/constants';
 

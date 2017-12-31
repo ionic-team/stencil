@@ -11,10 +11,10 @@ import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/instance/listeners';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { h } from '../core/renderer/h';
-import { initHostElementConstructor } from '../core/instance/init-host';
+import { initHostElement } from '../core/instance/init-host-element';
 import { initStyleTemplate } from '../core/instance/styles';
 import { parseComponentLoader } from '../util/data-parse';
-import { proxyController } from '../core/instance/proxy';
+import { proxyController } from '../core/instance/proxy-controller';
 import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
 
@@ -42,7 +42,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   App.h = h;
 
   // keep a global set of tags we've already defined
-  const globalDefined: {[tag: string]: boolean} = (win as any).definedComponents = (win as any).definedComponents || {};
+  const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};
 
   // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
@@ -108,11 +108,11 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
 
     if (!globalDefined[cmpMeta.tagNameMeta]) {
-      // keep an array of all the defined components, useful for external frameworks
+      // keep a map of all the defined components
       globalDefined[cmpMeta.tagNameMeta] = true;
 
       // initialize the members on the host element prototype
-      initHostElementConstructor(plt, cmpMeta, HostElementConstructor.prototype, hydratedCssClass);
+      initHostElement(plt, cmpMeta, HostElementConstructor.prototype, hydratedCssClass);
 
       if (Build.observeAttr) {
         // add which attributes should be observed

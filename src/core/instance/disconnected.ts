@@ -2,7 +2,7 @@ import { Build } from '../../util/build-conditionals';
 import { callNodeRefs } from '../renderer/patch';
 import { DomApi, HostElement, PlatformApi } from '../../util/interfaces';
 import { NODE_TYPE } from '../../util/constants';
-import { propagateElementLoaded } from './init-component';
+import { propagateComponentLoaded } from './init-component-instance';
 
 
 export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
@@ -17,7 +17,7 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement) {
 
     // double check that we've informed the ancestor host elements
     // that they're good to go and loaded (cuz this one is on its way out)
-    propagateElementLoaded(elm);
+    propagateComponentLoaded(elm);
 
     // since we're disconnecting, call all of the JSX ref's with null
     callNodeRefs(elm._vnode, true);

@@ -91,7 +91,7 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
     // - check if elm contains name or if the value is array, object, or function
 
     const cmpMeta = plt.getComponentMeta(elm);
-    if (cmpMeta && cmpMeta.membersMeta && name in cmpMeta.membersMeta) {
+    if (cmpMeta && cmpMeta.componentConstructor && cmpMeta.componentConstructor.properties && name in cmpMeta.componentConstructor.properties) {
       // setting a known @Prop on this element
       setProperty(elm, name, newValue);
 

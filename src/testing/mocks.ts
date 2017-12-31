@@ -3,8 +3,8 @@ import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostE
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { initHostElementConstructor } from '../core/instance/init-host';
-import { initComponentInstance } from '../core/instance/init-component';
+import { initHostElement } from '../core/instance/init-host-element';
+import { initComponentInstance } from '../core/instance/init-component-instance';
 import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../util/validate-config';
 import { ComponentInstance } from '../util/interfaces';
@@ -449,7 +449,7 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
     if (!node.$connected) {
       const cmpMeta = (<PlatformApi>plt).getComponentMeta(node);
       if (cmpMeta) {
-        initHostElementConstructor((<PlatformApi>plt), cmpMeta, node);
+        initHostElement((<PlatformApi>plt), cmpMeta, node);
         (<HostElement>node).connectedCallback();
       }
     }

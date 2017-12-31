@@ -1,7 +1,7 @@
 import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { ComponentMeta, ComponentConstructor, ComponentInstance, PlatformApi } from '../../../util/interfaces';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
-import { proxyComponentInstance } from '../proxy';
+import { proxyComponentInstance } from '../proxy-component-instance';
 
 
 describe('set instance property', () => {
