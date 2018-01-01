@@ -154,7 +154,11 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
 
 function callChangeMethods(changeMethods: string[], instance: any, newVal: any, oldVal: any, i?: number) {
   for (i = 0; i < changeMethods.length; i++) {
-    instance && instance[changeMethods[i]].call(instance, newVal, oldVal);
+    try {
+      instance && instance[changeMethods[i]].call(instance, newVal, oldVal);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 
