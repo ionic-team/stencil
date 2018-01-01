@@ -244,22 +244,12 @@ export interface AppRegistryComponents {
 
 
 export interface Bundle {
-  bundleId?: string;
   cacheKey?: string;
   moduleFiles: ModuleFile[];
   compiledModuleText?: string;
   compiledModuleLegacyText?: string;
-  bundleBuilds?: BundleBuild[];
-  requiresScopedCss?: boolean;
-}
-
-
-export interface BundleBuild {
-  modeName: string;
-  isScopedCss: boolean;
-  isLegacyJs: boolean;
-  fileName?: string;
-  jsText?: string;
+  requiresScopedStyles?: boolean;
+  modeNames?: string[];
 }
 
 
@@ -837,12 +827,7 @@ export interface JSDoc {
 
 
 export interface BundleIds {
-  [modeName: string]: BundleId;
-}
-
-export interface BundleId {
-  esm?: string;
-  es5?: string;
+  [modeName: string]: string;
 }
 
 

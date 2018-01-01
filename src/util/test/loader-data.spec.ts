@@ -190,26 +190,26 @@ describe('data serialize/parse', () => {
 
     it('should set all of the bundle ids as an object', () => {
       cmpMeta.bundleIds = {
-        ios: { esm: 'abc'},
-        md: { esm: 'def'}
+        ios: 'abc',
+        md: 'def'
       };
 
       const format = formatComponentLoader(cmpMeta);
       cmpMeta = parseComponentLoader(format, {});
 
-      expect(cmpMeta.bundleIds.ios[0]).toBe('abc');
-      expect(cmpMeta.bundleIds.md[0]).toBe('def');
+      expect(cmpMeta.bundleIds.ios).toBe('abc');
+      expect(cmpMeta.bundleIds.md).toBe('def');
     });
 
     it('should set the default bundle id as a string', () => {
       cmpMeta.bundleIds = {
-        $: { esm: 'default-id'}
+        $: 'default-id'
       };
 
       const format = formatComponentLoader(cmpMeta);
       cmpMeta = parseComponentLoader(format, {});
 
-      expect(cmpMeta.bundleIds[0]).toBe('default-id');
+      expect(cmpMeta.bundleIds).toBe('default-id');
     });
 
     it('should set the bundle id as a string', () => {

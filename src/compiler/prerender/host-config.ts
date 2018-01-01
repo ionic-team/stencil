@@ -98,11 +98,9 @@ export function getBundleIds(bundles: Bundle[], components: HydrateComponent[]) 
         bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE];
       }
 
-      if (!bundleId || !bundleId.esm || bundleIds.indexOf(bundleId.esm) > -1) {
-        return;
+      if (bundleId && bundleIds.indexOf(bundleId) === -1) {
+        bundleIds.push(bundleId);
       }
-
-      bundleIds.push(bundleId.esm);
     });
   });
 
@@ -111,7 +109,7 @@ export function getBundleIds(bundles: Bundle[], components: HydrateComponent[]) 
 
 
 function getBundleUrl(config: BuildConfig, bundleId: string) {
-  const unscopedFileName = getBundleFilename(bundleId);
+  const unscopedFileName = getBundleFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), unscopedFileName);
   return pathJoin(config, '/', config.sys.path.relative(config.wwwDir, unscopedWwwBuildPath));
 }

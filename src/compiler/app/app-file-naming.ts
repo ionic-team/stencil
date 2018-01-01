@@ -1,4 +1,4 @@
-import { BuildConfig } from '../../util/interfaces';
+import { BuildConfig, SourceTarget } from '../../util/interfaces';
 import { pathJoin } from '../util';
 
 
@@ -69,8 +69,8 @@ export function getGlobalStyleFilename(config: BuildConfig) {
 }
 
 
-export function getBundleFilename(bundleId: string) {
-  return `${bundleId}.js`;
+export function getBundleFilename(bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
+  return `${bundleId}${isScopedStyles ? '.sc' : ''}${sourceTarget === 'es5' ? '.es5' : ''}.js`;
 }
 
 

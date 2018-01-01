@@ -14,7 +14,7 @@ describe('validation', () => {
       expect(config.buildEs5).toBe(false);
     });
 
-    it('set es5Fallback true', () => {
+    it('set buildEs5 true', () => {
       config.buildEs5 = true;
       validateBuildConfig(config);
       expect(config.buildEs5).toBe(true);

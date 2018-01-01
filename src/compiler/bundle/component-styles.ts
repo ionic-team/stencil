@@ -72,7 +72,7 @@ export function setStyleText(config: BuildConfig, ctx: BuildContext, cmpMeta: Co
     }
   }
 
-  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+  if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to
     styleMeta.compiledStyleTextScoped = scopeComponentCss(ctx, cmpMeta, styleMeta.compiledStyleText);
   }
@@ -92,6 +92,11 @@ export function cleanStyle(style: string) {
   return style.replace(/\r\n|\r|\n/g, `\\n`)
               .replace(/\"/g, `\\"`)
               .replace(/\@/g, `\\@`);
+}
+
+
+export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
+  return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
 }
 
 

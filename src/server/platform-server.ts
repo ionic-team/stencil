@@ -165,8 +165,7 @@ export function createPlatformServer(
     // synchronous in nodejs
     if (!cmpMeta.componentConstructor) {
       try {
-        const bundleId = getBundleId(cmpMeta, modeName);
-        const fileName = getBundleFilename(cmpMeta, bundleId);
+        const fileName = getBundleFilename(cmpMeta, modeName);
         const jsFilePath = config.sys.path.join(appBuildDir, fileName);
         const jsCode = config.sys.fs.readFileSync(jsFilePath, 'utf-8');
         config.sys.vm.runInContext(jsCode, win);
@@ -256,18 +255,15 @@ export function createPlatformServer(
 }
 
 
-export function getBundleId(cmpMeta: ComponentMeta, modeName: string) {
-  const bundleIds = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE]);
+export function getBundleFilename(cmpMeta: ComponentMeta, modeName: string) {
+  let bundleId = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE]);
 
-  // server side should use the es5 builds, which use the loadComponents jsonp callback
-  return bundleIds.es5;
-}
-
-
-export function getBundleFilename(cmpMeta: ComponentMeta, bundleId: string) {
   if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     bundleId += '.sc';
   }
-  bundleId += '.js';
+
+  // server-side always uses es5 and jsonp callback modules
+  bundleId += '.es5.js';
+
   return bundleId;
 }

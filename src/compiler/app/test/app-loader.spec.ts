@@ -32,8 +32,8 @@ describe('build-project-files', () => {
       const cmpRegistry: ComponentRegistry = {
         'root-cmp': {
           bundleIds: {
-            Mode1: { esm: 'Mode1_es2015', es5: 'Mode1_es5' },
-            Mode2: { esm: 'Mode2_es2015', es5: 'Mode2_es5' },
+            Mode1: 'abc',
+            Mode2: 'def',
           }
         }
       };
@@ -47,7 +47,7 @@ describe('build-project-files', () => {
         `("__APP__")`
       );
 
-      expect(appLoader).toBe(`("MyApp","build/my-app/","my-app.core.js","my-app.core.ssr.js","my-app.core.pf.js\",[["root-cmp",{"Mode1":["Mode1_es2015","Mode1_es5"],"Mode2":["Mode2_es2015","Mode2_es5"]}]])`);
+      expect(appLoader).toBe(`("MyApp","build/my-app/","my-app.core.js","my-app.core.ssr.js","my-app.core.pf.js\",[["root-cmp",{"Mode1":"abc","Mode2":"def"}]])`);
     });
 
   });

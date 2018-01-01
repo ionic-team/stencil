@@ -344,7 +344,7 @@ export function validateUserBundles(manifestBundles: ManifestBundle[]) {
     b.components = b.components.map(tag => validateComponentTag(tag)).sort();
   });
 
-  manifestBundles.sort((a, b) => {
+  manifestBundles = manifestBundles.sort((a, b) => {
     if (a.components && a.components.length && b.components && b.components.length) {
       if (a.components[0].toLowerCase() < b.components[0].toLowerCase()) return -1;
       if (a.components[0].toLowerCase() > b.components[0].toLowerCase()) return 1;

@@ -151,7 +151,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
       cb();
 
     } else {
-      const bundleId = (cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any))[0];
+      const bundleId = (cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any));
       const url = publicPath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
 
       // dynamic es module import() => woot!

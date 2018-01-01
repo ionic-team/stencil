@@ -209,7 +209,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
 
 
   function loadBundle(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
-    bundleId = (cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any))[1];
+    bundleId = cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any);
 
     if (loadedBundles[bundleId]) {
       // sweet, we've already loaded this bundle
@@ -245,7 +245,8 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
 
   function requestBundle(cmpMeta: ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
     // create the url we'll be requesting
-    url = publicPath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
+    // always use the es5/jsonp callback module
+    url = publicPath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js');
 
     function onScriptComplete() {
       clearTimeout(tmrId);

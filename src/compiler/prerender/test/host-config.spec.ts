@@ -14,9 +14,7 @@ describe('host-config', () => {
               cmpMeta: {
                 tagNameMeta: 'cmp-a',
                 bundleIds: {
-                  md: {
-                    esm: 'bundle-a'
-                  }
+                  md: 'bundle-a'
                 }
               },
             },
@@ -24,9 +22,7 @@ describe('host-config', () => {
               cmpMeta: {
                 tagNameMeta: 'cmp-b',
                 bundleIds: {
-                  md: {
-                    esm: 'bundle-a'
-                  }
+                  md: 'bundle-a'
                 }
               },
             }
@@ -38,9 +34,7 @@ describe('host-config', () => {
               cmpMeta: {
                 tagNameMeta: 'cmp-c',
                 bundleIds: {
-                  $: {
-                    esm: 'bundle-b'
-                  }
+                  $: 'bundle-b'
                 }
               },
             },
@@ -48,9 +42,7 @@ describe('host-config', () => {
               cmpMeta: {
                 tagNameMeta: 'cmp-d',
                 bundleIds: {
-                  $: {
-                    esm: 'bundle-b'
-                  }
+                  $: 'bundle-b'
                 }
               },
             }

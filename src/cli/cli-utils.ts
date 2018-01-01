@@ -49,7 +49,7 @@ export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
   }
 
   if (argv.es5) {
-    config.es5Fallback = true;
+    config.buildEs5 = true;
   }
 
   if (argv.docs) {

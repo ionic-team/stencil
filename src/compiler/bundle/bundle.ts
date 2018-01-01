@@ -1,9 +1,10 @@
-import { BuildConfig, BuildContext, Diagnostic, Bundle, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic, ManifestBundle, ModuleFile } from '../../util/interfaces';
 import { buildError, catchError, hasError } from '../util';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
-import { ENCAPSULATION } from '../../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { upgradeDependentComponents } from '../upgrade-dependents/index';
+import { requiresScopedStyles } from './component-styles';
 
 
 export async function bundle(config: BuildConfig, ctx: BuildContext) {
@@ -26,12 +27,6 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
   try {
     // get all of the bundles from the manifest bundles
     bundles = getBundlesFromManifest(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
-
-    // check they're good to go
-    bundles = validateBundleModules(bundles);
-
-    // always consistently sort them
-    bundles = sortBundles(bundles);
 
     // Look at all dependent components from outside collections and
     // upgrade the components to be compatible with this version if need be
@@ -57,7 +52,10 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
   const bundles: Bundle[] = [];
 
   manifestBundles.filter(b => b.components && b.components.length).forEach(manifestBundle => {
-    const bundle = createBundle([]);
+    const bundle: Bundle = {
+      moduleFiles: [],
+      compiledModuleText: ''
+    };
 
     manifestBundle.components.forEach(tag => {
       const cmpMeta = moduleFiles.find(modulesFile => modulesFile.cmpMeta.tagNameMeta === tag);
@@ -65,123 +63,90 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
         bundle.moduleFiles.push(cmpMeta);
 
       } else {
-        buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
+        buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or collections.`;
       }
     });
 
     if (bundle.moduleFiles.length > 0) {
+      updateBundleBuilds(bundle);
       bundles.push(bundle);
     }
   });
 
-  return bundles;
+  // always consistently sort them
+  return sortBundles(bundles);
 }
 
 
-function validateBundleModules(bundles: Bundle[]) {
-  // can't mix and match different types of encapsulation in the same bundle
-  const validatedBundles: Bundle[] = [];
+export function updateBundleBuilds(bundle: Bundle) {
+  // get the modes used in this bundle
+  bundle.modeNames = getBundleModes(bundle.moduleFiles);
 
-  bundles.forEach(bundle => {
-    validateBundle(validatedBundles, bundle);
+  // get the encapsulations used in this bundle
+  const encapsulations = getBundleEncapsulations(bundle);
+
+  // figure out if we'll need an unscoped css build
+  bundle.requiresScopedStyles = bundleRequiresScopedStyles(encapsulations);
+
+  // figure out if we'll need a scoped css build
+  bundle.requiresScopedStyles = bundleRequiresScopedStyles(encapsulations);
+}
+
+
+export function getBundleModes(moduleFiles: ModuleFile[]) {
+  const styleModeNames: string[] = [];
+
+  moduleFiles.forEach(m => {
+    const cmpStyleModes = getComponentStyleModes(m.cmpMeta);
+    cmpStyleModes.forEach(modeName => {
+      if (!styleModeNames.includes(modeName)) {
+        styleModeNames.push(modeName);
+      }
+    });
   });
 
-  return validatedBundles;
+  if (styleModeNames.length === 0) {
+    styleModeNames.push(DEFAULT_STYLE_MODE);
+
+  } else if (styleModeNames.length > 1) {
+    let index = (styleModeNames.indexOf(DEFAULT_STYLE_MODE));
+    if (index > -1) {
+      styleModeNames.splice(index, 1);
+    }
+  }
+
+  return styleModeNames.sort();
 }
 
 
-export function validateBundle(validatedBundles: Bundle[], bundle: Bundle) {
-  // ok, so this method is used to clean up the bundles to make sure that
-  // all of the components in this bundle share the same encapsulation type
-  // we could throw an error if the user mix and matches, but that's confusing
-  // and they'd have to manually do what we're doing below. So let's just do it for them
-  // so make sure each bundle has the same encapsulation type, and for those who
-  // don't have the same type, then create new bundles which share the same type
-  if (bundle.moduleFiles.length === 0) {
-    // no components, no bundle (not sure how this could happen, but whatever)
-    return;
-  }
+export function getComponentStyleModes(cmpMeta: ComponentMeta) {
+  return (cmpMeta && cmpMeta.stylesMeta) ? Object.keys(cmpMeta.stylesMeta) : [];
+}
 
-  if (bundle.moduleFiles.length === 1) {
-    // only one component, so we couldn't have issues with
-    // different encapsulation types in the bundle
-    validatedBundles.push(bundle);
-    return;
-  }
 
-  // there are multiple components in this bundle
-  // figure out which encapsulation type we see the most of in this bundle
-  const primaryEncapsulation = findPrimaryEncapsulation(bundle.moduleFiles);
+export function getBundleEncapsulations(bundle: Bundle) {
+  const encapsulations: ENCAPSULATION[] = [];
 
-  // used to collect all the same encapsulation type in this main bundle
-  const primaryCss: ModuleFile[] = [];
-
-  // used to collect all the types that shouldn't be grouped in this module
-  const scopedCss: ModuleFile[] = [];
-  const shadowCss: ModuleFile[] = [];
-  const plainCss: ModuleFile[] = [];
-
-  // pick out only
-  bundle.moduleFiles.forEach(moduleFile => {
-    const cmpMeta = moduleFile.cmpMeta;
-    if (cmpMeta.encapsulation === primaryEncapsulation || !cmpMeta.stylesMeta) {
-      // this component uses the same encapsulation type as everyone else
-      // or it doesn't have styles at all so it doesn't matter
-      primaryCss.push(moduleFile);
-
-    } else if (moduleFile.cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
-      scopedCss.push(moduleFile);
-
-    } else if (moduleFile.cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-      shadowCss.push(moduleFile);
-
-    } else {
-      plainCss.push(moduleFile);
+  bundle.moduleFiles.forEach(m => {
+    const encapsulation = m.cmpMeta.encapsulation || ENCAPSULATION.NoEncapsulation;
+    if (!encapsulations.includes(encapsulation)) {
+      encapsulations.push(encapsulation);
     }
   });
 
-  if (primaryCss.length) {
-    bundle.moduleFiles = primaryCss;
-    validatedBundles.push(bundle);
+  if (encapsulations.length === 0) {
+    encapsulations.push(ENCAPSULATION.NoEncapsulation);
+
+  } else if (encapsulations.includes(ENCAPSULATION.ShadowDom) && !encapsulations.includes(ENCAPSULATION.ScopedCss)) {
+    encapsulations.push(ENCAPSULATION.ScopedCss);
   }
-  if (scopedCss.length) {
-    validatedBundles.push(createBundle(scopedCss));
-  }
-  if (shadowCss.length) {
-    validatedBundles.push(createBundle(shadowCss));
-  }
-  if (plainCss.length) {
-    validatedBundles.push(createBundle(plainCss));
-  }
+
+  return encapsulations.sort();
 }
 
 
-export function findPrimaryEncapsulation(moduleFiles: ModuleFile[]) {
-  const plainCssCmps = moduleFiles.filter(m => m.cmpMeta.encapsulation !== ENCAPSULATION.ScopedCss && m.cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom);
-  const scopedCssCmps = moduleFiles.filter(m => m.cmpMeta.encapsulation === ENCAPSULATION.ScopedCss);
-  const shadowCssCmps = moduleFiles.filter(m => m.cmpMeta.encapsulation === ENCAPSULATION.ShadowDom);
-
-  // figure out which encapsulation type we have the most of
-  const sorted = [plainCssCmps, scopedCssCmps, shadowCssCmps].sort((a, b) => {
-    if (a.length < b.length) return 1;
-    if (a.length > b.length) return -1;
-    return 0;
-  });
-
-  if (sorted.length && sorted[0].length) {
-    return sorted[0][0].cmpMeta.encapsulation;
-  }
-
-  return null;
-}
-
-
-function createBundle(moduleFiles: ModuleFile[]) {
-  const bundle: Bundle = {
-    moduleFiles: moduleFiles,
-    compiledModuleText: ''
-  };
-  return bundle;
+export function bundleRequiresScopedStyles(encapsulations?: ENCAPSULATION[]) {
+  return encapsulations.some(e => requiresScopedStyles(e));
 }
 
 

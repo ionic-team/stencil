@@ -43,19 +43,13 @@ export function formatLoaderBundleIds(bundleIds: BundleIds): any {
   }
 
   if (modes.length === 1) {
-    return [
-      bundleIds[modes[0]].esm,
-      bundleIds[modes[0]].es5
-    ];
+    return bundleIds[modes[0]];
   }
 
   const bundleIdObj: any = {};
 
   modes.forEach(modeName => {
-    bundleIdObj[modeName] = [
-      bundleIds[modeName].esm,
-      bundleIds[modeName].es5
-    ];
+    bundleIdObj[modeName] = bundleIds[modeName];
   });
 
   return bundleIdObj;
@@ -294,5 +288,5 @@ export function getBundleIdPlaceholder() {
 
 
 export function replaceBundleIdPlaceholder(jsText: string, bundleId: string) {
-  return jsText.replace(getBundleIdPlaceholder(), `${bundleId}`);
+  return jsText.replace(getBundleIdPlaceholder(), bundleId);
 }
