@@ -9,7 +9,10 @@
   },
   "files": [
     "bin/",
-    "dist/"
+    "dist/",
+    "compiler.js",
+    "server.js",
+    "testing.js"
   ],
   "scripts": {
     "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run build.sys.node && npm run prepare.package",
