@@ -1,4 +1,4 @@
-import { Component, Method, PropWillChange, PropDidChange } from '../../../../../index';
+import { Component, Method, PropWillChange, PropDidChange, Watch } from '../../../../../index';
 
 /**
  * This is an actionSheet class
@@ -38,10 +38,27 @@ class ActionSheet {
     this.emitStyle();
   }
 
-  @PropDidChange('event1')
-  @PropDidChange('event2')
-  @PropWillChange('event3')
+  @PropDidChange('someProp1')
+  @PropDidChange('someProp2')
+  @PropWillChange('someProp3')
   protected method() {
+
+  }
+
+  @Watch('prop1')
+  @Watch('prop2')
+  @Watch('prop3')
+  protected propWatchCallback() {
+
+  }
+
+  @Watch('someProp')
+  protected stateWatchCallback1() {
+
+  }
+
+  @Watch('someProp')
+  protected stateWatchCallback2() {
 
   }
 

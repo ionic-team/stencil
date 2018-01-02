@@ -51,12 +51,8 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
         coreBuild.element = true;
       }
 
-      if (memberMeta.willChangeMethodNames && memberMeta.willChangeMethodNames.length > 0) {
-        coreBuild.willChange = true;
-      }
-
-      if (memberMeta.didChangeMethodNames && memberMeta.didChangeMethodNames.length > 0) {
-        coreBuild.didChange = true;
+      if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length > 0) {
+        coreBuild.watchCallback = true;
       }
     });
   }

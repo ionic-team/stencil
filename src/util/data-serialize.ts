@@ -205,12 +205,8 @@ function formatComponentConstructorProperty(memberMeta: MemberMeta) {
     }
   }
 
-  if (memberMeta.willChangeMethodNames && memberMeta.willChangeMethodNames.length > 0) {
-    property.willChange = memberMeta.willChangeMethodNames.slice();
-  }
-
-  if (memberMeta.didChangeMethodNames && memberMeta.didChangeMethodNames.length > 0) {
-    property.didChange = memberMeta.didChangeMethodNames.slice();
+  if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length > 0) {
+    property.watchCallbacks = memberMeta.watchCallbacks.slice();
   }
 
   return property;

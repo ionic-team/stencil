@@ -396,6 +396,10 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
         propData.mutable = true;
       }
 
+      if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length) {
+        propData.watch = memberMeta.watchCallbacks.slice();
+      }
+
       cmpData.props.push(propData);
     }
   });
@@ -443,6 +447,10 @@ function parseProps(config: BuildConfig, manifest: Manifest, cmpData: ComponentD
     if (cmpMeta.membersMeta[propData.name].propType) {
       cmpMeta.membersMeta[propData.name].attribName = propData.name;
     }
+
+    if (!invalidArrayData(propData.watch)) {
+      cmpMeta.membersMeta[propData.name].watchCallbacks = propData.watch.slice().sort();
+    }
   });
 }
 
@@ -463,8 +471,8 @@ export function parseWillChangeDeprecated(cmpData: any, cmpMeta: ComponentMeta) 
     cmpMeta.membersMeta = cmpMeta.membersMeta || {};
     cmpMeta.membersMeta[propName] = cmpMeta.membersMeta[propName] || {};
 
-    cmpMeta.membersMeta[propName].willChangeMethodNames = cmpMeta.membersMeta[propName].willChangeMethodNames || [];
-    cmpMeta.membersMeta[propName].willChangeMethodNames.push(methodName);
+    cmpMeta.membersMeta[propName].watchCallbacks = cmpMeta.membersMeta[propName].watchCallbacks || [];
+    cmpMeta.membersMeta[propName].watchCallbacks.push(methodName);
   });
 }
 
@@ -485,8 +493,8 @@ export function parseDidChangeDeprecated(cmpData: any, cmpMeta: ComponentMeta) {
     cmpMeta.membersMeta = cmpMeta.membersMeta || {};
     cmpMeta.membersMeta[propName] = cmpMeta.membersMeta[propName] || {};
 
-    cmpMeta.membersMeta[propName].didChangeMethodNames = cmpMeta.membersMeta[propName].didChangeMethodNames || [];
-    cmpMeta.membersMeta[propName].didChangeMethodNames.push(methodName);
+    cmpMeta.membersMeta[propName].watchCallbacks = cmpMeta.membersMeta[propName].watchCallbacks || [];
+    cmpMeta.membersMeta[propName].watchCallbacks.push(methodName);
   });
 }
 

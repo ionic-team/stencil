@@ -1,5 +1,4 @@
 import { BuildConfig, ComponentRegistry, ComponentMeta, Diagnostic } from '../../../util/interfaces';
-import { getChangeDecoratorMeta } from './change-decorator';
 import { getComponentDecoratorMeta } from './component-decorator';
 import { getElementDecoratorMeta } from './element-decorator';
 import { getEventDecoratorMeta } from './event-decorator';
@@ -7,6 +6,7 @@ import { getListenDecoratorMeta } from './listen-decorator';
 import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropDecoratorMeta } from './prop-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
+import { getWatchDecoratorMeta } from './watch-decorator';
 import { validateComponentClass } from './validate-component';
 import * as ts from 'typescript';
 
@@ -62,7 +62,7 @@ export function visitClass(config: BuildConfig, checker: ts.TypeChecker, classNo
     listenersMeta: getListenDecoratorMeta(checker, classNode)
   };
 
-  getChangeDecoratorMeta(classNode, cmpMeta);
+  getWatchDecoratorMeta(config, classNode, cmpMeta);
 
   // validate the user's component class for any common errors
   validateComponentClass(config, cmpMeta, classNode);

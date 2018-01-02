@@ -74,12 +74,8 @@ export function defineMember(
       elm._values[memberName] = (instance as any)[memberName];
     }
 
-    if (property.willChange) {
-      elm._values[WILL_CHG_PREFIX + memberName] = property.willChange.slice();
-    }
-
-    if (property.didChange) {
-      elm._values[DID_CHG_PREFIX + memberName] = property.didChange.slice();
+    if (property.watchCallbacks) {
+      elm._values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
     }
 
     // add getter/setter to the component instance
@@ -127,19 +123,14 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
   // check our new property value against our internal value
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
-    if (Build.willChange && elm._values[WILL_CHG_PREFIX + memberName]) {
-      // this instance is watching for when this property WILL change
-      callChangeMethods(elm._values[WILL_CHG_PREFIX + memberName], elm._instance, newVal, oldVal);
+    if (Build.watchCallback && elm._values[WATCH_CB_PREFIX + memberName]) {
+      // this instance is watching for when this property changed
+      callWatchMethods(elm._values[WATCH_CB_PREFIX + memberName], elm._instance, newVal, oldVal);
     }
 
     // set our new value!
     // https://youtu.be/dFtLONl4cNc?t=22
     internalValues[memberName] = newVal;
-
-    if (Build.didChange && elm._values[DID_CHG_PREFIX + memberName]) {
-      // this instance is watching for when this property DID change
-      callChangeMethods(elm._values[DID_CHG_PREFIX + memberName], elm._instance, newVal, oldVal);
-    }
 
     if (elm._instance && !plt.activeRender) {
       // looks like this value actually changed, so we've got work to do!
@@ -152,7 +143,7 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
 }
 
 
-function callChangeMethods(changeMethods: string[], instance: any, newVal: any, oldVal: any, i?: number) {
+function callWatchMethods(changeMethods: string[], instance: any, newVal: any, oldVal: any, i?: number) {
   for (i = 0; i < changeMethods.length; i++) {
     try {
       instance && instance[changeMethods[i]].call(instance, newVal, oldVal);
@@ -182,5 +173,4 @@ export function definePropertyGetterSetter(obj: any, propertyKey: string, get: a
 }
 
 
-const WILL_CHG_PREFIX = `w-`;
-const DID_CHG_PREFIX = `d-`;
+const WATCH_CB_PREFIX = `wc-`;

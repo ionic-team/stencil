@@ -1,31 +1,21 @@
-import { mockPlatform, mockDomApi } from '../../../testing/mocks';
-import { ComponentMeta, ComponentConstructor, ComponentInstance, PlatformApi } from '../../../util/interfaces';
+import { ComponentConstructor, ComponentMeta, ComponentInstance, PlatformApi } from '../../../util/interfaces';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
+import { mockPlatform, mockDomApi } from '../../../testing/mocks';
 import { proxyComponentInstance } from '../proxy-component-instance';
 
 
 describe('proxy-component', () => {
 
-  describe('change callbacks', () => {
+  describe('watch callbacks', () => {
 
-    it('will change methods called', () => {
+    it('watch callbacks called', () => {
       instance.chg = 'oldValue';
-      spyOn(instance, 'willChangeCallback_A');
-      spyOn(instance, 'willChangeCallback_B');
+      spyOn(instance, 'watchCallbackA');
+      spyOn(instance, 'watchCallbackB');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.chg = 'newValue';
-      expect(instance.willChangeCallback_A).toBeCalledWith('newValue', 'oldValue');
-      expect(instance.willChangeCallback_B).toBeCalledWith('newValue', 'oldValue');
-    });
-
-    it('did change methods called', () => {
-      instance.chg = 'oldValue';
-      spyOn(instance, 'didChangeCallback_A');
-      spyOn(instance, 'didChangeCallback_B');
-      proxyComponentInstance(plt, CmpConstructor, elm, instance);
-      instance.chg = 'newValue';
-      expect(instance.didChangeCallback_A).toBeCalledWith('newValue', 'oldValue');
-      expect(instance.didChangeCallback_B).toBeCalledWith('newValue', 'oldValue');
+      expect(instance.watchCallbackA).toBeCalledWith('newValue', 'oldValue');
+      expect(instance.watchCallbackB).toBeCalledWith('newValue', 'oldValue');
     });
 
   });
@@ -94,10 +84,8 @@ describe('proxy-component', () => {
     arr = [1, 21];
     obj = { 'flux': 'plutonium' };
 
-    willChangeCallback_A(newValue: any, oldValue: any) {}
-    willChangeCallback_B(newValue: any, oldValue: any) {}
-    didChangeCallback_A(newValue: any, oldValue: any) {}
-    didChangeCallback_B(newValue: any, oldValue: any) {}
+    watchCallbackA(newValue: any, oldValue: any) {}
+    watchCallbackB(newValue: any, oldValue: any) {}
 
     static get properties() {
       return {
@@ -129,8 +117,7 @@ describe('proxy-component', () => {
         'chg': {
           mutable: true,
           type: Boolean,
-          willChange: ['willChangeCallback_A', 'willChangeCallback_B'],
-          didChange: ['didChangeCallback_A', 'didChangeCallback_B']
+          watchCallbacks: ['watchCallbackA', 'watchCallbackB']
         }
       };
     }

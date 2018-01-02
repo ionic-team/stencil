@@ -281,8 +281,7 @@ export interface BuildConditionals {
   method: boolean;
   propConnect: boolean;
   propContext: boolean;
-  didChange: boolean;
-  willChange: boolean;
+  watchCallback: boolean;
 
   // lifecycle events
   cmpDidLoad: boolean;
@@ -670,8 +669,7 @@ export interface MemberMeta {
   attribType?: AttributeTypeInfo;
   ctrlId?: string;
   jsdoc?: JSDoc;
-  willChangeMethodNames?: string[];
-  didChangeMethodNames?: string[];
+  watchCallbacks?: string[];
 }
 
 
@@ -708,14 +706,10 @@ export interface ComponentConstructorProperty {
   mutable?: boolean;
   state?: boolean;
   type?: PropertyType;
-  willChange?: ComponentConstructorPropertyChange[];
-  didChange?: ComponentConstructorPropertyChange[];
+  watchCallbacks?: string[];
 }
 
 export type PropertyType = StringConstructor | BooleanConstructor | NumberConstructor | 'Any';
-
-
-export type ComponentConstructorPropertyChange = string;
 
 
 export interface ComponentConstructorEvent {
@@ -792,7 +786,7 @@ export interface StateDecorator {
 }
 
 
-export interface PropChangeDecorator {
+export interface WatchDecorator {
   (propName: string): any;
 }
 
@@ -1440,8 +1434,7 @@ export interface PropData {
   name?: string;
   type?: 'Boolean'|'Number'|'String'|'Any';
   mutable?: boolean;
-  willChange?: string[];
-  didChange?: string[];
+  watch?: string[];
 }
 
 export interface StateData {

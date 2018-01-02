@@ -1,6 +1,6 @@
 import { ComponentMeta, ComponentRegistry, ImportedModule, MembersMeta, ComponentConstructor } from '../interfaces';
 import { formatComponentConstructorProperties } from '../data-serialize';
-import { MEMBER_TYPE, PROP_CHANGE, PROP_TYPE } from '../constants';
+import { MEMBER_TYPE, PROP_TYPE } from '../constants';
 import { parsePropertyValue } from '../data-parse';
 
 
