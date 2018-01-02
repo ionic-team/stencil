@@ -79,7 +79,6 @@ export function parseArgv(process: NodeJS.Process) {
   const argv: CliArgv = minimist(cmdArgs, ARG_OPTS) as any;
 
   argv.serviceWorker = (argv as any)['service-worker'];
-  argv.skipNodeCheck = (argv as any)['skip-node-check'];
   argv.logLevel = (argv as any)['log-level'];
 
   return argv as CliArgv;
@@ -123,7 +122,6 @@ export interface CliArgv {
   prerender?: boolean;
   prod?: boolean;
   serviceWorker?: boolean;
-  skipNodeCheck?: boolean;
   version?: boolean;
   watch?: boolean;
 }
