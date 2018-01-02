@@ -78,7 +78,7 @@ function generateBundleMode(config: BuildConfig, ctx: BuildContext, bundle: Bund
 
 function createBundleJsText(config: BuildConfig, ctx: BuildContext, bundle: Bundle, modeName: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
   // get the already bundled js module text
-  let jsText = getBundleJsText(ctx, bundle);
+  let jsText = getBundleJsText(ctx, bundle, sourceTarget);
 
   if (config.minifyJs) {
     // minify the bundle js text
