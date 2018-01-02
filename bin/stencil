@@ -3,10 +3,9 @@
 
 process.title = 'stencil';
 
-var path = require('path');
-var cli = require(path.join(__dirname, '../cli/index.js'));
-var compiler = require(path.join(__dirname, '../compiler/index.js'));
-var nodeSys = require(path.join(__dirname, '../sys/node/index.js'));
+var cli = require('../dist/cli/index.js');
+var compiler = require('../dist/compiler/index.js');
+var nodeSys = require('../dist/sys/node/index.js');
 
 var sys = new nodeSys.NodeSystem();
 var logger = new nodeSys.NodeLogger();

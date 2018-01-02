@@ -1,8 +1,7 @@
-import { BuildResults, StencilSystem, BuildConfig, Logger } from '../util/interfaces';
+import { BuildConfig, BuildResults, Logger, StencilSystem } from '../util/interfaces';
 import { getConfigFilePath, hasError, overrideConfigFromArgv, parseArgv } from './cli-utils';
 import { help } from './task-help';
 import { initApp } from './task-init';
-import { loadConfigFile } from '../util/load-config';
 
 
 export function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger, compiler: any, minNodeVersion?: string) {
@@ -17,7 +16,7 @@ export function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger,
   }
 
   if (task === 'init') {
-    initApp(process, logger);
+    initApp(process, sys, logger);
     return process.exit(0);
   }
 
@@ -34,8 +33,8 @@ export function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger,
   // load the config file
   let config: BuildConfig;
   try {
-    const configPath = getConfigFilePath(process, argv.config);
-    config = loadConfigFile(sys, configPath);
+    const configPath = getConfigFilePath(process, sys, argv.config);
+    config = sys.loadConfigFile(configPath);
 
   } catch (e) {
     logger.error(e);

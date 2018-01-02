@@ -1,17 +1,15 @@
-import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../util/interfaces';
 import { Chalk } from 'chalk';
-import * as path from 'path';
+import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../util/interfaces';
 
 
 export class NodeLogger implements Logger {
   private _level = 'info';
-  private process: NodeJS.Process;
   private chalk: Chalk;
 
-  constructor(opts: { level?: string, process?: NodeJS.Process } = {}) {
-    this.process = opts.process || process;
+  constructor(opts: { level?: string } = {}) {
     this.level = opts.level;
 
+    const path = require('path');
     const sysUtil = require(path.join(__dirname, './sys-util.js'));
     this.chalk = sysUtil.chalk;
   }
@@ -146,7 +144,7 @@ export class NodeLogger implements Logger {
   }
 
   memoryUsage() {
-    return this.dim(` MEM: ${(this.process.memoryUsage().rss / 1000000).toFixed(1)}MB`);
+    return this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`);
   }
 
   private shouldLog(level: string): boolean {

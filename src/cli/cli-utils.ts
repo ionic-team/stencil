@@ -1,6 +1,4 @@
-import { BuildConfig, Diagnostic } from '../util/interfaces';
-import { isAbsolute, join } from 'path';
-import { normalizePath } from '../compiler/util';
+import { BuildConfig, Diagnostic, StencilSystem } from '../util/interfaces';
 
 
 export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
@@ -58,20 +56,20 @@ export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
 }
 
 
-export function getConfigFilePath(process: NodeJS.Process, configArg: string) {
+export function getConfigFilePath(process: NodeJS.Process, sys: StencilSystem, configArg: string) {
   if (configArg) {
-    if (!isAbsolute(configArg)) {
+    if (!sys.path.isAbsolute(configArg)) {
       // passed in a custom stencil config location
       // but it's relative, so prefix the cwd
-      return normalizePath(join(process.cwd(), configArg));
+      return sys.path.join(process.cwd(), configArg);
     }
 
     // config path already an absolute path, we're good here
-    return normalizePath(configArg);
+    return configArg;
   }
 
   // nothing was passed in, use the current working directory
-  return normalizePath(process.cwd());
+  return process.cwd();
 }
 
 

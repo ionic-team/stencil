@@ -2,7 +2,6 @@ import { build } from './build';
 import { BuildConfig, BuildContext } from '../../util/interfaces';
 import { copyTasks, isCopyTaskFile } from './copy-tasks';
 import { isCssFile, isHtmlFile, isSassFile, isTsFile, isWebDevFile, normalizePath } from '../util';
-import { loadConfigFile } from '../../util/load-config';
 
 
 export function setupWatcher(config: BuildConfig, ctx: BuildContext) {
@@ -259,7 +258,7 @@ function configFileReload(config: BuildConfig) {
   config.logger.debug(`reload config file: ${config.configPath}`);
 
   try {
-    const updatedConfig = loadConfigFile(config.sys, config.configPath);
+    const updatedConfig = config.sys.loadConfigFile(config.configPath);
 
     // just update the existing config in place
     // not everything should be overwritten or merged

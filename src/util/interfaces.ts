@@ -1190,6 +1190,7 @@ export interface StencilSystem {
     nodir?: boolean;
   }): Promise<string[]>;
   isGlob?(str: string): boolean;
+  loadConfigFile?(configPath: string): BuildConfig;
   minifyCss?(input: string, opts?: any): {
     output: string;
     sourceMap?: any;
