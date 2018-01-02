@@ -83,6 +83,6 @@ export function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger,
     default:
       config.logger.error(`Invalid stencil command, please see the options below:`);
       help(process, logger);
-      break;
+      process.exit(1);
   }
 }
