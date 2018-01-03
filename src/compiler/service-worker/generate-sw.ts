@@ -2,36 +2,46 @@ import { BuildConfig, BuildContext, ServiceWorkerConfig } from '../../util/inter
 import { catchError } from '../util';
 
 
-export function generateServiceWorker(config: BuildConfig, ctx: BuildContext) {
+export async function generateServiceWorker(config: BuildConfig, ctx: BuildContext) {
   if (!ctx.hasIndexHtml || !config.generateWWW) {
     config.logger.debug(`generateServiceWorker, no index.html, so skipping sw build`);
-    return Promise.resolve();
+    return;
   }
 
   if (!config.serviceWorker) {
     // no sw config, let's not continue
-    return Promise.resolve();
+    return;
   }
 
   if (hasSrcConfig(config)) {
-    return injectManifest(config, ctx);
+    await injectManifest(config, ctx);
   } else {
-    return generate(config, ctx);
+    await generateSW(config, ctx);
   }
 }
 
-function generate(config: BuildConfig, ctx: BuildContext) {
+async function generateSW(config: BuildConfig, ctx: BuildContext) {
   const timeSpan = config.logger.createTimeSpan(`generate service worker started`);
-  return config.sys.workbox.generateSW(config.serviceWorker)
-    .catch(err => catchError(ctx.diagnostics, err))
-    .then(() => timeSpan.finish(`generate service worker finished`));
+
+  try {
+    await config.sys.workbox.generateSW(config.serviceWorker);
+    timeSpan.finish(`generate service worker finished`);
+
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
 }
 
-function injectManifest(config: BuildConfig, ctx: BuildContext) {
+async function injectManifest(config: BuildConfig, ctx: BuildContext) {
   const timeSpan = config.logger.createTimeSpan(`inject manifest into service worker started`);
-  return config.sys.workbox.injectManifest(config.serviceWorker)
-    .catch(err => catchError(ctx.diagnostics, err))
-    .then(() => timeSpan.finish('inject manifest into service worker finished'));
+
+  try {
+    await config.sys.workbox.injectManifest(config.serviceWorker);
+    timeSpan.finish('inject manifest into service worker finished');
+
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
 }
 
 function hasSrcConfig(config: BuildConfig) {

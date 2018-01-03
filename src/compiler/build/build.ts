@@ -11,7 +11,6 @@ import { generateBundles } from '../bundle/generate-bundles';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateIndexHtml } from '../html/generate-index-html';
 import { generateReadmes } from '../docs/generate-readmes';
-import { generateServiceWorker } from '../service-worker/generate-sw';
 import { initIndexHtml } from '../html/init-index-html';
 import { prerenderApp } from '../prerender/prerender-app';
 import { setupWatcher } from './watch';
@@ -102,9 +101,6 @@ export async function build(config: BuildConfig, context?: any) {
 
     // write all the files and copy asset files
     await writeBuildFiles(config, ctx, buildResults);
-
-    // generate the service worker
-    await generateServiceWorker(config, ctx);
 
     // prerender that app
     await prerenderApp(config, ctx, bundles);
