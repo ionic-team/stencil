@@ -1327,6 +1327,14 @@ export interface FSWatcher {
 export interface HydrateResults {
   diagnostics: Diagnostic[];
   url?: string;
+  host?: string;
+  hostname?: string;
+  port?: string;
+  path?: string;
+  pathname?: string;
+  search?: string;
+  query?: string;
+  hash?: string;
   html?: string;
   styles?: string;
   anchors?: HydrateAnchor[];
@@ -1335,6 +1343,7 @@ export interface HydrateResults {
   styleUrls?: string[];
   scriptUrls?: string[];
   imgUrls?: string[];
+  opts?: HydrateOptions;
 }
 
 

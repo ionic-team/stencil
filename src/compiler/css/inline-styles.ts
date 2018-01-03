@@ -1,14 +1,14 @@
-import { BuildConfig, Diagnostic, HydrateOptions } from '../../util/interfaces';
+import { BuildConfig, Diagnostic, HydrateResults } from '../../util/interfaces';
 import { removeUnusedStyles } from './remove-unused-styles';
 import { UsedSelectors } from '../html/used-selectors';
 
 
-export function inlineComponentStyles(config: BuildConfig, doc: Document, styles: string[], opts: HydrateOptions, diagnostics: Diagnostic[]) {
+export function inlineComponentStyles(config: BuildConfig, doc: Document, styles: string[], results: HydrateResults, diagnostics: Diagnostic[]) {
   if (!styles.length) {
     return;
   }
 
-  if (opts.removeUnusedStyles !== false) {
+  if (results.opts.removeUnusedStyles !== false) {
     // removeUnusedStyles is the default
     try {
       // pick out all of the selectors that are actually
@@ -28,6 +28,8 @@ export function inlineComponentStyles(config: BuildConfig, doc: Document, styles
       });
     }
   }
+
+  config.logger.debug(`optimize ${results.pathname}, inline component styles`);
 
   // insert our styles to the head of the document
   insertStyles(doc, styles);

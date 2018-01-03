@@ -1,8 +1,8 @@
-import { BuildConfig, BuildContext } from '../../util/interfaces';
+import { BuildConfig, BuildContext, HydrateResults } from '../../util/interfaces';
 import { getLoaderFileName, getLoaderWWW } from '../app/app-file-naming';
 
 
-export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document) {
+export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document, results: HydrateResults) {
   // create the script url we'll be looking for
   let loaderExternalSrcUrl = config.publicPath;
   if (loaderExternalSrcUrl.charAt(loaderExternalSrcUrl.length - 1) !== '/') {
@@ -19,7 +19,7 @@ export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: 
 
   if (scriptElm) {
     // append the loader script content to the bottom of <body>
-    relocateInlineLoaderScript(config, ctx, doc, scriptElm);
+    relocateInlineLoaderScript(config, ctx, doc, results, scriptElm);
   }
 }
 
@@ -41,7 +41,7 @@ function findExternalLoaderScript(doc: Document, loaderExternalSrcUrl: string) {
 }
 
 
-function relocateInlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document, scriptElm: HTMLScriptElement) {
+function relocateInlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
   // get the file path
   const appLoaderWWW = getLoaderWWW(config);
 
@@ -65,6 +65,8 @@ function relocateInlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc:
     // didn't get good loader content, don't bother
     return;
   }
+
+  config.logger.debug(`optimize ${results.pathname}, inline loader: ${appLoaderWWW}`);
 
   // remove the external src
   scriptElm.removeAttribute('src');

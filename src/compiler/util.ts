@@ -49,11 +49,10 @@ export function readFile(sys: StencilSystem, filePath: string) {
 }
 
 
-export function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesMap): Promise<any> {
+export async function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesMap): Promise<any> {
   const directories = getDirectoriesFromFiles(sys, filesToWrite);
-  return ensureDirectoriesExist(sys, directories, [rootDir]).then(() => {
-    return writeToDisk(sys, filesToWrite);
-  });
+  await ensureDirectoriesExist(sys, directories, [rootDir]);
+  await writeToDisk(sys, filesToWrite);
 }
 
 

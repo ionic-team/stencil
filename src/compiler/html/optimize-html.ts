@@ -11,7 +11,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
   if (opts.canonicalLink !== false) {
     try {
-      insertCanonicalLink(config, doc, results.url);
+      insertCanonicalLink(config, doc, results);
 
     } catch (e) {
       results.diagnostics.push({
@@ -25,7 +25,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
   if (opts.inlineStyles !== false) {
     try {
-      inlineComponentStyles(config, doc, styles, opts, results.diagnostics);
+      inlineComponentStyles(config, doc, styles, results, results.diagnostics);
 
     } catch (e) {
       results.diagnostics.push({
@@ -41,7 +41,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     // remove the script to the external loader script request
     // inline the loader script at the bottom of the html
     try {
-      inlineLoaderScript(config, ctx, doc);
+      inlineLoaderScript(config, ctx, doc, results);
 
     } catch (e) {
       results.diagnostics.push({
@@ -55,7 +55,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
   if (opts.inlineAssetsMaxSize > 0) {
     try {
-      inlineExternalAssets(config, ctx, opts, doc);
+      inlineExternalAssets(config, ctx, results, doc);
 
     } catch (e) {
       results.diagnostics.push({
@@ -70,6 +70,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
   if (opts.collapseWhitespace !== false && !config.devMode) {
     // collapseWhitespace is the default
     try {
+      config.logger.debug(`optimize ${results.pathname}, collapse html whitespace`);
       collapseHtmlWhitepace(doc.documentElement);
 
     } catch (e) {

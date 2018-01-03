@@ -1,37 +1,49 @@
 import { BuildConfig, BuildContext } from '../../util/interfaces';
-import { buildError, readFile, pathJoin } from '../util';
+import { catchError, readFile, pathJoin } from '../util';
 import { getGlobalStyleFilename } from './app-file-naming';
 
 
 export async function generateGlobalStyles(config: BuildConfig, ctx: BuildContext) {
   const filePaths = config.globalStyle;
   if (!filePaths || !filePaths.length) {
-    return Promise.resolve();
+    config.logger.debug(`"config.globalStyle" not found`);
+    return;
   }
 
   let content = await readStyleContent(config, filePaths);
   if (ctx.appGlobalStyles.content === content) {
-    return Promise.resolve();
+    return;
   }
 
-  content = await compileGlobalSass(config, ctx, content);
+  const timeSpan = config.logger.createTimeSpan(`compile global style start`);
 
-  const fileName = getGlobalStyleFilename(config);
+  try {
+    content = await compileGlobalSass(config, content);
 
-  if (config.generateWWW) {
-    const wwwFilePath = pathJoin(config, config.buildDir, fileName);
-    ctx.filesToWrite[wwwFilePath] = content;
+    const fileName = getGlobalStyleFilename(config);
+
+    if (config.generateWWW) {
+      const wwwFilePath = pathJoin(config, config.buildDir, fileName);
+      config.logger.debug(`www global style: ${wwwFilePath}`);
+      ctx.filesToWrite[wwwFilePath] = content;
+    }
+
+    if (config.generateDistribution) {
+      const distFilePath = pathJoin(config, config.distDir, fileName);
+      config.logger.debug(`dist global style: ${distFilePath}`);
+      ctx.filesToWrite[distFilePath] = content;
+    }
+
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
   }
 
-  if (config.generateDistribution) {
-    const distFilePath = pathJoin(config, config.distDir, fileName);
-    ctx.filesToWrite[distFilePath] = content;
-  }
+  timeSpan.finish(`compile global style finish`);
 }
 
 
-function compileGlobalSass(config: BuildConfig, ctx: BuildContext, content: string): Promise<string> {
-  return new Promise(resolve => {
+function compileGlobalSass(config: BuildConfig, content: string): Promise<string> {
+  return new Promise((resolve, reject) => {
     const sassConfig = {
       ...config.sassConfig,
       data: content,
@@ -39,17 +51,11 @@ function compileGlobalSass(config: BuildConfig, ctx: BuildContext, content: stri
     };
 
     config.sys.sass.render(sassConfig, (err, result) => {
-      let content = '';
-
       if (err) {
-        const d = buildError(ctx.diagnostics);
-        d.messageText = err;
-
+        reject(err);
       } else {
-        content = result.css.toString();
+        resolve(result.css.toString());
       }
-
-      resolve(content);
     });
   });
 }

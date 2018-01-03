@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, HydrateResults, Bundle, PrerenderConfig, PrerenderStatus, PrerenderLocation, PrerenderResult } from '../../util/interfaces';
-import { buildError, catchError, hasError, normalizePath, readFile } from '../util';
+import { buildError, catchError, hasError, normalizePath, readFile, writeFiles } from '../util';
 import { generateHostConfig } from './host-config';
 import { prerenderUrl } from './prerender-url';
 
@@ -57,6 +57,14 @@ export async function prerenderApp(config: BuildConfig, ctx: BuildContext, bundl
     });
 
     await generateHostConfig(config, ctx, bundles, prerenderResults);
+
+    // create a copy of all the files to write
+    const filesToWrite = Object.assign({}, ctx.filesToWrite);
+
+    // clear out the files to write object for the next build
+    ctx.filesToWrite = {};
+
+    await writeFiles(config.sys, config.rootDir, filesToWrite);
 
   } catch (e) {
     catchError(ctx.diagnostics, e);

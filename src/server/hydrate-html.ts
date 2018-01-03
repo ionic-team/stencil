@@ -11,18 +11,7 @@ import { proxyHostElementPrototype } from '../core/instance/proxy-host-element';
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
   return new Promise(resolve => {
-
-    const hydrateResults: HydrateResults = {
-      diagnostics: [],
-      url: opts.url,
-      html: opts.html,
-      styles: null,
-      anchors: [],
-      components: [],
-      styleUrls: [],
-      scriptUrls: [],
-      imgUrls: []
-    };
+    const hydrateResults = generateHydrateResults(config, opts);
 
     const registeredTags = Object.keys(cmpRegistry || {});
     let ssrIds = 0;
@@ -94,7 +83,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
 
           // gather up all of the <a> tag information in the doc
           if (opts.collectAnchors !== false) {
-            collectAnchors(doc, hydrateResults);
+            collectAnchors(config, doc, hydrateResults);
           }
 
           // serialize this dom back into a string
@@ -234,7 +223,7 @@ export function connectElement(plt: PlatformApi, elm: HostElement, hydrateResult
 }
 
 
-function collectAnchors(doc: Document, hydrateResults: HydrateResults) {
+function collectAnchors(config: BuildConfig, doc: Document, results: HydrateResults) {
   const anchorElements = doc.querySelectorAll('a');
 
   for (var i = 0; i < anchorElements.length; i++) {
@@ -245,8 +234,10 @@ function collectAnchors(doc: Document, hydrateResults: HydrateResults) {
       attrs[anchorAttrs[j].nodeName.toLowerCase()] = anchorAttrs[j].nodeValue;
     }
 
-    hydrateResults.anchors.push(attrs);
+    results.anchors.push(attrs);
   }
+
+  config.logger.debug(`optimize ${results.pathname}, collected anchors: ${results.anchors.length}`);
 }
 
 
@@ -301,6 +292,36 @@ function normalizeLanguage(doc: Document, opts: HydrateOptions) {
       doc.documentElement.lang = lang;
     }
   }
+}
+
+
+function generateHydrateResults(config: BuildConfig, opts: HydrateOptions) {
+  // https://nodejs.org/api/url.html
+  const url = opts.url || '';
+  const urlParse =  config.sys.url.parse(url);
+
+  const hydrateResults: HydrateResults = {
+    diagnostics: [],
+    url: url,
+    host: urlParse.host,
+    hostname: urlParse.hostname,
+    port: urlParse.port,
+    path: urlParse.path,
+    pathname: urlParse.pathname,
+    search: urlParse.search,
+    query: urlParse.query,
+    hash: urlParse.hash,
+    html: opts.html,
+    styles: null,
+    anchors: [],
+    components: [],
+    styleUrls: [],
+    scriptUrls: [],
+    imgUrls: [],
+    opts: opts
+  };
+
+  return hydrateResults;
 }
 
 
