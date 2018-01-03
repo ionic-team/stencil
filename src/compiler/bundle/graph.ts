@@ -23,7 +23,7 @@ class BiMap {
   private incs_: GraphData;
 
   constructor(deps: GraphData) {
-    this.deps_ = deps;
+    this.deps_ = new Map(deps);
     this.incs_ = new Map();
 
     for (const src of deps.keys()) {
@@ -33,7 +33,9 @@ class BiMap {
     deps.forEach((required, src) => {
       required.forEach((require) => {
         const l = this.incs_.get(require);
-        if (l.indexOf(src) === -1) {
+        if (l == null) {
+          this.incs_.set(require, []);
+        } else if (l.indexOf(src) === -1) {
           l.push(src);
         }
       });
@@ -51,8 +53,8 @@ class BiMap {
 }
 
 
-class Module {
-  constructor(private id: string, private srcs: string[], private entrypoint: boolean = false) {
+export class Module {
+  constructor(public id: string, public srcs: string[], public entrypoint: boolean = false) {
     this.srcs = srcs.slice();
   }
 
@@ -84,9 +86,9 @@ export function processGraph(graph: GraphData, entrypoints: string[]): Module[] 
   });
 
   // find all files in the same module
-  const grow = (from) => {
+  const grow = (from: string) => {
     const hash = hashes.get(from);
-    const wouldSplitSrc = (src) => {
+    const wouldSplitSrc = (src: string) => {
       // entrypoints are always their own starting point
       if (entrypoints.indexOf(src) !== -1) {
         return true;
@@ -125,6 +127,7 @@ export function processGraph(graph: GraphData, entrypoints: string[]): Module[] 
 
   const modules: Module[] = [];
   hashes.forEach((hash, src) => {
+    hash;
     const srcs = grow(src);
     if (srcs) {
       const entrypoint = entrypoints.indexOf(src) !== -1;

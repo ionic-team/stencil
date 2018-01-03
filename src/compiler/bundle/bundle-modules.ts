@@ -2,6 +2,7 @@ import { BuildConfig, BuildContext, Bundle, ModuleFile } from '../../util/interf
 import { catchError, hasError } from '../util';
 import { createDependencyGraph } from './create-dependency-graph';
 import { generateEsModule, generateLegacyModule, runRollup } from './rollup-bundle';
+import { processGraph } from './graph';
 
 
 export async function bundleModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
@@ -23,7 +24,9 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
       return createDependencyGraph(config, ctx, bundles);
     }));
 
-    console.log(ctx.graphData.keys());
+    const entryKeys = bundles.map(b => b.entryKey);
+    const results = processGraph(ctx.graphData, entryKeys);
+    console.log(JSON.stringify(results, null, 2));
 
     await Promise.all(bundles.map(bundle => {
       return generateComponentModules(config, ctx, bundle);
