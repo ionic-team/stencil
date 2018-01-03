@@ -5,7 +5,8 @@ import { generateCore } from './app-core';
 import { generateEs5DisabledMessage } from './app-es5-disabled';
 import { generateGlobalStyles } from './app-global-styles';
 import { generateLoader } from './app-loader';
-import { hasError } from '../util';
+import { getAppWWWBuildDir } from './app-file-naming';
+import { hasError, pathJoin } from '../util';
 import { setBuildConditionals } from './build-conditionals';
 
 
@@ -36,7 +37,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, b
 
   const coreSsrFilename = await generateCore(config, ctx, globalJsContentsEs2015, buildConditionalsSsr);
   appRegistry.coreSsr = coreSsrFilename;
-  ctx.appCoreWWWPath = coreSsrFilename;
+  ctx.appCoreWWWPath = pathJoin(config, getAppWWWBuildDir(config), coreSsrFilename);
 
 
   if (config.buildEs5) {
