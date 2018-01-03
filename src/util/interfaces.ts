@@ -483,10 +483,7 @@ export interface BuildResults {
   changedFiles?: string[];
 }
 
-export interface GraphData {
-  [key: string]: string[];
-}
-
+export type GraphData = Map<string, string[]>;
 
 export interface BuildContext {
   graphData?: GraphData;

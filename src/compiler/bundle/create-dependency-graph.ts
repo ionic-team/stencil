@@ -16,7 +16,7 @@ export async function createDependencyGraph(config: BuildConfig, ctx: BuildConte
       input: bundle.entryKey,
       cache: ctx.rollupCache[bundle.entryKey],
       plugins: [
-        graphIt(config, ctx.graphData, bundle.entryKey),
+        graphIt(config, ctx.graphData),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true

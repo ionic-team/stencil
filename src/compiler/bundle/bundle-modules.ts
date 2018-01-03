@@ -16,14 +16,14 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
 
   const timeSpan = config.logger.createTimeSpan(`bundle modules started`, !doBundling);
 
-  ctx.graphData = {};
+  ctx.graphData = ctx.graphData || new Map();
 
   try {
     await Promise.all(bundles.map(bundles => {
       return createDependencyGraph(config, ctx, bundles);
     }));
 
-    ctx.graphData = remapData(ctx.graphData);
+    console.log(ctx.graphData.keys());
 
     await Promise.all(bundles.map(bundle => {
       return generateComponentModules(config, ctx, bundle);
@@ -35,31 +35,6 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
 
   timeSpan.finish('bundle modules finished');
 }
-
-function remapData(graphData: any) {
-  return Object.keys(graphData)
-    .reduce((allFiles: string[], key: string) => {
-      return allFiles.concat(graphData[key]);
-    }, [] as string[])
-    .filter((fileName, index, array) => array.indexOf(fileName) === index)
-    .reduce((allFiles: { [key: string]: string[] }, fileName: string) => {
-      let listArray: string[] = [];
-
-      for (let key in graphData) {
-        if (graphData[key].indexOf(fileName) !== -1) {
-          listArray.push(key);
-        }
-      }
-
-      if (listArray.length > 1) {
-        allFiles[fileName] = listArray;
-      }
-
-      return allFiles;
-    }, {} as { [key: string]: any });
-}
-
-
 
 export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle) {
   if (canSkipBuild(config, ctx, bundles.moduleFiles, bundles.entryKey)) {

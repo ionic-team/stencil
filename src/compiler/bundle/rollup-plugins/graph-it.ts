@@ -1,20 +1,24 @@
 import { BuildConfig, GraphData } from '../../../util/interfaces';
 
 
-export default function graphIt(config: BuildConfig, graphData: GraphData, key: string) {
+export default function graphIt(config: BuildConfig, graphData: GraphData) {
 
   return {
     name: 'graphItPlugin',
 
     resolveId(importee: string, importer: string) {
-      if (!graphData[key]) {
-        graphData[key] = [];
+      if (!importer) {
+        return;
       }
-      if (importee && graphData[key].indexOf(importee) === -1) {
-        graphData[key].push(resolvePath(config, importee, importer));
+      if (!graphData.has(importer)) {
+        graphData.set(importer, []);
       }
-      if (importer && graphData[key].indexOf(importer) === -1) {
-        graphData[key].push(importer);
+      if (importee && graphData.get(importer).indexOf(importee) === -1) {
+        const path = resolvePath(config, importee, importer);
+        graphData.set(importer, graphData.get(importer).concat(path));
+      }
+      if (importer && graphData.get(importer).indexOf(importer) === -1) {
+        graphData.set(importer, graphData.get(importer).concat(importer));
       }
     }
   };
