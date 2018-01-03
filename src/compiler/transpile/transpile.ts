@@ -1,4 +1,3 @@
-import { addComponentExports } from './transformers/add-component-exports';
 import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath, hasError } from '../util';
@@ -178,8 +177,7 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
     before: [
       removeDecorators(),
       removeImports(),
-      addComponentMetadata(config, ctx.moduleFiles),
-      addComponentExports(config, ctx)
+      addComponentMetadata(config, ctx.moduleFiles)
     ]
   });
 

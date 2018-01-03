@@ -19,15 +19,16 @@ export interface CoreContext {
 }
 
 
-export interface CommonJsImporter {
-  (moduleImports: CommonJsModuleImports): void;
+export interface AppGlobal {
+  components?: LoadComponentRegistry[];
+  loadComponents?: (importFn: CjsImporterFn, bundleId: string) => void;
+  h?: Function;
+  Context?: any;
 }
 
 
-export interface AppGlobal {
-  components?: LoadComponentRegistry[];
-  loadComponents?: (importFn: CommonJsImporter, bundleId: string) => void;
-  h?: Function;
+export interface CjsImporterFn {
+  (exports: CjsExports, h: Function, Context: any): void;
 }
 
 
@@ -244,7 +245,7 @@ export interface AppRegistryComponents {
 
 
 export interface Bundle {
-  cacheKey?: string;
+  entryKey?: string;
   moduleFiles: ModuleFile[];
   compiledModuleText?: string;
   compiledModuleLegacyText?: string;
@@ -601,7 +602,7 @@ export interface LoggerTimeSpan {
 }
 
 
-export interface CommonJsModuleImports {
+export interface CjsExports {
   [moduleId: string]: ComponentConstructor;
 }
 

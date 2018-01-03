@@ -20,7 +20,6 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
 
   try {
     await Promise.all(bundles.map(bundles => {
-      bundles.cacheKey = getModuleBundleCacheKey(bundles.moduleFiles.map(m => m.cmpMeta.tagNameMeta));
       return createDependencyGraph(config, ctx, bundles);
     }));
 
@@ -63,11 +62,11 @@ function remapData(graphData: any) {
 
 
 export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle) {
-  if (canSkipBuild(config, ctx, bundles.moduleFiles, bundles.cacheKey)) {
+  if (canSkipBuild(config, ctx, bundles.moduleFiles, bundles.entryKey)) {
     // don't bother bundling if this is a change build but
     // none of the changed files are modules or components
-    bundles.compiledModuleText = ctx.moduleBundleOutputs[bundles.cacheKey];
-    bundles.compiledModuleLegacyText = ctx.moduleBundleLegacyOutputs[bundles.cacheKey];
+    bundles.compiledModuleText = ctx.moduleBundleOutputs[bundles.entryKey];
+    bundles.compiledModuleLegacyText = ctx.moduleBundleLegacyOutputs[bundles.entryKey];
     return Promise.resolve();
   }
 
@@ -82,7 +81,7 @@ export async function generateComponentModules(config: BuildConfig, ctx: BuildCo
   bundles.compiledModuleText = await generateEsModule(config, rollupBundle);
 
   // cache for later
-  ctx.moduleBundleOutputs[bundles.cacheKey] = bundles.compiledModuleText;
+  ctx.moduleBundleOutputs[bundles.entryKey] = bundles.compiledModuleText;
 
   if (config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks
@@ -90,7 +89,7 @@ export async function generateComponentModules(config: BuildConfig, ctx: BuildCo
     bundles.compiledModuleLegacyText = await generateLegacyModule(config, rollupBundle);
 
     // cache for later
-    ctx.moduleBundleLegacyOutputs[bundles.cacheKey] = bundles.compiledModuleLegacyText;
+    ctx.moduleBundleLegacyOutputs[bundles.entryKey] = bundles.compiledModuleLegacyText;
   }
 }
 
@@ -141,9 +140,4 @@ export function bundledComponentContainsChangedFile(config: BuildConfig, bundles
       return (changedFileName === distFileName + '.ts' || changedFileName === distFileName + '.tsx');
     });
   });
-}
-
-
-export function getModuleBundleCacheKey(components: string[]) {
-  return `bundle:${components.map(c => c.toLocaleLowerCase().trim()).sort().join('.')}`;
 }

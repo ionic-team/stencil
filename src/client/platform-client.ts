@@ -40,6 +40,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   // add the h() fn to the app's global namespace
   App.h = h;
+  App.Context = Context;
 
   // keep a global set of tags we've already defined
   const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};

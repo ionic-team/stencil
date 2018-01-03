@@ -10,7 +10,7 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, bundles:
   // both styles and modules are done bundling
   // combine the styles and modules together
   // generate the actual files to write
-  const timeSpan = config.logger.createTimeSpan(`generate bundles started`, true);
+  const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
 
   bundles.forEach(bundle => {
     generateBundle(config, ctx, bundle);
@@ -38,10 +38,6 @@ function generateBundleMode(config: BuildConfig, ctx: BuildContext, bundle: Bund
 
   // the only bundle id comes from mode, no scoped styles and esm
   const bundleId = getBundleId(config, bundle, modeName, jsText);
-
-  // update the bundle id placeholder with the actual bundle id
-  // this is used by jsonp callbacks to know which bundle loaded
-  jsText = replaceBundleIdPlaceholder(jsText, bundleId);
 
   // assign the bundle id build from the
   // mode, no scoped styles and esm to each of the components
@@ -98,6 +94,10 @@ function generateBundleBuild(config: BuildConfig, ctx: BuildContext, jsText: str
 
   // get the absolute path to where it'll be saved in dist
   const distPath = pathJoin(config, getAppDistDir(config), fileName);
+
+  // update the bundle id placeholder with the actual bundle id
+  // this is used by jsonp callbacks to know which bundle loaded
+  jsText = replaceBundleIdPlaceholder(jsText, bundleId);
 
   // use wwwBuildPath as the cache key
   if (ctx.compiledFileCache[wwwBuildPath] === jsText) {

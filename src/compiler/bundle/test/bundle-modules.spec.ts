@@ -1,8 +1,7 @@
 import { BuildConfig, BuildContext, Bundle, Diagnostic, ModuleFile } from '../../../util/interfaces';
 import {
   bundledComponentContainsChangedFile,
-  canSkipBuild,
-  getModuleBundleCacheKey
+  canSkipBuild
  } from '../bundle-modules';
  import { mockStencilSystem } from '../../../testing/mocks';
 
@@ -84,15 +83,6 @@ describe('bundle-modules', () => {
       ];
       const hasChanged = bundledComponentContainsChangedFile(config, moduleFiles, changedFiles);
       expect(hasChanged).toBe(true);
-    });
-
-  });
-
-  describe('getModuleBundleCacheKey', () => {
-
-    it('should create the cache key', () => {
-      const cacheKey = getModuleBundleCacheKey(['CMP-Z', 'cmp-A']);
-      expect(cacheKey).toBe('bundle:cmp-a.cmp-z');
     });
 
   });

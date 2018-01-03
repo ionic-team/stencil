@@ -1,7 +1,6 @@
 import { BuildConfig, BuildContext, Bundle } from '../../util/interfaces';
-import bundleResolution from './rollup-plugins/bundle-resolution';
+import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
-import { getBundleEntryInput } from './rollup-bundle';
 import graphIt from './rollup-plugins/graph-it';
 import { hasError } from '../util';
 import localResolution from './rollup-plugins/local-resolution';
@@ -14,9 +13,10 @@ export async function createDependencyGraph(config: BuildConfig, ctx: BuildConte
 
   try {
     rollupBundle = await config.sys.rollup.rollup({
-      input: getBundleEntryInput(bundle),
+      input: bundle.entryKey,
+      cache: ctx.rollupCache[bundle.entryKey],
       plugins: [
-        graphIt(config, ctx.graphData, bundle.cacheKey),
+        graphIt(config, ctx.graphData, bundle.entryKey),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
@@ -25,7 +25,7 @@ export async function createDependencyGraph(config: BuildConfig, ctx: BuildConte
           include: 'node_modules/**',
           sourceMap: false
         }),
-        bundleResolution(bundle, ctx.moduleFiles),
+        bundleEntryFile(bundle),
         transpiledInMemoryPlugin(config, ctx),
         localResolution(config),
       ],

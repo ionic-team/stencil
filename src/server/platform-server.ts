@@ -1,4 +1,4 @@
-import { AppGlobal, BuildConfig, BuildContext, CommonJsModuleImports,
+import { AppGlobal, BuildConfig, BuildContext, CjsExports,
   ComponentMeta, ComponentRegistry, CoreContext, Diagnostic, DomApi,
   HostElement, PlatformApi } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
@@ -48,6 +48,7 @@ export function createPlatformServer(
 
   // add the h() fn to the app's global namespace
   App.h = h;
+  App.Context = Context;
 
   // add the app's global to the window context
   win[config.namespace] = App;
@@ -137,16 +138,17 @@ export function createPlatformServer(
   App.loadComponents = function loadComponents(importer) {
     try {
       // requested component constructors are placed on the moduleImports object
-      const moduleImports: CommonJsModuleImports = {};
-      importer(moduleImports);
+      // inject the h() function so it can be use by the components
+      const exports: CjsExports = {};
+      importer(exports, h, Context);
 
       // let's add a reference to the constructors on each components metadata
       // each key in moduleImports is a PascalCased tag name
-      Object.keys(moduleImports).forEach(pascalCasedTagName => {
+      Object.keys(exports).forEach(pascalCasedTagName => {
         const cmpMeta = registry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
           // connect the component's constructor to its metadata
-          cmpMeta.componentConstructor = moduleImports[pascalCasedTagName];
+          cmpMeta.componentConstructor = exports[pascalCasedTagName];
         }
       });
 

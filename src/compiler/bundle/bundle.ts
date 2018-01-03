@@ -32,7 +32,7 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
     // upgrade the components to be compatible with this version if need be
     await upgradeDependentComponents(config, ctx, bundles);
 
-  // kick off style and module bundling at the same time
+    // kick off style and module bundling at the same time
     await Promise.all([
       bundleStyles(config, ctx, bundles),
       bundleModules(config, ctx, bundles)
@@ -68,7 +68,7 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
     });
 
     if (bundle.moduleFiles.length > 0) {
-      updateBundleBuilds(bundle);
+      updateBundleData(bundle);
       bundles.push(bundle);
     }
   });
@@ -78,7 +78,10 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
 }
 
 
-export function updateBundleBuilds(bundle: Bundle) {
+export function updateBundleData(bundle: Bundle) {
+  // generate a unique entry key based on the components within this bundle
+  bundle.entryKey = 'bundle:' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('.');
+
   // get the modes used in this bundle
   bundle.modeNames = getBundleModes(bundle.moduleFiles);
 
@@ -151,6 +154,7 @@ export function bundleRequiresScopedStyles(encapsulations?: ENCAPSULATION[]) {
 
 
 export function sortBundles(bundles: Bundle[]) {
+  // sort components by tagname within each bundle
   bundles.forEach(m => {
     m.moduleFiles = m.moduleFiles.sort((a, b) => {
       if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
@@ -159,6 +163,7 @@ export function sortBundles(bundles: Bundle[]) {
     });
   });
 
+  // sort each bundle by the first component's tagname
   return bundles.sort((a, b) => {
     if (a.moduleFiles[0].cmpMeta.tagNameMeta < b.moduleFiles[0].cmpMeta.tagNameMeta) return -1;
     if (a.moduleFiles[0].cmpMeta.tagNameMeta > b.moduleFiles[0].cmpMeta.tagNameMeta) return 1;
