@@ -10,7 +10,6 @@ const readPkgUp = require('read-pkg-up');
 const path = require('path');
 const rimraf = require('rimraf');
 const semver = require('semver');
-const minimist = require('minimist');
 const tar = require('tar');
 
 
