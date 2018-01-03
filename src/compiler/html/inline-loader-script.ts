@@ -66,7 +66,7 @@ function relocateInlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc:
     return;
   }
 
-  config.logger.debug(`optimize ${results.pathname}, inline loader: ${appLoaderWWW}`);
+  config.logger.debug(`optimize ${results.pathname}, inline loader`);
 
   // remove the external src
   scriptElm.removeAttribute('src');

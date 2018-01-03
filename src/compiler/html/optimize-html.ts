@@ -67,7 +67,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     }
   }
 
-  if (opts.collapseWhitespace !== false && !config.devMode) {
+  if (opts.collapseWhitespace !== false && !config.devMode && config.logger.level !== 'debug') {
     // collapseWhitespace is the default
     try {
       config.logger.debug(`optimize ${results.pathname}, collapse html whitespace`);

@@ -21,7 +21,7 @@ function inlineStyle(config: BuildConfig, ctx: BuildContext, results: HydrateRes
     return;
   }
 
-  config.logger.debug(`optimize ${results.pathname}, inline style: ${linkElm.href}`);
+  config.logger.debug(`optimize ${results.pathname}, inline style: ${config.sys.url.parse(linkElm.href).pathname}`);
 
   const styleElm = doc.createElement('style');
   styleElm.innerHTML = content;
