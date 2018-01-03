@@ -14,10 +14,18 @@ export function generateServiceWorker(config: BuildConfig, ctx: BuildContext) {
   }
 
   if (hasSrcConfig(config)) {
+    copyLib(config, ctx);
     return injectManifest(config, ctx);
   } else {
     return generate(config, ctx);
   }
+}
+
+function copyLib(config: BuildConfig, ctx: BuildContext) {
+  const timeSpan = config.logger.createTimeSpan(`copy service worker library started`);
+  return config.sys.workbox.copyWorkboxLibraries(config.wwwDir)
+    .catch(err => catchError(ctx.diagnostics, err))
+    .then(() => timeSpan.finish(`copy service worker library finished`));
 }
 
 function generate(config: BuildConfig, ctx: BuildContext) {
@@ -38,3 +46,4 @@ function hasSrcConfig(config: BuildConfig) {
   const serviceWorkerConfig = config.serviceWorker as ServiceWorkerConfig;
   return !!serviceWorkerConfig.swSrc;
 }
+
