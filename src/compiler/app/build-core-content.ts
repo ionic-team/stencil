@@ -237,10 +237,12 @@ var RESERVED_PROPERTIES: string[] = [
   'addListener',
   'attr',
   'color',
+  'Context',
   'dom',
   'emit',
   'enableListener',
   'eventNameFn',
+  'h',
   'isClient',
   'isPrerender',
   'isServer',
@@ -279,19 +281,21 @@ var RESERVED_PROPERTIES: string[] = [
   /**
    * Component Constructor static properties
    */
-  'is',
-  'properties',
   'attr',
+  'connect',
+  'context',
   'elementRef',
   'events',
-  'mutable',
-  'state',
-  'didChange',
   'host',
+  'is',
+  'method',
+  'mutable',
+  'properties',
+  'state',
   'style',
   'styleMode',
-  'willChange',
-
+  'type',
+  'watchCallbacks',
 
   /**
    * Component Instance
