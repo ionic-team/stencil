@@ -153,7 +153,7 @@ export function createPlatformServer(
       });
 
     } catch (e) {
-      console.error(e);
+      onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
     }
   };
 

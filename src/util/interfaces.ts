@@ -473,6 +473,9 @@ export interface HydrateOptions extends RenderOptions {
   isPrerender?: boolean;
   serializeHtml?: boolean;
   collectAnchors?: boolean;
+  console?: {
+    [level: string]: (...msgs: string[]) => void;
+  };
 }
 
 
@@ -1121,7 +1124,7 @@ export interface BundleCallbacks {
 
 
 export interface Diagnostic {
-  level: 'error'|'warn'|'info';
+  level: 'error'|'warn'|'info'|'log'|'debug';
   type: string;
   header?: string;
   messageText: string;
@@ -1156,7 +1159,6 @@ export interface StencilSystem {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
     destroy(): void;
-    getDiagnostics(): Diagnostic[];
   };
   emptyDir?(dir: string): Promise<void>;
   ensureDir?(dir: string): Promise<void>;

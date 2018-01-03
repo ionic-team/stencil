@@ -1,5 +1,6 @@
 import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement,
   HydrateOptions, HydrateResults, PlatformApi, VNode } from '../util/interfaces';
+import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, getNodeDepth, normalizeDirection, normalizeLanguage } from './hydrate-utils';
 import { connectedCallback } from '../core/instance/connected';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from './platform-server';
@@ -11,8 +12,8 @@ import { proxyHostElementPrototype } from '../core/instance/proxy-host-element';
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
   return new Promise(resolve => {
-    const hydrateResults = generateHydrateResults(config, opts);
 
+    const hydrateResults = generateHydrateResults(config, opts);
     const registeredTags = Object.keys(cmpRegistry || {});
     let ssrIds = 0;
 
@@ -91,9 +92,6 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
             hydrateResults.html = dom.serialize();
           }
 
-          // also collect up any dom errors that may have happened
-          hydrateResults.diagnostics = hydrateResults.diagnostics.concat(dom.getDiagnostics());
-
         } catch (e) {
           // gahh, something's up
           hydrateResults.diagnostics.push({
@@ -157,60 +155,62 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
 
 
 export function connectElement(plt: PlatformApi, elm: HostElement, hydrateResults: HydrateResults, hydratedCssClass: string) {
-  if (!elm.$connected) {
-    // only connect elements which is a registered component
-    const tagName = elm.tagName.toLowerCase();
-    const cmpMeta = plt.getComponentMeta(elm);
+  if (elm.$connected) {
+    return;
+  }
 
-    if (cmpMeta) {
+  // only connect elements which is a registered component
+  const tagName = elm.tagName.toLowerCase();
+  const cmpMeta = plt.getComponentMeta(elm);
 
-      if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
-        elm.$initLoad = () => {
-          initComponentLoaded(plt, elm, hydratedCssClass);
-        };
+  if (cmpMeta) {
 
-        proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
+    if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
+      elm.$initLoad = () => {
+        initComponentLoaded(plt, elm, hydratedCssClass);
+      };
 
-        connectedCallback(plt, cmpMeta, elm);
-      }
+      proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
 
-      const depth = getDepth(elm);
-
-      const cmp = hydrateResults.components.find(c => c.tag === tagName);
-      if (cmp) {
-        cmp.count++;
-        if (depth > cmp.depth) {
-          cmp.depth = depth;
-        }
-
-      } else {
-        hydrateResults.components.push({
-          tag: tagName,
-          count: 1,
-          depth: depth
-        });
-      }
-
-    } else if (tagName === 'script') {
-      const src = (elm as any).src;
-      if (src && hydrateResults.scriptUrls.indexOf(src) === -1) {
-        hydrateResults.scriptUrls.push(src);
-      }
-
-    } else if (tagName === 'link') {
-      const href = (elm as any).href;
-      const rel = ((elm as any).rel || '').toLowerCase();
-      if (rel === 'stylesheet' && href && hydrateResults.styleUrls.indexOf(href) === -1) {
-        hydrateResults.styleUrls.push(href);
-      }
-
-    } else if (tagName === 'img') {
-      const src = (elm as any).src;
-      if (src && hydrateResults.imgUrls.indexOf(src) === -1) {
-        hydrateResults.imgUrls.push(src);
-      }
-
+      connectedCallback(plt, cmpMeta, elm);
     }
+
+    const depth = getNodeDepth(elm);
+
+    const cmp = hydrateResults.components.find(c => c.tag === tagName);
+    if (cmp) {
+      cmp.count++;
+      if (depth > cmp.depth) {
+        cmp.depth = depth;
+      }
+
+    } else {
+      hydrateResults.components.push({
+        tag: tagName,
+        count: 1,
+        depth: depth
+      });
+    }
+
+  } else if (tagName === 'script') {
+    const src = (elm as any).src;
+    if (src && hydrateResults.scriptUrls.indexOf(src) === -1) {
+      hydrateResults.scriptUrls.push(src);
+    }
+
+  } else if (tagName === 'link') {
+    const href = (elm as any).href;
+    const rel = ((elm as any).rel || '').toLowerCase();
+    if (rel === 'stylesheet' && href && hydrateResults.styleUrls.indexOf(href) === -1) {
+      hydrateResults.styleUrls.push(href);
+    }
+
+  } else if (tagName === 'img') {
+    const src = (elm as any).src;
+    if (src && hydrateResults.imgUrls.indexOf(src) === -1) {
+      hydrateResults.imgUrls.push(src);
+    }
+
   }
 
   const elmChildren = elm.children;
@@ -220,128 +220,4 @@ export function connectElement(plt: PlatformApi, elm: HostElement, hydrateResult
       connectElement(plt, <HostElement>elmChildren[i], hydrateResults, hydratedCssClass);
     }
   }
-}
-
-
-function collectAnchors(config: BuildConfig, doc: Document, results: HydrateResults) {
-  const anchorElements = doc.querySelectorAll('a');
-
-  for (var i = 0; i < anchorElements.length; i++) {
-    var attrs: any = {};
-    var anchorAttrs = anchorElements[i].attributes;
-
-    for (var j = 0; j < anchorAttrs.length; j++) {
-      attrs[anchorAttrs[j].nodeName.toLowerCase()] = anchorAttrs[j].nodeValue;
-    }
-
-    results.anchors.push(attrs);
-  }
-
-  config.logger.debug(`optimize ${results.pathname}, collected anchors: ${results.anchors.length}`);
-}
-
-
-function normalizeDirection(doc: Document, opts: HydrateOptions) {
-  let dir = doc.body.getAttribute('dir');
-  if (dir) {
-    dir = dir.trim().toLowerCase();
-    if (dir.trim().length > 0) {
-      console.warn(`dir="${dir}" should be placed on the <html> instead of <body>`);
-    }
-  }
-
-  if (opts.dir) {
-    dir = opts.dir;
-  } else {
-    dir = doc.documentElement.getAttribute('dir');
-  }
-
-  if (dir) {
-    dir = dir.trim().toLowerCase();
-    if (dir !== 'ltr' && dir !== 'rtl') {
-      console.warn(`only "ltr" and "rtl" are valid "dir" values on the <html> element`);
-    }
-  }
-
-  if (dir !== 'ltr' && dir !== 'rtl') {
-    dir = 'ltr';
-  }
-
-  doc.documentElement.dir = dir;
-}
-
-
-function normalizeLanguage(doc: Document, opts: HydrateOptions) {
-  let lang = doc.body.getAttribute('lang');
-  if (lang) {
-    lang = lang.trim().toLowerCase();
-    if (lang.trim().length > 0) {
-      console.warn(`lang="${lang}" should be placed on <html> instead of <body>`);
-    }
-  }
-
-  if (opts.lang) {
-    lang = opts.lang;
-  } else {
-    lang = doc.documentElement.getAttribute('lang');
-  }
-
-  if (lang) {
-    lang = lang.trim().toLowerCase();
-    if (lang.length > 0) {
-      doc.documentElement.lang = lang;
-    }
-  }
-}
-
-
-function generateHydrateResults(config: BuildConfig, opts: HydrateOptions) {
-  // https://nodejs.org/api/url.html
-  const url = opts.url || '';
-  const urlParse =  config.sys.url.parse(url);
-
-  const hydrateResults: HydrateResults = {
-    diagnostics: [],
-    url: url,
-    host: urlParse.host,
-    hostname: urlParse.hostname,
-    port: urlParse.port,
-    path: urlParse.path,
-    pathname: urlParse.pathname,
-    search: urlParse.search,
-    query: urlParse.query,
-    hash: urlParse.hash,
-    html: opts.html,
-    styles: null,
-    anchors: [],
-    components: [],
-    styleUrls: [],
-    scriptUrls: [],
-    imgUrls: [],
-    opts: opts
-  };
-
-  return hydrateResults;
-}
-
-
-function getDepth(elm: Node) {
-  let depth = 0;
-
-  while (elm.parentNode) {
-    depth++;
-    elm = elm.parentNode;
-  }
-
-  return depth;
-}
-
-
-function generateFailureDiagnostic(d: Diagnostic) {
-  return `
-    <div style="padding: 20px;">
-      <div style="font-weight: bold;">${d.header}</div>
-      <div>${d.messageText}</div>
-    </div>
-  `;
 }

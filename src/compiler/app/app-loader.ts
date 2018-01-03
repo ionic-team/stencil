@@ -87,7 +87,7 @@ function minifyLoader(config: BuildConfig, jsText: string) {
 
   const minifyJsResults = config.sys.minifyJs(jsText, opts);
   minifyJsResults.diagnostics.forEach(d => {
-    config.logger[d.level](d.messageText);
+    (config.logger as any)[d.level](d.messageText);
   });
 
   if (!minifyJsResults.diagnostics.length) {
