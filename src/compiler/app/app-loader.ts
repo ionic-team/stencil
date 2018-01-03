@@ -23,6 +23,7 @@ export async function generateLoader(
     appRegistry.core,
     appRegistry.coreSsr,
     appRegistry.corePolyfilled,
+    config.hydratedCssClass,
     cmpRegistry,
     loaderContent
   );
@@ -102,6 +103,7 @@ export function injectAppIntoLoader(
   appCoreFileName: string,
   appCoreSsrFileName: string,
   appCorePolyfilledFileName: string,
+  hydratedCssClass: string,
   cmpRegistry: ComponentRegistry,
   loaderContent: string
 ) {
@@ -117,6 +119,7 @@ export function injectAppIntoLoader(
     `"${appCoreFileName}"`,
     `"${appCoreSsrFileName}"`,
     `"${appCorePolyfilledFileName}"`,
+    `"${hydratedCssClass}"`,
     cmpLoaderRegistryStr
   ].join(',');
 

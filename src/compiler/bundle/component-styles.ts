@@ -77,9 +77,6 @@ export function setStyleText(config: BuildConfig, ctx: BuildContext, cmpMeta: Co
     styleMeta.compiledStyleTextScoped = scopeComponentCss(ctx, cmpMeta, styleMeta.compiledStyleText);
   }
 
-  // append the hydrated css to the output
-  setHydratedCss(config, cmpMeta, styleMeta);
-
   styleMeta.compiledStyleText = cleanStyle(styleMeta.compiledStyleText);
 
   if (styleMeta.compiledStyleTextScoped) {
@@ -97,39 +94,6 @@ export function cleanStyle(style: string) {
 
 export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
   return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
-}
-
-
-function setHydratedCss(config: BuildConfig, cmpMeta: ComponentMeta, styleMeta: StyleMeta) {
-  const tagSelector = `${cmpMeta.tagNameMeta}.${config.hydratedCssClass}`;
-
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-    const hostSelector = `:host(.${config.hydratedCssClass})`;
-
-    styleMeta.compiledStyleText = appendHydratedCss(
-      styleMeta.compiledStyleText,
-      hostSelector,
-      true
-    );
-
-  } else {
-    styleMeta.compiledStyleText = appendHydratedCss(
-      styleMeta.compiledStyleText,
-      tagSelector
-    );
-  }
-
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom || cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
-    styleMeta.compiledStyleTextScoped = appendHydratedCss(
-      styleMeta.compiledStyleTextScoped,
-      tagSelector
-    );
-  }
-}
-
-
-function appendHydratedCss(styles: string, selector: string, important?: boolean) {
-  return `${styles || ''}\n${selector}{visibility:inherit${important ? ' !important' : ''}}`;
 }
 
 

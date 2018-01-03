@@ -20,11 +20,11 @@ let content = fs.readFileSync(srcLoaderPath, 'utf-8');
 
 content = content.replace(/export function /g, 'function ');
 
-content = `(function(win, doc, appNamespace, publicPath, appCore, appCoreSsr, appCorePolyfilled, components) {
+content = `(function(win, doc, appNamespace, publicPath, appCore, appCoreSsr, appCorePolyfilled, hydratedCssClass, components) {
 
 ${content}
 
-init(win, doc, appNamespace, publicPath, appCore, appCoreSsr, appCorePolyfilled, components);
+init(win, doc, appNamespace, publicPath, appCore, appCoreSsr, appCorePolyfilled, hydratedCssClass, components);
 
 })(window, document, '__APP__');`;
 

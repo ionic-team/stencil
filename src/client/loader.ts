@@ -1,7 +1,17 @@
 import { LoadComponentRegistry } from '../util/interfaces';
 
 
-export function init(win: any, doc: HTMLDocument, appNamespace: string, publicPath: string, appCore: string, appCoreSsr: string, appCorePolyfilled: string, components: LoadComponentRegistry[], x?: any, y?: any) {
+export function init(
+  win: any,
+  doc: HTMLDocument,
+  appNamespace: string,
+  publicPath: string,
+  appCore: string,
+  appCoreSsr: string,
+  appCorePolyfilled: string,
+  hydratedCssClass: string,
+  components: LoadComponentRegistry[], x?: any, y?: any
+) {
   // create global namespace if it doesn't already exist
   (win[appNamespace] = win[appNamespace] || {}).components = components;
 
@@ -10,7 +20,7 @@ export function init(win: any, doc: HTMLDocument, appNamespace: string, publicPa
     // auto hide components until they been fully hydrated
     // reusing the "x" and "i" variables from the args for funzies
     x = doc.createElement('style');
-    x.innerHTML = y.join() + '{visibility:hidden}';
+    x.innerHTML = y.join() + '{visibility:hidden}.' + hydratedCssClass + '{visibility:inherit}';
     x.setAttribute('data-visibility', '');
     doc.head.insertBefore(x, doc.head.firstChild);
   }
