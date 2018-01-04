@@ -42,7 +42,6 @@ export default function memory(config: InMemoryConfig = {}) {
 
       load(id: string): string | void {
           if (id === path) {
-              console.log(contents);
               return contents;
           }
       }

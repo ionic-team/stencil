@@ -1,6 +1,8 @@
 import { BuildConfig, BuildContext, Bundle, ModuleFile } from '../../util/interfaces';
 import { catchError, hasError } from '../util';
 import { generateEsModule, generateLegacyModule, runRollup } from './rollup-bundle';
+import { processGraph, Module } from './graph';
+import { createDependencyGraph } from './create-dependency-graph';
 
 
 export async function bundleModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
@@ -18,8 +20,21 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
   ctx.graphData = ctx.graphData || new Map();
 
   try {
+    const entryFileNames: string[] = [];
     await Promise.all(bundles.map(bundle => {
-      return generateComponentModules(config, ctx, bundle);
+      entryFileNames.push(bundle.entryKey);
+      return createDependencyGraph(config, ctx, bundle);
+    }));
+
+    const absolutePaths = new Map<string, string>();
+    const moduleList = processGraph(ctx.graphData, entryFileNames);
+    moduleList.forEach(m => {
+      absolutePaths.set(config.sys.path.resolve(m.id), m.id);
+    });
+
+    await Promise.all(moduleList.map(mod => {
+      const bundle = bundles.find(b => b.entryKey === mod.id);
+      return generateComponentModules(config, ctx, mod, bundle, absolutePaths);
     }));
 
   } catch (err) {
@@ -29,35 +44,21 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
   timeSpan.finish('bundle modules finished');
 }
 
-export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle) {
-  if (canSkipBuild(config, ctx, bundles.moduleFiles, bundles.entryKey)) {
-    // don't bother bundling if this is a change build but
-    // none of the changed files are modules or components
-    bundles.compiledModuleText = ctx.moduleBundleOutputs[bundles.entryKey];
-    bundles.compiledModuleLegacyText = ctx.moduleBundleLegacyOutputs[bundles.entryKey];
-    return Promise.resolve();
-  }
-
+export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, mod: Module, bundle: Bundle, absolutePaths: Map<string, string>) {
   // keep track of module bundling for testing
   ctx.moduleBundleCount++;
 
   // run rollup, but don't generate yet
   // returned rollup bundle can be reused for es module and legacy
-  const rollupBundle = await runRollup(config, ctx, bundles);
+  const rollupBundle = await runRollup(config, ctx, mod, bundle);
 
   // bundle using only es modules and dynamic imports
-  bundles.compiledModuleText = await generateEsModule(config, rollupBundle);
-
-  // cache for later
-  ctx.moduleBundleOutputs[bundles.entryKey] = bundles.compiledModuleText;
+  await generateEsModule(config, rollupBundle, absolutePaths);
 
   if (config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks
     // bundle using commonjs using jsonp callback
-    bundles.compiledModuleLegacyText = await generateLegacyModule(config, rollupBundle);
-
-    // cache for later
-    ctx.moduleBundleLegacyOutputs[bundles.entryKey] = bundles.compiledModuleLegacyText;
+    await generateLegacyModule(config, rollupBundle, absolutePaths);
   }
 }
 

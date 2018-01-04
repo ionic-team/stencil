@@ -1,35 +1,37 @@
 import { BuildConfig, BuildContext, Bundle, RollupBundle } from '../../util/interfaces';
-import bundleEntryFile from './rollup-plugins/bundle-entry-file';
+import { Module } from './graph';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import localResolution from './rollup-plugins/local-resolution';
 import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
+import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 
 
-export async function runRollup(config: BuildConfig, ctx: BuildContext, bundle: Bundle) {
+export async function runRollup(config: BuildConfig, ctx: BuildContext, mod: Module, bundles: Bundle[]) {
   let rollupBundle: RollupBundle;
+  let rollupConfig = {
+    input: mod.id,
+    cache: ctx.rollupCache[mod.id],
+    external: (id: string) => mod.external(id),
+    plugins: [
+      config.sys.rollup.plugins.nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+      config.sys.rollup.plugins.commonjs({
+        include: 'node_modules/**',
+        sourceMap: false
+      }),
+      bundleEntryFile(bundles),
+      transpiledInMemoryPlugin(config, ctx),
+      localResolution(config),
+    ],
+    onwarn: createOnWarnFn(ctx.diagnostics)
+  };
 
   try {
-    rollupBundle = await config.sys.rollup.rollup({
-      input: bundle.entryKey,
-      cache: ctx.rollupCache[bundle.entryKey],
-      plugins: [
-        config.sys.rollup.plugins.nodeResolve({
-          jsnext: true,
-          main: true
-        }),
-        config.sys.rollup.plugins.commonjs({
-          include: 'node_modules/**',
-          sourceMap: false
-        }),
-        bundleEntryFile(bundle),
-        transpiledInMemoryPlugin(config, ctx),
-        localResolution(config),
-      ],
-      onwarn: createOnWarnFn(ctx.diagnostics, bundle.moduleFiles)
-
-    });
+    rollupBundle = await config.sys.rollup.rollup(rollupConfig);
 
   } catch (err) {
     loadRollupDiagnostics(config, ctx.diagnostics, err);
@@ -42,24 +44,25 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, bundle: 
   // cache for later
   // watch out for any rollup cache bugs
   // https://github.com/rollup/rollup/issues/1372
-  ctx.rollupCache[bundle.entryKey] = rollupBundle;
+  ctx.rollupCache[mod.id] = rollupBundle;
 
   return rollupBundle;
 }
 
 
-export async function generateEsModule(config: BuildConfig, rollupBundle: RollupBundle) {
+export async function generateEsModule(config: BuildConfig, rollupBundle: RollupBundle, absolutePaths: Map<string, string>) {
   const { code } = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
-    intro: `const { h, Context } = window.${config.namespace};`
+    intro: `const { h, Context } = window.${config.namespace};`,
+    globals: (id: string) => absolutePaths.get(id),
   });
 
   return code;
 }
 
 
-export async function generateLegacyModule(config: BuildConfig, rollupBundle: RollupBundle) {
+export async function generateLegacyModule(config: BuildConfig, rollupBundle: RollupBundle, absolutePaths: Map<string, string>) {
   const { code } = await rollupBundle.generate({
     format: 'cjs',
     banner: generatePreamble(config),
@@ -67,7 +70,8 @@ export async function generateLegacyModule(config: BuildConfig, rollupBundle: Ro
            `"use strict";`,
             // module content w/ commonjs exports object
     outro: `\n},"${getBundleIdPlaceholder()}");`,
-    strict: false
+    strict: false,
+    globals: (id: string) => absolutePaths.get(id),
   });
 
   return code;

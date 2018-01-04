@@ -2,13 +2,14 @@ import { Bundle } from '../../../util/interfaces';
 import { generateBundleEntryInput } from '../bundle-entry-input';
 
 
-export default function bundleEntryFile(bundle: Bundle) {
+export default function bundleEntryFile(bundles: Bundle[]) {
 
   return {
     name: 'bundleEntryFilePlugin',
 
     resolveId(importee: string) {
-      if (importee === bundle.entryKey) {
+      const bundle = bundles.find(b => b.entryKey === importee);
+      if (bundle) {
         return bundle.entryKey;
       }
 
@@ -16,7 +17,8 @@ export default function bundleEntryFile(bundle: Bundle) {
     },
 
     load(id: string) {
-      if (id === bundle.entryKey) {
+      const bundle = bundles.find(b => b.entryKey === id);
+      if (bundle) {
         return generateBundleEntryInput(bundle);
       }
 

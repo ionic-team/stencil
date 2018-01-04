@@ -59,6 +59,9 @@ export class Module {
   }
 
   external(id: string, pwd: string = '.') {
+    if (id === this.id) {
+      return false;
+    }
     if (id.startsWith('./')) {
       // these are relative to the module file being evaluated, so don't have an opinion
       // e.g., 'foo/bar/test.js' importing './other.js' will see that literal passed here

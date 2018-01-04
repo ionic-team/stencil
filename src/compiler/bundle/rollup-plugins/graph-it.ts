@@ -27,7 +27,7 @@ export default function graphIt(config: BuildConfig, graphData: GraphData) {
 
 function resolvePath(config: BuildConfig, importee: string, importer: string) {
   if (importee.charAt(0) === '.') {
-    return config.sys.path.resolve(importer, importee);
+    return config.sys.path.resolve(config.sys.path.dirname(importer), importee);
   }
   return importee;
 }
