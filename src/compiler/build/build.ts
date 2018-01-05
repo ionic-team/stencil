@@ -73,6 +73,7 @@ export async function build(config: BuildConfig, context?: any) {
 
     // bundle modules and styles into separate files phase
     const bundles = await bundle(config, ctx);
+    console.log(JSON.stringify(bundles.map(b => b.entryKey), null, 2));
 
     // both styles and modules are done bundling
     // inject the styles into the modules and

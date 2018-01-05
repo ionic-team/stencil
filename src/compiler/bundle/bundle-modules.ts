@@ -32,10 +32,13 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
       absolutePaths.set(config.sys.path.resolve(m.id), m.id);
     });
 
-    await Promise.all(moduleList.map(mod => {
-      const bundle = bundles.find(b => b.entryKey === mod.id);
-      return generateComponentModules(config, ctx, mod, bundle, absolutePaths);
-    }));
+    await Promise.all(
+      moduleList
+        .filter(mod => mod.id !== '@stencil/core')
+        .map(mod => {
+          return generateComponentModules(config, ctx, mod, bundles, absolutePaths);
+        })
+    );
 
   } catch (err) {
     catchError(ctx.diagnostics, err);
@@ -44,7 +47,17 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
   timeSpan.finish('bundle modules finished');
 }
 
-export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, mod: Module, bundle: Bundle, absolutePaths: Map<string, string>) {
+export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, mod: Module, bundles: Bundle[], absolutePaths: Map<string, string>) {
+  const bundle = bundles.find(b => b.entryKey === mod.id);
+
+  if (bundle && canSkipBuild(config, ctx, bundle.moduleFiles, bundle.entryKey)) {
+    // don't bother bundling if this is a change build but
+    // none of the changed files are modules or components
+    bundle.compiledModuleText = ctx.moduleBundleOutputs[bundle.entryKey];
+    bundle.compiledModuleLegacyText = ctx.moduleBundleLegacyOutputs[bundle.entryKey];
+    return Promise.resolve();
+  }
+
   // keep track of module bundling for testing
   ctx.moduleBundleCount++;
 
@@ -55,10 +68,11 @@ export async function generateComponentModules(config: BuildConfig, ctx: BuildCo
   // bundle using only es modules and dynamic imports
   await generateEsModule(config, rollupBundle, absolutePaths);
 
-  if (config.buildEs5) {
+  if (bundle && config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks
     // bundle using commonjs using jsonp callback
-    await generateLegacyModule(config, rollupBundle, absolutePaths);
+    bundle.compiledModuleLegacyText = await generateLegacyModule(config, rollupBundle, absolutePaths);
+    ctx.moduleBundleLegacyOutputs[bundle.entryKey] = bundle.compiledModuleLegacyText;
   }
 }
 
