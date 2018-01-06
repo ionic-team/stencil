@@ -26,7 +26,7 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
 
   try {
     // get all of the bundles from the manifest bundles
-    bundles = getBundlesFromManifest(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
+    bundles = getBundlesFromManifest(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics, config);
 
     // Look at all dependent components from outside collections and
     // upgrade the components to be compatible with this version if need be
@@ -48,39 +48,45 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundles: ManifestBundle[], diagnostics: Diagnostic[]) {
+export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundles: ManifestBundle[], diagnostics: Diagnostic[], config: BuildConfig) {
   const bundles: Bundle[] = [];
 
-  manifestBundles.filter(b => b.components && b.components.length).forEach(manifestBundle => {
-    const bundle: Bundle = {
-      moduleFiles: [],
-      compiledModuleText: ''
-    };
+  manifestBundles
+    .filter(b => b.components && b.components.length)
+    .forEach(manifestBundle => {
+      const bundle: Bundle = {
+        moduleFiles: [],
+        compiledModuleText: ''
+      };
 
-    manifestBundle.components.forEach(tag => {
-      const cmpMeta = moduleFiles.find(modulesFile => modulesFile.cmpMeta.tagNameMeta === tag);
-      if (cmpMeta) {
-        bundle.moduleFiles.push(cmpMeta);
+      manifestBundle.components.forEach(tag => {
+        const cmpMeta = moduleFiles.find(modulesFile => modulesFile.cmpMeta.tagNameMeta === tag);
+        if (cmpMeta) {
+          bundle.moduleFiles.push(cmpMeta);
 
-      } else {
-        buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or collections.`;
+        } else {
+          buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or collections.`;
+        }
+      });
+
+      if (bundle.moduleFiles.length > 0) {
+        updateBundleData(bundle, config);
+        bundles.push(bundle);
       }
     });
-
-    if (bundle.moduleFiles.length > 0) {
-      updateBundleData(bundle);
-      bundles.push(bundle);
-    }
-  });
 
   // always consistently sort them
   return sortBundles(bundles);
 }
 
 
-export function updateBundleData(bundle: Bundle) {
+export function updateBundleData(bundle: Bundle, config: BuildConfig) {
+  const path = config.sys.path;
+
   // generate a unique entry key based on the components within this bundle
-  bundle.entryKey = 'bundle:' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('.');
+  bundle.entryKey = path.join(
+    path.dirname(bundle.moduleFiles[0].jsFilePath), 'bundle_' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('_')
+  );
 
   // get the modes used in this bundle
   bundle.modeNames = getBundleModes(bundle.moduleFiles);

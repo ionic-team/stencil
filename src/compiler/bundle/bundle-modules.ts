@@ -66,7 +66,11 @@ export async function generateComponentModules(config: BuildConfig, ctx: BuildCo
   const rollupBundle = await runRollup(config, ctx, mod, bundle);
 
   // bundle using only es modules and dynamic imports
-  await generateEsModule(config, rollupBundle, absolutePaths);
+  const text = await generateEsModule(config, rollupBundle, absolutePaths);
+
+  if (bundle) {
+    bundle.compiledModuleText = text;
+  }
 
   if (bundle && config.buildEs5) {
     // only create legacy modules when generating es5 fallbacks

@@ -1,8 +1,7 @@
-import { Bundle } from '../../../util/interfaces';
-import { generateBundleEntryInput } from '../bundle-entry-input';
+import { Bundle, ModuleFile, BuildConfig } from '../../../util/interfaces';
+import { dashToPascalCase } from '../../../util/helpers';
 
-
-export default function bundleEntryFile(bundles: Bundle[]) {
+export default function bundleEntryFile(config: BuildConfig, bundles: Bundle[]) {
 
   return {
     name: 'bundleEntryFilePlugin',
@@ -19,10 +18,37 @@ export default function bundleEntryFile(bundles: Bundle[]) {
     load(id: string) {
       const bundle = bundles.find(b => b.entryKey === id);
       if (bundle) {
-        return generateBundleEntryInput(bundle);
+        return generateBundleEntryInput(config, bundle);
       }
 
       return null;
     }
   };
+}
+
+export function generateBundleEntryInput(config: BuildConfig, bundle: Bundle) {
+  const lines: string[] = [];
+
+  // create a PascalCased named export for each component within the button
+  bundle.moduleFiles.forEach(m => {
+    lines.push(componentExport(config, m, bundle.entryKey));
+  });
+
+  // return a string representing the entry input file for this bundle
+  return lines.join('\n');
+}
+
+
+function componentExport(config: BuildConfig, moduleFile: ModuleFile, bundlePath: string) {
+  const path = config.sys.path;
+  const originalClassName = moduleFile.cmpMeta.componentClass;
+  const pascalCasedClassName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
+
+  let filePath = path.relative(path.dirname(bundlePath), moduleFile.jsFilePath);
+  if (!filePath.startsWith('.')) {
+    filePath = `./${filePath}`;
+  }
+
+  // export { Button as IonButton } from '/some/path.js';
+  return `export { ${originalClassName} as ${pascalCasedClassName} } from '${filePath}';`;
 }

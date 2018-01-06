@@ -13,7 +13,9 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, mod: Mod
   let rollupConfig = {
     input: mod.id,
     cache: ctx.rollupCache[mod.id],
-    external: (id: string) => mod.external(id),
+    external: (id: string) => {
+      return mod.external(id, config.sys.path.dirname(mod.id));
+    },
     plugins: [
       config.sys.rollup.plugins.nodeResolve({
         jsnext: true,
@@ -23,7 +25,7 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, mod: Mod
         include: 'node_modules/**',
         sourceMap: false
       }),
-      bundleEntryFile(bundles),
+      bundleEntryFile(config, bundles),
       transpiledInMemoryPlugin(config, ctx),
       localResolution(config),
     ],
@@ -57,7 +59,6 @@ export async function generateEsModule(config: BuildConfig, rollupBundle: Rollup
     intro: `const { h, Context } = window.${config.namespace};`,
     globals: (id: string) => absolutePaths.get(id),
   });
-
   return code;
 }
 
