@@ -45,9 +45,7 @@ function componentExport(config: BuildConfig, moduleFile: ModuleFile, bundlePath
   const pascalCasedClassName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
 
   let filePath = path.relative(path.dirname(bundlePath), moduleFile.jsFilePath);
-  if (!filePath.startsWith('.')) {
-    filePath = `./${filePath}`;
-  }
+  filePath = `./${filePath}`;
 
   // export { Button as IonButton } from '/some/path.js';
   return `export { ${originalClassName} as ${pascalCasedClassName} } from '${filePath}';`;
