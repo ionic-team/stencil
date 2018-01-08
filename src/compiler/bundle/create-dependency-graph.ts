@@ -25,7 +25,7 @@ export async function createDependencyGraph(config: BuildConfig, ctx: BuildConte
           include: 'node_modules/**',
           sourceMap: false
         }),
-        bundleEntryFile(config, [bundle]),
+        bundleEntryFile(config, bundle),
         transpiledInMemoryPlugin(config, ctx),
         localResolution(config),
       ],

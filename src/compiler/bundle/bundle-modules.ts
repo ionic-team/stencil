@@ -30,25 +30,14 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
     const moduleList = processGraph(ctx.graphData, entryFileNames);
 
     moduleList.forEach(m => {
-      console.log('\n');
-      console.log('----------------------------------------------------------');
-      console.log(JSON.stringify(ctx.graphData.get(m.id), null, 2));
-      console.log(JSON.stringify(m, null, 2));
-      console.log('----------------------------------------------------------');
-      console.log('\n');
       absolutePaths.set(config.sys.path.resolve(m.id), m.id);
     });
 
-    console.log([...ctx.graphData].length);
-    console.log(moduleList.length);
-    console.log(entryFileNames.length);
-    console.log([...absolutePaths].length);
-
     await Promise.all(
       moduleList
-        .filter(mod => mod.id !== '@stencil/core')
         .map(mod => {
-          return generateComponentModules(config, ctx, mod, bundles, absolutePaths);
+          const bundle = bundles.find(b => b.entryKey === mod.id);
+          return generateComponentModules(config, ctx, mod, bundle, absolutePaths);
         })
     );
 
@@ -59,8 +48,7 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
   timeSpan.finish('bundle modules finished');
 }
 
-export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, mod: Module, bundles: Bundle[], absolutePaths: Map<string, string>) {
-  const bundle = bundles.find(b => b.entryKey === mod.id);
+export async function generateComponentModules(config: BuildConfig, ctx: BuildContext, mod: Module, bundle: Bundle, absolutePaths: Map<string, string>) {
 
   if (bundle && canSkipBuild(config, ctx, bundle.moduleFiles, bundle.entryKey)) {
     // don't bother bundling if this is a change build but

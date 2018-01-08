@@ -1,14 +1,13 @@
 import { Bundle, ModuleFile, BuildConfig } from '../../../util/interfaces';
 import { dashToPascalCase } from '../../../util/helpers';
 
-export default function bundleEntryFile(config: BuildConfig, bundles: Bundle[]) {
+export default function bundleEntryFile(config: BuildConfig, bundle: Bundle) {
 
   return {
     name: 'bundleEntryFilePlugin',
 
     resolveId(importee: string) {
-      const bundle = bundles.find(b => b.entryKey === importee);
-      if (bundle) {
+      if (bundle && bundle.entryKey === importee) {
         return bundle.entryKey;
       }
 
@@ -16,8 +15,7 @@ export default function bundleEntryFile(config: BuildConfig, bundles: Bundle[]) 
     },
 
     load(id: string) {
-      const bundle = bundles.find(b => b.entryKey === id);
-      if (bundle) {
+      if (bundle && bundle.entryKey === id) {
         return generateBundleEntryInput(config, bundle);
       }
 

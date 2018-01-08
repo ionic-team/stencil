@@ -8,7 +8,7 @@ import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 
 
-export async function runRollup(config: BuildConfig, ctx: BuildContext, mod: Module, bundles: Bundle[]) {
+export async function runRollup(config: BuildConfig, ctx: BuildContext, mod: Module, bundle: Bundle) {
   let rollupBundle: RollupBundle;
   let rollupConfig = {
     input: mod.id,
@@ -25,7 +25,7 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, mod: Mod
         include: 'node_modules/**',
         sourceMap: false
       }),
-      bundleEntryFile(config, bundles),
+      bundleEntryFile(config, bundle),
       transpiledInMemoryPlugin(config, ctx),
       localResolution(config),
     ],
