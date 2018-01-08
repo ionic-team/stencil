@@ -20,7 +20,7 @@ import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
 
 export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
-  const registry: ComponentRegistry = { 'html': {} };
+  const cmpRegistry: ComponentRegistry = { 'html': {} };
   const bundleCallbacks: BundleCallbacks = {};
   const loadedBundles: {[bundleId: string]: boolean} = {};
   const pendingBundleRequests: {[url: string]: boolean} = {};
@@ -55,7 +55,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     domApi,
     defineComponent,
     emitEvent: Context.emit,
-    getComponentMeta: elm => registry[domApi.$tagName(elm)],
+    getComponentMeta: elm => cmpRegistry[domApi.$tagName(elm)],
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
     isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
@@ -63,7 +63,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: createQueueClient(win),
-    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoader(data, registry))
+    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoader(data, cmpRegistry))
   };
 
   // create the renderer that will be used
@@ -161,7 +161,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
       // let's add a reference to the constructors on each components metadata
       // each key in moduleImports is a PascalCased tag name
       Object.keys(exports).forEach(pascalCasedTagName => {
-        const cmpMeta = registry[toDashCase(pascalCasedTagName)];
+        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
           // connect the component's constructor to its metadata
           cmpMeta.componentConstructor = exports[pascalCasedTagName];

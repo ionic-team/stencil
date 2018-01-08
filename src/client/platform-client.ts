@@ -19,7 +19,7 @@ import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
 
 export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
-  const registry: ComponentRegistry = { 'html': {} };
+  const cmpRegistry: ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
 
@@ -51,7 +51,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     domApi,
     defineComponent,
     emitEvent: Context.emit,
-    getComponentMeta: elm => registry[domApi.$tagName(elm)],
+    getComponentMeta: elm => cmpRegistry[domApi.$tagName(elm)],
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
     isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
@@ -59,7 +59,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: createQueueClient(win),
-    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoader(data, registry))
+    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoader(data, cmpRegistry))
   };
 
   // create the renderer that will be used
