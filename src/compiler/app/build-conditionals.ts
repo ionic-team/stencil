@@ -5,6 +5,7 @@ import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 export function setBuildConditionals(ctx: BuildContext, bundles: Bundle[]) {
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
+  coreBuild.clientSide = true;
 
   bundles.forEach(bundle => {
     bundle.moduleFiles.forEach(moduleFile => {

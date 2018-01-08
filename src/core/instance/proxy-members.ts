@@ -45,22 +45,42 @@ export function defineMember(
           elm._values[memberName] = parsePropertyValue(property.type, hostAttrValue);
         }
       }
-      if (elm.hasOwnProperty(memberName)) {
-        // @Prop or @Prop({mutable:true})
-        // property values on the host element should override
-        // any default values on the component instance
-        if (elm._values[memberName] === undefined) {
-          elm._values[memberName] = (elm as any)[memberName];
+
+      if (Build.clientSide) {
+        // client-side
+        // within the browser, the element's prototype
+        // already has its getter/setter set, but on the
+        // server the prototype is shared causing issues
+        // so instead the server's elm has the getter/setter
+        // directly on the actual element instance, not its prototype
+        // so on the browser we can use "hasOwnProperty"
+        if (elm.hasOwnProperty(memberName)) {
+          // @Prop or @Prop({mutable:true})
+          // property values on the host element should override
+          // any default values on the component instance
+          if (elm._values[memberName] === undefined) {
+            elm._values[memberName] = (elm as any)[memberName];
+          }
+
+          // for the client only, let's delete its "own" property
+          // this way our already assigned getter/setter on the prototype kicks in
+          delete (elm as any)[memberName];
         }
 
-        if (plt.isClient) {
-          // within the browser, the element's prototype
-          // already has its getter/setter set, but on the
-          // server the prototype is shared causing issues
-          // so instead the server's elm has the getter/setter
-          // on the actual element instance, not its prototype
-          // for the client, let's delete its "own" property
-          delete (elm as any)[memberName];
+      } else {
+        // server-side
+        // server-side elm has the getter/setter
+        // on the actual element instance, not its prototype
+        // on the server we cannot accurately use "hasOwnProperty"
+        // instead we'll do a direct lookup to see if the
+        // constructor has this property
+        if (elementHasProperty(plt, elm, memberName)) {
+          // @Prop or @Prop({mutable:true})
+          // property values on the host element should override
+          // any default values on the component instance
+          if (elm._values[memberName] === undefined) {
+            elm._values[memberName] = (elm as any)[memberName];
+          }
         }
       }
     }
@@ -174,3 +194,34 @@ export function definePropertyGetterSetter(obj: any, propertyKey: string, get: a
 
 
 const WATCH_CB_PREFIX = `wc-`;
+
+
+export function elementHasProperty(plt: PlatformApi, elm: HostElement, memberName: string) {
+  // within the browser, the element's prototype
+  // already has its getter/setter set, but on the
+  // server the prototype is shared causing issues
+  // so instead the server's elm has the getter/setter
+  // directly on the actual element instance, not its prototype
+  // so at the time of this function being called, the server
+  // side element is unaware if the element has this property
+  // name. So for server-side only, do this trick below
+  // don't worry, this runtime code doesn't show on the client
+  let hasOwnProperty = elm.hasOwnProperty(memberName);
+  if (!hasOwnProperty) {
+    // element doesn't
+    const cmpMeta = plt.getComponentMeta(elm);
+    if (cmpMeta) {
+      if (cmpMeta.componentConstructor && cmpMeta.componentConstructor.properties) {
+        // if we have the constructor property data, let's check that
+        const member = cmpMeta.componentConstructor.properties[memberName];
+        hasOwnProperty = !!(member && member.type);
+      }
+      if (!hasOwnProperty && cmpMeta.membersMeta) {
+        // if we have the component's metadata, let's check that
+        const member = cmpMeta.membersMeta[memberName];
+        hasOwnProperty = !!(member && member.propType);
+      }
+    }
+  }
+  return hasOwnProperty;
+}
