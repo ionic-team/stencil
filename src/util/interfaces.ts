@@ -1286,6 +1286,7 @@ export interface Workbox {
   generateFileManifest(): Promise<any>;
   getFileManifestEntries(): Promise<any>;
   injectManifest(swConfig: any): Promise<any>;
+  copyWorkboxLibraries(wwwDir: string): Promise<any>;
 }
 
 

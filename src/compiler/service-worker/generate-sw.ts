@@ -14,10 +14,25 @@ export async function generateServiceWorker(config: BuildConfig, ctx: BuildConte
   }
 
   if (hasSrcConfig(config)) {
+    copyLib(config, ctx);
     await injectManifest(config, ctx);
+
   } else {
     await generateSW(config, ctx);
   }
+}
+
+async function copyLib(config: BuildConfig, ctx: BuildContext) {
+  const timeSpan = config.logger.createTimeSpan(`copy service worker library started`, true);
+
+  try {
+    await config.sys.workbox.copyWorkboxLibraries(config.wwwDir);
+
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
+
+  timeSpan.finish(`copy service worker library finished`);
 }
 
 async function generateSW(config: BuildConfig, ctx: BuildContext) {
@@ -48,3 +63,4 @@ function hasSrcConfig(config: BuildConfig) {
   const serviceWorkerConfig = config.serviceWorker as ServiceWorkerConfig;
   return !!serviceWorkerConfig.swSrc;
 }
+

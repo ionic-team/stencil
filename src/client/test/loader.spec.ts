@@ -100,34 +100,34 @@ describe('loader', () => {
 
   });
 
-  describe('supportsCustomElements', () => {
+  describe('supportsEsModules', () => {
 
-    it('supportsCustomElements true', () => {
+    it('supportsEsModules true', () => {
       const scriptElm: any = {
         noModule: {}
       };
-      expect(loader.supportsCustomElements(scriptElm)).toBeTruthy();
+      expect(loader.supportsEsModules(scriptElm)).toBeTruthy();
     });
 
-    it('supportsCustomElements false', () => {
+    it('supportsEsModules false', () => {
       const scriptElm: any = {};
-      expect(loader.supportsCustomElements(scriptElm)).toBeFalsy();
+      expect(loader.supportsEsModules(scriptElm)).toBeFalsy();
     });
 
   });
 
-  describe('supportsEsModules', () => {
+  describe('supportsCustomElements', () => {
 
-    it('supportsEsModules true', () => {
+    it('supportsCustomElements true', () => {
       win = {
         customElements: {}
       };
-      expect(loader.supportsEsModules(win)).toBeTruthy();
+      expect(loader.supportsCustomElements(win)).toBeTruthy();
     });
 
-    it('supportsEsModules false', () => {
+    it('supportsCustomElements false', () => {
       win = {};
-      expect(loader.supportsEsModules(win)).toBeFalsy();
+      expect(loader.supportsCustomElements(win)).toBeFalsy();
     });
 
   });

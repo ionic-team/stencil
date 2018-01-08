@@ -39,17 +39,17 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = publicPath + ((supportsCustomElements(x) && supportsEsModules(win) && supportsFetch(win) && supportsCssVariables(win)) ? (requiresSsrClient(doc) ? appCoreSsr : appCore) : appCorePolyfilled);
+  x.src = publicPath + ((supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? (requiresSsrClient(doc) ? appCoreSsr : appCore) : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
   x.setAttribute('data-namespace', appNamespace);
   doc.head.appendChild(x);
 }
 
-export function supportsCustomElements(scriptElm: HTMLScriptElement) {
+export function supportsEsModules(scriptElm: HTMLScriptElement) {
   return 'noModule' in scriptElm;
 }
 
-export function supportsEsModules(win: Window) {
+export function supportsCustomElements(win: Window) {
   return win.customElements;
 }
 
