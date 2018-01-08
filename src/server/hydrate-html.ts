@@ -1,42 +1,25 @@
-import { BuildConfig, BuildContext, ComponentRegistry, Diagnostic, HostElement,
-  HydrateOptions, HydrateResults, PlatformApi, VNode } from '../util/interfaces';
-import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, getNodeDepth, normalizeDirection, normalizeLanguage } from './hydrate-utils';
-import { connectedCallback } from '../core/instance/connected';
-import { createDomApi } from '../core/renderer/dom-api';
+import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
+import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeLanguage, normalizeHydrateOptions } from './hydrate-utils';
+import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
-import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
-import { initComponentLoaded } from '../core/instance/init-component-instance';
 import { optimizeHtml } from '../compiler/html/optimize-html';
-import { proxyHostElementPrototype } from '../core/instance/proxy-host-element';
+import { SSR_VNODE_ID } from '../util/constants';
 
 
 export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
   return new Promise(resolve => {
 
-    const hydrateResults = generateHydrateResults(config, opts);
-    const registeredTags = Object.keys(cmpRegistry || {});
-    let ssrIds = 0;
+    // validate the hydrate options and add any missing info
+    opts = normalizeHydrateOptions(opts);
 
-    // if there are no components registered at all
-    // then let's skip all this (and why didn't we get components!?)
-    if (registeredTags.length === 0) {
-      hydrateResults.diagnostics.push({
-        header: 'Hydrate Components',
-        messageText: `No registered components found`,
-        type: 'hydrate',
-        level: 'info'
-      });
-      hydrateResults.html = opts.html;
-      resolve(hydrateResults);
-      return;
-    }
+    // create the results object we're gonna return
+    const hydrateResults = generateHydrateResults(config, opts);
 
     // create a emulated window
     // attach data the request to the window
     const dom = config.sys.createDom();
     const win = dom.parse(opts);
     const doc = win.document;
-    const domApi = createDomApi(win, doc);
 
     // normalize dir and lang before connecting elements
     // so that the info is their incase they read it at runtime
@@ -48,21 +31,15 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
       config,
       win,
       doc,
-      domApi,
-      hydrateResults.diagnostics,
+      cmpRegistry,
+      hydrateResults,
       opts.isPrerender,
       ctx
     );
 
-    // fully define each of our components onto this new platform instance
-    registeredTags.forEach(registryTag => {
-      cmpRegistry[registryTag].tagNameMeta = registryTag.toLowerCase().trim();
-      plt.defineComponent(cmpRegistry[registryTag]);
-    });
-
     // fire off this function when the app has finished loading
     // and all components have finished hydrating
-    plt.onAppLoad = (rootElm, styles, failureDiagnostic: Diagnostic) => {
+    plt.onAppLoad = (rootElm, styles, failureDiagnostic) => {
 
       if (config._isTesting) {
         (hydrateResults as any).__testPlatform = plt;
@@ -70,6 +47,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
 
       if (failureDiagnostic) {
         hydrateResults.html = generateFailureDiagnostic(failureDiagnostic);
+        dom.destroy();
         resolve(hydrateResults);
         return;
       }
@@ -108,11 +86,13 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
 
       // cool, all good here, even if there are errors
       // we're passing back the result object
+      dom.destroy();
       resolve(hydrateResults);
     };
 
     // patch the render function that we can add SSR ids
     // and to connect any elements it may have just appened to the DOM
+    let ssrIds = 0;
     const pltRender = plt.render;
     plt.render = function render(oldVNode: VNode, newVNode, isUpdate, hostContentNodes, encapsulation) {
       let ssrId: number;
@@ -134,15 +114,15 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
 
       newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, encapsulation, ssrId);
 
-      connectElement(plt, <HostElement>newVNode.elm, hydrateResults, config.hydratedCssClass);
+      connectChildElements(config, plt, hydrateResults, newVNode.elm as Element);
 
       return newVNode;
     };
 
     // loop through each node and start connecting/hydrating
     // any elements that are host elements to components
-    // this kicks off all the async loading and hydrating
-    connectElement(plt, <any>win.document.body, hydrateResults, config.hydratedCssClass);
+    // this kicks off all the async hydrating
+    connectChildElements(config, plt, hydrateResults, win.document.body);
 
     if (hydrateResults.components.length === 0) {
       // what gives, never found ANY host elements to connect!
@@ -151,73 +131,4 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
       resolve(hydrateResults);
     }
   });
-}
-
-
-export function connectElement(plt: PlatformApi, elm: HostElement, hydrateResults: HydrateResults, hydratedCssClass: string) {
-  if (elm.$connected) {
-    return;
-  }
-
-  // only connect elements which is a registered component
-  const tagName = elm.tagName.toLowerCase();
-  const cmpMeta = plt.getComponentMeta(elm);
-
-  if (cmpMeta) {
-
-    if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {
-      elm.$initLoad = () => {
-        initComponentLoaded(plt, elm, hydratedCssClass);
-      };
-
-      proxyHostElementPrototype(plt, cmpMeta.membersMeta, elm);
-
-      connectedCallback(plt, cmpMeta, elm);
-    }
-
-    const depth = getNodeDepth(elm);
-
-    const cmp = hydrateResults.components.find(c => c.tag === tagName);
-    if (cmp) {
-      cmp.count++;
-      if (depth > cmp.depth) {
-        cmp.depth = depth;
-      }
-
-    } else {
-      hydrateResults.components.push({
-        tag: tagName,
-        count: 1,
-        depth: depth
-      });
-    }
-
-  } else if (tagName === 'script') {
-    const src = (elm as any).src;
-    if (src && hydrateResults.scriptUrls.indexOf(src) === -1) {
-      hydrateResults.scriptUrls.push(src);
-    }
-
-  } else if (tagName === 'link') {
-    const href = (elm as any).href;
-    const rel = ((elm as any).rel || '').toLowerCase();
-    if (rel === 'stylesheet' && href && hydrateResults.styleUrls.indexOf(href) === -1) {
-      hydrateResults.styleUrls.push(href);
-    }
-
-  } else if (tagName === 'img') {
-    const src = (elm as any).src;
-    if (src && hydrateResults.imgUrls.indexOf(src) === -1) {
-      hydrateResults.imgUrls.push(src);
-    }
-
-  }
-
-  const elmChildren = elm.children;
-  if (elmChildren) {
-    // continue drilling down through child elements
-    for (var i = 0, l = elmChildren.length; i < l; i++) {
-      connectElement(plt, <HostElement>elmChildren[i], hydrateResults, hydratedCssClass);
-    }
-  }
 }

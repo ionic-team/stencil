@@ -1,14 +1,20 @@
 import { BuildConfig, BuildContext, HydrateOptions, HydrateResults } from '../util/interfaces';
-import { buildError, getBuildContext } from '../compiler/util';
-import { DEFAULT_PRERENDER_CONFIG, DEFAULT_SSR_CONFIG } from '../compiler/prerender/validate-prerender-config';
-import { getGlobalWWW, getRegistryJsonWWW } from '../compiler/app/app-file-naming';
+import { catchError, getBuildContext } from '../compiler/util';
+import { getGlobalWWW } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
-import { parseComponentRegistryJsonFile } from '../compiler/app/app-registry';
+import { loadComponentRegistry } from './load-registry';
 import { validateBuildConfig } from '../util/validate-config';
 
 
 export function createRenderer(config: BuildConfig, ctx?: BuildContext) {
   validateBuildConfig(config);
+
+  // load the component registry from the registry.json file
+  const cmpRegistry = loadComponentRegistry(config);
+
+  if (Object.keys(cmpRegistry).length === 0) {
+    throw new Error(`No registered components found: ${config.namespace}`);
+  }
 
   ctx = ctx || {};
 
@@ -18,24 +24,19 @@ export function createRenderer(config: BuildConfig, ctx?: BuildContext) {
   // load the app global file into the context
   loadAppGlobal(config, ctx);
 
-  if (!ctx.cmpRegistry) {
-    // load the app registry if we haven't already
-    // if one wasn't passed in already
-    // and cache this for later reuse
-    ctx.cmpRegistry = loadComponentRegistry(config);
-  }
-
   // overload with two options for hydrateToString
   // one that returns a promise, and one that takes a callback as the last arg
-  function hydrateToString(hydrateOpts: HydrateOptions): Promise<HydrateResults> {
-
-    // validate the hydrate options and add any missing info
-    hydrateOpts = normalizeHydrateOptions(config, hydrateOpts);
+  async function hydrateToString(hydrateOpts: HydrateOptions) {
+    let hydrateResults: HydrateResults;
 
     // kick off hydrated, which is an async opertion
-    return hydrateHtml(config, ctx, ctx.cmpRegistry, hydrateOpts).catch(err => {
-      const hydrateResults: HydrateResults = {
-        diagnostics: [buildError(err)],
+    try {
+      hydrateResults = await hydrateHtml(config, ctx, cmpRegistry, hydrateOpts);
+
+    } catch (e) {
+      hydrateResults = {
+        url: hydrateOpts.path,
+        diagnostics: [],
         html: hydrateOpts.html,
         styles: null,
         anchors: [],
@@ -44,46 +45,16 @@ export function createRenderer(config: BuildConfig, ctx?: BuildContext) {
         scriptUrls: [],
         imgUrls: []
       };
-      return hydrateResults;
-    });
+
+      catchError(hydrateResults.diagnostics, e);
+    }
+
+    return hydrateResults;
   }
 
   return {
     hydrateToString: hydrateToString
   };
-}
-
-
-function normalizeHydrateOptions(config: BuildConfig, inputOpts: HydrateOptions) {
-  const opts = Object.assign({}, DEFAULT_SSR_CONFIG, inputOpts);
-  const req = opts.req;
-
-  if (req && typeof req.get === 'function') {
-    // assuming node express request object
-    // https://expressjs.com/
-    if (!opts.url) opts.url = req.protocol + '://' + req.get('host') + req.originalUrl;
-    if (!opts.referrer) opts.referrer = req.get('referrer');
-    if (!opts.userAgent) opts.userAgent = req.get('user-agent');
-    if (!opts.cookie) opts.cookie = req.get('cookie');
-  }
-
-  if (!opts.url) {
-    opts.url = '/';
-  }
-
-  const urlObj = config.sys.url.parse(opts.url);
-  if (!urlObj.protocol) urlObj.protocol = 'https:';
-  if (!urlObj.hostname) urlObj.hostname = DEFAULT_PRERENDER_CONFIG.host;
-
-  opts.url = config.sys.url.format(urlObj);
-
-  return opts;
-}
-
-
-function loadComponentRegistry(config: BuildConfig) {
-  const registryJsonFilePath = getRegistryJsonWWW(config);
-  return parseComponentRegistryJsonFile(config, registryJsonFilePath);
 }
 
 

@@ -1,5 +1,6 @@
-import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, Logger, PlatformApi, RendererApi, StencilSystem, VNode } from '../util/interfaces';
+import { BuildConfig, ComponentMeta, DomApi, HostContentNodes, HostElement,
+  HydrateOptions, HydrateResults, Logger, PlatformApi, RendererApi, StencilSystem, VNode, ComponentRegistry } from '../util/interfaces';
+import { ComponentInstance } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
@@ -7,21 +8,23 @@ import { initHostElement } from '../core/instance/init-host-element';
 import { initComponentInstance } from '../core/instance/init-component-instance';
 import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../util/validate-config';
-import { ComponentInstance } from '../util/interfaces';
 
 
 export function mockPlatform(win?: any, domApi?: DomApi) {
-  const diagnostics: Diagnostic[] = [];
+  const hydrateResults: HydrateResults = {
+    diagnostics: []
+  };
   const config = mockBuildConfig();
   win = win || config.sys.createDom().parse({html: ''});
   domApi = domApi || createDomApi(win, win.document);
+  const cmpRegistry: ComponentRegistry = {};
 
   const plt = createPlatformServer(
     config,
     win,
     win.document,
-    domApi,
-    diagnostics,
+    cmpRegistry,
+    hydrateResults,
     false,
     null
   );
@@ -221,7 +224,7 @@ function mockCreateDom() {
   return {
     parse: function(opts: HydrateOptions) {
       dom = new jsdom.JSDOM(opts.html, {
-        url: opts.url,
+        url: opts.path,
         referrer: opts.referrer,
         userAgent: opts.userAgent,
       });

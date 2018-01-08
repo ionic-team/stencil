@@ -2,24 +2,28 @@ import { HydrateOptions } from '../../util/interfaces';
 
 
 export function createDom() {
-  var jsdom = require('jsdom');
-  var virtualConsole = new jsdom.VirtualConsole();
-  var dom: any;
+  let dom: any = null;
 
   return {
 
     parse(opts: HydrateOptions) {
-
-      if (opts.console) {
-        virtualConsole.sendTo(opts.console);
+      if (dom) {
+        dom.window.close();
       }
 
-      dom = new jsdom.JSDOM(opts.html, {
-        virtualConsole: virtualConsole,
+      const jsdom = require('jsdom');
+      const jsdomOptions: any = {
         url: opts.url,
         referrer: opts.referrer,
         userAgent: opts.userAgent
-      });
+      };
+
+      if (opts.console) {
+        jsdomOptions.virtualConsole = new jsdom.VirtualConsole();
+        jsdomOptions.virtualConsole.sendTo(opts.console);
+      }
+
+      dom = new jsdom.JSDOM(opts.html, jsdomOptions);
 
       return dom.window;
     },

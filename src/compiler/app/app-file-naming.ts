@@ -12,13 +12,13 @@ export function getAppDistDir(config: BuildConfig) {
 }
 
 
-export function getRegistryJsonWWW(config: BuildConfig) {
-  return pathJoin(config, getAppWWWBuildDir(config), `${config.fsNamespace}.registry.json`);
+function getRegistryFileName(config: BuildConfig) {
+  return `${config.fsNamespace}.registry.json`;
 }
 
 
-export function getRegistryJsonDist(config: BuildConfig) {
-  return pathJoin(config, config.distDir, `${config.fsNamespace}.registry.json`);
+export function getRegistryJsonWWW(config: BuildConfig) {
+  return pathJoin(config, getAppWWWBuildDir(config), getRegistryFileName(config));
 }
 
 

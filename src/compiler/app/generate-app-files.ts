@@ -18,7 +18,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, b
   const timespan = config.logger.createTimeSpan(`generateAppFiles: ${config.namespace} start`, true);
 
   // generate the shared app registry object
-  const appRegistry = createAppRegistry(config, cmpRegistry);
+  const appRegistry = createAppRegistry(config);
 
   // normal es2015 build
   const globalJsContentsEs2015 = await generateAppGlobalScript(config, ctx, appRegistry);
@@ -61,7 +61,7 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, b
   }
 
   // create a json file for the app registry
-  writeAppRegistry(config, ctx, appRegistry);
+  writeAppRegistry(config, ctx, appRegistry, cmpRegistry);
 
   // create the loader after creating the loader file name
   await generateLoader(config, ctx, appRegistry, cmpRegistry);

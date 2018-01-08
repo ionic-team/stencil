@@ -12,7 +12,6 @@ export async function generateLoader(
   cmpRegistry: ComponentRegistry
 ) {
   const appLoaderFileName = getLoaderFileName(config);
-  appRegistry.loader = `../${appLoaderFileName}`;
 
   const clientLoaderSource = `loader.js`;
 

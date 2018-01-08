@@ -1,14 +1,35 @@
 import { BuildConfig, Diagnostic, HydrateOptions, HydrateResults } from '../util/interfaces';
+import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/prerender/validate-prerender-config';
+
+
+export function normalizeHydrateOptions(inputOpts: HydrateOptions) {
+  const opts: HydrateOptions = Object.assign({}, DEFAULT_SSR_CONFIG, inputOpts);
+  const req = opts.req;
+
+  if (req && typeof req.get === 'function') {
+    // assuming node express request object
+    // https://expressjs.com/
+    if (!opts.url) opts.url = req.protocol + '://' + req.get('host') + req.originalUrl;
+    if (!opts.referrer) opts.referrer = req.get('referrer');
+    if (!opts.userAgent) opts.userAgent = req.get('user-agent');
+    if (!opts.cookie) opts.cookie = req.get('cookie');
+  }
+
+  return opts;
+}
 
 
 export function generateHydrateResults(config: BuildConfig, opts: HydrateOptions) {
+  if (!opts.url) {
+    opts.url = `https://${DEFAULT_PRERENDER_HOST}/`;
+  }
+
   // https://nodejs.org/api/url.html
-  const url = opts.url || '';
-  const urlParse =  config.sys.url.parse(url);
+  const urlParse =  config.sys.url.parse(opts.url);
 
   const hydrateResults: HydrateResults = {
     diagnostics: [],
-    url: url,
+    url: opts.url,
     host: urlParse.host,
     hostname: urlParse.hostname,
     port: urlParse.port,
@@ -144,16 +165,4 @@ export function generateFailureDiagnostic(d: Diagnostic) {
       <div>${d.messageText}</div>
     </div>
   `;
-}
-
-
-export function getNodeDepth(elm: Node) {
-  let depth = 0;
-
-  while (elm.parentNode) {
-    depth++;
-    elm = elm.parentNode;
-  }
-
-  return depth;
 }

@@ -1,12 +1,15 @@
 import { AppGlobal, BuildConfig, BuildContext, CjsExports,
-  ComponentMeta, ComponentRegistry, CoreContext, Diagnostic, DomApi,
-  HostElement, PlatformApi } from '../util/interfaces';
+  ComponentMeta, ComponentRegistry, CoreContext, Diagnostic,
+  HostElement, PlatformApi, HydrateResults } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
+import { createDomApi } from '../core/renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR, PROP_TYPE } from '../util/constants';
+import { getAppWWWBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';
+import { patchDomApi } from './dom-api-server';
 import { proxyController } from '../core/instance/proxy-controller';
 import { toDashCase } from '../util/helpers';
 
@@ -15,17 +18,20 @@ export function createPlatformServer(
   config: BuildConfig,
   win: any,
   doc: any,
-  domApi: DomApi,
-  diagnostics: Diagnostic[],
+  cmpRegistry: ComponentRegistry,
+  hydrateResults: HydrateResults,
   isPrerender: boolean,
   ctx?: BuildContext
 ): PlatformApi {
-  const registry: ComponentRegistry = { 'html': {} };
   const styles: string[] = [];
   const controllerComponents: {[tag: string]: HostElement} = {};
+  const domApi = createDomApi(win, doc);
 
   // init build context
   ctx = ctx || {};
+
+  // the root <html> element is always the top level registered component
+  cmpRegistry = Object.assign({ 'html': {}}, cmpRegistry);
 
   // initialize Core global object
   const Context: CoreContext = {};
@@ -54,7 +60,7 @@ export function createPlatformServer(
   win[config.namespace] = App;
 
   const appWwwDir = config.wwwDir;
-  const appBuildDir = config.sys.path.join(config.buildDir, config.fsNamespace);
+  const appBuildDir = getAppWWWBuildDir(config);
   Context.publicPath = appBuildDir;
 
   // create the sandboxed context with a new instance of a V8 Context
@@ -81,6 +87,8 @@ export function createPlatformServer(
     tmpDisconnected: false,
   };
 
+  // patch dom api like createElement()
+  patchDomApi(plt, domApi);
 
   // create the renderer which will be used to patch the vdom
   plt.render = createRendererPatch(plt, domApi);
@@ -119,19 +127,12 @@ export function createPlatformServer(
 
   function getComponentMeta(elm: Element) {
     // registry tags are always lower-case
-    return registry[elm.tagName.toLowerCase()];
+    return cmpRegistry[elm.tagName.toLowerCase()];
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
     // default mode and color props
-    cmpMeta.membersMeta = cmpMeta.membersMeta || {};
-
-    cmpMeta.membersMeta.mode = { memberType: MEMBER_TYPE.Prop };
-    cmpMeta.membersMeta.color = { memberType: MEMBER_TYPE.Prop, attribName: 'color' };
-
-    if (!registry[cmpMeta.tagNameMeta]) {
-      registry[cmpMeta.tagNameMeta] = cmpMeta;
-    }
+    cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
   }
 
 
@@ -145,10 +146,26 @@ export function createPlatformServer(
       // let's add a reference to the constructors on each components metadata
       // each key in moduleImports is a PascalCased tag name
       Object.keys(exports).forEach(pascalCasedTagName => {
-        const cmpMeta = registry[toDashCase(pascalCasedTagName)];
+        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
           // connect the component's constructor to its metadata
           cmpMeta.componentConstructor = exports[pascalCasedTagName];
+
+          cmpMeta.membersMeta = {
+            'color': {}
+          };
+
+          if (cmpMeta.componentConstructor.properties) {
+            Object.keys(cmpMeta.componentConstructor.properties).forEach(memberName => {
+              const constructorProperty = cmpMeta.componentConstructor.properties[memberName];
+
+              if (constructorProperty.type) {
+                cmpMeta.membersMeta[memberName] = {
+                  propType: PROP_TYPE.Any
+                };
+              }
+            });
+          }
         }
       });
 
@@ -159,7 +176,7 @@ export function createPlatformServer(
 
 
   function isDefinedComponent(elm: Element) {
-    return !!(registry[elm.tagName.toLowerCase()]);
+    return !!(cmpRegistry[elm.tagName.toLowerCase()]);
   }
 
 
@@ -238,7 +255,7 @@ export function createPlatformServer(
       d.header += ': ' + elm.tagName.toLowerCase();
     }
 
-    diagnostics.push(d);
+    hydrateResults.diagnostics.push(d);
 
     if (appFailure) {
       appLoaded(d);
@@ -258,7 +275,7 @@ export function createPlatformServer(
 
 
 export function getBundleFilename(cmpMeta: ComponentMeta, modeName: string) {
-  let bundleId = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE]);
+  let bundleId: string = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || cmpMeta.bundleIds as any);
 
   if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     bundleId += '.sc';

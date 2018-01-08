@@ -210,14 +210,17 @@ export class NodeLogger implements Logger {
       outputLines.push('');
     }
 
-    if (d.level === 'warn') {
+    if (d.level === 'error') {
+      this.errorPrefix(outputLines);
+
+    } else if (d.level === 'warn') {
       this.warnPrefix(outputLines);
 
-    } else if (d.level === 'info') {
-      this.infoPrefix(outputLines);
+    } else if (d.level === 'debug') {
+      this.debugPrefix(outputLines);
 
     } else {
-      this.errorPrefix(outputLines);
+      this.infoPrefix(outputLines);
     }
 
     return outputLines;
