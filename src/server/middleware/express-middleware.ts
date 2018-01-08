@@ -1,6 +1,6 @@
-import { BuildConfig } from '../util/interfaces';
-import { createRenderer } from './renderer';
-import { loadConfig } from '../util/load-config';
+import { BuildConfig } from '../../util/interfaces';
+import { createRenderer } from '../renderer';
+import { loadConfig } from '../../util/load-config';
 
 
 export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
