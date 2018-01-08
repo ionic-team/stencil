@@ -1,10 +1,58 @@
-import { ComponentMeta, ComponentRegistry, ImportedModule, MembersMeta, ComponentConstructor } from '../interfaces';
-import { formatComponentConstructorProperties } from '../data-serialize';
+import { ComponentMeta, ComponentRegistry, ImportedModule, MembersMeta, ComponentConstructor, EventMeta } from '../interfaces';
+import { formatComponentConstructorProperties, formatComponentConstructorEvent, formatComponentConstructorEvents } from '../data-serialize';
 import { MEMBER_TYPE, PROP_TYPE } from '../constants';
 import { parsePropertyValue } from '../data-parse';
 
 
 describe('data serialize/parse', () => {
+
+  describe('format component events', () => {
+
+    it('should set event name and method name', () => {
+      const ev = formatComponentConstructorEvent({
+        eventName: 'eventName',
+        eventMethodName: 'methodName'
+      });
+      expect(ev.name).toBe('eventName');
+      expect(ev.method).toBe('methodName');
+    });
+
+    it('should set false for bubbles', () => {
+      const ev = formatComponentConstructorEvent({ eventBubbles: false });
+      expect(ev.bubbles).toBe(false);
+    });
+
+    it('should set false for cancelable', () => {
+      const ev = formatComponentConstructorEvent({ eventCancelable: false });
+      expect(ev.cancelable).toBe(false);
+    });
+
+    it('should set false for composed', () => {
+      const ev = formatComponentConstructorEvent({ eventComposed: false });
+      expect(ev.composed).toBe(false);
+    });
+
+    it('should default true for composed', () => {
+      const ev = formatComponentConstructorEvent({});
+      expect(ev.composed).toBe(true);
+    });
+
+    it('should default true for cancelable', () => {
+      const ev = formatComponentConstructorEvent({});
+      expect(ev.cancelable).toBe(true);
+    });
+
+    it('should default true for bubbles', () => {
+      const ev = formatComponentConstructorEvent({});
+      expect(ev.bubbles).toBe(true);
+    });
+
+    it('should do nothing for no event data', () => {
+      expect(formatComponentConstructorEvents(null)).toBe(null);
+      expect(formatComponentConstructorEvents([])).toBe(null);
+    });
+
+  });
 
   describe('format component constructor properties', () => {
 

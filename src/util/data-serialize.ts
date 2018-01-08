@@ -228,22 +228,25 @@ export function formatComponentConstructorEvent(eventMeta: EventMeta) {
     method: eventMeta.eventMethodName
   };
 
-  // bubbles default w/in runtime is true
-  // only set if it's false
-  if (!eventMeta.eventBubbles) {
-    constructorEvent.bubbles = false;
+  // default bubbles true
+  if (typeof eventMeta.eventBubbles === 'boolean') {
+    constructorEvent.bubbles = eventMeta.eventBubbles;
+  } else {
+    constructorEvent.bubbles = true;
   }
 
-  // cancelable default w/in runtime is true
-  // only set if it's false
-  if (!eventMeta.eventCancelable) {
-    constructorEvent.cancelable = false;
+  // default cancelable true
+  if (typeof eventMeta.eventCancelable === 'boolean') {
+    constructorEvent.cancelable = eventMeta.eventCancelable;
+  } else {
+    constructorEvent.cancelable = true;
   }
 
-  // cancelable default w/in runtime is true
-  // only set if it's false
-  if (!eventMeta.eventComposed) {
-    constructorEvent.composed = false;
+  // default composed true
+  if (typeof eventMeta.eventComposed === 'boolean') {
+    constructorEvent.composed = eventMeta.eventComposed;
+  } else {
+    constructorEvent.composed = true;
   }
 
   return constructorEvent;
