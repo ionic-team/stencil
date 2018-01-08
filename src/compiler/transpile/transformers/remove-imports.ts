@@ -12,7 +12,8 @@ const REMOVE_GLOBALS = [
   'Prop',
   'PropDidChange',
   'PropWillChange',
-  'State'
+  'State',
+  'Watch'
 ];
 
 
@@ -32,9 +33,10 @@ export function removeImports(): ts.TransformerFactory<ts.SourceFile> {
         if (nb.kind === ts.SyntaxKind.ImportSpecifier) {
           const importSpecifier = nb as ts.ImportSpecifier;
 
-          if (REMOVE_GLOBALS.indexOf(importSpecifier.name.text) === -1) {
+          if (!isStencilDecorator(importNode, importSpecifier)) {
             importSpecifiers.push(importSpecifier);
           }
+
         } else {
           hasKeeperImport = true;
         }
@@ -66,4 +68,17 @@ export function removeImports(): ts.TransformerFactory<ts.SourceFile> {
     };
   };
 
+}
+
+
+function isStencilDecorator(importNode: ts.ImportDeclaration, importSpecifier: ts.ImportSpecifier) {
+  if (importNode.moduleSpecifier) {
+    const importPath = importNode.moduleSpecifier.getText().replace(/\'|\"|\`/g, '');
+
+    if (importPath === '@stencil/core') {
+      return (REMOVE_GLOBALS.indexOf(importSpecifier.name.text) > -1);
+    }
+  }
+
+  return false;
 }
