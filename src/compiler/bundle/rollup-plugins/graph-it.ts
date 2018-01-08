@@ -1,4 +1,5 @@
 import { BuildConfig, GraphData } from '../../../util/interfaces';
+import * as path from 'path';
 
 
 export default function graphIt(config: BuildConfig, graphData: GraphData) {
@@ -11,14 +12,16 @@ export default function graphIt(config: BuildConfig, graphData: GraphData) {
       if (!importer) {
         return;
       }
-      if (!graphData.has(importer)) {
-        graphData.set(importer, []);
-      }
-      if (importee && graphData.get(importer).indexOf(importee) === -1) {
-        graphData.set(importer, graphData.get(importer).concat(importee));
-      }
-      if (importer && graphData.get(importer).indexOf(importer) === -1) {
-        graphData.set(importer, graphData.get(importer).concat(importer));
+
+      const prevData = graphData.get(importer) || [];
+      if (importee && prevData.indexOf(importee) === -1) {
+        if (!importee.startsWith('./') && !importee.startsWith('../')) {
+          return;
+        }
+        const dir = path.dirname(importer);
+        const importFullPath = path.resolve(dir, importee);
+
+        graphData.set(importer, prevData.concat(importFullPath));
       }
     }
   };

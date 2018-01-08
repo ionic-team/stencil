@@ -75,47 +75,47 @@ describe('chunk-plugin', () => {
   });
   it('if a module that is not an entry point relies on a file then all associated should be seperated', () => {
     const modules = new Map([
-      ['a.js',
-        [ '1.js' ]],
-      ['b.js',
-        [ '2.js', '3.js' ]],
-      ['c.js',
-        [ '2.js', '3.js', '4.js' ]],
-      ['1.js',
-        [ '4.js' ]]
+      ['/home/a.js',
+        [ '/home/1' ]],
+      ['/home/b.js',
+        [ '/home/2', '/home/3' ]],
+      ['/home/c.js',
+        [ '/home/2', '/home/3', '/home/4' ]],
+      ['/home/1.js',
+        [ '/home/4' ]]
     ]);
-    const graphedCommons = processGraph(modules, ['a.js', 'b.js', 'c.js']);
+    const graphedCommons = processGraph(modules, ['/home/a.js', '/home/b.js', '/home/c.js']);
     expect([...graphedCommons]).toEqual([
       {
         'entrypoint': true,
-        'id': 'a.js',
-        'srcs': ['a.js', '1.js']
-      },
-      {
-        'entrypoint': false,
-        'id': '4.js',
-        'srcs': ['4.js']
+        'id': '/home/a.js',
+        'srcs': ['/home/a.js', '/home/1']
       },
       {
         'entrypoint': true,
-        'id': 'b.js',
-        'srcs': ['b.js']
+        'id': '/home/b.js',
+        'srcs': ['/home/b.js']
       },
       {
         'entrypoint': false,
-        'id': '2.js',
-        'srcs': ['2.js']
+        'id': '/home/2',
+        'srcs': ['/home/2']
       },
       {
         'entrypoint': false,
-        'id': '3.js',
-        'srcs': ['3.js']
+        'id': '/home/3',
+        'srcs': ['/home/3']
       },
       {
         'entrypoint': true,
-        'id': 'c.js',
-        'srcs': ['c.js']
-      }
+        'id': '/home/c.js',
+        'srcs': ['/home/c.js']
+      },
+      {
+        'entrypoint': false,
+        'id': '/home/4',
+        'srcs': ['/home/4']
+      },
     ]);
   });
 });

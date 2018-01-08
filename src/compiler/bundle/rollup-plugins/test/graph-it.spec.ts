@@ -27,32 +27,28 @@ describe('chunk-plugin', () => {
       [
         path.resolve(__dirname, './graph-fixtures/a.js'),
         [
-          './1',
-          path.resolve(__dirname, './graph-fixtures/a.js'),
+          path.resolve(__dirname, './graph-fixtures/1'),
         ]
       ],
       [
         path.resolve(__dirname, './graph-fixtures/b.js'),
         [
-          './2',
-          path.resolve(__dirname, './graph-fixtures/b.js'),
-          './3'
+          path.resolve(__dirname, './graph-fixtures/2'),
+          path.resolve(__dirname, './graph-fixtures/3')
         ]
       ],
       [
         path.resolve(__dirname, './graph-fixtures/c.js'),
         [
-          './2',
-          path.resolve(__dirname, './graph-fixtures/c.js'),
-          './3',
-          './4'
+          path.resolve(__dirname, './graph-fixtures/2'),
+          path.resolve(__dirname, './graph-fixtures/3'),
+          path.resolve(__dirname, './graph-fixtures/4')
         ]
       ],
       [
         path.resolve(__dirname, './graph-fixtures/1.js'),
         [
-          './4',
-          path.resolve(__dirname, './graph-fixtures/1.js'),
+          path.resolve(__dirname, './graph-fixtures/4'),
         ]
       ]
     ]);
