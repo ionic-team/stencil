@@ -28,9 +28,21 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
 
     const absolutePaths = new Map<string, string>();
     const moduleList = processGraph(ctx.graphData, entryFileNames);
+
     moduleList.forEach(m => {
+      console.log('\n');
+      console.log('----------------------------------------------------------');
+      console.log(JSON.stringify(ctx.graphData.get(m.id), null, 2));
+      console.log(JSON.stringify(m, null, 2));
+      console.log('----------------------------------------------------------');
+      console.log('\n');
       absolutePaths.set(config.sys.path.resolve(m.id), m.id);
     });
+
+    console.log([...ctx.graphData].length);
+    console.log(moduleList.length);
+    console.log(entryFileNames.length);
+    console.log([...absolutePaths].length);
 
     await Promise.all(
       moduleList
