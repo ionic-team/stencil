@@ -3,8 +3,8 @@ import { catchError } from '../util';
 import { createRenderer } from '../../server/index';
 
 
-export async function prerenderUrl(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
-  const timeSpan = config.logger.createTimeSpan(`prerender, started: ${prerenderLocation.pathname}`);
+export async function prerenderPath(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
+  const timeSpan = config.logger.createTimeSpan(`prerender, started: ${prerenderLocation.path}`);
 
   const results: HydrateResults = {
     diagnostics: []
@@ -15,7 +15,7 @@ export async function prerenderUrl(config: BuildConfig, ctx: BuildContext, index
     const rendererConfig = Object.assign({}, config);
 
     // create the hydrate options from the prerender config
-    const hydrateOpts: HydrateOptions = Object.assign({}, config.prerender);
+    const hydrateOpts: HydrateOptions = rendererConfig.prerender as HydrateOptions;
     hydrateOpts.url = prerenderLocation.url;
     hydrateOpts.isPrerender = true;
 
@@ -38,7 +38,7 @@ export async function prerenderUrl(config: BuildConfig, ctx: BuildContext, index
     catchError(ctx.diagnostics, e);
   }
 
-  timeSpan.finish(`prerender, finished: ${prerenderLocation.pathname}`);
+  timeSpan.finish(`prerender, finished: ${prerenderLocation.path}`);
 
   return results;
 }

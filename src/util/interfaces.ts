@@ -260,6 +260,7 @@ export interface BuildConditionals {
   verboseError: boolean;
   es5?: boolean;
   cssVarShim?: boolean;
+  clientSide?: boolean;
 
   // ssr
   ssrClientSide: boolean;
@@ -396,6 +397,10 @@ export interface RenderOptions {
   inlineStyles?: boolean;
   removeUnusedStyles?: boolean;
   ssrIds?: boolean;
+  userAgent?: string;
+  cookie?: string;
+  dir?: string;
+  lang?: string;
 }
 
 
@@ -404,22 +409,8 @@ export interface PrerenderConfig extends RenderOptions {
   include?: PrerenderLocation[];
   prerenderDir?: string;
   maxConcurrent?: number;
-  userAgent?: string;
-  cookie?: string;
-  dir?: string;
-  lang?: string;
-  host?: string;
-}
-
-
-export interface PrerenderResult {
-  url: string;
-  hostname: string;
-  path: string;
-  components: HydrateComponent[];
-  styleUrls: string[];
-  scriptUrls: string[];
-  imgUrls: string[];
+  includePathHash?: boolean;
+  includePathQuery?: boolean;
 }
 
 
@@ -443,8 +434,8 @@ export interface HostRuleHeader {
 
 
 export interface PrerenderLocation {
-  pathname?: string;
   url?: string;
+  path?: string;
   status?: PrerenderStatus;
 }
 
@@ -461,10 +452,10 @@ export interface HydrateOptions extends RenderOptions {
     protocol: string;
     get: (key: string) => string;
     originalUrl: string;
-    url: string;
   };
   html?: string;
   url?: string;
+  path?: string;
   referrer?: string;
   userAgent?: string;
   cookie?: string;
@@ -538,8 +529,6 @@ export interface BuildContext {
   diagnostics?: Diagnostic[];
   manifest?: Manifest;
   onFinish?: (buildResults: BuildResults) => void;
-
-  cmpRegistry?: ComponentRegistry;
 }
 
 
@@ -936,7 +925,7 @@ export interface ComponentModule {
 
 export interface ComponentRegistry {
   // registry tag must always be lower-case
-  [registryTag: string]: ComponentMeta;
+  [tagName: string]: ComponentMeta;
 }
 
 

@@ -28,17 +28,19 @@ export function validatePrerenderConfig(config: BuildConfig) {
 export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
   crawl: true,
   include: [
-    { url: '/' }
+    { path: '/' }
   ],
   maxConcurrent: 4,
-  host: 'dev.prerender.stenciljs.com'
+  includePathQuery: false,
+  includePathHash: false,
 };
-
 
 export const DEFAULT_SSR_CONFIG: RenderOptions = {
   collapseWhitespace: true,
   inlineLoaderScript: true,
   inlineStyles: true,
   inlineAssetsMaxSize: 5000,
-  removeUnusedStyles: true,
+  removeUnusedStyles: true
 };
+
+export const DEFAULT_PRERENDER_HOST = 'prerender.stenciljs.com';

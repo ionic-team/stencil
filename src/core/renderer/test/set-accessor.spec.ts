@@ -1,6 +1,7 @@
 import { ComponentMeta, PlatformApi } from '../../../util/interfaces';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { setAccessor } from '../update-dom-node';
+import { PROP_TYPE } from '../../../util/constants';
 
 
 describe('setAccessor', () => {
@@ -81,13 +82,11 @@ describe('setAccessor', () => {
   it('should set null property to child when known child component should have that property', () => {
     const childCmpMeta: ComponentMeta = {
       tagNameMeta: 'cmp-a',
-      componentConstructor: class {
-        static get properties() {
-          return {
-            'cmpAprop': String
-          };
+      membersMeta: {
+        cmpAprop: {
+          propType: PROP_TYPE.String
         }
-      } as any
+      }
     };
     var plt: any = {
       getComponentMeta: function() {
