@@ -1,29 +1,29 @@
 import { Build } from '../../util/build-conditionals';
 import { callNodeRefs } from '../renderer/patch';
-import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
-import { initEventEmitters } from './events';
+import { ComponentConstructor, HostElement, PlatformApi } from '../../util/interfaces';
+import { initEventEmitters } from './init-event-emitters';
 import { replayQueuedEventsOnInstance } from './listeners';
 import { RUNTIME_ERROR } from '../../util/constants';
-import { proxyComponentInstance } from './proxy';
+import { proxyComponentInstance } from './proxy-component-instance';
 
 
-export function initComponentInstance(plt: PlatformApi, elm: HostElement, cmpMeta?: ComponentMeta) {
+export function initComponentInstance(plt: PlatformApi, elm: HostElement, componentConstructor?: ComponentConstructor) {
   try {
     // using the user's component class, let's create a new instance
-    cmpMeta = plt.getComponentMeta(elm);
-    elm._instance = new cmpMeta.componentModule();
+    componentConstructor = plt.getComponentMeta(elm).componentConstructor;
+    elm._instance = new (componentConstructor as any)();
 
     // ok cool, we've got an host element now, and a actual instance
     // and there were no errors creating the instance
 
     // let's upgrade the data on the host element
     // and let the getters/setters do their jobs
-    proxyComponentInstance(plt, cmpMeta, elm, elm._instance);
+    proxyComponentInstance(plt, componentConstructor, elm, elm._instance);
 
     if (Build.event) {
       // add each of the event emitters which wire up instance methods
       // to fire off dom events from the host element
-      initEventEmitters(plt, cmpMeta.eventsMeta, elm._instance);
+      initEventEmitters(plt, componentConstructor.events, elm._instance);
     }
 
     if (Build.listener) {
@@ -48,7 +48,7 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement, cmpMet
 }
 
 
-export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: string): any {
+export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydratedCssClass?: string): any {
   // all is good, this component has been told it's time to finish loading
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
@@ -95,12 +95,12 @@ export function initLoad(plt: PlatformApi, elm: HostElement, hydratedCssClass?: 
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    propagateElementLoaded(elm);
+    propagateComponentLoaded(elm);
   }
 }
 
 
-export function propagateElementLoaded(elm: HostElement, index?: number, ancestorsActivelyLoadingChildren?: HostElement[]) {
+export function propagateComponentLoaded(elm: HostElement, index?: number, ancestorsActivelyLoadingChildren?: HostElement[]) {
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
   if (elm._ancestorHostElement) {

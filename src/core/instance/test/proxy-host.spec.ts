@@ -1,5 +1,5 @@
 import { ComponentMeta, PlatformApi } from '../../../util/interfaces';
-import { proxyHostElementPrototype } from '../proxy';
+import { proxyHostElementPrototype } from '../proxy-host-element';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { MEMBER_TYPE } from '../../../util/constants';
 

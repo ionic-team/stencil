@@ -1,4 +1,4 @@
-import { ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
+import { ComponentMeta, HostElement, PlatformApi, ComponentConstructor } from '../../../util/interfaces';
 import { mockPlatform, mockElement } from '../../../testing/mocks';
 import { render } from '../render';
 import { h } from '../../renderer/h';
@@ -61,12 +61,10 @@ describe('instance render', () => {
   });
 
   it('should apply css even if there is not render function', () => {
-    class MyComponent { }
+    class MyComponent {}
     spyOn(plt, 'attachStyles');
-    const cmp = {loadPriority: 12345678};
-
-    doRender(MyComponent, cmp);
-    expect(plt.attachStyles).toHaveBeenCalledWith(cmp, undefined, elm);
+    doRender(MyComponent);
+    expect(plt.attachStyles).toHaveBeenCalled();
   });
 
 
@@ -147,13 +145,15 @@ describe('instance render', () => {
     });
 
     it('should apply theme', () => {
-      class MyComponent { }
-
-      doRender(MyComponent, {
-        hostMeta: {
-          theme: 'my-component'
+      class MyComponent {
+        static get host() {
+          return {
+            theme: 'my-component'
+          };
         }
-      });
+      }
+
+      doRender(MyComponent);
 
       expect(elm).toMatchClasses(['my-component']);
     });
@@ -161,31 +161,32 @@ describe('instance render', () => {
     it('should apply theme with mode', () => {
       class MyComponent {
         mode = 'ios';
+        static get host() {
+          return {
+            theme: 'my-component'
+          };
+        }
       }
 
-      const cmp = {
-        hostMeta: {
-          theme: 'my-component'
-        }
-      };
       spyOn(plt, 'attachStyles');
-      doRender(MyComponent, cmp);
+      doRender(MyComponent);
 
       expect(elm).toMatchClasses(['my-component', 'my-component-ios']);
-      expect(plt.attachStyles).toHaveBeenCalledWith(cmp, 'ios', elm);
+      expect(plt.attachStyles).toHaveBeenCalled();
     });
 
     it('should apply theme with mode and color', () => {
       class MyComponent {
         mode = 'md';
         color = 'main';
+        static get host() {
+          return {
+            theme: 'my-component'
+          };
+        }
       }
 
-      doRender(MyComponent, {
-        hostMeta: {
-          theme: 'my-component'
-        }
-      });
+      doRender(MyComponent);
 
       expect(elm).toMatchClasses([
         'my-component',
@@ -213,13 +214,15 @@ describe('instance render', () => {
             }
           };
         }
+
+        static get host() {
+          return {
+            theme: 'my-component'
+          };
+        }
       }
 
-      doRender(MyComponent, {
-        hostMeta: {
-          theme: 'my-component'
-        }
-      });
+      doRender(MyComponent);
 
       expect(elm).toMatchClasses([
         'a',
@@ -239,9 +242,9 @@ describe('instance render', () => {
 
   });
 
-  function doRender(cmp: any, meta: ComponentMeta = {}) {
+  function doRender(cmp: any) {
     const instance = elm._instance = new cmp();
-    render(plt, elm, meta, false);
+    render(plt, elm, (cmp as ComponentConstructor), false);
     return instance;
   }
 

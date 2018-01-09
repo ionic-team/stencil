@@ -1,5 +1,6 @@
-import { AppGlobal, ComponentMeta, ComponentRegistry, CoreContext,
-  EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi, ImportedModule } from '../util/interfaces';
+import { enableEventListener } from '../core/instance/listeners';
+import { AppGlobal, BundleCallbacks, CjsExports, ComponentMeta, ComponentRegistry, CoreContext,
+  EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { attachStyles } from '../core/instance/styles';
 import { Build } from '../util/build-conditionals';
@@ -7,19 +8,22 @@ import { createDomApi } from '../core/renderer/dom-api';
 import { createRendererPatch } from '../core/renderer/patch';
 import { createVNodesFromSsr } from '../core/renderer/ssr';
 import { createQueueClient } from './queue-client';
-import { dashToPascalCase } from '../util/helpers';
-import { enableEventListener } from '../core/instance/listeners';
+import { CustomStyle } from './css-shim/custom-style';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { h } from '../core/renderer/h';
+import { initCssVarShim } from './css-shim/init-css-shim';
 import { initHostElement } from '../core/instance/init-host-element';
-import { initStyleTemplate } from '../core/instance/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy-controller';
+import { toDashCase } from '../util/helpers';
 import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
 
-export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
+export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
+  const bundleCallbacks: BundleCallbacks = {};
+  const loadedBundles: {[bundleId: string]: boolean} = {};
+  const pendingBundleRequests: {[url: string]: boolean} = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
 
@@ -107,10 +111,11 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
 
   function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
+    const tagName = cmpMeta.tagNameMeta;
 
-    if (!globalDefined[cmpMeta.tagNameMeta]) {
+    if (!globalDefined[tagName]) {
       // keep a map of all the defined components
-      globalDefined[cmpMeta.tagNameMeta] = true;
+      globalDefined[tagName] = true;
 
       // initialize the members on the host element prototype
       initHostElement(plt, cmpMeta, HostElementConstructor.prototype, hydratedCssClass);
@@ -133,55 +138,148 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
               cmpMeta.membersMeta[propName].attribName
             );
           }
-
-          // set the array of all the attributes to keep an eye on
-          // https://www.youtube.com/watch?v=RBs21CFBALI
-          HostElementConstructor.observedAttributes = observedAttributes;
         }
+
+        // set the array of all the attributes to keep an eye on
+        // https://www.youtube.com/watch?v=RBs21CFBALI
+        HostElementConstructor.observedAttributes = observedAttributes;
       }
 
       // define the custom element
-      win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
+      win.customElements.define(tagName, HostElementConstructor);
     }
   }
 
 
-  function loadBundle(cmpMeta: ComponentMeta, modeName: string, cb: Function) {
-    if (cmpMeta.componentConstructor) {
-      // we're already all loaded up :)
+  App.loadComponents = function loadComponents(importer, bundleId) {
+    try {
+      // requested component constructors are placed on the moduleImports object
+      // inject the h() function so it can be use by the components
+      const exports: CjsExports = {};
+      importer(exports, h, Context);
+
+      // let's add a reference to the constructors on each components metadata
+      // each key in moduleImports is a PascalCased tag name
+      Object.keys(exports).forEach(pascalCasedTagName => {
+        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
+        if (cmpMeta) {
+          // connect the component's constructor to its metadata
+          cmpMeta.componentConstructor = exports[pascalCasedTagName];
+        }
+      });
+
+    } catch (e) {
+      console.error(e);
+    }
+
+    // fire off all the callbacks waiting on this bundle to load
+    const callbacks = bundleCallbacks[bundleId];
+    if (callbacks) {
+      for (var i = 0; i < callbacks.length; i++) {
+        try {
+          callbacks[i]();
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      bundleCallbacks[bundleId] = null;
+    }
+
+    // remember that we've already loaded this bundle
+    loadedBundles[bundleId] = true;
+  };
+
+
+  let customStyle: CustomStyle;
+  let requestBundleQueue: Function[];
+  if (Build.cssVarShim) {
+    customStyle = new CustomStyle(win, doc);
+
+    // keep a queue of all the request bundle callbacks to run
+    requestBundleQueue = [];
+
+    initCssVarShim(win, doc, customStyle, () => {
+      // loaded all the css, let's run all the request bundle callbacks
+      while (requestBundleQueue.length) {
+        requestBundleQueue.shift()();
+      }
+
+      // set to null to we know we're loaded
+      requestBundleQueue = null;
+    });
+  }
+
+
+  function loadBundle(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
+    bundleId = cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any);
+
+    if (loadedBundles[bundleId]) {
+      // sweet, we've already loaded this bundle
       cb();
 
     } else {
-      const bundleId = (cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any));
-      const url = publicPath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
+      // never seen this bundle before, let's start the request
+      // and add it to the callbacks to fire when it has loaded
+      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
 
-      // dynamic es module import() => woot!
-      __import(url).then(importedModule => {
-        try {
-          // async loading of the module is done
-          if (!cmpMeta.componentConstructor) {
-            // we haven't initialized the component module yet
-            // get the component constructor from the module
-            cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
-          }
+      // when to request the bundle depends is we're using the css shim or not
+      if (Build.cssVarShim && !customStyle.supportsCssVars) {
+        // using css shim, so we've gotta wait until it's ready
+        if (requestBundleQueue) {
+          // add this to the loadBundleQueue to run when css is ready
+          requestBundleQueue.push(() => {
+            requestBundle(cmpMeta, bundleId);
+          });
 
-          // initialize this components styles
-          // it is possible for the same component to have difficult styles applied in the same app
-          initStyleTemplate(domApi, cmpMeta.componentConstructor);
-
-        } catch (e) {
-          // oh man, something's up
-          console.error(e);
-
-          // provide a bogus component constructor
-          // so the rest of the app acts as normal
-          cmpMeta.componentConstructor = class {} as any;
+        } else {
+          // css already all loaded
+          requestBundle(cmpMeta, bundleId);
         }
 
-        // bundle all loaded up, let's continue
-        cb();
+      } else {
+        // not using css shim, so no need to wait on css shim to finish
+        // figure out which bundle to request and kick it off
+        requestBundle(cmpMeta, bundleId);
+      }
+    }
+  }
 
-      }).catch(err => console.error(err));
+
+  function requestBundle(cmpMeta: ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
+    // create the url we'll be requesting
+    // always use the es5/jsonp callback module
+    url = publicPath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js');
+
+    function onScriptComplete() {
+      clearTimeout(tmrId);
+      scriptElm.onerror = scriptElm.onload = null;
+      domApi.$removeChild(domApi.$parentNode(scriptElm), scriptElm);
+
+      // remove from our list of active requests
+      pendingBundleRequests[url] = false;
+    }
+
+    if (!pendingBundleRequests[url]) {
+      // we're not already actively requesting this url
+      // let's kick off the bundle request and
+      // remember that we're now actively requesting this url
+      pendingBundleRequests[url] = true;
+
+      // create a sript element to add to the document.head
+      scriptElm = domApi.$createElement('script');
+      scriptElm.charset = 'utf-8';
+      scriptElm.async = true;
+      scriptElm.src = url;
+
+      // create a fallback timeout if something goes wrong
+      tmrId = setTimeout(onScriptComplete, 120000);
+
+      // add script completed listener to this script element
+      scriptElm.onerror = scriptElm.onload = onScriptComplete;
+
+      // inject a script tag in the head
+      // kick off the actual request
+      domApi.$appendChild(domApi.$head, scriptElm);
     }
   }
 
@@ -191,6 +289,3 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   return plt;
 }
-
-
-declare var __import: (url: string) => Promise<ImportedModule>;
