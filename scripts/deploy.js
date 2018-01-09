@@ -115,23 +115,26 @@ function runTasks(opts) {
             throw new Error('Remote history differs. Please pull changes.');
           }
         })
-      },
-      {
-        title: 'Cleanup',
-        task: () => new Promise((resolve, reject) => {
-          rimraf('node_modules', (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }});
-        })
-      },
-      {
-        title: 'Install npm dependencies',
-        task: () => execa('npm', ['install', '--no-package-lock'], { cwd: rootDir }),
       }
     )
+  }
+
+  if (opts.prepare) {
+    tasks.push({
+      title: 'Cleanup',
+      task: () => new Promise((resolve, reject) => {
+        rimraf('node_modules', (err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }});
+      })
+    },
+    {
+      title: 'Install npm dependencies',
+      task: () => execa('npm', ['install'], { cwd: rootDir }),
+    });
   }
 
   tasks.push(
