@@ -1,9 +1,11 @@
 import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
 import { PlatformApi, VNode } from '../../util/interfaces';
 import { toLowerCase } from '../../util/helpers';
+import { Build } from '../../util/build-conditionals';
+import { elementHasProperty } from '../instance/proxy-members';
 
 
-export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, name?: string): void {
+export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, memberName?: string): void {
   // if the element passed in is a shadow root, which is a document fragment
   // then we want to be adding attrs/props to the shadow root's "host" element
   // if it's not a shadow root, then we add attrs/props to the same element
@@ -12,23 +14,23 @@ export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode
   const newVnodeAttrs = newVnode.vattrs || EMPTY_OBJ;
 
   // remove attributes no longer present on the vnode by setting them to undefined
-  for (name in oldVnodeAttrs) {
-    if (!(newVnodeAttrs && newVnodeAttrs[name] != null) && oldVnodeAttrs[name] != null) {
-      setAccessor(plt, elm, name, oldVnodeAttrs[name], undefined, isSvgMode);
+  for (memberName in oldVnodeAttrs) {
+    if (!(newVnodeAttrs && newVnodeAttrs[memberName] != null) && oldVnodeAttrs[memberName] != null) {
+      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode);
     }
   }
 
   // add new & update changed attributes
-  for (name in newVnodeAttrs) {
-    if (!(name in oldVnodeAttrs) || newVnodeAttrs[name] !== (name === 'value' || name === 'checked' ? elm[name] : oldVnodeAttrs[name])) {
-      setAccessor(plt, elm, name, oldVnodeAttrs[name], newVnodeAttrs[name], isSvgMode);
+  for (memberName in newVnodeAttrs) {
+    if (!(memberName in oldVnodeAttrs) || newVnodeAttrs[memberName] !== (memberName === 'value' || memberName === 'checked' ? elm[memberName] : oldVnodeAttrs[memberName])) {
+      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode);
     }
   }
 }
 
 
-export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: any, newValue: any, isSvg: boolean, i?: any, ilen?: number) {
-  if (name === 'class' && !isSvg) {
+export function setAccessor(plt: PlatformApi, elm: any, memberName: string, oldValue: any, newValue: any, isSvg: boolean, i?: any, ilen?: number) {
+  if (memberName === 'class' && !isSvg) {
     // Class
     if (oldValue !== newValue) {
       const oldList: string[] = (oldValue == null || oldValue === '') ? EMPTY_ARR : oldValue.trim().split(/\s+/);
@@ -51,7 +53,7 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
       elm.className = classList.join(' ');
     }
 
-  } else if (name === 'style') {
+  } else if (memberName === 'style') {
     // Style
     oldValue = oldValue || EMPTY_OBJ;
     newValue = newValue || EMPTY_OBJ;
@@ -68,59 +70,63 @@ export function setAccessor(plt: PlatformApi, elm: any, name: string, oldValue: 
       }
     }
 
-  } else if (name[0] === 'o' && name[1] === 'n' && (!(name in elm))) {
+  } else if (memberName[0] === 'o' && memberName[1] === 'n' && (!(memberName in elm))) {
     // Event Handlers
     // adding an standard event listener, like <button onClick=...> or something
-    name = toLowerCase(name.substring(2));
+    memberName = toLowerCase(memberName.substring(2));
     if (newValue) {
       if (!oldValue) {
         // add listener
-        plt.domApi.$addEventListener(elm, name, newValue);
+        plt.domApi.$addEventListener(elm, memberName, newValue);
       }
 
     } else {
       // remove listener
-      plt.domApi.$removeEventListener(elm, name);
+      plt.domApi.$removeEventListener(elm, memberName);
     }
 
-  } else if (name !== 'list' && name !== 'type' && !isSvg &&
-    (name in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)) {
+  } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&
+    (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)
+    || (!Build.clientSide && elementHasProperty(plt, elm, memberName))) {
     // Properties
     // - list and type are attributes that get applied as values on the element
     // - all svgs get values as attributes not props
     // - check if elm contains name or if the value is array, object, or function
-
     const cmpMeta = plt.getComponentMeta(elm);
-    if (cmpMeta && cmpMeta.membersMeta && name in cmpMeta.membersMeta) {
-      // setting a known @Prop on this element
-      setProperty(elm, name, newValue);
+    if (cmpMeta && cmpMeta.membersMeta && cmpMeta.membersMeta[memberName]) {
+      // we know for a fact that this element is a known component
+      // and this component has this member name as a property,
+      // let's set the known @Prop on this element
+      setProperty(elm, memberName, newValue);
 
-    } else if (name !== 'ref') {
-      // property setting a prop on a native property, like "value" or something
-      setProperty(elm, name, newValue == null ? '' : newValue);
+    } else if (memberName !== 'ref') {
+      // this member name is a property on this element, but it's not a component
+      // this is a native property like "value" or something
+      // also we can ignore the "ref" member name at this point
+      setProperty(elm, memberName, newValue == null ? '' : newValue);
       if (newValue == null || newValue === false) {
-        elm.removeAttribute(name);
+        elm.removeAttribute(memberName);
       }
     }
 
   } else if (newValue != null) {
     // Element Attributes
-    i = (name !== (name = name.replace(/^xlink\:?/, '')));
+    i = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
 
-    if (BOOLEAN_ATTRS[name] === 1 && (!newValue || newValue === 'false')) {
+    if (BOOLEAN_ATTRS[memberName] === 1 && (!newValue || newValue === 'false')) {
       if (i) {
-        elm.removeAttributeNS(XLINK_NS, toLowerCase(name));
+        elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
 
       } else {
-        elm.removeAttribute(name);
+        elm.removeAttribute(memberName);
       }
 
     } else if (typeof newValue !== 'function') {
       if (i) {
-        elm.setAttributeNS(XLINK_NS, toLowerCase(name), newValue);
+        elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
 
       } else {
-        elm.setAttribute(name, newValue);
+        elm.setAttribute(memberName, newValue);
       }
     }
   }

@@ -1,5 +1,8 @@
-import { setAccessor } from '../update-dom-node';
+import { ComponentMeta, PlatformApi } from '../../../util/interfaces';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
+import { setAccessor } from '../update-dom-node';
+import { PROP_TYPE } from '../../../util/constants';
+
 
 describe('setAccessor', () => {
   const plt: any = mockPlatform();
@@ -76,6 +79,31 @@ describe('setAccessor', () => {
     expect(elm.hasAttribute('myprop')).toBe(false);
   });
 
+  it('should set null property to child when known child component should have that property', () => {
+    const childCmpMeta: ComponentMeta = {
+      tagNameMeta: 'cmp-a',
+      membersMeta: {
+        cmpAprop: {
+          propType: PROP_TYPE.String
+        }
+      }
+    };
+    var plt: any = {
+      getComponentMeta: function() {
+        return childCmpMeta;
+      }
+    };
+    elm = mockElement('cmp-a');
+
+    const oldValue: any = 'someval';
+    const newValue: any = null;
+    elm.cmpAprop = oldValue;
+
+    setAccessor(plt, elm, 'cmpAprop', oldValue, newValue, false);
+    expect(elm.cmpAprop).toBe(null);
+    expect(elm.hasAttribute('cmpAprop')).toBe(false);
+  });
+
   it('should do nothing when setting null prop but child doesnt have that prop', () => {
     const oldValue: any = 'someval';
     const newValue: any = null;
@@ -142,11 +170,11 @@ describe('setAccessor', () => {
 });
 
 
-
 describe('setAccessor for inputs', () => {
   const plt: any = mockPlatform();
 
   describe('simple attributes', () => {
+
     describe('should not add attribute when prop is undefined or null', () => {
       function testStraightForwardAttribute(propName: string, newValue: any, oldValue: any) {
         let inputElm = mockElement('input');
@@ -226,6 +254,7 @@ describe('setAccessor for inputs', () => {
 
 
   describe('special attributes', () => {
+
     describe('should not add attribute when prop is undefined or null', () => {
       function testSpecialAttribute(propName: string, newValue: any, oldValue: any) {
         let inputElm = mockElement('input');
@@ -311,6 +340,7 @@ describe('setAccessor for inputs', () => {
   });
 
   describe('boolean attributes', () => {
+
     describe('should not add attribute when prop is undefined or null', () => {
       function testBooleanAttribute(propName: string, newValue: any, oldValue: any) {
         let inputElm = mockElement('input');
@@ -336,6 +366,7 @@ describe('setAccessor for inputs', () => {
         testBooleanAttribute('readOnly', null, undefined);
       });
     });
+
     describe('should update when prop is defined', () => {
       function testBooleanAttribute(propName: string, newValue: any, oldValue: any) {
         let inputElm = mockElement('input');
@@ -358,6 +389,7 @@ describe('setAccessor for inputs', () => {
         testBooleanAttribute('readOnly', true, undefined);
       });
     });
+
   });
 
   describe('min/max attributes', () => {
@@ -378,6 +410,7 @@ describe('setAccessor for inputs', () => {
         testMinMaxAttribute('max', null, undefined);
       });
     });
+
     describe('should update when prop is defined', () => {
       function testMinMaxAttribute(propName: string, newValue: any, oldValue: any) {
         let inputElm = mockElement('input');

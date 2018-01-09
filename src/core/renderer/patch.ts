@@ -7,9 +7,9 @@
  * Modified for Stencil's renderer and slot projection
  */
 import { Build } from '../../util/build-conditionals';
-import { DomApi, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
-import { ENCAPSULATION, NODE_TYPE } from '../../util/constants';
+import { DomApi, Encapsulation, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
+import { NODE_TYPE } from '../../util/constants';
 import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
@@ -31,7 +31,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       });
     }
 
-    if (Build.slot && vnode.vtag === 'slot' && !useNativeShadowDom) {
+    if (!useNativeShadowDom && vnode.vtag === 'slot') {
 
       if (hostContentNodes) {
         if (scopeId) {
@@ -348,7 +348,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       scopeId: string;
 
 
-  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION, ssrPatchId?: number) {
+  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: Encapsulation, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
@@ -359,12 +359,12 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       ssrId = ssrPatchId;
     }
 
-    scopeId = (encapsulation === ENCAPSULATION.ScopedCss || (encapsulation === ENCAPSULATION.ShadowDom && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
+    scopeId = (encapsulation === 'scoped' || (encapsulation === 'shadow' && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
 
     if (Build.shadowDom) {
       // use native shadow dom only if the component wants to use it
       // and if this browser supports native shadow dom
-      useNativeShadowDom = (encapsulation === ENCAPSULATION.ShadowDom && domApi.$supportsShadowDom);
+      useNativeShadowDom = (encapsulation === 'shadow' && domApi.$supportsShadowDom);
     }
 
     if (!isUpdate) {
