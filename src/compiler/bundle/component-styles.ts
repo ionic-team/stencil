@@ -1,172 +1,105 @@
-import { BuildContext, BuildConfig, ModuleFile, ComponentMeta, CompiledModeStyles } from '../../util/interfaces';
+import { BuildContext, BuildConfig, ComponentMeta, ModuleFile, StyleMeta } from '../../util/interfaces';
 import { buildError, isCssFile, isSassFile, readFile, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
 import { scopeComponentCss } from '../css/scope-css';
 
 
-
-export function generateComponentStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, bundleModes: string[]) {
-  const promises = bundleModes.map(modeName => {
-    return generateComponentModeStyles(config, ctx, moduleFile, modeName);
-  });
-
-  return Promise.all(promises).then(componentModeStyles => {
-    if (componentModeStyles.some(c => c.writeFile)) {
-      ctx.styleBundleCount++;
-    }
-    return componentModeStyles;
-  });
-}
-
-
-export function generateComponentModeStyles(
-  config: BuildConfig,
-  ctx: BuildContext,
-  moduleFile: ModuleFile,
-  modeName: string
-) {
-  return generateAllComponentModeStyles(config, ctx, moduleFile, modeName).then(allCmpStyleDetails => {
-    const compiledModeStyles = groupComponentModeStyles(moduleFile.cmpMeta.tagNameMeta, modeName, allCmpStyleDetails);
-
-    setHydratedCss(config, moduleFile.cmpMeta, compiledModeStyles);
-
-    return compiledModeStyles;
-  });
-}
-
-
-function generateAllComponentModeStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, modeName: string) {
+export function generateComponentStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile) {
   moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
-  const modeStyleMeta = moduleFile.cmpMeta.stylesMeta[modeName];
-  const promises: Promise<CompiledModeStyles>[] = [];
 
-  if (modeStyleMeta) {
-    // used to remember the exact order the user wants
-    // sass render and file reads are async so it could mess with the order
-    let styleOrder = 0;
+  return Promise.all(Object.keys(moduleFile.cmpMeta.stylesMeta).map(async modeName => {
+    // compile each style mode's sass/css
+    const styles = await compileStyles(config, ctx, moduleFile, moduleFile.cmpMeta.stylesMeta[modeName]);
 
-    if (modeStyleMeta.absolutePaths) {
-      modeStyleMeta.absolutePaths.forEach(absStylePath => {
-        styleOrder++;
+    // format and set the styles for use later
+    return setStyleText(config, ctx,  moduleFile.cmpMeta, moduleFile.cmpMeta.stylesMeta[modeName], styles);
+  }));
+}
 
-        absStylePath = normalizePath(absStylePath);
 
-        if (isSassFile(absStylePath)) {
-          // sass file needs to be compiled
-          promises.push(compileSassFile(config, ctx, moduleFile, absStylePath, styleOrder));
+async function compileStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, styleMeta: StyleMeta) {
+  const styles = await compileExternalStyles(config, ctx, moduleFile, styleMeta.absolutePaths);
 
-        } else if (isCssFile(absStylePath)) {
-          // plain ol' css file
-          promises.push(readCssFile(config, ctx, moduleFile.cmpMeta, absStylePath, styleOrder));
+  if (typeof styleMeta.styleStr === 'string') {
+    // plain styles just in a string
+    styles.push(styleMeta.styleStr);
+  }
 
-        } else {
-          // idk
-          const d = buildError(ctx.diagnostics);
-          d.messageText = `style url "${absStylePath}", in component "${moduleFile.cmpMeta.tagNameMeta}", is not a supported file type`;
-        }
-      });
+  return styles;
+}
+
+
+async function compileExternalStyles(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, absStylePaths: string[]) {
+  if (!Array.isArray(absStylePaths)) {
+    return [];
+  }
+
+  return Promise.all(absStylePaths.map(filePath => {
+
+    filePath = normalizePath(filePath);
+
+    if (isSassFile(filePath)) {
+      // sass file needs to be compiled
+      return compileSassFile(config, ctx, moduleFile.jsFilePath, filePath);
     }
 
-    if (typeof modeStyleMeta.styleStr === 'string') {
-      // plain styles as a string
-      promises.push(readInlineStyles(config, ctx, moduleFile.cmpMeta, modeStyleMeta.styleStr, styleOrder));
+    if (isCssFile(filePath)) {
+      // plain ol' css file
+      return readCssFile(config, ctx, filePath);
     }
 
-  } else {
-    // containing bundle has this mode
-    // but turns out this component doesn't have this mode
-    const stylesDetail: CompiledModeStyles = {
-      styleOrder: 0,
-      modeName: modeName,
-      tag: moduleFile.cmpMeta.tagNameMeta,
-      scopedStyles: ' ',
-      unscopedStyles: ' ',
-      writeFile: false
-    };
-    promises.push(Promise.resolve(stylesDetail));
-  }
-
-  return Promise.all(promises);
+    // idk
+    const d = buildError(ctx.diagnostics);
+    d.messageText = `style url "${filePath}", in component "${moduleFile.cmpMeta.tagNameMeta}", is not a supported file type`;
+    return '';
+  }));
 }
 
 
-export function groupComponentModeStyles(tag: string, modeName: string, allCmpStyleDetails: CompiledModeStyles[]) {
-  const compiledModeStyles: CompiledModeStyles = {
-    tag: tag,
-    modeName: modeName,
-    writeFile: allCmpStyleDetails.some(c => c.writeFile)
-  };
+export function setStyleText(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, styleMeta: StyleMeta, styles: string[]) {
+  // join all the component's styles for this mode together into one line
+  styleMeta.compiledStyleText = styles.join('\n\n').trim();
 
-  if (allCmpStyleDetails.length === 0) {
-    return compiledModeStyles;
+  if (config.minifyCss) {
+    // minify css
+    const minifyCssResults = config.sys.minifyCss(styleMeta.compiledStyleText);
+    minifyCssResults.diagnostics.forEach(d => {
+      ctx.diagnostics.push(d);
+    });
+
+    if (minifyCssResults.output) {
+      styleMeta.compiledStyleText = minifyCssResults.output;
+    }
   }
 
-  allCmpStyleDetails = allCmpStyleDetails.sort((a, b) => {
-    if (a.styleOrder < b.styleOrder) return -1;
-    if (a.styleOrder > b.styleOrder) return 1;
-    return 0;
-  });
-
-  // create the unscoped css by combining
-  // all of the styles this component should use
-  compiledModeStyles.unscopedStyles = joinCmpStyleDetails(allCmpStyleDetails.map(s => s.unscopedStyles || ''));
-
-  // group all scoped css
-  compiledModeStyles.scopedStyles = joinCmpStyleDetails(allCmpStyleDetails.map(s => s.scopedStyles || ''));
-
-  return compiledModeStyles;
-}
-
-
-function joinCmpStyleDetails(styles: string[]) {
-  let content = styles.join('\n\n').trim();
-
-  content = content.replace(/\@/g, `\\@`);
-
-  return content;
-}
-
-
-function setHydratedCss(config: BuildConfig, cmpMeta: ComponentMeta, compiledModeStyles: CompiledModeStyles) {
-  const tagSelector = `${cmpMeta.tagNameMeta}.${config.hydratedCssClass}`;
-
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-    const hostSelector = `:host(.${config.hydratedCssClass})`;
-
-    compiledModeStyles.unscopedStyles = appendHydratedCss(
-      compiledModeStyles.unscopedStyles,
-      hostSelector,
-      true
-    );
-
-  } else {
-    compiledModeStyles.unscopedStyles = appendHydratedCss(
-      compiledModeStyles.unscopedStyles,
-      tagSelector
-    );
+  if (requiresScopedStyles(cmpMeta.encapsulation)) {
+    // only create scoped styles if we need to
+    styleMeta.compiledStyleTextScoped = scopeComponentCss(ctx, cmpMeta, styleMeta.compiledStyleText);
   }
 
-  if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom || cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
-    compiledModeStyles.scopedStyles = appendHydratedCss(
-      compiledModeStyles.scopedStyles,
-      tagSelector
-    );
+  styleMeta.compiledStyleText = cleanStyle(styleMeta.compiledStyleText);
+
+  if (styleMeta.compiledStyleTextScoped) {
+    styleMeta.compiledStyleTextScoped = cleanStyle(styleMeta.compiledStyleTextScoped);
   }
 }
 
 
-function appendHydratedCss(styles: string, selector: string, important?: boolean) {
-  return `${styles || ''}\n${selector}{visibility:inherit${important ? ' !important' : ''}}`;
+export function cleanStyle(style: string) {
+  return style.replace(/\r\n|\r|\n/g, `\\n`)
+              .replace(/\"/g, `\\"`)
+              .replace(/\@/g, `\\@`);
 }
 
 
-function compileSassFile(config: BuildConfig, ctx: BuildContext, moduleFile: ModuleFile, absStylePath: string, styleOrder: number): Promise<CompiledModeStyles> {
-  const compileSassDetails: CompiledModeStyles = {
-    styleOrder: styleOrder,
-    writeFile: false
-  };
+export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
+  return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
+}
 
-  if (ctx.isChangeBuild && !ctx.changeHasSass) {
+
+function compileSassFile(config: BuildConfig, ctx: BuildContext, jsFilePath: string, absStylePath: string): Promise<string> {
+
+  if (ctx.isChangeBuild && !ctx.changeHasSass && ctx.compiledFileCache[absStylePath]) {
     // if this is a change build, but there wasn't specifically a sass file change
     // however we may still need to build sass if its typescript module changed
 
@@ -174,18 +107,16 @@ function compileSassFile(config: BuildConfig, ctx: BuildContext, moduleFile: Mod
     // if there are no filenames that match then let's not run sass
     // yes...there could be two files that have the same filename in different directories
     // but worst case scenario is that both of them run sass, which isn't a performance problem
-    const distFileName = config.sys.path.basename(moduleFile.jsFilePath, '.js');
+    const distFileName = config.sys.path.basename(jsFilePath, '.js');
     const hasChangedFileName = ctx.changedFiles.some(f => {
       const changedFileName = config.sys.path.basename(f);
       return (changedFileName === distFileName + '.ts' || changedFileName === distFileName + '.tsx');
     });
 
-    if (!hasChangedFileName && ctx.styleSassUnscopedOutputs[absStylePath]) {
+    if (!hasChangedFileName) {
       // don't bother running sass on this, none of the changed files have the same filename
       // use the cached version
-      compileSassDetails.unscopedStyles = ctx.styleSassUnscopedOutputs[absStylePath];
-      compileSassDetails.scopedStyles = ctx.styleSassScopedOutputs[absStylePath];
-      return Promise.resolve(compileSassDetails);
+      return Promise.resolve(ctx.compiledFileCache[absStylePath]);
     }
   }
 
@@ -201,93 +132,45 @@ function compileSassFile(config: BuildConfig, ctx: BuildContext, moduleFile: Mod
         const d = buildError(ctx.diagnostics);
         d.absFilePath = absStylePath;
         d.messageText = err;
+        resolve(`/** ${err} **/`);
 
       } else {
-        fillStyleText(config, ctx, moduleFile.cmpMeta, compileSassDetails, result.css.toString());
-
-        compileSassDetails.writeFile = true;
+        // keep track of how many times sass builds
         ctx.sassBuildCount++;
 
         // cache for later
-        ctx.styleSassUnscopedOutputs[absStylePath] = compileSassDetails.unscopedStyles;
-        ctx.styleSassScopedOutputs[absStylePath] = compileSassDetails.scopedStyles;
+        ctx.compiledFileCache[absStylePath] = result.css.toString();
+
+        // resolve w/ our compiled sass
+        resolve(ctx.compiledFileCache[absStylePath]);
       }
-      resolve(compileSassDetails);
     });
   });
 }
 
 
-function readCssFile(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, absStylePath: string, styleOrder: number) {
-  const readCssDetails: CompiledModeStyles = {
-    styleOrder: styleOrder,
-    writeFile: false
-  };
-
-  if (ctx.isChangeBuild && !ctx.changeHasCss) {
-    // if this is a change build, but there were no sass changes then don't bother
-    readCssDetails.unscopedStyles = ctx.styleCssUnscopedOutputs[absStylePath];
-    readCssDetails.scopedStyles = ctx.styleCssScopedOutputs[absStylePath];
-    return Promise.resolve(readCssDetails);
+async function readCssFile(config: BuildConfig, ctx: BuildContext, absStylePath: string) {
+  if (ctx.isChangeBuild && !ctx.changeHasCss && ctx.compiledFileCache[absStylePath]) {
+    // if this is a change build, but there were no css changes so don't bother
+    // and we have cached content for this file
+    return ctx.compiledFileCache[absStylePath];
   }
 
-  // this is just a plain css file
-  // only open it up for its content
-  const sys = config.sys;
+  let styleText: string = '';
 
-  return readFile(sys, absStylePath).then(cssText => {
-    fillStyleText(config, ctx, cmpMeta, readCssDetails, cssText.toString());
-
-    readCssDetails.writeFile = true;
+  try {
+    // this is just a plain css file
+    // only open it up for its content
+    styleText = await readFile(config.sys, absStylePath);
 
     // cache for later
-    ctx.styleCssUnscopedOutputs[absStylePath] = readCssDetails.unscopedStyles;
-    ctx.styleCssScopedOutputs[absStylePath] = readCssDetails.scopedStyles;
+    ctx.compiledFileCache[absStylePath] = styleText;
 
-  }).catch(err => {
+  } catch (e) {
     const d = buildError(ctx.diagnostics);
-    d.messageText = `Error opening CSS file. ${err}`;
+    d.messageText = `Error opening CSS file. ${e}`;
     d.absFilePath = absStylePath;
-
-  }).then(() => {
-    return readCssDetails;
-  });
-}
-
-
-function readInlineStyles(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, styleStr: string, styleOrder: number) {
-  const inlineStylesDetail: CompiledModeStyles = {
-    styleOrder: styleOrder
-  };
-
-  fillStyleText(config, ctx, cmpMeta, inlineStylesDetail, styleStr);
-
-  return Promise.resolve(inlineStylesDetail);
-}
-
-
-export function fillStyleText(config: BuildConfig, ctx: BuildContext, cmpMeta: ComponentMeta, compiledModeStyles: CompiledModeStyles, unscopedStyles: string) {
-  compiledModeStyles.unscopedStyles = null;
-  compiledModeStyles.scopedStyles = null;
-
-  if (typeof unscopedStyles === 'string') {
-    compiledModeStyles.unscopedStyles = unscopedStyles.trim();
-
-    if (config.minifyCss) {
-      // minify css
-      const minifyCssResults = config.sys.minifyCss(compiledModeStyles.unscopedStyles);
-      minifyCssResults.diagnostics.forEach(d => {
-        ctx.diagnostics.push(d);
-      });
-
-      if (minifyCssResults.output) {
-        compiledModeStyles.unscopedStyles = minifyCssResults.output;
-      }
-    }
-
-    if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-      // only create scoped styles if we need to
-      compiledModeStyles.scopedStyles = scopeComponentCss(ctx, cmpMeta, unscopedStyles);
-    }
   }
+
+  return styleText;
 }

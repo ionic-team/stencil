@@ -1,134 +1,146 @@
 import { Bundle, Diagnostic, ManifestBundle, ModuleFile } from '../../../util/interfaces';
 import { ENCAPSULATION } from '../../../util/constants';
-import { getManifestBundles, findPrimaryEncapsulation, sortBundles, validateManifestBundle } from '../bundle';
+import { bundleRequiresScopedStyles, getBundlesFromManifest, getBundleModes, getBundleEncapsulations, sortBundles } from '../bundle';
 
 
 describe('bundle', () => {
 
-  describe('validateManifestBundle', () => {
+  describe('bundleRequiresScopedStyles', () => {
 
-    it('should add when majority shadow, secondary scoped and no encapsulation', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
-        moduleFiles: [
-          { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom, stylesMeta: {} } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom, stylesMeta: {} } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom, stylesMeta: {} } },
-          { cmpMeta: { } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss, stylesMeta: {} } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss, stylesMeta: {} } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation, stylesMeta: {} } }
-        ],
-      };
-      validateManifestBundle(validatedBundles, manifestBundle);
-      expect(validatedBundles.length).toBe(3);
-      expect(validatedBundles[0].moduleFiles.length).toBe(4);
-      expect(validatedBundles[0].moduleFiles[0].cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
-      expect(validatedBundles[0].moduleFiles[1].cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
-      expect(validatedBundles[0].moduleFiles[2].cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
-
-      expect(validatedBundles[1].moduleFiles.length).toBe(2);
-      expect(validatedBundles[1].moduleFiles[0].cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
-      expect(validatedBundles[1].moduleFiles[1].cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
-
-      expect(validatedBundles[2].moduleFiles.length).toBe(1);
-      expect(validatedBundles[2].moduleFiles[0].cmpMeta.encapsulation).toBe(ENCAPSULATION.NoEncapsulation);
+    it('scoped if using shadow', () => {
+      const requiresScopedCss = bundleRequiresScopedStyles([
+        ENCAPSULATION.ShadowDom
+      ]);
+      expect(requiresScopedCss).toBe(true);
     });
 
-    it('should add when all no encapsulation', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
-        moduleFiles: [
-          { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation } }
-        ],
-      };
-      validateManifestBundle(validatedBundles, manifestBundle);
-      expect(validatedBundles.length).toBe(1);
-      expect(validatedBundles[0].moduleFiles.length).toBe(2);
+    it('scoped if using scoped', () => {
+      const requiresScopedCss = bundleRequiresScopedStyles([
+        ENCAPSULATION.ScopedCss
+      ]);
+      expect(requiresScopedCss).toBe(true);
     });
 
-    it('should add when all scoped', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
-        moduleFiles: [
-          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } }
-        ],
-      };
-      validateManifestBundle(validatedBundles, manifestBundle);
-      expect(validatedBundles.length).toBe(1);
-      expect(validatedBundles[0].moduleFiles.length).toBe(2);
+    it('no scoped if only using no encapsulation', () => {
+      const requiresScopedCss = bundleRequiresScopedStyles([
+        ENCAPSULATION.NoEncapsulation, ENCAPSULATION.NoEncapsulation
+      ]);
+      expect(requiresScopedCss).toBe(false);
     });
 
-    it('should add when all shadow', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
+    it('no scoped if empty', () => {
+      const requiresScopedCss = bundleRequiresScopedStyles([]);
+      expect(requiresScopedCss).toBe(false);
+    });
+
+  });
+
+  describe('getBundleEncapsulations', () => {
+
+    it('should add scoped when using shadow', () => {
+      const bundle: Bundle = {
         moduleFiles: [
           { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom } },
-          { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom } }
         ]
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
-      expect(validatedBundles.length).toBe(1);
-      expect(validatedBundles[0].moduleFiles.length).toBe(2);
+      const modes = getBundleEncapsulations(bundle);
+      expect(modes.length).toBe(2);
+      expect(modes[0]).toBe(ENCAPSULATION.ShadowDom);
+      expect(modes[1]).toBe(ENCAPSULATION.ScopedCss);
     });
 
-    it('should add when only 1 module', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const moduleFile: ModuleFile = {};
-      const manifestBundle: ManifestBundle = {
-        moduleFiles: [moduleFile]
+    it('get all encapsulations', () => {
+      const bundle: Bundle = {
+        moduleFiles: [
+          { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation } },
+          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } },
+          { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } },
+          { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom } },
+        ]
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
-      expect(validatedBundles[0]).toBe(manifestBundle);
-      expect(validatedBundles[0].moduleFiles[0]).toBe(moduleFile);
-      expect(validatedBundles.length).toBe(1);
+      const modes = getBundleEncapsulations(bundle);
+      expect(modes.length).toBe(3);
+      expect(modes[0]).toBe(ENCAPSULATION.NoEncapsulation);
+      expect(modes[1]).toBe(ENCAPSULATION.ShadowDom);
+      expect(modes[2]).toBe(ENCAPSULATION.ScopedCss);
     });
 
-    it('should not add when no module files', () => {
-      const validatedBundles: ManifestBundle[] = [];
-      const manifestBundle: ManifestBundle = {
-        moduleFiles: []
+    it('get no encapsulation', () => {
+      const bundle: Bundle = {
+        moduleFiles: [
+          { cmpMeta: { } },
+        ]
       };
-      validateManifestBundle(validatedBundles, manifestBundle);
-      expect(validatedBundles.length).toBe(0);
+      const modes = getBundleEncapsulations(bundle);
+      expect(modes.length).toBe(1);
+      expect(modes[0]).toBe(ENCAPSULATION.NoEncapsulation);
     });
 
   });
 
-  describe('findPrimaryEncapsulation', () => {
+  describe('getBundleModes', () => {
 
-    it('find no ecapsulation as primary', () => {
+    it('get specific modes and not default mode when theres a mix', () => {
       const moduleFiles: ModuleFile[] = [
-        { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation } },
-        { cmpMeta: { encapsulation: ENCAPSULATION.NoEncapsulation } }
+        { cmpMeta: { stylesMeta: { $: {} } } },
+        { cmpMeta: { stylesMeta: { $: {} } } },
+        { cmpMeta: { stylesMeta: { modeA: {}, modeB: {} } } },
+        { cmpMeta: { stylesMeta: { modeB: {} } } },
+        { cmpMeta: { stylesMeta: { modeA: {} } } },
       ];
-      expect(findPrimaryEncapsulation(moduleFiles)).toBe(ENCAPSULATION.NoEncapsulation);
+      const modes = getBundleModes(moduleFiles);
+      expect(modes.length).toBe(2);
+      expect(modes[0]).toBe('modeA');
+      expect(modes[1]).toBe('modeB');
     });
 
-    it('find scoped as primary', () => {
+    it('get modes only', () => {
       const moduleFiles: ModuleFile[] = [
-        { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } },
-        { cmpMeta: { encapsulation: ENCAPSULATION.ScopedCss } }
+        { cmpMeta: { stylesMeta: { modeA: {}, modeB: {} } } },
+        { cmpMeta: { stylesMeta: { modeA: {}, modeB: {} } } },
       ];
-      expect(findPrimaryEncapsulation(moduleFiles)).toBe(ENCAPSULATION.ScopedCss);
+      const modes = getBundleModes(moduleFiles);
+      expect(modes.length).toBe(2);
+      expect(modes[0]).toBe('modeA');
+      expect(modes[1]).toBe('modeB');
     });
 
-    it('find shadow as primary', () => {
+    it('get default only', () => {
       const moduleFiles: ModuleFile[] = [
-        { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom } },
-        { cmpMeta: { encapsulation: ENCAPSULATION.ShadowDom } }
+        { cmpMeta: { stylesMeta: { $: {} } } },
       ];
-      expect(findPrimaryEncapsulation(moduleFiles)).toBe(ENCAPSULATION.ShadowDom);
+      const modes = getBundleModes(moduleFiles);
+      expect(modes.length).toBe(1);
+      expect(modes[0]).toBe('$');
+    });
+
+    it('get default if no modes found', () => {
+      const moduleFiles: ModuleFile[] = [
+        { cmpMeta: {} },
+      ];
+      const modes = getBundleModes(moduleFiles);
+      expect(modes.length).toBe(1);
+      expect(modes[0]).toBe('$');
+    });
+
+    it('get modes without dups', () => {
+      const moduleFiles: ModuleFile[] = [
+        { cmpMeta: { stylesMeta: { modeB: {} } } },
+        { cmpMeta: { stylesMeta: { modeA: {} } } },
+        { cmpMeta: { stylesMeta: { modeA: {}, modeB: {} } } }
+      ];
+      const modes = getBundleModes(moduleFiles);
+      expect(modes.length).toBe(2);
+      expect(modes[0]).toBe('modeA');
+      expect(modes[1]).toBe('modeB');
     });
 
   });
 
-  describe('getManifestBundles', () => {
+  describe('getBundlesFromManifest', () => {
 
     it('should error when component isnt found in bundle', () => {
-      const bundles: Bundle[] = [
+      const manifestBundles: ManifestBundle[] = [
         { components: ['cmp-b', 'cmp-a', 'cmp-z'] },
       ];
       const allModuleFiles: ModuleFile[] =  [
@@ -137,15 +149,15 @@ describe('bundle', () => {
       ];
       const diagnostics: Diagnostic[] = [];
 
-      const manifestBundles = getManifestBundles(allModuleFiles, bundles, diagnostics);
+      const bundles = getBundlesFromManifest(allModuleFiles, manifestBundles, diagnostics);
 
-      expect(manifestBundles.length).toBe(1);
-      expect(manifestBundles[0].moduleFiles.length).toBe(2);
+      expect(bundles.length).toBe(1);
+      expect(bundles[0].moduleFiles.length).toBe(2);
       expect(diagnostics.length).toBe(1);
     });
 
-    it('not bundle with no components', () => {
-      const bundles: Bundle[] = [
+    it('no bundle with no components', () => {
+      const manifestBundles: ManifestBundle[] = [
         { components: ['cmp-d', 'cmp-e'] },
         { components: ['cmp-b', 'cmp-a'] },
         { components: [] },
@@ -158,14 +170,14 @@ describe('bundle', () => {
       ];
       const diagnostics: Diagnostic[] = [];
 
-      const manifestBundles = getManifestBundles(allModuleFiles, bundles, diagnostics);
+      const bundles = getBundlesFromManifest(allModuleFiles, manifestBundles, diagnostics);
 
-      expect(manifestBundles.length).toBe(2);
+      expect(bundles.length).toBe(2);
       expect(diagnostics.length).toBe(0);
     });
 
     it('load bundles and sort alpha', () => {
-      const bundles: Bundle[] = [
+      const manifestBundles: ManifestBundle[] = [
         { components: ['cmp-e', 'cmp-d'] },
         { components: ['cmp-b', 'cmp-a'] },
         { components: ['cmp-c'] },
@@ -180,15 +192,15 @@ describe('bundle', () => {
       ];
       const diagnostics: Diagnostic[] = [];
 
-      let manifestBundles = getManifestBundles(allModuleFiles, bundles, diagnostics);
-      manifestBundles = sortBundles(manifestBundles);
+      let bundles = getBundlesFromManifest(allModuleFiles, manifestBundles, diagnostics);
+      bundles = sortBundles(bundles);
 
-      expect(manifestBundles[0].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-a');
-      expect(manifestBundles[0].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-b');
-      expect(manifestBundles[1].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-c');
-      expect(manifestBundles[2].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-d');
-      expect(manifestBundles[2].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-e');
-      expect(manifestBundles.length).toBe(3);
+      expect(bundles[0].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-a');
+      expect(bundles[0].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-b');
+      expect(bundles[1].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-c');
+      expect(bundles[2].moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-d');
+      expect(bundles[2].moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-e');
+      expect(bundles.length).toBe(3);
       expect(diagnostics.length).toBe(0);
     });
 

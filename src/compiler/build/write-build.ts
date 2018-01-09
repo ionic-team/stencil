@@ -5,14 +5,14 @@ import { generateDistribution } from './distribution';
 import { writeAppManifest } from '../manifest/manifest-data';
 
 
-export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+export async function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
   // serialize and write the manifest file if need be
   writeAppManifest(config, ctx, buildResults);
 
   buildResults.files = Object.keys(ctx.filesToWrite).sort();
   const totalFilesToWrite = buildResults.files.length;
 
-  const timeSpan = config.logger.createTimeSpan(`writePhase started, fileUpdates: ${totalFilesToWrite}`, true);
+  const timeSpan = config.logger.createTimeSpan(`writeBuildFiles started, fileUpdates: ${totalFilesToWrite}`, true);
 
   // create a copy of all the files to write
   const filesToWrite = Object.assign({}, ctx.filesToWrite);
@@ -25,20 +25,21 @@ export function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildRes
   // 3) copy all of the assets
   // not doing write and copy at the same time incase they
   // both try to create the same directory at the same time
-  return writeFiles(config.sys, config.rootDir, filesToWrite).catch(err => {
-    catchError(ctx.diagnostics, err);
+  try {
+    await writeFiles(config.sys, config.rootDir, filesToWrite);
 
-  }).then(() => {
-    // kick off copying component assets
-    // and copy www/build to dist/ if generateDistribution is enabled
-    return Promise.all([
-      copyComponentAssets(config, ctx),
-      generateDistribution(config, ctx)
-    ]);
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
 
-  }).then(() => {
-    timeSpan.finish(`writePhase finished`);
-  });
+  // kick off copying component assets
+  // and copy www/build to dist/ if generateDistribution is enabled
+  await Promise.all([
+    copyComponentAssets(config, ctx),
+    generateDistribution(config, ctx)
+  ]);
+
+  timeSpan.finish(`writeBuildFiles finished`);
 }
 
 

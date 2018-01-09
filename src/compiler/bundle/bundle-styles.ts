@@ -1,12 +1,12 @@
-import { BuildContext, BuildConfig, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { BuildContext, BuildConfig, Bundle } from '../../util/interfaces';
 import { catchError, hasError } from '../util';
 import { generateComponentStyles } from './component-styles';
 
 
-export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export async function bundleStyles(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
   // create main style results object
   if (hasError(ctx.diagnostics)) {
-    return Promise.resolve();
+    return;
   }
 
   // do bundling if this is not a change build
@@ -15,46 +15,23 @@ export function bundleStyles(config: BuildConfig, ctx: BuildContext, manifestBun
 
   const timeSpan = config.logger.createTimeSpan(`bundle styles started`, !doBundling);
 
-  // go through each bundle the user wants created
-  // and create css files for each mode for each bundle
-  return Promise.all(manifestBundles.map(manifestBundle => {
-    return generateBundleComponentStyles(config, ctx, manifestBundle);
+  try {
+    // go through each bundle the user wants created
+    // and create css files for each mode for each bundle
+    await Promise.all(bundles.map(bundle => {
+      return bundleComponentStyles(config, ctx, bundle);
+    }));
 
-  }))
-  .catch(err => {
-    catchError(ctx.diagnostics, err);
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
 
-  })
-  .then(() => {
-    timeSpan.finish('bundle styles finished');
-  });
+  timeSpan.finish('bundle styles finished');
 }
 
 
-function generateBundleComponentStyles(config: BuildConfig, ctx: BuildContext, manifestBundle: ManifestBundle) {
-  const bundleModes = getManifestBundleModes(manifestBundle.moduleFiles);
-
-  const promises = manifestBundle. moduleFiles.filter(m => m.cmpMeta).map(moduleFile => {
-    return generateComponentStyles(config, ctx, moduleFile, bundleModes).then(compiledModeStyles => {
-      manifestBundle.compiledModeStyles.push(...compiledModeStyles);
-    });
-  });
-
-  return Promise.all(promises);
+function bundleComponentStyles(config: BuildConfig, ctx: BuildContext, bundles: Bundle) {
+  return Promise.all(bundles.moduleFiles.filter(m => m.cmpMeta).map(moduleFile => {
+    return generateComponentStyles(config, ctx, moduleFile);
+  }));
 }
-
-
-export function getManifestBundleModes(bundleModuleFiles: ModuleFile[]) {
-  const allBundleModes: string[] = [];
-
-  bundleModuleFiles.filter(m => m.cmpMeta && m.cmpMeta.stylesMeta && Object.keys(m.cmpMeta.stylesMeta).length).forEach(moduleFile => {
-    Object.keys(moduleFile.cmpMeta.stylesMeta).forEach(styleModeName => {
-      if (!allBundleModes.includes(styleModeName)) {
-        allBundleModes.push(styleModeName);
-      }
-    });
-  });
-
-  return allBundleModes.sort();
-}
-

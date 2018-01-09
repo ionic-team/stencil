@@ -3,6 +3,8 @@ import { BuildConfig } from '../../../util/interfaces';
 
 export default function localResolver(config: BuildConfig) {
   return {
+    name: 'localResolverPlugin',
+
     async resolveId(importee: string, importer: string) {
       if (importee.indexOf('./') === -1) {
         return null;

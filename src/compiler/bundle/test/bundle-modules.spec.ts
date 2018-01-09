@@ -1,53 +1,12 @@
 import { BuildConfig, BuildContext, Bundle, Diagnostic, ModuleFile } from '../../../util/interfaces';
 import {
   bundledComponentContainsChangedFile,
-  canSkipBuild,
-  createInMemoryBundleInput,
-  generateBundleExport,
-  generateBundleImport,
-  getModuleBundleCacheKey
- } from '../component-modules';
+  canSkipBuild
+ } from '../bundle-modules';
  import { mockStencilSystem } from '../../../testing/mocks';
 
 
-describe('component-modules', () => {
-
-  describe('createInMemoryBundleInput', () => {
-
-    it('should create in memory bundle input', () => {
-      const moduleFiles: ModuleFile[] = [
-        { cmpMeta: { tagNameMeta: 'cmp-a', componentClass: 'CmpA' }, jsFilePath: '/tmp/cmp-a.js' },
-        { cmpMeta: { tagNameMeta: 'cmp-b', componentClass: 'CmpB' }, jsFilePath: '/tmp/cmp-b.js' },
-        { cmpMeta: { tagNameMeta: 'cmp-c', componentClass: 'CmpC' }, jsFilePath: '/tmp/cmp-c.js' },
-      ];
-      const input = createInMemoryBundleInput(moduleFiles);
-      expect(input.length).toBe(6);
-    });
-
-  });
-
-  describe('generateBundleImport', () => {
-
-    it('should create bundle import', () => {
-      const cmpClassName = 'MyClassName';
-      const asName = 'AsName';
-      const importPath = 'c:\\import\\path';
-      const bundleImport = generateBundleImport(cmpClassName, asName, importPath);
-      expect(bundleImport).toBe(`import { MyClassName as AsName } from "c:/import/path";`);
-    });
-
-  });
-
-  describe('generateBundleExport', () => {
-
-    it('should create bundle import', () => {
-      const tagName = 'MY-tag';
-      const asName = 'AsName';
-      const bundleImport = generateBundleExport(tagName, asName);
-      expect(bundleImport).toBe(`exports['my-tag'] = AsName;`);
-    });
-
-  });
+describe('bundle-modules', () => {
 
   describe('canSkipBuild', () => {
     const moduleFiles: ModuleFile[] = [];
@@ -124,15 +83,6 @@ describe('component-modules', () => {
       ];
       const hasChanged = bundledComponentContainsChangedFile(config, moduleFiles, changedFiles);
       expect(hasChanged).toBe(true);
-    });
-
-  });
-
-  describe('getModuleBundleCacheKey', () => {
-
-    it('should create the cache key', () => {
-      const cacheKey = getModuleBundleCacheKey(['CMP-Z', 'cmp-A']);
-      expect(cacheKey).toBe('cmp-a.cmp-z');
     });
 
   });

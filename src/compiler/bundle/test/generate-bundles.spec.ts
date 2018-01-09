@@ -1,87 +1,11 @@
-import { BuildConfig, BuildContext, Bundle, ComponentMeta, ManifestBundle, ModuleFile } from '../../../util/interfaces';
-import {
-  bundleRequiresScopedStyles,
-  containsDefaultMode,
-  containsNonDefaultModes,
-  getBundleId,
-  getManifestBundleModes,
-  setBundleModeIds,
-  writeBundleFile
-} from '../generate-bundles';
-import { getBundleFileName } from '../../app/app-file-naming';
+import { BuildConfig, BuildContext, ComponentMeta, ModuleFile } from '../../../util/interfaces';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
+import { getBundleIdDev, getBundleIdHashed, injectComponentStyleMode } from '../generate-bundles';
 import { mockStencilSystem } from '../../../testing/mocks';
+import { getStylePlaceholder } from '../../../util/data-serialize';
 
 
 describe('generate-bundles', () => {
-
-  describe('containsNonDefaultModes', () => {
-
-    it('should not contain non default', () => {
-      expect(containsDefaultMode(['ios'])).toBe(false);
-      expect(containsDefaultMode([])).toBe(false);
-    });
-
-    it('should contain non default', () => {
-      expect(containsNonDefaultModes(['$', 'ios'])).toBe(true);
-    });
-
-  });
-
-  describe('containsDefaultMode', () => {
-
-    it('should not contain default', () => {
-      expect(containsDefaultMode(['ios', 'md'])).toBe(false);
-      expect(containsDefaultMode([])).toBe(false);
-    });
-
-    it('should contain default', () => {
-      expect(containsDefaultMode(['$', 'ios'])).toBe(true);
-    });
-
-  });
-
-  describe('setBundleModeIds', () => {
-
-    it('should set default style mode with null mode name', () => {
-      const moduleFiles: ModuleFile[] = [
-        { cmpMeta: { bundleIds: {} } }
-      ];
-      setBundleModeIds(moduleFiles, null, 'bundle-id', 'es2015');
-      expect(moduleFiles[0].cmpMeta.bundleIds[DEFAULT_STYLE_MODE].es2015).toBe('bundle-id');
-    });
-
-    it('should set mode with es2015 mode name', () => {
-      const moduleFiles: ModuleFile[] = [
-        { cmpMeta: { bundleIds: {} } }
-      ];
-      setBundleModeIds(moduleFiles, 'ios', 'bundle-id', 'es2015');
-      expect(moduleFiles[0].cmpMeta.bundleIds.ios.es2015).toBe('bundle-id');
-    });
-
-    it('should set mode with es5 mode name', () => {
-      const moduleFiles: ModuleFile[] = [
-        { cmpMeta: { bundleIds: {} } }
-      ];
-      setBundleModeIds(moduleFiles, 'ios', 'bundle-id', 'es5');
-      expect(moduleFiles[0].cmpMeta.bundleIds.ios.es5).toBe('bundle-id');
-    });
-
-  });
-
-  describe('getBundleFileName', () => {
-
-    it('get filename from bundle id and scoped', () => {
-      const fileName = getBundleFileName('bundle-id', true);
-      expect(fileName).toBe('bundle-id.sc.js');
-    });
-
-    it('get filename from bundle id only', () => {
-      const fileName = getBundleFileName('bundle-id', false);
-      expect(fileName).toBe('bundle-id.js');
-    });
-
-  });
 
   describe('getBundleId', () => {
 
@@ -89,66 +13,117 @@ describe('generate-bundles', () => {
       const config: BuildConfig = { hashFileNames: true, hashedFileNameLength: 4 };
       config.sys = mockStencilSystem();
 
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], 'ios', 'h1{color:blue;}');
-
-      expect(styleId).toBe('ehrd');
+      const id = getBundleIdHashed(config, 'abcdefg');
+      expect(id).toBe('l7xh');
     });
 
     it('get bundle id from components and mode', () => {
-      const config: BuildConfig = {};
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], 'ios', 'h1{color:blue;}');
-
-      expect(styleId).toBe('cmp-a.ios');
+      const id = getBundleIdDev(['cmp-a', 'cmp-b'], 'ios');
+      expect(id).toBe('cmp-a.ios');
     });
 
-    it('get bundle id from components and default mode', () => {
+    it('get bundle id from components and default mode mode', () => {
       const config: BuildConfig = {};
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], '$', 'h1{color:blue;}');
-
-      expect(styleId).toBe('cmp-a');
-    });
-
-    it('get bundle id from components and null mode', () => {
-      const config: BuildConfig = {};
-      const styleId = getBundleId(config, ['cmp-a', 'cmp-b'], null, 'h1{color:blue;}');
-
-      expect(styleId).toBe('cmp-a');
+      const id = getBundleIdDev(['cmp-a', 'cmp-b'], null);
+      expect(id).toBe('cmp-a');
     });
 
   });
 
-  describe('bundleRequiresScopedStyles', () => {
+  describe('injectComponentStyleMode', () => {
 
-    it('scoped styles required for shadow dom w/ styles', () => {
-      const allModuleFiles: ModuleFile[] =  [
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION.ShadowDom, stylesMeta: {} } },
-        { cmpMeta: { tagNameMeta: 'cmp-a', stylesMeta: { $: {}, md: {} } } },
-        { }
-      ];
-
-      const isRequired = bundleRequiresScopedStyles(allModuleFiles);
-      expect(isRequired).toBe(true);
+    it('inject mode style unscoped css when asking for scoped, but doesnt exist', () => {
+      const cmpMeta: ComponentMeta = {
+        stylesMeta: {
+          ios: {
+            compiledStyleText: 'ios-css'
+          }
+        }
+      };
+      const modeName = `ios`;
+      const inputJs = getStylePlaceholder(cmpMeta.tagNameMeta);
+      const outputJs = injectComponentStyleMode(cmpMeta, modeName, inputJs, true);
+      expect(outputJs).toBe('ios-css');
     });
 
-    it('scoped styles required for scoped css w/ styles', () => {
-      const allModuleFiles: ModuleFile[] =  [
-        { cmpMeta: { tagNameMeta: 'cmp-d', encapsulation: ENCAPSULATION.ScopedCss, stylesMeta: {} } },
-        { cmpMeta: { tagNameMeta: 'cmp-a', stylesMeta: { $: {}, md: {} } } },
-        { }
-      ];
-
-      const isRequired = bundleRequiresScopedStyles(allModuleFiles);
-      expect(isRequired).toBe(true);
+    it('inject mode style', () => {
+      const cmpMeta: ComponentMeta = {
+        stylesMeta: {
+          ios: {
+            compiledStyleText: 'ios-css'
+          }
+        }
+      };
+      const modeName = `ios`;
+      const inputJs = getStylePlaceholder(cmpMeta.tagNameMeta);
+      const outputJs = injectComponentStyleMode(cmpMeta, modeName, inputJs, false);
+      expect(outputJs).toBe('ios-css');
     });
 
-    it('scoped styles not required', () => {
-      const allModuleFiles: ModuleFile[] =  [
-        { cmpMeta: { tagNameMeta: 'cmp-a', stylesMeta: { $: {}, md: {} } } },
-        { }
-      ];
+    it('inject default style when no matching mode', () => {
+      const cmpMeta: ComponentMeta = {
+        stylesMeta: {
+          $: {
+            compiledStyleText: 'default-css'
+          }
+        }
+      };
+      const modeName = `ios`;
+      const inputJs = getStylePlaceholder(cmpMeta.tagNameMeta);
+      const outputJs = injectComponentStyleMode(cmpMeta, modeName, inputJs, false);
+      expect(outputJs).toBe('default-css');
+    });
 
-      const isRequired = bundleRequiresScopedStyles(allModuleFiles);
-      expect(isRequired).toBe(false);
+    it('inject default scoped style when no matching mode', () => {
+      const cmpMeta: ComponentMeta = {
+        stylesMeta: {
+          $: {
+            compiledStyleText: 'default-css',
+            compiledStyleTextScoped: 'default-scoped-css'
+          }
+        }
+      };
+      const modeName = `ios`;
+      const inputJs = getStylePlaceholder(cmpMeta.tagNameMeta);
+      const outputJs = injectComponentStyleMode(cmpMeta, modeName, inputJs, true);
+      expect(outputJs).toBe('default-scoped-css');
+    });
+
+    it('inject default scoped style', () => {
+      const cmpMeta: ComponentMeta = {
+        stylesMeta: {
+          $: {
+            compiledStyleText: 'default-css',
+            compiledStyleTextScoped: 'default-scoped-css'
+          }
+        }
+      };
+      const modeName = DEFAULT_STYLE_MODE;
+      const inputJs = getStylePlaceholder(cmpMeta.tagNameMeta);
+      const outputJs = injectComponentStyleMode(cmpMeta, modeName, inputJs, true);
+      expect(outputJs).toBe('default-scoped-css');
+    });
+
+    it('inject default style', () => {
+      const cmpMeta: ComponentMeta = {
+        stylesMeta: {
+          $: {
+            compiledStyleText: 'default-css'
+          }
+        }
+      };
+      const modeName = DEFAULT_STYLE_MODE;
+      const inputJs = getStylePlaceholder(cmpMeta.tagNameMeta);
+      const outputJs = injectComponentStyleMode(cmpMeta, modeName, inputJs, false);
+      expect(outputJs).toBe('default-css');
+    });
+
+    it('inject empty string when no style', () => {
+      const cmpMeta: ComponentMeta = {};
+      const modeName = DEFAULT_STYLE_MODE;
+      const inputJs = getStylePlaceholder(cmpMeta.tagNameMeta);
+      const outputJs = injectComponentStyleMode(cmpMeta, modeName, inputJs, false);
+      expect(outputJs).toBe('');
     });
 
   });

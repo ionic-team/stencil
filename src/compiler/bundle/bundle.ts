@@ -1,14 +1,17 @@
-import { BuildConfig, BuildContext, Bundle, Diagnostic, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic, ManifestBundle, ModuleFile } from '../../util/interfaces';
 import { buildError, catchError, hasError } from '../util';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
-import { ENCAPSULATION, PRIORITY } from '../../util/constants';
-import { generateBundles } from './generate-bundles';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
+import { upgradeDependentComponents } from '../upgrade-dependents/index';
+import { requiresScopedStyles } from './component-styles';
 
 
-export function bundle(config: BuildConfig, ctx: BuildContext) {
+export async function bundle(config: BuildConfig, ctx: BuildContext) {
+  let bundles: Bundle[] = [];
+
   if (hasError(ctx.diagnostics)) {
-    return Promise.resolve();
+    return bundles;
   }
 
   if (config.generateWWW) {
@@ -19,167 +22,140 @@ export function bundle(config: BuildConfig, ctx: BuildContext) {
     config.logger.debug(`bundle, distDir: ${config.distDir}`);
   }
 
-  ctx.manifestBundles = getManifestBundles(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
+  const timeSpan = config.logger.createTimeSpan(`bundle started`, true);
 
-  ctx.manifestBundles = validateBundleModules(ctx.manifestBundles);
+  try {
+    // get all of the bundles from the manifest bundles
+    bundles = getBundlesFromManifest(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
 
-  ctx.manifestBundles = sortBundles(ctx.manifestBundles);
+    // Look at all dependent components from outside collections and
+    // upgrade the components to be compatible with this version if need be
+    await upgradeDependentComponents(config, ctx, bundles);
 
-  // kick off style and module bundling at the same time
-  return Promise.all([
-    bundleStyles(config, ctx, ctx.manifestBundles),
-    bundleModules(config, ctx, ctx.manifestBundles)
+    // kick off style and module bundling at the same time
+    await Promise.all([
+      bundleStyles(config, ctx, bundles),
+      bundleModules(config, ctx, bundles)
+    ]);
 
-  ]).then(() => {
-    // both styles and modules are done bundling
-    // generate the actual files to write
-    generateBundles(config, ctx, ctx.manifestBundles, 'es2015');
+  } catch (e) {
+    catchError(ctx.diagnostics, e);
+  }
 
-    if (config.es5Fallback) {
-      generateBundles(config, ctx, ctx.manifestBundles, 'es5');
-    }
+  timeSpan.finish(`bundle finished`);
 
-  }).catch(err => {
-    catchError(ctx.diagnostics, err);
-  });
+  return bundles;
 }
 
 
-export function getManifestBundles(moduleFiles: ModuleFile[], bundles: Bundle[], diagnostics: Diagnostic[]) {
-  const manifestBundles: ManifestBundle[] = [];
+export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundles: ManifestBundle[], diagnostics: Diagnostic[]) {
+  const bundles: Bundle[] = [];
 
-  bundles.filter(b => b.components && b.components.length).forEach(bundle => {
-    const manifestBundle = createManifestBundle([], bundle.priority);
+  manifestBundles.filter(b => b.components && b.components.length).forEach(manifestBundle => {
+    const bundle: Bundle = {
+      moduleFiles: [],
+      compiledModuleText: ''
+    };
 
-    bundle.components.forEach(tag => {
+    manifestBundle.components.forEach(tag => {
       const cmpMeta = moduleFiles.find(modulesFile => modulesFile.cmpMeta.tagNameMeta === tag);
       if (cmpMeta) {
-        manifestBundle.moduleFiles.push(cmpMeta);
+        bundle.moduleFiles.push(cmpMeta);
 
       } else {
-        buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or its collections.`;
+        buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or collections.`;
       }
     });
 
-    if (manifestBundle.moduleFiles.length > 0) {
-      manifestBundles.push(manifestBundle);
+    if (bundle.moduleFiles.length > 0) {
+      updateBundleData(bundle);
+      bundles.push(bundle);
     }
   });
 
-  return manifestBundles;
+  // always consistently sort them
+  return sortBundles(bundles);
 }
 
 
-function validateBundleModules(manifestBundles: ManifestBundle[]) {
-  // can't mix and match different types of encapsulation in the same bundle
-  const validatedBundles: ManifestBundle[] = [];
+export function updateBundleData(bundle: Bundle) {
+  // generate a unique entry key based on the components within this bundle
+  bundle.entryKey = 'bundle:' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('.');
 
-  manifestBundles.forEach(manifestBundle => {
-    validateManifestBundle(validatedBundles, manifestBundle);
+  // get the modes used in this bundle
+  bundle.modeNames = getBundleModes(bundle.moduleFiles);
+
+  // get the encapsulations used in this bundle
+  const encapsulations = getBundleEncapsulations(bundle);
+
+  // figure out if we'll need an unscoped css build
+  bundle.requiresScopedStyles = bundleRequiresScopedStyles(encapsulations);
+
+  // figure out if we'll need a scoped css build
+  bundle.requiresScopedStyles = bundleRequiresScopedStyles(encapsulations);
+}
+
+
+export function getBundleModes(moduleFiles: ModuleFile[]) {
+  const styleModeNames: string[] = [];
+
+  moduleFiles.forEach(m => {
+    const cmpStyleModes = getComponentStyleModes(m.cmpMeta);
+    cmpStyleModes.forEach(modeName => {
+      if (!styleModeNames.includes(modeName)) {
+        styleModeNames.push(modeName);
+      }
+    });
   });
 
-  return validatedBundles;
+  if (styleModeNames.length === 0) {
+    styleModeNames.push(DEFAULT_STYLE_MODE);
+
+  } else if (styleModeNames.length > 1) {
+    let index = (styleModeNames.indexOf(DEFAULT_STYLE_MODE));
+    if (index > -1) {
+      styleModeNames.splice(index, 1);
+    }
+  }
+
+  return styleModeNames.sort();
 }
 
-export function validateManifestBundle(validatedBundles: ManifestBundle[], manifestBundle: ManifestBundle) {
-  // ok, so this method is used to clean up the bundles to make sure that
-  // all of the components in this bundle share the same encapsulation type
-  // we could throw an error if the user mix and matches, but that's confusing
-  // and they'd have to manually do what we're doing below. So let's just do it for them
-  // so make sure each bundle has the same encapsulation type, and for those who
-  // don't have the same type, then create new bundles which share the same type
-  if (manifestBundle.moduleFiles.length === 0) {
-    // no components, no bundle (not sure how this could happen, but whatever)
-    return;
-  }
 
-  if (manifestBundle.moduleFiles.length === 1) {
-    // only one component, so we couldn't have issues with
-    // different encapsulation types in the bundle
-    validatedBundles.push(manifestBundle);
-    return;
-  }
+export function getComponentStyleModes(cmpMeta: ComponentMeta) {
+  return (cmpMeta && cmpMeta.stylesMeta) ? Object.keys(cmpMeta.stylesMeta) : [];
+}
 
-  // there are multiple components in this bundle
-  // figure out which encapsulation type we see the most of in this bundle
-  const primaryEncapsulation = findPrimaryEncapsulation(manifestBundle.moduleFiles);
 
-  // used to collect all the same encapsulation type in this main bundle
-  const primaryCss: ModuleFile[] = [];
+export function getBundleEncapsulations(bundle: Bundle) {
+  const encapsulations: ENCAPSULATION[] = [];
 
-  // used to collect all the types that shouldn't be grouped in this module
-  const scopedCss: ModuleFile[] = [];
-  const shadowCss: ModuleFile[] = [];
-  const plainCss: ModuleFile[] = [];
-
-  // pick out only
-  manifestBundle.moduleFiles.forEach(moduleFile => {
-    const cmpMeta = moduleFile.cmpMeta;
-    if (cmpMeta.encapsulation === primaryEncapsulation || !cmpMeta.stylesMeta) {
-      // this component uses the same encapsulation type as everyone else
-      // or it doesn't have styles at all so it doesn't matter
-      primaryCss.push(moduleFile);
-
-    } else if (moduleFile.cmpMeta.encapsulation === ENCAPSULATION.ScopedCss) {
-      scopedCss.push(moduleFile);
-
-    } else if (moduleFile.cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-      shadowCss.push(moduleFile);
-
-    } else {
-      plainCss.push(moduleFile);
+  bundle.moduleFiles.forEach(m => {
+    const encapsulation = m.cmpMeta.encapsulation || ENCAPSULATION.NoEncapsulation;
+    if (!encapsulations.includes(encapsulation)) {
+      encapsulations.push(encapsulation);
     }
   });
 
-  if (primaryCss.length) {
-    manifestBundle.moduleFiles = primaryCss;
-    validatedBundles.push(manifestBundle);
+  if (encapsulations.length === 0) {
+    encapsulations.push(ENCAPSULATION.NoEncapsulation);
+
+  } else if (encapsulations.includes(ENCAPSULATION.ShadowDom) && !encapsulations.includes(ENCAPSULATION.ScopedCss)) {
+    encapsulations.push(ENCAPSULATION.ScopedCss);
   }
-  if (scopedCss.length) {
-    validatedBundles.push(createManifestBundle(scopedCss, manifestBundle.priority));
-  }
-  if (shadowCss.length) {
-    validatedBundles.push(createManifestBundle(shadowCss, manifestBundle.priority));
-  }
-  if (plainCss.length) {
-    validatedBundles.push(createManifestBundle(plainCss, manifestBundle.priority));
-  }
+
+  return encapsulations.sort();
 }
 
 
-export function findPrimaryEncapsulation(moduleFiles: ModuleFile[]) {
-  const plainCssCmps = moduleFiles.filter(m => m.cmpMeta.encapsulation !== ENCAPSULATION.ScopedCss && m.cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom);
-  const scopedCssCmps = moduleFiles.filter(m => m.cmpMeta.encapsulation === ENCAPSULATION.ScopedCss);
-  const shadowCssCmps = moduleFiles.filter(m => m.cmpMeta.encapsulation === ENCAPSULATION.ShadowDom);
-
-  // figure out which encapsulation type we have the most of
-  const sorted = [plainCssCmps, scopedCssCmps, shadowCssCmps].sort((a, b) => {
-    if (a.length < b.length) return 1;
-    if (a.length > b.length) return -1;
-    return 0;
-  });
-
-  if (sorted.length && sorted[0].length) {
-    return sorted[0][0].cmpMeta.encapsulation;
-  }
-
-  return null;
+export function bundleRequiresScopedStyles(encapsulations?: ENCAPSULATION[]) {
+  return encapsulations.some(e => requiresScopedStyles(e));
 }
 
 
-function createManifestBundle(moduleFiles: ModuleFile[], priority: PRIORITY) {
-  const manifestBundle: ManifestBundle = {
-    moduleFiles: moduleFiles,
-    compiledModeStyles: [],
-    compiledModuleText: '',
-    priority: priority
-  };
-  return manifestBundle;
-}
-
-
-export function sortBundles(manifestBundles: ManifestBundle[]) {
-  manifestBundles.forEach(m => {
+export function sortBundles(bundles: Bundle[]) {
+  // sort components by tagname within each bundle
+  bundles.forEach(m => {
     m.moduleFiles = m.moduleFiles.sort((a, b) => {
       if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
       if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
@@ -187,7 +163,8 @@ export function sortBundles(manifestBundles: ManifestBundle[]) {
     });
   });
 
-  return manifestBundles.sort((a, b) => {
+  // sort each bundle by the first component's tagname
+  return bundles.sort((a, b) => {
     if (a.moduleFiles[0].cmpMeta.tagNameMeta < b.moduleFiles[0].cmpMeta.tagNameMeta) return -1;
     if (a.moduleFiles[0].cmpMeta.tagNameMeta > b.moduleFiles[0].cmpMeta.tagNameMeta) return 1;
     return 0;
