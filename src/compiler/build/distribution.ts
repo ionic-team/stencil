@@ -2,7 +2,7 @@ import { BuildConfig, BuildContext, Diagnostic } from '../../util/interfaces';
 import { buildError, buildWarn, normalizePath } from '../util';
 import { COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
-import { getAppFileName } from '../app/app-file-naming';
+import { getLoaderFileName } from '../app/app-file-naming';
 import { pathJoin, readFile } from '../util';
 
 
@@ -38,11 +38,9 @@ async function readPackageJson(config: BuildConfig, diagnostics: Diagnostic[]) {
 
 
 export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic[], data: any) {
-  const appNamespace = getAppFileName(config);
-
   validatePackageFiles(config, diagnostics, data);
 
-  const mainFileName = appNamespace + '.js';
+  const mainFileName = getLoaderFileName(config);
   const main = pathJoin(config, config.sys.path.relative(config.rootDir, config.distDir), mainFileName);
   if (!data.main || normalizePath(data.main) !== main) {
     const err = buildError(diagnostics);
@@ -59,7 +57,7 @@ export function validatePackageJson(config: BuildConfig, diagnostics: Diagnostic
     err.messageText = `package.json "collection" property is required when generating a distribution and must be set to: ${collection}`;
   }
 
-  if (typeof config.namespace !== 'string' || config.namespace.toLowerCase().trim() === 'app') {
+  if (typeof config.namespace !== 'string' || config.fsNamespace === 'app') {
     const err = buildWarn(diagnostics);
     err.header = `config warning`;
     err.messageText = `When generating a distribution it is recommended to choose a unique namespace, which can be updated using the "namespace" config property within the stencil.config.js file.`;

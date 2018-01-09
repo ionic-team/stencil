@@ -19,7 +19,6 @@ describe('build', () => {
       expect(ctx.transpileBuildCount).toBe(1);
       expect(ctx.sassBuildCount).toBe(1);
       expect(ctx.moduleBundleCount).toBe(1);
-      expect(ctx.styleBundleCount).toBe(1);
 
       expect(wroteFile(r, 'cmp-a.js')).toBe(true);
 
@@ -39,7 +38,6 @@ describe('build', () => {
       expect(ctx.transpileBuildCount).toBe(1);
       expect(ctx.sassBuildCount).toBe(0);
       expect(ctx.moduleBundleCount).toBe(1);
-      expect(ctx.styleBundleCount).toBe(0);
 
       const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
       expect(cmpMeta).toBeDefined();
@@ -54,7 +52,6 @@ describe('build', () => {
       expect(ctx.transpileBuildCount).toBe(0);
       expect(ctx.sassBuildCount).toBe(0);
       expect(ctx.moduleBundleCount).toBe(0);
-      expect(ctx.styleBundleCount).toBe(0);
     });
   });
 

@@ -1,60 +1,57 @@
-import { AppRegistry, BuildConfig, BuildContext } from '../../util/interfaces';
-import { formatComponentRegistry } from '../../util/data-serialize';
-import { generateCore } from './app-core';
+import { BuildConfig, BuildContext, ComponentRegistry, Bundle } from '../../util/interfaces';
+import { createAppRegistry, writeAppRegistry } from './app-registry';
 import { generateAppGlobalScript } from './app-global-scripts';
-import { generateAppRegistry } from './app-registry';
+import { generateCore } from './app-core';
 import { generateEs5DisabledMessage } from './app-es5-disabled';
 import { generateGlobalStyles } from './app-global-styles';
 import { generateLoader } from './app-loader';
-import { hasError } from '../util';
+import { getAppWWWBuildDir } from './app-file-naming';
+import { hasError, pathJoin } from '../util';
 import { setBuildConditionals } from './build-conditionals';
 
 
-export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
+export async function generateAppFiles(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], cmpRegistry: ComponentRegistry) {
   if (hasError(ctx.diagnostics)) {
-    return Promise.resolve();
+    return;
   }
 
   const timespan = config.logger.createTimeSpan(`generateAppFiles: ${config.namespace} start`, true);
 
   // generate the shared app registry object
-  const appRegistry: AppRegistry = {
-    namespace: config.namespace,
-    components: formatComponentRegistry(ctx.registry)
-  };
+  const appRegistry = createAppRegistry(config);
 
   // normal es2015 build
-  const globalJsContentsEs2015 = await generateAppGlobalScript(config, ctx, 'es2015', appRegistry);
+  const globalJsContentsEs2015 = await generateAppGlobalScript(config, ctx, appRegistry);
 
   // figure out which sections should be included in the core build
-  const buildConditionals = setBuildConditionals(ctx, ctx.manifestBundles);
+  const buildConditionals = setBuildConditionals(ctx, bundles);
   buildConditionals.coreId = 'core';
   buildConditionals.ssrClientSide = false;
 
-  const coreFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionals);
+  const coreFilename = await generateCore(config, ctx, globalJsContentsEs2015, buildConditionals);
   appRegistry.core = coreFilename;
 
-  const buildConditionalsSsr = setBuildConditionals(ctx, ctx.manifestBundles);
+  const buildConditionalsSsr = setBuildConditionals(ctx, bundles);
   buildConditionalsSsr.coreId = 'core.ssr';
   buildConditionalsSsr.ssrClientSide = true;
 
-  const coreSsrFilename = await generateCore(config, ctx, 'es2015', globalJsContentsEs2015, buildConditionalsSsr);
+  const coreSsrFilename = await generateCore(config, ctx, globalJsContentsEs2015, buildConditionalsSsr);
   appRegistry.coreSsr = coreSsrFilename;
-  ctx.appCoreWWWPath = coreSsrFilename;
+  ctx.appCoreWWWPath = pathJoin(config, getAppWWWBuildDir(config), coreSsrFilename);
 
 
-  if (config.es5Fallback) {
+  if (config.buildEs5) {
     // es5 build (if needed)
-    const globalJsContentsEs5 = await generateAppGlobalScript(config, ctx, 'es5', appRegistry);
+    const globalJsContentsEs5 = await generateAppGlobalScript(config, ctx, appRegistry, 'es5');
 
-    const buildConditionalsEs5 = setBuildConditionals(ctx, ctx.manifestBundles);
+    const buildConditionalsEs5 = setBuildConditionals(ctx, bundles);
     buildConditionalsEs5.coreId = 'core.pf';
     buildConditionalsEs5.es5 = true;
     buildConditionalsEs5.polyfills = true;
     buildConditionalsEs5.cssVarShim = true;
     buildConditionalsEs5.ssrClientSide = true;
 
-    const coreFilenameEs5 = await generateCore(config, ctx, 'es5', globalJsContentsEs5, buildConditionalsEs5);
+    const coreFilenameEs5 = await generateCore(config, ctx, globalJsContentsEs5, buildConditionalsEs5);
     appRegistry.corePolyfilled = coreFilenameEs5;
 
   } else if (config.generateWWW) {
@@ -64,10 +61,10 @@ export async function generateAppFiles(config: BuildConfig, ctx: BuildContext) {
   }
 
   // create a json file for the app registry
-  await generateAppRegistry(config, ctx, appRegistry);
+  writeAppRegistry(config, ctx, appRegistry, cmpRegistry);
 
   // create the loader after creating the loader file name
-  await generateLoader(config, ctx, appRegistry);
+  await generateLoader(config, ctx, appRegistry, cmpRegistry);
 
   // create the global styles
   await generateGlobalStyles(config, ctx);

@@ -13,7 +13,7 @@ describe('rebuild', () => {
       { components: ['cmp-a'] }
     ];
     config.watch = true;
-    config.es5Fallback = true;
+    config.buildEs5 = true;
     writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
     writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
 
@@ -180,7 +180,6 @@ describe('rebuild', () => {
       expect(ctx.transpileBuildCount).toBe(3);
       expect(ctx.moduleBundleCount).toBe(2);
       expect(ctx.sassBuildCount).toBe(2);
-      expect(ctx.styleBundleCount).toBe(2);
 
       expect(wroteFile(r, 'cmp-a.js')).toBe(true);
       expect(wroteFile(r, 'cmp-b.js')).toBe(true);
@@ -195,7 +194,6 @@ describe('rebuild', () => {
         expect(ctx.transpileBuildCount).toBe(1);
         expect(ctx.moduleBundleCount).toBe(2);
         expect(ctx.sassBuildCount).toBe(0);
-        expect(ctx.styleBundleCount).toBe(0);
 
         expect(wroteFile(r, 'cmp-a.js')).toBe(true);
         expect(wroteFile(r, 'cmp-b.js')).toBe(true);
@@ -203,7 +201,7 @@ describe('rebuild', () => {
     });
   });
 
-  it('should rebundle both cmp-a and cmp-b when non-component module has changed', () => {
+  it('should rebundle both cmp-a and cmp-b when non-component module has changed', async () => {
     ctx = {};
     config.bundles = [
       { components: ['cmp-a'] },
@@ -308,7 +306,6 @@ describe('rebuild', () => {
         expect(ctx.transpileBuildCount).toBe(0);
         expect(ctx.moduleBundleCount).toBe(0);
         expect(ctx.sassBuildCount).toBe(2);
-        expect(ctx.styleBundleCount).toBe(2);
       });
     });
   });
@@ -330,7 +327,6 @@ describe('rebuild', () => {
       expect(ctx.transpileBuildCount).toBe(2);
       expect(ctx.moduleBundleCount).toBe(2);
       expect(ctx.sassBuildCount).toBe(2);
-      expect(ctx.styleBundleCount).toBe(2);
 
       expect(wroteFile(r, 'cmp-a.js')).toBe(true);
       expect(wroteFile(r, 'cmp-b.js')).toBe(true);
@@ -345,7 +341,6 @@ describe('rebuild', () => {
         expect(ctx.transpileBuildCount).toBe(1);
         expect(ctx.moduleBundleCount).toBe(1);
         expect(ctx.sassBuildCount).toBe(1);
-        expect(ctx.styleBundleCount).toBe(1);
 
         expect(wroteFile(r, 'cmp-a.js')).toBe(true);
         expect(wroteFile(r, 'cmp-b.js')).toBe(false);
@@ -399,7 +394,6 @@ describe('rebuild', () => {
         expect(ctx.transpileBuildCount).toBe(0);
         expect(ctx.moduleBundleCount).toBe(0);
         expect(ctx.sassBuildCount).toBe(1);
-        expect(ctx.styleBundleCount).toBe(1);
 
         expect(r.files.length).toBe(1);
         expect(wroteFile(r, 'cmp-a.js')).toBe(true);
@@ -425,7 +419,6 @@ describe('rebuild', () => {
         expect(ctx.transpileBuildCount).toBe(1);
         expect(ctx.moduleBundleCount).toBe(1);
         expect(ctx.sassBuildCount).toBe(1);
-        expect(ctx.styleBundleCount).toBe(1);
 
         expect(r.files.length).toBe(0);
       });

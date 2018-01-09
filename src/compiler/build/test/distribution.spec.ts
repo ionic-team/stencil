@@ -87,6 +87,7 @@ describe('distribution', () => {
     beforeEach(() => {
       config = mockBuildConfig();
       config.namespace = 'SomeNamespace';
+      config.fsNamespace = config.namespace.toLowerCase();
       diagnostics = [];
       packageJsonData = {};
     });

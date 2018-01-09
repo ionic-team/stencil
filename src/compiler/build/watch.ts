@@ -225,9 +225,8 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
     // completely clear out the cache
     ctx.moduleFiles = {};
     ctx.jsFiles = {};
-    ctx.cssFiles = {};
     ctx.moduleBundleOutputs = {};
-    ctx.styleSassUnscopedOutputs = {};
+    ctx.moduleBundleLegacyOutputs = {};
   }
 
   changedFiles.sort();
@@ -255,36 +254,41 @@ function watchBuild(config: BuildConfig, ctx: BuildContext, requiresFullBuild: b
 }
 
 
-function configFileReload(existingConfig: BuildConfig) {
-  existingConfig.logger.debug(`reload config file: ${existingConfig.configPath}`);
+function configFileReload(config: BuildConfig) {
+  config.logger.debug(`reload config file: ${config.configPath}`);
 
-  const updatedConfig = existingConfig.sys.loadConfigFile(existingConfig.configPath);
+  try {
+    const updatedConfig = config.sys.loadConfigFile(config.configPath);
 
-  // just update the existing config in place
-  // not everything should be overwritten or merged
-  // pick and choose what's ok to update
-  existingConfig._isValidated = false;
-  existingConfig.buildDir = updatedConfig.buildDir;
-  existingConfig.distDir = updatedConfig.distDir;
-  existingConfig.bundles = updatedConfig.bundles;
-  existingConfig.collectionDir = updatedConfig.collectionDir;
-  existingConfig.collections = updatedConfig.collections;
-  existingConfig.includeSrc = updatedConfig.includeSrc;
-  existingConfig.excludeSrc = updatedConfig.excludeSrc;
-  existingConfig.generateDistribution = updatedConfig.generateDistribution;
-  existingConfig.generateWWW = updatedConfig.generateWWW;
-  existingConfig.globalScript = updatedConfig.globalScript;
-  existingConfig.globalStyle = updatedConfig.globalStyle;
-  existingConfig.hashedFileNameLength = updatedConfig.hashedFileNameLength;
-  existingConfig.hashFileNames = updatedConfig.hashFileNames;
-  existingConfig.wwwIndexHtml = updatedConfig.wwwIndexHtml;
-  existingConfig.srcIndexHtml = updatedConfig.srcIndexHtml;
-  existingConfig.minifyCss = updatedConfig.minifyCss;
-  existingConfig.minifyJs = updatedConfig.minifyJs;
-  existingConfig.namespace = updatedConfig.namespace;
-  existingConfig.preamble = updatedConfig.preamble;
-  existingConfig.prerender = updatedConfig.prerender;
-  existingConfig.publicPath = updatedConfig.publicPath;
-  existingConfig.srcDir = updatedConfig.srcDir;
-  existingConfig.watchIgnoredRegex = updatedConfig.watchIgnoredRegex;
+    // just update the existing config in place
+    // not everything should be overwritten or merged
+    // pick and choose what's ok to update
+    config._isValidated = false;
+    config.buildDir = updatedConfig.buildDir;
+    config.distDir = updatedConfig.distDir;
+    config.bundles = updatedConfig.bundles;
+    config.collectionDir = updatedConfig.collectionDir;
+    config.collections = updatedConfig.collections;
+    config.includeSrc = updatedConfig.includeSrc;
+    config.excludeSrc = updatedConfig.excludeSrc;
+    config.generateDistribution = updatedConfig.generateDistribution;
+    config.generateWWW = updatedConfig.generateWWW;
+    config.globalScript = updatedConfig.globalScript;
+    config.globalStyle = updatedConfig.globalStyle;
+    config.hashedFileNameLength = updatedConfig.hashedFileNameLength;
+    config.hashFileNames = updatedConfig.hashFileNames;
+    config.wwwIndexHtml = updatedConfig.wwwIndexHtml;
+    config.srcIndexHtml = updatedConfig.srcIndexHtml;
+    config.minifyCss = updatedConfig.minifyCss;
+    config.minifyJs = updatedConfig.minifyJs;
+    config.namespace = updatedConfig.namespace;
+    config.preamble = updatedConfig.preamble;
+    config.prerender = updatedConfig.prerender;
+    config.publicPath = updatedConfig.publicPath;
+    config.srcDir = updatedConfig.srcDir;
+    config.watchIgnoredRegex = updatedConfig.watchIgnoredRegex;
+
+  } catch (e) {
+    config.logger.error(e);
+  }
 }

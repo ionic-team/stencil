@@ -1,10 +1,10 @@
-import { BuildConfig, BuildContext, BuildConditionals, SourceTarget } from '../../util/interfaces';
+import { BuildConfig, BuildContext, BuildConditionals } from '../../util/interfaces';
 import { buildCoreContent } from './build-core-content';
 import { generatePreamble, pathJoin } from '../util';
-import { getAppPublicPath, getAppFileName, getAppDistDir, getAppWWWBuildDir, getCoreFilename } from './app-file-naming';
+import { getAppPublicPath, getAppDistDir, getAppWWWBuildDir, getCoreFilename } from './app-file-naming';
 
 
-export async function generateCore(config: BuildConfig, ctx: BuildContext, sourceTarget: SourceTarget, globalJsContent: string, buildConditionals: BuildConditionals) {
+export async function generateCore(config: BuildConfig, ctx: BuildContext, globalJsContent: string, buildConditionals: BuildConditionals) {
   // mega-minify the core w/ property renaming, but not the user's globals
   // hardcode which features should and should not go in the core builds
   // process the transpiled code by removing unused code and minify when configured to do so
@@ -19,7 +19,7 @@ export async function generateCore(config: BuildConfig, ctx: BuildContext, sourc
   }
 
   // wrap the core js code together
-  jsContent = wrapCoreJs(config, sourceTarget, jsContent);
+  jsContent = wrapCoreJs(config, jsContent);
 
   if (buildConditionals.polyfills) {
     // this build wants polyfills so let's
@@ -38,7 +38,7 @@ export async function generateCore(config: BuildConfig, ctx: BuildContext, sourc
   ctx.appFiles[buildConditionals.coreId] = jsContent;
 
   // update the app core filename within the content
-  jsContent = jsContent.replace(APP_NAMESPACE_PLACEHOLDER, getAppFileName(config));
+  jsContent = jsContent.replace(APP_NAMESPACE_PLACEHOLDER, config.fsNamespace);
 
   if (config.generateWWW) {
     // write the www/build/ app core file
@@ -56,11 +56,11 @@ export async function generateCore(config: BuildConfig, ctx: BuildContext, sourc
 }
 
 
-export function wrapCoreJs(config: BuildConfig, sourceTarget: SourceTarget, jsContent: string) {
+export function wrapCoreJs(config: BuildConfig, jsContent: string) {
   const publicPath = getAppPublicPath(config);
 
   const output = [
-    generatePreamble(config, sourceTarget),
+    generatePreamble(config) + '\n',
     `(function(Context,appNamespace,hydratedCssClass,publicPath){`,
     `"use strict";\n`,
     `var s=document.querySelector("script[data-namespace='${APP_NAMESPACE_PLACEHOLDER}']");`,
@@ -92,7 +92,7 @@ export function getCorePolyfills(config: BuildConfig) {
 
   return Promise.all(readFilePromises).then(results => {
     // concat the polyfills
-    return generatePreamble(config, 'es5') + results.join('\n').trim();
+    return results.join('\n').trim();
   });
 }
 

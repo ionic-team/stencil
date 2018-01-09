@@ -1,13 +1,14 @@
-import { BuildContext, ComponentMeta, BuildConditionals, ManifestBundle } from '../../util/interfaces';
+import { BuildContext, ComponentMeta, BuildConditionals, Bundle } from '../../util/interfaces';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
-export function setBuildConditionals(ctx: BuildContext, manifestBundles: ManifestBundle[]) {
+export function setBuildConditionals(ctx: BuildContext, bundles: Bundle[]) {
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
+  coreBuild.clientSide = true;
 
-  manifestBundles.forEach(manifestBundle => {
-    manifestBundle.moduleFiles.forEach(moduleFile => {
+  bundles.forEach(bundle => {
+    bundle.moduleFiles.forEach(moduleFile => {
       if (moduleFile.cmpMeta) {
         setBuildFromComponentMeta(coreBuild, moduleFile.cmpMeta);
         setBuildFromComponentContent(coreBuild, ctx.jsFiles[moduleFile.jsFilePath]);
@@ -26,15 +27,12 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
     coreBuild.shadowDom = true;
   }
 
-  if (cmpMeta.slotMeta) {
-    coreBuild.slot = true;
-  }
-
   if (cmpMeta.membersMeta) {
     const memberNames = Object.keys(cmpMeta.membersMeta);
     memberNames.forEach(memberName => {
-      const memberType = cmpMeta.membersMeta[memberName].memberType;
-      const propType = cmpMeta.membersMeta[memberName].propType;
+      const memberMeta = cmpMeta.membersMeta[memberName];
+      const memberType = memberMeta.memberType;
+      const propType = memberMeta.propType;
 
       if (memberType === MEMBER_TYPE.Prop || memberType === MEMBER_TYPE.PropMutable) {
         if (propType === PROP_TYPE.String || propType === PROP_TYPE.Number || propType === PROP_TYPE.Boolean || propType === PROP_TYPE.Any) {
@@ -53,15 +51,11 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
       } else if (memberType === MEMBER_TYPE.Element) {
         coreBuild.element = true;
       }
+
+      if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length > 0) {
+        coreBuild.watchCallback = true;
+      }
     });
-  }
-
-  if (cmpMeta.propsDidChangeMeta && cmpMeta.propsDidChangeMeta.length > 0) {
-    coreBuild.didChange = true;
-  }
-
-  if (cmpMeta.propsWillChangeMeta && cmpMeta.propsWillChangeMeta.length > 0) {
-    coreBuild.willChange = true;
   }
 
   if (cmpMeta.eventsMeta && cmpMeta.eventsMeta.length) {

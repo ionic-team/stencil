@@ -1,4 +1,4 @@
-import { AppRegistry, BuildConfig, BuildContext, LoadComponentRegistry } from '../../../util/interfaces';
+import { AppRegistry, BuildConfig, BuildContext, ComponentRegistry, LoadComponentRegistry } from '../../../util/interfaces';
 import { generateLoader, injectAppIntoLoader } from '../app-loader';
 import { generatePreamble } from '../../util';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
@@ -11,13 +11,16 @@ describe('build-project-files', () => {
   beforeEach(() => {
     mockStencilContent = `('__APP__')`;
     config = {
+      namespace: 'MyApp',
+      fsNamespace: 'my-app',
       logger: mockLogger(),
       sys: mockStencilSystem(),
-      hydratedCssClass: 'hydrated'
+      hydratedCssClass: 'hydrated',
+      publicPath: 'build'
     };
   });
 
-  describe('inject project', () => {
+  describe('injectAppIntoLoader', () => {
     let mockMinify: jest.Mock<any>;
     beforeEach(() => {
       mockMinify = jest.fn();
@@ -26,17 +29,26 @@ describe('build-project-files', () => {
     });
 
     it('should set the loader arguments', () => {
-      const loadCmp: any = ['my-app', { Mode1: 'something', Mode2: 'Something Else' }, false, null, null, null, null, null];
-      const projectLoader = callInjectAppIntoLoader({
-        componentRegistry: [loadCmp]
-      });
-      expect(projectLoader).toBe(`("MyApp","build/myapp/","myapp.core.js","myapp.core.ssr.js","myapp.core.pf.js",[["my-app",{"Mode1":"something","Mode2":"Something Else"},false,null,null,null,null,null]])`);
-    });
+      const cmpRegistry: ComponentRegistry = {
+        'root-cmp': {
+          bundleIds: {
+            Mode1: 'abc',
+            Mode2: 'def',
+          }
+        }
+      };
 
-    it('only replaces the magic string', () => {
-      mockStencilContent = `(This is bogus text'__APP__'yeah, me too)`;
-      const projectLoader = callInjectAppIntoLoader();
-      expect(projectLoader).toBe(`(This is bogus text"MyApp","build/myapp/","myapp.core.js","myapp.core.ssr.js","myapp.core.pf.js",[]yeah, me too)`);
+      const appLoader = injectAppIntoLoader(
+        config,
+        'my-app.core.js',
+        'my-app.core.ssr.js',
+        'my-app.core.pf.js',
+        'hydrated-css',
+        cmpRegistry,
+        `("__APP__")`
+      );
+
+      expect(appLoader).toBe(`("MyApp","build/my-app/","my-app.core.js","my-app.core.ssr.js","my-app.core.pf.js","hydrated-css",[["root-cmp",{"Mode1":"abc","Mode2":"def"}]])`);
     });
 
   });
@@ -49,9 +61,9 @@ describe('build-project-files', () => {
       config.sys.getClientCoreFile = mockGetClientCoreFile;
     });
 
-    it('gets the client core minified file', () => {
+    it('gets the client core minified file', async () => {
       config.minifyJs = true;
-      callGenerateLoader();
+      await callGenerateLoader();
       expect(mockGetClientCoreFile.mock.calls.length).toEqual(1);
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'loader.js' });
     });
@@ -60,37 +72,17 @@ describe('build-project-files', () => {
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
       const res = await callGenerateLoader();
       let lines = res.split('\n');
-      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.ssr.js","myapp.core.pf.js",[]) yeah me too`);
+      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.ssr.js","myapp.core.pf.js","hydrated",[]) yeah me too`);
     });
   });
-
-  function callInjectAppIntoLoader(params?: {
-    namespace?: string,
-    publicPath?: string,
-    appCoreFileName?: string,
-    appCoreSsrFileName?: string,
-    appCorePolyfillFileName?: string,
-    componentRegistry?: Array<LoadComponentRegistry>
-  }): string {
-    let p = params || {};
-    config.namespace = 'MyApp';
-    config.publicPath = 'build/';
-    return injectAppIntoLoader(
-      config,
-      p.appCoreFileName || 'myapp.core.js',
-      p.appCoreSsrFileName || 'myapp.core.ssr.js',
-      p.appCorePolyfillFileName || 'myapp.core.pf.js',
-      p.componentRegistry || [],
-      mockStencilContent
-    );
-  }
 
   async function callGenerateLoader(params?: {
     namespace?: string,
     publicPath?: string,
-    componentRegistry?: Array<LoadComponentRegistry>
+    componentRegistry?: ComponentRegistry
   }) {
     config.namespace = 'MyApp';
+    config.fsNamespace = config.namespace.toLowerCase();
     config.publicPath = 'build/';
 
     let ctx: BuildContext = { appFiles: {} };
@@ -99,14 +91,16 @@ describe('build-project-files', () => {
       core: 'myapp.core.js',
       coreSsr: 'myapp.core.ssr.js',
       corePolyfilled: 'myapp.core.pf.js',
-      components: [],
-      namespace: config.namespace
+      components: {},
+      namespace: config.namespace,
+      fsNamespace: config.fsNamespace
     };
 
     return await generateLoader(
       config,
       ctx,
-      appRegistry
+      appRegistry,
+      (params && params.componentRegistry) || {}
     );
   }
 
