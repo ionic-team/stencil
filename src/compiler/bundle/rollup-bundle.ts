@@ -14,7 +14,7 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, mod: Mod
     input: mod.id,
     cache: ctx.rollupCache[mod.id],
     external: (id: string) => {
-      return mod.external(id, config.sys.path.dirname(mod.id));
+      return mod.external(id);
     },
     plugins: [
       config.sys.rollup.plugins.nodeResolve({

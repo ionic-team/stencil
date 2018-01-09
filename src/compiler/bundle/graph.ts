@@ -57,7 +57,7 @@ export class Module {
     this.srcs = srcs.slice();
   }
 
-  external(id: string, pwd: string = '.') {
+  external(id: string) {
     if (id === this.id) {
       return false;
     }
