@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.1.1-0",
+  "version": "0.1.2",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,12 +10,13 @@
   "files": [
     "bin/",
     "dist/",
-    "compiler.js",
-    "server.js",
-    "testing.js"
+    "compiler/",
+    "server/",
+    "sys/",
+    "testing/"
   ],
   "scripts": {
-    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run build.sys.node && npm run prepare.package",
+    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run build.sys.node && npm run submodules.create",
     "build.cli": "tsc -p src/cli/tsconfig.json && node scripts/build-cli.js",
     "build.compiler": "tsc -p src/compiler/tsconfig.json && node scripts/build-compiler.js",
     "build.core": "tsc -p src/tsconfig.json && node scripts/build-loader.js && node scripts/build-core.js",
@@ -28,7 +29,7 @@
     "clean": "rimraf dist/",
     "deploy": "node scripts/deploy.js",
     "prepare.deploy": "node scripts/deploy.js --prepare",
-    "prepare.package": "node scripts/prepare-package.js",
+    "submodules.create": "node scripts/submodules.js",
     "set.version": "node scripts/set-version.js",
     "start": "npm install && npm run build",
     "test": "jest --no-cache",
@@ -38,7 +39,7 @@
     "chokidar": "1.7.0",
     "jsdom": "11.5.1",
     "node-sass": "4.7.2",
-    "rollup": "^0.53.3",
+    "rollup": "0.53.2",
     "rollup-plugin-commonjs": "8.2.6",
     "rollup-plugin-node-resolve": "3.0.0",
     "typescript": "^2.6.2",

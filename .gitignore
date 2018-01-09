@@ -17,6 +17,7 @@ node_modules/
 **/www/build/
 
 # submodule packages
-/compiler.js
-/server.js
-/testing.js
+/compiler
+/server
+/sys
+/testing

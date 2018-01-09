@@ -1,3 +1,35 @@
+<a name="0.1.2"></a>
+## [0.1.2](https://github.com/ionic-team/stencil/compare/v0.1.1...v0.1.2) (2018-01-09)
+
+### Bug Fixes
+
+* Call `@Watch` after property has been set
+* Fix submodule references, such as `@stencil/core/tesing`
+
+
+<a name="0.1.1"></a>
+## [0.1.1](https://github.com/ionic-team/stencil/compare/v0.1.1-0...v0.1.1) (2018-01-09)
+
+### Features
+
+* Component output is now an ES module.
+* Dynamic `import()` instead of global jsonp callbacks.
+* ES5 and jsonp callback modules are still built for IE11 and server-side rendering.
+* Component metadata is now stored within `static` properties on the component class.
+
+### Breaking Changes
+
+* `@Watch` decorator has replaced both `@PropWillChange` and `@PropDidChange`. Previous decorators will continue to work.
+
+
+### Bug Fixes
+
+* **loader:** fix incorrect feature detection ([db277a1](https://github.com/ionic-team/stencil/commit/db277a1))
+* **serviceworker:** updating to workbox 3.0 ([63b2f1c](https://github.com/ionic-team/stencil/commit/63b2f1c))
+* **testing:** fix preprocessor to only process .tsx files w/ transforms, .ts with vanilla typescript, and .d.ts to be ignored ([80f4d49](https://github.com/ionic-team/stencil/commit/80f4d49))
+
+
+
 <a name="0.1.1-0"></a>
 ## [0.1.1-0](https://github.com/ionic-team/stencil/compare/v0.1.0...v0.1.1-0) (2017-12-22)
 

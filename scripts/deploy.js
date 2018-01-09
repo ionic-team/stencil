@@ -10,7 +10,6 @@ const readPkgUp = require('read-pkg-up');
 const path = require('path');
 const rimraf = require('rimraf');
 const semver = require('semver');
-const tar = require('tar');
 
 
 const rootDir = path.join(__dirname, '../');
@@ -53,70 +52,73 @@ function runTasks(opts) {
     )
   }
 
-  if (opts.prepare || opts.publish) {
-    tasks.push(
-      {
-        title: 'Check npm version',
-        skip: () => isVersionLower('6.0.0', process.version),
-        task: () => execa.stdout('npm', ['version', '--json']).then(json => {
-          const versions = JSON.parse(json);
-          if (!satisfies(versions.npm, '>=2.15.8 <3.0.0 || >=3.10.1')) {
-            throw new Error(`npm@${versions.npm} has known issues publishing when running Node.js 6. Please upgrade npm or downgrade Node and publish again. https://github.com/npm/npm/issues/5082`);
-          }
+  tasks.push(
+    {
+      title: 'Check npm version',
+      skip: () => isVersionLower('6.0.0', process.version),
+      task: () => execa.stdout('npm', ['version', '--json']).then(json => {
+        const versions = JSON.parse(json);
+        if (!satisfies(versions.npm, '>=2.15.8 <3.0.0 || >=3.10.1')) {
+          throw new Error(`npm@${versions.npm} has known issues publishing when running Node.js 6. Please upgrade npm or downgrade Node and publish again. https://github.com/npm/npm/issues/5082`);
+        }
+      })
+    },
+    {
+      title: 'Check git tag existence',
+      task: () => execa('git', ['fetch'])
+        .then(() => {
+          return execa.stdout('npm', ['config', 'get', 'tag-version-prefix']);
         })
-      },
-      {
-        title: 'Check git tag existence',
-        task: () => execa('git', ['fetch'])
-          .then(() => {
-            return execa.stdout('npm', ['config', 'get', 'tag-version-prefix']);
-          })
-          .then(
-            output => {
-              tagPrefix = output;
-            },
-            () => {}
-          )
-          .then(() => execa.stdout('git', ['rev-parse', '--quiet', '--verify', `refs/tags/${tagPrefix}${newVersion}`]))
-          .then(
-            output => {
-              if (output) {
-                throw new Error(`Git tag \`${tagPrefix}${newVersion}\` already exists.`);
-              }
-            },
-            err => {
-              // Command fails with code 1 and no output if the tag does not exist, even though `--quiet` is provided
-              // https://github.com/sindresorhus/np/pull/73#discussion_r72385685
-              if (err.stdout !== '' || err.stderr !== '') {
-                throw err;
-              }
+        .then(
+          output => {
+            tagPrefix = output;
+          },
+          () => {}
+        )
+        .then(() => execa.stdout('git', ['rev-parse', '--quiet', '--verify', `refs/tags/${tagPrefix}${newVersion}`]))
+        .then(
+          output => {
+            if (output) {
+              throw new Error(`Git tag \`${tagPrefix}${newVersion}\` already exists.`);
             }
-          )
-      },
-      {
-        title: 'Check current branch',
-        task: () => execa.stdout('git', ['symbolic-ref', '--short', 'HEAD']).then(branch => {
-          if (branch !== 'master') {
-            throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
+          },
+          err => {
+            // Command fails with code 1 and no output if the tag does not exist, even though `--quiet` is provided
+            // https://github.com/sindresorhus/np/pull/73#discussion_r72385685
+            if (err.stdout !== '' || err.stderr !== '') {
+              throw err;
+            }
           }
-        })
-      },
-      {
-        title: 'Check local working tree',
-        task: () => execa.stdout('git', ['status', '--porcelain']).then(status => {
-          if (status !== '') {
-            throw new Error('Unclean working tree. Commit or stash changes first.');
-          }
-        })
-      },
-      {
-        title: 'Check remote history',
-        task: () => execa.stdout('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(result => {
-          if (result !== '0') {
-            throw new Error('Remote history differs. Please pull changes.');
-          }
-        })
-      },
+        )
+    },
+    {
+      title: 'Check current branch',
+      task: () => execa.stdout('git', ['symbolic-ref', '--short', 'HEAD']).then(branch => {
+        if (branch !== 'master') {
+          throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
+        }
+      })
+    },
+    {
+      title: 'Check local working tree',
+      task: () => execa.stdout('git', ['status', '--porcelain']).then(status => {
+        if (status !== '') {
+          throw new Error('Unclean working tree. Commit or stash changes first.');
+        }
+      })
+    },
+    {
+      title: 'Check remote history',
+      task: () => execa.stdout('git', ['rev-list', '--count', '--left-only', '@{u}...HEAD']).then(result => {
+        if (result !== '0') {
+          throw new Error('Remote history differs. Please pull changes.');
+        }
+      })
+    }
+  );
+
+  if (opts.prepare) {
+    tasks.push(
       {
         title: 'Cleanup',
         task: () => new Promise((resolve, reject) => {
@@ -130,26 +132,21 @@ function runTasks(opts) {
       },
       {
         title: 'Install npm dependencies',
-        task: () => execa('npm', ['install', '--no-package-lock'], { cwd: rootDir }),
+        task: () => execa('npm', ['install'], { cwd: rootDir }),
       }
-    )
+    );
   }
 
   tasks.push(
     {
       title: 'Build @stencil/core',
       task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
+    },
+    {
+      title: 'Run tests',
+      task: () => execa('npm', ['test'], { cwd: rootDir })
     }
   );
-
-  if (opts.prepare || opts.publish) {
-    tasks.push(
-      {
-        title: 'Run tests',
-        task: () => execa('npm', ['test'], { cwd: rootDir })
-      }
-    );
-  }
 
   if (opts.prepare){
     tasks.push(
@@ -165,7 +162,6 @@ function runTasks(opts) {
   }
 
   if (opts.publish) {
-    publish
     tasks.push(
       {
         title: 'Publish @stencil/core',
@@ -405,13 +401,10 @@ function prettyVersionDiff(oldVersion, inc) {
   return output.join(chalk.reset.dim('.'));
 }
 
-let prepare = process.argv.slice(2).indexOf('--prepare') > -1;
-let publish = !prepare && process.argv.slice(2).indexOf('--dry-run') === -1;
+const prepare = process.argv.slice(2).indexOf('--prepare') > -1;
 
 if (prepare) {
   prepareUI();
-} else if (publish) {
-  publishUI();
 } else {
-  runTasks({ prepare: false, publish: false, version: '0.0.1-test', tag: 'test' });
+  publishUI();
 }

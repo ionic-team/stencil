@@ -133,7 +133,7 @@ export function defineMember(
 }
 
 
-export function setValue(plt: PlatformApi, elm: HostElement, memberName: string, newVal: any, internalValues?: any) {
+export function setValue(plt: PlatformApi, elm: HostElement, memberName: string, newVal: any, internalValues?: any, instance?: any, watchMethods?: string[]) {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
   internalValues = (elm._values = elm._values || {});
@@ -143,32 +143,36 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
   // check our new property value against our internal value
   if (newVal !== oldVal) {
     // gadzooks! the property's value has changed!!
-    if (Build.watchCallback && elm._values[WATCH_CB_PREFIX + memberName]) {
-      // this instance is watching for when this property changed
-      callWatchMethods(elm._values[WATCH_CB_PREFIX + memberName], elm._instance, newVal, oldVal);
-    }
 
     // set our new value!
     // https://youtu.be/dFtLONl4cNc?t=22
     internalValues[memberName] = newVal;
 
-    if (elm._instance && !plt.activeRender) {
-      // looks like this value actually changed, so we've got work to do!
-      // but only if we've already created an instance, otherwise just chill out
-      // queue that we need to do an update, but don't worry about queuing
-      // up millions cuz this function ensures it only runs once
-      queueUpdate(plt, elm);
-    }
-  }
-}
+    instance = elm._instance;
 
+    if (instance) {
+      // get an array of method names of watch functions to call
+      watchMethods = internalValues[WATCH_CB_PREFIX + memberName];
 
-function callWatchMethods(changeMethods: string[], instance: any, newVal: any, oldVal: any, i?: number) {
-  for (i = 0; i < changeMethods.length; i++) {
-    try {
-      instance && instance[changeMethods[i]].call(instance, newVal, oldVal);
-    } catch (e) {
-      console.error(e);
+      if (Build.watchCallback && watchMethods) {
+        // this instance is watching for when this property changed
+        for (let i = 0; i < watchMethods.length; i++) {
+          try {
+            // fire off each of the watch methods that are watching this property
+            instance[watchMethods[i]].call(instance, newVal, oldVal);
+          } catch (e) {
+            console.error(e);
+          }
+        }
+      }
+
+      if (!plt.activeRender) {
+        // looks like this value actually changed, so we've got work to do!
+        // but only if we've already created an instance, otherwise just chill out
+        // queue that we need to do an update, but don't worry about queuing
+        // up millions cuz this function ensures it only runs once
+        queueUpdate(plt, elm);
+      }
     }
   }
 }

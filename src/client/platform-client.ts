@@ -165,11 +165,9 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
             cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
           }
 
-          if (Build.styles) {
-            // initialize this components styles
-            // it is possible for the same component to have difficult styles applied in the same app
-            initStyleTemplate(domApi, cmpMeta.componentConstructor);
-          }
+          // initialize this components styles
+          // it is possible for the same component to have difficult styles applied in the same app
+          initStyleTemplate(domApi, cmpMeta.componentConstructor);
 
         } catch (e) {
           // oh man, something's up
