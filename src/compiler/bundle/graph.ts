@@ -14,7 +14,6 @@
  * the License.
  */
 
-import * as path from 'path';
 import { GraphData } from '../../util/interfaces';
 
 
@@ -70,8 +69,7 @@ export class Module {
       // this is an unknown/unsupported module, it's definitely an extern
       return true;
     }
-    const rel = './' + path.relative(pwd, id);
-    return (this.srcs.indexOf(rel) === -1);
+    return (this.srcs.indexOf(id) === -1);
   }
 }
 

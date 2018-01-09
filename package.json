@@ -38,7 +38,7 @@
     "chokidar": "1.7.0",
     "jsdom": "11.5.1",
     "node-sass": "4.7.2",
-    "rollup": "0.53.2",
+    "rollup": "^0.53.3",
     "rollup-plugin-commonjs": "8.2.6",
     "rollup-plugin-node-resolve": "3.0.0",
     "typescript": "^2.6.2",
