@@ -1,5 +1,5 @@
 {
   "name": "@stencil/core/sys/node",
   "private": true,
-  "main": "./index.js"
+  "main": "../../dist/sys/node/index.js"
 }
