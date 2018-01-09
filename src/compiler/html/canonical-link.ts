@@ -1,8 +1,8 @@
-import { BuildConfig } from '../../util/interfaces';
+import { BuildConfig, HydrateResults } from '../../util/interfaces';
 
 
-export function insertCanonicalLink(config: BuildConfig, doc: Document, url: string) {
-  if (!url) return;
+export function insertCanonicalLink(config: BuildConfig, doc: Document, results: HydrateResults) {
+  if (!results.path) return;
 
   // https://webmasters.googleblog.com/2009/02/specify-your-canonical.html
   // <link rel="canonical" href="http://www.example.com/product.php?item=swedish-fish" />
@@ -10,11 +10,11 @@ export function insertCanonicalLink(config: BuildConfig, doc: Document, url: str
   let canonicalLink = doc.querySelector('link[rel="canonical"]');
   if (canonicalLink) return;
 
-  const parsedUrl = config.sys.url.parse(url);
-
   canonicalLink = doc.createElement('link');
   canonicalLink.setAttribute('rel', 'canonical');
-  canonicalLink.setAttribute('href', parsedUrl.path);
+  canonicalLink.setAttribute('href', results.path);
+
+  config.logger.debug(`add cononical link: ${results.path}`);
 
   doc.head.appendChild(canonicalLink);
 }

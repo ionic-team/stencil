@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, FilesMap, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { BuildConfig, BuildContext, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineLoaderScript } from './inline-loader-script';
 import { inlineComponentStyles } from '../css/inline-styles';
@@ -6,12 +6,12 @@ import { inlineExternalAssets } from './inline-external-assets';
 import { insertCanonicalLink } from './canonical-link';
 
 
-export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, results: HydrateResults) {
+export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
   setHtmlDataSsrAttr(doc);
 
   if (opts.canonicalLink !== false) {
     try {
-      insertCanonicalLink(config, doc, results.url);
+      insertCanonicalLink(config, doc, results);
 
     } catch (e) {
       results.diagnostics.push({
@@ -25,7 +25,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
   if (opts.inlineStyles !== false) {
     try {
-      inlineComponentStyles(config, doc, stylesMap, opts, results.diagnostics);
+      inlineComponentStyles(config, doc, styles, results, results.diagnostics);
 
     } catch (e) {
       results.diagnostics.push({
@@ -41,7 +41,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     // remove the script to the external loader script request
     // inline the loader script at the bottom of the html
     try {
-      inlineLoaderScript(config, ctx, doc);
+      inlineLoaderScript(config, ctx, doc, results);
 
     } catch (e) {
       results.diagnostics.push({
@@ -55,7 +55,7 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
 
   if (opts.inlineAssetsMaxSize > 0) {
     try {
-      inlineExternalAssets(config, ctx, opts, doc);
+      inlineExternalAssets(config, ctx, results, doc);
 
     } catch (e) {
       results.diagnostics.push({
@@ -67,9 +67,10 @@ export function optimizeHtml(config: BuildConfig, ctx: BuildContext, doc: Docume
     }
   }
 
-  if (opts.collapseWhitespace !== false && !config.devMode) {
+  if (opts.collapseWhitespace !== false && !config.devMode && config.logger.level !== 'debug') {
     // collapseWhitespace is the default
     try {
+      config.logger.debug(`optimize ${results.pathname}, collapse html whitespace`);
       collapseHtmlWhitepace(doc.documentElement);
 
     } catch (e) {

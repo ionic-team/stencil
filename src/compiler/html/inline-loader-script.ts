@@ -1,33 +1,30 @@
-import { BuildConfig, BuildContext } from '../../util/interfaces';
-import { getAppFileName } from '../app/app-file-naming';
+import { BuildConfig, BuildContext, HydrateResults } from '../../util/interfaces';
+import { getLoaderFileName, getLoaderWWW } from '../app/app-file-naming';
 
 
-export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document) {
-  if (!ctx.appFiles || !ctx.appFiles.loader) {
-    // don't bother if we don't have good loader content for whatever reason
-    return;
-  }
-
+export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document, results: HydrateResults) {
   // create the script url we'll be looking for
   let loaderExternalSrcUrl = config.publicPath;
   if (loaderExternalSrcUrl.charAt(loaderExternalSrcUrl.length - 1) !== '/') {
     loaderExternalSrcUrl += '/';
   }
-  loaderExternalSrcUrl += getAppFileName(config) + '.js';
+  loaderExternalSrcUrl += getLoaderFileName(config);
 
-  // remove the app loader script url request
-  const removedLoader = removeExternalLoaderScript(doc, loaderExternalSrcUrl);
+  // find the external loader script
+  // which is usually in the <head> and a pretty small external file
+  // now that we're prerendering the html, and all the styles and html
+  // will get hardcoded in the output, it's safe to now put the
+  // loader script at the bottom of <body>
+  const scriptElm = findExternalLoaderScript(doc, loaderExternalSrcUrl);
 
-  if (removedLoader) {
-    // append the loader script content to the bottom of the document
-    appendInlineLoaderScript(ctx, doc);
+  if (scriptElm) {
+    // append the loader script content to the bottom of <body>
+    relocateInlineLoaderScript(config, ctx, doc, results, scriptElm);
   }
 }
 
 
-function removeExternalLoaderScript(doc: Document, loaderExternalSrcUrl: string) {
-  let removedLoader = false;
-
+function findExternalLoaderScript(doc: Document, loaderExternalSrcUrl: string) {
   const scriptElements = doc.getElementsByTagName('script');
 
   for (var i = 0; i < scriptElements.length; i++) {
@@ -35,21 +32,51 @@ function removeExternalLoaderScript(doc: Document, loaderExternalSrcUrl: string)
       // this is a script element with a src attribute which is
       // pointing to the app's external loader script
       // remove the script from the document, be gone with you
-      scriptElements[i].parentNode.removeChild(scriptElements[i]);
-      removedLoader = true;
+      //
+      return scriptElements[i];
     }
   }
 
-  return removedLoader;
+  return null;
 }
 
 
-function appendInlineLoaderScript(ctx: BuildContext, doc: Document) {
-  // now that we've removed the external script
-  // let's add the loader script back in, except let's
-  // inline the js directly into the document
-  // and append it as the last child in the body
-  const scriptElm = doc.createElement('script');
-  scriptElm.innerHTML = ctx.appFiles.loader;
+function relocateInlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
+  // get the file path
+  const appLoaderWWW = getLoaderWWW(config);
+
+  // get the loader content
+  let content = ctx.appFiles[appLoaderWWW];
+  if (!content) {
+    // didn't find a cached version
+    try {
+      // let's look it up directly
+      content = config.sys.fs.readFileSync(appLoaderWWW, 'utf-8');
+
+      // cool we found content, let's cache it for later
+      ctx.appFiles[appLoaderWWW] = content;
+
+    } catch (e) {
+      config.logger.debug(`unable to inline loader: ${appLoaderWWW}`, e);
+    }
+  }
+
+  if (!content) {
+    // didn't get good loader content, don't bother
+    return;
+  }
+
+  config.logger.debug(`optimize ${results.pathname}, inline loader`);
+
+  // remove the external src
+  scriptElm.removeAttribute('src');
+
+  // inline the js content
+  scriptElm.innerHTML = content;
+
+  // remove the script element from where it's currently at in the dom
+  scriptElm.parentNode.removeChild(scriptElm);
+
+  // place it back in the dom, but at the bottom of the body
   doc.body.appendChild(scriptElm);
 }

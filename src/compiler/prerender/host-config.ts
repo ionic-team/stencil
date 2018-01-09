@@ -1,24 +1,24 @@
-import { BuildConfig, BuildContext, HostConfig, HostRule, HostRuleHeader, HydrateComponent, ManifestBundle, PrerenderResult, ServiceWorkerConfig } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, ServiceWorkerConfig } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { getBundleFileName, getAppWWWBuildDir } from '../app/app-file-naming';
+import { getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { pathJoin, readFile } from '../util';
 
 
-export async function generateHostConfig(config: BuildConfig, ctx: BuildContext, prerenderResults: PrerenderResult[]) {
+export async function generateHostConfig(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], hydrateResultss: HydrateResults[]) {
   const hostConfig: HostConfig = {
     hosting: {
       rules: []
     }
   };
 
-  prerenderResults = prerenderResults.sort((a, b) => {
+  hydrateResultss = hydrateResultss.sort((a, b) => {
     if (a.url.toLowerCase() < b.url.toLowerCase()) return -1;
     if (a.url.toLowerCase() > b.url.toLowerCase()) return 1;
     return 0;
   });
 
-  prerenderResults.forEach(prerenderResult => {
-    const hostRule = generateHostRule(config, ctx, prerenderResult);
+  hydrateResultss.forEach(hydrateResults => {
+    const hostRule = generateHostRule(config, ctx, bundles, hydrateResults);
     if (hostRule) {
       hostConfig.hosting.rules.push(hostRule);
     }
@@ -34,10 +34,10 @@ export async function generateHostConfig(config: BuildConfig, ctx: BuildContext,
 }
 
 
-export function generateHostRule(config: BuildConfig, ctx: BuildContext, prerenderResult: PrerenderResult) {
+export function generateHostRule(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], hydrateResults: HydrateResults) {
   const hostRule: HostRule = {
-    include: prerenderResult.path,
-    headers: generateHostRuleHeaders(config, ctx, prerenderResult)
+    include: hydrateResults.path,
+    headers: generateHostRuleHeaders(config, ctx, bundles, hydrateResults)
   };
 
   if (hostRule.headers.length === 0) {
@@ -48,14 +48,14 @@ export function generateHostRule(config: BuildConfig, ctx: BuildContext, prerend
 }
 
 
-export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, prerenderResult: PrerenderResult) {
+export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], hydrateResults: HydrateResults) {
   const hostRuleHeaders: HostRuleHeader[] = [];
 
-  addStyles(config, hostRuleHeaders, prerenderResult);
+  addStyles(config, hostRuleHeaders, hydrateResults);
   addCoreJs(config, ctx.appCoreWWWPath, hostRuleHeaders);
-  addBundles(config, ctx.manifestBundles, hostRuleHeaders, prerenderResult.components);
-  addScripts(config, hostRuleHeaders, prerenderResult);
-  addImgs(config, hostRuleHeaders, prerenderResult);
+  addBundles(config, bundles, hostRuleHeaders, hydrateResults.components);
+  addScripts(config, hostRuleHeaders, hydrateResults);
+  addImgs(config, hostRuleHeaders, hydrateResults);
 
   return hostRuleHeaders;
 }
@@ -68,10 +68,10 @@ function addCoreJs(config: BuildConfig, appCoreWWWPath: string, hostRuleHeaders:
 }
 
 
-export function addBundles(config: BuildConfig, manifestBundles: ManifestBundle[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
+export function addBundles(config: BuildConfig, bundles: Bundle[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
   components = sortComponents(components);
 
-  const bundleIds = getBundleIds(manifestBundles, components);
+  const bundleIds = getBundleIds(bundles, components);
 
   bundleIds.forEach(bundleId => {
     if (hostRuleHeaders.length < MAX_LINK_REL_PRELOAD_COUNT) {
@@ -83,11 +83,11 @@ export function addBundles(config: BuildConfig, manifestBundles: ManifestBundle[
 }
 
 
-export function getBundleIds(manifestBundles: ManifestBundle[], components: HydrateComponent[]) {
+export function getBundleIds(bundles: Bundle[], components: HydrateComponent[]) {
   const bundleIds: string[] = [];
 
   components.forEach(cmp => {
-    manifestBundles.forEach(mb => {
+    bundles.forEach(mb => {
       const moduleFile = mb.moduleFiles.find(mf => mf.cmpMeta && mf.cmpMeta.tagNameMeta === cmp.tag);
       if (!moduleFile) {
         return;
@@ -98,11 +98,9 @@ export function getBundleIds(manifestBundles: ManifestBundle[], components: Hydr
         bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE];
       }
 
-      if (!bundleId || !bundleId.es2015 || bundleIds.indexOf(bundleId.es2015) > -1) {
-        return;
+      if (bundleId && bundleIds.indexOf(bundleId) === -1) {
+        bundleIds.push(bundleId);
       }
-
-      bundleIds.push(bundleId.es2015);
     });
   });
 
@@ -111,7 +109,7 @@ export function getBundleIds(manifestBundles: ManifestBundle[], components: Hydr
 
 
 function getBundleUrl(config: BuildConfig, bundleId: string) {
-  const unscopedFileName = getBundleFileName(bundleId, false);
+  const unscopedFileName = getBundleFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), unscopedFileName);
   return pathJoin(config, '/', config.sys.path.relative(config.wwwDir, unscopedWwwBuildPath));
 }
@@ -130,42 +128,42 @@ export function sortComponents(components: HydrateComponent[]) {
 }
 
 
-function addStyles(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], prerenderResult: PrerenderResult) {
-  prerenderResult.styleUrls.forEach(styleUrl => {
+function addStyles(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
+  hydrateResults.styleUrls.forEach(styleUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
     const url = config.sys.url.parse(styleUrl);
-    if (url.hostname === prerenderResult.hostname) {
+    if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
   });
 }
 
 
-function addScripts(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], prerenderResult: PrerenderResult) {
-  prerenderResult.scriptUrls.forEach(scriptUrl => {
+function addScripts(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
+  hydrateResults.scriptUrls.forEach(scriptUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
     const url = config.sys.url.parse(scriptUrl);
-    if (url.hostname === prerenderResult.hostname) {
+    if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
   });
 }
 
 
-function addImgs(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], prerenderResult: PrerenderResult) {
-  prerenderResult.imgUrls.forEach(imgUrl => {
+function addImgs(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
+  hydrateResults.imgUrls.forEach(imgUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
     }
 
     const url = config.sys.url.parse(imgUrl);
-    if (url.hostname === prerenderResult.hostname) {
+    if (url.hostname === hydrateResults.hostname) {
       hostRuleHeaders.push(formatLinkRelPreloadHeader(url.path));
     }
   });

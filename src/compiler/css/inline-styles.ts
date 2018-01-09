@@ -1,28 +1,22 @@
-import { BuildConfig, Diagnostic, FilesMap, HydrateOptions } from '../../util/interfaces';
+import { BuildConfig, Diagnostic, HydrateResults } from '../../util/interfaces';
 import { removeUnusedStyles } from './remove-unused-styles';
 import { UsedSelectors } from '../html/used-selectors';
 
 
-export function inlineComponentStyles(config: BuildConfig, doc: Document, stylesMap: FilesMap, opts: HydrateOptions, diagnostics: Diagnostic[]) {
-  const styleFileNames = Object.keys(stylesMap);
-
-  if (!styleFileNames.length) {
+export function inlineComponentStyles(config: BuildConfig, doc: Document, styles: string[], results: HydrateResults, diagnostics: Diagnostic[]) {
+  if (!styles.length) {
     return;
   }
 
-  let styles: string[] = [];
-
-  if (opts.removeUnusedStyles !== false) {
+  if (results.opts.removeUnusedStyles !== false) {
     // removeUnusedStyles is the default
     try {
       // pick out all of the selectors that are actually
       // being used in the html document
       const usedSelectors = new UsedSelectors(doc.documentElement);
 
-      const cssFilePaths = Object.keys(stylesMap);
-
-      styles = cssFilePaths.map(styleTag => {
-        return removeUnusedStyles(config, usedSelectors, stylesMap[styleTag], styleTag, diagnostics);
+      styles = styles.map(styleText => {
+        return removeUnusedStyles(config, usedSelectors, styleText, diagnostics);
       });
 
     } catch (e) {
@@ -33,11 +27,9 @@ export function inlineComponentStyles(config: BuildConfig, doc: Document, styles
         messageText: e
       });
     }
-
-  } else {
-    // do not removeUnusedStyles
-    styles = styleFileNames.map(styleFileName => stylesMap[styleFileName]);
   }
+
+  config.logger.debug(`optimize ${results.pathname}, inline component styles`);
 
   // insert our styles to the head of the document
   insertStyles(doc, styles);
@@ -45,10 +37,6 @@ export function inlineComponentStyles(config: BuildConfig, doc: Document, styles
 
 
 function insertStyles(doc: Document, styles: string[]) {
-  if (!styles.length) {
-    return;
-  }
-
   const styleElm = doc.createElement('style');
 
   styleElm.setAttribute('data-styles', '');

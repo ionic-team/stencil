@@ -1,27 +1,33 @@
 import { BuildConfig, BuildContext, ServiceWorkerConfig } from '../../util/interfaces';
 import { catchError, hasError, readFile } from '../util';
 import { injectRegisterServiceWorker, injectUnregisterServiceWorker } from '../service-worker/inject-sw-script';
+import { generateServiceWorker } from '../service-worker/generate-sw';
 
 
-export function generateIndexHtml(config: BuildConfig, ctx: BuildContext) {
+export async function generateIndexHtml(config: BuildConfig, ctx: BuildContext) {
+
   if ((ctx.isRebuild && ctx.appFileBuildCount === 0) || hasError(ctx.diagnostics) || !config.generateWWW) {
     // no need to rebuild index.html if there were no app file changes
-    return Promise.resolve();
+    return;
   }
 
+  // generate the service worker
+  await generateServiceWorker(config, ctx);
+
   // get the source index html content
-  return readFile(config.sys, config.srcIndexHtml).then(indexSrcHtml => {
-    // set the index content to be written
+  try {
+    const indexSrcHtml = await readFile(config.sys, config.srcIndexHtml);
+
     try {
-      return setIndexHtmlContent(config, ctx, indexSrcHtml);
+      setIndexHtmlContent(config, ctx, indexSrcHtml);
     } catch (e) {
       catchError(ctx.diagnostics, e);
     }
 
-  }).catch(err => {
+  } catch (e) {
     // it's ok if there's no index file
-    config.logger.debug(`no index html: ${config.srcIndexHtml}: ${err}`);
-  });
+    config.logger.debug(`no index html: ${config.srcIndexHtml}: ${e}`);
+  }
 }
 
 

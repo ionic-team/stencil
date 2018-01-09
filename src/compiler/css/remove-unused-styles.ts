@@ -4,12 +4,12 @@ import { StringifyCss } from './stringify-css';
 import { UsedSelectors } from '../html/used-selectors';
 
 
-export function removeUnusedStyles(config: BuildConfig, usedSelectors: UsedSelectors, cssContent: string, cssFilePath?: string, diagnostics?: Diagnostic[]) {
+export function removeUnusedStyles(config: BuildConfig, usedSelectors: UsedSelectors, cssContent: string, diagnostics?: Diagnostic[]) {
   let cleanedCss = cssContent;
 
   try {
     // parse the css from being applied to the document
-    const cssAst = parseCss(config, cssContent, cssFilePath);
+    const cssAst = parseCss(config, cssContent);
 
     if (cssAst.stylesheet.diagnostics.length) {
       cssAst.stylesheet.diagnostics.forEach(d => {
@@ -37,7 +37,6 @@ export function removeUnusedStyles(config: BuildConfig, usedSelectors: UsedSelec
     diagnostics.push({
       level: 'error',
       type: 'css',
-      absFilePath: cssFilePath,
       header: 'CSS Parse',
       messageText: e
     });
