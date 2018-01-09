@@ -1,3 +1,12 @@
+<a name="0.1.2"></a>
+## [0.1.2](https://github.com/ionic-team/stencil/compare/v0.1.1...v0.1.2) (2018-01-09)
+
+### Bug Fixes
+
+* Call `@Watch` after property has been set
+* Fix submodule references, such as `@stencil/core/tesing`
+
+
 <a name="0.1.1"></a>
 ## [0.1.1](https://github.com/ionic-team/stencil/compare/v0.1.1-0...v0.1.1) (2018-01-09)
 
