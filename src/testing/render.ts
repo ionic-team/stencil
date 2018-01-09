@@ -29,7 +29,7 @@ export async function render(opts: RenderTestOptions): Promise<any> {
   opts.components.forEach(testCmp => {
     if (testCmp && testCmp.metadata) {
       const cmpMeta: ComponentMeta = testCmp.metadata;
-      cmpMeta.componentModule = testCmp;
+      cmpMeta.componentConstructor = testCmp;
       registry[cmpMeta.tagNameMeta] = cmpMeta;
     }
   });

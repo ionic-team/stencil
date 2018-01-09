@@ -1,27 +1,30 @@
-import { BuildConfig, ComponentMeta, Diagnostic, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, Logger, PlatformApi, RendererApi, StencilSystem, VNode } from '../util/interfaces';
+import { BuildConfig, ComponentMeta, DomApi, HostContentNodes, HostElement,
+  HydrateOptions, HydrateResults, Logger, PlatformApi, RendererApi, StencilSystem, VNode, ComponentRegistry } from '../util/interfaces';
+import { ComponentInstance } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { initHostConstructor } from '../core/instance/init-host';
-import { initComponentInstance } from '../core/instance/init-component';
+import { initHostElement } from '../core/instance/init-host-element';
+import { initComponentInstance } from '../core/instance/init-component-instance';
 import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../util/validate-config';
-import { ComponentInstance } from '../util/interfaces';
 
 
 export function mockPlatform(win?: any, domApi?: DomApi) {
-  const diagnostics: Diagnostic[] = [];
+  const hydrateResults: HydrateResults = {
+    diagnostics: []
+  };
   const config = mockBuildConfig();
   win = win || config.sys.createDom().parse({html: ''});
   domApi = domApi || createDomApi(win, win.document);
+  const cmpRegistry: ComponentRegistry = {};
 
   const plt = createPlatformServer(
     config,
     win,
     win.document,
-    domApi,
-    diagnostics,
+    cmpRegistry,
+    hydrateResults,
     false,
     null
   );
@@ -30,8 +33,7 @@ export function mockPlatform(win?: any, domApi?: DomApi) {
   const $mockedQueue = plt.queue = mockQueue();
   const $loadBundleQueue = mockQueue();
 
-  plt.loadBundle = function(a: any, elm: HostElement, cb: Function) {
-    a; elm;
+  plt.loadBundle = function(_: any, _modeName: string, cb: Function) {
     $loadBundleQueue.add(cb);
   };
 
@@ -167,6 +169,8 @@ export function mockStencilSystem() {
       }
     },
 
+    semver: require('semver'),
+
     typescript: require('typescript'),
 
     url: require('url'),
@@ -220,7 +224,7 @@ function mockCreateDom() {
   return {
     parse: function(opts: HydrateOptions) {
       dom = new jsdom.JSDOM(opts.html, {
-        url: opts.url,
+        url: opts.path,
         referrer: opts.referrer,
         userAgent: opts.userAgent,
       });
@@ -407,8 +411,9 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
   if (!cmpMeta.tagNameMeta) {
     cmpMeta.tagNameMeta = 'ion-cmp';
   }
-  if (!cmpMeta.componentModule) {
-    cmpMeta.componentModule = class {};
+  if (!cmpMeta.componentConstructor) {
+    cmpMeta.componentConstructor = class {} as any;
+
   }
   if (!cmpMeta.membersMeta) {
     cmpMeta.membersMeta = {};
@@ -447,7 +452,7 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
     if (!node.$connected) {
       const cmpMeta = (<PlatformApi>plt).getComponentMeta(node);
       if (cmpMeta) {
-        initHostConstructor((<PlatformApi>plt), cmpMeta, node);
+        initHostElement((<PlatformApi>plt), cmpMeta, node);
         (<HostElement>node).connectedCallback();
       }
     }

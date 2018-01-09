@@ -6,30 +6,30 @@ import * as path from 'path';
 
 describe('validation', () => {
 
-  describe('es5 fallback', () => {
+  describe('es5 build', () => {
 
-    it('set es5Fallback false', () => {
-      config.es5Fallback = false;
+    it('set buildEs5 false', () => {
+      config.buildEs5 = false;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(false);
+      expect(config.buildEs5).toBe(false);
     });
 
-    it('set es5Fallback true', () => {
-      config.es5Fallback = true;
+    it('set buildEs5 true', () => {
+      config.buildEs5 = true;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(true);
+      expect(config.buildEs5).toBe(true);
     });
 
     it('prod mode default to both es2015 and es5', () => {
       config.devMode = false;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(true);
+      expect(config.buildEs5).toBe(true);
     });
 
     it('dev mode default to only es2015', () => {
       config.devMode = true;
       validateBuildConfig(config);
-      expect(config.es5Fallback).toBe(false);
+      expect(config.buildEs5).toBe(false);
     });
 
   });
@@ -378,91 +378,6 @@ describe('validation', () => {
     });
 
   });
-
-
-  describe('namespace', () => {
-
-    it('should not allow special characters in namespace', () => {
-      expect(() => {
-        config.namespace = 'My/Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-      expect(() => {
-        config.namespace = 'My%20Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-      expect(() => {
-        config.namespace = 'My:Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should not allow spaces in namespace', () => {
-      expect(() => {
-        config.namespace = 'My Namespace';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should not allow dash for last character of namespace', () => {
-      expect(() => {
-        config.namespace = 'MyNamespace-';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should not allow dash for first character of namespace', () => {
-      expect(() => {
-        config.namespace = '-MyNamespace';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should not allow number for first character of namespace', () => {
-      expect(() => {
-        config.namespace = '88MyNamespace';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should enforce namespace being at least 3 characters', () => {
-      expect(() => {
-        config.namespace = 'ab';
-        validateBuildConfig(config);
-      }).toThrow();
-    });
-
-    it('should allow $ in the namespace', () => {
-      config.namespace = '$MyNamespace';
-      validateBuildConfig(config);
-      expect(config.namespace).toBe('$MyNamespace');
-    });
-
-    it('should allow underscore in the namespace', () => {
-      config.namespace = 'My_Namespace';
-      validateBuildConfig(config);
-      expect(config.namespace).toBe('My_Namespace');
-    });
-
-    it('should allow dash in the namespace', () => {
-      config.namespace = 'My-Namespace';
-      validateBuildConfig(config);
-      expect(config.namespace).toBe('My-Namespace');
-    });
-
-    it('should set user namespace', () => {
-      config.namespace = 'MyNamespace';
-      validateBuildConfig(config);
-      expect(config.namespace).toBe('MyNamespace');
-    });
-
-    it('should set default namespace', () => {
-      validateBuildConfig(config);
-      expect(config.namespace).toBe('App');
-    });
-
-  });
-
 
   describe('copy tasks', () => {
 

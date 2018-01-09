@@ -1,37 +1,37 @@
+import { AppGlobal, BuildConfig, BuildContext, CjsExports,
+  ComponentMeta, ComponentRegistry, CoreContext, Diagnostic,
+  HostElement, PlatformApi, HydrateResults } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
-import { BuildConfig, BuildContext, ComponentMeta, ComponentRegistry,
-  CoreContext, Diagnostic, DomApi, FilesMap, HostElement,
-  BundleCallbacks, PlatformApi, AppGlobal } from '../util/interfaces';
+import { createDomApi } from '../core/renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { ENCAPSULATION, DEFAULT_STYLE_MODE, MEMBER_TYPE, RUNTIME_ERROR } from '../util/constants';
-import { getAppFileName } from '../compiler/app/app-file-naming';
-import { getJsFile, normalizePath } from '../compiler/util';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR, PROP_TYPE } from '../util/constants';
+import { getAppWWWBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';
-import { parseComponentMeta } from '../util/data-parse';
-import { proxyController } from '../core/instance/proxy';
+import { patchDomApi } from './dom-api-server';
+import { proxyController } from '../core/instance/proxy-controller';
+import { toDashCase } from '../util/helpers';
 
 
 export function createPlatformServer(
   config: BuildConfig,
   win: any,
   doc: any,
-  domApi: DomApi,
-  diagnostics: Diagnostic[],
+  cmpRegistry: ComponentRegistry,
+  hydrateResults: HydrateResults,
   isPrerender: boolean,
   ctx?: BuildContext
 ): PlatformApi {
-  const registry: ComponentRegistry = { 'html': {} };
-  const moduleImports: {[tag: string]: any} = {};
-  const bundleCallbacks: BundleCallbacks = {};
-  const loadedBundles: {[bundleId: string]: boolean} = {};
-  const pendingBundleFileReads: {[url: string]: boolean} = {};
-  const stylesMap: FilesMap = {};
+  const styles: string[] = [];
   const controllerComponents: {[tag: string]: HostElement} = {};
+  const domApi = createDomApi(win, doc);
 
   // init build context
   ctx = ctx || {};
+
+  // the root <html> element is always the top level registered component
+  cmpRegistry = Object.assign({ 'html': {}}, cmpRegistry);
 
   // initialize Core global object
   const Context: CoreContext = {};
@@ -52,14 +52,15 @@ export function createPlatformServer(
   // create the app global
   const App: AppGlobal = {};
 
+  // add the h() fn to the app's global namespace
+  App.h = h;
+  App.Context = Context;
+
   // add the app's global to the window context
   win[config.namespace] = App;
 
-  // keep a global set of tags we've already defined
-  const globalDefined: { [tagName: string]: boolean } = win.$definedComponents = win.$definedComponents || {};
-
   const appWwwDir = config.wwwDir;
-  const appBuildDir = config.sys.path.join(config.buildDir, getAppFileName(config));
+  const appBuildDir = getAppWWWBuildDir(config);
   Context.publicPath = appBuildDir;
 
   // create the sandboxed context with a new instance of a V8 Context
@@ -86,6 +87,8 @@ export function createPlatformServer(
     tmpDisconnected: false,
   };
 
+  // patch dom api like createElement()
+  patchDomApi(plt, domApi);
 
   // create the renderer which will be used to patch the vdom
   plt.render = createRendererPatch(plt, domApi);
@@ -104,11 +107,11 @@ export function createPlatformServer(
     if (rootElm._hasLoaded || failureDiagnostic) {
       // the root node has loaded
       // and there are no css files still loading
-      plt.onAppLoad && plt.onAppLoad(rootElm, stylesMap, failureDiagnostic);
+      plt.onAppLoad && plt.onAppLoad(rootElm, styles, failureDiagnostic);
     }
   }
 
-  function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
+  function connectHostElement(_cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -118,124 +121,90 @@ export function createPlatformServer(
     }
 
     // pick out all of the light dom nodes from the host element
-    assignHostContentSlots(domApi, cmpMeta, elm, elm.childNodes);
+    assignHostContentSlots(domApi, elm, elm.childNodes);
   }
 
 
   function getComponentMeta(elm: Element) {
     // registry tags are always lower-case
-    return registry[elm.tagName.toLowerCase()];
+    return cmpRegistry[elm.tagName.toLowerCase()];
   }
 
   function defineComponent(cmpMeta: ComponentMeta) {
     // default mode and color props
-    cmpMeta.membersMeta = cmpMeta.membersMeta || {};
-
-    cmpMeta.membersMeta.mode = { memberType: MEMBER_TYPE.Prop };
-    cmpMeta.membersMeta.color = { memberType: MEMBER_TYPE.Prop, attribName: 'color' };
-
-    // registry tags are always lower-case
-    const registryTag = cmpMeta.tagNameMeta.toLowerCase();
-
-    if (!globalDefined[registryTag]) {
-      globalDefined[registryTag] = true;
-
-      registry[registryTag] = cmpMeta;
-
-      if (cmpMeta.componentModule) {
-        // for unit testing
-        moduleImports[registryTag] = cmpMeta.componentModule;
-      }
-    }
+    cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
   }
+
+
+  App.loadComponents = function loadComponents(importer) {
+    try {
+      // requested component constructors are placed on the moduleImports object
+      // inject the h() function so it can be use by the components
+      const exports: CjsExports = {};
+      importer(exports, h, Context);
+
+      // let's add a reference to the constructors on each components metadata
+      // each key in moduleImports is a PascalCased tag name
+      Object.keys(exports).forEach(pascalCasedTagName => {
+        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
+        if (cmpMeta) {
+          // connect the component's constructor to its metadata
+          cmpMeta.componentConstructor = exports[pascalCasedTagName];
+
+          cmpMeta.membersMeta = {
+            'color': {}
+          };
+
+          if (cmpMeta.componentConstructor.properties) {
+            Object.keys(cmpMeta.componentConstructor.properties).forEach(memberName => {
+              const constructorProperty = cmpMeta.componentConstructor.properties[memberName];
+
+              if (constructorProperty.type) {
+                cmpMeta.membersMeta[memberName] = {
+                  propType: PROP_TYPE.Any
+                };
+              }
+            });
+          }
+        }
+      });
+
+    } catch (e) {
+      onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
+    }
+  };
+
 
   function isDefinedComponent(elm: Element) {
-    return !!(globalDefined[elm.tagName.toLowerCase()] || registry[elm.tagName.toLowerCase()]);
+    return !!(cmpRegistry[elm.tagName.toLowerCase()]);
   }
 
 
-  App.loadComponents = function loadComponents(bundleId, importFn) {
-    const args = arguments;
+  function loadBundle(cmpMeta: ComponentMeta, modeName: string, cb: Function): void {
+    // synchronous in nodejs
+    if (!cmpMeta.componentConstructor) {
+      try {
+        const fileName = getBundleFilename(cmpMeta, modeName);
+        const jsFilePath = config.sys.path.join(appBuildDir, fileName);
+        const jsCode = config.sys.fs.readFileSync(jsFilePath, 'utf-8');
+        config.sys.vm.runInContext(jsCode, win);
 
-    // import component function
-    // inject globals
-    importFn(moduleImports, h, Context, appBuildDir);
-
-    for (var i = 2; i < args.length; i++) {
-      parseComponentMeta(registry, moduleImports, args[i], Context.attr);
-    }
-
-    // fire off all the callbacks waiting on this bundle to load
-    var callbacks = bundleCallbacks[bundleId];
-    if (callbacks) {
-      for (i = 0; i < callbacks.length; i++) {
-        callbacks[i]();
-      }
-      delete bundleCallbacks[bundleId];
-    }
-
-    // remember that we've already loaded this bundle
-    loadedBundles[bundleId] = true;
-  };
-
-
-  App.loadStyles = function loadStyles() {
-    // jsonp callback from requested bundles
-    const args = arguments;
-    for (var i = 0; i < args.length; i += 2) {
-      stylesMap[args[i]] = args[i + 1];
-    }
-  };
-
-
-  function loadBundle(cmpMeta: ComponentMeta, elm: HostElement, cb: Function): void {
-    if (cmpMeta.componentModule) {
-      // we already have the module loaded
-      // (this is probably a unit test)
-      cb();
-      return;
-    }
-
-    const bundleId: string = (cmpMeta.bundleIds[elm.mode] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || (cmpMeta.bundleIds as any)).es2015;
-
-    if (loadedBundles[bundleId]) {
-      // sweet, we've already loaded this bundle
-      cb();
-
-    } else {
-      // never seen this bundle before, let's start loading the file
-      // and add it to the bundle callbacks to fire when it's loaded
-      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
-
-      let requestBundleId = bundleId;
-      if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-        requestBundleId += '.sc';
-      }
-      requestBundleId += '.js';
-
-      // create the bundle filePath we'll be reading
-      const jsFilePath = normalizePath(config.sys.path.join(appBuildDir, requestBundleId));
-
-      if (!pendingBundleFileReads[jsFilePath]) {
-        // not already actively reading this file
-        // remember that we're now actively requesting this url
-        pendingBundleFileReads[jsFilePath] = true;
-
-        // let's kick off reading the bundle
-        // this could come from the cache or a new readFile
-        getJsFile(config.sys, ctx, jsFilePath).then(jsContent => {
-          // remove it from the list of file reads we're waiting on
-          delete pendingBundleFileReads[jsFilePath];
-
-          // run the code in this sandboxed context
-          config.sys.vm.runInContext(jsContent, win, { timeout: 10000 });
-
-        }).catch(err => {
-          onError(err, RUNTIME_ERROR.LoadBundleError, elm, true);
-        });
+      } catch (e) {
+        onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
+        cmpMeta.componentConstructor = class {} as any;
       }
     }
+
+    cb();
   }
+
+
+  plt.attachStyles = function attachStyles(_domApi, cmpConstructor, _modeName, _elm) {
+    if (cmpConstructor.style) {
+      styles.push(cmpConstructor.style);
+    }
+  };
+
 
   function runGlobalScripts() {
     if (!ctx || !ctx.appFiles || !ctx.appFiles.global) {
@@ -250,8 +219,13 @@ export function createPlatformServer(
       type: 'runtime',
       header: 'Runtime error detected',
       level: 'error',
-      messageText: err ? err.message ? err.message : err.toString() : null
+      messageText: err ? err.message ? err.message : err.toString() : ''
     };
+
+    if (err && err.stack) {
+      d.messageText += '\n' + err.stack;
+      d.messageText = d.messageText.trim();
+    }
 
     switch (type) {
       case RUNTIME_ERROR.LoadBundleError:
@@ -281,7 +255,7 @@ export function createPlatformServer(
       d.header += ': ' + elm.tagName.toLowerCase();
     }
 
-    diagnostics.push(d);
+    hydrateResults.diagnostics.push(d);
 
     if (appFailure) {
       appLoaded(d);
@@ -297,4 +271,18 @@ export function createPlatformServer(
   }
 
   return plt;
+}
+
+
+export function getBundleFilename(cmpMeta: ComponentMeta, modeName: string) {
+  let bundleId: string = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || cmpMeta.bundleIds as any);
+
+  if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+    bundleId += '.sc';
+  }
+
+  // server-side always uses es5 and jsonp callback modules
+  bundleId += '.es5.js';
+
+  return bundleId;
 }

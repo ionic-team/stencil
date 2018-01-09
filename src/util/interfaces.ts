@@ -1,6 +1,6 @@
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, PRIORITY, RUNTIME_ERROR, SLOT_META } from './constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, RUNTIME_ERROR } from './constants';
 
 
 export interface CoreContext {
@@ -21,8 +21,14 @@ export interface CoreContext {
 
 export interface AppGlobal {
   components?: LoadComponentRegistry[];
-  loadComponents?: (bundleId: string, modulesImporterFn: ModulesImporterFn, cmp0?: LoadComponentMeta, cmp1?: LoadComponentMeta, cmp2?: LoadComponentMeta) => void;
-  loadStyles?: (styleId: string, styleText: string) => void;
+  loadComponents?: (importFn: CjsImporterFn, bundleId: string) => void;
+  h?: Function;
+  Context?: any;
+}
+
+
+export interface CjsImporterFn {
+  (exports: CjsExports, h: Function, Context: any): void;
 }
 
 
@@ -96,19 +102,9 @@ export interface LoadComponentRegistry {
   [4]: ENCAPSULATION;
 
   /**
-   * slot
-   */
-  [5]: SLOT_META;
-
-  /**
    * listeners
    */
-  [6]: ComponentListenersData[];
-
-  /**
-   * load priority
-   */
-  [7]: PRIORITY;
+  [5]: ComponentListenersData[];
 }
 
 
@@ -137,44 +133,6 @@ export interface ComponentMemberData {
    * controller id
    */
   [4]: string;
-}
-
-
-export interface LoadComponentMeta {
-  /**
-   * tag name (ION-BADGE)
-   */
-  [0]: string;
-
-  /**
-   * members
-   */
-  [1]: ComponentMemberData[];
-
-  /**
-   * host
-   */
-  [2]: any;
-
-  /**
-   * component instance events
-   */
-  [3]: ComponentEventData[];
-
-  /**
-   * prop WILL change
-   */
-  [4]: PropChangeMeta[];
-
-  /**
-   * prop DID change
-   */
-  [5]: PropChangeMeta[];
-
-  /**
-   * encapsulation
-   */
-  [6]: ENCAPSULATION;
 }
 
 
@@ -234,26 +192,18 @@ export interface ComponentEventData {
 }
 
 
-export interface PropChangeMeta {
-  /**
-   * prop name
-   */
-  [0]?: string;
-
-  /**
-   * fn name
-   */
-  [1]?: string;
-}
-
-
 export interface Manifest {
   manifestName?: string;
   modulesFiles?: ModuleFile[];
-  bundles?: Bundle[];
+  bundles?: ManifestBundle[];
   global?: ModuleFile;
   dependentManifests?: Manifest[];
   compiler?: ManifestCompiler;
+}
+
+
+export interface ManifestBundle {
+  components: string[];
 }
 
 
@@ -278,37 +228,29 @@ export interface ModuleFile {
 
 
 export interface AppRegistry {
-  namespace: string;
+  namespace?: string;
+  fsNamespace?: string;
   loader?: string;
   core?: string;
   coreSsr?: string;
   corePolyfilled?: string;
   global?: string;
-  components: LoadComponentRegistry[];
+  components?: AppRegistryComponents;
+}
+
+
+export interface AppRegistryComponents {
+  [tagName: string]: BundleIds;
 }
 
 
 export interface Bundle {
-  components: string[];
-  priority?: number;
-}
-
-
-export interface ManifestBundle {
+  entryKey?: string;
   moduleFiles: ModuleFile[];
-  compiledModeStyles?: CompiledModeStyles[];
   compiledModuleText?: string;
-  priority?: PRIORITY;
-}
-
-
-export interface CompiledModeStyles {
-  tag?: string;
-  modeName?: string;
-  styleOrder?: number;
-  unscopedStyles?: string;
-  scopedStyles?: string;
-  writeFile?: boolean;
+  compiledModuleLegacyText?: string;
+  requiresScopedStyles?: boolean;
+  modeNames?: string[];
 }
 
 
@@ -318,6 +260,7 @@ export interface BuildConditionals {
   verboseError: boolean;
   es5?: boolean;
   cssVarShim?: boolean;
+  clientSide?: boolean;
 
   // ssr
   ssrClientSide: boolean;
@@ -328,7 +271,6 @@ export interface BuildConditionals {
 
   // dom
   shadowDom: boolean;
-  slot: boolean;
 
   // vdom
   hostData: boolean;
@@ -341,8 +283,7 @@ export interface BuildConditionals {
   method: boolean;
   propConnect: boolean;
   propContext: boolean;
-  didChange: boolean;
-  willChange: boolean;
+  watchCallback: boolean;
 
   // lifecycle events
   cmpDidLoad: boolean;
@@ -368,8 +309,9 @@ export interface BuildConfig {
   logger?: Logger;
   rootDir?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
-  es5Fallback?: boolean;
+  buildEs5?: boolean;
   namespace?: string;
+  fsNamespace?: string;
   globalScript?: string;
   globalStyle?: string[];
   srcDir?: string;
@@ -385,7 +327,7 @@ export interface BuildConfig {
   publicPath?: string;
   generateDistribution?: boolean;
   generateWWW?: boolean;
-  bundles?: Bundle[];
+  bundles?: ManifestBundle[];
   collections?: DependentCollection[];
   devMode?: boolean;
   watch?: boolean;
@@ -448,13 +390,17 @@ export interface CopyTask {
 
 
 export interface RenderOptions {
-  collapseWhitespace?: boolean;
-  inlineStyles?: boolean;
-  inlineAssetsMaxSize?: number;
-  removeUnusedStyles?: boolean;
-  inlineLoaderScript?: boolean;
   canonicalLink?: boolean;
+  collapseWhitespace?: boolean;
+  inlineAssetsMaxSize?: number;
+  inlineLoaderScript?: boolean;
+  inlineStyles?: boolean;
+  removeUnusedStyles?: boolean;
   ssrIds?: boolean;
+  userAgent?: string;
+  cookie?: string;
+  dir?: string;
+  lang?: string;
 }
 
 
@@ -463,22 +409,8 @@ export interface PrerenderConfig extends RenderOptions {
   include?: PrerenderLocation[];
   prerenderDir?: string;
   maxConcurrent?: number;
-  userAgent?: string;
-  cookie?: string;
-  dir?: string;
-  lang?: string;
-  host?: string;
-}
-
-
-export interface PrerenderResult {
-  url: string;
-  hostname: string;
-  path: string;
-  components: HydrateComponent[];
-  styleUrls: string[];
-  scriptUrls: string[];
-  imgUrls: string[];
+  includePathHash?: boolean;
+  includePathQuery?: boolean;
 }
 
 
@@ -502,8 +434,8 @@ export interface HostRuleHeader {
 
 
 export interface PrerenderLocation {
-  pathname?: string;
   url?: string;
+  path?: string;
   status?: PrerenderStatus;
 }
 
@@ -520,10 +452,10 @@ export interface HydrateOptions extends RenderOptions {
     protocol: string;
     get: (key: string) => string;
     originalUrl: string;
-    url: string;
   };
   html?: string;
   url?: string;
+  path?: string;
   referrer?: string;
   userAgent?: string;
   cookie?: string;
@@ -532,6 +464,9 @@ export interface HydrateOptions extends RenderOptions {
   isPrerender?: boolean;
   serializeHtml?: boolean;
   collectAnchors?: boolean;
+  console?: {
+    [level: string]: (...msgs: string[]) => void;
+  };
 }
 
 
@@ -545,15 +480,11 @@ export interface BuildResults {
 
 export interface BuildContext {
   moduleFiles?: ModuleFiles;
-  manifestBundles?: ManifestBundle[];
   jsFiles?: FilesMap;
-  cssFiles?: FilesMap;
-  compiledFileCache?: ModuleBundles;
+  compiledFileCache?: FilesMap;
+  rollupCache?: { [cacheKey: string]: any };
   moduleBundleOutputs?: ModuleBundles;
-  styleSassUnscopedOutputs?: ModuleBundles;
-  styleSassScopedOutputs?: ModuleBundles;
-  styleCssUnscopedOutputs?: ModuleBundles;
-  styleCssScopedOutputs?: ModuleBundles;
+  moduleBundleLegacyOutputs?: ModuleBundles;
   filesToWrite?: FilesMap;
   dependentManifests?: {[collectionName: string]: Manifest};
   appFiles?: {
@@ -591,16 +522,11 @@ export interface BuildContext {
   appFileBuildCount?: number;
 
   moduleBundleCount?: number;
-  styleBundleCount?: number;
   localPrerenderServer?: any;
-  prerenderResults?: PrerenderResult[];
 
   diagnostics?: Diagnostic[];
-  registry?: ComponentRegistry;
   manifest?: Manifest;
   onFinish?: (buildResults: BuildResults) => void;
-
-  prerenderUrlQueue?: PrerenderLocation[];
 }
 
 
@@ -663,8 +589,8 @@ export interface LoggerTimeSpan {
 }
 
 
-export interface ModulesImporterFn {
-  (importer: any, h: Function, Core: CoreContext, publicPath: string): void;
+export interface CjsExports {
+  [moduleId: string]: ComponentConstructor;
 }
 
 
@@ -731,7 +657,57 @@ export interface MemberMeta {
   attribType?: AttributeTypeInfo;
   ctrlId?: string;
   jsdoc?: JSDoc;
+  watchCallbacks?: string[];
 }
+
+
+export interface ImportedModule {
+  [pascalCaseTag: string]: ComponentConstructor;
+}
+
+
+export interface ComponentConstructor {
+  is?: string;
+  properties?: ComponentConstructorProperties;
+  events?: ComponentConstructorEvent[];
+  host?: any;
+  style?: string;
+  styleMode?: string;
+  encapsulation?: Encapsulation;
+}
+
+
+export type Encapsulation = 'shadow' | 'scoped' | 'none';
+
+
+export interface ComponentConstructorProperties {
+  [propName: string]: ComponentConstructorProperty;
+}
+
+
+export interface ComponentConstructorProperty {
+  attr?: string;
+  connect?: string;
+  context?: string;
+  elementRef?: boolean;
+  method?: boolean;
+  mutable?: boolean;
+  state?: boolean;
+  type?: PropertyType;
+  watchCallbacks?: string[];
+}
+
+export type PropertyType = StringConstructor | BooleanConstructor | NumberConstructor | 'Any';
+
+
+export interface ComponentConstructorEvent {
+  name?: string;
+  method?: string;
+  bubbles?: boolean;
+  cancelable?: boolean;
+  composed?: boolean;
+}
+
 
 
 export interface MethodDecorator {
@@ -798,7 +774,7 @@ export interface StateDecorator {
 }
 
 
-export interface PropChangeDecorator {
+export interface WatchDecorator {
   (propName: string): any;
 }
 
@@ -816,17 +792,14 @@ export interface ComponentMeta {
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
-  propsWillChangeMeta?: PropChangeMeta[];
-  propsDidChangeMeta?: PropChangeMeta[];
-  encapsulation?: ENCAPSULATION;
   hostMeta?: HostMeta;
+  encapsulation?: ENCAPSULATION;
   assetsDirsMeta?: AssetsMeta[];
-  slotMeta?: SLOT_META;
-  loadPriority?: number;
-  componentModule?: any;
+  componentConstructor?: ComponentConstructor;
   componentClass?: string;
   jsdoc?: JSDoc;
 }
+
 
 export interface JSDoc {
   name: string;
@@ -836,12 +809,7 @@ export interface JSDoc {
 
 
 export interface BundleIds {
-  [modeName: string]: BundleId;
-}
-
-export interface BundleId {
-  es2015?: string;
-  es5?: string;
+  [modeName: string]: string;
 }
 
 
@@ -857,6 +825,8 @@ export interface StyleMeta {
   originalComponentPaths?: string[];
   originalCollectionPaths?: string[];
   styleStr?: string;
+  compiledStyleText?: string;
+  compiledStyleTextScoped?: string;
 }
 
 
@@ -890,6 +860,28 @@ export interface ComponentInstance {
   __el?: HostElement;
 
   [memberName: string]: any;
+}
+
+
+export abstract class ComponentModule {
+  abstract componentWillLoad?: () => Promise<void>;
+  abstract componentDidLoad?: () => void;
+  abstract componentWillUpdate?: () => Promise<void>;
+  abstract componentDidUpdate?: () => void;
+  abstract componentDidUnload?: () => void;
+
+  abstract render?: () => any;
+  abstract hostData?: () => VNodeData;
+
+  abstract mode?: string;
+  abstract color?: string;
+
+  abstract __el?: HostElement;
+
+  [memberName: string]: any;
+
+  abstract get is(): string;
+  abstract get properties(): string;
 }
 
 
@@ -931,7 +923,7 @@ export interface ComponentModule {
 
 export interface ComponentRegistry {
   // registry tag must always be lower-case
-  [registryTag: string]: ComponentMeta;
+  [tagName: string]: ComponentMeta;
 }
 
 
@@ -974,7 +966,7 @@ export interface HostElement extends HTMLElement {
 
 
 export interface RendererApi {
-  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: ENCAPSULATION, ssrId?: number): VNode;
+  (oldVNode: VNode | Element, newVNode: VNode, isUpdate?: boolean, hostContentNodes?: HostContentNodes, encapsulation?: Encapsulation, ssrId?: number): VNode;
 }
 
 
@@ -1055,7 +1047,7 @@ export interface VNodeProdData {
 
 export interface PlatformApi {
   activeRender?: boolean;
-  attachStyles?: (cmpMeta: ComponentMeta, modeName: string, elm: HostElement) => void;
+  attachStyles?: (domApi: DomApi, cmpConstructor: ComponentConstructor, modeName: string, elm: HostElement) => void;
   connectHostElement: (cmpMeta: ComponentMeta, elm: HostElement) => void;
   defineComponent: (cmpMeta: ComponentMeta, HostElementConstructor?: any) => void;
   domApi?: DomApi;
@@ -1066,8 +1058,8 @@ export interface PlatformApi {
   isDefinedComponent?: (elm: Element) => boolean;
   isPrerender?: boolean;
   isServer?: boolean;
-  loadBundle: (cmpMeta: ComponentMeta, elm: HostElement, cb: Function) => void;
-  onAppLoad?: (rootElm: HostElement, stylesMap: FilesMap, failureDiagnostic?: Diagnostic) => void;
+  loadBundle: (cmpMeta: ComponentMeta, modeName: string, cb: Function) => void;
+  onAppLoad?: (rootElm: HostElement, styles: string[], failureDiagnostic?: Diagnostic) => void;
   onError: (err: Error, type?: RUNTIME_ERROR, elm?: HostElement, appFailure?: boolean) => void;
   propConnect: (ctrlTag: string) => PropConnect;
   queue: QueueApi;
@@ -1119,7 +1111,7 @@ export interface BundleCallbacks {
 
 
 export interface Diagnostic {
-  level: 'error'|'warn'|'info';
+  level: 'error'|'warn'|'info'|'log'|'debug';
   type: string;
   header?: string;
   messageText: string;
@@ -1154,7 +1146,6 @@ export interface StencilSystem {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
     destroy(): void;
-    getDiagnostics(): Diagnostic[];
   };
   emptyDir?(dir: string): Promise<void>;
   ensureDir?(dir: string): Promise<void>;
@@ -1206,23 +1197,9 @@ export interface StencilSystem {
   remove?(path: string): Promise<void>;
   rollup?: {
     rollup: {
-      (config: { input: string; plugins?: any[]; treeshake?: boolean; onwarn?: Function; }): Promise<{
-        generate: {(config: {
-          format?: string;
-          banner?: string;
-          footer?: string;
-          exports?: string;
-          external?: string[];
-          globals?: {[key: string]: any};
-          moduleName?: string;
-          plugins?: any;
-        }): Promise<{
-          code: string;
-          map: any;
-        }>}
-      }>;
+      (config: RollupInputConfig): Promise<RollupBundle>;
     };
-    plugins: { [pluginName: string]: any };
+    plugins: RollupPlugins;
   };
   sass?: {
     render(
@@ -1238,7 +1215,9 @@ export interface StencilSystem {
   };
   semver?: {
     gt: (a: string, b: string, loose?: boolean) => boolean;
+    gte: (a: string, b: string, loose?: boolean) => boolean;
     lt: (a: string, b: string, loose?: boolean) => boolean;
+    lte: (a: string, b: string, loose?: boolean) => boolean;
   };
   typescript?: any;
   url?: {
@@ -1252,6 +1231,45 @@ export interface StencilSystem {
   };
   watch?(paths: string | string[], opts?: any): FSWatcher;
   workbox?: Workbox;
+}
+
+
+export interface RollupInputConfig {
+  entry?: any;
+  input?: string;
+  cache?: any;
+  external?: Function;
+  plugins?: any[];
+  onwarn?: Function;
+}
+
+export interface RollupBundle {
+  generate: {(config: RollupGenerateConfig): Promise<RollupGenerateResults>};
+}
+
+
+export interface RollupGenerateConfig {
+  format: 'es' | 'cjs';
+  intro?: string;
+  outro?: string;
+  banner?: string;
+  footer?: string;
+  exports?: string;
+  external?: string[];
+  globals?: {[key: string]: any};
+  moduleName?: string;
+  strict?: boolean;
+}
+
+
+export interface RollupGenerateResults {
+  code: string;
+  map: any;
+}
+
+
+export interface RollupPlugins {
+  [pluginName: string]: any;
 }
 
 
@@ -1296,6 +1314,14 @@ export interface FSWatcher {
 export interface HydrateResults {
   diagnostics: Diagnostic[];
   url?: string;
+  host?: string;
+  hostname?: string;
+  port?: string;
+  path?: string;
+  pathname?: string;
+  search?: string;
+  query?: string;
+  hash?: string;
   html?: string;
   styles?: string;
   anchors?: HydrateAnchor[];
@@ -1304,6 +1330,7 @@ export interface HydrateResults {
   styleUrls?: string[];
   scriptUrls?: string[];
   imgUrls?: string[];
+  opts?: HydrateOptions;
 }
 
 
@@ -1376,8 +1403,6 @@ export interface ComponentData {
   componentClass?: string;
   styles?: StylesData;
   props?: PropData[];
-  propsWillChange?: PropChangeData[];
-  propsDidChange?: PropChangeData[];
   states?: StateData[];
   listeners?: ListenerData[];
   methods?: MethodData[];
@@ -1404,13 +1429,9 @@ export interface StyleData {
 
 export interface PropData {
   name?: string;
-  type?: 'boolean'|'number'|'string'|'any';
+  type?: 'Boolean'|'Number'|'String'|'Any';
   mutable?: boolean;
-}
-
-export interface PropChangeData {
-  name: string;
-  method: string;
+  watch?: string[];
 }
 
 export interface StateData {

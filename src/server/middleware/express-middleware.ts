@@ -1,11 +1,13 @@
-import { BuildConfig } from '../util/interfaces';
-import { createRenderer } from './renderer';
-import { loadConfig } from '../util/node/load-config';
+import { BuildConfig } from '../../util/interfaces';
+import { createRenderer } from '../renderer';
+import { loadConfig } from '../../util/load-config';
 
 
 export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
   // load up the config
-  const config = loadConfig(middlewareConfig.config);
+  const path = require('path');
+  const nodeSys = require(path.join(__dirname, '../sys/node/index.js'));
+  const config = loadConfig(nodeSys.sys, middlewareConfig.config);
 
   // create the renderer
   const renderer = createRenderer(config);
