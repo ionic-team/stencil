@@ -4,7 +4,7 @@ import { BuildConfig, BuildContext, ModuleFile } from '../../util/interfaces';
 import { readFile } from '../util';
 
 
-export function genereateReadmes(config: BuildConfig, ctx: BuildContext): Promise<any> {
+export function generateReadmes(config: BuildConfig, ctx: BuildContext): Promise<any> {
   if (!config.generateDocs) {
     return Promise.resolve();
   }

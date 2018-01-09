@@ -2,9 +2,8 @@ import { BuildConfig } from '../../util/interfaces';
 import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { compileSrcDir } from '../build/compile';
-import { genereateReadmes } from './generate-readmes';
+import { generateReadmes } from './generate-readmes';
 import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
-import { getAppFileName } from '../app/app-file-naming';
 import { isConfigValid } from '../build/build';
 
 
@@ -23,7 +22,7 @@ export function docs(config: BuildConfig) {
   }
 
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`generate docs, ${getAppFileName(config)}, started`);
+  const timeSpan = config.logger.createTimeSpan(`generate docs, ${config.fsNamespace}, started`);
 
   // begin the build
   return Promise.resolve().then(() => {
@@ -33,7 +32,7 @@ export function docs(config: BuildConfig) {
 
   }).then(() => {
     // generate each of the readmes
-    return genereateReadmes(config, ctx);
+    return generateReadmes(config, ctx);
 
   }).catch(err => {
     // catch all phase
