@@ -1,7 +1,7 @@
 import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../testing/mocks';
-import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal, serializeAppManifest } from '../manifest-data';
-import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE, SLOT_META } from '../../../util/constants';
+import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal, serializeAppManifest, parseWillChangeDeprecated, parseDidChangeDeprecated } from '../manifest-data';
+import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
 
 
 describe('manifest-data serialize/parse', () => {
@@ -81,14 +81,6 @@ describe('manifest-data serialize/parse', () => {
     expect(manifestData.bundles[1].components[0]).toBe('cmp-c');
   });
 
-  it('loadPriority', () => {
-    a.loadPriority = PRIORITY.Low;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.priority).toBe('low');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.loadPriority).toBe(PRIORITY.Low);
-  });
-
   it('scoped css encapsulation', () => {
     a.encapsulation = ENCAPSULATION.ScopedCss;
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
@@ -105,22 +97,6 @@ describe('manifest-data serialize/parse', () => {
     expect(cmpData.scoped).toBeFalsy();
     b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
     expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
-  });
-
-  it('slotMeta HAS_NAMED_SLOTS', () => {
-    a.slotMeta = SLOT_META.HasNamedSlots;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.slot).toBe('hasNamedSlots');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.slotMeta).toBe(SLOT_META.HasNamedSlots);
-  });
-
-  it('slotMeta HAS_SLOTS', () => {
-    a.slotMeta = SLOT_META.HasSlots;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.slot).toBe('hasSlots');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.slotMeta).toBe(SLOT_META.HasSlots);
   });
 
   it('eventsMeta', () => {
@@ -224,38 +200,42 @@ describe('manifest-data serialize/parse', () => {
     expect(b.cmpMeta.membersMeta.stateB.memberType).toBe(MEMBER_TYPE.State);
   });
 
-  it('propsDidChange', () => {
-    a.propsDidChangeMeta = [
-      ['nameA', 'methodA'],
-      ['nameB', 'methodB']
-    ];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.propsDidChange[0].name).toBe('nameA');
-    expect(cmpData.propsDidChange[0].method).toBe('methodA');
-    expect(cmpData.propsDidChange[1].name).toBe('nameB');
-    expect(cmpData.propsDidChange[1].method).toBe('methodB');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.propsDidChangeMeta[0][0]).toBe('nameA');
-    expect(b.cmpMeta.propsDidChangeMeta[0][1]).toBe('methodA');
-    expect(b.cmpMeta.propsDidChangeMeta[1][0]).toBe('nameB');
-    expect(b.cmpMeta.propsDidChangeMeta[1][1]).toBe('methodB');
+  it('propsDidChange (deprecated, uses watchCallbacks now)', () => {
+    const cmpData: any = {
+      propsDidChange: [
+        {
+          name: 'nameA',
+          method: 'methodA'
+        },
+        {
+          name: 'nameB',
+          method: 'methodB'
+        }
+      ]
+    };
+    const cmpMeta: ComponentMeta = {};
+    parseDidChangeDeprecated(cmpData, cmpMeta);
+    expect(cmpMeta.membersMeta.nameA.watchCallbacks[0]).toBe('methodA');
+    expect(cmpMeta.membersMeta.nameB.watchCallbacks[0]).toBe('methodB');
   });
 
-  it('propsWillChange', () => {
-    a.propsWillChangeMeta = [
-      ['nameA', 'methodA'],
-      ['nameB', 'methodB']
-    ];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    expect(cmpData.propsWillChange[0].name).toBe('nameA');
-    expect(cmpData.propsWillChange[0].method).toBe('methodA');
-    expect(cmpData.propsWillChange[1].name).toBe('nameB');
-    expect(cmpData.propsWillChange[1].method).toBe('methodB');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.propsWillChangeMeta[0][0]).toBe('nameA');
-    expect(b.cmpMeta.propsWillChangeMeta[0][1]).toBe('methodA');
-    expect(b.cmpMeta.propsWillChangeMeta[1][0]).toBe('nameB');
-    expect(b.cmpMeta.propsWillChangeMeta[1][1]).toBe('methodB');
+  it('propsWillChange (deprecated, uses watchCallbacks now)', () => {
+    const cmpData: any = {
+      propsWillChange: [
+        {
+          name: 'nameA',
+          method: 'methodA'
+        },
+        {
+          name: 'nameB',
+          method: 'methodB'
+        }
+      ]
+    };
+    const cmpMeta: ComponentMeta = {};
+    parseWillChangeDeprecated(cmpData, cmpMeta);
+    expect(cmpMeta.membersMeta.nameA.watchCallbacks[0]).toBe('methodA');
+    expect(cmpMeta.membersMeta.nameB.watchCallbacks[0]).toBe('methodB');
   });
 
   it('membersMeta el', () => {
@@ -321,6 +301,20 @@ describe('manifest-data serialize/parse', () => {
 
     expect(b.cmpMeta.membersMeta.prop.memberType).toBe(MEMBER_TYPE.Prop);
     expect(b.cmpMeta.membersMeta.prop.propType).toBe(PROP_TYPE.String);
+  });
+
+  it('membersMeta prop watch callbacks', () => {
+    a.membersMeta = {
+      'prop1': { memberType: MEMBER_TYPE.Prop, watchCallbacks: ['method1', 'method2'] },
+      'prop2': { memberType: MEMBER_TYPE.PropMutable, watchCallbacks: ['method1', 'method3'] }
+    };
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+
+    expect(b.cmpMeta.membersMeta.prop1.watchCallbacks[0]).toBe('method1');
+    expect(b.cmpMeta.membersMeta.prop1.watchCallbacks[1]).toBe('method2');
+    expect(b.cmpMeta.membersMeta.prop2.watchCallbacks[0]).toBe('method1');
+    expect(b.cmpMeta.membersMeta.prop2.watchCallbacks[1]).toBe('method3');
   });
 
   it('assetsDirsMeta', () => {

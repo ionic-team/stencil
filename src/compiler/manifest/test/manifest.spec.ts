@@ -1,4 +1,4 @@
-import { Bundle, DependentCollection, Manifest } from '../../../util/interfaces';
+import { DependentCollection, Manifest, ManifestBundle } from '../../../util/interfaces';
 import { filterDependentComponents } from '../load-dependent-manifests';
 import { validateDependentCollection } from '../../../util/validate-config';
 
@@ -8,7 +8,7 @@ describe('manifest', () => {
   describe('filterDependentComponents', () => {
 
     it('should remove components not found in user bundles if includeBundledOnly is true', () => {
-      const bundles: Bundle[] = [
+      const bundles: ManifestBundle[] = [
         { components: ['cmp-a'] },
         { components: ['cmp-b', 'cmp-e'] }
       ];
@@ -35,7 +35,7 @@ describe('manifest', () => {
     });
 
     it('should keep all components if includeBundledOnly is falsy', () => {
-      const bundles: Bundle[] = [];
+      const bundles: ManifestBundle[] = [];
       const dependentCollection: DependentCollection = { name: '@awesome/collection' };
       const dependentManifest: Manifest = {
         modulesFiles: [
