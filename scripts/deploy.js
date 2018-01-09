@@ -10,13 +10,11 @@ const readPkgUp = require('read-pkg-up');
 const path = require('path');
 const rimraf = require('rimraf');
 const semver = require('semver');
-const minimist = require('minimist');
 const tar = require('tar');
 
 
 const rootDir = path.join(__dirname, '../');
 const scriptsDir = path.join(rootDir, 'scripts');
-const dstDir = path.join(rootDir, 'dist');
 
 
 function runTasks(opts) {
@@ -131,7 +129,7 @@ function runTasks(opts) {
         })
       },
       {
-        title: 'Install root dependencies',
+        title: 'Install npm dependencies',
         task: () => execa('npm', ['install', '--no-package-lock'], { cwd: rootDir }),
       }
     )
@@ -164,25 +162,14 @@ function runTasks(opts) {
         task: () => execa('npm', ['run', 'changelog'], { cwd: rootDir }),
       }
     );
-  } else {
-    tasks.push(
-      {
-        title: 'Prepare "dist" @stencil/core package',
-        task: () => execa('npm', ['run', 'prepare.package'], { cwd: scriptsDir })
-      },
-      {
-        title: 'Build "dist" @stencil/core local dependencies',
-        task: () => execa('npm', ['run', 'build.deps'], { cwd: scriptsDir })
-      }
-    );
   }
 
   if (opts.publish) {
     publish
     tasks.push(
       {
-        title: 'Publish "dist" @stencil/core package',
-        task: () => execa('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: dstDir })
+        title: 'Publish @stencil/core',
+        task: () => execa('npm', ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []), { cwd: rootDir })
       },
       {
         title: 'Tagging the latest commit',
@@ -193,28 +180,6 @@ function runTasks(opts) {
         task: () => execa('git', ['push', '--tags'], { cwd: rootDir })
       }
     );
-
-  } else if (!opts.prepare) {
-    // dry run
-    tasks.push(
-      {
-        title: 'Install "dist" @stencil/core dependencies',
-        task: () => execa('npm', ['install', '--no-package-lock'], { cwd: dstDir })
-      },
-      {
-        title: 'Create dist/core.tar.gz package',
-        task: () => {
-          const opts = {
-            gzip: true,
-            file: path.join(dstDir, 'core.tar.gz'),
-            cwd: dstDir
-          };
-          const files = ['./'];
-
-          return tar.c(opts, files);
-        }
-      }
-    );
   }
 
   const listr = new Listr(tasks, { showSubtasks: false });
@@ -222,11 +187,9 @@ function runTasks(opts) {
   return listr.run()
     .then(() => {
       if (opts.prepare) {
-        console.log(`\n ${pkg.name} ${newVersion} prepared, check the diffs and commit\n`);
+        console.log(`\n ${pkg.name} ${newVersion} prepared, check the diffs and commit 🕵️\n`);
       } else if (opts.publish) {
         console.log(`\n ${pkg.name} ${newVersion} published!! 🎉\n`);
-      } else {
-        console.log(`\n ${pkg.name} dryrun finished 🕵️\n`);
       }
     })
     .catch(err => {

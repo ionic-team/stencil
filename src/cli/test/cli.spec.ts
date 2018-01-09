@@ -1,8 +1,8 @@
-import { BuildConfig } from '../../../util/interfaces';
+import { BuildConfig } from '../../util/interfaces';
 import { getConfigFilePath, parseArgv, overrideConfigFromArgv, CliArgv } from '../cli-utils';
-import { mockStencilSystem } from '../../../testing/mocks';
+import { mockStencilSystem } from '../../testing/mocks';
 import { run } from '../index';
-import { validateBuildConfig } from '../../../util/validate-config';
+import { validateBuildConfig } from '../../util/validate-config';
 
 
 describe('cli', () => {
@@ -10,19 +10,19 @@ describe('cli', () => {
   describe('getConfigFilePath', () => {
 
     it('should get absolute config path from argv', () => {
-      const configPath = getConfigFilePath(process, '/my-absolute-path/some.config.js');
+      const configPath = getConfigFilePath(process, config.sys, '/my-absolute-path/some.config.js');
       expect(configPath).toBe('/my-absolute-path/some.config.js');
     });
 
     it('should get cwd relative config path from argv', () => {
       process.cwd = () => '/my-cwd';
-      const configPath = getConfigFilePath(process, 'some.config.js');
+      const configPath = getConfigFilePath(process, config.sys, 'some.config.js');
       expect(configPath).toBe('/my-cwd/some.config.js');
     });
 
     it('should default config path from process.cwd()', () => {
       process.cwd = () => '/my-cwd';
-      const configPath = getConfigFilePath(process, '/my-cwd');
+      const configPath = getConfigFilePath(process, config.sys, '/my-cwd');
       expect(configPath).toBe('/my-cwd');
     });
 
@@ -169,10 +169,6 @@ describe('cli', () => {
       argv = parseArgv(process);
       expect(argv.serviceWorker).toBe(true);
 
-      process.argv[2] = '--skip-node-check';
-      argv = parseArgv(process);
-      expect(argv.skipNodeCheck).toBe(true);
-
       process.argv[2] = '--log-level';
       process.argv[3] = 'error';
       argv = parseArgv(process);
@@ -197,13 +193,6 @@ describe('cli', () => {
       expect(argv.docs).toBe(true);
     });
 
-  });
-
-
-  it('should error when min node version not met', () => {
-    run(process, 46.0, logger);
-    expect(error).toContain('Please update to the latest Node LTS version');
-    expect(exitCode).toBe(1);
   });
 
 

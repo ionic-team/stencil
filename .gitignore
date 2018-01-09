@@ -15,3 +15,8 @@ node_modules/
 
 **/dist/
 **/www/build/
+
+# submodule packages
+/compiler.js
+/server.js
+/testing.js

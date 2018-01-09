@@ -1,0 +1,5 @@
+{
+  "name": "@stencil/core/cli",
+  "private": true,
+  "main": "./index.js"
+}

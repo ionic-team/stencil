@@ -1,0 +1,5 @@
+{
+  "name": "@stencil/core/sys/browser",
+  "private": true,
+  "main": "./index.js"
+}

@@ -1,17 +1,16 @@
-import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../interfaces';
 import { Chalk } from 'chalk';
+import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../util/interfaces';
 
 
 export class NodeLogger implements Logger {
   private _level = 'info';
-  private process: NodeJS.Process;
   private chalk: Chalk;
 
-  constructor(opts: { level?: string, process: NodeJS.Process }) {
-    this.process = opts.process;
+  constructor(opts: { level?: string } = {}) {
     this.level = opts.level;
 
-    const sysUtil = require('./sys-util.js');
+    const path = require('path');
+    const sysUtil = require(path.join(__dirname, './sys-util.js'));
     this.chalk = sysUtil.chalk;
   }
 
@@ -145,7 +144,7 @@ export class NodeLogger implements Logger {
   }
 
   memoryUsage() {
-    return this.dim(` MEM: ${(this.process.memoryUsage().rss / 1000000).toFixed(1)}MB`);
+    return this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`);
   }
 
   private shouldLog(level: string): boolean {
@@ -211,14 +210,17 @@ export class NodeLogger implements Logger {
       outputLines.push('');
     }
 
-    if (d.level === 'warn') {
+    if (d.level === 'error') {
+      this.errorPrefix(outputLines);
+
+    } else if (d.level === 'warn') {
       this.warnPrefix(outputLines);
 
-    } else if (d.level === 'info') {
-      this.infoPrefix(outputLines);
+    } else if (d.level === 'debug') {
+      this.debugPrefix(outputLines);
 
     } else {
-      this.errorPrefix(outputLines);
+      this.infoPrefix(outputLines);
     }
 
     return outputLines;

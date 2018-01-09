@@ -8,7 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "lib": [
       "dom",
-      "es2015"
+      "es2017"
     ],
     "module": "es2015",
     "moduleResolution": "node",
@@ -17,10 +17,10 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "../../../dist/transpiled-cli",
+    "outDir": "../../../dist/transpiled-sys-node",
     "pretty": true,
     "rootDir": "../../",
-    "target": "es5"
+    "target": "es2015"
   },
   "files": [
     "./index.ts"
