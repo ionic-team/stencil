@@ -5,8 +5,8 @@ import {
   ListenDecorator,
   MethodDecorator,
   PropDecorator,
-  PropChangeDecorator,
   StateDecorator,
+  WatchDecorator,
 } from './interfaces';
 
 
@@ -22,8 +22,16 @@ export declare const Method: MethodDecorator;
 
 export declare const Prop: PropDecorator;
 
-export declare const PropWillChange: PropChangeDecorator;
+/**
+ * Deprecated: Please use @Watch decorator instead
+ */
+export declare const PropWillChange: WatchDecorator;
 
-export declare const PropDidChange: PropChangeDecorator;
+/**
+ * Deprecated: Please use @Watch decorator instead
+ */
+export declare const PropDidChange: WatchDecorator;
 
 export declare const State: StateDecorator;
+
+export declare const Watch: WatchDecorator;

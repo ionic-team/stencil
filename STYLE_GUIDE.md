@@ -185,11 +185,12 @@ export class Something {
   /**
    * NOTE: Prop lifecycle events SHOULD go just behind the Prop they listen to.
    * This makes sense since both statements are strongly connected.
-   * - If renaming the instance variable name you must also update the name in @PropDidChange()
+   * - If renaming the instance variable name you must also update the name in @Watch()
    * - Code is easier to follow and maintain.
    */
   @Prop() swipeEnabled = true;
-  @PropDidChange('swipeEnabled')
+
+  @Watch('swipeEnabled')
   swipeEnabledChanged() {
     this.updateState();
   }

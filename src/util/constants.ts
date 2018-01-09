@@ -14,15 +14,6 @@ export const enum MEMBER_TYPE {
 
 
 /**
- * Prop Change Meta Indexes
- */
-export const enum PROP_CHANGE {
-  PropName = 0,
-  MethodName = 1,
-}
-
-
-/**
  * Property Types
  */
 export const enum PROP_TYPE {
@@ -49,16 +40,6 @@ export const enum PRIORITY {
   Low = 1,
   Medium = 2,
   High = 3,
-}
-
-
-/**
- * Slot Meta
- */
-export const enum SLOT_META {
-  NoSlots = 0,
-  HasSlots = 1,
-  HasNamedSlots = 2,
 }
 
 
@@ -134,9 +115,6 @@ export const XML_NS = 'http://www.w3.org/XML/1998/namespace';
  */
 export const BANNER = `Built with http://stenciljs.com`;
 export const COLLECTION_MANIFEST_FILE_NAME = 'collection-manifest.json';
-export const CORE_NAME = 'core';
-export const GLOBAL_NAME = 'global';
-export const LOADER_NAME = 'loader';
 export const APP_NAMESPACE_REGEX = /["']__APP__['"]/g;
 
 

@@ -1,8 +1,8 @@
-import { ComponentMeta, ComponentRegistry, MembersMeta, MemberMeta, BuildConfig } from '../../util/interfaces';
-import { normalizePath } from '../util';
+import { BuildConfig, ComponentMeta, ComponentRegistry, MembersMeta, MemberMeta } from '../../util/interfaces';
 import { dashToPascalCase } from '../../util/helpers';
+import { normalizePath } from '../util';
 import { MEMBER_TYPE } from '../../util/constants';
-import * as path from 'path';
+
 
 const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
 
@@ -43,7 +43,7 @@ export function generateComponentTypesFile(config: BuildConfig, cmpList: Compone
       const importPath = normalizePath(config.sys.path.relative(config.srcDir, moduleFileName)
           .replace(/\.(tsx|ts)$/, ''));
 
-      typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmpMeta, moduleFileName, config);
+      typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmpMeta, moduleFileName);
 
       finalString +=
         `${createTypesAsString(cmpMeta, importPath)}\n`;
@@ -103,8 +103,7 @@ function sortImportNames(a: MemberNameData, b: MemberNameData) {
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-function updateReferenceTypeImports(importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: ComponentMeta, filePath: string, config: BuildConfig) {
-  config;
+function updateReferenceTypeImports(config: BuildConfig, importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: ComponentMeta, filePath: string) {
 
   function getIncrememntTypeName(name: string): string {
     if (allTypes[name] == null) {
@@ -144,8 +143,8 @@ function updateReferenceTypeImports(importDataObj: ImportData, allTypes: { [key:
       // If this is a relative path make it absolute
       if (importFileLocation.startsWith('.')) {
         importFileLocation =
-          path.resolve(
-            path.dirname(filePath),
+          config.sys.path.resolve(
+            config.sys.path.dirname(filePath),
             importFileLocation
           );
       }

@@ -6,7 +6,6 @@ export const Build: BuildConditionals = {
 
   cssVarShim: true,
   shadowDom: true,
-  slot: true,
   ssrClientSide: true,
   ssrServerSide: true,
 
@@ -24,8 +23,7 @@ export const Build: BuildConditionals = {
   method: true,
   propConnect: true,
   propContext: true,
-  didChange: true,
-  willChange: true,
+  watchCallback: true,
 
   // lifecycle events
   cmpDidLoad: true,

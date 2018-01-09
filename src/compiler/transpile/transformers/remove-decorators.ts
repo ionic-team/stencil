@@ -10,7 +10,8 @@ const DECORATORS_TO_REMOVE = [
   'Prop',
   'PropDidChange',
   'PropWillChange',
-  'State'
+  'State',
+  'Watch'
 ];
 
 /**
