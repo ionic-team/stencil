@@ -1,4 +1,4 @@
-import addMetadataExport from './transformers/add-metadata-export';
+import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildConfig, BuildContext, Diagnostic, ModuleFile, ModuleFiles, TranspileModulesResults, TranspileResults } from '../../util/interfaces';
 import { buildError, catchError, isSassFile, normalizePath, hasError } from '../util';
 import { COMPONENTS_DTS } from '../build/distribution';
@@ -11,8 +11,6 @@ import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeImports } from './transformers/remove-imports';
-import renameLifecycleMethods from './transformers/rename-lifecycle-methods';
-import { updateFileMetaFromSlot } from './transformers/vnode-slots';
 import * as ts from 'typescript';
 
 
@@ -85,11 +83,7 @@ export function transpileModule(config: BuildConfig, compilerOptions: ts.Compile
       before: [
         removeDecorators(),
         removeImports(),
-        renameLifecycleMethods(),
-        addMetadataExport(moduleFiles)
-      ],
-      after: [
-        updateFileMetaFromSlot(moduleFiles)
+        addComponentMetadata(config, moduleFiles)
       ]
     }
   };
@@ -183,10 +177,7 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
     before: [
       removeDecorators(),
       removeImports(),
-      renameLifecycleMethods()
-    ],
-    after: [
-      updateFileMetaFromSlot(ctx.moduleFiles)
+      addComponentMetadata(config, ctx.moduleFiles)
     ]
   });
 
