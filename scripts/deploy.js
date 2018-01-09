@@ -164,7 +164,6 @@ function runTasks(opts) {
   }
 
   if (opts.publish) {
-    publish
     tasks.push(
       {
         title: 'Publish @stencil/core',
@@ -404,13 +403,10 @@ function prettyVersionDiff(oldVersion, inc) {
   return output.join(chalk.reset.dim('.'));
 }
 
-let prepare = process.argv.slice(2).indexOf('--prepare') > -1;
-let publish = !prepare && process.argv.slice(2).indexOf('--dry-run') === -1;
+const prepare = process.argv.slice(2).indexOf('--prepare') > -1;
 
 if (prepare) {
   prepareUI();
-} else if (publish) {
-  publishUI();
 } else {
-  runTasks({ prepare: false, publish: false, version: '0.0.1-test', tag: 'test' });
+  publishUI();
 }
