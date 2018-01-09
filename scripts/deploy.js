@@ -10,7 +10,6 @@ const readPkgUp = require('read-pkg-up');
 const path = require('path');
 const rimraf = require('rimraf');
 const semver = require('semver');
-const tar = require('tar');
 
 
 const rootDir = path.join(__dirname, '../');
