@@ -26,7 +26,7 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
 
   try {
     // get all of the bundles from the manifest bundles
-    bundles = getBundlesFromManifest(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics, config);
+    bundles = getBundlesFromManifest(ctx.manifest.modulesFiles, ctx.manifest.bundles, ctx.diagnostics);
 
     // Look at all dependent components from outside collections and
     // upgrade the components to be compatible with this version if need be
@@ -48,7 +48,7 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
 }
 
 
-export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundles: ManifestBundle[], diagnostics: Diagnostic[], config: BuildConfig) {
+export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundles: ManifestBundle[], diagnostics: Diagnostic[]) {
   const bundles: Bundle[] = [];
 
   manifestBundles
@@ -70,7 +70,7 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
       });
 
       if (bundle.moduleFiles.length > 0) {
-        updateBundleData(bundle, config);
+        updateBundleData(bundle);
         bundles.push(bundle);
       }
     });
@@ -80,13 +80,10 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
 }
 
 
-export function updateBundleData(bundle: Bundle, config: BuildConfig) {
-  const path = config.sys.path;
+export function updateBundleData(bundle: Bundle) {
 
   // generate a unique entry key based on the components within this bundle
-  bundle.entryKey = path.join(
-    path.dirname(bundle.moduleFiles[0].jsFilePath), 'bundle_' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('_')
-  );
+  bundle.entryKey = 'bundle_' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('_');
 
   // get the modes used in this bundle
   bundle.modeNames = getBundleModes(bundle.moduleFiles);
