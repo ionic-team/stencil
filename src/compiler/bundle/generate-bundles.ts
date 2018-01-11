@@ -11,18 +11,28 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, bundles:
   // combine the styles and modules together
   // generate the actual files to write
   const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
+  const bundleKeys: { [key: string]: string } = {};
 
-  // writeJSFile(config, ctx, fileName, jsText);
   bundles.forEach(bundle => {
+    bundleKeys[`./${bundle.entryKey}.js`] = bundle.entryKey;
     bundle.modeNames.forEach(modeName => {
-      const es5 = jsModules['es5'][`./${bundle.entryKey}.js`].code;
-      const esm = jsModules['esm'][`./${bundle.entryKey}.js`].code;
+      const es5 = jsModules.es5[`./${bundle.entryKey}.js`].code;
+      const esm = jsModules.esm[`./${bundle.entryKey}.js`].code;
       generateBundleMode(config, ctx, bundle, modeName, {
         es5,
         esm
       });
     });
   });
+
+  Object.entries(jsModules.esm)
+    .filter(([key]) => !bundleKeys[key])
+    .forEach(([key, value]) => {
+      writeJSFile(config, ctx, key, value.code);
+    });
+
+  // Object.entries(jsModules.es5)
+  //  .filter(([key]) => !bundleKeys[key]);
 
   // create the registry of all the components
   const cmpRegistry = createComponentRegistry(bundles);
