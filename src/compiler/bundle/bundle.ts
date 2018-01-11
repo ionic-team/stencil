@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, ComponentMeta, Diagnostic, ManifestBundle, ModuleFile, JSModuleMap } from '../../util/interfaces';
 import { buildError, catchError, hasError } from '../util';
 import { bundleModules } from './bundle-modules';
 import { bundleStyles } from './bundle-styles';
@@ -7,11 +7,11 @@ import { upgradeDependentComponents } from '../upgrade-dependents/index';
 import { requiresScopedStyles } from './component-styles';
 
 
-export async function bundle(config: BuildConfig, ctx: BuildContext) {
+export async function bundle(config: BuildConfig, ctx: BuildContext): Promise<[Bundle[], JSModuleMap]> {
   let bundles: Bundle[] = [];
 
   if (hasError(ctx.diagnostics)) {
-    return bundles;
+    return [bundles, {}];
   }
 
   if (config.generateWWW) {
@@ -23,6 +23,7 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
   }
 
   const timeSpan = config.logger.createTimeSpan(`bundle started`, true);
+  let jsModules;
 
   try {
     // get all of the bundles from the manifest bundles
@@ -33,7 +34,7 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
     await upgradeDependentComponents(config, ctx, bundles);
 
     // kick off style and module bundling at the same time
-    await Promise.all([
+    [, jsModules] = await Promise.all([
       bundleStyles(config, ctx, bundles),
       bundleModules(config, ctx, bundles)
     ]);
@@ -44,7 +45,7 @@ export async function bundle(config: BuildConfig, ctx: BuildContext) {
 
   timeSpan.finish(`bundle finished`);
 
-  return bundles;
+  return [bundles, jsModules];
 }
 
 
@@ -56,7 +57,6 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
     .forEach(manifestBundle => {
       const bundle: Bundle = {
         moduleFiles: [],
-        compiledModuleText: ''
       };
 
       manifestBundle.components.forEach(tag => {

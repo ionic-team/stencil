@@ -72,12 +72,12 @@ export async function build(config: BuildConfig, context?: any) {
     await generateAppManifest(config, ctx, compileResults.moduleFiles);
 
     // bundle modules and styles into separate files phase
-    const bundles = await bundle(config, ctx);
+    const [ bundles, jsModules ] = await bundle(config, ctx);
 
     // both styles and modules are done bundling
     // inject the styles into the modules and
     // generate each of the output bundles
-    const cmpRegistry = generateBundles(config, ctx, bundles);
+    const cmpRegistry = generateBundles(config, ctx, bundles, jsModules);
 
     // generate the app files, such as app.js, app.core.js
     await generateAppFiles(config, ctx, bundles, cmpRegistry);

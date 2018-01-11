@@ -1,12 +1,12 @@
-import { BuildConfig, BuildContext, Bundle } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, JSModuleMap } from '../../util/interfaces';
 import { catchError, hasError } from '../util';
-import { writeEsModules, /*writeLegacyModules,*/ createBundle, } from './rollup-bundle';
+import { writeEsModules, writeLegacyModules, createBundle, } from './rollup-bundle';
 
 
-export async function bundleModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
+export async function bundleModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]): Promise<JSModuleMap> {
   // create main module results object
   if (hasError(ctx.diagnostics)) {
-    return;
+    return {};
   }
 
   // do bundling if this is not a change build
@@ -14,29 +14,26 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
   const doBundling = (!ctx.isChangeBuild || ctx.changeHasComponentModules || ctx.changeHasNonComponentModules);
   const timeSpan = config.logger.createTimeSpan(`bundle modules started`, !doBundling);
 
-  let rollupBundle;
+  let results: JSModuleMap = {};
 
   try {
     // run rollup, but don't generate yet
     // returned rollup bundle can be reused for es module and legacy
-    rollupBundle = await createBundle(config, ctx, bundles);
+    const rollupBundle = await createBundle(config, ctx, bundles);
 
     // bundle using only es modules and dynamic imports
-    await writeEsModules(config, rollupBundle);
+    results.esm = await writeEsModules(config, rollupBundle);
 
-    /*
     if (config.buildEs5) {
       // only create legacy modules when generating es5 fallbacks
       // bundle using commonjs using jsonp callback
-      await writeLegacyModules(config, rollupBundle);
+      results.es5 = await writeLegacyModules(config, rollupBundle);
     }
-    */
 
   } catch (err) {
     catchError(ctx.diagnostics, err);
   }
 
   timeSpan.finish('bundle modules finished');
-
-  // return (<any>rollupBundle).chunks;
+  return results;
 }

@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Bundle } from '../../util/interfaces';
+import { BuildConfig, BuildContext, Bundle, JSModuleList } from '../../util/interfaces';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
@@ -40,24 +40,24 @@ export async function createBundle(config: BuildConfig, ctx: BuildContext, bundl
 
 
 export async function writeEsModules(config: BuildConfig, rollupBundle: OutputBundle) {
-  await rollupBundle.write({
-    dir: config.buildDir,
+  const results = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
     intro: `const { h, Context } = window.${config.namespace};`,
   });
+  return <any>results as JSModuleList;
 }
 
 
 export async function writeLegacyModules(config: BuildConfig, rollupBundle: OutputBundle) {
-  await rollupBundle.write({
-    dir: config.buildDir,
+  const results = await rollupBundle.generate({
     format: 'cjs',
     banner: generatePreamble(config),
-    intro: `${config.namespace}.loadComponents(function(exports,h,Context){` +
+    intro: `${config.namespace}.loadComponents(function(exports, h, Context){` +
            `"use strict";`,
             // module content w/ commonjs exports object
     outro: `\n},"${getBundleIdPlaceholder()}");`,
     strict: false,
   });
+  return <any>results as JSModuleList;
 }

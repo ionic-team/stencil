@@ -247,10 +247,18 @@ export interface AppRegistryComponents {
 export interface Bundle {
   entryKey?: string;
   moduleFiles: ModuleFile[];
-  compiledModuleText?: string;
-  compiledModuleLegacyText?: string;
   requiresScopedStyles?: boolean;
   modeNames?: string[];
+}
+
+
+export interface JSModuleList {
+  [key: string]: { code: string };
+}
+
+export interface JSModuleMap {
+  esm?: JSModuleList;
+  es5?: JSModuleList;
 }
 
 
