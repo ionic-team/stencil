@@ -1,3 +1,13 @@
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/ionic-team/stencil/compare/v0.1.2...v0.1.3) (2018-01-11)
+
+
+### Bug Fixes
+
+* **styles:** styles applied in browsers using the legacy client ([d6bc15e](https://github.com/ionic-team/stencil/commit/d6bc15e))
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/ionic-team/stencil/compare/v0.1.1...v0.1.2) (2018-01-09)
 
