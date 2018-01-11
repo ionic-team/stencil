@@ -13,6 +13,7 @@ import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { h } from '../core/renderer/h';
 import { initCssVarShim } from './css-shim/init-css-shim';
 import { initHostElement } from '../core/instance/init-host-element';
+import { initStyleTemplate } from '../core/instance/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy-controller';
 import { toDashCase } from '../util/helpers';
@@ -165,6 +166,8 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
         if (cmpMeta) {
           // connect the component's constructor to its metadata
           cmpMeta.componentConstructor = exports[pascalCasedTagName];
+
+          initStyleTemplate(domApi, cmpMeta.componentConstructor);
         }
       });
 
