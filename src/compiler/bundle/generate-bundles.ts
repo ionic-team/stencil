@@ -16,23 +16,23 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, bundles:
   bundles.forEach(bundle => {
     bundleKeys[`./${bundle.entryKey}.js`] = bundle.entryKey;
     bundle.modeNames.forEach(modeName => {
-      const es5 = jsModules.es5[`./${bundle.entryKey}.js`].code;
-      const esm = jsModules.esm[`./${bundle.entryKey}.js`].code;
-      generateBundleMode(config, ctx, bundle, modeName, {
-        es5,
-        esm
-      });
+      const jsCode = Object.keys(jsModules).reduce((all, mType) => {
+        return {
+          ...all,
+          [mType]: jsModules[mType][`./${bundle.entryKey}.js`].code
+        };
+      }, {} as {[key: string]: string});
+      generateBundleMode(config, ctx, bundle, modeName, jsCode);
     });
   });
 
-  Object.entries(jsModules.esm)
-    .filter(([key]) => !bundleKeys[key])
-    .forEach(([key, value]) => {
-      writeJSFile(config, ctx, key, value.code);
-    });
-
-  // Object.entries(jsModules.es5)
-  //  .filter(([key]) => !bundleKeys[key]);
+  Object.keys(jsModules).forEach(mType => {
+    Object.entries(jsModules[mType])
+      .filter(([key]) => !bundleKeys[key])
+      .forEach(([key, value]) => {
+        writeJSFile(config, ctx, key, value.code);
+      });
+  });
 
   // create the registry of all the components
   const cmpRegistry = createComponentRegistry(bundles);
