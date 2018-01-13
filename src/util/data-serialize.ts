@@ -222,31 +222,28 @@ export function formatComponentConstructorEvents(eventsMeta: EventMeta[]) {
 }
 
 
-export function formatComponentConstructorEvent(eventMeta: EventMeta) {
-  const constructorEvent: ComponentConstructorEvent = {
+export function formatComponentConstructorEvent(eventMeta: EventMeta): ComponentConstructorEvent {
+  const constructorEvent = {
     name: eventMeta.eventName,
-    method: eventMeta.eventMethodName
+    method: eventMeta.eventMethodName,
+    bubbles: true,
+    cancelable: true,
+    composed: true
   };
 
   // default bubbles true
   if (typeof eventMeta.eventBubbles === 'boolean') {
     constructorEvent.bubbles = eventMeta.eventBubbles;
-  } else {
-    constructorEvent.bubbles = true;
   }
 
   // default cancelable true
   if (typeof eventMeta.eventCancelable === 'boolean') {
     constructorEvent.cancelable = eventMeta.eventCancelable;
-  } else {
-    constructorEvent.cancelable = true;
   }
 
   // default composed true
   if (typeof eventMeta.eventComposed === 'boolean') {
     constructorEvent.composed = eventMeta.eventComposed;
-  } else {
-    constructorEvent.composed = true;
   }
 
   return constructorEvent;

@@ -13,7 +13,7 @@ export function getEventDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cla
       }
 
       const [ eventOptions ] = getDeclarationParameters<EventOptions>(elementDecorator);
-      const metadata: EventMeta = convertOptionsToMeta(eventOptions, member.name.getText());
+      const metadata = convertOptionsToMeta(eventOptions, member.name.getText());
 
       if (metadata) {
         const symbol = checker.getSymbolAtLocation(member.name);
@@ -26,24 +26,15 @@ export function getEventDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cla
     }, [] as EventMeta[]);
 }
 
-function convertOptionsToMeta(rawEventOpts: EventOptions = {}, methodName: string): EventMeta | null {
-
+export function convertOptionsToMeta(rawEventOpts: EventOptions = {}, methodName: string): EventMeta | null {
   if (!methodName) {
     return null;
   }
-
-  const eventMeta: EventMeta = {
+  return {
     eventMethodName: methodName,
-    eventName: methodName
+    eventName: typeof rawEventOpts.eventName === 'string' ? rawEventOpts.eventName : methodName,
+    eventBubbles: typeof rawEventOpts.bubbles === 'boolean' ? rawEventOpts.bubbles : true,
+    eventCancelable: typeof rawEventOpts.cancelable === 'boolean' ? rawEventOpts.cancelable : true,
+    eventComposed: typeof rawEventOpts.composed === 'boolean' ? rawEventOpts.composed : true
   };
-
-  if (typeof rawEventOpts.eventName === 'string') {
-    eventMeta.eventName = rawEventOpts.eventName;
-  }
-
-  eventMeta.eventBubbles = typeof rawEventOpts.bubbles === 'boolean' ? rawEventOpts.bubbles : true;
-  eventMeta.eventCancelable = typeof rawEventOpts.cancelable === 'boolean' ? rawEventOpts.cancelable : true;
-  eventMeta.eventComposed = typeof rawEventOpts.composed === 'boolean' ? rawEventOpts.composed : true;
-
-  return eventMeta;
 }
