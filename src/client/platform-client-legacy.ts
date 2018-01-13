@@ -36,7 +36,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   Context.publicPath = publicPath;
 
   if (Build.listener) {
-    Context.enableListener = (instance, eventName, enabled, attachTo) => enableEventListener(plt, instance, eventName, enabled, attachTo);
+    Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
   }
 
   if (Build.event) {

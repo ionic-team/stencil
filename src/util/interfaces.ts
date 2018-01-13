@@ -38,7 +38,7 @@ export interface AddEventListener {
 
 
 export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element): void;
+  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element, passive?: boolean): void;
 }
 
 

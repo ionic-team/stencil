@@ -47,7 +47,7 @@ export function createListenerCallback(elm: HostElement, eventMethodName: string
 }
 
 
-export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element) {
+export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element, passive?: boolean) {
   if (instance) {
     // cool, we've got an instance, it's get the element it's on
     const elm = instance.__el;
@@ -67,7 +67,7 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
             eventName,
             (ev: any) => instance[listenMeta.eventMethodName](ev),
             listenMeta.eventCapture,
-            listenMeta.eventPassive,
+            (passive === undefined) ? listenMeta.eventPassive : !!passive,
             attachTo
           );
         }
