@@ -20,4 +20,7 @@ class ActionSheet {
    * @param opts action sheet options
    */
   @Event() ionGestureMove: EventEmitter;
+
+  @Event({eventName: 'event-emitted'}) eventEmitted: EventEmitter;
+
 }

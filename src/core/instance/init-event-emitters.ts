@@ -5,7 +5,7 @@ export function initEventEmitters(plt: PlatformApi, cmpEvents: ComponentConstruc
   if (cmpEvents) {
     cmpEvents.forEach(eventMeta => {
 
-      instance[eventMeta.name] = {
+      instance[eventMeta.method] = {
         emit: (data: any) => {
           plt.emitEvent(instance.__el, eventMeta.name, {
             bubbles: eventMeta.bubbles,

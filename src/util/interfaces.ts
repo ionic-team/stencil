@@ -701,11 +701,11 @@ export type PropertyType = StringConstructor | BooleanConstructor | NumberConstr
 
 
 export interface ComponentConstructorEvent {
-  name?: string;
-  method?: string;
-  bubbles?: boolean;
-  cancelable?: boolean;
-  composed?: boolean;
+  name: string;
+  method: string;
+  bubbles: boolean;
+  cancelable: boolean;
+  composed: boolean;
 }
 
 
@@ -737,11 +737,11 @@ export interface EventOptions {
 
 
 export interface EventMeta {
-  eventName?: string;
-  eventMethodName?: string;
-  eventBubbles?: boolean;
-  eventCancelable?: boolean;
-  eventComposed?: boolean;
+  eventName: string;
+  eventMethodName: string;
+  eventBubbles: boolean;
+  eventCancelable: boolean;
+  eventComposed: boolean;
   jsdoc?: JSDoc;
 }
 

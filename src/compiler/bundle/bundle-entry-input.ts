@@ -4,12 +4,8 @@ import { normalizePath } from '../util';
 
 
 export function generateBundleEntryInput(bundle: Bundle) {
-  const lines: string[] = [];
-
   // create a PascalCased named export for each component within the button
-  bundle.moduleFiles.forEach(m => {
-    lines.push(componentExport(m));
-  });
+  const lines = bundle.moduleFiles.map(m => componentExport(m));
 
   // return a string representing the entry input file for this bundle
   return lines.join('\n');
