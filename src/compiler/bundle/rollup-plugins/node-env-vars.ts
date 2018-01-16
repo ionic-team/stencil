@@ -1,5 +1,6 @@
 import { BuildConfig } from '../../../util/interfaces';
 import { buildExpressionReplacer } from '../../build/replacer';
+import { Plugin, SourceDescription } from 'rollup';
 
 
 export default function nodeEnvVars(config: BuildConfig) {
@@ -8,8 +9,10 @@ export default function nodeEnvVars(config: BuildConfig) {
   return {
     name: 'nodeEnvVarsPlugin',
 
-    transform(sourceText: string) {
-      return buildExpressionReplacer(config, sourceText);
+    transform(sourceText: string): Promise<SourceDescription> {
+      return Promise.resolve({
+        code: buildExpressionReplacer(config, sourceText)
+      });
     }
-  };
+  } as Plugin;
 }
