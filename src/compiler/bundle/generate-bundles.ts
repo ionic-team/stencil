@@ -1,6 +1,6 @@
 import { BuildConfig, BuildContext, Bundle, ComponentMeta, ComponentRegistry, SourceTarget, ModuleFile } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { generatePreamble, hasError, pathJoin } from '../util';
+import { hasError, pathJoin, minifyJs } from '../util';
 import { getAppDistDir, getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { getStylePlaceholder, getStyleIdPlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { transpileToEs5 } from '../transpile/core-build';
@@ -201,38 +201,8 @@ function transileEs5Bundle(ctx: BuildContext, jsText: string) {
   return transpileResults.code;
 }
 
-
-function minifyBundleJs(config: BuildConfig, ctx: BuildContext, jsText: string, sourceTarget?: SourceTarget) {
-  const opts: any = { output: {}, compress: {}, mangle: {} };
-
-  if (sourceTarget === 'es5') {
-    opts.ecma = 5;
-    opts.output.ecma = 5;
-    opts.compress.ecma = 5;
-    opts.compress.arrows = false;
-
-  } else {
-    opts.ecma = 6;
-    opts.output.ecma = 6;
-    opts.compress.ecma = 6;
-    opts.compress.arrows = true;
-  }
-
-  if (config.logLevel === 'debug') {
-    opts.mangle.keep_fnames = true;
-    opts.compress.drop_console = false;
-    opts.compress.drop_debugger = false;
-    opts.output.beautify = true;
-    opts.output.bracketize = true;
-    opts.output.indent_level = 2;
-    opts.output.comments = 'all';
-    opts.output.preserve_line = true;
-  }
-
-  opts.output.preamble = generatePreamble(config);
-
-  const minifyJsResults = config.sys.minifyJs(jsText, opts);
-
+function minifyBundleJs(config: BuildConfig, ctx: BuildContext, jsText: string, sourceTarget?: SourceTarget): string {
+  const minifyJsResults = minifyJs(config, jsText, sourceTarget, true);
   if (minifyJsResults.diagnostics.length) {
     minifyJsResults.diagnostics.forEach(d => {
       ctx.diagnostics.push(d);
@@ -241,7 +211,6 @@ function minifyBundleJs(config: BuildConfig, ctx: BuildContext, jsText: string, 
   } else {
     jsText = minifyJsResults.output;
   }
-
   return jsText;
 }
 

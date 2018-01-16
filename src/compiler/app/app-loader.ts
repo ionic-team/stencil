@@ -1,6 +1,6 @@
 import { AppRegistry, BuildConfig, BuildContext, ComponentRegistry } from '../../util/interfaces';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
-import { generatePreamble } from '../util';
+import { generatePreamble, minifyJs } from '../util';
 import { getAppPublicPath, getLoaderFileName, getLoaderDist, getLoaderWWW } from './app-file-naming';
 import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 
@@ -65,26 +65,7 @@ export async function generateLoader(
 
 function minifyLoader(config: BuildConfig, jsText: string) {
   // minify the loader
-  const opts: any = { output: {}, compress: {}, mangle: {} };
-  opts.ecma = 5;
-  opts.output.ecma = 5;
-  opts.compress.ecma = 5;
-  opts.compress.arrows = false;
-
-  if (config.logLevel === 'debug') {
-    opts.mangle.keep_fnames = true;
-    opts.compress.drop_console = false;
-    opts.compress.drop_debugger = false;
-    opts.output.beautify = true;
-    opts.output.bracketize = true;
-    opts.output.indent_level = 2;
-    opts.output.comments = 'all';
-    opts.output.preserve_line = true;
-  }
-
-  opts.output.preamble = generatePreamble(config);
-
-  const minifyJsResults = config.sys.minifyJs(jsText, opts);
+  const minifyJsResults = minifyJs(config, jsText, 'es5', true);
   minifyJsResults.diagnostics.forEach(d => {
     (config.logger as any)[d.level](d.messageText);
   });

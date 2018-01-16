@@ -1,5 +1,5 @@
 import { BANNER } from '../util/constants';
-import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem } from '../util/interfaces';
+import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem, SourceTarget } from '../util/interfaces';
 
 
 export function getBuildContext(ctx?: BuildContext) {
@@ -247,6 +247,37 @@ export function isWebDevFile(filePath: string) {
 }
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
 
+export function minifyJs(config: BuildConfig, jsText: string, sourceTarget: SourceTarget, preamble: boolean) {
+  const opts: any = { output: {}, compress: {}, mangle: {} };
+
+  if (sourceTarget === 'es5') {
+    opts.ecma = 5;
+    opts.output.ecma = 5;
+    opts.compress.ecma = 5;
+    opts.compress.arrows = false;
+
+  } else {
+    opts.ecma = 6;
+    opts.output.ecma = 6;
+    opts.compress.ecma = 6;
+    opts.compress.arrows = true;
+  }
+
+  if (config.logLevel === 'debug') {
+    opts.mangle.keep_fnames = true;
+    opts.compress.drop_console = false;
+    opts.compress.drop_debugger = false;
+    opts.output.beautify = true;
+    opts.output.bracketize = true;
+    opts.output.indent_level = 2;
+    opts.output.comments = 'all';
+    opts.output.preserve_line = true;
+  }
+  if (preamble) {
+    opts.output.preamble = generatePreamble(config);
+  }
+  return config.sys.minifyJs(jsText, opts);
+}
 
 export function generatePreamble(config: BuildConfig) {
   let preamble: string[] = [];
