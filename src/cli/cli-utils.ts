@@ -28,16 +28,14 @@ export function overrideConfigFromArgv(config: BuildConfig, argv: CliArgv) {
   }
 
   if (config.devMode) {
-    if (argv.serviceWorker && config.serviceWorker === undefined) {
+    if (argv.serviceWorker === undefined) {
+      // should disable service worker in dev mode by default
+      config.serviceWorker = false;
+    } else if (config.serviceWorker === undefined) {
       // dev mode, but forcing service worker
       // but they didn't provide a sw config
       // so still force it to generate w/ our defaults
       config.serviceWorker = true;
-
-    } else {
-      // dev mode, and not forcing service worker
-      // so set this to false so it's not generated
-      config.serviceWorker = false;
     }
 
   } else if (config.serviceWorker === undefined) {
