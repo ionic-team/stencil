@@ -18,6 +18,8 @@ export function createDomApi(win: any, doc: Document): DomApi {
 
     $body: doc.body,
 
+    $supportsEventOptions: false,
+
     $nodeType: (node: any) =>
       node.nodeType,
 
@@ -223,7 +225,8 @@ export function createDomApi(win: any, doc: Document): DomApi {
     }
 
     domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
-
+  }
+  if (Build.event || Build.listener) {
     // test if this browser supports event options or not
     try {
       (win as Window).addEventListener('e', null,
@@ -233,7 +236,6 @@ export function createDomApi(win: any, doc: Document): DomApi {
       );
     } catch (e) {}
   }
-
 
   domApi.$parentElement = (elm: Node, parentNode?: any): any => {
     // if the parent node is a document fragment (shadow root)
