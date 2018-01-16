@@ -46,7 +46,18 @@ export function init(
 }
 
 export function supportsEsModules(scriptElm: HTMLScriptElement) {
-  return 'noModule' in scriptElm;
+  // detect static ES module support
+  const staticModule = 'noModule' in scriptElm;
+  if (!staticModule) {
+    return false;
+  }
+  // detect dynamic import support
+  try {
+    new Function('import("")');
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 
 export function supportsCustomElements(win: Window) {
