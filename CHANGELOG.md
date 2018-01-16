@@ -1,3 +1,24 @@
+<a name="0.1.5"></a>
+## [0.1.5](https://github.com/ionic-team/stencil/compare/v0.1.4...v0.1.5) (2018-01-16)
+
+
+### Bug Fixes
+
+* **events:** Event() options ([e1662a5](https://github.com/ionic-team/stencil/commit/e1662a5)), closes [#406](https://github.com/ionic-team/stencil/issues/406)
+* **listeners:** addListenerEvent() options check ([1275327](https://github.com/ionic-team/stencil/commit/1275327))
+
+
+### Features
+
+* **listeners:** enableListener accepts passive option ([1275327](https://github.com/ionic-team/stencil/commit/1275327))
+
+
+### Performance Improvements
+
+* **sw:** serviceWorker script is minified ([76bcc52](https://github.com/ionic-team/stencil/commit/76bcc52))
+
+
+
 <a name="0.1.4"></a>
 ## [0.1.4](https://github.com/ionic-team/stencil/compare/v0.1.3...v0.1.4) (2018-01-12)
 
