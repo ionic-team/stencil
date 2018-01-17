@@ -139,6 +139,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
           }
         }
       }
+
+      isSvgMode = false;
     }
 
     return vnode.elm;
