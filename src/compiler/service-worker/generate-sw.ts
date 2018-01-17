@@ -1,5 +1,5 @@
 import { BuildConfig, BuildContext, ServiceWorkerConfig } from '../../util/interfaces';
-import { catchError } from '../util';
+import { buildWarn, catchError } from '../util';
 
 
 export async function generateServiceWorker(config: BuildConfig, ctx: BuildContext) {
@@ -29,7 +29,9 @@ async function copyLib(config: BuildConfig, ctx: BuildContext) {
     await config.sys.workbox.copyWorkboxLibraries(config.wwwDir);
 
   } catch (e) {
-    catchError(ctx.diagnostics, e);
+    // workaround for workbox issue in the latest alpha
+    const d = buildWarn(ctx.diagnostics);
+    d.messageText = 'Service worker library already exists';
   }
 
   timeSpan.finish(`copy service worker library finished`);
