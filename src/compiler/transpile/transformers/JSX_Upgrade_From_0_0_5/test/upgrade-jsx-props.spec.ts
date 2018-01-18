@@ -25,7 +25,7 @@ describe('vnode-slot transform', async () => {
         fs.readFileSync(path.join(__dirname, './post-update', fileName), { encoding: 'utf8'})
       ]);
 
-      const output = await transformSourceString(compilerCtx, fileName, source, [upgradeJsxProps]);
+      const output = await transformSourceString(fileName, source, [upgradeJsxProps]);
       expect(
         output
       ).toEqual(
