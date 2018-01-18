@@ -1,11 +1,20 @@
 
 export {
+  AddEventListener,
+  AppGlobal,
+  ComponentDidLoad,
+  ComponentDidUnload,
+  ComponentDidUpdate,
+  ComponentWillLoad,
+  ComponentWillUpdate,
   ComponentDecorator,
   Config,
   CssClassMap,
   Diagnostic,
   ElementDecorator,
   EventDecorator,
+  EventEmitter,
+  EventListenerEnable,
   HydrateOptions,
   ListenDecorator,
   MethodDecorator,
@@ -17,5 +26,5 @@ export {
   StateDecorator,
   StencilSystem,
   VNodeData,
-  WatchDecorator
+  WatchDecorator,
 } from './index';
