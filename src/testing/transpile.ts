@@ -1,12 +1,10 @@
-import { BuildConfig, Diagnostic } from '../util/interfaces';
+import { Config, Diagnostic } from '../util/interfaces';
 import { transpileModule } from '../compiler/transpile/transpile';
 
 
-const TEST_CONFIG: BuildConfig = {
+const TEST_CONFIG: Config = {
   sys: {
     path: require('path'),
-    fs: require('fs'),
-    typescript: require('typescript'),
     url: require('url'),
     vm: require('vm')
   },

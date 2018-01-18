@@ -1,20 +1,25 @@
-import { BuildConfig, ComponentMeta, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, HydrateResults, Logger, PlatformApi, RendererApi, StencilSystem, VNode, ComponentRegistry } from '../util/interfaces';
+import { ComponentMeta, ComponentRegistry, Config, DomApi, HostContentNodes, HostElement,
+  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode } from '../util/interfaces';
 import { ComponentInstance } from '../util/interfaces';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
 import { initHostElement } from '../core/instance/init-host-element';
 import { initComponentInstance } from '../core/instance/init-component-instance';
-import { noop } from '../util/helpers';
 import { validateBuildConfig } from '../util/validate-config';
+import { TestingConfig } from './testing-config';
+import { TestingSystem } from './testing-sys';
+import { TestingFs } from './testing-fs';
+import { TestingLogger } from './index';
+import { Cache } from '../compiler/cache';
+import { InMemoryFileSystem } from '../util/in-memory-fs';
 
 
 export function mockPlatform(win?: any, domApi?: DomApi) {
   const hydrateResults: HydrateResults = {
     diagnostics: []
   };
-  const config = mockBuildConfig();
+  const config = mockConfig();
   win = win || config.sys.createDom().parse({html: ''});
   domApi = domApi || createDomApi(win, win.document);
   const cmpRegistry: ComponentRegistry = {};
@@ -70,255 +75,32 @@ export interface MockedPlatform extends PlatformApi {
 }
 
 
-export function mockBuildConfig() {
-  var sys = mockStencilSystem();
-
-  const config: BuildConfig = {
-    sys: sys,
-    logger: mockLogger(),
-    rootDir: '/',
-    suppressTypeScriptErrors: true,
-    devMode: true
-  };
-
+export function mockConfig(): Config {
+  const config = new TestingConfig();
   return validateBuildConfig(config);
 }
 
 
-export function mockStencilSystem() {
-  const sys: StencilSystem = {
-
-    compiler: {
-      name: 'test',
-      version: 'test',
-      typescriptVersion: 'test'
-    },
-
-    copy: function mockCopyDir(src: string, dest: string) {
-      src; dest;
-      return new Promise(resolve => {
-        resolve();
-      });
-    },
-
-    createDom: mockCreateDom,
-
-    emptyDir: function() {
-      return new Promise(resolve => {
-        resolve();
-      });
-    },
-
-    ensureDir: function() {
-      return new Promise(resolve => {
-        resolve();
-      });
-    },
-
-    generateContentHash: function mockGenerateContentHash(content: string, length: number) {
-      var crypto = require('crypto');
-      return crypto.createHash('sha1')
-                  .update(content)
-                  .digest('base64')
-                  .replace(/\W/g, '')
-                  .substr(0, length)
-                  .toLowerCase();
-    },
-
-    getClientCoreFile: mockGetClientCoreFile,
-
-    fs: null,
-
-    isGlob: function(str) {
-      const isGlob = require('is-glob');
-      return isGlob(str);
-    },
-
-    minifyCss: mockMinify,
-
-    minifyJs: mockMinify,
-
-    minimatch(filePath, pattern, opts) {
-      const minimatch = require('minimatch');
-      return minimatch(filePath, pattern, opts);
-    },
-
-    path: require('path'),
-
-    remove: function mockRmDir(path) {
-      path;
-      return new Promise(resolve => {
-        resolve();
-      });
-    },
-
-    rollup: rollup,
-
-    sass: {
-      render: function(config: any, cb: Function) {
-        Promise.resolve().then(() => {
-          config;
-
-          let content: string;
-          if (sys.fs) {
-            content = sys.fs.readFileSync(config.file, 'utf-8');
-          } else {
-            content = `/** ${config.file} mock css **/`;
-          }
-
-          cb(null, {
-            css: content,
-            stats: []
-          });
-        });
-      }
-    },
-
-    semver: require('semver'),
-
-    typescript: require('typescript'),
-
-    url: require('url'),
-
-    vm: {
-      createContext: function(ctx, wwwDir, sandbox) {
-        ctx; wwwDir;
-        return require('vm').createContext(sandbox);
-      },
-      runInContext: function(code, contextifiedSandbox, options) {
-        require('vm').runInContext(code, contextifiedSandbox, options);
-      }
-    },
-
-    watch: mockWatch
-  };
-
-  return sys;
+export function mockStencilSystem(): StencilSystem {
+  return new TestingSystem();
 }
-
-
-function mockGetClientCoreFile(opts: {staticName: string}) {
-  return Promise.resolve(`
-    (function (window, document, apptNamespace, appFileName, appCore, appCorePolyfilled, components) {
-        // mock getClientCoreFile, staticName: ${opts.staticName}
-    })(window, document, '__APP__');`);
-}
-
-
-function mockWatch(paths: string): any {
-  paths;
-  const events: {[eventName: string]: Function} = {};
-
-  const watcher = {
-    on: function(eventName: string, listener: Function) {
-      events[eventName] = listener;
-      return watcher;
-    },
-    $triggerEvent: function(eventName: string, path: string) {
-      events[eventName](path);
-    }
-  };
-
-  return watcher;
-}
-
-function mockCreateDom() {
-  const jsdom = require('jsdom');
-  let dom: any;
-
-  return {
-    parse: function(opts: HydrateOptions) {
-      dom = new jsdom.JSDOM(opts.html, {
-        url: opts.path,
-        referrer: opts.referrer,
-        userAgent: opts.userAgent,
-      });
-      return dom.window;
-    },
-    serialize: function() {
-      return dom.serialize();
-    },
-    destroy: function() {
-      dom.window.close();
-      dom = null;
-    },
-    getDiagnostics: function(): any {
-      return [];
-    }
-  };
-}
-
-function mockMinify(input: string) {
-  return <any>{
-    output: `/** mock minify **/\n${input}`,
-    diagnostics: []
-  };
-}
-
-var rollup = require('rollup');
-rollup.plugins = {
-  commonjs: require('rollup-plugin-commonjs'),
-  nodeResolve: require('rollup-plugin-node-resolve')
-};
 
 
 export function mockFs() {
-  const MemoryFileSystem = require('memory-fs');
-  const fs = new MemoryFileSystem();
-
-  const orgreadFileSync = fs.readFileSync;
-  const orgwriteFileSync = fs.writeFileSync;
-
-  fs.readFileSync = function() {
-    try {
-      return orgreadFileSync.apply(fs, arguments);
-    } catch (e) {
-      if (e.message && e.message.indexOf('invalid argument') > -1) {
-        console.log('mockFs, fs.readFileSync', arguments);
-        console.trace(e);
-      } else if (e.message && e.message.indexOf('no such file') > -1 && e.path.indexOf('node_modules') === -1) {
-        console.log('mockFs, fs.readFileSync', arguments);
-        console.trace(e);
-      } else {
-        throw e;
-      }
-    }
-  };
-
-  fs.writeFileSync = function() {
-    return orgwriteFileSync.apply(fs, arguments);
-  };
-
-  return fs;
+  return new TestingFs();
 }
 
 
 export function mockLogger() {
-  const logger: Logger = {
-    level: 'info',
-    debug: noop,
-    info: noop,
-    error: noop,
-    warn: noop,
-    createTimeSpan: (startMsg: string, debug?: boolean) => {
-      return {
-        finish: () => {
-          startMsg; debug;
-        }
-      };
-    },
-    printDiagnostics: noop,
-    red: (msg) => msg,
-    green: (msg) => msg,
-    yellow: (msg) => msg,
-    blue: (msg) => msg,
-    magenta: (msg) => msg,
-    cyan: (msg) => msg,
-    gray: (msg) => msg,
-    bold: (msg) => msg,
-    dim: (msg) => msg
-  };
-  return logger;
+  return new TestingLogger();
+}
+
+
+export function mockCache() {
+  const fs = new InMemoryFileSystem(mockFs(), require('path'));
+  const config = mockConfig();
+  config.enableCache = true;
+  return new Cache(config, fs, '/tmp/mock-cache');
 }
 
 
