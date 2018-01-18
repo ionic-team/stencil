@@ -1,15 +1,15 @@
-import { BuildConfig, BuildContext, CopyTask } from '../../util/interfaces';
-import { catchError, ensureDirectoriesExist, normalizePath } from '../util';
+import { BuildCtx, Config, CompilerCtx, CopyTask } from '../../util/interfaces';
+import { catchError, normalizePath } from '../util';
 
 
-export function copyTasks(config: BuildConfig, ctx: BuildContext) {
+export async function copyTasks(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   if (!config.copy) {
     config.logger.debug(`copy tasks disabled`);
-    return Promise.resolve();
+    return;
   }
 
   if (!config.generateWWW) {
-    return Promise.resolve();
+    return;
   }
 
   const timeSpan = config.logger.createTimeSpan(`copyTasks started`, true);
@@ -17,39 +17,29 @@ export function copyTasks(config: BuildConfig, ctx: BuildContext) {
 
   const copyTasks = Object.keys(config.copy).map(copyTaskName => config.copy[copyTaskName]);
 
-  return Promise.all(copyTasks.map(copyTask => {
-    return processCopyTasks(config, allCopyTasks, copyTask);
-
-  })).then(() => {
-    const ensureDirectories: string[] = [];
-
-    allCopyTasks.forEach(ct => {
-      const dest = ct.isDirectory ? ct.dest : config.sys.path.dirname(ct.dest);
-      if (ensureDirectories.indexOf(dest) === -1) {
-        ensureDirectories.push(dest);
-      }
-    });
-
-    return ensureDirectoriesExist(config.sys, ensureDirectories, [config.rootDir]);
-
-  }).then(() => {
-    return Promise.all(allCopyTasks.map(copyTask => {
-      return config.sys.copy(copyTask.src, copyTask.dest, { filter: copyTask.filter });
+  try {
+    await Promise.all(copyTasks.map(copyTask => {
+      return processCopyTasks(config, compilerCtx, allCopyTasks, copyTask);
     }));
 
-  }).catch(err => {
-    catchError(ctx.diagnostics, err);
+    await Promise.all(allCopyTasks.map(async copyTask => {
+      await compilerCtx.fs.copy(copyTask.src, copyTask.dest, { filter: copyTask.filter });
+    }));
 
-  }).then(() => {
-    timeSpan.finish(`copyTasks finished`);
-  });
+    await compilerCtx.fs.commitCopy();
+
+  } catch (e) {
+    catchError(buildCtx.diagnostics, e);
+  }
+
+  timeSpan.finish(`copyTasks finished`);
 }
 
 
-export function processCopyTasks(config: BuildConfig, allCopyTasks: CopyTask[], copyTask: CopyTask): Promise<any> {
+export async function processCopyTasks(config: Config, ctx: CompilerCtx, allCopyTasks: CopyTask[], copyTask: CopyTask): Promise<any> {
   if (!copyTask) {
     // possible null was set, which is fine, just skip over this one
-    return Promise.resolve(null);
+    return null;
   }
 
   if (!copyTask.src) {
@@ -68,26 +58,21 @@ export function processCopyTasks(config: BuildConfig, allCopyTasks: CopyTask[], 
 
   const processedCopyTask = processCopyTask(config, copyTask);
 
-  return new Promise(resolve => {
-    config.sys.fs.stat(processedCopyTask.src, (err, stats) => {
-      if (err) {
-        if (copyTask.warn !== false) {
-          config.logger.warn(`copy, ${processedCopyTask.src}: ${err}`);
-        }
-        resolve();
+  try {
+    const stats = await ctx.fs.stat(processedCopyTask.src);
+    processedCopyTask.isDirectory = stats.isDirectory;
+    config.logger.debug(`copy, ${processedCopyTask.src} to ${processedCopyTask.dest}, isDirectory: ${processedCopyTask.isDirectory}`);
+    allCopyTasks.push(processedCopyTask);
 
-      } else {
-        processedCopyTask.isDirectory = stats.isDirectory();
-        config.logger.debug(`copy, ${processedCopyTask.src} to ${processedCopyTask.dest}, isDirectory: ${processedCopyTask.isDirectory}`);
-        allCopyTasks.push(processedCopyTask);
-        resolve();
-      }
-    });
-  });
+  } catch (e) {
+    if (copyTask.warn !== false) {
+      config.logger.warn(`copy, ${processedCopyTask.src}: ${e}`);
+    }
+  }
 }
 
 
-function processGlob(config: BuildConfig, copyTask: CopyTask) {
+function processGlob(config: Config, copyTask: CopyTask) {
   const globOpts = {
     cwd: config.srcDir,
     nodir: true
@@ -101,7 +86,7 @@ function processGlob(config: BuildConfig, copyTask: CopyTask) {
 }
 
 
-export function getGlobCopyTask(config: BuildConfig, copyTask: CopyTask, globRelPath: string) {
+export function getGlobCopyTask(config: Config, copyTask: CopyTask, globRelPath: string) {
   let dest: string;
 
   if (copyTask.dest) {
@@ -126,7 +111,7 @@ export function getGlobCopyTask(config: BuildConfig, copyTask: CopyTask, globRel
 }
 
 
-export function processCopyTask(config: BuildConfig, copyTask: CopyTask) {
+export function processCopyTask(config: Config, copyTask: CopyTask) {
   const processedCopyTask: CopyTask = {
     src: getSrcAbsPath(config, copyTask.src),
     dest: getDestAbsPath(config, copyTask.src, copyTask.dest),
@@ -137,7 +122,7 @@ export function processCopyTask(config: BuildConfig, copyTask: CopyTask) {
 }
 
 
-export function getSrcAbsPath(config: BuildConfig, src: string) {
+export function getSrcAbsPath(config: Config, src: string) {
   if (config.sys.path.isAbsolute(src)) {
     return src;
   }
@@ -146,7 +131,7 @@ export function getSrcAbsPath(config: BuildConfig, src: string) {
 }
 
 
-export function getDestAbsPath(config: BuildConfig, src: string, dest?: string) {
+export function getDestAbsPath(config: Config, src: string, dest?: string) {
   if (dest) {
     if (config.sys.path.isAbsolute(dest)) {
       return dest;
@@ -164,7 +149,7 @@ export function getDestAbsPath(config: BuildConfig, src: string, dest?: string) 
 }
 
 
-export function isCopyTaskFile(config: BuildConfig, filePath: string) {
+export function isCopyTaskFile(config: Config, filePath: string) {
   if (!config.copy) {
     // there is no copy config
     return false;
@@ -192,9 +177,7 @@ export function isCopyTaskFile(config: BuildConfig, filePath: string) {
     } else {
       copySrc = normalizePath(getSrcAbsPath(config, copySrc));
 
-      var relPath = config.sys.path.relative(copySrc, filePath);
-
-      if (!relPath.startsWith('.')) {
+      if (!config.sys.path.relative(copySrc, filePath).startsWith('.')) {
         return true;
       }
     }
