@@ -1,11 +1,11 @@
-import { BuildConfig, ComponentMeta, HostElement, HydrateResults, PlatformApi } from '../util/interfaces';
+import { Config, ComponentMeta, HostElement, HydrateResults, PlatformApi } from '../util/interfaces';
 import { connectedCallback } from '../core/instance/connected';
 import { ENCAPSULATION } from '../util/constants';
 import { initHostElement } from '../core/instance/init-host-element';
 import { noop } from '../util/helpers';
 
 
-export function connectChildElements(config: BuildConfig, plt: PlatformApi, hydrateResults: HydrateResults, parentElm: Element) {
+export function connectChildElements(config: Config, plt: PlatformApi, hydrateResults: HydrateResults, parentElm: Element) {
   if (parentElm && parentElm.children) {
     for (var i = 0; i < parentElm.children.length; i++) {
       connectElement(config, plt, hydrateResults, parentElm.children[i]);
@@ -15,7 +15,7 @@ export function connectChildElements(config: BuildConfig, plt: PlatformApi, hydr
 }
 
 
-export function connectElement(config: BuildConfig, plt: PlatformApi, hydrateResults: HydrateResults, elm: Element) {
+export function connectElement(config: Config, plt: PlatformApi, hydrateResults: HydrateResults, elm: Element) {
   if (!(elm as HostElement).$connected) {
     const tagName = elm.tagName.toLowerCase();
     const cmpMeta = plt.getComponentMeta(elm);
@@ -38,7 +38,7 @@ export function connectElement(config: BuildConfig, plt: PlatformApi, hydrateRes
 }
 
 
-function connectHostElement(config: BuildConfig, plt: PlatformApi, hydrateResults: HydrateResults, elm: HostElement, cmpMeta: ComponentMeta) {
+function connectHostElement(config: Config, plt: PlatformApi, hydrateResults: HydrateResults, elm: HostElement, cmpMeta: ComponentMeta) {
   if (!cmpMeta.componentConstructor) {
     plt.connectHostElement(cmpMeta, elm);
     plt.loadBundle(cmpMeta, elm.mode, noop);

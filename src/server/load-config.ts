@@ -1,8 +1,8 @@
-import { BuildConfig, StencilSystem } from '../util/interfaces';
+import { Config, StencilSystem } from '../util/interfaces';
 import * as util from '../util/load-config';
 
 
-export function loadConfig(configObj: string | BuildConfig) {
+export function loadConfig(configObj: string | Config) {
   const path = require('path');
   const nodeSys = require(path.join(__dirname, '../sys/node/index.js'));
   const sys: StencilSystem = new nodeSys.NodeSystem();

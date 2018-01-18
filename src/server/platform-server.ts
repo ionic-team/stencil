@@ -1,4 +1,4 @@
-import { AppGlobal, BuildConfig, BuildContext, CjsExports,
+import { AppGlobal, Config, CompilerCtx, CjsExports,
   ComponentMeta, ComponentRegistry, CoreContext, Diagnostic,
   HostElement, PlatformApi, HydrateResults } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
@@ -15,20 +15,20 @@ import { toDashCase } from '../util/helpers';
 
 
 export function createPlatformServer(
-  config: BuildConfig,
+  config: Config,
   win: any,
   doc: any,
   cmpRegistry: ComponentRegistry,
   hydrateResults: HydrateResults,
   isPrerender: boolean,
-  ctx?: BuildContext
+  compilerCtx?: CompilerCtx
 ): PlatformApi {
   const styles: string[] = [];
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
 
   // init build context
-  ctx = ctx || {};
+  compilerCtx = compilerCtx || {};
 
   // the root <html> element is always the top level registered component
   cmpRegistry = Object.assign({ 'html': {}}, cmpRegistry);
@@ -65,7 +65,7 @@ export function createPlatformServer(
 
   // create the sandboxed context with a new instance of a V8 Context
   // V8 Context provides an isolated global environment
-  config.sys.vm.createContext(ctx, appWwwDir, win);
+  config.sys.vm.createContext(compilerCtx, appWwwDir, win);
 
   // execute the global scripts (if there are any)
   runGlobalScripts();
@@ -186,7 +186,7 @@ export function createPlatformServer(
       try {
         const fileName = getBundleFilename(cmpMeta, modeName);
         const jsFilePath = config.sys.path.join(appBuildDir, fileName);
-        const jsCode = config.sys.fs.readFileSync(jsFilePath, 'utf-8');
+        const jsCode = compilerCtx.fs.readFileSync(jsFilePath);
         config.sys.vm.runInContext(jsCode, win);
 
       } catch (e) {
@@ -207,11 +207,11 @@ export function createPlatformServer(
 
 
   function runGlobalScripts() {
-    if (!ctx || !ctx.appFiles || !ctx.appFiles.global) {
+    if (!compilerCtx || !compilerCtx.appFiles || !compilerCtx.appFiles.global) {
       return;
     }
 
-    config.sys.vm.runInContext(ctx.appFiles.global, win);
+    config.sys.vm.runInContext(compilerCtx.appFiles.global, win);
   }
 
   function onError(err: Error, type: RUNTIME_ERROR, elm: HostElement, appFailure: boolean) {
