@@ -1,7 +1,7 @@
 
-export * from './declarations/public';
+import './declarations/jsx';
 
-export * from './declarations/jsx';
+export * from './declarations/public';
 
 export * from './util/decorators';
 
