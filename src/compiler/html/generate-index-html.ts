@@ -1,27 +1,28 @@
-import { BuildConfig, BuildContext, ServiceWorkerConfig } from '../../util/interfaces';
-import { catchError, hasError, readFile } from '../util';
+import { BuildCtx, Config, CompilerCtx, ServiceWorkerConfig } from '../../util/interfaces';
+import { catchError, hasError } from '../util';
 import { injectRegisterServiceWorker, injectUnregisterServiceWorker } from '../service-worker/inject-sw-script';
 import { generateServiceWorker } from '../service-worker/generate-sw';
 
 
-export async function generateIndexHtml(config: BuildConfig, ctx: BuildContext) {
+export async function generateIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
-  if ((ctx.isRebuild && ctx.appFileBuildCount === 0) || hasError(ctx.diagnostics) || !config.generateWWW) {
+  if (canSkipGenerateIndexHtml(config, compilerCtx, buildCtx)) {
     // no need to rebuild index.html if there were no app file changes
     return;
   }
 
   // generate the service worker
-  await generateServiceWorker(config, ctx);
+  await generateServiceWorker(config, compilerCtx, buildCtx);
 
   // get the source index html content
   try {
-    const indexSrcHtml = await readFile(config.sys, config.srcIndexHtml);
+    const indexSrcHtml = await compilerCtx.fs.readFile(config.srcIndexHtml);
 
     try {
-      setIndexHtmlContent(config, ctx, indexSrcHtml);
+      await setIndexHtmlContent(config, compilerCtx, indexSrcHtml);
+
     } catch (e) {
-      catchError(ctx.diagnostics, e);
+      catchError(buildCtx.diagnostics, e);
     }
 
   } catch (e) {
@@ -31,7 +32,16 @@ export async function generateIndexHtml(config: BuildConfig, ctx: BuildContext) 
 }
 
 
-function setIndexHtmlContent(config: BuildConfig, ctx: BuildContext, indexHtml: string) {
+function canSkipGenerateIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+  if ((compilerCtx.isRebuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.generateWWW) {
+    // no need to rebuild index.html if there were no app file changes
+    return true;
+  }
+  return false;
+}
+
+
+async function setIndexHtmlContent(config: Config, compilerCtx: CompilerCtx, indexHtml: string) {
   const swConfig = config.serviceWorker as ServiceWorkerConfig;
 
   if (!swConfig && config.devMode) {
@@ -41,20 +51,11 @@ function setIndexHtmlContent(config: BuildConfig, ctx: BuildContext, indexHtml: 
 
   } else if (swConfig) {
     // we have a valid sw config, so we'll need to inject the register sw script
-    indexHtml = injectRegisterServiceWorker(config, swConfig, indexHtml);
-  }
-
-  if (ctx.appFiles.indexHtml === indexHtml) {
-    // only write to disk if the html content is different than last time
-    return;
+    indexHtml = await injectRegisterServiceWorker(config, compilerCtx, swConfig, indexHtml);
   }
 
   // add the prerendered html to our list of files to write
-  // and cache the html to check against for next time
-  ctx.filesToWrite[config.wwwIndexHtml] = ctx.appFiles.indexHtml = indexHtml;
+  compilerCtx.fs.writeFile(config.wwwIndexHtml, indexHtml);
 
-  // keep track of how many times we built the index file
-  // useful for debugging/testing
-  ctx.indexBuildCount++;
   config.logger.debug(`optimizeHtml, write: ${config.wwwIndexHtml}`);
 }
