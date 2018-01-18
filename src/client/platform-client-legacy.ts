@@ -79,11 +79,9 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   // this will fire when all components have finished loaded
   rootElm.$initLoad = () => rootElm._hasLoaded = true;
 
-  if (Build.ssrClientSide) {
-    // if the HTML was generated from SSR
-    // then let's walk the tree and generate vnodes out of the data
-    createVNodesFromSsr(domApi, rootElm);
-  }
+  // if the HTML was generated from SSR
+  // then let's walk the tree and generate vnodes out of the data
+  createVNodesFromSsr(domApi, rootElm);
 
   function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property

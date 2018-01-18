@@ -1,4 +1,4 @@
-import { AppRegistry, BuildConfig, BuildContext, ComponentRegistry } from '../../util/interfaces';
+import { AppRegistry, Config, CompilerCtx, ComponentRegistry } from '../../util/interfaces';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
 import { generatePreamble, minifyJs } from '../util';
 import { getAppPublicPath, getLoaderFileName, getLoaderDist, getLoaderWWW } from './app-file-naming';
@@ -6,8 +6,8 @@ import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 
 
 export async function generateLoader(
-  config: BuildConfig,
-  ctx: BuildContext,
+  config: Config,
+  compilerCtx: CompilerCtx,
   appRegistry: AppRegistry,
   cmpRegistry: ComponentRegistry
 ) {
@@ -20,7 +20,6 @@ export async function generateLoader(
   loaderContent = injectAppIntoLoader(
     config,
     appRegistry.core,
-    appRegistry.coreSsr,
     appRegistry.corePolyfilled,
     config.hydratedCssClass,
     cmpRegistry,
@@ -28,60 +27,47 @@ export async function generateLoader(
   );
 
   // write the app loader file
-  if (ctx.appFiles.loaderContent !== loaderContent) {
+  if (compilerCtx.appFiles.loaderContent !== loaderContent) {
     // app loader file is actually different from our last saved version
     config.logger.debug(`build, app loader: ${appLoaderFileName}`);
-    ctx.appFiles.loaderContent = loaderContent;
+    compilerCtx.appFiles.loaderContent = loaderContent;
 
     if (config.minifyJs) {
-      // minify
-      loaderContent = minifyLoader(config, loaderContent);
+      // minify the loader
+      const minifyJsResults = await minifyJs(config, compilerCtx, loaderContent, 'es5', true);
+      minifyJsResults.diagnostics.forEach(d => {
+        (config.logger as any)[d.level](d.messageText);
+      });
+
+      if (!minifyJsResults.diagnostics.length) {
+        loaderContent = minifyJsResults.output;
+      }
 
     } else {
       // dev
       loaderContent = generatePreamble(config) + '\n' + loaderContent;
     }
 
-    ctx.appFiles.loader = loaderContent;
+    compilerCtx.appFiles.loader = loaderContent;
 
     if (config.generateWWW) {
       const appLoaderWWW = getLoaderWWW(config);
-      ctx.filesToWrite[appLoaderWWW] = loaderContent;
-      ctx.appFiles[appLoaderWWW] = loaderContent;
+      await compilerCtx.fs.writeFile(appLoaderWWW, loaderContent);
     }
 
     if (config.generateDistribution) {
       const appLoaderDist = getLoaderDist(config);
-      ctx.filesToWrite[appLoaderDist] = loaderContent;
-      ctx.appFiles[appLoaderDist] = loaderContent;
+      await compilerCtx.fs.writeFile(appLoaderDist, loaderContent);
     }
-
-    ctx.appFileBuildCount++;
   }
 
   return loaderContent;
 }
 
 
-function minifyLoader(config: BuildConfig, jsText: string) {
-  // minify the loader
-  const minifyJsResults = minifyJs(config, jsText, 'es5', true);
-  minifyJsResults.diagnostics.forEach(d => {
-    (config.logger as any)[d.level](d.messageText);
-  });
-
-  if (!minifyJsResults.diagnostics.length) {
-    jsText = minifyJsResults.output;
-  }
-
-  return jsText;
-}
-
-
 export function injectAppIntoLoader(
-  config: BuildConfig,
+  config: Config,
   appCoreFileName: string,
-  appCoreSsrFileName: string,
   appCorePolyfilledFileName: string,
   hydratedCssClass: string,
   cmpRegistry: ComponentRegistry,
@@ -97,7 +83,6 @@ export function injectAppIntoLoader(
     `"${config.namespace}"`,
     `"${publicPath}"`,
     `"${appCoreFileName}"`,
-    `"${appCoreSsrFileName}"`,
     `"${appCorePolyfilledFileName}"`,
     `"${hydratedCssClass}"`,
     cmpLoaderRegistryStr
