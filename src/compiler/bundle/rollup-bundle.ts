@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Bundle, RollupBundle } from '../../util/interfaces';
+import { Config, CompilerCtx, Bundle, RollupBundle, BuildCtx } from '../../util/interfaces';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
@@ -8,13 +8,13 @@ import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 
 
-export async function runRollup(config: BuildConfig, ctx: BuildContext, bundle: Bundle) {
+export async function runRollup(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundle: Bundle) {
   let rollupBundle: RollupBundle;
 
   try {
     rollupBundle = await config.sys.rollup.rollup({
       input: bundle.entryKey,
-      cache: ctx.rollupCache[bundle.entryKey],
+      cache: compilerCtx.rollupCache[bundle.entryKey],
       plugins: [
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
@@ -25,32 +25,32 @@ export async function runRollup(config: BuildConfig, ctx: BuildContext, bundle: 
           sourceMap: false
         }),
         bundleEntryFile(bundle),
-        transpiledInMemoryPlugin(config, ctx),
-        localResolution(config),
+        transpiledInMemoryPlugin(config, compilerCtx),
+        localResolution(config, compilerCtx),
         nodeEnvVars(config),
       ],
-      onwarn: createOnWarnFn(ctx.diagnostics, bundle.moduleFiles)
+      onwarn: createOnWarnFn(buildCtx.diagnostics, bundle.moduleFiles)
 
     });
 
   } catch (err) {
-    loadRollupDiagnostics(config, ctx.diagnostics, err);
+    loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
   }
 
-  if (hasError(ctx.diagnostics) || !rollupBundle) {
+  if (hasError(buildCtx.diagnostics) || !rollupBundle) {
     throw new Error('rollup died');
   }
 
   // cache for later
   // watch out for any rollup cache bugs
   // https://github.com/rollup/rollup/issues/1372
-  ctx.rollupCache[bundle.entryKey] = rollupBundle;
+  compilerCtx.rollupCache[bundle.entryKey] = rollupBundle;
 
   return rollupBundle;
 }
 
 
-export async function generateEsModule(config: BuildConfig, rollupBundle: RollupBundle) {
+export async function generateEsModule(config: Config, rollupBundle: RollupBundle) {
   const { code } = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
@@ -61,7 +61,7 @@ export async function generateEsModule(config: BuildConfig, rollupBundle: Rollup
 }
 
 
-export async function generateLegacyModule(config: BuildConfig, rollupBundle: RollupBundle) {
+export async function generateLegacyModule(config: Config, rollupBundle: RollupBundle) {
   const { code } = await rollupBundle.generate({
     format: 'cjs',
     banner: generatePreamble(config),
