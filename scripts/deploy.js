@@ -6,9 +6,8 @@ const chalk = require('chalk');
 const execa = require('execa');
 const inquirer = require('inquirer');
 const Listr = require('listr');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
-const rimraf = require('rimraf');
 const semver = require('semver');
 
 
@@ -122,14 +121,7 @@ function runTasks(opts) {
     tasks.push(
       {
         title: 'Cleanup',
-        task: () => new Promise((resolve, reject) => {
-          rimraf('node_modules', (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }});
-        })
+        task: () => fs.remove('node_modules')
       },
       {
         title: 'Install npm dependencies',
