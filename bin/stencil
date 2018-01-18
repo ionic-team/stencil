@@ -12,10 +12,9 @@ if (process.argv.indexOf('--skip-node-check') === -1 && semver.lt(process.versio
 }
 
 var cli = require('../dist/cli/index.js');
-var compiler = require('../dist/compiler/index.js');
 var nodeSys = require('../dist/sys/node/index.js');
 
 var sys = new nodeSys.NodeSystem();
 var logger = new nodeSys.NodeLogger();
 
-cli.run(process, sys, logger, compiler);
+cli.run(process, sys, logger);

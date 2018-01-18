@@ -1,10 +1,11 @@
-import { BuildConfig, BuildResults, Logger, StencilSystem } from '../util/interfaces';
+import { Compiler as CompilerType } from '../compiler';
+import { Config, Logger, StencilSystem } from '../util/interfaces';
 import { getConfigFilePath, hasError, overrideConfigFromArgv, parseArgv } from './cli-utils';
 import { help } from './task-help';
 import { initApp } from './task-init';
 
 
-export function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger, compiler: any) {
+export async function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger) {
   const task = process.argv[2];
   const argv = parseArgv(process);
 
@@ -26,7 +27,7 @@ export function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger,
   }
 
   // load the config file
-  let config: BuildConfig;
+  let config: Config;
   try {
     const configPath = getConfigFilePath(process, sys, argv.config);
     config = sys.loadConfigFile(configPath);
@@ -36,53 +37,57 @@ export function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger,
     return process.exit(1);
   }
 
-  // override the config values with any cli arguments
-  overrideConfigFromArgv(config, argv);
+  try {
+    // override the config values with any cli arguments
+    overrideConfigFromArgv(config, argv);
 
-  if (!config.logger) {
-    // if a logger was not provided then use the
-    // default stencil command line logger
-    config.logger = logger;
-  }
+    if (!config.logger) {
+      // if a logger was not provided then use the
+      // default stencil command line logger
+      config.logger = logger;
+    }
 
-  if (config.logLevel) {
-    config.logger.level = config.logLevel;
-  }
+    if (config.logLevel) {
+      config.logger.level = config.logLevel;
+    }
 
-  if (!config.sys) {
-    // if the config was not provided then use the default node sys
-    config.sys = sys;
-  }
+    if (!config.sys) {
+      // if the config was not provided then use the default node sys
+      config.sys = sys;
+    }
 
-  switch (task) {
-    case 'build':
-      compiler.build(config).then((results: BuildResults) => {
+    const { Compiler } = require('../compiler/index.js');
+
+    const compiler: CompilerType = new Compiler(config);
+    if (!compiler.isValid) {
+      return process.exit(1);
+    }
+
+    switch (task) {
+      case 'build':
+        const results = await compiler.build();
         if (!config.watch && hasError(results && results.diagnostics)) {
           process.exit(1);
         }
 
-      }).catch((err: any) => {
-        config.logger.error(err);
+        if (config.watch) {
+          process.once('SIGINT', () => {
+            return process.exit(0);
+          });
+        }
+        break;
+
+      case 'docs':
+        await compiler.docs();
+        break;
+
+      default:
+        config.logger.error(`Invalid stencil command, please see the options below:`);
+        help(process, logger);
         process.exit(1);
-      });
+    }
 
-      if (config.watch) {
-        process.once('SIGINT', () => {
-          return process.exit(0);
-        });
-      }
-      break;
-
-    case 'docs':
-      config.generateDocs = true;
-      compiler.docs(config).catch((err: any) => {
-        config.logger.error(err);
-      });
-      break;
-
-    default:
-      config.logger.error(`Invalid stencil command, please see the options below:`);
-      help(process, logger);
-      process.exit(1);
+  } catch (e) {
+    config.logger.error(e);
   }
 }

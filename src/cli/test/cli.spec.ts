@@ -1,4 +1,4 @@
-import { BuildConfig } from '../../util/interfaces';
+import { Config } from '../../util/interfaces';
 import { getConfigFilePath, parseArgv, overrideConfigFromArgv, CliArgv } from '../cli-utils';
 import { mockStencilSystem } from '../../testing/mocks';
 import { run } from '../index';
@@ -205,7 +205,7 @@ describe('cli', () => {
   };
   var error: string;
   var exitCode: number;
-  var config: BuildConfig;
+  var config: Config;
 
   beforeEach(() => {
     (process as any) = {};
