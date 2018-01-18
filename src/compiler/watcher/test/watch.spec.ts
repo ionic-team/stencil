@@ -1,6 +1,6 @@
 import { Config } from '../../../util/interfaces';
 import { mockConfig } from '../../../testing/mocks';
-import { validateBuildConfig } from '../../../util/validate-config';
+import { validateBuildConfig } from '../../../compiler/config/validate-config';
 
 
 describe('watch', () => {

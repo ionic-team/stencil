@@ -1,10 +1,10 @@
-import { BuildResults, Config, CompilerCtx, CompilerEventName, Diagnostic } from '../util/interfaces';
+import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic } from '../util/interfaces';
 import { build } from './build/build';
 import { catchError, getCompilerCtx } from './util';
 import { docs } from './docs/docs';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { initPlugins } from './plugin/plugin';
-import { validateBuildConfig } from '../util/validate-config';
+import { validateBuildConfig } from '../compiler/config/validate-config';
 import { validatePrerenderConfig } from './prerender/validate-prerender-config';
 import { validateServiceWorkerConfig } from './service-worker/validate-sw-config';
 

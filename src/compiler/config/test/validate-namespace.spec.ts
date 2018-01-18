@@ -1,6 +1,5 @@
-import { Config } from '../interfaces';
-import { validateNamespace } from '../validate-config';
-import * as path from 'path';
+import { Config } from '../../../util/interfaces';
+import { validateNamespace } from '../validate-namespace';
 
 
 describe('validateNamespace', () => {

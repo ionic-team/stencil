@@ -1,6 +1,5 @@
 import { DependentCollection, Manifest, ManifestBundle } from '../../../util/interfaces';
 import { filterDependentComponents } from '../load-dependent-manifests';
-import { validateDependentCollection } from '../../../util/validate-config';
 
 
 describe('manifest', () => {
@@ -48,32 +47,6 @@ describe('manifest', () => {
       filterDependentComponents(bundles, dependentCollection, dependentManifest);
 
       expect(dependentManifest.modulesFiles.length).toBe(3);
-    });
-
-  });
-
-  describe('validateDependentCollection', () => {
-
-    it('should set includeBundledOnly', () => {
-      const collection = validateDependentCollection({
-        name: '@mycollection/core',
-        includeBundledOnly: true
-      });
-      expect(collection.includeBundledOnly).toBe(true);
-    });
-
-    it('should use the same collection object', () => {
-      const collection = validateDependentCollection({
-        name: '@mycollection/core'
-      });
-      expect(collection.name).toBe('@mycollection/core');
-      expect(collection.includeBundledOnly).toBe(false);
-    });
-
-    it('should convert a string value to a collection object', () => {
-      const collection = validateDependentCollection('@mycollection/core');
-      expect(collection.name).toBe('@mycollection/core');
-      expect(collection.includeBundledOnly).toBe(false);
     });
 
   });

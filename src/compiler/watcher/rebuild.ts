@@ -1,6 +1,6 @@
 import { build } from '../build/build';
-import { BuildResults, Config, CompilerCtx, WatcherResults } from '../../util/interfaces';
-import { validateBuildConfig } from '../../util/validate-config';
+import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
+import { validateBuildConfig } from '../../compiler/config/validate-config';
 
 
 export function rebuild(config: Config, ctx: CompilerCtx, watcher: WatcherResults): Promise<BuildResults> {

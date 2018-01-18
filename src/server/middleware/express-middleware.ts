@@ -1,5 +1,5 @@
 import { Config } from '../../util/interfaces';
-import { loadConfig } from '../../util/load-config';
+import { loadConfig } from '../../compiler/config/load-config';
 import { Renderer } from '../renderer';
 
 
