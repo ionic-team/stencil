@@ -1,193 +1,36 @@
 import { BANNER } from '../util/constants';
-import { BuildConfig, BuildContext, Diagnostic, FilesMap, StencilSystem, SourceTarget } from '../util/interfaces';
+import { BuildEvents } from './events';
+import { Cache } from './cache';
+import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../util/interfaces';
+import { InMemoryFileSystem } from '../util/in-memory-fs';
 
 
-export function getBuildContext(ctx?: BuildContext) {
-  // create the build context if it doesn't exist
-  ctx = ctx || {};
+export function getCompilerCtx(config: Config, compilerCtx?: CompilerCtx) {
+  // reusable data between builds
+  compilerCtx = compilerCtx || {};
+  compilerCtx.fs = compilerCtx.fs || new InMemoryFileSystem(config.sys.fs, config.sys.path);
+  compilerCtx.cache = compilerCtx.cache || new Cache(config, new InMemoryFileSystem(config.sys.fs, config.sys.path), config.sys.tmpdir());
+  compilerCtx.events = compilerCtx.events || new BuildEvents(config);
+  compilerCtx.appFiles = compilerCtx.appFiles || {};
+  compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};
+  compilerCtx.rollupCache = compilerCtx.rollupCache || {};
+  compilerCtx.dependentManifests = compilerCtx.dependentManifests || {};
+  compilerCtx.compiledModuleJsText = compilerCtx.compiledModuleJsText || {};
+  compilerCtx.compiledModuleLegacyJsText = compilerCtx.compiledModuleLegacyJsText || {};
 
-  ctx.diagnostics = ctx.diagnostics || [];
-  ctx.manifest = ctx.manifest || {};
-  ctx.filesToWrite = ctx.filesToWrite || {};
-  ctx.appFiles = ctx.appFiles || {};
-  ctx.appGlobalStyles = ctx.appGlobalStyles || {};
-  ctx.coreBuilds = ctx.coreBuilds || {};
-  ctx.moduleFiles = ctx.moduleFiles || {};
-  ctx.jsFiles = ctx.jsFiles || {};
-  ctx.rollupCache = ctx.rollupCache || {};
-  ctx.dependentManifests = ctx.dependentManifests || {};
-  ctx.compiledFileCache = ctx.compiledFileCache || {};
-  ctx.moduleBundleOutputs = ctx.moduleBundleOutputs || {};
-  ctx.moduleBundleLegacyOutputs = ctx.moduleBundleLegacyOutputs || {};
-  ctx.changedFiles = ctx.changedFiles || [];
+  if (typeof compilerCtx.activeBuildId !== 'number') {
+    compilerCtx.activeBuildId = -1;
+  }
 
-  return ctx;
+  return compilerCtx;
 }
 
 
-export function resetBuildContext(ctx: BuildContext) {
-  ctx.manifest = {};
-  ctx.diagnostics = [];
-  ctx.sassBuildCount = 0;
-  ctx.transpileBuildCount = 0;
-  ctx.indexBuildCount = 0;
-  ctx.moduleBundleCount = 0;
-  delete ctx.localPrerenderServer;
-}
-
-
-export function readFile(sys: StencilSystem, filePath: string) {
-  return new Promise<string>((resolve, reject) => {
-    sys.fs.readFile(filePath, 'utf-8', (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
-
-
-export async function writeFiles(sys: StencilSystem, rootDir: string, filesToWrite: FilesMap): Promise<any> {
-  const directories = getDirectoriesFromFiles(sys, filesToWrite);
-  await ensureDirectoriesExist(sys, directories, [rootDir]);
-  await writeToDisk(sys, filesToWrite);
-}
-
-
-function writeToDisk(sys: StencilSystem, filesToWrite: FilesMap): Promise<any> {
-  // assumes directories to be saved in already exit
-  return new Promise((resolve, reject) => {
-    const filePathsToWrite = Object.keys(filesToWrite);
-
-    let doneWriting = 0;
-    let rejected = false;
-
-    if (!filePathsToWrite.length) {
-      // shouldn't be possible, but ya never know
-      resolve();
-      return;
-    }
-
-    filePathsToWrite.forEach(filePathToWrite => {
-      sys.fs.writeFile(filePathToWrite, filesToWrite[filePathToWrite], (err) => {
-        if (err) {
-          rejected = true;
-          reject(err);
-
-        } else {
-          doneWriting++;
-          if (doneWriting >= filePathsToWrite.length && !rejected) {
-            resolve();
-          }
-        }
-      });
-    });
-  });
-}
-
-
-export function ensureDirectoriesExist(sys: StencilSystem, directories: string[], existingDirectories: string[]) {
-  return new Promise(resolve => {
-
-    const knowExistingDirPaths = existingDirectories.map(existingDirectory => {
-      return normalizePath(existingDirectory).split('/');
-    });
-
-    const checkDirectories = sortDirectories(directories).slice();
-
-    function ensureDir() {
-      if (checkDirectories.length === 0) {
-        resolve();
-        return;
-      }
-
-      // double check this path has been normalized with / paths
-      const checkDirectory = normalizePath(checkDirectories.shift());
-
-      const dirPaths = checkDirectory.split('/');
-      let pathSections = 1;
-
-      function ensureSection() {
-        if (pathSections > dirPaths.length) {
-          ensureDir();
-          return;
-        }
-
-        const checkDirPaths = dirPaths.slice(0, pathSections);
-
-        // should have already been normalized to / paths
-        const dirPath = checkDirPaths.join('/');
-
-        for (var i = 0; i < knowExistingDirPaths.length; i++) {
-          var existingDirPaths = knowExistingDirPaths[i];
-          var alreadyExists = true;
-
-          for (var j = 0; j < checkDirPaths.length; j++) {
-            if (checkDirPaths[j] !== existingDirPaths[j]) {
-              alreadyExists = false;
-              break;
-            }
-          }
-
-          if (alreadyExists) {
-            pathSections++;
-            ensureSection();
-            return;
-          }
-        }
-
-        sys.fs.mkdir(normalizePath(dirPath), () => {
-          // not worrying about the error here
-          // if there's an error, it's probably because this directory already exists
-          // which is what we want, no need to check access AND mkdir
-          // should have already been normalized to / paths
-          knowExistingDirPaths.push(dirPath.split('/'));
-          pathSections++;
-          ensureSection();
-        });
-      }
-
-      ensureSection();
-    }
-
-    ensureDir();
-  });
-}
-
-
-function getDirectoriesFromFiles(sys: StencilSystem, filesToWrite: FilesMap) {
-  const directories: string[] = [];
-
-  Object.keys(filesToWrite).forEach(filePath => {
-    const dir = normalizePath(sys.path.dirname(filePath));
-    if (directories.indexOf(dir) === -1) {
-      directories.push(dir);
-    }
-  });
-
-  return directories;
-}
-
-
-function sortDirectories(directories: string[]) {
-  return directories.sort((a, b) => {
-    // should have already been normalized to / paths
-    const aPaths = a.split('/').length;
-    const bPaths = b.split('/').length;
-
-    if (aPaths < bPaths) return -1;
-    if (aPaths > bPaths) return 1;
-
-    if (a < b) return -1;
-    if (a > b) return 1;
-
-    return 0;
-  });
-}
-
-
+/**
+ * Test if a file is a typescript source file, such as .ts or .tsx.
+ * However, d.ts files and spec.ts files return false.
+ * @param filePath
+ */
 export function isTsFile(filePath: string) {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 1) {
@@ -241,13 +84,22 @@ export function isHtmlFile(filePath: string) {
   return ext === 'html' || ext === 'htm';
 }
 
+/**
+ * Only web development text files, like ts, tsx,
+ * js, html, css, scss, etc.
+ * @param filePath
+ */
 export function isWebDevFile(filePath: string) {
   const ext = filePath.split('.').pop().toLowerCase();
+  if (WEB_DEV_EXT.indexOf(ext) > -1) {
+    return true;
+  }
   return (WEB_DEV_EXT.indexOf(ext) > -1 || isTsFile(filePath));
 }
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
 
-export function minifyJs(config: BuildConfig, jsText: string, sourceTarget: SourceTarget, preamble: boolean) {
+
+export async function minifyJs(config: Config, compilerCtx: CompilerCtx, jsText: string, sourceTarget: SourceTarget, preamble: boolean) {
   const opts: any = { output: {}, compress: {}, mangle: {} };
 
   if (sourceTarget === 'es5') {
@@ -273,13 +125,28 @@ export function minifyJs(config: BuildConfig, jsText: string, sourceTarget: Sour
     opts.output.comments = 'all';
     opts.output.preserve_line = true;
   }
+
   if (preamble) {
     opts.output.preamble = generatePreamble(config);
   }
-  return config.sys.minifyJs(jsText, opts);
+
+  const cacheKey = compilerCtx.cache.createKey('minifyJs', opts, jsText);
+  const cachedContent = await compilerCtx.cache.get(cacheKey);
+  if (cachedContent != null) {
+    return {
+      output: cachedContent,
+      diagnostics: []
+    };
+  }
+
+  const r = config.sys.minifyJs(jsText, opts);
+  if (r && r.diagnostics.length === 0 && typeof r.output === 'string') {
+    await compilerCtx.cache.put(cacheKey, r.output);
+  }
+  return r;
 }
 
-export function generatePreamble(config: BuildConfig) {
+export function generatePreamble(config: Config) {
   let preamble: string[] = [];
 
   if (config.preamble) {
@@ -374,7 +241,7 @@ export function hasError(diagnostics: Diagnostic[]): boolean {
 }
 
 
-export function pathJoin(config: BuildConfig, ...paths: string[]) {
+export function pathJoin(config: Config, ...paths: string[]) {
   return normalizePath(config.sys.path.join.apply(config.sys.path, paths));
 }
 
@@ -383,11 +250,32 @@ export function normalizePath(str: string) {
   // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
   // https://github.com/sindresorhus/slash MIT
   // By Sindre Sorhus
+  if (typeof str !== 'string') {
+    throw new Error(`invalid path to normalize`);
+  }
+  str = str.trim();
+
   if (EXTENDED_PATH_REGEX.test(str) || NON_ASCII_REGEX.test(str)) {
     return str;
   }
 
-  return str.replace(SLASH_REGEX, '/');
+  str = str.replace(SLASH_REGEX, '/');
+
+  // always remove the trailing /
+  // this makes our file cache look ups consistent
+  if (str.charAt(str.length - 1) === '/') {
+    const colonIndex = str.indexOf(':');
+    if (colonIndex > -1) {
+      if (colonIndex < str.length - 2) {
+        str = str.substring(0, str.length - 1);
+      }
+
+    } else if (str.length > 1) {
+      str = str.substring(0, str.length - 1);
+    }
+  }
+
+  return str;
 }
 
 const EXTENDED_PATH_REGEX = /^\\\\\?\\/;

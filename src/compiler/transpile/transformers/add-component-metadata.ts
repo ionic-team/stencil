@@ -1,17 +1,17 @@
-import { BuildConfig, ComponentMeta, ModuleFiles } from '../../../util/interfaces';
-import { convertValueToLiteral, getImportNameMapFromStyleMeta, StyleImport } from './util';
+import { ComponentMeta, ModuleFiles } from '../../../util/interfaces';
+import { convertValueToLiteral } from './util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getStylePlaceholder, getStyleIdPlaceholder } from '../../../util/data-serialize';
 import { formatComponentConstructorEvents, formatComponentConstructorProperties } from '../../../util/data-serialize';
 import * as ts from 'typescript';
 
 
-export default function addComponentMetadata(config: BuildConfig, moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
+export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
     function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
-      const staticMembers = addStaticMeta(config, cmpMeta);
+      const staticMembers = addStaticMeta(cmpMeta);
 
       const newMembers = Object.keys(staticMembers).map(memberName => {
         return createGetter(memberName, (staticMembers as any)[memberName]);
@@ -50,7 +50,7 @@ export default function addComponentMetadata(config: BuildConfig, moduleFiles: M
 }
 
 
-export function addStaticMeta(config: BuildConfig, cmpMeta: ComponentMeta) {
+export function addStaticMeta(cmpMeta: ComponentMeta) {
   const staticMembers: ConstructorComponentMeta = {};
 
   staticMembers.is = convertValueToLiteral(cmpMeta.tagNameMeta);
@@ -76,14 +76,10 @@ export function addStaticMeta(config: BuildConfig, cmpMeta: ComponentMeta) {
     staticMembers.events = convertValueToLiteral(eventsMeta);
   }
 
-  if (cmpMeta.stylesMeta && Object.keys(cmpMeta.stylesMeta).length > 0) {
-    const stylesMeta = Object.keys(cmpMeta.stylesMeta)
-      .reduce((all, smn) => {
-        return all.concat(getImportNameMapFromStyleMeta(config, cmpMeta.stylesMeta[smn]));
-      }, [] as StyleImport[])
-      .map(obj => obj.importName);
+  if (cmpMeta.stylesMeta) {
+    const styleModes = Object.keys(cmpMeta.stylesMeta);
 
-    if (stylesMeta.length > 0) {
+    if (styleModes.length > 0) {
       // awesome, we know we've got styles!
       // let's add the placeholder which we'll use later
       // after we generate the css

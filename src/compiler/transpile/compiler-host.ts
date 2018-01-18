@@ -1,196 +1,82 @@
-import { BuildConfig, BuildContext, ModuleFile, TranspileModulesResults } from '../../util/interfaces';
-import { normalizePath, isDtsFile, isJsFile, readFile } from '../util';
+import { Config, CompilerCtx, FsWriteResults } from '../../util/interfaces';
+import { isDtsFile, isJsFile, normalizePath } from '../util';
 import * as ts from 'typescript';
 
 
-export function getTsHost(config: BuildConfig, ctx: BuildContext, tsCompilerOptions: ts.CompilerOptions, transpileResults: TranspileModulesResults) {
+export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<FsWriteResults>[], tsCompilerOptions: ts.CompilerOptions) {
   const tsHost = ts.createCompilerHost(tsCompilerOptions);
 
   tsHost.getSourceFile = (filePath) => {
-    const cachedValue = readFromCache(ctx, filePath);
-    if (cachedValue != null) {
-      return ts.createSourceFile(filePath, cachedValue, ts.ScriptTarget.ES2015);
+    filePath = normalizePath(filePath);
+    let tsSourceFile: ts.SourceFile = null;
+
+    try {
+      tsSourceFile = ts.createSourceFile(filePath, ctx.fs.readFileSync(filePath), ts.ScriptTarget.ES2015);
+
+    } catch (e) {
+      config.logger.error(`tsHost.getSourceFile unable to find: ${filePath}`);
     }
 
-    const diskValue = readFileFromDisk(config, filePath);
-    if (diskValue != null) {
-      return ts.createSourceFile(filePath, diskValue, ts.ScriptTarget.ES2015);
-    }
-
-    config.logger.error(`tsHost.getSourceFile unable to find ${filePath}`);
-    return null;
+    return tsSourceFile;
   };
 
   tsHost.fileExists = (filePath) => {
-    if (isCached(ctx, filePath)) {
-      return true;
-    }
-
-    return fileExistsOnDisk(config, filePath);
+    return ctx.fs.accessSync(filePath);
   },
 
   tsHost.readFile = (filePath) => {
-    const cachedValue = readFromCache(ctx, filePath);
-    if (cachedValue) {
-      return cachedValue;
-    }
+    let sourceText: string = null;
+    try {
+      sourceText = ctx.fs.readFileSync(filePath);
+    } catch (e) {}
 
-    const diskValue = readFileFromDisk(config, filePath);
-    if (diskValue) {
-      return diskValue;
-    }
-
-    return null;
+    return sourceText;
   },
 
-  tsHost.writeFile = (outputFilePath: string, outputText: string, writeByteOrderMark: boolean, onError: any, sourceFiles: ts.SourceFile[]): void => {
+  tsHost.writeFile = (outputFilePath: string, outputText: string, _writeByteOrderMark: boolean, _onError: any, sourceFiles: ts.SourceFile[]): void => {
     sourceFiles.forEach(sourceFile => {
-      writeFileInMemory(config, ctx, transpileResults, sourceFile, outputFilePath, outputText);
+      writeQueue.push(writeFileInMemory(config, ctx, sourceFile, outputFilePath, outputText));
     });
-    writeByteOrderMark; onError;
   };
 
   return tsHost;
 }
 
 
-function writeFileInMemory(config: BuildConfig, ctx: BuildContext, transpileResults: TranspileModulesResults, sourceFile: ts.SourceFile, outputFilePath: string, outputText: string) {
+function writeFileInMemory(config: Config, ctx: CompilerCtx, sourceFile: ts.SourceFile, distFilePath: string, outputText: string) {
   const tsFilePath = normalizePath(sourceFile.fileName);
-  outputFilePath = normalizePath(outputFilePath);
+  distFilePath = normalizePath(distFilePath);
 
-  if (isJsFile(outputFilePath)) {
+  // if this build is also building a distribution then we
+  // actually want to eventually write the files to disk
+  // otherwise we still want to put these files in our file system but
+  // only as in-memory files and never are actually written to disk
+  const isInMemoryOnly = !config.generateDistribution;
+
+  // get or create the ctx module file object
+  if (!ctx.moduleFiles[tsFilePath]) {
+    // we don't have this module in the ctx yet
+    ctx.moduleFiles[tsFilePath] = {};
+  }
+
+  // figure out which file type this is
+  if (isJsFile(distFilePath)) {
     // transpiled file is a js file
-    const jsFilePath = outputFilePath;
+    ctx.moduleFiles[tsFilePath].jsFilePath = distFilePath;
 
-    let moduleFile = ctx.moduleFiles[tsFilePath];
-    if (moduleFile) {
-      // we got the module we already cached
-      moduleFile.jsFilePath = jsFilePath;
-
-    } else {
-      // this actually shouldn't happen, but just in case
-      moduleFile = ctx.moduleFiles[tsFilePath] = {
-        tsFilePath: tsFilePath,
-        jsFilePath: jsFilePath,
-      };
-    }
-
-    // cache the js content
-    ctx.jsFiles[jsFilePath] = outputText;
-
-    // add this module to the list of files that were just transpiled
-    transpileResults.moduleFiles[tsFilePath] = moduleFile;
-
-  } else if (isDtsFile(outputFilePath)) {
+  } else if (isDtsFile(distFilePath)) {
     // transpiled file is a .d.ts file
-    const dtsFilePath = outputFilePath;
-
-    let moduleFile = ctx.moduleFiles[tsFilePath];
-    if (moduleFile) {
-      // we got the module we already cached
-      moduleFile.dtsFilePath = dtsFilePath;
-
-    } else {
-      // this actually shouldn't happen, but just in case
-      moduleFile = ctx.moduleFiles[tsFilePath] = {
-        tsFilePath: tsFilePath,
-        dtsFilePath: dtsFilePath,
-      };
-    }
-
-    // write the .d.ts file
-    ctx.filesToWrite[dtsFilePath] = outputText;
-
-    // add this module to the list of files that were just transpiled
-    transpileResults.moduleFiles[tsFilePath] = moduleFile;
+    ctx.moduleFiles[tsFilePath].dtsFilePath = distFilePath;
 
   } else {
     // idk, this shouldn't happen
-    config.logger.debug(`unknown transpiled output: ${outputFilePath}`);
-  }
-}
-
-
-/**
- * Check if the given file path exists in cache
- * @param ctx BuildContext
- * @param filePath path to file to check from cache
- */
-function isCached(ctx: BuildContext, filePath: string) {
-  if (ctx.moduleFiles[filePath] && typeof ctx.moduleFiles[filePath].tsText === 'string') {
-    return true;
-  }
-  return !!ctx.jsFiles[filePath];
-}
-
-/**
- * Read the give file path from cache
- * @param ctx BuildContext
- * @param filePath path to file to read from cache
- */
-function readFromCache(ctx: BuildContext, filePath: string): string | undefined {
-  if (ctx.moduleFiles[filePath] && typeof ctx.moduleFiles[filePath].tsText === 'string') {
-    return ctx.moduleFiles[filePath].tsText;
-  }
-  return ctx.jsFiles[filePath];
-}
-
-/**
- * Check if a file exists on disk
- * @param config BuildConfig
- * @param filePath path to file to check existence on disk
- */
-function fileExistsOnDisk(config: BuildConfig, filePath: string) {
-  try {
-    const stat = config.sys.fs.statSync(normalizePath(filePath));
-    return stat.isFile();
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Read a given file path from disk
- * @param config BuildConfig
- * @param filePath path to file to read from disk
- */
-function readFileFromDisk(config: BuildConfig, filePath: string) {
-  let fileContents: string | undefined;
-  try {
-    fileContents = config.sys.fs.readFileSync(normalizePath(filePath), 'utf-8');
-  } catch {
-    fileContents = undefined;
+    config.logger.debug(`unknown transpiled output: ${distFilePath}`);
   }
 
-  return fileContents;
-}
-
-
-
-export function getModuleFile(config: BuildConfig, ctx: BuildContext, tsFilePath: string): Promise<ModuleFile> {
-  tsFilePath = normalizePath(tsFilePath);
-
-  let moduleFile = ctx.moduleFiles[tsFilePath];
-  if (moduleFile) {
-    if (typeof moduleFile.tsText === 'string') {
-      // cool, already have the ts source content
-      return Promise.resolve(moduleFile);
-    }
-
-    // we have the module, but no source content, let's load it up
-    return readFile(config.sys, tsFilePath).then(tsText => {
-      moduleFile.tsText = tsText;
-      return moduleFile;
-    });
-  }
-
-  // never seen this ts file before, let's start a new module file
-  return readFile(config.sys, tsFilePath).then(tsText => {
-    moduleFile = ctx.moduleFiles[tsFilePath] = {
-      tsFilePath: tsFilePath,
-      tsText: tsText
-    };
-
-    return moduleFile;
-  });
+  // let's write the beast to our internal in-memory file system
+  // the distFilePath is only written to disk when a distribution
+  // is being created. But if we're not generating a distribution
+  // like just a website, we still need to write it to our file system
+  // so it can be read later, but it only needs to be in memory
+  return ctx.fs.writeFile(distFilePath, outputText, { inMemoryOnly: isInMemoryOnly });
 }
