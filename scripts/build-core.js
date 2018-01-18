@@ -29,7 +29,11 @@ function bundleClientCore() {
   const outputFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
 
   return rollup.rollup({
-    input: inputFile
+    input: inputFile,
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
   })
   .then(bundle => {
     bundle.generate({

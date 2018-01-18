@@ -26,7 +26,11 @@ function bundleCompiler() {
     ],
     plugins: [
       rollupResolve()
-    ]
+    ],
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
 
   }).then(bundle => {
 

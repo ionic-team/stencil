@@ -22,11 +22,17 @@ function bundleTestingUtils() {
     external: [
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
-      'typescript'
+      'typescript',
+      'fs',
+      'path'
     ],
     plugins: [
       rollupResolve()
-    ]
+    ],
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
 
   }).then(bundle => {
 

@@ -28,7 +28,11 @@ function bundleCompiler() {
       'rollup-plugin-node-resolve',
       'typescript',
       'util'
-    ]
+    ],
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
 
   }).then(bundle => {
 

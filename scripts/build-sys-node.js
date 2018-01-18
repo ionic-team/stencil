@@ -47,7 +47,11 @@ function bundleSysNode() {
       'os',
       'typescript',
       'url'
-    ]
+    ],
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
 
   }).then(bundle => {
 
