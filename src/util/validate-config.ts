@@ -1,9 +1,9 @@
-import { BuildConfig, ManifestBundle, CopyTasks, DependentCollection } from './interfaces';
+import { Config, ManifestBundle, CopyTasks, DependentCollection } from './interfaces';
 import { dashToPascalCase } from '../util/helpers';
 import { normalizePath } from '../compiler/util';
 
 
-export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boolean) {
+export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   if (!config) {
     throw new Error(`invalid build config`);
   }
@@ -21,6 +21,20 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
   }
   if (!config.sys) {
     throw new Error('config.sys required');
+  }
+
+  if (typeof config.logLevel === 'string') {
+    config.logger.level = config.logLevel;
+  } else if (typeof config.logger.level === 'string') {
+    config.logLevel = config.logger.level;
+  }
+
+  if (typeof config.buildStats !== 'boolean') {
+    config.buildStats = false;
+  }
+
+  if (typeof config.buildAppCore !== 'boolean') {
+    config.buildAppCore = true;
   }
 
   validateNamespace(config);
@@ -222,6 +236,10 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.generateDocs = false;
   }
 
+  if (typeof config.enableCache !== 'boolean') {
+    config.enableCache = false;
+  }
+
   if (!Array.isArray(config.includeSrc)) {
     config.includeSrc = DEFAULT_INCLUDES.map(include => {
       return config.sys.path.join(config.srcDir, include);
@@ -232,9 +250,10 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
     config.excludeSrc = DEFAULT_EXCLUDES.slice();
   }
 
-
   config.collections = config.collections || [];
   config.collections = config.collections.map(validateDependentCollection);
+
+  config.plugins = config.plugins || [];
 
   config.bundles = config.bundles || [];
 
@@ -253,7 +272,7 @@ export function validateBuildConfig(config: BuildConfig, setEnvVariables?: boole
 }
 
 
-export function validateNamespace(config: BuildConfig) {
+export function validateNamespace(config: Config) {
   if (typeof config.namespace !== 'string') {
     config.namespace = DEFAULT_NAMESPACE;
   }
@@ -291,7 +310,7 @@ export function validateNamespace(config: BuildConfig) {
 }
 
 
-export function setProcessEnvironment(config: BuildConfig) {
+export function setProcessEnvironment(config: Config) {
   process.env.NODE_ENV = config.devMode ? 'development' : 'production';
 }
 

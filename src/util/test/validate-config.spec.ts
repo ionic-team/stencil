@@ -1,10 +1,73 @@
-import { BuildConfig } from '../interfaces';
+import { Config } from '../interfaces';
 import { mockFs, mockLogger, mockStencilSystem } from '../../testing/mocks';
 import { setProcessEnvironment, validateBuildConfig } from '../validate-config';
 import * as path from 'path';
 
 
 describe('validation', () => {
+
+  describe('enableCache', () => {
+
+    it('set enableCache true', () => {
+      config.enableCache = true;
+      validateBuildConfig(config);
+      expect(config.enableCache).toBe(true);
+    });
+
+    it('set enableCache false', () => {
+      config.enableCache = false;
+      validateBuildConfig(config);
+      expect(config.enableCache).toBe(false);
+    });
+
+    it('default enableCache false', () => {
+      validateBuildConfig(config);
+      expect(config.enableCache).toBe(false);
+    });
+
+  });
+
+  describe('buildAppCore', () => {
+
+    it('set buildAppCore true', () => {
+      config.buildStats = true;
+      validateBuildConfig(config);
+      expect(config.buildAppCore).toBe(true);
+    });
+
+    it('set buildAppCore false', () => {
+      config.buildAppCore = false;
+      validateBuildConfig(config);
+      expect(config.buildAppCore).toBe(false);
+    });
+
+    it('default buildAppCore true', () => {
+      validateBuildConfig(config);
+      expect(config.buildAppCore).toBe(true);
+    });
+
+  });
+
+  describe('buildStats', () => {
+
+    it('set buildStats true', () => {
+      config.buildStats = true;
+      validateBuildConfig(config);
+      expect(config.buildStats).toBe(true);
+    });
+
+    it('set buildStats false', () => {
+      config.buildStats = false;
+      validateBuildConfig(config);
+      expect(config.buildStats).toBe(false);
+    });
+
+    it('default buildStats false', () => {
+      validateBuildConfig(config);
+      expect(config.buildStats).toBe(false);
+    });
+
+  });
 
   describe('es5 build', () => {
 
@@ -463,7 +526,7 @@ describe('validation', () => {
 
 
   var sys = mockStencilSystem();
-  var config: BuildConfig;
+  var config: Config;
   var logger = mockLogger();
 
   beforeEach(() => {
