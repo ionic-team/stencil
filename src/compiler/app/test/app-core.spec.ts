@@ -1,5 +1,4 @@
-import { BuildConfig, BuildContext } from '../../../util/interfaces';
-import { CORE_NAME } from '../../../util/constants';
+import { Config, CompilerCtx } from '../../../util/interfaces';
 import { generatePreamble } from '../../util';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 
@@ -8,8 +7,8 @@ import { getAppPublicPath } from '../app-file-naming';
 
 
 describe('app-core', () => {
-  let config: BuildConfig;
-  let ctx: BuildContext;
+  let config: Config;
+  let ctx: CompilerCtx;
   let logger = mockLogger();
 
   beforeEach(() => {
