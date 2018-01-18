@@ -105,7 +105,7 @@ export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAd
 export interface TranspileResults {
   code?: string;
   diagnostics?: d.Diagnostic[];
-  cmpMeta?: ComponentMeta;
+  cmpMeta?: d.ComponentMeta;
 }
 
 
