@@ -28,6 +28,7 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "clean": "node scripts/clean.js",
     "deploy": "node scripts/deploy.js",
+    "lint": "tslint --project src/tsconfig.json",
     "prepare.deploy": "node scripts/deploy.js --prepare",
     "submodules.create": "node scripts/submodules.js",
     "set.version": "node scripts/set-version.js",
@@ -69,7 +70,7 @@
     "semver": "^5.5.0",
     "ts-jest": "^22.0.1",
     "tslint": "^5.9.1",
-    "tslint-ionic-rules": "^0.0.12",
+    "tslint-ionic-rules": "0.0.13",
     "webpack": "^3.10.0"
   },
   "repository": {

@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentMeta, BuildConditionals, Bundle, ModuleFile, Config } from '../../util/interfaces';
+import { BuildConditionals, Bundle, CompilerCtx, ComponentMeta, Config, ModuleFile } from '../../util/interfaces';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 

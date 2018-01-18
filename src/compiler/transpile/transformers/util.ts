@@ -77,7 +77,7 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
 
 export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpression {
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(objMap).map((key: string): ts.ObjectLiteralElementLike => {
-    let value = objMap[key];
+    const value = objMap[key];
 
     if (!ts.isIdentifier(value) && isInstanceOfObjectMap(value)) {
       return ts.createPropertyAssignment(ts.createLiteral(key), objectMapToObjectLiteral(value));

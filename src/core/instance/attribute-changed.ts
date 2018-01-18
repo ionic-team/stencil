@@ -1,4 +1,4 @@
-import { MembersMeta, HostElement } from '../../util/interfaces';
+import { HostElement, MembersMeta } from '../../util/interfaces';
 import { parsePropertyValue } from '../../util/data-parse';
 import { toLowerCase } from '../../util/helpers';
 

@@ -1,4 +1,4 @@
-import { ComponentInstance, ComponentConstructorEvent, EventEmitterData, PlatformApi } from '../../util/interfaces';
+import { ComponentConstructorEvent, ComponentInstance, EventEmitterData, PlatformApi } from '../../util/interfaces';
 
 
 export function initEventEmitters(plt: PlatformApi, cmpEvents: ComponentConstructorEvent[], instance: ComponentInstance) {

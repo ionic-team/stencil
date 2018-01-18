@@ -1,8 +1,8 @@
-import { testClasslist, testAttributes } from '../utils';
+import { testAttributes, testClasslist } from '../utils';
 
 declare global {
   namespace jest {
-    interface Matchers {
+    interface Matchers<R> {
       toMatchClasses(classlist: string[]): void;
       toMatchAttributes(attributes: { [attr: string]: string }): void;
     }

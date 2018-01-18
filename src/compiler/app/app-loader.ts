@@ -1,7 +1,7 @@
-import { AppRegistry, Config, CompilerCtx, ComponentRegistry } from '../../util/interfaces';
+import { AppRegistry, CompilerCtx, ComponentRegistry, Config } from '../../util/interfaces';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
 import { generatePreamble, minifyJs } from '../util';
-import { getAppPublicPath, getLoaderFileName, getLoaderDist, getLoaderWWW } from './app-file-naming';
+import { getAppPublicPath, getLoaderDist, getLoaderFileName, getLoaderWWW } from './app-file-naming';
 import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 
 

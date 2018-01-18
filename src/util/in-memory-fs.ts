@@ -1,5 +1,5 @@
-import { FileSystem, FsReaddirItem, FsReadOptions, FsWriteOptions,
-  FsItems, FsCopyFileTask, Path, FsReaddirOptions, FsWriteResults } from './interfaces';
+import { FileSystem, FsCopyFileTask, FsItems, FsReadOptions, FsReaddirItem,
+  FsReaddirOptions, FsWriteOptions, FsWriteResults, Path } from './interfaces';
 import { normalizePath } from '../compiler/util';
 
 
@@ -218,14 +218,14 @@ export class InMemoryFileSystem {
     try {
       const dirItems = await this.readdir(dirPath, { recursive: true });
 
-      await dirItems.forEach(async item => {
+      await Promise.all(dirItems.map(async item => {
         if (item.isDirectory) {
           await this.removeDir(item.absPath);
 
         } else if (item.isFile) {
           await this.removeFile(item.absPath);
         }
-      });
+      }));
 
     } catch (e) {
       // do not throw error if the directory never existed

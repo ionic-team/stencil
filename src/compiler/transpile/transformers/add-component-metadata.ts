@@ -1,7 +1,7 @@
 import { ComponentMeta, ModuleFiles } from '../../../util/interfaces';
 import { convertValueToLiteral } from './util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
-import { getStylePlaceholder, getStyleIdPlaceholder } from '../../../util/data-serialize';
+import { getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';
 import { formatComponentConstructorEvents, formatComponentConstructorProperties } from '../../../util/data-serialize';
 import * as ts from 'typescript';
 

@@ -1,8 +1,8 @@
-import { AppRegistry, BuildCtx, Config, CompilerCtx, SourceTarget } from '../../util/interfaces';
+import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../util/interfaces';
 import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, minifyJs } from '../util';
-import { getAppPublicPath, getGlobalFileName, getGlobalDist, getGlobalWWW } from './app-file-naming';
+import { getAppPublicPath, getGlobalDist, getGlobalFileName, getGlobalWWW } from './app-file-naming';
 import { transpileToEs5 } from '../transpile/core-build';
 import transpiledInMemoryPlugin from '../bundle/rollup-plugins/transpiled-in-memory';
 

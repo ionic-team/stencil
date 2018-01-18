@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, BuildConditionals, SourceTarget, BuildCtx, Diagnostic } from '../../util/interfaces';
+import { BuildConditionals, BuildCtx, CompilerCtx, Config, Diagnostic, SourceTarget } from '../../util/interfaces';
 import { transpileCoreBuild } from '../transpile/core-build';
 
 
@@ -229,7 +229,7 @@ const PROD_MINIFY_OPTS: any = {
 };
 
 
-var RESERVED_PROPERTIES: string[] = [
+const RESERVED_PROPERTIES: string[] = [
   'addListener',
   'attr',
   'color',

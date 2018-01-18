@@ -10,7 +10,7 @@ import { Build } from '../../util/build-conditionals';
 import { DomApi, Encapsulation, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
 import { isDef, isUndef } from '../../util/helpers';
 import { NODE_TYPE } from '../../util/constants';
-import { SSR_VNODE_ID, SSR_CHILD_ID } from '../../util/constants';
+import { SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -40,7 +40,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
         // special case for manually relocating host content nodes
         // to their new home in either a named slot or the default slot
-        let namedSlot = (vnode.vattrs && vnode.vattrs.name);
+        const namedSlot = (vnode.vattrs && vnode.vattrs.name);
         let slotNodes: Node[];
 
         if (isDef(namedSlot)) {
@@ -146,20 +146,14 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     return vnode.elm;
   }
 
-  function addVnodes(parentElm: Node, before: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
+  function addVnodes(parentElm: Node, before: Node, vnodes: VNode[], startIdx: number, endIdx: number, childNode?: Node, vnodeChild?: VNode) {
     const containerElm = ((parentElm as HostElement).$defaultHolder && domApi.$parentNode((parentElm as HostElement).$defaultHolder)) || parentElm;
-    let childNode: Node;
 
     for (; startIdx <= endIdx; ++startIdx) {
-      var vnodeChild = vnodes[startIdx];
+      vnodeChild = vnodes[startIdx];
 
       if (isDef(vnodeChild)) {
-        if (isDef(vnodeChild.vtext)) {
-          childNode = domApi.$createTextNode(vnodeChild.vtext);
-
-        } else {
-          childNode = createElm(vnodeChild, parentElm, startIdx);
-        }
+        childNode = isDef(vnodeChild.vtext) ? domApi.$createTextNode(vnodeChild.vtext) : createElm(vnodeChild, parentElm, startIdx);
 
         if (isDef(childNode)) {
           vnodeChild.elm = childNode;
@@ -276,7 +270,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   }
 
   function createKeyToOldIdx(children: VNode[], beginIdx: number, endIdx: number) {
-    let i: number, map: {[key: string]: number} = {}, key: Key, ch;
+    const map: {[key: string]: number} = {};
+    let i: number, key: Key, ch;
 
     for (i = beginIdx; i <= endIdx; ++i) {
       ch = children[i];
@@ -331,7 +326,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
     } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
       // this element has slotted content
-      let parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
+      const parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
       domApi.$setTextContent(parentElement, newVNode.vtext);
       elm._hostContentNodes.defaultSlot = [parentElement.childNodes[0]];
 

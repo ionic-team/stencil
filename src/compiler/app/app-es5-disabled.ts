@@ -1,4 +1,4 @@
-import { Config, CompilerCtx } from '../../util/interfaces';
+import { CompilerCtx, Config } from '../../util/interfaces';
 import { getAppWWWBuildDir } from './app-file-naming';
 import { pathJoin } from '../util';
 

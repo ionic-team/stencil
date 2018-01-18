@@ -1,4 +1,4 @@
-import { Bundle, BuildCtx, Config, CompilerCtx, ComponentRegistry } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, ComponentRegistry, Config } from '../../util/interfaces';
 import { catchError, pathJoin } from '../util';
 import { createAppRegistry, writeAppRegistry } from './app-registry';
 import { generateAppGlobalScript } from './app-global-scripts';

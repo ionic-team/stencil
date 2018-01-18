@@ -1,4 +1,4 @@
-import { parse, stringify, types, StyleNode } from './css-parse';
+import { StyleNode, parse, stringify, types } from './css-parse';
 import { StyleElement } from './custom-style';
 
 
@@ -28,11 +28,11 @@ export function forEachRule(win: Window, node: StyleNode, styleRuleCallback?: (s
   }
 
   let skipRules = false;
-  let type = node.type;
+  const type = node.type;
 
   if (onlyActiveRules) {
     if (type === types.MEDIA_RULE) {
-      let matchMedia = node.selector.match(MEDIA_MATCH);
+      const matchMedia = node.selector.match(MEDIA_MATCH);
       if (matchMedia) {
         // if rule is a non matching @media rule, skip subrules
         if (!win.matchMedia(matchMedia[1]).matches) {
@@ -53,7 +53,7 @@ export function forEachRule(win: Window, node: StyleNode, styleRuleCallback?: (s
     skipRules = true;
   }
 
-  let r$ = node.rules;
+  const r$ = node.rules;
   if (r$ && !skipRules) {
     for (let i = 0, l = r$.length, r; (i < l) && (r = r$[i]); i++) {
       forEachRule(win, r, styleRuleCallback, keyframesRuleCallback, onlyActiveRules);
@@ -81,19 +81,19 @@ function findMatchingParen(text: string, start: number) {
 
 export function processVariableAndFallback(str: string, callback: Function): Function {
   // find 'var('
-  let start = str.indexOf('var(');
+  const start = str.indexOf('var(');
   if (start === -1) {
     // no var?, everything is prefix
     return callback(str, '', '', '');
   }
   // ${prefix}var(${inner})${suffix}
-  let end = findMatchingParen(str, start + 3);
-  let inner = str.substring(start + 4, end);
-  let prefix = str.substring(0, start);
+  const end = findMatchingParen(str, start + 3);
+  const inner = str.substring(start + 4, end);
+  const prefix = str.substring(0, start);
 
   // suffix may have other variables
-  let suffix = processVariableAndFallback(str.substring(end + 1), callback);
-  let comma = inner.indexOf(',');
+  const suffix = processVariableAndFallback(str.substring(end + 1), callback);
+  const comma = inner.indexOf(',');
 
   // value and fallback args should be trimmed to match in property lookup
   if (comma === -1) {
@@ -102,8 +102,8 @@ export function processVariableAndFallback(str: string, callback: Function): Fun
   }
 
   // var(${value},${fallback})
-  let value = inner.substring(0, comma).trim();
-  let fallback = inner.substring(comma + 1).trim();
+  const value = inner.substring(0, comma).trim();
+  const fallback = inner.substring(comma + 1).trim();
 
   return callback(prefix, value, fallback, suffix);
 }

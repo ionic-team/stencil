@@ -126,7 +126,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
         // at this point the membersMeta only includes attributes which should
         // be observed, it does not include all props yet, so it's safe to
         // loop through all of the props (attrs) and observed them
-        for (var propName in cmpMeta.membersMeta) {
+        for (const propName in cmpMeta.membersMeta) {
           // initialize the actual attribute name used vs. the prop name
           // for example, "myProp" would be "my-prop" as an attribute
           // and these can be configured to be all lower case or dash case (default)

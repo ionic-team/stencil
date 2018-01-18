@@ -2,7 +2,7 @@ import { DomApi, HostElement } from '../../util/interfaces';
 import { NODE_TYPE } from '../../util/constants';
 
 
-export function assignHostContentSlots(domApi: DomApi, elm: HostElement, childNodes: NodeList) {
+export function assignHostContentSlots(domApi: DomApi, elm: HostElement, childNodes: NodeList, childNode?: Node) {
   // so let's loop through each of the childNodes to the host element
   // and pick out the ones that have a slot attribute
   // if it doesn't have a slot attribute, than it's a default slot
@@ -19,7 +19,7 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, childNo
   let i = 0;
 
   for (; i < childNodes.length; i++) {
-    var childNode = childNodes[i];
+    childNode = childNodes[i];
 
     if (domApi.$nodeType(childNode) === NODE_TYPE.ElementNode && ((slotName = domApi.$getAttribute(childNode, 'slot')) != null)) {
       // is element node

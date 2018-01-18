@@ -5,12 +5,12 @@ import { VNode as VNodeObj } from './vnode';
 
 
 export function createVNodesFromSsr(domApi: DomApi, rootElm: Element) {
-  var allSsrElms: HostElement[] = <any>rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`),
-      elm: HostElement,
+  const allSsrElms: HostElement[] = <any>rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`);
+  const ilen = allSsrElms.length;
+  let elm: HostElement,
       ssrVNodeId: string,
       ssrVNode: VNode,
       i: number,
-      ilen = allSsrElms.length,
       j: number,
       jlen: number;
 
@@ -30,9 +30,9 @@ export function createVNodesFromSsr(domApi: DomApi, rootElm: Element) {
 
 
 function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVNodeId: string, checkNestedElements: boolean) {
-  var nodeType = domApi.$nodeType(node);
-  var previousComment: Comment;
-  var childVNodeId: string,
+  const nodeType = domApi.$nodeType(node);
+  let previousComment: Comment;
+  let childVNodeId: string,
       childVNodeSplt: string[],
       childVNode: VNode;
 
@@ -69,7 +69,7 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
     }
 
     // keep drilling down through the elements
-    for (var i = 0; i < node.childNodes.length; i++) {
+    for (let i = 0; i < node.childNodes.length; i++) {
       addChildSsrVNodes(domApi, <any>node.childNodes[i], parentVNode, ssrVNodeId, checkNestedElements);
     }
 

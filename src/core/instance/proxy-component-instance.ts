@@ -1,5 +1,5 @@
-import { ComponentInstance, ComponentConstructor, HostElement,
-  PlatformApi, ComponentConstructorProperties } from '../../util/interfaces';
+import { ComponentConstructor, ComponentConstructorProperties,
+  ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
 import { defineMember } from './proxy-members';
 
 

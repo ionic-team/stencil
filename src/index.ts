@@ -1,18 +1,18 @@
 import {
   AddEventListener,
+  AppGlobal,
+  ComponentDidLoad,
+  ComponentDidUnload,
+  ComponentDidUpdate,
+  ComponentWillLoad,
+  ComponentWillUpdate,
   Config,
   CssClassMap,
-  EventListenerEnable,
   EventEmitter,
+  EventListenerEnable,
   HydrateOptions,
-  AppGlobal,
   StencilSystem,
-  VNodeData,
-  ComponentWillLoad,
-  ComponentDidLoad,
-  ComponentWillUpdate,
-  ComponentDidUpdate,
-  ComponentDidUnload
+  VNodeData
 } from './util/interfaces';
 
 export * from './util/decorators';

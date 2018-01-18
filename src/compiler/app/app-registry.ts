@@ -1,4 +1,4 @@
-import { AppRegistry, Config, CompilerCtx, ComponentRegistry, AppRegistryComponents } from '../../util/interfaces';
+import { AppRegistry, AppRegistryComponents, CompilerCtx, ComponentRegistry, Config } from '../../util/interfaces';
 import { getLoaderFileName, getRegistryJsonWWW } from './app-file-naming';
 
 
