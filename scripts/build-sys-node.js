@@ -41,8 +41,12 @@ function bundleSysNode() {
   rollup.rollup({
     input: ENTRY_FILE,
     external: [
+      'crypto',
       'fs',
-      'path'
+      'path',
+      'os',
+      'typescript',
+      'url'
     ]
 
   }).then(bundle => {
