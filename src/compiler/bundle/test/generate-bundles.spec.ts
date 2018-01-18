@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, ComponentMeta, ModuleFile } from '../../../util/interfaces';
+import { Config, CompilerCtx, ComponentMeta, ModuleFile } from '../../../util/interfaces';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getBundleIdDev, getBundleIdHashed, injectComponentStyleMode } from '../generate-bundles';
 import { mockStencilSystem } from '../../../testing/mocks';
@@ -10,7 +10,7 @@ describe('generate-bundles', () => {
   describe('getBundleId', () => {
 
     it('get bundle id from hashed content', () => {
-      const config: BuildConfig = { hashFileNames: true, hashedFileNameLength: 4 };
+      const config: Config = { hashFileNames: true, hashedFileNameLength: 4 };
       config.sys = mockStencilSystem();
 
       const id = getBundleIdHashed(config, 'abcdefg');
@@ -23,7 +23,7 @@ describe('generate-bundles', () => {
     });
 
     it('get bundle id from components and default mode mode', () => {
-      const config: BuildConfig = {};
+      const config: Config = {};
       const id = getBundleIdDev(['cmp-a', 'cmp-b'], null);
       expect(id).toBe('cmp-a');
     });

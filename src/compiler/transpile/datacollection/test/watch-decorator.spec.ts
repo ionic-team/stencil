@@ -2,7 +2,7 @@ import { ComponentMeta } from '../../../../util/interfaces';
 import { gatherMetadata } from './test-utils';
 import { getWatchDecoratorMeta } from '../watch-decorator';
 import { MEMBER_TYPE } from '../../../../util/constants';
-import { mockBuildConfig } from '../../../../testing/mocks';
+import { mockConfig } from '../../../../testing/mocks';
 import * as path from 'path';
 import * as ts from 'typescript';
 
@@ -47,6 +47,6 @@ describe('@Watch decorator', () => {
     expect(cmpMeta.membersMeta.someProp3.watchCallbacks[0]).toBe('method');
   });
 
-  var config = mockBuildConfig();
+  var config = mockConfig();
 
 });

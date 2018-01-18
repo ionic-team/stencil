@@ -1,13 +1,13 @@
-import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { Config, CompilerCtx, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { hydrateHtml } from '../hydrate-html';
 import { h } from '../../core/renderer/h';
-import { mockBuildConfig, compareHtml } from '../../testing/mocks';
+import { mockConfig, compareHtml } from '../../testing/mocks';
 
 
 describe('hydrate', () => {
 
   it('should load content in nested named slots', async () => {
-    const ctx: BuildContext = {};
+    const ctx: CompilerCtx = {};
     const registry: ComponentRegistry = {
       'ion-test': {
         componentConstructor: class {
@@ -53,7 +53,7 @@ describe('hydrate', () => {
   });
 
   it('should load content in nested default slot', async () => {
-    const ctx: BuildContext = {};
+    const ctx: CompilerCtx = {};
 
     const registry: ComponentRegistry = {
       'ion-test': {
@@ -97,7 +97,7 @@ describe('hydrate', () => {
   });
 
   it('should load one component and assign ssr ids', async () => {
-    const ctx: BuildContext = {};
+    const ctx: CompilerCtx = {};
     const registry: ComponentRegistry = {
       'ion-test': {
         componentConstructor: class {
@@ -130,7 +130,7 @@ describe('hydrate', () => {
   });
 
   it('should do nothing when no components registered', async () => {
-    const ctx: BuildContext = {};
+    const ctx: CompilerCtx = {};
     const registry: ComponentRegistry = {};
     const opts: HydrateOptions = {
       html: `<body>hello</body>`
@@ -140,10 +140,10 @@ describe('hydrate', () => {
     expect(hydrateResults.html).toBe(`<body>hello</body>`);
   });
 
-  var config: BuildConfig;
+  var config: Config;
 
   beforeEach(() => {
-    config = mockBuildConfig();
+    config = mockConfig();
   });
 
 });

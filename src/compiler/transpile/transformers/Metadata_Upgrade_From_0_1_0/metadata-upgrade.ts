@@ -1,10 +1,10 @@
 import { addStaticMeta } from '../add-component-metadata';
-import { BuildConfig, Bundle, ComponentMeta } from '../../../../util/interfaces';
+import { Bundle, ComponentMeta } from '../../../../util/interfaces';
 import { normalizePath } from '../../../util';
 import * as ts from 'typescript';
 
 
-export default function upgradeFromMetadata(config: BuildConfig, bundles: Bundle[]) {
+export default function upgradeFromMetadata(bundles: Bundle[]) {
 
   return (tsSourceFile: ts.SourceFile) => {
     const tsFilePath = normalizePath(tsSourceFile.fileName);
@@ -20,7 +20,7 @@ export default function upgradeFromMetadata(config: BuildConfig, bundles: Bundle
     const moduleFile = bundle.moduleFiles.find(m => m.cmpMeta && normalizePath(m.jsFilePath) === tsFilePath);
 
     if (moduleFile) {
-      tsSourceFile = upgradeModuleFile(config, tsSourceFile, moduleFile.cmpMeta);
+      tsSourceFile = upgradeModuleFile(tsSourceFile, moduleFile.cmpMeta);
     }
 
     return tsSourceFile;
@@ -28,8 +28,8 @@ export default function upgradeFromMetadata(config: BuildConfig, bundles: Bundle
 }
 
 
-function upgradeModuleFile(config: BuildConfig, tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
-  const staticMembers = addStaticMeta(config, cmpMeta);
+function upgradeModuleFile(tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
+  const staticMembers = addStaticMeta(cmpMeta);
 
   const newStatements: any = Object.keys(staticMembers).map(memberName => {
     return ts.createBinary(

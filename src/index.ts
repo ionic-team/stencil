@@ -1,6 +1,6 @@
 import {
   AddEventListener,
-  BuildConfig,
+  Config,
   CssClassMap,
   EventListenerEnable,
   EventEmitter,
@@ -21,7 +21,7 @@ export interface HostElement extends HTMLElement {}
 
 export {
   AddEventListener,
-  BuildConfig,
+  Config,
   CssClassMap,
   EventEmitter,
   EventListenerEnable,

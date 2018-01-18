@@ -1,4 +1,4 @@
-import { BuildConfig } from '../../../util/interfaces';
+import { Config } from '../../../util/interfaces';
 import { mockHtml } from '../../../testing/mocks';
 import { removeUnusedStyles } from '../remove-unused-styles';
 import { UsedSelectors } from '../../html/used-selectors';
@@ -167,6 +167,6 @@ describe('removeUnusedStyles', () => {
     expect(css).not.toContain(selector);
   }
 
-  var config: BuildConfig = {};
+  var config: Config = {};
 
 });

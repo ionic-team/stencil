@@ -1,4 +1,4 @@
-import { BuildConfig, ComponentRegistry, ComponentMeta, Diagnostic } from '../../../util/interfaces';
+import { Config, ComponentRegistry, ComponentMeta, Diagnostic } from '../../../util/interfaces';
 import { getComponentDecoratorMeta } from './component-decorator';
 import { getElementDecoratorMeta } from './element-decorator';
 import { getEventDecoratorMeta } from './event-decorator';
@@ -7,11 +7,12 @@ import { getMethodDecoratorMeta } from './method-decorator';
 import { getPropDecoratorMeta } from './prop-decorator';
 import { getStateDecoratorMeta } from './state-decorator';
 import { getWatchDecoratorMeta } from './watch-decorator';
+import { normalizePath } from '../../util';
 import { validateComponentClass } from './validate-component';
 import * as ts from 'typescript';
 
 
-export function gatherMetadata(config: BuildConfig, typechecker: ts.TypeChecker, sourceFileList: ReadonlyArray<ts.SourceFile>): ComponentRegistry {
+export function gatherMetadata(config: Config, typechecker: ts.TypeChecker, sourceFileList: ReadonlyArray<ts.SourceFile>): ComponentRegistry {
   const componentMetaList: ComponentRegistry = {};
   const diagnostics: Diagnostic[] = [];
 
@@ -26,13 +27,14 @@ export function gatherMetadata(config: BuildConfig, typechecker: ts.TypeChecker,
   return componentMetaList;
 }
 
-function visitFactory(config: BuildConfig, checker: ts.TypeChecker, componentMetaList: ComponentRegistry, diagnostics: Diagnostic[]) {
+function visitFactory(config: Config, checker: ts.TypeChecker, componentMetaList: ComponentRegistry, diagnostics: Diagnostic[]) {
 
   return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
     if (ts.isClassDeclaration(node)) {
       const cmpMeta = visitClass(config, checker, node as ts.ClassDeclaration, sourceFile, diagnostics);
       if (cmpMeta) {
-        componentMetaList[sourceFile.getSourceFile().fileName] = cmpMeta;
+        const tsFilePath = normalizePath(sourceFile.getSourceFile().fileName);
+        componentMetaList[tsFilePath] = cmpMeta;
       }
     }
     ts.forEachChild(node, (node) => {
@@ -41,8 +43,8 @@ function visitFactory(config: BuildConfig, checker: ts.TypeChecker, componentMet
   };
 }
 
-export function visitClass(config: BuildConfig, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): ComponentMeta | undefined {
-  let cmpMeta: ComponentMeta = getComponentDecoratorMeta(checker, classNode);
+export function visitClass(config: Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): ComponentMeta | undefined {
+  let cmpMeta = getComponentDecoratorMeta(checker, classNode);
 
   if (!cmpMeta) {
     return undefined;

@@ -1,4 +1,4 @@
-import { AssetsMeta, BuildConfig, BuildContext, BuildResults, ManifestBundle, BundleData,
+import { AssetsMeta, BuildCtx, Config, CompilerCtx, ManifestBundle, BundleData,
   ComponentMeta, ComponentData, EventData, Manifest, ManifestData, ModuleFile, ListenerData,
   ListenMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
@@ -11,8 +11,7 @@ import { normalizePath } from '../util';
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
 
-
-export function writeAppManifest(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+export function writeAppManifest(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
   // get the absolute path to the directory where the manifest will be saved
   const manifestDir = normalizePath(config.collectionDir);
@@ -24,16 +23,18 @@ export function writeAppManifest(config: BuildConfig, ctx: BuildContext, buildRe
 
   // serialize the manifest into a json string and
   // add it to the list of files we need to write when we're ready
-  buildResults.manifest = serializeAppManifest(config, manifestDir, ctx.manifest);
+  const manifestData = serializeAppManifest(config, manifestDir, buildCtx.manifest);
 
   if (config.generateDistribution) {
     // don't bother serializing/writing the manifest if we're not creating a distribution
-    ctx.filesToWrite[manifestFilePath] = JSON.stringify(buildResults.manifest, null, 2);
+    compilerCtx.fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2));
   }
+
+  return manifestData;
 }
 
 
-export function serializeAppManifest(config: BuildConfig, manifestDir: string, manifest: Manifest) {
+export function serializeAppManifest(config: Config, manifestDir: string, manifest: Manifest) {
   // create the single manifest we're going to fill up with data
   const manifestData: ManifestData = {
     components: [],
@@ -73,7 +74,7 @@ export function serializeAppManifest(config: BuildConfig, manifestDir: string, m
 }
 
 
-export function parseDependentManifest(config: BuildConfig, collectionName: string, manifestDir: string, manifestJson: string) {
+export function parseDependentManifest(config: Config, collectionName: string, manifestDir: string, manifestJson: string) {
   const manifestData: ManifestData = JSON.parse(manifestJson);
   const manifest: Manifest = {
     manifestName: collectionName,
@@ -92,7 +93,7 @@ export function parseDependentManifest(config: BuildConfig, collectionName: stri
 }
 
 
-function parseComponents(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+function parseComponents(config: Config, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
   const componentsData = manifestData.components;
 
   if (!componentsData || !Array.isArray(componentsData)) {
@@ -106,7 +107,7 @@ function parseComponents(config: BuildConfig, manifestDir: string, manifestData:
 }
 
 
-export function excludeFromCollection(config: BuildConfig, cmpData: ComponentData) {
+export function excludeFromCollection(config: Config, cmpData: ComponentData) {
   // this is a component from a collection dependency
   // however, this project may also become a collection
   // for example, "ionicons" is a dependency of "ionic"
@@ -126,7 +127,7 @@ export function excludeFromCollection(config: BuildConfig, cmpData: ComponentDat
 }
 
 
-export function serializeComponent(config: BuildConfig, manifestDir: string, moduleFile: ModuleFile) {
+export function serializeComponent(config: Config, manifestDir: string, moduleFile: ModuleFile) {
   if (!moduleFile || !moduleFile.cmpMeta) return null;
 
   const cmpData: ComponentData = {};
@@ -161,7 +162,7 @@ export function serializeComponent(config: BuildConfig, manifestDir: string, mod
 }
 
 
-export function parseComponentDataToModuleFile(config: BuildConfig, manifest: Manifest, manifestDir: string, cmpData: ComponentData) {
+export function parseComponentDataToModuleFile(config: Config, manifest: Manifest, manifestDir: string, cmpData: ComponentData) {
   const moduleFile: ModuleFile = {
     cmpMeta: {},
     isCollectionDependency: true,
@@ -202,7 +203,7 @@ function parseTag(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeComponentPath(config: BuildConfig, manifestDir: string, moduleFile: ModuleFile, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
+function serializeComponentPath(config: Config, manifestDir: string, moduleFile: ModuleFile, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
   if (moduleFile.isCollectionDependency && moduleFile.originalCollectionComponentPath) {
     // use the original path from its collection if there was one
     cmpData.componentPath = normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, moduleFile.originalCollectionComponentPath));
@@ -213,7 +214,7 @@ function serializeComponentPath(config: BuildConfig, manifestDir: string, module
   }
 }
 
-function parseModuleJsFilePath(config: BuildConfig, manifestDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
+function parseModuleJsFilePath(config: Config, manifestDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
   // convert the path that's relative to the manifest file
   // into an absolute path to the component's js file path
   moduleFile.jsFilePath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
@@ -232,7 +233,7 @@ function parseComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeStyles(config: BuildConfig, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeStyles(config: Config, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.stylesMeta) {
     cmpData.styles = {};
 
@@ -244,7 +245,7 @@ function serializeStyles(config: BuildConfig, moduleFile: ModuleFile, compiledCo
   }
 }
 
-function parseStyles(config: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseStyles(config: Config, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const stylesData = cmpData.styles;
 
   cmpMeta.stylesMeta = {};
@@ -258,7 +259,7 @@ function parseStyles(config: BuildConfig, manifestDir: string, cmpData: Componen
 }
 
 
-function serializeStyle(config: BuildConfig, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
+function serializeStyle(config: Config, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
   const modeStyleData: StyleData = {};
 
   if (modeStyleMeta.cmpRelativePaths) {
@@ -290,7 +291,7 @@ function serializeStyle(config: BuildConfig, moduleFile: ModuleFile, compiledCom
   return modeStyleData;
 }
 
-function parseStyle(config: BuildConfig, manifestDir: string, cmpData: ComponentData, modeStyleData: StyleData) {
+function parseStyle(config: Config, manifestDir: string, cmpData: ComponentData, modeStyleData: StyleData) {
   const modeStyle: StyleMeta = {
     styleStr: modeStyleData.style
   };
@@ -317,7 +318,7 @@ function parseStyle(config: BuildConfig, manifestDir: string, cmpData: Component
 }
 
 
-function serializeAssetsDir(config: BuildConfig, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeAssetsDir(config: Config, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpMeta.assetsDirsMeta)) {
     return;
   }
@@ -339,7 +340,7 @@ function serializeAssetsDir(config: BuildConfig, moduleFile: ModuleFile, compile
 }
 
 
-function parseAssetsDir(config: BuildConfig, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseAssetsDir(config: Config, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpData.assetPaths)) {
     return;
   }
@@ -405,7 +406,7 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   });
 }
 
-function parseProps(config: BuildConfig, manifest: Manifest, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseProps(config: Config, manifest: Manifest, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const propsData = cmpData.props;
 
   if (invalidArrayData(propsData)) {
@@ -848,7 +849,7 @@ export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
 }
 
 
-export function serializeAppGlobal(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+export function serializeAppGlobal(config: Config, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
   if (!manifest.global) {
     return;
   }
@@ -857,7 +858,7 @@ export function serializeAppGlobal(config: BuildConfig, manifestDir: string, man
 }
 
 
-export function parseGlobal(config: BuildConfig, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+export function parseGlobal(config: Config, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
   if (typeof manifestData.global !== 'string') return;
 
   manifest.global = {

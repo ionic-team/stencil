@@ -12,7 +12,7 @@
  */
 
 
-import { BuildContext, ComponentMeta } from '../../../util/interfaces';
+import { CompilerCtx, ComponentMeta } from '../../../util/interfaces';
 import { parseCss } from '../parse-css';
 import { getScopeAttribute, getHostScopeAttribute, scopeCss } from '../scope-css';
 

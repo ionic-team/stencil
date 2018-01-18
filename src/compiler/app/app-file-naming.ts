@@ -1,58 +1,58 @@
-import { BuildConfig, SourceTarget } from '../../util/interfaces';
+import { Config, SourceTarget } from '../../util/interfaces';
 import { pathJoin } from '../util';
 
 
-export function getAppWWWBuildDir(config: BuildConfig) {
+export function getAppWWWBuildDir(config: Config) {
   return pathJoin(config, config.buildDir, config.fsNamespace);
 }
 
 
-export function getAppDistDir(config: BuildConfig) {
+export function getAppDistDir(config: Config) {
   return pathJoin(config, config.distDir, config.fsNamespace);
 }
 
 
-function getRegistryFileName(config: BuildConfig) {
+function getRegistryFileName(config: Config) {
   return `${config.fsNamespace}.registry.json`;
 }
 
 
-export function getRegistryJsonWWW(config: BuildConfig) {
+export function getRegistryJsonWWW(config: Config) {
   return pathJoin(config, getAppWWWBuildDir(config), getRegistryFileName(config));
 }
 
 
-export function getLoaderFileName(config: BuildConfig) {
+export function getLoaderFileName(config: Config) {
   return `${config.fsNamespace}.js`;
 }
 
 
-export function getLoaderWWW(config: BuildConfig) {
+export function getLoaderWWW(config: Config) {
   return pathJoin(config, config.buildDir, getLoaderFileName(config));
 }
 
 
-export function getLoaderDist(config: BuildConfig) {
+export function getLoaderDist(config: Config) {
   return pathJoin(config, config.distDir, getLoaderFileName(config));
 }
 
 
-export function getGlobalFileName(config: BuildConfig) {
+export function getGlobalFileName(config: Config) {
   return `${config.fsNamespace}.global.js`;
 }
 
 
-export function getGlobalWWW(config: BuildConfig) {
+export function getGlobalWWW(config: Config) {
   return pathJoin(config, getAppWWWBuildDir(config), getGlobalFileName(config));
 }
 
 
-export function getGlobalDist(config: BuildConfig) {
+export function getGlobalDist(config: Config) {
   return pathJoin(config, getAppDistDir(config), getGlobalFileName(config));
 }
 
 
-export function getCoreFilename(config: BuildConfig, coreId: string, jsContent: string) {
+export function getCoreFilename(config: Config, coreId: string, jsContent: string) {
   if (config.hashFileNames) {
     // prod mode renames the core file with its hashed content
     const contentHash = config.sys.generateContentHash(jsContent, config.hashedFileNameLength);
@@ -64,7 +64,7 @@ export function getCoreFilename(config: BuildConfig, coreId: string, jsContent: 
 }
 
 
-export function getGlobalStyleFilename(config: BuildConfig) {
+export function getGlobalStyleFilename(config: Config) {
   return `${config.fsNamespace}.css`;
 }
 
@@ -74,6 +74,6 @@ export function getBundleFilename(bundleId: string, isScopedStyles: boolean, sou
 }
 
 
-export function getAppPublicPath(config: BuildConfig) {
+export function getAppPublicPath(config: Config) {
   return pathJoin(config, config.publicPath, config.fsNamespace) + '/';
 }

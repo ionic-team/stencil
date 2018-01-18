@@ -1,16 +1,16 @@
-import { BuildConfig, BuildContext, BuildConditionals } from '../../util/interfaces';
+import { Config, CompilerCtx, BuildConditionals, BuildCtx } from '../../util/interfaces';
 import { buildCoreContent } from './build-core-content';
 import { generatePreamble, pathJoin } from '../util';
 import { getAppPublicPath, getAppDistDir, getAppWWWBuildDir, getCoreFilename } from './app-file-naming';
 
 
-export async function generateCore(config: BuildConfig, ctx: BuildContext, globalJsContent: string, buildConditionals: BuildConditionals) {
+export async function generateCore(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, globalJsContent: string, buildConditionals: BuildConditionals) {
   // mega-minify the core w/ property renaming, but not the user's globals
   // hardcode which features should and should not go in the core builds
   // process the transpiled code by removing unused code and minify when configured to do so
   let jsContent = await config.sys.getClientCoreFile({ staticName: 'core.build.js' });
 
-  jsContent = buildCoreContent(config, ctx, buildConditionals, jsContent);
+  jsContent = await buildCoreContent(config, compilerCtx, buildCtx, buildConditionals, jsContent);
 
   if (globalJsContent) {
     // we've got global js to put in the core build too
@@ -31,32 +31,26 @@ export async function generateCore(config: BuildConfig, ctx: BuildContext, globa
 
   const coreFilename = getCoreFilename(config, buildConditionals.coreId, jsContent);
 
-  if (ctx.appFiles[buildConditionals.coreId] === jsContent) {
-    // build is identical from last, no need to resave
-    return coreFilename;
-  }
-  ctx.appFiles[buildConditionals.coreId] = jsContent;
-
   // update the app core filename within the content
   jsContent = jsContent.replace(APP_NAMESPACE_PLACEHOLDER, config.fsNamespace);
 
   if (config.generateWWW) {
     // write the www/build/ app core file
     const appCoreWWW = pathJoin(config, getAppWWWBuildDir(config), coreFilename);
-    ctx.filesToWrite[appCoreWWW] = jsContent;
+    await compilerCtx.fs.writeFile(appCoreWWW, jsContent);
   }
 
   if (config.generateDistribution) {
     // write the dist/ app core file
     const appCoreDist = pathJoin(config, getAppDistDir(config), coreFilename);
-    ctx.filesToWrite[appCoreDist] = jsContent;
+    await compilerCtx.fs.writeFile(appCoreDist, jsContent);
   }
 
   return coreFilename;
 }
 
 
-export function wrapCoreJs(config: BuildConfig, jsContent: string) {
+export function wrapCoreJs(config: Config, jsContent: string) {
   const publicPath = getAppPublicPath(config);
 
   const output = [
@@ -73,7 +67,7 @@ export function wrapCoreJs(config: BuildConfig, jsContent: string) {
 }
 
 
-export function getCorePolyfills(config: BuildConfig) {
+export function getCorePolyfills(config: Config) {
   // first load up all of the polyfill content
   const readFilePromises = [
     'template.js',

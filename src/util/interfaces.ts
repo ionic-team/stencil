@@ -1,6 +1,10 @@
+import { BuildEvents } from '../compiler/events';
+import { Cache } from '../compiler/cache';
 import { CssClassMap } from './jsx-interfaces';
 export { CssClassMap } from './jsx-interfaces';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE, RUNTIME_ERROR } from './constants';
+import { InMemoryFileSystem } from './in-memory-fs';
+import { Plugin } from '../compiler/plugin/plugin-interfaces';
 
 
 export interface CoreContext {
@@ -215,12 +219,9 @@ export interface ManifestCompiler {
 
 
 export interface ModuleFile {
-  tsFilePath?: string;
-  tsText?: string;
-  dtsFilePath?: string;
   jsFilePath?: string;
+  dtsFilePath?: string;
   cmpMeta?: ComponentMeta;
-  includedSassFiles?: string[];
   isCollectionDependency?: boolean;
   excludeFromCollection?: boolean;
   originalCollectionComponentPath?: string;
@@ -232,7 +233,6 @@ export interface AppRegistry {
   fsNamespace?: string;
   loader?: string;
   core?: string;
-  coreSsr?: string;
   corePolyfilled?: string;
   global?: string;
   components?: AppRegistryComponents;
@@ -247,15 +247,15 @@ export interface AppRegistryComponents {
 export interface Bundle {
   entryKey?: string;
   moduleFiles: ModuleFile[];
-  compiledModuleText?: string;
-  compiledModuleLegacyText?: string;
+  compiledModuleJsText?: string;
+  compiledModuleLegacyJsText?: string;
   requiresScopedStyles?: boolean;
   modeNames?: string[];
 }
 
 
 export interface BuildConditionals {
-  coreId?: 'core' | 'core.ssr' | 'core.pf';
+  coreId?: 'core' | 'core.pf';
   polyfills?: boolean;
   verboseError: boolean;
   es5?: boolean;
@@ -263,7 +263,6 @@ export interface BuildConditionals {
   clientSide?: boolean;
 
   // ssr
-  ssrClientSide: boolean;
   ssrServerSide: boolean;
 
   // encapsulation
@@ -303,13 +302,15 @@ export interface BuildConditionals {
 export type SourceTarget = 'es5' | 'es2015';
 
 
-export interface BuildConfig {
+export interface Config {
   configPath?: string;
   sys?: StencilSystem;
   logger?: Logger;
   rootDir?: string;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
+  buildStats?: boolean;
   buildEs5?: boolean;
+  buildAppCore?: boolean;
   namespace?: string;
   fsNamespace?: string;
   globalScript?: string;
@@ -329,6 +330,7 @@ export interface BuildConfig {
   generateWWW?: boolean;
   bundles?: ManifestBundle[];
   collections?: DependentCollection[];
+  plugins?: Plugin[];
   devMode?: boolean;
   watch?: boolean;
   hashFileNames?: boolean;
@@ -346,6 +348,7 @@ export interface BuildConfig {
   generateDocs?: boolean;
   includeSrc?: string[];
   excludeSrc?: string[];
+  enableCache?: boolean;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -470,22 +473,16 @@ export interface HydrateOptions extends RenderOptions {
 }
 
 
-export interface BuildResults {
-  files: string[];
-  diagnostics: Diagnostic[];
-  manifest: ManifestData;
-  changedFiles?: string[];
-}
-
-
-export interface BuildContext {
+export interface CompilerCtx {
+  activeBuildId?: number;
+  isRebuild?: boolean;
+  fs?: InMemoryFileSystem;
+  cache?: Cache;
+  events?: BuildEvents;
   moduleFiles?: ModuleFiles;
-  jsFiles?: FilesMap;
-  compiledFileCache?: FilesMap;
   rollupCache?: { [cacheKey: string]: any };
-  moduleBundleOutputs?: ModuleBundles;
-  moduleBundleLegacyOutputs?: ModuleBundles;
-  filesToWrite?: FilesMap;
+  compiledModuleJsText?: ModuleBundles;
+  compiledModuleLegacyJsText?: ModuleBundles;
   dependentManifests?: {[collectionName: string]: Manifest};
   appFiles?: {
     loader?: string;
@@ -494,39 +491,71 @@ export interface BuildContext {
     corePolyfilled?: string;
     global?: string;
     registryJson?: string;
-    indexHtml?: string;
-    components_d_ts?: string;
-    [key: string]: string;
-  };
-  appGlobalStyles?: {
-    content?: string;
   };
   appCoreWWWPath?: string;
-  coreBuilds?: {[cacheKey: string]: string};
-  watcher?: FSWatcher;
-  hasIndexHtml?: boolean;
 
-  isRebuild?: boolean;
-  isChangeBuild?: boolean;
   lastBuildHadError?: boolean;
-  changeHasNonComponentModules?: boolean;
-  changeHasComponentModules?: boolean;
-  changeHasSass?: boolean;
-  changeHasCss?: boolean;
-  changeHasHtml?: boolean;
-  changedFiles?: string[];
-
-  sassBuildCount?: number;
-  transpileBuildCount?: number;
-  indexBuildCount?: number;
-  appFileBuildCount?: number;
-
-  moduleBundleCount?: number;
   localPrerenderServer?: any;
+}
 
-  diagnostics?: Diagnostic[];
-  manifest?: Manifest;
-  onFinish?: (buildResults: BuildResults) => void;
+
+export interface BuildCtx {
+  buildId: number;
+  requiresFullBuild: boolean;
+  diagnostics: Diagnostic[];
+  manifest: Manifest;
+  transpileBuildCount: number;
+  bundleBuildCount: number;
+  appFileBuildCount: number;
+  indexBuildCount: number;
+  components: string[];
+  aborted: boolean;
+  timeSpan: LoggerTimeSpan;
+  startTime: number;
+  hasChangedJsText: boolean;
+  filesWritten: string[];
+  filesDeleted: string[];
+  dirsDeleted: string[];
+  dirsAdded: string[];
+  filesChanged: string[];
+  filesUpdated: string[];
+  filesAdded: string[];
+  shouldAbort?(): boolean;
+  finish?(): BuildResults;
+}
+
+
+export interface BuildResults {
+  buildId: number;
+  diagnostics: Diagnostic[];
+  hasError: boolean;
+  aborted?: boolean;
+  stats?: {
+    duration: number;
+    isRebuild: boolean;
+    filesWritten: string[];
+    components: string[];
+    transpileBuildCount: number;
+    bundleBuildCount: number;
+    hasChangedJsText: boolean;
+    dirsAdded: string[];
+    dirsDeleted: string[];
+    filesChanged: string[];
+    filesUpdated: string[];
+    filesAdded: string[];
+    filesDeleted: string[];
+  };
+}
+
+
+export interface WatcherResults {
+  dirsAdded: string[];
+  dirsDeleted: string[];
+  filesChanged: string[];
+  filesUpdated: string[];
+  filesAdded: string[];
+  filesDeleted: string[];
+  configUpdated: boolean;
 }
 
 
@@ -537,17 +566,6 @@ export interface ModuleFiles {
 
 export interface ModuleBundles {
   [bundleId: string]: string;
-}
-
-
-export interface CompileResults {
-  moduleFiles: ModuleFiles;
-  includedSassFiles?: string[];
-}
-
-
-export interface TranspileModulesResults {
-  moduleFiles: ModuleFiles;
 }
 
 
@@ -1134,44 +1152,27 @@ export interface PrintLine {
 
 
 export interface StencilSystem {
-  copy?(src: string, dest: string, opts?: {
-    filter?: (src: string, dest?: string) => boolean;
-  }): Promise<void>;
   compiler?: {
     name: string;
     version: string;
     typescriptVersion?: string;
+    runtime?: string;
   };
   createDom?(): {
     parse(hydrateOptions: HydrateOptions): Window;
     serialize(): string;
     destroy(): void;
   };
-  emptyDir?(dir: string): Promise<void>;
-  ensureDir?(dir: string): Promise<void>;
-  ensureDirSync?(dir: string): void;
-  ensureFile?(dir: string): Promise<void>;
-  fs?: {
-    access(path: string, callback: (err: any) => void): void;
-    accessSync(path: string, mode?: number): void
-    mkdir(path: string, callback?: (err?: any) => void): void;
-    readdir(path: string, callback?: (err: any, files: string[]) => void): void;
-    readFile(filename: string, encoding: string, callback: (err: any, data: string) => void): void;
-    readFileSync(filename: string, encoding: string): string;
-    stat(path: string, callback?: (err: any, stats: { isFile(): boolean; isDirectory(): boolean; size: number; }) => any): void;
-    statSync(path: string): { isFile(): boolean; isDirectory(): boolean; };
-    unlink(path: string, callback?: (err?: any) => void): void;
-    writeFile(filename: string, data: any, callback?: (err: any) => void): void;
-    writeFileSync(filename: string, data: any, options?: { encoding?: string; mode?: number; flag?: string; }): void;
-  };
+  createWatcher?(events: BuildEvents, paths: string, opts?: any): FsWatcher;
   generateContentHash?(content: string, length: number): string;
+  fs?: FileSystem;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;
   glob?(pattern: string, options: {
     cwd?: string;
     nodir?: boolean;
   }): Promise<string[]>;
   isGlob?(str: string): boolean;
-  loadConfigFile?(configPath: string): BuildConfig;
+  loadConfigFile?(configPath: string): Config;
   minifyCss?(input: string, opts?: any): {
     output: string;
     sourceMap?: any;
@@ -1184,34 +1185,12 @@ export interface StencilSystem {
   };
   minimatch?(path: string, pattern: string, opts?: any): boolean;
   resolveModule?(fromDir: string, moduleId: string): string;
-  path?: {
-    basename(p: string, ext?: string): string;
-    dirname(p: string): string;
-    extname(p: string): string;
-    isAbsolute(p: string): boolean;
-    join(...paths: string[]): string;
-    relative(from: string, to: string): string;
-    resolve(...pathSegments: any[]): string;
-    sep: string;
-  };
-  remove?(path: string): Promise<void>;
+  path?: Path;
   rollup?: {
     rollup: {
       (config: RollupInputConfig): Promise<RollupBundle>;
     };
     plugins: RollupPlugins;
-  };
-  sass?: {
-    render(
-      config: {
-        data?: string;
-        file?: string;
-        includePaths?: string[];
-        outFile?: string;
-        outputStyle?: string;
-      },
-      cb: (err: any, result: {css: string; stats: any}) => void
-    ): void;
   };
   semver?: {
     gt: (a: string, b: string, loose?: boolean) => boolean;
@@ -1219,18 +1198,96 @@ export interface StencilSystem {
     lt: (a: string, b: string, loose?: boolean) => boolean;
     lte: (a: string, b: string, loose?: boolean) => boolean;
   };
-  typescript?: any;
+  tmpdir?(): string;
   url?: {
     parse(urlStr: string, parseQueryString?: boolean, slashesDenoteHost?: boolean): Url;
     format(url: Url): string;
     resolve(from: string, to: string): string;
   };
   vm?: {
-    createContext(ctx: BuildContext, wwwDir: string, sandbox?: any): any;
+    createContext(ctx: CompilerCtx, wwwDir: string, sandbox?: any): any;
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
-  watch?(paths: string | string[], opts?: any): FSWatcher;
   workbox?: Workbox;
+}
+
+
+export interface FileSystem {
+  copyFile(src: string, dest: string): Promise<void>;
+  mkdir(dirPath: string): Promise<void>;
+  readdir(dirPath: string): Promise<string[]>;
+  readFile(filePath: string, encoding?: string): Promise<string>;
+  readFileSync(filePath: string, encoding?: string): string;
+  rmdir(dirPath: string): Promise<void>;
+  stat(path: string): Promise<{ isFile: () => boolean; isDirectory: () => boolean; }>;
+  statSync(path: string): { isFile: () => boolean; isDirectory: () => boolean; };
+  unlink(filePath: string): Promise<void>;
+  writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<void>;
+  writeFileSync(filePath: string, content: string, opts?: FsWriteOptions): void;
+}
+
+
+export interface FsReadOptions {
+  useCache?: boolean;
+}
+
+
+export interface FsReaddirOptions {
+  recursive?: boolean;
+}
+
+
+export interface FsReaddirItem {
+  absPath: string;
+  relPath: string;
+  isDirectory: boolean;
+  isFile: boolean;
+}
+
+
+export interface FsWriteOptions {
+  inMemoryOnly?: boolean;
+  clearFileCache?: boolean;
+}
+
+
+export interface FsWriteResults {
+  changedContent?: boolean;
+  queuedWrite?: boolean;
+}
+
+
+export interface FsItems {
+  [filePath: string]: FsItem;
+}
+
+
+export interface FsItem {
+  fileText?: string;
+  isFile?: boolean;
+  isDirectory?: boolean;
+  exists?: boolean;
+  queueWriteToDisk?: boolean;
+  queueDeleteFromDisk?: boolean;
+}
+
+
+export interface FsCopyFileTask {
+  src: string;
+  dest: string;
+}
+
+
+export interface Path {
+  basename(p: string, ext?: string): string;
+  dirname(p: string): string;
+  extname(p: string): string;
+  isAbsolute(p: string): boolean;
+  join(...paths: string[]): string;
+  parse(pathString: string): { root: string; dir: string; base: string; ext: string; name: string; };
+  relative(from: string, to: string): string;
+  resolve(...pathSegments: any[]): string;
+  sep: string;
 }
 
 
@@ -1304,10 +1361,8 @@ export interface Url {
 }
 
 
-export interface FSWatcher {
-  on(eventName: string, callback: Function): this;
-  add(path: string|string[]): this;
-  $triggerEvent(eventName: string, path: string): void;
+export interface FsWatcher {
+  add(path: string|string[]): void;
 }
 
 
@@ -1491,3 +1546,5 @@ export interface ComponentDidUpdate {
 export interface ComponentDidUnload {
   componentDidUnload: () => void;
 }
+
+export type CompilerEventName = 'fileUpdate' | 'fileAdd' | 'fileDelete' | 'dirAdd' | 'dirDelete' | 'build' | 'rebuild';

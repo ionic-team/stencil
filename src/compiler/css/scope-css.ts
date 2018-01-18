@@ -1,9 +1,9 @@
-import { BuildContext, ComponentMeta } from '../../util/interfaces';
+import { BuildCtx, ComponentMeta } from '../../util/interfaces';
 import { catchError } from '../util';
 import { ShadowCss } from './shadow-css';
 
 
-export function scopeComponentCss(ctx: BuildContext, cmpMeta: ComponentMeta, cssText: string) {
+export function scopeComponentCss(buildCtx: BuildCtx, cmpMeta: ComponentMeta, cssText: string) {
   try {
     const scopeAttribute = getScopeAttribute(cmpMeta);
     const hostScopeAttr = getHostScopeAttribute(cmpMeta);
@@ -12,7 +12,7 @@ export function scopeComponentCss(ctx: BuildContext, cmpMeta: ComponentMeta, css
     cssText = scopeCss(cssText, scopeAttribute, hostScopeAttr, slotScopeAttr);
 
   } catch (e) {
-    catchError(ctx.diagnostics, e);
+    catchError(buildCtx.diagnostics, e);
   }
 
   return cssText;

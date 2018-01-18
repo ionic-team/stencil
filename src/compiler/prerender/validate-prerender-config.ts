@@ -1,8 +1,8 @@
-import { BuildConfig, PrerenderConfig, RenderOptions } from '../../util/interfaces';
+import { Config, PrerenderConfig, RenderOptions } from '../../util/interfaces';
 import { normalizePath } from '../util';
 
 
-export function validatePrerenderConfig(config: BuildConfig) {
+export function validatePrerenderConfig(config: Config) {
   if (config.prerender && config.generateWWW) {
     if (typeof config.prerender !== 'object' || Array.isArray(config.prerender)) {
       config.prerender = {};

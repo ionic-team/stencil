@@ -1,4 +1,4 @@
-import { BuildConfig, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
+import { Config, ComponentData, ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile, parseGlobal, serializeBundles, serializeComponent, serializeAppGlobal, serializeAppManifest, parseWillChangeDeprecated, parseDidChangeDeprecated } from '../manifest-data';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
@@ -35,8 +35,6 @@ describe('manifest-data serialize/parse', () => {
     ]);
     expect(outManifest.components).toHaveLength(1);
     expect(outManifest.compiler.name).toEqual('test');
-    expect(outManifest.compiler.version).toEqual('test');
-    expect(outManifest.compiler.typescriptVersion).toEqual('test');
   });
 
   it('serializeAppGlobal', () => {
@@ -376,7 +374,7 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('excludeFromCollection false if tag is in bundles', () => {
-    const config: BuildConfig = {
+    const config: Config = {
       bundles: [
         { components: ['cmp-a', 'cmp-b'] }
       ]
@@ -389,7 +387,7 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('excludeFromCollection true if tag not in bundles', () => {
-    const config: BuildConfig = {
+    const config: Config = {
       bundles: [
         { components: ['cmp-a', 'cmp-b'] }
       ]
@@ -402,7 +400,7 @@ describe('manifest-data serialize/parse', () => {
   });
 
   it('excludeFromCollection defaults true', () => {
-    const config: BuildConfig = {};
+    const config: Config = {};
     const cmpData: ComponentData = {};
     const r = excludeFromCollection(config, cmpData);
     expect(r).toBe(true);
@@ -424,7 +422,7 @@ describe('manifest-data serialize/parse', () => {
   var b: ModuleFile;
   var moduleFile: ModuleFile;
   var manifestDir = '/User/me/myapp/dist/collection/';
-  var config: BuildConfig = {
+  var config: Config = {
     sys: mockStencilSystem()
   };
 

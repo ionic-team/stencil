@@ -1,4 +1,4 @@
-import { BuildConfig } from '../interfaces';
+import { Config } from '../interfaces';
 import { validateNamespace } from '../validate-config';
 import * as path from 'path';
 
@@ -89,7 +89,7 @@ describe('validateNamespace', () => {
     expect(config.fsNamespace).toBe('app');
   });
 
-  var config: BuildConfig;
+  var config: Config;
   beforeEach(() => {
     config = {};
   });

@@ -1,7 +1,7 @@
-import { BuildConfig, Manifest } from '../../util/interfaces';
+import { Config, Manifest } from '../../util/interfaces';
 
 
-export function validateManifestCompatibility(config: BuildConfig, manifest: Manifest): number[] {
+export function validateManifestCompatibility(config: Config, manifest: Manifest): number[] {
   if (!manifest.compiler) {
     // if there is no compiler data at all then this was probably
     // set on purpose and we should avoid doing any upgrading
@@ -18,7 +18,7 @@ export function validateManifestCompatibility(config: BuildConfig, manifest: Man
 }
 
 
-export function calculateRequiredUpgrades(config: BuildConfig, collectionVersion: string) {
+export function calculateRequiredUpgrades(config: Config, collectionVersion: string) {
   // CUSTOM CHECKS PER KNOWN BREAKING CHANGES
   // UNIT TEST UNIT TEST UNIT TEST
   const upgrades: CompilerUpgrade[] = [];
