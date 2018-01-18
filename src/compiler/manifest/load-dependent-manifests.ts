@@ -1,6 +1,6 @@
-import { Config, CompilerCtx, ManifestBundle, DependentCollection, Manifest, ModuleFile } from '../../util/interfaces';
+import { COLLECTION_DEPENDENCIES_DIR, parseDependentManifest } from './manifest-data';
+import { CompilerCtx, Config, DependentCollection, Manifest, ManifestBundle, ModuleFile } from '../../util/interfaces';
 import { normalizePath } from '../util';
-import { parseDependentManifest, COLLECTION_DEPENDENCIES_DIR } from './manifest-data';
 
 
 export function loadDependentManifests(config: Config, ctx: CompilerCtx) {

@@ -6,13 +6,8 @@ import {
   ComponentDidUpdate,
   ComponentWillLoad,
   ComponentWillUpdate,
-  Config,
-  CssClassMap,
   EventEmitter,
-  EventListenerEnable,
-  HydrateOptions,
-  StencilSystem,
-  VNodeData
+  EventListenerEnable
 } from './util/interfaces';
 
 export * from './util/decorators';
@@ -21,17 +16,15 @@ export interface HostElement extends HTMLElement {}
 
 export {
   AddEventListener,
-  Config,
-  CssClassMap,
   EventEmitter,
   EventListenerEnable,
-  HydrateOptions,
   AppGlobal,
-  StencilSystem,
-  VNodeData,
   ComponentWillLoad,
   ComponentDidLoad,
   ComponentWillUpdate,
   ComponentDidUpdate,
   ComponentDidUnload
 };
+
+
+export * from './declarations/public';

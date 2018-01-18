@@ -1,14 +1,14 @@
-import { Plugin, PluginTransformResults, PluginCtx } from '../../compiler/plugin/plugin-interfaces';
+import * as d from '../../declarations/public';
 
 
-export class StyleMinifyPlugin implements Plugin {
+export class StyleMinifyPlugin implements d.Plugin {
 
-  async transform(sourceText: string, id: string, context: PluginCtx) {
+  async transform(sourceText: string, id: string, context: d.PluginCtx): Promise<d.PluginTransformResults> {
     if (!context.config.minifyCss || !this.usePlugin(id)) {
       return null;
     }
 
-    const results: PluginTransformResults = {};
+    const results: d.PluginTransformResults = {};
 
     const cacheKey = context.cache.createKey(this.name, sourceText);
     const cachedContent = await context.cache.get(cacheKey);

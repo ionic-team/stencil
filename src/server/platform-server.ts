@@ -1,11 +1,11 @@
-import { AppGlobal, Config, CompilerCtx, CjsExports,
-  ComponentMeta, ComponentRegistry, CoreContext, Diagnostic,
-  HostElement, PlatformApi, HydrateResults } from '../util/interfaces';
+import { AppGlobal, CjsExports, CompilerCtx, ComponentMeta,
+  ComponentRegistry, Config, CoreContext, Diagnostic,
+  HostElement, HydrateResults, PlatformApi } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR, PROP_TYPE } from '../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { getAppWWWBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../core/renderer/h';
 import { noop } from '../util/helpers';

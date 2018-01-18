@@ -1,18 +1,17 @@
-import { Plugin, PluginTransformResults, PluginCtx } from '../../compiler/plugin/plugin-interfaces';
-import { Diagnostic, PrintLine } from '../../util/interfaces';
+import * as d from '../../declarations/public';
 const nodeSass = require('node-sass');
 
 
-export class StyleSassPlugin implements Plugin {
+export class StyleSassPlugin implements d.Plugin {
 
   constructor(private renderOpts: RenderOptions = {}) {}
 
-  async transform(sourceText: string, id: string, context: PluginCtx) {
+  async transform(sourceText: string, id: string, context: d.PluginCtx): Promise<d.PluginTransformResults> {
     if (!this.usePlugin(id)) {
       return null;
     }
 
-    const results: PluginTransformResults = {};
+    const results: d.PluginTransformResults = {};
 
     // create what the new path is post transform (.css)
     const pathParts = id.split('.');
@@ -78,12 +77,12 @@ export class StyleSassPlugin implements Plugin {
 }
 
 
-function loadDiagnostic(context: PluginCtx, sassError: any, filePath: string) {
+function loadDiagnostic(context: d.PluginCtx, sassError: any, filePath: string) {
   if (!sassError || !context) {
     return;
   }
 
-  const d: Diagnostic = {
+  const d: d.Diagnostic = {
     level: 'error',
     type: 'sass',
     language: 'scss',
@@ -105,7 +104,7 @@ function loadDiagnostic(context: PluginCtx, sassError: any, filePath: string) {
         const sourceText = context.fs.readFileSync(d.absFilePath);
         const srcLines = sourceText.split(/(\r?\n)/);
 
-        const errorLine: PrintLine = {
+        const errorLine: d.PrintLine = {
           lineIndex: sassError.line - 1,
           lineNumber: sassError.line,
           text: srcLines[sassError.line - 1],
@@ -135,7 +134,7 @@ function loadDiagnostic(context: PluginCtx, sassError: any, filePath: string) {
         d.lines.push(errorLine);
 
         if (errorLine.lineIndex > 0) {
-          const previousLine: PrintLine = {
+          const previousLine: d.PrintLine = {
             lineIndex: errorLine.lineIndex - 1,
             lineNumber: errorLine.lineNumber - 1,
             text: srcLines[errorLine.lineIndex - 1],
@@ -147,7 +146,7 @@ function loadDiagnostic(context: PluginCtx, sassError: any, filePath: string) {
         }
 
         if (errorLine.lineIndex + 1 < srcLines.length) {
-          const nextLine: PrintLine = {
+          const nextLine: d.PrintLine = {
             lineIndex: errorLine.lineIndex + 1,
             lineNumber: errorLine.lineNumber + 1,
             text: srcLines[errorLine.lineIndex + 1],

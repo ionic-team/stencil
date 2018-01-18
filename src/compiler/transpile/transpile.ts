@@ -1,5 +1,5 @@
 import addComponentMetadata from './transformers/add-component-metadata';
-import { Config, CompilerCtx, Diagnostic, ModuleFiles, TranspileResults, BuildCtx, FsWriteResults } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, ComponentMeta, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../util/interfaces';
 import { hasError, normalizePath } from '../util';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';

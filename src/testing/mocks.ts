@@ -6,7 +6,7 @@ import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
 import { initHostElement } from '../core/instance/init-host-element';
 import { initComponentInstance } from '../core/instance/init-component-instance';
-import { validateBuildConfig } from '../util/validate-config';
+import { validateBuildConfig } from '../compiler/config/validate-config';
 import { TestingConfig } from './testing-config';
 import { TestingSystem } from './testing-sys';
 import { TestingFs } from './testing-fs';
@@ -175,7 +175,7 @@ export function mockSVGElement(): Element {
   return jsdom.JSDOM.fragment(`<svg xmlns="http://www.w3.org/2000/svg"></svg>`).firstChild;
 }
 
-export function mockElement(tag: string = 'div'): Element {
+export function mockElement(tag = 'div'): Element {
   const jsdom = require('jsdom');
   return jsdom.JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
 }

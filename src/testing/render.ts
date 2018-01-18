@@ -1,9 +1,8 @@
 import { ComponentMeta, ComponentRegistry, Config, HydrateOptions, PlatformApi } from '../util/interfaces';
 import { mockLogger, mockStencilSystem } from './mocks';
 import { Renderer } from '../server';
-import { validateBuildConfig } from '../util/validate-config';
+import { validateBuildConfig } from '../compiler/config/validate-config';
 
-import './expect';
 
 export async function render(opts: RenderTestOptions): Promise<any> {
   validateRenderOptions(opts);
@@ -68,7 +67,7 @@ export function flush(root: any): Promise<void> {
 
 
 function getTestBuildConfig() {
-  var sys = mockStencilSystem();
+  const sys = mockStencilSystem();
 
   const config: Config = {
     sys: sys,

@@ -1,6 +1,6 @@
 import { BuildCtx, CompilerCtx, Config } from '../../util/interfaces';
 import { catchError } from '../util';
-import { PluginTransformResults, PluginCtx } from './plugin-interfaces';
+import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { StyleMinifyPlugin } from '../style/style-minify-plugin';
 import { StyleSassPlugin } from '../style/style-sass-plugin';
 

@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, Diagnostic, ModuleFile, PrintLine, BuildCtx } from '../interfaces';
+import { BuildCtx, CompilerCtx, Config, Diagnostic, ModuleFile, PrintLine } from '../interfaces';
 import { buildWarn } from '../../compiler/util';
 import { formatFileName, formatHeader, splitLineBreaks } from './logger-util';
 import { highlight } from './highlight/highlight';

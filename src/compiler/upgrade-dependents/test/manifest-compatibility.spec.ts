@@ -1,5 +1,5 @@
 import { Config, Manifest } from '../../../util/interfaces';
-import { calculateRequiredUpgrades, CompilerUpgrade } from '../manifest-compatibility';
+import { CompilerUpgrade, calculateRequiredUpgrades } from '../manifest-compatibility';
 import { mockConfig } from '../../../testing/mocks';
 
 
@@ -24,6 +24,6 @@ describe('Manifest Compatibility', () => {
 
   });
 
-  var config = mockConfig();
+  const config = mockConfig();
 
 });

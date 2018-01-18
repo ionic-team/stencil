@@ -1,5 +1,5 @@
-import { Config, CompilerCtx, ComponentRegistry, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
-import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeLanguage, normalizeHydrateOptions } from './hydrate-utils';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
+import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeHydrateOptions, normalizeLanguage } from './hydrate-utils';
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';

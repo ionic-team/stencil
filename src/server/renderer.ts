@@ -1,10 +1,10 @@
-import { Config, CompilerCtx, HydrateOptions, HydrateResults, ComponentRegistry } from '../util/interfaces';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../util/interfaces';
 import { catchError, getCompilerCtx } from '../compiler/util';
 import { getGlobalWWW } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { loadComponentRegistry } from './load-registry';
-import { validateBuildConfig } from '../util/validate-config';
+import { validateBuildConfig } from '../compiler/config/validate-config';
 
 
 export class Renderer {
