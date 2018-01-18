@@ -6,7 +6,7 @@ const chalk = require('chalk');
 const execa = require('execa');
 const inquirer = require('inquirer');
 const Listr = require('listr');
-const readPkgUp = require('read-pkg-up');
+const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
 const semver = require('semver');
@@ -14,6 +14,7 @@ const semver = require('semver');
 
 const rootDir = path.join(__dirname, '../');
 const scriptsDir = path.join(rootDir, 'scripts');
+const packageJsonPath = path.join(rootDir, 'package.json');
 
 
 function runTasks(opts) {
@@ -371,13 +372,7 @@ const isVersionLower = (oldVersion, newVersion) => {
 const satisfies = (version, range) => semver.satisfies(version, range);
 
 const readPkg = () => {
-  const pkg = readPkgUp.sync().pkg;
-
-  if (!pkg) {
-    throw new Error(`No package.json found. Make sure you're in the correct project.`);
-  }
-
-  return pkg;
+  return JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
 };
 
 function prettyVersionDiff(oldVersion, inc) {

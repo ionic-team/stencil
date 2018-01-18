@@ -1,22 +1,19 @@
-'use strict';
-
 const fs = require('fs');
+const path = require('path');
 
-const packageFile = require('read-pkg-up').sync().path;
+const packageJsonPath = path.join(__dirname, '../package.json');
+const packageLockPath = path.join(__dirname, '../package-lock.json');
+
 
 function getVersion() {
   return process.argv[process.argv.length - 1];
 }
 
-function readPackage() {
-  return JSON.parse(fs.readFileSync(packageFile, 'utf8'));
-}
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+packageJson.version = getVersion();
 
-function writePackage(pkg) {
-  fs.writeFileSync(packageFile, JSON.stringify(pkg, null, 2));
-  fs.appendFileSync(packageFile, '\n');
-}
+const packageLock = JSON.parse(fs.readFileSync(packageLockPath, 'utf-8'));
+packageLock.version = packageJson.version;
 
-let pkg = readPackage();
-pkg.version = getVersion();
-writePackage(pkg);
+fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
+fs.writeFileSync(packageLockPath, JSON.stringify(packageLock, null, 2) + '\n');
