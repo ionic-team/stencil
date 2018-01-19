@@ -39,10 +39,14 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = publicPath + ((supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? (requiresSsrClient(doc) ? appCoreSsr : appCore) : appCorePolyfilled);
+  x.src = publicPath + ((!urlContainsFlag(win) && supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? (requiresSsrClient(doc) ? appCoreSsr : appCore) : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
   x.setAttribute('data-namespace', appNamespace);
   doc.head.appendChild(x);
+}
+
+export function urlContainsFlag(win: Window) {
+  return win.location.search.indexOf('core=es5') > -1;
 }
 
 export function supportsEsModules(scriptElm: HTMLScriptElement) {
