@@ -51,15 +51,26 @@ export async function writeEsModules(config: BuildConfig, rollupBundle: OutputBu
 }
 
 
-export async function writeLegacyModules(config: BuildConfig, rollupBundle: OutputBundle) {
+export async function writeLegacyModules(config: BuildConfig, rollupBundle: OutputBundle, bundles: Bundle[]) {
+  Object.entries((<any>rollupBundle).chunks).forEach(([key, value]) => {
+    const b = bundles.find(b => b.entryKey === `./${key}.js`);
+    if (b) {
+      b.dependencies = value.imports.slice();
+    }
+  });
+
   const results = await rollupBundle.generate({
-    format: 'cjs',
+    format: 'amd',
+    amd: {
+      id: getBundleIdPlaceholder(),
+      define: `${config.namespace}.loadBundle`
+    },
     banner: generatePreamble(config),
-    intro: `${config.namespace}.loadComponents(function(exports, h, Context){` +
-           `"use strict";`,
-            // module content w/ commonjs exports object
-    outro: `\n},"${getBundleIdPlaceholder()}");`,
+    intro:
+`const h = window.${config.namespace}.h;
+const Context = window.${config.namespace}.Context;`,
     strict: false,
   });
+
   return <any>results as JSModuleList;
 }

@@ -136,12 +136,13 @@ export function createPlatformServer(
   }
 
 
-  App.loadComponents = function loadComponents(importer) {
+  App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
     try {
       // requested component constructors are placed on the moduleImports object
       // inject the h() function so it can be use by the components
       const exports: CjsExports = {};
-      importer(exports, h, Context);
+      console.log(bundleId, ...dependentsList, importer);
+
 
       // let's add a reference to the constructors on each components metadata
       // each key in moduleImports is a PascalCased tag name

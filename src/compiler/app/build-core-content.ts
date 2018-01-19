@@ -260,7 +260,7 @@ var RESERVED_PROPERTIES: string[] = [
    * Properties which get added to the app's global
    */
   'components',
-  'loadComponents',
+  'loadBundle',
   'loadStyles',
 
 

@@ -1,5 +1,5 @@
 import { enableEventListener } from '../core/instance/listeners';
-import { AppGlobal, BundleCallbacks, CjsExports, ComponentMeta, ComponentRegistry, CoreContext,
+import { AppGlobal, BundleCallback, CjsExports, ComponentMeta, ComponentRegistry, CoreContext,
   EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../util/interfaces';
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { attachStyles } from '../core/instance/styles';
@@ -21,8 +21,8 @@ import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
 
 export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
-  const bundleCallbacks: BundleCallbacks = {};
-  const loadedBundles: {[bundleId: string]: boolean} = {};
+  const bundleQueue: BundleCallback[] = [];
+  const loadedBundles: {[bundleId: string]: any} = {};
   const pendingBundleRequests: {[url: string]: boolean} = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
@@ -59,7 +59,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
     isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
-    loadBundle,
+    loadBundle: loadComponent,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: createQueueClient(win),
@@ -150,43 +150,73 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     }
   }
 
+  /**
+   * Execute a bundle queue item
+   * @param name
+   * @param deps
+   * @param callback
+   */
+  function execBundleCallback(name: string, deps: string[], callback: Function) {
+    const bundleExports: CjsExports = {};
 
-  App.loadComponents = function loadComponents(importer, bundleId) {
     try {
-      // requested component constructors are placed on the moduleImports object
-      // inject the h() function so it can be use by the components
-      const exports: CjsExports = {};
-      importer(exports, h, Context);
-
-      // let's add a reference to the constructors on each components metadata
-      // each key in moduleImports is a PascalCased tag name
-      Object.keys(exports).forEach(pascalCasedTagName => {
-        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
-        if (cmpMeta) {
-          // connect the component's constructor to its metadata
-          cmpMeta.componentConstructor = exports[pascalCasedTagName];
-        }
-      });
-
+      callback([bundleExports, ...deps.map(d => loadedBundles[d])]);
     } catch (e) {
       console.error(e);
     }
 
-    // fire off all the callbacks waiting on this bundle to load
-    const callbacks = bundleCallbacks[bundleId];
-    if (callbacks) {
-      for (var i = 0; i < callbacks.length; i++) {
-        try {
-          callbacks[i]();
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      bundleCallbacks[bundleId] = null;
+    // If name is undefined then this callback was fired by component callback
+    if (name === undefined) {
+      return;
     }
 
-    // remember that we've already loaded this bundle
-    loadedBundles[bundleId] = true;
+    loadedBundles[name] = bundleExports;
+
+    // If name contains chunk then this callback was associated with a dependent bundle loading
+    if (name.startsWith('./chunk')) {
+      return;
+    }
+
+    // let's add a reference to the constructors on each components metadata
+    // each key in moduleImports is a PascalCased tag name
+    Object.keys(bundleExports).forEach(pascalCasedTagName => {
+      const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
+      if (cmpMeta) {
+        // connect the component's constructor to its metadata
+        cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
+      }
+    });
+  }
+
+  /**
+   * Check to see if any items in the bundle queue can be executed
+   */
+  function checkQueue() {
+    bundleQueue.forEach(([bundleId, dependentsList, importer]) => {
+      if (dependentsList.every(dep => loadedBundles[dep])) {
+        execBundleCallback(bundleId, dependentsList, importer);
+      }
+    });
+  }
+
+  /**
+   * This function is called anytime a JS file is loaded
+   */
+  App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
+
+    const missingDependents = dependentsList.filter(d => !!loadedBundles[d]);
+
+    missingDependents.forEach(d => {
+        requestUrl(d);
+      });
+    bundleQueue.push([bundleId, dependentsList, importer]);
+
+    // If any dependents are not yet met then queue the bundle execution
+    if (missingDependents.length > 0) {
+      return;
+    }
+
+    checkQueue();
   };
 
 
@@ -194,9 +224,6 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   let requestBundleQueue: Function[];
   if (Build.cssVarShim) {
     customStyle = new CustomStyle(win, doc);
-
-    // keep a queue of all the request bundle callbacks to run
-    requestBundleQueue = [];
 
     initCssVarShim(win, doc, customStyle, () => {
       // loaded all the css, let's run all the request bundle callbacks
@@ -209,8 +236,8 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     });
   }
 
-
-  function loadBundle(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
+  // This is executed by the component's connected callback.
+  function loadComponent(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
     bundleId = cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any);
 
     if (loadedBundles[bundleId]) {
@@ -220,7 +247,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
-      (bundleCallbacks[bundleId] = bundleCallbacks[bundleId] || []).push(cb);
+      bundleQueue.push([undefined, [bundleId], cb]);
 
       // when to request the bundle depends is we're using the css shim or not
       if (Build.cssVarShim && !customStyle.supportsCssVars) {
@@ -228,27 +255,34 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
         if (requestBundleQueue) {
           // add this to the loadBundleQueue to run when css is ready
           requestBundleQueue.push(() => {
-            requestBundle(cmpMeta, bundleId);
+            requestComponentBundle(cmpMeta, bundleId);
           });
 
         } else {
           // css already all loaded
-          requestBundle(cmpMeta, bundleId);
+          requestComponentBundle(cmpMeta, bundleId);
         }
 
       } else {
         // not using css shim, so no need to wait on css shim to finish
         // figure out which bundle to request and kick it off
-        requestBundle(cmpMeta, bundleId);
+        requestComponentBundle(cmpMeta, bundleId);
       }
     }
   }
 
 
-  function requestBundle(cmpMeta: ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
+  function requestComponentBundle(cmpMeta: ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
     url = publicPath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js');
+
+    requestUrl(url, tmrId, scriptElm);
+  }
+
+
+  // Use JSONP to load in bundles
+  function requestUrl(url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
 
     function onScriptComplete() {
       clearTimeout(tmrId);

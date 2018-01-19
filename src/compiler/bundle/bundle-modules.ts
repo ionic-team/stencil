@@ -27,7 +27,7 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
     if (config.buildEs5) {
       // only create legacy modules when generating es5 fallbacks
       // bundle using commonjs using jsonp callback
-      results.es5 = await writeLegacyModules(config, rollupBundle);
+      results.es5 = await writeLegacyModules(config, rollupBundle, bundles);
     }
 
   } catch (err) {
