@@ -2,6 +2,53 @@ import * as d from './index';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
 
 
+export interface ComponentWillLoad {
+  /**
+   * componentWillLoad
+   */
+  componentWillLoad: () => Promise<void> | void;
+}
+
+export interface ComponentDidLoad {
+  /**
+   * componentDidLoad
+   */
+  componentDidLoad: () => void;
+}
+
+export interface ComponentWillUpdate {
+  /**
+   * componentWillUpdate
+   */
+  componentWillUpdate: () => Promise<void> | void;
+}
+
+export interface ComponentDidUpdate {
+  /**
+   * componentDidUpdate
+   */
+  componentDidUpdate: () => void;
+}
+
+export interface ComponentDidUnload {
+  /**
+   * componentDidUnload
+   */
+  componentDidUnload: () => void;
+}
+
+
+export interface ComponentConstructor {
+  is?: string;
+  properties?: ComponentConstructorProperties;
+  events?: ComponentConstructorEvent[];
+  host?: any;
+  style?: string;
+  styleMode?: string;
+  encapsulation?: Encapsulation;
+}
+
+
 export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
@@ -23,6 +70,7 @@ export interface ModeStyles {
   [modeName: string]: string | string[];
 }
 
+
 export interface BundleIds {
   [modeName: string]: string;
 }
@@ -42,6 +90,7 @@ export interface MemberMeta {
   jsdoc?: JSDoc;
   watchCallbacks?: string[];
 }
+
 
 export interface AttributeTypeReference {
   referenceLocation: 'local' | 'global' | 'import';
@@ -83,17 +132,6 @@ export interface AssetsMeta {
 
 export interface HostMeta {
   [key: string]: any;
-}
-
-
-export interface ComponentConstructor {
-  is?: string;
-  properties?: ComponentConstructorProperties;
-  events?: ComponentConstructorEvent[];
-  host?: any;
-  style?: string;
-  styleMode?: string;
-  encapsulation?: Encapsulation;
 }
 
 
@@ -198,34 +236,8 @@ export abstract class ComponentModule {
 }
 
 
-export interface ComponentActiveListeners {
-  [eventName: string]: Function;
-}
-
-
-export interface ComponentActivePropChanges {
-  [propName: string]: Function;
-}
-
-
 export interface ComponentInternalValues {
   [propName: string]: any;
-}
-
-
-export interface BaseInputComponent extends ComponentInstance {
-  disabled: boolean;
-  hasFocus: boolean;
-  value: string;
-
-  fireFocus: () => void;
-  fireBlur: () => void;
-}
-
-
-export interface BooleanInputComponent extends BaseInputComponent {
-  checked: boolean;
-  toggle: (ev: UIEvent) => void;
 }
 
 
@@ -275,26 +287,6 @@ export interface HostElement extends HTMLElement {
   _root?: HTMLElement | ShadowRoot;
   _values?: ComponentInternalValues;
   _vnode: d.VNode;
-}
-
-export interface ComponentWillLoad {
-  componentWillLoad: () => Promise<void> | void;
-}
-
-export interface ComponentDidLoad {
-  componentDidLoad: () => void;
-}
-
-export interface ComponentWillUpdate {
-  componentWillUpdate: () => Promise<void> | void;
-}
-
-export interface ComponentDidUpdate {
-  componentDidUpdate: () => void;
-}
-
-export interface ComponentDidUnload {
-  componentDidUnload: () => void;
 }
 
 
