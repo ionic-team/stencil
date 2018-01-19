@@ -24,10 +24,6 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
   // reset the build context, this is important for rebuilds
   const buildCtx = getBuildContext(config, compilerCtx, watcher);
 
-  if (!compilerCtx.isRebuild) {
-    config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
-  }
-
   try {
     // create an initial index.html file if one doesn't already exist
     // this is synchronous on purpose

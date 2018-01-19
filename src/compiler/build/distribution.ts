@@ -1,4 +1,4 @@
-import { BuildCtx, Config, CompilerCtx, Diagnostic } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, Diagnostic } from '../../util/interfaces';
 import { buildError, buildWarn, normalizePath } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { getLoaderFileName } from '../app/app-file-naming';
@@ -27,7 +27,7 @@ async function readPackageJson(config: Config, compilerCtx: CompilerCtx, buildCt
   try {
     packageJsonText = await compilerCtx.fs.readFile(packageJsonPath);
   } catch (e) {
-    throw `Missing "package.json" file for distribution: ${packageJsonPath}`;
+    throw new Error(`Missing "package.json" file for distribution: ${packageJsonPath}`);
   }
 
   const packageJsonData = JSON.parse(packageJsonText);

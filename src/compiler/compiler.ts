@@ -15,9 +15,12 @@ export class Compiler {
 
   constructor(public config: Config) {
     this.isValid = isValid(config);
+
     if (this.isValid) {
       this.ctx = getCompilerCtx(config);
       initPlugins(config);
+
+      config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
     }
   }
 

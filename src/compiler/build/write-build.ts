@@ -1,4 +1,4 @@
-import { BuildCtx, Config, CompilerCtx } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config } from '../../util/interfaces';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { generateDistribution } from './distribution';
@@ -21,15 +21,17 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
   let totalFilesWrote = 0;
 
   try {
+    // commit all the writeFiles, mkdirs, rmdirs and unlinks to disk
     const commitResults = await compilerCtx.fs.commit();
 
+    // get the results from the write to disk commit
     buildCtx.filesWritten = commitResults.filesWritten;
     buildCtx.filesDeleted = commitResults.filesDeleted;
     buildCtx.dirsDeleted = commitResults.dirsDeleted;
     buildCtx.dirsAdded = commitResults.dirsAdded;
-
     totalFilesWrote = commitResults.filesWritten.length;
 
+    // build a list of all the components used
     buildCtx.manifest.bundles.forEach(b => {
       b.components.forEach(c => buildCtx.components.push(c));
     });
