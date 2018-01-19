@@ -1,9 +1,9 @@
-import { FsItems, FsCopyFileTask, FileSystem } from '../interfaces';
+import { FileSystem, FsCopyFileTask, FsItems } from '../interfaces';
 import { InMemoryFileSystem, getCommitInstructions } from '../in-memory-fs';
 import { mockFs } from '../../testing/mocks';
-import * as path from 'path';
 import { normalizePath } from '../../compiler/util';
 import { TestingFs } from '../../testing/testing-fs';
+import * as path from 'path';
 
 
 describe(`in-memory-fs, getCommitInstructions`, () => {
@@ -217,7 +217,7 @@ describe(`in-memory-fs`, () => {
 
     await fs.copy(`/src`, `/some/path`);
 
-    let filesCopied = await fs.commitCopy();
+    const filesCopied = await fs.commitCopy();
     expect(filesCopied[0]).toBe(`/some/path/file1.js`);
     expect(filesCopied[1]).toBe(`/some/path/file2.js`);
     expect(filesCopied.length).toBe(2);
@@ -230,7 +230,7 @@ describe(`in-memory-fs`, () => {
 
     await fs.copy(`/src/file1.js`, `/some/path/file1.js`);
 
-    let filesCopied = await fs.commitCopy();
+    const filesCopied = await fs.commitCopy();
     expect(filesCopied[0]).toBe(`/some/path/file1.js`);
     expect(filesCopied.length).toBe(1);
   });
@@ -243,7 +243,7 @@ describe(`in-memory-fs`, () => {
 
     await fs.copyDir(`/src`, `/some/path`);
 
-    let filesCopied = await fs.commitCopy();
+    const filesCopied = await fs.commitCopy();
     expect(filesCopied[0]).toBe(`/some/path/file1.js`);
     expect(filesCopied[1]).toBe(`/some/path/file2.js`);
     expect(filesCopied.length).toBe(2);
@@ -255,7 +255,7 @@ describe(`in-memory-fs`, () => {
 
     await fs.copyFile(`/src/file.js`, `/some/path/whatever.js`);
 
-    let filesCopied = await fs.commitCopy();
+    const filesCopied = await fs.commitCopy();
     expect(filesCopied[0]).toBe(`/some/path/whatever.js`);
     expect(filesCopied.length).toBe(1);
   });
@@ -268,7 +268,7 @@ describe(`in-memory-fs`, () => {
       return src === `/src/file.js` && dest === `/some/path/whatever.js`;
     }});
 
-    let filesCopied = await fs.commitCopy();
+    const filesCopied = await fs.commitCopy();
     expect(filesCopied[0]).toBe(`/some/path/whatever.js`);
     expect(filesCopied.length).toBe(1);
   });
@@ -281,7 +281,7 @@ describe(`in-memory-fs`, () => {
       return false;
     }});
 
-    let i = await fs.commit();
+    const i = await fs.commit();
     expect(i.filesWritten.length).toBe(0);
   });
 
@@ -306,19 +306,24 @@ describe(`in-memory-fs`, () => {
     fs.clearCache();
     mockedFs.diskReads = 0;
 
-    let items = await fs.readdir(`/dir1`, { recursive: true });
+    const items = await fs.readdir(`/dir1`, { recursive: true });
     expect(items.length).toBe(5);
+
     expect(items[0].absPath).toBe(`/dir1/dir2`);
     expect(items[0].relPath).toBe(`dir2`);
     expect(items[0].isDirectory).toBe(true);
     expect(items[0].isFile).toBe(false);
-    expect(items[1].absPath).toBe(`/dir1/file1.js`);
-    expect(items[1].relPath).toBe(`file1.js`);
-    expect(items[1].isFile).toBe(true);
-    expect(items[1].isDirectory).toBe(false);
-    expect(items[2].absPath).toBe(`/dir1/file2.js`);
-    expect(items[3].absPath).toBe(`/dir1/dir2/file1.js`);
-    expect(items[4].absPath).toBe(`/dir1/dir2/file2.js`);
+
+    expect(items[1].absPath).toBe(`/dir1/dir2/file1.js`);
+    expect(items[2].absPath).toBe(`/dir1/dir2/file2.js`);
+
+    expect(items[3].absPath).toBe(`/dir1/file1.js`);
+    expect(items[3].relPath).toBe(`file1.js`);
+    expect(items[3].isFile).toBe(true);
+    expect(items[3].isDirectory).toBe(false);
+
+    expect(items[4].absPath).toBe(`/dir1/file2.js`);
+
     expect(mockedFs.diskReads).toBe(7);
   });
 
@@ -333,7 +338,7 @@ describe(`in-memory-fs`, () => {
     fs.clearCache();
     mockedFs.diskReads = 0;
 
-    let items = await fs.readdir(`/dir1`);
+    const items = await fs.readdir(`/dir1`);
     expect(items.length).toBe(3);
     expect(items[0].absPath).toBe(`/dir1/dir2`);
     expect(items[0].relPath).toBe(`dir2`);
@@ -400,7 +405,7 @@ describe(`in-memory-fs`, () => {
     await fs.commit();
     expect(mockedFs.diskWrites).toBe(2);
 
-    let content = await fs.readFile(`/dir/file.js`);
+    const content = await fs.readFile(`/dir/file.js`);
     await fs.commit();
     expect(mockedFs.diskReads).toBe(0);
     expect(content).toBe(`content`);
@@ -442,7 +447,7 @@ describe(`in-memory-fs`, () => {
 
     expect(mockedFs.diskWrites).toBe(2);
 
-    let content = fs.readFileSync(`/dir/file.js`);
+    const content = fs.readFileSync(`/dir/file.js`);
     expect(mockedFs.diskReads).toBe(0);
     expect(content).toBe(`content`);
   });
@@ -536,7 +541,7 @@ describe(`in-memory-fs`, () => {
     await fs.writeFile(`/dir/file2.js`, `2`);
     await fs.writeFile(`/dir/file2.js`, `2`);
 
-    let i = await fs.commit();
+    const i = await fs.commit();
     expect(mockedFs.diskWrites).toBe(3);
     expect(i.filesWritten.length).toBe(2);
     expect(i.filesWritten[0]).toBe(`/dir/file1.js`);

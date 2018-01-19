@@ -123,7 +123,11 @@ export class InMemoryFileSystem {
     // always a disk read
     await this.readDirectory(dirPath, dirPath, opts, collectedPaths);
 
-    return collectedPaths;
+    return collectedPaths.sort((a, b) => {
+      if (a.absPath < b.absPath) return -1;
+      if (a.absPath > b.absPath) return 1;
+      return 0;
+    });
   }
 
   private async readDirectory(initPath: string, dirPath: string, opts: FsReaddirOptions, collectedPaths: FsReaddirItem[]) {

@@ -11,7 +11,6 @@ export interface FileSystem {
   statSync(path: string): { isFile: () => boolean; isDirectory: () => boolean; };
   unlink(filePath: string): Promise<void>;
   writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<void>;
-  writeFileSync(filePath: string, content: string, opts?: FsWriteOptions): void;
 }
 
 
