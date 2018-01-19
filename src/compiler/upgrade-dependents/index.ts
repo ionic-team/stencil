@@ -1,6 +1,7 @@
-import { Config, CompilerCtx, Manifest, Bundle, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, Manifest } from '../../util/interfaces';
 import { CompilerUpgrade, validateManifestCompatibility } from './manifest-compatibility';
 import { transformSourceString } from '../transpile/transformers/util';
+import { removeStencilImports } from '../transpile/transformers/remove-stencil-imports';
 import upgradeFrom0_0_5 from '../transpile/transformers/JSX_Upgrade_From_0_0_5/upgrade-jsx-props';
 import upgradeFromMetadata from '../transpile/transformers/Metadata_Upgrade_From_0_1_0/metadata-upgrade';
 import ts from 'typescript';
@@ -44,6 +45,12 @@ function createDoUpgrade(config: Config, compilerCtx: CompilerCtx, bundles: Bund
           config.logger.debug(`Metadata_Upgrade_From_0_1_0, manifestCompilerVersion: ${manifest.compiler.version}`);
           return () => {
             return upgradeFromMetadata(bundles);
+          };
+
+        case CompilerUpgrade.REMOVE_STENCIL_IMPORTS:
+          config.logger.debug(`REMOVE_STENCIL_IMPORTS, manifestCompilerVersion: ${manifest.compiler.version}`);
+          return (transformContext: ts.TransformationContext) => {
+            return removeStencilImports()(transformContext);
           };
       }
       return () => (tsSourceFile: ts.SourceFile) => (tsSourceFile);

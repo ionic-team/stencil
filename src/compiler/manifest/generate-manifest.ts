@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, Manifest, ModuleFiles, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, Manifest, ModuleFiles } from '../../util/interfaces';
 import { catchError } from '../util';
 import { loadDependentManifests } from './load-dependent-manifests';
 import { mergeDependentManifests } from './merge-manifests';

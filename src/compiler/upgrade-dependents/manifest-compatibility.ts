@@ -37,11 +37,18 @@ export function calculateRequiredUpgrades(config: Config, collectionVersion: str
     upgrades.push(CompilerUpgrade.Metadata_Upgrade_From_0_1_0);
   }
 
+  if (config.sys.semver.lte(collectionVersion, '0.2.0')) {
+    // 2018-01-19
+    // ensure all @stencil/core imports are removed
+    upgrades.push(CompilerUpgrade.REMOVE_STENCIL_IMPORTS);
+  }
+
   return upgrades;
 }
 
 
 export const enum CompilerUpgrade {
   JSX_Upgrade_From_0_0_5,
-  Metadata_Upgrade_From_0_1_0
+  Metadata_Upgrade_From_0_1_0,
+  REMOVE_STENCIL_IMPORTS
 }

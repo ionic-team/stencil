@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 
 
-export function removeStencil(): ts.TransformerFactory<ts.SourceFile> {
+export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
