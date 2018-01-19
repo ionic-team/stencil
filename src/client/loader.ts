@@ -7,7 +7,6 @@ export function init(
   appNamespace: string,
   publicPath: string,
   appCore: string,
-  appCoreSsr: string,
   appCorePolyfilled: string,
   hydratedCssClass: string,
   components: LoadComponentRegistry[], x?: any, y?: any
@@ -39,7 +38,7 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = publicPath + ((!urlContainsFlag(win) && supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? (requiresSsrClient(doc) ? appCoreSsr : appCore) : appCorePolyfilled);
+  x.src = publicPath + ((!urlContainsFlag(win) && supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? appCore : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
   x.setAttribute('data-namespace', appNamespace);
   doc.head.appendChild(x);
@@ -50,7 +49,18 @@ export function urlContainsFlag(win: Window) {
 }
 
 export function supportsEsModules(scriptElm: HTMLScriptElement) {
-  return 'noModule' in scriptElm;
+  // detect static ES module support
+  const staticModule = 'noModule' in scriptElm;
+  if (!staticModule) {
+    return false;
+  }
+  // detect dynamic import support
+  try {
+    new Function('import("")');
+    return true;
+  } catch (err) {
+    return false;
+  }
 }
 
 export function supportsCustomElements(win: Window) {
@@ -63,8 +73,4 @@ export function supportsFetch(win: Window) {
 
 export function supportsCssVariables(win: any) {
   return (win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'));
-}
-
-export function requiresSsrClient(doc: HTMLDocument) {
-  return doc.documentElement.hasAttribute('data-ssr');
 }

@@ -1,9 +1,9 @@
-import { BuildConfig, ComponentMeta } from '../../../util/interfaces';
+import { Config, ComponentMeta } from '../../../util/interfaces';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators } from './utils';
 import * as ts from 'typescript';
 
 
-export function getWatchDecoratorMeta(config: BuildConfig, classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
+export function getWatchDecoratorMeta(config: Config, classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
   const methods = classNode.members.filter(isMethodWithDecorators);
 
   getChangeMetaByName(config, methods, cmpMeta, 'Watch');
@@ -11,7 +11,7 @@ export function getWatchDecoratorMeta(config: BuildConfig, classNode: ts.ClassDe
   getChangeMetaByName(config, methods, cmpMeta, 'PropDidChange');
 }
 
-function getChangeMetaByName(config: BuildConfig, methods: ts.ClassElement[], cmpMeta: ComponentMeta, decoratorName: string) {
+function getChangeMetaByName(config: Config, methods: ts.ClassElement[], cmpMeta: ComponentMeta, decoratorName: string) {
   methods.forEach(({decorators, name}) => {
     decorators
       .filter(isDecoratorNamed(decoratorName))
@@ -24,7 +24,7 @@ function getChangeMetaByName(config: BuildConfig, methods: ts.ClassElement[], cm
   });
 }
 
-function updateWatchCallback(config: BuildConfig, cmpMeta: ComponentMeta, propName: string, decoratorData: ts.PropertyName, decoratorName: string) {
+function updateWatchCallback(config: Config, cmpMeta: ComponentMeta, propName: string, decoratorData: ts.PropertyName, decoratorName: string) {
   cmpMeta.membersMeta = cmpMeta.membersMeta || {};
   cmpMeta.membersMeta[propName] = cmpMeta.membersMeta[propName] || {};
 

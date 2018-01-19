@@ -1,7 +1,7 @@
-import { BuildConfig } from '../../../util/interfaces';
+import { Config, CompilerCtx } from '../../../util/interfaces';
 
 
-export default function localResolver(config: BuildConfig) {
+export default function localResolver(config: Config, compilerCtx: CompilerCtx) {
   return {
     name: 'localResolverPlugin',
 
@@ -20,8 +20,10 @@ export default function localResolver(config: BuildConfig) {
       const dirIndexFile = config.sys.path.join(directory + importee, 'index.js');
 
       try {
-        await config.sys.ensureFile(dirIndexFile);
-        return dirIndexFile;
+        if (await compilerCtx.fs.access(dirIndexFile)) {
+          return dirIndexFile;
+        }
+
       } catch (e) {}
 
       return null;

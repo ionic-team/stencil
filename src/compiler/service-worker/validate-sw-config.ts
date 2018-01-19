@@ -1,7 +1,7 @@
-import { BuildConfig, ServiceWorkerConfig } from '../../util/interfaces';
+import { Config, ServiceWorkerConfig } from '../../util/interfaces';
 
 
-export function validateServiceWorkerConfig(config: BuildConfig) {
+export function validateServiceWorkerConfig(config: Config) {
   if (!config.serviceWorker) {
     config.serviceWorker = null;
     return;
@@ -15,7 +15,7 @@ export function validateServiceWorkerConfig(config: BuildConfig) {
 
   const swConfig: ServiceWorkerConfig = Object.assign({}, DEFAULT_SW_CONFIG, config.serviceWorker);
 
-  if (!swConfig.globDirectory) {
+  if (typeof swConfig.globDirectory !== 'string') {
     swConfig.globDirectory = config.wwwDir;
   }
 

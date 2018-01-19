@@ -1,36 +1,43 @@
-import { BuildConfig, BuildContext, Bundle, ComponentMeta, ComponentRegistry, SourceTarget, ModuleFile, JSModuleMap } from '../../util/interfaces';
+import { Config, CompilerCtx, Bundle, ComponentMeta, ComponentRegistry, SourceTarget, ModuleFile, BuildCtx, JSModuleMap } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { generatePreamble, hasError, pathJoin } from '../util';
+import { hasError, pathJoin, minifyJs } from '../util';
 import { getAppDistDir, getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { getStylePlaceholder, getStyleIdPlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
-export function generateBundles(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], jsModules: JSModuleMap) {
+export async function generateBundles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[], jsModules: JSModuleMap) {
   // both styles and modules are done bundling
   // combine the styles and modules together
   // generate the actual files to write
   const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
   const bundleKeys: { [key: string]: string } = {};
 
-  bundles.forEach(bundle => {
-    bundleKeys[`./${bundle.entryKey}.js`] = bundle.entryKey;
-    bundle.modeNames.forEach(modeName => {
-      const jsCode = Object.keys(jsModules).reduce((all, mType) => {
-        return {
-          ...all,
-          [mType]: jsModules[mType][`./${bundle.entryKey}.js`].code
-        };
-      }, {} as {[key: string]: string});
-      generateBundleMode(config, ctx, bundle, modeName, jsCode);
-    });
-  });
+  await Promise.all(
+    bundles.map(async bundle => {
+      const bundleKeyPath = `./${bundle.entryKey}.js`;
+      bundleKeys[bundleKeyPath] = bundle.entryKey;
+
+      return Promise.all(
+        bundle.modeNames.map(async modeName => {
+          const jsCode = Object.keys(jsModules).reduce((all, mType) => {
+            return {
+              ...all,
+              [mType]: jsModules[mType][bundleKeyPath].code
+            };
+          }, {} as {[key: string]: string});
+
+          return await generateBundleMode(config, compilerCtx, buildCtx, bundle, modeName, jsCode);
+        })
+      );
+    })
+  );
 
   Object.keys(jsModules).forEach(mType => {
     Object.entries(jsModules[mType])
       .filter(([key]) => !bundleKeys[key])
       .forEach(([key, value]) => {
-        writeJSFile(config, ctx, key, value.code);
+        writeJSFile(config, compilerCtx, key, value.code);
       });
   });
 
@@ -42,13 +49,13 @@ export function generateBundles(config: BuildConfig, ctx: BuildContext, bundles:
   return cmpRegistry;
 }
 
-function generateBundleMode(config: BuildConfig, ctx: BuildContext, bundle: Bundle, modeName: string, jsCode: { [key: string]: string }) {
+async function generateBundleMode(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundle: Bundle, modeName: string, jsCode: { [key: string]: string }) {
 
   // create js text for: mode, no scoped styles and esm
-  let jsText = createBundleJsText(config, ctx, bundle, jsCode['esm'], modeName, false);
+  let jsText = await createBundleJsText(config, compilerCtx, buildCtx, bundle, jsCode['esm'], modeName, false);
 
   // the only bundle id comes from mode, no scoped styles and esm
-  const bundleId = createBundleId(config, bundle, modeName, jsText);
+  const bundleId = getBundleId(config, bundle, modeName, jsText);
 
   // assign the bundle id build from the
   // mode, no scoped styles and esm to each of the components
@@ -58,61 +65,73 @@ function generateBundleMode(config: BuildConfig, ctx: BuildContext, bundle: Bund
   });
 
   // generate the bundle build for mode, no scoped styles, and esm
-  generateBundleBuild(config, ctx, jsText, bundleId, false);
+  generateBundleBuild(config, compilerCtx, jsText, bundleId, false);
 
   if (bundle.requiresScopedStyles) {
     // create js text for: mode, scoped styles, esm
-    jsText = createBundleJsText(config, ctx, bundle, jsCode['esm'], modeName, true);
+    jsText = await createBundleJsText(config, compilerCtx, buildCtx, bundle, jsCode['esm'], modeName, true);
 
     // generate the bundle build for: mode, esm and scoped styles
-    generateBundleBuild(config, ctx, jsText, bundleId, true);
+    generateBundleBuild(config, compilerCtx, jsText, bundleId, true);
   }
 
   if (config.buildEs5) {
     // create js text for: mode, no scoped styles, es5
-    jsText = createBundleJsText(config, ctx, bundle, jsCode['es5'], modeName, false, 'es5');
+    jsText = await createBundleJsText(config, compilerCtx, buildCtx, bundle, jsCode['es5'], modeName, false, 'es5');
 
     // generate the bundle build for: mode, no scoped styles and es5
-    generateBundleBuild(config, ctx, jsText, bundleId, false, 'es5');
+    generateBundleBuild(config, compilerCtx, jsText, bundleId, false, 'es5');
 
     if (bundle.requiresScopedStyles) {
       // create js text for: mode, scoped styles, es5
-      jsText = createBundleJsText(config, ctx, bundle, jsCode['es5'], modeName, true, 'es5');
+      jsText = await createBundleJsText(config, compilerCtx, buildCtx, bundle, jsCode['es5'], modeName, true, 'es5');
 
       // generate the bundle build for: mode, es5 and scoped styles
-      generateBundleBuild(config, ctx, jsText, bundleId, true, 'es5');
+      generateBundleBuild(config, compilerCtx, jsText, bundleId, true, 'es5');
     }
   }
 }
 
-function createBundleJsText(config: BuildConfig, ctx: BuildContext, bundle: Bundle, jsText: string, modeName: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
-  // get the already bundled js module text
+
+async function createBundleJsText(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundle: Bundle, jsText: string, modeName: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
+
   if (sourceTarget === 'es5') {
     // use legacy bundling with commonjs/jsonp modules
     // and transpile the build to es5
-    return transpileEs5Bundle(ctx, jsText);
+    return transpileEs5Bundle(compilerCtx, buildCtx, jsText);
   }
 
   if (config.minifyJs) {
     // minify the bundle js text
-    jsText = minifyBundleJs(config, ctx, jsText, sourceTarget);
+    const minifyJsResults = await minifyJs(config, compilerCtx, jsText, sourceTarget, true);
+    if (minifyJsResults.diagnostics.length) {
+      minifyJsResults.diagnostics.forEach(d => {
+        buildCtx.diagnostics.push(d);
+      });
+
+    } else {
+      jsText = minifyJsResults.output;
+    }
   }
 
   return injectStyleMode(bundle.moduleFiles, jsText, modeName, isScopedStyles);
 }
 
-function generateBundleBuild(config: BuildConfig, ctx: BuildContext, jsText: string, bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
+
+function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, jsText: string, bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
   // create the file name
   const fileName = getBundleFilename(bundleId, isScopedStyles, sourceTarget);
+
 
   // update the bundle id placeholder with the actual bundle id
   // this is used by jsonp callbacks to know which bundle loaded
   jsText = replaceBundleIdPlaceholder(jsText, bundleId);
 
-  writeJSFile(config, ctx, fileName, jsText);
+  writeJSFile(config, compilerCtx, fileName, jsText);
 }
 
-function writeJSFile(config: BuildConfig, ctx: BuildContext, fileName: string, jsText: string) {
+
+function writeJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
 
   // get the absolute path to where it'll be saved in www
   const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
@@ -120,23 +139,14 @@ function writeJSFile(config: BuildConfig, ctx: BuildContext, fileName: string, j
   // get the absolute path to where it'll be saved in dist
   const distPath = pathJoin(config, getAppDistDir(config), fileName);
 
-  // use wwwBuildPath as the cache key
-  if (ctx.compiledFileCache[wwwBuildPath] === jsText) {
-    // unchanged, no need to resave
-    return;
-  }
-
-  // cache for later
-  ctx.compiledFileCache[wwwBuildPath] = jsText;
-
   if (config.generateWWW) {
     // write to the www build
-    ctx.filesToWrite[wwwBuildPath] = jsText;
+    compilerCtx.fs.writeFile(wwwBuildPath, jsText);
   }
 
   if (config.generateDistribution) {
     // write to the dist build
-    ctx.filesToWrite[distPath] = jsText;
+    compilerCtx.fs.writeFile(distPath, jsText);
   }
 }
 
@@ -195,11 +205,11 @@ export function injectComponentStyleMode(cmpMeta: ComponentMeta, modeName: strin
   return jsText;
 }
 
-function transpileEs5Bundle(ctx: BuildContext, jsText: string): string {
+async function transpileEs5Bundle(compilerCtx: CompilerCtx, buildCtx: BuildCtx, jsText: string) {
   // use typescript to convert this js text into es5
-  const transpileResults = transpileToEs5(jsText);
+  const transpileResults = await transpileToEs5(compilerCtx, jsText);
   if (transpileResults.diagnostics && transpileResults.diagnostics.length > 0) {
-    ctx.diagnostics.push(...transpileResults.diagnostics);
+    buildCtx.diagnostics.push(...transpileResults.diagnostics);
   }
   if (hasError(transpileResults.diagnostics)) {
     return jsText;
@@ -207,58 +217,35 @@ function transpileEs5Bundle(ctx: BuildContext, jsText: string): string {
   return transpileResults.code;
 }
 
-function minifyBundleJs(config: BuildConfig, ctx: BuildContext, jsText: string, sourceTarget?: SourceTarget): string {
-  const opts: any = { output: {}, compress: {}, mangle: {} };
 
-  if (sourceTarget === 'es5') {
-    opts.ecma = 5;
-    opts.output.ecma = 5;
-    opts.compress.ecma = 5;
-    opts.compress.arrows = false;
-
-  } else {
-    opts.ecma = 6;
-    opts.output.ecma = 6;
-    opts.compress.ecma = 6;
-    opts.compress.arrows = true;
-  }
-
-  if (config.logLevel === 'debug') {
-    opts.mangle.keep_fnames = true;
-    opts.compress.drop_console = false;
-    opts.compress.drop_debugger = false;
-    opts.output.beautify = true;
-    opts.output.bracketize = true;
-    opts.output.indent_level = 2;
-    opts.output.comments = 'all';
-    opts.output.preserve_line = true;
-  }
-
-  opts.output.preamble = generatePreamble(config);
-
-  const minifyJsResults = config.sys.minifyJs(jsText, opts);
-
-  if (minifyJsResults.diagnostics.length) {
-    minifyJsResults.diagnostics.forEach(d => {
-      ctx.diagnostics.push(d);
-    });
-
-  } else {
-    jsText = minifyJsResults.output;
-  }
-
-  return jsText;
+export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bundleId: string) {
+  // assign the bundle id build from the
+  // mode, no scoped styles and esm to each of the components
+  moduleFiles.forEach(moduleFile => {
+    moduleFile.cmpMeta.bundleIds = moduleFile.cmpMeta.bundleIds || {};
+    moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+  });
 }
 
-export function createBundleId(config: BuildConfig, bundle: Bundle, modeName: string, jsText: string) {
+
+export function getBundleId(config: Config, bundle: Bundle, modeName: string, jsText: string) {
   if (config.hashFileNames) {
     // create style id from hashing the content
     return config.sys.generateContentHash(jsText, config.hashedFileNameLength);
   }
 
-  const tags = bundle.moduleFiles
-    .map(m => m.cmpMeta.tagNameMeta)
-    .sort();
+  const tags = bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta);
+  return getBundleIdDev(tags, modeName);
+}
+
+
+export function getBundleIdHashed(config: Config, jsText: string) {
+  return config.sys.generateContentHash(jsText, config.hashedFileNameLength);
+}
+
+
+export function getBundleIdDev(tags: string[], modeName: string) {
+  tags = tags.sort();
 
   if (modeName === DEFAULT_STYLE_MODE || !modeName) {
     return tags[0];

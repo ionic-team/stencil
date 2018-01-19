@@ -11,6 +11,9 @@ const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
 const POLYFILLS_SRC_DIR = path.join(ROOT_DIR, 'scripts', 'polyfills');
 const POLYFILLS_DIST_DIR = path.join(DST_DIR, 'client', 'polyfills');
 
+const inputFile = path.join(TRANSPILED_DIR, 'client/core.js');
+const outputFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
+
 
 // empty out the dist/client directory
 fs.ensureDirSync(DIST_CLIENT_DIR);
@@ -25,11 +28,12 @@ copyUtilDir();
 
 
 function bundleClientCore() {
-  const inputFile = path.join(TRANSPILED_DIR, 'client/core.js');
-  const outputFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
-
   return rollup.rollup({
-    input: inputFile
+    input: inputFile,
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
   })
   .then(bundle => {
     bundle.generate({
@@ -45,8 +49,7 @@ function bundleClientCore() {
       fs.writeFile(outputFile, code, (err) => {
         if (err) {
           console.log(err);
-        } else {
-          console.log('built core:', outputFile);
+          process.exit(1);
         }
       });
 
@@ -55,6 +58,7 @@ function bundleClientCore() {
   .catch(err => {
     console.log(err);
     console.log(err.stack);
+    process.exit(1);
   });
 }
 
@@ -111,4 +115,5 @@ function createIndexJs() {
 
 process.on('exit', (code) => {
   fs.removeSync(TRANSPILED_DIR);
+  console.log(`✅ core: ${outputFile}`);
 });

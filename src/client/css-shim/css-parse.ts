@@ -2,6 +2,7 @@
 Extremely simple css parser. Intended to be not more than what we need
 and definitely not necessarily correct =).
 */
+/* tslint:disable */
 
 export class StyleNode {
   propertyInfo: { [key: string]: any };

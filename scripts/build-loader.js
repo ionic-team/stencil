@@ -29,3 +29,5 @@ init(win, doc, appNamespace, publicPath, appCore, appCoreSsr, appCorePolyfilled,
 })(window, document, '__APP__');`;
 
 fs.writeFileSync(dstLoaderPath, content);
+
+console.log(`✅ loader: ${dstLoaderPath}`);

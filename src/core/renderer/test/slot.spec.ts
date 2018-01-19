@@ -152,7 +152,7 @@ describe('Component slot', () => {
   });
 
   it('should render conditional content into a nested default slot', () => {
-    var plt: any = mockPlatform();
+    const plt: any = mockPlatform();
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
       componentConstructor: class {

@@ -1,4 +1,4 @@
-import { StyleNode, StyleInfo } from './css-parse';
+import { StyleInfo, StyleNode } from './css-parse';
 import { StyleProperties } from './style-properties';
 import * as StyleUtil from './style-util';
 
@@ -18,7 +18,7 @@ export class CustomStyle {
 
     if (!this.supportsCssVars) {
       this.documentOwner = doc.documentElement;
-      let ast = new StyleNode();
+      const ast = new StyleNode();
       ast.rules = [];
       this.documentOwnerStyleInfo = StyleInfo.set(this.documentOwner, new StyleInfo(ast));
       this.styleProperties = new StyleProperties(win);
@@ -26,7 +26,7 @@ export class CustomStyle {
   }
 
   private flushCustomStyles() {
-    let customStyles = this.processStyles();
+    const customStyles = this.processStyles();
 
     // early return if custom-styles don't need validation
     if (!this.enqueued) {
@@ -44,8 +44,8 @@ export class CustomStyle {
 
   private applyCustomStyles(customStyles: any) {
     for (let i = 0; i < customStyles.length; i++) {
-      let c = customStyles[i];
-      let s = this.getStyleForCustomStyle(c);
+      const c = customStyles[i];
+      const s = this.getStyleForCustomStyle(c);
       if (s) {
         this.styleProperties.applyCustomStyle(s, this.documentOwnerStyleInfo.styleProperties);
       }
@@ -53,12 +53,12 @@ export class CustomStyle {
   }
 
   private updateProperties(host: any, styleInfo: any) {
-    let owner = this.documentOwner;
-    let ownerStyleInfo = StyleInfo.get(owner);
-    let ownerProperties = ownerStyleInfo.styleProperties;
-    let props = Object.create(ownerProperties || null);
-    let propertyData = this.styleProperties.propertyDataFromStyles(ownerStyleInfo.styleRules, host);
-    let propertiesMatchingHost = propertyData.properties;
+    const owner = this.documentOwner;
+    const ownerStyleInfo = StyleInfo.get(owner);
+    const ownerProperties = ownerStyleInfo.styleProperties;
+    const props = Object.create(ownerProperties || null);
+    const propertyData = this.styleProperties.propertyDataFromStyles(ownerStyleInfo.styleRules, host);
+    const propertiesMatchingHost = propertyData.properties;
 
     Object.assign(
       props,
@@ -99,14 +99,7 @@ export class CustomStyle {
       return customStyle.__cached;
     }
 
-    let style;
-    if (customStyle.getStyle) {
-      style = customStyle.getStyle();
-    } else {
-      style = customStyle;
-    }
-
-    return style;
+    return (customStyle.getStyle) ? customStyle.getStyle() : customStyle;
   }
 
   private processStyles() {
@@ -129,7 +122,7 @@ export class CustomStyle {
   }
 
   private transformCustomStyleForDocument(style: StyleElement) {
-    let ast = StyleUtil.rulesForStyle(style);
+    const ast = StyleUtil.rulesForStyle(style);
     this.documentOwnerStyleInfo.styleRules.rules.push(ast);
   }
 }

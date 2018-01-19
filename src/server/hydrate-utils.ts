@@ -1,4 +1,4 @@
-import { BuildConfig, Diagnostic, HydrateOptions, HydrateResults } from '../util/interfaces';
+import { Config, Diagnostic, HydrateOptions, HydrateResults } from '../util/interfaces';
 import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/prerender/validate-prerender-config';
 
 
@@ -19,7 +19,7 @@ export function normalizeHydrateOptions(inputOpts: HydrateOptions) {
 }
 
 
-export function generateHydrateResults(config: BuildConfig, opts: HydrateOptions) {
+export function generateHydrateResults(config: Config, opts: HydrateOptions) {
   if (!opts.url) {
     opts.url = `https://${DEFAULT_PRERENDER_HOST}/`;
   }
@@ -54,7 +54,7 @@ export function generateHydrateResults(config: BuildConfig, opts: HydrateOptions
 }
 
 
-function createConsole(config: BuildConfig, opts: HydrateOptions, results: HydrateResults) {
+function createConsole(config: Config, opts: HydrateOptions, results: HydrateResults) {
   const pathname = results.pathname;
   opts.console = opts.console || {};
 
@@ -140,7 +140,7 @@ export function normalizeLanguage(doc: Document, opts: HydrateOptions) {
 }
 
 
-export function collectAnchors(config: BuildConfig, doc: Document, results: HydrateResults) {
+export function collectAnchors(config: Config, doc: Document, results: HydrateResults) {
   const anchorElements = doc.querySelectorAll('a');
 
   for (var i = 0; i < anchorElements.length; i++) {

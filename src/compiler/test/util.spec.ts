@@ -1,6 +1,53 @@
 import * as util from '../util';
 
 describe('util', () => {
+
+  describe('normalizePath', () => {
+
+    it('remove trailing slash, windows', () => {
+      const path = util.normalizePath(`C:\\Johnny\\B\\Goode\\`);
+      expect(path).toBe(`C:/Johnny/B/Goode`);
+    });
+
+    it('normalize file, windows', () => {
+      const path = util.normalizePath(`C:\\Johnny\\B\\Goode.js`);
+      expect(path).toBe(`C:/Johnny/B/Goode.js`);
+    });
+
+    it('not remove trailing slash for root dir, windows', () => {
+      const path = util.normalizePath(`C:\\`);
+      expect(path).toBe(`C:/`);
+    });
+
+    it('not remove trailing slash for root dir, unix', () => {
+      const path = util.normalizePath(`/`);
+      expect(path).toBe(`/`);
+    });
+
+    it('remove trailing slash, unix', () => {
+      const path = util.normalizePath(`/Johnny/B/Goode/`);
+      expect(path).toBe(`/Johnny/B/Goode`);
+    });
+
+    it('normalize file, unix', () => {
+      const path = util.normalizePath(`/Johnny/B/Goode.js`);
+      expect(path).toBe(`/Johnny/B/Goode.js`);
+    });
+
+    it('normalize file with spaces to trim', () => {
+      const path = util.normalizePath(`    /Johnny/B/Goode.js    `);
+      expect(path).toBe(`/Johnny/B/Goode.js`);
+    });
+
+    it('throw error when invalid string', () => {
+      expect(() => {
+        const path = util.normalizePath(null);
+        expect(path).toBe(`/Johnny/B/Goode.js`);
+      }).toThrow();
+    });
+
+  });
+
   describe('isTsFile', () => {
     it('should return true for regular .ts and .tsx files', () => {
       expect(util.isTsFile('.ts')).toEqual(true);

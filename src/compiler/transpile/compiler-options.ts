@@ -1,8 +1,8 @@
-import { BuildConfig } from '../../util/interfaces';
+import { Config } from '../../util/interfaces';
 import * as ts from 'typescript';
 
 
-export function getUserTsConfig(config: BuildConfig): ts.CompilerOptions {
+export function getUserTsConfig(config: Config): ts.CompilerOptions {
   // force defaults
   const options: ts.CompilerOptions = {
     // to allow jsx to work

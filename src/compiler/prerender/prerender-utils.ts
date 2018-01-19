@@ -1,8 +1,8 @@
-import { BuildConfig, HydrateResults, PrerenderConfig, PrerenderLocation, PrerenderStatus } from '../../util/interfaces';
+import { Config, HydrateResults, PrerenderConfig, PrerenderLocation, PrerenderStatus } from '../../util/interfaces';
 import { DEFAULT_PRERENDER_HOST } from './validate-prerender-config';
 
 
-export function normalizePrerenderLocation(config: BuildConfig, windowLocationHref: string, href: string) {
+export function normalizePrerenderLocation(config: Config, windowLocationHref: string, href: string) {
   const prerenderConfig = config && config.prerender as PrerenderConfig;
   let prerenderLocation: PrerenderLocation = null;
 
@@ -57,14 +57,14 @@ export function normalizePrerenderLocation(config: BuildConfig, windowLocationHr
 }
 
 
-export function crawlAnchorsForNextUrls(config: BuildConfig, prerenderQueue: PrerenderLocation[], results: HydrateResults) {
+export function crawlAnchorsForNextUrls(config: Config, prerenderQueue: PrerenderLocation[], results: HydrateResults) {
   results.anchors && results.anchors.forEach(anchor => {
     addLocationToProcess(config, results.url, prerenderQueue, anchor.href);
   });
 }
 
 
-function addLocationToProcess(config: BuildConfig, windowLocationHref: string, prerenderQueue: PrerenderLocation[], locationUrl: string) {
+function addLocationToProcess(config: Config, windowLocationHref: string, prerenderQueue: PrerenderLocation[], locationUrl: string) {
   const prerenderLocation = normalizePrerenderLocation(config, windowLocationHref, locationUrl);
 
   if (!prerenderLocation || prerenderQueue.some(p => p.url === prerenderLocation.url)) {
@@ -81,7 +81,7 @@ function addLocationToProcess(config: BuildConfig, windowLocationHref: string, p
 }
 
 
-export function getPrerenderQueue(config: BuildConfig) {
+export function getPrerenderQueue(config: Config) {
   const prerenderHost = `http://${DEFAULT_PRERENDER_HOST}`;
 
   const prerenderQueue: PrerenderLocation[] = [];

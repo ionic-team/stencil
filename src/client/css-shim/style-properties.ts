@@ -1,6 +1,6 @@
-import { removeCustomPropAssignment, StyleNode } from './css-parse';
+import { StyleNode, removeCustomPropAssignment } from './css-parse';
 import * as StyleUtil from './style-util';
-
+/* tslint:disable */
 
 export class StyleProperties {
   private matchesSelector: Function;

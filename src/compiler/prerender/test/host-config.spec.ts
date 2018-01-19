@@ -1,4 +1,4 @@
-import { BuildConfig, Bundle, HostConfig, HostRuleHeader, HydrateComponent } from '../../../util/interfaces';
+import { Config, Bundle, HostConfig, HostRuleHeader, HydrateComponent } from '../../../util/interfaces';
 import { addBundles, formatLinkRelPreloadHeader, getBundleIds, mergeUserHostConfig, sortComponents } from '../host-config';
 
 

@@ -1,8 +1,8 @@
-import { BuildConfig } from '../../util/interfaces';
-import { getConfigFilePath, parseArgv, overrideConfigFromArgv, CliArgv } from '../cli-utils';
+import { Config } from '../../util/interfaces';
+import { CliArgv, getConfigFilePath, overrideConfigFromArgv, parseArgv } from '../cli-utils';
 import { mockStencilSystem } from '../../testing/mocks';
 import { run } from '../index';
-import { validateBuildConfig } from '../../util/validate-config';
+import { validateBuildConfig } from '../../compiler/config/validate-config';
 
 
 describe('cli', () => {
@@ -205,7 +205,7 @@ describe('cli', () => {
   };
   var error: string;
   var exitCode: number;
-  var config: BuildConfig;
+  var config: Config;
 
   beforeEach(() => {
     (process as any) = {};

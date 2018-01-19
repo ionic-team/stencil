@@ -1,3 +1,11 @@
 {
-    "extends": "tslint-ionic-rules"
+    "extends": "tslint-ionic-rules",
+    "rules": {
+        "ban-comma-operator": false,
+        "no-empty": [true, "allow-empty-catch"],
+        "no-import-side-effect": false,
+        "no-var-keyword": false,
+        "no-var-requires": false,
+        "prefer-conditional-expression": false
+    }
 }

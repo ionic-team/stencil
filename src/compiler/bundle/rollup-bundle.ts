@@ -1,4 +1,4 @@
-import { BuildConfig, BuildContext, Bundle, JSModuleList } from '../../util/interfaces';
+import { Config, CompilerCtx, Bundle, BuildCtx, JSModuleList } from '../../util/interfaces';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
@@ -9,7 +9,7 @@ import { rollup, OutputBundle, InputOptions } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 
 
-export async function createBundle(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
+export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
   let rollupBundle: OutputBundle;
 
   let rollupConfig: InputOptions = {
@@ -18,11 +18,11 @@ export async function createBundle(config: BuildConfig, ctx: BuildContext, bundl
     experimentalDynamicImport: true,
     plugins: [
       bundleEntryFile(config, bundles),
-      transpiledInMemoryPlugin(config, ctx),
-      localResolution(config),
+      transpiledInMemoryPlugin(config, compilerCtx),
+      localResolution(config, compilerCtx),
       nodeEnvVars(config),
     ],
-    onwarn: createOnWarnFn(ctx.diagnostics)
+    onwarn: createOnWarnFn(buildCtx.diagnostics)
   };
 
   try {
@@ -30,10 +30,10 @@ export async function createBundle(config: BuildConfig, ctx: BuildContext, bundl
 
   } catch (err) {
     console.log(err);
-    loadRollupDiagnostics(config, ctx.diagnostics, err);
+    loadRollupDiagnostics(config, compilerCtx, buildCtx, err);
   }
 
-  if (hasError(ctx.diagnostics) || !rollupBundle) {
+  if (hasError(buildCtx.diagnostics) || !rollupBundle) {
     throw new Error('rollup died');
   }
 
@@ -41,7 +41,7 @@ export async function createBundle(config: BuildConfig, ctx: BuildContext, bundl
 }
 
 
-export async function writeEsModules(config: BuildConfig, rollupBundle: OutputBundle) {
+export async function writeEsModules(config: Config, rollupBundle: OutputBundle) {
   const results = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
@@ -51,7 +51,7 @@ export async function writeEsModules(config: BuildConfig, rollupBundle: OutputBu
 }
 
 
-export async function writeLegacyModules(config: BuildConfig, rollupBundle: OutputBundle, bundles: Bundle[]) {
+export async function writeLegacyModules(config: Config, rollupBundle: OutputBundle, bundles: Bundle[]) {
   Object.entries((<any>rollupBundle).chunks).forEach(([key, value]) => {
     const b = bundles.find(b => b.entryKey === `./${key}.js`);
     if (b) {

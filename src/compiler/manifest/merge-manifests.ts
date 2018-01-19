@@ -1,4 +1,4 @@
-import { ManifestBundle, Manifest } from '../../util/interfaces';
+import { Manifest, ManifestBundle } from '../../util/interfaces';
 
 
 export function mergeDependentManifests(appManifest: Manifest, dependentManifests: Manifest[]) {
@@ -46,7 +46,7 @@ function updateManifestBundles(appManifest: Manifest, dependentManifest: Manifes
 
       // check if this dependent component tag is already in the app config's bundle
       const componentInAppBundle = appManifest.bundles.some(b => {
-        return b.components.indexOf(dependentBundleComponentTag) > -1;
+        return b.components.includes(dependentBundleComponentTag);
       });
 
       if (!componentInAppBundle) {

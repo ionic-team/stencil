@@ -12,16 +12,16 @@ export function defineMember(
   memberName: string
 ) {
 
-  function getComponentProp(elm?: HostElement) {
+  function getComponentProp(this: ComponentInstance, elm?: HostElement) {
     // component instance prop/state getter
     // get the property value directly from our internal values
-    elm = (this as ComponentInstance).__el;
+    elm = this.__el;
     return elm && elm._values && elm._values[memberName];
   }
 
-  function setComponentProp(newValue: any, elm?: HostElement) {
+  function setComponentProp(this: ComponentInstance, newValue: any, elm?: HostElement) {
     // component instance prop/state setter (cannot be arrow fn)
-    elm = (this as ComponentInstance).__el;
+    elm = this.__el;
 
     if (elm) {
       if (property.state || property.mutable) {

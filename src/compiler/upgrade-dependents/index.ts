@@ -1,16 +1,24 @@
-import { BuildConfig, BuildContext, Manifest, Bundle } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, Manifest } from '../../util/interfaces';
 import { CompilerUpgrade, validateManifestCompatibility } from './manifest-compatibility';
 import { transformSourceString } from '../transpile/transformers/util';
+import { removeStencilImports } from '../transpile/transformers/remove-stencil-imports';
 import upgradeFrom0_0_5 from '../transpile/transformers/JSX_Upgrade_From_0_0_5/upgrade-jsx-props';
 import upgradeFromMetadata from '../transpile/transformers/Metadata_Upgrade_From_0_1_0/metadata-upgrade';
 import ts from 'typescript';
 
 
-export async function upgradeDependentComponents(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
-  const doUpgrade = createDoUpgrade(config, ctx, bundles);
+export async function upgradeDependentComponents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
+  if (!buildCtx.requiresFullBuild) {
+    // if this doesn't require a full build then no need to do it again
+    return;
+  }
 
-  return Promise.all(Object.keys(ctx.dependentManifests).map(async collectionName => {
-    const manifest = ctx.dependentManifests[collectionName];
+  const timeSpan = config.logger.createTimeSpan(`upgradeDependentComponents started`, true);
+
+  const doUpgrade = createDoUpgrade(config, compilerCtx, bundles);
+
+  await Promise.all(Object.keys(compilerCtx.dependentManifests).map(async collectionName => {
+    const manifest = compilerCtx.dependentManifests[collectionName];
     const upgrades = validateManifestCompatibility(config, manifest);
 
     try {
@@ -19,10 +27,12 @@ export async function upgradeDependentComponents(config: BuildConfig, ctx: Build
       config.logger.error(`error performing compiler upgrade: ${e}`);
     }
   }));
+
+  timeSpan.finish(`upgradeDependentComponents finished`);
 }
 
 
-function createDoUpgrade(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]) {
+function createDoUpgrade(config: Config, compilerCtx: CompilerCtx, bundles: Bundle[]) {
 
   return async (manifest: Manifest, upgrades: CompilerUpgrade[]): Promise<void> => {
     const upgradeTransforms: ts.TransformerFactory<ts.SourceFile>[] = (upgrades.map((upgrade) => {
@@ -34,7 +44,13 @@ function createDoUpgrade(config: BuildConfig, ctx: BuildContext, bundles: Bundle
         case CompilerUpgrade.Metadata_Upgrade_From_0_1_0:
           config.logger.debug(`Metadata_Upgrade_From_0_1_0, manifestCompilerVersion: ${manifest.compiler.version}`);
           return () => {
-            return upgradeFromMetadata(config, bundles);
+            return upgradeFromMetadata(bundles);
+          };
+
+        case CompilerUpgrade.REMOVE_STENCIL_IMPORTS:
+          config.logger.debug(`REMOVE_STENCIL_IMPORTS, manifestCompilerVersion: ${manifest.compiler.version}`);
+          return (transformContext: ts.TransformationContext) => {
+            return removeStencilImports()(transformContext);
           };
       }
       return () => (tsSourceFile: ts.SourceFile) => (tsSourceFile);
@@ -44,26 +60,17 @@ function createDoUpgrade(config: BuildConfig, ctx: BuildContext, bundles: Bundle
       return;
     }
 
-    await Promise.all(manifest.modulesFiles.map(async function(moduleFile) {
+    await Promise.all(manifest.modulesFiles.map(async moduleFile => {
 
-      return new Promise((resolve, reject) => {
-        config.sys.fs.readFile(moduleFile.jsFilePath, 'utf8', (err, source) => {
-          if (err) {
-            reject(err);
-          } else {
-            let output = '';
+      try {
+        const source = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
+        const output = await transformSourceString(moduleFile.jsFilePath, source, upgradeTransforms);
+        await compilerCtx.fs.writeFile(moduleFile.jsFilePath, output, { inMemoryOnly: true });
 
-            try {
-              output = transformSourceString(moduleFile.jsFilePath, source, upgradeTransforms);
-            } catch (e) {
-              config.logger.error(`error performing compiler upgrade on ${moduleFile.jsFilePath}: ${e}`);
-            }
-            ctx.jsFiles[moduleFile.jsFilePath] = output;
+      } catch (e) {
+        config.logger.error(`error performing compiler upgrade on ${moduleFile.jsFilePath}: ${e}`);
+      }
 
-            resolve();
-          }
-        });
-      });
     }));
   };
 }

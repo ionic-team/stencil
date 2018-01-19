@@ -38,5 +38,16 @@ describe('renderer', () => {
       expect(elm.firstChild.namespaceURI).toEqual(SVGNamespace);
       expect(elm.firstChild.firstChild.namespaceURI).toEqual(XHTMLNamespace);
     });
+
+    it('should not affect subsequence element', function() {
+      elm = patch(vnode0, h('div', null, [
+        h('svg', null),
+        h('div', null)
+      ])).elm;
+
+      expect(elm.constructor.name).toEqual('HTMLDivElement')
+      expect(elm.firstChild.constructor.name).toEqual('SVGSVGElement')
+      expect(elm.lastChild.constructor.name).toEqual('HTMLDivElement')
+    })
   });
 });

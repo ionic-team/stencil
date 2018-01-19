@@ -1,16 +1,27 @@
-import { BuildConfig, ServiceWorkerConfig } from '../../util/interfaces';
+import { Config, ServiceWorkerConfig, CompilerCtx } from '../../util/interfaces';
+import { minifyJs } from '../util';
 
 
-export function injectRegisterServiceWorker(config: BuildConfig, swConfig: ServiceWorkerConfig, indexHtml: string) {
+export async function injectRegisterServiceWorker(config: Config, compilerCtx: CompilerCtx, swConfig: ServiceWorkerConfig, indexHtml: string) {
   const match = indexHtml.match(BODY_CLOSE_REG);
 
   let swUrl = config.sys.path.relative(config.wwwDir, swConfig.swDest);
   if (swUrl.charAt(0) !== '/') {
     swUrl = '/' + swUrl;
   }
-
   if (match) {
-    indexHtml = indexHtml.replace(match[0], `${getRegisterSwScript(swUrl)}\n${match[0]}`);
+    let serviceWorker = getRegisterSwScript(swUrl);
+    if (config.minifyJs) {
+      const minifyResults = await minifyJs(config, compilerCtx, serviceWorker, 'es5', false);
+      minifyResults.diagnostics.forEach(d => {
+        (config.logger as any)[d.level](d.messageText);
+      });
+
+      if (!minifyResults.diagnostics.length) {
+        serviceWorker = minifyResults.output;
+      }
+    }
+    indexHtml = indexHtml.replace(match[0], `<script>${serviceWorker}</script>\n${match[0]}`);
   }
 
   return indexHtml;
@@ -30,7 +41,6 @@ export function injectUnregisterServiceWorker(indexHtml: string) {
 
 function getRegisterSwScript(swUrl: string) {
   return `
-  <script>
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       window.addEventListener('load', function(){
         navigator.serviceWorker.register('${swUrl}')
@@ -50,7 +60,6 @@ function getRegisterSwScript(swUrl: string) {
           .catch(function(err) { console.log('service worker error', err) });
       });
     }
-  </script>
 `;
 }
 

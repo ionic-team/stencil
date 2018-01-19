@@ -1,168 +1,105 @@
-import { BuildConfig, BuildContext, BuildResults, Diagnostic } from '../../util/interfaces';
+import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
 import { bundle } from '../bundle/bundle';
-import { catchError, getBuildContext, hasError, resetBuildContext } from '../util';
-import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { compileSrcDir } from './compile';
-import { copyTasks } from './copy-tasks';
+import { catchError, getCompilerCtx } from '../util';
+import { copyTasks } from '../copy/copy-tasks';
 import { emptyDestDir, writeBuildFiles } from './write-build';
+import { getBuildContext } from './build-utils';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
 import { generateBundles } from '../bundle/generate-bundles';
-import { generateHtmlDiagnostics } from '../../util/logger/generate-html-diagnostics';
 import { generateIndexHtml } from '../html/generate-index-html';
 import { generateReadmes } from '../docs/generate-readmes';
+import { generateStyles } from '../style/style';
 import { initIndexHtml } from '../html/init-index-html';
 import { prerenderApp } from '../prerender/prerender-app';
-import { setupWatcher } from './watch';
-import { validateBuildConfig } from '../../util/validate-config';
-import { validatePrerenderConfig } from '../prerender/validate-prerender-config';
-import { validateServiceWorkerConfig } from '../service-worker/validate-sw-config';
+import { transpileScanSrc } from '../transpile/transpile-scan-src';
 
 
-export async function build(config: BuildConfig, context?: any) {
+export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?: WatcherResults): Promise<BuildResults> {
   // create the build context if it doesn't exist
   // the buid context is the same object used for all builds and rebuilds
   // ctx is where stuff is cached for fast in-memory lookups later
-  const ctx = getBuildContext(context);
+  compilerCtx = getCompilerCtx(config, compilerCtx);
 
-  if (!ctx.isRebuild) {
+  // reset the build context, this is important for rebuilds
+  const buildCtx = getBuildContext(config, compilerCtx, watcher);
+
+  if (!compilerCtx.isRebuild) {
     config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
   }
 
-  // reset the build context, this is important for rebuilds
-  resetBuildContext(ctx);
-
-  // create the build results that get returned
-  const buildResults: BuildResults = {
-    files: [],
-    diagnostics: [],
-    manifest: {},
-    changedFiles: ctx.isRebuild ? ctx.changedFiles : null
-  };
-
-  // validate the build config
-  if (!isConfigValid(config, ctx, buildResults.diagnostics)) {
-    // invalid build config, let's not continue
-    config.logger.printDiagnostics(buildResults.diagnostics);
-    generateHtmlDiagnostics(config, buildResults.diagnostics);
-    return buildResults;
-  }
-
-  // create an initial index.html file if one doesn't already exist
-  // this is synchronous on purpose
-  if (!initIndexHtml(config, ctx, buildResults.diagnostics)) {
-    // error initializing the index.html file
-    // something's wrong, so let's not continue
-    config.logger.printDiagnostics(buildResults.diagnostics);
-    generateHtmlDiagnostics(config, buildResults.diagnostics);
-    return buildResults;
-  }
-
-  // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`${ctx.isRebuild ? 'rebuild' : 'build'}, ${config.fsNamespace}, ${config.devMode ? 'dev' : 'prod'} mode, started`);
-
   try {
+    // create an initial index.html file if one doesn't already exist
+    // this is synchronous on purpose
+    if (await !initIndexHtml(config, compilerCtx, buildCtx)) {
+      // error initializing the index.html file
+      // something's wrong, so let's not continue
+      return buildCtx.finish();
+    }
+
+    if (!compilerCtx.isRebuild) {
+      // empty the directories on the first build
+      await emptyDestDir(config, compilerCtx);
+    }
+
     // begin the build
     // async scan the src directory for ts files
     // then transpile them all in one go
-    const compileResults = await compileSrcDir(config, ctx);
+    await transpileScanSrc(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
-    // generation the app manifest from the compiled results
+    // generation the app manifest from the compiled module file results
     // and from all the dependent collections
-    await generateAppManifest(config, ctx, compileResults.moduleFiles);
+    await generateAppManifest(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // bundle modules and styles into separate files phase
-    const [ bundles, jsModules ] = await bundle(config, ctx);
+    const [ bundles, jsModules ] = await bundle(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
+
+    // create each of the components's styles
+    await generateStyles(config, compilerCtx, buildCtx, bundles);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // both styles and modules are done bundling
     // inject the styles into the modules and
     // generate each of the output bundles
-    const cmpRegistry = generateBundles(config, ctx, bundles, jsModules);
+    const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, bundles, jsModules);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // generate the app files, such as app.js, app.core.js
-    await generateAppFiles(config, ctx, bundles, cmpRegistry);
-
-    // empty the build dest directory
-    // doing this now incase the
-    // copy tasks add to the dest directories
-    await emptyDestDir(config, ctx);
+    await generateAppFiles(config, compilerCtx, buildCtx, bundles, cmpRegistry);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // copy all assets
-    if (!ctx.isRebuild) {
+    if (!compilerCtx.isRebuild) {
       // only do the initial copy on the first build
-      await copyTasks(config, ctx);
+      // watcher handles any re-copies
+      await copyTasks(config, compilerCtx, buildCtx);
+      if (buildCtx.shouldAbort()) return buildCtx.finish();
     }
 
     // build index file and service worker
-    await generateIndexHtml(config, ctx);
+    await generateIndexHtml(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // generate each of the readmes
-    await generateReadmes(config, ctx);
-
-    // write all the files and copy asset files
-    await writeBuildFiles(config, ctx, buildResults);
+    await generateReadmes(config, compilerCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // prerender that app
-    await prerenderApp(config, ctx, bundles);
+    await prerenderApp(config, compilerCtx, buildCtx, bundles);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
-    // setup watcher if need be
-    await setupWatcher(config, ctx);
+    // write all the files and copy asset files
+    await writeBuildFiles(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
   } catch (e) {
-    // catch all
-    catchError(ctx.diagnostics, e);
+    // ¯\_(ツ)_/¯
+    catchError(buildCtx.diagnostics, e);
   }
-
-  // finalize phase
-  buildResults.diagnostics = cleanDiagnostics(ctx.diagnostics);
-  config.logger.printDiagnostics(buildResults.diagnostics);
-  generateHtmlDiagnostics(config, buildResults.diagnostics);
-
-  // create a nice pretty message stating what happend
-  const buildText = ctx.isRebuild ? 'rebuild' : 'build';
-  const watchText = config.watch ? ', watching for changes...' : '';
-  let buildStatus = 'finished';
-  let statusColor = 'green';
-
-  if (hasError(ctx.diagnostics)) {
-    buildStatus = 'failed';
-    statusColor = 'red';
-  }
-
-  timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, true, true);
-
-  if (typeof ctx.onFinish === 'function') {
-    // fire off any provided onFinish fn every time the build finishes
-    ctx.onFinish(buildResults);
-  }
-
-  // remember if the last build had an error or not
-  // this is useful if the next build should do a full build or not
-  ctx.lastBuildHadError = hasError(ctx.diagnostics);
 
   // return what we've learned today
-  return buildResults;
-}
-
-
-export function isConfigValid(config: BuildConfig, ctx: BuildContext, diagnostics: Diagnostic[]) {
-  try {
-    // validate the build config
-    validateBuildConfig(config, true);
-
-    if (!ctx.isRebuild) {
-      validatePrerenderConfig(config);
-      validateServiceWorkerConfig(config);
-    }
-
-  } catch (e) {
-    if (config.logger) {
-      catchError(diagnostics, e);
-    } else {
-      console.error(e);
-    }
-    return false;
-  }
-
-  return true;
+  return buildCtx.finish();
 }

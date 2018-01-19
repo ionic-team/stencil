@@ -1,5 +1,5 @@
-import { BuildConfig, ServiceWorkerConfig } from '../../../util/interfaces';
-import { mockFs, mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { Config, ServiceWorkerConfig } from '../../../util/interfaces';
+import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateServiceWorkerConfig } from '../validate-sw-config';
 import { normalizePath } from '../../../compiler/util';
 
@@ -10,18 +10,18 @@ describe('service worker', () => {
 
     it('should set globDirectory', () => {
       config.serviceWorker = {
-        globDirectory: '/custom/www/'
+        globDirectory: '/custom/www'
       };
       validateServiceWorkerConfig(config);
       const swConfig = config.serviceWorker as ServiceWorkerConfig;
-      expect(swConfig.globDirectory).toBe(normalizePath('/custom/www/'));
+      expect(swConfig.globDirectory).toBe('/custom/www');
     });
 
     it('should set default globDirectory', () => {
       config.serviceWorker = true;
       validateServiceWorkerConfig(config);
       const swConfig = config.serviceWorker as ServiceWorkerConfig;
-      expect(swConfig.globDirectory).toBe(normalizePath('/User/me/app/www/'));
+      expect(swConfig.globDirectory).toBe('/User/me/app/www/');
     });
 
     it('should set globPatterns', () => {
@@ -57,7 +57,7 @@ describe('service worker', () => {
     });
 
 
-    var config: BuildConfig = {
+    var config: Config = {
       sys: mockStencilSystem(),
       wwwDir: '/User/me/app/www/'
     };

@@ -1,10 +1,10 @@
-import { AssetsMeta, BuildConfig, BuildContext } from '../../util/interfaces';
-import { catchError, normalizePath } from '../util';
+import { AssetsMeta, BuildCtx, Config, CompilerCtx } from '../../util/interfaces';
+import { catchError, normalizePath, pathJoin } from '../util';
 import { COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
 import { getAppDistDir, getAppWWWBuildDir } from '../app/app-file-naming';
 
 
-export function normalizeAssetsDir(config: BuildConfig, componentFilePath: string, assetsMetas: AssetsMeta[])  {
+export function normalizeAssetsDir(config: Config, componentFilePath: string, assetsMetas: AssetsMeta[])  {
   return assetsMetas.map((assetMeta) => {
     return {
       ...assetMeta,
@@ -14,7 +14,7 @@ export function normalizeAssetsDir(config: BuildConfig, componentFilePath: strin
 }
 
 
-function normalizeAssetDir(config: BuildConfig, componentFilePath: string, assetsDir: string): AssetsMeta {
+function normalizeAssetDir(config: Config, componentFilePath: string, assetsDir: string): AssetsMeta {
 
   const assetsMeta: AssetsMeta = {};
 
@@ -37,125 +37,119 @@ function normalizeAssetDir(config: BuildConfig, componentFilePath: string, asset
     assetsMeta.cmpRelativePath = assetsDir;
 
     // create the absolute path to the asset dir
-    assetsMeta.absolutePath = normalizePath(config.sys.path.join(componentDir, assetsDir));
+    assetsMeta.absolutePath = pathJoin(config, componentDir, assetsDir);
   }
 
   return assetsMeta;
 }
 
 
-export function copyComponentAssets(config: BuildConfig, ctx: BuildContext) {
+export async function copyComponentAssets(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
-  if (skipAssetsCopy(config, ctx)) {
+  if (skipAssetsCopy(config, compilerCtx, buildCtx)) {
     // no need to recopy all assets again
-    return Promise.resolve();
+    return;
   }
 
   const timeSpan = config.logger.createTimeSpan(`copy assets started`, true);
 
-  // get a list of all the directories to copy
-  // these paths should be absolute
-  const copyToBuildDir: AssetsMeta[] = [];
-  const copyToCollectionDir: AssetsMeta[] = [];
+  try {
+    // get a list of all the directories to copy
+    // these paths should be absolute
+    const copyToBuildDir: AssetsMeta[] = [];
+    const copyToCollectionDir: AssetsMeta[] = [];
 
-  ctx.manifest.modulesFiles.forEach(moduleFile => {
-    if (!moduleFile.cmpMeta.assetsDirsMeta || !moduleFile.cmpMeta.assetsDirsMeta.length) return;
+    buildCtx.manifest.modulesFiles.forEach(moduleFile => {
+      if (!moduleFile.cmpMeta.assetsDirsMeta || !moduleFile.cmpMeta.assetsDirsMeta.length) return;
 
-    moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
-      copyToBuildDir.push(assetsMeta);
+      moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
+        copyToBuildDir.push(assetsMeta);
 
-      if (!moduleFile.excludeFromCollection) {
-        copyToCollectionDir.push(assetsMeta);
+        if (!moduleFile.excludeFromCollection) {
+          copyToCollectionDir.push(assetsMeta);
+        }
+      });
+    });
+
+    const dirCopyPromises: Promise<any>[] = [];
+
+    // copy all of the files in asset directories to the app's build and/or dist directory
+    copyToBuildDir.forEach(assetsMeta => {
+      // figure out what the path is to the component directory
+      if (config.generateWWW) {
+        const wwwBuildDirDestination = pathJoin(config, getAppWWWBuildDir(config), assetsMeta.cmpRelativePath);
+
+        // let's copy to the www/build directory!
+        const copyToWWWBuildDir = compilerCtx.fs.copy(assetsMeta.absolutePath, wwwBuildDirDestination);
+        dirCopyPromises.push(copyToWWWBuildDir);
+      }
+
+      if (config.generateDistribution) {
+        const distDirDestination = pathJoin(config, getAppDistDir(config), assetsMeta.cmpRelativePath);
+
+        // let's copy to the www/build directory!
+        const copyToDistDir = compilerCtx.fs.copy(assetsMeta.absolutePath, distDirDestination);
+        dirCopyPromises.push(copyToDistDir);
       }
     });
-  });
 
-  const dirCopyPromises: Promise<any>[] = [];
 
-  // copy all of the files in asset directories to the app's build and/or dist directory
-  copyToBuildDir.forEach(assetsMeta => {
-    // figure out what the path is to the component directory
-    if (config.generateWWW) {
-      const wwwBuildDirDestination = normalizePath(config.sys.path.join(
-        getAppWWWBuildDir(config),
-        assetsMeta.cmpRelativePath
-      ));
-
-      // let's copy to the www/build directory!
-      const copyToWWWBuildDir = config.sys.copy(assetsMeta.absolutePath, wwwBuildDirDestination);
-      dirCopyPromises.push(copyToWWWBuildDir);
-    }
-
+    // copy all of the files in asset directories to the dist/collection directory
+    // but only do this copy when the generateCollection flag is set to true
     if (config.generateDistribution) {
-      const distDirDestination = normalizePath(config.sys.path.join(
-        getAppDistDir(config),
-        assetsMeta.cmpRelativePath
-      ));
 
-      // let's copy to the www/build directory!
-      const copyToDistDir = config.sys.copy(assetsMeta.absolutePath, distDirDestination);
-      dirCopyPromises.push(copyToDistDir);
+      // copy all of the files in asset directories to the app's collection directory
+      copyToCollectionDir.forEach(assetsMeta => {
+        // figure out what the path is to the component directory
+        const collectionDirDestination = getCollectionDirDestination(config, assetsMeta);
+
+        // let's copy to the dist/collection directory!
+        const copyToCollectionDir = compilerCtx.fs.copy(assetsMeta.absolutePath, collectionDirDestination);
+        dirCopyPromises.push(copyToCollectionDir);
+      });
     }
-  });
 
+    await Promise.all(dirCopyPromises);
 
-  // copy all of the files in asset directories to the dist/collection directory
-  // but only do this copy when the generateCollection flag is set to true
-  if (config.generateDistribution) {
+    await compilerCtx.fs.commitCopy();
 
-    // copy all of the files in asset directories to the app's collection directory
-    copyToCollectionDir.forEach(assetsMeta => {
-      // figure out what the path is to the component directory
-      const collectionDirDestination = getCollectionDirDestination(config, assetsMeta);
-
-      // let's copy to the dist/collection directory!
-      const copyToCollectionDir = config.sys.copy(assetsMeta.absolutePath, collectionDirDestination);
-      dirCopyPromises.push(copyToCollectionDir);
-    });
+  } catch (e) {
+    catchError(buildCtx.diagnostics, e);
   }
 
-  return Promise.all(dirCopyPromises).catch(err => {
-    catchError(ctx.diagnostics, err);
-
-  }).then(() => {
-    timeSpan.finish('copy assets finished');
-  });
+  timeSpan.finish('copy assets finished');
 }
 
 
-export function getCollectionDirDestination(config: BuildConfig, assetsMeta: AssetsMeta) {
+export function getCollectionDirDestination(config: Config, assetsMeta: AssetsMeta) {
   // figure out what the path is to the component directory
 
   if (assetsMeta.originalCollectionPath) {
     // this is from another collection, so reuse the same path it had
-    return normalizePath(config.sys.path.join(
-      config.collectionDir,
-      COLLECTION_DEPENDENCIES_DIR,
-      assetsMeta.originalCollectionPath
-    ));
+    return pathJoin(config, config.collectionDir, COLLECTION_DEPENDENCIES_DIR, assetsMeta.originalCollectionPath);
   }
 
-  return normalizePath(config.sys.path.join(
+  return pathJoin(config,
     config.collectionDir,
     config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
-  ));
+  );
 }
 
 
-export function skipAssetsCopy(config: BuildConfig, ctx: BuildContext) {
+export function skipAssetsCopy(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   // always copy assets if it's not a rebuild
-  if (!ctx.isRebuild) return false;
+  if (!compilerCtx.isRebuild) return false;
 
   // assume we want to skip copying assets again
   let shouldSkipAssetsCopy = true;
 
   // loop through each of the changed files
-  ctx.changedFiles.forEach(changedFile => {
+  buildCtx.filesChanged.forEach(changedFile => {
     // get the directory of where the changed file is in
     const changedFileDirPath = normalizePath(config.sys.path.dirname(changedFile));
 
     // loop through all the possible asset directories
-    ctx.manifest.modulesFiles.forEach(moduleFile => {
+    buildCtx.manifest.modulesFiles.forEach(moduleFile => {
       if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
 
         // loop through each of the asset directories of each component

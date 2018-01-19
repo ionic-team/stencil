@@ -1,7 +1,3 @@
-/**
- * Build Testing Utilities
- */
-
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
@@ -15,18 +11,22 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 
 function bundleTestingUtils() {
-  console.log('bundling testing utilites...');
-
   rollup.rollup({
     input: ENTRY_FILE,
     external: [
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
-      'typescript'
+      'typescript',
+      'fs',
+      'path'
     ],
     plugins: [
       rollupResolve()
-    ]
+    ],
+    onwarn: (message) => {
+      if (/top level of an ES module/.test(message)) return;
+      console.error( message );
+    }
 
   }).then(bundle => {
 
@@ -42,8 +42,9 @@ function bundleTestingUtils() {
       format: 'cjs',
       file: DEST_FILE
 
-    }).then(() => {
-      console.log(`bundled compiler: ${DEST_FILE}`);
+    }).catch(err => {
+      console.log(`build testing error: ${err}`);
+      process.exit(1);
     });
 
   });
@@ -55,4 +56,5 @@ bundleTestingUtils();
 
 process.on('exit', (code) => {
   fs.removeSync(TRANSPILED_DIR);
+  console.log(`✅ compiler: ${DEST_FILE}`);
 });

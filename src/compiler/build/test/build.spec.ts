@@ -1,122 +1,72 @@
-import { build } from '../build';
-import { BuildConfig, BuildContext, BuildResults, ComponentRegistry } from '../../../util/interfaces';
-import { mockBuildConfig, mockFs } from '../../../testing/mocks';
-import { validateBuildConfig } from '../../../util/validate-config';
-import * as path from 'path';
+import { expectFilesWritten } from '../../../testing/utils';
+import { TestingCompiler } from '../../../testing/index';
 
 
 describe('build', () => {
 
-  it('should build one component w/ styleUrl', () => {
-    ctx = {};
-    config.bundles = [ { components: ['cmp-a'] } ];
-    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.scss' }) export class CmpA {}`);
-    writeFileSync('/src/cmp-a.scss', `body { color: red; }`);
+  it('should minify es5 build', async () => {
+    c.config.bundles = [ { components: ['cmp-a'] } ];
+    c.config.minifyJs = true;
+    c.config.buildEs5 = true;
+    await c.fs.writeFile('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA { /** minify me plz **/ }`);
 
-    return build(config, ctx).then(r => {
-      expect(r.diagnostics.length).toBe(0);
-      expect(r.manifest.components.length).toBe(1);
-      expect(ctx.transpileBuildCount).toBe(1);
-      expect(ctx.sassBuildCount).toBe(1);
-      expect(ctx.moduleBundleCount).toBe(1);
+    await c.fs.commit();
 
-      expect(wroteFile(r, 'cmp-a.js')).toBe(true);
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
 
-      const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
-      expect(cmpMeta.styles.$.stylePaths[0]).toEqual('cmp-a.scss');
-    });
+    const output = await c.fs.readFile('/www/build/app/cmp-a.es5.js');
+    expect(output).toContain('App.loadComponents(function(e,n,t){\"use strict\";Object.defineProperty(e,\"__esModule\",{value:!0});var r=function(){function e(){}return Object.defineProperty(e,\"is\",{get:function(){return\"cmp-a\"},enumerable:!0,configurable:!0}),e}();e.CmpA=r},\"cmp-a\");');
   });
 
-  it('should build one component w/ no styles', () => {
-    ctx = {};
-    config.bundles = [ { components: ['cmp-a'] } ];
-    writeFileSync('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+  it('should minify es2015 build', async () => {
+    c.config.bundles = [ { components: ['cmp-a'] } ];
+    c.config.minifyJs = true;
+    await c.fs.writeFile('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA { /** minify me plz **/ }`);
+    await c.fs.commit();
 
-    return build(config, ctx).then(r => {
-      expect(r.diagnostics.length).toBe(0);
-      expect(r.manifest.components.length).toBe(1);
-      expect(ctx.transpileBuildCount).toBe(1);
-      expect(ctx.sassBuildCount).toBe(0);
-      expect(ctx.moduleBundleCount).toBe(1);
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
 
-      const cmpMeta = r.manifest.components.find(c => c.tag === 'cmp-a');
-      expect(cmpMeta).toBeDefined();
-    });
+    const output = await c.fs.readFile('/www/build/app/cmp-a.js');
+    expect(output).toContain('const{h,Context}=window.App;class CmpA{static get is(){return"cmp-a"}}export{CmpA};');
   });
 
-  it('should build no components', () => {
-    ctx = {};
-    return build(config, ctx).then(r => {
-      expect(r.diagnostics.length).toBe(0);
-      expect(r.manifest.components.length).toBe(0);
-      expect(ctx.transpileBuildCount).toBe(0);
-      expect(ctx.sassBuildCount).toBe(0);
-      expect(ctx.moduleBundleCount).toBe(0);
-    });
+  it('should build one component', async () => {
+    c.config.bundles = [ { components: ['cmp-a'] } ];
+    await c.fs.writeFile('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
+    await c.fs.commit();
+
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+    expect(r.stats.components.length).toBe(1);
+    expect(r.stats.components).toContain('cmp-a');
+    expect(r.stats.transpileBuildCount).toBe(1);
+    expect(r.stats.bundleBuildCount).toBe(1);
+
+    expectFilesWritten(r,
+      '/src/components.d.ts',
+      '/www/build/app/cmp-a.js',
+      '/www/index.html'
+    );
+    expect(r.stats.filesWritten.length).toBe(3);
   });
 
-  it('should ignore common web files not used in builds', () => {
-    validateBuildConfig(config);
-    const reg = config.watchIgnoredRegex;
-
-    expect(reg.test('/asdf/.gitignore')).toBe(true);
-    expect(reg.test('/.gitignore')).toBe(true);
-    expect(reg.test('.gitignore')).toBe(true);
-    expect(reg.test('/image.jpg')).toBe(true);
-    expect(reg.test('image.jpg')).toBe(true);
-    expect(reg.test('/asdf/image.jpg')).toBe(true);
-    expect(reg.test('/asdf/image.jpeg')).toBe(true);
-    expect(reg.test('/asdf/image.png')).toBe(true);
-    expect(reg.test('/asdf/image.gif')).toBe(true);
-    expect(reg.test('/asdf/image.woff')).toBe(true);
-    expect(reg.test('/asdf/image.woff2')).toBe(true);
-    expect(reg.test('/asdf/image.ttf')).toBe(true);
-    expect(reg.test('/asdf/image.eot')).toBe(true);
-
-    expect(reg.test('/asdf/image.ts')).toBe(false);
-    expect(reg.test('/asdf/image.tsx')).toBe(false);
-    expect(reg.test('/asdf/image.css')).toBe(false);
-    expect(reg.test('/asdf/image.scss')).toBe(false);
-    expect(reg.test('/asdf/image.sass')).toBe(false);
-    expect(reg.test('/asdf/image.html')).toBe(false);
-    expect(reg.test('/asdf/image.htm')).toBe(false);
+  it('should build no components', async () => {
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+    expect(r.stats.components.length).toBe(0);
+    expect(r.stats.transpileBuildCount).toBe(0);
+    expect(r.stats.bundleBuildCount).toBe(0);
   });
 
 
-  var registry: ComponentRegistry = {};
-  var ctx: BuildContext = {};
-  var config: BuildConfig = {};
+  var c: TestingCompiler;
 
-  beforeEach(() => {
-    ctx = null;
-    registry = {};
-
-    config = mockBuildConfig();
-    config.sys.fs = mockFs();
-
-    mkdirSync('/');
-    mkdirSync('/src');
-    writeFileSync('/src/index.html', `<cmp-a></cmp-a>`);
+  beforeEach(async () => {
+    c = new TestingCompiler();
+    await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+    await c.fs.commit();
   });
-
-
-  function mkdirSync(path: string) {
-    (<any>config.sys.fs).mkdirSync(path);
-  }
-
-  function writeFileSync(filePath: string, data: any) {
-    (<any>config.sys.fs).writeFileSync(filePath, data);
-  }
-
-  function unlinkSync(filePath: string) {
-    (<any>config.sys.fs).unlinkSync(filePath);
-  }
-
-  function wroteFile(r: BuildResults, p: string) {
-    const filename = path.basename(p);
-    return r.files.some(f => {
-      return path.basename(f) === filename;
-    });
-  }
 
 });

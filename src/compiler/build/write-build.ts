@@ -1,67 +1,68 @@
-import { BuildConfig, BuildContext, BuildResults } from '../../util/interfaces';
-import { catchError, writeFiles } from '../util';
+import { BuildCtx, Config, CompilerCtx } from '../../util/interfaces';
+import { catchError } from '../util';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { generateDistribution } from './distribution';
 import { writeAppManifest } from '../manifest/manifest-data';
 
 
-export async function writeBuildFiles(config: BuildConfig, ctx: BuildContext, buildResults: BuildResults) {
+export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   // serialize and write the manifest file if need be
-  writeAppManifest(config, ctx, buildResults);
+  writeAppManifest(config, compilerCtx, buildCtx);
 
-  buildResults.files = Object.keys(ctx.filesToWrite).sort();
-  const totalFilesToWrite = buildResults.files.length;
-
-  const timeSpan = config.logger.createTimeSpan(`writeBuildFiles started, fileUpdates: ${totalFilesToWrite}`, true);
-
-  // create a copy of all the files to write
-  const filesToWrite = Object.assign({}, ctx.filesToWrite);
-
-  // clear out the files to write object for the next build
-  ctx.filesToWrite = {};
-
-  // 1) destination directory has already been emptied earlier in the build
-  // 2) write all of the files
-  // 3) copy all of the assets
-  // not doing write and copy at the same time incase they
-  // both try to create the same directory at the same time
-  try {
-    await writeFiles(config.sys, config.rootDir, filesToWrite);
-
-  } catch (e) {
-    catchError(ctx.diagnostics, e);
-  }
+  const timeSpan = config.logger.createTimeSpan(`writeBuildFiles started`, true);
 
   // kick off copying component assets
   // and copy www/build to dist/ if generateDistribution is enabled
   await Promise.all([
-    copyComponentAssets(config, ctx),
-    generateDistribution(config, ctx)
+    copyComponentAssets(config, compilerCtx, buildCtx),
+    generateDistribution(config, compilerCtx, buildCtx)
   ]);
 
-  timeSpan.finish(`writeBuildFiles finished`);
+  let totalFilesWrote = 0;
+
+  try {
+    const commitResults = await compilerCtx.fs.commit();
+
+    buildCtx.filesWritten = commitResults.filesWritten;
+    buildCtx.filesDeleted = commitResults.filesDeleted;
+    buildCtx.dirsDeleted = commitResults.dirsDeleted;
+    buildCtx.dirsAdded = commitResults.dirsAdded;
+
+    totalFilesWrote = commitResults.filesWritten.length;
+
+    buildCtx.manifest.bundles.forEach(b => {
+      b.components.forEach(c => buildCtx.components.push(c));
+    });
+    buildCtx.components.sort();
+
+    // successful write
+    // kick off writing the cached file stuff
+    // no need to wait on it finishing
+    compilerCtx.cache.commit();
+
+  } catch (e) {
+    catchError(buildCtx.diagnostics, e);
+  }
+
+  timeSpan.finish(`writeBuildFiles finished, files wrote: ${totalFilesWrote}`);
 }
 
 
-export function emptyDestDir(config: BuildConfig, ctx: BuildContext) {
+export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
   // empty promises :(
   const emptyPromises: Promise<any>[] = [];
 
-  if (!ctx.isRebuild) {
-    // don't bother emptying the directories when it's a rebuild
-
-    if (config.generateWWW && config.emptyWWW) {
-      config.logger.debug(`empty buildDir: ${config.buildDir}`);
-      emptyPromises.push(config.sys.emptyDir(config.buildDir));
-    }
-
-    if (config.generateDistribution && config.emptyDist) {
-      config.logger.debug(`empty distDir: ${config.distDir}`);
-      emptyPromises.push(config.sys.emptyDir(config.distDir));
-    }
-
+  if (config.generateWWW && config.emptyWWW) {
+    config.logger.debug(`empty buildDir: ${config.buildDir}`);
+    emptyPromises.push(compilerCtx.fs.emptyDir(config.buildDir));
   }
 
+  if (config.generateDistribution && config.emptyDist) {
+    config.logger.debug(`empty distDir: ${config.distDir}`);
+    emptyPromises.push(compilerCtx.fs.emptyDir(config.distDir));
+  }
   // let's empty out the build dest directory
-  return Promise.all(emptyPromises);
+  await Promise.all(emptyPromises);
+
+  await compilerCtx.fs.commit();
 }

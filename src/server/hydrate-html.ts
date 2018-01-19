@@ -1,12 +1,12 @@
-import { BuildConfig, BuildContext, ComponentRegistry, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
-import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeLanguage, normalizeHydrateOptions } from './hydrate-utils';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
+import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeHydrateOptions, normalizeLanguage } from './hydrate-utils';
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
 import { optimizeHtml } from '../compiler/html/optimize-html';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
-export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
+export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
   return new Promise(resolve => {
 
     // validate the hydrate options and add any missing info
@@ -39,7 +39,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
 
     // fire off this function when the app has finished loading
     // and all components have finished hydrating
-    plt.onAppLoad = (rootElm, styles, failureDiagnostic) => {
+    plt.onAppLoad = async (rootElm, styles, failureDiagnostic) => {
 
       if (config._isTesting) {
         (hydrateResults as any).__testPlatform = plt;
@@ -58,7 +58,7 @@ export function hydrateHtml(config: BuildConfig, ctx: BuildContext, cmpRegistry:
       if (rootElm) {
         try {
           // optimize this document!!
-          optimizeHtml(config, ctx, doc, styles, opts, hydrateResults);
+          await optimizeHtml(config, ctx, doc, styles, opts, hydrateResults);
 
           // gather up all of the <a> tag information in the doc
           if (opts.collectAnchors !== false) {

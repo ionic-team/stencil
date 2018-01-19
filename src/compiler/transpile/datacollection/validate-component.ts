@@ -1,15 +1,15 @@
-import { BuildConfig, ComponentMeta } from '../../../util/interfaces';
+import { Config, ComponentMeta } from '../../../util/interfaces';
 import { isMethod } from './utils';
 import * as ts from 'typescript';
 
 
-export function validateComponentClass(config: BuildConfig, cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
+export function validateComponentClass(config: Config, cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
   requiresReturnStatement(config, cmpMeta, classNode, 'hostData');
   requiresReturnStatement(config, cmpMeta, classNode, 'render');
 }
 
 
-function requiresReturnStatement(config: BuildConfig, cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration, methodName: string) {
+function requiresReturnStatement(config: Config, cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration, methodName: string) {
   const classElm = classNode.members.find(m => isMethod(m, methodName));
   if (!classElm) return;
 

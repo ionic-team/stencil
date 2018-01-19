@@ -1,7 +1,7 @@
-import { Bundle, BuildConfig } from '../../../util/interfaces';
+import { Bundle, Config } from '../../../util/interfaces';
 import { dashToPascalCase } from '../../../util/helpers';
 
-export default function bundleEntryFile(config: BuildConfig, bundles: Bundle[]) {
+export default function bundleEntryFile(config: Config, bundles: Bundle[]) {
 
   return {
     name: 'bundleEntryFilePlugin',
@@ -26,7 +26,7 @@ export default function bundleEntryFile(config: BuildConfig, bundles: Bundle[]) 
   };
 }
 
-export function createEntryPointString(config: BuildConfig, bundle: Bundle): string {
+export function createEntryPointString(config: Config, bundle: Bundle): string {
   const path = config.sys.path;
 
   return bundle.moduleFiles

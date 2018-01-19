@@ -1,20 +1,14 @@
-import { BuildConfig, BuildContext, BuildConditionals, SourceTarget } from '../../util/interfaces';
+import { BuildConditionals, BuildCtx, CompilerCtx, Config, Diagnostic, SourceTarget } from '../../util/interfaces';
 import { transpileCoreBuild } from '../transpile/core-build';
 
 
-export function buildCoreContent(config: BuildConfig, ctx: BuildContext, coreBuild: BuildConditionals, coreContent: string) {
-  const cacheKey = getCoreCacheKey(coreBuild);
-
-  if (typeof ctx.coreBuilds[cacheKey] === 'string') {
-    return ctx.coreBuilds[cacheKey];
-  }
-
+export async function buildCoreContent(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, coreBuild: BuildConditionals, coreContent: string) {
   const timespan = config.logger.createTimeSpan(`buildCoreContent ${coreBuild.coreId} start`, true);
 
-  const transpileResults = transpileCoreBuild(coreBuild, coreContent);
+  const transpileResults = await transpileCoreBuild(compilerCtx, coreBuild, coreContent);
 
   if (transpileResults.diagnostics && transpileResults.diagnostics.length) {
-    ctx.diagnostics.push(...transpileResults.diagnostics);
+    buildCtx.diagnostics.push(...transpileResults.diagnostics);
     return coreContent;
   }
 
@@ -22,35 +16,20 @@ export function buildCoreContent(config: BuildConfig, ctx: BuildContext, coreBui
 
   const sourceTarget: SourceTarget = coreBuild.es5 ? 'es5' : 'es2015';
 
-  const minifyResults = minifyCore(config, sourceTarget, coreContent);
+  const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, coreContent);
 
   if (minifyResults.diagnostics && minifyResults.diagnostics.length) {
-    ctx.diagnostics.push(...minifyResults.diagnostics);
+    buildCtx.diagnostics.push(...minifyResults.diagnostics);
     return coreContent;
   }
 
   timespan.finish(`buildCoreContent ${coreBuild.coreId} finished`);
 
-  ctx.coreBuilds[cacheKey] = minifyResults.output;
-
   return minifyResults.output;
 }
 
 
-function getCoreCacheKey(coreBuild: BuildConditionals) {
-  const cacheKey: string[] = [];
-
-  Object.keys(coreBuild).forEach(key => {
-    if ((coreBuild as any)[key]) {
-      cacheKey.push(key);
-    }
-  });
-
-  return cacheKey.sort().join('_');
-}
-
-
-function minifyCore(config: BuildConfig, sourceTarget: SourceTarget, input: string) {
+async function minifyCore(config: Config, compilerCtx: CompilerCtx, sourceTarget: SourceTarget, input: string) {
   const opts: any = Object.assign({}, config.minifyJs ? PROD_MINIFY_OPTS : DEV_MINIFY_OPTS);
 
   if (sourceTarget === 'es5') {
@@ -67,6 +46,9 @@ function minifyCore(config: BuildConfig, sourceTarget: SourceTarget, input: stri
       opts.compress.arrows = true;
     }
 
+    // reserved properties is a list of properties to NOT rename
+    // if something works in dev, but a runtime error in prod
+    // chances are we need to add a property to this list
     opts.mangle.properties.reserved = RESERVED_PROPERTIES.slice();
 
     if (config.logLevel === 'debug') {
@@ -85,7 +67,21 @@ function minifyCore(config: BuildConfig, sourceTarget: SourceTarget, input: stri
     }
   }
 
-  return config.sys.minifyJs(input, opts);
+  const cacheKey = compilerCtx.cache.createKey('minifyCore', opts, input);
+  const cachedContent = await compilerCtx.cache.get(cacheKey);
+  if (cachedContent != null) {
+    return {
+      output: cachedContent,
+      diagnostics: [] as Diagnostic[]
+    };
+  }
+
+  const results = config.sys.minifyJs(input, opts);
+  if (results && results.diagnostics.length === 0) {
+    await compilerCtx.cache.put(cacheKey, results.output);
+  }
+
+  return results;
 }
 
 
@@ -233,7 +229,7 @@ const PROD_MINIFY_OPTS: any = {
 };
 
 
-var RESERVED_PROPERTIES: string[] = [
+const RESERVED_PROPERTIES: string[] = [
   'addListener',
   'attr',
   'color',

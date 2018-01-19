@@ -1,11 +1,11 @@
-import { BuildContext } from '../../util/interfaces';
+import { CompilerCtx } from '../../util/interfaces';
 
 
-export function createContext(ctx: BuildContext, wwwDir: string, sandbox: any) {
+export function createContext(compilerCtx: CompilerCtx, wwwDir: string, sandbox: any) {
   const vm = require('vm');
   // https://github.com/tmpvar/jsdom/issues/1724
   // manually adding a fetch polyfill until jsdom adds it
-  patchFetch(ctx, wwwDir, sandbox);
+  patchFetch(compilerCtx, wwwDir, sandbox);
 
   patchRaf(sandbox);
 
@@ -13,12 +13,12 @@ export function createContext(ctx: BuildContext, wwwDir: string, sandbox: any) {
 }
 
 
-function patchFetch(ctx: BuildContext, wwwDir: string, sandbox: any) {
+function patchFetch(compilerCtx: CompilerCtx, wwwDir: string, sandbox: any) {
 
   function fetch(input: any, init: any) {
     var path = require('path');
     var nf = require(path.join(__dirname, './node-fetch.js'));
-    createServer(ctx, wwwDir);
+    createServer(compilerCtx, wwwDir);
 
     if (typeof input === 'string') {
       // fetch(url)
@@ -66,15 +66,15 @@ function patchRaf(sandbox: any) {
 }
 
 
-function createServer(ctx: BuildContext, wwwDir: string) {
-  if (ctx.localPrerenderServer) return;
+function createServer(compilerCtx: CompilerCtx, wwwDir: string) {
+  if (compilerCtx.localPrerenderServer) return;
 
   var fs = require('fs');
   var path = require('path');
   var http = require('http');
   var Url = require('url');
 
-  ctx.localPrerenderServer = http.createServer((request: any, response: any) => {
+  compilerCtx.localPrerenderServer = http.createServer((request: any, response: any) => {
     var parsedUrl = Url.parse(request.url);
     var filePath = path.join(wwwDir, parsedUrl.pathname);
 
@@ -89,7 +89,7 @@ function createServer(ctx: BuildContext, wwwDir: string) {
 
   });
 
-  ctx.localPrerenderServer.listen(PORT);
+  compilerCtx.localPrerenderServer.listen(PORT);
 }
 
 var PORT = 53536;

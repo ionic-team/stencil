@@ -1,8 +1,9 @@
 import { MEMBER_TYPE } from '../../../../util/constants';
-import { getEventDecoratorMeta } from '../event-decorator';
+import { getEventDecoratorMeta, convertOptionsToMeta } from '../event-decorator';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { gatherMetadata } from './test-utils';
+import { EventOptions } from '../../../../util/interfaces';
 
 describe('event decorator', () => {
 
@@ -23,6 +24,18 @@ describe('event decorator', () => {
         jsdoc: {
           documentation: 'Create method for something',
           name: 'ionGestureMove',
+          type: 'EventEmitter<any>'
+        }
+      },
+      {
+        eventBubbles: true,
+        eventCancelable: true,
+        eventComposed: true,
+        eventMethodName: 'eventEmitted',
+        eventName: 'event-emitted',
+        jsdoc: {
+          documentation: '',
+          name: 'eventEmitted',
           type: 'EventEmitter<any>'
         }
       }
@@ -50,6 +63,36 @@ describe('event decorator', () => {
         }
       }
     ]);
+  });
+
+  describe('convertOptionsToMeta', () => {
+    it('should return null if methodName is null', () => {
+      expect(convertOptionsToMeta({}, null)).toBeNull();
+    });
+
+    it('should return default EventMeta', () => {
+      expect(convertOptionsToMeta({}, 'myEvent')).toEqual({
+        eventBubbles: true,
+        eventCancelable: true,
+        eventComposed: true,
+        eventMethodName: 'myEvent',
+        eventName: 'myEvent'});
+    });
+
+    it('should configure EventMeta', () => {
+      const eventOptions: EventOptions = {
+        eventName: 'my-name',
+        bubbles: false,
+        cancelable: false,
+        composed: false
+      };
+      expect(convertOptionsToMeta(eventOptions, 'myEvent')).toEqual({
+        eventBubbles: false,
+        eventCancelable: false,
+        eventComposed: false,
+        eventMethodName: 'myEvent',
+        eventName: 'my-name'});
+    });
   });
 
 });

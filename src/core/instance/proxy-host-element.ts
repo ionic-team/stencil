@@ -17,15 +17,15 @@ export function proxyHostElementPrototype(plt: PlatformApi, membersMeta: Members
       definePropertyGetterSetter(
         hostPrototype,
         memberName,
-        function getHostElementProp() {
+        function getHostElementProp(this: HostElement) {
           // host element getter (cannot be arrow fn)
           // yup, ugly, srynotsry
           // but its creating _values if it doesn't already exist
-          return ((this as HostElement)._values = (this as HostElement)._values || {})[memberName];
+          return (this._values = this._values || {})[memberName];
         },
-        function setHostElementProp(newValue: any) {
+        function setHostElementProp(this: HostElement, newValue: any) {
           // host element setter (cannot be arrow fn)
-          setValue(plt, (this as HostElement), memberName, newValue);
+          setValue(plt, this, memberName, newValue);
         }
       );
 

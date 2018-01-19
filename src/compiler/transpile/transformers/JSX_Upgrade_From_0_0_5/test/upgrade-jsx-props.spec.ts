@@ -4,12 +4,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { transformSourceString } from '../../util';
 import upgradeJsxProps from '../upgrade-jsx-props';
+import { CompilerCtx } from '../../../../../util/interfaces';
+import { mockCache } from '../../../../../testing/mocks';
 
 
 const fileList = fs.readdirSync(path.join(__dirname, './pre-update'));
 const directory = __dirname;
 
-describe('vnode-slot transform', () => {
+describe('vnode-slot transform', async () => {
+  const compilerCtx: CompilerCtx = { cache: mockCache() as any };
 
   let i;
   for (i = fileList.length - 1; i >= 0; i -= 1) {
@@ -21,7 +24,7 @@ describe('vnode-slot transform', () => {
         fs.readFileSync(path.join(__dirname, './post-update', fileName), { encoding: 'utf8'})
       ]);
 
-      const output = transformSourceString(fileName, source, [upgradeJsxProps]);
+      const output = await transformSourceString(fileName, source, [upgradeJsxProps]);
       expect(
         output
       ).toEqual(

@@ -1,10 +1,10 @@
-import { BuildConfig, BuildContext, Bundle, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, ServiceWorkerConfig } from '../../util/interfaces';
+import { Config, CompilerCtx, Bundle, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, ServiceWorkerConfig } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
-import { pathJoin, readFile } from '../util';
+import { pathJoin } from '../util';
 
 
-export async function generateHostConfig(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], hydrateResultss: HydrateResults[]) {
+export async function generateHostConfig(config: Config, ctx: CompilerCtx, bundles: Bundle[], hydrateResultss: HydrateResults[]) {
   const hostConfig: HostConfig = {
     hosting: {
       rules: []
@@ -28,13 +28,13 @@ export async function generateHostConfig(config: BuildConfig, ctx: BuildContext,
 
   const hostConfigFilePath = pathJoin(config, config.wwwDir, HOST_CONFIG_FILENAME);
 
-  await mergeUserHostConfigFile(config, hostConfig);
+  await mergeUserHostConfigFile(config, ctx, hostConfig);
 
-  ctx.filesToWrite[hostConfigFilePath] = JSON.stringify(hostConfig, null, 2);
+  ctx.fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
 }
 
 
-export function generateHostRule(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], hydrateResults: HydrateResults) {
+export function generateHostRule(config: Config, ctx: CompilerCtx, bundles: Bundle[], hydrateResults: HydrateResults) {
   const hostRule: HostRule = {
     include: hydrateResults.path,
     headers: generateHostRuleHeaders(config, ctx, bundles, hydrateResults)
@@ -48,7 +48,7 @@ export function generateHostRule(config: BuildConfig, ctx: BuildContext, bundles
 }
 
 
-export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, bundles: Bundle[], hydrateResults: HydrateResults) {
+export function generateHostRuleHeaders(config: Config, ctx: CompilerCtx, bundles: Bundle[], hydrateResults: HydrateResults) {
   const hostRuleHeaders: HostRuleHeader[] = [];
 
   addStyles(config, hostRuleHeaders, hydrateResults);
@@ -61,14 +61,14 @@ export function generateHostRuleHeaders(config: BuildConfig, ctx: BuildContext, 
 }
 
 
-function addCoreJs(config: BuildConfig, appCoreWWWPath: string, hostRuleHeaders: HostRuleHeader[]) {
+function addCoreJs(config: Config, appCoreWWWPath: string, hostRuleHeaders: HostRuleHeader[]) {
   const relPath = pathJoin(config, '/', config.sys.path.relative(config.wwwDir, appCoreWWWPath));
 
   hostRuleHeaders.push(formatLinkRelPreloadHeader(relPath));
 }
 
 
-export function addBundles(config: BuildConfig, bundles: Bundle[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
+export function addBundles(config: Config, bundles: Bundle[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
   components = sortComponents(components);
 
   const bundleIds = getBundleIds(bundles, components);
@@ -108,7 +108,7 @@ export function getBundleIds(bundles: Bundle[], components: HydrateComponent[]) 
 }
 
 
-function getBundleUrl(config: BuildConfig, bundleId: string) {
+function getBundleUrl(config: Config, bundleId: string) {
   const unscopedFileName = getBundleFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), unscopedFileName);
   return pathJoin(config, '/', config.sys.path.relative(config.wwwDir, unscopedWwwBuildPath));
@@ -128,7 +128,7 @@ export function sortComponents(components: HydrateComponent[]) {
 }
 
 
-function addStyles(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
+function addStyles(config: Config, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
   hydrateResults.styleUrls.forEach(styleUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
@@ -142,7 +142,7 @@ function addStyles(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydra
 }
 
 
-function addScripts(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
+function addScripts(config: Config, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
   hydrateResults.scriptUrls.forEach(scriptUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
@@ -156,7 +156,7 @@ function addScripts(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydr
 }
 
 
-function addImgs(config: BuildConfig, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
+function addImgs(config: Config, hostRuleHeaders: HostRuleHeader[], hydrateResults: HydrateResults) {
   hydrateResults.imgUrls.forEach(imgUrl => {
     if (hostRuleHeaders.length >= MAX_LINK_REL_PRELOAD_COUNT) {
       return;
@@ -200,13 +200,13 @@ function formatLinkRelPreloadValue(url: string) {
 }
 
 
-function addDefaults(config: BuildConfig, hostConfig: HostConfig) {
+function addDefaults(config: Config, hostConfig: HostConfig) {
   addBuildDirCacheControl(config, hostConfig);
   addServiceWorkerNoCacheControl(config, hostConfig);
 }
 
 
-function addBuildDirCacheControl(config: BuildConfig, hostConfig: HostConfig) {
+function addBuildDirCacheControl(config: Config, hostConfig: HostConfig) {
   const relPath = pathJoin(config, '/', config.sys.path.relative(config.wwwDir, getAppWWWBuildDir(config)), '**');
 
   hostConfig.hosting.rules.push({
@@ -221,7 +221,7 @@ function addBuildDirCacheControl(config: BuildConfig, hostConfig: HostConfig) {
 }
 
 
-function addServiceWorkerNoCacheControl(config: BuildConfig, hostConfig: HostConfig) {
+function addServiceWorkerNoCacheControl(config: Config, hostConfig: HostConfig) {
   if (!config.serviceWorker) {
     return;
   }
@@ -241,10 +241,10 @@ function addServiceWorkerNoCacheControl(config: BuildConfig, hostConfig: HostCon
 }
 
 
-async function mergeUserHostConfigFile(config: BuildConfig, hostConfig: HostConfig) {
+async function mergeUserHostConfigFile(config: Config, ctx: CompilerCtx, hostConfig: HostConfig) {
   const hostConfigFilePath = pathJoin(config, config.srcDir, HOST_CONFIG_FILENAME);
   try {
-    const userHostConfigStr = await readFile(config.sys, hostConfigFilePath);
+    const userHostConfigStr = await ctx.fs.readFile(hostConfigFilePath);
 
     const userHostConfig = JSON.parse(userHostConfigStr) as HostConfig;
 

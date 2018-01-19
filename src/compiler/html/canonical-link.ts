@@ -1,7 +1,7 @@
-import { BuildConfig, HydrateResults } from '../../util/interfaces';
+import { Config, HydrateResults } from '../../util/interfaces';
 
 
-export function insertCanonicalLink(config: BuildConfig, doc: Document, results: HydrateResults) {
+export function insertCanonicalLink(config: Config, doc: Document, results: HydrateResults) {
   if (!results.path) return;
 
   // https://webmasters.googleblog.com/2009/02/specify-your-canonical.html

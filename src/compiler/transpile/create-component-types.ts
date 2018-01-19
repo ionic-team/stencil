@@ -1,4 +1,4 @@
-import { BuildConfig, ComponentMeta, ComponentRegistry, MembersMeta, MemberMeta } from '../../util/interfaces';
+import { Config, ComponentMeta, ComponentRegistry, MembersMeta, MemberMeta } from '../../util/interfaces';
 import { dashToPascalCase } from '../../util/helpers';
 import { normalizePath } from '../util';
 import { MEMBER_TYPE } from '../../util/constants';
@@ -21,7 +21,7 @@ export interface MemberNameData {
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-export function generateComponentTypesFile(config: BuildConfig, cmpList: ComponentRegistry): string {
+export function generateComponentTypesFile(config: Config, cmpList: ComponentRegistry): string {
   let typeImportData: ImportData = {};
   const allTypes: { [key: string]: number } = {};
   let componentsFileContent =
@@ -103,7 +103,7 @@ function sortImportNames(a: MemberNameData, b: MemberNameData) {
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-function updateReferenceTypeImports(config: BuildConfig, importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: ComponentMeta, filePath: string) {
+function updateReferenceTypeImports(config: Config, importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: ComponentMeta, filePath: string) {
 
   function getIncrememntTypeName(name: string): string {
     if (allTypes[name] == null) {

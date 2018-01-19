@@ -3,7 +3,7 @@ import { visitClass } from '../index';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { gatherMetadata } from './test-utils';
-import { mockBuildConfig } from '../../../../testing/mocks';
+import { mockConfig } from '../../../../testing/mocks';
 
 
 describe('component decorator', () => {
@@ -267,5 +267,5 @@ describe('component decorator', () => {
     });
   });
 
-  var config = mockBuildConfig();
+  var config = mockConfig();
 });

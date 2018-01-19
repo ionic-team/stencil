@@ -1,51 +1,44 @@
-import { BuildConfig, BuildContext, Manifest, ModuleFiles } from '../../util/interfaces';
-import { catchError, hasError } from '../util';
+import { BuildCtx, CompilerCtx, Config, Manifest, ModuleFiles } from '../../util/interfaces';
+import { catchError } from '../util';
 import { loadDependentManifests } from './load-dependent-manifests';
 import { mergeDependentManifests } from './merge-manifests';
 
 
-export function generateAppManifest(config: BuildConfig, ctx: BuildContext, moduleFiles: ModuleFiles) {
-  // create the app manifest we're going to fill up with data
-  // the data will be both the app's data, and the collections it depends on
-  ctx.manifest = {
-    modulesFiles: [],
-    bundles: [],
-    global: null,
-    dependentManifests: [],
-    compiler: {
-      name: config.sys.compiler.name,
-      version: config.sys.compiler.version,
-      typescriptVersion: config.sys.compiler.typescriptVersion
-    }
-  };
+export async function generateAppManifest(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+  try {
+    // create the app manifest we're going to fill up with data
+    // the data will be both the app's data, and the collections it depends on
+    buildCtx.manifest = {
+      modulesFiles: [],
+      bundles: [],
+      global: null,
+      dependentManifests: [],
+      compiler: {
+        name: config.sys.compiler.name,
+        version: config.sys.compiler.version,
+        typescriptVersion: config.sys.compiler.typescriptVersion
+      }
+    };
 
-  if (hasError(ctx.diagnostics)) {
-    return Promise.resolve();
-  }
-
-  return Promise.resolve().then(() => {
     // add the app's compiled components to the manifest
-    addAppBundles(config, ctx.manifest);
-    return addAppComponents(config, ctx.manifest, moduleFiles);
+    addAppBundles(config, buildCtx.manifest);
+    addAppComponents(config, buildCtx.manifest, compilerCtx.moduleFiles);
 
-  }).then(() => {
     // load each of the manifests for each dependent collection
-    return loadDependentManifests(config, ctx);
+    const dependentManifests = await loadDependentManifests(config, compilerCtx);
 
-    }).then(dependentManifests => {
     // merge the loaded dependent manifests
     // into the app's manifest
-    return mergeDependentManifests(ctx.manifest, dependentManifests);
+    mergeDependentManifests(buildCtx.manifest, dependentManifests);
 
-  }).catch(err => {
+  } catch (e) {
     // ¯\_(ツ)_/¯
-    catchError(ctx.diagnostics, err);
-
-  });
+    catchError(buildCtx.diagnostics, e);
+  }
 }
 
 
-export function addAppComponents(config: BuildConfig, manifest: Manifest, moduleFiles: ModuleFiles) {
+export function addAppComponents(config: Config, manifest: Manifest, moduleFiles: ModuleFiles) {
   // get all of the filenames of the compiled files
   const filePaths = Object.keys(moduleFiles);
 
@@ -77,7 +70,7 @@ export function addAppComponents(config: BuildConfig, manifest: Manifest, module
 }
 
 
-export function addAppBundles(config: BuildConfig, manifest: Manifest) {
+export function addAppBundles(config: Config, manifest: Manifest) {
   config.bundles.forEach(configBundle => {
     manifest.bundles.push({
       components: configBundle.components.slice()

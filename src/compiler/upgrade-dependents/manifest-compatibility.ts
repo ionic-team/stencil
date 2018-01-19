@@ -1,7 +1,7 @@
-import { BuildConfig, Manifest } from '../../util/interfaces';
+import { Config, Manifest } from '../../util/interfaces';
 
 
-export function validateManifestCompatibility(config: BuildConfig, manifest: Manifest): number[] {
+export function validateManifestCompatibility(config: Config, manifest: Manifest): number[] {
   if (!manifest.compiler) {
     // if there is no compiler data at all then this was probably
     // set on purpose and we should avoid doing any upgrading
@@ -18,7 +18,7 @@ export function validateManifestCompatibility(config: BuildConfig, manifest: Man
 }
 
 
-export function calculateRequiredUpgrades(config: BuildConfig, collectionVersion: string) {
+export function calculateRequiredUpgrades(config: Config, collectionVersion: string) {
   // CUSTOM CHECKS PER KNOWN BREAKING CHANGES
   // UNIT TEST UNIT TEST UNIT TEST
   const upgrades: CompilerUpgrade[] = [];
@@ -37,11 +37,18 @@ export function calculateRequiredUpgrades(config: BuildConfig, collectionVersion
     upgrades.push(CompilerUpgrade.Metadata_Upgrade_From_0_1_0);
   }
 
+  if (config.sys.semver.lte(collectionVersion, '0.2.0')) {
+    // 2018-01-19
+    // ensure all @stencil/core imports are removed
+    upgrades.push(CompilerUpgrade.REMOVE_STENCIL_IMPORTS);
+  }
+
   return upgrades;
 }
 
 
 export const enum CompilerUpgrade {
   JSX_Upgrade_From_0_0_5,
-  Metadata_Upgrade_From_0_1_0
+  Metadata_Upgrade_From_0_1_0,
+  REMOVE_STENCIL_IMPORTS
 }

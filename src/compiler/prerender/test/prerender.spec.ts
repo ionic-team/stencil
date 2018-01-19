@@ -1,5 +1,5 @@
-import { BuildConfig, PrerenderConfig } from '../../../util/interfaces';
-import { mockFs, mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { Config, PrerenderConfig } from '../../../util/interfaces';
+import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { normalizePrerenderLocation } from '../prerender-utils';
 import { validatePrerenderConfig } from '../validate-prerender-config';
 
@@ -223,7 +223,7 @@ describe('prerender', () => {
 
   });
 
-  var config: BuildConfig;
+  var config: Config;
 
   beforeEach(() => {
     config = {

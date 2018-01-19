@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 import * as util from '../util';
+/* tslint:disable */
 
 
 export default function upgradeJsxProps(transformContext: ts.TransformationContext) {
@@ -64,7 +65,7 @@ function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralEx
   if (!ts.isObjectLiteralExpression(props)) {
     return ts.createNull();
   }
-  let objectProps = util.objectLiteralToObjectMap(<ts.ObjectLiteralExpression>props);
+  const objectProps = util.objectLiteralToObjectMap(<ts.ObjectLiteralExpression>props);
 
   upgradedProps = Object.keys(objectProps).reduce((newProps, propName) => {
     const propValue = objectProps[propName];
@@ -133,7 +134,7 @@ function upgradeProps(props: ts.Expression): ts.NullLiteral | ts.ObjectLiteralEx
     throw e;
   }
 
-  let response = util.objectMapToObjectLiteral(upgradedProps);
+  const response = util.objectMapToObjectLiteral(upgradedProps);
 
   // Looks like someone used the props hack. So we need to create the following code:
   // Object.assign({}, upgradedProps, propHackValue);

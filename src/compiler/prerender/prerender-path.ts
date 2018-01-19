@@ -1,9 +1,9 @@
-import { BuildConfig, BuildContext, HydrateOptions, HydrateResults, PrerenderLocation } from '../../util/interfaces';
+import { Config, CompilerCtx, HydrateOptions, HydrateResults, PrerenderLocation, BuildCtx } from '../../util/interfaces';
 import { catchError } from '../util';
-import { createRenderer } from '../../server/index';
+import { Renderer } from '../../server/index';
 
 
-export async function prerenderPath(config: BuildConfig, ctx: BuildContext, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
+export async function prerenderPath(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
   const timeSpan = config.logger.createTimeSpan(`prerender, started: ${prerenderLocation.path}`);
 
   const results: HydrateResults = {
@@ -23,11 +23,11 @@ export async function prerenderPath(config: BuildConfig, ctx: BuildContext, inde
     hydrateOpts.html = indexSrcHtml;
 
     // create a server-side renderer
-    const renderer = createRenderer(rendererConfig, ctx);
+    const renderer = new Renderer(rendererConfig, compilerCtx);
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html
-    const hydratedResults = await renderer.hydrateToString(hydrateOpts);
+    const hydratedResults = await renderer.hydrate(hydrateOpts);
 
     // hydrating to string is done!!
     // let's use this updated html for the index content now
@@ -35,7 +35,7 @@ export async function prerenderPath(config: BuildConfig, ctx: BuildContext, inde
 
   } catch (e) {
     // ahh man! what happened!
-    catchError(ctx.diagnostics, e);
+    catchError(buildCtx.diagnostics, e);
   }
 
   timeSpan.finish(`prerender, finished: ${prerenderLocation.path}`);

@@ -1,9 +1,9 @@
-import { BuildConfig, Diagnostic, HydrateResults } from '../../util/interfaces';
+import { Config, Diagnostic, HydrateResults } from '../../util/interfaces';
 import { removeUnusedStyles } from './remove-unused-styles';
 import { UsedSelectors } from '../html/used-selectors';
 
 
-export function inlineComponentStyles(config: BuildConfig, doc: Document, styles: string[], results: HydrateResults, diagnostics: Diagnostic[]) {
+export function inlineComponentStyles(config: Config, doc: Document, styles: string[], results: HydrateResults, diagnostics: Diagnostic[]) {
   if (!styles.length) {
     return;
   }

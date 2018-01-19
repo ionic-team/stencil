@@ -1,13 +1,13 @@
-import { BuildConfig, StencilSystem } from '../util/interfaces';
-import * as util from '../util/load-config';
+import { Config, StencilSystem } from '../util/interfaces';
+import { loadConfig as utilLoadConfig } from '../compiler/config/load-config';
 
 
-export function loadConfig(configObj: string | BuildConfig) {
+export function loadConfig(configObj: string | Config) {
   const path = require('path');
   const nodeSys = require(path.join(__dirname, '../sys/node/index.js'));
   const sys: StencilSystem = new nodeSys.NodeSystem();
 
-  const config = util.loadConfig(sys, configObj);
+  const config = utilLoadConfig(sys, configObj);
   config.logger = new nodeSys.NodeLogger();
   return config;
 }

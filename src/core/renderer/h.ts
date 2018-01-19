@@ -30,9 +30,9 @@ export interface FunctionalComponent<PropsType> {
 export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, child?: ChildType): VNode;
 export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, ...children: ChildType[]): VNode;
 export function h(nodeName: any, vnodeData: any, child?: any) {
-  var children: any[];
-  var lastSimple = false;
-  var simple = false;
+  let children: any[];
+  let lastSimple = false;
+  let simple = false;
 
   for (var i = arguments.length; i-- > 2; ) {
     stack.push(arguments[i]);

@@ -1,6 +1,4 @@
-import { dashToPascalCase } from '../../../util/helpers';
 import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
-import { StyleMeta, BuildConfig } from '../../../util/interfaces';
 import * as ts from 'typescript';
 
 
@@ -79,7 +77,7 @@ export function objectLiteralToObjectMap(objectLiteral: ts.ObjectLiteralExpressi
 
 export function objectMapToObjectLiteral(objMap: any): ts.ObjectLiteralExpression {
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(objMap).map((key: string): ts.ObjectLiteralElementLike => {
-    let value = objMap[key];
+    const value = objMap[key];
 
     if (!ts.isIdentifier(value) && isInstanceOfObjectMap(value)) {
       return ts.createPropertyAssignment(ts.createLiteral(key), objectMapToObjectLiteral(value));
@@ -146,7 +144,7 @@ function arrayToArrayLiteral(list: any[]): ts.ArrayLiteralExpression {
  * @param transformers Array of transforms to run agains the source string
  * @returns a string
  */
-export function transformSourceString(fileName: string, sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
+export async function transformSourceString(fileName: string, sourceText: string, transformers: ts.TransformerFactory<ts.SourceFile>[]) {
   const transformed = ts.transform(ts.createSourceFile(fileName, sourceText, ts.ScriptTarget.ES2015), transformers);
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed }, {
       onEmitNode: transformed.emitNodeWithNotification,
@@ -154,6 +152,7 @@ export function transformSourceString(fileName: string, sourceText: string, tran
   });
   const result = printer.printBundle(ts.createBundle(transformed.transformed));
   transformed.dispose();
+
   return result;
 }
 
@@ -170,26 +169,4 @@ export function transformSourceFile(sourceText: string, transformers: ts.CustomT
       target: ts.ScriptTarget.ES2017
     })
   }).outputText;
-}
-
-export function createImportNameFromUrl(config: BuildConfig, importUrl: string) {
-  const ext = config.sys.path.extname(importUrl);
-  const baseName = config.sys.path.basename(importUrl, ext);
-
-  return dashToPascalCase(baseName);
-}
-
-export interface StyleImport {
-  importName: string;
-  absolutePath: string;
-}
-
-export function getImportNameMapFromStyleMeta(config: BuildConfig, styleMeta: StyleMeta): StyleImport[] {
-  return styleMeta.absolutePaths.map((ocp) => {
-    const importName = createImportNameFromUrl(config, ocp) + 'Css';
-    return {
-      importName,
-      absolutePath: ocp,
-    };
-  });
 }

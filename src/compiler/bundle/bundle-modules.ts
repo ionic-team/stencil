@@ -1,25 +1,16 @@
-import { BuildConfig, BuildContext, Bundle, JSModuleMap } from '../../util/interfaces';
-import { catchError, hasError } from '../util';
+import { Config, BuildCtx, CompilerCtx, Bundle, JSModuleMap } from '../../util/interfaces';
+import { catchError } from '../util';
 import { writeEsModules, writeLegacyModules, createBundle, } from './rollup-bundle';
 
 
-export async function bundleModules(config: BuildConfig, ctx: BuildContext, bundles: Bundle[]): Promise<JSModuleMap> {
-  // create main module results object
-  if (hasError(ctx.diagnostics)) {
-    return {};
-  }
-
-  // do bundling if this is not a change build
-  // or it's a change build that has either changed modules or components
-  const doBundling = (!ctx.isChangeBuild || ctx.changeHasComponentModules || ctx.changeHasNonComponentModules);
-  const timeSpan = config.logger.createTimeSpan(`bundle modules started`, !doBundling);
+export async function generateBundleModule(config: Config, contextCtx: CompilerCtx, ctx: BuildCtx, bundles: Bundle[]): Promise<JSModuleMap> {
 
   let results: JSModuleMap = {};
 
   try {
     // run rollup, but don't generate yet
     // returned rollup bundle can be reused for es module and legacy
-    const rollupBundle = await createBundle(config, ctx, bundles);
+    const rollupBundle = await createBundle(config, contextCtx, ctx, bundles);
 
     // bundle using only es modules and dynamic imports
     results.esm = await writeEsModules(config, rollupBundle);
@@ -34,6 +25,5 @@ export async function bundleModules(config: BuildConfig, ctx: BuildContext, bund
     catchError(ctx.diagnostics, err);
   }
 
-  timeSpan.finish('bundle modules finished');
   return results;
 }

@@ -1,30 +1,24 @@
-import { BuildConfig, BuildContext, Diagnostic } from '../../util/interfaces';
+import { BuildCtx, Config, CompilerCtx } from '../../util/interfaces';
 import { catchError } from '../util';
 
 
-export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostics: Diagnostic[]) {
+export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   // if there isn't an index.html yet
   // let's generate a slim one quick so that
   // on the first build the user sees a loading indicator
   // this is synchronous on purpose so that it's saved
   // before the dev server fires up and loads the index.html page
 
-  if (ctx.isRebuild) {
-    // if this is a rebuild then don't bother
-    // we've already done this
+  if (!config.generateWWW || compilerCtx.isRebuild) {
+    // don't bother doing this again on rebuilds
     return true;
   }
 
-  try {
-    // check if there's even a src index.html file
-    config.sys.fs.accessSync(config.srcIndexHtml);
-    ctx.hasIndexHtml = true;
-
-  } catch (e) {
+  // check if there's even a src index.html file
+  if (!compilerCtx.fs.accessSync(config.srcIndexHtml)) {
     // there is no src index.html file in the config, which is fine
     // since there is no src index file at all, don't bother
     // this isn't actually an error, don't worry about it
-    ctx.hasIndexHtml = false;
     return true;
   }
 
@@ -32,11 +26,11 @@ export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostic
     // ok, so we haven't written an index.html build file yet
     // and we do know they have a src one, so let's write a
     // filler index.html file that shows while the first build is happening
-    config.sys.ensureDirSync(config.wwwDir);
-    config.sys.fs.writeFileSync(config.wwwIndexHtml, FILLER_INDEX_BUILD);
+    await compilerCtx.fs.writeFile(config.wwwIndexHtml, FILLER_INDEX_BUILD);
+    compilerCtx.fs.commit();
 
   } catch (e) {
-    catchError(diagnostics, e);
+    catchError(buildCtx.diagnostics, e);
 
     // darn, actual error here, idk
     return false;
@@ -45,6 +39,7 @@ export function initIndexHtml(config: BuildConfig, ctx: BuildContext, diagnostic
   // successful, let's continue with the build
   return true;
 }
+
 
 const FILLER_INDEX_BUILD = `
 <!DOCTYPE html>

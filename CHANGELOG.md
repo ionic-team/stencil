@@ -1,3 +1,58 @@
+<a name="0.1.6"></a>
+## [0.1.6](https://github.com/ionic-team/stencil/compare/v0.1.5...v0.1.6) (2018-01-18)
+
+
+### Bug Fixes
+
+* **loader:** detect dynamic import ([e4e2dc2](https://github.com/ionic-team/stencil/commit/e4e2dc2))
+* **service-worker:** correct checks for service worker in dev mode ([9a3cce3](https://github.com/ionic-team/stencil/commit/9a3cce3))
+* **service-worker:** workaround for a bug in workbox ([3bb761d](https://github.com/ionic-team/stencil/commit/3bb761d))
+* **serviceworker:** Compiler prevents use of service worker in dev mode when forced ([#423](https://github.com/ionic-team/stencil/issues/423)) ([0704d05](https://github.com/ionic-team/stencil/commit/0704d05))
+* **svg:** html after a svg node fails to render ([7ffb4ef](https://github.com/ionic-team/stencil/commit/7ffb4ef)), closes [#375](https://github.com/ionic-team/stencil/issues/375)
+
+
+
+<a name="0.1.5"></a>
+## [0.1.5](https://github.com/ionic-team/stencil/compare/v0.1.4...v0.1.5) (2018-01-16)
+
+
+### Bug Fixes
+
+* **events:** Event() options ([e1662a5](https://github.com/ionic-team/stencil/commit/e1662a5)), closes [#406](https://github.com/ionic-team/stencil/issues/406)
+* **listeners:** addListenerEvent() options check ([1275327](https://github.com/ionic-team/stencil/commit/1275327))
+
+
+### Features
+
+* **listeners:** enableListener accepts passive option ([1275327](https://github.com/ionic-team/stencil/commit/1275327))
+
+
+### Performance Improvements
+
+* **sw:** serviceWorker script is minified ([76bcc52](https://github.com/ionic-team/stencil/commit/76bcc52))
+
+
+
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/ionic-team/stencil/compare/v0.1.3...v0.1.4) (2018-01-12)
+
+
+### Bug Fixes
+
+* ensure node env vars are replaced with rollup plugin. ([688fc88](https://github.com/ionic-team/stencil/commit/688fc88))
+
+
+
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/ionic-team/stencil/compare/v0.1.2...v0.1.3) (2018-01-11)
+
+
+### Bug Fixes
+
+* **styles:** styles applied in browsers using the legacy client ([d6bc15e](https://github.com/ionic-team/stencil/commit/d6bc15e))
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/ionic-team/stencil/compare/v0.1.1...v0.1.2) (2018-01-09)
 

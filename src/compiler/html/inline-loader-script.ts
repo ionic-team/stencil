@@ -1,8 +1,8 @@
-import { BuildConfig, BuildContext, HydrateResults } from '../../util/interfaces';
+import { Config, CompilerCtx, HydrateResults } from '../../util/interfaces';
 import { getLoaderFileName, getLoaderWWW } from '../app/app-file-naming';
 
 
-export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document, results: HydrateResults) {
+export async function inlineLoaderScript(config: Config, ctx: CompilerCtx, doc: Document, results: HydrateResults) {
   // create the script url we'll be looking for
   let loaderExternalSrcUrl = config.publicPath;
   if (loaderExternalSrcUrl.charAt(loaderExternalSrcUrl.length - 1) !== '/') {
@@ -19,7 +19,7 @@ export function inlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: 
 
   if (scriptElm) {
     // append the loader script content to the bottom of <body>
-    relocateInlineLoaderScript(config, ctx, doc, results, scriptElm);
+    await relocateInlineLoaderScript(config, ctx, doc, results, scriptElm);
   }
 }
 
@@ -41,24 +41,18 @@ function findExternalLoaderScript(doc: Document, loaderExternalSrcUrl: string) {
 }
 
 
-function relocateInlineLoaderScript(config: BuildConfig, ctx: BuildContext, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
+async function relocateInlineLoaderScript(config: Config, ctx: CompilerCtx, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
   // get the file path
   const appLoaderWWW = getLoaderWWW(config);
 
   // get the loader content
-  let content = ctx.appFiles[appLoaderWWW];
-  if (!content) {
-    // didn't find a cached version
-    try {
-      // let's look it up directly
-      content = config.sys.fs.readFileSync(appLoaderWWW, 'utf-8');
+  let content: string = null;
+  try {
+    // let's look it up directly
+    content = await ctx.fs.readFile(appLoaderWWW);
 
-      // cool we found content, let's cache it for later
-      ctx.appFiles[appLoaderWWW] = content;
-
-    } catch (e) {
-      config.logger.debug(`unable to inline loader: ${appLoaderWWW}`, e);
-    }
+  } catch (e) {
+    config.logger.debug(`unable to inline loader: ${appLoaderWWW}`, e);
   }
 
   if (!content) {

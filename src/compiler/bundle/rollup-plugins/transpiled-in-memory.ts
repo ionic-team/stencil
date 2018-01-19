@@ -1,7 +1,7 @@
-import { BuildConfig, BuildContext, FilesMap } from '../../../util/interfaces';
-import { normalizePath, readFile } from '../../util';
+import { Config, CompilerCtx, FilesMap } from '../../../util/interfaces';
+import { normalizePath } from '../../util';
 
-export default function transpiledInMemoryPlugin(config: BuildConfig, ctx: BuildContext) {
+export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCtx) {
   const sys = config.sys;
   const assetsCache: FilesMap = {};
 
@@ -54,7 +54,7 @@ export default function transpiledInMemoryPlugin(config: BuildConfig, ctx: Build
               // ok, we've got a potential absolute path where the file "could" be
               try {
                 // let's see if it actually exists, but with readFileSync :(
-                assetsCache[assetsFilePath] = sys.fs.readFileSync(assetsFilePath, 'utf-8');
+                assetsCache[assetsFilePath] = ctx.fs.readFileSync(assetsFilePath);
                 if (typeof assetsCache[assetsFilePath] === 'string') {
                   return assetsFilePath;
                 }
@@ -72,24 +72,12 @@ export default function transpiledInMemoryPlugin(config: BuildConfig, ctx: Build
     async load(sourcePath: string) {
       sourcePath = normalizePath(sourcePath);
 
-      if (typeof ctx.jsFiles[sourcePath] === 'string') {
-        // perfect, we already got this js file cached
-        return ctx.jsFiles[sourcePath];
-      }
-
       if (typeof assetsCache[sourcePath] === 'string') {
         // awesome, this is one of the cached asset file we already read in resolveId
         return assetsCache[sourcePath];
       }
 
-      // ok so it's not in one of our caches, so let's look it up directly
-      const jsText = await readFile(sys, sourcePath);
-      ctx.moduleFiles[sourcePath] = {
-        jsFilePath: sourcePath,
-      };
-      ctx.jsFiles[sourcePath] = jsText;
-
-      return jsText;
+      return ctx.fs.readFile(sourcePath);
     }
   };
 }

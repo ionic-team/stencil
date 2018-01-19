@@ -3,7 +3,7 @@ import { ENCAPSULATION, DEFAULT_STYLE_MODE } from '../../../util/constants';
 import { getDeclarationParameters, serializeSymbol, isDecoratorNamed } from './utils';
 import * as ts from 'typescript';
 
-export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
+export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
   let cmpMeta: ComponentMeta = {};
   let symbol = checker.getSymbolAtLocation(node.name);
 
@@ -40,19 +40,22 @@ export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.Cla
   cmpMeta.stylesMeta = {};
 
   // styles: 'div { padding: 10px }'
-  if (typeof componentOptions.styles === 'string' && componentOptions.styles.trim().length) {
-    cmpMeta.stylesMeta = {
-      [DEFAULT_STYLE_MODE]: {
-        styleStr: componentOptions.styles.trim()
-      }
-    };
+  if (typeof componentOptions.styles === 'string') {
+    componentOptions.styles = componentOptions.styles.trim();
+    if (componentOptions.styles.length > 0) {
+      cmpMeta.stylesMeta = {
+        [DEFAULT_STYLE_MODE]: {
+          styleStr: componentOptions.styles
+        }
+      };
+    }
   }
 
   // styleUrl: 'my-styles.scss'
   if (typeof componentOptions.styleUrl === 'string' && componentOptions.styleUrl.trim()) {
     cmpMeta.stylesMeta = {
       [DEFAULT_STYLE_MODE]: {
-        originalComponentPaths: [componentOptions.styleUrl]
+        originalComponentPaths: [componentOptions.styleUrl.trim()]
       }
     };
 
@@ -60,7 +63,7 @@ export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.Cla
   } else if (Array.isArray(componentOptions.styleUrls)) {
     cmpMeta.stylesMeta = {
       [DEFAULT_STYLE_MODE]: {
-        originalComponentPaths: componentOptions.styleUrls
+        originalComponentPaths: componentOptions.styleUrls.map(s => s.trim())
       }
     };
 
@@ -80,7 +83,6 @@ export function getComponentDecoratorMeta (checker: ts.TypeChecker, node: ts.Cla
       return stylesMeta;
     }, cmpMeta.stylesMeta);
   }
-
 
   cmpMeta.assetsDirsMeta = [];
 

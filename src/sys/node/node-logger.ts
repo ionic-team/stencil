@@ -321,6 +321,8 @@ class CmdTimeSpan {
   }
 
   finish(msg: string, color?: 'red', bold?: boolean, newLineSuffix?: boolean) {
+    const duration = this.duration();
+
     if (color) {
       msg = this.logger.color(msg, color);
     }
@@ -328,7 +330,7 @@ class CmdTimeSpan {
       msg = this.logger.bold(msg);
     }
 
-    msg += ' ' + this.logger.dim(this.timeSuffix());
+    msg += ' ' + this.logger.dim(this.timeSuffix(duration));
 
     if (this.debug) {
       this.logger.debug(msg);
@@ -341,8 +343,11 @@ class CmdTimeSpan {
     }
   }
 
-  private timeSuffix() {
-    const duration = Date.now() - this.start;
+  private duration() {
+    return Date.now() - this.start;
+  }
+
+  private timeSuffix(duration: number) {
     let time: string;
 
     if (duration > 1000) {

@@ -35,7 +35,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   Context.publicPath = publicPath;
 
   if (Build.listener) {
-    Context.enableListener = (instance, eventName, enabled, attachTo) => enableEventListener(plt, instance, eventName, enabled, attachTo);
+    Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
   }
 
   if (Build.event) {
@@ -78,11 +78,9 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   // this will fire when all components have finished loaded
   rootElm.$initLoad = () => rootElm._hasLoaded = true;
 
-  if (Build.ssrClientSide) {
-    // if the HTML was generated from SSR
-    // then let's walk the tree and generate vnodes out of the data
-    createVNodesFromSsr(domApi, rootElm);
-  }
+  // if the HTML was generated from SSR
+  // then let's walk the tree and generate vnodes out of the data
+  createVNodesFromSsr(domApi, rootElm);
 
   function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property
@@ -127,7 +125,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
         // at this point the membersMeta only includes attributes which should
         // be observed, it does not include all props yet, so it's safe to
         // loop through all of the props (attrs) and observed them
-        for (var propName in cmpMeta.membersMeta) {
+        for (const propName in cmpMeta.membersMeta) {
           // initialize the actual attribute name used vs. the prop name
           // for example, "myProp" would be "my-prop" as an attribute
           // and these can be configured to be all lower case or dash case (default)

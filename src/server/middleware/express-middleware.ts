@@ -1,6 +1,6 @@
-import { BuildConfig } from '../../util/interfaces';
-import { createRenderer } from '../renderer';
-import { loadConfig } from '../../util/load-config';
+import { Config } from '../../util/interfaces';
+import { loadConfig } from '../../compiler/config/load-config';
+import { Renderer } from '../renderer';
 
 
 export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
@@ -10,12 +10,12 @@ export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
   const config = loadConfig(nodeSys.sys, middlewareConfig.config);
 
   // create the renderer
-  const renderer = createRenderer(config);
+  const renderer = new Renderer(config);
 
   let srcIndexHtml: string;
   try {
     // load the source index.html
-    srcIndexHtml = config.sys.fs.readFileSync(config.srcIndexHtml, 'utf-8');
+    srcIndexHtml = renderer.fs.readFileSync(config.srcIndexHtml);
 
   } catch (e) {
     config.logger.error(`ssrMiddleware, error loading srcIndexHtml: ${e}`);
@@ -27,7 +27,7 @@ export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
     config.logger.debug(`ssr request: ${req.url}`);
 
     // hydrate level 4, please!
-    renderer.hydrateToString({
+    renderer.hydrate({
       html: srcIndexHtml,
       req: req
     }).then(results => {
@@ -61,5 +61,5 @@ export const ssrPathRegex = /^([^.+]|.html)*(\?.*)?$/i;
 
 
 export interface MiddlewareConfig {
-  config: string | BuildConfig;
+  config: string | Config;
 }

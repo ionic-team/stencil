@@ -1,9 +1,14 @@
-import { BuildConfig, BuildContext, ServiceWorkerConfig } from '../../util/interfaces';
-import { catchError } from '../util';
+import { BuildCtx, Config, CompilerCtx, ServiceWorkerConfig } from '../../util/interfaces';
+import { buildWarn, catchError } from '../util';
 
 
-export async function generateServiceWorker(config: BuildConfig, ctx: BuildContext) {
-  if (!ctx.hasIndexHtml || !config.generateWWW) {
+export async function generateServiceWorker(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+  if (!config.generateWWW) {
+    config.logger.debug(`generateServiceWorker, not generating www`);
+    return;
+  }
+
+  if (await !compilerCtx.fs.access(config.srcIndexHtml)) {
     config.logger.debug(`generateServiceWorker, no index.html, so skipping sw build`);
     return;
   }
@@ -14,28 +19,30 @@ export async function generateServiceWorker(config: BuildConfig, ctx: BuildConte
   }
 
   if (hasSrcConfig(config)) {
-    copyLib(config, ctx);
-    await injectManifest(config, ctx);
+    copyLib(config, buildCtx);
+    await injectManifest(config, buildCtx);
 
   } else {
-    await generateSW(config, ctx);
+    await generateSW(config, buildCtx);
   }
 }
 
-async function copyLib(config: BuildConfig, ctx: BuildContext) {
+async function copyLib(config: Config, buildCtx: BuildCtx) {
   const timeSpan = config.logger.createTimeSpan(`copy service worker library started`, true);
 
   try {
     await config.sys.workbox.copyWorkboxLibraries(config.wwwDir);
 
   } catch (e) {
-    catchError(ctx.diagnostics, e);
+    // workaround for workbox issue in the latest alpha
+    const d = buildWarn(buildCtx.diagnostics);
+    d.messageText = 'Service worker library already exists';
   }
 
   timeSpan.finish(`copy service worker library finished`);
 }
 
-async function generateSW(config: BuildConfig, ctx: BuildContext) {
+async function generateSW(config: Config, buildCtx: BuildCtx) {
   const timeSpan = config.logger.createTimeSpan(`generate service worker started`);
 
   try {
@@ -43,11 +50,11 @@ async function generateSW(config: BuildConfig, ctx: BuildContext) {
     timeSpan.finish(`generate service worker finished`);
 
   } catch (e) {
-    catchError(ctx.diagnostics, e);
+    catchError(buildCtx.diagnostics, e);
   }
 }
 
-async function injectManifest(config: BuildConfig, ctx: BuildContext) {
+async function injectManifest(config: Config, buildCtx: BuildCtx) {
   const timeSpan = config.logger.createTimeSpan(`inject manifest into service worker started`);
 
   try {
@@ -55,11 +62,11 @@ async function injectManifest(config: BuildConfig, ctx: BuildContext) {
     timeSpan.finish('inject manifest into service worker finished');
 
   } catch (e) {
-    catchError(ctx.diagnostics, e);
+    catchError(buildCtx.diagnostics, e);
   }
 }
 
-function hasSrcConfig(config: BuildConfig) {
+function hasSrcConfig(config: Config) {
   const serviceWorkerConfig = config.serviceWorker as ServiceWorkerConfig;
   return !!serviceWorkerConfig.swSrc;
 }

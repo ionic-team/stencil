@@ -17,4 +17,4 @@ export const dashToPascalCase = (str: string) => toLowerCase(str).split('-').map
 
 export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.substr(1);
 
-export const noop = (): any => {};
+export const noop = (): any => { /* noop*/ };

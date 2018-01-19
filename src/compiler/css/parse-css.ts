@@ -5,7 +5,7 @@
  * Licensed under the MIT License
  * https://github.com/reworkcss/css/blob/master/LICENSE
  */
-import { BuildConfig, Diagnostic, PrintLine } from '../../util/interfaces';
+import { Config, Diagnostic, PrintLine } from '../../util/interfaces';
 import { formatHeader } from '../../util/logger/logger-util';
 
 // http://www.w3.org/TR/CSS21/grammar.html
@@ -13,7 +13,7 @@ import { formatHeader } from '../../util/logger/logger-util';
 var commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
 
-export function parseCss(config: BuildConfig, css: string, filePath?: string): {
+export function parseCss(config: Config, css: string, filePath?: string): {
   type: string;
   stylesheet: {
     source: string;
@@ -48,7 +48,7 @@ export function parseCss(config: BuildConfig, css: string, filePath?: string): {
   function position(): any {
     var start = { line: lineno, column: column };
 
-    return function(node: any){
+    return function(node: any) {
       node.position = new ParsePosition(start);
       whitespace();
       return node;
