@@ -1,6 +1,6 @@
-import { AssetsMeta, BuildCtx, Config, CompilerCtx, ManifestBundle, BundleData,
-  ComponentMeta, ComponentData, EventData, Manifest, ManifestData, ModuleFile, ListenerData,
-  ListenMeta, PropData, StyleData, StyleMeta } from '../../util/interfaces';
+import { AssetsMeta, BuildCtx, BundleData, CompilerCtx, ComponentData, ComponentMeta, Config,
+  EventData, ListenMeta, ListenerData, Manifest, ManifestBundle, ManifestData, ModuleFile,
+  PropData, StyleData, StyleMeta } from '../../util/interfaces';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
@@ -74,7 +74,7 @@ export function serializeAppManifest(config: Config, manifestDir: string, manife
 }
 
 
-export function parseDependentManifest(config: Config, collectionName: string, manifestDir: string, manifestJson: string) {
+export function parseDependentManifest(config: Config, collectionName: string, includeBundledOnly: boolean, manifestDir: string, manifestJson: string) {
   const manifestData: ManifestData = JSON.parse(manifestJson);
   const manifest: Manifest = {
     manifestName: collectionName,
@@ -85,20 +85,26 @@ export function parseDependentManifest(config: Config, collectionName: string, m
     }
   };
 
-  parseComponents(config, manifestDir, manifestData, manifest);
-  parseBundles(manifestData, manifest);
+  parseComponents(config, includeBundledOnly, manifestDir, manifestData, manifest);
+  parseBundles(includeBundledOnly, manifestData, manifest);
   parseGlobal(config, manifestDir, manifestData, manifest);
 
   return manifest;
 }
 
 
-function parseComponents(config: Config, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
-  const componentsData = manifestData.components;
+export function parseComponents(config: Config, includeBundledOnly: boolean, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
+  let componentsData = manifestData.components;
 
   if (!componentsData || !Array.isArray(componentsData)) {
     manifest.modulesFiles = [];
     return;
+  }
+
+  if (includeBundledOnly) {
+    componentsData = componentsData.filter(cmpData => {
+      return config.bundles.some(configBundle => configBundle.components.includes(cmpData.tag));
+    });
   }
 
   manifest.modulesFiles = componentsData.map(cmpData => {
@@ -217,6 +223,9 @@ function serializeComponentPath(config: Config, manifestDir: string, moduleFile:
 function parseModuleJsFilePath(config: Config, manifestDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
   // convert the path that's relative to the manifest file
   // into an absolute path to the component's js file path
+  if (typeof cmpData.componentPath !== 'string') {
+    throw new Error(`parseModuleJsFilePath, "componentPath" missing on cmpData: ${cmpData.tag}`);
+  }
   moduleFile.jsFilePath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
 
   // remember the original component path from its collection
@@ -828,8 +837,12 @@ export function serializeBundles(manifestData: ManifestData, manifest: Manifest)
 }
 
 
-export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
+export function parseBundles(includeBundledOnly: boolean, manifestData: ManifestData, manifest: Manifest) {
   manifest.bundles = [];
+
+  if (includeBundledOnly) {
+    return;
+  }
 
   if (invalidArrayData(manifestData.bundles)) {
     return;
@@ -844,7 +857,9 @@ export function parseBundles(manifestData: ManifestData, manifest: Manifest) {
       components: bundleData.components.sort()
     };
 
-    manifest.bundles.push(manifestBundle);
+    if (manifestBundle.components.length > 0) {
+      manifest.bundles.push(manifestBundle);
+    }
   });
 }
 

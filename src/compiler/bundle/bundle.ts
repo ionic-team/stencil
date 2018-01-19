@@ -20,7 +20,11 @@ export async function bundleModules(config: Config, compilerCtx: CompilerCtx, bu
 
   try {
     // get all of the bundles from the manifest bundles
-    bundles = getBundlesFromManifest(buildCtx.manifest.modulesFiles, buildCtx.manifest.bundles, buildCtx.diagnostics);
+    bundles = getBundlesFromManifest(
+      buildCtx.manifest.modulesFiles,
+      buildCtx.manifest.bundles,
+      buildCtx.diagnostics
+    );
 
     // Look at all dependent components from outside collections and
     // upgrade the components to be compatible with this version if need be

@@ -169,10 +169,10 @@ export interface ComponentConstructorEvent {
 
 export interface EventMeta {
   eventName: string;
-  eventMethodName: string;
-  eventBubbles: boolean;
-  eventCancelable: boolean;
-  eventComposed: boolean;
+  eventMethodName?: string;
+  eventBubbles?: boolean;
+  eventCancelable?: boolean;
+  eventComposed?: boolean;
   jsdoc?: JSDoc;
 }
 

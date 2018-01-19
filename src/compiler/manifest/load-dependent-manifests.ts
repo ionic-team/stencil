@@ -1,9 +1,9 @@
 import { COLLECTION_DEPENDENCIES_DIR, parseDependentManifest } from './manifest-data';
-import { CompilerCtx, Config, DependentCollection, Manifest, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { CompilerCtx, Config, DependentCollection, Manifest, ModuleFile } from '../../util/interfaces';
 import { normalizePath } from '../util';
 
 
-export function loadDependentManifests(config: Config, ctx: CompilerCtx) {
+export function loadDependentManifests(config: Config, ctx: CompilerCtx): Promise<Manifest[]> {
   // load up all of the collections which this app is dependent on
   return Promise.all(config.collections.map(configCollection => {
     return loadDependentManifest(config, ctx, configCollection);
@@ -45,12 +45,15 @@ async function loadDependentManifest(config: Config, compilerCtx: CompilerCtx, d
   const dependentManifestDir = normalizePath(config.sys.path.dirname(dependentManifestFilePath));
 
   // parse the json string into our Manifest data
-  const dependentManifest = parseDependentManifest(config, dependentCollection.name, dependentManifestDir, dependentManifestJson);
+  const dependentManifest = parseDependentManifest(
+    config,
+    dependentCollection.name,
+    dependentCollection.includeBundledOnly,
+    dependentManifestDir,
+    dependentManifestJson
+  );
 
   await copySourceCollectionComponentsToDistribution(config, compilerCtx, dependentManifest.modulesFiles);
-
-  // go through and filter out components if need be
-  filterDependentComponents(config.bundles, dependentCollection, dependentManifest);
 
   // cache it for later yo
   compilerCtx.dependentManifests[dependentCollection.name] = dependentManifest;
@@ -77,18 +80,4 @@ async function copySourceCollectionComponentsToDistribution(config: Config, comp
 
   await Promise.all(copyPromises);
   await compilerCtx.fs.commitCopy();
-}
-
-
-export function filterDependentComponents(manifetBundles: ManifestBundle[], dependentCollection: DependentCollection, dependentManifest: Manifest) {
-  if (dependentCollection.includeBundledOnly) {
-    // what was imported included every component this collection has
-    // however, the user only want to include specific components
-    // which are seen within the user's own bundles
-    // loop through this manifest an take out components which are not
-    // seen in the user's list of bundled components
-    dependentManifest.modulesFiles = dependentManifest.modulesFiles.filter(modulesFile => {
-      return manifetBundles.some(b => b.components.indexOf(modulesFile.cmpMeta.tagNameMeta) > -1);
-    });
-  }
 }
