@@ -1,7 +1,3 @@
-/**
- * Build Server
- */
-
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
@@ -15,8 +11,6 @@ const DEST_FILE = path.join(DEST_DIR, 'index.js');
 
 
 function bundleCompiler() {
-  console.log('bundling server...');
-
   rollup.rollup({
     input: ENTRY_FILE,
     external: [
@@ -46,8 +40,9 @@ function bundleCompiler() {
       format: 'cjs',
       file: DEST_FILE
 
-    }).then(() => {
-      console.log(`bundled server: ${DEST_FILE}`);
+    }).catch(err => {
+      console.log(`build server error: ${err}`);
+      process.exit(1);
     });
 
   });
@@ -59,4 +54,5 @@ bundleCompiler();
 
 process.on('exit', (code) => {
   fs.removeSync(TRANSPILED_DIR);
+  console.log(`✅ server: ${DEST_FILE}`);
 });

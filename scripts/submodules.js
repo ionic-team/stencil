@@ -9,7 +9,6 @@ const ROOT_DIR = path.join(__dirname, '../');
 const SUBMODULES = [
   'compiler',
   'server',
-  'sys/browser',
   'sys/node',
   'testing'
 ];
@@ -19,7 +18,7 @@ function createSubmodule(submoduleName) {
   const submoduleDir = path.join(ROOT_DIR, submoduleName);
 
   fs.emptyDirSync(submoduleDir);
-  fs.copy(srcPackagesDir, submoduleDir)
+  fs.copySync(srcPackagesDir, submoduleDir)
 }
 
 // create submodules for npm dist

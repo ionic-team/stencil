@@ -7,5 +7,7 @@ const cleanDirs = [
 ];
 
 cleanDirs.forEach(dir => {
-  fs.removeSync(path.join(__dirname, '../', dir));
+  const cleanDir = path.join(__dirname, '../', dir);
+  fs.removeSync(cleanDir);
+  console.log(`✅ clean: ${cleanDir}`);
 });

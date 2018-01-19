@@ -29,15 +29,11 @@ function bundle(entryFileName) {
   }, (err) => {
     if (err) {
       console.error(err);
-    } else {
-      console.log('bundle sys.node dep:', entryFileName);
     }
   });
 }
 
 function bundleSysNode() {
-  console.log('bundling sys.node...');
-
   rollup.rollup({
     input: ENTRY_FILE,
     external: [
@@ -59,10 +55,10 @@ function bundleSysNode() {
       format: 'cjs',
       file: DEST_FILE
 
-    }).then(() => {
-      console.log(`bundled sys.node: ${DEST_FILE}`);
+    }).catch(err => {
+      console.log(`build sys.node error: ${err}`);
+      process.exit(1);
     });
-
   });
 }
 
@@ -70,4 +66,5 @@ bundleSysNode();
 
 process.on('exit', (code) => {
   fs.removeSync(TRANSPILED_DIR);
+  console.log(`✅ sys.node: ${DEST_FILE}`);
 });

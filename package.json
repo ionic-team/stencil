@@ -22,7 +22,6 @@
     "build.core": "tsc -p src/tsconfig.json && node scripts/build-loader.js && node scripts/build-core.js",
     "build.loader": "node scripts/build-loader.js",
     "build.server": "tsc -p src/server/tsconfig.json && node scripts/build-server.js",
-    "build.sys.browser": "tsc -p src/sys/browser/tsconfig.json && node scripts/build-sys-browser.js",
     "build.sys.node": "tsc -p src/sys/node/tsconfig.json && node scripts/build-sys-node.js",
     "build.testing": "tsc -p src/testing/tsconfig.json && node scripts/build-testing.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
