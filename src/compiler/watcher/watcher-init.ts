@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config } from '../../util/interfaces';
 import { normalizePath } from '../util';
 import { WatcherListener } from './watcher-listener';
 

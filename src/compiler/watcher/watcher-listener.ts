@@ -1,8 +1,8 @@
-import { BuildCtx, Config, CompilerCtx, WatcherResults } from '../../util/interfaces';
-import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
-import { isWebDevFile, normalizePath, isDtsFile } from '../util';
-import { rebuild, configFileReload } from './rebuild';
+import { BuildCtx, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
 import { COMPONENTS_DTS } from '../build/distribution';
+import { configFileReload, rebuild } from './rebuild';
+import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
+import { isDtsFile, isWebDevFile, normalizePath } from '../util';
 
 
 export class WatcherListener {

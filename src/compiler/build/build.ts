@@ -2,6 +2,7 @@ import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/in
 import { bundleModules } from '../bundle/bundle';
 import { catchError, getCompilerCtx } from '../util';
 import { copyTasks } from '../copy/copy-tasks';
+import { emptyDestDir, writeBuildFiles } from './write-build';
 import { getBuildContext } from './build-utils';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateAppManifest } from '../manifest/generate-manifest';
@@ -10,10 +11,8 @@ import { generateIndexHtml } from '../html/generate-index-html';
 import { generateReadmes } from '../docs/generate-readmes';
 import { generateStyles } from '../style/style';
 import { initIndexHtml } from '../html/init-index-html';
-import { initWatcher } from '../watcher/watcher-init';
 import { prerenderApp } from '../prerender/prerender-app';
 import { transpileScanSrc } from '../transpile/transpile-scan-src';
-import { writeBuildFiles, emptyDestDir } from './write-build';
 
 
 export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?: WatcherResults): Promise<BuildResults> {
@@ -95,9 +94,6 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     // write all the files and copy asset files
     await writeBuildFiles(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
-
-    // setup watcher if need be
-    initWatcher(config, compilerCtx, buildCtx);
 
   } catch (e) {
     // ¯\_(ツ)_/¯

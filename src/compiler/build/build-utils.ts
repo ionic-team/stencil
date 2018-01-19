@@ -1,6 +1,7 @@
 import { BuildCtx, BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
+import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { hasError } from '../util';
+import { initWatcher } from '../watcher/watcher-init';
 
 
 export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watcher: WatcherResults) {
@@ -45,6 +46,13 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
   };
 
   buildCtx.finish = () => {
+    try {
+      // setup watcher if need be
+      initWatcher(config, compilerCtx, buildCtx);
+    } catch (e) {
+      catchError(buildCtx.diagnostics, e);
+    }
+
     return finishBuild(config, compilerCtx, buildCtx);
   };
 
