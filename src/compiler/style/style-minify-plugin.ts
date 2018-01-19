@@ -1,4 +1,4 @@
-import * as d from '../../declarations/public';
+import * as d from '../../declarations/index';
 
 
 export class StyleMinifyPlugin implements d.Plugin {

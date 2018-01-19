@@ -1,4 +1,4 @@
-import * as d from '../../declarations/public';
+import * as d from '../../declarations/index';
 const nodeSass = require('node-sass');
 
 
