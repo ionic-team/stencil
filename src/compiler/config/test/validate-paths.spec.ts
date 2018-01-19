@@ -120,6 +120,20 @@ describe('validatePaths', () => {
     expect(path.isAbsolute(config.globalScript)).toBe(true);
   });
 
+  it('should handle absolute paths on re-validate', () => {
+    config.globalStyle = 'src/global/styles1.css' as any;
+    validateBuildConfig(config);
+    expect(path.basename(config.globalStyle[0])).toBe('styles1.css');
+    expect(path.isAbsolute(config.globalStyle[0])).toBe(true);
+
+    const orgPath = config.globalStyle[0];
+
+    config._isValidated = false;
+    validateBuildConfig(config);
+
+    expect(config.globalStyle[0]).toBe(orgPath);
+  });
+
   it('should convert globalStyle string to absolute path array, if a globalStyle property was provided', () => {
     config.globalStyle = 'src/global/styles.css' as any;
     validateBuildConfig(config);
