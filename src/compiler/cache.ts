@@ -1,4 +1,4 @@
-import { Config } from '../util/interfaces';
+import { Config } from '../declarations';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 
 
@@ -12,8 +12,7 @@ export class Cache {
 
     } else {
       config.logger.debug(`cache disabled, empty tmpdir: ${tmpDir}`);
-      cacheFs.emptyDir(tmpDir);
-      cacheFs.commit();
+      this.clearDiskCache();
     }
   }
 
@@ -79,6 +78,11 @@ export class Cache {
 
   clear() {
     this.cacheFs.clearCache();
+  }
+
+  async clearDiskCache() {
+    await this.cacheFs.emptyDir(this.tmpDir);
+    await this.cacheFs.commit();
   }
 
   private getCacheFilePath(key: string) {

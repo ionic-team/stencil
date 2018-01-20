@@ -1,8 +1,8 @@
-import { Config, CompilerCtx, Bundle, ComponentMeta, ComponentRegistry, SourceTarget, ModuleFile, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, ComponentMeta, ComponentRegistry, Config, ModuleFile, SourceTarget } from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { hasError, pathJoin, minifyJs } from '../util';
+import { hasError, minifyJs, pathJoin } from '../util';
 import { getAppDistDir, getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
-import { getStylePlaceholder, getStyleIdPlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
+import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
@@ -44,14 +44,14 @@ async function generateBundleMode(config: Config, comilerCtx: CompilerCtx, build
   setBundleModeIds(bundle.moduleFiles, modeName, bundleId);
 
   // generate the bundle build for mode, no scoped styles, and esm
-  generateBundleBuild(config, comilerCtx, jsText, bundleId, false);
+  await generateBundleBuild(config, comilerCtx, jsText, bundleId, false);
 
   if (bundle.requiresScopedStyles) {
     // create js text for: mode, scoped styles, esm
     jsText = await createBundleJsText(config, comilerCtx, buildCtx, bundle, modeName, true);
 
     // generate the bundle build for: mode, esm and scoped styles
-    generateBundleBuild(config, comilerCtx, jsText, bundleId, true);
+    await generateBundleBuild(config, comilerCtx, jsText, bundleId, true);
   }
 
   if (config.buildEs5) {
@@ -59,14 +59,14 @@ async function generateBundleMode(config: Config, comilerCtx: CompilerCtx, build
     jsText = await createBundleJsText(config, comilerCtx, buildCtx, bundle, modeName, false, 'es5');
 
     // generate the bundle build for: mode, no scoped styles and es5
-    generateBundleBuild(config, comilerCtx, jsText, bundleId, false, 'es5');
+    await generateBundleBuild(config, comilerCtx, jsText, bundleId, false, 'es5');
 
     if (bundle.requiresScopedStyles) {
       // create js text for: mode, scoped styles, es5
       jsText = await createBundleJsText(config, comilerCtx, buildCtx, bundle, modeName, true, 'es5');
 
       // generate the bundle build for: mode, es5 and scoped styles
-      generateBundleBuild(config, comilerCtx, jsText, bundleId, true, 'es5');
+      await generateBundleBuild(config, comilerCtx, jsText, bundleId, true, 'es5');
     }
   }
 }
@@ -93,7 +93,7 @@ async function createBundleJsText(config: Config, compilerCtx: CompilerCtx, buil
 }
 
 
-function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, jsText: string, bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
+async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, jsText: string, bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
   // create the file name
   const fileName = getBundleFilename(bundleId, isScopedStyles, sourceTarget);
 
@@ -109,12 +109,12 @@ function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, jsText: s
 
   if (config.generateWWW) {
     // write to the www build
-    compilerCtx.fs.writeFile(wwwBuildPath, jsText);
+    await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
   }
 
   if (config.generateDistribution) {
     // write to the dist build
-    compilerCtx.fs.writeFile(distPath, jsText);
+    await compilerCtx.fs.writeFile(distPath, jsText);
   }
 }
 

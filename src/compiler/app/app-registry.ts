@@ -1,4 +1,4 @@
-import { AppRegistry, AppRegistryComponents, CompilerCtx, ComponentRegistry, Config } from '../../util/interfaces';
+import { AppRegistry, AppRegistryComponents, CompilerCtx, ComponentRegistry, Config } from '../../declarations';
 import { getLoaderFileName, getRegistryJsonWWW } from './app-file-naming';
 
 
@@ -46,7 +46,7 @@ export function serializeComponentRegistry(cmpRegistry: ComponentRegistry) {
 }
 
 
-export function writeAppRegistry(config: Config, ctx: CompilerCtx, appRegistry: AppRegistry, cmpRegistry: ComponentRegistry) {
+export async function writeAppRegistry(config: Config, ctx: CompilerCtx, appRegistry: AppRegistry, cmpRegistry: ComponentRegistry) {
   if (!config.generateWWW) {
     // only create a registry for www builds
     return;
@@ -61,5 +61,5 @@ export function writeAppRegistry(config: Config, ctx: CompilerCtx, appRegistry: 
 
   const appRegistryWWW = getRegistryJsonWWW(config);
   config.logger.debug(`build, app www registry: ${appRegistryWWW}`);
-  ctx.fs.writeFile(appRegistryWWW, registryJson);
+  await ctx.fs.writeFile(appRegistryWWW, registryJson);
 }

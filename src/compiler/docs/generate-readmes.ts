@@ -1,6 +1,6 @@
 import { addAutoGenerate } from './auto-docs';
 import { AUTO_GENERATE_COMMENT } from './constants';
-import { Config, CompilerCtx, ModuleFile } from '../../util/interfaces';
+import { CompilerCtx, Config, ModuleFile } from '../../declarations';
 
 
 export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> {
@@ -56,7 +56,7 @@ async function genereateReadme(config: Config, ctx: CompilerCtx, moduleFile: Mod
 
 
 async function createReadme(config: Config, ctx: CompilerCtx, moduleFile: ModuleFile, readMePath: string) {
-  let content: string[] = [];
+  const content: string[] = [];
 
   content.push(`# ${moduleFile.cmpMeta.tagNameMeta}`);
   content.push(``);
@@ -99,7 +99,8 @@ async function updateReadme(config: Config, ctx: CompilerCtx, moduleFile: Module
     return true;
   }
 
-  ctx.fs.writeFile(readMePath, updatedContent);
+  await ctx.fs.writeFile(readMePath, updatedContent);
+
   config.logger.info(`updated readme docs: ${moduleFile.cmpMeta.tagNameMeta}`);
   return true;
 }

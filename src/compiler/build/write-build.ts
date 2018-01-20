@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../component-plugins/assets-plugin';
 import { generateDistribution } from './distribution';
@@ -7,7 +7,7 @@ import { writeAppManifest } from '../manifest/manifest-data';
 
 export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   // serialize and write the manifest file if need be
-  writeAppManifest(config, compilerCtx, buildCtx);
+  await writeAppManifest(config, compilerCtx, buildCtx);
 
   const timeSpan = config.logger.createTimeSpan(`writeBuildFiles started`, true);
 
@@ -51,6 +51,11 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
 
 
 export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
+  if (compilerCtx.isRebuild) {
+    // only empty the directories on the first build
+    return;
+  }
+
   // empty promises :(
   const emptyPromises: Promise<any>[] = [];
 

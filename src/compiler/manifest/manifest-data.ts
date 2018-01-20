@@ -1,6 +1,6 @@
 import { AssetsMeta, BuildCtx, BundleData, CompilerCtx, ComponentData, ComponentMeta, Config,
   EventData, ListenMeta, ListenerData, Manifest, ManifestBundle, ManifestData, ModuleFile,
-  PropData, StyleData, StyleMeta } from '../../util/interfaces';
+  PropData, StyleData, StyleMeta } from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
@@ -11,7 +11,7 @@ import { normalizePath } from '../util';
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
 
-export function writeAppManifest(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function writeAppManifest(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
   // get the absolute path to the directory where the manifest will be saved
   const manifestDir = normalizePath(config.collectionDir);
@@ -27,7 +27,7 @@ export function writeAppManifest(config: Config, compilerCtx: CompilerCtx, build
 
   if (config.generateDistribution) {
     // don't bother serializing/writing the manifest if we're not creating a distribution
-    compilerCtx.fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2));
+    await compilerCtx.fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2));
   }
 
   return manifestData;

@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
 import { StyleMinifyPlugin } from '../style/style-minify-plugin';
@@ -17,8 +17,7 @@ export function initPlugins(config: Config) {
 
 
 export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string) {
-  for (let i = 0; i < pluginCtx.config.plugins.length; i++) {
-    const plugin = pluginCtx.config.plugins[i];
+  for (const plugin of pluginCtx.config.plugins) {
 
     if (typeof plugin.resolveId === 'function') {
       try {
@@ -49,8 +48,7 @@ export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string)
 
 
 export async function runPluginLoad(pluginCtx: PluginCtx, id: string) {
-  for (let i = 0; i < pluginCtx.config.plugins.length; i++) {
-    const plugin = pluginCtx.config.plugins[i];
+  for (const plugin of pluginCtx.config.plugins) {
 
     if (typeof plugin.load === 'function') {
       try {
@@ -97,8 +95,7 @@ export async function runPluginTransforms(config: Config, compilerCtx: CompilerC
     id: id
   };
 
-  for (let i = 0; i < config.plugins.length; i++) {
-    const plugin = config.plugins[i];
+  for (const plugin of pluginCtx.config.plugins) {
 
     if (typeof plugin.transform === 'function') {
       try {

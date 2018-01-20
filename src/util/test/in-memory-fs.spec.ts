@@ -1,4 +1,4 @@
-import { FileSystem, FsCopyFileTask, FsItems } from '../interfaces';
+import { FileSystem, FsCopyFileTask, FsItems } from '../../declarations';
 import { InMemoryFileSystem, getCommitInstructions } from '../in-memory-fs';
 import { mockFs } from '../../testing/mocks';
 import { normalizePath } from '../../compiler/util';
@@ -559,12 +559,10 @@ describe(`in-memory-fs`, () => {
 
   it(`clearFileCache`, async () => {
     await fs.writeFile(`/dir/file1.js`, `1`);
-    await fs.writeFile(`/dir/file2.js`, `2`);
+    await fs.commit();
 
-    fs.clearFileCache(`/dir/file2.js`);
-
-    expect(await fs.access(`/dir/file1.js`)).toBe(true);
-    expect(await fs.access(`/dir/file2.js`)).toBe(false);
+    expect(fs.getCache(`/dir/file1.js`).fileText).toBe('1');
+    expect(fs.getCache(`/dir/file2.js`)).toBe(null);
   });
 
   it(`clearDirCache`, async () => {
@@ -572,13 +570,14 @@ describe(`in-memory-fs`, () => {
     await fs.writeFile(`/dir1/file2.js`, `2`);
     await fs.writeFile(`/dir1/dir2/file3.js`, `3`);
     await fs.writeFile(`/dir3/file4.js`, `4`);
+    await fs.commit();
 
     fs.clearDirCache(`/dir1`);
 
-    expect(await fs.access(`/dir1/file1.js`)).toBe(false);
-    expect(await fs.access(`/dir1/file2.js`)).toBe(false);
-    expect(await fs.access(`/dir1/dir2/file3.js`)).toBe(false);
-    expect(await fs.access(`/dir3/file4.js`)).toBe(true);
+    expect(fs.getCache(`/dir1/file1.js`)).toBe(null);
+    expect(fs.getCache(`/dir1/file2.js`)).toBe(null);
+    expect(fs.getCache(`/dir1/dir2/file3.js`)).toBe(null);
+    expect(fs.getCache(`/dir3/file4.js`).fileText).toBe('4');
   });
 
   it(`clearDirCache windows`, async () => {
@@ -586,13 +585,14 @@ describe(`in-memory-fs`, () => {
     await fs.writeFile(`C:\\dir1\\file2.js`, `2`);
     await fs.writeFile(`C:\\dir1\\dir2\\file3.js`, `3`);
     await fs.writeFile(`C:\\dir3\\file4.js`, `4`);
+    await fs.commit();
 
     fs.clearDirCache(`C:\\dir1`);
 
-    expect(await fs.access(`C:\\dir1\\file1.js`)).toBe(false);
-    expect(await fs.access(`C:\\dir1\\file2.js`)).toBe(false);
-    expect(await fs.access(`C:\\dir1\\dir2\\file3.js`)).toBe(false);
-    expect(await fs.access(`C:\\dir3\\file4.js`)).toBe(true);
+    expect(fs.getCache(`C:\\dir1\\file1.js`)).toBe(null);
+    expect(fs.getCache(`C:\\dir1\\file2.js`)).toBe(null);
+    expect(fs.getCache(`C:\\dir1\\dir2\\file3.js`)).toBe(null);
+    expect(fs.getCache(`C:\\dir3\\file4.js`).fileText).toBe('4');
   });
 
   var mockedFs: TestingFs;

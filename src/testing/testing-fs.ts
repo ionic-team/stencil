@@ -170,6 +170,6 @@ export class TestingFs implements FileSystem {
   }
 
   get resolveTime() {
-    return (Math.random() * 8);
+    return (Math.random() * 6);
   }
 }

@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, Bundle, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, ServiceWorkerConfig } from '../../util/interfaces';
+import { Bundle, CompilerCtx, Config, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, ServiceWorkerConfig } from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { pathJoin } from '../util';
@@ -30,7 +30,7 @@ export async function generateHostConfig(config: Config, ctx: CompilerCtx, bundl
 
   await mergeUserHostConfigFile(config, ctx, hostConfig);
 
-  ctx.fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
+  await ctx.fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
 }
 
 

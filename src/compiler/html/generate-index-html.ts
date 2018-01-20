@@ -1,4 +1,4 @@
-import { BuildCtx, Config, CompilerCtx, ServiceWorkerConfig } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, ServiceWorkerConfig } from '../../declarations';
 import { catchError, hasError } from '../util';
 import { injectRegisterServiceWorker, injectUnregisterServiceWorker } from '../service-worker/inject-sw-script';
 import { generateServiceWorker } from '../service-worker/generate-sw';
@@ -55,7 +55,7 @@ async function setIndexHtmlContent(config: Config, compilerCtx: CompilerCtx, ind
   }
 
   // add the prerendered html to our list of files to write
-  compilerCtx.fs.writeFile(config.wwwIndexHtml, indexHtml);
+  await compilerCtx.fs.writeFile(config.wwwIndexHtml, indexHtml);
 
   config.logger.debug(`optimizeHtml, write: ${config.wwwIndexHtml}`);
 }

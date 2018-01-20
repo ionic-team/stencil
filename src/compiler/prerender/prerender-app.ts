@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, HydrateResults, Bundle, PrerenderConfig, PrerenderStatus, PrerenderLocation, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, HydrateResults, PrerenderConfig, PrerenderLocation, PrerenderStatus } from '../../declarations';
 import { buildWarn, catchError, hasError, pathJoin } from '../util';
 import { generateHostConfig } from './host-config';
 import { prerenderPath } from './prerender-path';
@@ -80,7 +80,7 @@ async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCt
 
 function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, prerenderQueue: PrerenderLocation[], indexSrcHtml: string, hydrateResults: HydrateResults[], resolve: Function) {
   for (var i = 0; i < (config.prerender as PrerenderConfig).maxConcurrent; i++) {
-    var activelyProcessingCount = prerenderQueue.filter(p => p.status === PrerenderStatus.processing).length;
+    const activelyProcessingCount = prerenderQueue.filter(p => p.status === PrerenderStatus.processing).length;
 
     if (activelyProcessingCount >= (config.prerender as PrerenderConfig).maxConcurrent) {
       // whooaa, slow down there buddy, let's not get carried away
@@ -125,7 +125,7 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
 
     hydrateResults.push(results);
 
-    writePrerenderDest(config, compilerCtx, results);
+    await writePrerenderDest(config, compilerCtx, results);
 
   } catch (e) {
     // darn, idk, bad news
@@ -141,7 +141,7 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
 }
 
 
-function writePrerenderDest(config: Config, ctx: CompilerCtx, results: HydrateResults) {
+async function writePrerenderDest(config: Config, ctx: CompilerCtx, results: HydrateResults) {
   const parsedUrl = config.sys.url.parse(results.url);
 
   // figure out the directory where this file will be saved
@@ -155,5 +155,5 @@ function writePrerenderDest(config: Config, ctx: CompilerCtx, results: HydrateRe
 
   // add the prerender html content it to our collection of
   // files that need to be saved when we're all ready
-  ctx.fs.writeFile(filePath, results.html);
+  await ctx.fs.writeFile(filePath, results.html);
 }

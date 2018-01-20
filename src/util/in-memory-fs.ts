@@ -1,5 +1,5 @@
 import { FileSystem, FsCopyFileTask, FsItems, FsReadOptions, FsReaddirItem,
-  FsReaddirOptions, FsWriteOptions, FsWriteResults, Path } from './interfaces';
+  FsReaddirOptions, FsWriteOptions, FsWriteResults, Path } from '../declarations';
 import { normalizePath } from '../compiler/util';
 
 
@@ -12,7 +12,7 @@ export class InMemoryFileSystem {
   async access(filePath: string) {
     filePath = normalizePath(filePath);
     if (this.d[filePath]) {
-      return this.d[filePath].exists;
+      return !!this.d[filePath].exists;
     }
 
     let hasAccess = false;
@@ -34,10 +34,15 @@ export class InMemoryFileSystem {
     return hasAccess;
   }
 
+  /**
+   * Synchronous!!! Do not use!!!
+   * (Only typescript transpiling is allowed to use)
+   * @param filePath
+   */
   accessSync(filePath: string) {
     filePath = normalizePath(filePath);
     if (this.d[filePath]) {
-      return this.d[filePath].exists;
+      return !!this.d[filePath].exists;
     }
 
     let hasAccess = false;
@@ -193,6 +198,11 @@ export class InMemoryFileSystem {
     return fileContent;
   }
 
+  /**
+   * Synchronous!!! Do not use!!!
+   * (Only typescript transpiling is allowed to use)
+   * @param filePath
+   */
   readFileSync(filePath: string) {
     filePath = normalizePath(filePath);
     let f = this.d[filePath];
@@ -261,6 +271,11 @@ export class InMemoryFileSystem {
     };
   }
 
+  /**
+   * Synchronous!!! Do not use!!!
+   * (Only typescript transpiling is allowed to use)
+   * @param itemPath
+   */
   statSync(itemPath: string) {
     itemPath = normalizePath(itemPath);
 
@@ -283,10 +298,14 @@ export class InMemoryFileSystem {
   async writeFile(filePath: string, content: string, opts?: FsWriteOptions) {
     const results: FsWriteResults = {};
 
+    if (typeof filePath !== 'string') {
+      throw new Error(`writeFile, invalid filePath: ${filePath}`);
+    }
+
     filePath = normalizePath(filePath);
 
     if (typeof content !== 'string') {
-      throw new Error(`writeFile, invalid string content: ${filePath}`);
+      throw new Error(`writeFile, invalid content: ${filePath}`);
     }
 
     const d = this.d[filePath] = this.d[filePath] || {};
@@ -351,8 +370,8 @@ export class InMemoryFileSystem {
     this.copyFileTasks.length = 0;
 
     // add all the ancestor directories for each directory too
-    for (let i = 0, ilen = dirsToEnsure.length; i < ilen; i++) {
-      const segments = dirsToEnsure[i].split('/');
+    for (const dirToEnsure of dirsToEnsure) {
+      const segments = dirToEnsure.split('/');
 
       for (let j = 2; j < segments.length; j++) {
         const dir = segments.slice(0, j).join('/');
@@ -375,7 +394,7 @@ export class InMemoryFileSystem {
 
     await this.commitEnsureDirs(dirsToEnsure);
 
-    return await Promise.all(copyFileTasks.map(async copyFileTask => {
+    return Promise.all(copyFileTasks.map(async copyFileTask => {
       await this.fs.copyFile(copyFileTask.src, copyFileTask.dest);
       return copyFileTask.dest;
     }));
@@ -416,8 +435,7 @@ export class InMemoryFileSystem {
   private async commitEnsureDirs(dirsToEnsure: string[]) {
     const dirsAdded: string[] = [];
 
-    for (let i = 0; i < dirsToEnsure.length; i++) {
-      const dirPath = dirsToEnsure[i];
+    for (const dirPath of dirsToEnsure) {
 
       if (this.d[dirPath] && this.d[dirPath].exists && this.d[dirPath].isDirectory) {
         // already cached that this path is indeed an existing directory
@@ -442,14 +460,27 @@ export class InMemoryFileSystem {
 
   private commitWriteFiles(filesToWrite: string[]) {
     return Promise.all(filesToWrite.map(async filePath => {
+      if (typeof filePath !== 'string') {
+        throw new Error(`unable to writeFile without filePath`);
+      }
       const item = this.d[filePath];
+      if (item == null) {
+        throw new Error(`unable to find item to write: ${filePath}`);
+      }
+      if (item.fileText == null) {
+        throw new Error(`unable to find item fileText to write: ${filePath}`);
+      }
       await this.fs.writeFile(filePath, item.fileText);
+
       return filePath;
     }));
   }
 
   private commitDeleteFiles(filesToDelete: string[]) {
     return Promise.all(filesToDelete.map(async filePath => {
+      if (typeof filePath !== 'string') {
+        throw new Error(`unable to unlink without filePath`);
+      }
       await this.fs.unlink(filePath);
       return filePath;
     }));
@@ -458,8 +489,7 @@ export class InMemoryFileSystem {
   private async commitDeleteDirs(dirsToDelete: string[]) {
     const dirsDeleted: string[] = [];
 
-    for (let i = 0; i < dirsToDelete.length; i++) {
-      const dirPath = dirsToDelete[i];
+    for (const dirPath of dirsToDelete) {
       try {
         await this.fs.rmdir(dirPath);
       } catch (e) {}
@@ -484,7 +514,24 @@ export class InMemoryFileSystem {
 
   clearFileCache(filePath: string) {
     filePath = normalizePath(filePath);
-    delete this.d[filePath];
+    const item = this.d[filePath];
+    if (item && !item.queueWriteToDisk) {
+      delete this.d[filePath];
+    }
+  }
+
+  getCache(itemPath: string) {
+    itemPath = normalizePath(itemPath);
+    const item = this.d[itemPath];
+    if (item) {
+      return {
+        exists: item.exists,
+        isDirectory: item.isDirectory,
+        isFile: item.isFile,
+        fileText: item.fileText
+      };
+    }
+    return null;
   }
 
   clearCache() {
