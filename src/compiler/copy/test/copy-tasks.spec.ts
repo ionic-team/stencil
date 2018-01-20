@@ -1,9 +1,17 @@
-import { Config, CopyTask } from '../../../util/interfaces';
-import { getSrcAbsPath, getDestAbsPath, getGlobCopyTask, isCopyTaskFile, processCopyTask, processCopyTasks } from '../copy-tasks';
-import { mockStencilSystem } from '../../../testing/mocks';
+import { Config, CopyTask } from '../../../declarations';
+import { createGlobCopyTask, getDestAbsPath, getSrcAbsPath, isCopyTaskFile, processCopyTask, processCopyTasks } from '../copy-tasks';
+import { mockConfig } from '../../../testing/mocks';
 
 
 describe('copy tasks', () => {
+
+  let config: Config;
+
+  beforeEach(() => {
+    config = mockConfig();
+    config.srcDir = '/User/marty/my-app/src';
+    config.wwwDir = '/User/marty/my-app/www';
+  });
 
   describe('processCopyTasks', () => {
 
@@ -27,22 +35,22 @@ describe('copy tasks', () => {
       } catch (e) {}
     });
 
-    it('should resolve with null copy task', () => {
-      return processCopyTasks(config, {}, [], null).then(r => {
-        expect(r).toBe(null);
-      });
+    it('should resolve with null copy task', async () => {
+      const r = await processCopyTasks(config, {}, [], null);
+      expect(r).toBeUndefined();
     });
 
   });
 
-  describe('getGlobCopyTask', () => {
+  describe('createGlobCopyTask', () => {
 
     it('should get glob files and set absolute dest with absolute dest', () => {
       const copyTask: CopyTask = {
         src: 'assets/**/*.js',
         dest: '/User/marty/my-app/www/abs-images'
       };
-      const p = getGlobCopyTask(config, copyTask, 'assets/bear.js');
+      const destDir = '/User/marty/my-app/www';
+      const p = createGlobCopyTask(config, copyTask, destDir, 'assets/bear.js');
       expect(p.dest).toBe('/User/marty/my-app/www/abs-images/bear.js');
     });
 
@@ -51,7 +59,8 @@ describe('copy tasks', () => {
         src: 'assets/**/*.js',
         dest: 'images'
       };
-      const p = getGlobCopyTask(config, copyTask, 'assets/bear.js');
+      const destDir = '/User/marty/my-app/www';
+      const p = createGlobCopyTask(config, copyTask, destDir, 'assets/bear.js');
       expect(p.dest).toBe('/User/marty/my-app/www/images/bear.js');
     });
 
@@ -59,7 +68,8 @@ describe('copy tasks', () => {
       const copyTask: CopyTask = {
         src: 'assets/**/*.js'
       };
-      const p = getGlobCopyTask(config, copyTask, 'assets/bear.js');
+      const destDir = '/User/marty/my-app/www';
+      const p = createGlobCopyTask(config, copyTask, destDir, 'assets/bear.js');
       expect(p.dest).toBe('/User/marty/my-app/www/assets/bear.js');
     });
 
@@ -75,7 +85,7 @@ describe('copy tasks', () => {
           return (/\.js$/i).test(src);
         }
       };
-      const p = processCopyTask(config, copyTask);
+      const p = processCopyTask(config, copyTask, config.wwwDir);
       expect(p.filter()).toBe(false);
     });
 
@@ -86,33 +96,33 @@ describe('copy tasks', () => {
     it('should get "dest" path when "dest" is relative and "src" is relative', () => {
       const src = 'assets/bear.jpg';
       const dest = 'images/bear.jpg';
-      const p = getDestAbsPath(config, src, dest);
+      const p = getDestAbsPath(config, src, config.wwwDir, dest);
       expect(p).toBe('/User/marty/my-app/www/images/bear.jpg');
     });
 
     it('should get "dest" path when "dest" is relative and "src" is absolute', () => {
       const src = '/User/marty/my-app/src/assets/bear.jpg';
       const dest = 'images/bear.jpg';
-      const p = getDestAbsPath(config, src, dest);
+      const p = getDestAbsPath(config, src, config.wwwDir, dest);
       expect(p).toBe('/User/marty/my-app/www/images/bear.jpg');
     });
 
     it('should get "dest" path when "dest" is absolute', () => {
       const src = '/User/marty/my-app/src/assets/bear.jpg';
       const dest = '/User/marty/my-app/www/images/bear.jpg';
-      const p = getDestAbsPath(config, src, dest);
+      const p = getDestAbsPath(config, src, config.wwwDir, dest);
       expect(p).toBe('/User/marty/my-app/www/images/bear.jpg');
     });
 
     it('should get "dest" path when missing "dest" path and "src" is relative', () => {
       const src = 'assets/bear.jpg';
-      const p = getDestAbsPath(config, src);
+      const p = getDestAbsPath(config, src, config.wwwDir, undefined);
       expect(p).toBe('/User/marty/my-app/www/assets/bear.jpg');
     });
 
     it('should throw error when missing "dest" path and "src" is absolute', () => {
       expect(() => {
-        getDestAbsPath(config, '/User/big/bear.jpg');
+        getDestAbsPath(config, '/User/big/bear.jpg', config.wwwDir, undefined);
       }).toThrow();
     });
 
@@ -249,18 +259,6 @@ describe('copy tasks', () => {
       expect(isCopyTaskFile(config, filePath)).toBe(false);
     });
 
-  });
-
-
-  var config: Config;
-  var sys = mockStencilSystem();
-
-  beforeEach(() => {
-    config = {
-      sys: sys,
-      srcDir: '/User/marty/my-app/src',
-      wwwDir: '/User/marty/my-app/www'
-    };
   });
 
 });
