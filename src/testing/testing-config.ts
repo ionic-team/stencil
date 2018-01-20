@@ -1,4 +1,4 @@
-import { Config } from '../util/interfaces';
+import { Config } from '../declarations';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 
@@ -13,5 +13,4 @@ export class TestingConfig implements Config {
   buildStats = true;
   enableCache = false;
   buildAppCore = false;
-
 }

@@ -1,4 +1,4 @@
-import { FileSystem } from '../util/interfaces';
+import { FileSystem } from '../declarations';
 import { normalizePath } from '../compiler/util';
 import * as path from 'path';
 

@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentRegistry, Config, HydrateOptions, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, ComponentRegistry, Config, HydrateOptions, PlatformApi } from '../declarations';
 import { mockLogger, mockStencilSystem } from './mocks';
 import { Renderer } from '../server';
 import { validateBuildConfig } from '../compiler/config/validate-config';
