@@ -1,4 +1,4 @@
-import { Config, HydrateResults, PrerenderConfig, PrerenderLocation, PrerenderStatus } from '../../util/interfaces';
+import { Config, HydrateResults, PrerenderConfig } from '../../declarations';
 import { DEFAULT_PRERENDER_HOST } from './validate-prerender-config';
 
 
@@ -94,4 +94,18 @@ export function getPrerenderQueue(config: Config) {
   }
 
   return prerenderQueue;
+}
+
+
+export interface PrerenderLocation {
+  url?: string;
+  path?: string;
+  status?: PrerenderStatus;
+}
+
+
+export enum PrerenderStatus {
+  pending = 1,
+  processing = 2,
+  complete = 3
 }

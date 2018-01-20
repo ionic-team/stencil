@@ -1,4 +1,4 @@
-import { Config, PrerenderConfig, RenderOptions } from '../../util/interfaces';
+import { Config, PrerenderConfig, RenderOptions } from '../../declarations';
 import { normalizePath } from '../util';
 
 

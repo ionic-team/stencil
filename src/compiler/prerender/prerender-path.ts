@@ -1,5 +1,6 @@
-import { Config, CompilerCtx, HydrateOptions, HydrateResults, PrerenderLocation, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, HydrateOptions, HydrateResults } from '../../declarations';
 import { catchError } from '../util';
+import { PrerenderLocation } from './prerender-utils';
 import { Renderer } from '../../server/index';
 
 

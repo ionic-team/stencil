@@ -87,14 +87,7 @@ export interface HydrateOptions extends RenderOptions {
 export interface PrerenderLocation {
   url?: string;
   path?: string;
-  status?: PrerenderStatus;
-}
-
-
-export enum PrerenderStatus {
-  pending = 1,
-  processing = 2,
-  complete = 3
+  status?: 'pending' | 'processing' | 'complete';
 }
 
 

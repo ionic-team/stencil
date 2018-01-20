@@ -1,4 +1,4 @@
-import { Config, Bundle, HostConfig, HostRuleHeader, HydrateComponent } from '../../../util/interfaces';
+import { Bundle, Config, HostConfig, HostRuleHeader, HydrateComponent } from '../../../declarations';
 import { addBundles, formatLinkRelPreloadHeader, getBundleIds, mergeUserHostConfig, sortComponents } from '../host-config';
 
 
@@ -132,6 +132,22 @@ describe('host-config', () => {
 
   describe('mergeUserHostConfig', () => {
 
+    const hostConfig: HostConfig = {
+      hosting: {
+        rules: [
+          {
+            include: '/default/path',
+            headers: [
+              {
+                name: 'Link',
+                value: '</build/app/5e3mm8py.js>;rel=preload;as=script'
+               }
+            ]
+          }
+        ]
+      }
+    };
+
     it('should do nothing for no user host config', () => {
       let userHostConfig: HostConfig = null;
       mergeUserHostConfig(userHostConfig, hostConfig);
@@ -171,22 +187,6 @@ describe('host-config', () => {
       expect(hostConfig.hosting.rules[0].include).toBe('/user/path');
       expect(hostConfig.hosting.rules[1].include).toBe('/default/path');
     });
-
-    var hostConfig: HostConfig = {
-      hosting: {
-        rules: [
-          {
-            include: '/default/path',
-            headers: [
-              {
-                name: 'Link',
-                value: '</build/app/5e3mm8py.js>;rel=preload;as=script'
-               }
-            ]
-          }
-        ]
-      }
-    };
 
   });
 

@@ -1,6 +1,7 @@
-import { BuildCtx, Bundle, CompilerCtx, Config, HydrateResults, PrerenderConfig, PrerenderLocation, PrerenderStatus } from '../../declarations';
+import { BuildCtx, Bundle, CompilerCtx, Config, HydrateResults, PrerenderConfig } from '../../declarations';
 import { buildWarn, catchError, hasError, pathJoin } from '../util';
 import { generateHostConfig } from './host-config';
+import { PrerenderLocation, PrerenderStatus } from './prerender-utils';
 import { prerenderPath } from './prerender-path';
 import { crawlAnchorsForNextUrls, getPrerenderQueue } from './prerender-utils';
 
