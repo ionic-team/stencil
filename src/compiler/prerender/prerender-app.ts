@@ -1,7 +1,6 @@
-import { BuildCtx, Bundle, CompilerCtx, Config, HydrateResults, PrerenderConfig } from '../../declarations';
+import { BuildCtx, Bundle, CompilerCtx, Config, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
 import { buildWarn, catchError, hasError, pathJoin } from '../util';
 import { generateHostConfig } from './host-config';
-import { PrerenderLocation, PrerenderStatus } from './prerender-utils';
 import { prerenderPath } from './prerender-path';
 import { crawlAnchorsForNextUrls, getPrerenderQueue } from './prerender-utils';
 
@@ -81,7 +80,7 @@ async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCt
 
 function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, prerenderQueue: PrerenderLocation[], indexSrcHtml: string, hydrateResults: HydrateResults[], resolve: Function) {
   for (var i = 0; i < (config.prerender as PrerenderConfig).maxConcurrent; i++) {
-    const activelyProcessingCount = prerenderQueue.filter(p => p.status === PrerenderStatus.processing).length;
+    const activelyProcessingCount = prerenderQueue.filter(p => p.status === 'processing').length;
 
     if (activelyProcessingCount >= (config.prerender as PrerenderConfig).maxConcurrent) {
       // whooaa, slow down there buddy, let's not get carried away
@@ -92,7 +91,7 @@ function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx:
   }
 
   const remaining = prerenderQueue.filter(p => {
-    return p.status === PrerenderStatus.processing || p.status === PrerenderStatus.pending;
+    return p.status === 'processing' || p.status === 'pending';
   }).length;
 
   if (remaining === 0) {
@@ -105,12 +104,12 @@ function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx:
 
 
 async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, prerenderQueue: PrerenderLocation[], indexSrcHtml: string, hydrateResults: HydrateResults[], resolve: Function) {
-  const p = prerenderQueue.find(p => p.status === PrerenderStatus.pending);
+  const p = prerenderQueue.find(p => p.status === 'pending');
   if (!p) return;
 
   // we've got a url that's pending
   // well guess what, it's go time
-  p.status = PrerenderStatus.processing;
+  p.status = 'processing';
 
   try {
     // prender this path and wait on the results
@@ -134,7 +133,7 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
   }
 
   // this job is not complete
-  p.status = PrerenderStatus.complete;
+  p.status = 'complete';
 
   // let's try to drain the queue again and let this
   // next call figure out if we're actually done or not

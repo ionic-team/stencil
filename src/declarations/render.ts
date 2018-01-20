@@ -26,6 +26,13 @@ export interface PrerenderConfig extends RenderOptions {
 }
 
 
+export interface PrerenderLocation {
+  url?: string;
+  path?: string;
+  status?: 'pending' | 'processing' | 'complete';
+}
+
+
 export interface HydrateResults {
   diagnostics: d.Diagnostic[];
   url?: string;
@@ -81,13 +88,6 @@ export interface HydrateOptions extends RenderOptions {
   console?: {
     [level: string]: (...msgs: string[]) => void;
   };
-}
-
-
-export interface PrerenderLocation {
-  url?: string;
-  path?: string;
-  status?: 'pending' | 'processing' | 'complete';
 }
 
 
