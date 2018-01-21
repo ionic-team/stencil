@@ -1,34 +1,31 @@
-import { FileSystem, FsCopyFileTask, FsItems, FsReadOptions, FsReaddirItem,
+import { FileSystem, FsItem, FsItems, FsReadOptions, FsReaddirItem,
   FsReaddirOptions, FsWriteOptions, FsWriteResults, Path } from '../declarations';
 import { normalizePath } from '../compiler/util';
 
 
 export class InMemoryFileSystem {
   private d: FsItems = {};
-  private copyFileTasks: FsCopyFileTask[] = [];
 
-  constructor(public fs: FileSystem, private path: Path) {}
+  constructor(public disk: FileSystem, private path: Path) {}
 
   async access(filePath: string) {
-    filePath = normalizePath(filePath);
-    if (this.d[filePath]) {
-      return !!this.d[filePath].exists;
+    const item = this.getItem(filePath);
+
+    if (typeof item.exists === 'boolean') {
+      return item.exists;
     }
 
     let hasAccess = false;
     try {
       const s = await this.stat(filePath);
-      this.d[filePath] = {
-        exists: true,
-        isDirectory: s.isDirectory,
-        isFile: s.isFile
-      };
+      item.exists = true;
+      item.isDirectory = s.isDirectory;
+      item.isFile = s.isFile;
+
       hasAccess = true;
 
     } catch (e) {
-      this.d[filePath] = {
-        exists: false
-      };
+      item.exists = false;
     }
 
     return hasAccess;
@@ -40,25 +37,23 @@ export class InMemoryFileSystem {
    * @param filePath
    */
   accessSync(filePath: string) {
-    filePath = normalizePath(filePath);
-    if (this.d[filePath]) {
-      return !!this.d[filePath].exists;
+    const item = this.getItem(filePath);
+
+    if (typeof item.exists === 'boolean') {
+      return item.exists;
     }
 
     let hasAccess = false;
     try {
       const s = this.statSync(filePath);
-      this.d[filePath] = {
-        exists: true,
-        isDirectory: s.isDirectory,
-        isFile: s.isFile
-      };
+      item.exists = true;
+      item.isDirectory = s.isDirectory;
+      item.isFile = s.isFile;
+
       hasAccess = true;
 
     } catch (e) {
-      this.d[filePath] = {
-        exists: false
-      };
+      item.exists = false;
     }
 
     return hasAccess;
@@ -75,7 +70,7 @@ export class InMemoryFileSystem {
     }
   }
 
-  async copyDir(src: string, dest: string, opts?: { filter?: (src: string, dest?: string) => boolean; }) {
+  private async copyDir(src: string, dest: string, opts?: { filter?: (src: string, dest?: string) => boolean; }) {
     src = normalizePath(src);
     dest = normalizePath(dest);
 
@@ -94,7 +89,7 @@ export class InMemoryFileSystem {
     }));
   }
 
-  async copyFile(src: string, dest: string, opts?: { filter?: (src: string, dest?: string) => boolean; }) {
+  private async copyFile(src: string, dest: string, opts?: { filter?: (src: string, dest?: string) => boolean; }) {
     src = normalizePath(src);
     dest = normalizePath(dest);
 
@@ -102,22 +97,40 @@ export class InMemoryFileSystem {
       return;
     }
 
-    this.copyFileTasks.push({
-      src: src,
-      dest: dest
-    });
+    if (shouldIgnore(src)) {
+      return;
+    }
+
+    const srcItem = this.getItem(src);
+    srcItem.isFile = true;
+    srcItem.isDirectory = false;
+
+    const destItem = this.getItem(dest);
+    destItem.isFile = true;
+    destItem.isDirectory = false;
+
+    if (isTextFile(src)) {
+      const srcFileText = await this.readFile(src);
+      if (srcFileText !== destItem.fileText) {
+        destItem.fileText = srcFileText;
+        destItem.queueWriteToDisk = true;
+      }
+
+    } else {
+      destItem.fileSrc = src;
+      destItem.queueWriteToDisk = true;
+    }
   }
 
   async emptyDir(dirPath: string) {
-    dirPath = normalizePath(dirPath);
+    const item = this.getItem(dirPath);
 
     await this.removeDir(dirPath);
 
-    this.d[dirPath] = this.d[dirPath] || {};
-    this.d[dirPath].isFile = false;
-    this.d[dirPath].isDirectory = true;
-    this.d[dirPath].queueWriteToDisk = true;
-    this.d[dirPath].queueDeleteFromDisk = false;
+    item.isFile = false;
+    item.isDirectory = true;
+    item.queueWriteToDisk = true;
+    item.queueDeleteFromDisk = false;
   }
 
   async readdir(dirPath: string, opts: FsReaddirOptions = {}) {
@@ -139,13 +152,13 @@ export class InMemoryFileSystem {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
     // always a disk read!!
-    const dirItems = await this.fs.readdir(dirPath);
+    const dirItems = await this.disk.readdir(dirPath);
 
     // cache some facts about this path
-    this.d[dirPath] = this.d[dirPath] || {};
-    this.d[dirPath].exists = true;
-    this.d[dirPath].isFile = false;
-    this.d[dirPath].isDirectory = true;
+    const item = this.getItem(dirPath);
+    item.exists = true;
+    item.isFile = false;
+    item.isDirectory = true;
 
     await Promise.all(dirItems.map(async dirItem => {
       // let's loop through each of the files we've found so far
@@ -157,10 +170,10 @@ export class InMemoryFileSystem {
       const stats = await this.stat(absPath);
 
       // cache some stats about this path
-      this.d[absPath] = this.d[absPath] || {};
-      this.d[absPath].exists = true;
-      this.d[absPath].isDirectory = stats.isDirectory;
-      this.d[absPath].isFile = stats.isFile;
+      const subItem = this.getItem(absPath);
+      subItem.exists = true;
+      subItem.isDirectory = stats.isDirectory;
+      subItem.isFile = stats.isFile;
 
       collectedPaths.push({
         absPath: absPath,
@@ -178,22 +191,20 @@ export class InMemoryFileSystem {
   }
 
   async readFile(filePath: string, opts?: FsReadOptions) {
-    filePath = normalizePath(filePath);
-
     if (!opts || (opts.useCache === true || opts.useCache === undefined)) {
-      const f = this.d[filePath];
-      if (f && f.exists && typeof f.fileText === 'string') {
-        return f.fileText;
+      const item = this.getItem(filePath);
+      if (item.exists && typeof item.fileText === 'string') {
+        return item.fileText;
       }
     }
 
-    const fileContent = await this.fs.readFile(filePath, 'utf-8');
+    const fileContent = await this.disk.readFile(filePath, 'utf-8');
 
-    const f = this.d[filePath] = this.d[filePath] || {};
-    f.exists = true;
-    f.isFile = true;
-    f.isDirectory = false;
-    f.fileText = fileContent;
+    const item = this.getItem(filePath);
+    item.exists = true;
+    item.isFile = true;
+    item.isDirectory = false;
+    item.fileText = fileContent;
 
     return fileContent;
   }
@@ -204,30 +215,39 @@ export class InMemoryFileSystem {
    * @param filePath
    */
   readFileSync(filePath: string) {
-    filePath = normalizePath(filePath);
-    let f = this.d[filePath];
-    if (f && f.exists && typeof f.fileText === 'string') {
-      return f.fileText;
+    const item = this.getItem(filePath);
+    if (item.exists && typeof item.fileText === 'string') {
+      return item.fileText;
     }
 
-    const fileContent = this.fs.readFileSync(filePath, 'utf-8');
+    const fileContent = this.disk.readFileSync(filePath, 'utf-8');
 
-    f = this.d[filePath] = this.d[filePath] || {};
-    f.exists = true;
-    f.isFile = true;
-    f.isDirectory = false;
-    f.fileText = fileContent;
+    item.exists = true;
+    item.isFile = true;
+    item.isDirectory = false;
+    item.fileText = fileContent;
 
     return fileContent;
   }
 
-  async removeDir(dirPath: string): Promise<any> {
-    dirPath = normalizePath(dirPath);
+  async remove(itemPath: string) {
+    const stats = await this.stat(itemPath);
 
-    this.d[dirPath] = this.d[dirPath] || {};
-    this.d[dirPath].isFile = false;
-    this.d[dirPath].isDirectory = true;
-    this.d[dirPath].queueDeleteFromDisk = true;
+    if (stats.isDirectory) {
+      await this.removeDir(itemPath);
+
+    } else if (stats.isFile) {
+      await this.removeFile(itemPath);
+    }
+  }
+
+  private async removeDir(dirPath: string) {
+    const item = this.getItem(dirPath);
+    item.isFile = false;
+    item.isDirectory = true;
+    if (!item.queueWriteToDisk) {
+      item.queueDeleteFromDisk = true;
+    }
 
     try {
       const dirItems = await this.readdir(dirPath, { recursive: true });
@@ -246,28 +266,26 @@ export class InMemoryFileSystem {
     }
   }
 
-  async removeFile(filePath: string) {
-    filePath = normalizePath(filePath);
-    this.d[filePath] = this.d[filePath] || {};
-    this.d[filePath].queueDeleteFromDisk = true;
+  private async removeFile(filePath: string) {
+    const item = this.getItem(filePath);
+    if (!item.queueWriteToDisk) {
+      item.queueDeleteFromDisk = true;
+    }
   }
 
   async stat(itemPath: string) {
-    itemPath = normalizePath(itemPath);
+    const item = this.getItem(itemPath);
 
-    let f = this.d[itemPath];
-    if (!f || typeof f.isDirectory !== 'boolean' || typeof f.isFile !== 'boolean') {
-      const s = await this.fs.stat(itemPath);
-      f = this.d[itemPath] = {
-        exists: true,
-        isFile: s.isFile(),
-        isDirectory: s.isDirectory()
-      };
+    if (typeof item.isDirectory !== 'boolean' || typeof item.isFile !== 'boolean') {
+      const s = await this.disk.stat(itemPath);
+      item.exists = true;
+      item.isDirectory = s.isDirectory();
+      item.isFile = s.isFile();
     }
 
     return {
-      isFile: f.isFile,
-      isDirectory: f.isDirectory
+      isFile: item.isFile,
+      isDirectory: item.isDirectory
     };
   }
 
@@ -277,21 +295,18 @@ export class InMemoryFileSystem {
    * @param itemPath
    */
   statSync(itemPath: string) {
-    itemPath = normalizePath(itemPath);
+    const item = this.getItem(itemPath);
 
-    let f = this.d[itemPath];
-    if (!f || typeof f.isDirectory !== 'boolean' || typeof f.isFile !== 'boolean') {
-      const s = this.fs.statSync(itemPath);
-      f = this.d[itemPath] = {
-        exists: true,
-        isFile: s.isFile(),
-        isDirectory: s.isDirectory()
-      };
+    if (typeof item.isDirectory !== 'boolean' || typeof item.isFile !== 'boolean') {
+      const s = this.disk.statSync(itemPath);
+      item.exists = true;
+      item.isDirectory = s.isDirectory();
+      item.isFile = s.isFile();
     }
 
     return {
-      isFile: f.isFile,
-      isDirectory: f.isDirectory
+      isFile: item.isFile,
+      isDirectory: item.isDirectory
     };
   }
 
@@ -302,27 +317,30 @@ export class InMemoryFileSystem {
       throw new Error(`writeFile, invalid filePath: ${filePath}`);
     }
 
-    filePath = normalizePath(filePath);
-
     if (typeof content !== 'string') {
       throw new Error(`writeFile, invalid content: ${filePath}`);
     }
 
-    const d = this.d[filePath] = this.d[filePath] || {};
-    d.exists = true;
-    d.isFile = true;
-    d.isDirectory = false;
-    d.queueDeleteFromDisk = false;
+    if (shouldIgnore(filePath)) {
+      results.ignored = true;
+      return results;
+    }
 
-    results.changedContent = d.fileText !== content;
+    const item = this.getItem(filePath);
+    item.exists = true;
+    item.isFile = true;
+    item.isDirectory = false;
+    item.queueDeleteFromDisk = false;
+
+    results.changedContent = item.fileText !== content;
     results.queuedWrite = false;
 
-    d.fileText = content;
+    item.fileText = content;
 
     if (opts && opts.inMemoryOnly) {
       // we don't want to actually write this to disk
       // just keep it in memory
-      if (d.queueWriteToDisk) {
+      if (item.queueWriteToDisk) {
         // we already queued this file to write to disk
         // in that case we still need to do it
         results.queuedWrite = true;
@@ -330,17 +348,17 @@ export class InMemoryFileSystem {
       } else {
         // we only want this in memory and
         // it wasn't already queued to be written
-        d.queueWriteToDisk = false;
+        item.queueWriteToDisk = false;
       }
 
     } else {
       // we want to write this to disk (eventually)
       // but only if the content is different
       // from our existing cached content
-      if (!d.queueWriteToDisk && results.changedContent) {
+      if (!item.queueWriteToDisk && results.changedContent) {
         // not already queued to be written
         // and the content is different
-        d.queueWriteToDisk = true;
+        item.queueWriteToDisk = true;
         results.queuedWrite = true;
       }
     }
@@ -351,52 +369,6 @@ export class InMemoryFileSystem {
   writeFiles(files: { [filePath: string]: string }, opts?: FsWriteOptions) {
     return Promise.all(Object.keys(files).map(filePath => {
       return this.writeFile(filePath, files[filePath], opts);
-    }));
-  }
-
-  async commitCopy() {
-    const dirsToEnsure: string[] = [];
-
-    const copyFileTasks: FsCopyFileTask[] = this.copyFileTasks.map(copyFileTask => {
-      const dir = normalizePath(this.path.dirname(copyFileTask.dest));
-      if (!dirsToEnsure.includes(dir)) {
-        dirsToEnsure.push(dir);
-      }
-      return {
-        src: copyFileTask.src,
-        dest: copyFileTask.dest
-      };
-    });
-    this.copyFileTasks.length = 0;
-
-    // add all the ancestor directories for each directory too
-    for (const dirToEnsure of dirsToEnsure) {
-      const segments = dirToEnsure.split('/');
-
-      for (let j = 2; j < segments.length; j++) {
-        const dir = segments.slice(0, j).join('/');
-        if (!dirsToEnsure.includes(dir)) {
-          dirsToEnsure.push(dir);
-        }
-      }
-    }
-
-    // sort so the the shortest paths ensured first
-    dirsToEnsure.sort((a, b) => {
-      const segmentsA = a.split('/').length;
-      const segmentsB = b.split('/').length;
-      if (segmentsA < segmentsB) return -1;
-      if (segmentsA > segmentsB) return 1;
-      if (a.length < b.length) return -1;
-      if (a.length > b.length) return 1;
-      return 0;
-    });
-
-    await this.commitEnsureDirs(dirsToEnsure);
-
-    return Promise.all(copyFileTasks.map(async copyFileTask => {
-      await this.fs.copyFile(copyFileTask.src, copyFileTask.dest);
-      return copyFileTask.dest;
     }));
   }
 
@@ -436,20 +408,20 @@ export class InMemoryFileSystem {
     const dirsAdded: string[] = [];
 
     for (const dirPath of dirsToEnsure) {
+      const item = this.getItem(dirPath);
 
-      if (this.d[dirPath] && this.d[dirPath].exists && this.d[dirPath].isDirectory) {
+      if (item.exists && item.isDirectory) {
         // already cached that this path is indeed an existing directory
         continue;
       }
 
       try {
         // cache that we know this is a directory on disk
-        const d = this.d[dirPath] = this.d[dirPath] || {};
-        d.exists = true;
-        d.isDirectory = true;
-        d.isFile = false;
+        item.exists = true;
+        item.isDirectory = true;
+        item.isFile = false;
 
-        await this.fs.mkdir(dirPath);
+        await this.disk.mkdir(dirPath);
         dirsAdded.push(dirPath);
 
       } catch (e) {}
@@ -463,17 +435,25 @@ export class InMemoryFileSystem {
       if (typeof filePath !== 'string') {
         throw new Error(`unable to writeFile without filePath`);
       }
-      const item = this.d[filePath];
-      if (item == null) {
-        throw new Error(`unable to find item to write: ${filePath}`);
-      }
-      if (item.fileText == null) {
-        throw new Error(`unable to find item fileText to write: ${filePath}`);
-      }
-      await this.fs.writeFile(filePath, item.fileText);
-
-      return filePath;
+      return this.commitWriteFile(filePath);
     }));
+  }
+
+  private async commitWriteFile(filePath: string) {
+    const item = this.getItem(filePath);
+
+    if (typeof item.fileSrc === 'string') {
+      await this.disk.copyFile(item.fileSrc, filePath);
+      return filePath;
+    }
+
+    if (item.fileText == null) {
+      throw new Error(`unable to find item fileText to write: ${filePath}`);
+    }
+
+    await this.disk.writeFile(filePath, item.fileText);
+
+    return filePath;
   }
 
   private commitDeleteFiles(filesToDelete: string[]) {
@@ -481,7 +461,7 @@ export class InMemoryFileSystem {
       if (typeof filePath !== 'string') {
         throw new Error(`unable to unlink without filePath`);
       }
-      await this.fs.unlink(filePath);
+      await this.disk.unlink(filePath);
       return filePath;
     }));
   }
@@ -491,7 +471,7 @@ export class InMemoryFileSystem {
 
     for (const dirPath of dirsToDelete) {
       try {
-        await this.fs.rmdir(dirPath);
+        await this.disk.rmdir(dirPath);
       } catch (e) {}
       dirsDeleted.push(dirPath);
     }
@@ -520,27 +500,19 @@ export class InMemoryFileSystem {
     }
   }
 
-  getCache(itemPath: string) {
+  getItem(itemPath: string): FsItem {
     itemPath = normalizePath(itemPath);
     const item = this.d[itemPath];
     if (item) {
-      return {
-        exists: item.exists,
-        isDirectory: item.isDirectory,
-        isFile: item.isFile,
-        fileText: item.fileText
-      };
+      return item;
     }
-    return null;
+    return this.d[itemPath] = {};
   }
 
   clearCache() {
     this.d = {};
   }
 
-  get disk() {
-    return this.fs;
-  }
 }
 
 
@@ -552,31 +524,46 @@ export function getCommitInstructions(path: Path, d: FsItems) {
     dirsToEnsure: [] as string[]
   };
 
-  Object.keys(d).forEach(filePath => {
-    const item = d[filePath];
+  Object.keys(d).forEach(itemPath => {
+    const item = d[itemPath];
 
     if (item.queueWriteToDisk) {
 
       if (item.isFile) {
-        instructions.filesToWrite.push(filePath);
-        const dir = normalizePath(path.dirname(filePath));
+        instructions.filesToWrite.push(itemPath);
 
+        const dir = normalizePath(path.dirname(itemPath));
         if (!instructions.dirsToEnsure.includes(dir)) {
           instructions.dirsToEnsure.push(dir);
         }
 
+        const dirDeleteIndex = instructions.dirsToDelete.indexOf(dir);
+        if (dirDeleteIndex > -1) {
+          instructions.dirsToDelete.splice(dirDeleteIndex, 1);
+        }
+
+        const fileDeleteIndex = instructions.filesToDelete.indexOf(itemPath);
+        if (fileDeleteIndex > -1) {
+          instructions.filesToDelete.splice(fileDeleteIndex, 1);
+        }
+
       } else if (item.isDirectory) {
-        if (!instructions.dirsToEnsure.includes(filePath)) {
-          instructions.dirsToEnsure.push(filePath);
+        if (!instructions.dirsToEnsure.includes(itemPath)) {
+          instructions.dirsToEnsure.push(itemPath);
+        }
+
+        const dirDeleteIndex = instructions.dirsToDelete.indexOf(itemPath);
+        if (dirDeleteIndex > -1) {
+          instructions.dirsToDelete.splice(dirDeleteIndex, 1);
         }
       }
 
     } else if (item.queueDeleteFromDisk) {
-      if (item.isDirectory) {
-        instructions.dirsToDelete.push(filePath);
+      if (item.isDirectory && !instructions.dirsToEnsure.includes(itemPath)) {
+        instructions.dirsToDelete.push(itemPath);
 
-      } else if (item.isFile) {
-        instructions.filesToDelete.push(filePath);
+      } else if (item.isFile && !instructions.filesToWrite.includes(itemPath)) {
+        instructions.filesToDelete.push(itemPath);
       }
     }
 
@@ -596,7 +583,7 @@ export function getCommitInstructions(path: Path, d: FsItems) {
     }
   }
 
-  // sort so the the shortest paths ensured first
+  // sort directories so shortest paths are ensured first
   instructions.dirsToEnsure.sort((a, b) => {
     const segmentsA = a.split('/').length;
     const segmentsB = b.split('/').length;
@@ -607,7 +594,7 @@ export function getCommitInstructions(path: Path, d: FsItems) {
     return 0;
   });
 
-  // sort so the the longest paths are removed first
+  // sort directories so longest paths are removed first
   instructions.dirsToDelete.sort((a, b) => {
     const segmentsA = a.split('/').length;
     const segmentsB = b.split('/').length;
@@ -644,3 +631,28 @@ export function getCommitInstructions(path: Path, d: FsItems) {
 
   return instructions;
 }
+
+
+export function isTextFile(filePath: string) {
+  filePath = filePath.toLowerCase().trim();
+  return TXT_EXT.some(ext => filePath.endsWith(ext));
+}
+
+const TXT_EXT = [
+  '.ts', '.tsx', '.js', '.jsx', '.svg',
+  '.html', '.txt', '.md', '.markdown', '.json',
+  '.css', '.scss', '.sass', '.less', '.styl'
+];
+
+
+export function shouldIgnore(filePath: string) {
+  filePath = filePath.trim().toLowerCase();
+  return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
+}
+
+const IGNORE = [
+  '.ds_store',
+  '.gitignore',
+  'desktop.ini',
+  'thumbs.db'
+];

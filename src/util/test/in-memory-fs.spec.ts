@@ -1,5 +1,5 @@
-import { FileSystem, FsCopyFileTask, FsItems } from '../../declarations';
-import { InMemoryFileSystem, getCommitInstructions } from '../in-memory-fs';
+import { FileSystem, FsItems } from '../../declarations';
+import { InMemoryFileSystem, getCommitInstructions, isTextFile, shouldIgnore } from '../in-memory-fs';
 import { mockFs } from '../../testing/mocks';
 import { normalizePath } from '../../compiler/util';
 import { TestingFs } from '../../testing/testing-fs';
@@ -7,6 +7,12 @@ import * as path from 'path';
 
 
 describe(`in-memory-fs, getCommitInstructions`, () => {
+
+  let d: FsItems;
+
+  beforeEach(() => {
+    d = {};
+  });
 
   it(`dirsToDelete, sort longest to shortest, windows`, () => {
     const root = normalizePath(`C:\\`);
@@ -147,18 +153,19 @@ describe(`in-memory-fs, getCommitInstructions`, () => {
     expect(i.dirsToEnsure).toEqual([]);
   });
 
-  var d: FsItems;
-  var copyFileTasks: FsCopyFileTask[];
-
-  beforeEach(() => {
-    d = {};
-    copyFileTasks = [];
-  });
-
 });
 
 
 describe(`in-memory-fs`, () => {
+
+  let mockedFs: TestingFs;
+  let fs: InMemoryFileSystem;
+
+  beforeEach(() => {
+    mockedFs = mockFs();
+    fs = new InMemoryFileSystem(mockedFs, path);
+  });
+
 
   it(`access true`, async () => {
     await fs.writeFile(`/file`, `content`);
@@ -210,79 +217,63 @@ describe(`in-memory-fs`, () => {
     expect(mockedFs.diskReads).toBe(1);
   });
 
-  it(`copy, of dir`, async () => {
+  it(`copyDir`, async () => {
     await fs.writeFile(`/src/file1.js`, '1');
     await fs.writeFile(`/src/file2.js`, '2');
     await fs.commit();
 
     await fs.copy(`/src`, `/some/path`);
 
-    const filesCopied = await fs.commitCopy();
-    expect(filesCopied[0]).toBe(`/some/path/file1.js`);
-    expect(filesCopied[1]).toBe(`/some/path/file2.js`);
-    expect(filesCopied.length).toBe(2);
+    const result = await fs.commit();
+    expect(result.filesWritten[0]).toBe(`/some/path/file1.js`);
+    expect(result.filesWritten[1]).toBe(`/some/path/file2.js`);
+    expect(result.filesWritten).toHaveLength(2);
+    expect(result.dirsDeleted).toHaveLength(0);
+    expect(result.dirsAdded[0]).toBe(`/some`);
+    expect(result.dirsAdded[1]).toBe(`/some/path`);
   });
 
-  it(`copy, of file`, async () => {
+  it(`copyFile`, async () => {
     await fs.writeFile(`/src/file1.js`, '1');
     await fs.writeFile(`/src/file2.js`, '2');
     await fs.commit();
 
     await fs.copy(`/src/file1.js`, `/some/path/file1.js`);
 
-    const filesCopied = await fs.commitCopy();
-    expect(filesCopied[0]).toBe(`/some/path/file1.js`);
-    expect(filesCopied.length).toBe(1);
-  });
-
-  it(`copyDir`, async () => {
-    await fs.writeFile(`/src/file1.js`, '1');
-    await fs.writeFile(`/src/file2.js`, '2');
-    await fs.writeFile(`/other-dir/file3.js`, '3');
-    await fs.commit();
-
-    await fs.copyDir(`/src`, `/some/path`);
-
-    const filesCopied = await fs.commitCopy();
-    expect(filesCopied[0]).toBe(`/some/path/file1.js`);
-    expect(filesCopied[1]).toBe(`/some/path/file2.js`);
-    expect(filesCopied.length).toBe(2);
-  });
-
-  it(`copyFile`, async () => {
-    await fs.writeFile(`/src/file.js`, 'content');
-    await fs.commit();
-
-    await fs.copyFile(`/src/file.js`, `/some/path/whatever.js`);
-
-    const filesCopied = await fs.commitCopy();
-    expect(filesCopied[0]).toBe(`/some/path/whatever.js`);
-    expect(filesCopied.length).toBe(1);
+    const result = await fs.commit();
+    expect(result.filesWritten[0]).toBe(`/some/path/file1.js`);
+    expect(result.filesWritten).toHaveLength(1);
+    expect(result.dirsDeleted).toHaveLength(0);
+    expect(result.dirsAdded[0]).toBe(`/some`);
+    expect(result.dirsAdded[1]).toBe(`/some/path`);
   });
 
   it(`copyFile, do copy w/ filter`, async () => {
     await fs.writeFile(`/src/file.js`, 'content');
     await fs.commit();
 
-    await fs.copyFile(`/src/file.js`, `/some/path/whatever.js`, { filter: (src, dest) => {
+    await fs.copy(`/src/file.js`, `/some/path/whatever.js`, { filter: (src, dest) => {
       return src === `/src/file.js` && dest === `/some/path/whatever.js`;
     }});
 
-    const filesCopied = await fs.commitCopy();
-    expect(filesCopied[0]).toBe(`/some/path/whatever.js`);
-    expect(filesCopied.length).toBe(1);
+    const result = await fs.commit();
+    expect(result.filesWritten[0]).toBe(`/some/path/whatever.js`);
+    expect(result.filesWritten).toHaveLength(1);
   });
 
   it(`copyFile, do not copy w/ filter`, async () => {
     await fs.writeFile(`/src/file.js`, 'content');
     await fs.commit();
 
-    await fs.copyFile(`/src/file.js`, `/some/path/whatever.js`, { filter: () => {
+    await fs.copy(`/src/file.js`, `/some/path/whatever.js`, { filter: () => {
       return false;
     }});
 
     const i = await fs.commit();
-    expect(i.filesWritten.length).toBe(0);
+    expect(i.filesWritten).toHaveLength(0);
+    expect(i.filesDeleted).toHaveLength(0);
+    expect(i.dirsAdded).toHaveLength(0);
+    expect(i.dirsDeleted).toHaveLength(0);
   });
 
   it(`readdir always does disk reads`, async () => {
@@ -307,7 +298,7 @@ describe(`in-memory-fs`, () => {
     mockedFs.diskReads = 0;
 
     const items = await fs.readdir(`/dir1`, { recursive: true });
-    expect(items.length).toBe(5);
+    expect(items).toHaveLength(5);
 
     expect(items[0].absPath).toBe(`/dir1/dir2`);
     expect(items[0].relPath).toBe(`dir2`);
@@ -339,7 +330,7 @@ describe(`in-memory-fs`, () => {
     mockedFs.diskReads = 0;
 
     const items = await fs.readdir(`/dir1`);
-    expect(items.length).toBe(3);
+    expect(items).toHaveLength(3);
     expect(items[0].absPath).toBe(`/dir1/dir2`);
     expect(items[0].relPath).toBe(`dir2`);
     expect(items[0].isDirectory).toBe(true);
@@ -459,7 +450,7 @@ describe(`in-memory-fs`, () => {
     expect(await fs.access(`/dir/file.js`)).toBe(true);
     await fs.commit();
 
-    await fs.removeFile(`/dir/file.js`);
+    await fs.remove(`/dir/file.js`);
     await fs.commit();
 
     expect(await fs.access(`/dir/file.js`)).toBe(false);
@@ -471,7 +462,7 @@ describe(`in-memory-fs`, () => {
 
     expect(await fs.access(`/dir/file.js`)).toBe(true);
 
-    await fs.removeDir(`/dir`);
+    await fs.remove(`/dir`);
     await fs.commit();
 
     expect(await fs.access(`/dir/file.js`)).toBe(false);
@@ -523,14 +514,14 @@ describe(`in-memory-fs`, () => {
 
     let i = await fs.commit();
     expect(mockedFs.diskWrites).toBe(3);
-    expect(i.filesWritten.length).toBe(2);
+    expect(i.filesWritten).toHaveLength(2);
     expect(i.filesWritten[0]).toBe(`/dir/file1.js`);
     expect(i.filesWritten[1]).toBe(`/dir/file2.js`);
 
     mockedFs.diskWrites = 0;
     i = await fs.commit();
     expect(mockedFs.diskWrites).toBe(0);
-    expect(i.filesWritten.length).toBe(0);
+    expect(i.filesWritten).toHaveLength(0);
   });
 
   it(`writeFile doesnt rewrite same content`, async () => {
@@ -543,7 +534,7 @@ describe(`in-memory-fs`, () => {
 
     const i = await fs.commit();
     expect(mockedFs.diskWrites).toBe(3);
-    expect(i.filesWritten.length).toBe(2);
+    expect(i.filesWritten).toHaveLength(2);
     expect(i.filesWritten[0]).toBe(`/dir/file1.js`);
     expect(i.filesWritten[1]).toBe(`/dir/file2.js`);
   });
@@ -561,8 +552,8 @@ describe(`in-memory-fs`, () => {
     await fs.writeFile(`/dir/file1.js`, `1`);
     await fs.commit();
 
-    expect(fs.getCache(`/dir/file1.js`).fileText).toBe('1');
-    expect(fs.getCache(`/dir/file2.js`)).toBe(null);
+    expect(fs.getItem(`/dir/file1.js`).fileText).toBe('1');
+    expect(fs.getItem(`/dir/file2.js`).exists).toBe(undefined);
   });
 
   it(`clearDirCache`, async () => {
@@ -574,10 +565,10 @@ describe(`in-memory-fs`, () => {
 
     fs.clearDirCache(`/dir1`);
 
-    expect(fs.getCache(`/dir1/file1.js`)).toBe(null);
-    expect(fs.getCache(`/dir1/file2.js`)).toBe(null);
-    expect(fs.getCache(`/dir1/dir2/file3.js`)).toBe(null);
-    expect(fs.getCache(`/dir3/file4.js`).fileText).toBe('4');
+    expect(fs.getItem(`/dir1/file1.js`).exists).toBe(undefined);
+    expect(fs.getItem(`/dir1/file2.js`).exists).toBe(undefined);
+    expect(fs.getItem(`/dir1/dir2/file3.js`).exists).toBe(undefined);
+    expect(fs.getItem(`/dir3/file4.js`).fileText).toBe('4');
   });
 
   it(`clearDirCache windows`, async () => {
@@ -589,19 +580,60 @@ describe(`in-memory-fs`, () => {
 
     fs.clearDirCache(`C:\\dir1`);
 
-    expect(fs.getCache(`C:\\dir1\\file1.js`)).toBe(null);
-    expect(fs.getCache(`C:\\dir1\\file2.js`)).toBe(null);
-    expect(fs.getCache(`C:\\dir1\\dir2\\file3.js`)).toBe(null);
-    expect(fs.getCache(`C:\\dir3\\file4.js`).fileText).toBe('4');
+    expect(fs.getItem(`C:\\dir1\\file1.js`).exists).toBe(undefined);
+    expect(fs.getItem(`C:\\dir1\\file2.js`).exists).toBe(undefined);
+    expect(fs.getItem(`C:\\dir1\\dir2\\file3.js`).exists).toBe(undefined);
+    expect(fs.getItem(`C:\\dir3\\file4.js`).fileText).toBe('4');
   });
 
-  var mockedFs: TestingFs;
 
-  var fs: InMemoryFileSystem;
+  describe('fs utils', () => {
 
-  beforeEach(() => {
-    mockedFs = mockFs();
-    fs = new InMemoryFileSystem(mockedFs, path);
+    it('isTextFile', () => {
+      const filePaths = [
+        '/file.ts', '/file.tsx', '/file.js', '/file.jsx', '/file.svg',
+        '/file.html', '/file.txt', '/file.md', '/file.markdown',
+        '/file.css', '/file.scss', '/file.sass', '/file.less', '/file.styl'
+      ];
+      filePaths.forEach(filePath => {
+        expect(isTextFile(filePath)).toBe(true);
+      });
+    });
+
+    it('not isTextFile', () => {
+      const filePaths = [
+        '/file.png', '/file.gif', '/file.jpg', '/file.jpeg',
+        '/file.psd', '/file.pdf', '/file.bmp',
+        '/file.woff2', '/file.woff', '/file.ttf', '/file.eot'
+      ];
+      filePaths.forEach(filePath => {
+        expect(isTextFile(filePath)).toBe(false);
+      });
+    });
+
+    it('not shouldIgnore', () => {
+      const filePaths = [
+        '/file.ts', '/file.tsx', '/file.js', '/file.jsx', '/file.svg',
+        '/file.html', '/file.txt', '/file.md', '/file.markdown', '/file.json',
+        '/file.css', '/file.scss', '/file.sass', '/file.less', '/file.styl'
+      ];
+      filePaths.forEach(filePath => {
+        expect(shouldIgnore(filePath)).toBe(false);
+      });
+    });
+
+    it('shouldIgnore', () => {
+      const filePaths = [
+        '/User/.DS_Store',
+        '/User/.gitignore',
+        '/User/desktop.ini',
+        '/User/thumbs.db'
+      ];
+      filePaths.forEach(filePath => {
+        expect(shouldIgnore(filePath)).toBe(true);
+      });
+    });
+
   });
 
 });

@@ -1,5 +1,5 @@
 import { COLLECTION_DEPENDENCIES_DIR, parseDependentManifest } from './manifest-data';
-import { CompilerCtx, Config, DependentCollection, Manifest, ModuleFile } from '../../util/interfaces';
+import { CompilerCtx, Config, DependentCollection, Manifest, ModuleFile } from '../../declarations';
 import { normalizePath } from '../util';
 
 
@@ -79,5 +79,4 @@ async function copySourceCollectionComponentsToDistribution(config: Config, comp
           });
 
   await Promise.all(copyPromises);
-  await compilerCtx.fs.commitCopy();
 }
