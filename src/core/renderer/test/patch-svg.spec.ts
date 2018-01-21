@@ -49,5 +49,18 @@ describe('renderer', () => {
       expect(elm.firstChild.constructor.name).toEqual('SVGSVGElement')
       expect(elm.lastChild.constructor.name).toEqual('HTMLDivElement')
     })
+
+    it('should handle "title" element correctly', function() {
+      elm = patch(vnode0, h('div', null, [
+        h('svg', null, [
+          h('title', null, 'Title'),
+          h('circle', null)
+        ]),
+      ])).elm;
+
+      expect(elm.constructor.name).toEqual('HTMLDivElement')
+      expect(elm.firstChild.constructor.name).toEqual('SVGSVGElement')
+      expect(elm.firstChild.lastChild.constructor.name).toEqual('SVGElement')
+    })
   });
 });
