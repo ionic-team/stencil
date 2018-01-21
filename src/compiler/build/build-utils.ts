@@ -1,4 +1,4 @@
-import { BuildCtx, BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
+import { BuildCtx, BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { initWatcher } from '../watcher/watcher-init';
@@ -63,7 +63,7 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
 function finishBuild(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   const buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
-  // print print any errors/warnings
+  // log any errors/warnings
   config.logger.printDiagnostics(buildResults.diagnostics);
 
   // create a nice pretty message stating what happend
@@ -85,6 +85,7 @@ function finishBuild(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCt
     bold = false;
 
   } else {
+    compilerCtx.hasSuccessfulBuild = true;
     compilerCtx.lastBuildHadError = false;
   }
 
@@ -145,7 +146,7 @@ function generateBuildResultsStats(compilerCtx: CompilerCtx, buildCtx: BuildCtx,
 
 
 function shouldAbort(ctx: CompilerCtx, buildCtx: BuildCtx) {
-  if (ctx.activeBuildId > buildCtx.buildId) {
+  if (ctx.activeBuildId > buildCtx.buildId || buildCtx.aborted) {
     buildCtx.aborted = true;
     return true;
   }

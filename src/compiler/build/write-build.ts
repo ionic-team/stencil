@@ -1,6 +1,6 @@
 import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
-import { copyComponentAssets } from '../component-plugins/assets-plugin';
+import { copyComponentAssets } from '../copy/copy-assets';
 import { generateDistribution } from './distribution';
 import { writeAppManifest } from '../manifest/manifest-data';
 
@@ -68,8 +68,7 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
     config.logger.debug(`empty distDir: ${config.distDir}`);
     emptyPromises.push(compilerCtx.fs.emptyDir(config.distDir));
   }
+
   // let's empty out the build dest directory
   await Promise.all(emptyPromises);
-
-  await compilerCtx.fs.commit();
 }
