@@ -159,7 +159,7 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
         for (let i = 0; i < watchMethods.length; i++) {
           try {
             // fire off each of the watch methods that are watching this property
-            instance[watchMethods[i]].call(instance, newVal, oldVal);
+            instance[watchMethods[i]].call(instance, newVal, oldVal, memberName);
           } catch (e) {
             console.error(e);
           }
