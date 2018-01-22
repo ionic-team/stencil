@@ -38,7 +38,8 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     Object.entries(jsModules[mType])
       .filter(([key]) => !bundleKeys[key])
       .forEach(async ([key, value]) => {
-        await writeJSFile(config, compilerCtx, key, value.code);
+        const jsText = replaceBundleIdPlaceholder(value.code, key);
+        await writeJSFile(config, compilerCtx, key, jsText);
       });
   });
 

@@ -191,7 +191,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
    */
   function checkQueue() {
     bundleQueue.forEach(([bundleId, dependentsList, importer]) => {
-      if (dependentsList.every(dep => loadedBundles[dep])) {
+      if (dependentsList.every(dep => loadedBundles[dep]) && !loadedBundles[bundleId]) {
         execBundleCallback(bundleId, dependentsList, importer);
       }
     });
@@ -202,10 +202,11 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
    */
   App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
 
-    const missingDependents = dependentsList.filter(d => !!loadedBundles[d]);
+    const missingDependents = dependentsList.filter(d => !loadedBundles[d]);
 
     missingDependents.forEach(d => {
-        requestUrl(d);
+        const url = publicPath + d;
+        requestUrl(url);
       });
     bundleQueue.push([bundleId, dependentsList, importer]);
 
@@ -219,7 +220,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
 
 
   let customStyle: CustomStyle;
-  let requestBundleQueue: Function[];
+  let requestBundleQueue: Function[] = [];
   if (Build.cssVarShim) {
     customStyle = new CustomStyle(win, doc);
 
