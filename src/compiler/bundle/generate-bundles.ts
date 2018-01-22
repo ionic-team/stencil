@@ -17,6 +17,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     bundles.map(async bundle => {
       const bundleKeyPath = `./${bundle.entryKey}.js`;
       bundleKeys[bundleKeyPath] = bundle.entryKey;
+      bundle.modeNames = bundle.modeNames || [];
 
       return Promise.all(
         bundle.modeNames.map(async modeName => {

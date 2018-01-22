@@ -17,7 +17,7 @@ export async function bundle(config: Config, compilerCtx: CompilerCtx, buildCtx:
   }
 
   const timeSpan = config.logger.createTimeSpan(`bundle started`, true);
-  let jsModules;
+  let jsModules: JSModuleMap;
 
   try {
     // get all of the bundles from the manifest bundles
@@ -32,9 +32,7 @@ export async function bundle(config: Config, compilerCtx: CompilerCtx, buildCtx:
     await upgradeDependentComponents(config, compilerCtx, buildCtx, bundles);
 
     // kick off style and module bundling at the same time
-    [, jsModules] = await Promise.all([
-      generateBundleModule(config, compilerCtx, buildCtx, bundles)
-    ]);
+    jsModules = await generateBundleModule(config, compilerCtx, buildCtx, bundles);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

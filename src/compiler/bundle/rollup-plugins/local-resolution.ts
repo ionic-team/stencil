@@ -18,6 +18,10 @@ export default function localResolver(config: Config, compilerCtx: CompilerCtx) 
         return null;
       }
 
+      if (importee.endsWith('.js')) {
+        return null;
+      }
+
       const basename = config.sys.path.basename(importer);
       const directory = importer.split(basename)[0];
 

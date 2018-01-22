@@ -5,12 +5,12 @@ import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import localResolution from './rollup-plugins/local-resolution';
 import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
-import { rollup, OutputBundle, InputOptions } from 'rollup';
+import { rollup, OutputChunk, InputOptions } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
-  let rollupBundle: OutputBundle;
+  let rollupBundle: OutputChunk;
 
   let rollupConfig: InputOptions = {
     input: bundles.map(b => b.entryKey),
@@ -41,7 +41,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
 }
 
 
-export async function writeEsModules(config: Config, rollupBundle: OutputBundle) {
+export async function writeEsModules(config: Config, rollupBundle: OutputChunk) {
   const results = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
@@ -51,7 +51,7 @@ export async function writeEsModules(config: Config, rollupBundle: OutputBundle)
 }
 
 
-export async function writeLegacyModules(config: Config, rollupBundle: OutputBundle, bundles: Bundle[]) {
+export async function writeLegacyModules(config: Config, rollupBundle: OutputChunk, bundles: Bundle[]) {
   Object.entries((<any>rollupBundle).chunks).forEach(([key, value]) => {
     const b = bundles.find(b => b.entryKey === `./${key}.js`);
     if (b) {
