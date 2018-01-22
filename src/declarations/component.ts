@@ -53,7 +53,7 @@ export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
   bundleIds?: BundleIds;
-  stylesMeta?: StylesMeta;
+  stylesMeta?: d.StylesMeta;
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
@@ -102,23 +102,6 @@ export interface AttributeTypeInfo {
   typeReferences?: {
     [key: string]: AttributeTypeReference;
   };
-}
-
-
-export interface StylesMeta {
-  [modeName: string]: StyleMeta;
-}
-
-
-export interface StyleMeta {
-  styleId?: string;
-  absolutePaths?: string[];
-  cmpRelativePaths?: string[];
-  originalComponentPaths?: string[];
-  originalCollectionPaths?: string[];
-  styleStr?: string;
-  compiledStyleText?: string;
-  compiledStyleTextScoped?: string;
 }
 
 

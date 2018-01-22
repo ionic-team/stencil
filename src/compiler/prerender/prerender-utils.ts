@@ -1,4 +1,4 @@
-import { Config, HydrateResults, PrerenderConfig, PrerenderLocation, PrerenderStatus } from '../../util/interfaces';
+import { Config, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
 import { DEFAULT_PRERENDER_HOST } from './validate-prerender-config';
 
 
@@ -74,7 +74,7 @@ function addLocationToProcess(config: Config, windowLocationHref: string, preren
   }
 
   // set that this location is pending to be prerendered
-  prerenderLocation.status = PrerenderStatus.pending;
+  prerenderLocation.status = 'pending';
 
   // add this to our queue of locations to prerender
   prerenderQueue.push(prerenderLocation);

@@ -1,4 +1,4 @@
-import { BuildCtx, Config, CompilerCtx, CopyTask } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, CopyTask } from '../../declarations';
 import { catchError, normalizePath } from '../util';
 
 
@@ -8,25 +8,24 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, buildC
     return;
   }
 
-  if (!config.generateWWW) {
+  if (!config.generateWWW && !config.generateDistribution) {
     return;
   }
 
   const timeSpan = config.logger.createTimeSpan(`copyTasks started`, true);
-  const allCopyTasks: CopyTask[] = [];
-
-  const copyTasks = Object.keys(config.copy).map(copyTaskName => config.copy[copyTaskName]);
 
   try {
-    await Promise.all(copyTasks.map(copyTask => {
-      return processCopyTasks(config, compilerCtx, allCopyTasks, copyTask);
+    const allCopyTasks: CopyTask[] = [];
+
+    const copyTasks = Object.keys(config.copy).map(copyTaskName => config.copy[copyTaskName]);
+
+    await Promise.all(copyTasks.map(async copyTask => {
+      await processCopyTasks(config, compilerCtx, allCopyTasks, copyTask);
     }));
 
     await Promise.all(allCopyTasks.map(async copyTask => {
       await compilerCtx.fs.copy(copyTask.src, copyTask.dest, { filter: copyTask.filter });
     }));
-
-    await compilerCtx.fs.commitCopy();
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
@@ -36,10 +35,10 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, buildC
 }
 
 
-export async function processCopyTasks(config: Config, ctx: CompilerCtx, allCopyTasks: CopyTask[], copyTask: CopyTask): Promise<any> {
+export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx, allCopyTasks: CopyTask[], copyTask: CopyTask): Promise<any> {
   if (!copyTask) {
     // possible null was set, which is fine, just skip over this one
-    return null;
+    return;
   }
 
   if (!copyTask.src) {
@@ -51,15 +50,26 @@ export async function processCopyTasks(config: Config, ctx: CompilerCtx, allCopy
   }
 
   if (config.sys.isGlob(copyTask.src)) {
-    return processGlob(config, copyTask).then(copyTasks => {
-      allCopyTasks.push(...copyTasks);
-    });
+    const copyTasks = await processGlob(config, copyTask);
+    allCopyTasks.push(...copyTasks);
+    return;
   }
 
-  const processedCopyTask = processCopyTask(config, copyTask);
+  if (config.generateWWW) {
+    processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.wwwDir);
+  }
+
+  if (config.generateDistribution) {
+    processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.collectionDir);
+  }
+}
+
+
+async function processCopyTaskDestDir(config: Config, compilerCtx: CompilerCtx, allCopyTasks: CopyTask[], copyTask: CopyTask, destAbsDir: string) {
+  const processedCopyTask = processCopyTask(config, copyTask, destAbsDir);
 
   try {
-    const stats = await ctx.fs.stat(processedCopyTask.src);
+    const stats = await compilerCtx.fs.stat(processedCopyTask.src);
     processedCopyTask.isDirectory = stats.isDirectory;
     config.logger.debug(`copy, ${processedCopyTask.src} to ${processedCopyTask.dest}, isDirectory: ${processedCopyTask.isDirectory}`);
     allCopyTasks.push(processedCopyTask);
@@ -72,49 +82,56 @@ export async function processCopyTasks(config: Config, ctx: CompilerCtx, allCopy
 }
 
 
-function processGlob(config: Config, copyTask: CopyTask) {
+async function processGlob(config: Config, copyTask: CopyTask) {
+  const globCopyTasks: CopyTask[] = [];
+
   const globOpts = {
     cwd: config.srcDir,
     nodir: true
   };
 
-  return config.sys.glob(copyTask.src, globOpts).then(files => {
-    return files.map(globRelPath => {
-      return getGlobCopyTask(config, copyTask, globRelPath);
-    });
+  const files = await config.sys.glob(copyTask.src, globOpts);
+
+  files.forEach(globRelPath => {
+    if (config.generateWWW) {
+      globCopyTasks.push(createGlobCopyTask(config, copyTask, config.wwwDir, globRelPath));
+    }
+
+    if (config.generateDistribution) {
+      globCopyTasks.push(createGlobCopyTask(config, copyTask, config.collectionDir, globRelPath));
+    }
   });
+
+  return globCopyTasks;
 }
 
 
-export function getGlobCopyTask(config: Config, copyTask: CopyTask, globRelPath: string) {
-  let dest: string;
+export function createGlobCopyTask(config: Config, copyTask: CopyTask, destDir: string, globRelPath: string) {
+  const processedCopyTask: CopyTask = {
+    src: config.sys.path.join(config.srcDir, globRelPath),
+    filter: copyTask.filter
+  };
 
   if (copyTask.dest) {
     if (config.sys.path.isAbsolute(copyTask.dest)) {
-      dest = config.sys.path.join(copyTask.dest, config.sys.path.basename(globRelPath));
+      processedCopyTask.dest = config.sys.path.join(copyTask.dest, config.sys.path.basename(globRelPath));
 
     } else {
-      dest = config.sys.path.join(config.wwwDir, copyTask.dest, config.sys.path.basename(globRelPath));
+      processedCopyTask.dest = config.sys.path.join(destDir, copyTask.dest, config.sys.path.basename(globRelPath));
     }
 
   } else {
-    dest = config.sys.path.join(config.wwwDir, globRelPath);
+    processedCopyTask.dest = config.sys.path.join(destDir, globRelPath);
   }
-
-  const processedCopyTask: CopyTask = {
-    src: config.sys.path.join(config.srcDir, globRelPath),
-    dest: dest,
-    filter: copyTask.filter
-  };
 
   return processedCopyTask;
 }
 
 
-export function processCopyTask(config: Config, copyTask: CopyTask) {
+export function processCopyTask(config: Config, copyTask: CopyTask, destAbsPath: string) {
   const processedCopyTask: CopyTask = {
     src: getSrcAbsPath(config, copyTask.src),
-    dest: getDestAbsPath(config, copyTask.src, copyTask.dest),
+    dest: getDestAbsPath(config, copyTask.src, destAbsPath, copyTask.dest),
     filter: copyTask.filter
   };
 
@@ -131,13 +148,13 @@ export function getSrcAbsPath(config: Config, src: string) {
 }
 
 
-export function getDestAbsPath(config: Config, src: string, dest?: string) {
-  if (dest) {
-    if (config.sys.path.isAbsolute(dest)) {
-      return dest;
+export function getDestAbsPath(config: Config, src: string, destAbsPath: string, destRelPath: string) {
+  if (destRelPath) {
+    if (config.sys.path.isAbsolute(destRelPath)) {
+      return destRelPath;
 
     } else {
-      return config.sys.path.join(config.wwwDir, dest);
+      return config.sys.path.join(destAbsPath, destRelPath);
     }
   }
 
@@ -145,7 +162,7 @@ export function getDestAbsPath(config: Config, src: string, dest?: string) {
     throw new Error(`copy task, "to" property must exist if "from" property is an absolute path: ${src}`);
   }
 
-  return config.sys.path.join(config.wwwDir, src);
+  return config.sys.path.join(destAbsPath, src);
 }
 
 

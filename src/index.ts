@@ -1,6 +1,5 @@
 
 import * as d from './declarations';
-import './declarations/jsx';
 
 export {
   ComponentDidLoad,

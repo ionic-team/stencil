@@ -1,4 +1,4 @@
-import { Config, PrerenderConfig } from '../../../util/interfaces';
+import { Config, PrerenderConfig } from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { normalizePrerenderLocation } from '../prerender-utils';
 import { validatePrerenderConfig } from '../validate-prerender-config';

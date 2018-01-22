@@ -1,8 +1,8 @@
 import { Config, CompilerCtx, Bundle, ComponentMeta, ComponentRegistry, SourceTarget, ModuleFile, BuildCtx, JSModuleMap } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { hasError, pathJoin, minifyJs } from '../util';
+import { hasError, minifyJs, pathJoin } from '../util';
 import { getAppDistDir, getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
-import { getStylePlaceholder, getStyleIdPlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
+import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
@@ -36,8 +36,8 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
   Object.keys(jsModules).forEach(mType => {
     Object.entries(jsModules[mType])
       .filter(([key]) => !bundleKeys[key])
-      .forEach(([key, value]) => {
-        writeJSFile(config, compilerCtx, key, value.code);
+      .forEach(async ([key, value]) => {
+        await writeJSFile(config, compilerCtx, key, value.code);
       });
   });
 
@@ -65,14 +65,14 @@ async function generateBundleMode(config: Config, compilerCtx: CompilerCtx, buil
   });
 
   // generate the bundle build for mode, no scoped styles, and esm
-  generateBundleBuild(config, compilerCtx, jsText, bundleId, false);
+  await generateBundleBuild(config, compilerCtx, jsText, bundleId, false);
 
   if (bundle.requiresScopedStyles) {
     // create js text for: mode, scoped styles, esm
     jsText = await createBundleJsText(config, compilerCtx, buildCtx, bundle, jsCode['esm'], modeName, true);
 
     // generate the bundle build for: mode, esm and scoped styles
-    generateBundleBuild(config, compilerCtx, jsText, bundleId, true);
+    await generateBundleBuild(config, compilerCtx, jsText, bundleId, true);
   }
 
   if (config.buildEs5) {
@@ -80,14 +80,14 @@ async function generateBundleMode(config: Config, compilerCtx: CompilerCtx, buil
     jsText = await createBundleJsText(config, compilerCtx, buildCtx, bundle, jsCode['es5'], modeName, false, 'es5');
 
     // generate the bundle build for: mode, no scoped styles and es5
-    generateBundleBuild(config, compilerCtx, jsText, bundleId, false, 'es5');
+    await generateBundleBuild(config, compilerCtx, jsText, bundleId, false, 'es5');
 
     if (bundle.requiresScopedStyles) {
       // create js text for: mode, scoped styles, es5
       jsText = await createBundleJsText(config, compilerCtx, buildCtx, bundle, jsCode['es5'], modeName, true, 'es5');
 
       // generate the bundle build for: mode, es5 and scoped styles
-      generateBundleBuild(config, compilerCtx, jsText, bundleId, true, 'es5');
+      await generateBundleBuild(config, compilerCtx, jsText, bundleId, true, 'es5');
     }
   }
 }
@@ -118,7 +118,7 @@ async function createBundleJsText(config: Config, compilerCtx: CompilerCtx, buil
 }
 
 
-function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, jsText: string, bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
+async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, jsText: string, bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
   // create the file name
   const fileName = getBundleFilename(bundleId, isScopedStyles, sourceTarget);
 
@@ -127,11 +127,11 @@ function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, jsText: s
   // this is used by jsonp callbacks to know which bundle loaded
   jsText = replaceBundleIdPlaceholder(jsText, bundleId);
 
-  writeJSFile(config, compilerCtx, fileName, jsText);
+  await writeJSFile(config, compilerCtx, fileName, jsText);
 }
 
 
-function writeJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
+async function writeJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
 
   // get the absolute path to where it'll be saved in www
   const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
@@ -141,12 +141,12 @@ function writeJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string,
 
   if (config.generateWWW) {
     // write to the www build
-    compilerCtx.fs.writeFile(wwwBuildPath, jsText);
+    await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
   }
 
   if (config.generateDistribution) {
     // write to the dist build
-    compilerCtx.fs.writeFile(distPath, jsText);
+    await compilerCtx.fs.writeFile(distPath, jsText);
   }
 }
 

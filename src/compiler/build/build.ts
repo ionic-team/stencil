@@ -24,23 +24,15 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
   // reset the build context, this is important for rebuilds
   const buildCtx = getBuildContext(config, compilerCtx, watcher);
 
-  if (!compilerCtx.isRebuild) {
-    config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
-  }
-
   try {
     // create an initial index.html file if one doesn't already exist
     // this is synchronous on purpose
-    if (await !initIndexHtml(config, compilerCtx, buildCtx)) {
-      // error initializing the index.html file
-      // something's wrong, so let's not continue
-      return buildCtx.finish();
-    }
+    await initIndexHtml(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
-    if (!compilerCtx.isRebuild) {
-      // empty the directories on the first build
-      await emptyDestDir(config, compilerCtx);
-    }
+    // empty the directories on the first build
+    await emptyDestDir(config, compilerCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // begin the build
     // async scan the src directory for ts files
@@ -72,7 +64,7 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // copy all assets
-    if (!compilerCtx.isRebuild) {
+    if (!compilerCtx.hasSuccessfulBuild) {
       // only do the initial copy on the first build
       // watcher handles any re-copies
       await copyTasks(config, compilerCtx, buildCtx);

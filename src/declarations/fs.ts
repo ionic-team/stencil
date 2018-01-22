@@ -41,6 +41,7 @@ export interface FsWriteOptions {
 export interface FsWriteResults {
   changedContent?: boolean;
   queuedWrite?: boolean;
+  ignored?: boolean;
 }
 
 
@@ -51,15 +52,11 @@ export interface FsItems {
 
 export interface FsItem {
   fileText?: string;
+  fileSrc?: string;
   isFile?: boolean;
   isDirectory?: boolean;
+  mtimeMs?: number;
   exists?: boolean;
   queueWriteToDisk?: boolean;
   queueDeleteFromDisk?: boolean;
-}
-
-
-export interface FsCopyFileTask {
-  src: string;
-  dest: string;
 }

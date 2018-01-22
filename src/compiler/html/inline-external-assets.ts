@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, HydrateResults, Url } from '../../util/interfaces';
+import { CompilerCtx, Config, HydrateResults, Url } from '../../declarations';
 import { pathJoin } from '../util';
 
 
@@ -60,7 +60,7 @@ async function getAssetContent(config: Config, ctx: CompilerCtx, results: Hydrat
   // doesn't look like we've got it cached in app files
   try {
     // try looking it up directly
-    let content = await ctx.fs.readFile(filePath);
+    const content = await ctx.fs.readFile(filePath);
 
     // rough estimate of size
     const fileSize = content.length;

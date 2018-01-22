@@ -1,18 +1,17 @@
-import { ComponentMeta, ComponentRegistry, Config, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode } from '../util/interfaces';
-import { ComponentInstance } from '../util/interfaces';
+import { Cache } from '../compiler/cache';
+import { ComponentInstance, ComponentMeta, ComponentRegistry, Config, DomApi, HostContentNodes, HostElement,
+  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
-import { initHostElement } from '../core/instance/init-host-element';
 import { initComponentInstance } from '../core/instance/init-component-instance';
-import { validateBuildConfig } from '../compiler/config/validate-config';
+import { initHostElement } from '../core/instance/init-host-element';
+import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { TestingConfig } from './testing-config';
 import { TestingSystem } from './testing-sys';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './index';
-import { Cache } from '../compiler/cache';
-import { InMemoryFileSystem } from '../util/in-memory-fs';
+import { validateBuildConfig } from '../compiler/config/validate-config';
 
 
 export function mockPlatform(win?: any, domApi?: DomApi) {
@@ -75,8 +74,9 @@ export interface MockedPlatform extends PlatformApi {
 }
 
 
-export function mockConfig(): Config {
+export function mockConfig(opts = { enableLogger: false }): Config {
   const config = new TestingConfig();
+  (config.logger as TestingLogger).enable = opts.enableLogger;
   return validateBuildConfig(config);
 }
 

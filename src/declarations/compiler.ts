@@ -26,5 +26,6 @@ export interface CompilerCtx {
   appCoreWWWPath?: string;
 
   lastBuildHadError?: boolean;
+  hasSuccessfulBuild?: boolean;
   localPrerenderServer?: any;
 }

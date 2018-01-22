@@ -1,4 +1,4 @@
-import { BuildCtx, Bundle, CompilerCtx, ComponentRegistry, Config } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, ComponentRegistry, Config } from '../../declarations';
 import { catchError, pathJoin } from '../util';
 import { createAppRegistry, writeAppRegistry } from './app-registry';
 import { generateAppGlobalScript } from './app-global-scripts';
@@ -53,7 +53,7 @@ export async function generateAppFiles(config: Config, compilerCtx: CompilerCtx,
     }
 
     // create a json file for the app registry
-    writeAppRegistry(config, compilerCtx, appRegistry, cmpRegistry);
+    await writeAppRegistry(config, compilerCtx, appRegistry, cmpRegistry);
 
     // create the loader after creating the loader file name
     await generateLoader(config, compilerCtx, appRegistry, cmpRegistry);

@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, FsWriteResults } from '../../util/interfaces';
+import { CompilerCtx, Config, FsWriteResults } from '../../declarations';
 import { isDtsFile, isJsFile, normalizePath } from '../util';
 import * as ts from 'typescript';
 

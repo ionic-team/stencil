@@ -1,13 +1,34 @@
-import { Diagnostic, Logger, LoggerTimeSpan } from '../util/interfaces';
+import { Diagnostic, Logger, LoggerTimeSpan } from '../declarations';
 
 
 export class TestingLogger implements Logger {
+
+  enable = false;
+
   level: string;
-  info(..._msg: any[]) {}
-  warn(..._msg: any[]) {}
-  error(..._msg: any[]) {}
-  debug(..._msg: any[]) {}
-  color(_msg: string, _color: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {}
+  info(...msg: any[]) {
+    if (this.enable) {
+      console.log.apply(console, msg);
+    }
+  }
+  warn(...msg: any[]) {
+    if (this.enable) {
+      console.warn.apply(console, msg);
+    }
+  }
+  error(...msg: any[]) {
+    if (this.enable) {
+      console.error.apply(console, msg);
+    }
+  }
+  debug(...msg: any[]) {
+    if (this.enable) {
+      console.log.apply(console, msg);
+    }
+  }
+  color(_msg: string, _color: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {
+    /* */
+  }
   red(msg: string) { return msg; }
   green(msg: string) { return msg; }
   yellow(msg: string) { return msg; }
@@ -19,8 +40,12 @@ export class TestingLogger implements Logger {
   dim(msg: string) { return msg; }
   createTimeSpan(_startMsg: string, _debug = false): LoggerTimeSpan {
     return {
-      finish: () => {}
+      finish: () => {
+        /* finish */
+      }
     };
   }
-  printDiagnostics(_diagnostics: Diagnostic[]) {}
+  printDiagnostics(_diagnostics: Diagnostic[]) {
+    /* */
+  }
 }

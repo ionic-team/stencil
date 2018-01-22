@@ -1,6 +1,6 @@
 import { AssetsMeta, BuildCtx, BundleData, CompilerCtx, ComponentData, ComponentMeta, Config,
-  EventData, ListenMeta, ListenerData, Manifest, ManifestBundle, ManifestData, ModuleFile,
-  PropData, StyleData, StyleMeta } from '../../util/interfaces';
+  EventData, ExternalStyleMeta, ListenMeta, ListenerData, Manifest, ManifestBundle, ManifestData, ModuleFile,
+  PropData, StyleData, StyleMeta } from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
@@ -11,7 +11,7 @@ import { normalizePath } from '../util';
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
 
-export function writeAppManifest(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function writeAppManifest(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
   // get the absolute path to the directory where the manifest will be saved
   const manifestDir = normalizePath(config.collectionDir);
@@ -27,7 +27,7 @@ export function writeAppManifest(config: Config, compilerCtx: CompilerCtx, build
 
   if (config.generateDistribution) {
     // don't bother serializing/writing the manifest if we're not creating a distribution
-    compilerCtx.fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2));
+    await compilerCtx.fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2));
   }
 
   return manifestData;
@@ -271,22 +271,22 @@ function parseStyles(config: Config, manifestDir: string, cmpData: ComponentData
 function serializeStyle(config: Config, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
   const modeStyleData: StyleData = {};
 
-  if (modeStyleMeta.cmpRelativePaths) {
+  if (modeStyleMeta.externalStyles && modeStyleMeta.externalStyles.length > 0) {
     if (moduleFile.isCollectionDependency) {
       // this is from a collection, let's use the original paths
-      modeStyleData.stylePaths = modeStyleMeta.originalCollectionPaths.map(originalCollectionPath => {
-        return normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, originalCollectionPath));
+      modeStyleData.stylePaths = modeStyleMeta.externalStyles.map(externalStyle => {
+        return normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, externalStyle.originalCollectionPath));
       });
 
     } else {
-      modeStyleData.stylePaths = modeStyleMeta.cmpRelativePaths.map(componentRelativeStylePath => {
+      modeStyleData.stylePaths = modeStyleMeta.externalStyles.map(externalStyle => {
         // convert style paths which are relative to the component file
         // to be style paths that are relative to the manifest file
 
         // we've already figured out the component's relative path from the manifest file
         // use the value we already created in serializeComponentPath()
         // create a relative path from the manifest file to the style path
-        return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, componentRelativeStylePath));
+        return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, externalStyle.cmpRelativePath));
       });
     }
 
@@ -306,21 +306,23 @@ function parseStyle(config: Config, manifestDir: string, cmpData: ComponentData,
   };
 
   if (modeStyleData.stylePaths) {
-    modeStyle.absolutePaths = modeStyleData.stylePaths.map(stylePath => {
-      return normalizePath(config.sys.path.join(
+    modeStyle.externalStyles = modeStyleData.stylePaths.map(stylePath => {
+      const externalStyle: ExternalStyleMeta = {};
+
+      externalStyle.absolutePath = normalizePath(config.sys.path.join(
         manifestDir,
         stylePath
       ));
-    });
 
-    modeStyle.cmpRelativePaths = modeStyleData.stylePaths.map(stylePath => {
-      return normalizePath(config.sys.path.relative(
+      externalStyle.cmpRelativePath = normalizePath(config.sys.path.relative(
         config.sys.path.dirname(cmpData.componentPath),
         stylePath
       ));
-    });
 
-    modeStyle.originalCollectionPaths = modeStyleData.stylePaths.slice();
+      externalStyle.originalCollectionPath = normalizePath(stylePath);
+
+      return externalStyle;
+    });
   }
 
   return modeStyle;

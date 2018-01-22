@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import { gatherMetadata } from './test-utils';
 
+
 describe('component decorator', () => {
 
   describe('getComponentDecoratorMeta', () => {
@@ -90,10 +91,18 @@ describe('component decorator', () => {
         },
         stylesMeta: {
           ios: {
-            originalComponentPaths: ['action-sheet.ios.scss']
+            externalStyles: [
+              {
+                originalComponentPath: 'action-sheet.ios.scss'
+              }
+            ]
           },
           md: {
-            originalComponentPaths: ['action-sheet.md.scss']
+            externalStyles: [
+              {
+                originalComponentPath: 'action-sheet.md.scss'
+              }
+            ]
           }
         },
         assetsDirsMeta: [],

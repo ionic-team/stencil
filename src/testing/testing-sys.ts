@@ -1,5 +1,5 @@
 import { TestingFs } from './testing-fs';
-import { StencilSystem } from '../util/interfaces';
+import { StencilSystem } from '../declarations';
 import * as fs from 'fs';
 import * as path from 'path';
 

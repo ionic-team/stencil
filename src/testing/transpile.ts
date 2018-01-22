@@ -1,4 +1,4 @@
-import { Config, Diagnostic } from '../util/interfaces';
+import { Config, Diagnostic } from '../declarations';
 import { transpileModule } from '../compiler/transpile/transpile';
 
 

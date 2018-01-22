@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, HydrateResults, Bundle, PrerenderConfig, PrerenderStatus, PrerenderLocation, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
 import { buildWarn, catchError, hasError, pathJoin } from '../util';
 import { generateHostConfig } from './host-config';
 import { prerenderPath } from './prerender-path';
@@ -80,7 +80,7 @@ async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCt
 
 function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, prerenderQueue: PrerenderLocation[], indexSrcHtml: string, hydrateResults: HydrateResults[], resolve: Function) {
   for (var i = 0; i < (config.prerender as PrerenderConfig).maxConcurrent; i++) {
-    var activelyProcessingCount = prerenderQueue.filter(p => p.status === PrerenderStatus.processing).length;
+    const activelyProcessingCount = prerenderQueue.filter(p => p.status === 'processing').length;
 
     if (activelyProcessingCount >= (config.prerender as PrerenderConfig).maxConcurrent) {
       // whooaa, slow down there buddy, let's not get carried away
@@ -91,7 +91,7 @@ function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx:
   }
 
   const remaining = prerenderQueue.filter(p => {
-    return p.status === PrerenderStatus.processing || p.status === PrerenderStatus.pending;
+    return p.status === 'processing' || p.status === 'pending';
   }).length;
 
   if (remaining === 0) {
@@ -104,12 +104,12 @@ function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx:
 
 
 async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, prerenderQueue: PrerenderLocation[], indexSrcHtml: string, hydrateResults: HydrateResults[], resolve: Function) {
-  const p = prerenderQueue.find(p => p.status === PrerenderStatus.pending);
+  const p = prerenderQueue.find(p => p.status === 'pending');
   if (!p) return;
 
   // we've got a url that's pending
   // well guess what, it's go time
-  p.status = PrerenderStatus.processing;
+  p.status = 'processing';
 
   try {
     // prender this path and wait on the results
@@ -125,7 +125,7 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
 
     hydrateResults.push(results);
 
-    writePrerenderDest(config, compilerCtx, results);
+    await writePrerenderDest(config, compilerCtx, results);
 
   } catch (e) {
     // darn, idk, bad news
@@ -133,7 +133,7 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
   }
 
   // this job is not complete
-  p.status = PrerenderStatus.complete;
+  p.status = 'complete';
 
   // let's try to drain the queue again and let this
   // next call figure out if we're actually done or not
@@ -141,7 +141,7 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
 }
 
 
-function writePrerenderDest(config: Config, ctx: CompilerCtx, results: HydrateResults) {
+async function writePrerenderDest(config: Config, ctx: CompilerCtx, results: HydrateResults) {
   const parsedUrl = config.sys.url.parse(results.url);
 
   // figure out the directory where this file will be saved
@@ -155,5 +155,5 @@ function writePrerenderDest(config: Config, ctx: CompilerCtx, results: HydrateRe
 
   // add the prerender html content it to our collection of
   // files that need to be saved when we're all ready
-  ctx.fs.writeFile(filePath, results.html);
+  await ctx.fs.writeFile(filePath, results.html);
 }

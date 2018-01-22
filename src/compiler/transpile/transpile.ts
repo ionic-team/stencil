@@ -1,5 +1,5 @@
 import addComponentMetadata from './transformers/add-component-metadata';
-import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../declarations';
 import { hasError, normalizePath } from '../util';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
@@ -77,7 +77,7 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
   const componentTypesFileContent = generateComponentTypesFile(config, metadata);
 
   // queue the components.d.ts async file write and put it into memory
-  compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
+  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
 
   // get all of the ts files paths to transpile
   // ensure the components.d.ts file is always included to this transpile program
@@ -184,86 +184,3 @@ export function transpileModule(config: Config, compilerOptions: ts.CompilerOpti
 
   return results;
 }
-
-
-// function processIncludedStyles(config: Config, ctx: CompilerCtx, moduleFile: ModuleFile) {
-//   if (ctx.isChangeBuild && !ctx.changeHasSass && !ctx.changeHasCss) {
-//     // this is a change, but it's not for any styles so don't bother
-//     return Promise.resolve([]);
-//   }
-//   if (!moduleFile.cmpMeta || !moduleFile.cmpMeta.stylesMeta) {
-//     // module isn't a component or the component doesn't have styles, so don't bother
-//     return Promise.resolve([]);
-//   }
-//   const promises: Promise<any>[] = [];
-//   // loop through each of the style paths and see if there are any sass files
-//   // for each sass file let's figure out which source sass files it uses
-//   const modeNames = Object.keys(moduleFile.cmpMeta.stylesMeta);
-//   modeNames.forEach(modeName => {
-//     const modeMeta = moduleFile.cmpMeta.stylesMeta[modeName];
-//     if (modeMeta.absolutePaths) {
-//       modeMeta.absolutePaths.forEach(absoluteStylePath => {
-//         if (isSassFile(absoluteStylePath)) {
-//           // this componet mode has a sass file, let's see which
-//           // sass files are included in it
-//           promises.push(
-//             getIncludedSassFiles(config, ctx.diagnostics, moduleFile, absoluteStylePath)
-//           );
-//         }
-//       });
-//     }
-//   });
-//   return Promise.all(promises);
-// }
-
-// function getIncludedSassFiles(config: Config, diagnostics: Diagnostic[], moduleFile: ModuleFile, scssFilePath: string) {
-//   return new Promise(resolve => {
-//     scssFilePath = normalizePath(scssFilePath);
-//     const sassConfig = {
-//       ...config.sassConfig,
-//       file: scssFilePath
-//     };
-//     const includedSassFiles: string[] = []
-//     if (includedSassFiles.indexOf(scssFilePath) === -1) {
-//       moduleFile.includedSassFiles.push(scssFilePath);
-//     }
-//     config.sys.sass.render(sassConfig, (err, result) => {
-//       if (err) {
-//         const d = buildError(diagnostics);
-//         d.messageText = err.message;
-//         d.absFilePath = err.file;
-//       } else if (result.stats && result.stats.includedFiles) {
-//         result.stats.includedFiles.forEach((includedFile: string) => {
-//           includedFile = normalizePath(includedFile);
-//           if (moduleFile.includedSassFiles.indexOf(includedFile) === -1) {
-//             moduleFile.includedSassFiles.push(includedFile);
-//           }
-//         });
-//       }
-//       resolve();
-//     });
-//   });
-// }
-// async function copySourceSassFilesToDest(config: Config, ctx: CompilerCtx, compileResults: CompileResults): Promise<any> {
-//   if (!config.generateDistribution) {
-//     return;
-//   }
-//   return Promise.all(compileResults.includedSassFiles.map(async sassSrcPath => {
-//     const sassSrcText = await ctx.fs.readFile(sassSrcPath);
-//     const includeDir = sassSrcPath.indexOf(config.srcDir) === 0;
-//     let sassDestPath: string;
-//     if (includeDir) {
-//       sassDestPath = pathJoin(
-//         config,
-//         config.collectionDir,
-//         config.sys.path.relative(config.srcDir, sassSrcPath)
-//       );
-//     } else {
-//       sassDestPath = pathJoin(config,
-//         config.rootDir,
-//         config.sys.path.relative(config.rootDir, sassSrcPath)
-//       );
-//     }
-//     ctx.fs.writeFile(sassDestPath, sassSrcText);
-//   }));
-// }

@@ -1,4 +1,4 @@
-import { BuildCtx, Config, CompilerCtx } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 
 
@@ -9,41 +9,41 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
   // this is synchronous on purpose so that it's saved
   // before the dev server fires up and loads the index.html page
 
-  if (!config.generateWWW || compilerCtx.isRebuild) {
-    // don't bother doing this again on rebuilds
-    return true;
+  if (!config.generateWWW) {
+    // only worry about this when generating www directory
+    return;
+  }
+
+  if (compilerCtx.hasSuccessfulBuild) {
+    // we've already had a successful build, we're good
+    return;
   }
 
   // check if there's even a src index.html file
-  if (!compilerCtx.fs.accessSync(config.srcIndexHtml)) {
+  const hasSrcIndexHtml = await compilerCtx.fs.access(config.srcIndexHtml);
+  if (!hasSrcIndexHtml) {
     // there is no src index.html file in the config, which is fine
     // since there is no src index file at all, don't bother
     // this isn't actually an error, don't worry about it
-    return true;
+    return;
   }
 
   try {
     // ok, so we haven't written an index.html build file yet
     // and we do know they have a src one, so let's write a
     // filler index.html file that shows while the first build is happening
-    await compilerCtx.fs.writeFile(config.wwwIndexHtml, FILLER_INDEX_BUILD);
-    compilerCtx.fs.commit();
+    await compilerCtx.fs.writeFile(config.wwwIndexHtml, APP_LOADING_HTML);
+    await compilerCtx.fs.commit();
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
-
-    // darn, actual error here, idk
-    return false;
   }
-
-  // successful, let's continue with the build
-  return true;
 }
 
 
-const FILLER_INDEX_BUILD = `
+const APP_LOADING_HTML = `
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html dir="ltr" lang="en" data-init="app-dev-first-build-loader">
 <head>
   <script>
     if ('serviceWorker' in navigator) {
@@ -54,6 +54,7 @@ const FILLER_INDEX_BUILD = `
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="x-ua-compatible" content="IE=Edge">
   <title>Initializing First Build...</title>
   <style>
     * {
@@ -174,6 +175,26 @@ const FILLER_INDEX_BUILD = `
     setTimeout(function() {
       document.querySelector('.toast').classList.add('active');
     }, 100);
+
+    setInterval(function() {
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', function() {
+          try {
+            if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
+              window.location.reload(true);
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        });
+        var url = window.location.pathname + '?' + Math.random();
+        xhr.open('GET', url);
+        xhr.send();
+      } catch (e) {
+        console.error(e);
+      }
+    }, 1000);
   </script>
 
 </body>
