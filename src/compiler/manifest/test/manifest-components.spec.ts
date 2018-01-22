@@ -294,14 +294,16 @@ describe('manifest components', () => {
   it('stylesMeta stylePaths', () => {
     a.stylesMeta = {
       ios: {
-        cmpRelativePaths: ['cmp-a.scss']
+        externalStyles: [{
+          cmpRelativePath: 'cmp-a.scss'
+        }]
       }
     };
     const cmpData = serializeComponent(config, manifestDir, moduleFile);
     expect(cmpData.styles.ios.stylePaths[0]).toBe('components/cmp-a.scss');
     b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
-    expect(b.cmpMeta.stylesMeta.ios.cmpRelativePaths[0]).toBe('cmp-a.scss');
-    expect(b.cmpMeta.stylesMeta.ios.absolutePaths[0]).toBe('/User/me/myapp/dist/collection/components/cmp-a.scss');
+    expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].cmpRelativePath).toBe('cmp-a.scss');
+    expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/cmp-a.scss');
   });
 
   it('stylesMeta styleStr', () => {

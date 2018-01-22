@@ -15,9 +15,9 @@ export async function copyComponentStyles(config: Config, compilerCtx: CompilerC
       Object.keys(c.cmpMeta.stylesMeta).forEach(modeName => {
         const styleMeta = c.cmpMeta.stylesMeta[modeName];
 
-        if (styleMeta.absolutePaths) {
-          styleMeta.absolutePaths.forEach(absPath => {
-            absSrcStylePaths.push(absPath);
+        if (styleMeta.externalStyles) {
+          styleMeta.externalStyles.forEach(externalStyle => {
+            absSrcStylePaths.push(externalStyle.absolutePath);
           });
         }
       });

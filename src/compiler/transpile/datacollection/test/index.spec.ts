@@ -1,12 +1,14 @@
 import { ENCAPSULATION } from '../../../../util/constants';
+import { gatherMetadata } from './test-utils';
+import { mockConfig } from '../../../../testing/mocks';
 import { visitClass } from '../index';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { gatherMetadata } from './test-utils';
-import { mockConfig } from '../../../../testing/mocks';
 
 
 describe('component decorator', () => {
+
+  const config = mockConfig();
 
   describe('getComponentDecoratorMeta', () => {
     it('simple decorator', () => {
@@ -252,14 +254,18 @@ describe('component decorator', () => {
         },
         'stylesMeta': {
           'ios': {
-            'originalComponentPaths': [
-              'action-sheet.ios.scss',
-            ],
+            'externalStyles': [
+              {
+                'originalComponentPath': 'action-sheet.ios.scss'
+              }
+            ]
           },
           'md': {
-            'originalComponentPaths': [
-              'action-sheet.md.scss',
-            ],
+            'externalStyles': [
+              {
+                'originalComponentPath': 'action-sheet.md.scss'
+              }
+            ]
           },
         },
         'tagNameMeta': 'ion-action-sheet'
@@ -267,5 +273,4 @@ describe('component decorator', () => {
     });
   });
 
-  var config = mockConfig();
 });

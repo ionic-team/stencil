@@ -1,11 +1,12 @@
-import { ComponentOptions, ComponentMeta, ModeStyles, AssetsMeta } from '../../../util/interfaces';
-import { ENCAPSULATION, DEFAULT_STYLE_MODE } from '../../../util/constants';
-import { getDeclarationParameters, serializeSymbol, isDecoratorNamed } from './utils';
+import { AssetsMeta, ComponentMeta, ComponentOptions, ExternalStyleMeta, ModeStyles } from '../../../declarations';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
+import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
+
 export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
-  let cmpMeta: ComponentMeta = {};
-  let symbol = checker.getSymbolAtLocation(node.name);
+  const cmpMeta: ComponentMeta = {};
+  const symbol = checker.getSymbolAtLocation(node.name);
 
   if (!node.decorators) {
     return undefined;
@@ -51,33 +52,48 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
     }
   }
 
-  // styleUrl: 'my-styles.scss'
+  // styleUrl: 'my-styles.css'
   if (typeof componentOptions.styleUrl === 'string' && componentOptions.styleUrl.trim()) {
     cmpMeta.stylesMeta = {
       [DEFAULT_STYLE_MODE]: {
-        originalComponentPaths: [componentOptions.styleUrl.trim()]
+        externalStyles: [{
+          originalComponentPath: componentOptions.styleUrl.trim()
+        }]
       }
     };
 
-  // styleUrls: ['my-styles.scss', 'my-other-styles']
+  // styleUrls: ['my-styles.css', 'my-other-styles']
   } else if (Array.isArray(componentOptions.styleUrls)) {
     cmpMeta.stylesMeta = {
       [DEFAULT_STYLE_MODE]: {
-        originalComponentPaths: componentOptions.styleUrls.map(s => s.trim())
+        externalStyles: componentOptions.styleUrls.map(styleUrl => {
+          const externalStyle: ExternalStyleMeta = {
+            originalComponentPath: styleUrl.trim()
+          };
+          return externalStyle;
+        })
       }
     };
 
   // styleUrls: {
-  //   ios: 'badge.ios.scss',
-  //   md: 'badge.md.scss',
-  //   wp: 'badge.wp.scss'
+  //   ios: 'badge.ios.css',
+  //   md: 'badge.md.css',
+  //   wp: 'badge.wp.css'
   // }
   } else {
+
     Object.keys(componentOptions.styleUrls || {}).reduce((stylesMeta, styleType) => {
-      let styleUrls = <ModeStyles>componentOptions.styleUrls;
+      const styleUrls = <ModeStyles>componentOptions.styleUrls;
+
+      const sUrls = [].concat(styleUrls[styleType]);
 
       stylesMeta[styleType] = {
-        originalComponentPaths: [].concat(styleUrls[styleType])
+        externalStyles: sUrls.map(sUrl => {
+          const externalStyle: ExternalStyleMeta = {
+            originalComponentPath: sUrl
+          };
+          return externalStyle;
+        })
       };
 
       return stylesMeta;

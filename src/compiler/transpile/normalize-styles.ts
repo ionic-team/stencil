@@ -1,4 +1,4 @@
-import { Config, StylesMeta } from '../../util/interfaces';
+import { Config, ExternalStyleMeta, StylesMeta } from '../../declarations';
 import { normalizePath } from '../util';
 
 
@@ -6,13 +6,23 @@ export function normalizeStyles(config: Config, componentFilePath: string, style
   const newStylesMeta: StylesMeta = {};
 
   Object.keys(stylesMeta).forEach((modeName) => {
-    newStylesMeta[modeName] = {};
-    const originalPaths = newStylesMeta[modeName].originalComponentPaths = stylesMeta[modeName].originalComponentPaths || [];
+    newStylesMeta[modeName] = {
+      externalStyles: []
+    };
 
-    originalPaths.forEach((originalPath) => {
-      const { cmpRelativePath, absolutePath } = normalizeModeStylePaths(config, componentFilePath, originalPath);
-      newStylesMeta[modeName].cmpRelativePaths = (newStylesMeta[modeName].cmpRelativePaths || []).concat(cmpRelativePath);
-      newStylesMeta[modeName].absolutePaths = (newStylesMeta[modeName].absolutePaths || []).concat(absolutePath);
+    const externalStyles = stylesMeta[modeName].externalStyles || [];
+
+    newStylesMeta[modeName].externalStyles = externalStyles.map(externalStyle => {
+      const { cmpRelativePath, absolutePath } = normalizeModeStylePaths(config, componentFilePath, externalStyle.originalComponentPath);
+
+      const normalizedExternalStyles: ExternalStyleMeta = {
+        absolutePath: absolutePath,
+        cmpRelativePath: cmpRelativePath,
+        originalComponentPath: externalStyle.originalComponentPath,
+        originalCollectionPath: externalStyle.originalCollectionPath
+      };
+
+      return normalizedExternalStyles;
     });
 
     if (typeof stylesMeta[modeName].styleStr === 'string') {
