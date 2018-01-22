@@ -94,8 +94,8 @@ function loadDiagnostic(context: d.PluginCtx, sassError: any, filePath: string) 
     lines: []
   };
 
-  if (sassError.file || filePath) {
-    d.absFilePath = sassError.file || filePath;
+  if (filePath) {
+    d.absFilePath = filePath;
     d.relFilePath = formatFileName(context.config.rootDir, d.absFilePath);
     d.header = formatHeader('sass', d.absFilePath, context.config.rootDir, sassError.line);
 
