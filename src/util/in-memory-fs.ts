@@ -108,6 +108,7 @@ export class InMemoryFileSystem {
     const destItem = this.getItem(dest);
     destItem.isFile = true;
     destItem.isDirectory = false;
+    destItem.queueDeleteFromDisk = false;
 
     if (isTextFile(src)) {
       const srcFileText = await this.readFile(src);
@@ -237,7 +238,7 @@ export class InMemoryFileSystem {
       await this.removeDir(itemPath);
 
     } else if (stats.isFile) {
-      await this.removeFile(itemPath);
+      await this.removeItem(itemPath);
     }
   }
 
@@ -253,12 +254,7 @@ export class InMemoryFileSystem {
       const dirItems = await this.readdir(dirPath, { recursive: true });
 
       await Promise.all(dirItems.map(async item => {
-        if (item.isDirectory) {
-          await this.removeDir(item.absPath);
-
-        } else if (item.isFile) {
-          await this.removeFile(item.absPath);
-        }
+        await this.removeItem(item.absPath);
       }));
 
     } catch (e) {
@@ -266,7 +262,7 @@ export class InMemoryFileSystem {
     }
   }
 
-  private async removeFile(filePath: string) {
+  private async removeItem(filePath: string) {
     const item = this.getItem(filePath);
     if (!item.queueWriteToDisk) {
       item.queueDeleteFromDisk = true;
