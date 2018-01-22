@@ -1,4 +1,4 @@
-import { BuildCtx, Bundle, CompilerCtx, ComponentMeta, Config, ModuleFile, StyleMeta } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, ComponentMeta, Config, ModuleFile, StyleMeta } from '../../declarations';
 import { ENCAPSULATION } from '../../util/constants';
 import { normalizePath } from '../util';
 import { runPluginTransforms } from '../plugin/plugin';
@@ -31,7 +31,10 @@ export async function generateComponentStyles(config: Config, compilerCtx: Compi
 
 
 async function compileStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, jsFilePath: string, styleMeta: StyleMeta) {
-  const absStylePath = styleMeta.absolutePaths ? styleMeta.absolutePaths.slice() : [];
+  const absStylePath: string[] = styleMeta.externalStyles.map(externalStyle => {
+    return externalStyle.absolutePath;
+  });
+
 
   if (typeof styleMeta.styleStr === 'string') {
     // plain styles just in a string
@@ -62,18 +65,20 @@ export function setStyleText(buildCtx: BuildCtx, cmpMeta: ComponentMeta, styleMe
     styleMeta.compiledStyleTextScoped = scopeComponentCss(buildCtx, cmpMeta, styleMeta.compiledStyleText);
   }
 
-  styleMeta.compiledStyleText = cleanStyle(styleMeta.compiledStyleText);
+  styleMeta.compiledStyleText = escapeCssForJs(styleMeta.compiledStyleText);
 
   if (styleMeta.compiledStyleTextScoped) {
-    styleMeta.compiledStyleTextScoped = cleanStyle(styleMeta.compiledStyleTextScoped);
+    styleMeta.compiledStyleTextScoped = escapeCssForJs(styleMeta.compiledStyleTextScoped);
   }
 }
 
 
-export function cleanStyle(style: string) {
-  return style.replace(/\r\n|\r|\n/g, `\\n`)
-              .replace(/\"/g, `\\"`)
-              .replace(/\@/g, `\\@`);
+export function escapeCssForJs(style: string) {
+  return style
+    .replace(/\\[0-7]/g, (v) => '\\' + v)
+    .replace(/\r\n|\r|\n/g, `\\n`)
+    .replace(/\"/g, `\\"`)
+    .replace(/\@/g, `\\@`);
 }
 
 
