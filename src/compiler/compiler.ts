@@ -1,4 +1,4 @@
-import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic } from '../util/interfaces';
+import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic } from '../declarations';
 import { build } from './build/build';
 import { catchError, getCompilerCtx } from './util';
 import { docs } from './docs/docs';
@@ -21,6 +21,7 @@ export class Compiler {
       initPlugins(config);
 
       config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version}`));
+      config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
     }
   }
 
