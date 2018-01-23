@@ -95,14 +95,9 @@ export function update(plt: PlatformApi, elm: HostElement) {
 export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean) {
   // if this component has a render function, let's fire
   // it off and generate a vnode for this
-  try {
-    render(plt, elm, plt.getComponentMeta(elm).componentConstructor, !isInitialLoad);
-    // _hasRendered was just set
-    // _onRenderCallbacks were all just fired off
-
-  } catch (e) {
-    plt.onError(e, RUNTIME_ERROR.RenderError, elm, true);
-  }
+  render(plt, elm, plt.getComponentMeta(elm).componentConstructor, !isInitialLoad);
+  // _hasRendered was just set
+  // _onRenderCallbacks were all just fired off
 
   try {
     if (isInitialLoad) {
