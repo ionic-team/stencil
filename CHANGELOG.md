@@ -1,3 +1,13 @@
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/ionic-team/stencil/compare/v0.2.0...v0.2.1) (2018-01-23)
+
+
+### Bug Fixes
+
+* **watch:** rebuild from copy task file changes ([e2a8632](https://github.com/ionic-team/stencil/commit/e2a8632))
+
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/ionic-team/stencil/compare/v0.1.6...v0.2.0) (2018-01-22)
 
