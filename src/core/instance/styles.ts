@@ -1,5 +1,6 @@
 import { Build } from '../../util/build-conditionals';
-import { ComponentConstructor, DomApi, HostElement } from '../../util/interfaces';
+import { ComponentConstructor, DomApi, HostElement } from '../../declarations';
+import { CustomStyle } from '../../client/css-shim/custom-style';
 
 
 export function initStyleTemplate(domApi: DomApi, cmpConstructor: ComponentConstructor) {
@@ -42,7 +43,7 @@ export function initStyleTemplate(domApi: DomApi, cmpConstructor: ComponentConst
 }
 
 
-export function attachStyles(domApi: DomApi, cmpConstructor: ComponentConstructor, modeName: string, elm: HostElement, styleElm?: HTMLStyleElement) {
+export function attachStyles(domApi: DomApi, cmpConstructor: ComponentConstructor, modeName: string, elm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
   // first see if we've got a style for a specific mode
   let styleModeId = cmpConstructor.is + (modeName || '');
   let styleTemplate = (cmpConstructor as any)[styleModeId];
@@ -93,6 +94,10 @@ export function attachStyles(domApi: DomApi, cmpConstructor: ComponentConstructo
         // create a new style element and add as innerHTML
         styleElm = domApi.$createElement('style');
         styleElm.innerHTML = styleTemplate;
+
+        if (Build.cssVarShim && customStyle) {
+          customStyle.addStyle(styleElm);
+        }
 
       } else {
         // clone the template element to create a new <style> element
