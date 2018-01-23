@@ -40,7 +40,9 @@ export class WatcherListener {
         // this is a big deal, so do a full rebuild
         configFileReload(this.config);
         this.configUpdated = true;
-        this.filesUpdated.push(path);
+        if (!this.filesUpdated.includes(path)) {
+          this.filesUpdated.push(path);
+        }
         this.queue();
 
       } else if (isCopyTaskFile(this.config, path)) {
@@ -54,7 +56,9 @@ export class WatcherListener {
 
         // web dev file was updaed
         // queue change build
-        this.filesUpdated.push(path);
+        if (!this.filesUpdated.includes(path)) {
+          this.filesUpdated.push(path);
+        }
         this.queue();
 
       } else {
@@ -84,7 +88,9 @@ export class WatcherListener {
         await this.compilerCtx.fs.readFile(path, { useCache: false });
 
         // new web dev file was added
-        this.filesAdded.push(path);
+        if (!this.filesAdded.includes(path)) {
+          this.filesAdded.push(path);
+        }
         this.queue();
 
       } else {
@@ -113,7 +119,9 @@ export class WatcherListener {
 
       if (isWebDevFileToWatch(path)) {
         // web dev file was delete
-        this.filesDeleted.push(path);
+        if (!this.filesDeleted.includes(path)) {
+          this.filesDeleted.push(path);
+        }
         this.queue();
       }
 
@@ -140,7 +148,9 @@ export class WatcherListener {
         const addedItems = await this.compilerCtx.fs.readdir(path, { recursive: true });
 
         addedItems.forEach(item => {
-          this.filesAdded.push(item.absPath);
+          if (!this.filesAdded.includes(item.absPath)) {
+            this.filesAdded.push(item.absPath);
+          }
         });
 
         this.dirsAdded.push(path);
@@ -165,7 +175,9 @@ export class WatcherListener {
         this.queueCopyTasks();
 
       } else {
-        this.dirsDeleted.push(path);
+        if (!this.dirsDeleted.includes(path)) {
+          this.dirsDeleted.push(path);
+        }
         this.queue();
       }
 
