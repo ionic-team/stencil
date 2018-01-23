@@ -34,14 +34,24 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     })
   );
 
-  Object.keys(jsModules).forEach(mType => {
-    Object.entries(jsModules[mType])
+  Object.entries(jsModules['esm'])
+    .filter(([key]) => !bundleKeys[key])
+    .forEach(async ([key, value]) => {
+      const fileName = getBundleFilename(key.replace('.js', ''), false, 'es2015');
+      const jsText = replaceBundleIdPlaceholder(value.code, key);
+      await writeJSFile(config, compilerCtx, fileName, jsText);
+    });
+
+  if (config.buildEs5) {
+    Object.entries(jsModules['es5'])
       .filter(([key]) => !bundleKeys[key])
       .forEach(async ([key, value]) => {
-        const jsText = replaceBundleIdPlaceholder(value.code, key);
-        await writeJSFile(config, compilerCtx, key, jsText);
+        const fileName = getBundleFilename(key.replace('.js', ''), false, 'es5');
+        let jsText = replaceBundleIdPlaceholder(value.code, key);
+        jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+        await writeJSFile(config, compilerCtx, fileName, jsText);
       });
-  });
+    }
 
   // create the registry of all the components
   const cmpRegistry = createComponentRegistry(bundles);
@@ -100,7 +110,7 @@ async function createBundleJsText(config: Config, compilerCtx: CompilerCtx, buil
   if (sourceTarget === 'es5') {
     // use legacy bundling with commonjs/jsonp modules
     // and transpile the build to es5
-    return transpileEs5Bundle(compilerCtx, buildCtx, jsText);
+    jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
   }
 
   if (config.minifyJs) {

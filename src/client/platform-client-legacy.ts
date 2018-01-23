@@ -9,10 +9,11 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { createVNodesFromSsr } from '../core/renderer/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './css-shim/custom-style';
-import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
+import { ENCAPSULATION, PROP_TYPE, SSR_VNODE_ID } from '../util/constants';
 import { h } from '../core/renderer/h';
 import { initCssVarShim } from './css-shim/init-css-shim';
 import { initHostElement } from '../core/instance/init-host-element';
+import { initStyleTemplate } from '../core/instance/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/instance/proxy-controller';
 import { toDashCase } from '../util/helpers';
@@ -158,7 +159,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     const bundleExports: CjsExports = {};
 
     try {
-      callback([bundleExports, ...deps.map(d => loadedBundles[d])]);
+      callback(bundleExports, ...deps.map(d => loadedBundles[d]));
     } catch (e) {
       console.error(e);
     }
@@ -171,30 +172,45 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     loadedBundles[name] = bundleExports;
 
     // If name contains chunk then this callback was associated with a dependent bundle loading
-    if (name.startsWith('./chunk')) {
-      return;
-    }
-
     // let's add a reference to the constructors on each components metadata
     // each key in moduleImports is a PascalCased tag name
-    Object.keys(bundleExports).forEach(pascalCasedTagName => {
-      const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
-      if (cmpMeta) {
-        // connect the component's constructor to its metadata
-        cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
-      }
-    });
+    if (!name.startsWith('./chunk')) {
+      Object.keys(bundleExports).forEach(pascalCasedTagName => {
+        const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
+        if (cmpMeta) {
+          // connect the component's constructor to its metadata
+          cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
+          initStyleTemplate(domApi, cmpMeta.componentConstructor);
+          cmpMeta.membersMeta = {
+            'color': {}
+          };
+
+          if (cmpMeta.componentConstructor.properties) {
+            Object.keys(cmpMeta.componentConstructor.properties).forEach(memberName => {
+              const constructorProperty = cmpMeta.componentConstructor.properties[memberName];
+
+              if (constructorProperty.type) {
+                cmpMeta.membersMeta[memberName] = {
+                  propType: PROP_TYPE.Any
+                };
+              }
+            });
+          }
+        }
+      });
+    }
   }
 
   /**
    * Check to see if any items in the bundle queue can be executed
    */
   function checkQueue() {
-    bundleQueue.forEach(([bundleId, dependentsList, importer]) => {
+    for (let i = bundleQueue.length - 1; i > -1; i--) {
+      const [bundleId, dependentsList, importer] = bundleQueue[i];
       if (dependentsList.every(dep => loadedBundles[dep]) && !loadedBundles[bundleId]) {
         execBundleCallback(bundleId, dependentsList, importer);
       }
-    });
+    }
   }
 
   /**
@@ -203,19 +219,16 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
 
     const missingDependents = dependentsList.filter(d => !loadedBundles[d]);
-
     missingDependents.forEach(d => {
-        const url = publicPath + d;
+        const url = publicPath + d.replace('.js', '.es5.js');
         requestUrl(url);
       });
     bundleQueue.push([bundleId, dependentsList, importer]);
 
     // If any dependents are not yet met then queue the bundle execution
-    if (missingDependents.length > 0) {
-      return;
+    if (missingDependents.length === 0) {
+      checkQueue();
     }
-
-    checkQueue();
   };
 
 
