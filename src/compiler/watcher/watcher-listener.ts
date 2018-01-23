@@ -194,8 +194,10 @@ export class WatcherListener {
       // reset the watcher data for next time
       this.resetWatcher();
 
-      // kick off the rebuild
-      rebuild(this.config, this.compilerCtx, watcher);
+      if (shouldRebuild(watcher)) {
+        // kick off the rebuild
+        rebuild(this.config, this.compilerCtx, watcher);
+      }
 
     } catch (e) {
       this.config.logger.error(e.toString());
@@ -203,7 +205,7 @@ export class WatcherListener {
   }
 
   generateWatcherResults() {
-    const watcherResults: WatcherResults = {
+    const watcher: WatcherResults = {
       dirsAdded: this.dirsAdded.slice(),
       dirsDeleted: this.dirsDeleted.slice(),
       filesAdded: this.filesAdded.slice(),
@@ -212,7 +214,7 @@ export class WatcherListener {
       filesChanged: this.filesUpdated.concat(this.filesAdded, this.filesDeleted),
       configUpdated: this.configUpdated
     };
-    return watcherResults;
+    return watcher;
   }
 
   queue() {
@@ -241,6 +243,16 @@ export class WatcherListener {
     this.configUpdated = false;
   }
 
+}
+
+
+function shouldRebuild(watcher: WatcherResults) {
+  return watcher.configUpdated ||
+  watcher.dirsAdded.length > 0 ||
+  watcher.dirsDeleted.length > 0 ||
+  watcher.filesAdded.length > 0 ||
+  watcher.filesDeleted.length > 0 ||
+  watcher.filesUpdated.length > 0;
 }
 
 
