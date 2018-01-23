@@ -1,7 +1,7 @@
-import { BuildCtx, Bundle, CompilerCtx, Config, Diagnostic, ManifestBundle, ModuleFile, JSModuleMap } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, Diagnostic, JSModuleMap, ManifestBundle, ModuleFile } from '../../util/interfaces';
 import { buildError, catchError } from '../util';
 import { bundleRequiresScopedStyles, getBundleEncapsulations, getBundleModes, sortBundles } from './bundle-utils';
-import { generateBundleModule } from './bundle-modules';
+import { generateBundleModules } from './bundle-modules';
 import { upgradeDependentComponents } from '../upgrade-dependents/index';
 
 
@@ -32,7 +32,7 @@ export async function bundle(config: Config, compilerCtx: CompilerCtx, buildCtx:
     await upgradeDependentComponents(config, compilerCtx, buildCtx, bundles);
 
     // kick off style and module bundling at the same time
-    jsModules = await generateBundleModule(config, compilerCtx, buildCtx, bundles);
+    jsModules = await generateBundleModules(config, compilerCtx, buildCtx, bundles);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

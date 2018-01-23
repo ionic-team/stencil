@@ -1,5 +1,4 @@
-import { bundledComponentContainsChangedFile, } from '../bundle-module';
-import { Bundle, Config, CompilerCtx, Diagnostic, ModuleFile } from '../../../util/interfaces';
+import { Bundle, CompilerCtx, Config, Diagnostic, ModuleFile } from '../../../util/interfaces';
 import { expectFilesWritten } from '../../../testing/utils';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { TestingCompiler } from '../../../testing/index';
@@ -84,36 +83,6 @@ describe('bundle-module', () => {
       c = new TestingCompiler();
       await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
       await c.fs.commit();
-    });
-
-  });
-
-  describe('bundledComponentContainsChangedFile', () => {
-    const config: Config = {
-      sys: mockStencilSystem()
-    };
-    const moduleFiles: ModuleFile[] = [
-      { jsFilePath: '/tmp/build/cmp-a.js' },
-      { jsFilePath: '/tmp/build/cmp-b.js' },
-      { jsFilePath: '/tmp/build/cmp-c.js' }
-    ];
-
-    it('should not contain changed files', () => {
-      const changedFiles = [
-        '/User/app/build/cmp-x.ts',
-        '/User/app/build/cmp-y.tsx'
-      ];
-      const hasChanged = bundledComponentContainsChangedFile(config, moduleFiles, changedFiles);
-      expect(hasChanged).toBe(false);
-    });
-
-    it('should contain changed files', () => {
-      const changedFiles = [
-        '/User/app/build/cmp-a.ts',
-        '/User/app/build/cmp-b.tsx'
-      ];
-      const hasChanged = bundledComponentContainsChangedFile(config, moduleFiles, changedFiles);
-      expect(hasChanged).toBe(true);
     });
 
   });

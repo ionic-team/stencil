@@ -1,11 +1,11 @@
-import { Config, BuildCtx, CompilerCtx, Bundle, JSModuleMap } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, JSModuleMap } from '../../util/interfaces';
 import { catchError } from '../util';
-import { writeEsModules, writeLegacyModules, createBundle, } from './rollup-bundle';
+import { createBundle, writeEsModules, writeLegacyModules  } from './rollup-bundle';
 
 
-export async function generateBundleModule(config: Config, contextCtx: CompilerCtx, ctx: BuildCtx, bundles: Bundle[]): Promise<JSModuleMap> {
+export async function generateBundleModules(config: Config, contextCtx: CompilerCtx, ctx: BuildCtx, bundles: Bundle[]): Promise<JSModuleMap> {
 
-  let results: JSModuleMap = {};
+  const results: JSModuleMap = {};
 
   try {
     // run rollup, but don't generate yet
@@ -14,6 +14,8 @@ export async function generateBundleModule(config: Config, contextCtx: CompilerC
 
     // bundle using only es modules and dynamic imports
     results.esm = await writeEsModules(config, rollupBundle);
+
+    ctx.bundleBuildCount = Object.keys(results.esm).length;
 
     if (config.buildEs5) {
       // only create legacy modules when generating es5 fallbacks
