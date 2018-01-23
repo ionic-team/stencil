@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { COMPONENTS_DTS } from '../build/distribution';
 import { configFileReload, rebuild } from './rebuild';
 import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
@@ -56,6 +56,11 @@ export class WatcherListener {
         // queue change build
         this.filesUpdated.push(path);
         this.queue();
+
+      } else {
+        // always clear the cache if it wasn't a web dev file
+        this.compilerCtx.fs.clearFileCache(path);
+        this.config.logger.debug(`clear file cache: ${path}`);
       }
 
     } catch (e) {
@@ -81,6 +86,11 @@ export class WatcherListener {
         // new web dev file was added
         this.filesAdded.push(path);
         this.queue();
+
+      } else {
+        // always clear the cache if it wasn't a web dev file
+        this.compilerCtx.fs.clearFileCache(path);
+        this.config.logger.debug(`clear file cache: ${path}`);
       }
 
     } catch (e) {
