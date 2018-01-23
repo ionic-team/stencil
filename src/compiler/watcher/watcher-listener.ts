@@ -45,8 +45,9 @@ export class WatcherListener {
 
       } else if (isCopyTaskFile(this.config, path)) {
         this.queueCopyTasks();
+      }
 
-      } else if (isWebDevFileToWatch(path)) {
+      if (isWebDevFileToWatch(path)) {
         // read the file, but without using
         // the cache so we get the latest change
         await this.compilerCtx.fs.readFile(path, { useCache: false });
@@ -70,8 +71,9 @@ export class WatcherListener {
 
       if (isCopyTaskFile(this.config, path)) {
         this.queueCopyTasks();
+      }
 
-      } else if (isWebDevFileToWatch(path)) {
+      if (isWebDevFileToWatch(path)) {
         // read the file, but without using
         // the cache so we get the latest change
         await this.compilerCtx.fs.readFile(path, { useCache: false });
@@ -97,8 +99,9 @@ export class WatcherListener {
 
       if (isCopyTaskFile(this.config, path)) {
         this.queueCopyTasks();
+      }
 
-      } else if (isWebDevFileToWatch(path)) {
+      if (isWebDevFileToWatch(path)) {
         // web dev file was delete
         this.filesDeleted.push(path);
         this.queue();
