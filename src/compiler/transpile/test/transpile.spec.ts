@@ -6,6 +6,15 @@ import * as ts from 'typescript';
 
 describe('transpile', () => {
 
+  let c: TestingCompiler;
+
+  beforeEach(async () => {
+    c = new TestingCompiler();
+
+    await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+    await c.fs.commit();
+  });
+
   describe('rebuild', () => {
 
     it('should rebuild transpile for deleted directory', async () => {
@@ -148,13 +157,34 @@ describe('transpile', () => {
     });
 
 
-    var c: TestingCompiler;
-
-    beforeEach(async () => {
-      c = new TestingCompiler();
-
-      await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+    it('should transpile attr in componet static property', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFile('/src/cmp-a.tsx', `
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          @Prop() str: string;
+          @Prop() myStr: string;
+          @Prop() myNum: number;
+          @Prop() myBool: boolean;
+          @Prop() myAny: any;
+          @Prop() myPromise: Promise<void>;
+          @Prop() arr: string[];
+          @Prop() obj: Object;
+        }
+      `, { clearFileCache: true });
       await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      expect(content).toContain(`"arr": { "type": "Any" }`);
+      expect(content).toContain(`"myAny": { "type": "Any", "attr": "my-any"`);
+      expect(content).toContain(`"myBool": { "type": Boolean, "attr": "my-bool" }`);
+      expect(content).toContain(`"myNum": { "type": Number, "attr": "my-num" }`);
+      expect(content).toContain(`"myPromise": { "type": "Any" }`);
+      expect(content).toContain(`"myStr": { "type": String, "attr": "my-str" }`);
+      expect(content).toContain(`"obj": { "type": "Any" }`);
+      expect(content).toContain(`"str": { "type": String, "attr": "str" }`);
     });
 
   });

@@ -1,5 +1,5 @@
 import { ComponentConstructor, ComponentConstructorProperties,
-  ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
+  ComponentInstance, HostElement, PlatformApi } from '../../declarations';
 import { defineMember } from './proxy-members';
 
 
@@ -19,9 +19,11 @@ export function proxyComponentInstance(plt: PlatformApi, cmpConstructor: Compone
   // get the properties from the constructor
   // and add default "mode" and "color" properties
   properties = Object.assign({
-    mode: { type: String },
     color: { type: String }
   }, cmpConstructor.properties);
+
+  // always set mode
+  properties.mode = { type: String };
 
   // define each of the members and initialize what their role is
   for (memberName in properties) {

@@ -320,9 +320,9 @@ export interface ComponentMemberData {
   [1]: number;
 
   /**
-   * is attribute to observe
+   * is attribute name to observe
    */
-  [2]: number;
+  [2]: string|number;
 
   /**
    * prop type

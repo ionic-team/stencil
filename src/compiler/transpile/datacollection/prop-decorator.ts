@@ -1,9 +1,9 @@
+import { AttributeTypeInfo, AttributeTypeReference, Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../declarations';
 import { catchError } from '../../util';
-import { Diagnostic, MemberMeta, MembersMeta, PropOptions, AttributeTypeInfo, AttributeTypeReference } from '../../../util/interfaces';
+import { isDecoratorNamed, serializeSymbol } from './utils';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
-import { isTypeReferenceNode } from 'typescript';
-import { serializeSymbol, isDecoratorNamed } from './utils';
+
 
 export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): MembersMeta {
   return classNode.members
@@ -27,7 +27,7 @@ export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Clas
           }
         });
       const propOptions: PropOptions = suppliedOptions[0];
-      const attribName = (<ts.Identifier>prop.name).text;
+      const memberName = (<ts.Identifier>prop.name).text;
       const symbol = checker.getSymbolAtLocation(prop.name);
 
       if (propOptions && typeof propOptions.connect === 'string') {
@@ -77,13 +77,13 @@ export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Clas
           memberData.memberType = MEMBER_TYPE.Prop;
         }
 
+        memberData.attribName = memberName;
         memberData.attribType = attribType;
-        memberData.attribName = attribName;
         memberData.propType = propTypeFromTSType(attribType.text);
         memberData.jsdoc = serializeSymbol(checker, symbol);
       }
 
-      allMembers[attribName] = memberData;
+      allMembers[memberName] = memberData;
       return allMembers;
     }, {} as MembersMeta);
 }
@@ -116,14 +116,16 @@ function getAllTypeReferences(node: ts.TypeNode): string[] {
       referencedTypes.push((<ts.TypeReferenceNode>node).typeName.getText().trim());
       if ((<ts.TypeReferenceNode>node).typeArguments) {
         (<ts.TypeReferenceNode>node).typeArguments
-          .filter(ta => isTypeReferenceNode(ta))
+          .filter(ta => ts.isTypeReferenceNode(ta))
           .forEach(tr => referencedTypes.push((<ts.TypeReferenceNode>tr).typeName.getText().trim()));
       }
+    /* tslint:disable */
     default:
       return ts.forEachChild(node, (node) => {
         return visit(node);
       });
     }
+    /* tslint:enable */
   }
 
   visit(node);
@@ -210,14 +212,15 @@ function inferPropType(expression: ts.Expression | undefined) {
 
 function propTypeFromTSType(type: string) {
   switch (type) {
-  case 'string':
-    return PROP_TYPE.String;
-  case 'number':
-    return PROP_TYPE.Number;
-  case 'boolean':
-    return PROP_TYPE.Boolean;
-  case 'any':
-  default:
-    return PROP_TYPE.Any;
+    case 'string':
+      return PROP_TYPE.String;
+    case 'number':
+      return PROP_TYPE.Number;
+    case 'boolean':
+      return PROP_TYPE.Boolean;
+    case 'any':
+      return PROP_TYPE.Any;
+    default:
+      return PROP_TYPE.Unknown;
   }
 }

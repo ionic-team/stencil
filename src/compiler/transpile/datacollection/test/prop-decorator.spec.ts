@@ -1,6 +1,6 @@
-import { MEMBER_TYPE } from '../../../../util/constants';
 import { gatherMetadata } from './test-utils';
 import { getPropDecoratorMeta } from '../prop-decorator';
+import { MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
 import * as path from 'path';
 import * as ts from 'typescript';
 
@@ -35,7 +35,7 @@ describe('props decorator', () => {
           type: '(_: any) => any',
         },
         memberType: 1,
-        propType: 1
+        propType: PROP_TYPE.Unknown
       },
       size: {
         attribName: 'size',
@@ -48,7 +48,7 @@ describe('props decorator', () => {
           type: 'string',
         },
         memberType: 1,
-        propType: 2
+        propType: PROP_TYPE.String
       }
     });
   });
