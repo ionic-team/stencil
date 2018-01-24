@@ -1,8 +1,9 @@
 import { MEMBER_TYPE } from '../../../../util/constants';
+import { gatherMetadata } from './test-utils';
 import { getPropDecoratorMeta } from '../prop-decorator';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { gatherMetadata } from './test-utils';
+
 
 describe('props decorator', () => {
 
@@ -35,6 +36,19 @@ describe('props decorator', () => {
         },
         memberType: 1,
         propType: 1
+      },
+      size: {
+        attribName: 'size',
+        attribType: {
+          text: 'string',
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'size',
+          type: 'string',
+        },
+        memberType: 1,
+        propType: 2
       }
     });
   });

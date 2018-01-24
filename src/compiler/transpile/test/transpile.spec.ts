@@ -24,7 +24,7 @@ describe('transpile', () => {
       // create a rebuild listener
       const rebuildListener = c.once('rebuild');
 
-      await c.fs.removeDir('/src/some-dir');
+      await c.fs.remove('/src/some-dir');
       await c.fs.commit();
 
       // kick off a rebuild
