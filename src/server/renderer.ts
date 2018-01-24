@@ -11,7 +11,7 @@ export class Renderer {
   private ctx: CompilerCtx;
   private cmpRegistry: ComponentRegistry;
 
-  constructor(public config: Config, ctx?: CompilerCtx) {
+  constructor(public config: Config, ctx?: CompilerCtx, registry?: ComponentRegistry) {
     this.config = config;
     validateBuildConfig(config);
 
@@ -19,7 +19,7 @@ export class Renderer {
     this.ctx = getCompilerCtx(config, ctx);
 
     // load the component registry from the registry.json file
-    this.cmpRegistry = loadComponentRegistry(config, this.ctx);
+    this.cmpRegistry = registry || loadComponentRegistry(config, this.ctx);
 
     if (Object.keys(this.cmpRegistry).length === 0) {
       throw new Error(`No registered components found: ${config.namespace}`);

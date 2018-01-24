@@ -6,4 +6,4 @@ export * from './testing-logger';
 export * from './testing-sys';
 export * from './render';
 export * from './transpile';
-export { h, t } from '../core/renderer/h';
+export { h } from '../core/renderer/h';
