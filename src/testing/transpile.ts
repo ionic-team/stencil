@@ -1,5 +1,6 @@
 import { Config, Diagnostic } from '../declarations';
 import { transpileModule } from '../compiler/transpile/transpile';
+import ts from 'typescript';
 
 
 const TEST_CONFIG: Config = {
@@ -12,14 +13,32 @@ const TEST_CONFIG: Config = {
 };
 
 
-export function transpile(src: string, opts: any, path?: string) {
+export function transpile(input: string, opts: TranspileOptions = {}, path?: string) {
   const results: TranspileResults = { diagnostics: null, code: null };
-  const transpileResults = transpileModule(TEST_CONFIG, opts, path, src);
+
+  if (!opts.module) {
+    opts.module = 'CommonJS';
+  }
+
+  const compilerOpts: ts.CompilerOptions = Object.assign({}, opts as any);
+
+  if (!path) {
+    path = '/tmp/transpile-path.tsx';
+  }
+
+  const transpileResults = transpileModule(TEST_CONFIG, compilerOpts, path, input);
 
   results.code = transpileResults.code;
   results.diagnostics = transpileResults.diagnostics;
 
   return results;
+}
+
+
+export interface TranspileOptions {
+  module?: 'None' | 'CommonJS' | 'AMD' | 'System' | 'UMD' | 'ES6' | 'ES2015' | 'ESNext' | string;
+  target?: 'ES5' | 'ES6' | 'ES2015' | 'ES2016' | 'ES2017' | 'ESNext' | string;
+  [key: string]: any;
 }
 
 
