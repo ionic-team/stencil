@@ -1,3 +1,23 @@
+<a name="0.2.3"></a>
+## [0.2.3](https://github.com/ionic-team/stencil/compare/v0.2.2...v0.2.3) (2018-01-24)
+
+
+### Bug Fixes
+
+* **attribute:** attr name from toDashCase of property name ([28740be](https://github.com/ionic-team/stencil/commit/28740be))
+* **build:** update uglify-es to 3.3.8 ([690759d](https://github.com/ionic-team/stencil/commit/690759d))
+* **compiler:** avoid global JSX namespace collisions ([9c1e721](https://github.com/ionic-team/stencil/commit/9c1e721))
+* **test:** fix unit test hydration ([122b1cd](https://github.com/ionic-team/stencil/commit/122b1cd)), closes [#441](https://github.com/ionic-team/stencil/issues/441)
+* **watcher:** ensure duplicate builds are not started ([b3d6cf2](https://github.com/ionic-team/stencil/commit/b3d6cf2))
+* **watcher:** ensure duplicate paths are not added to queue ([767b879](https://github.com/ionic-team/stencil/commit/767b879))
+
+
+### Features
+
+* **test:** add test transpile fn interface ([d68fffb](https://github.com/ionic-team/stencil/commit/d68fffb))
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/ionic-team/stencil/compare/v0.2.1...v0.2.2) (2018-01-23)
 
