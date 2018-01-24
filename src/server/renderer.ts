@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../util/interfaces';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../declarations';
 import { catchError, getCompilerCtx } from '../compiler/util';
 import { getGlobalWWW } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
@@ -11,7 +11,7 @@ export class Renderer {
   private ctx: CompilerCtx;
   private cmpRegistry: ComponentRegistry;
 
-  constructor(public config: Config, ctx?: CompilerCtx, registry?: ComponentRegistry) {
+  constructor(public config: Config, registry?: ComponentRegistry, ctx?: CompilerCtx) {
     this.config = config;
     validateBuildConfig(config);
 

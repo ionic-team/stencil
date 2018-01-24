@@ -46,7 +46,7 @@ export async function render(opts: RenderTestOptions): Promise<any> {
       }
     });
 
-    const renderer = new Renderer(config, compilerCtx, registry);
+    const renderer = new Renderer(config, registry, compilerCtx);
 
     const hydrateOpts: HydrateOptions = {
       html: opts.html,
