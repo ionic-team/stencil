@@ -1,10 +1,10 @@
-import { Config, CompilerCtx, Bundle, RollupBundle, BuildCtx } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, RollupBundle } from '../../util/interfaces';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import localResolution from './rollup-plugins/local-resolution';
-import { resolvePaths } from './rollup-plugins/resolve-paths';
+import pathsResolution from './rollup-plugins/paths-resolution';
 import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 
@@ -28,10 +28,8 @@ export async function runRollup(config: Config, compilerCtx: CompilerCtx, buildC
         bundleEntryFile(bundle),
         transpiledInMemoryPlugin(config, compilerCtx),
         localResolution(config, compilerCtx),
-        nodeEnvVars(config),
-        resolvePaths({
-          tsconfig: true
-        })
+        pathsResolution(config, compilerCtx),
+        nodeEnvVars(config)
       ],
       onwarn: createOnWarnFn(buildCtx.diagnostics, bundle.moduleFiles)
 
