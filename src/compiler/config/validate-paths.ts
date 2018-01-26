@@ -68,6 +68,13 @@ export function validatePaths(config: Config) {
     config.collectionDir = normalizePath(path.join(config.distDir, config.collectionDir));
   }
 
+  if (typeof config.tsconfig !== 'string') {
+    config.tsconfig = DEFAULT_TSCONFIG;
+  }
+  if (!path.isAbsolute(config.tsconfig)) {
+    config.tsconfig = normalizePath(path.join(config.rootDir, config.tsconfig));
+  }
+
   if (typeof config.typesDir !== 'string') {
     config.typesDir = DEFAULT_TYPES_DIR;
   }
@@ -116,3 +123,4 @@ const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_DIST_DIR = 'dist';
 const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_TYPES_DIR = 'types';
+const DEFAULT_TSCONFIG = 'tsconfig.json';

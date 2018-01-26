@@ -71,6 +71,12 @@ describe('validatePaths', () => {
     expect(path.isAbsolute(config.collectionDir)).toBe(true);
   });
 
+  it('should set default tsconfig and convert to absolute path', () => {
+    validateBuildConfig(config);
+    expect(path.basename(config.tsconfig)).toBe('tsconfig.json');
+    expect(path.isAbsolute(config.tsconfig)).toBe(true);
+  });
+
   it('should set default types dir and convert to absolute path', () => {
     validateBuildConfig(config);
     expect(path.basename(config.typesDir)).toBe('types');

@@ -43,6 +43,7 @@ export interface Config {
   srcIndexHtml?: string;
   suppressTypeScriptErrors?: boolean;
   sys?: d.StencilSystem;
+  tsconfig?: string;
   typesDir?: string;
   watch?: boolean;
   watchIgnoredRegex?: RegExp;
