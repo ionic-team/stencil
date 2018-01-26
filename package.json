@@ -39,9 +39,9 @@
     "chokidar": "2.0.0",
     "jsdom": "11.5.1",
     "node-sass": "4.7.2",
-    "rollup": "^0.55.0",
-    "rollup-plugin-commonjs": "8.2.6",
-    "rollup-plugin-node-resolve": "3.0.0",
+    "rollup": "0.55.0",
+    "rollup-plugin-commonjs": "8.3.0",
+    "rollup-plugin-node-resolve": "3.0.2",
     "typescript": "^2.6.2",
     "uglify-es": "3.3.7",
     "workbox-build": "3.0.0-alpha.3"

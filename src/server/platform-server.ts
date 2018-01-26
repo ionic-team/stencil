@@ -23,6 +23,7 @@ export function createPlatformServer(
   isPrerender: boolean,
   compilerCtx?: CompilerCtx
 ): PlatformApi {
+  const loadedBundles: {[bundleId: string]: any} = {};
   const styles: string[] = [];
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
@@ -80,7 +81,7 @@ export function createPlatformServer(
     getComponentMeta,
     getContextItem,
     isDefinedComponent,
-    loadBundle,
+    loadBundle: loadComponent,
     onError,
     propConnect,
     queue: createQueueServer(),
@@ -135,23 +136,37 @@ export function createPlatformServer(
     cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
   }
 
+  /**
+   * Execute a bundle queue item
+   * @param name
+   * @param deps
+   * @param callback
+   */
+  function execBundleCallback(name: string, deps: string[], callback: Function) {
+    const bundleExports: CjsExports = {};
 
-  App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
     try {
-      // requested component constructors are placed on the moduleImports object
-      // inject the h() function so it can be use by the components
-      const exports: CjsExports = {};
-      console.log(bundleId, ...dependentsList, importer);
+      callback(bundleExports, ...deps.map(d => loadedBundles[d]));
+    } catch (e) {
+      onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
+    }
 
+    // If name is undefined then this callback was fired by component callback
+    if (name === undefined) {
+      return;
+    }
 
-      // let's add a reference to the constructors on each components metadata
-      // each key in moduleImports is a PascalCased tag name
-      Object.keys(exports).forEach(pascalCasedTagName => {
+    loadedBundles[name] = bundleExports;
+
+    // If name contains chunk then this callback was associated with a dependent bundle loading
+    // let's add a reference to the constructors on each components metadata
+    // each key in moduleImports is a PascalCased tag name
+    if (!name.startsWith('./chunk')) {
+      Object.keys(bundleExports).forEach(pascalCasedTagName => {
         const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
           // connect the component's constructor to its metadata
-          cmpMeta.componentConstructor = exports[pascalCasedTagName];
-
+          cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
           cmpMeta.membersMeta = {
             'color': {}
           };
@@ -169,10 +184,21 @@ export function createPlatformServer(
           }
         }
       });
-
-    } catch (e) {
-      onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
     }
+  }
+
+  /**
+   * This function is called anytime a JS file is loaded
+   */
+  App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
+
+    const missingDependents = dependentsList.filter(d => !loadedBundles[d]);
+    missingDependents.forEach(d => {
+        const fileName = d.replace('.js', '.es5.js');
+        loadFile(fileName);
+      });
+
+    execBundleCallback(bundleId, dependentsList, importer);
   };
 
 
@@ -181,30 +207,31 @@ export function createPlatformServer(
   }
 
 
-  function loadBundle(cmpMeta: ComponentMeta, modeName: string, cb: Function): void {
-    // synchronous in nodejs
-    if (!cmpMeta.componentConstructor) {
-      try {
-        const fileName = getBundleFilename(cmpMeta, modeName);
-        const jsFilePath = config.sys.path.join(appBuildDir, fileName);
-        const jsCode = compilerCtx.fs.readFileSync(jsFilePath);
-        config.sys.vm.runInContext(jsCode, win);
-
-      } catch (e) {
-        onError(e, RUNTIME_ERROR.LoadBundleError, null, true);
-        cmpMeta.componentConstructor = class {} as any;
-      }
-    }
-
-    cb();
-  }
-
-
   plt.attachStyles = function attachStyles(_domApi, cmpConstructor, _modeName, _elm) {
     if (cmpConstructor.style) {
       styles.push(cmpConstructor.style);
     }
   };
+
+  // This is executed by the component's connected callback.
+  function loadComponent(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
+    bundleId = cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any);
+
+    if (loadedBundles[bundleId]) {
+      // sweet, we've already loaded this bundle
+      cb();
+
+    } else {
+      const fileName = getComponentBundleFilename(cmpMeta, modeName);
+      loadFile(fileName);
+    }
+  }
+
+  function loadFile(fileName: string) {
+    const jsFilePath = config.sys.path.join(appBuildDir, fileName);
+    const jsCode = compilerCtx.fs.readFileSync(jsFilePath);
+    config.sys.vm.runInContext(jsCode, win);
+  }
 
 
   function runGlobalScripts() {
@@ -275,7 +302,7 @@ export function createPlatformServer(
 }
 
 
-export function getBundleFilename(cmpMeta: ComponentMeta, modeName: string) {
+export function getComponentBundleFilename(cmpMeta: ComponentMeta, modeName: string) {
   let bundleId: string = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || cmpMeta.bundleIds as any);
 
   if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {

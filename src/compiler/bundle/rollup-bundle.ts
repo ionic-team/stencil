@@ -1,25 +1,32 @@
-import { Config, CompilerCtx, Bundle, BuildCtx, JSModuleList } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, JSModuleList } from '../../util/interfaces';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import localResolution from './rollup-plugins/local-resolution';
 import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
-import { rollup, OutputChunk, InputOptions } from 'rollup';
+import { InputOptions, OutputChunk, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
   let rollupBundle: OutputChunk;
 
-  let rollupConfig: InputOptions = {
+  const rollupConfig: InputOptions = {
     input: bundles.map(b => b.entryKey),
     experimentalCodeSplitting: true,
-    experimentalDynamicImport: true,
     plugins: [
+      config.sys.rollup.plugins.nodeResolve({
+        jsnext: true,
+        main: true
+      }),
+      config.sys.rollup.plugins.commonjs({
+        include: 'node_modules/**',
+        sourceMap: false
+      }),
       bundleEntryFile(config, bundles),
       transpiledInMemoryPlugin(config, compilerCtx),
-      localResolution(config, compilerCtx),
+      localResolution(config),
       nodeEnvVars(config),
     ],
     onwarn: createOnWarnFn(buildCtx.diagnostics)

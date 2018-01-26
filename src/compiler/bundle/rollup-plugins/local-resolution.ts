@@ -1,8 +1,8 @@
-import { CompilerCtx, Config } from '../../../declarations';
+import { Config } from '../../../declarations';
 import { normalizePath } from '../../util';
 
 
-export default function localResolver(config: Config, compilerCtx: CompilerCtx) {
+export default function localResolver(config: Config) {
   return {
     name: 'localResolverPlugin',
 
@@ -27,12 +27,19 @@ export default function localResolver(config: Config, compilerCtx: CompilerCtx) 
 
       const dirIndexFile = config.sys.path.join(directory + importee, 'index.js');
 
-      const hasAccess = compilerCtx.fs.access(dirIndexFile);
-      if (hasAccess) {
+      let stats;
+
+      try {
+        stats = config.sys.fs.statSync(importee);
+      } catch (e) {
+        return null;
+      }
+
+      if (stats.isFile()) {
         return dirIndexFile;
       }
 
       return null;
-    },
+    }
   };
 }

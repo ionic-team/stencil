@@ -1,7 +1,7 @@
-import { Config, CompilerCtx, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { hydrateHtml } from '../hydrate-html';
 import { h } from '../../core/renderer/h';
-import { mockConfig, compareHtml } from '../../testing/mocks';
+import { compareHtml, mockConfig } from '../../testing/mocks';
 
 
 describe('hydrate', () => {
