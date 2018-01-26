@@ -167,7 +167,7 @@ export function transpileModule(config: Config, compilerOptions: ts.CompilerOpti
         addComponentMetadata(moduleFiles)
       ],
       after: [
-        removeImports()
+        removeStencilImports()
       ]
     }
   };

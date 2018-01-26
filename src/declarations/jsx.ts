@@ -1029,5 +1029,9 @@ declare global {
       onTransitionEndCapture?: EventHandler<TransitionEvent>;
     }
 
+    // required for the compiler to avoid global JSX namespace collisions
+    interface StencilJSX {}
+
   }
+
 }

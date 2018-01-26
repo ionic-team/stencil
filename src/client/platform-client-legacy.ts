@@ -330,7 +330,9 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   }
 
   if (Build.styles) {
-    plt.attachStyles = attachStyles;
+    plt.attachStyles = (domApi, cmpConstructor, modeName, elm) => {
+      attachStyles(domApi, cmpConstructor, modeName, elm, customStyle);
+    };
   }
 
   return plt;

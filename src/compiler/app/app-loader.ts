@@ -1,8 +1,8 @@
-import { AppRegistry, CompilerCtx, ComponentRegistry, Config } from '../../util/interfaces';
+import { AppRegistry, CompilerCtx, ComponentRegistry, Config } from '../../declarations';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
+import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 import { generatePreamble, minifyJs } from '../util';
 import { getAppPublicPath, getLoaderDist, getLoaderFileName, getLoaderWWW } from './app-file-naming';
-import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 
 
 export async function generateLoader(
@@ -81,6 +81,7 @@ export function injectAppIntoLoader(
 
   const loaderArgs = [
     `"${config.namespace}"`,
+    `"${config.fsNamespace}"`,
     `"${publicPath}"`,
     `"${appCoreFileName}"`,
     `"${appCorePolyfilledFileName}"`,

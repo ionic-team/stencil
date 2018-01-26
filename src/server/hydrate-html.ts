@@ -52,8 +52,6 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
         return;
       }
 
-      hydrateResults.root = rootElm;
-
       // all synchronous operations next
       if (rootElm) {
         try {
@@ -84,9 +82,18 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
         }
       }
 
+      if (opts.destroyDom !== false) {
+        // always destroy the dom unless told otherwise
+        dom.destroy();
+
+      } else {
+        // we didn't destroy the dom
+        // so let's return the root element
+        hydrateResults.root = rootElm;
+      }
+
       // cool, all good here, even if there are errors
       // we're passing back the result object
-      dom.destroy();
       resolve(hydrateResults);
     };
 

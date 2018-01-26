@@ -1,12 +1,19 @@
-import { waitForLoad, mockConnect, mockDefine, mockElement, mockPlatform } from '../../../testing/mocks';
-import { ComponentMeta, HostElement } from '../../../util/interfaces';
-import { h } from '../../renderer/h';
-import { renderUpdate, queueUpdate } from '../update';
 import { Build } from '../../../util/build-conditionals';
+import { ComponentMeta, HostElement } from '../../../declarations';
+import { h } from '../../renderer/h';
+import { MockedPlatform, mockConnect, mockDefine, mockElement, mockPlatform, waitForLoad } from '../../../testing/mocks';
 import { NODE_TYPE } from '../../../util/constants';
+import { queueUpdate, renderUpdate } from '../update';
 
 
 describe('instance update', () => {
+
+  let plt: MockedPlatform;
+
+  beforeEach(() => {
+    plt = mockPlatform();
+  });
+
 
   describe('renderUpdate', () => {
 
@@ -18,6 +25,8 @@ describe('instance update', () => {
         }
       }
       const elm = mockElement('ion-tag') as HostElement;
+      const cmpMeta: ComponentMeta = { tagNameMeta: 'ion-tag' };
+      plt.defineComponent(cmpMeta);
       elm._instance = new MyComponent();
       renderUpdate(plt, elm, false);
       expect(elm._instance.ranLifeCycle).toBe(true);
@@ -31,6 +40,8 @@ describe('instance update', () => {
         }
       }
       const elm = mockElement('ion-tag') as HostElement;
+      const cmpMeta: ComponentMeta = { tagNameMeta: 'ion-tag' };
+      plt.defineComponent(cmpMeta);
       elm._instance = new MyComponent();
       renderUpdate(plt, elm, true);
       expect(elm._instance.ranLifeCycle).toBe(false);
@@ -135,8 +146,7 @@ describe('instance update', () => {
     const cmpMeta: ComponentMeta = {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
-        constructor() {
-        }
+        constructor() {/**/}
       } as any
     };
     mockDefine(plt, cmpMeta);
@@ -146,13 +156,6 @@ describe('instance update', () => {
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm._instance).toBeDefined();
     });
-  });
-
-
-  var plt: any;
-
-  beforeEach(() => {
-    plt = mockPlatform();
   });
 
 });

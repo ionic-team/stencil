@@ -1,4 +1,4 @@
-import { ComponentMeta } from '../interfaces';
+import { ComponentMeta } from '../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../constants';
 import { formatComponentLoader } from '../data-serialize';
 import { parseComponentLoader, parsePropertyValue } from '../data-parse';
@@ -59,7 +59,7 @@ describe('data serialize/parse', () => {
         }
       ];
 
-      let format = formatComponentLoader(cmpMeta);
+      const format = formatComponentLoader(cmpMeta);
       cmpMeta = parseComponentLoader(format, {});
 
       expect(cmpMeta.listenersMeta[0].eventName).toBe('click');
@@ -115,13 +115,13 @@ describe('data serialize/parse', () => {
 
     it('should set any type prop with attribName', () => {
       cmpMeta.membersMeta = {
-        'any': { memberType: MEMBER_TYPE.Prop, attribName: 'any' },
+        'any': { memberType: MEMBER_TYPE.Prop, propType: PROP_TYPE.Any, attribName: 'any' },
       };
 
       const format = formatComponentLoader(cmpMeta);
       cmpMeta = parseComponentLoader(format, {});
 
-      expect(cmpMeta.membersMeta.any.propType).toBeUndefined();
+      expect(cmpMeta.membersMeta.any.propType).toBe(PROP_TYPE.Any);
       expect(cmpMeta.membersMeta.any.attribName).toBe('any');
     });
 
@@ -147,6 +147,18 @@ describe('data serialize/parse', () => {
 
       expect(cmpMeta.membersMeta.boo.propType).toEqual(PROP_TYPE.Boolean);
       expect(cmpMeta.membersMeta.boo.attribName).toEqual('boo');
+    });
+
+    it('should set custom attribute string', () => {
+      cmpMeta.membersMeta = {
+        'str': { memberType: MEMBER_TYPE.Prop, attribName: 'my-custom-attr-name', propType: PROP_TYPE.String }
+      };
+
+      const format = formatComponentLoader(cmpMeta);
+      cmpMeta = parseComponentLoader(format, {});
+
+      expect(cmpMeta.membersMeta.str.propType).toEqual(PROP_TYPE.String);
+      expect(cmpMeta.membersMeta.str.attribName).toEqual('my-custom-attr-name');
     });
 
     it('should set string prop', () => {

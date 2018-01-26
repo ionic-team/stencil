@@ -1,4 +1,4 @@
-import { ENCAPSULATION } from '../../../../util/constants';
+import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
 import { gatherMetadata } from './test-utils';
 import { mockConfig } from '../../../../testing/mocks';
 import { visitClass } from '../index';
@@ -20,7 +20,7 @@ describe('component decorator', () => {
 
       expect(response).toEqual({
         'componentClass': 'ActionSheet',
-        'encapsulation': 0,
+        'encapsulation': ENCAPSULATION.NoEncapsulation,
         'assetsDirsMeta': [],
         'eventsMeta': [
           {
@@ -129,12 +129,12 @@ describe('component decorator', () => {
               'name': 'actionSheetId',
               'type': 'string',
             },
-            'memberType': 1,
-            'propType': 2,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.String,
           },
           'animationCtrl': {
             'ctrlId': 'ion-animation-controller',
-            'memberType': 4,
+            'memberType': MEMBER_TYPE.PropConnect,
           },
           'buttons': {
             'attribName': 'buttons',
@@ -151,12 +151,12 @@ describe('component decorator', () => {
               'name': 'buttons',
               'type': '{}',
             },
-            'memberType': 1,
-            'propType': 1,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.Unknown,
           },
           'config': {
             'ctrlId': 'config',
-            'memberType': 3,
+            'memberType': MEMBER_TYPE.PropContext,
           },
           'cssClass': {
             'attribName': 'cssClass',
@@ -168,11 +168,11 @@ describe('component decorator', () => {
               'name': 'cssClass',
               'type': 'string',
             },
-            'memberType': 1,
-            'propType': 2,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.String,
           },
           'el': {
-            'memberType': 7,
+            'memberType': MEMBER_TYPE.Element,
           },
           'enableBackdropDismiss': {
             'attribName': 'enableBackdropDismiss',
@@ -184,8 +184,8 @@ describe('component decorator', () => {
               'name': 'enableBackdropDismiss',
               'type': 'boolean',
             },
-            'memberType': 1,
-            'propType': 3,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.Boolean,
           },
           'enterAnimation': {
             'attribName': 'enterAnimation',
@@ -203,8 +203,8 @@ describe('component decorator', () => {
               'name': 'enterAnimation',
               'type': 'any',
             },
-            'memberType': 1,
-            'propType': 1,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.Unknown,
           },
           'exitAnimation': {
             'attribName': 'exitAnimation',
@@ -222,8 +222,8 @@ describe('component decorator', () => {
               'name': 'exitAnimation',
               'type': 'any',
             },
-            'memberType': 1,
-            'propType': 1,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.Unknown,
           },
           'subTitle': {
             'attribName': 'subTitle',
@@ -235,8 +235,8 @@ describe('component decorator', () => {
               'name': 'subTitle',
               'type': 'string',
             },
-            'memberType': 1,
-            'propType': 2,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.String,
           },
           'title': {
             'attribName': 'title',
@@ -248,8 +248,8 @@ describe('component decorator', () => {
               'name': 'title',
               'type': 'string',
             },
-            'memberType': 1,
-            'propType': 2,
+            'memberType': MEMBER_TYPE.Prop,
+            'propType': PROP_TYPE.String,
           },
         },
         'stylesMeta': {

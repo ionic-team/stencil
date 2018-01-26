@@ -25,6 +25,8 @@ export function createDom() {
 
       dom = new jsdom.JSDOM(opts.html, jsdomOptions);
 
+      polyfillJsDom(dom.window);
+
       return dom.window;
     },
 
@@ -38,5 +40,22 @@ export function createDom() {
     }
 
   };
+
+}
+
+
+function polyfillJsDom(window: any) {
+
+  if (!window.Element.prototype.closest) {
+    window.Element.prototype.closest = function (selector: string) {
+      let el = this;
+      while (el) {
+          if (el.matches(selector)) {
+              return el;
+          }
+          el = el.parentElement;
+      }
+    };
+  }
 
 }
