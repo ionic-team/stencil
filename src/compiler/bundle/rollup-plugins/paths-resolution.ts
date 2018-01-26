@@ -7,10 +7,15 @@ import * as ts from 'typescript';
 export default async function pathsResolver(config: Config, compilerCtx: CompilerCtx) {
   const tsconfig: ts.CompilerOptions = await getUserTsConfig(config, compilerCtx);
 
+  const extensions = [
+    'ts',
+    'tsx'
+  ];
+
   return {
     name: 'pathsResolverPlugin',
 
-    async resolveId(importee: string, importer: string) {
+    resolveId(importee: string, importer: string) {
       importee = normalizePath(importee);
       importer = normalizePath(importer);
 
@@ -38,21 +43,16 @@ export default async function pathsResolver(config: Config, compilerCtx: Compile
             // Build the subrule replacing the wildcard with actual path
             const enrichedSubrule: string = normalizePath(normalizedSubrule.replace(/\*$/, wildcard));
 
-            // Get the absolute path to the src
-            let finalPath = config.sys.path.join(config.rootDir, enrichedSubrule);
+            const finalPath = normalizePath(config.sys.path.join(config.rootDir, enrichedSubrule));
 
-            // Replace src with collection dir
-            finalPath = finalPath.replace(config.srcDir, config.collectionDir);
+            const moduleFiles = compilerCtx.moduleFiles;
 
-            // Add the extension
-            if (finalPath.indexOf('.js') !== finalPath.length - 3) {
-              finalPath += '.js';
-            }
+            for (let i = 0; i < extensions.length; i++) {
+              const moduleFile = moduleFiles[`${finalPath}.${extensions[i]}`];
 
-            const hasAccess = compilerCtx.fs.access(normalizePath(finalPath));
-
-            if (hasAccess) {
-              return finalPath;
+              if (moduleFile) {
+                return moduleFile.jsFilePath;
+              }
             }
           }
         }

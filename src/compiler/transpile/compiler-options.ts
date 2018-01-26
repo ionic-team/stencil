@@ -7,7 +7,7 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx):
   let compilerOptions: ts.CompilerOptions = DEFAULT_COMPILER_OPTIONS;
 
   try {
-    const normalizedConfigPath = normalizePath(config.sys.path.join(config.rootDir, config.tsconfig));
+    const normalizedConfigPath = normalizePath(config.tsconfig);
 
     const sourceText = await compilerCtx.fs.readFile(normalizedConfigPath);
 
