@@ -1,12 +1,15 @@
 import { CompilerCtx, Config } from '../../declarations';
 import * as ts from 'typescript';
+import { normalizePath } from '../util';
 
 
-export function getUserTsConfig(config: Config, compilerCtx: CompilerCtx): ts.CompilerOptions {
+export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx): Promise<ts.CompilerOptions> {
   let compilerOptions: ts.CompilerOptions = DEFAULT_COMPILER_OPTIONS;
 
   try {
-    const sourceText = compilerCtx.fs.readFileSync(config.tsconfig);
+    const normalizedConfigPath = normalizePath(config.sys.path.join(config.rootDir, config.tsconfig));
+
+    const sourceText = await compilerCtx.fs.readFile(normalizedConfigPath);
 
     try {
       const sourceJson = JSON.parse(sourceText);

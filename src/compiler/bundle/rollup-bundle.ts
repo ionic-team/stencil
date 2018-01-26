@@ -28,7 +28,7 @@ export async function runRollup(config: Config, compilerCtx: CompilerCtx, buildC
         bundleEntryFile(bundle),
         transpiledInMemoryPlugin(config, compilerCtx),
         localResolution(config, compilerCtx),
-        pathsResolution(config, compilerCtx),
+        await pathsResolution(config, compilerCtx),
         nodeEnvVars(config)
       ],
       onwarn: createOnWarnFn(buildCtx.diagnostics, bundle.moduleFiles)
