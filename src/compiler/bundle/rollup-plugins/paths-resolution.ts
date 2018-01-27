@@ -4,8 +4,8 @@ import { normalizePath } from '../../util';
 import * as ts from 'typescript';
 
 
-export default async function pathsResolver(config: Config, compilerCtx: CompilerCtx) {
-  const tsconfig: ts.CompilerOptions = await getUserTsConfig(config, compilerCtx);
+export default async function pathsResolver(config: Config, compilerCtx: CompilerCtx, testTsconfig?: ts.CompilerOptions) {
+  const tsconfig: ts.CompilerOptions = testTsconfig || await getUserTsConfig(config, compilerCtx);
 
   const extensions = [
     'ts',
