@@ -76,7 +76,7 @@ export async function writeLegacyModules(config: Config, rollupBundle: OutputChu
     },
     banner: generatePreamble(config),
     intro:
-      `const h = window.${config.namespace}.h;
+`const h = window.${config.namespace}.h;
 const Context = window.${config.namespace}.Context;`,
     strict: false,
   });
