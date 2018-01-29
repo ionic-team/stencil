@@ -16,7 +16,8 @@ describe('build', () => {
     expect(r.diagnostics).toEqual([]);
 
     const output = await c.fs.readFile('/www/build/app/cmp-a.es5.js');
-    expect(output).toContain('App.loadComponents(function(e,n,t){\"use strict\";Object.defineProperty(e,\"__esModule\",{value:!0});var r=function(){function e(){}return Object.defineProperty(e,\"is\",{get:function(){return\"cmp-a\"},enumerable:!0,configurable:!0}),e}();e.CmpA=r},\"cmp-a\");');
+    /*! Built with http://stenciljs.com */
+    expect(output).toContain('App.loadBundle(\"cmp-a\",[\"exports\"],function(e){window.App.h,window.App.Context;var n=function(){function e(){}return Object.defineProperty(e,\"is\",{get:function(){return\"cmp-a\"},enumerable:!0,configurable:!0}),e}();e.CmpA=n,Object.defineProperty(e,\"__esModule\",{value:!0})});');
   });
 
   it('should minify es2015 build', async () => {

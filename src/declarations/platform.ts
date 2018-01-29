@@ -69,7 +69,7 @@ export interface EventEmitterData<T = any> {
 
 export interface AppGlobal {
   components?: d.LoadComponentRegistry[];
-  loadComponents?: (importFn: CjsImporterFn, bundleId: string) => void;
+  loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
   h?: Function;
   Context?: any;
 }
@@ -92,7 +92,7 @@ export interface CoreContext {
 
 
 export interface CjsImporterFn {
-  (exports: CjsExports, h: Function, Context: any): void;
+  (exports: CjsExports, requirePoly: Function): void;
 }
 
 
@@ -142,6 +142,8 @@ export interface IdleOptions {
 }
 
 
-export interface BundleCallbacks {
-  [bundleId: string]: Function[];
-}
+export type BundleCallback = [
+  string | undefined,
+  string[],
+  Function
+];

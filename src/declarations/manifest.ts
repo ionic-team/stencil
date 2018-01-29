@@ -35,15 +35,14 @@ export interface AppRegistry {
 
 
 export interface AppRegistryComponents {
-  [tagName: string]: d.BundleIds;
+  [tagName: string]: string | d.BundleIds;
 }
 
 
 export interface Bundle {
   entryKey?: string;
   moduleFiles: d.ModuleFile[];
-  compiledModuleJsText?: string;
-  compiledModuleLegacyJsText?: string;
+  dependencies?: string[];
   requiresScopedStyles?: boolean;
   modeNames?: string[];
 }

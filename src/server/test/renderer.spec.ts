@@ -1,4 +1,4 @@
-import { ComponentConstructor, ComponentRegistry, Config } from '../../declarations';
+import { ComponentConstructor, ComponentMeta, ComponentRegistry, Config } from '../../declarations';
 import { Renderer, h } from '../index';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { mockConfig } from '../../testing/mocks';
@@ -40,6 +40,7 @@ describe('Renderer', () => {
 
     const cmpRegistry: ComponentRegistry = {
       'my-button': {
+        bundleIds: 'my-button',
         tagNameMeta: 'my-button',
         membersMeta: {
           size: {
@@ -49,7 +50,7 @@ describe('Renderer', () => {
           }
         },
         componentConstructor: MyButton
-      }
+      } as ComponentMeta
     };
 
     renderer = new Renderer(config, cmpRegistry);
