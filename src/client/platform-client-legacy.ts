@@ -250,7 +250,9 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
 
   // This is executed by the component's connected callback.
   function loadComponent(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
-    bundleId = cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any);
+    bundleId = (typeof cmpMeta.bundleIds === 'string') ?
+      cmpMeta.bundleIds :
+      cmpMeta.bundleIds[modeName];
 
     if (loadedBundles[bundleId]) {
       // sweet, we've already loaded this bundle

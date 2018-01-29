@@ -215,9 +215,15 @@ export function createPlatformServer(
 
   // This is executed by the component's connected callback.
   function loadComponent(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
-    bundleId = cmpMeta.bundleIds[modeName] || (cmpMeta.bundleIds as any);
+    bundleId = (typeof cmpMeta.bundleIds === 'string') ?
+      cmpMeta.bundleIds :
+      cmpMeta.bundleIds[modeName];
 
-    if (loadedBundles[bundleId]) {
+    // It is possible the data was loaded from an outside source like tests
+    if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor) {
+      cb();
+
+    } else if (loadedBundles[bundleId]) {
       // sweet, we've already loaded this bundle
       cb();
 
@@ -303,7 +309,9 @@ export function createPlatformServer(
 
 
 export function getComponentBundleFilename(cmpMeta: ComponentMeta, modeName: string) {
-  let bundleId: string = (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE] || cmpMeta.bundleIds as any);
+  let bundleId: string = (typeof cmpMeta.bundleIds === 'string') ?
+    cmpMeta.bundleIds :
+    (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE]);
 
   if (cmpMeta.encapsulation === ENCAPSULATION.ScopedCss || cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     bundleId += '.sc';

@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, Bundle, ComponentMeta, ComponentRegistry, SourceTarget, ModuleFile, BuildCtx, JSModuleMap } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, ComponentMeta, ComponentRegistry, Config, JSModuleMap, ModuleFile, SourceTarget } from '../../util/interfaces';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { hasError, minifyJs, pathJoin } from '../util';
 import { getAppDistDir, getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
@@ -73,7 +73,9 @@ async function generateBundleMode(config: Config, compilerCtx: CompilerCtx, buil
   // mode, no scoped styles and esm to each of the components
   bundle.moduleFiles.forEach(moduleFile => {
     moduleFile.cmpMeta.bundleIds = moduleFile.cmpMeta.bundleIds || {};
-    moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+    if (typeof moduleFile.cmpMeta.bundleIds === 'object') {
+      moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+    }
   });
 
   // generate the bundle build for mode, no scoped styles, and esm
@@ -235,7 +237,9 @@ export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bu
   // mode, no scoped styles and esm to each of the components
   moduleFiles.forEach(moduleFile => {
     moduleFile.cmpMeta.bundleIds = moduleFile.cmpMeta.bundleIds || {};
-    moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+    if (typeof moduleFile.cmpMeta.bundleIds === 'object') {
+      moduleFile.cmpMeta.bundleIds[modeName] = bundleId;
+    }
   });
 }
 

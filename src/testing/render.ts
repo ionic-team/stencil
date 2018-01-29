@@ -22,6 +22,7 @@ export async function render(opts: RenderTestOptions): Promise<any> {
       if (testCmp) {
         const cmpMeta: ComponentMeta = {
           tagNameMeta: testCmp.is,
+          bundleIds: testCmp.is,
           componentConstructor: testCmp,
           membersMeta: {
             color: { propType: PROP_TYPE.String, memberType: MEMBER_TYPE.Prop }

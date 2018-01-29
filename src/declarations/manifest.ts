@@ -35,7 +35,7 @@ export interface AppRegistry {
 
 
 export interface AppRegistryComponents {
-  [tagName: string]: d.BundleIds;
+  [tagName: string]: string | d.BundleIds;
 }
 
 

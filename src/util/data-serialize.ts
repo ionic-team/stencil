@@ -29,7 +29,7 @@ export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegi
 }
 
 
-export function formatLoaderBundleIds(bundleIds: BundleIds): any {
+export function formatLoaderBundleIds(bundleIds: string | BundleIds): any {
   if (!bundleIds) {
     return `invalid-bundle-id`;
   }
