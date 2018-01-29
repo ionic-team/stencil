@@ -5,10 +5,6 @@ import {
   mockStencilSystem
 } from '../../../../testing/mocks';
 import { CompilerCtx } from '../../../../util/interfaces';
-import { Bundle, Diagnostic, ManifestBundle, ModuleFile } from '../../../util/interfaces';
-import { ENCAPSULATION } from '../../../util/constants';
-import { getBundlesFromManifest } from '../bundle';
-import { sortBundles } from '../bundle-utils';
 import localResolution from '../local-resolution';
 import pathsResolver from '../paths-resolution';
 
