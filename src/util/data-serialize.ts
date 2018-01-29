@@ -1,7 +1,8 @@
-import { BundleIds, ComponentMeta, ComponentConstructorProperty,
-  ComponentConstructorProperties, ComponentRegistry, ListenMeta,
-  LoadComponentRegistry, MemberMeta, MembersMeta, StylesMeta, EventMeta, ComponentConstructorEvent } from './interfaces';
+import { BundleIds, ComponentConstructorEvent, ComponentConstructorProperties,
+  ComponentConstructorProperty, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta,
+  LoadComponentRegistry, MemberMeta, MembersMeta, StylesMeta } from '../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
+import { toDashCase } from './helpers';
 
 
 export function formatComponentLoaderRegistry(cmpRegistry: ComponentRegistry) {
@@ -28,7 +29,7 @@ export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegi
 }
 
 
-export function formatLoaderBundleIds(bundleIds: BundleIds): any {
+export function formatLoaderBundleIds(bundleIds: string | BundleIds): any {
   if (!bundleIds) {
     return `invalid-bundle-id`;
   }
@@ -81,19 +82,25 @@ function formatMembers(membersMeta: MembersMeta) {
       memberMeta.memberType
     ];
 
-    if (typeof memberMeta.attribName === 'string') {
+    if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String || memberMeta.propType === PROP_TYPE.Any) {
       // observe the attribute
-      d.push(1);
+
+      if (memberMeta.attribName !== memberName) {
+        // property name and attribute name are different
+        // ariaDisabled !== aria-disabled
+        d.push(memberMeta.attribName);
+
+      } else {
+        // property name and attribute name are the exact same
+        // checked === checked
+        d.push(1);
+      }
+
+      d.push(memberMeta.propType);
 
     } else {
       // do not observe the attribute
       d.push(0);
-    }
-
-    if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String || memberMeta.propType === PROP_TYPE.Any) {
-      d.push(memberMeta.propType);
-
-    } else {
       d.push(PROP_TYPE.Unknown);
     }
 
@@ -161,14 +168,14 @@ export function formatComponentConstructorProperties(membersMeta: MembersMeta) {
   const properties: ComponentConstructorProperties = {};
 
   memberNames.forEach(memberName => {
-    properties[memberName] = formatComponentConstructorProperty(membersMeta[memberName]);
+    properties[memberName] = formatComponentConstructorProperty(memberName, membersMeta[memberName]);
   });
 
   return properties;
 }
 
 
-function formatComponentConstructorProperty(memberMeta: MemberMeta) {
+function formatComponentConstructorProperty(memberName: string, memberMeta: MemberMeta) {
   const property: ComponentConstructorProperty = {};
 
   if (memberMeta.memberType === MEMBER_TYPE.State) {
@@ -189,14 +196,21 @@ function formatComponentConstructorProperty(memberMeta: MemberMeta) {
   } else {
     if (memberMeta.propType === PROP_TYPE.String) {
       property.type = String;
+      property.attr = toDashCase(memberName);
 
     } else if (memberMeta.propType === PROP_TYPE.Boolean) {
       property.type = Boolean;
+      property.attr = toDashCase(memberName);
 
     } else if (memberMeta.propType === PROP_TYPE.Number) {
       property.type = Number;
+      property.attr = toDashCase(memberName);
 
     } else if (memberMeta.propType === PROP_TYPE.Any) {
+      property.type = 'Any';
+      property.attr = toDashCase(memberName);
+
+    } else {
       property.type = 'Any';
     }
 

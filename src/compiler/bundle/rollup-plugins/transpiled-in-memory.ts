@@ -32,6 +32,9 @@ export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCt
           // awesome, there's a module file for this js file, we're good here
           return importee;
         }
+        if (moduleFile.jsFilePath === importee + '.js') {
+          return `${importee}.js`;
+        }
       }
 
       // let's check all of the asset directories for this path

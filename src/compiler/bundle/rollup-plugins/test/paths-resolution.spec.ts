@@ -9,9 +9,10 @@ import { Bundle, Diagnostic, ManifestBundle, ModuleFile } from '../../../util/in
 import { ENCAPSULATION } from '../../../util/constants';
 import { getBundlesFromManifest } from '../bundle';
 import { sortBundles } from '../bundle-utils';
+import localResolution from '../local-resolution';
 import pathsResolver from '../paths-resolution';
 
-
+// localResolution(config, compilerCtx),
 describe('paths-resolution', () => {
 
   it('should resolve UNIX paths', async () => {

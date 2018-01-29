@@ -23,7 +23,7 @@ export async function prerenderPath(config: Config, compilerCtx: CompilerCtx, bu
     hydrateOpts.html = indexSrcHtml;
 
     // create a server-side renderer
-    const renderer = new Renderer(rendererConfig, compilerCtx);
+    const renderer = new Renderer(rendererConfig, null, compilerCtx);
 
     // parse the html to dom nodes, hydrate the components, then
     // serialize the hydrated dom nodes back to into html

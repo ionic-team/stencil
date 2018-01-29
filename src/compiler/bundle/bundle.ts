@@ -1,11 +1,11 @@
-import { BuildCtx, Bundle, CompilerCtx, Config, Diagnostic, ManifestBundle, ModuleFile } from '../../util/interfaces';
+import { BuildCtx, Bundle, CompilerCtx, Config, Diagnostic, JSModuleMap, ManifestBundle, ModuleFile } from '../../util/interfaces';
 import { buildError, catchError } from '../util';
 import { bundleRequiresScopedStyles, getBundleEncapsulations, getBundleModes, sortBundles } from './bundle-utils';
-import { generateBundleModule } from './bundle-module';
+import { generateBundleModules } from './bundle-modules';
 import { upgradeDependentComponents } from '../upgrade-dependents/index';
 
 
-export async function bundleModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function bundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx): Promise<[Bundle[], JSModuleMap]> {
   let bundles: Bundle[] = [];
 
   if (config.generateWWW) {
@@ -16,7 +16,8 @@ export async function bundleModules(config: Config, compilerCtx: CompilerCtx, bu
     config.logger.debug(`bundle, distDir: ${config.distDir}`);
   }
 
-  const timeSpan = config.logger.createTimeSpan(`bundling started`, true);
+  const timeSpan = config.logger.createTimeSpan(`bundle started`, true);
+  let jsModules: JSModuleMap;
 
   try {
     // get all of the bundles from the manifest bundles
@@ -30,10 +31,8 @@ export async function bundleModules(config: Config, compilerCtx: CompilerCtx, bu
     // upgrade the components to be compatible with this version if need be
     await upgradeDependentComponents(config, compilerCtx, buildCtx, bundles);
 
-    // kick off bundling
-    await Promise.all(bundles.map(async bundle => {
-      await generateBundleModule(config, compilerCtx, buildCtx, bundle);
-    }));
+    // kick off style and module bundling at the same time
+    jsModules = await generateBundleModules(config, compilerCtx, buildCtx, bundles);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
@@ -41,34 +40,35 @@ export async function bundleModules(config: Config, compilerCtx: CompilerCtx, bu
 
   timeSpan.finish(`bundling finished`);
 
-  return bundles;
+  return [bundles, jsModules];
 }
 
 
 export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundles: ManifestBundle[], diagnostics: Diagnostic[]) {
   const bundles: Bundle[] = [];
 
-  manifestBundles.filter(b => b.components && b.components.length).forEach(manifestBundle => {
-    const bundle: Bundle = {
-      moduleFiles: [],
-      compiledModuleJsText: ''
-    };
+  manifestBundles
+    .filter(b => b.components && b.components.length)
+    .forEach(manifestBundle => {
+      const bundle: Bundle = {
+        moduleFiles: [],
+      };
 
-    manifestBundle.components.forEach(tag => {
-      const cmpMeta = moduleFiles.find(modulesFile => modulesFile.cmpMeta.tagNameMeta === tag);
-      if (cmpMeta) {
-        bundle.moduleFiles.push(cmpMeta);
+      manifestBundle.components.forEach(tag => {
+        const cmpMeta = moduleFiles.find(modulesFile => modulesFile.cmpMeta.tagNameMeta === tag);
+        if (cmpMeta) {
+          bundle.moduleFiles.push(cmpMeta);
 
-      } else {
-        buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or collections.`;
+        } else {
+          buildError(diagnostics).messageText = `Component tag "${tag}" is defined in a bundle but no matching component was found within this app or collections.`;
+        }
+      });
+
+      if (bundle.moduleFiles.length > 0) {
+        updateBundleData(bundle);
+        bundles.push(bundle);
       }
     });
-
-    if (bundle.moduleFiles.length > 0) {
-      updateBundleData(bundle);
-      bundles.push(bundle);
-    }
-  });
 
   // always consistently sort them
   return sortBundles(bundles);
@@ -76,8 +76,9 @@ export function getBundlesFromManifest(moduleFiles: ModuleFile[], manifestBundle
 
 
 export function updateBundleData(bundle: Bundle) {
+
   // generate a unique entry key based on the components within this bundle
-  bundle.entryKey = 'bundle:' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('.');
+  bundle.entryKey = 'bundle_' + bundle.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort().join('_');
 
   // get the modes used in this bundle
   bundle.modeNames = getBundleModes(bundle.moduleFiles);

@@ -52,7 +52,7 @@ export interface ComponentConstructor {
 export interface ComponentMeta {
   // "Meta" suffix to ensure property renaming
   tagNameMeta?: string;
-  bundleIds?: BundleIds;
+  bundleIds?: string | BundleIds;
   stylesMeta?: d.StylesMeta;
   membersMeta?: MembersMeta;
   eventsMeta?: EventMeta[];
@@ -320,9 +320,9 @@ export interface ComponentMemberData {
   [1]: number;
 
   /**
-   * is attribute to observe
+   * is attribute name to observe
    */
-  [2]: number;
+  [2]: string|number;
 
   /**
    * prop type

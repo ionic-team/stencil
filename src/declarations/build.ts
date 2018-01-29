@@ -2,6 +2,7 @@ import * as d from './index';
 
 
 export interface BuildCtx {
+  graphData?: GraphData;
   buildId: number;
   requiresFullBuild: boolean;
   diagnostics: d.Diagnostic[];
@@ -25,6 +26,9 @@ export interface BuildCtx {
   shouldAbort?(): boolean;
   finish?(): BuildResults;
 }
+
+
+export type GraphData = Map<string, string[]>;
 
 
 export interface BuildResults {
@@ -106,6 +110,15 @@ export interface TranspileResults {
   code?: string;
   diagnostics?: d.Diagnostic[];
   cmpMeta?: d.ComponentMeta;
+}
+
+
+export interface JSModuleList {
+  [key: string]: { code: string };
+}
+
+export interface JSModuleMap {
+  [key: string]: JSModuleList;
 }
 
 

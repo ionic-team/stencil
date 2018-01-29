@@ -93,9 +93,15 @@ export function getBundleIds(bundles: Bundle[], components: HydrateComponent[]) 
         return;
       }
 
-      let bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_MODE];
-      if (!bundleId) {
-        bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE];
+      let bundleId: string;
+      if (typeof moduleFile.cmpMeta.bundleIds === 'string') {
+        bundleId = moduleFile.cmpMeta.bundleIds;
+      } else {
+
+        bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_MODE];
+        if (!bundleId) {
+          bundleId = moduleFile.cmpMeta.bundleIds[DEFAULT_STYLE_MODE];
+        }
       }
 
       if (bundleId && bundleIds.indexOf(bundleId) === -1) {

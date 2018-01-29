@@ -1,5 +1,5 @@
-import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
-import { bundleModules } from '../bundle/bundle';
+import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
+import { bundle } from '../bundle/bundle';
 import { catchError, getCompilerCtx } from '../util';
 import { copyTasks } from '../copy/copy-tasks';
 import { emptyDestDir, writeBuildFiles } from './write-build';
@@ -46,7 +46,7 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // bundle modules and styles into separate files phase
-    const bundles = await bundleModules(config, compilerCtx, buildCtx);
+    const [ bundles, jsModules ] = await bundle(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // create each of the components's styles
@@ -56,7 +56,7 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     // both styles and modules are done bundling
     // inject the styles into the modules and
     // generate each of the output bundles
-    const cmpRegistry = generateBundles(config, compilerCtx, buildCtx, bundles);
+    const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, bundles, jsModules);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // generate the app files, such as app.js, app.core.js
