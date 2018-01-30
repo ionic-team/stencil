@@ -22,6 +22,9 @@
     "rootDir": "../",
     "target": "es2015"
   },
+  "include": [
+    "../../types/rollup-plugin-node-builtins.d.ts"
+  ],
   "files": [
     "./index.ts"
   ]
