@@ -1,5 +1,6 @@
 import { Bundle, Config } from '../../../util/interfaces';
 import { dashToPascalCase } from '../../../util/helpers';
+import { normalizePath } from '../../util';
 
 export default function bundleEntryFile(config: Config, bundles: Bundle[]) {
 
@@ -34,7 +35,7 @@ export function createEntryPointString(config: Config, bundle: Bundle): string {
       const originalClassName = moduleFile.cmpMeta.componentClass;
       const pascalCasedClassName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
 
-      let filePath = path.relative(path.dirname(bundle.entryKey), moduleFile.jsFilePath);
+      const filePath = normalizePath(path.relative(path.dirname(bundle.entryKey), moduleFile.jsFilePath));
       return `export { ${originalClassName} as ${pascalCasedClassName} } from './${filePath}';`;
     })
     .join('\n');

@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, FilesMap } from '../../../util/interfaces';
+import { CompilerCtx, Config, FilesMap } from '../../../util/interfaces';
 import { normalizePath } from '../../util';
 
 export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCtx) {
@@ -47,9 +47,9 @@ export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCt
           // now let's check if this module has an assets directory
           if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
             for (var j = 0; j < moduleFile.cmpMeta.assetsDirsMeta.length; j++) {
-              var assetsAbsPath = moduleFile.cmpMeta.assetsDirsMeta[j].absolutePath;
-              var importeeFileName = sys.path.basename(importee);
-              var assetsFilePath = normalizePath(sys.path.join(assetsAbsPath, importeeFileName));
+              const assetsAbsPath = moduleFile.cmpMeta.assetsDirsMeta[j].absolutePath;
+              const importeeFileName = sys.path.basename(importee);
+              const assetsFilePath = normalizePath(sys.path.join(assetsAbsPath, importeeFileName));
 
               // ok, we've got a potential absolute path where the file "could" be
               try {
