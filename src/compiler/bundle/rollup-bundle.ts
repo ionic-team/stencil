@@ -7,6 +7,8 @@ import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import { InputOptions, OutputChunk, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
+import './rollup-plugin-node-builtins';
+import builtins from 'rollup-plugin-node-builtins';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
@@ -16,6 +18,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     input: bundles.map(b => b.entryKey),
     experimentalCodeSplitting: true,
     plugins: [
+      builtins(),
       config.sys.rollup.plugins.nodeResolve({
         jsnext: true,
         main: true
