@@ -140,7 +140,10 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         }
       }
 
-      isSvgMode = false;
+      // Only reset the SVG context when we're exiting SVG element
+      if (vnode.vtag === 'svg') {
+        isSvgMode = false;
+      }
     }
 
     return vnode.elm;
