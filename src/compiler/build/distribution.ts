@@ -1,6 +1,7 @@
-import { BuildCtx, CompilerCtx, Config, Diagnostic } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, Diagnostic } from '../../declarations';
 import { buildError, buildWarn, normalizePath } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
+import { copyComponentStyles } from '../copy/copy-styles';
 import { getLoaderFileName } from '../app/app-file-naming';
 import { pathJoin } from '../util';
 
@@ -13,6 +14,7 @@ export async function generateDistribution(config: Config, compilerCtx: Compiler
   }
 
   await Promise.all([
+    copyComponentStyles(config, compilerCtx, buildCtx),
     readPackageJson(config, compilerCtx, buildCtx),
     generateTypes(config, compilerCtx)
   ]);
@@ -66,7 +68,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], d
 function validatePackageJsonTypes(config: Config, diagnostics: Diagnostic[], data: any) {
   const indexDtsFileAbsPath = config.sys.path.join(config.typesDir, 'index.d.ts');
   const indexDtsFileRelPath = pathJoin(config, config.sys.path.relative(config.rootDir, indexDtsFileAbsPath));
-  const componentsDtsFileAbsPath = config.sys.path.join(config.typesDir, 'components.d.ts');
+  const componentsDtsFileAbsPath = config.sys.path.join(config.typesDir, COMPONENTS_DTS);
   const componentsDtsFileRelPath = pathJoin(config, config.sys.path.relative(config.rootDir, componentsDtsFileAbsPath));
 
   if (!data.types || (normalizePath(data.types) !== indexDtsFileRelPath && normalizePath(data.types) !== componentsDtsFileRelPath)) {

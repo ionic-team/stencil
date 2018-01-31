@@ -1,7 +1,7 @@
 import { Config } from '../../util/interfaces';
 
 
-export function buildExpressionReplacer(config: Config, input: string) {
+export function buildExpressionReplacer(config: Config, input: string): string {
   return input
           .replace(
             /process.env.NODE_ENV(\s*)(===|==)(\s*)['"`]production['"`]/g,

@@ -1,4 +1,4 @@
-import { AppRegistry, Config, CompilerCtx, ComponentRegistry, LoadComponentRegistry } from '../../../util/interfaces';
+import { AppRegistry, CompilerCtx, ComponentRegistry, Config, LoadComponentRegistry } from '../../../declarations';
 import { generateLoader, injectAppIntoLoader } from '../app-loader';
 import { generatePreamble } from '../../util';
 import { mockCache, mockLogger, mockStencilSystem } from '../../../testing/mocks';
@@ -47,7 +47,7 @@ describe('build-project-files', () => {
         `("__APP__")`
       );
 
-      expect(appLoader).toBe(`("MyApp","build/my-app/","my-app.core.js","my-app.core.pf.js","hydrated-css",[["root-cmp",{"Mode1":"abc","Mode2":"def"}]])`);
+      expect(appLoader).toBe(`("MyApp","my-app","build/my-app/","my-app.core.js","my-app.core.pf.js","hydrated-css",[["root-cmp",{"Mode1":"abc","Mode2":"def"}]])`);
     });
 
   });
@@ -70,8 +70,8 @@ describe('build-project-files', () => {
     it('includes the injected app', async () => {
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
       const res = await callGenerateLoader();
-      let lines = res.split('\n');
-      expect(lines[1]).toEqual(`pretend i am code ("MyApp","build/myapp/","myapp.core.js","myapp.core.pf.js","hydrated",[]) yeah me too`);
+      const lines = res.split('\n');
+      expect(lines[1]).toEqual(`pretend i am code ("MyApp","my-app","build/my-app/","myapp.core.js","myapp.core.pf.js","hydrated",[]) yeah me too`);
     });
   });
 
@@ -81,12 +81,12 @@ describe('build-project-files', () => {
     componentRegistry?: ComponentRegistry
   }) {
     config.namespace = 'MyApp';
-    config.fsNamespace = config.namespace.toLowerCase();
+    config.fsNamespace = 'my-app';
     config.publicPath = 'build/';
 
-    let ctx: CompilerCtx = { appFiles: {}, cache: mockCache() as any };
+    const ctx: CompilerCtx = { appFiles: {}, cache: mockCache() as any };
 
-    let appRegistry: AppRegistry = {
+    const appRegistry: AppRegistry = {
       core: 'myapp.core.js',
       corePolyfilled: 'myapp.core.pf.js',
       components: {},

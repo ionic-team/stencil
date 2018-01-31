@@ -1,3 +1,71 @@
+<a name="0.2.3"></a>
+## [0.2.3](https://github.com/ionic-team/stencil/compare/v0.2.2...v0.2.3) (2018-01-24)
+
+
+### Bug Fixes
+
+* **attribute:** attr name from toDashCase of property name ([28740be](https://github.com/ionic-team/stencil/commit/28740be))
+* **build:** update uglify-es to 3.3.8 ([690759d](https://github.com/ionic-team/stencil/commit/690759d))
+* **compiler:** avoid global JSX namespace collisions ([9c1e721](https://github.com/ionic-team/stencil/commit/9c1e721))
+* **test:** fix unit test hydration ([122b1cd](https://github.com/ionic-team/stencil/commit/122b1cd)), closes [#441](https://github.com/ionic-team/stencil/issues/441)
+* **watcher:** ensure duplicate builds are not started ([b3d6cf2](https://github.com/ionic-team/stencil/commit/b3d6cf2))
+* **watcher:** ensure duplicate paths are not added to queue ([767b879](https://github.com/ionic-team/stencil/commit/767b879))
+
+
+### Features
+
+* **test:** add test transpile fn interface ([d68fffb](https://github.com/ionic-team/stencil/commit/d68fffb))
+
+
+
+<a name="0.2.2"></a>
+## [0.2.2](https://github.com/ionic-team/stencil/compare/v0.2.1...v0.2.2) (2018-01-23)
+
+
+### Bug Fixes
+
+* **core:** fix core js request for namespace w/ dash ([be074db](https://github.com/ionic-team/stencil/commit/be074db)), closes [#421](https://github.com/ionic-team/stencil/issues/421)
+* **cssvars:** fix IE11 css vars ([31f4083](https://github.com/ionic-team/stencil/commit/31f4083)), closes [#422](https://github.com/ionic-team/stencil/issues/422)
+* **fs:** clear file cache on change/add for non-web dev files ([f817109](https://github.com/ionic-team/stencil/commit/f817109))
+* **render:** handle runtime errors within render() ([5a224d5](https://github.com/ionic-team/stencil/commit/5a224d5)), closes [#370](https://github.com/ionic-team/stencil/issues/370)
+
+
+
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/ionic-team/stencil/compare/v0.2.0...v0.2.1) (2018-01-23)
+
+
+### Bug Fixes
+
+* **watch:** rebuild from copy task file changes ([e2a8632](https://github.com/ionic-team/stencil/commit/e2a8632))
+
+
+
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/ionic-team/stencil/compare/v0.1.6...v0.2.0) (2018-01-22)
+
+
+### Bug Fixes
+
+* **async:** fix async writes ([614bb97](https://github.com/ionic-team/stencil/commit/614bb97))
+* **build:** ensure stencil imports are removed from older collections ([9df9d7e](https://github.com/ionic-team/stencil/commit/9df9d7e))
+* **bundle:** fix config.collections includeBundledOnly ([8b6fd11](https://github.com/ionic-team/stencil/commit/8b6fd11)), closes [#426](https://github.com/ionic-team/stencil/issues/426)
+* **copy:** copy to distribution directory option ([267a66c](https://github.com/ionic-team/stencil/commit/267a66c)), closes [#246](https://github.com/ionic-team/stencil/issues/246)
+* **fs:** remove queue delete when copying ([55f7aee](https://github.com/ionic-team/stencil/commit/55f7aee))
+* **style:** handle octal escape sequences w/in compiled css ([40a030e](https://github.com/ionic-team/stencil/commit/40a030e))
+* **watch:** correct globalStyle path on rebuild ([4843801](https://github.com/ionic-team/stencil/commit/4843801)), closes [#430](https://github.com/ionic-team/stencil/issues/430)
+* **watcher:** always initWatcher ([70c27fd](https://github.com/ionic-team/stencil/commit/70c27fd))
+* **ssr:** polyfill "Element.prototype.closest" on jsdom ([58d48ad](https://github.com/ionic-team/stencil/commit/58d48ad)), closes [#437](https://github.com/ionic-team/stencil/issues/437)
+
+
+### Features
+
+* **fs:** in-memory filesystem and caching updates ([7ad25bd](https://github.com/ionic-team/stencil/commit/7ad25bd)
+* **plugins:** init plugins ([55827cc](https://github.com/ionic-team/stencil/commit/55827cc))
+* **watch:** add member name as 3rd arg ([5bc261c](https://github.com/ionic-team/stencil/commit/5bc261c))
+
+
+
 <a name="0.1.6"></a>
 ## [0.1.6](https://github.com/ionic-team/stencil/compare/v0.1.5...v0.1.6) (2018-01-18)
 

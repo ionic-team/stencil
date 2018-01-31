@@ -22,6 +22,9 @@
     "rootDir": "../",
     "target": "es2015"
   },
+  "include": [
+    "../../types/*.d.ts"
+  ],
   "files": [
     "./index.ts"
   ]

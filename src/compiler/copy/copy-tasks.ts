@@ -27,8 +27,6 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, buildC
       await compilerCtx.fs.copy(copyTask.src, copyTask.dest, { filter: copyTask.filter });
     }));
 
-    await compilerCtx.fs.commitCopy();
-
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }

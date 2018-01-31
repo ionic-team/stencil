@@ -1,4 +1,4 @@
-import { CompilerCtx, Config } from '../../util/interfaces';
+import { CompilerCtx, Config } from '../../declarations';
 import { getAppWWWBuildDir } from './app-file-naming';
 import { pathJoin } from '../util';
 
@@ -9,11 +9,8 @@ export async function generateEs5DisabledMessage(config: Config, compilerCtx: Co
   // tests on a browser that doesn't support es2015
   const fileName = 'es5-build-disabled.js';
 
-  if (!compilerCtx.isRebuild) {
-    // only write this once
-    const filePath = pathJoin(config, getAppWWWBuildDir(config), fileName);
-    await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript());
-  }
+  const filePath = pathJoin(config, getAppWWWBuildDir(config), fileName);
+  await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript());
 
   return fileName;
 }

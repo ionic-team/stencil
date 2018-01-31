@@ -1,10 +1,10 @@
-import { ATTR_CASE, PROP_TYPE } from './constants';
 import { ComponentListenersData, ComponentMemberData, ComponentMeta,
-  ComponentRegistry, LoadComponentRegistry, PropertyType } from '../util/interfaces';
-import { isDef, toDashCase, toLowerCase } from './helpers';
+  ComponentRegistry, LoadComponentRegistry, PropertyType } from '../declarations';
+import { isDef } from './helpers';
+import { PROP_TYPE } from './constants';
 
 
-export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmpRegistry: ComponentRegistry, attr?: number, i?: number, d?: ComponentMemberData) {
+export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmpRegistry: ComponentRegistry, i?: number, d?: ComponentMemberData) {
   // tag name will always be lower case
   const cmpMeta: ComponentMeta = {
     tagNameMeta: cmpRegistryData[0],
@@ -29,7 +29,7 @@ export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmp
       d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        attribName: d[2] ? attr === ATTR_CASE.LowerCase ? toLowerCase(d[0]) : toDashCase(d[0]) : (0 as any),
+        attribName: typeof d[2] === 'string' ? d[2] as string : d[2] ? d[0] : 0 as any,
         propType: d[3]
       };
     }

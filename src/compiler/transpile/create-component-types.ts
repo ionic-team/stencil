@@ -1,7 +1,7 @@
-import { Config, ComponentMeta, ComponentRegistry, MembersMeta, MemberMeta } from '../../util/interfaces';
+import { ComponentMeta, ComponentRegistry, Config, MemberMeta, MembersMeta } from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
-import { normalizePath } from '../util';
 import { MEMBER_TYPE } from '../../util/constants';
+import { normalizePath } from '../util';
 
 
 const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
@@ -78,6 +78,8 @@ ${typeData.sort(sortImportNames).map(td => {
 
   componentsFileContent += typeImportString + componentFileString;
 
+  componentsFileContent += `declare global { namespace JSX { interface StencilJSX {} } }\n`;
+
   return componentsFileContent;
 }
 
@@ -125,7 +127,7 @@ function updateReferenceTypeImports(config: Config, importDataObj: ImportData, a
   .reduce((obj, memberName) => {
     const member: MemberMeta = cmpMeta.membersMeta[memberName];
     Object.keys(member.attribType.typeReferences).forEach(typeName => {
-      var type = member.attribType.typeReferences[typeName];
+      const type = member.attribType.typeReferences[typeName];
       let importFileLocation: string;
 
       // If global then there is no import statement needed

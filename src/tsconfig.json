@@ -24,6 +24,7 @@
   },
   "include": [
     "index.ts",
+    "../types/*.d.ts",
     "client/*.ts"
   ]
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-process.title = 'stencil';
+process.title = 'Stencil';
 
 var minNodeVersion = '6.11.0';
 var semver = require('semver');

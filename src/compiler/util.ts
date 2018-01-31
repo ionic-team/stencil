@@ -1,7 +1,7 @@
 import { BANNER } from '../util/constants';
 import { BuildEvents } from './events';
 import { Cache } from './cache';
-import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../util/interfaces';
+import { CompilerCtx, Config, Diagnostic, SourceTarget } from '../declarations';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 
 
@@ -91,12 +91,9 @@ export function isHtmlFile(filePath: string) {
  */
 export function isWebDevFile(filePath: string) {
   const ext = filePath.split('.').pop().toLowerCase();
-  if (WEB_DEV_EXT.indexOf(ext) > -1) {
-    return true;
-  }
-  return (WEB_DEV_EXT.indexOf(ext) > -1 || isTsFile(filePath));
+  return (WEB_DEV_EXT.includes(ext) || isTsFile(filePath));
 }
-const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass'];
+const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl'];
 
 
 export async function minifyJs(config: Config, compilerCtx: CompilerCtx, jsText: string, sourceTarget: SourceTarget, preamble: boolean) {

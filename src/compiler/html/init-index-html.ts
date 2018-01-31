@@ -9,8 +9,13 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
   // this is synchronous on purpose so that it's saved
   // before the dev server fires up and loads the index.html page
 
-  if (!config.generateWWW || compilerCtx.isRebuild) {
-    // don't bother doing this again on rebuilds
+  if (!config.generateWWW) {
+    // only worry about this when generating www directory
+    return;
+  }
+
+  if (compilerCtx.hasSuccessfulBuild) {
+    // we've already had a successful build, we're good
     return;
   }
 
@@ -27,7 +32,7 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
     // ok, so we haven't written an index.html build file yet
     // and we do know they have a src one, so let's write a
     // filler index.html file that shows while the first build is happening
-    await compilerCtx.fs.writeFile(config.wwwIndexHtml, FILLER_INDEX_BUILD);
+    await compilerCtx.fs.writeFile(config.wwwIndexHtml, APP_LOADING_HTML);
     await compilerCtx.fs.commit();
 
   } catch (e) {
@@ -36,9 +41,9 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
 }
 
 
-const FILLER_INDEX_BUILD = `
+const APP_LOADING_HTML = `
 <!DOCTYPE html>
-<html dir="ltr" lang="en">
+<html dir="ltr" lang="en" data-init="app-dev-first-build-loader">
 <head>
   <script>
     if ('serviceWorker' in navigator) {
@@ -170,6 +175,26 @@ const FILLER_INDEX_BUILD = `
     setTimeout(function() {
       document.querySelector('.toast').classList.add('active');
     }, 100);
+
+    setInterval(function() {
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', function() {
+          try {
+            if (this.responseText.indexOf('app-dev-first-build-loader') === -1) {
+              window.location.reload(true);
+            }
+          } catch (e) {
+            console.error(e);
+          }
+        });
+        var url = window.location.pathname + '?' + Math.random();
+        xhr.open('GET', url);
+        xhr.send();
+      } catch (e) {
+        console.error(e);
+      }
+    }, 1000);
   </script>
 
 </body>

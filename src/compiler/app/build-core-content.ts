@@ -122,7 +122,7 @@ const DEV_MINIFY_OPTS: any = {
     unsafe: false,
     unsafe_arrows: false,
     unsafe_comps: false,
-    unsafe_Func: false,
+    unsafe_Function: false,
     unsafe_math: false,
     unsafe_proto: false,
     unsafe_regexp: false,
@@ -190,7 +190,7 @@ const PROD_MINIFY_OPTS: any = {
     unsafe: false,
     unsafe_arrows: false,
     unsafe_comps: false,
-    unsafe_Func: false,
+    unsafe_Function: false,
     unsafe_math: false,
     unsafe_proto: false,
     unsafe_regexp: false,
@@ -256,7 +256,7 @@ const RESERVED_PROPERTIES: string[] = [
    * Properties which get added to the app's global
    */
   'components',
-  'loadComponents',
+  'loadBundle',
   'loadStyles',
 
 

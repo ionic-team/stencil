@@ -164,8 +164,10 @@ export function transpileModule(config: Config, compilerOptions: ts.CompilerOpti
     transformers: {
       before: [
         removeDecorators(),
-        removeImports(),
         addComponentMetadata(moduleFiles)
+      ],
+      after: [
+        removeStencilImports()
       ]
     }
   };

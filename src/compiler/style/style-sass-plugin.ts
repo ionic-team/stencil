@@ -11,6 +11,16 @@ export class StyleSassPlugin implements d.Plugin {
       return null;
     }
 
+    const renderOpts = Object.assign({}, context.config.sassConfig || {}, this.renderOpts);
+    renderOpts.data = sourceText;
+    if (!renderOpts.outputStyle) {
+      renderOpts.outputStyle = 'expanded';
+    }
+    renderOpts.includePaths = renderOpts.includePaths || [];
+
+    const dirName = context.sys.path.dirname(id);
+    renderOpts.includePaths.push(dirName);
+
     const results: d.PluginTransformResults = {};
 
     // create what the new path is post transform (.css)
@@ -24,7 +34,7 @@ export class StyleSassPlugin implements d.Plugin {
       return results;
     }
 
-    const cacheKey = context.cache.createKey(this.name, sourceText);
+    const cacheKey = context.cache.createKey(this.name, renderOpts);
     const cachedContent = await context.cache.get(cacheKey);
 
     if (cachedContent != null) {
@@ -33,16 +43,6 @@ export class StyleSassPlugin implements d.Plugin {
     }
 
     results.code = await new Promise<string>(resolve => {
-      const renderOpts = Object.assign({}, this.renderOpts);
-      renderOpts.data = sourceText;
-      if (!renderOpts.outputStyle) {
-        renderOpts.outputStyle = 'expanded';
-      }
-
-      renderOpts.includePaths = renderOpts.includePaths || [];
-
-      const dirName = context.sys.path.dirname(id);
-      renderOpts.includePaths.push(dirName);
 
       nodeSass.render(renderOpts, async (err: any, sassResult: any) => {
         if (err) {
@@ -94,8 +94,8 @@ function loadDiagnostic(context: d.PluginCtx, sassError: any, filePath: string) 
     lines: []
   };
 
-  if (sassError.file || filePath) {
-    d.absFilePath = sassError.file || filePath;
+  if (filePath) {
+    d.absFilePath = filePath;
     d.relFilePath = formatFileName(context.config.rootDir, d.absFilePath);
     d.header = formatHeader('sass', d.absFilePath, context.config.rootDir, sassError.line);
 

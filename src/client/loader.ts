@@ -1,10 +1,11 @@
-import { LoadComponentRegistry } from '../util/interfaces';
+import { LoadComponentRegistry } from '../declarations';
 
 
 export function init(
   win: any,
   doc: HTMLDocument,
   appNamespace: string,
+  urlNamespace: string,
   publicPath: string,
   appCore: string,
   appCorePolyfilled: string,
@@ -26,11 +27,10 @@ export function init(
 
   // get this current script
   // script tag cannot use "async" attribute
-  appNamespace = appNamespace.toLowerCase();
   x = doc.scripts[doc.scripts.length - 1];
   if (x && x.src) {
     y = x.src.split('/').slice(0, -1);
-    publicPath = (y.join('/')) + (y.length ? '/' : '') + appNamespace + '/';
+    publicPath = (y.join('/')) + (y.length ? '/' : '') + urlNamespace + '/';
   }
 
   // request the core this browser needs
@@ -38,10 +38,14 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = publicPath + ((supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? appCore : appCorePolyfilled);
+  x.src = publicPath + ((!urlContainsFlag(win) && supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? appCore : appCorePolyfilled);
   x.setAttribute('data-path', publicPath);
-  x.setAttribute('data-namespace', appNamespace);
+  x.setAttribute('data-namespace', urlNamespace);
   doc.head.appendChild(x);
+}
+
+export function urlContainsFlag(win: Window) {
+  return win.location.search.indexOf('core=es5') > -1;
 }
 
 export function supportsEsModules(scriptElm: HTMLScriptElement) {

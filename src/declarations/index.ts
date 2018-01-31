@@ -12,6 +12,7 @@ export * from './manifest';
 export * from './platform';
 export * from './plugin';
 export * from './render';
+export * from './style';
 export * from './system';
 export * from './vdom';
 export * from './watcher';

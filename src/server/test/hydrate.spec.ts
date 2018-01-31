@@ -1,7 +1,8 @@
-import { Config, CompilerCtx, ComponentRegistry, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../../util/interfaces';
 import { hydrateHtml } from '../hydrate-html';
 import { h } from '../../core/renderer/h';
-import { mockConfig, compareHtml } from '../../testing/mocks';
+import { compareHtml, mockConfig } from '../../testing/mocks';
+import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
 describe('hydrate', () => {
@@ -10,7 +11,27 @@ describe('hydrate', () => {
     const ctx: CompilerCtx = {};
     const registry: ComponentRegistry = {
       'ion-test': {
+        bundleIds: 'ion-test',
+        tagNameMeta: 'ion-test',
+        membersMeta: {
+          size: {
+            memberType: MEMBER_TYPE.Prop,
+            propType: PROP_TYPE.String,
+            attribName: 'size'
+          }
+        },
         componentConstructor: class {
+          static get is() {
+            return 'ion-test';
+          }
+          static get properties() {
+            return {
+              size: {
+                type: String,
+                attr: 'size'
+              }
+            };
+          }
           render() {
             return h('elm-a', null,
               h('slot', { name: 'slot-a' }),
@@ -57,7 +78,27 @@ describe('hydrate', () => {
 
     const registry: ComponentRegistry = {
       'ion-test': {
+        bundleIds: 'ion-test',
+        tagNameMeta: 'ion-test',
+        membersMeta: {
+          size: {
+            memberType: MEMBER_TYPE.Prop,
+            propType: PROP_TYPE.String,
+            attribName: 'size'
+          }
+        },
         componentConstructor: class {
+          static get is() {
+            return 'ion-test';
+          }
+          static get properties() {
+            return {
+              size: {
+                type: String,
+                attr: 'size'
+              }
+            };
+          }
           render() {
             return h('elm-a', null,
               'inner text',
@@ -100,7 +141,27 @@ describe('hydrate', () => {
     const ctx: CompilerCtx = {};
     const registry: ComponentRegistry = {
       'ion-test': {
+        bundleIds: 'ion-test',
+        tagNameMeta: 'ion-test',
+        membersMeta: {
+          size: {
+            memberType: MEMBER_TYPE.Prop,
+            propType: PROP_TYPE.String,
+            attribName: 'size'
+          }
+        },
         componentConstructor: class {
+          static get is() {
+            return 'ion-test';
+          }
+          static get properties() {
+            return {
+              size: {
+                type: String,
+                attr: 'size'
+              }
+            };
+          }
           render() {
             return h('div', null);
           }

@@ -1,5 +1,6 @@
 import * as util from '../util';
 
+
 describe('util', () => {
 
   describe('normalizePath', () => {
@@ -218,6 +219,8 @@ describe('util', () => {
       expect(util.isWebDevFile('foo.css')).toEqual(true);
       expect(util.isWebDevFile('foo.scss')).toEqual(true);
       expect(util.isWebDevFile('foo.sass')).toEqual(true);
+      expect(util.isWebDevFile('foo.less')).toEqual(true);
+      expect(util.isWebDevFile('foo.styl')).toEqual(true);
     });
 
     it('should return false for d.ts file', () => {

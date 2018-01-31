@@ -11,7 +11,22 @@ export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<
     let tsSourceFile: ts.SourceFile = null;
 
     try {
-      tsSourceFile = ts.createSourceFile(filePath, ctx.fs.readFileSync(filePath), ts.ScriptTarget.ES2015);
+      let content = ctx.fs.readFileSync(filePath);
+      if (isDtsFile(filePath)) {
+        if (content.includes('namespace JSX {') && !content.includes('StencilJSX')) {
+          // we currently have what seems to be an unsolvable problem where any third-party
+          // package can provide their own global JSX types, while stencil also
+          // provides them as a global in order for typescript to understand and use JSX
+          // types. So we're renaming any "other" imported global JSX namespaces so there
+          // are no collisions with the same global JSX interfaces stencil already has
+          // we're totally up for better ideas  ¯\_(ツ)_/¯
+          content = content.replace('namespace JSX {', `namespace JSX_NO_COLLISION_${Math.round(Math.random() * 99999999)} {`);
+
+          config.logger.debug(`renamed global JSX namespace collision: ${filePath}`);
+        }
+      }
+
+      tsSourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.ES2015);
 
     } catch (e) {
       config.logger.error(`tsHost.getSourceFile unable to find: ${filePath}`);

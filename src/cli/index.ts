@@ -63,6 +63,8 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
       return process.exit(1);
     }
 
+    process.title = `Stencil: ${config.namespace}`;
+
     switch (task) {
       case 'build':
         const results = await compiler.build();

@@ -1,6 +1,6 @@
-import { ComponentConstructor, ComponentMeta, ComponentInstance, PlatformApi } from '../../../util/interfaces';
+import { ComponentConstructor, ComponentInstance, ComponentMeta, PlatformApi } from '../../../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
-import { mockPlatform, mockDomApi } from '../../../testing/mocks';
+import { mockDomApi, mockPlatform } from '../../../testing/mocks';
 import { proxyComponentInstance } from '../proxy-component-instance';
 
 
@@ -14,8 +14,33 @@ describe('proxy-component', () => {
       spyOn(instance, 'watchCallbackB');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.chg = 'newValue';
-      expect(instance.watchCallbackA).toBeCalledWith('newValue', 'oldValue');
-      expect(instance.watchCallbackB).toBeCalledWith('newValue', 'oldValue');
+      expect(instance.watchCallbackA).toBeCalledWith('newValue', 'oldValue', 'chg');
+      expect(instance.watchCallbackB).toBeCalledWith('newValue', 'oldValue', 'chg');
+    });
+
+    it('multiple watch callbacks called w/ different property names', () => {
+      const calls: any[] = [];
+
+      const orgWatchCallbackA = instance.watchCallbackA;
+      instance.watchCallbackA = function patchWatchCallbackA(newValue: string, oldValue: string, propName: string) {
+        calls.push([newValue, oldValue, propName]);
+      };
+
+      instance.chg = 'oldValueChg1';
+      instance.chg2 = 'oldValueChg2';
+      proxyComponentInstance(plt, CmpConstructor, elm, instance);
+
+      instance.chg = 'newValueChg1';
+      instance.chg2 = 'newValueChg2';
+
+      expect(calls).toHaveLength(2);
+      expect(calls[0][0]).toBe('newValueChg1');
+      expect(calls[0][1]).toBe('oldValueChg1');
+      expect(calls[0][2]).toBe('chg');
+
+      expect(calls[1][0]).toBe('newValueChg2');
+      expect(calls[1][1]).toBe('oldValueChg2');
+      expect(calls[1][2]).toBe('chg2');
     });
 
   });
@@ -84,8 +109,8 @@ describe('proxy-component', () => {
     arr = [1, 21];
     obj = { 'flux': 'plutonium' };
 
-    watchCallbackA(newValue: any, oldValue: any) {}
-    watchCallbackB(newValue: any, oldValue: any) {}
+    watchCallbackA(newValue: any, oldValue: any) {/**/}
+    watchCallbackB(newValue: any, oldValue: any) {/**/}
 
     static get properties() {
       return {
@@ -118,6 +143,11 @@ describe('proxy-component', () => {
           mutable: true,
           type: Boolean,
           watchCallbacks: ['watchCallbackA', 'watchCallbackB']
+        },
+        'chg2': {
+          mutable: true,
+          type: Boolean,
+          watchCallbacks: ['watchCallbackA']
         }
       };
     }

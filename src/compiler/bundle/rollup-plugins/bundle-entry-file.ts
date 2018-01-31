@@ -1,14 +1,15 @@
-import { Bundle } from '../../../util/interfaces';
-import { generateBundleEntryInput } from '../bundle-entry-input';
+import { Bundle, Config } from '../../../util/interfaces';
+import { dashToPascalCase } from '../../../util/helpers';
+import { normalizePath } from '../../util';
 
-
-export default function bundleEntryFile(bundle: Bundle) {
+export default function bundleEntryFile(config: Config, bundles: Bundle[]) {
 
   return {
     name: 'bundleEntryFilePlugin',
 
     resolveId(importee: string) {
-      if (importee === bundle.entryKey) {
+      const bundle = bundles.find(b => b.entryKey === importee);
+      if (bundle) {
         return bundle.entryKey;
       }
 
@@ -16,11 +17,26 @@ export default function bundleEntryFile(bundle: Bundle) {
     },
 
     load(id: string) {
-      if (id === bundle.entryKey) {
-        return generateBundleEntryInput(bundle);
+      const bundle = bundles.find(b => b.entryKey === id);
+      if (bundle) {
+        return createEntryPointString(config, bundle);
       }
 
       return null;
     }
   };
+}
+
+export function createEntryPointString(config: Config, bundle: Bundle): string {
+  const path = config.sys.path;
+
+  return bundle.moduleFiles
+    .map(moduleFile => {
+      const originalClassName = moduleFile.cmpMeta.componentClass;
+      const pascalCasedClassName = dashToPascalCase(moduleFile.cmpMeta.tagNameMeta);
+
+      const filePath = normalizePath(path.relative(path.dirname(bundle.entryKey), moduleFile.jsFilePath));
+      return `export { ${originalClassName} as ${pascalCasedClassName} } from './${filePath}';`;
+    })
+    .join('\n');
 }
