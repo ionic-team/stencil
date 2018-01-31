@@ -24,7 +24,7 @@
   },
   "include": [
     "index.ts",
-    "../types/rollup-plugin-node-builtins.d.ts",
+    "../types/*.d.ts",
     "client/*.ts"
   ]
 }

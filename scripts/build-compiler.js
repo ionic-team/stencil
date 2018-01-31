@@ -20,6 +20,7 @@ function bundleCompiler() {
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
       'rollup-plugin-node-builtins',
+      'rollup-plugin-node-globals',
       'typescript',
       'util'
     ],

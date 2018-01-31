@@ -22,7 +22,7 @@
     "target": "es2015"
   },
   "include": [
-    "../../types/rollup-plugin-node-builtins.d.ts"
+    "../../types/*.d.ts"
   ],
   "files": [
     "./index.ts"
