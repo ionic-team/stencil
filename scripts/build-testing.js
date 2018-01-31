@@ -16,12 +16,15 @@ function bundleTestingUtils() {
     external: [
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
+      'rollup-plugin-node-builtins',
       'typescript',
       'fs',
       'path'
     ],
     plugins: [
-      rollupResolve()
+      rollupResolve({
+        jsnext: true
+      })
     ],
     onwarn: (message) => {
       if (/top level of an ES module/.test(message)) return;
