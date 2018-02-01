@@ -1,6 +1,7 @@
 import { AttributeTypeInfo, AttributeTypeReference, Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../declarations';
 import { catchError } from '../../util';
 import { isDecoratorNamed, serializeSymbol } from './utils';
+import { toDashCase } from '../../../util/helpers';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
@@ -77,7 +78,7 @@ export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Clas
           memberData.memberType = MEMBER_TYPE.Prop;
         }
 
-        memberData.attribName = memberName;
+        memberData.attribName = toDashCase(memberName);
         memberData.attribType = attribType;
         memberData.propType = propTypeFromTSType(attribType.text);
         memberData.jsdoc = serializeSymbol(checker, symbol);
