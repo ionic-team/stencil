@@ -177,13 +177,13 @@ describe('transpile', () => {
       expect(r.diagnostics).toEqual([]);
 
       const content = await c.fs.readFile('/www/build/app/cmp-a.js');
-      expect(content).toContain(`"arr": { "type": "Any" }`);
+      expect(content).toContain(`"arr": { "type": "Any", "attr": "arr" }`);
       expect(content).toContain(`"myAny": { "type": "Any", "attr": "my-any"`);
       expect(content).toContain(`"myBool": { "type": Boolean, "attr": "my-bool" }`);
       expect(content).toContain(`"myNum": { "type": Number, "attr": "my-num" }`);
-      expect(content).toContain(`"myPromise": { "type": "Any" }`);
+      expect(content).toContain(`"myPromise": { "type": "Any", "attr": "my-promise" }`);
       expect(content).toContain(`"myStr": { "type": String, "attr": "my-str" }`);
-      expect(content).toContain(`"obj": { "type": "Any" }`);
+      expect(content).toContain(`"obj": { "type": "Any", "attr": "obj" }`);
       expect(content).toContain(`"str": { "type": String, "attr": "str" }`);
     });
 

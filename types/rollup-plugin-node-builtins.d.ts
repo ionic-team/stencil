@@ -1,1 +1,6 @@
-declare module 'rollup-plugin-node-builtins';
+declare module "rollup-plugin-node-builtins" {
+  namespace rollupPluginNodeBuiltins {}
+  function rollupPluginNodeBuiltins(): void;
+
+  export = rollupPluginNodeBuiltins;
+}

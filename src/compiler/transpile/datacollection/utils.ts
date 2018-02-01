@@ -42,8 +42,8 @@ export function isMethodWithDecorators(member: ts.ClassElement): boolean {
 export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): JSDoc {
   return {
       name: symbol.getName(),
-      documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
-      type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration!))
+      documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
+      type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
   };
 }
 
