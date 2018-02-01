@@ -19,4 +19,4 @@ jobs:
             - ./node_modules
 
       - run: npm run build
-      - run: npm test
+      - run: npm test -- --maxWorkers=4
