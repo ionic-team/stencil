@@ -86,7 +86,7 @@ export function validatePaths(config: Config) {
     config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, DEFAULT_INDEX_HTML));
   }
   if (!path.isAbsolute(config.wwwIndexHtml)) {
-    config.wwwIndexHtml = normalizePath(path.join(config.rootDir, config.wwwDir));
+    config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, config.wwwIndexHtml));
   }
 
   if (typeof config.publicPath !== 'string') {
