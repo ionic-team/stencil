@@ -120,7 +120,7 @@ describe('component decorator', () => {
         ],
         'membersMeta': {
           'actionSheetId': {
-            'attribName': 'actionSheetId',
+            'attribName': 'action-sheet-id',
             'attribType': {
               'text': 'string',
             },
@@ -159,7 +159,7 @@ describe('component decorator', () => {
             'memberType': MEMBER_TYPE.PropContext,
           },
           'cssClass': {
-            'attribName': 'cssClass',
+            'attribName': 'css-class',
             'attribType': {
               'text': 'string',
             },
@@ -175,7 +175,7 @@ describe('component decorator', () => {
             'memberType': MEMBER_TYPE.Element,
           },
           'enableBackdropDismiss': {
-            'attribName': 'enableBackdropDismiss',
+            'attribName': 'enable-backdrop-dismiss',
             'attribType': {
               'text': 'boolean',
             },
@@ -188,7 +188,7 @@ describe('component decorator', () => {
             'propType': PROP_TYPE.Boolean,
           },
           'enterAnimation': {
-            'attribName': 'enterAnimation',
+            'attribName': 'enter-animation',
             'attribType': {
               'text': 'AnimationBuilder',
               'typeReferences': {
@@ -207,7 +207,7 @@ describe('component decorator', () => {
             'propType': PROP_TYPE.Unknown,
           },
           'exitAnimation': {
-            'attribName': 'exitAnimation',
+            'attribName': 'exit-animation',
             'attribType': {
               'text': 'AnimationBuilder',
               'typeReferences': {
@@ -226,7 +226,7 @@ describe('component decorator', () => {
             'propType': PROP_TYPE.Unknown,
           },
           'subTitle': {
-            'attribName': 'subTitle',
+            'attribName': 'sub-title',
             'attribType': {
               'text': 'string',
             },

@@ -212,6 +212,7 @@ function formatComponentConstructorProperty(memberName: string, memberMeta: Memb
 
     } else {
       property.type = 'Any';
+      property.attr = toDashCase(memberName);
     }
 
     if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {

@@ -11,11 +11,14 @@ import nodeEnvVars from './rollup-plugins/node-env-vars';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
+  const builtins = require('rollup-plugin-node-builtins');
+  const globals = require('rollup-plugin-node-globals');
   let rollupBundle: OutputChunk;
 
   const rollupConfig: InputOptions = {
     input: bundles.map(b => b.entryKey),
     experimentalCodeSplitting: true,
+    preserveSymlinks: false,
     plugins: [
       config.sys.rollup.plugins.nodeResolve({
         jsnext: true,
@@ -25,6 +28,8 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
         include: 'node_modules/**',
         sourceMap: false
       }),
+      globals(),
+      builtins(),
       bundleEntryFile(config, bundles),
       transpiledInMemoryPlugin(config, compilerCtx),
       pathsResolution(config, compilerCtx),
@@ -64,7 +69,7 @@ export async function writeLegacyModules(config: Config, rollupBundle: OutputChu
   Object.entries((<any>rollupBundle).chunks).forEach(([key, value]) => {
     const b = bundles.find(b => b.entryKey === `./${key}.js`);
     if (b) {
-      b.dependencies = value.imports.slice();
+      b.dependencies = (<any>value).imports.slice();
     }
   });
 

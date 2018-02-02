@@ -16,7 +16,7 @@ describe('props decorator', () => {
 
     expect(response).toEqual({
       objectAnyThing: {
-        attribName: 'objectAnyThing',
+        attribName: 'object-any-thing',
         attribType: {
           text: '(_) => Promise<OtherThing>',
           typeReferences: {

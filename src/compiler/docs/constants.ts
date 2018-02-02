@@ -1,3 +1,3 @@
 
 export const AUTO_GENERATE_COMMENT = `<!-- Auto Generated Below -->`;
-export const NOTE = `*Built by [StencilJS](https://stenciljs.com/)*`;
+export const NOTE = `*Built with [StencilJS](https://stenciljs.com/)*`;
