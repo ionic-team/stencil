@@ -93,7 +93,7 @@ export function isWebDevFile(filePath: string) {
   const ext = filePath.split('.').pop().toLowerCase();
   return (WEB_DEV_EXT.includes(ext) || isTsFile(filePath));
 }
-const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl'];
+const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl', 'pcss'];
 
 
 export async function minifyJs(config: Config, compilerCtx: CompilerCtx, jsText: string, sourceTarget: SourceTarget, preamble: boolean) {
