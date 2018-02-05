@@ -1,4 +1,4 @@
-import { CompilerCtx, Config, Diagnostic, WatcherResults } from '../../declarations';
+import { CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { COMPONENTS_DTS } from '../build/distribution';
 import { configFileReload, rebuild } from './rebuild';
 import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
