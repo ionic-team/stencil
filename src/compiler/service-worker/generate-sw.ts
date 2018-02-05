@@ -1,20 +1,10 @@
-import { BuildCtx, Config, CompilerCtx, ServiceWorkerConfig } from '../../util/interfaces';
-import { buildWarn, catchError } from '../util';
+import { BuildCtx, CompilerCtx, Config, ServiceWorkerConfig } from '../../declarations';
+import { buildWarn, catchError, hasError } from '../util';
 
 
 export async function generateServiceWorker(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  if (!config.generateWWW) {
-    config.logger.debug(`generateServiceWorker, not generating www`);
-    return;
-  }
-
-  if (await !compilerCtx.fs.access(config.srcIndexHtml)) {
-    config.logger.debug(`generateServiceWorker, no index.html, so skipping sw build`);
-    return;
-  }
-
-  if (!config.serviceWorker) {
-    // no sw config, let's not continue
+  const shouldSkipSW = await canSkipGenerateSW(config, compilerCtx, buildCtx);
+  if (shouldSkipSW) {
     return;
   }
 
@@ -54,6 +44,7 @@ async function generateSW(config: Config, buildCtx: BuildCtx) {
   }
 }
 
+
 async function injectManifest(config: Config, buildCtx: BuildCtx) {
   const timeSpan = config.logger.createTimeSpan(`inject manifest into service worker started`);
 
@@ -66,8 +57,35 @@ async function injectManifest(config: Config, buildCtx: BuildCtx) {
   }
 }
 
+
 function hasSrcConfig(config: Config) {
   const serviceWorkerConfig = config.serviceWorker as ServiceWorkerConfig;
   return !!serviceWorkerConfig.swSrc;
 }
 
+
+async function canSkipGenerateSW(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+  if (!config.generateWWW) {
+    config.logger.debug(`generateServiceWorker, not generating www`);
+    return true;
+  }
+
+  const hasSrcIndexHtml = await compilerCtx.fs.access(config.srcIndexHtml);
+  if (!hasSrcIndexHtml) {
+    config.logger.debug(`generateServiceWorker, no index.html, so skipping sw build`);
+    return true;
+  }
+
+  if (!config.serviceWorker) {
+    // no sw config, let's not continue
+    return true;
+  }
+
+  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.generateWWW) {
+    // no need to rebuild index.html if there were no app file changes
+    return true;
+  }
+
+  // let's build us some service workerz
+  return false;
+}

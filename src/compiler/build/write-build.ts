@@ -2,6 +2,7 @@ import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
 import { generateDistribution } from './distribution';
+import { generateServiceWorker } from '../service-worker/generate-sw';
 import { writeAppManifest } from '../manifest/manifest-data';
 
 
@@ -41,6 +42,9 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
     // kick off writing the cached file stuff
     // no need to wait on it finishing
     compilerCtx.cache.commit();
+
+    // generate the service worker
+    await generateServiceWorker(config, compilerCtx, buildCtx);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

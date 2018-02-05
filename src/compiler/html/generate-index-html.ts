@@ -1,7 +1,6 @@
 import { BuildCtx, CompilerCtx, Config, ServiceWorkerConfig } from '../../declarations';
 import { catchError, hasError } from '../util';
 import { injectRegisterServiceWorker, injectUnregisterServiceWorker } from '../service-worker/inject-sw-script';
-import { generateServiceWorker } from '../service-worker/generate-sw';
 
 
 export async function generateIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
@@ -10,9 +9,6 @@ export async function generateIndexHtml(config: Config, compilerCtx: CompilerCtx
     // no need to rebuild index.html if there were no app file changes
     return;
   }
-
-  // generate the service worker
-  await generateServiceWorker(config, compilerCtx, buildCtx);
 
   // get the source index html content
   try {
