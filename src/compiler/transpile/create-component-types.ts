@@ -35,6 +35,8 @@ export function generateComponentTypesFile(config: Config, cmpList: ComponentReg
     return finalString + `import '${compCollection.name}';\n\n`;
   }, componentsFileContent);
 
+  componentsFileContent += createStencilElement();
+
   const componentFileString = Object.keys(cmpList)
     .filter(moduleFileName => cmpList[moduleFileName] != null)
     .sort()
@@ -169,6 +171,18 @@ function updateReferenceTypeImports(config: Config, importDataObj: ImportData, a
   }, importDataObj);
 }
 
+export function createStencilElement(): string {
+  return `
+declare global {
+  interface HTMLStencilElement extends HTMLElement {
+    componentOnReady(): Promise<this>;
+    componentOnReady(done: (ele?: this) => void): void;
+  }
+}
+\n
+`;
+}
+
 /**
  * Generate a string based on the types that are defined within a component.
  *
@@ -189,7 +203,7 @@ import {
 } from './${importPath}';
 
 declare global {
-  interface ${interfaceName} extends ${tagNameAsPascal}, HTMLElement {
+  interface ${interfaceName} extends ${tagNameAsPascal}, HTMLStencilElement {
   }
   var ${interfaceName}: {
     prototype: ${interfaceName};
@@ -208,7 +222,9 @@ declare global {
   }
   namespace JSXElements {
     export interface ${jsxInterfaceName} extends HTMLAttributes {
-      ${Object.keys(interfaceOptions).sort(sortInterfaceMembers).map((key: string) => `${key}?: ${interfaceOptions[key]};`).join('\n      ')}
+      ${Object.keys(interfaceOptions)
+        .sort(sortInterfaceMembers)
+        .map((key: string) => `${key}?: ${interfaceOptions[key]};`).join('\n      ')}
     }
   }
 }
