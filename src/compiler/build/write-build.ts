@@ -60,8 +60,8 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
   const emptyPromises: Promise<any>[] = [];
 
   if (config.generateWWW && config.emptyWWW) {
-    config.logger.debug(`empty buildDir: ${config.buildDir}`);
-    emptyPromises.push(compilerCtx.fs.emptyDir(config.buildDir));
+    config.logger.debug(`empty wwwDir: ${config.wwwDir}`);
+    emptyPromises.push(compilerCtx.fs.emptyDir(config.wwwDir));
   }
 
   if (config.generateDistribution && config.emptyDist) {
