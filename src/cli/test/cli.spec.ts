@@ -1,11 +1,42 @@
-import { Config } from '../../util/interfaces';
 import { CliArgv, getConfigFilePath, overrideConfigFromArgv, parseArgv } from '../cli-utils';
+import { Config } from '../../declarations';
 import { mockStencilSystem } from '../../testing/mocks';
 import { run } from '../index';
 import { validateBuildConfig } from '../../compiler/config/validate-config';
 
 
 describe('cli', () => {
+
+  let process: NodeJS.Process;
+  const logger: any = {
+    error: (msg: string) => { error = msg; },
+    log: () => {/**/},
+    warn: () => {/**/},
+    debug: () => {/**/}
+  };
+  var error: string;
+  var exitCode: number;
+  var config: Config;
+
+  beforeEach(() => {
+    process = {} as any;
+    process.cwd = () => '/User/ellie_mae';
+    process.exit = (code) => { exitCode = code; };
+    process.once = () => process;
+    process.on = () => process;
+    process.env = {};
+    process.platform = 'win32';
+    process.argv = ['/node', '/stencil'];
+    process.version = 'v6.11.2';
+    error = null;
+    exitCode = null;
+
+    config = {};
+    config.logger = logger;
+    config.rootDir = process.cwd();
+    config.sys = mockStencilSystem();
+  });
+
 
   describe('getConfigFilePath', () => {
 
@@ -73,6 +104,13 @@ describe('cli', () => {
       overrideConfigFromArgv(config, argv);
       validateBuildConfig(config);
       expect(config.prerender).toBe(true);
+    });
+
+    it('should enable writeLog with argv', () => {
+      const argv: CliArgv = { log: true };
+      overrideConfigFromArgv(config, argv);
+      validateBuildConfig(config);
+      expect(config.writeLog).toBe(true);
     });
 
     it('should enable service worker in prod mode by default', () => {
@@ -174,6 +212,14 @@ describe('cli', () => {
       argv = parseArgv(process);
       expect(argv.logLevel).toBe('error');
 
+      process.argv[2] = '--log';
+      argv = parseArgv(process);
+      expect(argv.log).toBe(true);
+
+      process.argv[2] = '--stats';
+      argv = parseArgv(process);
+      expect(argv.stats).toBe(true);
+
       process.argv[2] = '--config';
       process.argv[3] = '/my-config.js';
       argv = parseArgv(process);
@@ -193,37 +239,6 @@ describe('cli', () => {
       expect(argv.docs).toBe(true);
     });
 
-  });
-
-
-  var process: NodeJS.Process;
-  var logger: any = {
-    error: (msg: string) => { error = msg; },
-    log: () => {},
-    warn: () => {},
-    debug: () => {}
-  };
-  var error: string;
-  var exitCode: number;
-  var config: Config;
-
-  beforeEach(() => {
-    (process as any) = {};
-    process.cwd = () => '/User/ellie_mae';
-    process.exit = (code) => { exitCode = code; };
-    process.once = () => process;
-    process.on = () => process;
-    process.env = {};
-    process.platform = 'win32';
-    process.argv = ['/node', '/stencil'];
-    process.version = 'v6.11.2';
-    error = null;
-    exitCode = null;
-
-    config = {};
-    config.logger = logger;
-    config.rootDir = process.cwd();
-    config.sys = mockStencilSystem();
   });
 
 });

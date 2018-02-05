@@ -1,4 +1,4 @@
-import { Config, Diagnostic, StencilSystem } from '../util/interfaces';
+import { Config, Diagnostic, StencilSystem } from '../declarations';
 import { normalizePath } from '../compiler/util';
 
 
@@ -8,6 +8,14 @@ export function overrideConfigFromArgv(config: Config, argv: CliArgv) {
 
   } else if (argv.dev) {
     config.devMode = true;
+  }
+
+  if (argv.stats) {
+    config.writeStats = true;
+  }
+
+  if (argv.log) {
+    config.writeLog = true;
   }
 
   if (argv.watch) {
@@ -96,10 +104,12 @@ const ARG_OPTS: any = {
     'docs',
     'es5',
     'help',
+    'log',
     'prod',
     'prerender',
     'service-worker',
     'skip-node-check',
+    'stats',
     'version',
     'watch'
   ],
@@ -122,10 +132,12 @@ export interface CliArgv {
   docs?: boolean;
   es5?: boolean;
   help?: boolean;
+  log?: boolean;
   logLevel?: string;
   prerender?: boolean;
   prod?: boolean;
   serviceWorker?: boolean;
+  stats?: boolean;
   version?: boolean;
   watch?: boolean;
 }
@@ -135,7 +147,7 @@ function getCmdArgs(process: NodeJS.Process) {
   let cmdArgs = process.argv.slice(2);
 
   try {
-    var npmRunArgs = process.env.npm_config_argv;
+    const npmRunArgs = process.env.npm_config_argv;
     if (npmRunArgs) {
       cmdArgs = cmdArgs.concat(JSON.parse(npmRunArgs).original);
     }

@@ -114,7 +114,6 @@ function getTestBuildConfig() {
   config.emptyWWW = false;
   config.generateDistribution = false;
   config.generateWWW = false;
-  config.buildStats = true;
 
   return validateBuildConfig(config);
 }

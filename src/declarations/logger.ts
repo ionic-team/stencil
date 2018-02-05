@@ -18,6 +18,8 @@ export interface Logger {
   gray(msg: string): string;
   bold(msg: string): string;
   dim(msg: string): string;
+  buildLogFilePath: string;
+  writeLogs(append: boolean): void;
 }
 
 

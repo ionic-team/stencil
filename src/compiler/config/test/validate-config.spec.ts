@@ -1,7 +1,6 @@
-import { Config } from '../../../util/interfaces';
+import { Config } from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { setProcessEnvironment, validateBuildConfig } from '../validate-config';
-import * as path from 'path';
 
 
 describe('validation', () => {
@@ -30,7 +29,7 @@ describe('validation', () => {
   describe('buildAppCore', () => {
 
     it('set buildAppCore true', () => {
-      config.buildStats = true;
+      config.buildAppCore = true;
       validateBuildConfig(config);
       expect(config.buildAppCore).toBe(true);
     });
@@ -48,23 +47,44 @@ describe('validation', () => {
 
   });
 
-  describe('buildStats', () => {
+  describe('writeStats', () => {
 
-    it('set buildStats true', () => {
-      config.buildStats = true;
+    it('set writeStats true', () => {
+      config.writeStats = true;
       validateBuildConfig(config);
-      expect(config.buildStats).toBe(true);
+      expect(config.writeStats).toBe(true);
     });
 
-    it('set buildStats false', () => {
-      config.buildStats = false;
+    it('set writeStats false', () => {
+      config.writeStats = false;
       validateBuildConfig(config);
-      expect(config.buildStats).toBe(false);
+      expect(config.writeStats).toBe(false);
     });
 
-    it('default buildStats false', () => {
+    it('default writeStats false', () => {
       validateBuildConfig(config);
-      expect(config.buildStats).toBe(false);
+      expect(config.writeStats).toBe(false);
+    });
+
+  });
+
+  describe('writeLog', () => {
+
+    it('set writeLog true', () => {
+      config.writeLog = true;
+      validateBuildConfig(config);
+      expect(config.writeLog).toBe(true);
+    });
+
+    it('set writeLog false', () => {
+      config.writeLog = false;
+      validateBuildConfig(config);
+      expect(config.writeLog).toBe(false);
+    });
+
+    it('default writeLog false', () => {
+      validateBuildConfig(config);
+      expect(config.writeLog).toBe(false);
     });
 
   });

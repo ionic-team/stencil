@@ -48,4 +48,6 @@ export class TestingLogger implements Logger {
   printDiagnostics(_diagnostics: Diagnostic[]) {
     /* */
   }
+  buildLogFilePath: string = null;
+  writeLogs(_: boolean) { /**/ }
 }

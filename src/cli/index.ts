@@ -1,5 +1,5 @@
 import { Compiler as CompilerType } from '../compiler';
-import { Config, Logger, StencilSystem } from '../util/interfaces';
+import { Config, Logger, StencilSystem } from '../declarations';
 import { getConfigFilePath, hasError, overrideConfigFromArgv, parseArgv } from './cli-utils';
 import { help } from './task-help';
 import { initApp } from './task-init';
@@ -90,6 +90,7 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
     }
 
   } catch (e) {
-    config.logger.error(e);
+    config.logger.error('uncaught cli error', e);
+    process.exit(1);
   }
 }

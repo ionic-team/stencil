@@ -1,15 +1,17 @@
 import { Chalk } from 'chalk';
-import { Diagnostic, Logger, LoggerTimeSpan, PrintLine } from '../../util/interfaces';
+import * as d from '../../declarations';
+import * as fs from 'fs';
+import * as path from 'path';
 
 
-export class NodeLogger implements Logger {
+export class NodeLogger implements d.Logger {
   private _level = 'info';
   private chalk: Chalk;
+  private writeLogQueue: string[] = [];
+  buildLogFilePath: string = null;
+  graphLogFilePath: string = null;
 
-  constructor(opts: { level?: string } = {}) {
-    this.level = opts.level;
-
-    const path = require('path');
+  constructor() {
     const sysUtil = require(path.join(__dirname, './sys-util.js'));
     this.chalk = sysUtil.chalk;
   }
@@ -36,13 +38,14 @@ export class NodeLogger implements Logger {
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
     }
+    this.queueWriteLog('I', msg);
   }
 
   infoPrefix(lines: string[]) {
     if (lines.length) {
       const d = new Date();
 
-      let prefix = '[' +
+      const prefix = '[' +
         ('0' + d.getMinutes()).slice(-2) + ':' +
         ('0' + d.getSeconds()).slice(-2) + '.' +
         Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
@@ -57,50 +60,159 @@ export class NodeLogger implements Logger {
       this.warnPrefix(lines);
       console.warn(lines.join('\n'));
     }
+    this.queueWriteLog('W', msg);
   }
 
   warnPrefix(lines: string[]) {
     if (lines.length) {
-      let prefix = '[ WARN  ]';
+      const prefix = '[ WARN  ]';
       lines[0] = this.bold(this.chalk.yellow(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
   error(...msg: any[]) {
+    for (let i = 0; i < msg.length; i++) {
+      if (msg[i] instanceof Error) {
+        const err: Error = msg[i];
+        msg[i] = err.message;
+        if (err.stack) {
+          msg[i] += '\n' + err.stack;
+        }
+      }
+    }
+
     if (this.shouldLog('error')) {
       const lines = wordWrap(msg);
       this.errorPrefix(lines);
       console.error(lines.join('\n'));
     }
+    this.queueWriteLog('E', msg);
   }
 
   errorPrefix(lines: string[]) {
     if (lines.length) {
-      let prefix = '[ ERROR ]';
+      const prefix = '[ ERROR ]';
       lines[0] = this.bold(this.chalk.red(prefix)) + lines[0].substr(prefix.length);
     }
   }
 
   debug(...msg: any[]) {
     if (this.shouldLog('debug')) {
-      msg.push(this.memoryUsage());
+      msg.push(this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`));
       const lines = wordWrap(msg);
       this.debugPrefix(lines);
       console.log(lines.join('\n'));
     }
+    this.queueWriteLog('D', msg);
   }
 
   debugPrefix(lines: string[]) {
     if (lines.length) {
       const d = new Date();
 
-      let prefix = '[' +
+      const prefix = '[' +
         ('0' + d.getMinutes()).slice(-2) + ':' +
         ('0' + d.getSeconds()).slice(-2) + '.' +
         Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
 
       lines[0] = this.chalk.cyan(prefix) + lines[0].substr(prefix.length);
     }
+  }
+
+  timespanStart(startMsg: string, debug: boolean) {
+    const msg = [`${startMsg} ${this.dim('...')}`];
+
+    if (debug) {
+      if (this.shouldLog('debug')) {
+        const lines = wordWrap(msg);
+        this.debugPrefix(lines);
+        console.log(lines.join('\n'));
+        this.queueWriteLog('D', [`${startMsg} ...`]);
+      }
+
+    } else {
+      const lines = wordWrap(msg);
+      this.infoPrefix(lines);
+      console.log(lines.join('\n'));
+      this.queueWriteLog('I', [`${startMsg} ...`]);
+    }
+  }
+
+  timespanFinish(finishMsg: string, timeSuffix: string, color: 'red', bold: boolean, newLineSuffix: boolean, debug: boolean) {
+    let msg = finishMsg;
+
+    if (color) {
+      msg = this.color(finishMsg, color);
+    }
+    if (bold) {
+      msg = this.bold(msg);
+    }
+
+    msg += ' ' + this.dim(timeSuffix);
+
+    if (debug) {
+      if (this.shouldLog('debug')) {
+        const lines = wordWrap([msg]);
+        this.debugPrefix(lines);
+        console.log(lines.join('\n'));
+      }
+      this.queueWriteLog('D', [`${finishMsg} ${timeSuffix}`]);
+
+    } else {
+      const lines = wordWrap([msg]);
+      this.infoPrefix(lines);
+      console.log(lines.join('\n'));
+      this.queueWriteLog('I', [`${finishMsg} ${timeSuffix}`]);
+    }
+
+    if (newLineSuffix) {
+      console.log('');
+    }
+  }
+
+  private queueWriteLog(prefix: string, msg: any[]) {
+    if (this.buildLogFilePath) {
+      const d = new Date();
+      const log = '' +
+        ('0' + d.getHours()).slice(-2) + ':' +
+        ('0' + d.getMinutes()).slice(-2) + ':' +
+        ('0' + d.getSeconds()).slice(-2) + '.' +
+        ('0' + Math.floor((d.getMilliseconds() / 1000) * 10)) +
+        '  ' +
+        ('000' + (process.memoryUsage().rss / 1000000).toFixed(1)).slice(-6) + 'MB' +
+        '  ' + prefix +
+        '  ' +
+        msg.join(', ');
+
+      this.writeLogQueue.push(log);
+    }
+  }
+
+  writeLogs(append: boolean) {
+    if (this.buildLogFilePath) {
+      try {
+        this.queueWriteLog('F', ['--------------------------------------']);
+
+        const log = this.writeLogQueue.join('\n');
+
+        if (append) {
+          try {
+            fs.accessSync(this.buildLogFilePath);
+          } catch (e) {
+            append = false;
+          }
+        }
+
+        if (append) {
+          fs.appendFileSync(this.buildLogFilePath, log);
+        } else {
+          fs.writeFileSync(this.buildLogFilePath, log);
+        }
+
+      } catch (e) {}
+    }
+
+    this.writeLogQueue.length = 0;
   }
 
   color(msg: string, color: 'red'|'green'|'yellow'|'blue'|'magenta'|'cyan'|'gray') {
@@ -143,19 +255,15 @@ export class NodeLogger implements Logger {
     return this.chalk.dim(msg);
   }
 
-  memoryUsage() {
-    return this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`);
-  }
-
   private shouldLog(level: string): boolean {
     return LOG_LEVELS.indexOf(level) >= LOG_LEVELS.indexOf(this.level);
   }
 
-  createTimeSpan(startMsg: string, debug = false): LoggerTimeSpan {
+  createTimeSpan(startMsg: string, debug = false): d.LoggerTimeSpan {
     return new CmdTimeSpan(this, startMsg, debug);
   }
 
-  printDiagnostics(diagnostics: Diagnostic[]) {
+  printDiagnostics(diagnostics: d.Diagnostic[]) {
     if (!diagnostics || !diagnostics.length) return;
 
     let outputLines: string[] = [''];
@@ -167,7 +275,7 @@ export class NodeLogger implements Logger {
     console.log(outputLines.join('\n'));
   }
 
-  printDiagnostic(d: Diagnostic) {
+  printDiagnostic(d: d.Diagnostic) {
     const outputLines = wordWrap([d.messageText]);
 
     if (d.header && d.header !== 'build error' && d.header !== 'build warn') {
@@ -280,7 +388,7 @@ export class NodeLogger implements Logger {
     const chars: string[] = [];
 
     for (var i = 0; i < text.length; i++) {
-      var c = text.charAt(i);
+      const c = text.charAt(i);
 
       if (c === ';' || c === '{') {
         cssProp = true;
@@ -311,50 +419,18 @@ class CmdTimeSpan {
   ) {
     this.logger = logger;
     this.start = Date.now();
-    let msg = `${startMsg} ${logger.dim('...')}`;
-
-    if (this.debug) {
-      this.logger.debug(msg);
-    } else {
-      this.logger.info(msg);
-    }
+    this.logger.timespanStart(startMsg, debug);
   }
 
   finish(msg: string, color?: 'red', bold?: boolean, newLineSuffix?: boolean) {
-    const duration = this.duration();
-
-    if (color) {
-      msg = this.logger.color(msg, color);
-    }
-    if (bold) {
-      msg = this.logger.bold(msg);
-    }
-
-    msg += ' ' + this.logger.dim(this.timeSuffix(duration));
-
-    if (this.debug) {
-      this.logger.debug(msg);
-    } else {
-      this.logger.info(msg);
-    }
-
-    if (newLineSuffix) {
-      console.log('');
-    }
-  }
-
-  private duration() {
-    return Date.now() - this.start;
-  }
-
-  private timeSuffix(duration: number) {
+    const duration = Date.now() - this.start;
     let time: string;
 
     if (duration > 1000) {
       time = 'in ' + (duration / 1000).toFixed(2) + ' s';
 
     } else {
-      let ms = parseFloat((duration).toFixed(3));
+      const ms = parseFloat((duration).toFixed(3));
       if (ms > 0) {
         time = 'in ' + duration + ' ms';
       } else {
@@ -362,7 +438,14 @@ class CmdTimeSpan {
       }
     }
 
-    return time;
+    this.logger.timespanFinish(
+      msg,
+      time,
+      color,
+      bold,
+      newLineSuffix,
+      this.debug
+    );
   }
 
 }
@@ -447,8 +530,8 @@ function wordWrap(msg: any[]) {
 }
 
 
-function prepareLines(orgLines: PrintLine[], code: 'text'|'html') {
-  const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
+function prepareLines(orgLines: d.PrintLine[], code: 'text'|'html') {
+  const lines: d.PrintLine[] = JSON.parse(JSON.stringify(orgLines));
 
   for (let i = 0; i < 100; i++) {
     if (!eachLineHasLeadingWhitespace(lines, code)) {
@@ -467,7 +550,7 @@ function prepareLines(orgLines: PrintLine[], code: 'text'|'html') {
 }
 
 
-function eachLineHasLeadingWhitespace(lines: PrintLine[], code: 'text'|'html') {
+function eachLineHasLeadingWhitespace(lines: d.PrintLine[], code: 'text'|'html') {
   if (!lines.length) {
     return false;
   }
@@ -475,7 +558,7 @@ function eachLineHasLeadingWhitespace(lines: PrintLine[], code: 'text'|'html') {
     if ( !(<any>lines[i])[code] || (<any>lines[i])[code].length < 1) {
       return false;
     }
-    var firstChar = (<any>lines[i])[code].charAt(0);
+    const firstChar = (<any>lines[i])[code].charAt(0);
     if (firstChar !== ' ' && firstChar !== '\t') {
       return false;
     }

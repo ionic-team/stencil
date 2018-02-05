@@ -1,4 +1,4 @@
-import { Logger, StencilSystem } from '../util/interfaces';
+import { Logger, StencilSystem } from '../declarations';
 
 
 export async function initApp(process: NodeJS.Process, sys: StencilSystem, logger: Logger) {
@@ -18,12 +18,10 @@ export async function initApp(process: NodeJS.Process, sys: StencilSystem, logge
 const DEFAULT_CONFIG = `
 exports.config = {
   namespace: 'App',
-  bundles: [],
   collections: []
 };
 
 exports.devServer = {
-  root: 'www',
-  watchGlob: '**/**'
+  root: 'www'
 };
 `;
