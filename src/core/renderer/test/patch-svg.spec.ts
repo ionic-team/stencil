@@ -41,13 +41,18 @@ describe('renderer', () => {
 
     it('should not affect subsequence element', function() {
       elm = patch(vnode0, h('div', null, [
-        h('svg', null),
+        h('svg', null, [
+          h('title', null, 'Title'),
+          h('circle', null)
+        ]),
         h('div', null)
       ])).elm;
 
-      expect(elm.constructor.name).toEqual('HTMLDivElement')
-      expect(elm.firstChild.constructor.name).toEqual('SVGSVGElement')
-      expect(elm.lastChild.constructor.name).toEqual('HTMLDivElement')
-    })
+      expect(elm.constructor.name).toEqual('HTMLDivElement');
+      expect(elm.firstChild.constructor.name).toEqual('SVGSVGElement');
+      expect(elm.firstChild.firstChild.constructor.name).toEqual('SVGElement');
+      expect(elm.firstChild.lastChild.constructor.name).toEqual('SVGElement');
+      expect(elm.lastChild.constructor.name).toEqual('HTMLDivElement');
+    });
   });
 });
