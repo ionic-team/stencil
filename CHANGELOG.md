@@ -1,3 +1,21 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/ionic-team/stencil/compare/v0.3.0-5...v0.3.0) (2018-02-05)
+
+
+### Bug Fixes
+
+* **config:** fixes absolutizing of wwwIndexHtml ([#470](https://github.com/ionic-team/stencil/issues/470)) ([81dde18](https://github.com/ionic-team/stencil/commit/81dde18))
+* **styles:** always place component styles below prerender/visibility styles ([8ed47b9](https://github.com/ionic-team/stencil/commit/8ed47b9))
+* **sw:** build service worker after built fs commit ([9ea7235](https://github.com/ionic-team/stencil/commit/9ea7235))
+
+
+### Features
+
+* **ES Modules:** load modules through native ES Modules ([#162](https://github.com/ionic-team/stencil/issues/162)) ([c3524a94](https://github.com/ionic-team/stencil/commit/c3524a94c2402ce47fdfdda7012854f3b0081817))
+* **watch:** add pcss to recognized web dev extensions ([#477](https://github.com/ionic-team/stencil/issues/477)) ([f783273](https://github.com/ionic-team/stencil/commit/f783273))
+
+
+
 <a name="0.2.3"></a>
 ## [0.2.3](https://github.com/ionic-team/stencil/compare/v0.2.2...v0.2.3) (2018-01-24)
 
