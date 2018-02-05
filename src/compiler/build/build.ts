@@ -1,18 +1,19 @@
-import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
+import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { bundle } from '../bundle/bundle';
 import { catchError, getCompilerCtx } from '../util';
 import { copyTasks } from '../copy/copy-tasks';
 import { emptyDestDir, writeBuildFiles } from './write-build';
 import { getBuildContext } from './build-utils';
 import { generateAppFiles } from '../app/generate-app-files';
-import { generateAppManifest } from '../manifest/generate-manifest';
 import { generateBundles } from '../bundle/generate-bundles';
+import { generateEntryModules } from '../entries/entry-modules';
 import { generateIndexHtml } from '../html/generate-index-html';
 import { generateReadmes } from '../docs/generate-readmes';
 import { generateStyles } from '../style/style';
 import { initIndexHtml } from '../html/init-index-html';
+import { loadCollections } from '../collections/load-collections';
 import { prerenderApp } from '../prerender/prerender-app';
-import { transpileScanSrc } from '../transpile/transpile-scan-src';
+import { transpileAppModules } from '../transpile/transpile-app-modules';
 
 
 export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?: WatcherResults): Promise<BuildResults> {
@@ -34,40 +35,44 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     await emptyDestDir(config, compilerCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
-    // begin the build
-    // async scan the src directory for ts files
-    // then transpile them all in one go
-    await transpileScanSrc(config, compilerCtx, buildCtx);
+    // load colleciton data from all the dependent collections
+    // and upgrade modules as necessary
+    await loadCollections(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
-    // generation the app manifest from the compiled module file results
-    // and from all the dependent collections
-    await generateAppManifest(config, compilerCtx, buildCtx);
+    // async scan the src directory for ts files
+    // then transpile them all in one go
+    await transpileAppModules(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
+
+    // we've got the compiler context filled with app modules and collection dependency modules
+    // figure out how all these components should be connected
+    const entryModules = generateEntryModules(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // bundle modules and styles into separate files phase
-    const [ bundles, jsModules ] = await bundle(config, compilerCtx, buildCtx);
+    const jsModules = await bundle(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // create each of the components's styles
-    await generateStyles(config, compilerCtx, buildCtx, bundles);
+    await generateStyles(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // both styles and modules are done bundling
     // inject the styles into the modules and
     // generate each of the output bundles
-    const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, bundles, jsModules);
+    const cmpRegistry = await generateBundles(config, compilerCtx, buildCtx, entryModules, jsModules);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // generate the app files, such as app.js, app.core.js
-    await generateAppFiles(config, compilerCtx, buildCtx, bundles, cmpRegistry);
+    await generateAppFiles(config, compilerCtx, buildCtx, entryModules, cmpRegistry);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // copy all assets
     if (!compilerCtx.hasSuccessfulBuild) {
       // only do the initial copy on the first build
       // watcher handles any re-copies
-      await copyTasks(config, compilerCtx, buildCtx);
+      await copyTasks(config, compilerCtx, buildCtx.diagnostics);
       if (buildCtx.shouldAbort()) return buildCtx.finish();
     }
 
@@ -80,7 +85,7 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // prerender that app
-    await prerenderApp(config, compilerCtx, buildCtx, bundles);
+    await prerenderApp(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // write all the files and copy asset files

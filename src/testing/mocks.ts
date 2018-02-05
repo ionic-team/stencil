@@ -1,6 +1,6 @@
 import { Cache } from '../compiler/cache';
 import { ComponentInstance, ComponentMeta, ComponentRegistry, Config, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
+  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode, CompilerCtx } from '../declarations';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
@@ -78,6 +78,16 @@ export function mockConfig(opts = { enableLogger: false }): Config {
   const config = new TestingConfig();
   (config.logger as TestingLogger).enable = opts.enableLogger;
   return validateBuildConfig(config);
+}
+
+
+export function mockCompilerCtx() {
+  const compilerCtx: CompilerCtx = {
+    activeBuildId: 0,
+    fs: new InMemoryFileSystem(mockFs(), require('path')),
+  };
+
+  return compilerCtx;
 }
 
 

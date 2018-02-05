@@ -1,23 +1,21 @@
 import { addStaticMeta } from '../add-component-metadata';
-import { Bundle, ComponentMeta } from '../../../../util/interfaces';
+import { ComponentMeta, ModuleFiles } from '../../../../declarations';
 import { normalizePath } from '../../../util';
 import * as ts from 'typescript';
 
 
-export default function upgradeFromMetadata(bundles: Bundle[]) {
+export default function upgradeFromMetadata(moduleFiles: ModuleFiles) {
+  const allModuleFiles = Object.keys(moduleFiles).map(filePath => {
+    return moduleFiles[filePath];
+  });
 
   return (tsSourceFile: ts.SourceFile) => {
     const tsFilePath = normalizePath(tsSourceFile.fileName);
 
-    const bundle = bundles.find(m => {
-      return m.moduleFiles.some(m => m.cmpMeta && normalizePath(m.jsFilePath) === tsFilePath);
-    });
-
-    if (!bundle) {
-      return tsSourceFile;
+    let moduleFile = moduleFiles[tsFilePath];
+    if (!moduleFile || !moduleFile.cmpMeta) {
+      moduleFile = allModuleFiles.find(m => m.jsFilePath === tsFilePath);
     }
-
-    const moduleFile = bundle.moduleFiles.find(m => m.cmpMeta && normalizePath(m.jsFilePath) === tsFilePath);
 
     if (moduleFile) {
       tsSourceFile = upgradeModuleFile(tsSourceFile, moduleFile.cmpMeta);

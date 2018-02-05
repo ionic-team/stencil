@@ -1,10 +1,10 @@
-import { BuildCtx, CompilerCtx, Config, ModuleFiles } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 import { InMemoryFileSystem } from '../../util/in-memory-fs';
 import { transpileModules } from '../transpile/transpile';
 
 
-export async function transpileScanSrc(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function transpileAppModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   if (canSkipTranspiling(config, buildCtx)) {
     // this is a rebuild, but turns out the files causing to
     // do not require us to run the transpiling again
@@ -19,10 +19,6 @@ export async function transpileScanSrc(config: Config, compilerCtx: CompilerCtx,
     // and read the files async and put into our
     // in-memory file system
     const tsFilePaths = await scanDirForTsFiles(config, compilerCtx.fs, config.srcDir);
-
-    // let's be sure to clean out the moduleFiles in the compiler context
-    // some components may have been deleted since the last build
-    removeDeletedModules(compilerCtx.moduleFiles, tsFilePaths);
 
     // found all the files we need to transpile
     // and have all the files in-memory and ready to go
@@ -60,19 +56,6 @@ async function scanDirForTsFiles(config: Config, fs: InMemoryFileSystem, dir: st
 
   // return just the abs path
   return tsFileItems.map(tsFileItem => tsFileItem.absPath);
-}
-
-
-function removeDeletedModules(cachedModuleFiles: ModuleFiles, currentTsFilePaths: string[]) {
-  const cachedModuleFileNames = Object.keys(cachedModuleFiles);
-
-  // loop through and delete any cached module files that were not just found
-  cachedModuleFileNames.forEach(cachedModuleFileName => {
-    const stillHasModule = currentTsFilePaths.some(currentTsFilePath => currentTsFilePath === cachedModuleFileName);
-    if (!stillHasModule) {
-      delete cachedModuleFiles[cachedModuleFileName];
-    }
-  });
 }
 
 

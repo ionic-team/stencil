@@ -29,14 +29,14 @@ export function testAttributes(el: HTMLElement, attributes: { [attr: string]: st
 }
 
 export function wroteFile(r: BuildResults, p: string) {
-  return r.stats.filesWritten.some(f => {
+  return r.filesWritten.some(f => {
     return normalizePath(f) === normalizePath(p);
   });
 }
 
 export function expectFilesWritten(r: BuildResults, ...filePaths: string[]) {
   filePaths.forEach(filePath => {
-    const fileWritten = r.stats.filesWritten.find(p => p === filePath);
+    const fileWritten = r.filesWritten.find(p => p === filePath);
     expect(fileWritten).toBe(filePath);
   });
 }

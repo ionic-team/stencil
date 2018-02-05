@@ -14,7 +14,7 @@ export function getCompilerCtx(config: Config, compilerCtx?: CompilerCtx) {
   compilerCtx.appFiles = compilerCtx.appFiles || {};
   compilerCtx.moduleFiles = compilerCtx.moduleFiles || {};
   compilerCtx.rollupCache = compilerCtx.rollupCache || {};
-  compilerCtx.dependentManifests = compilerCtx.dependentManifests || {};
+  compilerCtx.collections = compilerCtx.collections || {};
   compilerCtx.compiledModuleJsText = compilerCtx.compiledModuleJsText || {};
   compilerCtx.compiledModuleLegacyJsText = compilerCtx.compiledModuleLegacyJsText || {};
 

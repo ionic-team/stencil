@@ -1,4 +1,4 @@
-import * as d from '../declarations/index';
+import * as d from '../declarations';
 
 
 export interface Hyperscript {

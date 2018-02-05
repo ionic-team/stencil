@@ -1,4 +1,4 @@
-import { DependentCollection } from '../../declarations/config';
+import { ConfigCollection } from '../../declarations';
 
 
 export function validateDependentCollection(userInput: any) {
@@ -6,23 +6,23 @@ export function validateDependentCollection(userInput: any) {
     throw new Error(`invalid collection: ${userInput}`);
   }
 
-  let collection: DependentCollection;
+  let configCollection: ConfigCollection;
 
   if (typeof userInput === 'string') {
-    collection = {
+    configCollection = {
       name: userInput
     };
 
   } else {
-    collection = userInput;
+    configCollection = userInput;
   }
 
-  if (!collection.name || typeof collection.name !== 'string' || collection.name.trim() === '') {
+  if (!configCollection.name || typeof configCollection.name !== 'string' || configCollection.name.trim() === '') {
     throw new Error(`missing collection name`);
   }
 
-  collection.name = collection.name.trim();
-  collection.includeBundledOnly = !!collection.includeBundledOnly;
+  configCollection.name = configCollection.name.trim();
+  configCollection.includeBundledOnly = !!configCollection.includeBundledOnly;
 
-  return collection;
+  return configCollection;
 }

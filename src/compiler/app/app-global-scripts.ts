@@ -1,4 +1,4 @@
-import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../util/interfaces';
+import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../declarations';
 import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, minifyJs } from '../util';
@@ -57,16 +57,19 @@ export async function generateAppGlobalContents(config: Config, compilerCtx: Com
 }
 
 
-function loadDependentGlobalJsContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget): Promise<string[]> {
-  if (!buildCtx.manifest.dependentManifests) {
-    return Promise.resolve([]);
+async function loadDependentGlobalJsContents(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, sourceTarget: SourceTarget): Promise<string[]> {
+  if (!compilerCtx.collections) {
+    return [];
   }
 
-  const dependentManifests = buildCtx.manifest.dependentManifests
-                                .filter(m => m.global && m.global.jsFilePath);
+  const collections = Object.keys(compilerCtx.collections)
+    .map(collectionName => {
+      return compilerCtx.collections[collectionName];
+    })
+    .filter(m => m.global && m.global.jsFilePath);
 
-  return Promise.all(dependentManifests.map(dependentManifest => {
-    return bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, dependentManifest.manifestName, dependentManifest.global.jsFilePath);
+  return Promise.all(collections.map(collectionManifest => {
+    return bundleProjectGlobal(config, compilerCtx, buildCtx, sourceTarget, collectionManifest.collectionName, collectionManifest.global.jsFilePath);
   }));
 }
 
@@ -124,7 +127,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
 
     await compilerCtx.cache.put(cacheKey, output);
 
-    buildCtx.manifest.global = compilerCtx.moduleFiles[config.globalScript];
+    buildCtx.global = compilerCtx.moduleFiles[config.globalScript];
 
   } catch (e) {
     loadRollupDiagnostics(config, compilerCtx, buildCtx, e);

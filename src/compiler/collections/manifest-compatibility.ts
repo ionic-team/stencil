@@ -1,4 +1,4 @@
-import { Config, Manifest } from '../../util/interfaces';
+import { Config, Manifest } from '../../declarations';
 
 
 export function validateManifestCompatibility(config: Config, manifest: Manifest): number[] {
@@ -40,7 +40,13 @@ export function calculateRequiredUpgrades(config: Config, collectionVersion: str
   if (config.sys.semver.lte(collectionVersion, '0.2.0')) {
     // 2018-01-19
     // ensure all @stencil/core imports are removed
-    upgrades.push(CompilerUpgrade.REMOVE_STENCIL_IMPORTS);
+    upgrades.push(CompilerUpgrade.Remove_Stencil_Imports);
+  }
+
+  if (config.sys.semver.lte(collectionVersion, '0.3.0')) {
+    // 2018-01-30
+    // add dependencies to component metadata
+    upgrades.push(CompilerUpgrade.Add_Component_Dependencies);
   }
 
   return upgrades;
@@ -50,5 +56,6 @@ export function calculateRequiredUpgrades(config: Config, collectionVersion: str
 export const enum CompilerUpgrade {
   JSX_Upgrade_From_0_0_5,
   Metadata_Upgrade_From_0_1_0,
-  REMOVE_STENCIL_IMPORTS
+  Remove_Stencil_Imports,
+  Add_Component_Dependencies
 }

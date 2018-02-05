@@ -1,4 +1,4 @@
-import { Config, Manifest } from '../../../util/interfaces';
+import { Config, Manifest } from '../../../declarations';
 import { CompilerUpgrade, calculateRequiredUpgrades } from '../manifest-compatibility';
 import { mockConfig } from '../../../testing/mocks';
 

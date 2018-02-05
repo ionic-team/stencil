@@ -1,4 +1,4 @@
-import { Config } from '../../util/interfaces';
+import { Config } from '../../declarations';
 import { loadConfig } from '../../compiler/config/load-config';
 import { Renderer } from '../renderer';
 
@@ -18,7 +18,7 @@ export function ssrMiddleware(middlewareConfig: MiddlewareConfig) {
     srcIndexHtml = renderer.fs.readFileSync(config.srcIndexHtml);
 
   } catch (e) {
-    config.logger.error(`ssrMiddleware, error loading srcIndexHtml: ${e}`);
+    config.logger.error(`ssrMiddleware, error loading srcIndexHtml`, e);
     process.exit(1);
   }
 

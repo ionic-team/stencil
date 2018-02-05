@@ -1,7 +1,7 @@
 import { ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { mockConfig } from '../../../testing/mocks';
-import { parseBundles, parseComponentDataToModuleFile, parseComponents, parseDidChangeDeprecated, parseWillChangeDeprecated, serializeBundles, serializeComponent } from '../manifest-data';
+import { parseComponentDataToModuleFile, parseComponents, parseDidChangeDeprecated, parseWillChangeDeprecated, serializeComponent } from '../manifest-data';
 
 
 describe('manifest components', () => {
@@ -39,9 +39,9 @@ describe('manifest components', () => {
     const manifest: Manifest = {};
     const includeBundledOnly = true;
     parseComponents(config, includeBundledOnly, manifestDir, manifestData, manifest);
-    expect(manifest.modulesFiles[0].cmpMeta.tagNameMeta).toBe('cmp-a');
-    expect(manifest.modulesFiles[1].cmpMeta.tagNameMeta).toBe('cmp-c');
-    expect(manifest.modulesFiles[2].cmpMeta.tagNameMeta).toBe('cmp-e');
+    expect(manifest.moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-a');
+    expect(manifest.moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-c');
+    expect(manifest.moduleFiles[2].cmpMeta.tagNameMeta).toBe('cmp-e');
   });
 
   it('scoped css encapsulation', () => {
@@ -330,6 +330,14 @@ describe('manifest components', () => {
     expect(cmpData.componentClass).toBe('ComponentClass');
     b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
     expect(b.cmpMeta.componentClass).toBe(a.componentClass);
+  });
+
+  it('component dependencies', () => {
+    a.dependencies = ['cmp-a', 'cmp-b'];
+    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    expect(cmpData.dependencies).toEqual(['cmp-a', 'cmp-b']);
+    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    expect(b.cmpMeta.dependencies).toEqual(a.dependencies);
   });
 
   it('tag name', () => {

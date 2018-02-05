@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config, WatcherResults } from '../../declarations';
+import { CompilerCtx, Config, Diagnostic, WatcherResults } from '../../declarations';
 import { COMPONENTS_DTS } from '../build/distribution';
 import { configFileReload, rebuild } from './rebuild';
 import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
@@ -17,7 +17,7 @@ export class WatcherListener {
   private copyTaskTmr: NodeJS.Timer;
 
 
-  constructor(private config: Config, private compilerCtx: CompilerCtx, private buildCtx: BuildCtx) {
+  constructor(private config: Config, private compilerCtx: CompilerCtx) {
     this.resetWatcher();
   }
 
@@ -68,7 +68,7 @@ export class WatcherListener {
       }
 
     } catch (e) {
-      this.config.logger.error(`watcher, fileUpdate: ${e}`);
+      this.config.logger.error(`watcher, fileUpdate`, e);
     }
   }
 
@@ -100,7 +100,7 @@ export class WatcherListener {
       }
 
     } catch (e) {
-      this.config.logger.error(`watcher, fileAdd: ${e}`);
+      this.config.logger.error(`watcher, fileAdd`, e);
     }
   }
 
@@ -126,7 +126,7 @@ export class WatcherListener {
       }
 
     } catch (e) {
-      this.config.logger.error(`watcher, fileDelete: ${e}`);
+      this.config.logger.error(`watcher, fileDelete`, e);
     }
   }
 
@@ -158,7 +158,7 @@ export class WatcherListener {
       }
 
     } catch (e) {
-      this.config.logger.error(`watcher, dirAdd: ${e}`);
+      this.config.logger.error(`watcher, dirAdd`, e);
     }
   }
 
@@ -182,7 +182,7 @@ export class WatcherListener {
       }
 
     } catch (e) {
-      this.config.logger.error(`dirDelete, dirAdd: ${e}`);
+      this.config.logger.error(`watcher, dirDelete`, e);
     }
   }
 
@@ -200,7 +200,7 @@ export class WatcherListener {
       }
 
     } catch (e) {
-      this.config.logger.error(e.toString());
+      this.config.logger.error(`watcher, startRebuild`, e);
     }
   }
 
@@ -230,7 +230,7 @@ export class WatcherListener {
     clearTimeout(this.copyTaskTmr);
 
     this.copyTaskTmr = setTimeout(() => {
-      copyTasks(this.config, this.compilerCtx, this.buildCtx);
+      copyTasks(this.config, this.compilerCtx, []);
     }, 80);
   }
 

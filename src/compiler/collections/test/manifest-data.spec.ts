@@ -1,9 +1,9 @@
-import { ComponentData, ComponentMeta, Config, Manifest, ManifestData, ModuleFile } from '../../../util/interfaces';
+import { ComponentData, ComponentMeta, Config, Manifest, ManifestData, ModuleFile, EntryModule } from '../../../declarations';
 import { mockConfig } from '../../../testing/mocks';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
-import { excludeFromCollection, parseBundles, parseComponentDataToModuleFile,
+import { excludeFromCollection, parseComponentDataToModuleFile,
   parseDidChangeDeprecated, parseGlobal, parseWillChangeDeprecated,
-  serializeAppGlobal, serializeAppManifest, serializeBundles } from '../manifest-data';
+  serializeAppGlobal, serializeAppManifest } from '../manifest-data';
 
 
 describe('manifest-data serialize/parse', () => {
@@ -38,19 +38,11 @@ describe('manifest-data serialize/parse', () => {
       { components: ['cmp-a', 'cmp-b'] },
       { components: ['cmp-c'] }
     ];
-    manifest.bundles = [
-      { components: ['cmp-b', 'cmp-a'] },
-      { components: ['cmp-d'] },
-      { components: ['cmp-c'] }
-    ];
-    manifest.modulesFiles = [moduleFile];
-    const outManifest = serializeAppManifest(config, manifestDir, manifest);
+    const entryModules: EntryModule[] = [{
+      moduleFiles: [moduleFile]
+    }];
+    const outManifest = serializeAppManifest(config, manifestDir, entryModules, manifest.global);
 
-    expect(outManifest.bundles).toEqual([
-      { components: ['cmp-a', 'cmp-b'] },
-      { components: ['cmp-c'] },
-      { components: ['cmp-d'] }
-    ]);
     expect(outManifest.components).toHaveLength(1);
     expect(outManifest.compiler.name).toEqual('test');
   });
@@ -63,7 +55,7 @@ describe('manifest-data serialize/parse', () => {
       }
     };
 
-    serializeAppGlobal(config, manifestDir, manifestData, manifest);
+    serializeAppGlobal(config, manifestDir, manifestData, manifest.global);
     expect(manifestData.global).toBe('global/my-global.js');
   });
 

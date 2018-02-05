@@ -1,13 +1,13 @@
-import { BuildCtx, Bundle, CompilerCtx, ComponentMeta, Config, ModuleFile, StyleMeta } from '../../declarations';
+import { BuildCtx, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile, StyleMeta } from '../../declarations';
 import { ENCAPSULATION } from '../../util/constants';
 import { normalizePath } from '../util';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from '../css/scope-css';
 
 
-export async function generateStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
+export async function generateStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
 
-  await Promise.all(bundles.map(async bundle => {
+  await Promise.all(entryModules.map(async bundle => {
 
     await Promise.all(bundle.moduleFiles.map(async moduleFile => {
       await generateComponentStyles(config, compilerCtx, buildCtx, moduleFile);

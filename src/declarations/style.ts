@@ -20,3 +20,8 @@ export interface ExternalStyleMeta {
   originalComponentPath?: string;
   originalCollectionPath?: string;
 }
+
+
+export interface ModeStyles {
+  [modeName: string]: string | string[];
+}

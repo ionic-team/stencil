@@ -1,5 +1,5 @@
 import { Config } from '../../../util/interfaces';
-import { isFileIncludePath } from '../transpile-scan-src';
+import { isFileIncludePath } from '../transpile-app-modules';
 import { mockConfig } from '../../../testing/mocks';
 
 

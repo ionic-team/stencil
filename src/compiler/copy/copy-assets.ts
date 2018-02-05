@@ -1,6 +1,6 @@
 import { AssetsMeta, BuildCtx, CompilerCtx, Config, CopyTask } from '../../declarations';
 import { catchError, normalizePath, pathJoin } from '../util';
-import { COLLECTION_DEPENDENCIES_DIR } from '../manifest/manifest-data';
+import { COLLECTION_DEPENDENCIES_DIR } from '../collections/manifest-data';
 import { getAppDistDir, getAppWWWBuildDir } from '../app/app-file-naming';
 
 
@@ -20,17 +20,19 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
     const copyToCollectionDir: AssetsMeta[] = [];
     const copyTasks: CopyTask[] = [];
 
-    const moduleFiles = buildCtx.manifest.modulesFiles.filter(m => {
-      return m.cmpMeta.assetsDirsMeta && m.cmpMeta.assetsDirsMeta.length;
-    });
+    buildCtx.entryModules.forEach(entryModule => {
+      const moduleFiles = entryModule.moduleFiles.filter(m => {
+        return m.cmpMeta.assetsDirsMeta && m.cmpMeta.assetsDirsMeta.length;
+      });
 
-    moduleFiles.forEach(moduleFile => {
-      moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
-        copyToBuildDir.push(assetsMeta);
+      moduleFiles.forEach(moduleFile => {
+        moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
+          copyToBuildDir.push(assetsMeta);
 
-        if (!moduleFile.excludeFromCollection) {
-          copyToCollectionDir.push(assetsMeta);
-        }
+          if (!moduleFile.excludeFromCollection) {
+            copyToCollectionDir.push(assetsMeta);
+          }
+        });
       });
     });
 
@@ -115,23 +117,24 @@ export function canSkipAssetsCopy(config: Config, compilerCtx: CompilerCtx, buil
     const changedFileDirPath = normalizePath(config.sys.path.dirname(changedFile));
 
     // loop through all the possible asset directories
-    buildCtx.manifest.modulesFiles.forEach(moduleFile => {
-      if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
+    buildCtx.entryModules.forEach(entryModule => {
+      entryModule.moduleFiles.forEach(moduleFile => {
+        if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
 
-        // loop through each of the asset directories of each component
-        moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsDir => {
-          // get the absolute of the asset directory
-          const assetDirPath = normalizePath(assetsDir.absolutePath);
+          // loop through each of the asset directories of each component
+          moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsDir => {
+            // get the absolute of the asset directory
+            const assetDirPath = normalizePath(assetsDir.absolutePath);
 
-          // if the changed file directory is this asset directory
-          // then we should recopy everything over again
-          if (changedFileDirPath === assetDirPath) {
-            shouldSkipAssetsCopy = false;
-            return;
-          }
-        });
-
-      }
+            // if the changed file directory is this asset directory
+            // then we should recopy everything over again
+            if (changedFileDirPath === assetDirPath) {
+              shouldSkipAssetsCopy = false;
+              return;
+            }
+          });
+        }
+      });
     });
 
   });

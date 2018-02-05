@@ -1,11 +1,12 @@
 import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../declarations';
-import { hasError, normalizePath } from '../util';
+import { componentDependencies } from './transformers/component-dependencies';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
 import { getComponentsDtsSrcFilePath } from '../build/distribution';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
+import { hasError, normalizePath } from '../util';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
@@ -112,7 +113,8 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
     ],
     after: [
       removeImports(),
-      removeStencilImports()
+      removeStencilImports(),
+      componentDependencies(compilerCtx.moduleFiles)
     ]
   });
 

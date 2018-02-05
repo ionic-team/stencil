@@ -49,7 +49,7 @@ export function normalizePrerenderLocation(config: Config, windowLocationHref: s
     }
 
   } catch (e) {
-    config.logger.error(`normalizePrerenderLocation: ${e}`);
+    config.logger.error(`normalizePrerenderLocation`, e);
     return null;
   }
 

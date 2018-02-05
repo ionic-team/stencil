@@ -1,8 +1,8 @@
-import { BuildCtx, CompilerCtx, Config, CopyTask } from '../../declarations';
+import { CompilerCtx, Config, CopyTask, Diagnostic } from '../../declarations';
 import { catchError, normalizePath } from '../util';
 
 
-export async function copyTasks(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagnostics: Diagnostic[]) {
   if (!config.copy) {
     config.logger.debug(`copy tasks disabled`);
     return;
@@ -28,7 +28,7 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, buildC
     }));
 
   } catch (e) {
-    catchError(buildCtx.diagnostics, e);
+    catchError(diagnostics, e);
   }
 
   timeSpan.finish(`copyTasks finished`);

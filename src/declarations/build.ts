@@ -6,7 +6,9 @@ export interface BuildCtx {
   buildId: number;
   requiresFullBuild: boolean;
   diagnostics: d.Diagnostic[];
-  manifest: d.Manifest;
+  entryModules: d.EntryModule[];
+  entryPoints: d.EntryPoint[];
+  global?: d.ModuleFile;
   transpileBuildCount: number;
   bundleBuildCount: number;
   appFileBuildCount: number;
@@ -24,7 +26,7 @@ export interface BuildCtx {
   filesUpdated: string[];
   filesAdded: string[];
   shouldAbort?(): boolean;
-  finish?(): BuildResults;
+  finish?(): Promise<BuildResults>;
 }
 
 
@@ -36,21 +38,75 @@ export interface BuildResults {
   diagnostics: d.Diagnostic[];
   hasError: boolean;
   aborted?: boolean;
-  stats?: {
-    duration: number;
-    isRebuild: boolean;
-    filesWritten: string[];
-    components: string[];
-    transpileBuildCount: number;
-    bundleBuildCount: number;
-    hasChangedJsText: boolean;
-    dirsAdded: string[];
-    dirsDeleted: string[];
-    filesChanged: string[];
-    filesUpdated: string[];
-    filesAdded: string[];
-    filesDeleted: string[];
+  duration: number;
+  isRebuild: boolean;
+  transpileBuildCount: number;
+  bundleBuildCount: number;
+  hasChangedJsText: boolean;
+  dirsAdded: string[];
+  dirsDeleted: string[];
+  filesWritten: string[];
+  filesChanged: string[];
+  filesUpdated: string[];
+  filesAdded: string[];
+  filesDeleted: string[];
+  components: BuildComponent[];
+  entries: BuildEntry[];
+}
+
+
+export interface BuildStats {
+  compiler: {
+    name: string;
+    version: string;
   };
+  app: {
+    namespace: string;
+    fsNamespace: string;
+    components: number;
+    entries: number;
+    bundles: number;
+  };
+  options: {
+    generateWWW: boolean;
+    generateDistribution: boolean;
+    minifyJs: boolean;
+    minifyCss: boolean;
+    hashFileNames: boolean;
+    hashedFileNameLength: number;
+    buildEs5: boolean;
+  };
+  components: BuildComponent[];
+  entries: BuildEntry[];
+}
+
+
+export interface BuildEntry {
+  entryId: string;
+  components: BuildComponent[];
+  bundles: BuildBundle[];
+  input: {
+    filePath: string;
+  }[];
+  modes?: string[];
+  encapsulations: string[];
+}
+
+
+export interface BuildBundle {
+  fileName: string;
+  size: number;
+  outputs: string[];
+  mode?: string;
+  scopedStyles?: boolean;
+  target?: string;
+}
+
+
+export interface BuildComponent {
+  tag: string;
+  dependencyOf?: string[];
+  dependencies?: string[];
 }
 
 

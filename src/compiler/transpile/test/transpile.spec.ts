@@ -48,7 +48,7 @@ describe('transpile', () => {
       expect(wroteFile(r, '/www/build/app/cmp-b.js')).toBe(false);
       expect(wroteFile(r, '/www/build/app/cmp-c.js')).toBe(false);
 
-      expect(r.stats.components).toEqual(['cmp-a']);
+      expect(r.entries[0].components[0].tag).toEqual('cmp-a');
     });
 
     it('should rebuild transpile for added directory', async () => {
@@ -84,8 +84,10 @@ describe('transpile', () => {
       expect(wroteFile(r, '/www/build/app/cmp-a.js')).toBe(false);
       expect(wroteFile(r, '/www/build/app/cmp-b.js')).toBe(true);
       expect(wroteFile(r, '/www/build/app/cmp-c.js')).toBe(true);
-      expect(r.stats.components).toEqual(['cmp-a', 'cmp-b', 'cmp-c']);
-      expect(r.stats.hasChangedJsText).toBe(true);
+      expect(r.entries[0].components[0].tag).toEqual('cmp-a');
+      expect(r.entries[1].components[0].tag).toEqual('cmp-b');
+      expect(r.entries[2].components[0].tag).toEqual('cmp-c');
+      expect(r.hasChangedJsText).toBe(true);
     });
 
     it('should rebuild transpile for changed typescript file', async () => {
@@ -114,9 +116,9 @@ describe('transpile', () => {
       expect(r.diagnostics).toEqual([]);
 
       expect(wroteFile(r, '/www/build/app/cmp-a.js')).toBe(true);
-      expect(r.stats.components).toEqual(['cmp-a']);
-      expect(r.stats.transpileBuildCount).toBe(1);
-      expect(r.stats.hasChangedJsText).toBe(true);
+      expect(r.entries[0].components[0].tag).toEqual('cmp-a');
+      expect(r.transpileBuildCount).toBe(1);
+      expect(r.hasChangedJsText).toBe(true);
     });
 
     it('should not rebuild transpile for unchanged typescript file', async () => {
@@ -131,7 +133,7 @@ describe('transpile', () => {
       // initial build finished
       expect(r.diagnostics).toEqual([]);
       expect(r.buildId).toBe(0);
-      expect(r.stats.isRebuild).toBe(false);
+      expect(r.isRebuild).toBe(false);
 
       // create a rebuild listener
       const rebuildListener = c.once('rebuild');
@@ -146,16 +148,14 @@ describe('transpile', () => {
       // wait for the rebuild to finish
       // get the rebuild results
       r = await rebuildListener;
-
       expect(r.diagnostics).toEqual([]);
       expect(r.buildId).toBe(1);
-      expect(r.stats.isRebuild).toBe(true);
-      expect(r.stats.components).toEqual(['cmp-a']);
-      expect(r.stats.transpileBuildCount).toBe(1);
-      expect(r.stats.transpileBuildCount).toBe(1);
-      expect(r.stats.hasChangedJsText).toBe(false);
+      expect(r.isRebuild).toBe(true);
+      expect(r.entries[0].components[0].tag).toEqual('cmp-a');
+      expect(r.transpileBuildCount).toBe(1);
+      expect(r.transpileBuildCount).toBe(1);
+      expect(r.hasChangedJsText).toBe(false);
     });
-
 
     it('should transpile attr in componet static property', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
@@ -185,6 +185,98 @@ describe('transpile', () => {
       expect(content).toContain(`"myStr": { "type": String, "attr": "my-str" }`);
       expect(content).toContain(`"obj": { "type": "Any", "attr": "obj" }`);
       expect(content).toContain(`"str": { "type": String, "attr": "str" }`);
+    });
+
+    it('get CallExpression component dependencies', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFiles({
+        '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
+        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
+        '/src/new-dir/no-find.tsx': `@Component({ tag: 'no-find' }) export class NoFind {}`
+      }, { clearFileCache: true });
+
+      await c.fs.writeFile('/src/cmp-a.tsx', `
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          render() {
+            someFunction('no-find');
+
+            if (true) {
+              return (
+                h('cmp-b')
+              );
+            }
+
+            return (
+              h('cmp-c')
+            );
+          }
+        }
+      `, { clearFileCache: true });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      expect(r.components[0].tag).toBe('cmp-a');
+      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c']);
+    });
+
+    it('get CallExpression PropertyAccessExpression component dependencies', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFiles({
+        '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
+        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
+        '/src/new-dir/no-find.tsx': `@Component({ tag: 'no-find' }) export class NoFind {}`
+      }, { clearFileCache: true });
+
+      await c.fs.writeFile('/src/cmp-a.tsx', `
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          constructor() {
+            document.createElement('cmp-b');
+            var doc = document;
+            doc.createElementNS('cmp-c');
+            doc.someFunction('no-find');
+          }
+        }
+      `, { clearFileCache: true });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      expect(r.components[0].tag).toBe('cmp-a');
+      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c']);
+    });
+
+    it('get component dependencies from html string literals', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFiles({
+        '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
+        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
+        '/src/new-dir/no-find.tsx': `@Component({ tag: 'no-find' }) export class NoFind {}`
+      }, { clearFileCache: true });
+
+      await c.fs.writeFile('/src/cmp-a.tsx', `
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          // no-find
+          //no-find
+          /* no-find */
+          /*no-find*/
+          constructor() {
+            this.el.innerHTML = '<cmp-b></cmp-b>';
+            $.append('<cmp-c></cmp-c>');
+            console.log('no-find');
+            console.log(' no-find ');
+          }
+        }
+      `, { clearFileCache: true });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      expect(r.components[0].tag).toBe('cmp-a');
+      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c']);
     });
 
   });

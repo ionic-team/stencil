@@ -1,11 +1,11 @@
-import { BuildCtx, Bundle, CompilerCtx, Config, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, EntryModule, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
 import { buildWarn, catchError, hasError, pathJoin } from '../util';
 import { generateHostConfig } from './host-config';
 import { prerenderPath } from './prerender-path';
 import { crawlAnchorsForNextUrls, getPrerenderQueue } from './prerender-utils';
 
 
-export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
+export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
   if (!config.prerender) {
     // no need to rebuild index.html if there were no app file changes
     config.logger.debug(`prerenderApp, skipping because config.prerender is falsy`);
@@ -41,11 +41,11 @@ export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, bui
     return [];
   }
 
-  return runPrerenderApp(config, compilerCtx, buildCtx, bundles, prerenderQueue, indexHtml);
+  return runPrerenderApp(config, compilerCtx, buildCtx, entryModules, prerenderQueue, indexHtml);
 }
 
 
-async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[], prerenderQueue: PrerenderLocation[], indexHtml: string) {
+async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[], prerenderQueue: PrerenderLocation[], indexHtml: string) {
   // keep track of how long the entire build process takes
   const timeSpan = config.logger.createTimeSpan(`prerendering started`);
 
@@ -56,7 +56,7 @@ async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCt
       drainPrerenderQueue(config, compilerCtx, buildCtx, prerenderQueue, indexHtml, hydrateResults, resolve);
     });
 
-    await generateHostConfig(config, compilerCtx, bundles, hydrateResults);
+    await generateHostConfig(config, compilerCtx, entryModules, hydrateResults);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

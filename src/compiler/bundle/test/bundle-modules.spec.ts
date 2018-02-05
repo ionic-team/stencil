@@ -1,6 +1,4 @@
-import { Bundle, CompilerCtx, Config, Diagnostic, ModuleFile } from '../../../util/interfaces';
 import { expectFilesWritten } from '../../../testing/utils';
-import { mockStencilSystem } from '../../../testing/mocks';
 import { TestingCompiler } from '../../../testing/index';
 
 
@@ -42,10 +40,10 @@ describe('bundle-module', () => {
       r = await rebuildListener;
 
       expect(r.diagnostics).toEqual([]);
-      expect(r.stats.components.length).toBe(3);
-      expect(r.stats.components[0]).toBe('cmp-a');
-      expect(r.stats.components[1]).toBe('cmp-b');
-      expect(r.stats.components[2]).toBe('cmp-c');
+      expect(r.components.length).toBe(3);
+      expect(r.components[0].tag).toBe('cmp-a');
+      expect(r.components[1].tag).toBe('cmp-b');
+      expect(r.components[2].tag).toBe('cmp-c');
 
       const secondBuildText = await c.fs.readFile('/www/build/app/cmp-a.js');
       expect(firstBuildText).toBe(secondBuildText);
@@ -65,11 +63,11 @@ describe('bundle-module', () => {
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
-      expect(r.stats.components.length).toBe(3);
-      expect(r.stats.components[0]).toBe('cmp-a');
-      expect(r.stats.components[1]).toBe('cmp-b');
-      expect(r.stats.components[2]).toBe('cmp-c');
-      expect(r.stats.bundleBuildCount).toBe(2);
+      expect(r.components.length).toBe(3);
+      expect(r.components[0].tag).toBe('cmp-a');
+      expect(r.components[1].tag).toBe('cmp-b');
+      expect(r.components[2].tag).toBe('cmp-c');
+      expect(r.bundleBuildCount).toBe(2);
 
       expectFilesWritten(r,
         '/www/build/app/cmp-a.js',

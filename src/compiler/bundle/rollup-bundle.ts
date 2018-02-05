@@ -1,4 +1,4 @@
-import { BuildCtx, Bundle, CompilerCtx, Config, JSModuleList } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleList } from '../../declarations';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
@@ -10,13 +10,13 @@ import { InputOptions, OutputChunk, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 
 
-export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, bundles: Bundle[]) {
+export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
   const builtins = require('rollup-plugin-node-builtins');
   const globals = require('rollup-plugin-node-globals');
   let rollupBundle: OutputChunk;
 
   const rollupConfig: InputOptions = {
-    input: bundles.map(b => b.entryKey),
+    input: entryModules.map(b => b.entryKey),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
     plugins: [
@@ -30,7 +30,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       }),
       globals(),
       builtins(),
-      bundleEntryFile(config, bundles),
+      bundleEntryFile(config, entryModules),
       transpiledInMemoryPlugin(config, compilerCtx),
       await pathsResolution(config, compilerCtx),
       localResolution(config),
@@ -65,11 +65,11 @@ export async function writeEsModules(config: Config, rollupBundle: OutputChunk) 
 }
 
 
-export async function writeLegacyModules(config: Config, rollupBundle: OutputChunk, bundles: Bundle[]) {
+export async function writeLegacyModules(config: Config, rollupBundle: OutputChunk, entryModules: EntryModule[]) {
   Object.entries((<any>rollupBundle).chunks).forEach(([key, value]) => {
-    const b = bundles.find(b => b.entryKey === `./${key}.js`);
-    if (b) {
-      b.dependencies = (<any>value).imports.slice();
+    const entryModule = entryModules.find(b => b.entryKey === `./${key}.js`);
+    if (entryModule) {
+      entryModule.dependencies = (<any>value).imports.slice();
     }
   });
 

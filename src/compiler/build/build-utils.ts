@@ -1,13 +1,14 @@
-import { BuildCtx, BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { catchError, hasError } from '../util';
-import { cleanDiagnostics } from '../../util/logger/logger-util';
+import { generateBuildResults, generateBuildStats } from './build-results';
 import { initWatcher } from '../watcher/watcher-init';
 
 
 export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watcher: WatcherResults) {
   // do a full build if there is no watcher
   // or the watcher said the config has updated
-  const requiresFullBuild = !watcher || watcher.configUpdated;
+  // or we've never had a successful build yet
+  const requiresFullBuild = !watcher || watcher.configUpdated || !compilerCtx.hasSuccessfulBuild;
 
   const isRebuild = !!watcher;
   compilerCtx.isRebuild = isRebuild;
@@ -22,7 +23,9 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
     requiresFullBuild: requiresFullBuild,
     buildId: compilerCtx.activeBuildId,
     diagnostics: [],
-    manifest: {},
+    entryPoints: [],
+    entryModules: [],
+    components: [],
     transpileBuildCount: 0,
     bundleBuildCount: 0,
     appFileBuildCount: 0,
@@ -30,7 +33,6 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
     aborted: false,
     startTime: Date.now(),
     timeSpan: config.logger.createTimeSpan(msg),
-    components: [],
     hasChangedJsText: false,
     filesWritten: [],
     filesChanged: watcher ? watcher.filesChanged : [],
@@ -45,10 +47,10 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
     return shouldAbort(compilerCtx, buildCtx);
   };
 
-  buildCtx.finish = () => {
+  buildCtx.finish = async () => {
     try {
       // setup watcher if need be
-      initWatcher(config, compilerCtx, buildCtx);
+      initWatcher(config, compilerCtx);
     } catch (e) {
       catchError(buildCtx.diagnostics, e);
     }
@@ -60,7 +62,7 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
 }
 
 
-function finishBuild(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+async function finishBuild(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   const buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
   // log any errors/warnings
@@ -93,6 +95,17 @@ function finishBuild(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCt
   // and add the duration to the build results
   buildCtx.timeSpan.finish(`${buildText} ${buildStatus}${watchText}`, statusColor, bold, true);
 
+  // write the build stats
+  await generateBuildStats(config, compilerCtx, buildCtx, buildResults);
+
+  // clear it all out for good measure
+  for (const k in buildCtx) {
+    (buildCtx as any)[k] = null;
+  }
+
+  // write all of our logs to disk if config'd to do so
+  config.logger.writeLogs(compilerCtx.isRebuild);
+
   // emit a build event, which happens for inital build and rebuilds
   compilerCtx.events.emit('build', buildResults);
 
@@ -102,46 +115,6 @@ function finishBuild(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCt
   }
 
   return buildResults;
-}
-
-
-function generateBuildResults(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  // create the build results that get returned
-  const buildResults: BuildResults = {
-    buildId: buildCtx.buildId,
-    diagnostics: cleanDiagnostics(buildCtx.diagnostics),
-    hasError: hasError(buildCtx.diagnostics),
-    aborted: buildCtx.aborted
-  };
-
-  // only bother adding the buildStats config is enabled
-  // useful for testing/debugging
-  if (config.buildStats) {
-    generateBuildResultsStats(compilerCtx, buildCtx, buildResults);
-  }
-
-  return buildResults;
-}
-
-
-function generateBuildResultsStats(compilerCtx: CompilerCtx, buildCtx: BuildCtx, buildResults: BuildResults) {
-  // stuff on the right are internal property names
-  // stuff set on the left is public and should not be refactored
-  buildResults.stats = {
-    duration: Date.now() - buildCtx.startTime,
-    isRebuild: compilerCtx.isRebuild,
-    components: buildCtx.components,
-    transpileBuildCount: buildCtx.transpileBuildCount,
-    bundleBuildCount: buildCtx.bundleBuildCount,
-    hasChangedJsText: buildCtx.hasChangedJsText,
-    filesWritten: buildCtx.filesWritten.sort(),
-    filesChanged: buildCtx.filesChanged.slice().sort(),
-    filesUpdated: buildCtx.filesUpdated.slice().sort(),
-    filesAdded: buildCtx.filesAdded.slice().sort(),
-    filesDeleted: buildCtx.filesDeleted.slice().sort(),
-    dirsAdded: buildCtx.dirsAdded.slice().sort(),
-    dirsDeleted: buildCtx.dirsDeleted.slice().sort()
-  };
 }
 
 

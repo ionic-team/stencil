@@ -126,9 +126,9 @@ describe('component-styles', () => {
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
-      expect(r.stats.components).toHaveLength(1);
-      expect(r.stats.transpileBuildCount).toBe(1);
-      expect(r.stats.bundleBuildCount).toBe(1);
+      expect(r.components).toHaveLength(1);
+      expect(r.transpileBuildCount).toBe(1);
+      expect(r.bundleBuildCount).toBe(1);
 
       const content = await c.fs.readFile('/www/build/app/cmp-a.js');
       expect(content).toContain(`body { color: red; }`);

@@ -3,7 +3,7 @@ import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
 import { generateDistribution } from './distribution';
 import { generateServiceWorker } from '../service-worker/generate-sw';
-import { writeAppManifest } from '../manifest/manifest-data';
+import { writeAppManifest } from '../collections/manifest-data';
 
 
 export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
@@ -32,12 +32,6 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
     buildCtx.dirsAdded = commitResults.dirsAdded;
     totalFilesWrote = commitResults.filesWritten.length;
 
-    // build a list of all the components used
-    buildCtx.manifest.bundles.forEach(b => {
-      b.components.forEach(c => buildCtx.components.push(c));
-    });
-    buildCtx.components.sort();
-
     // successful write
     // kick off writing the cached file stuff
     // no need to wait on it finishing
@@ -45,6 +39,9 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
 
     // generate the service worker
     await generateServiceWorker(config, compilerCtx, buildCtx);
+
+    config.logger.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
+    config.logger.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

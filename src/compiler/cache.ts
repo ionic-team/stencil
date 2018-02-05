@@ -89,6 +89,10 @@ export class Cache {
     return this.config.sys.path.join(this.tmpDir, key);
   }
 
+  getMemoryStats() {
+    return this.cacheFs.getMemoryStats();
+  }
+
 }
 
 

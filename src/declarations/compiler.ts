@@ -1,7 +1,7 @@
 import { BuildEvents } from '../compiler/events';
 import { Cache } from '../compiler/cache';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
-import { Manifest, ModuleBundles, ModuleFiles } from '../util/interfaces';
+import { Manifest, ModuleBundles, ModuleFiles } from '../declarations';
 
 
 export interface CompilerCtx {
@@ -14,7 +14,7 @@ export interface CompilerCtx {
   rollupCache?: { [cacheKey: string]: any };
   compiledModuleJsText?: ModuleBundles;
   compiledModuleLegacyJsText?: ModuleBundles;
-  dependentManifests?: {[collectionName: string]: Manifest};
+  collections?: { [name: string]: Manifest };
   appFiles?: {
     loader?: string;
     loaderContent?: string;

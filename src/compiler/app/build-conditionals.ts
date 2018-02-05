@@ -1,15 +1,15 @@
-import { BuildConditionals, Bundle, CompilerCtx, ComponentMeta, Config, ModuleFile } from '../../util/interfaces';
+import { BuildConditionals, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile } from '../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
-export async function setBuildConditionals(config: Config, ctx: CompilerCtx, bundles: Bundle[]) {
+export async function setBuildConditionals(config: Config, ctx: CompilerCtx, entryModules: EntryModule[]) {
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
   coreBuild.clientSide = true;
 
   const promises: Promise<void>[] = [];
 
-  bundles.forEach(bundle => {
+  entryModules.forEach(bundle => {
     bundle.moduleFiles.forEach(moduleFile => {
       if (moduleFile.cmpMeta) {
         promises.push(setBuildFromComponent(config, ctx, coreBuild, moduleFile));

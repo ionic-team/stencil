@@ -1,10 +1,10 @@
-import { Bundle, CompilerCtx, Config, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, ServiceWorkerConfig } from '../../declarations';
+import { CompilerCtx, Config, EntryModule, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, ServiceWorkerConfig } from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { pathJoin } from '../util';
 
 
-export async function generateHostConfig(config: Config, ctx: CompilerCtx, bundles: Bundle[], hydrateResultss: HydrateResults[]) {
+export async function generateHostConfig(config: Config, ctx: CompilerCtx, entryModules: EntryModule[], hydrateResultss: HydrateResults[]) {
   const hostConfig: HostConfig = {
     hosting: {
       rules: []
@@ -18,7 +18,7 @@ export async function generateHostConfig(config: Config, ctx: CompilerCtx, bundl
   });
 
   hydrateResultss.forEach(hydrateResults => {
-    const hostRule = generateHostRule(config, ctx, bundles, hydrateResults);
+    const hostRule = generateHostRule(config, ctx, entryModules, hydrateResults);
     if (hostRule) {
       hostConfig.hosting.rules.push(hostRule);
     }
@@ -34,10 +34,10 @@ export async function generateHostConfig(config: Config, ctx: CompilerCtx, bundl
 }
 
 
-export function generateHostRule(config: Config, ctx: CompilerCtx, bundles: Bundle[], hydrateResults: HydrateResults) {
+export function generateHostRule(config: Config, ctx: CompilerCtx, entryModules: EntryModule[], hydrateResults: HydrateResults) {
   const hostRule: HostRule = {
     include: hydrateResults.path,
-    headers: generateHostRuleHeaders(config, ctx, bundles, hydrateResults)
+    headers: generateHostRuleHeaders(config, ctx, entryModules, hydrateResults)
   };
 
   if (hostRule.headers.length === 0) {
@@ -48,12 +48,12 @@ export function generateHostRule(config: Config, ctx: CompilerCtx, bundles: Bund
 }
 
 
-export function generateHostRuleHeaders(config: Config, ctx: CompilerCtx, bundles: Bundle[], hydrateResults: HydrateResults) {
+export function generateHostRuleHeaders(config: Config, ctx: CompilerCtx, entryModules: EntryModule[], hydrateResults: HydrateResults) {
   const hostRuleHeaders: HostRuleHeader[] = [];
 
   addStyles(config, hostRuleHeaders, hydrateResults);
   addCoreJs(config, ctx.appCoreWWWPath, hostRuleHeaders);
-  addBundles(config, bundles, hostRuleHeaders, hydrateResults.components);
+  addBundles(config, entryModules, hostRuleHeaders, hydrateResults.components);
   addScripts(config, hostRuleHeaders, hydrateResults);
   addImgs(config, hostRuleHeaders, hydrateResults);
 
@@ -68,10 +68,10 @@ function addCoreJs(config: Config, appCoreWWWPath: string, hostRuleHeaders: Host
 }
 
 
-export function addBundles(config: Config, bundles: Bundle[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
+export function addBundles(config: Config, entryModules: EntryModule[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
   components = sortComponents(components);
 
-  const bundleIds = getBundleIds(bundles, components);
+  const bundleIds = getBundleIds(entryModules, components);
 
   bundleIds.forEach(bundleId => {
     if (hostRuleHeaders.length < MAX_LINK_REL_PRELOAD_COUNT) {
@@ -83,11 +83,11 @@ export function addBundles(config: Config, bundles: Bundle[], hostRuleHeaders: H
 }
 
 
-export function getBundleIds(bundles: Bundle[], components: HydrateComponent[]) {
+export function getBundleIds(entryModules: EntryModule[], components: HydrateComponent[]) {
   const bundleIds: string[] = [];
 
   components.forEach(cmp => {
-    bundles.forEach(mb => {
+    entryModules.forEach(mb => {
       const moduleFile = mb.moduleFiles.find(mf => mf.cmpMeta && mf.cmpMeta.tagNameMeta === cmp.tag);
       if (!moduleFile) {
         return;

@@ -29,7 +29,7 @@ export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<
       tsSourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.ES2015);
 
     } catch (e) {
-      config.logger.error(`tsHost.getSourceFile unable to find: ${filePath}`);
+      config.logger.error(`tsHost.getSourceFile unable to find: ${filePath}`, e);
     }
 
     return tsSourceFile;
