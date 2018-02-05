@@ -59,7 +59,12 @@ export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<
 
 
 function writeFileInMemory(config: Config, ctx: CompilerCtx, sourceFile: ts.SourceFile, distFilePath: string, outputText: string) {
-  const tsFilePath = normalizePath(sourceFile.fileName);
+  let tsFilePath = normalizePath(sourceFile.fileName);
+
+  if (!config.sys.path.isAbsolute(tsFilePath)) {
+    tsFilePath = normalizePath(config.sys.path.join(config.rootDir, tsFilePath));
+  }
+
   distFilePath = normalizePath(distFilePath);
 
   // if this build is also building a distribution then we

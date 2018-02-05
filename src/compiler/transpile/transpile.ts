@@ -30,7 +30,7 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
   const timespace = config.logger.createTimeSpan('transpileModules start', true);
 
   // get the tsconfig compiler options we'll use
-  const tsOptions = getUserTsConfig(config);
+  const tsOptions = await getUserTsConfig(config, compilerCtx);
 
   if (config.suppressTypeScriptErrors) {
     // suppressTypeScriptErrors mainly for unit testing

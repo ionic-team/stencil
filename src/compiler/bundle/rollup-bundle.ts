@@ -2,6 +2,7 @@ import { BuildCtx, Bundle, CompilerCtx, Config, JSModuleList } from '../../util/
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
+import pathsResolution from './rollup-plugins/paths-resolution';
 import localResolution from './rollup-plugins/local-resolution';
 import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
@@ -31,6 +32,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       builtins(),
       bundleEntryFile(config, bundles),
       transpiledInMemoryPlugin(config, compilerCtx),
+      await pathsResolution(config, compilerCtx),
       localResolution(config),
       nodeEnvVars(config),
     ],

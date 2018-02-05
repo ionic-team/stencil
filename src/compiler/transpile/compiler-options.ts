@@ -1,58 +1,50 @@
-import { Config } from '../../util/interfaces';
+import { CompilerCtx, Config } from '../../declarations';
 import * as ts from 'typescript';
+import { normalizePath } from '../util';
 
 
-export function getUserTsConfig(config: Config): ts.CompilerOptions {
-  // force defaults
-  const options: ts.CompilerOptions = {
-    // to allow jsx to work
-    jsx: ts.JsxEmit.React,
+export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx): Promise<ts.CompilerOptions> {
+  let compilerOptions: ts.CompilerOptions = DEFAULT_COMPILER_OPTIONS;
 
-    // the factory function to use
-    jsxFactory: 'h',
+  try {
+    const normalizedConfigPath = normalizePath(config.tsconfig);
 
-    // transpileModule does not write anything to disk so there is no need
-    // to verify that there are no conflicts between input and output paths.
-    suppressOutputPathCheck: true,
+    const sourceText = await compilerCtx.fs.readFile(normalizedConfigPath);
 
-    // Clear out other settings that would not be used in transpiling this module
-    lib: [
-      'lib.dom.d.ts',
-      'lib.es5.d.ts',
-      'lib.es2015.d.ts',
-      'lib.es2016.d.ts',
-      'lib.es2017.d.ts'
-    ],
+    try {
+      const sourceJson = JSON.parse(sourceText);
+      const parsedCompilerOptions: ts.CompilerOptions = ts.convertCompilerOptionsFromJson(sourceJson.compilerOptions, '.').options;
 
-    allowSyntheticDefaultImports: true,
+      compilerOptions = {
+        ...compilerOptions,
+        ...parsedCompilerOptions
+      };
+    } catch (e) {
+      config.logger.warn('tsconfig.json is malformed, using default settings');
+    }
+  } catch (e) {
+    config.logger.warn('tsconfig.json is missing, using default settings');
+  }
 
-    // must always allow decorators
-    experimentalDecorators: true,
-
-    // create es2015 modules
-    module: ts.ModuleKind.ES2015,
-
-    // resolve using NodeJs style
-    moduleResolution: ts.ModuleResolutionKind.NodeJs,
-
-    target: ts.ScriptTarget.ES2015
-  };
+  // ensure that we do emit something
+  compilerOptions.noEmitOnError = false;
 
   if (config._isTesting) {
-    options.module = ts.ModuleKind.CommonJS;
+    compilerOptions.module = ts.ModuleKind.CommonJS;
   }
 
   // apply user config to tsconfig
-  options.outDir = config.collectionDir;
-  options.rootDir = config.srcDir;
+  compilerOptions.outDir = config.collectionDir;
+  compilerOptions.rootDir = config.srcDir;
 
   // generate .d.ts files when generating a distribution and in prod mode
-  options.declaration = config.generateDistribution;
+  compilerOptions.declaration = config.generateDistribution;
+
   if (config.generateDistribution) {
-    options.declarationDir = config.typesDir;
+    compilerOptions.declarationDir = config.typesDir;
   }
 
-  return options;
+  return compilerOptions;
 }
 
 
@@ -93,5 +85,8 @@ export const DEFAULT_COMPILER_OPTIONS: ts.CompilerOptions = {
   module: ts.ModuleKind.ES2015,
 
   // resolve using NodeJs style
-  moduleResolution: ts.ModuleResolutionKind.NodeJs
+  moduleResolution: ts.ModuleResolutionKind.NodeJs,
+
+  // ensure that we do emit something
+  noEmitOnError: false
 };
