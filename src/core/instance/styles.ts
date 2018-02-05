@@ -1,17 +1,17 @@
 import { Build } from '../../util/build-conditionals';
 import { ComponentConstructor, DomApi, HostElement } from '../../declarations';
 import { CustomStyle } from '../../client/css-shim/custom-style';
+import { DEFAULT_STYLE_MODE } from '../../util/constants';
 
 
 export function initStyleTemplate(domApi: DomApi, cmpConstructor: ComponentConstructor) {
   const style = cmpConstructor.style;
   if (style) {
     // we got a style mode for this component, let's create an id for this style
-    const styleModeId = cmpConstructor.is + (cmpConstructor.styleMode || '');
+    const styleModeId = cmpConstructor.is + (cmpConstructor.styleMode || DEFAULT_STYLE_MODE);
 
     if (!(cmpConstructor as any)[styleModeId]) {
       // we don't have this style mode id initialized yet
-
       if (Build.es5) {
         // ie11's template polyfill doesn't fully do the trick and there's still issues
         // so instead of trying to clone templates with styles in them, we'll just
@@ -32,7 +32,7 @@ export function initStyleTemplate(domApi: DomApi, cmpConstructor: ComponentConst
         (cmpConstructor as any)[styleModeId] = templateElm;
 
         // add the style text to the template element's innerHTML
-        templateElm.innerHTML = '<style>' + style + '</style>';
+        templateElm.innerHTML = `<style>${style}</style>`;
 
         // add our new template element to the head
         // so it can be cloned later
@@ -45,13 +45,13 @@ export function initStyleTemplate(domApi: DomApi, cmpConstructor: ComponentConst
 
 export function attachStyles(domApi: DomApi, cmpConstructor: ComponentConstructor, modeName: string, elm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
   // first see if we've got a style for a specific mode
-  let styleModeId = cmpConstructor.is + (modeName || '');
+  let styleModeId = cmpConstructor.is + (modeName || DEFAULT_STYLE_MODE);
   let styleTemplate = (cmpConstructor as any)[styleModeId];
 
   if (!styleTemplate) {
     // didn't find a style for this mode
     // now let's check if there's a default style for this component
-    styleModeId = cmpConstructor.is;
+    styleModeId = cmpConstructor.is + DEFAULT_STYLE_MODE;
     styleTemplate = (cmpConstructor as any)[styleModeId];
   }
 
@@ -104,10 +104,10 @@ export function attachStyles(domApi: DomApi, cmpConstructor: ComponentConstructo
         styleElm = styleTemplate.content.cloneNode(true);
       }
 
-      // let's make sure we put the styles below the <style data-visibility> element
+      // let's make sure we put the styles below the <style data-styles> element
       // so any visibility css overrides the default
-      const insertReferenceNode = styleContainerNode.querySelector('[data-visibility]');
-      domApi.$insertBefore(styleContainerNode, styleElm, (insertReferenceNode && insertReferenceNode.nextSibling) || styleContainerNode.firstChild);
+      const dataStyles = styleContainerNode.querySelectorAll('[data-styles]');
+      domApi.$insertBefore(styleContainerNode, styleElm, (dataStyles.length && dataStyles[dataStyles.length - 1].nextSibling) || styleContainerNode.firstChild);
 
       // remember we don't need to do this again for this element
       appliedStyles[styleModeId] = true;

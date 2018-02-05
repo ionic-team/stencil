@@ -45,7 +45,7 @@ describe('loader', () => {
       ];
       loader.init(win, doc, appNamespace, urlNamespace, publicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
       const style = doc.head.querySelector('style');
-      expect(style.hasAttribute('data-visibility')).toBeTruthy();
+      expect(style.hasAttribute('data-styles')).toBeTruthy();
       expect(style.innerHTML.indexOf('cmp-tag') > -1).toBeTruthy();
       expect(style.innerHTML.indexOf('{visibility:hidden}') > -1).toBeTruthy();
     });

@@ -21,7 +21,7 @@ export function init(
     // reusing the "x" and "i" variables from the args for funzies
     x = doc.createElement('style');
     x.innerHTML = y.join() + '{visibility:hidden}.' + hydratedCssClass + '{visibility:inherit}';
-    x.setAttribute('data-visibility', '');
+    x.setAttribute('data-styles', '');
     doc.head.insertBefore(x, doc.head.firstChild);
   }
 
