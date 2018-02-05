@@ -31,6 +31,14 @@ describe('validatePaths', () => {
     expect(path.isAbsolute(config.wwwIndexHtml)).toBe(true);
   });
 
+  it('should convert a custom wwwIndexHtml to absolute path', () => {
+    config.wwwIndexHtml = 'assets/custom-index.html';
+    validateBuildConfig(config);
+    expect(path.basename(config.wwwIndexHtml)).toBe('custom-index.html');
+    expect(path.isAbsolute(config.wwwIndexHtml)).toBe(true);
+  });
+
+
   it('should set default indexHtmlSrc and convert to absolute path', () => {
     validateBuildConfig(config);
     expect(path.basename(config.srcIndexHtml)).toBe('index.html');
