@@ -88,11 +88,12 @@
   "keywords": [
     "web components",
     "components",
-    "custom elements",
     "stencil",
     "ionic",
     "webapp",
-    "pwa"
+    "pwa",
+    "custom elements",
+    "shadow dom"
   ],
   "jest": {
     "testEnvironment": "node",

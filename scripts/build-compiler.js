@@ -17,6 +17,7 @@ function bundleCompiler() {
     external: [
       'fs',
       'path',
+      'rollup',
       'rollup-plugin-commonjs',
       'rollup-plugin-node-resolve',
       'rollup-plugin-node-builtins',
