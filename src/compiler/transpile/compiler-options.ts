@@ -42,18 +42,16 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) 
     compilerOptions.declarationDir = config.typesDir;
   }
 
-  validateCompilerOptions(config, compilerOptions);
+  validateCompilerOptions(compilerOptions);
 
   return compilerOptions;
 }
 
 
-function validateCompilerOptions(config: Config, compilerOptions: ts.CompilerOptions) {
+function validateCompilerOptions(compilerOptions: ts.CompilerOptions) {
 
   if (compilerOptions.allowJs && compilerOptions.declaration) {
-    config.logger.warn(`tsconfig: Option 'allowJs' cannot be specified with option 'declaration'. Setting 'declaration' to 'false'`);
-    compilerOptions.declaration = false;
-    compilerOptions.declarationDir = undefined;
+    compilerOptions.allowJs = false;
   }
 
   // triple stamp a double stamp we've got the required settings
