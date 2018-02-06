@@ -3,8 +3,8 @@ import * as ts from 'typescript';
 import { normalizePath } from '../util';
 
 
-export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx): Promise<ts.CompilerOptions> {
-  let compilerOptions: ts.CompilerOptions = DEFAULT_COMPILER_OPTIONS;
+export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) {
+  let compilerOptions: ts.CompilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   try {
     const normalizedConfigPath = normalizePath(config.tsconfig);
@@ -19,15 +19,13 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx):
         ...compilerOptions,
         ...parsedCompilerOptions
       };
+
     } catch (e) {
       config.logger.warn('tsconfig.json is malformed, using default settings');
     }
   } catch (e) {
     config.logger.warn('tsconfig.json is missing, using default settings');
   }
-
-  // ensure that we do emit something
-  compilerOptions.noEmitOnError = false;
 
   if (config._isTesting) {
     compilerOptions.module = ts.ModuleKind.CommonJS;
@@ -44,7 +42,32 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx):
     compilerOptions.declarationDir = config.typesDir;
   }
 
+  validateCompilerOptions(config, compilerOptions);
+
   return compilerOptions;
+}
+
+
+function validateCompilerOptions(config: Config, compilerOptions: ts.CompilerOptions) {
+
+  if (compilerOptions.allowJs && compilerOptions.declaration) {
+    config.logger.warn(`tsconfig: Option 'allowJs' cannot be specified with option 'declaration'. Setting 'declaration' to 'false'`);
+    compilerOptions.declaration = false;
+    compilerOptions.declarationDir = undefined;
+  }
+
+  // triple stamp a double stamp we've got the required settings
+  compilerOptions.jsx = DEFAULT_COMPILER_OPTIONS.jsx;
+  compilerOptions.jsxFactory = DEFAULT_COMPILER_OPTIONS.jsxFactory;
+  compilerOptions.experimentalDecorators = DEFAULT_COMPILER_OPTIONS.experimentalDecorators;
+  compilerOptions.noEmitOnError = DEFAULT_COMPILER_OPTIONS.noEmit;
+  compilerOptions.suppressOutputPathCheck = DEFAULT_COMPILER_OPTIONS.suppressOutputPathCheck;
+  compilerOptions.module = DEFAULT_COMPILER_OPTIONS.module;
+  compilerOptions.moduleResolution = DEFAULT_COMPILER_OPTIONS.moduleResolution;
+
+  if (compilerOptions.target === ts.ScriptTarget.ES3 || compilerOptions.target === ts.ScriptTarget.ES5) {
+    compilerOptions.target = DEFAULT_COMPILER_OPTIONS.target;
+  }
 }
 
 
