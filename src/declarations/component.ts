@@ -251,6 +251,7 @@ export interface HostElement extends HTMLElement {
   $rendered?: boolean;
   $onRender: (() => void)[];
   componentOnReady?: (cb?: (elm: HostElement) => void) => Promise<void>;
+  onReady?: (cb?: HostElement) => void;
   color?: string;
   mode?: string;
 

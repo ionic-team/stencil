@@ -67,6 +67,12 @@ export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydrated
       // fire off the ref if it exists
       callNodeRefs(elm._vnode);
 
+      // fire off the user's elm.onReady function
+      if (elm.onReady) {
+        elm.onReady(elm);
+        elm.onReady = null;
+      }
+
       // fire off the user's elm.componentOnReady() callbacks that were
       // put directly on the element (well before anything was ready)
       if (elm._onReadyCallbacks) {
