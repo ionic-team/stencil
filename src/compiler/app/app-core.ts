@@ -74,6 +74,7 @@ export function getCorePolyfills(config: Config) {
     'document-register-element.js',
     'array-find.js',
     'object-assign.js',
+    'string-startswith.js',
     'promise.js',
     'fetch.js',
     'request-animation-frame.js',
