@@ -34,8 +34,10 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     })
   );
 
-  Object.entries(jsModules['esm'])
-    .filter(([key]) => !bundleKeys[key])
+  const esmModules = jsModules['esm'];
+  Object.keys(esmModules)
+    .filter(key => !bundleKeys[key])
+    .map(key => { return [key, esmModules[key]] as [string, { code: string}]; })
     .forEach(async ([key, value]) => {
       const fileName = getBundleFilename(key.replace('.js', ''), false, 'es2015');
       const jsText = replaceBundleIdPlaceholder(value.code, key);
@@ -43,8 +45,10 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     });
 
   if (config.buildEs5) {
-    Object.entries(jsModules['es5'])
-      .filter(([key]) => !bundleKeys[key])
+    const es5Modules = jsModules['es5'];
+    Object.keys(es5Modules)
+      .filter(key => !bundleKeys[key])
+      .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
       .forEach(async ([key, value]) => {
         const fileName = getBundleFilename(key.replace('.js', ''), false, 'es5');
         let jsText = replaceBundleIdPlaceholder(value.code, key);
