@@ -166,21 +166,31 @@ export function createPlatformServer(
         const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
           // connect the component's constructor to its metadata
-          cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
-          cmpMeta.membersMeta = {
-            'color': {}
-          };
+          const componentConstructor = bundleExports[pascalCasedTagName];
 
-          if (cmpMeta.componentConstructor.properties) {
-            Object.keys(cmpMeta.componentConstructor.properties).forEach(memberName => {
-              const constructorProperty = cmpMeta.componentConstructor.properties[memberName];
+          if (!cmpMeta.componentConstructor) {
+            // init component constructor
+            cmpMeta.componentConstructor = componentConstructor;
 
-              if (constructorProperty.type) {
-                cmpMeta.membersMeta[memberName] = {
-                  propType: PROP_TYPE.Any
-                };
-              }
-            });
+            cmpMeta.membersMeta = {
+              'color': {}
+            };
+
+            if (cmpMeta.componentConstructor.properties) {
+              Object.keys(cmpMeta.componentConstructor.properties).forEach(memberName => {
+                const constructorProperty = cmpMeta.componentConstructor.properties[memberName];
+
+                if (constructorProperty.type) {
+                  cmpMeta.membersMeta[memberName] = {
+                    propType: PROP_TYPE.Any
+                  };
+                }
+              });
+            }
+          }
+
+          if (componentConstructor.style) {
+            styles.push(componentConstructor.style);
           }
         }
       });
@@ -194,9 +204,9 @@ export function createPlatformServer(
 
     const missingDependents = dependentsList.filter(d => !loadedBundles[d]);
     missingDependents.forEach(d => {
-        const fileName = d.replace('.js', '.es5.js');
-        loadFile(fileName);
-      });
+      const fileName = d.replace('.js', '.es5.js');
+      loadFile(fileName);
+    });
 
     execBundleCallback(bundleId, dependentsList, importer);
   };
@@ -207,11 +217,7 @@ export function createPlatformServer(
   }
 
 
-  plt.attachStyles = function attachStyles(_domApi, cmpConstructor, _modeName, _elm) {
-    if (cmpConstructor.style) {
-      styles.push(cmpConstructor.style);
-    }
-  };
+  plt.attachStyles = function attachStyles(_domApi, _cmpMeta, _modeName, _elm) {/**/};
 
   // This is executed by the component's connected callback.
   function loadComponent(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {

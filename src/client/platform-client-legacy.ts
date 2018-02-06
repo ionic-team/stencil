@@ -1,6 +1,5 @@
-import { enableEventListener } from '../core/instance/listeners';
 import { AppGlobal, BundleCallback, CjsExports, ComponentMeta, ComponentRegistry, CoreContext,
-  EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../util/interfaces';
+  EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../declarations';
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { attachStyles } from '../core/instance/styles';
 import { Build } from '../util/build-conditionals';
@@ -9,6 +8,7 @@ import { createRendererPatch } from '../core/renderer/patch';
 import { createVNodesFromSsr } from '../core/renderer/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './css-shim/custom-style';
+import { enableEventListener } from '../core/instance/listeners';
 import { ENCAPSULATION, PROP_TYPE, SSR_VNODE_ID } from '../util/constants';
 import { h } from '../core/renderer/h';
 import { initCssVarShim } from './css-shim/init-css-shim';
@@ -178,9 +178,10 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
         const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
-          // connect the component's constructor to its metadata
+          // get the component constructor from the module
           cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
-          initStyleTemplate(domApi, cmpMeta.componentConstructor);
+
+          initStyleTemplate(domApi, cmpMeta, cmpMeta.componentConstructor);
           cmpMeta.membersMeta = {
             'color': {}
           };
@@ -332,8 +333,8 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   }
 
   if (Build.styles) {
-    plt.attachStyles = (domApi, cmpConstructor, modeName, elm) => {
-      attachStyles(domApi, cmpConstructor, modeName, elm, customStyle);
+    plt.attachStyles = (domApi, cmpMeta, modeName, elm) => {
+      attachStyles(domApi, cmpMeta, modeName, elm, customStyle);
     };
   }
 

@@ -1,7 +1,8 @@
-import { ComponentMeta, HostElement, PlatformApi, ComponentConstructor } from '../../../util/interfaces';
-import { mockPlatform, mockElement } from '../../../testing/mocks';
-import { render } from '../render';
+import { ComponentConstructor, ComponentMeta, HostElement, PlatformApi } from '../../../declarations';
+import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { h } from '../../renderer/h';
+import { render } from '../render';
+
 
 describe('instance render', () => {
 
@@ -242,9 +243,12 @@ describe('instance render', () => {
 
   });
 
-  function doRender(cmp: any) {
-    const instance = elm._instance = new cmp();
-    render(plt, elm, (cmp as ComponentConstructor), false);
+  function doRender(cmpConstructor: any) {
+    const instance = elm._instance = new cmpConstructor();
+    const cmpMeta: ComponentMeta = {
+      componentConstructor: cmpConstructor
+    };
+    render(plt, elm, cmpMeta, false);
     return instance;
   }
 

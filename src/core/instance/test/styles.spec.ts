@@ -1,5 +1,5 @@
 import { attachStyles, initStyleTemplate } from '../styles';
-import { ComponentConstructor, DomApi, HostElement } from '../../../declarations';
+import { ComponentConstructor, ComponentMeta, DomApi, HostElement } from '../../../declarations';
 import { mockDomApi, mockElement } from '../../../testing/mocks';
 
 
@@ -7,10 +7,14 @@ describe('styles', () => {
 
   let domApi: DomApi;
   let elm: HostElement;
+  let cmpMeta: ComponentMeta;
 
   beforeEach(() => {
     domApi = mockDomApi();
     elm = mockElement() as any;
+    cmpMeta = {
+      tagNameMeta: 'cmp-a'
+    };
   });
 
   it('should place the styles in the head below multiple existing <styles data-styles>', () => {
@@ -34,8 +38,8 @@ describe('styles', () => {
     prerenderStyles.innerHTML = `body { color: blue; }`;
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
-    initStyleTemplate(domApi, cmpConstructor);
-    attachStyles(domApi, cmpConstructor, modeName, elm);
+    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    attachStyles(domApi, cmpMeta, modeName, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
     expect(styles).toHaveLength(3);
@@ -61,8 +65,8 @@ describe('styles', () => {
     prerenderStyles.innerHTML = `body { color: blue; }`;
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
-    initStyleTemplate(domApi, cmpConstructor);
-    attachStyles(domApi, cmpConstructor, modeName, elm);
+    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    attachStyles(domApi, cmpMeta, modeName, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
     expect(styles).toHaveLength(2);
@@ -82,8 +86,8 @@ describe('styles', () => {
     };
     const modeName = null;
 
-    initStyleTemplate(domApi, cmpConstructor);
-    attachStyles(domApi, cmpConstructor, modeName, elm);
+    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
+    attachStyles(domApi, cmpMeta, modeName, elm);
 
     const style = domApi.$head.querySelector('style');
     expect(style.innerHTML).toBe(cmpConstructor.style);
@@ -102,11 +106,11 @@ describe('styles', () => {
       }
     };
 
-    initStyleTemplate(domApi, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
     const template = domApi.$head.querySelector('template');
     expect(template.innerHTML).toBe(`<style>${cmpConstructor.style}</style>`);
-    expect(cmpConstructor[`cmp-aios`]).toBe(template);
+    expect(cmpMeta[`cmp-aios`]).toBe(template);
   });
 
   it('should append component styles template to head, no styleMode', () => {
@@ -119,11 +123,11 @@ describe('styles', () => {
       }
     };
 
-    initStyleTemplate(domApi, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
     const template = domApi.$head.querySelector('template');
     expect(template.innerHTML).toBe(`<style>${cmpConstructor.style}</style>`);
-    expect(cmpConstructor[`cmp-a$`]).toBe(template);
+    expect(cmpMeta[`cmp-a$`]).toBe(template);
   });
 
   it('should not append component styles template when no styles', () => {
@@ -133,7 +137,7 @@ describe('styles', () => {
       }
     };
 
-    initStyleTemplate(domApi, cmpConstructor);
+    initStyleTemplate(domApi, cmpMeta, cmpConstructor);
 
     const template = domApi.$head.querySelector('template');
     expect(template).toBe(null);

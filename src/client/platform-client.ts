@@ -1,5 +1,5 @@
 import { AppGlobal, ComponentMeta, ComponentRegistry, CoreContext, EventEmitterData,
-  HostElement, ImportedModule, LoadComponentRegistry, PlatformApi } from '../util/interfaces';
+  HostElement, ImportedModule, LoadComponentRegistry, PlatformApi } from '../declarations';
 import { assignHostContentSlots } from '../core/renderer/slot';
 import { attachStyles } from '../core/instance/styles';
 import { Build } from '../util/build-conditionals';
@@ -157,17 +157,14 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
       // dynamic es module import() => woot!
       __import(url).then(importedModule => {
+        // async loading of the module is done
         try {
-          // async loading of the module is done
-          if (!cmpMeta.componentConstructor) {
-            // we haven't initialized the component module yet
-            // get the component constructor from the module
-            cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
-          }
+          // get the component constructor from the module
+          cmpMeta.componentConstructor = importedModule[dashToPascalCase(cmpMeta.tagNameMeta)];
 
-          // initialize this components styles
+          // initialize this component constructor's styles
           // it is possible for the same component to have difficult styles applied in the same app
-          initStyleTemplate(domApi, cmpMeta.componentConstructor);
+          initStyleTemplate(domApi, cmpMeta, cmpMeta.componentConstructor);
 
         } catch (e) {
           // oh man, something's up

@@ -1,6 +1,6 @@
 import { Cache } from '../compiler/cache';
-import { ComponentInstance, ComponentMeta, ComponentRegistry, Config, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode, CompilerCtx } from '../declarations';
+import { CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DomApi, HostContentNodes, HostElement,
+  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';

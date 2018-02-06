@@ -153,7 +153,8 @@ describe('Component slot', () => {
 
   it('should render conditional content into a nested default slot', () => {
     const plt: any = mockPlatform();
-    mockDefine(plt, {
+
+    const parentCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-parent',
       componentConstructor: class {
         msg = 'parent message';
@@ -166,7 +167,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    mockDefine(plt, {
+    const childCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-child',
       componentConstructor: class {
         test = 0;
@@ -200,13 +201,13 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.textContent).toBe('');
 
-        render(plt, childElm, {}, false);
+        render(plt, childElm, parentCmpMeta, false);
         expect(parentElm.firstElementChild.textContent).toBe('content 1content 2');
 
-        render(plt, childElm, {}, false);
+        render(plt, childElm, childCmpMeta, false);
         expect(parentElm.firstElementChild.textContent).toBe('');
 
-        render(plt, childElm, {}, false);
+        render(plt, childElm, childCmpMeta, false);
         expect(parentElm.firstElementChild.textContent).toBe('content 4');
       });
     });
@@ -215,7 +216,7 @@ describe('Component slot', () => {
 
   it('should update parent content in child default slot', () => {
 
-    mockDefine(plt, {
+    const parentCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-parent',
       componentConstructor: class {
         msg = 'parent message';
@@ -230,7 +231,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    mockDefine(plt, {
+    const childCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-child',
       componentConstructor: class {
         render() {
@@ -253,7 +254,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
         parentElm._instance.msg = 'change 1';
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, parentCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -262,7 +263,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
         parentElm._instance.msg = 'change 2';
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, childCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('CHEETAH');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ION-CHILD');
@@ -275,7 +276,7 @@ describe('Component slot', () => {
 
   it('should update parent content inner text in child nested default slot', () => {
 
-    mockDefine(plt, {
+    const parentCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-parent',
       componentConstructor: class {
         msg = 'parent message';
@@ -288,7 +289,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    mockDefine(plt, {
+    const childCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-child',
       componentConstructor: class {
         render() {
@@ -309,7 +310,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
 
         parentElm._instance.msg = 'change 1';
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, parentCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -317,7 +318,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 1');
 
         parentElm._instance.msg = 'change 2';
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, childCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('BULL');
@@ -330,7 +331,7 @@ describe('Component slot', () => {
   it('should allow multiple slots with same name', () => {
     let values = 0;
 
-    mockDefine(plt, {
+    const parentCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-parent',
       componentConstructor: class {
         render() {
@@ -342,7 +343,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    mockDefine(plt, {
+    const childCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-child',
       componentConstructor: class {
         render() {
@@ -366,7 +367,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].nodeName).toBe('EAGLE');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].textContent).toBe('2');
 
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, parentCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -375,7 +376,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].nodeName).toBe('EAGLE');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[2].textContent).toBe('4');
 
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, childCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
@@ -391,7 +392,7 @@ describe('Component slot', () => {
   it('should only render nested named slots and default slot', () => {
     let values = 0;
 
-    mockDefine(plt, {
+    const parentCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-parent',
       componentConstructor: class {
         render() {
@@ -404,7 +405,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    mockDefine(plt, {
+    const childCmpMeta = mockDefine(plt, {
       tagNameMeta: 'ion-child',
       componentConstructor: class {
         render() {
@@ -436,7 +437,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('2');
 
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, parentCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -449,7 +450,7 @@ describe('Component slot', () => {
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].nodeName).toBe('FOX');
         expect(parentElm.firstElementChild.firstElementChild.childNodes[1].childNodes[2].childNodes[0].textContent).toBe('5');
 
-        render(plt, parentElm, {}, false);
+        render(plt, parentElm, childCmpMeta, false);
 
         expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
         expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
@@ -481,7 +482,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    mockDefine(plt, {
+    const test1CmpMeta = mockDefine(plt, {
       tagNameMeta: 'test-1',
       componentConstructor: class {
         render() {
@@ -492,7 +493,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    mockDefine(plt, {
+    const test2CmpMeta = mockDefine(plt, {
       tagNameMeta: 'test-2',
       componentConstructor: class {
         render() {
@@ -516,7 +517,7 @@ describe('Component slot', () => {
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('1');
 
-          render(plt, elm, {}, false);
+          render(plt, elm, test1CmpMeta, false);
 
           expect(elm.firstElementChild.nodeName).toBe('TEST-1');
           expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
@@ -525,7 +526,7 @@ describe('Component slot', () => {
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
           expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('2');
 
-          render(plt, elm, {}, false);
+          render(plt, elm, test2CmpMeta, false);
 
           expect(elm.firstElementChild.nodeName).toBe('TEST-1');
           expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');

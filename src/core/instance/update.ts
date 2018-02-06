@@ -95,7 +95,7 @@ export function update(plt: PlatformApi, elm: HostElement) {
 export function renderUpdate(plt: PlatformApi, elm: HostElement, isInitialLoad: boolean) {
   // if this component has a render function, let's fire
   // it off and generate a vnode for this
-  render(plt, elm, plt.getComponentMeta(elm).componentConstructor, !isInitialLoad);
+  render(plt, elm, plt.getComponentMeta(elm), !isInitialLoad);
   // _hasRendered was just set
   // _onRenderCallbacks were all just fired off
 

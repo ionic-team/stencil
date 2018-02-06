@@ -1,10 +1,10 @@
-import * as d from '../declarations/index';
+import * as d from '../declarations';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
 export interface PlatformApi {
   activeRender?: boolean;
-  attachStyles?: (domApi: d.DomApi, cmpConstructor: d.ComponentConstructor, modeName: string, elm: d.HostElement, customStyle?: any) => void;
+  attachStyles?: (domApi: d.DomApi, cmpMeta: d.ComponentMeta, modeName: string, elm: d.HostElement, customStyle?: any) => void;
   connectHostElement: (cmpMeta: d.ComponentMeta, elm: d.HostElement) => void;
   defineComponent: (cmpMeta: d.ComponentMeta, HostElementConstructor?: any) => void;
   domApi?: d.DomApi;
