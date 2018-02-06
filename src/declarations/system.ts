@@ -37,6 +37,7 @@ export interface StencilSystem {
   minimatch?(path: string, pattern: string, opts?: any): boolean;
   resolveModule?(fromDir: string, moduleId: string): string;
   path?: Path;
+  platform?: string;
   rollup?: {
     rollup: {
       (config: RollupInputConfig): Promise<RollupBundle>;

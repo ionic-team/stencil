@@ -1,5 +1,5 @@
 import { BuildEvents } from '../../compiler/events';
-import { Config, Diagnostic, FileSystem, Path, PackageJsonData, StencilSystem } from '../../util/interfaces';
+import { Config, Diagnostic, FileSystem, PackageJsonData, Path, StencilSystem } from '../../declarations';
 import { createContext, runInContext } from './node-context';
 import { createDom } from './node-dom';
 import { NodeFs } from './node-fs';
@@ -213,6 +213,10 @@ export class NodeSystem implements StencilSystem {
 
   minimatch(filePath: string, pattern: string, opts: any) {
     return this.sysUtil.minimatch(filePath, pattern, opts);
+  }
+
+  get platform() {
+    return os.platform();
   }
 
   resolveModule(fromDir: string, moduleId: string) {

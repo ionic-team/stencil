@@ -20,7 +20,12 @@ export class Compiler {
       this.ctx = getCompilerCtx(config);
       initPlugins(config);
 
-      config.logger.info(config.logger.cyan(`${config.sys.compiler.name} v${config.sys.compiler.version} 💎`));
+      let startupMsg = `${config.sys.compiler.name} v${config.sys.compiler.version} `;
+      if (config.sys.platform !== 'win32') {
+        startupMsg += `💎`;
+      }
+
+      config.logger.info(config.logger.cyan(startupMsg));
       config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
     }
   }
