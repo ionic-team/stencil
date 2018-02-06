@@ -66,7 +66,10 @@ export async function writeEsModules(config: Config, rollupBundle: OutputChunk) 
 
 
 export async function writeLegacyModules(config: Config, rollupBundle: OutputChunk, entryModules: EntryModule[]) {
-  Object.entries((<any>rollupBundle).chunks).forEach(([key, value]) => {
+  const { chunks } = <any>rollupBundle;
+  Object.keys(chunks).map(key => {
+    return [key, chunks[key]];
+  }).forEach(([key, value]) => {
     const entryModule = entryModules.find(b => b.entryKey === `./${key}.js`);
     if (entryModule) {
       entryModule.dependencies = (<any>value).imports.slice();
