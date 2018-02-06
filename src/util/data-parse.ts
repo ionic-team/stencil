@@ -1,6 +1,6 @@
 import { ComponentListenersData, ComponentMemberData, ComponentMeta,
   ComponentRegistry, LoadComponentRegistry, PropertyType } from '../declarations';
-import { isDef } from './helpers';
+import { isDef, toDashCase } from './helpers';
 import { PROP_TYPE } from './constants';
 
 
@@ -29,7 +29,7 @@ export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmp
       d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        attribName: typeof d[2] === 'string' ? d[2] as string : d[2] ? d[0] : 0 as any,
+        attribName: typeof d[2] === 'string' ? d[2] as string : d[2] ? toDashCase(d[0]) : 0 as any,
         propType: d[3]
       };
     }
