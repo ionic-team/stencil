@@ -35,7 +35,7 @@ export function generateComponentTypesFile(config: Config, cmpList: ComponentReg
     return finalString + `import '${compCollection.name}';\n\n`;
   }, componentsFileContent);
 
-  componentsFileContent += createStencilElement();
+  let addedStencilElement = false;
 
   const componentFileString = Object.keys(cmpList)
     .filter(moduleFileName => cmpList[moduleFileName] != null)
@@ -46,6 +46,11 @@ export function generateComponentTypesFile(config: Config, cmpList: ComponentReg
           .replace(/\.(tsx|ts)$/, ''));
 
       typeImportData = updateReferenceTypeImports(config, typeImportData, allTypes, cmpMeta, moduleFileName);
+
+      if (!addedStencilElement) {
+        finalString += createStencilElement();
+        addedStencilElement = true;
+      }
 
       finalString +=
         `${createTypesAsString(cmpMeta, importPath)}\n`;
@@ -80,7 +85,9 @@ ${typeData.sort(sortImportNames).map(td => {
 
   componentsFileContent += typeImportString + componentFileString;
 
-  componentsFileContent += `declare global { namespace JSX { interface StencilJSX {} } }\n`;
+  if (componentFileString.includes('namespace JSX')) {
+    componentsFileContent += `declare global { namespace JSX { interface StencilJSX {} } }\n`;
+  }
 
   return componentsFileContent;
 }
