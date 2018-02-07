@@ -281,6 +281,7 @@ const RESERVED_PROPERTIES: string[] = [
   'connect',
   'context',
   'elementRef',
+  'encapsulation',
   'events',
   'host',
   'is',
