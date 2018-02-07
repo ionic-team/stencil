@@ -1,5 +1,5 @@
 import { Build } from '../../util/build-conditionals';
-import { ComponentConstructorProperty, ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentConstructorProperty, ComponentInstance, HostElement, PlatformApi } from '../../declarations';
 import { parsePropertyValue } from '../../util/data-parse';
 import { queueUpdate } from './update';
 
@@ -122,7 +122,7 @@ export function defineMember(
   } else if (Build.propContext && property.context) {
     // @Prop({ context: 'config' })
     const contextObj = plt.getContextItem(property.context);
-    if (contextObj) {
+    if (contextObj !== undefined) {
       definePropertyValue(instance, memberName, (contextObj.getContext && contextObj.getContext(elm)) || contextObj);
     }
 

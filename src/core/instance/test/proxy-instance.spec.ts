@@ -1,10 +1,22 @@
-import { ComponentConstructor, HostElement, PlatformApi } from '../../../util/interfaces';
+import { ComponentConstructor, HostElement, PlatformApi } from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { proxyComponentInstance } from '../proxy-component-instance';
 
 
 describe('proxyComponentInstance', () => {
+
+  const plt: PlatformApi = mockPlatform() as any;
+  var cmpConstructor: ComponentConstructor;
+  var elm: HostElement;
+  var instance: any;
+
+  beforeEach(() => {
+    cmpConstructor = {};
+    elm = mockElement('my-cmp') as any;
+    instance = {};
+  });
+
 
   it('should get attr value even if existin data is empty string', () => {
     cmpConstructor.properties = {
@@ -152,6 +164,17 @@ describe('proxyComponentInstance', () => {
     expect(instance.myElement).toBe(elm);
   });
 
+  it('defines falsey prop context', () => {
+    plt.getContextItem = () => {
+      return false;
+    };
+    cmpConstructor.properties = {
+      isServer: { context: 'isServer' }
+    };
+    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    expect(instance.isServer).toBe(false);
+  });
+
   it('defines prop context', () => {
     spyOn(plt, 'getContextItem');
     cmpConstructor.properties = {
@@ -187,17 +210,6 @@ describe('proxyComponentInstance', () => {
     expect(() => {
       proxyComponentInstance(plt, cmpConstructor, elm, instance);
     }).not.toThrow();
-  });
-
-  var plt: PlatformApi = mockPlatform() as any;
-  var cmpConstructor: ComponentConstructor;
-  var elm: HostElement;
-  var instance: any;
-
-  beforeEach(() => {
-    cmpConstructor = {};
-    elm = mockElement('my-cmp') as any;
-    instance = {};
   });
 
 });
