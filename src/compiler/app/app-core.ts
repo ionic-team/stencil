@@ -1,6 +1,7 @@
-import { BuildConditionals, BuildCtx, CompilerCtx, Config } from '../../util/interfaces';
+import { BuildConditionals, BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { buildCoreContent } from './build-core-content';
 import { generatePreamble, pathJoin } from '../util';
+import { getAppCorePolyfills } from './app-polyfills';
 import { getAppDistDir, getAppPublicPath, getAppWWWBuildDir, getCoreFilename } from './app-file-naming';
 
 
@@ -25,7 +26,7 @@ export async function generateCore(config: Config, compilerCtx: CompilerCtx, bui
     // this build wants polyfills so let's
     // add the polyfills to the top of the core content
     // the polyfilled code is already es5/minified ready to go
-    const polyfillsContent = await getCorePolyfills(config);
+    const polyfillsContent = await getAppCorePolyfills(config);
     jsContent = polyfillsContent + '\n' + jsContent;
   }
 
@@ -64,31 +65,6 @@ export function wrapCoreJs(config: Config, jsContent: string) {
   ].join('');
 
   return output;
-}
-
-
-export function getCorePolyfills(config: Config) {
-  // first load up all of the polyfill content
-  const readFilePromises = [
-    'template.js',
-    'document-register-element.js',
-    'array-find.js',
-    'object-assign.js',
-    'string-startswith.js',
-    'promise.js',
-    'fetch.js',
-    'request-animation-frame.js',
-    'closest.js',
-    'performance-now.js'
-  ].map(polyfillFile => {
-    const staticName = config.sys.path.join('polyfills', polyfillFile);
-    return config.sys.getClientCoreFile({ staticName: staticName });
-  });
-
-  return Promise.all(readFilePromises).then(results => {
-    // concat the polyfills
-    return results.join('\n').trim();
-  });
 }
 
 
