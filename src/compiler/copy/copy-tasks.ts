@@ -56,11 +56,11 @@ export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx,
   }
 
   if (config.generateWWW) {
-    processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.wwwDir);
+    await processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.wwwDir);
   }
 
   if (config.generateDistribution) {
-    processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.collectionDir);
+    await processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.collectionDir);
   }
 }
 
