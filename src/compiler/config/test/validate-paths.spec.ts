@@ -1,4 +1,4 @@
-import { Config } from '../../../util/interfaces';
+import { Config } from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateBuildConfig } from '../validate-config';
 import * as path from 'path';
@@ -112,6 +112,20 @@ describe('validatePaths', () => {
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('custom-www');
     expect(path.isAbsolute(config.buildDir)).toBe(true);
+  });
+
+  it('should set src dir from incorrect config case', () => {
+    (config as any).SrcDIR = () => 'myapp';
+    validateBuildConfig(config);
+    expect(path.basename(config.srcDir)).toBe('myapp');
+    expect(path.isAbsolute(config.srcDir)).toBe(true);
+  });
+
+  it('should set src dir from function', () => {
+    (config as any).srcDir = () => 'myapp';
+    validateBuildConfig(config);
+    expect(path.basename(config.srcDir)).toBe('myapp');
+    expect(path.isAbsolute(config.srcDir)).toBe(true);
   });
 
   it('should set default src dir and convert to absolute path', () => {

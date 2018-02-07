@@ -154,11 +154,30 @@ describe('validation', () => {
 
   describe('hashed filenames', () => {
 
-    it('should throw error when hashedFileNameLength to small', () => {
+    it('should throw error when hashedFileNameLength too large', () => {
+      expect(() => {
+        config.hashedFileNameLength = 33;
+        validateBuildConfig(config);
+      }).toThrow();
+    });
+
+    it('should throw error when hashedFileNameLength too small', () => {
       expect(() => {
         config.hashedFileNameLength = 3;
         validateBuildConfig(config);
       }).toThrow();
+    });
+
+    it('should set from hashedfilenamelength', () => {
+      (config as any).hashedfilenamelength = 28;
+      validateBuildConfig(config);
+      expect(config.hashedFileNameLength).toBe(28);
+    });
+
+    it('should set hashedFileNameLength from function', () => {
+      (config as any).hashedfilenamelength = () => 11;
+      validateBuildConfig(config);
+      expect(config.hashedFileNameLength).toBe(11);
     });
 
     it('should set hashedFileNameLength', () => {
@@ -195,6 +214,20 @@ describe('validation', () => {
       (config as any).hashFilenames = false;
       validateBuildConfig(config);
       expect(config.hashFileNames).toBe(false);
+    });
+
+    it('should set hashFileNames from hashFilenames', () => {
+      (config as any).hashFilenames = true;
+      validateBuildConfig(config);
+      expect(config.hashFileNames).toBe(true);
+    });
+
+    it('should set hashFileNames from function', () => {
+      (config as any).hashFileNames = () => {
+        return true;
+      };
+      validateBuildConfig(config);
+      expect(config.hashFileNames).toBe(true);
     });
 
   });

@@ -1,5 +1,6 @@
 import { Config } from '../../declarations';
 import { normalizePath } from '../util';
+import { setStringConfig } from './config-utils';
 
 
 export function validatePaths(config: Config) {
@@ -33,65 +34,48 @@ export function validatePaths(config: Config) {
     config.logger.warn(`stencil config property "src" has been renamed to "srcDir"`);
     config.srcDir = (config as any).src;
   }
-  if (typeof config.srcDir !== 'string') {
-    config.srcDir = DEFAULT_SRC_DIR;
-  }
+
+  setStringConfig(config, 'srcDir', DEFAULT_SRC_DIR);
   if (!path.isAbsolute(config.srcDir)) {
     config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
   }
 
-  if (typeof config.wwwDir !== 'string') {
-    config.wwwDir = DEFAULT_WWW_DIR;
-  }
+  setStringConfig(config, 'wwwDir', DEFAULT_WWW_DIR);
   if (!path.isAbsolute(config.wwwDir)) {
     config.wwwDir = normalizePath(path.join(config.rootDir, config.wwwDir));
   }
 
-  if (typeof config.buildDir !== 'string') {
-    config.buildDir = DEFAULT_BUILD_DIR;
-  }
+  setStringConfig(config, 'buildDir', DEFAULT_BUILD_DIR);
   if (!path.isAbsolute(config.buildDir)) {
     config.buildDir = normalizePath(path.join(config.wwwDir, config.buildDir));
   }
 
-  if (typeof config.distDir !== 'string') {
-    config.distDir = DEFAULT_DIST_DIR;
-  }
+  setStringConfig(config, 'distDir', DEFAULT_DIST_DIR);
   if (!path.isAbsolute(config.distDir)) {
     config.distDir = normalizePath(path.join(config.rootDir, config.distDir));
   }
 
-  if (typeof config.collectionDir !== 'string') {
-    config.collectionDir = DEFAULT_COLLECTION_DIR;
-  }
+  setStringConfig(config, 'collectionDir', DEFAULT_COLLECTION_DIR);
   if (!path.isAbsolute(config.collectionDir)) {
     config.collectionDir = normalizePath(path.join(config.distDir, config.collectionDir));
   }
 
-  if (typeof config.tsconfig !== 'string') {
-    config.tsconfig = DEFAULT_TSCONFIG;
-  }
+  setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
   if (!path.isAbsolute(config.tsconfig)) {
     config.tsconfig = normalizePath(path.join(config.rootDir, config.tsconfig));
   }
 
-  if (typeof config.typesDir !== 'string') {
-    config.typesDir = DEFAULT_TYPES_DIR;
-  }
+  setStringConfig(config, 'typesDir', DEFAULT_TYPES_DIR);
   if (!path.isAbsolute(config.typesDir)) {
     config.typesDir = normalizePath(path.join(config.distDir, config.typesDir));
   }
 
-  if (typeof config.srcIndexHtml !== 'string') {
-    config.srcIndexHtml = normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML));
-  }
+  setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
   if (!path.isAbsolute(config.srcIndexHtml)) {
     config.srcIndexHtml = normalizePath(path.join(config.rootDir, config.srcIndexHtml));
   }
 
-  if (typeof config.wwwIndexHtml !== 'string') {
-    config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, DEFAULT_INDEX_HTML));
-  }
+  setStringConfig(config, 'wwwIndexHtml', normalizePath(path.join(config.wwwDir, DEFAULT_INDEX_HTML)));
   if (!path.isAbsolute(config.wwwIndexHtml)) {
     config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, config.wwwIndexHtml));
   }
@@ -114,9 +98,7 @@ export function validatePaths(config: Config) {
   }
 
   if (config.writeLog) {
-    if (typeof config.buildLogFilePath !== 'string') {
-      config.buildLogFilePath = DEFAULT_BUILD_LOG_FILE_NAME;
-    }
+    setStringConfig(config, 'buildLogFilePath', DEFAULT_BUILD_LOG_FILE_NAME);
     if (!path.isAbsolute(config.buildLogFilePath)) {
       config.buildLogFilePath = normalizePath(path.join(config.rootDir, config.buildLogFilePath));
     }
@@ -124,9 +106,7 @@ export function validatePaths(config: Config) {
   }
 
   if (config.writeStats) {
-    if (typeof config.buildStatsFilePath !== 'string') {
-      config.buildStatsFilePath = DEFAULT_STATS_JSON_FILE_NAME;
-    }
+    setStringConfig(config, 'buildStatsFilePath', DEFAULT_STATS_JSON_FILE_NAME);
     if (!path.isAbsolute(config.buildStatsFilePath)) {
       config.buildStatsFilePath = normalizePath(path.join(config.rootDir, config.buildStatsFilePath));
     }

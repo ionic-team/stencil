@@ -1,4 +1,5 @@
 import { Config } from '../../declarations';
+import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateCopy } from './validate-copy';
 import { validateDependentCollection } from './validate-collection';
 import { validateNamespace } from './validate-namespace';
@@ -31,17 +32,9 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
     config.logLevel = config.logger.level;
   }
 
-  if (typeof config.writeStats !== 'boolean') {
-    config.writeStats = false;
-  }
-
-  if (typeof config.writeLog !== 'boolean') {
-    config.writeLog = false;
-  }
-
-  if (typeof config.buildAppCore !== 'boolean') {
-    config.buildAppCore = true;
-  }
+  setBooleanConfig(config, 'writeLog', false);
+  setBooleanConfig(config, 'writeStats', false);
+  setBooleanConfig(config, 'buildAppCore', true);
 
   // get a good namespace
   validateNamespace(config);
@@ -55,51 +48,29 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   // default watch false
   config.watch = !!config.watch;
 
-  if (typeof config.minifyCss !== 'boolean') {
-    // if no config, minify css when it's the prod build
-    config.minifyCss = (!config.devMode);
-  }
+  setBooleanConfig(config, 'minifyCss', !config.devMode);
+  setBooleanConfig(config, 'minifyJs', !config.devMode);
 
-  if (typeof config.minifyJs !== 'boolean') {
-    // if no config, minify js when it's the prod build
-    config.minifyJs = (!config.devMode);
-  }
   config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}`);
 
-  if (typeof config.hashFileNames !== 'boolean' && typeof (config as any).hashFilenames === 'boolean') {
-    config.hashFileNames = (config as any).hashFilenames;
-    config.logger.warn(`"hashFilenames" was used in the config, did you mean "hashFileNames"? (Has a capital N)`);
-  }
+  setBooleanConfig(config, 'buildEs5', !config.devMode);
 
-  if (typeof config.hashFileNames !== 'boolean') {
-    // hashFileNames config was not provided, so let's create the default
+  setBooleanConfig(config, 'hashFileNames', !(config.devMode || config.watch));
+  setNumberConfig(config, 'hashedFileNameLength', DEFAULT_HASHED_FILENAME_LENTH);
 
-    if (config.devMode || config.watch) {
-      // dev mode should not hash filenames
-      // during watch rebuilds it should not hash filenames
-      config.hashFileNames = false;
-
-    } else {
-      // prod builds should hash filenames
-      config.hashFileNames = true;
-    }
-  }
-
-  if (typeof config.hashedFileNameLength !== 'number') {
-    config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
-  }
   if (config.hashFileNames) {
-    if (config.hashedFileNameLength < 4) {
-      throw new Error(`config.hashedFileNameLength must be at least 4 characters`);
+    if (config.hashedFileNameLength < MIN_HASHED_FILENAME_LENTH) {
+      throw new Error(`config.hashedFileNameLength must be at least ${MIN_HASHED_FILENAME_LENTH} characters`);
+    }
+    if (config.hashedFileNameLength > MAX_HASHED_FILENAME_LENTH) {
+      throw new Error(`config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`);
     }
   }
   config.logger.debug(`hashFileNames: ${config.hashFileNames}, hashedFileNameLength: ${config.hashedFileNameLength}`);
 
   config.generateDistribution = !!config.generateDistribution;
 
-  if (typeof config.generateWWW !== 'boolean') {
-    config.generateWWW = true;
-  }
+  setBooleanConfig(config, 'generateWWW', true);
 
   validateCopy(config);
 
@@ -107,36 +78,11 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;
   }
 
-  if (typeof config.hydratedCssClass !== 'string') {
-    config.hydratedCssClass = DEFAULT_HYDRATED_CSS_CLASS;
-  }
-
-  if (typeof config.buildEs5 !== 'boolean') {
-    if (config.devMode) {
-      // default dev mode only builds es2015
-      config.buildEs5 = false;
-
-    } else {
-      // default prod mode builds both es2015 and es5
-      config.buildEs5 = true;
-    }
-  }
-
-  if (typeof config.emptyDist !== 'boolean') {
-    config.emptyDist = true;
-  }
-
-  if (typeof config.emptyWWW !== 'boolean') {
-    config.emptyWWW = true;
-  }
-
-  if (typeof config.generateDocs !== 'boolean') {
-    config.generateDocs = false;
-  }
-
-  if (typeof config.enableCache !== 'boolean') {
-    config.enableCache = false;
-  }
+  setStringConfig(config, 'hydratedCssClass', DEFAULT_HYDRATED_CSS_CLASS);
+  setBooleanConfig(config, 'emptyDist', true);
+  setBooleanConfig(config, 'emptyWWW', true);
+  setBooleanConfig(config, 'generateDocs', false);
+  setBooleanConfig(config, 'enableCache', false);
 
   if (!Array.isArray(config.includeSrc)) {
     config.includeSrc = DEFAULT_INCLUDES.map(include => {
@@ -148,12 +94,11 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
     config.excludeSrc = DEFAULT_EXCLUDES.slice();
   }
 
-  config.collections = Array.isArray(config.collections) ? config.collections : [];
+  setArrayConfig(config, 'collections');
   config.collections = config.collections.map(validateDependentCollection);
 
-  config.plugins = Array.isArray(config.plugins) ? config.plugins : [];
-
-  config.bundles = Array.isArray(config.bundles) ? config.bundles : [];
+  setArrayConfig(config, 'plugins');
+  setArrayConfig(config, 'bundles');
 
   // set to true so it doesn't bother going through all this again on rebuilds
   config._isValidated = true;
@@ -174,6 +119,8 @@ export function setProcessEnvironment(config: Config) {
 
 
 const DEFAULT_HASHED_FILENAME_LENTH = 8;
+const MIN_HASHED_FILENAME_LENTH = 4;
+const MAX_HASHED_FILENAME_LENTH = 32;
 const DEFAULT_INCLUDES = ['**/*.ts', '**/*.tsx'];
 const DEFAULT_EXCLUDES = ['**/test/**', '**/*.spec.*'];
 const DEFAULT_WATCH_IGNORED_REGEX = /(\.(jpg|jpeg|png|gif|woff|woff2|ttf|eot)|(?:^|[\\\/])(\.(?!\.)[^\\\/]+)$)$/i;

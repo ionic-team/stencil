@@ -1,12 +1,10 @@
-import { Config } from '../../declarations/config';
+import { Config } from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
+import { setStringConfig } from './config-utils';
 
 
 export function validateNamespace(config: Config) {
-  if (typeof config.namespace !== 'string') {
-    config.namespace = DEFAULT_NAMESPACE;
-  }
-
+  setStringConfig(config, 'namespace', DEFAULT_NAMESPACE);
   config.namespace = config.namespace.trim();
 
   const invalidNamespaceChars = config.namespace.replace(/(\w)|(\-)|(\$)/g, '');
@@ -28,9 +26,8 @@ export function validateNamespace(config: Config) {
 
   // the file system namespace is the one
   // used in filenames and seen in the url
-  if (typeof config.fsNamespace !== 'string') {
-    config.fsNamespace = config.namespace.toLowerCase();
-  }
+  setStringConfig(config, 'fsNamespace', config.namespace.toLowerCase());
+
 
   if (config.namespace.includes('-')) {
     // convert to PascalCase
