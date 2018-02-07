@@ -1,4 +1,5 @@
 import { ComponentMeta, ModuleFiles } from '../../../declarations';
+import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
@@ -29,6 +30,16 @@ export function componentDependencies(allModuleFiles: ModuleFiles): ts.Transform
 
       if (moduleFile && moduleFile.cmpMeta) {
         moduleFile.cmpMeta.dependencies = moduleFile.cmpMeta.dependencies || [];
+
+        if (moduleFile.cmpMeta.membersMeta) {
+          Object.keys(moduleFile.cmpMeta.membersMeta).forEach(memberName => {
+            const memberMeta = moduleFile.cmpMeta.membersMeta[memberName];
+            if (memberMeta.memberType === MEMBER_TYPE.PropConnect) {
+              moduleFile.cmpMeta.dependencies.push(memberMeta.ctrlId);
+            }
+          });
+        }
+
         return visit(tsSourceFile, moduleFile.cmpMeta) as ts.SourceFile;
       }
       return tsSourceFile;
