@@ -91,6 +91,13 @@ describe('cli', () => {
       expect(config.logLevel).toBe('error');
     });
 
+    it('should set no-cache', () => {
+      const argv: CliArgv = { noCache: true };
+      overrideConfigFromArgv(config, argv);
+      validateBuildConfig(config);
+      expect(config.enableCache).toBe(false);
+    });
+
     it('should disable prerender by default', () => {
       config.prerender = true;
       const argv: CliArgv = {};

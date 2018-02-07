@@ -18,6 +18,10 @@ export function overrideConfigFromArgv(config: Config, argv: CliArgv) {
     config.writeLog = true;
   }
 
+  if (argv.noCache) {
+    config.enableCache = false;
+  }
+
   if (argv.watch) {
     config.watch = true;
   }
@@ -105,6 +109,7 @@ const ARG_OPTS: any = {
     'es5',
     'help',
     'log',
+    'no-cache',
     'prod',
     'prerender',
     'service-worker',
@@ -134,6 +139,7 @@ export interface CliArgv {
   help?: boolean;
   log?: boolean;
   logLevel?: string;
+  noCache?: boolean;
   prerender?: boolean;
   prod?: boolean;
   serviceWorker?: boolean;
