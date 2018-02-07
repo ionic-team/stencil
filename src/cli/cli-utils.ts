@@ -94,8 +94,9 @@ export function parseArgv(process: NodeJS.Process) {
   const cmdArgs = getCmdArgs(process);
   const argv: CliArgv = minimist(cmdArgs, ARG_OPTS) as any;
 
-  argv.serviceWorker = (argv as any)['service-worker'];
   argv.logLevel = (argv as any)['log-level'];
+  argv.serviceWorker = (argv as any)['service-worker'];
+  argv.noCache = cmdArgs.includes('--no-cache');
 
   return argv as CliArgv;
 }

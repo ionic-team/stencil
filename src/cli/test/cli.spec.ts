@@ -202,6 +202,10 @@ describe('cli', () => {
       argv = parseArgv(process);
       expect(argv.watch).toBe(true);
 
+      process.argv[2] = '--no-cache';
+      argv = parseArgv(process);
+      expect(argv.noCache).toBe(true);
+
       process.argv[2] = '--debug';
       argv = parseArgv(process);
       expect(argv.debug).toBe(true);
