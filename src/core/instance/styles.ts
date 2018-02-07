@@ -95,7 +95,7 @@ export function attachStyles(domApi: DomApi, cmpMeta: ComponentMeta, modeName: s
         styleElm = domApi.$createElement('style');
         styleElm.innerHTML = styleTemplate;
 
-        if (Build.cssVarShim && customStyle) {
+        if (Build.cssVarShim && customStyle && !customStyle.supportsCssVars) {
           customStyle.addStyle(styleElm);
         }
 
