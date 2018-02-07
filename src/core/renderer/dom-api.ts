@@ -36,8 +36,9 @@ export function createDomApi(win: any, doc: Document): DomApi {
     $insertBefore: (parentNode: Node, childNode: Node, referenceNode: Node) =>
       parentNode.insertBefore(childNode, referenceNode),
 
-    $removeChild: (parentNode: Node, childNode: Node) =>
-      parentNode.removeChild(childNode),
+    // https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
+    // and it's polyfilled in es5 builds
+    $remove: (node: Node) => (node as any).remove(),
 
     $appendChild: (parentNode: Node, childNode: Node) =>
       parentNode.appendChild(childNode),

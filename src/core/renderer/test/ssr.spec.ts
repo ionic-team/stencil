@@ -1,13 +1,23 @@
 import { createRendererPatch } from '../patch';
 import { createVNodesFromSsr } from '../ssr';
-import { DomApi, HostContentNodes, RendererApi, VNode } from '../../../util/interfaces';
-import { ENCAPSULATION, SSR_VNODE_ID, SSR_CHILD_ID } from '../../../util/constants';
+import { DomApi, HostContentNodes, RendererApi, VNode } from '../../../declarations';
+import { ENCAPSULATION, SSR_CHILD_ID, SSR_VNODE_ID } from '../../../util/constants';
 import { h } from '../h';
-import { mockPlatform, mockDomApi, removeWhitespaceFromNodes } from '../../../testing/mocks';
+import { mockDomApi, mockPlatform, removeWhitespaceFromNodes } from '../../../testing/mocks';
 import { VNode as VNodeObj } from '../vnode';
 
 
 describe('ssr', () => {
+
+  const plt = mockPlatform();
+  let domApi: DomApi;
+  let patch: RendererApi;
+
+  beforeEach(() => {
+    domApi = mockDomApi();
+    patch = createRendererPatch(<any>plt, domApi);
+  });
+
 
   describe('ssr vnode', () => {
 
@@ -153,7 +163,7 @@ describe('ssr', () => {
         ]
       };
 
-      ssrVNode = patch(oldVnode, newVnode, false, hostContentNodes, ENCAPSULATION.NoEncapsulation, 1);
+      ssrVNode = patch(oldVnode, newVnode, false, hostContentNodes, 'none', 1);
       elm = removeWhitespaceFromNodes(ssrVNode.elm);
 
       expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
@@ -169,7 +179,7 @@ describe('ssr', () => {
         )
       );
 
-      ssrVNode = patch(oldVnode, newVnode, false, null, ENCAPSULATION.NoEncapsulation, 1);
+      ssrVNode = patch(oldVnode, newVnode, false, null, 'none', 1);
       elm = <any>ssrVNode.elm;
 
       expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
@@ -180,16 +190,6 @@ describe('ssr', () => {
       expect(elm.querySelector('span').innerHTML).toBe('<!--s.1.0-->Text 2<!--/--> ');
     });
 
-  });
-
-
-  var domApi: DomApi;
-  var patch: RendererApi;
-  var plt = mockPlatform();
-
-  beforeEach(() => {
-    domApi = mockDomApi();
-    patch = createRendererPatch(<any>plt, domApi);
   });
 
 });

@@ -63,9 +63,10 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
           for (; i < slotNodes.length; i++) {
             // remove the host content node from it's original parent node
             // then relocate the host content node to its new slotted home
+            domApi.$remove(slotNodes[i]);
             domApi.$appendChild(
               parentElm,
-              domApi.$removeChild(domApi.$parentNode(slotNodes[i]), slotNodes[i])
+              slotNodes[i]
             );
           }
 
@@ -166,10 +167,10 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     }
   }
 
-  function removeVnodes(parentElm: Node, vnodes: VNode[], startIdx: number, endIdx: number) {
+  function removeVnodes(vnodes: VNode[], startIdx: number, endIdx: number) {
     for (; startIdx <= endIdx; ++startIdx) {
       if (isDef(vnodes[startIdx])) {
-        domApi.$removeChild(parentElm, vnodes[startIdx].elm);
+        domApi.$remove(vnodes[startIdx].elm);
       }
     }
   }
@@ -251,7 +252,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         }
 
         if (node) {
-          domApi.$insertBefore(parentElm, node, oldStartVnode.elm);
+          domApi.$insertBefore((oldStartVnode.elm && oldStartVnode.elm.parentNode) || parentElm, node, oldStartVnode.elm);
         }
       }
     }
@@ -262,7 +263,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
                 newCh, newStartIdx, newEndIdx);
 
     } else if (newStartIdx > newEndIdx) {
-      removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
+      removeVnodes(oldCh, oldStartIdx, oldEndIdx);
     }
   }
 
@@ -324,7 +325,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
       } else if (isDef(oldChildren)) {
         // no new child vnodes, but there are old child vnodes to remove
-        removeVnodes(elm, oldChildren, 0, oldChildren.length - 1);
+        removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
     } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {

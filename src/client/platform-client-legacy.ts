@@ -302,7 +302,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     function onScriptComplete() {
       clearTimeout(tmrId);
       scriptElm.onerror = scriptElm.onload = null;
-      domApi.$removeChild(domApi.$parentNode(scriptElm), scriptElm);
+      domApi.$remove(scriptElm);
 
       // remove from our list of active requests
       pendingBundleRequests[url] = false;

@@ -11,7 +11,7 @@ export interface DomApi {
   $createTextNode(text: string): Text;
   $createComment(data: string): Comment;
   $insertBefore(parentNode: Node, childNode: Node, referenceNode: Node): void;
-  $removeChild(parentNode: Node, childNode: Node): Node;
+  $remove(node: Node): Node;
   $appendChild(parentNode: Node, childNode: Node): void;
   $childNodes(node: Node): NodeList;
   $parentNode(node: Node): Node;
