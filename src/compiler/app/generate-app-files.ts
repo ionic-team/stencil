@@ -46,9 +46,8 @@ export async function generateAppFiles(config: Config, compilerCtx: CompilerCtx,
       const coreFilenameEs5 = await generateCore(config, compilerCtx, buildCtx, globalJsContentsEs5, buildConditionalsEs5);
       appRegistry.corePolyfilled = coreFilenameEs5;
 
-    } else if (config.generateWWW) {
+    } else {
       // not doing an es5, probably in dev mode
-      // and don't bother if we're not generating a www build
       appRegistry.corePolyfilled = await generateEs5DisabledMessage(config, compilerCtx);
     }
 
