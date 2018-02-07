@@ -52,7 +52,7 @@ export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydrated
   // all is good, this component has been told it's time to finish loading
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
-  if (elm._instance && !elm._hasDestroyed && (!elm.$activeLoading || !elm.$activeLoading.length)) {
+  if (!elm._hasLoaded && elm._instance && !elm._hasDestroyed && (!elm.$activeLoading || !elm.$activeLoading.length)) {
 
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
