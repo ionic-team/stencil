@@ -19,9 +19,9 @@ describe('validation', () => {
       expect(config.enableCache).toBe(false);
     });
 
-    it('default enableCache false', () => {
+    it('default enableCache true', () => {
       validateBuildConfig(config);
-      expect(config.enableCache).toBe(false);
+      expect(config.enableCache).toBe(true);
     });
 
   });

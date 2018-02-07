@@ -82,7 +82,7 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'emptyDist', true);
   setBooleanConfig(config, 'emptyWWW', true);
   setBooleanConfig(config, 'generateDocs', false);
-  setBooleanConfig(config, 'enableCache', false);
+  setBooleanConfig(config, 'enableCache', true);
 
   if (!Array.isArray(config.includeSrc)) {
     config.includeSrc = DEFAULT_INCLUDES.map(include => {
