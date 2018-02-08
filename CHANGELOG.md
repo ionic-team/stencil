@@ -1,5 +1,47 @@
+<a name="0.4.0-0"></a>
+# [0.4.0-0](https://github.com/ionic-team/stencil/compare/v0.3.0...v0.4.0) (2018-02-08)
+
+
+### Breaking Changes
+
+1. `www` directory is always emptied of all files and directories when a build starts. The `www` directory is now only a distribution directory, and should not be used to for production static source files. If an app has static source files that need to be copied to the `www` directory, please use the `src/assets` directory instead. Files within `src/assets` will automatically get copied to `www/assets` during the build.
+2. `config.bundles` is no longer required. However, if the `config.bundles` is left within `stencil.config.js`, and that config didn't correctly have all the app's required components, then some components won't render. It's best to just remove `config.bundles` entirely since `0.4.0`.
+3. App's root `tsconfig.json` file is used directly by stencil for further configuration during build. [See PR 451](https://github.com/ionic-team/stencil/pull/451). There may be settings within an app's existing tsconfig that didn't error out previous, but now would. But this is a good thing.
+
+
+### Features
+
+* **build:** default enableCache to true ([c75ac33](https://github.com/ionic-team/stencil/commit/c75ac33))
+* **components:** componentOnReady() ([#479](https://github.com/ionic-team/stencil/issues/479)) ([f5a32ba](https://github.com/ionic-team/stencil/commit/f5a32ba))
+* **config:** optionally set config values from functions, and test correct case ([d6e754a](https://github.com/ionic-team/stencil/commit/d6e754a))
+* **config:** read user tsconfig for path resolution ([16d9008](https://github.com/ionic-team/stencil/commit/16d9008))
+* **graph:** auto-gen bundles through component dependency graph ([78f0f59](https://github.com/ionic-team/stencil/commit/78f0f59))
+* **polyfill:** add Element.remove() polyfill to es5 builds ([833a8da](https://github.com/ionic-team/stencil/commit/833a8da))
+* **stats:** write build log and build stats options ([5f7e0b8](https://github.com/ionic-team/stencil/commit/5f7e0b8))
+
+
+### Bug Fixes
+
+* **build:** avoid using Object.entries (breaks Node 6) ([8283df7](https://github.com/ionic-team/stencil/commit/8283df7)), closes [#463](https://github.com/ionic-team/stencil/issues/463)
+* **build:** fix es5 dev mode build message ([5ec6884](https://github.com/ionic-team/stencil/commit/5ec6884)), closes [#492](https://github.com/ionic-team/stencil/issues/492)
+* **context:** apply falsy context values ([f3ba32f](https://github.com/ionic-team/stencil/commit/f3ba32f)), closes [#483](https://github.com/ionic-team/stencil/issues/483)
+* **copy:** wait for processCopyTaskDestDir execution ([900bbb8](https://github.com/ionic-team/stencil/commit/900bbb8))
+* **cssvars:** ensure css var polyfill used only when no support ([863f3fc](https://github.com/ionic-team/stencil/commit/863f3fc))
+* **ie:** add startsWith polyfill ([e60085c](https://github.com/ionic-team/stencil/commit/e60085c)), closes [#481](https://github.com/ionic-team/stencil/issues/481)
+* **shadowdom:** ensure "encapsulation" is not property renamed in prod builds ([a93704a](https://github.com/ionic-team/stencil/commit/a93704a)), closes [#419](https://github.com/ionic-team/stencil/issues/419)
+* **slot:** insertBefore reference to old elm parentNode, also use remove() ([e380517](https://github.com/ionic-team/stencil/commit/e380517)), closes [#395](https://github.com/ionic-team/stencil/issues/395)
+* **styles:** two different modes for the same component on the same page ([1d7c2f7](https://github.com/ionic-team/stencil/commit/1d7c2f7)), closes [#480](https://github.com/ionic-team/stencil/issues/480)
+* **svg:** fix rendering entire svg ([1d73aa6](https://github.com/ionic-team/stencil/commit/1d73aa6)), closes [#448](https://github.com/ionic-team/stencil/issues/448)
+* **svg:** isSvgMode must be reset when an svg node is patched ([50a088d](https://github.com/ionic-team/stencil/commit/50a088d)), closes [#503](https://github.com/ionic-team/stencil/issues/503)
+* **transpile:** ensure initial transpile stays at es2015 target ([4545e9d](https://github.com/ionic-team/stencil/commit/4545e9d))
+* **transpile:** validate tsconfig after merging user tsconfig ([dc2b087](https://github.com/ionic-team/stencil/commit/dc2b087))
+* **types:** only add component type globals when there are components ([06cc217](https://github.com/ionic-team/stencil/commit/06cc217))
+* **watcher:** limit rebuilds within a short period of time ([3683d85](https://github.com/ionic-team/stencil/commit/3683d85))
+* **watcher:** recopy asset changes and index.html changes ([ec1f16e](https://github.com/ionic-team/stencil/commit/ec1f16e))
+
+
 <a name="0.3.0"></a>
-# [0.3.0](https://github.com/ionic-team/stencil/compare/v0.3.0-5...v0.3.0) (2018-02-05)
+# [0.3.0](https://github.com/ionic-team/stencil/compare/v0.2.3...v0.3.0) (2018-02-05)
 
 
 ### Bug Fixes
