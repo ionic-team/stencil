@@ -336,7 +336,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       domApi.$setTextContent(elm, newVNode.vtext);
     }
     // reset svgMode when svg node is fully patched
-    // if ('svg' === newVNode.vtag && isSvgMode) isSvgMode = false;
+    if ('svg' === newVNode.vtag && isSvgMode) isSvgMode = false;
     }
 
   // internal variables to be reused per patch() call
