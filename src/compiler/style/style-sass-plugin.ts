@@ -34,14 +34,6 @@ export class StyleSassPlugin implements d.Plugin {
       return results;
     }
 
-    const cacheKey = context.cache.createKey(this.name, renderOpts);
-    const cachedContent = await context.cache.get(cacheKey);
-
-    if (cachedContent != null) {
-      results.code = cachedContent;
-      return results;
-    }
-
     results.code = await new Promise<string>(resolve => {
 
       nodeSass.render(renderOpts, async (err: any, sassResult: any) => {
@@ -60,8 +52,6 @@ export class StyleSassPlugin implements d.Plugin {
         }
       });
     });
-
-    await context.cache.put(cacheKey, results.code);
 
     return results;
   }
