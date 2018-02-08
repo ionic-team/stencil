@@ -40,7 +40,7 @@ function getDisabledMessageScript() {
   }
   </style>
 
-  <h1>This app is disabled for this browser.</h1>
+  <h1>This Stencil app is disabled for this browser.</h1>
 
   <h2>Developers:</h2>
   <ul>
