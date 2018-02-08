@@ -55,4 +55,24 @@ describe('renderer', () => {
       expect(elm.lastChild.constructor.name).toEqual('HTMLDivElement');
     });
   });
+
+  describe('created trailing svg element', () => {
+    
+    it('should not affect subsequent created element', function() {
+      
+      const divWithSVGChild = patch(vnode0,  h('div', null,
+        h('div', null,
+          h('svg', null)
+        )
+      ));
+      const oneMoreChildAdded = patch(divWithSVGChild, h('div', null, [
+          h('div', null,
+            h('svg', null)
+          ),
+          h('div', null)
+        ]
+      ));
+      expect(oneMoreChildAdded.vchildren[1].elm.constructor.name).toEqual('HTMLDivElement');
+    });
+  })
 });
