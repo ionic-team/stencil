@@ -36,17 +36,17 @@
     "test.watch": "jest --watch"
   },
   "dependencies": {
-    "chokidar": "2.0.0",
+    "chokidar": "2.0.1",
     "jsdom": "11.5.1",
     "node-sass": "4.7.2",
-    "rollup": "^0.55.3",
+    "rollup": "0.55.3",
     "rollup-plugin-commonjs": "8.3.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-globals": "^1.1.0",
+    "rollup-plugin-node-builtins": "2.1.2",
+    "rollup-plugin-node-globals": "1.1.0",
     "rollup-plugin-node-resolve": "3.0.2",
     "typescript": "^2.7.1",
-    "uglify-es": "3.3.8",
-    "workbox-build": "3.0.0-alpha.3"
+    "uglify-es": "3.3.10",
+    "workbox-build": "3.0.0-alpha.6"
   },
   "devDependencies": {
     "@types/acorn": "^4.0.3",
@@ -70,7 +70,7 @@
     "listr": "^0.13.0",
     "magic-string": "^0.22.4",
     "minimatch": "^3.0.4",
-    "node-fetch": "^1.7.3",
+    "node-fetch": "1.7.3",
     "semver": "^5.5.0",
     "source-map": "^0.7.0",
     "ts-jest": "^22.0.1",
