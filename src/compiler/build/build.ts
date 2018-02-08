@@ -72,7 +72,7 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     if (!compilerCtx.hasSuccessfulBuild) {
       // only do the initial copy on the first build
       // watcher handles any re-copies
-      await copyTasks(config, compilerCtx, buildCtx.diagnostics);
+      await copyTasks(config, compilerCtx, buildCtx.diagnostics, false);
       if (buildCtx.shouldAbort()) return buildCtx.finish();
     }
 

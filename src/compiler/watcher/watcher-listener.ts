@@ -247,9 +247,9 @@ export class WatcherListener {
   queueCopyTasks() {
     clearTimeout(this.copyTaskTmr);
 
-    this.copyTaskTmr = setTimeout(() => {
-      copyTasks(this.config, this.compilerCtx, []);
-    }, 80);
+    this.copyTaskTmr = setTimeout(async () => {
+      await copyTasks(this.config, this.compilerCtx, [], true);
+    }, 100);
   }
 
   resetWatcher() {

@@ -14,17 +14,20 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
     return;
   }
 
-  if (compilerCtx.hasSuccessfulBuild) {
-    // we've already had a successful build, we're good
-    return;
-  }
-
   // check if there's even a src index.html file
   const hasSrcIndexHtml = await compilerCtx.fs.access(config.srcIndexHtml);
   if (!hasSrcIndexHtml) {
     // there is no src index.html file in the config, which is fine
     // since there is no src index file at all, don't bother
     // this isn't actually an error, don't worry about it
+    return;
+  }
+
+  if (compilerCtx.hasSuccessfulBuild) {
+    // we've already had a successful build, we're good
+    // always recopy index.html (it's all cached if it didn't actually change, all good)
+    const srcIndexHtmlContent = await compilerCtx.fs.readFile(config.srcIndexHtml);
+    await compilerCtx.fs.writeFile(config.wwwIndexHtml, srcIndexHtmlContent);
     return;
   }
 

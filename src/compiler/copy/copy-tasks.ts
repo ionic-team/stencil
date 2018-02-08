@@ -2,7 +2,7 @@ import { CompilerCtx, Config, CopyTask, Diagnostic } from '../../declarations';
 import { catchError, normalizePath } from '../util';
 
 
-export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagnostics: Diagnostic[]) {
+export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagnostics: Diagnostic[], commit: boolean) {
   if (!config.copy) {
     config.logger.debug(`copy tasks disabled`);
     return;
@@ -12,7 +12,7 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagno
     return;
   }
 
-  const timeSpan = config.logger.createTimeSpan(`copyTasks started`, true);
+  const timeSpan = config.logger.createTimeSpan(`copy task started`, true);
 
   try {
     const allCopyTasks: CopyTask[] = [];
@@ -27,11 +27,16 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagno
       await compilerCtx.fs.copy(copyTask.src, copyTask.dest, { filter: copyTask.filter });
     }));
 
+    if (commit && allCopyTasks.length > 0) {
+      config.logger.debug(`copy task commit, tasks: ${allCopyTasks.length}`);
+      await compilerCtx.fs.commit();
+    }
+
   } catch (e) {
     catchError(diagnostics, e);
   }
 
-  timeSpan.finish(`copyTasks finished`);
+  timeSpan.finish(`copy task finished`);
 }
 
 
