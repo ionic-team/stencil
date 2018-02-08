@@ -12,6 +12,7 @@ export class WatcherListener {
   private filesDeleted: string[];
   private filesUpdated: string[];
   private configUpdated = false;
+  private recentChanges: RecentChange[] = [];
 
   private watchTmr: NodeJS.Timer;
   private copyTaskTmr: NodeJS.Timer;
@@ -43,7 +44,7 @@ export class WatcherListener {
         if (!this.filesUpdated.includes(path)) {
           this.filesUpdated.push(path);
         }
-        this.queue();
+        this.queue(path);
 
       } else if (isCopyTaskFile(this.config, path)) {
         this.queueCopyTasks();
@@ -59,7 +60,7 @@ export class WatcherListener {
         if (!this.filesUpdated.includes(path)) {
           this.filesUpdated.push(path);
         }
-        this.queue();
+        this.queue(path);
 
       } else {
         // always clear the cache if it wasn't a web dev file
@@ -91,7 +92,7 @@ export class WatcherListener {
         if (!this.filesAdded.includes(path)) {
           this.filesAdded.push(path);
         }
-        this.queue();
+        this.queue(path);
 
       } else {
         // always clear the cache if it wasn't a web dev file
@@ -122,7 +123,7 @@ export class WatcherListener {
         if (!this.filesDeleted.includes(path)) {
           this.filesDeleted.push(path);
         }
-        this.queue();
+        this.queue(path);
       }
 
     } catch (e) {
@@ -154,7 +155,7 @@ export class WatcherListener {
         });
 
         this.dirsAdded.push(path);
-        this.queue();
+        this.queue(path);
       }
 
     } catch (e) {
@@ -178,7 +179,7 @@ export class WatcherListener {
         if (!this.dirsDeleted.includes(path)) {
           this.dirsDeleted.push(path);
         }
-        this.queue();
+        this.queue(path);
       }
 
     } catch (e) {
@@ -217,13 +218,30 @@ export class WatcherListener {
     return watcher;
   }
 
-  queue() {
+  queue(path: string) {
+    this.recentChanges = this.recentChanges.filter(rc => {
+      // only keep changes that happened in the last XX milliseconds
+      return (Date.now() - 2000) < rc.timestamp;
+    });
+
+    if (this.recentChanges.some(rc => rc.filePath === path)) {
+      // we already kicked off a build for this path
+      // within the last XX milliseconds, let's just ignore the subsequent changes
+      this.config.logger.debug(`skipping recent subsequent file change: ${path}`);
+      return;
+    }
+
     // debounce builds
     clearTimeout(this.watchTmr);
 
+    this.recentChanges.push({
+      filePath: path,
+      timestamp: Date.now()
+    });
+
     this.watchTmr = setTimeout(() => {
       this.startRebuild();
-    }, 40);
+    }, 20);
   }
 
   queueCopyTasks() {
@@ -261,4 +279,10 @@ function isWebDevFileToWatch(filePath: string) {
   // but don't worry about jpg, png, gif, svgs
   // also don't bother rebuilds when the components.d.ts file gets updated
   return isWebDevFile(filePath) || (isDtsFile(filePath) && filePath.indexOf(COMPONENTS_DTS) === -1);
+}
+
+
+interface RecentChange {
+  filePath: string;
+  timestamp: number;
 }
