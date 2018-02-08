@@ -35,27 +35,29 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
   );
 
   const esmModules = jsModules['esm'];
-  Object.keys(esmModules)
+  const esmPromises = Object.keys(esmModules)
     .filter(key => !bundleKeys[key])
     .map(key => { return [key, esmModules[key]] as [string, { code: string}]; })
-    .forEach(async ([key, value]) => {
+    .map(async ([key, value]) => {
       const fileName = getBundleFilename(key.replace('.js', ''), false, 'es2015');
       const jsText = replaceBundleIdPlaceholder(value.code, key);
       await writeJSFile(config, compilerCtx, fileName, jsText);
     });
+  await Promise.all(esmPromises);
 
   if (config.buildEs5) {
     const es5Modules = jsModules['es5'];
-    Object.keys(es5Modules)
+    const es5Promises = Object.keys(es5Modules)
       .filter(key => !bundleKeys[key])
       .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
-      .forEach(async ([key, value]) => {
+      .map(async ([key, value]) => {
         const fileName = getBundleFilename(key.replace('.js', ''), false, 'es5');
         let jsText = replaceBundleIdPlaceholder(value.code, key);
         jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
         await writeJSFile(config, compilerCtx, fileName, jsText);
       });
-    }
+    await Promise.all(es5Promises);
+  }
 
   // create the registry of all the components
   const cmpRegistry = createComponentRegistry(entryModules);

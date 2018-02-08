@@ -24,7 +24,7 @@ export function generateComponentEntries(
 
 
 export function processAppComponentEntryTags(allModules: ModuleFile[], entryPoints: EntryPoint[], appEntryTags: string[]) {
-  // remove any tags already found in user config and root html
+  // remove any tags already found in user config
   appEntryTags = appEntryTags.filter(tag => !entryPoints.some(ep => ep.some(em => em.tag === tag)));
 
   return processAppGraph(allModules, appEntryTags);

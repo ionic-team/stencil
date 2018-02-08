@@ -41,7 +41,36 @@ export function processAppGraph(allModules: ModuleFile[], entryTags: string[]) {
         return ep.some(ec => commonEntryCmps.some(cec => cec.tag === ec.tag));
       });
 
-      if (!existingEntryPoint) {
+      if (existingEntryPoint) {
+        const depsOf = graph.filter(d => d.dependencies.includes(graphEntry.tag));
+        if (depsOf.length > 0) {
+          const existingEntryPointDepOf = entryPoints.find(ep => ep.some(ec => depsOf.some(d => d.dependencies.includes(ec.tag))));
+
+          if (existingEntryPointDepOf) {
+            existingEntryPointDepOf.push({
+              tag: graphEntry.tag,
+              dependencyOf: depsOf.map(d => d.tag)
+            });
+
+          } else {
+            entryPoints.push([
+              {
+                tag: graphEntry.tag,
+                dependencyOf: []
+              }
+            ]);
+          }
+
+        } else {
+          entryPoints.push([
+            {
+              tag: graphEntry.tag,
+              dependencyOf: []
+            }
+          ]);
+        }
+
+      } else {
         entryPoints.push(commonEntryCmps);
       }
 
@@ -112,7 +141,7 @@ function getGraph(allModules: ModuleFile[], entryTags: string[]) {
     }
     m.cmpMeta.dependencies = (m.cmpMeta.dependencies || []);
 
-    const dependencies = m.cmpMeta.dependencies.filter(t => t !== tag);
+    const dependencies = m.cmpMeta.dependencies.filter(t => t !== tag).sort();
 
     graph.push({
       tag: tag,
