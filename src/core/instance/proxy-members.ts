@@ -166,7 +166,7 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
         }
       }
 
-      if (!plt.activeRender) {
+      if (!plt.activeRender && elm.$rendered) {
         // looks like this value actually changed, so we've got work to do!
         // but only if we've already created an instance, otherwise just chill out
         // queue that we need to do an update, but don't worry about queuing

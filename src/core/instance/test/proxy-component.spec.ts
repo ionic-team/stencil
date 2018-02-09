@@ -1,4 +1,4 @@
-import { ComponentConstructor, ComponentInstance, ComponentMeta, PlatformApi } from '../../../declarations';
+import { ComponentConstructor, ComponentInstance, ComponentMeta, HostElement, PlatformApi } from '../../../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { mockDomApi, mockPlatform } from '../../../testing/mocks';
 import { proxyComponentInstance } from '../proxy-component-instance';
@@ -45,9 +45,10 @@ describe('proxy-component', () => {
 
   });
 
-  describe('has changed', () => {
+  describe('has changed, if it has rendered once', () => {
 
     it('instance number changed', () => {
+      elm.$rendered = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.num = 141.622;
@@ -55,6 +56,7 @@ describe('proxy-component', () => {
     });
 
     it('instance string changed', () => {
+      elm.$rendered = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.str = 'kph';
@@ -62,6 +64,7 @@ describe('proxy-component', () => {
     });
 
     it('instance boolean changed', () => {
+      elm.$rendered = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.bool = false;
@@ -70,9 +73,10 @@ describe('proxy-component', () => {
 
   });
 
-  describe('no change', () => {
+  describe('no change, if it has rendered once', () => {
 
     it('instance number unchanged', () => {
+      elm.$rendered = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.num = 88;
@@ -80,6 +84,7 @@ describe('proxy-component', () => {
     });
 
     it('instance string unchanged', () => {
+      elm.$rendered = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.str = 'mph';
@@ -87,6 +92,7 @@ describe('proxy-component', () => {
     });
 
     it('instance boolean unchanged', () => {
+      elm.$rendered = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.bool = true;
@@ -95,10 +101,38 @@ describe('proxy-component', () => {
 
   });
 
+  describe('does not queue another render if it hasnt rendered yet', () => {
+
+    it('instance number changed', () => {
+      elm.$rendered = false;
+      spyOn(plt.queue, 'add');
+      proxyComponentInstance(plt, CmpConstructor, elm, instance);
+      instance.num = 1234;
+      expect(plt.queue.add).not.toHaveBeenCalled();
+    });
+
+    it('instance string changed', () => {
+      elm.$rendered = false;
+      spyOn(plt.queue, 'add');
+      proxyComponentInstance(plt, CmpConstructor, elm, instance);
+      instance.str = 'asdfasdf';
+      expect(plt.queue.add).not.toHaveBeenCalled();
+    });
+
+    it('instance boolean changed', () => {
+      elm.$rendered = false;
+      spyOn(plt.queue, 'add');
+      proxyComponentInstance(plt, CmpConstructor, elm, instance);
+      instance.bool = false;
+      expect(plt.queue.add).not.toHaveBeenCalled();
+    });
+
+  });
+
 
   let plt: PlatformApi;
   const domApi = mockDomApi();
-  let elm: any;
+  let elm: HostElement;
   let instance: ComponentInstance;
   let CmpConstructor: ComponentConstructor;
 
