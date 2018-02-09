@@ -83,7 +83,9 @@ async function loadConfigCollection(config: Config, compilerCtx: CompilerCtx, bu
   // upgrade the components to be compatible with this version if need be
   await upgradeCollection(config, compilerCtx, buildCtx, collectionManifest);
 
-  await copySourceCollectionComponentsToDistribution(config, compilerCtx, collectionManifest.moduleFiles);
+  if (config.generateDistribution) {
+    await copySourceCollectionComponentsToDistribution(config, compilerCtx, collectionManifest.moduleFiles);
+  }
 
   // cache it for later yo
   compilerCtx.collections[configCollection.name] = collectionManifest;
