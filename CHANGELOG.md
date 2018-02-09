@@ -1,3 +1,15 @@
+<a name="0.4.1"></a>
+## [0.4.1](https://github.com/ionic-team/stencil/compare/v0.4.0...v0.4.1) (2018-02-09)
+
+
+### Bug Fixes
+
+* **distribution:** only copy distribution assets for generateDistribution ([09c6ea4](https://github.com/ionic-team/stencil/commit/09c6ea4))
+* **init:** componentDidLoad called twice ([a49f1a6](https://github.com/ionic-team/stencil/commit/a49f1a6)), closes [#498](https://github.com/ionic-team/stencil/issues/498)
+* **render:** State updates in componentWillLoad should not cause render ([9f7061d](https://github.com/ionic-team/stencil/commit/9f7061d)), closes [#449](https://github.com/ionic-team/stencil/issues/449)
+
+
+
 <a name="0.4.0-0"></a>
 # [0.4.0-0](https://github.com/ionic-team/stencil/compare/v0.3.0...v0.4.0) (2018-02-08)
 
