@@ -1,10 +1,30 @@
-import { mockPlatform, mockDomApi } from '../../../testing/mocks';
-import { ComponentInstance, ComponentMeta, HostElement, PlatformApi } from '../../../util/interfaces';
+import { ComponentInstance, ComponentMeta, HostElement, PlatformApi } from '../../../declarations';
 import { initHostElement } from '../init-host-element';
 import { initComponentLoaded } from '../init-component-instance';
+import { mockDomApi, mockPlatform } from '../../../testing/mocks';
 
 
 describe('instance init', () => {
+
+  const plt: PlatformApi = <any>mockPlatform();
+  const domApi = mockDomApi();
+  let elm: HostElement;
+  let instance: ComponentInstance;
+  let cmpMeta: ComponentMeta;
+
+  class TestInstance {
+    state = 'value';
+    componentDidLoad() {/**/}
+  }
+
+  beforeEach(() => {
+    cmpMeta = {};
+    elm = domApi.$createElement('ion-cmp') as any;
+    instance = new TestInstance();
+    elm._instance = instance;
+    instance.__el = elm;
+  });
+
 
   describe('initLoad', () => {
 
@@ -14,11 +34,11 @@ describe('instance init', () => {
       let called1 = false;
       let called2 = false;
 
-      let p1 = elm.componentOnReady().then(() => {
+      const p1 = elm.componentOnReady().then(() => {
         called1 = true;
       });
 
-      let p2 = elm.componentOnReady().then(() => {
+      const p2 = elm.componentOnReady().then(() => {
         called2 = true;
       });
 
@@ -48,24 +68,18 @@ describe('instance init', () => {
       expect(called2).toBe(true);
     });
 
-  });
+    it('should not call componentDidLoad() more than once', () => {
+      initHostElement(plt, cmpMeta, elm);
 
-  const plt: PlatformApi = <any>mockPlatform();
-  const domApi = mockDomApi();
-  let elm: HostElement;
-  let instance: ComponentInstance;
-  let cmpMeta: ComponentMeta;
+      const spy = spyOn(instance, 'componentDidLoad');
 
-  class TestInstance {
-    state = 'value';
-  }
+      initComponentLoaded(plt, elm);
+      expect(spy).toHaveBeenCalledTimes(1);
 
-  beforeEach(() => {
-    cmpMeta = {};
-    elm = domApi.$createElement('ion-cmp') as any;
-    instance = new TestInstance();
-    elm._instance = instance;
-    instance.__el = elm;
+      initComponentLoaded(plt, elm);
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
   });
 
 });
