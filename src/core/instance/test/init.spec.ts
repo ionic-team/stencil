@@ -14,11 +14,11 @@ describe('instance init', () => {
       let called1 = false;
       let called2 = false;
 
-      let p1 = elm.componentOnReady().then(() => {
+      const p1 = elm.componentOnReady().then(() => {
         called1 = true;
       });
 
-      let p2 = elm.componentOnReady().then(() => {
+      const p2 = elm.componentOnReady().then(() => {
         called2 = true;
       });
 
@@ -49,6 +49,47 @@ describe('instance init', () => {
     });
 
   });
+
+  it('should call onReady before initHostElement', () => {
+    let called1 = false;
+    let called2 = false;
+
+    elm.onReady = () => {
+      called1 = true;
+    };
+
+    initHostElement(plt, cmpMeta, elm);
+
+    elm.componentOnReady(() => {
+      called2 = true;
+    });
+
+    initComponentLoaded(plt, elm);
+    expect(called1).toBe(true);
+    expect(called2).toBe(true);
+  });
+
+
+  it('should call onReady after initHostElement', () => {
+    let called1 = false;
+    let called2 = false;
+
+    initHostElement(plt, cmpMeta, elm);
+
+    elm.onReady = () => {
+      called2 = true;
+    };
+
+    elm.componentOnReady(() => {
+      called1 = true;
+    });
+
+    initComponentLoaded(plt, elm);
+    expect(called1).toBe(true);
+    expect(called2).toBe(true);
+  });
+
+});
 
   const plt: PlatformApi = <any>mockPlatform();
   const domApi = mockDomApi();

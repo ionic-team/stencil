@@ -272,6 +272,7 @@ const RESERVED_PROPERTIES: string[] = [
   '$onRender',
   '$',
   'componentOnReady',
+  'onReady',
 
 
   /**
