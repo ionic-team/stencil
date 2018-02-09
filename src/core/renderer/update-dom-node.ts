@@ -75,7 +75,7 @@ export function setAccessor(plt: PlatformApi, elm: any, memberName: string, oldV
     // adding an standard event listener, like <button onClick=...> or something
     memberName = toLowerCase(memberName.substring(2));
     if (newValue) {
-      if (!oldValue) {
+      if (newValue !== oldValue) {
         // add listener
         plt.domApi.$addEventListener(elm, memberName, newValue);
       }

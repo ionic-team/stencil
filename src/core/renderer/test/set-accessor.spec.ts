@@ -1,18 +1,64 @@
-import { ComponentMeta, PlatformApi } from '../../../util/interfaces';
+import { ComponentMeta, PlatformApi } from '../../../declarations';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
-import { setAccessor } from '../update-dom-node';
 import { PROP_TYPE } from '../../../util/constants';
+import { setAccessor } from '../update-dom-node';
 
 
 describe('setAccessor', () => {
+
   const plt: any = mockPlatform();
+
+  describe('event listener', () => {
+
+    it('should remove event listener when has old value, but no new', () => {
+      const addEventSpy = spyOn(elm, 'addEventListener');
+      const removeEventSpy = spyOn(elm, 'removeEventListener');
+
+      const orgValue = () => {/**/};
+      setAccessor(plt, elm, 'onClick', undefined, orgValue, false);
+
+      const newValue = undefined;
+      setAccessor(plt, elm, 'onClick', orgValue, undefined, false);
+
+      expect(addEventSpy).toHaveBeenCalledTimes(1);
+      expect(removeEventSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should remove then add event listener w/ different value', () => {
+      const addEventSpy = spyOn(elm, 'addEventListener');
+      const removeEventSpy = spyOn(elm, 'removeEventListener');
+
+      const orgValue = () => {/**/};
+      setAccessor(plt, elm, 'onClick', undefined, orgValue, false);
+
+      const newValue = () => {/**/};
+      setAccessor(plt, elm, 'onClick', orgValue, undefined, false);
+
+      expect(addEventSpy).toHaveBeenCalledTimes(1);
+      expect(removeEventSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('should add event listener when no old value', () => {
+      const addEventSpy = spyOn(elm, 'addEventListener');
+      const removeEventSpy = spyOn(elm, 'removeEventListener');
+
+      const oldValue = undefined;
+      const newValue = () => {/**/};
+
+      setAccessor(plt, elm, 'onClick', oldValue, newValue, false);
+
+      expect(addEventSpy).toHaveBeenCalled();
+      expect(removeEventSpy).not.toHaveBeenCalled();
+    });
+
+  });
 
   it('should set undefined property to child with existing property', () => {
     const oldValue: any = 'someval';
     const newValue: any = undefined;
 
     Object.defineProperty(elm, 'myprop', {
-      set: () => {},
+      set: () => {/**/},
       get: () => 'getterValue'
     });
 
@@ -44,7 +90,7 @@ describe('setAccessor', () => {
 
   it('should not set ref as a property', () => {
     const oldValue: any = 'someval';
-    const newValue: any = function meFun() {};
+    const newValue: any = function meFun() {/**/};
 
     setAccessor(plt, elm, 'ref', oldValue, newValue, false);
     expect(elm.ref).toBeUndefined();
@@ -53,7 +99,7 @@ describe('setAccessor', () => {
 
   it('should set function property to child', () => {
     const oldValue: any = 'someval';
-    const newValue: any = function meFun() {};
+    const newValue: any = function meFun() {/**/};
 
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false);
     expect(elm.myprop).toBe(newValue);
@@ -88,7 +134,7 @@ describe('setAccessor', () => {
         }
       }
     };
-    var plt: any = {
+    const plt: any = {
       getComponentMeta: function() {
         return childCmpMeta;
       }
@@ -177,7 +223,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should not add attribute when prop is undefined or null', () => {
       function testStraightForwardAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm.hasAttribute(propName)).toBe(false);
@@ -219,7 +265,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testStraightForwardAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
@@ -257,7 +303,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should not add attribute when prop is undefined or null', () => {
       function testSpecialAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm).toMatchAttributes({ });
@@ -302,7 +348,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testSpecialAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
@@ -343,7 +389,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should not add attribute when prop is undefined or null', () => {
       function testBooleanAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm.hasAttribute(propName)).toBe(false);
@@ -369,7 +415,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testBooleanAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm).toMatchAttributes({ [propName]: '' });
@@ -395,7 +441,7 @@ describe('setAccessor for inputs', () => {
   describe('min/max attributes', () => {
     describe('should not add attribute when prop is undefined or null', () => {
       function testMinMaxAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm.hasAttribute(propName)).toBe(false);
@@ -413,7 +459,7 @@ describe('setAccessor for inputs', () => {
 
     describe('should update when prop is defined', () => {
       function testMinMaxAttribute(propName: string, newValue: any, oldValue: any) {
-        let inputElm = mockElement('input');
+        const inputElm = mockElement('input');
         setAccessor(plt, inputElm, propName, oldValue, newValue, false);
 
         expect(inputElm).toMatchAttributes({ [propName]: newValue.toString() });
