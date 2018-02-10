@@ -85,9 +85,7 @@ export interface BuildEntry {
   entryId: string;
   components: BuildComponent[];
   bundles: BuildBundle[];
-  input: {
-    filePath: string;
-  }[];
+  inputs: string[];
   modes?: string[];
   encapsulations: string[];
 }

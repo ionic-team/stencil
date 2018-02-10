@@ -1,7 +1,7 @@
 import { BuildBundle, BuildComponent, BuildCtx, BuildEntry, BuildResults, BuildStats, CompilerCtx, Config } from '../../declarations';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
-import { hasError, pathJoin } from '../util';
+import { hasError, normalizePath } from '../util';
 
 
 export function generateBuildResults(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
@@ -53,7 +53,7 @@ export function generateBuildResults(config: Config, compilerCtx: CompilerCtx, b
             fileName: entryBundle.fileName,
             size: entryBundle.text.length,
             outputs: entryBundle.outputs.map(filePath => {
-              return pathJoin(config, config.sys.path.relative(config.rootDir, filePath));
+              return normalizePath(config.sys.path.relative(config.rootDir, filePath));
             })
           };
           if (typeof entryBundle.sourceTarget === 'string') {
@@ -68,15 +68,9 @@ export function generateBuildResults(config: Config, compilerCtx: CompilerCtx, b
           return buildBundle;
         }),
 
-        input: en.moduleFiles.map(m => {
-          return {
-            filePath: pathJoin(config, config.sys.path.relative(config.rootDir, m.jsFilePath))
-          };
-        }).sort((a, b) => {
-          if (a.filePath < b.filePath) return -1;
-          if (a.filePath > b.filePath) return 1;
-          return 0;
-        }),
+        inputs: en.moduleFiles.map(m => {
+          return normalizePath(config.sys.path.relative(config.rootDir, m.jsFilePath));
+        }).sort(),
 
         encapsulations: []
       };
