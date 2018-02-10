@@ -140,12 +140,13 @@ export class NodeSystem implements StencilSystem {
       config = configFileData.config;
       config.configPath = configPath;
 
-      if (!config.rootDir && configPath) {
-        config.rootDir = path.dirname(configPath);
-      }
-
     } catch (e) {
-      throw new Error(`Error reading Stencil configuration file "${configPath}". ` + e);
+      // no stencil.config.js file, which is fine
+      config = {};
+    }
+
+    if (!config.rootDir && configPath) {
+      config.rootDir = path.dirname(configPath);
     }
 
     if (!config.sys) {
