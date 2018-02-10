@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, ComponentMeta, ModuleFile } from '../../../util/interfaces';
+import { CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile } from '../../../declarations';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getBundleIdDev, getBundleIdHashed, injectComponentStyleMode } from '../generate-bundles';
 import { mockStencilSystem } from '../../../testing/mocks';
@@ -17,14 +17,38 @@ describe('generate-bundles', () => {
       expect(id).toBe('l7xh');
     });
 
+    it('get bundle id and sort with collection dependencies at the end', () => {
+      const entryModule: EntryModule = {
+        moduleFiles: [
+          { cmpMeta: { tagNameMeta: 'cmp-z' } },
+          { cmpMeta: { tagNameMeta: 'cmp-x' } },
+          { cmpMeta: { tagNameMeta: 'cmp-b' }, isCollectionDependency: true },
+          { cmpMeta: { tagNameMeta: 'cmp-a' }, isCollectionDependency: true }
+        ]
+      };
+      const id = getBundleIdDev(entryModule, null);
+      expect(id).toBe('cmp-x');
+    });
+
     it('get bundle id from components and mode', () => {
-      const id = getBundleIdDev(['cmp-a', 'cmp-b'], 'ios');
+      const entryModule: EntryModule = {
+        moduleFiles: [
+          { cmpMeta: { tagNameMeta: 'cmp-a' } },
+          { cmpMeta: { tagNameMeta: 'cmp-b' } }
+        ]
+      };
+      const id = getBundleIdDev(entryModule, 'ios');
       expect(id).toBe('cmp-a.ios');
     });
 
     it('get bundle id from components and default mode mode', () => {
-      const config: Config = {};
-      const id = getBundleIdDev(['cmp-a', 'cmp-b'], null);
+      const entryModule: EntryModule = {
+        moduleFiles: [
+          { cmpMeta: { tagNameMeta: 'cmp-a' } },
+          { cmpMeta: { tagNameMeta: 'cmp-b' } }
+        ]
+      };
+      const id = getBundleIdDev(entryModule, null);
       expect(id).toBe('cmp-a');
     });
 

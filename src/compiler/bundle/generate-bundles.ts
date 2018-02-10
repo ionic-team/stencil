@@ -261,14 +261,13 @@ export function setBundleModeIds(moduleFiles: ModuleFile[], modeName: string, bu
 }
 
 
-export function getBundleId(config: Config, entryModules: EntryModule, modeName: string, jsText: string) {
+export function getBundleId(config: Config, entryModule: EntryModule, modeName: string, jsText: string) {
   if (config.hashFileNames) {
     // create style id from hashing the content
     return config.sys.generateContentHash(jsText, config.hashedFileNameLength);
   }
 
-  const tags = entryModules.moduleFiles.map(m => m.cmpMeta.tagNameMeta);
-  return getBundleIdDev(tags, modeName);
+  return getBundleIdDev(entryModule, modeName);
 }
 
 
@@ -277,8 +276,21 @@ export function getBundleIdHashed(config: Config, jsText: string) {
 }
 
 
-export function getBundleIdDev(tags: string[], modeName: string) {
-  tags = tags.sort();
+export function getBundleIdDev(entryModule: EntryModule, modeName: string) {
+  const tags = entryModule.moduleFiles
+    .sort((a, b) => {
+      if (a.isCollectionDependency && !b.isCollectionDependency) {
+        return 1;
+      }
+      if (!a.isCollectionDependency && b.isCollectionDependency) {
+        return -1;
+      }
+
+      if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
+      if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+      return 0;
+    })
+    .map(m => m.cmpMeta.tagNameMeta);
 
   if (modeName === DEFAULT_STYLE_MODE || !modeName) {
     return tags[0];

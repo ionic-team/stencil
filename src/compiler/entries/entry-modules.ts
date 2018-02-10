@@ -157,9 +157,24 @@ export function createEntryModule(moduleFiles: ModuleFile[]) {
   };
 
   // generate a unique entry key based on the components within this entry module
-  entryModule.entryKey = 'entry:' + entryModule.moduleFiles.map(m => {
-    return m.cmpMeta.tagNameMeta;
-  }).sort().join('.');
+
+
+  entryModule.entryKey = 'entry:' + entryModule.moduleFiles
+    .sort((a, b) => {
+      if (a.isCollectionDependency && !b.isCollectionDependency) {
+        return 1;
+      }
+      if (!a.isCollectionDependency && b.isCollectionDependency) {
+        return -1;
+      }
+
+      if (a.cmpMeta.tagNameMeta < b.cmpMeta.tagNameMeta) return -1;
+      if (a.cmpMeta.tagNameMeta > b.cmpMeta.tagNameMeta) return 1;
+      return 0;
+    })
+    .map(m => {
+      return m.cmpMeta.tagNameMeta;
+    }).join('.');
 
   // get the modes used in this bundle
   entryModule.modeNames = getEntryModes(entryModule.moduleFiles);
