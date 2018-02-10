@@ -139,7 +139,16 @@ export async function generateBuildStats(config: Config, compilerCtx: CompilerCt
           buildEs5: config.buildEs5
         },
         components: buildResults.components,
-        entries: buildResults.entries
+        entries: buildResults.entries,
+        collections: config.collections.map(c => {
+          return {
+            name: c.name
+          };
+        }).sort((a, b) => {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
+        })
       };
 
       jsonData = stats;

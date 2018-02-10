@@ -78,6 +78,9 @@ export interface BuildStats {
   };
   components: BuildComponent[];
   entries: BuildEntry[];
+  collections: {
+    name: string;
+  }[];
 }
 
 
