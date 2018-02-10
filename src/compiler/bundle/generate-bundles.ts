@@ -41,7 +41,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     .map(async ([key, value]) => {
       const fileName = getBundleFilename(key.replace('.js', ''), false, 'es2015');
       const jsText = replaceBundleIdPlaceholder(value.code, key);
-      await writeJSFile(config, compilerCtx, fileName, jsText);
+      await writeBundleJSFile(config, compilerCtx, fileName, jsText);
     });
   await Promise.all(esmPromises);
 
@@ -54,7 +54,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
         const fileName = getBundleFilename(key.replace('.js', ''), false, 'es5');
         let jsText = replaceBundleIdPlaceholder(value.code, key);
         jsText = await transpileEs5Bundle(compilerCtx, buildCtx, jsText);
-        await writeJSFile(config, compilerCtx, fileName, jsText);
+        await writeBundleJSFile(config, compilerCtx, fileName, jsText);
       });
     await Promise.all(es5Promises);
   }
@@ -65,6 +65,25 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
   timeSpan.finish(`generate bundles finished`);
 
   return cmpRegistry;
+}
+
+async function writeBundleJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
+
+  // get the absolute path to where it'll be saved in www
+  const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
+
+  // get the absolute path to where it'll be saved in dist
+  const distPath = pathJoin(config, getAppDistDir(config), fileName);
+
+  if (config.generateWWW) {
+    // write to the www build
+    await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
+  }
+
+  if (config.generateDistribution) {
+    // write to the dist build
+    await compilerCtx.fs.writeFile(distPath, jsText);
+  }
 }
 
 async function generateBundleMode(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModule: EntryModule, modeName: string, jsCode: { [key: string]: string }) {
@@ -158,12 +177,6 @@ async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, ent
   entryModule.entryBundles = entryModule.entryBundles || [];
   entryModule.entryBundles.push(entryBundle);
 
-  await writeJSFile(config, compilerCtx, fileName, jsText);
-}
-
-
-async function writeJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
-
   // get the absolute path to where it'll be saved in www
   const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
 
@@ -173,13 +186,16 @@ async function writeJSFile(config: Config, compilerCtx: CompilerCtx, fileName: s
   if (config.generateWWW) {
     // write to the www build
     await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
+    entryBundle.outputs.push(wwwBuildPath);
   }
 
   if (config.generateDistribution) {
     // write to the dist build
     await compilerCtx.fs.writeFile(distPath, jsText);
+    entryBundle.outputs.push(distPath);
   }
 }
+
 
 function injectStyleMode(moduleFiles: ModuleFile[], jsText: string, modeName: string, isScopedStyles: boolean) {
   moduleFiles.forEach(moduleFile => {
