@@ -131,11 +131,10 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
               cmpMeta.membersMeta[propName].attribName
             );
           }
-
-          // set the array of all the attributes to keep an eye on
-          // https://www.youtube.com/watch?v=RBs21CFBALI
-          HostElementConstructor.observedAttributes = observedAttributes;
         }
+        // set the array of all the attributes to keep an eye on
+        // https://www.youtube.com/watch?v=RBs21CFBALI
+        HostElementConstructor.observedAttributes = observedAttributes;
       }
 
       // define the custom element
