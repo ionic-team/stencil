@@ -27,3 +27,13 @@ export interface EntryComponent {
   tag: string;
   dependencyOf?: string[];
 }
+
+export interface ComponentReference {
+  tag: string;
+  filePath: string;
+}
+
+export interface ModuleGraph {
+  filePath: string;
+  importPaths: string[];
+}

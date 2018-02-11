@@ -187,6 +187,62 @@ describe('transpile', () => {
       expect(content).toContain(`"str": { "type": String, "attr": "str" }`);
     });
 
+    it('get component dependencies from imports', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFiles({
+        '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
+        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
+        '/src/new-dir/cmp-d.tsx': `@Component({ tag: 'cmp-d' }) export class CmpD {}`,
+        '/src/new-dir/cmp-e.tsx': `@Component({ tag: 'cmp-e' }) export class CmpE {}`,
+        '/src/util-1.tsx': `
+          import { getImportedCmpC } from './util-2';
+          export function getCmpB() {
+            const el = document.createElement("cmp-b");
+            return el;
+          }
+          export function getCmpC() {
+            return getImportedCmpC();
+          }
+        `,
+        '/src/util-2.tsx': `
+          import { getJsxCmpD } from './util-3';
+          export function getImportedCmpC() {
+            return {
+              cmpC: document.createElement("cmp-c"),
+              cmpD: getJsxCmpD()
+            };
+          }
+        `,
+        '/src/util-3.tsx': `
+          export function getJsxCmpD() {
+            return <cmp-d/>;
+          }
+          export function getJsxCmpE() {
+            return document.createElement('cmp-e');
+          }
+        `
+      }, { clearFileCache: true });
+
+      await c.fs.writeFile('/src/cmp-a.tsx', `
+        import { getCmpB, getCmpC } from './util-1';
+
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          componentWillLoad() {
+            getCmpB();
+          }
+          componentDidLoad() {
+            getCmpC();
+          }
+        }
+      `, { clearFileCache: true });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c', 'cmp-d', 'cmp-e']);
+    });
+
     it('get CallExpression component dependencies', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({

@@ -55,7 +55,7 @@ function createDoUpgrade(config: Config, compilerCtx: CompilerCtx, buildCtx: Bui
         case CompilerUpgrade.Add_Component_Dependencies:
           config.logger.debug(`Add_Component_Dependencies, ${manifest.collectionName}, compiled by v${manifest.compiler.version}`);
           return (transformContext: ts.TransformationContext) => {
-            return componentDependencies(compilerCtx.moduleFiles)(transformContext);
+            return componentDependencies(compilerCtx, buildCtx)(transformContext);
           };
       }
       return () => (tsSourceFile: ts.SourceFile) => (tsSourceFile);
