@@ -177,7 +177,8 @@ export interface JSModuleList {
 }
 
 export interface JSModuleMap {
-  [key: string]: JSModuleList;
+  esm?: JSModuleList;
+  es5?: JSModuleList;
 }
 
 

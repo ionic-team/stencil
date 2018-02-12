@@ -97,22 +97,26 @@ const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 
 
 
 export async function minifyJs(config: Config, compilerCtx: CompilerCtx, jsText: string, sourceTarget: SourceTarget, preamble: boolean) {
-  const opts: any = { output: {}, compress: {}, mangle: {} };
+  const opts: any = { output: {}, compress: {}, mangle: true };
 
   if (sourceTarget === 'es5') {
     opts.ecma = 5;
     opts.output.ecma = 5;
     opts.compress.ecma = 5;
     opts.compress.arrows = false;
+    opts.output.beautify = false;
 
   } else {
     opts.ecma = 6;
     opts.output.ecma = 6;
     opts.compress.ecma = 6;
+    opts.toplevel = true;
     opts.compress.arrows = true;
+    opts.output.beautify = false;
   }
 
   if (config.logLevel === 'debug') {
+    opts.mangle = {};
     opts.mangle.keep_fnames = true;
     opts.compress.drop_console = false;
     opts.compress.drop_debugger = false;
@@ -122,6 +126,8 @@ export async function minifyJs(config: Config, compilerCtx: CompilerCtx, jsText:
     opts.output.comments = 'all';
     opts.output.preserve_line = true;
   }
+
+  opts.compress.passes = 2;
 
   if (preamble) {
     opts.output.preamble = generatePreamble(config);

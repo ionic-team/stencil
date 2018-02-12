@@ -1,8 +1,8 @@
 import { BuildCtx, CompilerCtx, ComponentMeta, ComponentRegistry, Config, EntryBundle, EntryModule, JSModuleMap, ModuleFile, SourceTarget } from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
-import { hasError, minifyJs, pathJoin } from '../util';
 import { getAppDistDir, getAppWWWBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { getStyleIdPlaceholder, getStylePlaceholder, replaceBundleIdPlaceholder } from '../../util/data-serialize';
+import { hasError, minifyJs, pathJoin } from '../util';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
@@ -21,10 +21,10 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
 
       return Promise.all(
         entryModule.modeNames.map(async modeName => {
-          const jsCode = Object.keys(jsModules).reduce((all, mType) => {
+          const jsCode = Object.keys(jsModules).reduce((all, moduleType: 'esm' | 'es5') => {
             return {
               ...all,
-              [mType]: jsModules[mType][bundleKeyPath].code
+              [moduleType]: jsModules[moduleType][bundleKeyPath].code
             };
           }, {} as {[key: string]: string});
 
@@ -34,7 +34,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
     })
   );
 
-  const esmModules = jsModules['esm'];
+  const esmModules = jsModules.esm;
   const esmPromises = Object.keys(esmModules)
     .filter(key => !bundleKeys[key])
     .map(key => { return [key, esmModules[key]] as [string, { code: string}]; })
@@ -46,7 +46,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
   await Promise.all(esmPromises);
 
   if (config.buildEs5) {
-    const es5Modules = jsModules['es5'];
+    const es5Modules = jsModules.es5;
     const es5Promises = Object.keys(es5Modules)
       .filter(key => !bundleKeys[key])
       .map(key => { return [key, es5Modules[key]] as [string, { code: string}]; })
