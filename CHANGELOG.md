@@ -1,3 +1,18 @@
+<a name="0.5.0-0"></a>
+# [0.5.0-0](https://github.com/ionic-team/stencil/compare/v0.4.3...v0.5.0-0) (2018-02-12)
+
+
+### Bug Fixes
+
+* **publicPath:** allow for custom public path ([19095e7](https://github.com/ionic-team/stencil/commit/19095e7)), closes [#464](https://github.com/ionic-team/stencil/issues/464)
+
+
+### Features
+
+* **plugins:** add rollup plugins through config ([b8abbce](https://github.com/ionic-team/stencil/commit/b8abbce)), closes [#472](https://github.com/ionic-team/stencil/issues/472)
+
+
+
 <a name="0.4.3"></a>
 ## [0.4.3](https://github.com/ionic-team/stencil/compare/v0.4.2...v0.4.3) (2018-02-12)
 
