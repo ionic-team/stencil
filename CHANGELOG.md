@@ -1,3 +1,20 @@
+<a name="0.4.2"></a>
+## [0.4.2](https://github.com/ionic-team/stencil/compare/v0.4.1...v0.4.2) (2018-02-12)
+
+
+### Bug Fixes
+
+* **entries:** component dependencies from module imports ([3eac82a](https://github.com/ionic-team/stencil/commit/3eac82a)), closes [#513](https://github.com/ionic-team/stencil/issues/513)
+* **events:** ensure old events are removed ([ae68f98](https://github.com/ionic-team/stencil/commit/ae68f98)), closes [#500](https://github.com/ionic-team/stencil/issues/500)
+* **minify:** minify chunks ([897f29b](https://github.com/ionic-team/stencil/commit/897f29b)), closes [#518](https://github.com/ionic-team/stencil/issues/518)
+* **platform-client:** observedAttributes ([38c9201]
+
+### Features
+
+* **config:** do not require config file ([c8cc144](https://github.com/ionic-team/stencil/commit/c8cc144))
+
+
+
 <a name="0.4.1"></a>
 ## [0.4.1](https://github.com/ionic-team/stencil/compare/v0.4.0...v0.4.1) (2018-02-09)
 
