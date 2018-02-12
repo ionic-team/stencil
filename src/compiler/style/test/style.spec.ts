@@ -7,7 +7,7 @@ describe('component-styles', () => {
 
   describe('build', () => {
 
-    it('should build 2 bundles w/ 3 components w/ styleUrls and css variables', async () => {
+    it('should build 2 bundles w/ 3 components w/ styleUrls and scss variables', async () => {
       c.config.bundles = [
         { components: ['cmp-a', 'cmp-b'] },
         { components: ['cmp-c'] }

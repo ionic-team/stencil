@@ -4,6 +4,7 @@ import { validateCopy } from './validate-copy';
 import { validateDependentCollection } from './validate-collection';
 import { validateNamespace } from './validate-namespace';
 import { validatePaths } from './validate-paths';
+import { validatePlugins } from './validate-plugins';
 
 
 export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
@@ -73,6 +74,8 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'generateWWW', true);
 
   validateCopy(config);
+
+  validatePlugins(config);
 
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;

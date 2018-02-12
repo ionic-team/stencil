@@ -1,19 +1,6 @@
 import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 import { PluginCtx, PluginTransformResults } from '../../declarations/plugin';
-import { StyleMinifyPlugin } from '../style/style-minify-plugin';
-import { StyleSassPlugin } from '../style/style-sass-plugin';
-
-
-export function initPlugins(config: Config) {
-  config.plugins = (config.plugins || []).filter(p => !!p);
-
-  const styleSassPlugin = new StyleSassPlugin();
-  config.plugins.push(styleSassPlugin);
-
-  const styleMinifyPlugin = new StyleMinifyPlugin();
-  config.plugins.push(styleMinifyPlugin);
-}
 
 
 export async function runPluginResolveId(pluginCtx: PluginCtx, importee: string) {

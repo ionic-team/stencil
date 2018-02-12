@@ -109,7 +109,8 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           include: 'node_modules/**',
           sourceMap: false
         }),
-        transpiledInMemoryPlugin(config, compilerCtx)
+        transpiledInMemoryPlugin(config, compilerCtx),
+        ...config.plugins
       ],
       onwarn: createOnWarnFn(buildCtx.diagnostics)
     });

@@ -35,6 +35,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       await pathsResolution(config, compilerCtx),
       localResolution(config),
       nodeEnvVars(config),
+      ...config.plugins
     ],
     onwarn: createOnWarnFn(buildCtx.diagnostics)
   };

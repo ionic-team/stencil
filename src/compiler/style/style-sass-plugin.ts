@@ -2,68 +2,70 @@ import * as d from '../../declarations/index';
 const nodeSass = require('node-sass');
 
 
-export class StyleSassPlugin implements d.Plugin {
+export default function styleSassPlugin(opts: RenderOptions = {}): d.Plugin {
+  const name = 'styleSassPlugin';
 
-  constructor(private renderOpts: RenderOptions = {}) {}
+  return {
 
-  async transform(sourceText: string, id: string, context: d.PluginCtx): Promise<d.PluginTransformResults> {
-    if (!this.usePlugin(id)) {
-      return null;
-    }
+    transform: async function(sourceText: string, id: string, context: d.PluginCtx): Promise<d.PluginTransformResults> {
+      if (!context || !usePlugin(id)) {
+        return null;
+      }
 
-    const renderOpts = Object.assign({}, context.config.sassConfig || {}, this.renderOpts);
-    renderOpts.data = sourceText;
-    if (!renderOpts.outputStyle) {
-      renderOpts.outputStyle = 'expanded';
-    }
-    renderOpts.includePaths = renderOpts.includePaths || [];
+      const renderOpts = Object.assign({}, context.config.sassConfig || {}, opts);
+      renderOpts.data = sourceText;
+      if (!renderOpts.outputStyle) {
+        renderOpts.outputStyle = 'expanded';
+      }
+      renderOpts.includePaths = renderOpts.includePaths || [];
 
-    const dirName = context.sys.path.dirname(id);
-    renderOpts.includePaths.push(dirName);
+      const dirName = context.sys.path.dirname(id);
+      renderOpts.includePaths.push(dirName);
 
-    const results: d.PluginTransformResults = {};
+      const results: d.PluginTransformResults = {};
 
-    // create what the new path is post transform (.css)
-    const pathParts = id.split('.');
-    pathParts.pop();
-    pathParts.push('css');
-    results.id = pathParts.join('.');
+      // create what the new path is post transform (.css)
+      const pathParts = id.split('.');
+      pathParts.pop();
+      pathParts.push('css');
+      results.id = pathParts.join('.');
 
-    if (sourceText.trim() === '') {
-      results.code = '';
-      return results;
-    }
+      if (sourceText.trim() === '') {
+        results.code = '';
+        return results;
+      }
 
-    results.code = await new Promise<string>(resolve => {
+      results.code = await new Promise<string>(resolve => {
 
-      nodeSass.render(renderOpts, async (err: any, sassResult: any) => {
-        if (err) {
-          loadDiagnostic(context, err, id);
-          resolve(`/**  sass error${err && err.message ? ': ' + err.message : ''}  **/`);
+        nodeSass.render(renderOpts, async (err: any, sassResult: any) => {
+          if (err) {
+            loadDiagnostic(context, err, id);
+            resolve(`/**  sass error${err && err.message ? ': ' + err.message : ''}  **/`);
 
-        } else {
-          const css = sassResult.css.toString();
+          } else {
+            const css = sassResult.css.toString();
 
-          // write this css content to memory only so it can be referenced
-          // later by other plugins (minify css)
-          // but no need to actually write to disk
-          await context.fs.writeFile(results.id, css, { inMemoryOnly: true });
-          resolve(css);
-        }
+            // write this css content to memory only so it can be referenced
+            // later by other plugins (minify css)
+            // but no need to actually write to disk
+            await context.fs.writeFile(results.id, css, { inMemoryOnly: true });
+            resolve(css);
+          }
+        });
       });
-    });
 
-    return results;
-  }
+      return results;
+    },
 
-  usePlugin(id: string) {
-    return /(.scss|.sass)$/i.test(id);
-  }
+    name: name,
 
-  get name() {
-    return 'StyleSassPlugin';
-  }
+  };
 
+}
+
+
+function usePlugin(id: string) {
+  return /(.scss|.sass)$/i.test(id);
 }
 
 
