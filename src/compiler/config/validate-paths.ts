@@ -80,23 +80,6 @@ export function validatePaths(config: Config) {
     config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, config.wwwIndexHtml));
   }
 
-  if (typeof config.publicPath !== 'string') {
-    // CLIENT SIDE ONLY! Do not use this for server-side file read/writes
-    // this is a reference to the public static directory from the index.html running from a browser
-    // in most cases it's just "build", as in index page would request scripts from `/build/`
-    config.publicPath = normalizePath(
-      path.relative(config.wwwDir, config.buildDir)
-    );
-    if (config.publicPath.charAt(0) !== '/') {
-      // ensure prefix / by default
-      config.publicPath = '/' + config.publicPath;
-    }
-  }
-  if (config.publicPath.charAt(config.publicPath.length - 1) !== '/') {
-    // ensure there's a trailing /
-    config.publicPath += '/';
-  }
-
   if (config.writeLog) {
     setStringConfig(config, 'buildLogFilePath', DEFAULT_BUILD_LOG_FILE_NAME);
     if (!path.isAbsolute(config.buildLogFilePath)) {

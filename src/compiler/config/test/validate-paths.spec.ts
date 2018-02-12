@@ -6,23 +6,17 @@ import * as path from 'path';
 
 describe('validatePaths', () => {
 
-  it('should set publicPath from custom buildDir', () => {
-    config.wwwDir = 'some-www';
-    config.buildDir = 'some-build';
-    validateBuildConfig(config);
-    expect(config.publicPath).toBe('/some-build/');
-    expect(path.isAbsolute(config.publicPath)).toBe(true);
-  });
+  let config: Config;
+  const logger = mockLogger();
+  const sys = mockStencilSystem();
 
-  it('should set publicPath and not force absolute path, but suffix with /', () => {
-    config.publicPath = 'my-crazy-public-path';
-    validateBuildConfig(config);
-    expect(config.publicPath).toBe('my-crazy-public-path/');
-  });
-
-  it('should set default publicPath and convert to absolute path', () => {
-    validateBuildConfig(config);
-    expect(config.publicPath).toBe('/build/');
+  beforeEach(() => {
+    config = {
+      sys: sys,
+      logger: logger,
+      rootDir: '/User/some/path/',
+      suppressTypeScriptErrors: true
+    };
   });
 
   it('should set default wwwIndexHtml and convert to absolute path', () => {
@@ -169,16 +163,4 @@ describe('validatePaths', () => {
     expect(path.isAbsolute(config.globalStyle[0])).toBe(true);
   });
 
-  var config: Config;
-  const logger = mockLogger();
-  const sys = mockStencilSystem();
-
-  beforeEach(() => {
-    config = {
-      sys: sys,
-      logger: logger,
-      rootDir: '/User/some/path/',
-      suppressTypeScriptErrors: true
-    };
-  });
 });

@@ -5,6 +5,7 @@ import { validateDependentCollection } from './validate-collection';
 import { validateNamespace } from './validate-namespace';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
+import { validatePublicPath } from './validate-public-path';
 
 
 export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
@@ -42,6 +43,9 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
 
   // figure out all of the config paths and absolute paths
   validatePaths(config);
+
+  // figure out the client-side public path
+  validatePublicPath(config);
 
   // default devMode false
   config.devMode = !!config.devMode;

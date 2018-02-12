@@ -75,5 +75,9 @@ export function getBundleFilename(bundleId: string, isScopedStyles: boolean, sou
 
 
 export function getAppPublicPath(config: Config) {
-  return pathJoin(config, config.publicPath, config.fsNamespace) + '/';
+  if (config.discoverPublicPath !== false) {
+    return pathJoin(config, config.publicPath, config.fsNamespace) + '/';
+  }
+
+  return config.publicPath;
 }

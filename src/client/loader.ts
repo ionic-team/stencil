@@ -4,9 +4,11 @@ import { LoadComponentRegistry } from '../declarations';
 export function init(
   win: any,
   doc: HTMLDocument,
+  docScripts: HTMLScriptElement[],
   appNamespace: string,
   urlNamespace: string,
   publicPath: string,
+  discoverPublicPath: boolean,
   appCore: string,
   appCorePolyfilled: string,
   hydratedCssClass: string,
@@ -27,10 +29,12 @@ export function init(
 
   // get this current script
   // script tag cannot use "async" attribute
-  x = doc.scripts[doc.scripts.length - 1];
-  if (x && x.src) {
-    y = x.src.split('/').slice(0, -1);
-    publicPath = (y.join('/')) + (y.length ? '/' : '') + urlNamespace + '/';
+  if (discoverPublicPath) {
+    x = docScripts[docScripts.length - 1];
+    if (x && x.src) {
+      y = x.src.split('/').slice(0, -1);
+      publicPath = (y.join('/')) + (y.length ? '/' : '') + urlNamespace + '/';
+    }
   }
 
   // request the core this browser needs

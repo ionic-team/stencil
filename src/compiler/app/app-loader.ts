@@ -79,10 +79,13 @@ export function injectAppIntoLoader(
 
   const publicPath = getAppPublicPath(config);
 
+  const discoverPublicPath = (config.discoverPublicPath !== false);
+
   const loaderArgs = [
     `"${config.namespace}"`,
     `"${config.fsNamespace}"`,
     `"${publicPath}"`,
+    `${discoverPublicPath}`,
     `"${appCoreFileName}"`,
     `"${appCorePolyfilledFileName}"`,
     `"${hydratedCssClass}"`,

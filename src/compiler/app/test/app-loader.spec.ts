@@ -47,7 +47,7 @@ describe('build-project-files', () => {
         `("__APP__")`
       );
 
-      expect(appLoader).toBe(`("MyApp","my-app","build/my-app/","my-app.core.js","my-app.core.pf.js","hydrated-css",[["root-cmp",{"Mode1":"abc","Mode2":"def"}]])`);
+      expect(appLoader).toBe(`("MyApp","my-app","build/my-app/",true,"my-app.core.js","my-app.core.pf.js","hydrated-css",[["root-cmp",{"Mode1":"abc","Mode2":"def"}]])`);
     });
 
   });
@@ -67,12 +67,42 @@ describe('build-project-files', () => {
       expect(mockGetClientCoreFile.mock.calls[0][0]).toEqual({ staticName: 'loader.js' });
     });
 
+    it('includes the injected app, w/ discoverPublicPath', async () => {
+      mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
+
+      const ctx: CompilerCtx = { appFiles: {}, cache: mockCache() as any };
+
+      const appRegistry: AppRegistry = {
+        core: 'myapp.core.js',
+        corePolyfilled: 'myapp.core.pf.js',
+        components: {},
+        namespace: config.namespace,
+        fsNamespace: config.fsNamespace
+      };
+
+      config.namespace = 'MyApp';
+      config.fsNamespace = 'my-app';
+      config.publicPath = '/my/custom/public/path/';
+      config.discoverPublicPath = false;
+
+      const res = await generateLoader(
+        config,
+        ctx,
+        appRegistry,
+        {}
+      );
+
+      const lines = res.split('\n');
+      expect(lines[1]).toEqual(`pretend i am code ("MyApp","my-app","/my/custom/public/path/",false,"myapp.core.js","myapp.core.pf.js","hydrated",[]) yeah me too`);
+    });
+
     it('includes the injected app', async () => {
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
       const res = await callGenerateLoader();
       const lines = res.split('\n');
-      expect(lines[1]).toEqual(`pretend i am code ("MyApp","my-app","build/my-app/","myapp.core.js","myapp.core.pf.js","hydrated",[]) yeah me too`);
+      expect(lines[1]).toEqual(`pretend i am code ("MyApp","my-app","build/my-app/",true,"myapp.core.js","myapp.core.pf.js","hydrated",[]) yeah me too`);
     });
+
   });
 
   async function callGenerateLoader(params?: {
