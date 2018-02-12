@@ -13,18 +13,25 @@ export function calcComponentDependencies(moduleFiles: ModuleFiles, moduleGraphs
 
 function getComponentDependencies(moduleGraphs: ModuleGraph[], componentRefs: ComponentReference[], filePath: string, cmpMeta: ComponentMeta) {
   cmpMeta.dependencies = componentRefs.filter(cr => cr.filePath === filePath).map(cr => cr.tag);
+  const importsInspected: string[] = [];
 
   const moduleGraph = moduleGraphs.find(mg => mg.filePath === filePath);
   if (moduleGraph) {
-    getComponentDepsFromImports(moduleGraphs, componentRefs, moduleGraph, cmpMeta);
+    getComponentDepsFromImports(moduleGraphs, componentRefs, importsInspected, moduleGraph, cmpMeta);
   }
 
   cmpMeta.dependencies.sort();
 }
 
 
-function getComponentDepsFromImports(moduleGraphs: ModuleGraph[], componentRefs: ComponentReference[], moduleGraph: ModuleGraph, cmpMeta: ComponentMeta) {
+function getComponentDepsFromImports(moduleGraphs: ModuleGraph[], componentRefs: ComponentReference[], importsInspected: string[], moduleGraph: ModuleGraph, cmpMeta: ComponentMeta) {
   moduleGraph.importPaths.forEach(importPath => {
+    if (importsInspected.includes(importPath)) {
+      return;
+    }
+
+    importsInspected.push(importPath);
+
     const subModuleGraph = moduleGraphs.find(mg => {
       return (mg.filePath === importPath) ||
              (mg.filePath === importPath + '.ts') ||
@@ -35,9 +42,13 @@ function getComponentDepsFromImports(moduleGraphs: ModuleGraph[], componentRefs:
     if (subModuleGraph) {
       const tags = componentRefs.filter(cr => cr.filePath === subModuleGraph.filePath).map(cr => cr.tag);
 
-      cmpMeta.dependencies.push(...tags);
+      tags.forEach(tag => {
+        if (!cmpMeta.dependencies.includes(tag)) {
+          cmpMeta.dependencies.push(tag);
+        }
+      });
 
-      getComponentDepsFromImports(moduleGraphs, componentRefs, subModuleGraph, cmpMeta);
+      getComponentDepsFromImports(moduleGraphs, componentRefs, importsInspected, subModuleGraph, cmpMeta);
     }
   });
 }

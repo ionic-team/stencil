@@ -187,6 +187,51 @@ describe('transpile', () => {
       expect(content).toContain(`"str": { "type": String, "attr": "str" }`);
     });
 
+    it('get component dependencies from imports w/ circular dependencies', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFiles({
+        '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
+        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
+        '/src/util-1.tsx': `
+          import { getImportedCmpC } from './util-2';
+          export function getCmpB() {
+            return {
+              'b': document.createElement("cmp-b"),
+              'c': getImportedCmpC()
+            }
+          }
+        `,
+        '/src/util-2.tsx': `
+          import { getCmpB } from './util-1';
+          export function derpCircular() {
+            return getCmpB();
+          }
+          export function getImportedCmpC() {
+            return {
+              'b': document.createElement("cmp-b"),
+              'c': document.createElement("cmp-c")
+            };
+          }
+        `
+      }, { clearFileCache: true });
+
+      await c.fs.writeFile('/src/cmp-a.tsx', `
+        import { getCmpB } from './util-1';
+
+        @Component({ tag: 'cmp-a' }) export class CmpA {
+          componentWillLoad() {
+            getCmpB();
+          }
+        }
+      `, { clearFileCache: true });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c']);
+    });
+
     it('get component dependencies from imports', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({
