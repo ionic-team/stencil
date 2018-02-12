@@ -72,11 +72,11 @@ describe('component-styles', () => {
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const iosContent = await c.fs.readFile('/www/build/app/u.js');
+      const iosContent = await c.fs.readFile('/www/build/app/h.js');
       expect(iosContent).toContain(`body{font:ios}`);
       expect(iosContent).toContain(`static get styleMode(){return"ios"}`);
 
-      const mdContent = await c.fs.readFile('/www/build/app/w.js');
+      const mdContent = await c.fs.readFile('/www/build/app/r.js');
       expect(mdContent).toContain(`body{font:md}`);
       expect(mdContent).toContain(`static get styleMode(){return"md"}`);
     });
@@ -96,7 +96,7 @@ describe('component-styles', () => {
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const content = await c.fs.readFile('/www/build/app/y.js');
+      const content = await c.fs.readFile('/www/build/app/0.js');
       expect(content).toContain(`body{color:red}`);
     });
 

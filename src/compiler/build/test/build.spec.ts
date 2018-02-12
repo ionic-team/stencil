@@ -30,7 +30,7 @@ describe('build', () => {
     expect(r.diagnostics).toEqual([]);
 
     const output = await c.fs.readFile('/www/build/app/cmp-a.js');
-    expect(output).toContain('const{h,Context}=window.App;class CmpA{static get is(){return"cmp-a"}}export{CmpA};');
+    expect(output).toContain('/*! Built with http://stenciljs.com */\nconst{h:t,Context:s}=window.App;class c{static get is(){return"cmp-a"}}export{c as CmpA};');
   });
 
   it('should build one component', async () => {
