@@ -12,7 +12,12 @@ export function calcComponentDependencies(moduleFiles: ModuleFiles, moduleGraphs
 
 
 function getComponentDependencies(moduleGraphs: ModuleGraph[], componentRefs: ComponentReference[], filePath: string, cmpMeta: ComponentMeta) {
-  cmpMeta.dependencies = componentRefs.filter(cr => cr.filePath === filePath).map(cr => cr.tag);
+  // we may have already figured out some dependencies (collections aready have this info)
+  cmpMeta.dependencies = cmpMeta.dependencies || [];
+
+  // push on any new tags we found through component references
+  cmpMeta.dependencies.push(...componentRefs.filter(cr => cr.filePath === filePath).map(cr => cr.tag));
+
   const importsInspected: string[] = [];
 
   const moduleGraph = moduleGraphs.find(mg => mg.filePath === filePath);
