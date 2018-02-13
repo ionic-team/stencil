@@ -376,6 +376,35 @@ describe('transpile', () => {
       expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c']);
     });
 
+    it('wildcard imports should remain within component files', async () => {
+      c.config.bundles = [ { components: ['cmp-a']}, { components: ['cmp-b'] } ];
+      await c.fs.writeFiles({
+        '/src/new-dir/cmp-a.tsx': `
+          import * as file from './file';
+          @Component({ tag: 'cmp-a' }) export class CmpA {
+            render() {
+              return file.file;
+            }
+          }
+        `,
+        '/src/new-dir/cmp-b.tsx': `
+          import * as file from './file';
+          @Component({ tag: 'cmp-b' }) export class CmpB {
+            render() {
+              return file.file;
+            }
+          }
+        `,
+        '/src/new-dir/file.ts': `export const file = 'filetext';`,
+      }, { clearFileCache: true });
+
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+      expect(r.bundleBuildCount).toEqual(3);
+    });
+
   });
 
 });
