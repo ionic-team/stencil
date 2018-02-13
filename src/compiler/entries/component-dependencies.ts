@@ -1,9 +1,34 @@
-import { ComponentMeta, ComponentReference, ModuleFiles, ModuleGraph } from '../../declarations';
+import { CompilerCtx, ComponentMeta, ComponentReference, ModuleFiles, ModuleGraph, SourceString } from '../../declarations';
+import { getComponentRefsFromSourceStrings } from './component-references';
 
 
-export function calcComponentDependencies(moduleFiles: ModuleFiles, moduleGraphs: ModuleGraph[], componentRefs: ComponentReference[]) {
-  Object.keys(moduleFiles).forEach(filePath => {
-    const moduleFile = moduleFiles[filePath];
+export function calcModuleGraphImportPaths(compilerCtx: CompilerCtx, moduleGraphs: ModuleGraph[]) {
+  // figure out the actual source's file path
+  // cuz right now the import paths probably don't have the extension on them
+  moduleGraphs.forEach(mg => {
+    mg.importPaths = mg.importPaths.map(importPath => {
+      if (importPath.startsWith('.') || importPath.startsWith('/')) {
+        for (const srcExt of SRC_EXTS) {
+          const srcFilePath = importPath + srcExt;
+          if (compilerCtx.moduleFiles[srcFilePath]) {
+            return srcFilePath;
+          }
+        }
+      }
+      return importPath;
+    });
+  });
+}
+
+const SRC_EXTS = ['.tsx', '.ts', '.js'];
+
+
+export function calcComponentDependencies(allModuleFiles: ModuleFiles, moduleGraphs: ModuleGraph[], sourceStrings: SourceString[]) {
+  // figure out all the component references seen in each file
+  const componentRefs = getComponentRefsFromSourceStrings(allModuleFiles, sourceStrings);
+
+  Object.keys(allModuleFiles).forEach(filePath => {
+    const moduleFile = allModuleFiles[filePath];
     if (moduleFile.cmpMeta) {
       getComponentDependencies(moduleGraphs, componentRefs, filePath, moduleFile.cmpMeta);
     }
@@ -15,8 +40,13 @@ function getComponentDependencies(moduleGraphs: ModuleGraph[], componentRefs: Co
   // we may have already figured out some dependencies (collections aready have this info)
   cmpMeta.dependencies = cmpMeta.dependencies || [];
 
-  // push on any new tags we found through component references
-  cmpMeta.dependencies.push(...componentRefs.filter(cr => cr.filePath === filePath).map(cr => cr.tag));
+  // figure out if this file has any components in it
+  const refTags = componentRefs.filter(cr => cr.filePath === filePath).map(cr => cr.tag);
+  refTags.forEach(tag => {
+    if (tag !== cmpMeta.tagNameMeta && !cmpMeta.dependencies.includes(tag)) {
+      cmpMeta.dependencies.push(tag);
+    }
+  });
 
   const importsInspected: string[] = [];
 

@@ -1,4 +1,5 @@
 import { BuildCtx, CompilerCtx, ComponentMeta, Config, ConfigBundle, EntryModule, EntryPoint, ModuleFile } from '../../declarations';
+import { calcComponentDependencies, calcModuleGraphImportPaths } from './component-dependencies';
 import { catchError } from '../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { generateComponentEntries } from './entry-components';
@@ -8,6 +9,12 @@ import { validateComponentTag } from '../config/validate-component';
 
 export function generateEntryModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   buildCtx.entryModules = [];
+
+  // figure out all the actual import paths (basically which extension each import uses)
+  calcModuleGraphImportPaths(compilerCtx, buildCtx.moduleGraphs);
+
+  // figure out how modules and components connect
+  calcComponentDependencies(compilerCtx.moduleFiles, buildCtx.moduleGraphs, buildCtx.sourceStrings);
 
   try {
     const allModules = Object.keys(compilerCtx.moduleFiles).map(filePath => compilerCtx.moduleFiles[filePath]);

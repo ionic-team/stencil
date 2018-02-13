@@ -22,8 +22,8 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
   const buildCtx: BuildCtx = {
     requiresFullBuild: requiresFullBuild,
     buildId: compilerCtx.activeBuildId,
-    componentRefs: [],
-    moduleGraph: [],
+    sourceStrings: [],
+    moduleGraphs: [],
     diagnostics: [],
     entryPoints: [],
     entryModules: [],

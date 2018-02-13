@@ -1,4 +1,4 @@
-import { BuildBundle, BuildComponent, BuildCtx, BuildEntry, BuildResults, BuildStats, CompilerCtx, Config } from '../../declarations';
+import { BuildBundle, BuildComponent, BuildCtx, BuildEntry, BuildResults, BuildStats, CompilerCtx, Config, EntryComponent } from '../../declarations';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 import { hasError, normalizePath } from '../util';
@@ -31,19 +31,24 @@ export function generateBuildResults(config: Config, compilerCtx: CompilerCtx, b
       en.entryBundles = en.entryBundles || [];
       en.moduleFiles = en.moduleFiles || [];
 
+      const entryCmps: EntryComponent[] = [];
+      buildCtx.entryPoints.forEach(ep => {
+        entryCmps.push(...ep);
+      });
+
       const buildEntry: BuildEntry = {
         entryId: en.entryKey,
 
         components: en.moduleFiles.map(m => {
+          const entryCmp = entryCmps.find(ec => {
+            return ec.tag === m.cmpMeta.tagNameMeta;
+          });
+          const dependencyOf = ((entryCmp && entryCmp.dependencyOf) || []).slice().sort();
+
           const buildCmp: BuildComponent = {
             tag: m.cmpMeta.tagNameMeta,
             dependencies: m.cmpMeta.dependencies.slice(),
-            dependencyOf: en.moduleFiles.reduce((dependencyOf, otherModule) => {
-              if (otherModule.cmpMeta.dependencies.includes(m.cmpMeta.tagNameMeta)) {
-                dependencyOf.push(otherModule.cmpMeta.tagNameMeta);
-              }
-              return dependencyOf;
-            }, [] as string[]).sort()
+            dependencyOf: dependencyOf
           };
           return buildCmp;
         }),

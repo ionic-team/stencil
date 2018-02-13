@@ -40,7 +40,7 @@ export function moduleGraph(config: Config, buildCtx: BuildCtx): ts.TransformerF
 
       const dirPath = config.sys.path.dirname(tsSourceFile.fileName);
 
-      buildCtx.moduleGraph.push(moduleGraph);
+      buildCtx.moduleGraphs.push(moduleGraph);
 
       return visit(moduleGraph, dirPath, tsSourceFile) as ts.SourceFile;
     };

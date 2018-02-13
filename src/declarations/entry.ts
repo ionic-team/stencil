@@ -33,6 +33,11 @@ export interface ComponentReference {
   filePath: string;
 }
 
+export interface SourceString {
+  str: string;
+  filePath: string;
+}
+
 export interface ModuleGraph {
   filePath: string;
   importPaths: string[];

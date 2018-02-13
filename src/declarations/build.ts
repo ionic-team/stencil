@@ -3,8 +3,8 @@ import * as d from './index';
 
 export interface BuildCtx {
   graphData?: GraphData;
-  componentRefs?: d.ComponentReference[];
-  moduleGraph?: d.ModuleGraph[];
+  sourceStrings?: d.SourceString[];
+  moduleGraphs?: d.ModuleGraph[];
   buildId: number;
   requiresFullBuild: boolean;
   diagnostics: d.Diagnostic[];

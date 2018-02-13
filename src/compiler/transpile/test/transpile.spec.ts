@@ -292,15 +292,12 @@ describe('transpile', () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({
         '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
-        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
-        '/src/new-dir/no-find.tsx': `@Component({ tag: 'no-find' }) export class NoFind {}`
+        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`
       }, { clearFileCache: true });
 
       await c.fs.writeFile('/src/cmp-a.tsx', `
         @Component({ tag: 'cmp-a' }) export class CmpA {
           render() {
-            someFunction('no-find');
-
             if (true) {
               return (
                 h('cmp-b')
@@ -327,7 +324,7 @@ describe('transpile', () => {
       await c.fs.writeFiles({
         '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
         '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
-        '/src/new-dir/no-find.tsx': `@Component({ tag: 'no-find' }) export class NoFind {}`
+        '/src/new-dir/cmp-d.tsx': `@Component({ tag: 'cmp-d' }) export class CmpD {}`
       }, { clearFileCache: true });
 
       await c.fs.writeFile('/src/cmp-a.tsx', `
@@ -336,7 +333,8 @@ describe('transpile', () => {
             document.createElement('cmp-b');
             var doc = document;
             doc.createElementNS('cmp-c');
-            doc.someFunction('no-find');
+            var tag = 'cmp-d';
+            document.createElement(tag);
           }
         }
       `, { clearFileCache: true });
@@ -346,7 +344,7 @@ describe('transpile', () => {
       expect(r.diagnostics).toEqual([]);
 
       expect(r.components[0].tag).toBe('cmp-a');
-      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c']);
+      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c', 'cmp-d']);
     });
 
     it('get component dependencies from html string literals', async () => {
@@ -366,8 +364,6 @@ describe('transpile', () => {
           constructor() {
             this.el.innerHTML = '<cmp-b></cmp-b>';
             $.append('<cmp-c></cmp-c>');
-            console.log('no-find');
-            console.log(' no-find ');
           }
         }
       `, { clearFileCache: true });

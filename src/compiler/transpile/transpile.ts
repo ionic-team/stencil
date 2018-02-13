@@ -3,7 +3,6 @@ import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles,
 import { componentDependencies } from './transformers/component-dependencies';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
-import { calcComponentDependencies } from '../entries/component-dependencies';
 import { getComponentsDtsSrcFilePath } from '../build/distribution';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
@@ -106,23 +105,22 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
 
 
 function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-
   // this is the big one, let's go ahead and kick off the transpiling
   program.emit(undefined, tsHost.writeFile, undefined, false, {
+
+    // NOTE! order of transforms and being in either "before" or "after" is very important!!!!
     before: [
       removeDecorators(),
-      addComponentMetadata(compilerCtx.moduleFiles),
-      moduleGraph(config, buildCtx)
+      addComponentMetadata(compilerCtx.moduleFiles)
     ],
     after: [
       removeImports(),
       removeStencilImports(),
+      moduleGraph(config, buildCtx),
       componentDependencies(compilerCtx, buildCtx)
     ]
-  });
 
-  // figure out how modules and components connect
-  calcComponentDependencies(compilerCtx.moduleFiles, buildCtx.moduleGraph, buildCtx.componentRefs);
+  });
 
   if (!config.suppressTypeScriptErrors) {
     // suppressTypeScriptErrors mainly for unit testing
