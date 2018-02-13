@@ -34,7 +34,7 @@ export class NodeLogger implements d.Logger {
 
   info(...msg: any[]) {
     if (this.shouldLog('info')) {
-      const lines = wordWrap(msg);
+      const lines = wordWrap(msg, getColumns());
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
     }
@@ -56,9 +56,9 @@ export class NodeLogger implements d.Logger {
 
   warn(...msg: any[]) {
     if (this.shouldLog('warn')) {
-      const lines = wordWrap(msg);
+      const lines = wordWrap(msg, getColumns());
       this.warnPrefix(lines);
-      console.warn(lines.join('\n'));
+      console.warn('\n' + lines.join('\n') + '\n');
     }
     this.queueWriteLog('W', msg);
   }
@@ -82,9 +82,9 @@ export class NodeLogger implements d.Logger {
     }
 
     if (this.shouldLog('error')) {
-      const lines = wordWrap(msg);
+      const lines = wordWrap(msg, getColumns());
       this.errorPrefix(lines);
-      console.error(lines.join('\n'));
+      console.error('\n' + lines.join('\n') + '\n');
     }
     this.queueWriteLog('E', msg);
   }
@@ -99,7 +99,7 @@ export class NodeLogger implements d.Logger {
   debug(...msg: any[]) {
     if (this.shouldLog('debug')) {
       msg.push(this.dim(` MEM: ${(process.memoryUsage().rss / 1000000).toFixed(1)}MB`));
-      const lines = wordWrap(msg);
+      const lines = wordWrap(msg, getColumns());
       this.debugPrefix(lines);
       console.log(lines.join('\n'));
     }
@@ -124,14 +124,14 @@ export class NodeLogger implements d.Logger {
 
     if (debug) {
       if (this.shouldLog('debug')) {
-        const lines = wordWrap(msg);
+        const lines = wordWrap(msg, getColumns());
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
         this.queueWriteLog('D', [`${startMsg} ...`]);
       }
 
     } else {
-      const lines = wordWrap(msg);
+      const lines = wordWrap(msg, getColumns());
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${startMsg} ...`]);
@@ -152,14 +152,14 @@ export class NodeLogger implements d.Logger {
 
     if (debug) {
       if (this.shouldLog('debug')) {
-        const lines = wordWrap([msg]);
+        const lines = wordWrap([msg], getColumns());
         this.debugPrefix(lines);
         console.log(lines.join('\n'));
       }
       this.queueWriteLog('D', [`${finishMsg} ${timeSuffix}`]);
 
     } else {
-      const lines = wordWrap([msg]);
+      const lines = wordWrap([msg], getColumns());
       this.infoPrefix(lines);
       console.log(lines.join('\n'));
       this.queueWriteLog('I', [`${finishMsg} ${timeSuffix}`]);
@@ -276,7 +276,7 @@ export class NodeLogger implements d.Logger {
   }
 
   printDiagnostic(d: d.Diagnostic) {
-    const outputLines = wordWrap([d.messageText]);
+    const outputLines = wordWrap([d.messageText], getColumns());
 
     if (d.header && d.header !== 'build error' && d.header !== 'build warn') {
       outputLines.unshift(INDENT + d.header);
@@ -336,7 +336,7 @@ export class NodeLogger implements d.Logger {
 
   highlightError(errorLine: string, errorCharStart: number, errorLength: number) {
     let rightSideChars = errorLine.length - errorCharStart + errorLength - 1;
-    while (errorLine.length + INDENT.length > MAX_LEN) {
+    while (errorLine.length + INDENT.length > MAX_COLUMNS) {
       if (errorCharStart > (errorLine.length - errorCharStart + errorLength) && errorCharStart > 5) {
         // larger on left side
         errorLine = errorLine.substr(1);
@@ -454,7 +454,13 @@ class CmdTimeSpan {
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
 
 
-function wordWrap(msg: any[]) {
+function getColumns() {
+  const terminalWidth = (process.stdout && (process.stdout as any).columns) || 80;
+  return Math.max(Math.min(MAX_COLUMNS, terminalWidth), MIN_COLUMNS);
+}
+
+
+export function wordWrap(msg: any[], columns: number) {
   const lines: string[] = [];
   const words: any[] = [];
 
@@ -503,7 +509,7 @@ function wordWrap(msg: any[]) {
       lines.push(word());
       line = INDENT;
 
-    } else if (INDENT.length + word.length > MAX_LEN) {
+    } else if (INDENT.length + word.length > columns - 1) {
       // word is too long to play nice, just give it its own line
       if (line.trim().length) {
         lines.push(line);
@@ -511,7 +517,7 @@ function wordWrap(msg: any[]) {
       lines.push(INDENT + word);
       line = INDENT;
 
-    } else if ((word.length + line.length) > MAX_LEN) {
+    } else if ((word.length + line.length) > columns - 1) {
       // this word would make the line too long
       // print the line now, then start a new one
       lines.push(line);
@@ -526,7 +532,9 @@ function wordWrap(msg: any[]) {
     lines.push(line);
   }
 
-  return lines;
+  return lines.map(line => {
+    return (line as any).trimRight();
+  });
 }
 
 
@@ -593,4 +601,5 @@ const JS_KEYWORDS = [
 
 
 const INDENT = '           ';
-const MAX_LEN = 120;
+const MIN_COLUMNS = 60;
+const MAX_COLUMNS = 120;
