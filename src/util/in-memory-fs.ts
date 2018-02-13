@@ -201,11 +201,13 @@ export class InMemoryFileSystem {
 
     const fileContent = await this.disk.readFile(filePath, 'utf-8');
 
-    const item = this.getItem(filePath);
-    item.exists = true;
-    item.isFile = true;
-    item.isDirectory = false;
-    item.fileText = fileContent;
+    if (fileContent.length < MAX_TEXT_CACHE) {
+      const item = this.getItem(filePath);
+      item.exists = true;
+      item.isFile = true;
+      item.isDirectory = false;
+      item.fileText = fileContent;
+    }
 
     return fileContent;
   }
@@ -223,10 +225,12 @@ export class InMemoryFileSystem {
 
     const fileContent = this.disk.readFileSync(filePath, 'utf-8');
 
-    item.exists = true;
-    item.isFile = true;
-    item.isDirectory = false;
-    item.fileText = fileContent;
+    if (fileContent.length < MAX_TEXT_CACHE) {
+      item.exists = true;
+      item.isFile = true;
+      item.isDirectory = false;
+      item.fileText = fileContent;
+    }
 
     return fileContent;
   }
@@ -656,3 +660,10 @@ const IGNORE = [
   'desktop.ini',
   'thumbs.db'
 ];
+
+// only cache if it's less than 5MB-ish (using .length as a rough guess)
+// why 5MB? idk, seems like a good number for source text
+// it's pretty darn large to cover almost ALL legitimate source files
+// and anything larger is probably a REALLY large file and a rare case
+// which we don't need to eat up memory for
+const MAX_TEXT_CACHE = 5242880;
