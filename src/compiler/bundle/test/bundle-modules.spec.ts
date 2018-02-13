@@ -75,6 +75,39 @@ describe('bundle-module', () => {
       );
     });
 
+    it('should include json files', async () => {
+      c.config.bundles = [
+        { components: ['cmp-a'] },
+        { components: ['cmp-b'] }
+      ];
+      await c.fs.writeFiles({
+        '/src/cmp-a.tsx': `
+          import json from './package.json';
+          console.log(json.thename);
+          @Component({ tag: 'cmp-a' }) export class CmpA {}
+        `,
+        '/src/cmp-b.tsx': `
+          import json from './package.json';
+          console.log(json.thename);
+          @Component({ tag: 'cmp-b' }) export class CmpB {}
+        `,
+        '/src/package.json': `
+          {
+            "thename": "test"
+          }
+        `
+      });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+      expectFilesWritten(r,
+        '/www/build/app/cmp-a.js',
+        '/www/build/app/cmp-b.js',
+        '/www/build/app/chunk1.js'
+      );
+    });
+
     var c: TestingCompiler;
 
     beforeEach(async () => {

@@ -8,6 +8,7 @@ import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
 import bundleEntryFile from './rollup-plugins/bundle-entry-file';
 import { InputOptions, OutputChunk, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
+import bundleJson from './rollup-plugins/json';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
@@ -28,6 +29,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
         include: 'node_modules/**',
         sourceMap: false
       }),
+      bundleJson(config),
       globals(),
       builtins(),
       bundleEntryFile(config, entryModules),
