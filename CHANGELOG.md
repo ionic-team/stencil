@@ -1,3 +1,13 @@
+<a name="0.5.0-1"></a>
+# [0.5.0-1](https://github.com/ionic-team/stencil/compare/v0.5.0-0...v0.5.0-1) (2018-02-13)
+
+
+### Bug Fixes
+
+* **entries:** ensure dependency data from collections remains ([f9fb09a](https://github.com/ionic-team/stencil/commit/f9fb09a))
+
+
+
 <a name="0.5.0-0"></a>
 # [0.5.0-0](https://github.com/ionic-team/stencil/compare/v0.4.3...v0.5.0-0) (2018-02-12)
 
