@@ -1,40 +1,13 @@
-<a name="0.5.0-3"></a>
-# [0.5.0-3](https://github.com/ionic-team/stencil/compare/v0.5.0-2...v0.5.0-3) (2018-02-13)
-
-
-### Bug Fixes
-
-* **transpile:** remove unneded remove-imports transform because it is causing issues with wildcard imports. fixes [#526](https://github.com/ionic-team/stencil/issues/526) ([256e70a](https://github.com/ionic-team/stencil/commit/256e70a))
-
-
-
-<a name="0.5.0-2"></a>
-# [0.5.0-2](https://github.com/ionic-team/stencil/compare/v0.5.0-1...v0.5.0-2) (2018-02-13)
-
-
-### Bug Fixes
-
-* **entries:** use all strings for component reference graph ([6629aa1](https://github.com/ionic-team/stencil/commit/6629aa1))
-
-
-
-<a name="0.5.0-1"></a>
-# [0.5.0-1](https://github.com/ionic-team/stencil/compare/v0.5.0-0...v0.5.0-1) (2018-02-13)
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/ionic-team/stencil/compare/v0.4.3...v0.5.0) (2018-02-13)
 
 
 ### Bug Fixes
 
 * **entries:** ensure dependency data from collections remains ([f9fb09a](https://github.com/ionic-team/stencil/commit/f9fb09a))
-
-
-
-<a name="0.5.0-0"></a>
-# [0.5.0-0](https://github.com/ionic-team/stencil/compare/v0.4.3...v0.5.0-0) (2018-02-12)
-
-
-### Bug Fixes
-
+* **entries:** use all strings for component reference graph ([6629aa1](https://github.com/ionic-team/stencil/commit/6629aa1))
 * **publicPath:** allow for custom public path ([19095e7](https://github.com/ionic-team/stencil/commit/19095e7)), closes [#464](https://github.com/ionic-team/stencil/issues/464)
+* **transpile:** remove unneded remove-imports transform because it is causing issues with wildcard imports. fixes [#526](https://github.com/ionic-team/stencil/issues/526) ([256e70a](https://github.com/ionic-team/stencil/commit/256e70a))
 
 
 ### Features
@@ -1808,6 +1781,3 @@
 
 * **demos:** add height attributes to header ([b70f25a](https://github.com/ionic-team/stencil/commit/b70f25a))
 * reduce css parser code ([12ee8aa](https://github.com/ionic-team/stencil/commit/12ee8aa))
-
-
-
