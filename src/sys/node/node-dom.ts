@@ -35,7 +35,7 @@ export function createDom() {
     },
 
     destroy() {
-      dom.window.close();
+      dom && dom.window && dom.window.close();
       dom = null;
     }
 
