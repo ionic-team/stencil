@@ -1,3 +1,13 @@
+<a name="0.5.0-3"></a>
+# [0.5.0-3](https://github.com/ionic-team/stencil/compare/v0.5.0-2...v0.5.0-3) (2018-02-13)
+
+
+### Bug Fixes
+
+* **transpile:** remove unneded remove-imports transform because it is causing issues with wildcard imports. fixes [#526](https://github.com/ionic-team/stencil/issues/526) ([256e70a](https://github.com/ionic-team/stencil/commit/256e70a))
+
+
+
 <a name="0.5.0-2"></a>
 # [0.5.0-2](https://github.com/ionic-team/stencil/compare/v0.5.0-1...v0.5.0-2) (2018-02-13)
 
