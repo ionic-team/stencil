@@ -3,7 +3,7 @@ import * as d from './index';
 
 export interface BuildCtx {
   graphData?: GraphData;
-  sourceStrings?: d.SourceString[];
+  componentRefs?: d.PotentialComponentRef[];
   moduleGraphs?: d.ModuleGraph[];
   buildId: number;
   requiresFullBuild: boolean;

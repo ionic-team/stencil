@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentMeta, ComponentReference, ModuleFiles, ModuleGraph, SourceString } from '../../declarations';
+import { CompilerCtx, ComponentMeta, ComponentRef, ModuleFiles, ModuleGraph, PotentialComponentRef } from '../../declarations';
 import { getComponentRefsFromSourceStrings } from './component-references';
 
 
@@ -23,7 +23,7 @@ export function calcModuleGraphImportPaths(compilerCtx: CompilerCtx, moduleGraph
 const SRC_EXTS = ['.tsx', '.ts', '.js'];
 
 
-export function calcComponentDependencies(allModuleFiles: ModuleFiles, moduleGraphs: ModuleGraph[], sourceStrings: SourceString[]) {
+export function calcComponentDependencies(allModuleFiles: ModuleFiles, moduleGraphs: ModuleGraph[], sourceStrings: PotentialComponentRef[]) {
   // figure out all the component references seen in each file
   const componentRefs = getComponentRefsFromSourceStrings(allModuleFiles, sourceStrings);
 
@@ -36,7 +36,7 @@ export function calcComponentDependencies(allModuleFiles: ModuleFiles, moduleGra
 }
 
 
-function getComponentDependencies(moduleGraphs: ModuleGraph[], componentRefs: ComponentReference[], filePath: string, cmpMeta: ComponentMeta) {
+function getComponentDependencies(moduleGraphs: ModuleGraph[], componentRefs: ComponentRef[], filePath: string, cmpMeta: ComponentMeta) {
   // we may have already figured out some dependencies (collections aready have this info)
   cmpMeta.dependencies = cmpMeta.dependencies || [];
 
@@ -59,7 +59,7 @@ function getComponentDependencies(moduleGraphs: ModuleGraph[], componentRefs: Co
 }
 
 
-function getComponentDepsFromImports(moduleGraphs: ModuleGraph[], componentRefs: ComponentReference[], importsInspected: string[], moduleGraph: ModuleGraph, cmpMeta: ComponentMeta) {
+function getComponentDepsFromImports(moduleGraphs: ModuleGraph[], componentRefs: ComponentRef[], importsInspected: string[], moduleGraph: ModuleGraph, cmpMeta: ComponentMeta) {
   moduleGraph.importPaths.forEach(importPath => {
     if (importsInspected.includes(importPath)) {
       return;

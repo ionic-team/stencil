@@ -292,18 +292,19 @@ describe('transpile', () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({
         '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
-        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`
+        '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
+        '/src/new-dir/no-find.tsx': `@Component({ tag: 'no-find' }) export class NoFind {}`
       }, { clearFileCache: true });
 
       await c.fs.writeFile('/src/cmp-a.tsx', `
         @Component({ tag: 'cmp-a' }) export class CmpA {
           render() {
+            someFunction('no-find');
             if (true) {
               return (
                 h('cmp-b')
               );
             }
-
             return (
               h('cmp-c')
             );
@@ -324,7 +325,7 @@ describe('transpile', () => {
       await c.fs.writeFiles({
         '/src/new-dir/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
         '/src/new-dir/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`,
-        '/src/new-dir/cmp-d.tsx': `@Component({ tag: 'cmp-d' }) export class CmpD {}`
+        '/src/new-dir/no-find.tsx': `@Component({ tag: 'no-find' }) export class NoFind {}`
       }, { clearFileCache: true });
 
       await c.fs.writeFile('/src/cmp-a.tsx', `
@@ -332,9 +333,9 @@ describe('transpile', () => {
           constructor() {
             document.createElement('cmp-b');
             var doc = document;
-            doc.createElementNS('cmp-c');
-            var tag = 'cmp-d';
-            document.createElement(tag);
+            doc.createElementNS('cMp-C');
+            document.createElement('   no-find   ');
+            doc.someFunction('no-find');
           }
         }
       `, { clearFileCache: true });
@@ -344,7 +345,7 @@ describe('transpile', () => {
       expect(r.diagnostics).toEqual([]);
 
       expect(r.components[0].tag).toBe('cmp-a');
-      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c', 'cmp-d']);
+      expect(r.components[0].dependencies).toEqual(['cmp-b', 'cmp-c']);
     });
 
     it('get component dependencies from html string literals', async () => {

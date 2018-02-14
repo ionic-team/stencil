@@ -14,7 +14,7 @@ export function generateEntryModules(config: Config, compilerCtx: CompilerCtx, b
   calcModuleGraphImportPaths(compilerCtx, buildCtx.moduleGraphs);
 
   // figure out how modules and components connect
-  calcComponentDependencies(compilerCtx.moduleFiles, buildCtx.moduleGraphs, buildCtx.sourceStrings);
+  calcComponentDependencies(compilerCtx.moduleFiles, buildCtx.moduleGraphs, buildCtx.componentRefs);
 
   try {
     const allModules = Object.keys(compilerCtx.moduleFiles).map(filePath => compilerCtx.moduleFiles[filePath]);
