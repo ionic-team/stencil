@@ -1,18 +1,5 @@
-import makeLegalIdentifier from './makeLegalIdentifier';
 import { Config } from '../../../declarations';
 
-export interface Options {
-  indent?: string;
-  preferConst?: boolean;
-}
-export interface ASTNode {
-  type: string;
-  sourceType?: string;
-  start: number | null;
-  end: number | null;
-  body?: any[];
-  declaration?: any;
-}
 
 export default function bundleJson(config: Config, options: Options = {}) {
   const path = config.sys.path;
@@ -192,4 +179,37 @@ export default function bundleJson(config: Config, options: Options = {}) {
       return { ast, code, map: { mappings: '' } };
     }
   };
+}
+
+const reservedWords = 'break case class catch const continue debugger default delete do else export extends finally for function if import in instanceof let new return super switch this throw try typeof var void while with yield enum await implements package protected static interface private public'.split( ' ' );
+const builtins = 'arguments Infinity NaN undefined null true false eval uneval isFinite isNaN parseFloat parseInt decodeURI decodeURIComponent encodeURI encodeURIComponent escape unescape Object Function Boolean Symbol Error EvalError InternalError RangeError ReferenceError SyntaxError TypeError URIError Number Math Date String RegExp Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array Map Set WeakMap WeakSet SIMD ArrayBuffer DataView JSON Promise Generator GeneratorFunction Reflect Proxy Intl'.split( ' ' );
+
+const blacklisted: { [ key: string]: boolean} = {};
+reservedWords.concat(builtins).forEach(word => blacklisted[word] = true );
+
+export function makeLegalIdentifier(str: string) {
+  str = str
+    .replace( /-(\w)/g, ( _, letter ) => letter.toUpperCase() )
+    .replace( /[^$_a-zA-Z0-9]/g, '_' );
+
+  if ( /\d/.test( str[0] ) || blacklisted[str] ) {
+    str = `_${str}`;
+  }
+
+  return str;
+}
+
+
+export interface Options {
+  indent?: string;
+  preferConst?: boolean;
+}
+
+export interface ASTNode {
+  type: string;
+  sourceType?: string;
+  start: number | null;
+  end: number | null;
+  body?: any[];
+  declaration?: any;
 }
