@@ -1,4 +1,5 @@
-import { flush, h, render, transpile } from '../index';
+import { flush, render, transpile } from '../index';
+import { h } from '../../core/renderer/h';
 import { ComponentConstructor } from '../../declarations';
 
 
