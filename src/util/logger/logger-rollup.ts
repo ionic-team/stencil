@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config, Diagnostic, ModuleFile, PrintLine } from '../interfaces';
+import { BuildCtx, CompilerCtx, Config, Diagnostic, ModuleFile, PrintLine } from '../../declarations';
 import { buildWarn } from '../../compiler/util';
 import { formatFileName, formatHeader, splitLineBreaks } from './logger-util';
 import { highlight } from './highlight/highlight';
@@ -22,8 +22,8 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
     d.relFilePath = formatFileName(config.rootDir, d.absFilePath);
 
     try {
-      let sourceText = compilerCtx.fs.readFileSync(d.absFilePath);
-      let srcLines = splitLineBreaks(sourceText);
+      const sourceText = compilerCtx.fs.readFileSync(d.absFilePath);
+      const srcLines = splitLineBreaks(sourceText);
       let htmlLines = srcLines;
 
       try {
@@ -39,7 +39,7 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
         errorLength: 0
       };
 
-      let highlightLine = errorLine.text.substr(rollupError.loc.column);
+      const highlightLine = errorLine.text.substr(rollupError.loc.column);
       for (var i = 0; i < highlightLine.length; i++) {
         if (CHAR_BREAK.indexOf(highlightLine.charAt(i)) > -1) {
           break;
@@ -110,16 +110,19 @@ export function loadRollupDiagnostics(config: Config, compilerCtx: CompilerCtx, 
 const CHAR_BREAK = [' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`'];
 
 
-export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
+export function createOnWarnFn(config: Config, diagnostics: Diagnostic[], bundleModulesFiles?: ModuleFile[]) {
   const previousWarns: {[key: string]: boolean} = {};
 
-  return function onWarningMessage(warning: any) {
+  return function onWarningMessage(warning: { code: string, importer: string, message: string }) {
     if (warning && warning.message in previousWarns) {
       return;
     }
     if (warning && warning.code) {
-      if (INGORE_BUNDLE_CODES.indexOf(warning.code) > -1) {
+      if (INGORE_WARNING_CODES.includes(warning.code)) {
         return;
+      }
+      if (SUPPRESS_WARNING_CODES.includes(warning.code)) {
+        config.logger.debug(warning.message);
       }
     }
     previousWarns[warning.message] = true;
@@ -137,6 +140,10 @@ export function createOnWarnFn(diagnostics: Diagnostic[], bundleModulesFiles?: M
 }
 
 
-const INGORE_BUNDLE_CODES = [
+const INGORE_WARNING_CODES = [
   `THIS_IS_UNDEFINED`, `NON_EXISTENT_EXPORT`
+];
+
+const SUPPRESS_WARNING_CODES = [
+  `CIRCULAR_DEPENDENCY`
 ];

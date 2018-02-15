@@ -39,7 +39,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       nodeEnvVars(config),
       ...config.plugins
     ],
-    onwarn: createOnWarnFn(buildCtx.diagnostics)
+    onwarn: createOnWarnFn(config, buildCtx.diagnostics)
   };
 
   try {

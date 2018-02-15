@@ -112,7 +112,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
         transpiledInMemoryPlugin(config, compilerCtx),
         ...config.plugins
       ],
-      onwarn: createOnWarnFn(buildCtx.diagnostics)
+      onwarn: createOnWarnFn(config, buildCtx.diagnostics)
     });
 
     const results = await rollup.generate({ format: 'es' });
