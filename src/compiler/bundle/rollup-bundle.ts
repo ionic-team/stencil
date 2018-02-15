@@ -1,14 +1,14 @@
 import { BuildCtx, CompilerCtx, Config, EntryModule, JSModuleList } from '../../declarations';
+import bundleEntryFile from './rollup-plugins/bundle-entry-file';
+import bundleJson from './rollup-plugins/json';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
-import pathsResolution from './rollup-plugins/paths-resolution';
 import localResolution from './rollup-plugins/local-resolution';
-import transpiledInMemoryPlugin from './rollup-plugins/transpiled-in-memory';
-import bundleEntryFile from './rollup-plugins/bundle-entry-file';
+import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
 import { InputOptions, OutputChunk, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
-import bundleJson from './rollup-plugins/json';
+import pathsResolution from './rollup-plugins/paths-resolution';
 
 
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
@@ -33,7 +33,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       globals(),
       builtins(),
       bundleEntryFile(config, entryModules),
-      transpiledInMemoryPlugin(config, compilerCtx),
+      inMemoryFsRead(config, compilerCtx),
       await pathsResolution(config, compilerCtx),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),

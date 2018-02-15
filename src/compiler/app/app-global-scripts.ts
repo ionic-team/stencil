@@ -3,8 +3,8 @@ import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, minifyJs } from '../util';
 import { getAppPublicPath, getGlobalDist, getGlobalFileName, getGlobalWWW } from './app-file-naming';
+import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import { transpileToEs5 } from '../transpile/core-build';
-import transpiledInMemoryPlugin from '../bundle/rollup-plugins/transpiled-in-memory';
 
 
 export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
@@ -109,7 +109,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           include: 'node_modules/**',
           sourceMap: false
         }),
-        transpiledInMemoryPlugin(config, compilerCtx),
+        inMemoryFsRead(config, compilerCtx),
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics)

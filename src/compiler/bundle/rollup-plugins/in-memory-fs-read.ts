@@ -1,14 +1,15 @@
-import { CompilerCtx, Config, FilesMap } from '../../../util/interfaces';
+import { CompilerCtx, Config, FilesMap } from '../../../declarations';
 import { normalizePath } from '../../util';
 
-export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCtx) {
+
+export default function inMemoryFsRead(config: Config, compilerCtx: CompilerCtx) {
   const sys = config.sys;
   const assetsCache: FilesMap = {};
 
   return {
-    name: 'transpiledInMemoryPlugin',
+    name: 'inMemoryFsRead',
 
-    resolveId(importee: string, importer: string): string {
+    async resolveId(importee: string, importer: string) {
       if (!sys.path.isAbsolute(importee)) {
         importee = normalizePath(sys.path.resolve(importer ? sys.path.dirname(importer) : sys.path.resolve(), importee));
 
@@ -19,15 +20,15 @@ export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCt
 
       // it's possible the importee is a file pointing directly to the source ts file
       // if it is a ts file path, then we're good to go
-      var moduleFile = ctx.moduleFiles[importee];
-      if (ctx.moduleFiles[importee]) {
+      var moduleFile = compilerCtx.moduleFiles[importee];
+      if (compilerCtx.moduleFiles[importee]) {
         return moduleFile.jsFilePath;
       }
 
-      const tsFileNames = Object.keys(ctx.moduleFiles);
+      const tsFileNames = Object.keys(compilerCtx.moduleFiles);
       for (var i = 0; i < tsFileNames.length; i++) {
         // see if we can find by importeE
-        moduleFile = ctx.moduleFiles[tsFileNames[i]];
+        moduleFile = compilerCtx.moduleFiles[tsFileNames[i]];
         if (moduleFile.jsFilePath === importee) {
           // awesome, there's a module file for this js file, we're good here
           return importee;
@@ -41,7 +42,7 @@ export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCt
       // think slide's swiper dependency
       for (i = 0; i < tsFileNames.length; i++) {
         // see if we can find by importeR
-        moduleFile = ctx.moduleFiles[tsFileNames[i]];
+        moduleFile = compilerCtx.moduleFiles[tsFileNames[i]];
         if (moduleFile.jsFilePath === importer) {
           // awesome, there's a module file for this js file via importeR
           // now let's check if this module has an assets directory
@@ -54,7 +55,7 @@ export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCt
               // ok, we've got a potential absolute path where the file "could" be
               try {
                 // let's see if it actually exists, but with readFileSync :(
-                assetsCache[assetsFilePath] = ctx.fs.readFileSync(assetsFilePath);
+                assetsCache[assetsFilePath] = compilerCtx.fs.readFileSync(assetsFilePath);
                 if (typeof assetsCache[assetsFilePath] === 'string') {
                   return assetsFilePath;
                 }
@@ -77,7 +78,7 @@ export default function transpiledInMemoryPlugin(config: Config, ctx: CompilerCt
         return assetsCache[sourcePath];
       }
 
-      return ctx.fs.readFile(sourcePath);
+      return compilerCtx.fs.readFile(sourcePath);
     }
   };
 }
