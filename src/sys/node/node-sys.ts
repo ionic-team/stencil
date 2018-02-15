@@ -18,6 +18,7 @@ export class NodeSystem implements StencilSystem {
   private runtime: string;
   private sysUtil: any;
   private typescriptPackageJson: PackageJsonData;
+  private resolveModuleCache: { [cacheKey: string]: string } = {};
 
   fs: FileSystem;
   path: Path;
@@ -119,34 +120,48 @@ export class NodeSystem implements StencilSystem {
   loadConfigFile(configPath: string) {
     let config: Config;
 
-    if (!path.isAbsolute(configPath)) {
-      throw new Error(`Stencil configuration file "${configPath}" must be an absolute path.`);
-    }
+    let hasConfigFile = false;
 
-    try {
-      const fileStat = this.fs.statSync(configPath);
-      if (fileStat.isDirectory()) {
-        // this is only a directory, so let's just assume we're looking for in stencil.config.js
-        // otherwise they could pass in an absolute path if it was somewhere else
-        configPath = path.join(configPath, 'stencil.config.js');
+    if (typeof configPath === 'string') {
+      if (!path.isAbsolute(configPath)) {
+        throw new Error(`Stencil configuration file "${configPath}" must be an absolute path.`);
       }
 
+      try {
+        let fileStat = this.fs.statSync(configPath);
+        if (fileStat.isFile()) {
+          hasConfigFile = true;
+
+        } else if (fileStat.isDirectory()) {
+          // this is only a directory, so let's just assume we're looking for in stencil.config.js
+          // otherwise they could pass in an absolute path if it was somewhere else
+          configPath = path.join(configPath, 'stencil.config.js');
+          fileStat = this.fs.statSync(configPath);
+          hasConfigFile = fileStat.isFile();
+        }
+      } catch (e) {
+        hasConfigFile = false;
+      }
+    }
+
+    if (hasConfigFile) {
       // the passed in config was a string, so it's probably a path to the config we need to load
       const configFileData = require(configPath);
       if (!configFileData.config) {
         throw new Error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);
       }
-
       config = configFileData.config;
       config.configPath = configPath;
 
-    } catch (e) {
-      // no stencil.config.js file, which is fine
-      config = {};
-    }
+      if (!config.rootDir && configPath) {
+        config.rootDir = path.dirname(configPath);
+      }
 
-    if (!config.rootDir && configPath) {
-      config.rootDir = path.dirname(configPath);
+    } else {
+      // no stencil.config.js file, which is fine
+      config = {
+        rootDir: process.cwd()
+      };
     }
 
     if (!config.sys) {
@@ -221,6 +236,11 @@ export class NodeSystem implements StencilSystem {
   }
 
   resolveModule(fromDir: string, moduleId: string) {
+    const cacheKey = `${fromDir}:${moduleId}`;
+    if (this.resolveModuleCache[cacheKey]) {
+      return this.resolveModuleCache[cacheKey];
+    }
+
     const Module = require('module');
 
     fromDir = path.resolve(fromDir);
@@ -245,7 +265,11 @@ export class NodeSystem implements StencilSystem {
         continue;
       }
 
-      return normalizePath(packageJsonFilePath);
+      const resolvedModulePath = normalizePath(packageJsonFilePath);
+
+      this.resolveModuleCache[cacheKey] = resolvedModulePath;
+
+      return resolvedModulePath;
     }
 
     throw new Error(`error loading "${moduleId}" from "${fromDir}"`);

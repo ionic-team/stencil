@@ -62,34 +62,25 @@ export function configFileReload(config: Config) {
   try {
     const updatedConfig = config.sys.loadConfigFile(config.configPath);
 
-    // just update the existing config in place
-    // not everything should be overwritten or merged
-    // pick and choose what's ok to update
-    config.buildDir = updatedConfig.buildDir;
-    config.distDir = updatedConfig.distDir;
-    config.bundles = updatedConfig.bundles;
-    config.collectionDir = updatedConfig.collectionDir;
-    config.collections = updatedConfig.collections;
-    config.includeSrc = updatedConfig.includeSrc;
-    config.excludeSrc = updatedConfig.excludeSrc;
-    config.generateDistribution = updatedConfig.generateDistribution;
-    config.generateWWW = updatedConfig.generateWWW;
-    config.globalScript = updatedConfig.globalScript;
-    config.globalStyle = updatedConfig.globalStyle;
-    config.hashedFileNameLength = updatedConfig.hashedFileNameLength;
-    config.hashFileNames = updatedConfig.hashFileNames;
-    config.wwwIndexHtml = updatedConfig.wwwIndexHtml;
-    config.srcIndexHtml = updatedConfig.srcIndexHtml;
-    config.minifyCss = updatedConfig.minifyCss;
-    config.minifyJs = updatedConfig.minifyJs;
-    config.namespace = updatedConfig.namespace;
-    config.preamble = updatedConfig.preamble;
-    config.prerender = updatedConfig.prerender;
-    config.publicPath = updatedConfig.publicPath;
-    config.srcDir = updatedConfig.srcDir;
-    config.watchIgnoredRegex = updatedConfig.watchIgnoredRegex;
+    // keepers
+    const sys = config.sys;
+    const logger = config.logger;
+    const rootDir = config.rootDir;
 
-    config._isValidated = false;
+    // empty it out cuz we're gonna use the same object
+    for (const key in config) {
+      delete (config as any)[key];
+    }
+
+    // fill it back up with the keepers
+    config.sys = sys;
+    config.logger = logger;
+    config.rootDir = rootDir;
+
+    // fill it up with the newly loaded config
+    Object.assign(config, updatedConfig);
+
+    // validate our new config data
     validateBuildConfig(config);
 
   } catch (e) {
