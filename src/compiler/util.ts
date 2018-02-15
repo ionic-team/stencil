@@ -44,20 +44,19 @@ export function isJsFile(filePath: string) {
 }
 
 
-export function isSassFile(filePath: string) {
-  const ext = filePath.split('.').pop().toLowerCase();
-  return ext === 'scss' || ext === 'sass';
+export function hasFileExtension(filePath: string, extensions: string[]) {
+  filePath = filePath.toLowerCase();
+  return extensions.some(ext => filePath.endsWith('.' + ext));
 }
 
 
 export function isCssFile(filePath: string) {
-  return filePath.split('.').pop().toLowerCase() === 'css';
+  return hasFileExtension(filePath, ['css']);
 }
 
 
 export function isHtmlFile(filePath: string) {
-  const ext = filePath.split('.').pop().toLowerCase();
-  return ext === 'html' || ext === 'htm';
+  return hasFileExtension(filePath, ['html', 'htm']);
 }
 
 /**
@@ -66,8 +65,7 @@ export function isHtmlFile(filePath: string) {
  * @param filePath
  */
 export function isWebDevFile(filePath: string) {
-  const ext = filePath.split('.').pop().toLowerCase();
-  return (WEB_DEV_EXT.includes(ext) || isTsFile(filePath));
+  return (hasFileExtension(filePath, WEB_DEV_EXT) || isTsFile(filePath));
 }
 const WEB_DEV_EXT = ['js', 'jsx', 'html', 'htm', 'css', 'scss', 'sass', 'less', 'styl', 'pcss'];
 

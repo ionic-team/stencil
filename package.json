@@ -38,7 +38,6 @@
   "dependencies": {
     "chokidar": "2.0.1",
     "jsdom": "11.5.1",
-    "node-sass": "4.7.2",
     "rollup": "0.55.5",
     "rollup-plugin-commonjs": "8.3.0",
     "rollup-plugin-node-builtins": "2.1.2",

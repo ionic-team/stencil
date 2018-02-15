@@ -141,27 +141,27 @@ describe('util', () => {
     });
   });
 
-  describe('isSassFile', () => {
+  describe('hasFileExtension', () => {
     it('should return true for .scss and .sass files', () => {
-      expect(util.isSassFile('.scss')).toEqual(true);
-      expect(util.isSassFile('foo.scss')).toEqual(true);
-      expect(util.isSassFile('foo/bar.scss')).toEqual(true);
-      expect(util.isSassFile('.sass')).toEqual(true);
-      expect(util.isSassFile('foo.sass')).toEqual(true);
-      expect(util.isSassFile('foo/bar.sass')).toEqual(true);
+      expect(util.hasFileExtension('.scss', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('foo.scss', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('foo/bar.scss', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('.sass', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('foo.sass', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('foo/bar.sass', ['scss', 'sass'])).toEqual(true);
     });
 
     it('should return false for other types of files', () => {
-      expect(util.isSassFile('.stss')).toEqual(false);
-      expect(util.isSassFile('foo.html')).toEqual(false);
-      expect(util.isSassFile('foo/bar.css')).toEqual(false);
+      expect(util.hasFileExtension('.stss', ['scss', 'sass'])).toEqual(false);
+      expect(util.hasFileExtension('foo.html', ['scss', 'sass'])).toEqual(false);
+      expect(util.hasFileExtension('foo/bar.css', ['scss', 'sass'])).toEqual(false);
     });
 
     it('should be case insensitive', () => {
-      expect(util.isSassFile('.sCss')).toEqual(true);
-      expect(util.isSassFile('foo.SCSS')).toEqual(true);
-      expect(util.isSassFile('.sAss')).toEqual(true);
-      expect(util.isSassFile('foo/bar.saSS')).toEqual(true);
+      expect(util.hasFileExtension('.sCss', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('foo.SCSS', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('.sAss', ['scss', 'sass'])).toEqual(true);
+      expect(util.hasFileExtension('foo/bar.saSS', ['scss', 'sass'])).toEqual(true);
     });
   });
 

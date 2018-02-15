@@ -1,6 +1,6 @@
 import { BuildCtx, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile, StyleMeta } from '../../declarations';
 import { ENCAPSULATION } from '../../util/constants';
-import { normalizePath } from '../util';
+import { hasFileExtension, normalizePath } from '../util';
 import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from '../css/scope-css';
 
@@ -46,6 +46,28 @@ async function compileStyles(config: Config, compilerCtx: CompilerCtx, buildCtx:
 
   const styles = await Promise.all(absStylePath.map(async filePath => {
     filePath = normalizePath(filePath);
+
+    // test for well-known extensions and if the plugin has been installed
+    if (hasFileExtension(filePath, ['scss', 'sass'])) {
+      if (!config.plugins.some(p => p.name === 'sass')) {
+        // using a sass file, however the sass plugin isn't installed
+        if (!buildCtx.data.hasShownSassError) {
+          const relPath = config.sys.path.relative(config.rootDir, filePath);
+          config.logger.error(`Style "${relPath}" is a Sass file, however the "sass" plugin has not been installed. Please install the "@stencil/sass" plugin and add it to "config.plugins" within the project's stencil.config.js file. For more info please see: https://www.npmjs.com/package/@stencil/sass`);
+          buildCtx.data.hasShownSassError = true;
+        }
+      }
+
+    } else if (hasFileExtension(filePath, ['pcss'])) {
+      if (!config.plugins.some(p => p.name === 'postcss')) {
+        // using a pcss file, however the postcss plugin isn't installed
+        if (!buildCtx.data.hasShownPostCssError) {
+          const relPath = config.sys.path.relative(config.rootDir, filePath);
+          config.logger.error(`Style "${relPath}" is a PostCSS file, however the "postcss" plugin has not been installed. Please install the "@stencil/postcss" plugin and add it to "config.plugins" within the project's stencil.config.js file. For more info please see: https://www.npmjs.com/package/@stencil/postcss`);
+          buildCtx.data.hasShownPostCssError = true;
+        }
+      }
+    }
 
     const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
 
