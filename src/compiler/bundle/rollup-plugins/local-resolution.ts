@@ -1,8 +1,8 @@
-import { Config } from '../../../declarations';
+import { CompilerCtx, Config } from '../../../declarations';
 import { normalizePath } from '../../util';
 
 
-export default function localResolver(config: Config) {
+export default function localResolver(config: Config, compilerCtx: CompilerCtx) {
   return {
     name: 'localResolverPlugin',
 
@@ -30,12 +30,12 @@ export default function localResolver(config: Config) {
       let stats;
 
       try {
-        stats = config.sys.fs.statSync(importee);
+        stats = await compilerCtx.fs.stat(importee);
       } catch (e) {
         return null;
       }
 
-      if (stats.isFile()) {
+      if (stats.isFile) {
         return dirIndexFile;
       }
 

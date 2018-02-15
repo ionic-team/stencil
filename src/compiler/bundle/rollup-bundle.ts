@@ -35,7 +35,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       bundleEntryFile(config, entryModules),
       transpiledInMemoryPlugin(config, compilerCtx),
       await pathsResolution(config, compilerCtx),
-      localResolution(config),
+      localResolution(config, compilerCtx),
       nodeEnvVars(config),
       ...config.plugins
     ],
