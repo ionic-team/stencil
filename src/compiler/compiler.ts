@@ -1,7 +1,8 @@
 import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic } from '../declarations';
 import { build } from './build/build';
-import { catchError, getCompilerCtx } from './util';
+import { catchError } from './util';
 import { docs } from './docs/docs';
+import { getCompilerCtx } from './build/compiler-ctx';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { validateBuildConfig } from '../compiler/config/validate-config';
 import { validatePrerenderConfig } from './prerender/validate-prerender-config';

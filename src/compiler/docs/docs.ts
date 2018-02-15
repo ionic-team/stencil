@@ -1,8 +1,9 @@
 import { CompilerCtx, Config } from '../../declarations';
-import { catchError, getCompilerCtx, hasError } from '../util';
+import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { generateReadmes } from './generate-readmes';
 import { getBuildContext } from '../build/build-utils';
+import { getCompilerCtx } from '../build/compiler-ctx';
 import { transpileAppModules } from '../transpile/transpile-app-modules';
 
 

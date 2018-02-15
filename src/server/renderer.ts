@@ -1,5 +1,6 @@
 import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../declarations';
-import { catchError, getCompilerCtx } from '../compiler/util';
+import { catchError } from '../compiler/util';
+import { getCompilerCtx } from '../compiler/build/compiler-ctx';
 import { getGlobalWWW } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { InMemoryFileSystem } from '../util/in-memory-fs';

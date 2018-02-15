@@ -1,9 +1,10 @@
 import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { bundle } from '../bundle/bundle';
-import { catchError, getCompilerCtx } from '../util';
+import { catchError } from '../util';
 import { copyTasks } from '../copy/copy-tasks';
 import { emptyDestDir, writeBuildFiles } from './write-build';
 import { getBuildContext } from './build-utils';
+import { getCompilerCtx } from './compiler-ctx';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateBundles } from '../bundle/generate-bundles';
 import { generateEntryModules } from '../entries/entry-modules';
