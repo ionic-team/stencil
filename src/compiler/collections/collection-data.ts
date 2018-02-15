@@ -1,6 +1,6 @@
-import { AssetsMeta, BuildCtx, CompilerCtx, ComponentData, ComponentMeta, Config,
-  EntryModule, EventData, ExternalStyleMeta, ListenMeta, ListenerData, Manifest,
-  ManifestData, ModuleFile, PropData, StyleData, StyleMeta } from '../../declarations';
+import { AssetsMeta, BuildCtx, Collection, CollectionData, CompilerCtx, ComponentData, ComponentMeta, Config,
+  EntryModule, EventData, ExternalStyleMeta, ListenMeta, ListenerData,
+  ModuleFile, PropData, StyleData, StyleMeta } from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
@@ -11,32 +11,32 @@ import { normalizePath } from '../util';
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
 
-export async function writeAppManifest(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function writeAppCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
-  // get the absolute path to the directory where the manifest will be saved
-  const manifestDir = normalizePath(config.collectionDir);
+  // get the absolute path to the directory where the collection will be saved
+  const collectionDir = normalizePath(config.collectionDir);
 
-  // create an absolute file path to the actual manifest json file
-  const manifestFilePath = normalizePath(config.sys.path.join(manifestDir, COLLECTION_MANIFEST_FILE_NAME));
+  // create an absolute file path to the actual collection json file
+  const collectionFilePath = normalizePath(config.sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
 
-  config.logger.debug(`manifest, serializeAppManifest: ${manifestFilePath}`);
+  config.logger.debug(`collection, serialize: ${collectionFilePath}`);
 
-  // serialize the manifest into a json string and
+  // serialize the collection into a json string and
   // add it to the list of files we need to write when we're ready
-  const manifestData = serializeAppManifest(config, manifestDir, buildCtx.entryModules, buildCtx.global);
+  const collectionData = serializeAppCollection(config, collectionDir, buildCtx.entryModules, buildCtx.global);
 
   if (config.generateDistribution) {
-    // don't bother serializing/writing the manifest if we're not creating a distribution
-    await compilerCtx.fs.writeFile(manifestFilePath, JSON.stringify(manifestData, null, 2));
+    // don't bother serializing/writing the collection if we're not creating a distribution
+    await compilerCtx.fs.writeFile(collectionFilePath, JSON.stringify(collectionData, null, 2));
   }
 
-  return manifestData;
+  return collectionData;
 }
 
 
-export function serializeAppManifest(config: Config, manifestDir: string, entryModules: EntryModule[], globalModule: ModuleFile) {
-  // create the single manifest we're going to fill up with data
-  const manifestData: ManifestData = {
+export function serializeAppCollection(config: Config, collectionDir: string, entryModules: EntryModule[], globalModule: ModuleFile) {
+  // create the single collection we're going to fill up with data
+  const collectionData: CollectionData = {
     components: [],
     compiler: {
       name: config.sys.compiler.name,
@@ -45,67 +45,61 @@ export function serializeAppManifest(config: Config, manifestDir: string, entryM
     }
   };
 
-  // add component data for each of the manifest files
+  // add component data for each of the collection files
   entryModules.forEach(entryModule => {
     entryModule.moduleFiles.forEach(moduleFile => {
       if (!moduleFile.excludeFromCollection) {
-        const cmpData = serializeComponent(config, manifestDir, moduleFile);
+        const cmpData = serializeComponent(config, collectionDir, moduleFile);
         if (cmpData) {
-          manifestData.components.push(cmpData);
+          collectionData.components.push(cmpData);
         }
       }
     });
   });
 
   // sort it alphabetically, cuz
-  manifestData.components.sort((a, b) => {
+  collectionData.components.sort((a, b) => {
     if (a.tag < b.tag) return -1;
     if (a.tag > b.tag) return 1;
     return 0;
   });
 
   // set the global path if it exists
-  serializeAppGlobal(config, manifestDir, manifestData, globalModule);
+  serializeAppGlobal(config, collectionDir, collectionData, globalModule);
 
   // success!
-  return manifestData;
+  return collectionData;
 }
 
 
-export function parseDependentManifest(config: Config, collectionName: string, includeBundledOnly: boolean, manifestDir: string, manifestJson: string) {
-  const manifestData: ManifestData = JSON.parse(manifestJson);
-  const manifest: Manifest = {
+export function parseCollectionData(config: Config, collectionName: string, collectionDir: string, collectionJsonStr: string) {
+  const collectionData: CollectionData = JSON.parse(collectionJsonStr);
+  const collection: Collection = {
     collectionName: collectionName,
     compiler: {
-      name: manifestData.compiler.name,
-      version: manifestData.compiler.version,
-      typescriptVersion: manifestData.compiler.typescriptVersion
+      name: collectionData.compiler.name,
+      version: collectionData.compiler.version,
+      typescriptVersion: collectionData.compiler.typescriptVersion
     }
   };
 
-  parseComponents(config, includeBundledOnly, manifestDir, manifestData, manifest);
-  parseGlobal(config, manifestDir, manifestData, manifest);
+  parseComponents(config, collectionDir, collectionData, collection);
+  parseGlobal(config, collectionDir, collectionData, collection);
 
-  return manifest;
+  return collection;
 }
 
 
-export function parseComponents(config: Config, includeBundledOnly: boolean, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
-  let componentsData = manifestData.components;
+export function parseComponents(config: Config, collectionDir: string, collectionData: CollectionData, collection: Collection) {
+  const componentsData = collectionData.components;
 
   if (!componentsData || !Array.isArray(componentsData)) {
-    manifest.moduleFiles = [];
+    collection.moduleFiles = [];
     return;
   }
 
-  if (includeBundledOnly) {
-    componentsData = componentsData.filter(cmpData => {
-      return config.bundles.some(configBundle => configBundle.components.includes(cmpData.tag));
-    });
-  }
-
-  manifest.moduleFiles = componentsData.map(cmpData => {
-    return parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+  collection.moduleFiles = componentsData.map(cmpData => {
+    return parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
   });
 }
 
@@ -130,7 +124,7 @@ export function excludeFromCollection(config: Config, cmpData: ComponentData) {
 }
 
 
-export function serializeComponent(config: Config, manifestDir: string, moduleFile: ModuleFile) {
+export function serializeComponent(config: Config, collectionDir: string, moduleFile: ModuleFile) {
   if (!moduleFile || !moduleFile.cmpMeta) return null;
 
   const cmpData: ComponentData = {};
@@ -139,8 +133,8 @@ export function serializeComponent(config: Config, manifestDir: string, moduleFi
   // get the absolute path to the compiled component's output javascript file
   const compiledComponentAbsoluteFilePath = normalizePath(moduleFile.jsFilePath);
 
-  // create a relative path from the manifest file to the compiled component's output javascript file
-  const compiledComponentRelativeFilePath = normalizePath(config.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
+  // create a relative path from the collection file to the compiled component's output javascript file
+  const compiledComponentRelativeFilePath = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
 
   // create a relative path to the directory where the compiled component's output javascript is sitting in
   const compiledComponentRelativeDirPath = normalizePath(config.sys.path.dirname(compiledComponentRelativeFilePath));
@@ -148,7 +142,7 @@ export function serializeComponent(config: Config, manifestDir: string, moduleFi
   serializeTag(cmpData, cmpMeta);
   serializeComponentDependencies(cmpData, cmpMeta);
   serializeComponentClass(cmpData, cmpMeta);
-  serializeComponentPath(config, manifestDir, moduleFile, compiledComponentAbsoluteFilePath, cmpData);
+  serializeComponentPath(config, collectionDir, moduleFile, compiledComponentAbsoluteFilePath, cmpData);
   serializeStyles(config, moduleFile, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeAssetsDir(config, moduleFile, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeProps(cmpData, cmpMeta);
@@ -166,7 +160,7 @@ export function serializeComponent(config: Config, manifestDir: string, moduleFi
 }
 
 
-export function parseComponentDataToModuleFile(config: Config, manifest: Manifest, manifestDir: string, cmpData: ComponentData) {
+export function parseComponentDataToModuleFile(config: Config, collection: Collection, collectionDir: string, cmpData: ComponentData) {
   const moduleFile: ModuleFile = {
     cmpMeta: {},
     isCollectionDependency: true,
@@ -177,10 +171,10 @@ export function parseComponentDataToModuleFile(config: Config, manifest: Manifes
   parseTag(cmpData, cmpMeta);
   parseComponentDependencies(cmpData, cmpMeta);
   parseComponentClass(cmpData, cmpMeta);
-  parseModuleJsFilePath(config, manifestDir, cmpData, moduleFile);
-  parseStyles(config, manifestDir, cmpData, cmpMeta);
-  parseAssetsDir(config, manifestDir, cmpData, cmpMeta);
-  parseProps(config, manifest, cmpData, cmpMeta);
+  parseModuleJsFilePath(config, collectionDir, cmpData, moduleFile);
+  parseStyles(config, collectionDir, cmpData, cmpMeta);
+  parseAssetsDir(config, collectionDir, cmpData, cmpMeta);
+  parseProps(config, collection, cmpData, cmpMeta);
   parseStates(cmpData, cmpMeta);
   parseListeners(cmpData, cmpMeta);
   parseMethods(cmpData, cmpMeta);
@@ -208,24 +202,24 @@ function parseTag(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeComponentPath(config: Config, manifestDir: string, moduleFile: ModuleFile, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
+function serializeComponentPath(config: Config, collectionDir: string, moduleFile: ModuleFile, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
   if (moduleFile.isCollectionDependency && moduleFile.originalCollectionComponentPath) {
     // use the original path from its collection if there was one
     cmpData.componentPath = normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, moduleFile.originalCollectionComponentPath));
 
   } else {
-    // convert absolute path into a path that's relative to the manifest file
-    cmpData.componentPath = normalizePath(config.sys.path.relative(manifestDir, compiledComponentAbsoluteFilePath));
+    // convert absolute path into a path that's relative to the collection file
+    cmpData.componentPath = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
   }
 }
 
-function parseModuleJsFilePath(config: Config, manifestDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
-  // convert the path that's relative to the manifest file
+function parseModuleJsFilePath(config: Config, collectionDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
+  // convert the path that's relative to the collection file
   // into an absolute path to the component's js file path
   if (typeof cmpData.componentPath !== 'string') {
     throw new Error(`parseModuleJsFilePath, "componentPath" missing on cmpData: ${cmpData.tag}`);
   }
-  moduleFile.jsFilePath = normalizePath(config.sys.path.join(manifestDir, cmpData.componentPath));
+  moduleFile.jsFilePath = normalizePath(config.sys.path.join(collectionDir, cmpData.componentPath));
 
   // remember the original component path from its collection
   moduleFile.originalCollectionComponentPath = cmpData.componentPath;
@@ -266,7 +260,7 @@ function serializeStyles(config: Config, moduleFile: ModuleFile, compiledCompone
   }
 }
 
-function parseStyles(config: Config, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseStyles(config: Config, collectionDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const stylesData = cmpData.styles;
 
   cmpMeta.stylesMeta = {};
@@ -274,7 +268,7 @@ function parseStyles(config: Config, manifestDir: string, cmpData: ComponentData
   if (stylesData) {
     Object.keys(stylesData).forEach(modeName => {
       modeName = modeName.toLowerCase();
-      cmpMeta.stylesMeta[modeName] = parseStyle(config, manifestDir, cmpData, stylesData[modeName]);
+      cmpMeta.stylesMeta[modeName] = parseStyle(config, collectionDir, cmpData, stylesData[modeName]);
     });
   }
 }
@@ -293,11 +287,11 @@ function serializeStyle(config: Config, moduleFile: ModuleFile, compiledComponen
     } else {
       modeStyleData.stylePaths = modeStyleMeta.externalStyles.map(externalStyle => {
         // convert style paths which are relative to the component file
-        // to be style paths that are relative to the manifest file
+        // to be style paths that are relative to the collection file
 
-        // we've already figured out the component's relative path from the manifest file
+        // we've already figured out the component's relative path from the collection file
         // use the value we already created in serializeComponentPath()
-        // create a relative path from the manifest file to the style path
+        // create a relative path from the collection file to the style path
         return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, externalStyle.cmpRelativePath));
       });
     }
@@ -312,7 +306,7 @@ function serializeStyle(config: Config, moduleFile: ModuleFile, compiledComponen
   return modeStyleData;
 }
 
-function parseStyle(config: Config, manifestDir: string, cmpData: ComponentData, modeStyleData: StyleData) {
+function parseStyle(config: Config, collectionDir: string, cmpData: ComponentData, modeStyleData: StyleData) {
   const modeStyle: StyleMeta = {
     styleStr: modeStyleData.style
   };
@@ -322,7 +316,7 @@ function parseStyle(config: Config, manifestDir: string, cmpData: ComponentData,
       const externalStyle: ExternalStyleMeta = {};
 
       externalStyle.absolutePath = normalizePath(config.sys.path.join(
-        manifestDir,
+        collectionDir,
         stylePath
       ));
 
@@ -347,11 +341,11 @@ function serializeAssetsDir(config: Config, moduleFile: ModuleFile, compiledComp
   }
 
   // convert asset paths which are relative to the component file
-  // to be asset paths that are relative to the manifest file
+  // to be asset paths that are relative to the collection file
 
-  // we've already figured out the component's relative path from the manifest file
+  // we've already figured out the component's relative path from the collection file
   // use the value we already created in serializeComponentPath()
-  // create a relative path from the manifest file to the asset path
+  // create a relative path from the collection file to the asset path
 
   cmpData.assetPaths = cmpMeta.assetsDirsMeta.map(assetMeta => {
     if (moduleFile.isCollectionDependency && assetMeta.originalCollectionPath) {
@@ -363,7 +357,7 @@ function serializeAssetsDir(config: Config, moduleFile: ModuleFile, compiledComp
 }
 
 
-function parseAssetsDir(config: Config, manifestDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseAssetsDir(config: Config, collectionDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpData.assetPaths)) {
     return;
   }
@@ -371,7 +365,7 @@ function parseAssetsDir(config: Config, manifestDir: string, cmpData: ComponentD
   cmpMeta.assetsDirsMeta = cmpData.assetPaths.map(assetsPath => {
     const assetsMeta: AssetsMeta = {
       absolutePath: normalizePath(config.sys.path.join(
-        manifestDir,
+        collectionDir,
         assetsPath
       )),
       cmpRelativePath: normalizePath(config.sys.path.relative(
@@ -429,7 +423,7 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   });
 }
 
-function parseProps(config: Config, manifest: Manifest, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseProps(config: Config, collection: Collection, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   const propsData = cmpData.props;
 
   if (invalidArrayData(propsData)) {
@@ -463,7 +457,7 @@ function parseProps(config: Config, manifest: Manifest, cmpData: ComponentData, 
     } else if (type === ANY_KEY.toLowerCase()) {
       cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Any;
 
-    } else if (!manifest.compiler || !manifest.compiler.version || config.sys.semver.lt(manifest.compiler.version, '0.0.6-23')) {
+    } else if (!collection.compiler || !collection.compiler.version || config.sys.semver.lt(collection.compiler.version, '0.0.6-23')) {
       // older compilers didn't remember "any" type
       cmpMeta.membersMeta[propData.name].propType = PROP_TYPE.Any;
     }
@@ -823,20 +817,20 @@ function parseEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-export function serializeAppGlobal(config: Config, manifestDir: string, manifestData: ManifestData, globalModule: ModuleFile) {
+export function serializeAppGlobal(config: Config, collectionDir: string, collectionData: CollectionData, globalModule: ModuleFile) {
   if (!globalModule) {
     return;
   }
 
-  manifestData.global = normalizePath(config.sys.path.relative(manifestDir, globalModule.jsFilePath));
+  collectionData.global = normalizePath(config.sys.path.relative(collectionDir, globalModule.jsFilePath));
 }
 
 
-export function parseGlobal(config: Config, manifestDir: string, manifestData: ManifestData, manifest: Manifest) {
-  if (typeof manifestData.global !== 'string') return;
+export function parseGlobal(config: Config, collectionDir: string, collectionData: CollectionData, collection: Collection) {
+  if (typeof collectionData.global !== 'string') return;
 
-  manifest.global = {
-    jsFilePath: normalizePath(config.sys.path.join(manifestDir, manifestData.global))
+  collection.global = {
+    jsFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global))
   };
 }
 

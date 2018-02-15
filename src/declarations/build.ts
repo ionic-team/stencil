@@ -5,6 +5,7 @@ export interface BuildCtx {
   graphData?: GraphData;
   componentRefs?: d.PotentialComponentRef[];
   moduleGraphs?: d.ModuleGraph[];
+  collections?: d.Collection[];
   buildId: number;
   requiresFullBuild: boolean;
   diagnostics: d.Diagnostic[];
@@ -28,6 +29,7 @@ export interface BuildCtx {
   filesUpdated: string[];
   filesAdded: string[];
   shouldAbort?(): boolean;
+  data?: any;
   finish?(): Promise<BuildResults>;
 }
 
@@ -80,8 +82,11 @@ export interface BuildStats {
   };
   components: BuildComponent[];
   entries: BuildEntry[];
+  sourceGraph: BuildSourceGraph;
   collections: {
     name: string;
+    source: string;
+    tags: string[];
   }[];
 }
 
@@ -103,6 +108,11 @@ export interface BuildBundle {
   mode?: string;
   scopedStyles?: boolean;
   target?: string;
+}
+
+
+export interface BuildSourceGraph {
+  [filePath: string]: string[];
 }
 
 

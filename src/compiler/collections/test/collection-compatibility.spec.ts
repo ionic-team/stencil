@@ -1,9 +1,9 @@
-import { Config, Manifest } from '../../../declarations';
-import { CompilerUpgrade, calculateRequiredUpgrades } from '../manifest-compatibility';
+import { Collection, Config } from '../../../declarations';
+import { CompilerUpgrade, calculateRequiredUpgrades } from '../collection-compatibility';
 import { mockConfig } from '../../../testing/mocks';
 
 
-describe('Manifest Compatibility', () => {
+describe('collection-compatibility', () => {
 
   describe('calculateRequiredUpgrades', () => {
 

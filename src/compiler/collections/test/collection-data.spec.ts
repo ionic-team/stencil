@@ -1,21 +1,21 @@
-import { ComponentData, ComponentMeta, Config, Manifest, ManifestData, ModuleFile, EntryModule } from '../../../declarations';
-import { mockConfig } from '../../../testing/mocks';
+import { Collection, CollectionData, ComponentData, ComponentMeta, Config, EntryModule, ModuleFile } from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
 import { excludeFromCollection, parseComponentDataToModuleFile,
   parseDidChangeDeprecated, parseGlobal, parseWillChangeDeprecated,
-  serializeAppGlobal, serializeAppManifest } from '../manifest-data';
+  serializeAppCollection, serializeAppGlobal } from '../collection-data';
+import { mockConfig } from '../../../testing/mocks';
 
 
 describe('manifest-data serialize/parse', () => {
 
-  let manifest: Manifest;
+  let collection: Collection;
   let a: ComponentMeta;
   let moduleFile: ModuleFile;
   const manifestDir = '/User/me/myapp/dist/collection/';
   const config = mockConfig();
 
   beforeEach(() => {
-    manifest = {};
+    collection = {};
     a = {};
     moduleFile = {
       jsFilePath: '/User/me/myapp/dist/collection/components/cmp-a.js',
@@ -25,15 +25,15 @@ describe('manifest-data serialize/parse', () => {
 
 
   it('parseGlobal', () => {
-    const manifestData: ManifestData = {
+    const collectionData: CollectionData = {
       global: 'global/my-global.js'
     };
-    const manifest: Manifest = {};
-    parseGlobal(config, manifestDir, manifestData, manifest);
+    const manifest: Collection = {};
+    parseGlobal(config, manifestDir, collectionData, manifest);
     expect(manifest.global.jsFilePath).toBe('/User/me/myapp/dist/collection/global/my-global.js');
   });
 
-  it('serializeAppManifest', () => {
+  it('serializeAppCollection', () => {
     config.bundles = [
       { components: ['cmp-a', 'cmp-b'] },
       { components: ['cmp-c'] }
@@ -41,22 +41,22 @@ describe('manifest-data serialize/parse', () => {
     const entryModules: EntryModule[] = [{
       moduleFiles: [moduleFile]
     }];
-    const outManifest = serializeAppManifest(config, manifestDir, entryModules, manifest.global);
+    const outManifest = serializeAppCollection(config, manifestDir, entryModules, collection.global);
 
     expect(outManifest.components).toHaveLength(1);
     expect(outManifest.compiler.name).toEqual('test');
   });
 
   it('serializeAppGlobal', () => {
-    const manifestData: ManifestData = {};
-    const manifest: Manifest = {
+    const collectionData: CollectionData = {};
+    const collection: Collection = {
       global: {
         jsFilePath: '/User/me/myapp/dist/collection/global/my-global.js'
       }
     };
 
-    serializeAppGlobal(config, manifestDir, manifestData, manifest.global);
-    expect(manifestData.global).toBe('global/my-global.js');
+    serializeAppGlobal(config, manifestDir, collectionData, collection.global);
+    expect(collectionData.global).toBe('global/my-global.js');
   });
 
   it('excludeFromCollection false if tag is in bundles', () => {

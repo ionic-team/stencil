@@ -1,20 +1,20 @@
-import { ComponentMeta, Manifest, ManifestData, ModuleFile } from '../../../declarations';
+import { Collection, CollectionData, ComponentMeta, ModuleFile } from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { mockConfig } from '../../../testing/mocks';
-import { parseComponentDataToModuleFile, parseComponents, parseDidChangeDeprecated, parseWillChangeDeprecated, serializeComponent } from '../manifest-data';
+import { parseComponentDataToModuleFile, parseComponents, parseDidChangeDeprecated, parseWillChangeDeprecated, serializeComponent } from '../collection-data';
 
 
-describe('manifest components', () => {
+describe('collection components', () => {
 
-  let manifest: Manifest;
+  let collection: Collection;
   let a: ComponentMeta;
   let b: ModuleFile;
   let moduleFile: ModuleFile;
-  const manifestDir = '/User/me/myapp/dist/collection/';
+  const collectionDir = '/User/me/myapp/dist/collection/';
   const config = mockConfig();
 
   beforeEach(() => {
-    manifest = {};
+    collection = {};
     a = {};
     moduleFile = {
       jsFilePath: '/User/me/myapp/dist/collection/components/cmp-a.js',
@@ -22,43 +22,21 @@ describe('manifest components', () => {
     };
   });
 
-  it('parseComponents, includeBundledOnly=true', () => {
-    const manifestData: ManifestData = {
-      components: [
-        { tag: 'cmp-a', componentPath: '/cmp-a.tsx' },
-        { tag: 'cmp-b', componentPath: '/cmp-b.tsx' },
-        { tag: 'cmp-c', componentPath: '/cmp-c.tsx' },
-        { tag: 'cmp-d', componentPath: '/cmp-d.tsx' },
-        { tag: 'cmp-e', componentPath: '/cmp-e.tsx' }
-      ]
-    };
-    config.bundles = [
-      { components: ['cmp-a', 'cmp-c'] },
-      { components: ['cmp-e'] }
-    ];
-    const manifest: Manifest = {};
-    const includeBundledOnly = true;
-    parseComponents(config, includeBundledOnly, manifestDir, manifestData, manifest);
-    expect(manifest.moduleFiles[0].cmpMeta.tagNameMeta).toBe('cmp-a');
-    expect(manifest.moduleFiles[1].cmpMeta.tagNameMeta).toBe('cmp-c');
-    expect(manifest.moduleFiles[2].cmpMeta.tagNameMeta).toBe('cmp-e');
-  });
-
   it('scoped css encapsulation', () => {
     a.encapsulation = ENCAPSULATION.ScopedCss;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.scoped).toBe(true);
     expect(cmpData.shadow).toBeFalsy();
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ScopedCss);
   });
 
   it('shadow dom encapsulation', () => {
     a.encapsulation = ENCAPSULATION.ShadowDom;
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.shadow).toBe(true);
     expect(cmpData.scoped).toBeFalsy();
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.encapsulation).toBe(ENCAPSULATION.ShadowDom);
   });
 
@@ -67,9 +45,9 @@ describe('manifest components', () => {
       { eventName: 'zzEvent' },
       { eventName: 'aa-event', eventMethodName: 'methodName', eventBubbles: false, eventCancelable: false, eventComposed: false }
     ];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.events.length).toBe(2);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.eventsMeta.length).toBe(2);
 
     expect(b.cmpMeta.eventsMeta[0].eventName).toBe('aa-event');
@@ -89,17 +67,17 @@ describe('manifest components', () => {
     a.membersMeta = {
       'myElement': { memberType: MEMBER_TYPE.Element }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.hostElement.name).toBe('myElement');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.membersMeta.myElement.memberType).toBe(MEMBER_TYPE.Element);
   });
 
   it('hostMeta', () => {
     a.hostMeta = { theme: { 'some-class': true } };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.host.theme['some-class']).toBe(true);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.hostMeta.theme['some-class']).toBe(true);
   });
 
@@ -108,10 +86,10 @@ describe('manifest components', () => {
       'methodA': { memberType: MEMBER_TYPE.Method },
       'methodB': { memberType: MEMBER_TYPE.Method }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.methods[0].name).toBe('methodA');
     expect(cmpData.methods[1].name).toBe('methodB');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.membersMeta.methodA.memberType).toBe(MEMBER_TYPE.Method);
     expect(b.cmpMeta.membersMeta.methodB.memberType).toBe(MEMBER_TYPE.Method);
   });
@@ -121,7 +99,7 @@ describe('manifest components', () => {
       { eventName: 'eventB', eventMethodName: 'methodB', eventPassive: false, eventCapture: false, eventDisabled: false },
       { eventName: 'eventA', eventMethodName: 'methodA', eventPassive: true, eventCapture: true, eventDisabled: true }
     ];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.listeners.length).toBe(2);
 
     expect(cmpData.listeners[0].event).toBe('eventA');
@@ -136,7 +114,7 @@ describe('manifest components', () => {
     expect(cmpData.listeners[1].capture).toBe(false);
     expect(cmpData.listeners[1].enabled).toBeUndefined();
 
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.listenersMeta[0].eventName).toBe('eventA');
     expect(b.cmpMeta.listenersMeta[0].eventMethodName).toBe('methodA');
     expect(b.cmpMeta.listenersMeta[0].eventPassive).toBe(true);
@@ -155,10 +133,10 @@ describe('manifest components', () => {
       'stateA': { memberType: MEMBER_TYPE.State },
       'stateB': { memberType: MEMBER_TYPE.State }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.states[0].name).toBe('stateA');
     expect(cmpData.states[1].name).toBe('stateB');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.membersMeta.stateA.memberType).toBe(MEMBER_TYPE.State);
     expect(b.cmpMeta.membersMeta.stateB.memberType).toBe(MEMBER_TYPE.State);
   });
@@ -205,8 +183,8 @@ describe('manifest components', () => {
     a.membersMeta = {
       'el': { memberType: MEMBER_TYPE.Element }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.el.memberType).toBe(MEMBER_TYPE.Element);
   });
@@ -215,8 +193,8 @@ describe('manifest components', () => {
     a.membersMeta = {
       'state': { memberType: MEMBER_TYPE.State }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.state.memberType).toBe(MEMBER_TYPE.State);
     expect(b.cmpMeta.membersMeta.state.propType).toBeUndefined();
@@ -226,8 +204,8 @@ describe('manifest components', () => {
     a.membersMeta = {
       'propMutable': { memberType: MEMBER_TYPE.PropMutable, propType: PROP_TYPE.Number }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.propMutable.memberType).toBe(MEMBER_TYPE.PropMutable);
     expect(b.cmpMeta.membersMeta.propMutable.propType).toBe(PROP_TYPE.Number);
@@ -237,8 +215,8 @@ describe('manifest components', () => {
     a.membersMeta = {
       'prop': { memberType: MEMBER_TYPE.Prop, propType: PROP_TYPE.Any }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.prop.memberType).toBe(MEMBER_TYPE.Prop);
     expect(b.cmpMeta.membersMeta.prop.propType).toBe(PROP_TYPE.Any);
@@ -248,8 +226,8 @@ describe('manifest components', () => {
     a.membersMeta = {
       'prop': { memberType: MEMBER_TYPE.Prop, propType: PROP_TYPE.Boolean }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.prop.memberType).toBe(MEMBER_TYPE.Prop);
     expect(b.cmpMeta.membersMeta.prop.propType).toBe(PROP_TYPE.Boolean);
@@ -259,8 +237,8 @@ describe('manifest components', () => {
     a.membersMeta = {
       'prop': { memberType: MEMBER_TYPE.Prop, propType: PROP_TYPE.String }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.prop.memberType).toBe(MEMBER_TYPE.Prop);
     expect(b.cmpMeta.membersMeta.prop.propType).toBe(PROP_TYPE.String);
@@ -271,8 +249,8 @@ describe('manifest components', () => {
       'prop1': { memberType: MEMBER_TYPE.Prop, watchCallbacks: ['method1', 'method2'] },
       'prop2': { memberType: MEMBER_TYPE.PropMutable, watchCallbacks: ['method1', 'method3'] }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
 
     expect(b.cmpMeta.membersMeta.prop1.watchCallbacks[0]).toBe('method1');
     expect(b.cmpMeta.membersMeta.prop1.watchCallbacks[1]).toBe('method2');
@@ -284,9 +262,9 @@ describe('manifest components', () => {
     a.assetsDirsMeta = [{
       cmpRelativePath: 'svgs'
     }];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.assetPaths[0]).toBe('components/svgs');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.assetsDirsMeta[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/svgs');
     expect(b.cmpMeta.assetsDirsMeta[0].cmpRelativePath).toBe('svgs');
   });
@@ -299,9 +277,9 @@ describe('manifest components', () => {
         }]
       }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.styles.ios.stylePaths[0]).toBe('components/cmp-a.scss');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].cmpRelativePath).toBe('cmp-a.scss');
     expect(b.cmpMeta.stylesMeta.ios.externalStyles[0].absolutePath).toBe('/User/me/myapp/dist/collection/components/cmp-a.scss');
   });
@@ -312,39 +290,39 @@ describe('manifest components', () => {
         styleStr: 'cmp-a{color:red}'
       }
     };
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(a.stylesMeta.ios.styleStr).toBe(b.cmpMeta.stylesMeta.ios.styleStr);
   });
 
   it('js file path', () => {
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.componentPath).toBe('components/cmp-a.js');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.jsFilePath).toBe('/User/me/myapp/dist/collection/components/cmp-a.js');
   });
 
   it('componentClass', () => {
     a.componentClass = 'ComponentClass';
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.componentClass).toBe('ComponentClass');
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.componentClass).toBe(a.componentClass);
   });
 
   it('component dependencies', () => {
     a.dependencies = ['cmp-a', 'cmp-b'];
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.dependencies).toEqual(['cmp-a', 'cmp-b']);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.dependencies).toEqual(a.dependencies);
   });
 
   it('tag name', () => {
     a.tagNameMeta = 'ion-tag';
-    const cmpData = serializeComponent(config, manifestDir, moduleFile);
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
     expect(cmpData.tag).toBe(a.tagNameMeta);
-    b = parseComponentDataToModuleFile(config, manifest, manifestDir, cmpData);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
     expect(b.cmpMeta.tagNameMeta).toBe(a.tagNameMeta);
   });
 

@@ -1,5 +1,5 @@
-import { BuildCtx, CompilerCtx, Config, Manifest } from '../../declarations';
-import { CompilerUpgrade, validateManifestCompatibility } from './manifest-compatibility';
+import { BuildCtx, Collection, CompilerCtx, Config } from '../../declarations';
+import { CompilerUpgrade, validateCollectinCompatibility } from './collection-compatibility';
 import { componentDependencies } from '../transpile/transformers/component-dependencies';
 import { removeStencilImports } from '../transpile/transformers/remove-stencil-imports';
 import { transformSourceString } from '../transpile/transformers/util';
@@ -9,21 +9,21 @@ import ts from 'typescript';
 import { catchError } from '../util';
 
 
-export async function upgradeCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, manifest: Manifest) {
+export async function upgradeCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, collection: Collection) {
   try {
-    const upgradeTransforms = validateManifestCompatibility(config, manifest);
+    const upgradeTransforms = validateCollectinCompatibility(config, collection);
 
     if (upgradeTransforms.length === 0) {
       return;
     }
 
-    const timeSpan = config.logger.createTimeSpan(`upgrade ${manifest.collectionName} started`, true);
+    const timeSpan = config.logger.createTimeSpan(`upgrade ${collection.collectionName} started`, true);
 
     const doUpgrade = createDoUpgrade(config, compilerCtx, buildCtx);
 
-    await doUpgrade(manifest, upgradeTransforms);
+    await doUpgrade(collection, upgradeTransforms);
 
-    timeSpan.finish(`upgrade ${manifest.collectionName} finished`);
+    timeSpan.finish(`upgrade ${collection.collectionName} finished`);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
@@ -33,27 +33,27 @@ export async function upgradeCollection(config: Config, compilerCtx: CompilerCtx
 
 function createDoUpgrade(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
-  return async (manifest: Manifest, upgrades: CompilerUpgrade[]): Promise<void> => {
+  return async (collection: Collection, upgrades: CompilerUpgrade[]): Promise<void> => {
     const upgradeTransforms: ts.TransformerFactory<ts.SourceFile>[] = (upgrades.map((upgrade) => {
       switch (upgrade) {
         case CompilerUpgrade.JSX_Upgrade_From_0_0_5:
-          config.logger.debug(`JSX_Upgrade_From_0_0_5, ${manifest.collectionName}, compiled by v${manifest.compiler.version}`);
+          config.logger.debug(`JSX_Upgrade_From_0_0_5, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return upgradeFrom0_0_5 as ts.TransformerFactory<ts.SourceFile>;
 
         case CompilerUpgrade.Metadata_Upgrade_From_0_1_0:
-          config.logger.debug(`Metadata_Upgrade_From_0_1_0, ${manifest.collectionName}, compiled by v${manifest.compiler.version}`);
+          config.logger.debug(`Metadata_Upgrade_From_0_1_0, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return () => {
             return upgradeFromMetadata(compilerCtx.moduleFiles);
           };
 
         case CompilerUpgrade.Remove_Stencil_Imports:
-          config.logger.debug(`Remove_Stencil_Imports, ${manifest.collectionName}, compiled by v${manifest.compiler.version}`);
+          config.logger.debug(`Remove_Stencil_Imports, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return (transformContext: ts.TransformationContext) => {
             return removeStencilImports()(transformContext);
           };
 
         case CompilerUpgrade.Add_Component_Dependencies:
-          config.logger.debug(`Add_Component_Dependencies, ${manifest.collectionName}, compiled by v${manifest.compiler.version}`);
+          config.logger.debug(`Add_Component_Dependencies, ${collection.collectionName}, compiled by v${collection.compiler.version}`);
           return (transformContext: ts.TransformationContext) => {
             return componentDependencies(compilerCtx, buildCtx)(transformContext);
           };
@@ -61,7 +61,7 @@ function createDoUpgrade(config: Config, compilerCtx: CompilerCtx, buildCtx: Bui
       return () => (tsSourceFile: ts.SourceFile) => (tsSourceFile);
     }));
 
-    await Promise.all(manifest.moduleFiles.map(async moduleFile => {
+    await Promise.all(collection.moduleFiles.map(async moduleFile => {
       try {
         const source = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
         const output = await transformSourceString(moduleFile.jsFilePath, source, upgradeTransforms);

@@ -1,20 +1,20 @@
-import { Config, Manifest } from '../../declarations';
+import { Collection, Config } from '../../declarations';
 
 
-export function validateManifestCompatibility(config: Config, manifest: Manifest): number[] {
-  if (!manifest.compiler) {
+export function validateCollectinCompatibility(config: Config, collection: Collection): number[] {
+  if (!collection.compiler) {
     // if there is no compiler data at all then this was probably
     // set on purpose and we should avoid doing any upgrading
     return [];
   }
 
   // fill in any default data if somehow it's missing entirely
-  manifest.compiler.name = manifest.compiler.name || '@stencil/core';
-  manifest.compiler.version = manifest.compiler.version || '0.0.1';
-  manifest.compiler.typescriptVersion = manifest.compiler.typescriptVersion || '2.5.3';
+  collection.compiler.name = collection.compiler.name || '@stencil/core';
+  collection.compiler.version = collection.compiler.version || '0.0.1';
+  collection.compiler.typescriptVersion = collection.compiler.typescriptVersion || '2.5.3';
 
   // figure out which compiler upgrades, if any, we need to do
-  return calculateRequiredUpgrades(config, manifest.compiler.version);
+  return calculateRequiredUpgrades(config, collection.compiler.version);
 }
 
 

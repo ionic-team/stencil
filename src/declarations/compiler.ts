@@ -1,7 +1,7 @@
 import { BuildEvents } from '../compiler/events';
 import { Cache } from '../compiler/cache';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
-import { Manifest, ModuleBundles, ModuleFiles } from '../declarations';
+import { Collection, ModuleBundles, ModuleFiles } from '../declarations';
 
 
 export interface CompilerCtx {
@@ -11,10 +11,9 @@ export interface CompilerCtx {
   cache?: Cache;
   events?: BuildEvents;
   moduleFiles?: ModuleFiles;
-  rollupCache?: { [cacheKey: string]: any };
   compiledModuleJsText?: ModuleBundles;
   compiledModuleLegacyJsText?: ModuleBundles;
-  collections?: { [name: string]: Manifest };
+  collections?: Collection[];
   appFiles?: {
     loader?: string;
     loaderContent?: string;
@@ -24,6 +23,7 @@ export interface CompilerCtx {
     registryJson?: string;
   };
   appCoreWWWPath?: string;
+  resolvedModuleIds?: string[];
 
   lastBuildHadError?: boolean;
   hasSuccessfulBuild?: boolean;

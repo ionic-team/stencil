@@ -31,7 +31,10 @@ export function generateComponentTypesFile(config: Config, cmpList: ComponentReg
  * and imports for stencil collections that might be configured in your stencil.config.js file
  */\n\n`;
 
-  componentsFileContent = config.collections.reduce((finalString, compCollection) => {
+ /**
+  * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
+  */
+  componentsFileContent = config._deprecatedCollections.reduce((finalString, compCollection) => {
     return finalString + `import '${compCollection.name}';\n\n`;
   }, componentsFileContent);
 

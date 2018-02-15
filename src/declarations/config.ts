@@ -9,7 +9,6 @@ export interface Config {
   buildStatsFilePath?: string;
   bundles?: ConfigBundle[];
   collectionDir?: string;
-  collections?: ConfigCollection[];
   configPath?: string;
   copy?: CopyTasks;
   discoverPublicPath?: boolean;
@@ -56,6 +55,11 @@ export interface Config {
 
   _isValidated?: boolean;
   _isTesting?: boolean;
+
+  /**
+   * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
+   */
+  _deprecatedCollections?: ConfigCollection[];
 }
 
 
@@ -66,7 +70,6 @@ export interface ConfigBundle {
 
 export interface ConfigCollection {
   name: string;
-  includeBundledOnly?: boolean;
 }
 
 

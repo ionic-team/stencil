@@ -1,6 +1,6 @@
 import { AssetsMeta, BuildCtx, CompilerCtx, Config, CopyTask } from '../../declarations';
 import { catchError, normalizePath, pathJoin } from '../util';
-import { COLLECTION_DEPENDENCIES_DIR } from '../collections/manifest-data';
+import { COLLECTION_DEPENDENCIES_DIR } from '../collections/collection-data';
 import { getAppDistDir, getAppWWWBuildDir } from '../app/app-file-naming';
 
 

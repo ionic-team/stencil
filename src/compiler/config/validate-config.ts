@@ -1,11 +1,11 @@
 import { Config } from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateCopy } from './validate-copy';
-import { validateDependentCollection } from './validate-collection';
 import { validateNamespace } from './validate-namespace';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validatePublicPath } from './validate-public-path';
+import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
 export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
@@ -101,8 +101,10 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
     config.excludeSrc = DEFAULT_EXCLUDES.slice();
   }
 
-  setArrayConfig(config, 'collections');
-  config.collections = config.collections.map(validateDependentCollection);
+  /**
+   * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
+   */
+  _deprecatedValidateConfigCollections(config);
 
   setArrayConfig(config, 'plugins');
   setArrayConfig(config, 'bundles');

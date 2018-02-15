@@ -1,6 +1,7 @@
 import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../declarations';
 import { componentDependencies } from './transformers/component-dependencies';
+import { discoverCollections } from './transformers/discover-collections';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
 import { getComponentsDtsSrcFilePath } from '../build/distribution';
@@ -110,7 +111,8 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
     // NOTE! order of transforms and being in either "before" or "after" is very important!!!!
     before: [
       removeDecorators(),
-      addComponentMetadata(compilerCtx.moduleFiles)
+      addComponentMetadata(compilerCtx.moduleFiles),
+      discoverCollections(config, compilerCtx, buildCtx)
     ],
     after: [
       removeStencilImports(),

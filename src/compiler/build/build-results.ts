@@ -59,7 +59,7 @@ export function generateBuildResults(config: Config, compilerCtx: CompilerCtx, b
             size: entryBundle.text.length,
             outputs: entryBundle.outputs.map(filePath => {
               return normalizePath(config.sys.path.relative(config.rootDir, filePath));
-            })
+            }).sort()
           };
           if (typeof entryBundle.sourceTarget === 'string') {
             buildBundle.target = entryBundle.sourceTarget;
@@ -145,9 +145,12 @@ export async function generateBuildStats(config: Config, compilerCtx: CompilerCt
         },
         components: buildResults.components,
         entries: buildResults.entries,
-        collections: config.collections.map(c => {
+        sourceGraph: {},
+        collections: buildCtx.collections.map(c => {
           return {
-            name: c.name
+            name: c.collectionName,
+            source: normalizePath(config.sys.path.relative(config.rootDir, c.moduleDir)),
+            tags: c.moduleFiles.map(m => m.cmpMeta.tagNameMeta).sort()
           };
         }).sort((a, b) => {
           if (a.name < b.name) return -1;
@@ -155,6 +158,19 @@ export async function generateBuildStats(config: Config, compilerCtx: CompilerCt
           return 0;
         })
       };
+
+      buildCtx.moduleGraphs
+        .sort((a, b) => {
+          if (a.filePath < b.filePath) return -1;
+          if (a.filePath > b.filePath) return 1;
+          return 0;
+
+        }).forEach(mg => {
+          const key = normalizePath(config.sys.path.relative(config.rootDir, mg.filePath));
+          stats.sourceGraph[key] = mg.importPaths.map(importPath => {
+            return normalizePath(config.sys.path.relative(config.rootDir, importPath));
+          }).sort();
+        });
 
       jsonData = stats;
     }

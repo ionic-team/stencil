@@ -11,8 +11,9 @@ import { generateEntryModules } from '../entries/entry-modules';
 import { generateIndexHtml } from '../html/generate-index-html';
 import { generateReadmes } from '../docs/generate-readmes';
 import { generateStyles } from '../style/style';
+import { initCollections } from '../collections/init-collections';
 import { initIndexHtml } from '../html/init-index-html';
-import { loadCollections } from '../collections/load-collections';
+import { _deprecatedConfigCollections } from '../collections/_deprecated-collections';
 import { prerenderApp } from '../prerender/prerender-app';
 import { transpileAppModules } from '../transpile/transpile-app-modules';
 
@@ -36,14 +37,18 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     await emptyDestDir(config, compilerCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
-    // load colleciton data from all the dependent collections
-    // and upgrade modules as necessary
-    await loadCollections(config, compilerCtx, buildCtx);
+    // DEPRECATED config.colllections 2018-02-13
+    await _deprecatedConfigCollections(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // async scan the src directory for ts files
     // then transpile them all in one go
     await transpileAppModules(config, compilerCtx, buildCtx);
+    if (buildCtx.shouldAbort()) return buildCtx.finish();
+
+    // initialize all the collections we found when transpiling
+    // async copy collection files and upgrade collections as needed
+    await initCollections(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // we've got the compiler context filled with app modules and collection dependency modules

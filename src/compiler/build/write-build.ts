@@ -3,12 +3,12 @@ import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
 import { generateDistribution } from './distribution';
 import { generateServiceWorker } from '../service-worker/generate-sw';
-import { writeAppManifest } from '../collections/manifest-data';
+import { writeAppCollection } from '../collections/collection-data';
 
 
 export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   // serialize and write the manifest file if need be
-  await writeAppManifest(config, compilerCtx, buildCtx);
+  await writeAppCollection(config, compilerCtx, buildCtx);
 
   const timeSpan = config.logger.createTimeSpan(`writeBuildFiles started`, true);
 
