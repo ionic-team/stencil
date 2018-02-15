@@ -114,18 +114,21 @@ export function createOnWarnFn(config: Config, diagnostics: Diagnostic[], bundle
   const previousWarns: {[key: string]: boolean} = {};
 
   return function onWarningMessage(warning: { code: string, importer: string, message: string }) {
-    if (warning && warning.message in previousWarns) {
+    if (!warning || warning.message in previousWarns) {
       return;
     }
-    if (warning && warning.code) {
+
+    previousWarns[warning.message] = true;
+
+    if (warning.code) {
       if (INGORE_WARNING_CODES.includes(warning.code)) {
         return;
       }
       if (SUPPRESS_WARNING_CODES.includes(warning.code)) {
         config.logger.debug(warning.message);
+        return;
       }
     }
-    previousWarns[warning.message] = true;
 
     let label = '';
     if (bundleModulesFiles) {
