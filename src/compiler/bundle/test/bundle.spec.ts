@@ -10,10 +10,41 @@ describe('bundle', () => {
 
   beforeEach(async () => {
     c = new TestingCompiler();
-    await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
     await c.fs.commit();
   });
 
+
+  it('should resolve directory index w/ exports', async () => {
+    c.config.bundles = [ { components: ['x-bar']} ];
+    await c.fs.writeFiles({
+      '/src/components/bar/bar.tsx': `
+        import { foo } from '../../utils';
+        @Component({
+          tag: 'x-bar'
+        })
+        export class Bar {
+          render() {
+            foo();
+            return <div/>;
+          }
+        }
+      `,
+      '/src/utils/index.ts': `
+        export * from './foo';
+      `,
+      '/src/utils/foo.ts': `
+        export const foo = () => {
+          console.log('foo');
+        };
+      `,
+    }, { clearFileCache: true });
+
+    await c.fs.commit();
+
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+
+  });
 
   it('wildcard imports should remain within component files', async () => {
     c.config.bundles = [ { components: ['cmp-a']}, { components: ['cmp-b'] } ];

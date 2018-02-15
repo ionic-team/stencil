@@ -2,9 +2,9 @@ import { CompilerCtx, Config } from '../../../declarations';
 import { normalizePath } from '../../util';
 
 
-export default function localResolver(config: Config, compilerCtx: CompilerCtx) {
+export default function localResolution(config: Config, compilerCtx: CompilerCtx) {
   return {
-    name: 'localResolverPlugin',
+    name: 'localResolution',
 
     async resolveId(importee: string, importer: string) {
       importee = normalizePath(importee);
@@ -28,9 +28,8 @@ export default function localResolver(config: Config, compilerCtx: CompilerCtx) 
       const dirIndexFile = config.sys.path.join(directory + importee, 'index.js');
 
       let stats;
-
       try {
-        stats = await compilerCtx.fs.stat(importee);
+        stats = await compilerCtx.fs.stat(dirIndexFile);
       } catch (e) {
         return null;
       }
