@@ -1,19 +1,19 @@
 import { build } from '../build/build';
 import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
-import { validateBuildConfig } from '../../compiler/config/validate-config';
+import { configFileReload } from  '../../compiler/config/config-reload';
 
 
-export function rebuild(config: Config, ctx: CompilerCtx, watcher: WatcherResults): Promise<BuildResults> {
+export function rebuild(config: Config, compilerCtx: CompilerCtx, watcher: WatcherResults): Promise<BuildResults> {
 
   // print out a pretty message about the changed files
   printWatcherMessage(config, watcher);
 
   if (watcher.configUpdated) {
-    configFileReload(config);
+    configFileReload(config, compilerCtx);
   }
 
   // kick off the rebuild
-  return build(config, ctx, watcher);
+  return build(config, compilerCtx, watcher);
 }
 
 
@@ -52,38 +52,5 @@ function printWatcherMessage(config: Config, watcherResults: WatcherResults) {
 
   if (msg != null) {
     config.logger.info(config.logger.cyan(msg));
-  }
-}
-
-
-export function configFileReload(config: Config) {
-  config.logger.debug(`reload config file: ${config.configPath}`);
-
-  try {
-    const updatedConfig = config.sys.loadConfigFile(config.configPath);
-
-    // keepers
-    const sys = config.sys;
-    const logger = config.logger;
-    const rootDir = config.rootDir;
-
-    // empty it out cuz we're gonna use the same object
-    for (const key in config) {
-      delete (config as any)[key];
-    }
-
-    // fill it back up with the keepers
-    config.sys = sys;
-    config.logger = logger;
-    config.rootDir = rootDir;
-
-    // fill it up with the newly loaded config
-    Object.assign(config, updatedConfig);
-
-    // validate our new config data
-    validateBuildConfig(config);
-
-  } catch (e) {
-    config.logger.error(e);
   }
 }

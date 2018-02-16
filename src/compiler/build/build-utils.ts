@@ -62,6 +62,12 @@ export function getBuildContext(config: Config, compilerCtx: CompilerCtx, watche
     return finishBuild(config, compilerCtx, buildCtx);
   };
 
+  if (watcher) {
+    Object.keys(watcher).forEach(key => {
+      (watcher as any)[key] = {};
+    });
+  }
+
   return buildCtx;
 }
 

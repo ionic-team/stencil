@@ -146,6 +146,9 @@ export class NodeSystem implements StencilSystem {
 
     if (hasConfigFile) {
       // the passed in config was a string, so it's probably a path to the config we need to load
+      // first clear the require cache so we don't get the same file
+      delete require.cache[path.resolve(configPath)];
+
       const configFileData = require(configPath);
       if (!configFileData.config) {
         throw new Error(`Invalid Stencil configuration file "${configPath}". Missing "config" property.`);

@@ -23,3 +23,17 @@ export function getCompilerCtx(config: Config, compilerCtx?: CompilerCtx) {
 
   return compilerCtx;
 }
+
+
+export function resetCompilerCtx(compilerCtx: CompilerCtx) {
+  compilerCtx.fs.clearCache();
+  compilerCtx.cache.clear();
+  compilerCtx.appFiles = {};
+  compilerCtx.moduleFiles = {};
+  compilerCtx.collections.length = 0;
+  compilerCtx.resolvedModuleIds.length = 0;
+  compilerCtx.compiledModuleJsText = {};
+  compilerCtx.compiledModuleLegacyJsText = {};
+
+  // do NOT reset 'hasSuccessfulBuild'
+}

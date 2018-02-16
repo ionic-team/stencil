@@ -1,8 +1,8 @@
 import { CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { COMPONENTS_DTS } from '../build/distribution';
-import { configFileReload, rebuild } from './rebuild';
 import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
 import { isDtsFile, isWebDevFile, normalizePath } from '../util';
+import { rebuild } from './rebuild';
 
 
 export class WatcherListener {
@@ -39,7 +39,6 @@ export class WatcherListener {
       if (path === this.config.configPath) {
         // the actual stencil config file changed
         // this is a big deal, so do a full rebuild
-        configFileReload(this.config);
         this.configUpdated = true;
         if (!this.filesUpdated.includes(path)) {
           this.filesUpdated.push(path);
