@@ -13,17 +13,17 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
 
   if (argv.help) {
     help(process, logger);
-    return process.exit(0);
+    process.exit(0);
   }
 
   if (task === 'init') {
     initApp(process, sys, logger);
-    return process.exit(0);
+    process.exit(0);
   }
 
   if (argv.version) {
     console.log(sys.compiler.version);
-    return process.exit(0);
+    process.exit(0);
   }
 
   // load the config file
@@ -34,7 +34,7 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
 
   } catch (e) {
     logger.error(e);
-    return process.exit(1);
+    process.exit(1);
   }
 
   try {
@@ -60,7 +60,7 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
 
     const compiler: CompilerType = new Compiler(config);
     if (!compiler.isValid) {
-      return process.exit(1);
+      process.exit(1);
     }
 
     process.title = `Stencil: ${config.namespace}`;
@@ -74,7 +74,7 @@ export async function run(process: NodeJS.Process, sys: StencilSystem, logger: L
 
         if (config.watch) {
           process.once('SIGINT', () => {
-            return process.exit(0);
+            process.exit(0);
           });
         }
         break;
