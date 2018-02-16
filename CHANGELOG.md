@@ -1,24 +1,11 @@
-<a name="0.6.0-1"></a>
-# 0.6.0 Prerelease [0.6.0-1](https://github.com/ionic-team/stencil/compare/v0.6.0-0...v0.6.0-1) (2018-02-16)
-
-
-### Bug Fixes
-
-* **config:** fix rebuilds from config updates ([1f46a92](https://github.com/ionic-team/stencil/commit/1f46a92))
-
-
-
-<a name="0.6.0-0"></a>
-# [0.6.0-0](https://github.com/ionic-team/stencil/compare/v0.5.2...v0.6.0-0) (2018-02-15)
-
+<a name="0.6.0"></a>
+# [0.6.0](https://github.com/ionic-team/stencil/compare/v0.5.2...v0.6.0) (2018-02-16)
 
 ### Features
 
-* **collections:** import collections through es module imports ([9015569](https://github.com/ionic-team/stencil/commit/9015569))
-* **sass:** move sass to external plugin, [@stencil](https://github.com/stencil)/sass ([371c44c](https://github.com/ionic-team/stencil/commit/371c44c)), closes [#490](https://github.com/ionic-team/stencil/issues/490)
-
-
 #### Collection Imports
+
+* **collections:** import collections through es module imports ([9015569](https://github.com/ionic-team/stencil/commit/9015569))
 
 The `config.collections` config has been deprecated in favor of standard ES module imports. Instead of listing collections within `stencil.config.js`, collections should now be imported by the app's root component. The benefit of this is to not only simplify the config by using a standards approach for imports, but to also automatically import the collection's types to improve development. If you are using any collections, such as `@ionic/core`, please remove the `config.collections` property entirely from `stencil.config.js`. Next, to include the collection and its types in the project, add the import to your root component. For example:
 
@@ -28,6 +15,8 @@ import '@ionic/core';
 
 
 #### Sass moved to `@stencil/sass`
+
+* **sass:** move sass to external plugin, [@stencil](https://github.com/stencil)/sass ([371c44c](https://github.com/ionic-team/stencil/commit/371c44c)), closes [#490](https://github.com/ionic-team/stencil/issues/490)
 
 Previously Sass was embedded within `@stencil/core`, and styles with a scss extension were automatically precompiled to CSS. In order to better support all external projects, the plugin system is now apart of the compiler's public API and config. With this update, Sass has been moved out of core and into its own plugin, [@stencil/sass](https://www.npmjs.com/package/@stencil/sass). Additionally, this enables other external projects, such as [@stencil/postcss](https://www.npmjs.com/package/@stencil/postcss). If you are currently using Sass, please run the following:
 
@@ -48,6 +37,11 @@ exports.config = {
 ```
 
 (Also note that adding Stylus and Less plugins are on our roadmap.)
+
+
+### Bug Fixes
+
+* **config:** fix rebuilds from config updates ([1f46a92](https://github.com/ionic-team/stencil/commit/1f46a92))
 
 
 <a name="0.5.2"></a>
