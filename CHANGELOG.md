@@ -1,5 +1,15 @@
+<a name="0.6.0-1"></a>
+# 0.6.0 Prerelease [0.6.0-1](https://github.com/ionic-team/stencil/compare/v0.6.0-0...v0.6.0-1) (2018-02-16)
+
+
+### Bug Fixes
+
+* **config:** fix rebuilds from config updates ([1f46a92](https://github.com/ionic-team/stencil/commit/1f46a92))
+
+
+
 <a name="0.6.0-0"></a>
-# 0.6.0 Prerelease [0.6.0-0](https://github.com/ionic-team/stencil/compare/v0.5.2...v0.6.0-0) (2018-02-15)
+# [0.6.0-0](https://github.com/ionic-team/stencil/compare/v0.5.2...v0.6.0-0) (2018-02-15)
 
 
 ### Features
