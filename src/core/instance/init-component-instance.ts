@@ -1,29 +1,28 @@
 import { Build } from '../../util/build-conditionals';
 import { callNodeRefs } from '../renderer/patch';
-import { ComponentConstructor, HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentConstructor, ComponentInstance, HostElement, OnReadyCallback, PlatformApi } from '../../declarations';
 import { initEventEmitters } from './init-event-emitters';
-import { replayQueuedEventsOnInstance } from './listeners';
 import { RUNTIME_ERROR } from '../../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
-export function initComponentInstance(plt: PlatformApi, elm: HostElement, componentConstructor?: ComponentConstructor) {
+export function initComponentInstance(plt: PlatformApi, elm: HostElement, instance?: ComponentInstance, componentConstructor?: ComponentConstructor, queuedEvents?: any[], i?: number) {
   try {
     // using the user's component class, let's create a new instance
     componentConstructor = plt.getComponentMeta(elm).componentConstructor;
-    elm._instance = new (componentConstructor as any)();
+    instance = new (componentConstructor as any)();
 
     // ok cool, we've got an host element now, and a actual instance
     // and there were no errors creating the instance
 
     // let's upgrade the data on the host element
     // and let the getters/setters do their jobs
-    proxyComponentInstance(plt, componentConstructor, elm, elm._instance);
+    proxyComponentInstance(plt, componentConstructor, elm, instance);
 
     if (Build.event) {
       // add each of the event emitters which wire up instance methods
       // to fire off dom events from the host element
-      initEventEmitters(plt, componentConstructor.events, elm._instance);
+      initEventEmitters(plt, componentConstructor.events, instance);
     }
 
     if (Build.listener) {
@@ -31,7 +30,20 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement, compon
         // replay any event listeners on the instance that
         // were queued up between the time the element was
         // connected and before the instance was ready
-        replayQueuedEventsOnInstance(elm);
+        queuedEvents = plt.queuedEvents.get(elm);
+        if (queuedEvents) {
+          // events may have already fired before the instance was even ready
+          // now that the instance is ready, let's replay all of the events that
+          // we queued up earlier that were originally meant for the instance
+          for (i = 0; i < queuedEvents.length; i += 2) {
+            // data was added in sets of two
+            // first item the eventMethodName
+            // second item is the event data
+            // take a look at initElementListener()
+            instance[queuedEvents[i]](queuedEvents[i + 1]);
+          }
+          plt.queuedEvents.delete(elm);
+        }
 
       } catch (e) {
         plt.onError(e, RUNTIME_ERROR.QueueEventsError, elm);
@@ -42,36 +54,41 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement, compon
     // something done went wrong trying to create a component instance
     // create a dumby instance so other stuff can load
     // but chances are the app isn't fully working cuz this component has issues
-    elm._instance = {};
+    instance = {};
     plt.onError(e, RUNTIME_ERROR.InitInstanceError, elm, true);
   }
+
+  plt.instanceMap.set(elm, instance);
+
+  return instance;
 }
 
 
-export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydratedCssClass?: string): any {
+export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydratedCssClass: string, instance?: ComponentInstance, onReadyCallbacks?: OnReadyCallback[]): any {
   // all is good, this component has been told it's time to finish loading
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
-  if (!elm._hasLoaded && elm._instance && !elm._hasDestroyed && (!elm.$activeLoading || !elm.$activeLoading.length)) {
+  if (!plt.hasLoadedMap.has(elm) && (instance = plt.instanceMap.get(elm)) && !plt.isDisconnectedMap.has(elm) && (!elm.$activeLoading || !elm.$activeLoading.length)) {
 
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
-    elm.$activeLoading = null;
+    delete elm.$activeLoading;
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
-    elm._hasLoaded = true;
+    // elm._hasLoaded = true;
+    plt.hasLoadedMap.set(elm, true);
 
     try {
       // fire off the ref if it exists
-      callNodeRefs(elm._vnode);
+      callNodeRefs(plt.vnodeMap.get(elm));
 
       // fire off the user's elm.componentOnReady() callbacks that were
       // put directly on the element (well before anything was ready)
-      if (elm._onReadyCallbacks) {
-        elm._onReadyCallbacks.forEach(cb => cb(elm));
-        elm._onReadyCallbacks = null;
+      if (onReadyCallbacks = plt.onReadyCallbacksMap.get(elm)) {
+        onReadyCallbacks.forEach(cb => cb(elm));
+        plt.onReadyCallbacksMap.delete(elm);
       }
 
       if (Build.cmpDidLoad) {
@@ -79,7 +96,7 @@ export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydrated
         // componentDidLoad only runs ONCE, after the instance's element has been
         // assigned as the host element, and AFTER render() has been called
         // we'll also fire this method off on the element, just to
-        elm._instance.componentDidLoad && elm._instance.componentDidLoad();
+        instance.componentDidLoad && instance.componentDidLoad();
       }
 
     } catch (e) {
@@ -95,19 +112,21 @@ export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydrated
 
     // load events fire from bottom to top
     // the deepest elements load first then bubbles up
-    propagateComponentLoaded(elm);
+    propagateComponentLoaded(plt, elm);
   }
 }
 
 
-export function propagateComponentLoaded(elm: HostElement, index?: number, ancestorsActivelyLoadingChildren?: HostElement[]) {
+export function propagateComponentLoaded(plt: PlatformApi, elm: HostElement, index?: number, ancestorsActivelyLoadingChildren?: HostElement[]) {
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
-  if (elm._ancestorHostElement) {
+  const ancestorHostElement = plt.ancestorHostElementMap.get(elm);
+
+  if (ancestorHostElement) {
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
-    ancestorsActivelyLoadingChildren = elm._ancestorHostElement.$activeLoading;
+    ancestorsActivelyLoadingChildren = ancestorHostElement.$activeLoading;
 
     if (ancestorsActivelyLoadingChildren) {
       index = ancestorsActivelyLoadingChildren.indexOf(elm);
@@ -121,10 +140,9 @@ export function propagateComponentLoaded(elm: HostElement, index?: number, ances
       // to see if the ancestor is actually loaded or not
       // then let's call the ancestor's initLoad method if there's no length
       // (which actually ends up as this method again but for the ancestor)
-      !ancestorsActivelyLoadingChildren.length && elm._ancestorHostElement.$initLoad();
+      !ancestorsActivelyLoadingChildren.length && ancestorHostElement.$initLoad();
     }
 
-    // fuhgeddaboudit, no need to keep a reference after this element loaded
-    elm._ancestorHostElement = null;
+    plt.ancestorHostElementMap.delete(elm);
   }
 }

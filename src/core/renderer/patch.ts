@@ -7,10 +7,9 @@
  * Modified for Stencil's renderer and slot projection
  */
 import { Build } from '../../util/build-conditionals';
-import { DomApi, Encapsulation, HostContentNodes, HostElement, Key, PlatformApi, RendererApi, VNode } from '../../util/interfaces';
+import { DefaultSlot, DomApi, Encapsulation, HostElement, Key, NamedSlots, PlatformApi, RendererApi, VNode } from '../../declarations';
 import { isDef, isUndef } from '../../util/helpers';
-import { NODE_TYPE } from '../../util/constants';
-import { SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
+import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
@@ -33,7 +32,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
     if (!useNativeShadowDom && vnode.vtag === 'slot') {
 
-      if (hostContentNodes) {
+      if (defaultSlot || namedSlots) {
         if (scopeId) {
           domApi.$setAttribute(parentElm, scopeId + '-slot', '');
         }
@@ -45,11 +44,11 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
         if (isDef(namedSlot)) {
           // this vnode is a named slot
-          slotNodes = hostContentNodes.namedSlots && hostContentNodes.namedSlots[namedSlot];
+          slotNodes = namedSlots && namedSlots[namedSlot];
 
         } else {
           // this vnode is the default slot
-          slotNodes = hostContentNodes.defaultSlot;
+          slotNodes = defaultSlot;
         }
 
         if (isDef(slotNodes)) {
@@ -294,6 +293,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     const elm: HostElement = newVNode.elm = <any>oldVNode.elm;
     const oldChildren = oldVNode.vchildren;
     const newChildren = newVNode.vchildren;
+    let defaultSlot: Node[];
 
     if (Build.svg) {
       isSvgMode = newVNode.elm && newVNode.elm.parentElement != null && (newVNode.elm as SVGElement).ownerSVGElement !== undefined;
@@ -328,11 +328,11 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (elm._hostContentNodes && elm._hostContentNodes.defaultSlot) {
+    } else if (defaultSlot = plt.defaultSlotsMap.get(elm)) {
       // this element has slotted content
-      const parentElement = elm._hostContentNodes.defaultSlot[0].parentElement;
+      const parentElement = defaultSlot[0].parentElement;
       domApi.$setTextContent(parentElement, newVNode.vtext);
-      elm._hostContentNodes.defaultSlot = [parentElement.childNodes[0]];
+      plt.defaultSlotsMap.set(elm, [parentElement.childNodes[0]]);
 
     } else if (oldVNode.vtext !== newVNode.vtext) {
       // update the text content for the text only vnode
@@ -346,18 +346,20 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
   // internal variables to be reused per patch() call
   let isUpdate: boolean,
-      hostContentNodes: HostContentNodes,
+      defaultSlot: DefaultSlot,
+      namedSlots: NamedSlots,
       useNativeShadowDom: boolean,
       ssrId: number,
       scopeId: string;
 
 
-  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, hostElementContentNodes?: HostContentNodes, encapsulation?: Encapsulation, ssrPatchId?: number) {
+  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, elmDefaultSlot?: DefaultSlot, elmNamedSlots?: NamedSlots, encapsulation?: Encapsulation, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
     isUpdate = isUpdatePatch;
-    hostContentNodes = hostElementContentNodes;
+    defaultSlot = elmDefaultSlot;
+    namedSlots = elmNamedSlots;
 
     if (Build.ssrServerSide) {
       ssrId = ssrPatchId;

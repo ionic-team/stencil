@@ -1,10 +1,10 @@
-import { DomApi, HostElement, VNode } from '../../util/interfaces';
+import { DomApi, HostElement, PlatformApi, VNode } from '../../declarations';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { t } from './h';
 import { VNode as VNodeObj } from './vnode';
 
 
-export function createVNodesFromSsr(domApi: DomApi, rootElm: Element) {
+export function createVNodesFromSsr(plt: PlatformApi, domApi: DomApi, rootElm: Element) {
   const allSsrElms: HostElement[] = <any>rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`);
   const ilen = allSsrElms.length;
   let elm: HostElement,
@@ -14,12 +14,15 @@ export function createVNodesFromSsr(domApi: DomApi, rootElm: Element) {
       j: number,
       jlen: number;
 
-  if ((<HostElement>rootElm)._hasLoaded = ilen > 0) {
+  if (ilen > 0) {
+    plt.hasLoadedMap.set(rootElm as HostElement, true);
+
     for (i = 0; i < ilen; i++) {
       elm = allSsrElms[i];
       ssrVNodeId = domApi.$getAttribute(elm, SSR_VNODE_ID);
-      ssrVNode = elm._vnode = new VNodeObj();
+      ssrVNode = new VNodeObj();
       ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm);
+      plt.vnodeMap.set(elm, ssrVNode);
 
       for (j = 0, jlen = elm.childNodes.length; j < jlen; j++) {
         addChildSsrVNodes(domApi, elm.childNodes[j], ssrVNode, ssrVNodeId, true);

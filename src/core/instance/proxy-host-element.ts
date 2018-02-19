@@ -1,5 +1,5 @@
 import { definePropertyGetterSetter, definePropertyValue, setValue } from './proxy-members';
-import { HostElement, MembersMeta, PlatformApi } from '../../util/interfaces';
+import { HostElement, MembersMeta, PlatformApi } from '../../declarations';
 import { MEMBER_TYPE } from '../../util/constants';
 import { noop } from '../../util/helpers';
 
@@ -21,7 +21,7 @@ export function proxyHostElementPrototype(plt: PlatformApi, membersMeta: Members
           // host element getter (cannot be arrow fn)
           // yup, ugly, srynotsry
           // but its creating _values if it doesn't already exist
-          return (this._values = this._values || {})[memberName];
+          return (plt.valuesMap.get(this) || {})[memberName];
         },
         function setHostElementProp(this: HostElement, newValue: any) {
           // host element setter (cannot be arrow fn)

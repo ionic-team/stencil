@@ -1,26 +1,34 @@
 import { Build } from '../../util/build-conditionals';
-import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentMeta, HostElement, PlatformApi } from '../../declarations';
 import { initElementListeners } from './listeners';
 import { PRIORITY } from '../../util/constants';
 import { queueUpdate } from './update';
 
 
 export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement) {
-  // do not reconnect if we've already created an instance for this element
 
-  if (!elm.$connected) {
-    // first time we've connected
-    elm.$connected = true;
-
-    // if somehow this node was reused, ensure we've removed this property
-    elm._hasDestroyed = null;
-
-    if (Build.listener) {
-      // initialize our event listeners on the host element
-      // we do this now so that we can listening to events that may
-      // have fired even before the instance is ready
+  if (Build.listener) {
+    // initialize our event listeners on the host element
+    // we do this now so that we can listening to events that may
+    // have fired even before the instance is ready
+    if (!plt.hasListenersMap.has(elm)) {
+      // it's possible we've already connected
+      // then disconnected
+      // and the same element is reconnected again
+      plt.hasListenersMap.set(elm, true);
       initElementListeners(plt, elm);
     }
+  }
+
+  plt.isDisconnectedMap.delete(elm);
+
+  if (!plt.hasConnectedMap.has(elm)) {
+
+    // first time we've connected
+    plt.hasConnectedMap.set(elm, true);
+
+    // if somehow this node was reused, ensure we've removed this property
+    // elm._hasDestroyed = null;
 
     // register this component as an actively
     // loading child to its parent component
@@ -58,10 +66,11 @@ export function registerWithParentComponent(plt: PlatformApi, elm: HostElement, 
     if (plt.isDefinedComponent(ancestorHostElement)) {
       // we found this elements the first ancestor host element
       // if the ancestor already loaded then do nothing, it's too late
-      if (!ancestorHostElement._hasLoaded) {
+      if (!plt.hasLoadedMap.has(elm)) {
 
         // keep a reference to this element's ancestor host element
-        elm._ancestorHostElement = ancestorHostElement;
+        // elm._ancestorHostElement = ancestorHostElement;
+        plt.ancestorHostElementMap.set(elm, ancestorHostElement);
 
         // ensure there is an array to contain a reference to each of the child elements
         // and set this element as one of the ancestor's child elements it should wait on

@@ -1,4 +1,4 @@
-import { ComponentInstance, HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentInstance, HostElement, PlatformApi } from '../../declarations';
 
 
 export function initElementListeners(plt: PlatformApi, elm: HostElement) {
@@ -19,7 +19,7 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
         plt.domApi.$addEventListener(
           elm,
           listenMeta.eventName,
-          createListenerCallback(elm, listenMeta.eventMethodName),
+          createListenerCallback(plt, elm, listenMeta.eventMethodName),
           listenMeta.eventCapture,
           listenMeta.eventPassive
         );
@@ -29,19 +29,23 @@ export function initElementListeners(plt: PlatformApi, elm: HostElement) {
 }
 
 
-export function createListenerCallback(elm: HostElement, eventMethodName: string) {
+export function createListenerCallback(plt: PlatformApi, elm: HostElement, eventMethodName: string, val?: any) {
   // create the function that gets called when the element receives
   // an event which it should be listening for
   return (ev?: any) => {
-    if (elm._instance) {
+    // get the instance if it exists
+    val = plt.instanceMap.get(elm);
+    if (val) {
       // instance is ready, let's call it's member method for this event
-      elm._instance[eventMethodName](ev);
+      val[eventMethodName](ev);
 
     } else {
       // instance is not ready!!
       // let's queue up this event data and replay it later
       // when the instance is ready
-      (elm._queuedEvents = elm._queuedEvents || []).push(eventMethodName, ev);
+      val = (plt.queuedEvents.get(elm) || []);
+      val.push(eventMethodName, ev);
+      plt.queuedEvents.set(elm, val);
     }
   };
 }
@@ -50,7 +54,7 @@ export function createListenerCallback(elm: HostElement, eventMethodName: string
 export function enableEventListener(plt: PlatformApi, instance: ComponentInstance, eventName: string, shouldEnable: boolean, attachTo?: string|Element, passive?: boolean) {
   if (instance) {
     // cool, we've got an instance, it's get the element it's on
-    const elm = instance.__el;
+    const elm = plt.hostElementMap.get(instance);
     const cmpMeta = plt.getComponentMeta(elm);
 
     if (cmpMeta && cmpMeta.listenersMeta) {
@@ -78,28 +82,5 @@ export function enableEventListener(plt: PlatformApi, instance: ComponentInstanc
         plt.domApi.$removeEventListener(elm, eventName);
       }
     }
-  }
-}
-
-
-export function replayQueuedEventsOnInstance(elm: HostElement, i?: number) {
-  // the element has an instance now and
-  // we already added the event listeners to the element
-  const queuedEvents = elm._queuedEvents;
-
-  if (queuedEvents) {
-    // events may have already fired before the instance was even ready
-    // now that the instance is ready, let's replay all of the events that
-    // we queued up earlier that were originally meant for the instance
-    for (i = 0; i < queuedEvents.length; i += 2) {
-      // data was added in sets of two
-      // first item the eventMethodName
-      // second item is the event data
-      // take a look at initElementListener()
-      elm._instance[queuedEvents[i]](queuedEvents[i + 1]);
-    }
-
-    // no longer need this data, be gone with you
-    elm._queuedEvents = null;
   }
 }

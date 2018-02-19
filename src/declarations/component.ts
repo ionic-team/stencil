@@ -189,9 +189,6 @@ export interface ComponentInstance {
   mode?: string;
   color?: string;
 
-  // private properties
-  __el?: HostElement;
-
   [memberName: string]: any;
 }
 
@@ -239,13 +236,13 @@ export interface HostElement extends HTMLElement {
   connectedCallback: () => void;
   attributeChangedCallback?: (attribName: string, oldVal: string, newVal: string, namespace: string) => void;
   disconnectedCallback?: () => void;
+  host: Element;
   forceUpdate: () => void;
 
   // public members which can be used externally and should
   // not be property renamed (these should all be in externs)
-  // HOWEVER!!! Don't use these :)
+  // HOWEVER!!! Don't use these :) Nothing to see here
   $activeLoading?: HostElement[];
-  $connected?: boolean;
   $defaultHolder?: Comment;
   $initLoad: () => void;
   $rendered?: boolean;
@@ -253,23 +250,14 @@ export interface HostElement extends HTMLElement {
   componentOnReady?: (cb?: (elm: HostElement) => void) => Promise<void>;
   color?: string;
   mode?: string;
-
-  // private members which are only internal to
-  // this runtime and can be safely property renamed
-  _ancestorHostElement?: HostElement;
-  _appliedStyles?: { [tagNameForStyles: string]: boolean };
-  _hasDestroyed?: boolean;
-  _hasLoaded?: boolean;
-  _hostContentNodes?: d.HostContentNodes;
-  _instance?: ComponentInstance;
-  _isQueuedForUpdate?: boolean;
-  _observer?: MutationObserver;
-  _onReadyCallbacks: ((elm: HostElement) => void)[];
-  _queuedEvents?: any[];
-  _root?: HTMLElement | ShadowRoot;
-  _values?: ComponentInternalValues;
-  _vnode: d.VNode;
 }
+
+export interface ComponentAppliedStyles {
+  [tagNameForStyles: string]: boolean;
+}
+
+
+export type OnReadyCallback = ((elm: HostElement) => void);
 
 
 export interface LoadComponentRegistry {

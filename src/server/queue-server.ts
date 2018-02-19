@@ -1,10 +1,9 @@
 import { PRIORITY } from '../util/constants';
-import { QueueApi } from '../util/interfaces';
+import { QueueApi } from '../declarations';
 
 
 export function createQueueServer(): QueueApi {
   const highCallbacks: Function[] = [];
-  const mediumCallbacks: Function[] = [];
   const lowCallbacks: Function[] = [];
 
   let queued = false;
@@ -14,15 +13,11 @@ export function createQueueServer(): QueueApi {
       highCallbacks.shift()();
     }
 
-    while (mediumCallbacks.length > 0) {
-      mediumCallbacks.shift()();
-    }
-
     while (lowCallbacks.length > 0) {
       lowCallbacks.shift()();
     }
 
-    queued = (highCallbacks.length > 0) || (mediumCallbacks.length > 0) || (lowCallbacks.length > 0);
+    queued = (highCallbacks.length > 0) || (lowCallbacks.length > 0);
     if (queued) {
       process.nextTick(flush);
     }
@@ -30,15 +25,12 @@ export function createQueueServer(): QueueApi {
     cb && cb();
   }
 
-  function add(cb: Function, priority?: number) {
+  function add(cb: Function, priority?: PRIORITY) {
     if (priority === PRIORITY.High) {
       highCallbacks.push(cb);
 
-    } else if (priority === PRIORITY.Low) {
-      lowCallbacks.push(cb);
-
     } else {
-      mediumCallbacks.push(cb);
+      lowCallbacks.push(cb);
     }
 
     if (!queued) {

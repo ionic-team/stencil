@@ -1,6 +1,6 @@
 import { attributeChangedCallback } from './attribute-changed';
 import { Build } from '../../util/build-conditionals';
-import { ComponentMeta, HostElement, PlatformApi } from '../../util/interfaces';
+import { ComponentMeta, HostElement, OnReadyCallback, PlatformApi } from '../../declarations';
 import { connectedCallback } from './connected';
 import { disconnectedCallback } from './disconnected';
 import { initComponentLoaded } from './init-component-instance';
@@ -35,7 +35,7 @@ export function initHostElement(plt: PlatformApi, cmpMeta: ComponentMeta, HostEl
     if (!cb) {
       promise = new Promise(resolve => cb = resolve);
     }
-    componentOnReady((this as HostElement), cb);
+    componentOnReady(plt, (this as HostElement), cb);
     return promise;
   };
 
@@ -54,12 +54,15 @@ export function initHostElement(plt: PlatformApi, cmpMeta: ComponentMeta, HostEl
 }
 
 
-function componentOnReady(elm: HostElement, cb: (elm: HostElement) => void) {
-  if (!elm._hasDestroyed) {
-    if (elm._hasLoaded) {
+function componentOnReady(plt: PlatformApi, elm: HostElement, cb: (elm: HostElement) => void, onReadyCallbacks?: OnReadyCallback[]) {
+  if (!plt.isDisconnectedMap.has(elm)) {
+    if (plt.hasLoadedMap.has(elm)) {
       cb(elm);
+
     } else {
-      (elm._onReadyCallbacks = elm._onReadyCallbacks || []).push(cb);
+      onReadyCallbacks = plt.onReadyCallbacksMap.get(elm) || [];
+      onReadyCallbacks.push(cb);
+      plt.onReadyCallbacksMap.set(elm, onReadyCallbacks);
     }
   }
 }

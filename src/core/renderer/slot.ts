@@ -1,8 +1,8 @@
-import { DomApi, HostElement } from '../../util/interfaces';
+import { DomApi, HostElement, PlatformApi } from '../../declarations';
 import { NODE_TYPE } from '../../util/constants';
 
 
-export function assignHostContentSlots(domApi: DomApi, elm: HostElement, childNodes: NodeList, childNode?: Node) {
+export function assignHostContentSlots(plt: PlatformApi, domApi: DomApi, elm: HostElement, childNodes: NodeList, childNode?: Node, slotName?: string, defaultSlot?: Node[], namedSlots?: {[slotName: string]: Node[]}, i?: number) {
   // so let's loop through each of the childNodes to the host element
   // and pick out the ones that have a slot attribute
   // if it doesn't have a slot attribute, than it's a default slot
@@ -13,12 +13,7 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, childNo
     domApi.$insertBefore(elm, (elm.$defaultHolder = domApi.$createComment('')), childNodes[0]);
   }
 
-  let slotName: string;
-  let defaultSlot: Node[];
-  let namedSlots: {[slotName: string]: Node[]};
-  let i = 0;
-
-  for (; i < childNodes.length; i++) {
+  for (i = 0; i < childNodes.length; i++) {
     childNode = childNodes[i];
 
     if (domApi.$nodeType(childNode) === NODE_TYPE.ElementNode && ((slotName = domApi.$getAttribute(childNode, 'slot')) != null)) {
@@ -47,8 +42,11 @@ export function assignHostContentSlots(domApi: DomApi, elm: HostElement, childNo
 
   // keep a reference to all of the initial nodes
   // found as immediate childNodes to the host element
-  elm._hostContentNodes = {
-    defaultSlot: defaultSlot,
-    namedSlots: namedSlots
-  };
+  // elm._hostContentNodes = {
+  //   defaultSlot: defaultSlot,
+  //   namedSlots: namedSlots
+  // };
+
+  plt.defaultSlotsMap.set(elm, defaultSlot);
+  plt.namedSlotsMap.set(elm, namedSlots);
 }

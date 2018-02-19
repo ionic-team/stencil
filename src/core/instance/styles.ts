@@ -1,5 +1,5 @@
 import { Build } from '../../util/build-conditionals';
-import { ComponentConstructor, ComponentMeta, DomApi, HostElement } from '../../declarations';
+import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../../declarations';
 import { CustomStyle } from '../../client/css-shim/custom-style';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../util/constants';
 
@@ -43,7 +43,7 @@ export function initStyleTemplate(domApi: DomApi, cmpMeta: ComponentMeta, cmpCon
 }
 
 
-export function attachStyles(domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, elm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
+export function attachStyles(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta, modeName: string, elm: HostElement, customStyle?: CustomStyle, styleElm?: HTMLStyleElement) {
   // first see if we've got a style for a specific mode
   let styleModeId = cmpMeta.tagNameMeta + (modeName || DEFAULT_STYLE_MODE);
   let styleTemplate = (cmpMeta as any)[styleModeId];
@@ -65,15 +65,15 @@ export function attachStyles(domApi: DomApi, cmpMeta: ComponentMeta, modeName: s
       if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
         // we already know we're in a shadow dom
         // so shadow root is the container for these styles
-        styleContainerNode = (elm.shadowRoot as any);
+        styleContainerNode = elm.shadowRoot as any;
 
       } else {
         // climb up the dom and see if we're in a shadow dom
         while ((elm as Node) = domApi.$parentNode(elm)) {
-          if ((elm as any).host && (elm as any).host.shadowRoot) {
+          if (elm.host && elm.host.shadowRoot) {
             // looks like we are in shadow dom, let's use
             // this shadow root as the container for these styles
-            styleContainerNode = (elm as any).host.shadowRoot;
+            styleContainerNode = (elm.host.shadowRoot) as any;
             break;
           }
         }
@@ -83,8 +83,7 @@ export function attachStyles(domApi: DomApi, cmpMeta: ComponentMeta, modeName: s
     // if this container element already has these styles
     // then there's no need to apply them again
     // create an object to keep track if we'ready applied this component style
-    const appliedStyles = ((styleContainerNode as HostElement)._appliedStyles = (styleContainerNode as HostElement)._appliedStyles || {});
-
+    const appliedStyles = plt.componentAppliedStyles.get(styleContainerNode) || {};
     if (!appliedStyles[styleModeId]) {
       // looks like we haven't applied these styles to this container yet
 
@@ -100,6 +99,8 @@ export function attachStyles(domApi: DomApi, cmpMeta: ComponentMeta, modeName: s
         }
 
       } else {
+        // this browser supports the <template> element
+        // and all its native content.cloneNode() goodness
         // clone the template element to create a new <style> element
         styleElm = styleTemplate.content.cloneNode(true);
       }
@@ -111,6 +112,7 @@ export function attachStyles(domApi: DomApi, cmpMeta: ComponentMeta, modeName: s
 
       // remember we don't need to do this again for this element
       appliedStyles[styleModeId] = true;
+      plt.componentAppliedStyles.set(styleContainerNode, appliedStyles);
     }
   }
 }

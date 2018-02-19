@@ -1,15 +1,13 @@
 import { Build } from '../../util/build-conditionals';
-import { ComponentMeta, HostElement, PlatformApi, VNodeData } from '../../util/interfaces';
+import { ComponentInstance, ComponentMeta, HostElement, PlatformApi, VNodeData } from '../../declarations';
 import { createThemedClasses } from '../../util/theme';
 import { h } from '../renderer/h';
 import { RUNTIME_ERROR } from '../../util/constants';
 import { VNode as VNodeObj } from '../renderer/vnode';
 
 
-export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMeta, isUpdateRender: boolean) {
+export function render(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement, instance: ComponentInstance, isUpdateRender: boolean) {
   try {
-    const instance = elm._instance;
-
     // if this component has a render function, let's fire
     // it off and generate the child vnodes for this host element
     // note that we do not create the host element cuz it already exists
@@ -55,26 +53,27 @@ export function render(plt: PlatformApi, elm: HostElement, cmpMeta: ComponentMet
 
       // if we haven't already created a vnode, then we give the renderer the actual element
       // if this is a re-render, then give the renderer the last vnode we already created
-      const oldVNode = elm._vnode || new VNodeObj();
+      const oldVNode = plt.vnodeMap.get(elm) || new VNodeObj();
       oldVNode.elm = elm;
 
       // each patch always gets a new vnode
       // the host element itself isn't patched because it already exists
       // kick off the actual render and any DOM updates
-      elm._vnode = plt.render(
+      plt.vnodeMap.set(elm, plt.render(
         oldVNode,
         h(null, vnodeHostData, vnodeChildren),
         isUpdateRender,
-        elm._hostContentNodes,
+        plt.defaultSlotsMap.get(elm),
+        plt.namedSlotsMap.get(elm),
         cmpMeta.componentConstructor.encapsulation
-      );
+      ));
 
     }
     if (Build.styles) {
       // attach the styles this component needs, if any
       // this fn figures out if the styles should go in a
       // shadow root or if they should be global
-      plt.attachStyles(plt.domApi, cmpMeta, instance.mode, elm);
+      plt.attachStyles(plt, plt.domApi, cmpMeta, instance.mode, elm);
     }
 
     // it's official, this element has rendered

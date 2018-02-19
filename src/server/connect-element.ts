@@ -1,4 +1,4 @@
-import { Config, ComponentMeta, HostElement, HydrateResults, PlatformApi } from '../util/interfaces';
+import { ComponentMeta, Config, HostElement, HydrateResults, PlatformApi } from '../declarations';
 import { connectedCallback } from '../core/instance/connected';
 import { ENCAPSULATION } from '../util/constants';
 import { initHostElement } from '../core/instance/init-host-element';
@@ -16,7 +16,7 @@ export function connectChildElements(config: Config, plt: PlatformApi, hydrateRe
 
 
 export function connectElement(config: Config, plt: PlatformApi, hydrateResults: HydrateResults, elm: Element) {
-  if (!(elm as HostElement).$connected) {
+  if (!plt.hasConnectedMap.has(elm as HostElement)) {
     const tagName = elm.tagName.toLowerCase();
     const cmpMeta = plt.getComponentMeta(elm);
 
@@ -33,7 +33,7 @@ export function connectElement(config: Config, plt: PlatformApi, hydrateResults:
       connectImgElement(hydrateResults, elm as HTMLImageElement);
     }
 
-    (elm as HostElement).$connected = true;
+    plt.hasConnectedMap.set(elm as HostElement, true);
   }
 }
 

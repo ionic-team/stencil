@@ -12,16 +12,16 @@ export function defineMember(
   memberName: string
 ) {
 
-  function getComponentProp(this: ComponentInstance, elm?: HostElement) {
+  function getComponentProp(this: ComponentInstance, values?: any) {
     // component instance prop/state getter
     // get the property value directly from our internal values
-    elm = this.__el;
-    return elm && elm._values && elm._values[memberName];
+    values = plt.valuesMap.get(plt.hostElementMap.get(this));
+    return values && values[memberName];
   }
 
   function setComponentProp(this: ComponentInstance, newValue: any, elm?: HostElement) {
     // component instance prop/state setter (cannot be arrow fn)
-    elm = this.__el;
+    elm = plt.hostElementMap.get(this);
 
     if (elm) {
       if (property.state || property.mutable) {
@@ -34,15 +34,16 @@ export function defineMember(
   }
 
   if (property.type || property.state) {
+    const values = plt.valuesMap.get(elm);
 
     if (!property.state) {
-      if (property.attr && (elm._values[memberName] === undefined || elm._values[memberName] === '')) {
+      if (property.attr && (values[memberName] === undefined || values[memberName] === '')) {
         // check the prop value from the host element attribute
         const hostAttrValue = plt.domApi.$getAttribute(elm, property.attr);
         if (hostAttrValue != null) {
           // looks like we've got an attribute value
           // let's set it to our internal values
-          elm._values[memberName] = parsePropertyValue(property.type, hostAttrValue);
+          values[memberName] = parsePropertyValue(property.type, hostAttrValue);
         }
       }
 
@@ -58,8 +59,8 @@ export function defineMember(
           // @Prop or @Prop({mutable:true})
           // property values on the host element should override
           // any default values on the component instance
-          if (elm._values[memberName] === undefined) {
-            elm._values[memberName] = (elm as any)[memberName];
+          if (values[memberName] === undefined) {
+            values[memberName] = (elm as any)[memberName];
           }
 
           // for the client only, let's delete its "own" property
@@ -78,24 +79,24 @@ export function defineMember(
           // @Prop or @Prop({mutable:true})
           // property values on the host element should override
           // any default values on the component instance
-          if (elm._values[memberName] === undefined) {
-            elm._values[memberName] = (elm as any)[memberName];
+          if (values[memberName] === undefined) {
+            values[memberName] = (elm as any)[memberName];
           }
         }
       }
     }
 
-    if (instance.hasOwnProperty(memberName) && elm._values[memberName] === undefined) {
+    if (instance.hasOwnProperty(memberName) && values[memberName] === undefined) {
       // @Prop() or @Prop({mutable:true}) or @State()
       // we haven't yet got a value from the above checks so let's
       // read any "own" property instance values already set
       // to our internal value as the source of getter data
       // we're about to define a property and it'll overwrite this "own" property
-      elm._values[memberName] = (instance as any)[memberName];
+      values[memberName] = (instance as any)[memberName];
     }
 
     if (property.watchCallbacks) {
-      elm._values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
+      values[WATCH_CB_PREFIX + memberName] = property.watchCallbacks.slice();
     }
 
     // add getter/setter to the component instance
@@ -133,12 +134,15 @@ export function defineMember(
 }
 
 
-export function setValue(plt: PlatformApi, elm: HostElement, memberName: string, newVal: any, internalValues?: any, instance?: any, watchMethods?: string[]) {
+export function setValue(plt: PlatformApi, elm: HostElement, memberName: string, newVal: any, values?: any, instance?: ComponentInstance, watchMethods?: string[]) {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
-  internalValues = (elm._values = elm._values || {});
+  values = plt.valuesMap.get(elm);
+  if (!values) {
+    plt.valuesMap.set(elm, values = {});
+  }
 
-  const oldVal = internalValues[memberName];
+  const oldVal = values[memberName];
 
   // check our new property value against our internal value
   if (newVal !== oldVal) {
@@ -146,13 +150,13 @@ export function setValue(plt: PlatformApi, elm: HostElement, memberName: string,
 
     // set our new value!
     // https://youtu.be/dFtLONl4cNc?t=22
-    internalValues[memberName] = newVal;
+    values[memberName] = newVal;
 
-    instance = elm._instance;
+    instance = plt.instanceMap.get(elm);
 
     if (instance) {
       // get an array of method names of watch functions to call
-      watchMethods = internalValues[WATCH_CB_PREFIX + memberName];
+      watchMethods = values[WATCH_CB_PREFIX + memberName];
 
       if (Build.watchCallback && watchMethods) {
         // this instance is watching for when this property changed

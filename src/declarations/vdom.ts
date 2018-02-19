@@ -1,4 +1,4 @@
-import * as d from '../declarations';
+import * as d from './index';
 
 
 export interface Hyperscript {
@@ -57,7 +57,9 @@ export interface VNodeProdData {
 export type Key = string | number;
 
 
-export interface HostContentNodes {
-  defaultSlot?: Node[];
-  namedSlots?: {[slotName: string]: Node[]};
+export type DefaultSlot = Node[];
+
+
+export interface NamedSlots {
+  [slotName: string]: Node[];
 }

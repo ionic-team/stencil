@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, VNode } from '../util/interfaces';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, VNode } from '../declarations';
 import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeHydrateOptions, normalizeLanguage } from './hydrate-utils';
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
@@ -101,7 +101,7 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
     // and to connect any elements it may have just appened to the DOM
     let ssrIds = 0;
     const pltRender = plt.render;
-    plt.render = function render(oldVNode: VNode, newVNode, isUpdate, hostContentNodes, encapsulation) {
+    plt.render = function render(oldVNode: VNode, newVNode, isUpdate, defaultSlots, namedSlotsMap, encapsulation) {
       let ssrId: number;
       let existingSsrId: string;
 
@@ -119,7 +119,7 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
         }
       }
 
-      newVNode = pltRender(oldVNode, newVNode, isUpdate, hostContentNodes, encapsulation, ssrId);
+      newVNode = pltRender(oldVNode, newVNode, isUpdate, defaultSlots, namedSlotsMap, encapsulation, ssrId);
 
       connectChildElements(config, plt, hydrateResults, newVNode.elm as Element);
 
