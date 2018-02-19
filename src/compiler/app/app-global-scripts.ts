@@ -4,6 +4,7 @@ import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-
 import { generatePreamble, minifyJs } from '../util';
 import { getAppPublicPath, getGlobalDist, getGlobalFileName, getGlobalWWW } from './app-file-naming';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
+import resolveCollections from '../bundle/rollup-plugins/resolve-collections';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
@@ -93,6 +94,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
     const rollup = await config.sys.rollup.rollup({
       input: entry,
       plugins: [
+        resolveCollections(compilerCtx),
         config.sys.rollup.plugins.nodeResolve({
           jsnext: true,
           main: true
