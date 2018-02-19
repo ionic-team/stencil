@@ -1,3 +1,13 @@
+<a name="0.6.3"></a>
+## [0.6.3](https://github.com/ionic-team/stencil/compare/v0.6.2...v0.6.3) (2018-02-19)
+
+
+### Bug Fixes
+
+* remove isBuildSvg from prop test in render. ([913d4d1](https://github.com/ionic-team/stencil/commit/913d4d1))
+
+
+
 <a name="0.6.2"></a>
 ## [0.6.2](https://github.com/ionic-team/stencil/compare/v0.6.1...v0.6.2) (2018-02-19)
 
