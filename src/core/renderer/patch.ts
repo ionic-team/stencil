@@ -146,9 +146,11 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         }
       }
 
-      // Only reset the SVG context when we're exiting SVG element
-      if (vnode.vtag === 'svg') {
-        isSvgMode = false;
+      if (Build.svg) {
+        // Only reset the SVG context when we're exiting SVG element
+        if (vnode.vtag === 'svg') {
+          isSvgMode = false;
+        }
       }
     }
 
@@ -347,8 +349,12 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       domApi.$setTextContent(elm, newVNode.vtext);
     }
 
-    // reset svgMode when svg node is fully patched
-    if ('svg' === newVNode.vtag && isSvgMode) isSvgMode = false;
+    if (Build.svg) {
+      // reset svgMode when svg node is fully patched
+      if (isSvgMode && 'svg' === newVNode.vtag) {
+        isSvgMode = false;
+      }
+    }
   }
 
   // internal variables to be reused per patch() call
