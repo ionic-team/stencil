@@ -43,6 +43,7 @@
     "rollup-plugin-node-builtins": "2.1.2",
     "rollup-plugin-node-globals": "1.1.0",
     "rollup-plugin-node-resolve": "3.0.3",
+    "rollup-pluginutils": "^2.0.1",
     "typescript": "^2.7.1",
     "uglify-es": "3.3.9",
     "workbox-build": "3.0.0-alpha.6"
