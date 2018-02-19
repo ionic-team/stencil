@@ -64,7 +64,7 @@ export async function writeEsModules(config: Config, rollupBundle: OutputChunk) 
   const results = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
-    intro: `const { h, Context } = window.${config.namespace};`,
+    intro: `const { h } = window.${config.namespace};`,
   });
   return <any>results as JSModuleList;
 }
@@ -88,9 +88,7 @@ export async function writeLegacyModules(config: Config, rollupBundle: OutputChu
       define: `${config.namespace}.loadBundle`
     },
     banner: generatePreamble(config),
-    intro:
-`const h = window.${config.namespace}.h;
-const Context = window.${config.namespace}.Context;`,
+    intro: `const h = window.${config.namespace}.h;`,
     strict: false,
   });
 
