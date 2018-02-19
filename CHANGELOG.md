@@ -1,3 +1,13 @@
+<a name="0.6.1"></a>
+## [0.6.1](https://github.com/ionic-team/stencil/compare/v0.6.0...v0.6.1) (2018-02-19)
+
+
+### Bug Fixes
+
+* **component:** keep references to components when temporarily disconnected ([bb7b8f5](https://github.com/ionic-team/stencil/commit/bb7b8f5)), closes [#527](https://github.com/ionic-team/stencil/issues/527)
+
+
+
 <a name="0.6.0"></a>
 # [0.6.0](https://github.com/ionic-team/stencil/compare/v0.5.2...v0.6.0) (2018-02-16)
 
