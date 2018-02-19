@@ -1,3 +1,16 @@
+<a name="0.6.2"></a>
+## [0.6.2](https://github.com/ionic-team/stencil/compare/v0.6.1...v0.6.2) (2018-02-19)
+
+
+### Bug Fixes
+
+* **collection:** remove collection loader from global scripts ([a70476e](https://github.com/ionic-team/stencil/commit/a70476e))
+* **json:** add rollup pluginutils to json plugin so that we can ignore commonjs proxy files. ([b148239](https://github.com/ionic-team/stencil/commit/b148239))
+* **prerender:** handle anchor href values that contain quotes ([3f87e1d](https://github.com/ionic-team/stencil/commit/3f87e1d)), closes [#552](https://github.com/ionic-team/stencil/issues/552)
+* **slot:** component provided default slot content ([59ff359](https://github.com/ionic-team/stencil/commit/59ff359)), closes [#171](https://github.com/ionic-team/stencil/issues/171)
+
+
+
 <a name="0.6.1"></a>
 ## [0.6.1](https://github.com/ionic-team/stencil/compare/v0.6.0...v0.6.1) (2018-02-19)
 
