@@ -27,9 +27,9 @@ describe('instance update', () => {
       const elm = mockElement('ion-tag') as HostElement;
       const cmpMeta: ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
-      elm._instance = new MyComponent();
-      renderUpdate(plt, elm, false);
-      expect(elm._instance.ranLifeCycle).toBe(true);
+      const instance = new MyComponent();
+      renderUpdate(plt, elm, instance, false);
+      expect(instance.ranLifeCycle).toBe(true);
     });
 
     it('should not fire off componentDidUpdate if its on the instance and isInitialLoad is true', () => {
@@ -42,14 +42,15 @@ describe('instance update', () => {
       const elm = mockElement('ion-tag') as HostElement;
       const cmpMeta: ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
-      elm._instance = new MyComponent();
-      renderUpdate(plt, elm, true);
-      expect(elm._instance.ranLifeCycle).toBe(false);
+
+      const instance = new MyComponent();
+      renderUpdate(plt, elm, instance, true);
+      expect(instance.ranLifeCycle).toBe(false);
     });
 
   });
 
-  it('should render state', () => {
+  it('should render state', async () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -64,22 +65,23 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
     Build.hostData = false;
-    return waitForLoad(plt, node, 'ion-test').then(elm => {
-      expect(elm._vnode.elm.textContent).toBe('88');
 
-      const instance: any = elm._instance;
-      instance.value = '99';
+    const elm = await waitForLoad(plt, node, 'ion-test');
+    const vnode = plt.vnodeMap.get(elm);
+    expect(vnode.elm.textContent).toBe('88');
 
-      queueUpdate(plt, elm);
+    const instance = plt.instanceMap.get(elm);
+    instance.value = '99';
 
-      plt.$flushQueue(() => {
-        expect(elm._vnode.elm.textContent).toBe('99');
-        Build.hostData = true;
-      });
-    });
+    queueUpdate(plt, elm);
+
+    await plt.$flushQueue();
+
+    expect(vnode.elm.textContent).toBe('99');
+    Build.hostData = true;
   });
 
-  it('should render text', () => {
+  it('should render text', async () => {
 
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
@@ -94,14 +96,13 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    return waitForLoad(plt, node, 'ion-test').then(elm => {
-      expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
-      expect(elm.childNodes[1].nodeName).toBe('GRASSHOPPER');
-      expect(elm.childNodes[1].textContent).toBe('hi');
-    });
+    const elm = await waitForLoad(plt, node, 'ion-test');
+    expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
+    expect(elm.childNodes[1].nodeName).toBe('GRASSHOPPER');
+    expect(elm.childNodes[1].textContent).toBe('hi');
   });
 
-  it('should render text where null values exist in an array', () => {
+  it('should render text where null values exist in an array', async () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -117,19 +118,18 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    return waitForLoad(plt, node, 'ion-test').then(elm => {
-      expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
-      expect(elm.childNodes[1].nodeType).toBe(3); // Node.TEXT_NODE
-      expect(elm.childNodes[1].textContent).toBe('');
-      expect(elm.childNodes[2].nodeType).toBe(1); // Node.ELEMENT_NODE
-      expect(elm.childNodes[2].nodeName).toBe('GRASSHOPPER');
-      expect(elm.childNodes[2].textContent).toBe('hi');
-      expect(elm.childNodes[3].nodeType).toBe(3); // Node.TEXT_NODE
-      expect(elm.childNodes[3].textContent).toBe('');
-    });
+    const elm = await waitForLoad(plt, node, 'ion-test');
+    expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
+    expect(elm.childNodes[1].nodeType).toBe(3); // Node.TEXT_NODE
+    expect(elm.childNodes[1].textContent).toBe('');
+    expect(elm.childNodes[2].nodeType).toBe(1); // Node.ELEMENT_NODE
+    expect(elm.childNodes[2].nodeName).toBe('GRASSHOPPER');
+    expect(elm.childNodes[2].textContent).toBe('hi');
+    expect(elm.childNodes[3].nodeType).toBe(3); // Node.TEXT_NODE
+    expect(elm.childNodes[3].textContent).toBe('');
   });
 
-  it('should not run renderer when no render() fn', () => {
+  it('should not run renderer when no render() fn', async () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {} as any
@@ -137,12 +137,12 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    return waitForLoad(plt, node, 'ion-test').then(elm => {
-      expect(elm._vnode).toBeUndefined();
-    });
+    const elm = await waitForLoad(plt, node, 'ion-test');
+    const vnode = plt.vnodeMap.get(elm);
+    expect(vnode).toBeUndefined();
   });
 
-  it('should create _instance', () => {
+  it('should create instance', async () => {
     const cmpMeta: ComponentMeta = {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -153,9 +153,9 @@ describe('instance update', () => {
 
     const node = mockConnect(plt, '<ion-test></ion-test>');
 
-    return waitForLoad(plt, node, 'ion-test').then(elm => {
-      expect(elm._instance).toBeDefined();
-    });
+    const elm = await waitForLoad(plt, node, 'ion-test');
+    const instance = plt.instanceMap.get(elm);
+    expect(instance).toBeDefined();
   });
 
 });

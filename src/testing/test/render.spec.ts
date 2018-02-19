@@ -4,7 +4,7 @@ import { ComponentConstructor } from '../../declarations';
 
 describe('rendering', () => {
 
-  let element;
+  let elm;
   let MyComponent: ComponentConstructor;
 
   beforeEach(async () => {
@@ -29,33 +29,33 @@ describe('rendering', () => {
       }
     };
 
-    element = await render({
+    elm = await render({
       components: [MyComponent],
       html: '<my-component></my-component>'
     });
   });
 
   it('should work without parameters', () => {
-    expect(element.textContent.trim()).toEqual(`Hello, World! I'm`);
+    expect(elm.textContent.trim()).toEqual(`Hello, World! I'm`);
   });
 
   it('should work with a first name', async () => {
-    element.first = 'Peter';
-    await flush(element);
-    expect(element.textContent.trim()).toEqual(`Hello, World! I'm Peter`);
+    elm.first = 'Peter';
+    await flush(elm);
+    expect(elm.textContent.trim()).toEqual(`Hello, World! I'm Peter`);
   });
 
   it('should work with a last name', async () => {
-    element.last = 'Parker';
-    await flush(element);
-    expect(element.textContent.trim()).toEqual('Hello, World! I\'m  Parker');
+    elm.last = 'Parker';
+    await flush(elm);
+    expect(elm.textContent.trim()).toEqual('Hello, World! I\'m  Parker');
   });
 
   it('should work with both a first and a last name', async () => {
-    element.first = 'Peter';
-    element.last = 'Parker';
-    await flush(element);
-    expect(element.textContent.trim()).toEqual('Hello, World! I\'m Peter Parker');
+    elm.first = 'Peter';
+    elm.last = 'Parker';
+    await flush(elm);
+    expect(elm.textContent.trim()).toEqual('Hello, World! I\'m Peter Parker');
   });
 
 });

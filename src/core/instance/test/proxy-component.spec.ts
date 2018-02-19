@@ -188,12 +188,12 @@ describe('proxy-component', () => {
   }
 
   beforeEach(() => {
-    plt = <any>mockPlatform();
+    plt = mockPlatform();
     elm = domApi.$createElement('ion-cmp') as any;
     CmpConstructor = TwinPines as any;
     instance = new TwinPines();
-    elm._instance = instance;
-    instance.__el = elm;
+    plt.instanceMap.set(elm, instance);
+    plt.hostElementMap.set(instance, elm);
   });
 
 });

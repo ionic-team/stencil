@@ -1,6 +1,6 @@
 import { createRendererPatch } from '../patch';
 import { createVNodesFromSsr } from '../ssr';
-import { DomApi, HostContentNodes, RendererApi, VNode } from '../../../declarations';
+import { DefaultSlot, DomApi, RendererApi, VNode } from '../../../declarations';
 import { ENCAPSULATION, SSR_CHILD_ID, SSR_VNODE_ID } from '../../../util/constants';
 import { h } from '../h';
 import { mockDomApi, mockPlatform, removeWhitespaceFromNodes } from '../../../testing/mocks';
@@ -36,12 +36,12 @@ describe('ssr', () => {
       `;
       removeWhitespaceFromNodes(rootElm);
 
-      createVNodesFromSsr(domApi, rootElm);
+      createVNodesFromSsr(plt, domApi, rootElm);
 
-      const cmpA: VNode = (<any>rootElm).querySelector('cmp-a')._vnode;
-      expect(cmpA.vchildren.length).toBe(1);
+      const cmpA = plt.vnodeMap.get(rootElm.querySelector('cmp-a'));
+      expect(cmpA.vchildren).toHaveLength(1);
       expect(cmpA.vchildren[0].vtag).toBe('cmp-b');
-      expect(cmpA.vchildren[0].vchildren.length).toBe(1);
+      expect(cmpA.vchildren[0].vchildren).toHaveLength(1);
     });
 
     it('should create a vnode from complex html', () => {
@@ -69,35 +69,35 @@ describe('ssr', () => {
       `;
       removeWhitespaceFromNodes(rootElm);
 
-      createVNodesFromSsr(domApi, rootElm);
+      createVNodesFromSsr(plt, domApi, rootElm);
 
-      const cmpA: VNode = (<any>rootElm).querySelector('cmp-a')._vnode;
-      expect(cmpA.vchildren.length).toBe(1);
+      const cmpA = plt.vnodeMap.get(rootElm.querySelector('cmp-a'));
+      expect(cmpA.vchildren).toHaveLength(1);
       expect(cmpA.vchildren[0].vtag).toBe('cmp-b');
       expect(cmpA.vchildren[0].vchildren[0].vtext).toBe('TEXT 2');
       expect(cmpA.vchildren[0].vchildren[1].vtext).toBe('TEXT 3');
       expect(cmpA.vchildren[0].vchildren[2].vtag).toBe('cmp-d');
       expect(cmpA.vchildren[0].vchildren[3].vtag).toBe('cmp-e');
-      expect(cmpA.vchildren[0].vchildren[3].vchildren.length).toBe(1);
+      expect(cmpA.vchildren[0].vchildren[3].vchildren).toHaveLength(1);
       expect(cmpA.vchildren[0].vchildren[3].vchildren[0].vtext).toBe('TEXT 5');
       expect(cmpA.vchildren[0].vchildren[4].vtext).toBe('TEXT 4');
-      expect(cmpA.vchildren[0].vchildren.length).toBe(5);
+      expect(cmpA.vchildren[0].vchildren).toHaveLength(5);
 
-      const cmpB: VNode = (<any>rootElm).querySelector('cmp-b')._vnode;
-      expect(cmpB.vchildren.length).toBe(2);
+      const cmpB = plt.vnodeMap.get(rootElm.querySelector('cmp-b'));
+      expect(cmpB.vchildren).toHaveLength(2);
       expect(cmpB.vchildren[0].vtext).toBe('TEXT 1');
       expect(cmpB.vchildren[1].vtag).toBe('cmp-c');
 
-      const cmpC: VNode = (<any>rootElm).querySelector('cmp-c')._vnode;
-      expect(cmpC.vchildren.length).toBe(1);
+      const cmpC = plt.vnodeMap.get(rootElm.querySelector('cmp-c'));
+      expect(cmpC.vchildren).toHaveLength(1);
       expect(cmpC.vchildren[0].vtext).toBe('TEXT 7');
 
-      const cmpD: VNode = (<any>rootElm).querySelector('cmp-d')._vnode;
-      expect(cmpD.vchildren.length).toBe(1);
+      const cmpD = plt.vnodeMap.get(rootElm.querySelector('cmp-d'));
+      expect(cmpD.vchildren).toHaveLength(1);
       expect(cmpD.vchildren[0].vtag).toBe('cmp-f');
       expect(cmpD.vchildren[0].vchildren[0].vtext).toBe('TEXT 6');
 
-      const cmpE: VNode = (<any>rootElm).querySelector('cmp-e')._vnode;
+      const cmpE = plt.vnodeMap.get(rootElm.querySelector('cmp-e'));
       expect(cmpE.vchildren).toBeUndefined();
     });
 
@@ -117,19 +117,19 @@ describe('ssr', () => {
       `;
       removeWhitespaceFromNodes(rootElm);
 
-      createVNodesFromSsr(domApi, rootElm);
+      createVNodesFromSsr(plt, domApi, rootElm);
 
-      const cmpA: VNode = (<any>rootElm).querySelector('cmp-a')._vnode;
-      expect(cmpA.vchildren.length).toBe(2);
+      const cmpA = plt.vnodeMap.get(rootElm.querySelector('cmp-a'));
+      expect(cmpA.vchildren).toHaveLength(2);
       expect(cmpA.vchildren[0].vtag).toBe('cmp-b');
       expect(cmpA.vchildren[1].vtag).toBe('cmp-c');
 
-      const cmpB: VNode = (<any>rootElm).querySelector('cmp-b')._vnode;
-      expect(cmpB.vchildren.length).toBe(1);
+      const cmpB = plt.vnodeMap.get(rootElm.querySelector('cmp-b'));
+      expect(cmpB.vchildren).toHaveLength(1);
       expect(cmpB.vchildren[0].vtext).toBe('88');
 
-      const cmpC: VNode = (<any>rootElm).querySelector('cmp-c')._vnode;
-      expect(cmpC.vchildren.length).toBe(1);
+      const cmpC = plt.vnodeMap.get(rootElm.querySelector('cmp-c'));
+      expect(cmpC.vchildren).toHaveLength(1);
       expect(cmpC.vchildren[0].vtext).toBe('mph');
     });
 
@@ -157,13 +157,11 @@ describe('ssr', () => {
       const defaultContentNode = domApi.$createElement('child-a');
       elm.appendChild(defaultContentNode);
 
-      const hostContentNodes: HostContentNodes = {
-        defaultSlot: [
-          defaultContentNode
-        ]
-      };
+      const defaultSlot: DefaultSlot = [
+        defaultContentNode
+      ];
 
-      ssrVNode = patch(oldVnode, newVnode, false, hostContentNodes, 'none', 1);
+      ssrVNode = patch(oldVnode, newVnode, false, defaultSlot, null, 'none', 1);
       elm = removeWhitespaceFromNodes(ssrVNode.elm);
 
       expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');
@@ -179,7 +177,7 @@ describe('ssr', () => {
         )
       );
 
-      ssrVNode = patch(oldVnode, newVnode, false, null, 'none', 1);
+      ssrVNode = patch(oldVnode, newVnode, false, null, null, 'none', 1);
       elm = <any>ssrVNode.elm;
 
       expect(elm.getAttribute(SSR_VNODE_ID)).toBe('1');

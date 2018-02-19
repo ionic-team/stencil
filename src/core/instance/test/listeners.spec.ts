@@ -1,9 +1,25 @@
-import { createListenerCallback, enableEventListener, replayQueuedEventsOnInstance, initElementListeners } from '../listeners';
-import { DomApi, HostElement } from '../../../util/interfaces';
+import { createListenerCallback, enableEventListener, initElementListeners } from '../listeners';
+import { DomApi, HostElement, PlatformApi } from '../../../declarations';
+import { initComponentInstance } from '../init-component-instance';
 import { mockComponentInstance, mockDispatchEvent, mockDomApi, mockPlatform, mockWindow } from '../../../testing/mocks';
 
 
 describe('instance listeners', () => {
+
+  let domApi: DomApi;
+  let elm: HostElement;
+  let plt: PlatformApi;
+  let win: any;
+  let doc: any;
+
+  beforeEach(() => {
+    win = mockWindow();
+    doc = win.document;
+    plt = mockPlatform(win);
+    domApi = plt.domApi;
+    domApi.$supportsEventOptions = true;
+    elm = domApi.$createElement('ion-cmp') as any;
+  });
 
   it('should only add enabled listeners', () => {
     const instance = mockComponentInstance(plt, domApi, {
@@ -24,43 +40,58 @@ describe('instance listeners', () => {
         eventDisabled: false
       }]
     });
-    spyOn(instance.__el, 'addEventListener');
-    initElementListeners(plt, instance.__el);
-    expect(instance.__el.addEventListener).toHaveBeenCalledTimes(1);
-    expect(instance.__el.addEventListener).toBeCalledWith('enabled', expect.any(Function), {
+
+    spyOn(elm, 'addEventListener');
+    initElementListeners(plt, elm);
+    expect(elm.addEventListener).toHaveBeenCalledTimes(1);
+    expect(elm.addEventListener).toBeCalledWith('enabled', expect.any(Function), {
       capture: true,
       passive: false
     });
   });
 
-  describe('replayQueuedEventsOnInstance', () => {
+  describe('queue and reply events on instance', () => {
 
     it('should fire off queued events on method', () => {
-      elm._instance = {
-        myMethod: function() {},
-      };
 
-      spyOn(elm._instance, 'myMethod');
+      plt.defineComponent({
+        tagNameMeta: 'ion-cmp',
+        componentConstructor: class {
+          data: any;
 
-      const onEvent = createListenerCallback(elm, 'myMethod');
+          myMethod(data: any) {
+            this.data = data;
+          }
+
+          getData() {
+            return this.data;
+          }
+        } as any
+      });
+
+      const onEvent = createListenerCallback(plt, elm, 'myMethod');
       onEvent({
         detail: { some: 'data' }
       });
 
-      replayQueuedEventsOnInstance(elm);
+      expect(plt.queuedEvents.get(elm)).toHaveLength(2);
 
-      expect(elm._instance.myMethod).toHaveBeenCalledWith({detail: {some: 'data'}});
-      expect(elm._queuedEvents).toBeUndefined();
+      const instance = initComponentInstance(plt, elm);
+
+      const data = instance.getData();
+      expect(data).toEqual({ detail: { some: 'data' } });
+      expect(plt.queuedEvents.has(elm)).toBeFalsy();
     });
 
-    it('should do nothing if theres no queued events', () => {
-      elm._instance = {
-        myMethod: function() {}
-      };
-      spyOn(elm._instance, 'myMethod');
-      replayQueuedEventsOnInstance(elm);
-      expect(elm._instance.myMethod).not.toHaveBeenCalled();
-      expect(elm._queuedEvents).toBeUndefined();
+    it('should queue up events if theres no instance on the element', () => {
+      const onEvent = createListenerCallback(plt, elm, 'myMethod');
+      onEvent({
+        detail: { some: 'data' }
+      });
+      onEvent({
+        detail: { some: 'more data' }
+      });
+      expect(plt.queuedEvents.get(elm)).toHaveLength(4);
     });
 
   });
@@ -69,47 +100,39 @@ describe('instance listeners', () => {
   describe('createListenerCallback', () => {
 
     it('should fire instance methods when an instance is already on the element', () => {
-      elm._instance = {
-        myMethod: function() {}
+      const instance = {
+        myMethod: function() {/**/}
       };
-      spyOn(elm._instance, 'myMethod');
+      spyOn(instance, 'myMethod');
+      plt.instanceMap.set(elm, instance);
 
-      const onEvent = createListenerCallback(elm, 'myMethod');
+      const onEvent = createListenerCallback(plt, elm, 'myMethod');
       onEvent({
         detail: { some: 'data' }
       });
-      expect(elm._instance.myMethod).toHaveBeenCalledWith({detail: {some: 'data'}});
+      expect(instance.myMethod).toHaveBeenCalledWith({detail: {some: 'data'}});
     });
 
     it('should fire instance methods multiple times', () => {
-      elm._instance = {
-        myMethod: function() {},
-        myOtherMethod: function() {}
+      const instance = {
+        myMethod: function() {/**/},
+        myOtherMethod: function() {/**/}
       };
-      spyOn(elm._instance, 'myMethod');
-      spyOn(elm._instance, 'myOtherMethod');
+      spyOn(instance, 'myMethod');
+      spyOn(instance, 'myOtherMethod');
 
-      const onEvent1 = createListenerCallback(elm, 'myMethod');
+      plt.instanceMap.set(elm, instance);
+
+      const onEvent1 = createListenerCallback(plt, elm, 'myMethod');
       onEvent1();
 
-      const onEvent2 = createListenerCallback(elm, 'myOtherMethod');
+      const onEvent2 = createListenerCallback(plt, elm, 'myOtherMethod');
       onEvent2();
       onEvent2();
       onEvent2();
 
-      expect(elm._instance.myMethod).toHaveBeenCalledTimes(1);
-      expect(elm._instance.myOtherMethod).toHaveBeenCalledTimes(3);
-    });
-
-    it('should queue up events if theres no instance on the element', () => {
-      const onEvent = createListenerCallback(elm, 'myMethod');
-      onEvent({
-        detail: { some: 'data' }
-      });
-      onEvent({
-        detail: { some: 'more data' }
-      });
-      expect(elm._queuedEvents.length).toBe(4);
+      expect(instance.myMethod).toHaveBeenCalledTimes(1);
+      expect(instance.myOtherMethod).toHaveBeenCalledTimes(3);
     });
 
   });
@@ -126,46 +149,48 @@ describe('instance listeners', () => {
 
     function testEnableDisableEvent(eventName: string) {
       const instance = newTestComponent();
-      spyOn(instance.__el, 'addEventListener').and.callThrough();
-      spyOn(instance.__el, 'removeEventListener').and.callThrough();
+      const elm = plt.hostElementMap.get(instance);
+      spyOn(elm, 'addEventListener').and.callThrough();
+      spyOn(elm, 'removeEventListener').and.callThrough();
 
       // Remove listener (it was never added, should do nothing)
       enableEventListener(plt, instance, eventName, false);
-      mockDispatchEvent(domApi, instance.__el, eventName);
+      mockDispatchEvent(domApi, elm, eventName);
       expect(instance.test).not.toBeCalled();
-      expect(instance.__el.addEventListener).toHaveBeenCalledTimes(0);
-      expect(instance.__el.removeEventListener).toHaveBeenCalledTimes(0);
+      expect(elm.addEventListener).toHaveBeenCalledTimes(0);
+      expect(elm.removeEventListener).toHaveBeenCalledTimes(0);
 
       // Add listener
       enableEventListener(plt, instance, eventName, true);
-      mockDispatchEvent(domApi, instance.__el, eventName, 'hello');
+      mockDispatchEvent(domApi, elm, eventName, 'hello');
       expect(instance.test).toBeCalled();
-      expect(instance.__el.addEventListener).toHaveBeenCalledTimes(1);
-      expect(instance.__el.removeEventListener).toHaveBeenCalledTimes(0);
+      expect(elm.addEventListener).toHaveBeenCalledTimes(1);
+      expect(elm.removeEventListener).toHaveBeenCalledTimes(0);
 
       // Add listener, second time, should do nothing
       enableEventListener(plt, instance, eventName, true);
-      expect(instance.__el.addEventListener).toHaveBeenCalledTimes(2);
-      expect(instance.__el.removeEventListener).toHaveBeenCalledTimes(1);
+      expect(elm.addEventListener).toHaveBeenCalledTimes(2);
+      expect(elm.removeEventListener).toHaveBeenCalledTimes(1);
 
       // Remove listener
       enableEventListener(plt, instance, eventName, false);
-      mockDispatchEvent(domApi, instance.__el, eventName);
+      mockDispatchEvent(domApi, elm, eventName);
       expect(instance.test).toHaveBeenCalledTimes(1);
-      expect(instance.__el.addEventListener).toHaveBeenCalledTimes(2);
-      expect(instance.__el.removeEventListener).toHaveBeenCalledTimes(2);
+      expect(elm.addEventListener).toHaveBeenCalledTimes(2);
+      expect(elm.removeEventListener).toHaveBeenCalledTimes(2);
     }
 
     it('should not listen for unregistered events', () => {
       const instance = newTestComponent();
-      spyOn(instance.__el, 'addEventListener').and.callThrough();
-      spyOn(instance.__el, 'removeEventListener').and.callThrough();
+      const elm = plt.hostElementMap.get(instance);
+      spyOn(elm, 'addEventListener').and.callThrough();
+      spyOn(elm, 'removeEventListener').and.callThrough();
 
       enableEventListener(plt, instance, 'unknown_event', true);
       enableEventListener(plt, instance, 'unknown_event', false);
 
-      expect(instance.__el.addEventListener).not.toBeCalled();
-      expect(instance.__el.removeEventListener).not.toBeCalled();
+      expect(elm.addEventListener).not.toBeCalled();
+      expect(elm.removeEventListener).not.toBeCalled();
     });
 
     it('should listen to body', () => {
@@ -186,14 +211,16 @@ describe('instance listeners', () => {
     it('should listen to parent', () => {
       const instance = newTestComponent();
       const parent = domApi.$createElement('div');
-      parent.appendChild(instance.__el);
+      const elm = plt.hostElementMap.get(instance);
+      parent.appendChild(elm);
       testAttachTo('parent', instance, parent);
     });
 
     it('should listen to child', () => {
       const instance = newTestComponent();
       const child = domApi.$createElement('div');
-      instance.__el.appendChild(child);
+      const elm = plt.hostElementMap.get(instance);
+      elm.appendChild(child);
       testAttachTo('child', instance, child);
     });
 
@@ -245,11 +272,12 @@ describe('instance listeners', () => {
     function testEventsOptions(eventName, passive, expectedPassive, expectedCapture) {
       domApi.$supportsEventOptions = true;
       const instance = newTestComponent();
-      spyOn(instance.__el, 'addEventListener');
+      const elm = plt.hostElementMap.get(instance);
+      spyOn(elm, 'addEventListener');
 
       enableEventListener(plt, instance, eventName, true, undefined, passive);
 
-      expect(instance.__el.addEventListener).toBeCalledWith(eventName, expect.any(Function), {
+      expect(elm.addEventListener).toBeCalledWith(eventName, expect.any(Function), {
         passive: expectedPassive,
         capture: expectedCapture
       });
@@ -356,19 +384,4 @@ describe('instance listeners', () => {
   });
 
 
-});
-
-let domApi: DomApi;
-let elm: HostElement;
-let plt: any;
-let win: any;
-let doc: any;
-
-beforeEach(() => {
-  win = mockWindow();
-  doc = win.document;
-  plt = mockPlatform(win);
-  domApi = plt.domApi;
-  domApi.$supportsEventOptions = true;
-  elm = domApi.$createElement('ion-cmp') as any;
 });

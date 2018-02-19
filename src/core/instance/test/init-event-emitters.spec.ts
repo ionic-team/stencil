@@ -1,12 +1,19 @@
-import { initEventEmitters } from '../init-event-emitters';
-import { mockPlatform, mockComponentInstance, mockElement } from '../../../testing/mocks';
+import { ComponentConstructorEvent } from '../../../declarations';
 import { HostElement } from '../../../index';
-import { ComponentConstructorEvent } from '../../../util/interfaces';
+import { initEventEmitters } from '../init-event-emitters';
+import { mockComponentInstance, mockElement, mockPlatform } from '../../../testing/mocks';
+
 
 describe('initEventEmitters', () => {
+
   it('should init event emitter', () => {
     const plt = mockPlatform();
-    const instance = {__el: mockElement() as any};
+    const instance = {};
+    const elm = mockElement() as any;
+
+    plt.instanceMap.set(elm, instance);
+    plt.hostElementMap.set(instance, elm);
+
     const events = [{
       name: 'my-event',
       method: 'myEvent',
@@ -25,9 +32,9 @@ describe('initEventEmitters', () => {
     spyOn(plt, 'emitEvent').and.callThrough();
     initEventEmitters(plt, events, instance);
 
-    for (let event of events) {
+    for (const event of events) {
       instance[event.method].emit('detail');
-      expect(plt.emitEvent).toBeCalledWith(instance.__el, event.name, {
+      expect(plt.emitEvent).toBeCalledWith(elm, event.name, {
         bubbles: event.bubbles,
         cancelable: event.cancelable,
         composed: event.composed,
@@ -35,4 +42,5 @@ describe('initEventEmitters', () => {
       });
     }
   });
+
 });

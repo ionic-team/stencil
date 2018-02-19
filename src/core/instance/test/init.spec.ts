@@ -6,7 +6,7 @@ import { mockDomApi, mockPlatform } from '../../../testing/mocks';
 
 describe('instance init', () => {
 
-  const plt: PlatformApi = <any>mockPlatform();
+  let plt: PlatformApi;
   const domApi = mockDomApi();
   let elm: HostElement;
   let instance: ComponentInstance;
@@ -18,11 +18,12 @@ describe('instance init', () => {
   }
 
   beforeEach(() => {
+    plt = mockPlatform();
     cmpMeta = {};
     elm = domApi.$createElement('ion-cmp') as any;
     instance = new TestInstance();
-    elm._instance = instance;
-    instance.__el = elm;
+    plt.instanceMap.set(elm, instance);
+    plt.hostElementMap.set(instance, elm);
   });
 
 
@@ -42,7 +43,7 @@ describe('instance init', () => {
         called2 = true;
       });
 
-      initComponentLoaded(plt, elm);
+      initComponentLoaded(plt, elm, 'hydrated');
 
       return Promise.all([p1, p2]).then(() => {
         expect(called1).toBe(true);
@@ -63,7 +64,7 @@ describe('instance init', () => {
         called2 = true;
       });
 
-      initComponentLoaded(plt, elm);
+      initComponentLoaded(plt, elm, 'hydrated');
       expect(called1).toBe(true);
       expect(called2).toBe(true);
     });
@@ -73,10 +74,10 @@ describe('instance init', () => {
 
       const spy = spyOn(instance, 'componentDidLoad');
 
-      initComponentLoaded(plt, elm);
+      initComponentLoaded(plt, elm, 'hydrated');
       expect(spy).toHaveBeenCalledTimes(1);
 
-      initComponentLoaded(plt, elm);
+      initComponentLoaded(plt, elm, 'hydrated');
       expect(spy).toHaveBeenCalledTimes(1);
     });
 

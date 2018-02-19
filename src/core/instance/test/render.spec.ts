@@ -6,6 +6,14 @@ import { render } from '../render';
 
 describe('instance render', () => {
 
+  let plt: PlatformApi;
+  let elm: HostElement;
+
+  beforeEach(() => {
+    plt = mockPlatform();
+    elm = mockElement('ion-tag') as HostElement;
+  });
+
   it('should create a vnode with no children when there is a render() but it returned null', () => {
     class MyComponent {
       render(): any {
@@ -15,8 +23,9 @@ describe('instance render', () => {
 
     doRender(MyComponent);
 
-    expect(elm._vnode).toBeDefined();
-    expect(elm._vnode.vchildren[0].vtext).toBe('');
+    const vnode = plt.vnodeMap.get(elm);
+    expect(vnode).toBeDefined();
+    expect(vnode.vchildren[0].vtext).toBe('');
   });
 
   it('should create a vnode when there is a render() and it returned a vnode', () => {
@@ -28,9 +37,10 @@ describe('instance render', () => {
 
     doRender(MyComponent);
 
-    expect(elm._vnode).toBeDefined();
-    expect(elm._vnode.vchildren[0].vtag).toBe('div');
-    expect(elm._vnode.vchildren[0].vchildren[0].vtext).toBe('text');
+    const vnode = plt.vnodeMap.get(elm);
+    expect(vnode).toBeDefined();
+    expect(vnode.vchildren[0].vtag).toBe('div');
+    expect(vnode.vchildren[0].vchildren[0].vtext).toBe('text');
   });
 
   it('should create a vnode for non null values of an array and create text for null values', () => {
@@ -46,11 +56,12 @@ describe('instance render', () => {
 
     doRender(MyComponent);
 
-    expect(elm._vnode).toBeDefined();
-    expect(elm._vnode.vchildren[0].vtext).toBe('');
-    expect(elm._vnode.vchildren[1].vtag).toBe('div');
-    expect(elm._vnode.vchildren[1].vchildren[0].vtext).toBe('text');
-    expect(elm._vnode.vchildren[2].vtext).toBe('');
+    const vnode = plt.vnodeMap.get(elm);
+    expect(vnode).toBeDefined();
+    expect(vnode.vchildren[0].vtext).toBe('');
+    expect(vnode.vchildren[1].vtag).toBe('div');
+    expect(vnode.vchildren[1].vchildren[0].vtext).toBe('text');
+    expect(vnode.vchildren[2].vtext).toBe('');
   });
 
   it('should not create a vnode when there is no render() or hostData() or hostMeta', () => {
@@ -58,7 +69,8 @@ describe('instance render', () => {
 
     doRender(MyComponent);
 
-    expect(elm._vnode).toBeUndefined();
+    const vnode = plt.vnodeMap.get(elm);
+    expect(vnode).toBeUndefined();
   });
 
   it('should apply css even if there is not render function', () => {
@@ -244,19 +256,13 @@ describe('instance render', () => {
   });
 
   function doRender(cmpConstructor: any) {
-    const instance = elm._instance = new cmpConstructor();
+    const instance = new cmpConstructor();
+    plt.instanceMap.set(elm, instance);
     const cmpMeta: ComponentMeta = {
       componentConstructor: cmpConstructor
     };
-    render(plt, elm, cmpMeta, false);
+    render(plt, cmpMeta, elm, instance, false);
     return instance;
   }
-
-  var plt = mockPlatform() as PlatformApi;
-  var elm: HostElement;
-
-  beforeEach(() => {
-    elm = mockElement('ion-tag') as HostElement;
-  });
 
 });

@@ -6,12 +6,13 @@ import { proxyComponentInstance } from '../proxy-component-instance';
 
 describe('proxyComponentInstance', () => {
 
-  const plt: PlatformApi = mockPlatform() as any;
-  var cmpConstructor: ComponentConstructor;
-  var elm: HostElement;
-  var instance: any;
+  let plt: PlatformApi;
+  let cmpConstructor: ComponentConstructor;
+  let elm: HostElement;
+  let instance: any;
 
   beforeEach(() => {
+    plt = mockPlatform();
     cmpConstructor = {};
     elm = mockElement('my-cmp') as any;
     instance = {};
@@ -22,7 +23,7 @@ describe('proxyComponentInstance', () => {
     cmpConstructor.properties = {
       propVal: { type: String, attr: 'prop-val' }
     };
-    elm._values = { propVal: '' };
+    plt.valuesMap.set(elm, { propVal: '' });
     elm.setAttribute('prop-val', 'elm-attr-val');
     proxyComponentInstance(plt, cmpConstructor, elm, instance);
 
@@ -196,14 +197,14 @@ describe('proxyComponentInstance', () => {
   });
 
   it('reused existing internal values', () => {
-    elm._values = { mph: 88 };
+    plt.valuesMap.set(elm, { mph: 88 });
     proxyComponentInstance(plt, cmpConstructor, elm, instance);
-    expect(elm._values.mph).toBe(88);
+    expect(plt.valuesMap.get(elm).mph).toBe(88);
   });
 
   it('create new internal values', () => {
     proxyComponentInstance(plt, cmpConstructor, elm, instance);
-    expect(elm._values).toBeDefined();
+    expect(plt.valuesMap.get(elm)).toBeDefined();
   });
 
   it('do nothing for no members', () => {

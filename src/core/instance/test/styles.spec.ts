@@ -1,15 +1,17 @@
 import { attachStyles, initStyleTemplate } from '../styles';
-import { ComponentConstructor, ComponentMeta, DomApi, HostElement } from '../../../declarations';
-import { mockDomApi, mockElement } from '../../../testing/mocks';
+import { ComponentConstructor, ComponentMeta, DomApi, HostElement, PlatformApi } from '../../../declarations';
+import { mockDomApi, mockElement, mockPlatform } from '../../../testing/mocks';
 
 
 describe('styles', () => {
 
+  let plt: PlatformApi;
   let domApi: DomApi;
   let elm: HostElement;
   let cmpMeta: ComponentMeta;
 
   beforeEach(() => {
+    plt = mockPlatform();
     domApi = mockDomApi();
     elm = mockElement() as any;
     cmpMeta = {
@@ -39,7 +41,7 @@ describe('styles', () => {
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
-    attachStyles(domApi, cmpMeta, modeName, elm);
+    attachStyles(plt, domApi, cmpMeta, modeName, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
     expect(styles).toHaveLength(3);
@@ -66,7 +68,7 @@ describe('styles', () => {
     domApi.$appendChild(domApi.$head, prerenderStyles);
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
-    attachStyles(domApi, cmpMeta, modeName, elm);
+    attachStyles(plt, domApi, cmpMeta, modeName, elm);
 
     const styles = domApi.$head.querySelectorAll('style');
     expect(styles).toHaveLength(2);
@@ -87,7 +89,7 @@ describe('styles', () => {
     const modeName = null;
 
     initStyleTemplate(domApi, cmpMeta, cmpConstructor);
-    attachStyles(domApi, cmpMeta, modeName, elm);
+    attachStyles(plt, domApi, cmpMeta, modeName, elm);
 
     const style = domApi.$head.querySelector('style');
     expect(style.innerHTML).toBe(cmpConstructor.style);

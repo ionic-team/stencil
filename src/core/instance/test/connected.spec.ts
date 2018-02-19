@@ -1,4 +1,4 @@
-import { waitForLoad, mockConnect, mockDefine, mockPlatform } from '../../../testing/mocks';
+import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
 
 
 describe('connected', () => {
@@ -6,22 +6,22 @@ describe('connected', () => {
   describe('instance connected', () => {
     const plt = mockPlatform();
 
-    it('should create _instance', () => {
+    it('should create instance', async () => {
       mockDefine(plt, { tagNameMeta: 'ion-test' });
 
       const node = mockConnect(plt, '<ion-test></ion-test>');
-      return waitForLoad(plt, node, 'ion-test').then(elm => {
-        expect(elm._instance).toBeDefined();
-      });
+      const elm = await waitForLoad(plt, node, 'ion-test');
+      const instance = plt.instanceMap.get(elm);
+      expect(instance).toBeDefined();
     });
 
-    it('should set $connected', () => {
+    it('should set $connected', async () => {
       mockDefine(plt, { tagNameMeta: 'ion-test' });
 
       const node = mockConnect(plt, '<ion-test></ion-test>');
-      return waitForLoad(plt, node, 'ion-test').then(elm => {
-        expect(elm.$connected).toBe(true);
-      });
+      const elm = await waitForLoad(plt, node, 'ion-test');
+      const hasConnected = plt.hasConnectedMap.has(elm);
+      expect(hasConnected).toBe(true);
     });
 
   });

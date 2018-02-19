@@ -1,6 +1,6 @@
 import { Cache } from '../compiler/cache';
-import { CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DomApi, HostContentNodes, HostElement,
-  HydrateOptions, HydrateResults, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
+import { CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DefaultSlot, DomApi, HostElement,
+  HydrateOptions, HydrateResults, NamedSlots, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
 import { createDomApi } from '../core/renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../core/renderer/patch';
@@ -60,8 +60,8 @@ export function mockPlatform(win?: any, domApi?: DomApi) {
 
   const renderer = createRendererPatch(plt, domApi);
 
-  plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, hostElementContentNode?: HostContentNodes) {
-    return renderer(oldVNode, newVNode, isUpdate, hostElementContentNode);
+  plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, defaultSlot?: DefaultSlot, namedSlots?: NamedSlots) {
+    return renderer(oldVNode, newVNode, isUpdate, defaultSlot, namedSlots);
   };
 
   return (<MockedPlatform>plt);
@@ -194,8 +194,7 @@ export function mockComponentInstance(plt: PlatformApi, domApi: DomApi, cmpMeta:
   mockDefine(plt, cmpMeta);
 
   const el = domApi.$createElement('ion-cmp') as any;
-  initComponentInstance(plt, el);
-  return el._instance;
+  return initComponentInstance(plt, el);
 }
 
 export function mockTextNode(text: string): Element {
@@ -246,10 +245,10 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
   if (!node) return;
 
   if (node.tagName) {
-    if (!node.$connected) {
-      const cmpMeta = (<PlatformApi>plt).getComponentMeta(node);
+    if (!plt.hasConnectedMap.has(node)) {
+      const cmpMeta = (plt as PlatformApi).getComponentMeta(node);
       if (cmpMeta) {
-        initHostElement((<PlatformApi>plt), cmpMeta, node);
+        initHostElement((plt as PlatformApi), cmpMeta, node);
         (<HostElement>node).connectedCallback();
       }
     }
@@ -262,19 +261,21 @@ function connectComponents(plt: MockedPlatform, node: HostElement) {
 }
 
 
-export function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Promise<HostElement> {
+export async function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Promise<HostElement> {
   const elm: HostElement = rootNode.tagName === tag.toLowerCase() ? rootNode : rootNode.querySelector(tag);
 
-  return plt.$flushQueue()
     // flush to read attribute mode on host elment
-    .then(() => plt.$flushLoadBundle())
-    // flush to load component mode data
-    .then(() => plt.$flushQueue())
-    .then(() => {
-      // flush to do the update
-      connectComponents(plt, elm);
-      return elm;
-    });
+  await plt.$flushQueue();
+
+  // flush requesting and loading the bundle
+  await plt.$flushLoadBundle();
+
+  // flush to load component mode data
+  await plt.$flushQueue();
+
+  connectComponents(plt, elm);
+
+  return elm;
 }
 
 
