@@ -11,6 +11,9 @@ export function normalizePrerenderLocation(config: Config, windowLocationHref: s
       return null;
     }
 
+    // remove any quotes that somehow got in the href
+    href = href.replace(/\'|\"/g, '');
+
     // parse the <a href> passed in
     const hrefParseUrl = config.sys.url.parse(href);
 

@@ -1,4 +1,4 @@
-import { Config, Diagnostic, HydrateOptions, HydrateResults } from '../util/interfaces';
+import { Config, Diagnostic, HydrateOptions, HydrateResults } from '../declarations';
 import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/prerender/validate-prerender-config';
 
 
@@ -144,8 +144,8 @@ export function collectAnchors(config: Config, doc: Document, results: HydrateRe
   const anchorElements = doc.querySelectorAll('a');
 
   for (var i = 0; i < anchorElements.length; i++) {
-    var attrs: any = {};
-    var anchorAttrs = anchorElements[i].attributes;
+    const attrs: any = {};
+    const anchorAttrs = anchorElements[i].attributes;
 
     for (var j = 0; j < anchorAttrs.length; j++) {
       attrs[anchorAttrs[j].nodeName.toLowerCase()] = anchorAttrs[j].nodeValue;

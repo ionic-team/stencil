@@ -1,6 +1,6 @@
-import { Config } from '../../../declarations';
+import { Config, HydrateResults, PrerenderLocation } from '../../../declarations';
+import { crawlAnchorsForNextUrls, normalizePrerenderLocation } from '../prerender-utils';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { normalizePrerenderLocation } from '../prerender-utils';
 
 
 describe('normalizeLocation', () => {
@@ -139,6 +139,55 @@ describe('normalizeLocation', () => {
     const p = normalizePrerenderLocation(config, windowLocationHref, urlStr);
     expect(p.url).toBe('http://localhost:1234/');
     expect(p.path).toBe('/');
+  });
+
+  it('should normalize and not have duplicate pending urls', () => {
+    const prerenderQueue: PrerenderLocation[] = [];
+    const results: HydrateResults = {
+      url: 'http://docbrown.com',
+      anchors: [
+        { href: '/' },
+        { href: '/?qs=1' },
+        { href: '/#hash1' },
+        { href: '/#hash2' },
+        { href: '/page-1' },
+        { href: '/page-1#hash3' },
+        { href: '/page-2' },
+        { href: '/page-2?qs=2' },
+        { href: '/page-2?qs=3' },
+      ],
+      diagnostics: []
+    };
+    crawlAnchorsForNextUrls(config, prerenderQueue, results);
+
+    expect(prerenderQueue).toHaveLength(3);
+    expect(prerenderQueue[0].url).toBe('http://docbrown.com/');
+    expect(prerenderQueue[0].path).toBe('/');
+    expect(prerenderQueue[1].path).toBe('/page-1');
+    expect(prerenderQueue[2].path).toBe('/page-2');
+  });
+
+  it('should handle quotes in pathnames', () => {
+    const prerenderQueue: PrerenderLocation[] = [];
+    const results: HydrateResults = {
+      url: 'http://docbrown.com',
+      anchors: [
+        { href: `/` },
+        { href: `'./` },
+        { href: `"./` },
+        { href: `"./'` },
+        { href: '/#hash1' },
+        { href: '/#hash2' },
+        { href: '/?qs=1`' },
+        { href: '/?qs=2`' },
+      ],
+      diagnostics: []
+    };
+    crawlAnchorsForNextUrls(config, prerenderQueue, results);
+
+    expect(prerenderQueue).toHaveLength(1);
+    expect(prerenderQueue[0].url).toBe('http://docbrown.com/');
+    expect(prerenderQueue[0].path).toBe('/');
   });
 
 });
