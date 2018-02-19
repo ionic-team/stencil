@@ -1,4 +1,4 @@
-import { BuildConditionals, BuildCtx, CompilerCtx, Config, Diagnostic, SourceTarget } from '../../util/interfaces';
+import { BuildConditionals, BuildCtx, CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
 import { transpileCoreBuild } from '../transpile/core-build';
 
 
@@ -265,7 +265,6 @@ const RESERVED_PROPERTIES: string[] = [
    * Properties set on the host element
    */
   '$activeLoading',
-  '$connected',
   '$defaultHolder',
   '$initLoad',
   '$rendered',
