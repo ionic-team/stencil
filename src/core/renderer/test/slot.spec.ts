@@ -70,6 +70,43 @@ describe('Component slot', () => {
     });
   });
 
+  it('should use components default slot text content', () => {
+    mockDefine(plt, {
+      tagNameMeta: 'ion-test',
+      componentConstructor: class {
+        render() {
+          return h('spider', null, h('slot', null, 'default content'));
+        }
+      } as any
+    });
+
+    const node = mockConnect(plt, '<ion-test></ion-test>');
+
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
+      expect(elm.firstElementChild.nodeName).toBe('SPIDER');
+      expect(elm.firstElementChild.childNodes[1].textContent).toBe('default content');
+      expect(elm.firstElementChild.childNodes).toHaveLength(2);
+    });
+  });
+
+  it('should use components default slot node content', () => {
+    mockDefine(plt, {
+      tagNameMeta: 'ion-test',
+      componentConstructor: class {
+        render() {
+          return h('spider', null, h('slot', null, h('div', null, 'default content')));
+        }
+      } as any
+    });
+
+    const node = mockConnect(plt, '<ion-test></ion-test>');
+
+    return waitForLoad(plt, node, 'ion-test').then(elm => {
+      expect(elm.firstElementChild.nodeName).toBe('SPIDER');
+      expect(elm.firstElementChild.childNodes[1].childNodes[0].textContent).toBe('default content');
+      expect(elm.firstElementChild.childNodes).toHaveLength(2);
+    });
+  });
 
   it('should relocate nested named slot nodes', () => {
     mockDefine(plt, {
@@ -578,6 +615,77 @@ describe('Component slot', () => {
     expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
     expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
     expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('3');
+  });
+
+  it('should allow nested default slots w/ default slot content', async () => {
+
+    mockDefine(plt, {
+      tagNameMeta: 'ion-parent',
+      componentConstructor: class {
+        render() {
+          return h('test-1', null,
+            h('test-2', null,
+              h('goat', null, 'hey goat!')
+            )
+          );
+        }
+      } as any
+    });
+
+    const test1CmpMeta = mockDefine(plt, {
+      tagNameMeta: 'test-1',
+      componentConstructor: class {
+        render() {
+          return h('seal', null,
+            h('slot', null, h('div', null, 'hey seal!'))
+          );
+        }
+      } as any
+    });
+
+    const test2CmpMeta = mockDefine(plt, {
+      tagNameMeta: 'test-2',
+      componentConstructor: class {
+        render() {
+          return h('goose', null,
+            h('slot', null, h('div', null, 'hey goose!'))
+          );
+        }
+      } as any
+    });
+
+    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+
+    const elm = await waitForLoad(plt, node, 'ion-parent');
+    await waitForLoad(plt, node, 'test-1');
+    await waitForLoad(plt, node, 'test-2');
+
+    expect(elm.firstElementChild.nodeName).toBe('TEST-1');
+    expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('hey goat!');
+
+    let instance = plt.instanceMap.get(elm);
+    render(plt, test1CmpMeta, elm, instance, false);
+
+    expect(elm.firstElementChild.nodeName).toBe('TEST-1');
+    expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('hey goat!');
+
+    instance = plt.instanceMap.get(elm);
+    render(plt, test2CmpMeta, elm, instance, false);
+
+    expect(elm.firstElementChild.nodeName).toBe('TEST-1');
+    expect(elm.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOAT');
+    expect(elm.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('hey goat!');
   });
 
 });

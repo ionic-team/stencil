@@ -20,9 +20,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
 
-  function createElm(vnode: VNode, parentElm: Node, childIndex: number) {
-    let i = 0;
-
+  function createElm(vnode: VNode, parentElm: Node, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
     if (typeof vnode.vtag === 'function') {
       vnode = vnode.vtag({
         ...vnode.vattrs,
@@ -31,7 +29,6 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     }
 
     if (!useNativeShadowDom && vnode.vtag === 'slot') {
-
       if (defaultSlot || namedSlots) {
         if (scopeId) {
           domApi.$setAttribute(parentElm, scopeId + '-slot', '');
@@ -39,8 +36,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
         // special case for manually relocating host content nodes
         // to their new home in either a named slot or the default slot
-        const namedSlot = (vnode.vattrs && vnode.vattrs.name);
-        let slotNodes: Node[];
+        namedSlot = (vnode.vattrs && vnode.vattrs.name);
 
         if (isDef(namedSlot)) {
           // this vnode is a named slot
@@ -59,14 +55,25 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
           // the disconnectCallback from working
           plt.tmpDisconnected = true;
 
-          for (; i < slotNodes.length; i++) {
+          for (i = 0; i < slotNodes.length; i++) {
+            childNode = slotNodes[i];
             // remove the host content node from it's original parent node
             // then relocate the host content node to its new slotted home
-            domApi.$remove(slotNodes[i]);
+            domApi.$remove(childNode);
             domApi.$appendChild(
               parentElm,
-              slotNodes[i]
+              childNode
             );
+
+            if (childNode.nodeType !== NODE_TYPE.CommentNode) {
+              hasLightDom = true;
+            }
+          }
+
+          if (!hasLightDom && vnode.vchildren) {
+            // the user did not provide light-dom content
+            // and this vnode does come with it's own default content
+            updateChildren(parentElm, [], vnode.vchildren);
           }
 
           // done moving nodes around
@@ -86,7 +93,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
     } else {
       // create element
-      const elm = vnode.elm = ((Build.svg && (isSvgMode || vnode.vtag === 'svg')) ? domApi.$createElementNS('http://www.w3.org/2000/svg', vnode.vtag) : domApi.$createElement(vnode.vtag));
+      elm = vnode.elm = ((Build.svg && (isSvgMode || vnode.vtag === 'svg')) ? domApi.$createElementNS('http://www.w3.org/2000/svg', vnode.vtag) : domApi.$createElement(vnode.vtag));
 
       if (Build.svg) {
         isSvgMode = vnode.vtag === 'svg' ? true : (vnode.vtag === 'foreignObject' ? false : isSvgMode);
@@ -116,8 +123,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       }
 
       if (children) {
-        let childNode: Node;
-        for (; i < children.length; ++i) {
+        for (i = 0; i < children.length; ++i) {
           // create the node
           childNode = createElm(children[i], elm, i);
 
@@ -186,7 +192,6 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     let idxInOld: number;
     let elmToMove: VNode;
     let node: Node;
-
 
     while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
       if (oldStartVnode == null) {
@@ -296,6 +301,8 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     let defaultSlot: Node[];
 
     if (Build.svg) {
+      // test if we're rendering an svg element, or still rendering nodes inside of one
+      // only add this to the when the compiler sees we're using an svg somewhere
       isSvgMode = newVNode.elm && newVNode.elm.parentElement != null && (newVNode.elm as SVGElement).ownerSVGElement !== undefined;
       isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
     }
