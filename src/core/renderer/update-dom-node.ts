@@ -85,7 +85,7 @@ export function setAccessor(plt: PlatformApi, elm: any, memberName: string, oldV
       plt.domApi.$removeEventListener(elm, memberName);
     }
 
-  } else if (memberName !== 'list' && memberName !== 'type' && (Build.svg && !isSvg) &&
+  } else if (memberName !== 'list' && memberName !== 'type' && !isSvg &&
     (memberName in elm || (['object', 'function'].indexOf(typeof newValue) !== -1) && newValue !== null)
     || (!Build.clientSide && elementHasProperty(plt, elm, memberName))) {
     // Properties
