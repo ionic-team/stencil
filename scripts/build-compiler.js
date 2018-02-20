@@ -55,6 +55,9 @@ function bundleCompiler() {
       console.log(`build compiler error: ${err}`);
     });
 
+  }).catch(err => {
+    console.log(`build compiler error: ${err}`);
+    process.exit(1);
   });
 }
 

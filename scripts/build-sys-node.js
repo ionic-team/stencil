@@ -59,6 +59,9 @@ function bundleSysNode() {
       console.log(`build sys.node error: ${err}`);
       process.exit(1);
     });
+  }).catch(err => {
+    console.log(`build sys.node error: ${err}`);
+    process.exit(1);
   });
 }
 

@@ -52,6 +52,9 @@ function bundleTestingUtils() {
       process.exit(1);
     });
 
+  }).catch(err => {
+    console.log(`build testing error: ${err}`);
+    process.exit(1);
   });
 }
 
