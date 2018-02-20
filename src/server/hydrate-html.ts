@@ -59,7 +59,7 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
           await optimizeHtml(config, ctx, doc, styles, opts, hydrateResults);
 
           // gather up all of the <a> tag information in the doc
-          if (opts.collectAnchors !== false) {
+          if (opts.collectAnchors !== false && opts.hydrateComponents !== false) {
             collectAnchors(config, doc, hydrateResults);
           }
 
@@ -96,6 +96,11 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
       // we're passing back the result object
       resolve(hydrateResults);
     };
+
+    if (opts.hydrateComponents === false) {
+      plt.onAppLoad(win.document.body as any, []);
+      return;
+    }
 
     // patch the render function that we can add SSR ids
     // and to connect any elements it may have just appened to the DOM

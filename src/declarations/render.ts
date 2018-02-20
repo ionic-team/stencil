@@ -23,6 +23,7 @@ export interface PrerenderConfig extends RenderOptions {
   maxConcurrent?: number;
   includePathHash?: boolean;
   includePathQuery?: boolean;
+  hydrateComponents?: boolean;
 }
 
 
@@ -89,6 +90,7 @@ export interface HydrateOptions extends RenderOptions {
   console?: {
     [level: string]: (...msgs: string[]) => void;
   };
+  hydrateComponents?: boolean;
 }
 
 

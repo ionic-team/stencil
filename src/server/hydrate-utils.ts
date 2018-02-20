@@ -1,5 +1,5 @@
 import { Config, Diagnostic, HydrateOptions, HydrateResults } from '../declarations';
-import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/prerender/validate-prerender-config';
+import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/config/validate-prerender-config';
 
 
 export function normalizeHydrateOptions(inputOpts: HydrateOptions) {

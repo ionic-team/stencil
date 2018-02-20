@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, HydrateResults } from '../../util/interfaces';
+import { CompilerCtx, Config, HydrateResults } from '../../declarations';
 import { getLoaderFileName, getLoaderWWW } from '../app/app-file-naming';
 
 
@@ -68,9 +68,11 @@ async function relocateInlineLoaderScript(config: Config, ctx: CompilerCtx, doc:
   // inline the js content
   scriptElm.innerHTML = content;
 
-  // remove the script element from where it's currently at in the dom
-  scriptElm.parentNode.removeChild(scriptElm);
+  if (results.opts.hydrateComponents) {
+    // remove the script element from where it's currently at in the dom
+    scriptElm.parentNode.removeChild(scriptElm);
 
-  // place it back in the dom, but at the bottom of the body
-  doc.body.appendChild(scriptElm);
+    // place it back in the dom, but at the bottom of the body
+    doc.body.appendChild(scriptElm);
+  }
 }

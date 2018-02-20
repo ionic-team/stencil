@@ -1,4 +1,4 @@
-import { Config, CompilerCtx, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { CompilerCtx, Config, HydrateOptions, HydrateResults } from '../../declarations';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineLoaderScript } from './inline-loader-script';
 import { inlineComponentStyles } from '../css/inline-styles';
@@ -7,7 +7,9 @@ import { insertCanonicalLink } from './canonical-link';
 
 
 export async function optimizeHtml(config: Config, ctx: CompilerCtx, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
-  setHtmlDataSsrAttr(doc);
+  if (opts.hydrateComponents !== false) {
+    setHtmlDataSsrAttr(doc);
+  }
 
   if (opts.canonicalLink !== false) {
     try {

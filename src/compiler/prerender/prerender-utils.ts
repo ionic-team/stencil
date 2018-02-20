@@ -1,5 +1,5 @@
 import { Config, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
-import { DEFAULT_PRERENDER_HOST } from './validate-prerender-config';
+import { DEFAULT_PRERENDER_HOST } from '../config/validate-prerender-config';
 
 
 export function normalizePrerenderLocation(config: Config, windowLocationHref: string, href: string) {

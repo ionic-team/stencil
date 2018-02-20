@@ -6,7 +6,9 @@ import { crawlAnchorsForNextUrls, getPrerenderQueue } from './prerender-utils';
 
 
 export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
-  if (!config.prerender) {
+  const prerenderConfig = config.prerender as PrerenderConfig;
+
+  if (!prerenderConfig) {
     // no need to rebuild index.html if there were no app file changes
     config.logger.debug(`prerenderApp, skipping because config.prerender is falsy`);
     return [];
@@ -47,7 +49,7 @@ export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, bui
 
 async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[], prerenderQueue: PrerenderLocation[], indexHtml: string) {
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`prerendering started`);
+  const timeSpan = config.logger.createTimeSpan(`prerendering started`, !(config.prerender as PrerenderConfig).hydrateComponents);
 
   const hydrateResults: HydrateResults[] = [];
 
