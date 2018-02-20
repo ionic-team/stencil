@@ -1,3 +1,14 @@
+<a name="0.6.4"></a>
+## [0.6.4](https://github.com/ionic-team/stencil/compare/v0.6.3...v0.6.4) (2018-02-20)
+
+
+### Bug Fixes
+
+* **loader:** force es5 builds for file:// protocol ([851fcec](https://github.com/ionic-team/stencil/commit/851fcec)), closes [#517](https://github.com/ionic-team/stencil/issues/517)
+* move rollup-pluginutils to an external for the rollup build. ([90b295b](https://github.com/ionic-team/stencil/commit/90b295b))
+
+
+
 <a name="0.6.3"></a>
 ## [0.6.3](https://github.com/ionic-team/stencil/compare/v0.6.2...v0.6.3) (2018-02-19)
 
