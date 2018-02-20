@@ -42,39 +42,55 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = publicPath + ((!urlContainsFlag(win) && supportsCustomElements(win) && supportsEsModules(x) && supportsFetch(win) && supportsCssVariables(win)) ? appCore : appCorePolyfilled);
+  x.src = publicPath + (usePolyfills(win as any, win.location, x, 'import("")') ? appCorePolyfilled : appCore);
   x.setAttribute('data-path', publicPath);
   x.setAttribute('data-namespace', urlNamespace);
   doc.head.appendChild(x);
 }
 
-export function urlContainsFlag(win: Window) {
-  return win.location.search.indexOf('core=es5') > -1;
-}
 
-export function supportsEsModules(scriptElm: HTMLScriptElement) {
-  // detect static ES module support
-  const staticModule = 'noModule' in scriptElm;
-  if (!staticModule) {
-    return false;
-  }
-  // detect dynamic import support
-  try {
-    new Function('import("")');
+export function usePolyfills(win: any, location: Location, scriptElm: HTMLScriptElement, dynamicImportTest: string) {
+  // fyi, dev mode has verbose if/return statements
+  // but it minifies to a nice 'lil one-liner ;)
+
+  if (location.search.indexOf('core=es5') > -1) {
+    // force es5 polyfill w/ ?core=es5 querystring
     return true;
-  } catch (err) {
-    return false;
   }
+
+  if (location.protocol === 'file:') {
+    // file protocol cannot use dynamic module imports
+    return true;
+  }
+
+  if (!win.customElements) {
+    // does not have customElement support
+    return true;
+  }
+
+  if (!win.fetch) {
+    // does not have fetch support
+    return true;
+  }
+
+  if (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) {
+    // does not have CSS variables support
+    return true;
+  }
+
+  if (!('noModule' in scriptElm)) {
+    // does not have static ES module support
+    return true;
+  }
+
+  return doesNotSupportsDynamicImports(dynamicImportTest);
 }
 
-export function supportsCustomElements(win: Window) {
-  return win.customElements;
-}
 
-export function supportsFetch(win: Window) {
-  return win.fetch;
-}
-
-export function supportsCssVariables(win: any) {
-  return (win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'));
+function doesNotSupportsDynamicImports(dynamicImportTest: string) {
+  try {
+    new Function(dynamicImportTest);
+    return false;
+  } catch (e) {}
+  return true;
 }
