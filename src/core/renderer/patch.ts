@@ -375,7 +375,11 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     namedSlots = elmNamedSlots;
 
     if (Build.ssrServerSide) {
-      ssrId = ssrPatchId;
+      if (encapsulation !== 'shadow') {
+        ssrId = ssrPatchId;
+      } else {
+        ssrId = null;
+      }
     }
 
     scopeId = (encapsulation === 'scoped' || (encapsulation === 'shadow' && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
