@@ -2,6 +2,7 @@ import { AppGlobal, CoreContext } from '../util/interfaces';
 import { Build } from '../util/build-conditionals';
 import { createPlatformClient } from './platform-client';
 import { createPlatformClientLegacy } from './platform-client-legacy';
+import { genereateDevInspector } from './dev-inspector';
 
 
 declare const appNamespace: string;
@@ -30,10 +31,22 @@ if (Build.es5) {
     plt.defineComponent(cmpMeta, HostElement);
   });
 
+  if (Build.devInspector) {
+    genereateDevInspector(App, appNamespace, window, plt);
+  }
+
 } else {
   const plt = createPlatformClient(Context, App, window, document, publicPath, hydratedCssClass);
 
   // es6 class extends HTMLElement
   plt.registerComponents(App.components).forEach(cmpMeta =>
     plt.defineComponent(cmpMeta, class extends HTMLElement {}));
+
+  if (Build.devInspector) {
+    genereateDevInspector(App, appNamespace, window, plt);
+  }
+}
+
+if (Build.devMode) {
+  console.log(`💎 dev mode enabled`);
 }

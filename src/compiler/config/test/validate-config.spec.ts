@@ -318,6 +318,30 @@ describe('validation', () => {
     expect(config.devMode).toBe(false);
   });
 
+  it('should set devInspector false', () => {
+    config.devInspector = false;
+    validateBuildConfig(config);
+    expect(config.devInspector).toBe(false);
+  });
+
+  it('should set devInspector true ', () => {
+    config.devInspector = true;
+    validateBuildConfig(config);
+    expect(config.devInspector).toBe(true);
+  });
+
+  it('should default devInspector false when devMode is false', () => {
+    config.devMode = false;
+    validateBuildConfig(config);
+    expect(config.devInspector).toBe(false);
+  });
+
+  it('should default devInspector true when devMode is true', () => {
+    config.devMode = true;
+    validateBuildConfig(config);
+    expect(config.devInspector).toBe(true);
+  });
+
   it('should set default generateDocs to false', () => {
     validateBuildConfig(config);
     expect(config.generateDocs).toBe(false);

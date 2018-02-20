@@ -7,6 +7,10 @@ export async function setBuildConditionals(config: Config, ctx: CompilerCtx, ent
   const coreBuild: BuildConditionals = ({} as any);
   coreBuild.clientSide = true;
 
+  coreBuild.devMode = config.devMode;
+  coreBuild.devInspector = config.devInspector;
+  coreBuild.verboseError = config.devMode;
+
   const promises: Promise<void>[] = [];
 
   entryModules.forEach(bundle => {

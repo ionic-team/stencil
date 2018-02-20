@@ -11,8 +11,9 @@ export interface Config {
   collectionDir?: string;
   configPath?: string;
   copy?: CopyTasks;
-  discoverPublicPath?: boolean;
+  devInspector?: boolean;
   devMode?: boolean;
+  discoverPublicPath?: boolean;
   distDir?: string;
   emptyDist?: boolean;
   emptyWWW?: boolean;

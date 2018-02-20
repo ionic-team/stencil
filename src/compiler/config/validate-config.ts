@@ -48,10 +48,13 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   validatePublicPath(config);
 
   // default devMode false
-  config.devMode = !!config.devMode;
+  setBooleanConfig(config, 'devMode', false);
+
+  // default devInspector to whatever devMode is
+  setBooleanConfig(config, 'devInspector', config.devMode);
 
   // default watch false
-  config.watch = !!config.watch;
+  setBooleanConfig(config, 'watch', false);
 
   setBooleanConfig(config, 'minifyCss', !config.devMode);
   setBooleanConfig(config, 'minifyJs', !config.devMode);

@@ -259,6 +259,17 @@ const RESERVED_PROPERTIES: string[] = [
   'loadBundle',
   'loadStyles',
 
+  /**
+   * Dev Inspector
+   */
+  'devInspector',
+  'apps',
+  'meta',
+  'instance',
+  'namespace',
+  'getComponent',
+  'getMetadata',
+
 
   /**
    * Host Element
