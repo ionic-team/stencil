@@ -1,4 +1,5 @@
 import { Build } from '../../util/build-conditionals';
+import { callNodeRefs } from '../renderer/patch';
 import { ComponentInstance, HostElement, PlatformApi } from '../../declarations';
 import { initComponentInstance } from './init-component-instance';
 import { render } from './render';
@@ -114,6 +115,8 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, instance: Compo
         instance.componentDidUpdate && instance.componentDidUpdate();
       }
     }
+
+    callNodeRefs(plt.vnodeMap.get(elm));
 
   } catch (e) {
     // derp
