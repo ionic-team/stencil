@@ -114,9 +114,8 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, instance: Compo
         // but only AFTER an UPDATE and not after the intial render
         instance.componentDidUpdate && instance.componentDidUpdate();
       }
+      callNodeRefs(plt.vnodeMap.get(elm));
     }
-
-    callNodeRefs(plt.vnodeMap.get(elm));
 
   } catch (e) {
     // derp
