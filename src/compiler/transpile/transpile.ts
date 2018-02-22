@@ -12,6 +12,7 @@ import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { moduleGraph } from './transformers/module-graph';
 import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizeStyles } from './normalize-styles';
+import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
 import * as ts from 'typescript';
@@ -116,6 +117,7 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
     ],
     after: [
       removeStencilImports(),
+      removeCollectionImports(compilerCtx),
       moduleGraph(config, buildCtx),
       componentDependencies(compilerCtx, buildCtx)
     ]
