@@ -47,8 +47,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
 
   // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
-    connectHostElementSync,
-    connectHostElementAsync,
+    connectHostElement,
     domApi,
     defineComponent,
     emitEvent: Context.emit,
@@ -95,23 +94,21 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   // then let's walk the tree and generate vnodes out of the data
   createVNodesFromSsr(plt, domApi, rootElm);
 
-  function connectHostElementSync(cmpMeta: ComponentMeta, elm: HostElement) {
-    // host element has been connected to the DOM
-    if (!domApi.$getAttribute(elm, SSR_VNODE_ID) && !useShadowDom(domApi.$supportsShadowDom, cmpMeta)) {
-      // only required when we're NOT using native shadow dom (slot)
-      // this host element was NOT created with SSR
-      // let's pick out the inner content for slot projection
-      assignHostContentSlots(plt, domApi, elm, elm.childNodes);
-    }
-  }
-
-  function connectHostElementAsync(cmpMeta: ComponentMeta, elm: HostElement) {
+  function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
       // first check if there's an attribute
       // next check the app's global
       elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
+    }
+
+    // host element has been connected to the DOM
+    if (!domApi.$getAttribute(elm, SSR_VNODE_ID) && !useShadowDom(domApi.$supportsShadowDom, cmpMeta)) {
+      // only required when we're NOT using native shadow dom (slot)
+      // this host element was NOT created with SSR
+      // let's pick out the inner content for slot projection
+      assignHostContentSlots(plt, domApi, elm, elm.childNodes);
     }
 
     if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {

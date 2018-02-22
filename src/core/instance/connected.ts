@@ -34,18 +34,14 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
     // loading child to its parent component
     registerWithParentComponent(plt, elm);
 
-    // collects slot and node references as it stands this moment
-    // before the component is fully hydrated
-    plt.connectHostElementSync(cmpMeta, elm);
-
     // add to the queue to load the bundle
     // it's important to have an async tick in here so we can
     // ensure the "mode" attribute has been added to the element
     // place in high priority since it's not much work and we need
     // to know as fast as possible, but still an async tick in between
     plt.queue.add(() => {
-      // allow all attributes to be added and get the element's mode attr value
-      plt.connectHostElementAsync(cmpMeta, elm);
+      // only collects slot references if this component even has slots
+      plt.connectHostElement(cmpMeta, elm);
 
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous

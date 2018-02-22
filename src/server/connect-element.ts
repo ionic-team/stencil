@@ -40,8 +40,7 @@ export function connectElement(config: Config, plt: PlatformApi, hydrateResults:
 
 function connectHostElement(config: Config, plt: PlatformApi, hydrateResults: HydrateResults, elm: HostElement, cmpMeta: ComponentMeta) {
   if (!cmpMeta.componentConstructor) {
-    plt.connectHostElementSync(cmpMeta, elm);
-    plt.connectHostElementAsync(cmpMeta, elm);
+    plt.connectHostElement(cmpMeta, elm);
     plt.loadBundle(cmpMeta, elm.mode, noop);
   }
 

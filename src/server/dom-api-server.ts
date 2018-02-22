@@ -1,4 +1,4 @@
-import { DomApi, HostElement, PlatformApi } from '../declarations';
+import { DomApi, PlatformApi, HostElement } from '../util/interfaces';
 import { noop } from '../util/helpers';
 
 
@@ -10,8 +10,7 @@ export function patchDomApi(plt: PlatformApi, domApi: DomApi) {
 
     const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta && !cmpMeta.componentConstructor) {
-      plt.connectHostElementSync(cmpMeta, elm);
-      plt.connectHostElementAsync(cmpMeta, elm);
+      plt.connectHostElement(cmpMeta, elm);
       plt.loadBundle(cmpMeta, elm.mode, noop);
     }
 

@@ -42,6 +42,11 @@ export function assignHostContentSlots(plt: PlatformApi, domApi: DomApi, elm: Ho
 
   // keep a reference to all of the initial nodes
   // found as immediate childNodes to the host element
+  // elm._hostContentNodes = {
+  //   defaultSlot: defaultSlot,
+  //   namedSlots: namedSlots
+  // };
+
   plt.defaultSlotsMap.set(elm, defaultSlot);
   plt.namedSlotsMap.set(elm, namedSlots);
 }

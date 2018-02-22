@@ -74,8 +74,7 @@ export function createPlatformServer(
   // create the platform api which is used throughout common core code
   const plt: PlatformApi = {
     attachStyles: noop,
-    connectHostElementSync,
-    connectHostElementAsync,
+    connectHostElement,
     defineComponent,
     domApi,
     emitEvent: noop,
@@ -129,12 +128,7 @@ export function createPlatformServer(
     }
   }
 
-  function connectHostElementSync(_cmpMeta: ComponentMeta, elm: HostElement) {
-    // pick out all of the light dom nodes from the host element
-    assignHostContentSlots(plt, domApi, elm, elm.childNodes);
-  }
-
-  function connectHostElementAsync(_cmpMeta: ComponentMeta, elm: HostElement) {
+  function connectHostElement(_cmpMeta: ComponentMeta, elm: HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -142,6 +136,9 @@ export function createPlatformServer(
       // next check the app's global
       elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
+
+    // pick out all of the light dom nodes from the host element
+    assignHostContentSlots(plt, domApi, elm, elm.childNodes);
   }
 
 
