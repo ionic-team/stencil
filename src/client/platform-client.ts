@@ -196,7 +196,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
         // bundle all loaded up, let's continue
         cb();
 
-      }).catch(err => console.error(err));
+      }).catch(err => console.error(err, url));
     }
   }
 
