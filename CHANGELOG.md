@@ -1,3 +1,15 @@
+<a name="0.6.6"></a>
+## [0.6.6](https://github.com/ionic-team/stencil/compare/v0.6.5...v0.6.6) (2018-02-22)
+
+
+### Bug Fixes
+
+* **ref:** execute ref on vnode items that get added during update. ([b192def](https://github.com/ionic-team/stencil/commit/b192def))
+* **ref:** move callNodeRefs check to only occur on rerender not on initial load. ([f09a5ee](https://github.com/ionic-team/stencil/commit/f09a5ee))
+* **global:** always add global script to built context ([db594bd](https://github.com/ionic-team/stencil/commit/db594bd))
+* **types:** remove deprecated collection imports ([6103fef](https://github.com/ionic-team/stencil/commit/6103fef))
+
+
 <a name="0.6.5"></a>
 ## [0.6.5](https://github.com/ionic-team/stencil/compare/v0.6.4...v0.6.5) (2018-02-20)
 
