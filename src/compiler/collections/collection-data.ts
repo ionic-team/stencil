@@ -1,6 +1,6 @@
-import { AssetsMeta, BuildCtx, Collection, CollectionData, CompilerCtx, ComponentData, ComponentMeta, Config,
-  EntryModule, EventData, ExternalStyleMeta, ListenMeta, ListenerData,
-  ModuleFile, PropData, StyleData, StyleMeta } from '../../declarations';
+import { AssetsMeta, BuildCtx, Collection, CollectionData, CollectionDependencyData, CompilerCtx,
+  ComponentData, ComponentMeta, Config, EntryModule, EventData, ExternalStyleMeta, ListenMeta,
+  ListenerData, ModuleFile, PropData, StyleData, StyleMeta } from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
@@ -23,7 +23,7 @@ export async function writeAppCollection(config: Config, compilerCtx: CompilerCt
 
   // serialize the collection into a json string and
   // add it to the list of files we need to write when we're ready
-  const collectionData = serializeAppCollection(config, collectionDir, buildCtx.entryModules, buildCtx.global);
+  const collectionData = serializeAppCollection(config, compilerCtx, collectionDir, buildCtx.entryModules, buildCtx.global);
 
   if (config.generateDistribution) {
     // don't bother serializing/writing the collection if we're not creating a distribution
@@ -34,10 +34,11 @@ export async function writeAppCollection(config: Config, compilerCtx: CompilerCt
 }
 
 
-export function serializeAppCollection(config: Config, collectionDir: string, entryModules: EntryModule[], globalModule: ModuleFile) {
+export function serializeAppCollection(config: Config, compilerCtx: CompilerCtx, collectionDir: string, entryModules: EntryModule[], globalModule: ModuleFile) {
   // create the single collection we're going to fill up with data
   const collectionData: CollectionData = {
     components: [],
+    collections: serializeCollectionDependencies(compilerCtx),
     compiler: {
       name: config.sys.compiler.name,
       version: config.sys.compiler.version,
@@ -48,11 +49,9 @@ export function serializeAppCollection(config: Config, collectionDir: string, en
   // add component data for each of the collection files
   entryModules.forEach(entryModule => {
     entryModule.moduleFiles.forEach(moduleFile => {
-      if (!moduleFile.excludeFromCollection) {
-        const cmpData = serializeComponent(config, collectionDir, moduleFile);
-        if (cmpData) {
-          collectionData.components.push(cmpData);
-        }
+      const cmpData = serializeComponent(config, collectionDir, moduleFile);
+      if (cmpData) {
+        collectionData.components.push(cmpData);
       }
     });
   });
@@ -72,10 +71,30 @@ export function serializeAppCollection(config: Config, collectionDir: string, en
 }
 
 
+export function serializeCollectionDependencies(compilerCtx: CompilerCtx) {
+  const collectionDeps = compilerCtx.collections.map(c => {
+    const collectionDeps: CollectionDependencyData = {
+      name: c.collectionName,
+      tags: c.moduleFiles.filter(m => {
+        return !!m.cmpMeta;
+      }).map(m => m.cmpMeta.tagNameMeta).sort()
+    };
+    return collectionDeps;
+  });
+
+  return collectionDeps.sort((a, b) => {
+    if (a.name < b.name) return -1;
+    if (a.name > b.name) return 1;
+    return 0;
+  });
+}
+
+
 export function parseCollectionData(config: Config, collectionName: string, collectionDir: string, collectionJsonStr: string) {
   const collectionData: CollectionData = JSON.parse(collectionJsonStr);
   const collection: Collection = {
     collectionName: collectionName,
+    dependencies: parseCollectionDependencies(collectionData),
     compiler: {
       name: collectionData.compiler.name,
       version: collectionData.compiler.version,
@@ -104,6 +123,19 @@ export function parseComponents(config: Config, collectionDir: string, collectio
 }
 
 
+export function parseCollectionDependencies(collectionData: CollectionData) {
+  const dependencies: string[] = [];
+
+  if (Array.isArray(collectionData.collections)) {
+    collectionData.collections.forEach(c => {
+      dependencies.push(c.name);
+    });
+  }
+
+  return dependencies;
+}
+
+
 export function excludeFromCollection(config: Config, cmpData: ComponentData) {
   // this is a component from a collection dependency
   // however, this project may also become a collection
@@ -125,7 +157,9 @@ export function excludeFromCollection(config: Config, cmpData: ComponentData) {
 
 
 export function serializeComponent(config: Config, collectionDir: string, moduleFile: ModuleFile) {
-  if (!moduleFile || !moduleFile.cmpMeta) return null;
+  if (!moduleFile || !moduleFile.cmpMeta || moduleFile.isCollectionDependency || moduleFile.excludeFromCollection) {
+    return null;
+  }
 
   const cmpData: ComponentData = {};
   const cmpMeta = moduleFile.cmpMeta;
@@ -142,9 +176,9 @@ export function serializeComponent(config: Config, collectionDir: string, module
   serializeTag(cmpData, cmpMeta);
   serializeComponentDependencies(cmpData, cmpMeta);
   serializeComponentClass(cmpData, cmpMeta);
-  serializeComponentPath(config, collectionDir, moduleFile, compiledComponentAbsoluteFilePath, cmpData);
-  serializeStyles(config, moduleFile, compiledComponentRelativeDirPath, cmpData, cmpMeta);
-  serializeAssetsDir(config, moduleFile, compiledComponentRelativeDirPath, cmpData, cmpMeta);
+  serializeComponentPath(config, collectionDir, compiledComponentAbsoluteFilePath, cmpData);
+  serializeStyles(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
+  serializeAssetsDir(config, compiledComponentRelativeDirPath, cmpData, cmpMeta);
   serializeProps(cmpData, cmpMeta);
   serializeStates(cmpData, cmpMeta);
   serializeListeners(cmpData, cmpMeta);
@@ -202,15 +236,9 @@ function parseTag(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeComponentPath(config: Config, collectionDir: string, moduleFile: ModuleFile, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
-  if (moduleFile.isCollectionDependency && moduleFile.originalCollectionComponentPath) {
-    // use the original path from its collection if there was one
-    cmpData.componentPath = normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, moduleFile.originalCollectionComponentPath));
-
-  } else {
-    // convert absolute path into a path that's relative to the collection file
-    cmpData.componentPath = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
-  }
+function serializeComponentPath(config: Config, collectionDir: string, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
+  // convert absolute path into a path that's relative to the collection file
+  cmpData.componentPath = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
 }
 
 function parseModuleJsFilePath(config: Config, collectionDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
@@ -248,14 +276,14 @@ function parseComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeStyles(config: Config, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeStyles(config: Config, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (cmpMeta.stylesMeta) {
     cmpData.styles = {};
 
     const modeNames = Object.keys(cmpMeta.stylesMeta).map(m => m.toLowerCase()).sort();
 
     modeNames.forEach(modeName => {
-      cmpData.styles[modeName] = serializeStyle(config, moduleFile, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
+      cmpData.styles[modeName] = serializeStyle(config, compiledComponentRelativeDirPath, cmpMeta.stylesMeta[modeName]);
     });
   }
 }
@@ -274,27 +302,19 @@ function parseStyles(config: Config, collectionDir: string, cmpData: ComponentDa
 }
 
 
-function serializeStyle(config: Config, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
+function serializeStyle(config: Config, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
   const modeStyleData: StyleData = {};
 
   if (modeStyleMeta.externalStyles && modeStyleMeta.externalStyles.length > 0) {
-    if (moduleFile.isCollectionDependency) {
-      // this is from a collection, let's use the original paths
-      modeStyleData.stylePaths = modeStyleMeta.externalStyles.map(externalStyle => {
-        return normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, externalStyle.originalCollectionPath));
-      });
+    modeStyleData.stylePaths = modeStyleMeta.externalStyles.map(externalStyle => {
+      // convert style paths which are relative to the component file
+      // to be style paths that are relative to the collection file
 
-    } else {
-      modeStyleData.stylePaths = modeStyleMeta.externalStyles.map(externalStyle => {
-        // convert style paths which are relative to the component file
-        // to be style paths that are relative to the collection file
-
-        // we've already figured out the component's relative path from the collection file
-        // use the value we already created in serializeComponentPath()
-        // create a relative path from the collection file to the style path
-        return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, externalStyle.cmpRelativePath));
-      });
-    }
+      // we've already figured out the component's relative path from the collection file
+      // use the value we already created in serializeComponentPath()
+      // create a relative path from the collection file to the style path
+      return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, externalStyle.cmpRelativePath));
+    });
 
     modeStyleData.stylePaths.sort();
   }
@@ -335,7 +355,7 @@ function parseStyle(config: Config, collectionDir: string, cmpData: ComponentDat
 }
 
 
-function serializeAssetsDir(config: Config, moduleFile: ModuleFile, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeAssetsDir(config: Config, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
   if (invalidArrayData(cmpMeta.assetsDirsMeta)) {
     return;
   }
@@ -348,10 +368,6 @@ function serializeAssetsDir(config: Config, moduleFile: ModuleFile, compiledComp
   // create a relative path from the collection file to the asset path
 
   cmpData.assetPaths = cmpMeta.assetsDirsMeta.map(assetMeta => {
-    if (moduleFile.isCollectionDependency && assetMeta.originalCollectionPath) {
-      return normalizePath(config.sys.path.join(COLLECTION_DEPENDENCIES_DIR, assetMeta.originalCollectionPath));
-    }
-
     return normalizePath(config.sys.path.join(compiledComponentRelativeDirPath, assetMeta.cmpRelativePath));
   }).sort();
 }
@@ -845,7 +861,6 @@ function nameSort(a: string, b: string) {
   return 0;
 }
 
-export const COLLECTION_DEPENDENCIES_DIR = 'dependencies';
 export const BOOLEAN_KEY = 'Boolean';
 export const NUMBER_KEY = 'Number';
 export const STRING_KEY = 'String';

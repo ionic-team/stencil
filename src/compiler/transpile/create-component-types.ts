@@ -287,17 +287,13 @@ async function getCollectionTypesImport(config: Config, compilerCtx: CompilerCtx
 
   try {
     const collectionDir = collection.moduleDir;
+    const collectionPkgJson = config.sys.path.join(collectionDir, 'package.json');
 
-    if (collectionDir.includes('node_modules')) {
-      const collectionPkgJson = config.sys.path.join(collectionDir, 'package.json');
+    const pkgJsonStr = await compilerCtx.fs.readFile(collectionPkgJson);
+    const pkgData: PackageJsonData = JSON.parse(pkgJsonStr);
 
-      const packageJsonStr = await compilerCtx.fs.readFile(collectionPkgJson);
-
-      const packageJsonData: PackageJsonData = JSON.parse(packageJsonStr);
-
-      if (packageJsonData.types) {
-        typeImport = `import '${packageJsonData.name}';`;
-      }
+    if (pkgData.types && pkgData.collection) {
+      typeImport = `import '${pkgData.name}';`;
     }
 
   } catch (e) {

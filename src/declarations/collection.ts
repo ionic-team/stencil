@@ -8,6 +8,7 @@ export interface Collection {
   global?: ModuleFile;
   compiler?: CollectionCompiler;
   isInitialized?: boolean;
+  dependencies?: string[];
 }
 
 
@@ -65,12 +66,19 @@ export interface ModuleBundles {
 
 export interface CollectionData {
   components?: ComponentData[];
+  collections?: CollectionDependencyData[];
   global?: string;
   compiler?: {
     name: string;
     version: string;
     typescriptVersion?: string;
   };
+}
+
+
+export interface CollectionDependencyData {
+  name: string;
+  tags: string[];
 }
 
 

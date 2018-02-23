@@ -1,4 +1,4 @@
-import { Collection, CollectionData, ComponentData, ComponentMeta, Config, EntryModule, ModuleFile } from '../../../declarations';
+import { Collection, CollectionData, CompilerCtx, ComponentData, ComponentMeta, Config, EntryModule, ModuleFile } from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PRIORITY, PROP_TYPE } from '../../../util/constants';
 import { excludeFromCollection, parseComponentDataToModuleFile,
   parseDidChangeDeprecated, parseGlobal, parseWillChangeDeprecated,
@@ -41,9 +41,27 @@ describe('manifest-data serialize/parse', () => {
     const entryModules: EntryModule[] = [{
       moduleFiles: [moduleFile]
     }];
-    const outManifest = serializeAppCollection(config, manifestDir, entryModules, collection.global);
+    const compilerCtx: CompilerCtx = {
+      collections: [
+        {
+          collectionName: 'ionicons',
+          moduleFiles: [
+            {
+              cmpMeta: {
+                tagNameMeta: 'ion-icon'
+              }
+            }
+          ]
+        }
+      ]
+    };
+    const outManifest = serializeAppCollection(config, compilerCtx, manifestDir, entryModules, collection.global);
 
     expect(outManifest.components).toHaveLength(1);
+    expect(outManifest.collections).toHaveLength(1);
+    expect(outManifest.collections[0].name).toBe('ionicons');
+    expect(outManifest.collections[0].tags).toHaveLength(1);
+    expect(outManifest.collections[0].tags[0]).toBe('ion-icon');
     expect(outManifest.compiler.name).toEqual('test');
   });
 

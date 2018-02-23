@@ -13,6 +13,10 @@ export async function copyComponentStyles(config: Config, compilerCtx: CompilerC
       const cmps = entryModule.moduleFiles.filter(m => m.cmpMeta.stylesMeta);
 
       cmps.forEach(c => {
+        if (c.isCollectionDependency) {
+          return;
+        }
+
         Object.keys(c.cmpMeta.stylesMeta).forEach(modeName => {
           const styleMeta = c.cmpMeta.stylesMeta[modeName];
 

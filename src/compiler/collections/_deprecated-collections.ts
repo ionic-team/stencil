@@ -1,6 +1,5 @@
 import { BuildCtx, Collection, CompilerCtx, Config, ConfigCollection } from '../../declarations';
 import { catchError } from '../util';
-import { copySourceCollectionComponentsToDistribution } from './copy-collection';
 import { parseCollectionData } from './collection-data';
 import { normalizePath, pathJoin } from '../util';
 import { upgradeCollection } from './upgrade-collection';
@@ -82,10 +81,6 @@ async function loadConfigCollection(config: Config, compilerCtx: CompilerCtx, bu
   // Look at all dependent components from outside collections and
   // upgrade the components to be compatible with this version if need be
   await upgradeCollection(config, compilerCtx, buildCtx, collection);
-
-  if (config.generateDistribution) {
-    await copySourceCollectionComponentsToDistribution(config, compilerCtx, collection.moduleFiles);
-  }
 
   // cache it for later yo
   compilerCtx.collections.push(collection);

@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config } from '../../../declarations';
+import { BuildCtx, CompilerCtx, Config, PackageJsonData } from '../../../declarations';
 import { parseCollectionModule } from '../../collections/parse-collection-module';
 import * as ts from 'typescript';
 
@@ -15,36 +15,41 @@ export function getCollections(config: Config, compilerCtx: CompilerCtx, buildCt
     return;
   }
 
-  if (compilerCtx.resolvedModuleIds.includes(moduleId)) {
-    // we've already handled this import before
+  if (compilerCtx.resolvedCollections.includes(moduleId)) {
+    // we've already handled this collection moduleId before
     return;
   }
 
-  // cache that we've already parsed this already
-  compilerCtx.resolvedModuleIds.push(moduleId);
+  // cache that we've already parsed this
+  compilerCtx.resolvedCollections.push(moduleId);
 
-  let packageJsonFilePath: string;
+  // see if we can add this collection dependency
+  addCollection(config, compilerCtx, buildCtx, config.rootDir, moduleId);
+}
 
+
+function addCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, resolveFromDir: string, moduleId: string) {
+  let pkgJsonFilePath: string;
   try {
     // get the full package.json file path
-    packageJsonFilePath = config.sys.resolveModule(config.rootDir, moduleId);
+    pkgJsonFilePath = config.sys.resolveModule(resolveFromDir, moduleId);
 
   } catch (e) {
     // it's someone else's job to handle unresolvable paths
     return;
   }
 
-  if (packageJsonFilePath === 'package.json') {
+  if (pkgJsonFilePath === 'package.json') {
     // the resolved package is actually this very same package, so whatever
     return;
   }
 
   // open up and parse the package.json
   // sync on purpose :(
-  const packageJsonStr = compilerCtx.fs.readFileSync(packageJsonFilePath);
-  const packageJsonData = JSON.parse(packageJsonStr);
+  const pkgJsonStr = compilerCtx.fs.readFileSync(pkgJsonFilePath);
+  const pkgData: PackageJsonData = JSON.parse(pkgJsonStr);
 
-  if (!packageJsonData.collection) {
+  if (!pkgData.collection || !pkgData.types) {
     // this import is not a stencil collection
     return;
   }
@@ -52,10 +57,27 @@ export function getCollections(config: Config, compilerCtx: CompilerCtx, buildCt
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollectionModule(config, compilerCtx, packageJsonFilePath, packageJsonData);
+  const collection = parseCollectionModule(config, compilerCtx, pkgJsonFilePath, pkgData);
 
-  // add the collection to the build context to be used later
+  // check if we already added this collection to the build context
+  const alreadyHasCollection = buildCtx.collections.some(c => {
+    return c.collectionName === collection.collectionName;
+  });
+
+  if (alreadyHasCollection) {
+    // we already have this collection in our build context
+    return;
+  }
+
+  // let's add the collection to the build context
   buildCtx.collections.push(collection);
 
-  return;
+  if (Array.isArray(collection.dependencies)) {
+    // this collection has more collections
+    // let's keep digging down and discover all of them
+    collection.dependencies.forEach(dependencyModuleId => {
+      const resolveFromDir = config.sys.path.dirname(pkgJsonFilePath);
+      addCollection(config, compilerCtx, buildCtx, resolveFromDir, dependencyModuleId);
+    });
+  }
 }

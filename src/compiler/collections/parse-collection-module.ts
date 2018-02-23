@@ -1,11 +1,11 @@
-import { Collection, CompilerCtx, Config } from '../../declarations';
+import { Collection, CompilerCtx, Config, PackageJsonData } from '../../declarations';
 import { normalizePath, pathJoin } from '../util';
 import { parseCollectionData } from './collection-data';
 
 
-export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, packageJsonFilePath: string, packageJsonData: any) {
+export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, pkgJsonFilePath: string, pkgData: PackageJsonData) {
   // note this MUST be synchronous because this is used during transpile
-  const collectionName = packageJsonData.name;
+  const collectionName = pkgData.name;
 
   let collection: Collection = compilerCtx.collections.find(c => c.collectionName === collectionName);
   if (collection) {
@@ -15,10 +15,10 @@ export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, 
   }
 
   // get the root directory of the dependency
-  const collectionPackageRootDir = config.sys.path.dirname(packageJsonFilePath);
+  const collectionPackageRootDir = config.sys.path.dirname(pkgJsonFilePath);
 
   // figure out the full path to the collection collection file
-  const collectionFilePath = pathJoin(config, collectionPackageRootDir, packageJsonData.collection);
+  const collectionFilePath = pathJoin(config, collectionPackageRootDir, pkgData.collection);
 
   config.logger.debug(`load colleciton: ${collectionFilePath}`);
 

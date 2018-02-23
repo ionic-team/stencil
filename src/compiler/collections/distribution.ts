@@ -1,5 +1,5 @@
 import { BuildCtx, CompilerCtx, Config, Diagnostic, PackageJsonData } from '../../declarations';
-import { buildError, buildWarn, catchError, isDtsFile, normalizePath } from '../util';
+import { buildError, buildWarn, hasError, isDtsFile, normalizePath } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentStyles } from '../copy/copy-styles';
 import { getLoaderFileName } from '../app/app-file-naming';
@@ -13,7 +13,13 @@ export async function generateDistribution(config: Config, compilerCtx: Compiler
     return;
   }
 
-  const pkgData = await readPackageJson(config, compilerCtx, buildCtx);
+  const pkgData = await readPackageJson(config, compilerCtx);
+
+  validatePackageJson(config, buildCtx.diagnostics, pkgData);
+
+  if (hasError(buildCtx.diagnostics)) {
+    return;
+  }
 
   await Promise.all([
     copyComponentStyles(config, compilerCtx, buildCtx),
@@ -22,7 +28,7 @@ export async function generateDistribution(config: Config, compilerCtx: Compiler
 }
 
 
-async function readPackageJson(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+async function readPackageJson(config: Config, compilerCtx: CompilerCtx) {
   const packageJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 
   let packageJsonText: string;
@@ -42,7 +48,7 @@ async function readPackageJson(config: Config, compilerCtx: CompilerCtx, buildCt
     throw new Error(`Error parsing package.json: ${packageJsonPath}, ${e}`);
   }
 
-  return validatePackageJson(config, buildCtx.diagnostics, pkgData);
+  return pkgData;
 }
 
 
@@ -83,8 +89,6 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
     err.header = `config warning`;
     err.messageText = `When generating a distribution it is recommended to choose a unique namespace, which can be updated using the "namespace" config property within the stencil.config.js file.`;
   }
-
-  return pkgData;
 }
 
 
@@ -112,10 +116,6 @@ export function validatePackageFiles(config: Config, diagnostics: Diagnostic[], 
 
 
 async function generateTypes(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, pkgData: PackageJsonData) {
-  if (typeof pkgData.types !== 'string') {
-    return;
-  }
-
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
   const srcDtsFiles = srcDirItems.filter(srcItem => srcItem.isFile && isDtsFile(srcItem.absPath));
   await Promise.all(srcDtsFiles.map(async srcDtsFile => {
@@ -127,22 +127,13 @@ async function generateTypes(config: Config, compilerCtx: CompilerCtx, buildCtx:
     await compilerCtx.fs.writeFile(distPath, dtsContent);
   }));
 
-  const componentsDtsFilePath = config.sys.path.join(config.rootDir, pkgData.types);
-  const typesFileExists = await compilerCtx.fs.access(componentsDtsFilePath);
-  if (!typesFileExists) {
+  const dtsEntryFilePath = config.sys.path.join(config.rootDir, pkgData.types);
+  const dtsFileExists = await compilerCtx.fs.access(dtsEntryFilePath);
+  if (!dtsFileExists) {
     const err = buildError(buildCtx.diagnostics);
     err.header = `package.json error`;
-    err.messageText = `package.json "types" file does not exist: ${componentsDtsFilePath}`;
+    err.messageText = `package.json "types" file does not exist: ${dtsEntryFilePath}`;
     return;
-  }
-
-  // copy the generated components.d.ts file
-  try {
-    const componentsDtsSrcContent = await compilerCtx.fs.readFile(componentsDtsFilePath);
-    await compilerCtx.fs.writeFile(getComponentsDtsDistTypesFilePath(config), componentsDtsSrcContent);
-
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
   }
 }
 

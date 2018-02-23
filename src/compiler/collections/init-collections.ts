@@ -1,5 +1,4 @@
 import { BuildCtx, CompilerCtx, Config } from '../../declarations';
-import { copySourceCollectionComponentsToDistribution } from './copy-collection';
 import { upgradeCollection } from './upgrade-collection';
 
 
@@ -10,10 +9,6 @@ export async function initCollections(config: Config, compilerCtx: CompilerCtx, 
     // Look at all dependent components from outside collections and
     // upgrade the components to be compatible with this version if need be
     await upgradeCollection(config, compilerCtx, buildCtx, collection);
-
-    if (config.generateDistribution) {
-      await copySourceCollectionComponentsToDistribution(config, compilerCtx, collection.moduleFiles);
-    }
 
     collection.isInitialized = true;
   }));
