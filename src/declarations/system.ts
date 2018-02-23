@@ -120,6 +120,9 @@ export interface RollupPlugins {
 export interface PackageJsonData {
   name: string;
   version: string;
+  main?: string;
+  collection?: string;
+  types?: string;
 }
 
 

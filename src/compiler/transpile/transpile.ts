@@ -1,7 +1,6 @@
 import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../declarations';
 import { componentDependencies } from './transformers/component-dependencies';
-import { discoverCollections } from './transformers/discover-collections';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
 import { getComponentsDtsSrcFilePath } from '../build/distribution';
@@ -60,7 +59,7 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
   const checkProgram = ts.createProgram(checkProgramTsFiles, tsOptions, tsHost);
 
   // Gather component metadata and type info
-  const metadata = gatherMetadata(config, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
+  const metadata = gatherMetadata(config, compilerCtx, buildCtx, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
 
   Object.keys(metadata).forEach(key => {
     const tsFilePath = normalizePath(key);
@@ -77,7 +76,7 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
   });
 
   // Generate d.ts files for component types
-  const componentTypesFileContent = generateComponentTypesFile(config, metadata);
+  const componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
 
   // queue the components.d.ts async file write and put it into memory
   await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
@@ -112,8 +111,7 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
     // NOTE! order of transforms and being in either "before" or "after" is very important!!!!
     before: [
       removeDecorators(),
-      addComponentMetadata(compilerCtx.moduleFiles),
-      discoverCollections(config, compilerCtx, buildCtx)
+      addComponentMetadata(compilerCtx.moduleFiles)
     ],
     after: [
       removeStencilImports(),
@@ -142,6 +140,8 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
 export function transpileModule(config: Config, compilerOptions: ts.CompilerOptions, path: string, input: string) {
   const moduleFiles: ModuleFiles = {};
   const diagnostics: Diagnostic[] = [];
+  const compilerCtx: CompilerCtx = null;
+  const buildCtx: BuildCtx = null;
   const results: TranspileResults = {
     code: null,
     diagnostics: null,
@@ -152,7 +152,7 @@ export function transpileModule(config: Config, compilerOptions: ts.CompilerOpti
 
   // Gather component metadata and type info
   const files = checkProgram.getSourceFiles().filter(sf => sf.getSourceFile().fileName === path);
-  const metadata = gatherMetadata(config, checkProgram.getTypeChecker(), files);
+  const metadata = gatherMetadata(config, compilerCtx, buildCtx, checkProgram.getTypeChecker(), files);
 
   if (Object.keys(metadata).length > 0) {
     const fileMetadata = metadata[path];
