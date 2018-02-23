@@ -1,5 +1,5 @@
-import { validatePackageJson, validatePackageFiles } from '../distribution';
-import { Config, CompilerCtx, BuildResults, ComponentRegistry, Diagnostic } from '../../../util/interfaces';
+import { validatePackageFiles, validatePackageJson } from '../distribution';
+import { BuildResults, CompilerCtx, ComponentRegistry, Config, Diagnostic } from '../../../util/interfaces';
 import { mockConfig } from '../../../testing/mocks';
 import * as path from 'path';
 
@@ -38,6 +38,17 @@ describe('distribution', () => {
       validatePackageJson(config, diagnostics, packageJsonData);
       expect(diagnostics[0].messageText).toMatch(/package.json "types" property is required/);
       expect(diagnostics[0].messageText).toMatch(/dist\/types\/components.d.ts/);
+    });
+
+    it('should error when missing types property isnt a d.ts file', () => {
+      packageJsonData.files = [
+        'dist/'
+      ];
+      packageJsonData.main = 'dist/somenamespace.js';
+      packageJsonData.types = 'dist/types/components.ts';
+      validatePackageJson(config, diagnostics, packageJsonData);
+      expect(diagnostics[0].messageText).toMatch(/package.json "types" file must have a ".d.ts" e/);
+      expect(diagnostics[0].messageText).toMatch(/dist\/types\/components.ts/);
     });
 
     it('should error when missing main property', () => {

@@ -123,6 +123,7 @@ export interface PackageJsonData {
   main?: string;
   collection?: string;
   types?: string;
+  files?: string[];
 }
 
 

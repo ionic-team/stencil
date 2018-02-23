@@ -1,7 +1,7 @@
 import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
-import { generateDistribution } from './distribution';
+import { generateDistribution } from '../collections/distribution';
 import { generateServiceWorker } from '../service-worker/generate-sw';
 import { writeAppCollection } from '../collections/collection-data';
 

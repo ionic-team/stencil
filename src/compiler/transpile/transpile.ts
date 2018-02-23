@@ -3,7 +3,7 @@ import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles,
 import { componentDependencies } from './transformers/component-dependencies';
 import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypesFile } from './create-component-types';
-import { getComponentsDtsSrcFilePath } from '../build/distribution';
+import { getComponentsDtsSrcFilePath } from '../collections/distribution';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
 import { hasError, normalizePath } from '../util';
