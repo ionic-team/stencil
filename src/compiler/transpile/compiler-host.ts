@@ -6,6 +6,18 @@ import * as ts from 'typescript';
 export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<FsWriteResults>[], tsCompilerOptions: ts.CompilerOptions) {
   const tsHost = ts.createCompilerHost(tsCompilerOptions);
 
+  tsHost.directoryExists = (dirPath) => {
+    dirPath = normalizePath(dirPath);
+
+    try {
+      const stat = ctx.fs.statSync(dirPath);
+
+      return stat && stat.isDirectory;
+    } catch (e) {
+      return false;
+    }
+  };
+
   tsHost.getSourceFile = (filePath) => {
     filePath = normalizePath(filePath);
     let tsSourceFile: ts.SourceFile = null;
