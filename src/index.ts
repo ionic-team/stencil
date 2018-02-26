@@ -8,7 +8,6 @@ export {
   ComponentWillLoad,
   ComponentWillUpdate,
   Config,
-  CssClassMap,
   EventEmitter,
   EventListenerEnable
 } from './declarations';
