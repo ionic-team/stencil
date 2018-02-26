@@ -6,3 +6,4 @@ export * from './testing-logger';
 export * from './testing-sys';
 export * from './render';
 export * from './transpile';
+export { VNode, h } from '../renderer/vdom/h';

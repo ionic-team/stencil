@@ -1,6 +1,5 @@
 import { ComponentConstructor, ComponentMeta, ComponentRegistry, Config } from '../../declarations';
-import { Renderer } from '../index';
-import { h } from '../../core/renderer/h';
+import { Renderer, h } from '../index';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { mockConfig } from '../../testing/mocks';
 

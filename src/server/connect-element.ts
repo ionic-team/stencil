@@ -1,7 +1,7 @@
 import { ComponentMeta, Config, HostElement, HydrateResults, PlatformApi } from '../declarations';
-import { connectedCallback } from '../core/instance/connected';
+import { connectedCallback } from '../core/connected';
 import { ENCAPSULATION } from '../util/constants';
-import { initHostElement } from '../core/instance/init-host-element';
+import { initHostElement } from '../core/init-host-element';
 import { noop } from '../util/helpers';
 
 

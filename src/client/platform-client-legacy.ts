@@ -1,23 +1,23 @@
 import { AppGlobal, BundleCallback, CjsExports, ComponentMeta, ComponentRegistry, CoreContext,
   EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../declarations';
-import { assignHostContentSlots } from '../core/renderer/slot';
-import { attachStyles } from '../core/instance/styles';
+import { assignHostContentSlots } from '../renderer/vdom/slot';
+import { attachStyles } from '../core/styles';
 import { Build } from '../util/build-conditionals';
-import { createDomApi } from '../core/renderer/dom-api';
-import { createRendererPatch } from '../core/renderer/patch';
-import { createVNodesFromSsr } from '../core/renderer/ssr';
+import { createDomApi } from '../renderer/vdom/dom-api';
+import { createRendererPatch } from '../renderer/vdom/patch';
+import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './css-shim/custom-style';
-import { enableEventListener } from '../core/instance/listeners';
+import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION, PROP_TYPE, SSR_VNODE_ID } from '../util/constants';
-import { h } from '../core/renderer/h';
+import { h } from '../renderer/vdom/h';
 import { initCssVarShim } from './css-shim/init-css-shim';
-import { initHostElement } from '../core/instance/init-host-element';
-import { initStyleTemplate } from '../core/instance/styles';
+import { initHostElement } from '../core/init-host-element';
+import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
-import { proxyController } from '../core/instance/proxy-controller';
+import { proxyController } from '../core/proxy-controller';
 import { toDashCase } from '../util/helpers';
-import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
+import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
 export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {

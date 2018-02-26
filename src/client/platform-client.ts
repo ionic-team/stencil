@@ -1,21 +1,21 @@
 import { AppGlobal, ComponentMeta, ComponentRegistry, CoreContext, EventEmitterData,
   HostElement, ImportedModule, LoadComponentRegistry, PlatformApi } from '../declarations';
-import { assignHostContentSlots } from '../core/renderer/slot';
-import { attachStyles } from '../core/instance/styles';
+import { assignHostContentSlots } from '../renderer/vdom/slot';
+import { attachStyles } from '../core/styles';
 import { Build } from '../util/build-conditionals';
-import { createDomApi } from '../core/renderer/dom-api';
-import { createRendererPatch } from '../core/renderer/patch';
-import { createVNodesFromSsr } from '../core/renderer/ssr';
+import { createDomApi } from '../renderer/vdom/dom-api';
+import { createRendererPatch } from '../renderer/vdom/patch';
+import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { dashToPascalCase } from '../util/helpers';
-import { enableEventListener } from '../core/instance/listeners';
+import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
-import { h } from '../core/renderer/h';
-import { initHostElement } from '../core/instance/init-host-element';
-import { initStyleTemplate } from '../core/instance/styles';
+import { h } from '../renderer/vdom/h';
+import { initHostElement } from '../core/init-host-element';
+import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
-import { proxyController } from '../core/instance/proxy-controller';
-import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
+import { proxyController } from '../core/proxy-controller';
+import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
 export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {

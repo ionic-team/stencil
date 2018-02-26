@@ -162,7 +162,7 @@ describe('transpile', () => {
     jest.setTimeout(20 * 1000);
 
     const nodeModulesDir = path.resolve(__dirname, '../../../../node_modules');
-    const distDir = path.resolve(__dirname, '../../../../dist')
+    const distDir = path.resolve(__dirname, '../../../../dist');
 
     c.config.suppressTypeScriptErrors = false;
     c.config.buildAppCore = true;
@@ -178,7 +178,7 @@ describe('transpile', () => {
       }
 
       return originalReadFileSync(filePath);
-    }
+    };
     c.fs.statSync = (itemPath) => {
       itemPath = normalizePath(itemPath);
       if (itemPath.indexOf(nodeModulesDir) === 0 || itemPath.indexOf(distDir) === 0) {
@@ -186,7 +186,7 @@ describe('transpile', () => {
       }
 
       return originalStatSync(itemPath);
-    }
+    };
 
     await c.fs.writeFiles({
       '/tsconfig.json': JSON.stringify({
@@ -199,7 +199,7 @@ describe('transpile', () => {
             )]
           }
         }
-      })
+      }),
       '/src/cmp-a.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-a' }) export class CmpA {}`,
       '/src/some-dir/cmp-b.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       '/src/some-dir/cmp-c.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-c' }) export class CmpC {}`
@@ -207,7 +207,7 @@ describe('transpile', () => {
     await c.fs.commit();
 
     // kick off the initial build, wait for it to finish
-    let r = await c.build();
+    const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
     expect(wroteFile(r, '/www/build/app.js')).toBe(true);

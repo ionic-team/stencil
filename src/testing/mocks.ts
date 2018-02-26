@@ -1,11 +1,11 @@
 import { Cache } from '../compiler/cache';
 import { CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DefaultSlot, DomApi, HostElement,
   HydrateOptions, HydrateResults, NamedSlots, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
-import { createDomApi } from '../core/renderer/dom-api';
+import { createDomApi } from '../renderer/vdom/dom-api';
 import { createPlatformServer } from '../server/platform-server';
-import { createRendererPatch } from '../core/renderer/patch';
-import { initComponentInstance } from '../core/instance/init-component-instance';
-import { initHostElement } from '../core/instance/init-host-element';
+import { createRendererPatch } from '../renderer/vdom/patch';
+import { initComponentInstance } from '../core/init-component-instance';
+import { initHostElement } from '../core/init-host-element';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { TestingConfig } from './testing-config';
 import { TestingSystem } from './testing-sys';

@@ -16,9 +16,10 @@
     "testing/"
   ],
   "scripts": {
-    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run build.sys.node && npm run submodules.create",
+    "build": "npm run clean && npm run build.compiler && npm run build.renderer.vdom && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run build.sys.node && npm run submodules.create",
     "build.cli": "tsc -p src/cli/tsconfig.json && node scripts/build-cli.js",
     "build.compiler": "tsc -p src/compiler/tsconfig.json && node scripts/build-compiler.js",
+    "build.renderer.vdom": "tsc -p src/renderer/vdom/tsconfig.json && node scripts/build-renderer-vdom.js",
     "build.core": "tsc -p src/tsconfig.json && node scripts/build-loader.js && node scripts/build-core.js",
     "build.loader": "node scripts/build-loader.js",
     "build.server": "tsc -p src/server/tsconfig.json && node scripts/build-server.js",

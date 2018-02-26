@@ -1,16 +1,16 @@
 import { AppGlobal, CjsExports, CompilerCtx, ComponentMeta,
   ComponentRegistry, Config, CoreContext, Diagnostic,
   HostElement, HydrateResults, PlatformApi } from '../declarations';
-import { assignHostContentSlots } from '../core/renderer/slot';
-import { createDomApi } from '../core/renderer/dom-api';
+import { assignHostContentSlots } from '../renderer/vdom/slot';
+import { createDomApi } from '../renderer/vdom/dom-api';
 import { createQueueServer } from './queue-server';
-import { createRendererPatch } from '../core/renderer/patch';
+import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { getAppWWWBuildDir } from '../compiler/app/app-file-naming';
-import { h } from '../core/renderer/h';
+import { h } from '../renderer/vdom/h';
 import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';
-import { proxyController } from '../core/instance/proxy-controller';
+import { proxyController } from '../core/proxy-controller';
 import { toDashCase } from '../util/helpers';
 
 
