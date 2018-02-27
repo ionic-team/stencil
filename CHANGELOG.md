@@ -1,3 +1,13 @@
+<a name="0.6.10"></a>
+## [0.6.10](https://github.com/ionic-team/stencil/compare/v0.6.9...v0.6.10) (2018-02-27)
+
+
+### Bug Fixes
+
+* remove global JSX Elements that should be provided by the host application. ([4d151cc](https://github.com/ionic-team/stencil/commit/4d151cc))
+
+
+
 <a name="0.6.9"></a>
 ## [0.6.9](https://github.com/ionic-team/stencil/compare/v0.6.8...v0.6.9) (2018-02-27)
 
