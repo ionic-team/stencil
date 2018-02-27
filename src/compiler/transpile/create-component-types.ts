@@ -181,10 +181,16 @@ function updateReferenceTypeImports(config: Config, importDataObj: ImportData, a
 export function createStencilElement(): string {
   return `
 declare global {
+  interface HTMLAttributes {}
   interface HTMLStencilElement extends HTMLElement {
     componentOnReady(): Promise<this>;
     componentOnReady(done: (ele?: this) => void): void;
   }
+  namespace JSX {
+    interface Element {}
+    interface IntrinsicElements {}
+  }
+  namespace JSXElements {}
 }
 \n
 `;
