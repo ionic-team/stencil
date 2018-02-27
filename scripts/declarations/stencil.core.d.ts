@@ -1,4 +1,12 @@
-export type CssClassMap = { [className: string]: boolean };
+
+export interface EventEmitter<T= any> {
+  emit: (data?: T) => void;
+}
+
+
+export interface EventListenerEnable {
+  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element, passive?: boolean): void;
+}
 
 
 declare global {
@@ -125,9 +133,6 @@ declare global {
       'var': JSXElements.HTMLAttributes;
       video: JSXElements.VideoHTMLAttributes;
       wbr: JSXElements.HTMLAttributes;
-
-      // catch all
-      [tagName: string]: any;
     }
   }
 
@@ -581,7 +586,7 @@ declare global {
 
       // Standard HTML Attributes
       accessKey?: string;
-      class?: string | CssClassMap;
+      class?: string | { [className: string]: boolean };
       contentEditable?: boolean | string;
       contenteditable?: boolean | string;
       contextMenu?: string;
@@ -645,7 +650,7 @@ declare global {
     export interface SVGAttributes extends DOMAttributes {
       // Attributes which also defined in HTMLAttributes
       // See comment in SVGDOMPropertyConfig.js
-      class?: string | CssClassMap;
+      class?: string | { [className: string]: boolean };
       color?: string;
       height?: number | string;
       id?: string;
@@ -1022,10 +1027,6 @@ declare global {
       onTransitionEnd?: (event: TransitionEvent) => void;
       onTransitionEndCapture?: (event: TransitionEvent) => void;
     }
-
-    // required for the compiler to avoid global JSX namespace collisions
-    interface StencilJSX {}
-
   }
 
 }

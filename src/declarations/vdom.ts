@@ -1,5 +1,3 @@
-import * as d from './index';
-
 
 export interface Hyperscript {
   (sel: any): VNode;
@@ -36,7 +34,7 @@ export interface VNode {
 export interface VNodeData {
   props?: any;
   attrs?: any;
-  class?: d.CssClassMap;
+  class?: {[className: string]: boolean};
   style?: any;
   on?: any;
   key?: Key;
@@ -48,8 +46,8 @@ export interface VNodeData {
  */
 export interface VNodeProdData {
   key?: Key;
-  class?: d.CssClassMap | string;
-  className?: d.CssClassMap | string;
+  class?: {[className: string]: boolean} | string;
+  className?: {[className: string]: boolean} | string;
   style?: any;
   [key: string]: any;
 }

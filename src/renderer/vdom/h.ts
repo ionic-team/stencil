@@ -16,7 +16,7 @@ export type ChildType = VNode | number | string;
 
 
 export interface ComponentProps {
-  children?: JSX.Element[];
+  children?: any[];
   key?: string | number | any;
 }
 

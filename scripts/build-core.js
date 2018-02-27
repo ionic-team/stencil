@@ -10,6 +10,8 @@ const TRANSPILED_DIR = path.join(DST_DIR, 'transpiled-core');
 const DIST_CLIENT_DIR = path.join(DST_DIR, 'client');
 const POLYFILLS_SRC_DIR = path.join(ROOT_DIR, 'scripts', 'polyfills');
 const POLYFILLS_DIST_DIR = path.join(DST_DIR, 'client', 'polyfills');
+const DECLARATIONS_SRC_DIR = path.join(ROOT_DIR, 'scripts', 'declarations');
+const DECLARATIONS_DIST_DIR = path.join(DST_DIR, 'client', 'declarations');
 
 const inputFile = path.join(TRANSPILED_DIR, 'client/core.js');
 const outputFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
@@ -23,7 +25,7 @@ fs.ensureDirSync(DIST_CLIENT_DIR);
 bundleClientCore();
 createIndexJs();
 copyMainDTs();
-copyPolyfills();
+copyClientFiles();
 copyUtilDir();
 
 
@@ -70,8 +72,9 @@ function dynamicImportFnHack(input) {
 }
 
 
-function copyPolyfills() {
+function copyClientFiles() {
   fs.copySync(POLYFILLS_SRC_DIR, POLYFILLS_DIST_DIR);
+  fs.copySync(DECLARATIONS_SRC_DIR, DECLARATIONS_DIST_DIR);
 }
 
 

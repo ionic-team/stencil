@@ -1,9 +1,9 @@
 import { BuildCtx, CompilerCtx, Config, Diagnostic, PackageJsonData } from '../../declarations';
-import { buildError, buildWarn, hasError, isDtsFile, normalizePath } from '../util';
+import { buildError, buildWarn, hasError, normalizePath, pathJoin } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentStyles } from '../copy/copy-styles';
+import { generateTypes } from './collection-types';
 import { getLoaderFileName } from '../app/app-file-naming';
-import { pathJoin } from '../util';
 
 
 
@@ -29,23 +29,22 @@ export async function generateDistribution(config: Config, compilerCtx: Compiler
 
 
 async function readPackageJson(config: Config, compilerCtx: CompilerCtx) {
-  const packageJsonPath = config.sys.path.join(config.rootDir, 'package.json');
+  const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 
-  let packageJsonText: string;
-
+  let pkgJson: string;
   try {
-    packageJsonText = await compilerCtx.fs.readFile(packageJsonPath);
+    pkgJson = await compilerCtx.fs.readFile(pkgJsonPath);
 
   } catch (e) {
-    throw new Error(`Missing "package.json" file for distribution: ${packageJsonPath}`);
+    throw new Error(`Missing "package.json" file for distribution: ${pkgJsonPath}`);
   }
 
   let pkgData: PackageJsonData;
   try {
-    pkgData = JSON.parse(packageJsonText);
+    pkgData = JSON.parse(pkgJson);
 
   } catch (e) {
-    throw new Error(`Error parsing package.json: ${packageJsonPath}, ${e}`);
+    throw new Error(`Error parsing package.json: ${pkgJsonPath}, ${e}`);
   }
 
   return pkgData;
@@ -111,29 +110,6 @@ export function validatePackageFiles(config: Config, diagnostics: Diagnostic[], 
       err.header = `package.json error`;
       err.messageText = `package.json "files" array must contain the distribution directory "${actualDistDir}/" when generating a distribution.`;
     }
-  }
-}
-
-
-async function generateTypes(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, pkgData: PackageJsonData) {
-  const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
-  const srcDtsFiles = srcDirItems.filter(srcItem => srcItem.isFile && isDtsFile(srcItem.absPath));
-  await Promise.all(srcDtsFiles.map(async srcDtsFile => {
-    const relPath = config.sys.path.relative(config.srcDir, srcDtsFile.absPath);
-    const distTypesDir = config.sys.path.dirname(pkgData.types);
-    const distPath = pathJoin(config, config.rootDir, distTypesDir, relPath);
-
-    const dtsContent = await compilerCtx.fs.readFile(srcDtsFile.absPath);
-    await compilerCtx.fs.writeFile(distPath, dtsContent);
-  }));
-
-  const dtsEntryFilePath = config.sys.path.join(config.rootDir, pkgData.types);
-  const dtsFileExists = await compilerCtx.fs.access(dtsEntryFilePath);
-  if (!dtsFileExists) {
-    const err = buildError(buildCtx.diagnostics);
-    err.header = `package.json error`;
-    err.messageText = `package.json "types" file does not exist: ${dtsEntryFilePath}`;
-    return;
   }
 }
 
