@@ -276,6 +276,44 @@ describe(`in-memory-fs`, () => {
     expect(i.dirsDeleted).toHaveLength(0);
   });
 
+  it(`readdir combines both in-memory read w/ allowInMemoryDirRead option and disk readdir reads`, async () => {
+    await fs.writeFile(`/dir/file1.js`, `1`);
+    await fs.commit();
+    await fs.writeFile(`/dir/file2.js`, `2`);
+    // NO COMMIT!
+
+    const files = await fs.readdir(`/dir`, { allowInMemoryDirRead: true });
+    expect(files).toHaveLength(2);
+    expect(files[0].relPath).toBe('file1.js');
+    expect(files[1].relPath).toBe('file2.js');
+    expect(mockedFs.diskReads).toBe(1);
+  });
+
+  it(`readdir does in-memory read w/ allowInMemoryDirRead option`, async () => {
+    await fs.writeFile(`/dir`, `?`);
+    await fs.writeFile(`/dir/file1.js`, `1`);
+    await fs.writeFile(`/dir/file2.js`, `2`);
+    await fs.writeFile(`/dir/sub1/file3.js`, `3`);
+    await fs.writeFile(`/dir/sub2/file4.js`, `4`);
+    await fs.writeFile(`/not-dir/file5.js`, `5`);
+    await fs.writeFile(`/not-dir/file6.js`, `6`);
+    // NO COMMIT!
+
+    const files = await fs.readdir(`/dir`, { allowInMemoryDirRead: true });
+    expect(files).toHaveLength(2);
+    expect(mockedFs.diskReads).toBe(1);
+  });
+
+  it(`readdir does in-memory read w/ allowInMemoryDirRead but has error cuz no data`, async () => {
+    let threwError = false;
+    try {
+      await fs.readdir(`/dir`, { allowInMemoryDirRead: true });
+    } catch (e) {
+      threwError = true;
+    }
+    expect(threwError).toBeTruthy();
+  });
+
   it(`readdir always does disk reads`, async () => {
     await fs.writeFile(`/dir/file1.js`, `1`);
     await fs.commit();
@@ -283,6 +321,7 @@ describe(`in-memory-fs`, () => {
     let files = await fs.readdir(`/dir`);
     expect(mockedFs.diskReads).toBe(1);
     files = await fs.readdir(`/dir`);
+    expect(files).toHaveLength(1);
     expect(mockedFs.diskReads).toBe(2);
   });
 
