@@ -182,5 +182,14 @@ const PLUGIN_HELPERS = [
     pluginName: 'Sass',
     pluginId: 'sass',
     pluginExts: ['scss', 'sass']
+  },
+  {
+    pluginName: 'Stylus',
+    pluginId: 'stylus',
+    pluginExts: ['styl', 'stylus']
+  }, {
+    pluginName: 'Less',
+    pluginId: 'less',
+    pluginExts: ['less']
   }
 ];
