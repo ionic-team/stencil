@@ -43,7 +43,8 @@ export function serializeAppCollection(config: Config, compilerCtx: CompilerCtx,
       name: config.sys.compiler.name,
       version: config.sys.compiler.version,
       typescriptVersion: config.sys.compiler.typescriptVersion
-    }
+    },
+    bundles: []
   };
 
   // add component data for each of the collection files
@@ -65,6 +66,8 @@ export function serializeAppCollection(config: Config, compilerCtx: CompilerCtx,
 
   // set the global path if it exists
   serializeAppGlobal(config, collectionDir, collectionData, globalModule);
+
+  serializeBundles(config, collectionData);
 
   // success!
   return collectionData;
@@ -99,11 +102,13 @@ export function parseCollectionData(config: Config, collectionName: string, coll
       name: collectionData.compiler.name,
       version: collectionData.compiler.version,
       typescriptVersion: collectionData.compiler.typescriptVersion
-    }
+    },
+    bundles: []
   };
 
   parseComponents(config, collectionDir, collectionData, collection);
   parseGlobal(config, collectionDir, collectionData, collection);
+  parseBundles(collectionData, collection);
 
   return collection;
 }
@@ -848,6 +853,29 @@ export function parseGlobal(config: Config, collectionDir: string, collectionDat
   collection.global = {
     jsFilePath: normalizePath(config.sys.path.join(collectionDir, collectionData.global))
   };
+}
+
+
+export function serializeBundles(config: Config, collectionData: CollectionData) {
+  collectionData.bundles = config.bundles.map(b => {
+    return {
+      components: b.components.slice().sort()
+    };
+  });
+}
+
+
+export function parseBundles(collectionData: CollectionData, collection: Collection) {
+  if (invalidArrayData(collectionData.bundles)) {
+    collection.bundles = [];
+    return;
+  }
+
+  collection.bundles = collectionData.bundles.map(b => {
+    return {
+      components: b.components.slice().sort()
+    };
+  });
 }
 
 

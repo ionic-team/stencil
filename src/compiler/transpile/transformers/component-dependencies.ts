@@ -44,13 +44,35 @@ function addPropConnects(compilerCtx: CompilerCtx, sourceStrings: PotentialCompo
     Object.keys(cmpMeta.membersMeta).forEach(memberName => {
       const memberMeta = cmpMeta.membersMeta[memberName];
       if (memberMeta.memberType === MEMBER_TYPE.PropConnect) {
-        sourceStrings.push({
-          tag: memberMeta.ctrlId,
-          filePath: filePath
-        });
+        addPropConnect(compilerCtx, sourceStrings, filePath, memberMeta.ctrlId);
       }
     });
   }
+}
+
+
+function addPropConnect(compilerCtx: CompilerCtx, sourceStrings: PotentialComponentRef[], filePath: string, tag: string) {
+  sourceStrings.push({
+    tag: tag,
+    filePath: filePath
+  });
+
+  compilerCtx.collections.forEach(collection => {
+
+    collection.bundles.forEach(bundle => {
+      if (bundle.components.includes(tag)) {
+        bundle.components.forEach(bundleTag => {
+          if (bundleTag !== tag) {
+            sourceStrings.push({
+              tag: bundleTag,
+              filePath: filePath
+            });
+          }
+        });
+      }
+    });
+
+  });
 }
 
 
