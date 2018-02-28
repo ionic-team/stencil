@@ -29,7 +29,7 @@ export async function generateTypes(config: Config, compilerCtx: CompilerCtx, bu
 
 
 async function updateTypes(config: Config, compilerCtx: CompilerCtx) {
-  const typeDirItems = await compilerCtx.fs.readdir(config.typesDir, { recursive: true });
+  const typeDirItems = await compilerCtx.fs.readdir(config.typesDir, { inMemoryOnly: true, recursive: true });
   const dtsFiles = typeDirItems.filter(dtsItem => dtsItem.isFile && isDtsFile(dtsItem.absPath));
 
   const updates = await Promise.all(dtsFiles.map(dtsFile => {

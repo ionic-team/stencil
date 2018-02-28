@@ -139,8 +139,43 @@ export class InMemoryFileSystem {
 
     const collectedPaths: FsReaddirItem[] = [];
 
-    // always a disk read
-    await this.readDirectory(dirPath, dirPath, opts, collectedPaths);
+    if (opts.inMemoryOnly) {
+      let inMemoryDir = dirPath;
+      if (!inMemoryDir.endsWith('/')) {
+        inMemoryDir += '/';
+      }
+
+      const inMemoryDirs = dirPath.split('/');
+
+      const filePaths = Object.keys(this.d);
+
+      filePaths.forEach(filePath => {
+        if (!filePath.startsWith(dirPath)) {
+          return;
+        }
+
+        const parts = filePath.split('/');
+
+        if (parts.length === inMemoryDirs.length + 1 || (opts.recursive && parts.length > inMemoryDirs.length)) {
+          const d = this.d[filePath];
+
+          if (d.exists) {
+            // console.log(filePath, d)
+            const item: FsReaddirItem = {
+              absPath: filePath,
+              relPath: parts[inMemoryDirs.length],
+              isDirectory: d.isDirectory,
+              isFile: d.isFile
+            };
+            collectedPaths.push(item);
+          }
+        }
+      });
+
+    } else {
+      // always a disk read
+      await this.readDirectory(dirPath, dirPath, opts, collectedPaths);
+    }
 
     return collectedPaths.sort((a, b) => {
       if (a.absPath < b.absPath) return -1;
@@ -152,58 +187,8 @@ export class InMemoryFileSystem {
   private async readDirectory(initPath: string, dirPath: string, opts: FsReaddirOptions, collectedPaths: FsReaddirItem[]) {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
-    // always a disk read by default!!
-    // only tries in memory look ups when "allowInMemoryDirRead" option true!!
-    const dirItems: string[] = [];
-    let hasInMemoryDirectory = false;
-
-    if (opts.allowInMemoryDirRead) {
-      let inMemoryDir = dirPath;
-      if (!inMemoryDir.endsWith('/')) {
-        inMemoryDir += '/';
-      }
-
-      const inMemoryDirs = dirPath.split('/');
-
-      const filePaths = Object.keys(this.d);
-
-      filePaths.forEach(p => {
-        const d = this.d[p];
-        if (!d.isFile) {
-          return;
-        }
-
-        const parts = p.split('/');
-
-        if (parts.length === inMemoryDirs.length) {
-          return;
-        }
-
-        for (let i = 0; i < parts.length - 1; i++) {
-          if (parts[i] !== inMemoryDirs[i]) {
-            return;
-          }
-        }
-
-        dirItems.push(parts[parts.length - 1]);
-        hasInMemoryDirectory = true;
-      });
-    }
-
-    try {
-      // also do disk read
-      let diskDirItems = await this.disk.readdir(dirPath);
-
-      // only add items not already added
-      diskDirItems = diskDirItems.filter(diskDirItem => !dirItems.includes(diskDirItem));
-      dirItems.push(...diskDirItems);
-
-    } catch (e) {
-      if (!opts.allowInMemoryDirRead || (opts.allowInMemoryDirRead && !hasInMemoryDirectory)) {
-        // only throw if not allowInMemoryDirRead
-        throw e;
-      }
-    }
+    // always a disk read!!
+    const dirItems = await this.disk.readdir(dirPath);
 
     // cache some facts about this path
     const item = this.getItem(dirPath);

@@ -20,7 +20,7 @@ export interface FsReadOptions {
 
 
 export interface FsReaddirOptions {
-  allowInMemoryDirRead?: boolean;
+  inMemoryOnly?: boolean;
   recursive?: boolean;
 }
 
