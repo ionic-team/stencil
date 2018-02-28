@@ -1,25 +1,13 @@
-<a name="0.6.12"></a>
-## [0.6.12](https://github.com/ionic-team/stencil/compare/v0.6.11...v0.6.12) (2018-02-28)
+<a name="0.6.13"></a>
+## [0.6.13](https://github.com/ionic-team/stencil/compare/v0.6.9...v0.6.13) (2018-02-28)
 
-Fix collection JSX types for redistribution.
-
-
-<a name="0.6.11"></a>
-## [0.6.11](https://github.com/ionic-team/stencil/compare/v0.6.10...v0.6.11) (2018-02-27)
+0.6.10 to 0.6.13: Fix collection JSX types for redistribution.
 
 
 ### Bug Fixes
 
+* **types:** export lifecycle method interfaces for collections ([ef1875f](https://github.com/ionic-team/stencil/commit/ef1875f))
 * **types:** add JSX types to injected stencil core dts ([53bb4d1](https://github.com/ionic-team/stencil/commit/53bb4d1))
-
-
-
-<a name="0.6.10"></a>
-## [0.6.10](https://github.com/ionic-team/stencil/compare/v0.6.9...v0.6.10) (2018-02-27)
-
-
-### Bug Fixes
-
 * **types:** remove global JSX Elements that should be provided by the host application. ([4d151cc](https://github.com/ionic-team/stencil/commit/4d151cc))
 
 
