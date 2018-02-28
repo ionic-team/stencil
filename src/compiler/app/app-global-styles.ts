@@ -26,14 +26,14 @@ export async function generateGlobalStyles(config: Config, compilerCtx: Compiler
 
     const fileName = getGlobalStyleFilename(config);
 
-    if (config.generateWWW) {
+    if (config.outputTargets['www']) {
       const wwwFilePath = pathJoin(config, config.buildDir, fileName);
       config.logger.debug(`www global style: ${wwwFilePath}`);
       await compilerCtx.fs.writeFile(wwwFilePath, styleText);
     }
 
-    if (config.generateDistribution) {
-      const distFilePath = pathJoin(config, config.distDir, fileName);
+    if (config.outputTargets['distribution']) {
+      const distFilePath = pathJoin(config, config.outputTargets['distribution'].dir, fileName);
       config.logger.debug(`dist global style: ${distFilePath}`);
       await compilerCtx.fs.writeFile(distFilePath, styleText);
     }

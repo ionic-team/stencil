@@ -1,4 +1,4 @@
-import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic } from '../declarations';
+import { BuildResults, CompilerCtx, CompilerEventName, Config, ConfigBuildTarget, Diagnostic, ValidatedConfig } from '../declarations';
 import { build } from './build/build';
 import { catchError } from './util';
 import { docs } from './docs/docs';
@@ -17,6 +17,7 @@ export class Compiler {
     this.isValid = isValid(config);
 
     if (this.isValid) {
+      config = updateToMultipleTarget(config);
       this.ctx = getCompilerCtx(config);
 
       let startupMsg = `${config.sys.compiler.name} v${config.sys.compiler.version} `;
@@ -82,8 +83,40 @@ export class Compiler {
 
 }
 
+function updateToMultipleTarget(config: ValidatedConfig): Config {
+  const {
+    generateWWW,
+    wwwDir,
+    emptyWWW,
+    generateDistribution,
+    distDir,
+    emptyDist,
+    ...newConfig
+  } = config;
+  const outputTargets: ConfigBuildTarget = {};
 
-function isValid(config: Config) {
+  if (generateWWW) {
+    outputTargets['www'] = {
+      dir: wwwDir,
+      emptyDir: emptyWWW
+    };
+  }
+
+  if (generateDistribution) {
+    outputTargets['distribution'] = {
+      dir: distDir,
+      emptyDir: emptyDist
+    };
+  }
+
+  return {
+    ...newConfig,
+    outputTargets
+  };
+}
+
+
+function isValid(config: ValidatedConfig) {
   try {
     // validate the build config
     validateBuildConfig(config, true);

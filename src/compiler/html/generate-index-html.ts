@@ -29,7 +29,7 @@ export async function generateIndexHtml(config: Config, compilerCtx: CompilerCtx
 
 
 function canSkipGenerateIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.generateWWW) {
+  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.outputTargets['www']) {
     // no need to rebuild index.html if there were no app file changes
     return true;
   }

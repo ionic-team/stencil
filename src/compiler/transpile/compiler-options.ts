@@ -36,9 +36,9 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) 
   compilerOptions.rootDir = config.srcDir;
 
   // generate .d.ts files when generating a distribution and in prod mode
-  compilerOptions.declaration = config.generateDistribution;
+  compilerOptions.declaration = !!config.outputTargets['distribution'];
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
     compilerOptions.declarationDir = config.typesDir;
   }
 

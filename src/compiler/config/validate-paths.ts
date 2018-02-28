@@ -1,9 +1,9 @@
-import { Config } from '../../declarations';
+import { ValidatedConfig } from '../../declarations';
 import { normalizePath } from '../util';
 import { setStringConfig } from './config-utils';
 
 
-export function validatePaths(config: Config) {
+export function validatePaths(config: ValidatedConfig) {
   const path = config.sys.path;
 
   if (typeof (config as any).global === 'string') {

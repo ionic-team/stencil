@@ -1,4 +1,4 @@
-import { Config } from '../../declarations';
+import { Config, ValidatedConfig } from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateCopy } from './validate-copy';
 import { validateNamespace } from './validate-namespace';
@@ -8,7 +8,7 @@ import { validatePublicPath } from './validate-public-path';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
-export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
+export function validateBuildConfig(config: ValidatedConfig, setEnvVariables?: boolean) {
   if (!config) {
     throw new Error(`invalid build config`);
   }

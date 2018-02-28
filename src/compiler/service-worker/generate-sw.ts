@@ -21,7 +21,7 @@ async function copyLib(config: Config, buildCtx: BuildCtx) {
   const timeSpan = config.logger.createTimeSpan(`copy service worker library started`, true);
 
   try {
-    await config.sys.workbox.copyWorkboxLibraries(config.wwwDir);
+    await config.sys.workbox.copyWorkboxLibraries(config.outputTargets['www'].dir);
 
   } catch (e) {
     // workaround for workbox issue in the latest alpha
@@ -65,7 +65,7 @@ function hasSrcConfig(config: Config) {
 
 
 async function canSkipGenerateSW(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  if (!config.generateWWW) {
+  if (!config.outputTargets['www']) {
     config.logger.debug(`generateServiceWorker, not generating www`);
     return true;
   }
@@ -81,7 +81,7 @@ async function canSkipGenerateSW(config: Config, compilerCtx: CompilerCtx, build
     return true;
   }
 
-  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.generateWWW) {
+  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.outputTargets['www']) {
     // no need to rebuild index.html if there were no app file changes
     return true;
   }

@@ -1,27 +1,28 @@
 import * as d from './index';
 
+export type BuildTarget = 'www' | 'distribution';
 
-export interface Config {
+export type ConfigBuildTarget = {
+  [Target in BuildTarget]?: {
+    dir?: string;
+    emptyDir?: boolean;
+  };
+};
+
+export interface CommonConfig {
   buildAppCore?: boolean;
   buildDir?: string;
   buildEs5?: boolean;
   buildLogFilePath?: string;
   buildStatsFilePath?: string;
   bundles?: ConfigBundle[];
-  collectionDir?: string;
   configPath?: string;
   copy?: CopyTasks;
   discoverPublicPath?: boolean;
   devMode?: boolean;
-  distDir?: string;
-  emptyDist?: boolean;
-  emptyWWW?: boolean;
   enableCache?: boolean;
   excludeSrc?: string[];
   fsNamespace?: string;
-  generateDistribution?: boolean;
-  generateDocs?: boolean;
-  generateWWW?: boolean;
   globalScript?: string;
   globalStyle?: string[];
   hashedFileNameLength?: number;
@@ -50,9 +51,9 @@ export interface Config {
   watchIgnoredRegex?: RegExp;
   writeLog?: boolean;
   writeStats?: boolean;
-  wwwDir?: string;
   wwwIndexHtml?: string;
-
+  generateDocs?: boolean;
+  collectionDir?: string;
   _isValidated?: boolean;
   _isTesting?: boolean;
 
@@ -60,6 +61,20 @@ export interface Config {
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
    */
   _deprecatedCollections?: ConfigCollection[];
+}
+
+export interface ValidatedConfig extends CommonConfig {
+  generateWWW?: boolean;
+  wwwDir?: string;
+  emptyWWW?: boolean;
+
+  generateDistribution?: boolean;
+  distDir?: string;
+  emptyDist?: boolean;
+}
+
+export interface Config extends CommonConfig {
+  outputTargets?: ConfigBuildTarget;
 }
 
 

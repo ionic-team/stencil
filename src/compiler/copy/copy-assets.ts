@@ -38,7 +38,7 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
     // copy all of the files in asset directories to the app's build and/or dist directory
     copyToBuildDir.forEach(assetsMeta => {
       // figure out what the path is to the component directory
-      if (config.generateWWW) {
+      if (config.outputTargets['www']) {
         const wwwBuildDirDestination = pathJoin(config, getAppWWWBuildDir(config), assetsMeta.cmpRelativePath);
 
         copyTasks.push({
@@ -47,7 +47,7 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
         });
       }
 
-      if (config.generateDistribution) {
+      if (config.outputTargets['distribution']) {
         const distDirDestination = pathJoin(config, getAppDistDir(config), assetsMeta.cmpRelativePath);
 
         copyTasks.push({
@@ -60,7 +60,7 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
 
     // copy all of the files in asset directories to the dist/collection directory
     // but only do this copy when the generateCollection flag is set to true
-    if (config.generateDistribution) {
+    if (config.outputTargets['distribution']) {
 
       // copy all of the files in asset directories to the app's collection directory
       copyToCollectionDir.forEach(assetsMeta => {

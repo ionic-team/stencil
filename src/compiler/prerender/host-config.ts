@@ -26,7 +26,7 @@ export async function generateHostConfig(config: Config, ctx: CompilerCtx, entry
 
   addDefaults(config, hostConfig);
 
-  const hostConfigFilePath = pathJoin(config, config.wwwDir, HOST_CONFIG_FILENAME);
+  const hostConfigFilePath = pathJoin(config, config.outputTargets['www'].dir, HOST_CONFIG_FILENAME);
 
   await mergeUserHostConfigFile(config, ctx, hostConfig);
 
@@ -62,7 +62,7 @@ export function generateHostRuleHeaders(config: Config, ctx: CompilerCtx, entryM
 
 
 function addCoreJs(config: Config, appCoreWWWPath: string, hostRuleHeaders: HostRuleHeader[]) {
-  const relPath = pathJoin(config, '/', config.sys.path.relative(config.wwwDir, appCoreWWWPath));
+  const relPath = pathJoin(config, '/', config.sys.path.relative(config.outputTargets['www'].dir, appCoreWWWPath));
 
   hostRuleHeaders.push(formatLinkRelPreloadHeader(relPath));
 }
@@ -117,7 +117,7 @@ export function getBundleIds(entryModules: EntryModule[], components: HydrateCom
 function getBundleUrl(config: Config, bundleId: string) {
   const unscopedFileName = getBundleFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), unscopedFileName);
-  return pathJoin(config, '/', config.sys.path.relative(config.wwwDir, unscopedWwwBuildPath));
+  return pathJoin(config, '/', config.sys.path.relative(config.outputTargets['www'].dir, unscopedWwwBuildPath));
 }
 
 
@@ -213,7 +213,7 @@ function addDefaults(config: Config, hostConfig: HostConfig) {
 
 
 function addBuildDirCacheControl(config: Config, hostConfig: HostConfig) {
-  const relPath = pathJoin(config, '/', config.sys.path.relative(config.wwwDir, getAppWWWBuildDir(config)), '**');
+  const relPath = pathJoin(config, '/', config.sys.path.relative(config.outputTargets['www'].dir, getAppWWWBuildDir(config)), '**');
 
   hostConfig.hosting.rules.push({
     include: relPath,
@@ -233,7 +233,7 @@ function addServiceWorkerNoCacheControl(config: Config, hostConfig: HostConfig) 
   }
   const swConfig = config.serviceWorker as ServiceWorkerConfig;
 
-  const relPath = pathJoin(config, '/', config.sys.path.relative(config.wwwDir, swConfig.swDest));
+  const relPath = pathJoin(config, '/', config.sys.path.relative(config.outputTargets['www'].dir, swConfig.swDest));
 
   hostConfig.hosting.rules.push({
     include: relPath,

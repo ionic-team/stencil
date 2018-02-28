@@ -8,7 +8,7 @@ import { getLoaderFileName } from '../app/app-file-naming';
 
 
 export async function generateDistribution(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx): Promise<any> {
-  if (!config.generateDistribution) {
+  if (!config.outputTargets['distribution']) {
     // don't bother
     return;
   }
@@ -55,7 +55,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
   validatePackageFiles(config, diagnostics, pkgData);
 
   const mainFileName = getLoaderFileName(config);
-  const main = pathJoin(config, config.sys.path.relative(config.rootDir, config.distDir), mainFileName);
+  const main = pathJoin(config, config.sys.path.relative(config.rootDir, config.outputTargets['distribution'].dir), mainFileName);
   if (!pkgData.main || normalizePath(pkgData.main) !== main) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
@@ -93,7 +93,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
 
 export function validatePackageFiles(config: Config, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
   if (pkgData.files) {
-    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, config.distDir));
+    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, config.outputTargets['distribution'].dir));
 
     const validPaths = [
       `${actualDistDir}`,

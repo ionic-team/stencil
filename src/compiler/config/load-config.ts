@@ -1,7 +1,7 @@
-import { Config, StencilSystem } from '../../util/interfaces';
+import { Config, StencilSystem, ValidatedConfig } from '../../util/interfaces';
 
 
-export function loadConfig(sys: StencilSystem, config: string | Config) {
+export function loadConfig(sys: StencilSystem, config: string | ValidatedConfig) {
   if (!config || Array.isArray(config) || typeof config === 'function' || typeof config === 'number' || typeof config === 'boolean') {
     throw new Error(`Invalid config: ${config}. Config must be either a file path or a config object.`);
   }

@@ -83,7 +83,7 @@ function writeFileInMemory(config: Config, ctx: CompilerCtx, sourceFile: ts.Sour
   // actually want to eventually write the files to disk
   // otherwise we still want to put these files in our file system but
   // only as in-memory files and never are actually written to disk
-  const isInMemoryOnly = !config.generateDistribution;
+  const isInMemoryOnly = !config.outputTargets['distribution'];
 
   // get or create the ctx module file object
   if (!ctx.moduleFiles[tsFilePath]) {

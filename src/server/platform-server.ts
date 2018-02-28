@@ -60,7 +60,7 @@ export function createPlatformServer(
   // add the app's global to the window context
   win[config.namespace] = App;
 
-  const appWwwDir = config.wwwDir;
+  const appWwwDir = config.outputTargets['www'].dir;
   const appBuildDir = getAppWWWBuildDir(config);
   Context.publicPath = appBuildDir;
 

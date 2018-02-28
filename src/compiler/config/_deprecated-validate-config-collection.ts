@@ -1,10 +1,10 @@
-import { Config, ConfigCollection } from '../../declarations';
+import { ConfigCollection, ValidatedConfig } from '../../declarations';
 
 
 /**
  * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
  */
-export function _deprecatedValidateConfigCollections(config: Config) {
+export function _deprecatedValidateConfigCollections(config: ValidatedConfig) {
   if (Array.isArray((config as any).collections)) {
     config._deprecatedCollections = (config as any).collections;
   } else {

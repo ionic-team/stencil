@@ -1,9 +1,9 @@
-import { Config } from '../../declarations';
+import { ValidatedConfig } from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
 import { setStringConfig } from './config-utils';
 
 
-export function validateNamespace(config: Config) {
+export function validateNamespace(config: ValidatedConfig) {
   setStringConfig(config, 'namespace', DEFAULT_NAMESPACE);
   config.namespace = config.namespace.trim();
 

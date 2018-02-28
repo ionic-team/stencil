@@ -50,12 +50,12 @@ export async function generateLoader(
 
     compilerCtx.appFiles.loader = loaderContent;
 
-    if (config.generateWWW) {
+    if (config.outputTargets['www']) {
       const appLoaderWWW = getLoaderWWW(config);
       await compilerCtx.fs.writeFile(appLoaderWWW, loaderContent);
     }
 
-    if (config.generateDistribution) {
+    if (config.outputTargets['distribution']) {
       const appLoaderDist = getLoaderDist(config);
       await compilerCtx.fs.writeFile(appLoaderDist, loaderContent);
     }

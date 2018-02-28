@@ -75,12 +75,12 @@ async function writeBundleJSFile(config: Config, compilerCtx: CompilerCtx, fileN
   // get the absolute path to where it'll be saved in dist
   const distPath = pathJoin(config, getAppDistDir(config), fileName);
 
-  if (config.generateWWW) {
+  if (config.outputTargets['www']) {
     // write to the www build
     await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
   }
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
     // write to the dist build
     await compilerCtx.fs.writeFile(distPath, jsText);
   }
@@ -183,13 +183,13 @@ async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, ent
   // get the absolute path to where it'll be saved in dist
   const distPath = pathJoin(config, getAppDistDir(config), fileName);
 
-  if (config.generateWWW) {
+  if (config.outputTargets['www']) {
     // write to the www build
     await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
     entryBundle.outputs.push(wwwBuildPath);
   }
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
     // write to the dist build
     await compilerCtx.fs.writeFile(distPath, jsText);
     entryBundle.outputs.push(distPath);

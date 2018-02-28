@@ -25,7 +25,7 @@ export async function writeAppCollection(config: Config, compilerCtx: CompilerCt
   // add it to the list of files we need to write when we're ready
   const collectionData = serializeAppCollection(config, compilerCtx, collectionDir, buildCtx.entryModules, buildCtx.global);
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
     // don't bother serializing/writing the collection if we're not creating a distribution
     await compilerCtx.fs.writeFile(collectionFilePath, JSON.stringify(collectionData, null, 2));
   }

@@ -9,7 +9,7 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
   // this is synchronous on purpose so that it's saved
   // before the dev server fires up and loads the index.html page
 
-  if (!config.generateWWW) {
+  if (!config.outputTargets['www']) {
     // only worry about this when generating www directory
     return;
   }

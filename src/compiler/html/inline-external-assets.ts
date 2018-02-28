@@ -81,5 +81,5 @@ async function getAssetContent(config: Config, ctx: CompilerCtx, results: Hydrat
 
 export function getFilePathFromUrl(config: Config, fromUrl: Url, toUrl: Url) {
   const resolvedUrl = '.' + config.sys.url.resolve(fromUrl.pathname, toUrl.pathname);
-  return pathJoin(config, config.wwwDir, resolvedUrl);
+  return pathJoin(config, config.outputTargets['www'].dir, resolvedUrl);
 }

@@ -9,12 +9,12 @@ export async function generateEs5DisabledMessage(config: Config, compilerCtx: Co
   // tests on a browser that doesn't support es2015
   const fileName = 'es5-build-disabled.js';
 
-  if (config.generateWWW) {
+  if (config.outputTargets['www']) {
     const filePath = pathJoin(config, getAppWWWBuildDir(config), fileName);
     await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript());
   }
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
     const filePath = pathJoin(config, getAppDistDir(config), fileName);
     await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript());
   }

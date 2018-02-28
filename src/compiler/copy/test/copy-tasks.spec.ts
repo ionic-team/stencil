@@ -10,7 +10,8 @@ describe('copy tasks', () => {
   beforeEach(() => {
     config = mockConfig();
     config.srcDir = '/User/marty/my-app/src';
-    config.wwwDir = '/User/marty/my-app/www';
+    config.outputTargets['www'] = {};
+    config.outputTargets['www'].dir = '/User/marty/my-app/www';
   });
 
   describe('processCopyTasks', () => {
@@ -85,7 +86,7 @@ describe('copy tasks', () => {
           return (/\.js$/i).test(src);
         }
       };
-      const p = processCopyTask(config, copyTask, config.wwwDir);
+      const p = processCopyTask(config, copyTask, config.outputTargets['www'].dir);
       expect(p.filter()).toBe(false);
     });
 
@@ -96,33 +97,33 @@ describe('copy tasks', () => {
     it('should get "dest" path when "dest" is relative and "src" is relative', () => {
       const src = 'assets/bear.jpg';
       const dest = 'images/bear.jpg';
-      const p = getDestAbsPath(config, src, config.wwwDir, dest);
+      const p = getDestAbsPath(config, src, config.outputTargets['www'].dir, dest);
       expect(p).toBe('/User/marty/my-app/www/images/bear.jpg');
     });
 
     it('should get "dest" path when "dest" is relative and "src" is absolute', () => {
       const src = '/User/marty/my-app/src/assets/bear.jpg';
       const dest = 'images/bear.jpg';
-      const p = getDestAbsPath(config, src, config.wwwDir, dest);
+      const p = getDestAbsPath(config, src, config.outputTargets['www'].dir, dest);
       expect(p).toBe('/User/marty/my-app/www/images/bear.jpg');
     });
 
     it('should get "dest" path when "dest" is absolute', () => {
       const src = '/User/marty/my-app/src/assets/bear.jpg';
       const dest = '/User/marty/my-app/www/images/bear.jpg';
-      const p = getDestAbsPath(config, src, config.wwwDir, dest);
+      const p = getDestAbsPath(config, src, config.outputTargets['www'].dir, dest);
       expect(p).toBe('/User/marty/my-app/www/images/bear.jpg');
     });
 
     it('should get "dest" path when missing "dest" path and "src" is relative', () => {
       const src = 'assets/bear.jpg';
-      const p = getDestAbsPath(config, src, config.wwwDir, undefined);
+      const p = getDestAbsPath(config, src, config.outputTargets['www'].dir, undefined);
       expect(p).toBe('/User/marty/my-app/www/assets/bear.jpg');
     });
 
     it('should throw error when missing "dest" path and "src" is absolute', () => {
       expect(() => {
-        getDestAbsPath(config, '/User/big/bear.jpg', config.wwwDir, undefined);
+        getDestAbsPath(config, '/User/big/bear.jpg', config.outputTargets['www'].dir, undefined);
       }).toThrow();
     });
 

@@ -18,14 +18,14 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
 
     compilerCtx.appFiles.global = globalJsContent;
 
-    if (config.generateWWW) {
+    if (config.outputTargets['www']) {
       const appGlobalWWWFilePath = getGlobalWWW(config);
 
       config.logger.debug(`build, app global www: ${appGlobalWWWFilePath}`);
       await compilerCtx.fs.writeFile(appGlobalWWWFilePath, globalJsContent);
     }
 
-    if (config.generateDistribution) {
+    if (config.outputTargets['distribution']) {
       const appGlobalDistFilePath = getGlobalDist(config);
 
       config.logger.debug(`build, app global dist: ${appGlobalDistFilePath}`);

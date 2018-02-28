@@ -47,7 +47,7 @@ export function serializeComponentRegistry(cmpRegistry: ComponentRegistry) {
 
 
 export async function writeAppRegistry(config: Config, ctx: CompilerCtx, appRegistry: AppRegistry, cmpRegistry: ComponentRegistry) {
-  if (!config.generateWWW) {
+  if (!config.outputTargets['www']) {
     // only create a registry for www builds
     return;
   }
