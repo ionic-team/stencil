@@ -1,3 +1,9 @@
+<a name="0.6.12"></a>
+## [0.6.12](https://github.com/ionic-team/stencil/compare/v0.6.11...v0.6.12) (2018-02-28)
+
+Fix collection JSX types for redistribution.
+
+
 <a name="0.6.11"></a>
 ## [0.6.11](https://github.com/ionic-team/stencil/compare/v0.6.10...v0.6.11) (2018-02-27)
 
