@@ -114,8 +114,10 @@ export function mockCache() {
 }
 
 
-export function mockWindow(opts: HydrateOptions = {}) {
-  opts.userAgent = opts.userAgent || 'test';
+export function mockWindow() {
+  const opts: HydrateOptions = {
+    userAgent: 'test'
+  };
 
   const window = mockStencilSystem().createDom().parse(opts);
 

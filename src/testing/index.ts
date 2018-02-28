@@ -6,4 +6,5 @@ export * from './testing-logger';
 export * from './testing-sys';
 export * from './render';
 export * from './transpile';
+export { mockDocument, mockElement, mockWindow } from './mocks';
 export { VNode, h } from '../renderer/vdom/h';
