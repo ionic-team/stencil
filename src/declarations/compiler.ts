@@ -28,4 +28,5 @@ export interface CompilerCtx {
   lastBuildHadError?: boolean;
   hasSuccessfulBuild?: boolean;
   localPrerenderServer?: any;
+  hasWatcher?: boolean;
 }

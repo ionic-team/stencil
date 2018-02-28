@@ -1,9 +1,36 @@
-import { Config } from '../../../util/interfaces';
-import { mockConfig } from '../../../testing/mocks';
+import { CompilerCtx, Config } from '../../../util/interfaces';
+import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
 import { validateBuildConfig } from '../../../compiler/config/validate-config';
+import { initWatcher } from '../watcher-init';
+import { BuildEvents } from '../../events';
 
 
-describe('watch', () => {
+describe('watcher', () => {
+
+  let config: Config;
+  let compilerCtx: CompilerCtx;
+
+  beforeEach(() => {
+    config = mockConfig();
+    config.watch = true;
+    compilerCtx = mockCompilerCtx();
+    compilerCtx.events = new BuildEvents(config);
+  });
+
+
+  it('should only create the watch listener once', () => {
+    let didCreateWatcher = initWatcher(config, compilerCtx);
+    expect(didCreateWatcher).toBe(true);
+
+    didCreateWatcher = initWatcher(config, compilerCtx);
+    expect(didCreateWatcher).toBe(false);
+  });
+
+  it('should not create watcher if config.watch falsy', () => {
+    config.watch = false;
+    const didCreateWatcher = initWatcher(config, compilerCtx);
+    expect(didCreateWatcher).toBe(false);
+  });
 
   it('should ignore common web files not used in builds', () => {
     validateBuildConfig(config);
@@ -30,13 +57,6 @@ describe('watch', () => {
     expect(reg.test('/asdf/image.sass')).toBe(false);
     expect(reg.test('/asdf/image.html')).toBe(false);
     expect(reg.test('/asdf/image.htm')).toBe(false);
-  });
-
-
-  var config: Config;
-
-  beforeEach(() => {
-    config = mockConfig();
   });
 
 });
