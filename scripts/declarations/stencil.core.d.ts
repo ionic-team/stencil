@@ -1,4 +1,24 @@
 
+export interface ComponentWillLoad {
+  componentWillLoad: () => Promise<void> | void;
+}
+
+export interface ComponentDidLoad {
+  componentDidLoad: () => void;
+}
+
+export interface ComponentWillUpdate {
+  componentWillUpdate: () => Promise<void> | void;
+}
+
+export interface ComponentDidUpdate {
+  componentDidUpdate: () => void;
+}
+
+export interface ComponentDidUnload {
+  componentDidUnload: () => void;
+}
+
 export interface EventEmitter<T= any> {
   emit: (data?: T) => void;
 }
