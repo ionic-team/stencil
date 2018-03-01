@@ -14,6 +14,7 @@ export const Build: BuildConditionals = {
   hostTheme: true,
   svg: true,
   observeAttr: true,
+  isDev: true,
 
   // decorators
   element: true,
