@@ -7,7 +7,7 @@ import { initApp } from './task-init';
 
 export async function run(process: NodeJS.Process, sys: StencilSystem, logger: Logger) {
   const task = process.argv[2];
-  const argv = parseArgv(process);
+  const argv = parseArgv(process, sys);
 
   process.on('unhandledRejection', (r: any) => logger.error(r));
 

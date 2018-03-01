@@ -71,6 +71,7 @@
     "listr": "^0.13.0",
     "magic-string": "^0.22.4",
     "minimatch": "^3.0.4",
+    "minimist": "^1.2.0",
     "node-fetch": "1.7.3",
     "semver": "^5.5.0",
     "source-map": "^0.7.0",
