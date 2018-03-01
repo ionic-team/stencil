@@ -5,12 +5,12 @@
  * Licensed under the MIT License
  * https://github.com/reworkcss/css/blob/master/LICENSE
  */
-import { Config, Diagnostic, PrintLine } from '../../util/interfaces';
+import { Config, Diagnostic, PrintLine } from '../../declarations';
 import { formatHeader } from '../../util/logger/logger-util';
 
 // http://www.w3.org/TR/CSS21/grammar.html
 // https://github.com/visionmedia/css-parse/pull/49#issuecomment-30088027
-var commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
+const commentre = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//g;
 
 
 export function parseCss(config: Config, css: string, filePath?: string): {
@@ -35,9 +35,9 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function updatePosition(str: string) {
-    var lines = str.match(/\n/g);
+    const lines = str.match(/\n/g);
     if (lines) lineno += lines.length;
-    var i = str.lastIndexOf('\n');
+    const i = str.lastIndexOf('\n');
     column = ~i ? str.length - i : column + str.length;
   }
 
@@ -46,7 +46,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function position(): any {
-    var start = { line: lineno, column: column };
+    const start = { line: lineno, column: column };
 
     return function(node: any) {
       node.position = new ParsePosition(start);
@@ -83,7 +83,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    * Error `msg`.
    */
 
-  var diagnostics: Diagnostic[] = [];
+  const diagnostics: Diagnostic[] = [];
 
   function error(msg: string) {
     if (!srcLines) {
@@ -138,7 +138,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function stylesheet() {
-    var rulesList = rules();
+    const rulesList = rules();
 
     return {
       type: 'stylesheet',
@@ -172,7 +172,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
 
   function rules() {
     var node;
-    var rules: any[] = [];
+    const rules: any[] = [];
 
     whitespace();
     comments(rules);
@@ -191,9 +191,9 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function match(re: any) {
-    var m = re.exec(css);
+    const m = re.exec(css);
     if (!m) return;
-    var str = m[0];
+    const str = m[0];
     updatePosition(str);
     css = css.slice(str.length);
     return m;
@@ -227,7 +227,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function comment() {
-    var pos = position();
+    const pos = position();
     if ('/' !== css.charAt(0) || '*' !== css.charAt(1)) return;
 
     var i = 2;
@@ -238,7 +238,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
       return error('End of comment missing');
     }
 
-    var str = css.slice(2, i - 2);
+    const str = css.slice(2, i - 2);
     column += 2;
     updatePosition(str);
     css = css.slice(i);
@@ -255,7 +255,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function selector(): any {
-    var m: any = match(/^([^{]+)/);
+    const m: any = match(/^([^{]+)/);
     if (!m) return;
     /* @fix Remove all comments from selectors
      * http://ostermiller.org/findcomment.html */
@@ -275,7 +275,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function declaration() {
-    var pos = position();
+    const pos = position();
 
     // prop
     var prop = match(/^(\*?[-#\/\*\\\w]+(\[[0-9a-z_-]+\])?)\s*/);
@@ -286,9 +286,9 @@ export function parseCss(config: Config, css: string, filePath?: string): {
     if (!match(/^:\s*/)) return error(`property missing ':'`);
 
     // val
-    var val = match(/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/);
+    const val = match(/^((?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^\)]*?\)|[^};])+)/);
 
-    var ret = pos({
+    const ret = pos({
       type: 'declaration',
       property: prop.replace(commentre, ''),
       value: val ? trim(val[0]).replace(commentre, '') : ''
@@ -305,7 +305,7 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function declarations() {
-    var decls: any[] = [];
+    const decls: any[] = [];
 
     if (!open()) return error(`missing '{'`);
     comments(decls);
@@ -329,8 +329,8 @@ export function parseCss(config: Config, css: string, filePath?: string): {
 
   function keyframe() {
     var m;
-    var vals = [];
-    var pos = position();
+    const vals = [];
+    const pos = position();
 
     while (m = match(/^((\d+\.\d+|\.\d+|\d+)%?|[a-z]+)\s*/)) {
       vals.push(m[1]);
@@ -351,16 +351,16 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function atkeyframes() {
-    var pos = position();
+    const pos = position();
     var m = match(/^@([-\w]+)?keyframes\s*/);
 
     if (!m) return;
-    var vendor = m[1];
+    const vendor = m[1];
 
     // identifier
     m = match(/^([-\w]+)\s*/);
     if (!m) return error(`@keyframes missing name`);
-    var name = m[1];
+    const name = m[1];
 
     if (!open()) return error(`@keyframes missing '{'`);
 
@@ -386,15 +386,15 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function atsupports() {
-    var pos = position();
-    var m = match(/^@supports *([^{]+)/);
+    const pos = position();
+    const m = match(/^@supports *([^{]+)/);
 
     if (!m) return;
-    var supports = trim(m[1]);
+    const supports = trim(m[1]);
 
     if (!open()) return error(`@supports missing '{'`);
 
-    var style = comments().concat(rules());
+    const style = comments().concat(rules());
 
     if (!close()) return error(`@supports missing '}'`);
 
@@ -410,14 +410,14 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function athost() {
-    var pos = position();
-    var m = match(/^@host\s*/);
+    const pos = position();
+    const m = match(/^@host\s*/);
 
     if (!m) return;
 
     if (!open()) return error(`@host missing '{'`);
 
-    var style = comments().concat(rules());
+    const style = comments().concat(rules());
 
     if (!close()) return error(`@host missing '}'`);
 
@@ -432,15 +432,15 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function atmedia() {
-    var pos = position();
-    var m = match(/^@media *([^{]+)/);
+    const pos = position();
+    const m = match(/^@media *([^{]+)/);
 
     if (!m) return;
-    var media = trim(m[1]);
+    const media = trim(m[1]);
 
     if (!open()) return error(`@media missing '{'`);
 
-    var style = comments().concat(rules());
+    const style = comments().concat(rules());
 
     if (!close()) return error(`@media missing '}'`);
 
@@ -457,8 +457,8 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function atcustommedia() {
-    var pos = position();
-    var m = match(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/);
+    const pos = position();
+    const m = match(/^@custom-media\s+(--[^\s]+)\s*([^{;]+);/);
     if (!m) return;
 
     return pos({
@@ -473,11 +473,11 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function atpage() {
-    var pos = position();
-    var m = match(/^@page */);
+    const pos = position();
+    const m = match(/^@page */);
     if (!m) return;
 
-    var sel = selector() || [];
+    const sel = selector() || [];
 
     if (!open()) return error(`@page missing '{'`);
     var decls = comments();
@@ -503,16 +503,16 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function atdocument() {
-    var pos = position();
-    var m = match(/^@([-\w]+)?document *([^{]+)/);
+    const pos = position();
+    const m = match(/^@([-\w]+)?document *([^{]+)/);
     if (!m) return;
 
-    var vendor = trim(m[1]);
-    var doc = trim(m[2]);
+    const vendor = trim(m[1]);
+    const doc = trim(m[2]);
 
     if (!open()) return error(`@document missing '{'`);
 
-    var style = comments().concat(rules());
+    const style = comments().concat(rules());
 
     if (!close()) return error(`@document missing '}'`);
 
@@ -529,8 +529,8 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function atfontface() {
-    var pos = position();
-    var m = match(/^@font-face\s*/);
+    const pos = position();
+    const m = match(/^@font-face\s*/);
     if (!m) return;
 
     if (!open()) return error(`@font-face missing '{'`);
@@ -555,19 +555,19 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    * Parse import
    */
 
-  var atimport = _compileAtrule('import');
+  const atimport = _compileAtrule('import');
 
   /**
    * Parse charset
    */
 
-  var atcharset = _compileAtrule('charset');
+  const atcharset = _compileAtrule('charset');
 
   /**
    * Parse namespace
    */
 
-  var atnamespace = _compileAtrule('namespace');
+  const atnamespace = _compileAtrule('namespace');
 
   /**
    * Parse non-block at-rules
@@ -575,12 +575,12 @@ export function parseCss(config: Config, css: string, filePath?: string): {
 
 
   function _compileAtrule(name: any) {
-    var re = new RegExp('^@' + name + '\\s*([^;]+);');
+    const re = new RegExp('^@' + name + '\\s*([^;]+);');
     return function() {
-      var pos = position();
-      var m = match(re);
+      const pos = position();
+      const m = match(re);
       if (!m) return;
-      var ret: any = { type: name };
+      const ret: any = { type: name };
       ret[name] = m[1].trim();
       return pos(ret);
     };
@@ -611,8 +611,8 @@ export function parseCss(config: Config, css: string, filePath?: string): {
    */
 
   function rule() {
-    var pos = position();
-    var sel = selector();
+    const pos = position();
+    const sel = selector();
 
     if (!sel) return error('selector missing');
     comments();
@@ -640,11 +640,11 @@ function trim(str: string) {
  */
 
 function addParent(obj?: any, parent?: any) {
-  var isNode = obj && typeof obj.type === 'string';
-  var childParent = isNode ? obj : parent;
+  const isNode = obj && typeof obj.type === 'string';
+  const childParent = isNode ? obj : parent;
 
-  for (var k in obj) {
-    var value = obj[k];
+  for (const k in obj) {
+    const value = obj[k];
     if (Array.isArray(value)) {
       value.forEach(function(v) { addParent(v, childParent); });
     } else if (value && typeof value === 'object') {

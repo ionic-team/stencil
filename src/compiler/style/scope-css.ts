@@ -1,4 +1,4 @@
-import { BuildCtx, ComponentMeta } from '../../util/interfaces';
+import { BuildCtx, ComponentMeta } from '../../declarations';
 import { catchError } from '../util';
 import { ShadowCss } from './shadow-css';
 

@@ -3,7 +3,7 @@ import { buildError, hasFileExtension, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
 import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
-import { scopeComponentCss } from '../css/scope-css';
+import { scopeComponentCss } from './scope-css';
 
 
 export async function generateStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
@@ -140,7 +140,7 @@ export async function setStyleText(config: Config, compilerCtx: CompilerCtx, bui
   // join all the component's styles for this mode together into one line
 
   if (config.minifyCss) {
-    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx, styles.join(''));
+    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styles.join(''));
   } else {
     styleMeta.compiledStyleText = styles.join('\n\n').trim();
   }

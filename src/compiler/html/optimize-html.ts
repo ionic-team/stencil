@@ -1,12 +1,16 @@
 import { CompilerCtx, Config, HydrateOptions, HydrateResults } from '../../declarations';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
-import { inlineLoaderScript } from './inline-loader-script';
-import { inlineComponentStyles } from '../css/inline-styles';
+import { inlineComponentStyles } from '../style/inline-styles';
 import { inlineExternalAssets } from './inline-external-assets';
+import { inlineLoaderScript } from './inline-loader-script';
 import { insertCanonicalLink } from './canonical-link';
+import { minifyInlineScripts } from './minify-inline-scripts';
+import { minifyInlineStyles } from '../style/minify-inline-styles';
 
 
-export async function optimizeHtml(config: Config, ctx: CompilerCtx, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
+export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
+  const promises: Promise<any>[] = [];
+
   if (opts.hydrateComponents !== false) {
     setHtmlDataSsrAttr(doc);
   }
@@ -42,31 +46,11 @@ export async function optimizeHtml(config: Config, ctx: CompilerCtx, doc: Docume
   if (opts.inlineLoaderScript !== false) {
     // remove the script to the external loader script request
     // inline the loader script at the bottom of the html
-    try {
-      await inlineLoaderScript(config, ctx, doc, results);
-
-    } catch (e) {
-      results.diagnostics.push({
-        level: 'error',
-        type: 'hydrate',
-        header: 'Inline Loader Script',
-        messageText: e
-      });
-    }
+    promises.push(inlineLoaderScript(config, compilerCtx, doc, results));
   }
 
   if (opts.inlineAssetsMaxSize > 0) {
-    try {
-      await inlineExternalAssets(config, ctx, results, doc);
-
-    } catch (e) {
-      results.diagnostics.push({
-        level: 'error',
-        type: 'hydrate',
-        header: 'Inline External Styles',
-        messageText: e
-      });
-    }
+    promises.push(inlineExternalAssets(config, compilerCtx, results, doc));
   }
 
   if (opts.collapseWhitespace !== false && !config.devMode && config.logger.level !== 'debug') {
@@ -84,6 +68,16 @@ export async function optimizeHtml(config: Config, ctx: CompilerCtx, doc: Docume
       });
     }
   }
+
+  if (config.minifyCss) {
+    promises.push(minifyInlineStyles(config, compilerCtx, doc, results));
+  }
+
+  if (config.minifyJs) {
+    promises.push(minifyInlineScripts(config, compilerCtx, doc, results));
+  }
+
+  await Promise.all(promises);
 }
 
 
