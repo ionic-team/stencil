@@ -14,6 +14,7 @@ import { normalizeStyles } from '../style/normalize-styles';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
+import { buildConditionalsTransform } from './transformers/build-conditionals';
 import * as ts from 'typescript';
 
 
@@ -106,12 +107,16 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
 
 function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   // this is the big one, let's go ahead and kick off the transpiling
+  const buildConditionals: any = {
+    isDev: !!config.devMode
+  };
   program.emit(undefined, tsHost.writeFile, undefined, false, {
 
     // NOTE! order of transforms and being in either "before" or "after" is very important!!!!
     before: [
       removeDecorators(),
-      addComponentMetadata(compilerCtx.moduleFiles)
+      addComponentMetadata(compilerCtx.moduleFiles),
+      buildConditionalsTransform(buildConditionals)
     ],
     after: [
       removeStencilImports(),

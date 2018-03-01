@@ -130,6 +130,7 @@ export interface BuildConditionals {
   es5?: boolean;
   cssVarShim?: boolean;
   clientSide?: boolean;
+  isDev: boolean;
 
   // ssr
   ssrServerSide: boolean;
@@ -167,6 +168,9 @@ export interface BuildConditionals {
   svg: boolean;
 }
 
+export interface UserBuildConditionals {
+  isDev: boolean;
+}
 
 export interface FilesMap {
   [filePath: string]: string;

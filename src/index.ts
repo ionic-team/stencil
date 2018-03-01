@@ -13,6 +13,11 @@ export {
 } from './declarations';
 
 /**
+ * Build
+ */
+export declare const Build: d.UserBuildConditionals;
+
+/**
  * Component
  */
 export declare const Component: d.ComponentDecorator;
