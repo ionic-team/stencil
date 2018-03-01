@@ -31,6 +31,7 @@ export function validatePrerenderConfig(config: Config) {
       include: [
         { path: '/' }
       ],
+      assetsFileVersioning:  DEFAULT_SSR_CONFIG.assetsFileVersioning,
       collapseWhitespace: DEFAULT_SSR_CONFIG.collapseWhitespace,
       inlineLoaderScript:  DEFAULT_SSR_CONFIG.inlineLoaderScript,
       inlineStyles: false,
@@ -66,6 +67,7 @@ export const DEFAULT_PRERENDER_CONFIG: PrerenderConfig = {
 };
 
 export const DEFAULT_SSR_CONFIG: RenderOptions = {
+  assetsFileVersioning: false,
   collapseWhitespace: true,
   inlineLoaderScript: true,
   inlineStyles: true,

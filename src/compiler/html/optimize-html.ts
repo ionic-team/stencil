@@ -1,3 +1,4 @@
+import { assetsFileVersioning } from './assets-file-versioning';
 import { CompilerCtx, Config, HydrateOptions, HydrateResults } from '../../declarations';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineComponentStyles } from '../style/inline-styles';
@@ -12,7 +13,7 @@ export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc
   const promises: Promise<any>[] = [];
 
   if (opts.hydrateComponents !== false) {
-    setHtmlDataSsrAttr(doc);
+    doc.documentElement.setAttribute('data-ssr', '');
   }
 
   if (opts.canonicalLink !== false) {
@@ -69,6 +70,12 @@ export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc
     }
   }
 
+  // need to wait on to see if external files are inlined
+  await Promise.all(promises);
+
+  // reset for new promises
+  promises.length = 0;
+
   if (config.minifyCss) {
     promises.push(minifyInlineStyles(config, compilerCtx, doc, results));
   }
@@ -77,10 +84,9 @@ export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc
     promises.push(minifyInlineScripts(config, compilerCtx, doc, results));
   }
 
+  if (opts.assetsFileVersioning) {
+    promises.push(assetsFileVersioning(config, compilerCtx, results.url, doc));
+  }
+
   await Promise.all(promises);
-}
-
-
-function setHtmlDataSsrAttr(doc: Document) {
-  doc.documentElement.setAttribute('data-ssr', '');
 }
