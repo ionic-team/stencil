@@ -2,8 +2,8 @@ import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { ComponentInstance, HostElement, PlatformApi } from '../declarations';
 import { initComponentInstance } from './init-component-instance';
+import { PRIORITY, RUNTIME_ERROR } from '../util/constants';
 import { render } from './render';
-import { RUNTIME_ERROR } from '../util/constants';
 
 
 export function queueUpdate(plt: PlatformApi, elm: HostElement) {
@@ -15,7 +15,7 @@ export function queueUpdate(plt: PlatformApi, elm: HostElement) {
     plt.queue.add(() => {
       // vdom diff and patch the host element for differences
       update(plt, elm);
-    });
+    }, plt.isAppLoaded ? PRIORITY.Low : PRIORITY.High);
   }
 }
 

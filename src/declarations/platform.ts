@@ -17,6 +17,7 @@ export interface PlatformApi {
   isServer?: boolean;
   loadBundle: (cmpMeta: d.ComponentMeta, modeName: string, cb: Function) => void;
   onAppLoad?: (rootElm: d.HostElement, styles: string[], failureDiagnostic?: d.Diagnostic) => void;
+  isAppLoaded?: boolean;
   onError: (err: Error, type?: RUNTIME_ERROR, elm?: d.HostElement, appFailure?: boolean) => void;
   propConnect: (ctrlTag: string) => PropConnect;
   queue: QueueApi;

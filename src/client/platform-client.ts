@@ -88,7 +88,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   rootElm.$activeLoading = [];
 
   // this will fire when all components have finished loaded
-  rootElm.$initLoad = () => plt.hasLoadedMap.set(rootElm, true);
+  rootElm.$initLoad = () => plt.hasLoadedMap.set(rootElm, plt.isAppLoaded = true);
 
   // if the HTML was generated from SSR
   // then let's walk the tree and generate vnodes out of the data
