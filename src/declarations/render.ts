@@ -2,7 +2,6 @@ import * as d from './index';
 
 
 export interface RenderOptions {
-  assetsFileVersioning?: boolean;
   canonicalLink?: boolean;
   collapseWhitespace?: boolean;
   inlineAssetsMaxSize?: number;

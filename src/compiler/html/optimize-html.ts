@@ -1,4 +1,4 @@
-import { assetsFileVersioning } from './assets-file-versioning';
+import { assetVersioning } from './asset-versioning';
 import { CompilerCtx, Config, HydrateOptions, HydrateResults } from '../../declarations';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineComponentStyles } from '../style/inline-styles';
@@ -84,8 +84,8 @@ export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc
     promises.push(minifyInlineScripts(config, compilerCtx, doc, results));
   }
 
-  if (opts.assetsFileVersioning) {
-    promises.push(assetsFileVersioning(config, compilerCtx, results.url, doc));
+  if (config.assetVersioning) {
+    promises.push(assetVersioning(config, compilerCtx, results.url, doc));
   }
 
   await Promise.all(promises);

@@ -3,15 +3,19 @@ import { normalizePrerenderLocation } from '../prerender/prerender-utils';
 import { hasFileExtension } from '../util';
 
 
-export function assetsFileVersioning(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, doc: Document) {
+export function assetVersioning(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, doc: Document) {
   return Promise.all([
     versionElementAssets(config, compilerCtx, windowLocationHref, doc)
   ]);
 }
 
 
-function versionElementAssets(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, doc: Document) {
-  return Promise.all([
+async function versionElementAssets(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, doc: Document) {
+  if (!config.assetVersioning.versionHtml) {
+    return;
+  }
+
+  await Promise.all([
     versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'img[src]', 'src'),
     versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'link[rel="apple-touch-icon"][href]', 'href'),
     versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'link[rel="icon"][href]', 'href'),

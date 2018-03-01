@@ -83,12 +83,6 @@ describe('validatePrerenderConfig', () => {
     expect((config.prerender as PrerenderConfig).inlineLoaderScript).toBe(true);
   });
 
-  it('should default prerender.assetsFileVersioning', () => {
-    config.prerender = true;
-    validatePrerenderConfig(config);
-    expect((config.prerender as PrerenderConfig).assetsFileVersioning).toBe(false);
-  });
-
   it('should default prerender values', () => {
     config.prerender = true;
     validatePrerenderConfig(config);
