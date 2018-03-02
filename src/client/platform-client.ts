@@ -18,11 +18,10 @@ import { proxyController } from '../core/proxy-controller';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClient(Context: CoreContext, appNamespace: string, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
+export function createPlatformClient(appNamespace: string, App: AppGlobal, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
-  const App: AppGlobal = (window as any)[appNamespace] = (window as any)[appNamespace] || {};
 
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);
@@ -59,7 +58,7 @@ export function createPlatformClient(Context: CoreContext, appNamespace: string,
     loadBundle,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
-    queue: createQueueClient(win),
+    queue: createQueueClient(App, win),
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),

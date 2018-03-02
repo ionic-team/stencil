@@ -20,14 +20,13 @@ import { toDashCase } from '../util/helpers';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClientLegacy(Context: CoreContext, appNamespace: string, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
+export function createPlatformClientLegacy(appNamespace: string, App: AppGlobal, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const bundleQueue: BundleCallback[] = [];
   const loadedBundles: {[bundleId: string]: any} = {};
   const pendingBundleRequests: {[url: string]: boolean} = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
   const domApi = createDomApi(win, doc);
-  const App: AppGlobal = (window as any)[appNamespace] = (window as any)[appNamespace] || {};
 
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);
@@ -64,7 +63,7 @@ export function createPlatformClientLegacy(Context: CoreContext, appNamespace: s
     loadBundle: loadComponent,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
-    queue: createQueueClient(win),
+    queue: createQueueClient(App, win),
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),

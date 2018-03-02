@@ -1,5 +1,5 @@
+import { AppGlobal, CoreContext } from '../declarations';
 import { Build } from '../util/build-conditionals';
-import { CoreContext } from '../declarations';
 import { createPlatformClient } from './platform-client';
 import { createPlatformClientLegacy } from './platform-client-legacy';
 
@@ -10,12 +10,17 @@ declare const hydratedCssClass: string;
 declare const publicPath: string;
 
 
+const App: AppGlobal = (window as any)[appNamespace] = (window as any)[appNamespace] || {};
+if (!App.raf) {
+  App.raf = window.requestAnimationFrame.bind(window);
+}
+
 if (Build.es5) {
   // es5 build which does not use es module imports or dynamic imports
   // and requires the es5 way of extending HTMLElement
-  createPlatformClientLegacy(Context, appNamespace, window, document, publicPath, hydratedCssClass);
+  createPlatformClientLegacy(appNamespace, App, Context, window, document, publicPath, hydratedCssClass);
 
 } else {
   // es2015 build which does uses es module imports and dynamic imports
-  createPlatformClient(Context, appNamespace, window, document, publicPath, hydratedCssClass);
+  createPlatformClient(appNamespace, App, Context, window, document, publicPath, hydratedCssClass);
 }

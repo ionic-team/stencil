@@ -89,6 +89,7 @@ export interface AppGlobal {
   loaded?: boolean;
   h?: Function;
   initialized?: boolean;
+  raf?: DomControllerCallback;
 }
 
 
@@ -129,7 +130,7 @@ export interface RafCallback {
 
 
 export interface DomControllerCallback {
-  (cb: RafCallback): void;
+  (cb: RafCallback): number;
 }
 
 
