@@ -1,5 +1,4 @@
 import * as d from './index';
-import { RUNTIME_ERROR } from '../util/constants';
 
 
 export interface PlatformApi {
@@ -18,10 +17,9 @@ export interface PlatformApi {
   loadBundle: (cmpMeta: d.ComponentMeta, modeName: string, cb: Function) => void;
   onAppLoad?: (rootElm: d.HostElement, styles: string[], failureDiagnostic?: d.Diagnostic) => void;
   isAppLoaded?: boolean;
-  onError: (err: Error, type?: RUNTIME_ERROR, elm?: d.HostElement, appFailure?: boolean) => void;
+  onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
   propConnect: (ctrlTag: string) => PropConnect;
   queue: QueueApi;
-  registerComponents?: (components?: d.LoadComponentRegistry[]) => d.ComponentMeta[];
   render?: d.RendererApi;
   tmpDisconnected?: boolean;
 
@@ -86,9 +84,11 @@ export interface EventEmitterData<T = any> {
 
 export interface AppGlobal {
   components?: d.LoadComponentRegistry[];
-  loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
-  h?: Function;
   Context?: any;
+  loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
+  loaded?: boolean;
+  h?: Function;
+  initialized?: boolean;
 }
 
 
