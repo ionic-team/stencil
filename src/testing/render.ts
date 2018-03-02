@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentConstructor, ComponentMeta, ComponentRegistry, HydrateOptions, PlatformApi, ValidatedConfig } from '../declarations';
+import { CompilerCtx, ComponentConstructor, ComponentMeta, ComponentRegistry, HydrateOptions, PlatformApi, RawConfig } from '../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../util/constants';
 import { mockLogger, mockStencilSystem } from './mocks';
 import { Renderer } from '../server';
@@ -98,7 +98,7 @@ export async function flush(root: any) {
 function getTestBuildConfig() {
   const sys = mockStencilSystem();
 
-  const config: ValidatedConfig = {
+  const config: RawConfig = {
     sys: sys,
     logger: mockLogger(),
     rootDir: '/',

@@ -1,4 +1,4 @@
-import { BuildResults, CompilerCtx, CompilerEventName, Config, ConfigBuildTarget, Diagnostic, ValidatedConfig } from '../declarations';
+import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic, RawConfig } from '../declarations';
 import { build } from './build/build';
 import { catchError } from './util';
 import { docs } from './docs/docs';
@@ -12,21 +12,21 @@ import { validateServiceWorkerConfig } from './service-worker/validate-sw-config
 export class Compiler {
   protected ctx: CompilerCtx;
   isValid: boolean;
+  config: Config;
 
-  constructor(public config: Config) {
-    this.isValid = isValid(config);
+  constructor(rawConfig: RawConfig) {
+    [ this.isValid, this.config ] = isValid(rawConfig);
 
     if (this.isValid) {
-      config = updateToMultipleTarget(config);
-      this.ctx = getCompilerCtx(config);
+      this.ctx = getCompilerCtx(this.config);
 
-      let startupMsg = `${config.sys.compiler.name} v${config.sys.compiler.version} `;
-      if (config.sys.platform !== 'win32') {
+      let startupMsg = `${this.config.sys.compiler.name} v${this.config.sys.compiler.version} `;
+      if (this.config.sys.platform !== 'win32') {
         startupMsg += `💎`;
       }
 
-      config.logger.info(config.logger.cyan(startupMsg));
-      config.logger.debug(`compiler runtime: ${config.sys.compiler.runtime}`);
+     this.config.logger.info(this.config.logger.cyan(startupMsg));
+     this.config.logger.debug(`compiler runtime: ${this.config.sys.compiler.runtime}`);
     }
   }
 
@@ -83,46 +83,13 @@ export class Compiler {
 
 }
 
-function updateToMultipleTarget(config: ValidatedConfig): Config {
-  const {
-    generateWWW,
-    wwwDir,
-    emptyWWW,
-    generateDistribution,
-    distDir,
-    emptyDist,
-    ...newConfig
-  } = config;
-  const outputTargets: ConfigBuildTarget = {};
-
-  if (generateWWW) {
-    outputTargets['www'] = {
-      dir: wwwDir,
-      emptyDir: emptyWWW
-    };
-  }
-
-  if (generateDistribution) {
-    outputTargets['distribution'] = {
-      dir: distDir,
-      emptyDir: emptyDist
-    };
-  }
-
-  return {
-    ...newConfig,
-    outputTargets
-  };
-}
-
-
-function isValid(config: ValidatedConfig) {
+function isValid(config: RawConfig): [ boolean, Config | null] {
   try {
     // validate the build config
     validateBuildConfig(config, true);
     validatePrerenderConfig(config);
     validateServiceWorkerConfig(config);
-    return true;
+    return [ true, config ];
 
   } catch (e) {
     if (config.logger) {
@@ -133,6 +100,6 @@ function isValid(config: ValidatedConfig) {
     } else {
       console.error(e);
     }
-    return false;
+    return [ false, null ];
   }
 }

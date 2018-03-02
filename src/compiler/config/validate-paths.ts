@@ -1,9 +1,9 @@
-import { ValidatedConfig } from '../../declarations';
+import { RawConfig } from '../../declarations';
 import { normalizePath } from '../util';
 import { setStringConfig } from './config-utils';
 
 
-export function validatePaths(config: ValidatedConfig) {
+export function validatePaths(config: RawConfig) {
   const path = config.sys.path;
 
   if (typeof (config as any).global === 'string') {
@@ -40,9 +40,16 @@ export function validatePaths(config: ValidatedConfig) {
     config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
   }
 
-  setStringConfig(config, 'wwwDir', DEFAULT_WWW_DIR);
-  if (!path.isAbsolute(config.wwwDir)) {
-    config.wwwDir = normalizePath(path.join(config.rootDir, config.wwwDir));
+  if (config.outputTargets['www']) {
+    if (!path.isAbsolute(config.outputTargets['www'].dir)) {
+      config.outputTargets['www'].dir = normalizePath(path.join(config.rootDir, config.outputTargets['www'].dir));
+    }
+  }
+
+  if (config.outputTargets['distribution']) {
+    if (!path.isAbsolute(config.outputTargets['distribution'].dir)) {
+      config.outputTargets['distribution'].dir = normalizePath(path.join(config.rootDir, config.outputTargets['distribution'].dir));
+    }
   }
 
   setStringConfig(config, 'buildDir', DEFAULT_BUILD_DIR);
@@ -50,10 +57,6 @@ export function validatePaths(config: ValidatedConfig) {
     config.buildDir = normalizePath(path.join(config.wwwDir, config.buildDir));
   }
 
-  setStringConfig(config, 'distDir', DEFAULT_DIST_DIR);
-  if (!path.isAbsolute(config.distDir)) {
-    config.distDir = normalizePath(path.join(config.rootDir, config.distDir));
-  }
 
   setStringConfig(config, 'collectionDir', DEFAULT_COLLECTION_DIR);
   if (!path.isAbsolute(config.collectionDir)) {
@@ -94,15 +97,13 @@ export function validatePaths(config: ValidatedConfig) {
       config.buildStatsFilePath = normalizePath(path.join(config.rootDir, config.buildStatsFilePath));
     }
   }
-
 }
 
-
+export const DEFAULT_DIST_DIR = 'dist';
+export const DEFAULT_WWW_DIR = 'www';
 const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_WWW_DIR = 'www';
 const DEFAULT_BUILD_DIR = 'build';
 const DEFAULT_INDEX_HTML = 'index.html';
-const DEFAULT_DIST_DIR = 'dist';
 const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_TSCONFIG = 'tsconfig.json';

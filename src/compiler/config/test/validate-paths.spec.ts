@@ -1,4 +1,4 @@
-import { ValidatedConfig } from '../../../declarations';
+import { RawConfig } from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateBuildConfig } from '../validate-config';
 import * as path from 'path';
@@ -6,7 +6,7 @@ import * as path from 'path';
 
 describe('validatePaths', () => {
 
-  let config: ValidatedConfig;
+  let config: RawConfig;
   const logger = mockLogger();
   const sys = mockStencilSystem();
 

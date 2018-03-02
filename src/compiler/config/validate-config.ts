@@ -1,14 +1,14 @@
-import { Config, ValidatedConfig } from '../../declarations';
+import { Config, RawConfig } from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateCopy } from './validate-copy';
 import { validateNamespace } from './validate-namespace';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validatePublicPath } from './validate-public-path';
-import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
+import {_deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
+import {_deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
 
-
-export function validateBuildConfig(config: ValidatedConfig, setEnvVariables?: boolean) {
+export function validateBuildConfig(config: RawConfig, setEnvVariables?: boolean) {
   if (!config) {
     throw new Error(`invalid build config`);
   }
@@ -73,10 +73,6 @@ export function validateBuildConfig(config: ValidatedConfig, setEnvVariables?: b
   }
   config.logger.debug(`hashFileNames: ${config.hashFileNames}, hashedFileNameLength: ${config.hashedFileNameLength}`);
 
-  config.generateDistribution = !!config.generateDistribution;
-
-  setBooleanConfig(config, 'generateWWW', true);
-
   validateCopy(config);
 
   validatePlugins(config);
@@ -86,8 +82,6 @@ export function validateBuildConfig(config: ValidatedConfig, setEnvVariables?: b
   }
 
   setStringConfig(config, 'hydratedCssClass', DEFAULT_HYDRATED_CSS_CLASS);
-  setBooleanConfig(config, 'emptyDist', true);
-  setBooleanConfig(config, 'emptyWWW', true);
   setBooleanConfig(config, 'generateDocs', false);
   setBooleanConfig(config, 'enableCache', true);
 
@@ -105,6 +99,7 @@ export function validateBuildConfig(config: ValidatedConfig, setEnvVariables?: b
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
    */
   _deprecatedValidateConfigCollections(config);
+  config = _deprecatedToMultipleTarget(config);
 
   setArrayConfig(config, 'plugins');
   setArrayConfig(config, 'bundles');

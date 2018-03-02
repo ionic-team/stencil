@@ -9,7 +9,7 @@ export type ConfigBuildTarget = {
   };
 };
 
-export interface CommonConfig {
+export interface Config {
   buildAppCore?: boolean;
   buildDir?: string;
   buildEs5?: boolean;
@@ -56,6 +56,7 @@ export interface CommonConfig {
   collectionDir?: string;
   _isValidated?: boolean;
   _isTesting?: boolean;
+  outputTargets?: ConfigBuildTarget;
 
   /**
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
@@ -63,7 +64,7 @@ export interface CommonConfig {
   _deprecatedCollections?: ConfigCollection[];
 }
 
-export interface ValidatedConfig extends CommonConfig {
+export interface RawConfig extends Config {
   generateWWW?: boolean;
   wwwDir?: string;
   emptyWWW?: boolean;
@@ -71,10 +72,6 @@ export interface ValidatedConfig extends CommonConfig {
   generateDistribution?: boolean;
   distDir?: string;
   emptyDist?: boolean;
-}
-
-export interface Config extends CommonConfig {
-  outputTargets?: ConfigBuildTarget;
 }
 
 

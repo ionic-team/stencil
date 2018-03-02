@@ -1,7 +1,7 @@
-import { CopyTasks, ValidatedConfig } from '../../util/interfaces';
+import { CopyTasks, RawConfig } from '../../util/interfaces';
 
 
-export function validateCopy(config: ValidatedConfig) {
+export function validateCopy(config: RawConfig) {
   if (config.copy) {
     // merge user copy tasks into the default
     config.copy = Object.assign({}, DEFAULT_COPY_TASKS, config.copy);
