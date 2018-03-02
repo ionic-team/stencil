@@ -26,7 +26,11 @@ export function createPlatformServer(
   const loadedBundles: {[bundleId: string]: any} = {};
   const styles: string[] = [];
   const controllerComponents: {[tag: string]: HostElement} = {};
-  const domApi = createDomApi(win, doc);
+
+  // create the app global
+  const App: AppGlobal = {};
+
+  const domApi = createDomApi(App, win, doc);
 
   // init build context
   compilerCtx = compilerCtx || {};
@@ -49,9 +53,6 @@ export function createPlatformServer(
   // add the Core global to the window context
   // Note: "Core" is not on the window context on the client-side
   win.Context = Context;
-
-  // create the app global
-  const App: AppGlobal = {};
 
   // add the h() fn to the app's global namespace
   App.h = h;

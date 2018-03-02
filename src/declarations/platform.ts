@@ -83,6 +83,7 @@ export interface EventEmitterData<T = any> {
 
 
 export interface AppGlobal {
+  ael?: (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions) => void;
   components?: d.LoadComponentRegistry[];
   Context?: any;
   loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
@@ -90,6 +91,7 @@ export interface AppGlobal {
   h?: Function;
   initialized?: boolean;
   raf?: DomControllerCallback;
+  rel?: (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions) => void;
 }
 
 

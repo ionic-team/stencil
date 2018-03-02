@@ -18,10 +18,11 @@ import { proxyController } from '../core/proxy-controller';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClient(appNamespace: string, App: AppGlobal, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
+export function createPlatformClient(appNamespace: string, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: HostElement} = {};
-  const domApi = createDomApi(win, doc);
+  const App: AppGlobal = (win as any)[appNamespace] = (win as any)[appNamespace] || {};
+  const domApi = createDomApi(App, win, doc);
 
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);

@@ -20,13 +20,14 @@ import { toDashCase } from '../util/helpers';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClientLegacy(appNamespace: string, App: AppGlobal, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
+export function createPlatformClientLegacy(appNamespace: string, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const bundleQueue: BundleCallback[] = [];
   const loadedBundles: {[bundleId: string]: any} = {};
   const pendingBundleRequests: {[url: string]: boolean} = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
-  const domApi = createDomApi(win, doc);
+  const App: AppGlobal = (win as any)[appNamespace] = (win as any)[appNamespace] || {};
+  const domApi = createDomApi(App, win, doc);
 
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);

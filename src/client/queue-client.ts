@@ -9,6 +9,9 @@ export function createQueueClient(App: AppGlobal, win: Window, resolvePending?: 
   const highPriority: Function[] = [];
   const lowPriority: Function[] = [];
 
+  if (!App.raf) {
+    App.raf = window.requestAnimationFrame.bind(window);
+  }
 
   function doHighPriority() {
     // holy geez we need to get this stuff done and fast
