@@ -1,7 +1,7 @@
 import { Cache } from '../compiler/cache';
 import { CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DefaultSlot, DomApi, HostElement,
   HydrateOptions, HydrateResults, NamedSlots, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
-import { createDomApi } from '../renderer/vdom/dom-api';
+import { createDomApi } from '../renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { initComponentInstance } from '../core/init-component-instance';

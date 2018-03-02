@@ -1,6 +1,6 @@
 import { createDomApi } from '../dom-api';
-import { DomApi } from '../../../util/interfaces';
-import { mockElement, mockWindow } from '../../../testing/mocks';
+import { DomApi } from '../../declarations';
+import { mockElement, mockWindow } from '../../testing/mocks';
 
 
 describe('dom api', () => {

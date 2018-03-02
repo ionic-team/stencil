@@ -2,7 +2,7 @@ import { AppGlobal, CjsExports, CompilerCtx, ComponentMeta,
   ComponentRegistry, Config, CoreContext, Diagnostic,
   HostElement, HydrateResults, PlatformApi } from '../declarations';
 import { assignHostContentSlots } from '../renderer/vdom/slot';
-import { createDomApi } from '../renderer/vdom/dom-api';
+import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../util/constants';

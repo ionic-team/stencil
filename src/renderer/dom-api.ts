@@ -1,7 +1,7 @@
-import { Build } from '../../util/build-conditionals';
-import { DomApi, EventEmitterData } from '../../declarations';
-import { KEY_CODE_MAP, NODE_TYPE } from '../../util/constants';
-import { toLowerCase } from '../../util/helpers';
+import { Build } from '../util/build-conditionals';
+import { DomApi, EventEmitterData } from '../declarations';
+import { KEY_CODE_MAP, NODE_TYPE } from '../util/constants';
+import { toLowerCase } from '../util/helpers';
 
 
 export function createDomApi(win: any, doc: Document): DomApi {
