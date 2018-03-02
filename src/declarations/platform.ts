@@ -1,5 +1,4 @@
 import * as d from './index';
-import { RUNTIME_ERROR } from '../util/constants';
 
 
 export interface PlatformApi {
@@ -17,10 +16,10 @@ export interface PlatformApi {
   isServer?: boolean;
   loadBundle: (cmpMeta: d.ComponentMeta, modeName: string, cb: Function) => void;
   onAppLoad?: (rootElm: d.HostElement, styles: string[], failureDiagnostic?: d.Diagnostic) => void;
-  onError: (err: Error, type?: RUNTIME_ERROR, elm?: d.HostElement, appFailure?: boolean) => void;
+  isAppLoaded?: boolean;
+  onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
   propConnect: (ctrlTag: string) => PropConnect;
   queue: QueueApi;
-  registerComponents?: (components?: d.LoadComponentRegistry[]) => d.ComponentMeta[];
   render?: d.RendererApi;
   tmpDisconnected?: boolean;
 
@@ -84,10 +83,15 @@ export interface EventEmitterData<T = any> {
 
 
 export interface AppGlobal {
+  ael?: (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions) => void;
   components?: d.LoadComponentRegistry[];
-  loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
-  h?: Function;
   Context?: any;
+  loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
+  loaded?: boolean;
+  h?: Function;
+  initialized?: boolean;
+  raf?: DomControllerCallback;
+  rel?: (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions) => void;
 }
 
 
@@ -128,7 +132,7 @@ export interface RafCallback {
 
 
 export interface DomControllerCallback {
-  (cb: RafCallback): void;
+  (cb: RafCallback): number;
 }
 
 

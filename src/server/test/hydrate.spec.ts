@@ -1,6 +1,6 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../../declarations';
 import { hydrateHtml } from '../hydrate-html';
-import { h } from '../../core/renderer/h';
+import { h } from '../../renderer/vdom/h';
 import { compareHtml, mockConfig } from '../../testing/mocks';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 

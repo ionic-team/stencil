@@ -5,13 +5,16 @@ import { WatcherListener } from './watcher-listener';
 
 export function initWatcher(config: Config, compilerCtx: CompilerCtx) {
   // only create the watcher if this is a watch build
-  // and this is the first build
-  if (compilerCtx.hasSuccessfulBuild || !config.watch) return;
+  // and we haven't created a watch listener already
+  if (compilerCtx.hasWatcher || !config.watch) {
+    return false;
+  }
 
   config.logger.debug(`initWatcher: ${config.srcDir}`);
 
   const watcherListener = new WatcherListener(config, compilerCtx);
   watcherListener.subscribe();
+  compilerCtx.hasWatcher = true;
 
   if (config.sys.createWatcher) {
     const watcher = config.sys.createWatcher(compilerCtx.events, config.srcDir, {
@@ -25,4 +28,6 @@ export function initWatcher(config: Config, compilerCtx: CompilerCtx) {
       watcher.add(config.configPath);
     }
   }
+
+  return true;
 }

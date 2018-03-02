@@ -1,11 +1,11 @@
 import { Cache } from '../compiler/cache';
-import { CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DefaultSlot, DomApi, HostElement,
+import { AppGlobal, CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DefaultSlot, DomApi, HostElement,
   HydrateOptions, HydrateResults, NamedSlots, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
-import { createDomApi } from '../core/renderer/dom-api';
+import { createDomApi } from '../renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
-import { createRendererPatch } from '../core/renderer/patch';
-import { initComponentInstance } from '../core/instance/init-component-instance';
-import { initHostElement } from '../core/instance/init-host-element';
+import { createRendererPatch } from '../renderer/vdom/patch';
+import { initComponentInstance } from '../core/init-component-instance';
+import { initHostElement } from '../core/init-host-element';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { TestingConfig } from './testing-config';
 import { TestingSystem } from './testing-sys';
@@ -18,9 +18,10 @@ export function mockPlatform(win?: any, domApi?: DomApi) {
   const hydrateResults: HydrateResults = {
     diagnostics: []
   };
+  const App: AppGlobal = {};
   const config = mockConfig();
   win = win || config.sys.createDom().parse({html: ''});
-  domApi = domApi || createDomApi(win, win.document);
+  domApi = domApi || createDomApi(App, win, win.document);
   const cmpRegistry: ComponentRegistry = {};
 
   const plt = createPlatformServer(
@@ -114,8 +115,10 @@ export function mockCache() {
 }
 
 
-export function mockWindow(opts: HydrateOptions = {}) {
-  opts.userAgent = opts.userAgent || 'test';
+export function mockWindow() {
+  const opts: HydrateOptions = {
+    userAgent: 'test'
+  };
 
   const window = mockStencilSystem().createDom().parse(opts);
 
@@ -135,9 +138,10 @@ export function mockDocument(window?: Window) {
 
 
 export function mockDomApi(win?: any, doc?: any) {
+  const App: AppGlobal = {};
   win = win || mockWindow();
   doc = doc || win.document;
-  return createDomApi(win, doc);
+  return createDomApi(App, win, doc);
 }
 
 

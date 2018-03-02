@@ -1,13 +1,20 @@
-import { Config, CompilerCtx, HydrateOptions, HydrateResults } from '../../util/interfaces';
+import { assetVersioning } from './asset-versioning';
+import { CompilerCtx, Config, HydrateOptions, HydrateResults } from '../../declarations';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
-import { inlineLoaderScript } from './inline-loader-script';
-import { inlineComponentStyles } from '../css/inline-styles';
+import { inlineComponentStyles } from '../style/inline-styles';
 import { inlineExternalAssets } from './inline-external-assets';
+import { inlineLoaderScript } from './inline-loader-script';
 import { insertCanonicalLink } from './canonical-link';
+import { minifyInlineScripts } from './minify-inline-scripts';
+import { minifyInlineStyles } from '../style/minify-inline-styles';
 
 
-export async function optimizeHtml(config: Config, ctx: CompilerCtx, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
-  setHtmlDataSsrAttr(doc);
+export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
+  const promises: Promise<any>[] = [];
+
+  if (opts.hydrateComponents !== false) {
+    doc.documentElement.setAttribute('data-ssr', '');
+  }
 
   if (opts.canonicalLink !== false) {
     try {
@@ -40,31 +47,11 @@ export async function optimizeHtml(config: Config, ctx: CompilerCtx, doc: Docume
   if (opts.inlineLoaderScript !== false) {
     // remove the script to the external loader script request
     // inline the loader script at the bottom of the html
-    try {
-      await inlineLoaderScript(config, ctx, doc, results);
-
-    } catch (e) {
-      results.diagnostics.push({
-        level: 'error',
-        type: 'hydrate',
-        header: 'Inline Loader Script',
-        messageText: e
-      });
-    }
+    promises.push(inlineLoaderScript(config, compilerCtx, doc, results));
   }
 
   if (opts.inlineAssetsMaxSize > 0) {
-    try {
-      await inlineExternalAssets(config, ctx, results, doc);
-
-    } catch (e) {
-      results.diagnostics.push({
-        level: 'error',
-        type: 'hydrate',
-        header: 'Inline External Styles',
-        messageText: e
-      });
-    }
+    promises.push(inlineExternalAssets(config, compilerCtx, results, doc));
   }
 
   if (opts.collapseWhitespace !== false && !config.devMode && config.logger.level !== 'debug') {
@@ -82,9 +69,24 @@ export async function optimizeHtml(config: Config, ctx: CompilerCtx, doc: Docume
       });
     }
   }
-}
 
+  // need to wait on to see if external files are inlined
+  await Promise.all(promises);
 
-function setHtmlDataSsrAttr(doc: Document) {
-  doc.documentElement.setAttribute('data-ssr', '');
+  // reset for new promises
+  promises.length = 0;
+
+  if (config.minifyCss) {
+    promises.push(minifyInlineStyles(config, compilerCtx, doc, results));
+  }
+
+  if (config.minifyJs) {
+    promises.push(minifyInlineScripts(config, compilerCtx, doc, results));
+  }
+
+  if (config.assetVersioning) {
+    promises.push(assetVersioning(config, compilerCtx, results.url, doc));
+  }
+
+  await Promise.all(promises);
 }

@@ -6,7 +6,7 @@ export const Build: BuildConditionals = {
   shadowDom: true,
   ssrServerSide: true,
 
-  devMode: true,
+  isDev: true,
   devInspector: true,
   verboseError: true,
 

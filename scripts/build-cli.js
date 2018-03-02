@@ -31,6 +31,9 @@ function bundle() {
       process.exit(1);
     });
 
+  }).catch(err => {
+    console.log(`build cli error: ${err}`);
+    process.exit(1);
   });
 }
 

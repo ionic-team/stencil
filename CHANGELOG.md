@@ -1,3 +1,137 @@
+<a name="0.6.16"></a>
+## [0.6.16](https://github.com/ionic-team/stencil/compare/v0.6.15...v0.6.16) (2018-03-01)
+
+
+### Bug Fixes
+
+* **cli:** fix minimist dependency ([75dfab6](https://github.com/ionic-team/stencil/commit/75dfab6)), closes [#580](https://github.com/ionic-team/stencil/issues/580)
+
+
+
+<a name="0.6.15"></a>
+## [0.6.15](https://github.com/ionic-team/stencil/compare/v0.6.14...v0.6.15) (2018-03-01)
+
+
+### Bug Fixes
+
+* **prerender:** improve inline loader script ([cf72640](https://github.com/ionic-team/stencil/commit/cf72640))
+
+
+### Performance Improvements
+
+* **file hash:** init asset file versioning ([65c5783](https://github.com/ionic-team/stencil/commit/65c5783))
+* **minify:** minify inline styles and scripts ([286bf7d](https://github.com/ionic-team/stencil/commit/286bf7d))
+* **render:** microtask resolve all tasks until app loaded ([c9aee2b](https://github.com/ionic-team/stencil/commit/c9aee2b))
+
+
+
+<a name="0.6.14"></a>
+## [0.6.14](https://github.com/ionic-team/stencil/compare/v0.6.13...v0.6.14) (2018-02-28)
+
+
+### Bug Fixes
+
+* **collection:** add bundle data to collection manifest for prop connect tags ([6ba0150](https://github.com/ionic-team/stencil/commit/6ba0150))
+* **watcher:** do not create more than one watcher ([0df1dff](https://github.com/ionic-team/stencil/commit/0df1dff))
+
+
+
+<a name="0.6.13"></a>
+## [0.6.13](https://github.com/ionic-team/stencil/compare/v0.6.9...v0.6.13) (2018-02-28)
+
+0.6.10 to 0.6.13: Fix collection JSX types for redistribution.
+
+
+### Bug Fixes
+
+* **types:** export lifecycle method interfaces for collections ([ef1875f](https://github.com/ionic-team/stencil/commit/ef1875f))
+* **types:** add JSX types to injected stencil core dts ([53bb4d1](https://github.com/ionic-team/stencil/commit/53bb4d1))
+* **types:** remove global JSX Elements that should be provided by the host application. ([4d151cc](https://github.com/ionic-team/stencil/commit/4d151cc))
+
+
+
+<a name="0.6.9"></a>
+## [0.6.9](https://github.com/ionic-team/stencil/compare/v0.6.8...v0.6.9) (2018-02-27)
+
+
+### Bug Fixes
+
+* **bundling:** update to rollup 0.56.3 ([3904bd1](https://github.com/ionic-team/stencil/commit/3904bd1))
+* **collection:** ship stencil/core interfaces w/ collections ([d462b7f](https://github.com/ionic-team/stencil/commit/d462b7f))
+* **exports:** update renderer exports and refactor renderer location ([40faa65](https://github.com/ionic-team/stencil/commit/40faa65)), closes [#574](https://github.com/ionic-team/stencil/issues/574)
+* **transpile:** implement directoryExists for compiler-host ([ebccbc1](https://github.com/ionic-team/stencil/commit/ebccbc1))
+
+
+
+<a name="0.6.8"></a>
+## [0.6.8](https://github.com/ionic-team/stencil/compare/v0.6.7...v0.6.8) (2018-02-25)
+
+
+### Bug Fixes
+
+* **css:** use default css if sass plugin not installed ([a61dc3b](https://github.com/ionic-team/stencil/commit/a61dc3b))
+* **types:** import to missing dist/core folder after build process ([fb554c9](https://github.com/ionic-team/stencil/commit/fb554c9))
+
+
+### Component CSS and Sass Plugin Update
+
+For external collections that provide both CSS and Sass files, such as [Ionic](https://www.npmjs.com/package/@ionic/core), if the Stencil project does not have the [@stencil/sass](https://www.npmjs.com/package/@stencil/sass) plugin installed then it'll default to using the collection's CSS build. If project does have the sass plugin installed then it'll rebuild the external collection's sass files at compile time. This allows projects to override a collection's default Sass variables using the plugin's `injectGlobalPaths` option. Please see the [@stencil/sass options](https://www.npmjs.com/package/@stencil/sass) for more information.
+
+
+<a name="0.6.7"></a>
+## [0.6.7](https://github.com/ionic-team/stencil/compare/v0.6.6...v0.6.7) (2018-02-23)
+
+
+### Bug Fixes
+
+* **collection:** copy all src root level d.ts to dist/types directory for distribution ([9fcad83](https://github.com/ionic-team/stencil/commit/9fcad83))
+* **collection:** remove side effect collection imports from JS output ([64b03d0](https://github.com/ionic-team/stencil/commit/64b03d0))
+* **types:** gather collect types during ts typechecking ([03349be](https://github.com/ionic-team/stencil/commit/03349be))
+
+
+### Refactor
+
+* **collections:** use node module resolution for collection dependencies ([0dd621c](https://github.com/ionic-team/stencil/commit/0dd621c))
+
+
+<a name="0.6.6"></a>
+## [0.6.6](https://github.com/ionic-team/stencil/compare/v0.6.5...v0.6.6) (2018-02-22)
+
+
+### Bug Fixes
+
+* **ref:** execute ref on vnode items that get added during update. ([b192def](https://github.com/ionic-team/stencil/commit/b192def))
+* **ref:** move callNodeRefs check to only occur on rerender not on initial load. ([f09a5ee](https://github.com/ionic-team/stencil/commit/f09a5ee))
+* **global:** always add global script to built context ([db594bd](https://github.com/ionic-team/stencil/commit/db594bd))
+* **types:** remove deprecated collection imports ([6103fef](https://github.com/ionic-team/stencil/commit/6103fef))
+
+
+<a name="0.6.5"></a>
+## [0.6.5](https://github.com/ionic-team/stencil/compare/v0.6.4...v0.6.5) (2018-02-20)
+
+
+### Bug Fixes
+
+* **prerender:** handle shadow components in patch ([0c9117e](https://github.com/ionic-team/stencil/commit/0c9117e)), closes [#553](https://github.com/ionic-team/stencil/issues/553)
+
+
+### Performance Improvements
+
+* **optimizeHtml:** default to optimize html when prerendering disabled ([d2def84](https://github.com/ionic-team/stencil/commit/d2def84))
+
+
+
+<a name="0.6.4"></a>
+## [0.6.4](https://github.com/ionic-team/stencil/compare/v0.6.3...v0.6.4) (2018-02-20)
+
+
+### Bug Fixes
+
+* **loader:** force es5 builds for file:// protocol ([851fcec](https://github.com/ionic-team/stencil/commit/851fcec)), closes [#517](https://github.com/ionic-team/stencil/issues/517)
+* **package:** move rollup-pluginutils to an external for the rollup build. ([90b295b](https://github.com/ionic-team/stencil/commit/90b295b))
+
+
+
 <a name="0.6.3"></a>
 ## [0.6.3](https://github.com/ionic-team/stencil/compare/v0.6.2...v0.6.3) (2018-02-19)
 

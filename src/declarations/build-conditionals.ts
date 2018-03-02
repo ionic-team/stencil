@@ -8,7 +8,7 @@ export interface BuildConditionals {
   clientSide?: boolean;
 
   // dev
-  devMode: boolean;
+  isDev: boolean;
   devInspector: boolean;
   verboseError: boolean;
 
@@ -46,4 +46,8 @@ export interface BuildConditionals {
 
   // svg
   svg: boolean;
+}
+
+export interface UserBuildConditionals {
+  isDev: boolean;
 }

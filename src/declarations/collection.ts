@@ -3,11 +3,15 @@ import * as d from './index';
 
 export interface Collection {
   collectionName?: string;
-  moduleDir ?: string;
+  moduleDir?: string;
   moduleFiles?: ModuleFile[];
   global?: ModuleFile;
   compiler?: CollectionCompiler;
   isInitialized?: boolean;
+  dependencies?: string[];
+  bundles?: {
+    components: string[];
+  }[];
 }
 
 
@@ -65,12 +69,25 @@ export interface ModuleBundles {
 
 export interface CollectionData {
   components?: ComponentData[];
+  collections?: CollectionDependencyData[];
   global?: string;
   compiler?: {
     name: string;
     version: string;
     typescriptVersion?: string;
   };
+  bundles?: CollectionBundle[];
+}
+
+
+export interface CollectionBundle {
+  components: string[];
+}
+
+
+export interface CollectionDependencyData {
+  name: string;
+  tags: string[];
 }
 
 

@@ -17,7 +17,7 @@ export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> 
   moduleFiles.forEach(filePath => {
     const moduleFile = ctx.moduleFiles[filePath];
 
-    if (!moduleFile.cmpMeta) {
+    if (!moduleFile.cmpMeta || moduleFile.isCollectionDependency) {
       return;
     }
 
@@ -43,12 +43,17 @@ export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> 
 async function genereateReadme(config: Config, ctx: CompilerCtx, moduleFile: ModuleFile, dirPath: string) {
   const readMePath = config.sys.path.join(dirPath, 'readme.md');
 
-  try {
-    const content = await ctx.fs.readFile(readMePath);
-    // update
-    return updateReadme(config, ctx, moduleFile, readMePath, content);
+  let existingContent: string = null;
 
-  } catch (e) {
+  try {
+    existingContent = await ctx.fs.readFile(readMePath);
+  } catch (e) {}
+
+  if (typeof existingContent === 'string' && existingContent.trim() !== '') {
+    // update
+    return updateReadme(config, ctx, moduleFile, readMePath, existingContent);
+
+  } else {
     // create
     return createReadme(config, ctx, moduleFile, readMePath);
   }
@@ -70,6 +75,10 @@ async function createReadme(config: Config, ctx: CompilerCtx, moduleFile: Module
 
 
 async function updateReadme(config: Config, ctx: CompilerCtx, moduleFile: ModuleFile, readMePath: string, existingContent: string) {
+  if (typeof existingContent !== 'string' || existingContent.trim() === '') {
+    throw new Error('missing existing content');
+  }
+
   const content: string[] = [];
 
   const existingLines = existingContent.split(/(\r?\n)/);

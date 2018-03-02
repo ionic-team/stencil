@@ -16,15 +16,15 @@ export class UsedSelectors {
     if (elm && elm.tagName) {
 
       // tags
-      var tagName = elm.tagName.toLowerCase();
+      const tagName = elm.tagName.toLowerCase();
       if (this.tags.indexOf(tagName) === -1) {
         this.tags.push(tagName);
       }
 
       // classes
-      var classList = elm.classList;
+      const classList = elm.classList;
       for (i = 0; i < classList.length; i++) {
-        var className = classList[i];
+        const className = classList[i];
 
         if (this.classNames.indexOf(className) === -1) {
           this.classNames.push(className);
@@ -33,11 +33,11 @@ export class UsedSelectors {
       }
 
       // attributes
-      var attributes = elm.attributes;
+      const attributes = elm.attributes;
       for (i = 0; i < attributes.length; i++) {
-        var attr = attributes[i];
+        const attr = attributes[i];
 
-        var attrName = attr.name.toLowerCase();
+        const attrName = attr.name.toLowerCase();
         if (!attrName || attrName === 'class' || attrName === 'id' || attrName === 'style') continue;
 
         if (this.attrs.indexOf(attrName) === -1) {

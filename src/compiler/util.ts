@@ -99,6 +99,8 @@ export async function minifyJs(config: Config, compilerCtx: CompilerCtx, jsText:
     opts.output.indent_level = 2;
     opts.output.comments = 'all';
     opts.output.preserve_line = true;
+  } else {
+    opts.compress.pure_funcs = ['assert', 'console.debug'];
   }
 
   opts.compress.passes = 2;

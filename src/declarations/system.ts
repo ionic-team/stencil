@@ -36,6 +36,7 @@ export interface StencilSystem {
   };
   minimatch?(path: string, pattern: string, opts?: any): boolean;
   resolveModule?(fromDir: string, moduleId: string): string;
+  parseArgv?: (cmdArgs: string[], opts?: any) => any;
   path?: Path;
   platform?: string;
   rollup?: {
@@ -120,6 +121,10 @@ export interface RollupPlugins {
 export interface PackageJsonData {
   name: string;
   version: string;
+  main?: string;
+  collection?: string;
+  types?: string;
+  files?: string[];
 }
 
 

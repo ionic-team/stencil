@@ -2,7 +2,7 @@ import { AppGlobal, DevInspector, DevInspectorApp, DevInspectorComponentData,
   DevInspectorComponentMeta, PlatformApi } from '../declarations';
 
 
-export function genereateDevInspector(App: AppGlobal, appNamespace: string, win: any, plt: PlatformApi) {
+export function generateDevInspector(App: AppGlobal, appNamespace: string, win: any, plt: PlatformApi) {
   const devInspector: DevInspector = win.devInspector = (win.devInspector || {});
 
   devInspector.apps = devInspector.apps || [];

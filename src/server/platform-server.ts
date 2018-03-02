@@ -1,16 +1,16 @@
 import { AppGlobal, CjsExports, CompilerCtx, ComponentMeta,
   ComponentRegistry, Config, CoreContext, Diagnostic,
   HostElement, HydrateResults, PlatformApi } from '../declarations';
-import { assignHostContentSlots } from '../core/renderer/slot';
-import { createDomApi } from '../core/renderer/dom-api';
+import { assignHostContentSlots } from '../renderer/vdom/slot';
+import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
-import { createRendererPatch } from '../core/renderer/patch';
+import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { getAppWWWBuildDir } from '../compiler/app/app-file-naming';
-import { h } from '../core/renderer/h';
+import { h } from '../renderer/vdom/h';
 import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';
-import { proxyController } from '../core/instance/proxy-controller';
+import { proxyController } from '../core/proxy-controller';
 import { toDashCase } from '../util/helpers';
 
 
@@ -26,7 +26,11 @@ export function createPlatformServer(
   const loadedBundles: {[bundleId: string]: any} = {};
   const styles: string[] = [];
   const controllerComponents: {[tag: string]: HostElement} = {};
-  const domApi = createDomApi(win, doc);
+
+  // create the app global
+  const App: AppGlobal = {};
+
+  const domApi = createDomApi(App, win, doc);
 
   // init build context
   compilerCtx = compilerCtx || {};
@@ -49,9 +53,6 @@ export function createPlatformServer(
   // add the Core global to the window context
   // Note: "Core" is not on the window context on the client-side
   win.Context = Context;
-
-  // create the app global
-  const App: AppGlobal = {};
 
   // add the h() fn to the app's global namespace
   App.h = h;

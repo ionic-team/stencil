@@ -1,6 +1,5 @@
 import { AssetsMeta, BuildCtx, CompilerCtx, Config, CopyTask } from '../../declarations';
 import { catchError, normalizePath, pathJoin } from '../util';
-import { COLLECTION_DEPENDENCIES_DIR } from '../collections/collection-data';
 import { getAppDistDir, getAppWWWBuildDir } from '../app/app-file-naming';
 
 
@@ -29,7 +28,7 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
         moduleFile.cmpMeta.assetsDirsMeta.forEach(assetsMeta => {
           copyToBuildDir.push(assetsMeta);
 
-          if (!moduleFile.excludeFromCollection) {
+          if (!moduleFile.excludeFromCollection && !moduleFile.isCollectionDependency) {
             copyToCollectionDir.push(assetsMeta);
           }
         });
@@ -66,7 +65,10 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
       // copy all of the files in asset directories to the app's collection directory
       copyToCollectionDir.forEach(assetsMeta => {
         // figure out what the path is to the component directory
-        const collectionDirDestination = getCollectionDirDestination(config, assetsMeta);
+        const collectionDirDestination = pathJoin(config,
+          config.collectionDir,
+          config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
+        );
 
         copyTasks.push({
           src: assetsMeta.absolutePath,
@@ -85,20 +87,6 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
   }
 }
 
-
-export function getCollectionDirDestination(config: Config, assetsMeta: AssetsMeta) {
-  // figure out what the path is to the component directory
-
-  if (assetsMeta.originalCollectionPath) {
-    // this is from another collection, so reuse the same path it had
-    return pathJoin(config, config.collectionDir, COLLECTION_DEPENDENCIES_DIR, assetsMeta.originalCollectionPath);
-  }
-
-  return pathJoin(config,
-    config.collectionDir,
-    config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
-  );
-}
 
 
 export function canSkipAssetsCopy(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {

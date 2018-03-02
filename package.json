@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "0.6.3",
+  "version": "0.6.16",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,9 +16,10 @@
     "testing/"
   ],
   "scripts": {
-    "build": "npm run clean && npm run build.compiler && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run build.sys.node && npm run submodules.create",
+    "build": "npm run clean && npm run build.compiler && npm run build.renderer.vdom && npm run build.core && npm run build.server && npm run build.testing && npm run build.cli && npm run build.sys.node && npm run submodules.create",
     "build.cli": "tsc -p src/cli/tsconfig.json && node scripts/build-cli.js",
     "build.compiler": "tsc -p src/compiler/tsconfig.json && node scripts/build-compiler.js",
+    "build.renderer.vdom": "tsc -p src/renderer/vdom/tsconfig.json && node scripts/build-renderer-vdom.js",
     "build.core": "tsc -p src/tsconfig.json && node scripts/build-loader.js && node scripts/build-core.js",
     "build.loader": "node scripts/build-loader.js",
     "build.server": "tsc -p src/server/tsconfig.json && node scripts/build-server.js",
@@ -38,13 +39,13 @@
   "dependencies": {
     "chokidar": "2.0.1",
     "jsdom": "11.5.1",
-    "rollup": "0.55.5",
+    "rollup": "0.56.3",
     "rollup-plugin-commonjs": "8.3.0",
     "rollup-plugin-node-builtins": "2.1.2",
     "rollup-plugin-node-globals": "1.1.0",
     "rollup-plugin-node-resolve": "3.0.3",
     "rollup-pluginutils": "^2.0.1",
-    "typescript": "^2.7.1",
+    "typescript": "^2.7.2",
     "uglify-es": "3.3.9",
     "workbox-build": "3.0.0-alpha.6"
   },
@@ -70,6 +71,7 @@
     "listr": "^0.13.0",
     "magic-string": "^0.22.4",
     "minimatch": "^3.0.4",
+    "minimist": "^1.2.0",
     "node-fetch": "1.7.3",
     "semver": "^5.5.0",
     "source-map": "^0.7.0",

@@ -1,32 +1,34 @@
 import { AppGlobal, BundleCallback, CjsExports, ComponentMeta, ComponentRegistry, CoreContext,
-  EventEmitterData, HostElement, LoadComponentRegistry, PlatformApi } from '../declarations';
-import { assignHostContentSlots } from '../core/renderer/slot';
-import { attachStyles } from '../core/instance/styles';
+  EventEmitterData, HostElement, PlatformApi } from '../declarations';
+import { assignHostContentSlots } from '../renderer/vdom/slot';
+import { attachStyles } from '../core/styles';
 import { Build } from '../util/build-conditionals';
-import { createDomApi } from '../core/renderer/dom-api';
-import { createRendererPatch } from '../core/renderer/patch';
-import { createVNodesFromSsr } from '../core/renderer/ssr';
+import { createDomApi } from '../renderer/dom-api';
+import { createRendererPatch } from '../renderer/vdom/patch';
+import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './css-shim/custom-style';
-import { enableEventListener } from '../core/instance/listeners';
+import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION, PROP_TYPE, SSR_VNODE_ID } from '../util/constants';
-import { h } from '../core/renderer/h';
+import { generateDevInspector } from './dev-inspector';
+import { h } from '../renderer/vdom/h';
 import { initCssVarShim } from './css-shim/init-css-shim';
-import { initHostElement } from '../core/instance/init-host-element';
-import { initStyleTemplate } from '../core/instance/styles';
+import { initHostElement } from '../core/init-host-element';
+import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
-import { proxyController } from '../core/instance/proxy-controller';
+import { proxyController } from '../core/proxy-controller';
 import { toDashCase } from '../util/helpers';
-import { useScopedCss, useShadowDom } from '../core/renderer/encapsulation';
+import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
+export function createPlatformClientLegacy(appNamespace: string, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const bundleQueue: BundleCallback[] = [];
   const loadedBundles: {[bundleId: string]: any} = {};
   const pendingBundleRequests: {[url: string]: boolean} = {};
   const controllerComponents: {[tag: string]: HostElement} = {};
-  const domApi = createDomApi(win, doc);
+  const App: AppGlobal = (win as any)[appNamespace] = (win as any)[appNamespace] || {};
+  const domApi = createDomApi(App, win, doc);
 
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);
@@ -63,8 +65,7 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     loadBundle: loadComponent,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
-    queue: createQueueClient(win),
-    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoader(data, cmpRegistry)),
+    queue: createQueueClient(App, win),
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -93,7 +94,10 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
   rootElm.$activeLoading = [];
 
   // this will fire when all components have finished loaded
-  rootElm.$initLoad = () => plt.hasLoadedMap.set(rootElm, true);
+  rootElm.$initLoad = () => {
+    plt.hasLoadedMap.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    domApi.$dispatchEvent(win, 'appload', { detail: { namespace: appNamespace } });
+  };
 
   // if the HTML was generated from SSR
   // then let's walk the tree and generate vnodes out of the data
@@ -354,5 +358,29 @@ export function createPlatformClientLegacy(Context: CoreContext, App: AppGlobal,
     };
   }
 
-  return plt;
+  if (Build.devInspector) {
+    generateDevInspector(App, appNamespace, window, plt);
+  }
+
+  // register all the components now that everything's ready
+  (App.components || [])
+    .map(data => parseComponentLoader(data, cmpRegistry))
+    .forEach(cmpMeta => {
+    // es5 way of extending HTMLElement
+    function HostElement(self: any) {
+      return HTMLElement.call(this, self);
+    }
+
+    HostElement.prototype = Object.create(
+      HTMLElement.prototype,
+      { constructor: { value: HostElement, configurable: true } }
+    );
+
+    plt.defineComponent(cmpMeta, HostElement);
+  });
+
+  // notify that the app has initialized and the core script is ready
+  // but note that the components have not fully loaded yet, that's the "appload" event
+  App.initialized = true;
+  domApi.$dispatchEvent(win, 'appload', { detail: { namespace: appNamespace } });
 }

@@ -45,6 +45,9 @@ function bundleCompiler() {
       process.exit(1);
     });
 
+  }).catch(err => {
+    console.log(`build server error: ${err}`);
+    process.exit(1);
   });
 }
 

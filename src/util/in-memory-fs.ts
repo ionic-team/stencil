@@ -139,8 +139,43 @@ export class InMemoryFileSystem {
 
     const collectedPaths: FsReaddirItem[] = [];
 
-    // always a disk read
-    await this.readDirectory(dirPath, dirPath, opts, collectedPaths);
+    if (opts.inMemoryOnly) {
+      let inMemoryDir = dirPath;
+      if (!inMemoryDir.endsWith('/')) {
+        inMemoryDir += '/';
+      }
+
+      const inMemoryDirs = dirPath.split('/');
+
+      const filePaths = Object.keys(this.d);
+
+      filePaths.forEach(filePath => {
+        if (!filePath.startsWith(dirPath)) {
+          return;
+        }
+
+        const parts = filePath.split('/');
+
+        if (parts.length === inMemoryDirs.length + 1 || (opts.recursive && parts.length > inMemoryDirs.length)) {
+          const d = this.d[filePath];
+
+          if (d.exists) {
+            // console.log(filePath, d)
+            const item: FsReaddirItem = {
+              absPath: filePath,
+              relPath: parts[inMemoryDirs.length],
+              isDirectory: d.isDirectory,
+              isFile: d.isFile
+            };
+            collectedPaths.push(item);
+          }
+        }
+      });
+
+    } else {
+      // always a disk read
+      await this.readDirectory(dirPath, dirPath, opts, collectedPaths);
+    }
 
     return collectedPaths.sort((a, b) => {
       if (a.absPath < b.absPath) return -1;

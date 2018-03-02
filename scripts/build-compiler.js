@@ -22,6 +22,7 @@ function bundleCompiler() {
       'rollup-plugin-node-resolve',
       'rollup-plugin-node-builtins',
       'rollup-plugin-node-globals',
+      'rollup-pluginutils',
       'typescript',
       'util'
     ],
@@ -55,6 +56,9 @@ function bundleCompiler() {
       console.log(`build compiler error: ${err}`);
     });
 
+  }).catch(err => {
+    console.log(`build compiler error: ${err}`);
+    process.exit(1);
   });
 }
 

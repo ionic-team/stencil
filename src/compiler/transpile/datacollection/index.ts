@@ -1,4 +1,5 @@
-import { Config, ComponentRegistry, ComponentMeta, Diagnostic } from '../../../util/interfaces';
+import { BuildCtx, CompilerCtx, ComponentMeta, ComponentRegistry, Config, Diagnostic } from '../../../declarations';
+import { getCollections } from './discover-collections';
 import { getComponentDecoratorMeta } from './component-decorator';
 import { getElementDecoratorMeta } from './element-decorator';
 import { getEventDecoratorMeta } from './event-decorator';
@@ -12,11 +13,11 @@ import { validateComponentClass } from './validate-component';
 import * as ts from 'typescript';
 
 
-export function gatherMetadata(config: Config, typechecker: ts.TypeChecker, sourceFileList: ReadonlyArray<ts.SourceFile>): ComponentRegistry {
+export function gatherMetadata(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, typechecker: ts.TypeChecker, sourceFileList: ReadonlyArray<ts.SourceFile>): ComponentRegistry {
   const componentMetaList: ComponentRegistry = {};
   const diagnostics: Diagnostic[] = [];
 
-  const visitFile = visitFactory(config, typechecker, componentMetaList, diagnostics);
+  const visitFile = visitFactory(config, compilerCtx, buildCtx, typechecker, componentMetaList, diagnostics);
 
   // Visit every sourceFile in the program
   for (const sourceFile of sourceFileList) {
@@ -27,9 +28,13 @@ export function gatherMetadata(config: Config, typechecker: ts.TypeChecker, sour
   return componentMetaList;
 }
 
-function visitFactory(config: Config, checker: ts.TypeChecker, componentMetaList: ComponentRegistry, diagnostics: Diagnostic[]) {
+function visitFactory(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, checker: ts.TypeChecker, componentMetaList: ComponentRegistry, diagnostics: Diagnostic[]) {
 
   return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
+    if (node.kind === ts.SyntaxKind.ImportDeclaration) {
+      getCollections(config, compilerCtx, buildCtx, node as ts.ImportDeclaration);
+    }
+
     if (ts.isClassDeclaration(node)) {
       const cmpMeta = visitClass(config, checker, node as ts.ClassDeclaration, sourceFile, diagnostics);
       if (cmpMeta) {
@@ -37,6 +42,7 @@ function visitFactory(config: Config, checker: ts.TypeChecker, componentMetaList
         componentMetaList[tsFilePath] = cmpMeta;
       }
     }
+
     ts.forEachChild(node, (node) => {
       visit(node, sourceFile);
     });

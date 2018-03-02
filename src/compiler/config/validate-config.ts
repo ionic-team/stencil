@@ -1,5 +1,6 @@
 import { Config } from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
+import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateCopy } from './validate-copy';
 import { validateNamespace } from './validate-namespace';
 import { validatePaths } from './validate-paths';
@@ -83,6 +84,8 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   validateCopy(config);
 
   validatePlugins(config);
+
+  validateAssetVerioning(config);
 
   if (!config.watchIgnoredRegex) {
     config.watchIgnoredRegex = DEFAULT_WATCH_IGNORED_REGEX;

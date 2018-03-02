@@ -19,6 +19,7 @@ function bundleTestingUtils() {
       'rollup-plugin-node-resolve',
       'rollup-plugin-node-builtins',
       'rollup-plugin-node-globals',
+      'rollup-pluginutils',
       'typescript',
       'fs',
       'path'
@@ -52,6 +53,9 @@ function bundleTestingUtils() {
       process.exit(1);
     });
 
+  }).catch(err => {
+    console.log(`build testing error: ${err}`);
+    process.exit(1);
   });
 }
 

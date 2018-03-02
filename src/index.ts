@@ -8,10 +8,14 @@ export {
   ComponentWillLoad,
   ComponentWillUpdate,
   Config,
-  CssClassMap,
   EventEmitter,
   EventListenerEnable
 } from './declarations';
+
+/**
+ * Build
+ */
+export declare const Build: d.UserBuildConditionals;
 
 /**
  * Component

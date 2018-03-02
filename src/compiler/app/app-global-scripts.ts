@@ -82,6 +82,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
   const cacheKey = compilerCtx.cache.createKey('bundleProjectGlobal', namespace, entry, sourceTarget);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
+    buildCtx.global = compilerCtx.moduleFiles[config.globalScript];
     return cachedContent;
   }
 

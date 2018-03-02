@@ -1,6 +1,8 @@
 import { TestingCompiler } from '../../../testing';
 import { wroteFile } from '../../../testing/utils';
+import { normalizePath } from '../../../compiler/util';
 import * as path from 'path';
+import * as fs from 'fs';
 import * as ts from 'typescript';
 
 
@@ -153,6 +155,69 @@ describe('transpile', () => {
     expect(r.transpileBuildCount).toBe(1);
     expect(r.transpileBuildCount).toBe(1);
     expect(r.hasChangedJsText).toBe(false);
+  });
+
+  it('should transpile with core and without typescript errors', async () => {
+    // this one takes a bit longer
+    jest.setTimeout(20 * 1000);
+
+    const nodeModulesDir = path.resolve(__dirname, '../../../../node_modules');
+    const distDir = path.resolve(__dirname, '../../../../dist');
+
+    c.config.suppressTypeScriptErrors = false;
+    c.config.buildAppCore = true;
+
+    // typescript needs real node modules and stencil dist files
+    // so we need to bypass the testing-fs for these.
+    const originalReadFileSync = c.fs.readFileSync.bind(c.fs);
+    const originalStatSync = c.fs.statSync.bind(c.fs);
+    c.fs.readFileSync = (filePath) => {
+      filePath = normalizePath(filePath);
+      if (filePath.indexOf(nodeModulesDir) === 0 || filePath.indexOf(distDir) === 0) {
+        return fs.readFileSync(filePath).toString();
+      }
+
+      return originalReadFileSync(filePath);
+    };
+    c.fs.statSync = (itemPath) => {
+      itemPath = normalizePath(itemPath);
+      if (itemPath.indexOf(nodeModulesDir) === 0 || itemPath.indexOf(distDir) === 0) {
+        return fs.statSync(itemPath);
+      }
+
+      return originalStatSync(itemPath);
+    };
+
+    await c.fs.writeFiles({
+      '/tsconfig.json': JSON.stringify({
+        compilerOptions: {
+          baseUrl: nodeModulesDir,
+          paths: {
+            '@stencil/core': [path.join(
+              path.relative(nodeModulesDir, distDir),
+              'index.d.ts'
+            )]
+          }
+        }
+      }),
+      '/src/cmp-a.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      '/src/some-dir/cmp-b.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-b' }) export class CmpB {}`,
+      '/src/some-dir/cmp-c.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-c' }) export class CmpC {}`
+    });
+    await c.fs.commit();
+
+    // kick off the initial build, wait for it to finish
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+
+    expect(wroteFile(r, '/www/build/app.js')).toBe(true);
+    expect(wroteFile(r, '/www/build/app/app.core.js')).toBe(true);
+    expect(wroteFile(r, '/www/build/app/app.registry.json')).toBe(true);
+    expect(wroteFile(r, '/www/build/app/cmp-a.js')).toBe(true);
+    expect(wroteFile(r, '/www/build/app/cmp-b.js')).toBe(true);
+    expect(wroteFile(r, '/www/build/app/cmp-c.js')).toBe(true);
+
+    expect(r.entries[0].components[0].tag).toEqual('cmp-a');
   });
 
 });

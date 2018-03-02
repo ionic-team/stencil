@@ -6,8 +6,8 @@ export async function setBuildConditionals(config: Config, ctx: CompilerCtx, ent
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
   coreBuild.clientSide = true;
+  coreBuild.isDev = !!config.devMode;
 
-  coreBuild.devMode = config.devMode;
   coreBuild.devInspector = config.devInspector;
   coreBuild.verboseError = config.devMode;
 

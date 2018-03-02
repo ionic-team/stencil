@@ -1,10 +1,11 @@
-import { BuildCtx, CompilerCtx, Config, HydrateOptions, HydrateResults, PrerenderLocation } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, HydrateOptions, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
 import { catchError } from '../util';
 import { Renderer } from '../../server/index';
 
 
 export async function prerenderPath(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
-  const timeSpan = config.logger.createTimeSpan(`prerender, started: ${prerenderLocation.path}`);
+  const msg = (config.prerender as PrerenderConfig).hydrateComponents ? 'prerender' : 'optimize html';
+  const timeSpan = config.logger.createTimeSpan(`${msg}, started: ${prerenderLocation.path}`);
 
   const results: HydrateResults = {
     diagnostics: []
@@ -38,7 +39,7 @@ export async function prerenderPath(config: Config, compilerCtx: CompilerCtx, bu
     catchError(buildCtx.diagnostics, e);
   }
 
-  timeSpan.finish(`prerender, finished: ${prerenderLocation.path}`);
+  timeSpan.finish(`${msg}, finished: ${prerenderLocation.path}`);
 
   return results;
 }

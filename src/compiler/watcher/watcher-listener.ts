@@ -1,5 +1,5 @@
 import { CompilerCtx, Config, WatcherResults } from '../../declarations';
-import { COMPONENTS_DTS } from '../build/distribution';
+import { COMPONENTS_DTS } from '../collections/distribution';
 import { copyTasks, isCopyTaskFile } from '../copy/copy-tasks';
 import { isDtsFile, isWebDevFile, normalizePath } from '../util';
 import { rebuild } from './rebuild';

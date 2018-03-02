@@ -1,8 +1,7 @@
-import { Config, ServiceWorkerConfig, CompilerCtx } from '../../util/interfaces';
-import { minifyJs } from '../util';
+import { Config, ServiceWorkerConfig } from '../../declarations';
 
 
-export async function injectRegisterServiceWorker(config: Config, compilerCtx: CompilerCtx, swConfig: ServiceWorkerConfig, indexHtml: string) {
+export async function injectRegisterServiceWorker(config: Config, swConfig: ServiceWorkerConfig, indexHtml: string) {
   const match = indexHtml.match(BODY_CLOSE_REG);
 
   let swUrl = config.sys.path.relative(config.wwwDir, swConfig.swDest);
@@ -10,17 +9,7 @@ export async function injectRegisterServiceWorker(config: Config, compilerCtx: C
     swUrl = '/' + swUrl;
   }
   if (match) {
-    let serviceWorker = getRegisterSwScript(swUrl);
-    if (config.minifyJs) {
-      const minifyResults = await minifyJs(config, compilerCtx, serviceWorker, 'es5', false);
-      minifyResults.diagnostics.forEach(d => {
-        (config.logger as any)[d.level](d.messageText);
-      });
-
-      if (!minifyResults.diagnostics.length) {
-        serviceWorker = minifyResults.output;
-      }
-    }
+    const serviceWorker = getRegisterSwScript(swUrl);
     indexHtml = indexHtml.replace(match[0], `<script>${serviceWorker}</script>\n${match[0]}`);
   }
 
@@ -68,8 +57,10 @@ const UNREGSITER_SW = `
   <script>
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       // auto-unregister service worker during dev mode
-      navigator.serviceWorker.ready.then(function(registration) {
-        registration.unregister().then(function() { location.reload(true) });
+      navigator.serviceWorker.getRegistration().then(function(registration) {
+        if (registration) {
+          registration.unregister().then(function() { location.reload(true) });
+        }
       });
     }
   </script>

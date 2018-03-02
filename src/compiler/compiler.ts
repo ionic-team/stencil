@@ -5,7 +5,7 @@ import { docs } from './docs/docs';
 import { getCompilerCtx } from './build/compiler-ctx';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { validateBuildConfig } from '../compiler/config/validate-config';
-import { validatePrerenderConfig } from './prerender/validate-prerender-config';
+import { validatePrerenderConfig } from '../compiler/config/validate-prerender-config';
 import { validateServiceWorkerConfig } from './service-worker/validate-sw-config';
 
 

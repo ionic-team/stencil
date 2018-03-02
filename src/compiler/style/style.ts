@@ -1,8 +1,9 @@
 import { BuildCtx, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile, StyleMeta } from '../../declarations';
+import { buildError, hasFileExtension, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
-import { hasFileExtension, normalizePath } from '../util';
+import { minifyStyle } from './minify-style';
 import { runPluginTransforms } from '../plugin/plugin';
-import { scopeComponentCss } from '../css/scope-css';
+import { scopeComponentCss } from './scope-css';
 
 
 export async function generateStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
@@ -22,65 +23,127 @@ export async function generateComponentStyles(config: Config, compilerCtx: Compi
 
   await Promise.all(Object.keys(stylesMeta).map(async modeName => {
     // compile each style mode's sass/css
-    const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile.jsFilePath, stylesMeta[modeName]);
+    const styles = await compileStyles(config, compilerCtx, buildCtx, moduleFile, stylesMeta[modeName]);
 
     // format and set the styles for use later
-    await setStyleText(buildCtx, moduleFile.cmpMeta, stylesMeta[modeName], styles);
+    await setStyleText(config, compilerCtx, buildCtx, moduleFile.cmpMeta, stylesMeta[modeName], styles);
   }));
 }
 
 
-async function compileStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, jsFilePath: string, styleMeta: StyleMeta) {
-  const absStylePath: string[] = styleMeta.externalStyles.map(externalStyle => {
-    return externalStyle.absolutePath;
+async function compileStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, moduleFile: ModuleFile, styleMeta: StyleMeta) {
+  const extStylePaths = styleMeta.externalStyles.map(extStyle => {
+    return extStyle.absolutePath;
   });
-
 
   if (typeof styleMeta.styleStr === 'string') {
     // plain styles just in a string
     // let's put these file in an in-memory file
-    const inlineAbsPath = jsFilePath + '.css';
-    absStylePath.push(inlineAbsPath);
+    const inlineAbsPath = moduleFile.jsFilePath + '.css';
+    extStylePaths.push(inlineAbsPath);
     await compilerCtx.fs.writeFile(inlineAbsPath, styleMeta.styleStr, { inMemoryOnly: true });
   }
 
-  const styles = await Promise.all(absStylePath.map(async filePath => {
-    filePath = normalizePath(filePath);
-
-    // test for well-known extensions and if the plugin has been installed
-    if (hasFileExtension(filePath, ['scss', 'sass'])) {
-      if (!config.plugins.some(p => p.name === 'sass')) {
-        // using a sass file, however the sass plugin isn't installed
-        if (!buildCtx.data.hasShownSassError) {
-          const relPath = config.sys.path.relative(config.rootDir, filePath);
-          config.logger.error(`Style "${relPath}" is a Sass file, however the "sass" plugin has not been installed. Please install the "@stencil/sass" plugin and add it to "config.plugins" within the project's stencil.config.js file. For more info please see: https://www.npmjs.com/package/@stencil/sass`);
-          buildCtx.data.hasShownSassError = true;
-        }
-      }
-
-    } else if (hasFileExtension(filePath, ['pcss'])) {
-      if (!config.plugins.some(p => p.name === 'postcss')) {
-        // using a pcss file, however the postcss plugin isn't installed
-        if (!buildCtx.data.hasShownPostCssError) {
-          const relPath = config.sys.path.relative(config.rootDir, filePath);
-          config.logger.error(`Style "${relPath}" is a PostCSS file, however the "postcss" plugin has not been installed. Please install the "@stencil/postcss" plugin and add it to "config.plugins" within the project's stencil.config.js file. For more info please see: https://www.npmjs.com/package/@stencil/postcss`);
-          buildCtx.data.hasShownPostCssError = true;
-        }
-      }
-    }
-
-    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
-
-    return transformResults.code;
+  const styles = await Promise.all(extStylePaths.map(extStylePath => {
+    return compileExternalStyle(config, compilerCtx, buildCtx, moduleFile, extStylePath);
   }));
 
   return styles;
 }
 
 
-export function setStyleText(buildCtx: BuildCtx, cmpMeta: ComponentMeta, styleMeta: StyleMeta, styles: string[]) {
+async function compileExternalStyle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, moduleFile: ModuleFile, extStylePath: string) {
+  extStylePath = normalizePath(extStylePath);
+
+  if (moduleFile.isCollectionDependency) {
+    // if it's a collection dependency and it's a preprocessor file like sass
+    // AND we have the correct plugin then let's compile it
+    const hasPlugin = hasPluginInstalled(config, extStylePath);
+    if (!hasPlugin) {
+      // the collection has this style as a preprocessor file, like sass
+      // however the user doesn't have this plugin installed, which is file
+      // instead of using the preprocessor file (sass) use the vanilla css file
+      const parts = extStylePath.split('.');
+      parts[parts.length - 1] = 'css';
+      extStylePath = parts.join('.');
+    }
+
+  } else {
+    // not a collection dependency
+    // check known extensions just for a helpful message
+    checkPluginHelpers(config, buildCtx, extStylePath);
+  }
+
+  const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
+
+  if (config.generateDistribution && !moduleFile.isCollectionDependency) {
+    const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
+    const collectionPath = config.sys.path.join(config.collectionDir, relPath);
+    await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
+  }
+
+  return transformResults.code;
+}
+
+
+function checkPluginHelpers(config: Config, buildCtx: BuildCtx, externalStylePath: string) {
+  PLUGIN_HELPERS.forEach(p => {
+    checkPluginHelper(config, buildCtx, externalStylePath, p.pluginExts, p.pluginId, p.pluginName);
+  });
+}
+
+
+function checkPluginHelper(config: Config, buildCtx: BuildCtx, externalStylePath: string, pluginExts: string[], pluginId: string, pluginName: string) {
+  if (!hasFileExtension(externalStylePath, pluginExts)) {
+    return;
+  }
+
+  if (config.plugins.some(p => p.name === pluginId)) {
+    return;
+  }
+
+  const errorKey = 'styleError' + pluginId;
+  if (buildCtx.data[errorKey]) {
+    // already added this key
+    return;
+  }
+  buildCtx.data[errorKey] = true;
+
+  const relPath = config.sys.path.relative(config.rootDir, externalStylePath);
+
+  const msg = [
+    `Style "${relPath}" is a ${pluginName} file, however the "${pluginId}" `,
+    `plugin has not been installed. Please install the "@stencil/${pluginId}" `,
+    `plugin and add it to "config.plugins" within the project's stencil.config.js `,
+    `file. For more info please see: https://www.npmjs.com/package/@stencil/${pluginId}`
+  ].join('');
+
+  const d = buildError(buildCtx.diagnostics);
+  d.header = 'style error';
+  d.messageText = msg;
+}
+
+
+function hasPluginInstalled(config: Config, filePath: string) {
+  // TODO: don't hard these
+
+  const plugin = PLUGIN_HELPERS.find(p => hasFileExtension(filePath, p.pluginExts));
+  if (plugin) {
+    return config.plugins.some(p => p.name === plugin.pluginId);
+  }
+
+  return false;
+}
+
+
+export async function setStyleText(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, cmpMeta: ComponentMeta, styleMeta: StyleMeta, styles: string[]) {
   // join all the component's styles for this mode together into one line
-  styleMeta.compiledStyleText = styles.join('\n\n').trim();
+
+  if (config.minifyCss) {
+    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styles.join(''));
+  } else {
+    styleMeta.compiledStyleText = styles.join('\n\n').trim();
+  }
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
     // only create scoped styles if we need to
@@ -107,3 +170,26 @@ export function escapeCssForJs(style: string) {
 export function requiresScopedStyles(encapsulation: ENCAPSULATION) {
   return (encapsulation === ENCAPSULATION.ScopedCss || encapsulation === ENCAPSULATION.ShadowDom);
 }
+
+
+const PLUGIN_HELPERS = [
+  {
+    pluginName: 'PostCSS',
+    pluginId: 'postcss',
+    pluginExts: ['pcss']
+  },
+  {
+    pluginName: 'Sass',
+    pluginId: 'sass',
+    pluginExts: ['scss', 'sass']
+  },
+  {
+    pluginName: 'Stylus',
+    pluginId: 'stylus',
+    pluginExts: ['styl', 'stylus']
+  }, {
+    pluginName: 'Less',
+    pluginId: 'less',
+    pluginExts: ['less']
+  }
+];
