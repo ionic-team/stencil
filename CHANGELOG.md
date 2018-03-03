@@ -1,3 +1,21 @@
+<a name="0.6.17"></a>
+## [0.6.17](https://github.com/ionic-team/stencil/compare/v0.6.16...v0.6.17) (2018-03-03)
+
+
+### Bug Fixes
+
+* **sw:** update sw unregistration ([9864159](https://github.com/ionic-team/stencil/commit/9864159))
+
+
+### Features
+
+* **App:** expose addEventListener to app global so external libs can override ([ed99d45](https://github.com/ionic-team/stencil/commit/ed99d45))
+* **App:** expose raf to app global so external libs can override raf ([0fb14a3](https://github.com/ionic-team/stencil/commit/0fb14a3))
+* **Build:** user-land Build conditions ([c855353](https://github.com/ionic-team/stencil/commit/c855353))
+* **events:** dispatch "appinit" and "appload" events on window ([639626b](https://github.com/ionic-team/stencil/commit/639626b))
+
+
+
 <a name="0.6.16"></a>
 ## [0.6.16](https://github.com/ionic-team/stencil/compare/v0.6.15...v0.6.16) (2018-03-01)
 
