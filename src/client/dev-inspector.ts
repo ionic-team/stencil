@@ -1,9 +1,8 @@
-import { AppGlobal, DevInspector, DevInspectorApp, DevInspectorComponentData,
-  DevInspectorComponentMeta, PlatformApi } from '../declarations';
+import * as d from '../declarations';
 
 
-export function generateDevInspector(App: AppGlobal, appNamespace: string, win: any, plt: PlatformApi) {
-  const devInspector: DevInspector = win.devInspector = (win.devInspector || {});
+export function generateDevInspector(App: d.AppGlobal, appNamespace: string, win: any, plt: d.PlatformApi) {
+  const devInspector: d.DevInspector = win.devInspector = (win.devInspector || {});
 
   devInspector.apps = devInspector.apps || [];
   devInspector.apps.push(generateDevInspectorApp(App, appNamespace, plt));
@@ -20,14 +19,14 @@ export function generateDevInspector(App: AppGlobal, appNamespace: string, win: 
 
   if (!devInspector.getComponents) {
     devInspector.getComponents = () => {
-      const appsMetadata: Promise<DevInspectorComponentMeta[]>[] = [];
+      const appsMetadata: Promise<d.DevInspectorComponentMeta[]>[] = [];
 
       devInspector.apps.forEach(app => {
         appsMetadata.push(app.getComponents());
       });
 
       return Promise.all(appsMetadata).then(appMetadata => {
-        const allMetadata: DevInspectorComponentMeta[] = [];
+        const allMetadata: d.DevInspectorComponentMeta[] = [];
 
         appMetadata.forEach(metadata => {
           metadata.forEach(m => {
@@ -44,8 +43,8 @@ export function generateDevInspector(App: AppGlobal, appNamespace: string, win: 
 }
 
 
-function generateDevInspectorApp(App: AppGlobal, appNamespace: string, plt: PlatformApi) {
-  const app: DevInspectorApp = {
+function generateDevInspectorApp(App: d.AppGlobal, appNamespace: string, plt: d.PlatformApi) {
+  const app: d.DevInspectorApp = {
 
     namespace: appNamespace,
 
@@ -56,7 +55,7 @@ function generateDevInspectorApp(App: AppGlobal, appNamespace: string, plt: Plat
           getComponentInstance(plt, elm)
         ]).then(results => {
           if (results[0] && results[1]) {
-            const cmp: DevInspectorComponentData = {
+            const cmp: d.DevInspectorComponentData = {
               meta: results[0],
               instance: results[1]
             };
@@ -85,7 +84,56 @@ function generateDevInspectorApp(App: AppGlobal, appNamespace: string, plt: Plat
 }
 
 
-function getComponentMeta(plt: PlatformApi, tagName: string): Promise<DevInspectorComponentMeta> {
+function getMembersMeta(properties: d.ComponentConstructorProperties): d.DevInspectorMembersMap {
+  return Object.keys(properties).reduce((membersMap: d.DevInspectorMembersMap, memberKey) => {
+    const prop = properties[memberKey];
+
+    let category: 'states' | 'elements' | 'methods' | 'props';
+    const member: any = {
+      name: memberKey
+    };
+
+    if (prop.state) {
+      category = 'states';
+
+      member.watchers = prop.watchCallbacks || [];
+    } else if (prop.elementRef) {
+      category = 'elements';
+    } else if (prop.method) {
+      category = 'methods';
+    } else {
+      category = 'props';
+
+      let type = 'any';
+
+      if (prop.type) {
+        type = prop.type as string;
+
+        if (typeof prop.type === 'function') {
+          type = prop.type.name;
+        }
+      }
+
+      member.type = type.toLowerCase();
+      member.mutable = prop.mutable || false;
+      member.connect = prop.connect || '-';
+      member.context = prop.connect || '-';
+      member.watchers = prop.watchCallbacks || [];
+    }
+
+    (membersMap[category] as any).push(member);
+
+    return membersMap;
+  }, {
+      props: [],
+      states: [],
+      elements: [],
+      methods: []
+    });
+}
+
+
+function getComponentMeta(plt: d.PlatformApi, tagName: string): Promise<d.DevInspectorComponentMeta> {
   const elm = { tagName: tagName } as any;
   const internalMeta = plt.getComponentMeta(elm);
 
@@ -95,16 +143,34 @@ function getComponentMeta(plt: PlatformApi, tagName: string): Promise<DevInspect
 
   const cmpCtr = internalMeta.componentConstructor;
 
-  const meta: DevInspectorComponentMeta = {
-    is: cmpCtr.is,
-    properties: cmpCtr.properties,
-    events: cmpCtr.events,
-    encapsulation: cmpCtr.encapsulation
+  const members = getMembersMeta(cmpCtr.properties || {});
+
+  const listeners = (internalMeta.listenersMeta || []).map(listenerMeta => {
+    return {
+      event: listenerMeta.eventName,
+      capture: listenerMeta.eventCapture,
+      disabled: listenerMeta.eventDisabled,
+      passive: listenerMeta.eventPassive,
+      method: listenerMeta.eventMethodName
+    };
+  });
+
+  const emmiters = cmpCtr.events || [];
+
+  const meta: d.DevInspectorComponentMeta = {
+    tag: cmpCtr.is,
+    bundle: internalMeta.bundleIds || 'unknown',
+    encapsulation: cmpCtr.encapsulation || 'none',
+    ...members,
+    events: {
+      emmiters,
+      listeners
+    }
   };
 
   return Promise.resolve(meta);
 }
 
-function getComponentInstance(plt: PlatformApi, elm: any) {
+function getComponentInstance(plt: d.PlatformApi, elm: any) {
   return Promise.resolve(plt.instanceMap.get(elm));
 }

@@ -24,8 +24,67 @@ export interface DevInspectorComponentData {
 
 
 export interface DevInspectorComponentMeta {
-  is?: string;
-  properties?: d.ComponentConstructorProperties;
-  events?: d.ComponentConstructorEvent[];
-  encapsulation?: d.Encapsulation;
+  tag: string;
+  bundle: string | d.BundleIds;
+  encapsulation: d.Encapsulation;
+  props: DevInspectorPropMeta[];
+  states: DevInspectorStateMeta[];
+  elements: DevInspectorElementMeta[];
+  methods: DevInspectorMethodMeta[];
+  events: {
+    emmiters: DevInspectorEmmiterMeta[];
+    listeners: DevInspectorListenerMeta[];
+  };
+}
+
+
+export interface DevInspectorPropMeta {
+  name: string;
+  type: string;
+  connect: string;
+  context: string;
+  mutable: false;
+  watchers: string[];
+}
+
+
+export interface DevInspectorStateMeta {
+  name: string;
+  watchers: string[];
+}
+
+
+export interface DevInspectorElementMeta {
+  name: string;
+}
+
+
+export interface DevInspectorMethodMeta {
+  name: string;
+}
+
+
+export interface DevInspectorMembersMap {
+  props: DevInspectorPropMeta[];
+  states: DevInspectorStateMeta[];
+  elements: DevInspectorElementMeta[];
+  methods: DevInspectorMethodMeta[];
+}
+
+
+export interface DevInspectorListenerMeta {
+  event: string;
+  capture: boolean;
+  disabled: boolean;
+  passive: boolean;
+  method: string;
+}
+
+
+export interface DevInspectorEmmiterMeta {
+  name: string;
+  bubbles: boolean;
+  cancelable: boolean;
+  composed: boolean;
+  method: string;
 }
