@@ -25,6 +25,7 @@ const POLYFILLS = [
   'array-find.js',
   'object-assign.js',
   'string-startswith.js',
+  'string-endswith.js',
   'promise.js',
   'fetch.js',
   'request-animation-frame.js',
