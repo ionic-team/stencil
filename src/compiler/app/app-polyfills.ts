@@ -23,6 +23,7 @@ const POLYFILLS = [
   'template.js',
   'document-register-element.js',
   'array-find.js',
+  'array-includes.js',
   'object-assign.js',
   'string-startswith.js',
   'string-endswith.js',
