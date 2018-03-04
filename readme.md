@@ -176,7 +176,7 @@ For the small minority of browsers that do not support modern browser features a
  - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE)
 
 
--[npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg	+
--[npm-badge-url]: https://www.npmjs.com/package/@stencil/core	+## Related
--[circle-badge]: https://circleci.com/gh/ionic-team/stencil.svg?style=shield	+
--[circle-badge-url]: https://circleci.com/gh/ionic-team/stencil
+[npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg
+[npm-badge-url]: https://www.npmjs.com/package/@stencil/core
+[circle-badge]: https://circleci.com/gh/ionic-team/stencil.svg?style=shield
+[circle-badge-url]: https://circleci.com/gh/ionic-team/stencil
