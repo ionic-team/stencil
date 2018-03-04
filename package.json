@@ -34,7 +34,8 @@
     "set.version": "node scripts/set-version.js",
     "start": "npm install && npm run build",
     "test": "jest",
-    "test.watch": "jest --watch"
+    "test.watch": "jest --watch",
+    "vermoji": "node scripts/vermoji.js"
   },
   "dependencies": {
     "chokidar": "2.0.1",

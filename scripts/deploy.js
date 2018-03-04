@@ -126,30 +126,26 @@ function runTasks(opts) {
       {
         title: 'Install npm dependencies',
         task: () => execa('npm', ['install'], { cwd: rootDir }),
-      }
-    );
-  }
-
-  tasks.push(
-    {
-      title: 'Build @stencil/core',
-      task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
-    },
-    {
-      title: 'Run tests',
-      task: () => execa('npm', ['test'], { cwd: rootDir })
-    }
-  );
-
-  if (opts.prepare){
-    tasks.push(
+      },
+      {
+        title: 'Build @stencil/core',
+        task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
+      },
+      {
+        title: 'Run tests',
+        task: () => execa('npm', ['test'], { cwd: rootDir })
+      },
       {
         title: 'Set package.json version',
         task: () => execa('npm', ['run', 'set.version', opts.version], { cwd: rootDir }),
       },
       {
-        title: 'Generate CHANGELOG',
+        title: 'Generate Changelog',
         task: () => execa('npm', ['run', 'changelog'], { cwd: rootDir }),
+      },
+      {
+        title: 'Generate Vermoji',
+        task: () => execa('npm', ['run', 'vermoji'], { cwd: rootDir }),
       }
     );
   }
