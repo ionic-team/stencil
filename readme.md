@@ -10,7 +10,7 @@ Stencil components are just Web Components, so they work in any major framework 
 
 Stencil also enables a number of key capabilities on top of Web Components, in particular Server Side Rendering (SSR) without the need to run a headless browser, pre-rendering, and objects-as-properties (instead of just strings).
 
-*Note: Stencil and Ionic are completely independent projects. Stencil does not prescribe any specific UI framework, but Ionic is the largest user of Stencil (today!)*
+*Note: Stencil and [Ionic](https://ionicframework.com/) are completely independent projects. Stencil does not prescribe any specific UI framework, but Ionic is the largest user of Stencil (today!)*
 
 ## Why Stencil?
 
@@ -81,7 +81,7 @@ To use this component, just use it like any other HTML tag:
 
 When creating new component tags, we recommend _not_ using `stencil` in the component name (ex: `<stencil-datepicker>`). This is because the generated component has little to nothing to do with Stencil; it's just a web component!
 
-Instead, use a prefix that fits your company or any name for a group of related components. For example, all of the Ionic generated web components use the prefix `ion`.
+Instead, use a prefix that fits your company or any name for a group of related components. For example, all of the [Ionic](https://ionicframework.com/docs/) generated web components use the prefix `ion`.
 
 ## Hosting the app
 
@@ -157,10 +157,22 @@ For the small minority of browsers that do not support modern browser features a
  - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
  - [performance.now()](https://gist.github.com/paulirish/5438650)
  - [requestAnimationFrame()](https://gist.github.com/paulirish/1579671)
+ - [Array.find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
  - [Element.closest](https://github.com/jonathantneal/closest)
  - [Element.matches](https://github.com/jonathantneal/closest)
+ - [Element.remove](https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove)
+ - [String.startsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
 
-[npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg
-[npm-badge-url]: https://www.npmjs.com/package/@stencil/core
-[circle-badge]: https://circleci.com/gh/ionic-team/stencil.svg?style=shield
-[circle-badge-url]: https://circleci.com/gh/ionic-team/stencil
+
+## Related
+
+ - [Stencil Documentation](https://stenciljs.com/)
+ - [Stencil Worldwide Slack](https://stencil-worldwide.slack.com)
+ - [Ionic](https://ionicframework.com/)
+ - [Ionic Worldwide Slack](http://ionicworldwide.herokuapp.com/)
+ - [Ionicons](http://ionicons.com/)
+
+
+## License
+
+ - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE)
