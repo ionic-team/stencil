@@ -212,23 +212,19 @@ export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
     domApi.$supportsShadowDom = !!domApi.$documentElement.attachShadow;
   }
 
-
-  if (Build.event) {
-
-    if (Build.es5) {
-      if (typeof win.CustomEvent !== 'function') {
-        // CustomEvent polyfill
-        win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
-          evt = doc.createEvent('CustomEvent');
-          evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
-          return evt;
-        };
-        win.CustomEvent.prototype = win.Event.prototype;
-      }
+  if (Build.es5) {
+    if (typeof win.CustomEvent !== 'function') {
+      // CustomEvent polyfill
+      win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
+        evt = doc.createEvent('CustomEvent');
+        evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
+        return evt;
+      };
+      win.CustomEvent.prototype = win.Event.prototype;
     }
-
-    domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
   }
+  domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
+
   if (Build.event || Build.listener) {
     // test if this browser supports event options or not
     try {
