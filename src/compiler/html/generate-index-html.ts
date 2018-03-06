@@ -29,7 +29,7 @@ export async function generateIndexHtml(config: Config, compilerCtx: CompilerCtx
 
 
 function canSkipGenerateIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.generateWWW) {
+  if ((compilerCtx.hasSuccessfulBuild && buildCtx.appFileBuildCount === 0) || hasError(buildCtx.diagnostics) || !config.outputTargets['www']) {
     // no need to rebuild index.html if there were no app file changes
     return true;
   }
@@ -51,7 +51,7 @@ async function setIndexHtmlContent(config: Config, compilerCtx: CompilerCtx, ind
   }
 
   // add the prerendered html to our list of files to write
-  await compilerCtx.fs.writeFile(config.wwwIndexHtml, indexHtml);
+  await compilerCtx.fs.writeFile(config.outputTargets['www'].indexHtml, indexHtml);
 
-  config.logger.debug(`optimizeHtml, write: ${config.wwwIndexHtml}`);
+  config.logger.debug(`optimizeHtml, write: ${config.outputTargets['www'].indexHtml}`);
 }

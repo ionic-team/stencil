@@ -3,12 +3,12 @@ import { pathJoin } from '../util';
 
 
 export function getAppWWWBuildDir(config: Config) {
-  return pathJoin(config, config.buildDir, config.fsNamespace);
+  return pathJoin(config, config.outputTargets['www'].buildDir, config.fsNamespace);
 }
 
 
 export function getAppDistDir(config: Config) {
-  return pathJoin(config, config.distDir, config.fsNamespace);
+  return pathJoin(config, config.outputTargets['distribution'].dir, config.fsNamespace);
 }
 
 
@@ -28,12 +28,12 @@ export function getLoaderFileName(config: Config) {
 
 
 export function getLoaderWWW(config: Config) {
-  return pathJoin(config, config.buildDir, getLoaderFileName(config));
+  return pathJoin(config, config.outputTargets['www'].buildDir, getLoaderFileName(config));
 }
 
 
 export function getLoaderDist(config: Config) {
-  return pathJoin(config, config.distDir, getLoaderFileName(config));
+  return pathJoin(config, config.outputTargets['distribution'].dir, getLoaderFileName(config));
 }
 
 

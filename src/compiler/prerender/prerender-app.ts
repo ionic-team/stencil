@@ -14,9 +14,9 @@ export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, bui
     return [];
   }
 
-  if (!config.generateWWW) {
+  if (!config.outputTargets['www']) {
     // no need to rebuild index.html if there were no app file changes
-    config.logger.debug(`prerenderApp, skipping because config.generateWWW is falsy`);
+    config.logger.debug(`prerenderApp, skipping because config.outputTargets['www'] is falsy`);
     return [];
   }
 
@@ -25,7 +25,7 @@ export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, bui
   // get the www index html content for the template for all prerendered pages
   let indexHtml: string = null;
   try {
-    indexHtml = await compilerCtx.fs.readFile(config.wwwIndexHtml);
+    indexHtml = await compilerCtx.fs.readFile(config.outputTargets['www'].indexHtml);
   } catch (e) {}
 
   if (typeof indexHtml !== 'string') {

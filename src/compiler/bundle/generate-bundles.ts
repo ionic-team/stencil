@@ -69,18 +69,18 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
 
 async function writeBundleJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
 
-  // get the absolute path to where it'll be saved in www
-  const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
+  if (config.outputTargets['www']) {
+    // get the absolute path to where it'll be saved in www
+    const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
 
-  // get the absolute path to where it'll be saved in dist
-  const distPath = pathJoin(config, getAppDistDir(config), fileName);
-
-  if (config.generateWWW) {
     // write to the www build
     await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
   }
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
+    // get the absolute path to where it'll be saved in dist
+    const distPath = pathJoin(config, getAppDistDir(config), fileName);
+
     // write to the dist build
     await compilerCtx.fs.writeFile(distPath, jsText);
   }
@@ -177,19 +177,20 @@ async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, ent
   entryModule.entryBundles = entryModule.entryBundles || [];
   entryModule.entryBundles.push(entryBundle);
 
-  // get the absolute path to where it'll be saved in www
-  const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
 
-  // get the absolute path to where it'll be saved in dist
-  const distPath = pathJoin(config, getAppDistDir(config), fileName);
+  if (config.outputTargets['www']) {
+    // get the absolute path to where it'll be saved in www
+    const wwwBuildPath = pathJoin(config, getAppWWWBuildDir(config), fileName);
 
-  if (config.generateWWW) {
     // write to the www build
     await compilerCtx.fs.writeFile(wwwBuildPath, jsText);
     entryBundle.outputs.push(wwwBuildPath);
   }
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
+    // get the absolute path to where it'll be saved in dist
+    const distPath = pathJoin(config, getAppDistDir(config), fileName);
+
     // write to the dist build
     await compilerCtx.fs.writeFile(distPath, jsText);
     entryBundle.outputs.push(distPath);

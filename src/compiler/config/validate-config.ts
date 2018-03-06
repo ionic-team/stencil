@@ -6,8 +6,8 @@ import { validateNamespace } from './validate-namespace';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validatePublicPath } from './validate-public-path';
-import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
-
+import {_deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
+import {_deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
 
 export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   if (!config) {
@@ -38,6 +38,9 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'writeLog', false);
   setBooleanConfig(config, 'writeStats', false);
   setBooleanConfig(config, 'buildAppCore', true);
+
+  // Setup outputTargets
+  _deprecatedToMultipleTarget(config);
 
   // get a good namespace
   validateNamespace(config);
@@ -74,10 +77,6 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   }
   config.logger.debug(`hashFileNames: ${config.hashFileNames}, hashedFileNameLength: ${config.hashedFileNameLength}`);
 
-  config.generateDistribution = !!config.generateDistribution;
-
-  setBooleanConfig(config, 'generateWWW', true);
-
   validateCopy(config);
 
   validatePlugins(config);
@@ -89,8 +88,6 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   }
 
   setStringConfig(config, 'hydratedCssClass', DEFAULT_HYDRATED_CSS_CLASS);
-  setBooleanConfig(config, 'emptyDist', true);
-  setBooleanConfig(config, 'emptyWWW', true);
   setBooleanConfig(config, 'generateDocs', false);
   setBooleanConfig(config, 'enableCache', true);
 

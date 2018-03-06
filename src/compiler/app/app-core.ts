@@ -35,13 +35,13 @@ export async function generateCore(config: Config, compilerCtx: CompilerCtx, bui
   // update the app core filename within the content
   jsContent = jsContent.replace(APP_NAMESPACE_PLACEHOLDER, config.fsNamespace);
 
-  if (config.generateWWW) {
+  if (config.outputTargets['www']) {
     // write the www/build/ app core file
     const appCoreWWW = pathJoin(config, getAppWWWBuildDir(config), coreFilename);
     await compilerCtx.fs.writeFile(appCoreWWW, jsContent);
   }
 
-  if (config.generateDistribution) {
+  if (config.outputTargets['distribution']) {
     // write the dist/ app core file
     const appCoreDist = pathJoin(config, getAppDistDir(config), coreFilename);
     await compilerCtx.fs.writeFile(appCoreDist, jsContent);

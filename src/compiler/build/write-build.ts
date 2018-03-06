@@ -60,14 +60,14 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
   // empty promises :(
   const emptyPromises: Promise<any>[] = [];
 
-  if (config.generateWWW && config.emptyWWW) {
-    config.logger.debug(`empty wwwDir: ${config.wwwDir}`);
-    emptyPromises.push(compilerCtx.fs.emptyDir(config.wwwDir));
+  if (config.outputTargets['www'] && config.outputTargets['www'].emptyDir) {
+    config.logger.debug(`empty www dir: ${config.outputTargets['www'].dir}`);
+    emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['www'].dir));
   }
 
-  if (config.generateDistribution && config.emptyDist) {
-    config.logger.debug(`empty distDir: ${config.distDir}`);
-    emptyPromises.push(compilerCtx.fs.emptyDir(config.distDir));
+  if (config.outputTargets['distribution'] && config.outputTargets['distribution'].emptyDir) {
+    config.logger.debug(`empty dist dir: ${config.outputTargets['distribution'].dir}`);
+    emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['distribution'].dir));
   }
 
   // let's empty out the build dest directory

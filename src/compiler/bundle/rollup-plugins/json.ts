@@ -10,7 +10,10 @@ export default function bundleJson(config: Config, options: Options = {}) {
     name: 'json',
 
     resolveId(importee: string, importer: string): any {
-      if (importer && importer.startsWith(config.collectionDir) && importee.endsWith('.json')) {
+      if (importer &&
+        importer.startsWith(config.collectionDir) &&
+        importee.endsWith('.json')
+      ) {
         return path.resolve(
           path.dirname(importer).replace(config.collectionDir, config.srcDir),
           importee

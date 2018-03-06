@@ -21,15 +21,19 @@ describe('validatePaths', () => {
 
   it('should set default wwwIndexHtml and convert to absolute path', () => {
     validateBuildConfig(config);
-    expect(path.basename(config.wwwIndexHtml)).toBe('index.html');
-    expect(path.isAbsolute(config.wwwIndexHtml)).toBe(true);
+    expect(path.basename(config.outputTargets['www'].indexHtml)).toBe('index.html');
+    expect(path.isAbsolute(config.outputTargets['www'].indexHtml)).toBe(true);
   });
 
   it('should convert a custom wwwIndexHtml to absolute path', () => {
-    config.wwwIndexHtml = 'assets/custom-index.html';
+    config.outputTargets = {
+      'www': {
+        indexHtml: 'assets/custom-index.html'
+      }
+    };
     validateBuildConfig(config);
-    expect(path.basename(config.wwwIndexHtml)).toBe('custom-index.html');
-    expect(path.isAbsolute(config.wwwIndexHtml)).toBe(true);
+    expect(path.basename(config.outputTargets['www'].indexHtml)).toBe('custom-index.html');
+    expect(path.isAbsolute(config.outputTargets['www'].indexHtml)).toBe(true);
   });
 
 
@@ -40,34 +44,51 @@ describe('validatePaths', () => {
   });
 
   it('should set default dist dir and convert to absolute path', () => {
+    config.outputTargets = {
+      distribution: {}
+    };
     validateBuildConfig(config);
-    expect(path.basename(config.distDir)).toBe('dist');
-    expect(path.isAbsolute(config.distDir)).toBe(true);
+    expect(path.basename(config.outputTargets.distribution.dir)).toBe('dist');
+    expect(path.isAbsolute(config.outputTargets.distribution.dir)).toBe(true);
   });
 
   it('should set default emptyDist to true', () => {
+    config.outputTargets = {
+      distribution: {}
+    };
     validateBuildConfig(config);
-    expect(config.emptyDist).toBe(true);
+    expect(config.outputTargets.distribution.emptyDir).toBe(true);
   });
 
   it('should set emptyDist to false', () => {
-    config.emptyDist = false;
+    config.outputTargets = {
+      distribution: {
+        emptyDir: false
+      }
+    };
     validateBuildConfig(config);
-    expect(config.emptyDist).toBe(false);
+    expect(config.outputTargets.distribution.emptyDir).toBe(false);
   });
 
   it('should set default emptyWWW to true', () => {
     validateBuildConfig(config);
-    expect(config.emptyWWW).toBe(true);
+    expect(config.outputTargets.www.emptyDir).toBe(true);
   });
 
   it('should set emptyWWW to false', () => {
-    config.emptyWWW = false;
+    config.outputTargets = {
+      www: {
+        emptyDir: false
+      }
+    };
     validateBuildConfig(config);
-    expect(config.emptyWWW).toBe(false);
+    expect(config.outputTargets.www.emptyDir).toBe(false);
   });
 
   it('should set default collection dir and convert to absolute path', () => {
+    config.outputTargets = {
+      distribution: {}
+    };
     validateBuildConfig(config);
     expect(path.basename(config.collectionDir)).toBe('collection');
     expect(path.isAbsolute(config.collectionDir)).toBe(true);
@@ -80,32 +101,33 @@ describe('validatePaths', () => {
   });
 
   it('should set default types dir and convert to absolute path', () => {
+    config.outputTargets = {
+      distribution: {}
+    };
     validateBuildConfig(config);
     expect(path.basename(config.typesDir)).toBe('types');
     expect(path.isAbsolute(config.typesDir)).toBe(true);
   });
 
-  it('should set default www dir and convert to absolute path', () => {
-    validateBuildConfig(config);
-    expect(path.basename(config.wwwDir)).toBe('www');
-    expect(path.isAbsolute(config.wwwDir)).toBe(true);
-  });
-
   it('should set default build dir and convert to absolute path', () => {
     validateBuildConfig(config);
-    const parts = config.buildDir.split(path.sep);
+    const parts = config.outputTargets['www'].buildDir.split(path.sep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('www');
-    expect(path.isAbsolute(config.buildDir)).toBe(true);
+    expect(path.isAbsolute(config.outputTargets['www'].buildDir)).toBe(true);
   });
 
   it('should set build dir w/ custom www', () => {
-    config.wwwDir = 'custom-www';
+    config.outputTargets = {
+      www: {
+        dir: 'custom-www'
+      }
+    };
     validateBuildConfig(config);
-    const parts = config.buildDir.split(path.sep);
+    const parts = config.outputTargets['www'].buildDir.split(path.sep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('custom-www');
-    expect(path.isAbsolute(config.buildDir)).toBe(true);
+    expect(path.isAbsolute(config.outputTargets['www'].buildDir)).toBe(true);
   });
 
   it('should set src dir from incorrect config case', () => {

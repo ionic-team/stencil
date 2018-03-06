@@ -40,24 +40,38 @@ export function validatePaths(config: Config) {
     config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
   }
 
-  setStringConfig(config, 'wwwDir', DEFAULT_WWW_DIR);
-  if (!path.isAbsolute(config.wwwDir)) {
-    config.wwwDir = normalizePath(path.join(config.rootDir, config.wwwDir));
+  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].dir)) {
+    config.outputTargets['www'].dir =
+      normalizePath(path.join(config.rootDir, config.outputTargets['www'].dir));
   }
 
-  setStringConfig(config, 'buildDir', DEFAULT_BUILD_DIR);
-  if (!path.isAbsolute(config.buildDir)) {
-    config.buildDir = normalizePath(path.join(config.wwwDir, config.buildDir));
+  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].indexHtml)) {
+    config.outputTargets['www'].indexHtml =
+      normalizePath(path.join(config.outputTargets['www'].dir, config.outputTargets['www'].indexHtml));
   }
 
-  setStringConfig(config, 'distDir', DEFAULT_DIST_DIR);
-  if (!path.isAbsolute(config.distDir)) {
-    config.distDir = normalizePath(path.join(config.rootDir, config.distDir));
+  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].buildDir)) {
+    config.outputTargets['www'].buildDir =
+      normalizePath(path.join(config.outputTargets['www'].dir, config.outputTargets['www'].buildDir));
+  }
+
+  if (config.outputTargets['distribution'] && !path.isAbsolute(config.outputTargets['distribution'].dir)) {
+    config.outputTargets['distribution'].dir =
+      normalizePath(path.join(config.rootDir, config.outputTargets['distribution'].dir));
   }
 
   setStringConfig(config, 'collectionDir', DEFAULT_COLLECTION_DIR);
   if (!path.isAbsolute(config.collectionDir)) {
-    config.collectionDir = normalizePath(path.join(config.distDir, config.collectionDir));
+    let distPath;
+
+    if (config.outputTargets['distribution']) {
+      distPath = config.outputTargets['distribution'].dir;
+    } else {
+      distPath = normalizePath(path.join(config.rootDir, DEFAULT_DIST_DIR));
+    }
+
+    config.collectionDir =
+      normalizePath(path.join(distPath, config.collectionDir));
   }
 
   setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
@@ -66,8 +80,8 @@ export function validatePaths(config: Config) {
   }
 
   setStringConfig(config, 'typesDir', DEFAULT_TYPES_DIR);
-  if (!path.isAbsolute(config.typesDir)) {
-    config.typesDir = normalizePath(path.join(config.distDir, config.typesDir));
+  if (config.outputTargets['distribution'] && !path.isAbsolute(config.typesDir)) {
+    config.typesDir = normalizePath(path.join(config.outputTargets['distribution'].dir, config.typesDir));
   }
 
   setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
@@ -75,10 +89,6 @@ export function validatePaths(config: Config) {
     config.srcIndexHtml = normalizePath(path.join(config.rootDir, config.srcIndexHtml));
   }
 
-  setStringConfig(config, 'wwwIndexHtml', normalizePath(path.join(config.wwwDir, DEFAULT_INDEX_HTML)));
-  if (!path.isAbsolute(config.wwwIndexHtml)) {
-    config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, config.wwwIndexHtml));
-  }
 
   if (config.writeLog) {
     setStringConfig(config, 'buildLogFilePath', DEFAULT_BUILD_LOG_FILE_NAME);
@@ -94,16 +104,14 @@ export function validatePaths(config: Config) {
       config.buildStatsFilePath = normalizePath(path.join(config.rootDir, config.buildStatsFilePath));
     }
   }
-
 }
 
-
-const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_WWW_DIR = 'www';
-const DEFAULT_BUILD_DIR = 'build';
-const DEFAULT_INDEX_HTML = 'index.html';
-const DEFAULT_DIST_DIR = 'dist';
+export const DEFAULT_WWW_DIR = 'www';
+export const DEFAULT_INDEX_HTML = 'index.html';
+export const DEFAULT_BUILD_DIR = 'build';
+export const DEFAULT_DIST_DIR = 'dist';
 const DEFAULT_COLLECTION_DIR = 'collection';
+const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_TSCONFIG = 'tsconfig.json';
 const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';

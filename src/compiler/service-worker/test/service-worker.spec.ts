@@ -57,9 +57,13 @@ describe('service worker', () => {
     });
 
 
-    var config: Config = {
+    const config: Config = {
       sys: mockStencilSystem(),
-      wwwDir: '/User/me/app/www/'
+      outputTargets: {
+        www: {
+          dir: '/User/me/app/www/'
+        }
+      }
     };
 
     beforeEach(() => {

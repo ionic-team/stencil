@@ -332,23 +332,23 @@ describe('validation', () => {
   it('should set generateDistribution to true', () => {
     config.generateDistribution = true;
     validateBuildConfig(config);
-    expect(config.generateDistribution).toBe(true);
+    expect(config.outputTargets['distribution']).not.toBe(undefined);
   });
 
   it('should default generateDistribution to false', () => {
     validateBuildConfig(config);
-    expect(config.generateDistribution).toBe(false);
+    expect(config.outputTargets['distribution']).toBe(undefined);
   });
 
   it('should set generateWWW to false', () => {
-    config.generateWWW = false;
+    config.outputTargets = {};
     validateBuildConfig(config);
-    expect(config.generateWWW).toBe(false);
+    expect(config.outputTargets['www']).toBe(undefined);
   });
 
   it('should default generateWWW to true', () => {
     validateBuildConfig(config);
-    expect(config.generateWWW).toBe(true);
+    expect(config.outputTargets['www']).not.toBe(undefined);
   });
 
   var config: Config;

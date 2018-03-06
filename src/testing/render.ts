@@ -110,10 +110,6 @@ function getTestBuildConfig() {
   config.devMode = true;
   config._isTesting = true;
   config.serviceWorker = false;
-  config.emptyDist = false;
-  config.emptyWWW = false;
-  config.generateDistribution = false;
-  config.generateWWW = false;
 
   return validateBuildConfig(config);
 }
