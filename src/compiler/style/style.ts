@@ -78,7 +78,7 @@ async function compileExternalStyle(config: Config, compilerCtx: CompilerCtx, bu
 
   if (config.outputTargets['distribution'] && !moduleFile.isCollectionDependency) {
     const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
-    const collectionPath = config.sys.path.join(config.collectionDir, relPath);
+    const collectionPath = config.sys.path.join(config.outputTargets['distribution'].collectionDir, relPath);
     await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
   }
 

@@ -3,7 +3,7 @@ import { pathJoin } from '../util';
 
 
 export function getAppWWWBuildDir(config: Config) {
-  return pathJoin(config, config.buildDir, config.fsNamespace);
+  return pathJoin(config, config.outputTargets['www'].buildDir, config.fsNamespace);
 }
 
 
@@ -28,7 +28,7 @@ export function getLoaderFileName(config: Config) {
 
 
 export function getLoaderWWW(config: Config) {
-  return pathJoin(config, config.buildDir, getLoaderFileName(config));
+  return pathJoin(config, config.outputTargets['www'].buildDir, getLoaderFileName(config));
 }
 
 

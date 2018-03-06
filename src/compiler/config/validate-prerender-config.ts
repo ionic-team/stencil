@@ -1,9 +1,9 @@
-import { PrerenderConfig, RawConfig, RenderOptions } from '../../declarations';
+import { Config, PrerenderConfig, RenderOptions } from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export function validatePrerenderConfig(config: RawConfig) {
-  if (config.prerender && config.generateWWW) {
+export function validatePrerenderConfig(config: Config) {
+  if (config.prerender && config.outputTargets['www']) {
     if (typeof config.prerender !== 'object' || Array.isArray(config.prerender)) {
       config.prerender = {};
     }
@@ -15,7 +15,7 @@ export function validatePrerenderConfig(config: RawConfig) {
     }
 
     if (!config.prerender.prerenderDir) {
-      config.prerender.prerenderDir = config.wwwDir;
+      config.prerender.prerenderDir = config.outputTargets['www'].dir;
     }
 
     if (!config.sys.path.isAbsolute(config.prerender.prerenderDir)) {
@@ -24,7 +24,7 @@ export function validatePrerenderConfig(config: RawConfig) {
 
     config.buildEs5 = true;
 
-  } else if (config.prerender !== null && config.generateWWW && !config.devMode) {
+  } else if (config.prerender !== null && config.outputTargets['www'] && !config.devMode) {
     config.prerender = {
       hydrateComponents: false,
       crawl: false,
@@ -42,7 +42,7 @@ export function validatePrerenderConfig(config: RawConfig) {
     };
 
     if (!config.prerender.prerenderDir) {
-      config.prerender.prerenderDir = config.wwwDir;
+      config.prerender.prerenderDir = config.outputTargets['www'].dir;
     }
 
     if (!config.sys.path.isAbsolute(config.prerender.prerenderDir)) {

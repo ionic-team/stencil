@@ -13,8 +13,11 @@ describe('validatePrerenderConfig', () => {
       logger: mockLogger(),
       rootDir: '/User/some/path/',
       srcDir: '/User/some/path/src/',
-      wwwDir: '/User/some/path/www/',
-      generateWWW: true,
+      outputTargets: {
+        www: {
+          dir: '/User/some/path/www/',
+        }
+      },
       suppressTypeScriptErrors: true
     };
   });
@@ -53,10 +56,10 @@ describe('validatePrerenderConfig', () => {
     expect(config.sys.path.basename(config.prerender.prerenderDir)).toBe('some-prerender-dir');
   });
 
-  it('should default prerender.prerenderDir to wwwDir', () => {
+  it('should default prerender.prerenderDir to www dir', () => {
     config.prerender = true;
     validatePrerenderConfig(config);
-    expect((config.prerender as PrerenderConfig).prerenderDir).toBe(config.wwwDir);
+    expect((config.prerender as PrerenderConfig).prerenderDir).toBe(config.outputTargets.www.dir);
   });
 
   it('should default prerender.inlineStyles', () => {

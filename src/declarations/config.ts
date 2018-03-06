@@ -1,17 +1,23 @@
 import * as d from './index';
 
-export type BuildTarget = 'www' | 'distribution';
+export type BuildTarget = 'distribution';
 
 export type ConfigBuildTarget = {
-  [Target in BuildTarget]?: {
+  www?: {
+    dir?: string;
+    buildDir?: string;
+    emptyDir?: boolean;
+    indexHtml?: string;
+  },
+  distribution?: {
     dir?: string;
     emptyDir?: boolean;
-  };
+    collectionDir?: string;
+  }
 };
 
 export interface Config {
   buildAppCore?: boolean;
-  buildDir?: string;
   buildEs5?: boolean;
   buildLogFilePath?: string;
   buildStatsFilePath?: string;
@@ -51,27 +57,26 @@ export interface Config {
   watchIgnoredRegex?: RegExp;
   writeLog?: boolean;
   writeStats?: boolean;
-  wwwIndexHtml?: string;
   generateDocs?: boolean;
-  collectionDir?: string;
   _isValidated?: boolean;
   _isTesting?: boolean;
   outputTargets?: ConfigBuildTarget;
+
+  generateWWW?: boolean;
+  wwwDir?: string;
+  buildDir?: string;
+  emptyWWW?: boolean;
+  wwwIndexHtml?: string;
+
+  generateDistribution?: boolean;
+  distDir?: string;
+  emptyDist?: boolean;
+  collectionDir?: string;
 
   /**
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
    */
   _deprecatedCollections?: ConfigCollection[];
-}
-
-export interface RawConfig extends Config {
-  generateWWW?: boolean;
-  wwwDir?: string;
-  emptyWWW?: boolean;
-
-  generateDistribution?: boolean;
-  distDir?: string;
-  emptyDist?: boolean;
 }
 
 

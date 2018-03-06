@@ -1,8 +1,8 @@
-import { RawConfig } from '../../declarations';
+import { Config } from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export function validatePublicPath(config: RawConfig) {
+export function validatePublicPath(config: Config) {
   if (typeof config.discoverPublicPath !== 'boolean') {
     // only do this check if the config hasn't been fully validated yet
     // if the config has a publicPath, then let's remember it was a custom one
@@ -14,7 +14,7 @@ export function validatePublicPath(config: RawConfig) {
     // this is a reference to the public static directory from the index.html running from a browser
     // in most cases it's just "build", as in index page would request scripts from `/build/`
     config.publicPath = normalizePath(
-      config.sys.path.relative(config.wwwDir, config.buildDir)
+      config.sys.path.relative(config.outputTargets['www'].dir, config.outputTargets['www'].buildDir)
     );
     if (config.publicPath.charAt(0) !== '/') {
       // ensure prefix / by default

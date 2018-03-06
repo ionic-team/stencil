@@ -27,7 +27,7 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
     // we've already had a successful build, we're good
     // always recopy index.html (it's all cached if it didn't actually change, all good)
     const srcIndexHtmlContent = await compilerCtx.fs.readFile(config.srcIndexHtml);
-    await compilerCtx.fs.writeFile(config.wwwIndexHtml, srcIndexHtmlContent);
+    await compilerCtx.fs.writeFile(config.outputTargets['www'].indexHtml, srcIndexHtmlContent);
     return;
   }
 
@@ -35,7 +35,7 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
     // ok, so we haven't written an index.html build file yet
     // and we do know they have a src one, so let's write a
     // filler index.html file that shows while the first build is happening
-    await compilerCtx.fs.writeFile(config.wwwIndexHtml, APP_LOADING_HTML);
+    await compilerCtx.fs.writeFile(config.outputTargets['www'].indexHtml, APP_LOADING_HTML);
     await compilerCtx.fs.commit();
 
   } catch (e) {

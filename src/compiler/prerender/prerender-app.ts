@@ -25,7 +25,7 @@ export async function prerenderApp(config: Config, compilerCtx: CompilerCtx, bui
   // get the www index html content for the template for all prerendered pages
   let indexHtml: string = null;
   try {
-    indexHtml = await compilerCtx.fs.readFile(config.wwwIndexHtml);
+    indexHtml = await compilerCtx.fs.readFile(config.outputTargets['www'].indexHtml);
   } catch (e) {}
 
   if (typeof indexHtml !== 'string') {

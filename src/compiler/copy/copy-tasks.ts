@@ -65,7 +65,7 @@ export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx,
   }
 
   if (config.outputTargets['distribution']) {
-    await processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.collectionDir);
+    await processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, config.outputTargets['distribution'].collectionDir);
   }
 }
 
@@ -103,7 +103,7 @@ async function processGlob(config: Config, copyTask: CopyTask) {
     }
 
     if (config.outputTargets['distribution']) {
-      globCopyTasks.push(createGlobCopyTask(config, copyTask, config.collectionDir, globRelPath));
+      globCopyTasks.push(createGlobCopyTask(config, copyTask, config.outputTargets['distribution'].collectionDir, globRelPath));
     }
   });
 

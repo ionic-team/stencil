@@ -1,9 +1,9 @@
-import { RawConfig } from '../../declarations';
+import { Config } from '../../declarations';
 import { normalizePath } from '../util';
 import { setStringConfig } from './config-utils';
 
 
-export function validatePaths(config: RawConfig) {
+export function validatePaths(config: Config) {
   const path = config.sys.path;
 
   if (typeof (config as any).global === 'string') {
@@ -40,27 +40,29 @@ export function validatePaths(config: RawConfig) {
     config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
   }
 
-  if (config.outputTargets['www']) {
-    if (!path.isAbsolute(config.outputTargets['www'].dir)) {
-      config.outputTargets['www'].dir = normalizePath(path.join(config.rootDir, config.outputTargets['www'].dir));
-    }
+  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].dir)) {
+    config.outputTargets['www'].dir =
+      normalizePath(path.join(config.rootDir, config.outputTargets['www'].dir));
   }
 
-  if (config.outputTargets['distribution']) {
-    if (!path.isAbsolute(config.outputTargets['distribution'].dir)) {
-      config.outputTargets['distribution'].dir = normalizePath(path.join(config.rootDir, config.outputTargets['distribution'].dir));
-    }
+  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].indexHtml)) {
+    config.outputTargets['www'].indexHtml =
+      normalizePath(path.join(config.outputTargets['www'].dir, config.outputTargets['www'].indexHtml));
   }
 
-  setStringConfig(config, 'buildDir', DEFAULT_BUILD_DIR);
-  if (!path.isAbsolute(config.buildDir)) {
-    config.buildDir = normalizePath(path.join(config.wwwDir, config.buildDir));
+  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].buildDir)) {
+    config.outputTargets['www'].buildDir =
+      normalizePath(path.join(config.outputTargets['www'].dir, config.outputTargets['www'].buildDir));
   }
 
+  if (config.outputTargets['distribution'] && !path.isAbsolute(config.outputTargets['distribution'].dir)) {
+    config.outputTargets['distribution'].dir =
+      normalizePath(path.join(config.rootDir, config.outputTargets['distribution'].dir));
+  }
 
-  setStringConfig(config, 'collectionDir', DEFAULT_COLLECTION_DIR);
-  if (!path.isAbsolute(config.collectionDir)) {
-    config.collectionDir = normalizePath(path.join(config.distDir, config.collectionDir));
+  if (config.outputTargets['distribution'] && !path.isAbsolute(config.outputTargets['distribution'].collectionDir)) {
+    config.outputTargets['distribution'].collectionDir =
+      normalizePath(path.join(config.outputTargets['distribution'].dir, config.outputTargets['distribution'].collectionDir));
   }
 
   setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
@@ -69,8 +71,8 @@ export function validatePaths(config: RawConfig) {
   }
 
   setStringConfig(config, 'typesDir', DEFAULT_TYPES_DIR);
-  if (!path.isAbsolute(config.typesDir)) {
-    config.typesDir = normalizePath(path.join(config.distDir, config.typesDir));
+  if (config.outputTargets['distribution'] && !path.isAbsolute(config.typesDir)) {
+    config.typesDir = normalizePath(path.join(config.outputTargets['distribution'].dir, config.typesDir));
   }
 
   setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
@@ -78,10 +80,6 @@ export function validatePaths(config: RawConfig) {
     config.srcIndexHtml = normalizePath(path.join(config.rootDir, config.srcIndexHtml));
   }
 
-  setStringConfig(config, 'wwwIndexHtml', normalizePath(path.join(config.wwwDir, DEFAULT_INDEX_HTML)));
-  if (!path.isAbsolute(config.wwwIndexHtml)) {
-    config.wwwIndexHtml = normalizePath(path.join(config.wwwDir, config.wwwIndexHtml));
-  }
 
   if (config.writeLog) {
     setStringConfig(config, 'buildLogFilePath', DEFAULT_BUILD_LOG_FILE_NAME);
@@ -101,10 +99,10 @@ export function validatePaths(config: RawConfig) {
 
 export const DEFAULT_DIST_DIR = 'dist';
 export const DEFAULT_WWW_DIR = 'www';
+export const DEFAULT_INDEX_HTML = 'index.html';
+export const DEFAULT_COLLECTION_DIR = 'collection';
+export const DEFAULT_BUILD_DIR = 'build';
 const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_BUILD_DIR = 'build';
-const DEFAULT_INDEX_HTML = 'index.html';
-const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_TSCONFIG = 'tsconfig.json';
 const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';

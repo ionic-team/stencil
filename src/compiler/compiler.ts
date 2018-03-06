@@ -1,4 +1,4 @@
-import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic, RawConfig } from '../declarations';
+import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic } from '../declarations';
 import { build } from './build/build';
 import { catchError } from './util';
 import { docs } from './docs/docs';
@@ -14,7 +14,7 @@ export class Compiler {
   isValid: boolean;
   config: Config;
 
-  constructor(rawConfig: RawConfig) {
+  constructor(rawConfig: Config) {
     [ this.isValid, this.config ] = isValid(rawConfig);
 
     if (this.isValid) {
@@ -83,7 +83,7 @@ export class Compiler {
 
 }
 
-function isValid(config: RawConfig): [ boolean, Config | null] {
+function isValid(config: Config): [ boolean, Config | null] {
   try {
     // validate the build config
     validateBuildConfig(config, true);

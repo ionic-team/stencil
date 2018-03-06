@@ -1,4 +1,4 @@
-import { Config, RawConfig } from '../../declarations';
+import { Config } from '../../declarations';
 import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } from './config-utils';
 import { validateCopy } from './validate-copy';
 import { validateNamespace } from './validate-namespace';
@@ -8,7 +8,7 @@ import { validatePublicPath } from './validate-public-path';
 import {_deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 import {_deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
 
-export function validateBuildConfig(config: RawConfig, setEnvVariables?: boolean) {
+export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   if (!config) {
     throw new Error(`invalid build config`);
   }
@@ -37,6 +37,9 @@ export function validateBuildConfig(config: RawConfig, setEnvVariables?: boolean
   setBooleanConfig(config, 'writeLog', false);
   setBooleanConfig(config, 'writeStats', false);
   setBooleanConfig(config, 'buildAppCore', true);
+
+  // Setup outputTargets
+  _deprecatedToMultipleTarget(config);
 
   // get a good namespace
   validateNamespace(config);
@@ -99,7 +102,6 @@ export function validateBuildConfig(config: RawConfig, setEnvVariables?: boolean
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
    */
   _deprecatedValidateConfigCollections(config);
-  config = _deprecatedToMultipleTarget(config);
 
   setArrayConfig(config, 'plugins');
   setArrayConfig(config, 'bundles');

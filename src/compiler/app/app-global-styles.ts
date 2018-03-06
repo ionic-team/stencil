@@ -27,7 +27,7 @@ export async function generateGlobalStyles(config: Config, compilerCtx: Compiler
     const fileName = getGlobalStyleFilename(config);
 
     if (config.outputTargets['www']) {
-      const wwwFilePath = pathJoin(config, config.buildDir, fileName);
+      const wwwFilePath = pathJoin(config, config.outputTargets['www'].buildDir, fileName);
       config.logger.debug(`www global style: ${wwwFilePath}`);
       await compilerCtx.fs.writeFile(wwwFilePath, styleText);
     }

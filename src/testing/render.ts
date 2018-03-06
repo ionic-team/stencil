@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentConstructor, ComponentMeta, ComponentRegistry, HydrateOptions, PlatformApi, RawConfig } from '../declarations';
+import { CompilerCtx, ComponentConstructor, ComponentMeta, ComponentRegistry, Config, HydrateOptions, PlatformApi } from '../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../util/constants';
 import { mockLogger, mockStencilSystem } from './mocks';
 import { Renderer } from '../server';
@@ -98,7 +98,7 @@ export async function flush(root: any) {
 function getTestBuildConfig() {
   const sys = mockStencilSystem();
 
-  const config: RawConfig = {
+  const config: Config = {
     sys: sys,
     logger: mockLogger(),
     rootDir: '/',
@@ -110,10 +110,16 @@ function getTestBuildConfig() {
   config.devMode = true;
   config._isTesting = true;
   config.serviceWorker = false;
-  config.emptyDist = false;
-  config.emptyWWW = false;
-  config.generateDistribution = false;
-  config.generateWWW = false;
+  config.outputTargets = {
+    www: {
+      dir: 'www',
+      emptyDir: false
+    },
+    distribution: {
+      dir: 'dist',
+      emptyDir: false
+    }
+  };
 
   return validateBuildConfig(config);
 }

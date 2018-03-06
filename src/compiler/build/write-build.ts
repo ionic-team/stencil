@@ -61,12 +61,12 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
   const emptyPromises: Promise<any>[] = [];
 
   if (config.outputTargets['www'] && config.outputTargets['www'].emptyDir) {
-    config.logger.debug(`empty wwwDir: ${config.outputTargets['www'].dir}`);
+    config.logger.debug(`empty www dir: ${config.outputTargets['www'].dir}`);
     emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['www'].dir));
   }
 
   if (config.outputTargets['distribution'] && config.outputTargets['www'].emptyDir) {
-    config.logger.debug(`empty distDir: ${config.outputTargets['distribution'].dir}`);
+    config.logger.debug(`empty dist dir: ${config.outputTargets['distribution'].dir}`);
     emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['distribution'].dir));
   }
 

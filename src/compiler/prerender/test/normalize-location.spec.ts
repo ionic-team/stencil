@@ -13,8 +13,11 @@ describe('normalizeLocation', () => {
       logger: mockLogger(),
       rootDir: '/User/some/path/',
       srcDir: '/User/some/path/src/',
-      wwwDir: '/User/some/path/www/',
-      generateWWW: true,
+      outputTargets: {
+        www: {
+          dir: '/User/some/path/www/'
+        }
+      },
       suppressTypeScriptErrors: true
     };
   });

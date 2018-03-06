@@ -29,17 +29,13 @@ describe('_deprecated multiple targets', () => {
     });
   });
 
-  it('no configuration is provided should default to www and dist filed out', () => {
+  it('no configuration is provided should default to www and dist filled out', () => {
     const config = _deprecatedToMultipleTarget({});
 
     expect(config).toEqual({
       outputTargets: {
         www: {
           dir: 'www',
-          emptyDir: true
-        },
-        distribution: {
-          dir: 'dist',
           emptyDir: true
         }
       }

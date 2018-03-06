@@ -51,7 +51,7 @@ async function setIndexHtmlContent(config: Config, compilerCtx: CompilerCtx, ind
   }
 
   // add the prerendered html to our list of files to write
-  await compilerCtx.fs.writeFile(config.wwwIndexHtml, indexHtml);
+  await compilerCtx.fs.writeFile(config.outputTargets['www'].indexHtml, indexHtml);
 
-  config.logger.debug(`optimizeHtml, write: ${config.wwwIndexHtml}`);
+  config.logger.debug(`optimizeHtml, write: ${config.outputTargets['www'].indexHtml}`);
 }

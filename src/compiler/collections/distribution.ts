@@ -76,7 +76,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
     err.messageText = `package.json "types" file must have a ".d.ts" extension: ${pkgData.types}`;
   }
 
-  const collection = pathJoin(config, config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
+  const collection = pathJoin(config, config.sys.path.relative(config.rootDir, config.outputTargets['distribution'].collectionDir), COLLECTION_MANIFEST_FILE_NAME);
   if (!pkgData.collection || normalizePath(pkgData.collection) !== collection) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
