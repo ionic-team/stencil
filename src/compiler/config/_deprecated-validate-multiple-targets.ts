@@ -18,18 +18,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
   if (outputTargets === undefined) {
     const warningMsg =
 `As of v0.7.0 "config.generateWWW, config.wwwDir" has been deprecated in favor of a configuration
-that supports multiple output targets. The new format is as follows:
-
-outputTargets: {
-  "www": {
-    dir: "www",
-    emptyDir: true
-  },
-  "distribution": {
-    dir: "dist",
-    emptyDir: true
-  }
-}
+that supports multiple output targets. The new format can be found here: https://stenciljs.com/docs/config
 `;
     if (config.logger) {
       config.logger.warn(warningMsg);
