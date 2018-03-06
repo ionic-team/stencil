@@ -1,3 +1,13 @@
+<a name="0.7.0-0"></a>
+# 🐖 [0.7.0-0](https://github.com/ionic-team/stencil/compare/v0.6.18...v0.7.0-0) (2018-03-06)
+
+
+### Features
+
+* allow for multiple build target configurations ( fixes [#582](https://github.com/ionic-team/stencil/issues/582)) ([a05dc00](https://github.com/ionic-team/stencil/commit/a05dc00))
+
+
+
 <a name="0.6.18"></a>
 ## 🗻 [0.6.18](https://github.com/ionic-team/stencil/compare/v0.6.17...v0.6.18) (2018-03-05)
 
