@@ -1,4 +1,4 @@
-import { Config, Diagnostic, HydrateResults } from '../../util/interfaces';
+import { Config, Diagnostic, HydrateResults } from '../../declarations';
 import { removeUnusedStyles } from './remove-unused-styles';
 import { UsedSelectors } from '../html/used-selectors';
 

@@ -47,7 +47,7 @@ async function setIndexHtmlContent(config: Config, compilerCtx: CompilerCtx, ind
 
   } else if (swConfig) {
     // we have a valid sw config, so we'll need to inject the register sw script
-    indexHtml = await injectRegisterServiceWorker(config, compilerCtx, swConfig, indexHtml);
+    indexHtml = await injectRegisterServiceWorker(config, swConfig, indexHtml);
   }
 
   // add the prerendered html to our list of files to write

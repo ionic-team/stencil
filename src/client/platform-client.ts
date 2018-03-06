@@ -1,9 +1,9 @@
 import { AppGlobal, ComponentMeta, ComponentRegistry, CoreContext, EventEmitterData,
-  HostElement, ImportedModule, LoadComponentRegistry, PlatformApi } from '../declarations';
+  HostElement, ImportedModule, PlatformApi } from '../declarations';
 import { assignHostContentSlots } from '../renderer/vdom/slot';
 import { attachStyles } from '../core/styles';
 import { Build } from '../util/build-conditionals';
-import { createDomApi } from '../renderer/vdom/dom-api';
+import { createDomApi } from '../renderer/dom-api';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
@@ -18,10 +18,11 @@ import { proxyController } from '../core/proxy-controller';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: Window, doc: Document, publicPath: string, hydratedCssClass: string): PlatformApi {
+export function createPlatformClient(appNamespace: string, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: HostElement} = {};
-  const domApi = createDomApi(win, doc);
+  const App: AppGlobal = (win as any)[appNamespace] = (win as any)[appNamespace] || {};
+  const domApi = createDomApi(App, win, doc);
 
   // set App Context
   Context.isServer = Context.isPrerender = !(Context.isClient = true);
@@ -58,8 +59,7 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     loadBundle,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
-    queue: createQueueClient(win),
-    registerComponents: (components: LoadComponentRegistry[]) => (components || []).map(data => parseComponentLoader(data, cmpRegistry)),
+    queue: createQueueClient(App, win),
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -88,7 +88,10 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
   rootElm.$activeLoading = [];
 
   // this will fire when all components have finished loaded
-  rootElm.$initLoad = () => plt.hasLoadedMap.set(rootElm, true);
+  rootElm.$initLoad = () => {
+    plt.hasLoadedMap.set(rootElm, App.loaded = plt.isAppLoaded = true);
+    domApi.$dispatchEvent(win, 'appload', { detail: { namespace: appNamespace } });
+  };
 
   // if the HTML was generated from SSR
   // then let's walk the tree and generate vnodes out of the data
@@ -201,7 +204,16 @@ export function createPlatformClient(Context: CoreContext, App: AppGlobal, win: 
     plt.attachStyles = attachStyles;
   }
 
-  return plt;
+  // register all the components now that everything's ready
+  // standard es2015 class extends HTMLElement
+  (App.components || [])
+    .map(data => parseComponentLoader(data, cmpRegistry))
+    .forEach(cmpMeta => plt.defineComponent(cmpMeta, class extends HTMLElement {}));
+
+  // notify that the app has initialized and the core script is ready
+  // but note that the components have not fully loaded yet, that's the "appload" event
+  App.initialized = true;
+  domApi.$dispatchEvent(window, 'appinit', { detail: { namespace: appNamespace } });
 }
 
 

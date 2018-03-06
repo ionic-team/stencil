@@ -139,9 +139,7 @@
 */
 
 export class ShadowCss {
-  strictStyling: boolean = true;
-
-  constructor() {}
+  strictStyling = true;
 
   /*
   * Shim some cssText with the given selector. Returns cssText that can
@@ -151,7 +149,7 @@ export class ShadowCss {
   * - selector is the attribute added to all elements inside the host,
   * - hostSelector is the attribute added to the host itself.
   */
-  shimCssText(cssText: string, selector: string, hostSelector: string = '', slotSelector: string = ''): string {
+  shimCssText(cssText: string, selector: string, hostSelector = '', slotSelector = ''): string {
     const sourceMappingUrl: string = extractSourceMappingUrl(cssText);
     cssText = stripComments(cssText);
     cssText = this._insertDirectives(cssText);
@@ -279,10 +277,10 @@ export class ShadowCss {
 
     return cssText.replace(regExp, function(...m: string[]) {
       if (m[2]) {
-        let compound = m[2].trim();
-        let suffix = m[3];
+        const compound = m[2].trim();
+        const suffix = m[3];
 
-        let sel = '[' + slotAttr + '] > ' + compound + suffix;
+        const sel = '[' + slotAttr + '] > ' + compound + suffix;
 
         return sel;
 

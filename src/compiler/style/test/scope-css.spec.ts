@@ -12,13 +12,13 @@
  */
 
 
-import { CompilerCtx, ComponentMeta } from '../../../util/interfaces';
+import { CompilerCtx, ComponentMeta } from '../../../declarations';
 import { parseCss } from '../parse-css';
-import { getScopeAttribute, getHostScopeAttribute, scopeCss } from '../scope-css';
+import { getHostScopeAttribute, getScopeAttribute, scopeCss } from '../scope-css';
 
 describe('ShadowCss', function() {
 
-  function s(css: string, contentAttr: string, hostAttr: string = '', slotAttr: string = '') {
+  function s(css: string, contentAttr: string, hostAttr = '', slotAttr = '') {
     const shim = scopeCss(css, contentAttr, hostAttr, slotAttr);
     const nlRegexp = /\n/g;
     return normalizeCSS(shim.replace(nlRegexp, ''));

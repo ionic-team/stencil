@@ -49,7 +49,7 @@ export function setStringConfig(config: any, configName: string, defaultValue: s
 }
 
 
-export function setArrayConfig(config: any, configName: string) {
+export function setArrayConfig(config: any, configName: string, defaultValue?: any[]) {
   const userConfigName = getUserConfigName(config, configName);
 
   if (typeof config[userConfigName] === 'function') {
@@ -57,7 +57,11 @@ export function setArrayConfig(config: any, configName: string) {
   }
 
   if (!Array.isArray(config[configName])) {
-    config[configName] = [];
+    if (Array.isArray(defaultValue)) {
+      config[configName] = defaultValue.slice();
+    } else {
+      config[configName] = [];
+    }
   }
 }
 

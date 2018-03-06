@@ -1,12 +1,17 @@
-import { Build } from '../../util/build-conditionals';
-import { DomApi, EventEmitterData } from '../../declarations';
-import { KEY_CODE_MAP, NODE_TYPE } from '../../util/constants';
-import { toLowerCase } from '../../util/helpers';
+import { AppGlobal, DomApi, EventEmitterData } from '../declarations';
+import { Build } from '../util/build-conditionals';
+import { KEY_CODE_MAP, NODE_TYPE } from '../util/constants';
+import { toLowerCase } from '../util/helpers';
 
 
-export function createDomApi(win: any, doc: Document): DomApi {
+export function createDomApi(App: AppGlobal, win: any, doc: Document): DomApi {
   // using the $ prefix so that closure is
   // cool with property renaming each of these
+
+  if (!App.ael) {
+    App.ael = (elm, eventName, cb, opts) => elm.addEventListener(eventName, cb, opts);
+    App.rel = (elm, eventName, cb, opts) => elm.removeEventListener(eventName, cb, opts);
+  }
 
   const unregisterListenerFns = new WeakMap<Node, ElementUnregisterListeners>();
 
@@ -164,7 +169,7 @@ export function createDomApi(win: any, doc: Document): DomApi {
       } : !!useCapture;
 
       // ok, good to go, let's add the actual listener to the dom element
-      attachToElm.addEventListener(eventName, eventListener, eventListenerOpts);
+      App.ael(attachToElm, eventName, eventListener, eventListenerOpts);
 
       if (!assignersUnregListeners) {
         // we don't already have a collection, let's create it
@@ -174,7 +179,7 @@ export function createDomApi(win: any, doc: Document): DomApi {
       // add the unregister listener to this element's collection
       assignersUnregListeners[assignersEventName] = () => {
         // looks like it's time to say goodbye
-        attachToElm && attachToElm.removeEventListener(eventName, eventListener, eventListenerOpts);
+        attachToElm && App.rel(attachToElm, eventName, eventListener, eventListenerOpts);
         assignersUnregListeners[assignersEventName] = null;
       };
     },
@@ -207,23 +212,19 @@ export function createDomApi(win: any, doc: Document): DomApi {
     domApi.$supportsShadowDom = !!domApi.$documentElement.attachShadow;
   }
 
-
-  if (Build.event) {
-
-    if (Build.es5) {
-      if (typeof win.CustomEvent !== 'function') {
-        // CustomEvent polyfill
-        win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
-          evt = doc.createEvent('CustomEvent');
-          evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
-          return evt;
-        };
-        win.CustomEvent.prototype = win.Event.prototype;
-      }
+  if (Build.es5) {
+    if (typeof win.CustomEvent !== 'function') {
+      // CustomEvent polyfill
+      win.CustomEvent = (event: any, data: EventEmitterData, evt?: any) => {
+        evt = doc.createEvent('CustomEvent');
+        evt.initCustomEvent(event, data.bubbles, data.cancelable, data.detail);
+        return evt;
+      };
+      win.CustomEvent.prototype = win.Event.prototype;
     }
-
-    domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
   }
+  domApi.$dispatchEvent = (elm, eventName, data) => elm && elm.dispatchEvent(new win.CustomEvent(eventName, data));
+
   if (Build.event || Build.listener) {
     // test if this browser supports event options or not
     try {

@@ -2,7 +2,7 @@
 [![Build Status][circle-badge]][circle-badge-url]
 # Stencil: A Compiler for Web Components
 
-Stencil is a simple compiler for generating Web Components.
+[Stencil](https://stenciljs.com/) is a simple compiler for generating Web Components and progressive web apps (PWA).
 
 Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool.  Stencil takes TypeScript, JSX, a tiny virtual DOM layer, efficient one-way data binding, an asynchronous rendering pipeline (similar to React Fiber), and lazy-loading out of the box, and generates 100% standards-based Web Components that run in any browser supporting the Custom Elements v1 spec.
 
@@ -10,7 +10,8 @@ Stencil components are just Web Components, so they work in any major framework 
 
 Stencil also enables a number of key capabilities on top of Web Components, in particular Server Side Rendering (SSR) without the need to run a headless browser, pre-rendering, and objects-as-properties (instead of just strings).
 
-*Note: Stencil and Ionic are completely independent projects. Stencil does not prescribe any specific UI framework, but Ionic is the largest user of Stencil (today!)*
+*Note: Stencil and [Ionic](https://ionicframework.com/) are completely independent projects. Stencil does not prescribe any specific UI framework, but Ionic is the largest user of Stencil (today!)*
+
 
 ## Why Stencil?
 
@@ -19,6 +20,7 @@ Stencil is a new approach to a popular idea: building fast and feature-rich apps
 Stencil is also a solution to organizations and library authors struggling to build reusable components across a diverse spectrum of frontend frameworks, each with their own component system. Stencil components work in Angular, React, Ember, and Vue as well as they work with jQuery or with no framework at all, because they are just plain HTML elements.
 
 Compared to using Custom Elements directly, inside of every Stencil component is an efficient Virtual DOM rendering system, JSX rendering capabilities, asynchronous rendering pipeline (like React Fiber), and more. This makes Stencil components more performant while maintaining full compatibility with plain Custom Elements. Think of Stencil as creating pre-baked Custom Elements as if you wrote in those features yourself.
+
 
 ## Getting Started
 
@@ -77,11 +79,13 @@ To use this component, just use it like any other HTML tag:
 <my-component first="Stencil" last="JS"></my-component>
 ```
 
+
 ## Naming Components
 
 When creating new component tags, we recommend _not_ using `stencil` in the component name (ex: `<stencil-datepicker>`). This is because the generated component has little to nothing to do with Stencil; it's just a web component!
 
-Instead, use a prefix that fits your company or any name for a group of related components. For example, all of the Ionic generated web components use the prefix `ion`.
+Instead, use a prefix that fits your company or any name for a group of related components. For example, all of the [Ionic](https://ionicframework.com/docs/) generated web components use the prefix `ion`.
+
 
 ## Hosting the app
 
@@ -92,23 +96,16 @@ Here's an example `index.html` file that runs a Stencil app:
 ```html
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta charset="utf-8">
   <title>My App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="format-detection" content="telephone=no">
-  <meta name="msapplication-tap-highlight" content="no">
-
   <script src="build/app.js"></script>
 </head>
-
 <body>
   <my-component first="Stencil" last="JS"></my-component>
 </body>
-
 </html>
 ```
+
 
 ## API
 
@@ -157,8 +154,27 @@ For the small minority of browsers that do not support modern browser features a
  - [Object.assign](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
  - [performance.now()](https://gist.github.com/paulirish/5438650)
  - [requestAnimationFrame()](https://gist.github.com/paulirish/1579671)
+ - [Array.find](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
  - [Element.closest](https://github.com/jonathantneal/closest)
  - [Element.matches](https://github.com/jonathantneal/closest)
+ - [Element.remove](https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove)
+ - [String.startsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
+- [String.endsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith)
+
+
+## Related
+
+ - [Stencil Documentation](https://stenciljs.com/)
+ - [Stencil Worldwide Slack](https://stencil-worldwide.slack.com)
+ - [Ionic](https://ionicframework.com/)
+ - [Ionic Worldwide Slack](http://ionicworldwide.herokuapp.com/)
+ - [Ionicons](http://ionicons.com/)
+
+
+## License
+
+ - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE)
+
 
 [npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg
 [npm-badge-url]: https://www.npmjs.com/package/@stencil/core

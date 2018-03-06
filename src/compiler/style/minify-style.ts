@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 
 
-export async function minifyStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, styleText: string) {
+export async function minifyStyle(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], styleText: string) {
   const cacheKey = compilerCtx.cache.createKey('minifyStyle', styleText);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
 
@@ -11,7 +11,7 @@ export async function minifyStyle(config: d.Config, compilerCtx: d.CompilerCtx, 
 
   const minifyResults = config.sys.minifyCss(styleText);
   minifyResults.diagnostics.forEach(d => {
-    buildCtx.diagnostics.push(d);
+    diagnostics.push(d);
   });
 
   if (typeof minifyResults.output === 'string') {

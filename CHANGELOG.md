@@ -1,3 +1,69 @@
+<a name="0.6.18"></a>
+## 🗻 [0.6.18](https://github.com/ionic-team/stencil/compare/v0.6.17...v0.6.18) (2018-03-05)
+
+
+### Bug Fixes
+
+* **events:** always add dispatchEvent to build ([830d601](https://github.com/ionic-team/stencil/commit/830d601)), closes [#595](https://github.com/ionic-team/stencil/issues/595)
+
+
+
+<a name="0.6.17"></a>
+## [0.6.17](https://github.com/ionic-team/stencil/compare/v0.6.16...v0.6.17) (2018-03-03)
+
+
+### Bug Fixes
+
+* **sw:** update sw unregistration ([9864159](https://github.com/ionic-team/stencil/commit/9864159))
+
+
+### Features
+
+* **App:** expose addEventListener to app global so external libs can override ([ed99d45](https://github.com/ionic-team/stencil/commit/ed99d45))
+* **App:** expose raf to app global so external libs can override raf ([0fb14a3](https://github.com/ionic-team/stencil/commit/0fb14a3))
+* **Build:** user-land Build conditions ([c855353](https://github.com/ionic-team/stencil/commit/c855353))
+* **events:** dispatch "appinit" and "appload" events on window ([639626b](https://github.com/ionic-team/stencil/commit/639626b))
+
+
+
+<a name="0.6.16"></a>
+## [0.6.16](https://github.com/ionic-team/stencil/compare/v0.6.15...v0.6.16) (2018-03-01)
+
+
+### Bug Fixes
+
+* **cli:** fix minimist dependency ([75dfab6](https://github.com/ionic-team/stencil/commit/75dfab6)), closes [#580](https://github.com/ionic-team/stencil/issues/580)
+
+
+
+<a name="0.6.15"></a>
+## [0.6.15](https://github.com/ionic-team/stencil/compare/v0.6.14...v0.6.15) (2018-03-01)
+
+
+### Bug Fixes
+
+* **prerender:** improve inline loader script ([cf72640](https://github.com/ionic-team/stencil/commit/cf72640))
+
+
+### Performance Improvements
+
+* **file hash:** init asset file versioning ([65c5783](https://github.com/ionic-team/stencil/commit/65c5783))
+* **minify:** minify inline styles and scripts ([286bf7d](https://github.com/ionic-team/stencil/commit/286bf7d))
+* **render:** microtask resolve all tasks until app loaded ([c9aee2b](https://github.com/ionic-team/stencil/commit/c9aee2b))
+
+
+
+<a name="0.6.14"></a>
+## [0.6.14](https://github.com/ionic-team/stencil/compare/v0.6.13...v0.6.14) (2018-02-28)
+
+
+### Bug Fixes
+
+* **collection:** add bundle data to collection manifest for prop connect tags ([6ba0150](https://github.com/ionic-team/stencil/commit/6ba0150))
+* **watcher:** do not create more than one watcher ([0df1dff](https://github.com/ionic-team/stencil/commit/0df1dff))
+
+
+
 <a name="0.6.13"></a>
 ## [0.6.13](https://github.com/ionic-team/stencil/compare/v0.6.9...v0.6.13) (2018-02-28)
 

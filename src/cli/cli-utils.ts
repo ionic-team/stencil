@@ -89,10 +89,9 @@ export function getConfigFilePath(process: NodeJS.Process, sys: StencilSystem, c
 }
 
 
-export function parseArgv(process: NodeJS.Process) {
-  const minimist = require('minimist');
+export function parseArgv(process: NodeJS.Process, sys: StencilSystem) {
   const cmdArgs = getCmdArgs(process);
-  const argv: CliArgv = minimist(cmdArgs, ARG_OPTS) as any;
+  const argv: CliArgv = sys.parseArgv(cmdArgs, ARG_OPTS);
 
   argv.logLevel = (argv as any)['log-level'];
   argv.serviceWorker = (argv as any)['service-worker'];

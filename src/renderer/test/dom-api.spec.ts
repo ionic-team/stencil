@@ -1,9 +1,24 @@
+import { AppGlobal, DomApi } from '../../declarations';
 import { createDomApi } from '../dom-api';
-import { DomApi } from '../../../util/interfaces';
-import { mockElement, mockWindow } from '../../../testing/mocks';
+import { mockElement, mockWindow } from '../../testing/mocks';
 
 
 describe('dom api', () => {
+
+  let domApi: DomApi;
+  let win: Window;
+  let doc: any;
+  let elm: Element;
+  let App: AppGlobal;
+
+  beforeEach(() => {
+    win = mockWindow();
+    doc = win.document;
+    elm = mockElement('div');
+    App = {};
+    domApi = createDomApi(App, win, doc);
+  });
+
 
   describe('$parentElement', () => {
 
@@ -64,19 +79,6 @@ describe('dom api', () => {
       expect(r).toBe(elm);
     });
 
-  });
-
-
-  var domApi: DomApi;
-  var win: any;
-  var doc: any;
-  var elm: any;
-
-  beforeEach(() => {
-    win = mockWindow();
-    doc = win.document;
-    elm = mockElement('div');
-    domApi = createDomApi(win, doc);
   });
 
 });

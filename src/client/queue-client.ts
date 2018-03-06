@@ -1,15 +1,17 @@
-import { DomControllerCallback, Now, QueueApi } from '../util/interfaces';
+import { AppGlobal, Now, QueueApi } from '../declarations';
 import { PRIORITY } from '../util/constants';
 
 
-export function createQueueClient(win: Window, resolvePending?: boolean, rafPending?: boolean): QueueApi {
+export function createQueueClient(App: AppGlobal, win: Window, resolvePending?: boolean, rafPending?: boolean): QueueApi {
   const now: Now = () => win.performance.now();
-  const raf: DomControllerCallback = (cb: FrameRequestCallback) => window.requestAnimationFrame(cb);
 
   const highPromise = Promise.resolve();
   const highPriority: Function[] = [];
   const lowPriority: Function[] = [];
 
+  if (!App.raf) {
+    App.raf = window.requestAnimationFrame.bind(window);
+  }
 
   function doHighPriority() {
     // holy geez we need to get this stuff done and fast
@@ -37,7 +39,7 @@ export function createQueueClient(win: Window, resolvePending?: boolean, rafPend
       // we already don't have time to do anything in this callback
       // let's throw the next one in a requestAnimationFrame
       // so we can just simmer down for a bit
-      raf(flush);
+      App.raf(flush);
     }
   }
 
@@ -55,7 +57,7 @@ export function createQueueClient(win: Window, resolvePending?: boolean, rafPend
     if (rafPending = (lowPriority.length > 0)) {
       // still more to do yet, but we've run out of time
       // let's let this thing cool off and try again in the next ric
-      raf(doWork);
+      App.raf(doWork);
     }
   }
 
@@ -79,7 +81,7 @@ export function createQueueClient(win: Window, resolvePending?: boolean, rafPend
         if (!rafPending) {
           // not already pending work to do, so let's tee it up
           rafPending = true;
-          raf(doWork);
+          App.raf(doWork);
         }
       }
     }

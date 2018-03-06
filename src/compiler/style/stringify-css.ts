@@ -82,7 +82,7 @@ export class StringifyCss {
     if (documentCss === '') {
       return '';
     }
-    var doc = '@' + (node.vendor || '') + 'document ' + node.document;
+    const doc = '@' + (node.vendor || '') + 'document ' + node.document;
     return doc + '{' + documentCss + '}';
   }
 
@@ -132,7 +132,7 @@ export class StringifyCss {
    */
 
   keyframe(node: any) {
-    var decls = node.declarations;
+    const decls = node.declarations;
 
     return node.values.join(',') + '{' + this.mapVisit(decls) + '}';
   }
@@ -142,7 +142,7 @@ export class StringifyCss {
    */
 
   page(node: any) {
-    var sel = node.selectors.length
+    const sel = node.selectors.length
       ? node.selectors.join(', ')
       : '';
 
@@ -183,13 +183,13 @@ export class StringifyCss {
    */
 
   rule(node: any) {
-    var decls = node.declarations;
+    const decls = node.declarations;
     if (!decls.length) return '';
 
     var i: number, j: number;
 
     for (i = node.selectors.length - 1; i >= 0; i--) {
-      var sel = getSelectors(node.selectors[i]);
+      const sel = getSelectors(node.selectors[i]);
 
       if (this.usedSelectors) {
         var include = true;
