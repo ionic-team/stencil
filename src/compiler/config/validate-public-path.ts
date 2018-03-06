@@ -3,6 +3,10 @@ import { normalizePath } from '../util';
 
 
 export function validatePublicPath(config: Config) {
+  if (!config.outputTargets['www']) {
+    return;
+  }
+
   if (typeof config.discoverPublicPath !== 'boolean') {
     // only do this check if the config hasn't been fully validated yet
     // if the config has a publicPath, then let's remember it was a custom one

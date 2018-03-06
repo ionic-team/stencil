@@ -1,7 +1,6 @@
 import { Config } from '../../declarations';
 import {
   DEFAULT_BUILD_DIR,
-  DEFAULT_COLLECTION_DIR,
   DEFAULT_DIST_DIR,
   DEFAULT_INDEX_HTML,
   DEFAULT_WWW_DIR,
@@ -17,25 +16,6 @@ export function _deprecatedToMultipleTarget(config: Config) {
   } = config;
 
   if (outputTargets === undefined) {
-    outputTargets = {};
-
-    if (config.generateWWW !== false) {
-      outputTargets['www'] = {
-        emptyDir: !(config.emptyWWW === false),
-        dir: config.wwwDir || DEFAULT_WWW_DIR,
-        buildDir: config.buildDir || DEFAULT_BUILD_DIR,
-        indexHtml: config.wwwIndexHtml || DEFAULT_INDEX_HTML
-      };
-    }
-
-    if (config.generateDistribution === true) {
-      outputTargets['distribution'] = {
-        emptyDir: !(config.emptyDist === false),
-        dir: config.distDir || DEFAULT_DIST_DIR,
-        collectionDir: config.collectionDir || DEFAULT_COLLECTION_DIR
-      };
-    }
-
     const warningMsg =
 `As of v0.7.0 "config.generateWWW, config.wwwDir" has been deprecated in favor of a configuration
 that supports multiple output targets. The new format is as follows:
@@ -51,7 +31,42 @@ outputTargets: {
   }
 }
 `;
-    config.logger.warn(warningMsg);
+    if (config.logger) {
+      config.logger.warn(warningMsg);
+    }
+  }
+
+  if (outputTargets && outputTargets['www']) {
+    outputTargets['www'] = {
+      emptyDir: true,
+      dir: DEFAULT_WWW_DIR,
+      buildDir: DEFAULT_BUILD_DIR,
+      indexHtml: DEFAULT_INDEX_HTML,
+      ...outputTargets['www']
+    };
+  } else if (!outputTargets && config.generateWWW !== false) {
+    outputTargets = {};
+    outputTargets['www'] = {
+      emptyDir: !(config.emptyWWW === false),
+      dir: config.wwwDir || DEFAULT_WWW_DIR,
+      buildDir: config.buildDir || DEFAULT_BUILD_DIR,
+      indexHtml: config.wwwIndexHtml || DEFAULT_INDEX_HTML
+    };
+  } else {
+    outputTargets = outputTargets || {};
+  }
+
+  if (outputTargets && outputTargets['distribution']) {
+    outputTargets['distribution'] = {
+      emptyDir: true,
+      dir: DEFAULT_DIST_DIR,
+      ...outputTargets['distribution']
+    };
+  } else if (config.generateDistribution === true) {
+    outputTargets['distribution'] = {
+      emptyDir: !(config.emptyDist === false),
+      dir: config.distDir || DEFAULT_DIST_DIR,
+    };
   }
 
   delete config.generateWWW;
@@ -62,7 +77,6 @@ outputTargets: {
   delete config.generateDistribution;
   delete config.emptyDist;
   delete config.distDir;
-  delete config.collectionDir;
 
   config.outputTargets = outputTargets;
 }

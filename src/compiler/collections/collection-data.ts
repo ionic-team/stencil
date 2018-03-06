@@ -13,8 +13,12 @@ import { normalizePath } from '../util';
 
 export async function writeAppCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
 
+  if (!config.outputTargets['distribution']) {
+    return Promise.resolve();
+  }
+
   // get the absolute path to the directory where the collection will be saved
-  const collectionDir = normalizePath(config.outputTargets['distribution'].collectionDir);
+  const collectionDir = normalizePath(config.collectionDir);
 
   // create an absolute file path to the actual collection json file
   const collectionFilePath = normalizePath(config.sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
@@ -25,10 +29,8 @@ export async function writeAppCollection(config: Config, compilerCtx: CompilerCt
   // add it to the list of files we need to write when we're ready
   const collectionData = serializeAppCollection(config, compilerCtx, collectionDir, buildCtx.entryModules, buildCtx.global);
 
-  if (config.outputTargets['distribution']) {
-    // don't bother serializing/writing the collection if we're not creating a distribution
-    await compilerCtx.fs.writeFile(collectionFilePath, JSON.stringify(collectionData, null, 2));
-  }
+  // don't bother serializing/writing the collection if we're not creating a distribution
+  await compilerCtx.fs.writeFile(collectionFilePath, JSON.stringify(collectionData, null, 2));
 
   return collectionData;
 }

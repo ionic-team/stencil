@@ -60,9 +60,18 @@ export function validatePaths(config: Config) {
       normalizePath(path.join(config.rootDir, config.outputTargets['distribution'].dir));
   }
 
-  if (config.outputTargets['distribution'] && !path.isAbsolute(config.outputTargets['distribution'].collectionDir)) {
-    config.outputTargets['distribution'].collectionDir =
-      normalizePath(path.join(config.outputTargets['distribution'].dir, config.outputTargets['distribution'].collectionDir));
+  setStringConfig(config, 'collectionDir', DEFAULT_COLLECTION_DIR);
+  if (!path.isAbsolute(config.collectionDir)) {
+    let distPath;
+
+    if (config.outputTargets['distribution']) {
+      distPath = config.outputTargets['distribution'].dir;
+    } else {
+      distPath = normalizePath(path.join(config.rootDir, DEFAULT_DIST_DIR));
+    }
+
+    config.collectionDir =
+      normalizePath(path.join(distPath, config.collectionDir));
   }
 
   setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
@@ -97,11 +106,11 @@ export function validatePaths(config: Config) {
   }
 }
 
-export const DEFAULT_DIST_DIR = 'dist';
 export const DEFAULT_WWW_DIR = 'www';
 export const DEFAULT_INDEX_HTML = 'index.html';
-export const DEFAULT_COLLECTION_DIR = 'collection';
 export const DEFAULT_BUILD_DIR = 'build';
+export const DEFAULT_DIST_DIR = 'dist';
+const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_TSCONFIG = 'tsconfig.json';

@@ -84,6 +84,7 @@ describe('build-project-files', () => {
       config.fsNamespace = 'my-app';
       config.publicPath = '/my/custom/public/path/';
       config.discoverPublicPath = false;
+      config.outputTargets = {};
 
       const res = await generateLoader(
         config,
@@ -113,6 +114,7 @@ describe('build-project-files', () => {
     config.namespace = 'MyApp';
     config.fsNamespace = 'my-app';
     config.publicPath = 'build/';
+    config.outputTargets = {};
 
     const ctx: CompilerCtx = { appFiles: {}, cache: mockCache() as any };
 

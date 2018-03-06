@@ -341,7 +341,7 @@ describe('validation', () => {
   });
 
   it('should set generateWWW to false', () => {
-    config.generateWWW = false;
+    config.outputTargets = {};
     validateBuildConfig(config);
     expect(config.outputTargets['www']).toBe(undefined);
   });

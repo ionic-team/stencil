@@ -21,8 +21,12 @@ describe('validatePublicPath', () => {
 
 
   it('should set publicPath from custom buildDir', () => {
-    config.outputTargets.www.dir = 'some-www';
-    config.outputTargets.www.buildDir = 'some-build';
+    config.outputTargets = {
+      www: {
+        dir: 'some-www',
+        buildDir: 'some-build'
+      }
+    };
     validateBuildConfig(config);
     expect(config.publicPath).toBe('/some-build/');
     expect(path.isAbsolute(config.publicPath)).toBe(true);

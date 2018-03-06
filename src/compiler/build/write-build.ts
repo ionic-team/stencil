@@ -65,7 +65,7 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
     emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['www'].dir));
   }
 
-  if (config.outputTargets['distribution'] && config.outputTargets['www'].emptyDir) {
+  if (config.outputTargets['distribution'] && config.outputTargets['distribution'].emptyDir) {
     config.logger.debug(`empty dist dir: ${config.outputTargets['distribution'].dir}`);
     emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['distribution'].dir));
   }

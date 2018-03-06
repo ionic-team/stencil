@@ -99,6 +99,11 @@ describe('distribution', () => {
       config = mockConfig();
       config.namespace = 'SomeNamespace';
       config.fsNamespace = config.namespace.toLowerCase();
+      config.outputTargets['distribution'] = {
+        dir: '/dist',
+        collectionDir: '/dist/collection'
+      };
+      config.typesDir = '/dist/types';
       diagnostics = [];
       packageJsonData = {};
     });

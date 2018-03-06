@@ -1,11 +1,12 @@
 import { _deprecatedToMultipleTarget } from '../_deprecated-validate-multiple-targets';
+import { Config } from '../../../declarations';
 
 describe('_deprecated multiple targets', () => {
   it('do nothing if outputTargets already provided', () => {
-    const config = _deprecatedToMultipleTarget({
+    const config: Config = {
       outputTargets: {
         www: {
-          dir: 'www',
+          dir: 'ww',
           emptyDir: true
         },
         distribution: {
@@ -13,52 +14,72 @@ describe('_deprecated multiple targets', () => {
           emptyDir: true
         }
       }
-    });
+    };
+    _deprecatedToMultipleTarget(config);
 
     expect(config).toEqual({
       outputTargets: {
         www: {
-          dir: 'www',
-          emptyDir: true
+          emptyDir: true,
+          dir: 'ww',
+          buildDir: 'build',
+          indexHtml: 'index.html'
         },
         distribution: {
+          emptyDir: true,
           dir: 'dist',
-          emptyDir: true
         }
       }
     });
   });
 
   it('no configuration is provided should default to www and dist filled out', () => {
-    const config = _deprecatedToMultipleTarget({});
+    const config: Config = {};
+    _deprecatedToMultipleTarget(config);
 
     expect(config).toEqual({
       outputTargets: {
         www: {
+          emptyDir: true,
           dir: 'www',
-          emptyDir: true
+          buildDir: 'build',
+          indexHtml: 'index.html'
         }
       }
     });
   });
+  it('no configuration is provided should default to www and dist filled out', () => {
+    const config: Config = {
+      outputTargets: {}
+    };
+    _deprecatedToMultipleTarget(config);
+
+    expect(config).toEqual({
+      outputTargets: {}
+    });
+  });
 
   it('should use provided values', () => {
-    const config = _deprecatedToMultipleTarget({
+    const config: Config = {
       wwwDir: 'wwwdir',
       emptyWWW: false,
+      generateDistribution: true,
       distDir: 'distdir',
       emptyDist: false
-    });
+    };
+    _deprecatedToMultipleTarget(config);
 
     expect(config).toEqual({
       outputTargets: {
         www: {
+          emptyDir: false,
           dir: 'wwwdir',
-          emptyDir: false
+          buildDir: 'build',
+          indexHtml: 'index.html'
         },
         distribution: {
+          emptyDir: false,
           dir: 'distdir',
-          emptyDir: false
         }
       }
     });

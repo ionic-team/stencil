@@ -31,7 +31,7 @@ export async function copyComponentStyles(config: Config, compilerCtx: CompilerC
 
     await Promise.all(absSrcStylePaths.map(async absSrcStylePath => {
       const relPath = config.sys.path.relative(config.srcDir, absSrcStylePath);
-      const dest = config.sys.path.join(config.outputTargets['distribution'].collectionDir, relPath);
+      const dest = config.sys.path.join(config.collectionDir, relPath);
 
       await compilerCtx.fs.copy(absSrcStylePath, dest);
     }));

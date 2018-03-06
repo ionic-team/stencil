@@ -66,7 +66,7 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
       copyToCollectionDir.forEach(assetsMeta => {
         // figure out what the path is to the component directory
         const collectionDirDestination = pathJoin(config,
-          config.outputTargets['distribution'].collectionDir,
+          config.collectionDir,
           config.sys.path.relative(config.srcDir, assetsMeta.absolutePath)
         );
 

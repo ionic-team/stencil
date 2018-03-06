@@ -76,9 +76,9 @@ async function compileExternalStyle(config: Config, compilerCtx: CompilerCtx, bu
 
   const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
 
-  if (config.outputTargets['distribution'] && !moduleFile.isCollectionDependency) {
+  if (!moduleFile.isCollectionDependency) {
     const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
-    const collectionPath = config.sys.path.join(config.outputTargets['distribution'].collectionDir, relPath);
+    const collectionPath = config.sys.path.join(config.collectionDir, relPath);
     await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
   }
 

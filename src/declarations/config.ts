@@ -12,7 +12,6 @@ export type ConfigBuildTarget = {
   distribution?: {
     dir?: string;
     emptyDir?: boolean;
-    collectionDir?: string;
   }
 };
 
@@ -71,6 +70,7 @@ export interface Config {
   generateDistribution?: boolean;
   distDir?: string;
   emptyDist?: boolean;
+
   collectionDir?: string;
 
   /**

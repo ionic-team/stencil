@@ -32,11 +32,12 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) 
   }
 
   // apply user config to tsconfig
-  compilerOptions.outDir = config.outputTargets['distribution'].collectionDir;
   compilerOptions.rootDir = config.srcDir;
 
   // generate .d.ts files when generating a distribution and in prod mode
   compilerOptions.declaration = !!config.outputTargets['distribution'];
+
+  compilerOptions.outDir = config.collectionDir;
 
   if (config.outputTargets['distribution']) {
     compilerOptions.declarationDir = config.typesDir;

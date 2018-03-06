@@ -110,16 +110,6 @@ function getTestBuildConfig() {
   config.devMode = true;
   config._isTesting = true;
   config.serviceWorker = false;
-  config.outputTargets = {
-    www: {
-      dir: 'www',
-      emptyDir: false
-    },
-    distribution: {
-      dir: 'dist',
-      emptyDir: false
-    }
-  };
 
   return validateBuildConfig(config);
 }

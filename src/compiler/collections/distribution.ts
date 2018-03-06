@@ -56,6 +56,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
 
   const mainFileName = getLoaderFileName(config);
   const main = pathJoin(config, config.sys.path.relative(config.rootDir, config.outputTargets['distribution'].dir), mainFileName);
+
   if (!pkgData.main || normalizePath(pkgData.main) !== main) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
@@ -76,7 +77,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
     err.messageText = `package.json "types" file must have a ".d.ts" extension: ${pkgData.types}`;
   }
 
-  const collection = pathJoin(config, config.sys.path.relative(config.rootDir, config.outputTargets['distribution'].collectionDir), COLLECTION_MANIFEST_FILE_NAME);
+  const collection = pathJoin(config, config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
   if (!pkgData.collection || normalizePath(pkgData.collection) !== collection) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
