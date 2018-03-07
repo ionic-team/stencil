@@ -159,7 +159,8 @@ For the small minority of browsers that do not support modern browser features a
  - [Element.matches](https://github.com/jonathantneal/closest)
  - [Element.remove](https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove)
  - [String.startsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/startsWith)
-- [String.endsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith)
+ - [String.endsWith](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/endsWith)
+ - [weakmap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)
 
 
 ## Related
