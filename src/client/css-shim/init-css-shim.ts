@@ -32,7 +32,7 @@ function loadLinkStyles(doc: Document, customStyle: CustomStyle, linkElm: HTMLLi
 
   return fetch(url).then(rsp => rsp.text()).then(text => {
 
-    if (text.indexOf('--') > -1 || text.indexOf('var(') > -1) {
+    if (hasCssVariables(text)) {
       const styleElm = doc.createElement('style');
       styleElm.innerHTML = text;
       linkElm.parentNode.insertBefore(styleElm, linkElm);
@@ -47,4 +47,9 @@ function loadLinkStyles(doc: Document, customStyle: CustomStyle, linkElm: HTMLLi
   }).catch(err => {
     console.error(err);
   });
+}
+
+
+export function hasCssVariables(css: string) {
+  return css.indexOf('var(') > -1 || /--[-a-zA-Z0-9\s]+:/.test(css);
 }
