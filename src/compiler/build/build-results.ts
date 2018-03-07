@@ -23,6 +23,7 @@ export function generateBuildResults(config: Config, compilerCtx: CompilerCtx, b
     filesDeleted: buildCtx.filesDeleted.slice().sort(),
     dirsAdded: buildCtx.dirsAdded.slice().sort(),
     dirsDeleted: buildCtx.dirsDeleted.slice().sort(),
+    hasSvg: !!buildCtx.hasSvg,
 
     components: [],
 

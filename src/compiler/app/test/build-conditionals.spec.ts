@@ -1,23 +1,56 @@
-import { BuildConditionals, ComponentMeta } from '../../../util/interfaces';
+import { BuildConditionals, BuildCtx, ComponentMeta, Config } from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
-import { setBuildFromComponentMeta, setBuildFromComponentContent } from '../build-conditionals';
+import { setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
 
 
 describe('build conditionals', () => {
 
+  let coreBuild: BuildConditionals;
+  let cmpMeta: ComponentMeta;
+  let config: Config;
+  let buildCtx: BuildCtx;
+
+  beforeEach(() => {
+    cmpMeta = {
+      membersMeta: {}
+    };
+    coreBuild = {} as any;
+    config = {};
+    buildCtx = {} as any;
+  });
+
+
+  describe('setBuildConditionals', () => {
+
+    it('set Build.svg true', async () => {
+      buildCtx.hasSvg = true;
+      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      expect(bc.svg).toBe(true);
+    });
+
+    it('set Build.svg false', async () => {
+      buildCtx.hasSvg = false;
+      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      expect(bc.svg).toBe(false);
+    });
+
+    it('set Build.isDev', async () => {
+      config.devMode = true;
+      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      expect(bc.isDev).toBe(true);
+      expect(bc.isProd).toBe(false);
+    });
+
+    it('set Build.isProd', async () => {
+      config.devMode = false;
+      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      expect(bc.isDev).toBe(false);
+      expect(bc.isProd).toBe(true);
+    });
+
+  });
+
   describe('setBuildFromComponentContent', () => {
-
-    it('SVG', () => {
-      const jsText = `SVG`;
-      setBuildFromComponentContent(coreBuild, jsText);
-      expect(coreBuild.svg).toBeTruthy();
-    });
-
-    it('svg', () => {
-      const jsText = `svg`;
-      setBuildFromComponentContent(coreBuild, jsText);
-      expect(coreBuild.svg).toBeTruthy();
-    });
 
     it('hostData', () => {
       const jsText = `hostData`;
@@ -88,7 +121,7 @@ describe('build conditionals', () => {
     });
 
     it('event', () => {
-      cmpMeta.eventsMeta = [{}];
+      cmpMeta.eventsMeta = [{ eventName: 'name' }];
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.event).toBeTruthy();
     });
@@ -175,17 +208,6 @@ describe('build conditionals', () => {
       expect(Object.keys(coreBuild).length).toBe(0);
     });
 
-  });
-
-
-  var coreBuild: BuildConditionals;
-  var cmpMeta: ComponentMeta;
-
-  beforeEach(() => {
-    cmpMeta = {
-      membersMeta: {}
-    };
-    (coreBuild as any) = {};
   });
 
 });

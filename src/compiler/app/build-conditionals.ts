@@ -1,19 +1,22 @@
-import { BuildConditionals, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile } from '../../declarations';
+import { BuildConditionals, BuildCtx, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile } from '../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
-export async function setBuildConditionals(config: Config, ctx: CompilerCtx, entryModules: EntryModule[]) {
+export async function setBuildConditionals(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
   coreBuild.clientSide = true;
   coreBuild.isDev = !!config.devMode;
+  coreBuild.isProd = !config.devMode;
+
+  coreBuild.svg = !!buildCtx.hasSvg;
 
   const promises: Promise<void>[] = [];
 
   entryModules.forEach(bundle => {
     bundle.moduleFiles.forEach(moduleFile => {
       if (moduleFile.cmpMeta) {
-        promises.push(setBuildFromComponent(config, ctx, coreBuild, moduleFile));
+        promises.push(setBuildFromComponent(config, compilerCtx, coreBuild, moduleFile));
       }
     });
   });
@@ -24,12 +27,12 @@ export async function setBuildConditionals(config: Config, ctx: CompilerCtx, ent
 }
 
 
-async function setBuildFromComponent(config: Config, ctx: CompilerCtx, coreBuild: BuildConditionals, moduleFile: ModuleFile) {
+async function setBuildFromComponent(config: Config, compilerCtx: CompilerCtx, coreBuild: BuildConditionals, moduleFile: ModuleFile) {
   setBuildFromComponentMeta(coreBuild, moduleFile.cmpMeta);
 
   if (moduleFile.jsFilePath) {
     try {
-      const jsText = await ctx.fs.readFile(moduleFile.jsFilePath);
+      const jsText = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
       setBuildFromComponentContent(coreBuild, jsText);
 
     } catch (e) {
@@ -130,8 +133,4 @@ export function setBuildFromComponentContent(coreBuild: BuildConditionals, jsTex
     coreBuild.hostData = (jsText.indexOf('hostData') > -1);
   }
 
-  if (!coreBuild.svg) {
-    jsText = jsText.toLowerCase();
-    coreBuild.svg = (jsText.indexOf('svg') > -1);
-  }
 }

@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentMeta, ComponentRef, ModuleFiles, ModuleGraph, PotentialComponentRef } from '../../declarations';
+import { BuildCtx, CompilerCtx, ComponentMeta, ComponentRef, ModuleFiles, ModuleGraph } from '../../declarations';
 import { getComponentRefsFromSourceStrings } from './component-references';
 
 
@@ -23,14 +23,14 @@ export function calcModuleGraphImportPaths(compilerCtx: CompilerCtx, moduleGraph
 const SRC_EXTS = ['.tsx', '.ts', '.js'];
 
 
-export function calcComponentDependencies(allModuleFiles: ModuleFiles, moduleGraphs: ModuleGraph[], sourceStrings: PotentialComponentRef[]) {
+export function calcComponentDependencies(allModuleFiles: ModuleFiles, buildCtx: BuildCtx) {
   // figure out all the component references seen in each file
-  const componentRefs = getComponentRefsFromSourceStrings(allModuleFiles, sourceStrings);
+  const componentRefs = getComponentRefsFromSourceStrings(allModuleFiles, buildCtx);
 
   Object.keys(allModuleFiles).forEach(filePath => {
     const moduleFile = allModuleFiles[filePath];
     if (moduleFile.cmpMeta) {
-      getComponentDependencies(moduleGraphs, componentRefs, filePath, moduleFile.cmpMeta);
+      getComponentDependencies(buildCtx.moduleGraphs, componentRefs, filePath, moduleFile.cmpMeta);
     }
   });
 }

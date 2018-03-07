@@ -30,6 +30,7 @@ export interface BuildCtx {
   filesAdded: string[];
   shouldAbort?(): boolean;
   data?: any;
+  hasSvg?: boolean;
   finish?(): Promise<BuildResults>;
 }
 
@@ -56,6 +57,7 @@ export interface BuildResults {
   filesDeleted: string[];
   components: BuildComponent[];
   entries: BuildEntry[];
+  hasSvg: boolean;
 }
 
 
@@ -131,6 +133,7 @@ export interface BuildConditionals {
   cssVarShim?: boolean;
   clientSide?: boolean;
   isDev: boolean;
+  isProd: boolean;
 
   // ssr
   ssrServerSide: boolean;
@@ -170,6 +173,7 @@ export interface BuildConditionals {
 
 export interface UserBuildConditionals {
   isDev: boolean;
+  isProd: boolean;
 }
 
 export interface FilesMap {
