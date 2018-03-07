@@ -15,15 +15,18 @@ export function validateServiceWorkerConfig(config: Config) {
 
   const swConfig: ServiceWorkerConfig = Object.assign({}, DEFAULT_SW_CONFIG, config.serviceWorker);
 
-  if (typeof swConfig.globDirectory !== 'string') {
-    swConfig.globDirectory = config.outputTargets['www'].dir;
-  }
+  if (config.outputTargets.www) {
+    if (typeof swConfig.globDirectory !== 'string') {
+      swConfig.globDirectory = config.outputTargets.www.dir;
+    }
 
-  if (!swConfig.swDest) {
-    swConfig.swDest = config.sys.path.join(config.outputTargets['www'].dir, DEFAULT_SW_FILENAME);
-  }
-  if (!config.sys.path.isAbsolute(swConfig.swDest)) {
-    swConfig.swDest = config.sys.path.join(config.outputTargets['www'].dir, swConfig.swDest);
+    if (!swConfig.swDest) {
+      swConfig.swDest = config.sys.path.join(config.outputTargets.www.dir, DEFAULT_SW_FILENAME);
+    }
+
+    if (!config.sys.path.isAbsolute(swConfig.swDest)) {
+      swConfig.swDest = config.sys.path.join(config.outputTargets.www.dir, swConfig.swDest);
+    }
   }
 
   config.serviceWorker = swConfig;
