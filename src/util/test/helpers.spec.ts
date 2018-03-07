@@ -5,6 +5,10 @@ describe('util helpers', () => {
 
   describe('dashToPascalCase', () => {
 
+    it('my-3d-component => My3dComponent', () => {
+      expect(dashToPascalCase('my-3d-component')).toBe('My3dComponent');
+    });
+
     it('madison-wisconsin => MadisonWisconsin', () => {
       expect(dashToPascalCase('madison-wisconsin')).toBe('MadisonWisconsin');
     });
@@ -16,6 +20,10 @@ describe('util helpers', () => {
   });
 
   describe('toDashCase', () => {
+
+    it('My3dComponent => my-3d-component', () => {
+      expect(toDashCase('My3dComponent')).toBe('my-3d-component');
+    });
 
     it('MadisonWisconsin => madison-wisconsin', () => {
       expect(toDashCase('MadisonWisconsin')).toBe('madison-wisconsin');
