@@ -283,6 +283,7 @@ declare global {
 
     export interface ImgHTMLAttributes extends HTMLAttributes {
       alt?: string;
+      decoding?: 'async' | 'auto' | 'sync';
       height?: number | string;
       sizes?: string;
       src?: string;
