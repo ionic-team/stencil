@@ -20,8 +20,4 @@ exports.config = {
   namespace: 'App',
   collections: []
 };
-
-exports.devServer = {
-  root: 'www'
-};
 `;
