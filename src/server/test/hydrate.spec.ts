@@ -1,11 +1,19 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../../declarations';
-import { hydrateHtml } from '../hydrate-html';
-import { h } from '../../renderer/vdom/h';
 import { compareHtml, mockConfig } from '../../testing/mocks';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '../../declarations';
+import { h } from '../../renderer/vdom/h';
+import { hydrateHtml } from '../hydrate-html';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 
 
 describe('hydrate', () => {
+
+  let config: Config;
+  let outputTarget: OutputTarget;
+
+  beforeEach(() => {
+    config = mockConfig();
+    outputTarget = config.outputTargets[0];
+  });
 
   it('should load content in nested named slots', async () => {
     const ctx: CompilerCtx = {};
@@ -52,7 +60,7 @@ describe('hydrate', () => {
       `
     };
 
-    const hydrateResults = await hydrateHtml(config, ctx, registry, opts);
+    const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
     expect(hydrateResults.diagnostics.length).toBe(0);
 
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
@@ -116,7 +124,7 @@ describe('hydrate', () => {
       `
     };
 
-    const hydrateResults = await hydrateHtml(config, ctx, registry, opts);
+    const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
 
     expect(hydrateResults.diagnostics.length).toBe(0);
 
@@ -172,7 +180,7 @@ describe('hydrate', () => {
       html: `<ion-test></ion-test>`
     };
 
-    const hydrateResults = await hydrateHtml(config, ctx, registry, opts);
+    const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
 
     expect(hydrateResults.diagnostics.length).toBe(0);
 
@@ -197,14 +205,8 @@ describe('hydrate', () => {
       html: `<body>hello</body>`
     };
 
-    const hydrateResults = await hydrateHtml(config, ctx, registry, opts);
+    const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
     expect(hydrateResults.html).toBe(`<body>hello</body>`);
-  });
-
-  var config: Config;
-
-  beforeEach(() => {
-    config = mockConfig();
   });
 
 });

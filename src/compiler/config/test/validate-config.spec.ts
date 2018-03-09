@@ -5,6 +5,20 @@ import { setProcessEnvironment, validateBuildConfig } from '../validate-config';
 
 describe('validation', () => {
 
+  let config: Config;
+  const logger = mockLogger();
+  const sys = mockStencilSystem();
+
+  beforeEach(() => {
+    config = {
+      sys: sys,
+      logger: logger,
+      rootDir: '/User/some/path/',
+      suppressTypeScriptErrors: true
+    };
+  });
+
+
   describe('enableCache', () => {
 
     it('set enableCache true', () => {
@@ -329,39 +343,28 @@ describe('validation', () => {
     expect(config.generateDocs).toBe(true);
   });
 
-  it('should set generateDistribution to true', () => {
-    config.generateDistribution = true;
+  it('should set generateDistribution to be defined', () => {
+    (config as any).generateDistribution = true;
     validateBuildConfig(config);
-    expect(config.outputTargets['distribution']).not.toBe(undefined);
+    expect(config.outputTargets[0].type).toBe('dist');
   });
 
-  it('should default generateDistribution to false', () => {
+  it('should default dist false and www true', () => {
     validateBuildConfig(config);
-    expect(config.outputTargets['distribution']).toBe(undefined);
+    expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
+    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
 
-  it('should set generateWWW to false', () => {
-    config.outputTargets = {};
-    validateBuildConfig(config);
-    expect(config.outputTargets['www']).toBe(undefined);
+  it('should require at least one output target', () => {
+    expect(() => {
+      config.outputTargets = [];
+      validateBuildConfig(config);
+    }).toThrow();
   });
 
-  it('should default generateWWW to true', () => {
+  it('should default outputTargets with www', () => {
     validateBuildConfig(config);
-    expect(config.outputTargets['www']).not.toBe(undefined);
-  });
-
-  var config: Config;
-  const logger = mockLogger();
-  const sys = mockStencilSystem();
-
-  beforeEach(() => {
-    config = {
-      sys: sys,
-      logger: logger,
-      rootDir: '/User/some/path/',
-      suppressTypeScriptErrors: true
-    };
+    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
 
 });

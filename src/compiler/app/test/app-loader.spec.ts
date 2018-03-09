@@ -1,27 +1,36 @@
-import { AppRegistry, CompilerCtx, ComponentRegistry, Config, LoadComponentRegistry } from '../../../declarations';
+import { AppRegistry, CompilerCtx, ComponentRegistry, Config, LoadComponentRegistry, OutputTarget } from '../../../declarations';
 import { generateLoader, injectAppIntoLoader } from '../app-loader';
 import { generatePreamble } from '../../util';
-import { mockCache, mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { mockCache, mockCompilerCtx, mockLogger, mockStencilSystem } from '../../../testing/mocks';
 
 
 describe('build-project-files', () => {
+
   let mockStencilContent: string;
   let config: Config;
+  let outputTarget: OutputTarget;
 
   beforeEach(() => {
     mockStencilContent = `('__APP__')`;
+
     config = {
       namespace: 'MyApp',
       fsNamespace: 'my-app',
       logger: mockLogger(),
       sys: mockStencilSystem(),
-      hydratedCssClass: 'hydrated',
-      publicPath: 'build'
+      hydratedCssClass: 'hydrated'
+    };
+
+    outputTarget = {
+      type: 'www',
+      publicPath: 'build',
     };
   });
 
   describe('injectAppIntoLoader', () => {
+
     let mockMinify: jest.Mock<any>;
+
     beforeEach(() => {
       mockMinify = jest.fn();
       mockMinify.mockReturnValue({ diagnostics: [] });  // NOTE: bad idea - typedef has this as optional, but not optional in the code under test...
@@ -40,6 +49,7 @@ describe('build-project-files', () => {
 
       const appLoader = injectAppIntoLoader(
         config,
+        outputTarget,
         'my-app.core.js',
         'my-app.core.pf.js',
         'hydrated-css',
@@ -53,7 +63,9 @@ describe('build-project-files', () => {
   });
 
   describe('generate loader', () => {
+
     let mockGetClientCoreFile: jest.Mock<Promise<string>>;
+
     beforeEach(() => {
       mockGetClientCoreFile = jest.fn();
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(''));
@@ -70,7 +82,7 @@ describe('build-project-files', () => {
     it('includes the injected app, w/ discoverPublicPath', async () => {
       mockGetClientCoreFile.mockReturnValue(Promise.resolve(`pretend i am code ('__APP__') yeah me too`));
 
-      const ctx: CompilerCtx = { appFiles: {}, cache: mockCache() as any };
+      const ctx = mockCompilerCtx();
 
       const appRegistry: AppRegistry = {
         core: 'myapp.core.js',
@@ -82,13 +94,14 @@ describe('build-project-files', () => {
 
       config.namespace = 'MyApp';
       config.fsNamespace = 'my-app';
-      config.publicPath = '/my/custom/public/path/';
-      config.discoverPublicPath = false;
-      config.outputTargets = {};
+      config.outputTargets = [
+        { type: 'www', buildDir: 'build/my-app/', publicPath: '/my/custom/public/path/', discoverPublicPath: false }
+      ];
 
       const res = await generateLoader(
         config,
         ctx,
+        config.outputTargets[0],
         appRegistry,
         {}
       );
@@ -113,10 +126,11 @@ describe('build-project-files', () => {
   }) {
     config.namespace = 'MyApp';
     config.fsNamespace = 'my-app';
-    config.publicPath = 'build/';
-    config.outputTargets = {};
+    config.outputTargets = [
+      { type: 'www', buildDir: 'build/mp-app/', publicPath: 'build/' }
+    ];
 
-    const ctx: CompilerCtx = { appFiles: {}, cache: mockCache() as any };
+    const ctx = mockCompilerCtx();
 
     const appRegistry: AppRegistry = {
       core: 'myapp.core.js',
@@ -129,6 +143,7 @@ describe('build-project-files', () => {
     return await generateLoader(
       config,
       ctx,
+      config.outputTargets[0],
       appRegistry,
       (params && params.componentRegistry) || {}
     );

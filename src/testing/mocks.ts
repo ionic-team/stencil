@@ -20,12 +20,15 @@ export function mockPlatform(win?: any, domApi?: DomApi) {
   };
   const App: AppGlobal = {};
   const config = mockConfig();
+  const outputTarget = config.outputTargets[0];
+
   win = win || config.sys.createDom().parse({html: ''});
   domApi = domApi || createDomApi(App, win, win.document);
   const cmpRegistry: ComponentRegistry = {};
 
   const plt = createPlatformServer(
     config,
+    outputTarget,
     win,
     win.document,
     cmpRegistry,
@@ -86,6 +89,9 @@ export function mockCompilerCtx() {
   const compilerCtx: CompilerCtx = {
     activeBuildId: 0,
     fs: new InMemoryFileSystem(mockFs(), require('path')),
+    collections: [],
+    appFiles: {},
+    cache: mockCache()
   };
 
   return compilerCtx;

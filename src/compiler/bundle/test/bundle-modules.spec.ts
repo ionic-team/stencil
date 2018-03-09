@@ -6,6 +6,15 @@ describe('bundle-module', () => {
 
   describe('build', () => {
 
+    let c: TestingCompiler;
+
+    beforeEach(async () => {
+      c = new TestingCompiler();
+      await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+      await c.fs.commit();
+    });
+
+
     it('should not rebuild without js changes', async () => {
       c.config.watch = true;
       c.config.bundles = [
@@ -106,14 +115,6 @@ describe('bundle-module', () => {
         '/www/build/app/cmp-b.js',
         '/www/build/app/chunk1.js'
       );
-    });
-
-    var c: TestingCompiler;
-
-    beforeEach(async () => {
-      c = new TestingCompiler();
-      await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
-      await c.fs.commit();
     });
 
   });

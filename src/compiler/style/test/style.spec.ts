@@ -7,6 +7,15 @@ describe('component-styles', () => {
 
   describe('build', () => {
 
+    let c: TestingCompiler;
+
+    beforeEach(async () => {
+      c = new TestingCompiler();
+      await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+      await c.fs.commit();
+    });
+
+
     it('should build one component w/ inline style', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];
       await c.fs.writeFiles({
@@ -106,14 +115,6 @@ describe('component-styles', () => {
 
       const content = await c.fs.readFile('/www/build/app/cmp-a.js');
       expect(content).toContain(`body { color: red; }`);
-    });
-
-    var c: TestingCompiler;
-
-    beforeEach(async () => {
-      c = new TestingCompiler();
-      await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
-      await c.fs.commit();
     });
 
   });

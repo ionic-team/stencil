@@ -106,10 +106,8 @@ function getTestBuildConfig() {
     devMode: true
   };
 
-  config.prerender = false;
   config.devMode = true;
   config._isTesting = true;
-  config.serviceWorker = false;
 
   return validateBuildConfig(config);
 }
