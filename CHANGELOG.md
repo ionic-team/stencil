@@ -1,3 +1,13 @@
+<a name="0.7.0-2"></a>
+# 😄 [0.7.0-2](https://github.com/ionic-team/stencil/compare/v0.7.0-1...v0.7.0-2) (2018-03-09)
+
+
+### Bug Fixes
+
+* **service-worker:** do not build service worker in dev builds ([72e2997](https://github.com/ionic-team/stencil/commit/72e2997))
+
+
+
 <a name="0.7.0-1"></a>
 # 🍅 [0.7.0-1](https://github.com/ionic-team/stencil/compare/v0.7.0-0...v0.7.0-1) (2018-03-09)
 
@@ -14,8 +24,8 @@
 
 ### Features
 
-* add image decode attribute to JSX definition ([#596](https://github.com/ionic-team/stencil/issues/596)) ([fbda0c8](https://github.com/ionic-team/stencil/commit/fbda0c8))
 * **config:** allow for multiple output target configurations ([c808dee](https://github.com/ionic-team/stencil/commit/c808dee))
+* **types:** add image decode attribute to JSX definition ([#596](https://github.com/ionic-team/stencil/issues/596)) ([fbda0c8](https://github.com/ionic-team/stencil/commit/fbda0c8))
 
 
 
