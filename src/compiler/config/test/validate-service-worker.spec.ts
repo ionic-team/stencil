@@ -8,7 +8,7 @@ describe('validateServiceWorker', () => {
 
   const config: Config = {
     sys: mockStencilSystem(),
-    devMode: true
+    devMode: false
   };
 
   let outputTarget: OutputTarget;
@@ -31,7 +31,6 @@ describe('validateServiceWorker', () => {
       type: 'www',
       dir: '/User/me/app/www/'
     };
-    config.devMode = false;
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globDirectory).toBe('/User/me/app/www/');
   });
@@ -56,7 +55,6 @@ describe('validateServiceWorker', () => {
         globPatterns: '**/*.{png,svg}' as any
       }
     };
-    config.devMode = false;
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{png,svg}']);
   });
@@ -66,7 +64,6 @@ describe('validateServiceWorker', () => {
       type: 'www',
       dir: '/www'
     };
-    config.devMode = false;
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{js,css,json,html,ico,png,svg}']);
   });
@@ -76,7 +73,6 @@ describe('validateServiceWorker', () => {
       type: 'www',
       dir: '/www'
     };
-    config.devMode = false;
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).not.toBe(null);
   });
@@ -107,6 +103,16 @@ describe('validateServiceWorker', () => {
     config.devMode = true;
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).not.toBe(true);
+  });
+
+  it('should not create sw config when in devMode', () => {
+    outputTarget = {
+      dir: '/www',
+      serviceWorker: true as any
+    };
+    config.devMode = true;
+    validateServiceWorker(config, outputTarget);
+    expect(outputTarget.serviceWorker).toBe(null);
   });
 
   it('should do nothing when falsy', () => {

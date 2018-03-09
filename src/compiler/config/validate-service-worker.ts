@@ -2,6 +2,11 @@ import { Config, OutputTarget } from '../../declarations';
 
 
 export function validateServiceWorker(config: Config, outputTarget: OutputTarget) {
+  if (config.devMode) {
+    outputTarget.serviceWorker = null;
+    return;
+  }
+
   if (outputTarget.serviceWorker === false || outputTarget.serviceWorker === null) {
     outputTarget.serviceWorker = null;
     return;
