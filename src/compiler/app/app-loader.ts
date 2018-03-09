@@ -1,13 +1,14 @@
-import { AppRegistry, CompilerCtx, ComponentRegistry, Config } from '../../declarations';
+import { AppRegistry, CompilerCtx, ComponentRegistry, Config, OutputTarget } from '../../declarations';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
 import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 import { generatePreamble, minifyJs } from '../util';
-import { getAppPublicPath, getLoaderDist, getLoaderFileName, getLoaderWWW } from './app-file-naming';
+import { getAppPublicPath, getLoaderFileName, getLoaderPath } from './app-file-naming';
 
 
 export async function generateLoader(
   config: Config,
   compilerCtx: CompilerCtx,
+  outputTarget: OutputTarget,
   appRegistry: AppRegistry,
   cmpRegistry: ComponentRegistry
 ) {
@@ -19,6 +20,7 @@ export async function generateLoader(
 
   loaderContent = injectAppIntoLoader(
     config,
+    outputTarget,
     appRegistry.core,
     appRegistry.corePolyfilled,
     config.hydratedCssClass,
@@ -27,39 +29,27 @@ export async function generateLoader(
   );
 
   // write the app loader file
-  if (compilerCtx.appFiles.loaderContent !== loaderContent) {
-    // app loader file is actually different from our last saved version
-    config.logger.debug(`build, app loader: ${appLoaderFileName}`);
-    compilerCtx.appFiles.loaderContent = loaderContent;
+  // app loader file is actually different from our last saved version
+  config.logger.debug(`build, app loader: ${appLoaderFileName}`);
 
-    if (config.minifyJs) {
-      // minify the loader
-      const minifyJsResults = await minifyJs(config, compilerCtx, loaderContent, 'es5', true);
-      minifyJsResults.diagnostics.forEach(d => {
-        (config.logger as any)[d.level](d.messageText);
-      });
+  if (config.minifyJs) {
+    // minify the loader
+    const minifyJsResults = await minifyJs(config, compilerCtx, loaderContent, 'es5', true);
+    minifyJsResults.diagnostics.forEach(d => {
+      (config.logger as any)[d.level](d.messageText);
+    });
 
-      if (!minifyJsResults.diagnostics.length) {
-        loaderContent = minifyJsResults.output;
-      }
-
-    } else {
-      // dev
-      loaderContent = generatePreamble(config) + '\n' + loaderContent;
+    if (!minifyJsResults.diagnostics.length) {
+      loaderContent = minifyJsResults.output;
     }
 
-    compilerCtx.appFiles.loader = loaderContent;
-
-    if (config.outputTargets['www']) {
-      const appLoaderWWW = getLoaderWWW(config);
-      await compilerCtx.fs.writeFile(appLoaderWWW, loaderContent);
-    }
-
-    if (config.outputTargets['distribution']) {
-      const appLoaderDist = getLoaderDist(config);
-      await compilerCtx.fs.writeFile(appLoaderDist, loaderContent);
-    }
+  } else {
+    // dev
+    loaderContent = generatePreamble(config) + '\n' + loaderContent;
   }
+
+  const appLoadPath = getLoaderPath(config, outputTarget);
+  await compilerCtx.fs.writeFile(appLoadPath, loaderContent);
 
   return loaderContent;
 }
@@ -67,6 +57,7 @@ export async function generateLoader(
 
 export function injectAppIntoLoader(
   config: Config,
+  outputTarget: OutputTarget,
   appCoreFileName: string,
   appCorePolyfilledFileName: string,
   hydratedCssClass: string,
@@ -77,9 +68,9 @@ export function injectAppIntoLoader(
 
   const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
 
-  const publicPath = getAppPublicPath(config);
+  const publicPath = getAppPublicPath(config, outputTarget);
 
-  const discoverPublicPath = (config.discoverPublicPath !== false);
+  const discoverPublicPath = (outputTarget.discoverPublicPath !== false);
 
   const loaderArgs = [
     `"${config.namespace}"`,

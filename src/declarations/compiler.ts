@@ -15,8 +15,6 @@ export interface CompilerCtx {
   compiledModuleLegacyJsText?: d.ModuleBundles;
   collections?: d.Collection[];
   appFiles?: {
-    loader?: string;
-    loaderContent?: string;
     core?: string;
     corePolyfilled?: string;
     global?: string;

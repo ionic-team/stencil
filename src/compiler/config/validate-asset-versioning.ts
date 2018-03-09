@@ -15,12 +15,12 @@ export function validateAssetVerioning(config: Config) {
   const hashLength = config.hashedFileNameLength > 3 ? config.hashedFileNameLength : DEFAULTS.hashLength;
 
   setArrayConfig(config.assetVersioning, 'cssProperties', DEFAULTS.cssProperties);
-  setNumberConfig(config.assetVersioning, 'hashLength', hashLength);
-  setBooleanConfig(config.assetVersioning, 'queryMode', DEFAULTS.queryMode);
+  setNumberConfig(config.assetVersioning, 'hashLength', null, hashLength);
+  setBooleanConfig(config.assetVersioning, 'queryMode', null, DEFAULTS.queryMode);
   setStringConfig(config.assetVersioning, 'prefix', DEFAULTS.separator);
   setStringConfig(config.assetVersioning, 'separator', DEFAULTS.separator);
-  setBooleanConfig(config.assetVersioning, 'versionHtml', DEFAULTS.versionHtml);
-  setBooleanConfig(config.assetVersioning, 'versionCssProperties', DEFAULTS.versionCssProperties);
+  setBooleanConfig(config.assetVersioning, 'versionHtml', null, DEFAULTS.versionHtml);
+  setBooleanConfig(config.assetVersioning, 'versionCssProperties', null, DEFAULTS.versionCssProperties);
 }
 
 

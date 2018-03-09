@@ -1,23 +1,31 @@
 import { Config } from '../../../declarations';
 import { createFilter, makeLegalIdentifier } from 'rollup-pluginutils';
+import { IN_MEMORY_DIR } from '../../../util/in-memory-fs';
+import { pathJoin } from '../../util';
 
 
 export default function bundleJson(config: Config, options: Options = {}) {
   const path = config.sys.path;
   const filter = createFilter(options.include, options.exclude);
 
+  const collectionDirs = config.outputTargets.filter(o => o.collectionDir).map(o => o.collectionDir);
+
+  const inMemoryDir = pathJoin(config, config.rootDir, IN_MEMORY_DIR);
+  collectionDirs.push(inMemoryDir);
+
   return {
     name: 'json',
 
     resolveId(importee: string, importer: string): any {
-      if (importer &&
-        importer.startsWith(config.collectionDir) &&
-        importee.endsWith('.json')
-      ) {
-        return path.resolve(
-          path.dirname(importer).replace(config.collectionDir, config.srcDir),
-          importee
-        );
+      if (importer && importee.endsWith('.json')) {
+        const collectionDir = collectionDirs.find(cd => importer.startsWith(cd));
+
+        if (collectionDir) {
+          return path.resolve(
+            path.dirname(importer).replace(collectionDir, config.srcDir),
+            importee
+          );
+        }
       }
 
       return null;

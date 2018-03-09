@@ -1,5 +1,5 @@
 import { assetVersioning } from './asset-versioning';
-import { CompilerCtx, Config, HydrateOptions, HydrateResults } from '../../declarations';
+import { CompilerCtx, Config, HydrateOptions, HydrateResults, OutputTarget } from '../../declarations';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineComponentStyles } from '../style/inline-styles';
 import { inlineExternalAssets } from './inline-external-assets';
@@ -9,7 +9,7 @@ import { minifyInlineScripts } from './minify-inline-scripts';
 import { minifyInlineStyles } from '../style/minify-inline-styles';
 
 
-export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
+export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, doc: Document, styles: string[], opts: HydrateOptions, results: HydrateResults) {
   const promises: Promise<any>[] = [];
 
   if (opts.hydrateComponents !== false) {
@@ -47,14 +47,14 @@ export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc
   if (opts.inlineLoaderScript !== false) {
     // remove the script to the external loader script request
     // inline the loader script at the bottom of the html
-    promises.push(inlineLoaderScript(config, compilerCtx, doc, results));
+    promises.push(inlineLoaderScript(config, compilerCtx, outputTarget, doc, results));
   }
 
   if (opts.inlineAssetsMaxSize > 0) {
-    promises.push(inlineExternalAssets(config, compilerCtx, results, doc));
+    promises.push(inlineExternalAssets(config, compilerCtx, outputTarget, results, doc));
   }
 
-  if (opts.collapseWhitespace !== false && !config.devMode && config.logger.level !== 'debug') {
+  if (opts.collapseWhitespace !== false && !config.devMode && config.logLevel !== 'debug') {
     // collapseWhitespace is the default
     try {
       config.logger.debug(`optimize ${results.pathname}, collapse html whitespace`);
@@ -85,7 +85,7 @@ export async function optimizeHtml(config: Config, compilerCtx: CompilerCtx, doc
   }
 
   if (config.assetVersioning) {
-    promises.push(assetVersioning(config, compilerCtx, results.url, doc));
+    promises.push(assetVersioning(config, compilerCtx, outputTarget, results.url, doc));
   }
 
   await Promise.all(promises);

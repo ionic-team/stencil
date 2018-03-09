@@ -74,8 +74,6 @@ export interface BuildStats {
     bundles: number;
   };
   options: {
-    generateWWW: boolean;
-    generateDistribution: boolean;
     minifyJs: boolean;
     minifyCss: boolean;
     hashFileNames: boolean;

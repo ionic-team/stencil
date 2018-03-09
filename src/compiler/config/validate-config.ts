@@ -3,11 +3,11 @@ import { setArrayConfig, setBooleanConfig, setNumberConfig, setStringConfig } fr
 import { validateAssetVerioning } from './validate-asset-versioning';
 import { validateCopy } from './validate-copy';
 import { validateNamespace } from './validate-namespace';
+import { validateOutputTargets } from './validate-outputs';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
-import { validatePublicPath } from './validate-public-path';
-import {_deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
-import {_deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
+import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
+
 
 export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   if (!config) {
@@ -29,18 +29,20 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
     throw new Error('config.sys required');
   }
 
-  if (typeof config.logLevel === 'string') {
-    config.logger.level = config.logLevel;
-  } else if (typeof config.logger.level === 'string') {
-    config.logLevel = config.logger.level;
+  config.flags = config.flags || {};
+
+  if (config.flags.debug) {
+    config.logLevel = 'debug';
+  } else if (config.flags.logLevel) {
+    config.logLevel = config.flags.logLevel;
+  } else if (typeof config.logLevel !== 'string') {
+    config.logLevel = 'info';
   }
+  config.logger.level = config.logLevel;
 
-  setBooleanConfig(config, 'writeLog', false);
-  setBooleanConfig(config, 'writeStats', false);
-  setBooleanConfig(config, 'buildAppCore', true);
-
-  // Setup outputTargets
-  _deprecatedToMultipleTarget(config);
+  setBooleanConfig(config, 'writeLog', 'log', false);
+  setBooleanConfig(config, 'writeStats', 'stats', false);
+  setBooleanConfig(config, 'buildAppCore', null, true);
 
   // get a good namespace
   validateNamespace(config);
@@ -48,24 +50,32 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   // figure out all of the config paths and absolute paths
   validatePaths(config);
 
-  // figure out the client-side public path
-  validatePublicPath(config);
+  // setup the outputTargets
+  validateOutputTargets(config);
 
   // default devMode false
-  config.devMode = !!config.devMode;
+  if (config.flags.prod) {
+    config.devMode = false;
+
+  } else if (config.flags.dev) {
+    config.devMode = true;
+
+  } else {
+    config.devMode = !!config.devMode;
+  }
 
   // default watch false
   config.watch = !!config.watch;
 
-  setBooleanConfig(config, 'minifyCss', !config.devMode);
-  setBooleanConfig(config, 'minifyJs', !config.devMode);
+  setBooleanConfig(config, 'minifyCss', null, !config.devMode);
+  setBooleanConfig(config, 'minifyJs', null, !config.devMode);
 
   config.logger.debug(`minifyJs: ${config.minifyJs}, minifyCss: ${config.minifyCss}`);
 
-  setBooleanConfig(config, 'buildEs5', !config.devMode);
+  setBooleanConfig(config, 'buildEs5', 'es5', !config.devMode);
 
-  setBooleanConfig(config, 'hashFileNames', !(config.devMode || config.watch));
-  setNumberConfig(config, 'hashedFileNameLength', DEFAULT_HASHED_FILENAME_LENTH);
+  setBooleanConfig(config, 'hashFileNames', null, !(config.devMode || config.watch));
+  setNumberConfig(config, 'hashedFileNameLength', null, DEFAULT_HASHED_FILENAME_LENTH);
 
   if (config.hashFileNames) {
     if (config.hashedFileNameLength < MIN_HASHED_FILENAME_LENTH) {
@@ -88,8 +98,8 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   }
 
   setStringConfig(config, 'hydratedCssClass', DEFAULT_HYDRATED_CSS_CLASS);
-  setBooleanConfig(config, 'generateDocs', false);
-  setBooleanConfig(config, 'enableCache', true);
+  setBooleanConfig(config, 'generateDocs', 'docs', false);
+  setBooleanConfig(config, 'enableCache', 'cache', true);
 
   if (!Array.isArray(config.includeSrc)) {
     config.includeSrc = DEFAULT_INCLUDES.map(include => {

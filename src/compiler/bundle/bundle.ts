@@ -4,14 +4,6 @@ import { generateBundleModules } from './bundle-modules';
 
 
 export async function bundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
-  if (config.outputTargets['www']) {
-    config.logger.debug(`bundle, buildDir: ${config.outputTargets['www'].buildDir}`);
-  }
-
-  if (config.outputTargets['distribution']) {
-    config.logger.debug(`bundle, distDir: ${config.outputTargets['distribution'].dir}`);
-  }
-
   const timeSpan = config.logger.createTimeSpan(`bundle started`, true);
   let jsModules: JSModuleMap;
 

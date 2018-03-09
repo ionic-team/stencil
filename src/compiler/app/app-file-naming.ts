@@ -1,14 +1,9 @@
-import { Config, SourceTarget } from '../../util/interfaces';
+import { Config, OutputTarget, SourceTarget } from '../../declarations';
 import { pathJoin } from '../util';
 
 
-export function getAppWWWBuildDir(config: Config) {
-  return pathJoin(config, config.outputTargets['www'].buildDir, config.fsNamespace);
-}
-
-
-export function getAppDistDir(config: Config) {
-  return pathJoin(config, config.outputTargets['distribution'].dir, config.fsNamespace);
+export function getAppBuildDir(config: Config, outputTarget: OutputTarget) {
+  return pathJoin(config, outputTarget.buildDir, config.fsNamespace);
 }
 
 
@@ -17,8 +12,8 @@ function getRegistryFileName(config: Config) {
 }
 
 
-export function getRegistryJsonWWW(config: Config) {
-  return pathJoin(config, getAppWWWBuildDir(config), getRegistryFileName(config));
+export function getRegistryJson(config: Config, outputTarget: OutputTarget) {
+  return pathJoin(config, getAppBuildDir(config, outputTarget), getRegistryFileName(config));
 }
 
 
@@ -27,13 +22,8 @@ export function getLoaderFileName(config: Config) {
 }
 
 
-export function getLoaderWWW(config: Config) {
-  return pathJoin(config, config.outputTargets['www'].buildDir, getLoaderFileName(config));
-}
-
-
-export function getLoaderDist(config: Config) {
-  return pathJoin(config, config.outputTargets['distribution'].dir, getLoaderFileName(config));
+export function getLoaderPath(config: Config, outputTarget: OutputTarget) {
+  return pathJoin(config, outputTarget.buildDir, getLoaderFileName(config));
 }
 
 
@@ -42,13 +32,8 @@ export function getGlobalFileName(config: Config) {
 }
 
 
-export function getGlobalWWW(config: Config) {
-  return pathJoin(config, getAppWWWBuildDir(config), getGlobalFileName(config));
-}
-
-
-export function getGlobalDist(config: Config) {
-  return pathJoin(config, getAppDistDir(config), getGlobalFileName(config));
+export function getGlobalBuildPath(config: Config, outputTarget: OutputTarget) {
+  return pathJoin(config, getAppBuildDir(config, outputTarget), getGlobalFileName(config));
 }
 
 
@@ -74,10 +59,10 @@ export function getBundleFilename(bundleId: string, isScopedStyles: boolean, sou
 }
 
 
-export function getAppPublicPath(config: Config) {
-  if (config.discoverPublicPath !== false) {
-    return pathJoin(config, config.publicPath, config.fsNamespace) + '/';
+export function getAppPublicPath(config: Config, outputTarget: OutputTarget) {
+  if (outputTarget.discoverPublicPath !== false) {
+    return pathJoin(config, outputTarget.publicPath, config.fsNamespace) + '/';
   }
 
-  return config.publicPath;
+  return outputTarget.publicPath;
 }

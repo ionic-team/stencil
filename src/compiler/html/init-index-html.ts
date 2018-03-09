@@ -1,15 +1,22 @@
-import { BuildCtx, CompilerCtx, Config } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, OutputTarget } from '../../declarations';
 import { catchError } from '../util';
 
 
-export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export function initIndexHtmls(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+  return Promise.all(config.outputTargets.map(outputTarget => {
+    return initIndexHtml(config, compilerCtx, buildCtx, outputTarget);
+  }));
+}
+
+
+async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
   // if there isn't an index.html yet
   // let's generate a slim one quick so that
   // on the first build the user sees a loading indicator
   // this is synchronous on purpose so that it's saved
   // before the dev server fires up and loads the index.html page
 
-  if (!config.outputTargets['www']) {
+  if (outputTarget.type !== 'www') {
     // only worry about this when generating www directory
     return;
   }
@@ -27,7 +34,7 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
     // we've already had a successful build, we're good
     // always recopy index.html (it's all cached if it didn't actually change, all good)
     const srcIndexHtmlContent = await compilerCtx.fs.readFile(config.srcIndexHtml);
-    await compilerCtx.fs.writeFile(config.outputTargets['www'].indexHtml, srcIndexHtmlContent);
+    await compilerCtx.fs.writeFile(outputTarget.indexHtml, srcIndexHtmlContent);
     return;
   }
 
@@ -35,7 +42,7 @@ export async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, bu
     // ok, so we haven't written an index.html build file yet
     // and we do know they have a src one, so let's write a
     // filler index.html file that shows while the first build is happening
-    await compilerCtx.fs.writeFile(config.outputTargets['www'].indexHtml, APP_LOADING_HTML);
+    await compilerCtx.fs.writeFile(outputTarget.indexHtml, APP_LOADING_HTML);
     await compilerCtx.fs.commit();
 
   } catch (e) {

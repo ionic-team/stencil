@@ -1,14 +1,14 @@
 import { BuildCtx, CompilerCtx, Config } from '../../declarations';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
-import { generateDistribution } from '../collections/distribution';
-import { generateServiceWorker } from '../service-worker/generate-sw';
-import { writeAppCollection } from '../collections/collection-data';
+import { generateDistributions } from '../collections/distribution';
+import { generateServiceWorkers } from '../service-worker/generate-sw';
+import { writeAppCollections } from '../collections/collection-data';
 
 
 export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
   // serialize and write the manifest file if need be
-  await writeAppCollection(config, compilerCtx, buildCtx);
+  await writeAppCollections(config, compilerCtx, buildCtx);
 
   const timeSpan = config.logger.createTimeSpan(`writeBuildFiles started`, true);
 
@@ -16,7 +16,7 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
   // and copy www/build to dist/ if generateDistribution is enabled
   await Promise.all([
     copyComponentAssets(config, compilerCtx, buildCtx),
-    generateDistribution(config, compilerCtx, buildCtx)
+    generateDistributions(config, compilerCtx, buildCtx)
   ]);
 
   let totalFilesWrote = 0;
@@ -37,8 +37,8 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
     // no need to wait on it finishing
     compilerCtx.cache.commit();
 
-    // generate the service worker
-    await generateServiceWorker(config, compilerCtx, buildCtx);
+    // generate the service workers
+    await generateServiceWorkers(config, compilerCtx, buildCtx);
 
     config.logger.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     config.logger.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
@@ -57,19 +57,14 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
     return;
   }
 
-  // empty promises :(
-  const emptyPromises: Promise<any>[] = [];
-
-  if (config.outputTargets['www'] && config.outputTargets['www'].emptyDir) {
-    config.logger.debug(`empty www dir: ${config.outputTargets['www'].dir}`);
-    emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['www'].dir));
-  }
-
-  if (config.outputTargets['distribution'] && config.outputTargets['distribution'].emptyDir) {
-    config.logger.debug(`empty dist dir: ${config.outputTargets['distribution'].dir}`);
-    emptyPromises.push(compilerCtx.fs.emptyDir(config.outputTargets['distribution'].dir));
-  }
-
   // let's empty out the build dest directory
-  await Promise.all(emptyPromises);
+  await Promise.all(config.outputTargets.map(async outputTarget => {
+    if (!outputTarget.emptyDir) {
+      return;
+    }
+
+    config.logger.debug(`empty dir: ${outputTarget.dir}`);
+
+    await compilerCtx.fs.emptyDir(outputTarget.dir);
+  }));
 }

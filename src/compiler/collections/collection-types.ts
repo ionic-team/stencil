@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config, PackageJsonData } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, OutputTarget, PackageJsonData } from '../../declarations';
 import { buildError, isDtsFile, pathJoin } from '../util';
 
 
@@ -24,30 +24,32 @@ export async function generateTypes(config: Config, compilerCtx: CompilerCtx, bu
     err.messageText = `package.json "types" file does not exist: ${dtsEntryFilePath}`;
   }
 
-  await updateTypes(config, compilerCtx);
+  await Promise.all(config.outputTargets.map(outputTarget => {
+    return updateTypes(config, compilerCtx, outputTarget);
+  }));
 }
 
 
-async function updateTypes(config: Config, compilerCtx: CompilerCtx) {
-  const typeDirItems = await compilerCtx.fs.readdir(config.typesDir, { inMemoryOnly: true, recursive: true });
+async function updateTypes(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+  const typeDirItems = await compilerCtx.fs.readdir(outputTarget.typesDir, { inMemoryOnly: true, recursive: true });
   const dtsFiles = typeDirItems.filter(dtsItem => dtsItem.isFile && isDtsFile(dtsItem.absPath));
 
   const updates = await Promise.all(dtsFiles.map(dtsFile => {
-    return updateDtsContent(config, compilerCtx, dtsFile.absPath);
+    return updateDtsContent(config, compilerCtx, outputTarget, dtsFile.absPath);
   }));
 
   if (updates.some(u => u)) {
-    await copyCoreDts(config, compilerCtx);
+    await copyCoreDts(config, compilerCtx, outputTarget);
   }
 }
 
 
-async function updateDtsContent(config: Config, compilerCtx: CompilerCtx, dtsFilePath: string) {
+async function updateDtsContent(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, dtsFilePath: string) {
   let content = await compilerCtx.fs.readFile(dtsFilePath);
 
   let madeChanges = false;
 
-  const relPath = config.sys.path.relative(config.sys.path.dirname(dtsFilePath), config.typesDir);
+  const relPath = config.sys.path.relative(config.sys.path.dirname(dtsFilePath), outputTarget.typesDir);
 
   let coreDtsPath = pathJoin(config, relPath, CORE_FILENAME);
   if (!coreDtsPath.startsWith('.')) {
@@ -72,12 +74,12 @@ async function updateDtsContent(config: Config, compilerCtx: CompilerCtx, dtsFil
 }
 
 
-async function copyCoreDts(config: Config, compilerCtx: CompilerCtx) {
+async function copyCoreDts(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
   const srcDts = await config.sys.getClientCoreFile({
    staticName: 'declarations/stencil.core.d.ts'
   });
 
-  const coreDtsFilePath = config.sys.path.join(config.typesDir, CORE_DTS);
+  const coreDtsFilePath = config.sys.path.join(outputTarget.typesDir, CORE_DTS);
   await compilerCtx.fs.writeFile(coreDtsFilePath, srcDts);
 }
 

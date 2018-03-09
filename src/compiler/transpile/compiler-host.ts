@@ -1,4 +1,5 @@
 import { CompilerCtx, Config, FsWriteResults } from '../../declarations';
+import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
 import { isDtsFile, isJsFile, normalizePath } from '../util';
 import * as ts from 'typescript';
 
@@ -79,12 +80,6 @@ function writeFileInMemory(config: Config, ctx: CompilerCtx, sourceFile: ts.Sour
 
   distFilePath = normalizePath(distFilePath);
 
-  // if this build is also building a distribution then we
-  // actually want to eventually write the files to disk
-  // otherwise we still want to put these files in our file system but
-  // only as in-memory files and never are actually written to disk
-  const isInMemoryOnly = !config.outputTargets['distribution'];
-
   // get or create the ctx module file object
   if (!ctx.moduleFiles[tsFilePath]) {
     // we don't have this module in the ctx yet
@@ -104,6 +99,12 @@ function writeFileInMemory(config: Config, ctx: CompilerCtx, sourceFile: ts.Sour
     // idk, this shouldn't happen
     config.logger.debug(`unknown transpiled output: ${distFilePath}`);
   }
+
+  // if this build is also building a distribution then we
+  // actually want to eventually write the files to disk
+  // otherwise we still want to put these files in our file system but
+  // only as in-memory files and never are actually written to disk
+  const isInMemoryOnly = distFilePath.includes(IN_MEMORY_DIR);
 
   // let's write the beast to our internal in-memory file system
   // the distFilePath is only written to disk when a distribution

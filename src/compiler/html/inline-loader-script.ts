@@ -1,8 +1,8 @@
-import { CompilerCtx, Config, HydrateResults } from '../../declarations';
-import { getLoaderFileName, getLoaderWWW } from '../app/app-file-naming';
+import { CompilerCtx, Config, HydrateResults, OutputTarget } from '../../declarations';
+import { getLoaderFileName, getLoaderPath } from '../app/app-file-naming';
 
 
-export async function inlineLoaderScript(config: Config, ctx: CompilerCtx, doc: Document, results: HydrateResults) {
+export async function inlineLoaderScript(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, doc: Document, results: HydrateResults) {
   // create the script url we'll be looking for
   const loaderFileName = getLoaderFileName(config);
 
@@ -11,20 +11,20 @@ export async function inlineLoaderScript(config: Config, ctx: CompilerCtx, doc: 
   // now that we're prerendering the html, and all the styles and html
   // will get hardcoded in the output, it's safe to now put the
   // loader script at the bottom of <body>
-  const scriptElm = findExternalLoaderScript(config, doc, loaderFileName);
+  const scriptElm = findExternalLoaderScript(outputTarget, doc, loaderFileName);
 
   if (scriptElm) {
     // append the loader script content to the bottom of <body>
-    await relocateInlineLoaderScript(config, ctx, doc, results, scriptElm);
+    await relocateInlineLoaderScript(config, compilerCtx, outputTarget, doc, results, scriptElm);
   }
 }
 
 
-function findExternalLoaderScript(config: Config, doc: Document, loaderFileName: string) {
+function findExternalLoaderScript(outputTarget: OutputTarget, doc: Document, loaderFileName: string) {
   const scriptElements = doc.getElementsByTagName('script');
 
   for (let i = 0; i < scriptElements.length; i++) {
-    if (isLoaderScriptSrc(config.publicPath, loaderFileName, scriptElements[i].getAttribute('src'))) {
+    if (isLoaderScriptSrc(outputTarget.publicPath, loaderFileName, scriptElements[i].getAttribute('src'))) {
       // this is a script element with a src attribute which is
       // pointing to the app's external loader script
       // remove the script from the document, be gone with you
@@ -70,18 +70,18 @@ export function isLoaderScriptSrc(publicPath: string, loaderFileName: string, sc
 }
 
 
-async function relocateInlineLoaderScript(config: Config, ctx: CompilerCtx, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
+async function relocateInlineLoaderScript(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
   // get the file path
-  const appLoaderWWW = getLoaderWWW(config);
+  const appLoaderPath = getLoaderPath(config, outputTarget);
 
   // get the loader content
   let content: string = null;
   try {
     // let's look it up directly
-    content = await ctx.fs.readFile(appLoaderWWW);
+    content = await compilerCtx.fs.readFile(appLoaderPath);
 
   } catch (e) {
-    config.logger.debug(`unable to inline loader: ${appLoaderWWW}`, e);
+    config.logger.debug(`unable to inline loader: ${appLoaderPath}`, e);
   }
 
   if (!content) {

@@ -1,35 +1,33 @@
-import { Config } from '../../declarations';
+import { Config, OutputTarget } from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export function validatePublicPath(config: Config) {
-  if (!config.outputTargets['www']) {
-    return;
-  }
-
-  if (typeof config.discoverPublicPath !== 'boolean') {
+export function validatePublicPath(config: Config, outputTarget: OutputTarget) {
+  if (typeof outputTarget.discoverPublicPath !== 'boolean') {
     // only do this check if the config hasn't been fully validated yet
     // if the config has a publicPath, then let's remember it was a custom one
-    config.discoverPublicPath = (typeof config.publicPath !== 'string');
+    outputTarget.discoverPublicPath = (typeof outputTarget.publicPath !== 'string');
   }
 
-  if (typeof config.publicPath !== 'string') {
+  if (typeof outputTarget.publicPath !== 'string') {
     // CLIENT SIDE ONLY! Do not use this for server-side file read/writes
     // this is a reference to the public static directory from the index.html running from a browser
     // in most cases it's just "build", as in index page would request scripts from `/build/`
-    config.publicPath = normalizePath(
-      config.sys.path.relative(config.outputTargets['www'].dir, config.outputTargets['www'].buildDir)
+
+    outputTarget.publicPath = normalizePath(
+      config.sys.path.relative(outputTarget.dir, outputTarget.buildDir)
     );
-    if (config.publicPath.charAt(0) !== '/') {
+
+    if (outputTarget.publicPath.charAt(0) !== '/') {
       // ensure prefix / by default
-      config.publicPath = '/' + config.publicPath;
+      outputTarget.publicPath = '/' + outputTarget.publicPath;
     }
   }
 
-  config.publicPath = config.publicPath.trim();
+  outputTarget.publicPath = outputTarget.publicPath.trim();
 
-  if (config.publicPath.charAt(config.publicPath.length - 1) !== '/') {
+  if (outputTarget.publicPath.charAt(outputTarget.publicPath.length - 1) !== '/') {
     // ensure there's a trailing /
-    config.publicPath += '/';
+    outputTarget.publicPath += '/';
   }
 }

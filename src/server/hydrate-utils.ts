@@ -1,5 +1,5 @@
 import { Config, Diagnostic, HydrateOptions, HydrateResults } from '../declarations';
-import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/config/validate-prerender-config';
+import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/config/validate-prerender';
 
 
 export function normalizeHydrateOptions(inputOpts: HydrateOptions) {
@@ -69,7 +69,7 @@ function createConsole(config: Config, opts: HydrateOptions, results: HydrateRes
     };
   }
 
-  if (config.logger.level === 'debug') {
+  if (config.logLevel === 'debug') {
     ['debug', 'info', 'log', 'warn'].forEach(level => {
       if (typeof (opts.console as any)[level] !== 'function') {
         opts.console[level] = function(...args: string[]) {

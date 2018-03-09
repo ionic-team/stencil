@@ -1,7 +1,13 @@
 import { Config } from '../../declarations';
 
 
-export function setBooleanConfig(config: any, configName: string, defaultValue: boolean) {
+export function setBooleanConfig(config: any, configName: string, flagName: string, defaultValue: boolean) {
+  if (flagName) {
+    if (typeof config.flags[flagName] === 'boolean') {
+      config[configName] = config.flags[flagName];
+    }
+  }
+
   const userConfigName = getUserConfigName(config, configName);
 
   if (typeof config[userConfigName] === 'function') {
@@ -17,7 +23,7 @@ export function setBooleanConfig(config: any, configName: string, defaultValue: 
 }
 
 
-export function setNumberConfig(config: any, configName: string, defaultValue: number) {
+export function setNumberConfig(config: any, configName: string, _flagName: string, defaultValue: number) {
   const userConfigName = getUserConfigName(config, configName);
 
   if (typeof config[userConfigName] === 'function') {

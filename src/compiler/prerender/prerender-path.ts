@@ -1,10 +1,10 @@
-import { BuildCtx, CompilerCtx, Config, HydrateOptions, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, HydrateOptions, HydrateResults, OutputTarget, PrerenderLocation } from '../../declarations';
 import { catchError } from '../util';
 import { Renderer } from '../../server/index';
 
 
-export async function prerenderPath(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
-  const msg = (config.prerender as PrerenderConfig).hydrateComponents ? 'prerender' : 'optimize html';
+export async function prerenderPath(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, indexSrcHtml: string, prerenderLocation: PrerenderLocation) {
+  const msg = outputTarget.prerender.hydrateComponents ? 'prerender' : 'optimize html';
   const timeSpan = config.logger.createTimeSpan(`${msg}, started: ${prerenderLocation.path}`);
 
   const results: HydrateResults = {
@@ -16,7 +16,7 @@ export async function prerenderPath(config: Config, compilerCtx: CompilerCtx, bu
     const rendererConfig = Object.assign({}, config);
 
     // create the hydrate options from the prerender config
-    const hydrateOpts: HydrateOptions = rendererConfig.prerender as HydrateOptions;
+    const hydrateOpts: HydrateOptions = Object.assign({}, outputTarget.prerender) as HydrateOptions;
     hydrateOpts.url = prerenderLocation.url;
     hydrateOpts.isPrerender = true;
 

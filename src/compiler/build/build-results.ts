@@ -136,8 +136,6 @@ export async function generateBuildStats(config: Config, compilerCtx: CompilerCt
           }, 0)
         },
         options: {
-          generateWWW: !!config.outputTargets['www'],
-          generateDistribution: !!config.outputTargets['distribution'],
           minifyJs: config.minifyJs,
           minifyCss: config.minifyCss,
           hashFileNames: config.hashFileNames,

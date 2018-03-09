@@ -77,9 +77,14 @@ async function compileExternalStyle(config: Config, compilerCtx: CompilerCtx, bu
   const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
 
   if (!moduleFile.isCollectionDependency) {
+    const collectionDirs = config.outputTargets.filter(o => o.collectionDir);
+
     const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
-    const collectionPath = config.sys.path.join(config.collectionDir, relPath);
-    await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
+
+    await Promise.all(collectionDirs.map(async outputTarget => {
+      const collectionPath = config.sys.path.join(outputTarget.collectionDir, relPath);
+      await compilerCtx.fs.writeFile(collectionPath, transformResults.code);
+    }));
   }
 
   return transformResults.code;

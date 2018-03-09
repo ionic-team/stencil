@@ -1,7 +1,7 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults } from '../declarations';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '../declarations';
 import { catchError } from '../compiler/util';
 import { getCompilerCtx } from '../compiler/build/compiler-ctx';
-import { getGlobalWWW } from '../compiler/app/app-file-naming';
+import { getGlobalBuildPath } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { loadComponentRegistry } from './load-registry';
@@ -10,7 +10,9 @@ import { validateBuildConfig } from '../compiler/config/validate-config';
 
 export class Renderer {
   private ctx: CompilerCtx;
+  private outputTarget: OutputTarget;
   private cmpRegistry: ComponentRegistry;
+
 
   constructor(public config: Config, registry?: ComponentRegistry, ctx?: CompilerCtx) {
     this.config = config;
@@ -19,15 +21,17 @@ export class Renderer {
     // init the build context
     this.ctx = getCompilerCtx(config, ctx);
 
+    this.outputTarget = config.outputTargets.find(o => o.type === 'www');
+
     // load the component registry from the registry.json file
-    this.cmpRegistry = registry || loadComponentRegistry(config, this.ctx);
+    this.cmpRegistry = registry || loadComponentRegistry(config, this.ctx, this.outputTarget);
 
     if (Object.keys(this.cmpRegistry).length === 0) {
       throw new Error(`No registered components found: ${config.namespace}`);
     }
 
     // load the app global file into the context
-    loadAppGlobal(config, this.ctx);
+    loadAppGlobal(config, this.ctx, this.outputTarget);
   }
 
   async hydrate(hydrateOpts: HydrateOptions) {
@@ -35,7 +39,7 @@ export class Renderer {
 
     // kick off hydrated, which is an async opertion
     try {
-      hydrateResults = await hydrateHtml(this.config, this.ctx, this.cmpRegistry, hydrateOpts);
+      hydrateResults = await hydrateHtml(this.config, this.ctx, this.outputTarget, this.cmpRegistry, hydrateOpts);
 
     } catch (e) {
       hydrateResults = {
@@ -78,18 +82,18 @@ export function createRenderer(config: Config) {
 }
 
 
-function loadAppGlobal(config: Config, ctx: CompilerCtx) {
-  ctx.appFiles = ctx.appFiles || {};
+function loadAppGlobal(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+  compilerCtx.appFiles = compilerCtx.appFiles || {};
 
-  if (ctx.appFiles.global) {
+  if (compilerCtx.appFiles.global) {
     // already loaded the global js content
     return;
   }
 
   // let's load the app global js content
-  const appGlobalPath = getGlobalWWW(config);
+  const appGlobalPath = getGlobalBuildPath(config, outputTarget);
   try {
-    ctx.appFiles.global = ctx.fs.readFileSync(appGlobalPath);
+    compilerCtx.appFiles.global = compilerCtx.fs.readFileSync(appGlobalPath);
 
   } catch (e) {
     config.logger.debug(`missing app global: ${appGlobalPath}`);

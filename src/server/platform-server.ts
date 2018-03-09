@@ -1,12 +1,12 @@
 import { AppGlobal, CjsExports, CompilerCtx, ComponentMeta,
   ComponentRegistry, Config, CoreContext, Diagnostic,
-  HostElement, HydrateResults, PlatformApi } from '../declarations';
+  HostElement, HydrateResults, OutputTarget, PlatformApi } from '../declarations';
 import { assignHostContentSlots } from '../renderer/vdom/slot';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../util/constants';
-import { getAppWWWBuildDir } from '../compiler/app/app-file-naming';
+import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../renderer/vdom/h';
 import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';
@@ -16,6 +16,7 @@ import { toDashCase } from '../util/helpers';
 
 export function createPlatformServer(
   config: Config,
+  outputTarget: OutputTarget,
   win: any,
   doc: any,
   cmpRegistry: ComponentRegistry,
@@ -61,13 +62,12 @@ export function createPlatformServer(
   // add the app's global to the window context
   win[config.namespace] = App;
 
-  const appWwwDir = config.outputTargets['www'].dir;
-  const appBuildDir = getAppWWWBuildDir(config);
+  const appBuildDir = getAppBuildDir(config, outputTarget);
   Context.publicPath = appBuildDir;
 
   // create the sandboxed context with a new instance of a V8 Context
   // V8 Context provides an isolated global environment
-  config.sys.vm.createContext(compilerCtx, appWwwDir, win);
+  config.sys.vm.createContext(compilerCtx, outputTarget.dir, win);
 
   // execute the global scripts (if there are any)
   runGlobalScripts();

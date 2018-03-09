@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, VNode } from '../declarations';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget, VNode } from '../declarations';
 import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeHydrateOptions, normalizeLanguage } from './hydrate-utils';
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
@@ -6,7 +6,7 @@ import { optimizeHtml } from '../compiler/html/optimize-html';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
-export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
+export function hydrateHtml(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
   return new Promise(resolve => {
 
     // validate the hydrate options and add any missing info
@@ -29,12 +29,13 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
     // create the platform
     const plt = createPlatformServer(
       config,
+      outputTarget,
       win,
       doc,
       cmpRegistry,
       hydrateResults,
       opts.isPrerender,
-      ctx
+      compilerCtx
     );
 
     // fire off this function when the app has finished loading
@@ -56,7 +57,7 @@ export function hydrateHtml(config: Config, ctx: CompilerCtx, cmpRegistry: Compo
       if (rootElm) {
         try {
           // optimize this document!!
-          await optimizeHtml(config, ctx, doc, styles, opts, hydrateResults);
+          await optimizeHtml(config, compilerCtx, outputTarget, doc, styles, opts, hydrateResults);
 
           // gather up all of the <a> tag information in the doc
           if (opts.collectAnchors !== false && opts.hydrateComponents !== false) {

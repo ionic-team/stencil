@@ -1,10 +1,10 @@
-import { BuildCtx, CompilerCtx, Config } from '../../util/interfaces';
+import { BuildCtx, CompilerCtx, Config, OutputTarget } from '../../declarations';
 import { catchError, normalizePath, pathJoin } from '../util';
 import { getGlobalStyleFilename } from './app-file-naming';
 import { runPluginTransforms } from '../plugin/plugin';
 
 
-export async function generateGlobalStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function generateGlobalStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
   const filePaths = config.globalStyle;
   if (!filePaths || !filePaths.length) {
     config.logger.debug(`"config.globalStyle" not found`);
@@ -26,17 +26,9 @@ export async function generateGlobalStyles(config: Config, compilerCtx: Compiler
 
     const fileName = getGlobalStyleFilename(config);
 
-    if (config.outputTargets['www']) {
-      const wwwFilePath = pathJoin(config, config.outputTargets['www'].buildDir, fileName);
-      config.logger.debug(`www global style: ${wwwFilePath}`);
-      await compilerCtx.fs.writeFile(wwwFilePath, styleText);
-    }
-
-    if (config.outputTargets['distribution']) {
-      const distFilePath = pathJoin(config, config.outputTargets['distribution'].dir, fileName);
-      config.logger.debug(`dist global style: ${distFilePath}`);
-      await compilerCtx.fs.writeFile(distFilePath, styleText);
-    }
+    const filePath = pathJoin(config, outputTarget.buildDir, fileName);
+    config.logger.debug(`global style: ${filePath}`);
+    await compilerCtx.fs.writeFile(filePath, styleText);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);

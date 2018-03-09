@@ -1,57 +1,57 @@
-import { CompilerCtx, Config } from '../../declarations';
-import { normalizePrerenderLocation } from '../prerender/prerender-utils';
+import { CompilerCtx, Config, OutputTarget } from '../../declarations';
 import { hasFileExtension } from '../util';
+import { normalizePrerenderLocation } from '../prerender/prerender-utils';
 
 
-export function assetVersioning(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, doc: Document) {
+export function assetVersioning(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, doc: Document) {
   return Promise.all([
-    versionElementAssets(config, compilerCtx, windowLocationHref, doc)
+    versionElementAssets(config, compilerCtx, outputTarget, windowLocationHref, doc)
   ]);
 }
 
 
-async function versionElementAssets(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, doc: Document) {
+async function versionElementAssets(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, doc: Document) {
   if (!config.assetVersioning.versionHtml) {
     return;
   }
 
   await Promise.all([
-    versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'img[src]', 'src'),
-    versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'link[rel="apple-touch-icon"][href]', 'href'),
-    versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'link[rel="icon"][href]', 'href'),
-    versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'link[rel="manifest"][href]', 'href'),
-    versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'link[rel="stylesheet"][href]', 'href'),
-    versionElementTypeAssets(config, compilerCtx, windowLocationHref, doc, 'script[src]', 'src'),
+    versionElementTypeAssets(config, compilerCtx, outputTarget, windowLocationHref, doc, 'img[src]', 'src'),
+    versionElementTypeAssets(config, compilerCtx, outputTarget, windowLocationHref, doc, 'link[rel="apple-touch-icon"][href]', 'href'),
+    versionElementTypeAssets(config, compilerCtx, outputTarget, windowLocationHref, doc, 'link[rel="icon"][href]', 'href'),
+    versionElementTypeAssets(config, compilerCtx, outputTarget, windowLocationHref, doc, 'link[rel="manifest"][href]', 'href'),
+    versionElementTypeAssets(config, compilerCtx, outputTarget, windowLocationHref, doc, 'link[rel="stylesheet"][href]', 'href'),
+    versionElementTypeAssets(config, compilerCtx, outputTarget, windowLocationHref, doc, 'script[src]', 'src'),
   ]);
 }
 
 
-async function versionElementTypeAssets(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, doc: Document, selector: string, attrName: string) {
+async function versionElementTypeAssets(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, doc: Document, selector: string, attrName: string) {
   const elements = doc.querySelectorAll(selector);
 
   const promises: Promise<any>[] = [];
 
   for (let i = 0; i < elements.length; i++) {
-    promises.push(versionElementTypeAsset(config, compilerCtx, windowLocationHref, elements[i], attrName));
+    promises.push(versionElementTypeAsset(config, compilerCtx, outputTarget, windowLocationHref, elements[i], attrName));
   }
 
   return Promise.all(promises);
 }
 
 
-async function versionElementTypeAsset(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, elm: Element, attrName: string) {
+async function versionElementTypeAsset(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, elm: Element, attrName: string) {
   const url = elm.getAttribute(attrName);
 
-  const versionedUrl = await versionAsset(config, compilerCtx, windowLocationHref, url);
+  const versionedUrl = await versionAsset(config, compilerCtx, outputTarget, windowLocationHref, url);
   if (versionedUrl) {
     elm.setAttribute(attrName, versionedUrl);
   }
 }
 
 
-async function versionAsset(config: Config, compilerCtx: CompilerCtx, windowLocationHref: string, url: string) {
+async function versionAsset(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, url: string) {
   try {
-    const orgFilePath = getFilePathFromUrl(config, windowLocationHref, url);
+    const orgFilePath = getFilePathFromUrl(config, outputTarget, windowLocationHref, url);
     if (!orgFilePath) {
       return null;
     }
@@ -78,17 +78,17 @@ async function versionAsset(config: Config, compilerCtx: CompilerCtx, windowLoca
 }
 
 
-function getFilePathFromUrl(config: Config, windowLocationHref: string, url: string) {
+function getFilePathFromUrl(config: Config, outputTarget: OutputTarget, windowLocationHref: string, url: string) {
   if (typeof url !== 'string' || url.trim() === '') {
     return null;
   }
 
-  const location = normalizePrerenderLocation(config, windowLocationHref, url);
+  const location = normalizePrerenderLocation(config, outputTarget, windowLocationHref, url);
   if (!location) {
     return null;
   }
 
-  return config.sys.path.join(config.wwwDir, location.path);
+  return config.sys.path.join(outputTarget.dir, location.path);
 }
 
 

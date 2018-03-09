@@ -1,20 +1,5 @@
 import * as d from './index';
 
-export type BuildTarget = 'distribution';
-
-export type ConfigBuildTarget = {
-  www?: {
-    dir?: string;
-    buildDir?: string;
-    emptyDir?: boolean;
-    indexHtml?: string;
-  },
-  distribution?: {
-    dir?: string;
-    emptyDir?: boolean;
-  }
-};
-
 export interface Config {
   assetVersioning?: ConfigAssetVersioning;
   buildAppCore?: boolean;
@@ -24,11 +9,11 @@ export interface Config {
   bundles?: ConfigBundle[];
   configPath?: string;
   copy?: CopyTasks;
-  discoverPublicPath?: boolean;
   devMode?: boolean;
   enableCache?: boolean;
   excludeSrc?: string[];
   fsNamespace?: string;
+  generateDocs?: boolean;
   globalScript?: string;
   globalStyle?: string[];
   hashedFileNameLength?: number;
@@ -40,44 +25,61 @@ export interface Config {
   minifyCss?: boolean;
   minifyJs?: boolean;
   namespace?: string;
+  outputTargets?: OutputTarget[];
   plugins?: d.Plugin[];
   preamble?: string;
-  prerender?: d.PrerenderConfig|boolean;
-  publicPath?: string;
   rootDir?: string;
-  sassConfig?: any;
-  serviceWorker?: d.ServiceWorkerConfig|boolean;
   srcDir?: string;
   srcIndexHtml?: string;
   suppressTypeScriptErrors?: boolean;
   sys?: d.StencilSystem;
   tsconfig?: string;
-  typesDir?: string;
   watch?: boolean;
   watchIgnoredRegex?: RegExp;
   writeLog?: boolean;
   writeStats?: boolean;
-  generateDocs?: boolean;
+  flags?: ConfigFlags;
   _isValidated?: boolean;
   _isTesting?: boolean;
-  outputTargets?: ConfigBuildTarget;
-
-  generateWWW?: boolean;
-  wwwDir?: string;
-  buildDir?: string;
-  emptyWWW?: boolean;
-  wwwIndexHtml?: string;
-
-  generateDistribution?: boolean;
-  distDir?: string;
-  emptyDist?: boolean;
-
-  collectionDir?: string;
 
   /**
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
    */
   _deprecatedCollections?: ConfigCollection[];
+}
+
+
+export interface ConfigFlags {
+  task?: 'build' | 'docs' | 'init' | 'help';
+  config?: string;
+  debug?: boolean;
+  dev?: boolean;
+  docs?: boolean;
+  es5?: boolean;
+  help?: boolean;
+  log?: boolean;
+  logLevel?: string;
+  cache?: boolean;
+  prerender?: boolean;
+  prod?: boolean;
+  stats?: boolean;
+  version?: boolean;
+  watch?: boolean;
+}
+
+
+export interface OutputTarget {
+  type?: 'www' | 'dist';
+  dir?: string;
+  buildDir?: string;
+  emptyDir?: boolean;
+  discoverPublicPath?: boolean;
+  publicPath?: string;
+  indexHtml?: string;
+  prerender?: d.PrerenderConfig;
+  serviceWorker?: d.ServiceWorkerConfig;
+  typesDir?: string;
+  collectionDir?: string;
 }
 
 

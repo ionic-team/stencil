@@ -1,6 +1,7 @@
 import { CompilerCtx, Config } from '../../declarations';
+import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
+import { normalizePath, pathJoin } from '../util';
 import * as ts from 'typescript';
-import { normalizePath } from '../util';
 
 
 export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) {
@@ -34,13 +35,22 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) 
   // apply user config to tsconfig
   compilerOptions.rootDir = config.srcDir;
 
+  const collectionOutputTarget = config.outputTargets.find(o => !!o.collectionDir);
+  if (collectionOutputTarget) {
+    compilerOptions.outDir = collectionOutputTarget.collectionDir;
+
+  } else {
+    compilerOptions.outDir = pathJoin(config, config.rootDir, IN_MEMORY_DIR);
+  }
+
+
   // generate .d.ts files when generating a distribution and in prod mode
-  compilerOptions.declaration = !!config.outputTargets['distribution'];
-
-  compilerOptions.outDir = config.collectionDir;
-
-  if (config.outputTargets['distribution']) {
-    compilerOptions.declarationDir = config.typesDir;
+  const typesOutputTarget = config.outputTargets.find(o => !!o.typesDir);
+  if (typesOutputTarget) {
+    compilerOptions.declaration = true;
+    compilerOptions.declarationDir = typesOutputTarget.typesDir;
+  } else {
+    compilerOptions.declaration = false;
   }
 
   validateCompilerOptions(compilerOptions);

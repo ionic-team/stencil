@@ -1,36 +1,29 @@
-import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../declarations';
+import { AppRegistry, BuildCtx, CompilerCtx, Config, OutputTarget, SourceTarget } from '../../declarations';
 import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, minifyJs } from '../util';
-import { getAppPublicPath, getGlobalDist, getGlobalFileName, getGlobalWWW } from './app-file-naming';
+import { getAppPublicPath, getGlobalBuildPath, getGlobalFileName } from './app-file-naming';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import resolveCollections from '../bundle/rollup-plugins/resolve-collections';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
-export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
+export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
   const globalJsContents = await generateAppGlobalContents(config, compilerCtx, buildCtx, sourceTarget);
 
   if (globalJsContents.length) {
     appRegistry.global = getGlobalFileName(config);
 
-    const globalJsContent = generateGlobalJs(config, globalJsContents);
+    const globalJsContent = generateGlobalJs(config, outputTarget, globalJsContents);
 
     compilerCtx.appFiles.global = globalJsContent;
 
-    if (config.outputTargets['www']) {
-      const appGlobalWWWFilePath = getGlobalWWW(config);
+    await Promise.all(config.outputTargets.map(outputTarget => {
+      const appGlobalWWWFilePath = getGlobalBuildPath(config, outputTarget);
 
       config.logger.debug(`build, app global www: ${appGlobalWWWFilePath}`);
-      await compilerCtx.fs.writeFile(appGlobalWWWFilePath, globalJsContent);
-    }
-
-    if (config.outputTargets['distribution']) {
-      const appGlobalDistFilePath = getGlobalDist(config);
-
-      config.logger.debug(`build, app global dist: ${appGlobalDistFilePath}`);
-      await compilerCtx.fs.writeFile(appGlobalDistFilePath, globalJsContent);
-    }
+      return compilerCtx.fs.writeFile(appGlobalWWWFilePath, globalJsContent);
+    }));
   }
 
   return globalJsContents.join('\n').trim();
@@ -172,8 +165,8 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
 }
 
 
-export function generateGlobalJs(config: Config, globalJsContents: string[]) {
-  const publicPath = getAppPublicPath(config);
+export function generateGlobalJs(config: Config, outputTarget: OutputTarget, globalJsContents: string[]) {
+  const publicPath = getAppPublicPath(config, outputTarget);
 
   const output = [
     generatePreamble(config) + '\n',

@@ -29,49 +29,9 @@ export function validatePaths(config: Config) {
     });
   }
 
-  if (typeof (config as any).src === 'string') {
-    // deprecated: 2017-08-14
-    config.logger.warn(`stencil config property "src" has been renamed to "srcDir"`);
-    config.srcDir = (config as any).src;
-  }
-
   setStringConfig(config, 'srcDir', DEFAULT_SRC_DIR);
   if (!path.isAbsolute(config.srcDir)) {
     config.srcDir = normalizePath(path.join(config.rootDir, config.srcDir));
-  }
-
-  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].dir)) {
-    config.outputTargets['www'].dir =
-      normalizePath(path.join(config.rootDir, config.outputTargets['www'].dir));
-  }
-
-  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].indexHtml)) {
-    config.outputTargets['www'].indexHtml =
-      normalizePath(path.join(config.outputTargets['www'].dir, config.outputTargets['www'].indexHtml));
-  }
-
-  if (config.outputTargets['www'] && !path.isAbsolute(config.outputTargets['www'].buildDir)) {
-    config.outputTargets['www'].buildDir =
-      normalizePath(path.join(config.outputTargets['www'].dir, config.outputTargets['www'].buildDir));
-  }
-
-  if (config.outputTargets['distribution'] && !path.isAbsolute(config.outputTargets['distribution'].dir)) {
-    config.outputTargets['distribution'].dir =
-      normalizePath(path.join(config.rootDir, config.outputTargets['distribution'].dir));
-  }
-
-  setStringConfig(config, 'collectionDir', DEFAULT_COLLECTION_DIR);
-  if (!path.isAbsolute(config.collectionDir)) {
-    let distPath;
-
-    if (config.outputTargets['distribution']) {
-      distPath = config.outputTargets['distribution'].dir;
-    } else {
-      distPath = normalizePath(path.join(config.rootDir, DEFAULT_DIST_DIR));
-    }
-
-    config.collectionDir =
-      normalizePath(path.join(distPath, config.collectionDir));
   }
 
   setStringConfig(config, 'tsconfig', DEFAULT_TSCONFIG);
@@ -79,16 +39,10 @@ export function validatePaths(config: Config) {
     config.tsconfig = normalizePath(path.join(config.rootDir, config.tsconfig));
   }
 
-  setStringConfig(config, 'typesDir', DEFAULT_TYPES_DIR);
-  if (config.outputTargets['distribution'] && !path.isAbsolute(config.typesDir)) {
-    config.typesDir = normalizePath(path.join(config.outputTargets['distribution'].dir, config.typesDir));
-  }
-
   setStringConfig(config, 'srcIndexHtml', normalizePath(path.join(config.srcDir, DEFAULT_INDEX_HTML)));
   if (!path.isAbsolute(config.srcIndexHtml)) {
     config.srcIndexHtml = normalizePath(path.join(config.rootDir, config.srcIndexHtml));
   }
-
 
   if (config.writeLog) {
     setStringConfig(config, 'buildLogFilePath', DEFAULT_BUILD_LOG_FILE_NAME);
@@ -108,11 +62,10 @@ export function validatePaths(config: Config) {
 
 export const DEFAULT_WWW_DIR = 'www';
 export const DEFAULT_INDEX_HTML = 'index.html';
-export const DEFAULT_BUILD_DIR = 'build';
+export const DEFAULT_WWW_BUILD_DIR = 'build';
 export const DEFAULT_DIST_DIR = 'dist';
-const DEFAULT_COLLECTION_DIR = 'collection';
+export const DEFAULT_DIST_BUILD_DIR = '';
 const DEFAULT_SRC_DIR = 'src';
-const DEFAULT_TYPES_DIR = 'types';
 const DEFAULT_TSCONFIG = 'tsconfig.json';
 const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';
 const DEFAULT_STATS_JSON_FILE_NAME = 'stencil-stats.json';

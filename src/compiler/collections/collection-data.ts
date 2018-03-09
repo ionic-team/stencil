@@ -1,24 +1,29 @@
 import { AssetsMeta, BuildCtx, Collection, CollectionData, CollectionDependencyData, CompilerCtx,
   ComponentData, ComponentMeta, Config, EntryModule, EventData, ExternalStyleMeta, ListenMeta,
-  ListenerData, ModuleFile, PropData, StyleData, StyleMeta } from '../../declarations';
+  ListenerData, ModuleFile, OutputTarget, PropData, StyleData, StyleMeta } from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
+
+export async function writeAppCollections(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+  return Promise.all(config.outputTargets.map(outputTarget => {
+    return writeAppCollection(config, compilerCtx, buildCtx, outputTarget);
+  }));
+}
 
 // this maps the json data to our internal data structure
 // apping is so that the internal data structure "could"
 // change, but the external user data will always use the same api
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
+async function writeAppCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
 
-export async function writeAppCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-
-  if (!config.outputTargets['distribution']) {
+  if (!outputTarget.collectionDir) {
     return Promise.resolve();
   }
 
   // get the absolute path to the directory where the collection will be saved
-  const collectionDir = normalizePath(config.collectionDir);
+  const collectionDir = normalizePath(outputTarget.collectionDir);
 
   // create an absolute file path to the actual collection json file
   const collectionFilePath = normalizePath(config.sys.path.join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));

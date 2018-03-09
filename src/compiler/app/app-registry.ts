@@ -1,5 +1,5 @@
-import { AppRegistry, AppRegistryComponents, CompilerCtx, ComponentRegistry, Config } from '../../declarations';
-import { getLoaderFileName, getRegistryJsonWWW } from './app-file-naming';
+import { AppRegistry, AppRegistryComponents, CompilerCtx, ComponentRegistry, Config, OutputTarget } from '../../declarations';
+import { getLoaderFileName, getRegistryJson } from './app-file-naming';
 
 
 export function createAppRegistry(config: Config) {
@@ -14,13 +14,13 @@ export function createAppRegistry(config: Config) {
 }
 
 
-export function getAppRegistry(config: Config, ctx: CompilerCtx) {
-  const registryJsonFilePath = getRegistryJsonWWW(config);
+export function getAppRegistry(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+  const registryJsonFilePath = getRegistryJson(config, outputTarget);
   let appRegistry: AppRegistry;
 
   try {
     // open up the app registry json file
-    const appRegistryJson = ctx.fs.readFileSync(registryJsonFilePath);
+    const appRegistryJson = compilerCtx.fs.readFileSync(registryJsonFilePath);
 
     // parse the json into app registry data
     appRegistry = JSON.parse(appRegistryJson);
@@ -46,8 +46,8 @@ export function serializeComponentRegistry(cmpRegistry: ComponentRegistry) {
 }
 
 
-export async function writeAppRegistry(config: Config, ctx: CompilerCtx, appRegistry: AppRegistry, cmpRegistry: ComponentRegistry) {
-  if (!config.outputTargets['www']) {
+export async function writeAppRegistry(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, appRegistry: AppRegistry, cmpRegistry: ComponentRegistry) {
+  if (outputTarget.type !== 'www') {
     // only create a registry for www builds
     return;
   }
@@ -57,9 +57,10 @@ export async function writeAppRegistry(config: Config, ctx: CompilerCtx, appRegi
   const registryJson = JSON.stringify(appRegistry, null, 2);
 
   // cache so we can check if it changed on rebuilds
-  ctx.appFiles.registryJson = registryJson;
+  compilerCtx.appFiles.registryJson = registryJson;
 
-  const appRegistryWWW = getRegistryJsonWWW(config);
+  const appRegistryWWW = getRegistryJson(config, outputTarget);
   config.logger.debug(`build, app www registry: ${appRegistryWWW}`);
-  await ctx.fs.writeFile(appRegistryWWW, registryJson);
+
+  await compilerCtx.fs.writeFile(appRegistryWWW, registryJson);
 }

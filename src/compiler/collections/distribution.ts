@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config, Diagnostic, PackageJsonData } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, Diagnostic, OutputTarget, PackageJsonData } from '../../declarations';
 import { buildError, buildWarn, hasError, normalizePath, pathJoin } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentStyles } from '../copy/copy-styles';
@@ -7,15 +7,22 @@ import { getLoaderFileName } from '../app/app-file-naming';
 
 
 
-export async function generateDistribution(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx): Promise<any> {
-  if (!config.outputTargets['distribution']) {
+export async function generateDistributions(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx): Promise<any> {
+  return Promise.all(config.outputTargets.map(outputTarget => {
+    return generateDistribution(config, compilerCtx, buildCtx, outputTarget);
+  }));
+}
+
+
+async function generateDistribution(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget): Promise<any> {
+  if (outputTarget.type !== 'dist') {
     // don't bother
     return;
   }
 
   const pkgData = await readPackageJson(config, compilerCtx);
 
-  validatePackageJson(config, buildCtx.diagnostics, pkgData);
+  validatePackageJson(config, outputTarget, buildCtx.diagnostics, pkgData);
 
   if (hasError(buildCtx.diagnostics)) {
     return;
@@ -51,11 +58,11 @@ async function readPackageJson(config: Config, compilerCtx: CompilerCtx) {
 }
 
 
-export function validatePackageJson(config: Config, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
-  validatePackageFiles(config, diagnostics, pkgData);
+export function validatePackageJson(config: Config, outputTarget: OutputTarget, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
+  validatePackageFiles(config, outputTarget, diagnostics, pkgData);
 
   const mainFileName = getLoaderFileName(config);
-  const main = pathJoin(config, config.sys.path.relative(config.rootDir, config.outputTargets['distribution'].dir), mainFileName);
+  const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.dir), mainFileName);
 
   if (!pkgData.main || normalizePath(pkgData.main) !== main) {
     const err = buildError(diagnostics);
@@ -64,7 +71,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
   }
 
   if (typeof pkgData.types !== 'string' || pkgData.types === '') {
-    const componentsDtsFileAbsPath = config.sys.path.join(config.typesDir, COMPONENTS_DTS);
+    const componentsDtsFileAbsPath = config.sys.path.join(outputTarget.typesDir, COMPONENTS_DTS);
     const componentsDtsFileRelPath = pathJoin(config, config.sys.path.relative(config.rootDir, componentsDtsFileAbsPath));
 
     const err = buildError(diagnostics);
@@ -77,7 +84,7 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
     err.messageText = `package.json "types" file must have a ".d.ts" extension: ${pkgData.types}`;
   }
 
-  const collection = pathJoin(config, config.sys.path.relative(config.rootDir, config.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
+  const collection = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
   if (!pkgData.collection || normalizePath(pkgData.collection) !== collection) {
     const err = buildError(diagnostics);
     err.header = `package.json error`;
@@ -92,9 +99,9 @@ export function validatePackageJson(config: Config, diagnostics: Diagnostic[], p
 }
 
 
-export function validatePackageFiles(config: Config, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
+export function validatePackageFiles(config: Config, outputTarget: OutputTarget, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
   if (pkgData.files) {
-    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, config.outputTargets['distribution'].dir));
+    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.dir));
 
     const validPaths = [
       `${actualDistDir}`,
@@ -120,8 +127,8 @@ export function getComponentsDtsSrcFilePath(config: Config) {
 }
 
 
-export function getComponentsDtsDistTypesFilePath(config: Config) {
-  return pathJoin(config, config.typesDir, COMPONENTS_DTS);
+export function getComponentsDtsDistTypesFilePath(config: Config, outputTarget: OutputTarget) {
+  return pathJoin(config, outputTarget.typesDir, COMPONENTS_DTS);
 }
 
 

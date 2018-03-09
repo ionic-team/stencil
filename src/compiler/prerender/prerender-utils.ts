@@ -1,9 +1,9 @@
-import { Config, HydrateResults, PrerenderConfig, PrerenderLocation } from '../../declarations';
-import { DEFAULT_PRERENDER_HOST } from '../config/validate-prerender-config';
+import { Config, HydrateResults, OutputTarget, PrerenderConfig, PrerenderLocation } from '../../declarations';
+import { DEFAULT_PRERENDER_HOST } from '../config/validate-prerender';
 
 
-export function normalizePrerenderLocation(config: Config, windowLocationHref: string, href: string) {
-  const prerenderConfig = config && config.prerender as PrerenderConfig;
+export function normalizePrerenderLocation(config: Config, outputTarget: OutputTarget, windowLocationHref: string, href: string) {
+  const prerenderConfig = outputTarget.prerender;
   let prerenderLocation: PrerenderLocation = null;
 
   try {
@@ -60,15 +60,15 @@ export function normalizePrerenderLocation(config: Config, windowLocationHref: s
 }
 
 
-export function crawlAnchorsForNextUrls(config: Config, prerenderQueue: PrerenderLocation[], results: HydrateResults) {
+export function crawlAnchorsForNextUrls(config: Config, outputTarget: OutputTarget, prerenderQueue: PrerenderLocation[], results: HydrateResults) {
   results.anchors && results.anchors.forEach(anchor => {
-    addLocationToProcess(config, results.url, prerenderQueue, anchor.href);
+    addLocationToProcess(config, outputTarget, results.url, prerenderQueue, anchor.href);
   });
 }
 
 
-function addLocationToProcess(config: Config, windowLocationHref: string, prerenderQueue: PrerenderLocation[], locationUrl: string) {
-  const prerenderLocation = normalizePrerenderLocation(config, windowLocationHref, locationUrl);
+function addLocationToProcess(config: Config, outputTarget: OutputTarget, windowLocationHref: string, prerenderQueue: PrerenderLocation[], locationUrl: string) {
+  const prerenderLocation = normalizePrerenderLocation(config, outputTarget, windowLocationHref, locationUrl);
 
   if (!prerenderLocation || prerenderQueue.some(p => p.url === prerenderLocation.url)) {
     // either it's not a good location to prerender
@@ -84,15 +84,15 @@ function addLocationToProcess(config: Config, windowLocationHref: string, preren
 }
 
 
-export function getPrerenderQueue(config: Config) {
+export function getPrerenderQueue(config: Config, outputTarget: OutputTarget) {
   const prerenderHost = `http://${DEFAULT_PRERENDER_HOST}`;
 
   const prerenderQueue: PrerenderLocation[] = [];
-  const prerenderConfig = config.prerender as PrerenderConfig;
+  const prerenderConfig = outputTarget.prerender as PrerenderConfig;
 
   if (Array.isArray(prerenderConfig.include)) {
     prerenderConfig.include.forEach(prerenderUrl => {
-      addLocationToProcess(config, prerenderHost, prerenderQueue, prerenderUrl.path);
+      addLocationToProcess(config, outputTarget, prerenderHost, prerenderQueue, prerenderUrl.path);
     });
   }
 
