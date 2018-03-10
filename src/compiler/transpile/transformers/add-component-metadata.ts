@@ -1,4 +1,4 @@
-import { ComponentMeta, ModuleFiles } from '../../../util/interfaces';
+import { ComponentMeta, ModuleFiles } from '../../../declarations';
 import { convertValueToLiteral } from './util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';

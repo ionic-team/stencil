@@ -1,4 +1,4 @@
-import { MembersMeta } from '../../../util/interfaces';
+import { MembersMeta } from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 import { isDecoratorNamed, isPropertyWithDecorators } from './utils';

@@ -1,4 +1,4 @@
-import { EventMeta, EventOptions } from '../../../util/interfaces';
+import { EventMeta, EventOptions } from '../../../declarations';
 import { getDeclarationParameters, isDecoratorNamed, isPropertyWithDecorators } from './utils';
 import * as ts from 'typescript';
 import { serializeSymbol } from './utils';

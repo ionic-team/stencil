@@ -1,4 +1,4 @@
-import { BuildConditionals } from '../../../util/interfaces';
+import { BuildConditionals } from '../../../declarations';
 import * as ts from 'typescript';
 
 

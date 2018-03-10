@@ -1,4 +1,4 @@
-import { Config, HydrateResults } from '../../util/interfaces';
+import { Config, HydrateResults } from '../../declarations';
 
 
 export function insertCanonicalLink(config: Config, doc: Document, results: HydrateResults) {

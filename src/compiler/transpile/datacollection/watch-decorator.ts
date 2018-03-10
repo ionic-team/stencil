@@ -1,4 +1,4 @@
-import { Config, ComponentMeta } from '../../../util/interfaces';
+import { ComponentMeta, Config } from '../../../declarations';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators } from './utils';
 import * as ts from 'typescript';
 

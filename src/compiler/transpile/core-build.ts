@@ -1,4 +1,4 @@
-import { BuildConditionals, CompilerCtx, Diagnostic, TranspileResults } from '../../util/interfaces';
+import { BuildConditionals, CompilerCtx, Diagnostic, TranspileResults } from '../../declarations';
 import { buildConditionalsTransform } from './transformers/build-conditionals';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import * as ts from 'typescript';

@@ -1,4 +1,4 @@
-import { Diagnostic, PrintLine } from '../interfaces';
+import { Diagnostic, PrintLine } from '../../declarations';
 
 
 export function cleanDiagnostics(diagnostics: Diagnostic[]) {
@@ -8,9 +8,9 @@ export function cleanDiagnostics(diagnostics: Diagnostic[]) {
   const dups: {[key: string]: boolean} = {};
 
   for (var i = 0; i < maxErrors; i++) {
-    var d = diagnostics[i];
+    const d = diagnostics[i];
 
-    var key = d.absFilePath + d.code + d.messageText + d.type;
+    const key = d.absFilePath + d.code + d.messageText + d.type;
     if (dups[key]) {
       continue;
     }
@@ -85,11 +85,11 @@ function eachLineHasLeadingWhitespace(lines: PrintLine[], code: 'text'|'html') {
   if (!lines.length) {
     return false;
   }
-  for (var i = 0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length; i++) {
     if ( !(<any>lines[i])[code] || (<any>lines[i])[code].length < 1) {
       return false;
     }
-    var firstChar = (<any>lines[i])[code].charAt(0);
+    const firstChar = (<any>lines[i])[code].charAt(0);
     if (firstChar !== ' ' && firstChar !== '\t') {
       return false;
     }

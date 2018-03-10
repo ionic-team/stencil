@@ -1,5 +1,5 @@
 import { build } from '../build/build';
-import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../util/interfaces';
+import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { configFileReload } from  '../../compiler/config/config-reload';
 
 

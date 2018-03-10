@@ -1,7 +1,8 @@
-import { MembersMeta } from '../../../util/interfaces';
+import { isDecoratorNamed, isPropertyWithDecorators } from './utils';
+import { MembersMeta } from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
-import { isDecoratorNamed, isPropertyWithDecorators } from './utils';
+
 
 export function getStateDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration): MembersMeta {
   checker;

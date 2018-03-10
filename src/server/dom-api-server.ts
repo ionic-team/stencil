@@ -1,4 +1,4 @@
-import { DomApi, PlatformApi, HostElement } from '../util/interfaces';
+import { DomApi, HostElement, PlatformApi } from '../declarations';
 import { noop } from '../util/helpers';
 
 

@@ -1,8 +1,8 @@
-import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
-import { PlatformApi, VNode } from '../../util/interfaces';
-import { toLowerCase } from '../../util/helpers';
 import { Build } from '../../util/build-conditionals';
 import { elementHasProperty } from '../../core/proxy-members';
+import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
+import { PlatformApi, VNode } from '../../declarations';
+import { toLowerCase } from '../../util/helpers';
 
 
 export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, memberName?: string): void {

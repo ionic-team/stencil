@@ -1,4 +1,4 @@
-import { BuildConditionals } from './interfaces';
+import { BuildConditionals } from '../declarations';
 
 
 export const Build: BuildConditionals = {

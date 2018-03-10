@@ -1,4 +1,4 @@
-import { Config, CopyTasks } from '../../util/interfaces';
+import { Config, CopyTasks } from '../../declarations';
 
 
 export function validateCopy(config: Config) {

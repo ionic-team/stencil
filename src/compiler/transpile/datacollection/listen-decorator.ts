@@ -1,5 +1,5 @@
-import { ListenMeta, ListenOptions } from '../../../util/interfaces';
-import { getDeclarationParameters, serializeSymbol, isDecoratorNamed, isMethodWithDecorators } from './utils';
+import { ListenMeta, ListenOptions } from '../../../declarations';
+import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
 export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration): ListenMeta[] {
@@ -34,25 +34,25 @@ export function validateListener(eventName: string, rawListenOpts: ListenOptions
   let splt = eventName.split(':');
 
   if (splt.length > 2) {
-    throw `@Listen can only contain one colon: ${eventName}`;
+    throw new Error(`@Listen can only contain one colon: ${eventName}`);
   }
 
   if (splt.length > 1) {
-    let prefix = splt[0].toLowerCase().trim();
+    const prefix = splt[0].toLowerCase().trim();
     if (!isValidElementRefPrefix(prefix)) {
-      throw `invalid @Listen prefix "${prefix}" for "${eventName}"`;
+      throw new Error(`invalid @Listen prefix "${prefix}" for "${eventName}"`);
     }
     rawEventName = splt[1].toLowerCase().trim();
   }
 
   splt = rawEventName.split('.');
   if (splt.length > 2) {
-    throw `@Listen can only contain one period: ${eventName}`;
+    throw new Error(`@Listen can only contain one period: ${eventName}`);
   }
   if (splt.length > 1) {
-    let suffix = splt[1].toLowerCase().trim();
+    const suffix = splt[1].toLowerCase().trim();
     if (!isValidKeycodeSuffix(suffix)) {
-      throw `invalid @Listen suffix "${suffix}" for "${eventName}"`;
+      throw new Error(`invalid @Listen suffix "${suffix}" for "${eventName}"`);
     }
     rawEventName = splt[0].toLowerCase().trim();
   }

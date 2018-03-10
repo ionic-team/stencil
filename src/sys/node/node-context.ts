@@ -1,4 +1,4 @@
-import { CompilerCtx } from '../../util/interfaces';
+import { CompilerCtx } from '../../declarations';
 
 
 export function createContext(compilerCtx: CompilerCtx, wwwDir: string, sandbox: any) {
@@ -16,8 +16,8 @@ export function createContext(compilerCtx: CompilerCtx, wwwDir: string, sandbox:
 function patchFetch(compilerCtx: CompilerCtx, wwwDir: string, sandbox: any) {
 
   function fetch(input: any, init: any) {
-    var path = require('path');
-    var nf = require(path.join(__dirname, './node-fetch.js'));
+    const path = require('path');
+    const nf = require(path.join(__dirname, './node-fetch.js'));
     createServer(compilerCtx, wwwDir);
 
     if (typeof input === 'string') {
@@ -36,8 +36,8 @@ function patchFetch(compilerCtx: CompilerCtx, wwwDir: string, sandbox: any) {
 
 
 function normalizeUrl(url: string) {
-  var Url = require('url');
-  var parsedUrl = Url.parse(url);
+  const Url = require('url');
+  const parsedUrl = Url.parse(url);
 
   if (!parsedUrl.protocol || !parsedUrl.hostname) {
     parsedUrl.protocol = 'http:';
@@ -52,7 +52,7 @@ function normalizeUrl(url: string) {
 function patchRaf(sandbox: any) {
   if (!sandbox.requestAnimationFrame) {
     sandbox.requestAnimationFrame = function(callback: Function) {
-      var id = sandbox.setTimeout(function() {
+      const id = sandbox.setTimeout(function() {
         callback(Date.now());
       }, 0);
 
@@ -69,14 +69,14 @@ function patchRaf(sandbox: any) {
 function createServer(compilerCtx: CompilerCtx, wwwDir: string) {
   if (compilerCtx.localPrerenderServer) return;
 
-  var fs = require('fs');
-  var path = require('path');
-  var http = require('http');
-  var Url = require('url');
+  const fs = require('fs');
+  const path = require('path');
+  const http = require('http');
+  const Url = require('url');
 
   compilerCtx.localPrerenderServer = http.createServer((request: any, response: any) => {
-    var parsedUrl = Url.parse(request.url);
-    var filePath = path.join(wwwDir, parsedUrl.pathname);
+    const parsedUrl = Url.parse(request.url);
+    const filePath = path.join(wwwDir, parsedUrl.pathname);
 
     fs.readFile(filePath, 'utf-8', (err: any, data: any) => {
       if (err) {
@@ -92,7 +92,7 @@ function createServer(compilerCtx: CompilerCtx, wwwDir: string) {
   compilerCtx.localPrerenderServer.listen(PORT);
 }
 
-var PORT = 53536;
+const PORT = 53536;
 
 
 export function runInContext(code: string, contextifiedSandbox: any, options: any) {

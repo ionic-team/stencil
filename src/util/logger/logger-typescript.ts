@@ -1,6 +1,6 @@
-import { Diagnostic, PrintLine } from '../interfaces';
-import { formatFileName, formatHeader, splitLineBreaks, MAX_ERRORS } from './logger-util';
+import { Diagnostic, PrintLine } from '../../declarations';
 import { highlight } from './highlight/highlight';
+import { MAX_ERRORS, formatFileName, formatHeader, splitLineBreaks } from './logger-util';
 import * as ts from 'typescript';
 
 
@@ -35,8 +35,8 @@ function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
     d.absFilePath = tsDiagnostic.file.fileName;
     d.relFilePath = formatFileName(rootDir, d.absFilePath);
 
-    let sourceText = tsDiagnostic.file.getText();
-    let srcLines = splitLineBreaks(sourceText);
+    const sourceText = tsDiagnostic.file.getText();
+    const srcLines = splitLineBreaks(sourceText);
     let htmlLines = srcLines;
 
     try {

@@ -1,4 +1,4 @@
-import { ComponentMeta } from '../../util/interfaces';
+import { ComponentMeta } from '../../declarations';
 import { ENCAPSULATION } from '../../util/constants';
 
 

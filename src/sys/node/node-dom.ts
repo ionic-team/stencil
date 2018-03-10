@@ -1,4 +1,4 @@
-import { HydrateOptions } from '../../util/interfaces';
+import { HydrateOptions } from '../../declarations';
 
 
 export function createDom() {

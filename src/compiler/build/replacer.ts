@@ -1,4 +1,4 @@
-import { Config } from '../../util/interfaces';
+import { Config } from '../../declarations';
 
 
 export function buildExpressionReplacer(config: Config, input: string): string {

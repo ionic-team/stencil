@@ -1,4 +1,4 @@
-import { BuildResults, CompilerEventName, Config } from '../util/interfaces';
+import { BuildResults, CompilerEventName, Config } from '../declarations';
 
 
 export class BuildEvents {

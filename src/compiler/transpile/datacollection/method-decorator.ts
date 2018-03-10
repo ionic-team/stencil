@@ -1,7 +1,8 @@
-import { MembersMeta } from '../../../util/interfaces';
+import { isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
+import { MembersMeta } from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
-import { serializeSymbol, isDecoratorNamed, isMethodWithDecorators } from './utils';
+
 
 export function getMethodDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration): MembersMeta {
   return classNode.members

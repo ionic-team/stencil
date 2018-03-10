@@ -1,5 +1,6 @@
-import { JSDoc } from '../../../util/interfaces';
+import { JSDoc } from '../../../declarations';
 import * as ts from 'typescript';
+
 
 export function evalText(text: string) {
   const fnStr = `return ${text};`;

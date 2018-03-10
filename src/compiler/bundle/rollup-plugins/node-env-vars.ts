@@ -1,4 +1,4 @@
-import { Config } from '../../../util/interfaces';
+import { Config } from '../../../declarations';
 import { buildExpressionReplacer } from '../../build/replacer';
 import { Plugin, SourceDescription } from 'rollup';
 
