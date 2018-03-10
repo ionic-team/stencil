@@ -19,7 +19,7 @@ describe('validatePrerender', () => {
     };
     outputTarget = {
       type: 'www',
-      dir: '/www'
+      path: '/www'
     };
   });
 
@@ -143,7 +143,7 @@ describe('validatePrerender', () => {
 
   it('should default null prerender if undefined and not type www', () => {
     outputTarget.type = 'dist';
-    outputTarget.dir = '/dist';
+    outputTarget.path = '/dist';
     validatePrerender(config, outputTarget);
     expect(outputTarget.prerender).toBe(null);
   });

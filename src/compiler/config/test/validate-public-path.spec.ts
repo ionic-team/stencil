@@ -1,6 +1,6 @@
 import { Config } from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { validateBuildConfig } from '../validate-config';
+import { validateConfig } from '../validate-config';
 import * as path from 'path';
 
 
@@ -23,10 +23,10 @@ describe('validatePublicPath', () => {
   it('should set publicPath from custom buildDir', () => {
     config.outputTargets = [{
       type: 'www',
-      dir: 'some-www',
-      buildDir: 'some-build'
+      path: 'some-www',
+      buildPath: 'some-build'
     }];
-    validateBuildConfig(config);
+    validateConfig(config);
     expect(config.outputTargets[0].publicPath).toBe('/some-build/');
     expect(path.isAbsolute(config.outputTargets[0].publicPath)).toBe(true);
   });

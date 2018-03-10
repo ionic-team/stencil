@@ -1,10 +1,13 @@
-import { updateElement } from '../update-dom-node';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { NODE_TYPE } from '../../../util/constants';
-import { VNode } from '../../../util/interfaces';
+import { updateElement } from '../update-dom-node';
+import { VNode } from '../../../declarations';
 
 
 describe('updateElement', () => {
+
+  const plt: any = mockPlatform();
+
 
   it('should add/remove classes', () => {
     const elm = mockElement('my-tag') as HTMLElement;
@@ -128,8 +131,5 @@ describe('updateElement', () => {
     expect(elm.className).toBe('mr fusion');
     expect(elm.style.color).toBe('gray');
   });
-
-
-  var plt: any = mockPlatform();
 
 });

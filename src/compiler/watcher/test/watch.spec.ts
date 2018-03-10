@@ -1,8 +1,8 @@
-import { CompilerCtx, Config } from '../../../util/interfaces';
-import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
-import { validateBuildConfig } from '../../../compiler/config/validate-config';
-import { initWatcher } from '../watcher-init';
 import { BuildEvents } from '../../events';
+import { CompilerCtx, Config } from '../../../declarations';
+import { mockCompilerCtx, mockConfig } from '../../../testing/mocks';
+import { initWatcher } from '../watcher-init';
+import { validateConfig } from '../../../compiler/config/validate-config';
 
 
 describe('watcher', () => {
@@ -33,7 +33,7 @@ describe('watcher', () => {
   });
 
   it('should ignore common web files not used in builds', () => {
-    validateBuildConfig(config);
+    validateConfig(config);
     const reg = config.watchIgnoredRegex;
 
     expect(reg.test('/asdf/.gitignore')).toBe(true);

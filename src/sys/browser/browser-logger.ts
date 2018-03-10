@@ -1,4 +1,4 @@
-import { Diagnostic, Logger, LoggerTimeSpan } from '../../util/interfaces';
+import { Diagnostic, Logger, LoggerTimeSpan } from '../../declarations';
 
 
 export class BrowserLogger implements Logger {
@@ -129,7 +129,7 @@ class CmdTimeSpan {
   ) {
     this.logger = logger;
     this.start = Date.now();
-    let msg = `${startMsg} ${logger.dim('...')}`;
+    const msg = `${startMsg} ${logger.dim('...')}`;
 
     if (this.debug) {
       this.logger.debug(msg);
@@ -167,7 +167,7 @@ class CmdTimeSpan {
       time = 'in ' + (duration / 1000).toFixed(2) + ' s';
 
     } else {
-      let ms = parseFloat((duration).toFixed(3));
+      const ms = parseFloat((duration).toFixed(3));
       if (ms > 0) {
         time = 'in ' + duration + ' ms';
       } else {

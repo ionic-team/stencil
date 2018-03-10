@@ -1,4 +1,4 @@
-import { DomApi } from '../../util/interfaces';
+import { DomApi } from '../../declarations';
 import { VNode } from './h';
 
 

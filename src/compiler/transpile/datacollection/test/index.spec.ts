@@ -22,6 +22,7 @@ describe('component decorator', () => {
         'componentClass': 'ActionSheet',
         'encapsulation': ENCAPSULATION.NoEncapsulation,
         'assetsDirsMeta': [],
+        'dependencies': [],
         'eventsMeta': [
           {
             'eventBubbles': true,

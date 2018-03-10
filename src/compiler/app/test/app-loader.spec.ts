@@ -95,7 +95,7 @@ describe('build-project-files', () => {
       config.namespace = 'MyApp';
       config.fsNamespace = 'my-app';
       config.outputTargets = [
-        { type: 'www', buildDir: 'build/my-app/', publicPath: '/my/custom/public/path/', discoverPublicPath: false }
+        { type: 'www', buildPath: 'build/my-app/', publicPath: '/my/custom/public/path/', discoverPublicPath: false }
       ];
 
       const res = await generateLoader(
@@ -127,7 +127,7 @@ describe('build-project-files', () => {
     config.namespace = 'MyApp';
     config.fsNamespace = 'my-app';
     config.outputTargets = [
-      { type: 'www', buildDir: 'build/mp-app/', publicPath: 'build/' }
+      { type: 'www', buildPath: 'build/mp-app/', publicPath: 'build/' }
     ];
 
     const ctx = mockCompilerCtx();

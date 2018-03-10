@@ -1,8 +1,9 @@
-import { ComponentMeta, Diagnostic } from '../../../../util/interfaces';
+import { ComponentMeta, Diagnostic } from '../../../../declarations';
 import { getComponentDecoratorMeta } from '../component-decorator';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { CompilerOptions } from 'typescript';
+
 
 const compilerOptions: CompilerOptions = {
   'allowJs': true,

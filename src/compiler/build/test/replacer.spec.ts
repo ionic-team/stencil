@@ -1,5 +1,5 @@
-import { Config } from '../../../util/interfaces';
 import { buildExpressionReplacer } from '../replacer';
+import { Config } from '../../../declarations';
 
 
 describe('buildExpressionReplacer', () => {

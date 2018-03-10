@@ -1,6 +1,6 @@
-import { ComponentMeta } from '../../../util/interfaces';
+import { ComponentMeta } from '../../../declarations';
 import { ENCAPSULATION } from '../../../util/constants';
-import { useShadowDom, useScopedCss } from '../encapsulation';
+import { useScopedCss, useShadowDom } from '../encapsulation';
 
 
 describe('render encapsulation', () => {

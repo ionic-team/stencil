@@ -25,7 +25,8 @@ describe('component decorator', () => {
           name: 'ActionSheet',
           type: 'typeof ActionSheet'
         },
-        assetsDirsMeta: []
+        assetsDirsMeta: [],
+        dependencies: []
       });
     });
 
@@ -46,7 +47,8 @@ describe('component decorator', () => {
           name: 'ActionSheet',
           type: 'typeof ActionSheet'
         },
-        assetsDirsMeta: []
+        assetsDirsMeta: [],
+        dependencies: []
       });
     });
 
@@ -67,7 +69,8 @@ describe('component decorator', () => {
           documentation: '',
           name: 'ActionSheet',
           type: 'typeof ActionSheet'
-        }
+        },
+        dependencies: []
       });
     });
 
@@ -106,6 +109,7 @@ describe('component decorator', () => {
           }
         },
         assetsDirsMeta: [],
+        dependencies: []
       });
     });
   });

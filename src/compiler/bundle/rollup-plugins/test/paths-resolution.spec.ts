@@ -1,14 +1,13 @@
-import { Config } from '../../../../declarations';
+import { CompilerCtx, Config } from '../../../../declarations';
 import {
   mockCache,
   mockConfig,
   mockStencilSystem
 } from '../../../../testing/mocks';
-import { CompilerCtx } from '../../../../util/interfaces';
 import localResolution from '../local-resolution';
 import pathsResolver from '../paths-resolution';
 
-// localResolution(config, compilerCtx),
+
 describe('paths-resolution', () => {
 
   it('should resolve UNIX paths', async () => {

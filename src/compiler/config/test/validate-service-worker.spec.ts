@@ -17,7 +17,7 @@ describe('validateServiceWorker', () => {
   it('should set globDirectory', () => {
     outputTarget = {
       type: 'www',
-      dir: '/User/me/app/www/',
+      path: '/User/me/app/www/',
       serviceWorker: {
         globDirectory: '/custom/www'
       }
@@ -29,7 +29,7 @@ describe('validateServiceWorker', () => {
   it('should set default globDirectory', () => {
     outputTarget = {
       type: 'www',
-      dir: '/User/me/app/www/'
+      path: '/User/me/app/www/'
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globDirectory).toBe('/User/me/app/www/');
@@ -38,7 +38,7 @@ describe('validateServiceWorker', () => {
   it('should set globPatterns array', () => {
     outputTarget = {
       type: 'www',
-      dir: '/www',
+      path: '/www',
       serviceWorker: {
         globPatterns: ['**/*.{png,svg}']
       }
@@ -50,7 +50,7 @@ describe('validateServiceWorker', () => {
   it('should set globPatterns string', () => {
     outputTarget = {
       type: 'www',
-      dir: '/www',
+      path: '/www',
       serviceWorker: {
         globPatterns: '**/*.{png,svg}' as any
       }
@@ -62,7 +62,7 @@ describe('validateServiceWorker', () => {
   it('should create default globPatterns', () => {
     outputTarget = {
       type: 'www',
-      dir: '/www'
+      path: '/www'
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{js,css,json,html,ico,png,svg}']);
@@ -71,7 +71,7 @@ describe('validateServiceWorker', () => {
   it('should create default sw config when www type and prod mode', () => {
     outputTarget = {
       type: 'www',
-      dir: '/www'
+      path: '/www'
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).not.toBe(null);
@@ -80,7 +80,7 @@ describe('validateServiceWorker', () => {
   it('should not create default sw config when www type and devMode', () => {
     outputTarget = {
       type: 'www',
-      dir: '/www'
+      path: '/www'
     };
     config.devMode = true;
     validateServiceWorker(config, outputTarget);
@@ -89,7 +89,7 @@ describe('validateServiceWorker', () => {
 
   it('should not create default sw config when not www type', () => {
     outputTarget = {
-      dir: '/www'
+      path: '/www'
     };
     validateServiceWorker(config, outputTarget);
     expect(outputTarget.serviceWorker).toBe(null);
@@ -97,7 +97,7 @@ describe('validateServiceWorker', () => {
 
   it('should create default sw config when true boolean, even if devMode', () => {
     outputTarget = {
-      dir: '/www',
+      path: '/www',
       serviceWorker: true as any
     };
     config.devMode = true;
@@ -107,7 +107,7 @@ describe('validateServiceWorker', () => {
 
   it('should not create sw config when in devMode', () => {
     outputTarget = {
-      dir: '/www',
+      path: '/www',
       serviceWorker: true as any
     };
     config.devMode = true;

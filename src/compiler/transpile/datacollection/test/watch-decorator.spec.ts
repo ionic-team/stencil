@@ -1,4 +1,4 @@
-import { ComponentMeta } from '../../../../util/interfaces';
+import { ComponentMeta } from '../../../../declarations';
 import { gatherMetadata } from './test-utils';
 import { getWatchDecoratorMeta } from '../watch-decorator';
 import { MEMBER_TYPE } from '../../../../util/constants';
@@ -8,6 +8,8 @@ import * as ts from 'typescript';
 
 
 describe('@Watch decorator', () => {
+
+  const config = mockConfig();
 
   it('adds same callback to multiple props', () => {
     const sourceFilePath = path.resolve(__dirname, './fixtures/watch-simple');
@@ -46,7 +48,5 @@ describe('@Watch decorator', () => {
     expect(cmpMeta.membersMeta.someProp2.watchCallbacks[0]).toBe('method');
     expect(cmpMeta.membersMeta.someProp3.watchCallbacks[0]).toBe('method');
   });
-
-  var config = mockConfig();
 
 });

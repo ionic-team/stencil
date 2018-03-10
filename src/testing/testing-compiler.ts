@@ -1,6 +1,6 @@
 import { Compiler } from '../compiler/index';
 import { TestingConfig } from './testing-config';
-import { validateBuildConfig } from '../compiler/config/validate-config';
+import { validateConfig } from '../compiler/config/validate-config';
 
 
 export class TestingCompiler extends Compiler {
@@ -19,7 +19,7 @@ export class TestingCompiler extends Compiler {
     Object.assign(this.config, exports.config);
 
     this.config._isValidated = false;
-    validateBuildConfig(this.config);
+    validateConfig(this.config);
   }
 
 }

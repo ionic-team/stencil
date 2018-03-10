@@ -1,4 +1,4 @@
-import { Config } from '../../../util/interfaces';
+import { Config } from '../../../declarations';
 import { validateNamespace } from '../validate-namespace';
 
 

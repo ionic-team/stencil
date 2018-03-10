@@ -1,4 +1,4 @@
-import { Config } from '../../../util/interfaces';
+import { Config } from '../../../declarations';
 import { isFileIncludePath } from '../transpile-app-modules';
 import { mockConfig } from '../../../testing/mocks';
 

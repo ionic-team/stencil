@@ -1,6 +1,6 @@
 import { Config } from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { validateBuildConfig } from '../validate-config';
+import { validateConfig } from '../validate-config';
 import * as path from 'path';
 
 
@@ -21,7 +21,7 @@ describe('validateAssetVerioning', () => {
 
 
   it('should default null', () => {
-    validateBuildConfig(config);
+    validateConfig(config);
     expect(config.assetVersioning).toBe(null);
   });
 

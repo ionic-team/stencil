@@ -2,7 +2,7 @@ import { BuildCtx, CompilerCtx, ComponentRegistry, Config, EntryModule } from '.
 import { generateAppFiles } from '../../compiler/app/generate-app-files';
 import { getBuildContext } from '../../compiler/build/build-utils';
 import { mockCompilerCtx, mockConfig } from '../../testing/mocks';
-import { validateBuildConfig } from '../../compiler/config/validate-config';
+import { validateConfig } from '../../compiler/config/validate-config';
 
 
 describe('client publicPath', () => {
@@ -29,10 +29,10 @@ describe('client publicPath', () => {
       config.outputTargets = [
         {
           type: 'www',
-          buildDir: 'my-build'
+          buildPath: 'my-build'
         }
       ];
-      config = validateBuildConfig(config);
+      config = validateConfig(config);
 
       buildCtx = getBuildContext(config, compilerCtx, null);
 
@@ -51,16 +51,16 @@ describe('client publicPath', () => {
       config.outputTargets = [
         {
           type: 'www',
-          dir: 'my-www',
-          buildDir: 'my-www-build'
+          path: 'my-www',
+          buildPath: 'my-www-build'
         },
         {
           type: 'dist',
-          dir: 'my-dist',
-          buildDir: 'my-dist-build'
+          path: 'my-dist',
+          buildPath: 'my-dist-build'
         }
       ];
-      config = validateBuildConfig(config);
+      config = validateConfig(config);
 
       buildCtx = getBuildContext(config, compilerCtx, null);
 
@@ -84,7 +84,7 @@ describe('client publicPath', () => {
         type: 'dist'
       }];
       config.buildEs5 = true;
-      config = validateBuildConfig(config);
+      config = validateConfig(config);
       buildCtx = getBuildContext(config, compilerCtx, null);
 
       await generateAppFiles(config, compilerCtx, buildCtx, entryModules, componentRegistry);
@@ -104,7 +104,7 @@ describe('client publicPath', () => {
 
     it('writes www loader, app core and app core es5, default config w/ es5 build', async () => {
       config.buildEs5 = true;
-      config = validateBuildConfig(config);
+      config = validateConfig(config);
       buildCtx = getBuildContext(config, compilerCtx, null);
 
       await generateAppFiles(config, compilerCtx, buildCtx, entryModules, componentRegistry);

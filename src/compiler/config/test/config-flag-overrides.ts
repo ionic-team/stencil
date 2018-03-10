@@ -98,18 +98,4 @@ describe('overrideConfigFromArgv', () => {
     expect(config.writeLog).toBe(true);
   });
 
-  it('should enable docs generate', () => {
-    config.flags = { docs: true };
-    config.generateDocs = false;
-    validateBuildConfig(config);
-    expect(config.generateDocs).toBe(true);
-  });
-
-  it('should disable docs generate', () => {
-    config.flags = { docs: false };
-    config.generateDocs = true;
-    validateBuildConfig(config);
-    expect(config.generateDocs).toBe(false);
-  });
-
 });

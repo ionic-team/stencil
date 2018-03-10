@@ -2,7 +2,7 @@ import { CompilerCtx, ComponentConstructor, ComponentMeta, ComponentRegistry, Co
 import { MEMBER_TYPE, PROP_TYPE } from '../util/constants';
 import { mockLogger, mockStencilSystem } from './mocks';
 import { Renderer } from '../server';
-import { validateBuildConfig } from '../compiler/config/validate-config';
+import { validateConfig } from '../compiler/config/validate-config';
 
 
 const testPlatforms = new WeakMap<Element, PlatformApi>();
@@ -109,7 +109,7 @@ function getTestBuildConfig() {
   config.devMode = true;
   config._isTesting = true;
 
-  return validateBuildConfig(config);
+  return validateConfig(config);
 }
 
 

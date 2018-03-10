@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { transformSourceString } from '../../util';
 import upgradeJsxProps from '../upgrade-jsx-props';
-import { CompilerCtx } from '../../../../../util/interfaces';
+import { CompilerCtx } from '../../../../../declarations';
 import { mockCache } from '../../../../../testing/mocks';
 
 

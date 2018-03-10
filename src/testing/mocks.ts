@@ -11,7 +11,7 @@ import { TestingConfig } from './testing-config';
 import { TestingSystem } from './testing-sys';
 import { TestingFs } from './testing-fs';
 import { TestingLogger } from './index';
-import { validateBuildConfig } from '../compiler/config/validate-config';
+import { validateConfig } from '../compiler/config/validate-config';
 
 
 export function mockPlatform(win?: any, domApi?: DomApi) {
@@ -81,7 +81,7 @@ export interface MockedPlatform extends PlatformApi {
 export function mockConfig(opts = { enableLogger: false }): Config {
   const config = new TestingConfig();
   (config.logger as TestingLogger).enable = opts.enableLogger;
-  return validateBuildConfig(config);
+  return validateConfig(config);
 }
 
 

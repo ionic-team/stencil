@@ -18,7 +18,7 @@ describe('normalizeLocation', () => {
     };
     outputTarget = {
       type: 'www',
-      dir: '/User/some/path/www/'
+      path: '/User/some/path/www/'
     };
   });
 

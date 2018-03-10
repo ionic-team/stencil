@@ -1,9 +1,11 @@
+import { convertOptionsToMeta, getEventDecoratorMeta } from '../event-decorator';
+import { EventOptions } from '../../../../declarations';
+import { gatherMetadata } from './test-utils';
 import { MEMBER_TYPE } from '../../../../util/constants';
-import { getEventDecoratorMeta, convertOptionsToMeta } from '../event-decorator';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { gatherMetadata } from './test-utils';
-import { EventOptions } from '../../../../util/interfaces';
+
+
 
 describe('event decorator', () => {
 

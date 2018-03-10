@@ -1,4 +1,4 @@
-import { Config } from '../../util/interfaces';
+import { Config } from '../../declarations';
 import { normalizeHydrateOptions } from '../hydrate-utils';
 import { mockConfig } from '../../testing/mocks';
 
