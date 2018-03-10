@@ -186,6 +186,38 @@ export function _deprecatedToMultipleTarget(config: Config) {
     delete (config as any).discoverPublicPath;
   }
 
+  if ((config as any).serviceWorker !== undefined) {
+    deprecatedConfigs.push('serviceWorker');
+
+    config.outputTargets = config.outputTargets || [];
+
+    let o = config.outputTargets.find(o => o.type === 'www');
+    if (!o) {
+      o = { type: 'www', serviceWorker: (config as any).serviceWorker };
+      config.outputTargets.push(o);
+    } else {
+      o.serviceWorker = (config as any).serviceWorker;
+    }
+
+    delete (config as any).serviceWorker;
+  }
+
+  if ((config as any).prerender !== undefined) {
+    deprecatedConfigs.push('prerender');
+
+    config.outputTargets = config.outputTargets || [];
+
+    let o = config.outputTargets.find(o => o.type === 'www');
+    if (!o) {
+      o = { type: 'www', prerender: (config as any).prerender };
+      config.outputTargets.push(o);
+    } else {
+      o.prerender = (config as any).prerender;
+    }
+
+    delete (config as any).prerender;
+  }
+
   if (deprecatedConfigs.length > 0) {
     const warningMsg = [
       `As of v0.7.0, the config `,

@@ -16,6 +16,44 @@ describe('_deprecated multiple targets', () => {
   });
 
 
+  it('prerender, create outputTargets', () => {
+    (config as any).prerender = true;
+    const r = _deprecatedToMultipleTarget(config);
+    expect((config as any).prerender).toBeUndefined();
+    expect(config.outputTargets[0].type).toBe('www');
+    expect(config.outputTargets[0].prerender).toBe(true);
+    expect(r).toHaveLength(1);
+  });
+
+  it('prerender', () => {
+    (config as any).prerender = true;
+    config.outputTargets = [ { type: 'www' } ];
+    const r = _deprecatedToMultipleTarget(config);
+    expect((config as any).prerender).toBeUndefined();
+    expect(config.outputTargets[0].type).toBe('www');
+    expect(config.outputTargets[0].prerender).toBe(true);
+    expect(r).toHaveLength(1);
+  });
+
+  it('serviceWorker, create outputTargets', () => {
+    (config as any).serviceWorker = true;
+    const r = _deprecatedToMultipleTarget(config);
+    expect((config as any).serviceWorker).toBeUndefined();
+    expect(config.outputTargets[0].type).toBe('www');
+    expect(config.outputTargets[0].serviceWorker).toBe(true);
+    expect(r).toHaveLength(1);
+  });
+
+  it('serviceWorker', () => {
+    (config as any).serviceWorker = true;
+    config.outputTargets = [ { type: 'www' } ];
+    const r = _deprecatedToMultipleTarget(config);
+    expect((config as any).serviceWorker).toBeUndefined();
+    expect(config.outputTargets[0].type).toBe('www');
+    expect(config.outputTargets[0].serviceWorker).toBe(true);
+    expect(r).toHaveLength(1);
+  });
+
   it('discoverPublicPath', () => {
     (config as any).discoverPublicPath = true;
     config.outputTargets = [ { type: 'www' }, { type: 'dist' } ];
