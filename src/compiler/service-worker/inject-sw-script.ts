@@ -4,7 +4,7 @@ import { Config, OutputTarget } from '../../declarations';
 export async function injectRegisterServiceWorker(config: Config, outputTarget: OutputTarget, indexHtml: string) {
   const match = indexHtml.match(BODY_CLOSE_REG);
 
-  let swUrl = config.sys.path.relative(outputTarget.dir, outputTarget.serviceWorker.swDest);
+  let swUrl = config.sys.path.relative(outputTarget.path, outputTarget.serviceWorker.swDest);
   if (swUrl.charAt(0) !== '/') {
     swUrl = '/' + swUrl;
   }

@@ -32,7 +32,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
       o = { type: 'www' };
       config.outputTargets.push(o);
     }
-    o.emptyDir = !!(config as any).emptyWWW;
+    o.empty = !!(config as any).emptyWWW;
 
     delete (config as any).emptyWWW;
   }
@@ -46,7 +46,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
       o = { type: 'www' };
       config.outputTargets.push(o);
     }
-    o.dir = (config as any).wwwDir;
+    o.path = (config as any).wwwDir;
 
     delete (config as any).wwwDir;
   }
@@ -60,7 +60,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
       o = { type: 'www' };
       config.outputTargets.push(o);
     }
-    o.buildDir = (config as any).buildDir;
+    o.buildPath = (config as any).buildDir;
 
     delete (config as any).buildDir;
   }
@@ -103,7 +103,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
     }
-    o.dir = (config as any).distDir;
+    o.path = (config as any).distDir;
 
     delete (config as any).distDir;
   }
@@ -117,7 +117,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
     }
-    o.emptyDir = !!(config as any).emptyDist;
+    o.empty = !!(config as any).emptyDist;
 
     delete (config as any).emptyDist;
   }
@@ -131,7 +131,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
     }
-    o.dir = (config as any).collectionDir;
+    o.path = (config as any).collectionDir;
 
     delete (config as any).collectionDir;
   }
@@ -145,7 +145,7 @@ export function _deprecatedToMultipleTarget(config: Config) {
       o = { type: 'dist' };
       config.outputTargets.push(o);
     }
-    o.dir = (config as any).typesDir;
+    o.path = (config as any).typesDir;
 
     delete (config as any).typesDir;
   }

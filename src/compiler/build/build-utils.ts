@@ -1,6 +1,7 @@
 import { BuildCtx, CompilerCtx, Config, WatcherResults } from '../../declarations';
 import { catchError, hasError } from '../util';
-import { generateBuildResults, generateBuildStats } from './build-results';
+import { generateBuildResults } from './build-results';
+import { generateBuildStats } from './build-stats';
 import { initWatcher } from '../watcher/watcher-init';
 
 

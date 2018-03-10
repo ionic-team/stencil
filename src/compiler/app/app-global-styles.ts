@@ -26,7 +26,7 @@ export async function generateGlobalStyles(config: Config, compilerCtx: Compiler
 
     const fileName = getGlobalStyleFilename(config);
 
-    const filePath = pathJoin(config, outputTarget.buildDir, fileName);
+    const filePath = pathJoin(config, outputTarget.buildPath, fileName);
     config.logger.debug(`global style: ${filePath}`);
     await compilerCtx.fs.writeFile(filePath, styleText);
 

@@ -1,12 +1,12 @@
-import { EventMeta } from '../../util/interfaces';
 import { getMemberDocumentation } from './docs-util';
+import { MemberMeta } from '../../../declarations';
 
 
-export class MarkdownEvents {
+export class MarkdownMethods {
   private rows: Row[] = [];
 
-  addRow(eventMeta: EventMeta) {
-    this.rows.push(new Row(eventMeta));
+  addRow(memberName: string, memberMeta: MemberMeta) {
+    this.rows.push(new Row(memberName, memberMeta));
   }
 
   toMarkdown() {
@@ -15,12 +15,12 @@ export class MarkdownEvents {
       return content;
     }
 
-    content.push(`## Events`);
+    content.push(`## Methods`);
     content.push(``);
 
     this.rows = this.rows.sort((a, b) => {
-      if (a.eventMeta.eventName < b.eventMeta.eventName) return -1;
-      if (a.eventMeta.eventName > b.eventMeta.eventName) return 1;
+      if (a.memberName < b.memberName) return -1;
+      if (a.memberName > b.memberName) return 1;
       return 0;
     });
 
@@ -35,15 +35,15 @@ export class MarkdownEvents {
 
 class Row {
 
-  constructor(public eventMeta: EventMeta) {}
+  constructor(public memberName: string, private memberMeta: MemberMeta) {}
 
   toMarkdown() {
     const content: string[] = [];
 
-    content.push(`#### ${this.eventMeta.eventName}`);
+    content.push(`#### ${this.memberName}()`);
     content.push(``);
 
-    const doc = getMemberDocumentation(this.eventMeta.jsdoc);
+    const doc = getMemberDocumentation(this.memberMeta.jsdoc);
     if (doc) {
       content.push(doc);
       content.push(``);

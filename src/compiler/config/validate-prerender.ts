@@ -25,7 +25,7 @@ export function validatePrerender(config: Config, outputTarget: OutputTarget) {
     }
 
     if (!outputTarget.prerender.prerenderDir) {
-      outputTarget.prerender.prerenderDir = outputTarget.dir;
+      outputTarget.prerender.prerenderDir = outputTarget.path;
     }
 
     if (!config.sys.path.isAbsolute(outputTarget.prerender.prerenderDir)) {
@@ -52,7 +52,7 @@ export function validatePrerender(config: Config, outputTarget: OutputTarget) {
     };
 
     if (!outputTarget.prerender.prerenderDir) {
-      outputTarget.prerender.prerenderDir = outputTarget.dir;
+      outputTarget.prerender.prerenderDir = outputTarget.path;
     }
 
     if (!config.sys.path.isAbsolute(outputTarget.prerender.prerenderDir)) {

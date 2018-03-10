@@ -5,7 +5,7 @@ import { getGlobalBuildPath } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { loadComponentRegistry } from './load-registry';
-import { validateBuildConfig } from '../compiler/config/validate-config';
+import { validateConfig } from '../compiler/config/validate-config';
 
 
 export class Renderer {
@@ -16,7 +16,7 @@ export class Renderer {
 
   constructor(public config: Config, registry?: ComponentRegistry, ctx?: CompilerCtx) {
     this.config = config;
-    validateBuildConfig(config);
+    validateConfig(config);
 
     // init the build context
     this.ctx = getCompilerCtx(config, ctx);

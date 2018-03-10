@@ -1,8 +1,9 @@
 import { getMemberDocumentation } from './docs-util';
-import { MemberMeta } from '../../util/interfaces';
+import { MemberMeta } from '../../../declarations';
+import { PROP_TYPE } from '../../../util/constants';
 
 
-export class MarkdownMethods {
+export class MarkdownProps {
   private rows: Row[] = [];
 
   addRow(memberName: string, memberMeta: MemberMeta) {
@@ -15,7 +16,7 @@ export class MarkdownMethods {
       return content;
     }
 
-    content.push(`## Methods`);
+    content.push(`## Properties`);
     content.push(``);
 
     this.rows = this.rows.sort((a, b) => {
@@ -40,7 +41,9 @@ class Row {
   toMarkdown() {
     const content: string[] = [];
 
-    content.push(`#### ${this.memberName}()`);
+    content.push(`#### ${this.memberName}`);
+    content.push(``);
+    content.push(getPropType(this.memberMeta.propType));
     content.push(``);
 
     const doc = getMemberDocumentation(this.memberMeta.jsdoc);
@@ -54,3 +57,19 @@ class Row {
     return content;
   }
 }
+
+
+function getPropType(propType: PROP_TYPE) {
+  switch (propType) {
+    case PROP_TYPE.Any:
+      return 'any';
+    case PROP_TYPE.Boolean:
+      return 'boolean';
+    case PROP_TYPE.Number:
+      return 'number';
+    case PROP_TYPE.String:
+      return 'string';
+  }
+  return '';
+}
+

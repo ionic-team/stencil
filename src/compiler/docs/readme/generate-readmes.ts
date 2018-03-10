@@ -1,13 +1,9 @@
 import { addAutoGenerate } from './auto-docs';
 import { AUTO_GENERATE_COMMENT } from './constants';
-import { CompilerCtx, Config, ModuleFile } from '../../declarations';
+import { CompilerCtx, Config, ModuleFile } from '../../../declarations';
 
 
 export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> {
-  if (!config.generateDocs) {
-    return Promise.resolve();
-  }
-
   const cmpDirectories: string[] = [];
   const promises: Promise<any>[] = [];
   const warnings: string[] = [];

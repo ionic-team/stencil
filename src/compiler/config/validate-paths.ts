@@ -51,21 +51,10 @@ export function validatePaths(config: Config) {
     }
     config.logger.buildLogFilePath = config.buildLogFilePath;
   }
-
-  if (config.writeStats) {
-    setStringConfig(config, 'buildStatsFilePath', DEFAULT_STATS_JSON_FILE_NAME);
-    if (!path.isAbsolute(config.buildStatsFilePath)) {
-      config.buildStatsFilePath = normalizePath(path.join(config.rootDir, config.buildStatsFilePath));
-    }
-  }
 }
 
-export const DEFAULT_WWW_DIR = 'www';
-export const DEFAULT_INDEX_HTML = 'index.html';
-export const DEFAULT_WWW_BUILD_DIR = 'build';
-export const DEFAULT_DIST_DIR = 'dist';
-export const DEFAULT_DIST_BUILD_DIR = '';
+
+const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_SRC_DIR = 'src';
 const DEFAULT_TSCONFIG = 'tsconfig.json';
 const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';
-const DEFAULT_STATS_JSON_FILE_NAME = 'stencil-stats.json';

@@ -4,7 +4,7 @@ import { catchError } from './util';
 import { docs } from './docs/docs';
 import { getCompilerCtx } from './build/compiler-ctx';
 import { InMemoryFileSystem } from '../util/in-memory-fs';
-import { validateBuildConfig } from '../compiler/config/validate-config';
+import { validateConfig } from '../compiler/config/validate-config';
 
 
 export class Compiler {
@@ -84,7 +84,7 @@ export class Compiler {
 function isValid(config: Config): [ boolean, Config | null] {
   try {
     // validate the build config
-    validateBuildConfig(config, true);
+    validateConfig(config, true);
     return [ true, config ];
 
   } catch (e) {

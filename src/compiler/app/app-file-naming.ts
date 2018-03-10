@@ -3,7 +3,7 @@ import { pathJoin } from '../util';
 
 
 export function getAppBuildDir(config: Config, outputTarget: OutputTarget) {
-  return pathJoin(config, outputTarget.buildDir, config.fsNamespace);
+  return pathJoin(config, outputTarget.buildPath, config.fsNamespace);
 }
 
 
@@ -23,7 +23,7 @@ export function getLoaderFileName(config: Config) {
 
 
 export function getLoaderPath(config: Config, outputTarget: OutputTarget) {
-  return pathJoin(config, outputTarget.buildDir, getLoaderFileName(config));
+  return pathJoin(config, outputTarget.buildPath, getLoaderFileName(config));
 }
 
 

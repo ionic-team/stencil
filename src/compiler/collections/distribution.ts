@@ -62,7 +62,7 @@ export function validatePackageJson(config: Config, outputTarget: OutputTarget, 
   validatePackageFiles(config, outputTarget, diagnostics, pkgData);
 
   const mainFileName = getLoaderFileName(config);
-  const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.dir), mainFileName);
+  const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.path), mainFileName);
 
   if (!pkgData.main || normalizePath(pkgData.main) !== main) {
     const err = buildError(diagnostics);
@@ -101,7 +101,7 @@ export function validatePackageJson(config: Config, outputTarget: OutputTarget, 
 
 export function validatePackageFiles(config: Config, outputTarget: OutputTarget, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
   if (pkgData.files) {
-    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.dir));
+    const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.path));
 
     const validPaths = [
       `${actualDistDir}`,

@@ -31,7 +31,7 @@ async function copyLib(config: Config, buildCtx: BuildCtx, outputTarget: OutputT
   const timeSpan = config.logger.createTimeSpan(`copy service worker library started`, true);
 
   try {
-    await config.sys.workbox.copyWorkboxLibraries(outputTarget.dir);
+    await config.sys.workbox.copyWorkboxLibraries(outputTarget.path);
 
   } catch (e) {
     // workaround for workbox issue in the latest alpha

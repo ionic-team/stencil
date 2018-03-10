@@ -5,15 +5,14 @@ export interface Config {
   buildAppCore?: boolean;
   buildEs5?: boolean;
   buildLogFilePath?: string;
-  buildStatsFilePath?: string;
   bundles?: ConfigBundle[];
   configPath?: string;
   copy?: CopyTasks;
   devMode?: boolean;
   enableCache?: boolean;
   excludeSrc?: string[];
+  flags?: ConfigFlags;
   fsNamespace?: string;
-  generateDocs?: boolean;
   globalScript?: string;
   globalStyle?: string[];
   hashedFileNameLength?: number;
@@ -37,8 +36,6 @@ export interface Config {
   watch?: boolean;
   watchIgnoredRegex?: RegExp;
   writeLog?: boolean;
-  writeStats?: boolean;
-  flags?: ConfigFlags;
   _isValidated?: boolean;
   _isTesting?: boolean;
 
@@ -50,7 +47,7 @@ export interface Config {
 
 
 export interface ConfigFlags {
-  task?: 'build' | 'docs' | 'init' | 'help';
+  task?: 'build' | 'docs' | 'help' | 'init';
   config?: string;
   debug?: boolean;
   dev?: boolean;
@@ -69,10 +66,11 @@ export interface ConfigFlags {
 
 
 export interface OutputTarget {
-  type?: 'www' | 'dist';
-  dir?: string;
-  buildDir?: string;
-  emptyDir?: boolean;
+  type?: 'dist' | 'docs' | 'stats' | 'www';
+  path?: string;
+  buildPath?: string;
+  empty?: boolean;
+  format?: string;
   discoverPublicPath?: boolean;
   publicPath?: string;
   indexHtml?: string;

@@ -3,6 +3,10 @@ import { normalizePath } from '../util';
 
 
 export function validatePublicPath(config: Config, outputTarget: OutputTarget) {
+  if (outputTarget.type !== 'www' && outputTarget.type !== 'dist') {
+    return;
+  }
+
   if (typeof outputTarget.discoverPublicPath !== 'boolean') {
     // only do this check if the config hasn't been fully validated yet
     // if the config has a publicPath, then let's remember it was a custom one
@@ -15,7 +19,7 @@ export function validatePublicPath(config: Config, outputTarget: OutputTarget) {
     // in most cases it's just "build", as in index page would request scripts from `/build/`
 
     outputTarget.publicPath = normalizePath(
-      config.sys.path.relative(outputTarget.dir, outputTarget.buildDir)
+      config.sys.path.relative(outputTarget.path, outputTarget.buildPath)
     );
 
     if (outputTarget.publicPath.charAt(0) !== '/') {

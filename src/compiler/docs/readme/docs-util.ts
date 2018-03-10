@@ -1,4 +1,4 @@
-import { JSDoc } from '../../util/interfaces';
+import { JSDoc } from '../../../declarations';
 
 
 export function getMemberDocumentation(jsDoc: JSDoc) {

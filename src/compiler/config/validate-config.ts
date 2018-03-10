@@ -9,7 +9,7 @@ import { validatePlugins } from './validate-plugins';
 import { _deprecatedValidateConfigCollections } from './_deprecated-validate-config-collection';
 
 
-export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
+export function validateConfig(config: Config, setEnvVariables?: boolean) {
   if (!config) {
     throw new Error(`invalid build config`);
   }
@@ -41,7 +41,6 @@ export function validateBuildConfig(config: Config, setEnvVariables?: boolean) {
   config.logger.level = config.logLevel;
 
   setBooleanConfig(config, 'writeLog', 'log', false);
-  setBooleanConfig(config, 'writeStats', 'stats', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
 
   // get a good namespace

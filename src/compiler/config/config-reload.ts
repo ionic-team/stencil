@@ -1,6 +1,6 @@
 import { CompilerCtx, Config } from '../../declarations';
 import { resetCompilerCtx } from '../build/compiler-ctx';
-import { validateBuildConfig } from './validate-config';
+import { validateConfig } from './validate-config';
 
 
 export function configFileReload(config: Config, compilerCtx: CompilerCtx) {
@@ -26,7 +26,7 @@ export function configFileReload(config: Config, compilerCtx: CompilerCtx) {
     }
 
     // validate our new config data
-    validateBuildConfig(config);
+    validateConfig(config);
 
     // reset the compiler context cache
     resetCompilerCtx(compilerCtx);
@@ -44,7 +44,7 @@ const CONFIG_RELOAD_KEEPERS: Config = {
   logger: null,
   devMode: null,
   watch: null,
-  generateDocs: null
+  outputTargets: null
 };
 
 const CONFIG_RELOAD_KEEPER_KEYS = Object.keys(CONFIG_RELOAD_KEEPERS);

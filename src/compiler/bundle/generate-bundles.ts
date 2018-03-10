@@ -69,7 +69,11 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
 
 async function writeBundleJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
 
-  return Promise.all(config.outputTargets.map(outputTarget => {
+  const outputTargets = config.outputTargets.filter(outputTarget => {
+    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+  });
+
+  return Promise.all(outputTargets.map(outputTarget => {
     // get the absolute path to where it'll be saved in www
     const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
 
@@ -169,7 +173,11 @@ async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, ent
   entryModule.entryBundles = entryModule.entryBundles || [];
   entryModule.entryBundles.push(entryBundle);
 
-  return Promise.all(config.outputTargets.map(async outputTarget => {
+  const outputTargets = config.outputTargets.filter(outputTarget => {
+    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+  });
+
+  return Promise.all(outputTargets.map(async outputTarget => {
     // get the absolute path to where it'll be saved
     const wwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), fileName);
 

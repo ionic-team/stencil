@@ -8,20 +8,20 @@ export function validateDistOutputTarget(config: Config) {
   const distOutputTargets = config.outputTargets.filter(o => o.type === 'dist');
 
   distOutputTargets.forEach(outputTarget => {
-    if (!outputTarget.dir) {
-      outputTarget.dir = DEFAULT_DIST_DIR;
+    if (!outputTarget.path) {
+      outputTarget.path = DEFAULT_DIST_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.dir)) {
-      outputTarget.dir = normalizePath(path.join(config.rootDir, outputTarget.dir));
+    if (!path.isAbsolute(outputTarget.path)) {
+      outputTarget.path = normalizePath(path.join(config.rootDir, outputTarget.path));
     }
 
-    if (!outputTarget.buildDir) {
-      outputTarget.buildDir = DEFAULT_DIST_BUILD_DIR;
+    if (!outputTarget.buildPath) {
+      outputTarget.buildPath = DEFAULT_DIST_BUILD_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.buildDir)) {
-      outputTarget.buildDir = normalizePath(path.join(outputTarget.dir, outputTarget.buildDir));
+    if (!path.isAbsolute(outputTarget.buildPath)) {
+      outputTarget.buildPath = normalizePath(path.join(outputTarget.path, outputTarget.buildPath));
     }
 
     if (!outputTarget.collectionDir) {
@@ -29,7 +29,7 @@ export function validateDistOutputTarget(config: Config) {
     }
 
     if (!path.isAbsolute(outputTarget.collectionDir)) {
-      outputTarget.collectionDir = normalizePath(path.join(outputTarget.dir, outputTarget.collectionDir));
+      outputTarget.collectionDir = normalizePath(path.join(outputTarget.path, outputTarget.collectionDir));
     }
 
     if (!outputTarget.typesDir) {
@@ -37,11 +37,11 @@ export function validateDistOutputTarget(config: Config) {
     }
 
     if (!path.isAbsolute(outputTarget.typesDir)) {
-      outputTarget.typesDir = normalizePath(path.join(outputTarget.dir, outputTarget.typesDir));
+      outputTarget.typesDir = normalizePath(path.join(outputTarget.path, outputTarget.typesDir));
     }
 
-    if (typeof outputTarget.emptyDir !== 'boolean') {
-      outputTarget.emptyDir = DEFAULT_DIST_EMPTY_DIR;
+    if (typeof outputTarget.empty !== 'boolean') {
+      outputTarget.empty = DEFAULT_DIST_EMPTY_DIR;
     }
   });
 }

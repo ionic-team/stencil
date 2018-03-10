@@ -56,12 +56,16 @@ export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx,
     return;
   }
 
-  return Promise.all(config.outputTargets.map(outputTarget => {
+  const outputTargets = config.outputTargets.filter(outputTarget => {
+    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+  });
+
+  return Promise.all(outputTargets.map(outputTarget => {
     if (outputTarget.collectionDir) {
       return processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, outputTarget.collectionDir);
 
     } else {
-      return processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, outputTarget.dir);
+      return processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, outputTarget.path);
     }
   }));
 }
@@ -101,7 +105,7 @@ async function processGlob(config: Config, copyTask: CopyTask) {
         globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.collectionDir, globRelPath));
 
       } else {
-        globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.dir, globRelPath));
+        globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.path, globRelPath));
       }
     });
 

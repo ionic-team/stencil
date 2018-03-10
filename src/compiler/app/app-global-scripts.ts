@@ -18,7 +18,11 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
 
     compilerCtx.appFiles.global = globalJsContent;
 
-    await Promise.all(config.outputTargets.map(outputTarget => {
+    const outputTargets = config.outputTargets.filter(outputTarget => {
+      return outputTarget.type === 'www' || outputTarget.type === 'dist';
+    });
+
+    await Promise.all(outputTargets.map(outputTarget => {
       const appGlobalWWWFilePath = getGlobalBuildPath(config, outputTarget);
 
       config.logger.debug(`build, app global www: ${appGlobalWWWFilePath}`);

@@ -5,14 +5,9 @@ import * as ts from 'typescript';
 
 
 export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
-  const cmpMeta: ComponentMeta = {};
-  const symbol = checker.getSymbolAtLocation(node.name);
-
   if (!node.decorators) {
     return undefined;
   }
-
-  cmpMeta.jsdoc = serializeSymbol(checker, symbol);
 
   const componentDecorator = node.decorators.find(isDecoratorNamed('Component'));
   if (!componentDecorator) {
@@ -25,20 +20,22 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
     throw new Error(`tag missing in component decorator: ${JSON.stringify(componentOptions, null, 2)}`);
   }
 
-  // normalizeTag
-  cmpMeta.tagNameMeta = componentOptions.tag;
+  const symbol = checker.getSymbolAtLocation(node.name);
 
-  // normalizeHost
-  cmpMeta.hostMeta = componentOptions.host || {};
+  const cmpMeta: ComponentMeta = {
+    tagNameMeta: componentOptions.tag,
+    stylesMeta: {},
+    assetsDirsMeta: [],
+    hostMeta: componentOptions.host || {},
+    dependencies: [],
+    jsdoc: serializeSymbol(checker, symbol)
+  };
 
   // normalizeEncapsulation
   cmpMeta.encapsulation =
       componentOptions.shadow ? ENCAPSULATION.ShadowDom :
       componentOptions.scoped ? ENCAPSULATION.ScopedCss :
       ENCAPSULATION.NoEncapsulation;
-
-  // noramlizeStyles
-  cmpMeta.stylesMeta = {};
 
   // styles: 'div { padding: 10px }'
   if (typeof componentOptions.styles === 'string') {
@@ -99,8 +96,6 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
       return stylesMeta;
     }, cmpMeta.stylesMeta);
   }
-
-  cmpMeta.assetsDirsMeta = [];
 
   // assetsDir: './somedir'
   if (componentOptions.assetsDir) {

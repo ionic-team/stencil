@@ -1,6 +1,6 @@
 import { getMemberDocumentation } from './docs-util';
-import { MemberMeta } from '../../util/interfaces';
-import { PROP_TYPE } from '../../util/constants';
+import { MemberMeta } from '../../../declarations';
+import { PROP_TYPE } from '../../../util/constants';
 
 
 export class MarkdownAttrs {

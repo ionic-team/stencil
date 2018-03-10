@@ -10,7 +10,11 @@ import { setBuildConditionals } from './build-conditionals';
 
 
 export function generateAppFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[], cmpRegistry: ComponentRegistry) {
-  return Promise.all(config.outputTargets.map(outputTarget => {
+  const outputTargets = config.outputTargets.filter(outputTarget => {
+    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+  });
+
+  return Promise.all(outputTargets.map(outputTarget => {
     return generateAppFilesOutputTarget(config, compilerCtx, buildCtx, outputTarget, entryModules, cmpRegistry);
   }));
 }

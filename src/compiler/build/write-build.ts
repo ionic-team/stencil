@@ -59,12 +59,12 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
 
   // let's empty out the build dest directory
   await Promise.all(config.outputTargets.map(async outputTarget => {
-    if (!outputTarget.emptyDir) {
+    if (!outputTarget.empty) {
       return;
     }
 
-    config.logger.debug(`empty dir: ${outputTarget.dir}`);
+    config.logger.debug(`empty dir: ${outputTarget.path}`);
 
-    await compilerCtx.fs.emptyDir(outputTarget.dir);
+    await compilerCtx.fs.emptyDir(outputTarget.path);
   }));
 }

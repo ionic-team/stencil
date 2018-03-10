@@ -26,7 +26,7 @@ export async function generateHostConfig(config: Config, compilerCtx: CompilerCt
 
   addDefaults(config, outputTarget, hostConfig);
 
-  const hostConfigFilePath = pathJoin(config, outputTarget.dir, HOST_CONFIG_FILENAME);
+  const hostConfigFilePath = pathJoin(config, outputTarget.path, HOST_CONFIG_FILENAME);
 
   await mergeUserHostConfigFile(config, compilerCtx, hostConfig);
 
@@ -117,7 +117,7 @@ export function getBundleIds(entryModules: EntryModule[], components: HydrateCom
 function getBundleUrl(config: Config, outputTarget: OutputTarget, bundleId: string) {
   const unscopedFileName = getBundleFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), unscopedFileName);
-  return pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, unscopedWwwBuildPath));
+  return pathJoin(config, '/', config.sys.path.relative(outputTarget.path, unscopedWwwBuildPath));
 }
 
 
@@ -215,7 +215,7 @@ function addDefaults(config: Config, outputTarget: OutputTarget, hostConfig: Hos
 function addBuildDirCacheControl(config: Config, outputTarget: OutputTarget, hostConfig: HostConfig) {
   const relPath = pathJoin(config,
     '/',
-    config.sys.path.relative(outputTarget.dir,
+    config.sys.path.relative(outputTarget.path,
     getAppBuildDir(config, outputTarget)),
     '**'
   );
@@ -237,7 +237,7 @@ function addServiceWorkerNoCacheControl(config: Config, outputTarget: OutputTarg
     return;
   }
 
-  const relPath = pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, outputTarget.serviceWorker.swDest));
+  const relPath = pathJoin(config, '/', config.sys.path.relative(outputTarget.path, outputTarget.serviceWorker.swDest));
 
   hostConfig.hosting.rules.push({
     include: relPath,

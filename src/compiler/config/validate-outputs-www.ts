@@ -14,20 +14,20 @@ export function validateWwwOutputTarget(config: Config) {
   const wwwOutputTargets = config.outputTargets.filter(o => o.type === 'www');
 
   wwwOutputTargets.forEach(outputTarget => {
-    if (!outputTarget.dir) {
-      outputTarget.dir = DEFAULT_WWW_DIR;
+    if (!outputTarget.path) {
+      outputTarget.path = DEFAULT_WWW_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.dir)) {
-      outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
+    if (!path.isAbsolute(outputTarget.path)) {
+      outputTarget.path = pathJoin(config, config.rootDir, outputTarget.path);
     }
 
-    if (!outputTarget.buildDir) {
-      outputTarget.buildDir = DEFAULT_WWW_BUILD_DIR;
+    if (!outputTarget.buildPath) {
+      outputTarget.buildPath = DEFAULT_WWW_BUILD_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.buildDir)) {
-      outputTarget.buildDir = pathJoin(config, outputTarget.dir, outputTarget.buildDir);
+    if (!path.isAbsolute(outputTarget.buildPath)) {
+      outputTarget.buildPath = pathJoin(config, outputTarget.path, outputTarget.buildPath);
     }
 
     if (!outputTarget.indexHtml) {
@@ -35,19 +35,19 @@ export function validateWwwOutputTarget(config: Config) {
     }
 
     if (!path.isAbsolute(outputTarget.indexHtml)) {
-      outputTarget.indexHtml = pathJoin(config, outputTarget.dir, outputTarget.indexHtml);
+      outputTarget.indexHtml = pathJoin(config, outputTarget.path, outputTarget.indexHtml);
     }
 
     if (outputTarget.collectionDir && !path.isAbsolute(outputTarget.collectionDir)) {
-      outputTarget.collectionDir = pathJoin(config, outputTarget.dir, outputTarget.collectionDir);
+      outputTarget.collectionDir = pathJoin(config, outputTarget.path, outputTarget.collectionDir);
     }
 
     if (outputTarget.typesDir && !path.isAbsolute(outputTarget.typesDir)) {
-      outputTarget.typesDir = pathJoin(config, outputTarget.dir, outputTarget.typesDir);
+      outputTarget.typesDir = pathJoin(config, outputTarget.path, outputTarget.typesDir);
     }
 
-    if (typeof outputTarget.emptyDir !== 'boolean') {
-      outputTarget.emptyDir = DEFAULT_WWW_EMPTY_DIR;
+    if (typeof outputTarget.empty !== 'boolean') {
+      outputTarget.empty = DEFAULT_WWW_EMPTY_DIR;
     }
   });
 }

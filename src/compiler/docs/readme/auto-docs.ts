@@ -1,10 +1,10 @@
 import { AUTO_GENERATE_COMMENT, NOTE } from './constants';
-import { ComponentMeta } from '../../util/interfaces';
+import { ComponentMeta } from '../../../declarations';
 import { MarkdownAttrs } from './markdown-attrs';
 import { MarkdownEvents } from './markdown-events';
 import { MarkdownMethods } from './markdown-methods';
 import { MarkdownProps } from './markdown-props';
-import { MEMBER_TYPE } from '../../util/constants';
+import { MEMBER_TYPE } from '../../../util/constants';
 
 
 export function addAutoGenerate(cmpMeta: ComponentMeta, content: string[]) {

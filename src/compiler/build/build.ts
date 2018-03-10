@@ -7,9 +7,9 @@ import { getBuildContext } from './build-utils';
 import { getCompilerCtx } from './compiler-ctx';
 import { generateAppFiles } from '../app/generate-app-files';
 import { generateBundles } from '../bundle/generate-bundles';
+import { generateDocs } from '../docs/docs';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateIndexHtmls } from '../html/generate-index-html';
-import { generateReadmes } from '../docs/generate-readmes';
 import { generateStyles } from '../style/style';
 import { initCollections } from '../collections/init-collections';
 import { initIndexHtmls } from '../html/init-index-html';
@@ -86,8 +86,8 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     await generateIndexHtmls(config, compilerCtx, buildCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
-    // generate each of the readmes
-    await generateReadmes(config, compilerCtx);
+    // generate component docs
+    await generateDocs(config, compilerCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // prerender that app
