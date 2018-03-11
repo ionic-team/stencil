@@ -1,18 +1,55 @@
-import { Collection, CompilerCtx, ComponentMeta, ComponentRegistry, Config, MemberMeta, MembersMeta, PackageJsonData } from '../../declarations';
+import { BuildCtx, Collection, CompilerCtx, ComponentMeta, ComponentRegistry, Config, MemberMeta, MembersMeta, PackageJsonData } from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
+import { gatherMetadata } from './datacollection/index';
+import { getComponentsDtsTypesFilePath } from '../collections/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
+import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizePath } from '../util';
+import { normalizeStyles } from '../style/normalize-styles';
+import * as ts from 'typescript';
 
 
-const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
+export async function generateComponentTypes(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, tsOptions: ts.CompilerOptions, tsHost: ts.CompilerHost, tsFilePaths: string[], componentsDtsSrcFilePath: string) {
+  // get all of the ts files paths to transpile
+  // ensure the components.d.ts file is always excluded from this transpile program
+  const checkProgramTsFiles = tsFilePaths.filter(filePath => filePath !== componentsDtsSrcFilePath);
 
-export interface ImportData {
-  [key: string]: MemberNameData[];
-}
+  // keep track of how many files we transpiled (great for debugging/testing)
+  buildCtx.transpileBuildCount = checkProgramTsFiles.length;
 
-export interface MemberNameData {
-  localName: string;
-  importName?: string;
+  // run the first program that only does the checking
+  const checkProgram = ts.createProgram(checkProgramTsFiles, tsOptions, tsHost);
+
+  // Gather component metadata and type info
+  const metadata = gatherMetadata(config, compilerCtx, buildCtx, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
+
+  Object.keys(metadata).forEach(key => {
+    const tsFilePath = normalizePath(key);
+    const fileMetadata = metadata[tsFilePath];
+    // normalize metadata
+    fileMetadata.stylesMeta = normalizeStyles(config, tsFilePath, fileMetadata.stylesMeta);
+    fileMetadata.assetsDirsMeta = normalizeAssetsDir(config, tsFilePath, fileMetadata.assetsDirsMeta);
+
+    // assign metadata to module files
+    if (!compilerCtx.moduleFiles[tsFilePath]) {
+      compilerCtx.moduleFiles[tsFilePath] = {};
+    }
+    compilerCtx.moduleFiles[tsFilePath].cmpMeta = fileMetadata;
+  });
+
+  // Generate d.ts files for component types
+  const componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
+
+  // queue the components.d.ts async file write and put it into memory
+  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
+
+  const typesOutputTargets = config.outputTargets.filter(o => !!o.typesDir);
+  await Promise.all(typesOutputTargets.map(async outputTarget => {
+    const typesFile = getComponentsDtsTypesFilePath(config, outputTarget);
+    await compilerCtx.fs.writeFile(typesFile, componentTypesFileContent);
+  }));
+
+  return checkProgram;
 }
 
 
@@ -304,4 +341,17 @@ async function getCollectionTypesImport(config: Config, compilerCtx: CompilerCtx
   }
 
   return typeImport;
+}
+
+
+
+const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
+
+export interface ImportData {
+  [key: string]: MemberNameData[];
+}
+
+export interface MemberNameData {
+  localName: string;
+  importName?: string;
 }

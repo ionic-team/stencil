@@ -548,6 +548,10 @@ export class InMemoryFileSystem {
     this.d = {};
   }
 
+  get keys() {
+    return Object.keys(this.d).sort();
+  }
+
   getMemoryStats() {
     return `data length: ${Object.keys(this.d).length}`;
   }

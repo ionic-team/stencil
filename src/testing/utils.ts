@@ -1,5 +1,6 @@
-import { BuildResults } from '../declarations';
+import { BuildResults, CompilerCtx } from '../declarations';
 import { normalizePath } from '../compiler/util';
+import { InMemoryFileSystem } from '../util/in-memory-fs';
 
 
 export function testClasslist(el: HTMLElement, classes: string[]) {
@@ -26,6 +27,26 @@ export function testAttributes(el: HTMLElement, attributes: { [attr: string]: st
       throw new Error(`expected attribute "${attr}" to be equal to "${attributes[attr]}, but it is "${el.getAttribute(attr)}"`);
     }
   }
+}
+
+export function expectFiles(compilerCtx: CompilerCtx, filePaths: string[]) {
+  filePaths.forEach(filePath => {
+    compilerCtx.fs.disk.statSync(filePath);
+  });
+}
+
+export function doNotExpectFiles(compilerCtx: CompilerCtx, filePaths: string[]) {
+  filePaths.forEach(filePath => {
+    try {
+      compilerCtx.fs.disk.statSync(filePath);
+    } catch (e) {
+      return;
+    }
+
+    if (compilerCtx.fs.accessSync(filePath)) {
+      throw new Error(`did not expect access: ${filePath}`);
+    }
+  });
 }
 
 export function wroteFile(r: BuildResults, p: string) {

@@ -17,6 +17,7 @@ describe('distribution', () => {
       outputTarget = {
         type: 'dist',
         path: '/dist',
+        buildPath: '/dist',
         collectionDir: '/dist/collection',
         typesDir: '/dist/types'
       };

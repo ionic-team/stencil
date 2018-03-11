@@ -24,7 +24,9 @@ export async function generateTypes(config: Config, compilerCtx: CompilerCtx, bu
     err.messageText = `package.json "types" file does not exist: ${dtsEntryFilePath}`;
   }
 
-  await Promise.all(config.outputTargets.map(outputTarget => {
+  const outputTargets = config.outputTargets.filter(o => o.typesDir);
+
+  await Promise.all(outputTargets.map(outputTarget => {
     return updateTypes(config, compilerCtx, outputTarget);
   }));
 }

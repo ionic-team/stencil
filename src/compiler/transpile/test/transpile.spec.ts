@@ -1,6 +1,6 @@
+import { normalizePath } from '../../../compiler/util';
 import { TestingCompiler } from '../../../testing';
 import { wroteFile } from '../../../testing/utils';
-import { normalizePath } from '../../../compiler/util';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as ts from 'typescript';
@@ -152,7 +152,6 @@ describe('transpile', () => {
     expect(r.buildId).toBe(1);
     expect(r.isRebuild).toBe(true);
     expect(r.entries[0].components[0].tag).toEqual('cmp-a');
-    expect(r.transpileBuildCount).toBe(1);
     expect(r.transpileBuildCount).toBe(1);
     expect(r.hasChangedJsText).toBe(false);
   });

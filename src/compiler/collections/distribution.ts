@@ -62,7 +62,7 @@ export function validatePackageJson(config: Config, outputTarget: OutputTarget, 
   validatePackageFiles(config, outputTarget, diagnostics, pkgData);
 
   const mainFileName = getLoaderFileName(config);
-  const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.path), mainFileName);
+  const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.buildPath), mainFileName);
 
   if (!pkgData.main || normalizePath(pkgData.main) !== main) {
     const err = buildError(diagnostics);
@@ -127,7 +127,7 @@ export function getComponentsDtsSrcFilePath(config: Config) {
 }
 
 
-export function getComponentsDtsDistTypesFilePath(config: Config, outputTarget: OutputTarget) {
+export function getComponentsDtsTypesFilePath(config: Config, outputTarget: OutputTarget) {
   return pathJoin(config, outputTarget.typesDir, COMPONENTS_DTS);
 }
 

@@ -2,11 +2,11 @@ import addComponentMetadata from './transformers/add-component-metadata';
 import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../declarations';
 import { componentDependencies } from './transformers/component-dependencies';
 import { gatherMetadata } from './datacollection/index';
-import { generateComponentTypesFile } from './create-component-types';
+import { generateComponentTypes } from './create-component-types';
 import { getComponentsDtsSrcFilePath } from '../collections/distribution';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
-import { hasError, normalizePath } from '../util';
+import { hasError } from '../util';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { moduleGraph } from './transformers/module-graph';
 import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
@@ -49,38 +49,8 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
   // fire up the typescript program
   const componentsDtsSrcFilePath = getComponentsDtsSrcFilePath(config);
 
-  // get all of the ts files paths to transpile
-  // ensure the components.d.ts file is always excluded from this transpile program
-  const checkProgramTsFiles = tsFilePaths.filter(filePath => filePath !== componentsDtsSrcFilePath);
-
-  // keep track of how many files we transpiled (great for debugging/testing)
-  buildCtx.transpileBuildCount = checkProgramTsFiles.length;
-
-  // run the first program that only does the checking
-  const checkProgram = ts.createProgram(checkProgramTsFiles, tsOptions, tsHost);
-
-  // Gather component metadata and type info
-  const metadata = gatherMetadata(config, compilerCtx, buildCtx, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
-
-  Object.keys(metadata).forEach(key => {
-    const tsFilePath = normalizePath(key);
-    const fileMetadata = metadata[tsFilePath];
-    // normalize metadata
-    fileMetadata.stylesMeta = normalizeStyles(config, tsFilePath, fileMetadata.stylesMeta);
-    fileMetadata.assetsDirsMeta = normalizeAssetsDir(config, tsFilePath, fileMetadata.assetsDirsMeta);
-
-    // assign metadata to module files
-    if (!compilerCtx.moduleFiles[tsFilePath]) {
-      compilerCtx.moduleFiles[tsFilePath] = {};
-    }
-    compilerCtx.moduleFiles[tsFilePath].cmpMeta = fileMetadata;
-  });
-
-  // Generate d.ts files for component types
-  const componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
-
-  // queue the components.d.ts async file write and put it into memory
-  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
+  // create the components.d.ts file from the component metadata
+  const checkProgram = await generateComponentTypes(config, compilerCtx, buildCtx, tsOptions, tsHost, tsFilePaths, componentsDtsSrcFilePath);
 
   // get all of the ts files paths to transpile
   // ensure the components.d.ts file is always included to this transpile program
