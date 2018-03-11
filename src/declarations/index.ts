@@ -1,6 +1,8 @@
 
 export * from './build';
 export * from './build-conditionals';
+export * from './build-events';
+export * from './cache';
 export * from './collection';
 export * from './compiler';
 export * from './component';

@@ -1,19 +1,19 @@
-import { BuildResults, CompilerEventName, Config } from '../declarations';
+import * as d from '../declarations';
 
 
-export class BuildEvents {
+export class BuildEvents implements d.BuildEvents {
   private evCallbacks: { [eventName: string]: Function[] } = {};
 
-  constructor(private config: Config) {}
+  constructor(private config: d.Config) {}
 
   subscribe(eventName: 'fileUpdate', cb: (path: string) => void): Function;
   subscribe(eventName: 'fileAdd', cb: (path: string) => void): Function;
   subscribe(eventName: 'fileDelete', cb: (path: string) => void): Function;
   subscribe(eventName: 'dirAdd', cb: (path: string) => void): Function;
   subscribe(eventName: 'dirDelete', cb: (path: string) => void): Function;
-  subscribe(eventName: 'build', cb: (buildResults: BuildResults) => void): Function;
-  subscribe(eventName: 'rebuild', cb: (buildResults: BuildResults) => void): Function;
-  subscribe(eventName: CompilerEventName, cb: Function): Function {
+  subscribe(eventName: 'build', cb: (buildResults: d.BuildResults) => void): Function;
+  subscribe(eventName: 'rebuild', cb: (buildResults: d.BuildResults) => void): Function;
+  subscribe(eventName: d.CompilerEventName, cb: Function): Function {
     const evName = getEventName(eventName);
 
     if (eventName === 'rebuild' && !this.config.watch) {
@@ -48,7 +48,7 @@ export class BuildEvents {
   }
 
 
-  emit(eventName: CompilerEventName, ...args: any[]) {
+  emit(eventName: d.CompilerEventName, ...args: any[]) {
     const evName = getEventName(eventName);
     const evCallbacks = this.evCallbacks[evName];
 

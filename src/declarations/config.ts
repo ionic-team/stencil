@@ -1,5 +1,6 @@
 import * as d from './index';
 
+
 export interface Config {
   assetVersioning?: ConfigAssetVersioning;
   buildAppCore?: boolean;

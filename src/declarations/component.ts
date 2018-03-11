@@ -1,5 +1,4 @@
 import * as d from './index';
-import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
 
 
 export interface ComponentWillLoad {
@@ -58,7 +57,7 @@ export interface ComponentMeta {
   eventsMeta?: EventMeta[];
   listenersMeta?: ListenMeta[];
   hostMeta?: HostMeta;
-  encapsulation?: ENCAPSULATION;
+  encapsulation?: number;
   assetsDirsMeta?: AssetsMeta[];
   componentConstructor?: ComponentConstructor;
   componentClass?: string;
@@ -78,8 +77,8 @@ export interface MembersMeta {
 
 
 export interface MemberMeta {
-  memberType?: MEMBER_TYPE;
-  propType?: PROP_TYPE;
+  memberType?: number;
+  propType?: number;
   attribName?: string;
   attribType?: AttributeTypeInfo;
   ctrlId?: string;
@@ -286,7 +285,7 @@ export interface LoadComponentRegistry {
   /**
    * encapsulated
    */
-  [4]: ENCAPSULATION;
+  [4]: number;
 
   /**
    * listeners

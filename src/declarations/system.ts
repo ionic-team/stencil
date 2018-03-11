@@ -1,5 +1,4 @@
 import * as d from './index';
-import { BuildEvents } from '../compiler/events';
 
 
 export interface StencilSystem {
@@ -14,7 +13,7 @@ export interface StencilSystem {
     serialize(): string;
     destroy(): void;
   };
-  createWatcher?(events: BuildEvents, paths: string, opts?: any): d.FsWatcher;
+  createWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
   generateContentHash?(content: string, length: number): string;
   fs?: d.FileSystem;
   getClientCoreFile?(opts: {staticName: string}): Promise<string>;

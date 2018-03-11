@@ -1,9 +1,9 @@
-import { Config, ConfigBundle, ConfigFlags, OutputTarget } from '../declarations';
+import * as d from '../declarations';
 import { TestingLogger } from './testing-logger';
 import { TestingSystem } from './testing-sys';
 
 
-export class TestingConfig implements Config {
+export class TestingConfig implements d.Config {
   logger = new TestingLogger();
   sys = new TestingSystem();
 
@@ -13,7 +13,7 @@ export class TestingConfig implements Config {
   devMode = true;
   enableCache = false;
   buildAppCore = false;
-  flags: ConfigFlags = {};
-  bundles: ConfigBundle[];
-  outputTargets: OutputTarget[];
+  flags: d.ConfigFlags = {};
+  bundles: d.ConfigBundle[];
+  outputTargets: d.OutputTarget[];
 }

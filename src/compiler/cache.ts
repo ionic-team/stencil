@@ -1,11 +1,11 @@
-import { Config, InMemoryFileSystem } from '../declarations';
+import * as d from '../declarations';
 
 
-export class Cache {
+export class Cache implements d.Cache {
   private failed = 0;
   private skip = false;
 
-  constructor(private config: Config, private cacheFs: InMemoryFileSystem, private tmpDir: string) {
+  constructor(private config: d.Config, private cacheFs: d.InMemoryFileSystem, private tmpDir: string) {
     if (config.enableCache) {
       config.logger.debug(`cache enabled, tmpdir: ${tmpDir}`);
 

@@ -1,5 +1,4 @@
 import * as d from './index';
-import { Cache } from '../compiler/cache';
 
 
 export interface Plugin {
@@ -20,6 +19,6 @@ export interface PluginCtx {
   config: d.Config;
   sys: d.StencilSystem;
   fs: d.InMemoryFileSystem;
-  cache: Cache;
+  cache: d.Cache;
   diagnostics: d.Diagnostic[];
 }

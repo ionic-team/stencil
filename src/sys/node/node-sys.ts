@@ -1,5 +1,4 @@
-import { BuildEvents } from '../../compiler/events';
-import { Config, Diagnostic, FileSystem, PackageJsonData, Path, StencilSystem } from '../../declarations';
+import * as d from '../../declarations';
 import { createContext, runInContext } from './node-context';
 import { createDom } from './node-dom';
 import { NodeFs } from './node-fs';
@@ -12,19 +11,19 @@ import * as path from 'path';
 import * as url from 'url';
 
 
-export class NodeSystem implements StencilSystem {
-  private packageJsonData: PackageJsonData;
+export class NodeSystem implements d.StencilSystem {
+  private packageJsonData: d.PackageJsonData;
   private distDir: string;
   private runtime: string;
   private sysUtil: any;
-  private typescriptPackageJson: PackageJsonData;
+  private typescriptPackageJson: d.PackageJsonData;
   private resolveModuleCache: { [cacheKey: string]: string } = {};
 
-  fs: FileSystem;
-  path: Path;
+  fs: d.FileSystem;
+  path: d.Path;
 
 
-  constructor(fs?: FileSystem) {
+  constructor(fs?: d.FileSystem) {
     this.fs = fs || new NodeFs();
     this.path = path;
 
@@ -41,7 +40,7 @@ export class NodeSystem implements StencilSystem {
     }
 
     try {
-      this.typescriptPackageJson = require(this.resolveModule(rootDir, 'typescript')) as PackageJsonData;
+      this.typescriptPackageJson = require(this.resolveModule(rootDir, 'typescript')) as d.PackageJsonData;
     } catch (e) {
       throw new Error(`unable to resolve "typescript" from: ${rootDir}`);
     }
@@ -60,7 +59,7 @@ export class NodeSystem implements StencilSystem {
     return createDom;
   }
 
-  createWatcher(events: BuildEvents, paths: string, opts: any) {
+  createWatcher(events: d.BuildEvents, paths: string, opts: any) {
     const chokidar = require('chokidar');
     const watcher = chokidar.watch(paths, opts);
 
@@ -118,7 +117,7 @@ export class NodeSystem implements StencilSystem {
   }
 
   loadConfigFile(configPath: string) {
-    let config: Config;
+    let config: d.Config;
 
     let hasConfigFile = false;
 
@@ -178,7 +177,7 @@ export class NodeSystem implements StencilSystem {
     const cleanCssModule = path.join(this.distDir, 'sys/node/clean-css.js');
     const CleanCSS = require(cleanCssModule).cleanCss;
     const result = new CleanCSS().minify(input);
-    const diagnostics: Diagnostic[] = [];
+    const diagnostics: d.Diagnostic[] = [];
 
     if (result.errors) {
       result.errors.forEach((msg: string) => {
@@ -212,7 +211,7 @@ export class NodeSystem implements StencilSystem {
   minifyJs(input: string, opts?: any) {
     const UglifyJS = require('uglify-es');
     const result = UglifyJS.minify(input, opts);
-    const diagnostics: Diagnostic[] = [];
+    const diagnostics: d.Diagnostic[] = [];
 
     if (result.error) {
       diagnostics.push({
