@@ -63,8 +63,11 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
     config.devMode = !!config.devMode;
   }
 
+  // default devInspector to whatever devMode is
+  setBooleanConfig(config, 'devInspector', null, config.devMode);
+
   // default watch false
-  config.watch = !!config.watch;
+  setBooleanConfig(config, 'watch', null, false);
 
   setBooleanConfig(config, 'minifyCss', null, !config.devMode);
   setBooleanConfig(config, 'minifyJs', null, !config.devMode);

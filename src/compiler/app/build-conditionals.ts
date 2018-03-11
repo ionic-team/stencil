@@ -11,6 +11,9 @@ export async function setBuildConditionals(config: Config, compilerCtx: Compiler
 
   coreBuild.svg = !!buildCtx.hasSvg;
 
+  coreBuild.devInspector = config.devInspector;
+  coreBuild.verboseError = config.devMode;
+
   const promises: Promise<void>[] = [];
 
   entryModules.forEach(bundle => {

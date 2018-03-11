@@ -10,6 +10,7 @@ import { createQueueClient } from './queue-client';
 import { dashToPascalCase } from '../util/helpers';
 import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
+import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initHostElement } from '../core/init-host-element';
 import { initStyleTemplate } from '../core/styles';
@@ -202,6 +203,10 @@ export function createPlatformClient(appNamespace: string, Context: CoreContext,
 
   if (Build.styles) {
     plt.attachStyles = attachStyles;
+  }
+
+  if (Build.devInspector) {
+    generateDevInspector(App, appNamespace, window, plt);
   }
 
   // register all the components now that everything's ready

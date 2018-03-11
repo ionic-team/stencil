@@ -8,6 +8,7 @@ export interface Config {
   bundles?: ConfigBundle[];
   configPath?: string;
   copy?: CopyTasks;
+  devInspector?: boolean;
   devMode?: boolean;
   enableCache?: boolean;
   excludeSrc?: string[];

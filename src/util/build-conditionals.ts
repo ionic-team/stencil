@@ -2,11 +2,12 @@ import { BuildConditionals } from '../declarations';
 
 
 export const Build: BuildConditionals = {
-  verboseError: true,
-
   cssVarShim: true,
   shadowDom: true,
   ssrServerSide: true,
+
+  devInspector: true,
+  verboseError: true,
 
   styles: true,
 

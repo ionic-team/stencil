@@ -314,6 +314,54 @@ describe('validation', () => {
     }).toThrow();
   });
 
+  it('should set devInspector false', () => {
+    config.devInspector = false;
+    validateConfig(config);
+    expect(config.devInspector).toBe(false);
+  });
+
+  it('should set devInspector true ', () => {
+    config.devInspector = true;
+    validateConfig(config);
+    expect(config.devInspector).toBe(true);
+  });
+
+  it('should default devInspector false when devMode is false', () => {
+    config.devMode = false;
+    validateConfig(config);
+    expect(config.devInspector).toBe(false);
+  });
+
+  it('should default devInspector true when devMode is true', () => {
+    config.devMode = true;
+    validateConfig(config);
+    expect(config.devInspector).toBe(true);
+  });
+
+  it('should set default generateDocs to false', () => {
+    validateConfig(config);
+    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
+  });
+
+  it('should set generateDistribution to be defined', () => {
+    (config as any).generateDistribution = true;
+    validateConfig(config);
+    expect(config.outputTargets[0].type).toBe('dist');
+  });
+
+  it('should default dist false and www true', () => {
+    validateConfig(config);
+    expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
+    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+  });
+
+  it('should require at least one output target', () => {
+    expect(() => {
+      config.outputTargets = [];
+      validateConfig(config);
+    }).toThrow();
+  });
+
   it('should default outputTargets with www', () => {
     validateConfig(config);
     expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);

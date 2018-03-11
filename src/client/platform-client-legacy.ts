@@ -10,6 +10,7 @@ import { createQueueClient } from './queue-client';
 import { CustomStyle } from './css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION, PROP_TYPE, SSR_VNODE_ID } from '../util/constants';
+import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCssVarShim } from './css-shim/init-css-shim';
 import { initHostElement } from '../core/init-host-element';
@@ -355,6 +356,10 @@ export function createPlatformClientLegacy(appNamespace: string, Context: CoreCo
     plt.attachStyles = (plt, domApi, cmpMeta, modeName, elm) => {
       attachStyles(plt, domApi, cmpMeta, modeName, elm, customStyle);
     };
+  }
+
+  if (Build.devInspector) {
+    generateDevInspector(App, appNamespace, window, plt);
   }
 
   // register all the components now that everything's ready
