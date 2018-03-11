@@ -1,3 +1,19 @@
+<a name="0.7.0-3"></a>
+# 🌾 [0.7.0-3](https://github.com/ionic-team/stencil/compare/v0.7.0-2...v0.7.0-3) (2018-03-11)
+
+
+### Bug Fixes
+
+* **config:** convert serviceWorker and prerender config to outputTargets ([148c41e](https://github.com/ionic-team/stencil/commit/148c41e))
+* **outputTargets:** fix collection targets ([797f1b4](https://github.com/ionic-team/stencil/commit/797f1b4))
+
+
+### Features
+
+* **inspector:** add devInspector for improved debugging ([034f0a9](https://github.com/ionic-team/stencil/commit/034f0a9))
+
+
+
 <a name="0.7.0-2"></a>
 # 😄 [0.7.0-2](https://github.com/ionic-team/stencil/compare/v0.7.0-1...v0.7.0-2) (2018-03-09)
 
