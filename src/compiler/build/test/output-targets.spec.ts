@@ -23,7 +23,7 @@ describe('outputTargets', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    expectFiles(c, [
+    expectFiles(c.fs, [
       '/User/testing/www',
       '/User/testing/www/build',
       '/User/testing/www/build/app',
@@ -38,7 +38,7 @@ describe('outputTargets', () => {
       '/User/testing/src/components.d.ts',
     ]);
 
-    doNotExpectFiles(c, [
+    doNotExpectFiles(c.fs, [
       '/User/testing/__tmp__in__memory__/components/cmp-a.js',
 
       '/User/testing/dist/',
@@ -84,7 +84,7 @@ describe('outputTargets', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    expectFiles(c, [
+    expectFiles(c.fs, [
       '/User/testing/dist/',
 
       '/User/testing/dist/collection',
@@ -107,7 +107,7 @@ describe('outputTargets', () => {
       '/User/testing/src/components.d.ts',
     ]);
 
-    doNotExpectFiles(c, [
+    doNotExpectFiles(c.fs, [
       '/User/testing/www/',
       '/User/testing/www/index.html',
     ]);
@@ -155,7 +155,7 @@ describe('outputTargets', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    expectFiles(c, [
+    expectFiles(c.fs, [
       '/User/testing/custom-dist',
       '/User/testing/custom-dist/dist-collection',
       '/User/testing/custom-dist/dist-collection/collection-manifest.json',
@@ -187,7 +187,7 @@ describe('outputTargets', () => {
       '/User/testing/src/components/readme.md'
     ]);
 
-    doNotExpectFiles(c, [
+    doNotExpectFiles(c.fs, [
       '/User/testing/www/',
       '/User/testing/www/index.html',
       '/User/testing/www/custom-index.htm',

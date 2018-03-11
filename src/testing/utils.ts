@@ -29,21 +29,21 @@ export function testAttributes(el: HTMLElement, attributes: { [attr: string]: st
   }
 }
 
-export function expectFiles(compilerCtx: CompilerCtx, filePaths: string[]) {
+export function expectFiles(fs: InMemoryFileSystem, filePaths: string[]) {
   filePaths.forEach(filePath => {
-    compilerCtx.fs.disk.statSync(filePath);
+    fs.disk.statSync(filePath);
   });
 }
 
-export function doNotExpectFiles(compilerCtx: CompilerCtx, filePaths: string[]) {
+export function doNotExpectFiles(fs: InMemoryFileSystem, filePaths: string[]) {
   filePaths.forEach(filePath => {
     try {
-      compilerCtx.fs.disk.statSync(filePath);
+      fs.disk.statSync(filePath);
     } catch (e) {
       return;
     }
 
-    if (compilerCtx.fs.accessSync(filePath)) {
+    if (fs.accessSync(filePath)) {
       throw new Error(`did not expect access: ${filePath}`);
     }
   });

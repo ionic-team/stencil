@@ -1,127 +1,198 @@
-import { BuildCtx, CompilerCtx, ComponentRegistry, Config, EntryModule } from '../../declarations';
-import { generateAppFiles } from '../../compiler/app/generate-app-files';
-import { getBuildContext } from '../../compiler/build/build-utils';
-import { mockCompilerCtx, mockConfig } from '../../testing/mocks';
-import { validateConfig } from '../../compiler/config/validate-config';
+import { doNotExpectFiles, expectFiles } from '../../testing/utils';
+import { TestingCompiler, TestingConfig } from '../../../testing';
 
 
 describe('client publicPath', () => {
 
-  let config: Config;
-  let compilerCtx: CompilerCtx;
-  let componentRegistry: ComponentRegistry;
-  let buildCtx: BuildCtx;
-  let entryModules: EntryModule[];
+  let c: TestingCompiler;
+  let config: TestingConfig;
 
-  beforeEach(() => {
-    config = mockConfig();
+  it('default www files', async () => {
+    config = new TestingConfig();
     config.buildAppCore = true;
-    config._isValidated = false;
-    compilerCtx = mockCompilerCtx();
-    componentRegistry = {};
-    entryModules = [];
+    config.rootDir = '/User/testing/';
+
+    c = new TestingCompiler(config);
+
+    await c.fs.writeFiles({
+      '/User/testing/src/index.html': `<cmp-a></cmp-a>`,
+      '/User/testing/src/components/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+    });
+    await c.fs.commit();
+
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+
+    expectFiles(c.fs, [
+      '/User/testing/www',
+      '/User/testing/www/build',
+      '/User/testing/www/build/app',
+      '/User/testing/www/build/app.js',
+      '/User/testing/www/build/app/cmp-a.js',
+      '/User/testing/www/build/app/es5-build-disabled.js',
+      '/User/testing/www/build/app/app.core.js',
+      '/User/testing/www/build/app/app.registry.json',
+
+      '/User/testing/www/index.html',
+
+      '/User/testing/src/components.d.ts',
+    ]);
+
+    doNotExpectFiles(c.fs, [
+      '/User/testing/__tmp__in__memory__/components/cmp-a.js',
+
+      '/User/testing/dist/',
+      '/User/testing/dist/collection',
+      '/User/testing/dist/collection/collection-manifest.json',
+      '/User/testing/dist/collection/components',
+      '/User/testing/dist/collection/components/cmp-a.js',
+
+      '/User/testing/dist/testapp/',
+      '/User/testing/dist/testapp.js',
+      '/User/testing/dist/testapp/cmp-a.js',
+      '/User/testing/dist/testapp/es5-build-disabled.js',
+      '/User/testing/dist/testapp/testapp.core.js',
+
+      '/User/testing/dist/types',
+      '/User/testing/dist/types/components',
+      '/User/testing/dist/types/components.d.ts',
+      '/User/testing/dist/types/components/cmp-a.d.ts',
+      '/User/testing/dist/types/stencil.core.d.ts',
+    ]);
   });
 
+  it('default dist files', async () => {
+    config = new TestingConfig();
+    config.buildAppCore = true;
+    config.rootDir = '/User/testing/';
+    config.namespace = 'TestApp';
+    config.outputTargets = [{ type: 'dist' }];
 
-  describe('same domain', () => {
+    c = new TestingCompiler(config);
 
-    it('change www.build', async () => {
-      config.outputTargets = [
-        {
-          type: 'www',
-          buildPath: 'my-build'
-        }
-      ];
-      config = validateConfig(config);
-
-      buildCtx = getBuildContext(config, compilerCtx, null);
-
-      await generateAppFiles(config, compilerCtx, buildCtx, entryModules, componentRegistry);
-
-      const appLoaderJs = await compilerCtx.fs.readFile('/www/my-build/app.js');
-      expect(appLoaderJs).toBeDefined();
-
-      const appCoreJs = await compilerCtx.fs.readFile('/www/my-build/app/app.core.js');
-      expect(appCoreJs).toBeDefined();
+    await c.fs.writeFiles({
+      '/User/testing/package.json': `{
+        "main": "dist/testapp.js",
+        "collection": "dist/collection/collection-manifest.json",
+        "types": "dist/types/components.d.ts"
+      }`,
+      '/User/testing/src/index.html': `<cmp-a></cmp-a>`,
+      '/User/testing/src/components/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
+    await c.fs.commit();
 
-    it('change www.dir and www.buildDir', async () => {
-      config.namespace = 'MyNamespace';
-      delete config.fsNamespace;
-      config.outputTargets = [
-        {
-          type: 'www',
-          path: 'my-www',
-          buildPath: 'my-www-build'
-        },
-        {
-          type: 'dist',
-          path: 'my-dist',
-          buildPath: 'my-dist-build'
-        }
-      ];
-      config = validateConfig(config);
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
 
-      buildCtx = getBuildContext(config, compilerCtx, null);
+    expectFiles(c.fs, [
+      '/User/testing/dist/',
 
-      await generateAppFiles(config, compilerCtx, buildCtx, entryModules, componentRegistry);
+      '/User/testing/dist/collection',
+      '/User/testing/dist/collection/collection-manifest.json',
+      '/User/testing/dist/collection/components',
+      '/User/testing/dist/collection/components/cmp-a.js',
 
-      const appWwwLoaderJs = await compilerCtx.fs.readFile('/my-www/my-www-build/mynamespace.js');
-      expect(appWwwLoaderJs).toBeDefined();
+      '/User/testing/dist/testapp/',
+      '/User/testing/dist/testapp.js',
+      '/User/testing/dist/testapp/cmp-a.js',
+      '/User/testing/dist/testapp/es5-build-disabled.js',
+      '/User/testing/dist/testapp/testapp.core.js',
 
-      const appWwwCoreJs = await compilerCtx.fs.readFile('/my-www/my-www-build/mynamespace/mynamespace.core.js');
-      expect(appWwwCoreJs).toBeDefined();
+      '/User/testing/dist/types',
+      '/User/testing/dist/types/components',
+      '/User/testing/dist/types/components.d.ts',
+      '/User/testing/dist/types/components/cmp-a.d.ts',
+      '/User/testing/dist/types/stencil.core.d.ts',
 
-      const appDistLoaderJs = await compilerCtx.fs.readFile('/my-dist/my-dist-build/mynamespace.js');
-      expect(appDistLoaderJs).toBeDefined();
+      '/User/testing/src/components.d.ts',
+    ]);
 
-      const appDistCoreJs = await compilerCtx.fs.readFile('/my-dist/my-dist-build/mynamespace/mynamespace.core.js');
-      expect(appDistCoreJs).toBeDefined();
+    doNotExpectFiles(c.fs, [
+      '/User/testing/www/',
+      '/User/testing/www/index.html',
+    ]);
+  });
+
+  it('dist, www and readme files w/ custom paths', async () => {
+    config = new TestingConfig();
+    config.flags.docs = true;
+    config.buildAppCore = true;
+    config.rootDir = '/User/testing/';
+    config.namespace = 'TestApp';
+    config.outputTargets = [
+      {
+        type: 'www',
+        path: 'custom-www',
+        buildPath: 'www-build',
+        indexHtml: 'custom-index.htm'
+      },
+      {
+        type: 'dist',
+        path: 'custom-dist',
+        buildPath: 'dist-build',
+        collectionDir: 'dist-collection',
+        typesDir: 'custom-types'
+      },
+      {
+        type: 'docs',
+        format: 'readme'
+      }
+    ];
+
+    c = new TestingCompiler(config);
+
+    await c.fs.writeFiles({
+      '/User/testing/package.json': `{
+        "main": "custom-dist/dist-build/testapp.js",
+        "collection": "custom-dist/dist-collection/collection-manifest.json",
+        "types": "custom-dist/custom-types/components.d.ts"
+      }`,
+      '/User/testing/src/index.html': `<cmp-a></cmp-a>`,
+      '/User/testing/src/components/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
+    await c.fs.commit();
 
-    it('writes distribution loader, app core and app core es5, default config w/ es5 build', async () => {
-      config.outputTargets = [{
-        type: 'dist'
-      }];
-      config.buildEs5 = true;
-      config = validateConfig(config);
-      buildCtx = getBuildContext(config, compilerCtx, null);
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
 
-      await generateAppFiles(config, compilerCtx, buildCtx, entryModules, componentRegistry);
+    expectFiles(c.fs, [
+      '/User/testing/custom-dist',
+      '/User/testing/custom-dist/dist-collection',
+      '/User/testing/custom-dist/dist-collection/collection-manifest.json',
+      '/User/testing/custom-dist/dist-collection/components',
+      '/User/testing/custom-dist/dist-collection/components/cmp-a.js',
 
-      const apDistLoaderJs = await compilerCtx.fs.readFile('/dist/app.js');
-      expect(apDistLoaderJs).toBeDefined();
+      '/User/testing/custom-dist/dist-build/testapp',
+      '/User/testing/custom-dist/dist-build/testapp.js',
+      '/User/testing/custom-dist/dist-build/testapp/cmp-a.js',
+      '/User/testing/custom-dist/dist-build/testapp/es5-build-disabled.js',
+      '/User/testing/custom-dist/dist-build/testapp/testapp.core.js',
 
-      const appDistCoreJs = await compilerCtx.fs.readFile('/dist/app/app.core.js');
-      expect(appDistCoreJs).toBeDefined();
+      '/User/testing/custom-dist/custom-types',
+      '/User/testing/custom-dist/custom-types/components',
+      '/User/testing/custom-dist/custom-types/components.d.ts',
+      '/User/testing/custom-dist/custom-types/components/cmp-a.d.ts',
+      '/User/testing/custom-dist/custom-types/stencil.core.d.ts',
 
-      const appDistCorePolyfillJs = await compilerCtx.fs.readFile('/dist/app/app.core.pf.js');
-      expect(appDistCorePolyfillJs).toBeDefined();
+      '/User/testing/custom-www',
+      '/User/testing/custom-www/www-build',
+      '/User/testing/custom-www/www-build/testapp',
+      '/User/testing/custom-www/www-build/testapp.js',
+      '/User/testing/custom-www/www-build/testapp/cmp-a.js',
+      '/User/testing/custom-www/www-build/testapp/es5-build-disabled.js',
+      '/User/testing/custom-www/www-build/testapp/testapp.core.js',
+      '/User/testing/custom-www/www-build/testapp/testapp.registry.json',
+      '/User/testing/custom-www/custom-index.htm',
 
-      const wwwLoaderExists = await compilerCtx.fs.access('/www/build/app.js');
-      expect(wwwLoaderExists).toBe(false);
-    });
+      '/User/testing/src/components/readme.md'
+    ]);
 
-    it('writes www loader, app core and app core es5, default config w/ es5 build', async () => {
-      config.buildEs5 = true;
-      config = validateConfig(config);
-      buildCtx = getBuildContext(config, compilerCtx, null);
-
-      await generateAppFiles(config, compilerCtx, buildCtx, entryModules, componentRegistry);
-
-      const appWwwLoaderJs = await compilerCtx.fs.readFile('/www/build/app.js');
-      expect(appWwwLoaderJs).toBeDefined();
-
-      const appWwwCoreJs = await compilerCtx.fs.readFile('/www/build/app/app.core.js');
-      expect(appWwwCoreJs).toBeDefined();
-
-      const appWwwCorePolyfillJs = await compilerCtx.fs.readFile('/www/build/app/app.core.pf.js');
-      expect(appWwwCorePolyfillJs).toBeDefined();
-
-      const distLoaderExists = await compilerCtx.fs.access('/dist/app.js');
-      expect(distLoaderExists).toBe(false);
-    });
-
+    doNotExpectFiles(c.fs, [
+      '/User/testing/www/',
+      '/User/testing/www/index.html',
+      '/User/testing/www/custom-index.htm',
+      '/User/testing/custom-www/index.html',
+    ]);
   });
 
 });

@@ -1,9 +1,8 @@
-import { getConfigFilePath } from '../cli-utils';
-import { parseFlags } from '../parse-flags';
 import { Config, ConfigFlags } from '../../declarations';
+import { getConfigFilePath } from '../cli-utils';
 import { mockStencilSystem } from '../../testing/mocks';
+import { parseFlags } from '../parse-flags';
 import { run } from '../index';
-import { validateBuildConfig } from '../../compiler/config/validate-config';
 
 
 describe('cli', () => {
