@@ -1,6 +1,5 @@
-import { BuildCtx, CompilerCtx, Config } from '../../declarations';
+import { BuildCtx, CompilerCtx, Config, InMemoryFileSystem } from '../../declarations';
 import { catchError } from '../util';
-import { InMemoryFileSystem } from '../../util/in-memory-fs';
 import { transpileModules } from '../transpile/transpile';
 
 

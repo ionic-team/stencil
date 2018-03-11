@@ -1,12 +1,11 @@
-import { FileSystem, FsItem, FsItems, FsReadOptions, FsReaddirItem,
-  FsReaddirOptions, FsWriteOptions, FsWriteResults, Path } from '../declarations';
 import { normalizePath } from '../compiler/util';
+import * as d from '../declarations';
 
 
-export class InMemoryFileSystem {
-  private d: FsItems = {};
+export class InMemoryFileSystem implements d.InMemoryFileSystem {
+  private d: d.FsItems = {};
 
-  constructor(public disk: FileSystem, private path: Path) {}
+  constructor(public disk: d.FileSystem, private path: d.Path) {}
 
   async access(filePath: string) {
     const item = this.getItem(filePath);
@@ -134,10 +133,10 @@ export class InMemoryFileSystem {
     item.queueDeleteFromDisk = false;
   }
 
-  async readdir(dirPath: string, opts: FsReaddirOptions = {}) {
+  async readdir(dirPath: string, opts: d.FsReaddirOptions = {}) {
     dirPath = normalizePath(dirPath);
 
-    const collectedPaths: FsReaddirItem[] = [];
+    const collectedPaths: d.FsReaddirItem[] = [];
 
     if (opts.inMemoryOnly) {
       let inMemoryDir = dirPath;
@@ -161,7 +160,7 @@ export class InMemoryFileSystem {
 
           if (d.exists) {
             // console.log(filePath, d)
-            const item: FsReaddirItem = {
+            const item: d.FsReaddirItem = {
               absPath: filePath,
               relPath: parts[inMemoryDirs.length],
               isDirectory: d.isDirectory,
@@ -184,7 +183,7 @@ export class InMemoryFileSystem {
     });
   }
 
-  private async readDirectory(initPath: string, dirPath: string, opts: FsReaddirOptions, collectedPaths: FsReaddirItem[]) {
+  private async readDirectory(initPath: string, dirPath: string, opts: d.FsReaddirOptions, collectedPaths: d.FsReaddirItem[]) {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
     // always a disk read!!
@@ -226,7 +225,7 @@ export class InMemoryFileSystem {
     }));
   }
 
-  async readFile(filePath: string, opts?: FsReadOptions) {
+  async readFile(filePath: string, opts?: d.FsReadOptions) {
     if (!opts || (opts.useCache === true || opts.useCache === undefined)) {
       const item = this.getItem(filePath);
       if (item.exists && typeof item.fileText === 'string') {
@@ -345,8 +344,8 @@ export class InMemoryFileSystem {
     };
   }
 
-  async writeFile(filePath: string, content: string, opts?: FsWriteOptions) {
-    const results: FsWriteResults = {};
+  async writeFile(filePath: string, content: string, opts?: d.FsWriteOptions) {
+    const results: d.FsWriteResults = {};
 
     if (typeof filePath !== 'string') {
       throw new Error(`writeFile, invalid filePath: ${filePath}`);
@@ -401,7 +400,7 @@ export class InMemoryFileSystem {
     return results;
   }
 
-  writeFiles(files: { [filePath: string]: string }, opts?: FsWriteOptions) {
+  writeFiles(files: { [filePath: string]: string }, opts?: d.FsWriteOptions) {
     return Promise.all(Object.keys(files).map(filePath => {
       return this.writeFile(filePath, files[filePath], opts);
     }));
@@ -535,7 +534,7 @@ export class InMemoryFileSystem {
     }
   }
 
-  getItem(itemPath: string): FsItem {
+  getItem(itemPath: string): d.FsItem {
     itemPath = normalizePath(itemPath);
     const item = this.d[itemPath];
     if (item) {
@@ -559,7 +558,7 @@ export class InMemoryFileSystem {
 }
 
 
-export function getCommitInstructions(path: Path, d: FsItems) {
+export function getCommitInstructions(path: d.Path, d: d.FsItems) {
   const instructions = {
     filesToDelete: [] as string[],
     filesToWrite: [] as string[],

@@ -1,9 +1,8 @@
-import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic } from '../declarations';
+import { BuildResults, CompilerCtx, CompilerEventName, Config, Diagnostic, InMemoryFileSystem } from '../declarations';
 import { build } from './build/build';
 import { catchError } from './util';
 import { docs } from './docs/docs';
 import { getCompilerCtx } from './build/compiler-ctx';
-import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { validateConfig } from '../compiler/config/validate-config';
 
 

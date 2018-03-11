@@ -1,6 +1,5 @@
-import { BuildResults, CompilerCtx } from '../declarations';
+import { BuildResults, CompilerCtx, InMemoryFileSystem } from '../declarations';
 import { normalizePath } from '../compiler/util';
-import { InMemoryFileSystem } from '../util/in-memory-fs';
 
 
 export function testClasslist(el: HTMLElement, classes: string[]) {

@@ -1,5 +1,4 @@
-import { Config } from '../declarations';
-import { InMemoryFileSystem } from '../util/in-memory-fs';
+import { Config, InMemoryFileSystem } from '../declarations';
 
 
 export class Cache {

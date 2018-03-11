@@ -1,9 +1,8 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget } from '../declarations';
+import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, InMemoryFileSystem, OutputTarget } from '../declarations';
 import { catchError } from '../compiler/util';
 import { getCompilerCtx } from '../compiler/build/compiler-ctx';
 import { getGlobalBuildPath } from '../compiler/app/app-file-naming';
 import { hydrateHtml } from './hydrate-html';
-import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { loadComponentRegistry } from './load-registry';
 import { validateConfig } from '../compiler/config/validate-config';
 

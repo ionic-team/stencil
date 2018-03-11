@@ -1,4 +1,4 @@
-import { FileSystem, FsItems } from '../../declarations';
+import * as d from '../../declarations';
 import { InMemoryFileSystem, getCommitInstructions, isTextFile, shouldIgnore } from '../in-memory-fs';
 import { mockFs } from '../../testing/mocks';
 import { normalizePath } from '../../compiler/util';
@@ -8,7 +8,7 @@ import * as path from 'path';
 
 describe(`in-memory-fs, getCommitInstructions`, () => {
 
-  let d: FsItems;
+  let d: d.FsItems;
 
   beforeEach(() => {
     d = {};
@@ -159,7 +159,7 @@ describe(`in-memory-fs, getCommitInstructions`, () => {
 describe(`in-memory-fs`, () => {
 
   let mockedFs: TestingFs;
-  let fs: InMemoryFileSystem;
+  let fs: d.InMemoryFileSystem;
 
   beforeEach(() => {
     mockedFs = mockFs();

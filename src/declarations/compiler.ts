@@ -1,13 +1,12 @@
 import * as d from './index';
 import { BuildEvents } from '../compiler/events';
 import { Cache } from '../compiler/cache';
-import { InMemoryFileSystem } from '../util/in-memory-fs';
 
 
 export interface CompilerCtx {
   activeBuildId?: number;
   isRebuild?: boolean;
-  fs?: InMemoryFileSystem;
+  fs?: d.InMemoryFileSystem;
   cache?: Cache;
   events?: BuildEvents;
   moduleFiles?: d.ModuleFiles;
