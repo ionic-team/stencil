@@ -1,5 +1,5 @@
-import { doNotExpectFiles, expectFiles } from '../../testing/utils';
 import { TestingCompiler, TestingConfig } from '../../../testing';
+import { mockElement, mockHtml } from '../../testing/mocks';
 
 
 describe('client publicPath', () => {
@@ -7,192 +7,104 @@ describe('client publicPath', () => {
   let c: TestingCompiler;
   let config: TestingConfig;
 
-  it('default www files', async () => {
+  beforeEach(() => {
+    (global as any).HTMLElement = class {};
+  });
+
+  afterEach(() => {
+    delete (global as any).HTMLElement;
+  });
+
+
+  it('default www build w/ external loader script', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
     config.rootDir = '/User/testing/';
 
     c = new TestingCompiler(config);
+    const wwwOutput = config.outputTargets.find(o => o.type === 'www');
 
     await c.fs.writeFiles({
-      '/User/testing/src/index.html': `<cmp-a></cmp-a>`,
       '/User/testing/src/components/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      '/User/testing/src/index.html': `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <script src="/build/app.js"></script>
+        </head>
+        <body>
+          <cmp-a></cmp-a>
+        </body>
+        </html>
+      `,
     });
     await c.fs.commit();
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    expectFiles(c.fs, [
-      '/User/testing/www',
-      '/User/testing/www/build',
-      '/User/testing/www/build/app',
-      '/User/testing/www/build/app.js',
-      '/User/testing/www/build/app/cmp-a.js',
-      '/User/testing/www/build/app/es5-build-disabled.js',
-      '/User/testing/www/build/app/app.core.js',
-      '/User/testing/www/build/app/app.registry.json',
+    const indexHtml = await c.fs.readFile(wwwOutput.indexHtml);
 
-      '/User/testing/www/index.html',
+    const { win, doc } = mockDom(indexHtml, { url: 'http://emmitts-garage.com/?core=es2015' });
 
-      '/User/testing/src/components.d.ts',
-    ]);
+    const loaderScriptElm = doc.head.querySelector('script[src="/build/app.js"]');
+    expect(loaderScriptElm).not.toBe(null);
 
-    doNotExpectFiles(c.fs, [
-      '/User/testing/__tmp__in__memory__/components/cmp-a.js',
+    const loaderContent = await c.fs.readFile('/User/testing/www/build/app.js');
+    execScript(win, doc, loaderContent);
 
-      '/User/testing/dist/',
-      '/User/testing/dist/collection',
-      '/User/testing/dist/collection/collection-manifest.json',
-      '/User/testing/dist/collection/components',
-      '/User/testing/dist/collection/components/cmp-a.js',
+    const coreScriptElm = doc.head.querySelector('script[data-path][data-namespace]');
+    expect(coreScriptElm).not.toBe(null);
 
-      '/User/testing/dist/testapp/',
-      '/User/testing/dist/testapp.js',
-      '/User/testing/dist/testapp/cmp-a.js',
-      '/User/testing/dist/testapp/es5-build-disabled.js',
-      '/User/testing/dist/testapp/testapp.core.js',
+    const coreScriptSrc = coreScriptElm.getAttribute('src');
+    const buildPath = coreScriptElm.getAttribute('data-path');
+    const fsNamespace = coreScriptElm.getAttribute('data-namespace');
 
-      '/User/testing/dist/types',
-      '/User/testing/dist/types/components',
-      '/User/testing/dist/types/components.d.ts',
-      '/User/testing/dist/types/components/cmp-a.d.ts',
-      '/User/testing/dist/types/stencil.core.d.ts',
-    ]);
+    expect(coreScriptSrc).toBe('/build/app/app.core.js');
+    expect(buildPath).toBe('/build/app/');
+    expect(fsNamespace).toBe('app');
+
+    const coreContent = await c.fs.readFile('/User/testing/www/build/app/app.core.js');
+    execScript(win, doc, coreContent);
   });
 
-  it('default dist files', async () => {
-    config = new TestingConfig();
-    config.buildAppCore = true;
-    config.rootDir = '/User/testing/';
-    config.namespace = 'TestApp';
-    config.outputTargets = [{ type: 'dist' }];
 
-    c = new TestingCompiler(config);
+  function mockDom(html: string, opts: any): { win: Window, doc: HTMLDocument } {
+    const jsdom = require('jsdom');
+    const dom = new jsdom.JSDOM(html, opts);
 
-    await c.fs.writeFiles({
-      '/User/testing/package.json': `{
-        "main": "dist/testapp.js",
-        "collection": "dist/collection/collection-manifest.json",
-        "types": "dist/types/components.d.ts"
-      }`,
-      '/User/testing/src/index.html': `<cmp-a></cmp-a>`,
-      '/User/testing/src/components/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
-    });
-    await c.fs.commit();
+    const win = dom.window;
+    const doc = win.document;
 
-    const r = await c.build();
-    expect(r.diagnostics).toEqual([]);
+    win.fetch = {};
 
-    expectFiles(c.fs, [
-      '/User/testing/dist/',
+    win.CSS = {
+      supports: () => true
+    };
 
-      '/User/testing/dist/collection',
-      '/User/testing/dist/collection/collection-manifest.json',
-      '/User/testing/dist/collection/components',
-      '/User/testing/dist/collection/components/cmp-a.js',
+    win.requestAnimationFrame = (cb: Function) => {
+      setTimeout(cb);
+    };
 
-      '/User/testing/dist/testapp/',
-      '/User/testing/dist/testapp.js',
-      '/User/testing/dist/testapp/cmp-a.js',
-      '/User/testing/dist/testapp/es5-build-disabled.js',
-      '/User/testing/dist/testapp/testapp.core.js',
+    win.performance = {
+      now: () => Date.now()
+    };
 
-      '/User/testing/dist/types',
-      '/User/testing/dist/types/components',
-      '/User/testing/dist/types/components.d.ts',
-      '/User/testing/dist/types/components/cmp-a.d.ts',
-      '/User/testing/dist/types/stencil.core.d.ts',
+    win.CustomEvent = class {};
 
-      '/User/testing/src/components.d.ts',
-    ]);
+    win.customElements = {
+      define: (tag: string) => true
+    };
 
-    doNotExpectFiles(c.fs, [
-      '/User/testing/www/',
-      '/User/testing/www/index.html',
-    ]);
-  });
+    win.dispatchEvent = () => true;
 
-  it('dist, www and readme files w/ custom paths', async () => {
-    config = new TestingConfig();
-    config.flags.docs = true;
-    config.buildAppCore = true;
-    config.rootDir = '/User/testing/';
-    config.namespace = 'TestApp';
-    config.outputTargets = [
-      {
-        type: 'www',
-        path: 'custom-www',
-        buildPath: 'www-build',
-        indexHtml: 'custom-index.htm'
-      },
-      {
-        type: 'dist',
-        path: 'custom-dist',
-        buildPath: 'dist-build',
-        collectionDir: 'dist-collection',
-        typesDir: 'custom-types'
-      },
-      {
-        type: 'docs',
-        format: 'readme'
-      }
-    ];
+    return { win, doc };
+  }
 
-    c = new TestingCompiler(config);
-
-    await c.fs.writeFiles({
-      '/User/testing/package.json': `{
-        "main": "custom-dist/dist-build/testapp.js",
-        "collection": "custom-dist/dist-collection/collection-manifest.json",
-        "types": "custom-dist/custom-types/components.d.ts"
-      }`,
-      '/User/testing/src/index.html': `<cmp-a></cmp-a>`,
-      '/User/testing/src/components/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
-    });
-    await c.fs.commit();
-
-    const r = await c.build();
-    expect(r.diagnostics).toEqual([]);
-
-    expectFiles(c.fs, [
-      '/User/testing/custom-dist',
-      '/User/testing/custom-dist/dist-collection',
-      '/User/testing/custom-dist/dist-collection/collection-manifest.json',
-      '/User/testing/custom-dist/dist-collection/components',
-      '/User/testing/custom-dist/dist-collection/components/cmp-a.js',
-
-      '/User/testing/custom-dist/dist-build/testapp',
-      '/User/testing/custom-dist/dist-build/testapp.js',
-      '/User/testing/custom-dist/dist-build/testapp/cmp-a.js',
-      '/User/testing/custom-dist/dist-build/testapp/es5-build-disabled.js',
-      '/User/testing/custom-dist/dist-build/testapp/testapp.core.js',
-
-      '/User/testing/custom-dist/custom-types',
-      '/User/testing/custom-dist/custom-types/components',
-      '/User/testing/custom-dist/custom-types/components.d.ts',
-      '/User/testing/custom-dist/custom-types/components/cmp-a.d.ts',
-      '/User/testing/custom-dist/custom-types/stencil.core.d.ts',
-
-      '/User/testing/custom-www',
-      '/User/testing/custom-www/www-build',
-      '/User/testing/custom-www/www-build/testapp',
-      '/User/testing/custom-www/www-build/testapp.js',
-      '/User/testing/custom-www/www-build/testapp/cmp-a.js',
-      '/User/testing/custom-www/www-build/testapp/es5-build-disabled.js',
-      '/User/testing/custom-www/www-build/testapp/testapp.core.js',
-      '/User/testing/custom-www/www-build/testapp/testapp.registry.json',
-      '/User/testing/custom-www/custom-index.htm',
-
-      '/User/testing/src/components/readme.md'
-    ]);
-
-    doNotExpectFiles(c.fs, [
-      '/User/testing/www/',
-      '/User/testing/www/index.html',
-      '/User/testing/www/custom-index.htm',
-      '/User/testing/custom-www/index.html',
-    ]);
-  });
+  function execScript(win: any, doc: any, jsContent: string) {
+    jsContent = jsContent.replace(/import\(/g, 'mockImport(');
+    const winFn = new Function('window', 'document', jsContent);
+    winFn(win, doc, jsContent);
+  }
 
 });

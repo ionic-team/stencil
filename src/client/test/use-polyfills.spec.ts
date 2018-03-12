@@ -33,8 +33,13 @@ describe('usePolyfills', () => {
   });
 
   it('polyfill cuz force es5', () => {
-    win.location.search = 'core=es5';
+    win.location.search = '?core=es5';
     expect(usePolyfills(win, win.location, scriptElm, dynamicImportTest)).toBeTruthy();
+  });
+
+  it('polyfill cuz force es2015', () => {
+    win.location.search = '?core=es2015';
+    expect(usePolyfills(win, win.location, scriptElm, dynamicImportTest)).toBeFalsy();
   });
 
   it('polyfill cuz file: protocol', () => {
