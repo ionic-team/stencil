@@ -11,8 +11,8 @@ export interface RenderOptions {
   ssrIds?: boolean;
   userAgent?: string;
   cookie?: string;
-  dir?: string;
-  lang?: string;
+  direction?: string;
+  language?: string;
 }
 
 
@@ -81,8 +81,8 @@ export interface HydrateOptions extends RenderOptions {
   referrer?: string;
   userAgent?: string;
   cookie?: string;
-  dir?: string;
-  lang?: string;
+  direction?: string;
+  language?: string;
   isPrerender?: boolean;
   serializeHtml?: boolean;
   destroyDom?: boolean;

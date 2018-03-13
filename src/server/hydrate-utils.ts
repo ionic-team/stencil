@@ -95,8 +95,8 @@ export function normalizeDirection(doc: Document, opts: HydrateOptions) {
     }
   }
 
-  if (opts.dir) {
-    dir = opts.dir;
+  if (opts.direction) {
+    dir = opts.direction;
   } else {
     dir = doc.documentElement.getAttribute('dir');
   }
@@ -125,8 +125,8 @@ export function normalizeLanguage(doc: Document, opts: HydrateOptions) {
     }
   }
 
-  if (opts.lang) {
-    lang = opts.lang;
+  if (opts.language) {
+    lang = opts.language;
   } else {
     lang = doc.documentElement.getAttribute('lang');
   }
