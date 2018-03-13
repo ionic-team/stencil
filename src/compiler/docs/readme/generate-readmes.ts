@@ -1,6 +1,6 @@
 import { addAutoGenerate } from './auto-docs';
 import { AUTO_GENERATE_COMMENT } from './constants';
-import { CompilerCtx, Config, ModuleFile } from '../../../declarations';
+import { CompilerCtx, Config, ModuleFile, OutputTarget } from '../../../declarations';
 
 
 export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> {
@@ -9,6 +9,8 @@ export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> 
   const warnings: string[] = [];
 
   const moduleFiles = Object.keys(ctx.moduleFiles).sort();
+
+  const readmeOutputs = config.outputTargets.filter(o => o.type === 'docs' && o.format === 'readme' && o.dir);
 
   moduleFiles.forEach(filePath => {
     const moduleFile = ctx.moduleFiles[filePath];
@@ -28,7 +30,7 @@ export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> 
     } else {
       cmpDirectories.push(dirPath);
 
-      promises.push(genereateReadme(config, ctx, moduleFile, dirPath));
+      promises.push(genereateReadme(config, ctx, readmeOutputs, moduleFile, dirPath));
     }
   });
 
@@ -36,7 +38,7 @@ export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> 
 }
 
 
-async function genereateReadme(config: Config, ctx: CompilerCtx, moduleFile: ModuleFile, dirPath: string) {
+async function genereateReadme(config: Config, ctx: CompilerCtx, readmeOutputs: OutputTarget[], moduleFile: ModuleFile, dirPath: string) {
   const readMePath = config.sys.path.join(dirPath, 'readme.md');
 
   let existingContent: string = null;
@@ -47,16 +49,16 @@ async function genereateReadme(config: Config, ctx: CompilerCtx, moduleFile: Mod
 
   if (typeof existingContent === 'string' && existingContent.trim() !== '') {
     // update
-    return updateReadme(config, ctx, moduleFile, readMePath, existingContent);
+    return updateReadme(config, ctx, readmeOutputs, moduleFile, readMePath, existingContent);
 
   } else {
     // create
-    return createReadme(config, ctx, moduleFile, readMePath);
+    return createReadme(config, ctx, readmeOutputs, moduleFile, readMePath);
   }
 }
 
 
-async function createReadme(config: Config, ctx: CompilerCtx, moduleFile: ModuleFile, readMePath: string) {
+async function createReadme(config: Config, ctx: CompilerCtx, readmeOutputs: OutputTarget[], moduleFile: ModuleFile, readMePath: string) {
   const content: string[] = [];
 
   content.push(`# ${moduleFile.cmpMeta.tagNameMeta}`);
@@ -65,12 +67,25 @@ async function createReadme(config: Config, ctx: CompilerCtx, moduleFile: Module
   content.push(``);
   addAutoGenerate(moduleFile.cmpMeta, content);
 
-  await ctx.fs.writeFile(readMePath, content.join('\n'));
+  const readmeContent = content.join('\n');
+
+  const writeFiles: { [filePath: string]: string } = {};
+
+  readmeOutputs.forEach(readmeOutput => {
+    const relPath = config.sys.path.relative(config.srcDir, readMePath);
+    const absPath = config.sys.path.join(readmeOutput.dir, relPath);
+    writeFiles[absPath] = readmeContent;
+  });
+
+  writeFiles[readMePath] = readmeContent;
+
   config.logger.info(`created readme docs: ${moduleFile.cmpMeta.tagNameMeta}`);
+
+  await ctx.fs.writeFiles(writeFiles);
 }
 
 
-async function updateReadme(config: Config, ctx: CompilerCtx, moduleFile: ModuleFile, readMePath: string, existingContent: string) {
+async function updateReadme(config: Config, ctx: CompilerCtx, readmeOutputs: OutputTarget[], moduleFile: ModuleFile, readMePath: string, existingContent: string) {
   if (typeof existingContent !== 'string' || existingContent.trim() === '') {
     throw new Error('missing existing content');
   }
@@ -100,12 +115,21 @@ async function updateReadme(config: Config, ctx: CompilerCtx, moduleFile: Module
 
   const updatedContent = content.join('\n');
 
-  if (updatedContent.trim() === existingContent.trim()) {
-    return true;
+  const writeFiles: { [filePath: string]: string } = {};
+
+  if (updatedContent.trim() !== existingContent.trim()) {
+    writeFiles[readMePath] = updatedContent;
   }
 
-  await ctx.fs.writeFile(readMePath, updatedContent);
+  readmeOutputs.forEach(readmeOutput => {
+    const relPath = config.sys.path.relative(config.srcDir, readMePath);
+    const absPath = config.sys.path.join(readmeOutput.dir, relPath);
+    writeFiles[absPath] = updatedContent;
+  });
 
   config.logger.info(`updated readme docs: ${moduleFile.cmpMeta.tagNameMeta}`);
+
+  await ctx.fs.writeFiles(writeFiles);
+
   return true;
 }
