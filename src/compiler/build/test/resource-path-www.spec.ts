@@ -4,7 +4,7 @@ import { OutputTarget } from '../../../declarations';
 import * as path from 'path';
 
 
-describe('loader/core resourcePath', () => {
+describe('www loader/core resourcePath', () => {
 
   let c: TestingCompiler;
   let config: TestingConfig;
@@ -221,7 +221,7 @@ describe('loader/core resourcePath', () => {
     const wwwOutput = config.outputTargets.find(o => o.type === 'www');
     expect(wwwOutput.resourcePath).toBeUndefined();
 
-    await setupFs(c, '<script src="build/app.js" data-resource-path="/some/resource/attr/path/" test-inlined>></script>');
+    await setupFs(c, '<script src="build/app.js" data-resource-path="/some/resource/attr/path/" test-inlined></script>');
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
@@ -243,7 +243,6 @@ describe('loader/core resourcePath', () => {
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
   });
-
 
   function mockDom(htmlFilePath: string): { win: Window, doc: HTMLDocument } {
     const jsdom = require('jsdom');
@@ -294,10 +293,10 @@ describe('loader/core resourcePath', () => {
 
 
   async function setupFs(c: TestingCompiler, loaderSrc: string) {
-    await c.fs.writeFiles({
-      '/User/testing/src/components/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+    await c.fs.writeFile('/User/testing/src/components/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`);
 
-      '/User/testing/src/index.html': `
+    await c.fs.writeFile(
+      '/User/testing/src/index.html', `
         <!DOCTYPE html>
         <html>
         <head>
@@ -317,7 +316,8 @@ describe('loader/core resourcePath', () => {
         </body>
         </html>
       `
-    });
+    );
+
     await c.fs.commit();
   }
 
