@@ -107,6 +107,7 @@ export interface CoreContext {
   location?: Location;
   document?: Document;
   mode?: string;
+  resourcePath?: string;
   [contextId: string]: any;
 }
 

@@ -73,8 +73,7 @@ export interface OutputTarget {
   buildPath?: string;
   empty?: boolean;
   format?: string;
-  discoverPublicPath?: boolean;
-  publicPath?: string;
+  resourcePath?: string;
   indexHtml?: string;
   prerender?: d.PrerenderConfig;
   serviceWorker?: d.ServiceWorkerConfig;

@@ -1,5 +1,6 @@
 import { CompilerCtx, Config, HydrateResults, OutputTarget } from '../../declarations';
 import { getLoaderFileName, getLoaderPath } from '../app/app-file-naming';
+import { normalizePath } from '../util';
 
 
 export async function inlineLoaderScript(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, doc: Document, results: HydrateResults) {
@@ -11,20 +12,20 @@ export async function inlineLoaderScript(config: Config, compilerCtx: CompilerCt
   // now that we're prerendering the html, and all the styles and html
   // will get hardcoded in the output, it's safe to now put the
   // loader script at the bottom of <body>
-  const scriptElm = findExternalLoaderScript(outputTarget, doc, loaderFileName);
+  const scriptElm = findExternalLoaderScript(doc, loaderFileName);
 
   if (scriptElm) {
     // append the loader script content to the bottom of <body>
-    await relocateInlineLoaderScript(config, compilerCtx, outputTarget, doc, results, scriptElm);
+    await updateInlineLoaderScriptElement(config, compilerCtx, outputTarget, doc, results, scriptElm);
   }
 }
 
 
-function findExternalLoaderScript(outputTarget: OutputTarget, doc: Document, loaderFileName: string) {
+function findExternalLoaderScript(doc: Document, loaderFileName: string) {
   const scriptElements = doc.getElementsByTagName('script');
 
   for (let i = 0; i < scriptElements.length; i++) {
-    if (isLoaderScriptSrc(outputTarget.publicPath, loaderFileName, scriptElements[i].getAttribute('src'))) {
+    if (isLoaderScriptSrc(loaderFileName, scriptElements[i].getAttribute('src'))) {
       // this is a script element with a src attribute which is
       // pointing to the app's external loader script
       // remove the script from the document, be gone with you
@@ -36,7 +37,7 @@ function findExternalLoaderScript(outputTarget: OutputTarget, doc: Document, loa
 }
 
 
-export function isLoaderScriptSrc(publicPath: string, loaderFileName: string, scriptSrc: string) {
+export function isLoaderScriptSrc(loaderFileName: string, scriptSrc: string) {
   try {
     if (typeof scriptSrc !== 'string' || scriptSrc.trim() === '') {
       return false;
@@ -44,33 +45,24 @@ export function isLoaderScriptSrc(publicPath: string, loaderFileName: string, sc
 
     scriptSrc = scriptSrc.toLowerCase();
 
-    if (!scriptSrc.includes(loaderFileName)) {
-      return false;
-    }
-
     if (scriptSrc.startsWith('http') || scriptSrc.startsWith('file')) {
       return false;
     }
 
-    const pathDirs = publicPath.toLowerCase().split('/');
-    const firstPublicPathDir = pathDirs.find(pathDir => pathDir.length > 0);
+    scriptSrc = scriptSrc.split('?')[0].split('#')[0];
+    loaderFileName = loaderFileName.split('?')[0].split('#')[0];
 
-    const scriptSrcDirs = scriptSrc.split('/');
-    const firstScriptSrcDir = scriptSrcDirs.find(scriptSrcDir => scriptSrcDir.length > 0);
-
-    if (firstPublicPathDir !== null && firstScriptSrcDir !== null) {
-      return firstPublicPathDir === firstScriptSrcDir;
+    if (scriptSrc === loaderFileName || scriptSrc.endsWith('/' + loaderFileName)) {
+      return true;
     }
 
-    return true;
+  } catch (e) {}
 
-  } catch (e) {
-    return false;
-  }
+  return false;
 }
 
 
-async function relocateInlineLoaderScript(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
+async function updateInlineLoaderScriptElement(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, doc: Document, results: HydrateResults, scriptElm: HTMLScriptElement) {
   // get the file path
   const appLoaderPath = getLoaderPath(config, outputTarget);
 
@@ -93,6 +85,27 @@ async function relocateInlineLoaderScript(config: Config, compilerCtx: CompilerC
 
   // remove the external src
   scriptElm.removeAttribute('src');
+
+  // only add the data-resource-path attr if we don't already have one
+  const existingResourcePathAttr = scriptElm.getAttribute('data-resource-path');
+  if (!existingResourcePathAttr) {
+    let resourcePath = outputTarget.resourcePath;
+    if (!resourcePath) {
+      resourcePath = config.sys.path.join(outputTarget.buildPath, config.fsNamespace);
+      resourcePath = normalizePath(config.sys.path.relative(outputTarget.path, resourcePath));
+
+      if (!resourcePath.startsWith('/')) {
+        resourcePath = '/' + resourcePath;
+      }
+
+      if (!resourcePath.endsWith('/')) {
+        resourcePath = resourcePath + '/';
+      }
+    }
+
+    // add the resource path data attribute
+    scriptElm.setAttribute('data-resource-path', resourcePath);
+  }
 
   // inline the js content
   scriptElm.innerHTML = content;

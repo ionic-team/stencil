@@ -40,8 +40,8 @@ function bundleClientCore() {
   .then(bundle => {
     bundle.generate({
       format: 'es',
-      intro: '(function(window, document, Context, appNamespace, publicPath) {\n"use strict";\n',
-      outro: '})(window, document, Context, appNamespace, publicPath);'
+      intro: '(function(window, document, Context, namespace) {\n"use strict";\n',
+      outro: '})(window, document, Context, namespace);'
 
     }).then(clientCore => {
 

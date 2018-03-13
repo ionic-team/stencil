@@ -2,7 +2,7 @@ import { AppRegistry, CompilerCtx, ComponentRegistry, Config, OutputTarget } fro
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
 import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 import { generatePreamble, minifyJs } from '../util';
-import { getAppPublicPath, getLoaderFileName, getLoaderPath } from './app-file-naming';
+import { getLoaderFileName, getLoaderPath } from './app-file-naming';
 
 
 export async function generateLoader(
@@ -68,15 +68,12 @@ export function injectAppIntoLoader(
 
   const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
 
-  const publicPath = getAppPublicPath(config, outputTarget);
-
-  const discoverPublicPath = (outputTarget.discoverPublicPath !== false);
+  const resourcePath = outputTarget.resourcePath ? `"${outputTarget.resourcePath}"` : 0;
 
   const loaderArgs = [
     `"${config.namespace}"`,
     `"${config.fsNamespace}"`,
-    `"${publicPath}"`,
-    `${discoverPublicPath}`,
+    `${resourcePath}`,
     `"${appCoreFileName}"`,
     `"${appCorePolyfilledFileName}"`,
     `"${hydratedCssClass}"`,

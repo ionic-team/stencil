@@ -1,11 +1,11 @@
 import * as d from '../declarations';
 
 
-export function generateDevInspector(App: d.AppGlobal, appNamespace: string, win: any, plt: d.PlatformApi) {
+export function generateDevInspector(App: d.AppGlobal, namespace: string, win: any, plt: d.PlatformApi) {
   const devInspector: d.DevInspector = win.devInspector = (win.devInspector || {});
 
   devInspector.apps = devInspector.apps || [];
-  devInspector.apps.push(generateDevInspectorApp(App, appNamespace, plt));
+  devInspector.apps.push(generateDevInspectorApp(App, namespace, plt));
 
   if (!devInspector.getInstance) {
     devInspector.getInstance = (elm: Element) => {
@@ -43,10 +43,10 @@ export function generateDevInspector(App: d.AppGlobal, appNamespace: string, win
 }
 
 
-function generateDevInspectorApp(App: d.AppGlobal, appNamespace: string, plt: d.PlatformApi) {
+function generateDevInspectorApp(App: d.AppGlobal, namespace: string, plt: d.PlatformApi) {
   const app: d.DevInspectorApp = {
 
-    namespace: appNamespace,
+    namespace: namespace,
 
     getInstance: (elm: any) => {
       if (elm && elm.tagName) {

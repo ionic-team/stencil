@@ -16,4 +16,8 @@ export class TestingConfig implements d.Config {
   flags: d.ConfigFlags = {};
   bundles: d.ConfigBundle[];
   outputTargets: d.OutputTarget[];
+  buildEs5: boolean;
+  hashFileNames: boolean;
+  minifyCss: boolean;
+  minifyJs: boolean;
 }

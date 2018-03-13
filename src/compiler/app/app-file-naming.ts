@@ -57,12 +57,3 @@ export function getGlobalStyleFilename(config: Config) {
 export function getBundleFilename(bundleId: string, isScopedStyles: boolean, sourceTarget?: SourceTarget) {
   return `${bundleId}${isScopedStyles ? '.sc' : ''}${sourceTarget === 'es5' ? '.es5' : ''}.js`;
 }
-
-
-export function getAppPublicPath(config: Config, outputTarget: OutputTarget) {
-  if (outputTarget.discoverPublicPath !== false) {
-    return pathJoin(config, outputTarget.publicPath, config.fsNamespace) + '/';
-  }
-
-  return outputTarget.publicPath;
-}

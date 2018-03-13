@@ -19,10 +19,10 @@ import { proxyController } from '../core/proxy-controller';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClient(appNamespace: string, Context: CoreContext, win: Window, doc: Document, publicPath: string, hydratedCssClass: string) {
+export function createPlatformClient(namespace: string, Context: CoreContext, win: Window, doc: Document, resourcePath: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: HostElement} = {};
-  const App: AppGlobal = (win as any)[appNamespace] = (win as any)[appNamespace] || {};
+  const App: AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
   // set App Context
@@ -30,7 +30,7 @@ export function createPlatformClient(appNamespace: string, Context: CoreContext,
   Context.window = win;
   Context.location = win.location;
   Context.document = doc;
-  Context.publicPath = publicPath;
+  Context.resourcePath = Context.publicPath = resourcePath;
 
   if (Build.listener) {
     Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
@@ -91,7 +91,7 @@ export function createPlatformClient(appNamespace: string, Context: CoreContext,
   // this will fire when all components have finished loaded
   rootElm.$initLoad = () => {
     plt.hasLoadedMap.set(rootElm, App.loaded = plt.isAppLoaded = true);
-    domApi.$dispatchEvent(win, 'appload', { detail: { namespace: appNamespace } });
+    domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
 
   // if the HTML was generated from SSR
@@ -172,7 +172,7 @@ export function createPlatformClient(appNamespace: string, Context: CoreContext,
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
         cmpMeta.bundleIds :
         cmpMeta.bundleIds[modeName];
-      const url = publicPath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
+      const url = resourcePath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
 
       // dynamic es module import() => woot!
       __import(url).then(importedModule => {
@@ -206,7 +206,7 @@ export function createPlatformClient(appNamespace: string, Context: CoreContext,
   }
 
   if (Build.devInspector) {
-    generateDevInspector(App, appNamespace, window, plt);
+    generateDevInspector(App, namespace, window, plt);
   }
 
   // register all the components now that everything's ready
@@ -218,7 +218,7 @@ export function createPlatformClient(appNamespace: string, Context: CoreContext,
   // notify that the app has initialized and the core script is ready
   // but note that the components have not fully loaded yet, that's the "appload" event
   App.initialized = true;
-  domApi.$dispatchEvent(window, 'appinit', { detail: { namespace: appNamespace } });
+  domApi.$dispatchEvent(window, 'appinit', { detail: { namespace: namespace } });
 }
 
 

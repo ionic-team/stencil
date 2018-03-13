@@ -1,20 +1,20 @@
-import { AppRegistry, BuildCtx, CompilerCtx, Config, OutputTarget, SourceTarget } from '../../declarations';
+import { AppRegistry, BuildCtx, CompilerCtx, Config, SourceTarget } from '../../declarations';
 import { buildExpressionReplacer } from '../build/replacer';
 import { createOnWarnFn, loadRollupDiagnostics } from '../../util/logger/logger-rollup';
 import { generatePreamble, minifyJs } from '../util';
-import { getAppPublicPath, getGlobalBuildPath, getGlobalFileName } from './app-file-naming';
+import { getGlobalBuildPath, getGlobalFileName } from './app-file-naming';
 import inMemoryFsRead from '../bundle/rollup-plugins/in-memory-fs-read';
 import resolveCollections from '../bundle/rollup-plugins/resolve-collections';
 import { transpileToEs5 } from '../transpile/core-build';
 
 
-export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
+export async function generateAppGlobalScript(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, appRegistry: AppRegistry, sourceTarget?: SourceTarget) {
   const globalJsContents = await generateAppGlobalContents(config, compilerCtx, buildCtx, sourceTarget);
 
   if (globalJsContents.length) {
     appRegistry.global = getGlobalFileName(config);
 
-    const globalJsContent = generateGlobalJs(config, outputTarget, globalJsContents);
+    const globalJsContent = generateGlobalJs(config, globalJsContents);
 
     compilerCtx.appFiles.global = globalJsContent;
 
@@ -165,19 +165,17 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     }
   }
 
-  return `\n(function(publicPath){${jsContent}\n})(publicPath);\n`;
+  return `\n(function(resourcePath){${jsContent}\n})(resourcePath);\n`;
 }
 
 
-export function generateGlobalJs(config: Config, outputTarget: OutputTarget, globalJsContents: string[]) {
-  const publicPath = getAppPublicPath(config, outputTarget);
-
+export function generateGlobalJs(config: Config, globalJsContents: string[]) {
   const output = [
     generatePreamble(config) + '\n',
-    `(function(appNamespace,publicPath){`,
+    `(function(namespace,resourcePath){`,
     `"use strict";\n`,
     globalJsContents.join('\n').trim(),
-    `\n})("${config.namespace}","${publicPath}");`
+    `\n})("${config.namespace}");`
   ].join('');
 
   return output;

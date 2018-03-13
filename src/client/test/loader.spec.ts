@@ -7,11 +7,9 @@ describe('loader', () => {
 
   let win: any;
   let doc: HTMLDocument;
-  let docScripts: HTMLScriptElement[];
-  let appNamespace: string;
-  let urlNamespace: string;
-  let publicPath: string;
-  let discoverPublicPath: boolean;
+  let namespace: string;
+  let fsNamespace: string;
+  let resourcePath: string;
   let appCore: string;
   let appCorePolyfilled: string;
   let hydratedCssClass: string;
@@ -20,11 +18,9 @@ describe('loader', () => {
   beforeEach(() => {
     win = mockWindow();
     doc = win.document;
-    docScripts = doc.scripts as any;
-    appNamespace = 'AppNameSpace';
-    urlNamespace = 'app-namespace';
-    publicPath = '/build/app-namespace/';
-    discoverPublicPath = true;
+    namespace = 'AppNameSpace';
+    fsNamespace = 'app-namespace';
+    resourcePath = null;
     appCore = 'app.core.js';
     appCorePolyfilled = 'app.core.pf.js';
     hydratedCssClass = 'hydrated';
@@ -33,61 +29,31 @@ describe('loader', () => {
 
   describe('init', () => {
 
-    describe('publicPath', () => {
-
-      it('should not discover public path, but always use given path', () => {
-        const script1 = doc.createElement('script');
-        script1.src = '/assets1/script1/file.js';
-
-        const script2 = doc.createElement('script');
-        script2.src = '/assets2/script2/file.js';
-
-        discoverPublicPath = false;
-        publicPath = '/my-awesome-public/path/';
-
-        docScripts = [
-          script1,
-          script2
-        ];
-        init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
-        const script = doc.head.children[0];
-        expect(script.getAttribute('data-path')).toBe('/my-awesome-public/path/');
-      });
-
-      it('should discover public path from last script', () => {
-        const script1 = doc.createElement('script');
-        script1.src = '/assets1/script1/file.js';
-
-        const script2 = doc.createElement('script');
-        script2.src = '/assets2/script2/file.js';
-
-        discoverPublicPath = true;
-        docScripts = [
-          script1,
-          script2
-        ];
-        init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
-        const script = doc.head.children[0];
-        expect(script.getAttribute('data-path')).toBe('/assets2/script2/app-namespace/');
-      });
-
-    });
-
     it('set window namespace', () => {
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
-      expect(win[appNamespace]).toBeDefined();
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      expect(win[namespace]).toBeDefined();
     });
 
     it('set window namespace components', () => {
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
-      expect(win[appNamespace].components).toBe(components);
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      expect(win[namespace].components).toBe(components);
     });
 
     it('add <style> when components w/ styles', () => {
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
       components = [
         ['cmp-tag', {}, true] as any
       ];
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
       const style = doc.head.querySelector('style');
       expect(style.hasAttribute('data-styles')).toBeTruthy();
       expect(style.innerHTML.indexOf('cmp-tag') > -1).toBeTruthy();
@@ -95,35 +61,56 @@ describe('loader', () => {
     });
 
     it('do not add <style> when no components w/ styles', () => {
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
       components = [];
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
+
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
+
       const style = doc.head.querySelector('style');
       expect(style).toBeFalsy();
     });
 
     it('set script src attribute', () => {
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
-      const script = doc.head.children[0];
-      expect(script.getAttribute('src')).toBe('/build/app-namespace/app.core.pf.js');
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
+
+      const coreScript = doc.head.querySelector('script[data-resource-path][data-namespace]');
+      expect(coreScript.getAttribute('src')).toBe('/build/app-namespace/app.core.pf.js');
     });
 
-    it('set script public path data attribute', () => {
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
-      const script = doc.head.children[0];
-      expect(script.getAttribute('data-path')).toBe(publicPath);
+    it('set script resource path data attribute from defaults', () => {
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      const coreScript = doc.head.querySelector('script[data-resource-path][data-namespace]');
+
+      expect(coreScript.getAttribute('data-resource-path')).toBe('/build/app-namespace/');
     });
 
-    it('set script appNamespace data attribute', () => {
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
-      const script = doc.head.children[0];
-      expect(script.getAttribute('data-namespace')).toBe(urlNamespace);
+    it('set script namespce data attribute', () => {
+      const loaderScript = doc.createElement('script');
+      loaderScript.src = '/build/app.js';
+      doc.head.appendChild(loaderScript);
+
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
+
+      const coreScript = doc.head.querySelector('script[data-namespace]');
+      expect(coreScript.getAttribute('data-namespace')).toBe(fsNamespace);
     });
 
     it('parse file:// src', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = 'file:///c:/path/to/my%20bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('file:///c:/path/to/app-namespace/app.core.pf.js');
     });
@@ -132,7 +119,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = 'http://domain.com/some/path/bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('http://domain.com/some/path/app-namespace/app.core.pf.js');
     });
@@ -141,7 +128,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = '../bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('../app-namespace/app.core.pf.js');
     });
@@ -150,7 +137,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = './bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('./app-namespace/app.core.pf.js');
     });
@@ -159,7 +146,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = 'bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, docScripts, appNamespace, urlNamespace, publicPath, discoverPublicPath, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcePath, appCore, appCorePolyfilled, hydratedCssClass, components);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('app-namespace/app.core.pf.js');
     });

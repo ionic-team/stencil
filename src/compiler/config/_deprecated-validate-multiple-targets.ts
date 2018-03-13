@@ -157,33 +157,15 @@ export function _deprecatedToMultipleTarget(config: Config) {
 
     const www = config.outputTargets.find(o => o.type === 'www');
     if (www) {
-      www.publicPath = (config as any).publicPath;
+      www.resourcePath = (config as any).publicPath;
     }
 
     const dist = config.outputTargets.find(o => o.type === 'dist');
     if (dist) {
-      dist.publicPath = (config as any).publicPath;
+      dist.resourcePath = (config as any).publicPath;
     }
 
     delete (config as any).publicPath;
-  }
-
-  if ((config as any).discoverPublicPath !== undefined) {
-    deprecatedConfigs.push('discoverPublicPath');
-
-    config.outputTargets = config.outputTargets || [];
-
-    const www = config.outputTargets.find(o => o.type === 'www');
-    if (www) {
-      www.discoverPublicPath = (config as any).discoverPublicPath;
-    }
-
-    const dist = config.outputTargets.find(o => o.type === 'dist');
-    if (dist) {
-      dist.discoverPublicPath = (config as any).discoverPublicPath;
-    }
-
-    delete (config as any).discoverPublicPath;
   }
 
   if ((config as any).serviceWorker !== undefined) {

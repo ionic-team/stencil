@@ -33,7 +33,7 @@ export async function generateAppFilesOutputTarget(config: Config, compilerCtx: 
     const appRegistry = createAppRegistry(config);
 
     // normal es2015 build
-    const globalJsContentsEs2015 = await generateAppGlobalScript(config, compilerCtx, buildCtx, outputTarget, appRegistry);
+    const globalJsContentsEs2015 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
 
     // figure out which sections should be included in the core build
     const buildConditionals = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
@@ -44,7 +44,7 @@ export async function generateAppFilesOutputTarget(config: Config, compilerCtx: 
 
     if (config.buildEs5) {
       // es5 build (if needed)
-      const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, outputTarget, appRegistry, 'es5');
+      const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
 
       const buildConditionalsEs5 = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
       buildConditionalsEs5.coreId = 'core.pf';

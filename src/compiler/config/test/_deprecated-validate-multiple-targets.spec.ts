@@ -54,27 +54,15 @@ describe('_deprecated multiple targets', () => {
     expect(r).toHaveLength(1);
   });
 
-  it('discoverPublicPath', () => {
-    (config as any).discoverPublicPath = true;
+  it('resourcePath', () => {
+    (config as any).publicPath = 'my-resource-path';
     config.outputTargets = [ { type: 'www' }, { type: 'dist' } ];
     const r = _deprecatedToMultipleTarget(config);
-    expect((config as any).discoverPublicPath).toBeUndefined();
+    expect((config as any).resourcePath).toBeUndefined();
     expect(config.outputTargets[0].type).toBe('www');
-    expect(config.outputTargets[0].discoverPublicPath).toBe(true);
+    expect(config.outputTargets[0].resourcePath).toBe('my-resource-path');
     expect(config.outputTargets[1].type).toBe('dist');
-    expect(config.outputTargets[1].discoverPublicPath).toBe(true);
-    expect(r).toHaveLength(1);
-  });
-
-  it('publicPath', () => {
-    (config as any).publicPath = 'my-public-path';
-    config.outputTargets = [ { type: 'www' }, { type: 'dist' } ];
-    const r = _deprecatedToMultipleTarget(config);
-    expect((config as any).publicPath).toBeUndefined();
-    expect(config.outputTargets[0].type).toBe('www');
-    expect(config.outputTargets[0].publicPath).toBe('my-public-path');
-    expect(config.outputTargets[1].type).toBe('dist');
-    expect(config.outputTargets[1].publicPath).toBe('my-public-path');
+    expect(config.outputTargets[1].resourcePath).toBe('my-resource-path');
     expect(r).toHaveLength(1);
   });
 

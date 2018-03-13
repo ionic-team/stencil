@@ -4,18 +4,17 @@ import { LoadComponentRegistry } from '../declarations';
 export function init(
   win: any,
   doc: HTMLDocument,
-  docScripts: HTMLScriptElement[],
-  appNamespace: string,
-  urlNamespace: string,
-  publicPath: string,
-  discoverPublicPath: boolean,
+  namespace: string,
+  fsNamespace: string,
+  resourcePath: string,
   appCore: string,
   appCorePolyfilled: string,
   hydratedCssClass: string,
-  components: LoadComponentRegistry[], x?: any, y?: any
+  components: LoadComponentRegistry[],
+  x?: any, y?: any, scriptElm?: HTMLScriptElement
 ) {
   // create global namespace if it doesn't already exist
-  (win[appNamespace] = win[appNamespace] || {}).components = components;
+  (win[namespace] = win[namespace] || {}).components = components;
 
   y = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
   if (y.length) {
@@ -27,14 +26,28 @@ export function init(
     doc.head.insertBefore(x, doc.head.firstChild);
   }
 
-  // get this current script
-  // script tag cannot use "async" attribute
-  if (discoverPublicPath) {
-    x = docScripts[docScripts.length - 1];
-    if (x && x.src) {
-      y = x.src.split('/').slice(0, -1);
-      publicPath = (y.join('/')) + (y.length ? '/' : '') + urlNamespace + '/';
+  // figure out the script element for this current script
+  y = doc.querySelectorAll('script');
+  for (x = y.length - 1; x >= 0; x--) {
+    scriptElm = y[x];
+    if (scriptElm.src || scriptElm.hasAttribute('data-resource-path')) {
+      break;
     }
+  }
+
+  // get the resource path attribute on this script element
+  y = scriptElm.getAttribute('data-resource-path');
+
+  if (y) {
+    // the script element has a data-resource-path attribute, always use that
+    resourcePath = y;
+  }
+
+  if (!resourcePath && scriptElm.src) {
+    // we don't have an exact resourcePath, so let's
+    // figure it out relative to this script's src and app's filesystem namespace
+    y = scriptElm.src.split('/').slice(0, -1);
+    resourcePath = (y.join('/')) + (y.length ? '/' : '') + fsNamespace + '/';
   }
 
   // request the core this browser needs
@@ -42,9 +55,9 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = publicPath + (usePolyfills(win as any, win.location, x, 'import("")') ? appCorePolyfilled : appCore);
-  x.setAttribute('data-path', publicPath);
-  x.setAttribute('data-namespace', urlNamespace);
+  x.src = resourcePath + (usePolyfills(win as any, win.location, x, 'import("")') ? appCorePolyfilled : appCore);
+  x.setAttribute('data-resource-path', resourcePath);
+  x.setAttribute('data-namespace', fsNamespace);
   doc.head.appendChild(x);
 }
 

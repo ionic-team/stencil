@@ -2,7 +2,7 @@ import { BuildConditionals, BuildCtx, CompilerCtx, Config, OutputTarget } from '
 import { buildCoreContent } from './build-core-content';
 import { generatePreamble, pathJoin } from '../util';
 import { getAppCorePolyfills } from './app-polyfills';
-import { getAppBuildDir, getAppPublicPath, getCoreFilename } from './app-file-naming';
+import { getAppBuildDir, getCoreFilename } from './app-file-naming';
 
 
 export async function generateCore(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, globalJsContent: string, buildConditionals: BuildConditionals) {
@@ -20,7 +20,7 @@ export async function generateCore(config: Config, compilerCtx: CompilerCtx, bui
   }
 
   // wrap the core js code together
-  jsContent = wrapCoreJs(config, outputTarget, jsContent);
+  jsContent = wrapCoreJs(config, jsContent);
 
   if (buildConditionals.polyfills) {
     // this build wants polyfills so let's
@@ -42,17 +42,15 @@ export async function generateCore(config: Config, compilerCtx: CompilerCtx, bui
 }
 
 
-export function wrapCoreJs(config: Config, outputTarget: OutputTarget, jsContent: string) {
-  const publicPath = getAppPublicPath(config, outputTarget);
-
+export function wrapCoreJs(config: Config, jsContent: string) {
   const output = [
     generatePreamble(config) + '\n',
-    `(function(Context,appNamespace,hydratedCssClass,publicPath){`,
+    `(function(Context,namespace,hydratedCssClass,resourcePath,s){`,
     `"use strict";\n`,
-    `var s=document.querySelector("script[data-namespace='${APP_NAMESPACE_PLACEHOLDER}']");`,
-    `if(s){publicPath=s.getAttribute('data-path');}\n`,
+    `s=document.querySelector("script[data-namespace='${config.fsNamespace}']");`,
+    `if(s){resourcePath=s.getAttribute('data-resource-path');}\n`,
     jsContent.trim(),
-    `\n})({},"${config.namespace}","${config.hydratedCssClass}","${publicPath}");`
+    `\n})({},"${config.namespace}","${config.hydratedCssClass}");`
   ].join('');
 
   return output;

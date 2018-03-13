@@ -2,7 +2,7 @@ import { Config } from '../../declarations';
 import { validateDistOutputTarget } from './validate-outputs-dist';
 import { validateDocs } from './validate-docs';
 import { validatePrerender } from './validate-prerender';
-import { validatePublicPath } from './validate-public-path';
+import { validateResourcePath } from './validate-resource-path';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateStats } from './validate-stats';
 import { validateWwwOutputTarget } from './validate-outputs-www';
@@ -24,7 +24,7 @@ export function validateOutputTargets(config: Config) {
   }
 
   config.outputTargets.forEach(outputTarget => {
-    validatePublicPath(config, outputTarget);
+    validateResourcePath(outputTarget);
     validatePrerender(config, outputTarget);
     validateServiceWorker(config, outputTarget);
   });
