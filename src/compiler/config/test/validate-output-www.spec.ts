@@ -15,6 +15,17 @@ describe('validateWwwOutputTarget', () => {
     };
   });
 
+  it('should www with sub directory', () => {
+    config.outputTargets = [{
+      type: 'www',
+      dir: 'www/docs'
+    }];
+    validateWwwOutputTarget(config);
+    expect(config.outputTargets[0].dir).toBe('/www/docs');
+    expect(config.outputTargets[0].buildDir).toBe('/www/docs/build');
+    expect(config.outputTargets[0].indexHtml).toBe('/www/docs/index.html');
+  });
+
   it('should set www values', () => {
     config.outputTargets = [{
       type: 'www',

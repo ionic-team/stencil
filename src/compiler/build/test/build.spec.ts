@@ -4,6 +4,15 @@ import { TestingCompiler } from '../../../testing/index';
 
 describe('build', () => {
 
+  let c: TestingCompiler;
+
+  beforeEach(async () => {
+    c = new TestingCompiler();
+    await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+    await c.fs.commit();
+  });
+
+
   it('should minify es5 build', async () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
     c.config.minifyJs = true;
@@ -59,15 +68,6 @@ describe('build', () => {
     expect(r.entries).toHaveLength(0);
     expect(r.transpileBuildCount).toBe(0);
     expect(r.bundleBuildCount).toBe(0);
-  });
-
-
-  var c: TestingCompiler;
-
-  beforeEach(async () => {
-    c = new TestingCompiler();
-    await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
-    await c.fs.commit();
   });
 
 });
