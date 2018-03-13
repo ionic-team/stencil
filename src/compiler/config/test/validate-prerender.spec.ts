@@ -24,16 +24,27 @@ describe('validatePrerender', () => {
   });
 
 
-  it('should set prerender no hydrate defaults when config.prerender false', () => {
-    config.flags.prerender = true;
+  it('should not prerender when config.prerender false', () => {
     outputTarget.prerender = false as any;
     validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBeDefined();
-    expect(outputTarget.prerender.hydrateComponents).toBe(false);
+    expect(outputTarget.prerender).toBe(null);
   });
 
-  it('should set prerendering no hydrate defaults if prerendering is not null and not devMode', () => {
+  it('should set prerendering defaults if prerendering flag', () => {
     config.flags.prerender = true;
+    validatePrerender(config, outputTarget);
+    expect(outputTarget.prerender).toBeDefined();
+    expect(outputTarget.prerender.hydrateComponents).toBe(true);
+    expect(outputTarget.prerender.crawl).toBe(true);
+    expect(outputTarget.prerender.include).toEqual([{ path: '/' }]);
+    expect(outputTarget.prerender.collapseWhitespace).toBe(true);
+    expect(outputTarget.prerender.inlineLoaderScript).toBe(true);
+    expect(outputTarget.prerender.inlineStyles).toBe(true);
+    expect(outputTarget.prerender.inlineAssetsMaxSize).toBe(5000);
+    expect(outputTarget.prerender.removeUnusedStyles).toBe(true);
+  });
+
+  it('should set prerendering no hydrate defaults if no prerender flag and not devMode', () => {
     config.devMode = false;
     validatePrerender(config, outputTarget);
     expect(outputTarget.prerender).toBeDefined();
@@ -128,13 +139,6 @@ describe('validatePrerender', () => {
     expect(config.buildEs5).toBe(true);
   });
 
-  it('should set prerender null if dev mode', () => {
-    outputTarget.prerender = {};
-    config.devMode = true;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBe(null);
-  });
-
   it('should default prerender if undefined and type www', () => {
     outputTarget.type = 'www';
     validatePrerender(config, outputTarget);
@@ -148,7 +152,15 @@ describe('validatePrerender', () => {
     expect(outputTarget.prerender).toBe(null);
   });
 
-  it('should default prerender values when true', () => {
+  it('should default prerender values flag true but no outputTarget', () => {
+    config.flags.prerender = true;
+    validatePrerender(config, outputTarget);
+    expect(outputTarget.prerender).not.toBe(null);
+    expect(outputTarget.prerender).not.toBe(true);
+    expect(outputTarget.prerender).not.toBe(false);
+  });
+
+  it('should default prerender values when outputTarget.prerender true and flag true', () => {
     config.flags.prerender = true;
     outputTarget.prerender = true as any;
     validatePrerender(config, outputTarget);

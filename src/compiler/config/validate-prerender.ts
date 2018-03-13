@@ -3,21 +3,22 @@ import { normalizePath } from '../util';
 
 
 export function validatePrerender(config: Config, outputTarget: OutputTarget) {
-  if (!config.flags.prerender) {
+  if (outputTarget.type !== 'www') {
     outputTarget.prerender = null;
     return;
   }
 
-  if (config.devMode && config.flags.prerender === true) {
+  if (outputTarget.prerender === false) {
     outputTarget.prerender = null;
     return;
   }
 
-  if (outputTarget.prerender && outputTarget.type === 'www' && !config.devMode) {
-    if (typeof outputTarget.prerender !== 'object' || Array.isArray(outputTarget.prerender)) {
-      outputTarget.prerender = {};
-    }
+  if (config.flags.prerender) {
+    outputTarget.prerender = outputTarget.prerender || {};
+  }
 
+  if (outputTarget.prerender) {
+    // we already have a prerender config
     outputTarget.prerender = Object.assign({}, DEFAULT_SSR_CONFIG, DEFAULT_PRERENDER_CONFIG, outputTarget.prerender);
 
     if (typeof outputTarget.prerender.hydrateComponents !== 'boolean') {
@@ -34,7 +35,9 @@ export function validatePrerender(config: Config, outputTarget: OutputTarget) {
 
     config.buildEs5 = true;
 
-  } else if (outputTarget.prerender !== null && outputTarget.type === 'www' && !config.devMode) {
+  } else if (outputTarget.prerender !== null && !config.devMode) {
+    // don't have a prerender config
+    // and it's prod mode
     outputTarget.prerender = {
       hydrateComponents: false,
       crawl: false,
