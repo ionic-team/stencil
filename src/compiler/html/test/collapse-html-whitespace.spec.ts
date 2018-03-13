@@ -4,6 +4,46 @@ import { collapseHtmlWhitepace } from '../collapse-html-whitespace';
 
 describe('collapseHtmlWhitepace', () => {
 
+  it('should remove empty style attr', () => {
+    const node = mockHtml(`
+      <p style="">text</p>
+    `);
+
+    collapseHtmlWhitepace(node);
+
+    expect(node.outerHTML).toBe(`<p>text</p>`);
+  });
+
+  it('should not remove style attr w/ value', () => {
+    const node = mockHtml(`
+      <p style="color: red">text</p>
+    `);
+
+    collapseHtmlWhitepace(node);
+
+    expect(node.outerHTML).toBe(`<p style="color: red">text</p>`);
+  });
+
+  it('should remove empty class attr', () => {
+    const node = mockHtml(`
+      <p class="">text</p>
+    `);
+
+    collapseHtmlWhitepace(node);
+
+    expect(node.outerHTML).toBe(`<p>text</p>`);
+  });
+
+  it('should not remove class attr w/ value', () => {
+    const node = mockHtml(`
+      <p class="red-text">text</p>
+    `);
+
+    collapseHtmlWhitepace(node);
+
+    expect(node.outerHTML).toBe(`<p class="red-text">text</p>`);
+  });
+
   it('should remove multiple spaces, new lines and comments between used text nodes', () => {
     const node = mockHtml(`
     <div> <i></i>
