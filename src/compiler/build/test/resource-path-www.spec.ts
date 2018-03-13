@@ -137,7 +137,7 @@ describe('www loader/core resourcePath', () => {
 
     const { win, doc } = mockDom(wwwOutput.indexHtml);
 
-    const loaderContent = doc.head.querySelector('script[test-inlined]').innerHTML;
+    const loaderContent = doc.body.querySelector('script[test-inlined]').innerHTML;
     execScript(win, doc, loaderContent);
 
     const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="app"]');
@@ -168,7 +168,10 @@ describe('www loader/core resourcePath', () => {
       {
         type: 'www',
         resourcePath: '/some/resource/config/path',
-        serviceWorker: null
+        serviceWorker: null,
+        prerender: {
+          hydrateComponents: false
+        }
       }
     ];
 
@@ -228,7 +231,7 @@ describe('www loader/core resourcePath', () => {
 
     const { win, doc } = mockDom(wwwOutput.indexHtml);
 
-    const loaderContent = doc.head.querySelector('script[test-inlined]').innerHTML;
+    const loaderContent = doc.body.querySelector('script[test-inlined]').innerHTML;
     execScript(win, doc, loaderContent);
 
     const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="app"]');
