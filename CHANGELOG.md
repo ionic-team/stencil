@@ -1,3 +1,19 @@
+<a name="0.7.0-4"></a>
+# 🌏 [0.7.0-4](https://github.com/ionic-team/stencil/compare/v0.7.0-3...v0.7.0-4) (2018-03-13)
+
+
+### Bug Fixes
+
+* **prerender:** update prerender config defaults ([19b27e4](https://github.com/ionic-team/stencil/commit/19b27e4))
+* **resourcePath:** improve loader script resource path ([58f9e99](https://github.com/ionic-team/stencil/commit/19b27e4))
+
+
+### Features
+
+* **docs:** write docs to multiple locations ([24fe78d](https://github.com/ionic-team/stencil/commit/24fe78d))
+
+
+
 <a name="0.7.0-3"></a>
 # 🌾 [0.7.0-3](https://github.com/ionic-team/stencil/compare/v0.7.0-2...v0.7.0-3) (2018-03-11)
 
