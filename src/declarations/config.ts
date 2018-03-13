@@ -69,8 +69,9 @@ export interface ConfigFlags {
 
 export interface OutputTarget {
   type?: 'dist' | 'docs' | 'stats' | 'www';
-  path?: string;
-  buildPath?: string;
+  dir?: string;
+  file?: string;
+  buildDir?: string;
   empty?: boolean;
   format?: string;
   resourcePath?: string;

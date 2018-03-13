@@ -88,7 +88,7 @@ function getFilePathFromUrl(config: Config, outputTarget: OutputTarget, windowLo
     return null;
   }
 
-  return config.sys.path.join(outputTarget.path, location.path);
+  return config.sys.path.join(outputTarget.dir, location.path);
 }
 
 

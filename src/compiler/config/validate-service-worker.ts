@@ -41,15 +41,15 @@ export function validateServiceWorker(config: Config, outputTarget: OutputTarget
   }
 
   if (typeof outputTarget.serviceWorker.globDirectory !== 'string') {
-    outputTarget.serviceWorker.globDirectory = outputTarget.path;
+    outputTarget.serviceWorker.globDirectory = outputTarget.dir;
   }
 
   if (!outputTarget.serviceWorker.swDest) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.path, DEFAULT_FILENAME);
+    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
   }
 
   if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.path, outputTarget.serviceWorker.swDest);
+    outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
   }
 }
 

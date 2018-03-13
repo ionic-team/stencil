@@ -65,7 +65,7 @@ export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx,
       return processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, outputTarget.collectionDir);
 
     } else {
-      return processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, outputTarget.path);
+      return processCopyTaskDestDir(config, compilerCtx, allCopyTasks, copyTask, outputTarget.dir);
     }
   }));
 }
@@ -105,7 +105,7 @@ async function processGlob(config: Config, copyTask: CopyTask) {
         globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.collectionDir, globRelPath));
 
       } else {
-        globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.path, globRelPath));
+        globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.dir, globRelPath));
       }
     });
 

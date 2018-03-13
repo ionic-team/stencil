@@ -55,7 +55,7 @@ describe('dist loader/core resourcePath', () => {
   });
 
 
-  it('custom buildPath config', async () => {
+  it('custom buildDir config', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
     config.rootDir = '/User/testing/';
@@ -63,7 +63,7 @@ describe('dist loader/core resourcePath', () => {
     config.outputTargets = [
       {
         type: 'dist',
-        buildPath: 'some-build'
+        buildDir: 'some-build'
       }
     ];
 

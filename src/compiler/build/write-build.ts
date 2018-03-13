@@ -63,8 +63,8 @@ export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
       return;
     }
 
-    config.logger.debug(`empty dir: ${outputTarget.path}`);
+    config.logger.debug(`empty dir: ${outputTarget.dir}`);
 
-    await compilerCtx.fs.emptyDir(outputTarget.path);
+    await compilerCtx.fs.emptyDir(outputTarget.dir);
   }));
 }

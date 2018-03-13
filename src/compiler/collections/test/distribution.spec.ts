@@ -16,8 +16,8 @@ describe('distribution', () => {
     beforeEach(() => {
       outputTarget = {
         type: 'dist',
-        path: '/dist',
-        buildPath: '/dist',
+        dir: '/dist',
+        buildDir: '/dist',
         collectionDir: '/dist/collection',
         typesDir: '/dist/types'
       };

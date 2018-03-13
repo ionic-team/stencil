@@ -91,22 +91,22 @@ describe('validatePaths', () => {
 
   it('should set default build dir and convert to absolute path', () => {
     validateConfig(config);
-    const parts = config.outputTargets[0].buildPath.split(path.sep);
+    const parts = config.outputTargets[0].buildDir.split(path.sep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('www');
-    expect(path.isAbsolute(config.outputTargets[0].buildPath)).toBe(true);
+    expect(path.isAbsolute(config.outputTargets[0].buildDir)).toBe(true);
   });
 
   it('should set build dir w/ custom www', () => {
     config.outputTargets = [{
       type: 'www',
-      path: 'custom-www'
+      dir: 'custom-www'
     }];
     validateConfig(config);
-    const parts = config.outputTargets[0].buildPath.split(path.sep);
+    const parts = config.outputTargets[0].buildDir.split(path.sep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('custom-www');
-    expect(path.isAbsolute(config.outputTargets[0].buildPath)).toBe(true);
+    expect(path.isAbsolute(config.outputTargets[0].buildDir)).toBe(true);
   });
 
   it('should set src dir from incorrect config case', () => {

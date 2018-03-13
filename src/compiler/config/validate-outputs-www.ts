@@ -14,20 +14,20 @@ export function validateWwwOutputTarget(config: Config) {
   const wwwOutputTargets = config.outputTargets.filter(o => o.type === 'www');
 
   wwwOutputTargets.forEach(outputTarget => {
-    if (!outputTarget.path) {
-      outputTarget.path = DEFAULT_WWW_DIR;
+    if (!outputTarget.dir) {
+      outputTarget.dir = DEFAULT_WWW_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.path)) {
-      outputTarget.path = pathJoin(config, config.rootDir, outputTarget.path);
+    if (!path.isAbsolute(outputTarget.dir)) {
+      outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
     }
 
-    if (!outputTarget.buildPath) {
-      outputTarget.buildPath = DEFAULT_WWW_BUILD_DIR;
+    if (!outputTarget.buildDir) {
+      outputTarget.buildDir = DEFAULT_WWW_BUILD_DIR;
     }
 
-    if (!path.isAbsolute(outputTarget.buildPath)) {
-      outputTarget.buildPath = pathJoin(config, outputTarget.path, outputTarget.buildPath);
+    if (!path.isAbsolute(outputTarget.buildDir)) {
+      outputTarget.buildDir = pathJoin(config, outputTarget.dir, outputTarget.buildDir);
     }
 
     if (!outputTarget.indexHtml) {
@@ -35,15 +35,15 @@ export function validateWwwOutputTarget(config: Config) {
     }
 
     if (!path.isAbsolute(outputTarget.indexHtml)) {
-      outputTarget.indexHtml = pathJoin(config, outputTarget.path, outputTarget.indexHtml);
+      outputTarget.indexHtml = pathJoin(config, outputTarget.dir, outputTarget.indexHtml);
     }
 
     if (outputTarget.collectionDir && !path.isAbsolute(outputTarget.collectionDir)) {
-      outputTarget.collectionDir = pathJoin(config, outputTarget.path, outputTarget.collectionDir);
+      outputTarget.collectionDir = pathJoin(config, outputTarget.dir, outputTarget.collectionDir);
     }
 
     if (outputTarget.typesDir && !path.isAbsolute(outputTarget.typesDir)) {
-      outputTarget.typesDir = pathJoin(config, outputTarget.path, outputTarget.typesDir);
+      outputTarget.typesDir = pathJoin(config, outputTarget.dir, outputTarget.typesDir);
     }
 
     if (typeof outputTarget.empty !== 'boolean') {

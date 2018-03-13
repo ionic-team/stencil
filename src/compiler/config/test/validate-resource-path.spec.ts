@@ -22,7 +22,7 @@ describe('validateResourcePath', () => {
   // resourcePath is url the loader script should use to find
   // the core script, and where the core script should use to find component modules
   // the name of the loader script is the namespace lowercased
-  // and by default the resourcePath is the buildPath + lowercased namespace
+  // and by default the resourcePath is the buildDir + lowercased namespace
   //
   // DEFAULTS:
   // - build/
@@ -52,20 +52,20 @@ describe('validateResourcePath', () => {
     expect(path.isAbsolute(config.outputTargets[0].resourcePath)).toBe(false);
   });
 
-  it('do not set resourcePath w/ custom path and buildPath', () => {
+  it('do not set resourcePath w/ custom path and buildDir', () => {
     config.outputTargets = [{
       type: 'www',
-      path: 'some-www',
-      buildPath: 'some-build'
+      dir: 'some-www',
+      buildDir: 'some-build'
     }];
     validateConfig(config);
     expect(config.outputTargets[0].resourcePath).toBeUndefined();
   });
 
-  it('do not set resourcePath w/ custom buildPath', () => {
+  it('do not set resourcePath w/ custom buildDir', () => {
     config.outputTargets = [{
       type: 'www',
-      buildPath: 'some-build'
+      buildDir: 'some-build'
     }];
     validateConfig(config);
     expect(config.outputTargets[0].resourcePath).toBeUndefined();

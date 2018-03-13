@@ -72,7 +72,7 @@ describe('_deprecated multiple targets', () => {
     expect((config as any).typesDir).toBeUndefined();
     expect(config.outputTargets).toHaveLength(1);
     expect(config.outputTargets[0].type).toBe('dist');
-    expect(config.outputTargets[0].path).toBe('my-types');
+    expect(config.outputTargets[0].dir).toBe('my-types');
     expect(r).toHaveLength(1);
   });
 
@@ -82,7 +82,7 @@ describe('_deprecated multiple targets', () => {
     expect((config as any).collectionDir).toBeUndefined();
     expect(config.outputTargets).toHaveLength(1);
     expect(config.outputTargets[0].type).toBe('dist');
-    expect(config.outputTargets[0].path).toBe('my-collection');
+    expect(config.outputTargets[0].dir).toBe('my-collection');
     expect(r).toHaveLength(1);
   });
 
@@ -112,7 +112,7 @@ describe('_deprecated multiple targets', () => {
     expect((config as any).distDir).toBeUndefined();
     expect(config.outputTargets).toHaveLength(1);
     expect(config.outputTargets[0].type).toBe('dist');
-    expect(config.outputTargets[0].path).toBe('my-dist');
+    expect(config.outputTargets[0].dir).toBe('my-dist');
     expect(r).toHaveLength(1);
   });
 
@@ -149,7 +149,7 @@ describe('_deprecated multiple targets', () => {
     expect((config as any).buildDir).toBeUndefined();
     expect(config.outputTargets).toHaveLength(1);
     expect(config.outputTargets[0].type).toBe('www');
-    expect(config.outputTargets[0].buildPath).toBe('my-build');
+    expect(config.outputTargets[0].buildDir).toBe('my-build');
     expect(r).toHaveLength(1);
   });
 
@@ -159,7 +159,7 @@ describe('_deprecated multiple targets', () => {
     expect((config as any).wwwDir).toBeUndefined();
     expect(config.outputTargets).toHaveLength(1);
     expect(config.outputTargets[0].type).toBe('www');
-    expect(config.outputTargets[0].path).toBe('my-www');
+    expect(config.outputTargets[0].dir).toBe('my-www');
     expect(r).toHaveLength(1);
   });
 

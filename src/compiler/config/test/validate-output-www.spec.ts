@@ -18,16 +18,16 @@ describe('validateWwwOutputTarget', () => {
   it('should set www values', () => {
     config.outputTargets = [{
       type: 'www',
-      path: 'my-www',
-      buildPath: 'my-build',
+      dir: 'my-www',
+      buildDir: 'my-build',
       indexHtml: 'my-index.htm',
       empty: false
     }];
     validateWwwOutputTarget(config);
     expect(config.outputTargets[0]).toBeDefined();
     expect(config.outputTargets[0].type).toBe('www');
-    expect(config.outputTargets[0].path).toBe('/my-www');
-    expect(config.outputTargets[0].buildPath).toBe('/my-www/my-build');
+    expect(config.outputTargets[0].dir).toBe('/my-www');
+    expect(config.outputTargets[0].buildDir).toBe('/my-www/my-build');
     expect(config.outputTargets[0].indexHtml).toBe('/my-www/my-index.htm');
     expect(config.outputTargets[0].empty).toBe(false);
   });
@@ -35,8 +35,8 @@ describe('validateWwwOutputTarget', () => {
   it('should default to add www when outputTargets is undefined', () => {
     validateWwwOutputTarget(config);
     expect(config.outputTargets).toHaveLength(1);
-    expect(config.outputTargets[0].path).toBe('/www');
-    expect(config.outputTargets[0].buildPath).toBe('/www/build');
+    expect(config.outputTargets[0].dir).toBe('/www');
+    expect(config.outputTargets[0].buildDir).toBe('/www/build');
     expect(config.outputTargets[0].indexHtml).toBe('/www/index.html');
     expect(config.outputTargets[0].empty).toBe(true);
   });

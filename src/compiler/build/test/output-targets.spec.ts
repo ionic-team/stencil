@@ -122,14 +122,14 @@ describe('outputTargets', () => {
     config.outputTargets = [
       {
         type: 'www',
-        path: 'custom-www',
-        buildPath: 'www-build',
+        dir: 'custom-www',
+        buildDir: 'www-build',
         indexHtml: 'custom-index.htm'
       },
       {
         type: 'dist',
-        path: 'custom-dist',
-        buildPath: 'dist-build',
+        dir: 'custom-dist',
+        buildDir: 'dist-build',
         collectionDir: 'dist-collection',
         typesDir: 'custom-types'
       },

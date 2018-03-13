@@ -91,8 +91,8 @@ async function updateInlineLoaderScriptElement(config: Config, compilerCtx: Comp
   if (!existingResourcePathAttr) {
     let resourcePath = outputTarget.resourcePath;
     if (!resourcePath) {
-      resourcePath = config.sys.path.join(outputTarget.buildPath, config.fsNamespace);
-      resourcePath = normalizePath(config.sys.path.relative(outputTarget.path, resourcePath));
+      resourcePath = config.sys.path.join(outputTarget.buildDir, config.fsNamespace);
+      resourcePath = normalizePath(config.sys.path.relative(outputTarget.dir, resourcePath));
 
       if (!resourcePath.startsWith('/')) {
         resourcePath = '/' + resourcePath;

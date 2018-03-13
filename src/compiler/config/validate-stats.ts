@@ -26,12 +26,12 @@ export function validateStats(config: Config) {
 
 
 function validateStatsOutputTarget(config: Config, outputTarget: OutputTarget) {
-  if (!outputTarget.path) {
-    outputTarget.path = DEFAULT_JSON_FILE_NAME;
+  if (!outputTarget.file) {
+    outputTarget.file = DEFAULT_JSON_FILE_NAME;
   }
 
-  if (!config.sys.path.isAbsolute(outputTarget.path)) {
-    outputTarget.path = pathJoin(config, config.rootDir, outputTarget.path);
+  if (!config.sys.path.isAbsolute(outputTarget.file)) {
+    outputTarget.file = pathJoin(config, config.rootDir, outputTarget.file);
   }
 }
 

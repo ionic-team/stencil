@@ -30,27 +30,27 @@ describe('validateDocs', () => {
     validateConfig(config);
     const o = config.outputTargets.find(o => o.type === 'docs');
     expect(o).toBeDefined();
-    expect(o.path).toContain('dist');
+    expect(o.dir).toContain('dist');
     expect(o.format).toBe('json');
   });
 
   it('docs default readme', () => {
     config.flags.docs = true;
-    config.outputTargets.push({ type: 'docs', path: 'my-dir' });
+    config.outputTargets.push({ type: 'docs', dir: 'my-dir' });
     validateConfig(config);
     const o = config.outputTargets.find(o => o.type === 'docs');
     expect(o).toBeDefined();
-    expect(o.path).toContain('my-dir');
+    expect(o.dir).toContain('my-dir');
     expect(o.format).toBe('readme');
   });
 
   it('docs, keep docs output target', () => {
     config.flags.docs = true;
-    config.outputTargets.push({ type: 'docs', path: 'my-dir' });
+    config.outputTargets.push({ type: 'docs', dir: 'my-dir' });
     validateConfig(config);
     const o = config.outputTargets.find(o => o.type === 'docs');
     expect(o).toBeDefined();
-    expect(o.path).toContain('my-dir');
+    expect(o.dir).toContain('my-dir');
   });
 
   it('docs, and docs output target', () => {

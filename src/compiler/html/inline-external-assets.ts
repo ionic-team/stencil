@@ -81,5 +81,5 @@ async function getAssetContent(config: Config, ctx: CompilerCtx, outputTarget: O
 
 export function getFilePathFromUrl(config: Config, outputTarget: OutputTarget, fromUrl: Url, toUrl: Url) {
   const resolvedUrl = '.' + config.sys.url.resolve(fromUrl.pathname, toUrl.pathname);
-  return pathJoin(config, outputTarget.path, resolvedUrl);
+  return pathJoin(config, outputTarget.dir, resolvedUrl);
 }

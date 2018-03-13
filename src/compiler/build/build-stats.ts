@@ -79,7 +79,7 @@ export async function generateStatsOutputTarget(config: Config, compilerCtx: Com
       jsonData = stats;
     }
 
-    await compilerCtx.fs.writeFile(outputTarget.path, JSON.stringify(jsonData, null, 2));
+    await compilerCtx.fs.writeFile(outputTarget.file, JSON.stringify(jsonData, null, 2));
     await compilerCtx.fs.commit();
 
   } catch (e) {}

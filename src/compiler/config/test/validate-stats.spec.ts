@@ -17,7 +17,7 @@ describe('validateStats', () => {
       flags: {},
       outputTargets: [{
         type: 'www',
-        path: '/www'
+        dir: '/www'
       }]
     };
   });
@@ -29,28 +29,28 @@ describe('validateStats', () => {
     validateStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats');
     expect(o).toBeDefined();
-    expect(o.path).toContain('stencil-stats.json');
+    expect(o.file).toContain('stencil-stats.json');
   });
 
   it('uses stats config, custom path', () => {
     config.outputTargets.push({
       type: 'stats',
-      path: 'custom-path.json'
+      file: 'custom-path.json'
     });
     validateStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats');
     expect(o).toBeDefined();
-    expect(o.path).toContain('custom-path.json');
+    expect(o.file).toContain('custom-path.json');
   });
 
-  it('uses stats config, defaults path', () => {
+  it('uses stats config, defaults file', () => {
     config.outputTargets.push({
       type: 'stats'
     });
     validateStats(config);
     const o = config.outputTargets.find(o => o.type === 'stats');
     expect(o).toBeDefined();
-    expect(o.path).toContain('stencil-stats.json');
+    expect(o.file).toContain('stencil-stats.json');
   });
 
   it('default no stats', () => {

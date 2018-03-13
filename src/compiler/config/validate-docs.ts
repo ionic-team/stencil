@@ -24,11 +24,11 @@ export function validateDocs(config: Config) {
 
 function validateDocsOutputTarget(config: Config, outputTarget: OutputTarget) {
   if (outputTarget.format === 'json') {
-    if (!outputTarget.path) {
-      outputTarget.path = 'dist/docs';
+    if (!outputTarget.dir) {
+      outputTarget.dir = 'dist/docs';
     }
-    if (!config.sys.path.isAbsolute(outputTarget.path)) {
-      outputTarget.path = pathJoin(config, config.rootDir, outputTarget.path);
+    if (!config.sys.path.isAbsolute(outputTarget.dir)) {
+      outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
     }
 
   } else {
