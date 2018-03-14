@@ -40,7 +40,7 @@
   "dependencies": {
     "chokidar": "2.0.1",
     "jsdom": "11.5.1",
-    "rollup": "0.56.3",
+    "rollup": "0.56.5",
     "rollup-plugin-commonjs": "8.3.0",
     "rollup-plugin-node-builtins": "2.1.2",
     "rollup-plugin-node-globals": "1.1.0",
