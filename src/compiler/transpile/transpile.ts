@@ -6,7 +6,7 @@ import { generateComponentTypes } from './create-component-types';
 import { getComponentsDtsSrcFilePath } from '../collections/distribution';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
-import { hasError } from '../util';
+import { hasError, normalizePath } from '../util';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { moduleGraph } from './transformers/module-graph';
 import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
@@ -122,7 +122,7 @@ export function transpileModule(config: Config, compilerOptions: ts.CompilerOpti
     diagnostics: null,
     cmpMeta: null
   };
-
+  path = normalizePath(path);
   const checkProgram = ts.createProgram([path], compilerOptions);
 
   // Gather component metadata and type info
