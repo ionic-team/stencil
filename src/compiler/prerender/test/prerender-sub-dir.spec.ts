@@ -11,7 +11,7 @@ describe('prerender', () => {
   let config: d.Config;
   let outputTarget: d.OutputTargetWww;
 
-  fit('should prerender www dir w/ sub directory', async () => {
+  it('should prerender www dir w/ sub directory', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
     config.flags.prerender = true;
@@ -62,19 +62,20 @@ describe('prerender', () => {
     );
 
     doNotExpectFiles(c.fs, [
+      '/www/docs/docs/index.html',
       '/www/docs/data.pdf',
       '/www/docs/data.pdf/index.html',
       '/www/docs/components/button/index.html'
     ]);
 
     const indexHtml = await c.fs.readFile('/www/docs/index.html');
-    expect(indexHtml).toContain('<script data-resource-path="/build/app/">');
+    expect(indexHtml).toContain('<script data-resource-path="/docs/build/app/">');
 
     const aboutHtml = await c.fs.readFile('/www/docs/about/index.html');
-    expect(aboutHtml).toContain('<script data-resource-path="/build/app/">');
+    expect(aboutHtml).toContain('<script data-resource-path="/docs/build/app/">');
 
     const toggleHtml = await c.fs.readFile('/www/docs/components/toggle/index.html');
-    expect(toggleHtml).toContain('<script data-resource-path="/build/app/">');
+    expect(toggleHtml).toContain('<script data-resource-path="/docs/build/app/">');
   });
 
 });

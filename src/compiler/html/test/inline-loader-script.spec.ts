@@ -1,4 +1,8 @@
-import { isLoaderScriptSrc } from '../inline-loader-script';
+import * as d from '../../../declarations';
+import { isLoaderScriptSrc, setDataResourcePathAttr } from '../inline-loader-script';
+import { mockStencilSystem } from '../../../testing/mocks';
+import { TestingConfig } from '../../../testing';
+import { validateConfig } from '../../config/validate-config';
 
 
 describe('isLoaderScriptSrc', () => {
@@ -78,6 +82,43 @@ describe('isLoaderScriptSrc', () => {
     const scriptSrc = null;
     const r = isLoaderScriptSrc(loaderFileName, scriptSrc);
     expect(r).toBe(false);
+  });
+
+});
+
+
+describe('setDataResourcePathAttr',  () => {
+
+  let config: d.Config;
+  let outputTarget: d.OutputTargetHydrate;
+
+  beforeEach(() => {
+    config = new TestingConfig();
+    validateConfig(config);
+    outputTarget = config.outputTargets[0];
+  });
+
+  it('add baseUrl', () => {
+    outputTarget.baseUrl = '/my/base/url/';
+    const r = setDataResourcePathAttr(config, outputTarget);
+    expect(r).toBe('/my/base/url/build/app/');
+  });
+
+  it('use config.resourcePath if given', () => {
+    outputTarget.resourcePath = '/my/resource/path/';
+    const r = setDataResourcePathAttr(config, outputTarget);
+    expect(r).toBe('/my/resource/path/');
+  });
+
+  it('custom namespace', () => {
+    config.fsNamespace = 'my-namespace';
+    const r = setDataResourcePathAttr(config, outputTarget);
+    expect(r).toBe('/build/my-namespace/');
+  });
+
+  it('defaults', () => {
+    const r = setDataResourcePathAttr(config, outputTarget);
+    expect(r).toBe('/build/app/');
   });
 
 });

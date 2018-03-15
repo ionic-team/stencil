@@ -97,19 +97,7 @@ async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.
   // only add the data-resource-path attr if we don't already have one
   const existingResourcePathAttr = scriptElm.getAttribute('data-resource-path');
   if (!existingResourcePathAttr) {
-    let resourcePath = outputTarget.resourcePath;
-    if (!resourcePath) {
-      resourcePath = config.sys.path.join(outputTarget.buildDir, config.fsNamespace);
-      resourcePath = normalizePath(config.sys.path.relative(outputTarget.dir, resourcePath));
-
-      if (!resourcePath.startsWith('/')) {
-        resourcePath = '/' + resourcePath;
-      }
-
-      if (!resourcePath.endsWith('/')) {
-        resourcePath = resourcePath + '/';
-      }
-    }
+    const resourcePath = setDataResourcePathAttr(config, outputTarget);
 
     // add the resource path data attribute
     scriptElm.setAttribute('data-resource-path', resourcePath);
@@ -125,4 +113,26 @@ async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.
     // place it back in the dom, but at the bottom of the body
     doc.body.appendChild(scriptElm);
   }
+}
+
+
+export function setDataResourcePathAttr(config: d.Config, outputTarget: d.OutputTargetHydrate) {
+  let resourcePath = outputTarget.resourcePath;
+
+  if (!resourcePath) {
+    resourcePath = config.sys.path.join(outputTarget.buildDir, config.fsNamespace);
+    resourcePath = normalizePath(config.sys.path.relative(outputTarget.dir, resourcePath));
+
+    if (!resourcePath.startsWith('/')) {
+      resourcePath = '/' + resourcePath;
+    }
+
+    if (!resourcePath.endsWith('/')) {
+      resourcePath = resourcePath + '/';
+    }
+
+    resourcePath = outputTarget.baseUrl + resourcePath.substring(1);
+  }
+
+  return resourcePath;
 }

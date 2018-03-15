@@ -140,8 +140,11 @@ export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTarg
   const parsedUrl = config.sys.url.parse(url);
 
   let pathName = parsedUrl.pathname;
-  if (pathName.startsWith(outputTarget.baseUrl) || outputTarget.baseUrl === pathName + '/') {
+  if (pathName.startsWith(outputTarget.baseUrl)) {
     pathName = pathName.substring(outputTarget.baseUrl.length);
+
+  } else if (outputTarget.baseUrl === pathName + '/') {
+    pathName = '/';
   }
 
   // figure out the directory where this file will be saved
