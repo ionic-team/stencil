@@ -21,7 +21,7 @@ import { toDashCase } from '../util/helpers';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClientLegacy(namespace: string, Context: CoreContext, win: Window, doc: Document, resourcePath: string, hydratedCssClass: string) {
+export function createPlatformClientLegacy(namespace: string, Context: CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const bundleQueue: BundleCallback[] = [];
   const loadedBundles: {[bundleId: string]: any} = {};
@@ -35,7 +35,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   Context.window = win;
   Context.location = win.location;
   Context.document = doc;
-  Context.resourcePath = Context.publicPath = resourcePath;
+  Context.resourcesUrl = Context.publicPath = resourcesUrl;
 
   if (Build.listener) {
     Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
@@ -241,7 +241,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
 
     const missingDependents = dependentsList.filter(d => !loadedBundles[d]);
     missingDependents.forEach(d => {
-        const url = resourcePath + d.replace('.js', '.es5.js');
+        const url = resourcesUrl + d.replace('.js', '.es5.js');
         requestUrl(url);
       });
     bundleQueue.push([bundleId, dependentsList, importer]);
@@ -310,7 +310,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   function requestComponentBundle(cmpMeta: ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
-    url = resourcePath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js');
+    url = resourcesUrl + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js');
 
     requestUrl(url, tmrId, scriptElm);
   }

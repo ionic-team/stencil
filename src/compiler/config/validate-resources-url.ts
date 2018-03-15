@@ -1,0 +1,14 @@
+import * as d from '../../declarations';
+import { normalizePath } from '../util';
+
+
+export function validateResourcesUrl(outputTarget: d.OutputTargetWww) {
+  if (typeof outputTarget.resourcesUrl === 'string') {
+    outputTarget.resourcesUrl = normalizePath(outputTarget.resourcesUrl.trim());
+
+    if (outputTarget.resourcesUrl.charAt(outputTarget.resourcesUrl.length - 1) !== '/') {
+      // ensure there's a trailing /
+      outputTarget.resourcesUrl += '/';
+    }
+  }
+}

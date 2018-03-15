@@ -157,7 +157,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
 
     const www: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
     if (www) {
-      www.resourcePath = (config as any).publicPath;
+      www.resourcesUrl = (config as any).publicPath;
     }
 
     delete (config as any).publicPath;

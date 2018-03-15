@@ -6,7 +6,7 @@ var injectTestingScript = [
   'var StencilTesting = require("@stencil/core/testing");',
   'var h = StencilTesting.h;',
   'var t = StencilTesting.t;',
-  'var resourcePath = "build/"',
+  'var resourcesUrl = "build/"',
   'var Context = {};'
 ].join('\n');
 

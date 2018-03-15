@@ -35,13 +35,13 @@ describe('_deprecated multiple targets', () => {
     expect(r).toHaveLength(1);
   });
 
-  it('resourcePath', () => {
+  it('resourcesUrl', () => {
     (config as any).publicPath = 'my-resource-path';
     config.outputTargets = [ { type: 'www' }, { type: 'dist' } ];
     const r = _deprecatedToMultipleTarget(config);
-    expect((config as any).resourcePath).toBeUndefined();
+    expect((config as any).publicPath).toBeUndefined();
     expect((config.outputTargets[0] as d.OutputTargetWww).type).toBe('www');
-    expect((config.outputTargets[0] as d.OutputTargetWww).resourcePath).toBe('my-resource-path');
+    expect((config.outputTargets[0] as d.OutputTargetWww).resourcesUrl).toBe('my-resource-path');
     expect(r).toHaveLength(1);
   });
 

@@ -23,7 +23,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'raf',
   'read',
   'ref',
-  'resourcePath',
+  'resourcesUrl',
   'write',
   '$definedCmps',
 

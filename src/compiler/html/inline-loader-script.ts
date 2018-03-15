@@ -94,13 +94,13 @@ async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.
   // remove the external src
   scriptElm.removeAttribute('src');
 
-  // only add the data-resource-path attr if we don't already have one
-  const existingResourcePathAttr = scriptElm.getAttribute('data-resource-path');
-  if (!existingResourcePathAttr) {
-    const resourcePath = setDataResourcePathAttr(config, outputTarget);
+  // only add the data-resources-url attr if we don't already have one
+  const existingResourcesUrlAttr = scriptElm.getAttribute('data-resources-url');
+  if (!existingResourcesUrlAttr) {
+    const resourcesUrl = setDataResourcesUrlAttr(config, outputTarget);
 
     // add the resource path data attribute
-    scriptElm.setAttribute('data-resource-path', resourcePath);
+    scriptElm.setAttribute('data-resources-url', resourcesUrl);
   }
 
   // inline the js content
@@ -116,23 +116,23 @@ async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.
 }
 
 
-export function setDataResourcePathAttr(config: d.Config, outputTarget: d.OutputTargetHydrate) {
-  let resourcePath = outputTarget.resourcePath;
+export function setDataResourcesUrlAttr(config: d.Config, outputTarget: d.OutputTargetHydrate) {
+  let resourcesUrl = outputTarget.resourcesUrl;
 
-  if (!resourcePath) {
-    resourcePath = config.sys.path.join(outputTarget.buildDir, config.fsNamespace);
-    resourcePath = normalizePath(config.sys.path.relative(outputTarget.dir, resourcePath));
+  if (!resourcesUrl) {
+    resourcesUrl = config.sys.path.join(outputTarget.buildDir, config.fsNamespace);
+    resourcesUrl = normalizePath(config.sys.path.relative(outputTarget.dir, resourcesUrl));
 
-    if (!resourcePath.startsWith('/')) {
-      resourcePath = '/' + resourcePath;
+    if (!resourcesUrl.startsWith('/')) {
+      resourcesUrl = '/' + resourcesUrl;
     }
 
-    if (!resourcePath.endsWith('/')) {
-      resourcePath = resourcePath + '/';
+    if (!resourcesUrl.endsWith('/')) {
+      resourcesUrl = resourcesUrl + '/';
     }
 
-    resourcePath = outputTarget.baseUrl + resourcePath.substring(1);
+    resourcesUrl = outputTarget.baseUrl + resourcesUrl.substring(1);
   }
 
-  return resourcePath;
+  return resourcesUrl;
 }

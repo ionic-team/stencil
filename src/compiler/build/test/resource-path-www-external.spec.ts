@@ -5,7 +5,7 @@ import * as path from 'path';
 
 jest.setTimeout(10000);
 
-describe('www loader/core resourcePath', () => {
+describe('www loader/core resourcesUrl', () => {
 
   let c: TestingCompiler;
   let config: TestingConfig;
@@ -17,7 +17,7 @@ describe('www loader/core resourcePath', () => {
 
     c = new TestingCompiler(config);
     const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
-    expect(wwwOutput.resourcePath).toBeUndefined();
+    expect(wwwOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c, '<script src="build/app.js"></script>');
 
@@ -29,11 +29,11 @@ describe('www loader/core resourcePath', () => {
     const loaderContent = await c.fs.readFile('/User/testing/www/build/app.js');
     execScript(win, doc, loaderContent);
 
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="app"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
+    const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="app"]');
+    const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcePath).toBe('http://emmitts-garage.com/build/app/');
+    expect(resourcesUrl).toBe('http://emmitts-garage.com/build/app/');
     expect(coreScriptSrc).toBe('http://emmitts-garage.com/build/app/app.core.js');
 
     const coreContent = await c.fs.readFile('/User/testing/www/build/app/app.core.js');
@@ -43,18 +43,18 @@ describe('www loader/core resourcePath', () => {
   });
 
 
-  it('custom resourcePath config w/ external loader script', async () => {
+  it('custom resourcesUrl config w/ external loader script', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
     config.rootDir = '/User/testing/';
     config.outputTargets = [{
       type: 'www',
-      resourcePath: '/some/resource/config/path'
+      resourcesUrl: '/some/resource/config/path'
     } as d.OutputTargetWww];
 
     c = new TestingCompiler(config);
     const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
-    expect(wwwOutput.resourcePath).toBe('/some/resource/config/path/');
+    expect(wwwOutput.resourcesUrl).toBe('/some/resource/config/path/');
 
     await setupFs(c, '<script src="build/app.js"></script>');
 
@@ -66,11 +66,11 @@ describe('www loader/core resourcePath', () => {
     const loaderContent = await c.fs.readFile('/User/testing/www/build/app.js');
     execScript(win, doc, loaderContent);
 
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace][data-namespace="app"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
+    const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace][data-namespace="app"]');
+    const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcePath).toBe('/some/resource/config/path/');
+    expect(resourcesUrl).toBe('/some/resource/config/path/');
     expect(coreScriptSrc).toBe('/some/resource/config/path/app.core.js');
 
     const coreContent = await c.fs.readFile('/User/testing/www/build/app/app.core.js');
@@ -80,16 +80,16 @@ describe('www loader/core resourcePath', () => {
   });
 
 
-  it('custom data-resource-path attr on external loader script', async () => {
+  it('custom data-resources-url attr on external loader script', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
     config.rootDir = '/User/testing/';
 
     c = new TestingCompiler(config);
     const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
-    expect(wwwOutput.resourcePath).toBeUndefined();
+    expect(wwwOutput.resourcesUrl).toBeUndefined();
 
-    await setupFs(c, '<script src="build/app.js" data-resource-path="/some/resource/attr/path/"></script>');
+    await setupFs(c, '<script src="build/app.js" data-resources-url="/some/resource/attr/path/"></script>');
 
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
@@ -99,11 +99,11 @@ describe('www loader/core resourcePath', () => {
     const loaderContent = await c.fs.readFile('/User/testing/www/build/app.js');
     execScript(win, doc, loaderContent);
 
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="app"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
+    const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="app"]');
+    const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcePath).toBe('/some/resource/attr/path/');
+    expect(resourcesUrl).toBe('/some/resource/attr/path/');
     expect(coreScriptSrc).toBe('/some/resource/attr/path/app.core.js');
 
     const coreContent = await c.fs.readFile('/User/testing/www/build/app/app.core.js');
@@ -169,13 +169,13 @@ describe('www loader/core resourcePath', () => {
         <!DOCTYPE html>
         <html>
         <head>
-          <script src="http://some-cdn.com/dist/other-stencil-app1.js" data-resource-path="http://some-cdn.com/dist/other-stencil-app1/" data-namespace="other-stencil-app1"></script>
+          <script src="http://some-cdn.com/dist/other-stencil-app1.js" data-resources-url="http://some-cdn.com/dist/other-stencil-app1/" data-namespace="other-stencil-app1"></script>
           <script>/* some other inlined script */</script>
           <script src="assets/other-local-stencil-app2.js"></script>
           <script>/* some other inlined script */</script>
-          <script src="assets/other-local-stencil-app2/other-local-stencil-app2.core.js" data-resource-path="/assets/other-local-stencil-app2/" data-namespace="other-local-stencil-app2"></script>
+          <script src="assets/other-local-stencil-app2/other-local-stencil-app2.core.js" data-resources-url="/assets/other-local-stencil-app2/" data-namespace="other-local-stencil-app2"></script>
           <script src="assets/jquery.js"></script>
-          <script src="http://some-cdn.com/dist/other-stencil-app3.js" data-resource-path="http://some-cdn.com/dist/other-stencil-app3/" data-namespace="other-stencil-app3"></script>
+          <script src="http://some-cdn.com/dist/other-stencil-app3.js" data-resources-url="http://some-cdn.com/dist/other-stencil-app3/" data-namespace="other-stencil-app3"></script>
           ${loaderSrc}
         </head>
         <body>

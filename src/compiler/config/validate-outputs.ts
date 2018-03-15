@@ -2,7 +2,7 @@ import * as d from '../../declarations';
 import { validateDocs } from './validate-docs';
 import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetWww } from './validate-outputs-www';
-import { validateResourcePath } from './validate-resource-path';
+import { validateResourcesUrl } from './validate-resources-url';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateStats } from './validate-stats';
 import { _deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
@@ -23,7 +23,7 @@ export function validateOutputTargets(config: d.Config) {
   }
 
   config.outputTargets.forEach(outputTarget => {
-    validateResourcePath(outputTarget);
+    validateResourcesUrl(outputTarget);
     validateServiceWorker(config, outputTarget);
   });
 }

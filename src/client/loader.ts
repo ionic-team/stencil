@@ -6,7 +6,7 @@ export function init(
   doc: HTMLDocument,
   namespace: string,
   fsNamespace: string,
-  resourcePath: string,
+  resourcesUrl: string,
   appCore: string,
   appCorePolyfilled: string,
   hydratedCssClass: string,
@@ -30,24 +30,24 @@ export function init(
   y = doc.querySelectorAll('script');
   for (x = y.length - 1; x >= 0; x--) {
     scriptElm = y[x];
-    if (scriptElm.src || scriptElm.hasAttribute('data-resource-path')) {
+    if (scriptElm.src || scriptElm.hasAttribute('data-resources-url')) {
       break;
     }
   }
 
   // get the resource path attribute on this script element
-  y = scriptElm.getAttribute('data-resource-path');
+  y = scriptElm.getAttribute('data-resources-url');
 
   if (y) {
-    // the script element has a data-resource-path attribute, always use that
-    resourcePath = y;
+    // the script element has a data-resources-url attribute, always use that
+    resourcesUrl = y;
   }
 
-  if (!resourcePath && scriptElm.src) {
-    // we don't have an exact resourcePath, so let's
+  if (!resourcesUrl && scriptElm.src) {
+    // we don't have an exact resourcesUrl, so let's
     // figure it out relative to this script's src and app's filesystem namespace
     y = scriptElm.src.split('/').slice(0, -1);
-    resourcePath = (y.join('/')) + (y.length ? '/' : '') + fsNamespace + '/';
+    resourcesUrl = (y.join('/')) + (y.length ? '/' : '') + fsNamespace + '/';
   }
 
   // request the core this browser needs
@@ -55,8 +55,8 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = resourcePath + (usePolyfills(win as any, win.location, x, 'import("")') ? appCorePolyfilled : appCore);
-  x.setAttribute('data-resource-path', resourcePath);
+  x.src = resourcesUrl + (usePolyfills(win as any, win.location, x, 'import("")') ? appCorePolyfilled : appCore);
+  x.setAttribute('data-resources-url', resourcesUrl);
   x.setAttribute('data-namespace', fsNamespace);
   doc.head.appendChild(x);
 }

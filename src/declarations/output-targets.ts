@@ -6,7 +6,7 @@ export interface OutputTargetWww extends OutputTarget {
   dir?: string;
   empty?: boolean;
   indexHtml?: string;
-  resourcePath?: string;
+  resourcesUrl?: string;
   serviceWorker?: d.ServiceWorkerConfig;
 
   baseUrl?: string;
@@ -31,7 +31,7 @@ export interface OutputTargetDist extends OutputTarget {
   collectionDir?: string;
   dir?: string;
   empty?: boolean;
-  resourcePath?: string;
+  resourcesUrl?: string;
   typesDir?: string;
 }
 

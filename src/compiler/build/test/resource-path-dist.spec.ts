@@ -1,10 +1,10 @@
+import * as d from '../../../declarations';
 import { TestingCompiler, TestingConfig } from '../../../testing';
 import { mockElement, mockHtml } from '../../../testing/mocks';
-import { OutputTarget } from '../../../declarations';
 import * as path from 'path';
 
 
-describe('dist loader/core resourcePath', () => {
+describe('dist loader/core resourcesUrl', () => {
 
   let c: TestingCompiler;
   let config: TestingConfig;
@@ -22,8 +22,8 @@ describe('dist loader/core resourcePath', () => {
     ];
 
     c = new TestingCompiler(config);
-    const distOutput = config.outputTargets.find(o => o.type === 'dist');
-    expect(distOutput.resourcePath).toBeUndefined();
+    const distOutput: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    expect(distOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c,
       '<script src="http://cdn.stenciljs.com/dist/myapp.js"></script>',
@@ -41,11 +41,11 @@ describe('dist loader/core resourcePath', () => {
     const loaderContent = await c.fs.readFile('/User/testing/dist/myapp.js');
     execScript(win, doc, loaderContent);
 
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="myapp"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
+    const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="myapp"]');
+    const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcePath).toBe('http://cdn.stenciljs.com/dist/myapp/');
+    expect(resourcesUrl).toBe('http://cdn.stenciljs.com/dist/myapp/');
     expect(coreScriptSrc).toBe('http://cdn.stenciljs.com/dist/myapp/myapp.core.js');
 
     const coreContent = await c.fs.readFile('/User/testing/dist/myapp/myapp.core.js');
@@ -64,12 +64,12 @@ describe('dist loader/core resourcePath', () => {
       {
         type: 'dist',
         buildDir: 'some-build'
-      }
+      } as d.OutputTargetDist
     ];
 
     c = new TestingCompiler(config);
-    const distOutput = config.outputTargets.find(o => o.type === 'dist');
-    expect(distOutput.resourcePath).toBeUndefined();
+    const distOutput: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    expect(distOutput.resourcesUrl).toBeUndefined();
 
     await setupFs(c,
       '<script src="http://cdn.stenciljs.com/dist/some-build/myapp.js"></script>',
@@ -87,11 +87,11 @@ describe('dist loader/core resourcePath', () => {
     const loaderContent = await c.fs.readFile('/User/testing/dist/some-build/myapp.js');
     execScript(win, doc, loaderContent);
 
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="myapp"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
+    const coreScriptElm = doc.head.querySelector('script[data-resources-url][data-namespace="myapp"]');
+    const resourcesUrl = coreScriptElm.getAttribute('data-resources-url');
     const coreScriptSrc = coreScriptElm.getAttribute('src');
 
-    expect(resourcePath).toBe('http://cdn.stenciljs.com/dist/some-build/myapp/');
+    expect(resourcesUrl).toBe('http://cdn.stenciljs.com/dist/some-build/myapp/');
     expect(coreScriptSrc).toBe('http://cdn.stenciljs.com/dist/some-build/myapp/myapp.core.js');
 
     const coreContent = await c.fs.readFile('/User/testing/dist/some-build/myapp/myapp.core.js');
@@ -157,13 +157,13 @@ describe('dist loader/core resourcePath', () => {
         <!DOCTYPE html>
         <html>
         <head>
-          <script src="http://some-cdn.com/dist/other-stencil-app1.js" data-resource-path="http://some-cdn.com/dist/other-stencil-app1/" data-namespace="other-stencil-app1"></script>
+          <script src="http://some-cdn.com/dist/other-stencil-app1.js" data-resources-url="http://some-cdn.com/dist/other-stencil-app1/" data-namespace="other-stencil-app1"></script>
           <script>/* some other inlined script */</script>
           <script src="assets/other-local-stencil-app2.js"></script>
           <script>/* some other inlined script */</script>
-          <script src="assets/other-local-stencil-app2/other-local-stencil-app2.core.js" data-resource-path="/assets/other-local-stencil-app2/" data-namespace="other-local-stencil-app2"></script>
+          <script src="assets/other-local-stencil-app2/other-local-stencil-app2.core.js" data-resources-url="/assets/other-local-stencil-app2/" data-namespace="other-local-stencil-app2"></script>
           <script src="assets/jquery.js"></script>
-          <script src="http://some-cdn.com/dist/other-stencil-app3.js" data-resource-path="http://some-cdn.com/dist/other-stencil-app3/" data-namespace="other-stencil-app3"></script>
+          <script src="http://some-cdn.com/dist/other-stencil-app3.js" data-resources-url="http://some-cdn.com/dist/other-stencil-app3/" data-namespace="other-stencil-app3"></script>
           ${loaderSrc}
         </head>
         <body>

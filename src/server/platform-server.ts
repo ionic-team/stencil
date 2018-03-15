@@ -61,7 +61,7 @@ export function createPlatformServer(
   win[config.namespace] = App;
 
   const appBuildDir = getAppBuildDir(config, outputTarget);
-  Context.resourcePath = Context.publicPath = appBuildDir;
+  Context.resourcesUrl = Context.publicPath = appBuildDir;
 
   // create the sandboxed context with a new instance of a V8 Context
   // V8 Context provides an isolated global environment

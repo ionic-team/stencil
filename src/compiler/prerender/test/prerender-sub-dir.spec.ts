@@ -71,13 +71,13 @@ describe('prerender', () => {
     ]);
 
     const indexHtml = await c.fs.readFile('/www/docs/index.html');
-    expect(indexHtml).toContain('<script data-resource-path="/docs/build/app/">');
+    expect(indexHtml).toContain('<script data-resources-url="/docs/build/app/">');
 
     const aboutHtml = await c.fs.readFile('/www/docs/about/index.html');
-    expect(aboutHtml).toContain('<script data-resource-path="/docs/build/app/">');
+    expect(aboutHtml).toContain('<script data-resources-url="/docs/build/app/">');
 
     const toggleHtml = await c.fs.readFile('/www/docs/components/toggle/index.html');
-    expect(toggleHtml).toContain('<script data-resource-path="/docs/build/app/">');
+    expect(toggleHtml).toContain('<script data-resources-url="/docs/build/app/">');
   });
 
 });

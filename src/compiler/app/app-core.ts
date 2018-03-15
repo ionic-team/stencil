@@ -45,10 +45,10 @@ export async function generateCore(config: Config, compilerCtx: CompilerCtx, bui
 export function wrapCoreJs(config: Config, jsContent: string) {
   const output = [
     generatePreamble(config) + '\n',
-    `(function(Context,namespace,hydratedCssClass,resourcePath,s){`,
+    `(function(Context,namespace,hydratedCssClass,resourcesUrl,s){`,
     `"use strict";\n`,
     `s=document.querySelector("script[data-namespace='${config.fsNamespace}']");`,
-    `if(s){resourcePath=s.getAttribute('data-resource-path');}\n`,
+    `if(s){resourcesUrl=s.getAttribute('data-resources-url');}\n`,
     jsContent.trim(),
     `\n})({},"${config.namespace}","${config.hydratedCssClass}");`
   ].join('');

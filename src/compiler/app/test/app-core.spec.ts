@@ -1,4 +1,4 @@
-import { CompilerCtx, Config, OutputTarget } from '../../../declarations';
+import * as d from '../../../declarations';
 import { generatePreamble } from '../../util';
 import { mockConfig } from '../../../testing/mocks';
 import * as core from '../app-core';
@@ -6,9 +6,9 @@ import * as core from '../app-core';
 
 describe('app-core', () => {
 
-  let config: Config;
-  let outputTarget: OutputTarget;
-  let ctx: CompilerCtx;
+  let config: d.Config;
+  let outputTarget: d.OutputTargetWww;
+  let ctx: d.CompilerCtx;
 
   beforeEach(() => {
     config = mockConfig();
@@ -22,7 +22,7 @@ describe('app-core', () => {
     beforeEach(() => {
       config.namespace = 'WillyWendLeSWeTWasaBi';
       config.fsNamespace = config.namespace.toLowerCase();
-      outputTarget.resourcePath = 'Projects\\Ionic\\Stencil';
+      outputTarget.resourcesUrl = 'Projects\\Ionic\\Stencil';
     });
 
     it('starts with the preamble', () => {
@@ -33,7 +33,7 @@ describe('app-core', () => {
 
     it('wraps the JS content in an IFEE', () => {
       const lines = core.wrapCoreJs(config, 'this is JavaScript code, really it is').split('\n');
-      expect(lines[1]).toEqual(`(function(Context,namespace,hydratedCssClass,resourcePath,s){"use strict";`);
+      expect(lines[1]).toEqual(`(function(Context,namespace,hydratedCssClass,resourcesUrl,s){"use strict";`);
       expect(lines[3]).toEqual('this is JavaScript code, really it is');
       expect(lines[4]).toEqual(`})({},"${config.namespace}","${config.hydratedCssClass}");`);
     });

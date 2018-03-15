@@ -19,7 +19,7 @@ import { proxyController } from '../core/proxy-controller';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClient(namespace: string, Context: CoreContext, win: Window, doc: Document, resourcePath: string, hydratedCssClass: string) {
+export function createPlatformClient(namespace: string, Context: CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
   const cmpRegistry: ComponentRegistry = { 'html': {} };
   const controllerComponents: {[tag: string]: HostElement} = {};
   const App: AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
@@ -30,7 +30,7 @@ export function createPlatformClient(namespace: string, Context: CoreContext, wi
   Context.window = win;
   Context.location = win.location;
   Context.document = doc;
-  Context.resourcePath = Context.publicPath = resourcePath;
+  Context.resourcesUrl = Context.publicPath = resourcesUrl;
 
   if (Build.listener) {
     Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
@@ -172,7 +172,7 @@ export function createPlatformClient(namespace: string, Context: CoreContext, wi
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
         cmpMeta.bundleIds :
         cmpMeta.bundleIds[modeName];
-      const url = resourcePath + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
+      const url = resourcesUrl + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.js');
 
       // dynamic es module import() => woot!
       __import(url).then(importedModule => {

@@ -165,14 +165,14 @@ async function wrapGlobalJs(config: Config, compilerCtx: CompilerCtx, buildCtx: 
     }
   }
 
-  return `\n(function(resourcePath){${jsContent}\n})(resourcePath);\n`;
+  return `\n(function(resourcesUrl){${jsContent}\n})(resourcesUrl);\n`;
 }
 
 
 export function generateGlobalJs(config: Config, globalJsContents: string[]) {
   const output = [
     generatePreamble(config) + '\n',
-    `(function(namespace,resourcePath){`,
+    `(function(namespace,resourcesUrl){`,
     `"use strict";\n`,
     globalJsContents.join('\n').trim(),
     `\n})("${config.namespace}");`

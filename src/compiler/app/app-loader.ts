@@ -68,12 +68,12 @@ export function injectAppIntoLoader(
 
   const cmpLoaderRegistryStr = JSON.stringify(cmpLoaderRegistry);
 
-  const resourcePath = outputTarget.resourcePath ? `"${outputTarget.resourcePath}"` : 0;
+  const resourcesUrl = outputTarget.resourcesUrl ? `"${outputTarget.resourcesUrl}"` : 0;
 
   const loaderArgs = [
     `"${config.namespace}"`,
     `"${config.fsNamespace}"`,
-    `${resourcePath}`,
+    `${resourcesUrl}`,
     `"${appCoreFileName}"`,
     `"${appCorePolyfilledFileName}"`,
     `"${hydratedCssClass}"`,
