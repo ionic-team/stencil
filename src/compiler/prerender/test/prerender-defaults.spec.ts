@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { expectFilesWritten } from '../../../testing/utils';
+import { doNotExpectFiles, expectFilesWritten } from '../../../testing/utils';
 import { TestingCompiler, TestingConfig } from '../../../testing/index';
 
 jest.setTimeout(10000);
@@ -17,7 +17,7 @@ describe('prerender', () => {
 
     c = new TestingCompiler(config);
     await c.fs.writeFile('/src/index.html', `
-      <script src="/docs/build/app.js"></script>
+      <script src="/build/app.js"></script>
       <ionic-docs></ionic-docs>
     `);
     await c.fs.writeFile('/src/components/ionic-docs/ionic-docs.tsx', `
@@ -27,7 +27,8 @@ describe('prerender', () => {
           return (
             <div>
               <a href="/about">About</a>
-              <a href="/components/toggle">Toggle</a>
+              <a href="/components/toggle" target="_SELF">Toggle</a>
+              <a href="/components/button" target="_BLANK">Button</a>
             </div>
           );
         }
@@ -39,6 +40,7 @@ describe('prerender', () => {
     expect(r.diagnostics).toEqual([]);
 
     expectFilesWritten(r,
+      '/www/build/app.js',
       '/www/build/app/app.core.js',
       '/www/build/app/app.core.pf.js',
       '/www/build/app/ionic-docs.es5.js',
@@ -49,6 +51,10 @@ describe('prerender', () => {
       '/www/about/index.html',
       '/www/components/toggle/index.html'
     );
+
+    doNotExpectFiles(c.fs, [
+      '/www/components/button/index.html'
+    ]);
 
     const indexHtml = await c.fs.readFile('/www/index.html');
     expect(indexHtml).toContain('<script data-resource-path="/build/app/">');

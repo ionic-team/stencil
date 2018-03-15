@@ -14,6 +14,14 @@ describe('isValidCrawlableAnchor', () => {
     expect(r).toBe(false);
   });
 
+  it('true for _SELF target attr', () => {
+    const r = isValidCrawlableAnchor({
+      href: '/',
+      target: '_SELF'
+    });
+    expect(r).toBe(true);
+  });
+
   it('true for _self target attr', () => {
     const r = isValidCrawlableAnchor({
       href: '/',

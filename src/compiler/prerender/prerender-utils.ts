@@ -96,7 +96,7 @@ export function isValidCrawlableAnchor(anchor: d.HydrateAnchor) {
     return false;
   }
 
-  if (typeof anchor.target === 'string' && anchor.target !== '_self') {
+  if (typeof anchor.target === 'string' && anchor.target.trim().toLowerCase() !== '_self') {
     return false;
   }
 
