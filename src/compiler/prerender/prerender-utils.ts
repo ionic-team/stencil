@@ -2,19 +2,19 @@ import * as d from '../../declarations';
 import { pathJoin } from '../util';
 
 
-export function normalizePrerenderLocation(config: d.Config, outputTarget: d.OutputTargetWww, windowLocationHref: string, href: string) {
+export function normalizePrerenderLocation(config: d.Config, outputTarget: d.OutputTargetWww, windowLocationHref: string, url: string) {
   let prerenderLocation: d.PrerenderLocation = null;
 
   try {
-    if (typeof href !== 'string') {
+    if (typeof url !== 'string') {
       return null;
     }
 
     // remove any quotes that somehow got in the href
-    href = href.replace(/\'|\"/g, '');
+    url = url.replace(/\'|\"/g, '');
 
     // parse the <a href> passed in
-    const hrefParseUrl = config.sys.url.parse(href);
+    const hrefParseUrl = config.sys.url.parse(url);
 
     // don't bother for basically empty <a> tags
     if (!hrefParseUrl.pathname) {
@@ -32,7 +32,7 @@ export function normalizePrerenderLocation(config: d.Config, outputTarget: d.Out
 
     // convert it back to a nice in pretty path
     prerenderLocation = {
-      url: config.sys.url.resolve(windowLocationHref, href)
+      url: config.sys.url.resolve(windowLocationHref, url)
     };
 
     const normalizedUrl = config.sys.url.parse(prerenderLocation.url);
@@ -80,8 +80,27 @@ function prerenderFilter(url: d.Url) {
 
 export function crawlAnchorsForNextUrls(config: d.Config, outputTarget: d.OutputTargetWww, prerenderQueue: d.PrerenderLocation[], windowLocationHref: string, anchors: d.HydrateAnchor[]) {
   anchors && anchors.forEach(anchor => {
-    addLocationToProcess(config, outputTarget, windowLocationHref, prerenderQueue, anchor.href);
+    if (isValidCrawlableAnchor(anchor)) {
+      addLocationToProcess(config, outputTarget, windowLocationHref, prerenderQueue, anchor.href);
+    }
   });
+}
+
+
+export function isValidCrawlableAnchor(anchor: d.HydrateAnchor) {
+  if (!anchor) {
+    return false;
+  }
+
+  if (typeof anchor.href !== 'string' || anchor.href.trim() === '' || anchor.href.trim() === '#') {
+    return false;
+  }
+
+  if (typeof anchor.target === 'string' && anchor.target !== '_self') {
+    return false;
+  }
+
+  return true;
 }
 
 

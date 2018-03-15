@@ -53,6 +53,8 @@ export interface HydrateComponent {
 
 
 export interface HydrateAnchor {
+  href?: string;
+  target?: string;
   [attrName: string]: string;
 }
 

@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
-import { expectFilesWritten } from '../../../testing/utils';
+import { doNotExpectFiles, expectFilesWritten } from '../../../testing/utils';
 import { TestingCompiler, TestingConfig } from '../../../testing/index';
+
 
 jest.setTimeout(10000);
 
@@ -33,8 +34,11 @@ describe('prerender', () => {
         render() {
           return (
             <div>
-              <a href="/docs/about">About</a>
-              <a href="/docs/components/toggle">Toggle</a>
+              <a href="/docs">Overview</a>
+              <a HREF="/docs/about">About</a>
+              <a hReF="/docs/components/toggle" targeT="_self">Toggle</a>
+              <a href="/docs/components/button" target="_blank">Button</a>
+              <a href="/docs/data.pdf">Download PDF</a>
             </div>
           );
         }
@@ -56,6 +60,12 @@ describe('prerender', () => {
       '/www/docs/about/index.html',
       '/www/docs/components/toggle/index.html'
     );
+
+    doNotExpectFiles(c.fs, [
+      '/www/docs/data.pdf',
+      '/www/docs/data.pdf/index.html',
+      '/www/docs/components/button/index.html'
+    ]);
 
     const indexHtml = await c.fs.readFile('/www/docs/index.html');
     expect(indexHtml).toContain('<script data-resource-path="/build/app/">');

@@ -1,7 +1,66 @@
 import * as d from '../../../declarations';
-import { getWritePathFromUrl } from '../prerender-utils';
+import { getWritePathFromUrl, isValidCrawlableAnchor } from '../prerender-utils';
 import { TestingConfig } from '../../../testing';
 import { validateConfig } from '../../config/validate-config';
+
+
+describe('isValidCrawlableAnchor', () => {
+
+  it('true for non _self target attr', () => {
+    const r = isValidCrawlableAnchor({
+      href: '/',
+      target: '_blank'
+    });
+    expect(r).toBe(false);
+  });
+
+  it('true for _self target attr', () => {
+    const r = isValidCrawlableAnchor({
+      href: '/',
+      target: '_self'
+    });
+    expect(r).toBe(true);
+  });
+
+  it('true for valid href attr', () => {
+    const r = isValidCrawlableAnchor({
+      href: '/'
+    });
+    expect(r).toBe(true);
+  });
+
+  it('false for # href attr', () => {
+    const r = isValidCrawlableAnchor({
+      href: '#'
+    });
+    expect(r).toBe(false);
+  });
+
+  it('false for spaces only href attr', () => {
+    const r = isValidCrawlableAnchor({
+      href: '    '
+    });
+    expect(r).toBe(false);
+  });
+
+  it('false for empty href attr', () => {
+    const r = isValidCrawlableAnchor({
+      href: ''
+    });
+    expect(r).toBe(false);
+  });
+
+  it('false for no href attr', () => {
+    const r = isValidCrawlableAnchor({});
+    expect(r).toBe(false);
+  });
+
+  it('false for invalid anchor', () => {
+    const r = isValidCrawlableAnchor(null);
+    expect(r).toBe(false);
+  });
+
+});
 
 
 describe('getWritePathFromUrl', () => {

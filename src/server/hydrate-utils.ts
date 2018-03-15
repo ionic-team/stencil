@@ -147,7 +147,7 @@ export function collectAnchors(config: d.Config, doc: Document, results: d.Hydra
   const anchorElements = doc.querySelectorAll('a');
 
   for (var i = 0; i < anchorElements.length; i++) {
-    const attrs: any = {};
+    const attrs: d.HydrateAnchor = {};
     const anchorAttrs = anchorElements[i].attributes;
 
     for (var j = 0; j < anchorAttrs.length; j++) {
