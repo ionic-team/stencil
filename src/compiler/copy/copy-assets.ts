@@ -1,16 +1,16 @@
-import { AssetsMeta, BuildCtx, CompilerCtx, Config, CopyTask } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError, normalizePath, pathJoin } from '../util';
 import { getAppBuildDir } from '../app/app-file-naming';
 
 
-export async function copyComponentAssets(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function copyComponentAssets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
 
   if (canSkipAssetsCopy(config, compilerCtx, buildCtx)) {
     // no need to recopy all assets again
     return;
   }
 
-  const outputTargets = config.outputTargets.filter(outputTarget => {
+  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(outputTarget => {
     return outputTarget.type === 'www' || outputTarget.type === 'dist';
   });
 
@@ -19,9 +19,9 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
   try {
     // get a list of all the directories to copy
     // these paths should be absolute
-    const copyToBuildDir: AssetsMeta[] = [];
-    const copyToCollectionDir: AssetsMeta[] = [];
-    const copyTasks: CopyTask[] = [];
+    const copyToBuildDir: d.AssetsMeta[] = [];
+    const copyToCollectionDir: d.AssetsMeta[] = [];
+    const copyTasks: d.CopyTask[] = [];
 
     buildCtx.entryModules.forEach(entryModule => {
       const moduleFiles = entryModule.moduleFiles.filter(m => {
@@ -84,7 +84,7 @@ export async function copyComponentAssets(config: Config, compilerCtx: CompilerC
 
 
 
-export function canSkipAssetsCopy(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export function canSkipAssetsCopy(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build

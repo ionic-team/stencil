@@ -1,11 +1,11 @@
-import { Config } from '../../../declarations';
-import { validateDistOutputTarget } from '../validate-outputs-dist';
+import * as d from '../../../declarations';
+import { validateOutputTargetDist } from '../validate-outputs-dist';
 import * as path from 'path';
 
 
 describe('validateDistOutputTarget', () => {
 
-  let config: Config;
+  let config: d.Config;
   beforeEach(() => {
     config = {
       sys: {
@@ -16,33 +16,36 @@ describe('validateDistOutputTarget', () => {
   });
 
   it('should set dist values', () => {
-    config.outputTargets = [{
+    const outputTarget: d.OutputTargetDist = {
       type: 'dist',
       dir: 'my-dist',
       buildDir: 'my-build',
       empty: false
-    }];
-    validateDistOutputTarget(config);
-    expect(config.outputTargets[0]).toBeDefined();
-    expect(config.outputTargets[0].dir).toBe('/my-dist');
-    expect(config.outputTargets[0].buildDir).toBe('/my-dist/my-build');
-    expect(config.outputTargets[0].empty).toBe(false);
+    };
+    config.outputTargets = [outputTarget];
+    validateOutputTargetDist(config);
+    expect(config.outputTargets).toHaveLength(1);
+    expect(outputTarget).toBeDefined();
+    expect(outputTarget.dir).toBe('/my-dist');
+    expect(outputTarget.buildDir).toBe('/my-dist/my-build');
+    expect(outputTarget.empty).toBe(false);
   });
 
   it('should set defaults when outputTargets dist is empty', () => {
     config.outputTargets = [
       { type: 'dist' }
     ];
-    validateDistOutputTarget(config);
-    expect(config.outputTargets[0]).toBeDefined();
-    expect(config.outputTargets[0].dir).toBe('/dist');
-    expect(config.outputTargets[0].buildDir).toBe('/dist');
-    expect(config.outputTargets[0].empty).toBe(true);
+    validateOutputTargetDist(config);
+    const outputTarget: d.OutputTargetDist = config.outputTargets.find(o => o.type === 'dist');
+    expect(outputTarget).toBeDefined();
+    expect(outputTarget.dir).toBe('/dist');
+    expect(outputTarget.buildDir).toBe('/dist');
+    expect(outputTarget.empty).toBe(true);
   });
 
   it('should default to not add dist when outputTargets exists, but without dist', () => {
     config.outputTargets = [];
-    validateDistOutputTarget(config);
+    validateOutputTargetDist(config);
     expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
   });
 

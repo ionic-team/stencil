@@ -1,6 +1,5 @@
+import * as d from '../declarations';
 import { Cache } from '../compiler/cache';
-import { AppGlobal, CompilerCtx, ComponentInstance, ComponentMeta, ComponentRegistry, Config, DefaultSlot, DomApi, HostElement,
-  HydrateOptions, HydrateResults, NamedSlots, PlatformApi, RendererApi, StencilSystem, VNode } from '../declarations';
 import { createDomApi } from '../renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
@@ -14,17 +13,17 @@ import { TestingLogger } from './index';
 import { validateConfig } from '../compiler/config/validate-config';
 
 
-export function mockPlatform(win?: any, domApi?: DomApi) {
-  const hydrateResults: HydrateResults = {
+export function mockPlatform(win?: any, domApi?: d.DomApi) {
+  const hydrateResults: d.HydrateResults = {
     diagnostics: []
   };
-  const App: AppGlobal = {};
+  const App: d.AppGlobal = {};
   const config = mockConfig();
   const outputTarget = config.outputTargets[0];
 
   win = win || config.sys.createDom().parse({html: ''});
   domApi = domApi || createDomApi(App, win, win.document);
-  const cmpRegistry: ComponentRegistry = {};
+  const cmpRegistry: d.ComponentRegistry = {};
 
   const plt = createPlatformServer(
     config,
@@ -32,7 +31,7 @@ export function mockPlatform(win?: any, domApi?: DomApi) {
     win,
     win.document,
     cmpRegistry,
-    hydrateResults,
+    hydrateResults.diagnostics,
     false,
     null
   );
@@ -64,7 +63,7 @@ export function mockPlatform(win?: any, domApi?: DomApi) {
 
   const renderer = createRendererPatch(plt, domApi);
 
-  plt.render = function(oldVNode: VNode, newVNode: VNode, isUpdate: boolean, defaultSlot?: DefaultSlot, namedSlots?: NamedSlots) {
+  plt.render = function(oldVNode: d.VNode, newVNode: d.VNode, isUpdate: boolean, defaultSlot?: d.DefaultSlot, namedSlots?: d.NamedSlots) {
     return renderer(oldVNode, newVNode, isUpdate, defaultSlot, namedSlots);
   };
 
@@ -72,13 +71,13 @@ export function mockPlatform(win?: any, domApi?: DomApi) {
 }
 
 
-export interface MockedPlatform extends PlatformApi {
+export interface MockedPlatform extends d.PlatformApi {
   $flushQueue?: () => Promise<any>;
   $flushLoadBundle?: () => Promise<any>;
 }
 
 
-export function mockConfig(opts = { enableLogger: false }): Config {
+export function mockConfig(opts = { enableLogger: false }): d.Config {
   const config = new TestingConfig();
   (config.logger as TestingLogger).enable = opts.enableLogger;
   return validateConfig(config);
@@ -86,7 +85,7 @@ export function mockConfig(opts = { enableLogger: false }): Config {
 
 
 export function mockCompilerCtx() {
-  const compilerCtx: CompilerCtx = {
+  const compilerCtx: d.CompilerCtx = {
     activeBuildId: 0,
     fs: new InMemoryFileSystem(mockFs(), require('path')),
     collections: [],
@@ -98,7 +97,7 @@ export function mockCompilerCtx() {
 }
 
 
-export function mockStencilSystem(): StencilSystem {
+export function mockStencilSystem(): d.StencilSystem {
   return new TestingSystem();
 }
 
@@ -122,7 +121,7 @@ export function mockCache() {
 
 
 export function mockWindow() {
-  const opts: HydrateOptions = {
+  const opts: d.HydrateOptions = {
     userAgent: 'test'
   };
 
@@ -144,16 +143,16 @@ export function mockDocument(window?: Window) {
 
 
 export function mockDomApi(win?: any, doc?: any) {
-  const App: AppGlobal = {};
+  const App: d.AppGlobal = {};
   win = win || mockWindow();
   doc = doc || win.document;
   return createDomApi(App, win, doc);
 }
 
 
-export function mockRenderer(plt?: MockedPlatform, domApi?: DomApi): RendererApi {
+export function mockRenderer(plt?: MockedPlatform, domApi?: d.DomApi): d.RendererApi {
   plt = plt || mockPlatform();
-  return createRendererPatch(<PlatformApi>plt, domApi || mockDomApi());
+  return createRendererPatch(<d.PlatformApi>plt, domApi || mockDomApi());
 }
 
 
@@ -200,7 +199,7 @@ export function mockElement(tag = 'div'): Element {
   return jsdom.JSDOM.fragment(`<${tag}></${tag}>`).firstChild;
 }
 
-export function mockComponentInstance(plt: PlatformApi, domApi: DomApi, cmpMeta: ComponentMeta = {}): ComponentInstance {
+export function mockComponentInstance(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta = {}): d.ComponentInstance {
   mockDefine(plt, cmpMeta);
 
   const el = domApi.$createElement('ion-cmp') as any;
@@ -213,7 +212,7 @@ export function mockTextNode(text: string): Element {
 }
 
 
-export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
+export function mockDefine(plt: MockedPlatform, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.tagNameMeta) {
     cmpMeta.tagNameMeta = 'ion-cmp';
   }
@@ -225,18 +224,18 @@ export function mockDefine(plt: MockedPlatform, cmpMeta: ComponentMeta) {
     cmpMeta.membersMeta = {};
   }
 
-  (<PlatformApi>plt).defineComponent(cmpMeta);
+  (plt as d.PlatformApi).defineComponent(cmpMeta);
 
   return cmpMeta;
 }
 
-export function mockEvent(domApi: DomApi, name: string, detail: any = {}): CustomEvent {
+export function mockEvent(domApi: d.DomApi, name: string, detail: any = {}): CustomEvent {
   const evt = (domApi.$documentElement.parentNode as Document).createEvent('CustomEvent');
   evt.initCustomEvent(name, false, false, detail);
   return evt;
 }
 
-export function mockDispatchEvent(domApi: DomApi, el: HTMLElement, name: string, detail: any = {}): boolean {
+export function mockDispatchEvent(domApi: d.DomApi, el: HTMLElement, name: string, detail: any = {}): boolean {
   const ev = mockEvent(domApi, name, detail);
   return el.dispatchEvent(ev);
 }
@@ -251,28 +250,28 @@ export function mockConnect(plt: MockedPlatform, html: string) {
 }
 
 
-function connectComponents(plt: MockedPlatform, node: HostElement) {
+function connectComponents(plt: MockedPlatform, node: d.HostElement) {
   if (!node) return;
 
   if (node.tagName) {
     if (!plt.hasConnectedMap.has(node)) {
-      const cmpMeta = (plt as PlatformApi).getComponentMeta(node);
+      const cmpMeta = (plt as d.PlatformApi).getComponentMeta(node);
       if (cmpMeta) {
-        initHostElement((plt as PlatformApi), cmpMeta, node);
-        (<HostElement>node).connectedCallback();
+        initHostElement((plt as d.PlatformApi), cmpMeta, node);
+        (node as d.HostElement).connectedCallback();
       }
     }
   }
   if (node.childNodes) {
     for (var i = 0; i < node.childNodes.length; i++) {
-      connectComponents(plt, <HostElement>node.childNodes[i]);
+      connectComponents(plt, node.childNodes[i] as d.HostElement);
     }
   }
 }
 
 
-export async function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Promise<HostElement> {
-  const elm: HostElement = rootNode.tagName === tag.toLowerCase() ? rootNode : rootNode.querySelector(tag);
+export async function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Promise<d.HostElement> {
+  const elm: d.HostElement = rootNode.tagName === tag.toLowerCase() ? rootNode : rootNode.querySelector(tag);
 
     // flush to read attribute mode on host elment
   await plt.$flushQueue();

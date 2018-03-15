@@ -1,27 +1,33 @@
-import { CompilerCtx, Config, HydrateResults, OutputTarget, Url } from '../../declarations';
+import * as d from '../../declarations';
 import { pathJoin } from '../util';
 
 
-export async function inlineExternalAssets(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, results: HydrateResults, doc: Document) {
+export async function inlineExternalAssets(
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTargetHydrate,
+  windowLocationPath: string,
+  doc: Document
+) {
   const linkElements = doc.querySelectorAll('link[href][rel="stylesheet"]') as any;
   for (var i = 0; i < linkElements.length; i++) {
-    inlineStyle(config, compilerCtx, outputTarget, results, doc, linkElements[i] as any);
+    inlineStyle(config, compilerCtx, outputTarget, windowLocationPath, doc, linkElements[i] as any);
   }
 
   const scriptElements = doc.querySelectorAll('script[src]') as any;
   for (i = 0; i < scriptElements.length; i++) {
-    await inlineScript(config, compilerCtx, outputTarget, results, scriptElements[i] as any);
+    await inlineScript(config, compilerCtx, outputTarget, windowLocationPath, scriptElements[i] as any);
   }
 }
 
 
-async function inlineStyle(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, results: HydrateResults, doc: Document, linkElm: HTMLLinkElement) {
-  const content = await getAssetContent(config, compilerCtx, outputTarget, results, linkElm.href);
+async function inlineStyle(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, doc: Document, linkElm: HTMLLinkElement) {
+  const content = await getAssetContent(config, compilerCtx, outputTarget, windowLocationPath, linkElm.href);
   if (!content) {
     return;
   }
 
-  config.logger.debug(`optimize ${results.pathname}, inline style: ${config.sys.url.parse(linkElm.href).pathname}`);
+  config.logger.debug(`optimize ${windowLocationPath}, inline style: ${config.sys.url.parse(linkElm.href).pathname}`);
 
   const styleElm = doc.createElement('style');
   styleElm.innerHTML = content;
@@ -31,22 +37,26 @@ async function inlineStyle(config: Config, compilerCtx: CompilerCtx, outputTarge
 }
 
 
-async function inlineScript(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, results: HydrateResults, scriptElm: HTMLScriptElement) {
-  const content = await getAssetContent(config, compilerCtx, outputTarget, results, scriptElm.src);
+async function inlineScript(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, scriptElm: HTMLScriptElement) {
+  const content = await getAssetContent(config, compilerCtx, outputTarget, windowLocationPath, scriptElm.src);
   if (!content) {
     return;
   }
 
-  config.logger.debug(`optimize ${results.pathname}, inline script: ${scriptElm.src}`);
+  config.logger.debug(`optimize ${windowLocationPath}, inline script: ${scriptElm.src}`);
 
   scriptElm.innerHTML = content;
   scriptElm.removeAttribute('src');
 }
 
 
-async function getAssetContent(config: Config, ctx: CompilerCtx, outputTarget: OutputTarget, results: HydrateResults, assetUrl: string) {
+async function getAssetContent(config: d.Config, ctx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationPath: string, assetUrl: string) {
+  if (typeof assetUrl !== 'string' || assetUrl.trim() === '') {
+    return null;
+  }
+
   // figure out the url's so we can check the hostnames
-  const fromUrl = config.sys.url.parse(results.url);
+  const fromUrl = config.sys.url.parse(windowLocationPath);
   const toUrl = config.sys.url.parse(assetUrl);
 
   if (fromUrl.hostname !== toUrl.hostname) {
@@ -65,7 +75,7 @@ async function getAssetContent(config: Config, ctx: CompilerCtx, outputTarget: O
     // rough estimate of size
     const fileSize = content.length;
 
-    if (fileSize > results.opts.inlineAssetsMaxSize) {
+    if (fileSize > outputTarget.inlineAssetsMaxSize) {
       // welp, considered too big, don't inline
       return null;
     }
@@ -79,7 +89,7 @@ async function getAssetContent(config: Config, ctx: CompilerCtx, outputTarget: O
 }
 
 
-export function getFilePathFromUrl(config: Config, outputTarget: OutputTarget, fromUrl: Url, toUrl: Url) {
+export function getFilePathFromUrl(config: d.Config, outputTarget: d.OutputTargetHydrate, fromUrl: d.Url, toUrl: d.Url) {
   const resolvedUrl = '.' + config.sys.url.resolve(fromUrl.pathname, toUrl.pathname);
   return pathJoin(config, outputTarget.dir, resolvedUrl);
 }

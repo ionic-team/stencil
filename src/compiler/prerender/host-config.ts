@@ -1,10 +1,10 @@
-import { CompilerCtx, Config, EntryModule, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, OutputTarget } from '../../declarations';
+import { CompilerCtx, Config, EntryModule, HostConfig, HostRule, HostRuleHeader, HydrateComponent, HydrateResults, OutputTargetWww } from '../../declarations';
 import { DEFAULT_STYLE_MODE } from '../../util/constants';
 import { getAppBuildDir, getBundleFilename } from '../app/app-file-naming';
 import { pathJoin } from '../util';
 
 
-export async function generateHostConfig(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, entryModules: EntryModule[], hydrateResultss: HydrateResults[]) {
+export async function generateHostConfig(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetWww, entryModules: EntryModule[], hydrateResultss: HydrateResults[]) {
   const hostConfig: HostConfig = {
     hosting: {
       rules: []
@@ -34,7 +34,7 @@ export async function generateHostConfig(config: Config, compilerCtx: CompilerCt
 }
 
 
-export function generateHostRule(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, entryModules: EntryModule[], hydrateResults: HydrateResults) {
+export function generateHostRule(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetWww, entryModules: EntryModule[], hydrateResults: HydrateResults) {
   const hostRule: HostRule = {
     include: hydrateResults.path,
     headers: generateHostRuleHeaders(config, compilerCtx, outputTarget, entryModules, hydrateResults)
@@ -48,7 +48,7 @@ export function generateHostRule(config: Config, compilerCtx: CompilerCtx, outpu
 }
 
 
-export function generateHostRuleHeaders(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, entryModules: EntryModule[], hydrateResults: HydrateResults) {
+export function generateHostRuleHeaders(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetWww, entryModules: EntryModule[], hydrateResults: HydrateResults) {
   const hostRuleHeaders: HostRuleHeader[] = [];
 
   addStyles(config, hostRuleHeaders, hydrateResults);
@@ -68,7 +68,7 @@ function addCoreJs(_config: Config, _appCoreWWWPath: string, _hostRuleHeaders: H
 }
 
 
-export function addBundles(config: Config, outputTarget: OutputTarget, entryModules: EntryModule[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
+export function addBundles(config: Config, outputTarget: OutputTargetWww, entryModules: EntryModule[], hostRuleHeaders: HostRuleHeader[], components: HydrateComponent[]) {
   components = sortComponents(components);
 
   const bundleIds = getBundleIds(entryModules, components);
@@ -114,7 +114,7 @@ export function getBundleIds(entryModules: EntryModule[], components: HydrateCom
 }
 
 
-function getBundleUrl(config: Config, outputTarget: OutputTarget, bundleId: string) {
+function getBundleUrl(config: Config, outputTarget: OutputTargetWww, bundleId: string) {
   const unscopedFileName = getBundleFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), unscopedFileName);
   return pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, unscopedWwwBuildPath));
@@ -206,13 +206,13 @@ function formatLinkRelPreloadValue(url: string) {
 }
 
 
-function addDefaults(config: Config, outputTarget: OutputTarget, hostConfig: HostConfig) {
+function addDefaults(config: Config, outputTarget: OutputTargetWww, hostConfig: HostConfig) {
   addBuildDirCacheControl(config, outputTarget, hostConfig);
   addServiceWorkerNoCacheControl(config, outputTarget, hostConfig);
 }
 
 
-function addBuildDirCacheControl(config: Config, outputTarget: OutputTarget, hostConfig: HostConfig) {
+function addBuildDirCacheControl(config: Config, outputTarget: OutputTargetWww, hostConfig: HostConfig) {
   const relPath = pathJoin(config,
     '/',
     config.sys.path.relative(outputTarget.dir,
@@ -232,7 +232,7 @@ function addBuildDirCacheControl(config: Config, outputTarget: OutputTarget, hos
 }
 
 
-function addServiceWorkerNoCacheControl(config: Config, outputTarget: OutputTarget, hostConfig: HostConfig) {
+function addServiceWorkerNoCacheControl(config: Config, outputTarget: OutputTargetWww, hostConfig: HostConfig) {
   if (!outputTarget.serviceWorker) {
     return;
   }

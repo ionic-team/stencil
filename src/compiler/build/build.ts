@@ -2,7 +2,7 @@ import { BuildResults, CompilerCtx, Config, WatcherResults } from '../../declara
 import { bundle } from '../bundle/bundle';
 import { catchError } from '../util';
 import { copyTasks } from '../copy/copy-tasks';
-import { emptyDestDir, writeBuildFiles } from './write-build';
+import { emptyOutputTargetDirs } from './empty-dir';
 import { getBuildContext } from './build-utils';
 import { getCompilerCtx } from './compiler-ctx';
 import { generateAppFiles } from '../app/generate-app-files';
@@ -13,8 +13,9 @@ import { generateIndexHtmls } from '../html/generate-index-html';
 import { generateStyles } from '../style/style';
 import { initCollections } from '../collections/init-collections';
 import { initIndexHtmls } from '../html/init-index-html';
-import { prerenderApps } from '../prerender/prerender-app';
+import { prerenderOutputTargets } from '../prerender/prerender-app';
 import { transpileAppModules } from '../transpile/transpile-app-modules';
+import { writeBuildFiles } from './write-build';
 import { _deprecatedConfigCollections } from '../collections/_deprecated-collections';
 
 
@@ -34,7 +35,7 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // empty the directories on the first build
-    await emptyDestDir(config, compilerCtx);
+    await emptyOutputTargetDirs(config, compilerCtx);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // DEPRECATED config.colllections 2018-02-13
@@ -87,11 +88,11 @@ export async function build(config: Config, compilerCtx?: CompilerCtx, watcher?:
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // generate component docs
-    await generateDocs(config, compilerCtx);
-    if (buildCtx.shouldAbort()) return buildCtx.finish();
-
-    // prerender that app
-    await prerenderApps(config, compilerCtx, buildCtx, entryModules);
+    // and prerender can run in parallel
+    await Promise.all([
+      generateDocs(config, compilerCtx),
+      prerenderOutputTargets(config, compilerCtx, buildCtx, entryModules)
+    ]);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // write all the files and copy asset files

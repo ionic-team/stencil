@@ -1,4 +1,4 @@
-import { AppRegistry, CompilerCtx, ComponentRegistry, Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { APP_NAMESPACE_REGEX } from '../../util/constants';
 import { formatComponentLoaderRegistry } from '../../util/data-serialize';
 import { generatePreamble, minifyJs } from '../util';
@@ -6,11 +6,11 @@ import { getLoaderFileName, getLoaderPath } from './app-file-naming';
 
 
 export async function generateLoader(
-  config: Config,
-  compilerCtx: CompilerCtx,
-  outputTarget: OutputTarget,
-  appRegistry: AppRegistry,
-  cmpRegistry: ComponentRegistry
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTarget,
+  appRegistry: d.AppRegistry,
+  cmpRegistry: d.ComponentRegistry
 ) {
   const appLoaderFileName = getLoaderFileName(config);
 
@@ -56,12 +56,12 @@ export async function generateLoader(
 
 
 export function injectAppIntoLoader(
-  config: Config,
-  outputTarget: OutputTarget,
+  config: d.Config,
+  outputTarget: d.OutputTargetWww,
   appCoreFileName: string,
   appCorePolyfilledFileName: string,
   hydratedCssClass: string,
-  cmpRegistry: ComponentRegistry,
+  cmpRegistry: d.ComponentRegistry,
   loaderContent: string
 ) {
   const cmpLoaderRegistry = formatComponentLoaderRegistry(cmpRegistry);

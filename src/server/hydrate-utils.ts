@@ -1,11 +1,13 @@
-import { Config, Diagnostic, HydrateOptions, HydrateResults } from '../declarations';
-import { DEFAULT_PRERENDER_HOST, DEFAULT_SSR_CONFIG } from '../compiler/config/validate-prerender';
+import * as d from '../declarations';
 
 
-export function normalizeHydrateOptions(inputOpts: HydrateOptions) {
-  const opts: HydrateOptions = Object.assign({}, DEFAULT_SSR_CONFIG, inputOpts);
+export function normalizeHydrateOptions(wwwTarget: d.OutputTargetWww, opts: d.HydrateOptions) {
+  const hydrateTarget: d.OutputTargetHydrate = Object.assign({}, wwwTarget);
+  hydrateTarget.prerenderLocations = wwwTarget.prerenderLocations.map(p => Object.assign({}, p));
+
+  hydrateTarget.hydrateComponents = true;
+
   const req = opts.req;
-
   if (req && typeof req.get === 'function') {
     // assuming node express request object
     // https://expressjs.com/
@@ -15,21 +17,23 @@ export function normalizeHydrateOptions(inputOpts: HydrateOptions) {
     if (!opts.cookie) opts.cookie = req.get('cookie');
   }
 
-  return opts;
+  Object.assign(hydrateTarget, opts);
+
+  return hydrateTarget;
 }
 
 
-export function generateHydrateResults(config: Config, opts: HydrateOptions) {
-  if (!opts.url) {
-    opts.url = `https://${DEFAULT_PRERENDER_HOST}/`;
+export function generateHydrateResults(config: d.Config, hydrateTarget: d.OutputTargetHydrate) {
+  if (!hydrateTarget.url) {
+    hydrateTarget.url = `https://hydrate.stenciljs.com/`;
   }
 
   // https://nodejs.org/api/url.html
-  const urlParse =  config.sys.url.parse(opts.url);
+  const urlParse =  config.sys.url.parse(hydrateTarget.url);
 
-  const hydrateResults: HydrateResults = {
+  const hydrateResults: d.HydrateResults = {
     diagnostics: [],
-    url: opts.url,
+    url: hydrateTarget.url,
     host: urlParse.host,
     hostname: urlParse.hostname,
     port: urlParse.port,
@@ -38,23 +42,22 @@ export function generateHydrateResults(config: Config, opts: HydrateOptions) {
     search: urlParse.search,
     query: urlParse.query,
     hash: urlParse.hash,
-    html: opts.html,
+    html: hydrateTarget.html,
     styles: null,
     anchors: [],
     components: [],
     styleUrls: [],
     scriptUrls: [],
-    imgUrls: [],
-    opts: opts
+    imgUrls: []
   };
 
-  createConsole(config, opts, hydrateResults);
+  createConsole(config, hydrateTarget, hydrateResults);
 
   return hydrateResults;
 }
 
 
-function createConsole(config: Config, opts: HydrateOptions, results: HydrateResults) {
+function createConsole(config: d.Config, opts: d.HydrateOptions, results: d.HydrateResults) {
   const pathname = results.pathname;
   opts.console = opts.console || {};
 
@@ -86,7 +89,7 @@ function createConsole(config: Config, opts: HydrateOptions, results: HydrateRes
 }
 
 
-export function normalizeDirection(doc: Document, opts: HydrateOptions) {
+export function normalizeDirection(doc: Document, hydrateTarget: d.OutputTargetHydrate) {
   let dir = doc.body.getAttribute('dir');
   if (dir) {
     dir = dir.trim().toLowerCase();
@@ -95,8 +98,8 @@ export function normalizeDirection(doc: Document, opts: HydrateOptions) {
     }
   }
 
-  if (opts.direction) {
-    dir = opts.direction;
+  if (hydrateTarget.direction) {
+    dir = hydrateTarget.direction;
   } else {
     dir = doc.documentElement.getAttribute('dir');
   }
@@ -116,7 +119,7 @@ export function normalizeDirection(doc: Document, opts: HydrateOptions) {
 }
 
 
-export function normalizeLanguage(doc: Document, opts: HydrateOptions) {
+export function normalizeLanguage(doc: Document, hydrateTarget: d.OutputTargetHydrate) {
   let lang = doc.body.getAttribute('lang');
   if (lang) {
     lang = lang.trim().toLowerCase();
@@ -125,8 +128,8 @@ export function normalizeLanguage(doc: Document, opts: HydrateOptions) {
     }
   }
 
-  if (opts.language) {
-    lang = opts.language;
+  if (hydrateTarget.language) {
+    lang = hydrateTarget.language;
   } else {
     lang = doc.documentElement.getAttribute('lang');
   }
@@ -140,7 +143,7 @@ export function normalizeLanguage(doc: Document, opts: HydrateOptions) {
 }
 
 
-export function collectAnchors(config: Config, doc: Document, results: HydrateResults) {
+export function collectAnchors(config: d.Config, doc: Document, results: d.HydrateResults) {
   const anchorElements = doc.querySelectorAll('a');
 
   for (var i = 0; i < anchorElements.length; i++) {
@@ -158,11 +161,11 @@ export function collectAnchors(config: Config, doc: Document, results: HydrateRe
 }
 
 
-export function generateFailureDiagnostic(d: Diagnostic) {
+export function generateFailureDiagnostic(diagnostic: d.Diagnostic) {
   return `
     <div style="padding: 20px;">
-      <div style="font-weight: bold;">${d.header}</div>
-      <div>${d.messageText}</div>
+      <div style="font-weight: bold;">${diagnostic.header}</div>
+      <div>${diagnostic.messageText}</div>
     </div>
   `;
 }

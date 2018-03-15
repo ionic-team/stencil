@@ -1,11 +1,11 @@
-import { Config } from '../../declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export function validateDistOutputTarget(config: Config) {
+export function validateOutputTargetDist(config: d.Config) {
   const path = config.sys.path;
 
-  const distOutputTargets = config.outputTargets.filter(o => o.type === 'dist');
+  const distOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.type === 'dist');
 
   distOutputTargets.forEach(outputTarget => {
     if (!outputTarget.dir) {
@@ -45,6 +45,7 @@ export function validateDistOutputTarget(config: Config) {
     }
   });
 }
+
 
 const DEFAULT_DIST_DIR = 'dist';
 const DEFAULT_DIST_BUILD_DIR = '';

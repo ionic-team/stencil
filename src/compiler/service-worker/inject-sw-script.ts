@@ -1,7 +1,22 @@
-import { Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 
 
-export async function injectRegisterServiceWorker(config: Config, outputTarget: OutputTarget, indexHtml: string) {
+export async function updateIndexHtmlServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww, indexHtml: string) {
+  if (!outputTarget.serviceWorker && config.devMode) {
+    // if we're not generating a sw, and this is a dev build
+    // then let's inject a script that always unregisters any service workers
+    indexHtml = injectUnregisterServiceWorker(indexHtml);
+
+  } else if (outputTarget.serviceWorker) {
+    // we have a valid sw config, so we'll need to inject the register sw script
+    indexHtml = await injectRegisterServiceWorker(config, outputTarget, indexHtml);
+  }
+
+  return indexHtml;
+}
+
+
+export async function injectRegisterServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww, indexHtml: string) {
   const match = indexHtml.match(BODY_CLOSE_REG);
 
   let swUrl = config.sys.path.relative(outputTarget.dir, outputTarget.serviceWorker.swDest);

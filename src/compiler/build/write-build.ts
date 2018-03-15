@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
 import { generateDistributions } from '../collections/distribution';
@@ -6,7 +6,7 @@ import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { writeAppCollections } from '../collections/collection-data';
 
 
-export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   // serialize and write the manifest file if need be
   await writeAppCollections(config, compilerCtx, buildCtx);
 
@@ -48,23 +48,4 @@ export async function writeBuildFiles(config: Config, compilerCtx: CompilerCtx, 
   }
 
   timeSpan.finish(`writeBuildFiles finished, files wrote: ${totalFilesWrote}`);
-}
-
-
-export async function emptyDestDir(config: Config, compilerCtx: CompilerCtx) {
-  if (compilerCtx.isRebuild) {
-    // only empty the directories on the first build
-    return;
-  }
-
-  // let's empty out the build dest directory
-  await Promise.all(config.outputTargets.map(async outputTarget => {
-    if (!outputTarget.empty) {
-      return;
-    }
-
-    config.logger.debug(`empty dir: ${outputTarget.dir}`);
-
-    await compilerCtx.fs.emptyDir(outputTarget.dir);
-  }));
 }

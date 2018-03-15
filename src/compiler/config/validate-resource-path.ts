@@ -1,12 +1,8 @@
+import * as d from '../../declarations';
 import { normalizePath } from '../util';
-import { OutputTarget } from '../../declarations';
 
 
-export function validateResourcePath(outputTarget: OutputTarget) {
-  if (outputTarget.type !== 'www' && outputTarget.type !== 'dist') {
-    return;
-  }
-
+export function validateResourcePath(outputTarget: d.OutputTargetWww) {
   if (typeof outputTarget.resourcePath === 'string') {
     outputTarget.resourcePath = normalizePath(outputTarget.resourcePath.trim());
 

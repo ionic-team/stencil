@@ -1,4 +1,4 @@
-import { CompilerCtx, ComponentRegistry, Config, HydrateOptions, HydrateResults, OutputTarget, VNode } from '../declarations';
+import * as d from '../declarations';
 import { collectAnchors, generateFailureDiagnostic, generateHydrateResults, normalizeDirection, normalizeHydrateOptions, normalizeLanguage } from './hydrate-utils';
 import { connectChildElements } from './connect-element';
 import { createPlatformServer } from './platform-server';
@@ -6,35 +6,35 @@ import { optimizeHtml } from '../compiler/html/optimize-html';
 import { SSR_VNODE_ID } from '../util/constants';
 
 
-export function hydrateHtml(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, cmpRegistry: ComponentRegistry, opts: HydrateOptions): Promise<HydrateResults> {
-  return new Promise(resolve => {
+export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, cmpRegistry: d.ComponentRegistry, opts: d.HydrateOptions) {
+  return new Promise<d.HydrateResults>(resolve => {
 
     // validate the hydrate options and add any missing info
-    opts = normalizeHydrateOptions(opts);
+    const hydrateTarget = normalizeHydrateOptions(outputTarget, opts);
 
     // create the results object we're gonna return
-    const hydrateResults = generateHydrateResults(config, opts);
+    const hydrateResults = generateHydrateResults(config, hydrateTarget);
 
     // create a emulated window
     // attach data the request to the window
     const dom = config.sys.createDom();
-    const win = dom.parse(opts);
+    const win = dom.parse(hydrateTarget);
     const doc = win.document;
 
     // normalize dir and lang before connecting elements
     // so that the info is their incase they read it at runtime
-    normalizeDirection(doc, opts);
-    normalizeLanguage(doc, opts);
+    normalizeDirection(doc, hydrateTarget);
+    normalizeLanguage(doc, hydrateTarget);
 
     // create the platform
     const plt = createPlatformServer(
       config,
-      outputTarget,
+      hydrateTarget,
       win,
       doc,
       cmpRegistry,
-      hydrateResults,
-      opts.isPrerender,
+      hydrateResults.diagnostics,
+      hydrateTarget.isPrerender,
       compilerCtx
     );
 
@@ -57,15 +57,15 @@ export function hydrateHtml(config: Config, compilerCtx: CompilerCtx, outputTarg
       if (rootElm) {
         try {
           // optimize this document!!
-          await optimizeHtml(config, compilerCtx, outputTarget, doc, styles, opts, hydrateResults);
+          await optimizeHtml(config, compilerCtx, hydrateTarget, hydrateResults.url, doc, styles, hydrateResults.diagnostics);
 
           // gather up all of the <a> tag information in the doc
-          if (opts.collectAnchors !== false && opts.hydrateComponents !== false) {
+          if (hydrateTarget.isPrerender && hydrateTarget.hydrateComponents) {
             collectAnchors(config, doc, hydrateResults);
           }
 
           // serialize this dom back into a string
-          if (opts.serializeHtml !== false) {
+          if (hydrateTarget.serializeHtml !== false) {
             hydrateResults.html = dom.serialize();
           }
 
@@ -79,11 +79,11 @@ export function hydrateHtml(config: Config, compilerCtx: CompilerCtx, outputTarg
           });
 
           // idk, some error, just use the original html
-          hydrateResults.html = opts.html;
+          hydrateResults.html = hydrateTarget.html;
         }
       }
 
-      if (opts.destroyDom !== false) {
+      if (hydrateTarget.destroyDom !== false) {
         // always destroy the dom unless told otherwise
         dom.destroy();
 
@@ -98,7 +98,7 @@ export function hydrateHtml(config: Config, compilerCtx: CompilerCtx, outputTarg
       resolve(hydrateResults);
     };
 
-    if (opts.hydrateComponents === false) {
+    if (hydrateTarget.hydrateComponents === false) {
       plt.onAppLoad(win.document.body as any, []);
       return;
     }
@@ -107,11 +107,11 @@ export function hydrateHtml(config: Config, compilerCtx: CompilerCtx, outputTarg
     // and to connect any elements it may have just appened to the DOM
     let ssrIds = 0;
     const pltRender = plt.render;
-    plt.render = function render(oldVNode: VNode, newVNode, isUpdate, defaultSlots, namedSlotsMap, encapsulation) {
+    plt.render = function render(oldVNode: d.VNode, newVNode, isUpdate, defaultSlots, namedSlotsMap, encapsulation) {
       let ssrId: number;
       let existingSsrId: string;
 
-      if (opts.ssrIds !== false) {
+      if (hydrateTarget.ssrIds !== false) {
         // this may have been patched more than once
         // so reuse the ssr id if it already has one
         if (oldVNode && oldVNode.elm) {
@@ -140,7 +140,7 @@ export function hydrateHtml(config: Config, compilerCtx: CompilerCtx, outputTarg
     if (hydrateResults.components.length === 0) {
       // what gives, never found ANY host elements to connect!
       // ok we're just done i guess, idk
-      hydrateResults.html = opts.html;
+      hydrateResults.html = hydrateTarget.html;
       resolve(hydrateResults);
     }
   });

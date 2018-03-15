@@ -1,13 +1,11 @@
-import { Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { pathJoin } from '../util';
 
 
-export function validateStats(config: Config) {
+export function validateStats(config: d.Config) {
 
   if (config.flags.stats) {
-    const hasOutputTarget = config.outputTargets.some(outputTarget => {
-      return outputTarget.type === 'stats';
-    });
+    const hasOutputTarget = config.outputTargets.some(o => o.type === 'stats');
     if (!hasOutputTarget) {
       config.outputTargets.push({
         type: 'stats'
@@ -15,9 +13,7 @@ export function validateStats(config: Config) {
     }
   }
 
-  const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.type === 'stats';
-  });
+  const outputTargets = config.outputTargets.filter(o => o.type === 'stats');
 
   outputTargets.forEach(outputTarget => {
     validateStatsOutputTarget(config, outputTarget);
@@ -25,7 +21,7 @@ export function validateStats(config: Config) {
 }
 
 
-function validateStatsOutputTarget(config: Config, outputTarget: OutputTarget) {
+function validateStatsOutputTarget(config: d.Config, outputTarget: d.OutputTargetStats) {
   if (!outputTarget.file) {
     outputTarget.file = DEFAULT_JSON_FILE_NAME;
   }

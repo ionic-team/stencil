@@ -1,21 +1,20 @@
-import { Config } from '../../declarations';
-import { validateDistOutputTarget } from './validate-outputs-dist';
+import * as d from '../../declarations';
 import { validateDocs } from './validate-docs';
-import { validatePrerender } from './validate-prerender';
+import { validateOutputTargetDist } from './validate-outputs-dist';
+import { validateOutputTargetWww } from './validate-outputs-www';
 import { validateResourcePath } from './validate-resource-path';
 import { validateServiceWorker } from './validate-service-worker';
 import { validateStats } from './validate-stats';
-import { validateWwwOutputTarget } from './validate-outputs-www';
 import { _deprecatedToMultipleTarget } from './_deprecated-validate-multiple-targets';
 
 
-export function validateOutputTargets(config: Config) {
+export function validateOutputTargets(config: d.Config) {
 
   // setup outputTargets from deprecated config properties
   _deprecatedToMultipleTarget(config);
 
-  validateWwwOutputTarget(config);
-  validateDistOutputTarget(config);
+  validateOutputTargetWww(config);
+  validateOutputTargetDist(config);
   validateDocs(config);
   validateStats(config);
 
@@ -25,7 +24,6 @@ export function validateOutputTargets(config: Config) {
 
   config.outputTargets.forEach(outputTarget => {
     validateResourcePath(outputTarget);
-    validatePrerender(config, outputTarget);
     validateServiceWorker(config, outputTarget);
   });
 }

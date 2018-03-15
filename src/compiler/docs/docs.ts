@@ -1,4 +1,4 @@
-import { CompilerCtx, Config, OutputTarget } from '../../declarations';
+import { CompilerCtx, Config, OutputTargetDocs } from '../../declarations';
 import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
 import { generateJsons } from './json/generate-jsons';
@@ -49,7 +49,7 @@ export async function docs(config: Config, compilerCtx: CompilerCtx) {
 
 
 export function generateDocs(config: Config, compilerCtx: CompilerCtx) {
-  const docsOutputTargets = config.outputTargets.filter(o => o.type === 'docs');
+  const docsOutputTargets: OutputTargetDocs[] = config.outputTargets.filter(o => o.type === 'docs');
 
   return Promise.all(docsOutputTargets.map(outputTarget => {
     return generateDocOutputTarget(config, compilerCtx, outputTarget);
@@ -57,13 +57,13 @@ export function generateDocs(config: Config, compilerCtx: CompilerCtx) {
 }
 
 
-async function generateDocOutputTarget(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget) {
+async function generateDocOutputTarget(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetDocs) {
   if (outputTarget.format === 'readme') {
     return generateReadmes(config, compilerCtx);
   }
 
   if (outputTarget.format === 'json') {
-    return generateJsons(config, compilerCtx, outputTarget);
+    return generateJsons(config, compilerCtx);
   }
 
   throw new Error(`invalid docs format: ${outputTarget.format}`);

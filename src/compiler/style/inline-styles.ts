@@ -1,14 +1,14 @@
-import { Config, Diagnostic, HydrateResults } from '../../declarations';
+import * as d from '../../declarations';
 import { removeUnusedStyles } from './remove-unused-styles';
 import { UsedSelectors } from '../html/used-selectors';
 
 
-export function inlineComponentStyles(config: Config, doc: Document, styles: string[], results: HydrateResults, diagnostics: Diagnostic[]) {
+export function inlineComponentStyles(config: d.Config, outputTarget: d.OutputTargetHydrate, doc: Document, styles: string[], diagnostics: d.Diagnostic[]) {
   if (!styles.length) {
     return;
   }
 
-  if (results.opts.removeUnusedStyles !== false) {
+  if (outputTarget.removeUnusedStyles !== false) {
     // removeUnusedStyles is the default
     try {
       // pick out all of the selectors that are actually
@@ -28,8 +28,6 @@ export function inlineComponentStyles(config: Config, doc: Document, styles: str
       });
     }
   }
-
-  config.logger.debug(`optimize ${results.pathname}, inline component styles`);
 
   // insert our styles to the head of the document
   insertStyles(doc, styles);

@@ -60,7 +60,7 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
     config.devMode = true;
 
   } else {
-    config.devMode = !!config.devMode;
+    setBooleanConfig(config, 'devMode', null, DEFAULT_DEV_MODE);
   }
 
   // default devInspector to whatever devMode is
@@ -139,6 +139,7 @@ export function setProcessEnvironment(config: Config) {
 }
 
 
+const DEFAULT_DEV_MODE = false;
 const DEFAULT_HASHED_FILENAME_LENTH = 8;
 const MIN_HASHED_FILENAME_LENTH = 4;
 const MAX_HASHED_FILENAME_LENTH = 32;

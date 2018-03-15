@@ -1,11 +1,9 @@
-import { AssetsMeta, BuildCtx, Collection, CollectionData, CollectionDependencyData, CompilerCtx,
-  ComponentData, ComponentMeta, Config, EntryModule, EventData, ExternalStyleMeta, ListenMeta,
-  ListenerData, ModuleFile, OutputTarget, PropData, StyleData, StyleMeta } from '../../declarations';
+import * as d from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { normalizePath } from '../util';
 
 
-export async function writeAppCollections(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function writeAppCollections(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   return Promise.all(config.outputTargets.map(outputTarget => {
     return writeAppCollection(config, compilerCtx, buildCtx, outputTarget);
   }));
@@ -16,7 +14,7 @@ export async function writeAppCollections(config: Config, compilerCtx: CompilerC
 // change, but the external user data will always use the same api
 // over the top lame mapping functions is basically so we can loosly
 // couple core component meta data between specific versions of the compiler
-async function writeAppCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+async function writeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDist) {
 
   if (!outputTarget.collectionDir) {
     return Promise.resolve();
@@ -41,9 +39,9 @@ async function writeAppCollection(config: Config, compilerCtx: CompilerCtx, buil
 }
 
 
-export function serializeAppCollection(config: Config, compilerCtx: CompilerCtx, collectionDir: string, entryModules: EntryModule[], globalModule: ModuleFile) {
+export function serializeAppCollection(config: d.Config, compilerCtx: d.CompilerCtx, collectionDir: string, entryModules: d.EntryModule[], globalModule: d.ModuleFile) {
   // create the single collection we're going to fill up with data
-  const collectionData: CollectionData = {
+  const collectionData: d.CollectionData = {
     components: [],
     collections: serializeCollectionDependencies(compilerCtx),
     compiler: {
@@ -81,9 +79,9 @@ export function serializeAppCollection(config: Config, compilerCtx: CompilerCtx,
 }
 
 
-export function serializeCollectionDependencies(compilerCtx: CompilerCtx) {
+export function serializeCollectionDependencies(compilerCtx: d.CompilerCtx) {
   const collectionDeps = compilerCtx.collections.map(c => {
-    const collectionDeps: CollectionDependencyData = {
+    const collectionDeps: d.CollectionDependencyData = {
       name: c.collectionName,
       tags: c.moduleFiles.filter(m => {
         return !!m.cmpMeta;
@@ -100,9 +98,9 @@ export function serializeCollectionDependencies(compilerCtx: CompilerCtx) {
 }
 
 
-export function parseCollectionData(config: Config, collectionName: string, collectionDir: string, collectionJsonStr: string) {
-  const collectionData: CollectionData = JSON.parse(collectionJsonStr);
-  const collection: Collection = {
+export function parseCollectionData(config: d.Config, collectionName: string, collectionDir: string, collectionJsonStr: string) {
+  const collectionData: d.CollectionData = JSON.parse(collectionJsonStr);
+  const collection: d.Collection = {
     collectionName: collectionName,
     dependencies: parseCollectionDependencies(collectionData),
     compiler: {
@@ -121,7 +119,7 @@ export function parseCollectionData(config: Config, collectionName: string, coll
 }
 
 
-export function parseComponents(config: Config, collectionDir: string, collectionData: CollectionData, collection: Collection) {
+export function parseComponents(config: d.Config, collectionDir: string, collectionData: d.CollectionData, collection: d.Collection) {
   const componentsData = collectionData.components;
 
   if (!componentsData || !Array.isArray(componentsData)) {
@@ -135,7 +133,7 @@ export function parseComponents(config: Config, collectionDir: string, collectio
 }
 
 
-export function parseCollectionDependencies(collectionData: CollectionData) {
+export function parseCollectionDependencies(collectionData: d.CollectionData) {
   const dependencies: string[] = [];
 
   if (Array.isArray(collectionData.collections)) {
@@ -148,7 +146,7 @@ export function parseCollectionDependencies(collectionData: CollectionData) {
 }
 
 
-export function excludeFromCollection(config: Config, cmpData: ComponentData) {
+export function excludeFromCollection(config: d.Config, cmpData: d.ComponentData) {
   // this is a component from a collection dependency
   // however, this project may also become a collection
   // for example, "ionicons" is a dependency of "ionic"
@@ -168,12 +166,12 @@ export function excludeFromCollection(config: Config, cmpData: ComponentData) {
 }
 
 
-export function serializeComponent(config: Config, collectionDir: string, moduleFile: ModuleFile) {
+export function serializeComponent(config: d.Config, collectionDir: string, moduleFile: d.ModuleFile) {
   if (!moduleFile || !moduleFile.cmpMeta || moduleFile.isCollectionDependency || moduleFile.excludeFromCollection) {
     return null;
   }
 
-  const cmpData: ComponentData = {};
+  const cmpData: d.ComponentData = {};
   const cmpMeta = moduleFile.cmpMeta;
 
   // get the absolute path to the compiled component's output javascript file
@@ -206,8 +204,8 @@ export function serializeComponent(config: Config, collectionDir: string, module
 }
 
 
-export function parseComponentDataToModuleFile(config: Config, collection: Collection, collectionDir: string, cmpData: ComponentData) {
-  const moduleFile: ModuleFile = {
+export function parseComponentDataToModuleFile(config: d.Config, collection: d.Collection, collectionDir: string, cmpData: d.ComponentData) {
+  const moduleFile: d.ModuleFile = {
     cmpMeta: {},
     isCollectionDependency: true,
     excludeFromCollection: excludeFromCollection(config, cmpData)
@@ -239,21 +237,21 @@ export function parseComponentDataToModuleFile(config: Config, collection: Colle
 }
 
 
-function serializeTag(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeTag(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   cmpData.tag = cmpMeta.tagNameMeta;
 }
 
-function parseTag(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseTag(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   cmpMeta.tagNameMeta = cmpData.tag;
 }
 
 
-function serializeComponentPath(config: Config, collectionDir: string, compiledComponentAbsoluteFilePath: string, cmpData: ComponentData) {
+function serializeComponentPath(config: d.Config, collectionDir: string, compiledComponentAbsoluteFilePath: string, cmpData: d.ComponentData) {
   // convert absolute path into a path that's relative to the collection file
   cmpData.componentPath = normalizePath(config.sys.path.relative(collectionDir, compiledComponentAbsoluteFilePath));
 }
 
-function parseModuleJsFilePath(config: Config, collectionDir: string, cmpData: ComponentData, moduleFile: ModuleFile) {
+function parseModuleJsFilePath(config: d.Config, collectionDir: string, cmpData: d.ComponentData, moduleFile: d.ModuleFile) {
   // convert the path that's relative to the collection file
   // into an absolute path to the component's js file path
   if (typeof cmpData.componentPath !== 'string') {
@@ -266,11 +264,11 @@ function parseModuleJsFilePath(config: Config, collectionDir: string, cmpData: C
 }
 
 
-function serializeComponentDependencies(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeComponentDependencies(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   cmpData.dependencies = (cmpMeta.dependencies || []).sort();
 }
 
-function parseComponentDependencies(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseComponentDependencies(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpData.dependencies)) {
     cmpMeta.dependencies = [];
   } else {
@@ -279,16 +277,16 @@ function parseComponentDependencies(cmpData: ComponentData, cmpMeta: ComponentMe
 }
 
 
-function serializeComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeComponentClass(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   cmpData.componentClass = cmpMeta.componentClass;
 }
 
-function parseComponentClass(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseComponentClass(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   cmpMeta.componentClass = cmpData.componentClass;
 }
 
 
-function serializeStyles(config: Config, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeStyles(config: d.Config, compiledComponentRelativeDirPath: string, cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (cmpMeta.stylesMeta) {
     cmpData.styles = {};
 
@@ -300,7 +298,7 @@ function serializeStyles(config: Config, compiledComponentRelativeDirPath: strin
   }
 }
 
-function parseStyles(config: Config, collectionDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseStyles(config: d.Config, collectionDir: string, cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   const stylesData = cmpData.styles;
 
   cmpMeta.stylesMeta = {};
@@ -314,8 +312,8 @@ function parseStyles(config: Config, collectionDir: string, cmpData: ComponentDa
 }
 
 
-function serializeStyle(config: Config, compiledComponentRelativeDirPath: string, modeStyleMeta: StyleMeta) {
-  const modeStyleData: StyleData = {};
+function serializeStyle(config: d.Config, compiledComponentRelativeDirPath: string, modeStyleMeta: d.StyleMeta) {
+  const modeStyleData: d.StyleData = {};
 
   if (modeStyleMeta.externalStyles && modeStyleMeta.externalStyles.length > 0) {
     modeStyleData.stylePaths = modeStyleMeta.externalStyles.map(externalStyle => {
@@ -338,14 +336,14 @@ function serializeStyle(config: Config, compiledComponentRelativeDirPath: string
   return modeStyleData;
 }
 
-function parseStyle(config: Config, collectionDir: string, cmpData: ComponentData, modeStyleData: StyleData) {
-  const modeStyle: StyleMeta = {
+function parseStyle(config: d.Config, collectionDir: string, cmpData: d.ComponentData, modeStyleData: d.StyleData) {
+  const modeStyle: d.StyleMeta = {
     styleStr: modeStyleData.style
   };
 
   if (modeStyleData.stylePaths) {
     modeStyle.externalStyles = modeStyleData.stylePaths.map(stylePath => {
-      const externalStyle: ExternalStyleMeta = {};
+      const externalStyle: d.ExternalStyleMeta = {};
 
       externalStyle.absolutePath = normalizePath(config.sys.path.join(
         collectionDir,
@@ -367,7 +365,7 @@ function parseStyle(config: Config, collectionDir: string, cmpData: ComponentDat
 }
 
 
-function serializeAssetsDir(config: Config, compiledComponentRelativeDirPath: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeAssetsDir(config: d.Config, compiledComponentRelativeDirPath: string, cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpMeta.assetsDirsMeta)) {
     return;
   }
@@ -385,13 +383,13 @@ function serializeAssetsDir(config: Config, compiledComponentRelativeDirPath: st
 }
 
 
-function parseAssetsDir(config: Config, collectionDir: string, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseAssetsDir(config: d.Config, collectionDir: string, cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpData.assetPaths)) {
     return;
   }
 
   cmpMeta.assetsDirsMeta = cmpData.assetPaths.map(assetsPath => {
-    const assetsMeta: AssetsMeta = {
+    const assetsMeta: d.AssetsMeta = {
       absolutePath: normalizePath(config.sys.path.join(
         collectionDir,
         assetsPath
@@ -412,7 +410,7 @@ function parseAssetsDir(config: Config, collectionDir: string, cmpData: Componen
 }
 
 
-function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeProps(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.membersMeta) return;
 
   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
@@ -421,7 +419,7 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
     if (memberMeta.memberType === MEMBER_TYPE.Prop || memberMeta.memberType === MEMBER_TYPE.PropMutable) {
       cmpData.props = cmpData.props || [];
 
-      const propData: PropData = {
+      const propData: d.PropData = {
         name: memberName
       };
 
@@ -451,7 +449,7 @@ function serializeProps(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   });
 }
 
-function parseProps(config: Config, collection: Collection, cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseProps(config: d.Config, collection: d.Collection, cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   const propsData = cmpData.props;
 
   if (invalidArrayData(propsData)) {
@@ -501,7 +499,7 @@ function parseProps(config: Config, collection: Collection, cmpData: ComponentDa
 }
 
 
-export function parseWillChangeDeprecated(cmpData: any, cmpMeta: ComponentMeta) {
+export function parseWillChangeDeprecated(cmpData: any, cmpMeta: d.ComponentMeta) {
   // DEPRECATED: 2017-12-27
   // previous way of storing change, 0.1.0 and below
   const propWillChangeData = cmpData.propsWillChange;
@@ -523,7 +521,7 @@ export function parseWillChangeDeprecated(cmpData: any, cmpMeta: ComponentMeta) 
 }
 
 
-export function parseDidChangeDeprecated(cmpData: any, cmpMeta: ComponentMeta) {
+export function parseDidChangeDeprecated(cmpData: any, cmpMeta: d.ComponentMeta) {
   // DEPRECATED: 2017-12-27
   // previous way of storing change, 0.1.0 and below
   const propDidChangeData = cmpData.propsDidChange;
@@ -545,7 +543,7 @@ export function parseDidChangeDeprecated(cmpData: any, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeStates(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.membersMeta) return;
 
   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
@@ -562,7 +560,7 @@ function serializeStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function parseStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseStates(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpData.states)) {
     return;
   }
@@ -577,13 +575,13 @@ function parseStates(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeListeners(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpMeta.listenersMeta)) {
     return;
   }
 
   cmpData.listeners = cmpMeta.listenersMeta.map(listenerMeta => {
-    const listenerData: ListenerData = {
+    const listenerData: d.ListenerData = {
       event: listenerMeta.eventName,
       method: listenerMeta.eventMethodName
     };
@@ -606,7 +604,7 @@ function serializeListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function parseListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseListeners(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   const listenersData = cmpData.listeners;
 
   if (invalidArrayData(listenersData)) {
@@ -614,7 +612,7 @@ function parseListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
   }
 
   cmpMeta.listenersMeta = listenersData.map(listenerData => {
-    const listener: ListenMeta = {
+    const listener: d.ListenMeta = {
       eventName: listenerData.event,
       eventMethodName: listenerData.method,
       eventPassive: (listenerData.passive !== false),
@@ -626,7 +624,7 @@ function parseListeners(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeMethods(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.membersMeta) return;
 
   Object.keys(cmpMeta.membersMeta).sort(nameSort).forEach(memberName => {
@@ -643,7 +641,7 @@ function serializeMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function parseMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseMethods(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpData.methods)) {
     return;
   }
@@ -658,7 +656,7 @@ function parseMethods(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeContextMember(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.membersMeta) return;
 
   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
@@ -676,7 +674,7 @@ function serializeContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) 
 }
 
 
-function parseContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseContextMember(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpData.context)) {
     return;
   }
@@ -694,7 +692,7 @@ function parseContextMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeConnectMember(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.membersMeta) return;
 
   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
@@ -712,7 +710,7 @@ function serializeConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) 
 }
 
 
-function parseConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseConnectMember(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpData.connect)) {
     return;
   }
@@ -730,7 +728,7 @@ function parseConnectMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeHostElementMember(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.membersMeta) return;
 
   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
@@ -745,7 +743,7 @@ function serializeHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMe
 }
 
 
-function parseHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseHostElementMember(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpData.hostElement) {
     return;
   }
@@ -758,13 +756,13 @@ function parseHostElementMember(cmpData: ComponentData, cmpMeta: ComponentMeta) 
 }
 
 
-function serializeEvents(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeEvents(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (invalidArrayData(cmpMeta.eventsMeta)) {
     return;
   }
 
   cmpData.events = cmpMeta.eventsMeta.map(eventMeta => {
-    const eventData: EventData = {
+    const eventData: d.EventData = {
       event: eventMeta.eventName
     };
     if (eventMeta.eventMethodName !== eventMeta.eventName) {
@@ -789,7 +787,7 @@ function serializeEvents(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function parseEvents(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseEvents(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   const eventsData = cmpData.events;
 
   if (invalidArrayData(eventsData)) {
@@ -806,7 +804,7 @@ function parseEvents(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeHost(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.hostMeta || Array.isArray(cmpMeta.hostMeta) || !Object.keys(cmpMeta.hostMeta).length) {
     return;
   }
@@ -814,7 +812,7 @@ function serializeHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function parseHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseHost(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (!cmpData.host) {
     return;
   }
@@ -822,7 +820,7 @@ function parseHost(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-function serializeEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function serializeEncapsulation(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     cmpData.shadow = true;
 
@@ -832,7 +830,7 @@ function serializeEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) 
 }
 
 
-function parseEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
+function parseEncapsulation(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
   if (cmpData.shadow === true) {
     cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
 
@@ -845,7 +843,7 @@ function parseEncapsulation(cmpData: ComponentData, cmpMeta: ComponentMeta) {
 }
 
 
-export function serializeAppGlobal(config: Config, collectionDir: string, collectionData: CollectionData, globalModule: ModuleFile) {
+export function serializeAppGlobal(config: d.Config, collectionDir: string, collectionData: d.CollectionData, globalModule: d.ModuleFile) {
   if (!globalModule) {
     return;
   }
@@ -854,7 +852,7 @@ export function serializeAppGlobal(config: Config, collectionDir: string, collec
 }
 
 
-export function parseGlobal(config: Config, collectionDir: string, collectionData: CollectionData, collection: Collection) {
+export function parseGlobal(config: d.Config, collectionDir: string, collectionData: d.CollectionData, collection: d.Collection) {
   if (typeof collectionData.global !== 'string') return;
 
   collection.global = {
@@ -863,7 +861,7 @@ export function parseGlobal(config: Config, collectionDir: string, collectionDat
 }
 
 
-export function serializeBundles(config: Config, collectionData: CollectionData) {
+export function serializeBundles(config: d.Config, collectionData: d.CollectionData) {
   collectionData.bundles = config.bundles.map(b => {
     return {
       components: b.components.slice().sort()
@@ -872,7 +870,7 @@ export function serializeBundles(config: Config, collectionData: CollectionData)
 }
 
 
-export function parseBundles(collectionData: CollectionData, collection: Collection) {
+export function parseBundles(collectionData: d.CollectionData, collection: d.Collection) {
   if (invalidArrayData(collectionData.bundles)) {
     collection.bundles = [];
     return;
@@ -895,6 +893,7 @@ function nameSort(a: string, b: string) {
   if (a.toLowerCase() > b.toLowerCase()) return 1;
   return 0;
 }
+
 
 export const BOOLEAN_KEY = 'Boolean';
 export const NUMBER_KEY = 'Number';

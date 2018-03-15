@@ -1,9 +1,9 @@
-import { BuildCtx, BuildResults, BuildStats, CompilerCtx, Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { normalizePath } from '../util';
 
 
-export async function generateBuildStats(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, buildResults: BuildResults) {
-  const statsTargets = config.outputTargets.filter(o => o.type === 'stats');
+export async function generateBuildStats(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults) {
+  const statsTargets = (config.outputTargets as d.OutputTargetStats[]).filter(o => o.type === 'stats');
 
   await Promise.all(statsTargets.map(outputTarget => {
     return generateStatsOutputTarget(config, compilerCtx, buildCtx, buildResults, outputTarget);
@@ -11,7 +11,7 @@ export async function generateBuildStats(config: Config, compilerCtx: CompilerCt
 }
 
 
-export async function generateStatsOutputTarget(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, buildResults: BuildResults, outputTarget: OutputTarget) {
+export async function generateStatsOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, buildResults: d.BuildResults, outputTarget: d.OutputTargetStats) {
   if (buildCtx.aborted) {
     return;
   }
@@ -25,7 +25,7 @@ export async function generateStatsOutputTarget(config: Config, compilerCtx: Com
       };
 
     } else {
-      const stats: BuildStats = {
+      const stats: d.BuildStats = {
         compiler: {
           name: config.sys.compiler.name,
           version: config.sys.compiler.version

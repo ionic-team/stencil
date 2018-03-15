@@ -9,7 +9,7 @@ export interface StencilSystem {
     runtime?: string;
   };
   createDom?(): {
-    parse(hydrateOptions: d.HydrateOptions): Window;
+    parse(hydrateOptions: d.OutputTargetHydrate): Window;
     serialize(): string;
     destroy(): void;
   };
@@ -140,12 +140,11 @@ export interface Url {
   protocol?: string;
   auth?: string;
   hostname?: string;
-  port?: string;
   host?: string;
+  port?: string;
   pathname?: string;
+  path?: string;
   search?: string;
   query?: string | any;
-  slashes?: boolean;
   hash?: string;
-  path?: string;
 }

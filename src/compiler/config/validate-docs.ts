@@ -1,8 +1,8 @@
-import { Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { pathJoin } from '../util';
 
 
-export function validateDocs(config: Config) {
+export function validateDocs(config: d.Config) {
   if (config.flags.docs) {
     if (config.outputTargets) {
       if (!config.outputTargets.some(o => o.type === 'docs')) {
@@ -22,7 +22,7 @@ export function validateDocs(config: Config) {
 }
 
 
-function validateDocsOutputTarget(config: Config, outputTarget: OutputTarget) {
+function validateDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocs) {
   if (outputTarget.format === 'json') {
     if (!outputTarget.dir) {
       outputTarget.dir = 'dist/docs';

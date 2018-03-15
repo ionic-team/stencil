@@ -1,8 +1,8 @@
-import { CompilerCtx, Config, CopyTask, Diagnostic } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError, normalizePath } from '../util';
 
 
-export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagnostics: Diagnostic[], commit: boolean) {
+export async function copyTasks(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], commit: boolean) {
   if (!config.copy) {
     config.logger.debug(`copy tasks disabled`);
     return;
@@ -11,7 +11,7 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagno
   const timeSpan = config.logger.createTimeSpan(`copy task started`, true);
 
   try {
-    const allCopyTasks: CopyTask[] = [];
+    const allCopyTasks: d.CopyTask[] = [];
 
     const copyTasks = Object.keys(config.copy).map(copyTaskName => config.copy[copyTaskName]);
 
@@ -36,7 +36,7 @@ export async function copyTasks(config: Config, compilerCtx: CompilerCtx, diagno
 }
 
 
-export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx, allCopyTasks: CopyTask[], copyTask: CopyTask): Promise<any> {
+export async function processCopyTasks(config: d.Config, compilerCtx: d.CompilerCtx, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask): Promise<any> {
   if (!copyTask) {
     // possible null was set, which is fine, just skip over this one
     return;
@@ -50,15 +50,16 @@ export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx,
     throw new Error(`copy "dest" property cannot be a glob: ${copyTask.dest}`);
   }
 
+  const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(outputTarget => {
+    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+  });
+
   if (config.sys.isGlob(copyTask.src)) {
-    const copyTasks = await processGlob(config, copyTask);
+
+    const copyTasks = await processGlob(config, outputTargets, copyTask);
     allCopyTasks.push(...copyTasks);
     return;
   }
-
-  const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.type === 'www' || outputTarget.type === 'dist';
-  });
 
   return Promise.all(outputTargets.map(outputTarget => {
     if (outputTarget.collectionDir) {
@@ -71,7 +72,7 @@ export async function processCopyTasks(config: Config, compilerCtx: CompilerCtx,
 }
 
 
-async function processCopyTaskDestDir(config: Config, compilerCtx: CompilerCtx, allCopyTasks: CopyTask[], copyTask: CopyTask, destAbsDir: string) {
+async function processCopyTaskDestDir(config: d.Config, compilerCtx: d.CompilerCtx, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask, destAbsDir: string) {
   const processedCopyTask = processCopyTask(config, copyTask, destAbsDir);
 
   try {
@@ -88,8 +89,8 @@ async function processCopyTaskDestDir(config: Config, compilerCtx: CompilerCtx, 
 }
 
 
-async function processGlob(config: Config, copyTask: CopyTask) {
-  const globCopyTasks: CopyTask[] = [];
+async function processGlob(config: d.Config, outputTargets: d.OutputTargetDist[], copyTask: d.CopyTask) {
+  const globCopyTasks: d.CopyTask[] = [];
 
   const globOpts = {
     cwd: config.srcDir,
@@ -100,7 +101,7 @@ async function processGlob(config: Config, copyTask: CopyTask) {
 
   files.forEach(globRelPath => {
 
-    config.outputTargets.forEach(outputTarget => {
+    outputTargets.forEach(outputTarget => {
       if (outputTarget.collectionDir) {
         globCopyTasks.push(createGlobCopyTask(config, copyTask, outputTarget.collectionDir, globRelPath));
 
@@ -115,8 +116,8 @@ async function processGlob(config: Config, copyTask: CopyTask) {
 }
 
 
-export function createGlobCopyTask(config: Config, copyTask: CopyTask, destDir: string, globRelPath: string) {
-  const processedCopyTask: CopyTask = {
+export function createGlobCopyTask(config: d.Config, copyTask: d.CopyTask, destDir: string, globRelPath: string) {
+  const processedCopyTask: d.CopyTask = {
     src: config.sys.path.join(config.srcDir, globRelPath),
     filter: copyTask.filter
   };
@@ -137,8 +138,8 @@ export function createGlobCopyTask(config: Config, copyTask: CopyTask, destDir: 
 }
 
 
-export function processCopyTask(config: Config, copyTask: CopyTask, destAbsPath: string) {
-  const processedCopyTask: CopyTask = {
+export function processCopyTask(config: d.Config, copyTask: d.CopyTask, destAbsPath: string) {
+  const processedCopyTask: d.CopyTask = {
     src: getSrcAbsPath(config, copyTask.src),
     dest: getDestAbsPath(config, copyTask.src, destAbsPath, copyTask.dest),
     filter: copyTask.filter
@@ -148,7 +149,7 @@ export function processCopyTask(config: Config, copyTask: CopyTask, destAbsPath:
 }
 
 
-export function getSrcAbsPath(config: Config, src: string) {
+export function getSrcAbsPath(config: d.Config, src: string) {
   if (config.sys.path.isAbsolute(src)) {
     return src;
   }
@@ -157,7 +158,7 @@ export function getSrcAbsPath(config: Config, src: string) {
 }
 
 
-export function getDestAbsPath(config: Config, src: string, destAbsPath: string, destRelPath: string) {
+export function getDestAbsPath(config: d.Config, src: string, destAbsPath: string, destRelPath: string) {
   if (destRelPath) {
     if (config.sys.path.isAbsolute(destRelPath)) {
       return destRelPath;
@@ -175,7 +176,7 @@ export function getDestAbsPath(config: Config, src: string, destAbsPath: string,
 }
 
 
-export function isCopyTaskFile(config: Config, filePath: string) {
+export function isCopyTaskFile(config: d.Config, filePath: string) {
   if (!config.copy) {
     // there is no copy config
     return false;

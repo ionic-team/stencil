@@ -1,4 +1,4 @@
-import { HydrateOptions } from '../../declarations';
+import * as d from '../../declarations';
 
 
 export function createDom() {
@@ -6,7 +6,7 @@ export function createDom() {
 
   return {
 
-    parse(opts: HydrateOptions) {
+    parse(opts: d.OutputTargetHydrate) {
       if (dom) {
         dom.window.close();
       }

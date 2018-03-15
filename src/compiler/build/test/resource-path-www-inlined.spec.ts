@@ -1,115 +1,15 @@
+import * as d from '../../../declarations';
 import { TestingCompiler, TestingConfig } from '../../../testing';
 import { mockElement, mockHtml } from '../../../testing/mocks';
-import { OutputTarget } from '../../../declarations';
 import * as path from 'path';
 
+
+jest.setTimeout(10000);
 
 describe('www loader/core resourcePath', () => {
 
   let c: TestingCompiler;
   let config: TestingConfig;
-
-  it('default config w/ external loader script', async () => {
-    config = new TestingConfig();
-    config.buildAppCore = true;
-    config.rootDir = '/User/testing/';
-
-    c = new TestingCompiler(config);
-    const wwwOutput = config.outputTargets.find(o => o.type === 'www');
-    expect(wwwOutput.resourcePath).toBeUndefined();
-
-    await setupFs(c, '<script src="build/app.js"></script>');
-
-    const r = await c.build();
-    expect(r.diagnostics).toEqual([]);
-
-    const { win, doc } = mockDom(wwwOutput.indexHtml);
-
-    const loaderContent = await c.fs.readFile('/User/testing/www/build/app.js');
-    execScript(win, doc, loaderContent);
-
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="app"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
-    const coreScriptSrc = coreScriptElm.getAttribute('src');
-
-    expect(resourcePath).toBe('http://emmitts-garage.com/build/app/');
-    expect(coreScriptSrc).toBe('http://emmitts-garage.com/build/app/app.core.js');
-
-    const coreContent = await c.fs.readFile('/User/testing/www/build/app/app.core.js');
-    execScript(win, doc, coreContent);
-
-    expect(win.customElements.get('cmp-a')).toBeDefined();
-  });
-
-
-  it('custom resourcePath config w/ external loader script', async () => {
-    config = new TestingConfig();
-    config.buildAppCore = true;
-    config.rootDir = '/User/testing/';
-    config.outputTargets = [{
-      type: 'www',
-      resourcePath: '/some/resource/config/path'
-    }];
-
-    c = new TestingCompiler(config);
-    const wwwOutput = config.outputTargets.find(o => o.type === 'www');
-    expect(wwwOutput.resourcePath).toBe('/some/resource/config/path/');
-
-    await setupFs(c, '<script src="build/app.js"></script>');
-
-    const r = await c.build();
-    expect(r.diagnostics).toEqual([]);
-
-    const { win, doc } = mockDom(wwwOutput.indexHtml);
-
-    const loaderContent = await c.fs.readFile('/User/testing/www/build/app.js');
-    execScript(win, doc, loaderContent);
-
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace][data-namespace="app"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
-    const coreScriptSrc = coreScriptElm.getAttribute('src');
-
-    expect(resourcePath).toBe('/some/resource/config/path/');
-    expect(coreScriptSrc).toBe('/some/resource/config/path/app.core.js');
-
-    const coreContent = await c.fs.readFile('/User/testing/www/build/app/app.core.js');
-    execScript(win, doc, coreContent);
-
-    expect(win.customElements.get('cmp-a')).toBeDefined();
-  });
-
-
-  it('custom data-resource-path attr on external loader script', async () => {
-    config = new TestingConfig();
-    config.buildAppCore = true;
-    config.rootDir = '/User/testing/';
-
-    c = new TestingCompiler(config);
-    const wwwOutput = config.outputTargets.find(o => o.type === 'www');
-    expect(wwwOutput.resourcePath).toBeUndefined();
-
-    await setupFs(c, '<script src="build/app.js" data-resource-path="/some/resource/attr/path/"></script>');
-
-    const r = await c.build();
-    expect(r.diagnostics).toEqual([]);
-
-    const { win, doc } = mockDom(wwwOutput.indexHtml);
-
-    const loaderContent = await c.fs.readFile('/User/testing/www/build/app.js');
-    execScript(win, doc, loaderContent);
-
-    const coreScriptElm = doc.head.querySelector('script[data-resource-path][data-namespace="app"]');
-    const resourcePath = coreScriptElm.getAttribute('data-resource-path');
-    const coreScriptSrc = coreScriptElm.getAttribute('src');
-
-    expect(resourcePath).toBe('/some/resource/attr/path/');
-    expect(coreScriptSrc).toBe('/some/resource/attr/path/app.core.js');
-
-    const coreContent = await c.fs.readFile('/User/testing/www/build/app/app.core.js');
-    execScript(win, doc, coreContent);
-
-    expect(win.customElements.get('cmp-a')).toBeDefined();
-  });
 
 
   it('default config w/ inlined loader script', async () => {
@@ -123,11 +23,11 @@ describe('www loader/core resourcePath', () => {
     config.hashFileNames = false;
     config.rootDir = '/User/testing/';
     config.outputTargets = [
-      { type: 'www', serviceWorker: null }
+      { type: 'www', serviceWorker: null } as d.OutputTargetWww
     ];
 
     c = new TestingCompiler(config);
-    const wwwOutput = config.outputTargets.find(o => o.type === 'www');
+    const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
     expect(wwwOutput.resourcePath).toBeUndefined();
 
     await setupFs(c, '<script src="build/app.js" test-inlined></script>');
@@ -154,7 +54,7 @@ describe('www loader/core resourcePath', () => {
   });
 
 
-  it('custom resourcePath config w/ inlined loader script', async () => {
+  it('custom resourcePath config w/ inlined loader script, do not hydrateComponents', async () => {
     config = new TestingConfig();
     config.flags.prerender = true;
     config.devMode = false;
@@ -169,14 +69,13 @@ describe('www loader/core resourcePath', () => {
         type: 'www',
         resourcePath: '/some/resource/config/path',
         serviceWorker: null,
-        prerender: {
-          hydrateComponents: false
-        }
-      }
+        hydrateComponents: false
+      } as d.OutputTargetWww
     ];
 
     c = new TestingCompiler(config);
-    const wwwOutput = config.outputTargets.find(o => o.type === 'www');
+
+    const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
     expect(wwwOutput.resourcePath).toEqual('/some/resource/config/path/');
 
     await setupFs(c, '<script src="build/app.js" test-inlined></script>');
@@ -217,11 +116,11 @@ describe('www loader/core resourcePath', () => {
       {
         type: 'www',
         serviceWorker: null
-      }
+      } as d.OutputTargetWww
     ];
 
     c = new TestingCompiler(config);
-    const wwwOutput = config.outputTargets.find(o => o.type === 'www');
+    const wwwOutput: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
     expect(wwwOutput.resourcePath).toBeUndefined();
 
     await setupFs(c, '<script src="build/app.js" data-resource-path="/some/resource/attr/path/" test-inlined></script>');
@@ -246,6 +145,7 @@ describe('www loader/core resourcePath', () => {
 
     expect(win.customElements.get('cmp-a')).toBeDefined();
   });
+
 
   function mockDom(htmlFilePath: string): { win: Window, doc: HTMLDocument } {
     const jsdom = require('jsdom');

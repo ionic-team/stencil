@@ -61,13 +61,11 @@ describe('hydrate', () => {
     };
 
     const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
-    expect(hydrateResults.diagnostics.length).toBe(0);
+    expect(hydrateResults.diagnostics).toEqual([]);
 
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
-        <head>
-          <link rel="canonical" href="/">
-        </head>
+        <head></head>
         <body>
           <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
             <elm-a data-ssrc="0.0.">
@@ -126,13 +124,11 @@ describe('hydrate', () => {
 
     const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
 
-    expect(hydrateResults.diagnostics.length).toBe(0);
+    expect(hydrateResults.diagnostics).toEqual([]);
 
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
-        <head>
-          <link rel="canonical" href="/">
-        </head>
+        <head></head>
         <body>
           <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
             <elm-a data-ssrc="0.0">
@@ -182,13 +178,11 @@ describe('hydrate', () => {
 
     const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
 
-    expect(hydrateResults.diagnostics.length).toBe(0);
+    expect(hydrateResults.diagnostics).toEqual([]);
 
     expect(compareHtml(hydrateResults.html)).toEqual(compareHtml(`
       <html dir="ltr" data-ssr="">
-        <head>
-          <link rel="canonical" href="/">
-        </head>
+        <head></head>
         <body>
           <ion-test data-ssrv="0" class="${config.hydratedCssClass}">
             <div data-ssrc="0.0."></div>
@@ -206,6 +200,7 @@ describe('hydrate', () => {
     };
 
     const hydrateResults = await hydrateHtml(config, ctx, outputTarget, registry, opts);
+    expect(hydrateResults.diagnostics).toEqual([]);
     expect(hydrateResults.html).toBe(`<body>hello</body>`);
   });
 

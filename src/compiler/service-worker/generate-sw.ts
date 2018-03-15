@@ -1,15 +1,17 @@
-import { BuildCtx, CompilerCtx, Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { buildWarn, catchError, hasError } from '../util';
 
 
-export async function generateServiceWorkers(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  return Promise.all(config.outputTargets.map(outputTarget => {
+export async function generateServiceWorkers(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+  const wwwServiceOutputs = (config.outputTargets as d.OutputTargetWww[]).filter(o => o.type === 'www' && o.serviceWorker);
+
+  return Promise.all(wwwServiceOutputs.map(outputTarget => {
     return generateServiceWorker(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 
 
-async function generateServiceWorker(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+async function generateServiceWorker(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   const shouldSkipSW = await canSkipGenerateSW(config, compilerCtx, buildCtx, outputTarget);
   if (shouldSkipSW) {
     return;
@@ -27,7 +29,7 @@ async function generateServiceWorker(config: Config, compilerCtx: CompilerCtx, b
 }
 
 
-async function copyLib(config: Config, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+async function copyLib(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   const timeSpan = config.logger.createTimeSpan(`copy service worker library started`, true);
 
   try {
@@ -43,7 +45,7 @@ async function copyLib(config: Config, buildCtx: BuildCtx, outputTarget: OutputT
 }
 
 
-async function generateSW(config: Config, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+async function generateSW(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   const timeSpan = config.logger.createTimeSpan(`generate service worker started`);
 
   try {
@@ -56,7 +58,7 @@ async function generateSW(config: Config, buildCtx: BuildCtx, outputTarget: Outp
 }
 
 
-async function injectManifest(config: Config, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+async function injectManifest(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   const timeSpan = config.logger.createTimeSpan(`inject manifest into service worker started`);
 
   try {
@@ -69,12 +71,12 @@ async function injectManifest(config: Config, buildCtx: BuildCtx, outputTarget: 
 }
 
 
-function hasSrcConfig(outputTarget: OutputTarget) {
+function hasSrcConfig(outputTarget: d.OutputTargetWww) {
   return !!outputTarget.serviceWorker.swSrc;
 }
 
 
-async function canSkipGenerateSW(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+async function canSkipGenerateSW(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   if (!outputTarget.serviceWorker) {
     return true;
   }

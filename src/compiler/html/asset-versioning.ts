@@ -1,16 +1,16 @@
-import { CompilerCtx, Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { hasFileExtension } from '../util';
 import { normalizePrerenderLocation } from '../prerender/prerender-utils';
 
 
-export function assetVersioning(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, doc: Document) {
+export function assetVersioning(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, doc: Document) {
   return Promise.all([
     versionElementAssets(config, compilerCtx, outputTarget, windowLocationHref, doc)
   ]);
 }
 
 
-async function versionElementAssets(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, doc: Document) {
+async function versionElementAssets(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, doc: Document) {
   if (!config.assetVersioning.versionHtml) {
     return;
   }
@@ -26,7 +26,7 @@ async function versionElementAssets(config: Config, compilerCtx: CompilerCtx, ou
 }
 
 
-async function versionElementTypeAssets(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, doc: Document, selector: string, attrName: string) {
+async function versionElementTypeAssets(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, doc: Document, selector: string, attrName: string) {
   const elements = doc.querySelectorAll(selector);
 
   const promises: Promise<any>[] = [];
@@ -39,7 +39,7 @@ async function versionElementTypeAssets(config: Config, compilerCtx: CompilerCtx
 }
 
 
-async function versionElementTypeAsset(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, elm: Element, attrName: string) {
+async function versionElementTypeAsset(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, elm: Element, attrName: string) {
   const url = elm.getAttribute(attrName);
 
   const versionedUrl = await versionAsset(config, compilerCtx, outputTarget, windowLocationHref, url);
@@ -49,7 +49,7 @@ async function versionElementTypeAsset(config: Config, compilerCtx: CompilerCtx,
 }
 
 
-async function versionAsset(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTarget, windowLocationHref: string, url: string) {
+async function versionAsset(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, url: string) {
   try {
     const orgFilePath = getFilePathFromUrl(config, outputTarget, windowLocationHref, url);
     if (!orgFilePath) {
@@ -78,7 +78,7 @@ async function versionAsset(config: Config, compilerCtx: CompilerCtx, outputTarg
 }
 
 
-function getFilePathFromUrl(config: Config, outputTarget: OutputTarget, windowLocationHref: string, url: string) {
+function getFilePathFromUrl(config: d.Config, outputTarget: d.OutputTargetHydrate, windowLocationHref: string, url: string) {
   if (typeof url !== 'string' || url.trim() === '') {
     return null;
   }

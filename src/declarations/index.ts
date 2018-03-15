@@ -16,6 +16,7 @@ export * from './fs';
 export * from './in-memory-fs';
 export * from './jsx';
 export * from './logger';
+export * from './output-targets';
 export * from './platform';
 export * from './plugin';
 export * from './render';

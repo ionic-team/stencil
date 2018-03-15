@@ -1,4 +1,4 @@
-import { BuildCtx, Collection, CompilerCtx, ComponentMeta, ComponentRegistry, Config, MemberMeta, MembersMeta, PackageJsonData } from '../../declarations';
+import * as d from '../../declarations';
 import { dashToPascalCase } from '../../util/helpers';
 import { gatherMetadata } from './datacollection/index';
 import { getComponentsDtsTypesFilePath } from '../collections/distribution';
@@ -9,7 +9,7 @@ import { normalizeStyles } from '../style/normalize-styles';
 import * as ts from 'typescript';
 
 
-export async function generateComponentTypes(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, tsOptions: ts.CompilerOptions, tsHost: ts.CompilerHost, tsFilePaths: string[], componentsDtsSrcFilePath: string) {
+export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsOptions: ts.CompilerOptions, tsHost: ts.CompilerHost, tsFilePaths: string[], componentsDtsSrcFilePath: string) {
   // get all of the ts files paths to transpile
   // ensure the components.d.ts file is always excluded from this transpile program
   const checkProgramTsFiles = tsFilePaths.filter(filePath => filePath !== componentsDtsSrcFilePath);
@@ -43,7 +43,8 @@ export async function generateComponentTypes(config: Config, compilerCtx: Compil
   // queue the components.d.ts async file write and put it into memory
   await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
 
-  const typesOutputTargets = config.outputTargets.filter(o => !!o.typesDir);
+  const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
+
   await Promise.all(typesOutputTargets.map(async outputTarget => {
     const typesFile = getComponentsDtsTypesFilePath(config, outputTarget);
     await compilerCtx.fs.writeFile(typesFile, componentTypesFileContent);
@@ -58,7 +59,7 @@ export async function generateComponentTypes(config: Config, compilerCtx: Compil
  * @param config the project build configuration
  * @param options compiler options from tsconfig
  */
-export async function generateComponentTypesFile(config: Config, compilerCtx: CompilerCtx, cmpList: ComponentRegistry) {
+export async function generateComponentTypesFile(config: d.Config, compilerCtx: d.CompilerCtx, cmpList: d.ComponentRegistry) {
   let typeImportData: ImportData = {};
   const allTypes: { [key: string]: number } = {};
   let componentsFileContent =
@@ -161,7 +162,7 @@ function sortImportNames(a: MemberNameData, b: MemberNameData) {
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-function updateReferenceTypeImports(config: Config, importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: ComponentMeta, filePath: string) {
+function updateReferenceTypeImports(config: d.Config, importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: d.ComponentMeta, filePath: string) {
 
   function getIncrememntTypeName(name: string): string {
     if (allTypes[name] == null) {
@@ -175,13 +176,13 @@ function updateReferenceTypeImports(config: Config, importDataObj: ImportData, a
 
   return Object.keys(cmpMeta.membersMeta)
   .filter((memberName) => {
-    const member: MemberMeta = cmpMeta.membersMeta[memberName];
+    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
 
     return METADATA_MEMBERS_TYPED.indexOf(member.memberType) !== -1 &&
       member.attribType.typeReferences;
   })
   .reduce((obj, memberName) => {
-    const member: MemberMeta = cmpMeta.membersMeta[memberName];
+    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
     Object.keys(member.attribType.typeReferences).forEach(typeName => {
       const type = member.attribType.typeReferences[typeName];
       let importFileLocation: string;
@@ -232,13 +233,12 @@ function updateReferenceTypeImports(config: Config, importDataObj: ImportData, a
  * @param cmpMeta the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function createTypesAsString(cmpMeta: ComponentMeta, importPath: string) {
+export function createTypesAsString(cmpMeta: d.ComponentMeta, importPath: string) {
   const tagName = cmpMeta.tagNameMeta;
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
   const interfaceOptions = membersToInterfaceOptions(cmpMeta.membersMeta);
-  (<MembersMeta>cmpMeta.membersMeta);
 
   return `
 import {
@@ -287,13 +287,13 @@ function sortInterfaceMembers(a: string, b: string) {
 }
 
 
-function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: string } {
+function membersToInterfaceOptions(membersMeta: d.MembersMeta): { [key: string]: string } {
   const interfaceData = Object.keys(membersMeta)
     .filter((memberName) => {
       return METADATA_MEMBERS_TYPED.indexOf(membersMeta[memberName].memberType) !== -1;
     })
     .reduce((obj, memberName) => {
-      const member: MemberMeta = membersMeta[memberName];
+      const member: d.MemberMeta = membersMeta[memberName];
       obj[memberName] = member.attribType.text;
 
       return obj;
@@ -303,7 +303,7 @@ function membersToInterfaceOptions(membersMeta: MembersMeta): { [key: string]: s
 }
 
 
-async function getCollectionsTypeImports(config: Config, compilerCtx: CompilerCtx) {
+async function getCollectionsTypeImports(config: d.Config, compilerCtx: d.CompilerCtx) {
   const collections = compilerCtx.collections.map(collection => {
     return getCollectionTypesImport(config, compilerCtx, collection);
   });
@@ -318,7 +318,7 @@ async function getCollectionsTypeImports(config: Config, compilerCtx: CompilerCt
 }
 
 
-async function getCollectionTypesImport(config: Config, compilerCtx: CompilerCtx, collection: Collection) {
+async function getCollectionTypesImport(config: d.Config, compilerCtx: d.CompilerCtx, collection: d.Collection) {
   let typeImport = '';
 
   try {
@@ -326,7 +326,7 @@ async function getCollectionTypesImport(config: Config, compilerCtx: CompilerCtx
     const collectionPkgJson = config.sys.path.join(collectionDir, 'package.json');
 
     const pkgJsonStr = await compilerCtx.fs.readFile(collectionPkgJson);
-    const pkgData: PackageJsonData = JSON.parse(pkgJsonStr);
+    const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
 
     if (pkgData.types && pkgData.collection) {
       typeImport = `import '${pkgData.name}';`;

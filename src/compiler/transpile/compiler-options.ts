@@ -1,10 +1,10 @@
-import { CompilerCtx, Config } from '../../declarations';
+import * as d from '../../declarations';
 import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
 import { normalizePath, pathJoin } from '../util';
 import * as ts from 'typescript';
 
 
-export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) {
+export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerCtx) {
   let compilerOptions: ts.CompilerOptions = Object.assign({}, DEFAULT_COMPILER_OPTIONS);
 
   try {
@@ -35,7 +35,7 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) 
   // apply user config to tsconfig
   compilerOptions.rootDir = config.srcDir;
 
-  const collectionOutputTarget = config.outputTargets.find(o => !!o.collectionDir);
+  const collectionOutputTarget = (config.outputTargets as d.OutputTargetDist[]).find(o => !!o.collectionDir);
   if (collectionOutputTarget) {
     compilerOptions.outDir = collectionOutputTarget.collectionDir;
 
@@ -45,10 +45,11 @@ export async function getUserTsConfig(config: Config, compilerCtx: CompilerCtx) 
 
 
   // generate .d.ts files when generating a distribution and in prod mode
-  const typesOutputTarget = config.outputTargets.find(o => !!o.typesDir);
+  const typesOutputTarget = (config.outputTargets as d.OutputTargetDist[]).find(o => !!o.typesDir);
   if (typesOutputTarget) {
     compilerOptions.declaration = true;
     compilerOptions.declarationDir = typesOutputTarget.typesDir;
+
   } else {
     compilerOptions.declaration = false;
   }

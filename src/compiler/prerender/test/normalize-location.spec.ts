@@ -1,30 +1,100 @@
-import { Config, HydrateResults, OutputTarget, PrerenderLocation } from '../../../declarations';
+import * as d from '../../../declarations';
 import { crawlAnchorsForNextUrls, normalizePrerenderLocation } from '../prerender-utils';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
+import { validateConfig } from '../../config/validate-config';
 
 
 describe('normalizeLocation', () => {
 
-  let config: Config;
-  let outputTarget: OutputTarget;
+  const sys = mockStencilSystem();
+  let config: d.Config;
+  let outputTarget: d.OutputTargetWww;
 
   beforeEach(() => {
-    config = {
-      sys: mockStencilSystem(),
-      logger: mockLogger(),
-      rootDir: '/User/some/path/',
-      srcDir: '/User/some/path/src/',
-      suppressTypeScriptErrors: true
-    };
     outputTarget = {
       type: 'www',
-      path: '/User/some/path/www/'
+      dir: '/User/some/path/www/',
+      baseUrl: '/'
+    };
+    config = {
+      sys: sys
     };
   });
 
 
+  it('should not parse cuz of custom prerenderFilter', () => {
+    outputTarget.prerenderFilter = () => {
+      return false;
+    };
+    const windowLocationHref = 'http://localhost:1234/';
+    const urlStr = '/aboutus';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p).toBe(null);
+  });
+
+  it('should parse cuz of custom prerenderFilter', () => {
+    outputTarget.prerenderFilter = () => {
+      return true;
+    };
+    const windowLocationHref = 'http://localhost:1234/';
+    const urlStr = '/downloads/sales.html';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p.url).toBe('http://localhost:1234/downloads/sales.html');
+    expect(p.path).toBe('/downloads/sales.html');
+  });
+
+  it('should not parse urls with default prerender filter that hates dots', () => {
+    const windowLocationHref = 'http://localhost:1234/';
+    const urlStr = '/downloads/sales.pdf';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p).toBe(null);
+  });
+
+  it('should parse urls that is the directory of the base url with the ending /', () => {
+    outputTarget.baseUrl = '/madison/wisconsin/';
+    const windowLocationHref = 'http://localhost:1234/madison/';
+    const urlStr = './wisconsin/';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p.url).toBe('http://localhost:1234/madison/wisconsin/');
+    expect(p.path).toBe('/madison/wisconsin/');
+  });
+
+  it('should parse urls that is the directory of the base url without the ending /', () => {
+    outputTarget.baseUrl = '/madison/wisconsin/';
+    const windowLocationHref = 'http://localhost:1234/madison/';
+    const urlStr = './wisconsin';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p.url).toBe('http://localhost:1234/madison/wisconsin');
+    expect(p.path).toBe('/madison/wisconsin');
+  });
+
+  it('should parse urls that start with the baseUrl', () => {
+    outputTarget.baseUrl = '/docs/';
+    const windowLocationHref = 'http://localhost:1234/';
+    const urlStr = '/docs/overview';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p.url).toBe('http://localhost:1234/docs/overview');
+    expect(p.path).toBe('/docs/overview');
+  });
+
+  it('should ignore urls that are below the baseUrl, rel location ref', () => {
+    outputTarget.baseUrl = '/docs/';
+    const windowLocationHref = 'http://localhost:1234/docs';
+    const urlStr = './about-us';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p).toBe(null);
+  });
+
+  it('should ignore urls that are below the baseUrl', () => {
+    outputTarget.baseUrl = '/docs/';
+    const windowLocationHref = 'http://localhost:1234/';
+    const urlStr = '/about-us';
+    const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
+    expect(p).toBe(null);
+  });
+
   it('should ignore urls that are not on the same host', () => {
-    const windowLocationHref = 'https://somedomain.org/some/link-a';
+    const windowLocationHref = 'https://localhost:1234/some/link-a';
     const urlStr = 'https://some-other-domain.org/some/link-b';
     const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
     expect(p).toBe(null);
@@ -95,10 +165,8 @@ describe('normalizeLocation', () => {
   });
 
   it('should include querystring and hash within path', () => {
-    outputTarget.prerender = {
-      includePathQuery: true,
-      includePathHash: true
-    };
+    outputTarget.prerenderPathQuery = true;
+    outputTarget.prerenderPathHash = true;
     const windowLocationHref = 'http://localhost:1234/';
     const urlStr = '/?some=query&string=value#somehash';
     const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
@@ -107,9 +175,7 @@ describe('normalizeLocation', () => {
   });
 
   it('should include querystring within path', () => {
-    outputTarget.prerender = {
-      includePathQuery: true
-    };
+    outputTarget.prerenderPathQuery = true;
     const windowLocationHref = 'http://localhost:1234/';
     const urlStr = '/?some=query&string=value';
     const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
@@ -118,9 +184,7 @@ describe('normalizeLocation', () => {
   });
 
   it('should include hash within path', () => {
-    outputTarget.prerender = {
-      includePathHash: true
-    };
+    outputTarget.prerenderPathHash = true;
     const windowLocationHref = 'http://localhost:1234/';
     const urlStr = '/#somehash';
     const p = normalizePrerenderLocation(config, outputTarget, windowLocationHref, urlStr);
@@ -145,23 +209,21 @@ describe('normalizeLocation', () => {
   });
 
   it('should normalize and not have duplicate pending urls', () => {
-    const prerenderQueue: PrerenderLocation[] = [];
-    const results: HydrateResults = {
-      url: 'http://docbrown.com',
-      anchors: [
-        { href: '/' },
-        { href: '/?qs=1' },
-        { href: '/#hash1' },
-        { href: '/#hash2' },
-        { href: '/page-1' },
-        { href: '/page-1#hash3' },
-        { href: '/page-2' },
-        { href: '/page-2?qs=2' },
-        { href: '/page-2?qs=3' },
-      ],
-      diagnostics: []
-    };
-    crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, results);
+    const prerenderQueue: d.PrerenderLocation[] = [];
+    const windowLocationHref = 'http://docbrown.com';
+    const anchors: d.HydrateAnchor[] = [
+      { href: '/' },
+      { href: '/?qs=1' },
+      { href: '/#hash1' },
+      { href: '/#hash2' },
+      { href: '/page-1' },
+      { href: '/page-1#hash3' },
+      { href: '/page-2' },
+      { href: '/page-2?qs=2' },
+      { href: '/page-2?qs=3' },
+    ];
+
+    crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, windowLocationHref, anchors);
 
     expect(prerenderQueue).toHaveLength(3);
     expect(prerenderQueue[0].url).toBe('http://docbrown.com/');
@@ -171,22 +233,19 @@ describe('normalizeLocation', () => {
   });
 
   it('should handle quotes in pathnames', () => {
-    const prerenderQueue: PrerenderLocation[] = [];
-    const results: HydrateResults = {
-      url: 'http://docbrown.com',
-      anchors: [
-        { href: `/` },
-        { href: `'./` },
-        { href: `"./` },
-        { href: `"./'` },
-        { href: '/#hash1' },
-        { href: '/#hash2' },
-        { href: '/?qs=1`' },
-        { href: '/?qs=2`' },
-      ],
-      diagnostics: []
-    };
-    crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, results);
+    const prerenderQueue: d.PrerenderLocation[] = [];
+    const windowLocationHref = 'http://docbrown.com';
+    const anchors: d.HydrateAnchor[] = [
+      { href: `/` },
+      { href: `'./` },
+      { href: `"./` },
+      { href: `"./'` },
+      { href: '/#hash1' },
+      { href: '/#hash2' },
+      { href: '/?qs=1`' },
+      { href: '/?qs=2`' },
+    ];
+    crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, windowLocationHref, anchors);
 
     expect(prerenderQueue).toHaveLength(1);
     expect(prerenderQueue[0].url).toBe('http://docbrown.com/');

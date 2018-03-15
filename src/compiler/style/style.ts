@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile, StyleMeta } from '../../declarations';
+import * as d from '../../declarations';
 import { buildError, hasFileExtension, normalizePath } from '../util';
 import { ENCAPSULATION } from '../../util/constants';
 import { minifyStyle } from './minify-style';
@@ -6,7 +6,7 @@ import { runPluginTransforms } from '../plugin/plugin';
 import { scopeComponentCss } from './scope-css';
 
 
-export async function generateStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
+export async function generateStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
 
   await Promise.all(entryModules.map(async bundle => {
 
@@ -18,7 +18,7 @@ export async function generateStyles(config: Config, compilerCtx: CompilerCtx, b
 }
 
 
-export async function generateComponentStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, moduleFile: ModuleFile) {
+export async function generateComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile) {
   const stylesMeta = moduleFile.cmpMeta.stylesMeta = moduleFile.cmpMeta.stylesMeta || {};
 
   await Promise.all(Object.keys(stylesMeta).map(async modeName => {
@@ -31,7 +31,7 @@ export async function generateComponentStyles(config: Config, compilerCtx: Compi
 }
 
 
-async function compileStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, moduleFile: ModuleFile, styleMeta: StyleMeta) {
+async function compileStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, styleMeta: d.StyleMeta) {
   const extStylePaths = styleMeta.externalStyles.map(extStyle => {
     return extStyle.absolutePath;
   });
@@ -52,7 +52,7 @@ async function compileStyles(config: Config, compilerCtx: CompilerCtx, buildCtx:
 }
 
 
-async function compileExternalStyle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, moduleFile: ModuleFile, extStylePath: string) {
+async function compileExternalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, moduleFile: d.ModuleFile, extStylePath: string) {
   extStylePath = normalizePath(extStylePath);
 
   if (moduleFile.isCollectionDependency) {
@@ -77,7 +77,7 @@ async function compileExternalStyle(config: Config, compilerCtx: CompilerCtx, bu
   const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, extStylePath);
 
   if (!moduleFile.isCollectionDependency) {
-    const collectionDirs = config.outputTargets.filter(o => o.collectionDir);
+    const collectionDirs = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
 
     const relPath = config.sys.path.relative(config.srcDir, transformResults.id);
 
@@ -91,14 +91,14 @@ async function compileExternalStyle(config: Config, compilerCtx: CompilerCtx, bu
 }
 
 
-function checkPluginHelpers(config: Config, buildCtx: BuildCtx, externalStylePath: string) {
+function checkPluginHelpers(config: d.Config, buildCtx: d.BuildCtx, externalStylePath: string) {
   PLUGIN_HELPERS.forEach(p => {
     checkPluginHelper(config, buildCtx, externalStylePath, p.pluginExts, p.pluginId, p.pluginName);
   });
 }
 
 
-function checkPluginHelper(config: Config, buildCtx: BuildCtx, externalStylePath: string, pluginExts: string[], pluginId: string, pluginName: string) {
+function checkPluginHelper(config: d.Config, buildCtx: d.BuildCtx, externalStylePath: string, pluginExts: string[], pluginId: string, pluginName: string) {
   if (!hasFileExtension(externalStylePath, pluginExts)) {
     return;
   }
@@ -129,7 +129,7 @@ function checkPluginHelper(config: Config, buildCtx: BuildCtx, externalStylePath
 }
 
 
-function hasPluginInstalled(config: Config, filePath: string) {
+function hasPluginInstalled(config: d.Config, filePath: string) {
   // TODO: don't hard these
 
   const plugin = PLUGIN_HELPERS.find(p => hasFileExtension(filePath, p.pluginExts));
@@ -141,7 +141,7 @@ function hasPluginInstalled(config: Config, filePath: string) {
 }
 
 
-export async function setStyleText(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, cmpMeta: ComponentMeta, styleMeta: StyleMeta, styles: string[]) {
+export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, styleMeta: d.StyleMeta, styles: string[]) {
   // join all the component's styles for this mode together into one line
 
   if (config.minifyCss) {

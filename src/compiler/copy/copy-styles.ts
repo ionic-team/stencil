@@ -1,8 +1,8 @@
-import { BuildCtx, CompilerCtx, Config } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError } from '../util';
 
 
-export async function copyComponentStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function copyComponentStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
 
   config.logger.debug(`copy styles`);
 
@@ -31,8 +31,10 @@ export async function copyComponentStyles(config: Config, compilerCtx: CompilerC
 
     const promises: Promise<any>[] = [];
 
+    const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => o.collectionDir);
+
     absSrcStylePaths.map(async absSrcStylePath => {
-      config.outputTargets.forEach(outputTarget => {
+      outputTargets.forEach(outputTarget => {
         const relPath = config.sys.path.relative(config.srcDir, absSrcStylePath);
         const dest = config.sys.path.join(outputTarget.collectionDir, relPath);
         promises.push(compilerCtx.fs.copy(absSrcStylePath, dest));

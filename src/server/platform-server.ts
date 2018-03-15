@@ -1,6 +1,4 @@
-import { AppGlobal, CjsExports, CompilerCtx, ComponentMeta,
-  ComponentRegistry, Config, CoreContext, Diagnostic,
-  HostElement, HydrateResults, OutputTarget, PlatformApi } from '../declarations';
+import * as d from '../declarations';
 import { assignHostContentSlots } from '../renderer/vdom/slot';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
@@ -15,21 +13,21 @@ import { toDashCase } from '../util/helpers';
 
 
 export function createPlatformServer(
-  config: Config,
-  outputTarget: OutputTarget,
+  config: d.Config,
+  outputTarget: d.OutputTargetWww,
   win: any,
   doc: any,
-  cmpRegistry: ComponentRegistry,
-  hydrateResults: HydrateResults,
+  cmpRegistry: d.ComponentRegistry,
+  diagnostics: d.Diagnostic[],
   isPrerender: boolean,
-  compilerCtx?: CompilerCtx
-): PlatformApi {
+  compilerCtx?: d.CompilerCtx
+): d.PlatformApi {
   const loadedBundles: {[bundleId: string]: any} = {};
   const styles: string[] = [];
-  const controllerComponents: {[tag: string]: HostElement} = {};
+  const controllerComponents: {[tag: string]: d.HostElement} = {};
 
   // create the app global
-  const App: AppGlobal = {};
+  const App: d.AppGlobal = {};
 
   const domApi = createDomApi(App, win, doc);
 
@@ -40,7 +38,7 @@ export function createPlatformServer(
   cmpRegistry = Object.assign({ 'html': {}}, cmpRegistry);
 
   // initialize Core global object
-  const Context: CoreContext = {};
+  const Context: d.CoreContext = {};
   Context.addListener = noop;
   Context.enableListener = noop;
   Context.emit = noop;
@@ -73,7 +71,7 @@ export function createPlatformServer(
   runGlobalScripts();
 
   // create the platform api which is used throughout common core code
-  const plt: PlatformApi = {
+  const plt: d.PlatformApi = {
     attachStyles: noop,
     connectHostElement,
     defineComponent,
@@ -113,7 +111,7 @@ export function createPlatformServer(
 
   // setup the root node of all things
   // which is the mighty <html> tag
-  const rootElm = <HostElement>domApi.$documentElement;
+  const rootElm = domApi.$documentElement as d.HostElement;
   rootElm.$rendered = true;
   rootElm.$activeLoading = [];
   rootElm.$initLoad = function appLoadedCallback() {
@@ -121,7 +119,7 @@ export function createPlatformServer(
     appLoaded();
   };
 
-  function appLoaded(failureDiagnostic?: Diagnostic) {
+  function appLoaded(failureDiagnostic?: d.Diagnostic) {
     if (plt.hasLoadedMap.has(rootElm) || failureDiagnostic) {
       // the root node has loaded
       // and there are no css files still loading
@@ -129,7 +127,7 @@ export function createPlatformServer(
     }
   }
 
-  function connectHostElement(_cmpMeta: ComponentMeta, elm: HostElement) {
+  function connectHostElement(_cmpMeta: d.ComponentMeta, elm: d.HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -148,7 +146,7 @@ export function createPlatformServer(
     return cmpRegistry[elm.tagName.toLowerCase()];
   }
 
-  function defineComponent(cmpMeta: ComponentMeta) {
+  function defineComponent(cmpMeta: d.ComponentMeta) {
     // default mode and color props
     cmpRegistry[cmpMeta.tagNameMeta] = cmpMeta;
   }
@@ -160,7 +158,7 @@ export function createPlatformServer(
    * @param callback
    */
   function execBundleCallback(name: string, deps: string[], callback: Function) {
-    const bundleExports: CjsExports = {};
+    const bundleExports: d.CjsExports = {};
 
     try {
       callback(bundleExports, ...deps.map(d => loadedBundles[d]));
@@ -237,7 +235,7 @@ export function createPlatformServer(
   plt.attachStyles = function attachStyles(_domApi, _cmpMeta, _modeName, _elm) {/**/};
 
   // This is executed by the component's connected callback.
-  function loadComponent(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
+  function loadComponent(cmpMeta: d.ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
     bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
       cmpMeta.bundleIds[modeName];
@@ -271,8 +269,8 @@ export function createPlatformServer(
     config.sys.vm.runInContext(compilerCtx.appFiles.global, win);
   }
 
-  function onError(err: Error, type: RUNTIME_ERROR, elm: HostElement, appFailure: boolean) {
-    const d: Diagnostic = {
+  function onError(err: Error, type: RUNTIME_ERROR, elm: d.HostElement, appFailure: boolean) {
+    const diagnostic: d.Diagnostic = {
       type: 'runtime',
       header: 'Runtime error detected',
       level: 'error',
@@ -280,42 +278,42 @@ export function createPlatformServer(
     };
 
     if (err && err.stack) {
-      d.messageText += '\n' + err.stack;
-      d.messageText = d.messageText.trim();
+      diagnostic.messageText += '\n' + err.stack;
+      diagnostic.messageText = diagnostic.messageText.trim();
     }
 
     switch (type) {
       case RUNTIME_ERROR.LoadBundleError:
-        d.header += ' while loading bundle';
+        diagnostic.header += ' while loading bundle';
         break;
       case RUNTIME_ERROR.QueueEventsError:
-        d.header += ' while running initial events';
+        diagnostic.header += ' while running initial events';
         break;
       case RUNTIME_ERROR.WillLoadError:
-        d.header += ' during componentWillLoad()';
+        diagnostic.header += ' during componentWillLoad()';
         break;
       case RUNTIME_ERROR.DidLoadError:
-        d.header += ' during componentDidLoad()';
+        diagnostic.header += ' during componentDidLoad()';
         break;
       case RUNTIME_ERROR.InitInstanceError:
-        d.header += ' while initializing instance';
+        diagnostic.header += ' while initializing instance';
         break;
       case RUNTIME_ERROR.RenderError:
-        d.header += ' while rendering';
+        diagnostic.header += ' while rendering';
         break;
       case RUNTIME_ERROR.DidUpdateError:
-        d.header += ' while updating';
+        diagnostic.header += ' while updating';
         break;
     }
 
     if (elm && elm.tagName) {
-      d.header += ': ' + elm.tagName.toLowerCase();
+      diagnostic.header += ': ' + elm.tagName.toLowerCase();
     }
 
-    hydrateResults.diagnostics.push(d);
+    diagnostics.push(diagnostic);
 
     if (appFailure) {
-      appLoaded(d);
+      appLoaded(diagnostic);
     }
   }
 
@@ -331,7 +329,7 @@ export function createPlatformServer(
 }
 
 
-export function getComponentBundleFilename(cmpMeta: ComponentMeta, modeName: string) {
+export function getComponentBundleFilename(cmpMeta: d.ComponentMeta, modeName: string) {
   let bundleId: string = (typeof cmpMeta.bundleIds === 'string') ?
     cmpMeta.bundleIds :
     (cmpMeta.bundleIds[modeName] || cmpMeta.bundleIds[DEFAULT_STYLE_MODE]);

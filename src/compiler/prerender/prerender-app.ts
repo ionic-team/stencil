@@ -1,30 +1,35 @@
-import { BuildCtx, CompilerCtx, Config, EntryModule, HydrateResults, OutputTarget, PrerenderConfig, PrerenderLocation } from '../../declarations';
-import { buildWarn, catchError, hasError, pathJoin } from '../util';
-import { crawlAnchorsForNextUrls, getPrerenderQueue } from './prerender-utils';
+import * as d from '../../declarations';
+import { buildWarn, catchError, hasError } from '../util';
+import { crawlAnchorsForNextUrls, getPrerenderQueue, getWritePathFromUrl } from './prerender-utils';
 import { generateHostConfig } from './host-config';
+import { optimizeIndexHtml } from '../html/optimize-html';
 import { prerenderPath } from './prerender-path';
 
 
-export async function prerenderApps(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
-  return Promise.all(config.outputTargets.map(outputTarget => {
-    return prerenderApp(config, compilerCtx, buildCtx, outputTarget, entryModules);
+export async function prerenderOutputTargets(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[]) {
+  if (!config.srcIndexHtml) {
+    return;
+  }
+
+  const outputTargets = (config.outputTargets as d.OutputTargetWww[]).filter(o => {
+    return o.type === 'www' && o.indexHtml;
+  });
+
+  await Promise.all(outputTargets.map(async outputTarget => {
+
+    if (outputTarget.hydrateComponents && outputTarget.prerenderLocations && outputTarget.prerenderLocations.length > 0) {
+      await prerenderOutputTarget(config, compilerCtx, buildCtx, outputTarget, entryModules);
+
+    } else {
+      const windowLocationPath = outputTarget.baseUrl;
+      await optimizeIndexHtml(config, compilerCtx, outputTarget, windowLocationPath, buildCtx.diagnostics);
+    }
+
   }));
 }
 
 
-async function prerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, entryModules: EntryModule[]) {
-  if (!outputTarget.prerender) {
-    // no need to rebuild index.html if there were no app file changes
-    config.logger.debug(`prerenderApp, skipping because config.prerender is falsy`);
-    return [];
-  }
-
-  if (!outputTarget.indexHtml) {
-    // no need to rebuild index.html if there were no app file changes
-    config.logger.debug(`prerenderApp, skipping because config.outputTargets['www'] is falsy`);
-    return [];
-  }
-
+async function prerenderOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[]) {
   // if there was src index.html file, then the process before this one
   // would have already loaded and updated the src index to its www path
   // get the www index html content for the template for all prerendered pages
@@ -52,11 +57,11 @@ async function prerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: 
 }
 
 
-async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, entryModules: EntryModule[], prerenderQueue: PrerenderLocation[], indexHtml: string) {
+async function runPrerenderApp(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, entryModules: d.EntryModule[], prerenderQueue: d.PrerenderLocation[], indexHtml: string) {
   // keep track of how long the entire build process takes
-  const timeSpan = config.logger.createTimeSpan(`prerendering started`, !(outputTarget.prerender as PrerenderConfig).hydrateComponents);
+  const timeSpan = config.logger.createTimeSpan(`prerendering started`, !outputTarget.hydrateComponents);
 
-  const hydrateResults: HydrateResults[] = [];
+  const hydrateResults: d.HydrateResults[] = [];
 
   try {
     await new Promise(resolve => {
@@ -85,11 +90,11 @@ async function runPrerenderApp(config: Config, compilerCtx: CompilerCtx, buildCt
 }
 
 
-function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, prerenderQueue: PrerenderLocation[], indexSrcHtml: string, hydrateResults: HydrateResults[], resolve: Function) {
-  for (var i = 0; i < outputTarget.prerender.maxConcurrent; i++) {
+function drainPrerenderQueue(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, prerenderQueue: d.PrerenderLocation[], indexSrcHtml: string, hydrateResults: d.HydrateResults[], resolve: Function) {
+  for (var i = 0; i < outputTarget.prerenderMaxConcurrent; i++) {
     const activelyProcessingCount = prerenderQueue.filter(p => p.status === 'processing').length;
 
-    if (activelyProcessingCount >= outputTarget.prerender.maxConcurrent) {
+    if (activelyProcessingCount >= outputTarget.prerenderMaxConcurrent) {
       // whooaa, slow down there buddy, let's not get carried away
       break;
     }
@@ -110,7 +115,7 @@ function drainPrerenderQueue(config: Config, compilerCtx: CompilerCtx, buildCtx:
 }
 
 
-async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, prerenderQueue: PrerenderLocation[], indexSrcHtml: string, hydrateResults: HydrateResults[], resolve: Function) {
+async function runNextPrerenderUrl(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww, prerenderQueue: d.PrerenderLocation[], indexSrcHtml: string, hydrateResults: d.HydrateResults[], resolve: Function) {
   const p = prerenderQueue.find(p => p.status === 'pending');
   if (!p) return;
 
@@ -126,8 +131,8 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
     // merge any diagnostics we just got from this
     config.logger.printDiagnostics(results.diagnostics);
 
-    if (outputTarget.prerender.crawl !== false) {
-      crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, results);
+    if (outputTarget.prerenderUrlCrawl) {
+      crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, results.url, results.anchors);
     }
 
     hydrateResults.push(results);
@@ -148,19 +153,11 @@ async function runNextPrerenderUrl(config: Config, compilerCtx: CompilerCtx, bui
 }
 
 
-async function writePrerenderDest(config: Config, ctx: CompilerCtx, outputTarget: OutputTarget, results: HydrateResults) {
-  const parsedUrl = config.sys.url.parse(results.url);
-
-  // figure out the directory where this file will be saved
-  const dir = config.sys.path.join(
-    outputTarget.prerender.prerenderDir,
-    parsedUrl.pathname
-  );
-
-  // create the full path where this will be saved (normalize for windowz)
-  const filePath = pathJoin(config, dir, `index.html`);
+async function writePrerenderDest(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww, results: d.HydrateResults) {
+  // create the full path where this will be saved
+  const filePath = getWritePathFromUrl(config, outputTarget, results.url);
 
   // add the prerender html content it to our collection of
   // files that need to be saved when we're all ready
-  await ctx.fs.writeFile(filePath, results.html);
+  await compilerCtx.fs.writeFile(filePath, results.html);
 }

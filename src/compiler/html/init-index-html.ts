@@ -1,15 +1,15 @@
-import { BuildCtx, CompilerCtx, Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError } from '../util';
 
 
-export function initIndexHtmls(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export function initIndexHtmls(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   return Promise.all(config.outputTargets.map(outputTarget => {
     return initIndexHtml(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 
 
-async function initIndexHtml(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+async function initIndexHtml(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   // if there isn't an index.html yet
   // let's generate a slim one quick so that
   // on the first build the user sees a loading indicator

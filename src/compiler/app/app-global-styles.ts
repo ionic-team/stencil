@@ -1,10 +1,10 @@
-import { BuildCtx, CompilerCtx, Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError, normalizePath, pathJoin } from '../util';
 import { getGlobalStyleFilename } from './app-file-naming';
 import { runPluginTransforms } from '../plugin/plugin';
 
 
-export async function generateGlobalStyles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget) {
+export async function generateGlobalStyles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
   const filePaths = config.globalStyle;
   if (!filePaths || !filePaths.length) {
     config.logger.debug(`"config.globalStyle" not found`);

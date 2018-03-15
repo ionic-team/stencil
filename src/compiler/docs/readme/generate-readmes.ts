@@ -1,16 +1,16 @@
+import * as d from '../../../declarations';
 import { addAutoGenerate } from './auto-docs';
 import { AUTO_GENERATE_COMMENT } from './constants';
-import { CompilerCtx, Config, ModuleFile, OutputTarget } from '../../../declarations';
 
 
-export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> {
+export function generateReadmes(config: d.Config, ctx: d.CompilerCtx): Promise<any> {
   const cmpDirectories: string[] = [];
   const promises: Promise<any>[] = [];
   const warnings: string[] = [];
 
   const moduleFiles = Object.keys(ctx.moduleFiles).sort();
 
-  const readmeOutputs = config.outputTargets.filter(o => o.type === 'docs' && o.format === 'readme' && o.dir);
+  const readmeOutputs = (config.outputTargets as d.OutputTargetDocs[]).filter(o => o.type === 'docs' && o.format === 'readme' && o.dir);
 
   moduleFiles.forEach(filePath => {
     const moduleFile = ctx.moduleFiles[filePath];
@@ -38,7 +38,7 @@ export function generateReadmes(config: Config, ctx: CompilerCtx): Promise<any> 
 }
 
 
-async function genereateReadme(config: Config, ctx: CompilerCtx, readmeOutputs: OutputTarget[], moduleFile: ModuleFile, dirPath: string) {
+async function genereateReadme(config: d.Config, ctx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocs[], moduleFile: d.ModuleFile, dirPath: string) {
   const readMePath = config.sys.path.join(dirPath, 'readme.md');
 
   let existingContent: string = null;
@@ -58,7 +58,7 @@ async function genereateReadme(config: Config, ctx: CompilerCtx, readmeOutputs: 
 }
 
 
-async function createReadme(config: Config, ctx: CompilerCtx, readmeOutputs: OutputTarget[], moduleFile: ModuleFile, readMePath: string) {
+async function createReadme(config: d.Config, ctx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocs[], moduleFile: d.ModuleFile, readMePath: string) {
   const content: string[] = [];
 
   content.push(`# ${moduleFile.cmpMeta.tagNameMeta}`);
@@ -85,7 +85,7 @@ async function createReadme(config: Config, ctx: CompilerCtx, readmeOutputs: Out
 }
 
 
-async function updateReadme(config: Config, ctx: CompilerCtx, readmeOutputs: OutputTarget[], moduleFile: ModuleFile, readMePath: string, existingContent: string) {
+async function updateReadme(config: d.Config, ctx: d.CompilerCtx, readmeOutputs: d.OutputTargetDocs[], moduleFile: d.ModuleFile, readMePath: string, existingContent: string) {
   if (typeof existingContent !== 'string' || existingContent.trim() === '') {
     throw new Error('missing existing content');
   }

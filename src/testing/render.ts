@@ -54,7 +54,6 @@ export async function render(opts: RenderTestOptions): Promise<any> {
       serializeHtml: false,
       destroyDom: false,
       isPrerender: false,
-      collectAnchors: false,
       inlineLoaderScript: false,
       inlineStyles: false,
       removeUnusedStyles: false,

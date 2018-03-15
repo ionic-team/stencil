@@ -1,7 +1,7 @@
-import { Config, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 
 
-export function validateServiceWorker(config: Config, outputTarget: OutputTarget) {
+export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww) {
   if (config.devMode) {
     outputTarget.serviceWorker = null;
     return;

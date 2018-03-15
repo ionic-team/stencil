@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, Config, Diagnostic, OutputTarget, PackageJsonData } from '../../declarations';
+import * as d from '../../declarations';
 import { buildError, buildWarn, hasError, normalizePath, pathJoin } from '../util';
 import { COLLECTION_MANIFEST_FILE_NAME } from '../../util/constants';
 import { copyComponentStyles } from '../copy/copy-styles';
@@ -7,19 +7,16 @@ import { getLoaderFileName } from '../app/app-file-naming';
 
 
 
-export async function generateDistributions(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx): Promise<any> {
-  return Promise.all(config.outputTargets.map(outputTarget => {
+export async function generateDistributions(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<any> {
+  const distOutputs = config.outputTargets.filter(o => o.type === 'dist');
+
+  return Promise.all(distOutputs.map(outputTarget => {
     return generateDistribution(config, compilerCtx, buildCtx, outputTarget);
   }));
 }
 
 
-async function generateDistribution(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget): Promise<any> {
-  if (outputTarget.type !== 'dist') {
-    // don't bother
-    return;
-  }
-
+async function generateDistribution(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetDist): Promise<any> {
   const pkgData = await readPackageJson(config, compilerCtx);
 
   validatePackageJson(config, outputTarget, buildCtx.diagnostics, pkgData);
@@ -35,7 +32,7 @@ async function generateDistribution(config: Config, compilerCtx: CompilerCtx, bu
 }
 
 
-async function readPackageJson(config: Config, compilerCtx: CompilerCtx) {
+async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
   const pkgJsonPath = config.sys.path.join(config.rootDir, 'package.json');
 
   let pkgJson: string;
@@ -46,7 +43,7 @@ async function readPackageJson(config: Config, compilerCtx: CompilerCtx) {
     throw new Error(`Missing "package.json" file for distribution: ${pkgJsonPath}`);
   }
 
-  let pkgData: PackageJsonData;
+  let pkgData: d.PackageJsonData;
   try {
     pkgData = JSON.parse(pkgJson);
 
@@ -58,7 +55,7 @@ async function readPackageJson(config: Config, compilerCtx: CompilerCtx) {
 }
 
 
-export function validatePackageJson(config: Config, outputTarget: OutputTarget, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
+export function validatePackageJson(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   validatePackageFiles(config, outputTarget, diagnostics, pkgData);
 
   const mainFileName = getLoaderFileName(config);
@@ -99,7 +96,7 @@ export function validatePackageJson(config: Config, outputTarget: OutputTarget, 
 }
 
 
-export function validatePackageFiles(config: Config, outputTarget: OutputTarget, diagnostics: Diagnostic[], pkgData: PackageJsonData) {
+export function validatePackageFiles(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   if (pkgData.files) {
     const actualDistDir = normalizePath(config.sys.path.relative(config.rootDir, outputTarget.dir));
 
@@ -122,12 +119,12 @@ export function validatePackageFiles(config: Config, outputTarget: OutputTarget,
 }
 
 
-export function getComponentsDtsSrcFilePath(config: Config) {
+export function getComponentsDtsSrcFilePath(config: d.Config) {
   return pathJoin(config, config.srcDir, COMPONENTS_DTS);
 }
 
 
-export function getComponentsDtsTypesFilePath(config: Config, outputTarget: OutputTarget) {
+export function getComponentsDtsTypesFilePath(config: d.Config, outputTarget: d.OutputTargetDist) {
   return pathJoin(config, outputTarget.typesDir, COMPONENTS_DTS);
 }
 

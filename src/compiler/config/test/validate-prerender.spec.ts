@@ -1,178 +1,114 @@
-import { Config, OutputTarget, PrerenderConfig } from '../../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
-import { validatePrerender } from '../validate-prerender';
+import { validateConfig } from '../validate-config';
 
 
-describe('validatePrerender', () => {
+describe('validateConfig', () => {
 
-  let config: Config;
-  let outputTarget: OutputTarget;
+  let config: d.Config;
+  const logger = mockLogger();
+  const sys = mockStencilSystem();
 
   beforeEach(() => {
     config = {
-      sys: mockStencilSystem(),
-      logger: mockLogger(),
+      sys: sys,
+      logger: logger,
       rootDir: '/User/some/path/',
-      srcDir: '/User/some/path/src/',
       suppressTypeScriptErrors: true,
-      flags: {}
     };
-    outputTarget = {
+  });
+
+
+  it('default no prerender if existing outputTargets, but no www', () => {
+    const dist: d.OutputTargetDist = {
+      type: 'dist'
+    };
+    config.outputTargets = [dist];
+    validateConfig(config);
+    expect(config.outputTargets.some(o => o.type === 'www')).toBe(false);
+  });
+
+  it('default prerender when flag true, prod mode, get custom www output values', () => {
+    config.flags = { prerender: true };
+    const www: d.OutputTargetWww = {
       type: 'www',
-      dir: '/www'
+      dir: 'somedir',
+      buildDir: 'someotherdir',
+      indexHtml: 'some.html',
+      empty: false,
+      collapseWhitespace: false,
+      baseUrl: '/docs'
     };
+    config.outputTargets = [www];
+    validateConfig(config);
+    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    expect(outputTarget.dir).toContain('somedir');
+    expect(outputTarget.buildDir).toContain('someotherdir');
+    expect(outputTarget.indexHtml).toContain('some.html');
+    expect(outputTarget.empty).toBe(false);
+    expect(outputTarget.collapseWhitespace).toBe(false);
+    expect(outputTarget.hydrateComponents).toBe(true);
+    expect(outputTarget.baseUrl).toBe('/docs/');
+    expect(outputTarget.prerenderLocations).toEqual([{ path: '/docs/' }]);
   });
 
+  it('default prerender when flag true, prod mode', () => {
+    config.flags = { prerender: true };
+    validateConfig(config);
 
-  it('should not prerender when config.prerender false', () => {
-    outputTarget.prerender = false as any;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBe(null);
+    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    expect(outputTarget.baseUrl).toBe('/');
+    expect(outputTarget.canonicalLink).toBe(true);
+    expect(outputTarget.collapseWhitespace).toBe(true);
+    expect(outputTarget.hydrateComponents).toBe(true);
+    expect(outputTarget.inlineStyles).toBe(true);
+    expect(outputTarget.inlineLoaderScript).toBe(true);
+    expect(outputTarget.inlineAssetsMaxSize).toBe(5000);
+    expect(outputTarget.prerenderUrlCrawl).toBe(true);
+    expect(outputTarget.prerenderLocations).toEqual([{ path: '/' }]);
+    expect(outputTarget.prerenderPathHash).toBe(false);
+    expect(outputTarget.prerenderPathQuery).toBe(false);
+    expect(outputTarget.prerenderMaxConcurrent).toBe(4);
+    expect(outputTarget.removeUnusedStyles).toBe(true);
   });
 
-  it('should set prerendering defaults if prerendering flag', () => {
-    config.flags.prerender = true;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBeDefined();
-    expect(outputTarget.prerender.hydrateComponents).toBe(true);
-    expect(outputTarget.prerender.crawl).toBe(true);
-    expect(outputTarget.prerender.include).toEqual([{ path: '/' }]);
-    expect(outputTarget.prerender.collapseWhitespace).toBe(true);
-    expect(outputTarget.prerender.inlineLoaderScript).toBe(true);
-    expect(outputTarget.prerender.inlineStyles).toBe(true);
-    expect(outputTarget.prerender.inlineAssetsMaxSize).toBe(5000);
-    expect(outputTarget.prerender.removeUnusedStyles).toBe(true);
+  it('defaults, prod mode, no hydrate prerender without prerender flag', () => {
+    validateConfig(config);
+
+    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    expect(outputTarget.baseUrl).toBe('/');
+    expect(outputTarget.canonicalLink).toBe(false);
+    expect(outputTarget.collapseWhitespace).toBe(true);
+    expect(outputTarget.hydrateComponents).toBe(false);
+    expect(outputTarget.inlineStyles).toBe(false);
+    expect(outputTarget.inlineLoaderScript).toBe(true);
+    expect(outputTarget.inlineAssetsMaxSize).toBe(0);
+    expect(outputTarget.prerenderUrlCrawl).toBe(false);
+    expect(outputTarget.prerenderLocations).toEqual([]);
+    expect(outputTarget.prerenderPathHash).toBe(false);
+    expect(outputTarget.prerenderPathQuery).toBe(false);
+    expect(outputTarget.prerenderMaxConcurrent).toBe(0);
+    expect(outputTarget.removeUnusedStyles).toBe(false);
   });
 
-  it('should set prerendering no hydrate defaults if no prerender flag and not devMode', () => {
-    config.devMode = false;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBeDefined();
-    expect(outputTarget.prerender.hydrateComponents).toBe(false);
-    expect(outputTarget.prerender.crawl).toBe(false);
-    expect(outputTarget.prerender.include).toEqual([{ path: '/' }]);
-    expect(outputTarget.prerender.collapseWhitespace).toBe(true);
-    expect(outputTarget.prerender.inlineLoaderScript).toBe(true);
-    expect(outputTarget.prerender.inlineStyles).toBe(false);
-    expect(outputTarget.prerender.inlineAssetsMaxSize).toBe(5000);
-    expect(outputTarget.prerender.removeUnusedStyles).toBe(false);
-  });
+  it('defaults, dev mode, no prerender', () => {
+    config.devMode = true;
+    validateConfig(config);
 
-  it('should set prerender.maxConcurrent', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {
-      maxConcurrent: 8
-    };
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.maxConcurrent).toBe(8);
-  });
-
-  it('should default prerender.maxConcurrent', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.maxConcurrent).toBe(4);
-  });
-
-  it('should default prerender.include', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = undefined;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.include[0].path).toBe('/');
-  });
-
-  it('should default prerender.crawl', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.crawl).toBe(true);
-  });
-
-  it('should set prerender.prerenderDir', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {
-      prerenderDir: '/prerendered'
-    };
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.prerenderDir).toBe('/prerendered');
-  });
-
-  it('should default prerender.prerenderDir', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.prerenderDir).toBe('/www');
-  });
-
-  it('should default prerender.inlineStyles', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.inlineStyles).toBe(true);
-  });
-
-  it('should default prerender.removeUnusedStyles', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.removeUnusedStyles).toBe(true);
-  });
-
-  it('should default prerender.collapseWhitespace', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.collapseWhitespace).toBe(true);
-  });
-
-  it('should default prerender.inlineLoaderScript', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender.inlineLoaderScript).toBe(true);
-  });
-
-  it('should always set es5 build when prerendering', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = {};
-    validatePrerender(config, outputTarget);
-    expect(config.buildEs5).toBe(true);
-  });
-
-  it('should default prerender if undefined and type www', () => {
-    outputTarget.type = 'www';
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBeDefined();
-  });
-
-  it('should default null prerender if undefined and not type www', () => {
-    outputTarget.type = 'dist';
-    outputTarget.dir = '/dist';
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBe(null);
-  });
-
-  it('should default prerender values flag true but no outputTarget', () => {
-    config.flags.prerender = true;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).not.toBe(null);
-    expect(outputTarget.prerender).not.toBe(true);
-    expect(outputTarget.prerender).not.toBe(false);
-  });
-
-  it('should default prerender values when outputTarget.prerender true and flag true', () => {
-    config.flags.prerender = true;
-    outputTarget.prerender = true as any;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).not.toBe(null);
-    expect(outputTarget.prerender).not.toBe(true);
-    expect(outputTarget.prerender).not.toBe(false);
-  });
-
-  it('should not prerender if null', () => {
-    outputTarget.prerender = null;
-    validatePrerender(config, outputTarget);
-    expect(outputTarget.prerender).toBe(null);
+    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    expect(outputTarget.baseUrl).toBe('/');
+    expect(outputTarget.canonicalLink).toBe(false);
+    expect(outputTarget.collapseWhitespace).toBe(false);
+    expect(outputTarget.hydrateComponents).toBe(false);
+    expect(outputTarget.inlineStyles).toBe(false);
+    expect(outputTarget.inlineLoaderScript).toBe(false);
+    expect(outputTarget.inlineAssetsMaxSize).toBe(0);
+    expect(outputTarget.prerenderUrlCrawl).toBe(false);
+    expect(outputTarget.prerenderLocations).toEqual([]);
+    expect(outputTarget.prerenderPathHash).toBe(false);
+    expect(outputTarget.prerenderPathQuery).toBe(false);
+    expect(outputTarget.prerenderMaxConcurrent).toBe(0);
+    expect(outputTarget.removeUnusedStyles).toBe(false);
   });
 
 });
