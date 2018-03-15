@@ -106,7 +106,7 @@ describe('getWritePathFromUrl', () => {
     expect(p).toBe('/somepath/docs/about/index.html');
   });
 
-  it('custome baseUrl', () => {
+  it('custom baseUrl, trailing slash', () => {
     config = new TestingConfig();
     config.outputTargets = [
       {
@@ -118,6 +118,22 @@ describe('getWritePathFromUrl', () => {
     validateConfig(config);
     outputTarget = config.outputTargets.find(o => o.type === 'www');
     const url = 'http://stenciljs.com/base-url/';
+    const p = getWritePathFromUrl(config, outputTarget, url);
+    expect(p).toBe('/custom-dir/index.html');
+  });
+
+  it('custom baseUrl, no trailing slash', () => {
+    config = new TestingConfig();
+    config.outputTargets = [
+      {
+        type: 'www',
+        dir: 'custom-dir',
+        baseUrl: '/base-url'
+      } as d.OutputTargetWww
+    ];
+    validateConfig(config);
+    outputTarget = config.outputTargets.find(o => o.type === 'www');
+    const url = 'http://stenciljs.com/base-url';
     const p = getWritePathFromUrl(config, outputTarget, url);
     expect(p).toBe('/custom-dir/index.html');
   });

@@ -140,7 +140,7 @@ export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTarg
   const parsedUrl = config.sys.url.parse(url);
 
   let pathName = parsedUrl.pathname;
-  if (pathName.startsWith(outputTarget.baseUrl)) {
+  if (pathName.startsWith(outputTarget.baseUrl) || outputTarget.baseUrl === pathName + '/') {
     pathName = pathName.substring(outputTarget.baseUrl.length);
   }
 
