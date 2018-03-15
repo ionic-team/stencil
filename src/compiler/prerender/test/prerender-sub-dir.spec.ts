@@ -50,6 +50,7 @@ describe('prerender', () => {
     expect(r.diagnostics).toEqual([]);
 
     expectFilesWritten(r,
+      '/www/docs/build/app.js',
       '/www/docs/build/app/app.core.js',
       '/www/docs/build/app/app.core.pf.js',
       '/www/docs/build/app/ionic-docs.es5.js',
@@ -63,6 +64,7 @@ describe('prerender', () => {
 
     doNotExpectFiles(c.fs, [
       '/www/docs/docs/index.html',
+      '/www/docs/docs/build/app.js',
       '/www/docs/data.pdf',
       '/www/docs/data.pdf/index.html',
       '/www/docs/components/button/index.html'
