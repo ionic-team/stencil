@@ -1,3 +1,22 @@
+<a name="0.7.0-5"></a>
+# 🌷 [0.7.0-5](https://github.com/ionic-team/stencil/compare/v0.7.0-4...v0.7.0-5) (2018-03-15)
+
+
+### Bug Fixes
+
+* **build:** do not ignore watch flag ([982de3e](https://github.com/ionic-team/stencil/commit/982de3e))
+* **prerender:** fix inlined loader script with baseUrl confg ([7907b94](https://github.com/ionic-team/stencil/commit/7907b94))
+* **prerender:** fix urls w/ same as baseUrl but no trailing slash ([26bf09f](https://github.com/ionic-team/stencil/commit/26bf09f))
+* **test:** normalize path for windows ([5e3fbc0](https://github.com/ionic-team/stencil/commit/5e3fbc0))
+
+
+### Features
+
+* **prerender:** add baseUrl outputTarget config ([6d08a70](https://github.com/ionic-team/stencil/commit/6d08a70))
+* **prerender:** do not write empty attrs which are safe to remove ([18e7e2c](https://github.com/ionic-team/stencil/commit/18e7e2c))
+
+
+
 <a name="0.7.0-4"></a>
 # 🌏 [0.7.0-4](https://github.com/ionic-team/stencil/compare/v0.7.0-3...v0.7.0-4) (2018-03-13)
 
