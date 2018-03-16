@@ -1,4 +1,5 @@
 import * as d from '../../declarations';
+import { appendSwScript, generateServiceWorkerUrl } from './service-worker-util';
 
 
 export async function updateIndexHtmlServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww, indexHtml: string) {
@@ -17,10 +18,7 @@ export async function updateIndexHtmlServiceWorker(config: d.Config, outputTarge
 
 
 export async function injectRegisterServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww, indexHtml: string) {
-  let swUrl = config.sys.path.relative(outputTarget.dir, outputTarget.serviceWorker.swDest);
-  if (swUrl.charAt(0) !== '/') {
-    swUrl = '/' + swUrl;
-  }
+  const swUrl = generateServiceWorkerUrl(config, outputTarget);
 
   const serviceWorker = getRegisterSwScript(swUrl);
   const swHtml = `<script>${serviceWorker}</script>`;
@@ -71,19 +69,3 @@ const UNREGSITER_SW = `
     }
   </script>
 `;
-
-
-export function appendSwScript(indexHtml: string, htmlToAppend: string) {
-  const match = indexHtml.match(BODY_CLOSE_REG);
-
-  if (match) {
-    indexHtml = indexHtml.replace(match[0], `${htmlToAppend}\n${match[0]}`);
-  } else {
-    indexHtml += '\n' + htmlToAppend;
-  }
-
-  return indexHtml;
-}
-
-
-const BODY_CLOSE_REG = /<\/body>/i;

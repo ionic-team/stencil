@@ -1,5 +1,40 @@
-import { appendSwScript } from '../inject-sw-script';
-import { compareHtml } from '../../../testing/mocks';
+import * as d from '../../../declarations';
+import { appendSwScript, generateServiceWorkerUrl } from '../service-worker-util';
+import { compareHtml, mockConfig } from '../../../testing/mocks';
+import { TestingConfig } from '../../../testing';
+import { validateConfig } from '../../config/validate-config';
+
+
+describe('generateServiceWorkerUrl', () => {
+
+  let config: d.Config;
+  let outputTarget: d.OutputTargetWww;
+
+  it('sw url w/ baseUrl', () => {
+    config = new TestingConfig();
+    config.devMode = false;
+    config.outputTargets = [
+      {
+        type: 'www',
+        baseUrl: '/docs'
+      } as d.OutputTargetWww
+    ];
+    validateConfig(config);
+    outputTarget = config.outputTargets[0];
+    const swUrl = generateServiceWorkerUrl(config, outputTarget);
+    expect(swUrl).toBe('/docs/sw.js');
+  });
+
+  it('default sw url', () => {
+    config = new TestingConfig();
+    config.devMode = false;
+    validateConfig(config);
+    outputTarget = config.outputTargets[0];
+    const swUrl = generateServiceWorkerUrl(config, outputTarget);
+    expect(swUrl).toBe('/sw.js');
+  });
+
+});
 
 
 describe('appendSwScript', () => {
