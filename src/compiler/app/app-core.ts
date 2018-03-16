@@ -36,6 +36,9 @@ export async function generateCore(config: Config, compilerCtx: CompilerCtx, bui
   jsContent = jsContent.replace(APP_NAMESPACE_PLACEHOLDER, config.fsNamespace);
 
   const appCorePath = pathJoin(config, getAppBuildDir(config, outputTarget), coreFilename);
+
+  compilerCtx.appCoreWWWPath = appCorePath;
+
   await compilerCtx.fs.writeFile(appCorePath, jsContent);
 
   return coreFilename;

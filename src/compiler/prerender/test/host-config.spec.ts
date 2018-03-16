@@ -1,13 +1,63 @@
-import { Bundle, Config, HostConfig, HostRuleHeader, HydrateComponent } from '../../../declarations';
-import { addBundles, formatLinkRelPreloadHeader, getBundleIds, mergeUserHostConfig, sortComponents } from '../host-config';
+import * as d from '../../../declarations';
+import { addBundles, formatLinkRelPreloadHeader, getBundleIds, getUrlFromFilePath, mergeUserHostConfig, sortComponents } from '../host-config';
+import { TestingConfig } from '../../../testing';
+import { validateConfig } from '../../config/validate-config';
+import { pathJoin } from '../../util';
 
 
 describe('host-config', () => {
 
+  describe('getUrlFromFilePath',  () => {
+
+    let config: d.Config;
+    let outputTarget: d.OutputTargetWww;
+
+
+    it('path with custom baseUrl', () => {
+      config = new TestingConfig();
+      config.outputTargets = [
+        {
+          type: 'www',
+          baseUrl: '/docs'
+        } as d.OutputTargetWww
+      ];
+      validateConfig(config);
+      outputTarget = config.outputTargets[0];
+      const filePath = pathJoin(config, outputTarget.dir, 'build/app/1234.js');
+      const url = getUrlFromFilePath(config, outputTarget, filePath);
+      expect(url).toBe('/docs/build/app/1234.js');
+    });
+
+    it('path with custom dir', () => {
+      config = new TestingConfig();
+      config.outputTargets = [
+        {
+          type: 'www',
+          dir: 'whatever'
+        } as d.OutputTargetWww
+      ];
+      validateConfig(config);
+      outputTarget = config.outputTargets[0];
+      const filePath = pathJoin(config, outputTarget.dir, 'build/app/1234.js');
+      const url = getUrlFromFilePath(config, outputTarget, filePath);
+      expect(url).toBe('/build/app/1234.js');
+    });
+
+    it('path without baseUrl', () => {
+      config = new TestingConfig();
+      validateConfig(config);
+      outputTarget = config.outputTargets[0];
+      const filePath = pathJoin(config, outputTarget.dir, 'build/app/1234.js');
+      const url = getUrlFromFilePath(config, outputTarget, filePath);
+      expect(url).toBe('/build/app/1234.js');
+    });
+
+  });
+
   describe('getBundleIds', () => {
 
     it('get used components', () => {
-      const bundles: Bundle[] = [
+      const bundles: d.EntryModule[] = [
         {
           moduleFiles: [
             {
@@ -49,7 +99,7 @@ describe('host-config', () => {
           ]
         }
       ];
-      const components: HydrateComponent[] = [
+      const components: d.HydrateComponent[] = [
         { tag: 'cmp-a' },
         { tag: 'cmp-b' },
         { tag: 'cmp-c' },
@@ -67,7 +117,7 @@ describe('host-config', () => {
   describe('sortComponents', () => {
 
     it('depth, then count, then tag', () => {
-      const components: HydrateComponent[] = [
+      const components: d.HydrateComponent[] = [
         { depth: 1, count: 1, tag: 'cmp-c' },
         { depth: 1, count: 1, tag: 'cmp-b' },
         { depth: 1, count: 1, tag: 'cmp-a' },
@@ -132,7 +182,7 @@ describe('host-config', () => {
 
   describe('mergeUserHostConfig', () => {
 
-    const hostConfig: HostConfig = {
+    const hostConfig: d.HostConfig = {
       hosting: {
         rules: [
           {
@@ -149,7 +199,7 @@ describe('host-config', () => {
     };
 
     it('should do nothing for no user host config', () => {
-      let userHostConfig: HostConfig = null;
+      let userHostConfig: d.HostConfig = null;
       mergeUserHostConfig(userHostConfig, hostConfig);
       expect(hostConfig.hosting.rules.length).toBe(1);
 
@@ -167,7 +217,7 @@ describe('host-config', () => {
     });
 
     it('should merge rules', () => {
-      const userHostConfig: HostConfig = {
+      const userHostConfig: d.HostConfig = {
         hosting: {
           rules: [
             {

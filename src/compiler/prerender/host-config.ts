@@ -52,7 +52,7 @@ export function generateHostRuleHeaders(config: Config, compilerCtx: CompilerCtx
   const hostRuleHeaders: HostRuleHeader[] = [];
 
   addStyles(config, hostRuleHeaders, hydrateResults);
-  addCoreJs(config, compilerCtx.appCoreWWWPath, hostRuleHeaders);
+  addCoreJs(config, outputTarget, compilerCtx.appCoreWWWPath, hostRuleHeaders);
   addBundles(config, outputTarget, entryModules, hostRuleHeaders, hydrateResults.components);
   addScripts(config, hostRuleHeaders, hydrateResults);
   addImgs(config, hostRuleHeaders, hydrateResults);
@@ -61,10 +61,10 @@ export function generateHostRuleHeaders(config: Config, compilerCtx: CompilerCtx
 }
 
 
-function addCoreJs(_config: Config, _appCoreWWWPath: string, _hostRuleHeaders: HostRuleHeader[]) {
-  // const relPath = pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, appCoreWWWPath));
+function addCoreJs(config: Config, outputTarget: OutputTargetWww, appCoreWWWPath: string, hostRuleHeaders: HostRuleHeader[]) {
+  const url = getUrlFromFilePath(config, outputTarget, appCoreWWWPath);
 
-  // hostRuleHeaders.push(formatLinkRelPreloadHeader(relPath));
+  hostRuleHeaders.push(formatLinkRelPreloadHeader(url));
 }
 
 
@@ -117,7 +117,16 @@ export function getBundleIds(entryModules: EntryModule[], components: HydrateCom
 function getBundleUrl(config: Config, outputTarget: OutputTargetWww, bundleId: string) {
   const unscopedFileName = getBundleFilename(bundleId, false);
   const unscopedWwwBuildPath = pathJoin(config, getAppBuildDir(config, outputTarget), unscopedFileName);
-  return pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, unscopedWwwBuildPath));
+  return getUrlFromFilePath(config, outputTarget, unscopedWwwBuildPath);
+}
+
+
+export function getUrlFromFilePath(config: Config, outputTarget: OutputTargetWww, filePath: string) {
+  let url = pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, filePath));
+
+  url = outputTarget.baseUrl + url.substring(1);
+
+  return url;
 }
 
 
@@ -213,15 +222,10 @@ function addDefaults(config: Config, outputTarget: OutputTargetWww, hostConfig: 
 
 
 function addBuildDirCacheControl(config: Config, outputTarget: OutputTargetWww, hostConfig: HostConfig) {
-  const relPath = pathJoin(config,
-    '/',
-    config.sys.path.relative(outputTarget.dir,
-    getAppBuildDir(config, outputTarget)),
-    '**'
-  );
+  const url = getUrlFromFilePath(config, outputTarget, getAppBuildDir(config, outputTarget));
 
   hostConfig.hosting.rules.push({
-    include: relPath,
+    include: pathJoin(config, url, '**'),
     headers: [
       {
         name: `Cache-Control`,
@@ -237,10 +241,10 @@ function addServiceWorkerNoCacheControl(config: Config, outputTarget: OutputTarg
     return;
   }
 
-  const relPath = pathJoin(config, '/', config.sys.path.relative(outputTarget.dir, outputTarget.serviceWorker.swDest));
+  const url = getUrlFromFilePath(config, outputTarget, outputTarget.serviceWorker.swDest);
 
   hostConfig.hosting.rules.push({
-    include: relPath,
+    include: url,
     headers: [
       {
         name: `Cache-Control`,
