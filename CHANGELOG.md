@@ -1,3 +1,17 @@
+<a name="0.7.0-6"></a>
+# 🗺 [0.7.0-6](https://github.com/ionic-team/stencil/compare/v0.7.0-5...v0.7.0-6) (2018-03-16)
+
+
+### Bug Fixes
+
+* **host-config:** add baseUrl to host.config.json output ([da52e02](https://github.com/ionic-team/stencil/commit/da52e02))
+* **prerender:** update local prerender server w/ baseUrl ([f37d9d5](https://github.com/ionic-team/stencil/commit/f37d9d5))
+* **service-worker:** add registry.json, host config and global js to globIgnore ([8e3f616](https://github.com/ionic-team/stencil/commit/8e3f616))
+* **service-worker:** adjust sw.js w/ baseUrl ([eae035b](https://github.com/ionic-team/stencil/commit/eae035b))
+* **service-worker:** unregister sw when in dev mode ([7ea4307](https://github.com/ionic-team/stencil/commit/7ea4307))
+
+
+
 <a name="0.7.0-5"></a>
 # 🌷 [0.7.0-5](https://github.com/ionic-team/stencil/compare/v0.7.0-4...v0.7.0-5) (2018-03-15)
 
