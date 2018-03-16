@@ -43,15 +43,6 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
 
-  // get a good namespace
-  validateNamespace(config);
-
-  // figure out all of the config paths and absolute paths
-  validatePaths(config);
-
-  // setup the outputTargets
-  validateOutputTargets(config);
-
   // default devMode false
   if (config.flags.prod) {
     config.devMode = false;
@@ -62,6 +53,15 @@ export function validateConfig(config: Config, setEnvVariables?: boolean) {
   } else {
     setBooleanConfig(config, 'devMode', null, DEFAULT_DEV_MODE);
   }
+
+  // get a good namespace
+  validateNamespace(config);
+
+  // figure out all of the config paths and absolute paths
+  validatePaths(config);
+
+  // setup the outputTargets
+  validateOutputTargets(config);
 
   // default devInspector to whatever devMode is
   setBooleanConfig(config, 'devInspector', null, config.devMode);

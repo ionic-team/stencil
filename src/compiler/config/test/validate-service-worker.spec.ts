@@ -1,4 +1,4 @@
-import { Config, OutputTarget, ServiceWorkerConfig } from '../../../declarations';
+import * as d from '../../../declarations';
 import { mockStencilSystem } from '../../../testing/mocks';
 import { normalizePath } from '../../../compiler/util';
 import { validateServiceWorker } from '../validate-service-worker';
@@ -6,12 +6,12 @@ import { validateServiceWorker } from '../validate-service-worker';
 
 describe('validateServiceWorker', () => {
 
-  const config: Config = {
+  const config: d.Config = {
     sys: mockStencilSystem(),
     devMode: false
   };
 
-  let outputTarget: OutputTarget;
+  let outputTarget: d.OutputTargetWww;
 
 
   it('should set globDirectory', () => {
