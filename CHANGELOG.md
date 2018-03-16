@@ -1,107 +1,40 @@
-<a name="0.7.0-6"></a>
-# 🗺 [0.7.0-6](https://github.com/ionic-team/stencil/compare/v0.7.0-5...v0.7.0-6) (2018-03-16)
+<a name="0.7.0"></a>
+# 🍬 [0.7.0](https://github.com/ionic-team/stencil/compare/v0.6.18...v0.7.0) (2018-03-16)
 
 
-### Bug Fixes
+### Features
 
-* **host-config:** add baseUrl to host.config.json output ([da52e02](https://github.com/ionic-team/stencil/commit/da52e02))
-* **prerender:** update local prerender server w/ baseUrl ([f37d9d5](https://github.com/ionic-team/stencil/commit/f37d9d5))
-* **service-worker:** add registry.json, host config and global js to globIgnore ([8e3f616](https://github.com/ionic-team/stencil/commit/8e3f616))
-* **service-worker:** adjust sw.js w/ baseUrl ([eae035b](https://github.com/ionic-team/stencil/commit/eae035b))
-* **service-worker:** unregister sw when in dev mode ([7ea4307](https://github.com/ionic-team/stencil/commit/7ea4307))
-
-
-
-<a name="0.7.0-5"></a>
-# 🌷 [0.7.0-5](https://github.com/ionic-team/stencil/compare/v0.7.0-4...v0.7.0-5) (2018-03-15)
+* **build:** allow for multiple build target configurations ([#582](https://github.com/ionic-team/stencil/issues/582)) ([a05dc00](https://github.com/ionic-team/stencil/commit/a05dc00))
+* **config:** allow for multiple output target configurations ([c808dee](https://github.com/ionic-team/stencil/commit/c808dee))
+* **docs:** write docs to multiple locations ([24fe78d](https://github.com/ionic-team/stencil/commit/24fe78d))
+* **inspector:** add devInspector for improved debugging ([034f0a9](https://github.com/ionic-team/stencil/commit/034f0a9))
+* **prerender:** add baseUrl outputTarget config ([6d08a70](https://github.com/ionic-team/stencil/commit/6d08a70))
+* **prerender:** do not write empty attrs which are safe to remove ([18e7e2c](https://github.com/ionic-team/stencil/commit/18e7e2c))
+* **types:** add image decode attribute to JSX definition ([#596](https://github.com/ionic-team/stencil/issues/596)) ([fbda0c8](https://github.com/ionic-team/stencil/commit/fbda0c8))
 
 
 ### Bug Fixes
 
 * **build:** do not ignore watch flag ([982de3e](https://github.com/ionic-team/stencil/commit/982de3e))
+* **config:** convert serviceWorker and prerender config to outputTargets ([148c41e](https://github.com/ionic-team/stencil/commit/148c41e))
+* **css-shim:** improve tests for requiring css shim ([4a2a480](https://github.com/ionic-team/stencil/commit/4a2a480)), closes [#603](https://github.com/ionic-team/stencil/issues/603)
+* **host-config:** add baseUrl to host.config.json output ([da52e02](https://github.com/ionic-team/stencil/commit/da52e02))
+* **outputTargets:** fix collection targets ([797f1b4](https://github.com/ionic-team/stencil/commit/797f1b4))
+* **polyfills:** makes polyfills writable properties ([b439cad](https://github.com/ionic-team/stencil/commit/b439cad)), closes [#606](https://github.com/ionic-team/stencil/issues/606)
 * **prerender:** fix inlined loader script with baseUrl confg ([7907b94](https://github.com/ionic-team/stencil/commit/7907b94))
 * **prerender:** fix urls w/ same as baseUrl but no trailing slash ([26bf09f](https://github.com/ionic-team/stencil/commit/26bf09f))
-* **test:** normalize path for windows ([5e3fbc0](https://github.com/ionic-team/stencil/commit/5e3fbc0))
-
-
-### Features
-
-* **prerender:** add baseUrl outputTarget config ([6d08a70](https://github.com/ionic-team/stencil/commit/6d08a70))
-* **prerender:** do not write empty attrs which are safe to remove ([18e7e2c](https://github.com/ionic-team/stencil/commit/18e7e2c))
-
-
-
-<a name="0.7.0-4"></a>
-# 🌏 [0.7.0-4](https://github.com/ionic-team/stencil/compare/v0.7.0-3...v0.7.0-4) (2018-03-13)
-
-
-### Bug Fixes
-
+* **prerender:** update local prerender server w/ baseUrl ([f37d9d5](https://github.com/ionic-team/stencil/commit/f37d9d5))
 * **prerender:** update prerender config defaults ([19b27e4](https://github.com/ionic-team/stencil/commit/19b27e4))
 * **resourcePath:** improve loader script resource path ([58f9e99](https://github.com/ionic-team/stencil/commit/19b27e4))
-
-
-### Features
-
-* **docs:** write docs to multiple locations ([24fe78d](https://github.com/ionic-team/stencil/commit/24fe78d))
-
-
-
-<a name="0.7.0-3"></a>
-# 🌾 [0.7.0-3](https://github.com/ionic-team/stencil/compare/v0.7.0-2...v0.7.0-3) (2018-03-11)
-
-
-### Bug Fixes
-
-* **config:** convert serviceWorker and prerender config to outputTargets ([148c41e](https://github.com/ionic-team/stencil/commit/148c41e))
-* **outputTargets:** fix collection targets ([797f1b4](https://github.com/ionic-team/stencil/commit/797f1b4))
-
-
-### Features
-
-* **inspector:** add devInspector for improved debugging ([034f0a9](https://github.com/ionic-team/stencil/commit/034f0a9))
-
-
-
-<a name="0.7.0-2"></a>
-# 😄 [0.7.0-2](https://github.com/ionic-team/stencil/compare/v0.7.0-1...v0.7.0-2) (2018-03-09)
-
-
-### Bug Fixes
-
+* **service-worker:** add registry.json, host config and global js to globIgnore ([8e3f616](https://github.com/ionic-team/stencil/commit/8e3f616))
+* **service-worker:** adjust sw.js w/ baseUrl ([eae035b](https://github.com/ionic-team/stencil/commit/eae035b))
 * **service-worker:** do not build service worker in dev builds ([72e2997](https://github.com/ionic-team/stencil/commit/72e2997))
-
-
-
-<a name="0.7.0-1"></a>
-# 🍅 [0.7.0-1](https://github.com/ionic-team/stencil/compare/v0.7.0-0...v0.7.0-1) (2018-03-09)
-
-
-### Bug Fixes
-
-* **css-shim:** improve tests for requiring css shim ([4a2a480](https://github.com/ionic-team/stencil/commit/4a2a480)), closes [#603](https://github.com/ionic-team/stencil/issues/603)
-* **polyfills:** makes polyfills writable properties ([b439cad](https://github.com/ionic-team/stencil/commit/b439cad)), closes [#606](https://github.com/ionic-team/stencil/issues/606)
+* **service-worker:** unregister sw when in dev mode ([7ea4307](https://github.com/ionic-team/stencil/commit/7ea4307))
 * **svg:** build svg render into core w/ imports ([1b3904d](https://github.com/ionic-team/stencil/commit/1b3904d)), closes [#607](https://github.com/ionic-team/stencil/issues/607)
 * **sw:** fix service worker config validation ([cdf890e](https://github.com/ionic-team/stencil/commit/cdf890e))
 * **tag:** fix dash case conversion for tags with digits ([af12eb4](https://github.com/ionic-team/stencil/commit/af12eb4)), closes [#599](https://github.com/ionic-team/stencil/issues/599)
+* **test:** normalize path for windows ([5e3fbc0](https://github.com/ionic-team/stencil/commit/5e3fbc0))
 * **types:** adds forceUpdate() ([3640715](https://github.com/ionic-team/stencil/commit/3640715))
-
-
-### Features
-
-* **config:** allow for multiple output target configurations ([c808dee](https://github.com/ionic-team/stencil/commit/c808dee))
-* **types:** add image decode attribute to JSX definition ([#596](https://github.com/ionic-team/stencil/issues/596)) ([fbda0c8](https://github.com/ionic-team/stencil/commit/fbda0c8))
-
-
-
-<a name="0.7.0-0"></a>
-# 🐖 [0.7.0-0](https://github.com/ionic-team/stencil/compare/v0.6.18...v0.7.0-0) (2018-03-06)
-
-
-### Features
-
-* allow for multiple build target configurations ( fixes [#582](https://github.com/ionic-team/stencil/issues/582)) ([a05dc00](https://github.com/ionic-team/stencil/commit/a05dc00))
-
 
 
 <a name="0.6.18"></a>
