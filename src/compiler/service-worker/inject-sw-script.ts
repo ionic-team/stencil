@@ -17,29 +17,20 @@ export async function updateIndexHtmlServiceWorker(config: d.Config, outputTarge
 
 
 export async function injectRegisterServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww, indexHtml: string) {
-  const match = indexHtml.match(BODY_CLOSE_REG);
-
   let swUrl = config.sys.path.relative(outputTarget.dir, outputTarget.serviceWorker.swDest);
   if (swUrl.charAt(0) !== '/') {
     swUrl = '/' + swUrl;
   }
-  if (match) {
-    const serviceWorker = getRegisterSwScript(swUrl);
-    indexHtml = indexHtml.replace(match[0], `<script>${serviceWorker}</script>\n${match[0]}`);
-  }
 
-  return indexHtml;
+  const serviceWorker = getRegisterSwScript(swUrl);
+  const swHtml = `<script>${serviceWorker}</script>`;
+
+  return appendSwScript(indexHtml, swHtml);
 }
 
 
 export function injectUnregisterServiceWorker(indexHtml: string) {
-  const match = indexHtml.match(BODY_CLOSE_REG);
-
-  if (match) {
-    indexHtml = indexHtml.replace(match[0], `${UNREGSITER_SW}\n${match[0]}`);
-  }
-
-  return indexHtml;
+  return appendSwScript(indexHtml, UNREGSITER_SW);
 }
 
 
@@ -80,6 +71,19 @@ const UNREGSITER_SW = `
     }
   </script>
 `;
+
+
+export function appendSwScript(indexHtml: string, htmlToAppend: string) {
+  const match = indexHtml.match(BODY_CLOSE_REG);
+
+  if (match) {
+    indexHtml = indexHtml.replace(match[0], `${htmlToAppend}\n${match[0]}`);
+  } else {
+    indexHtml += '\n' + htmlToAppend;
+  }
+
+  return indexHtml;
+}
 
 
 const BODY_CLOSE_REG = /<\/body>/i;
