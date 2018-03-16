@@ -65,7 +65,7 @@ export function createPlatformServer(
 
   // create the sandboxed context with a new instance of a V8 Context
   // V8 Context provides an isolated global environment
-  config.sys.vm.createContext(compilerCtx, outputTarget.dir, win);
+  config.sys.vm.createContext(compilerCtx, outputTarget, win);
 
   // execute the global scripts (if there are any)
   runGlobalScripts();
