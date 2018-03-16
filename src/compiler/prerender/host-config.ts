@@ -281,7 +281,7 @@ export function mergeUserHostConfig(userHostConfig: HostConfig, hostConfig: Host
 
 const DEFAULT_MODE = 'md';
 const MAX_LINK_REL_PRELOAD_COUNT = 6;
-const HOST_CONFIG_FILENAME = 'host.config.json';
+export const HOST_CONFIG_FILENAME = 'host.config.json';
 
 const IMG_EXTS = ['png', 'gif', 'svg', 'jpg', 'jpeg', 'webp'];
 const STYLE_EXT = 'css';

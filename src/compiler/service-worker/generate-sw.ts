@@ -24,7 +24,7 @@ async function generateServiceWorker(config: d.Config, compilerCtx: d.CompilerCt
     ]);
 
   } else {
-    await generateSW(config, buildCtx, outputTarget);
+    await generateSW(config, buildCtx, outputTarget.serviceWorker);
   }
 }
 
@@ -45,11 +45,11 @@ async function copyLib(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.O
 }
 
 
-async function generateSW(config: d.Config, buildCtx: d.BuildCtx, outputTarget: d.OutputTargetWww) {
+async function generateSW(config: d.Config, buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerConfig) {
   const timeSpan = config.logger.createTimeSpan(`generate service worker started`);
 
   try {
-    await config.sys.workbox.generateSW(outputTarget.serviceWorker);
+    await config.sys.workbox.generateSW(serviceWorker);
     timeSpan.finish(`generate service worker finished`);
 
   } catch (e) {

@@ -1,4 +1,6 @@
 import * as d from '../../declarations';
+import { getGlobalFileName, getRegistryFileName } from '../app/app-file-naming';
+import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 
 
 export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTargetWww) {
@@ -44,6 +46,14 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
     outputTarget.serviceWorker.globDirectory = outputTarget.dir;
   }
 
+  if (typeof outputTarget.serviceWorker.globIgnores === 'string') {
+    outputTarget.serviceWorker.globIgnores = [outputTarget.serviceWorker.globIgnores];
+  }
+
+  outputTarget.serviceWorker.globIgnores = outputTarget.serviceWorker.globIgnores || [];
+
+  addGlobIgnores(config, outputTarget.serviceWorker.globIgnores);
+
   if (!outputTarget.serviceWorker.swDest) {
     outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, DEFAULT_FILENAME);
   }
@@ -51,6 +61,18 @@ export function validateServiceWorker(config: d.Config, outputTarget: d.OutputTa
   if (!config.sys.path.isAbsolute(outputTarget.serviceWorker.swDest)) {
     outputTarget.serviceWorker.swDest = config.sys.path.join(outputTarget.dir, outputTarget.serviceWorker.swDest);
   }
+}
+
+
+function addGlobIgnores(config: d.Config, globIgnores: string[]) {
+  const appRegistry = `**/${getRegistryFileName(config)}`;
+  globIgnores.push(appRegistry);
+
+  const appGlobal = `**/${getGlobalFileName(config)}`;
+  globIgnores.push(appGlobal);
+
+  const hostConfigJson = `**/${HOST_CONFIG_FILENAME}`;
+  globIgnores.push(hostConfigJson);
 }
 
 

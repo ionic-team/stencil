@@ -7,7 +7,7 @@ export function getAppBuildDir(config: d.Config, outputTarget: d.OutputTargetWww
 }
 
 
-function getRegistryFileName(config: d.Config) {
+export function getRegistryFileName(config: d.Config) {
   return `${config.fsNamespace}.registry.json`;
 }
 
