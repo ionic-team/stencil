@@ -72,7 +72,7 @@ export function usePolyfills(win: any, location: Location, scriptElm: HTMLScript
   // fyi, dev mode has verbose if/return statements
   // but it minifies to a nice 'lil one-liner ;)
 
-  if (location.search.indexOf('core=es2015') > 0) {
+  if (location.search.indexOf('core=esm') > 0) {
     // force es2015 build
     return false;
   }
