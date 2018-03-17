@@ -2,9 +2,10 @@ import * as d from '../../../declarations';
 import { doNotExpectFiles, expectFilesWritten } from '../../../testing/utils';
 import { TestingCompiler, TestingConfig } from '../../../testing/index';
 
+
 jest.setTimeout(10000);
 
-describe('prerender', () => {
+describe('prerender, defaults', () => {
 
   let c: TestingCompiler;
   let config: d.Config;
