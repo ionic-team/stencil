@@ -1,3 +1,16 @@
+<a name="0.7.1"></a>
+## 🏐 [0.7.1](https://github.com/ionic-team/stencil/compare/v0.7.0...v0.7.1) (2018-03-17)
+
+
+### Bug Fixes
+
+* **crossorigin:** support crossorigin for dynamic import ([037839f](https://github.com/ionic-team/stencil/commit/037839f))
+* **es5:** fix observedAttributes in es5 build ([7c93e85](https://github.com/ionic-team/stencil/commit/7c93e85)), closes [#623](https://github.com/ionic-team/stencil/issues/623)
+* **prerender:** fix custom indexHtml build ([7768864](https://github.com/ionic-team/stencil/commit/7768864)), closes [#563](https://github.com/ionic-team/stencil/issues/563)
+* **styles:** escape unicode characters in css ([b32d9da](https://github.com/ionic-team/stencil/commit/b32d9da)), closes [#545](https://github.com/ionic-team/stencil/issues/545)
+
+
+
 <a name="0.7.0"></a>
 # 🍬 [0.7.0](https://github.com/ionic-team/stencil/compare/v0.6.18...v0.7.0) (2018-03-16)
 
