@@ -57,7 +57,10 @@ export class TestingFs implements FileSystem {
           const dirs: string[] = [];
 
           filePaths.forEach(f => {
-            const dirItem = path.relative(dirPath, f).split('/')[0];
+            const pathRelative = path.relative(dirPath, f);
+            // Windows: pathRelative =  ..\dir2\dir3\dir4\file2.js
+            const dirItem = normalizePath(pathRelative).split('/')[0];
+
             if (!dirItem.startsWith('.') && !dirItem.startsWith('/')) {
               if (dirItem !== '' && !dirs.includes(dirItem)) {
                 dirs.push(dirItem);
