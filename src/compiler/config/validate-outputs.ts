@@ -13,6 +13,20 @@ export function validateOutputTargets(config: d.Config) {
   // setup outputTargets from deprecated config properties
   _deprecatedToMultipleTarget(config);
 
+  if (Array.isArray(config.outputTargets)) {
+    config.outputTargets.forEach(outputTarget => {
+      if (typeof outputTarget.type !== 'string') {
+        outputTarget.type = 'www';
+      }
+
+      outputTarget.type = outputTarget.type.trim().toLowerCase() as any;
+
+      if (!VALID_TYPES.includes(outputTarget.type)) {
+        throw new Error(`invalid outputTarget type "${outputTarget.type}". Valid target types: ${VALID_TYPES.join(', ')}`);
+      }
+    });
+  }
+
   validateOutputTargetWww(config);
   validateOutputTargetDist(config);
   validateDocs(config);
@@ -27,3 +41,6 @@ export function validateOutputTargets(config: d.Config) {
     validateServiceWorker(config, outputTarget);
   });
 }
+
+
+const VALID_TYPES = ['dist', 'docs', 'stats', 'www'];
