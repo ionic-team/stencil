@@ -9,7 +9,7 @@ import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
-import { ENCAPSULATION, PROP_TYPE, SSR_VNODE_ID } from '../util/constants';
+import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCssVarShim } from './css-shim/init-css-shim';
@@ -202,21 +202,6 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
           cmpMeta.componentConstructor = bundleExports[pascalCasedTagName];
 
           initStyleTemplate(domApi, cmpMeta, cmpMeta.componentConstructor);
-          cmpMeta.membersMeta = {
-            'color': {}
-          };
-
-          if (cmpMeta.componentConstructor.properties) {
-            Object.keys(cmpMeta.componentConstructor.properties).forEach(memberName => {
-              const constructorProperty = cmpMeta.componentConstructor.properties[memberName];
-
-              if (constructorProperty.type) {
-                cmpMeta.membersMeta[memberName] = {
-                  propType: PROP_TYPE.Any
-                };
-              }
-            });
-          }
         }
       });
     }
