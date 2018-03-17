@@ -38,7 +38,7 @@ describe('usePolyfills', () => {
   });
 
   it('polyfill cuz force es2015', () => {
-    win.location.search = '?core=es2015';
+    win.location.search = '?core=esm';
     expect(usePolyfills(win, win.location, scriptElm, dynamicImportTest)).toBeFalsy();
   });
 
