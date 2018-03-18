@@ -74,6 +74,12 @@ async function runPrerenderApp(config: d.Config, compilerCtx: d.CompilerCtx, bui
     catchError(buildCtx.diagnostics, e);
   }
 
+  hydrateResults.forEach(hydrateResult => {
+    hydrateResult.diagnostics.forEach(diagnostic => {
+      buildCtx.diagnostics.push(diagnostic);
+    });
+  });
+
   if (hasError(buildCtx.diagnostics)) {
     timeSpan.finish(`prerendering failed`);
 
@@ -127,9 +133,6 @@ async function runNextPrerenderUrl(config: d.Config, compilerCtx: d.CompilerCtx,
     // prender this path and wait on the results
     const results = await prerenderPath(config, compilerCtx, buildCtx, outputTarget, indexSrcHtml, p);
     // awesome!!
-
-    // merge any diagnostics we just got from this
-    config.logger.printDiagnostics(results.diagnostics);
 
     if (outputTarget.prerenderUrlCrawl) {
       crawlAnchorsForNextUrls(config, outputTarget, prerenderQueue, results.url, results.anchors);
