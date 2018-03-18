@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { doNotExpectFiles, expectFilesWritten } from '../../../testing/utils';
+import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
 import { TestingCompiler, TestingConfig } from '../../../testing/index';
 
 
@@ -40,7 +40,7 @@ describe('prerender, defaults', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
-    expectFilesWritten(r,
+    expectFiles(c.fs, [
       '/www/build/app.js',
       '/www/build/app/app.core.js',
       '/www/build/app/app.core.pf.js',
@@ -51,7 +51,7 @@ describe('prerender, defaults', () => {
       '/www/index.html',
       '/www/about/index.html',
       '/www/components/toggle/index.html'
-    );
+    ]);
 
     doNotExpectFiles(c.fs, [
       '/www/components/button/index.html'

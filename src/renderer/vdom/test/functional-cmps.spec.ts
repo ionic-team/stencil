@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { doNotExpectFiles, expectFilesWritten } from '../../../testing/utils';
+import { doNotExpectFiles } from '../../../testing/utils';
 import { mockHtml } from '../../../testing/mocks';
 import { TestingCompiler, TestingConfig, mockDocument } from '../../../testing/index';
 

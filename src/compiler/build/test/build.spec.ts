@@ -1,4 +1,4 @@
-import { expectFilesWritten } from '../../../testing/utils';
+import { expectFiles } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/index';
 
 
@@ -53,13 +53,13 @@ describe('build', () => {
     expect(r.entries[0].components[0].tag).toContain('cmp-a');
     expect(r.transpileBuildCount).toBe(1);
     expect(r.bundleBuildCount).toBe(1);
+    expect(r.filesWritten.length).toBe(3);
 
-    expectFilesWritten(r,
+    expectFiles(c.fs, [
       '/src/components.d.ts',
       '/www/build/app/cmp-a.js',
       '/www/index.html'
-    );
-    expect(r.filesWritten.length).toBe(3);
+    ]);
   });
 
   it('should build no components', async () => {

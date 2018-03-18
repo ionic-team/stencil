@@ -1,5 +1,4 @@
 import { escapeCssForJs } from '../style';
-import { expectFilesWritten } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/index';
 
 
