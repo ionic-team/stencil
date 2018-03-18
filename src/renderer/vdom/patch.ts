@@ -26,6 +26,9 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         ...vnode.vattrs,
         children: vnode.vchildren
       });
+      if (!vnode) {
+        return null;
+      }
     }
 
     if (!useNativeShadowDom && vnode.vtag === 'slot') {
