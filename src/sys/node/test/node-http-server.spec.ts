@@ -2,6 +2,7 @@ import * as d from '../../../declarations';
 import { getFilePath } from '../node-http-server';
 import { TestingConfig } from '../../../testing';
 import { validateConfig } from '../../../compiler/config/validate-config';
+import { normalizePath } from '../../../compiler/util';
 
 
 describe('node-http-server', () => {
@@ -24,7 +25,8 @@ describe('node-http-server', () => {
     const url = '/some/web/url/data.json?v=123#hello';
 
     const p = getFilePath(outputTarget, url);
-    expect(p).toBe('/my/network/drive/some/file/system/dir/data.json');
+    const normalizedPath = normalizePath(p);
+    expect(normalizedPath).toBe('/my/network/drive/some/file/system/dir/data.json');
   });
 
   it('getFilePath w/ baseUrl', () => {
@@ -40,7 +42,8 @@ describe('node-http-server', () => {
     const url = '/docs/data.json?v=123#hello';
 
     const p = getFilePath(outputTarget, url);
-    expect(p).toBe('/www/data.json');
+    const normalizedPath = normalizePath(p);
+    expect(normalizedPath).toBe('/www/data.json');
   });
 
   it('getFilePath, defaults w/ querystring and hash', () => {
@@ -50,7 +53,8 @@ describe('node-http-server', () => {
     const url = '/data.json?v=123#hello';
 
     const p = getFilePath(outputTarget, url);
-    expect(p).toBe('/www/data.json');
+    const normalizedPath = normalizePath(p);
+    expect(normalizedPath).toBe('/www/data.json');
   });
 
   it('getFilePath, defaults', () => {
@@ -60,7 +64,8 @@ describe('node-http-server', () => {
     const url = '/data.json';
 
     const p = getFilePath(outputTarget, url);
-    expect(p).toBe('/www/data.json');
+    const normalizedPath = normalizePath(p);
+    expect(normalizedPath).toBe('/www/data.json');
   });
 
 });
