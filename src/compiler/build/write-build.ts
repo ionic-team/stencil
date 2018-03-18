@@ -2,7 +2,6 @@ import * as d from '../../declarations';
 import { catchError } from '../util';
 import { copyComponentAssets } from '../copy/copy-assets';
 import { generateDistributions } from '../collections/distribution';
-import { generateServiceWorkers } from '../service-worker/generate-sw';
 import { writeAppCollections } from '../collections/collection-data';
 
 
@@ -36,9 +35,6 @@ export async function writeBuildFiles(config: d.Config, compilerCtx: d.CompilerC
     // kick off writing the cached file stuff
     // no need to wait on it finishing
     compilerCtx.cache.commit();
-
-    // generate the service workers
-    await generateServiceWorkers(config, compilerCtx, buildCtx);
 
     config.logger.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     config.logger.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
