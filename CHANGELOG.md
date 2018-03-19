@@ -1,3 +1,17 @@
+<a name="0.7.2"></a>
+## 🚔 [0.7.2](https://github.com/ionic-team/stencil/compare/v0.7.1...v0.7.2) (2018-03-19)
+
+
+### Bug Fixes
+
+* **canonical-link:** update `<link rel="canonical">` using existing href value ([0abcfbe](https://github.com/ionic-team/stencil/commit/0abcfbe))
+* **prerender:** merge prerender diagnostics with build output ([bc6c638](https://github.com/ionic-team/stencil/commit/bc6c638))
+* **render:** check if functional component on update element ([007b188](https://github.com/ionic-team/stencil/commit/007b188))
+* **render:** fix functional components returning null ([10a3777](https://github.com/ionic-team/stencil/commit/10a3777)), closes [#610](https://github.com/ionic-team/stencil/issues/610)
+* **whenDefined:** customElements.whenDefined() polyfill before the full polyfill ([8d92cc1](https://github.com/ionic-team/stencil/commit/8d92cc1))
+
+
+
 <a name="0.7.1"></a>
 ## 🏐 [0.7.1](https://github.com/ionic-team/stencil/compare/v0.7.0...v0.7.1) (2018-03-17)
 
