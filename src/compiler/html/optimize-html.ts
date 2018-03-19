@@ -4,7 +4,7 @@ import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineComponentStyles } from '../style/inline-styles';
 import { inlineExternalAssets } from './inline-external-assets';
 import { inlineLoaderScript } from './inline-loader-script';
-import { insertCanonicalLink } from './canonical-link';
+import { updateCanonicalLink } from './canonical-link';
 import { minifyInlineScripts } from './minify-inline-scripts';
 import { minifyInlineStyles } from '../style/minify-inline-styles';
 import { catchError } from '../util';
@@ -27,7 +27,7 @@ export async function optimizeHtml(
 
   if (hydrateTarget.canonicalLink) {
     try {
-      insertCanonicalLink(config, doc, windowLocationPath);
+      updateCanonicalLink(config, doc, windowLocationPath);
 
     } catch (e) {
       diagnostics.push({
