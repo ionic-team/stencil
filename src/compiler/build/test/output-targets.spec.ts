@@ -4,10 +4,13 @@ import { TestingCompiler, TestingConfig } from '../../../testing';
 
 describe('outputTargets', () => {
 
+  jest.setTimeout(20000);
   let c: TestingCompiler;
   let config: TestingConfig;
 
+
   it('default www files', async () => {
+
     config = new TestingConfig();
     config.buildAppCore = true;
     config.rootDir = '/User/testing/';
