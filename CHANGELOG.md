@@ -1,3 +1,13 @@
+<a name="0.7.3"></a>
+## 🏆 [0.7.3](https://github.com/ionic-team/stencil/compare/v0.7.2...v0.7.3) (2018-03-20)
+
+
+### Features
+
+* **reflectToAttr:** add Prop option to reflect property values to attribute ([741d97f](https://github.com/ionic-team/stencil/commit/741d97f)), closes [#588](https://github.com/ionic-team/stencil/issues/588)
+
+
+
 <a name="0.7.2"></a>
 ## 🚔 [0.7.2](https://github.com/ionic-team/stencil/compare/v0.7.1...v0.7.2) (2018-03-19)
 
