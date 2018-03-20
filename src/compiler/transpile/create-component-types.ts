@@ -205,7 +205,9 @@ function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string
   }
 
   return (obj: ImportData, typeReferences: { [key: string]: AttributeTypeReference }) => {
-    Object.entries(typeReferences).forEach(([typeName, type]) => {
+    Object.keys(typeReferences).map(typeName => {
+      return [typeName, typeReferences[typeName]] as [string, AttributeTypeReference];
+    }).forEach(([typeName, type]) => {
       let importFileLocation: string;
 
       // If global then there is no import statement needed
