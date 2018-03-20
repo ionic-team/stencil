@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { catchError, normalizePath, pathJoin } from '../util';
+import { buildError, catchError, normalizePath, pathJoin } from '../util';
 import { getGlobalStyleFilename } from './app-file-naming';
 import { runPluginTransforms } from '../plugin/plugin';
 
@@ -14,12 +14,8 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
   const timeSpan = config.logger.createTimeSpan(`compile global style start`);
 
   try {
-    const styles = await Promise.all(filePaths.map(async filePath => {
-      filePath = normalizePath(filePath);
-
-      const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
-
-      return transformResults.code;
+    const styles = await Promise.all(filePaths.map(filePath => {
+      return loadGlobalStyle(config, compilerCtx, buildCtx, filePath);
     }));
 
     const styleText = styles.join('\n').trim();
@@ -35,4 +31,23 @@ export async function generateGlobalStyles(config: d.Config, compilerCtx: d.Comp
   }
 
   timeSpan.finish(`compile global style finish`);
+}
+
+
+async function loadGlobalStyle(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, filePath: string) {
+  let style = '';
+
+  try {
+    filePath = normalizePath(filePath);
+
+    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, filePath);
+
+    style = transformResults.code;
+
+  } catch (e) {
+    const d = buildError(buildCtx.diagnostics);
+    d.messageText = `config.globalStyle ${e}`;
+  }
+
+  return style;
 }
