@@ -153,6 +153,7 @@ export interface EventMeta {
   eventBubbles?: boolean;
   eventCancelable?: boolean;
   eventComposed?: boolean;
+  eventType?: AttributeTypeInfo;
   jsdoc?: JSDoc;
 }
 

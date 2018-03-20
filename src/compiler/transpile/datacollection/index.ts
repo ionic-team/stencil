@@ -66,7 +66,7 @@ export function visitClass(config: Config, checker: ts.TypeChecker, classNode: t
       ...getStateDecoratorMeta(checker, classNode),
       ...getPropDecoratorMeta(checker, classNode, sourceFile, diagnostics)
     },
-    eventsMeta: getEventDecoratorMeta(checker, classNode),
+    eventsMeta: getEventDecoratorMeta(checker, classNode, sourceFile),
     listenersMeta: getListenDecoratorMeta(checker, classNode)
   };
 

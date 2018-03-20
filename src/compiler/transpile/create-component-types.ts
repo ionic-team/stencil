@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { dashToPascalCase } from '../../util/helpers';
+import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { gatherMetadata } from './datacollection/index';
 import { getComponentsDtsTypesFilePath } from '../collections/distribution';
 import { MEMBER_TYPE } from '../../util/constants';
@@ -7,6 +7,7 @@ import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizePath } from '../util';
 import { normalizeStyles } from '../style/normalize-styles';
 import * as ts from 'typescript';
+import { AttributeTypeReference } from '../../declarations';
 
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsOptions: ts.CompilerOptions, tsHost: ts.CompilerHost, tsFilePaths: string[], componentsDtsSrcFilePath: string) {
@@ -164,6 +165,35 @@ function sortImportNames(a: MemberNameData, b: MemberNameData) {
  */
 function updateReferenceTypeImports(config: d.Config, importDataObj: ImportData, allTypes: { [key: string]: number }, cmpMeta: d.ComponentMeta, filePath: string) {
 
+
+  const updateImportReferences = updateImportReferenceFactory(config, allTypes, filePath);
+
+  // cmpMeta.eventsMeta[0].eventType.typeReferences
+
+  importDataObj = Object.keys(cmpMeta.membersMeta)
+  .filter((memberName) => {
+    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
+
+    return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ].indexOf(member.memberType) !== -1 &&
+      member.attribType.typeReferences;
+  })
+  .reduce((obj, memberName) => {
+    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
+    return updateImportReferences(obj, member.attribType.typeReferences);
+  }, importDataObj);
+
+  cmpMeta.eventsMeta
+  .filter((meta: d.EventMeta) => {
+    return meta.eventType && meta.eventType.typeReferences;
+  })
+  .reduce((obj, meta) => {
+    return updateImportReferences(obj, meta.eventType.typeReferences);
+  }, importDataObj);
+
+  return importDataObj;
+}
+
+function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string]: number }, filePath: string) {
   function getIncrememntTypeName(name: string): string {
     if (allTypes[name] == null) {
       allTypes[name] = 1;
@@ -174,17 +204,8 @@ function updateReferenceTypeImports(config: d.Config, importDataObj: ImportData,
     return `${name}${allTypes[name]}`;
   }
 
-  return Object.keys(cmpMeta.membersMeta)
-  .filter((memberName) => {
-    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
-
-    return METADATA_MEMBERS_TYPED.indexOf(member.memberType) !== -1 &&
-      member.attribType.typeReferences;
-  })
-  .reduce((obj, memberName) => {
-    const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
-    Object.keys(member.attribType.typeReferences).forEach(typeName => {
-      const type = member.attribType.typeReferences[typeName];
+  return (obj: ImportData, typeReferences: { [key: string]: AttributeTypeReference }) => {
+    Object.entries(typeReferences).forEach(([typeName, type]) => {
       let importFileLocation: string;
 
       // If global then there is no import statement needed
@@ -223,7 +244,7 @@ function updateReferenceTypeImports(config: d.Config, importDataObj: ImportData,
     });
 
     return obj;
-  }, importDataObj);
+  };
 }
 
 
@@ -238,7 +259,10 @@ export function createTypesAsString(cmpMeta: d.ComponentMeta, importPath: string
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
-  const interfaceOptions = membersToInterfaceOptions(cmpMeta.membersMeta);
+  const propAttributes = membersToPropAttributes(cmpMeta.membersMeta);
+  const methodAttributes = membersToMethodAttributes(cmpMeta.membersMeta);
+  methodAttributes;
+  const eventAttributes = membersToEventAttributes(cmpMeta.eventsMeta);
 
   return `
 import {
@@ -265,39 +289,95 @@ declare global {
   }
   namespace JSXElements {
     export interface ${jsxInterfaceName} extends HTMLAttributes {
-      ${Object.keys(interfaceOptions)
-        .sort(sortInterfaceMembers)
-        .map((key: string) => `${key}?: ${interfaceOptions[key]};`).join('\n      ')}
+      ${attributesToMultiLineString(propAttributes)}
+      ${attributesToMultiLineString(eventAttributes)}
     }
   }
 }
 `;
 }
 
-
-function sortInterfaceMembers(a: string, b: string) {
-  const aLower = a.toLowerCase();
-  const bLower = b.toLowerCase();
-
-  if (aLower < bLower) return -1;
-  if (aLower > bLower) return 1;
-  if (a < b) return -1;
-  if (a > b) return 1;
-  return 0;
+interface TypeInfo {
+  [key: string]: {
+    type: string;
+    jsdoc?: string;
+  };
 }
 
+function attributesToMultiLineString(attributes: TypeInfo, optional = true) {
 
-function membersToInterfaceOptions(membersMeta: d.MembersMeta): { [key: string]: string } {
+  return Object.keys(attributes)
+    .sort()
+    .reduce((fullList, key) => {
+      if (attributes[key].jsdoc) {
+        fullList.push(`/**`);
+        fullList.push(` * ${attributes[key].jsdoc.replace(/\r?\n|\r/g, ' ')}`);
+        fullList.push(` */`);
+      }
+      fullList.push(`${key}${optional ? '?' : '' }: ${attributes[key].type};`);
+      return fullList;
+    }, <string[]>[])
+    .join('\n      ');
+}
+
+function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
   const interfaceData = Object.keys(membersMeta)
     .filter((memberName) => {
-      return METADATA_MEMBERS_TYPED.indexOf(membersMeta[memberName].memberType) !== -1;
+      return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ].indexOf(membersMeta[memberName].memberType) !== -1;
     })
     .reduce((obj, memberName) => {
       const member: d.MemberMeta = membersMeta[memberName];
-      obj[memberName] = member.attribType.text;
+      obj[memberName] = {
+        type: member.attribType.text,
+      };
+
+      if (member.jsdoc) {
+        obj[memberName].jsdoc = member.jsdoc.documentation;
+      }
 
       return obj;
-    }, <{ [key: string]: string }>{});
+    }, <TypeInfo>{});
+
+  return interfaceData;
+}
+
+function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
+  const interfaceData = Object.keys(membersMeta)
+    .filter((memberName) => {
+      return [ MEMBER_TYPE.Method ].indexOf(membersMeta[memberName].memberType) !== -1;
+    })
+    .reduce((obj, memberName) => {
+      const member: d.MemberMeta = membersMeta[memberName];
+      obj[memberName] = {
+        type: `() => void`, // TODO this is not good enough
+      };
+
+      if (member.jsdoc) {
+        obj[memberName].jsdoc = member.jsdoc.documentation;
+      }
+
+      return obj;
+    }, <TypeInfo>{});
+
+  return interfaceData;
+}
+
+
+function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
+  const interfaceData = eventMetaList
+    .reduce((obj, eventMetaObj) => {
+      const memberName = `on${captializeFirstLetter(eventMetaObj.eventName)}`;
+      const eventType = (eventMetaObj.eventType) ? `CustomEvent<${eventMetaObj.eventType.text}>` : `CustomEvent`;
+      obj[memberName] = {
+        type: `(event: ${eventType}) => void`, // TODO this is not good enough
+      };
+
+      if (eventMetaObj.jsdoc) {
+        obj[memberName].jsdoc = eventMetaObj.jsdoc.documentation;
+      }
+
+      return obj;
+    }, <TypeInfo>{});
 
   return interfaceData;
 }
@@ -343,9 +423,6 @@ async function getCollectionTypesImport(config: d.Config, compilerCtx: d.Compile
   return typeImport;
 }
 
-
-
-const METADATA_MEMBERS_TYPED = [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ];
 
 export interface ImportData {
   [key: string]: MemberNameData[];
