@@ -91,7 +91,8 @@ describe('validatePaths', () => {
 
   it('should set default build dir and convert to absolute path', () => {
     validateConfig(config);
-    const parts = config.outputTargets[0].buildDir.split(path.sep);
+    const normalizedPathSep = '/';
+    const parts = config.outputTargets[0].buildDir.split(normalizedPathSep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('www');
     expect(path.isAbsolute(config.outputTargets[0].buildDir)).toBe(true);
@@ -103,7 +104,8 @@ describe('validatePaths', () => {
       dir: 'custom-www'
     }];
     validateConfig(config);
-    const parts = config.outputTargets[0].buildDir.split(path.sep);
+    const normalizedPathSep = '/';
+    const parts = config.outputTargets[0].buildDir.split(normalizedPathSep);
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('custom-www');
     expect(path.isAbsolute(config.outputTargets[0].buildDir)).toBe(true);
