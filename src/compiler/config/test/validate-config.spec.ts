@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { setProcessEnvironment, validateConfig } from '../validate-config';
+import { normalizePath } from '../../util';
 
 
 describe('validation', () => {
@@ -94,7 +95,8 @@ describe('validation', () => {
 
     it('should default include glob', () => {
       validateConfig(config);
-      expect(config.includeSrc).toEqual([
+      const normalizedIncludeSrc = config.includeSrc.map(x => normalizePath(x));
+      expect(normalizedIncludeSrc).toEqual([
         '/User/some/path/src/**/*.ts',
         '/User/some/path/src/**/*.tsx'
       ]);
