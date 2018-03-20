@@ -30,6 +30,22 @@ describe('hasCssVariables', () => {
     expect(hasCssVariables(text)).toBe(false);
   });
 
+  it('false for normal CSS with a pseudo class', () => {
+    const text = `
+      .test--el:hover {
+        background-color: green
+      }
+    `;
+    expect(hasCssVariables(text)).toBe(false);
+  });
+
+  it('false for minified CSS with a pseudo class', () => {
+    const text = `
+      .test--el:hover{background-color: green}
+    `;
+    expect(hasCssVariables(text)).toBe(false);
+  });
+
   it('true for -- declaration w/ spaces', () => {
     const text = `
     element {
@@ -57,6 +73,16 @@ describe('hasCssVariables', () => {
     expect(hasCssVariables(text)).toBe(true);
   });
 
+  it('true for minified CSS with a semicolon', () => {
+    const text = `element{background-color: green;--main-text-color: black}`;
+    expect(hasCssVariables(text)).toBe(true);
+  });
+
+  it('true for minified CSS without a semicolon', () => {
+    const text = `element{--main-text-color: black}`;
+    expect(hasCssVariables(text)).toBe(true);
+  });
+   
   it('true for var()', () => {
     const text = `
       element {

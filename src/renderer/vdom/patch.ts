@@ -26,6 +26,9 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         ...vnode.vattrs,
         children: vnode.vchildren
       });
+      if (!vnode) {
+        return null;
+      }
     }
 
     if (!useNativeShadowDom && vnode.vtag === 'slot') {
@@ -312,7 +315,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     if (isUndef(newVNode.vtext)) {
       // element node
 
-      if (newVNode.vtag !== 'slot') {
+      if (newVNode.vtag !== 'slot' && typeof newVNode.vtag !== 'function') {
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.

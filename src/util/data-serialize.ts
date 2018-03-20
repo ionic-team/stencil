@@ -1,11 +1,8 @@
-import { BundleIds, ComponentConstructorEvent, ComponentConstructorProperties,
-  ComponentConstructorProperty, ComponentMeta, ComponentRegistry, EventMeta, ListenMeta,
-  LoadComponentRegistry, MemberMeta, MembersMeta, StylesMeta } from '../declarations';
+import * as d from '../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../util/constants';
-import { toDashCase } from './helpers';
 
 
-export function formatComponentLoaderRegistry(cmpRegistry: ComponentRegistry) {
+export function formatComponentLoaderRegistry(cmpRegistry: d.ComponentRegistry) {
   // ensure we've got a standard order of the components
   return Object.keys(cmpRegistry).sort().map(tag => {
     const cmpMeta = cmpRegistry[tag];
@@ -15,7 +12,7 @@ export function formatComponentLoaderRegistry(cmpRegistry: ComponentRegistry) {
 }
 
 
-export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegistry {
+export function formatComponentLoader(cmpMeta: d.ComponentMeta): d.LoadComponentRegistry {
   const d: any[] = [
     /* 0 */ cmpMeta.tagNameMeta,
     /* 1 */ formatLoaderBundleIds(cmpMeta.bundleIds),
@@ -29,7 +26,7 @@ export function formatComponentLoader(cmpMeta: ComponentMeta): LoadComponentRegi
 }
 
 
-export function formatLoaderBundleIds(bundleIds: string | BundleIds): any {
+export function formatLoaderBundleIds(bundleIds: string | d.BundleIds): any {
   if (!bundleIds) {
     return `invalid-bundle-id`;
   }
@@ -57,7 +54,7 @@ export function formatLoaderBundleIds(bundleIds: string | BundleIds): any {
 }
 
 
-export function formatHasStyles(stylesMeta: StylesMeta) {
+export function formatHasStyles(stylesMeta: d.StylesMeta) {
   if (stylesMeta && Object.keys(stylesMeta).length > 0) {
     return 1;
   }
@@ -65,7 +62,7 @@ export function formatHasStyles(stylesMeta: StylesMeta) {
 }
 
 
-function formatMembers(membersMeta: MembersMeta) {
+function formatMembers(membersMeta: d.MembersMeta) {
   if (!membersMeta) {
     return 0;
   }
@@ -78,34 +75,41 @@ function formatMembers(membersMeta: MembersMeta) {
     const memberMeta = membersMeta[memberName];
 
     const d: any[] = [
-      memberName,
-      memberMeta.memberType
+      memberName, /* 0 - memberName */
+      memberMeta.memberType /* 1 - memberType */
     ];
 
     if (memberMeta.propType === PROP_TYPE.Boolean || memberMeta.propType === PROP_TYPE.Number || memberMeta.propType === PROP_TYPE.String || memberMeta.propType === PROP_TYPE.Any) {
       // observe the attribute
 
+      if (memberMeta.reflectToAttr) {
+        d.push(1); /* 2 - reflectToAttr */
+      } else {
+        d.push(0); /* 2 - reflectToAttr */
+      }
+
       if (memberMeta.attribName !== memberName) {
         // property name and attribute name are different
         // ariaDisabled !== aria-disabled
-        d.push(memberMeta.attribName);
+        d.push(memberMeta.attribName); /* 3 - attribName */
 
       } else {
         // property name and attribute name are the exact same
         // checked === checked
-        d.push(1);
+        d.push(1); /* 3 - attribName */
       }
 
-      d.push(memberMeta.propType);
+      d.push(memberMeta.propType); /* 4 - propType */
 
     } else {
       // do not observe the attribute
-      d.push(0);
-      d.push(PROP_TYPE.Unknown);
+      d.push(0); /* 2 - reflectToAttr */
+      d.push(0); /* 3 - attribName */
+      d.push(PROP_TYPE.Unknown); /* 4 - propType */
     }
 
     if (memberMeta.ctrlId) {
-      d.push(memberMeta.ctrlId);
+      d.push(memberMeta.ctrlId); /* 5 - ctrlId */
     }
 
     observeAttrs.push(d);
@@ -132,7 +136,7 @@ function formatEncapsulation(val: ENCAPSULATION) {
 }
 
 
-function formatListeners(listeners: ListenMeta[]) {
+function formatListeners(listeners: d.ListenMeta[]) {
   if (!listeners || !listeners.length) {
     return 0;
   }
@@ -150,7 +154,7 @@ function formatListeners(listeners: ListenMeta[]) {
 }
 
 
-export function formatComponentConstructorProperties(membersMeta: MembersMeta) {
+export function formatComponentConstructorProperties(membersMeta: d.MembersMeta) {
   if (!membersMeta) {
     return null;
   }
@@ -165,18 +169,18 @@ export function formatComponentConstructorProperties(membersMeta: MembersMeta) {
     return null;
   }
 
-  const properties: ComponentConstructorProperties = {};
+  const properties: d.ComponentConstructorProperties = {};
 
   memberNames.forEach(memberName => {
-    properties[memberName] = formatComponentConstructorProperty(memberName, membersMeta[memberName]);
+    properties[memberName] = formatComponentConstructorProperty(membersMeta[memberName]);
   });
 
   return properties;
 }
 
 
-function formatComponentConstructorProperty(memberName: string, memberMeta: MemberMeta) {
-  const property: ComponentConstructorProperty = {};
+function formatComponentConstructorProperty(memberMeta: d.MemberMeta) {
+  const property: d.ComponentConstructorProperty = {};
 
   if (memberMeta.memberType === MEMBER_TYPE.State) {
     property.state = true;
@@ -196,23 +200,23 @@ function formatComponentConstructorProperty(memberName: string, memberMeta: Memb
   } else {
     if (memberMeta.propType === PROP_TYPE.String) {
       property.type = String;
-      property.attr = toDashCase(memberName);
 
     } else if (memberMeta.propType === PROP_TYPE.Boolean) {
       property.type = Boolean;
-      property.attr = toDashCase(memberName);
 
     } else if (memberMeta.propType === PROP_TYPE.Number) {
       property.type = Number;
-      property.attr = toDashCase(memberName);
-
-    } else if (memberMeta.propType === PROP_TYPE.Any) {
-      property.type = 'Any';
-      property.attr = toDashCase(memberName);
 
     } else {
       property.type = 'Any';
-      property.attr = toDashCase(memberName);
+    }
+
+    if (typeof memberMeta.attribName === 'string') {
+      property.attr = memberMeta.attribName;
+
+      if (memberMeta.reflectToAttr) {
+        property.reflectToAttr = true;
+      }
     }
 
     if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {
@@ -228,7 +232,7 @@ function formatComponentConstructorProperty(memberName: string, memberMeta: Memb
 }
 
 
-export function formatComponentConstructorEvents(eventsMeta: EventMeta[]) {
+export function formatComponentConstructorEvents(eventsMeta: d.EventMeta[]) {
   if (!eventsMeta || !eventsMeta.length) {
     return null;
   }
@@ -237,7 +241,7 @@ export function formatComponentConstructorEvents(eventsMeta: EventMeta[]) {
 }
 
 
-export function formatComponentConstructorEvent(eventMeta: EventMeta): ComponentConstructorEvent {
+export function formatComponentConstructorEvent(eventMeta: d.EventMeta): d.ComponentConstructorEvent {
   const constructorEvent = {
     name: eventMeta.eventName,
     method: eventMeta.eventMethodName,

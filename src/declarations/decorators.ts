@@ -25,14 +25,11 @@ export interface PropDecorator {
 
 
 export interface PropOptions {
+  attr?: string;
   context?: string;
   connect?: string;
   mutable?: boolean;
-
-  /**
-   * "state" has been deprecated. Please use "mutable" instead.
-   */
-  state?: boolean;
+  reflectToAttr?: boolean;
 }
 
 

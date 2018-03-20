@@ -3,8 +3,8 @@ import { catchError } from '../util';
 import { generateBundleModules } from './bundle-modules';
 
 
-export async function bundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
-  const timeSpan = config.logger.createTimeSpan(`bundle started`, true);
+export async function generateModuleMap(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
+  const timeSpan = config.logger.createTimeSpan(`module map started`);
   let jsModules: JSModuleMap;
 
   try {
@@ -15,7 +15,7 @@ export async function bundle(config: Config, compilerCtx: CompilerCtx, buildCtx:
     catchError(buildCtx.diagnostics, e);
   }
 
-  timeSpan.finish(`bundling finished`);
+  timeSpan.finish(`module map finished`);
 
   return jsModules;
 }

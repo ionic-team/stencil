@@ -13,6 +13,7 @@ export const Build: BuildConditionals = {
 
   hostData: true,
   hostTheme: true,
+  reflectToAttr: true,
   svg: true,
   observeAttr: true,
   isDev: true,

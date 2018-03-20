@@ -126,6 +126,8 @@ export interface PropData {
   name?: string;
   type?: 'Boolean'|'Number'|'String'|'Any';
   mutable?: boolean;
+  attr?: string;
+  reflectToAttr?: boolean;
   watch?: string[];
 }
 

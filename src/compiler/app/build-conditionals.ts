@@ -1,8 +1,17 @@
 import { BuildConditionals, BuildCtx, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile } from '../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import { isTsFile } from '../util';
 
 
 export async function setBuildConditionals(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
+  const existingCoreBuild = getLastBuildConditionals(compilerCtx, buildCtx);
+  if (existingCoreBuild) {
+    // cool we can use the last build conditionals
+    // because it's a rebuild, and was probably only a css or html change
+    // if it was a typescript change we need to do a full rebuild again
+    return existingCoreBuild;
+  }
+
   // figure out which sections of the core code this build doesn't even need
   const coreBuild: BuildConditionals = ({} as any);
   coreBuild.clientSide = true;
@@ -26,7 +35,28 @@ export async function setBuildConditionals(config: Config, compilerCtx: Compiler
 
   await Promise.all(promises);
 
+  compilerCtx.lastBuildConditionals = coreBuild;
+
   return coreBuild;
+}
+
+
+export function getLastBuildConditionals(compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+  if (compilerCtx.isRebuild && compilerCtx.lastBuildConditionals && Array.isArray(buildCtx.filesChanged)) {
+    // this is a rebuild and we do have lastBuildConditionals already
+    const hasChangedTsFile = buildCtx.filesChanged.some(filePath => {
+      return isTsFile(filePath);
+    });
+
+    if (!hasChangedTsFile) {
+      // we didn't have a typescript change
+      // so it's ok to use the lastBuildConditionals
+      return compilerCtx.lastBuildConditionals;
+    }
+  }
+
+  // we've gotta do a full rebuild of the build conditionals object again
+  return null;
 }
 
 
@@ -79,6 +109,10 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
 
       if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length > 0) {
         coreBuild.watchCallback = true;
+      }
+
+      if (memberMeta.reflectToAttr) {
+        coreBuild.reflectToAttr = true;
       }
     });
   }

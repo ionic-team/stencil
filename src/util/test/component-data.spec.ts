@@ -1,10 +1,15 @@
-import { ComponentMeta, ComponentRegistry, ImportedModule, MembersMeta, ComponentConstructor, EventMeta } from '../interfaces';
-import { formatComponentConstructorProperties, formatComponentConstructorEvent, formatComponentConstructorEvents } from '../data-serialize';
+import * as d from '../../declarations';
+import { formatComponentConstructorEvent, formatComponentConstructorEvents, formatComponentConstructorProperties } from '../data-serialize';
 import { MEMBER_TYPE, PROP_TYPE } from '../constants';
 import { parsePropertyValue } from '../data-parse';
 
 
 describe('data serialize/parse', () => {
+
+  const registry: d.ComponentRegistry = {};
+  const moduleImports: d.ImportedModule = { 'tag': class MyTag {} as any };
+  const cmpMeta: d.ComponentMeta = {};
+
 
   describe('format component events', () => {
 
@@ -18,32 +23,32 @@ describe('data serialize/parse', () => {
     });
 
     it('should set false for bubbles', () => {
-      const ev = formatComponentConstructorEvent({ eventBubbles: false });
+      const ev = formatComponentConstructorEvent({ eventName: 'ev', eventBubbles: false });
       expect(ev.bubbles).toBe(false);
     });
 
     it('should set false for cancelable', () => {
-      const ev = formatComponentConstructorEvent({ eventCancelable: false });
+      const ev = formatComponentConstructorEvent({ eventName: 'ev', eventCancelable: false });
       expect(ev.cancelable).toBe(false);
     });
 
     it('should set false for composed', () => {
-      const ev = formatComponentConstructorEvent({ eventComposed: false });
+      const ev = formatComponentConstructorEvent({ eventName: 'ev', eventComposed: false });
       expect(ev.composed).toBe(false);
     });
 
     it('should default true for composed', () => {
-      const ev = formatComponentConstructorEvent({});
+      const ev = formatComponentConstructorEvent({eventName: 'ev'});
       expect(ev.composed).toBe(true);
     });
 
     it('should default true for cancelable', () => {
-      const ev = formatComponentConstructorEvent({});
+      const ev = formatComponentConstructorEvent({eventName: 'ev'});
       expect(ev.cancelable).toBe(true);
     });
 
     it('should default true for bubbles', () => {
-      const ev = formatComponentConstructorEvent({});
+      const ev = formatComponentConstructorEvent({eventName: 'ev'});
       expect(ev.bubbles).toBe(true);
     });
 
@@ -56,8 +61,43 @@ describe('data serialize/parse', () => {
 
   describe('format component constructor properties', () => {
 
+    it('no Prop reflect to attribute when missing attribName', () => {
+      const membersMeta: d.MembersMeta = {
+        key: {
+          memberType: MEMBER_TYPE.PropMutable,
+          reflectToAttr: true
+        }
+      };
+      const properties = formatComponentConstructorProperties(membersMeta);
+      expect(properties.key.reflectToAttr).toBeUndefined();
+    });
+
+    it('Prop reflect to attribute when valid attribName', () => {
+      const membersMeta: d.MembersMeta = {
+        key: {
+          memberType: MEMBER_TYPE.PropMutable,
+          attribName: 'attr-name',
+          reflectToAttr: true
+        }
+      };
+      const properties = formatComponentConstructorProperties(membersMeta);
+      expect(properties.key.reflectToAttr).toBe(true);
+    });
+
+    it('Prop attribute name', () => {
+      const membersMeta: d.MembersMeta = {
+        key: {
+          memberType: MEMBER_TYPE.PropMutable,
+          attribName: 'my-custom-attribute-name'
+        }
+      };
+      const properties = formatComponentConstructorProperties(membersMeta);
+      expect(properties.key.attr).toBe('my-custom-attribute-name');
+      expect(properties.key.reflectToAttr).toBeUndefined();
+    });
+
     it('Prop Mutable', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.PropMutable
         }
@@ -67,7 +107,7 @@ describe('data serialize/parse', () => {
     });
 
     it('Prop Any', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.Prop,
           propType: PROP_TYPE.Any
@@ -78,7 +118,7 @@ describe('data serialize/parse', () => {
     });
 
     it('Prop Number', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.Prop,
           propType: PROP_TYPE.Number
@@ -89,7 +129,7 @@ describe('data serialize/parse', () => {
     });
 
     it('Prop Boolean', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.Prop,
           propType: PROP_TYPE.Boolean
@@ -100,7 +140,7 @@ describe('data serialize/parse', () => {
     });
 
     it('Prop String', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.Prop,
           propType: PROP_TYPE.String
@@ -111,7 +151,7 @@ describe('data serialize/parse', () => {
     });
 
     it('PropContext', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.PropContext,
           ctrlId: 'context-id'
@@ -122,7 +162,7 @@ describe('data serialize/parse', () => {
     });
 
     it('PropConnect', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.PropConnect,
           ctrlId: 'connect-id'
@@ -133,7 +173,7 @@ describe('data serialize/parse', () => {
     });
 
     it('Method', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: { memberType: MEMBER_TYPE.Method }
       };
       const properties = formatComponentConstructorProperties(membersMeta);
@@ -141,7 +181,7 @@ describe('data serialize/parse', () => {
     });
 
     it('Element', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: { memberType: MEMBER_TYPE.Element }
       };
       const properties = formatComponentConstructorProperties(membersMeta);
@@ -149,7 +189,7 @@ describe('data serialize/parse', () => {
     });
 
     it('State', () => {
-      const membersMeta: MembersMeta = {
+      const membersMeta: d.MembersMeta = {
         key: { memberType: MEMBER_TYPE.State }
       };
       const properties = formatComponentConstructorProperties(membersMeta);
@@ -157,7 +197,7 @@ describe('data serialize/parse', () => {
     });
 
     it('null for no member keys', () => {
-      const membersMeta: MembersMeta = {};
+      const membersMeta: d.MembersMeta = {};
       const properties = formatComponentConstructorProperties(membersMeta);
       expect(properties).toBe(null);
     });
@@ -252,10 +292,6 @@ describe('data serialize/parse', () => {
     });
 
   });
-
-  var registry: ComponentRegistry = {};
-  var moduleImports: ImportedModule = { 'tag': class MyTag {} as any };
-  var cmpMeta: ComponentMeta = {};
 
 });
 

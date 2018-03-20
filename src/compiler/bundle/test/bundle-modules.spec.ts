@@ -1,5 +1,5 @@
-import { expectFilesWritten } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/index';
+import { expectFiles } from '../../../testing/utils';
 
 
 describe('bundle-module', () => {
@@ -78,10 +78,10 @@ describe('bundle-module', () => {
       expect(r.components[2].tag).toBe('cmp-c');
       expect(r.bundleBuildCount).toBe(2);
 
-      expectFilesWritten(r,
+      expectFiles(c.fs, [
         '/www/build/app/cmp-a.js',
         '/www/build/app/cmp-c.js'
-      );
+      ]);
     });
 
     it('should include json files', async () => {
@@ -110,11 +110,12 @@ describe('bundle-module', () => {
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
-      expectFilesWritten(r,
+
+      expectFiles(c.fs, [
         '/www/build/app/cmp-a.js',
         '/www/build/app/cmp-b.js',
         '/www/build/app/chunk1.js'
-      );
+      ]);
     });
 
   });

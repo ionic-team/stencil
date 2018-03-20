@@ -440,6 +440,10 @@ function serializeProps(cmpData: d.ComponentData, cmpMeta: d.ComponentMeta) {
         propData.mutable = true;
       }
 
+      if (typeof memberMeta.attribName === 'string') {
+        propData.attr = memberMeta.attribName;
+      }
+
       if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length) {
         propData.watch = memberMeta.watchCallbacks.slice();
       }
@@ -489,7 +493,11 @@ function parseProps(config: d.Config, collection: d.Collection, cmpData: d.Compo
     }
 
     if (cmpMeta.membersMeta[propData.name].propType) {
+      // deprecated 0.7.3, 2018-03-19
       cmpMeta.membersMeta[propData.name].attribName = propData.name;
+    }
+    if (typeof propData.attr === 'string') {
+      cmpMeta.membersMeta[propData.name].attribName = propData.attr;
     }
 
     if (!invalidArrayData(propData.watch)) {

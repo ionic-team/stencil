@@ -81,6 +81,7 @@ export interface MemberMeta {
   propType?: number;
   attribName?: string;
   attribType?: AttributeTypeInfo;
+  reflectToAttr?: boolean;
   ctrlId?: string;
   jsdoc?: JSDoc;
   watchCallbacks?: string[];
@@ -128,6 +129,7 @@ export interface ComponentConstructorProperty {
   elementRef?: boolean;
   method?: boolean;
   mutable?: boolean;
+  reflectToAttr?: boolean;
   state?: boolean;
   type?: PropertyType;
   watchCallbacks?: string[];
@@ -307,19 +309,24 @@ export interface ComponentMemberData {
   [1]: number;
 
   /**
+   * reflect to attribute
+   */
+  [2]: boolean;
+
+  /**
    * is attribute name to observe
    */
-  [2]: string|number;
+  [3]: string|number;
 
   /**
    * prop type
    */
-  [3]: number;
+  [4]: number;
 
   /**
    * controller id
    */
-  [4]: string;
+  [5]: string;
 }
 
 

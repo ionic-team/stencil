@@ -125,6 +125,17 @@ describe('data serialize/parse', () => {
       expect(cmpMeta.membersMeta.any.attribName).toBe('any');
     });
 
+    it('should set reflect attribute', () => {
+      cmpMeta.membersMeta = {
+        'prop': { memberType: MEMBER_TYPE.Prop, reflectToAttr: true, propType: PROP_TYPE.Number },
+      };
+
+      const format = formatComponentLoader(cmpMeta);
+      cmpMeta = parseComponentLoader(format, {});
+
+      expect(cmpMeta.membersMeta.prop.reflectToAttr).toBe(true);
+    });
+
     it('should set number prop', () => {
       cmpMeta.membersMeta = {
         'num': { memberType: MEMBER_TYPE.Prop, attribName: 'num', propType: PROP_TYPE.Number }
@@ -159,6 +170,7 @@ describe('data serialize/parse', () => {
 
       expect(cmpMeta.membersMeta.str.propType).toEqual(PROP_TYPE.String);
       expect(cmpMeta.membersMeta.str.attribName).toEqual('my-custom-attr-name');
+      expect(cmpMeta.membersMeta.str.reflectToAttr).toEqual(false);
     });
 
     it('should set string prop', () => {
@@ -209,8 +221,8 @@ describe('data serialize/parse', () => {
       const format = formatComponentLoader(cmpMeta);
       cmpMeta = parseComponentLoader(format, {});
 
-      expect(cmpMeta.bundleIds.ios).toBe('abc');
-      expect(cmpMeta.bundleIds.md).toBe('def');
+      expect((cmpMeta.bundleIds as any).ios).toBe('abc');
+      expect((cmpMeta.bundleIds as any).md).toBe('def');
     });
 
     it('should set the default bundle id as a string', () => {

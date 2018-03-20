@@ -53,10 +53,3 @@ export function wroteFile(r: BuildResults, p: string) {
     return normalizePath(f) === normalizePath(p);
   });
 }
-
-export function expectFilesWritten(r: BuildResults, ...filePaths: string[]) {
-  filePaths.forEach(filePath => {
-    const fileWritten = r.filesWritten.find(p => p === filePath);
-    expect(fileWritten).toBe(filePath);
-  });
-}

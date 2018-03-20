@@ -1,11 +1,12 @@
-import { Config } from '../../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { setProcessEnvironment, validateConfig } from '../validate-config';
+import { normalizePath } from '../../util';
 
 
 describe('validation', () => {
 
-  let config: Config;
+  let config: d.Config;
   const logger = mockLogger();
   const sys = mockStencilSystem();
 
@@ -94,7 +95,8 @@ describe('validation', () => {
 
     it('should default include glob', () => {
       validateConfig(config);
-      expect(config.includeSrc).toEqual([
+      const normalizedIncludeSrc = config.includeSrc.map(x => normalizePath(x));
+      expect(normalizedIncludeSrc).toEqual([
         '/User/some/path/src/**/*.ts',
         '/User/some/path/src/**/*.tsx'
       ]);
@@ -360,6 +362,28 @@ describe('validation', () => {
       config.outputTargets = [];
       validateConfig(config);
     }).toThrow();
+  });
+
+  it('should throw error for invalie outputTarget type', () => {
+    expect(() => {
+      config.outputTargets = [
+        {
+          type: 'whatever'
+        } as any
+      ];
+      validateConfig(config);
+      expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+    }).toThrow();
+  });
+
+  it('should default add www type to outputTarget', () => {
+    config.outputTargets = [
+      {
+        dir: 'somedir'
+      } as d.OutputTargetWww
+    ];
+    validateConfig(config);
+    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
   });
 
   it('should default outputTargets with www', () => {

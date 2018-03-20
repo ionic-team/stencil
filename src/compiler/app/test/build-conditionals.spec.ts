@@ -1,14 +1,15 @@
-import { BuildConditionals, BuildCtx, ComponentMeta, Config } from '../../../declarations';
+import * as d from '../../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
-import { setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
+import { getLastBuildConditionals, setBuildConditionals, setBuildFromComponentContent, setBuildFromComponentMeta } from '../build-conditionals';
 
 
 describe('build conditionals', () => {
 
-  let coreBuild: BuildConditionals;
-  let cmpMeta: ComponentMeta;
-  let config: Config;
-  let buildCtx: BuildCtx;
+  let coreBuild: d.BuildConditionals;
+  let cmpMeta: d.ComponentMeta;
+  let config: d.Config;
+  let buildCtx: d.BuildCtx;
+  let compilerCtx: d.CompilerCtx;
 
   beforeEach(() => {
     cmpMeta = {
@@ -17,6 +18,55 @@ describe('build conditionals', () => {
     coreBuild = {} as any;
     config = {};
     buildCtx = {} as any;
+    compilerCtx = {} as any;
+  });
+
+
+  describe('getLastBuildConditionals',  () => {
+
+    it('use last build cuz only a css/html file changes', () => {
+      compilerCtx.isRebuild = true;
+      compilerCtx.lastBuildConditionals = {
+        svg: true
+      } as any;
+      buildCtx.filesChanged = ['/src/app.css', '/src/index.html'];
+      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      expect(b).toEqual({svg: true});
+    });
+
+    it('no last build cuz a tsx file change', () => {
+      compilerCtx.isRebuild = true;
+      compilerCtx.lastBuildConditionals = {
+        svg: true
+      } as any;
+      buildCtx.filesChanged = ['/src/cmp.tsx'];
+      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      expect(b).toBe(null);
+    });
+
+    it('no last build cuz a ts file change', () => {
+      compilerCtx.isRebuild = true;
+      compilerCtx.lastBuildConditionals = {
+        svg: true
+      } as any;
+      buildCtx.filesChanged = ['/src/cmp.ts', '/src/app.css', '/src/index.html'];
+      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      expect(b).toBe(null);
+    });
+
+    it('no last build cuz no compilerCtx.lastBuildConditionals', () => {
+      compilerCtx.isRebuild = true;
+      compilerCtx.lastBuildConditionals = null;
+      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      expect(b).toBe(null);
+    });
+
+    it('no last build cuz not rebuild', () => {
+      compilerCtx.isRebuild = false;
+      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      expect(b).toBe(null);
+    });
+
   });
 
 

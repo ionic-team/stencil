@@ -107,7 +107,7 @@ describe('dist loader/core resourcesUrl', () => {
     const html = c.fs.readFileSync(htmlFilePath);
 
     const dom = new jsdom.JSDOM(html, {
-      url: 'http://emmitts-garage.com/?core=es2015'
+      url: 'http://emmitts-garage.com/?core=esm'
     });
 
     const win = dom.window;

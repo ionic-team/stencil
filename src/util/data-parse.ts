@@ -29,8 +29,9 @@ export function parseComponentLoader(cmpRegistryData: LoadComponentRegistry, cmp
       d = memberData[i];
       cmpMeta.membersMeta[d[0]] = {
         memberType: d[1],
-        attribName: typeof d[2] === 'string' ? d[2] as string : d[2] ? d[0] : 0 as any,
-        propType: d[3]
+        reflectToAttr: !!d[2],
+        attribName: typeof d[3] === 'string' ? d[3] as string : d[3] ? d[0] : 0 as any,
+        propType: d[4]
       };
     }
   }

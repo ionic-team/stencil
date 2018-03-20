@@ -1,23 +1,22 @@
-import { HostElement, MembersMeta } from '../declarations';
+import * as d from '../declarations';
 import { parsePropertyValue } from '../util/data-parse';
 import { toLowerCase } from '../util/helpers';
 
 
-export function attributeChangedCallback(membersMeta: MembersMeta, elm: HostElement, attribName: string, oldVal: string, newVal: string, propName?: string) {
+export function attributeChangedCallback(membersMeta: d.MembersMeta, elm: d.HostElement, attribName: string, oldVal: string, newVal: string, propName?: string, memberMeta?: d.MemberMeta) {
   // only react if the attribute values actually changed
-  if (oldVal !== newVal && membersMeta) {
-
-    // normalize the attribute name w/ lower case
-    attribName = toLowerCase(attribName);
+  if (membersMeta && oldVal !== newVal) {
 
     // using the known component meta data
     // look up to see if we have a property wired up to this attribute name
     for (propName in membersMeta) {
-      if (membersMeta[propName].attribName === attribName) {
-        // cool we've got a prop using this attribute name the value will
+      memberMeta = membersMeta[propName];
+
+      // normalize the attribute name w/ lower case
+      if (memberMeta.attribName && toLowerCase(memberMeta.attribName) === toLowerCase(attribName)) {
+        // cool we've got a prop using this attribute name, the value will
         // be a string, so let's convert it to the correct type the app wants
-        // below code is ugly yes, but great minification ;)
-        (<any>elm)[propName] = parsePropertyValue(membersMeta[propName].propType, newVal);
+        (elm as any)[propName] = parsePropertyValue(memberMeta.propType, newVal);
         break;
       }
     }

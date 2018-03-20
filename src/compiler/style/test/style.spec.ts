@@ -1,5 +1,4 @@
 import { escapeCssForJs } from '../style';
-import { expectFilesWritten } from '../../../testing/utils';
 import { TestingCompiler } from '../../../testing/index';
 
 
@@ -15,6 +14,21 @@ describe('component-styles', () => {
       await c.fs.commit();
     });
 
+
+    it('should escape unicode characters', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFiles({
+        '/src/cmp-a.css': `.myclass:before { content: "\\F113"; }`,
+        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
+      });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      expect(content).toContain('\F113');
+    });
 
     it('should build one component w/ inline style', async () => {
       c.config.bundles = [ { components: ['cmp-a'] } ];

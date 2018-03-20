@@ -20,4 +20,9 @@ class ActionSheet {
   @Prop() objectAnyThing: (_) => Promise<OtherThing>;
 
   @Prop() size: string;
+
+  @Prop({
+    attr: 'my-custom-attr-name',
+    reflectToAttr: true
+  }) withOptions = 88;
 }

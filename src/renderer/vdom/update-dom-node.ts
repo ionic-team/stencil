@@ -1,11 +1,12 @@
+import * as d from '../../declarations';
 import { Build } from '../../util/build-conditionals';
 import { elementHasProperty } from '../../core/proxy-members';
 import { EMPTY_ARR, EMPTY_OBJ, NODE_TYPE } from '../../util/constants';
-import { PlatformApi, VNode } from '../../declarations';
 import { toLowerCase } from '../../util/helpers';
+import { updateAttribute } from './update-attribute';
 
 
-export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode: VNode, isSvgMode: boolean, memberName?: string): void {
+export function updateElement(plt: d.PlatformApi, oldVnode: d.VNode | null, newVnode: d.VNode, isSvgMode: boolean, memberName?: string): void {
   // if the element passed in is a shadow root, which is a document fragment
   // then we want to be adding attrs/props to the shadow root's "host" element
   // if it's not a shadow root, then we add attrs/props to the same element
@@ -16,20 +17,20 @@ export function updateElement(plt: PlatformApi, oldVnode: VNode | null, newVnode
   // remove attributes no longer present on the vnode by setting them to undefined
   for (memberName in oldVnodeAttrs) {
     if (!(newVnodeAttrs && newVnodeAttrs[memberName] != null) && oldVnodeAttrs[memberName] != null) {
-      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode);
+      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.isHostElement);
     }
   }
 
   // add new & update changed attributes
   for (memberName in newVnodeAttrs) {
     if (!(memberName in oldVnodeAttrs) || newVnodeAttrs[memberName] !== (memberName === 'value' || memberName === 'checked' ? elm[memberName] : oldVnodeAttrs[memberName])) {
-      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode);
+      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.isHostElement);
     }
   }
 }
 
 
-export function setAccessor(plt: PlatformApi, elm: any, memberName: string, oldValue: any, newValue: any, isSvg: boolean, i?: any, ilen?: number) {
+export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean, i?: any, ilen?: number) {
   if (memberName === 'class' && !isSvg) {
     // Class
     if (oldValue !== newValue) {
@@ -97,7 +98,13 @@ export function setAccessor(plt: PlatformApi, elm: any, memberName: string, oldV
       // we know for a fact that this element is a known component
       // and this component has this member name as a property,
       // let's set the known @Prop on this element
+      // set it directly as property on the element
       setProperty(elm, memberName, newValue);
+
+      if (Build.reflectToAttr && isHostElement && cmpMeta.membersMeta[memberName].reflectToAttr) {
+        // we also want to set this data to the attribute
+        updateAttribute(elm, cmpMeta.membersMeta[memberName].attribName, newValue);
+      }
 
     } else if (memberName !== 'ref') {
       // this member name is a property on this element, but it's not a component
@@ -111,26 +118,10 @@ export function setAccessor(plt: PlatformApi, elm: any, memberName: string, oldV
 
   } else if (newValue != null) {
     // Element Attributes
-    i = (memberName !== (memberName = memberName.replace(/^xlink\:?/, '')));
-
-    if (BOOLEAN_ATTRS[memberName] === 1 && (!newValue || newValue === 'false')) {
-      if (i) {
-        elm.removeAttributeNS(XLINK_NS, toLowerCase(memberName));
-
-      } else {
-        elm.removeAttribute(memberName);
-      }
-
-    } else if (typeof newValue !== 'function') {
-      if (i) {
-        elm.setAttributeNS(XLINK_NS, toLowerCase(memberName), newValue);
-
-      } else {
-        elm.setAttribute(memberName, newValue);
-      }
-    }
+    updateAttribute(elm, memberName, newValue);
   }
 }
+
 
 /**
  * Attempt to set a DOM property to the given value.
@@ -141,25 +132,3 @@ function setProperty(elm: any, name: string, value: any) {
     elm[name] = value;
   } catch (e) { }
 }
-
-
-const BOOLEAN_ATTRS: any = {
-  'allowfullscreen': 1,
-  'async': 1,
-  'autofocus': 1,
-  'autoplay': 1,
-  'checked': 1,
-  'controls': 1,
-  'disabled': 1,
-  'enabled': 1,
-  'formnovalidate': 1,
-  'hidden': 1,
-  'multiple': 1,
-  'noresize': 1,
-  'readonly': 1,
-  'required': 1,
-  'selected': 1,
-  'spellcheck': 1,
-};
-
-const XLINK_NS = 'http://www.w3.org/1999/xlink';

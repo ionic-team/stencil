@@ -6,12 +6,13 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 
-describe('component decorator', () => {
+describe('component', () => {
 
   const config = mockConfig();
 
   describe('getComponentDecoratorMeta', () => {
-    it('simple decorator', () => {
+
+    it('complex decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
@@ -132,6 +133,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
+            'reflectToAttr': false,
           },
           'animationCtrl': {
             'ctrlId': 'ion-animation-controller',
@@ -154,6 +156,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
+            'reflectToAttr': false,
           },
           'config': {
             'ctrlId': 'config',
@@ -171,6 +174,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
+            'reflectToAttr': false,
           },
           'el': {
             'memberType': MEMBER_TYPE.Element,
@@ -187,6 +191,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Boolean,
+            'reflectToAttr': false,
           },
           'enterAnimation': {
             'attribName': 'enter-animation',
@@ -206,6 +211,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
+            'reflectToAttr': false,
           },
           'exitAnimation': {
             'attribName': 'exit-animation',
@@ -225,6 +231,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.Unknown,
+            'reflectToAttr': false,
           },
           'subTitle': {
             'attribName': 'sub-title',
@@ -238,6 +245,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
+            'reflectToAttr': true,
           },
           'title': {
             'attribName': 'title',
@@ -251,6 +259,7 @@ describe('component decorator', () => {
             },
             'memberType': MEMBER_TYPE.Prop,
             'propType': PROP_TYPE.String,
+            'reflectToAttr': false,
           },
         },
         'stylesMeta': {

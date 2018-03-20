@@ -16,6 +16,22 @@ export function init(
   // create global namespace if it doesn't already exist
   (win[namespace] = win[namespace] || {}).components = components;
 
+  if (!win.customElements) {
+    // temporary customElements polyfill only for "whenDefined"
+    // this is incase customElements.whenDefined('my-tag') is
+    // used before the polyfill is downloaded
+    win.$whenDefined = [];
+    win.customElements = {
+      whenDefined: function(tag: string) {
+        return {
+          then: function(cb: Function) {
+            win.$whenDefined.push([tag, cb]);
+          }
+        };
+      }
+    };
+  }
+
   y = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
   if (y.length) {
     // auto hide components until they been fully hydrated
@@ -55,7 +71,13 @@ export function init(
   // if either of those are not supported, then use the core w/ polyfills
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
-  x.src = resourcesUrl + (usePolyfills(win as any, win.location, x, 'import("")') ? appCorePolyfilled : appCore);
+  if (usePolyfills(win, win.location, x, 'import("")')) {
+      x.src = resourcesUrl + appCorePolyfilled;
+  } else {
+      x.src = resourcesUrl + appCore;
+      x.setAttribute('type', 'module');
+      x.setAttribute('crossorigin', true);
+  }
   x.setAttribute('data-resources-url', resourcesUrl);
   x.setAttribute('data-namespace', fsNamespace);
   doc.head.appendChild(x);
@@ -66,7 +88,7 @@ export function usePolyfills(win: any, location: Location, scriptElm: HTMLScript
   // fyi, dev mode has verbose if/return statements
   // but it minifies to a nice 'lil one-liner ;)
 
-  if (location.search.indexOf('core=es2015') > 0) {
+  if (location.search.indexOf('core=esm') > 0) {
     // force es2015 build
     return false;
   }

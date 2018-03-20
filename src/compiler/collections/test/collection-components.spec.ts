@@ -200,6 +200,16 @@ describe('collection components', () => {
     expect(b.cmpMeta.membersMeta.state.propType).toBeUndefined();
   });
 
+  it('membersMeta prop attr', () => {
+    a.membersMeta = {
+      'propAttributeName': { memberType: MEMBER_TYPE.Prop, propType: PROP_TYPE.Number, attribName: 'my-attr-name' }
+    };
+    const cmpData = serializeComponent(config, collectionDir, moduleFile);
+    b = parseComponentDataToModuleFile(config, collection, collectionDir, cmpData);
+
+    expect(b.cmpMeta.membersMeta.propAttributeName.attribName).toBe('my-attr-name');
+  });
+
   it('membersMeta prop mutable', () => {
     a.membersMeta = {
       'propMutable': { memberType: MEMBER_TYPE.PropMutable, propType: PROP_TYPE.Number }

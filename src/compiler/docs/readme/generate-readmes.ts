@@ -119,6 +119,7 @@ async function updateReadme(config: d.Config, ctx: d.CompilerCtx, readmeOutputs:
 
   if (updatedContent.trim() !== existingContent.trim()) {
     writeFiles[readMePath] = updatedContent;
+    config.logger.info(`updated readme docs: ${moduleFile.cmpMeta.tagNameMeta}`);
   }
 
   readmeOutputs.forEach(readmeOutput => {
@@ -126,8 +127,6 @@ async function updateReadme(config: d.Config, ctx: d.CompilerCtx, readmeOutputs:
     const absPath = config.sys.path.join(readmeOutput.dir, relPath);
     writeFiles[absPath] = updatedContent;
   });
-
-  config.logger.info(`updated readme docs: ${moduleFile.cmpMeta.tagNameMeta}`);
 
   await ctx.fs.writeFiles(writeFiles);
 

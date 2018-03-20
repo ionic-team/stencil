@@ -154,5 +154,17 @@ export function getWritePathFromUrl(config: d.Config, outputTarget: d.OutputTarg
   );
 
   // create the full path where this will be saved (normalize for windowz)
-  return pathJoin(config, dir, `index.html`);
+  let filePath: string;
+
+  if (dir + '/' === outputTarget.dir + '/') {
+    // this is the root of the output target directory
+    // use the configured index.html
+    const basename = outputTarget.indexHtml.substr(dir.length + 1);
+    filePath = pathJoin(config, dir, basename);
+
+  } else {
+    filePath = pathJoin(config, dir, `index.html`);
+  }
+
+  return filePath;
 }
