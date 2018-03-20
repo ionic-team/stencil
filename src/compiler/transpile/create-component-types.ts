@@ -367,7 +367,7 @@ function membersToEventAttributes(eventMetaList: d.EventMeta[]): TypeInfo {
   const interfaceData = eventMetaList
     .reduce((obj, eventMetaObj) => {
       const memberName = `on${captializeFirstLetter(eventMetaObj.eventName)}`;
-      const eventType = (eventMetaObj.eventType) ? `CustomEvent<${eventMetaObj.eventType.text}` : `CustomEvent`;
+      const eventType = (eventMetaObj.eventType) ? `CustomEvent<${eventMetaObj.eventType.text}>` : `CustomEvent`;
       obj[memberName] = {
         type: `(event: ${eventType}) => void`, // TODO this is not good enough
       };
