@@ -49,7 +49,18 @@ function loadLinkStyles(doc: Document, customStyle: CustomStyle, linkElm: HTMLLi
   });
 }
 
+// This regexp tries to determine when a variable is declared, for example:
+//
+// .my-el { --highlight-color: green; }
+//
+// but we don't want to trigger when a classname uses "--" or a pseudo-class is
+// used. We assume that the only characters that can preceed a variable
+// declaration are "{", from an opening block, ";" from a preceeding rule, or a
+// space. This prevents the regexp from matching a word in a selector, since
+// they would need to start with a "." or "#". (We assume element names don't
+// start with "--").
+const CSS_VARIABLE_REGEXP = /[\s;{]--[-a-zA-Z0-9]+\s*:/m;
 
 export function hasCssVariables(css: string) {
-  return css.indexOf('var(') > -1 || /--[-a-zA-Z0-9\s]+:/.test(css);
+  return css.indexOf('var(') > -1 || CSS_VARIABLE_REGEXP.test(css);
 }
