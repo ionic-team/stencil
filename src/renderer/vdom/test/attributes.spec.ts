@@ -68,11 +68,11 @@ describe('attributes', function() {
       const vnode1 = h('div', { required: true, readonly: 1, noresize: 'truthy' });
       elm = patch(vnode0, vnode1).elm;
       expect(elm.hasAttribute('required')).toEqual(true);
-      expect(elm.getAttribute('required')).toEqual('true');
+      expect(elm.getAttribute('required')).toEqual('');
       expect(elm.hasAttribute('readonly')).toEqual(true);
-      expect(elm.getAttribute('readonly')).toEqual('1');
+      expect(elm.getAttribute('readonly')).toEqual('');
       expect(elm.hasAttribute('noresize')).toEqual(true);
-      expect(elm.getAttribute('noresize')).toEqual('truthy');
+      expect(elm.getAttribute('noresize')).toEqual('');
     });
 
     it('is omitted if the value is falsy', function() {

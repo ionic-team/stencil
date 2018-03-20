@@ -1,4 +1,4 @@
-import { AttributeTypeInfo, AttributeTypeReference, Diagnostic, MemberMeta, MembersMeta, PropOptions } from '../../../declarations';
+import * as d from '../../../declarations';
 import { catchError } from '../../util';
 import { isDecoratorNamed, serializeSymbol } from './utils';
 import { toDashCase } from '../../../util/helpers';
@@ -6,101 +6,127 @@ import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): MembersMeta {
+export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: d.Diagnostic[]) {
   return classNode.members
     .filter(member => Array.isArray(member.decorators) && member.decorators.length > 0)
-    .reduce((allMembers: MembersMeta, prop: ts.PropertyDeclaration) => {
-      const memberData: MemberMeta = {};
+    .reduce((allMembers: d.MembersMeta, prop: ts.PropertyDeclaration) => {
+      const memberData: d.MemberMeta = {};
       const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
+
       if (propDecorator == null) {
         return allMembers;
       }
 
-      const suppliedOptions = (<ts.CallExpression>propDecorator.expression).arguments
-        .map(arg => {
-          try {
-            const fnStr = `return ${arg.getText()};`;
-            return new Function(fnStr)();
-
-          } catch (e) {
-            const d = catchError(diagnostics, e);
-            d.messageText = `parse prop options: ${e}`;
-          }
-        });
-      const propOptions: PropOptions = suppliedOptions[0];
-      const memberName = (<ts.Identifier>prop.name).text;
+      const propOptions = getPropOptions(propDecorator, diagnostics);
+      const memberName = (prop.name as ts.Identifier).text;
       const symbol = checker.getSymbolAtLocation(prop.name);
 
       if (propOptions && typeof propOptions.connect === 'string') {
+        // @Prop({ connect: 'ion-alert-controller' })
         memberData.memberType = MEMBER_TYPE.PropConnect;
         memberData.ctrlId = propOptions.connect;
 
       } else if (propOptions && typeof propOptions.context === 'string') {
+        // @Prop({ context: 'config' })
         memberData.memberType = MEMBER_TYPE.PropContext;
         memberData.ctrlId = propOptions.context;
 
       } else {
-        let attribType: AttributeTypeInfo;
-
-        // If the @Prop() attribute does not have a defined type then infer it
-        if (!prop.type) {
-          let attribTypeText = inferPropType(prop.initializer);
-
-          if (!attribTypeText) {
-            attribTypeText = 'any';
-            diagnostics.push({
-              level: 'warn',
-              type: 'build',
-              header: 'Prop type provided is not supported, defaulting to any',
-              messageText: `'${prop.getFullText()}'`,
-            });
-          }
-          attribType = {
-            text: attribTypeText,
-          };
-        } else {
-          attribType = getAttributeTypeInfo(prop.type, sourceFile);
-        }
-
-        if (propOptions && typeof propOptions.state === 'boolean') {
-          diagnostics.push({
-            level: 'warn',
-            type: 'build',
-            header: '@Prop({ state: true }) option has been deprecated',
-            messageText: `"state" has been renamed to @Prop({ mutable: true })`,
-          });
-          propOptions.mutable = propOptions.state;
-        }
-
-        if (propOptions && typeof propOptions.mutable === 'boolean') {
-          memberData.memberType = MEMBER_TYPE.PropMutable;
-        } else {
-          memberData.memberType = MEMBER_TYPE.Prop;
-        }
-
-        memberData.attribName = toDashCase(memberName);
-        memberData.attribType = attribType;
-        memberData.propType = propTypeFromTSType(attribType.text);
+        // @Prop()
+        memberData.memberType = getMemberType(propOptions);
+        memberData.attribName = getAttributeName(propOptions, memberName);
+        memberData.attribType = getAttribType(sourceFile, prop, diagnostics);
+        memberData.reflectToAttr = getreflectToAttr(propOptions);
+        memberData.propType = propTypeFromTSType(memberData.attribType.text);
         memberData.jsdoc = serializeSymbol(checker, symbol);
       }
 
       allMembers[memberName] = memberData;
       return allMembers;
-    }, {} as MembersMeta);
+    }, {} as d.MembersMeta);
 }
 
 
+function getPropOptions(propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]) {
+  const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments
+  .map(arg => {
+    try {
+      const fnStr = `return ${arg.getText()};`;
+      return new Function(fnStr)();
+
+    } catch (e) {
+      const d = catchError(diagnostics, e);
+      d.messageText = `parse prop options: ${e}`;
+    }
+  });
+
+  const propOptions: d.PropOptions = suppliedOptions[0];
+  return propOptions;
+}
 
 
-function getAttributeTypeInfo(type: ts.TypeNode, sourceFile: ts.SourceFile): AttributeTypeInfo {
-  const typeInfo: AttributeTypeInfo = {
+function getMemberType(propOptions: d.PropOptions) {
+  if (propOptions && propOptions.mutable === true) {
+    return MEMBER_TYPE.PropMutable;
+  }
+
+  return MEMBER_TYPE.Prop;
+}
+
+
+function getAttributeName(propOptions: d.PropOptions, memberName: string) {
+  if (propOptions && typeof propOptions.attr === 'string' && propOptions.attr.trim().length > 0) {
+    return propOptions.attr.trim();
+  }
+  return toDashCase(memberName);
+}
+
+
+function getreflectToAttr(propOptions: d.PropOptions) {
+  if (propOptions && propOptions.reflectToAttr === true) {
+    return true;
+  }
+
+  return false;
+}
+
+
+function getAttribType(sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration, diagnostics: d.Diagnostic[]) {
+  let attribType: d.AttributeTypeInfo;
+
+  // If the @Prop() attribute does not have a defined type then infer it
+  if (!prop.type) {
+    let attribTypeText = inferPropType(prop.initializer);
+
+    if (!attribTypeText) {
+      attribTypeText = 'any';
+      diagnostics.push({
+        level: 'warn',
+        type: 'build',
+        header: 'Prop type provided is not supported, defaulting to any',
+        messageText: `'${prop.getFullText()}'`,
+      });
+    }
+    attribType = {
+      text: attribTypeText,
+    };
+  } else {
+    attribType = getAttributeTypeInfo(prop.type, sourceFile);
+  }
+
+  return attribType;
+}
+
+
+function getAttributeTypeInfo(type: ts.TypeNode, sourceFile: ts.SourceFile) {
+  const typeInfo: d.AttributeTypeInfo = {
     text: type.getFullText().trim()
   };
   const typeReferences = getAllTypeReferences(type)
     .reduce((allReferences, rt)  => {
       allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
       return allReferences;
-    }, {} as { [key: string]: AttributeTypeReference});
+    }, {} as { [key: string]: d.AttributeTypeReference});
 
   if (Object.keys(typeReferences).length > 0) {
     typeInfo.typeReferences = typeReferences;
@@ -134,7 +160,7 @@ function getAllTypeReferences(node: ts.TypeNode): string[] {
   return referencedTypes;
 }
 
-function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): AttributeTypeReference {
+function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): d.AttributeTypeReference {
 
   const sourceFileObj = sourceFile.getSourceFile();
 

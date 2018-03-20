@@ -1,10 +1,25 @@
-import { ComponentConstructor, ComponentInstance, ComponentMeta, HostElement, PlatformApi } from '../../declarations';
+import * as d from '../../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { mockDomApi, mockPlatform } from '../../testing/mocks';
 import { proxyComponentInstance } from '../proxy-component-instance';
 
 
 describe('proxy-component', () => {
+
+  let plt: d.PlatformApi;
+  let elm: d.HostElement;
+  let instance: d.ComponentInstance;
+  let CmpConstructor: d.ComponentConstructor;
+
+  beforeEach(() => {
+    plt = mockPlatform();
+    elm = plt.domApi.$createElement('ion-cmp') as any;
+    CmpConstructor = TwinPines as any;
+    instance = new TwinPines();
+    plt.instanceMap.set(elm, instance);
+    plt.hostElementMap.set(instance, elm);
+  });
+
 
   describe('watch callbacks', () => {
 
@@ -130,12 +145,6 @@ describe('proxy-component', () => {
   });
 
 
-  let plt: PlatformApi;
-  const domApi = mockDomApi();
-  let elm: HostElement;
-  let instance: ComponentInstance;
-  let CmpConstructor: ComponentConstructor;
-
   class TwinPines {
     num = 88;
     str = 'mph';
@@ -182,18 +191,14 @@ describe('proxy-component', () => {
           mutable: true,
           type: Boolean,
           watchCallbacks: ['watchCallbackA']
+        },
+        'rflBool': {
+          reflectToAttr: true,
+          attr: 'rfl-bool',
+          type: Boolean,
         }
       };
     }
   }
-
-  beforeEach(() => {
-    plt = mockPlatform();
-    elm = domApi.$createElement('ion-cmp') as any;
-    CmpConstructor = TwinPines as any;
-    instance = new TwinPines();
-    plt.instanceMap.set(elm, instance);
-    plt.hostElementMap.set(instance, elm);
-  });
 
 });

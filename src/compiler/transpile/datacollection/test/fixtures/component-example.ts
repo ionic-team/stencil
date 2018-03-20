@@ -57,7 +57,7 @@ class ActionSheet {
 
   @Prop() cssClass: string;
   @Prop() title: string;
-  @Prop() subTitle: string;
+  @Prop({ reflectToAttr: true }) subTitle: string;
   @Prop() buttons: ActionSheetButton[];
   @Prop() enableBackdropDismiss: boolean = true;
 

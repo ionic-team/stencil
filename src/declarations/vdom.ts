@@ -29,16 +29,13 @@ export interface VNode {
   vattrs?: any;
   vref?: (elm: any) => void;
   elm?: Element|Node;
+  isHostElement?: boolean;
 }
 
 export interface VNodeData {
-  props?: any;
-  attrs?: any;
   class?: {[className: string]: boolean};
   style?: any;
-  on?: any;
-  key?: Key;
-  ns?: any; // for SVGs
+  [attrName: string]: any;
 }
 
 /**

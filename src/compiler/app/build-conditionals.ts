@@ -80,6 +80,10 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
       if (memberMeta.watchCallbacks && memberMeta.watchCallbacks.length > 0) {
         coreBuild.watchCallback = true;
       }
+
+      if (memberMeta.reflectToAttr) {
+        coreBuild.reflectToAttr = true;
+      }
     });
   }
 

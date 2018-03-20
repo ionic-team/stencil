@@ -147,13 +147,9 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
         // be observed, it does not include all props yet, so it's safe to
         // loop through all of the props (attrs) and observed them
         for (const propName in cmpMeta.membersMeta) {
-          // initialize the actual attribute name used vs. the prop name
-          // for example, "myProp" would be "my-prop" as an attribute
-          // and these can be configured to be all lower case or dash case (default)
           if (cmpMeta.membersMeta[propName].attribName) {
             observedAttributes.push(
-              // dynamically generate the attribute name from the prop name
-              // also add it to our array of attributes we need to observe
+              // add this attribute to our array of attributes we need to observe
               cmpMeta.membersMeta[propName].attribName
             );
           }

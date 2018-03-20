@@ -35,7 +35,8 @@ describe('props decorator', () => {
           type: '(_: any) => any',
         },
         memberType: 1,
-        propType: PROP_TYPE.Unknown
+        propType: PROP_TYPE.Unknown,
+        reflectToAttr: false
       },
       size: {
         attribName: 'size',
@@ -48,8 +49,23 @@ describe('props decorator', () => {
           type: 'string',
         },
         memberType: 1,
-        propType: PROP_TYPE.String
-      }
+        propType: PROP_TYPE.String,
+        reflectToAttr: false
+      },
+      withOptions: {
+        attribName: 'my-custom-attr-name',
+        attribType: {
+          text: 'number',
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'withOptions',
+          type: 'number',
+        },
+        memberType: 1,
+        propType: PROP_TYPE.Number,
+        reflectToAttr: true
+      },
     });
   });
 

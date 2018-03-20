@@ -1,4 +1,4 @@
-import { ComponentConstructor, ComponentMeta, HostElement, PlatformApi } from '../../declarations';
+import * as d from '../../declarations';
 import { mockElement, mockPlatform } from '../../testing/mocks';
 import { h } from '../../renderer/vdom/h';
 import { render } from '../render';
@@ -6,12 +6,175 @@ import { render } from '../render';
 
 describe('instance render', () => {
 
-  let plt: PlatformApi;
-  let elm: HostElement;
+  let plt: d.PlatformApi;
+  let elm: d.HostElement;
 
   beforeEach(() => {
     plt = mockPlatform();
-    elm = mockElement('ion-tag') as HostElement;
+    elm = mockElement('ion-tag') as d.HostElement;
+  });
+
+
+  it('should reflect standardized boolean attribute, falsy by removing attr, no render()', () => {
+    class MyComponent {
+      checked = false;
+
+      static get properties() {
+        return {
+          checked: {
+            type: Boolean,
+            attr: 'checked',
+            reflectToAttr: true
+          }
+        };
+      }
+    }
+
+    elm.setAttribute('checked', '');
+
+    doRender(MyComponent);
+
+    const vnode = plt.vnodeMap.get(elm);
+    expect(elm.getAttribute('checked')).toBe(null);
+  });
+
+  it('should reflect standardized boolean attribute, truthy w/ no value, no render()', () => {
+    class MyComponent {
+      checked = true;
+
+      static get properties() {
+        return {
+          checked: {
+            type: Boolean,
+            attr: 'checked',
+            reflectToAttr: true
+          }
+        };
+      }
+    }
+
+    doRender(MyComponent);
+
+    const vnode = plt.vnodeMap.get(elm);
+    expect(elm.getAttribute('checked')).toBe('');
+  });
+
+  it('should reflect non-standardized boolean attribute, falsy w/ value', () => {
+    class MyComponent {
+      rflBool = false;
+
+      static get properties() {
+        return {
+          rflBool: {
+            type: Boolean,
+            attr: 'my-attr-name',
+            reflectToAttr: true
+          }
+        };
+      }
+    }
+
+    doRender(MyComponent);
+
+    const vnode = plt.vnodeMap.get(elm);
+    expect(elm.getAttribute('my-attr-name')).toBe('false');
+  });
+
+  it('should reflect non-standardized boolean attribute, truthy w/ value', () => {
+    class MyComponent {
+      rflBool = true;
+
+      static get properties() {
+        return {
+          rflBool: {
+            type: Boolean,
+            attr: 'my-attr-name',
+            reflectToAttr: true
+          }
+        };
+      }
+    }
+
+    doRender(MyComponent);
+
+    const vnode = plt.vnodeMap.get(elm);
+    expect(elm.getAttribute('my-attr-name')).toBe('true');
+  });
+
+  it('should reflect boolean property value to attribute, but not a standardized Boolean attribute, no render()', () => {
+    class MyComponent {
+      rflBool = true;
+
+      static get properties() {
+        return {
+          rflBool: {
+            type: Boolean,
+            attr: 'my-attr-name',
+            reflectToAttr: true
+          }
+        };
+      }
+    }
+
+    doRender(MyComponent);
+
+    const vnode = plt.vnodeMap.get(elm);
+    expect(elm.getAttribute('my-attr-name')).toBe('true');
+  });
+
+  it('should reflect number property value to attribute, w/ render()', () => {
+    class MyComponent {
+      rflNum = 88;
+
+      render() {
+        return h('div', 0, 'text');
+      }
+
+      static get properties() {
+        return {
+          rflNum: {
+            type: Number,
+            attr: 'my-attr-name',
+            reflectToAttr: true
+          }
+        };
+      }
+    }
+
+    doRender(MyComponent);
+
+    const vnode = plt.vnodeMap.get(elm);
+    expect(elm.getAttribute('my-attr-name')).toBe('88');
+  });
+
+  it('should reflect string property value to attribute, w/ hostData()', () => {
+    class MyComponent {
+      rflStr = 'str';
+
+      hostData() {
+        return {
+          'host-data': 'hello'
+        };
+      }
+
+      static get properties() {
+        return {
+          rflStr: {
+            type: String,
+            attr: 'my-attr-name',
+            reflectToAttr: true
+          }
+        };
+      }
+    }
+
+    doRender(MyComponent);
+
+    const vnode = plt.vnodeMap.get(elm);
+    expect(vnode.isHostElement).toBe(true);
+
+    expect(elm.getAttribute('my-attr-name')).toBe('str');
+    expect(elm.getAttribute('host-data')).toBe('hello');
   });
 
   it('should create a vnode with no children when there is a render() but it returned null', () => {
@@ -258,7 +421,7 @@ describe('instance render', () => {
   function doRender(cmpConstructor: any) {
     const instance = new cmpConstructor();
     plt.instanceMap.set(elm, instance);
-    const cmpMeta: ComponentMeta = {
+    const cmpMeta: d.ComponentMeta = {
       componentConstructor: cmpConstructor
     };
     render(plt, cmpMeta, elm, instance, false);

@@ -36,6 +36,8 @@ export class VNode implements d.VNode {
   vref: (elm: HTMLElement) => void;
 
   elm: Element|Node;
+
+  isHostElement?: boolean;
 }
 
 
