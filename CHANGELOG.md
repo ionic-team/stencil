@@ -1,3 +1,14 @@
+<a name="0.7.5"></a>
+## 🐬 [0.7.5](https://github.com/ionic-team/stencil/compare/v0.7.4...v0.7.5) (2018-03-20)
+
+
+### Bug Fixes
+
+* **css:** update the CSS variable regexp for pseudo-classes ([97c35ce](https://github.com/ionic-team/stencil/commit/97c35ce)), closes [#603](https://github.com/ionic-team/stencil/issues/603)
+* add event listeners and custom events types to components.d.ts ([#644](https://github.com/ionic-team/stencil/issues/644)) ([4644d91](https://github.com/ionic-team/stencil/commit/4644d91))
+
+
+
 <a name="0.7.4"></a>
 ## 🏵 [0.7.4](https://github.com/ionic-team/stencil/compare/v0.7.3...v0.7.4) (2018-03-20)
 
