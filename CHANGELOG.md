@@ -1,3 +1,14 @@
+<a name="0.7.4"></a>
+## 🏵 [0.7.4](https://github.com/ionic-team/stencil/compare/v0.7.3...v0.7.4) (2018-03-20)
+
+
+### Bug Fixes
+
+* **build:** reuse build conditionals from last build for non-typescript changes ([8127829](https://github.com/ionic-team/stencil/commit/8127829)), closes [#636](https://github.com/ionic-team/stencil/issues/636)
+* **prop:** fix prop decorator parsing ([857d81c](https://github.com/ionic-team/stencil/commit/857d81c))
+
+
+
 <a name="0.7.3"></a>
 ## 🏆 [0.7.3](https://github.com/ionic-team/stencil/compare/v0.7.2...v0.7.3) (2018-03-20)
 
