@@ -36,7 +36,7 @@ export function getPropDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Clas
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
         memberData.attribType = getAttribType(sourceFile, prop, diagnostics);
-        memberData.reflectToAttr = getreflectToAttr(propOptions);
+        memberData.reflectToAttr = getReflectToAttr(propOptions);
         memberData.propType = propTypeFromTSType(memberData.attribType.text);
         memberData.jsdoc = serializeSymbol(checker, symbol);
       }
@@ -82,7 +82,7 @@ function getAttributeName(propOptions: d.PropOptions, memberName: string) {
 }
 
 
-function getreflectToAttr(propOptions: d.PropOptions) {
+function getReflectToAttr(propOptions: d.PropOptions) {
   if (propOptions && propOptions.reflectToAttr === true) {
     return true;
   }

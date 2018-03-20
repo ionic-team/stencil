@@ -61,10 +61,22 @@ describe('data serialize/parse', () => {
 
   describe('format component constructor properties', () => {
 
-    it('Prop reflect to attribute', () => {
+    it('no Prop reflect to attribute when missing attribName', () => {
       const membersMeta: d.MembersMeta = {
         key: {
           memberType: MEMBER_TYPE.PropMutable,
+          reflectToAttr: true
+        }
+      };
+      const properties = formatComponentConstructorProperties(membersMeta);
+      expect(properties.key.reflectToAttr).toBeUndefined();
+    });
+
+    it('Prop reflect to attribute when valid attribName', () => {
+      const membersMeta: d.MembersMeta = {
+        key: {
+          memberType: MEMBER_TYPE.PropMutable,
+          attribName: 'attr-name',
           reflectToAttr: true
         }
       };

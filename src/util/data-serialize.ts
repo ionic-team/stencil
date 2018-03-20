@@ -200,27 +200,23 @@ function formatComponentConstructorProperty(memberMeta: d.MemberMeta) {
   } else {
     if (memberMeta.propType === PROP_TYPE.String) {
       property.type = String;
-      property.attr = memberMeta.attribName;
 
     } else if (memberMeta.propType === PROP_TYPE.Boolean) {
       property.type = Boolean;
-      property.attr = memberMeta.attribName;
 
     } else if (memberMeta.propType === PROP_TYPE.Number) {
       property.type = Number;
-      property.attr = memberMeta.attribName;
-
-    } else if (memberMeta.propType === PROP_TYPE.Any) {
-      property.type = 'Any';
-      property.attr = memberMeta.attribName;
 
     } else {
       property.type = 'Any';
-      property.attr = memberMeta.attribName;
     }
 
-    if (memberMeta.reflectToAttr) {
-      property.reflectToAttr = true;
+    if (typeof memberMeta.attribName === 'string') {
+      property.attr = memberMeta.attribName;
+
+      if (memberMeta.reflectToAttr) {
+        property.reflectToAttr = true;
+      }
     }
 
     if (memberMeta.memberType === MEMBER_TYPE.PropMutable) {

@@ -1,6 +1,5 @@
 import * as d from '../../declarations';
 import { buildAuxiliaries } from './build-auxiliaries';
-import { bundle } from '../bundle/bundle';
 import { catchError } from '../util';
 import { copyTasks } from '../copy/copy-tasks';
 import { emptyOutputTargetDirs } from './empty-dir';
@@ -10,6 +9,7 @@ import { generateAppFiles } from '../app/generate-app-files';
 import { generateBundles } from '../bundle/generate-bundles';
 import { generateEntryModules } from '../entries/entry-modules';
 import { generateIndexHtmls } from '../html/generate-index-html';
+import { generateModuleMap } from '../bundle/bundle';
 import { generateStyles } from '../style/style';
 import { initCollections } from '../collections/init-collections';
 import { initIndexHtmls } from '../html/init-index-html';
@@ -57,7 +57,7 @@ export async function build(config: d.Config, compilerCtx?: d.CompilerCtx, watch
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // bundle modules and styles into separate files phase
-    const jsModules = await bundle(config, compilerCtx, buildCtx, entryModules);
+    const jsModules = await generateModuleMap(config, compilerCtx, buildCtx, entryModules);
     if (buildCtx.shouldAbort()) return buildCtx.finish();
 
     // create each of the components's styles
