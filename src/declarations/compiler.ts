@@ -21,6 +21,7 @@ export interface CompilerCtx {
   resolvedCollections?: string[];
 
   lastBuildHadError?: boolean;
+  lastBuildConditionals?: d.BuildConditionals;
   hasSuccessfulBuild?: boolean;
   localPrerenderServer?: any;
   hasWatcher?: boolean;
