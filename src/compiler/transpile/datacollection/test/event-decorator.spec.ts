@@ -1,4 +1,4 @@
-import { convertOptionsToMeta, getEventDecoratorMeta } from '../event-decorator';
+import { convertOptionsToMeta, getEventDecoratorMeta, getEventName } from '../event-decorator';
 import { EventOptions } from '../../../../declarations';
 import { gatherMetadata } from './test-utils';
 import { MEMBER_TYPE } from '../../../../util/constants';
@@ -6,8 +6,26 @@ import * as path from 'path';
 import * as ts from 'typescript';
 
 
-
 describe('event decorator', () => {
+
+  describe('getEventName', () => {
+
+    it('should get given event name, with PascalCase', () => {
+      const ev = getEventName({ eventName: 'EventWithDashes' }, 'methodName');
+      expect(ev).toBe('EventWithDashes');
+    });
+
+    it('should get given event name, with-dashes', () => {
+      const ev = getEventName({ eventName: 'event-with-dashes' }, 'methodName');
+      expect(ev).toBe('event-with-dashes');
+    });
+
+    it('should lowercase methodName when no given eventName', () => {
+      const ev = getEventName({}, 'methodName');
+      expect(ev).toBe('methodname');
+    });
+
+  });
 
   it('simple decorator', () => {
     let response;
@@ -22,10 +40,10 @@ describe('event decorator', () => {
         eventCancelable: true,
         eventComposed: true,
         eventMethodName: 'ionGestureMove',
-        eventName: 'ionGestureMove',
+        eventName: 'iongesturemove',
         jsdoc: {
           documentation: 'Create method for something',
-          name: 'ionGestureMove',
+          name: 'iongesturemove',
           type: 'EventEmitter<any>'
         }
       },
@@ -37,7 +55,7 @@ describe('event decorator', () => {
         eventName: 'event-emitted',
         jsdoc: {
           documentation: '',
-          name: 'eventEmitted',
+          name: 'event-emitted',
           type: 'EventEmitter<any>'
         }
       }
@@ -57,10 +75,10 @@ describe('event decorator', () => {
         eventCancelable: false,
         eventComposed: false,
         eventMethodName: 'ionGestureMove',
-        eventName: 'gesture',
+        eventName: 'my-event-name',
         jsdoc: {
           documentation: 'Create event for something',
-          name: 'ionGestureMove',
+          name: 'my-event-name',
           type: 'EventEmitter<any>'
         }
       }
@@ -78,7 +96,7 @@ describe('event decorator', () => {
         eventCancelable: true,
         eventComposed: true,
         eventMethodName: 'myEvent',
-        eventName: 'myEvent'});
+        eventName: 'myevent'});
     });
 
     it('should configure EventMeta', () => {

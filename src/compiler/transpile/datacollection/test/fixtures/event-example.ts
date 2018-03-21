@@ -19,7 +19,7 @@ class ActionSheet {
    * Create event for something
    */
   @Event({
-    eventName: 'gesture',
+    eventName: 'my-event-name',
     bubbles: false,
     cancelable: false,
     composed: false
