@@ -279,14 +279,14 @@ declare global {
     new (): ${interfaceName};
   };
   interface HTMLElementTagNameMap {
-    "${tagName}": ${interfaceName};
+    '${tagName}': ${interfaceName};
   }
   interface ElementTagNameMap {
-    "${tagName}": ${interfaceName};
+    '${tagName}': ${interfaceName};
   }
   namespace JSX {
     interface IntrinsicElements {
-      "${tagName}": JSXElements.${jsxInterfaceName};
+      '${tagName}': JSXElements.${jsxInterfaceName};
     }
   }
   namespace JSXElements {
@@ -316,7 +316,7 @@ function attributesToMultiLineString(attributes: TypeInfo, optional = true) {
         fullList.push(` * ${attributes[key].jsdoc.replace(/\r?\n|\r/g, ' ')}`);
         fullList.push(` */`);
       }
-      fullList.push(`${key}${optional ? '?' : '' }: ${attributes[key].type};`);
+      fullList.push(`'${key}'${optional ? '?' : '' }: ${attributes[key].type};`);
       return fullList;
     }, <string[]>[])
     .join('\n      ');
