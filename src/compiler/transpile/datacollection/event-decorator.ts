@@ -20,12 +20,11 @@ export function getEventDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cla
       if (member.type) {
         const genericType = gatherEventEmitterGeneric(member.type);
         if (genericType) {
+          metadata.eventType = {
+            text: genericType.getText()
+          };
           if (ts.isTypeReferenceNode(genericType)) {
-            metadata.eventType = getAttributeTypeInfo(genericType, sourceFile);
-          } else {
-            metadata.eventType = {
-              text: genericType.getText()
-            };
+            metadata.eventType.typeReferences = getAttributeTypeInfo(member, sourceFile);
           }
         }
       }

@@ -44,6 +44,8 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   // queue the components.d.ts async file write and put it into memory
   await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
 
+  console.log(componentTypesFileContent);
+
   const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
 
   await Promise.all(typesOutputTargets.map(async outputTarget => {
@@ -256,23 +258,22 @@ function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string
  * @param cmpMeta the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function createTypesAsString(cmpMeta: d.ComponentMeta, importPath: string) {
+export function createTypesAsString(cmpMeta: d.ComponentMeta, _importPath: string) {
   const tagName = cmpMeta.tagNameMeta;
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
   const propAttributes = membersToPropAttributes(cmpMeta.membersMeta);
   const methodAttributes = membersToMethodAttributes(cmpMeta.membersMeta);
-  methodAttributes;
   const eventAttributes = membersToEventAttributes(cmpMeta.eventsMeta);
 
   return `
-import {
-  ${cmpMeta.componentClass} as ${dashToPascalCase(cmpMeta.tagNameMeta)}
-} from './${importPath}';
-
 declare global {
-  interface ${interfaceName} extends ${tagNameAsPascal}, HTMLStencilElement {
+  interface ${interfaceName} extends HTMLStencilElement {
+${attributesToMultiLineString({
+  ...propAttributes,
+  ...methodAttributes
+}, false, '    ')}
   }
   var ${interfaceName}: {
     prototype: ${interfaceName};
@@ -291,8 +292,10 @@ declare global {
   }
   namespace JSXElements {
     export interface ${jsxInterfaceName} extends HTMLAttributes {
-      ${attributesToMultiLineString(propAttributes)}
-      ${attributesToMultiLineString(eventAttributes)}
+${attributesToMultiLineString({
+  ...propAttributes,
+  ...eventAttributes
+}, true, '      ')}
     }
   }
 }
@@ -306,7 +309,7 @@ interface TypeInfo {
   };
 }
 
-function attributesToMultiLineString(attributes: TypeInfo, optional = true) {
+function attributesToMultiLineString(attributes: TypeInfo, optional = true, paddingString: string) {
 
   return Object.keys(attributes)
     .sort()
@@ -319,7 +322,8 @@ function attributesToMultiLineString(attributes: TypeInfo, optional = true) {
       fullList.push(`'${key}'${optional ? '?' : '' }: ${attributes[key].type};`);
       return fullList;
     }, <string[]>[])
-    .join('\n      ');
+    .map(item => `${paddingString}${item}`)
+    .join(`\n`);
 }
 
 function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {

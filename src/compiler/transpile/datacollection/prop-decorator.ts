@@ -111,7 +111,10 @@ function getAttribType(sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration, 
       text: attribTypeText,
     };
   } else {
-    attribType = getAttributeTypeInfo(prop.type, sourceFile);
+    attribType = {
+      text: prop.type.getText(),
+      typeReferences: getAttributeTypeInfo(prop.type, sourceFile)
+    };
   }
 
   return attribType;

@@ -93,11 +93,13 @@ export interface AttributeTypeReference {
   importReferenceLocation?: string;
 }
 
+export interface AttributeTypeReferences {
+  [key: string]: AttributeTypeReference;
+}
+
 export interface AttributeTypeInfo {
   text: string;
-  typeReferences?: {
-    [key: string]: AttributeTypeReference;
-  };
+  typeReferences?: AttributeTypeReferences;
 }
 
 

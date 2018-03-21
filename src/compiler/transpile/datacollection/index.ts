@@ -62,7 +62,7 @@ export function visitClass(config: Config, checker: ts.TypeChecker, classNode: t
     membersMeta: {
       // membersMeta is shared with @Prop, @State, @Method, @Element
       ...getElementDecoratorMeta(checker, classNode),
-      ...getMethodDecoratorMeta(checker, classNode),
+      ...getMethodDecoratorMeta(checker, classNode, sourceFile),
       ...getStateDecoratorMeta(checker, classNode),
       ...getPropDecoratorMeta(checker, classNode, sourceFile, diagnostics)
     },
