@@ -16,6 +16,13 @@ export default function inMemoryFsRead(config: Config, compilerCtx: CompilerCtx)
         if (importee.indexOf('.js') === -1) {
           importee += '.js';
         }
+
+        // Remove drive letter added by sys.path.resolve
+        // Windows: importee = 'C:/__tmp__in__memory__/cmp-a.js'
+        const colonIndex = importee.indexOf(':');
+        if (colonIndex === 1) {
+          importee = importee.substr(2);
+        }
       }
 
       // it's possible the importee is a file pointing directly to the source ts file
