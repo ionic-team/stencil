@@ -30,7 +30,7 @@ export function updateElement(plt: d.PlatformApi, oldVnode: d.VNode | null, newV
 }
 
 
-export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, oldValue: any, newValue: any, isSvg: boolean, isHostElement: boolean, i?: any, ilen?: number) {
+export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, oldValue: any, newValue: any, isSvg?: boolean, isHostElement?: boolean, i?: any, ilen?: number) {
   if (memberName === 'class' && !isSvg) {
     // Class
     if (oldValue !== newValue) {
@@ -71,10 +71,21 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
       }
     }
 
-  } else if (memberName[0] === 'o' && memberName[1] === 'n' && (!(memberName in elm))) {
+  } else if (memberName[0] === 'o' && memberName[1] === 'n' && /[A-Z]/.test(memberName[2]) && (!(memberName in elm))) {
     // Event Handlers
-    // adding an standard event listener, like <button onClick=...> or something
-    memberName = toLowerCase(memberName.substring(2));
+    memberName = memberName.substring(2);
+    memberName = toLowerCase(memberName[0]) + memberName.substring(1);
+
+    const cmpMeta = plt.getComponentMeta(elm);
+    if (!cmpMeta || !cmpMeta.listenersMeta || !(cmpMeta.listenersMeta.some(l => l.eventName === memberName))) {
+      // this event name is not an already defined custom event on this component
+      // if it was a custom event, then we leave the case as is
+      // for example, the actual event name for the attribute "onSomeCrazyChange" becomes "someCrazyChange"
+      // if it's not a custom event, then let's lowercase the whole thing cuz it's probably a standard event
+      // for example, the event name for the attribute "onMouseDown" becomes "mousedown"
+      memberName = toLowerCase(memberName);
+    }
+
     if (newValue) {
       if (newValue !== oldValue) {
         // add listener

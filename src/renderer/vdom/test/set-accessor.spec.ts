@@ -1,4 +1,4 @@
-import { ComponentMeta, PlatformApi } from '../../../declarations';
+import * as d from '../../../declarations';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { PROP_TYPE } from '../../../util/constants';
 import { setAccessor } from '../update-dom-node';
@@ -6,11 +6,16 @@ import { setAccessor } from '../update-dom-node';
 
 describe('setAccessor', () => {
 
-  const plt: any = mockPlatform();
+  let plt: d.PlatformApi;
+
+  beforeEach(() => {
+    plt = mockPlatform();
+  });
+
 
   describe('event listener', () => {
 
-    it('should remove event listener when has old value, but no new', () => {
+    it('should remove standardized event listener when has old value, but no new', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
@@ -21,10 +26,24 @@ describe('setAccessor', () => {
       setAccessor(plt, elm, 'onClick', orgValue, undefined, false);
 
       expect(addEventSpy).toHaveBeenCalledTimes(1);
-      expect(removeEventSpy).toHaveBeenCalledTimes(1);
+      expect(removeEventSpy).toHaveBeenCalledWith('click', orgValue, false);
     });
 
-    it('should remove then add event listener w/ different value', () => {
+    it('should remove standardized multiple-word then add event listener w/ different value', () => {
+      const addEventSpy = spyOn(elm, 'addEventListener');
+      const removeEventSpy = spyOn(elm, 'removeEventListener');
+
+      const orgValue = () => {/**/};
+      setAccessor(plt, elm, 'onMouseOver', undefined, orgValue, false);
+
+      const newValue = () => {/**/};
+      setAccessor(plt, elm, 'onMouseOver', orgValue, undefined, false);
+
+      expect(addEventSpy).toHaveBeenCalledWith('mouseover', orgValue, false);
+      expect(removeEventSpy).toHaveBeenCalledWith('mouseover', orgValue, false);
+    });
+
+    it('should remove standardized then add event listener w/ different value', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
@@ -32,13 +51,49 @@ describe('setAccessor', () => {
       setAccessor(plt, elm, 'onClick', undefined, orgValue, false);
 
       const newValue = () => {/**/};
-      setAccessor(plt, elm, 'onClick', orgValue, undefined, false);
+      setAccessor(plt, elm, 'onClick', orgValue, newValue, false);
 
-      expect(addEventSpy).toHaveBeenCalledTimes(1);
-      expect(removeEventSpy).toHaveBeenCalledTimes(1);
+      expect(addEventSpy).toHaveBeenCalledTimes(2);
+      expect(removeEventSpy).toHaveBeenCalledWith('click', orgValue, false);
     });
 
-    it('should add event listener when no old value', () => {
+    it('should add custom event listener when no old value', () => {
+      const addEventSpy = spyOn(elm, 'addEventListener');
+      const removeEventSpy = spyOn(elm, 'removeEventListener');
+
+      plt = mockPlatform();
+      plt.getComponentMeta = () => {
+        const cmpMeta: d.ComponentMeta = {
+          listenersMeta: [
+            { eventName: 'ionChange' }
+          ]
+        };
+        return cmpMeta;
+      };
+
+      const oldValue = undefined;
+      const newValue = () => {/**/};
+
+      setAccessor(plt, elm, 'onIonChange', oldValue, newValue, false);
+
+      expect(addEventSpy).toHaveBeenCalledWith('ionChange', newValue, false);
+      expect(removeEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('should add standardized multiple-word event listener when no old value', () => {
+      const addEventSpy = spyOn(elm, 'addEventListener');
+      const removeEventSpy = spyOn(elm, 'removeEventListener');
+
+      const oldValue = undefined;
+      const newValue = () => {/**/};
+
+      setAccessor(plt, elm, 'onMouseOver', oldValue, newValue, false);
+
+      expect(addEventSpy).toHaveBeenCalledWith('mouseover', newValue, false);
+      expect(removeEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('should add standardized event listener when no old value', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
 
@@ -47,7 +102,7 @@ describe('setAccessor', () => {
 
       setAccessor(plt, elm, 'onClick', oldValue, newValue, false);
 
-      expect(addEventSpy).toHaveBeenCalled();
+      expect(addEventSpy).toHaveBeenCalledWith('click', newValue, false);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
 
@@ -126,7 +181,7 @@ describe('setAccessor', () => {
   });
 
   it('should set null property to child when known child component should have that property', () => {
-    const childCmpMeta: ComponentMeta = {
+    const childCmpMeta: d.ComponentMeta = {
       tagNameMeta: 'cmp-a',
       membersMeta: {
         cmpAprop: {
