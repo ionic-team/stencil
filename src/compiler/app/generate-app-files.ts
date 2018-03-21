@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, ComponentRegistry, Config, EntryModule, OutputTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError } from '../util';
 import { createAppRegistry, writeAppRegistry } from './app-registry';
 import { generateAppGlobalScript } from './app-global-scripts';
@@ -9,7 +9,7 @@ import { generateLoader } from './app-loader';
 import { setBuildConditionals } from './build-conditionals';
 
 
-export function generateAppFiles(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[], cmpRegistry: ComponentRegistry) {
+export function generateAppFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
   const outputTargets = config.outputTargets.filter(outputTarget => {
     return outputTarget.type === 'www' || outputTarget.type === 'dist';
   });
@@ -20,7 +20,7 @@ export function generateAppFiles(config: Config, compilerCtx: CompilerCtx, build
 }
 
 
-export async function generateAppFilesOutputTarget(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, outputTarget: OutputTarget, entryModules: EntryModule[], cmpRegistry: ComponentRegistry) {
+export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
   if (!config.buildAppCore) {
     config.logger.createTimeSpan(`generate app files skipped`, true);
     return;
@@ -32,46 +32,62 @@ export async function generateAppFilesOutputTarget(config: Config, compilerCtx: 
     // generate the shared app registry object
     const appRegistry = createAppRegistry(config);
 
-    // normal es2015 build
-    const globalJsContentsEs2015 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
+    await Promise.all([
+      // core esm build
+      generateCoreEsm(config, compilerCtx, buildCtx, outputTarget, entryModules, appRegistry),
 
-    // figure out which sections should be included in the core build
-    const buildConditionals = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
-    buildConditionals.coreId = 'core';
+      // core es5 build
+      generateCoreEs5(config, compilerCtx, buildCtx, outputTarget, entryModules, appRegistry)
+    ]);
 
-    const coreFilename = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs2015, buildConditionals);
-    appRegistry.core = coreFilename;
+    await Promise.all([
+      // create a json file for the app registry
+      writeAppRegistry(config, compilerCtx, outputTarget, appRegistry, cmpRegistry),
 
-    if (config.buildEs5) {
-      // es5 build (if needed)
-      const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
+      // create the loader(s) after creating the loader file name
+      generateLoader(config, compilerCtx, outputTarget, appRegistry, cmpRegistry),
 
-      const buildConditionalsEs5 = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
-      buildConditionalsEs5.coreId = 'core.pf';
-      buildConditionalsEs5.es5 = true;
-      buildConditionalsEs5.polyfills = true;
-      buildConditionalsEs5.cssVarShim = true;
-
-      const coreFilenameEs5 = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs5, buildConditionalsEs5);
-      appRegistry.corePolyfilled = coreFilenameEs5;
-
-    } else {
-      // not doing an es5, probably in dev mode
-      appRegistry.corePolyfilled = await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
-    }
-
-    // create a json file for the app registry
-    await writeAppRegistry(config, compilerCtx, outputTarget, appRegistry, cmpRegistry);
-
-    // create the loader(s) after creating the loader file name
-    await generateLoader(config, compilerCtx, outputTarget, appRegistry, cmpRegistry);
-
-    // create the global styles
-    await generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget);
+      // create the global styles
+      generateGlobalStyles(config, compilerCtx, buildCtx, outputTarget)
+    ]);
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }
 
   timespan.finish(`generate app files finished`);
+}
+
+
+async function generateCoreEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
+  // esm core build
+  const globalJsContentsEs2015 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
+
+  // figure out which sections should be included in the core build
+  const buildConditionals = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
+  buildConditionals.coreId = 'core';
+
+  const coreFilename = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs2015, buildConditionals);
+  appRegistry.core = coreFilename;
+}
+
+
+async function generateCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
+  if (config.buildEs5) {
+    // core es5 build
+    const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
+
+    const buildConditionalsEs5 = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
+    buildConditionalsEs5.coreId = 'core.pf';
+    buildConditionalsEs5.es5 = true;
+    buildConditionalsEs5.polyfills = true;
+    buildConditionalsEs5.cssVarShim = true;
+
+    const coreFilenameEs5 = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs5, buildConditionalsEs5);
+    appRegistry.corePolyfilled = coreFilenameEs5;
+
+  } else {
+    // not doing an es5, probably in dev mode
+    appRegistry.corePolyfilled = await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
+  }
 }
