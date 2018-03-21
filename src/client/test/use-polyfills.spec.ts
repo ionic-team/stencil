@@ -9,7 +9,9 @@ describe('usePolyfills', () => {
 
   beforeEach(() => {
     win = {
-      customElements: {},
+      customElements: {
+        define: {}
+      },
       fetch: {},
       CSS: {
         supports: () => true
@@ -30,6 +32,11 @@ describe('usePolyfills', () => {
 
   it('supports latest and greatest', () => {
     expect(usePolyfills(win, win.location, scriptElm, dynamicImportTest)).toBeFalsy();
+  });
+
+  it('polyfill cuz no customElements.define', () => {
+    delete win.customElements.define;
+    expect(usePolyfills(win, win.location, scriptElm, dynamicImportTest)).toBeTruthy();
   });
 
   it('polyfill cuz force es5', () => {
