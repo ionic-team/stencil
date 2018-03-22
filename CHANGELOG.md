@@ -1,6 +1,18 @@
 <a name="0.7.6"></a>
 ## 🎺 [0.7.6](https://github.com/ionic-team/stencil/compare/v0.7.5...v0.7.6) (2018-03-22)
 
+### Features
+
+Listeners can now be added to specific elements within JSX. [#323](https://github.com/ionic-team/stencil/issues/323#issuecomment-375349412)
+
+For example, if a component emits the event `ionChange`, then the JSX attribute `onIonChange` can be added, such as:
+
+```
+<ion-input onIonChange={(ev) => this.someMethod(ev)}/>
+```
+
+This matches how listeners are added for standard events. For example, to listen to a button's `click` event, the JSX attribute would be `onClick`.
+
 
 ### Bug Fixes
 
