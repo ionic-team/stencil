@@ -27,7 +27,22 @@ describe('component-styles', () => {
       expect(r.diagnostics).toEqual([]);
 
       const content = await c.fs.readFile('/www/build/app/cmp-a.js');
-      expect(content).toContain('\F113');
+      expect(content).toContain('\\\\F113');
+    });
+
+    it('should escape octal literals', async () => {
+      c.config.bundles = [ { components: ['cmp-a'] } ];
+      await c.fs.writeFiles({
+        '/src/cmp-a.css': `.myclass:before { content: "\\2014 \\00A0"; }`,
+        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}`,
+      });
+      await c.fs.commit();
+
+      const r = await c.build();
+      expect(r.diagnostics).toEqual([]);
+
+      const content = await c.fs.readFile('/www/build/app/cmp-a.js');
+      expect(content).toContain('\\\\2014 \\\\00A0');
     });
 
     it('should build one component w/ inline style', async () => {
@@ -138,6 +153,11 @@ describe('component-styles', () => {
     /* this is all weird cuz we're testing by writing css in JS
      then testing that CSS works in JS so there's more escaping
      that you'd think, but it's more of a unit test thing */
+
+    it(`should escape unicode characters`, () => {
+      const escaped = escapeCssForJs(`p { content: '\\F113' }`);
+      expect(escaped).toBe(`p { content: '\\\\F113' }`);
+    });
 
     it(`should octal escape sequences 0 to 7 (not 8 or 9)`, () => {
       let escaped = escapeCssForJs(`p { content: '\\0660' }`);
