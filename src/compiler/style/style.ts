@@ -144,13 +144,10 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, styleMeta: d.StyleMeta, styles: string[]) {
   // join all the component's styles for this mode together into one line
 
-  // debugging css unicode escape issues read by js is probably the funnest thing ever
-  styleMeta.compiledStyleText = styles.map(style => {
-    return style.replace('\\', '\\\\');
-  }).join('\n\n');
-
   if (config.minifyCss) {
-    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText);
+    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styles.join(''));
+  } else {
+    styleMeta.compiledStyleText = styles.join('\n\n').trim();
   }
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
@@ -168,7 +165,7 @@ export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx,
 
 export function escapeCssForJs(style: string) {
   return style
-    .replace(/\\[0-7]/g, (v) => '\\' + v)
+    .replace(/\\[\D0-7]/g, (v) => '\\' + v)
     .replace(/\r\n|\r|\n/g, `\\n`)
     .replace(/\"/g, `\\"`)
     .replace(/\@/g, `\\@`);
