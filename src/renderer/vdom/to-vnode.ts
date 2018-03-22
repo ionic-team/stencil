@@ -1,13 +1,12 @@
-import { DomApi } from '../../declarations';
-import { VNode } from './h';
+import * as d from '../../declarations';
 
 
-export function toVNode(domApi: DomApi, node: Node): VNode {
+export function toVNode(domApi: d.DomApi, node: Node): d.VNode {
   const nodeType = domApi.$nodeType(node);
 
   if (nodeType === 1 || nodeType === 3) {
 
-    const vnode: VNode = new VNode();
+    const vnode: d.VNode = {};
     vnode.elm = node;
 
     if (nodeType === 1) {
@@ -15,7 +14,7 @@ export function toVNode(domApi: DomApi, node: Node): VNode {
       vnode.vtag = domApi.$tagName(node);
 
       const childNodes = domApi.$childNodes(node);
-      let childVnode: VNode;
+      let childVnode: d.VNode;
 
       for (let i = 0, l = childNodes.length; i < l; i++) {
         childVnode = toVNode(domApi, childNodes[i]);

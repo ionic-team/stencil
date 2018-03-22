@@ -11,40 +11,11 @@ import * as d from '../../declarations';
 
 const stack: any[] = [];
 
-export type PropsType = d.VNodeProdData | number | string | null;
-export type ChildType = VNode | number | string;
 
-
-export interface ComponentProps {
-  children?: any[];
-  key?: string | number | any;
-}
-
-
-export interface FunctionalComponent<PropsType> {
-  (props?: PropsType & ComponentProps): VNode;
-}
-
-
-export class VNode implements d.VNode {
-  vtag: string;
-  vtext: string;
-  vchildren: VNode[];
-
-  vattrs: any;
-  vkey: string | number;
-  vref: (elm: HTMLElement) => void;
-
-  elm: Element|Node;
-
-  isHostElement?: boolean;
-}
-
-
-export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, child?: ChildType): VNode;
-export function h(nodeName: string | FunctionalComponent<PropsType>, vnodeData: PropsType, ...children: ChildType[]): VNode;
+export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
+export function h(nodeName: string | d.FunctionalComponent<d.PropsType>, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export function h(nodeName: any, vnodeData: any, child?: any) {
-  let children: any[];
+  let children: any[] = null;
   let lastSimple = false;
   let simple = false;
 
@@ -59,37 +30,35 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
       }
 
     } else {
-      if (typeof child === 'boolean') child = null;
+      if (typeof child === 'boolean') {
+        child = null;
+      }
 
       if ((simple = typeof nodeName !== 'function')) {
-        if (child == null) child = '';
-        else if (typeof child === 'number') child = String(child);
-        else if (typeof child !== 'string') simple = false;
+        if (child == null) {
+          child = '';
+        } else if (typeof child === 'number') {
+          child = String(child);
+        } else if (typeof child !== 'string') {
+          simple = false;
+        }
       }
 
       if (simple && lastSimple) {
-        (<VNode>children[children.length - 1]).vtext += child;
+        (<d.VNode>children[children.length - 1]).vtext += child;
 
-      } else if (children === undefined) {
-        children = [simple ? t(child) : child];
+      } else if (children === null) {
+        children = [simple ? { vtext: child } as d.VNode : child];
 
       } else {
-        children.push(simple ? t(child) : child);
+        children.push(simple ? { vtext: child } as d.VNode : child);
       }
 
       lastSimple = simple;
     }
   }
 
-  const vnode = new VNode();
-  vnode.vtag = nodeName;
-  vnode.vchildren = children;
-
   if (vnodeData) {
-    vnode.vattrs = vnodeData;
-    vnode.vkey = vnodeData.key;
-    vnode.vref = vnodeData.ref;
-
     // normalize class / classname attributes
     if (vnodeData['className']) {
       vnodeData['class'] = vnodeData['className'];
@@ -107,11 +76,21 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     }
   }
 
-  return vnode;
-}
+  if (typeof nodeName === 'function') {
+    // nodeName is a functional component
+    return (nodeName as d.FunctionalComponent<any>)({
+      ...vnodeData,
+      children: children
+    });
+  }
 
-export function t(textValue: any) {
-  const vnode = new VNode();
-  vnode.vtext = textValue;
-  return vnode;
+  return {
+    vtag: nodeName,
+    vchildren: children,
+    vtext: null,
+    vattrs: vnodeData,
+    vkey: vnodeData && vnodeData.key,
+    elm: null,
+    ishost: false
+  } as d.VNode;
 }

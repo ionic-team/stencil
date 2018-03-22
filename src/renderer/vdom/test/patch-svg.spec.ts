@@ -1,6 +1,7 @@
+import * as d from '../../../declarations';
+import { h } from '../h';
 import { mockDomApi, mockElement, mockRenderer, mockSVGElement } from '../../../testing/mocks';
 import { toVNode } from '../to-vnode';
-import { VNode, h } from '../h';
 
 
 describe('renderer', () => {
@@ -8,11 +9,11 @@ describe('renderer', () => {
   const domApi = mockDomApi();
 
   var elm: any;
-  var vnode0: any;
+  var vnode0: d.VNode;
 
   beforeEach(function() {
     elm = mockElement('div');
-    vnode0 = new VNode();
+    vnode0 = {};
     vnode0.elm = elm;
   });
 
@@ -74,5 +75,6 @@ describe('renderer', () => {
       ));
       expect(oneMoreChildAdded.vchildren[1].elm.constructor.name).toEqual('HTMLDivElement');
     });
-  })
+  });
+
 });

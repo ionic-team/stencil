@@ -171,7 +171,7 @@ describe('instance render', () => {
     doRender(MyComponent);
 
     const vnode = plt.vnodeMap.get(elm);
-    expect(vnode.isHostElement).toBe(true);
+    expect(vnode.ishost).toBe(true);
 
     expect(elm.getAttribute('my-attr-name')).toBe('str');
     expect(elm.getAttribute('host-data')).toBe('hello');
@@ -372,7 +372,7 @@ describe('instance render', () => {
       ]);
     });
 
-    it ('should apply hostData() + theme (mode+color)', () => {
+    it('should apply hostData() + theme (mode+color)', () => {
       class MyComponent {
         mode = 'md';
         color = 'main';

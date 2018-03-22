@@ -1,15 +1,16 @@
+import * as d from '../../../declarations';
+import { h } from '../h';
 import { mockElement, mockRenderer } from '../../../testing/mocks';
-import { VNode, h } from '../h';
 
 
 describe('attributes', function() {
   const patch = mockRenderer();
   let elm: any;
-  let vnode0: any;
+  let vnode0: d.VNode;
 
   beforeEach(function() {
     elm = mockElement('div');
-    vnode0 = new VNode();
+    vnode0 = {};
     vnode0.elm = elm;
   });
 

@@ -17,14 +17,14 @@ export function updateElement(plt: d.PlatformApi, oldVnode: d.VNode | null, newV
   // remove attributes no longer present on the vnode by setting them to undefined
   for (memberName in oldVnodeAttrs) {
     if (!(newVnodeAttrs && newVnodeAttrs[memberName] != null) && oldVnodeAttrs[memberName] != null) {
-      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.isHostElement);
+      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.ishost);
     }
   }
 
   // add new & update changed attributes
   for (memberName in newVnodeAttrs) {
     if (!(memberName in oldVnodeAttrs) || newVnodeAttrs[memberName] !== (memberName === 'value' || memberName === 'checked' ? elm[memberName] : oldVnodeAttrs[memberName])) {
-      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.isHostElement);
+      setAccessor(plt, elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.ishost);
     }
   }
 }

@@ -1,38 +1,25 @@
+import * as d from '../../../declarations';
+import { h } from '../h';
 import { mockDomApi, mockElement, mockRenderer, mockTextNode } from '../../../testing/mocks';
 import { SVG_NS } from '../../../util/constants';
 import { toVNode } from '../to-vnode';
-import { VNode, h } from '../h';
 const shuffle = require('knuth-shuffle').knuthShuffle;
 
-
-function prop(name: any) {
-  return function(obj: any) {
-    return obj[name];
-  };
-}
-
-function map(fn: any, list: any) {
-  const ret = [];
-  for (let i = 0; i < list.length; ++i) {
-    ret[i] = fn(list[i]);
-  }
-  return ret;
-}
-
-const inner = prop('innerHTML');
 
 describe('renderer', () => {
   const domApi = mockDomApi();
   const patch = mockRenderer(null, domApi);
 
   let elm: any;
-  let vnode0: any;
+  let vnode0: d.VNode;
+  const inner = prop('innerHTML');
 
   beforeEach(() => {
     elm = mockElement('div');
-    vnode0 = new VNode();
+    vnode0 = {};
     vnode0.elm = elm;
   });
+
 
   describe('shadow dom', () => {
     const supportsShadowDom = true;
@@ -40,7 +27,7 @@ describe('renderer', () => {
 
     it('does not attachShadow on update render', () => {
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+      vnode0 = {};
       vnode0.elm = elm;
       let shadowOpts: any;
       elm.attachShadow = (opts: any) => {
@@ -56,7 +43,7 @@ describe('renderer', () => {
       const patch = mockRenderer(null, domApi);
 
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+      vnode0 = {};
       vnode0.elm = elm;
       let shadowOpts: any;
       elm.attachShadow = (opts: any) => {
@@ -74,13 +61,67 @@ describe('renderer', () => {
 
   describe('functional component', () => {
 
-    it('should render a basic component', () => {
+    it('should re-render functional component w/ children', () => {
+      const DoesNotRenderChildren = () => h('div', null, 'mph');
+      const RendersChildren = props => h('div', null, props.children, '-12');
+
+      elm = mockElement('my-tag');
+
+      const vnode0 = {} as d.VNode;
+      vnode0.elm = elm;
+
+      const vnode1 = h('my-tag', null,
+        h(DoesNotRenderChildren, null, '88'),
+        h(RendersChildren, null, 'DMC')
+      );
+
+      elm = patch(vnode0, vnode1).elm;
+      expect(elm.tagName).toBe('MY-TAG');
+      expect(elm.childNodes[0].innerHTML).toBe('mph');
+      expect(elm.childNodes[1].innerHTML).toBe('DMC-12');
+
+      const vnode2 = h('my-tag', null,
+        h(DoesNotRenderChildren, null, '88'),
+        h(RendersChildren, null, 'dmc')
+      );
+
+      elm = patch(vnode1, vnode2).elm;
+      expect(elm.childNodes[0].innerHTML).toBe('mph');
+      expect(elm.childNodes[1].innerHTML).toBe('dmc-12');
+    });
+
+    it('should re-render a functional component', () => {
       function functionalComp({children, ...props}: any) {
         return h('span', props, children);
       }
 
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+
+      const vnode0 = {} as d.VNode;
+      vnode0.elm = elm;
+
+      const vnode1 = h('my-tag', null,
+        h(functionalComp, { class: 'render-one' })
+      );
+
+      elm = patch(vnode0, vnode1).elm;
+      expect(elm.childNodes[0].className).toBe('render-one');
+
+      const vnode2 = h('my-tag', null,
+        h(functionalComp, { class: 'render-two' })
+      );
+
+      elm = patch(vnode1, vnode2).elm;
+      expect(elm.childNodes[0].className).toBe('render-two');
+    });
+
+    it('should render a basic functional component', () => {
+      function functionalComp({children, ...props}: any) {
+        return h('span', props, children);
+      }
+
+      elm = mockElement('my-tag');
+      vnode0 = {};
       vnode0.elm = elm;
       elm = patch(vnode0,
         h('my-tag', null,
@@ -98,7 +139,7 @@ describe('renderer', () => {
       }
 
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+      vnode0 = {};
       vnode0.elm = elm;
       elm = patch(vnode0,
         h('my-tag', null,
@@ -112,13 +153,14 @@ describe('renderer', () => {
       expect(elm.childNodes[1].textContent).toBe('');
       expect(elm.childNodes[1].className).toBe('functional-cmp');
     });
+
     it('should render children', () => {
       function functionalComp({children, ...props}: any) {
         return h('span', props, children);
       }
 
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+      vnode0 = {};
       vnode0.elm = elm;
       elm = patch(vnode0,
         h('my-tag', null,
@@ -131,13 +173,14 @@ describe('renderer', () => {
       expect(elm.childNodes[0].className).toBe('functional-cmp');
       expect(elm.childNodes[0].textContent).toBe('Test Child');
     });
+
   });
 
   describe('scoped css', () => {
 
     it('adds host scope id to shadow dom encapsulation root element, but doesnt support SD', () => {
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+      vnode0 = {};
       vnode0.elm = elm;
       elm.attachShadow = () => {
         return elm;
@@ -148,7 +191,7 @@ describe('renderer', () => {
 
     it('adds scope id to child elements', () => {
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+      vnode0 = {};
       vnode0.elm = elm;
       elm = patch(vnode0, h('my-tag', null, h('div', null)), false, null, null, 'scoped').elm;
       expect(elm.firstChild.hasAttribute('data-my-tag')).toBe(true);
@@ -156,7 +199,7 @@ describe('renderer', () => {
 
     it('adds host scope id to scoped css encapsulation root element', () => {
       elm = mockElement('my-tag');
-      vnode0 = new VNode();
+      vnode0 = {};
       vnode0.elm = elm;
       elm = patch(vnode0, h('my-tag', null), false, null, null, 'scoped').elm;
       expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
@@ -899,5 +942,19 @@ describe('renderer', () => {
     });
 
   });
+
+  function prop(name: any) {
+    return function(obj: any) {
+      return obj[name];
+    };
+  }
+
+  function map(fn: any, list: any) {
+    const ret = [];
+    for (let i = 0; i < list.length; ++i) {
+      ret[i] = fn(list[i]);
+    }
+    return ret;
+  }
 
 });
