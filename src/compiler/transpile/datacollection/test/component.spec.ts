@@ -125,6 +125,7 @@ describe('component', () => {
             'attribName': 'action-sheet-id',
             'attribType': {
               'text': 'string',
+              'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
@@ -166,6 +167,7 @@ describe('component', () => {
             'attribName': 'css-class',
             'attribType': {
               'text': 'string',
+              'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
@@ -183,6 +185,7 @@ describe('component', () => {
             'attribName': 'enable-backdrop-dismiss',
             'attribType': {
               'text': 'boolean',
+              'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
@@ -237,6 +240,7 @@ describe('component', () => {
             'attribName': 'sub-title',
             'attribType': {
               'text': 'string',
+              'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',
@@ -251,6 +255,7 @@ describe('component', () => {
             'attribName': 'title',
             'attribType': {
               'text': 'string',
+              'typeReferences': {}
             },
             'jsdoc': {
               'documentation': '',

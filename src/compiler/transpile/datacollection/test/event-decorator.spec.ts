@@ -30,8 +30,8 @@ describe('event decorator', () => {
   it('simple decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/event-simple');
-    const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-      response = getEventDecoratorMeta(checker, classNode);
+    const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
+      response = getEventDecoratorMeta(checker, classNode, sourceFile);
     });
 
     expect(response).toEqual([
@@ -65,8 +65,8 @@ describe('event decorator', () => {
   it('simple decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/event-example');
-    const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-      response = getEventDecoratorMeta(checker, classNode);
+    const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
+      response = getEventDecoratorMeta(checker, classNode, sourceFile);
     });
 
     expect(response).toEqual([

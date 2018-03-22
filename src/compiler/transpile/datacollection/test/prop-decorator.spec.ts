@@ -42,6 +42,7 @@ describe('props decorator', () => {
         attribName: 'size',
         attribType: {
           text: 'string',
+          typeReferences: {}
         },
         jsdoc: {
           documentation: '',
