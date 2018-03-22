@@ -42,7 +42,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   const componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
 
   // queue the components.d.ts async file write and put it into memory
-  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
+  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent, { immediateWrite: true });
 
   const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
 
