@@ -1,3 +1,18 @@
+<a name="0.7.6"></a>
+## 🎺 [0.7.6](https://github.com/ionic-team/stencil/compare/v0.7.5...v0.7.6) (2018-03-22)
+
+
+### Bug Fixes
+
+* **build:** avoid Object.entries (breaks Node 6) ([b39b2b9](https://github.com/ionic-team/stencil/commit/b39b2b9))
+* **events:** keep event names case-sensitive ([bb09964](https://github.com/ionic-team/stencil/commit/bb09964))
+* **loader:** more-specific "customElements" polyfill check ([f4823f7](https://github.com/ionic-team/stencil/commit/f4823f7)), closes [#648](https://github.com/ionic-team/stencil/issues/648)
+* **render:** fix functional components patch when children aren't rendered ([3747dcd](https://github.com/ionic-team/stencil/commit/3747dcd)), closes [#649](https://github.com/ionic-team/stencil/issues/649)
+* **styles:** escape unicode chars & octal literals in css ([f1af0bc](https://github.com/ionic-team/stencil/commit/f1af0bc)), closes [#656](https://github.com/ionic-team/stencil/issues/656)
+* **types:** dash based event names should appear within quotes in the components.d.ts file. ([dafd02d](https://github.com/ionic-team/stencil/commit/dafd02d))
+
+
+
 <a name="0.7.5"></a>
 ## 🐬 [0.7.5](https://github.com/ionic-team/stencil/compare/v0.7.4...v0.7.5) (2018-03-20)
 
