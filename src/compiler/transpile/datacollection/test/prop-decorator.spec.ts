@@ -1,17 +1,20 @@
 import { gatherMetadata } from './test-utils';
 import { getPropDecoratorMeta } from '../prop-decorator';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
+import { mockConfig } from '../../../../testing/mocks';
 import * as path from 'path';
 import * as ts from 'typescript';
 
 
 describe('props decorator', () => {
 
+  const config = mockConfig();
+
   it('simple decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/prop-example');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
-      response = getPropDecoratorMeta(checker, classNode, sourceFile, diagnostics);
+      response = getPropDecoratorMeta(config, checker, classNode, sourceFile, diagnostics);
     });
 
     expect(response).toEqual({
