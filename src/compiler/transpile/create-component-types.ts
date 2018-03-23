@@ -69,6 +69,9 @@ export async function generateComponentTypesFile(config: d.Config, compilerCtx: 
  * It contains typing information for all components that exist in this project
  * and imports for stencil collections that might be configured in your stencil.config.js file
  */
+
+import '@stencil/core';
+
 declare global {
   namespace JSX {
     interface Element {}
