@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import { getAttributeTypeInfo, serializeSymbol } from './utils';
 
 
-export function getEventDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
+export function getEventDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
   sourceFile;
   return classNode.members
     .filter(isPropertyWithDecorators)
@@ -15,7 +15,7 @@ export function getEventDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cla
       }
 
       const [ eventOptions ] = getDeclarationParameters<d.EventOptions>(elementDecorator);
-      const metadata = convertOptionsToMeta(eventOptions, member.name.getText());
+      const metadata = convertOptionsToMeta(config, eventOptions, member.name.getText());
 
       if (member.type) {
         const genericType = gatherEventEmitterGeneric(member.type);
@@ -43,30 +43,45 @@ export function getEventDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cla
 }
 
 
-export function convertOptionsToMeta(rawEventOpts: d.EventOptions = {}, methodName: string): d.EventMeta | null {
-  if (!methodName) {
+export function convertOptionsToMeta(config: d.Config, rawEventOpts: d.EventOptions = {}, memberName: string) {
+  if (!memberName) {
     return null;
   }
   return {
-    eventMethodName: methodName,
-    eventName: getEventName(rawEventOpts, methodName),
+    eventMethodName: memberName,
+    eventName: getEventName(config, rawEventOpts, memberName),
     eventBubbles: typeof rawEventOpts.bubbles === 'boolean' ? rawEventOpts.bubbles : true,
     eventCancelable: typeof rawEventOpts.cancelable === 'boolean' ? rawEventOpts.cancelable : true,
     eventComposed: typeof rawEventOpts.composed === 'boolean' ? rawEventOpts.composed : true
-  };
+  } as d.EventMeta;
 }
 
 
-export function getEventName(rawEventOpts: d.EventOptions, methodName: string) {
+export function getEventName(config: d.Config, rawEventOpts: d.EventOptions, memberName: string) {
   if (typeof rawEventOpts.eventName === 'string' && rawEventOpts.eventName.trim().length > 0) {
     // always use the event name if given
     return rawEventOpts.eventName.trim();
   }
 
   // event name wasn't provided
-  // so let's default it to be an all lowercased
-  // version of the method name
-  return methodName.toLowerCase().trim();
+  // so let's default to use the member name
+  validateEventEmitterMemeberName(config, memberName);
+
+  return memberName;
+}
+
+
+export function validateEventEmitterMemeberName(config: d.Config, memberName: string) {
+  const firstChar = memberName.charAt(0);
+
+  if (/[A-Z]/.test(firstChar)) {
+    config.logger.warn([
+      `@Event() "${memberName}" cannot start with a capital letter. `,
+      `Please lowercase the first character, or use use the "eventName" option `,
+      `within the decorator, such as `,
+      `@Event({ eventName: 'MyCustomEvent' }) myCustomEvent: EventEmitter;`
+    ].join(''));
+  }
 }
 
 

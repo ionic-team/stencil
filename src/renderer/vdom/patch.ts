@@ -7,7 +7,7 @@
  * Modified for Stencil's renderer and slot projection
  */
 import { Build } from '../../util/build-conditionals';
-import { DefaultSlot, DomApi, Encapsulation, HostElement, Key, NamedSlots, PlatformApi, RendererApi, VNode } from '../../declarations';
+import { DefaultSlot, DomApi, Encapsulation, HostElement, NamedSlots, PlatformApi, RendererApi, VNode } from '../../declarations';
 import { isDef, isUndef } from '../../util/helpers';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
@@ -21,16 +21,6 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   // which gets called numerous times by each component
 
   function createElm(vnode: VNode, parentElm: Node, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
-    if (typeof vnode.vtag === 'function') {
-      vnode = vnode.vtag({
-        ...vnode.vattrs,
-        children: vnode.vchildren
-      });
-      if (!vnode) {
-        return null;
-      }
-    }
-
     if (!useNativeShadowDom && vnode.vtag === 'slot') {
       if (defaultSlot || namedSlots) {
         if (scopeId) {
@@ -284,7 +274,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
   function createKeyToOldIdx(children: VNode[], beginIdx: number, endIdx: number) {
     const map: {[key: string]: number} = {};
-    let i: number, key: Key, ch;
+    let i: number, key: any, ch;
 
     for (i = beginIdx; i <= endIdx; ++i) {
       ch = children[i];
@@ -315,7 +305,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     if (isUndef(newVNode.vtext)) {
       // element node
 
-      if (newVNode.vtag !== 'slot' && typeof newVNode.vtag !== 'function') {
+      if (newVNode.vtag !== 'slot') {
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
@@ -425,7 +415,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
 export function callNodeRefs(vNode: VNode, isDestroy?: boolean) {
   if (vNode) {
-    vNode.vref && vNode.vref(isDestroy ? null : vNode.elm);
+    vNode.vattrs && vNode.vattrs.ref && vNode.vattrs.ref(isDestroy ? null : vNode.elm);
 
     vNode.vchildren && vNode.vchildren.forEach(vChild => {
       callNodeRefs(vChild, isDestroy);

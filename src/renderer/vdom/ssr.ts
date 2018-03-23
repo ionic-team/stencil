@@ -1,25 +1,24 @@
-import { DomApi, HostElement, PlatformApi, } from '../../declarations';
+import * as d from '../../declarations';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
-import { VNode, t } from './h';
 
 
-export function createVNodesFromSsr(plt: PlatformApi, domApi: DomApi, rootElm: Element) {
-  const allSsrElms: HostElement[] = <any>rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`);
+export function createVNodesFromSsr(plt: d.PlatformApi, domApi: d.DomApi, rootElm: Element) {
+  const allSsrElms: d.HostElement[] = <any>rootElm.querySelectorAll(`[${SSR_VNODE_ID}]`);
   const ilen = allSsrElms.length;
-  let elm: HostElement,
+  let elm: d.HostElement,
       ssrVNodeId: string,
-      ssrVNode: VNode,
+      ssrVNode: d.VNode,
       i: number,
       j: number,
       jlen: number;
 
   if (ilen > 0) {
-    plt.hasLoadedMap.set(rootElm as HostElement, true);
+    plt.hasLoadedMap.set(rootElm as d.HostElement, true);
 
     for (i = 0; i < ilen; i++) {
       elm = allSsrElms[i];
       ssrVNodeId = domApi.$getAttribute(elm, SSR_VNODE_ID);
-      ssrVNode = new VNode();
+      ssrVNode = {};
       ssrVNode.vtag = domApi.$tagName(ssrVNode.elm = elm);
       plt.vnodeMap.set(elm, ssrVNode);
 
@@ -31,12 +30,12 @@ export function createVNodesFromSsr(plt: PlatformApi, domApi: DomApi, rootElm: E
 }
 
 
-function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVNodeId: string, checkNestedElements: boolean) {
+function addChildSsrVNodes(domApi: d.DomApi, node: Node, parentVNode: d.VNode, ssrVNodeId: string, checkNestedElements: boolean) {
   const nodeType = domApi.$nodeType(node);
   let previousComment: Comment;
   let childVNodeId: string,
       childVNodeSplt: string[],
-      childVNode: VNode;
+      childVNode: d.VNode;
 
   if (checkNestedElements && nodeType === NODE_TYPE.ElementNode) {
     childVNodeId = domApi.$getAttribute(node, SSR_CHILD_ID);
@@ -48,7 +47,7 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
       // ensure this this element is a child element of the ssr vnode
       if (childVNodeSplt[0] === ssrVNodeId) {
         // cool, this element is a child to the parent vnode
-        childVNode = new VNode();
+        childVNode = {};
         childVNode.vtag = domApi.$tagName(childVNode.elm = node);
 
         // this is a new child vnode
@@ -86,7 +85,7 @@ function addChildSsrVNodes(domApi: DomApi, node: Node, parentVNode: VNode, ssrVN
     // which should start with an "s" and delimited by periods
     if (childVNodeSplt[0] === 's' && childVNodeSplt[1] === ssrVNodeId) {
       // cool, this is a text node and it's got a start comment
-      childVNode = t(domApi.$getTextContent(node));
+      childVNode = { vtext: domApi.$getTextContent(node) } as d.VNode;
       childVNode.elm = node;
 
       // this is a new child vnode

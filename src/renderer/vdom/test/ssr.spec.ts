@@ -1,17 +1,16 @@
+import * as d from '../../../declarations';
 import { createRendererPatch } from '../patch';
 import { createVNodesFromSsr } from '../ssr';
-import { DefaultSlot, DomApi, RendererApi, VNode } from '../../../declarations';
 import { ENCAPSULATION, SSR_CHILD_ID, SSR_VNODE_ID } from '../../../util/constants';
 import { h } from '../h';
 import { mockDomApi, mockPlatform, removeWhitespaceFromNodes } from '../../../testing/mocks';
-import { VNode as VNodeObj } from '../h';
 
 
 describe('ssr', () => {
 
   const plt = mockPlatform();
-  let domApi: DomApi;
-  let patch: RendererApi;
+  let domApi: d.DomApi;
+  let patch: d.RendererApi;
 
   beforeEach(() => {
     domApi = mockDomApi();
@@ -136,13 +135,13 @@ describe('ssr', () => {
   });
 
   describe('render for ssr output', () => {
-    var oldVnode: VNode;
-    var newVnode: VNode;
-    var ssrVNode: VNode;
+    var oldVnode: d.VNode;
+    var newVnode: d.VNode;
+    var ssrVNode: d.VNode;
     var elm: Element;
 
     beforeEach(() => {
-      oldVnode = new VNodeObj();
+      oldVnode = {};
       elm = domApi.$createElement('ion-test');
       oldVnode.elm = elm;
     });
@@ -157,7 +156,7 @@ describe('ssr', () => {
       const defaultContentNode = domApi.$createElement('child-a');
       elm.appendChild(defaultContentNode);
 
-      const defaultSlot: DefaultSlot = [
+      const defaultSlot: d.DefaultSlot = [
         defaultContentNode
       ];
 

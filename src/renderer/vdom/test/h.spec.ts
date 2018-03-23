@@ -3,6 +3,19 @@ import { h } from '../h';
 
 describe('h()', () => {
 
+  it('should render nested functional components', () => {
+    const FunctionalCmp1 = () => h('fn-cmp', null);
+    const FunctionalCmp2 = () => h(FunctionalCmp1, null);
+    const vnode = h(FunctionalCmp2, null);
+    expect(vnode.vtag).toEqual('fn-cmp');
+  });
+
+  it('should render functional component', () => {
+    const FunctionalCmp = () => h('fn-cmp', null);
+    const vnode = h(FunctionalCmp, null);
+    expect(vnode.vtag).toEqual('fn-cmp');
+  });
+
   it('should get vnode with only tag string', () => {
     const vnode = h('div', null);
     expect(vnode.vtag).toEqual('div');
@@ -120,18 +133,18 @@ describe('h()', () => {
 
   it('should not set vkey', () => {
     const vnode = h('div', null);
-    expect(vnode.vkey).toBeUndefined();
+    expect(vnode.vkey).toBe(null);
   });
 
-  it('should set vref', () => {
+  it('should set vattrs ref', () => {
     const ref = () => {/**/};
     const vnode = h('div', { ref: ref });
-    expect(vnode.vref).toBe(ref);
+    expect(vnode.vattrs.ref).toBe(ref);
   });
 
   it('should not set vref', () => {
     const vnode = h('div', {});
-    expect(vnode.vref).toBeUndefined();
+    expect(vnode.vattrs.ref).toBeUndefined();
   });
 
   it('should add one class from string', () => {

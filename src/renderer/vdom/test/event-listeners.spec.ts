@@ -1,16 +1,16 @@
+import * as d from '../../../declarations';
 import { h } from '../h';
 import { mockElement, mockRenderer } from '../../../testing/mocks';
-import { VNode } from '../h';
 
 
 describe('event listeners', () => {
   const patch = mockRenderer();
   let elm: any;
-  let vnode0: any;
+  let vnode0: d.VNode;
 
   beforeEach(() => {
     elm = mockElement('div');
-    vnode0 = new VNode();
+    vnode0 = {};
     vnode0.elm = elm;
   });
 

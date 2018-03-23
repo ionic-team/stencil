@@ -1,11 +1,11 @@
+import * as d from '../../declarations';
 import { flush, h, render, transpile } from '../index';
-import { ComponentConstructor } from '../../declarations';
 
 
 describe('rendering', () => {
 
   let elm;
-  let MyComponent: ComponentConstructor;
+  let MyComponent: d.ComponentConstructor;
 
   beforeEach(async () => {
     MyComponent = class {

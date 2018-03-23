@@ -1,8 +1,8 @@
 import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { createThemedClasses } from '../util/theme';
+import { h } from '../renderer/vdom/h';
 import { RUNTIME_ERROR } from '../util/constants';
-import { VNode, h } from '../renderer/vdom/h';
 
 
 export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, instance: d.ComponentInstance, isUpdateRender: boolean) {
@@ -62,27 +62,29 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
 
       // if we haven't already created a vnode, then we give the renderer the actual element
       // if this is a re-render, then give the renderer the last vnode we already created
-      const oldVNode = plt.vnodeMap.get(elm) || new VNode();
+      const oldVNode = plt.vnodeMap.get(elm) || ({} as d.VNode);
       oldVNode.elm = elm;
 
       const hostVNode = h(null, vnodeHostData, vnodeChildren);
 
       if (Build.reflectToAttr) {
         // only care if we're reflecting values to the host element
-        hostVNode.isHostElement = true;
+        hostVNode.ishost = true;
       }
 
       // each patch always gets a new vnode
       // the host element itself isn't patched because it already exists
       // kick off the actual render and any DOM updates
-      plt.vnodeMap.set(elm, plt.render(
+      const vnode = plt.render(
         oldVNode,
         hostVNode,
         isUpdateRender,
         plt.defaultSlotsMap.get(elm),
         plt.namedSlotsMap.get(elm),
         cmpMeta.componentConstructor.encapsulation
-      ));
+      );
+
+      plt.vnodeMap.set(elm, vnode);
     }
 
     if (Build.styles) {

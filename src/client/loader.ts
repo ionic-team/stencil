@@ -96,7 +96,9 @@ export function usePolyfills(win: any, location: Location, scriptElm: HTMLScript
   if (
       (location.search.indexOf('core=es5') > 0) ||
       (location.protocol === 'file:') ||
-      (!win.customElements) ||
+      // Need to look for define specifically because we polyfill customElements
+      // above to support whenDefined.
+      (!(win.customElements && win.customElements.define)) ||
       (!win.fetch) ||
       (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) ||
       (!('noModule' in scriptElm))
