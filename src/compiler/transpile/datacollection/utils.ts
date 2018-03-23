@@ -55,8 +55,8 @@ export function isMethod(member: ts.ClassElement, methodName: string): boolean {
   return false;
 }
 
-export function getAttributeTypeInfo(type: ts.Node, sourceFile: ts.SourceFile): AttributeTypeReferences {
-  return getAllTypeReferences(type)
+export function getAttributeTypeInfo(baseNode: ts.Node, sourceFile: ts.SourceFile): AttributeTypeReferences {
+  return getAllTypeReferences(baseNode)
     .reduce((allReferences, rt)  => {
       allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
       return allReferences;
@@ -69,11 +69,19 @@ function getAllTypeReferences(node: ts.Node): string[] {
   function visit(node: ts.Node): ts.VisitResult<ts.Node> {
     switch (node.kind) {
     case ts.SyntaxKind.TypeReference:
-      referencedTypes.push((<ts.TypeReferenceNode>node).typeName.getText().trim());
-      if ((<ts.TypeReferenceNode>node).typeArguments) {
-        (<ts.TypeReferenceNode>node).typeArguments
+      const typeNode = node as ts.TypeReferenceNode;
+
+      if (ts.isIdentifier(typeNode.typeName)) {
+        const name = typeNode.typeName as ts.Identifier;
+        referencedTypes.push(name.escapedText.toString());
+      }
+      if (typeNode.typeArguments) {
+        typeNode.typeArguments
           .filter(ta => ts.isTypeReferenceNode(ta))
-          .forEach(tr => referencedTypes.push((<ts.TypeReferenceNode>tr).typeName.getText().trim()));
+          .forEach((tr: ts.TypeReferenceNode) => {
+            const name = tr.typeName as ts.Identifier;
+            referencedTypes.push(name.escapedText.toString());
+          });
       }
     /* tslint:disable */
     default:

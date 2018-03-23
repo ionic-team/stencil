@@ -168,19 +168,18 @@ function updateReferenceTypeImports(config: d.Config, importDataObj: ImportData,
 
   const updateImportReferences = updateImportReferenceFactory(config, allTypes, filePath);
 
-  // cmpMeta.eventsMeta[0].eventType.typeReferences
-
   importDataObj = Object.keys(cmpMeta.membersMeta)
   .filter((memberName) => {
     const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
 
-    return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ].indexOf(member.memberType) !== -1 &&
+    return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable, MEMBER_TYPE.Method ].indexOf(member.memberType) !== -1 &&
       member.attribType.typeReferences;
   })
   .reduce((obj, memberName) => {
     const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
     return updateImportReferences(obj, member.attribType.typeReferences);
   }, importDataObj);
+
 
   cmpMeta.eventsMeta
   .filter((meta: d.EventMeta) => {
@@ -353,7 +352,7 @@ function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
     .reduce((obj, memberName) => {
       const member: d.MemberMeta = membersMeta[memberName];
       obj[memberName] = {
-        type: `() => void`, // TODO this is not good enough
+        type: member.attribType.text,
       };
 
       if (member.jsdoc) {
