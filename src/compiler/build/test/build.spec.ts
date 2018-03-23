@@ -53,7 +53,7 @@ describe('build', () => {
     expect(r.entries[0].components[0].tag).toContain('cmp-a');
     expect(r.transpileBuildCount).toBe(1);
     expect(r.bundleBuildCount).toBe(1);
-    expect(r.filesWritten.length).toBe(3);
+    expect(r.filesWritten.length).toBe(2);
 
     expectFiles(c.fs, [
       '/src/components.d.ts',

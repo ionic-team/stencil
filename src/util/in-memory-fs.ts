@@ -384,7 +384,11 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         // it wasn't already queued to be written
         item.queueWriteToDisk = false;
       }
+    } else if (opts && opts.immediateWrite) {
 
+      // If this is an immediate write then write the file
+      // and do not add it to the queue
+      await this.disk.writeFile(filePath, item.fileText);
     } else {
       // we want to write this to disk (eventually)
       // but only if the content is different
@@ -396,6 +400,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         results.queuedWrite = true;
       }
     }
+
 
     return results;
   }

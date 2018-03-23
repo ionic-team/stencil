@@ -604,6 +604,27 @@ describe(`in-memory-fs`, () => {
     expect(i.filesWritten).toHaveLength(0);
   });
 
+  it(`writeFile with immediate disk write`, async () => {
+    await fs.writeFile(`/dir/file1.js`, `content`, { immediateWrite: true });
+    expect(mockedFs.diskWrites).toBe(1);
+    await fs.writeFile(`/dir/file2.js`, `content`);
+    expect(mockedFs.diskWrites).toBe(1);
+
+    const content = await fs.readFile(`/dir/file2.js`);
+    expect(content).toBe(`content`);
+    expect(mockedFs.diskReads).toBe(0);
+
+    let i = await fs.commit();
+    expect(mockedFs.diskWrites).toBe(3);
+    expect(i.filesWritten).toHaveLength(1);
+    expect(i.filesWritten[0]).toBe(`/dir/file2.js`);
+
+    mockedFs.diskWrites = 1;
+    i = await fs.commit();
+    expect(mockedFs.diskWrites).toBe(1);
+    expect(i.filesWritten).toHaveLength(0);
+  });
+
   it(`writeFile doesnt rewrite same content`, async () => {
     await fs.writeFile(`/dir/file1.js`, `1`);
     await fs.writeFile(`/dir/file2.js`, `2`);

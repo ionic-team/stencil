@@ -1,29 +1,46 @@
+import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import * as d from '../../../declarations';
-import { isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration) {
+export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): d.MembersMeta {
   return classNode.members
     .filter(isMethodWithDecorators)
-    .reduce((membersMeta, member) => {
-      const elementDecorator = member.decorators.find(isDecoratorNamed('Method'));
-      if (elementDecorator == null) {
+    .reduce((membersMeta, member: ts.MethodDeclaration) => {
+      const methodDecorator = member.decorators.find(isDecoratorNamed('Method'));
+      if (methodDecorator == null) {
         return membersMeta;
       }
 
-      if (elementDecorator) {
-        const symbol = checker.getSymbolAtLocation(member.name);
-        const methodName = member.name.getText();
+      const symbol = checker.getSymbolAtLocation(member.name);
+      const methodName = member.name.getText();
+      const methodSignature = checker.getSignatureFromDeclaration(member);
 
-        validatePublicMethodName(config, methodName);
+      const returnType = checker.getReturnTypeOfSignature(methodSignature);
+      const typeString = checker.signatureToString(methodSignature, undefined, ts.TypeFormatFlags.WriteArrowStyleSignature, ts.SignatureKind.Call);
 
-        membersMeta[methodName] = {
-          memberType: MEMBER_TYPE.Method,
-          jsdoc: serializeSymbol(checker, symbol)
-        };
+      let methodReturnTypes: d.AttributeTypeReferences = {};
+      const returnTypeNode = checker.typeToTypeNode(returnType);
+
+      if (returnTypeNode) {
+        methodReturnTypes = getAttributeTypeInfo(returnTypeNode, sourceFile);
       }
+
+      validatePublicMethodName(config, methodName);
+
+      membersMeta[methodName] = {
+        memberType: MEMBER_TYPE.Method,
+        attribType: {
+          text: typeString,
+          typeReferences: {
+            ...methodReturnTypes,
+            ...getAttributeTypeInfo(member, sourceFile)
+          }
+        },
+        jsdoc: serializeSymbol(checker, symbol)
+      };
+
 
       return membersMeta;
     }, {} as d.MembersMeta);
@@ -39,3 +56,4 @@ function validatePublicMethodName(config: d.Config, methodName: string) {
     ].join(''));
   }
 }
+

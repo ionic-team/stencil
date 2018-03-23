@@ -42,7 +42,7 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
   const componentTypesFileContent = await generateComponentTypesFile(config, compilerCtx, metadata);
 
   // queue the components.d.ts async file write and put it into memory
-  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent);
+  await compilerCtx.fs.writeFile(componentsDtsSrcFilePath, componentTypesFileContent, { immediateWrite: true });
 
   const typesOutputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(o => !!o.typesDir);
 
@@ -69,6 +69,9 @@ export async function generateComponentTypesFile(config: d.Config, compilerCtx: 
  * It contains typing information for all components that exist in this project
  * and imports for stencil collections that might be configured in your stencil.config.js file
  */
+
+import '@stencil/core';
+
 declare global {
   namespace JSX {
     interface Element {}
@@ -168,19 +171,18 @@ function updateReferenceTypeImports(config: d.Config, importDataObj: ImportData,
 
   const updateImportReferences = updateImportReferenceFactory(config, allTypes, filePath);
 
-  // cmpMeta.eventsMeta[0].eventType.typeReferences
-
   importDataObj = Object.keys(cmpMeta.membersMeta)
   .filter((memberName) => {
     const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
 
-    return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable ].indexOf(member.memberType) !== -1 &&
+    return [ MEMBER_TYPE.Prop, MEMBER_TYPE.PropMutable, MEMBER_TYPE.Method ].indexOf(member.memberType) !== -1 &&
       member.attribType.typeReferences;
   })
   .reduce((obj, memberName) => {
     const member: d.MemberMeta = cmpMeta.membersMeta[memberName];
     return updateImportReferences(obj, member.attribType.typeReferences);
   }, importDataObj);
+
 
   cmpMeta.eventsMeta
   .filter((meta: d.EventMeta) => {
@@ -256,23 +258,22 @@ function updateImportReferenceFactory(config: d.Config, allTypes: { [key: string
  * @param cmpMeta the metadata for the component that a type definition string is generated for
  * @param importPath the path of the component file
  */
-export function createTypesAsString(cmpMeta: d.ComponentMeta, importPath: string) {
+export function createTypesAsString(cmpMeta: d.ComponentMeta, _importPath: string) {
   const tagName = cmpMeta.tagNameMeta;
   const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
   const interfaceName = `HTML${tagNameAsPascal}Element`;
   const jsxInterfaceName = `${tagNameAsPascal}Attributes`;
   const propAttributes = membersToPropAttributes(cmpMeta.membersMeta);
   const methodAttributes = membersToMethodAttributes(cmpMeta.membersMeta);
-  methodAttributes;
   const eventAttributes = membersToEventAttributes(cmpMeta.eventsMeta);
 
   return `
-import {
-  ${cmpMeta.componentClass} as ${dashToPascalCase(cmpMeta.tagNameMeta)}
-} from './${importPath}';
-
 declare global {
-  interface ${interfaceName} extends ${tagNameAsPascal}, HTMLStencilElement {
+  interface ${interfaceName} extends HTMLStencilElement {
+${attributesToMultiLineString({
+  ...propAttributes,
+  ...methodAttributes
+}, false, '    ')}
   }
   var ${interfaceName}: {
     prototype: ${interfaceName};
@@ -291,8 +292,10 @@ declare global {
   }
   namespace JSXElements {
     export interface ${jsxInterfaceName} extends HTMLAttributes {
-      ${attributesToMultiLineString(propAttributes)}
-      ${attributesToMultiLineString(eventAttributes)}
+${attributesToMultiLineString({
+  ...propAttributes,
+  ...eventAttributes
+}, true, '      ')}
     }
   }
 }
@@ -306,7 +309,7 @@ interface TypeInfo {
   };
 }
 
-function attributesToMultiLineString(attributes: TypeInfo, optional = true) {
+function attributesToMultiLineString(attributes: TypeInfo, optional = true, paddingString: string) {
 
   return Object.keys(attributes)
     .sort()
@@ -319,7 +322,8 @@ function attributesToMultiLineString(attributes: TypeInfo, optional = true) {
       fullList.push(`'${key}'${optional ? '?' : '' }: ${attributes[key].type};`);
       return fullList;
     }, <string[]>[])
-    .join('\n      ');
+    .map(item => `${paddingString}${item}`)
+    .join(`\n`);
 }
 
 function membersToPropAttributes(membersMeta: d.MembersMeta): TypeInfo {
@@ -351,7 +355,7 @@ function membersToMethodAttributes(membersMeta: d.MembersMeta): TypeInfo {
     .reduce((obj, memberName) => {
       const member: d.MemberMeta = membersMeta[memberName];
       obj[memberName] = {
-        type: `() => void`, // TODO this is not good enough
+        type: member.attribType.text,
       };
 
       if (member.jsdoc) {
