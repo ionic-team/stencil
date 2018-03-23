@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { mockElement, mockPlatform } from '../../../testing/mocks';
 import { PROP_TYPE } from '../../../util/constants';
-import { setAccessor } from '../update-dom-node';
+import { setAccessor } from '../set-accessor';
 
 
 describe('setAccessor', () => {
@@ -60,16 +60,6 @@ describe('setAccessor', () => {
     it('should add custom event listener when no old value', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
       const removeEventSpy = spyOn(elm, 'removeEventListener');
-
-      plt = mockPlatform();
-      plt.getComponentMeta = () => {
-        const cmpMeta: d.ComponentMeta = {
-          listenersMeta: [
-            { eventName: 'ionChange' }
-          ]
-        };
-        return cmpMeta;
-      };
 
       const oldValue = undefined;
       const newValue = () => {/**/};
