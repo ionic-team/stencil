@@ -1,3 +1,17 @@
+<a name="0.7.7"></a>
+## 🍒 [0.7.7](https://github.com/ionic-team/stencil/compare/v0.7.6...v0.7.7) (2018-03-23)
+
+### Features
+
+* **events:** reduce restrictions on public member names that are similar to event names ([ef1b2e7](https://github.com/ionic-team/stencil/commit/ef1b2e7))
+* **types:** add methods to components.d.ts file and remove localized dependency on components ([#654](https://github.com/ionic-team/stencil/issues/654)) ([ef304ea](https://github.com/ionic-team/stencil/commit/ef304ea))
+
+
+### Bug Fixes
+
+* **events:** fix adding listeners from JSX attributes ([527f2ac](https://github.com/ionic-team/stencil/commit/527f2ac)), closes [#662](https://github.com/ionic-team/stencil/issues/662)
+
+
 <a name="0.7.6"></a>
 ## 🎺 [0.7.6](https://github.com/ionic-team/stencil/compare/v0.7.5...v0.7.6) (2018-03-22)
 
