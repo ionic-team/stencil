@@ -14,7 +14,7 @@ describe('method decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/method-example');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getMethodDecoratorMeta(config, checker, classNode, sourceFile);
+      response = getMethodDecoratorMeta(config, checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({

@@ -56,15 +56,17 @@ export function visitClass(config: Config, checker: ts.TypeChecker, classNode: t
     return undefined;
   }
 
+  const componentClass = classNode.name.getText().trim();
+
   cmpMeta = {
     ...cmpMeta,
-    componentClass: classNode.name.getText().trim(),
+    componentClass: componentClass,
     membersMeta: {
       // membersMeta is shared with @Prop, @State, @Method, @Element
       ...getElementDecoratorMeta(checker, classNode),
-      ...getMethodDecoratorMeta(config, checker, classNode, sourceFile),
+      ...getMethodDecoratorMeta(config, checker, classNode, sourceFile, componentClass),
       ...getStateDecoratorMeta(checker, classNode),
-      ...getPropDecoratorMeta(config, checker, classNode, sourceFile, diagnostics)
+      ...getPropDecoratorMeta(config, checker, classNode, sourceFile, componentClass, diagnostics)
     },
     eventsMeta: getEventDecoratorMeta(config, checker, classNode, sourceFile),
     listenersMeta: getListenDecoratorMeta(checker, classNode)

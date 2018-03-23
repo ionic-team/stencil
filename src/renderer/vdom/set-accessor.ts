@@ -47,12 +47,11 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
       }
     }
 
-  } else if (memberName[0] === 'o' && memberName[1] === 'n' && /[A-Z]/.test(memberName[2])) {
+  } else if ((memberName[0] === 'o' && memberName[1] === 'n' && /[A-Z]/.test(memberName[2])) && (!(memberName in elm))) {
     // Event Handlers
     // so if the member name starts with "on" and the 3rd characters is
-    // a capital letter then we're assuming it's an event listener
-    // also, the compiler prints warnings if you create public methods or properties
-    // that start with "on" and the 3rd char is a capital letter
+    // a capital letter, and it's not already a member on the element,
+    // then we're assuming it's an event listener
 
     if (toLowerCase(memberName) in elm) {
       // standard event

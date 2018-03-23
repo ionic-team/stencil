@@ -1,12 +1,13 @@
 import * as d from '../../../declarations';
 import { catchError } from '../../util';
 import { getAttributeTypeInfo, isDecoratorNamed, serializeSymbol } from './utils';
-import { toDashCase } from '../../../util/helpers';
+import { isReservedMember } from './reserved-public-members';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
+import { toDashCase } from '../../../util/helpers';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: d.Diagnostic[]) {
+export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string, diagnostics: d.Diagnostic[]) {
   return classNode.members
     .filter(member => Array.isArray(member.decorators) && member.decorators.length > 0)
     .reduce((allMembers: d.MembersMeta, prop: ts.PropertyDeclaration) => {
@@ -33,7 +34,7 @@ export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, 
 
       } else {
         // @Prop()
-        validatePublicPropName(config, memberName);
+        validatePublicPropName(config, componentClass, memberName);
 
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
@@ -49,13 +50,11 @@ export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, 
 }
 
 
-function validatePublicPropName(config: d.Config, memberName: string) {
-  if (memberName[0] === 'o' && memberName[1] === 'n' && /[A-Z]/.test(memberName[2])) {
+function validatePublicPropName(config: d.Config, componentClass: string, methodName: string) {
+  if (isReservedMember(methodName)) {
     config.logger.warn([
-      `In order to be compatible with all event listeners on elements, it's `,
-      `recommended the public property name "${memberName}" does not start with "on", `,
-      `followed by capital letter which is the third character. `,
-      `Please rename the property so it does not conflict with common event listener naming.`
+      `The @Prop() name "${methodName}" used within "${componentClass}" is using a reserved public member name. `,
+      `Please rename the property so it does not conflict with existing standardized element members.`
     ].join(''));
   }
 }

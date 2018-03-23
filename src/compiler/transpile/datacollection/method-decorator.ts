@@ -1,10 +1,11 @@
-import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import * as d from '../../../declarations';
+import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
+import { isReservedMember } from './reserved-public-members';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): d.MembersMeta {
+export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string): d.MembersMeta {
   return classNode.members
     .filter(isMethodWithDecorators)
     .reduce((membersMeta, member: ts.MethodDeclaration) => {
@@ -27,7 +28,7 @@ export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker
         methodReturnTypes = getAttributeTypeInfo(returnTypeNode, sourceFile);
       }
 
-      validatePublicMethodName(config, methodName);
+      validatePublicMethodName(config, componentClass, methodName);
 
       membersMeta[methodName] = {
         memberType: MEMBER_TYPE.Method,
@@ -47,12 +48,12 @@ export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker
 }
 
 
-function validatePublicMethodName(config: d.Config, methodName: string) {
-  if (methodName[0] === 'o' && methodName[1] === 'n' && /[A-Z]/.test(methodName[2])) {
+function validatePublicMethodName(config: d.Config, componentClass: string, methodName: string) {
+  if (isReservedMember(methodName)) {
     config.logger.warn([
-      `In order to be compatible with all event listeners on elements, it's `,
-      `recommended the public method name "${methodName}" does not start with "on". `,
-      `Please rename the method so it does not conflict with common event listener naming.`
+      `The @Method() decoratored method name "${methodName}" used within "${componentClass}" `,
+      `is using a reserved public member name. `,
+      `Please rename the method so it does not conflict with existing standardized element members.`
     ].join(''));
   }
 }

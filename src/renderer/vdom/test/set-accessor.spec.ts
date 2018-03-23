@@ -6,14 +6,28 @@ import { setAccessor } from '../set-accessor';
 
 describe('setAccessor', () => {
 
+  var elm: any;
   let plt: d.PlatformApi;
 
   beforeEach(() => {
     plt = mockPlatform();
+    elm = mockElement('my-tag');
   });
 
 
   describe('event listener', () => {
+
+    it('should allow public method starting with "on" and capital 3rd character', () => {
+      const addEventSpy = spyOn(elm, 'addEventListener');
+      const removeEventSpy = spyOn(elm, 'removeEventListener');
+
+      elm.onMyMethod = () => {/**/};
+
+      const fn = () => {/**/};
+      setAccessor(plt, elm, 'onMyMethod', undefined, fn, false);
+
+      expect(addEventSpy).toHaveBeenCalledTimes(0);
+    });
 
     it('should remove standardized event listener when has old value, but no new', () => {
       const addEventSpy = spyOn(elm, 'addEventListener');
@@ -251,11 +265,6 @@ describe('setAccessor', () => {
     setAccessor(plt, elm, 'myprop', oldValue, newValue, false);
     expect(elm.myprop).toBeUndefined();
     expect(elm).toMatchAttributes({ 'myprop': 'stringval' });
-  });
-
-  var elm: any;
-  beforeEach(() => {
-    elm = mockElement('my-tag');
   });
 
 });

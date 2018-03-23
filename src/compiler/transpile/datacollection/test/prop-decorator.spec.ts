@@ -14,7 +14,7 @@ describe('props decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/prop-example');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
-      response = getPropDecoratorMeta(config, checker, classNode, sourceFile, diagnostics);
+      response = getPropDecoratorMeta(config, checker, classNode, sourceFile, 'ClassName', diagnostics);
     });
 
     expect(response).toEqual({
