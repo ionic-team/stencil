@@ -1,10 +1,10 @@
 import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
-import { AttributeTypeReferences, MembersMeta } from '../../../declarations';
+import * as d from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getMethodDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): MembersMeta {
+export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): d.MembersMeta {
   return classNode.members
     .filter(isMethodWithDecorators)
     .reduce((membersMeta, member: ts.MethodDeclaration) => {
@@ -14,19 +14,22 @@ export function getMethodDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cl
       }
 
       const symbol = checker.getSymbolAtLocation(member.name);
-      const sig = checker.getSignatureFromDeclaration(member);
+      const methodName = member.name.getText();
+      const methodSignature = checker.getSignatureFromDeclaration(member);
 
-      const returnType = checker.getReturnTypeOfSignature(sig);
-      const typeString = checker.signatureToString(sig, undefined, ts.TypeFormatFlags.WriteArrowStyleSignature, ts.SignatureKind.Call);
+      const returnType = checker.getReturnTypeOfSignature(methodSignature);
+      const typeString = checker.signatureToString(methodSignature, undefined, ts.TypeFormatFlags.WriteArrowStyleSignature, ts.SignatureKind.Call);
 
-      let methodReturnTypes: AttributeTypeReferences = {};
+      let methodReturnTypes: d.AttributeTypeReferences = {};
       const returnTypeNode = checker.typeToTypeNode(returnType);
 
       if (returnTypeNode) {
         methodReturnTypes = getAttributeTypeInfo(returnTypeNode, sourceFile);
       }
 
-      membersMeta[member.name.getText()] = {
+      validatePublicMethodName(config, methodName);
+
+      membersMeta[methodName] = {
         memberType: MEMBER_TYPE.Method,
         attribType: {
           text: typeString,
@@ -40,6 +43,17 @@ export function getMethodDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cl
 
 
       return membersMeta;
-    }, {} as MembersMeta);
+    }, {} as d.MembersMeta);
+}
+
+
+function validatePublicMethodName(config: d.Config, methodName: string) {
+  if (methodName[0] === 'o' && methodName[1] === 'n' && /[A-Z]/.test(methodName[2])) {
+    config.logger.warn([
+      `In order to be compatible with all event listeners on elements, it's `,
+      `recommended the public method name "${methodName}" does not start with "on". `,
+      `Please rename the method so it does not conflict with common event listener naming.`
+    ].join(''));
+  }
 }
 

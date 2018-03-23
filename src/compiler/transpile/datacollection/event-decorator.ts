@@ -76,10 +76,9 @@ export function validateEventEmitterMemeberName(config: d.Config, memberName: st
 
   if (/[A-Z]/.test(firstChar)) {
     config.logger.warn([
+      `In order to be compatible with all event listeners on elements, the `,
       `@Event() "${memberName}" cannot start with a capital letter. `,
-      `Please lowercase the first character, or use use the "eventName" option `,
-      `within the decorator, such as `,
-      `@Event({ eventName: 'MyCustomEvent' }) myCustomEvent: EventEmitter;`
+      `Please lowercase the first character for the event to best work with all listeners.`
     ].join(''));
   }
 }
