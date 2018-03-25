@@ -1,4 +1,4 @@
-import { TestingCompiler } from '../../../testing/index';
+import { TestingConfig, TjaTestingCompiler } from '../../../testing/index';
 import { expectFiles } from '../../../testing/utils';
 
 
@@ -6,11 +6,12 @@ describe('bundle-module', () => {
 
   describe('build', () => {
 
-    let c: TestingCompiler;
+    let c: TjaTestingCompiler;
 
     beforeEach(async () => {
-      c = new TestingCompiler();
-      await c.fs.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
+      c = new TjaTestingCompiler();
+
+      await c.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
       await c.fs.commit();
     });
 
@@ -21,8 +22,9 @@ describe('bundle-module', () => {
         { components: ['cmp-a', 'cmp-b'] },
         { components: ['cmp-c'] }
       ];
-      await c.fs.writeFiles({
-        '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+
+      await c.writeFiles({
+       '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
         '/src/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
         '/src/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`
       });
@@ -32,17 +34,17 @@ describe('bundle-module', () => {
       let r = await c.build();
       expect(r.diagnostics).toEqual([]);
 
-      const firstBuildText = await c.fs.readFile('/www/build/app/cmp-a.js');
+      const firstBuildText = await c.readFile('/www/build/app/cmp-a.js');
 
       // create a rebuild listener
       const rebuildListener = c.once('rebuild');
 
       // write the same darn thing, no actual change
-      await c.fs.writeFile('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
+      await c.writeFile('/src/cmp-a.tsx', `@Component({ tag: 'cmp-a' }) export class CmpA {}`, { clearFileCache: true });
       await c.fs.commit();
 
       // kick off a rebuild
-      c.trigger('fileUpdate', '/src/cmp-a.tsx');
+      c.trigger('fileUpdate', c.filePath('/src/cmp-a.tsx'));
 
       // wait for the rebuild to finish
       // get the rebuild results
@@ -54,7 +56,7 @@ describe('bundle-module', () => {
       expect(r.components[1].tag).toBe('cmp-b');
       expect(r.components[2].tag).toBe('cmp-c');
 
-      const secondBuildText = await c.fs.readFile('/www/build/app/cmp-a.js');
+      const secondBuildText = await c.readFile('/www/build/app/cmp-a.js');
       expect(firstBuildText).toBe(secondBuildText);
     });
 
@@ -63,7 +65,7 @@ describe('bundle-module', () => {
         { components: ['cmp-a', 'cmp-b'] },
         { components: ['cmp-c'] }
       ];
-      await c.fs.writeFiles({
+      await c.writeFiles({
         '/src/cmp-a.tsx': `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
         '/src/cmp-b.tsx': `@Component({ tag: 'cmp-b' }) export class CmpB {}`,
         '/src/cmp-c.tsx': `@Component({ tag: 'cmp-c' }) export class CmpC {}`
@@ -79,8 +81,8 @@ describe('bundle-module', () => {
       expect(r.bundleBuildCount).toBe(2);
 
       expectFiles(c.fs, [
-        '/www/build/app/cmp-a.js',
-        '/www/build/app/cmp-c.js'
+        c.filePath('/www/build/app/cmp-a.js'),
+        c.filePath('/www/build/app/cmp-c.js')
       ]);
     });
 
@@ -89,7 +91,7 @@ describe('bundle-module', () => {
         { components: ['cmp-a'] },
         { components: ['cmp-b'] }
       ];
-      await c.fs.writeFiles({
+      await c.writeFiles({
         '/src/cmp-a.tsx': `
           import json from './package.json';
           console.log(json.thename);
@@ -112,9 +114,9 @@ describe('bundle-module', () => {
       expect(r.diagnostics).toEqual([]);
 
       expectFiles(c.fs, [
-        '/www/build/app/cmp-a.js',
-        '/www/build/app/cmp-b.js',
-        '/www/build/app/chunk1.js'
+        c.filePath('/www/build/app/cmp-a.js'),
+        c.filePath('/www/build/app/cmp-b.js'),
+        c.filePath('/www/build/app/chunk1.js')
       ]);
     });
 
