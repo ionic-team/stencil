@@ -9,7 +9,7 @@ export function validateOutputTargetDist(config: d.Config) {
 
   distOutputTargets.forEach(outputTarget => {
     if (!outputTarget.dir) {
-      outputTarget.dir = DEFAULT_DIST_DIR;
+      outputTarget.dir = DEFAULT_DIR;
     }
 
     if (!path.isAbsolute(outputTarget.dir)) {
@@ -17,7 +17,7 @@ export function validateOutputTargetDist(config: d.Config) {
     }
 
     if (!outputTarget.buildDir) {
-      outputTarget.buildDir = DEFAULT_DIST_BUILD_DIR;
+      outputTarget.buildDir = DEFAULT_BUILD_DIR;
     }
 
     if (!path.isAbsolute(outputTarget.buildDir)) {
@@ -41,14 +41,18 @@ export function validateOutputTargetDist(config: d.Config) {
     }
 
     if (typeof outputTarget.empty !== 'boolean') {
-      outputTarget.empty = DEFAULT_DIST_EMPTY_DIR;
+      outputTarget.empty = DEFAULT_EMPTY_DIR;
+    }
+
+    if (typeof outputTarget.appBuild !== 'boolean') {
+      outputTarget.appBuild = true;
     }
   });
 }
 
 
-const DEFAULT_DIST_DIR = 'dist';
-const DEFAULT_DIST_BUILD_DIR = '';
-const DEFAULT_DIST_EMPTY_DIR = true;
+const DEFAULT_DIR = 'dist';
+const DEFAULT_BUILD_DIR = '';
+const DEFAULT_EMPTY_DIR = true;
 const DEFAULT_COLLECTION_DIR = 'collection';
 const DEFAULT_TYPES_DIR = 'types';

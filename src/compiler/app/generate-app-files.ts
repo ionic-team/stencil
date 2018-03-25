@@ -11,7 +11,7 @@ import { setBuildConditionals } from './build-conditionals';
 
 export function generateAppFiles(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, entryModules: d.EntryModule[], cmpRegistry: d.ComponentRegistry) {
   const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+    return outputTarget.appBuild;
   });
 
   return Promise.all(outputTargets.map(outputTarget => {

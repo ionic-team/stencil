@@ -51,7 +51,7 @@ export async function processCopyTasks(config: d.Config, compilerCtx: d.Compiler
   }
 
   const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(outputTarget => {
-    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+    return outputTarget.appBuild;
   });
 
   if (config.sys.isGlob(copyTask.src)) {

@@ -70,7 +70,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
 async function writeBundleJSFile(config: Config, compilerCtx: CompilerCtx, fileName: string, jsText: string) {
 
   const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+    return outputTarget.appBuild;
   });
 
   return Promise.all(outputTargets.map(outputTarget => {
@@ -174,7 +174,7 @@ async function generateBundleBuild(config: Config, compilerCtx: CompilerCtx, ent
   entryModule.entryBundles.push(entryBundle);
 
   const outputTargets = config.outputTargets.filter(outputTarget => {
-    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+    return outputTarget.appBuild;
   });
 
   return Promise.all(outputTargets.map(async outputTarget => {

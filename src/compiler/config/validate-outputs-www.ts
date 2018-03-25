@@ -43,6 +43,10 @@ function validateOutputTarget(config: d.Config, outputTarget: d.OutputTargetWww)
   setBooleanConfig(outputTarget, 'empty', null, DEFAULT_EMPTY_DIR);
 
   validatePrerender(config, outputTarget);
+
+  if (typeof outputTarget.appBuild !== 'boolean') {
+    outputTarget.appBuild = true;
+  }
 }
 
 

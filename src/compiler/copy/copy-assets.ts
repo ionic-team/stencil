@@ -11,7 +11,7 @@ export async function copyComponentAssets(config: d.Config, compilerCtx: d.Compi
   }
 
   const outputTargets = (config.outputTargets as d.OutputTargetDist[]).filter(outputTarget => {
-    return outputTarget.type === 'www' || outputTarget.type === 'dist';
+    return outputTarget.appBuild;
   });
 
   config.logger.debug(`copy assets`);

@@ -19,7 +19,7 @@ export async function generateAppGlobalScript(config: Config, compilerCtx: Compi
     compilerCtx.appFiles.global = globalJsContent;
 
     const outputTargets = config.outputTargets.filter(outputTarget => {
-      return outputTarget.type === 'www' || outputTarget.type === 'dist';
+      return outputTarget.appBuild;
     });
 
     await Promise.all(outputTargets.map(outputTarget => {
