@@ -44,7 +44,7 @@ describe('bundle-module', () => {
       await c.fs.commit();
 
       // kick off a rebuild
-      c.trigger('fileUpdate', c.filePath('/src/cmp-a.tsx'));
+      c.trigger('fileUpdate', c.adjustFilePath('/src/cmp-a.tsx'));
 
       // wait for the rebuild to finish
       // get the rebuild results
@@ -81,8 +81,8 @@ describe('bundle-module', () => {
       expect(r.bundleBuildCount).toBe(2);
 
       expectFiles(c.fs, [
-        c.filePath('/www/build/app/cmp-a.js'),
-        c.filePath('/www/build/app/cmp-c.js')
+        c.adjustFilePath('/www/build/app/cmp-a.js'),
+        c.adjustFilePath('/www/build/app/cmp-c.js')
       ]);
     });
 
@@ -114,9 +114,9 @@ describe('bundle-module', () => {
       expect(r.diagnostics).toEqual([]);
 
       expectFiles(c.fs, [
-        c.filePath('/www/build/app/cmp-a.js'),
-        c.filePath('/www/build/app/cmp-b.js'),
-        c.filePath('/www/build/app/chunk1.js')
+        c.adjustFilePath('/www/build/app/cmp-a.js'),
+        c.adjustFilePath('/www/build/app/cmp-b.js'),
+        c.adjustFilePath('/www/build/app/chunk1.js')
       ]);
     });
 

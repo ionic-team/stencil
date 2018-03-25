@@ -29,19 +29,19 @@ export class TjaTestingCompiler extends Compiler {
     validateConfig(this.config);
   }
 
-  public filePath(posixFilePath: string): string {
+  public adjustFilePath(posixFilePath: string): string {
     return normalizePath(path.resolve(posixFilePath));
   }
 
   async readFile(filePath: string, opts?: d.FsReadOptions) {
-    const resolvedFilePath = normalizePath(path.resolve(filePath));
+    const resolvedFilePath = this.adjustFilePath(filePath);
     // POSIX: '/src/index.html'
     // Windows: 'C:/src/index.html'
     return this.fs.readFile(resolvedFilePath, opts);
   }
 
   async writeFile(filePath: string, content: string, opts?: d.FsWriteOptions) {
-    const resolvedFilePath = normalizePath(path.resolve(filePath));
+    const resolvedFilePath = this.adjustFilePath(filePath);
     // POSIX: '/src/index.html'
     // Windows: 'C:/src/index.html'
     return this.fs.writeFile(resolvedFilePath, content, opts);
