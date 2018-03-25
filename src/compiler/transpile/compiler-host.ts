@@ -78,10 +78,7 @@ function writeFileInMemory(config: Config, ctx: CompilerCtx, sourceFile: ts.Sour
     tsFilePath = normalizePath(config.sys.path.join(config.rootDir, tsFilePath));
   }
 
-  // Windows: config.sys.path.resolve() required for tests to pass.
-  // jsFilePath needs drive letter.
-  const resolvedDistFilePath = config.sys.path.resolve(distFilePath);
-  distFilePath = normalizePath(resolvedDistFilePath);
+  distFilePath = normalizePath(distFilePath);
 
   // get or create the ctx module file object
   if (!ctx.moduleFiles[tsFilePath]) {
