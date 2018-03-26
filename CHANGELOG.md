@@ -1,3 +1,14 @@
+<a name="0.7.8"></a>
+## 👽 [0.7.8](https://github.com/ionic-team/stencil/compare/v0.7.7...v0.7.8) (2018-03-26)
+
+
+### Features
+
+* **config:** enable ng output target ([c2eb430](https://github.com/ionic-team/stencil/commit/c2eb430))
+* **docs:** generate component docs in json format ([34bd335](https://github.com/ionic-team/stencil/commit/34bd335))
+
+
+
 <a name="0.7.7"></a>
 ## 🍒 [0.7.7](https://github.com/ionic-team/stencil/compare/v0.7.6...v0.7.7) (2018-03-23)
 
