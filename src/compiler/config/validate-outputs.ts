@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
 import { validateDocs } from './validate-docs';
+import { validateOutputTargetAngular } from './validate-outputs-angular';
 import { validateOutputTargetDist } from './validate-outputs-dist';
 import { validateOutputTargetWww } from './validate-outputs-www';
 import { validateResourcesUrl } from './validate-resources-url';
@@ -29,6 +30,7 @@ export function validateOutputTargets(config: d.Config) {
 
   validateOutputTargetWww(config);
   validateOutputTargetDist(config);
+  validateOutputTargetAngular(config);
   validateDocs(config);
   validateStats(config);
 
@@ -43,4 +45,4 @@ export function validateOutputTargets(config: d.Config) {
 }
 
 
-const VALID_TYPES = ['dist', 'docs', 'stats', 'www'];
+const VALID_TYPES = ['angular', 'dist', 'docs', 'stats', 'www'];

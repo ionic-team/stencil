@@ -1,4 +1,6 @@
 import * as d from '../../declarations';
+import { angularDirectiveProxyOutputs } from '../output-targets/angular';
+import { AttributeTypeReference } from '../../declarations';
 import { captializeFirstLetter, dashToPascalCase } from '../../util/helpers';
 import { gatherMetadata } from './datacollection/index';
 import { getComponentsDtsTypesFilePath } from '../collections/distribution';
@@ -7,7 +9,6 @@ import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizePath } from '../util';
 import { normalizeStyles } from '../style/normalize-styles';
 import * as ts from 'typescript';
-import { AttributeTypeReference } from '../../declarations';
 
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsOptions: ts.CompilerOptions, tsHost: ts.CompilerHost, tsFilePaths: string[], componentsDtsSrcFilePath: string) {
@@ -23,6 +24,9 @@ export async function generateComponentTypes(config: d.Config, compilerCtx: d.Co
 
   // Gather component metadata and type info
   const metadata = gatherMetadata(config, compilerCtx, buildCtx, checkProgram.getTypeChecker(), checkProgram.getSourceFiles());
+
+  // create angular directive proxy outputs
+  angularDirectiveProxyOutputs(config, compilerCtx, metadata);
 
   Object.keys(metadata).forEach(key => {
     const tsFilePath = normalizePath(key);
