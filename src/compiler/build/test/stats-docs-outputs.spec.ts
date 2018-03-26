@@ -1,6 +1,6 @@
+import * as d from '../../../declarations';
 import { TestingCompiler, TestingConfig } from '../../../testing';
 import { mockElement, mockHtml } from '../../../testing/mocks';
-import { OutputTarget } from '../../../declarations';
 import * as path from 'path';
 
 
@@ -15,12 +15,12 @@ describe('stats and docs', () => {
     config.buildAppCore = true;
     config.rootDir = '/User/testing/';
     config.outputTargets = [
-      { type: 'www' },
-      { type: 'stats' },
-      { type: 'stats', file: 'my-stats.json' },
-      { type: 'stats', file: '/I/do/what/I/want/some-stats.json' },
-      { type: 'docs' },
-      { type: 'docs', dir: '/docs/' }
+      { type: 'www' } as d.OutputTargetWww,
+      { type: 'stats' } as d.OutputTargetStats,
+      { type: 'stats', file: 'my-stats.json' } as d.OutputTargetStats,
+      { type: 'stats', file: '/I/do/what/I/want/some-stats.json' } as d.OutputTargetStats,
+      { type: 'docs' } as d.OutputTargetDocs,
+      { type: 'docs', readmeDir: '/docs/' } as d.OutputTargetDocs
     ];
 
     c = new TestingCompiler(config);

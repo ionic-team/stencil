@@ -4,9 +4,14 @@ import { pathJoin } from '../util';
 
 export function validateDocs(config: d.Config) {
   if (config.flags.docs) {
+    // docs flag
     if (config.outputTargets) {
       if (!config.outputTargets.some(o => o.type === 'docs')) {
-        config.outputTargets.push({ type: 'docs' });
+        // didn't provide a docs config, so let's add one
+        (config.outputTargets as d.OutputTargetDocs[]).push({
+          type: 'docs',
+          readmeDir: config.srcDir
+        });
       }
 
       config.outputTargets.forEach(outputTarget => {
@@ -16,6 +21,7 @@ export function validateDocs(config: d.Config) {
 
   } else {
     if (config.outputTargets) {
+      // remove docs if there is no docs flag
       config.outputTargets = config.outputTargets.filter(o => o.type !== 'docs');
     }
   }
@@ -23,15 +29,11 @@ export function validateDocs(config: d.Config) {
 
 
 function validateDocsOutputTarget(config: d.Config, outputTarget: d.OutputTargetDocs) {
-  if (outputTarget.format === 'json') {
-    if (!outputTarget.dir) {
-      outputTarget.dir = 'dist/docs';
-    }
-    if (!config.sys.path.isAbsolute(outputTarget.dir)) {
-      outputTarget.dir = pathJoin(config, config.rootDir, outputTarget.dir);
-    }
+  if (typeof outputTarget.readmeDir === 'string' && !config.sys.path.isAbsolute(outputTarget.readmeDir)) {
+    outputTarget.readmeDir = pathJoin(config, config.rootDir, outputTarget.readmeDir);
+  }
 
-  } else {
-    outputTarget.format = 'readme';
+  if (typeof outputTarget.jsonFile === 'string') {
+    outputTarget.jsonFile = pathJoin(config, config.rootDir, outputTarget.jsonFile);
   }
 }

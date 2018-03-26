@@ -1,13 +1,13 @@
 import { getMemberDocumentation } from './docs-util';
-import { MemberMeta } from '../../../declarations';
-import { PROP_TYPE } from '../../../util/constants';
+import { MemberMeta } from '../../declarations';
+import { PROP_TYPE } from '../../util/constants';
 
 
-export class MarkdownProps {
+export class MarkdownAttrs {
   private rows: Row[] = [];
 
-  addRow(memberName: string, memberMeta: MemberMeta) {
-    this.rows.push(new Row(memberName, memberMeta));
+  addRow(memberMeta: MemberMeta) {
+    this.rows.push(new Row(memberMeta));
   }
 
   toMarkdown() {
@@ -16,12 +16,12 @@ export class MarkdownProps {
       return content;
     }
 
-    content.push(`## Properties`);
+    content.push(`## Attributes`);
     content.push(``);
 
     this.rows = this.rows.sort((a, b) => {
-      if (a.memberName < b.memberName) return -1;
-      if (a.memberName > b.memberName) return 1;
+      if (a.memberMeta.attribName < b.memberMeta.attribName) return -1;
+      if (a.memberMeta.attribName > b.memberMeta.attribName) return 1;
       return 0;
     });
 
@@ -36,12 +36,12 @@ export class MarkdownProps {
 
 class Row {
 
-  constructor(public memberName: string, private memberMeta: MemberMeta) {}
+  constructor(public memberMeta: MemberMeta) {}
 
   toMarkdown() {
     const content: string[] = [];
 
-    content.push(`#### ${this.memberName}`);
+    content.push(`#### ${this.memberMeta.attribName}`);
     content.push(``);
     content.push(getPropType(this.memberMeta.propType));
     content.push(``);

@@ -10,6 +10,7 @@ export * from './config';
 export * from './decorators';
 export * from './dev-inspector';
 export * from './diagnostics';
+export * from './docs';
 export * from './dom';
 export * from './entry';
 export * from './fs';

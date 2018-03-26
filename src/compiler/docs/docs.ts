@@ -1,14 +1,13 @@
-import { CompilerCtx, Config, OutputTargetDocs } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError, hasError } from '../util';
 import { cleanDiagnostics } from '../../util/logger/logger-util';
-import { generateJsons } from './json/generate-jsons';
-import { generateReadmes } from './readme/generate-readmes';
+import { generateReadmes } from './generate-readmes';
 import { getBuildContext } from '../build/build-utils';
 import { getCompilerCtx } from '../build/compiler-ctx';
 import { transpileAppModules } from '../transpile/transpile-app-modules';
 
 
-export async function docs(config: Config, compilerCtx: CompilerCtx) {
+export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
   compilerCtx = getCompilerCtx(config, compilerCtx);
   const buildCtx = getBuildContext(config, compilerCtx, null);
 
@@ -48,23 +47,8 @@ export async function docs(config: Config, compilerCtx: CompilerCtx) {
 }
 
 
-export function generateDocs(config: Config, compilerCtx: CompilerCtx) {
-  const docsOutputTargets: OutputTargetDocs[] = config.outputTargets.filter(o => o.type === 'docs');
+export function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx) {
+  const docsOutputTargets: d.OutputTargetDocs[] = config.outputTargets.filter(o => o.type === 'docs');
 
-  return Promise.all(docsOutputTargets.map(outputTarget => {
-    return generateDocOutputTarget(config, compilerCtx, outputTarget);
-  }));
-}
-
-
-async function generateDocOutputTarget(config: Config, compilerCtx: CompilerCtx, outputTarget: OutputTargetDocs) {
-  if (outputTarget.format === 'readme') {
-    return generateReadmes(config, compilerCtx);
-  }
-
-  if (outputTarget.format === 'json') {
-    return generateJsons(config, compilerCtx);
-  }
-
-  throw new Error(`invalid docs format: ${outputTarget.format}`);
+  return generateReadmes(config, compilerCtx, docsOutputTargets);
 }

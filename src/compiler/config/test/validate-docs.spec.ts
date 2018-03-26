@@ -1,4 +1,4 @@
-import { Config } from '../../../declarations';
+import * as d from '../../../declarations';
 import { mockLogger, mockStencilSystem } from '../../../testing/mocks';
 import { validateConfig } from '../validate-config';
 import * as path from 'path';
@@ -6,7 +6,7 @@ import * as path from 'path';
 
 describe('validateDocs', () => {
 
-  let config: Config;
+  let config: d.Config;
   const logger = mockLogger();
   const sys = mockStencilSystem();
 
@@ -24,31 +24,29 @@ describe('validateDocs', () => {
   });
 
 
-  it('docs default json dist', () => {
-    config.flags.docs = true;
-    config.outputTargets.push({ type: 'docs', format: 'json' });
-    validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs');
-    expect(o).toBeDefined();
-    expect(o.dir).toContain('dist');
-    expect(o.format).toBe('json');
-  });
-
   it('docs default readme', () => {
     config.flags.docs = true;
-    config.outputTargets.push({ type: 'docs', dir: 'my-dir' });
+    config.outputTargets.push(
+      {
+        type: 'docs', dir: 'my-dir'
+      } as d.OutputTargetDocs
+    );
     validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs');
+    const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
     expect(o).toBeDefined();
     expect(o.dir).toContain('my-dir');
-    expect(o.format).toBe('readme');
   });
 
   it('docs, keep docs output target', () => {
     config.flags.docs = true;
-    config.outputTargets.push({ type: 'docs', dir: 'my-dir' });
+    config.outputTargets.push(
+      {
+        type: 'docs',
+        dir: 'my-dir'
+      } as d.OutputTargetDocs
+    );
     validateConfig(config);
-    const o = config.outputTargets.find(o => o.type === 'docs');
+    const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
     expect(o).toBeDefined();
     expect(o.dir).toContain('my-dir');
   });

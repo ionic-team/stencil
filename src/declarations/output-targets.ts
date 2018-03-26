@@ -52,8 +52,8 @@ export interface OutputTargetHydrate extends OutputTargetWww, d.HydrateOptions {
 
 
 export interface OutputTargetDocs extends OutputTarget {
-  dir?: string;
-  format?: 'json' | 'readme';
+  readmeDir?: string;
+  jsonFile?: string;
 }
 
 
@@ -64,4 +64,5 @@ export interface OutputTargetStats extends OutputTarget {
 
 export interface OutputTarget {
   type?: 'dist' | 'docs' | 'stats' | 'www';
+  appBuild?: boolean;
 }
