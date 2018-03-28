@@ -86,7 +86,7 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
       // fire off the user's elm.componentOnReady() callbacks that were
       // put directly on the element (well before anything was ready)
       if (onReadyCallbacks = plt.onReadyCallbacksMap.get(elm)) {
-        onReadyCallbacks.forEach(cb => cb());
+        onReadyCallbacks.forEach(cb => cb(elm));
         plt.onReadyCallbacksMap.delete(elm);
       }
 

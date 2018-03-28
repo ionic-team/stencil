@@ -33,11 +33,11 @@ describe('componentOnReady', () => {
       connectComponentOnReady(App, elm);
       plt.hasLoadedMap.set(elm, true);
 
-      let called = false;
-      elm.componentOnReady(() => {
-        called = true;
+      let resolvedElm = null;
+      elm.componentOnReady(rElm => {
+        resolvedElm = rElm;
       });
-      expect(called).toBe(true);
+      expect(resolvedElm).toBe(elm);
 
       expect(plt.onReadyCallbacksMap.has(elm)).toBe(false);
     });
@@ -51,11 +51,11 @@ describe('componentOnReady', () => {
       initCoreComponentOnReady(plt, App);
       connectComponentOnReady(App, elm);
 
-      let called = false;
-      elm.componentOnReady(() => {
-        called = true;
+      let resolvedElm = null;
+      elm.componentOnReady(rElm => {
+        resolvedElm = rElm;
       });
-      expect(called).toBe(false);
+      expect(resolvedElm).toBe(null);
 
       expect(plt.onReadyCallbacksMap.has(elm)).toBe(true);
     });
@@ -66,15 +66,16 @@ describe('componentOnReady', () => {
       initCoreComponentOnReady(plt, App);
       connectComponentOnReady(App, elm);
 
-      let called = false;
-      elm.componentOnReady(() => {
-        called = true;
+      let resolvedElm = null;
+      elm.componentOnReady(rElm => {
+        resolvedElm = rElm;
       });
-      expect(called).toBe(true);
+      expect(resolvedElm).toBe(elm);
       expect(plt.onReadyCallbacksMap.has(elm)).toBe(false);
     });
 
   });
+
 
   describe('initComponentLoaded', () => {
 
@@ -89,15 +90,15 @@ describe('componentOnReady', () => {
     });
 
     it('should call multiple componentOnReady promises', async () => {
-      let called1 = false;
-      let called2 = false;
+      let resolvedElm1 = null;
+      let resolvedElm2 = null;
 
-      const p1 = elm.componentOnReady().then(() => {
-        called1 = true;
+      const p1 = elm.componentOnReady().then(resolveElm => {
+        resolvedElm1 = resolveElm;
       });
 
-      const p2 = elm.componentOnReady().then(() => {
-        called2 = true;
+      const p2 = elm.componentOnReady().then(resolveElm => {
+        resolvedElm2 = resolveElm;
       });
 
       initComponentLoaded(plt, elm, 'hydrated');
@@ -105,24 +106,24 @@ describe('componentOnReady', () => {
       await p1;
       await p2;
 
-      expect(called1).toBe(true);
-      expect(called2).toBe(true);
+      expect(resolvedElm1).toBe(elm);
+      expect(resolvedElm2).toBe(elm);
     });
 
     it('should call multiple componentOnReady callbacks', () => {
-      let called1 = false;
-      let called2 = false;
+      let resolvedElm1 = null;
+      let resolvedElm2 = null;
 
-      elm.componentOnReady(() => {
-        called1 = true;
+      elm.componentOnReady(resolveElm => {
+        resolvedElm1 = resolveElm;
       });
-      elm.componentOnReady(() => {
-        called2 = true;
+      elm.componentOnReady(resolveElm => {
+        resolvedElm2 = resolveElm;
       });
 
       initComponentLoaded(plt, elm, 'hydrated');
-      expect(called1).toBe(true);
-      expect(called2).toBe(true);
+      expect(resolvedElm1).toBe(elm);
+      expect(resolvedElm2).toBe(elm);
     });
 
   });

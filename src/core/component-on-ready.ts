@@ -15,7 +15,7 @@ export function initCoreComponentOnReady(plt: d.PlatformApi, App: d.AppGlobal) {
     } else {
       // either the host element has already loaded
       // or it's not even a component
-      resolve();
+      resolve(elm);
     }
   };
 
