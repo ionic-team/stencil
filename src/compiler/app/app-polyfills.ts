@@ -21,7 +21,6 @@ export async function getAppCorePolyfills(config: Config) {
 // during the end user's app build they're read from /dist/client/polyfills/
 const POLYFILLS = [
   'template.js',
-  'when-defined-before-polyfill.js',
   'document-register-element.js',
   'array-find.js',
   'array-includes.js',
@@ -34,5 +33,4 @@ const POLYFILLS = [
   'closest.js',
   'performance-now.js',
   'remove-element.js',
-  'when-defined-after-polyfill.js',
 ];

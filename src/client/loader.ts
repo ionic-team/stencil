@@ -20,22 +20,6 @@ export function init(
   App = win[namespace] = win[namespace] || {};
   App.components = components;
 
-  if (!win.customElements) {
-    // temporary customElements polyfill only for "whenDefined"
-    // this is incase customElements.whenDefined('my-tag') is
-    // used before the polyfill is downloaded
-    win.$whenDefined = [];
-    win.customElements = {
-      whenDefined: function(tag: string) {
-        return {
-          then: function(cb: Function) {
-            win.$whenDefined.push([tag, cb]);
-          }
-        };
-      }
-    };
-  }
-
   y = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
   if (y.length) {
     // auto hide components until they been fully hydrated

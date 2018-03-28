@@ -1,1 +1,0 @@
-window.$whenDefined&&delete window.customElements;
