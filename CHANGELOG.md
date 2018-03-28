@@ -1,3 +1,13 @@
+<a name="0.7.10"></a>
+## 🐚 [0.7.10](https://github.com/ionic-team/stencil/compare/v0.7.9...v0.7.10) (2018-03-28)
+
+
+### Bug Fixes
+
+* **componentOnReady:** set host element as resolve value ([dcfdf06](https://github.com/ionic-team/stencil/commit/dcfdf06))
+
+
+
 <a name="0.7.9"></a>
 ## 🎷 [0.7.9](https://github.com/ionic-team/stencil/compare/v0.7.8...v0.7.9) (2018-03-28)
 
