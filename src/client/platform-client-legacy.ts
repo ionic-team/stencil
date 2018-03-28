@@ -1,5 +1,4 @@
-import { AppGlobal, BundleCallback, CjsExports, ComponentMeta, ComponentRegistry, CoreContext,
-  EventEmitterData, HostElement, PlatformApi } from '../declarations';
+import * as d from '../declarations';
 import { assignHostContentSlots } from '../renderer/vdom/slot';
 import { attachStyles } from '../core/styles';
 import { Build } from '../util/build-conditionals';
@@ -12,6 +11,7 @@ import { enableEventListener } from '../core/listeners';
 import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
+import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { initCssVarShim } from './css-shim/init-css-shim';
 import { initHostElement } from '../core/init-host-element';
 import { initStyleTemplate } from '../core/styles';
@@ -21,13 +21,13 @@ import { toDashCase } from '../util/helpers';
 import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClientLegacy(namespace: string, Context: CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
-  const cmpRegistry: ComponentRegistry = { 'html': {} };
-  const bundleQueue: BundleCallback[] = [];
+export function createPlatformClientLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
+  const cmpRegistry: d.ComponentRegistry = { 'html': {} };
+  const bundleQueue: d.BundleCallback[] = [];
   const loadedBundles: {[bundleId: string]: any} = {};
   const pendingBundleRequests: {[url: string]: boolean} = {};
-  const controllerComponents: {[tag: string]: HostElement} = {};
-  const App: AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
+  const controllerComponents: {[tag: string]: d.HostElement} = {};
+  const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
   const domApi = createDomApi(App, win, doc);
 
   // set App Context
@@ -42,7 +42,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   }
 
   if (Build.event) {
-    Context.emit = (elm: Element, eventName: string, data: EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
+    Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   }
 
   // add the h() fn to the app's global namespace
@@ -53,7 +53,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};
 
   // create the platform api which is used throughout common core code
-  const plt: PlatformApi = {
+  const plt: d.PlatformApi = {
     connectHostElement,
     domApi,
     defineComponent,
@@ -89,7 +89,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
 
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded
-  const rootElm = domApi.$documentElement as HostElement;
+  const rootElm = domApi.$documentElement as d.HostElement;
   rootElm.$rendered = true;
   rootElm.$activeLoading = [];
 
@@ -103,7 +103,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   // then let's walk the tree and generate vnodes out of the data
   createVNodesFromSsr(plt, domApi, rootElm);
 
-  function connectHostElement(cmpMeta: ComponentMeta, elm: HostElement) {
+  function connectHostElement(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -129,7 +129,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   }
 
 
-  function defineComponent(cmpMeta: ComponentMeta, HostElementConstructor: any) {
+  function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
     const tagName = cmpMeta.tagNameMeta;
 
     if (!globalDefined[tagName]) {
@@ -172,7 +172,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
    * @param callback
    */
   function execBundleCallback(name: string, deps: string[], callback: Function) {
-    const bundleExports: CjsExports = {};
+    const bundleExports: d.CjsExports = {};
 
     try {
       callback(bundleExports, ...deps.map(d => loadedBundles[d]));
@@ -251,7 +251,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   }
 
   // This is executed by the component's connected callback.
-  function loadComponent(cmpMeta: ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
+  function loadComponent(cmpMeta: d.ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
     bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
       cmpMeta.bundleIds[modeName];
@@ -288,7 +288,7 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
   }
 
 
-  function requestComponentBundle(cmpMeta: ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
+  function requestComponentBundle(cmpMeta: d.ComponentMeta, bundleId: string, url?: string, tmrId?: any, scriptElm?: HTMLScriptElement) {
     // create the url we'll be requesting
     // always use the es5/jsonp callback module
     url = resourcesUrl + bundleId + ((useScopedCss(domApi.$supportsShadowDom, cmpMeta) ? '.sc' : '') + '.es5.js');
@@ -360,8 +360,11 @@ export function createPlatformClientLegacy(namespace: string, Context: CoreConte
     plt.defineComponent(cmpMeta, HostElement);
   });
 
+  // create the componentOnReady fn
+  initCoreComponentOnReady(plt, App);
+
   // notify that the app has initialized and the core script is ready
   // but note that the components have not fully loaded yet, that's the "appload" event
   App.initialized = true;
-  domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
+  domApi.$dispatchEvent(win, 'appinit', { detail: { namespace: namespace } });
 }

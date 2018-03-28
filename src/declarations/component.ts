@@ -261,7 +261,7 @@ export interface ComponentAppliedStyles {
 }
 
 
-export type OnReadyCallback = ((elm: HostElement) => void);
+export type OnReadyCallback = (() => void);
 
 
 export interface LoadComponentRegistry {

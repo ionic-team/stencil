@@ -14,6 +14,7 @@ describe('loader', () => {
   let appCorePolyfilled: string;
   let hydratedCssClass: string;
   let components: LoadComponentRegistry[];
+  let HTMLElementPrototype: any;
 
   beforeEach(() => {
     win = mockWindow();
@@ -25,6 +26,7 @@ describe('loader', () => {
     appCorePolyfilled = 'app.core.pf.js';
     hydratedCssClass = 'hydrated';
     components = [];
+    HTMLElementPrototype = {};
   });
 
   describe('init', () => {
@@ -33,7 +35,7 @@ describe('loader', () => {
       const loaderScript = doc.createElement('script');
       loaderScript.src = '/build/app.js';
       doc.head.appendChild(loaderScript);
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       expect(win[namespace]).toBeDefined();
     });
 
@@ -41,7 +43,7 @@ describe('loader', () => {
       const loaderScript = doc.createElement('script');
       loaderScript.src = '/build/app.js';
       doc.head.appendChild(loaderScript);
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       expect(win[namespace].components).toBe(components);
     });
 
@@ -53,7 +55,7 @@ describe('loader', () => {
       components = [
         ['cmp-tag', {}, true] as any
       ];
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       const style = doc.head.querySelector('style');
       expect(style.hasAttribute('data-styles')).toBeTruthy();
       expect(style.innerHTML.indexOf('cmp-tag') > -1).toBeTruthy();
@@ -67,7 +69,7 @@ describe('loader', () => {
 
       components = [];
 
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
 
       const style = doc.head.querySelector('style');
       expect(style).toBeFalsy();
@@ -78,7 +80,7 @@ describe('loader', () => {
       loaderScript.src = '/build/app.js';
       doc.head.appendChild(loaderScript);
 
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
 
       const coreScript = doc.head.querySelector('script[data-resources-url][data-namespace]');
       expect(coreScript.getAttribute('src')).toBe('/build/app-namespace/app.core.pf.js');
@@ -89,7 +91,7 @@ describe('loader', () => {
       loaderScript.src = '/build/app.js';
       doc.head.appendChild(loaderScript);
 
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       const coreScript = doc.head.querySelector('script[data-resources-url][data-namespace]');
 
       expect(coreScript.getAttribute('data-resources-url')).toBe('/build/app-namespace/');
@@ -100,7 +102,7 @@ describe('loader', () => {
       loaderScript.src = '/build/app.js';
       doc.head.appendChild(loaderScript);
 
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
 
       const coreScript = doc.head.querySelector('script[data-namespace]');
       expect(coreScript.getAttribute('data-namespace')).toBe(fsNamespace);
@@ -110,7 +112,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = 'file:///c:/path/to/my%20bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('file:///c:/path/to/app-namespace/app.core.pf.js');
     });
@@ -119,7 +121,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = 'http://domain.com/some/path/bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('http://domain.com/some/path/app-namespace/app.core.pf.js');
     });
@@ -128,7 +130,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = '../bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('../app-namespace/app.core.pf.js');
     });
@@ -137,7 +139,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = './bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('./app-namespace/app.core.pf.js');
     });
@@ -146,7 +148,7 @@ describe('loader', () => {
       const scriptElm = doc.createElement('script');
       scriptElm.src = 'bundle.js';
       doc.head.appendChild(scriptElm);
-      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components);
+      init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCorePolyfilled, hydratedCssClass, components, HTMLElementPrototype);
       const script = doc.head.lastElementChild;
       expect(script.getAttribute('src')).toBe('app-namespace/app.core.pf.js');
     });

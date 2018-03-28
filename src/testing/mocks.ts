@@ -13,7 +13,7 @@ import { TestingLogger } from './index';
 import { validateConfig } from '../compiler/config/validate-config';
 
 
-export function mockPlatform(win?: any, domApi?: d.DomApi) {
+export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.ComponentRegistry) {
   const hydrateResults: d.HydrateResults = {
     diagnostics: []
   };
@@ -23,13 +23,14 @@ export function mockPlatform(win?: any, domApi?: d.DomApi) {
 
   win = win || config.sys.createDom().parse({html: ''});
   domApi = domApi || createDomApi(App, win, win.document);
-  const cmpRegistry: d.ComponentRegistry = {};
+  cmpRegistry = cmpRegistry || {};
 
   const plt = createPlatformServer(
     config,
     outputTarget,
     win,
     win.document,
+    App,
     cmpRegistry,
     hydrateResults.diagnostics,
     false,

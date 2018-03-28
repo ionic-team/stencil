@@ -26,6 +26,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'resourcesUrl',
   'write',
   '$definedCmps',
+  '$r',
 
 
   /**

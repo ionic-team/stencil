@@ -1,12 +1,12 @@
+import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
-import { ComponentConstructor, ComponentInstance, HostElement, OnReadyCallback, PlatformApi } from '../declarations';
 import { initEventEmitters } from './init-event-emitters';
 import { RUNTIME_ERROR } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
-export function initComponentInstance(plt: PlatformApi, elm: HostElement, instance?: ComponentInstance, componentConstructor?: ComponentConstructor, queuedEvents?: any[], i?: number) {
+export function initComponentInstance(plt: d.PlatformApi, elm: d.HostElement, instance?: d.ComponentInstance, componentConstructor?: d.ComponentConstructor, queuedEvents?: any[], i?: number) {
   try {
     // using the user's component class, let's create a new instance
     componentConstructor = plt.getComponentMeta(elm).componentConstructor;
@@ -64,12 +64,11 @@ export function initComponentInstance(plt: PlatformApi, elm: HostElement, instan
 }
 
 
-export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydratedCssClass: string, instance?: ComponentInstance, onReadyCallbacks?: OnReadyCallback[]): any {
+export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydratedCssClass: string, instance?: d.ComponentInstance, onReadyCallbacks?: d.OnReadyCallback[]): any {
   // all is good, this component has been told it's time to finish loading
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
   if (!plt.hasLoadedMap.has(elm) && (instance = plt.instanceMap.get(elm)) && !plt.isDisconnectedMap.has(elm) && (!elm.$activeLoading || !elm.$activeLoading.length)) {
-
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
@@ -87,7 +86,7 @@ export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydrated
       // fire off the user's elm.componentOnReady() callbacks that were
       // put directly on the element (well before anything was ready)
       if (onReadyCallbacks = plt.onReadyCallbacksMap.get(elm)) {
-        onReadyCallbacks.forEach(cb => cb(elm));
+        onReadyCallbacks.forEach(cb => cb());
         plt.onReadyCallbacksMap.delete(elm);
       }
 
@@ -117,7 +116,7 @@ export function initComponentLoaded(plt: PlatformApi, elm: HostElement, hydrated
 }
 
 
-export function propagateComponentLoaded(plt: PlatformApi, elm: HostElement, index?: number, ancestorsActivelyLoadingChildren?: HostElement[]) {
+export function propagateComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, index?: number, ancestorsActivelyLoadingChildren?: d.HostElement[]) {
   // load events fire from bottom to top
   // the deepest elements load first then bubbles up
   const ancestorHostElement = plt.ancestorHostElementMap.get(elm);

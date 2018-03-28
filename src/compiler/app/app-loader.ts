@@ -77,7 +77,8 @@ export function injectAppIntoLoader(
     `"${appCoreFileName}"`,
     `"${appCorePolyfilledFileName}"`,
     `"${hydratedCssClass}"`,
-    cmpLoaderRegistryStr
+    cmpLoaderRegistryStr,
+    'HTMLElement.prototype'
   ].join(',');
 
   return loaderContent.replace(APP_NAMESPACE_REGEX, loaderArgs);

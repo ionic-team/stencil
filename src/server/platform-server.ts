@@ -6,6 +6,7 @@ import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../util/constants';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../renderer/vdom/h';
+import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';
 import { proxyController } from '../core/proxy-controller';
@@ -17,6 +18,7 @@ export function createPlatformServer(
   outputTarget: d.OutputTargetWww,
   win: any,
   doc: any,
+  App: d.AppGlobal,
   cmpRegistry: d.ComponentRegistry,
   diagnostics: d.Diagnostic[],
   isPrerender: boolean,
@@ -25,9 +27,6 @@ export function createPlatformServer(
   const loadedBundles: {[bundleId: string]: any} = {};
   const styles: string[] = [];
   const controllerComponents: {[tag: string]: d.HostElement} = {};
-
-  // create the app global
-  const App: d.AppGlobal = {};
 
   const domApi = createDomApi(App, win, doc);
 
@@ -108,6 +107,9 @@ export function createPlatformServer(
 
   // create the renderer which will be used to patch the vdom
   plt.render = createRendererPatch(plt, domApi);
+
+  // patch the componentOnReady fn
+  initCoreComponentOnReady(plt, App);
 
   // setup the root node of all things
   // which is the mighty <html> tag

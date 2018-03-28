@@ -1,4 +1,4 @@
-import { LoadComponentRegistry } from '../declarations';
+import * as d from '../declarations';
 
 
 export function init(
@@ -10,11 +10,15 @@ export function init(
   appCore: string,
   appCorePolyfilled: string,
   hydratedCssClass: string,
-  components: LoadComponentRegistry[],
-  x?: any, y?: any, scriptElm?: HTMLScriptElement
+  components: d.LoadComponentRegistry[],
+  HTMLElementPrototype: any,
+  App?: d.AppGlobal,
+  x?: any, y?: any, scriptElm?: HTMLScriptElement,
+  orgComponentOnReady?: Function
 ) {
   // create global namespace if it doesn't already exist
-  (win[namespace] = win[namespace] || {}).components = components;
+  App = win[namespace] = win[namespace] || {};
+  App.components = components;
 
   if (!win.customElements) {
     // temporary customElements polyfill only for "whenDefined"
@@ -41,6 +45,49 @@ export function init(
     x.setAttribute('data-styles', '');
     doc.head.insertBefore(x, doc.head.firstChild);
   }
+
+  // create a temporary array to store the resolves
+  // before the core file has fully loaded
+  App.$r = [];
+
+  // add componentOnReady to HTMLElement.prototype
+  orgComponentOnReady = HTMLElementPrototype.componentOnReady;
+  HTMLElementPrototype.componentOnReady = function componentOnReady(cb?: () => void): any {
+    const elm = this;
+
+    // there may be more than one app on the window so
+    // call original HTMLElement.prototype.componentOnReady
+    // if one exists already
+    orgComponentOnReady && orgComponentOnReady.call(elm);
+
+    function executor(resolve: () => void) {
+      if (App.$r) {
+        // core file hasn't loaded yet
+        // so let's throw it in this temporary queue
+        // and when the core does load it'll handle these
+        App.$r.push([elm, resolve]);
+
+      } else {
+        // core has finished loading because there's no temporary queue
+        // call the core's logic to handle this
+        App.componentOnReady(elm, resolve);
+      }
+    }
+
+    if (cb) {
+      // just a callback
+      return executor(cb);
+    }
+
+    // callback wasn't provided, let's return a promise
+    if (win.Promise) {
+      // use native/polyfilled promise
+      return new Promise(executor);
+    }
+
+    // promise may not have been polyfilled yet
+    return { then: executor } as Promise<any>;
+  };
 
   // figure out the script element for this current script
   y = doc.querySelectorAll('script');
@@ -72,12 +119,16 @@ export function init(
   // also check if the page was build with ssr or not
   x = doc.createElement('script');
   if (usePolyfills(win, win.location, x, 'import("")')) {
-      x.src = resourcesUrl + appCorePolyfilled;
+    // requires the es5/polyfilled core
+    x.src = resourcesUrl + appCorePolyfilled;
+
   } else {
-      x.src = resourcesUrl + appCore;
-      x.setAttribute('type', 'module');
-      x.setAttribute('crossorigin', true);
+    // let's do this!
+    x.src = resourcesUrl + appCore;
+    x.setAttribute('type', 'module');
+    x.setAttribute('crossorigin', true);
   }
+
   x.setAttribute('data-resources-url', resourcesUrl);
   x.setAttribute('data-namespace', fsNamespace);
   doc.head.appendChild(x);
@@ -89,24 +140,23 @@ export function usePolyfills(win: any, location: Location, scriptElm: HTMLScript
   // but it minifies to a nice 'lil one-liner ;)
 
   if (location.search.indexOf('core=esm') > 0) {
-    // force es2015 build
+    // force esm build
     return false;
   }
 
   if (
       (location.search.indexOf('core=es5') > 0) ||
       (location.protocol === 'file:') ||
-      // Need to look for define specifically because we polyfill customElements
-      // above to support whenDefined.
       (!(win.customElements && win.customElements.define)) ||
       (!win.fetch) ||
       (!(win.CSS && win.CSS.supports && win.CSS.supports('color', 'var(--c)'))) ||
       (!('noModule' in scriptElm))
     ) {
-    // force es5 build w/ polyfills
+    // es5 build w/ polyfills
     return true;
   }
 
+  // final test to see if this browser support dynamic imports
   return doesNotSupportsDynamicImports(dynamicImportTest);
 }
 
