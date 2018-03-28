@@ -9,7 +9,8 @@ export async function setBuildConditionals(config: Config, compilerCtx: Compiler
     // cool we can use the last build conditionals
     // because it's a rebuild, and was probably only a css or html change
     // if it was a typescript change we need to do a full rebuild again
-    return existingCoreBuild;
+    console.log('would return existing core build');
+    // return existingCoreBuild;
   }
 
   // figure out which sections of the core code this build doesn't even need
