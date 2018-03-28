@@ -102,6 +102,7 @@ const ARG_OPTS = {
   ],
   string: [
     'config',
+    'docs-json',
     'log-level'
   ],
   alias: {

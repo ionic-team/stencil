@@ -54,6 +54,7 @@ export interface ConfigFlags {
   debug?: boolean;
   dev?: boolean;
   docs?: boolean;
+  docsJson?: string;
   es5?: boolean;
   help?: boolean;
   log?: boolean;

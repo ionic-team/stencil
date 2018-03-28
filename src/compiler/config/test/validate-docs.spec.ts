@@ -24,17 +24,18 @@ describe('validateDocs', () => {
   });
 
 
-  it('docs default readme', () => {
+  it('docs default readmeDir', () => {
     config.flags.docs = true;
     config.outputTargets.push(
       {
-        type: 'docs', dir: 'my-dir'
+        type: 'docs',
+        readmeDir: 'my-dir'
       } as d.OutputTargetDocs
     );
     validateConfig(config);
     const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
     expect(o).toBeDefined();
-    expect(o.dir).toContain('my-dir');
+    expect(o.readmeDir).toContain('my-dir');
   });
 
   it('docs, keep docs output target', () => {
@@ -42,16 +43,23 @@ describe('validateDocs', () => {
     config.outputTargets.push(
       {
         type: 'docs',
-        dir: 'my-dir'
+        readmeDir: 'my-dir'
       } as d.OutputTargetDocs
     );
     validateConfig(config);
     const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
     expect(o).toBeDefined();
-    expect(o.dir).toContain('my-dir');
+    expect(o.readmeDir).toContain('my-dir');
   });
 
-  it('docs, and docs output target', () => {
+  it('docs-json flag', () => {
+    config.flags.docsJson = 'some/path/docs.json';
+    validateConfig(config);
+    const o: d.OutputTargetDocs = config.outputTargets.find(o => o.type === 'docs');
+    expect(o.jsonFile).toContain('docs.json');
+  });
+
+  it('docs flag, and docs output target', () => {
     config.flags.docs = true;
     validateConfig(config);
     expect(config.outputTargets.some(o => o.type === 'docs')).toBe(true);

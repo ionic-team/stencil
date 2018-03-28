@@ -86,6 +86,19 @@ describe('parseFlags', () => {
     expect(flags.docs).toBe(true);
   });
 
+  it('should parse --docs-json', () => {
+    process.argv[2] = '--docs-json';
+    process.argv[3] = 'some/path/docs.json';
+    const flags = parseFlags(process);
+    expect(flags.docsJson).toBe('some/path/docs.json');
+  });
+
+  it('should parse --docs-json w/ =', () => {
+    process.argv[2] = '--docs-json=some/path/docs.json';
+    const flags = parseFlags(process);
+    expect(flags.docsJson).toBe('some/path/docs.json');
+  });
+
   it('should parse --es5', () => {
     process.argv[2] = '--es5';
     const flags = parseFlags(process);

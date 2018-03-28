@@ -3,21 +3,29 @@ import { pathJoin } from '../util';
 
 
 export function validateDocs(config: d.Config) {
-  if (config.flags.docs) {
+  if (config.flags.docs || typeof config.flags.docsJson === 'string') {
     // docs flag
-    if (config.outputTargets) {
-      if (!config.outputTargets.some(o => o.type === 'docs')) {
-        // didn't provide a docs config, so let's add one
-        (config.outputTargets as d.OutputTargetDocs[]).push({
-          type: 'docs',
-          readmeDir: config.srcDir
-        });
+    config.outputTargets = config.outputTargets || [];
+
+    if (!config.outputTargets.some(o => o.type === 'docs')) {
+      // didn't provide a docs config, so let's add one
+      const outputTarget: d.OutputTargetDocs = {
+        type: 'docs'
+      };
+
+      if (typeof config.flags.docsJson === 'string') {
+        outputTarget.jsonFile = config.flags.docsJson;
+
+      } else if (config.flags.docs) {
+        outputTarget.readmeDir = config.srcDir;
       }
 
-      config.outputTargets.forEach(outputTarget => {
-        validateDocsOutputTarget(config, outputTarget);
-      });
+      (config.outputTargets as d.OutputTargetDocs[]).push(outputTarget);
     }
+
+    config.outputTargets.forEach(outputTarget => {
+      validateDocsOutputTarget(config, outputTarget);
+    });
 
   } else {
     if (config.outputTargets) {
