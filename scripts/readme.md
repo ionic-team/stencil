@@ -7,8 +7,9 @@
 5. Test test test. Add unit tests for any updates and always run `npm run test`.
 
 
-# Deploy
+# Release
 
-1. `npm run prepare.deploy`
+1. `npm run release.prepare`
 2. Check the changelog and make sure it is good, then commit the changes.
-3. `npm run deploy`
+3. `npm run release`
+4. :tada:
