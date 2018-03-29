@@ -1,5 +1,4 @@
-import { StencilSystem } from '../../declarations';
-import { parseFlags } from '../parse-flags';
+import { getCmdArgs, parseFlags } from '../parse-flags';
 
 
 describe('parseFlags', () => {
@@ -12,6 +11,24 @@ describe('parseFlags', () => {
     process.argv = ['/node', '/stencil'];
   });
 
+  it('should append npm run flags when provided', () => {
+    process.argv.push('build', '--a', '--b');
+
+    process.env = {
+      npm_config_argv: JSON.stringify({
+        original: ['run', 'build', '--c', '--d', '--a']
+      })
+    };
+
+    const cmdArgs = getCmdArgs(process);
+    expect(cmdArgs).toHaveLength(6);
+    expect(cmdArgs[0]).toBe('build');
+    expect(cmdArgs[1]).toBe('--a');
+    expect(cmdArgs[2]).toBe('--b');
+    expect(cmdArgs[3]).toBe('--c');
+    expect(cmdArgs[4]).toBe('--d');
+    expect(cmdArgs[5]).toBe('--a');
+  });
 
   it('should parse task', () => {
     process.argv[2] = 'build';
@@ -40,6 +57,15 @@ describe('parseFlags', () => {
   it('should not parse --cache', () => {
     const flags = parseFlags(process);
     expect(flags.cache).toBe(null);
+  });
+
+  it('should override --config with second --config', () => {
+    process.argv[2] = '--config';
+    process.argv[3] = '/config-1.js';
+    process.argv[4] = '--config';
+    process.argv[5] = '/config-2.js';
+    const flags = parseFlags(process);
+    expect(flags.config).toBe('/config-2.js');
   });
 
   it('should parse --config', () => {
@@ -78,6 +104,20 @@ describe('parseFlags', () => {
     process.argv[2] = '--dev';
     const flags = parseFlags(process);
     expect(flags.dev).toBe(true);
+  });
+
+  it('should override --no-docs flag with --docs', () => {
+    process.argv[2] = '--no-docs';
+    process.argv[3] = '--docs';
+    const flags = parseFlags(process);
+    expect(flags.docs).toBe(true);
+  });
+
+  it('should override --docs flag with --no-docs', () => {
+    process.argv[2] = '--docs';
+    process.argv[3] = '--no-docs';
+    const flags = parseFlags(process);
+    expect(flags.docs).toBe(false);
   });
 
   it('should parse --docs', () => {

@@ -17,7 +17,6 @@ export async function initApp(process: NodeJS.Process, sys: StencilSystem, logge
 
 const DEFAULT_CONFIG = `
 exports.config = {
-  namespace: 'App',
-  collections: []
+  namespace: 'App'
 };
 `;

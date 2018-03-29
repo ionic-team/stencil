@@ -14,30 +14,31 @@ export function parseFlags(process: NodeJS.Process): ConfigFlags {
 
   ARG_OPTS.boolean.forEach(booleanName => {
 
-    if (cmdArgs.includes(`--${booleanName}`)) {
-      flags[configCase(booleanName)] = true;
-      return;
-    }
-
-    if (cmdArgs.includes(`--no-${booleanName}`)) {
-      flags[configCase(booleanName)] = false;
-      return;
-    }
-
     const alias = (ARG_OPTS.alias as any)[booleanName];
+    const flagKey = configCase(booleanName);
 
-    if (alias) {
-      if (cmdArgs.includes(`-${alias}`)) {
-        flags[configCase(booleanName)] = true;
-        return;
+    flags[flagKey] = null;
+
+    cmdArgs.forEach(cmdArg => {
+      if (cmdArg === `--${booleanName}`) {
+        flags[flagKey] = true;
+
+      } else if (cmdArg === `--no-${booleanName}`) {
+        flags[flagKey] = false;
+
+      } else if (alias && cmdArg === `-${alias}`) {
+        flags[flagKey] = true;
       }
-    }
-
-    flags[configCase(booleanName)] = null;
+    });
 
   });
 
   ARG_OPTS.string.forEach(stringName => {
+
+    const alias = (ARG_OPTS.alias as any)[stringName];
+    const flagKey = configCase(stringName);
+
+    flags[flagKey] = null;
 
     for (let i = 0; i < cmdArgs.length; i++) {
       const cmdArg = cmdArgs[i];
@@ -45,32 +46,21 @@ export function parseFlags(process: NodeJS.Process): ConfigFlags {
       if (cmdArg.startsWith(`--${stringName}=`)) {
         const values = cmdArg.split('=');
         values.shift();
-        flags[configCase(stringName)] = values.join('=');
-        return;
-      }
+        flags[flagKey] = values.join('=');
 
-      if (cmdArg === `--${stringName}`) {
-        flags[configCase(stringName)] = cmdArgs[i + 1];
-        return;
-      }
+      } else if (cmdArg === `--${stringName}`) {
+        flags[flagKey] = cmdArgs[i + 1];
 
-      const alias = (ARG_OPTS.alias as any)[stringName];
-
-      if (alias) {
+      } else if (alias) {
         if (cmdArg.startsWith(`-${alias}=`)) {
           const values = cmdArg.split('=');
           values.shift();
-          flags[configCase(stringName)] = values.join('=');
-          return;
-        }
+          flags[flagKey] = values.join('=');
 
-        if (cmdArg === `-${alias}`) {
-          flags[configCase(stringName)] = cmdArgs[i + 1];
-          return;
+        } else if (cmdArg === `-${alias}`) {
+          flags[flagKey] = cmdArgs[i + 1];
         }
       }
-
-      flags[configCase(stringName)] = null;
     }
 
   });
@@ -93,8 +83,8 @@ const ARG_OPTS = {
     'es5',
     'help',
     'log',
-    'prod',
     'prerender',
+    'prod',
     'skip-node-check',
     'stats',
     'version',
@@ -113,13 +103,16 @@ const ARG_OPTS = {
 };
 
 
-function getCmdArgs(process: NodeJS.Process) {
+export function getCmdArgs(process: NodeJS.Process) {
   let cmdArgs = process.argv.slice(2);
 
   try {
-    const npmRunArgs = process.env.npm_config_argv;
-    if (npmRunArgs) {
-      cmdArgs = cmdArgs.concat(JSON.parse(npmRunArgs).original);
+    if (process.env) {
+      const npmConfigArgs = process.env.npm_config_argv;
+      if (npmConfigArgs) {
+        const npmOrginalFlags = (JSON.parse(npmConfigArgs).original as string[]).filter(arg => arg.startsWith('-'));
+        cmdArgs = cmdArgs.concat(npmOrginalFlags);
+      }
     }
   } catch (e) {}
 
