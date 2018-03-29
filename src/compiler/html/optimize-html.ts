@@ -1,5 +1,6 @@
 import * as d from '../../declarations';
-import { assetVersioning } from './asset-versioning';
+import { assetVersioning } from '../asset-versioning/asset-versioning';
+import { catchError } from '../util';
 import { collapseHtmlWhitepace } from './collapse-html-whitespace';
 import { inlineComponentStyles } from '../style/inline-styles';
 import { inlineExternalAssets } from './inline-external-assets';
@@ -7,7 +8,6 @@ import { inlineLoaderScript } from './inline-loader-script';
 import { updateCanonicalLink } from './canonical-link';
 import { minifyInlineScripts } from './minify-inline-scripts';
 import { minifyInlineStyles } from '../style/minify-inline-styles';
-import { catchError } from '../util';
 
 
 export async function optimizeHtml(

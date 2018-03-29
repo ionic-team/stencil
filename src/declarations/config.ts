@@ -115,6 +115,11 @@ export interface ConfigAssetVersioning {
   versionHtml?: boolean;
 
   /**
+   * Version assets found in mainfest, such as the manifest.json file itself and all assets referenced within. Defaults to true;
+   */
+  versionManifest?: boolean;
+
+  /**
    * Version assets that are found in styles and css, such as background-url and @font-face urls. Defaults to true;
    */
   versionCssProperties?: boolean;

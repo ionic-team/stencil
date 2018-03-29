@@ -20,6 +20,7 @@ export function validateAssetVerioning(config: Config) {
   setStringConfig(config.assetVersioning, 'prefix', DEFAULTS.separator);
   setStringConfig(config.assetVersioning, 'separator', DEFAULTS.separator);
   setBooleanConfig(config.assetVersioning, 'versionHtml', null, DEFAULTS.versionHtml);
+  setBooleanConfig(config.assetVersioning, 'versionManifest', null, DEFAULTS.versionManifest);
   setBooleanConfig(config.assetVersioning, 'versionCssProperties', null, DEFAULTS.versionCssProperties);
 }
 
@@ -32,5 +33,6 @@ const DEFAULTS: ConfigAssetVersioning = {
   prefix: '',
   separator: '.',
   versionHtml: true,
+  versionManifest: true,
   versionCssProperties: true,
 };
