@@ -86,16 +86,16 @@
   },
   "author": "Ionic Team",
   "homepage": "https://stenciljs.com/",
-  "description": "A Compiler for Web Components",
+  "description": "A Compiler for Web Components and Progressive Web Apps",
   "keywords": [
     "web components",
     "components",
     "stencil",
     "ionic",
     "webapp",
-    "pwa",
     "custom elements",
-    "shadow dom"
+    "pwa",
+    "progressive web app"
   ],
   "jest": {
     "testEnvironment": "node",
