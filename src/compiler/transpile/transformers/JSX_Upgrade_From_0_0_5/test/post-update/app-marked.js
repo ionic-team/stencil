@@ -1,4 +1,4 @@
-var AppMarked = (function () {
+var AppMarked = /** @class */ (function () {
     function AppMarked() {
     }
     AppMarked.prototype.componentWillLoad = function () {

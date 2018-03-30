@@ -1,4 +1,4 @@
-var App = (function () {
+var App = /** @class */ (function () {
     function App() {
     }
     App.prototype.render = function () {

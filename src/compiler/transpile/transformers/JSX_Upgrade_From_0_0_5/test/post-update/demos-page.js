@@ -1,4 +1,4 @@
-var DemosPage = (function () {
+var DemosPage = /** @class */ (function () {
     function DemosPage() {
         this.demos = [
             {

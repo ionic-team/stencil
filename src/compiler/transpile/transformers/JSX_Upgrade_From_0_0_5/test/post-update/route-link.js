@@ -1,5 +1,5 @@
 import matchPath from "../../utils/match-path";
-var RouteLink = (function () {
+var RouteLink = /** @class */ (function () {
     function RouteLink() {
         this.unsubscribe = function () { return; };
         this.exact = false;

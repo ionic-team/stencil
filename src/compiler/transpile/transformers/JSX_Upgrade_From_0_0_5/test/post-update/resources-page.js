@@ -1,4 +1,4 @@
-var ResourcesPage = (function () {
+var ResourcesPage = /** @class */ (function () {
     function ResourcesPage() {
         this.LINKS = {
             TEMPLATES: [

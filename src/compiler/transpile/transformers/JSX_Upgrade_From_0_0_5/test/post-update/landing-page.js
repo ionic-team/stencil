@@ -1,4 +1,4 @@
-var LandingPage = (function () {
+var LandingPage = /** @class */ (function () {
     function LandingPage() {
         document.title = "Stencil";
     }

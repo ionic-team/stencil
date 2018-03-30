@@ -1,5 +1,5 @@
 import createHistory from "../../utils/createBrowserHistory";
-var Router = (function () {
+var Router = /** @class */ (function () {
     function Router() {
         this.root = "/";
         // A suffix to append to the page title whenever

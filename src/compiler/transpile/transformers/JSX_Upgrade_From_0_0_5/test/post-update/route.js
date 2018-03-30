@@ -8,7 +8,7 @@ var __assign = (this && this.__assign) || Object.assign || function (t) {
     return t;
 };
 import matchPath from "../../utils/match-path";
-var Route = (function () {
+var Route = /** @class */ (function () {
     function Route() {
         this.unsubscribe = function () { return; };
         this.componentProps = {};
