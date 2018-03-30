@@ -11,6 +11,8 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
   // combine the styles and modules together
   // generate the actual files to write
   const timeSpan = config.logger.createTimeSpan(`generate bundles started`);
+  config.logger.debug(`generate bundles started`);
+
   const bundleKeys: { [key: string]: string } = {};
 
   await Promise.all(
@@ -33,6 +35,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
       );
     })
   );
+  config.logger.debug(`bundle mode finished`);
 
   const esmModules = jsModules.esm;
   const esmPromises = Object.keys(esmModules)
@@ -44,6 +47,7 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
       await writeBundleJSFile(config, compilerCtx, fileName, jsText);
     });
   await Promise.all(esmPromises);
+  config.logger.debug(`generate esm finished`);
 
   if (config.buildEs5) {
     const es5Modules = jsModules.es5;
@@ -57,12 +61,15 @@ export async function generateBundles(config: Config, compilerCtx: CompilerCtx, 
         await writeBundleJSFile(config, compilerCtx, fileName, jsText);
       });
     await Promise.all(es5Promises);
+    config.logger.debug(`generate es5 finished`);
   }
+
 
   // create the registry of all the components
   const cmpRegistry = createComponentRegistry(entryModules);
 
   timeSpan.finish(`generate bundles finished`);
+  config.logger.debug(`generate bundles finished`);
 
   return cmpRegistry;
 }

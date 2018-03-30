@@ -16,6 +16,7 @@ export async function generateModuleMap(config: Config, compilerCtx: CompilerCtx
   }
 
   timeSpan.finish(`module map finished`);
+  config.logger.debug(`module map finished`);
 
   return jsModules;
 }

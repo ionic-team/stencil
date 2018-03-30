@@ -30,6 +30,7 @@ export async function transpileAppModules(config: Config, compilerCtx: CompilerC
   }
 
   timeSpan.finish(`compile finished`);
+  config.logger.debug(`compile finished`);
 }
 
 
