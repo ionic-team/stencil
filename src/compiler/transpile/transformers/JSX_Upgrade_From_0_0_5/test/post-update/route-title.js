@@ -1,4 +1,4 @@
-var RouteTitle = (function () {
+var RouteTitle = /** @class */ (function () {
     function RouteTitle() {
     }
     RouteTitle.prototype.componentWillLoad = function () {

@@ -1,4 +1,4 @@
-var SiteMenu = (function () {
+var SiteMenu = /** @class */ (function () {
     function SiteMenu() {
     }
     SiteMenu.prototype.render = function () {

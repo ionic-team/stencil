@@ -1,4 +1,4 @@
-var Redirect = (function () {
+var Redirect = /** @class */ (function () {
     function Redirect() {
     }
     Redirect.prototype.componentWillLoad = function () {

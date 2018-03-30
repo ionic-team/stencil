@@ -1,4 +1,4 @@
-var DocumentComponent = (function () {
+var DocumentComponent = /** @class */ (function () {
     function DocumentComponent() {
         this.pages = [];
     }

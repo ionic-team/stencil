@@ -1,4 +1,4 @@
-var SiteHeader = (function () {
+var SiteHeader = /** @class */ (function () {
     function SiteHeader() {
     }
     SiteHeader.prototype.render = function () {

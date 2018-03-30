@@ -7,8 +7,10 @@ export function collapseHtmlWhitepace(node: Node) {
   // have to climb through while it's creating vnodes from this HTML
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
-    for (let j = node.attributes.length - 1; j >= 0; j--) {
-      const attr = node.attributes[j];
+    const attributeList: any[] = (<{ [key: string]: any}>node).attributes;
+
+    for (let j = attributeList.length - 1; j >= 0; j--) {
+      const attr = attributeList[j];
       if (!attr.value) {
         if (SAFE_TO_REMOVE_EMPTY_ATTRS.includes(attr.name)) {
           (node as HTMLElement).removeAttribute(attr.name);

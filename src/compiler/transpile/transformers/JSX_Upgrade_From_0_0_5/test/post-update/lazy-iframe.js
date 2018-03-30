@@ -1,4 +1,4 @@
-var LazyIframe = (function () {
+var LazyIframe = /** @class */ (function () {
     function LazyIframe() {
     }
     LazyIframe.prototype.componentDidLoad = function () {
