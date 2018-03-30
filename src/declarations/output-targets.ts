@@ -69,6 +69,7 @@ export interface OutputTargetAngular extends OutputTarget {
   resourcesUrl?: string;
   typesDir?: string;
   directivesProxyFile?: string;
+  directivesArrayFile?: string;
   excludeComponents?: string[];
 }
 

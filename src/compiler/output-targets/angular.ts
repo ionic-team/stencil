@@ -1,6 +1,6 @@
 import * as d from '../../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
-
+import { basename, dirname, relative } from 'path';
 
 export function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
   const angularOuputTargets = (config.outputTargets as d.OutputTargetAngular[]).filter(o => o.type === 'angular' && o.directivesProxyFile);
@@ -12,7 +12,8 @@ export function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.Co
 
 
 async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular, cmpRegistry: d.ComponentRegistry) {
-  let c = angularDirectiveProxies(outputTarget.excludeComponents, cmpRegistry);
+  const metadata = getMetadata(outputTarget.excludeComponents, cmpRegistry);
+  let c = angularDirectiveProxies(metadata);
 
   const angularImports: string[] = [];
 
@@ -34,10 +35,19 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
   c = `/* angular directive proxies */\nimport { ${angularImports.sort().join(', ')} } from '@angular/core';\n\n` + c;
 
   await compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, c);
-
+  if (outputTarget.directivesArrayFile) {
+    const proxyPath = relativeImport(outputTarget.directivesArrayFile, outputTarget.directivesProxyFile);
+    const a = angularArray(metadata, proxyPath);
+    await compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, a);
+  }
   config.logger.debug(`generated angular directives: ${outputTarget.directivesProxyFile}`);
 }
 
+function relativeImport(pathFrom: string, pathTo: string) {
+  let relativePath = relative(dirname(pathFrom), dirname(pathTo));
+  relativePath = relativePath === '' ? '.' : relativePath;
+  return `${relativePath}/${basename(pathTo, '.ts')}`;
+}
 
 function angularProxyInput() {
   return [
@@ -62,9 +72,9 @@ function angularProxyOutput() {
   ].join('\n') + '\n';
 }
 
-
-function angularDirectiveProxies(excludeComponents: string[], cmpRegistry: d.ComponentRegistry) {
-  const metadata = Object.keys(cmpRegistry).map(key => cmpRegistry[key])
+function getMetadata(excludeComponents: string[], cmpRegistry: d.ComponentRegistry): d.ComponentMeta[] {
+  return Object.keys(cmpRegistry)
+    .map(key => cmpRegistry[key])
     .filter(c => {
       return !excludeComponents.includes(c.tagNameMeta);
     })
@@ -73,18 +83,27 @@ function angularDirectiveProxies(excludeComponents: string[], cmpRegistry: d.Com
       if (a.componentClass > b.componentClass) return 1;
       return 0;
     });
+}
 
+function angularDirectiveProxies(metadata: d.ComponentMeta[]) {
   const allInstanceMembers: string[] = [];
-
-  let c = metadata.map(cmpMeta => angularDirectiveProxy(allInstanceMembers, cmpMeta)).join('\n');
-
+  const c = metadata.map(cmpMeta => angularDirectiveProxy(allInstanceMembers, cmpMeta)).join('\n');
   allInstanceMembers.sort();
 
   const instanceMembers = allInstanceMembers.map(v => `${v} = '${v}'`).join(', ');
 
-  c = `const ${instanceMembers};\n\n${c}`;
+  return `const ${instanceMembers};\n\n${c}`;
+}
 
-  return c;
+function angularArray(metadata: d.ComponentMeta[], proxyPath: string) {
+  const directives = metadata.map(cmpMeta => `d.${cmpMeta.componentClass}`).join(',\n  ');
+  return `
+import * as d from '${proxyPath}';
+
+export const DIRECTIVES = [
+  ${directives}
+];
+`;
 }
 
 
