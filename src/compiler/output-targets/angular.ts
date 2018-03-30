@@ -119,19 +119,17 @@ function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.Componen
     const m = cmpMeta.membersMeta[memberName];
 
     if (m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable) {
-      if (m.propType === PROP_TYPE.String || m.propType === PROP_TYPE.Number || m.propType === PROP_TYPE.Boolean || m.propType === PROP_TYPE.Any) {
-        o.push(getInput(memberName, m));
+      o.push(getInput(memberName, m));
 
-        if (RESERVED_KEYWORDS.includes(memberName)) {
-          inputMembers.push(`'${memberName}'`);
+      if (RESERVED_KEYWORDS.includes(memberName)) {
+        inputMembers.push(`'${memberName}'`);
 
-        } else {
-          if (!allInstanceMembers.includes(memberName)) {
-            allInstanceMembers.push(memberName);
-          }
-
-          inputMembers.push(memberName);
+      } else {
+        if (!allInstanceMembers.includes(memberName)) {
+          allInstanceMembers.push(memberName);
         }
+
+        inputMembers.push(memberName);
       }
     }
   });
