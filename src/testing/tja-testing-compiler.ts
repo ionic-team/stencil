@@ -9,10 +9,13 @@ import * as d from '../declarations';
 export class TjaTestingCompiler extends Compiler {
 
   constructor(config?: Config) {
-    config = config || new TestingConfig();
-    // POSIX: '/'
-    // Windows: 'C:/'
-    config.rootDir = path.resolve('/');
+    if (!config) {
+      config = new TestingConfig();
+      // POSIX: '/'
+      // Windows: 'C:/'
+      config.rootDir = path.resolve('/');
+    }
+
     super(config);
   }
 
