@@ -1,4 +1,4 @@
-import { dashToPascalCase, toDashCase } from '../helpers';
+import { dashToPascalCase, isDef, toDashCase } from '../helpers';
 
 
 describe('util helpers', () => {
@@ -39,6 +39,42 @@ describe('util helpers', () => {
 
     it('wisconsin => wisconsin', () => {
       expect(toDashCase('wisconsin')).toBe('wisconsin');
+    });
+
+  });
+
+  describe('isDef', () => {
+
+    it('number', () => {
+      expect(isDef(88)).toBe(true);
+    });
+
+    it('string', () => {
+      expect(isDef('str')).toBe(true);
+    });
+
+    it('object', () => {
+      expect(isDef({})).toBe(true);
+    });
+
+    it('array', () => {
+      expect(isDef([])).toBe(true);
+    });
+
+    it('false', () => {
+      expect(isDef(false)).toBe(true);
+    });
+
+    it('true', () => {
+      expect(isDef(true)).toBe(true);
+    });
+
+    it('undefined', () => {
+      expect(isDef(undefined)).toBe(false);
+    });
+
+    it('null', () => {
+      expect(isDef(null)).toBe(false);
     });
 
   });
