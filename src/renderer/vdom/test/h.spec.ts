@@ -1,3 +1,4 @@
+import * as d from '../../../declarations';
 import { h } from '../h';
 
 
@@ -131,9 +132,24 @@ describe('h()', () => {
     expect(vnode.vkey).toBe('my-key');
   });
 
-  it('should not set vkey', () => {
+  it('should set vkey to undefined when key is undefined', () => {
+    const vnode = h('div', { key: undefined });
+    expect(vnode.vkey).toBe(undefined);
+  });
+
+  it('should set vkey to undefined when key is null', () => {
+    const vnode = h('div', { key: null });
+    expect(vnode.vkey).toBe(undefined);
+  });
+
+  it('should set vkey to undefined when we have data, but no key', () => {
+    const vnode = h('div', { some: 'data' });
+    expect(vnode.vkey).toBe(undefined);
+  });
+
+  it('should set vkey to undefined when no data', () => {
     const vnode = h('div', null);
-    expect(vnode.vkey).toBe(null);
+    expect(vnode.vkey).toBe(undefined);
   });
 
   it('should set vattrs ref', () => {
@@ -246,4 +262,48 @@ describe('h()', () => {
     expect(vnode.vchildren[0].vtext).toEqual('I am a string');
   });
 
+  it('should not be same vnode with same tag and different key', () => {
+    const vnode1 = h('a', { attr: '1', key: 'mykey1' }, '1');
+    const vnode2 = h('a', { attr: '2', key: 'mykey2' }, '2');
+    expect(isSameVnode(vnode1, vnode2)).toBe(false);
+  });
+
+  it('should not be same vnode with different tag and same key', () => {
+    const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
+    const vnode2 = h('b', { attr: '2', key: 'mykey' }, '2');
+    expect(isSameVnode(vnode1, vnode2)).toBe(false);
+  });
+
+  it('should not be same vnode with different tag and no key', () => {
+    const vnode1 = h('a', null, '1');
+    const vnode2 = h('b', null, '2');
+    expect(isSameVnode(vnode1, vnode2)).toBe(false);
+  });
+
+  it('should be same vnode with same tag and same key', () => {
+    const vnode1 = h('a', { attr: '1', key: 'mykey' }, '1');
+    const vnode2 = h('a', { attr: '2', key: 'mykey' }, '2');
+    expect(isSameVnode(vnode1, vnode2)).toBe(true);
+  });
+
+  it('should be same vnode with same tag and defined data, but no key', () => {
+    const vnode1 = h('a', { attr: '1' }, '1');
+    const vnode2 = h('a', { attr: '2' }, '2');
+    expect(isSameVnode(vnode1, vnode2)).toBe(true);
+  });
+
+  it('should be same vnode with same tag and undefined data', () => {
+    const vnode1 = h('a', null, '1');
+    const vnode2 = h('a', null, '2');
+    expect(isSameVnode(vnode1, vnode2)).toBe(true);
+  });
+
 });
+
+
+function isSameVnode(vnode1: d.VNode, vnode2: d.VNode) {
+  // same function that's used within the patch() function
+  // compare if two vnode to see if they're "technically" the same
+  // need to have the same element tag, and same key to be the same
+  return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
+}

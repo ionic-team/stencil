@@ -19,13 +19,13 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
   let lastSimple = false;
   let simple = false;
 
-  for (var i = arguments.length; i-- > 2; ) {
+  for (var i = arguments.length; i-- > 2;) {
     stack.push(arguments[i]);
   }
 
-  while (stack.length) {
+  while (stack.length > 0) {
     if ((child = stack.pop()) && child.pop !== undefined) {
-      for (i = child.length; i--; ) {
+      for (i = child.length; i--;) {
         stack.push(child[i]);
       }
 
@@ -58,7 +58,9 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
     }
   }
 
-  if (vnodeData) {
+  let vkey: any;
+
+  if (vnodeData != null) {
     // normalize class / classname attributes
     if (vnodeData['className']) {
       vnodeData['class'] = vnodeData['className'];
@@ -74,6 +76,10 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
       vnodeData['class'] = stack.join(' ');
       stack.length = 0;
     }
+
+    if (vnodeData.key != null) {
+      vkey = vnodeData.key;
+    }
   }
 
   if (typeof nodeName === 'function') {
@@ -87,10 +93,10 @@ export function h(nodeName: any, vnodeData: any, child?: any) {
   return {
     vtag: nodeName,
     vchildren: children,
-    vtext: null,
+    vtext: undefined,
     vattrs: vnodeData,
-    vkey: vnodeData && vnodeData.key,
-    elm: null,
+    vkey: vkey,
+    elm: undefined,
     ishost: false
   } as d.VNode;
 }
