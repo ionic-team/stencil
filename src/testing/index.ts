@@ -1,6 +1,5 @@
 
 export * from './testing-compiler';
-export * from './tja-testing-compiler';
 export * from './testing-config';
 export * from './testing-fs';
 export * from './testing-logger';

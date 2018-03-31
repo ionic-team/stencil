@@ -1,4 +1,4 @@
-import { TestingConfig, TjaTestingCompiler } from '../../../testing/index';
+import { TestingCompiler, TestingConfig } from '../../../testing/index';
 import { expectFiles } from '../../../testing/utils';
 
 
@@ -6,10 +6,10 @@ describe('bundle-module', () => {
 
   describe('build', () => {
 
-    let c: TjaTestingCompiler;
+    let c: TestingCompiler;
 
     beforeEach(async () => {
-      c = new TjaTestingCompiler();
+      c = new TestingCompiler();
 
       await c.writeFile('/src/index.html', `<cmp-a></cmp-a>`);
       await c.fs.commit();
