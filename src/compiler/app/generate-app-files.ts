@@ -66,6 +66,9 @@ async function generateCoreEsm(config: d.Config, compilerCtx: d.CompilerCtx, bui
   // figure out which sections should be included in the core build
   const buildConditionals = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
   buildConditionals.coreId = 'core';
+  if (buildConditionals.slotPolyfill) {
+    buildConditionals.slotPolyfill = !!(buildCtx.hasSlot);
+  }
 
   const coreFilename = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs2015, buildConditionals);
   appRegistry.core = coreFilename;
@@ -82,6 +85,7 @@ async function generateCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
     buildConditionalsEs5.es5 = true;
     buildConditionalsEs5.polyfills = true;
     buildConditionalsEs5.cssVarShim = true;
+    buildConditionalsEs5.slotPolyfill = !!(buildCtx.hasSlot);
 
     const coreFilenameEs5 = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs5, buildConditionalsEs5);
     appRegistry.corePolyfilled = coreFilenameEs5;

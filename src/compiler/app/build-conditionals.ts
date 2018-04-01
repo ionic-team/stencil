@@ -18,7 +18,8 @@ export async function setBuildConditionals(config: Config, compilerCtx: Compiler
   coreBuild.isDev = !!config.devMode;
   coreBuild.isProd = !config.devMode;
 
-  coreBuild.svg = !!buildCtx.hasSvg;
+  coreBuild.hasSlot = !!buildCtx.hasSlot;
+  coreBuild.hasSvg = !!buildCtx.hasSvg;
 
   coreBuild.devInspector = config.devInspector;
   coreBuild.verboseError = config.devMode;
@@ -80,6 +81,8 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
 
   if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
     coreBuild.shadowDom = true;
+  } else {
+    coreBuild.slotPolyfill = true;
   }
 
   if (cmpMeta.membersMeta) {
@@ -147,27 +150,27 @@ export function setBuildFromComponentContent(coreBuild: BuildConditionals, jsTex
   // wasn't needed, but these keywords are all pretty unique already
 
   if (!coreBuild.cmpWillLoad) {
-    coreBuild.cmpWillLoad = (jsText.indexOf('componentWillLoad') > -1);
+    coreBuild.cmpWillLoad = (jsText.includes('componentWillLoad'));
   }
 
   if (!coreBuild.cmpDidLoad) {
-    coreBuild.cmpDidLoad = (jsText.indexOf('componentDidLoad') > -1);
+    coreBuild.cmpDidLoad = (jsText.includes('componentDidLoad'));
   }
 
   if (!coreBuild.cmpWillUpdate) {
-    coreBuild.cmpWillUpdate = (jsText.indexOf('componentWillUpdate') > -1);
+    coreBuild.cmpWillUpdate = (jsText.includes('componentWillUpdate'));
   }
 
   if (!coreBuild.cmpDidUpdate) {
-    coreBuild.cmpDidUpdate = (jsText.indexOf('componentDidUpdate') > -1);
+    coreBuild.cmpDidUpdate = (jsText.includes('componentDidUpdate'));
   }
 
   if (!coreBuild.cmpDidUnload) {
-    coreBuild.cmpDidUnload = (jsText.indexOf('componentDidUnload') > -1);
+    coreBuild.cmpDidUnload = (jsText.includes('componentDidUnload'));
   }
 
   if (!coreBuild.hostData) {
-    coreBuild.hostData = (jsText.indexOf('hostData') > -1);
+    coreBuild.hostData = (jsText.includes('hostData'));
   }
 
 }

@@ -1,9 +1,9 @@
-import { BuildConditionals, BuildCtx, CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
+import * as d from '../../declarations';
 import { RESERVED_PROPERTIES } from './reserved-properties';
 import { transpileCoreBuild } from '../transpile/core-build';
 
 
-export async function buildCoreContent(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, coreBuild: BuildConditionals, coreContent: string) {
+export async function buildCoreContent(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, coreBuild: d.BuildConditionals, coreContent: string) {
   const timespan = config.logger.createTimeSpan(`buildCoreContent ${coreBuild.coreId} start`, true);
 
   const transpileResults = await transpileCoreBuild(compilerCtx, coreBuild, coreContent);
@@ -15,7 +15,7 @@ export async function buildCoreContent(config: Config, compilerCtx: CompilerCtx,
 
   coreContent = transpileResults.code;
 
-  const sourceTarget: SourceTarget = coreBuild.es5 ? 'es5' : 'es2015';
+  const sourceTarget: d.SourceTarget = coreBuild.es5 ? 'es5' : 'es2015';
 
   const minifyResults = await minifyCore(config, compilerCtx, sourceTarget, coreContent);
 
@@ -30,7 +30,7 @@ export async function buildCoreContent(config: Config, compilerCtx: CompilerCtx,
 }
 
 
-async function minifyCore(config: Config, compilerCtx: CompilerCtx, sourceTarget: SourceTarget, input: string) {
+async function minifyCore(config: d.Config, compilerCtx: d.CompilerCtx, sourceTarget: d.SourceTarget, input: string) {
   const opts: any = Object.assign({}, config.minifyJs ? PROD_MINIFY_OPTS : DEV_MINIFY_OPTS);
 
   if (sourceTarget === 'es5') {
@@ -73,7 +73,7 @@ async function minifyCore(config: Config, compilerCtx: CompilerCtx, sourceTarget
   if (cachedContent != null) {
     return {
       output: cachedContent,
-      diagnostics: [] as Diagnostic[]
+      diagnostics: [] as d.Diagnostic[]
     };
   }
 

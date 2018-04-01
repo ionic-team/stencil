@@ -81,7 +81,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
         hostVNode,
         isUpdateRender,
         cmpMeta.componentConstructor.encapsulation,
-        loadHostContent(plt.domApi, elm)
+        Build.slotPolyfill ? loadHostContent(plt.domApi, elm) : {}
       );
 
       plt.vnodeMap.set(elm, vnode);

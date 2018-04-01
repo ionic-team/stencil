@@ -21,7 +21,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   // which gets called numerous times by each component
 
   function createElm(vnode: d.VNode, parentElm: Node, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
-    if (!useNativeShadowDom && vnode.vtag === 'slot') {
+    if (Build.slotPolyfill && !useNativeShadowDom && vnode.vtag === 'slot') {
       if (hostContent.defaultSlot || hostContent.namedSlots) {
         if (scopeId) {
           domApi.$setAttribute(parentElm, scopeId + '-slot', '');
@@ -86,9 +86,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
     } else {
       // create element
-      elm = vnode.elm = ((Build.svg && (isSvgMode || vnode.vtag === 'svg')) ? domApi.$createElementNS('http://www.w3.org/2000/svg', vnode.vtag) : domApi.$createElement(vnode.vtag));
+      elm = vnode.elm = ((Build.hasSvg && (isSvgMode || vnode.vtag === 'svg')) ? domApi.$createElementNS('http://www.w3.org/2000/svg', vnode.vtag) : domApi.$createElement(vnode.vtag));
 
-      if (Build.svg) {
+      if (Build.hasSvg) {
         isSvgMode = vnode.vtag === 'svg' ? true : (vnode.vtag === 'foreignObject' ? false : isSvgMode);
       }
 
@@ -139,7 +139,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         }
       }
 
-      if (Build.svg) {
+      if (Build.hasSvg) {
         // Only reset the SVG context when we're exiting SVG element
         if (vnode.vtag === 'svg') {
           isSvgMode = false;
@@ -297,7 +297,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     const oldChildren = oldVNode.vchildren;
     const newChildren = newVNode.vchildren;
 
-    if (Build.svg) {
+    if (Build.hasSvg) {
       // test if we're rendering an svg element, or still rendering nodes inside of one
       // only add this to the when the compiler sees we're using an svg somewhere
       isSvgMode = newVNode.elm && newVNode.elm.parentElement != null && (newVNode.elm as SVGElement).ownerSVGElement !== undefined;
@@ -332,7 +332,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (defaultHolder = (elm.$defaultHolder)) {
+    } else if (Build.slotPolyfill && (defaultHolder = (elm.$defaultHolder))) {
       // this element has slotted content
       domApi.$setTextContent(domApi.$parentNode(defaultHolder), newVNode.vtext);
 
@@ -342,7 +342,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       domApi.$setTextContent(elm, newVNode.vtext);
     }
 
-    if (Build.svg) {
+    if (Build.hasSvg) {
       // reset svgMode when svg node is fully patched
       if (isSvgMode && 'svg' === newVNode.vtag) {
         isSvgMode = false;
@@ -371,7 +371,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       }
     }
 
-    scopeId = (encapsulation === 'scoped' || (encapsulation === 'shadow' && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
+    if (Build.slotPolyfill) {
+      scopeId = (encapsulation === 'scoped' || (encapsulation === 'shadow' && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
+    }
 
     if (Build.shadowDom) {
       // use native shadow dom only if the component wants to use it
@@ -387,7 +389,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         // let's create that shadow root
         oldVNode.elm = domApi.$attachShadow(oldVNode.elm, { mode: 'open' });
 
-      } else if (scopeId) {
+      } else if (Build.slotPolyfill && scopeId) {
         // this host element should use scoped css
         // add the scope attribute to the host
         domApi.$setAttribute(oldVNode.elm, scopeId + '-host', '');

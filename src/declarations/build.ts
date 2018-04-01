@@ -30,6 +30,7 @@ export interface BuildCtx {
   filesAdded: string[];
   shouldAbort?(): boolean;
   data?: any;
+  hasSlot?: boolean;
   hasSvg?: boolean;
   finish?(): Promise<BuildResults>;
 }
@@ -57,6 +58,7 @@ export interface BuildResults {
   filesDeleted: string[];
   components: BuildComponent[];
   entries: BuildEntry[];
+  hasSlot: boolean;
   hasSvg: boolean;
 }
 

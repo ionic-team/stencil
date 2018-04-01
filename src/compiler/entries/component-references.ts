@@ -13,6 +13,9 @@ export function getComponentRefsFromSourceStrings(allModuleFiles: ModuleFiles, b
       if (typeof src.tag === 'string') {
         src.tag = src.tag.toLowerCase();
 
+        if (!buildCtx.hasSlot) {
+          buildCtx.hasSlot = src.tag === 'slot';
+        }
         if (!buildCtx.hasSvg) {
           buildCtx.hasSvg = src.tag === 'svg';
         }
@@ -48,6 +51,12 @@ export function getComponentRefsFromSourceStrings(allModuleFiles: ModuleFiles, b
             filePath: src.filePath
           });
         });
+
+        if (!buildCtx.hasSlot) {
+          buildCtx.hasSlot = src.html.includes('<slot>') ||
+                            src.html.includes('</slot>') ||
+                            src.html.includes('<slot~');
+        }
 
         if (!buildCtx.hasSvg) {
           buildCtx.hasSvg = src.html.includes('<svg>') ||

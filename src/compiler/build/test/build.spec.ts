@@ -38,6 +38,9 @@ describe('build', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
+    expect(r.hasSlot).toBe(false);
+    expect(r.hasSvg).toBe(false);
+
     const output = await c.fs.readFile('/www/build/app/cmp-a.js');
     expect(output).toContain('/*! Built with http://stenciljs.com */\nconst{h:t}=window.App;class s{static get is(){return"cmp-a"}}export{s as CmpA};');
   });

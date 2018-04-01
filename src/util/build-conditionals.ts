@@ -4,6 +4,7 @@ import { BuildConditionals } from '../declarations';
 export const Build: BuildConditionals = {
   cssVarShim: true,
   shadowDom: true,
+  slotPolyfill: true,
   ssrServerSide: true,
 
   devInspector: true,
@@ -14,7 +15,8 @@ export const Build: BuildConditionals = {
   hostData: true,
   hostTheme: true,
   reflectToAttr: true,
-  svg: true,
+  hasSlot: true,
+  hasSvg: true,
   observeAttr: true,
   isDev: true,
   isProd: false,

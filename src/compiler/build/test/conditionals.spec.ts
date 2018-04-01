@@ -19,12 +19,13 @@ describe('build conditionals', () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFiles({
       '/src/new-tab-icon.tsx': `
-        const NewTabIcon = () => (
+        const NewTabIcon = () => [
           <svg class="new-tab" viewBox="0 0 43 42">
             <rect class="new-tab__box" y="8" width="34" height="34" rx="6"/>
             <path class="new-tab__arrow" d="M37.078 3.268H23.617V.243h18.626v18.625h-3.026V5.407L16.13 28.494l-2.14-2.139z"/>
-          </svg>
-        );
+          </svg>,
+          <slot/>
+        ];
         export default NewTabIcon;
       `,
 
@@ -43,16 +44,17 @@ describe('build conditionals', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
+    expect(r.hasSlot).toBe(true);
     expect(r.hasSvg).toBe(true);
   });
 
-  it('svg in innerHTML', async () => {
+  it('svg and slot in innerHTML', async () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFile('/src/cmp-a.tsx', `
       @Component({ tag: 'cmp-a' }) export class CmpA {
 
         constructor() {
-          this.elm.innerHTML = '<svg></svg>';
+          this.elm.innerHTML = '<svg></svg><slot></slot>';
         }
 
         render() {
@@ -65,16 +67,17 @@ describe('build conditionals', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
+    expect(r.hasSlot).toBe(true);
     expect(r.hasSvg).toBe(true);
   });
 
-  it('svg in render()', async () => {
+  it('svg and slot in render()', async () => {
     c.config.bundles = [ { components: ['cmp-a'] } ];
     await c.fs.writeFile('/src/cmp-a.tsx', `
       @Component({ tag: 'cmp-a' }) export class CmpA {
 
         render() {
-          return <svg/>;
+          return [<svg/>, <slot/>];
         }
       }
     `, { clearFileCache: true });
@@ -83,6 +86,7 @@ describe('build conditionals', () => {
     const r = await c.build();
     expect(r.diagnostics).toEqual([]);
 
+    expect(r.hasSlot).toBe(true);
     expect(r.hasSvg).toBe(true);
   });
 

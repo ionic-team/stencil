@@ -21,6 +21,7 @@ export interface BuildConditionals {
 
   // dom
   shadowDom: boolean;
+  slotPolyfill: boolean;
 
   // vdom
   hostData: boolean;
@@ -46,8 +47,9 @@ export interface BuildConditionals {
   // attr
   observeAttr: boolean;
 
-  // svg
-  svg: boolean;
+  // elements
+  hasSlot: boolean;
+  hasSvg: boolean;
 }
 
 export interface UserBuildConditionals {

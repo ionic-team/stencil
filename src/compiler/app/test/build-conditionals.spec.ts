@@ -72,16 +72,28 @@ describe('build conditionals', () => {
 
   describe('setBuildConditionals', () => {
 
-    it('set Build.svg true', async () => {
-      buildCtx.hasSvg = true;
+    it('set Build.hasSlot true', async () => {
+      buildCtx.hasSlot = true;
       const bc = await setBuildConditionals(config, {}, buildCtx, []);
-      expect(bc.svg).toBe(true);
+      expect(bc.hasSlot).toBe(true);
     });
 
-    it('set Build.svg false', async () => {
+    it('set Build.hasSlot false', async () => {
+      buildCtx.hasSlot = false;
+      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      expect(bc.hasSlot).toBe(false);
+    });
+
+    it('set Build.hasSvg true', async () => {
+      buildCtx.hasSvg = true;
+      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      expect(bc.hasSvg).toBe(true);
+    });
+
+    it('set Build.hasSvg false', async () => {
       buildCtx.hasSvg = false;
       const bc = await setBuildConditionals(config, {}, buildCtx, []);
-      expect(bc.svg).toBe(false);
+      expect(bc.hasSvg).toBe(false);
     });
 
     it('set Build.isDev', async () => {
@@ -148,20 +160,37 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.hostTheme).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
+      expect(Object.keys(coreBuild)).toHaveLength(2);
+      expect(coreBuild.slotPolyfill).toBeTruthy();
     });
 
     it('styles', () => {
       cmpMeta.stylesMeta = {};
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.styles).toBeTruthy();
-      expect(Object.keys(coreBuild).length).toBe(1);
+      expect(Object.keys(coreBuild)).toHaveLength(2);
+      expect(coreBuild.slotPolyfill).toBeTruthy();
     });
 
     it('shadowDom', () => {
       cmpMeta.encapsulation = ENCAPSULATION.ShadowDom;
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.shadowDom).toBeTruthy();
+      expect(coreBuild.slotPolyfill).toBeFalsy();
+    });
+
+    it('slotPolyfill cuz ScopedCss', () => {
+      cmpMeta.encapsulation = ENCAPSULATION.ScopedCss;
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild.slotPolyfill).toBeTruthy();
+      expect(coreBuild.shadowDom).toBeFalsy();
+    });
+
+    it('slotPolyfill cuz NoEncapsulation', () => {
+      cmpMeta.encapsulation = ENCAPSULATION.NoEncapsulation;
+      setBuildFromComponentMeta(coreBuild, cmpMeta);
+      expect(coreBuild.slotPolyfill).toBeTruthy();
+      expect(coreBuild.shadowDom).toBeFalsy();
     });
 
     it('listener', () => {
@@ -250,12 +279,14 @@ describe('build conditionals', () => {
       };
       setBuildFromComponentMeta(coreBuild, cmpMeta);
       expect(coreBuild.observeAttr).toBeFalsy();
-      expect(Object.keys(coreBuild).length).toBe(0);
+      expect(Object.keys(coreBuild)).toHaveLength(1);
+      expect(coreBuild.slotPolyfill).toBeTruthy();
     });
 
     it('should do nothing with no member meta', () => {
       setBuildFromComponentMeta(coreBuild, cmpMeta);
-      expect(Object.keys(coreBuild).length).toBe(0);
+      expect(Object.keys(coreBuild)).toHaveLength(1);
+      expect(coreBuild.slotPolyfill).toBeTruthy();
     });
 
   });

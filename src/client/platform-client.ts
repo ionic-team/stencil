@@ -105,19 +105,21 @@ export function createPlatformClient(namespace: string, Context: d.CoreContext, 
       elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
 
-    // host element has been connected to the DOM
-    if (!domApi.$getAttribute(elm, SSR_VNODE_ID) && !useShadowDom(domApi.$supportsShadowDom, cmpMeta)) {
-      // only required when we're NOT using native shadow dom (slot)
-      // this host element was NOT created with SSR
-      // let's pick out the inner content for slot projection
-      initHostContent(domApi, elm);
-    }
+    if (Build.slotPolyfill) {
+      // host element has been connected to the DOM
+      if (!domApi.$getAttribute(elm, SSR_VNODE_ID) && !useShadowDom(domApi.$supportsShadowDom, cmpMeta)) {
+        // only required when we're NOT using native shadow dom (slot)
+        // this host element was NOT created with SSR
+        // let's pick out the inner content for slot projection
+        initHostContent(domApi, elm);
+      }
 
-    if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-      // this component should use shadow dom
-      // but this browser doesn't support it
-      // so let's polyfill a few things for the user
-      (elm as any).shadowRoot = elm;
+      if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
+        // this component should use shadow dom
+        // but this browser doesn't support it
+        // so let's polyfill a few things for the user
+        (elm as any).shadowRoot = elm;
+      }
     }
   }
 
