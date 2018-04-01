@@ -1,10 +1,16 @@
-import { BuildConditionals, BuildCtx, CompilerCtx, ComponentMeta, Config, EntryModule, ModuleFile } from '../../declarations';
+import * as d from '../../declarations';
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { isTsFile } from '../util';
 
 
-export async function setBuildConditionals(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
-  const existingCoreBuild = getLastBuildConditionals(compilerCtx, buildCtx);
+export async function setBuildConditionals(
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  coreId: 'core' | 'core.pf',
+  buildCtx: d.BuildCtx,
+  entryModules: d.EntryModule[]
+) {
+  const existingCoreBuild = getLastBuildConditionals(compilerCtx, coreId, buildCtx);
   if (existingCoreBuild) {
     // cool we can use the last build conditionals
     // because it's a rebuild, and was probably only a css or html change
@@ -13,7 +19,8 @@ export async function setBuildConditionals(config: Config, compilerCtx: Compiler
   }
 
   // figure out which sections of the core code this build doesn't even need
-  const coreBuild: BuildConditionals = ({} as any);
+  const coreBuild: d.BuildConditionals = ({} as any);
+  coreBuild.coreId = coreId;
   coreBuild.clientSide = true;
   coreBuild.isDev = !!config.devMode;
   coreBuild.isProd = !config.devMode;
@@ -36,14 +43,27 @@ export async function setBuildConditionals(config: Config, compilerCtx: Compiler
 
   await Promise.all(promises);
 
-  compilerCtx.lastBuildConditionals = coreBuild;
+  if (coreId === 'core') {
+    coreBuild.slotPolyfill = !!coreBuild.slotPolyfill;
+    if (coreBuild.slotPolyfill) {
+      coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
+    }
+    compilerCtx.lastBuildConditionalsEsm = coreBuild;
+
+  } else if (coreId === 'core.pf') {
+    coreBuild.es5 = true;
+    coreBuild.polyfills = true;
+    coreBuild.cssVarShim = true;
+    coreBuild.slotPolyfill = !!(buildCtx.hasSlot);
+    compilerCtx.lastBuildConditionalsEs5 = coreBuild;
+  }
 
   return coreBuild;
 }
 
 
-export function getLastBuildConditionals(compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
-  if (compilerCtx.isRebuild && compilerCtx.lastBuildConditionals && Array.isArray(buildCtx.filesChanged)) {
+export function getLastBuildConditionals(compilerCtx: d.CompilerCtx, coreId: 'core' | 'core.pf', buildCtx: d.BuildCtx) {
+  if (compilerCtx.isRebuild && Array.isArray(buildCtx.filesChanged)) {
     // this is a rebuild and we do have lastBuildConditionals already
     const hasChangedTsFile = buildCtx.filesChanged.some(filePath => {
       return isTsFile(filePath);
@@ -52,7 +72,13 @@ export function getLastBuildConditionals(compilerCtx: CompilerCtx, buildCtx: Bui
     if (!hasChangedTsFile) {
       // we didn't have a typescript change
       // so it's ok to use the lastBuildConditionals
-      return compilerCtx.lastBuildConditionals;
+      if (coreId === 'core' && compilerCtx.lastBuildConditionalsEsm) {
+        return compilerCtx.lastBuildConditionalsEsm;
+      }
+
+      if (coreId === 'core.pf' && compilerCtx.lastBuildConditionalsEs5) {
+        return compilerCtx.lastBuildConditionalsEs5;
+      }
     }
   }
 
@@ -61,7 +87,7 @@ export function getLastBuildConditionals(compilerCtx: CompilerCtx, buildCtx: Bui
 }
 
 
-async function setBuildFromComponent(config: Config, compilerCtx: CompilerCtx, coreBuild: BuildConditionals, moduleFile: ModuleFile) {
+async function setBuildFromComponent(config: d.Config, compilerCtx: d.CompilerCtx, coreBuild: d.BuildConditionals, moduleFile: d.ModuleFile) {
   setBuildFromComponentMeta(coreBuild, moduleFile.cmpMeta);
 
   if (moduleFile.jsFilePath) {
@@ -76,7 +102,7 @@ async function setBuildFromComponent(config: Config, compilerCtx: CompilerCtx, c
 }
 
 
-export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta: ComponentMeta) {
+export function setBuildFromComponentMeta(coreBuild: d.BuildConditionals, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta) return;
 
   if (cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
@@ -138,7 +164,7 @@ export function setBuildFromComponentMeta(coreBuild: BuildConditionals, cmpMeta:
 }
 
 
-export function setBuildFromComponentContent(coreBuild: BuildConditionals, jsText: string) {
+export function setBuildFromComponentContent(coreBuild: d.BuildConditionals, jsText: string) {
   if (typeof jsText !== 'string') return;
 
   // hacky to do it this way...yeah

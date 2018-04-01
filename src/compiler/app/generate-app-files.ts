@@ -61,16 +61,12 @@ export async function generateAppFilesOutputTarget(config: d.Config, compilerCtx
 
 async function generateCoreEsm(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTarget: d.OutputTarget, entryModules: d.EntryModule[], appRegistry: d.AppRegistry) {
   // esm core build
-  const globalJsContentsEs2015 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
+  const globalJsContentsEsm = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry);
 
   // figure out which sections should be included in the core build
-  const buildConditionals = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
-  buildConditionals.coreId = 'core';
-  if (buildConditionals.slotPolyfill) {
-    buildConditionals.slotPolyfill = !!(buildCtx.hasSlot);
-  }
+  const buildConditionals = await setBuildConditionals(config, compilerCtx, 'core', buildCtx, entryModules);
 
-  const coreFilename = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs2015, buildConditionals);
+  const coreFilename = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEsm, buildConditionals);
   appRegistry.core = coreFilename;
 }
 
@@ -80,12 +76,7 @@ async function generateCoreEs5(config: d.Config, compilerCtx: d.CompilerCtx, bui
     // core es5 build
     const globalJsContentsEs5 = await generateAppGlobalScript(config, compilerCtx, buildCtx, appRegistry, 'es5');
 
-    const buildConditionalsEs5 = await setBuildConditionals(config, compilerCtx, buildCtx, entryModules);
-    buildConditionalsEs5.coreId = 'core.pf';
-    buildConditionalsEs5.es5 = true;
-    buildConditionalsEs5.polyfills = true;
-    buildConditionalsEs5.cssVarShim = true;
-    buildConditionalsEs5.slotPolyfill = !!(buildCtx.hasSlot);
+    const buildConditionalsEs5 = await setBuildConditionals(config, compilerCtx, 'core.pf', buildCtx, entryModules);
 
     const coreFilenameEs5 = await generateCore(config, compilerCtx, buildCtx, outputTarget, globalJsContentsEs5, buildConditionalsEs5);
     appRegistry.corePolyfilled = coreFilenameEs5;

@@ -22,48 +22,48 @@ describe('build conditionals', () => {
   });
 
 
-  describe('getLastBuildConditionals',  () => {
+  describe('getlastBuildConditionalsEsm',  () => {
 
     it('use last build cuz only a css/html file changes', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionals = {
+      compilerCtx.lastBuildConditionalsEsm = {
         svg: true
       } as any;
       buildCtx.filesChanged = ['/src/app.css', '/src/index.html'];
-      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toEqual({svg: true});
     });
 
     it('no last build cuz a tsx file change', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionals = {
+      compilerCtx.lastBuildConditionalsEsm = {
         svg: true
       } as any;
       buildCtx.filesChanged = ['/src/cmp.tsx'];
-      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toBe(null);
     });
 
     it('no last build cuz a ts file change', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionals = {
+      compilerCtx.lastBuildConditionalsEsm = {
         svg: true
       } as any;
       buildCtx.filesChanged = ['/src/cmp.ts', '/src/app.css', '/src/index.html'];
-      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toBe(null);
     });
 
-    it('no last build cuz no compilerCtx.lastBuildConditionals', () => {
+    it('no last build cuz no compilerCtx.lastBuildConditionalsEsm', () => {
       compilerCtx.isRebuild = true;
-      compilerCtx.lastBuildConditionals = null;
-      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      compilerCtx.lastBuildConditionalsEsm = null;
+      const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toBe(null);
     });
 
     it('no last build cuz not rebuild', () => {
       compilerCtx.isRebuild = false;
-      const b = getLastBuildConditionals(compilerCtx, buildCtx);
+      const b = getLastBuildConditionals(compilerCtx, 'core', buildCtx);
       expect(b).toBe(null);
     });
 
@@ -74,40 +74,51 @@ describe('build conditionals', () => {
 
     it('set Build.hasSlot true', async () => {
       buildCtx.hasSlot = true;
-      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
       expect(bc.hasSlot).toBe(true);
     });
 
     it('set Build.hasSlot false', async () => {
       buildCtx.hasSlot = false;
-      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
       expect(bc.hasSlot).toBe(false);
     });
 
     it('set Build.hasSvg true', async () => {
       buildCtx.hasSvg = true;
-      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
       expect(bc.hasSvg).toBe(true);
     });
 
     it('set Build.hasSvg false', async () => {
       buildCtx.hasSvg = false;
-      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
       expect(bc.hasSvg).toBe(false);
     });
 
     it('set Build.isDev', async () => {
       config.devMode = true;
-      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
       expect(bc.isDev).toBe(true);
       expect(bc.isProd).toBe(false);
     });
 
     it('set Build.isProd', async () => {
       config.devMode = false;
-      const bc = await setBuildConditionals(config, {}, buildCtx, []);
+      const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
       expect(bc.isDev).toBe(false);
       expect(bc.isProd).toBe(true);
+    });
+
+    it('set compilerCtx lastBuildConditionalsEs5', async () => {
+      const bc = await setBuildConditionals(config, compilerCtx, 'core.pf', buildCtx, []);
+      expect(compilerCtx.lastBuildConditionalsEs5).toBe(bc);
+    });
+
+    it('set compilerCtx lastBuildConditionalsEsm', async () => {
+      const compilerCtx: d.CompilerCtx = {};
+      const bc = await setBuildConditionals(config, compilerCtx, 'core', buildCtx, []);
+      expect(compilerCtx.lastBuildConditionalsEsm).toBe(bc);
     });
 
   });
