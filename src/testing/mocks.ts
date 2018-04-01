@@ -64,8 +64,8 @@ export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.Compo
 
   const renderer = createRendererPatch(plt, domApi);
 
-  plt.render = function(oldVNode: d.VNode, newVNode: d.VNode, isUpdate: boolean, defaultSlot?: d.DefaultSlot, namedSlots?: d.NamedSlots) {
-    return renderer(oldVNode, newVNode, isUpdate, defaultSlot, namedSlots);
+  plt.render = function(oldVNode: d.VNode, newVNode: d.VNode, isUpdate: boolean, encapsulation, hostContent) {
+    return renderer(oldVNode, newVNode, isUpdate, encapsulation, hostContent);
   };
 
   return (<MockedPlatform>plt);
@@ -258,7 +258,7 @@ function connectComponents(plt: MockedPlatform, node: d.HostElement) {
     if (!plt.hasConnectedMap.has(node)) {
       const cmpMeta = (plt as d.PlatformApi).getComponentMeta(node);
       if (cmpMeta) {
-        initHostElement((plt as d.PlatformApi), cmpMeta, node);
+        initHostElement((plt as d.PlatformApi), cmpMeta, node, 'hydrated');
         (node as d.HostElement).connectedCallback();
       }
     }

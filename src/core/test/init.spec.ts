@@ -30,7 +30,7 @@ describe('instance init', () => {
   describe('initLoad', () => {
 
     it('should not call componentDidLoad() more than once', () => {
-      initHostElement(plt, cmpMeta, elm);
+      initHostElement(plt, cmpMeta, elm, 'hydrated');
 
       const spy = spyOn(instance, 'componentDidLoad');
 

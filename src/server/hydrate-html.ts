@@ -111,7 +111,7 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
     // and to connect any elements it may have just appened to the DOM
     let ssrIds = 0;
     const pltRender = plt.render;
-    plt.render = function render(oldVNode: d.VNode, newVNode, isUpdate, defaultSlots, namedSlotsMap, encapsulation) {
+    plt.render = function render(oldVNode: d.VNode, newVNode, isUpdate, encapsulation, hostContent) {
       let ssrId: number;
       let existingSsrId: string;
 
@@ -129,7 +129,7 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
         }
       }
 
-      newVNode = pltRender(oldVNode, newVNode, isUpdate, defaultSlots, namedSlotsMap, encapsulation, ssrId);
+      newVNode = pltRender(oldVNode, newVNode, isUpdate, encapsulation, hostContent, ssrId);
 
       connectChildElements(config, plt, App, hydrateResults, newVNode.elm as Element);
 

@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { assignHostContentSlots } from '../renderer/vdom/slot';
 import { attachStyles } from '../core/styles';
 import { Build } from '../util/build-conditionals';
 import { createDomApi } from '../renderer/dom-api';
@@ -12,6 +11,7 @@ import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
+import { initHostContent } from '../renderer/vdom/slot';
 import { initHostElement } from '../core/init-host-element';
 import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
@@ -64,7 +64,6 @@ export function createPlatformClient(namespace: string, Context: d.CoreContext, 
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
-    defaultSlotsMap: new WeakMap(),
     hasConnectedMap: new WeakMap(),
     hasListenersMap: new WeakMap(),
     hasLoadedMap: new WeakMap(),
@@ -72,7 +71,6 @@ export function createPlatformClient(namespace: string, Context: d.CoreContext, 
     instanceMap: new WeakMap(),
     isDisconnectedMap: new WeakMap(),
     isQueuedForUpdate: new WeakMap(),
-    namedSlotsMap: new WeakMap(),
     onReadyCallbacksMap: new WeakMap(),
     queuedEvents: new WeakMap(),
     vnodeMap: new WeakMap(),
@@ -112,7 +110,7 @@ export function createPlatformClient(namespace: string, Context: d.CoreContext, 
       // only required when we're NOT using native shadow dom (slot)
       // this host element was NOT created with SSR
       // let's pick out the inner content for slot projection
-      assignHostContentSlots(plt, domApi, elm, elm.childNodes);
+      initHostContent(domApi, elm);
     }
 
     if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {

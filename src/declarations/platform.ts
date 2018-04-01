@@ -25,7 +25,6 @@ export interface PlatformApi {
 
   ancestorHostElementMap?: WeakMap<d.HostElement, d.HostElement>;
   componentAppliedStyles?: WeakMap<Node, d.ComponentAppliedStyles>;
-  defaultSlotsMap?: WeakMap<d.HostElement, d.DefaultSlot>;
   hasConnectedMap?: WeakMap<d.HostElement, boolean>;
   hasListenersMap?: WeakMap<d.HostElement, boolean>;
   hasLoadedMap?: WeakMap<d.HostElement, boolean>;
@@ -33,7 +32,6 @@ export interface PlatformApi {
   instanceMap?: WeakMap<d.HostElement, d.ComponentInstance>;
   isDisconnectedMap?: WeakMap<d.HostElement, boolean>;
   isQueuedForUpdate?: WeakMap<d.HostElement, boolean>;
-  namedSlotsMap?: WeakMap<d.HostElement, d.NamedSlots>;
   onReadyCallbacksMap?: WeakMap<d.HostElement, d.OnReadyCallback[]>;
   queuedEvents?: WeakMap<d.HostElement, any[]>;
   vnodeMap?: WeakMap<d.HostElement, d.VNode>;

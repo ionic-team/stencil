@@ -88,9 +88,23 @@ export interface RendererApi {
     oldVNode: d.VNode | Element,
     newVNode: d.VNode,
     isUpdate?: boolean,
-    defaultSlots?: d.DefaultSlot,
-    namedSlotsMap?: d.NamedSlots,
     encapsulation?: d.Encapsulation,
+    hostContent?: HostContent,
     ssrId?: number
   ): d.VNode;
 }
+
+
+export interface HostContent {
+  defaultSlot?: DefaultSlot;
+  namedSlots?: NamedSlots;
+}
+
+
+export type DefaultSlot = Node[];
+
+
+export interface NamedSlots {
+  [slotName: string]: Node[];
+}
+

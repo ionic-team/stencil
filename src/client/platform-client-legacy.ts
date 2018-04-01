@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { assignHostContentSlots } from '../renderer/vdom/slot';
 import { attachStyles } from '../core/styles';
 import { Build } from '../util/build-conditionals';
 import { createDomApi } from '../renderer/dom-api';
@@ -13,6 +12,7 @@ import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { initCssVarShim } from './css-shim/init-css-shim';
+import { initHostContent } from '../renderer/vdom/slot';
 import { initHostElement } from '../core/init-host-element';
 import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
@@ -69,7 +69,6 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
-    defaultSlotsMap: new WeakMap(),
     hasConnectedMap: new WeakMap(),
     hasListenersMap: new WeakMap(),
     hasLoadedMap: new WeakMap(),
@@ -77,7 +76,6 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
     instanceMap: new WeakMap(),
     isDisconnectedMap: new WeakMap(),
     isQueuedForUpdate: new WeakMap(),
-    namedSlotsMap: new WeakMap(),
     onReadyCallbacksMap: new WeakMap(),
     queuedEvents: new WeakMap(),
     vnodeMap: new WeakMap(),
@@ -117,7 +115,7 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
       // only required when we're NOT using native shadow dom (slot)
       // this host element was NOT created with SSR
       // let's pick out the inner content for slot projection
-      assignHostContentSlots(plt, domApi, elm, elm.childNodes);
+      initHostContent(domApi, elm);
     }
 
     if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
@@ -130,11 +128,10 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
 
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
-    const tagName = cmpMeta.tagNameMeta;
 
-    if (!globalDefined[tagName]) {
+    if (!globalDefined[cmpMeta.tagNameMeta]) {
       // keep a map of all the defined components
-      globalDefined[tagName] = true;
+      globalDefined[cmpMeta.tagNameMeta] = true;
 
       // initialize the members on the host element prototype
       initHostElement(plt, cmpMeta, HostElementConstructor.prototype, hydratedCssClass);
@@ -161,7 +158,7 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
       }
 
       // define the custom element
-      win.customElements.define(tagName, HostElementConstructor);
+      win.customElements.define(cmpMeta.tagNameMeta, HostElementConstructor);
     }
   }
 

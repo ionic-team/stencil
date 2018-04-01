@@ -6,23 +6,23 @@
  *
  * Modified for Stencil's renderer and slot projection
  */
+import * as d from '../../declarations';
 import { Build } from '../../util/build-conditionals';
-import { DefaultSlot, DomApi, Encapsulation, HostElement, NamedSlots, PlatformApi, RendererApi, VNode } from '../../declarations';
-import { isDef, isUndef } from '../../util/helpers';
+import { isDef } from '../../util/helpers';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
 let isSvgMode = false;
 
 
-export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererApi {
+export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.RendererApi {
   // createRenderer() is only created once per app
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
 
-  function createElm(vnode: VNode, parentElm: Node, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
+  function createElm(vnode: d.VNode, parentElm: Node, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
     if (!useNativeShadowDom && vnode.vtag === 'slot') {
-      if (defaultSlot || namedSlots) {
+      if (hostContent.defaultSlot || hostContent.namedSlots) {
         if (scopeId) {
           domApi.$setAttribute(parentElm, scopeId + '-slot', '');
         }
@@ -33,11 +33,11 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 
         if (isDef(namedSlot)) {
           // this vnode is a named slot
-          slotNodes = namedSlots && namedSlots[namedSlot];
+          slotNodes = hostContent.namedSlots && hostContent.namedSlots[namedSlot];
 
         } else {
           // this vnode is the default slot
-          slotNodes = defaultSlot;
+          slotNodes = hostContent.defaultSlot;
         }
 
         if (isDef(slotNodes)) {
@@ -95,7 +95,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       // add css classes, attrs, props, listeners, etc.
       updateElement(plt, null, vnode, isSvgMode);
 
-      if (scopeId !== null && elm._scopeId !== scopeId) {
+      if (isDef(scopeId) && elm._scopeId !== scopeId) {
         // if there is a scopeId and this is the initial render
         // then let's add the scopeId as an attribute
         domApi.$setAttribute(elm, (elm._scopeId = scopeId), '');
@@ -150,16 +150,16 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     return vnode.elm;
   }
 
-  function addVnodes(parentElm: Node, before: Node, vnodes: VNode[], startIdx: number, endIdx: number, childNode?: Node, vnodeChild?: VNode) {
-    const containerElm = ((parentElm as HostElement).$defaultHolder && domApi.$parentNode((parentElm as HostElement).$defaultHolder)) || parentElm;
+  function addVnodes(parentElm: Node, before: Node, vnodes: d.VNode[], startIdx: number, endIdx: number, containerElm?: Node, childNode?: Node, vnodeChild?: d.VNode) {
+    containerElm = ((parentElm as d.HostElement).$defaultHolder && domApi.$parentNode((parentElm as d.HostElement).$defaultHolder)) || parentElm;
 
     for (; startIdx <= endIdx; ++startIdx) {
       vnodeChild = vnodes[startIdx];
 
-      if (isDef(vnodeChild)) {
+      if (vnodeChild) {
         childNode = isDef(vnodeChild.vtext) ? domApi.$createTextNode(vnodeChild.vtext) : createElm(vnodeChild, parentElm, startIdx);
 
-        if (isDef(childNode)) {
+        if (childNode) {
           vnodeChild.elm = childNode;
           domApi.$insertBefore(containerElm, childNode, before);
         }
@@ -167,7 +167,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     }
   }
 
-  function removeVnodes(vnodes: VNode[], startIdx: number, endIdx: number) {
+  function removeVnodes(vnodes: d.VNode[], startIdx: number, endIdx: number) {
     for (; startIdx <= endIdx; ++startIdx) {
       if (isDef(vnodes[startIdx])) {
         domApi.$remove(vnodes[startIdx].elm);
@@ -175,7 +175,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     }
   }
 
-  function updateChildren(parentElm: Node, oldCh: VNode[], newCh: VNode[]) {
+  function updateChildren(parentElm: Node, oldCh: d.VNode[], newCh: d.VNode[]) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -185,12 +185,13 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     let newEndVnode = newCh[newEndIdx];
     let oldKeyToIdx: any;
     let idxInOld: number;
-    let elmToMove: VNode;
+    let elmToMove: d.VNode;
     let node: Node;
 
     while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
       if (oldStartVnode == null) {
-        oldStartVnode = oldCh[++oldStartIdx]; // Vnode might have been moved left
+         // Vnode might have been moved left
+        oldStartVnode = oldCh[++oldStartIdx];
 
       } else if (oldEndVnode == null) {
         oldEndVnode = oldCh[--oldEndIdx];
@@ -211,26 +212,28 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         oldEndVnode = oldCh[--oldEndIdx];
         newEndVnode = newCh[--newEndIdx];
 
-      } else if (isSameVnode(oldStartVnode, newEndVnode)) { // Vnode moved right
+      } else if (isSameVnode(oldStartVnode, newEndVnode)) {
+        // Vnode moved right
         patchVNode(oldStartVnode, newEndVnode);
         domApi.$insertBefore(parentElm, oldStartVnode.elm, domApi.$nextSibling(oldEndVnode.elm));
         oldStartVnode = oldCh[++oldStartIdx];
         newEndVnode = newCh[--newEndIdx];
 
-      } else if (isSameVnode(oldEndVnode, newStartVnode)) { // Vnode moved left
+      } else if (isSameVnode(oldEndVnode, newStartVnode)) {
+        // Vnode moved left
         patchVNode(oldEndVnode, newStartVnode);
         domApi.$insertBefore(parentElm, oldEndVnode.elm, oldStartVnode.elm);
         oldEndVnode = oldCh[--oldEndIdx];
         newStartVnode = newCh[++newStartIdx];
 
       } else {
-        if (isUndef(oldKeyToIdx)) {
+        if (!isDef(oldKeyToIdx)) {
           oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
         }
 
         idxInOld = oldKeyToIdx[newStartVnode.vkey];
 
-        if (isUndef(idxInOld)) {
+        if (!isDef(idxInOld)) {
           // new element
           node = createElm(newStartVnode, parentElm, newStartIdx);
           newStartVnode = newCh[++newStartIdx];
@@ -266,13 +269,13 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     }
   }
 
-  function isSameVnode(vnode1: VNode, vnode2: VNode) {
+  function isSameVnode(vnode1: d.VNode, vnode2: d.VNode) {
     // compare if two vnode to see if they're "technically" the same
     // need to have the same element tag, and same key to be the same
     return vnode1.vtag === vnode2.vtag && vnode1.vkey === vnode2.vkey;
   }
 
-  function createKeyToOldIdx(children: VNode[], beginIdx: number, endIdx: number) {
+  function createKeyToOldIdx(children: d.VNode[], beginIdx: number, endIdx: number) {
     const map: {[key: string]: number} = {};
     let i: number, key: any, ch;
 
@@ -289,11 +292,10 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
     return map;
   }
 
-  function patchVNode(oldVNode: VNode, newVNode: VNode) {
-    const elm: HostElement = newVNode.elm = <any>oldVNode.elm;
+  function patchVNode(oldVNode: d.VNode, newVNode: d.VNode, defaultHolder?: Comment) {
+    const elm: d.HostElement = newVNode.elm = <any>oldVNode.elm;
     const oldChildren = oldVNode.vchildren;
     const newChildren = newVNode.vchildren;
-    let defaultSlot: Node[];
 
     if (Build.svg) {
       // test if we're rendering an svg element, or still rendering nodes inside of one
@@ -302,7 +304,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
       isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
     }
 
-    if (isUndef(newVNode.vtext)) {
+    if (!isDef(newVNode.vtext)) {
       // element node
 
       if (newVNode.vtag !== 'slot') {
@@ -330,11 +332,9 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (defaultSlot = plt.defaultSlotsMap.get(elm)) {
+    } else if (defaultHolder = (elm.$defaultHolder)) {
       // this element has slotted content
-      const parentElement = defaultSlot[0].parentElement;
-      domApi.$setTextContent(parentElement, newVNode.vtext);
-      plt.defaultSlotsMap.set(elm, [parentElement.childNodes[0]]);
+      domApi.$setTextContent(domApi.$parentNode(defaultHolder), newVNode.vtext);
 
     } else if (oldVNode.vtext !== newVNode.vtext) {
       // update the text content for the text only vnode
@@ -351,21 +351,17 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
   }
 
   // internal variables to be reused per patch() call
-  let isUpdate: boolean,
-      defaultSlot: DefaultSlot,
-      namedSlots: NamedSlots,
+  let hostContent: d.HostContent,
       useNativeShadowDom: boolean,
       ssrId: number,
       scopeId: string;
 
 
-  return function patch(oldVNode: VNode, newVNode: VNode, isUpdatePatch?: boolean, elmDefaultSlot?: DefaultSlot, elmNamedSlots?: NamedSlots, encapsulation?: Encapsulation, ssrPatchId?: number) {
+  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdate?: boolean, encapsulation?: d.Encapsulation, hostElmContent?: d.HostContent, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
-    isUpdate = isUpdatePatch;
-    defaultSlot = elmDefaultSlot;
-    namedSlots = elmNamedSlots;
+    hostContent = hostElmContent;
 
     if (Build.ssrServerSide) {
       if (encapsulation !== 'shadow') {
@@ -413,7 +409,7 @@ export function createRendererPatch(plt: PlatformApi, domApi: DomApi): RendererA
 }
 
 
-export function callNodeRefs(vNode: VNode, isDestroy?: boolean) {
+export function callNodeRefs(vNode: d.VNode, isDestroy?: boolean) {
   if (vNode) {
     vNode.vattrs && vNode.vattrs.ref && vNode.vattrs.ref(isDestroy ? null : vNode.elm);
 
@@ -424,7 +420,7 @@ export function callNodeRefs(vNode: VNode, isDestroy?: boolean) {
 }
 
 
-function hasChildNodes(children: VNode[]) {
+function hasChildNodes(children: d.VNode[]) {
   // SSR ONLY: check if there are any more nested child elements
   // if there aren't, this info is useful so the client runtime
   // doesn't have to climb down and check so many elements

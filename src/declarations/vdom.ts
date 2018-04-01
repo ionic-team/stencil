@@ -55,14 +55,6 @@ export interface FunctionalComponent<PropsType> {
 }
 
 
-export type DefaultSlot = Node[];
-
-
-export interface NamedSlots {
-  [slotName: string]: Node[];
-}
-
-
 /**
  * used by production compiler
  */

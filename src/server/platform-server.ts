@@ -1,5 +1,4 @@
 import * as d from '../declarations';
-import { assignHostContentSlots } from '../renderer/vdom/slot';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
@@ -7,6 +6,7 @@ import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
+import { initHostContent } from '../renderer/vdom/slot';
 import { noop } from '../util/helpers';
 import { patchDomApi } from './dom-api-server';
 import { proxyController } from '../core/proxy-controller';
@@ -17,7 +17,7 @@ export function createPlatformServer(
   config: d.Config,
   outputTarget: d.OutputTargetWww,
   win: any,
-  doc: any,
+  doc: Document,
   App: d.AppGlobal,
   cmpRegistry: d.ComponentRegistry,
   diagnostics: d.Diagnostic[],
@@ -87,7 +87,6 @@ export function createPlatformServer(
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
-    defaultSlotsMap: new WeakMap(),
     hasConnectedMap: new WeakMap(),
     hasListenersMap: new WeakMap(),
     hasLoadedMap: new WeakMap(),
@@ -95,7 +94,6 @@ export function createPlatformServer(
     instanceMap: new WeakMap(),
     isDisconnectedMap: new WeakMap(),
     isQueuedForUpdate: new WeakMap(),
-    namedSlotsMap: new WeakMap(),
     onReadyCallbacksMap: new WeakMap(),
     queuedEvents: new WeakMap(),
     vnodeMap: new WeakMap(),
@@ -139,7 +137,7 @@ export function createPlatformServer(
     }
 
     // pick out all of the light dom nodes from the host element
-    assignHostContentSlots(plt, domApi, elm, elm.childNodes);
+    initHostContent(domApi, elm);
   }
 
 

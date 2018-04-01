@@ -1,13 +1,5 @@
 
-export const isDef = (v: any) => v !== undefined && v !== null;
-
-export const isUndef = (v: any) => v === undefined || v === null;
-
-export const isBoolean = (v: any): v is boolean => typeof v === 'boolean';
-
-export const isString = (v: any): v is string => typeof v === 'string';
-
-export const isNumber = (v: any): v is number => typeof v === 'number';
+export const isDef = (v: any) => v != null;
 
 export const toLowerCase = (str: string) => str.toLowerCase();
 
@@ -17,6 +9,6 @@ export const dashToPascalCase = (str: string) => toLowerCase(str).split('-').map
 
 export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.substr(1);
 
-export const noop = (): any => { /* noop*/ };
-
 export const captializeFirstLetter = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const noop = (): any => { /* noop*/ };

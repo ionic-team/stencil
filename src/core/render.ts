@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { createThemedClasses } from '../util/theme';
 import { h } from '../renderer/vdom/h';
+import { loadHostContent } from '../renderer/vdom/slot';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
@@ -79,9 +80,8 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
         oldVNode,
         hostVNode,
         isUpdateRender,
-        plt.defaultSlotsMap.get(elm),
-        plt.namedSlotsMap.get(elm),
-        cmpMeta.componentConstructor.encapsulation
+        cmpMeta.componentConstructor.encapsulation,
+        loadHostContent(plt.domApi, elm)
       );
 
       plt.vnodeMap.set(elm, vnode);

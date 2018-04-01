@@ -199,6 +199,64 @@ describe('Component slot', () => {
     expect(parentElm.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('parent message');
   });
 
+  it('should relocate parent content after child content dynamically changes slot wrapper tag', async () => {
+    const plt = mockPlatform();
+
+    const parentCmpMeta = mockDefine(plt, {
+      tagNameMeta: 'ion-parent',
+      componentConstructor: class {
+        innerH = h('h1', null, 'parent text');
+
+        render() {
+          return h('ion-child', null,
+            this.innerH
+          );
+        }
+      } as any
+    });
+
+    const childCmpMeta = mockDefine(plt, {
+      tagNameMeta: 'ion-child',
+      componentConstructor: class {
+        tag = 'section';
+
+        render() {
+          return  h(this.tag, null,
+            h('slot', null)
+          );
+        }
+      } as any
+    });
+
+    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+
+    const parentElm = await waitForLoad(plt, node, 'ion-parent');
+    const childElm = await waitForLoad(plt, parentElm, 'ion-child');
+
+    expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('SECTION');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('H1');
+    expect(parentElm.firstElementChild.textContent).toBe('parent text');
+
+    let instance = plt.instanceMap.get(parentElm);
+    instance.innerH = h('h6', null, 'parent text update');
+    render(plt, parentCmpMeta, parentElm, instance, false);
+
+    expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('SECTION');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('H6');
+    expect(parentElm.firstElementChild.textContent).toBe('parent text update');
+
+    instance = plt.instanceMap.get(childElm);
+    instance.tag = 'article';
+    render(plt, childCmpMeta, childElm, instance, false);
+
+    expect(parentElm.firstElementChild.nodeName).toBe('ION-CHILD');
+    expect(parentElm.firstElementChild.firstElementChild.nodeName).toBe('ARTICLE');
+    expect(parentElm.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('H6');
+    expect(parentElm.firstElementChild.textContent).toBe('parent text update');
+  });
+
   it('should put parent content in child nested default slot', async () => {
     const { parentElm, childElm } = await mount({
       parentVNode: h('badger', null,

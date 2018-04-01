@@ -33,7 +33,7 @@ describe('renderer', () => {
       elm.attachShadow = (opts: any) => {
         shadowOpts = opts;
       };
-      elm = patch(vnode0, h('my-tag', null), true, null, null, 'shadow').elm;
+      elm = patch(vnode0, h('my-tag', null), true, 'shadow').elm;
       expect(shadowOpts).toBeUndefined();
     });
 
@@ -51,7 +51,7 @@ describe('renderer', () => {
         elm.shadowRoot = mockElement('shadowRoot');
         return elm;
       };
-      elm = patch(vnode0, h('my-tag', null), false, null, null, 'shadow').elm;
+      elm = patch(vnode0, h('my-tag', null), false, 'shadow').elm;
       expect(elm.shadowRoot).toBeDefined();
       expect(shadowOpts).toBeDefined();
       expect(shadowOpts.mode).toBe('open');
@@ -185,7 +185,7 @@ describe('renderer', () => {
       elm.attachShadow = () => {
         return elm;
       };
-      elm = patch(vnode0, h('my-tag', null), false, null, null, 'shadow').elm;
+      elm = patch(vnode0, h('my-tag', null), false, 'shadow').elm;
       expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
     });
 
@@ -193,7 +193,7 @@ describe('renderer', () => {
       elm = mockElement('my-tag');
       vnode0 = {};
       vnode0.elm = elm;
-      elm = patch(vnode0, h('my-tag', null, h('div', null)), false, null, null, 'scoped').elm;
+      elm = patch(vnode0, h('my-tag', null, h('div', null)), false, 'scoped').elm;
       expect(elm.firstChild.hasAttribute('data-my-tag')).toBe(true);
     });
 
@@ -201,7 +201,7 @@ describe('renderer', () => {
       elm = mockElement('my-tag');
       vnode0 = {};
       vnode0.elm = elm;
-      elm = patch(vnode0, h('my-tag', null), false, null, null, 'scoped').elm;
+      elm = patch(vnode0, h('my-tag', null), false, 'scoped').elm;
       expect(elm.hasAttribute('data-my-tag-host')).toBe(true);
     });
 

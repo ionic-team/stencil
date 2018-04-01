@@ -27,9 +27,6 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
     // first time we've connected
     plt.hasConnectedMap.set(elm, true);
 
-    // if somehow this node was reused, ensure we've removed this property
-    // elm._hasDestroyed = null;
-
     // register this component as an actively
     // loading child to its parent component
     registerWithParentComponent(plt, elm);
