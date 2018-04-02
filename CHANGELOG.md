@@ -1,3 +1,24 @@
+<a name="0.7.11"></a>
+## 🔦 [0.7.11](https://github.com/ionic-team/stencil/compare/v0.7.10...v0.7.11) (2018-04-02)
+
+
+### Bug Fixes
+
+* **build:** separate cached build conditionals ([bc7873e](https://github.com/ionic-team/stencil/commit/bc7873e)), closes [#676](https://github.com/ionic-team/stencil/issues/676)
+* **cli:** override previous flags in cli args ([da14e81](https://github.com/ionic-team/stencil/commit/da14e81))
+* **render:** fix vnode key comparison ([6f380da](https://github.com/ionic-team/stencil/commit/6f380da))
+* **render:** update parent host content from child changed element render ([6fe6a6e](https://github.com/ionic-team/stencil/commit/6fe6a6e)), closes [#679](https://github.com/ionic-team/stencil/issues/679)
+
+
+### Features
+* **angular:** directivesArrayFile ([ca11e0a](https://github.com/ionic-team/stencil/commit/ca11e0a))
+* **build:** exclude slot polyfill for shadow-only, or not slot components ([191d90a](https://github.com/ionic-team/stencil/commit/191d90a))
+* **docs:** cli flag for json docs ([7b9cedd](https://github.com/ionic-team/stencil/commit/7b9cedd))
+* **props:** warn when using standardized props/methods ([e6ff67c](https://github.com/ionic-team/stencil/commit/e6ff67c)), closes [#309](https://github.com/ionic-team/stencil/issues/309)
+* **typescript:** update to TypeScript 2.8.1 ([c98c7ce](https://github.com/ionic-team/stencil/commit/c98c7ce))
+
+
+
 <a name="0.7.10"></a>
 ## 🐚 [0.7.10](https://github.com/ionic-team/stencil/compare/v0.7.9...v0.7.10) (2018-03-28)
 
