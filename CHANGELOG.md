@@ -1,3 +1,13 @@
+<a name="0.7.12"></a>
+## 😋 [0.7.12](https://github.com/ionic-team/stencil/compare/v0.7.11...v0.7.12) (2018-04-02)
+
+
+### Bug Fixes
+
+* **angular:** emit all props ([dc5ac70](https://github.com/ionic-team/stencil/commit/dc5ac70))
+
+
+
 <a name="0.7.11"></a>
 ## 🔦 [0.7.11](https://github.com/ionic-team/stencil/compare/v0.7.10...v0.7.11) (2018-04-02)
 
