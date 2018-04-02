@@ -8,9 +8,15 @@ export interface JsonDocs {
 export interface JsonDocsComponent {
   tag?: string;
   readme?: string;
+  usage?: JsonDocsUsage;
   props?: JsonDocsProp[];
   methods?: JsonDocsMethod[];
   events?: JsonDocsEvent[];
+}
+
+
+export interface JsonDocsUsage {
+  [key: string]: string;
 }
 
 
