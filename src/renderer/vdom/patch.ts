@@ -300,7 +300,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     if (Build.hasSvg) {
       // test if we're rendering an svg element, or still rendering nodes inside of one
       // only add this to the when the compiler sees we're using an svg somewhere
-      isSvgMode = newVNode.elm && newVNode.elm.parentElement != null && (newVNode.elm as SVGElement).ownerSVGElement !== undefined;
+      isSvgMode = newVNode.elm && isDef(domApi.$parentElement(newVNode.elm)) && (newVNode.elm as SVGElement).ownerSVGElement !== undefined;
       isSvgMode = newVNode.vtag === 'svg' ? true : (newVNode.vtag === 'foreignObject' ? false : isSvgMode);
     }
 

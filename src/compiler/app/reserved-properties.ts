@@ -158,6 +158,7 @@ export const RESERVED_PROPERTIES: string[] = [
   'onerror',
   'onload',
   'ownerDocument',
+  'ownerSVGElement',
   'parentElement',
   'parentNode',
   'passive',
