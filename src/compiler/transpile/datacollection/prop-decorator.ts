@@ -1,9 +1,9 @@
 import * as d from '../../../declarations';
 import { catchError } from '../../util';
 import { getAttributeTypeInfo, isDecoratorNamed, serializeSymbol } from './utils';
-import { isReservedMember } from './reserved-public-members';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { toDashCase } from '../../../util/helpers';
+import { validatePublicName } from './reserved-public-members';
 import * as ts from 'typescript';
 
 
@@ -34,7 +34,7 @@ export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, 
 
       } else {
         // @Prop()
-        validatePublicPropName(config, componentClass, memberName);
+        validatePublicName(config, componentClass, memberName, '@Prop()', 'property');
 
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
@@ -47,16 +47,6 @@ export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, 
       allMembers[memberName] = memberData;
       return allMembers;
     }, {} as d.MembersMeta);
-}
-
-
-function validatePublicPropName(config: d.Config, componentClass: string, methodName: string) {
-  if (isReservedMember(methodName)) {
-    config.logger.warn([
-      `The @Prop() name "${methodName}" used within "${componentClass}" is using a reserved public member name. `,
-      `Please rename the property so it does not conflict with existing standardized element members.`
-    ].join(''));
-  }
 }
 
 

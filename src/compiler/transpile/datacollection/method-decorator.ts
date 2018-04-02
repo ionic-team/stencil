@@ -1,7 +1,7 @@
 import * as d from '../../../declarations';
 import { getAttributeTypeInfo, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
-import { isReservedMember } from './reserved-public-members';
 import { MEMBER_TYPE } from '../../../util/constants';
+import { validatePublicName } from './reserved-public-members';
 import * as ts from 'typescript';
 
 
@@ -28,7 +28,7 @@ export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker
         methodReturnTypes = getAttributeTypeInfo(returnTypeNode, sourceFile);
       }
 
-      validatePublicMethodName(config, componentClass, methodName);
+      validatePublicName(config, componentClass, methodName, '@Method()', 'method');
 
       membersMeta[methodName] = {
         memberType: MEMBER_TYPE.Method,
@@ -46,15 +46,3 @@ export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker
       return membersMeta;
     }, {} as d.MembersMeta);
 }
-
-
-function validatePublicMethodName(config: d.Config, componentClass: string, methodName: string) {
-  if (isReservedMember(methodName)) {
-    config.logger.warn([
-      `The @Method() decoratored method name "${methodName}" used within "${componentClass}" `,
-      `is using a reserved public member name. `,
-      `Please rename the method so it does not conflict with existing standardized element members.`
-    ].join(''));
-  }
-}
-
