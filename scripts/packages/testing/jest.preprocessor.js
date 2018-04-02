@@ -24,6 +24,7 @@ module.exports = {
 
       opts.jsx = ts.JsxEmit.React;
       opts.jsxFactory = 'h';
+      opts.esModuleInterop = true;
 
       sourceText = injectTestingScript + sourceText;
 
