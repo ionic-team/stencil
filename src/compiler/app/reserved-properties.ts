@@ -42,11 +42,6 @@ export const RESERVED_PROPERTIES: string[] = [
    * Host Element
    * Properties set on the host element
    */
-  '$activeLoading',
-  '$defaultHolder',
-  '$initLoad',
-  '$rendered',
-  '$onRender',
   '$',
   'componentOnReady',
 

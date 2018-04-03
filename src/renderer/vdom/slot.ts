@@ -1,21 +1,25 @@
 import * as d from '../../declarations';
+import { Build } from '../../util/build-conditionals';
 import { isDef } from '../../util/helpers';
 import { NODE_TYPE } from '../../util/constants';
 
 
 export function initHostContent(domApi: d.DomApi, elm: d.HostElement) {
-
-  if (!elm.$defaultHolder) {
+  if (!elm['s-cr']) {
     // create a comment to represent where the original
     // content was first placed, which is useful later on
-    domApi.$insertBefore(elm, (elm.$defaultHolder = domApi.$createComment('')), domApi.$childNodes(elm)[0]);
-  }
+    domApi.$insertBefore(elm, (elm['s-cr'] = domApi.$createComment('')), domApi.$childNodes(elm)[0]);
 
+    if (Build.isDev) {
+      (elm['s-cr'] as any)['s-host-id'] = elm['s-id'];
+      (elm['s-cr'] as any)['s-host-tag'] = elm.tagName.toLowerCase();
+    }
+  }
 }
 
 
 export function loadHostContent(domApi: d.DomApi, elm: d.HostElement, defaultSlot?: d.DefaultSlot, namedSlots?: d.NamedSlots, i?: number, node?: Node, childNodes?: NodeList, slotName?: string) {
-  if ((node = elm.$defaultHolder)) {
+  if ((node = elm['s-cr'])) {
     node = domApi.$parentNode(node);
 
     if (node) {

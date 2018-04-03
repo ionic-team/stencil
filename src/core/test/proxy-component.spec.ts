@@ -63,7 +63,7 @@ describe('proxy-component', () => {
   describe('has changed, if it has rendered once', () => {
 
     it('instance number changed', () => {
-      elm.$rendered = true;
+      elm['s-rn'] = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.num = 141.622;
@@ -71,7 +71,7 @@ describe('proxy-component', () => {
     });
 
     it('instance string changed', () => {
-      elm.$rendered = true;
+      elm['s-rn'] = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.str = 'kph';
@@ -79,7 +79,7 @@ describe('proxy-component', () => {
     });
 
     it('instance boolean changed', () => {
-      elm.$rendered = true;
+      elm['s-rn'] = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.bool = false;
@@ -91,7 +91,7 @@ describe('proxy-component', () => {
   describe('no change, if it has rendered once', () => {
 
     it('instance number unchanged', () => {
-      elm.$rendered = true;
+      elm['s-rn'] = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.num = 88;
@@ -99,7 +99,7 @@ describe('proxy-component', () => {
     });
 
     it('instance string unchanged', () => {
-      elm.$rendered = true;
+      elm['s-rn'] = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.str = 'mph';
@@ -107,7 +107,7 @@ describe('proxy-component', () => {
     });
 
     it('instance boolean unchanged', () => {
-      elm.$rendered = true;
+      elm['s-rn'] = true;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.bool = true;
@@ -119,7 +119,7 @@ describe('proxy-component', () => {
   describe('does not queue another render if it hasnt rendered yet', () => {
 
     it('instance number changed', () => {
-      elm.$rendered = false;
+      elm['s-rn'] = false;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.num = 1234;
@@ -127,7 +127,7 @@ describe('proxy-component', () => {
     });
 
     it('instance string changed', () => {
-      elm.$rendered = false;
+      elm['s-rn'] = false;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.str = 'asdfasdf';
@@ -135,7 +135,7 @@ describe('proxy-component', () => {
     });
 
     it('instance boolean changed', () => {
-      elm.$rendered = false;
+      elm['s-rn'] = false;
       spyOn(plt.queue, 'add');
       proxyComponentInstance(plt, CmpConstructor, elm, instance);
       instance.bool = false;

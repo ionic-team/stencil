@@ -69,6 +69,8 @@ export function createPlatformServer(
   // execute the global scripts (if there are any)
   runGlobalScripts();
 
+  let ids = 0;
+
   // create the platform api which is used throughout common core code
   const plt: d.PlatformApi = {
     attachStyles: noop,
@@ -84,6 +86,7 @@ export function createPlatformServer(
     propConnect,
     queue: createQueueServer(),
     tmpDisconnected: false,
+    nextId: () => ids += 2,
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -112,9 +115,10 @@ export function createPlatformServer(
   // setup the root node of all things
   // which is the mighty <html> tag
   const rootElm = domApi.$documentElement as d.HostElement;
-  rootElm.$rendered = true;
-  rootElm.$activeLoading = [];
-  rootElm.$initLoad = function appLoadedCallback() {
+  rootElm['s-ld'] = [];
+  rootElm['s-rn'] = true;
+
+  rootElm['s-init'] = function appLoadedCallback() {
     plt.hasLoadedMap.set(rootElm, true);
     appLoaded();
   };

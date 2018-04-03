@@ -20,7 +20,6 @@ export function proxyHostElementPrototype(plt: PlatformApi, membersMeta: Members
         function getHostElementProp(this: HostElement) {
           // host element getter (cannot be arrow fn)
           // yup, ugly, srynotsry
-          // but its creating _values if it doesn't already exist
           return (plt.valuesMap.get(this) || {})[memberName];
         },
         function setHostElementProp(this: HostElement, newValue: any) {

@@ -31,7 +31,7 @@ export function initHostElement(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, Ho
     disconnectedCallback(plt, (this as d.HostElement));
   };
 
-  HostElementConstructor.$initLoad = function() {
+  HostElementConstructor['s-init'] = function() {
     initComponentLoaded(plt, (this as d.HostElement), hydratedCssClass);
   };
 

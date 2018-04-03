@@ -95,14 +95,19 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
     }
 
     // it's official, this element has rendered
-    elm.$rendered = true;
+    elm['s-rn'] = true;
 
-    if (elm.$onRender) {
+    if ((elm as any)['$onRender']) {
+      // $onRender deprecated 2018-04-02
+      elm['s-rc'] = (elm as any)['$onRender'];
+    }
+
+    if (elm['s-rc']) {
       // ok, so turns out there are some child host elements
       // waiting on this parent element to load
       // let's fire off all update callbacks waiting
-      elm.$onRender.forEach(cb => cb());
-      elm.$onRender = null;
+      elm['s-rc'].forEach(cb => cb());
+      elm['s-rc'] = null;
     }
 
   } catch (e) {

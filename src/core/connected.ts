@@ -20,12 +20,20 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
     }
   }
 
+  // this element just connected, which may be re-connecting
+  // ensure we remove it from our map of disconnected
   plt.isDisconnectedMap.delete(elm);
 
   if (!plt.hasConnectedMap.has(elm)) {
 
     // first time we've connected
     plt.hasConnectedMap.set(elm, true);
+
+    if (!elm['s-id']) {
+      // assign a unique id to this host element
+      // possible we've already given this element an id
+      elm['s-id'] = plt.nextId();
+    }
 
     // register this component as an actively
     // loading child to its parent component
@@ -71,7 +79,11 @@ export function registerWithParentComponent(plt: PlatformApi, elm: HostElement, 
 
         // ensure there is an array to contain a reference to each of the child elements
         // and set this element as one of the ancestor's child elements it should wait on
-        (ancestorHostElement.$activeLoading = ancestorHostElement.$activeLoading || []).push(elm);
+        if ((ancestorHostElement as any)['$activeLoading']) {
+          // $activeLoading deprecated 2018-04-02
+          ancestorHostElement['s-ld'] = (ancestorHostElement as any)['$activeLoading'];
+        }
+        (ancestorHostElement['s-ld'] = ancestorHostElement['s-ld'] || []).push(elm);
       }
       break;
     }

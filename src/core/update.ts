@@ -12,10 +12,8 @@ export function queueUpdate(plt: PlatformApi, elm: HostElement) {
     plt.isQueuedForUpdate.set(elm, true);
 
     // run the patch in the next tick
-    plt.queue.add(() => {
       // vdom diff and patch the host element for differences
-      update(plt, elm);
-    }, plt.isAppLoaded ? PRIORITY.Low : PRIORITY.High);
+    plt.queue.add(() => update(plt, elm), plt.isAppLoaded ? PRIORITY.Low : PRIORITY.High);
   }
 }
 
@@ -33,16 +31,25 @@ export function update(plt: PlatformApi, elm: HostElement, isInitialLoad?: boole
 
     if (isInitialLoad) {
       ancestorHostElement = plt.ancestorHostElementMap.get(elm);
-      if (ancestorHostElement && !ancestorHostElement.$rendered) {
+
+      if (ancestorHostElement && (ancestorHostElement as any)['$rendered']) {
+        // $rendered deprecated 2018-04-02
+        ancestorHostElement['s-rn'] = true;
+      }
+
+      if (ancestorHostElement && !ancestorHostElement['s-rn']) {
         // this is the intial load
         // this element has an ancestor host element
         // but the ancestor host element has NOT rendered yet
         // so let's just cool our jets and wait for the ancestor to render
-        (ancestorHostElement.$onRender = ancestorHostElement.$onRender || []).push(() => {
+        (ancestorHostElement['s-rc'] = ancestorHostElement['s-rc'] || []).push(() => {
           // this will get fired off when the ancestor host element
           // finally gets around to rendering its lazy self
           update(plt, elm);
         });
+
+        // $onRender deprecated 2018-04-02
+        (ancestorHostElement as any)['$onRender'] = ancestorHostElement['s-rc'];
         return;
       }
 
@@ -104,7 +111,7 @@ export function renderUpdate(plt: PlatformApi, elm: HostElement, instance: Compo
   try {
     if (isInitialLoad) {
       // so this was the initial load i guess
-      elm.$initLoad();
+      elm['s-init']();
       // componentDidLoad just fired off
 
     } else {

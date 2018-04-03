@@ -52,6 +52,8 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
   // keep a global set of tags we've already defined
   const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};
 
+  let ids = 0;
+
   // create the platform api which is used throughout common core code
   const plt: d.PlatformApi = {
     connectHostElement,
@@ -66,6 +68,7 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: createQueueClient(App, win),
+    nextId: () => ids += 2,
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -88,11 +91,11 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
   // setup the root element which is the mighty <html> tag
   // the <html> has the final say of when the app has loaded
   const rootElm = domApi.$documentElement as d.HostElement;
-  rootElm.$rendered = true;
-  rootElm.$activeLoading = [];
+  rootElm['s-ld'] = [];
+  rootElm['s-rn'] = true;
 
   // this will fire when all components have finished loaded
-  rootElm.$initLoad = () => {
+  rootElm['s-init'] = () => {
     plt.hasLoadedMap.set(rootElm, App.loaded = plt.isAppLoaded = true);
     domApi.$dispatchEvent(win, 'appload', { detail: { namespace: namespace } });
   };
@@ -361,7 +364,6 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
   initCoreComponentOnReady(plt, App);
 
   // notify that the app has initialized and the core script is ready
-  // but note that the components have not fully loaded yet, that's the "appload" event
+  // but note that the components have not fully loaded yet
   App.initialized = true;
-  domApi.$dispatchEvent(win, 'appinit', { detail: { namespace: namespace } });
 }

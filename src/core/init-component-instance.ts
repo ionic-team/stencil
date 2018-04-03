@@ -68,11 +68,11 @@ export function initComponentLoaded(plt: d.PlatformApi, elm: d.HostElement, hydr
   // all is good, this component has been told it's time to finish loading
   // it's possible that we've already decided to destroy this element
   // check if this element has any actively loading child elements
-  if (!plt.hasLoadedMap.has(elm) && (instance = plt.instanceMap.get(elm)) && !plt.isDisconnectedMap.has(elm) && (!elm.$activeLoading || !elm.$activeLoading.length)) {
+  if (!plt.hasLoadedMap.has(elm) && (instance = plt.instanceMap.get(elm)) && !plt.isDisconnectedMap.has(elm) && (!elm['s-ld'] || !elm['s-ld'].length)) {
     // cool, so at this point this element isn't already being destroyed
     // and it does not have any child elements that are still loading
     // ensure we remove any child references cuz it doesn't matter at this point
-    delete elm.$activeLoading;
+    delete elm['s-ld'];
 
     // sweet, this particular element is good to go
     // all of this element's children have loaded (if any)
@@ -125,7 +125,7 @@ export function propagateComponentLoaded(plt: d.PlatformApi, elm: d.HostElement,
     // ok so this element already has a known ancestor host element
     // let's make sure we remove this element from its ancestor's
     // known list of child elements which are actively loading
-    ancestorsActivelyLoadingChildren = ancestorHostElement.$activeLoading;
+    ancestorsActivelyLoadingChildren = ancestorHostElement['s-ld'] || (ancestorHostElement as any)['$activeLoading'];
 
     if (ancestorsActivelyLoadingChildren) {
       index = ancestorsActivelyLoadingChildren.indexOf(elm);
@@ -139,7 +139,12 @@ export function propagateComponentLoaded(plt: d.PlatformApi, elm: d.HostElement,
       // to see if the ancestor is actually loaded or not
       // then let's call the ancestor's initLoad method if there's no length
       // (which actually ends up as this method again but for the ancestor)
-      !ancestorsActivelyLoadingChildren.length && ancestorHostElement.$initLoad();
+      if (!ancestorsActivelyLoadingChildren.length) {
+        ancestorHostElement['s-init'] && ancestorHostElement['s-init']();
+
+        // $initLoad deprecated 2018-04-02
+        (ancestorHostElement as any)['$initLoad'] && (ancestorHostElement as any)['$initLoad']();
+      }
     }
 
     plt.ancestorHostElementMap.delete(elm);

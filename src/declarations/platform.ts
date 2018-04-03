@@ -22,6 +22,7 @@ export interface PlatformApi {
   queue: QueueApi;
   render?: d.RendererApi;
   tmpDisconnected?: boolean;
+  nextId?: () => number;
 
   ancestorHostElementMap?: WeakMap<d.HostElement, d.HostElement>;
   componentAppliedStyles?: WeakMap<Node, d.ComponentAppliedStyles>;

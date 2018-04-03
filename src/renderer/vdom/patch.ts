@@ -20,7 +20,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   // the patch() function which createRenderer() returned is the function
   // which gets called numerous times by each component
 
-  function createElm(vnode: d.VNode, parentElm: Node, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
+  function createElm(vnode: d.VNode, parentElm: d.HostElement, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
     if (Build.slotPolyfill && !useNativeShadowDom && vnode.vtag === 'slot') {
       if (hostContent.defaultSlot || hostContent.namedSlots) {
         if (scopeId) {
@@ -150,8 +150,10 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     return vnode.elm;
   }
 
-  function addVnodes(parentElm: Node, before: Node, vnodes: d.VNode[], startIdx: number, endIdx: number, containerElm?: Node, childNode?: Node, vnodeChild?: d.VNode) {
-    containerElm = ((parentElm as d.HostElement).$defaultHolder && domApi.$parentNode((parentElm as d.HostElement).$defaultHolder)) || parentElm;
+  function addVnodes(parentElm: d.HostElement, before: Node, vnodes: d.VNode[], startIdx: number, endIdx: number, containerElm?: Node, childNode?: Node, vnodeChild?: d.VNode) {
+    // $defaultHolder deprecated 2018-04-02
+    const contentRef = parentElm['s-cr'] || (parentElm as any)['$defaultHolder'];
+    containerElm = (contentRef && domApi.$parentNode(contentRef)) || parentElm;
 
     for (; startIdx <= endIdx; ++startIdx) {
       vnodeChild = vnodes[startIdx];
@@ -175,7 +177,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     }
   }
 
-  function updateChildren(parentElm: Node, oldCh: d.VNode[], newCh: d.VNode[]) {
+  function updateChildren(parentElm: d.HostElement, oldCh: d.VNode[], newCh: d.VNode[]) {
     let oldStartIdx = 0, newStartIdx = 0;
     let oldEndIdx = oldCh.length - 1;
     let oldStartVnode = oldCh[0];
@@ -332,7 +334,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
         removeVnodes(oldChildren, 0, oldChildren.length - 1);
       }
 
-    } else if (Build.slotPolyfill && (defaultHolder = (elm.$defaultHolder))) {
+    } else if (Build.slotPolyfill && (defaultHolder = (elm['s-cr'] || (elm as any)['$defaultHolder']/* $defaultHolder deprecated 2018-04-02 */))) {
       // this element has slotted content
       domApi.$setTextContent(domApi.$parentNode(defaultHolder), newVNode.vtext);
 
