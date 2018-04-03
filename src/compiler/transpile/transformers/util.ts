@@ -11,7 +11,7 @@ export function isComponentClass(classNode: ts.ClassDeclaration) {
     return false;
   }
   const componentDecoratorIndex = classNode.decorators.findIndex(dec =>
-   (ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === 'Component')
+   (ts.isCallExpression(dec.expression) && ts.isIdentifier(dec.expression.expression) && dec.expression.expression.text === 'Component')
   );
   return (componentDecoratorIndex !== -1);
 }

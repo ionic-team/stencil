@@ -61,7 +61,9 @@ function visitComponentClass(classNode: ts.ClassDeclaration): ts.ClassDeclaratio
  */
 function removeDecoratorsByName(decoratorList: ts.NodeArray<ts.Decorator>, names: string[]): ts.NodeArray<ts.Decorator> {
   const updatedDecoratorList = decoratorList.filter(dec => {
-    const toRemove = ts.isCallExpression(dec.expression) && names.indexOf(dec.expression.expression.getText()) >= 0;
+    const toRemove = ts.isCallExpression(dec.expression) &&
+      ts.isIdentifier(dec.expression.expression) &&
+      names.indexOf(dec.expression.expression.text) >= 0;
     return !toRemove;
   });
 
