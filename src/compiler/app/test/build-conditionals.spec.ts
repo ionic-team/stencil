@@ -90,10 +90,10 @@ describe('build conditionals', () => {
       expect(bc.hasSvg).toBe(true);
     });
 
-    it('set Build.hasSvg false', async () => {
+    it('set Build.hasSvg always true (for now)', async () => {
       buildCtx.hasSvg = false;
       const bc = await setBuildConditionals(config, {}, 'core', buildCtx, []);
-      expect(bc.hasSvg).toBe(false);
+      expect(bc.hasSvg).toBe(true);
     });
 
     it('set Build.isDev', async () => {
