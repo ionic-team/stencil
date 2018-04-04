@@ -76,6 +76,7 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
     hasListenersMap: new WeakMap(),
     hasLoadedMap: new WeakMap(),
     hostElementMap: new WeakMap(),
+    hostSnapshotMap: new WeakMap(),
     instanceMap: new WeakMap(),
     isDisconnectedMap: new WeakMap(),
     isQueuedForUpdate: new WeakMap(),

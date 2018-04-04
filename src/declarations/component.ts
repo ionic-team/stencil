@@ -41,10 +41,16 @@ export interface ComponentConstructor {
   is?: string;
   properties?: ComponentConstructorProperties;
   events?: ComponentConstructorEvent[];
-  host?: any;
+  host?: ComponentConstructorHost;
   style?: string;
   styleMode?: string;
   encapsulation?: Encapsulation;
+}
+
+
+export interface ComponentConstructorHost {
+  theme?: string;
+  [attrName: string]: string;
 }
 
 

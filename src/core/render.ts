@@ -1,6 +1,5 @@
 import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
-import { createThemedClasses } from '../util/theme';
 import { h } from '../renderer/vdom/h';
 import { RUNTIME_ERROR } from '../util/constants';
 
@@ -45,17 +44,7 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
         // component meta data has a "theme"
         // use this to automatically generate a good css class
         // from the mode and color to add to the host element
-        vnodeHostData = Object.keys(hostMeta).reduce((hostData, key) => {
-          switch (key) {
-          case 'theme':
-            hostData['class'] = hostData['class'] || {};
-            hostData['class'] = Object.assign(
-              hostData['class'],
-              createThemedClasses(instance.mode, instance.color, hostMeta['theme']),
-            );
-          }
-          return hostData;
-        }, vnodeHostData || {});
+        vnodeHostData = applyComponentHostData(vnodeHostData, hostMeta, instance);
       }
       // looks like we've got child nodes to render into this host element
       // or we need to update the css class/attrs on the host element
@@ -110,6 +99,58 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
     plt.activeRender = false;
     plt.onError(e, RUNTIME_ERROR.RenderError, elm, true);
   }
+}
+
+
+export function applyComponentHostData(vnodeHostData: d.VNodeData, hostMeta: d.ComponentConstructorHost, instance: any) {
+  vnodeHostData = vnodeHostData || {};
+
+  // component meta data has a "theme"
+  // use this to automatically generate a good css class
+  // from the mode and color to add to the host element
+  Object.keys(hostMeta).forEach(key => {
+
+    if (key === 'theme') {
+      // host: { theme: 'button' }
+      // adds css classes w/ mode and color combinations
+      // class="button button-md button-primary button-md-primary"
+      convertCssNamesToObj(
+        vnodeHostData['class'] = vnodeHostData['class'] || {},
+        hostMeta[key],
+        instance.mode,
+        instance.color
+      );
+
+    } else if (key === 'class') {
+      // host: { class: 'multiple css-classes' }
+      // class="multiple css-classes"
+      convertCssNamesToObj(
+        vnodeHostData[key] = vnodeHostData[key] || {},
+        hostMeta[key]
+      );
+
+    } else {
+      // rando attribute/properties
+      vnodeHostData[key] = hostMeta[key];
+    }
+  });
+
+  return vnodeHostData;
+}
+
+
+export function convertCssNamesToObj(cssClassObj: { [className: string]: boolean}, className: string, mode?: string, color?: string) {
+  className.split(' ').forEach(cssClass => {
+    cssClassObj[cssClass] = true;
+
+    if (mode) {
+      cssClassObj[`${cssClass}-${mode}`] = true;
+
+      if (color) {
+        cssClassObj[`${cssClass}-${mode}-${color}`] = cssClassObj[`${cssClass}-${color}`] = true;
+      }
+    }
+  });
 }
 
 
