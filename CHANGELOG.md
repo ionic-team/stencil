@@ -1,3 +1,22 @@
+<a name="0.7.13"></a>
+## ⛱ [0.7.13](https://github.com/ionic-team/stencil/compare/v0.7.12...v0.7.13) (2018-04-04)
+
+
+### Bug Fixes
+
+* **docs:** only output readme docs w/ --docs flag ([0aad8e7](https://github.com/ionic-team/stencil/commit/0aad8e7)), closes [#690](https://github.com/ionic-team/stencil/issues/690)
+* **svg:** update css class on svg element ([260b538](https://github.com/ionic-team/stencil/commit/260b538))
+* **test:** add esModuleInterop so that tests will have proper interop with commonjs modules. ([8520059](https://github.com/ionic-team/stencil/commit/8520059))
+
+
+### Features
+
+* **docs:** add usage markdown to docs json output ([7d811f1](https://github.com/ionic-team/stencil/commit/7d811f1))
+* **host:** apply static Component host data to host element ([00b6af6](https://github.com/ionic-team/stencil/commit/00b6af6)), closes [#562](https://github.com/ionic-team/stencil/issues/562)
+* add commonjs config option that will allow additonal configuration of rollup like namedExports. ([d807ea1](https://github.com/ionic-team/stencil/commit/d807ea1))
+
+
+
 <a name="0.7.12"></a>
 ## 😋 [0.7.12](https://github.com/ionic-team/stencil/compare/v0.7.11...v0.7.12) (2018-04-02)
 
