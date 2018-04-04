@@ -7,6 +7,7 @@ export interface Config {
   buildEs5?: boolean;
   buildLogFilePath?: string;
   bundles?: ConfigBundle[];
+  commonjs?: BundlingConfig;
   configPath?: string;
   copy?: CopyTasks;
   devInspector?: boolean;
@@ -45,6 +46,13 @@ export interface Config {
    * DEPRECATED "config.collections" since 0.6.0, 2018-02-13
    */
   _deprecatedCollections?: ConfigCollection[];
+}
+
+
+export interface BundlingConfig {
+  namedExports?: {
+    [key: string]: string[];
+  };
 }
 
 

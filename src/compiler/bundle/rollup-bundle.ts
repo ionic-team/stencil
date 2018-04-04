@@ -17,6 +17,14 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
   const globals = require('rollup-plugin-node-globals');
   let rollupBundle: OutputChunk;
 
+  const commonjsConfig = {
+    include: 'node_modules/**',
+    sourceMap: false,
+    ...config.commonjs
+  };
+
+  console.log(commonjsConfig);
+
   const rollupConfig: InputOptions = {
     input: entryModules.map(b => b.entryKey),
     experimentalCodeSplitting: true,
@@ -27,10 +35,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
         jsnext: true,
         main: true
       }),
-      config.sys.rollup.plugins.commonjs({
-        include: 'node_modules/**',
-        sourceMap: false
-      }),
+      config.sys.rollup.plugins.commonjs(commonjsConfig),
       bundleJson(config),
       globals(),
       builtins(),
