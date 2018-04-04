@@ -58,6 +58,9 @@ export async function setBuildConditionals(
     compilerCtx.lastBuildConditionalsEs5 = coreBuild;
   }
 
+  coreBuild.slotPolyfill = true;
+  coreBuild.hasSvg = true;
+
   return coreBuild;
 }
 
