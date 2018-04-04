@@ -50,7 +50,7 @@ function visitFactory(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildC
 }
 
 export function visitClass(config: Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): ComponentMeta | undefined {
-  let cmpMeta = getComponentDecoratorMeta(checker, classNode);
+  let cmpMeta = getComponentDecoratorMeta(config, checker, classNode);
 
   if (!cmpMeta) {
     return undefined;

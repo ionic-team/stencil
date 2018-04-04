@@ -1,10 +1,10 @@
-import { AssetsMeta, ComponentMeta, ComponentOptions, ExternalStyleMeta, ModeStyles } from '../../../declarations';
+import * as d from '../../../declarations';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.ClassDeclaration): ComponentMeta | undefined {
+export function getComponentDecoratorMeta(config: d.Config, checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {
   if (!node.decorators) {
     return undefined;
   }
@@ -14,7 +14,7 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
     return undefined;
   }
 
-  const [ componentOptions ] = getDeclarationParameters<ComponentOptions>(componentDecorator);
+  const [ componentOptions ] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
 
   if (!componentOptions.tag || componentOptions.tag.trim() === '') {
     throw new Error(`tag missing in component decorator: ${JSON.stringify(componentOptions, null, 2)}`);
@@ -22,11 +22,11 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
 
   const symbol = checker.getSymbolAtLocation(node.name);
 
-  const cmpMeta: ComponentMeta = {
+  const cmpMeta: d.ComponentMeta = {
     tagNameMeta: componentOptions.tag,
     stylesMeta: {},
     assetsDirsMeta: [],
-    hostMeta: componentOptions.host || {},
+    hostMeta: getHostMeta(config, componentOptions.host),
     dependencies: [],
     jsdoc: serializeSymbol(checker, symbol)
   };
@@ -64,7 +64,7 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
     cmpMeta.stylesMeta = {
       [DEFAULT_STYLE_MODE]: {
         externalStyles: componentOptions.styleUrls.map(styleUrl => {
-          const externalStyle: ExternalStyleMeta = {
+          const externalStyle: d.ExternalStyleMeta = {
             originalComponentPath: styleUrl.trim()
           };
           return externalStyle;
@@ -80,13 +80,13 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
   } else {
 
     Object.keys(componentOptions.styleUrls || {}).reduce((stylesMeta, styleType) => {
-      const styleUrls = <ModeStyles>componentOptions.styleUrls;
+      const styleUrls = componentOptions.styleUrls as d.ModeStyles;
 
       const sUrls = [].concat(styleUrls[styleType]);
 
       stylesMeta[styleType] = {
         externalStyles: sUrls.map(sUrl => {
-          const externalStyle: ExternalStyleMeta = {
+          const externalStyle: d.ExternalStyleMeta = {
             originalComponentPath: sUrl
           };
           return externalStyle;
@@ -99,7 +99,7 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
 
   // assetsDir: './somedir'
   if (componentOptions.assetsDir) {
-    const assetsMeta: AssetsMeta = {
+    const assetsMeta: d.AssetsMeta = {
       originalComponentPath: componentOptions.assetsDir
     };
     cmpMeta.assetsDirsMeta.push(assetsMeta);
@@ -113,4 +113,37 @@ export function getComponentDecoratorMeta(checker: ts.TypeChecker, node: ts.Clas
   }
 
   return cmpMeta;
+}
+
+
+function getHostMeta(config: d.Config, hostData: d.HostMeta) {
+  hostData = hostData || {};
+
+  Object.keys(hostData).forEach(key => {
+    const type = typeof hostData[key];
+
+    if (type !== 'string' && type !== 'number' && type !== 'boolean') {
+      // invalid data
+      delete hostData[key];
+
+      let itsType = 'object';
+      if (type === 'function') {
+        itsType = 'function';
+
+      } else if (Array.isArray(hostData[key])) {
+        itsType = 'Array';
+      }
+
+      config.logger.warn([
+        `The @Component decorator's host property "${key}" has a type of "${itsType}". `,
+        `However, a @Component decorator's "host" can only take static data, `,
+        `such as a string, number or boolean. `,
+        `Please use the "hostData()" method instead `,
+        `if attributes or properties need to be dynamically added to `,
+        `the host element.`
+      ].join(''));
+    }
+  });
+
+  return hostData;
 }
