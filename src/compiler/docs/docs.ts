@@ -47,8 +47,10 @@ export async function docs(config: d.Config, compilerCtx: d.CompilerCtx) {
 }
 
 
-export function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx) {
+export async function generateDocs(config: d.Config, compilerCtx: d.CompilerCtx) {
   const docsOutputTargets: d.OutputTargetDocs[] = config.outputTargets.filter(o => o.type === 'docs');
 
-  return generateReadmes(config, compilerCtx, docsOutputTargets);
+  if (docsOutputTargets.length > 0) {
+    await generateReadmes(config, compilerCtx, docsOutputTargets);
+  }
 }
