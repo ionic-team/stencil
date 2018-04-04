@@ -1,9 +1,16 @@
-import { ComponentConstructor, ComponentConstructorProperties,
-  ComponentInstance, HostElement, PlatformApi } from '../declarations';
+import * as d from '../declarations';
 import { defineMember } from './proxy-members';
 
 
-export function proxyComponentInstance(plt: PlatformApi, cmpConstructor: ComponentConstructor, elm: HostElement, instance: ComponentInstance, properties?: ComponentConstructorProperties, memberName?: string) {
+export function proxyComponentInstance(
+  plt: d.PlatformApi,
+  cmpConstructor: d.ComponentConstructor,
+  elm: d.HostElement,
+  instance: d.ComponentInstance,
+  hostSnapshot: d.HostSnapshot,
+  properties?: d.ComponentConstructorProperties,
+  memberName?: string
+) {
   // at this point we've got a specific node of a host element, and created a component class instance
   // and we've already created getters/setters on both the host element and component class prototypes
   // let's upgrade any data that might have been set on the host element already
@@ -29,6 +36,6 @@ export function proxyComponentInstance(plt: PlatformApi, cmpConstructor: Compone
 
   // define each of the members and initialize what their role is
   for (memberName in properties) {
-    defineMember(plt, properties[memberName], elm, instance, memberName);
+    defineMember(plt, properties[memberName], elm, instance, memberName, hostSnapshot);
   }
 }

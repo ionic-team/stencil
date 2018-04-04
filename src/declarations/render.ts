@@ -89,22 +89,23 @@ export interface RendererApi {
     newVNode: d.VNode,
     isUpdate?: boolean,
     encapsulation?: d.Encapsulation,
-    hostContent?: HostContent,
     ssrId?: number
   ): d.VNode;
 }
 
 
-export interface HostContent {
-  defaultSlot?: DefaultSlot;
-  namedSlots?: NamedSlots;
+export interface HostSnapshot {
+  $id?: string;
+  $attributes?: HostSnapshotAttributes;
 }
 
 
-export type DefaultSlot = Node[];
+export interface HostSnapshotAttributes {
+  [attrName: string]: string;
+}
 
 
-export interface NamedSlots {
+export interface ContentSlots {
+  $defaultSlot?: Node[];
   [slotName: string]: Node[];
 }
-

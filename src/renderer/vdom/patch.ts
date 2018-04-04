@@ -9,6 +9,7 @@
 import * as d from '../../declarations';
 import { Build } from '../../util/build-conditionals';
 import { isDef } from '../../util/helpers';
+import { loadHostContent } from './host-content';
 import { NODE_TYPE, SSR_CHILD_ID, SSR_VNODE_ID } from '../../util/constants';
 import { updateElement } from './update-dom-node';
 
@@ -22,22 +23,25 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
 
   function createElm(vnode: d.VNode, parentElm: d.HostElement, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
     if (Build.slotPolyfill && !useNativeShadowDom && vnode.vtag === 'slot') {
-      if (hostContent.defaultSlot || hostContent.namedSlots) {
+
+      if (!contentSlots) {
+        contentSlots = loadHostContent(domApi, contentRef);
+      }
+
+      if (Object.keys(contentSlots).length) {
         if (scopeId) {
           domApi.$setAttribute(parentElm, scopeId + '-slot', '');
         }
 
         // special case for manually relocating host content nodes
         // to their new home in either a named slot or the default slot
-        namedSlot = (vnode.vattrs && vnode.vattrs.name);
-
-        if (isDef(namedSlot)) {
+        if (isDef(namedSlot = (vnode.vattrs && vnode.vattrs.name))) {
           // this vnode is a named slot
-          slotNodes = hostContent.namedSlots && hostContent.namedSlots[namedSlot];
+          slotNodes = contentSlots[namedSlot];
 
         } else {
           // this vnode is the default slot
-          slotNodes = hostContent.defaultSlot;
+          slotNodes = contentSlots.$defaultSlot;
         }
 
         if (isDef(slotNodes)) {
@@ -353,17 +357,18 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   }
 
   // internal variables to be reused per patch() call
-  let hostContent: d.HostContent,
+  let contentRef: Comment,
+      contentSlots: d.ContentSlots,
       useNativeShadowDom: boolean,
       ssrId: number,
       scopeId: string;
 
 
-  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdate?: boolean, encapsulation?: d.Encapsulation, hostElmContent?: d.HostContent, ssrPatchId?: number) {
+  return function patch(oldVNode: d.VNode, newVNode: d.VNode, isUpdate?: boolean, encapsulation?: d.Encapsulation, ssrPatchId?: number) {
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
-    hostContent = hostElmContent;
+    contentRef = (oldVNode.elm as d.HostElement)['s-cr'];
 
     if (Build.ssrServerSide) {
       if (encapsulation !== 'shadow') {
@@ -406,6 +411,9 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       // should be given the ssr id attribute
       domApi.$setAttribute(oldVNode.elm, SSR_VNODE_ID, ssrId);
     }
+
+    // reset
+    contentSlots = contentRef = null;
 
     // return our new vnode
     return newVNode;

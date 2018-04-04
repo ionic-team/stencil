@@ -250,7 +250,7 @@ export interface HostElement extends HTMLElement {
    * Host Element Id:
    * A unique id assigned to this host element.
    */
-  ['s-id']?: number;
+  ['s-id']?: string;
 
   /**
    * Content Reference:

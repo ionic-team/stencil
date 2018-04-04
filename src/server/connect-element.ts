@@ -2,7 +2,7 @@ import * as d from '../declarations';
 import { connectedCallback } from '../core/connected';
 import { ENCAPSULATION } from '../util/constants';
 import { initHostElement } from '../core/init-host-element';
-import { noop } from '../util/helpers';
+import { initHostSnapshot } from '../core/host-snapshot';
 
 
 export function connectChildElements(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, parentElm: Element) {
@@ -40,8 +40,8 @@ export function connectElement(config: d.Config, plt: d.PlatformApi, App: d.AppG
 
 function connectHostElement(config: d.Config, plt: d.PlatformApi, App: d.AppGlobal, hydrateResults: d.HydrateResults, elm: d.HostElement, cmpMeta: d.ComponentMeta) {
   if (!cmpMeta.componentConstructor) {
-    plt.connectHostElement(cmpMeta, elm);
-    plt.loadBundle(cmpMeta, elm.mode, noop);
+    const hostSnapshot = initHostSnapshot(plt.domApi, cmpMeta, elm);
+    plt.requestBundle(cmpMeta, elm, hostSnapshot);
   }
 
   if (cmpMeta.encapsulation !== ENCAPSULATION.ShadowDom) {

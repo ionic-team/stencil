@@ -2,7 +2,6 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { createThemedClasses } from '../util/theme';
 import { h } from '../renderer/vdom/h';
-import { loadHostContent } from '../renderer/vdom/slot';
 import { RUNTIME_ERROR } from '../util/constants';
 
 
@@ -76,15 +75,12 @@ export function render(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.Host
       // each patch always gets a new vnode
       // the host element itself isn't patched because it already exists
       // kick off the actual render and any DOM updates
-      const vnode = plt.render(
+      plt.vnodeMap.set(elm, plt.render(
         oldVNode,
         hostVNode,
         isUpdateRender,
-        cmpMeta.componentConstructor.encapsulation,
-        Build.slotPolyfill ? loadHostContent(plt.domApi, elm) : {}
-      );
-
-      plt.vnodeMap.set(elm, vnode);
+        cmpMeta.componentConstructor.encapsulation
+      ));
     }
 
     if (Build.styles) {

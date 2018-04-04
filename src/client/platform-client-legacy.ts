@@ -7,18 +7,18 @@ import { createVNodesFromSsr } from '../renderer/vdom/ssr';
 import { createQueueClient } from './queue-client';
 import { CustomStyle } from './css-shim/custom-style';
 import { enableEventListener } from '../core/listeners';
-import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { generateDevInspector } from './dev-inspector';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
 import { initCssVarShim } from './css-shim/init-css-shim';
-import { initHostContent } from '../renderer/vdom/slot';
 import { initHostElement } from '../core/init-host-element';
+import { initHostSnapshot } from '../core/host-snapshot';
 import { initStyleTemplate } from '../core/styles';
 import { parseComponentLoader } from '../util/data-parse';
 import { proxyController } from '../core/proxy-controller';
+import { queueUpdate } from '../core/update';
 import { toDashCase } from '../util/helpers';
-import { useScopedCss, useShadowDom } from '../renderer/vdom/encapsulation';
+import { useScopedCss } from '../renderer/vdom/encapsulation';
 
 
 export function createPlatformClientLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
@@ -52,11 +52,11 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
   // keep a global set of tags we've already defined
   const globalDefined: {[tag: string]: boolean} = (win as any).$definedCmps = (win as any).$definedCmps || {};
 
+  // internal id increment for unique ids
   let ids = 0;
 
   // create the platform api which is used throughout common core code
   const plt: d.PlatformApi = {
-    connectHostElement,
     domApi,
     defineComponent,
     emitEvent: Context.emit,
@@ -64,11 +64,11 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
     getContextItem: contextKey => Context[contextKey],
     isClient: true,
     isDefinedComponent: (elm: Element) => !!(globalDefined[domApi.$tagName(elm)] || plt.getComponentMeta(elm)),
-    loadBundle: loadComponent,
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
+    nextId: () => namespace + (ids++),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
     queue: createQueueClient(App, win),
-    nextId: () => ids += 2,
+    requestBundle: requestBundle,
 
     ancestorHostElementMap: new WeakMap(),
     componentAppliedStyles: new WeakMap(),
@@ -103,31 +103,6 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
   // if the HTML was generated from SSR
   // then let's walk the tree and generate vnodes out of the data
   createVNodesFromSsr(plt, domApi, rootElm);
-
-  function connectHostElement(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-    // set the "mode" property
-    if (!elm.mode) {
-      // looks like mode wasn't set as a property directly yet
-      // first check if there's an attribute
-      // next check the app's global
-      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
-    }
-
-    // host element has been connected to the DOM
-    if (!domApi.$getAttribute(elm, SSR_VNODE_ID) && !useShadowDom(domApi.$supportsShadowDom, cmpMeta)) {
-      // only required when we're NOT using native shadow dom (slot)
-      // this host element was NOT created with SSR
-      // let's pick out the inner content for slot projection
-      initHostContent(domApi, elm);
-    }
-
-    if (!domApi.$supportsShadowDom && cmpMeta.encapsulation === ENCAPSULATION.ShadowDom) {
-      // this component should use shadow dom
-      // but this browser doesn't support it
-      // so let's polyfill a few things for the user
-      (elm as any).shadowRoot = elm;
-    }
-  }
 
 
   function defineComponent(cmpMeta: d.ComponentMeta, HostElementConstructor: any) {
@@ -251,19 +226,32 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
   }
 
   // This is executed by the component's connected callback.
-  function loadComponent(cmpMeta: d.ComponentMeta, modeName: string, cb: Function, bundleId?: string) {
-    bundleId = (typeof cmpMeta.bundleIds === 'string') ?
+  function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+    // remember a "snapshot" of this host element's current attributes/child nodes/slots/etc
+    initHostSnapshot(plt.domApi, cmpMeta, elm);
+
+    // set the "mode" property
+    if (!elm.mode) {
+      // looks like mode wasn't set as a property directly yet
+      // first check if there's an attribute
+      // next check the app's global
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
+    }
+
+    const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :
-      cmpMeta.bundleIds[modeName];
+      cmpMeta.bundleIds[elm.mode];
 
     if (loadedBundles[bundleId]) {
       // sweet, we've already loaded this bundle
-      cb();
+      queueUpdate(plt, elm);
 
     } else {
       // never seen this bundle before, let's start the request
       // and add it to the callbacks to fire when it has loaded
-      bundleQueue.push([undefined, [bundleId], cb]);
+      bundleQueue.push([undefined, [bundleId], () => {
+        queueUpdate(plt, elm);
+      }]);
 
       // when to request the bundle depends is we're using the css shim or not
       if (Build.cssVarShim && !customStyle.supportsCssVars) {

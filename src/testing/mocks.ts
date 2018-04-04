@@ -44,37 +44,25 @@ export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.Compo
   plt.isClient = true;
 
   const $mockedQueue = plt.queue = mockQueue();
-  const $loadBundleQueue = mockQueue();
 
-  plt.loadBundle = function(_: any, _modeName: string, cb: Function) {
-    $loadBundleQueue.add(cb);
-  };
-
-  (<MockedPlatform>plt).$flushQueue = function() {
+  (plt as MockedPlatform).$flushQueue = function() {
     return new Promise(resolve => {
       $mockedQueue.flush(resolve);
     });
   };
 
-  (<MockedPlatform>plt).$flushLoadBundle = function() {
-    return new Promise(resolve => {
-      $loadBundleQueue.flush(resolve);
-    });
-  };
-
   const renderer = createRendererPatch(plt, domApi);
 
-  plt.render = function(oldVNode: d.VNode, newVNode: d.VNode, isUpdate: boolean, encapsulation, hostContent) {
-    return renderer(oldVNode, newVNode, isUpdate, encapsulation, hostContent);
+  plt.render = function(oldVNode, newVNode, isUpdate, encapsulation) {
+    return renderer(oldVNode, newVNode, isUpdate, encapsulation);
   };
 
-  return (<MockedPlatform>plt);
+  return plt as MockedPlatform;
 }
 
 
 export interface MockedPlatform extends d.PlatformApi {
   $flushQueue?: () => Promise<any>;
-  $flushLoadBundle?: () => Promise<any>;
 }
 
 
@@ -128,7 +116,7 @@ export function mockWindow() {
 
   const window = mockStencilSystem().createDom().parse(opts);
 
-  (window as any).requestAnimationFrame = function(callback: Function) {
+  (window as any).requestAnimationFrame = (callback: Function) => {
     setTimeout(() => {
       callback(Date.now());
     });
@@ -203,8 +191,13 @@ export function mockElement(tag = 'div'): Element {
 export function mockComponentInstance(plt: d.PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta = {}): d.ComponentInstance {
   mockDefine(plt, cmpMeta);
 
-  const el = domApi.$createElement('ion-cmp') as any;
-  return initComponentInstance(plt, el);
+  const elm = domApi.$createElement('ion-cmp') as d.HostElement;
+
+  const hostSnapshot: d.HostSnapshot = {
+    $attributes: {}
+  };
+
+  return initComponentInstance(plt, elm, hostSnapshot);
 }
 
 export function mockTextNode(text: string): Element {
@@ -241,11 +234,13 @@ export function mockDispatchEvent(domApi: d.DomApi, el: HTMLElement, name: strin
   return el.dispatchEvent(ev);
 }
 
-export function mockConnect(plt: MockedPlatform, html: string) {
+export async function mockConnect(plt: MockedPlatform, html: string) {
   const jsdom = require('jsdom');
   const rootNode = jsdom.JSDOM.fragment(html);
 
   connectComponents(plt, rootNode);
+
+  await plt.$flushQueue();
 
   return rootNode;
 }
@@ -263,24 +258,19 @@ function connectComponents(plt: MockedPlatform, node: d.HostElement) {
       }
     }
   }
+
   if (node.childNodes) {
-    for (var i = 0; i < node.childNodes.length; i++) {
+    for (let i = 0; i < node.childNodes.length; i++) {
       connectComponents(plt, node.childNodes[i] as d.HostElement);
     }
   }
 }
 
 
-export async function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string): Promise<d.HostElement> {
+export async function waitForLoad(plt: MockedPlatform, rootNode: any, tag: string) {
   const elm: d.HostElement = rootNode.tagName === tag.toLowerCase() ? rootNode : rootNode.querySelector(tag);
 
     // flush to read attribute mode on host elment
-  await plt.$flushQueue();
-
-  // flush requesting and loading the bundle
-  await plt.$flushLoadBundle();
-
-  // flush to load component mode data
   await plt.$flushQueue();
 
   connectComponents(plt, elm);

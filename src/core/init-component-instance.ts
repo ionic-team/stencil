@@ -6,7 +6,15 @@ import { RUNTIME_ERROR } from '../util/constants';
 import { proxyComponentInstance } from './proxy-component-instance';
 
 
-export function initComponentInstance(plt: d.PlatformApi, elm: d.HostElement, instance?: d.ComponentInstance, componentConstructor?: d.ComponentConstructor, queuedEvents?: any[], i?: number) {
+export function initComponentInstance(
+  plt: d.PlatformApi,
+  elm: d.HostElement,
+  hostSnapshot: d.HostSnapshot,
+  instance?: d.ComponentInstance,
+  componentConstructor?: d.ComponentConstructor,
+  queuedEvents?: any[],
+  i?: number
+) {
   try {
     // using the user's component class, let's create a new instance
     componentConstructor = plt.getComponentMeta(elm).componentConstructor;
@@ -17,7 +25,7 @@ export function initComponentInstance(plt: d.PlatformApi, elm: d.HostElement, in
 
     // let's upgrade the data on the host element
     // and let the getters/setters do their jobs
-    proxyComponentInstance(plt, componentConstructor, elm, instance);
+    proxyComponentInstance(plt, componentConstructor, elm, instance, hostSnapshot);
 
     if (Build.event) {
       // add each of the event emitters which wire up instance methods

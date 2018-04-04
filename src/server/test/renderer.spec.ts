@@ -1,12 +1,12 @@
-import { ComponentConstructor, ComponentMeta, ComponentRegistry, Config } from '../../declarations';
-import { Renderer, h } from '../index';
+import * as d from '../../declarations';
 import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
 import { mockConfig } from '../../testing/mocks';
+import { Renderer, h } from '../index';
 
 
 describe('Renderer', () => {
 
-  let config: Config;
+  let config: d.Config;
   let renderer: Renderer;
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('Renderer', () => {
   });
 
   it('hydrate elm attributes', async () => {
-    const MyButton: ComponentConstructor = class {
+    const MyButton: d.ComponentConstructor = class {
       size = 'default';
 
       static get is() {
@@ -38,7 +38,7 @@ describe('Renderer', () => {
       }
     };
 
-    const cmpRegistry: ComponentRegistry = {
+    const cmpRegistry: d.ComponentRegistry = {
       'my-button': {
         bundleIds: 'my-button',
         tagNameMeta: 'my-button',
@@ -50,7 +50,7 @@ describe('Renderer', () => {
           }
         },
         componentConstructor: MyButton
-      } as ComponentMeta
+      } as d.ComponentMeta
     };
 
     renderer = new Renderer(config, cmpRegistry);

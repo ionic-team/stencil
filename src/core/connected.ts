@@ -1,12 +1,11 @@
+import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
-import { ComponentMeta, HostElement, PlatformApi } from '../declarations';
-import { initElementListeners } from './listeners';
+import { initHostSnapshot } from './host-snapshot';
 import { PRIORITY } from '../util/constants';
-import { queueUpdate } from './update';
+import { initElementListeners } from './listeners';
 
 
-export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm: HostElement) {
-
+export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
   if (Build.listener) {
     // initialize our event listeners on the host element
     // we do this now so that we can listening to events that may
@@ -31,7 +30,7 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
 
     if (!elm['s-id']) {
       // assign a unique id to this host element
-      // possible we've already given this element an id
+      // it's possible this was already given an element id
       elm['s-id'] = plt.nextId();
     }
 
@@ -44,24 +43,17 @@ export function connectedCallback(plt: PlatformApi, cmpMeta: ComponentMeta, elm:
     // ensure the "mode" attribute has been added to the element
     // place in high priority since it's not much work and we need
     // to know as fast as possible, but still an async tick in between
-    plt.queue.add(() => {
-      // only collects slot references if this component even has slots
-      plt.connectHostElement(cmpMeta, elm);
-
+    plt.queue.add(() =>
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.loadBundle(cmpMeta, elm.mode, () =>
-        // we've fully loaded the component mode data
-        // let's queue it up to be rendered next
-        queueUpdate(plt, elm)
-      );
+      plt.requestBundle(cmpMeta, elm, initHostSnapshot(plt.domApi, cmpMeta, elm))
 
-    }, PRIORITY.High);
+    , PRIORITY.High);
   }
 }
 
 
-export function registerWithParentComponent(plt: PlatformApi, elm: HostElement, ancestorHostElement?: HostElement) {
+export function registerWithParentComponent(plt: d.PlatformApi, elm: d.HostElement, ancestorHostElement?: d.HostElement) {
   // find the first ancestor host element (if there is one) and register
   // this element as one of the actively loading child elements for its ancestor
   ancestorHostElement = elm;

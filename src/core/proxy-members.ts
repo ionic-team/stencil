@@ -1,25 +1,29 @@
+import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
-import { ComponentConstructorProperty, ComponentInstance, HostElement, PlatformApi } from '../declarations';
+import { isDef } from '../util/helpers';
 import { parsePropertyValue } from '../util/data-parse';
 import { queueUpdate } from './update';
 
 
 export function defineMember(
-  plt: PlatformApi,
-  property: ComponentConstructorProperty,
-  elm: HostElement,
-  instance: ComponentInstance,
-  memberName: string
+  plt: d.PlatformApi,
+  property: d.ComponentConstructorProperty,
+  elm: d.HostElement,
+  instance: d.ComponentInstance,
+  memberName: string,
+  hostSnapshot: d.HostSnapshot,
+  hostAttributes?: d.HostSnapshotAttributes,
+  hostAttrValue?: string
 ) {
 
-  function getComponentProp(this: ComponentInstance, values?: any) {
+  function getComponentProp(this: d.ComponentInstance, values?: any) {
     // component instance prop/state getter
     // get the property value directly from our internal values
     values = plt.valuesMap.get(plt.hostElementMap.get(this));
     return values && values[memberName];
   }
 
-  function setComponentProp(this: ComponentInstance, newValue: any, elm?: HostElement) {
+  function setComponentProp(this: d.ComponentInstance, newValue: any, elm?: d.HostElement) {
     // component instance prop/state setter (cannot be arrow fn)
     elm = plt.hostElementMap.get(this);
 
@@ -39,8 +43,7 @@ export function defineMember(
     if (!property.state) {
       if (property.attr && (values[memberName] === undefined || values[memberName] === '')) {
         // check the prop value from the host element attribute
-        const hostAttrValue = plt.domApi.$getAttribute(elm, property.attr);
-        if (hostAttrValue != null) {
+        if ((hostAttributes = hostSnapshot && hostSnapshot.$attributes) && isDef(hostAttrValue = hostAttributes[property.attr])) {
           // looks like we've got an attribute value
           // let's set it to our internal values
           values[memberName] = parsePropertyValue(property.type, hostAttrValue);
@@ -134,7 +137,7 @@ export function defineMember(
 }
 
 
-export function setValue(plt: PlatformApi, elm: HostElement, memberName: string, newVal: any, values?: any, instance?: ComponentInstance, watchMethods?: string[]) {
+export function setValue(plt: d.PlatformApi, elm: d.HostElement, memberName: string, newVal: any, values?: any, instance?: d.ComponentInstance, watchMethods?: string[]) {
   // get the internal values object, which should always come from the host element instance
   // create the _values object if it doesn't already exist
   values = plt.valuesMap.get(elm);
@@ -204,7 +207,7 @@ export function definePropertyGetterSetter(obj: any, propertyKey: string, get: a
 const WATCH_CB_PREFIX = `wc-`;
 
 
-export function elementHasProperty(plt: PlatformApi, elm: HostElement, memberName: string) {
+export function elementHasProperty(plt: d.PlatformApi, elm: d.HostElement, memberName: string) {
   // within the browser, the element's prototype
   // already has its getter/setter set, but on the
   // server the prototype is shared causing issues

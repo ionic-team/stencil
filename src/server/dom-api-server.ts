@@ -1,17 +1,19 @@
-import { DomApi, HostElement, PlatformApi } from '../declarations';
-import { noop } from '../util/helpers';
+import * as d from '../declarations';
+import { initHostElement } from '../core/init-host-element';
+import { initHostSnapshot } from '../core/host-snapshot';
 
 
-export function patchDomApi(plt: PlatformApi, domApi: DomApi) {
+export function patchDomApi(config: d.Config, plt: d.PlatformApi, domApi: d.DomApi) {
 
   const orgCreateElement = domApi.$createElement;
   domApi.$createElement = (tagName: string) => {
-    const elm = orgCreateElement(tagName) as HostElement;
+    const elm = orgCreateElement(tagName) as d.HostElement;
 
     const cmpMeta = plt.getComponentMeta(elm);
     if (cmpMeta && !cmpMeta.componentConstructor) {
-      plt.connectHostElement(cmpMeta, elm);
-      plt.loadBundle(cmpMeta, elm.mode, noop);
+      initHostElement(plt, cmpMeta, elm, config.namespace);
+      const hostSnapshot = initHostSnapshot(domApi, cmpMeta, elm);
+      plt.requestBundle(cmpMeta, elm, hostSnapshot);
     }
 
     return elm;

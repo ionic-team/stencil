@@ -9,7 +9,7 @@ describe('connected', () => {
     it('should create instance', async () => {
       mockDefine(plt, { tagNameMeta: 'ion-test' });
 
-      const node = mockConnect(plt, '<ion-test></ion-test>');
+      const node = await mockConnect(plt, '<ion-test></ion-test>');
       const elm = await waitForLoad(plt, node, 'ion-test');
       const instance = plt.instanceMap.get(elm);
       expect(instance).toBeDefined();
@@ -18,7 +18,7 @@ describe('connected', () => {
     it('should set $connected', async () => {
       mockDefine(plt, { tagNameMeta: 'ion-test' });
 
-      const node = mockConnect(plt, '<ion-test></ion-test>');
+      const node = await mockConnect(plt, '<ion-test></ion-test>');
       const elm = await waitForLoad(plt, node, 'ion-test');
       const hasConnected = plt.hasConnectedMap.has(elm);
       expect(hasConnected).toBe(true);

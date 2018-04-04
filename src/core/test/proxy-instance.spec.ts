@@ -1,4 +1,4 @@
-import { ComponentConstructor, HostElement, PlatformApi } from '../../declarations';
+import * as d from '../../declarations';
 import { MEMBER_TYPE } from '../../util/constants';
 import { mockElement, mockPlatform } from '../../testing/mocks';
 import { proxyComponentInstance } from '../proxy-component-instance';
@@ -6,16 +6,18 @@ import { proxyComponentInstance } from '../proxy-component-instance';
 
 describe('proxyComponentInstance', () => {
 
-  let plt: PlatformApi;
-  let cmpConstructor: ComponentConstructor;
-  let elm: HostElement;
+  let plt: d.PlatformApi;
+  let cmpConstructor: d.ComponentConstructor;
+  let elm: d.HostElement;
   let instance: any;
+  let hostSnapshot: d.HostSnapshot;
 
   beforeEach(() => {
     plt = mockPlatform();
     cmpConstructor = {};
     elm = mockElement('my-cmp') as any;
     instance = {};
+    hostSnapshot = {};
   });
 
 
@@ -24,8 +26,10 @@ describe('proxyComponentInstance', () => {
       propVal: { type: String, attr: 'prop-val' }
     };
     plt.valuesMap.set(elm, { propVal: '' });
-    elm.setAttribute('prop-val', 'elm-attr-val');
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    hostSnapshot.$attributes = {
+      'prop-val': 'elm-attr-val'
+    };
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
 
     expect(instance.propVal).toBe('elm-attr-val');
   });
@@ -36,7 +40,7 @@ describe('proxyComponentInstance', () => {
     };
     (elm as any).propVal = 'elm-prop-val';
     instance.propVal = 'instance-prop-val';
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
 
     expect(instance.propVal).toBe('elm-prop-val');
   });
@@ -45,10 +49,14 @@ describe('proxyComponentInstance', () => {
     cmpConstructor.properties = {
       propVal: { type: String, attr: 'prop-val' }
     };
-    elm.setAttribute('prop-val', 'elm-attr-val');
+
+    hostSnapshot.$attributes = {
+      'prop-val': 'elm-attr-val'
+    };
+
     (elm as any).propVal = 'elm-prop-val';
     instance.propVal = 'instance-prop-val';
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
 
     expect(instance.propVal).toBe('elm-attr-val');
   });
@@ -60,7 +68,7 @@ describe('proxyComponentInstance', () => {
     };
     instance.propVal = 'prop-val';
     instance.propMutableVal = 'prop-mutable-val';
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
 
     expect(instance.propVal).toBe('prop-val');
     expect(instance.propMutableVal).toBe('prop-mutable-val');
@@ -83,7 +91,7 @@ describe('proxyComponentInstance', () => {
     };
     (elm as any).propVal = 'prop-val';
     (elm as any).propMutableVal = 'prop-mutable-val';
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
 
     expect(instance.propVal).toBe('prop-val');
     expect(instance.propMutableVal).toBe('prop-mutable-val');
@@ -100,13 +108,17 @@ describe('proxyComponentInstance', () => {
   });
 
   it('should get elm attr values for prop/prop mutable', () => {
+    hostSnapshot.$attributes = {
+      'prop-val': 'prop-val',
+      'prop-mutable-val': 'prop-mutable-val'
+    };
+
     cmpConstructor.properties = {
       propVal: { type: String, attr: 'prop-val' },
       propMutableVal: { type: String, mutable: true, attr: 'prop-mutable-val' }
     };
-    elm.setAttribute('prop-val', 'prop-val');
-    elm.setAttribute('prop-mutable-val', 'prop-mutable-val');
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
 
     expect(instance.propVal).toBe('prop-val');
     expect(instance.propMutableVal).toBe('prop-mutable-val');
@@ -127,7 +139,7 @@ describe('proxyComponentInstance', () => {
       stateVal: { state: true }
     };
     instance.stateVal = 'some-val';
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     expect(instance.stateVal).toBe('some-val');
     const stateVal = Object.getOwnPropertyDescriptor(instance, 'stateVal');
     expect(stateVal.value).toBeUndefined();
@@ -140,7 +152,7 @@ describe('proxyComponentInstance', () => {
       mystate: { state: true }
     };
     (elm as any).mystate = 'invalid';
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     expect(instance.mystate).toBeUndefined();
   });
 
@@ -149,7 +161,7 @@ describe('proxyComponentInstance', () => {
       mystate: { state: true }
     };
     elm.setAttribute('mystate', 'invalid');
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     expect(instance.mystate).toBeUndefined();
   });
 
@@ -157,7 +169,7 @@ describe('proxyComponentInstance', () => {
     cmpConstructor.properties = {
       myElement: { elementRef: true }
     };
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     const myElement = Object.getOwnPropertyDescriptor(instance, 'myElement');
     expect(myElement.value).toBe(elm);
     expect(myElement.get).toBeUndefined();
@@ -172,7 +184,7 @@ describe('proxyComponentInstance', () => {
     cmpConstructor.properties = {
       isServer: { context: 'isServer' }
     };
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     expect(instance.isServer).toBe(false);
   });
 
@@ -181,7 +193,7 @@ describe('proxyComponentInstance', () => {
     cmpConstructor.properties = {
       myPropContext: { context: 'ctrlId' }
     };
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     expect(plt.getContextItem).toHaveBeenCalled();
   });
 
@@ -190,7 +202,7 @@ describe('proxyComponentInstance', () => {
     cmpConstructor.properties = {
       myPropConnect: { connect: 'ctrlId' }
     };
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     const myPropConnect = Object.getOwnPropertyDescriptor(instance, 'myPropConnect');
     expect(plt.propConnect).toHaveBeenCalled();
     expect(myPropConnect).toBeDefined();
@@ -198,18 +210,18 @@ describe('proxyComponentInstance', () => {
 
   it('reused existing internal values', () => {
     plt.valuesMap.set(elm, { mph: 88 });
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     expect(plt.valuesMap.get(elm).mph).toBe(88);
   });
 
   it('create new internal values', () => {
-    proxyComponentInstance(plt, cmpConstructor, elm, instance);
+    proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     expect(plt.valuesMap.get(elm)).toBeDefined();
   });
 
   it('do nothing for no members', () => {
     expect(() => {
-      proxyComponentInstance(plt, cmpConstructor, elm, instance);
+      proxyComponentInstance(plt, cmpConstructor, elm, instance, hostSnapshot);
     }).not.toThrow();
   });
 

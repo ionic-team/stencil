@@ -1,24 +1,23 @@
+import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
-import { ComponentInstance, HostElement, PlatformApi } from '../declarations';
 import { initComponentInstance } from './init-component-instance';
 import { PRIORITY, RUNTIME_ERROR } from '../util/constants';
 import { render } from './render';
 
 
-export function queueUpdate(plt: PlatformApi, elm: HostElement) {
+export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement) {
   // only run patch if it isn't queued already
   if (!plt.isQueuedForUpdate.has(elm)) {
     plt.isQueuedForUpdate.set(elm, true);
-
     // run the patch in the next tick
-      // vdom diff and patch the host element for differences
+    // vdom diff and patch the host element for differences
     plt.queue.add(() => update(plt, elm), plt.isAppLoaded ? PRIORITY.Low : PRIORITY.High);
   }
 }
 
 
-export function update(plt: PlatformApi, elm: HostElement, isInitialLoad?: boolean, instance?: ComponentInstance, ancestorHostElement?: HostElement) {
+export function update(plt: d.PlatformApi, elm: d.HostElement, isInitialLoad?: boolean, instance?: d.ComponentInstance, ancestorHostElement?: d.HostElement, userPromise?: Promise<void>) {
   // no longer queued for update
   plt.isQueuedForUpdate.delete(elm);
 
@@ -27,7 +26,6 @@ export function update(plt: PlatformApi, elm: HostElement, isInitialLoad?: boole
   if (!plt.isDisconnectedMap.has(elm)) {
     instance = plt.instanceMap.get(elm);
     isInitialLoad = !instance;
-    let userPromise: Promise<void>;
 
     if (isInitialLoad) {
       ancestorHostElement = plt.ancestorHostElementMap.get(elm);
@@ -56,7 +54,7 @@ export function update(plt: PlatformApi, elm: HostElement, isInitialLoad?: boole
       // haven't created a component instance for this host element yet!
       // create the instance from the user's component class
       // https://www.youtube.com/watch?v=olLxrojmvMg
-      instance = initComponentInstance(plt, elm);
+      instance = initComponentInstance(plt, elm, plt.hostSnapshotMap.get(elm));
 
       if (Build.cmpWillLoad) {
         // fire off the user's componentWillLoad method (if one was provided)
@@ -101,12 +99,10 @@ export function update(plt: PlatformApi, elm: HostElement, isInitialLoad?: boole
 }
 
 
-export function renderUpdate(plt: PlatformApi, elm: HostElement, instance: ComponentInstance, isInitialLoad: boolean) {
+export function renderUpdate(plt: d.PlatformApi, elm: d.HostElement, instance: d.ComponentInstance, isInitialLoad: boolean) {
   // if this component has a render function, let's fire
   // it off and generate a vnode for this
   render(plt, plt.getComponentMeta(elm), elm, instance, !isInitialLoad);
-  // _hasRendered was just set
-  // _onRenderCallbacks were all just fired off
 
   try {
     if (isInitialLoad) {

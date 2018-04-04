@@ -4,7 +4,6 @@ import * as d from './index';
 export interface PlatformApi {
   activeRender?: boolean;
   attachStyles?: (plt: PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, modeName: string, elm: d.HostElement, customStyle?: any) => void;
-  connectHostElement: (cmpMeta: d.ComponentMeta, elm: d.HostElement) => void;
   defineComponent: (cmpMeta: d.ComponentMeta, HostElementConstructor?: any) => void;
   domApi?: d.DomApi;
   emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
@@ -14,7 +13,7 @@ export interface PlatformApi {
   isDefinedComponent?: (elm: Element) => boolean;
   isPrerender?: boolean;
   isServer?: boolean;
-  loadBundle: (cmpMeta: d.ComponentMeta, modeName: string, cb: Function) => void;
+  requestBundle: (cmpMeta: d.ComponentMeta, elm: d.HostElement, hostSnapshot: d.HostSnapshot) => void;
   onAppLoad?: (rootElm: d.HostElement, styles: string[], failureDiagnostic?: d.Diagnostic) => void;
   isAppLoaded?: boolean;
   onError: (err: Error, type?: number, elm?: d.HostElement, appFailure?: boolean) => void;
@@ -22,13 +21,14 @@ export interface PlatformApi {
   queue: QueueApi;
   render?: d.RendererApi;
   tmpDisconnected?: boolean;
-  nextId?: () => number;
+  nextId?: () => string;
 
   ancestorHostElementMap?: WeakMap<d.HostElement, d.HostElement>;
   componentAppliedStyles?: WeakMap<Node, d.ComponentAppliedStyles>;
   hasConnectedMap?: WeakMap<d.HostElement, boolean>;
   hasListenersMap?: WeakMap<d.HostElement, boolean>;
   hasLoadedMap?: WeakMap<d.HostElement, boolean>;
+  hostSnapshotMap?: WeakMap<d.HostElement, d.HostSnapshot>;
   hostElementMap?: WeakMap<d.ComponentInstance, d.HostElement>;
   instanceMap?: WeakMap<d.HostElement, d.ComponentInstance>;
   isDisconnectedMap?: WeakMap<d.HostElement, boolean>;

@@ -39,11 +39,14 @@ export function disconnectedCallback(plt: PlatformApi, elm: HostElement, instanc
       }
     }
 
-    // ancestorHostElementMap has references to other elements
+    // clear any references to other elements
     // more than likely we've already deleted these references
     // but let's double check there pal
-    plt.ancestorHostElementMap.delete(elm);
-    plt.onReadyCallbacksMap.delete(elm);
+    [
+      plt.ancestorHostElementMap,
+      plt.onReadyCallbacksMap,
+      plt.hostSnapshotMap
+    ].forEach(wm => wm.delete(elm));
   }
 }
 

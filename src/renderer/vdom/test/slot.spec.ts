@@ -1,5 +1,5 @@
+import * as d from '../../../declarations';
 import { h } from '../h';
-import { HostElement, PlatformApi, VNode } from '../../../declarations';
 import { mockConnect, mockDefine, mockPlatform, waitForLoad } from '../../../testing/mocks';
 import { render } from '../../../core/render';
 
@@ -10,15 +10,15 @@ describe('Component slot', () => {
     msg: ''
   };
 
-  let plt: PlatformApi;
+  let plt: d.PlatformApi;
 
   beforeEach(() => {
     parentInstance.msg = 'parent message';
     plt = mockPlatform();
   });
 
-  function mount(options: {parentVNode: VNode, childVNode: VNode}): Promise<{ parentElm?: HostElement, childElm?: HostElement }> {
-    const rtn: { parentElm?: HostElement, childElm?: HostElement } = {};
+  async function mount(options: {parentVNode: d.VNode, childVNode: d.VNode}): Promise<{ parentElm?: d.HostElement, childElm?: d.HostElement }> {
+    const rtn: { parentElm?: d.HostElement, childElm?: d.HostElement } = {};
 
     mockDefine(plt, {
       tagNameMeta: 'ion-parent',
@@ -38,7 +38,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     return waitForLoad(plt, node, 'ion-parent').then(parentElm => {
       rtn.parentElm = parentElm;
@@ -51,7 +51,7 @@ describe('Component slot', () => {
   }
 
 
-  it('should relocate nested default slot nodes', () => {
+  it('should relocate nested default slot nodes', async () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -61,7 +61,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-test>88</ion-test>');
+    const node = await mockConnect(plt, '<ion-test>88</ion-test>');
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.firstElementChild.nodeName).toBe('SPIDER');
@@ -70,7 +70,7 @@ describe('Component slot', () => {
     });
   });
 
-  it('should use components default slot text content', () => {
+  it('should use components default slot text content', async () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -80,7 +80,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-test></ion-test>');
+    const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.firstElementChild.nodeName).toBe('SPIDER');
@@ -89,7 +89,7 @@ describe('Component slot', () => {
     });
   });
 
-  it('should use components default slot node content', () => {
+  it('should use components default slot node content', async () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -99,7 +99,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-test></ion-test>');
+    const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.firstElementChild.nodeName).toBe('SPIDER');
@@ -108,7 +108,7 @@ describe('Component slot', () => {
     });
   });
 
-  it('should relocate nested named slot nodes', () => {
+  it('should relocate nested named slot nodes', async () => {
     mockDefine(plt, {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
@@ -118,7 +118,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-test><tiger slot="start">88</tiger></ion-test>');
+    const node = await mockConnect(plt, '<ion-test><tiger slot="start">88</tiger></ion-test>');
 
     return waitForLoad(plt, node, 'ion-test').then(elm => {
       expect(elm.firstElementChild.nodeName).toBe('MONKEY');
@@ -228,7 +228,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const parentElm = await waitForLoad(plt, node, 'ion-parent');
     const childElm = await waitForLoad(plt, parentElm, 'ion-child');
@@ -334,7 +334,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const parentElm = await waitForLoad(plt, node, 'ion-parent');
     const childElm = await waitForLoad(plt, parentElm, 'ion-child');
@@ -381,7 +381,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const parentElm = await waitForLoad(plt, node, 'ion-parent');
     await waitForLoad(plt, parentElm, 'ion-child');
@@ -438,7 +438,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const parentElm = await waitForLoad(plt, node, 'ion-parent');
     await waitForLoad(plt, parentElm, 'ion-child');
@@ -494,7 +494,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const parentElm = await waitForLoad(plt, node, 'ion-parent');
     await waitForLoad(plt, parentElm, 'ion-child');
@@ -559,7 +559,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const parentElm = await waitForLoad(plt, node, 'ion-parent');
     await waitForLoad(plt, parentElm, 'ion-child');
@@ -641,7 +641,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const elm = await waitForLoad(plt, node, 'ion-parent');
     await waitForLoad(plt, node, 'test-1');
@@ -712,7 +712,7 @@ describe('Component slot', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-parent></ion-parent>');
+    const node = await mockConnect(plt, '<ion-parent></ion-parent>');
 
     const elm = await waitForLoad(plt, node, 'ion-parent');
     await waitForLoad(plt, node, 'test-1');

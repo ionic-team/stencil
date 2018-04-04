@@ -1,5 +1,5 @@
+import * as d from '../../declarations';
 import { Build } from '../../util/build-conditionals';
-import { ComponentMeta, HostElement } from '../../declarations';
 import { h } from '../../renderer/vdom/h';
 import { MockedPlatform, mockConnect, mockDefine, mockElement, mockPlatform, waitForLoad } from '../../testing/mocks';
 import { NODE_TYPE } from '../../util/constants';
@@ -24,8 +24,8 @@ describe('instance update', () => {
           this.ranLifeCycle = true;
         }
       }
-      const elm = mockElement('ion-tag') as HostElement;
-      const cmpMeta: ComponentMeta = { tagNameMeta: 'ion-tag' };
+      const elm = mockElement('ion-tag') as d.HostElement;
+      const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
       const instance = new MyComponent();
       renderUpdate(plt, elm, instance, false);
@@ -39,8 +39,8 @@ describe('instance update', () => {
           this.ranLifeCycle = true;
         }
       }
-      const elm = mockElement('ion-tag') as HostElement;
-      const cmpMeta: ComponentMeta = { tagNameMeta: 'ion-tag' };
+      const elm = mockElement('ion-tag') as d.HostElement;
+      const cmpMeta: d.ComponentMeta = { tagNameMeta: 'ion-tag' };
       plt.defineComponent(cmpMeta);
 
       const instance = new MyComponent();
@@ -57,15 +57,14 @@ describe('instance update', () => {
         value = '88';
         render() {
           return [
-            h('ion-test', null, this.value)
+            h('badger', null, this.value)
           ];
         }
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-test></ion-test>');
+    const node = await mockConnect(plt, '<ion-test></ion-test>');
     Build.hostData = false;
-
     const elm = await waitForLoad(plt, node, 'ion-test');
     const vnode = plt.vnodeMap.get(elm);
     expect(vnode.elm.textContent).toBe('88');
@@ -78,6 +77,7 @@ describe('instance update', () => {
     await plt.$flushQueue();
 
     expect(vnode.elm.textContent).toBe('99');
+
     Build.hostData = true;
   });
 
@@ -94,7 +94,7 @@ describe('instance update', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-test></ion-test>');
+    const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     const elm = await waitForLoad(plt, node, 'ion-test');
     expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
@@ -116,7 +116,7 @@ describe('instance update', () => {
       } as any
     });
 
-    const node = mockConnect(plt, '<ion-test></ion-test>');
+    const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     const elm = await waitForLoad(plt, node, 'ion-test');
     expect(elm.childNodes[0].nodeType).toBe(NODE_TYPE.CommentNode);
@@ -135,7 +135,7 @@ describe('instance update', () => {
       componentConstructor: class {} as any
     });
 
-    const node = mockConnect(plt, '<ion-test></ion-test>');
+    const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     const elm = await waitForLoad(plt, node, 'ion-test');
     const vnode = plt.vnodeMap.get(elm);
@@ -143,7 +143,7 @@ describe('instance update', () => {
   });
 
   it('should create instance', async () => {
-    const cmpMeta: ComponentMeta = {
+    const cmpMeta: d.ComponentMeta = {
       tagNameMeta: 'ion-test',
       componentConstructor: class {
         constructor() {/**/}
@@ -151,7 +151,7 @@ describe('instance update', () => {
     };
     mockDefine(plt, cmpMeta);
 
-    const node = mockConnect(plt, '<ion-test></ion-test>');
+    const node = await mockConnect(plt, '<ion-test></ion-test>');
 
     const elm = await waitForLoad(plt, node, 'ion-test');
     const instance = plt.instanceMap.get(elm);
