@@ -23,8 +23,6 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     ...config.commonjs
   };
 
-  console.log(commonjsConfig);
-
   const rollupConfig: InputOptions = {
     input: entryModules.map(b => b.entryKey),
     experimentalCodeSplitting: true,
