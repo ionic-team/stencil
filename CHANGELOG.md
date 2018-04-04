@@ -1,3 +1,13 @@
+<a name="0.7.14"></a>
+## 😛 [0.7.14](https://github.com/ionic-team/stencil/compare/v0.7.13...v0.7.14) (2018-04-04)
+
+
+### Bug Fixes
+
+* **slot:** alway include slot ([803cfa3](https://github.com/ionic-team/stencil/commit/803cfa3))
+
+
+
 <a name="0.7.13"></a>
 ## ⛱ [0.7.13](https://github.com/ionic-team/stencil/compare/v0.7.12...v0.7.13) (2018-04-04)
 
