@@ -50,7 +50,7 @@ export interface ComponentConstructor {
 
 export interface ComponentConstructorHost {
   theme?: string;
-  [attrName: string]: string;
+  [attrName: string]: string | undefined;
 }
 
 
@@ -231,7 +231,7 @@ export interface ComponentInternalValues {
 
 
 export interface ComponentModule {
-  new (): ComponentInstance;
+  new(): ComponentInstance;
 }
 
 
@@ -363,7 +363,7 @@ export interface ComponentMemberData {
   /**
    * is attribute name to observe
    */
-  [3]: string|number;
+  [3]: string | number;
 
   /**
    * prop type
