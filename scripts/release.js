@@ -132,8 +132,12 @@ function runTasks(opts) {
         task: () => execa('npm', ['run', 'build'], { cwd: rootDir })
       },
       {
-        title: 'Run tests',
+        title: 'Run unit tests',
         task: () => execa('npm', ['test'], { cwd: rootDir })
+      },
+      {
+        title: 'Run package tests',
+        task: () => execa('npm', ['run', 'test.packages'], { cwd: rootDir })
       },
       {
         title: 'Set package.json version',

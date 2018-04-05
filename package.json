@@ -34,6 +34,7 @@
     "set.version": "node scripts/set-version.js",
     "start": "npm install && npm run build",
     "test": "jest",
+    "test.packages": "node scripts/test-packages.js",
     "test.watch": "jest --watch",
     "vermoji": "node scripts/vermoji.js"
   },
