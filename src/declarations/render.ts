@@ -107,5 +107,5 @@ export interface HostSnapshotAttributes {
 
 export interface ContentSlots {
   $defaultSlot?: Node[];
-  [slotName: string]: Node[];
+  [slotName: string]: Node[] | undefined;
 }
