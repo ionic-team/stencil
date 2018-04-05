@@ -21,7 +21,7 @@ import { toDashCase } from '../util/helpers';
 import { useScopedCss } from '../renderer/vdom/encapsulation';
 
 
-export function createPlatformClientLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
+export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const bundleQueue: d.BundleCallback[] = [];
   const loadedBundles: {[bundleId: string]: any} = {};
