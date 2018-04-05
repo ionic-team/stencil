@@ -1,11 +1,18 @@
 var path = require('path');
+var fs = require('fs');
 var ts = require('typescript');
 var testing = require('./index');
 
+var stencilTestingPath = path.resolve(__dirname, '../dist/testing/index.js')
+try {
+  fs.accessSync(stencilTestingPath);
+} catch (e) {
+  stencilTestingPath = '@stencil/core/testing';
+}
+
 var injectTestingScript = [
-  'var StencilTesting = require("@stencil/core/testing");',
+  'var StencilTesting = require("' + stencilTestingPath + '");',
   'var h = StencilTesting.h;',
-  'var t = StencilTesting.t;',
   'var resourcesUrl = "build/"',
   'var Context = {};'
 ].join('\n');
@@ -13,13 +20,15 @@ var injectTestingScript = [
 
 module.exports = {
   process: function(sourceText, filePath) {
+
     if (filePath.endsWith('.d.ts')) {
       return '';
     }
 
     else if (filePath.endsWith('.tsx')) {
       var opts = {
-        module: 'commonjs'
+        module: 'commonjs',
+        target: 'es5'
       };
 
       opts.jsx = ts.JsxEmit.React;
