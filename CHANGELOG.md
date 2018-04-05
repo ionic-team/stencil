@@ -1,3 +1,15 @@
+<a name="0.7.15"></a>
+## 🚢 [0.7.15](https://github.com/ionic-team/stencil/compare/v0.7.14...v0.7.15) (2018-04-05)
+
+
+### Bug Fixes
+
+* **slot:** load host content on every render ([79fbf50](https://github.com/ionic-team/stencil/commit/79fbf50))
+* **theme:** ensure elm.mode is always set ([33dd711](https://github.com/ionic-team/stencil/commit/33dd711))
+* **types:** property possibly undefined ([18bac2a](https://github.com/ionic-team/stencil/commit/18bac2a))
+
+
+
 <a name="0.7.14"></a>
 ## 😛 [0.7.14](https://github.com/ionic-team/stencil/compare/v0.7.13...v0.7.14) (2018-04-04)
 
