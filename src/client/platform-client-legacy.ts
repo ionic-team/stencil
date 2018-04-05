@@ -228,9 +228,6 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
 
   // This is executed by the component's connected callback.
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
-    // remember a "snapshot" of this host element's current attributes/child nodes/slots/etc
-    initHostSnapshot(plt.domApi, cmpMeta, elm);
-
     // set the "mode" property
     if (!elm.mode) {
       // looks like mode wasn't set as a property directly yet
@@ -238,6 +235,9 @@ export function createPlatformClientLegacy(namespace: string, Context: d.CoreCon
       // next check the app's global
       elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
     }
+
+    // remember a "snapshot" of this host element's current attributes/child nodes/slots/etc
+    initHostSnapshot(plt.domApi, cmpMeta, elm);
 
     const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
       cmpMeta.bundleIds :

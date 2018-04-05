@@ -353,8 +353,7 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   }
 
   // internal variables to be reused per patch() call
-  let contentRef: Comment,
-      contentSlots: d.ContentSlots,
+  let contentSlots: d.ContentSlots,
       useNativeShadowDom: boolean,
       ssrId: number,
       scopeId: string;
@@ -374,11 +373,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     }
 
     if (Build.slotPolyfill) {
-      // get the host content reference comment node
-      contentRef = (oldVNode.elm as d.HostElement)['s-cr'];
-
-      // collect the host content nodes and and shots
-      loadHostContent(domApi, contentRef, (contentSlots = {}));
+      // get the host content reference comment node and
+      // collect the host content nodes and shots
+      loadHostContent(
+        domApi,
+        (oldVNode.elm as d.HostElement)['s-cr'],
+        (contentSlots = {})
+      );
 
       // get the scopeId
       scopeId = (encapsulation === 'scoped' || (encapsulation === 'shadow' && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;

@@ -137,6 +137,14 @@ export function createPlatformClient(namespace: string, Context: d.CoreContext, 
 
 
   function requestBundle(cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+    // set the "mode" property
+    if (!elm.mode) {
+      // looks like mode wasn't set as a property directly yet
+      // first check if there's an attribute
+      // next check the app's global
+      elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
+    }
+
     // remember a "snapshot" of this host element's current attributes/child nodes/slots/etc
     initHostSnapshot(plt.domApi, cmpMeta, elm);
 
@@ -145,14 +153,6 @@ export function createPlatformClient(namespace: string, Context: d.CoreContext, 
       queueUpdate(plt, elm);
 
     } else {
-      // set the "mode" property
-      if (!elm.mode) {
-        // looks like mode wasn't set as a property directly yet
-        // first check if there's an attribute
-        // next check the app's global
-        elm.mode = domApi.$getAttribute(elm, 'mode') || Context.mode;
-      }
-
       const bundleId = (typeof cmpMeta.bundleIds === 'string') ?
         cmpMeta.bundleIds :
         cmpMeta.bundleIds[elm.mode];
