@@ -21,15 +21,14 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
     angularImports.push('Directive as NgDirective');
   }
 
-  if (c.includes('@NgInput')) {
-    angularImports.push('Input as NgInput', 'ElementRef');
-    c = angularProxyInput() + c;
-  }
+  angularImports.push('Input as NgInput', 'ElementRef');
+
+  c = angularProxyInput() + c;
+  c = angularProxyMethod() + c;
 
   if (c.includes('@NgOutput')) {
     angularImports.push('Output as NgOutput');
     angularImports.push('EventEmitter as NgEventEmitter');
-    c = angularProxyOutput() + c;
   }
 
   c = `/* angular directive proxies */\nimport { ${angularImports.sort().join(', ')} } from '@angular/core';\n\n` + c;
@@ -50,26 +49,24 @@ function relativeImport(pathFrom: string, pathTo: string) {
 }
 
 function angularProxyInput() {
-  return [
-    `export function inputs(instance: any, el: ElementRef, props: string[]) {`,
-    `  props.forEach(propName => {`,
-    `    Object.defineProperty(instance, propName, {`,
-    `      get: () => el.nativeElement[propName], set: (val: any) => el.nativeElement[propName] = val`,
-    `    });`,
-    `  });`,
-    `}\n`
-  ].join('\n') + '\n';
+  return `
+export function inputs(instance: any, el: ElementRef, props: string[]) {
+  props.forEach(propName => {
+    Object.defineProperty(instance, propName, {
+      get: () => el.nativeElement[propName], set: (val: any) => el.nativeElement[propName] = val
+    });
+  });
+}
+`;
 }
 
-
-function angularProxyOutput() {
-  return [
-    `export function outputs(instance: any, events: string[]) {`,
-    `  events.forEach(eventName => {`,
-    `    instance[eventName] = new NgEventEmitter();`,
-    `  });`,
-    `}\n`
-  ].join('\n') + '\n';
+function angularProxyMethod() {
+  return `
+export function method(ref: ElementRef, methodName: string, ...args: any[]) {
+  return ref.nativeElement.componentOnReady()
+    .then((el: any) => el[methodName].apply(el, args));
+}
+`;
 }
 
 function getMetadata(excludeComponents: string[], cmpRegistry: d.ComponentRegistry): d.ComponentMeta[] {
@@ -115,6 +112,7 @@ function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.Componen
   o.push(`@NgDirective({ selector: '${cmpMeta.tagNameMeta}' })`);
   o.push(`export class ${cmpMeta.componentClass} {`);
 
+  // Inputs
   Object.keys(cmpMeta.membersMeta).forEach(memberName => {
     const m = cmpMeta.membersMeta[memberName];
 
@@ -134,35 +132,46 @@ function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.Componen
     }
   });
 
+  // Events
   cmpMeta.eventsMeta.forEach(eventMeta => {
     o.push(`  @NgOutput() ${eventMeta.eventName}: NgEventEmitter<any>;`);
 
     if (RESERVED_KEYWORDS.includes(eventMeta.eventName)) {
       outputMembers.push(`'${eventMeta.eventName}'`);
-
     } else {
-      if (!allInstanceMembers.includes(eventMeta.eventName)) {
-        allInstanceMembers.push(eventMeta.eventName);
-      }
-
       outputMembers.push(eventMeta.eventName);
     }
   });
 
-  if (inputMembers.length > 0 || outputMembers.length > 0) {
-    o.push(`  constructor(${inputMembers.length > 0 ? `el: ElementRef` : ``}) {`);
+  // Methods
+  let hasMethods = false;
+  Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+    const m = cmpMeta.membersMeta[memberName];
 
-    if (inputMembers.length > 0) {
-      o.push(`    inputs(this, el, [${inputMembers.join(`, `)}]);`);
+    if (m.memberType === MEMBER_TYPE.Method) {
+      if (!allInstanceMembers.includes(memberName)) {
+        allInstanceMembers.push(memberName);
+      }
+      o.push(getMethod(memberName, m));
+      hasMethods = true;
     }
+  });
 
-    if (outputMembers.length > 0) {
-      o.push(`    outputs(this, [${outputMembers.join(`, `)}]);`);
-    }
 
+  let hasContructor = false;
+  if (hasMethods) {
+    hasContructor = true;
+    o.push(`  constructor(private r: ElementRef) {`);
+  } else if ( inputMembers.length > 0 ) {
+    hasContructor = true;
+    o.push(`  constructor(r: ElementRef) {`);
+  }
+  if (inputMembers.length > 0) {
+    o.push(`    inputs(this, r, [${inputMembers.join(`, `)}]);`);
+  }
+  if (hasContructor) {
     o.push(`  }`);
   }
-
   o.push(`}\n`);
 
   return o.join('\n');
@@ -173,6 +182,11 @@ function getInput(memberName: string, memberMeta: d.MemberMeta) {
   return `${getJsDocs(memberMeta)}  @NgInput() ${memberName}: ${getPropType(memberMeta.propType)};`;
 }
 
+function getMethod(memberName: string, memberMeta: d.MemberMeta) {
+  return `${getJsDocs(memberMeta)}  ${memberName}(...__args: any[]): Promise<any> {
+    return method(this.r, ${memberName}, __args);
+  }`;
+}
 
 function getJsDocs(m: d.MemberMeta) {
   let c = '';
