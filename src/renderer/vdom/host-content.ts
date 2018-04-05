@@ -3,7 +3,7 @@ import { isDef } from '../../util/helpers';
 import { NODE_TYPE } from '../../util/constants';
 
 
-export function loadHostContent(domApi: d.DomApi, contentRef: Comment, contentSlots: d.ContentSlots = {}, node?: Node, childNodes?: NodeList, i?: number, slotName?: string) {
+export function loadHostContent(domApi: d.DomApi, contentRef: Comment, contentSlots: d.ContentSlots, node?: Node, childNodes?: NodeList, i?: number, slotName?: string) {
   node = contentRef && domApi.$parentNode(contentRef);
 
   if (node) {
@@ -35,6 +35,4 @@ export function loadHostContent(domApi: d.DomApi, contentRef: Comment, contentSl
       }
     }
   }
-
-  return contentSlots;
 }

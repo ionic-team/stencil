@@ -24,10 +24,6 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
   function createElm(vnode: d.VNode, parentElm: d.HostElement, childIndex: number, i?: number, elm?: any, childNode?: Node, namedSlot?: string, slotNodes?: Node[], hasLightDom?: boolean) {
     if (Build.slotPolyfill && !useNativeShadowDom && vnode.vtag === 'slot') {
 
-      if (!contentSlots) {
-        contentSlots = loadHostContent(domApi, contentRef);
-      }
-
       if (Object.keys(contentSlots).length) {
         if (scopeId) {
           domApi.$setAttribute(parentElm, scopeId + '-slot', '');
@@ -368,7 +364,6 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     // patchVNode() is synchronous
     // so it is safe to set these variables and internally
     // the same patch() call will reference the same data
-    contentRef = (oldVNode.elm as d.HostElement)['s-cr'];
 
     if (Build.ssrServerSide) {
       if (encapsulation !== 'shadow') {
@@ -379,6 +374,13 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
     }
 
     if (Build.slotPolyfill) {
+      // get the host content reference comment node
+      contentRef = (oldVNode.elm as d.HostElement)['s-cr'];
+
+      // collect the host content nodes and and shots
+      loadHostContent(domApi, contentRef, (contentSlots = {}));
+
+      // get the scopeId
       scopeId = (encapsulation === 'scoped' || (encapsulation === 'shadow' && !domApi.$supportsShadowDom)) ? 'data-' + domApi.$tagName(oldVNode.elm) : null;
     }
 
@@ -411,9 +413,6 @@ export function createRendererPatch(plt: d.PlatformApi, domApi: d.DomApi): d.Ren
       // should be given the ssr id attribute
       domApi.$setAttribute(oldVNode.elm, SSR_VNODE_ID, ssrId);
     }
-
-    // reset
-    contentSlots = contentRef = null;
 
     // return our new vnode
     return newVNode;
