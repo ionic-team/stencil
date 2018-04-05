@@ -1,3 +1,13 @@
+<a name="0.7.16"></a>
+## 🏌 [0.7.16](https://github.com/ionic-team/stencil/compare/v0.7.15...v0.7.16) (2018-04-05)
+
+
+### Bug Fixes
+
+* **tests:** fix test suite API ([dcac32f](https://github.com/ionic-team/stencil/commit/dcac32f)), closes [#697](https://github.com/ionic-team/stencil/issues/697)
+
+
+
 <a name="0.7.15"></a>
 ## 🚢 [0.7.15](https://github.com/ionic-team/stencil/compare/v0.7.14...v0.7.15) (2018-04-05)
 

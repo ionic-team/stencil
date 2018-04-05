@@ -1,0 +1,19 @@
+{
+  "name": "@stencil/test-testing",
+  "private": true,
+  "scripts": {
+    "test": "node ../../node_modules/.bin/jest --no-cache"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "<rootDir>../../testing/jest.preprocessor.js"
+    },
+    "testRegex": ".*\\.spec\\.(ts|tsx|js)$"
+  }
+}

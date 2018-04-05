@@ -2,7 +2,8 @@ import * as d from '../declarations';
 import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
-import { DEFAULT_STYLE_MODE, ENCAPSULATION, PROP_TYPE, RUNTIME_ERROR } from '../util/constants';
+import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
+import { fillCmpMetaFromConstructor } from './cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../renderer/vdom/h';
 import { initCoreComponentOnReady } from '../core/component-on-ready';
@@ -175,24 +176,7 @@ export function createPlatformServer(
           const componentConstructor = bundleExports[pascalCasedTagName];
 
           if (!cmpMeta.componentConstructor) {
-            // init component constructor
-            cmpMeta.componentConstructor = componentConstructor;
-
-            cmpMeta.membersMeta = {
-              'color': {}
-            };
-
-            if (cmpMeta.componentConstructor.properties) {
-              Object.keys(cmpMeta.componentConstructor.properties).forEach(memberName => {
-                const constructorProperty = cmpMeta.componentConstructor.properties[memberName];
-
-                if (constructorProperty.type) {
-                  cmpMeta.membersMeta[memberName] = {
-                    propType: PROP_TYPE.Any
-                  };
-                }
-              });
-            }
+            fillCmpMetaFromConstructor(componentConstructor, cmpMeta);
           }
 
           if (componentConstructor.style) {
