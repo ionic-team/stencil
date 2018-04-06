@@ -40,14 +40,14 @@
     "vermoji": "node scripts/vermoji.js"
   },
   "dependencies": {
-    "chokidar": "2.0.1",
+    "chokidar": "2.0.3",
     "jsdom": "11.5.1",
     "rollup": "0.56.5",
-    "rollup-plugin-commonjs": "8.3.0",
+    "rollup-plugin-commonjs": "9.1.0",
     "rollup-plugin-node-builtins": "2.1.2",
-    "rollup-plugin-node-globals": "1.1.0",
-    "rollup-plugin-node-resolve": "3.0.3",
-    "rollup-pluginutils": "^2.0.1",
+    "rollup-plugin-node-globals": "1.2.0",
+    "rollup-plugin-node-resolve": "3.3.0",
+    "rollup-pluginutils": "2.0.1",
     "typescript": "^2.8.1",
     "uglify-es": "3.3.9",
     "workbox-build": "3.0.0-alpha.6"
