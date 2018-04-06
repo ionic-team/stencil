@@ -1,3 +1,13 @@
+<a name="0.7.18"></a>
+## 🍹 [0.7.18](https://github.com/ionic-team/stencil/compare/v0.7.17...v0.7.18) (2018-04-06)
+
+
+### Bug Fixes
+
+* **angular:** outputs must be proxied ([e5647ac](https://github.com/ionic-team/stencil/commit/e5647ac))
+
+
+
 <a name="0.7.17"></a>
 ## 🍸 [0.7.17](https://github.com/ionic-team/stencil/compare/v0.7.16...v0.7.17) (2018-04-06)
 
