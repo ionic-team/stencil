@@ -1,9 +1,9 @@
 import { Component, State } from '../../../../dist/index';
 
 @Component({
-  tag: 'cmp-a'
+  tag: 'conditional-basic'
 })
-export class CmpA {
+export class ConditionalBasic {
 
   @State() showContent = false;
 

@@ -25,26 +25,107 @@ declare global {
 
 
 declare global {
-  interface HTMLCmpAElement extends HTMLStencilElement {
+  interface HTMLConditionalBasicElement extends HTMLStencilElement {
 
   }
-  var HTMLCmpAElement: {
-    prototype: HTMLCmpAElement;
-    new (): HTMLCmpAElement;
+  var HTMLConditionalBasicElement: {
+    prototype: HTMLConditionalBasicElement;
+    new (): HTMLConditionalBasicElement;
   };
   interface HTMLElementTagNameMap {
-    'cmp-a': HTMLCmpAElement;
+    'conditional-basic': HTMLConditionalBasicElement;
   }
   interface ElementTagNameMap {
-    'cmp-a': HTMLCmpAElement;
+    'conditional-basic': HTMLConditionalBasicElement;
   }
   namespace JSX {
     interface IntrinsicElements {
-      'cmp-a': JSXElements.CmpAAttributes;
+      'conditional-basic': JSXElements.ConditionalBasicAttributes;
     }
   }
   namespace JSXElements {
-    export interface CmpAAttributes extends HTMLAttributes {
+    export interface ConditionalBasicAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+  interface HTMLSlotLightDomElement extends HTMLStencilElement {
+
+  }
+  var HTMLSlotLightDomElement: {
+    prototype: HTMLSlotLightDomElement;
+    new (): HTMLSlotLightDomElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-light-dom': HTMLSlotLightDomElement;
+  }
+  interface ElementTagNameMap {
+    'slot-light-dom': HTMLSlotLightDomElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-light-dom': JSXElements.SlotLightDomAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotLightDomAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+  interface HTMLSlotBasicContentElement extends HTMLStencilElement {
+
+  }
+  var HTMLSlotBasicContentElement: {
+    prototype: HTMLSlotBasicContentElement;
+    new (): HTMLSlotBasicContentElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-basic-content': HTMLSlotBasicContentElement;
+  }
+  interface ElementTagNameMap {
+    'slot-basic-content': HTMLSlotBasicContentElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-basic-content': JSXElements.SlotBasicContentAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotBasicContentAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+  interface HTMLSlotLightDomContentElement extends HTMLStencilElement {
+
+  }
+  var HTMLSlotLightDomContentElement: {
+    prototype: HTMLSlotLightDomContentElement;
+    new (): HTMLSlotLightDomContentElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-light-dom-content': HTMLSlotLightDomContentElement;
+  }
+  interface ElementTagNameMap {
+    'slot-light-dom-content': HTMLSlotLightDomContentElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-light-dom-content': JSXElements.SlotLightDomContentAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotLightDomContentAttributes extends HTMLAttributes {
 
     }
   }

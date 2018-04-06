@@ -35,6 +35,7 @@
     "start": "npm install && npm run build",
     "test": "jest",
     "test.e2e.app": "node bin/stencil build -c test/e2e/app/stencil.config.js",
+    "test.e2e.app.dev": "node bin/stencil build --dev --watch -c test/e2e/app/stencil.config.js",
     "test.packages": "node scripts/test-packages.js",
     "test.testing": "cd test/testing && npm run test",
     "test.watch": "jest --watch",
