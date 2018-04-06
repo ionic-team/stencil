@@ -1,22 +1,28 @@
-import { CompilerCtx, Config, FilesMap } from '../../../declarations';
+import * as d from '../../../declarations';
 import { normalizePath } from '../../util';
 
 
-export default function inMemoryFsRead(config: Config, compilerCtx: CompilerCtx) {
-  const sys = config.sys;
-  const assetsCache: FilesMap = {};
+export default function inMemoryFsRead(config: d.Config, path: d.Path, compilerCtx: d.CompilerCtx) {
+  const assetsCache: d.FilesMap = {};
+  let tsFileNames: string[];
 
   return {
     name: 'inMemoryFsRead',
 
     async resolveId(importee: string, importer: string) {
-      if (!sys.path.isAbsolute(importee)) {
-        importee = normalizePath(sys.path.resolve(importer ? sys.path.dirname(importer) : sys.path.resolve(), importee));
+      // note: node-resolve plugin has already ran
+      // we can assume the importee is a file path
 
-        if (importee.indexOf('.js') === -1) {
+      const orgImportee = importee;
+
+      if (!path.isAbsolute(importee)) {
+        importee = path.resolve(importer ? path.dirname(importer) : path.resolve(), importee);
+
+        if (!importee.endsWith('.js')) {
           importee += '.js';
         }
       }
+      importee = normalizePath(importee);
 
       // it's possible the importee is a file pointing directly to the source ts file
       // if it is a ts file path, then we're good to go
@@ -25,22 +31,74 @@ export default function inMemoryFsRead(config: Config, compilerCtx: CompilerCtx)
         return moduleFile.jsFilePath;
       }
 
-      const tsFileNames = Object.keys(compilerCtx.moduleFiles);
-      for (var i = 0; i < tsFileNames.length; i++) {
+      if (!tsFileNames) {
+        // get all the module files as filenames
+        // caching the filenames so we don't have to keep doing this
+        tsFileNames = Object.keys(compilerCtx.moduleFiles);
+      }
+
+      for (let i = 0; i < tsFileNames.length; i++) {
         // see if we can find by importeE
         moduleFile = compilerCtx.moduleFiles[tsFileNames[i]];
-        if (moduleFile.jsFilePath === importee) {
-          // awesome, there's a module file for this js file, we're good here
+        const moduleJsFilePath = moduleFile.jsFilePath;
+
+        if (moduleJsFilePath === importee) {
+          // exact match
           return importee;
         }
-        if (moduleFile.jsFilePath === importee + '.js') {
+
+        if (!importee.endsWith('.js') && moduleJsFilePath === importee + '.js') {
+          // try by appending .js
           return `${importee}.js`;
+        }
+
+        if (!importee.endsWith('/index.js') && moduleJsFilePath === importee + '/index.js') {
+          // try by appending /index.js
+          return `${importee}/index.js`;
+        }
+      }
+
+      if (typeof importer === 'string' && !path.isAbsolute(orgImportee)) {
+        // no luck finding the path the importee
+        // try again by using the importers source path and original importee
+        // get the original ts source path importer from this js path importer
+        for (let i = 0; i < tsFileNames.length; i++) {
+          const tsFilePath = tsFileNames[i];
+          moduleFile = compilerCtx.moduleFiles[tsFilePath];
+          if (moduleFile.jsFilePath !== importer) {
+            continue;
+          }
+
+          // found the importer's module file using importer's jsFilePath
+          // create an importee path using the source of the importers original ts file path
+          const srcImportee = normalizePath(path.resolve(path.dirname(tsFilePath), orgImportee));
+
+          let accessData = await compilerCtx.fs.accessData(srcImportee);
+          if (accessData.isFile) {
+            return srcImportee;
+          }
+
+          if (!srcImportee.endsWith('/index.js')) {
+            accessData = await compilerCtx.fs.accessData(srcImportee + '/index.js');
+            if (accessData.isFile) {
+              return srcImportee + '/index.js';
+            }
+          }
+
+          if (!srcImportee.endsWith('.js')) {
+            accessData = await compilerCtx.fs.accessData(srcImportee + '.js');
+            if (accessData.isFile) {
+              return srcImportee + '.js';
+            }
+          }
+
+          break;
         }
       }
 
       // let's check all of the asset directories for this path
       // think slide's swiper dependency
-      for (i = 0; i < tsFileNames.length; i++) {
+      for (let i = 0; i < tsFileNames.length; i++) {
         // see if we can find by importeR
         moduleFile = compilerCtx.moduleFiles[tsFileNames[i]];
         if (moduleFile.jsFilePath === importer) {
@@ -49,8 +107,8 @@ export default function inMemoryFsRead(config: Config, compilerCtx: CompilerCtx)
           if (moduleFile.cmpMeta && moduleFile.cmpMeta.assetsDirsMeta) {
             for (var j = 0; j < moduleFile.cmpMeta.assetsDirsMeta.length; j++) {
               const assetsAbsPath = moduleFile.cmpMeta.assetsDirsMeta[j].absolutePath;
-              const importeeFileName = sys.path.basename(importee);
-              const assetsFilePath = normalizePath(sys.path.join(assetsAbsPath, importeeFileName));
+              const importeeFileName = path.basename(importee);
+              const assetsFilePath = normalizePath(path.join(assetsAbsPath, importeeFileName));
 
               // ok, we've got a potential absolute path where the file "could" be
               try {
@@ -67,6 +125,7 @@ export default function inMemoryFsRead(config: Config, compilerCtx: CompilerCtx)
           }
         }
       }
+
       return null;
     },
 

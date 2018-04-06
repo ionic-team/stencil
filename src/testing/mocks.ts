@@ -91,6 +91,25 @@ export function mockStencilSystem(): d.StencilSystem {
 }
 
 
+export function mockPath() {
+  const sys = mockStencilSystem();
+
+  const path: d.Path = {
+    isAbsolute: sys.path.isAbsolute,
+    resolve: sys.path.resolve,
+    dirname: sys.path.dirname,
+    basename: sys.path.basename,
+    extname: sys.path.extname,
+    join: sys.path.join,
+    parse: sys.path.parse,
+    relative: sys.path.relative,
+    sep: sys.path.sep
+  };
+
+  return path;
+}
+
+
 export function mockFs() {
   return new TestingFs();
 }

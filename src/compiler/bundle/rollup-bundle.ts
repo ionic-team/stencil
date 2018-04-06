@@ -38,7 +38,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
       globals(),
       builtins(),
       bundleEntryFile(config, entryModules),
-      inMemoryFsRead(config, compilerCtx),
+      inMemoryFsRead(config, config.sys.path, compilerCtx),
       await pathsResolution(config, compilerCtx),
       localResolution(config, compilerCtx),
       nodeEnvVars(config),

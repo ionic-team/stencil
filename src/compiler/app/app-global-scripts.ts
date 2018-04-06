@@ -101,7 +101,7 @@ async function bundleProjectGlobal(config: Config, compilerCtx: CompilerCtx, bui
           include: 'node_modules/**',
           sourceMap: false
         }),
-        inMemoryFsRead(config, compilerCtx),
+        inMemoryFsRead(config, config.sys.path, compilerCtx),
         ...config.plugins
       ],
       onwarn: createOnWarnFn(config, buildCtx.diagnostics)
