@@ -62,7 +62,7 @@ export function inputs(instance: any, el: ElementRef, props: string[]) {
 
 function angularProxyMethod() {
   return `
-export function method(ref: ElementRef, methodName: string, ...args: any[]) {
+export function method(ref: ElementRef, methodName: string, args: any[]) {
   return ref.nativeElement.componentOnReady()
     .then((el: any) => el[methodName].apply(el, args));
 }
