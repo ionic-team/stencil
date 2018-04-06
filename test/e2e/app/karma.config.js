@@ -32,17 +32,22 @@ module.exports = function(config) {
     frameworks: ['jasmine', 'karma-typescript'],
 
     preprocessors: {
-      "**/*.ts": "karma-typescript" // *.tsx for React Jsx
+      "**/*.ts": "karma-typescript"
     },
 
     files: [
-      'app/**/e2e.ts',
-      { pattern: path.resolve(__dirname, 'app/dist/app.js'), watched: false },
+      '**/e2e.ts',
+      { pattern: 'dist/app/*.js', watched: false, included: false, served: true, nocache: false },
+      'dist/app.js',
     ],
+
+    proxies: {
+      '/dist/app/*.js': '/base/dist/app/*.js'
+    },
 
     reporters: ['progress'],
     karmaTypescriptConfig: {
-      tsconfig: "./app/tsconfig.json"
-    }
+      tsconfig: "./tsconfig.json"
+    },
   });
 };
