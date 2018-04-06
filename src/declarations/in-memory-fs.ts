@@ -3,6 +3,11 @@ import * as d from './index';
 
 export interface InMemoryFileSystem {
   disk: d.FileSystem;
+  accessData(filePath: string): Promise<{
+    exists: boolean;
+    isDirectory: boolean;
+    isFile: boolean;
+  }>;
   access(filePath: string): Promise<boolean>;
   /**
    * Synchronous!!! Do not use!!!

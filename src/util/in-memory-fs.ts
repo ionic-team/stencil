@@ -1,33 +1,48 @@
-import { normalizePath } from '../compiler/util';
 import * as d from '../declarations';
+import { normalizePath } from '../compiler/util';
 
 
 export class InMemoryFileSystem implements d.InMemoryFileSystem {
-  private d: d.FsItems = {};
+  private items: d.FsItems = {};
 
   constructor(public disk: d.FileSystem, private path: d.Path) {}
 
-  async access(filePath: string) {
+  async accessData(filePath: string) {
     const item = this.getItem(filePath);
 
+    const data = {
+      exists: false,
+      isDirectory: false,
+      isFile: false
+    };
+
     if (typeof item.exists === 'boolean') {
-      return item.exists;
+      data.exists = item.exists;
+      data.isDirectory = item.isDirectory;
+      data.isFile = item.isFile;
+      return data;
     }
 
-    let hasAccess = false;
     try {
       const s = await this.stat(filePath);
       item.exists = true;
       item.isDirectory = s.isDirectory;
       item.isFile = s.isFile;
 
-      hasAccess = true;
+      data.exists = item.exists;
+      data.isDirectory = item.isDirectory;
+      data.isFile = item.isFile;
 
     } catch (e) {
       item.exists = false;
     }
 
-    return hasAccess;
+    return data;
+  }
+
+  async access(filePath: string) {
+    const data = await this.accessData(filePath);
+    return data.exists;
   }
 
   /**
@@ -146,7 +161,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
       const inMemoryDirs = dirPath.split('/');
 
-      const filePaths = Object.keys(this.d);
+      const filePaths = Object.keys(this.items);
 
       filePaths.forEach(filePath => {
         if (!filePath.startsWith(dirPath)) {
@@ -156,7 +171,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
         const parts = filePath.split('/');
 
         if (parts.length === inMemoryDirs.length + 1 || (opts.recursive && parts.length > inMemoryDirs.length)) {
-          const d = this.d[filePath];
+          const d = this.items[filePath];
 
           if (d.exists) {
             // console.log(filePath, d)
@@ -412,7 +427,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   }
 
   async commit() {
-    const instructions = getCommitInstructions(this.path, this.d);
+    const instructions = getCommitInstructions(this.path, this.items);
 
     // ensure directories we need exist
     const dirsAdded = await this.commitEnsureDirs(instructions.dirsToEnsure);
@@ -521,7 +536,7 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
   clearDirCache(dirPath: string) {
     dirPath = normalizePath(dirPath);
 
-    const filePaths = Object.keys(this.d);
+    const filePaths = Object.keys(this.items);
 
     filePaths.forEach(f => {
       const filePath = this.path.relative(dirPath, f).split('/')[0];
@@ -533,31 +548,31 @@ export class InMemoryFileSystem implements d.InMemoryFileSystem {
 
   clearFileCache(filePath: string) {
     filePath = normalizePath(filePath);
-    const item = this.d[filePath];
+    const item = this.items[filePath];
     if (item && !item.queueWriteToDisk) {
-      delete this.d[filePath];
+      delete this.items[filePath];
     }
   }
 
   getItem(itemPath: string): d.FsItem {
     itemPath = normalizePath(itemPath);
-    const item = this.d[itemPath];
+    const item = this.items[itemPath];
     if (item) {
       return item;
     }
-    return this.d[itemPath] = {};
+    return this.items[itemPath] = {};
   }
 
   clearCache() {
-    this.d = {};
+    this.items = {};
   }
 
   get keys() {
-    return Object.keys(this.d).sort();
+    return Object.keys(this.items).sort();
   }
 
   getMemoryStats() {
-    return `data length: ${Object.keys(this.d).length}`;
+    return `data length: ${Object.keys(this.items).length}`;
   }
 
 }
