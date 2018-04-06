@@ -11,9 +11,9 @@ const divB = <div>B</div>;
 
 
 @Component({
-  tag: 'slot-light-dom'
+  tag: 'slot-basic'
 })
-export class SlotLightDom {
+export class SlotBasic {
 
   @State() inc = 1;
 

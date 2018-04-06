@@ -52,26 +52,26 @@ declare global {
 
 
 declare global {
-  interface HTMLSlotLightDomElement extends HTMLStencilElement {
+  interface HTMLSlotBasicElement extends HTMLStencilElement {
 
   }
-  var HTMLSlotLightDomElement: {
-    prototype: HTMLSlotLightDomElement;
-    new (): HTMLSlotLightDomElement;
+  var HTMLSlotBasicElement: {
+    prototype: HTMLSlotBasicElement;
+    new (): HTMLSlotBasicElement;
   };
   interface HTMLElementTagNameMap {
-    'slot-light-dom': HTMLSlotLightDomElement;
+    'slot-basic': HTMLSlotBasicElement;
   }
   interface ElementTagNameMap {
-    'slot-light-dom': HTMLSlotLightDomElement;
+    'slot-basic': HTMLSlotBasicElement;
   }
   namespace JSX {
     interface IntrinsicElements {
-      'slot-light-dom': JSXElements.SlotLightDomAttributes;
+      'slot-basic': JSXElements.SlotBasicAttributes;
     }
   }
   namespace JSXElements {
-    export interface SlotLightDomAttributes extends HTMLAttributes {
+    export interface SlotBasicAttributes extends HTMLAttributes {
 
     }
   }
