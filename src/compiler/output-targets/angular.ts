@@ -27,6 +27,7 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
   c = angularProxyMethod() + c;
 
   if (c.includes('@NgOutput')) {
+    c = angularProxyOutput() + c;
     angularImports.push('Output as NgOutput');
     angularImports.push('EventEmitter as NgEventEmitter');
   }
@@ -59,6 +60,18 @@ export function inputs(instance: any, el: ElementRef, props: string[]) {
 }
 `;
 }
+
+
+function angularProxyOutput() {
+  return `
+export function outputs(instance: any, events: string[]) {
+  events.forEach(eventName => {
+    instance[eventName] = new NgEventEmitter();
+  });
+}
+`;
+}
+
 
 function angularProxyMethod() {
   return `
@@ -126,7 +139,6 @@ function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.Componen
         if (!allInstanceMembers.includes(memberName)) {
           allInstanceMembers.push(memberName);
         }
-
         inputMembers.push(memberName);
       }
     }
@@ -135,11 +147,14 @@ function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.Componen
   // Events
   cmpMeta.eventsMeta.forEach(eventMeta => {
     o.push(`  @NgOutput() ${eventMeta.eventName}: NgEventEmitter<any>;`);
-
-    if (RESERVED_KEYWORDS.includes(eventMeta.eventName)) {
-      outputMembers.push(`'${eventMeta.eventName}'`);
+    const eventName = eventMeta.eventName;
+    if (RESERVED_KEYWORDS.includes(eventName)) {
+      outputMembers.push(`'${eventName}'`);
     } else {
-      outputMembers.push(eventMeta.eventName);
+      outputMembers.push(eventName);
+      if (!allInstanceMembers.includes(eventName)) {
+        allInstanceMembers.push(eventName);
+      }
     }
   });
 
@@ -162,12 +177,18 @@ function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.Componen
   if (hasMethods) {
     hasContructor = true;
     o.push(`  constructor(private r: ElementRef) {`);
-  } else if ( inputMembers.length > 0 ) {
+  } else if ( inputMembers.length > 0) {
     hasContructor = true;
     o.push(`  constructor(r: ElementRef) {`);
+  } else if ( outputMembers.length > 0 ) {
+    hasContructor = true;
+    o.push(`  constructor() {`);
   }
   if (inputMembers.length > 0) {
     o.push(`    inputs(this, r, [${inputMembers.join(`, `)}]);`);
+  }
+  if (outputMembers.length > 0) {
+    o.push(`    outputs(this, [${outputMembers.join(`, `)}]);`);
   }
   if (hasContructor) {
     o.push(`  }`);
