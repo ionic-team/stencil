@@ -1,3 +1,15 @@
+<a name="0.7.17"></a>
+## 🍸 [0.7.17](https://github.com/ionic-team/stencil/compare/v0.7.16...v0.7.17) (2018-04-06)
+
+
+### Bug Fixes
+
+* **angular:** method proxy ([e06a37d](https://github.com/ionic-team/stencil/commit/e06a37d))
+* **angular:** proxy methods ([5e93ecb](https://github.com/ionic-team/stencil/commit/5e93ecb))
+* **bundle:** also resolve paths of relative source files not in memory ([9991d1e](https://github.com/ionic-team/stencil/commit/9991d1e))
+
+
+
 <a name="0.7.16"></a>
 ## 🏌 [0.7.16](https://github.com/ionic-team/stencil/compare/v0.7.15...v0.7.16) (2018-04-05)
 
