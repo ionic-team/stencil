@@ -12,7 +12,7 @@ describe('@Prop', () => {
         html: '<prop-cmp></prop-cmp>'
       });
       element.first = 'Marty';
-      element.last = 'McFly';
+      element.lastName = 'McFly';
       await flush(element);
       expect(element.textContent).toEqual('Hello, my name is Marty McFly');
     });
@@ -24,7 +24,7 @@ describe('@Prop', () => {
     it('should set props from attributes', async () => {
       const element = await render({
         components: [PropCmp],
-        html: '<prop-cmp first="Marty" last="McFly"></prop-cmp>'
+        html: '<prop-cmp first="Marty" last-name="McFly"></prop-cmp>'
       });
       await flush(element);
       expect(element.textContent).toEqual('Hello, my name is Marty McFly');

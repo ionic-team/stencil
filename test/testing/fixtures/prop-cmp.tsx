@@ -5,12 +5,12 @@ import { Component, Prop } from '../../../dist/index';
 })
 export class PropCmp {
   @Prop() first: string;
-  @Prop() last: string;
+  @Prop() lastName: string;
 
   render() {
     return (
       <div>
-        Hello, my name is {this.first} {this.last}
+        Hello, my name is {this.first} {this.lastName}
       </div>
     )
   }

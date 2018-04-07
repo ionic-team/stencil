@@ -4,7 +4,7 @@ import { ENCAPSULATION, SSR_VNODE_ID } from '../util/constants';
 import { useShadowDom } from '../renderer/vdom/encapsulation';
 
 
-export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm: d.HostElement) {
+export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm: d.HostElement, hostSnapshot?: d.HostSnapshot, attribName?: string) {
   // MAIN THREAD
   if (Build.slotPolyfill) {
     // host element has been connected to the DOM
@@ -31,14 +31,14 @@ export function initHostSnapshot(domApi: d.DomApi, cmpMeta: d.ComponentMeta, elm
     }
   }
 
-  const hostSnapshot: d.HostSnapshot = {
+  hostSnapshot = {
     $id: elm['s-id'],
     $attributes: {}
   };
 
   cmpMeta.membersMeta && Object.keys(cmpMeta.membersMeta).forEach(memberName => {
-    if (cmpMeta.membersMeta[memberName].attribName) {
-      hostSnapshot.$attributes[memberName] = domApi.$getAttribute(elm, cmpMeta.membersMeta[memberName].attribName);
+    if (attribName = cmpMeta.membersMeta[memberName].attribName) {
+      hostSnapshot.$attributes[attribName] = domApi.$getAttribute(elm, attribName);
     }
   });
 
