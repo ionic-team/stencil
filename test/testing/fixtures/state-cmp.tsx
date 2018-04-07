@@ -1,10 +1,9 @@
 import { Component, State } from '../../../dist/index';
 
 @Component({
-  tag: 'day-button-list',
-  styleUrl: 'day-button-list.css'
+  tag: 'state-cmp'
 })
-export class DaysButtonList {
+export class StateCmp {
 
   @State() days: DaySelection[] = [
     { label: 'Su', selected: true },

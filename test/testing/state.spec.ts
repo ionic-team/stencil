@@ -1,11 +1,11 @@
 import { flush, render } from '../../dist/testing/index';
-import { DaysButtonList } from './fixtures/state-cmp';
+import { StateCmp } from './fixtures/state-cmp';
 
 
-describe('day-button-list', () => {
+describe('@State', () => {
 
   it('should build', () => {
-    expect(new DaysButtonList()).toBeTruthy();
+    expect(new StateCmp()).toBeTruthy();
   });
 
   describe('rendering', () => {
@@ -13,8 +13,8 @@ describe('day-button-list', () => {
 
     beforeEach(async () => {
       element = await render({
-        components: [DaysButtonList],
-        html: '<day-button-list></day-button-list>'
+        components: [StateCmp],
+        html: '<state-cmp></state-cmp>'
       });
     });
 
