@@ -2,7 +2,7 @@
 describe("basic support", function() {
   let app = document.createElement("div");
   document.body.appendChild(app);
-  let scratch: HTMLDivElement; // This will hold the actual element under test.
+  let scratch: HTMLDivElement;
 
   beforeEach(function() {
     scratch = document.createElement("div");
@@ -14,17 +14,37 @@ describe("basic support", function() {
     scratch = null;
   });
 
-  describe("no children", function() {
-    it("can display a Custom Element with no children", function(done) {
-      scratch.innerHTML = '<cmp-a></cmp-a>';
-      let wc = scratch.querySelector("cmp-a");
+  function addComponent<T extends Element>(childHtml: string): T {
+    scratch.innerHTML = childHtml;
+    return scratch.firstChild as T;
+  }
 
-      window.addEventListener('appload', () => {
-        console.log('app load');
-        let button = wc.querySelector('button');
-        expect(button).toBeDefined();
-        done();
-      });
+  describe("simple test", function() {
+    it("contains a button as a child", async function() {
+
+      const component = addComponent<HTMLCmpAElement>(
+        '<cmp-a></cmp-a>'
+      );
+      await component.componentOnReady();
+      let button = component.querySelector('button');
+
+      expect(button).toBeDefined();
+    });
+
+    it("button click rerenders", async function() {
+
+      const component = addComponent<HTMLCmpAElement>(
+        '<cmp-a></cmp-a>'
+      );
+      await component.componentOnReady();
+
+      let button = component.querySelector('button');
+      let results = component.querySelector('div.results');
+
+
+      expect(results.textContent).toEqual('');
+      button.click();
+      // How do we wait for the rerender?
     });
   });
 });
