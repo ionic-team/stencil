@@ -1,4 +1,4 @@
-import { transpile } from '../transpile';
+import { transpile } from '../public-test-suite';
 
 
 describe('transpile', () => {

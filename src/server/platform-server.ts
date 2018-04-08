@@ -41,7 +41,7 @@ export function createPlatformServer(
   const Context: d.CoreContext = {};
   Context.addListener = noop;
   Context.enableListener = noop;
-  Context.emit = noop;
+  Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   Context.isClient = false;
   Context.isServer = true;
   Context.isPrerender = isPrerender;
@@ -78,7 +78,7 @@ export function createPlatformServer(
     attachStyles: noop,
     defineComponent,
     domApi,
-    emitEvent: noop,
+    emitEvent: Context.emit,
     getComponentMeta,
     getContextItem,
     isDefinedComponent,
