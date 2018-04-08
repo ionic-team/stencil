@@ -11,7 +11,7 @@ try {
 }
 
 var injectTestingScript = [
-  'var StencilTesting = require("' + stencilTestingPath + '");',
+  'var StencilTesting = require("' + stencilTestingPath.replace(/\\/g,"/") + '");',
   'var h = StencilTesting.h;',
   'var resourcesUrl = "build/"',
   'var Context = {};'
