@@ -1,14 +1,10 @@
 import { ENCAPSULATION, MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
 import { gatherMetadata } from './test-utils';
-import { mockConfig } from '../../../../testing/mocks';
 import { visitClass } from '../index';
 import * as path from 'path';
-import * as ts from 'typescript';
 
 
 describe('component', () => {
-
-  const config = mockConfig();
 
   describe('getComponentDecoratorMeta', () => {
 
@@ -16,7 +12,7 @@ describe('component', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
-        response = visitClass(config, checker, classNode, sourceFile, diagnostics);
+        response = visitClass(diagnostics, checker, classNode, sourceFile);
       });
 
       expect(response).toEqual({

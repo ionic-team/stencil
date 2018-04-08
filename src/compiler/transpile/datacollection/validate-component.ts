@@ -1,15 +1,16 @@
-import { ComponentMeta, Config } from '../../../declarations';
+import * as d from '../../../declarations';
+import { buildWarn } from '../../util';
 import { isMethod } from './utils';
 import * as ts from 'typescript';
 
 
-export function validateComponentClass(config: Config, cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration) {
-  requiresReturnStatement(config, cmpMeta, classNode, 'hostData');
-  requiresReturnStatement(config, cmpMeta, classNode, 'render');
+export function validateComponentClass(diagnostics: d.Diagnostic[], cmpMeta: d.ComponentMeta, classNode: ts.ClassDeclaration) {
+  requiresReturnStatement(diagnostics, cmpMeta, classNode, 'hostData');
+  requiresReturnStatement(diagnostics, cmpMeta, classNode, 'render');
 }
 
 
-function requiresReturnStatement(config: Config, cmpMeta: ComponentMeta, classNode: ts.ClassDeclaration, methodName: string) {
+function requiresReturnStatement(diagnostics: d.Diagnostic[], cmpMeta: d.ComponentMeta, classNode: ts.ClassDeclaration, methodName: string) {
   const classElm = classNode.members.find(m => isMethod(m, methodName));
   if (!classElm) return;
 
@@ -25,6 +26,7 @@ function requiresReturnStatement(config: Config, cmpMeta: ComponentMeta, classNo
   ts.forEachChild(classElm, visitNode);
 
   if (!hasReturn) {
-    config.logger.warn(`The "${methodName}()" method within the "${cmpMeta.tagNameMeta}" component is missing a "return" statement.`);
+    const diagnostic = buildWarn(diagnostics);
+    diagnostic.messageText = `The "${methodName}()" method within the "${cmpMeta.tagNameMeta}" component is missing a "return" statement.`;
   }
 }

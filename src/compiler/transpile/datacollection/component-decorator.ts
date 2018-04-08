@@ -1,10 +1,11 @@
 import * as d from '../../../declarations';
+import { buildWarn } from '../../util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getDeclarationParameters, isDecoratorNamed, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
 
-export function getComponentDecoratorMeta(config: d.Config, checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {
+export function getComponentDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, node: ts.ClassDeclaration): d.ComponentMeta | undefined {
   if (!node.decorators) {
     return undefined;
   }
@@ -26,7 +27,7 @@ export function getComponentDecoratorMeta(config: d.Config, checker: ts.TypeChec
     tagNameMeta: componentOptions.tag,
     stylesMeta: {},
     assetsDirsMeta: [],
-    hostMeta: getHostMeta(config, componentOptions.host),
+    hostMeta: getHostMeta(diagnostics, componentOptions.host),
     dependencies: [],
     jsdoc: serializeSymbol(checker, symbol)
   };
@@ -116,7 +117,7 @@ export function getComponentDecoratorMeta(config: d.Config, checker: ts.TypeChec
 }
 
 
-function getHostMeta(config: d.Config, hostData: d.HostMeta) {
+function getHostMeta(diagnostics: d.Diagnostic[], hostData: d.HostMeta) {
   hostData = hostData || {};
 
   Object.keys(hostData).forEach(key => {
@@ -134,14 +135,15 @@ function getHostMeta(config: d.Config, hostData: d.HostMeta) {
         itsType = 'Array';
       }
 
-      config.logger.warn([
+      const diagnostic = buildWarn(diagnostics);
+      diagnostic.messageText = [
         `The @Component decorator's host property "${key}" has a type of "${itsType}". `,
         `However, a @Component decorator's "host" can only take static data, `,
         `such as a string, number or boolean. `,
         `Please use the "hostData()" method instead `,
         `if attributes or properties need to be dynamically added to `,
         `the host element.`
-      ].join(''));
+      ].join('');
     }
   });
 

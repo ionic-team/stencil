@@ -1,21 +1,17 @@
 import { ENCAPSULATION } from '../../../../util/constants';
 import { getComponentDecoratorMeta } from '../component-decorator';
 import { gatherMetadata } from './test-utils';
-import { mockConfig } from '../../../../testing/mocks';
 import * as path from 'path';
-import * as ts from 'typescript';
 
 
 describe('component decorator', () => {
-
-  const config = mockConfig();
 
   describe('getComponentDecoratorMeta', () => {
     it('simple decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-simple');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-        response = getComponentDecoratorMeta(config, checker, classNode);
+        response = getComponentDecoratorMeta([], checker, classNode);
       });
 
       expect(response).toEqual({
@@ -37,7 +33,7 @@ describe('component decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-shadow');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-        response = getComponentDecoratorMeta(config, checker, classNode);
+        response = getComponentDecoratorMeta([], checker, classNode);
       });
 
       expect(response).toEqual({
@@ -59,7 +55,7 @@ describe('component decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-scoped');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-        response = getComponentDecoratorMeta(config, checker, classNode);
+        response = getComponentDecoratorMeta([], checker, classNode);
       });
 
       expect(response).toEqual({
@@ -81,7 +77,7 @@ describe('component decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
       const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-        response = getComponentDecoratorMeta(config, checker, classNode);
+        response = getComponentDecoratorMeta([], checker, classNode);
       });
 
       expect(response).toEqual({

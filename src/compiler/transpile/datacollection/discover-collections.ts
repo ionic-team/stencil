@@ -1,10 +1,10 @@
-import { BuildCtx, CompilerCtx, Config, PackageJsonData } from '../../../declarations';
+import * as d from '../../../declarations';
 import { parseCollectionModule } from '../../collections/parse-collection-module';
 import * as ts from 'typescript';
 
 
-export function getCollections(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, importNode: ts.ImportDeclaration) {
-  if (!importNode.moduleSpecifier || !compilerCtx || !buildCtx) {
+export function getCollections(config: d.Config, compilerCtx: d.CompilerCtx, collections: d.Collection[], importNode: ts.ImportDeclaration) {
+  if (!importNode.moduleSpecifier || !compilerCtx || !collections) {
     return;
   }
 
@@ -24,11 +24,11 @@ export function getCollections(config: Config, compilerCtx: CompilerCtx, buildCt
   compilerCtx.resolvedCollections.push(moduleId);
 
   // see if we can add this collection dependency
-  addCollection(config, compilerCtx, buildCtx, config.rootDir, moduleId);
+  addCollection(config, compilerCtx, collections, config.rootDir, moduleId);
 }
 
 
-function addCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, resolveFromDir: string, moduleId: string) {
+function addCollection(config: d.Config, compilerCtx: d.CompilerCtx, collections: d.Collection[], resolveFromDir: string, moduleId: string) {
   let pkgJsonFilePath: string;
   try {
     // get the full package.json file path
@@ -47,7 +47,7 @@ function addCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: Build
   // open up and parse the package.json
   // sync on purpose :(
   const pkgJsonStr = compilerCtx.fs.readFileSync(pkgJsonFilePath);
-  const pkgData: PackageJsonData = JSON.parse(pkgJsonStr);
+  const pkgData: d.PackageJsonData = JSON.parse(pkgJsonStr);
 
   if (!pkgData.collection || !pkgData.types) {
     // this import is not a stencil collection
@@ -60,7 +60,7 @@ function addCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: Build
   const collection = parseCollectionModule(config, compilerCtx, pkgJsonFilePath, pkgData);
 
   // check if we already added this collection to the build context
-  const alreadyHasCollection = buildCtx.collections.some(c => {
+  const alreadyHasCollection = collections.some(c => {
     return c.collectionName === collection.collectionName;
   });
 
@@ -70,14 +70,14 @@ function addCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: Build
   }
 
   // let's add the collection to the build context
-  buildCtx.collections.push(collection);
+  collections.push(collection);
 
   if (Array.isArray(collection.dependencies)) {
     // this collection has more collections
     // let's keep digging down and discover all of them
     collection.dependencies.forEach(dependencyModuleId => {
       const resolveFromDir = config.sys.path.dirname(pkgJsonFilePath);
-      addCollection(config, compilerCtx, buildCtx, resolveFromDir, dependencyModuleId);
+      addCollection(config, compilerCtx, collections, resolveFromDir, dependencyModuleId);
     });
   }
 }

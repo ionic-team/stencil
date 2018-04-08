@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import { catchError } from '../../util';
+import { buildWarn, catchError } from '../../util';
 import { getAttributeTypeInfo, isDecoratorNamed, serializeSymbol } from './utils';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../util/constants';
 import { toDashCase } from '../../../util/helpers';
@@ -7,7 +7,7 @@ import { validatePublicName } from './reserved-public-members';
 import * as ts from 'typescript';
 
 
-export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string, diagnostics: d.Diagnostic[]) {
+export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string) {
   return classNode.members
     .filter(member => Array.isArray(member.decorators) && member.decorators.length > 0)
     .reduce((allMembers: d.MembersMeta, prop: ts.PropertyDeclaration) => {
@@ -34,11 +34,11 @@ export function getPropDecoratorMeta(config: d.Config, checker: ts.TypeChecker, 
 
       } else {
         // @Prop()
-        validatePublicName(config, componentClass, memberName, '@Prop()', 'property');
+        validatePublicName(diagnostics, componentClass, memberName, '@Prop()', 'property');
 
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
-        memberData.attribType = getAttribType(sourceFile, prop, diagnostics);
+        memberData.attribType = getAttribType(diagnostics, sourceFile, prop);
         memberData.reflectToAttr = getReflectToAttr(propOptions);
         memberData.propType = propTypeFromTSType(memberData.attribType.text);
         memberData.jsdoc = serializeSymbol(checker, symbol);
@@ -94,7 +94,7 @@ function getReflectToAttr(propOptions: d.PropOptions) {
 }
 
 
-function getAttribType(sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration, diagnostics: d.Diagnostic[]) {
+function getAttribType(diagnostics: d.Diagnostic[], sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration) {
   let attribType: d.AttributeTypeInfo;
 
   // If the @Prop() attribute does not have a defined type then infer it
@@ -103,16 +103,15 @@ function getAttribType(sourceFile: ts.SourceFile, prop: ts.PropertyDeclaration, 
 
     if (!attribTypeText) {
       attribTypeText = 'any';
-      diagnostics.push({
-        level: 'warn',
-        type: 'build',
-        header: 'Prop type provided is not supported, defaulting to any',
-        messageText: `'${prop.getFullText()}'`,
-      });
+
+      const diagnostic = buildWarn(diagnostics);
+      diagnostic.messageText = `Prop type provided is not supported, defaulting to any: '${prop.getFullText()}'`;
     }
+
     attribType = {
       text: attribTypeText,
     };
+
   } else {
     attribType = {
       text: prop.type.getText(),

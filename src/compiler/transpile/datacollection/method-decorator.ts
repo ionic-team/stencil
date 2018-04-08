@@ -5,7 +5,7 @@ import { validatePublicName } from './reserved-public-members';
 import * as ts from 'typescript';
 
 
-export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string): d.MembersMeta {
+export function getMethodDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, componentClass: string): d.MembersMeta {
   return classNode.members
     .filter(isMethodWithDecorators)
     .reduce((membersMeta, member: ts.MethodDeclaration) => {
@@ -28,7 +28,7 @@ export function getMethodDecoratorMeta(config: d.Config, checker: ts.TypeChecker
         methodReturnTypes = getAttributeTypeInfo(returnTypeNode, sourceFile);
       }
 
-      validatePublicName(config, componentClass, methodName, '@Method()', 'method');
+      validatePublicName(diagnostics, componentClass, methodName, '@Method()', 'method');
 
       membersMeta[methodName] = {
         memberType: MEMBER_TYPE.Method,

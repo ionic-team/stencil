@@ -1,30 +1,25 @@
+import * as d from '../../../../declarations';
 import { convertOptionsToMeta, getEventDecoratorMeta, getEventName } from '../event-decorator';
-import { EventOptions } from '../../../../declarations';
 import { gatherMetadata } from './test-utils';
-import { MEMBER_TYPE } from '../../../../util/constants';
-import { mockConfig } from '../../../../testing/mocks';
 import * as path from 'path';
-import * as ts from 'typescript';
 
 
 describe('event decorator', () => {
 
-  const config = mockConfig();
-
   describe('getEventName', () => {
 
     it('should get given event name, with PascalCase', () => {
-      const ev = getEventName(config, { eventName: 'EventWithDashes' }, 'methodName');
+      const ev = getEventName([], { eventName: 'EventWithDashes' }, 'methodName');
       expect(ev).toBe('EventWithDashes');
     });
 
     it('should get given event name, with-dashes', () => {
-      const ev = getEventName(config, { eventName: 'event-with-dashes' }, 'methodName');
+      const ev = getEventName([], { eventName: 'event-with-dashes' }, 'methodName');
       expect(ev).toBe('event-with-dashes');
     });
 
     it('should use methodName when no given eventName', () => {
-      const ev = getEventName(config, {}, 'methodName');
+      const ev = getEventName([], {}, 'methodName');
       expect(ev).toBe('methodName');
     });
 
@@ -34,7 +29,7 @@ describe('event decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/event-simple');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getEventDecoratorMeta(config, checker, classNode, sourceFile);
+      response = getEventDecoratorMeta([], checker, classNode, sourceFile);
     });
 
     expect(response).toEqual([
@@ -69,7 +64,7 @@ describe('event decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/event-example');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile) => {
-      response = getEventDecoratorMeta(config, checker, classNode, sourceFile);
+      response = getEventDecoratorMeta([], checker, classNode, sourceFile);
     });
 
     expect(response).toEqual([
@@ -90,11 +85,11 @@ describe('event decorator', () => {
 
   describe('convertOptionsToMeta', () => {
     it('should return null if methodName is null', () => {
-      expect(convertOptionsToMeta(config, {}, null)).toBeNull();
+      expect(convertOptionsToMeta([], {}, null)).toBeNull();
     });
 
     it('should return default EventMeta', () => {
-      expect(convertOptionsToMeta(config, {}, 'myEvent')).toEqual({
+      expect(convertOptionsToMeta([], {}, 'myEvent')).toEqual({
         eventBubbles: true,
         eventCancelable: true,
         eventComposed: true,
@@ -103,19 +98,20 @@ describe('event decorator', () => {
     });
 
     it('should configure EventMeta', () => {
-      const eventOptions: EventOptions = {
+      const eventOptions: d.EventOptions = {
         eventName: 'my-name',
         bubbles: false,
         cancelable: false,
         composed: false
       };
-      expect(convertOptionsToMeta(config, eventOptions, 'myEvent')).toEqual({
+      expect(convertOptionsToMeta([], eventOptions, 'myEvent')).toEqual({
         eventBubbles: false,
         eventCancelable: false,
         eventComposed: false,
         eventMethodName: 'myEvent',
         eventName: 'my-name'});
     });
+
   });
 
 });

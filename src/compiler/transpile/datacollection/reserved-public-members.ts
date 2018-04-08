@@ -1,14 +1,16 @@
 import * as d  from '../../../declarations';
+import { buildWarn } from '../../util';
 
 
-export function validatePublicName(config: d.Config, componentClass: string, memberName: string, decorator: string, memberType: string) {
+export function validatePublicName(diagnostics: d.Diagnostic[], componentClass: string, memberName: string, decorator: string, memberType: string) {
   if (isReservedMember(memberName)) {
-    config.logger.warn([
+    const diagnostic = buildWarn(diagnostics);
+    diagnostic.messageText = [
       `The ${decorator} name "${memberName}" used within the "${componentClass}" class is a reserved public name. `,
       `Please rename the "${memberName}" ${memberType} so it does not conflict with an existing standardized prototype member. `,
       `Reusing ${memberType} names that are already defined on the element's prototype may cause `,
       `unexpected runtime errors or user-interface issues on various browsers, so it's best to avoid them entirely.`
-    ].join(''));
+    ].join('');
   }
 }
 
