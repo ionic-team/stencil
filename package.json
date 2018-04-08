@@ -70,7 +70,7 @@
     "glob": "^7.1.2",
     "inquirer": "^3.3.0",
     "is-glob": "^4.0.0",
-    "jest": "^22.1.1",
+    "jest": "^22.4.3",
     "jest-environment-node-debug": "^2.0.0",
     "knuth-shuffle": "1.0.1",
     "listr": "^0.13.0",
