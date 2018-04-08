@@ -1,5 +1,5 @@
-import { TestingCompiler } from '../../../testing/index';
 import { expectFiles } from '../../../testing/utils';
+import { TestingCompiler } from '../../../testing/testing-compiler';
 
 
 describe('bundle-module', () => {

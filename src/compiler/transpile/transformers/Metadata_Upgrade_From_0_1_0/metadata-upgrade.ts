@@ -1,10 +1,10 @@
+import * as d from '../../../../declarations';
 import { addStaticMeta } from '../add-component-metadata';
-import { ComponentMeta, ModuleFiles } from '../../../../declarations';
 import { normalizePath } from '../../../util';
 import * as ts from 'typescript';
 
 
-export default function upgradeFromMetadata(moduleFiles: ModuleFiles) {
+export default function upgradeFromMetadata(moduleFiles: d.ModuleFiles) {
   const allModuleFiles = Object.keys(moduleFiles).map(filePath => {
     return moduleFiles[filePath];
   });
@@ -26,7 +26,7 @@ export default function upgradeFromMetadata(moduleFiles: ModuleFiles) {
 }
 
 
-function upgradeModuleFile(tsSourceFile: ts.SourceFile, cmpMeta: ComponentMeta) {
+function upgradeModuleFile(tsSourceFile: ts.SourceFile, cmpMeta: d.ComponentMeta) {
   const staticMembers = addStaticMeta(cmpMeta);
 
   const newStatements: any = Object.keys(staticMembers).map(memberName => {

@@ -1,4 +1,4 @@
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 
 export function removeStencilImports(): ts.TransformerFactory<ts.SourceFile> {

@@ -1,11 +1,11 @@
-import { BuildConditionals, CompilerCtx, Diagnostic, TranspileResults } from '../../declarations';
+import * as d from '../../declarations';
 import { buildConditionalsTransform } from './transformers/build-conditionals';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 
-export async function transpileCoreBuild(compilerCtx: CompilerCtx, coreBuild: BuildConditionals, input: string) {
-  const results: TranspileResults = {
+export async function transpileCoreBuild(compilerCtx: d.CompilerCtx, coreBuild: d.BuildConditionals, input: string) {
+  const results: d.TranspileResults = {
     code: null,
     diagnostics: null
   };
@@ -18,7 +18,7 @@ export async function transpileCoreBuild(compilerCtx: CompilerCtx, coreBuild: Bu
     return results;
   }
 
-  const diagnostics: Diagnostic[] = [];
+  const diagnostics: d.Diagnostic[] = [];
 
   const transpileOpts: ts.TranspileOptions = {
     compilerOptions: getCompilerOptions(coreBuild),
@@ -47,9 +47,9 @@ export async function transpileCoreBuild(compilerCtx: CompilerCtx, coreBuild: Bu
 }
 
 
-export async function transpileToEs5(compilerCtx: CompilerCtx, input: string) {
-  const diagnostics: Diagnostic[] = [];
-  const results: TranspileResults = {
+export async function transpileToEs5(compilerCtx: d.CompilerCtx, input: string) {
+  const diagnostics: d.Diagnostic[] = [];
+  const results: d.TranspileResults = {
     code: null,
     diagnostics: null
   };
@@ -87,7 +87,7 @@ export async function transpileToEs5(compilerCtx: CompilerCtx, input: string) {
 }
 
 
-function getCompilerOptions(coreBuild: BuildConditionals) {
+function getCompilerOptions(coreBuild: d.BuildConditionals) {
   const opts: ts.CompilerOptions = {
     allowJs: true,
     declaration: false

@@ -1,16 +1,17 @@
-import { ListenMeta, ListenOptions } from '../../../declarations';
+import * as d from '../../../declarations';
 import { getDeclarationParameters, isDecoratorNamed, isMethodWithDecorators, serializeSymbol } from './utils';
 import * as ts from 'typescript';
 
-export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration): ListenMeta[] {
-  const listeners: ListenMeta[] = [];
+
+export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration) {
+  const listeners: d.ListenMeta[] = [];
 
   classNode.members
     .filter(isMethodWithDecorators)
     .forEach(member => {
       member.decorators
         .filter(isDecoratorNamed('Listen'))
-        .map(dec => getDeclarationParameters<string, ListenOptions>(dec))
+        .map(dec => getDeclarationParameters<string, d.ListenOptions>(dec))
         .forEach(([listenText, listenOptions]) => {
           listenText.split(',').forEach(eventName => {
             const symbol = checker.getSymbolAtLocation(member.name);
@@ -23,12 +24,12 @@ export function getListenDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cl
           });
         });
     });
+
   return listeners;
 }
 
-// export function getListenDecoratorMeta
 
-export function validateListener(eventName: string, rawListenOpts: ListenOptions = {}, methodName: string): ListenMeta | null {
+export function validateListener(eventName: string, rawListenOpts: d.ListenOptions = {}, methodName: string): d.ListenMeta | null {
   let rawEventName = eventName;
 
   let splt = eventName.split(':');
@@ -57,7 +58,7 @@ export function validateListener(eventName: string, rawListenOpts: ListenOptions
     rawEventName = splt[0].toLowerCase().trim();
   }
 
-  const listenMeta: ListenMeta = {
+  const listenMeta: d.ListenMeta = {
     eventName: eventName,
     eventMethodName: methodName
   };

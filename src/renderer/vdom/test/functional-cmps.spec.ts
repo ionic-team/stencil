@@ -1,7 +1,8 @@
 import * as d from '../../../declarations';
 import { doNotExpectFiles } from '../../../testing/utils';
-import { mockHtml } from '../../../testing/mocks';
-import { TestingCompiler, TestingConfig, mockDocument } from '../../../testing/index';
+import { mockDocument, mockHtml } from '../../../testing/mocks';
+import { TestingCompiler } from '../../../testing/testing-compiler';
+import { TestingConfig } from '../../../testing/testing-config';
 
 
 jest.setTimeout(10000);

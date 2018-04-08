@@ -1,4 +1,4 @@
-import { AttributeTypeReference, AttributeTypeReferences, JSDoc } from '../../../declarations';
+import * as d from '../../../declarations';
 import * as ts from 'typescript';
 
 
@@ -40,27 +40,27 @@ export function isMethodWithDecorators(member: ts.ClassElement): boolean {
     && member.decorators.length > 0;
 }
 
-export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol): JSDoc {
+export function serializeSymbol(checker: ts.TypeChecker, symbol: ts.Symbol) {
   return {
-      name: symbol.getName(),
-      documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
-      type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
-  };
+    name: symbol.getName(),
+    documentation: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
+    type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
+  } as d.JSDoc;
 }
 
-export function isMethod(member: ts.ClassElement, methodName: string): boolean {
+export function isMethod(member: ts.ClassElement, methodName: string) {
   if (ts.isMethodDeclaration(member)) {
     return member.getFirstToken().getText() === methodName;
   }
   return false;
 }
 
-export function getAttributeTypeInfo(baseNode: ts.Node, sourceFile: ts.SourceFile): AttributeTypeReferences {
+export function getAttributeTypeInfo(baseNode: ts.Node, sourceFile: ts.SourceFile) {
   return getAllTypeReferences(baseNode)
     .reduce((allReferences, rt)  => {
       allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
       return allReferences;
-    }, {} as AttributeTypeReferences);
+    }, {} as d.AttributeTypeReferences);
 }
 
 function getAllTypeReferences(node: ts.Node): string[] {
@@ -97,8 +97,7 @@ function getAllTypeReferences(node: ts.Node): string[] {
   return referencedTypes;
 }
 
-function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): AttributeTypeReference {
-
+function getTypeReferenceLocation(typeName: string, sourceFile: ts.SourceFile): d.AttributeTypeReference {
   const sourceFileObj = sourceFile.getSourceFile();
 
   // Loop through all top level imports to find any reference to the type for 'import' reference location

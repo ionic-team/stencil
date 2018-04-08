@@ -1,5 +1,5 @@
 import { DEFAULT_COMPILER_OPTIONS } from '../compiler-options';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 
 /**

@@ -1,5 +1,6 @@
 import * as d from '../../../declarations';
-import { TestingCompiler, TestingConfig } from '../../../testing/index';
+import { TestingCompiler } from '../../../testing/testing-compiler';
+import { TestingConfig } from '../../../testing/testing-config';
 
 
 describe('service worker', () => {

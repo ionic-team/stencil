@@ -1,8 +1,8 @@
 import * as d from '../../../declarations';
 import { addBundles, formatLinkRelPreloadHeader, getBundleIds, getUrlFromFilePath, mergeUserHostConfig, sortComponents } from '../host-config';
-import { TestingConfig } from '../../../testing';
-import { validateConfig } from '../../config/validate-config';
 import { pathJoin } from '../../util';
+import { TestingConfig } from '../../../testing/testing-config';
+import { validateConfig } from '../../config/validate-config';
 
 
 describe('host-config', () => {

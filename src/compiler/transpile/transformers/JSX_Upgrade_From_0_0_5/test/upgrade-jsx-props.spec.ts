@@ -1,18 +1,17 @@
+import * as d from '../../../../../declarations';
 import * as util from 'util';
-import ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
+import { mockCache } from '../../../../../testing/mocks';
 import { transformSourceString } from '../../util';
 import upgradeJsxProps from '../upgrade-jsx-props';
-import { CompilerCtx } from '../../../../../declarations';
-import { mockCache } from '../../../../../testing/mocks';
 
 
 const fileList = fs.readdirSync(path.join(__dirname, './pre-update'));
 const directory = __dirname;
 
 describe('vnode-slot transform', async () => {
-  const compilerCtx: CompilerCtx = { cache: mockCache() as any };
+  const compilerCtx: d.CompilerCtx = { cache: mockCache() as any };
 
   let i;
   for (i = fileList.length - 1; i >= 0; i -= 1) {

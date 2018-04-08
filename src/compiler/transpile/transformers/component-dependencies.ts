@@ -1,10 +1,10 @@
-import { BuildCtx, CompilerCtx, PotentialComponentRef } from '../../../declarations';
+import * as d from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import { normalizePath } from '../../util';
 import * as ts from 'typescript';
 
 
-export function componentDependencies(compilerCtx: CompilerCtx, buildCtx: BuildCtx): ts.TransformerFactory<ts.SourceFile> {
+export function componentDependencies(compilerCtx: d.CompilerCtx, buildCtx:  d.BuildCtx): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
@@ -32,7 +32,7 @@ export function componentDependencies(compilerCtx: CompilerCtx, buildCtx: BuildC
 }
 
 
-function addPropConnects(compilerCtx: CompilerCtx, sourceStrings: PotentialComponentRef[], filePath: string) {
+function addPropConnects(compilerCtx:  d.CompilerCtx, sourceStrings:  d.PotentialComponentRef[], filePath: string) {
   const moduleFile = compilerCtx.moduleFiles[filePath];
 
   const cmpMeta = (moduleFile && moduleFile.cmpMeta);
@@ -51,7 +51,7 @@ function addPropConnects(compilerCtx: CompilerCtx, sourceStrings: PotentialCompo
 }
 
 
-function addPropConnect(compilerCtx: CompilerCtx, sourceStrings: PotentialComponentRef[], filePath: string, tag: string) {
+function addPropConnect(compilerCtx:  d.CompilerCtx, sourceStrings:  d.PotentialComponentRef[], filePath: string, tag: string) {
   sourceStrings.push({
     tag: tag,
     filePath: filePath
@@ -76,7 +76,7 @@ function addPropConnect(compilerCtx: CompilerCtx, sourceStrings: PotentialCompon
 }
 
 
-function callExpression(buildCtx: BuildCtx, filePath: string, node: ts.CallExpression) {
+function callExpression(buildCtx:  d.BuildCtx, filePath: string, node: ts.CallExpression) {
   if (node.arguments && node.arguments[0]) {
 
     if (node.expression.kind === ts.SyntaxKind.Identifier) {
@@ -94,7 +94,7 @@ function callExpression(buildCtx: BuildCtx, filePath: string, node: ts.CallExpre
 }
 
 
-function callExpressionArg(buildCtx: BuildCtx, filePath: string, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
+function callExpressionArg(buildCtx:  d.BuildCtx, filePath: string, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) {
   if (TAG_CALL_EXPRESSIONS.includes(callExpressionName.escapedText as string)) {
 
     if (args[0].kind === ts.SyntaxKind.StringLiteral) {
@@ -111,7 +111,7 @@ function callExpressionArg(buildCtx: BuildCtx, filePath: string, callExpressionN
 }
 
 
-function stringLiteral(buildCtx: BuildCtx, filePath: string, node: ts.StringLiteral) {
+function stringLiteral(buildCtx:  d.BuildCtx, filePath: string, node: ts.StringLiteral) {
   if (typeof node.text === 'string' && node.text.includes('<')) {
     buildCtx.componentRefs.push({
       html: node.text,

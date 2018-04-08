@@ -1,7 +1,7 @@
-import { Diagnostic, PrintLine } from '../../declarations';
+import * as d from '../../declarations';
 import { highlight } from './highlight/highlight';
 import { MAX_ERRORS, formatFileName, formatHeader, splitLineBreaks } from './logger-util';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 
 /**
@@ -9,7 +9,7 @@ import ts from 'typescript';
  * error reporting within a terminal. So, yeah, let's code it up, shall we?
  */
 
-export function loadTypeScriptDiagnostics(rootDir: string, resultsDiagnostics: Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
+export function loadTypeScriptDiagnostics(rootDir: string, resultsDiagnostics: d.Diagnostic[], tsDiagnostics: ts.Diagnostic[]) {
   const maxErrors = Math.min(tsDiagnostics.length, MAX_ERRORS);
 
   for (var i = 0; i < maxErrors; i++) {
@@ -19,7 +19,7 @@ export function loadTypeScriptDiagnostics(rootDir: string, resultsDiagnostics: D
 
 
 function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
-  const d: Diagnostic = {
+  const d: d.Diagnostic = {
     level: 'error',
     type: 'typescript',
     language: 'typescript',
@@ -45,7 +45,7 @@ function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
 
     const posData = tsDiagnostic.file.getLineAndCharacterOfPosition(tsDiagnostic.start);
 
-    const errorLine: PrintLine = {
+    const errorLine: d.PrintLine = {
       lineIndex: posData.line,
       lineNumber: posData.line + 1,
       text: srcLines[posData.line],
@@ -70,7 +70,7 @@ function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
     d.header =  formatHeader('typescript', tsDiagnostic.file.fileName, rootDir, errorLine.lineNumber);
 
     if (errorLine.lineIndex > 0) {
-      const previousLine: PrintLine = {
+      const previousLine: d.PrintLine = {
         lineIndex: errorLine.lineIndex - 1,
         lineNumber: errorLine.lineNumber - 1,
         text: srcLines[errorLine.lineIndex - 1],
@@ -89,7 +89,7 @@ function loadDiagnostic(rootDir: string, tsDiagnostic: ts.Diagnostic) {
     }
 
     if (errorLine.lineIndex + 1 < srcLines.length) {
-      const nextLine: PrintLine = {
+      const nextLine: d.PrintLine = {
         lineIndex: errorLine.lineIndex + 1,
         lineNumber: errorLine.lineNumber + 1,
         text: srcLines[errorLine.lineIndex + 1],

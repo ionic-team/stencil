@@ -1,11 +1,10 @@
-import { ComponentMeta, Diagnostic } from '../../../../declarations';
+import * as d from '../../../../declarations';
 import { getComponentDecoratorMeta } from '../component-decorator';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { CompilerOptions } from 'typescript';
 
 
-const compilerOptions: CompilerOptions = {
+const compilerOptions: ts.CompilerOptions = {
   'allowJs': true,
   'allowSyntheticDefaultImports': true,
   'allowUnreachableCode': false,
@@ -31,14 +30,14 @@ const compilerOptions: CompilerOptions = {
 };
 
 export type GatherMetadataCallback = (
-  checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile?: ts.SourceFile, diagnostics?: Diagnostic[]
+  checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile?: ts.SourceFile, diagnostics?: d.Diagnostic[]
 ) => void;
 
 export function gatherMetadata(sourceFilePath: string, callback: GatherMetadataCallback) {
   const program = ts.createProgram([sourceFilePath], compilerOptions);
   const checker = program.getTypeChecker();
-  const componentMetaList: ComponentMeta[] = [];
-  const diagnostics: Diagnostic[] = [];
+  const componentMetaList: d.ComponentMeta[] = [];
+  const diagnostics: d.Diagnostic[] = [];
 
   const visitFile = visitFactory(checker, componentMetaList, diagnostics, callback);
 
@@ -50,7 +49,7 @@ export function gatherMetadata(sourceFilePath: string, callback: GatherMetadataC
   }
 }
 
-function visitFactory(checker: ts.TypeChecker, componentMetaList: ComponentMeta[], diagnostics: Diagnostic[], callback: GatherMetadataCallback) {
+function visitFactory(checker: ts.TypeChecker, componentMetaList: d.ComponentMeta[], diagnostics: d.Diagnostic[], callback: GatherMetadataCallback) {
   return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
     if (ts.isClassDeclaration(node)) {
       callback(checker, node, sourceFile, diagnostics);

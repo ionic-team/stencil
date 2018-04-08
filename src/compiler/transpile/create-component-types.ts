@@ -7,7 +7,7 @@ import { MEMBER_TYPE } from '../../util/constants';
 import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
 import { normalizePath } from '../util';
 import { normalizeStyles } from '../style/normalize-styles';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 
 export async function generateComponentTypes(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsOptions: ts.CompilerOptions, tsHost: ts.CompilerHost, tsFilePaths: string[], componentsDtsSrcFilePath: string) {

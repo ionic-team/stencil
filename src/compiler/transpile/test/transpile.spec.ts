@@ -1,9 +1,8 @@
 import { normalizePath } from '../../../compiler/util';
-import { TestingCompiler } from '../../../testing';
+import { TestingCompiler } from '../../../testing/testing-compiler';
 import { wroteFile } from '../../../testing/utils';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as ts from 'typescript';
 
 
 describe('transpile', () => {
@@ -187,18 +186,20 @@ describe('transpile', () => {
       return originalStatSync(itemPath);
     };
 
-    await c.fs.writeFiles({
-      '/tsconfig.json': JSON.stringify({
-        compilerOptions: {
-          baseUrl: nodeModulesDir,
-          paths: {
-            '@stencil/core': [path.join(
-              path.relative(nodeModulesDir, distDir),
-              'index.d.ts'
-            )]
-          }
+    const tsConfig = JSON.stringify({
+      compilerOptions: {
+        baseUrl: nodeModulesDir,
+        paths: {
+          '@stencil/core': [path.join(
+            path.relative(nodeModulesDir, distDir),
+            'index.d.ts'
+          )]
         }
-      }),
+      }
+    });
+
+    await c.fs.writeFiles({
+      '/tsconfig.json': tsConfig,
       '/src/cmp-a.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-a' }) export class CmpA {}`,
       '/src/some-dir/cmp-b.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-b' }) export class CmpB {}`,
       '/src/some-dir/cmp-c.tsx': `import { Component } from '@stencil/core';\n@Component({ tag: 'cmp-c' }) export class CmpC {}`

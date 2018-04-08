@@ -1,9 +1,9 @@
-import { BuildCtx, CompilerCtx, Config, InMemoryFileSystem } from '../../declarations';
+import * as d from '../../declarations';
 import { catchError } from '../util';
 import { transpileModules } from '../transpile/transpile';
 
 
-export async function transpileAppModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+export async function transpileAppModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   if (canSkipTranspiling(config, buildCtx)) {
     // this is a rebuild, but turns out the files causing to
     // do not require us to run the transpiling again
@@ -34,7 +34,7 @@ export async function transpileAppModules(config: Config, compilerCtx: CompilerC
 }
 
 
-async function scanDirForTsFiles(config: Config, fs: InMemoryFileSystem, dir: string): Promise<any> {
+async function scanDirForTsFiles(config: d.Config, fs: d.InMemoryFileSystem, dir: string): Promise<any> {
   const scanDirTimeSpan = config.logger.createTimeSpan(`scan ${config.srcDir} for ts files started`, true);
 
   // loop through this directory and sub directories looking for
@@ -59,7 +59,7 @@ async function scanDirForTsFiles(config: Config, fs: InMemoryFileSystem, dir: st
 }
 
 
-function canSkipTranspiling(config: Config, buildCtx: BuildCtx) {
+function canSkipTranspiling(config: d.Config, buildCtx: d.BuildCtx) {
   if (buildCtx.requiresFullBuild) {
     // requires a full rebuild, so we cannot skip transpiling
     return false;
@@ -83,7 +83,7 @@ function canSkipTranspiling(config: Config, buildCtx: BuildCtx) {
 }
 
 
-export function isFileIncludePath(config: Config, readPath: string) {
+export function isFileIncludePath(config: d.Config, readPath: string) {
   for (var i = 0; i < config.excludeSrc.length; i++) {
     if (config.sys.minimatch(readPath, config.excludeSrc[i])) {
       // this file is a file we want to exclude

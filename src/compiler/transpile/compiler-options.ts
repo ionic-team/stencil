@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
 import { normalizePath, pathJoin } from '../util';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 
 export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerCtx) {
@@ -24,9 +24,8 @@ export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerC
     } catch (e) {
       config.logger.warn('tsconfig.json is malformed, using default settings');
     }
-  } catch (e) {
-    config.logger.warn('tsconfig.json is missing, using default settings');
-  }
+
+  } catch (e) {}
 
   if (config._isTesting) {
     compilerOptions.module = ts.ModuleKind.CommonJS;

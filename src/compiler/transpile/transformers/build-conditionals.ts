@@ -1,5 +1,5 @@
 import * as d from '../../../declarations';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 
 export function buildConditionalsTransform(coreBuild: d.BuildConditionals): ts.TransformerFactory<ts.SourceFile> {

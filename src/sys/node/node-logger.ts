@@ -9,7 +9,6 @@ export class NodeLogger implements d.Logger {
   private chalk: Chalk;
   private writeLogQueue: string[] = [];
   buildLogFilePath: string = null;
-  graphLogFilePath: string = null;
 
   constructor() {
     const sysUtil = require(path.join(__dirname, './sys-util.js'));

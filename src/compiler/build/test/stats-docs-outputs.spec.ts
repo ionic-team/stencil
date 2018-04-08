@@ -1,6 +1,7 @@
 import * as d from '../../../declarations';
-import { TestingCompiler, TestingConfig } from '../../../testing';
 import { mockElement, mockHtml } from '../../../testing/mocks';
+import { TestingCompiler } from '../../../testing/testing-compiler';
+import { TestingConfig } from '../../../testing/testing-config';
 import * as path from 'path';
 
 

@@ -1,8 +1,8 @@
-import { CompilerCtx } from '../../../declarations';
-import ts from 'typescript';
+import * as d from '../../../declarations';
+import * as ts from 'typescript';
 
 
-export function removeCollectionImports(compilerCtx: CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
+export function removeCollectionImports(compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> {
   /*
 
     // remove side effect collection imports like:
