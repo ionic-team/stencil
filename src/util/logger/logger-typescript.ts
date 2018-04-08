@@ -1,7 +1,7 @@
 import { Diagnostic, PrintLine } from '../../declarations';
 import { highlight } from './highlight/highlight';
 import { MAX_ERRORS, formatFileName, formatHeader, splitLineBreaks } from './logger-util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 /**

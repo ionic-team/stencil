@@ -1,7 +1,7 @@
 import { BuildConditionals, CompilerCtx, Diagnostic, TranspileResults } from '../../declarations';
 import { buildConditionalsTransform } from './transformers/build-conditionals';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function transpileCoreBuild(compilerCtx: CompilerCtx, coreBuild: BuildConditionals, input: string) {

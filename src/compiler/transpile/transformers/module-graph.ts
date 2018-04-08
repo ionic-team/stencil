@@ -1,6 +1,6 @@
 import { BuildCtx, Config, ModuleGraph } from '../../../declarations/index';
 import { normalizePath, pathJoin } from '../../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function moduleGraph(config: Config, buildCtx: BuildCtx): ts.TransformerFactory<ts.SourceFile> {

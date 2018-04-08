@@ -1,5 +1,5 @@
 import { CompilerCtx } from '../../../declarations';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function removeCollectionImports(compilerCtx: CompilerCtx): ts.TransformerFactory<ts.SourceFile> {

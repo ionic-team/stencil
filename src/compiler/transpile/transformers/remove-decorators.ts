@@ -1,5 +1,5 @@
 import { isComponentClass } from './util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 // same as the "declare" variables in the root index.ts file
 const DECORATORS_TO_REMOVE = [

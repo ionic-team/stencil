@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
 import { normalizePath, pathJoin } from '../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export async function getUserTsConfig(config: d.Config, compilerCtx: d.CompilerCtx) {

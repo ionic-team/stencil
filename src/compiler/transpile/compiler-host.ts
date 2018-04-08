@@ -1,7 +1,7 @@
 import { CompilerCtx, Config, FsWriteResults } from '../../declarations';
 import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
 import { isDtsFile, isJsFile, normalizePath } from '../util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 
 
 export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<FsWriteResults>[], tsCompilerOptions: ts.CompilerOptions) {

@@ -1,5 +1,5 @@
 import * as util from 'util';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
 import { transformSourceString } from '../../util';
