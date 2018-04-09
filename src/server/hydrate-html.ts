@@ -48,7 +48,6 @@ export function hydrateHtml(config: d.Config, compilerCtx: d.CompilerCtx, output
 
       if (config._isTesting) {
         (hydrateResults as any).__testPlatform = plt;
-        (hydrateResults as any).__testLogger = config.logger;
       }
 
       if (failureDiagnostic) {

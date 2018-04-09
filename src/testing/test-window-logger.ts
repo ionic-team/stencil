@@ -1,7 +1,7 @@
 import * as d from '../declarations';
 
 
-export class JestLogger implements d.Logger {
+export class TestWindowLogger implements d.Logger {
   private logs: LogQueue[] = [];
   buildLogFilePath: string = null;
   level: string;
