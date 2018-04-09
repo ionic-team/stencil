@@ -3,6 +3,23 @@ var fs = require('fs');
 var ts = require('typescript');
 var testing = require('./index');
 
+function normalizePath(str) {
+  // Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
+  // https://github.com/sindresorhus/slash MIT
+  // By Sindre Sorhus
+
+  var EXTENDED_PATH_REGEX = /^\\\\\?\\/;
+  var NON_ASCII_REGEX = /[^\x00-\x80]+/;
+  var SLASH_REGEX = /\\/g;
+
+  if (EXTENDED_PATH_REGEX.test(str) || NON_ASCII_REGEX.test(str)) {
+    return str;
+  }
+
+  str = str.replace(SLASH_REGEX, '/');
+
+  return str;
+}
 
 var stencilTestingPath = path.resolve(__dirname, '../dist/testing/index.js')
 try {
@@ -14,7 +31,7 @@ try {
 
 // script to inject at the top of each tsx transpiled file
 var injectTestingScript = [
-  'var StencilTesting = require("' + stencilTestingPath.replace(/\\/g,"/") + '");',
+  'var StencilTesting = require("' + normalizePath(stencilTestingPath) + '");',
   'var h = StencilTesting.h;',
   'var resourcesUrl = "build/"',
   'var Context = {};'
