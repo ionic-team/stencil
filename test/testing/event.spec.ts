@@ -1,11 +1,12 @@
-import { flush, render } from '../../dist/testing/index';
+import { TestWindow } from '../../dist/testing/index';
 import { EventCmp } from './fixtures/event-cmp';
 
 
 describe('@Event', () => {
 
   it('should fire custom event w/ no options', async () => {
-    const element = await render({
+    const window = new TestWindow();
+    const element = await window.load({
       components: [EventCmp],
       html: '<event-cmp></event-cmp>'
     });
@@ -16,7 +17,7 @@ describe('@Event', () => {
       });
     })
 
-    await flush(element);
+    await window.flush();
 
     element.emitEvent();
 
