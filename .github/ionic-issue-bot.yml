@@ -28,6 +28,7 @@ stale:
   days: 30
   maxIssuesPerRun: 100
   exemptLabels:
+    - help wanted
     - good first issue
     - triage
   exemptProjects: true
