@@ -14,7 +14,7 @@ try {
 
 // script to inject at the top of each tsx transpiled file
 var injectTestingScript = [
-  'var StencilTesting = require("' + stencilTestingPath + '");',
+  'var StencilTesting = require("' + stencilTestingPath.replace(/\\/g,"/") + '");',
   'var h = StencilTesting.h;',
   'var resourcesUrl = "build/"',
   'var Context = {};'
