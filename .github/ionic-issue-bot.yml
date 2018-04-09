@@ -25,7 +25,7 @@ closeAndLock:
   dryRun: false
 
 stale:
-  days: 365
+  days: 30
   maxIssuesPerRun: 100
   exemptLabels:
     - good first issue
@@ -56,7 +56,7 @@ wrongRepo:
 
         Thank you for using Stencil!
     - label: "ionitron: ionic"
-      repo: stencil
+      repo: ionic
       message: >
         Thanks for the issue! We use this issue tracker exclusively for bug reports and feature requests
         associated with Stencil. It appears that this issue is associated with the Ionic Framework.
