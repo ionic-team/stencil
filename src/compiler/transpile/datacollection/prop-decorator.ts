@@ -34,13 +34,14 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
 
       } else {
         // @Prop()
+        const type = checker.getTypeAtLocation(prop);
         validatePublicName(diagnostics, componentClass, memberName, '@Prop()', 'property');
 
         memberData.memberType = getMemberType(propOptions);
         memberData.attribName = getAttributeName(propOptions, memberName);
         memberData.attribType = getAttribType(diagnostics, sourceFile, prop);
         memberData.reflectToAttr = getReflectToAttr(propOptions);
-        memberData.propType = propTypeFromTSType(memberData.attribType.text);
+        memberData.propType = propTypeFromTSType(type, memberData.attribType.text);
         memberData.jsdoc = serializeSymbol(checker, symbol);
       }
 
@@ -48,7 +49,6 @@ export function getPropDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.Ty
       return allMembers;
     }, {} as d.MembersMeta);
 }
-
 
 function getPropOptions(propDecorator: ts.Decorator, diagnostics: d.Diagnostic[]) {
   const suppliedOptions = (propDecorator.expression as ts.CallExpression).arguments
@@ -145,17 +145,47 @@ function inferPropType(expression: ts.Expression | undefined) {
   return undefined;
 }
 
-function propTypeFromTSType(type: string) {
-  switch (type) {
-    case 'string':
-      return PROP_TYPE.String;
-    case 'number':
-      return PROP_TYPE.Number;
-    case 'boolean':
-      return PROP_TYPE.Boolean;
-    case 'any':
-      return PROP_TYPE.Any;
-    default:
-      return PROP_TYPE.Unknown;
+function propTypeFromTSType(type: ts.Type, text: string) {
+  if (checkType(type, isString)) {
+    return PROP_TYPE.String;
   }
+  if (checkType(type, isNumber)) {
+    return PROP_TYPE.Number;
+  }
+  if (checkType(type, isBoolean)) {
+    return PROP_TYPE.Boolean;
+  }
+  if (text === 'any') {
+    return PROP_TYPE.Any;
+  }
+  return PROP_TYPE.Unknown;
+}
+
+function checkType(type: ts.Type, check: (type: ts.Type) => boolean ): boolean {
+  if (type.flags & ts.TypeFlags.Union) {
+    const union = type as ts.UnionType;
+    return union.types.some(type => checkType(type, check));
+  }
+  return check(type);
+}
+
+function isBoolean(t: ts.Type) {
+  if (t) {
+    return !!(t.flags & (ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLike | ts.TypeFlags.BooleanLike));
+  }
+  return false;
+}
+
+function isNumber(t: ts.Type) {
+  if (t) {
+    return !!(t.flags & (ts.TypeFlags.Number | ts.TypeFlags.NumberLike | ts.TypeFlags.NumberLiteral));
+  }
+  return false;
+}
+
+function isString(t: ts.Type) {
+  if (t) {
+    return !!(t.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLike | ts.TypeFlags.StringLiteral));
+  }
+  return false;
 }
