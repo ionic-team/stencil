@@ -75,5 +75,19 @@ export function fillCmpMetaFromConstructor(cmp: d.ComponentConstructor, cmpMeta:
     });
   }
 
+  if (cmp.listeners && cmp.listeners.length > 0) {
+    cmpMeta.listenersMeta = cmp.listeners.map(listener => {
+      const listenerMeta: d.ListenMeta = {
+        eventName: listener.name,
+        eventMethodName: listener.method,
+        eventCapture: listener.capture,
+        eventDisabled: listener.disabled,
+        eventPassive: listener.passive
+      };
+
+      return listenerMeta;
+    });
+  }
+
   return cmpMeta;
 }

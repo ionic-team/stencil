@@ -2,7 +2,7 @@ import * as d from '../../../declarations';
 import { convertValueToLiteral } from './util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';
-import { formatComponentConstructorEvents, formatComponentConstructorProperties } from '../../../util/data-serialize';
+import { formatComponentConstructorEvents, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../../../util/data-serialize';
 import * as ts from 'typescript';
 
 
@@ -76,6 +76,11 @@ export function addStaticMeta(cmpMeta: d.ComponentMeta) {
     staticMembers.events = convertValueToLiteral(eventsMeta);
   }
 
+  const listenerMeta = formatComponentConstructorListeners(cmpMeta.listenersMeta);
+  if (listenerMeta && listenerMeta.length > 0) {
+    staticMembers.listeners = convertValueToLiteral(listenerMeta);
+  }
+
   if (cmpMeta.stylesMeta) {
     const styleModes = Object.keys(cmpMeta.stylesMeta);
 
@@ -105,6 +110,7 @@ export interface ConstructorComponentMeta {
   didChange?: ts.Expression;
   willChange?: ts.Expression;
   events?: ts.Expression;
+  listeners?: ts.Expression;
   style?: ts.Expression;
   styleMode?: ts.Expression;
 }

@@ -241,8 +241,8 @@ export function formatComponentConstructorEvents(eventsMeta: d.EventMeta[]) {
 }
 
 
-export function formatComponentConstructorEvent(eventMeta: d.EventMeta): d.ComponentConstructorEvent {
-  const constructorEvent = {
+export function formatComponentConstructorEvent(eventMeta: d.EventMeta) {
+  const constructorEvent: d.ComponentConstructorEvent = {
     name: eventMeta.eventName,
     method: eventMeta.eventMethodName,
     bubbles: true,
@@ -266,6 +266,40 @@ export function formatComponentConstructorEvent(eventMeta: d.EventMeta): d.Compo
   }
 
   return constructorEvent;
+}
+
+
+export function formatComponentConstructorListeners(listenersMeta: d.ListenMeta[]) {
+  if (!listenersMeta || !listenersMeta.length) {
+    return null;
+  }
+
+  return listenersMeta.map(ev => formatComponentConstructorListener(ev));
+}
+
+
+export function formatComponentConstructorListener(listenMeta: d.ListenMeta) {
+  const constructorListener: d.ComponentConstructorListener = {
+    name: listenMeta.eventName,
+    method: listenMeta.eventMethodName
+  };
+
+  // default capture falsy
+  if (listenMeta.eventCapture === true) {
+    constructorListener.capture = true;
+  }
+
+  // default disabled falsy
+  if (listenMeta.eventDisabled === true) {
+    constructorListener.disabled = true;
+  }
+
+  // default passive falsy
+  if (listenMeta.eventPassive === true) {
+    constructorListener.passive = true;
+  }
+
+  return constructorListener;
 }
 
 
