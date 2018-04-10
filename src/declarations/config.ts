@@ -3,6 +3,7 @@ import * as d from './index';
 
 export interface Config {
   assetVersioning?: ConfigAssetVersioning;
+  autoprefixCss?: boolean | any;
   buildAppCore?: boolean;
   buildEs5?: boolean;
   buildLogFilePath?: string;

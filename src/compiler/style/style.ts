@@ -146,11 +146,17 @@ function hasPluginInstalled(config: d.Config, filePath: string) {
 
 export async function setStyleText(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, cmpMeta: d.ComponentMeta, styleMeta: d.StyleMeta, styles: string[]) {
   // join all the component's styles for this mode together into one line
+  styleMeta.compiledStyleText = styles.join('\n\n').trim();
 
+  // auto add css prefixes
+  const autoprefixConfig = config.autoprefixCss;
+  if (autoprefixConfig !== false) {
+    styleMeta.compiledStyleText = await config.sys.autoprefixCss(styleMeta.compiledStyleText, autoprefixConfig);
+  }
+
+  // minify css
   if (config.minifyCss) {
-    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styles.join(''));
-  } else {
-    styleMeta.compiledStyleText = styles.join('\n\n').trim();
+    styleMeta.compiledStyleText = await minifyStyle(config, compilerCtx, buildCtx.diagnostics, styleMeta.compiledStyleText);
   }
 
   if (requiresScopedStyles(cmpMeta.encapsulation)) {
