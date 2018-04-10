@@ -69,7 +69,6 @@
     "glob": "^7.1.2",
     "inquirer": "^3.3.0",
     "is-glob": "^4.0.0",
-    "jasmine-core": "^3.1.0",
     "jest": "^22.1.1",
     "jest-environment-node-debug": "^2.0.0",
     "knuth-shuffle": "1.0.1",
