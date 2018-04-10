@@ -1,8 +1,6 @@
 
 exports.config = {
 
-  srcDir: './',
-
   outputTargets: [
     {
       type: 'www',

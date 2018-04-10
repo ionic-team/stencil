@@ -1,5 +1,4 @@
-<script src="/dist/app.js"></script>
-
+`
 <slot-light-dom-content class='results1'>A</slot-light-dom-content>
 
 <slot-light-dom-content class='results2'>
@@ -45,3 +44,4 @@
     M
   </nav>
 </slot-light-dom-content>
+`

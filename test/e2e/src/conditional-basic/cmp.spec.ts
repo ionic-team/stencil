@@ -45,8 +45,8 @@ describe("basic support", function() {
   describe("simple test", function() {
     it("contains a button as a child", async function() {
 
-      const component = addComponent<HTMLCmpAElement>(
-        '<cmp-a></cmp-a>'
+      const component = addComponent<HTMLConditionalBasicElement>(
+        '<conditional-basic></conditional-basic>'
       );
       await component.componentOnReady();
       let button = component.querySelector('button');
@@ -56,8 +56,8 @@ describe("basic support", function() {
 
     it("button click rerenders", async function() {
 
-      const component = addComponent<HTMLCmpAElement>(
-        '<cmp-a></cmp-a>'
+      const component = addComponent<HTMLConditionalBasicElement>(
+        '<conditional-basic></conditional-basic>'
       );
       await component.componentOnReady();
 
