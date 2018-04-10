@@ -240,6 +240,35 @@ describe('setAccessor', () => {
     expect(elm).toMatchAttributes({ 'myprop': 'false' });
   });
 
+  it('should update svg attribute', () => {
+    elm.setAttribute('transform', 'rotate(45 72 72)');
+    const oldValue: any = 'rotate(45 72 72)';
+    const newValue: any = 'rotate(45 27 27)';
+
+    setAccessor(plt, elm, 'transform', oldValue, newValue, true);
+    expect(elm.transform).toBeUndefined();
+    expect(elm.getAttribute('transform')).toBe('rotate(45 27 27)');
+  });
+
+  it('should add svg attribute', () => {
+    const oldValue: any = undefined;
+    const newValue: any = 'rotate(45 27 27)';
+
+    setAccessor(plt, elm, 'transform', oldValue, newValue, true);
+    expect(elm.transform).toBeUndefined();
+    expect(elm.hasAttribute('transform')).toBe(true);
+  });
+
+  it('should remove svg attribute', () => {
+    elm.setAttribute('transform', 'rotate(45 27 27)');
+    const oldValue: any = 'rotate(45 27 27)';
+    const newValue: any = undefined;
+
+    setAccessor(plt, elm, 'transform', oldValue, newValue, true);
+    expect(elm.transform).toBeUndefined();
+    expect(elm.hasAttribute('transform')).toBe(false);
+  });
+
   it('should set true boolean to attribute', () => {
     const oldValue: any = 'someval';
     const newValue: any = true;

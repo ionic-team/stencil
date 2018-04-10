@@ -162,4 +162,58 @@ declare global {
   }
 }
 
+
+declare global {
+  interface HTMLSvgAttrElement extends HTMLStencilElement {
+
+  }
+  var HTMLSvgAttrElement: {
+    prototype: HTMLSvgAttrElement;
+    new (): HTMLSvgAttrElement;
+  };
+  interface HTMLElementTagNameMap {
+    'svg-attr': HTMLSvgAttrElement;
+  }
+  interface ElementTagNameMap {
+    'svg-attr': HTMLSvgAttrElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'svg-attr': JSXElements.SvgAttrAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SvgAttrAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+  interface HTMLSvgClassElement extends HTMLStencilElement {
+
+  }
+  var HTMLSvgClassElement: {
+    prototype: HTMLSvgClassElement;
+    new (): HTMLSvgClassElement;
+  };
+  interface HTMLElementTagNameMap {
+    'svg-class': HTMLSvgClassElement;
+  }
+  interface ElementTagNameMap {
+    'svg-class': HTMLSvgClassElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'svg-class': JSXElements.SvgClassAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SvgClassAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
 declare global { namespace JSX { interface StencilJSX {} } }

@@ -113,6 +113,10 @@ export function setAccessor(plt: d.PlatformApi, elm: any, memberName: string, ol
   } else if (newValue != null) {
     // Element Attributes
     updateAttribute(elm, memberName, newValue);
+
+  } else if (isSvg && (newValue == null || newValue === false)) {
+    // remove svg attribute
+    elm.removeAttribute(memberName);
   }
 }
 
