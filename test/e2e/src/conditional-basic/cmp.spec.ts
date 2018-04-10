@@ -22,10 +22,8 @@ describe("basic support", function() {
       const component = await addComponent<HTMLConditionalBasicElement>(`
         <conditional-basic></conditional-basic>
       `);
-
       let button = component.querySelector('button');
       let results = component.querySelector('div.results');
-
 
       expect(results.textContent).toEqual('');
 
