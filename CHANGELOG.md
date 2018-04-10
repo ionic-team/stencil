@@ -1,3 +1,21 @@
+<a name="0.7.20"></a>
+## 🍭 [0.7.20](https://github.com/ionic-team/stencil/compare/v0.7.19...v0.7.20) (2018-04-10)
+
+
+### Bug Fixes
+
+* **declarations:** fix dialog type interface ([9e7da78](https://github.com/ionic-team/stencil/commit/9e7da78))
+* **test:** fix accessing TestWindow properties ([1dabe1f](https://github.com/ionic-team/stencil/commit/1dabe1f))
+* **test:** update to TestWindow ([aa41953](https://github.com/ionic-team/stencil/commit/aa41953))
+* **test:** TestWindow types subclass Window ([a7feecc](https://github.com/ionic-team/stencil/commit/a7feecc))
+
+
+### Features
+
+* **autoprefix:** built-in css autoprefixing ([e141e8a](https://github.com/ionic-team/stencil/commit/e141e8a))
+
+
+
 <a name="0.7.19"></a>
 ## 💾 [0.7.19](https://github.com/ionic-team/stencil/compare/v0.7.18...v0.7.19) (2018-04-09)
 
