@@ -34,11 +34,10 @@
     "set.version": "node scripts/set-version.js",
     "start": "npm install && npm run build",
     "test": "npm run test.jest && npm run test.karma",
-    "test.build.karma": "node bin/stencil build -c test/karma/stencil.config.js",
-    "test.build.karma.dev": "node bin/stencil build --dev --watch -c test/karma/stencil.config.js",
     "test.dist": "node scripts/test-dist.js",
     "test.jest": "jest",
-    "test.karma": "npm run test.build.karma && node test/karma/node_modules/.bin/karma start test/karma/karma.config.js",
+    "test.karma": "node bin/stencil build -c test/karma/stencil.config.js && node test/karma/node_modules/.bin/karma start test/karma/karma.config.js",
+    "test.karma.watch": "node bin/stencil build --dev --watch -c test/karma/stencil.config.js",
     "test.watch": "jest --watch",
     "vermoji": "node scripts/vermoji.js"
   },
