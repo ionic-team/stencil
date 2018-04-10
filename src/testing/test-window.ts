@@ -11,6 +11,10 @@ const loggers = new WeakMap<TestWindow, TestWindowLogger>();
 const platforms = new WeakMap<TestWindow, d.PlatformApi>();
 
 
+// Extern type definition of TestWindow to look like a subclass of Window
+// while at runtime, it's not.
+export declare interface TestWindow extends Window {}
+
 export class TestWindow {
 
   async load(opts: TestWindowLoadOptions) {
