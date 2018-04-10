@@ -21,6 +21,7 @@ module.exports = function(config) {
 
     files: [
       'src/**/cmp.spec.ts',
+      'src/util.ts',
       'dist/app.js',
       { pattern: 'dist/app/*.js', watched: false, included: false, served: true, nocache: false },
     ],

@@ -1,53 +1,17 @@
-function addComponentFactory(scratch: Element) {
-  let addComponent = function<T extends Element>(childHtml: string): T {
-    scratch.innerHTML = childHtml;
-    return scratch.firstChild as T;
-  }
-
-  return addComponent;
-}
-
-function onComponentUpdate(el: Element) {
-  return new Promise((resolve) => {
-
-    const observer = new MutationObserver(function(mutations: MutationRecord[]) {
-      mutations;
-      observer.disconnect();
-      resolve();
-    });
-
-    observer.observe(el, {
-      childList: true,
-      attributes: true,
-      characterData: true,
-      subtree: true
-    });
-  });
-}
+import { setupDomTests, onComponentUpdate } from '../util';
 
 describe("basic support", function() {
-  let app = document.createElement("div");
-  document.body.appendChild(app);
-  let scratch: HTMLDivElement;
-  let addComponent: <T extends Element>(childHtml: string) => T;
+  const { setupDom, tearDownDom, addComponent } = setupDomTests(document);
 
-  beforeEach(function() {
-    scratch = document.createElement("div");
-    app.appendChild(scratch);
-    addComponent = addComponentFactory(scratch);
-  });
-
-  afterEach(function() {
-    app.innerHTML = "";
-    scratch = null;
-  });
+  beforeEach(setupDom);
+  afterEach(tearDownDom);
 
   describe("simple test", function() {
     it("contains a button as a child", async function() {
 
-      const component = addComponent<HTMLConditionalBasicElement>(
-        '<conditional-basic></conditional-basic>'
-      );
+      const component = addComponent<HTMLConditionalBasicElement>(`
+        <conditional-basic></conditional-basic>
+      `);
       await component.componentOnReady();
       let button = component.querySelector('button');
 
@@ -56,9 +20,9 @@ describe("basic support", function() {
 
     it("button click rerenders", async function() {
 
-      const component = addComponent<HTMLConditionalBasicElement>(
-        '<conditional-basic></conditional-basic>'
-      );
+      const component = addComponent<HTMLConditionalBasicElement>(`
+        <conditional-basic></conditional-basic>
+      `);
       await component.componentOnReady();
 
       let button = component.querySelector('button');

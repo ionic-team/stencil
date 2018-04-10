@@ -12,7 +12,7 @@
       "dom",
       "es2017",
     ],
-    "module": "es2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
