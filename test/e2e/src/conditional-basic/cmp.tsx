@@ -18,7 +18,7 @@ export class ConditionalBasic {
           Test
         </button>
         <div class='results'>
-          {this.showContent ? <div>Content</div> : null}
+          {this.showContent ? 'Content' : ''}
         </div>
       </div>
     );

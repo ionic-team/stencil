@@ -1,5 +1,5 @@
-<script src="/dist/app.js"></script>
 
+`
 <button class='test'>
   Test
 </button>
@@ -23,3 +23,4 @@
 
   document.querySelector('.test').addEventListener('click', update);
 </script>
+`

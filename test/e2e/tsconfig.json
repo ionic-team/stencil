@@ -10,15 +10,15 @@
     "jsxFactory": "h",
     "lib": [
       "dom",
-      "es2017"
+      "es2017",
     ],
-    "module": "es2015",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,
-    "target": "es2017"
+    "target": "es6"
   }
 }

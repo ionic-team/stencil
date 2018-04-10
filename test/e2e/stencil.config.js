@@ -1,8 +1,6 @@
 
 exports.config = {
-
-  srcDir: './',
-
+  namespace: 'app',
   outputTargets: [
     {
       type: 'www',
