@@ -2,6 +2,9 @@ var path = require('path');
 var fs = require('fs');
 
 
+// used to double-triple check all the packages
+// are good to go before publishing
+
 function testPackage(pkg) {
   console.log(pkg.packageJson);
 
@@ -48,6 +51,13 @@ function testPackage(pkg) {
       'ssrPathRegex',
       'loadConfig',
       'Renderer'
+    ]
+  },
+  {
+    packageJson: '../testing/package.json',
+    exports: [
+      'h',
+      'TestWindow'
     ]
   },
   {
