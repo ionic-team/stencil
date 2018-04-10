@@ -17,8 +17,6 @@ describe('@Event', () => {
       });
     })
 
-    await window.flush();
-
     element.emitEvent();
 
     const ev = await myEventPromise;
@@ -29,28 +27,27 @@ describe('@Event', () => {
     expect(ev.detail).toBe(true);
   });
 
-  // it('should fire custom event w/ options', async () => {
-  //   const element = await render({
-  //     components: [EventCmp],
-  //     html: '<event-cmp></event-cmp>'
-  //   });
+  it('should fire custom event w/ options', async () => {
+    const window = new TestWindow();
+    const element = await window.load({
+      components: [EventCmp],
+      html: '<event-cmp></event-cmp>'
+    });
 
-  //   const myEventPromise = new Promise<UIEvent>(resolve => {
-  //     element.addEventListener('myEventOne', (ev: UIEvent) => {
-  //       resolve(ev);
-  //     });
-  //   })
+    const myEventPromise = new Promise<UIEvent>(resolve => {
+      element.addEventListener('my-event-with-options', (ev: UIEvent) => {
+        resolve(ev);
+      });
+    })
 
-  //   await flush(element);
+    element.fireEventWithOptions();
 
-  //   element.fireEventTwo();
+    const ev = await myEventPromise;
 
-  //   const ev = await myEventPromise;
-
-  //   expect(ev.type).toBe('myEventOne');
-  //   expect(ev.bubbles).toBe(true);
-  //   expect(ev.cancelable).toBe(true);
-  //   expect(ev.detail).toBe(true);
-  // });
+    expect(ev.type).toBe('my-event-with-options');
+    expect(ev.bubbles).toBe(false);
+    expect(ev.cancelable).toBe(false);
+    expect(ev.detail).toEqual({ mph: 88 });
+  });
 
 });
