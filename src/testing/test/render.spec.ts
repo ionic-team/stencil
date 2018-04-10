@@ -1,10 +1,11 @@
 import * as d from '../../declarations';
-import { flush, h, render, transpile } from '../index';
+import { TestWindow, h } from '../index';
 
 
 describe('rendering', () => {
 
   let elm;
+  let win: TestWindow;
   let MyComponent: d.ComponentConstructor;
 
   beforeEach(async () => {
@@ -29,7 +30,8 @@ describe('rendering', () => {
       }
     };
 
-    elm = await render({
+    win = new TestWindow();
+    elm = await win.load({
       components: [MyComponent],
       html: '<my-component></my-component>'
     });
@@ -41,20 +43,20 @@ describe('rendering', () => {
 
   it('should work with a first name', async () => {
     elm.first = 'Peter';
-    await flush(elm);
+    await win.flush();
     expect(elm.textContent.trim()).toEqual(`Hello, World! I'm Peter`);
   });
 
   it('should work with a last name', async () => {
     elm.last = 'Parker';
-    await flush(elm);
+    await win.flush();
     expect(elm.textContent.trim()).toEqual('Hello, World! I\'m  Parker');
   });
 
   it('should work with both a first and a last name', async () => {
     elm.first = 'Peter';
     elm.last = 'Parker';
-    await flush(elm);
+    await win.flush();
     expect(elm.textContent.trim()).toEqual('Hello, World! I\'m Peter Parker');
   });
 

@@ -1,5 +1,5 @@
 import { escapeCssForJs } from '../style';
-import { TestingCompiler } from '../../../testing/index';
+import { TestingCompiler } from '../../../testing/testing-compiler';
 
 
 describe('component-styles', () => {

@@ -1,10 +1,10 @@
-import { CompilerCtx, Config, FsWriteResults } from '../../declarations';
+import * as d from '../../declarations';
 import { IN_MEMORY_DIR } from '../../util/in-memory-fs';
 import { isDtsFile, isJsFile, normalizePath } from '../util';
 import * as ts from 'typescript';
 
 
-export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<FsWriteResults>[], tsCompilerOptions: ts.CompilerOptions) {
+export function getTsHost(config: d.Config, ctx: d.CompilerCtx, writeQueue: Promise<d.FsWriteResults>[], tsCompilerOptions: ts.CompilerOptions) {
   const tsHost = ts.createCompilerHost(tsCompilerOptions);
 
   tsHost.directoryExists = (dirPath) => {
@@ -71,7 +71,7 @@ export function getTsHost(config: Config, ctx: CompilerCtx, writeQueue: Promise<
 }
 
 
-function writeFileInMemory(config: Config, ctx: CompilerCtx, sourceFile: ts.SourceFile, distFilePath: string, outputText: string) {
+function writeFileInMemory(config: d.Config, ctx: d.CompilerCtx, sourceFile: ts.SourceFile, distFilePath: string, outputText: string) {
   let tsFilePath = normalizePath(sourceFile.fileName);
 
   if (!config.sys.path.isAbsolute(tsFilePath)) {

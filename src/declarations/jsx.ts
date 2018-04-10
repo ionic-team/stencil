@@ -40,7 +40,7 @@ declare global {
       del: JSXElements.DelHTMLAttributes;
       details: JSXElements.DetailsHTMLAttributes;
       dfn: JSXElements.HTMLAttributes;
-      dialog: JSXElements.HTMLAttributes;
+      dialog: JSXElements.DialogHTMLAttributes;
       div: JSXElements.HTMLAttributes;
       dl: JSXElements.HTMLAttributes;
       dt: JSXElements.HTMLAttributes;
@@ -225,6 +225,11 @@ declare global {
       cite?: string;
       dateTime?: string;
       datetime?: string;
+    }
+
+    export interface DialogHTMLAttributes extends HTMLAttributes {
+      open?: boolean;
+      returnValue?: string;
     }
 
     export interface EmbedHTMLAttributes extends HTMLAttributes {

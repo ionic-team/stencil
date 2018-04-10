@@ -1,16 +1,12 @@
-import { Config, Diagnostic } from '../declarations';
-import { transpileModule } from '../compiler/transpile/transpile';
-import ts from 'typescript';
+import * as d from '../declarations';
+import { mockStencilSystem } from './mocks';
+import { transpileModuleForTesting } from '../compiler/transpile/transpile-testing';
+import { TestWindowLogger } from './test-window-logger';
+import { validateConfig } from '../compiler/config/validate-config';
+import * as ts from 'typescript';
 
 
-const TEST_CONFIG: Config = {
-  sys: {
-    path: require('path'),
-    url: require('url'),
-    vm: require('vm')
-  },
-  rootDir: '/'
-};
+const sys = mockStencilSystem();
 
 
 export function transpile(input: string, opts: TranspileOptions = {}, path?: string) {
@@ -23,13 +19,25 @@ export function transpile(input: string, opts: TranspileOptions = {}, path?: str
   const compilerOpts: ts.CompilerOptions = Object.assign({}, opts as any);
 
   if (!path) {
-    path = '/tmp/transpile-path.tsx';
+    path = '/tmp/transpile.tsx';
   }
 
-  const transpileResults = transpileModule(TEST_CONFIG, compilerOpts, path, input);
+  const logger = new TestWindowLogger();
+
+  const config = validateConfig({
+    sys: sys,
+    logger: logger,
+    rootDir: '/',
+    devMode: true,
+    _isTesting: true
+  });
+
+  const transpileResults = transpileModuleForTesting(config, compilerOpts, path, input);
 
   results.code = transpileResults.code;
   results.diagnostics = transpileResults.diagnostics;
+
+  logger.printLogs();
 
   return results;
 }
@@ -43,6 +51,6 @@ export interface TranspileOptions {
 
 
 export interface TranspileResults {
-  diagnostics: Diagnostic[];
+  diagnostics: d.Diagnostic[];
   code?: string;
 }

@@ -1,20 +1,16 @@
 import { gatherMetadata } from './test-utils';
 import { getPropDecoratorMeta } from '../prop-decorator';
 import { MEMBER_TYPE, PROP_TYPE } from '../../../../util/constants';
-import { mockConfig } from '../../../../testing/mocks';
 import * as path from 'path';
-import * as ts from 'typescript';
 
 
 describe('props decorator', () => {
-
-  const config = mockConfig();
 
   it('simple decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/prop-example');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
-      response = getPropDecoratorMeta(config, checker, classNode, sourceFile, 'ClassName', diagnostics);
+      response = getPropDecoratorMeta(diagnostics, checker, classNode, sourceFile, 'ClassName');
     });
 
     expect(response).toEqual({
@@ -71,6 +67,40 @@ describe('props decorator', () => {
         reflectToAttr: true
       },
     });
+  });
+
+  it('proper types', () => {
+    let response;
+    const sourceFilePath = path.resolve(__dirname, './fixtures/prop-types');
+    const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
+      response = getPropDecoratorMeta(diagnostics, checker, classNode, sourceFile, 'ClassName');
+    });
+
+    // check strings
+    for (let i = 0; i < 10; i++) {
+      expect(response[`text${i}`].propType).toEqual(PROP_TYPE.String);
+    }
+
+    // number
+    for (let i = 0; i < 10; i++) {
+      expect(response[`nu${i}`].propType).toEqual(PROP_TYPE.Number);
+    }
+
+    // boolean
+    for (let i = 0; i < 3; i++) {
+      expect(response[`bool${i}`].propType).toEqual(PROP_TYPE.Boolean);
+    }
+
+    // TODO: revisit any vs unknown
+    // any
+    for (let i = 0; i < 4; i++) {
+      expect(response[`any${i}`].propType).toEqual(PROP_TYPE.Any);
+    }
+
+    // unknown
+    for (let i = 0; i < 1; i++) {
+      expect(response[`unknown${i}`].propType).toEqual(PROP_TYPE.Unknown);
+    }
   });
 
 });

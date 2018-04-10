@@ -55,8 +55,17 @@ export class NodeSystem implements d.StencilSystem {
     };
   }
 
+  private _existingDom: () => d.CreateDom;
+
   get createDom() {
+    if (this._existingDom) {
+      return this._existingDom;
+    }
     return createDom;
+  }
+
+  set createDom(val) {
+    this._existingDom = val;
   }
 
   createWatcher(events: d.BuildEvents, paths: string, opts: any) {

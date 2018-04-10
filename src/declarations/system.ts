@@ -8,11 +8,7 @@ export interface StencilSystem {
     typescriptVersion?: string;
     runtime?: string;
   };
-  createDom?(): {
-    parse(hydrateOptions: d.OutputTargetHydrate): Window;
-    serialize(): string;
-    destroy(): void;
-  };
+  createDom?(): CreateDom;
   createWatcher?(events: d.BuildEvents, paths: string, opts?: any): d.FsWatcher;
   generateContentHash?(content: string, length: number): string;
   fs?: d.FileSystem;
@@ -60,6 +56,13 @@ export interface StencilSystem {
     runInContext(code: string, contextifiedSandbox: any, options?: any): any;
   };
   workbox?: Workbox;
+}
+
+
+export interface CreateDom {
+  parse(hydrateOptions: d.OutputTargetHydrate): Window;
+  serialize(): string;
+  destroy(): void;
 }
 
 

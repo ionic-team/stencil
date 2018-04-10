@@ -41,6 +41,7 @@ export interface ComponentConstructor {
   is?: string;
   properties?: ComponentConstructorProperties;
   events?: ComponentConstructorEvent[];
+  listeners?: ComponentConstructorListener[];
   host?: ComponentConstructorHost;
   style?: string;
   styleMode?: string;
@@ -152,6 +153,15 @@ export interface ComponentConstructorEvent {
   bubbles: boolean;
   cancelable: boolean;
   composed: boolean;
+}
+
+
+export interface ComponentConstructorListener {
+  name: string;
+  method: string;
+  capture?: boolean;
+  disabled?: boolean;
+  passive?: boolean;
 }
 
 

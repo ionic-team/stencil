@@ -1,4 +1,4 @@
-import { BuildCtx, CompilerCtx, ComponentMeta, ComponentRegistry, Config, Diagnostic } from '../../../declarations';
+import * as d from '../../../declarations';
 import { getCollections } from './discover-collections';
 import { getComponentDecoratorMeta } from './component-decorator';
 import { getElementDecoratorMeta } from './element-decorator';
@@ -13,11 +13,10 @@ import { validateComponentClass } from './validate-component';
 import * as ts from 'typescript';
 
 
-export function gatherMetadata(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, typechecker: ts.TypeChecker, sourceFileList: ReadonlyArray<ts.SourceFile>): ComponentRegistry {
-  const componentMetaList: ComponentRegistry = {};
-  const diagnostics: Diagnostic[] = [];
+export function gatherMetadata(config: d.Config, compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], collections: d.Collection[], typechecker: ts.TypeChecker, sourceFileList: ReadonlyArray<ts.SourceFile>) {
+  const componentMetaList: d.ComponentRegistry = {};
 
-  const visitFile = visitFactory(config, compilerCtx, buildCtx, typechecker, componentMetaList, diagnostics);
+  const visitFile = visitFactory(config, diagnostics, compilerCtx, collections, typechecker, componentMetaList);
 
   // Visit every sourceFile in the program
   for (const sourceFile of sourceFileList) {
@@ -28,15 +27,15 @@ export function gatherMetadata(config: Config, compilerCtx: CompilerCtx, buildCt
   return componentMetaList;
 }
 
-function visitFactory(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, checker: ts.TypeChecker, componentMetaList: ComponentRegistry, diagnostics: Diagnostic[]) {
+function visitFactory(config: d.Config, diagnostics: d.Diagnostic[], compilerCtx: d.CompilerCtx, collections: d.Collection[], checker: ts.TypeChecker, componentMetaList: d.ComponentRegistry) {
 
   return function visit(node: ts.Node, sourceFile: ts.SourceFile) {
     if (node.kind === ts.SyntaxKind.ImportDeclaration) {
-      getCollections(config, compilerCtx, buildCtx, node as ts.ImportDeclaration);
+      getCollections(config, compilerCtx, collections, node as ts.ImportDeclaration);
     }
 
     if (ts.isClassDeclaration(node)) {
-      const cmpMeta = visitClass(config, checker, node as ts.ClassDeclaration, sourceFile, diagnostics);
+      const cmpMeta = visitClass(diagnostics, checker, node as ts.ClassDeclaration, sourceFile);
       if (cmpMeta) {
         const tsFilePath = normalizePath(sourceFile.getSourceFile().fileName);
         componentMetaList[tsFilePath] = cmpMeta;
@@ -49,8 +48,8 @@ function visitFactory(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildC
   };
 }
 
-export function visitClass(config: Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile, diagnostics: Diagnostic[]): ComponentMeta | undefined {
-  let cmpMeta = getComponentDecoratorMeta(config, checker, classNode);
+export function visitClass(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile): d.ComponentMeta | undefined {
+  let cmpMeta = getComponentDecoratorMeta(diagnostics, checker, classNode);
 
   if (!cmpMeta) {
     return undefined;
@@ -64,18 +63,18 @@ export function visitClass(config: Config, checker: ts.TypeChecker, classNode: t
     membersMeta: {
       // membersMeta is shared with @Prop, @State, @Method, @Element
       ...getElementDecoratorMeta(checker, classNode),
-      ...getMethodDecoratorMeta(config, checker, classNode, sourceFile, componentClass),
-      ...getStateDecoratorMeta(checker, classNode),
-      ...getPropDecoratorMeta(config, checker, classNode, sourceFile, componentClass, diagnostics)
+      ...getMethodDecoratorMeta(diagnostics, checker, classNode, sourceFile, componentClass),
+      ...getStateDecoratorMeta(classNode),
+      ...getPropDecoratorMeta(diagnostics, checker, classNode, sourceFile, componentClass)
     },
-    eventsMeta: getEventDecoratorMeta(config, checker, classNode, sourceFile),
+    eventsMeta: getEventDecoratorMeta(diagnostics, checker, classNode, sourceFile),
     listenersMeta: getListenDecoratorMeta(checker, classNode)
   };
 
-  getWatchDecoratorMeta(config, classNode, cmpMeta);
+  getWatchDecoratorMeta(diagnostics, classNode, cmpMeta);
 
   // validate the user's component class for any common errors
-  validateComponentClass(config, cmpMeta, classNode);
+  validateComponentClass(diagnostics, cmpMeta, classNode);
 
   // Return Class Declaration with Decorator removed and as default export
   return cmpMeta;

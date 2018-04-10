@@ -1,15 +1,15 @@
-import { BuildCtx, Collection, CompilerCtx, Config } from '../../declarations';
+import * as d from '../../declarations';
+import { catchError } from '../util';
 import { CompilerUpgrade, validateCollectinCompatibility } from './collection-compatibility';
 import { componentDependencies } from '../transpile/transformers/component-dependencies';
 import { removeStencilImports } from '../transpile/transformers/remove-stencil-imports';
 import { transformSourceString } from '../transpile/transformers/util';
 import upgradeFrom0_0_5 from '../transpile/transformers/JSX_Upgrade_From_0_0_5/upgrade-jsx-props';
 import upgradeFromMetadata from '../transpile/transformers/Metadata_Upgrade_From_0_1_0/metadata-upgrade';
-import ts from 'typescript';
-import { catchError } from '../util';
+import * as ts from 'typescript';
 
 
-export async function upgradeCollection(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, collection: Collection) {
+export async function upgradeCollection(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, collection: d.Collection) {
   try {
     const upgradeTransforms = validateCollectinCompatibility(config, collection);
 
@@ -31,9 +31,9 @@ export async function upgradeCollection(config: Config, compilerCtx: CompilerCtx
 }
 
 
-function createDoUpgrade(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+function createDoUpgrade(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
 
-  return async (collection: Collection, upgrades: CompilerUpgrade[]): Promise<void> => {
+  return async (collection: d.Collection, upgrades: CompilerUpgrade[]): Promise<void> => {
     const upgradeTransforms: ts.TransformerFactory<ts.SourceFile>[] = (upgrades.map((upgrade) => {
       switch (upgrade) {
         case CompilerUpgrade.JSX_Upgrade_From_0_0_5:

@@ -1,3 +1,64 @@
+<a name="0.7.19"></a>
+## 💾 [0.7.19](https://github.com/ionic-team/stencil/compare/v0.7.18...v0.7.19) (2018-04-09)
+
+
+### Bug Fixes
+
+* **props:** dash-case attributes to props ([0bf1796](https://github.com/ionic-team/stencil/commit/0bf1796)), closes [#697](https://github.com/ionic-team/stencil/issues/697)
+* **props:** static type analysis for props ([b6e7863](https://github.com/ionic-team/stencil/commit/b6e7863))
+* **test:** use TestWindow for Listen testing ([3279676](https://github.com/ionic-team/stencil/commit/3279676)), closes [#572](https://github.com/ionic-team/stencil/issues/572)
+* **testing:** fix event emitter for test suite ([d388430](https://github.com/ionic-team/stencil/commit/d388430)), closes [#601](https://github.com/ionic-team/stencil/issues/601)
+* **tests:** path is not correct on windows ([#701](https://github.com/ionic-team/stencil/issues/701)) ([f7acae4](https://github.com/ionic-team/stencil/commit/f7acae4))
+
+
+### Refactor
+
+The test suite now comes with a `TestWindow` class, with the ultimate goal of better simulating a standardized browser environment built on top of `window` and `document`. Using a `TestWindow` instance allows tests to stay compartmentalized, and not require global objects which get reused (which is not ideal for testing). Instead, each test creates a new instance of `window`, and by doing so lets each test to not affect others.
+
+The test suite has been refactored to now use `TestWindow` instead of `render` and `flush`. Existing tests will continue to work, but warnings will be printed to use `TestWindow` instead. Here are [a few examples](https://github.com/ionic-team/stencil/commit/77dd1c79b4d8926995d9a48773c8516fff63e410).
+
+##### Old test:
+
+```
+import { render, flush } from '@stencil/core/testing';
+import { MyComponent } from './my-component';
+
+it('should be the old way', async () => {
+  const element = await render({
+    components: [MyComponent],
+    html: '<my-cmp first="Marty" last-name="McFly"></my-cmp>'
+  });
+  expect(element.textContent).toEqual('Hello, my name is Marty McFly');
+
+  element.first = 'George';
+  await flush(element);
+
+  expect(element.textContent).toEqual('Hello, my name is George McFly');
+});
+```
+
+##### New test:
+
+```
+import { TestWindow } from '@stencil/core/testing';
+import { MyComponent } from './my-component';
+
+it('should be the new way', async () => {
+  const window = new TestWindow();
+  const element = await window.load({
+    components: [MyComponent],
+    html: '<my-cmp first="Marty" last-name="McFly"></my-cmp>'
+  });
+  expect(element.textContent).toEqual('Hello, my name is Marty McFly');
+
+  element.first = 'George';
+  await window.flush();
+
+  expect(element.textContent).toEqual('Hello, my name is George McFly');
+});
+```
+
+
 <a name="0.7.18"></a>
 ## 🍹 [0.7.18](https://github.com/ionic-team/stencil/compare/v0.7.17...v0.7.18) (2018-04-06)
 

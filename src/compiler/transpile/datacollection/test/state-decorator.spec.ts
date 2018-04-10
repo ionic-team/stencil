@@ -1,8 +1,8 @@
-import { MEMBER_TYPE } from '../../../../util/constants';
-import { getStateDecoratorMeta } from '../state-decorator';
-import * as path from 'path';
-import * as ts from 'typescript';
 import { gatherMetadata } from './test-utils';
+import { getStateDecoratorMeta } from '../state-decorator';
+import { MEMBER_TYPE } from '../../../../util/constants';
+import * as path from 'path';
+
 
 describe('state decorator', () => {
 
@@ -10,7 +10,7 @@ describe('state decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/state-example');
     const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
-      response = getStateDecoratorMeta(null, classNode);
+      response = getStateDecoratorMeta(classNode);
     });
 
     expect(response).toEqual({

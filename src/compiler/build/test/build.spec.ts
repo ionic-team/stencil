@@ -1,5 +1,5 @@
 import { expectFiles } from '../../../testing/utils';
-import { TestingCompiler } from '../../../testing/index';
+import { TestingCompiler } from '../../../testing/testing-compiler';
 
 
 describe('build', () => {

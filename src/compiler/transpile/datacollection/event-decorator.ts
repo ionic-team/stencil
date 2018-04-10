@@ -1,11 +1,11 @@
 import * as d from '../../../declarations';
+import { buildWarn } from '../../util';
+import { getAttributeTypeInfo, serializeSymbol } from './utils';
 import { getDeclarationParameters, isDecoratorNamed, isPropertyWithDecorators } from './utils';
 import * as ts from 'typescript';
-import { getAttributeTypeInfo, serializeSymbol } from './utils';
 
 
-export function getEventDecoratorMeta(config: d.Config, checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
-  sourceFile;
+export function getEventDecoratorMeta(diagnostics: d.Diagnostic[], checker: ts.TypeChecker, classNode: ts.ClassDeclaration, sourceFile: ts.SourceFile) {
   return classNode.members
     .filter(isPropertyWithDecorators)
     .reduce((membersMeta, member: ts.PropertyDeclaration) => {
@@ -15,7 +15,7 @@ export function getEventDecoratorMeta(config: d.Config, checker: ts.TypeChecker,
       }
 
       const [ eventOptions ] = getDeclarationParameters<d.EventOptions>(elementDecorator);
-      const metadata = convertOptionsToMeta(config, eventOptions, member.name.getText());
+      const metadata = convertOptionsToMeta(diagnostics, eventOptions, member.name.getText());
 
       if (member.type) {
         const genericType = gatherEventEmitterGeneric(member.type);
@@ -43,13 +43,13 @@ export function getEventDecoratorMeta(config: d.Config, checker: ts.TypeChecker,
 }
 
 
-export function convertOptionsToMeta(config: d.Config, rawEventOpts: d.EventOptions = {}, memberName: string) {
+export function convertOptionsToMeta(diagnostics: d.Diagnostic[], rawEventOpts: d.EventOptions = {}, memberName: string) {
   if (!memberName) {
     return null;
   }
   return {
     eventMethodName: memberName,
-    eventName: getEventName(config, rawEventOpts, memberName),
+    eventName: getEventName(diagnostics, rawEventOpts, memberName),
     eventBubbles: typeof rawEventOpts.bubbles === 'boolean' ? rawEventOpts.bubbles : true,
     eventCancelable: typeof rawEventOpts.cancelable === 'boolean' ? rawEventOpts.cancelable : true,
     eventComposed: typeof rawEventOpts.composed === 'boolean' ? rawEventOpts.composed : true
@@ -57,7 +57,7 @@ export function convertOptionsToMeta(config: d.Config, rawEventOpts: d.EventOpti
 }
 
 
-export function getEventName(config: d.Config, rawEventOpts: d.EventOptions, memberName: string) {
+export function getEventName(diagnostics: d.Diagnostic[], rawEventOpts: d.EventOptions, memberName: string) {
   if (typeof rawEventOpts.eventName === 'string' && rawEventOpts.eventName.trim().length > 0) {
     // always use the event name if given
     return rawEventOpts.eventName.trim();
@@ -65,21 +65,22 @@ export function getEventName(config: d.Config, rawEventOpts: d.EventOptions, mem
 
   // event name wasn't provided
   // so let's default to use the member name
-  validateEventEmitterMemeberName(config, memberName);
+  validateEventEmitterMemeberName(diagnostics, memberName);
 
   return memberName;
 }
 
 
-export function validateEventEmitterMemeberName(config: d.Config, memberName: string) {
+export function validateEventEmitterMemeberName(diagnostics: d.Diagnostic[], memberName: string) {
   const firstChar = memberName.charAt(0);
 
   if (/[A-Z]/.test(firstChar)) {
-    config.logger.warn([
+    const diagnostic = buildWarn(diagnostics);
+    diagnostic.messageText = [
       `In order to be compatible with all event listeners on elements, the `,
       `@Event() "${memberName}" cannot start with a capital letter. `,
       `Please lowercase the first character for the event to best work with all listeners.`
-    ].join(''));
+    ].join('');
   }
 }
 

@@ -1,10 +1,10 @@
-import { CompilerCtx, Config } from '../../../declarations';
+import * as d from '../../../declarations';
 import { getUserTsConfig } from '../../transpile/compiler-options';
 import { normalizePath } from '../../util';
 import * as ts from 'typescript';
 
 
-export default async function pathsResolver(config: Config, compilerCtx: CompilerCtx, testTsconfig?: ts.CompilerOptions) {
+export default async function pathsResolver(config: d.Config, compilerCtx: d.CompilerCtx, testTsconfig?: ts.CompilerOptions) {
   const tsconfig: ts.CompilerOptions = testTsconfig || await getUserTsConfig(config, compilerCtx);
 
   const extensions = [

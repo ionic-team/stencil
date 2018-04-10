@@ -1,13 +1,13 @@
-import { BuildCtx, Config, ModuleGraph } from '../../../declarations/index';
+import * as d from '../../../declarations';
 import { normalizePath, pathJoin } from '../../util';
 import * as ts from 'typescript';
 
 
-export function moduleGraph(config: Config, buildCtx: BuildCtx): ts.TransformerFactory<ts.SourceFile> {
+export function moduleGraph(config: d.Config, buildCtx: d.BuildCtx): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
-    function visitImport(moduleGraph: ModuleGraph, dirPath: string, importNode: ts.ImportDeclaration) {
+    function visitImport(moduleGraph: d.ModuleGraph, dirPath: string, importNode: ts.ImportDeclaration) {
       if (importNode.moduleSpecifier) {
         let importPath = importNode.moduleSpecifier.getText().replace(/\'|\"|\`/g, '');
 
@@ -21,7 +21,7 @@ export function moduleGraph(config: Config, buildCtx: BuildCtx): ts.TransformerF
       return importNode;
     }
 
-    function visit(moduleGraph: ModuleGraph, dirPath: string, node: ts.Node): ts.VisitResult<ts.Node> {
+    function visit(moduleGraph: d.ModuleGraph, dirPath: string, node: ts.Node): ts.VisitResult<ts.Node> {
       switch (node.kind) {
         case ts.SyntaxKind.ImportDeclaration:
           return visitImport(moduleGraph, dirPath, node as ts.ImportDeclaration);
@@ -33,7 +33,7 @@ export function moduleGraph(config: Config, buildCtx: BuildCtx): ts.TransformerF
     }
 
     return (tsSourceFile) => {
-      const moduleGraph: ModuleGraph = {
+      const moduleGraph: d.ModuleGraph = {
         filePath: normalizePath(tsSourceFile.fileName),
         importPaths: []
       };

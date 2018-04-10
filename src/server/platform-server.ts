@@ -3,6 +3,7 @@ import { createDomApi } from '../renderer/dom-api';
 import { createQueueServer } from './queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION, RUNTIME_ERROR } from '../util/constants';
+import { enableEventListener } from '../core/listeners';
 import { fillCmpMetaFromConstructor } from './cmp-meta';
 import { getAppBuildDir } from '../compiler/app/app-file-naming';
 import { h } from '../renderer/vdom/h';
@@ -39,9 +40,8 @@ export function createPlatformServer(
 
   // initialize Core global object
   const Context: d.CoreContext = {};
-  Context.addListener = noop;
-  Context.enableListener = noop;
-  Context.emit = noop;
+  Context.enableListener = (instance, eventName, enabled, attachTo, passive) => enableEventListener(plt, instance, eventName, enabled, attachTo, passive);
+  Context.emit = (elm: Element, eventName: string, data: d.EventEmitterData) => domApi.$dispatchEvent(elm, Context.eventNameFn ? Context.eventNameFn(eventName) : eventName, data);
   Context.isClient = false;
   Context.isServer = true;
   Context.isPrerender = isPrerender;
@@ -78,7 +78,7 @@ export function createPlatformServer(
     attachStyles: noop,
     defineComponent,
     domApi,
-    emitEvent: noop,
+    emitEvent: Context.emit,
     getComponentMeta,
     getContextItem,
     isDefinedComponent,

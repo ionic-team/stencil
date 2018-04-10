@@ -1,7 +1,7 @@
 import * as d from '../../declarations';
 
 
-export function createDom() {
+export function createDom(): d.CreateDom {
   let dom: any = null;
 
   return {

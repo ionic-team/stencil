@@ -1,16 +1,16 @@
-import { ComponentMeta, ModuleFiles } from '../../../declarations';
+import * as d from '../../../declarations';
 import { convertValueToLiteral } from './util';
 import { DEFAULT_STYLE_MODE, ENCAPSULATION } from '../../../util/constants';
 import { getStyleIdPlaceholder, getStylePlaceholder } from '../../../util/data-serialize';
-import { formatComponentConstructorEvents, formatComponentConstructorProperties } from '../../../util/data-serialize';
+import { formatComponentConstructorEvents, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../../../util/data-serialize';
 import * as ts from 'typescript';
 
 
-export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
+export default function addComponentMetadata(moduleFiles: d.ModuleFiles): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
 
-    function visitClass(classNode: ts.ClassDeclaration, cmpMeta: ComponentMeta) {
+    function visitClass(classNode: ts.ClassDeclaration, cmpMeta: d.ComponentMeta) {
       const staticMembers = addStaticMeta(cmpMeta);
 
       const newMembers = Object.keys(staticMembers).map(memberName => {
@@ -28,7 +28,7 @@ export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.Trans
       );
     }
 
-    function visit(node: ts.Node, cmpMeta: ComponentMeta): ts.VisitResult<ts.Node> {
+    function visit(node: ts.Node, cmpMeta: d.ComponentMeta): ts.VisitResult<ts.Node> {
       switch (node.kind) {
         case ts.SyntaxKind.ClassDeclaration:
           return visitClass(node as ts.ClassDeclaration, cmpMeta);
@@ -50,7 +50,7 @@ export default function addComponentMetadata(moduleFiles: ModuleFiles): ts.Trans
 }
 
 
-export function addStaticMeta(cmpMeta: ComponentMeta) {
+export function addStaticMeta(cmpMeta: d.ComponentMeta) {
   const staticMembers: ConstructorComponentMeta = {};
 
   staticMembers.is = convertValueToLiteral(cmpMeta.tagNameMeta);
@@ -74,6 +74,11 @@ export function addStaticMeta(cmpMeta: ComponentMeta) {
   const eventsMeta = formatComponentConstructorEvents(cmpMeta.eventsMeta);
   if (eventsMeta && eventsMeta.length > 0) {
     staticMembers.events = convertValueToLiteral(eventsMeta);
+  }
+
+  const listenerMeta = formatComponentConstructorListeners(cmpMeta.listenersMeta);
+  if (listenerMeta && listenerMeta.length > 0) {
+    staticMembers.listeners = convertValueToLiteral(listenerMeta);
   }
 
   if (cmpMeta.stylesMeta) {
@@ -105,6 +110,7 @@ export interface ConstructorComponentMeta {
   didChange?: ts.Expression;
   willChange?: ts.Expression;
   events?: ts.Expression;
+  listeners?: ts.Expression;
   style?: ts.Expression;
   styleMode?: ts.Expression;
 }

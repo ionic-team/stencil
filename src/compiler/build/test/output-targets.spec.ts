@@ -1,5 +1,6 @@
 import { doNotExpectFiles, expectFiles } from '../../../testing/utils';
-import { TestingCompiler, TestingConfig } from '../../../testing';
+import { TestingCompiler } from '../../../testing/testing-compiler';
+import { TestingConfig } from '../../../testing/testing-config';
 
 
 describe('outputTargets', () => {

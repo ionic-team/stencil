@@ -22,3 +22,5 @@ node_modules/
 /server
 /sys
 /testing
+
+test/e2e/app/components.d.ts

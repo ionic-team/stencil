@@ -49,6 +49,32 @@ describe('fillCmpMetaFromConstructor', () => {
     expect(cmpMeta.membersMeta.color.attribName).toBe('color');
   });
 
+  it('listenersMeta', () => {
+    cmp.listeners = [
+      { name: 'click', method: 'clickA', capture: true, disabled: true, passive: true },
+      { name: 'click', method: 'clickB', capture: false, disabled: false, passive: false },
+      { name: 'click', method: 'clickC' }
+    ];
+    const cmpMeta = fillCmpMetaFromConstructor(cmp, {});
+    expect(cmpMeta.listenersMeta[0].eventName).toBe('click');
+    expect(cmpMeta.listenersMeta[0].eventMethodName).toBe('clickA');
+    expect(cmpMeta.listenersMeta[0].eventCapture).toBe(true);
+    expect(cmpMeta.listenersMeta[0].eventDisabled).toBe(true);
+    expect(cmpMeta.listenersMeta[0].eventPassive).toBe(true);
+
+    expect(cmpMeta.listenersMeta[1].eventName).toBe('click');
+    expect(cmpMeta.listenersMeta[1].eventMethodName).toBe('clickB');
+    expect(cmpMeta.listenersMeta[1].eventCapture).toBe(false);
+    expect(cmpMeta.listenersMeta[1].eventDisabled).toBe(false);
+    expect(cmpMeta.listenersMeta[1].eventPassive).toBe(false);
+
+    expect(cmpMeta.listenersMeta[2].eventName).toBe('click');
+    expect(cmpMeta.listenersMeta[2].eventMethodName).toBe('clickC');
+    expect(cmpMeta.listenersMeta[2].eventCapture).toBe(undefined);
+    expect(cmpMeta.listenersMeta[2].eventDisabled).toBe(undefined);
+    expect(cmpMeta.listenersMeta[2].eventPassive).toBe(undefined);
+  });
+
   it('componentConstructor', () => {
     const cmpMeta = fillCmpMetaFromConstructor(cmp, {});
     expect(cmpMeta.componentConstructor).toBe(cmp);

@@ -1,5 +1,5 @@
-import * as ts from 'typescript';
 import * as util from '../util';
+import * as ts from 'typescript';
 /* tslint:disable */
 
 

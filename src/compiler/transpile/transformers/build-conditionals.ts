@@ -1,8 +1,8 @@
-import { BuildConditionals } from '../../../declarations';
+import * as d from '../../../declarations';
 import * as ts from 'typescript';
 
 
-export function buildConditionalsTransform(coreBuild: BuildConditionals): ts.TransformerFactory<ts.SourceFile> {
+export function buildConditionalsTransform(coreBuild: d.BuildConditionals): ts.TransformerFactory<ts.SourceFile> {
 
   return (transformContext) => {
     function visitPropertyAccessExpression(node: ts.PropertyAccessExpression) {

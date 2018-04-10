@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { formatComponentConstructorEvent, formatComponentConstructorEvents, formatComponentConstructorProperties } from '../data-serialize';
+import { formatComponentConstructorEvent, formatComponentConstructorEvents, formatComponentConstructorListener, formatComponentConstructorListeners, formatComponentConstructorProperties } from '../data-serialize';
 import { MEMBER_TYPE, PROP_TYPE } from '../constants';
 import { parsePropertyValue } from '../data-parse';
 
@@ -9,6 +9,67 @@ describe('data serialize/parse', () => {
   const registry: d.ComponentRegistry = {};
   const moduleImports: d.ImportedModule = { 'tag': class MyTag {} as any };
   const cmpMeta: d.ComponentMeta = {};
+
+
+  describe('format component listeners', () => {
+
+    it('set passive falsy', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click', eventPassive: false});
+      expect(lsn.passive).toBe(undefined);
+    });
+
+    it('set passive true', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click', eventPassive: true});
+      expect(lsn.passive).toBe(true);
+    });
+
+    it('default passive undefined', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click'});
+      expect(lsn.passive).toBe(undefined);
+    });
+
+    it('set disabled falsy', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click', eventDisabled: false});
+      expect(lsn.disabled).toBe(undefined);
+    });
+
+    it('set disabled true', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click', eventDisabled: true});
+      expect(lsn.disabled).toBe(true);
+    });
+
+    it('default disabled undefined', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click'});
+      expect(lsn.disabled).toBe(undefined);
+    });
+
+    it('set capture falsy', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click', eventCapture: false});
+      expect(lsn.capture).toBe(undefined);
+    });
+
+    it('set capture true', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click', eventCapture: true});
+      expect(lsn.capture).toBe(true);
+    });
+
+    it('default capture undefined', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click'});
+      expect(lsn.capture).toBe(undefined);
+    });
+
+    it('name and method', () => {
+      const lsn = formatComponentConstructorListener({eventName: 'click', eventMethodName: 'someMethod'});
+      expect(lsn.name).toBe('click');
+      expect(lsn.method).toBe('someMethod');
+    });
+
+    it('should do nothing for no listener data', () => {
+      expect(formatComponentConstructorListeners(null)).toBe(null);
+      expect(formatComponentConstructorListeners([])).toBe(null);
+    });
+
+  });
 
 
   describe('format component events', () => {

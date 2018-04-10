@@ -1,7 +1,4 @@
-import { TestingCompiler } from '../../../testing';
-import { wroteFile } from '../../../testing/utils';
-import * as path from 'path';
-import * as ts from 'typescript';
+import { TestingCompiler } from '../../../testing/testing-compiler';
 
 
 describe('entries', () => {

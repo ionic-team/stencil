@@ -1,6 +1,6 @@
 import * as d from '../../../declarations';
 import { getWritePathFromUrl, isValidCrawlableAnchor } from '../prerender-utils';
-import { TestingConfig } from '../../../testing';
+import { TestingConfig } from '../../../testing/testing-config';
 import { validateConfig } from '../../config/validate-config';
 
 

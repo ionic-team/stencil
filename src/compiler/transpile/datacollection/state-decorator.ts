@@ -1,11 +1,10 @@
+import * as d from '../../../declarations';
 import { isDecoratorNamed, isPropertyWithDecorators } from './utils';
-import { MembersMeta } from '../../../declarations';
 import { MEMBER_TYPE } from '../../../util/constants';
 import * as ts from 'typescript';
 
 
-export function getStateDecoratorMeta(checker: ts.TypeChecker, classNode: ts.ClassDeclaration): MembersMeta {
-  checker;
+export function getStateDecoratorMeta(classNode: ts.ClassDeclaration) {
   return classNode.members
     .filter(isPropertyWithDecorators)
     .reduce((membersMeta, member) => {
@@ -18,5 +17,5 @@ export function getStateDecoratorMeta(checker: ts.TypeChecker, classNode: ts.Cla
       }
 
       return membersMeta;
-    }, {} as MembersMeta);
+    }, {} as d.MembersMeta);
 }

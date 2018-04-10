@@ -9,7 +9,7 @@ import { InMemoryFileSystem } from '../util/in-memory-fs';
 import { TestingConfig } from './testing-config';
 import { TestingSystem } from './testing-sys';
 import { TestingFs } from './testing-fs';
-import { TestingLogger } from './index';
+import { TestingLogger } from './testing-logger';
 import { validateConfig } from '../compiler/config/validate-config';
 
 

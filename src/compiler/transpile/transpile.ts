@@ -1,24 +1,21 @@
+import * as d from '../../declarations';
 import addComponentMetadata from './transformers/add-component-metadata';
-import { BuildCtx, CompilerCtx, Config, Diagnostic, FsWriteResults, ModuleFiles, TranspileResults } from '../../declarations';
+import { buildConditionalsTransform } from './transformers/build-conditionals';
 import { componentDependencies } from './transformers/component-dependencies';
-import { gatherMetadata } from './datacollection/index';
 import { generateComponentTypes } from './create-component-types';
 import { getComponentsDtsSrcFilePath } from '../collections/distribution';
 import { getTsHost } from './compiler-host';
 import { getUserTsConfig } from './compiler-options';
-import { hasError, normalizePath } from '../util';
+import { hasError } from '../util';
 import { loadTypeScriptDiagnostics } from '../../util/logger/logger-typescript';
 import { moduleGraph } from './transformers/module-graph';
-import { normalizeAssetsDir } from '../component-plugins/assets-plugin';
-import { normalizeStyles } from '../style/normalize-styles';
 import { removeCollectionImports } from './transformers/remove-collection-imports';
 import { removeDecorators } from './transformers/remove-decorators';
 import { removeStencilImports } from './transformers/remove-stencil-imports';
-import { buildConditionalsTransform } from './transformers/build-conditionals';
 import * as ts from 'typescript';
 
 
-export async function transpileModules(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, tsFilePaths: string[]) {
+export async function transpileModules(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, tsFilePaths: string[]) {
   if (hasError(buildCtx.diagnostics)) {
     // we've already got an error, let's not continue
     return;
@@ -40,7 +37,7 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
     tsOptions.lib = [];
   }
 
-  const writeQueue: Promise<FsWriteResults>[] = [];
+  const writeQueue: Promise<d.FsWriteResults>[] = [];
 
   // get the ts compiler host we'll use, which patches file operations
   // with our in-memory file system
@@ -75,7 +72,7 @@ export async function transpileModules(config: Config, compilerCtx: CompilerCtx,
 }
 
 
-function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx) {
+function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
   // this is the big one, let's go ahead and kick off the transpiling
   const buildConditionals: any = {
     isDev: !!config.devMode
@@ -106,64 +103,4 @@ function transpileProgram(program: ts.Program, tsHost: ts.CompilerHost, config: 
 
     loadTypeScriptDiagnostics(config.rootDir, buildCtx.diagnostics, tsDiagnostics);
   }
-}
-
-
-/**
- * This is only used during TESTING
- */
-export function transpileModule(config: Config, compilerOptions: ts.CompilerOptions, path: string, input: string) {
-  const moduleFiles: ModuleFiles = {};
-  const diagnostics: Diagnostic[] = [];
-  const compilerCtx: CompilerCtx = null;
-  const buildCtx: BuildCtx = null;
-  const results: TranspileResults = {
-    code: null,
-    diagnostics: null,
-    cmpMeta: null
-  };
-  path = normalizePath(path);
-  const checkProgram = ts.createProgram([path], compilerOptions);
-
-  // Gather component metadata and type info
-  const files = checkProgram.getSourceFiles().filter(sf => sf.getSourceFile().fileName === path);
-  const metadata = gatherMetadata(config, compilerCtx, buildCtx, checkProgram.getTypeChecker(), files);
-
-  if (Object.keys(metadata).length > 0) {
-    const fileMetadata = metadata[path];
-
-    // normalize metadata
-    fileMetadata.stylesMeta = normalizeStyles(config, path, fileMetadata.stylesMeta);
-    fileMetadata.assetsDirsMeta = normalizeAssetsDir(config, path, fileMetadata.assetsDirsMeta);
-
-    // assign metadata to module files
-    moduleFiles['module.tsx'] = {
-      cmpMeta: fileMetadata
-    };
-  }
-
-  const transpileOpts = {
-    compilerOptions: compilerOptions,
-    transformers: {
-      before: [
-        removeDecorators(),
-        addComponentMetadata(moduleFiles)
-      ],
-      after: [
-        removeStencilImports()
-      ]
-    }
-  };
-  const tsResults = ts.transpileModule(input, transpileOpts);
-
-  loadTypeScriptDiagnostics('', diagnostics, tsResults.diagnostics);
-
-  if (diagnostics.length) {
-    results.diagnostics = diagnostics;
-  }
-
-  results.code = tsResults.outputText;
-  results.cmpMeta = moduleFiles['module.tsx'] ? moduleFiles['module.tsx'].cmpMeta : null;
-
-  return results;
 }
