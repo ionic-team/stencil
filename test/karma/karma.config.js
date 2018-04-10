@@ -70,6 +70,13 @@ const localLaunchers = {
 			// Without a remote debugging port, Google Chrome exits immediately.
 			'--remote-debugging-port=9333'
 		]
+  },
+  Chrome: {
+    base: 'Chrome',
+    flags: [
+			// Without a remote debugging port, Google Chrome exits immediately.
+			'--remote-debugging-port=9333'
+		]
   }
 };
 
@@ -90,7 +97,7 @@ module.exports = function(config) {
     // browsers: Object.keys(browserStackLaunchers),
     browsers: Object.keys(localLaunchers),
 
-    singleRun: true, // set this to false to leave the browser open
+    singleRun: false, // set this to false to leave the browser open
 
     frameworks: ['jasmine', 'karma-typescript'],
 
@@ -99,7 +106,7 @@ module.exports = function(config) {
     },
 
     // customLaunchers: sauceLabs ? sauceLabsLaunchers : localLaunchers,
-    customLaunchers: browserStackLaunchers,
+    // customLaunchers: browserStackLaunchers,
 
     files: [
       'src/**/cmp.spec.ts',
