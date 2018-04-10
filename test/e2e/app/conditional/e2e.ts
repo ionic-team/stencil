@@ -1,23 +1,46 @@
+function addComponentFactory(scratch: Element) {
+  let addComponent = function<T extends Element>(childHtml: string): T {
+    scratch.innerHTML = childHtml;
+    return scratch.firstChild as T;
+  }
+
+  return addComponent;
+}
+
+function onComponentUpdate(el: Element) {
+  return new Promise((resolve) => {
+
+    const observer = new MutationObserver(function(mutations: MutationRecord[]) {
+      mutations;
+      observer.disconnect();
+      resolve();
+    });
+
+    observer.observe(el, {
+      childList: true,
+      attributes: true,
+      characterData: true,
+      subtree: true
+    });
+  });
+}
 
 describe("basic support", function() {
   let app = document.createElement("div");
   document.body.appendChild(app);
   let scratch: HTMLDivElement;
+  let addComponent: <T extends Element>(childHtml: string) => T;
 
   beforeEach(function() {
     scratch = document.createElement("div");
     app.appendChild(scratch);
+    addComponent = addComponentFactory(scratch);
   });
 
   afterEach(function() {
     app.innerHTML = "";
     scratch = null;
   });
-
-  function addComponent<T extends Element>(childHtml: string): T {
-    scratch.innerHTML = childHtml;
-    return scratch.firstChild as T;
-  }
 
   describe("simple test", function() {
     it("contains a button as a child", async function() {
@@ -43,8 +66,11 @@ describe("basic support", function() {
 
 
       expect(results.textContent).toEqual('');
+
       button.click();
-      // How do we wait for the rerender?
+      await onComponentUpdate(component);
+
+      expect(results.textContent).toEqual('Content');
     });
   });
 });
