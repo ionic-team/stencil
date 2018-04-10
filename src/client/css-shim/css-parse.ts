@@ -208,7 +208,7 @@ const CLOSE_BRACE = '}';
 // helper regexp's
 const COMMENTS_RX = /\/\*[^*]*\*+([^/*][^*]*\*+)*\//gim;
 const PORT_RX = /@import[^;]*;/gim;
-const CUSTOM_PROP_RX = /(?:^[^;\-\s}]+)?--[^;{}]*?:[^{};]*?(?:[;\n]|$)/gim;
+const CUSTOM_PROP_RX = /(?:^[^;\-\s}]+)?--[\w-]*?\s*:\s*(?:(?:'(?:\\'|.)*?'|"(?:\\"|.)*?"|\([^)]*?\)|[^};{])+(?:[;\n]|$))/gim;
 const VAR_APPLY_RX = /[^;:]*?:[^;]*?var\([^;]*\)(?:[;\n]|$)?/gim;
 const KEYFRAMES_RULE_RX = /^@[^\s]*keyframes/;
 const MULTI_SPACES_RX = /\s+/g;
