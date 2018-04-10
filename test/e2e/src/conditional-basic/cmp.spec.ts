@@ -9,10 +9,9 @@ describe("basic support", function() {
   describe("simple test", function() {
     it("contains a button as a child", async function() {
 
-      const component = addComponent<HTMLConditionalBasicElement>(`
+      const component = await addComponent<HTMLConditionalBasicElement>(`
         <conditional-basic></conditional-basic>
       `);
-      await component.componentOnReady();
       let button = component.querySelector('button');
 
       expect(button).toBeDefined();
@@ -20,10 +19,9 @@ describe("basic support", function() {
 
     it("button click rerenders", async function() {
 
-      const component = addComponent<HTMLConditionalBasicElement>(`
+      const component = await addComponent<HTMLConditionalBasicElement>(`
         <conditional-basic></conditional-basic>
       `);
-      await component.componentOnReady();
 
       let button = component.querySelector('button');
       let results = component.querySelector('div.results');

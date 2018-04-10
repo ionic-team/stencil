@@ -12,9 +12,12 @@ export function setupDomTests(document: Document, scratch: HTMLDivElement = null
     scratch = null;
   };
 
-  function addComponent<T extends Element>(childHtml: string): T {
+  async function addComponent<T extends HTMLStencilElement>(childHtml: string): Promise<T> {
     scratch.innerHTML = childHtml;
-    return scratch.firstElementChild as T;
+    const component =  scratch.firstElementChild as T;
+    await component.componentOnReady();
+
+    return component;
   }
 
   return { setupDom, tearDownDom, addComponent };
