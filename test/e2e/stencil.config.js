@@ -1,6 +1,6 @@
 
 exports.config = {
-
+  namespace: 'app',
   outputTargets: [
     {
       type: 'www',

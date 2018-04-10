@@ -20,7 +20,7 @@ module.exports = function(config) {
     },
 
     files: [
-      '**/cmp.spec.ts',
+      'src/**/cmp.spec.ts',
       'dist/app.js',
       { pattern: 'dist/app/*.js', watched: false, included: false, served: true, nocache: false },
     ],
