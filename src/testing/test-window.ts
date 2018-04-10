@@ -88,12 +88,7 @@ export class TestWindow {
         delete (results as any).__testPlatform;
 
         // get the window from the element just created
-        const window = elm.ownerDocument.defaultView as any;
-
-        // copy over all the dom window properties
-        Object.keys(window).forEach(key => {
-          (this as any)[key] = window[key];
-        });
+        this.window = elm.ownerDocument.defaultView as any;
       }
 
     } catch (e) {
@@ -115,57 +110,60 @@ export class TestWindow {
   }
 
 
-  // properties
-  crypto: Crypto;
-  document: Document;
-  history: History;
-  location: Location;
-  navigator: Navigator;
-  performance: Performance;
   window: Window;
 
-  // methods
-  getComputedStyle?(elt: Element, pseudoElt?: string | null): CSSStyleDeclaration;
-  getMatchedCSSRules?(elt: Element, pseudoElt?: string | null): CSSRuleList;
-  matchMedia?(mediaQuery: string): MediaQueryList;
-  requestAnimationFrame?(callback: FrameRequestCallback): number;
-  addEventListener?<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-  addEventListener?(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-  removeEventListener?<K extends keyof WindowEventMap>(type: K, listener: (this: Window, ev: WindowEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-  removeEventListener?(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-
-  get Blob() {
-    validateWindow(this, 'Blob');
-    return this.window.Blob;
+  get document(): Document {
+    return getWindowObj(this, 'document');
   }
 
-  get CustomEvent() {
-    validateWindow(this, 'CustomEvent');
-    return (this.window as any).CustomEvent;
+  get history(): History {
+    return getWindowObj(this, 'history');
   }
 
-  get Event() {
-    validateWindow(this, 'Event');
-    return (this.window as any).Event;
+  get location(): Location {
+    return getWindowObj(this, 'location');
   }
 
-  get URL() {
-    validateWindow(this, 'URL');
-    return this.window.URL;
+  get navigator(): Navigator {
+    return getWindowObj(this, 'navigator');
   }
 
-  get URLSearchParams() {
-    validateWindow(this, 'URLSearchParams');
-    return this.window.URLSearchParams;
+  get CustomEvent(): typeof CustomEvent {
+    return getWindowObj(this, 'CustomEvent');
+  }
+
+  get Event(): typeof Event {
+    return getWindowObj(this, 'Event');
+  }
+
+  get URL(): typeof URL {
+    return getWindowObj(this, 'URL');
   }
 
 }
 
+// shared window which can be reused
+let sharedWindow: any;
 
-function validateWindow(testWindow: TestWindow, key: string) {
-  if (!testWindow.window) {
-    throw new Error(`TestWindow load() must be called before using "${key}"`);
+function getWindowObj(testWindow: TestWindow, key: string) {
+  if (testWindow.window) {
+    // we've already created the window for this TestWindow, use this one
+    return (testWindow.window as any)[key];
   }
+
+  if (!sharedWindow) {
+    // we don't have a window created, so use the shared one
+    // but first let's create the shared one (which could get reused)
+    const opts: d.HydrateOptions = {
+      url: DEFAULT_URL,
+      userAgent: DEFAULT_USER_AGENT
+    };
+
+    sharedWindow = mockStencilSystem().createDom().parse(opts);
+  }
+
+  // we don't have a window created, so use the shared one
+  return sharedWindow[key];
 }
 
 
@@ -195,10 +193,14 @@ function validateTestWindowLoadOptions(opts: TestWindowLoadOptions) {
   }
 
   if (typeof opts.url !== 'string') {
-    opts.url = 'http://testwindow.stenciljs.com/';
+    opts.url = DEFAULT_URL;
   }
 
   if (typeof opts.userAgent !== 'string') {
-    opts.userAgent = 'testwindow';
+    opts.userAgent = DEFAULT_USER_AGENT;
   }
 }
+
+
+const DEFAULT_URL = `http://testwindow.stenciljs.com/`;
+const DEFAULT_USER_AGENT = `testwindow`;
