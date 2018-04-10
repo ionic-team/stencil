@@ -112,6 +112,10 @@
     "transform": {
       "^.+\\.(ts|tsx)$": "<rootDir>/scripts/jest.preprocessor.js"
     },
-    "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$"
+    "testRegex": "/src/.*\\.spec\\.(ts|tsx|js)$",
+    "testPathIgnorePatterns": [
+      "/node_modules",
+      "<rootDir>/test"
+    ]
   }
 }
