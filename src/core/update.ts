@@ -2,8 +2,8 @@ import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { callNodeRefs } from '../renderer/vdom/patch';
 import { initComponentInstance } from './init-component-instance';
-import { PRIORITY, RUNTIME_ERROR } from '../util/constants';
 import { render } from './render';
+import { RUNTIME_ERROR } from '../util/constants';
 
 
 export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement) {
@@ -12,7 +12,17 @@ export function queueUpdate(plt: d.PlatformApi, elm: d.HostElement) {
     plt.isQueuedForUpdate.set(elm, true);
     // run the patch in the next tick
     // vdom diff and patch the host element for differences
-    plt.queue.add(() => update(plt, elm), plt.isAppLoaded ? PRIORITY.Low : PRIORITY.High);
+    if (plt.isAppLoaded) {
+      // app has already loaded
+      // let's queue this work in the dom write phase
+      plt.queue.write(() => update(plt, elm));
+
+    } else {
+      // app hasn't finished loading yet
+      // so let's use next tick to do everything
+      // as fast as possible
+      plt.queue.tick(() => update(plt, elm));
+    }
   }
 }
 

@@ -2,6 +2,7 @@ import * as d from '../declarations';
 import { Cache } from '../compiler/cache';
 import { createDomApi } from '../renderer/dom-api';
 import { createPlatformServer } from '../server/platform-server';
+import { createQueueServer } from '../server/queue-server';
 import { createRendererPatch } from '../renderer/vdom/patch';
 import { initComponentInstance } from '../core/init-component-instance';
 import { initHostElement } from '../core/init-host-element';
@@ -45,7 +46,7 @@ export function mockPlatform(win?: any, domApi?: d.DomApi, cmpRegistry?: d.Compo
 
   const $mockedQueue = plt.queue = mockQueue();
 
-  (plt as MockedPlatform).$flushQueue = function() {
+  (plt as MockedPlatform).$flushQueue = () => {
     return new Promise(resolve => {
       $mockedQueue.flush(resolve);
     });
@@ -165,30 +166,7 @@ export function mockRenderer(plt?: MockedPlatform, domApi?: d.DomApi): d.Rendere
 
 
 export function mockQueue() {
-  const callbacks: Function[] = [];
-
-  function flush(cb?: Function) {
-    setTimeout(() => {
-      while (callbacks.length > 0) {
-        callbacks.shift()();
-      }
-      cb();
-    }, Math.round(Math.random() * 20));
-  }
-
-  function add(cb: Function) {
-    callbacks.push(cb);
-  }
-
-  function clear() {
-    callbacks.length = 0;
-  }
-
-  return {
-    add: add,
-    flush: flush,
-    clear: clear
-  };
+  return createQueueServer();
 }
 
 

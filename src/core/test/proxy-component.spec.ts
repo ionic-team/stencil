@@ -14,6 +14,7 @@ describe('proxy-component', () => {
 
   beforeEach(() => {
     plt = mockPlatform();
+    plt.isAppLoaded = true;
     elm = plt.domApi.$createElement('ion-cmp') as any;
     CmpConstructor = TwinPines as any;
     instance = new TwinPines();
@@ -66,26 +67,26 @@ describe('proxy-component', () => {
 
     it('instance number changed', () => {
       elm['s-rn'] = true;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.num = 141.622;
-      expect(plt.queue.add).toHaveBeenCalled();
+      expect(plt.queue.write).toHaveBeenCalled();
     });
 
     it('instance string changed', () => {
       elm['s-rn'] = true;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.str = 'kph';
-      expect(plt.queue.add).toHaveBeenCalled();
+      expect(plt.queue.write).toHaveBeenCalled();
     });
 
     it('instance boolean changed', () => {
       elm['s-rn'] = true;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.bool = false;
-      expect(plt.queue.add).toHaveBeenCalled();
+      expect(plt.queue.write).toHaveBeenCalled();
     });
 
   });
@@ -94,26 +95,26 @@ describe('proxy-component', () => {
 
     it('instance number unchanged', () => {
       elm['s-rn'] = true;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.num = 88;
-      expect(plt.queue.add).not.toHaveBeenCalled();
+      expect(plt.queue.write).not.toHaveBeenCalled();
     });
 
     it('instance string unchanged', () => {
       elm['s-rn'] = true;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.str = 'mph';
-      expect(plt.queue.add).not.toHaveBeenCalled();
+      expect(plt.queue.write).not.toHaveBeenCalled();
     });
 
     it('instance boolean unchanged', () => {
       elm['s-rn'] = true;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.bool = true;
-      expect(plt.queue.add).not.toHaveBeenCalled();
+      expect(plt.queue.write).not.toHaveBeenCalled();
     });
 
   });
@@ -122,26 +123,26 @@ describe('proxy-component', () => {
 
     it('instance number changed', () => {
       elm['s-rn'] = false;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.num = 1234;
-      expect(plt.queue.add).not.toHaveBeenCalled();
+      expect(plt.queue.write).not.toHaveBeenCalled();
     });
 
     it('instance string changed', () => {
       elm['s-rn'] = false;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.str = 'asdfasdf';
-      expect(plt.queue.add).not.toHaveBeenCalled();
+      expect(plt.queue.write).not.toHaveBeenCalled();
     });
 
     it('instance boolean changed', () => {
       elm['s-rn'] = false;
-      spyOn(plt.queue, 'add');
+      spyOn(plt.queue, 'write');
       proxyComponentInstance(plt, CmpConstructor, elm, instance, hostSnapshot);
       instance.bool = false;
-      expect(plt.queue.add).not.toHaveBeenCalled();
+      expect(plt.queue.write).not.toHaveBeenCalled();
     });
 
   });

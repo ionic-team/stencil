@@ -1,40 +1,48 @@
-import { AppGlobal, Now, QueueApi } from '../declarations';
-import { PRIORITY } from '../util/constants';
+import * as d from '../declarations';
 
 
-export function createQueueClient(App: AppGlobal, win: Window, resolvePending?: boolean, rafPending?: boolean): QueueApi {
-  const now: Now = () => win.performance.now();
+export function createQueueClient(App: d.AppGlobal, win: Window, highPriorityPending?: boolean, rafPending?: boolean) {
+  const now: d.Now = () => win.performance.now();
 
-  const highPromise = Promise.resolve();
+  const resolved = Promise.resolve();
   const highPriority: Function[] = [];
-  const lowPriority: Function[] = [];
+  const domReads: d.RafCallback[] = [];
+  const domWrites: d.RafCallback[] = [];
 
   if (!App.raf) {
     App.raf = window.requestAnimationFrame.bind(window);
   }
 
-  function doHighPriority() {
+  function doHighPriority(cb?: Function) {
     // holy geez we need to get this stuff done and fast
     // all high priority callbacks should be fired off immediately
-    while (highPriority.length > 0) {
-      highPriority.shift()();
+    while (cb = highPriority.shift()) {
+      cb();
     }
-    resolvePending = false;
+    highPriorityPending = false;
   }
 
 
-  function doWork(start?: number) {
+  function doWork(start?: number, cb?: d.RafCallback) {
     start = now();
 
     // always run all of the high priority work if there is any
     doHighPriority();
 
-    while (lowPriority.length > 0 && (now() - start < 40)) {
-      lowPriority.shift()();
+    // DOM READS!!!
+    while (cb = domReads.shift()) {
+      cb(start);
+    }
+
+    // -------------------------------
+
+    // DOM WRITES!!!
+    while ((cb = domWrites.shift()) && (now() - start < 40)) {
+      cb(start);
     }
 
     // check to see if we still have work to do
-    if (rafPending = (lowPriority.length > 0)) {
+    if (rafPending = (domReads.length > 0 || domWrites.length > 0)) {
       // everyone just settle down now
       // we already don't have time to do anything in this callback
       // let's throw the next one in a requestAnimationFrame
@@ -43,18 +51,26 @@ export function createQueueClient(App: AppGlobal, win: Window, resolvePending?: 
     }
   }
 
-  function flush(start?: number) {
+  function flush(start?: number, cb?: d.RafCallback) {
     // always run all of the high priority work if there is any
     doHighPriority();
 
     // always force a bunch of medium callbacks to run, but still have
     // a throttle on how many can run in a certain time
-    start = 4 + now();
-    while (lowPriority.length > 0 && (now() < start)) {
-      lowPriority.shift()();
+    // DOM READS!!!
+    while (cb = domReads.shift()) {
+      cb();
     }
 
-    if (rafPending = (lowPriority.length > 0)) {
+    // -------------------------------
+
+    start = 4 + now();
+    // DOM WRITES!!!
+    while ((cb = domWrites.shift()) && (now() < start)) {
+      cb();
+    }
+
+    if (rafPending = (domReads.length > 0 || domWrites.length > 0)) {
       // still more to do yet, but we've run out of time
       // let's let this thing cool off and try again in the next ric
       App.raf(doWork);
@@ -62,28 +78,37 @@ export function createQueueClient(App: AppGlobal, win: Window, resolvePending?: 
   }
 
   return {
-    add: (cb: Function, priority?: number) => {
-      if (priority === PRIORITY.High) {
-        // uses Promise.resolve() for next tick
-        highPriority.push(cb);
 
-        if (!resolvePending) {
-          // not already pending work to do, so let's tee it up
-          resolvePending = true;
-          highPromise.then(doHighPriority);
-        }
+    tick: (cb: Function) => {
+      // queue high priority work to happen in next tick
+      // uses Promise.resolve() for next tick
+      highPriority.push(cb);
 
-      } else {
-        // defaults to low priority
-        // uses requestAnimationFrame
-        lowPriority.push(cb);
+      if (!highPriorityPending) {
+        highPriorityPending = true;
+        resolved.then(doHighPriority as any);
+      }
+    },
 
-        if (!rafPending) {
-          // not already pending work to do, so let's tee it up
-          rafPending = true;
-          App.raf(doWork);
-        }
+    read: (cb: d.RafCallback) => {
+      // queue dom reads
+      domReads.push(cb);
+
+      if (!rafPending) {
+        rafPending = true;
+        App.raf(doWork);
+      }
+    },
+
+    write: (cb: d.RafCallback) => {
+      // queue dom writes
+      domWrites.push(cb);
+
+      if (!rafPending) {
+        rafPending = true;
+        App.raf(doWork);
       }
     }
-  };
+
+  } as d.QueueApi;
 }

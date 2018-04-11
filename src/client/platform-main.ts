@@ -62,7 +62,7 @@ export function createPlatformMain(namespace: string, Context: d.CoreContext, wi
     nextId: () => namespace + (ids++),
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
-    queue: createQueueClient(App, win),
+    queue: (App.queue = Context.queue = createQueueClient(App, win)),
     requestBundle,
 
     ancestorHostElementMap: new WeakMap(),

@@ -1,7 +1,6 @@
 import * as d from '../declarations';
 import { Build } from '../util/build-conditionals';
 import { initHostSnapshot } from './host-snapshot';
-import { PRIORITY } from '../util/constants';
 import { initElementListeners } from './listeners';
 
 
@@ -43,12 +42,10 @@ export function connectedCallback(plt: d.PlatformApi, cmpMeta: d.ComponentMeta, 
     // ensure the "mode" attribute has been added to the element
     // place in high priority since it's not much work and we need
     // to know as fast as possible, but still an async tick in between
-    plt.queue.add(() =>
+    plt.queue.tick(() =>
       // start loading this component mode's bundle
       // if it's already loaded then the callback will be synchronous
-      plt.requestBundle(cmpMeta, elm, initHostSnapshot(plt.domApi, cmpMeta, elm))
-
-    , PRIORITY.High);
+      plt.requestBundle(cmpMeta, elm, initHostSnapshot(plt.domApi, cmpMeta, elm)));
   }
 }
 

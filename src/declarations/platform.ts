@@ -41,7 +41,10 @@ export interface PlatformApi {
 
 
 export interface QueueApi {
-  add: (cb: Function, priority?: number) => void;
+  tick: (cb: Function) => void;
+  read: (cb: RafCallback) => void;
+  write: (cb: RafCallback) => void;
+  clear?: () => void;
   flush?: (cb?: Function) => void;
 }
 
@@ -90,6 +93,7 @@ export interface AppGlobal {
   loaded?: boolean;
   h?: Function;
   initialized?: boolean;
+  queue?: QueueApi;
   raf?: DomControllerCallback;
   rel?: (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions) => void;
   $r?: { 0: d.HostElement, 1: () => void }[];
@@ -108,6 +112,7 @@ export interface CoreContext {
   location?: Location;
   document?: Document;
   mode?: string;
+  queue?: QueueApi;
   resourcesUrl?: string;
   [contextId: string]: any;
 }
