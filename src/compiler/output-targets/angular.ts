@@ -1,6 +1,7 @@
 import * as d from '../../declarations';
-import { MEMBER_TYPE, PROP_TYPE } from '../../util/constants';
+import { MEMBER_TYPE } from '../../util/constants';
 import { basename, dirname, relative } from 'path';
+import { dashToPascalCase } from '../../util/helpers';
 
 export function angularDirectiveProxyOutputs(config: d.Config, compilerCtx: d.CompilerCtx, cmpRegistry: d.ComponentRegistry) {
   const angularOuputTargets = (config.outputTargets as d.OutputTargetAngular[]).filter(o => o.type === 'angular' && o.directivesProxyFile);
@@ -17,19 +18,19 @@ async function angularDirectiveProxyOutput(config: d.Config, compilerCtx: d.Comp
 
   const angularImports: string[] = [];
 
-  if (c.includes('@NgDirective')) {
-    angularImports.push('Directive as NgDirective');
+  if (c.includes('@Directive')) {
+    angularImports.push('Directive');
   }
 
-  angularImports.push('Input as NgInput', 'ElementRef');
+  angularImports.push('ElementRef');
 
   c = angularProxyInput() + c;
   c = angularProxyMethod() + c;
 
-  if (c.includes('@NgOutput')) {
+  if (c.includes('@Output')) {
     c = angularProxyOutput() + c;
-    angularImports.push('Output as NgOutput');
-    angularImports.push('EventEmitter as NgEventEmitter');
+    angularImports.push('Output');
+    angularImports.push('EventEmitter');
   }
 
   c = `/* angular directive proxies */\nimport { ${angularImports.sort().join(', ')} } from '@angular/core';\n\n` + c;
@@ -66,7 +67,7 @@ function angularProxyOutput() {
   return `
 export function outputs(instance: any, events: string[]) {
   events.forEach(eventName => {
-    instance[eventName] = new NgEventEmitter();
+    instance[eventName] = new EventEmitter();
   });
 }
 `;
@@ -75,9 +76,17 @@ export function outputs(instance: any, events: string[]) {
 
 function angularProxyMethod() {
   return `
-export function method(ref: ElementRef, methodName: string, args: any[]) {
-  return ref.nativeElement.componentOnReady()
-    .then((el: any) => el[methodName].apply(el, args));
+export function methods(instance: any, ref: ElementRef, methods: string[]) {
+  const el = ref.nativeElement;
+  methods.forEach(methodName => {
+    Object.defineProperty(instance, methodName, {
+      get: function() {
+        const args = arguments;
+        return el.componentOnReady()
+          .then((el: any) => el[methodName].apply(el, args));
+      }
+    });
+  });
 }
 `;
 }
@@ -96,9 +105,9 @@ function getMetadata(excludeComponents: string[], cmpRegistry: d.ComponentRegist
 }
 
 function angularDirectiveProxies(metadata: d.ComponentMeta[]) {
-  const allInstanceMembers: string[] = [];
-  const c = metadata.map(cmpMeta => angularDirectiveProxy(allInstanceMembers, cmpMeta)).join('\n');
-  allInstanceMembers.sort();
+  const set = new Set<string>();
+  const c = metadata.map(cmpMeta => angularDirectiveProxy(set, cmpMeta)).join('\n');
+  const allInstanceMembers = Array.from(set).sort();
 
   const instanceMembers = allInstanceMembers.map(v => `${v} = '${v}'`).join(', ');
 
@@ -117,72 +126,72 @@ export const DIRECTIVES = [
 }
 
 
-function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.ComponentMeta) {
-  const o: string[] = [];
-  const inputMembers: string[] = [];
-  const outputMembers: string[] = [];
-
-  o.push(`@NgDirective({ selector: '${cmpMeta.tagNameMeta}' })`);
-  o.push(`export class ${cmpMeta.componentClass} {`);
+function angularDirectiveProxy(allInstanceMembers: Set<string>, cmpMeta: d.ComponentMeta) {
+  const tagNameAsPascal = dashToPascalCase(cmpMeta.tagNameMeta);
 
   // Inputs
-  Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+  const inputMembers = Object.keys(cmpMeta.membersMeta).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-
-    if (m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable) {
-      o.push(getInput(memberName, m));
-
-      if (RESERVED_KEYWORDS.includes(memberName)) {
-        inputMembers.push(`'${memberName}'`);
-
-      } else {
-        if (!allInstanceMembers.includes(memberName)) {
-          allInstanceMembers.push(memberName);
-        }
-        inputMembers.push(memberName);
-      }
+    return m.memberType === MEMBER_TYPE.Prop || m.memberType === MEMBER_TYPE.PropMutable;
+  }).map(name => {
+    if (RESERVED_KEYWORDS.includes(name)) {
+      name = `'${name}'`;
+    } else {
+      allInstanceMembers.add(name);
     }
+    return name;
   });
 
   // Events
-  cmpMeta.eventsMeta.forEach(eventMeta => {
-    o.push(`  @NgOutput() ${eventMeta.eventName}: NgEventEmitter<any>;`);
-    const eventName = eventMeta.eventName;
-    if (RESERVED_KEYWORDS.includes(eventName)) {
-      outputMembers.push(`'${eventName}'`);
-    } else {
-      outputMembers.push(eventName);
-      if (!allInstanceMembers.includes(eventName)) {
-        allInstanceMembers.push(eventName);
-      }
-    }
+  const outputMembers = cmpMeta.eventsMeta.map(eventMeta => {
+    const name = eventMeta.eventName;
+    allInstanceMembers.add(name);
+    return name;
   });
 
   // Methods
-  let hasMethods = false;
-  Object.keys(cmpMeta.membersMeta).forEach(memberName => {
+  const methodMembers = Object.keys(cmpMeta.membersMeta).filter(memberName => {
     const m = cmpMeta.membersMeta[memberName];
-
-    if (m.memberType === MEMBER_TYPE.Method) {
-      if (!allInstanceMembers.includes(memberName)) {
-        allInstanceMembers.push(memberName);
-      }
-      o.push(getMethod(memberName, m));
-      hasMethods = true;
+    return m.memberType === MEMBER_TYPE.Method;
+  }).map(name => {
+    if (RESERVED_KEYWORDS.includes(name)) {
+      name = `'${name}'`;
+    } else {
+      allInstanceMembers.add(name);
     }
+    return name;
   });
 
 
+  const directiveOpts = [
+    `selector: \'${cmpMeta.tagNameMeta}\'`
+  ];
+  if (inputMembers.length > 0) {
+    directiveOpts.push(`inputs: [${inputMembers.join(', ')}]`);
+  }
+  if (outputMembers.length > 0) {
+    directiveOpts.push(`outputs: [${outputMembers.join(', ')}]`);
+  }
+  const o: string[] = [
+    `export declare interface ${cmpMeta.componentClass} extends StencilComponents.${tagNameAsPascal} {}`,
+    `@Directive({${directiveOpts.join(', ')}})`,
+    `export class ${cmpMeta.componentClass} {`
+  ];
+
+  outputMembers.forEach(output => {
+    o.push(`  @Output() ${output}: EventEmitter<any>;`);
+  });
+
   let hasContructor = false;
-  if (hasMethods) {
-    hasContructor = true;
-    o.push(`  constructor(private r: ElementRef) {`);
-  } else if ( inputMembers.length > 0) {
+  if (methodMembers.length > 0 || inputMembers.length > 0) {
     hasContructor = true;
     o.push(`  constructor(r: ElementRef) {`);
   } else if ( outputMembers.length > 0 ) {
     hasContructor = true;
     o.push(`  constructor() {`);
+  }
+  if (methodMembers.length > 0) {
+    o.push(`    methods(this, r, [${methodMembers.join(`, `)}]);`);
   }
   if (inputMembers.length > 0) {
     o.push(`    inputs(this, r, [${inputMembers.join(`, `)}]);`);
@@ -196,43 +205,6 @@ function angularDirectiveProxy(allInstanceMembers: string[], cmpMeta: d.Componen
   o.push(`}\n`);
 
   return o.join('\n');
-}
-
-
-function getInput(memberName: string, memberMeta: d.MemberMeta) {
-  return `${getJsDocs(memberMeta)}  @NgInput() ${memberName}: ${getPropType(memberMeta.propType)};`;
-}
-
-function getMethod(memberName: string, memberMeta: d.MemberMeta) {
-  return `${getJsDocs(memberMeta)}  ${memberName}(...__args: any[]): Promise<any> {
-    return method(this.r, ${memberName}, __args);
-  }`;
-}
-
-function getJsDocs(m: d.MemberMeta) {
-  let c = '';
-
-  if (m.jsdoc && m.jsdoc.documentation) {
-    c += `  /**\n`;
-    c += `   * ${m.jsdoc.documentation.replace(/\r?\n|\r/g, ' ')}\n`;
-    c += `   */\n`;
-  }
-
-  return c;
-}
-
-
-function getPropType(propType: PROP_TYPE) {
-  if (propType === PROP_TYPE.String) {
-    return 'string';
-  }
-  if (propType === PROP_TYPE.Number) {
-    return 'number';
-  }
-  if (propType === PROP_TYPE.Boolean) {
-    return 'boolean';
-  }
-  return 'any';
 }
 
 const RESERVED_KEYWORDS = [
