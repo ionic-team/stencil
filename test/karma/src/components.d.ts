@@ -25,11 +25,17 @@ declare global {
 
 
 declare global {
-  interface HTMLAttributeBasicElement extends HTMLStencilElement {
-    'customAttr': string;
-    'multiWord': string;
-    'single': string;
+
+  namespace StencilComponents {
+    interface AttributeBasic {
+      'customAttr': string;
+      'multiWord': string;
+      'single': string;
+    }
   }
+
+  interface HTMLAttributeBasicElement extends StencilComponents.AttributeBasic, HTMLStencilElement {}
+
   var HTMLAttributeBasicElement: {
     prototype: HTMLAttributeBasicElement;
     new (): HTMLAttributeBasicElement;
@@ -56,9 +62,15 @@ declare global {
 
 
 declare global {
-  interface HTMLConditionalBasicElement extends HTMLStencilElement {
 
+  namespace StencilComponents {
+    interface ConditionalBasic {
+
+    }
   }
+
+  interface HTMLConditionalBasicElement extends StencilComponents.ConditionalBasic, HTMLStencilElement {}
+
   var HTMLConditionalBasicElement: {
     prototype: HTMLConditionalBasicElement;
     new (): HTMLConditionalBasicElement;
@@ -83,9 +95,15 @@ declare global {
 
 
 declare global {
-  interface HTMLSlotBasicElement extends HTMLStencilElement {
 
+  namespace StencilComponents {
+    interface SlotBasic {
+
+    }
   }
+
+  interface HTMLSlotBasicElement extends StencilComponents.SlotBasic, HTMLStencilElement {}
+
   var HTMLSlotBasicElement: {
     prototype: HTMLSlotBasicElement;
     new (): HTMLSlotBasicElement;
@@ -110,9 +128,15 @@ declare global {
 
 
 declare global {
-  interface HTMLSlotBasicContentElement extends HTMLStencilElement {
 
+  namespace StencilComponents {
+    interface SlotBasicContent {
+
+    }
   }
+
+  interface HTMLSlotBasicContentElement extends StencilComponents.SlotBasicContent, HTMLStencilElement {}
+
   var HTMLSlotBasicContentElement: {
     prototype: HTMLSlotBasicContentElement;
     new (): HTMLSlotBasicContentElement;
@@ -137,9 +161,15 @@ declare global {
 
 
 declare global {
-  interface HTMLSlotLightDomContentElement extends HTMLStencilElement {
 
+  namespace StencilComponents {
+    interface SlotLightDomContent {
+
+    }
   }
+
+  interface HTMLSlotLightDomContentElement extends StencilComponents.SlotLightDomContent, HTMLStencilElement {}
+
   var HTMLSlotLightDomContentElement: {
     prototype: HTMLSlotLightDomContentElement;
     new (): HTMLSlotLightDomContentElement;
@@ -164,9 +194,15 @@ declare global {
 
 
 declare global {
-  interface HTMLSvgAttrElement extends HTMLStencilElement {
 
+  namespace StencilComponents {
+    interface SvgAttr {
+
+    }
   }
+
+  interface HTMLSvgAttrElement extends StencilComponents.SvgAttr, HTMLStencilElement {}
+
   var HTMLSvgAttrElement: {
     prototype: HTMLSvgAttrElement;
     new (): HTMLSvgAttrElement;
@@ -191,9 +227,15 @@ declare global {
 
 
 declare global {
-  interface HTMLSvgClassElement extends HTMLStencilElement {
 
+  namespace StencilComponents {
+    interface SvgClass {
+
+    }
   }
+
+  interface HTMLSvgClassElement extends StencilComponents.SvgClass, HTMLStencilElement {}
+
   var HTMLSvgClassElement: {
     prototype: HTMLSvgClassElement;
     new (): HTMLSvgClassElement;

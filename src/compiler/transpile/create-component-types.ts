@@ -279,12 +279,18 @@ export function createTypesAsString(cmpMeta: d.ComponentMeta, _importPath: strin
 
   return `
 declare global {
-  interface ${interfaceName} extends HTMLStencilElement {
+
+  namespace StencilComponents {
+    interface ${tagNameAsPascal} {
 ${attributesToMultiLineString({
   ...propAttributes,
   ...methodAttributes
-}, false, '    ')}
+}, false, '      ')}
+    }
   }
+
+  interface ${interfaceName} extends StencilComponents.${tagNameAsPascal}, HTMLStencilElement {}
+
   var ${interfaceName}: {
     prototype: ${interfaceName};
     new (): ${interfaceName};
