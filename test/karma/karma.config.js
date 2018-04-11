@@ -97,7 +97,7 @@ module.exports = function(config) {
     // browsers: Object.keys(browserStackLaunchers),
     browsers: Object.keys(localLaunchers),
 
-    singleRun: false, // set this to false to leave the browser open
+    singleRun: true, // set this to false to leave the browser open
 
     frameworks: ['jasmine', 'karma-typescript'],
 
@@ -110,6 +110,7 @@ module.exports = function(config) {
 
     files: [
       'src/**/cmp.spec.ts',
+      'src/**/cmp.examples.ts',
       'src/util.ts',
       'dist/app.js',
       { pattern: 'dist/app/*.js', watched: false, included: false, served: true, nocache: false },

@@ -1,2 +1,0 @@
-
-'<slot-basic></slot-basic>'

@@ -1,4 +1,5 @@
 import { setupDomTests, onComponentUpdate } from '../util';
+import examples from './cmp.examples';
 
 describe("basic support", function() {
   const { setupDom, tearDownDom, addComponent } = setupDomTests(document);
@@ -9,9 +10,7 @@ describe("basic support", function() {
   describe("simple test", function() {
     it("contains a button as a child", async function() {
 
-      const component = await addComponent<HTMLConditionalBasicElement>(`
-        <conditional-basic></conditional-basic>
-      `);
+      const component = await addComponent<HTMLConditionalBasicElement>(examples[0]);
       let button = component.querySelector('button');
 
       expect(button).toBeDefined();
@@ -19,9 +18,7 @@ describe("basic support", function() {
 
     it("button click rerenders", async function() {
 
-      const component = await addComponent<HTMLConditionalBasicElement>(`
-        <conditional-basic></conditional-basic>
-      `);
+      const component = await addComponent<HTMLConditionalBasicElement>(examples[0]);
       let button = component.querySelector('button');
       let results = component.querySelector('div.results');
 

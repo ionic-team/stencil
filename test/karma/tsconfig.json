@@ -19,6 +19,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,
-    "target": "es6"
-  }
+    "target": "es6",
+    "outDir": "dist"
+  },
+  "include": [
+    "build-test-example.ts",
+    "**/cmp.examples.ts"
+  ]
 }
