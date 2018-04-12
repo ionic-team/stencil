@@ -62,7 +62,7 @@ export function validatePackageJson(config: d.Config, outputTarget: d.OutputTarg
   const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.buildDir), mainFileName);
 
   if (!pkgData.main || normalizePath(pkgData.main) !== main) {
-    const err = buildError(diagnostics);
+    const err = buildWarn(diagnostics);
     err.header = `package.json error`;
     err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
   }
