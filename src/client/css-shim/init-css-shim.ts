@@ -34,6 +34,9 @@ function loadLinkStyles(doc: Document, customStyle: CustomStyle, linkElm: HTMLLi
 
     if (hasCssVariables(text)) {
       const styleElm = doc.createElement('style');
+      if (hasRelativeUrls(text)) {
+        text = fixRelativeUrls(text, url);
+      }
       styleElm.innerHTML = text;
       linkElm.parentNode.insertBefore(styleElm, linkElm);
 
@@ -63,4 +66,24 @@ const CSS_VARIABLE_REGEXP = /[\s;{]--[-a-zA-Z0-9]+\s*:/m;
 
 export function hasCssVariables(css: string) {
   return css.indexOf('var(') > -1 || CSS_VARIABLE_REGEXP.test(css);
+}
+
+// This regexp find all url() usages with relative urls
+const CSS_URL_REGEXP = /url[\s]*\([\s]*['"]?(?!http)([^\'\"\)]*)[\s]*['"]?\)[\s]*/gim;
+
+export function hasRelativeUrls(css: string) {
+  return CSS_URL_REGEXP.test(css);
+}
+
+export function fixRelativeUrls(css: string, originalUrl: string) {
+  //Get the basepath from the original import url
+  let basePath = originalUrl.replace(/[^/]*$/, '');
+
+  //Replace the relative url, with the new relative url
+  return css.replace(CSS_URL_REGEXP, (fullMatch, url) => {
+    //The new relative path is the base path + uri
+    //TODO: normalize relative URL
+    let relativeUrl = basePath + url;
+    return fullMatch.replace(url, relativeUrl);
+  });
 }
