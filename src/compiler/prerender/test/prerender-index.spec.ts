@@ -12,6 +12,44 @@ describe('prerender index', () => {
   let config: d.Config;
 
 
+  it('should pass properties down in prerendering', async () => {
+    config = new TestingConfig();
+    config.buildAppCore = true;
+    config.flags.prerender = true;
+
+    c = new TestingCompiler(config);
+    await c.fs.writeFile('/src/index.html', `
+      <script src="/build/app.js"></script>
+      <cmp-a></cmp-a>
+    `);
+    await c.fs.writeFile('/src/components/cmp-a/cmp-a.tsx', `
+      @Component({ tag: 'cmp-a' }) export class CmpA {
+
+        render() {
+          return <cmp-b someProp="data from parent" />;
+        }
+      }
+    `);
+    await c.fs.writeFile('/src/components/cmp-b/cmp-b.tsx', `
+      @Component({ tag: 'cmp-b' }) export class CmpB {
+        @Prop() someProp = 'unset';
+
+        render() {
+          return <p>{this.someProp}</p>;
+        }
+      }
+    `);
+    await c.fs.commit();
+
+    const r = await c.build();
+    expect(r.diagnostics).toEqual([]);
+
+    const index = await c.fs.readFile('/www/index.html');
+
+    expect(index).toContain('data from parent');
+    expect(index).not.toContain('unset');
+  });
+
   it('should prerender w/ defaults', async () => {
     config = new TestingConfig();
     config.buildAppCore = true;
