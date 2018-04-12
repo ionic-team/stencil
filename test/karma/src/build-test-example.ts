@@ -10,7 +10,7 @@ interface DirInfoMap {
   [key: string]: string[]
 }
 
-const exampleDir = join(__dirname, 'src');
+const exampleDir = join(__dirname);
 const outputFile = join(__dirname, 'index.html');
 
 const exampleDirs = readdirSync(exampleDir);
@@ -29,7 +29,6 @@ const exampleDirInfos: DirInfoMap = exampleDirs
   .reduce((finalMap, dirInfo: DirInfo) => {
     let contents: string[] = [];
     try {
-      console.log(dirInfo.path);
       contents = require(dirInfo.path);
       finalMap[dirInfo.name] = contents;
     } catch (e) {}
@@ -72,3 +71,7 @@ JSON.stringify(exampleDirInfos, null, 2)
 `;
 
 writeFileSync(outputFile, html);
+console.log(`
+--- Open the following file ---
+${outputFile}
+`);
