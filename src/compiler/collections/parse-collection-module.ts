@@ -37,6 +37,10 @@ export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, 
     collectionJsonStr
   );
 
+  if (pkgData.module || pkgData['jsnext:main']) {
+    collection.hasExports = true;
+  }
+
   // remember the source of this collection node_module
   collection.moduleDir = collectionPackageRootDir;
 
