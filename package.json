@@ -35,7 +35,7 @@
     "start": "npm install && npm run build",
     "test": "npm run test.jest && npm run test.karma",
     "test.dist": "node scripts/test-dist.js",
-    "test.jest": "jest",
+    "test.jest": "jest --no-cache",
     "test.karma": "node bin/stencil build -c test/karma/stencil.config.js && node test/karma/node_modules/.bin/karma start test/karma/karma.config.js",
     "test.karma.watch": "node bin/stencil build --dev --watch -c test/karma/stencil.config.js",
     "test.watch": "jest --watch",
