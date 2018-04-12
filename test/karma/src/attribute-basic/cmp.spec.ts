@@ -1,3 +1,4 @@
+/*
 function update() {
   var elm = document.querySelector('attribute-basic');
 
@@ -7,3 +8,4 @@ function update() {
 }
 
 document.querySelector('.test').addEventListener('click', update);
+*/

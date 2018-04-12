@@ -24,6 +24,7 @@
   },
   "include": [
     "build-test-example.ts",
+    "**/**.ts",
     "**/cmp.examples.ts"
   ]
 }
