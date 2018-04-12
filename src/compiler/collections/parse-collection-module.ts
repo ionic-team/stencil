@@ -20,7 +20,7 @@ export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, 
   // figure out the full path to the collection collection file
   const collectionFilePath = pathJoin(config, collectionPackageRootDir, pkgData.collection);
 
-  config.logger.debug(`load colleciton: ${collectionFilePath}`);
+  config.logger.debug(`load collection: ${collectionFilePath}`);
 
   // we haven't cached the collection yet, let's read this file
   // sync on purpose :(
@@ -37,7 +37,7 @@ export function parseCollectionModule(config: Config, compilerCtx: CompilerCtx, 
     collectionJsonStr
   );
 
-  if (pkgData.module || pkgData['jsnext:main']) {
+  if (pkgData.module && pkgData.module !== pkgData.main) {
     collection.hasExports = true;
   }
 
