@@ -1,4 +1,4 @@
-import { hasCssVariables } from '../init-css-shim';
+import { hasCssVariables, hasRelativeUrls, fixRelativeUrls } from '../init-css-shim';
 
 
 describe('hasCssVariables', () => {
@@ -92,4 +92,56 @@ describe('hasCssVariables', () => {
     expect(hasCssVariables(text)).toBe(true);
   });
 
+});
+
+describe('hasRelativeUrls', () => {
+  it("false for absolute urls", () => {
+    const text = `
+      div {
+        background-image: url('http://example.com/mytestimage.jpg');
+      }
+    `;
+
+    expect(hasRelativeUrls(text)).toBe(false);
+  });
+
+  it("true for relative urls", () => {
+    const text = `
+      div {
+        background-image: url('assets/images/mytestimage.jpg');
+      }
+    `;
+
+    expect(hasRelativeUrls(text)).toBe(true);
+  });
+});
+
+describe('fixRelativeUrls', () => {
+  it("should transform prepend relative urls with base path", () => {
+    const text = `
+      div {
+        background-image: url('../images/mytestimage.jpg');
+      }
+    `;
+
+    expect(fixRelativeUrls(text, "/assets/css/styles.css")).toBe(`
+      div {
+        background-image: url('/assets/css/../images/mytestimage.jpg');
+      }
+    `);
+  });
+
+  it("should keep absolute urls", () => {
+    const text = `
+      div {
+        background-image: url('http://www.example.com/assets/images/mytestimage.jpg');
+      }
+    `;
+
+    expect(fixRelativeUrls(text, "/assets/css/styles.css")).toBe(`
+      div {
+        background-image: url('http://www.example.com/assets/images/mytestimage.jpg');
+      }
+    `);
+  });
 });
