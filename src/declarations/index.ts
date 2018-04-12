@@ -1,4 +1,5 @@
 
+export * from './app-global';
 export * from './build';
 export * from './build-conditionals';
 export * from './build-events';
@@ -13,6 +14,7 @@ export * from './diagnostics';
 export * from './docs';
 export * from './dom';
 export * from './entry';
+export * from './events';
 export * from './fs';
 export * from './in-memory-fs';
 export * from './jsx';

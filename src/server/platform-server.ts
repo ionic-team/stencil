@@ -85,7 +85,7 @@ export function createPlatformServer(
     onError,
     nextId: () => config.namespace + (ids++),
     propConnect,
-    queue: createQueueServer(),
+    queue: (Context.queue = createQueueServer()),
     requestBundle: requestBundle,
     tmpDisconnected: false,
 

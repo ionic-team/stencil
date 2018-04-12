@@ -67,7 +67,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     onError: (err, type, elm) => console.error(err, type, elm && elm.tagName),
     nextId: () => namespace + (ids++),
     propConnect: ctrlTag => proxyController(domApi, controllerComponents, ctrlTag),
-    queue: (App.queue = Context.queue = createQueueClient(App, win)),
+    queue: (Context.queue = createQueueClient(App, win)),
     requestBundle: requestBundle,
 
     ancestorHostElementMap: new WeakMap(),

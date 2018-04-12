@@ -6,7 +6,7 @@ export interface PlatformApi {
   attachStyles?: (plt: PlatformApi, domApi: d.DomApi, cmpMeta: d.ComponentMeta, modeName: string, elm: d.HostElement, customStyle?: any) => void;
   defineComponent: (cmpMeta: d.ComponentMeta, HostElementConstructor?: any) => void;
   domApi?: d.DomApi;
-  emitEvent: (elm: Element, eventName: string, data: EventEmitterData) => void;
+  emitEvent: (elm: Element, eventName: string, data: d.EventEmitterData) => void;
   getComponentMeta: (elm: Element) => d.ComponentMeta;
   getContextItem: (contextKey: string) => any;
   isClient?: boolean;
@@ -56,78 +56,6 @@ export interface PropConnect {
 }
 
 
-export interface AddEventListener {
-  (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions): Function;
-}
-
-
-export interface EventEmitter<T= any> {
-  emit: (data?: T) => void;
-}
-
-
-export interface EventListenerEnable {
-  (instance: any, eventName: string, enabled: boolean, attachTo?: string|Element, passive?: boolean): void;
-}
-
-
-export interface EventListenerCallback {
-  (ev?: any): void;
-}
-
-
-export interface EventEmitterData<T = any> {
-  detail?: T;
-  bubbles?: boolean;
-  cancelable?: boolean;
-  composed?: boolean;
-}
-
-
-export interface AppGlobal {
-  ael?: (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions) => void;
-  components?: d.LoadComponentRegistry[];
-  componentOnReady?: (elm: d.HostElement, resolve: (elm: d.HostElement) => void) => void;
-  Context?: any;
-  loadBundle?: (bundleId: string, dependents: string[], importFn: CjsImporterFn) => void;
-  loaded?: boolean;
-  h?: Function;
-  initialized?: boolean;
-  queue?: QueueApi;
-  raf?: DomControllerCallback;
-  rel?: (elm: Element|Document|Window, eventName: string, cb: EventListenerCallback, opts?: d.ListenOptions) => void;
-  $r?: { 0: d.HostElement, 1: () => void }[];
-}
-
-
-export interface CoreContext {
-  attr?: number;
-  emit?: (elm: Element, eventName: string, data?: d.EventEmitterData) => void;
-  enableListener?: EventListenerEnable;
-  eventNameFn?: (eventName: string) => string;
-  isClient?: boolean;
-  isPrerender?: boolean;
-  isServer?: boolean;
-  window?: Window;
-  location?: Location;
-  document?: Document;
-  mode?: string;
-  queue?: QueueApi;
-  resourcesUrl?: string;
-  [contextId: string]: any;
-}
-
-
-export interface CjsImporterFn {
-  (exports: CjsExports, requirePoly: Function): void;
-}
-
-
-export interface CjsExports {
-  [moduleId: string]: d.ComponentConstructor;
-}
-
-
 export interface Now {
   (): number;
 }
@@ -135,11 +63,6 @@ export interface Now {
 
 export interface RafCallback {
   (timeStamp?: number): void;
-}
-
-
-export interface DomControllerCallback {
-  (cb: RafCallback): number;
 }
 
 
