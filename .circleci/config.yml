@@ -19,4 +19,4 @@ jobs:
             - ./node_modules
 
       - run: npm run build
-      - run: npm test.jest -- --maxWorkers=1
+      - run: npm run test.jest -- --maxWorkers=1
