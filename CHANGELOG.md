@@ -1,3 +1,14 @@
+<a name="0.7.22"></a>
+## ⛷ [0.7.22](https://github.com/ionic-team/stencil/compare/v0.7.21...v0.7.22) (2018-04-12)
+
+
+### Bug Fixes
+
+* **angular:** output decorator ([494fb18](https://github.com/ionic-team/stencil/commit/494fb18))
+* **prerender:** pass property data down to child components ([35c0911](https://github.com/ionic-team/stencil/commit/35c0911))
+
+
+
 <a name="0.7.21"></a>
 ## ⚾️ [0.7.21](https://github.com/ionic-team/stencil/compare/v0.7.20...v0.7.21) (2018-04-12)
 
