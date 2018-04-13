@@ -8,6 +8,7 @@ export interface Collection {
   global?: ModuleFile;
   compiler?: CollectionCompiler;
   isInitialized?: boolean;
+  hasExports?: boolean;
   dependencies?: string[];
   bundles?: {
     components: string[];

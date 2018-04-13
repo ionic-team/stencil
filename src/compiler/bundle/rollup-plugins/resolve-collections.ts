@@ -15,9 +15,9 @@ export default function resolveCollections(compilerCtx: CompilerCtx) {
     name: 'resolveCollections',
 
     resolveId(importee) {
-      const isStencilCollection = compilerCtx.collections.some(c => c.collectionName === importee);
+      const stencilCollection = compilerCtx.collections.find(c => c.collectionName === importee);
 
-      if (isStencilCollection) {
+      if (stencilCollection && !stencilCollection.hasExports) {
         return COLLECTION_ID;
       }
 
