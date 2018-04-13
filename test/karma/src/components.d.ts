@@ -27,6 +27,39 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface AttributeBasicRoot {
+
+    }
+  }
+
+  interface HTMLAttributeBasicRootElement extends StencilComponents.AttributeBasicRoot, HTMLStencilElement {}
+
+  var HTMLAttributeBasicRootElement: {
+    prototype: HTMLAttributeBasicRootElement;
+    new (): HTMLAttributeBasicRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'attribute-basic-root': HTMLAttributeBasicRootElement;
+  }
+  interface ElementTagNameMap {
+    'attribute-basic-root': HTMLAttributeBasicRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'attribute-basic-root': JSXElements.AttributeBasicRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface AttributeBasicRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface AttributeBasic {
       'customAttr': string;
       'multiWord': string;
@@ -97,6 +130,39 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface SlotBasicRoot {
+
+    }
+  }
+
+  interface HTMLSlotBasicRootElement extends StencilComponents.SlotBasicRoot, HTMLStencilElement {}
+
+  var HTMLSlotBasicRootElement: {
+    prototype: HTMLSlotBasicRootElement;
+    new (): HTMLSlotBasicRootElement;
+  };
+  interface HTMLElementTagNameMap {
+    'slot-basic-root': HTMLSlotBasicRootElement;
+  }
+  interface ElementTagNameMap {
+    'slot-basic-root': HTMLSlotBasicRootElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'slot-basic-root': JSXElements.SlotBasicRootAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface SlotBasicRootAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SlotBasic {
 
     }
@@ -130,30 +196,30 @@ declare global {
 declare global {
 
   namespace StencilComponents {
-    interface SlotBasicContent {
+    interface SlotLightDomRoot {
 
     }
   }
 
-  interface HTMLSlotBasicContentElement extends StencilComponents.SlotBasicContent, HTMLStencilElement {}
+  interface HTMLSlotLightDomRootElement extends StencilComponents.SlotLightDomRoot, HTMLStencilElement {}
 
-  var HTMLSlotBasicContentElement: {
-    prototype: HTMLSlotBasicContentElement;
-    new (): HTMLSlotBasicContentElement;
+  var HTMLSlotLightDomRootElement: {
+    prototype: HTMLSlotLightDomRootElement;
+    new (): HTMLSlotLightDomRootElement;
   };
   interface HTMLElementTagNameMap {
-    'slot-basic-content': HTMLSlotBasicContentElement;
+    'slot-light-dom-root': HTMLSlotLightDomRootElement;
   }
   interface ElementTagNameMap {
-    'slot-basic-content': HTMLSlotBasicContentElement;
+    'slot-light-dom-root': HTMLSlotLightDomRootElement;
   }
   namespace JSX {
     interface IntrinsicElements {
-      'slot-basic-content': JSXElements.SlotBasicContentAttributes;
+      'slot-light-dom-root': JSXElements.SlotLightDomRootAttributes;
     }
   }
   namespace JSXElements {
-    export interface SlotBasicContentAttributes extends HTMLAttributes {
+    export interface SlotLightDomRootAttributes extends HTMLAttributes {
 
     }
   }

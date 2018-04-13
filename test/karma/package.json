@@ -1,6 +1,14 @@
 {
+  "scripts": {
+    "dev": "sd concurrent \"../../bin/stencil build --dev --watch\" \"stencil-dev-server\" ",
+    "karma": " karma start karma.config.js",
+    "karma.prod": "npm run tsc && ../../bin/stencil build && karma start karma.config.js",
+    "tsc": "node ../../node_modules/.bin/tsc -p tsconfig.json"
+  },
   "private": true,
   "devDependencies": {
+    "@stencil/dev-server": "latest",
+    "@stencil/utils": "latest",
     "jasmine-core": "^3.1.0",
     "karma": "^2.0.0",
     "karma-browserstack-launcher": "^1.3.0",

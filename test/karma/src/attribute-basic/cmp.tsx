@@ -5,21 +5,21 @@ import { Component, Prop } from '../../../../dist/index';
 })
 export class AttributeBasic {
 
-  @Prop() single: string;
-  @Prop() multiWord: string;
-  @Prop({ attr: 'my-custom-attr' }) customAttr: string;
+  @Prop() single = 'single';
+  @Prop() multiWord = 'multiWord';
+  @Prop({ attr: 'my-custom-attr' }) customAttr = 'my-custom-attr';
 
   render() {
     return (
       <div>
         <div class="single">
-          single: {this.single}
+          {this.single}
         </div>
         <div class="multiWord">
-          multiWord: {this.multiWord}
+          {this.multiWord}
         </div>
         <div class="customAttr">
-          customAttr: {this.customAttr}
+          {this.customAttr}
         </div>
       </div>
     );

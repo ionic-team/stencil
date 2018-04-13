@@ -3,7 +3,7 @@
     "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
-    "declaration": true,
+    "declaration": false,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
@@ -20,11 +20,10 @@
     "noUnusedParameters": true,
     "pretty": true,
     "target": "es6",
-    "outDir": "dist"
+    "outDir": "www"
   },
   "include": [
-    "build-test-example.ts",
-    "**/**.ts",
-    "**/cmp.examples.ts"
+    "src/**/*.spec.ts",
+    "src/util.ts"
   ]
 }

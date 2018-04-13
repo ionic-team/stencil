@@ -1,14 +1,13 @@
 
 exports.config = {
-  namespace: 'app',
   outputTargets: [
     {
       type: 'www',
-      dir: 'dist',
-      buildDir: ''
+      empty: false
     }
   ],
-
+  copy: [
+    { src: '**/*.html' }
+  ],
   excludeSrc: []
-
 };

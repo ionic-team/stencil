@@ -195,7 +195,7 @@ export function _deprecatedToMultipleTarget(config: d.Config) {
       `is an array of output targets. `,
       `Note that not having an "outputTarget" config will default `,
       `to have an { type: "www" } output target. `,
-      `More information aobut the new format can be found here: https://stenciljs.com/docs/stencil-config`
+      `More information aobut the new format can be found here: https://stenciljs.com/docs/config`
     ];
     config.logger.warn(warningMsg.join(''));
   }

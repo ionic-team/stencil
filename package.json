@@ -36,9 +36,7 @@
     "test": "npm run test.jest",
     "test.dist": "node scripts/test-dist.js",
     "test.jest": "jest",
-    "test.karma": "node bin/stencil build -c test/karma/stencil.config.js && node test/karma/node_modules/.bin/karma start test/karma/karma.config.js",
-    "build.karma.app": "tsc -p test/karma/tsconfig.json && node test/karma/dist/build-test-example.js",
-    "test.karma.watch": "node bin/stencil build --dev --watch -c test/karma/stencil.config.js",
+    "test.karma": "cd test/karma && npm run karma.prod",
     "test.watch": "jest --watch",
     "vermoji": "node scripts/vermoji.js"
   },

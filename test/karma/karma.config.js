@@ -109,11 +109,11 @@ module.exports = function(config) {
     // customLaunchers: browserStackLaunchers,
 
     files: [
-      'src/**/cmp.spec.ts',
-      'src/**/cmp.examples.ts',
+      'src/**/*.spec.ts',
       'src/util.ts',
-      'dist/app.js',
-      { pattern: 'dist/app/*.js', watched: false, included: false, served: true, nocache: false },
+      'www/build/app.js',
+      { pattern: 'www/build/app/*.js', watched: false, included: false, served: true, nocache: false },
+      { pattern: 'www/**/*.html', watched: false, included: false, served: true, nocache: false },
     ],
 
     colors: true,
@@ -121,7 +121,8 @@ module.exports = function(config) {
     logLevel: config.LOG_INFO,
 
     proxies: {
-      '/dist/app/*.js': '/base/dist/app/*.js'
+      '/www/app/*.js': '/base/www/app/*.js',
+      '/www/**/*.html': '/base/www/**/*.html'
     },
 
     reporters: [
