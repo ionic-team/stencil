@@ -10,7 +10,7 @@ export function createQueueClient(App: d.AppGlobal, win: Window, highPriorityPen
   const domWrites: d.RafCallback[] = [];
 
   if (!App.raf) {
-    App.raf = window.requestAnimationFrame.bind(window);
+    App.raf = win.requestAnimationFrame.bind(win);
   }
 
   function doHighPriority(cb?: Function) {
@@ -23,22 +23,22 @@ export function createQueueClient(App: d.AppGlobal, win: Window, highPriorityPen
   }
 
 
-  function doWork(start?: number, cb?: d.RafCallback) {
+  function doWork(start?: number) {
     start = now();
 
     // always run all of the high priority work if there is any
     doHighPriority();
 
     // DOM READS!!!
-    while (cb = domReads.shift()) {
-      cb(start);
+    while (domReads.length > 0) {
+      domReads.shift()(start);
     }
 
     // -------------------------------
 
     // DOM WRITES!!!
-    while ((cb = domWrites.shift()) && (now() - start < 40)) {
-      cb(start);
+    while (domWrites.length > 0 && (now() - start < 40)) {
+      domWrites.shift()(start);
     }
 
     // check to see if we still have work to do
@@ -51,23 +51,23 @@ export function createQueueClient(App: d.AppGlobal, win: Window, highPriorityPen
     }
   }
 
-  function flush(start?: number, cb?: d.RafCallback) {
+  function flush(start?: number) {
     // always run all of the high priority work if there is any
     doHighPriority();
 
     // always force a bunch of medium callbacks to run, but still have
     // a throttle on how many can run in a certain time
     // DOM READS!!!
-    while (cb = domReads.shift()) {
-      cb();
+    while (domReads.length > 0) {
+      domReads.shift()(start);
     }
 
     // -------------------------------
 
     start = 4 + now();
     // DOM WRITES!!!
-    while ((cb = domWrites.shift()) && (now() < start)) {
-      cb();
+    while (domWrites.length > 0 && (now() < start)) {
+      domWrites.shift()();
     }
 
     if (rafPending = (domReads.length > 0 || domWrites.length > 0)) {
