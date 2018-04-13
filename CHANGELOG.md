@@ -1,3 +1,13 @@
+<a name="0.7.24"></a>
+## 🍣 [0.7.24](https://github.com/ionic-team/stencil/compare/v0.7.23...v0.7.24) (2018-04-13)
+
+
+### Bug Fixes
+
+* **queue:** ensure all queued callbacks run ([e251802](https://github.com/ionic-team/stencil/commit/e251802))
+
+
+
 <a name="0.7.23"></a>
 ## ☀️ [0.7.23](https://github.com/ionic-team/stencil/compare/v0.7.22...v0.7.23) (2018-04-13)
 
