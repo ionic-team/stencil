@@ -66,6 +66,21 @@ describe('props decorator', () => {
         propType: PROP_TYPE.Number,
         reflectToAttr: true
       },
+      width: {
+        attribName: 'width',
+        attribType: {
+          text: 'number',
+          typeReferences: {}
+        },
+        jsdoc: {
+          documentation: '',
+          name: 'width',
+          type: 'number',
+        },
+        memberType: 1,
+        propType: PROP_TYPE.Number,
+        reflectToAttr: false
+      },
     });
   });
 
@@ -77,28 +92,28 @@ describe('props decorator', () => {
     });
 
     // check strings
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 11; i++) {
       expect(response[`text${i}`].propType).toEqual(PROP_TYPE.String);
     }
 
     // number
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 11; i++) {
       expect(response[`nu${i}`].propType).toEqual(PROP_TYPE.Number);
     }
 
     // boolean
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       expect(response[`bool${i}`].propType).toEqual(PROP_TYPE.Boolean);
     }
 
     // TODO: revisit any vs unknown
     // any
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       expect(response[`any${i}`].propType).toEqual(PROP_TYPE.Any);
     }
 
     // unknown
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 2; i++) {
       expect(response[`unknown${i}`].propType).toEqual(PROP_TYPE.Unknown);
     }
   });

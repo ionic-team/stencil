@@ -25,4 +25,6 @@ class ActionSheet {
     attr: 'my-custom-attr-name',
     reflectToAttr: true
   }) withOptions = 88;
+
+  @Prop() width?: number;
 }

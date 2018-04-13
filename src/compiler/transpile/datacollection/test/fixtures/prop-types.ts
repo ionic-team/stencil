@@ -41,6 +41,7 @@ class MyComponent {
   @Prop() text7: 'md' | 'ios' | undefined;
   @Prop() text8 = returnText();
   @Prop() text9 = 'hola' + 'hello';
+  @Prop() text10?: string;
 
 
   // Expect "number"
@@ -54,11 +55,13 @@ class MyComponent {
   @Prop() nu7: 3 | 0.3 | undefined;
   @Prop() nu8 = returnNu();
   @Prop() nu9 = 3 + 1;
+  @Prop() nu10?: number;
 
   // Expect "boolean"
   @Prop() bool0 = false;
   @Prop() bool1: boolean;
   @Prop() bool2: boolean | null;
+  @Prop() bool3?: boolean;
 
 
   // TODO: revisit any vs unknown
@@ -67,8 +70,10 @@ class MyComponent {
   @Prop() any1 = [];
   @Prop() any2 = {};
   @Prop() any3 = new WeakMap();
+  @Prop() any4?: any;
 
 
   // Expect "unknown"
   @Prop() unknown0: Something;
+  @Prop() unknown1?: Something;
 }
