@@ -47,6 +47,7 @@ export function gatherMetadata(sourceFilePath: string, callback: GatherMetadataC
       visitFile(sourceFile, sourceFile as ts.SourceFile);
     }
   }
+  return diagnostics;
 }
 
 function visitFactory(checker: ts.TypeChecker, componentMetaList: d.ComponentMeta[], diagnostics: d.Diagnostic[], callback: GatherMetadataCallback) {

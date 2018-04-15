@@ -10,7 +10,7 @@ describe('component decorator', () => {
     it('simple decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-simple');
-      const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+      gatherMetadata(sourceFilePath, (checker, classNode) => {
         response = getComponentDecoratorMeta([], checker, classNode);
       });
 
@@ -32,7 +32,7 @@ describe('component decorator', () => {
     it('shadow encapsulation', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-shadow');
-      const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+      gatherMetadata(sourceFilePath, (checker, classNode) => {
         response = getComponentDecoratorMeta([], checker, classNode);
       });
 
@@ -54,7 +54,7 @@ describe('component decorator', () => {
     it('scoped encapsulation', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-scoped');
-      const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+      gatherMetadata(sourceFilePath, (checker, classNode) => {
         response = getComponentDecoratorMeta([], checker, classNode);
       });
 
@@ -76,7 +76,7 @@ describe('component decorator', () => {
     it('should gather jsdoc and hostmeta and styles', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
-      const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+      gatherMetadata(sourceFilePath, (checker, classNode) => {
         response = getComponentDecoratorMeta([], checker, classNode);
       });
 

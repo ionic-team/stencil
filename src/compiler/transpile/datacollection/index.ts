@@ -71,6 +71,7 @@ export function visitClass(diagnostics: d.Diagnostic[], checker: ts.TypeChecker,
     listenersMeta: getListenDecoratorMeta(checker, classNode)
   };
 
+  // watch meta collection MUST happen after prop/state decorator meta collection
   getWatchDecoratorMeta(diagnostics, classNode, cmpMeta);
 
   // validate the user's component class for any common errors
