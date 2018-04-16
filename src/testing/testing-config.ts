@@ -4,6 +4,7 @@ import { TestingSystem } from './testing-sys';
 
 
 export class TestingConfig implements d.Config {
+  _isTesting = true;
   logger = new TestingLogger();
   sys = new TestingSystem();
 

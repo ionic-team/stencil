@@ -16,6 +16,7 @@ export class TestingSystem extends NodeSystem {
 
   constructor() {
     super(new TestingFs());
+    this.createWatcher = null;
   }
 
   get compiler() {
