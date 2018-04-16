@@ -130,6 +130,109 @@ declare global {
 declare global {
 
   namespace StencilComponents {
+    interface LifecycleBasicA {
+
+    }
+  }
+
+  interface HTMLLifecycleBasicAElement extends StencilComponents.LifecycleBasicA, HTMLStencilElement {}
+
+  var HTMLLifecycleBasicAElement: {
+    prototype: HTMLLifecycleBasicAElement;
+    new (): HTMLLifecycleBasicAElement;
+  };
+  interface HTMLElementTagNameMap {
+    'lifecycle-basic-a': HTMLLifecycleBasicAElement;
+  }
+  interface ElementTagNameMap {
+    'lifecycle-basic-a': HTMLLifecycleBasicAElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'lifecycle-basic-a': JSXElements.LifecycleBasicAAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface LifecycleBasicAAttributes extends HTMLAttributes {
+
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface LifecycleBasicB {
+      'value': string;
+    }
+  }
+
+  interface HTMLLifecycleBasicBElement extends StencilComponents.LifecycleBasicB, HTMLStencilElement {}
+
+  var HTMLLifecycleBasicBElement: {
+    prototype: HTMLLifecycleBasicBElement;
+    new (): HTMLLifecycleBasicBElement;
+  };
+  interface HTMLElementTagNameMap {
+    'lifecycle-basic-b': HTMLLifecycleBasicBElement;
+  }
+  interface ElementTagNameMap {
+    'lifecycle-basic-b': HTMLLifecycleBasicBElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'lifecycle-basic-b': JSXElements.LifecycleBasicBAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface LifecycleBasicBAttributes extends HTMLAttributes {
+      'onLifecycleLoad'?: (event: CustomEvent) => void;
+      'onLifecycleUpdate'?: (event: CustomEvent) => void;
+      'value'?: string;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
+    interface LifecycleBasicC {
+      'value': string;
+    }
+  }
+
+  interface HTMLLifecycleBasicCElement extends StencilComponents.LifecycleBasicC, HTMLStencilElement {}
+
+  var HTMLLifecycleBasicCElement: {
+    prototype: HTMLLifecycleBasicCElement;
+    new (): HTMLLifecycleBasicCElement;
+  };
+  interface HTMLElementTagNameMap {
+    'lifecycle-basic-c': HTMLLifecycleBasicCElement;
+  }
+  interface ElementTagNameMap {
+    'lifecycle-basic-c': HTMLLifecycleBasicCElement;
+  }
+  namespace JSX {
+    interface IntrinsicElements {
+      'lifecycle-basic-c': JSXElements.LifecycleBasicCAttributes;
+    }
+  }
+  namespace JSXElements {
+    export interface LifecycleBasicCAttributes extends HTMLAttributes {
+      'onLifecycleLoad'?: (event: CustomEvent) => void;
+      'onLifecycleUpdate'?: (event: CustomEvent) => void;
+      'value'?: string;
+    }
+  }
+}
+
+
+declare global {
+
+  namespace StencilComponents {
     interface SlotBasicRoot {
 
     }
