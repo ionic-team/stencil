@@ -6,8 +6,6 @@ jobs:
       - image: circleci/node:8
     steps:
       - checkout
-      # for Closure Compiler
-      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends openjdk-7-jre-headless
 
       - restore_cache:
           keys:
@@ -19,4 +17,4 @@ jobs:
             - ./node_modules
 
       - run: npm run build
-      - run: npm run test.jest -- --maxWorkers=1
+      - run: npm run test.jest -- --maxWorkers=4
