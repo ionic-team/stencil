@@ -50,6 +50,10 @@ export function ssrMiddleware(middlewareConfig: d.MiddlewareConfig) {
 
   const config: d.Config = middlewareConfig.config;
 
+  // set the ssr flag
+  config.flags = config.flags || {};
+  config.flags.ssr = true;
+
   // create the renderer
   const renderer = new Renderer(middlewareConfig.config);
 

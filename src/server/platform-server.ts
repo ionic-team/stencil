@@ -27,7 +27,7 @@ export function createPlatformServer(
   compilerCtx?: d.CompilerCtx
 ): d.PlatformApi {
   const loadedBundles: {[bundleId: string]: any} = {};
-  const styles: string[] = [];
+  const styles: {[tagName: string]: string} = {};
   const controllerComponents: {[tag: string]: d.HostElement} = {};
 
   const domApi = createDomApi(App, win, doc);
@@ -129,7 +129,9 @@ export function createPlatformServer(
     if (plt.hasLoadedMap.has(rootElm) || failureDiagnostic) {
       // the root node has loaded
       // and there are no css files still loading
-      plt.onAppLoad && plt.onAppLoad(rootElm, styles, failureDiagnostic);
+      const allStyles = Object.keys(styles).map(tagName => styles[tagName]);
+
+      plt.onAppLoad && plt.onAppLoad(rootElm, allStyles, failureDiagnostic);
     }
   }
 
@@ -180,7 +182,7 @@ export function createPlatformServer(
           }
 
           if (componentConstructor.style) {
-            styles.push(componentConstructor.style);
+            styles[cmpMeta.tagNameMeta] = componentConstructor.style;
           }
         }
       });
@@ -225,6 +227,9 @@ export function createPlatformServer(
 
     // It is possible the data was loaded from an outside source like tests
     if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor) {
+      if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style) {
+        styles[cmpMeta.tagNameMeta] = cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style;
+      }
       queueUpdate(plt, elm);
 
     } else {
@@ -234,6 +239,9 @@ export function createPlatformServer(
 
       if (loadedBundles[bundleId]) {
         // sweet, we've already loaded this bundle
+        if (cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style) {
+          styles[cmpMeta.tagNameMeta] = cmpRegistry[cmpMeta.tagNameMeta].componentConstructor.style;
+        }
         queueUpdate(plt, elm);
 
       } else {

@@ -52,6 +52,26 @@ describe('validateConfig', () => {
     expect(outputTarget.prerenderLocations).toEqual([{ path: '/docs/' }]);
   });
 
+  it('default ssr when flag true, prod mode', () => {
+    config.flags = { ssr: true };
+    validateConfig(config);
+
+    const outputTarget: d.OutputTargetWww = config.outputTargets.find(o => o.type === 'www');
+    expect(outputTarget.baseUrl).toBe('/');
+    expect(outputTarget.canonicalLink).toBe(true);
+    expect(outputTarget.collapseWhitespace).toBe(true);
+    expect(outputTarget.hydrateComponents).toBe(true);
+    expect(outputTarget.inlineStyles).toBe(true);
+    expect(outputTarget.inlineLoaderScript).toBe(true);
+    expect(outputTarget.inlineAssetsMaxSize).toBe(0);
+    expect(outputTarget.prerenderUrlCrawl).toBe(false);
+    expect(outputTarget.prerenderLocations).toEqual([]);
+    expect(outputTarget.prerenderPathHash).toBe(false);
+    expect(outputTarget.prerenderPathQuery).toBe(false);
+    expect(outputTarget.prerenderMaxConcurrent).toBe(0);
+    expect(outputTarget.removeUnusedStyles).toBe(false);
+  });
+
   it('default prerender when flag true, prod mode', () => {
     config.flags = { prerender: true };
     validateConfig(config);
