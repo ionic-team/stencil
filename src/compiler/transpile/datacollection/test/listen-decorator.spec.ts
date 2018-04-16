@@ -8,7 +8,7 @@ describe('listen decorator', () => {
   it('simple decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/listen-simple');
-    const metadata = gatherMetadata(sourceFilePath, (checker, classNode) => {
+    gatherMetadata(sourceFilePath, (checker, classNode) => {
       response = getListenDecoratorMeta(checker, classNode);
     });
 

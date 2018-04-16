@@ -9,7 +9,7 @@ describe('props decorator', () => {
   it('simple decorator', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/prop-example');
-    const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
+    gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
       response = getPropDecoratorMeta(diagnostics, checker, classNode, sourceFile, 'ClassName');
     });
 
@@ -87,33 +87,33 @@ describe('props decorator', () => {
   it('proper types', () => {
     let response;
     const sourceFilePath = path.resolve(__dirname, './fixtures/prop-types');
-    const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
+    gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
       response = getPropDecoratorMeta(diagnostics, checker, classNode, sourceFile, 'ClassName');
     });
 
     // check strings
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 12; i++) {
       expect(response[`text${i}`].propType).toEqual(PROP_TYPE.String);
     }
 
     // number
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 12; i++) {
       expect(response[`nu${i}`].propType).toEqual(PROP_TYPE.Number);
     }
 
     // boolean
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 5; i++) {
       expect(response[`bool${i}`].propType).toEqual(PROP_TYPE.Boolean);
     }
 
     // TODO: revisit any vs unknown
     // any
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 6; i++) {
       expect(response[`any${i}`].propType).toEqual(PROP_TYPE.Any);
     }
 
     // unknown
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       expect(response[`unknown${i}`].propType).toEqual(PROP_TYPE.Unknown);
     }
   });

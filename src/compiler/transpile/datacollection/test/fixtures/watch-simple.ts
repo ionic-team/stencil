@@ -1,4 +1,4 @@
-import { Component, Method, PropWillChange, PropDidChange, Watch } from '../../../../../index';
+import { Component, Method, PropWillChange, PropDidChange, Watch, Prop } from '../../../../../index';
 
 /**
  * This is an actionSheet class
@@ -18,6 +18,14 @@ class ActionSheet {
    * Create method for something
    * @param opts action sheet options
    */
+  @State() checked: any;
+  @Prop() someProp: any;
+  @Prop() someProp1: any;
+  @Prop() someProp2: any;
+  @Prop() someProp3: any;
+  @Prop({mutable: true}) prop1: any;
+  @Prop({mutable: true}) prop2: any;
+  @Prop({mutable: true}) prop3: any;
 
   /**
    * CheckedChanged

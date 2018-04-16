@@ -11,7 +11,7 @@ describe('component', () => {
     it('complex decorator', () => {
       let response;
       const sourceFilePath = path.resolve(__dirname, './fixtures/component-example');
-      const metadata = gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
+      gatherMetadata(sourceFilePath, (checker, classNode, sourceFile, diagnostics) => {
         response = visitClass(diagnostics, checker, classNode, sourceFile);
       });
 
