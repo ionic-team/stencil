@@ -1,12 +1,17 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const cp = require('child_process');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-renderer-vdom');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'renderer/vdom/index.js');
 const DEST_DIR = path.join(__dirname, '../dist/renderer/vdom');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
+
+
+// transpile
+cp.execSync('node ../node_modules/.bin/tsc -p ../src/renderer/vdom/tsconfig.json', { cwd: __dirname });
 
 
 function bundleRenderer() {

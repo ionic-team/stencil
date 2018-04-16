@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const cp = require('child_process');
 
 
 const ROOT_DIR = path.join(__dirname, '../');
@@ -17,6 +18,10 @@ const inputFile = path.join(TRANSPILED_DIR, 'client/core.js');
 const outputFile = path.join(DIST_CLIENT_DIR, 'core.build.js');
 
 
+// transpile
+cp.execSync('node ../node_modules/.bin/tsc -p ../src/tsconfig.json', { cwd: __dirname });
+
+
 // empty out the dist/client directory
 fs.ensureDirSync(DIST_CLIENT_DIR);
 
@@ -27,6 +32,7 @@ createIndexJs();
 copyMainDTs();
 copyClientFiles();
 copyUtilDir();
+buildLoader();
 
 
 function bundleClientCore() {
@@ -113,6 +119,28 @@ function createIndexJs() {
   // create an empty index.js file so node resolve works
   const writeMainJsPath = path.join(DST_DIR, 'index.js');
   fs.writeFileSync(writeMainJsPath, '// @stencil/core');
+}
+
+
+function buildLoader() {
+  const srcLoaderPath = path.join(TRANSPILED_DIR, 'client/loader.js');
+  const dstLoaderPath = path.join(DST_DIR, 'client/loader.js');
+
+  let content = fs.readFileSync(srcLoaderPath, 'utf-8');
+
+  content = content.replace(/export function /g, 'function ');
+
+  content = `(function(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCoreSsr, appCorePolyfilled, hydratedCssClass, components) {
+
+  ${content}
+
+  init(win, doc, namespace, fsNamespace, resourcesUrl, appCore, appCoreSsr, appCorePolyfilled, hydratedCssClass, components);
+
+  })(window, document, '__APP__');`;
+
+  fs.writeFileSync(dstLoaderPath, content);
+
+  console.log(`✅ loader: ${dstLoaderPath}`);
 }
 
 

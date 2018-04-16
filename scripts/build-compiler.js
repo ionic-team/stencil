@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
+const cp = require('child_process');
 
 
 const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-compiler');
@@ -9,6 +10,10 @@ const DEST_DIR = path.join(__dirname, '../dist/compiler');
 const DEST_FILE = path.join(DEST_DIR, 'index.js');
 const DECLARATIONS_SRC_DIR = path.join(TRANSPILED_DIR, 'declarations');
 const DECLARATIONS_DST_DIR = path.join(__dirname, '../dist/declarations');
+
+
+// transpile
+cp.execSync('node ../node_modules/.bin/tsc -p ../src/compiler/tsconfig.json', { cwd: __dirname });
 
 
 function bundleCompiler() {

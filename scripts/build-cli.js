@@ -1,12 +1,14 @@
 const fs = require('fs-extra');
 const path = require('path');
 const rollup = require('rollup');
-
+const cp = require('child_process');
 
 const TRANSPILED_DIR = path.join(__dirname, '../dist/transpiled-cli');
 const ENTRY_FILE = path.join(TRANSPILED_DIR, 'cli/index.js');
 const DEST_FILE = path.join(__dirname, '../dist/cli/index.js');
 
+// transpile
+cp.execSync('node ../node_modules/.bin/tsc -p ../src/cli/tsconfig.json', { cwd: __dirname });
 
 function bundle() {
   rollup.rollup({
