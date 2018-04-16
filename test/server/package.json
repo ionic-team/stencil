@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "node ../../bin/stencil build",
-    "serve": "node ./server.js",
+    "serve.express": "node ./server.express.js",
+    "serve.node": "node ./server.node.js",
     "test": "node ../../node_modules/.bin/jest --no-cache",
     "test.prod": "npm install && npm run build && npm run test"
   },
