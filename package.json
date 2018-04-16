@@ -35,6 +35,7 @@
     "test.dist": "node scripts/test-dist.js",
     "test.jest": "jest",
     "test.karma": "cd test/karma && npm run karma.prod",
+    "test.server": "cd test/server && npm run test.prod",
     "test.watch": "jest --watch",
     "vermoji": "node scripts/vermoji.js"
   },

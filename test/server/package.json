@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "build": "node ../../bin/stencil build",
+    "serve": "node ./server.js",
+    "test": "node ../../node_modules/.bin/jest --no-cache",
+    "test.prod": "npm install && npm run build && npm run test"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.3",
+    "supertest": "^3.0.0"
+  }
+}
