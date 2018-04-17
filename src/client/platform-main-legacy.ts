@@ -24,7 +24,7 @@ import { useScopedCss } from '../renderer/vdom/encapsulation';
 export function createPlatformMainLegacy(namespace: string, Context: d.CoreContext, win: Window, doc: Document, resourcesUrl: string, hydratedCssClass: string) {
   const cmpRegistry: d.ComponentRegistry = { 'html': {} };
   const bundleQueue: d.BundleCallback[] = [];
-  const loadedBundles: {[bundleId: string]: any} = {};
+  const loadedBundles: {[bundleId: string]: d.CjsExports} = {};
   const pendingBundleRequests: {[url: string]: boolean} = {};
   const controllerComponents: {[tag: string]: d.HostElement} = {};
   const App: d.AppGlobal = (win as any)[namespace] = (win as any)[namespace] || {};
@@ -141,6 +141,17 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   }
 
+  function setLoadedBundle(bundleId: string, value: d.CjsExports) {
+    loadedBundles[bundleId] = value;
+  }
+
+  function getLoadedBundle(bundleId: string) {
+    if (bundleId == null) {
+      return null;
+    }
+    return loadedBundles[bundleId.replace(/^\.\//, '')];
+  }
+
   /**
    * Execute a bundle queue item
    * @param name
@@ -151,7 +162,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     const bundleExports: d.CjsExports = {};
 
     try {
-      callback(bundleExports, ...deps.map(d => loadedBundles[d]));
+      callback(bundleExports, ...deps.map(d => getLoadedBundle(d)));
     } catch (e) {
       console.error(e);
     }
@@ -161,12 +172,12 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       return;
     }
 
-    loadedBundles[name] = bundleExports;
+    setLoadedBundle(name, bundleExports);
 
     // If name contains chunk then this callback was associated with a dependent bundle loading
     // let's add a reference to the constructors on each components metadata
     // each key in moduleImports is a PascalCased tag name
-    if (!name.startsWith('./chunk')) {
+    if (!name.startsWith('chunk')) {
       Object.keys(bundleExports).forEach(pascalCasedTagName => {
         const cmpMeta = cmpRegistry[toDashCase(pascalCasedTagName)];
         if (cmpMeta) {
@@ -179,13 +190,14 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
     }
   }
 
+
   /**
    * Check to see if any items in the bundle queue can be executed
    */
   function checkQueue() {
     for (let i = bundleQueue.length - 1; i > -1; i--) {
       const [bundleId, dependentsList, importer] = bundleQueue[i];
-      if (dependentsList.every(dep => loadedBundles[dep]) && !loadedBundles[bundleId]) {
+      if (dependentsList.every(dep => !!getLoadedBundle(dep)) && !getLoadedBundle(bundleId)) {
         execBundleCallback(bundleId, dependentsList, importer);
       }
     }
@@ -196,7 +208,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
    */
   App.loadBundle = function loadBundle(bundleId: string, [, ...dependentsList]: string[], importer: Function) {
 
-    const missingDependents = dependentsList.filter(d => !loadedBundles[d]);
+    const missingDependents = dependentsList.filter(d => !getLoadedBundle(d));
     missingDependents.forEach(d => {
         const url = resourcesUrl + d.replace('.js', '.es5.js');
         requestUrl(url);
@@ -243,7 +255,7 @@ export function createPlatformMainLegacy(namespace: string, Context: d.CoreConte
       cmpMeta.bundleIds :
       cmpMeta.bundleIds[elm.mode];
 
-    if (loadedBundles[bundleId]) {
+    if (getLoadedBundle(bundleId)) {
       // sweet, we've already loaded this bundle
       queueUpdate(plt, elm);
 
