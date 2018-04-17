@@ -110,11 +110,12 @@ describe('bundle-module', () => {
 
       const r = await c.build();
       expect(r.diagnostics).toEqual([]);
+      console.log(r.filesWritten);
 
       expectFiles(c.fs, [
         '/www/build/app/cmp-a.js',
         '/www/build/app/cmp-b.js',
-        '/www/build/app/chunk1.js'
+        '/www/build/app/chunk-304ba7c3.js'
       ]);
     });
 

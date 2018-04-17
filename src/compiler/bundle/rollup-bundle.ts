@@ -6,7 +6,7 @@ import { generatePreamble, hasError } from '../util';
 import { getBundleIdPlaceholder } from '../../util/data-serialize';
 import localResolution from './rollup-plugins/local-resolution';
 import inMemoryFsRead from './rollup-plugins/in-memory-fs-read';
-import { InputOptions, OutputChunk, rollup } from 'rollup';
+import { BundleSet, OutputChunk, RollupDirOptions, rollup } from 'rollup';
 import nodeEnvVars from './rollup-plugins/node-env-vars';
 import pathsResolution from './rollup-plugins/paths-resolution';
 import resolveCollections from './rollup-plugins/resolve-collections';
@@ -15,7 +15,7 @@ import resolveCollections from './rollup-plugins/resolve-collections';
 export async function createBundle(config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, entryModules: EntryModule[]) {
   const builtins = require('rollup-plugin-node-builtins');
   const globals = require('rollup-plugin-node-globals');
-  let rollupBundle: OutputChunk;
+  let rollupBundle: BundleSet;
 
   const commonjsConfig = {
     include: 'node_modules/**',
@@ -23,7 +23,7 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
     ...config.commonjs
   };
 
-  const rollupConfig: InputOptions = {
+  const rollupConfig: RollupDirOptions = {
     input: entryModules.map(b => b.entryKey),
     experimentalCodeSplitting: true,
     preserveSymlinks: false,
@@ -63,8 +63,8 @@ export async function createBundle(config: Config, compilerCtx: CompilerCtx, bui
 }
 
 
-export async function writeEsModules(config: Config, rollupBundle: OutputChunk) {
-  const results = await rollupBundle.generate({
+export async function writeEsModules(config: Config, rollupBundle: BundleSet) {
+  const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
     format: 'es',
     banner: generatePreamble(config),
     intro: `const { h } = window.${config.namespace};`,
@@ -73,18 +73,16 @@ export async function writeEsModules(config: Config, rollupBundle: OutputChunk) 
 }
 
 
-export async function writeLegacyModules(config: Config, rollupBundle: OutputChunk, entryModules: EntryModule[]) {
-  const { chunks } = <any>rollupBundle;
-  Object.keys(chunks).map(key => {
-    return [key, chunks[key]];
-  }).forEach(([key, value]) => {
+export async function writeLegacyModules(config: Config, rollupBundle: BundleSet, entryModules: EntryModule[]) {
+  rollupBundle.cache.modules.forEach(module => {
+    const key = module.id;
     const entryModule = entryModules.find(b => b.entryKey === `./${key}.js`);
     if (entryModule) {
-      entryModule.dependencies = (<any>value).imports.slice();
+      entryModule.dependencies = module.dependencies.slice();
     }
   });
 
-  const results = await rollupBundle.generate({
+  const results: { [chunkName: string]: OutputChunk } = await rollupBundle.generate({
     format: 'amd',
     amd: {
       id: getBundleIdPlaceholder(),
