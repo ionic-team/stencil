@@ -31,7 +31,12 @@ export function generateEntryModules(config: Config, compilerCtx: CompilerCtx, b
 
     const cleanedEntryModules = regroupEntryModules(allModules, buildCtx.entryPoints);
 
-    buildCtx.entryModules = cleanedEntryModules.map(createEntryModule);
+    buildCtx.entryModules = cleanedEntryModules
+      .map(createEntryModule)
+      .filter((entryModule, index, array) => {
+        const firstIndex = array.findIndex(e => e.entryKey === entryModule.entryKey);
+        return firstIndex === index;
+      });
 
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
