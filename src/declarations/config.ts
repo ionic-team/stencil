@@ -23,6 +23,7 @@ export interface Config {
   hashFileNames?: boolean;
   hydratedCssClass?: string;
   includeSrc?: string[];
+  loaders?: any;
   logger?: d.Logger;
   logLevel?: 'error'|'warn'|'info'|'debug'|string;
   minifyCss?: boolean;

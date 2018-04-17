@@ -14,13 +14,22 @@ export function init(
   HTMLElementPrototype: any,
   App?: d.AppGlobal,
   x?: any, y?: any, scriptElm?: HTMLScriptElement,
-  orgComponentOnReady?: Function
+  orgComponentOnReady?: Function,
+  firstLoader?: boolean
 ) {
   // create global namespace if it doesn't already exist
-  App = win[namespace] = win[namespace] || {};
-  App.components = components;
+  App = win[namespace] = (firstLoader = !win[namespace]) ? {} : win[namespace];
+  
+  // create global set of tags if it doesn't already exist
+  x = (win as any).$definedCmps = (win as any).$definedCmps || {};
 
-  y = components.filter(function(c) { return c[2]; }).map(function(c) { return c[0]; });
+  components = components.filter(function(c) { 
+    const newCpms = !x.hasOwnProperty(c[0]);
+    if (newCpms) x[c[0]] = false;
+    return newCpms && c[2]; 
+  });
+  
+  y = components.map(function (c) { return c[0]; });
   if (y.length) {
     // auto hide components until they been fully hydrated
     // reusing the "x" and "i" variables from the args for funzies
@@ -97,25 +106,32 @@ export function init(
     resourcesUrl = (y.join('/')) + (y.length ? '/' : '') + fsNamespace + '/';
   }
 
-  // request the core this browser needs
-  // test for native support of custom elements and fetch
-  // if either of those are not supported, then use the core w/ polyfills
-  // also check if the page was build with ssr or not
-  x = doc.createElement('script');
-  if (usePolyfills(win, win.location, x, 'import("")')) {
-    // requires the es5/polyfilled core
-    x.src = resourcesUrl + appCorePolyfilled;
+  if (firstLoader) {
+    App.components = components;
+    
+    // request the core this browser needs
+    // test for native support of custom elements and fetch
+    // if either of those are not supported, then use the core w/ polyfills
+    // also check if the page was build with ssr or not
+    x = doc.createElement('script');
+    if (usePolyfills(win, win.location, x, 'import("")')) {
+      // requires the es5/polyfilled core
+      x.src = resourcesUrl + appCorePolyfilled;
 
+    } else {
+      // let's do this!
+      x.src = resourcesUrl + appCore;
+      x.setAttribute('type', 'module');
+      x.setAttribute('crossorigin', true);
+    }
+
+    x.setAttribute('data-resources-url', resourcesUrl);
+    x.setAttribute('data-namespace', fsNamespace);
+    doc.head.appendChild(x);
   } else {
-    // let's do this!
-    x.src = resourcesUrl + appCore;
-    x.setAttribute('type', 'module');
-    x.setAttribute('crossorigin', true);
+    components.forEach((c: d.LoadComponentRegistry) => { App.components.push(c) });
+    if (App.initialized) App.registerComponents(components);
   }
-
-  x.setAttribute('data-resources-url', resourcesUrl);
-  x.setAttribute('data-namespace', fsNamespace);
-  doc.head.appendChild(x);
 }
 
 

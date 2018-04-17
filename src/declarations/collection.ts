@@ -26,7 +26,7 @@ export interface CollectionCompiler {
 export interface AppRegistry {
   namespace?: string;
   fsNamespace?: string;
-  loader?: string;
+  loaders?: string[];
   core?: string;
   corePolyfilled?: string;
   global?: string;

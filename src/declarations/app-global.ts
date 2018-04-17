@@ -13,6 +13,7 @@ export interface AppGlobal {
   raf?: DomControllerCallback;
   rel?: (elm: Element|Document|Window, eventName: string, cb: d.EventListenerCallback, opts?: d.ListenOptions) => void;
   $r?: { 0: d.HostElement, 1: () => void }[];
+  registerComponents?: (components: d.LoadComponentRegistry[]) => void;
 }
 
 

@@ -58,15 +58,17 @@ async function readPackageJson(config: d.Config, compilerCtx: d.CompilerCtx) {
 export function validatePackageJson(config: d.Config, outputTarget: d.OutputTargetDist, diagnostics: d.Diagnostic[], pkgData: d.PackageJsonData) {
   validatePackageFiles(config, outputTarget, diagnostics, pkgData);
 
-  const mainFileName = getLoaderFileName(config);
-  const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.buildDir), mainFileName);
+  if (!config.loaders) {
+    const mainFileName = getLoaderFileName(config.namespace);
+    const main = pathJoin(config, config.sys.path.relative(config.rootDir, outputTarget.buildDir), mainFileName);
 
-  if (!pkgData.main || normalizePath(pkgData.main) !== main) {
-    const err = buildWarn(diagnostics);
-    err.header = `package.json error`;
-    err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
+    if (!pkgData.main || normalizePath(pkgData.main) !== main) {
+      const err = buildWarn(diagnostics);
+      err.header = `package.json error`;
+      err.messageText = `package.json "main" property is required when generating a distribution and must be set to: ${main}`;
+    }
   }
-
+  
   if (typeof pkgData.types !== 'string' || pkgData.types === '') {
     const componentsDtsFileAbsPath = config.sys.path.join(outputTarget.typesDir, COMPONENTS_DTS);
     const componentsDtsFileRelPath = pathJoin(config, config.sys.path.relative(config.rootDir, componentsDtsFileAbsPath));

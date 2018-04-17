@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { getLoaderFileName, getLoaderPath } from '../app/app-file-naming';
+import { getLoaders, getLoaderFileName, getLoaderPath } from '../app/app-file-naming';
 import { normalizePath } from '../util';
 
 
@@ -10,20 +10,23 @@ export async function inlineLoaderScript(
   windowLocationPath: string,
   doc: Document
 ) {
-  // create the script url we'll be looking for
-  const loaderFileName = getLoaderFileName(config);
 
-  // find the external loader script
-  // which is usually in the <head> and a pretty small external file
-  // now that we're prerendering the html, and all the styles and html
-  // will get hardcoded in the output, it's safe to now put the
-  // loader script at the bottom of <body>
-  const scriptElm = findExternalLoaderScript(doc, loaderFileName);
+  await Promise.all(getLoaders(config).map(async (loader: string) => {
+    // create the script url we'll be looking for
+    const loaderFileName = getLoaderFileName(loader);
 
-  if (scriptElm) {
-    // append the loader script content to the bottom of <body>
-    await updateInlineLoaderScriptElement(config, compilerCtx, outputTarget, doc, windowLocationPath, scriptElm);
-  }
+    // find the external loader script
+    // which is usually in the <head> and a pretty small external file
+    // now that we're prerendering the html, and all the styles and html
+    // will get hardcoded in the output, it's safe to now put the
+    // loader script at the bottom of <body>
+    const scriptElm = findExternalLoaderScript(doc, loaderFileName);
+
+    if (scriptElm) {
+      // append the loader script content to the bottom of <body>
+      await updateInlineLoaderScriptElement(config, compilerCtx, outputTarget, loader, doc, windowLocationPath, scriptElm);
+    }
+  })); 
 }
 
 
@@ -70,9 +73,9 @@ export function isLoaderScriptSrc(loaderFileName: string, scriptSrc: string) {
 }
 
 
-async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, doc: Document, windowLocationPath: string, scriptElm: HTMLScriptElement) {
+async function updateInlineLoaderScriptElement(config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetHydrate, loader: string, doc: Document, windowLocationPath: string, scriptElm: HTMLScriptElement) {
   // get the file path
-  const appLoaderPath = getLoaderPath(config, outputTarget);
+  const appLoaderPath = getLoaderPath(config, outputTarget, loader);
 
   // get the loader content
   let content: string = null;

@@ -1,13 +1,17 @@
 import { AppRegistry, AppRegistryComponents, CompilerCtx, ComponentRegistry, Config, OutputTarget } from '../../declarations';
-import { getLoaderFileName, getRegistryJson } from './app-file-naming';
+import { getLoaders, getLoaderFileName, getRegistryJson } from './app-file-naming';
 
 
 export function createAppRegistry(config: Config) {
+  const loaders: string[] = [];
+  getLoaders(config).forEach(loader => {
+      loaders.push(`../${getLoaderFileName(loader)}`);
+  });
   // create the shared app registry object
   const appRegistry: AppRegistry = {
     namespace: config.namespace,
     fsNamespace: config.fsNamespace,
-    loader: `../${getLoaderFileName(config)}`
+    loaders: loaders
   };
 
   return appRegistry;
